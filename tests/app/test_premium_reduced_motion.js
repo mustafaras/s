@@ -109,6 +109,25 @@ console.log('\n[4b] FX-P-82 — nav bounce + badge pop');
     covered && /animation\s*:\s*none\s*!important/.test(reduceText));
 })();
 
+// ── Test 4c: FX-P-83 — surface derinlik + glass genişlemesi ────────────────
+console.log('\n[4c] FX-P-83 — surface derinlik + glass');
+(function(){
+  // (1) styles.css'te @media (hover:hover) bloğunda .surface:hover mevcut
+  var hoverBlocks = css.match(/@media\s*\(hover:\s*hover\)\s*\{[\s\S]*?\n\}/g) || [];
+  var surfaceHoverInHover = hoverBlocks.some(function(b){
+    return b.indexOf('.surface:hover') > -1 && b.indexOf('.surface{') > -1;
+  });
+  ok('hover:hover bloğunda .surface:hover kuralı var', surfaceHoverInHover, 'hover bloğu sayısı: '+hoverBlocks.length);
+
+  // (2) reduce bloğu .surface transform'unu kapsıyor; @supports backdrop-filter bloğu mevcut
+  var surfaceInReduce = reduceText.indexOf('.surface') > -1;
+  ok('reduce bloğu .surface kapsıyor', surfaceInReduce);
+  ok('reduce bloğunda transform:none kullanılıyor',
+    surfaceInReduce && /transform\s*:\s*none\s*!important/.test(reduceText));
+  ok('@supports (backdrop-filter: blur(1px)) bloğu mevcut',
+    css.indexOf('@supports (backdrop-filter: blur(1px))') > -1);
+})();
+
 console.log('\n=== Özet ===');
 console.log('Passed: '+passed+' / '+(passed+failed));
 process.exit(failed ? 1 : 0);

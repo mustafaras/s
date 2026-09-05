@@ -6,6 +6,38 @@
 **Plan sürümü:** 2.3
 **Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
 
+## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-83 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-83 (surface derinlik + glass genişlemesi — salt CSS)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı
+  (`zikirmatik-manuel-zikir` üzerinde; ağaçtaki önceden var olan çalışma korunarak).
+  Sıradaki kart: **FX-P-84** (SeyOnSynced bell).
+- **FX-P-83 uygulaması:** `app/styles.css` FX bölümüne (1) genel kart derinliği:
+  `@media (hover:hover)` içinde `.surface` transition + `.surface:hover`
+  translateY(-2px)/box-shadow; touch cihazda hover-stick engellendi; dokunmada
+  yalnız `.surface:active` scale(.97); kendi `prefers-reduced-motion` bloğu
+  (transition+transform `none!important`). (2) Glass/blur: `@supports
+  (backdrop-filter: blur(1px))` içinde **yalnız doğrulanmış iki kalıcı yüzeye**
+  (`.sey-appheader`, `.sey-bottomnav` — render'da gerçek sınıf adları doğrulandı)
+  blur(14px) saturate(1.1). Kartın önerdiği `.overlay`/`.modal` genel sınıfları
+  app.js'te **mevcut değil** — overlay backdrop'ları inline stilli (sey-ov-back,
+  compact modal'lar zaten inline blur'lu; sey-room-overlay kendi blur'unu
+  satır içinde taşıyor), bu yüzden kartın "Tahminle sınıf uydurma" kuralına
+  uyularak genişletilmedi. Boot flaşı riski yok: mevcut `.sey-app-booted`
+  neutralizer bu iki yüzeyin blur'unu boot sonrası zaten sabitlemiyor
+  (`backdrop-filter:none` listesi dışında) — yalnız animasyon/transition'u
+  kesiyor; iOS parlama riski kartın kapsamı dışında gözlendi.
+  `app.js`/`index.html` DOKUNULMADI (cache-bump gereksiz: styles.css zaten
+  `?v=20260906a`'da); `contain` eklenmedi (FX-P-89'a ait).
+- **Testler:** syntax OK; driver fail=0; zikr 95/95; reduced-motion fixture
+  27→31 (+4 FX-P-83 assertion); kontrast 30 token 4.5:1 altı 0; theme-tristate
+  26/26; premium ailesi 9/9 yeşil.
+- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), tek `app.js` (`src` sayısı 1).
+- **Değişmezler:** I1–I6 korundu (data şekli, migrate/save/sync davranışı,
+  App.* yalnız-ekleme, tek app.js).
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
+
 ## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-82 tamamlandı)
 
 - **Son tamamlanan prompt:** FX-P-82 (nav bounce + badge pop — salt CSS)

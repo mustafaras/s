@@ -1621,6 +1621,26 @@
 .sey-bottomnav-badge{animation:seyBadgePop .3s var(--ease-premium,cubic-bezier(.16,1,.3,1));transform-origin:center;}
 @media (prefers-reduced-motion: reduce){.sey-bottomnav-item.is-active .sey-bottomnav-glyph,.sey-bottomnav-badge{animation:none!important;}}
 
+/* FX-P-83: genel kart derinliği — yalnız hover kabiliyetli cihazlarda;
+   dokunmada yalnız :active tepkisi (mobilde hover-stick engellenir). */
+@media (hover:hover){
+  .surface{transition:transform .18s var(--ease-premium,cubic-bezier(.16,1,.3,1)),box-shadow .18s ease;}
+  .surface:hover{transform:translateY(-2px);box-shadow:0 10px 24px color-mix(in srgb,var(--text) 8%,transparent);}
+}
+.surface:active{transform:scale(.97);}
+@media (prefers-reduced-motion: reduce){.surface,.surface:hover,.surface:active{transition:none!important;transform:none!important;}}
+
+/* FX-P-83: glass/blur — yalnız doğrulanmış iki kalıcı yüzeye (appheader +
+   bottomnav; render'da gerçek sınıfları doğrulandı). Genel `.overlay`/`.modal`
+   sınıfları app.js'te mevcut DEĞİL: overlay backdrop'ları inline stilli
+   (sey-ov-back, compact modal'lar zaten inline blur taşıyor; sey-room-overlay
+   kendi blur'unu satır içinde tanımlı) — tahminle sınıf uydurulmadı.
+   Eski iOS'ta backdrop-filter yoksa mevcut opak görünüm aynen korunur (@supports). */
+@supports (backdrop-filter: blur(1px)){
+  .sey-appheader,.sey-bottomnav{backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);}
+  .sey-appheader{border-color:color-mix(in srgb,var(--text) 10%,var(--field-bd,#E7DFE6));}
+}
+
 /* FX-P-32: Dokunma ripple efekti — SeyFx.ripple() tarafından üretilen dalga.
    Master switch (premiumAtmosphere) ve reduced-motion'a saygılıdır. */
 .sey-ripple {

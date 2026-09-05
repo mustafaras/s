@@ -6,6 +6,31 @@
 **Plan sürümü:** 2.3
 **Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
 
+## Son Durum (FX-WAVE-2 Dalga 10 — FX-P-89 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-89 (#app contain izole denemesi — DENEYSEL, **kullanıcı onaylı**)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
+  Sıradaki kart: **FX-P-90** (bağımsız denetim + seri kapanışı — seri sırasındaki
+  son kart; FX-P-88 bu seride bloklu/kartsız).
+- **FX-P-89 uygulaması:** `app/styles.css` FX bölümüne **tek kural**:
+  `#app{contain:layout style;}` (paint/size KULLANILMADI — kart yasağı).
+  Kart satırları FX-P-81/83/85 ile kaydığı için kural aurora bloğu ile ripple
+  bloğu arasına yerleştirildi. `index.html` cache-bump: `styles.css?v=20260906a`→`?v=20260906d`
+  (a'yı FX-P-81/83 tüketmişti; d FX-P-87'de app.js/state.js için kullanılmıştı —
+  harf çakışması yok, styles.css kendi zincirinde yeni).
+- **Deney kararı: contain:layout style BAŞARILI.** Dump karşılaştırması
+  (bugun + rapor): before/after tek fark anlık hesaplanan bir skor değeri
+  (85/100 → 86/100, contain ile ilgisiz — bugün değişen canlı veri); yapısal
+  diff SIFIR. Riskli yüzeyler doğrulandı: `#sey-splash` + `#sey-aurora`
+  `#app`'in kardeşi (contain'den etkilenmez), `.sey-bottomnav` dump'ta tam
+  üretildi, appheader/appheader-2 marker'ları yerinde.
+- **Testler:** syntax OK; driver fail=0; zikr 95/95; panel-v2 family **0 fail**;
+  reduced-motion 31/31; time-theme 53/53; splash 16/16; premium ailesi 9/9 yeşil.
+- **S6 değişmezler:** App.* yüzeyi 717 (FX-P-87 sonrası değer — değişmedi),
+  tek `app.js` (`src` sayısı 1), contain yalnız `#app`'ta (root/body/html temiz).
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
+
 ## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-87 tamamlandı)
 
 - **Son tamamlanan prompt:** FX-P-87 (voicePitch + voiceVoiceName UI ve backfill — integration)

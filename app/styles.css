@@ -1641,6 +1641,10 @@
   .sey-appheader{border-color:color-mix(in srgb,var(--text) 10%,var(--field-bd,#E7DFE6));}
 }
 
+/* FX-P-89 (DENEYSEL): #app içine layout izolasyonu. paint/size KULLANMA —
+   fixed nav/splash taşma riski. Regresyonda bu blok tamamen geri alınır. */
+#app{contain:layout style;}
+
 /* FX-P-32: Dokunma ripple efekti — SeyFx.ripple() tarafından üretilen dalga.
    Master switch (premiumAtmosphere) ve reduced-motion'a saygılıdır. */
 .sey-ripple {

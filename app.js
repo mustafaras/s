@@ -12543,20 +12543,20 @@ function ayarlarHTML(){
   // master kapalıyken alt satırlar kilitli görünür (gating mediaFx/timeTheme'de).
   var paOn=!(data.settings&&data.settings.premiumAtmosphere===false);
   var fxRows=[
-    ['uiSounds','🔊 Arayüz sesleri','Tıklama, başarı ve uyarı tonları'],
-    ['richHaptics','📳 Dokunmatik geri bildirim','Zenginleştirilmiş titreşim desenleri'],
-    ['launchRitual','🌅 Açılış ritüeli','Uygulama açılış animasyonu ve sesi'],
-    ['voiceGuidance','🎙️ Sesli rehberlik','Kritik anlarda kısa sesli yönlendirmeler'],
-    ['ambientSounds','🌧️ Ambiyans sesleri','Yağmur, dalga, ney gibi arka plan sesleri']
+    ['uiSounds','Arayüz sesleri','Tıklama, başarı ve uyarı tonları','volume-2'],
+    ['richHaptics','Dokunmatik geri bildirim','Zenginleştirilmiş titreşim desenleri','vibrate'],
+    ['launchRitual','Açılış ritüeli','Uygulama açılış animasyonu ve sesi','sparkles'],
+    ['voiceGuidance','Sesli rehberlik','Kritik anlarda kısa sesli yönlendirmeler','mic'],
+    ['ambientSounds','Ambiyans sesleri','Yağmur, dalga, ney gibi arka plan sesleri','cloud-drizzle']
   ];
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">✨ Premium Atmosfer</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tüm premium efektleri tek anahtarla yönet. Kapattığında uygulama sade modda çalışır.</div>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sparkles',15)+' Premium Atmosfer</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tüm premium efektleri tek anahtarla yönet. Kapattığında uygulama sade modda çalışır.</div>';
   h+='<div style="display:flex;gap:8px;">';
   h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\',true)" aria-pressed="'+paOn+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?onS:offS)+'">'+icon('sparkles',14)+' Açık</button>';
   h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\',false)" aria-pressed="'+(!paOn)+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div>';
   fxRows.forEach(function(row){
     var on=!!(data.settings&&data.settings[row[0]]);
     var lockStyle=paOn?'':'opacity:.45;pointer-events:none;';
-    h+='<div style="display:flex;align-items:center;gap:10px;'+lockStyle+'"><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+row[1]+'</div><div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.35;">'+row[2]+'</div></div>';
+    h+='<div style="display:flex;align-items:center;gap:10px;'+lockStyle+'"><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+(row[3]?icon(row[3],14)+' ':'')+row[1]+'</div><div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.35;">'+row[2]+'</div></div>';
     h+='<button onclick="App.toggleSetting(\''+row[0]+'\')" aria-pressed="'+on+'" aria-label="'+row[1].replace(/^[^A-Za-zÇĞİÖŞÜğöşüı]+ /,'')+' '+(on?'açık':'kapalı')+'" style="flex-shrink:0;min-width:74px;padding:8px 12px;border-radius:11px;cursor:pointer;font-size:var(--f-caption1);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:4px;'+(on?onS:offS)+'">'+(on?'Açık':'Kapalı')+'</button></div>';
   });
   h+='</div>';
@@ -12564,7 +12564,7 @@ function ayarlarHTML(){
   var vgOn=!!(data.settings&&data.settings.voiceGuidance);
   var vLang=(data.settings&&data.settings.voiceLang)||'tr-TR';
   var vRate=(data.settings&&data.settings.voiceRate!=null)?Number(data.settings.voiceRate):1;
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">🎙️ Sesli rehberlik</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Kritik anlarda kısa ve nazik sesli yönlendirmeler (onboarding, seri kutlaması, zikir tamamlama). Gece 23:00–07:00 arası sessiz kalır.</div>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('mic',15)+' Sesli rehberlik</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Kritik anlarda kısa ve nazik sesli yönlendirmeler (onboarding, seri kutlaması, zikir tamamlama). Gece 23:00–07:00 arası sessiz kalır.</div>';
   h+='<div style="display:flex;gap:8px;">';
   h+='<button onclick="App.setVoiceGuidance(true)" aria-pressed="'+vgOn+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(vgOn?onS:offS)+'">'+icon('mic',14)+' Açık</button>';
   h+='<button onclick="App.setVoiceGuidance(false)" aria-pressed="'+(!vgOn)+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(vgOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div>';

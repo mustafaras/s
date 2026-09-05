@@ -6,6 +6,34 @@
 **Plan sürümü:** 2.3
 **Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
 
+## Son Durum (FX-WAVE-2 Dalga 9.5 — FX-P-91 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-91 (emoji-ikon temizliği — K1 temizlik kartı)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
+  Sıradaki kart: **FX-P-90 zaten kapatıldı** (denetim + seri kapanışı önceki
+  oturumda yapıldı); FX-P-91 bu kapanışın ardından temizlik kartı olarak
+  çalıştırıldı. Kalan kart: **yok** (FX-P-88 bloklu; FX-P-66/67 ertelenmiş).
+- **FX-P-91 uygulaması:** `app.js` — (1) `fxRows` veri satırlarındaki emoji
+  önekleri kaldırılıp 4. eleman olarak Lucide ikon adları eklendi
+  (`volume-2/vibrate/sparkles/mic/cloud-drizzle` — registry'de doğrulanmış);
+  (2) render döngüsünde `row[3]?icon(row[3],14):''` ile ikonlar basılıyor
+  (kartın "en az karışım" seçeneği); (3) iki kart başlığı emoji'den icon()'a
+  çevrildi (`icon('sparkles',15)+' Premium Atmosfer'`,
+  `icon('mic',15)+' Sesli rehberlik'`). **Kapsam dışı marka emojilerine
+  dokunulmadı** (🦩 maskot, toast ✨, .sg-faith-preview-card 🌙). aria-label
+  strip regex'i artık emojisi olmayan başlıkla da çalışır durumda.
+  Cache-bump: `app.js?v=20260906d`→`?v=20260906e`.
+- **Testler:** syntax OK; driver fail=0; zikr 95/95; settings fixture 33→39
+  (+6: FX-P-91'lerin 2'si + önceden var olan emoji-bağımlı Test 7 assertion'ı
+  icon-tabanlı sözleşmeye güncellendi); premium ailesi 9/9 yeşil.
+- **Emoji taraması (kart adım 5):** app.js'te 46 emoji satırı kaldı — tamamı
+  kapsam dışı marka dili (🦩 maskot, toast ✨, ✓ işaretleri, 🌿 preset, Saygı 🌙);
+  **premium FX bölgesinde (12500+ satırlar) 0 emoji.**
+- **S6 değişmezler:** App.* yüzeyi 717 (değişmedi), onclick envanteri 277
+  (değişmedi), tek `app.js` (`src` sayısı 1).
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
+
 ## Son Durum (FX-WAVE-2 Dalga 10 — FX-P-89 tamamlandı)
 
 - **Son tamamlanan prompt:** FX-P-89 (#app contain izole denemesi — DENEYSEL, **kullanıcı onaylı**)

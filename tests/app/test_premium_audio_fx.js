@@ -246,6 +246,16 @@ console.log('\n[10] app.js SeyAudio çağrı noktaları');
   ok('app.js SeyAudio.bell çağrı noktası var', bell);
 })();
 
+// ── Test 11: FX-P-84 — SeyOnSynced kristal bell ─────────────────────────────
+console.log('\n[11] FX-P-84 — SeyOnSynced kristal bell');
+(function(){
+  var appSrc = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
+  // SeyOnSynced gövdesi ile toast('Panel ile eşitlendi') arasında guard'lı
+  // SeyAudio.bell çağrısı geçmeli (string-level desen, kartın regex'i).
+  var syncedBell = /SeyOnSynced[\s\S]{0,1200}?SeyAudio\.bell[\s\S]{0,200}Panel ile eşitlendi/.test(appSrc);
+  ok('SeyOnSynced başarı dalında guard\'lı SeyAudio.bell çağrısı var', syncedBell);
+})();
+
 console.log('\n=== Özet ===');
 console.log('Passed: '+passed+' / '+(passed+failed));
 process.exit(failed ? 1 : 0);

@@ -5417,6 +5417,7 @@ window.SeyOnSynced=function(receipt){
   if(ui.saveActionPending){
     ui.saveState='synced'; ui.saveActionPending=false;
     try{ clearTimeout(ui.syncedDecayTimer); ui.syncedDecayTimer=setTimeout(function(){ if(ui.saveState==='synced'){ ui.saveState='clean'; updateHeaderSave(); } },2600); }catch(e){}
+    if(window.SeyAudio&&typeof window.SeyAudio.bell==='function'){ try{ window.SeyAudio.bell(); }catch(e){} }
     try{ toast('Panel ile eşitlendi'); }catch(e){}
   }
   else if(ui.saveState==='saving') ui.saveState='dirty';

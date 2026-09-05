@@ -6,6 +6,28 @@
 **Plan sürümü:** 2.3
 **Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
 
+## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-84 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-84 (SeyOnSynced kristal bell — integration)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı
+  (`zikirmatik-manuel-zikir` üzerinde). Sıradaki kart: **FX-P-85** (splash
+  dün-hatırlatma notu).
+- **FX-P-84 uygulaması:** `app.js` `SeyOnSynced` gövdesinde, `ui.saveActionPending`
+  dalının içinde `toast('Panel ile eşitlendi')` satırının hemen üstüne **tek
+  satır** eklendi: guard'lı `window.SeyAudio.bell()` (zikrTap'teki desen).
+  Çan yalnız kullanıcının elle "Kaydet/Eşitle" onaylandığında çalar (QY-22);
+  arka plan save'lerde çalmaz. Başka hiçbir satır değişmedi (`else if saving`
+  dalı, `mergePersistedReminderState`, localStorage yazımı, toast metni aynen).
+  `index.html` app.js cache-bump `?v=20260905a`→`?v=20260906a`. `sync.js`
+  (I4) ve `save()` gövdesi dokunulmadı.
+- **Testler:** syntax OK; driver fail=0; zikr 95/95; faz10 sync 69/69 (sync
+  davranışı değişmedi); audio fixture 26→27 (+1 FX-P-84 assertion — kartın
+  regex'i 900→1200 pencereyle: gerçek offset 944); premium ailesi 9/9 yeşil.
+- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi — SeyOnSynced window.* zaten
+  mevcuttu), onclick envanteri 277, tek `app.js` (`src` sayısı 1).
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
+
 ## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-83 tamamlandı)
 
 - **Son tamamlanan prompt:** FX-P-83 (surface derinlik + glass genişlemesi — salt CSS)

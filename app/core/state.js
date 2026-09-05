@@ -127,6 +127,9 @@
     // açtığında robotik yerel ses yerine sinirsel ses devreye girer.
     if(typeof d.settings.voiceCloudTts!=='boolean') d.settings.voiceCloudTts=true;
     if(typeof d.settings.voiceLocalFallback!=='boolean') d.settings.voiceLocalFallback=false;
+    // FX-P-87: yerel TTS pitch (0.7–1.3) ve yerel ses adı backfill'i.
+    if(typeof d.settings.voicePitch!=='number') d.settings.voicePitch=1;
+    if(typeof d.settings.voiceVoiceName!=='string') d.settings.voiceVoiceName='';
     if(d.settings.caffeineMode!=='standard'&&d.settings.caffeineMode!=='sensitive'&&d.settings.caffeineMode!=='pregnant') d.settings.caffeineMode='standard';
     if(typeof d.settings.targetBed!=='string'||!/^\d{2}:\d{2}$/.test(d.settings.targetBed)) d.settings.targetBed=CAFFEINE_DEFAULT_BED;
     if(!d.settings.ghBranch) d.settings.ghBranch='main';
@@ -303,6 +306,9 @@
     if(d.settings.voiceCloudTts==null) d.settings.voiceCloudTts=true;
     if(d.settings.voiceCloudVoice==null) d.settings.voiceCloudVoice='shimmer';
     if(d.settings.voiceLocalFallback==null) d.settings.voiceLocalFallback=false;
+    // FX-P-87: yerel TTS pitch ve ses adı varsayılanları.
+    if(d.settings.voicePitch==null) d.settings.voicePitch=1;
+    if(d.settings.voiceVoiceName==null) d.settings.voiceVoiceName='';
     d.version=2;
     return d;
   }

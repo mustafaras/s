@@ -303,6 +303,79 @@ console.log('\n[12] azaltılmış harekette ses gatingi');
   ok('reduced-motion iken voice() false (master gating)', r === false);
 })();
 
+console.log('\n[13] FX-P-87 — voicePitch + voiceVoiceName backfill ve handler clamp');
+(function(){
+  var stateSrc = fs.readFileSync(path.join(repoRoot, 'app/core/state.js'), 'utf8');
+
+  // (1)+(2) Gerçek migrate gövdesi: state.js IIFE'sini sandbox'ta çalıştır,
+  // bağımlılıkları stub'layıp registerMigrate ile kaydet (test_premium_fx_gate_defaults
+  // deseni), SeymaState.migrate'i yaşlı (eski-state) veriyle çağır.
+  var migrated = (function(){
+    var MIGRATE_DEPS = [
+      'migrateReminderState','normalizeSyncReceipt','ensureEventLog','emptyZikrRoot',
+      'migrateZikrV2','ensureSaygiDay','emptySaygiRoot','ensureQuranJourney','emptyLibrary',
+      'normBook','emptyWatchlist','normTitle','emptyMusic','normTrack','emptySoulArchive',
+      'normSoulItem','backfillArchivesFromDays','todayStr','syncDerivedHabits',
+      'ensureProfileAssessment','dailyPhotoCopy','ensureTherapyAllDays','ensurePrayerDay'
+    ];
+    var vm = require('vm');
+    var sb = { console: console, Date: Date, Math: Math, JSON: JSON, isNaN: isNaN,
+               Number: Number, String: String, Object: Object, Array: Array };
+    sb.window = sb;
+    vm.createContext(sb);
+    vm.runInContext(stateSrc, sb, { filename: 'app/core/state.js' });
+    var deps = { caffeineDefaultBed: '23:00' };
+    MIGRATE_DEPS.forEach(function(n){ deps[n] = function(x){ return x; }; });
+    ['emptyZikrRoot','emptySaygiRoot','emptyLibrary','emptyWatchlist','emptyMusic',
+     'emptySoulArchive','normalizeSyncReceipt','ensureEventLog'].forEach(function(n){
+      deps[n] = function(x){ return (x && typeof x === 'object') ? x : {}; };
+    });
+    deps.todayStr = function(){ return '2026-09-05'; };
+    var registered = sb.window.SeymaState.registerMigrate(deps);
+    if (!registered) return null;
+    var out = sb.window.SeymaState.migrate({ version:1, settings: { nickname:'Test' }, days:{} });
+    return out && out.settings ? out.settings : null;
+  })();
+  ok('migrate() voicePitch backfill (===1)', !!migrated && migrated.voicePitch === 1, 'değer: '+JSON.stringify(migrated && migrated.voicePitch));
+  ok('migrate() voiceVoiceName backfill (===\'\')', !!migrated && migrated.voiceVoiceName === '', 'değer: '+JSON.stringify(migrated && migrated.voiceVoiceName));
+
+  // (3)+(4)+(5) Handler clamp: App.setVoicePitch/setVoiceVoiceName gövdelerini
+  // app.js'ten ayıklayıp data/save/render stub'larıyla çalıştır.
+  var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  function runHandler(name, arg, initial){
+    var start = appSrc.indexOf('App.'+name+'=function');
+    if (start < 0) return { error:true };
+    var depth = 0, end = start;
+    for (var i = appSrc.indexOf('{', start); i < appSrc.length; i++){
+      if (appSrc[i] === '{') depth++;
+      else if (appSrc[i] === '}') { depth--; if (depth === 0) { end = i+1; break; } }
+    }
+    var body = appSrc.substring(start, end);
+    var saved = [], rendered = 0;
+    var ctxData = { settings: Object.assign({ voicePitch: 1, voiceVoiceName: '' }, initial || {}) };
+    // body: 'App.X=function(v){...}' atama ifadesi — App sandbox'ına atar. data/
+    // save/render runHandler kapsamından gelir; sonuç ctxData.settings'te okunur.
+    var App = {};
+    (0, eval)('(function(){ var data=arguments[0], save=arguments[1], render=arguments[2], App=arguments[3], sandboxArg=arguments[4]; ' + body + '; App.' + name + '(sandboxArg); })')(ctxData, function(){ saved.push(1); }, function(){ rendered++; }, App, arg);
+    return { out: ctxData.settings, saved: saved.length, rendered: rendered };
+  }
+
+  // clamp üst sınır: '1.9' → 1.3
+  var hi = runHandler('setVoicePitch', '1.9', { voicePitch: 1 });
+  ok("setVoicePitch('1.9') → 1.3 (clamp üst)", !hi.error && hi.out.voicePitch === 1.3, 'değer: '+JSON.stringify(hi.out && hi.out.voicePitch));
+  // clamp alt sınır: '0.2' → 0.7
+  var lo = runHandler('setVoicePitch', '0.2', { voicePitch: 1 });
+  ok("setVoicePitch('0.2') → 0.7 (clamp alt)", !lo.error && lo.out.voicePitch === 0.7, 'değer: '+JSON.stringify(lo.out && lo.out.voicePitch));
+  // setVoiceVoiceName('') → boş string kabul; 42 → değişmez
+  var empty = runHandler('setVoiceVoiceName', '', { voiceVoiceName: 'eski' });
+  ok("setVoiceVoiceName('') boş string kabul", !empty.error && empty.out.voiceVoiceName === '', 'değer: '+JSON.stringify(empty.out && empty.out.voiceVoiceName));
+  var num = runHandler('setVoiceVoiceName', 42, { voiceVoiceName: 'eski' });
+  ok("setVoiceVoiceName(42) değeri değiştirmez", !num.error && num.out.voiceVoiceName === 'eski', 'değer: '+JSON.stringify(num.out && num.out.voiceVoiceName));
+  // UI kontrolleri + popülasyon bloğu kaynakta mevcut
+  ok('ses kartında Ton slider + Yerel ses select mevcut', appSrc.indexOf('id="sey-voice-pitch"') > -1 && appSrc.indexOf('id="sey-voice-vname"') > -1);
+  ok('speechSynthesis onvoiceschanged popülasyon bloğu render sonrasında', appSrc.indexOf('speechSynthesis.onvoiceschanged=pop') > -1);
+})();
+
 console.log('\n=== Özet ===');
 console.log('Passed: ' + passed + ' / ' + (passed + failed));
 process.exit(failed ? 1 : 0);

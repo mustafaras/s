@@ -6,6 +6,34 @@
 **Plan sürümü:** 2.3
 **Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
 
+## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-87 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-87 (voicePitch + voiceVoiceName UI ve backfill — integration)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
+  Sıradaki kart: **FX-P-91** (emoji-ikon temizliği — seri sırası FX-P-87 sonrası).
+- **FX-P-87 uygulaması:** `app/core/state.js` — migrate() premium bloğuna
+  `voicePitch` (typeof number, default 1) + `voiceVoiceName` (typeof string,
+  default '') backfill'i; createDefaultData premium bloğuna `==null` guard'lı
+  aynı varsayılanlar (I3 idempotent+additive desen). `app.js` — (1) 2 additive
+  handler (`App.setVoicePitch` clamp 0.7–1.3, `App.setVoiceVoiceName` yalnız
+  string kabul) mevcut `App.setVoiceCloudVoice` gövdesi değiştirilmeden yanına;
+  (2) sesli rehberlik kartına 2 kontrol: Ton slider (`sey-voice-pitch`,
+  voiceCloudTts açıkken opacity+pointer-events disabled) ve Yerel ses select
+  (`sey-voice-vname`, boş "Otomatik" seçeneğiyle) — K1: etiketler düz metin;
+  (3) render() sonrası `speechSynthesis.onvoiceschanged` popülasyon bloğu
+  (paint()'tan hemen sonra; iOS async getVoices deseni). **mediaFx.js doğrulandı:**
+  `voicePitch`/`voiceVoiceName` zaten okunuyor (satır 260/269-270) — değişiklik
+  gerekmedi. Cache-bump: `app.js?v=20260906c`→`?v=20260906d`, `state.js?v=20260905a`→`?v=20260906d`.
+- **Testler:** syntax OK (app.js + state.js); driver fail=0; zikr 95/95;
+  migration-boundary B2 60/60 (I3 uyumlu); faz10 sync 69/69; voice fixture
+  59→67 (+8 FX-P-87 assertion — kartın 5'i + UI varlık + popülasyon bloğu);
+  premium ailesi 9/9 yeşil.
+- **S6 değişmezler:** App.* yüzeyi **715→717 (+2 belgelendi: setVoicePitch,
+  setVoiceVoiceName)**, tek `app.js` (`src` sayısı 1), state.js'te premium dışı
+  bölüm diff'i 0.
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
+
 ## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-86 tamamlandı)
 
 - **Son tamamlanan prompt:** FX-P-86 (habits ring + motivation bar shimmer — integration)

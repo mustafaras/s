@@ -7500,6 +7500,21 @@ App.setVoiceCloudVoice=function(voice){
   data.settings.voiceCloudVoice=voice;
   save(); render();
 };
+// FX-P-87: yerel TTS pitch (0.7–1.3) ve yerel ses adı. Mevcut setVoice* gövdeleri
+// değişmeden YANINA additive eklendi (I2). Yerel ses yalnız voiceCloudTts kapalıyken
+// devreye girdiği için kontroller kartta voiceCloudTts açıkken disabled görünür.
+App.setVoicePitch=function(v){
+  var x=parseFloat(v); if(isNaN(x)) return;
+  if(!data.settings) data.settings={};
+  data.settings.voicePitch=Math.min(1.3,Math.max(0.7,x));
+  save(); render();
+};
+App.setVoiceVoiceName=function(v){
+  if(typeof v!=='string') return;
+  if(!data.settings) data.settings={};
+  data.settings.voiceVoiceName=v||'';
+  save(); render();
+};
 // FX-P-61: Premium FX boolean alanları için ortak toggle. Yalnız beyaz listeli
 // settings.* anahtarlarını çevirir; data şekli değişmez (I1), App.* yüzeyine
 // EKLEME (I2 uyumlu). Master switch kapatıldığında alt FX'ler gating'te otomatik
@@ -9123,6 +9138,15 @@ function render(){
   lastRenderTab=ui.tab;
   }
   paint();
+  // FX-P-87: yerel ses listesi popülasyonu — render SONRASI çalışmalı (eleman
+  // innerHTML ile bu noktadan önce oluşur). iOS'ta getVoices async boş döner;
+  // onvoiceschanged ile yeniden doldurulur. Emoji yok, ses çalınmaz.
+  try{
+    if(window.speechSynthesis){
+      var pop=function(){ var vs=speechSynthesis.getVoices().filter(function(v){ return v.lang&&v.lang.indexOf((data.settings.voiceLang||'tr-TR').slice(0,2))===0; }); var sel=document.getElementById('sey-voice-vname'); if(!sel) return; vs.slice(0,20).forEach(function(v){ var o=document.createElement('option'); o.value=v.name; o.textContent=v.name; if(v.name===data.settings.voiceVoiceName) o.selected=true; sel.appendChild(o); }); };
+      pop(); speechSynthesis.onvoiceschanged=pop;
+    }
+  }catch(e){}
   // İlk açılış sonrası sabit animasyon kipine geç; böylece sonraki sekme değişimlerinde
   // header shimmer, wordmark sheen veya sayfa-giriş fade'ı yeniden başlamaz.
   if(root) root.classList.add('sey-app-booted');
@@ -12555,6 +12579,13 @@ function ayarlarHTML(){
   h+='<div style="display:flex;align-items:center;gap:10px;"><label for="sey-voice-cloud" style="font-size:var(--f-footnote);color:var(--text2);flex-shrink:0;">Ses</label><select id="sey-voice-cloud" onchange="App.setVoiceCloudVoice(this.value)" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px;font-size:var(--f-footnote);outline:none;color:var(--text);">';
   ['alloy','ash','ballad','coral','echo','fable','juniper','marble','nova','onyx','sage','shimmer','verse'].forEach(function(v){ h+='<option value="'+v+'"'+(vVoice===v?' selected':'')+'>'+(voiceNames[v]||v)+'</option>'; });
   h+='</select></div>';
+  // FX-P-87: yerel TTS pitch + ses adı. Yalnız voiceCloudTts KAPALIyken etkin;
+  // bulut açıkken disabled (bulut sesinde pitch/ses-adı geçersiz).
+  var vCloudOn=!!(data.settings&&data.settings.voiceCloudTts);
+  var vPitch=(data.settings&&data.settings.voicePitch!=null)?Number(data.settings.voicePitch):1;
+  var vLock=vCloudOn?'opacity:.45;pointer-events:none;':'';
+  h+='<div style="display:flex;align-items:center;gap:10px;'+vLock+'"><label for="sey-voice-pitch" style="font-size:var(--f-footnote);color:var(--text2);flex-shrink:0;">Ton</label><input id="sey-voice-pitch" type="range" min="0.7" max="1.3" step="0.05" value="'+vPitch+'" oninput="App.setVoicePitch(this.value)" style="flex:1;accent-color:var(--accent-ink);"><span style="font-size:var(--f-caption1);font-weight:800;color:var(--text);min-width:44px;text-align:right;">'+vPitch.toFixed(2)+'x</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;'+vLock+'"><label for="sey-voice-vname" style="font-size:var(--f-footnote);color:var(--text2);flex-shrink:0;">Yerel ses</label><select id="sey-voice-vname" onchange="App.setVoiceVoiceName(this.value)" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px;font-size:var(--f-footnote);outline:none;color:var(--text);"><option value="">Otomatik</option></select></div>';
   h+='</div>';
   // D vitamini takviyesi — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sun',15)+' D vitamini takviyesi</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">20 Temmuz 2026 Pazartesi’den itibaren yeni forma geçiyoruz.</div>';

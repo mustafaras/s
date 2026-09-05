@@ -1611,6 +1611,16 @@
 #root[data-theme="dark"].theme-aurora #sey-aurora{opacity:.10;}
 @media (prefers-reduced-motion: reduce){#root.theme-aurora #sey-aurora{animation:none!important;opacity:0!important;}}
 
+/* FX-P-82: aktif sekme ikonu bounce — yalnız sekme DEĞİŞİKLİĞİNDE çalar
+   (render yeni buton dizisi üretince animation yeniden başlar). */
+@keyframes seyNavBounce{0%{transform:translateY(0) scale(1);}40%{transform:translateY(-3px) scale(1.06);}100%{transform:translateY(0) scale(1);}}
+.sey-bottomnav-item.is-active .sey-bottomnav-glyph{animation:seyNavBounce .32s var(--ease-premium,cubic-bezier(.16,1,.3,1));}
+/* FX-P-82: unread badge pop — badge her render'da yeniden oluştuğu için
+   giriş animasyonu doğal olarak yalnız yeni badge'te görünür. */
+@keyframes seyBadgePop{0%{transform:scale(.4);opacity:0;}60%{transform:scale(1.12);opacity:1;}100%{transform:scale(1);opacity:1;}}
+.sey-bottomnav-badge{animation:seyBadgePop .3s var(--ease-premium,cubic-bezier(.16,1,.3,1));transform-origin:center;}
+@media (prefers-reduced-motion: reduce){.sey-bottomnav-item.is-active .sey-bottomnav-glyph,.sey-bottomnav-badge{animation:none!important;}}
+
 /* FX-P-32: Dokunma ripple efekti — SeyFx.ripple() tarafından üretilen dalga.
    Master switch (premiumAtmosphere) ve reduced-motion'a saygılıdır. */
 .sey-ripple {

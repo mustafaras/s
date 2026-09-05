@@ -92,6 +92,23 @@ console.log('\n[4] Mevcut animasyonlu class’lar reduce-motion altında pasif')
   });
 })();
 
+// ── Test 4b: FX-P-82 — nav bounce + badge pop reduce-motion kapsamı ────────
+console.log('\n[4b] FX-P-82 — nav bounce + badge pop');
+(function(){
+  // (1) styles.css'te @keyframes seyNavBounce ve @keyframes seyBadgePop mevcut
+  ok('@keyframes seyNavBounce tanımlı', css.indexOf('@keyframes seyNavBounce') > -1);
+  ok('@keyframes seyBadgePop tanımlı', css.indexOf('@keyframes seyBadgePop') > -1);
+
+  // (2) reduce bloğu her iki hedefi animation:none ile kapsıyor
+  var glyphCovered = reduceText.indexOf('is-active .sey-bottomnav-glyph') > -1;
+  var badgeCovered = reduceText.indexOf('.sey-bottomnav-badge') > -1;
+  ok('reduce bloğu is-active .sey-bottomnav-glyph kapsıyor', glyphCovered);
+  ok('reduce bloğu .sey-bottomnav-badge kapsıyor', badgeCovered);
+  var covered = glyphCovered && badgeCovered;
+  ok('kapsanan hedeflerde animation:none kullanılıyor',
+    covered && /animation\s*:\s*none\s*!important/.test(reduceText));
+})();
+
 console.log('\n=== Özet ===');
 console.log('Passed: '+passed+' / '+(passed+failed));
 process.exit(failed ? 1 : 0);

@@ -6,6 +6,30 @@
 **Plan sürümü:** 2.3
 **Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
 
+## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-82 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-82 (nav bounce + badge pop — salt CSS)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı
+  (`zikirmatik-manuel-zikir` üzerinde; ağaçtaki önceden var olan çalışma korunarak).
+  Sıradaki kart: **FX-P-83** (surface hover/active + glass).
+- **FX-P-82 uygulaması:** `app/styles.css` FX bölümüne `@keyframes seyNavBounce`
+  + `.is-active .sey-bottomnav-glyph` animasyonu, `@keyframes seyBadgePop` +
+  `.sey-bottomnav-badge` giriş animasyonu ve kendi `prefers-reduced-motion`
+  bloğu eklendi (`animation:none!important`). Mevcut satır 138 reduce kuralı
+  (`transition:none`) ile çakışma yok — o transition tarafını kapsıyor, yeni
+  blok animation tarafını. Render tarafı (`app.js:14772-14775`) zaten
+  `is-active` + badge span ürettiği için `app.js`/`index.html` DOKUNULMADI;
+  cache-bump gerekmedi (styles.css zaten `?v=20260906a`'da).
+- **Testler:** syntax OK; driver fail=0; zikr 95/95; reduced-motion fixture
+  22→27 (+5 FX-P-82 assertion); premium ailesi 9/9 yeşil.
+- **Görsel kanıt:** `driver.mjs --dump bugun` → `class="sey-bottomnav-item is-active"`
+  + `<span class="sey-bottomnav-badge saygi">3` (render zaten üretiyor).
+- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), tek `app.js` (`src` sayısı 1).
+- **Değişmezler:** I1–I6 korundu (data şekli, migrate/save/sync davranışı,
+  App.* yalnız-ekleme, tek app.js).
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
+
 ## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-81 tamamlandı)
 
 - **Son tamamlanan prompt:** FX-P-81 (aurora arka plan katmanı)

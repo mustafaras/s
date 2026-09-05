@@ -7420,7 +7420,7 @@ App.toggleHabit=function(key){
   var msg='Kaydedildi'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
   commit(msg);
   if(editing()) return;
-  var ht=htToday(); if(after>=ht&&before<ht){ confetti(); if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); }
+  var ht=htToday(); if(after>=ht&&before<ht){ confetti(); if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); if(window.SeyFx&&typeof window.SeyFx.shimmer==='function'){ try{ var rw=document.getElementById('sey-habits-ring-wrap'); if(rw) window.SeyFx.shimmer(rw); }catch(e){} } setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); }
   else if(day.habits[key]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); maybeStreak(); }
 };
 App.toggleMgHabit=function(){
@@ -9674,7 +9674,7 @@ function habitsCardHTML(rec){
   var open=cardOpen('habits', !allDone);
   var circ=2*Math.PI*11;
   var off=circ*(1-(ht>0?completed/ht:0));
-  var ring='<div style="position:relative;width:30px;height:30px;flex-shrink:0;"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="3.5"></circle><circle cx="15" cy="15" r="11" fill="none" stroke="#E9AFC1" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"></circle></svg></div>';
+  var ring='<div id="sey-habits-ring-mini" style="position:relative;width:30px;height:30px;flex-shrink:0;"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="3.5"></circle><circle cx="15" cy="15" r="11" fill="none" stroke="#E9AFC1" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"></circle></svg></div>';
   var badge='<div style="display:flex;align-items:center;gap:7px;">'+ring+'<span style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+completed+'/'+ht+'</span></div>';
   var b='';
   HABITS.forEach(function(hb){
@@ -10672,7 +10672,7 @@ function roomProfileHTML(fi){
   h+='</div></div>';
   if(typeof p.confidence==='number'){
     h+='<div style="display:flex;align-items:center;gap:10px;">';
-    h+='<div style="flex:1;">'+progBar(p.confidence,'linear-gradient(90deg,var(--room2),var(--room))')+'</div>';
+    h+='<div id="sey-motivation-bar" style="flex:1;">'+progBar(p.confidence,'linear-gradient(90deg,var(--room2),var(--room))')+'</div>';
     h+='<div style="font-size:var(--f-footnote);font-weight:800;color:var(--room);white-space:nowrap;">%'+p.confidence+' güven</div>';
     h+='</div>';
   }
@@ -11088,7 +11088,7 @@ App.completeMotivationTask=function(status){
   render();
   var msg;
   if(wasDone) msg='Kaydın güncellendi';
-  else { if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell(); if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak(); msg=status==='minimum_completed'?'Minimum görev kaydedildi — bu da ilerleme':((mot&&mot.successMeaning)||'Bugünkü görev kaydedildi'); }
+  else { if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell(); if(window.SeyFx&&typeof window.SeyFx.shimmer==='function'){ try{ var mb=document.getElementById('sey-motivation-bar'); if(mb) window.SeyFx.shimmer(mb); }catch(e){} } if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak(); msg=status==='minimum_completed'?'Minimum görev kaydedildi — bu da ilerleme':((mot&&mot.successMeaning)||'Bugünkü görev kaydedildi'); }
   if(courageGained) msg+=' · bir cesaret kanıtı daha';
   toast(msg);
 };
@@ -11476,7 +11476,7 @@ function bugunHTML(){
   h+='<div style="display:flex;align-items:center;gap:8px;">';
   h+='<div style="background:rgba(201,184,255,0.28);color:var(--choc);font-weight:700;font-size:var(--f-footnote);padding:7px 13px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Gün '+curIdx+(!ed&&streak>1?('<span style="display:inline-flex;align-items:center;gap:2px;">'+icon('flame',13)+streak+'</span>'):'')+'</div></div></div>';
   h+='<div style="display:flex;align-items:center;gap:18px;">';
-  h+='<div style="position:relative;width:96px;height:96px;flex-shrink:0;"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="9"></circle><circle cx="48" cy="48" r="42" fill="none" stroke="#E9AFC1" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .6s ease"></circle></svg>';
+  h+='<div id="sey-habits-ring-wrap" style="position:relative;width:96px;height:96px;flex-shrink:0;"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="9"></circle><circle cx="48" cy="48" r="42" fill="none" stroke="#E9AFC1" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .6s ease"></circle></svg>';
   h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div style="font-size:var(--f-title1);font-weight:800;line-height:1;">'+pct+'%</div><div style="font-size:var(--f-caption2);color:var(--faint);margin-top:2px;">'+(ed?'o gün':'bugün')+'</div></div></div>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);color:var(--faint);margin-bottom:6px;">'+(ed?'O günün havası':'Bugünün havası')+'</div><div style="font-size:var(--f-title3);font-weight:800;line-height:1.25;">'+esc(badge)+'</div><div style="font-size:var(--f-caption1);color:var(--muted);margin-top:5px;font-weight:600;">'+completed+'/'+ht+' tik bugün</div></div></div>';
   // premium istatistik şeridi (seri · 7 günlük ritim · mod eğilimi · en güçlü/zayıf tik)

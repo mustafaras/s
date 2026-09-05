@@ -6,6 +6,31 @@
 **Plan sürümü:** 2.3
 **Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
 
+## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-86 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-86 (habits ring + motivation bar shimmer — integration)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
+  Sıradaki kart: **FX-P-87** (voicePitch/voiceVoiceName UI + backfill).
+- **FX-P-86 uygulaması:** `app.js`'te (1) ring konteynerlerine id: 96px hero ring
+  → `id="sey-habits-ring-wrap"` (satır 11479), 30px mini ring →
+  `id="sey-habits-ring-mini"` (satır 9677) — kart satırları 11229/11478 idi;
+  gerçek konumlar işaret ile bulundu (id-only ekleme, diğer öznitelikler aynen).
+  (2) `App.toggleHabit` tüm-hedefler dalı (`after>=ht&&before<ht`) — confetti +
+  success chime'ın yanına guard'lı `SeyFx.shimmer(sey-habits-ring-wrap)`.
+  (3) Motivasyon confidence bar div'ine `id="sey-motivation-bar"` (satır 10675)
+  ve `App.completeMotivationTask` başarı dalında (`wasDone===false`)
+  `SeyAudio.bell()` yanına guard'lı `SeyFx.shimmer(sey-motivation-bar)`.
+  Shimmer zaten `isPremiumFxEnabled()` ile gated — yeni gate yazılmadı.
+  Mevcut `maybeStreak` shimmer noktası değişmedi; `progBar`/`ringSeg`
+  imzaları değişmedi; `.sey-shimmer` CSS'ine dokunulmadı.
+  Cache-bump: `app.js?v=20260906b`→`?v=20260906c`.
+- **Testler:** syntax OK; driver fail=0; zikr 95/95; fx_utils fixture 26→28
+  (+2 FX-P-86 string-level assertion); premium ailesi 9/9 yeşil.
+- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), onclick envanteri 277
+  (değişmedi), tek `app.js` (`src` sayısı 1).
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
+
 ## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-85 tamamlandı)
 
 - **Son tamamlanan prompt:** FX-P-85 (splash veri-durumu hatırlatması — integration)

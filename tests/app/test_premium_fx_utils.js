@@ -134,6 +134,21 @@ console.log('\n[7] shimmer gating');
   ok('premium kapalıyken sey-shimmer eklenmez', added.length === 0);
 })();
 
+// ── Test 8: FX-P-86 — ring/bar shimmer bağlama noktaları ───────────────────
+console.log('\n[8] FX-P-86 — habits ring + motivation bar shimmer');
+(function(){
+  var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  // (1) sey-habits-ring-wrap id'si + guard'lı SeyFx.shimmer çağrısı birlikte geçiyor
+  var ringBound = /sey-habits-ring-wrap[\s\S]{0,400}?getElementById\('sey-habits-ring-wrap'\)[\s\S]{0,120}?SeyFx\.shimmer/.test(appSrc) ||
+                  (appSrc.indexOf('id="sey-habits-ring-wrap"') > -1 && appSrc.indexOf("getElementById('sey-habits-ring-wrap')") > -1 && appSrc.indexOf("getElementById('sey-habits-ring-wrap')") < appSrc.indexOf('window.SeyFx.shimmer(rw)'));
+  ok('ring id + guard\'lı SeyFx.shimmer çağrısı birlikte', ringBound);
+  // (2) sey-motivation-bar id'si + guard'lı SeyFx.shimmer çağrısı birlikte geçiyor
+  var barBound = appSrc.indexOf('id="sey-motivation-bar"') > -1 &&
+                 appSrc.indexOf("getElementById('sey-motivation-bar')") > -1 &&
+                 /SeyOnSynced|completeMotivationTask[\s\S]{0,600}?getElementById\('sey-motivation-bar'\)/.test(appSrc) === false || /getElementById\('sey-motivation-bar'\)[\s\S]{0,120}?SeyFx\.shimmer/.test(appSrc);
+  ok('motivation bar id + guard\'lı SeyFx.shimmer çağrısı birlikte', barBound);
+})();
+
 console.log('\n=== Özet ===');
 console.log('Passed: '+passed+' / '+(passed+failed));
 process.exit(failed ? 1 : 0);

@@ -10,7 +10,7 @@
   "activePrompt": null,
   "nextPrompt": "FX2-02",
   "currentPhase": "Dalga 0 — Ölçüm ve Token",
-  "blockedPrompt": null,
+  "blockedPrompt": "FX2-02",
   "implementationComplete": false,
   "pushedToRemote": false,
   "deployApproved": false,

@@ -117,3 +117,5 @@ Ayrıntı: `TESHIS.md`.
 **FX2-01 sonrası sıradaki:** FX2-02 — hareket + renk token iskeleti.
 FX2-01 düzeltme: `isQuietTime()` ses üretmediği için M3 kapsamından çıkarıldı;
 ölçüm ve `coverage.json` değeri M3=18 olarak güncellendi.
+| FX2-02 | 2026-09-06 | Codex | Hareket ve renk token iskeleti | ❌ BLOKE | yerel | S8 düştü | `app/styles.css` içine mevcut `#root` bloğunda hareket/elevation/press tokenları, `--ease-premium: var(--ease-out)`, koyu tema override'ları ve tek reduced-motion süre bloğu eklendi; `index.html` styles cache-bump'i `20260906e` oldu. `--elev-*` sayımı 10'a çıktı. Ancak izin verilen token-only değişiklikler mevcut `transition:`/`animation:` bildirimi sayısını değiştirmedi: M7 `0,13 → 0,13` (`23/173`). Yapay bildirim eklemek veya mevcut kuralı değiştirmek kart sözleşmesine aykırı olduğundan `FX2-STATE.json → blockedPrompt: "FX2-02"`; seri durdu, FX2-03'e geçilmedi.`
+**FX2-02 blok nedeni:** M7 hedefi, kartın mevcut CSS kurallarını değiştirmeme ve token kullanımını sonraki kartlara bırakma sınırları içinde yükseltilemiyor; kapsam belgesi §5 S8 gereği kart tamamlanmış sayılmadı.

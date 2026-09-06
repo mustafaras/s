@@ -289,7 +289,34 @@
     --aeon:#C99A3A; --aeon2:#E6C15A; --aeon-bg:rgba(201,154,58,0.14); --aeon-glow:rgba(212,175,55,0.45);
     --user-bubble:#7E62B8; --user-bubble2:#9B7FC9;
     --reminder-inbox:#76577F; --reminder-inbox-strong:#684B73; --reminder-inbox-soft:rgba(118,87,127,.10); --reminder-inbox-focus:#9B7FC9;
-    --ease-premium:cubic-bezier(.16,1,.3,1);
+    --ease-premium: var(--ease-out);
+
+    /* ── FX2-02: hareket skalası ───────────────────────────── */
+    --dur-1: 120ms;   /* basma durumu, mikro geri bildirim */
+    --dur-2: 200ms;   /* buton/ikon durum değişimi */
+    --dur-3: 320ms;   /* kart girişi, sekme geçişi */
+    --dur-4: 480ms;   /* overlay / sheet */
+    --dur-5: 800ms;   /* zemin / tema crossfade */
+
+    --ease-out:    cubic-bezier(.16, 1, .3, 1);
+    --ease-in:     cubic-bezier(.7, 0, .84, 0);
+    --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+    --ease-glide:  cubic-bezier(.65, 0, .35, 1);
+
+    /* ── FX2-02: yükseklik skalası (katmanlı gölge + iç ışık) ── */
+    --elev-0: none;
+    --elev-1: 0 1px 2px rgba(0,0,0,.04), 0 2px 8px rgba(0,0,0,.04),
+              inset 0 1px 0 rgba(255,255,255,.30);
+    --elev-2: 0 2px 4px rgba(0,0,0,.05), 0 8px 20px rgba(0,0,0,.06),
+              inset 0 1px 0 rgba(255,255,255,.34);
+    --elev-3: 0 4px 8px rgba(0,0,0,.06), 0 16px 36px rgba(0,0,0,.09),
+              inset 0 1px 0 rgba(255,255,255,.38);
+    --elev-4: 0 8px 16px rgba(0,0,0,.08), 0 28px 60px rgba(0,0,0,.13),
+              inset 0 1px 0 rgba(255,255,255,.42);
+
+    /* ── FX2-02: basma ─────────────────────────────────────── */
+    --press-scale: .965;
+    --press-dim:   .92;
 
     /* ── AD-43: tipografi ölçeği (dalga 9) ─────────────────────────────────
        `rem` tabanlıdır ve bu BİLİNÇLİDİR: html/body'de font-size tanımlı
@@ -351,6 +378,16 @@
     --drop:#E8A96B; --drop-bg:rgba(232,169,107,0.10);
     --pause:#C2AFE8; --pause-bg:rgba(194,175,232,0.10);
     --warn:#FF7378; --warn-glow:rgba(255,115,120,0.16);
+    --elev-0: none;
+    --elev-1: 0 1px 2px rgba(0,0,0,.40), 0 2px 8px rgba(0,0,0,.34),
+              inset 0 1px 0 rgba(255,255,255,.06);
+    --elev-2: 0 2px 4px rgba(0,0,0,.46), 0 8px 20px rgba(0,0,0,.40),
+              inset 0 1px 0 rgba(255,255,255,.07);
+    --elev-3: 0 4px 8px rgba(0,0,0,.52), 0 16px 36px rgba(0,0,0,.46),
+              inset 0 1px 0 rgba(255,255,255,.08);
+    --elev-4: 0 8px 16px rgba(0,0,0,.60), 0 28px 60px rgba(0,0,0,.54),
+              inset 0 1px 0 rgba(255,255,255,.10);
+    --press-dim: 1.12;   /* koyu zeminde karartma değil PARLATMA */
     --sun:#FFC768; --sun2:#FFA064; --sun-glow:rgba(255,190,100,0.09);
     --journal:#C9A4FF; --journal2:#E4CFFF; --journal-bg:rgba(201,164,255,0.12); --journal-glow:rgba(201,164,255,0.18);
     --vacation:#5ED4B4; --vacation2:#7DE8CB; --vacation-bg:rgba(94,212,180,0.12); --vacation-glow:rgba(94,212,180,0.18);
@@ -1647,6 +1684,9 @@
 
 /* FX-P-32: Dokunma ripple efekti — SeyFx.ripple() tarafından üretilen dalga.
    Master switch (premiumAtmosphere) ve reduced-motion'a saygılıdır. */
+@media (prefers-reduced-motion: reduce){
+  :root{ --dur-1:1ms; --dur-2:1ms; --dur-3:1ms; --dur-4:1ms; --dur-5:1ms; }
+}
 .sey-ripple {
   position: relative;
   overflow: hidden;

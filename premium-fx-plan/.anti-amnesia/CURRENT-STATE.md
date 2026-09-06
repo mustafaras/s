@@ -14,8 +14,8 @@
 | Son tamamlanan prompt | **FX2-01** — kapsam denetçisi + taban çizgisi |
 | Sıradaki prompt | **FX2-02** — hareket + renk token iskeleti |
 | Aşama | Dalga 0 — Ölçüm ve Token |
-| Bloklu | yok |
-| Uygulama tamamlandı | hayır |
+| Bloklu | **FX2-02** — M7 token-only değişiklikle yükselmiyor |
+| Uygulama tamamlandı | hayır — S8 nedeniyle seri durdu |
 
 **Durum makinesi:** [`FX2-STATE.json`](FX2-STATE.json)
 
@@ -85,6 +85,22 @@ eşikleriyle çalışır ve bu aşamada exit 1 verir.
 Ölçüm dosyası: [`coverage.json`](coverage.json). Uygulama yüzeyi değişmedi;
 `app.js`, `app/`, `index.html`, `tests/` ve `sync.js` dokunulmadı.
 
+## FX2-02 — BLOKE (2026-09-06)
+
+İzin verilen CSS iskeleti uygulandı: mevcut `#root` bloğuna `--dur-*`,
+`--ease-*`, `--elev-*`, `--press-*` tokenları eklendi; `--ease-premium`
+geriye uyumlu olarak `var(--ease-out)` alias'ına bağlandı; koyu tema
+elevation/press override'ları ve tek reduced-motion süre bloğu eklendi.
+`index.html` cache-bump'i `styles.css?v=20260906e` oldu. Mevcut CSS kuralı
+yeniden yazılmadı; `app.js`, `app/core/**` ve test dosyaları değişmedi.
+
+S8 kapısı geçmedi: `M7` **0,13 → 0,13** kaldı (`23/173` token uyumlu
+`transition`/`animation` bildirimi). Bu kart mevcut kuralları değiştirmeyi ve
+token kullanımını sonraki kartlara bırakmayı zorunlu tuttuğu için M7'yi yapay
+bildirim ekleyerek yükseltmek sözleşmeye aykırı olurdu. `--elev-*` doğrulaması
+10 bildirime ulaştı. Sonraki karta geçilmedi; `FX2-STATE.json` içinde
+`blockedPrompt: "FX2-02"` bırakıldı.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -123,13 +139,13 @@ renk kararı + canlı zemin sözleşmesi.
 
 ---
 
-## Sıradaki Oturum İçin
+## Sıradaki Oturum İçin — Engel Çözülmeden İlerleme Yok
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-02.md`](../.prompts/FX2-02.md)
+2. Kart: [`../.prompts/FX2-02.md`](../.prompts/FX2-02.md) — **BLOKE**
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
-4. **S8 kuralı:** kapsam yükselmediyse kart BLOKLU, seri durur.
+4. **S8 kuralı:** M7 kapsamı yükselmedikçe FX2-03'e geçilmez.
 
 ---
 

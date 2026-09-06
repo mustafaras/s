@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **yok** (seri henüz başlamadı) |
-| Sıradaki prompt | **FX2-01** — kapsam denetçisi + taban çizgisi |
+| Son tamamlanan prompt | **FX2-01** — kapsam denetçisi + taban çizgisi |
+| Sıradaki prompt | **FX2-02** — hareket + renk token iskeleti |
 | Aşama | Dalga 0 — Ölçüm ve Token |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır |
@@ -45,26 +45,45 @@ FX-2 bu yüzden birim olarak API'yi değil **kapsamı** alır
 
 ---
 
-## Taban Çizgisi (2026-09-06, commit `33995dc`)
+## Taban Çizgisi (2026-09-06, kaynak ölçümü commit `67f95a6`)
 
 | Metrik | Taban | Hedef |
 |---|---:|---:|
-| M1 etkileşimli eleman | 387 | — |
+| M1 etkileşimli eleman | 390 | — |
 | M2 basma geri bildirimi | **0** | ≥ 343 |
-| M3 ses bağlı etkileşim | 13 | ≥ 200 |
+| M3 ses bağlı etkileşim | 18 | ≥ 200 |
 | M4 ripple konteyneri | **0** | ≥ 325 |
 | M5 canlandırılan sayaç | 1 | ≥ 8 |
 | M6 çıkış animasyonlu overlay | **0** | ≥ 10 |
-| M7 hareket token uyumu | 0,21 | ≥ 0,80 |
-| M8 kapalı gelen premium ayar | 4 | 0 |
+| M7 hareket token uyumu | 0,13 | ≥ 0,80 |
+| M8 kapalı gelen premium ayar | 2 | 0 |
 | M9 iOS geri bildirim kanalı | **0** | ≥ 2 |
-| M10 pembe token | 11 | **0** |
-| M11 palet ailesi | 5 | **≤ 2** |
+| M10 pembe token | 9 | **0** |
+| M11 palet ailesi | 3 | **≤ 2** |
 | M12 canlı zemin sahnesi | **0** | ≥ 18 |
 | M13 kontrast (8 çift) | 0 | **8** |
 
 Testler taban anında **yeşil**: syntax OK, `driver.mjs` fail=0,
 premium ailesi 9/9.
+
+Kartın tarihsel beklenen tabanından farklar kaynak ölçümüyle kaydedildi:
+M1 390, M3 18, M7 0,13, M8 2, M10 9 ve M11 3. M8 yalnız kartta tanımlanan
+beş kimlik ayarını sayar; mevcut `migrate()` içinde `launchRitual` ile
+`voiceLocalFallback` false backfill edilir. M9 mevcut rastgele gürültü buffer'ını
+sessiz iOS unlock kanalı saymadığı için 0'dır. `coverage.json` bu ölçümün
+makinece okunabilir otoritesidir.
+
+---
+
+## FX2-01 — Tamamlandı (2026-09-06)
+
+`tools/fx-coverage.mjs` yalnızca `node:fs` ve `node:path` kullanarak kaynak
+metni tarayan, uygulamayı çalıştırmayan ve ağ/VM kullanmayan kapsam denetçisi
+olarak eklendi. `--save` yalnızca `coverage.json` yazar; `--gate` sabit FX2
+eşikleriyle çalışır ve bu aşamada exit 1 verir.
+
+Ölçüm dosyası: [`coverage.json`](coverage.json). Uygulama yüzeyi değişmedi;
+`app.js`, `app/`, `index.html`, `tests/` ve `sync.js` dokunulmadı.
 
 ---
 
@@ -108,7 +127,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-01.md`](../.prompts/FX2-01.md)
+2. Kart: [`../.prompts/FX2-02.md`](../.prompts/FX2-02.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** kapsam yükselmediyse kart BLOKLU, seri durur.
 

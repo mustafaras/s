@@ -2,7 +2,7 @@
 
 **Yerini aldığı belge:** `FX-LIBRARY.md` (silindi — parametreleri gerçek
 `mediaFx.js` ile uyuşmuyordu).
-**Uygulayan kartlar:** FX2-P-21 … FX2-P-24.
+**Uygulayan kartlar:** FX2-11 … FX2-14.
 
 ---
 
@@ -21,7 +21,7 @@
 
 ---
 
-## 2. Yeni Sinyal Zinciri (FX2-P-21)
+## 2. Yeni Sinyal Zinciri (FX2-11)
 
 ```
 kaynak(lar) ──► lowpass ──► ADSR gain ──► [dry]──────────────┐
@@ -45,7 +45,7 @@ kaynak(lar) ──► lowpass ──► ADSR gain ──► [dry]─────
 
 ---
 
-## 3. Ses Paleti (FX2-P-22)
+## 3. Ses Paleti (FX2-12)
 
 Hepsi aynı enstrüman ailesinden: yumuşak sine/triangle gövde + kısa filtrelenmiş
 gürültü transienti + kısa reverb kuyruğu. Türkçe sıcak tona uygun; hiçbiri
@@ -72,7 +72,7 @@ gürültü transienti + kısa reverb kuyruğu. Türkçe sıcak tona uygun; hiçb
 
 ---
 
-## 4. iOS Ses Kilidi (FX2-P-23)
+## 4. iOS Ses Kilidi (FX2-13)
 
 iOS Safari `AudioContext`'i kullanıcı jesti olmadan başlatmaz ve **sessiz
 anahtarı (ringer switch) `AudioContext` çıkışını susturabilir.**
@@ -82,7 +82,7 @@ anahtarı (ringer switch) `AudioContext` çıkışını susturabilir.**
 2. `visibilitychange` → gizliyken `suspend()`, dönünce `resume()` (batarya).
 3. `ctx.state !== 'running'` ise ses **sessizce** atlanır, hata basılmaz.
 4. Sessiz anahtar açıkken ses duyulmayabilir → **bu yüzden görsel basma
-   durumu (FX2-P-12) tek başına yeterli olmalı**, ses bonus.
+   durumu (FX2-07) tek başına yeterli olmalı**, ses bonus.
 
 ---
 

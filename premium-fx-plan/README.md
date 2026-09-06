@@ -1,8 +1,8 @@
 # Şeyma Premium FX
 
-**Aktif seri:** **FX-2 — "Hissedilir Premium"** · v1.0 · 2026-09-06
+**Aktif seri:** **FX-2 — "Hissedilir Premium"** · v2.0 · 28 kart · 2026-09-06
 **Dal:** `premium-fx-gorsel-yuzey` · **LOCAL ONLY** (push/merge/deploy yok)
-**Durum:** 🟡 Dalga 0 · sıradaki kart **FX2-P-01**
+**Durum:** 🟡 Dalga 0 · sıradaki kart **FX2-01**
 
 ---
 
@@ -37,6 +37,7 @@ her prompt, ölçülebilir bir kapsam sayısını yükseltmek zorundadır.
 | Konu | Belge |
 |---|---|
 | Ölçüm, eşikler, "bitti" tanımı | [`KAPSAM-OLCUMU.md`](KAPSAM-OLCUMU.md) |
+| **Renk kararı + canlı zemin** | [`RENK-VE-ZEMIN.md`](RENK-VE-ZEMIN.md) |
 | Ses motoru ve palet | [`SES-TASARIMI.md`](SES-TASARIMI.md) |
 | Token'lar, geçişler, malzeme | [`HAREKET-SISTEMI.md`](HAREKET-SISTEMI.md) |
 | Veri güvenliği, erişilebilirlik | [`SAFEGUARDS.md`](SAFEGUARDS.md) |
@@ -50,15 +51,23 @@ her prompt, ölçülebilir bir kapsam sayısını yükseltmek zorundadır.
 
 | Dalga | Kartlar | Konu | Ana hedef |
 |---|---|---|---|
-| 0 | FX2-P-01…02 | Ölçüm + hareket token'ları | araç kurulur |
-| **1** | FX2-P-11…15 | **Delege dokunma katmanı** | **M2 %0 → ≥%95** |
-| 2 | FX2-P-21…24 | Ses kimliği v2 | M3 13 → ≥200 |
-| 3 | FX2-P-31…34 | Hareket sistemi | M5/M6 |
-| 4 | FX2-P-41…43 | Malzeme + atmosfer | M7 ≥0,80 |
-| 5 | FX2-P-51…53 | Varsayılanlar + kapanış | M8 → 0 |
+| 0 | 01–02 | Ölçüm + hareket/renk token'ları | araç kurulur |
+| **1** 🎨 | 03–05 | **Pembe → Şampanya Altını** | **M10 11→0, M11 5→2** |
+| **2** ⭐ | 06–10 | **Delege dokunma katmanı** | **M2 %0 → ≥%95** |
+| 3 🔊 | 11–14 | Ses kimliği v2 (11 ses) | M3 13 → ≥200 |
+| 4 | 15–18 | Hareket sistemi | M5 ≥8, M6 ≥10 |
+| **5** 🌦️ | 19–23 | **Canlı zemin (hava+mevsim+güneş)** | **M12 0 → ≥18** |
+| 6 | 24–25 | Malzeme + aurora v2 | M7 ≥0,80 |
+| 7 | 26–28 | Varsayılanlar + kapanış | M8 → 0 |
 
-**En yüksek etkili kart:** [`FX2-P-11`](.prompts/FX2-P-11.md) — tek delege
+**En yüksek etkili kart:** [`FX2-06`](.prompts/FX2-06.md) — tek delege
 katmanla 361 butonun tamamı tek seferde kapsanır.
+
+**En görünür kart:** [`FX2-03`](.prompts/FX2-03.md) — pembe salt token
+seviyesinde (11 hex); ~11 tanım 65 kullanım noktasını birden değiştirir.
+
+**En çok "sıkılmayı önleyen" kart:** [`FX2-21`](.prompts/FX2-21.md) —
+`data.weather` zaten canlı; **yeni ağ çağrısı olmadan** 8 hava sahnesi.
 
 ---
 
@@ -74,6 +83,10 @@ katmanla 361 butonun tamamı tek seferde kapsanır.
 | Hareket token uyumu | 0,21 | ≥ 0,80 |
 | Kapalı gelen premium ayar | 4 | **0** |
 | iOS'ta çalışan geri bildirim kanalı | **0** | ≥ 2 |
+| **Pembe token** | 11 | **0** |
+| **Palet ailesi** | 5 | **≤ 2** |
+| **Canlı zemin sahnesi** | **0** | **≥ 18** (192 kombinasyon) |
+| **Kontrast (8 çift)** | — | **8/8** |
 
 ---
 
@@ -90,7 +103,7 @@ node .claude/skills/run-seyma/driver.mjs 2>&1 | grep -c '^FAIL'
 for f in tests/app/test_premium_*.js tests/app/test_fx2_*.js; do
   [ -e "$f" ] || continue; printf '%-46s ' "$(basename $f)"
   node "$f" >/dev/null 2>&1 && echo PASS || echo FAIL; done
-node tools/fx-coverage.mjs --gate     # FX2-P-01'den sonra
+node tools/fx-coverage.mjs --gate     # FX2-01'den sonra
 ```
 
 ---

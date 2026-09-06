@@ -16,7 +16,7 @@ ile karşılaştırır.
 
 ```bash
 node tools/fx-coverage.mjs            # rapor bas
-node tools/fx-coverage.mjs --save     # yeni taban çizgisi yaz (yalnız FX2-P-01)
+node tools/fx-coverage.mjs --save     # yeni taban çizgisi yaz (yalnız FX2-01)
 node tools/fx-coverage.mjs --gate     # eşiğin altına düşerse exit 1
 ```
 
@@ -37,7 +37,11 @@ node tools/fx-coverage.mjs --gate     # eşiğin altına düşerse exit 1
 | **M6** | `overlayExitAnimated` | Kapanışta çıkış animasyonu olan overlay |
 | **M7** | `motionTokenCompliance` | Token kullanan `transition:`/`animation:` oranı |
 | **M8** | `defaultOffPremium` | `migrate()`'te `false` gelen premium ayar sayısı |
-| **M9** | `feedbackChannelsIOS` | iOS'ta gerçekten çalışan geri bildirim kanalı (ses / görsel / titreşim) |
+| **M9** | `feedbackChannelsIOS` | iOS'ta gerçekten çalışan geri bildirim kanalı (görsel + ses; `vibrate` sayılmaz) |
+| **M10** | `pinkTokens` | Kalan pembe hex sayısı (`C77D93`, `B55471`, `FFB1CF`, `FCEDEE`, `F1EBFF`, `D96D8B`, `rgba(199,125,147`). `--kandil` **sayılmaz** |
+| **M11** | `paletteFamilies` | `--accent`/`--aeon`/`--read`/`--choc`/`--hijri` hue'ları 40° toleransla kümelenir; küme sayısı |
+| **M12** | `ambienceScenes` | Benzersiz `amb-time-*` + `amb-wx-*` + `amb-season-*` sınıf sayısı |
+| **M13** | `contrastPairs` | 4 zaman × 2 tema = 8 çiftin ≥ 4,5:1 geçme sayısı |
 
 ---
 
@@ -55,7 +59,11 @@ node tools/fx-coverage.mjs --gate     # eşiğin altına düşerse exit 1
   "M6_overlayExitAnimated": 0,
   "M7_motionTokenCompliance": 0.21,
   "M8_defaultOffPremium": 4,
-  "M9_feedbackChannelsIOS": 0
+  "M9_feedbackChannelsIOS": 0,
+  "M10_pinkTokens": 11,
+  "M11_paletteFamilies": 5,
+  "M12_ambienceScenes": 0,
+  "M13_contrastPairs": 0
 }
 ```
 
@@ -68,16 +76,34 @@ node tools/fx-coverage.mjs --gate     # eşiğin altına düşerse exit 1
 
 | Metrik | Taban | Eşik | Dalga |
 |---|---:|---:|---|
-| M2 `pressCovered` | 0 | **≥ 0,95 × M1** | 1 |
-| M3 `soundWired` | 13 | **≥ 200** | 1–2 |
-| M4 `rippleHosts` | 0 | **≥ 0,90 × M1** | 1 |
-| M5 `counterAnimated` | 1 | **≥ 8** | 3 |
-| M6 `overlayExitAnimated` | 0 | **≥ 10** | 3 |
-| M7 `motionTokenCompliance` | 0,21 | **≥ 0,80** | 2–4 |
-| M8 `defaultOffPremium` | 4 | **0** | 5 |
-| M9 `feedbackChannelsIOS` | 0 | **≥ 2** | 1–2 |
+| M2 `pressCovered` | 0 | **≥ 0,95 × M1** | 2 |
+| M3 `soundWired` | 13 | **≥ 200** | 2–3 |
+| M4 `rippleHosts` | 0 | **≥ 0,90 × M1** | 2 |
+| M5 `counterAnimated` | 1 | **≥ 8** | 4 |
+| M6 `overlayExitAnimated` | 0 | **≥ 10** | 4 |
+| M7 `motionTokenCompliance` | 0,21 | **≥ 0,80** | 0–6 |
+| M8 `defaultOffPremium` | 4 | **0** | 7 |
+| M9 `feedbackChannelsIOS` | 0 | **≥ 2** | 2–3 |
+| **M10 `pinkTokens`** | 11 | **0** | 1 |
+| **M11 `paletteFamilies`** | 5 | **≤ 2** | 1 |
+| **M12 `ambienceScenes`** | 0 | **≥ 18** | 5 |
+| **M13 `contrastPairs`** | 0 | **8** | 1, 5 |
 
 `--gate` bu tablodaki eşikleri uygular; **herhangi biri düşerse exit 1**.
+
+---
+
+## 4.1 M8 Tanım Daraltması (FX2-26)
+
+`M8` yalnız **kimlik** ayarlarını sayar:
+`premiumAtmosphere`, `uiSounds`, `richHaptics`, `launchRitual`,
+`voiceLocalFallback`.
+
+`voiceGuidance` ve `ambientSounds` **sayılmaz** — bunlar premium kimlik değil
+**kullanıcı tercihidir** (biri sesli konuşma, diğeri sürekli arka plan sesi;
+ikisi de rahatsız edici olabilir ve kapalı gelmesi doğrudur).
+
+Bu daraltma bilinçli ve belgelidir; sessizce yapılmamıştır.
 
 ---
 

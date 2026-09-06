@@ -1,13 +1,13 @@
 # HAREKET SİSTEMİ — Token'lar, Geçişler, Malzeme
 
-**Uygulayan kartlar:** FX2-P-02, FX2-P-12, FX2-P-31 … FX2-P-34, FX2-P-41 … FX2-P-43.
+**Uygulayan kartlar:** FX2-02, FX2-07, FX2-15 … FX2-18, FX2-24 … FX2-25.
 **Sorun:** 48 `@keyframes`, 82 `transition:` — süre ve eğri her yerde elle
 yazılmış. Premium his **tutarlılıktan** doğar; şu an tutarlılık yok
 (`M7 motionTokenCompliance = 0,21`).
 
 ---
 
-## 1. Token Skalası (FX2-P-02 — `app/styles.css` `:root`)
+## 1. Token Skalası (FX2-02 — `app/styles.css` `:root`)
 
 ```css
 /* Süre — 5 adım, hepsi bu skaladan seçilir */
@@ -50,7 +50,7 @@ kalır, 48 keyframe'e ayrı `!important` yazılmaz.
 
 ---
 
-## 2. Basma Durumu (FX2-P-12)
+## 2. Basma Durumu (FX2-07)
 
 Markup değişmez. Delege katman `pointerdown`'da `.sey-press` sınıfını takar,
 `pointerup/cancel/leave`'de kaldırır.
@@ -70,7 +70,7 @@ küçülmesi hatalı bir davranış (TEŞHİS §2).
 
 ---
 
-## 3. Sekme Geçişi (FX2-P-31)
+## 3. Sekme Geçişi (FX2-15)
 
 `render()` `app.innerHTML = html` ile ekranı yıkar → çıkış animasyonu doğal
 olarak imkânsız. Çözüm `render()`'ı **sarmalamak**, değiştirmemek (I7):
@@ -92,7 +92,7 @@ App.go(id)
 
 ---
 
-## 4. Overlay Hareketi (FX2-P-32)
+## 4. Overlay Hareketi (FX2-16)
 
 13 overlay (`reading`, `watching`, `listening`, `zikr`, `qibla`, `faith`,
 `quranJourney`, `saygiPerson`, `soulArchive`, `soulActivity`, `learning`,
@@ -117,7 +117,7 @@ backdrop `blur(0) → blur(14px)` `--dur-3`.
 
 ---
 
-## 5. Stagger (FX2-P-33)
+## 5. Stagger (FX2-17)
 
 JS düğüm gezmez. Markup üretilirken indeks CSS değişkeni basılır:
 
@@ -136,7 +136,7 @@ yarım saniye beklemez.
 
 ---
 
-## 6. Sayaç ve Halka (FX2-P-34)
+## 6. Sayaç ve Halka (FX2-18)
 
 - `SeyFx.countUp` şu an **tek** yerde (su). Hero istatistiklerinin tamamına
   `data-countup="<yeniDeğer>"` özniteliği basılır; `render()` sonrası tek bir
@@ -147,18 +147,17 @@ yarım saniye beklemez.
 
 ---
 
-## 7. Malzeme ve Atmosfer (FX2-P-41 … 43)
+## 7. Malzeme ve Atmosfer (FX2-24, FX2-25)
 
 - **Elevation:** 70 `.surface` kullanımı `--elev-2`, overlay `--elev-4`,
   header/nav `--elev-3`'e bağlanır. Tek gölge → katmanlı gölge + kenar ışığı.
-- **Zaman teması v2:** `#root.theme-time-*` şu an yalnız 2 elemanın
-  `box-shadow`'unu değiştiriyor. Yeni hâli `--page`, `--bg`, `--card`
-  tonlarını da kaydırır ve `--dur-5/--ease-glide` ile crossfade eder.
-  **Kontrast koruması:** her saat dilimi için metin/zemin oranı ≥ 4,5:1
-  fixture'la doğrulanır.
-- **Aurora v2:** `#sey-aurora` scroll'a göre `translate3d` parallax
-  (`will-change: transform`), üstüne çok düşük opaklıklı grain. GPU katmanı
-  **en fazla 2** (kapsam raporunda ölçülür).
+- **Zaman teması → canlı zemin:** bu iş bu belgeden çıkarıldı ve kendi
+  dalgasına taşındı. Ayrıntı: [`RENK-VE-ZEMIN.md`](RENK-VE-ZEMIN.md) Bölüm B
+  (FX2-19…23). Orada zemin yalnız saat dilimine değil **gerçek güneş saatine,
+  havaya ve mevsime** göre değişir (192 kombinasyon).
+- **Aurora v2 (FX2-25):** `#sey-aurora` scroll'a göre `translate3d` parallax
+  (`will-change: transform`), grain `::before`'da. `::after` **hava
+  katmanınındır** (FX2-21) — çakışmaz. GPU katmanı **en fazla 2**.
 
 ---
 

@@ -1,15 +1,15 @@
 {
   "series": "FX-2",
   "title": "Şeyma Premium FX — Hissedilir Premium Programı",
-  "planVersion": "1.0",
+  "planVersion": "2.0",
   "openedAt": "2026-09-06",
   "branch": "premium-fx-gorsel-yuzey",
-  "totalPrompts": 21,
-  "waves": 6,
+  "totalPrompts": 28,
+  "waves": 8,
   "lastCompletedPrompt": null,
   "activePrompt": null,
-  "nextPrompt": "FX2-P-01",
-  "currentPhase": "Dalga 0 — Ölçüm ve Sözleşme",
+  "nextPrompt": "FX2-01",
+  "currentPhase": "Dalga 0 — Ölçüm ve Token",
   "blockedPrompt": null,
   "implementationComplete": false,
   "pushedToRemote": false,
@@ -18,22 +18,35 @@
     "premium-fx-plan/TESHIS.md",
     "premium-fx-plan/PLAN-FX2.md",
     "premium-fx-plan/KAPSAM-OLCUMU.md",
+    "premium-fx-plan/RENK-VE-ZEMIN.md",
     "premium-fx-plan/SES-TASARIMI.md",
     "premium-fx-plan/HAREKET-SISTEMI.md",
     "premium-fx-plan/SAFEGUARDS.md",
     "premium-fx-plan/LOCAL-ONLY-IMPLEMENTATION.md"
   ],
   "promptOrder": [
-    "FX2-P-01", "FX2-P-02",
-    "FX2-P-11", "FX2-P-12", "FX2-P-13", "FX2-P-14", "FX2-P-15",
-    "FX2-P-21", "FX2-P-22", "FX2-P-23", "FX2-P-24",
-    "FX2-P-31", "FX2-P-32", "FX2-P-33", "FX2-P-34",
-    "FX2-P-41", "FX2-P-42", "FX2-P-43",
-    "FX2-P-51", "FX2-P-52", "FX2-P-53"
+    "FX2-01","FX2-02",
+    "FX2-03","FX2-04","FX2-05",
+    "FX2-06","FX2-07","FX2-08","FX2-09","FX2-10",
+    "FX2-11","FX2-12","FX2-13","FX2-14",
+    "FX2-15","FX2-16","FX2-17","FX2-18",
+    "FX2-19","FX2-20","FX2-21","FX2-22","FX2-23",
+    "FX2-24","FX2-25",
+    "FX2-26","FX2-27","FX2-28"
   ],
+  "waveMap": {
+    "0 Ölçüm ve Token": ["FX2-01","FX2-02"],
+    "1 Renk Kimliği": ["FX2-03","FX2-04","FX2-05"],
+    "2 Dokunma Katmanı": ["FX2-06","FX2-07","FX2-08","FX2-09","FX2-10"],
+    "3 Ses Kimliği": ["FX2-11","FX2-12","FX2-13","FX2-14"],
+    "4 Hareket Sistemi": ["FX2-15","FX2-16","FX2-17","FX2-18"],
+    "5 Canlı Zemin": ["FX2-19","FX2-20","FX2-21","FX2-22","FX2-23"],
+    "6 Malzeme ve Derinlik": ["FX2-24","FX2-25"],
+    "7 Varsayılanlar ve Kapanış": ["FX2-26","FX2-27","FX2-28"]
+  },
   "coverageBaseline": {
     "measuredAt": "2026-09-06",
-    "commit": "33995dc",
+    "commit": "42d599d",
     "M1_interactiveTotal": 387,
     "M2_pressCovered": 0,
     "M3_soundWired": 13,
@@ -42,7 +55,11 @@
     "M6_overlayExitAnimated": 0,
     "M7_motionTokenCompliance": 0.21,
     "M8_defaultOffPremium": 4,
-    "M9_feedbackChannelsIOS": 0
+    "M9_feedbackChannelsIOS": 0,
+    "M10_pinkTokens": 11,
+    "M11_paletteFamilies": 5,
+    "M12_ambienceScenes": 0,
+    "M13_contrastPairs": 0
   },
   "coverageTargets": {
     "M2_pressCovered": 343,
@@ -52,15 +69,49 @@
     "M6_overlayExitAnimated": 10,
     "M7_motionTokenCompliance": 0.80,
     "M8_defaultOffPremium": 0,
-    "M9_feedbackChannelsIOS": 2
+    "M9_feedbackChannelsIOS": 2,
+    "M10_pinkTokens": 0,
+    "M11_paletteFamilies": 2,
+    "M12_ambienceScenes": 18,
+    "M13_contrastPairs": 8
   },
-  "invariants": ["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8"],
-  "contract": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"],
-  "appSurfaceBaseline": { "AppHandlers": 717, "onclickCount": 391, "buttonCount": 361 },
+  "designDecisions": {
+    "palette": {
+      "decidedAt": "2026-09-06",
+      "decidedBy": "kullanıcı",
+      "choice": "Şampanya Altını + Füme Mürekkep",
+      "lightAccent": "#B08D57",
+      "lightAccentInk": "#8A6A3B",
+      "darkAccent": "#E3C08A",
+      "goldLadder": ["#F0E2C6", "#D9C29A", "#B08D57", "#8A6A3B", "#5E4826"],
+      "page": "linear-gradient(170deg,#FDFBF7 0%,#F7F1E8 46%,#F2EFF4 100%)",
+      "removed": ["#C77D93", "#B55471", "#FFB1CF", "#FCEDEE", "#F1EBFF", "#D96D8B"],
+      "preserved": ["--kandil", "--warn", "--read", "--watch", "--listen", "--sun"],
+      "rationale": "ÆON/nav/zikir/Saygı altını zaten hâkim; pembe paletteki tek yabancıydı. Palet 5 aileden 2'ye iner."
+    },
+    "ambience": {
+      "source": "data.weather.spots[0] — ZATEN CANLI, yeni ağ çağrısı yok",
+      "fields": ["code", "isDay", "precip", "temp", "sunrise", "sunset", "uv", "wind"],
+      "layers": ["amb-time-* (4, gerçek güneş saati)", "amb-wx-* (8, WMO kodu)", "amb-season-* (6)"],
+      "combinations": 192,
+      "seed": "günün tarihinden deterministik; gradient açısını ±8° kaydırır, gün içinde sabit",
+      "revives": "FX-1'de bloklu kalan FX-P-88 (hava modu)",
+      "constraints": ["DOM parçacığı yok", "opaklık <= 0.09", "setInterval yok", "reduced-motion: renk kalır hareket durur"]
+    }
+  },
+  "invariants": ["I1","I2","I3","I4","I5","I6","I7","I8"],
+  "contract": ["S1","S2","S3","S4","S5","S6","S7","S8"],
+  "appSurfaceBaseline": {
+    "AppHandlers": 717,
+    "AppHandlersAfterFX2_15": 718,
+    "onclickCount": 391,
+    "buttonCount": 361
+  },
   "predecessor": {
     "series": "FX-1",
     "state": "premium-fx-plan/.anti-amnesia/FX-PROMPT-STATE.json",
     "closure": "premium-fx-plan/deliverables/FX-SERI-KAPANIS-BELGESI.md",
+    "summary": "premium-fx-plan/arsiv/FX1-OZET.md",
     "verdict": "API tamamlandı, entegrasyon eksik kaldı — bkz. TESHIS.md"
   }
 }

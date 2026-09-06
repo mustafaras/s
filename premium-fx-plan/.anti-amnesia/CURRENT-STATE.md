@@ -3,7 +3,7 @@
 **Tarih:** 2026-09-06
 **Seri:** **FX-2 — "Hissedilir Premium"** (yeni seri açıldı)
 **Dal:** `premium-fx-gorsel-yuzey` · **LOCAL ONLY** (push/merge/deploy yok)
-**Plan sürümü:** FX-2 v1.0
+**Plan sürümü:** FX-2 v2.0 (28 kart, 8 dalga)
 
 ---
 
@@ -12,8 +12,8 @@
 | | |
 |---|---|
 | Son tamamlanan prompt | **yok** (seri henüz başlamadı) |
-| Sıradaki prompt | **FX2-P-01** — kapsam denetçisi + taban çizgisi |
-| Aşama | Dalga 0 — Ölçüm ve Sözleşme |
+| Sıradaki prompt | **FX2-01** — kapsam denetçisi + taban çizgisi |
+| Aşama | Dalga 0 — Ölçüm ve Token |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır |
 
@@ -58,9 +58,49 @@ FX-2 bu yüzden birim olarak API'yi değil **kapsamı** alır
 | M7 hareket token uyumu | 0,21 | ≥ 0,80 |
 | M8 kapalı gelen premium ayar | 4 | 0 |
 | M9 iOS geri bildirim kanalı | **0** | ≥ 2 |
+| M10 pembe token | 11 | **0** |
+| M11 palet ailesi | 5 | **≤ 2** |
+| M12 canlı zemin sahnesi | **0** | ≥ 18 |
+| M13 kontrast (8 çift) | 0 | **8** |
 
 Testler taban anında **yeşil**: syntax OK, `driver.mjs` fail=0,
 premium ailesi 9/9.
+
+---
+
+## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
+
+**1. Kartlar yeniden numaralandı ve yeniden yazıldı.** 21 kart (gap'li
+`FX2-P-01/02/11/…`) → **28 kart, kesintisiz `FX2-01…28`**. Yeni format:
+her kart **tek başına yeterli** — uygulamak için başka belge okumak gerekmez;
+kopyala-uygula kod blokları, kesin `grep` çapaları, beklenen çıktılı doğrulama.
+
+**2. Renk kimliği dalgası eklendi (Dalga 1, FX2-03…05).**
+Kullanıcı kararı: pembe (`#C77D93`/`#FFB1CF`) → **Şampanya Altını + Füme**
+(`#B08D57` / `#8A6A3B` / koyu `#E3C08A`), `--gold-1..5` merdiveni.
+Gerekçe: ÆON `#C99A3A`, nav `#A4824C`, zikir `#D8B968`, Saygı altını zaten
+hâkim; **pembe paletteki tek yabancıydı.** Palet 5 aileden 2'ye iner.
+Pembe tamamen token seviyesinde (11 hex) → düşük risk, yüksek etki.
+Dokunulmayan: `--kandil` (dinî), `--warn`, `--read`/`--watch`/`--listen`, `--sun`.
+
+**3. Canlı zemin dalgası eklendi (Dalga 5, FX2-19…23).**
+Kullanıcının "vardı, kayboldu" dediği iş. FX-1 `PLAN.md` §4.4 "hava modu"nu
+*"gelecekte hava API'si varsa"* diye ertelemiş, FX-P-88 bloklu kalmıştı.
+
+> **O gerekçe geçersiz:** `data.weather.spots[0]` (`code`, `isDay`, `precip`,
+> `sunrise`, `sunset`, `uv`, `wind`) **zaten canlı ve kayıtlı**.
+> Canlı zemin için **tek bir yeni ağ çağrısı bile gerekmiyor.**
+
+`SeyAmbience` üç katmanlı sahne yazar:
+`amb-time-*` (4, **gerçek güneş saatiyle** — sabit saat aralığı değil) ×
+`amb-wx-*` (8, WMO kodundan) × `amb-season-*` (6) = **192 kombinasyon**.
+Artı `--amb-seed`: günün tarihinden deterministik, gradient açısını ±8°
+kaydırır (gün içinde sabit). Sıkılma problemi böyle çözülür.
+Çitler: DOM parçacığı yok, opaklık ≤ 0,09, `setInterval` yok,
+reduced-motion'da renk kalır hareket durur, kontrast 8/8 fixture'lı.
+
+**4. Yeni belge:** [`../RENK-VE-ZEMIN.md`](../RENK-VE-ZEMIN.md) —
+renk kararı + canlı zemin sözleşmesi.
 
 ---
 
@@ -68,7 +108,7 @@ premium ailesi 9/9.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-P-01.md`](../.prompts/FX2-P-01.md)
+2. Kart: [`../.prompts/FX2-01.md`](../.prompts/FX2-01.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** kapsam yükselmediyse kart BLOKLU, seri durur.
 

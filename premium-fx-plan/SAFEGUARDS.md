@@ -33,8 +33,8 @@ yazmaz, `SeySync.schedule()` çağırmaz.
 | Bilinçli etkileşim sesi (`tap`/`tick`) reduced-motion'da **çalar** | işitsel geri bildirim hareket değildir |
 | Odak sözleşmesi korunur | `App.onModalKeydown`, `focusModalDialog`, Tab/Shift+Tab/Escape |
 | Backdrop asla odaklanabilir olmaz | `role="button" tabindex="0"` yasak |
-| `aria-pressed` / `aria-label` toggle'larda korunur | FX2-P-14 yalnız `data-fx` **ekler** |
-| Kontrast ≥ 4,5:1 | 4 saat dilimi × 2 tema = 8 kombinasyon fixture ile doğrulanır (FX2-P-42) |
+| `aria-pressed` / `aria-label` toggle'larda korunur | FX2-09 yalnız `data-fx` **ekler** |
+| Kontrast ≥ 4,5:1 | 4 saat dilimi × 2 tema = 8 kombinasyon fixture ile doğrulanır (FX2-20) |
 | Ses tek geri bildirim kanalı olamaz | iOS sessiz anahtarı sesi susturabilir → görsel kanal zorunlu |
 
 ---
@@ -61,7 +61,7 @@ yazmaz, `SeySync.schedule()` çağırmaz.
 | iOS sessiz anahtarı WebAudio'yu susturabilir | görsel kanal tek başına yeterli olmalı |
 | iOS `AudioContext` jest olmadan başlamaz | tek seferlik `{once:true}` kilit açma |
 | `speechSynthesis.getVoices()` Chrome/iOS'ta **asenkron** | `onvoiceschanged` beklenir |
-| Bulut TTS `settings.openaiKey` gerektirir | anahtarsızken yerel TTS'e düşülür (FX2-P-51) |
+| Bulut TTS `settings.openaiKey` gerektirir | anahtarsızken yerel TTS'e düşülür (FX2-26) |
 | GitHub Pages'te build yok | harici kütüphane/CDN/ses dosyası **eklenmez** |
 
 ---

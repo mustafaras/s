@@ -39,11 +39,11 @@ FX-2'de **tekrarlanmayacak** olanlar:
 | Hata | Sonucu | FX-2'deki panzehir |
 |---|---|---|
 | API yazıp bağlamamak | `SeyAudio.tap` 0 çağrı | Kapsam metriği + S8 kuralı |
-| Handler başına elle bağlama | 717'nin ~25'i kapsandı | Tek delege katman (FX2-P-11) |
+| Handler başına elle bağlama | 717'nin ~25'i kapsandı | Tek delege katman (FX2-06) |
 | `event` gerektiren API'yi `event` geçmeyen `onclick`'e bağlamak | Ripple hiç oynamadı | Delege katman gerçek `PointerEvent` tutar |
 | CSS sınıfı yazıp markup'a basmamak | `.sey-ripple` 0 kullanım | Sınıflar runtime'da takılır |
 | Haptik'i tek kanal saymak | iOS'ta tamamı sessiz | Çok kanallı (ses + görsel + titreşim) |
-| Premium özelliği kapalı göndermek | 4 özellik atıl | FX2-P-51 varsayılan denetimi |
+| Premium özelliği kapalı göndermek | 4 özellik atıl | FX2-26 varsayılan denetimi |
 | Modül testini entegrasyon kanıtı saymak | 9/9 yeşil, his sıfır | Fixture **+** `--gate` zorunlu |
 | Belge sayısını çoğaltmak (30+ .md) | Bayat, çelişkili kaynak | 8 belge, tek doğru kaynak |
 

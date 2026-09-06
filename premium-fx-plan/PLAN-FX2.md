@@ -1,27 +1,31 @@
 # FX-2 — "Hissedilir Premium" Programı
 
-**Sürüm:** 1.0 · **Tarih:** 2026-09-06 · **Dal:** `premium-fx-gorsel-yuzey`
+**Sürüm:** 2.0 · **Tarih:** 2026-09-06 · **Dal:** `premium-fx-gorsel-yuzey`
+**Kart sayısı:** 28 (FX2-01 … FX2-28), 8 dalga, kesintisiz sıralı
 **Ön koşul:** [`TESHIS.md`](TESHIS.md) okunmuş olmalı.
 **Kural:** LOCAL-ONLY — push/merge/deploy yok
 ([`LOCAL-ONLY-IMPLEMENTATION.md`](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ---
 
-## 1. FX-1'den Farkı (tek tabloda)
+## 1. Bu Seri Neyi Farklı Yapıyor
 
-| | FX-1 (91 prompt) | FX-2 (20 prompt) |
+| | FX-1 (91 prompt) | FX-2 (28 kart) |
 |---|---|---|
 | Birim | API yüzeyi | **Kapsanan etkileşim sayısı** |
-| Bağlama | Handler başına elle | **Tek delege katman** |
+| Bağlama | Handler başına elle (715'in ~25'i) | **Tek delege katman** (361 buton) |
 | Bitti tanımı | Fixture yeşil | Fixture yeşil **+ kapsam raporu yükseldi** |
-| Ses | Ham osilatör | Filtreli/harmonikli/reverb'lü enstrüman |
-| Haptik | `navigator.vibrate` | Çok kanallı (ses+görsel+titreşim) |
+| Ses | Ham osilatör ("bip") | Filtreli/harmonikli/reverb'lü enstrüman |
+| Haptik | `navigator.vibrate` (iOS'ta ölü) | Çok kanallı (ses + görsel + titreşim) |
+| Renk | 5 dağınık aile, pembe yabancı | **Şampanya altını + füme, 2 aile** |
+| Arka plan | Sabit; hava modu bloklanmış | **192 kombinasyonlu canlı zemin** |
 | Hareket | Serpiştirilmiş | Token sistemi + tek geçiş motoru |
-| Varsayılan | 4 özellik kapalı | Kapalı gelen özellik yok sayılır |
+| Varsayılan | 4 özellik kapalı | Kapalı gelen premium özellik yok |
+| Kart formatı | Belgeye atıflı | **Kendi kendine yeten, kopyala-uygula** |
 
 ---
 
-## 2. Değişmezler (I1–I8) — her prompt için bağlayıcı
+## 2. Değişmezler (I1–I8) — her kart için bağlayıcı
 
 - **I1** `data` şeması yalnız `settings.*` altına **ek** alan alır.
 - **I2** `App.<ad>` yüzeyi yalnız **eklenir**; mevcut hiçbir handler'ın imzası
@@ -32,117 +36,144 @@
   `localStorage` anahtarı (`seyma-reset-v1`) **davranış olarak** değişmez.
 - **I5** Tek `app.js`; IIFE + `window.*` deseni korunur (build yok).
 - **I6** `prefers-reduced-motion: reduce` her hareket/ses yolunda saygı görür.
-- **I7 (YENİ)** Hiçbir FX `render()`'ın çıktısını, `paint()` sözleşmesini veya
+- **I7** Hiçbir FX `render()`'ın çıktısını, `paint()` sözleşmesini veya
   scroll/odak restorasyonunu bozmaz.
-- **I8 (YENİ)** Hiçbir FX ana iş parçacığında 4 ms'ten uzun senkron iş yapmaz;
-  animasyon yalnız `transform`/`opacity`/`filter` üzerinden.
+- **I8** Ana iş parçacığında 4 ms'ten uzun senkron iş yok; animasyon yalnız
+  `transform` / `opacity` / `filter`.
 
 ---
 
 ## 3. Yürütme Sözleşmesi (S1–S8)
 
-- **S1** Promptlar **sırayla** çalıştırılır; atlama yok.
-- **S2** Her prompt tek bir konuya dokunur; kapsam dışı dosya değiştirilmez.
-- **S3** Her prompt sonunda: `node --check` → `driver.mjs` → ilgili fixture →
+- **S1** Kartlar **sırayla**: FX2-01 → FX2-28. Atlama yok.
+- **S2** Her kart tek konuya dokunur; "Dokunma" listesindeki dosya açılmaz.
+- **S3** Her kart sonunda: `node --check` → `driver.mjs` → ilgili fixture →
   `tools/fx-coverage.mjs`.
-- **S4** Her prompt kendi cache-bump'ını yapar (`index.html` `?v=`).
-- **S5** Değişmezlik kanıtı: `App.*` sayısı, `onclick` sayısı, tek `app.js`.
+- **S4** Her kart kendi cache-bump'ını yapar (`index.html` `?v=`).
+- **S5** Değişmezlik kanıtı: `App.*` = 717, `onclick` = 391, tek `app.js`.
 - **S6** `.anti-amnesia/{LEDGER.md, CURRENT-STATE.md, FX2-STATE.json}` **aynı
   commit içinde** güncellenir.
-- **S7** Yerel commit: `fx2: FX2-P-NN <kısa Türkçe özet>`. Push yok.
-- **S8** Bir prompt kapsam sayısını yükseltemiyorsa **BLOKLU** işaretlenir ve
-  seri durur; "yaptım ama ölçülemiyor" kabul edilmez.
+- **S7** Yerel commit: `fx2: FX2-NN <kısa Türkçe özet>`. Push yok.
+- **S8** Kart hedef metriğini yükseltemiyorsa **BLOKLU** işaretlenir ve seri
+  durur; "yaptım ama ölçülemiyor" kabul edilmez.
 
 ---
 
-## 4. Dalgalar
+## 4. Dalgalar (28 kart)
 
-### Dalga 0 — Ölçüm ve Sözleşme (FX2-P-01…02)
+### Dalga 0 — Ölçüm ve Token (FX2-01…02)
 Ölçemeden düzeltmeye başlamayacağız.
 
-| Kart | İş | Kapsam hedefi |
+| Kart | İş | Hedef |
 |---|---|---|
-| **FX2-P-01** | `tools/fx-coverage.mjs` — kapsam denetçisi + taban çizgisi JSON | araç var, taban kaydedildi |
-| **FX2-P-02** | Hareket token sistemi (`--dur-*`, `--ease-*`, `--elev-*`, spring) | token %100 tanımlı, davranış değişmez |
+| **01** | `tools/fx-coverage.mjs` — kapsam denetçisi + taban çizgisi | araç kurulur |
+| **02** | Hareket + renk token iskeleti (`--dur-*`, `--ease-*`, `--elev-*`, `--accent-soft`) | M7 → 0,45 |
 
-### Dalga 1 — Dokunma Katmanı (FX2-P-11…15) ⭐ en yüksek etki
-Tek delege edilmiş pointer katmanı; 361 buton tek seferde kapsanır.
+### Dalga 1 — Renk Kimliği (FX2-03…05) 🎨
+**Öne alındı:** tek dokunuşta en görünür değişim, salt CSS, en düşük risk.
 
-| Kart | İş | Kapsam hedefi |
+| Kart | İş | Hedef |
 |---|---|---|
-| **FX2-P-11** | `SeyTouch` — `#root` üzerinde delege `pointerdown/up/cancel`; `innerHTML` yeniden kurulumundan sağ çıkar | kapsanan buton ≥ %95 |
-| **FX2-P-12** | `.sey-press` basma durumu CSS'i (scale + parlaklık + gölge), sınıf JS'ten takılır, markup değişmez | görsel geri bildirim ≥ %95 |
-| **FX2-P-13** | Ripple'ı delege katmana bağla; `.sey-ripple` konteyneri runtime'da takılır | ripple çalışan buton ≥ %90 |
-| **FX2-P-14** | Niyet haritası: `data-fx="nav\|confirm\|destructive\|toggle\|open\|close"` — anlamına göre farklı geri bildirim | ≥ 40 yüksek değerli eylem etiketli |
-| **FX2-P-15** | Kapsam fixture'ı `test_fx2_touch_coverage.js` — eşik altına düşerse FAIL | eşik CI'da kilitli |
+| **03** | Pembe → **Şampanya Altını**; `--page` gradienti fildişi/kum/inci | **M10 → 0** |
+| **04** | Altın aile birleştirme (`--learn`, aurora halkası, `--accent-soft` yayılımı) | **M11 → ≤2** |
+| **05** | Kontrast + tema fixture'ı (8 kombinasyon ≥ 4,5:1) | M13 8/8 |
 
-### Dalga 2 — Ses Kimliği v2 (FX2-P-21…24)
-Bip'ten enstrümana.
+### Dalga 2 — Dokunma Katmanı (FX2-06…10) ⭐
+Serinin en yüksek etkili dalgası: 361 buton tek seferde kapsanır.
 
-| Kart | İş | Kapsam hedefi |
+| Kart | İş | Hedef |
 |---|---|---|
-| **FX2-P-21** | Ses motoru: master bus → kompresör → algoritmik reverb → limiter; ADSR, lowpass, ±cents detune, velocity jitter, polifoni sınırı | klipleme 0, gecikme < 10 ms |
-| **FX2-P-22** | Ses paleti v2: `tick/tap/toggleOn/toggleOff/nav/sheetOpen/sheetClose/success/bell/warning/error` — aynı enstrüman ailesi | 11 ses, hepsi bağlı |
-| **FX2-P-23** | iOS ses kilidi: ilk `pointerdown`'da `resume()` + sessiz buffer; `visibilitychange`'de suspend | ilk dokunuşta ses ≥ %99 |
-| **FX2-P-24** | `test_fx2_audio_engine.js` — graf şekli, gating matrisi, quiet-time | fixture yeşil |
+| **06** | `SeyTouch` — `#root` üzerinde delege pointer katmanı | **M2 → ≥%95** |
+| **07** | `.sey-press` basma durumu + `.surface:active` hatası düzeltmesi | M2 görsel |
+| **08** | Ripple'ı delege katmana bağla, konteyner runtime'da takılır | **M4 → ≥%90** |
+| **09** | Niyet haritası `data-fx` (nav/open/close/toggle/confirm/destructive) | ≥40 etiket |
+| **10** | Dokunma kapsamı fixture'ı — eşiği kilitle | eşik CI'da |
 
-### Dalga 3 — Hareket Sistemi (FX2-P-31…34)
-Ekranlar arasında süreklilik.
+### Dalga 3 — Ses Kimliği (FX2-11…14) 🔊
 
-| Kart | İş | Kapsam hedefi |
+| Kart | İş | Hedef |
 |---|---|---|
-| **FX2-P-31** | Sekme geçiş motoru: `paint()` çevresine çıkış→swap→giriş (çift rAF); `render()` sözleşmesi değişmez | 7 sekmenin 7'si |
-| **FX2-P-32** | Overlay/sheet hareketi: yaylı giriş, backdrop blur rampası, **DOM silinmeden önce çıkış animasyonu** | 13 overlay'in ≥ 10'u |
-| **FX2-P-33** | Liste/kart stagger: markup'ta `style="--i:N"`, animasyon CSS'te — JS düğüm gezmez | ≥ 8 liste yüzeyi |
-| **FX2-P-34** | Sayaç/halka canlandırma: `countUp` tüm hero istatistiklerine, ring'e `stroke-dashoffset` geçişi | 1 → ≥ 8 sayaç |
+| **11** | Ses motoru v2: bus → kompresör → reverb → limiter, ADSR, detune | klipleme 0 |
+| **12** | Ses paleti v2 — 11 ses; `bell` 6 inharmonik parsiyel; `tap` 45 ms | **M3 → ≥200** |
+| **13** | iOS ses kilidi (`{once:true}`) + `visibilitychange` | **M9 → ≥2** |
+| **14** | Ses motoru fixture'ı (sahte `AudioContext`, graf doğrulama) | fixture yeşil |
 
-### Dalga 4 — Malzeme ve Atmosfer (FX2-P-41…43)
-Derinlik gerçekten görünsün.
+### Dalga 4 — Hareket Sistemi (FX2-15…18)
 
-| Kart | İş | Kapsam hedefi |
+| Kart | İş | Hedef |
 |---|---|---|
-| **FX2-P-41** | Elevation skalası: katmanlı gölge + iç ışık + `color-mix` kenar; `.surface:active` kart-küçültme hatası düzeltilir | 70 `.surface` tutarlı |
-| **FX2-P-42** | Zaman teması v2: `--page`/`--bg`/`--card` gerçek gradient kayması + 800 ms crossfade | 2 eleman → tüm zemin |
-| **FX2-P-43** | Aurora v2: scroll parallax + grain overlay, `premiumAtmosphere` kapalıyken tam sönük | GPU katmanı ≤ 2 |
+| **15** | Sekme geçiş motoru (çıkış → swap → giriş, timeout ağlı) | 7/7 sekme |
+| **16** | Overlay giriş/çıkış hareketi (`SeyFx.sheetClose`) | **M6 → ≥10** |
+| **17** | Stagger sistemi (`--i`, CSS ile, JS düğüm gezmez) | ≥8 yüzey |
+| **18** | Sayaç + halka canlandırma (`data-countup`, `sweepCounters`) | **M5 → ≥8** |
 
-### Dalga 5 — Varsayılanlar ve Kapanış (FX2-P-51…53)
+### Dalga 5 — Canlı Zemin (FX2-19…23) 🌦️
+**Kullanıcının kaybolduğunu söylediği iş.** Hava verisi zaten `data.weather`
+içinde — yeni ağ çağrısı yok.
 
-| Kart | İş | Kapsam hedefi |
+| Kart | İş | Hedef |
 |---|---|---|
-| **FX2-P-51** | Varsayılan denetimi: `launchRitual` gerçek ritüelle açılır; anahtarsız kullanıcıda ses katmanı sessiz kalmaz | kapalı-gelen premium özellik = 0 |
-| **FX2-P-52** | Tam regresyon + kapsam raporu (öncesi/sonrası tablo) | 0 FAIL, kapsam hedefleri tutmuş |
-| **FX2-P-53** | Kapanış belgesi + doküman senkronu + CLAUDE.md/AGENTS.md yönlendirmesi | belgeler tutarlı |
+| **19** | `SeyAmbience` çekirdeği — saf `scene()` + `apply()`, 3 katmanlı sınıf | motor kurulur |
+| **20** | Güneş saati: gerçek `sunrise`/`sunset` ile 4 zaman sahnesi + fallback | 4 sahne |
+| **21** | **Hava modu**: WMO kodu → 8 sahne (yağmur/kar/sis/fırtına…), şiddet `precip`/`wind`'den | 8 sahne |
+| **22** | Mevsim + özel gün sahneleri + `--amb-seed` günlük varyasyon | 6 sahne, **M12 ≥18** |
+| **23** | Zemin fixture'ı + performans + kontrast kapısı | 192 kombinasyon güvenli |
+
+### Dalga 6 — Malzeme ve Derinlik (FX2-24…25)
+
+| Kart | İş | Hedef |
+|---|---|---|
+| **24** | Elevation skalası uygulaması (katmanlı gölge + iç ışık) | **M7 → ≥0,80** |
+| **25** | Aurora v2 — scroll parallax + grain, altın halkalı | GPU katmanı ≤2 |
+
+### Dalga 7 — Varsayılanlar ve Kapanış (FX2-26…28)
+
+| Kart | İş | Hedef |
+|---|---|---|
+| **26** | Varsayılan denetimi (`launchRitual`, `voiceLocalFallback` açılır) | **M8 → 0** |
+| **27** | Tam regresyon + kapsam raporu (öncesi/sonrası) | 0 FAIL |
+| **28** | Kapanış + doküman senkronu + `CLAUDE.md`/`AGENTS.md` | tutarlılık |
 
 ---
 
 ## 5. Kabul Eşikleri (seri bunlarla kapanır)
 
-| Metrik | Taban (2026-09-06) | Hedef |
-|---|---:|---:|
-| Basma geri bildirimi alan buton | 0 / 361 | **≥ 343 (%95)** |
-| Ses çıkaran etkileşim | ~13 | **≥ 200** |
-| Ripple çalışan buton | 0 | **≥ 325 (%90)** |
-| Canlandırılan sayaç | 1 | **≥ 8** |
-| Çıkış animasyonu olan overlay | 0 / 13 | **≥ 10** |
-| Kapalı gelen premium özellik | 4 | **0** |
-| iOS'ta hissedilen geri bildirim kanalı | 0 | **≥ 2** (ses + görsel) |
-| Premium fixture | 9/9 | **9/9 + 3 yeni** |
+| Metrik | Taban | Hedef | Dalga |
+|---|---:|---:|---|
+| M2 basma geri bildirimi alan buton | 0 / 361 | **≥ 343** | 2 |
+| M3 ses çıkaran etkileşim | 13 | **≥ 200** | 2–3 |
+| M4 ripple çalışan buton | 0 | **≥ 325** | 2 |
+| M5 canlandırılan sayaç | 1 | **≥ 8** | 4 |
+| M6 çıkış animasyonlu overlay | 0 / 13 | **≥ 10** | 4 |
+| M7 hareket token uyumu | 0,21 | **≥ 0,80** | 0–6 |
+| M8 kapalı gelen premium ayar | 4 | **0** | 7 |
+| M9 iOS geri bildirim kanalı | 0 | **≥ 2** | 2–3 |
+| **M10 pembe token** | 11 | **0** | 1 |
+| **M11 palet ailesi** | 5 | **≤ 2** | 1 |
+| **M12 canlı zemin sahnesi** | 0 | **≥ 18** | 5 |
+| **M13 kontrast (8 kombinasyon)** | 8/8 | **8/8** | 1, 5 |
 
 ---
 
 ## 6. Yapılmayacaklar (kapsam çitleri)
 
 - `render()` yeniden yazılmayacak, sanal DOM getirilmeyecek.
-- `addEventListener` tabanlı bir bileşen çatısı kurulmayacak; inline
+- `addEventListener` tabanlı bileşen çatısı kurulmayacak; inline
   `onclick="App.x()"` deseni korunacak (delege katman **ek** bir yoldur).
 - 361 buton elle sınıflandırılmayacak (FX-1'in hatası).
-- Harici kütüphane, ses dosyası, font veya CDN eklenmeyecek.
-- `panel.html` / `panel-v2.html` bu seride **kapsam dışı**.
-- FX-1'in ertelenmiş FX-P-66/67 kartları canlandırılmayacak.
+- Harici kütüphane, CDN, ses dosyası, font, görsel **eklenmeyecek**.
+- Canlı zemin için **yeni ağ çağrısı yapılmayacak** — `data.weather` yeter.
+- Yağmur/kar **DOM parçacığı** ile yapılmayacak (gradient + tek transform).
+- `--kandil`, `--warn`, `--read`/`--watch`/`--listen` renklerine dokunulmayacak.
+- `panel.html` / `panel-v2.html` bu seride kapsam dışı.
+- `MODULARIZATION.md` değiştirilmeyecek (`test_modularization_boundary.js`
+  içeriğine bağlı).
+- FX-1'in ertelenmiş FX-P-66/67 ve bloklu FX-P-88 kartları canlandırılmayacak
+  (FX-P-88'in konusu FX2-21'de **doğru şekilde** ele alınıyor).
 
 ---
 
 ## 7. Sıradaki İş
 
-`.prompts/FX2-KATALOG.md` → **FX2-P-01** ile başla.
-Durum makinesi: [`.anti-amnesia/FX2-STATE.json`](.anti-amnesia/FX2-STATE.json)
+[`.prompts/FX2-KATALOG.md`](.prompts/FX2-KATALOG.md) → **FX2-01** ile başla.
+Durum: [`.anti-amnesia/FX2-STATE.json`](.anti-amnesia/FX2-STATE.json)

@@ -156,3 +156,28 @@ bekleyen ayrı kart olarak kayıtlı.
 - Yeni settings alanları: `voicePitch` (1), `voiceVoiceName` ('') — migrate+createDefaultData backfill'li
 - `#app{contain:layout style;}` — denendi, başarılı, kalıcı
 - **Push/merge/deploy yok** — `premium-fx-gorsel-yuzey` dalında kullanıcı onayı bekliyor
+
+---
+
+## 9. Devam Kaydı — FX-2 (2026-09-06)
+
+> **Bu belge tarihsel kayıttır.** §7'deki "yeni bir FX dalı açılırsa
+> `.prompts/PROMPT-CATALOG.md`'ye ekle" yönergesi **geçersizdir**; o dosya ve
+> FX-1'in 67 prompt kartı kaldırıldı.
+
+2026-09-06'da yapılan kod denetimi, bu belgedeki "DEPLOY-A-HAZIR" kararının
+**kod doğruluğu** için geçerli, **kullanıcı deneyimi** için geçersiz olduğunu
+gösterdi: FX API'si yazıldı ama uygulamaya bağlanmadı
+(`SeyAudio.tap` 0 çağrı, ripple tetiklenemez, `.sey-ripple/.sey-shimmer/
+.sey-enter` markup'ta 0 kullanım, haptik iOS'ta no-op, 4 premium ayar kapalı;
+717 `App.*` handler'ının ~%3,5'i kapsanmış — buna rağmen 9/9 fixture yeşil).
+
+**Aktif seri artık FX-2'dir:**
+- Teşhis: [`../TESHIS.md`](../TESHIS.md)
+- Plan: [`../PLAN-FX2.md`](../PLAN-FX2.md)
+- Katalog: [`../.prompts/FX2-KATALOG.md`](../.prompts/FX2-KATALOG.md)
+- Durum: [`../.anti-amnesia/FX2-STATE.json`](../.anti-amnesia/FX2-STATE.json)
+- FX-1 özeti: [`../arsiv/FX1-OZET.md`](../arsiv/FX1-OZET.md)
+
+FX-1'de üretilen modüller, API iskeleti, migrate backfill'i, ayarlar kartı ve
+9 fixture **korunmaktadır** — FX-2 bunların üzerine inşa eder.

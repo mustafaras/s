@@ -1,190 +1,94 @@
-# Şeyma Premium FX Planı — Güvenlik, Erişilebilirlik ve Veri Kısıtları
+# SAFEGUARDS — Veri Güvenliği, Erişilebilirlik, Performans
 
-**Sürüm:** v2.1 — 2026-08-30
-
-**Amaç:** Planın uygulanması sırasında asla kırılmaması gereken kuralları netleştirmek.
+**Sürüm:** 3.0 (FX-2) · **Tarih:** 2026-09-06
+**Kapsam:** FX-2 serisinin her kartı için bağlayıcı.
+Kök [`CLAUDE.md`](../CLAUDE.md) "DATA SAFETY" bölümü bunun üstündedir.
 
 ---
 
-## 1. Veri Güvenliği
+## 1. Veri Güvenliği (ihlal = seri durur)
 
-### 1.1 Temel Kural
+| Kural | Neden |
+|---|---|
+| Hiçbir FX `data` şemasına `settings.*` dışında alan eklemez | sync payload'ı ve panel projeksiyonu bozulmasın |
+| Hiçbir FX `save()`, `sync.js`, `sanitize()` veya Contents API akışının **davranışını** değiştirmez | `sync.js` tam-değiştirme yapar; en küçük sapma veri kaybı riskidir |
+| `localStorage` anahtarı `seyma-reset-v1` değişmez | eski kayıtlar okunamaz hale gelir |
+| `migrate()` eklemeleri **idempotent + additive**, `typeof`/`==null` guard'lı | kullanıcının kayıtlı seçimi asla ezilmez |
+| Yeni gizli alan eklenirse `sanitize()` beyaz listesi güncellenir | `openaiKey` gibi sırlar repoya sızmasın |
+| `mustafaras/seyma-data` reposuna **yazılmaz** | tek canlı kişisel veri kopyası |
+| Uygulamayı "çalışıyor mu" diye tarayıcıda açmak **yasak** | 2026-07-10 veri kaybı olayı |
+| Doğrulama `run-seyma` headless harness'leri ile | `fetch`/timer ölü stub'lı, ağ çağrısı imkânsız |
 
-Hiçbir efekt, `data` objesinin, `migrate()` fonksiyonunun, `sync.js` akışının veya GitHub Contents API çağrılarının **davranışını** değiştirmemeli.
-
-> **B1 kararı (canlı getter):** Faz 0'da `app.js`'e yalnızca **canlı getter** tanımları eklenir: `Object.defineProperty(window, 'data', { get: () => data, configurable: true })` (ve `ui`, `dark`, `migrate`, `getDay`, `createDefaultData`, `save` için aynı). Bu, mevcut fonksiyonların davranışını/imzasını değiştirmez; yalnızca `window` üzerinden okunabilir kılar. `data` mutable bir bağlama olduğu için (6+ kez yeniden atanır: 4412/4413/6692/9203/18724/9173/9177) tek seferlik `window.data = data` bayat kalır; canlı getter her okumada taze değer döndürür (VM'de kanıtlandı). Bu, I2/I3/I4'ü ihlal etmez çünkü "dokunulmaz" = "davranış değiştirmez", "hiç satır eklenmez" değil.
-
-### 1.2 Yeni Veri Alanları
-
-Eklenebilecek tek veri: `settings` altındaki boolean/number/string tercih alanları.
-
-```js
-// İzin verilen yeni alanlar (migrate ile varsayılan değerli)
-settings.premiumAtmosphere
-settings.uiSounds
-settings.voiceGuidance
-settings.ambientSounds
-settings.richHaptics
-settings.launchRitual
-```
-
-### 1.3 Sync Payload Kuralı
-
-`sync.js` içindeki `sanitize()` fonksiyonu, `data.settings.*` altındaki tüm alanları zaten varsayılan olarak senkronize eder (`settings` zaten sync payload’ının içinde). Bu nedenle yeni premium tercih alanları da mutlaka `settings` altında tanımlanmalı; başka bir kök/namespace altına eklenmemeli.
-
-```js
-// Doğru: tercihler settings altında kalır, sync.js onları zaten senkronize eder
-settings.premiumAtmosphere
-settings.uiSounds
-settings.voiceGuidance
-settings.ambientSounds
-settings.richHaptics
-settings.launchRitual
-```
-
-**Asla sync payload’a eklenmemesi gerekenler:**
-- Audio context state
-- Animasyon state
-- Geçici UI durumları (`ui.*`)
-- Herhangi bir medya dosyası
-
-### 1.5 Uygulama Aşaması Veri Güvenliği Kuralı
-
-Uygulama aşamasında (`Faz -1` ile `Faz 6` arası) hiçbir commit uzak repoya gönderilmez. Tüm değişiklikler yerel `main` veya `premium-fx` dalında tutulur. Bu sayede canlı `seyma` GitHub Pages sitesi, canlı `seyma-data` reposu ve kullanıcı verisi uygulama denemelerinden etkilenmez. Detaylar [LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md).
-
-### 1.4 localStorage Kuralı
-
-Efektler sadece `settings` altında kaydedilebilir. `ui` objesine yeni alan eklenebilir ama bu alanlar **asla** `localStorage`’a ve repoya gitmemeli.
+**Ses/FX'e özel:** hiçbir ses veya animasyon `save()` tetiklemez, `data`'ya
+yazmaz, `SeySync.schedule()` çağırmaz.
 
 ---
 
 ## 2. Erişilebilirlik
 
-### 2.1 `prefers-reduced-motion`
-
-Tüm yeni animasyon ve geçişler, `@media (prefers-reduced-motion: reduce)` altında pasif hale getirilebilmeli.
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  .sey-fx-animated,
-  .sey-fx-shimmer,
-  .sey-fx-ripple,
-  .sey-fx-float,
-  .sey-fx-count,
-  .sey-fx-bounce,
-  .sey-fx-splash,
-  .sey-fx-time-theme,
-  .sey-fx-aurora,
-  .sey-fx-nav-bounce {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
-/* Reduced-motion açıkken ses/haptik de pasif olur: tüm SeyAudio/SeyHaptics çağrıları
-   isPremiumFxEnabled() helper’ından geçer; bu helper prefers-reduced-motion’ı da kontrol eder. */
-```
-
-### 2.2 Kullanıcı Kontrolü
-
-`settings.premiumAtmosphere` master anahtarı, tüm efektleri anında kapatmalı.
-
-### 2.3 Ses Erişilebilirliği
-
-- Ses efektleri varsayılan açık olabilir ama kolayca kapatılabilmeli.
-- Sesli rehberlik (`voiceGuidance`) varsayılan **kapalı** olmalı; kullanıcı açıkça açmalı.
-- iOS’ta AudioContext kullanıcı etkileşimi ile başlatılmalı; aksi takdirde sessiz kalır.
-
-### 2.4 Görsel Kontrast
-
-- Tüm yeni gradient, glow ve arka plan efektleri, mevcut kontrast fixture’larından (`docs/apple-design/verify-contrast.mjs`) geçmeli.
-- Metin okunabilirliği asla riske atılmamalı.
+| Kural | Uygulama |
+|---|---|
+| `prefers-reduced-motion: reduce` her hareket yolunda saygı görür | `--dur-*` tek blokta 1 ms'ye düşer + `SeyFx.shouldAnimate()` |
+| Basma geri bildirimi **premium ayarına bağlı değildir** | `.sey-press` `premiumAtmosphere:false` iken de takılır — bu erişilebilirlik, süs değil |
+| Bilinçli etkileşim sesi (`tap`/`tick`) reduced-motion'da **çalar** | işitsel geri bildirim hareket değildir |
+| Odak sözleşmesi korunur | `App.onModalKeydown`, `focusModalDialog`, Tab/Shift+Tab/Escape |
+| Backdrop asla odaklanabilir olmaz | `role="button" tabindex="0"` yasak |
+| `aria-pressed` / `aria-label` toggle'larda korunur | FX2-P-14 yalnız `data-fx` **ekler** |
+| Kontrast ≥ 4,5:1 | 4 saat dilimi × 2 tema = 8 kombinasyon fixture ile doğrulanır (FX2-P-42) |
+| Ses tek geri bildirim kanalı olamaz | iOS sessiz anahtarı sesi susturabilir → görsel kanal zorunlu |
 
 ---
 
-## 3. Güvenlik
+## 3. Performans (I8)
 
-### 3.1 Harici Kaynaklar
-
-- Mümkünse harici ses dosyası kullanılmasın.
-- Eğer kullanılırsa, base64/data-uri veya repo içindeki küçük dosyalar tercih edilmeli.
-- Harici URL’ye asla otomatik istek atılmamalı (gizlilik ve performans).
-
-### 3.2 Auto-play Kuralı
-
-Web Audio API ve Web Speech API, kullanıcı etkileşimi (touch/click) olmadan otomatik çalışmamalı. Splash ve karşılama sesleri, kullanıcı ilk dokunuşunu yapana kadar ertelenmeli.
-
-### 3.3 CSP
-
-GitHub Pages statik hosting için CSP etkisi sınırlı; ama yeni inline script/animasyonlar mevcut CSP’yi (varsa) kırmamalı.
+- Animasyon yalnız `transform` / `opacity` / `filter`.
+  `width`, `height`, `top`, `left`, `box-shadow` animasyonu **yasak**.
+- `will-change` yalnız animasyon süresince; bitince kaldırılır.
+- Delege dinleyiciler `{passive:true}`; `pointerdown` işi **≤ 4 ms**.
+- `preventDefault()` dokunma yolunda **çağrılmaz** — kaydırma bozulmaz.
+- Aynı anda **≤ 2** kalıcı sonsuz animasyon (aurora + shimmer).
+- Ses polifonisi **≤ 6**; taşarsa en eski fade-out.
+- `AudioContext` uygulama arka plandayken `suspend()`.
+- Stagger gecikmesi `--i` en fazla **8** ile sınırlı.
 
 ---
 
-## 4. Test Zorunlulukları
+## 4. Platform Gerçekleri (varsayım değil, ölçüm)
 
-### 4.1 Her Faz Sonrası Çalıştırılacak Testler
-
-```bash
-node --check app.js
-node --check app/core/mediaFx.js
-node .claude/skills/run-seyma/driver.mjs
-node .claude/skills/run-seyma/zikr-harness.mjs
-node tests/panel/test_faz11_panel.js
-node tests/app/test_premium_audio_fx.js
-node tests/app/test_premium_haptics_fx.js
-node tests/app/test_premium_reduced_motion.js
-node tests/app/test_premium_launch_splash.js
-node tests/app/test_premium_time_theme.js
-node tests/app/test_modularization_boundary.js
-node tests/app/test_faz_minus11_boundary.js
-node docs/apple-design/verify-contrast.mjs
-node docs/apple-design/verify-theme-tristate.mjs
-```
-
-### 4.2 Yeni Testler
-
-- `tests/app/test_premium_audio_fx.js`
-- `tests/app/test_premium_haptics_fx.js`
-- `tests/app/test_premium_reduced_motion.js`
-- `tests/app/test_premium_launch_splash.js`
-- `tests/app/test_premium_time_theme.js`
-- `tests/app/test_modularization_boundary.js`
-- `tests/app/test_faz_minus11_boundary.js`
-
-Mevcut kontrast ve tema fixture'ları:
-- `docs/apple-design/verify-contrast.mjs`
-- `docs/apple-design/verify-theme-tristate.mjs`
-
-### 4.3 Manuel / Görsel QA
-
-- Her değişiklik sonrası hem açık hem koyu tema kontrolü.
-- `prefers-reduced-motion: reduce` simülasyonu.
-- iOS Safari + Android Chrome dokunma davranışları.
+| Gerçek | Sonuç |
+|---|---|
+| iOS Safari `navigator.vibrate` **desteklemez** | haptik bonus, birincil kanal değil |
+| iOS sessiz anahtarı WebAudio'yu susturabilir | görsel kanal tek başına yeterli olmalı |
+| iOS `AudioContext` jest olmadan başlamaz | tek seferlik `{once:true}` kilit açma |
+| `speechSynthesis.getVoices()` Chrome/iOS'ta **asenkron** | `onvoiceschanged` beklenir |
+| Bulut TTS `settings.openaiKey` gerektirir | anahtarsızken yerel TTS'e düşülür (FX2-P-51) |
+| GitHub Pages'te build yok | harici kütüphane/CDN/ses dosyası **eklenmez** |
 
 ---
 
-## 5. Dışlananlar (Yapılmayacaklar)
+## 5. Kanıt Seviyeleri (rapor dili)
 
-Aşağıdaki öneriler bu plan kapsamında dışlanmıştır:
+| Seviye | Ne kanıtlar | Kim |
+|---|---|---|
+| **K1** kaynak/test | kod bağlı, fixture yeşil, kapsam yükseldi | ajan (headless) |
+| **K2** yerel görsel | `127.0.0.1:9000` kontrollü QA görüntüsü | ajan (CLAUDE.md istisnası) |
+| **K3** cihaz | iPhone'da ses duyuldu / basma hissedildi | **yalnız kullanıcı** |
 
-- Harici reklam, analytics veya üçüncü taraf SDK entegrasyonu.
-- Uygulamaya yeni backend veya sunucu tarafı bileşen.
-- Kullanıcı verisini değiştiren veya toplayan efekt.
-- Otomatik video oynatma.
-- Flashing/strobe efektleri (seizure riski).
-- Karanlık modda aşırı parlak glow.
+Hiçbir rapor K1'e dayanarak "cihazda düzeldi" demez. K2 için CLAUDE.md'deki
+istisna koşullarının tamamı sağlanmalıdır (Guard 1 doğrulanmış, `forceSync`
+yok, gerçek hesap/token yok, sunucu turn bitmeden kapatılır).
 
 ---
 
-## 6. Onay Kontrol Listesi
+## 6. Kırmızı Çizgiler
 
-Planı uygulamadan önce şu maddelerin tamamı onaylanmalı:
+Bunlardan biri gerçekleşirse **seri durur**, `blockedPrompt` yazılır:
 
-- [ ] Tüm yeni veri alanları `settings` altında tanımlı.
-- [ ] `migrate()` güncelleme spec’i yazıldı.
-- [ ] `prefers-reduced-motion` ve `premiumAtmosphere` pasif durumları belgelendi.
-- [ ] Sesler kullanıcı etkileşimiyle tetikleniyor.
-- [x] Yeni test fixture’ları oluşturuldu ve çalıştırıldı.
-- [ ] Kontrast ve erişilebilirlik kontrolü planlandı.
-- [ ] Uygulama aşamasında sadece yerel commitler yapılacağı onaylandı ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
-- [ ] `docs/GELISTIRME-PLANI.md` güncelleme planı var.
+- `git push` / PR / deploy / tag (onaysız)
+- `seyma-data` reposuna yazma
+- `sync.js` davranış değişikliği
+- `migrate()`'te var olan kullanıcı değerinin ezilmesi
+- `App.*` handler imzasının değişmesi
+- Odak/klavye sözleşmesinin bozulması
+- Kontrast oranının 4,5:1 altına düşmesi
+- Fixture'ı gevşeterek testi yeşile boyamak

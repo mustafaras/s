@@ -1,382 +1,95 @@
-# Premium FX — FX-WAVE-2 Dalga 8 Sürüyor (LOCAL ONLY)
+# Premium FX — Güncel Durum
 
-**Tarih:** 2026-09-05
-**Proje:** Şeyma Premium Görsel & İşitsel Efekt Yükseltme
-**Kaynak uygulama:** `/Users/m_ras/Desktop/seyma`
-**Plan sürümü:** 2.3
-**Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
+**Tarih:** 2026-09-06
+**Seri:** **FX-2 — "Hissedilir Premium"** (yeni seri açıldı)
+**Dal:** `premium-fx-gorsel-yuzey` · **LOCAL ONLY** (push/merge/deploy yok)
+**Plan sürümü:** FX-2 v1.0
 
-## Son Durum (FX-WAVE-2 Dalga 9.5 — FX-P-91 tamamlandı)
+---
 
-- **Son tamamlanan prompt:** FX-P-91 (emoji-ikon temizliği — K1 temizlik kartı)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
-  Sıradaki kart: **FX-P-90 zaten kapatıldı** (denetim + seri kapanışı önceki
-  oturumda yapıldı); FX-P-91 bu kapanışın ardından temizlik kartı olarak
-  çalıştırıldı. Kalan kart: **yok** (FX-P-88 bloklu; FX-P-66/67 ertelenmiş).
-- **FX-P-91 uygulaması:** `app.js` — (1) `fxRows` veri satırlarındaki emoji
-  önekleri kaldırılıp 4. eleman olarak Lucide ikon adları eklendi
-  (`volume-2/vibrate/sparkles/mic/cloud-drizzle` — registry'de doğrulanmış);
-  (2) render döngüsünde `row[3]?icon(row[3],14):''` ile ikonlar basılıyor
-  (kartın "en az karışım" seçeneği); (3) iki kart başlığı emoji'den icon()'a
-  çevrildi (`icon('sparkles',15)+' Premium Atmosfer'`,
-  `icon('mic',15)+' Sesli rehberlik'`). **Kapsam dışı marka emojilerine
-  dokunulmadı** (🦩 maskot, toast ✨, .sg-faith-preview-card 🌙). aria-label
-  strip regex'i artık emojisi olmayan başlıkla da çalışır durumda.
-  Cache-bump: `app.js?v=20260906d`→`?v=20260906e`.
-- **Testler:** syntax OK; driver fail=0; zikr 95/95; settings fixture 33→39
-  (+6: FX-P-91'lerin 2'si + önceden var olan emoji-bağımlı Test 7 assertion'ı
-  icon-tabanlı sözleşmeye güncellendi); premium ailesi 9/9 yeşil.
-- **Emoji taraması (kart adım 5):** app.js'te 46 emoji satırı kaldı — tamamı
-  kapsam dışı marka dili (🦩 maskot, toast ✨, ✓ işaretleri, 🌿 preset, Saygı 🌙);
-  **premium FX bölgesinde (12500+ satırlar) 0 emoji.**
-- **S6 değişmezler:** App.* yüzeyi 717 (değişmedi), onclick envanteri 277
-  (değişmedi), tek `app.js` (`src` sayısı 1).
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+## Şu An Neredeyiz
 
-## Son Durum (FX-WAVE-2 Dalga 10 — FX-P-89 tamamlandı)
+| | |
+|---|---|
+| Son tamamlanan prompt | **yok** (seri henüz başlamadı) |
+| Sıradaki prompt | **FX2-P-01** — kapsam denetçisi + taban çizgisi |
+| Aşama | Dalga 0 — Ölçüm ve Sözleşme |
+| Bloklu | yok |
+| Uygulama tamamlandı | hayır |
 
-- **Son tamamlanan prompt:** FX-P-89 (#app contain izole denemesi — DENEYSEL, **kullanıcı onaylı**)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
-  Sıradaki kart: **FX-P-90** (bağımsız denetim + seri kapanışı — seri sırasındaki
-  son kart; FX-P-88 bu seride bloklu/kartsız).
-- **FX-P-89 uygulaması:** `app/styles.css` FX bölümüne **tek kural**:
-  `#app{contain:layout style;}` (paint/size KULLANILMADI — kart yasağı).
-  Kart satırları FX-P-81/83/85 ile kaydığı için kural aurora bloğu ile ripple
-  bloğu arasına yerleştirildi. `index.html` cache-bump: `styles.css?v=20260906a`→`?v=20260906d`
-  (a'yı FX-P-81/83 tüketmişti; d FX-P-87'de app.js/state.js için kullanılmıştı —
-  harf çakışması yok, styles.css kendi zincirinde yeni).
-- **Deney kararı: contain:layout style BAŞARILI.** Dump karşılaştırması
-  (bugun + rapor): before/after tek fark anlık hesaplanan bir skor değeri
-  (85/100 → 86/100, contain ile ilgisiz — bugün değişen canlı veri); yapısal
-  diff SIFIR. Riskli yüzeyler doğrulandı: `#sey-splash` + `#sey-aurora`
-  `#app`'in kardeşi (contain'den etkilenmez), `.sey-bottomnav` dump'ta tam
-  üretildi, appheader/appheader-2 marker'ları yerinde.
-- **Testler:** syntax OK; driver fail=0; zikr 95/95; panel-v2 family **0 fail**;
-  reduced-motion 31/31; time-theme 53/53; splash 16/16; premium ailesi 9/9 yeşil.
-- **S6 değişmezler:** App.* yüzeyi 717 (FX-P-87 sonrası değer — değişmedi),
-  tek `app.js` (`src` sayısı 1), contain yalnız `#app`'ta (root/body/html temiz).
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+**Durum makinesi:** [`FX2-STATE.json`](FX2-STATE.json)
 
-## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-87 tamamlandı)
+---
 
-- **Son tamamlanan prompt:** FX-P-87 (voicePitch + voiceVoiceName UI ve backfill — integration)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
-  Sıradaki kart: **FX-P-91** (emoji-ikon temizliği — seri sırası FX-P-87 sonrası).
-- **FX-P-87 uygulaması:** `app/core/state.js` — migrate() premium bloğuna
-  `voicePitch` (typeof number, default 1) + `voiceVoiceName` (typeof string,
-  default '') backfill'i; createDefaultData premium bloğuna `==null` guard'lı
-  aynı varsayılanlar (I3 idempotent+additive desen). `app.js` — (1) 2 additive
-  handler (`App.setVoicePitch` clamp 0.7–1.3, `App.setVoiceVoiceName` yalnız
-  string kabul) mevcut `App.setVoiceCloudVoice` gövdesi değiştirilmeden yanına;
-  (2) sesli rehberlik kartına 2 kontrol: Ton slider (`sey-voice-pitch`,
-  voiceCloudTts açıkken opacity+pointer-events disabled) ve Yerel ses select
-  (`sey-voice-vname`, boş "Otomatik" seçeneğiyle) — K1: etiketler düz metin;
-  (3) render() sonrası `speechSynthesis.onvoiceschanged` popülasyon bloğu
-  (paint()'tan hemen sonra; iOS async getVoices deseni). **mediaFx.js doğrulandı:**
-  `voicePitch`/`voiceVoiceName` zaten okunuyor (satır 260/269-270) — değişiklik
-  gerekmedi. Cache-bump: `app.js?v=20260906c`→`?v=20260906d`, `state.js?v=20260905a`→`?v=20260906d`.
-- **Testler:** syntax OK (app.js + state.js); driver fail=0; zikr 95/95;
-  migration-boundary B2 60/60 (I3 uyumlu); faz10 sync 69/69; voice fixture
-  59→67 (+8 FX-P-87 assertion — kartın 5'i + UI varlık + popülasyon bloğu);
-  premium ailesi 9/9 yeşil.
-- **S6 değişmezler:** App.* yüzeyi **715→717 (+2 belgelendi: setVoicePitch,
-  setVoiceVoiceName)**, tek `app.js` (`src` sayısı 1), state.js'te premium dışı
-  bölüm diff'i 0.
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+## Neden Yeni Bir Seri Açıldı
 
-## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-86 tamamlandı)
+FX-1 (91 prompt, ~70 fixture, "DEPLOY-A-HAZIR" kararı) **kapandı** ama
+kullanıcı geri bildirimi net: *"tüm fx promptları uygulamama karşın uygulama
+hâlâ premium bir his vermiyor."*
 
-- **Son tamamlanan prompt:** FX-P-86 (habits ring + motivation bar shimmer — integration)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
-  Sıradaki kart: **FX-P-87** (voicePitch/voiceVoiceName UI + backfill).
-- **FX-P-86 uygulaması:** `app.js`'te (1) ring konteynerlerine id: 96px hero ring
-  → `id="sey-habits-ring-wrap"` (satır 11479), 30px mini ring →
-  `id="sey-habits-ring-mini"` (satır 9677) — kart satırları 11229/11478 idi;
-  gerçek konumlar işaret ile bulundu (id-only ekleme, diğer öznitelikler aynen).
-  (2) `App.toggleHabit` tüm-hedefler dalı (`after>=ht&&before<ht`) — confetti +
-  success chime'ın yanına guard'lı `SeyFx.shimmer(sey-habits-ring-wrap)`.
-  (3) Motivasyon confidence bar div'ine `id="sey-motivation-bar"` (satır 10675)
-  ve `App.completeMotivationTask` başarı dalında (`wasDone===false`)
-  `SeyAudio.bell()` yanına guard'lı `SeyFx.shimmer(sey-motivation-bar)`.
-  Shimmer zaten `isPremiumFxEnabled()` ile gated — yeni gate yazılmadı.
-  Mevcut `maybeStreak` shimmer noktası değişmedi; `progBar`/`ringSeg`
-  imzaları değişmedi; `.sey-shimmer` CSS'ine dokunulmadı.
-  Cache-bump: `app.js?v=20260906b`→`?v=20260906c`.
-- **Testler:** syntax OK; driver fail=0; zikr 95/95; fx_utils fixture 26→28
-  (+2 FX-P-86 string-level assertion); premium ailesi 9/9 yeşil.
-- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), onclick envanteri 277
-  (değişmedi), tek `app.js` (`src` sayısı 1).
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+2026-09-06'da yapılan kod denetimi bunu doğruladı
+([`../TESHIS.md`](../TESHIS.md)):
 
-## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-85 tamamlandı)
+- `SeyAudio.tap` → `app.js`'te **0 çağrı**
+- `SeyFx.ripple` → 1 çağrı, **tetiklenemez** (hiçbir `onclick` `event` geçmiyor)
+- `.sey-ripple` / `.sey-shimmer` / `.sey-enter` → markup'ta **0 kullanım**
+- `SeyHaptics` 21 çağrı → **iOS Safari'de tamamı no-op**
+- 361 butonun 277'si satır içi stille yazılı, **ortak sınıf yok**
+- 4 premium ayar varsayılan **kapalı**; bulut TTS anahtar olmadan sessiz
+- 717 `App.*` handler'ının **~%3,5'i** herhangi bir FX tetikliyor
+- Buna rağmen **9/9 premium fixture yeşil** ← asıl kök neden
 
-- **Son tamamlanan prompt:** FX-P-85 (splash veri-durumu hatırlatması — integration)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
-  Sıradaki kart: **FX-P-86** (ring + motivation bar shimmer).
-- **FX-P-85 uygulaması:** `index.html` `#sey-splash` içinde karşılama satırının
-  altına boş `#sey-splash-note` div'i; `app.js` boot IIFE'sinde
-  `setTimeout(hideSplash,900)` satırının hemen üstüne try/catch'li not bloğu —
-  dün (`addDays(todayStr(),-1)`, dateUtils zinciri — yeni yesterdayStr
-  helper'ı YOK, mevcut zincir kullanıldı) kaydedilmemişse not doldurulur.
-  **Yapı doğrulaması karttaki ydone koşulunu değiştirdi:** gerçek gün kaydında
-  `yd.ticks` alanı YOK — `mood` tek string (null/'' değil), `habits` object,
-  `water` number, `savedAt` ISO; ydone = savedAt || mood || habits.any-true ||
-  water>0. `!on||reduced` erken-dönüş dalı değişmedi; hideSplash gövdesi,
-  launchRitual varsayılanı (false), settings alanları dokunulmadı; ses yok.
-  Cache-bump: `app.js?v=20260906a`→`?v=20260906b` (a sürümünü FX-P-84 tüketmişti).
-- **Testler:** syntax OK; driver fail=0; zikr 95/95; splash fixture 9→16
-  (+7 FX-P-85 assertion: 3 senaryo + K1 düz-metin + habits varyantı + index
-  elemanı + kaynak işareti); premium ailesi 9/9 yeşil.
-- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), tek `app.js` (`src` sayısı 1).
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+**Ders:** Fixture'lar modülü test etti, **bağlantıyı** test etmedi.
+FX-2 bu yüzden birim olarak API'yi değil **kapsamı** alır
+([`../KAPSAM-OLCUMU.md`](../KAPSAM-OLCUMU.md)).
 
-## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-84 tamamlandı)
+---
 
-- **Son tamamlanan prompt:** FX-P-84 (SeyOnSynced kristal bell — integration)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı
-  (`zikirmatik-manuel-zikir` üzerinde). Sıradaki kart: **FX-P-85** (splash
-  dün-hatırlatma notu).
-- **FX-P-84 uygulaması:** `app.js` `SeyOnSynced` gövdesinde, `ui.saveActionPending`
-  dalının içinde `toast('Panel ile eşitlendi')` satırının hemen üstüne **tek
-  satır** eklendi: guard'lı `window.SeyAudio.bell()` (zikrTap'teki desen).
-  Çan yalnız kullanıcının elle "Kaydet/Eşitle" onaylandığında çalar (QY-22);
-  arka plan save'lerde çalmaz. Başka hiçbir satır değişmedi (`else if saving`
-  dalı, `mergePersistedReminderState`, localStorage yazımı, toast metni aynen).
-  `index.html` app.js cache-bump `?v=20260905a`→`?v=20260906a`. `sync.js`
-  (I4) ve `save()` gövdesi dokunulmadı.
-- **Testler:** syntax OK; driver fail=0; zikr 95/95; faz10 sync 69/69 (sync
-  davranışı değişmedi); audio fixture 26→27 (+1 FX-P-84 assertion — kartın
-  regex'i 900→1200 pencereyle: gerçek offset 944); premium ailesi 9/9 yeşil.
-- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi — SeyOnSynced window.* zaten
-  mevcuttu), onclick envanteri 277, tek `app.js` (`src` sayısı 1).
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+## Taban Çizgisi (2026-09-06, commit `33995dc`)
 
-## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-83 tamamlandı)
+| Metrik | Taban | Hedef |
+|---|---:|---:|
+| M1 etkileşimli eleman | 387 | — |
+| M2 basma geri bildirimi | **0** | ≥ 343 |
+| M3 ses bağlı etkileşim | 13 | ≥ 200 |
+| M4 ripple konteyneri | **0** | ≥ 325 |
+| M5 canlandırılan sayaç | 1 | ≥ 8 |
+| M6 çıkış animasyonlu overlay | **0** | ≥ 10 |
+| M7 hareket token uyumu | 0,21 | ≥ 0,80 |
+| M8 kapalı gelen premium ayar | 4 | 0 |
+| M9 iOS geri bildirim kanalı | **0** | ≥ 2 |
 
-- **Son tamamlanan prompt:** FX-P-83 (surface derinlik + glass genişlemesi — salt CSS)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı
-  (`zikirmatik-manuel-zikir` üzerinde; ağaçtaki önceden var olan çalışma korunarak).
-  Sıradaki kart: **FX-P-84** (SeyOnSynced bell).
-- **FX-P-83 uygulaması:** `app/styles.css` FX bölümüne (1) genel kart derinliği:
-  `@media (hover:hover)` içinde `.surface` transition + `.surface:hover`
-  translateY(-2px)/box-shadow; touch cihazda hover-stick engellendi; dokunmada
-  yalnız `.surface:active` scale(.97); kendi `prefers-reduced-motion` bloğu
-  (transition+transform `none!important`). (2) Glass/blur: `@supports
-  (backdrop-filter: blur(1px))` içinde **yalnız doğrulanmış iki kalıcı yüzeye**
-  (`.sey-appheader`, `.sey-bottomnav` — render'da gerçek sınıf adları doğrulandı)
-  blur(14px) saturate(1.1). Kartın önerdiği `.overlay`/`.modal` genel sınıfları
-  app.js'te **mevcut değil** — overlay backdrop'ları inline stilli (sey-ov-back,
-  compact modal'lar zaten inline blur'lu; sey-room-overlay kendi blur'unu
-  satır içinde taşıyor), bu yüzden kartın "Tahminle sınıf uydurma" kuralına
-  uyularak genişletilmedi. Boot flaşı riski yok: mevcut `.sey-app-booted`
-  neutralizer bu iki yüzeyin blur'unu boot sonrası zaten sabitlemiyor
-  (`backdrop-filter:none` listesi dışında) — yalnız animasyon/transition'u
-  kesiyor; iOS parlama riski kartın kapsamı dışında gözlendi.
-  `app.js`/`index.html` DOKUNULMADI (cache-bump gereksiz: styles.css zaten
-  `?v=20260906a`'da); `contain` eklenmedi (FX-P-89'a ait).
-- **Testler:** syntax OK; driver fail=0; zikr 95/95; reduced-motion fixture
-  27→31 (+4 FX-P-83 assertion); kontrast 30 token 4.5:1 altı 0; theme-tristate
-  26/26; premium ailesi 9/9 yeşil.
-- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), tek `app.js` (`src` sayısı 1).
-- **Değişmezler:** I1–I6 korundu (data şekli, migrate/save/sync davranışı,
-  App.* yalnız-ekleme, tek app.js).
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+Testler taban anında **yeşil**: syntax OK, `driver.mjs` fail=0,
+premium ailesi 9/9.
 
-## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-82 tamamlandı)
+---
 
-- **Son tamamlanan prompt:** FX-P-82 (nav bounce + badge pop — salt CSS)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı
-  (`zikirmatik-manuel-zikir` üzerinde; ağaçtaki önceden var olan çalışma korunarak).
-  Sıradaki kart: **FX-P-83** (surface hover/active + glass).
-- **FX-P-82 uygulaması:** `app/styles.css` FX bölümüne `@keyframes seyNavBounce`
-  + `.is-active .sey-bottomnav-glyph` animasyonu, `@keyframes seyBadgePop` +
-  `.sey-bottomnav-badge` giriş animasyonu ve kendi `prefers-reduced-motion`
-  bloğu eklendi (`animation:none!important`). Mevcut satır 138 reduce kuralı
-  (`transition:none`) ile çakışma yok — o transition tarafını kapsıyor, yeni
-  blok animation tarafını. Render tarafı (`app.js:14772-14775`) zaten
-  `is-active` + badge span ürettiği için `app.js`/`index.html` DOKUNULMADI;
-  cache-bump gerekmedi (styles.css zaten `?v=20260906a`'da).
-- **Testler:** syntax OK; driver fail=0; zikr 95/95; reduced-motion fixture
-  22→27 (+5 FX-P-82 assertion); premium ailesi 9/9 yeşil.
-- **Görsel kanıt:** `driver.mjs --dump bugun` → `class="sey-bottomnav-item is-active"`
-  + `<span class="sey-bottomnav-badge saygi">3` (render zaten üretiyor).
-- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), tek `app.js` (`src` sayısı 1).
-- **Değişmezler:** I1–I6 korundu (data şekli, migrate/save/sync davranışı,
-  App.* yalnız-ekleme, tek app.js).
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+## Sıradaki Oturum İçin
 
-## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-81 tamamlandı)
+1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
+   → [`FX2-STATE.json`](FX2-STATE.json)
+2. Kart: [`../.prompts/FX2-P-01.md`](../.prompts/FX2-P-01.md)
+3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
+4. **S8 kuralı:** kapsam yükselmediyse kart BLOKLU, seri durur.
 
-- **Son tamamlanan prompt:** FX-P-81 (aurora arka plan katmanı)
-- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı
-  (`zikirmatik-manuel-zikir` üzerinde; ağaçtaki önceden var olan çalışma korunarak).
-  Sıradaki kart: **FX-P-82** (nav bounce + badge pop).
-- **FX-P-81 uygulaması:** `index.html` `#sey-aurora` katman div'i (`#app`
-  kardeşi, aria-hidden, pointer-events yok) + cache-bump (`styles.css?v=20260906a`,
-  `timeTheme.js?v=20260906a`); `app/styles.css` aurora kuralları (mevcut
-  `seyAurora` keyframes, token tabanlı, reduced-motion'a saygılı); `app/core/timeTheme.js`
-  `apply()` artık premium kapalıyken `theme-aurora` sınıfını kaldırıyor, açıkken
-  ekliyor. `app.js`/settings/`migrate()`/`sync.js` dokunulmadı.
-- **Testler:** syntax OK; driver fail=0; premium ailesi 9/9 fixture yeşil
-  (time-theme 49→53: +4 FX-P-81 assertion); kontrast 30 token 4.5:1 altı 0.
-- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), tek `app.js` (`src` sayısı 1).
-- **Değişmezler:** I1–I6 korundu (data şekli, migrate/save/sync davranışı,
-  App.* yalnız-ekleme, tek app.js).
-- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
-  kullanıcı onayı + son regression ile.
+---
 
-## Son Durum (FX-P-74 — FINAL)
+## Engeller / Bekleyenler
 
-- **Son tamamlanan prompt:** FX-P-74 (final kapanış)
-- **Uygulama:** ✅ TAMAMLANDI — Dalga −1 (modüler çekirdek), 0 (master switch iskeleti), 1 (Audio), 2 (Haptics), 3 (Visual micro-FX), 4 (Time theme), 5 (Voice guidance + bulut TTS), 6 (Ayarlar master switch + panel + a11y) tamamlandı; FX-P-70 tam denetimi **DEPLOY-A-HAZIR** kararı verdi; Dalga 7 (71–74) kapatma tamamlandı.
-- **Testler:** ~70 headless fixture (app/panel/panel-v2/quran/reminders) + driver + zikr + 9 syntax — tamamı PASS; tam regression FX-P-65 ve FX-P-70'te iki kez koşuldu.
-- **Değişmezler:** I1–I6 korundu (data şekli, migrate/save/sync davranışı, App.* 705 yalnız-ekleme, tek app.js).
-- **Bulut TTS:** `voiceCloudTts=true` (varsayılan), `voiceLocalFallback=false` — robotik yerel sene asla düşülmez; anahtar `settings.openaiKey` (Luna ile paylaşımlı, sanitize ile repoya gitmez).
-- **Branch:** `premium-fx-local` — push edilmemiş; `main`'e merge kullanıcı onayı + son regression ile.
+- **Push/merge/deploy:** kullanıcı onayı bekliyor (LOCAL-ONLY)
+- **Cihaz kabulü (K3):** iPhone'da ses/basma doğrulaması yalnız kullanıcıdan
+- **FX-1 ertelenmiş kartlar (FX-P-66/67):** FX-2 kapsamına **alınmadı**
+- **FX-P-88 (hava modu):** FX-1'de bloklu kalmıştı; FX-2 kapsamı dışında
+- **`panel.html` / `panel-v2.html`:** bu seride kapsam dışı
 
-## Kapanış Sonrası Onarım — 2026-09-04 (LEDGER seq 72)
+---
 
-Seri "tamamlandı" ilan edildikten sonra kullanıcı FX'in uygulamada **hiç
-görünmediğini** bildirdi. Doğrulandı ve onarıldı.
+## FX-1 Arşivi
 
-**Kök neden:** `settings.premiumAtmosphere` (ve `uiSounds`/`richHaptics`)
-`migrate()`/`createDefaultData()` tarafından hiç yazılmıyordu. mediaFx ve
-timeTheme `!s.premiumAtmosphere` ile kapanıyor, ayarlar kartı ise
-`!(x === false)` okuduğu için **"Açık" gösteriyordu** — UI açık, motor kapalı.
-Alt anahtarları açmak da kurtarmıyordu, çünkü master hâlâ `undefined` kalıyordu.
+Tarihsel kayıt korunuyor:
+- [`../deliverables/FX-SERI-KAPANIS-BELGESI.md`](../deliverables/FX-SERI-KAPANIS-BELGESI.md)
+- [`FX-PROMPT-STATE.json`](FX-PROMPT-STATE.json) (kapalı seri)
+- [`LEDGER.md`](LEDGER.md) (append-only, seq 1–70 FX-1)
+- [`../arsiv/FX1-OZET.md`](../arsiv/FX1-OZET.md) (ne yapıldı / ne tutmadı)
 
-**Neden fark edilmedi:** premium fixture ailesinin tamamı gate'i kendisi
-enjekte ediyordu (`setSettings({premiumAtmosphere:true, …})`). Hiçbir test
-gerçek `migrate()` çıktısını doğrulamadığı için ~70 fixture yeşilken uygulama
-sessizdi. FX-P-70 denetimi bu yüzden hatalı olarak "DEPLOY-A-HAZIR" dedi.
-
-**Onarılanlar:**
-
-1. `app/core/state.js` → `migrate()`'e additive + idempotent FX gate backfill'i.
-   `premiumAtmosphere`/`uiSounds`/`richHaptics` = `true`;
-   `launchRitual`/`voiceGuidance`/`ambientSounds` = `false`;
-   `voiceCloudTts` = `true`, `voiceLocalFallback` = `false` (**karar D4**).
-   Kullanıcının bilinçli kapatma tercihi hiçbir koşulda ezilmez.
-2. `SeyTimeTheme.applySeasonal()` render sonunda bağlandı. FX-P-43 fonksiyonu ve
-   `#root.theme-season-*` CSS'ini yazmış, ancak "app.js değişmedi (yasak liste)"
-   denip bağlama adımı hiç gelmemişti; o CSS ölü duruyordu.
-3. `App.toggleSetting(key, value)` opsiyonel açık değer alıyor. Master switch'in
-   iki segmenti de değersiz toggle çağırdığı için "Kapalı"ya basmak anahtarı
-   açabiliyordu; artık idempotent.
-
-**Yeni koruma:** `tests/app/test_premium_fx_gate_defaults.js` (26/26) — gerçek
-`migrate()` çıktısını gerçek `mediaFx.js`/`timeTheme.js` gövdelerine verip
-ses/titreşim/tema üretildiğini doğrular. Spec kopyası değil, sevk edilen kod.
-
-**Regression:** fail=0 — 7 syntax, driver, zikr 95/95, tüm `tests/app`,
-23 panel, 27 panel-v2, 9 quran, 20 reminder fixture, 3 boundary verifier.
-
-## Known Blockers
-
-- **Uygulanmamış FX yüzeyleri (eksik özellik, hata değil):**
-  - `launchRitual` → `#sey-splash` ve `hideSplash()` hiç yazılmadı; ayar bu
-    yüzden varsayılan `false`. `test_premium_launch_splash.js` splash yokluğunu
-    açıkça "placeholder geçerli" sayıyor, dolayısıyla 11/11 PASS görsel uygulama
-    kanıtı değildir.
-  - `SeyFx.ripple` / `SeyFx.enter` / `SeyFx.transition` → motor mevcut, app.js'te
-    çağrı noktası yok (`VISUAL-FX-AUDIT.md` bunu zaten kaydetmişti).
-  - Bunlar ayrı ve açık kapsamlı bir uygulama kartı gerektirir; kullanıcı
-    yönlendirmesi olmadan başlanmaz.
-
-## Sonraki Adımlar
-
-1. Kullanıcı gözden geçirmesi (UI/UX + sesler).
-2. İstenirse FX-P-66/67 ertelenen zenginleştirmeleri.
-3. Merge kararı: `premium-fx-local` → `main` (kullanıcı onayı + son regression). Push/deploy onaysız yasak.
-
-## Durum
-
-> **GÜNCEL (FX-P-74, 2026-09-02):** Aşağıdaki bölüm tarihseldir. Güncel durum dosyanın başındaki "Implementation Tamamlandı" bölümündedir — tüm dalgalar (−1…6), FX-P-70 denetimi ve Dalga 7 kapanışı tamamlandı; push/merge/deploy kullanıcı onayı bekliyor.
-
-Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22). **Mimari karar B1 alındı** (seq 23): `data` mutable bir bağlama olduğu için Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklenir; I2/I3/I4 "davranış değiştirmez" olarak yeniden tanımlandı. **Kapsamlı denetimde 3 kırık fonksiyon bulundu** (seq 24): `dateUtils.js` `dayIndexFor`/`activeDate`/`curDay` closure bağımlılıklarını (`data`, `ui`, `getDay`) kaybetti. **FX-P-03'te bu 3 fonksiyon B1 canlı-getter yüzeyine hizalandı** (seq 25): `dayIndexFor` → `SeymaState.data.startDate`, `activeDate` → `SeymaState.ui.editDate`, `curDay` → `SeymaState.getDay(SeymaState.data, d, idx)`; `state.js` yorumu B1'e göre güncellendi; `test_date_utils_boundary.js` (58/58) ve `test_helpers_boundary.js` (30/30) genişletildi. **FX-P-04'te Faz -1.1 kapanışı tamamlandı** (seq 26): `test_modularization_boundary.js` (42/42) güncellendi. **FX-P-05'te Dalga 0 başladı** (seq 27): `migrate()`'e 6 premium FX settings alanı eklendi (premiumAtmosphere/uiSounds/voiceGuidance/ambientSounds/richHaptics/launchRitual) ve B1 canlı getter'ları `app.js`'e eklendi (`window.data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData`/`save`). **FX-P-06'da Dalga 0 tamamlandı** (seq 28): `mediaFx.js` API yüzeyi ve master gating fonksiyonları tanımlandı (`SeyAudio.ctx` lazy init, `SeyHaptics` gating, `SeyFx` master gating). **FX-P-11'de Dalga 1 başladı** (seq 29): `SeyAudio` temel UI sesleri implemente edildi (`tap`/`success`/`warning`/`bell` + vibrato, `premiumAtmosphere`+`uiSounds`+`prefers-reduced-motion` gating). S5/S6 geçti. **FX-P-12'de ilk `app.js` değişikliği yapıldı** (seq 30): `zikrTickSound` içindeki AudioContext/osilatör kodu kaldırılıp `window.SeyAudio.tap()`'e yönlendirildi (SeyAudio yoksa no-op); ölü `_zikrAudio` temizlendi; `zikr-harness.mjs` boot setine `state.js`+`mediaFx.js` eklendi (üretim yükleme sırasıyla hizalı). **Kullanıcı geri bildirimiyle FX-P-12 tamamlandı** (seq 31): tıklama sesi "Sıcak" (523Hz triangle 180ms) yapıldı ve reduce-motion erişilebilirlik düzeltmesi uygulandı — `allowed(allowReducedMotion)` opsiyonel parametresi; `tap()` gibi kullanıcının bilinçli tetiklediği kısa etkileşim sesleri reduce-motion altında da çalıyor, diğer sesler sessiz kalıyor. S5 geçti. **FX-P-13'te başarı/kutlama sesleri entegre edildi** (seq 32): `app.js` içinde 3 olumlu eylem noktasına güvenli wrapper ile `SeyAudio.success()` eklendi — kart toggle tamamlandığında, streak kilometre taşında ve tüm hedefler tamamlandığında (confetti ile eşzamanlı). **FX-P-14'te uyarı sesleri entegre edildi** (seq 34): `app.js` içinde 4 uyarı noktasına güvenli wrapper ile `SeyAudio.warning()` eklendi — günlük soru limiti, kafein limiti, geçersiz giriş (kitap/alıntı) ve boş reflection. **FX-P-15'te zil `bell` entegre edildi** (seq 35): `app.js` içinde 3 ritüel noktasına güvenli wrapper ile `SeyAudio.bell()` eklendi — zikir tur/hatim tamamlama, motivasyon görevi tamamlama ve hatırlatma kapanışı. **Faz 1 devam ediyor; sıradaki FX-P-16.** **FX-P-21'de Dalga 2 (Haptics) başladı** (seq 37): `SeyHaptics` desenleri FX-LIBRARY.md §2'ye hizalandı (`tap`/`success`/`error`/`refresh`/`streak`/`water`), `haptic()` helper'ına legacy `settings.haptics === false` kapısı eklendi; `app.js`/`index.html`/`sync.js` dokunulmadı. S5/S6 geçti. **FX-P-22'de temel etkileşimlere `SeyHaptics.tap()` entegre edildi** (seq 38): 17 nokta (setMood, setEnergy, setStress, toggleHabit, waterAdd, saveToday, overlay aç/kapa, yıldız puanlama, segmented tab, toggleTheme) güvenli guard ile sarıldı; `App.*` yüzeyi, onclick imzaları ve `data/settings` şekli değişmedi. S5/S6 geçti. **FX-P-23'te streak/water haptics entegre edildi** (seq 39): `SeyHaptics.streak()` 3 noktaya (maybeStreak, zikir tur/hatim, motivasyon görevi), `App.waterAdd` pozitif delta'da `tap()` yerine `SeyHaptics.water()` eklendi. S5/S6 geçti. **FX-P-24'te Dalga 2 kapatıldı** (seq 40): haptics test fixture gerçek `mediaFx.js` üzerinden yeniden yazıldı (25/25), REVIEW-CHECKLIST'e "Dalga 2 Haptics" kapsamı eklendi. S5/S6 geçti. **FX-P-31'de Dalga 3 (Visual micro-FX) başladı** (seq 41): `SeyFx` master gating utility'leri implemente edildi (isPremiumFxEnabled/prefersReducedMotion/shouldAnimate/ambientAllowed/isSoundAllowed); `settings()` helper'ı gerçek kaynak olarak kullanıldı. S5/S6 geçti. **FX-P-32'de ripple efekti implemente edildi** (seq 42): `.sey-ripple` CSS + `SeyFx.ripple(event,color)` (dokunma koordinatlarına göre dalga, isPremiumFxEnabled gating, reduced-motion'a saygılı); cache-busting `app/styles.css?v=20260901a`. S5/S6 geçti. **FX-P-33..38'te Dalga 3 (Visual micro-FX) tamamlandı** (seq 43-48): shimmer (FX-P-33), count-up (FX-P-34), micro-FX entegrasyonu (FX-P-35), test+kapsam (FX-P-36, fx_utils 26/26), enter/transition (FX-P-37), performans audit (FX-P-38, will-change + katalog + VISUAL-FX-AUDIT.md). Cache-busting: `app/styles.css?v=20260901b`, `mediaFx.js?v=20260901a`. S5/S6 geçti.
-
-## Tamamlananlar (v2.3)
-
-- FX-P-51 — Dalga 5 (Voice guidance) başlangıcı: `SeyAudio.voice(text, opts)` implemente edildi — `isPremiumFxEnabled` + `isVoiceEnabled` gating, `speechSynthesis` yoksa `false`, `speaking` iken `force`/`cancel`, `lang`/`rate`/`pitch` clamp (0.5-2), `voiceNames` tercihi, `speak` try/catch. `SeyAudio.isVoiceEnabled()` eklendi (`voiceGuidance` + `speechSynthesis` varlığı). `clamp(v,min,max)` helper'ı eklendi. `app.js` değişmedi (FX-P-51 yasak listesi). S5 (syntax, driver, zikr 95/95, modularization 42, faz10 64, faz11 50, panel-v2 27, audio 26, haptics 25, fx_utils 26, time_theme 49/49) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-44 — Dalga 4 (Time theme) kapanışı: `test_premium_time_theme.js` gerçek `timeTheme.js`'i VM'de yükleyip `classForHour`/`apply`/`seasonalClass`/`applySeasonal`'i doğrular (49/49) — `classForHour(5/9/17/21/4)` saat aralıkları, `apply()` mock document ile root sınıfı güncelleme + premiumAtmosphere gating, `seasonalClass(d)` dört mevsim, `applySeasonal(d)` root sınıfı güncelleme. `REVIEW-CHECKLIST.md`'ye "Dalga 4 Time theme" kapsam satırları eklendi. `app.js` değişmedi (FX-P-44 yasak listesi). S5 (syntax, driver, zikr 95/95, time_theme 49/49, faz10 64, faz11 50, panel-v2 27, audio 26, haptics 25, fx_utils 26) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi. **Faz 4 tamamlandı.**
-- FX-P-43 — Dalga 4 (Time theme) mevsimsel renk fonksiyonu: `seasonalClass(d)` dört mevsimi (spring/summer/autumn/winter) döndürecek şekilde tamamlandı — özel günler (newyear/ramazan) yalnızca `d` verilmediğinde (gerçek bugün) uygulanır, deterministik testler için `d` verilince atlanır; `applySeasonal(d)` tüm mevsim+özel sınıfları temizleyip yenisini ekler. `app/styles.css`'e `--season-accent` tokenları (açık+koyu, 4 mevsim + newyear/ramazan) ve `#root.theme-season-*` sınıf kuralları eklendi. `test_premium_time_theme.js` gerçek `timeTheme.js`'i VM'de yükleyip `seasonalClass`/`applySeasonal`'i doğrular (41/41). `app.js` değişmedi (FX-P-43 yasak listesi). S5 (syntax, driver, zikr 95/95, time_theme 41/41, faz10 64, faz11 50, panel-v2 27, audio 26, haptics 25, fx_utils 26) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-42 — Dalga 4 (Time theme) root uygulaması: `SeyTimeTheme.apply()` render() sonunda güvenli guard (`window.SeyTimeTheme && typeof ... === 'function'`) ile çağrıldı — render() her boot'ta ve 30 sn'lik poll loop'ta çalıştığı için tema değişiklikleri otomatik senkronize olur; SeyTimeTheme yoksa veya premiumAtmosphere kapalıysa no-op. `app/styles.css`'e `--surface-dawn/day/dusk/night` vurgu tokenları (açık + koyu tema) ve `#root.theme-time-*` sınıf kuralları eklendi (yalnızca ince yüzey vurgusu — header/bottomnav gölgesi; tüm rengi değiştirmez). `index.html` cache-busting `app/styles.css?v=20260901c` + `timeTheme.js?v=20260901a`. `App.*` yüzeyi, `data/settings` şekli ve fonksiyon imzaları değişmedi. S5 (syntax, driver, zikr 95/95, time_theme 24/24, faz10 64, faz11 50, panel-v2 27, audio 26, haptics 25, fx_utils 26) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-41 — Dalga 4 (Time theme) başlangıcı: `app/core/timeTheme.js`'in `classForHour(h)` fonksiyonu güncellendi — `h == null` ise `new Date().getHours()` default uygulanır; saat aralıkları `theme-time-dawn`(05-08) / `theme-time-day`(09-16) / `theme-time-dusk`(17-20) / `theme-time-night`(21-04) sınıflarına eşleştirildi. `window.SeyTimeTheme` expose (classForHour/apply/seasonalClass/applySeasonal) korundu; `apply`/`seasonalClass`/`applySeasonal` zaten doluydu, `app.js` davranışı değişmedi. S5 (syntax, driver, zikr 95/95, faz10, time_theme 24/24) ve S6 (App.* 701, onclick 320, tek app.js) geçti.
-- FX-P-38 — Dalga 3 (Visual micro-FX) kapanışı: performans audit — `.sey-ripple`/`.sey-ripple-wave` ve `.sey-shimmer`'a `will-change: transform, opacity` eklendi; `contain` geniş `#app`'e eklenmedi (modal/fixed riski, VISUAL-FX-AUDIT.md'de belgelendi); `FX-LIBRARY.md`'ye §3.8 Visual FX Catalog eklendi; `REVIEW-CHECKLIST.md`'ye will-change/reduced-motion/katalog satırları; `deliverables/VISUAL-FX-AUDIT.md` raporu oluşturuldu. S5 ve S6 (App.* 701, onclick 320, tek app.js) geçti.
-- FX-P-37 — Dalga 3 (Visual micro-FX): CSS transitions + sayfa enter — `.sey-enter` + `sey-fade-in` keyframe (fade/slide 220ms) + stagger delay'ları (60/120/180ms) + reduced-motion override; `SeyFx.enter(selector,staggerMs)` ve `SeyFx.transition(el,property,durationMs)` helper'ları eklendi. Cache-busting: `app/styles.css?v=20260901b`, `mediaFx.js?v=20260901a`. `app.js` davranışı değişmedi. S5/S6 geçti.
-- FX-P-36 — Dalga 3 kapanış testi: `tests/app/test_premium_fx_utils.js` oluşturuldu — gerçek `mediaFx.js`'i VM'de yükler; `SeyFx` API yüzeyi, `isPremiumFxEnabled`/`shouldAnimate`/`ambientAllowed`/`isSoundAllowed` gating kombinasyonları, ripple no-op, countUp reduced-motion hedef yazımı, shimmer gating. **26/26 PASS**. `REVIEW-CHECKLIST.md`'ye "Dalga 3 Visual FX" kapsam satırları eklendi. S5/S6 geçti.
-- FX-P-35 — Dalga 3 (Visual micro-FX): micro-FX app.js entegrasyonu — su sayacı (`App.waterAdd` → `SeyFx.countUp`, `.sey-hero-stat[data-stat="water"]`) ve streak kutlaması (`maybeStreak` → `SeyFx.shimmer`, `.sey-streak-area`/fallback `#app`) noktalarına güvenli guard'lı `SeyFx` çağrıları eklendi. `App.*` yüzeyi, inline onclick imzaları, `data/settings` şekli değişmedi. S5/S6 geçti.
-- FX-P-34 — Dalga 3 (Visual micro-FX): count-up animasyonu — `SeyFx.countUp(options)` implemente edildi (rAF, from→to interpolasyon, 0-2000ms clamp, formatter). Gating hassaslaştırıldı: `premiumAtmosphere !== false` kontrolü (reduced-motion'da animasyonu atlayıp hedef değeri yazar). `app.js` davranışı değişmedi. S5/S6 geçti.
-- FX-P-33 — Dalga 3 (Visual micro-FX): shimmer efekti — `.sey-shimmer`/`.sey-shimmer::after` + `sey-shimmer-sweep` keyframe + koyu tema + reduced-motion kuralı; `SeyFx.shimmer(element)` (isPremiumFxEnabled gating, 1400ms sonra class kaldırma). `app.js` davranışı değişmedi. S5/S6 geçti.
-- FX-P-32 — Dalga 3 (Visual micro-FX) devamı: ripple efekti implemente edildi. `app/styles.css`'e `.sey-ripple`/`.sey-ripple-wave` + `sey-ripple-spread` keyframe + reduced-motion kuralı eklendi; `SeyFx.ripple(event,color)` implemente edildi (dokunma koordinatlarına göre dalga, `isPremiumFxEnabled` gating, 600ms sonra kaldırma). `index.html` cache-busting `app/styles.css?v=20260901a`. `app.js` davranışı değişmedi. S5 (syntax, driver, zikr 95/95, modularization 42, faz10 64, haptics 25/25, audio 26/26, faz11 50, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-31 — Dalga 3 (Visual micro-FX) başlangıcı: `SeyFx` master gating utility'leri implemente edildi — `isPremiumFxEnabled`, `prefersReducedMotion`, `shouldAnimate`, `ambientAllowed`, `isSoundAllowed`. `settings()` helper'ı (window.SeymaState.data.settings) gerçek kaynak olarak kullanıldı (prompt'taki `SeymaConstants.data` gerçek kodda yok). `countUp`/`ripple`/`shimmer` stub'ları FX-P-32/33/34'e bırakıldı. `app.js`/`index.html` dokunulmadı. S5 (syntax, driver, zikr 95/95, modularization 42, faz10 64, haptics 25/25, audio 26/26, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-24 — Dalga 2 (Haptics) kapanışı: `test_premium_haptics_fx.js` gerçek `app/core/mediaFx.js` modülünü yükleyecek şekilde yeniden yazıldı (25/25). `SeyHaptics` yüzeyi (tap/success/error/refresh/streak/water), desenler, gating (premiumAtmosphere/richHaptics/haptics/reduced-motion), `navigator.vibrate` no-op ve `app.js` çağrı noktaları (tap/streak/water + güvenli guard) doğrulandı. `REVIEW-CHECKLIST.md`'ye "Dalga 2 Haptics" kapsam satırları eklendi. S5 (syntax, driver, zikr 95/95, faz10 64, faz11 50, haptics 25/25, faz_minus11 16, modularization 42, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-23 — Dalga 2 (Haptics) devamı: streak ve water haptics entegre edildi. `SeyHaptics.streak()` 3 noktaya eklendi: (1) `maybeStreak` kilometre taşı (m[s] dalında, `SeyAudio.success()` ile eşzamanlı), (2) zikir tur/hatim tamamlama (`r.doneNow` dalında, `SeyAudio.bell()` ile eşzamanlı), (3) motivasyon görevi tamamlama (`wasDone` false iken, `SeyAudio.bell()` ile eşzamanlı). `App.waterAdd` pozitif delta'da `tap()` yerine `SeyHaptics.water()` kullanıldı (aynı event'te tek haptik — prompt kuralı). Her çağrı güvenli guard (`window.SeyHaptics && typeof ... === 'function'`) ile sarıldı; `App.*` yüzeyi, `data/settings` şekli ve fonksiyon imzaları değişmedi. S5 (syntax, driver, zikr 95/95, faz10 64, faz11 50, haptics 12/12, modularization 42, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-22 — Dalga 2 (Haptics) devamı: temel etkileşim handler'larına `SeyHaptics.tap()` entegre edildi (17 nokta: setMood, setEnergy, setStress, toggleHabit, waterAdd (delta>0), saveToday, openReading/closeReading, openWatching/closeWatching, openListening/closeListening, rateBook/rateTitle/rateTrack (yıldız), setRoomTab (segmented), toggleTheme). Her çağrı güvenli guard (`window.SeyHaptics && typeof ... === 'function'`) ile sarıldı; `App.*` yüzeyi, inline onclick imzaları ve `data/settings` şekli değişmedi. S5 (syntax, driver, zikr 95/95, faz10 64, faz11 50, haptics 12/12, modularization 42, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-21 — Dalga 2 (Haptics) başlangıcı: `SeyHaptics` desenleri FX-LIBRARY.md §2'ye hizalandı (`tap`/`success`/`error`/`refresh`/`streak`/`water`), `haptic()` helper'ına legacy `settings.haptics === false` kapısı eklendi; `app.js`/`index.html`/`sync.js` dokunulmadı. S5 (syntax, driver, zikr 95/95, faz10 64, faz11 50, modularization 42, haptics 12/12, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-16 — Dalga 1 Audio kapanışı: `test_premium_audio_fx.js` gerçek `app/core/mediaFx.js` modülünü yükleyecek şekilde yeniden yazıldı (26/26). `SeyAudio` yüzeyi (`tap`/`success`/`warning`/`bell`/`voice`/`ambient` + `ctx` getter) ve `app.js` çağrı noktaları doğrulandı; `premiumAtmosphere=false`, `uiSounds=false`, `prefers-reduced-motion: reduce` gating'leri ve `tap()` erişilebilirlik istisnası test edildi; AudioContext stub ile osilatör/gain oluşum sayıları ölçüldü. `test_faz_minus11_boundary.js` (16/16) "henüz çağrılmıyor" testlerini kaldırıp `SeyAudio.tap/success/warning/bell` çağrı noktalarının varlığını assert edecek şekilde güncellendi. `REVIEW-CHECKLIST.md`'e "Dalga 1 Audio" kapsam satırları eklendi. S5 (syntax, driver, zikr 95/95, faz10 64, faz11 50, modularization 42, premium audio 26/26, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-15 — bell entegrasyonu: zikir tamamlama, hatim, motivasyon görevi tamamlama ve hatırlatma kapanış noktalarına `SeyAudio.bell()` eklendi. `app.js` içinde 3 noktaya güvenli wrapper (`window.SeyAudio && typeof ... === 'function'`) eklendi: (1) `App.zikrTap` `r.doneNow` dalında (tur/hatim tamamlandığında, haptic'ten önce), (2) `App.completeMotivationTask` başarılı yolunda (`wasDone` false iken, yeni kayıt), (3) `App.reminderInboxPrimary` hatırlatma kapanışında (kullanıcı hatırlatmayı ele aldığında). Snooze/todayOff'ta çalmaz. Çağrılar ritüel koşulu sağlandığında; `App.*` yüzeyi, `data/settings` şekli ve fonksiyon imzaları değişmedi. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, premium audio 13/13, reduced-motion 22/22, haptics 12/12, launch splash 11/11, time theme 24/24, faz11 50) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-14 — Uyarı durumlarına `SeyAudio.warning()` entegre edildi. `app.js` içinde 4 noktaya güvenli wrapper (`window.SeyAudio && typeof ... === 'function'`) eklendi: (1) `streamAsk` günlük soru limiti aşıldığında (Luna/AEON), (2) `App.addCaffeineDrink` kafein limiti aşıldığında (`caffeineTotalMg>caffeineLimit`), (3) `App.saveQuote` geçersiz girişte (kitap seçilmedi / alıntı boş), (4) `App.completeMotivationTask` reflection boşken. Çağrılar uyarı koşulu sağlandığında ve toast'tan önce; `App.*` yüzeyi, `data/settings` şekli ve fonksiyon imzaları değişmedi. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, premium audio 13/13, reduced-motion 22/22, haptics 12/12, launch splash 11/11, time theme 24/24) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-13 — Olumlu kullanıcı eylemlerine `SeyAudio.success()` entegre edildi. `app.js` içinde 3 noktaya güvenli wrapper (`window.SeyAudio && typeof ... === 'function'`) eklendi: (1) `App.toggleHabit` tek kart tamamlandığında (`day.habits[key]` dalı), (2) `maybeStreak` kilometre taşı (`m[s]`) dalında, (3) `App.toggleHabit` tüm hedefler tamamlandığında (`after>=ht && before<ht`, confetti ile eşzamanlı). Çağrılar eylemin sonunda ve başarı koşulu sağlandığında; `App.*` yüzeyi, `data/settings` şekli ve fonksiyon imzaları değişmedi. **Tutarlılık düzeltmesi (seq 33):** `App.toggleMgHabit` (magnezyum yolu) da "tüm hedefler tamamlandığında" kutlaması yapıyordu (confetti + toast) ama `SeyAudio.success()` eksikti; aynı koşul için eklendi — toplam 4 `SeyAudio.success()` noktası. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, premium audio 13/13, reduced-motion 22/22) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-12 — `zikrTickSound` içindeki AudioContext/osilatör kodu kaldırılıp `window.SeyAudio.tap()`'e yönlendirildi (SeyAudio yoksa sessizce no-op). Fonksiyon imzası ve çağrıldığı yerler (`App.zikrTap`, `toggleZikrSetting`) aynı kaldı. Ölü `_zikrAudio` değişkeni temizlendi. `zikr-harness.mjs` boot setine `state.js`+`mediaFx.js` eklendi (üretim `index.html` yükleme sırasıyla hizalı) — ses önizleme testi artık `SeyAudio.tap()` yönlendirmesini gerçekten ölçüyor. **Kullanıcı geri bildirimiyle (seq 31):** tıklama sesi "Sıcak" olarak değiştirildi (`tap()` 880Hz sine → 523Hz triangle 180ms) ve reduce-motion erişilebilirlik düzeltmesi yapıldı — `allowed(allowReducedMotion)` opsiyonel parametresi eklendi; `tap()` gibi kullanıcının bilinçli tetiklediği kısa etkileşim sesleri reduce-motion altında da çalıyor, diğer sesler sessiz kalıyor. `mediaFx.js` cache-busting `?v=20260831b`. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, faz11 50, premium FX 5/5, reduced-motion 22/22, Panel-v2 27) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-11 — `SeyAudio` temel UI sesleri implemente edildi: `tap()` (880Hz sine 150ms), `success()` (523→784Hz arpejio 200ms), `warning()` (200Hz saw 250ms), `bell()` (880Hz sine + 6Hz vibrato 600ms). `premiumAtmosphere`+`uiSounds`+`prefers-reduced-motion` gating; reduced-motion'da tüm sesler sessiz (erişilebilirlik). `app.js`/`index.html` dokunulmadı. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, premium audio 13/13) ve S6 (App.* 701, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-06 — `mediaFx.js` API yüzeyi ve master gating tanımlandı: `SeyAudio.ctx` lazy init (getter), `SeyAudio.tap/success/warning/bell/voice/ambient`, `SeyHaptics.tap/success/error/refresh/streak/water` (navigator.vibrate yoksa no-op, richHaptics + reduced-motion gating), `SeyFx.isPremiumFxEnabled/prefersReducedMotion/shouldAnimate/ambientAllowed/countUp/ripple/shimmer`. `app.js`/`index.html` dokunulmadı. S5 (syntax, driver, zikr 95/95, faz10 64, faz11 50, modularization 42, premium FX 5/5, Panel-v2 27) ve S6 (App.* 701, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-05 — `migrate()`'e 6 premium FX settings alanı eklendi (additive, idempotent); B1 canlı getter'ları `app.js`'e eklendi (`Object.defineProperty(window, 'data'/'ui'/'dark'/'migrate'/'getDay'/'createDefaultData'/'save', { get: ... })`). `sync.js`/`save()` dokunulmadı. S5 (syntax, migration-boundary 32, driver, zikr 95/95, faz10 64, faz11 50, modularization 42, date_utils 58, helpers 30, Panel-v2 27) ve S6 (App.* 701, tek app.js, sync.js 0 diff) geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-04 — `test_modularization_boundary.js` güncellendi (42/42): `window.SeymaDateUtils`/`SeymaHelpers`/`SeymaState`/`SeymaSave`/`SeyAudio`/`SeyHaptics`/`SeyFx`/`SeyTimeTheme` varlığı, `app.js`'in `window.App`/`SeyOnSyncState`/`SeyOnSynced`'i koruduğu, B1 gereği `window.data`/`ui`/`save`'in henüz atanmadığı ve `SeymaState.data`/`SeymaSave`'in undefined olduğu doğrulandı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-03 — `dateUtils.js`'teki 3 kırık fonksiyon (seq 24) B1 canlı-getter yüzeyine hizalandı; `state.js` yorumu B1'e göre güncellendi; `test_date_utils_boundary.js` (58/58) ve `test_helpers_boundary.js` (30/30) genişletildi (seq 24 fonksiyonları + state/syncGlue yüzeyleri + haptic closure). S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-- FX-P-01 — Faz -1.1 temel modül iskeletleri uygulandı ve yerel commitlendi (`premium-fx-local`).
-- FX-P-02 — `app/core/state.js` ve `app/core/syncGlue.js` iskeletleri oluşturuldu; `window.SeymaState` (data/ui/dark/migrate/getDay/createDefaultData) ve `window.SeymaSave` getter'ları tanımlandı; `index.html`'e `syncGlue.js` eklendi. `app.js`/`save()`/`migrate()` dokunulmadı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-- **Plan audit-fix (seq 22)** — plan belgeleri ve promptlar gerçek koda hizalandı: MODULARIZATION.md, API-TRANSITION-GUIDE, ROADMAP, CODE-MAP, FX-P-01/02/03/04/05, PROMPT-CATALOG, TEST-SKELETONS (7 dosya, vm2→global-mock). Uygulama koduna dokunulmadı.
-- **B1 kararı (seq 23)** — canlı getter yaklaşımı benimsendi; plan belgeleri ve promptlar buna göre güncellendi. Uygulama koduna dokunulmadı.
-- `PLAN.md` v2.3 — yerel-only uygulama kuralı ve `SeyOnSynced()` satır numarası düzeltmesi eklendi.
-- `CODE-MAP.md` v2.1 — gerçek fonksiyon/satır referanslarıyla güncellendi.
-- `ROADMAP.md` v2.3 — context-load sırası, yerel-only kuralı, Faz 7 kapanış notu eklendi.
-- `FX-LIBRARY.md` v2.1 — `settings.haptics`/`richHaptics` ilişkisi netleştirildi.
-- `MODULARIZATION.md` v2.2 — `state.js`/`save()` sınırı netleştirildi; time-theme saat aralığı düzeltildi.
-- `deliverables/SPEC-FAZ-0..6.md` v2.2 — tutarsızlıklar giderildi.
-- `deliverables/MIGRATE-SPEC.md` v2.1 — `migrate(d)` 4415 referansı eklendi.
-- `deliverables/REDUCED-MOTION-SPEC.md` v2.1 — reduce modunda yeni keyframe'lerin kapatılması notu.
-- `SAFEGUARDS.md` v2.2 — yerel-only kuralı ve reduced-motion ses/haptik geçişi.
-- `REVIEW-CHECKLIST.md` v2.1 — `App.*` yüzeyi ve inline `onclick` korunması.
-- `API-TRANSITION-GUIDE.md` v2.3.1 — API yüzeyi netlikleri ve PR dizilimi.
-- `DEEP-IMPLEMENTATION-GUIDE.md` v2.3.1 — `migrate()` `== null` formu.
-- `NEXT-STEPS.md` v2.3 — güncel bekleme listesi.
-- `LOCAL-ONLY-IMPLEMENTATION.md` v1.0 — yerel-only uygulama kuralı.
-- `.prompts/PROMPT-CATALOG.md` v1.0 — 74 promptluk katalog, ortak sözleşme ve kalite standartları.
-- `.prompts/FX-P-01.md` … `FX-P-14.md` — Faz -1.1, Faz 0 ve Faz 1 için detaylı uygulama promptları.
-- `.anti-amnesia/FX-PROMPT-STATE.json` — prompt ilerleme durumu makinesi.
-- `tests/app/` altında 7 mevcut headless test fixture'ı.
-  - `test_premium_audio_fx.js` (13/13)
-  - `test_premium_haptics_fx.js` (12/12)
-  - `test_premium_reduced_motion.js` (22/22)
-  - `test_premium_launch_splash.js` (11/11)
-  - `test_premium_time_theme.js` (24/24)
-  - `test_modularization_boundary.js` (16/16) ← Faz -1 sınır fixture'ı
-  - `test_faz_minus11_boundary.js` (13/13) ← PR -1.1 öncesi expose sınır fixture'ı
-
-## Devam Eden (kapandı — tarihsel)
-
-- **Dalga 5 (Sesli Rehberlik) TAMAMLANDI.** FX-P-52: sesli rehberlik entegrasyonu (isQuietTime 23:00–07:00; onboarding tek seferlik karşılama, streak günde 1 kez, zikir tamamlama günde 1 kez; hatırlatma sesli özeti adımı donmuş REM programına dokunmama gerekçesiyle atlandı). FX-P-53: ambiyans ses motoru (SeyAudio.ambient start/stop/isSupported/isEnabled, rain/wave/ney/nakar/birds/breeze/crickets, <audio> fallback, .ambient-control CSS). FX-P-54: tests/app/test_premium_voice.js fixture'ı (FX-P-54 kapsamı PASS). FX-P-55: SeyAudio.guides (zikirStart/zikirHalf/zikirComplete/suraOpen/suraBookmark) + app.js zikrTap entegrasyonu (start: oturum başına 1, half: oturum başına 1, complete: günde 1). FX-P-56: SeyAudio.greeting() zaman dilimi selamlaması (boot 2.2sn gecikmeli + foreground, 4h throttle, günde max 2; settings.lastVoiceGreetingAt/voiceGreetingDate/Count). FX-P-57: sesli rehberlik ayarları UI (Ayarlar > "🎙️ Sesli rehberlik" kartı; voiceGuidance toggle, voiceLang tr-TR/en-US/ar-SA, voiceRate 0.75–1.5; App.setVoiceGuidance/setVoiceLang/setVoiceRate; SeyAudio.voice settings defaults). FX-P-58: son denetim — FX-LIBRARY.md §3.9 ses/sesli rehberlik kataloğu + sessiz zaman matrisi; REVIEW-CHECKLIST Faz 5 kapanış satırları; tüm regression PASS. Sıradaki **Dalga 6 / FX-P-61** (Ayarlar & ana anahtar arayüzü) — ayrı kullanıcı onayı bekliyor.
-
-## Engeller
-
-- Yok.
-
-## Context Load Sırası (Her Oturum)
-
-1. `.anti-amnesia/CURRENT-STATE.md` (bu dosya)
-2. `.anti-amnesia/LEDGER.md`
-3. [`../NEXT-STEPS.md`](../NEXT-STEPS.md)
-4. [`../LOCAL-ONLY-IMPLEMENTATION.md`](../LOCAL-ONLY-IMPLEMENTATION.md)
-5. [`../.prompts/PROMPT-CATALOG.md`](../.prompts/PROMPT-CATALOG.md)
-6. İlgili [`../.prompts/FX-P-NN.md`](../.prompts)
-7. İlgili [`../deliverables/SPEC-FAZ-*.md`](../deliverables)
-8. [`../SAFEGUARDS.md`](../SAFEGUARDS.md)
+`monolit-bolumlenme-plan/` bu dosyaların bazılarına atıf yapar — **silinmezler.**

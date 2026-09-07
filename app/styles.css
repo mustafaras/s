@@ -211,18 +211,18 @@
   .sey-asbtn{appearance:none;-webkit-appearance:none;background:none;border:0;padding:0;margin:0;
     font:inherit;color:inherit;text-align:inherit;width:100%;display:block;cursor:pointer;}
   #root{
-    --page:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);
+    --page:linear-gradient(170deg,#FDFBF7 0%,#F7F1E8 46%,#F2EFF4 100%);
     --bg:var(--page);
     --card:rgba(255,255,255,0.72); --card-bd:rgba(255,255,255,0.75);
     /* AD-38: içerik katmanı yüzeyi. HIG Liquid Glass'ı içerik katmanında yasaklar;
        kartlar opak --card-solid'e taşınır, cam yalnızca fonksiyonel katmanda kalır. */
     --card-solid:#FFFDFC;
     --text:#2C2426; --text2:#5A4D52; --muted:#7A6B70; --faint:#816F76;
-    --choc:#6B4A3A; --accent:#C77D93;
-    /* -ink: aynı rengin METİN varyantı. Dolgu/kenarlık değerleri yukarıda
-       olduğu gibi kalır (WCAG dolgu eşiği 3:1); yalnızca yazı 4.5:1'e çekilir.
-       Hue ve saturation korundu, yalnızca lightness düşürüldü. */
-    --accent-ink:#B55471; --warn-ink:#E0252B; --ok-ink:#368243;
+    --choc:#6B4A3A; --accent:#B08D57;
+    --accent-soft:#D9C29A; --accent-bg:rgba(176,141,87,0.13);
+    /* -ink: aynı aksanın METİN varyantı. Dolgu/kenarlık değerleri yukarıda
+       olduğu gibi kalır (WCAG dolgu eşiği 3:1); yazı tonu 4.5:1'e çekilir. */
+    --accent-ink:#8A6A3B; --warn-ink:#E0252B; --ok-ink:#368243;
     --watch-ink:#A06629;  --listen-ink:#0D7F8B; --drop-ink:#9F6647;
     --field:rgba(255,248,243,0.7); --field-bd:rgba(108,74,58,0.15);
     --nav:rgba(255,255,255,0.85); --modal:#FFF8F3; --icon:rgba(255,248,243,0.8);
@@ -231,7 +231,7 @@
     --read:#6E55BF; --read-bg:rgba(110,85,191,0.12);
     --watch:#B5732E; --watch-bg:rgba(200,150,90,0.14);
     --listen:#0E8F9C; --listen-bg:rgba(14,154,167,0.12);
-    --learn:#C77D93; --learn-bg:rgba(199,125,147,0.14);
+    --learn:#B08D57; --learn-bg:rgba(176,141,87,0.14);
     --ok:#3F9A4F; --ok-bg:rgba(143,191,138,0.18);
     --drop:#B0714E; --drop-bg:rgba(200,150,90,0.16);
     --pause:#8A7BB0; --pause-bg:rgba(138,123,176,0.16);
@@ -362,7 +362,8 @@
     --card:rgba(17,17,20,0.96); --card-bd:rgba(255,255,255,0.17);
     --card-solid:#111114;
     --text:#F8F8FA; --text2:#D8D8DE; --muted:#AFAFB9; --faint:#858590;
-    --choc:#FFD9AA; --accent:#FFB1CF;
+    --choc:#FFD9AA; --accent:#E3C08A;
+    --accent-soft:#F0DBB8; --accent-bg:rgba(227,192,138,0.11);
     /* Koyu temada tüm tokenlar zaten AAA — ink doğrudan tokenı işaret eder. */
     --accent-ink:var(--accent); --warn-ink:var(--warn); --ok-ink:var(--ok);
     --watch-ink:var(--watch);   --listen-ink:var(--listen); --drop-ink:var(--drop);
@@ -373,7 +374,7 @@
     --read:#CBB8FF; --read-bg:rgba(203,184,255,0.11);
     --watch:#F0B66E; --watch-bg:rgba(240,182,110,0.11);
     --listen:#66D9E3; --listen-bg:rgba(102,217,227,0.10);
-    --learn:#FFB1CF; --learn-bg:rgba(255,177,207,0.10);
+    --learn:#E3C08A; --learn-bg:rgba(227,192,138,0.11);
     --ok:#82D990; --ok-bg:rgba(130,217,144,0.10);
     --drop:#E8A96B; --drop-bg:rgba(232,169,107,0.10);
     --pause:#C2AFE8; --pause-bg:rgba(194,175,232,0.10);

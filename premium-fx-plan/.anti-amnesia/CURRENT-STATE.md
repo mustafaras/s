@@ -1,6 +1,6 @@
 # Premium FX — Güncel Durum
 
-**Tarih:** 2026-09-06
+**Tarih:** 2026-09-07
 **Seri:** **FX-2 — "Hissedilir Premium"** (yeni seri açıldı)
 **Dal:** `premium-fx-gorsel-yuzey` · **LOCAL ONLY** (push/merge/deploy yok)
 **Plan sürümü:** FX-2 v2.0 (28 kart, 8 dalga)
@@ -11,9 +11,9 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-02** — hareket + renk token iskeleti |
-| Sıradaki prompt | **FX2-03** — renk kimliği |
-| Aşama | Dalga 0 — Ölçüm ve Token |
+| Son tamamlanan prompt | **FX2-03** — pembe → şampanya altını |
+| Sıradaki prompt | **FX2-04** — aurora halkası |
+| Aşama | Dalga 1 — Renk Kimliği |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
 
@@ -103,6 +103,21 @@ bildirim); kart hedefi `≥0,45` geçti. `--elev-*` doğrulaması 10 bildirime
 ulaştı. Global `--gate` diğer FX metrikleri henüz hedef altında olduğu için
 exit 1 vermeye devam eder; FX2-02'nin M7 kapısı geçmiştir.
 
+## FX2-03 — Tamamlandı (2026-09-07)
+
+Pembe ana palet tokenları Şampanya Altını + Füme Mürekkep kararına taşındı:
+açık tema `--accent:#B08D57`, `--accent-ink:#8A6A3B`, koyu tema
+`--accent:#E3C08A`, iki temada `--accent-soft` ve `--accent-bg`, ayrıca
+`--page` ve `--learn` yüzeyleri güncellendi. `index.html` CSS cache-bump'i
+`styles.css?v=20260906f` oldu.
+
+FX2-04 kapsamındaki `#D96D8B` aurora fallback'i özellikle korunarak M10
+`9 → 1`, M11 `3 → 2` oldu. `--kandil` açık tema renkleri (`#9C4A5A`,
+`#D68A94`), `--warn`, `--read`/`--watch`/`--listen` ve `--sun` değişmedi.
+Kontrast ölçümleri sırasıyla **4,83**, **13,48**, **12,17** ile AA eşiğini
+geçti. `app.js`, `app/core/**`, `sync.js`, `tests/**` ve `coverage.json`
+değişmedi.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -145,7 +160,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-03.md`](../.prompts/FX2-03.md)
+2. Kart: [`../.prompts/FX2-04.md`](../.prompts/FX2-04.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

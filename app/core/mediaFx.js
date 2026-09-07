@@ -529,6 +529,39 @@
   var TOUCH_SELECTOR = 'button,[role="button"],[data-fx],a[href],[onclick]';
   var _tActive = null, _tLastAt = 0, _tX = 0, _tY = 0;
 
+  // FX2-09: niyet → geri bildirim. Eksik sesler güvenli karşılığa düşer
+  // (FX2-12 öncesi de çalışır).
+  var FX_INTENT = {
+    nav:         { sound:'nav',        haptic:'tap',     ripple:true  },
+    open:        { sound:'sheetOpen',  haptic:'tap',     ripple:true  },
+    close:       { sound:'sheetClose', haptic:'tap',     ripple:false },
+    toggle:      { sound:'toggleOn',   haptic:'tap',     ripple:true  },
+    confirm:     { sound:'success',    haptic:'success', ripple:true  },
+    destructive: { sound:'warning',    haptic:'error',   ripple:true  },
+    none:        null
+  };
+  var FX_FALLBACK = { nav:'tap', sheetOpen:'tap', sheetClose:'tap',
+                      toggleOn:'success', toggleOff:'tap' };
+
+  function intentFor(el){
+    var k = el && el.dataset ? el.dataset.fx : '';
+    if (k === 'none') return null;
+    var i = FX_INTENT[k];
+    if (!i) return { sound:'tap', haptic:'tap', ripple:true };
+    if (k === 'toggle'){
+      var on = el.getAttribute('aria-pressed') === 'true'
+            || (el.className||'').indexOf('is-on') >= 0
+            || (el.className||'').indexOf('is-active') >= 0;
+      return { sound: on ? 'toggleOff' : 'toggleOn', haptic:'tap', ripple:true };
+    }
+    return i;
+  }
+  function playIntentSound(name){
+    var A = window.SeyAudio; if (!A) return;
+    var fn = A[name] || A[FX_FALLBACK[name]] || A.tap;
+    if (typeof fn === 'function') fn.call(A);
+  }
+
   function touchDown(e){
     try{
       if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -536,16 +569,16 @@
       if (!el) return;
       if (el.disabled || el.getAttribute('aria-disabled') === 'true') return;
       if (el.matches && el.matches('input,textarea,select')) return;
-      if (el.dataset && el.dataset.fx === 'none') return;
+      var it = intentFor(el);
+      if (!it) return;
       var now = Date.now();
       if (now - _tLastAt < 40) return;        // gürültü kapısı
       _tLastAt = now; _tActive = el;
       _tX = e.clientX || 0; _tY = e.clientY || 0;
       el.classList.add('sey-press');
-      // FX çağrıları: her biri kendi gating'ini yapar, hata tıklamayı engellemez
-      try{ if (window.SeyAudio && window.SeyAudio.tap) window.SeyAudio.tap(); }catch(err){}
-      try{ if (window.SeyHaptics && window.SeyHaptics.tap) window.SeyHaptics.tap(); }catch(err){}
-      try{ if (window.SeyFx && window.SeyFx.ripple) window.SeyFx.ripple(e, null, el); }catch(err){}
+      try{ playIntentSound(it.sound); }catch(err){}
+      try{ var H = window.SeyHaptics; if (H && H[it.haptic]) H[it.haptic](); }catch(err){}
+      try{ if (it.ripple && window.SeyFx && window.SeyFx.ripple) window.SeyFx.ripple(e, null, el); }catch(err){}
     }catch(err){}
   }
   function touchUp(){

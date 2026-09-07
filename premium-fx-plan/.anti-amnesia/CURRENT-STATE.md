@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-08** — ripple delege katmana bağlandı |
-| Sıradaki prompt | **FX2-09** — haptic delege katmana bağlantısı |
+| Son tamamlanan prompt | **FX2-09** — niyet haritası (`data-fx`) |
+| Sıradaki prompt | **FX2-10** — dokunma ayarları ve korumalar |
 | Aşama | Dalga 2 — Dokunma Katmanı |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -202,6 +202,24 @@ bump'leri `styles.css?v=20260906j` ve `mediaFx.js?v=20260902d` oldu. Canlı
 geçilmişti, bu kart host/taşma/temizleme sözleşmesini tamamlıyor. `app.js`,
 markup ve `coverage.json` değişmedi. Sıradaki FX2-09.
 
+## FX2-09 — Tamamlandı (2026-09-07)
+
+`SeyTouch` artık `data-fx` niyetini `nav`, `open`, `close`, `toggle`,
+`confirm` ve `destructive` olarak yorumluyor. Eksik ses API'leri `FX_FALLBACK`
+ile güvenli karşılığa düşüyor; `toggle`, mevcut `aria-pressed`/`is-on`/
+`is-active` durumundan sonraki sesi seçiyor. `close` ripple üretmez;
+`data-fx="none"` ise basma sınıfı dahil tüm geri bildirimi atlar.
+
+`app.js`te yalnız düğme açılış etiketlerine **41** `data-fx` özniteliği
+eklendi: alt navigasyon şablonu altı sekmeyi, başlık markası bir sekmeyi daha
+kapsadığı için gerçek yüzeyde en az 46 yüksek değerli eylem anlam ayrımı alır.
+`App.*=717` ve `onclick=391` korundu; handler, mevcut öznitelik değerleri ve
+markup yapısı değişmedi. Cache bump'leri `mediaFx.js?v=20260902e` ve
+`app.js?v=20260906g`. M2/M3/M4 canlı ölçümü 390/408/390 korundu; `coverage.json`
+yazılmadı. Sentetik niyet sözleşmesi 9/9, driver 0 fail, zikir 95/95, migration
+60/60, app 30/30, panel 23/23, Panel-v2 27/27, Kur'an 9/9, reminder 20/20 PASS.
+Sıradaki FX2-10.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -244,7 +262,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-09.md`](../.prompts/FX2-09.md)
+2. Kart: [`../.prompts/FX2-10.md`](../.prompts/FX2-10.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

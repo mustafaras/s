@@ -5340,7 +5340,7 @@ function headerSaveState(){
 }
 function saveButtonHTML(){
   var s=headerSaveState();
-  return '<button id="sey-header-save" type="button" class="sey-header-save '+s.cls+'" onclick="App.saveNow()" aria-label="'+esc(s.aria)+'" title="'+esc(s.title)+'" aria-live="polite" aria-busy="'+(s.busy?'true':'false')+'"'+(s.disabled?' disabled':'')+' data-save-state="'+s.cls.slice(3)+'">'
+  return '<button data-fx="confirm" id="sey-header-save" type="button" class="sey-header-save '+s.cls+'" onclick="App.saveNow()" aria-label="'+esc(s.aria)+'" title="'+esc(s.title)+'" aria-live="polite" aria-busy="'+(s.busy?'true':'false')+'"'+(s.disabled?' disabled':'')+' data-save-state="'+s.cls.slice(3)+'">'
     +icon(s.icon,17,'sey-header-save__icon')+'<span class="sey-header-save__label">'+esc(s.label)+'</span></button>';
 }
 function updateHeaderSave(){
@@ -5361,7 +5361,7 @@ function saveBanner(){
     return '<div id="sey-save-banner" class="surface" onclick="App.go(\'ayarlar\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.go(\'ayarlar\');}" style="cursor:pointer;border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid color-mix(in srgb,var(--warn) 48%, var(--card-bd));box-shadow:0 8px 22px rgba(229,72,77,0.10),inset 0 1px 0 rgba(255,255,255,0.3);"><span style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--warn-ink);background:color-mix(in srgb,var(--warn) 14%, var(--icon));">'+icon('link-2',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">Repoya bağlan</div><div style="font-size:var(--f-caption1);color:var(--muted);line-height:1.35;">Verilerin kaydedilsin diye Ayarlar\'dan bir kez bağlan.</div></div>'+hidePill('repo')+'<span style="font-size:var(--f-title3);color:var(--warn-ink);font-weight:700;line-height:1;">›</span></div>';
   }
   if(savedToday()) return '<div id="sey-save-banner" style="background:rgba(143,191,138,0.16);border:1px solid rgba(143,191,138,0.4);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:9px;"><span style="color:#3F8A4F;display:inline-flex;">'+icon('circle-check',17)+'</span><span style="font-size:var(--f-footnote);font-weight:600;color:var(--text2);">Bugün repoya kaydedildi. Harika.</span></div>';
-  return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="display:inline-flex;">'+icon('map-pin',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:var(--f-caption1);color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:var(--f-footnote);padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
+  return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="display:inline-flex;">'+icon('map-pin',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:var(--f-caption1);color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button data-fx="confirm" onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:var(--f-footnote);padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
 }
 function updateSaveBanner(){ var el=document.getElementById('sey-save-banner'); if(el){ var t=document.createElement('div'); t.innerHTML=saveBanner(); if(t.firstChild) el.replaceWith(t.firstChild); } }
 
@@ -5978,7 +5978,7 @@ function reminderCenterHistoryHTML(){
     });
     h+='</div>';
   }
-  h+='<div class="sey-reminder-history-actions"><button type="button" class="sey-reminder-secondary" onclick="App.clearReminderHistory()"'+(rows.length?'':' disabled')+'>'+esc(reminderCopy('inApp.history.clear','Geçmişi temizle'))+'</button>'+(ui.reminderHistoryUndo?'<button type="button" class="sey-reminder-secondary" onclick="App.undoReminderHistory()">'+esc(reminderCopy('inApp.history.undo','Geri al'))+'</button>':'')+'</div></section>';
+  h+='<div class="sey-reminder-history-actions"><button data-fx="destructive" type="button" class="sey-reminder-secondary" onclick="App.clearReminderHistory()"'+(rows.length?'':' disabled')+'>'+esc(reminderCopy('inApp.history.clear','Geçmişi temizle'))+'</button>'+(ui.reminderHistoryUndo?'<button type="button" class="sey-reminder-secondary" onclick="App.undoReminderHistory()">'+esc(reminderCopy('inApp.history.undo','Geri al'))+'</button>':'')+'</div></section>';
   return h;
 }
 function reminderCenterRetentionHTML(){
@@ -6002,7 +6002,7 @@ function reminderPersonalizationHTML(root){
       if(suggestions.length){ h+='<div class="sey-reminder-personalization-suggestions" role="list" aria-label="Uyarlama önerileri">'; suggestions.forEach(function(suggestion){ h+='<article class="sey-reminder-personalization-suggestion" role="listitem" data-reminder-personalization-suggestion="'+esc(suggestion.id)+'"><strong>'+(suggestion.kind==='capacity'?'Bugünün akışını hafiflet':'Bir durağı uygulama içinde tut')+'</strong><p>'+esc(suggestion.reason)+'</p><small>Kaynak: '+esc(suggestion.sourceLabel)+' · Kendiliğinden uygulanmaz · geri alınabilir</small><div class="sey-reminder-personalization-actions"><button type="button" class="sey-reminder-primary" onclick="App.applyReminderPersonalizationSuggestion(\''+esc(suggestion.id)+'\')">Uygula</button><button type="button" class="sey-reminder-secondary" onclick="App.dismissReminderPersonalizationSuggestion(\''+esc(suggestion.id)+'\')">Şimdi değil</button></div></article>'; }); h+='</div>'; }
       else h+='<div class="sey-reminder-empty" data-reminder-personalization-suggestions="empty" role="status"><strong>Şimdilik öneri yok.</strong><p>Açık seçimlerin güvenli bir değişiklik için yeterli ve tutarlı olduğunda burada nedenini görürsün.</p></div>';
       if(accepted.length){ h+='<div class="sey-reminder-personalization-applied" role="list" aria-label="Uygulanmış uyarlamalar"><strong>Uygulanan öneriler</strong>'; accepted.forEach(function(entry){ h+='<div role="listitem"><span>'+esc(reminderPersonalizationReasonLabel(entry.reasonCode))+'</span><button type="button" class="sey-reminder-secondary" onclick="App.undoReminderPersonalizationSuggestion(\''+esc(entry.suggestionId)+'\')">Geri al</button></div>'; }); h+='</div>'; }
-      h+='<button type="button" class="sey-reminder-secondary" onclick="App.resetReminderPersonalization()">Uyarlama geçmişini ve tercihini sıfırla</button>';
+      h+='<button data-fx="destructive" type="button" class="sey-reminder-secondary" onclick="App.resetReminderPersonalization()">Uyarlama geçmişini ve tercihini sıfırla</button>';
     }
   }
   return h+'</section>';
@@ -6013,7 +6013,7 @@ function reminderCenterPolicyHTML(root){
   h+='<label>Günlük akış bütçesi<input type="number" min="0" max="24" step="1" value="'+policy.dailyFlowBudget+'" aria-label="Günlük akış bütçesi" onchange="App.setReminderDailyFlowBudget(this.value)"><small>En fazla 24 uygulama içi öneri</small></label>';
   h+='<label>Native günlük üst sınır<input type="number" min="0" max="24" step="1" value="'+policy.nativeDailyCap+'" aria-label="Native günlük üst sınır" onchange="App.setReminderNativeDailyCap(this.value)"><small>Bugün kullanılan: '+reminderCenterNativeUsed()+'</small></label>';
   h+='<label>Düşük öncelik sınırı<input type="number" min="0" max="24" step="1" value="'+policy.lowPriorityNativeCap+'" aria-label="Düşük öncelikli native sınırı" onchange="App.setReminderLowPriorityNativeCap(this.value)"><small>P3 / düşük yoğunluklu adaylar</small></label>';
-  h+='</div><div class="sey-reminder-policy-quiet"><span><strong>Sessiz saatler</strong><small>Bu aralıkta uygulama içi kartlar korunur; native kanal ertelenir veya tutulur.</small></span><label>Başlangıç<input type="time" value="'+esc(policy.quietHours.start)+'" aria-label="Sessiz saat başlangıcı" onchange="App.setReminderQuietHours(this.value,\''+esc(policy.quietHours.end)+'\')"></label><label>Bitiş<input type="time" value="'+esc(policy.quietHours.end)+'" aria-label="Sessiz saat bitişi" onchange="App.setReminderQuietHours(\''+esc(policy.quietHours.start)+'\',this.value)"></label></div><div class="sey-reminder-policy-actions"><button type="button" class="sey-reminder-secondary" onclick="App.resetReminderCenter()">Genel ayarları sıfırla</button><small>Kategori override’ları korunur.</small></div></section>';
+  h+='</div><div class="sey-reminder-policy-quiet"><span><strong>Sessiz saatler</strong><small>Bu aralıkta uygulama içi kartlar korunur; native kanal ertelenir veya tutulur.</small></span><label>Başlangıç<input type="time" value="'+esc(policy.quietHours.start)+'" aria-label="Sessiz saat başlangıcı" onchange="App.setReminderQuietHours(this.value,\''+esc(policy.quietHours.end)+'\')"></label><label>Bitiş<input type="time" value="'+esc(policy.quietHours.end)+'" aria-label="Sessiz saat bitişi" onchange="App.setReminderQuietHours(\''+esc(policy.quietHours.start)+'\',this.value)"></label></div><div class="sey-reminder-policy-actions"><button data-fx="destructive" type="button" class="sey-reminder-secondary" onclick="App.resetReminderCenter()">Genel ayarları sıfırla</button><small>Kategori override’ları korunur.</small></div></section>';
   return h;
 }
 function reminderCenterNoticeHTML(){
@@ -6021,14 +6021,14 @@ function reminderCenterNoticeHTML(){
   return '<div class="sey-reminder-center-notice" role="status" aria-live="polite"><span aria-hidden="true">'+icon('check-check',16)+'</span><span>'+esc(ui.reminderCenterNotice)+'</span>'+(ui.reminderCenterUndo?'<button type="button" class="sey-reminder-secondary" onclick="App.undoReminderCenterReset()">Geri al</button>':'')+'</div>';
 }
 function reminderDigestLauncherHTML(){
-  return '<section class="sey-reminder-digest-launcher" aria-labelledby="sey-reminder-digest-launcher-title"><div><span class="sey-reminder-eyebrow">İSTEĞE BAĞLI · YALNIZCA BU CİHAZDA</span><h3 id="sey-reminder-digest-launcher-title">Bu hafta ve eski bir gün</h3><p>Bildirim üretmeden, puan tutmadan, istersen haftana sakince bak.</p></div><button type="button" class="sey-reminder-primary" onclick="App.openReminderDigest()">Sakin alana bak</button></section>';
+  return '<section class="sey-reminder-digest-launcher" aria-labelledby="sey-reminder-digest-launcher-title"><div><span class="sey-reminder-eyebrow">İSTEĞE BAĞLI · YALNIZCA BU CİHAZDA</span><h3 id="sey-reminder-digest-launcher-title">Bu hafta ve eski bir gün</h3><p>Bildirim üretmeden, puan tutmadan, istersen haftana sakince bak.</p></div><button data-fx="open" type="button" class="sey-reminder-primary" onclick="App.openReminderDigest()">Sakin alana bak</button></section>';
 }
 function reminderDigestHTML(){
   var digest=reminderDigestBuild({data:data}), state=ui.reminderDigestState==='no-op'?'no-op':digest.state, selected=reminderDigestReflectionOption(ui.reminderDigestReflection), h='<section class="sey-reminder-digest" data-reminder-digest-state="'+esc(state)+'" aria-labelledby="sey-reminder-digest-title">';
   h+='<div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">YEREL · KULLANICI İSTERSE</span><h3 id="sey-reminder-digest-title">Haftalık sakin alan</h3></div><button type="button" class="sey-reminder-secondary" onclick="App.dismissReminderDigest()">Şimdilik değil</button></div>';
   h+='<p class="sey-reminder-digest-window">'+esc(digest.window.startDate)+' – '+esc(digest.window.endDate)+' · '+esc(digest.timezone)+'</p>';
   if(state==='no-op'){
-    h+='<div class="sey-reminder-digest-empty" data-reminder-digest-no-op="true" role="status"><span aria-hidden="true">'+icon('pause-circle',23)+'</span><strong>'+esc(reminderCopy('inApp.empty.noOpTitle','Burada durmak da tamam.'))+'</strong><p>'+esc(reminderCopy('inApp.empty.noOpBody','Hiçbir şey seçilmedi, kaydedilmedi ve bildirim üretilmedi.'))+'</p><button type="button" class="sey-reminder-secondary" onclick="App.openReminderDigest()">Alanı yeniden aç</button></div>';
+    h+='<div class="sey-reminder-digest-empty" data-reminder-digest-no-op="true" role="status"><span aria-hidden="true">'+icon('pause-circle',23)+'</span><strong>'+esc(reminderCopy('inApp.empty.noOpTitle','Burada durmak da tamam.'))+'</strong><p>'+esc(reminderCopy('inApp.empty.noOpBody','Hiçbir şey seçilmedi, kaydedilmedi ve bildirim üretilmedi.'))+'</p><button data-fx="open" type="button" class="sey-reminder-secondary" onclick="App.openReminderDigest()">Alanı yeniden aç</button></div>';
   } else if(state==='empty'||state==='cleared-history'){
     h+='<div class="sey-reminder-digest-empty" role="status"><span aria-hidden="true">'+icon(state==='cleared-history'?'eraser':'sparkles',23)+'</span><strong>'+(state==='cleared-history'?esc(reminderCopy('inApp.empty.clearedHistoryTitle','Geçmiş temizlendi.')):esc(reminderCopy('inApp.empty.digestTitle','Bu hafta için sakin bir boşluk var.')))+'</strong><p>'+(state==='cleared-history'?esc(reminderCopy('inApp.empty.clearedHistoryBody','Bu ekran yeniden boş ve yerel kalır.')):esc(reminderCopy('inApp.empty.digestBody','Burada gösterecek güvenli bir yerel özet yok. Hiçbir şey eklemen gerekmiyor.')))+'</p></div>';
   } else {
@@ -6138,13 +6138,13 @@ function reminderMedicationSectionHTML(root){
     h+='<div class="sey-reminder-medication-list" role="list" aria-label="Yerel ilaç ve takviye saatleri">';
     list.forEach(function(schedule){
       var title=schedule.privateLabel||schedule.name, kind=reminderMedicationKindLabel(schedule.kind);
-      h+='<article class="sey-reminder-medication-item" data-reminder-medication-id="'+esc(schedule.id)+'" role="listitem"><div style="min-width:0;flex:1;"><strong>'+esc(title)+'</strong><small>'+esc(kind+' · '+schedule.name+' · her gün '+schedule.time)+'</small>'+(schedule.note?'<p>'+esc(schedule.note)+'</p>':'')+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;"><button type="button" class="sey-reminder-secondary" onclick="App.editReminderMedication(\''+esc(schedule.id)+'\')">Düzenle</button><button type="button" class="sey-reminder-secondary" onclick="App.muteReminderMedicationToday(\''+esc(schedule.id)+'\')">Bugün sustur</button><button type="button" class="sey-reminder-secondary is-disabled" onclick="App.deleteReminderMedication(\''+esc(schedule.id)+'\')">Sil</button></div></article>';
+      h+='<article class="sey-reminder-medication-item" data-reminder-medication-id="'+esc(schedule.id)+'" role="listitem"><div style="min-width:0;flex:1;"><strong>'+esc(title)+'</strong><small>'+esc(kind+' · '+schedule.name+' · her gün '+schedule.time)+'</small>'+(schedule.note?'<p>'+esc(schedule.note)+'</p>':'')+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;"><button type="button" class="sey-reminder-secondary" onclick="App.editReminderMedication(\''+esc(schedule.id)+'\')">Düzenle</button><button type="button" class="sey-reminder-secondary" onclick="App.muteReminderMedicationToday(\''+esc(schedule.id)+'\')">Bugün sustur</button><button data-fx="destructive" type="button" class="sey-reminder-secondary is-disabled" onclick="App.deleteReminderMedication(\''+esc(schedule.id)+'\')">Sil</button></div></article>';
     });
     h+='</div>';
   } else {
     h+='<div class="sey-reminder-empty" data-reminder-medication-empty="true"><span aria-hidden="true">'+icon('pill',22)+'</span><strong>'+esc(reminderCopy('inApp.empty.medicationTitle','Henüz kişisel sağlık saati yok.'))+'</strong><p>'+esc(reminderCopy('inApp.empty.medicationBody','Bir saat kurarsan yalnız o saati hatırlatırız; doz veya tedavi kararı üretmeyiz.'))+'</p></div>';
   }
-  h+='<button type="button" class="sey-reminder-medication-clear" onclick="App.clearReminderMedicationLocal()"'+(list.length?'':' disabled')+'>'+esc(reminderCopy('inApp.empty.medicationClear','Yerel ilaç / takviye kayıtlarını temizle'))+'</button></section>';
+  h+='<button data-fx="destructive" type="button" class="sey-reminder-medication-clear" onclick="App.clearReminderMedicationLocal()"'+(list.length?'':' disabled')+'>'+esc(reminderCopy('inApp.empty.medicationClear','Yerel ilaç / takviye kayıtlarını temizle'))+'</button></section>';
   return h;
 }
 function reminderCardHTML(def,index){
@@ -6541,7 +6541,7 @@ function reminderInboxCardHTML(input){
   } else {
     h+='<div class="sey-reminder-inbox-empty" role="status"><span aria-hidden="true">'+icon('sparkles',21)+'</span><strong>'+esc(reminderCopy('inApp.inbox.emptyTitle','Şimdilik boş'))+'</strong><p>'+esc(reminderCopy('inApp.inbox.emptyBody','Bugün için uygun bir öneri oluştuğunda burada görünür.'))+'</p></div>';
   }
-  h+='<div class="sey-reminder-inbox-footer"><button type="button" class="sey-reminder-inbox-mute'+(muted?' is-muted':'')+'" onclick="App.reminderInboxMuteToday()" aria-pressed="'+muted+'">'+icon(muted?'bell':'bell-off',15)+'<span>'+(muted?esc(reminderCopy('inApp.inbox.restore','Bugün susturuldu · geri getir')):esc(reminderCopy('inApp.inbox.mute','Bugün tümünü sustur')))+'</span></button><button type="button" id="sey-reminder-inbox-center" class="sey-reminder-inbox-center" onclick="App.openReminderCenter()">'+esc(reminderCopy('inApp.inbox.centerAction','Hatırlatma merkezini aç'))+'</button></div>';
+  h+='<div class="sey-reminder-inbox-footer"><button type="button" class="sey-reminder-inbox-mute'+(muted?' is-muted':'')+'" onclick="App.reminderInboxMuteToday()" aria-pressed="'+muted+'">'+icon(muted?'bell':'bell-off',15)+'<span>'+(muted?esc(reminderCopy('inApp.inbox.restore','Bugün susturuldu · geri getir')):esc(reminderCopy('inApp.inbox.mute','Bugün tümünü sustur')))+'</span></button><button data-fx="open" type="button" id="sey-reminder-inbox-center" class="sey-reminder-inbox-center" onclick="App.openReminderCenter()">'+esc(reminderCopy('inApp.inbox.centerAction','Hatırlatma merkezini aç'))+'</button></div>';
   h+='<p class="sey-reminder-inbox-privacy" role="note">'+esc(reminderCopy('inApp.inbox.privacy','Bu kart yalnız uygulama içinde görünür; native başlık, not veya hassas ayrıntı delivery günlüğüne yazılmaz.'))+'</p></section>';
   return h;
 }
@@ -6551,7 +6551,7 @@ function reminderCenterOverlayHTML(){
   if(!previewTarget) ui.reminderPreviewId='';
   var h='<div id="sey-reminder-overlay" class="sey-reminder-overlay" role="dialog" aria-modal="true" aria-labelledby="sey-reminder-title" aria-describedby="sey-reminder-overview-copy" tabindex="-1" onclick="App.closeReminderCenter()" onkeydown="if(event.key===\'Escape\'){event.preventDefault();App.closeReminderCenter();}">';
   h+='<section id="sey-reminder-screen" class="sey-reminder-screen" tabindex="-1" onkeydown="App.onReminderKeydown(event)" onclick="event.stopPropagation()">';
-  h+='<header class="sey-reminder-header"><div><span class="sey-reminder-eyebrow">ŞEYMA · RİTİM MERKEZİ</span><h2 id="sey-reminder-title">'+esc(reminderCopy('inApp.center.title','Hatırlatmalar ve bildirimler'))+'</h2><p>'+esc(reminderCopy('inApp.center.subtitle','Günün küçük duraklarını burada sakince gözden geçir.'))+'</p></div><button type="button" class="sey-reminder-close" onclick="App.closeReminderCenter()" aria-label="'+esc(reminderCopy('inApp.center.closeLabel','Hatırlatmalar ve bildirimler merkezini kapat'))+'">'+icon('x',18)+'</button></header>';
+  h+='<header class="sey-reminder-header"><div><span class="sey-reminder-eyebrow">ŞEYMA · RİTİM MERKEZİ</span><h2 id="sey-reminder-title">'+esc(reminderCopy('inApp.center.title','Hatırlatmalar ve bildirimler'))+'</h2><p>'+esc(reminderCopy('inApp.center.subtitle','Günün küçük duraklarını burada sakince gözden geçir.'))+'</p></div><button data-fx="close" type="button" class="sey-reminder-close" onclick="App.closeReminderCenter()" aria-label="'+esc(reminderCopy('inApp.center.closeLabel','Hatırlatmalar ve bildirimler merkezini kapat'))+'">'+icon('x',18)+'</button></header>';
   h+='<main id="sey-reminder-scroll" class="sey-reminder-scroll">';
   h+=reminderCenterNoticeHTML();
   h+='<section class="sey-reminder-intro" aria-labelledby="sey-reminder-overview-title"><div class="sey-reminder-intro-mark" aria-hidden="true">'+icon('bell-ring',22)+'</div><div><h3 id="sey-reminder-overview-title">'+esc(reminderCopy('inApp.center.introTitle','Kontrol sende'))+'</h3><p id="sey-reminder-overview-copy">'+esc(reminderCopy('inApp.center.introBody','Native kanal yalnız açık bir kullanıcı eylemiyle açılır; ilk yüklemede izin istenmez. Uygulama içi önizleme izin gerektirmez.'))+'</p></div></section>';
@@ -9739,7 +9739,7 @@ function eveningNudge(rec){
   return '<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);border-radius:20px;padding:15px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 26px rgba(110,85,191,0.35);">'
     +'<span style="flex-shrink:0;display:inline-flex;">'+icon('book-open',24)+'</span>'
     +'<div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:#fff;">Gece yaklaşıyor</div><div style="font-size:var(--f-caption1);color:rgba(255,255,255,0.9);line-height:1.35;">Bugün ne okudun? Birkaç sayfa, uykuya geçişi yumuşatır.</div></div>'
-    +'<button onclick="App.openReading()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#6E55BF;font-weight:800;font-size:var(--f-footnote);padding:9px 14px;border-radius:12px;">Ekle</button></div>';
+    +'<button data-fx="open" onclick="App.openReading()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#6E55BF;font-weight:800;font-size:var(--f-footnote);padding:9px 14px;border-radius:12px;">Ekle</button></div>';
 }
 
 function stepReminder(rec){
@@ -10312,7 +10312,7 @@ function motivationTodayCardHTML(){
   var doneToday=!!(st&&(st.status==='completed'||st.status==='minimum_completed'));
   var pct=sum.programComplete?100:Math.max(2,sum.percent);
   var pu=dark?'#B7A8F2':'#6E5FCB';
-  var h='<button type="button" id="sey-motivation-card" class="surface sey-room-card sey-asbtn" onclick="App.openRoom()" aria-label="Terapi Odası\'nı aç" style="cursor:pointer;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,'+pu+' 20%, var(--card-bd));">';
+  var h='<button data-fx="open" type="button" id="sey-motivation-card" class="surface sey-room-card sey-asbtn" onclick="App.openRoom()" aria-label="Terapi Odası\'nı aç" style="cursor:pointer;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,'+pu+' 20%, var(--card-bd));">';
   h+='<div style="display:flex;align-items:center;gap:11px;">';
   h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+pu+';background:color-mix(in srgb,'+pu+' 15%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('compass',19)+'</span>';
   h+='<div style="flex:1;min-width:0;">';
@@ -10369,7 +10369,7 @@ function roomOverlayHTML(){
   h+='<div id="sey-room-title" class="sey-room-title" style="font-size:var(--f-title2);letter-spacing:2.5px;animation:seyFloatIn .4s .04s ease both;">Terapi Odası</div>';
   h+=motivationSignHTML(0.12);
   h+='</div>';
-  h+='<button onclick="App.closeRoom()" aria-label="Kapat" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.16);cursor:pointer;width:36px;height:36px;border-radius:50%;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
+  h+='<button data-fx="close" onclick="App.closeRoom()" aria-label="Kapat" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.16);cursor:pointer;width:36px;height:36px;border-radius:50%;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
   h+='</div>';
   h+='<div style="position:relative;display:flex;align-items:center;gap:8px;">';
   h+='<div style="flex:1;min-width:0;font-size:var(--f-footnote);line-height:1.35;"><b style="color:var(--text);font-weight:800;">'+esc(motDayText)+'</b><span style="color:var(--muted);font-weight:700;"> · '+esc(mot.phaseTitle)+' · '+esc(mot.domainLabel)+'</span></div>';
@@ -10466,8 +10466,8 @@ function roomPathHTML(M,mot,sum,st,doneToday,nar,fi){
   h+='<button id="sey-mot-complete-btn-main" onclick="'+pOnclick+'"'+(pEnabled?'':' disabled')+' style="position:relative;overflow:hidden;flex:1;min-width:0;border:none;cursor:'+(pEnabled?'pointer':'not-allowed')+';padding:13px;border-radius:14px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,var(--room2),#C9B8FF);opacity:'+(pEnabled?'1':'0.45')+';">'
     +'<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.45) 50%,transparent 70%);animation:seyShine 3.2s ease-in-out infinite;"></span>'
     +'<span style="position:relative;">'+esc(pLabel)+' '+icon('check',14)+'</span></button>';
-  if(minMode) h+='<button onclick="App.closeMotivationMinimum()" style="flex-shrink:0;border:1px solid var(--field-bd);cursor:pointer;padding:13px 15px;border-radius:14px;font-size:var(--f-footnote);font-weight:700;color:var(--muted);background:transparent;">Vazgeç</button>';
-  else if(!doneToday) h+='<button onclick="App.openMotivationMinimum()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.4);cursor:pointer;padding:13px 15px;border-radius:14px;font-size:var(--f-footnote);font-weight:700;color:var(--text2);background:rgba(233,175,193,0.10);">Görevi küçült</button>';
+  if(minMode) h+='<button data-fx="close" onclick="App.closeMotivationMinimum()" style="flex-shrink:0;border:1px solid var(--field-bd);cursor:pointer;padding:13px 15px;border-radius:14px;font-size:var(--f-footnote);font-weight:700;color:var(--muted);background:transparent;">Vazgeç</button>';
+  else if(!doneToday) h+='<button data-fx="open" onclick="App.openMotivationMinimum()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.4);cursor:pointer;padding:13px 15px;border-radius:14px;font-size:var(--f-footnote);font-weight:700;color:var(--text2);background:rgba(233,175,193,0.10);">Görevi küçült</button>';
   h+='</div></div>';
   // Bugünün kazanımı (akşam kapanışı)
   h+=roomDailyWinHTML(fi, doneToday?0.16:0.15);
@@ -11166,7 +11166,7 @@ function hubTilesHTML(){
     : '<span style="flex-shrink:0;font-size:var(--f-caption2);font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">';
   h+='<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.45px;color:var(--muted);">BUGÜN '+filled+'/5 ALAN</span>';
-  h+='<button onclick="App.openSoulArchive()" style="border:none;background:transparent;cursor:pointer;font-size:var(--f-caption2);font-weight:700;color:var(--soul);display:inline-flex;align-items:center;gap:3px;padding:2px 4px;border-radius:6px;">Arşiv '+icon('archive',12)+'</button>';
+  h+='<button data-fx="open" onclick="App.openSoulArchive()" style="border:none;background:transparent;cursor:pointer;font-size:var(--f-caption2);font-weight:700;color:var(--soul);display:inline-flex;align-items:center;gap:3px;padding:2px 4px;border-radius:6px;">Arşiv '+icon('archive',12)+'</button>';
   h+=chip;
   h+='</div>';
   // 5 kategori butonu: 3+2 grid (mobilde otomatik wrap)
@@ -11573,7 +11573,7 @@ function bugunHTML(){
 
   // dağıldı
   if(!ed) h+=onThisDayCard();
-  if(!ed) h+='<button onclick="App.openEmergency()" style="border:1px dashed rgba(150,110,120,0.3);background:var(--card);cursor:pointer;width:100%;padding:14px;border-radius:18px;font-size:var(--f-subhead);font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;">Bugün biraz dağıldı '+icon('heart-handshake',15)+'</button>';
+  if(!ed) h+='<button data-fx="open" onclick="App.openEmergency()" style="border:1px dashed rgba(150,110,120,0.3);background:var(--card);cursor:pointer;width:100%;padding:14px;border-radius:18px;font-size:var(--f-subhead);font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;">Bugün biraz dağıldı '+icon('heart-handshake',15)+'</button>';
   h+='</div>';
   return h;
 }
@@ -11703,7 +11703,7 @@ function journalLightCardHTML(rec, streak){
   var has=rec&&rec.journal&&String(rec.journal.text||'').trim();
   var title=has?'Bugünün ışığı parlıyor ✨':'Bugünün ışığı henüz yazılmadı 🪶';
   var sub=has?(rec.journal.wordCount+' kelime · '+fmtDateShort(rec.journal.savedAt)):(streak>1?(streak+' günlük seri · yazmak seriyi korur'):'Birkaç satır yaz, kendine ışık tut');
-  return '<button type="button" onclick="App.openJournalModal()" class="sgl-journal-card sey-asbtn"><span class="sgl-journal-icon">'+icon('sparkles',17)+'</span><div class="sgl-journal-text"><div class="sgl-journal-title">'+esc(title)+'</div><div class="sgl-journal-sub">'+esc(sub)+'</div></div><span class="sgl-journal-action">'+(has?'Görüntüle':'Aç')+' '+icon('chevron-right',12)+'</span></button>';
+  return '<button data-fx="open" type="button" onclick="App.openJournalModal()" class="sgl-journal-card sey-asbtn"><span class="sgl-journal-icon">'+icon('sparkles',17)+'</span><div class="sgl-journal-text"><div class="sgl-journal-title">'+esc(title)+'</div><div class="sgl-journal-sub">'+esc(sub)+'</div></div><span class="sgl-journal-action">'+(has?'Görüntüle':'Aç')+' '+icon('chevron-right',12)+'</span></button>';
 }
 function journalModalHTML(){
   var date=activeDate();
@@ -11728,7 +11728,7 @@ function journalModalHTML(){
   h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
   h+='<span style="width:46px;height:46px;border-radius:15px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('book-open',23)+'</span>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-caption2);font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">GÜNLÜK IŞIĞI <span style="font-size:var(--f-caption1);">🦩</span></div><div style="font-size:var(--f-title3);font-weight:800;line-height:1.15;margin-top:2px;">Günışığı\'nın Günlüğü</div></div>';
-  h+='<button onclick="App.closeJournalModal()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
+  h+='<button data-fx="close" onclick="App.closeJournalModal()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
   h+='</div>';
 
   h+='<div style="position:relative;display:flex;gap:6px;margin-top:13px;">';
@@ -11781,7 +11781,7 @@ function journalModalHTML(){
   h+='</div>';
 
   h+='<div style="flex-shrink:0;padding:12px 15px calc(12px + env(safe-area-inset-bottom));background:var(--modal);border-top:1px solid var(--card-bd);display:flex;gap:10px;">';
-  h+='<button onclick="App.closeJournalModal()" style="flex:1;border:1px solid var(--card-bd);cursor:pointer;padding:14px;border-radius:16px;font-size:var(--f-subhead);font-weight:700;color:var(--text2);background:transparent;">Kapat</button>';
+  h+='<button data-fx="close" onclick="App.closeJournalModal()" style="flex:1;border:1px solid var(--card-bd);cursor:pointer;padding:14px;border-radius:16px;font-size:var(--f-subhead);font-weight:700;color:var(--text2);background:transparent;">Kapat</button>';
   h+='<button onclick="App.saveJournal()" style="flex:2;border:none;cursor:pointer;padding:14px;border-radius:16px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,var(--journal),var(--journal2));box-shadow:0 10px 24px color-mix(in srgb,var(--journal-glow) 55%,transparent),inset 0 1px 0 rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;gap:6px;">'+(hasSaved?('Güncelle ve kapat '+icon('sparkles',16)):('Kaydet ve kapat '+icon('sparkles',16)))+'</button>';
   h+='</div>';
 
@@ -11875,7 +11875,7 @@ function crisisModalHTML(){
   h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
   h+='<span style="width:46px;height:46px;border-radius:15px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(C.icon,23)+'</span>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-caption2);font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">'+C.tag+' <span style="font-size:var(--f-caption1);">🦩</span></div><div style="font-size:var(--f-title3);font-weight:800;line-height:1.15;margin-top:2px;">Raşit\'in Kriz Odası</div></div>';
-  h+='<button onclick="App.closeCrisis()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
+  h+='<button data-fx="close" onclick="App.closeCrisis()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
   h+='</div>';
   // 3 adımlı mikro-müdahale rayı: Dur → Dene → Karar ver
   h+='<div style="position:relative;display:flex;gap:6px;margin-top:13px;">';
@@ -11974,7 +11974,7 @@ function crisisModalHTML(){
   // ── sabit alt bar (birincil eylem her zaman erişilebilir) ──
   h+='<div style="flex-shrink:0;position:relative;padding:12px 15px calc(14px + env(safe-area-inset-bottom));background:var(--modal);border-top:1px solid var(--card-bd);box-shadow:0 -10px 26px rgba(0,0,0,0.07);">';
   if(ui.crisisDone){
-    h+='<button onclick="App.closeCrisis()" style="border:none;width:100%;padding:16px;border-radius:18px;font-size:var(--f-body);font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;">Tamam, kapat '+icon('check',16)+'</button>';
+    h+='<button data-fx="close" onclick="App.closeCrisis()" style="border:none;width:100%;padding:16px;border-radius:18px;font-size:var(--f-body);font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;">Tamam, kapat '+icon('check',16)+'</button>';
     h+='<div style="font-size:var(--f-caption2);color:var(--faint);text-align:center;line-height:1.5;margin-top:8px;">Kaydını aldım; bugünün ilgili tiki kendiliğinden yeşillendi.'+(C.habit?' Seni takip ediyorum, Sevgili Günışığı.':'')+'</div>';
   } else {
     h+='<button onclick="App.completeCrisis()" style="border:none;width:100%;padding:16px;border-radius:18px;font-size:var(--f-body);font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;opacity:1;">Krizi kaydet '+icon('check',16)+'</button>';
@@ -12402,7 +12402,7 @@ function magnesiumCardHTML(date){
         h+='<div style="font-size:var(--f-footnote);color:var(--text2);">Etki / not</div>';
         h+='<input type="text" value="'+esc(mg.effectNote||'')+'" oninput="App.saveMgNote(this.value)" placeholder="Bugünkü etkisini kısaca yaz..." style="border:1px solid var(--field-bd);background:var(--field);border-radius:10px;padding:9px 10px;font-size:var(--f-footnote);outline:none;">';
         h+='<button onclick="App.editMagnesium()" style="align-self:flex-start;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-size:var(--f-caption1);font-weight:800;">Tamam</button>';
-        h+='<button onclick="App.deleteMgEntry()" style="align-self:flex-start;background:transparent;border:1.5px solid var(--card-bd);color:var(--watch-ink);border-radius:12px;padding:8px 12px;font-size:var(--f-caption1);font-weight:700;">Sil</button>';
+        h+='<button data-fx="destructive" onclick="App.deleteMgEntry()" style="align-self:flex-start;background:transparent;border:1.5px solid var(--card-bd);color:var(--watch-ink);border-radius:12px;padding:8px 12px;font-size:var(--f-caption1);font-weight:700;">Sil</button>';
         h+='</div>';
       } else {
         if(mg.effectNote) h+='<div style="font-size:var(--f-caption1);color:var(--faint);padding:8px 10px;background:var(--card);border-radius:10px;">Not: '+esc(mg.effectNote)+'</div>';
@@ -12504,7 +12504,7 @@ function raporHTML(){
 
 function ayarlarHTML(){
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
-  h+='<button type="button" id="sey-reminder-settings-entry" class="sey-reminder-settings-entry" onclick="App.openReminderCenter()" aria-haspopup="dialog"><span class="sey-reminder-settings-icon" aria-hidden="true">'+icon('bell-ring',19)+'</span><span class="sey-reminder-settings-copy"><strong>'+esc(reminderCopy('inApp.center.title','Hatırlatmalar ve bildirimler'))+'</strong><small>'+esc(reminderCopy('inApp.center.settingsSubtitle','Günün duraklarını, uygulama içi önizlemeyi ve izin sınırını gör.'))+'</small></span><span class="sey-reminder-settings-action">'+esc(reminderCopy('inApp.actions.open','Aç'))+' '+icon('chevron-right',15)+'</span></button>';
+  h+='<button data-fx="open" type="button" id="sey-reminder-settings-entry" class="sey-reminder-settings-entry" onclick="App.openReminderCenter()" aria-haspopup="dialog"><span class="sey-reminder-settings-icon" aria-hidden="true">'+icon('bell-ring',19)+'</span><span class="sey-reminder-settings-copy"><strong>'+esc(reminderCopy('inApp.center.title','Hatırlatmalar ve bildirimler'))+'</strong><small>'+esc(reminderCopy('inApp.center.settingsSubtitle','Günün duraklarını, uygulama içi önizlemeyi ve izin sınırını gör.'))+'</small></span><span class="sey-reminder-settings-action">'+esc(reminderCopy('inApp.actions.open','Aç'))+' '+icon('chevron-right',15)+'</span></button>';
   // ── Veri & senkron özeti (teknik detay) ──
   var _dtracked=daysTracked(), _totalTicks=0,_dayRecs=0;
   for(var _dk in data.days){ _dayRecs++; _totalTicks+=countRec(data.days[_dk]); }
@@ -12551,13 +12551,13 @@ function ayarlarHTML(){
   ];
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sparkles',15)+' Premium Atmosfer</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tüm premium efektleri tek anahtarla yönet. Kapattığında uygulama sade modda çalışır.</div>';
   h+='<div style="display:flex;gap:8px;">';
-  h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\',true)" aria-pressed="'+paOn+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?onS:offS)+'">'+icon('sparkles',14)+' Açık</button>';
-  h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\',false)" aria-pressed="'+(!paOn)+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div>';
+  h+='<button data-fx="toggle" onclick="App.toggleSetting(\'premiumAtmosphere\',true)" aria-pressed="'+paOn+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?onS:offS)+'">'+icon('sparkles',14)+' Açık</button>';
+  h+='<button data-fx="toggle" onclick="App.toggleSetting(\'premiumAtmosphere\',false)" aria-pressed="'+(!paOn)+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div>';
   fxRows.forEach(function(row){
     var on=!!(data.settings&&data.settings[row[0]]);
     var lockStyle=paOn?'':'opacity:.45;pointer-events:none;';
     h+='<div style="display:flex;align-items:center;gap:10px;'+lockStyle+'"><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+(row[3]?icon(row[3],14)+' ':'')+row[1]+'</div><div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.35;">'+row[2]+'</div></div>';
-    h+='<button onclick="App.toggleSetting(\''+row[0]+'\')" aria-pressed="'+on+'" aria-label="'+row[1].replace(/^[^A-Za-zÇĞİÖŞÜğöşüı]+ /,'')+' '+(on?'açık':'kapalı')+'" style="flex-shrink:0;min-width:74px;padding:8px 12px;border-radius:11px;cursor:pointer;font-size:var(--f-caption1);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:4px;'+(on?onS:offS)+'">'+(on?'Açık':'Kapalı')+'</button></div>';
+    h+='<button data-fx="toggle" onclick="App.toggleSetting(\''+row[0]+'\')" aria-pressed="'+on+'" aria-label="'+row[1].replace(/^[^A-Za-zÇĞİÖŞÜğöşüı]+ /,'')+' '+(on?'açık':'kapalı')+'" style="flex-shrink:0;min-width:74px;padding:8px 12px;border-radius:11px;cursor:pointer;font-size:var(--f-caption1);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:4px;'+(on?onS:offS)+'">'+(on?'Açık':'Kapalı')+'</button></div>';
   });
   h+='</div>';
   // FX-P-57: sesli rehberlik ayarları — toggle + dil + konuşma hızı.
@@ -12878,7 +12878,7 @@ function sleepPrepCard(rec){
     rdEntries.forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:'+A+';">'+icon('book-open',14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(e.title||'(başlıksız)')+(e.author?' <span style=\"font-weight:500;color:var(--faint);\">· '+esc(e.author)+'</span>':'')+'</div>'+(meta.length?'<div style="font-size:var(--f-caption2);color:var(--faint);">'+meta.join(' · ')+'</div>':'')+'</div></div>'; });
     h+='</div>';
   }
-  h+='<button onclick="App.openReading()" style="border:1px solid color-mix(in srgb,'+A+' 35%, var(--field-bd));cursor:pointer;padding:11px;border-radius:14px;font-size:var(--f-footnote);font-weight:800;color:'+A+';background:color-mix(in srgb,'+A+' 8%, var(--field));display:flex;align-items:center;justify-content:center;gap:7px;">'+icon('book-open',15)+' Okuma ekle</button>';
+  h+='<button data-fx="open" onclick="App.openReading()" style="border:1px solid color-mix(in srgb,'+A+' 35%, var(--field-bd));cursor:pointer;padding:11px;border-radius:14px;font-size:var(--f-footnote);font-weight:800;color:'+A+';background:color-mix(in srgb,'+A+' 8%, var(--field));display:flex;align-items:center;justify-content:center;gap:7px;">'+icon('book-open',15)+' Okuma ekle</button>';
   return collapsibleCardHTML({key:'h-sleepprep', icon:icon('moon',18), accent:A, title:'Uykuya Dalma Hazırlığı', subtitle:'6 faktör · bilimsel skor', badge:hBadge(readiness.score+' / 100',scoreCol), open:cardOpen('h-sleepprep'), body:h, hint:'hazırlık skorunu aç'});
 }
 CARD_BUILDERS['h-sleepprep']=sleepPrepCard;
@@ -13503,7 +13503,7 @@ function zikroverlayHTML(){
   // kısa Türkçe etiket). Eski tek "Özet" sekmesi Geçmiş (istatistik/ısı) ve
   // Ayarlar (tüm toggle'lar) olarak ikiye ayrıldı — her ekranın tek bir işi var.
   var tabs=[['counter','Sayaç'],['presets','Esmâ'],['hatims','Hatimlerim'],['history','Geçmiş'],['settings','Ayarlar']];
-  var head='<header class="zikr-v2-header"><div class="brand"><span>'+icon('sparkles',18)+'</span><div><strong>Zikirmatik</strong><small>Kalıcı, odaklı ve sana ait</small></div></div><button class="close" onclick="App.closeZikr()" aria-label="Zikirmatiği kapat">'+icon('x',18)+'</button></header>';
+  var head='<header class="zikr-v2-header"><div class="brand"><span>'+icon('sparkles',18)+'</span><div><strong>Zikirmatik</strong><small>Kalıcı, odaklı ve sana ait</small></div></div><button data-fx="close" class="close" onclick="App.closeZikr()" aria-label="Zikirmatiği kapat">'+icon('x',18)+'</button></header>';
   // ZP-08.2: paylaşımlı segTabs() aktif sekmeye INLINE `background:linear-
   // gradient(...)` yazıyordu; inline stil sınıf seçicisini yendiği için
   // ZP-08'in opak/gradientsiz kuralı bu tek noktada UYGULANAMIYORDU (gerçek
@@ -13772,7 +13772,7 @@ function quranJourneyHubCardHTML(){
   var tone=quranPreviewToneOf(status);
   var verse=quranActiveVerse();
 
-  var h='<button id="quran-journey-card" class="quran-v2-preview is-'+tone+'" onclick="App.openQuranJourney()" aria-label="Kur’an Yolculuğu kütüphanesini aç">';
+  var h='<button data-fx="open" id="quran-journey-card" class="quran-v2-preview is-'+tone+'" onclick="App.openQuranJourney()" aria-label="Kur’an Yolculuğu kütüphanesini aç">';
   h+='<div class="quran-v2-preview-top"><span class="quran-v2-preview-icon" aria-hidden="true">'+icon('book',20)+'</span><div class="quran-v2-preview-copy"><strong>Kur’an Yolculuğu</strong><small>'+esc(copy.line)+'</small></div><span class="quran-v2-preview-status '+tone+'">'+esc(copy.statusLabel)+'</span></div>';
 
   // Vitrin: çarpıcı âyet modülü yüklüyse döner; yüklü değilse (statik denetim/
@@ -13814,7 +13814,7 @@ function quranJourneyOverlayHTML(){
   var head='<header class="quran-v2-header"><div id="quran-head-lead" class="lead">'+quranHeadLeadHTML()+'</div>';
   head+='<button id="quran-refresh-button" class="refresh'+(ui.quranRefreshing?' is-spinning':'')+'" onclick="App.refreshQuranUpdates()" aria-label="Güncellemeleri kontrol et" aria-busy="'+(!!ui.quranRefreshing)+'"'+(ui.quranRefreshing?' disabled':'')+'>'+icon('rotate-ccw',17)+'</button>';
   head+=quranRemoteStatusHTML();
-  head+='<button class="close" onclick="App.closeQuranJourney()" aria-label="Kur’an Yolculuğunu kapat">'+icon('x',18)+'</button></header>';
+  head+='<button data-fx="close" class="close" onclick="App.closeQuranJourney()" aria-label="Kur’an Yolculuğunu kapat">'+icon('x',18)+'</button></header>';
   return '<div id="quran-overlay" class="quran-v2-overlay" role="dialog" aria-modal="true" aria-label="Raşit ile Kur’an Yolculuğu">'
     +'<div id="quran-screen" class="quran-v2-screen" tabindex="-1" onkeydown="App.onQuranKeydown(event)">'
     +head+'<main id="quran-scroll" class="scroll quran-v2-scroll">'+quranViewBodyHTML()+'</main></div></div>';
@@ -14754,8 +14754,8 @@ function appHeaderHTML(){
   var m=appHeaderMeta();
   var h='<header id="sey-appheader" class="sey-appheader" style="--hdr-accent:'+m.accent+';--hdr-accent2:'+m.accent2+';--hdr-ink:'+m.ink+';">';
   h+='<div class="sey-header-top">';
-  h+='<button class="sey-header-brand" onclick="App.go(\'bugun\')" aria-label="Bugüne git"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></button>';
-  h+='<div class="sey-header-tools">'+saveButtonHTML()+'<button class="sey-header-mini" onclick="App.toggleTheme()" aria-label="Tema" title="Tema">'+icon(dark?'sun':'moon',16)+'</button></div>';
+  h+='<button data-fx="nav" class="sey-header-brand" onclick="App.go(\'bugun\')" aria-label="Bugüne git"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></button>';
+  h+='<div class="sey-header-tools">'+saveButtonHTML()+'<button data-fx="toggle" class="sey-header-mini" onclick="App.toggleTheme()" aria-label="Tema" title="Tema">'+icon(dark?'sun':'moon',16)+'</button></div>';
   h+='</div>';
   h+='<div class="sey-header-main">';
   h+='<span class="sey-header-icon">'+icon(m.icon,21)+'</span>';
@@ -14804,7 +14804,7 @@ function navHTML(){
     if(n[0]==='mesaj'&&unread>0) badge='<span class="sey-bottomnav-badge">'+(unread>9?'9+':unread)+'</span>';
     else if(n[0]==='saygi'&&saygiPending>0) badge='<span class="sey-bottomnav-badge saygi">'+saygiPending+'</span>';
     var clickFn=n[0]==='mesaj'?'App.openMesaj()':'App.go(\''+n[0]+'\')';
-    h+='<button class="sey-bottomnav-item'+(active?' is-active':'')+(n[5]?' is-saygi':'')+'" style="--nav-item-accent:'+n[3]+';--nav-item-accent2:'+n[4]+';" onclick="'+clickFn+'" aria-label="'+n[2]+'"'+(active?' aria-current="page"':'')+'>';
+    h+='<button data-fx="nav" class="sey-bottomnav-item'+(active?' is-active':'')+(n[5]?' is-saygi':'')+'" style="--nav-item-accent:'+n[3]+';--nav-item-accent2:'+n[4]+';" onclick="'+clickFn+'" aria-label="'+n[2]+'"'+(active?' aria-current="page"':'')+'>';
     h+='<span class="sey-bottomnav-icon"><span class="sey-bottomnav-indicator"></span><span class="sey-bottomnav-glyph">'+icon(n[1],20)+'</span>'+badge+'</span>';
     h+='<span class="sey-bottomnav-label">'+n[2]+'</span>';
     h+='</button>';
@@ -14839,7 +14839,7 @@ function soulOverlayShell(closeFn, sticky, body, maxw, fixedH, label){
 function bookStatusChip(st){ var m={reading:['Okunuyor','var(--read)','var(--read-bg)'],finished:['Bitti','var(--ok)','var(--ok-bg)'],dropped:['Bırakıldı','var(--drop)','var(--drop-bg)']}; var c=m[st]||m.reading; return '<span style="font-size:var(--f-caption2);font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
 function readingOverlayHTML(){
   var view=ui.readingView||'today';
-  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne okudum? '+icon('book-open',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugünkü okuman, kitaplığın ve alıntıların tek yerde.</div></div><button onclick="App.closeReading()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne okudum? '+icon('book-open',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugünkü okuman, kitaplığın ve alıntıların tek yerde.</div></div><button data-fx="close" onclick="App.closeReading()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
   var tabs=segTabs([['today','Bugün'],['library',icon('book',13)+' Kitaplık'],['stats',icon('chart-column',13)+' İstatistik'],['quotes',icon('quote',13)+' Alıntılar']],view,'App.setReadingView');
   var body='';
   if(view==='today') body=readingTodayView();
@@ -14979,7 +14979,7 @@ function quoteAddModal(){
 function titleStatusChip(st){ var m={watching:['İzleniyor','var(--watch)','var(--watch-bg)'],finished:['Bitti','var(--ok)','var(--ok-bg)'],dropped:['Bırakıldı','var(--pause)','var(--pause-bg)']}; var c=m[st]||m.watching; return '<span style="font-size:var(--f-caption2);font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
 function watchOverlayHTML(){
   var view=ui.watchView||'today';
-  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne izledim? '+icon('clapperboard',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugün izlediklerin, arşivin ve unutulmaz replikler.</div></div><button onclick="App.closeWatching()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne izledim? '+icon('clapperboard',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugün izlediklerin, arşivin ve unutulmaz replikler.</div></div><button data-fx="close" onclick="App.closeWatching()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
   var tabs=segTabs([['today','Bugün'],['archive',icon('archive',13)+' Arşiv'],['stats',icon('chart-column',13)+' İstatistik'],['quotes',icon('quote',13)+' Replikler']],view,'App.setWatchView','watch');
   var body='';
   if(view==='today') body=watchTodayView();
@@ -15110,7 +15110,7 @@ var LISTEN_KINDS=[['sarki',icon('music',13)+' Şarkı'],['album',icon('disc',13)
 function listenKindMeta(k){ return (k==='podcast')?{label:'Podcast',icon:'mic'}:(k==='album')?{label:'Albüm',icon:'disc'}:{label:'Şarkı',icon:'music'}; }
 function listeningOverlayHTML(){
   var view=ui.listeningView||'today';
-  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne dinledim? '+icon('headphones',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugün dinlediklerin, favorilerin ve akılda kalan sözler.</div></div><button onclick="App.closeListening()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne dinledim? '+icon('headphones',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugün dinlediklerin, favorilerin ve akılda kalan sözler.</div></div><button data-fx="close" onclick="App.closeListening()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
   var tabs=segTabs([['today','Bugün'],['favs',icon('star',13)+' Favoriler'],['stats',icon('chart-column',13)+' İstatistik'],['lyrics',icon('quote',13)+' Sözler']],view,'App.setListeningView','listen');
   var body='';
   if(view==='today') body=listeningTodayView();
@@ -15252,7 +15252,7 @@ function learningTodayView(){
   return h;
 }
 function learningOverlayHTML(){
-  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne öğrendim? '+icon('graduation-cap',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugün öğrendiğin küçük ya da büyük her şey, tek yerde.</div></div><button onclick="App.closeLearning()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne öğrendim? '+icon('graduation-cap',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugün öğrendiğin küçük ya da büyük her şey, tek yerde.</div></div><button data-fx="close" onclick="App.closeLearning()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
   return overlayShell('App.closeLearning()', head, learningTodayView(),null,false,'Öğrenme günlüğü');
 }
 
@@ -15309,7 +15309,7 @@ function soulActivityEntryCard(a){
   return h;
 }
 function soulPracticePickerHTML(){
-  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Bugün hangi pratik? '+icon('heart-handshake',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Pilates, ney veya binicilik — beden ve zihni birlikte besleyen ritim.</div></div><button onclick="App.closeSoulPracticePicker()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Bugün hangi pratik? '+icon('heart-handshake',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Pilates, ney veya binicilik — beden ve zihni birlikte besleyen ritim.</div></div><button data-fx="close" onclick="App.closeSoulPracticePicker()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
   var body='';
   body+='<div style="display:flex;flex-direction:column;gap:10px;">';
   SOUL_ACTIVITY_CATALOG.forEach(function(a){
@@ -15324,7 +15324,7 @@ function soulPracticePickerHTML(){
 }
 
 function soulActivityOverlayHTML(){
-  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Kurs & Pratik '+icon('heart-handshake',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Pilates, ney, binicilik — beden ve zihni birlikte besleyen ritimler.</div></div><button onclick="App.closeSoulActivity()" style="border:none;background:color-mix(in srgb,var(--soul) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Kurs & Pratik '+icon('heart-handshake',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Pilates, ney, binicilik — beden ve zihni birlikte besleyen ritimler.</div></div><button data-fx="close" onclick="App.closeSoulActivity()" style="border:none;background:color-mix(in srgb,var(--soul) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
   return soulOverlayShell('App.closeSoulActivity()', head, soulActivityTodayView(),null,false,'Zihin ve beden pratiği');
 }
 function soulArchiveSessions(type){

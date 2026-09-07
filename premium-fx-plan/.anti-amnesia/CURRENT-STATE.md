@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-15** — sekme geçiş motoru (çıkış → swap → giriş) |
-| Sıradaki prompt | **FX2-16** — overlay giriş/çıkış hareketi |
+| Son tamamlanan prompt | **FX2-17** — CSS tabanlı sınırlı liste stagger sistemi |
+| Sıradaki prompt | **FX2-18** — sayaç ve halka canlandırma |
 | Aşama | Dalga 4 — Hareket Sistemi |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -341,6 +341,23 @@ modal odak ve scroll kilidi dokunulmadı. Push/deploy/browser yok.
 
 Durum: `FX2-16 → FX2-17`, blokaj yok.
 
+## FX2-17 — Tamamlandı (2026-09-07)
+
+On ÆON-dışı tekrar eden liste yüzeyi `sey-stagger` sınıfı ve markup içi
+`--i:Math.min(i,8)` ile CSS tabanlı giriş sırası aldı: reminder kartları ve
+inbox, okuma/izleme/dinleme günlükleri ile arşivleri, öğrenme ve ruh pratiği
+kayıtları. Böylece JavaScript düğüm gezmeden, liste uzunluğu ne olursa olsun
+en yüksek gecikme sekizinci kademede kalır. ÆON sohbeti ve mesaj listesi
+bilinçli olarak dışarıda bırakıldı.
+
+`sey-fade-in` mevcut keyframe'i yeniden tanımlanmadı; yeni kural tokenlı süre
+ve easing kullanır. Reduced-motion altında `animation:none!important` ile
+anlıktır. CSS/app cache sürümleri `20260907c` oldu. Kanıt: syntax, driver,
+zikir 95/95, tüm app fixture'ları 34/34 ve `git diff --check` PASS; `App.*=718`
+ve `onclick=391` korundu. Push/deploy/browser yok.
+
+Durum: `FX2-17 → FX2-18`, blokaj yok.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -383,7 +400,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-17.md`](../.prompts/FX2-17.md)
+2. Kart: [`../.prompts/FX2-18.md`](../.prompts/FX2-18.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

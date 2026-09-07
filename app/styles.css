@@ -1821,6 +1821,12 @@
 .sey-enter {
   animation: sey-fade-in 220ms var(--ease-out) forwards;
 }
+/* FX2-17: Liste markup'ındaki sınırlı indeksle CSS tabanlı giriş sırası. */
+.sey-stagger{
+  animation:sey-fade-in var(--dur-3) var(--ease-out) backwards;
+  animation-delay:calc(var(--i,0) * 35ms);
+}
+@media (prefers-reduced-motion: reduce){ .sey-stagger{ animation:none!important; } }
 .sey-enter-delay-1 { animation-delay: 60ms; }
 .sey-enter-delay-2 { animation-delay: 120ms; }
 .sey-enter-delay-3 { animation-delay: 180ms; }

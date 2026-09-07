@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-18** — sayaç ve halka canlandırma |
-| Sıradaki prompt | **FX2-19** — canlı zemin çekirdeği |
+| Son tamamlanan prompt | **FX2-19** — canlı zemin çekirdeği |
+| Sıradaki prompt | **FX2-20** — güneş saati (4 zaman sahnesi) |
 | Aşama | Dalga 5 — Canlı Zemin |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -381,6 +381,32 @@ manuel `SeyFx.countUp`=0; ringSeg/progBar imzaları aynı. Browser/server,
 network, push/deploy yok.
 
 Durum: `FX2-18 → FX2-19`, blokaj yok; Dalga 4 kapandı.
+
+---
+
+## FX2-19 — Tamamlandı (2026-09-07)
+
+`app/core/timeTheme.js` sonuna **`SeyAmbience`** eklendi (saf sahne hesaplayıcı;
+`SeyTimeTheme`'in dört fonksiyonuna dokunulmadı — I2). `weatherClass(code)` WMO
+kodunu 7 eşleme ile 8 hava sahnesine (`amb-wx-clear/cloud/fog/drizzle/rain/
+snow/storm/none`) çevirir; `intensity(s)` yağış (0–8 mm) + rüzgârdan (0–40
+km/s) 0,15–1 aralığında şiddet türetir; `seed(d)` günün tarihinden türeyen
+deterministik 0–1 döndürür (gün içinde sabit, gün gün değişir); `scene(now,spot)`
+üç katmanlı sahne nesnesi üretir (`time` şimdilik `amb-time-day` — FX2-20 gerçek
+değeri koyacak, `season` boş — FX2-22 dolduracak); `apply()` bilinçli olarak
+`false` döndürür (FX2-20'de gerçek gövde gelir). **Bu kart bilinçli görsel
+değişiklik üretmez.** Canlı veri `data.weather.spots[0]` üzerinden `wx()` ile
+okunur — yeni ağ çağrısı yok. `fetch(` = 0, `setInterval` = 0.
+
+`app.js` **hiç açılmadı**. Cache: `timeTheme.js?v=20260906a` → `20260906b`.
+Kanıt: `node --check` PASS; saf fonksiyon testi — `weatherClass(0)=amb-wx-clear`,
+`63=amb-wx-rain`, `75=amb-wx-snow`, `95=amb-wx-storm`, `null=amb-wx-none`;
+`intensity({precip:4,wind:20})=0.50`; `seed` deterministik `true`; `apply()=false`.
+Driver 0 FAIL; `test_premium_time_theme.js` 53/53; tüm `tests/app/*.js` PASS.
+Kapsam M12 hâlâ 0 (beklenen — S8 ihlali değil, `apply()` kasıtlı inert).
+Browser/server, network, push/deploy, coverage.json yazımı yok.
+
+Durum: `FX2-19 → FX2-20`, blokaj yok; Dalga 5 açıldı.
 
 ---
 

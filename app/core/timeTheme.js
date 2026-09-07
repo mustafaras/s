@@ -62,4 +62,69 @@
     seasonalClass: seasonalClass,
     applySeasonal: applySeasonal
   };
+
+  // ── FX2-19: SeyAmbience — canlı zemin sahnesi ────────────────────────────
+  // Tek sorumluluk: #root'a hangi sahne sınıflarının yazılacağını HESAPLAMAK.
+  // Boyama tamamen CSS'te. Ağ çağrısı YOK — data.weather zaten dolu.
+  function wx(){
+    try{
+      var d = window.SeymaState && window.SeymaState.data;
+      var s = d && d.weather && d.weather.spots && d.weather.spots[0];
+      return s || null;
+    }catch(e){ return null; }
+  }
+
+  // WMO kodu → 8 hava sahnesi
+  var WX_MAP = [
+    ['amb-wx-clear',   [0,1]],
+    ['amb-wx-cloud',   [2,3]],
+    ['amb-wx-fog',     [45,48]],
+    ['amb-wx-drizzle', [51,53,55,56,57]],
+    ['amb-wx-rain',    [61,63,65,66,67,80,81,82]],
+    ['amb-wx-snow',    [71,73,75,77,85,86]],
+    ['amb-wx-storm',   [95,96,99]]
+  ];
+  function weatherClass(code){
+    if (code == null || isNaN(code)) return 'amb-wx-none';
+    for (var i=0;i<WX_MAP.length;i++){
+      if (WX_MAP[i][1].indexOf(Number(code)) >= 0) return WX_MAP[i][0];
+    }
+    return 'amb-wx-none';
+  }
+
+  // Şiddet 0–1: yağış + rüzgârdan türer. CSS animasyon hızı/opaklığı bundan.
+  function intensity(s){
+    if (!s) return 0.35;
+    var p = Math.min(Number(s.precip)||0, 8) / 8;      // 0–8 mm
+    var w = Math.min(Number(s.wind)||0, 40) / 40;      // 0–40 km/s
+    return Math.max(0.15, Math.min(1, p*0.7 + w*0.3));
+  }
+
+  // Günün tarihinden türeyen deterministik 0–1: gün içinde SABİT, gün gün değişir.
+  function seed(d){
+    var t = d || new Date();
+    var k = t.getFullYear()*10000 + (t.getMonth()+1)*100 + t.getDate();
+    var x = Math.sin(k) * 10000;
+    return x - Math.floor(x);
+  }
+
+  window.SeyAmbience = {
+    weatherClass: weatherClass,
+    intensity: intensity,
+    seed: seed,
+    // Saf: girdi verilirse onu kullanır, verilmezse canlı veriyi okur.
+    // FX2-20 zaman katmanını, FX2-22 mevsim katmanını ekler.
+    scene: function(now, spot){
+      var s = (spot !== undefined) ? spot : wx();
+      return {
+        time:    'amb-time-day',                 // FX2-20 gerçek değeri koyacak
+        weather: weatherClass(s && s.code),
+        season:  '',                             // FX2-22 dolduracak
+        isDay:   s ? s.isDay !== false : true,
+        intensity: intensity(s),
+        seed:    seed(now)
+      };
+    },
+    apply: function(){ return false; }            // FX2-20'de gerçek gövde gelir
+  };
 })();

@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-19** — canlı zemin çekirdeği |
-| Sıradaki prompt | **FX2-20** — güneş saati (4 zaman sahnesi) |
+| Son tamamlanan prompt | **FX2-20** — güneş saati (4 zaman sahnesi) |
+| Sıradaki prompt | **FX2-21** — hava modu (8 sahne) |
 | Aşama | Dalga 5 — Canlı Zemin |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -407,6 +407,51 @@ Kapsam M12 hâlâ 0 (beklenen — S8 ihlali değil, `apply()` kasıtlı inert).
 Browser/server, network, push/deploy, coverage.json yazımı yok.
 
 Durum: `FX2-19 → FX2-20`, blokaj yok; Dalga 5 açıldı.
+
+---
+
+## FX2-20 — Tamamlandı (2026-09-07)
+
+`SeyAmbience`'in `apply()`'i artık inert değil — gerçek gövdeyle canlı
+zemin boyanıyor. `timeTheme.js` içine `timeClass(now,spot)` eklendi: gerçek
+`sunrise/sunset` (45 dk öncesi dawn, +75 dk sonrasına kadar; gün +75 dk - gün
+batımından 90 dk; gün batımından 90 dk önce - +45 dk sonra dusk; aksi night).
+`sunrise/sunset` yoksa veya bozuksa `SeyTimeTheme.classForHour()`'a düşer
+(fallback — asla kırılmaz). `scene()`'in `time` alanı artık
+`this.timeClass(now, spot)` — FX2-19'daki sabit `amb-time-day` gitti.
+
+`apply(now)`: `#root` bulunamazsa `false`; premium kapalıysa tüm `amb-*`
+sınıflarını temizleyip `false` (katman söner). Premium açıkken `scene(now)`'ı
+okur, `sc.time/weather/season` sınıflarını takar ve `--wx-intensity` (0.00–1.00),
+`--amb-seed` (0.000–1.000), `--wx-dim` (isDay ? 1 : 0.72) değişkenlerini #root'a
+yazar, `true` döner. **`setInterval` eklenmedi** — `render()` 30 sn'lik poll'da
+`paint()`'i çağırır, sahne kendiliğinden tazelenir.
+
+`app.js` `paint()` içindeki `SeyTimeTheme.apply()` guard'ının **hemen altına**
+tek (1) satır `SeyAmbience.apply()` guard'ı eklendi. `SeyTimeTheme.apply()`
+**silinmedi** — `theme-aurora` sınıfını o yönetiyor (FX2-25 ona bağlı).
+
+`app/styles.css`: FX2-18 ringSeg bloğundan sonra canlı zemin zaman katmanı
+(4 `amb-time-*` × 2 tema). `--page` değişkenini sahne ezer; geçiş
+`background var(--dur-5) var(--ease-glide)` crossfade; reduced-motion'da
+`transition:none`. Ton kayması bilinçli çok ince tutuldu.
+
+Cache: `timeTheme.js?v=20260906b→c`, `styles.css?v=20260907d→e`,
+`app.js?v=20260907d→e`.
+
+Kanıt: `node --check` iki dosya PASS; grep — timeClass 2, classForHour 5
+(fallback korundu), `amb-time-` CSS 10, `SeyAmbience` app.js **1** (tek guard),
+setInterval 0. Fallback testi: veri yokken `amb-time-dusk` (sabit 17–20), veri
+varken `amb-time-dusk` (gerçek 17:20 → 15:50'den dusk) — ikisi de `undefined`
+değil. apply: premium kapalı `false` + `amb-*` temizleniyor (yalnız
+`theme-time-day` kalır); premium açık 12:00'de `amb-time-day amb-wx-rain`,
+intensity 0.50, seed 0.860, wx-dim 1. Driver 0 FAIL; `test_premium_time_theme`
+53/53; `test_fx2_palette_contrast` 12/12; tüm `tests/app/*.js` PASS. Kapsam
+**M12 0 → 4 ≥ 4** (hedef karşılandı; 18 seri kapanış kapısıdır, FX2-22/23'e
+ait). Push/deploy/browser/server/network/coverage.json yok. Guard `paint()`
+içinde (9051 satır) doğrulandı; `App.*` yüzeyine dokunulmadı.
+
+Durum: `FX2-20 → FX2-21`, blokaj yok.
 
 ---
 

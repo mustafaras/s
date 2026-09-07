@@ -113,11 +113,29 @@
     intensity: intensity,
     seed: seed,
     // Saf: girdi verilirse onu kullanır, verilmezse canlı veriyi okur.
-    // FX2-20 zaman katmanını, FX2-22 mevsim katmanını ekler.
+    // FX2-20 zaman katmanını ekler, FX2-22 mevsim katmanını dolduracak.
+    // Gerçek güneş saatine göre 4 dilim. sunrise/sunset yoksa
+    // SeyTimeTheme.classForHour()'a düşer (asla kırılmaz).
+    timeClass: function(now, spot){
+      var t = now || new Date();
+      var s = (spot !== undefined) ? spot : wx();
+      var sr = s && s.sunrise ? new Date(s.sunrise) : null;
+      var ss = s && s.sunset  ? new Date(s.sunset)  : null;
+      if (!sr || !ss || isNaN(sr.getTime()) || isNaN(ss.getTime())){
+        // FALLBACK — mevcut sabit aralıklar
+        var c = window.SeyTimeTheme.classForHour(t.getHours());
+        return c.replace('theme-time-', 'amb-time-');
+      }
+      var m = 60000;
+      if (t >= new Date(sr.getTime() - 45*m) && t < new Date(sr.getTime() + 75*m)) return 'amb-time-dawn';
+      if (t >= new Date(sr.getTime() + 75*m) && t < new Date(ss.getTime() - 90*m)) return 'amb-time-day';
+      if (t >= new Date(ss.getTime() - 90*m) && t < new Date(ss.getTime() + 45*m)) return 'amb-time-dusk';
+      return 'amb-time-night';
+    },
     scene: function(now, spot){
       var s = (spot !== undefined) ? spot : wx();
       return {
-        time:    'amb-time-day',                 // FX2-20 gerçek değeri koyacak
+        time:    this.timeClass(now, spot),
         weather: weatherClass(s && s.code),
         season:  '',                             // FX2-22 dolduracak
         isDay:   s ? s.isDay !== false : true,
@@ -125,6 +143,22 @@
         seed:    seed(now)
       };
     },
-    apply: function(){ return false; }            // FX2-20'de gerçek gövde gelir
+    apply: function(now){
+      var root = document.getElementById('root');
+      if (!root) return false;
+      var s = (window.SeymaState && window.SeymaState.data && window.SeymaState.data.settings) || {};
+      // Premium kapalı → tüm amb-* sınıfları temizlenir, katman söner.
+      var all = root.className.split(/\s+/).filter(function(c){ return c.indexOf('amb-') === 0; });
+      all.forEach(function(c){ root.classList.remove(c); });
+      if (!s.premiumAtmosphere) return false;
+      var sc = window.SeyAmbience.scene(now);
+      root.classList.add(sc.time);
+      if (sc.weather) root.classList.add(sc.weather);
+      if (sc.season)  root.classList.add(sc.season);
+      root.style.setProperty('--wx-intensity', String(sc.intensity.toFixed(2)));
+      root.style.setProperty('--amb-seed', String(sc.seed.toFixed(3)));
+      root.style.setProperty('--wx-dim', sc.isDay ? '1' : '0.72');
+      return true;
+    }
   };
 })();

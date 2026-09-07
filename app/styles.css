@@ -1830,6 +1830,22 @@
 /* FX2-18: ringSeg halkaları yalnız stroke-dashoffset üzerinden yumuşar. */
 .sey-ring-seg{ transition:stroke-dashoffset var(--dur-4) var(--ease-out); }
 @media (prefers-reduced-motion: reduce){ .sey-ring-seg{ transition:none!important; } }
+/* FX2-20: canlı zemin — zaman katmanı. --page'i sahne ezer. */
+#root[class*="amb-time-"]{ transition: background var(--dur-5) var(--ease-glide); }
+
+#root.amb-time-dawn { --page: linear-gradient(170deg,#FFF6EC 0%,#FBEBD8 46%,#F4EFF2 100%); }
+#root.amb-time-day  { --page: linear-gradient(170deg,#FDFBF7 0%,#F7F1E8 46%,#F2EFF4 100%); }
+#root.amb-time-dusk { --page: linear-gradient(170deg,#FBF0E4 0%,#F6E4D6 46%,#EFE9F0 100%); }
+#root.amb-time-night{ --page: linear-gradient(170deg,#F4F2F6 0%,#EDEBF2 46%,#E9E9F0 100%); }
+
+#root[data-theme="dark"].amb-time-dawn { --page: linear-gradient(170deg,#0B0806 0%,#0A0705 100%); }
+#root[data-theme="dark"].amb-time-day  { --page:#000000; }
+#root[data-theme="dark"].amb-time-dusk { --page: linear-gradient(170deg,#0A0706 0%,#080607 100%); }
+#root[data-theme="dark"].amb-time-night{ --page: linear-gradient(170deg,#04060A 0%,#000000 100%); }
+
+@media (prefers-reduced-motion: reduce){
+  #root[class*="amb-time-"]{ transition:none!important; }
+}
 .sey-enter-delay-1 { animation-delay: 60ms; }
 .sey-enter-delay-2 { animation-delay: 120ms; }
 .sey-enter-delay-3 { animation-delay: 180ms; }

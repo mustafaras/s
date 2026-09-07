@@ -183,7 +183,9 @@
     options = options || {};
     var ctx = bootCtx(); if (!ctx || !ctx.createOscillator || !ctx.createGain) return false;
     try{
-      if (ctx.state === 'suspended') ctx.resume();
+      // FX2-13: iOS kilidi yalnız gerçek pointer jestinde SeyTouch açar.
+      // Ses gövdesi bağlamı asla kendi başına resume etmez.
+      if (ctx.state !== 'running') return false;
       var start = (ctx.currentTime || 0) + Math.max(0, Number(options.delay) || 0);
       var duration = Math.max(0.01, Number(options.dur) || 0.18);
       var attack = Math.max(0.001, Math.min(duration * 0.5, Number(options.attack) || 0.01));
@@ -233,6 +235,7 @@
     var ctx = bootCtx();
     if (!ctx || !ctx.createBuffer || !ctx.createBufferSource || !ctx.createBiquadFilter || !ctx.createGain) return false;
     try{
+      if (ctx.state !== 'running') return false;
       var start = (ctx.currentTime || 0) + Math.max(0, Number(options.delay) || 0);
       var duration = Math.max(0.006, Math.min(0.12, Number(options.dur) || 0.025));
       var length = Math.max(1, Math.floor((ctx.sampleRate || 44100) * duration));
@@ -283,6 +286,12 @@
   window.SeyAudio = {
     // ctx lazy init: her erişimde bootCtx() çağrılır; AudioContext yoksa null döner.
     get ctx(){ return bootCtx(); },
+    // FX2-13: yalnız gerçek pointerdown jestinde true olur; iOS ses kilidi durumu.
+    _unlocked: false,
+    isAudible: function(){
+      try{ var c = bootCtx(); return !!(c && c.state === 'running' && allowed()); }
+      catch(e){ return false; }
+    },
     tick: function(){ if (allowed(true)) playNoise({ dur:0.022, freq:4000, q:2.4, gain:0.012 }); },
     tap: function(){ playTone(660, 0.045, 'sine', 0.065, true, { transientDur:0.008, transientFreq:4000, transientQ:2.4, transientGain:0.01, filter:3600, filterEnd:3000, reverb:0.03 }); },
     toggleOn: function(){ playArpeggio([587, 784], 0.09, 'sine', { interval:0.035, noteDur:0.055, gain:0.07, filter:3200, reverb:0.07, transientDur:0.008 }); },
@@ -424,7 +433,7 @@
           // Osilatör tabanlı minimal üretim (yalnız Web Audio destekliyorsa).
           try{
             var ctx = bootCtx(); if (!ctx) { A._playing=false; A._type=null; return false; }
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state !== 'running'){ A._playing=false; A._type=null; return false; }
             var out = ctx.createGain();
             out.gain.setValueAtTime(0, ctx.currentTime);
             out.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 1.2); // yavaş fade-in
@@ -700,6 +709,36 @@
     if (dx*dx + dy*dy > 100) touchUp();      // >10px sapma = kaydırma, basmayı iptal et
   }
 
+  // FX2-13: ayrı, tek seferlik iOS AudioContext kilit açma yolu. Bu dinleyici
+  // touchDown'dan önce kaydedilir; böylece ilk dokunuşun sesi de jest bağlamında
+  // üretilebilir. Scroll'u veya varsayılan davranışı engellemez.
+  function unlockAudio(){
+    try{
+      var c = bootCtx(); if (!c) return;
+      if (c.state === 'suspended') c.resume();
+      var b = c.createBuffer(1, 1, c.sampleRate);
+      var s = c.createBufferSource(); s.buffer = b;
+      s.connect(c.destination); s.start(0);
+      window.SeyAudio._unlocked = true;
+    }catch(e){}
+  }
+
+  // Sekme gizlenince ortak ses bağlamını ve ambiyansı kapat; görünür dönüşte
+  // yalnız önceden kullanıcı jestiyle açılmış bağlam geri sürdürülür.
+  if (typeof document !== 'undefined' && document.addEventListener){
+    document.addEventListener('visibilitychange', function(){
+      try{
+        var c = CTX; if (!c) return;
+        if (document.hidden){
+          if (window.SeyAudio.ambient && window.SeyAudio.ambient.isPlaying()) window.SeyAudio.ambient.stop();
+          c.suspend();
+        } else if (window.SeyAudio._unlocked){
+          c.resume();
+        }
+      }catch(e){}
+    });
+  }
+
   window.SeyTouch = {
     SELECTOR: TOUCH_SELECTOR,
     _installed: false,
@@ -707,6 +746,7 @@
       if (window.SeyTouch._installed) return true;      // idempotent
       var root = rootEl || document.getElementById('root');
       if (!root) return false;
+      root.addEventListener('pointerdown', unlockAudio, { once: true, passive: true, capture: true });
       root.addEventListener('pointerdown', touchDown, { passive: true, capture: true });
       window.addEventListener('pointerup', touchUp, { passive: true });
       window.addEventListener('pointercancel', touchUp, { passive: true });

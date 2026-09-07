@@ -113,6 +113,7 @@ console.log('[1] SeyAudio API yüzeyi tanımlı');
   // FX-P-53: ambient artık motor nesnesidir (start/stop/isSupported/isEnabled).
   ok('SeyAudio.ambient motor yüzeyi var', !!window.SeyAudio.ambient && typeof window.SeyAudio.ambient.start === 'function' && typeof window.SeyAudio.ambient.stop === 'function');
   ok('SeyAudio.ctx getter var', typeof Object.getOwnPropertyDescriptor(window.SeyAudio, 'ctx') === 'object');
+  ok('SeyAudio.isAudible fonksiyonu var ve çalışan bağlamı bildirir', typeof window.SeyAudio.isAudible === 'function' && window.SeyAudio.isAudible() === true);
 })();
 
 // ── Test 2: premiumAtmosphere=false iken sessiz ─────────────────────────────

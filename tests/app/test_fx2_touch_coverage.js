@@ -53,7 +53,7 @@ function target(options) {
   return element;
 }
 
-function audioContextFactory(counter) {
+function audioContextFactory(counter, initialState) {
   function audioNode() {
     return {
       connect: function() {},
@@ -65,12 +65,23 @@ function audioContextFactory(counter) {
   }
   return function FakeAudioContext() {
     counter.created += 1;
-    this.state = 'running';
+    counter.contexts.push(this);
+    this.state = initialState || 'running';
     this.currentTime = 0;
+    this.sampleRate = 44100;
     this.destination = {};
     this.createOscillator = audioNode;
     this.createGain = audioNode;
-    this.resume = function() {};
+    this.createBuffer = function(channels, length) {
+      counter.buffers += 1;
+      return { getChannelData: function() { return new Float32Array(length); } };
+    };
+    this.createBufferSource = function() {
+      counter.bufferSources += 1;
+      return audioNode();
+    };
+    this.resume = function() { counter.resumes += 1; this.state = 'running'; };
+    this.suspend = function() { counter.suspends += 1; this.state = 'suspended'; };
   };
 }
 
@@ -78,10 +89,13 @@ function loadMediaFx(options) {
   const opts = options || {};
   const rootListeners = [];
   const windowListeners = [];
+  const documentListeners = [];
   const root = {
     addEventListener: function(type, handler, config) { rootListeners.push({ type, handler, config }); }
   };
   const document = {
+    hidden: false,
+    addEventListener: function(type, handler, config) { documentListeners.push({ type, handler, config }); },
     getElementById: function(id) { return id === 'root' ? root : null; },
     createElement: function() {
       return { className: '', style: {}, classList: classList(), addEventListener: function() {}, remove: function() {} };
@@ -90,12 +104,12 @@ function loadMediaFx(options) {
     querySelector: function() { return null; }
   };
   const clock = { now: 1000 };
-  const audio = { created: 0 };
+  const audio = { created: 0, contexts: [], buffers: 0, bufferSources: 0, resumes: 0, suspends: 0 };
   const win = {
     SeymaState: { data: { settings: opts.settings || {} } },
     matchMedia: function() { return { matches: !!opts.reducedMotion }; },
     addEventListener: function(type, handler, config) { windowListeners.push({ type, handler, config }); },
-    AudioContext: audioContextFactory(audio),
+    AudioContext: audioContextFactory(audio, opts.audioState),
     requestAnimationFrame: function() {},
     setTimeout: function() { return 0; },
     clearTimeout: function() {}
@@ -116,11 +130,11 @@ function loadMediaFx(options) {
     getComputedStyle: function() { return { position: opts.position || 'relative' }; }
   });
   vm.runInContext(mediaSource, context, { timeout: 5000 });
-  return { win, root, rootListeners, windowListeners, clock, audio };
+  return { win, root, rootListeners, windowListeners, documentListeners, document, clock, audio };
 }
 
 function pointerDown(runtime, element) {
-  const down = runtime.rootListeners.find((listener) => listener.type === 'pointerdown');
+  const down = runtime.rootListeners.find((listener) => listener.type === 'pointerdown' && listener.config && listener.config.capture && !listener.config.once);
   if (!down) return false;
   runtime.clock.now += 100;
   down.handler({ pointerType: 'touch', target: element, clientX: 10, clientY: 10 });
@@ -144,10 +158,10 @@ group(
 // 2. İkinci kurulum dinleyici eklemez.
 const idempotentRuntime = loadMediaFx();
 const firstInstall = idempotentRuntime.win.SeyTouch.install(idempotentRuntime.root);
-const firstListenerCount = idempotentRuntime.rootListeners.length + idempotentRuntime.windowListeners.length;
+const firstListenerCount = idempotentRuntime.rootListeners.length + idempotentRuntime.windowListeners.length + idempotentRuntime.documentListeners.length;
 const secondInstall = idempotentRuntime.win.SeyTouch.install(idempotentRuntime.root);
-const secondListenerCount = idempotentRuntime.rootListeners.length + idempotentRuntime.windowListeners.length;
-group('FX2-10.2 install idempotent', firstInstall && secondInstall && firstListenerCount === 4 && secondListenerCount === firstListenerCount);
+const secondListenerCount = idempotentRuntime.rootListeners.length + idempotentRuntime.windowListeners.length + idempotentRuntime.documentListeners.length;
+group('FX2-10.2 install idempotent', firstInstall && secondInstall && firstListenerCount === 6 && secondListenerCount === firstListenerCount);
 
 // 3. Seçici bütün zorunlu etkileşim türlerini kapsar.
 const selector = apiRuntime.win.SeyTouch.SELECTOR;
@@ -162,10 +176,10 @@ group('FX2-10.4 statik dokunma kapsamı >= %95', staticCoverage >= 95, `buton=${
 const touchBlock = mediaSource.slice(mediaSource.indexOf('var TOUCH_SELECTOR'));
 group('FX2-10.5 SeyTouch preventDefault kullanmaz', !/preventDefault\s*\(/.test(touchBlock));
 
-// 6. Root + window üzerindeki dört dinleyicinin hepsi passive'dir.
+// 6. FX2-13 kilit açma dahil root/window dinleyicileri passive'dir.
 group(
-  'FX2-10.6 dört passive dinleyici var',
-  count(/\.addEventListener\(/g, touchBlock) === 4 && count(/passive\s*:\s*true/g, touchBlock) === 4
+  'FX2-10.6 beş passive dokunma dinleyicisi var',
+  count(/\.addEventListener\(/g, touchBlock) === 6 && count(/passive\s*:\s*true/g, touchBlock) === 5
 );
 
 // 7. Premium kapalıyken erişilebilir basma durumu kalır; ses/ripple üretimi yoktur.
@@ -219,6 +233,32 @@ group(
   count(/window\.SeyTouch\.install\(/g, appSource) === 1 &&
     /\nrender\(\);\s*\ntry\{\s*if\(window\.SeyTouch[\s\S]{0,140}?SeyTouch\.install\(/.test(appSource)
 );
+
+// 13. FX2-13: ilk pointer jesti tek seferlik sessiz buffer ile iOS sesini açar.
+const iosRuntime = loadMediaFx({ settings: { premiumAtmosphere: true, uiSounds: true }, audioState: 'suspended' });
+iosRuntime.win.SeyTouch.install(iosRuntime.root);
+const unlock = iosRuntime.rootListeners.find((listener) => listener.type === 'pointerdown' && listener.config && listener.config.once === true);
+const touch = iosRuntime.rootListeners.find((listener) => listener.type === 'pointerdown' && listener.config && listener.config.capture && !listener.config.once);
+unlock.handler();
+group(
+  'FX2-13.1 iOS kilit açma once + sessiz buffer',
+  !!unlock && !!touch && iosRuntime.rootListeners.indexOf(unlock) < iosRuntime.rootListeners.indexOf(touch) &&
+    iosRuntime.win.SeyAudio._unlocked === true && iosRuntime.audio.created === 1 &&
+    iosRuntime.audio.resumes === 1 && iosRuntime.audio.buffers === 1 && iosRuntime.audio.bufferSources === 1 &&
+    iosRuntime.win.SeyAudio.isAudible() === true
+);
+
+// 14. Gizlenen sekme ambiyansı durdurur/bağlamı askıya alır; önceden açılmış
+// bağlam görünür dönüşte sürdürülür.
+let ambientStops = 0;
+iosRuntime.win.SeyAudio.ambient = { isPlaying: function() { return true; }, stop: function() { ambientStops += 1; } };
+const visibility = iosRuntime.documentListeners.find((listener) => listener.type === 'visibilitychange');
+iosRuntime.document.hidden = true;
+visibility.handler();
+const suspended = iosRuntime.audio.suspends === 1 && ambientStops === 1;
+iosRuntime.document.hidden = false;
+visibility.handler();
+group('FX2-13.2 visibility suspend/resume yönetimi', !!visibility && suspended && iosRuntime.audio.resumes === 2);
 
 console.log(`Passed: ${passed} / ${passed + failed}`);
 if (failed > 0) process.exit(1);

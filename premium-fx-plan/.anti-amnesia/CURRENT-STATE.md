@@ -263,6 +263,21 @@ altı parsiyelli çan, `sawtooth=0` ve zikir tick yönlendirmesini kilitler.
 M3 canlı ölçüm **408 ≥ 200**; `coverage.json` yazılmadı. `mediaFx.js` cache
 versiyonu `20260902g` oldu. Sıradaki FX2-13.
 
+## FX2-13 — Tamamlandı (2026-09-07)
+
+`SeyTouch.install()` artık ilk `pointerdown`da, basma dinleyicisinden **önce**
+aynı capture fazında çalışan tek seferlik/pasif iOS kilit açma dinleyicisini
+kurar. Bu dinleyici askıdaki `AudioContext`i sürdürür, 1 örneklik sessiz
+buffer oynatır ve `_unlocked` işaretini yazar. Ses üreticileri ve ambiyans
+bağlamı kendi kendine `resume()` etmez; `running` değilse sessiz no-op olur.
+
+`visibilitychange` gizlenince ambiyansı durdurup bağlamı askıya alır; yalnız
+önceden kullanıcı jestiyle açılmış bağlamı görünür dönüşte sürdürür.
+`SeyAudio.isAudible()` yeni, geriye uyumlu durum API'sidir. Platform fixture'ı
+kilit açma sırasını, once/pasif davranışı ve suspend/resume yaşam döngüsünü
+**14/14** ile doğrular; audio fixture **37/37**. M9 canlı ölçüm **1 → 2**;
+cache sürümü `20260902h`. Sıradaki FX2-14.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -305,7 +320,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-13.md`](../.prompts/FX2-13.md)
+2. Kart: [`../.prompts/FX2-14.md`](../.prompts/FX2-14.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

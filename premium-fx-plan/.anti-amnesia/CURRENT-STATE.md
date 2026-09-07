@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-06** — delege dokunma katmanı |
-| Sıradaki prompt | **FX2-07** — basma durumu ve yüzey geri bildirimi |
+| Son tamamlanan prompt | **FX2-07** — basma durumu ve kart-küçültme düzeltmesi |
+| Sıradaki prompt | **FX2-08** — ripple konteyneri runtime bağlantısı |
 | Aşama | Dalga 2 — Dokunma Katmanı |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -173,6 +173,20 @@ FX2-06 denetim düzeltmesi: delege `pointerdown` sırasında `event.currentTarge
 `test_premium_fx_utils.js` içindeki sentetik hedef-host regression'ıyla
 kilitlendi. `mediaFx.js` cache-bump'i `20260902c` oldu.
 
+## FX2-07 — Tamamlandı (2026-09-07)
+
+`SeyTouch` tarafından takılan `.sey-press` için yalnız `transform` ve
+`filter` kullanan token tabanlı basma geri bildirimi eklendi. Açık temada
+`--press-scale`/`--press-dim`, koyu temada mevcut `--press-dim:1.12` kullanılır;
+reduced-motion'da transform kapanır, parlaklık geri bildirimi kalır.
+
+Kartın içindeki butona basınca tüm kartı küçülten `.surface:active` kuralı ve
+onun reduced-motion eşleniği tamamen kaldırıldı; `.surface:hover` değişmedi.
+`index.html` stylesheet cache-bump'i `20260906i` oldu. Canlı ölçüm M9 **0 → 1**;
+`app.js`, `app/core/**`, markup ve `coverage.json` değişmedi. Headless kanıt:
+reduced-motion 31/31, driver 0 fail, zikir 95/95, migration 60/60, app 30/30,
+panel 23/23, Panel-v2 27/27, Kur'an 9/9, reminder 20/20 PASS. Sıradaki FX2-08.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -215,7 +229,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-07.md`](../.prompts/FX2-07.md)
+2. Kart: [`../.prompts/FX2-08.md`](../.prompts/FX2-08.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

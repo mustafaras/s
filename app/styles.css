@@ -1677,8 +1677,7 @@
   .surface{transition:transform .18s var(--ease-premium,cubic-bezier(.16,1,.3,1)),box-shadow .18s ease;}
   .surface:hover{transform:translateY(-2px);box-shadow:0 10px 24px color-mix(in srgb,var(--text) 8%,transparent);}
 }
-.surface:active{transform:scale(.97);}
-@media (prefers-reduced-motion: reduce){.surface,.surface:hover,.surface:active{transition:none!important;transform:none!important;}}
+@media (prefers-reduced-motion: reduce){.surface,.surface:hover{transition:none!important;transform:none!important;}}
 
 /* FX-P-83: glass/blur — yalnız doğrulanmış iki kalıcı yüzeye (appheader +
    bottomnav; render'da gerçek sınıfları doğrulandı). Genel `.overlay`/`.modal`
@@ -1694,6 +1693,20 @@
 /* FX-P-89 (DENEYSEL): #app içine layout izolasyonu. paint/size KULLANMA —
    fixed nav/splash taşma riski. Regresyonda bu blok tamamen geri alınır. */
 #app{contain:layout style;}
+
+/* FX2-07: `.sey-press` — SeyTouch'ın taktığı basma durumu. Markup değişmez.
+   ÖNEMLİ: premiumAtmosphere'a BAĞLI DEĞİLDİR — basma geri bildirimi
+   erişilebilirliktir, süs değil (SAFEGUARDS §2). */
+.sey-press{
+  transform: scale(var(--press-scale));
+  filter: brightness(var(--press-dim));
+  transition: transform var(--dur-1) var(--ease-out),
+              filter    var(--dur-1) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+@media (prefers-reduced-motion: reduce){
+  .sey-press{ transform: none; }   /* parlaklık kalır, hareket gider */
+}
 
 /* FX-P-32: Dokunma ripple efekti — SeyFx.ripple() tarafından üretilen dalga.
    Master switch (premiumAtmosphere) ve reduced-motion'a saygılıdır. */

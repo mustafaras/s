@@ -17424,6 +17424,7 @@ window.addEventListener('online',function(){ var lifecycle=reminderSchedulerDisp
 window.addEventListener('offline',function(){ var lifecycle=reminderSchedulerDispatch('offline',{online:false,offline:true}); if(lifecycle&&lifecycle.status==='coalesced') return; if(ui.reminderCenterOpen) render(); });
 
 render();
+try{ if(window.SeyTouch && typeof window.SeyTouch.install==='function') window.SeyTouch.install(document.getElementById('root')); }catch(e){}
 if(data){ reminderSchedulerDispatch('boot'); }
 if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır
 setTimeout(maybeVoiceGreeting,2200); // FX-P-56: açılış selamlaması (gecikmeli — speech engine boot'u için)

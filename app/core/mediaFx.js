@@ -507,4 +507,55 @@
       return el;
     }
   };
+
+  // ── FX2-06: Delege dokunma katmanı ──────────────────────────────────────
+  // #root'a takılır (ASLA #app'e — o her render'da innerHTML ile yıkılır).
+  // Tek dinleyici, 361 butonun tamamını ve gelecekte üretilecek tüm DOM'u
+  // kapsar. Tarayıcı varsayılanı iptal edilmez: kaydırma asla bozulmaz.
+  var TOUCH_SELECTOR = 'button,[role="button"],[data-fx],a[href],[onclick]';
+  var _tActive = null, _tLastAt = 0, _tX = 0, _tY = 0;
+
+  function touchDown(e){
+    try{
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      var el = e.target && e.target.closest ? e.target.closest(TOUCH_SELECTOR) : null;
+      if (!el) return;
+      if (el.disabled || el.getAttribute('aria-disabled') === 'true') return;
+      if (el.matches && el.matches('input,textarea,select')) return;
+      if (el.dataset && el.dataset.fx === 'none') return;
+      var now = Date.now();
+      if (now - _tLastAt < 40) return;        // gürültü kapısı
+      _tLastAt = now; _tActive = el;
+      _tX = e.clientX || 0; _tY = e.clientY || 0;
+      el.classList.add('sey-press');
+      // FX çağrıları: her biri kendi gating'ini yapar, hata tıklamayı engellemez
+      try{ if (window.SeyAudio && window.SeyAudio.tap) window.SeyAudio.tap(); }catch(err){}
+      try{ if (window.SeyHaptics && window.SeyHaptics.tap) window.SeyHaptics.tap(); }catch(err){}
+      try{ if (window.SeyFx && window.SeyFx.ripple) window.SeyFx.ripple(e, null, el); }catch(err){}
+    }catch(err){}
+  }
+  function touchUp(){
+    if (_tActive){ try{ _tActive.classList.remove('sey-press'); }catch(e){} _tActive = null; }
+  }
+  function touchMove(e){
+    if (!_tActive) return;
+    var dx = (e.clientX || 0) - _tX, dy = (e.clientY || 0) - _tY;
+    if (dx*dx + dy*dy > 100) touchUp();      // >10px sapma = kaydırma, basmayı iptal et
+  }
+
+  window.SeyTouch = {
+    SELECTOR: TOUCH_SELECTOR,
+    _installed: false,
+    install: function(rootEl){
+      if (window.SeyTouch._installed) return true;      // idempotent
+      var root = rootEl || document.getElementById('root');
+      if (!root) return false;
+      root.addEventListener('pointerdown', touchDown, { passive: true, capture: true });
+      window.addEventListener('pointerup', touchUp, { passive: true });
+      window.addEventListener('pointercancel', touchUp, { passive: true });
+      window.addEventListener('pointermove', touchMove, { passive: true });
+      window.SeyTouch._installed = true;
+      return true;
+    }
+  };
 })();

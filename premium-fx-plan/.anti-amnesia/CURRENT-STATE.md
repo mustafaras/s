@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-05** — kontrast ve tema fixture'ı |
-| Sıradaki prompt | **FX2-06** — dokunma katmanı |
+| Son tamamlanan prompt | **FX2-06** — delege dokunma katmanı |
+| Sıradaki prompt | **FX2-07** — basma durumu ve yüzey geri bildirimi |
 | Aşama | Dalga 2 — Dokunma Katmanı |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -146,6 +146,26 @@ Sonuç: fixture **12/12**, M10 **0**, M11 **2**, M13 **8/8**. Protected
 renkler ve panel yüzeyi değişmedi; `app.js`/`app/core/**`/`sync.js` değişmedi.
 `coverage.json` yeniden yazılmadı. Dalga 1 kapandı; sıradaki kart FX2-06.
 
+## FX2-06 — Tamamlandı (2026-09-07)
+
+`app/core/mediaFx.js` sonuna `window.SeyTouch` eklendi: tek delege
+`pointerdown` dinleyicisi `#root` üzerinde, `pointerup`/`pointercancel`/
+`pointermove` yardımcıları `passive:true` ile kuruldu. Dinleme `#app`'e değil
+`#root`'a bağlı; `preventDefault` yok, scroll davranışı korunuyor. Devre dışı
+ve form elemanları filtreleniyor, >10 px hareket basmayı iptal ediyor, her FX
+çağrısı kendi `try/catch` sınırında ve `install()` idempotent.
+
+İlk boot `render()` çağrısından hemen sonra `app.js` içine tek satır bağlantı
+eklendi. `mediaFx.js` cache-bump'i `20260902b`, `app.js` cache-bump'i
+`20260906f` oldu. App handler/markup/render/paint ve CSS değişmedi.
+
+Sonuç: M2 **0 → 390/390** (hedef ≥343), `App.*` **717**, `onclick` **391**;
+statik gate `preventDefault=0`, listener **4**, passive listener **4**.
+Sentetik idempotence/pointer fixture PASS; driver 0 fail, zikir 95/95,
+migration 60/60, B1 0 failure, B3 20/20, app 30/30, panel 23/23,
+Panel-v2 27/27, Kur'an 9/9, reminder 20/20 PASS. `coverage.json` yeniden
+yazılmadı; push/deploy/browser yok. Sıradaki kart FX2-07.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -188,7 +208,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-06.md`](../.prompts/FX2-06.md)
+2. Kart: [`../.prompts/FX2-07.md`](../.prompts/FX2-07.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

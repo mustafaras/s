@@ -1846,6 +1846,87 @@
 @media (prefers-reduced-motion: reduce){
   #root[class*="amb-time-"]{ transition:none!important; }
 }
+
+/* ── FX2-21: hava sahneleri ─────────────────────────────────────────────
+   Katman #sey-aurora'nın ::after'ında yaşar; zemin gradientini EZMEZ,
+   üstüne <=%6 opaklıkla biner. Şiddet --wx-intensity'den (0–1) gelir. */
+#sey-aurora::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  opacity:0; transition:opacity var(--dur-5) var(--ease-glide);
+}
+
+/* Açık / güneşli — çok ince ışık huzmesi */
+#root.amb-wx-clear #sey-aurora::after{
+  opacity:calc(.05 * var(--wx-dim,1));
+  background:linear-gradient(105deg,transparent 40%,
+    color-mix(in srgb,var(--gold-1) 60%,transparent) 50%,transparent 60%);
+}
+
+/* Bulutlu — yumuşak gri kayma, doygunluk düşer */
+#root.amb-wx-cloud #sey-aurora::after{
+  opacity:calc(.06 * var(--wx-dim,1));
+  background:radial-gradient(60% 40% at 30% 30%,rgba(140,145,155,.5),transparent 70%),
+             radial-gradient(50% 36% at 72% 44%,rgba(150,155,165,.42),transparent 72%);
+  animation:ambDrift calc(48s / max(var(--wx-intensity,.4),.2)) ease-in-out infinite;
+}
+
+/* Sis — süt beyazı bulanıklık */
+#root.amb-wx-fog #sey-aurora::after{
+  opacity:calc(.055 * var(--wx-dim,1));
+  background:linear-gradient(0deg,rgba(230,232,236,.85),rgba(214,218,224,.55));
+  animation:ambDrift 70s ease-in-out infinite;
+}
+
+/* Çiseleme / Yağmur — dikey çizgiler, DOM parçacığı YOK */
+#root.amb-wx-drizzle #sey-aurora::after,
+#root.amb-wx-rain    #sey-aurora::after{
+  opacity:calc(.05 * var(--wx-dim,1));
+  background:repeating-linear-gradient(97deg,
+    transparent 0 7px,
+    color-mix(in srgb,var(--text) 26%,transparent) 7px 8px,
+    transparent 8px 15px);
+  background-size:auto 220px;
+  animation:ambRain calc(1.7s / max(var(--wx-intensity,.4),.2)) linear infinite;
+}
+#root.amb-wx-rain #sey-aurora::after{ opacity:calc(.07 * var(--wx-dim,1)); }
+
+/* Kar — yavaş, iri, mavi-beyaz */
+#root.amb-wx-snow #sey-aurora::after{
+  opacity:calc(.09 * var(--wx-dim,1));
+  background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.9) 0 1.6px,transparent 2.4px),
+             radial-gradient(circle at 62% 48%,rgba(240,246,255,.85) 0 1.9px,transparent 2.8px),
+             radial-gradient(circle at 84% 76%,rgba(255,255,255,.8) 0 1.5px,transparent 2.3px);
+  background-size:150px 190px,190px 230px,170px 210px;
+  animation:ambSnow calc(24s / max(var(--wx-intensity,.4),.2)) linear infinite;
+}
+
+/* Fırtına — koyulaşma + ÇOK SEYREK şimşek (>=40sn) */
+#root.amb-wx-storm #sey-aurora::after{
+  opacity:calc(.09 * var(--wx-dim,1));
+  background:repeating-linear-gradient(94deg,
+    transparent 0 5px,
+    color-mix(in srgb,var(--text) 34%,transparent) 5px 6px,
+    transparent 6px 12px);
+  background-size:auto 200px;
+  animation:ambRain calc(1.1s / max(var(--wx-intensity,.6),.3)) linear infinite,
+            ambFlash 41s steps(1,end) infinite;
+}
+
+/* Veri yok — hiçbir ek katman */
+#root.amb-wx-none #sey-aurora::after{ opacity:0; animation:none; }
+
+@keyframes ambDrift{ 0%,100%{ transform:translate3d(0,0,0) } 50%{ transform:translate3d(-3%,2%,0) } }
+@keyframes ambRain { to  { transform:translate3d(0,220px,0) } }
+@keyframes ambSnow { to  { transform:translate3d(-24px,230px,0) } }
+@keyframes ambFlash{ 0%,97%{ filter:none } 97.4%{ filter:brightness(1.9) } 98%{ filter:none } }
+
+/* Reduced-motion: RENK kalır, HAREKET durur */
+@media (prefers-reduced-motion: reduce){
+  #sey-aurora::after{ animation:none!important; }
+}
+
+/* Batarya: sekme arka plandayken hava animasyonları duraklar. */
+#root.amb-paused #sey-aurora::after{ animation-play-state:paused; }
 .sey-enter-delay-1 { animation-delay: 60ms; }
 .sey-enter-delay-2 { animation-delay: 120ms; }
 .sey-enter-delay-3 { animation-delay: 180ms; }

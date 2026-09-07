@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-20** — güneş saati (4 zaman sahnesi) |
-| Sıradaki prompt | **FX2-21** — hava modu (8 sahne) |
+| Son tamamlanan prompt | **FX2-21** — hava modu (8 WMO sahnesi) |
+| Sıradaki prompt | **FX2-22** — mevsim katmanı |
 | Aşama | Dalga 5 — Canlı Zemin |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -452,6 +452,39 @@ ait). Push/deploy/browser/server/network/coverage.json yok. Guard `paint()`
 içinde (9051 satır) doğrulandı; `App.*` yüzeyine dokunulmadı.
 
 Durum: `FX2-20 → FX2-21`, blokaj yok.
+
+---
+
+## FX2-21 — Tamamlandı (2026-09-07) · Hava Modu: WMO → 8 Sahne
+
+İlk önce FX2-19'un `SeyAmbience.weatherClass()` mantığını görünür kıldık;
+veri `data.weather.spots[0].code` üzerinden **zaten canlı** (yeni ağ çağrısı
+yok). `app.js` bu kartta **hiç açılmadı**.
+
+- **CSS (`styles.css`):** FX2-20 reduce bloğundan sonra 8 hava sahnesi; hepsi
+  `#sey-aurora::after` üzerinde yaşar — **yeni DOM düğümü YOK**, zemin
+  gradientini EZMEZ, üstüne **≤0,09 opaklıkla** biner (kontrast korunur):
+  - `clear` (ışık huzmesi) · `cloud` (ambDrift) · `fog` (süt beyazı) ·
+    `drizzle`+`rain` (dikey çizgiler; rain daha güçlü) · `snow` (iri mavi-beyaz
+    desen) · `storm` (koyulaşma + 41 sn aralıklı şimşek) · `none` (kapalı)
+  - Şiddet `--wx-intensity`'den (`max(var(--wx-intensity),…)`), gece koyulaşması
+    `--wx-dim`'den; 4 keyframe `ambDrift/ambRain/ambSnow/ambFlash`
+  - reduced-motion → renk kalır sadece animasyon durur
+- **Batarya (`timeTheme.js`):** FX2-19 bloğuna `visibilitychange` listener →
+  `#root.amb-paused` toggle; sekme arka plandayken hava animasyonları duraklar.
+  Yalnız `document.addEventListener` varsa bağlanır — headless harneşlerde
+  `document=null` olabileceği için sessizce geçer (53/53 korundu).
+- **Cache bump (`index.html`):** styles `20260907e→f`, timeTheme `20260906c→d`.
+
+**Kanıt:** syntax PASS; `amb-wx-` 9, 8 sahnenin hepsi ≥1, 4 `@keyframes amb*`,
+`amb-paused` = 3 (styles 1 + timeTheme 2), opacity max `.09`. WMO testi:
+`0→clear`, `3→cloud`, `45→fog`, `53→drizzle`, `63→rain`, `75→snow`,
+`95→storm`, `null→none` — hepsi doğru. Driver 0 FAIL; `test_premium_time_theme`
+53/53; `test_fx2_palette_contrast` 12/12; tüm `tests/app/*.js` PASS.
+**M12 4 → 12 ≥ 12** (4 zaman + 8 hava; 18 seri kapanış kapısı, FX2-22 season
++6 ile dolar). Push/deploy/browser/server/network/coverage.json yok.
+
+Durum: `FX2-21 → FX2-22`, blokaj yok.
 
 ---
 

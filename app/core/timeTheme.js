@@ -161,4 +161,17 @@
       return true;
     }
   };
+
+  // Sekme arka plandayken hava katmanı animasyonlarını duraklat (batarya).
+  // (FX2-21: #root.amb-paused → #sey-aurora::after animation-play-state:paused)
+  // Yalnızca `document` + `addEventListener` varsa bağla — headless harnesslerde
+  // document tanımsız olabilir, bu durumda sessizce geç.
+  if (typeof document !== 'undefined' && document && typeof document.addEventListener === 'function'){
+    document.addEventListener('visibilitychange', function(){
+      try{
+        var r = document.getElementById('root'); if (!r) return;
+        r.classList.toggle('amb-paused', document.hidden);
+      }catch(e){}
+    });
+  }
 })();

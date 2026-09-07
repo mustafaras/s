@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-03** — pembe → şampanya altını |
-| Sıradaki prompt | **FX2-04** — aurora halkası |
+| Son tamamlanan prompt | **FX2-04** — altın aile birleştirme |
+| Sıradaki prompt | **FX2-05** — kontrast ve doğrulama |
 | Aşama | Dalga 1 — Renk Kimliği |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -118,6 +118,21 @@ Kontrast ölçümleri sırasıyla **4,83**, **13,48**, **12,17** ile AA eşiğin
 geçti. `app.js`, `app/core/**`, `sync.js`, `tests/**` ve `coverage.json`
 değişmedi.
 
+## FX2-04 — Tamamlandı (2026-09-07)
+
+Altın aile iki temada `--gold-1..5` merdivenine bağlandı. ÆON (`--aeon`,
+`--aeon2`), zikir sayacı (`--zikr-counter-gold`) ve nav/header fallback'leri
+`var(--gold-*)` kullanıyor; 12 adet `#A4824C` kaldırıldı. `#sey-aurora`
+fallback'i `var(--accent-ink,#8A6A3B)` oldu. `index.html` CSS cache-bump'i
+`styles.css?v=20260906g` oldu.
+
+Canlı ölçüm: **M10 1 → 0**, **M11 2 → 2**; kart eşiği geçti. `--kandil`,
+`--warn`, `--read`/`--watch`/`--listen`, `--sun`/`--sun2` değerleri ve
+`panel/**` korunarak doğrulandı. `app.js`, `sync.js`, test dosyaları ve
+`coverage.json` değişmedi. Headless kanıt: driver 0 fail; app 29/29; zikir
+95/95; migration 60/60; panel 23/23; Panel-v2 27/27; Kur'an 9/9;
+reminder smoke 20/20.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -160,7 +175,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-04.md`](../.prompts/FX2-04.md)
+2. Kart: [`../.prompts/FX2-05.md`](../.prompts/FX2-05.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

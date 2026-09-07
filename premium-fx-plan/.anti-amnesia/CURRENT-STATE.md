@@ -11,9 +11,9 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-04** — altın aile birleştirme |
-| Sıradaki prompt | **FX2-05** — kontrast ve doğrulama |
-| Aşama | Dalga 1 — Renk Kimliği |
+| Son tamamlanan prompt | **FX2-05** — kontrast ve tema fixture'ı |
+| Sıradaki prompt | **FX2-06** — dokunma katmanı |
+| Aşama | Dalga 2 — Dokunma Katmanı |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
 
@@ -133,6 +133,19 @@ Canlı ölçüm: **M10 1 → 0**, **M11 2 → 2**; kart eşiği geçti. `--kandi
 95/95; migration 60/60; panel 23/23; Panel-v2 27/27; Kur'an 9/9;
 reminder smoke 20/20.
 
+## FX2-05 — Tamamlandı (2026-09-07)
+
+Yeni `tests/app/test_fx2_palette_contrast.js` fixture'ı ağsız biçimde
+`app/styles.css` tokenlarını okuyarak 12 grubu ve 8 kontrast çiftini kilitliyor.
+İlk gerçek koşuda `#8A6A3B / #F7F1E8` oranı **4,4472** çıktı; eşik
+gevşetilmedi. Açık `--accent-ink`, açık `--gold-4` ve aurora fallback'i
+`#886738` yapıldı; oran **4,625** oldu. CSS değiştiği için cache-bump
+`styles.css?v=20260906h` yapıldı.
+
+Sonuç: fixture **12/12**, M10 **0**, M11 **2**, M13 **8/8**. Protected
+renkler ve panel yüzeyi değişmedi; `app.js`/`app/core/**`/`sync.js` değişmedi.
+`coverage.json` yeniden yazılmadı. Dalga 1 kapandı; sıradaki kart FX2-06.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -175,7 +188,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-05.md`](../.prompts/FX2-05.md)
+2. Kart: [`../.prompts/FX2-06.md`](../.prompts/FX2-06.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

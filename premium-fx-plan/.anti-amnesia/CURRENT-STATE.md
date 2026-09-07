@@ -278,6 +278,22 @@ kilit açma sırasını, once/pasif davranışı ve suspend/resume yaşam döng�
 **14/14** ile doğrular; audio fixture **37/37**. M9 canlı ölçüm **1 → 2**;
 cache sürümü `20260902h`. Sıradaki FX2-14.
 
+## FX2-14 — Tamamlandı (2026-09-07)
+
+Yeni `tests/app/test_fx2_audio_engine.js`, gerçek `app/core/mediaFx.js`i
+ağsız `node:vm` içinde kayıt tutan bir sahte `AudioContext` ile yükler.
+Fixture 12 grupta master graph zincirini, kod içi reverb impulse'unu, tek
+kurulumu, altı sesli polifoni sınırını, detune varyasyonunu, kısa ses
+sürelerini, inharmonik çanı, warning waveformunu, dört koşullu gating
+matrisini, iOS kilidini, UI ses yolunda ağ yokluğunu ve I2 API yüzeyini
+doğrular.
+
+İlk çalıştırmada fake compressor parametreleri eksik olduğu için graph kurulum
+assertion'ı haklı olarak düştü; fixture gevşetilmeden mock tamamlandı. Sonuç
+**12/12 PASS**. Uygulama kaynakları ve `index.html` değişmedi;
+`coverage.json` yazılmadı. Dalga 3 kapandı: M3 **408 ≥ 200**, M9 **2 ≥ 2**.
+Sıradaki FX2-15.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -320,7 +336,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-14.md`](../.prompts/FX2-14.md)
+2. Kart: [`../.prompts/FX2-15.md`](../.prompts/FX2-15.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

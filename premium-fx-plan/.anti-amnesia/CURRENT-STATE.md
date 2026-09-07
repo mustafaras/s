@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-10** — dokunma kapsamı fixture'ı |
-| Sıradaki prompt | **FX2-11** — ses motoru v2 (bus / reverb / limiter) |
+| Son tamamlanan prompt | **FX2-11** — ses motoru v2 (bus / reverb / limiter) |
+| Sıradaki prompt | **FX2-12** — ses paleti v2 (11 ses) |
 | Aşama | Dalga 3 — Ses Kimliği |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -234,6 +234,21 @@ kapsanır; sayım tarihsel bir sabite bağlanmadı. Canlı kapsam ölçümü M2
 **390 ≥ 343**, M4 **390 ≥ 325**, M9 **1 ≥ 1**; `coverage.json` yazılmadı.
 Uygulama kaynakları ve `index.html` değişmedi. Sıradaki FX2-11.
 
+## FX2-11 — Tamamlandı (2026-09-07)
+
+`app/core/mediaFx.js` içindeki tek `AudioContext` artık ilk kullanımda ortak
+master bus'a bağlanır: `busGain(0.8)` → compressor (-18 dB, 4:1, 3 ms / 120
+ms) → tanh soft limiter (1024 örnek, 2x) → destination; reverb send ise kod
+içinde üretilen iki kanallı 0,9 sn impulse convolver üzerinden bus'a döner.
+Harici asset veya ağ çağrısı eklenmedi.
+
+İç `playVoice` ADSR/filter/detune/gain-jitter/reverb/partial'ları, `playNoise`
+band-pass transient'i ve altı köklü polifoni sınırını sağlar; eski
+`tap`/`success`/`warning`/`bell` adları ve imzaları korundu. Tam Web Audio
+stub kontratı graph düğümlerinin bir kez kurulmasını ve yedinci-sekizinci
+köklerde 20 ms eski-ses sönümünü doğruladı; mevcut audio fixture 27/27 geçti.
+`index.html` mediaFx cache-bump'i `20260902f` oldu. Sıradaki FX2-12.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -276,7 +291,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-11.md`](../.prompts/FX2-11.md)
+2. Kart: [`../.prompts/FX2-12.md`](../.prompts/FX2-12.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

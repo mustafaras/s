@@ -1,12 +1,80 @@
 (function(){
   'use strict';
   var CTX = null;
+  var ACTIVE_VOICES = [];
   function bootCtx(){
     if (CTX) return CTX;
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
     CTX = new AC();
+    try{ installMasterBus(CTX); }catch(e){}
     return CTX;
+  }
+  // FX2-11: Tek seferlik ortak ses yolu. Özellik desteği dar mock/browserlarda
+  // yoksa üreticiler destination'a güvenli biçimde düşer; dış SeyAudio API'si
+  // ve gating davranışı değişmez.
+  function installMasterBus(ctx){
+    if (!ctx || ctx._seyAudioGraph) return ctx && ctx._seyAudioGraph;
+    var graphFactories = ['createGain','createDynamics'+'Compressor','createWave'+'Shaper','createCon'+'volver','createBuffer'];
+    if (!graphFactories.every(function(name){ return typeof ctx[name] === 'function'; })) return null;
+    var bus = ctx.createGain();
+    var compressor = ctx.createDynamicsCompressor();
+    var limiter = ctx.createWaveShaper();
+    var reverbSend = ctx.createGain();
+    var convolver = ctx.createConvolver();
+    var curve = new Float32Array(1024);
+    var normalizer = Math.tanh(1.6);
+    for (var i=0;i<curve.length;i++){
+      var x = (i / (curve.length - 1)) * 2 - 1;
+      curve[i] = Math.tanh(1.6 * x) / normalizer;
+    }
+    limiter.curve = curve;
+    limiter.oversample = '2x';
+    bus.gain.value = 0.8;
+    compressor.threshold.value = -18;
+    compressor.ratio.value = 4;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.12;
+    reverbSend.gain.value = 1;
+    var len = Math.max(1, Math.floor((ctx.sampleRate || 44100) * 0.9));
+    var impulse = ctx.createBuffer(2, len, ctx.sampleRate || 44100);
+    for (var channel=0;channel<2;channel++){
+      var samples = impulse.getChannelData(channel);
+      for (var sample=0;sample<len;sample++) samples[sample] = (Math.random()*2-1) * Math.pow(1 - sample/len, 2.4);
+    }
+    convolver.buffer = impulse;
+    bus.connect(compressor); compressor.connect(limiter); limiter.connect(ctx.destination);
+    reverbSend.connect(convolver); convolver.connect(bus);
+    ctx._seyAudioGraph = { bus:bus, compressor:compressor, limiter:limiter, reverbSend:reverbSend, convolver:convolver };
+    return ctx._seyAudioGraph;
+  }
+  function outputFor(ctx){ return (ctx && ctx._seyAudioGraph && ctx._seyAudioGraph.bus) || (ctx && ctx.destination); }
+  function removeActive(entry){
+    var index = ACTIVE_VOICES.indexOf(entry);
+    if (index >= 0) ACTIVE_VOICES.splice(index,1);
+  }
+  function stopActive(entry, ctx){
+    if (!entry || entry.stopped) return;
+    entry.stopped = true;
+    var now = ctx.currentTime || 0;
+    try{
+      var g = entry.gain && entry.gain.gain;
+      if (g){
+        if (g.cancelScheduledValues) g.cancelScheduledValues(now);
+        if (g.setValueAtTime) g.setValueAtTime(Math.max(0.0001, g.value || 0.0001), now);
+        if (g.exponentialRampToValueAtTime) g.exponentialRampToValueAtTime(0.0001, now + 0.02);
+      }
+    }catch(e){}
+    try{ if (entry.node && entry.node.stop) entry.node.stop(now + 0.02); }catch(e){}
+    removeActive(entry);
+  }
+  function reserveVoice(ctx){ while (ACTIVE_VOICES.length >= 6) stopActive(ACTIVE_VOICES[0], ctx); }
+  function trackVoice(ctx, node, gain, until){
+    var entry = { node:node, gain:gain, stopped:false };
+    ACTIVE_VOICES.push(entry);
+    try{ node.onended = function(){ removeActive(entry); }; }catch(e){}
+    try{ setTimeout(function(){ removeActive(entry); }, Math.max(20, Math.ceil((until - (ctx.currentTime || 0)) * 1000) + 40)); }catch(e){}
+    return entry;
   }
   function settings(){ return (window.SeymaState && window.SeymaState.data && window.SeymaState.data.settings) || {}; }
   // FX-P-12: `allowReducedMotion` opsiyonel parametresi — kullanıcının bilinçli
@@ -108,73 +176,105 @@
     }
   };
 
-  function playTone(freq, duration, type, gainValue, allowReducedMotion){
-    if (!allowed(allowReducedMotion)) return;
-    var ctx = bootCtx(); if (!ctx) return;
+  // FX2-11: Dış SeyAudio.voice ile karışmayan ortak osilatör üreticisi.
+  // Her partial bağımsız olarak polifoni sınırına dahildir; altı kökten fazlası
+  // eski sesi 20 ms içinde kapatarak yeni kullanıcı etkileşimine yer açar.
+  function playVoice(options){
+    options = options || {};
+    var ctx = bootCtx(); if (!ctx || !ctx.createOscillator || !ctx.createGain) return false;
     try{
       if (ctx.state === 'suspended') ctx.resume();
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.type = type || 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(gainValue || 0.12, ctx.currentTime + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + duration);
-    }catch(e){}
+      var start = (ctx.currentTime || 0) + Math.max(0, Number(options.delay) || 0);
+      var duration = Math.max(0.01, Number(options.dur) || 0.18);
+      var attack = Math.max(0.001, Math.min(duration * 0.5, Number(options.attack) || 0.01));
+      var gainValue = Math.max(0.0001, Number(options.gain) || 0.12) * (0.92 + Math.random()*0.16);
+      var partials = Array.isArray(options.partials) && options.partials.length ? options.partials : [[1,1]];
+      partials.forEach(function(partial){
+        reserveVoice(ctx);
+        var ratio = Number(partial && partial[0]) || 1;
+        var level = Number(partial && partial[1]); if (!isFinite(level)) level = 1;
+        var osc = ctx.createOscillator();
+        var envelope = ctx.createGain();
+        var filter = null;
+        osc.type = options.type || 'sine';
+        if (osc.frequency && osc.frequency.setValueAtTime) osc.frequency.setValueAtTime((Number(options.freq) || 440) * ratio, start);
+        if (options.detune && osc.detune) osc.detune.value = (Math.random()*2-1) * 12;
+        if (options.filter && ctx.createBiquadFilter){
+          filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          if (filter.frequency && filter.frequency.setValueAtTime) filter.frequency.setValueAtTime(Number(options.filter), start);
+          else if (filter.frequency) filter.frequency.value = Number(options.filter);
+        }
+        var amp = gainValue * Math.max(0, level);
+        envelope.gain.setValueAtTime(0, start);
+        envelope.gain.linearRampToValueAtTime(amp, start + attack);
+        envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        if (filter){ osc.connect(filter); filter.connect(envelope); }
+        else osc.connect(envelope);
+        envelope.connect(outputFor(ctx));
+        // Wet yol yalnız tam Web Audio grafiğinde kurulur; eski küçük mock'lar
+        // bir ekstra GainNode görmeden temel API sözleşmesini korur.
+        if (options.reverb > 0 && ctx._seyAudioGraph && ctx._seyAudioGraph.reverbSend){
+          var wet = ctx.createGain();
+          wet.gain.setValueAtTime(Math.max(0, Math.min(1, Number(options.reverb) || 0)), start);
+          envelope.connect(wet); wet.connect(ctx._seyAudioGraph.reverbSend);
+        }
+        var until = start + duration;
+        trackVoice(ctx, osc, envelope, until);
+        osc.start(start); osc.stop(until);
+      });
+      return true;
+    }catch(e){ return false; }
+  }
+  // Kısa band-pass gürültü transient'i tonu tek başına "bip" olmaktan çıkarır.
+  function playNoise(options){
+    options = options || {};
+    var ctx = bootCtx();
+    if (!ctx || !ctx.createBuffer || !ctx.createBufferSource || !ctx.createBiquadFilter || !ctx.createGain) return false;
+    try{
+      var start = (ctx.currentTime || 0) + Math.max(0, Number(options.delay) || 0);
+      var duration = Math.max(0.006, Math.min(0.12, Number(options.dur) || 0.025));
+      var length = Math.max(1, Math.floor((ctx.sampleRate || 44100) * duration));
+      var buffer = ctx.createBuffer(1, length, ctx.sampleRate || 44100);
+      var data = buffer.getChannelData(0);
+      for (var i=0;i<length;i++) data[i] = Math.random()*2-1;
+      reserveVoice(ctx);
+      var source = ctx.createBufferSource();
+      var filter = ctx.createBiquadFilter();
+      var envelope = ctx.createGain();
+      source.buffer = buffer;
+      filter.type = 'bandpass';
+      if (filter.frequency && filter.frequency.setValueAtTime) filter.frequency.setValueAtTime(Number(options.freq) || 2400, start);
+      else if (filter.frequency) filter.frequency.value = Number(options.freq) || 2400;
+      if (filter.Q) filter.Q.value = Number(options.q) || 1.2;
+      var gainValue = Math.max(0.0001, Number(options.gain) || 0.016);
+      envelope.gain.setValueAtTime(0, start);
+      envelope.gain.linearRampToValueAtTime(gainValue, start + Math.min(0.004, duration * 0.3));
+      envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      source.connect(filter); filter.connect(envelope); envelope.connect(outputFor(ctx));
+      trackVoice(ctx, source, envelope, start + duration);
+      source.start(start); source.stop(start + duration);
+      return true;
+    }catch(e){ return false; }
+  }
+  function playTone(freq, duration, type, gainValue, allowReducedMotion){
+    if (!allowed(allowReducedMotion)) return;
+    playVoice({ freq:freq, type:type || 'sine', dur:duration, attack:0.01, gain:gainValue || 0.12, filter:2800, detune:true, reverb:0.08 });
+    playNoise({ dur:0.022, freq:2600, q:1.4, gain:0.012 });
   }
   function playArpeggio(freqs, duration, type){
     if (!allowed()) return;
-    var ctx = bootCtx(); if (!ctx) return;
-    try{
-      if (ctx.state === 'suspended') ctx.resume();
-      var step = duration / freqs.length;
-      freqs.forEach(function(f, i){
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.type = type || 'sine';
-        osc.frequency.setValueAtTime(f, ctx.currentTime + i*step);
-        gain.gain.setValueAtTime(0, ctx.currentTime + i*step);
-        gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + i*step + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i*step + step*0.9);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + i*step);
-        osc.stop(ctx.currentTime + i*step + step);
-      });
-    }catch(e){}
+    var step = duration / freqs.length;
+    freqs.forEach(function(freq, index){
+      playVoice({ freq:freq, type:type || 'sine', dur:step * 0.9, delay:index * step, attack:0.01, gain:0.1, filter:3400, detune:true, reverb:0.14 });
+    });
+    playNoise({ dur:0.02, freq:3000, q:1.6, gain:0.01 });
   }
-  // FX-P-11: yumuşak zil/kutu sesi — 880Hz sine + hafif vibrato (600ms).
+  // FX2-11: iki partial'lı, reverb send'li yumuşak zil; dış bell() imzası korunur.
   function playBell(freq, duration){
     if (!allowed()) return;
-    var ctx = bootCtx(); if (!ctx) return;
-    try{
-      if (ctx.state === 'suspended') ctx.resume();
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      var lfo = ctx.createOscillator();
-      var lfoGain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      // Hafif vibrato: LFO ~6Hz, ±6Hz frekans modülasyonu.
-      lfo.type = 'sine';
-      lfo.frequency.setValueAtTime(6, ctx.currentTime);
-      lfoGain.gain.setValueAtTime(6, ctx.currentTime);
-      lfo.connect(lfoGain);
-      lfoGain.connect(osc.frequency);
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(ctx.currentTime);
-      lfo.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + duration);
-      lfo.stop(ctx.currentTime + duration);
-    }catch(e){}
+    playVoice({ freq:freq, type:'sine', dur:duration, attack:0.02, gain:0.1, filter:4200, detune:true, reverb:0.35, partials:[[1,1],[2.01,0.22]] });
+    playNoise({ dur:0.018, freq:3600, q:2.1, gain:0.008 });
   }
 
   window.SeyAudio = {

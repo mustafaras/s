@@ -474,10 +474,10 @@ function zikrManualActive(date,presetId){
 
 function zikrTickSound(){
   if(!ensureZikrRoot().settings.soundOn) return;
-  // FX-P-12: ses üretimi SeyAudio.tap()'e yönlendirildi.
+  // FX2-12: hızlı sayaç için 22 ms transient; genel tap sesinden ayrıdır.
   // Eski AudioContext/osilatör kodu kaldırıldı; SeyAudio yoksa sessizce no-op.
-  if(window.SeyAudio && typeof window.SeyAudio.tap === 'function'){
-    window.SeyAudio.tap();
+  if(window.SeyAudio && typeof window.SeyAudio.tick === 'function'){
+    window.SeyAudio.tick();
   }
 }
 function zikrPauseSession(){

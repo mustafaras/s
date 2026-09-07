@@ -249,6 +249,20 @@ stub kontratı graph düğümlerinin bir kez kurulmasını ve yedinci-sekizinci
 köklerde 20 ms eski-ses sönümünü doğruladı; mevcut audio fixture 27/27 geçti.
 `index.html` mediaFx cache-bump'i `20260902f` oldu. Sıradaki FX2-12.
 
+## FX2-12 — Tamamlandı (2026-09-07)
+
+`SeyAudio` ses paleti 11 bağlayıcı sese genişletildi: 22 ms yalnız-gürültü
+`tick`, 45 ms/660 Hz sine `tap`, yönlü `toggleOn`/`toggleOff`, `nav`,
+`sheetOpen`/`sheetClose`, üç notalı `success`, altı inharmonik parsiyelli
+900 ms `bell`, triangle `warning` ve düşük kazançlı `error`. Eski
+`tap`/`success`/`warning`/`bell` dış adları korunurken zikirin hızlı sayacı
+`SeyAudio.tick()`e bağlandı; `sawtooth` tamamen kaldırıldı.
+
+Gerçek kaynak fixture'ı 36/36 ile yeni API, üç notalı başarı, 660 Hz tap,
+altı parsiyelli çan, `sawtooth=0` ve zikir tick yönlendirmesini kilitler.
+M3 canlı ölçüm **408 ≥ 200**; `coverage.json` yazılmadı. `mediaFx.js` cache
+versiyonu `20260902g` oldu. Sıradaki FX2-13.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -291,7 +305,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-12.md`](../.prompts/FX2-12.md)
+2. Kart: [`../.prompts/FX2-13.md`](../.prompts/FX2-13.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

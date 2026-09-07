@@ -47,11 +47,11 @@ var expectedModules = [
   var appSrc = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
   var zikirSrc = fs.readFileSync(path.join(repoRoot,'app/core/zikir.js'),'utf8');
   var fxSrc = appSrc+'\n'+zikirSrc;
-  // FX-P-12..15: SeyAudio artık app.js içinde çağrılıyor (zikr tap, success,
+  // FX2-12/FX-P-13..15: SeyAudio artık app.js içinde çağrılıyor (zikr tick, success,
   // warning, bell). "henüz çağrılmıyor" testi kalktı; yerine çağrı noktalarının
   // varlığı ve güvenli wrapper deseni doğrulanır.
-  ok('SeyAudio.tap çağrı noktası var (FX-P-12)', fxSrc.indexOf('SeyAudio.tap') >= 0);
-  ok('zikir tap FX guardı korunuyor (MON-20/M4)', /if\(window\.SeyAudio && typeof window\.SeyAudio\.tap === 'function'\)/.test(zikirSrc));
+  ok('SeyAudio.tick çağrı noktası var (FX2-12)', fxSrc.indexOf('SeyAudio.tick') >= 0);
+  ok('zikir kısa tick FX guardı korunuyor (MON-20/M4)', /if\(window\.SeyAudio && typeof window\.SeyAudio\.tick === 'function'\)/.test(zikirSrc));
   ok('SeyAudio.success çağrı noktası var (FX-P-13)', appSrc.indexOf('SeyAudio.success') >= 0);
   ok('SeyAudio.warning çağrı noktası var (FX-P-14)', appSrc.indexOf('SeyAudio.warning') >= 0);
   ok('SeyAudio.bell çağrı noktası var (FX-P-15)', appSrc.indexOf('SeyAudio.bell') >= 0);

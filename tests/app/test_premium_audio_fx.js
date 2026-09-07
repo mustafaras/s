@@ -1,6 +1,6 @@
 // Faz 1 — Headless ses efekti fixture'ı (sentetik veri, gerçek network YOK)
-// FX-P-16: gerçek app/core/mediaFx.js modülünü yükler ve SeyAudio yüzeyini
-// (tap/success/warning/bell/voice/ambient) + app.js çağrı noktalarını doğrular.
+// FX2-12: gerçek app/core/mediaFx.js modülünü yükler ve SeyAudio'nun 11 sesli
+// paletini + app.js çağrı noktalarını doğrular.
 // AudioContext stub ile gerçek osilatör/zarfların oluşturulduğunu ölçer.
 // Çalıştırma: node tests/app/test_premium_audio_fx.js
 
@@ -105,10 +105,10 @@ console.log('[1] SeyAudio API yüzeyi tanımlı');
   setReducedMotion(false);
   loadMediaFx();
   ok('SeyAudio var', !!window.SeyAudio);
-  ok('SeyAudio.tap fonksiyonu var', typeof window.SeyAudio.tap === 'function');
-  ok('SeyAudio.success fonksiyonu var', typeof window.SeyAudio.success === 'function');
-  ok('SeyAudio.warning fonksiyonu var', typeof window.SeyAudio.warning === 'function');
-  ok('SeyAudio.bell fonksiyonu var', typeof window.SeyAudio.bell === 'function');
+  ['tick','tap','toggleOn','toggleOff','nav','sheetOpen','sheetClose',
+    'success','bell','warning','error'].forEach(function(name){
+    ok('SeyAudio.'+name+' fonksiyonu var', typeof window.SeyAudio[name] === 'function');
+  });
   ok('SeyAudio.voice fonksiyonu var', typeof window.SeyAudio.voice === 'function');
   // FX-P-53: ambient artık motor nesnesidir (start/stop/isSupported/isEnabled).
   ok('SeyAudio.ambient motor yüzeyi var', !!window.SeyAudio.ambient && typeof window.SeyAudio.ambient.start === 'function' && typeof window.SeyAudio.ambient.stop === 'function');
@@ -175,20 +175,20 @@ console.log('\n[5] reduce-motion iken tap() (bilinçli etkileşim) çalar');
     'oscillator çağrısı: '+oscCount());
 })();
 
-// ── Test 6: success() 2 nota (arpejio) üretir ───────────────────────────────
-console.log('\n[6] success() 2 oscillator (arpejio) üretir');
+// ── Test 6: success() 3 nota (arpejio) üretir ───────────────────────────────
+console.log('\n[6] success() 3 oscillator (arpejio) üretir');
 (function(){
   setSettings({ premiumAtmosphere: true, uiSounds: true });
   setReducedMotion(false);
   loadMediaFx();
   clearCalls();
   window.SeyAudio.success();
-  ok('success() 2 oscillator oluşturur', oscCount()===2, 'oscillator sayısı: '+oscCount());
-  ok('success() 2 gain oluşturur', gainCount()===2, 'gain sayısı: '+gainCount());
+  ok('success() 3 oscillator oluşturur', oscCount()===3, 'oscillator sayısı: '+oscCount());
+  ok('success() 3 gain oluşturur', gainCount()===3, 'gain sayısı: '+gainCount());
 })();
 
-// ── Test 7: tap() 523 Hz triangle üretir ────────────────────────────────────
-console.log('\n[7] tap() 523 Hz triangle üretir');
+// ── Test 7: tap() 660 Hz sine üretir ────────────────────────────────────────
+console.log('\n[7] tap() 660 Hz sine üretir');
 (function(){
   setSettings({ premiumAtmosphere: true, uiSounds: true });
   setReducedMotion(false);
@@ -196,23 +196,27 @@ console.log('\n[7] tap() 523 Hz triangle üretir');
   clearCalls();
   window.SeyAudio.tap();
   ok('tap() 1 oscillator oluşturur', oscCount()===1, 'oscillator sayısı: '+oscCount());
-  // createOscillator kaydından sonraki ilk freq-set değeri 523 olmalı
+  // createOscillator kaydından sonraki ilk freq-set değeri 660 olmalı
   var freq = 0;
   for(var i=0;i<_audioCalls.length;i++){
     if(_audioCalls[i].type==='create-oscillator'){ i++; while(i<_audioCalls.length && _audioCalls[i].type!=='freq-set') i++; if(i<_audioCalls.length) freq=_audioCalls[i].v; break; }
   }
-  ok('tap() 523 Hz üretir', freq===523, 'freq='+freq);
+  ok('tap() 660 Hz üretir', freq===660, 'freq='+freq);
 })();
 
-// ── Test 8: bell() 2 oscillator (ana + LFO vibrato) üretir ──────────────────
-console.log('\n[8] bell() 2 oscillator (ana + LFO) üretir');
+// ── Test 8: bell() altı inharmonik parsiyel üretir ──────────────────────────
+console.log('\n[8] bell() 6 oscillator (inharmonik parsiyel) üretir');
 (function(){
   setSettings({ premiumAtmosphere: true, uiSounds: true });
   setReducedMotion(false);
   loadMediaFx();
   clearCalls();
   window.SeyAudio.bell();
-  ok('bell() 2 oscillator oluşturur', oscCount()===2, 'oscillator sayısı: '+oscCount());
+  ok('bell() 6 oscillator oluşturur', oscCount()===6, 'oscillator sayısı: '+oscCount());
+  var src = fs.readFileSync(path.join(repoRoot,'app/core/mediaFx.js'),'utf8');
+  ok('bell() bağlayıcı 6 inharmonik oranı taşır',
+    src.indexOf('[2.76,.6],[5.40,.4],[8.93,.25],[13.34,.15],[18.40,.1]') >= 0);
+  ok('mediaFx.js sawtooth içermez', src.indexOf('sawtooth') < 0);
 })();
 
 // ── Test 9: AudioContext yoksa graceful no-op ─────────────────────────────
@@ -236,11 +240,11 @@ console.log('\n[10] app.js SeyAudio çağrı noktaları');
   var appSrc = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
   var zikirSrc = fs.readFileSync(path.join(repoRoot,'app/core/zikir.js'),'utf8');
   var fxSrc = appSrc+'\n'+zikirSrc;
-  var tap = fxSrc.indexOf('SeyAudio.tap') >= 0;
+  var tick = zikirSrc.indexOf('SeyAudio.tick') >= 0;
   var success = appSrc.indexOf('SeyAudio.success') >= 0;
   var warning = appSrc.indexOf('SeyAudio.warning') >= 0;
   var bell = appSrc.indexOf('SeyAudio.bell') >= 0;
-  ok('Zikirmatik/app SeyAudio.tap çağrı noktası var', tap);
+  ok('Zikirmatik kısa tick çağrı noktası var', tick);
   ok('app.js SeyAudio.success çağrı noktası var', success);
   ok('app.js SeyAudio.warning çağrı noktası var', warning);
   ok('app.js SeyAudio.bell çağrı noktası var', bell);

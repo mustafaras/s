@@ -19,12 +19,12 @@ function ok(name,condition,detail){
 console.log('\n=== MON-20 — SeymaZikr motor boundary ===\n');
 
 var loadCalls={storage:0,fetch:0,timer:0};
-var tapCalls=0,saveCalls=0;
+var tickCalls=0,saveCalls=0;
 var sandbox={
   console:console, Date:Date, Math:Math, JSON:JSON, Object:Object, Array:Array,
   String:String, Number:Number, Boolean:Boolean, RegExp:RegExp, Error:Error,
   Promise:Promise, isNaN:isNaN, isFinite:isFinite, window:null,
-  SeyAudio:{tap:function(){ tapCalls++; }},
+  SeyAudio:{tick:function(){ tickCalls++; }},
   localStorage:{getItem:function(){ loadCalls.storage++; return null; },setItem:function(){ loadCalls.storage++; }},
   fetch:function(){ loadCalls.fetch++; return Promise.reject(new Error('MON-20 network')); },
   setTimeout:function(){ loadCalls.timer++; return 1; },
@@ -40,7 +40,7 @@ ok('modül root data rebind etmiyor',!/^[ \t]*(?:var[ \t]+)?data[ \t]*=/m.test(s
 ok('modül DOM/ağ/timer sahibi değil',source.indexOf('document')<0&&source.indexOf('fetch(')<0&&source.indexOf('setTimeout(')<0);
 ok('eksik resolver bag fail-closed reddediliyor',z.registerZikr({})===false);
 ok('seed kardinalitesi ve preset kimlikleri korunuyor',z.ZIKR_SEED.length===5&&z.ZIKR_SEED.map(function(p){return p.id;}).join(',')==='subhanallah,elhamdulillah,allahu_ekber,la_ilaha_illallah,estagfirullah');
-ok('tap FX guardı modülde korunuyor',/if\(window\.SeyAudio && typeof window\.SeyAudio\.tap === 'function'\)/.test(source));
+ok('kısa tick FX guardı modülde korunuyor',/if\(window\.SeyAudio && typeof window\.SeyAudio\.tick === 'function'\)/.test(source));
 
 var current={startDate:'2026-09-04',days:{}};
 var deps={
@@ -60,7 +60,7 @@ ok('zikrTouchTick hedef/sayaç/oturum eşdeğerini koruyor',result&&result.count
 ok('gün aynası getDay resolverından geçiyor',current.days['2026-09-04'].zikr&&current.days['2026-09-04'].zikr.totalCount===1&&z.zikrMath(p,0).baseTarget===before.baseTarget);
 root.settings.soundOn=false; z.zikrTickSound();
 root.settings.soundOn=true; z.zikrTickSound();
-ok('SeyAudio.tap yalnız soundOn guardı geçince bir kez çağrılıyor',tapCalls===1);
+ok('SeyAudio.tick yalnız soundOn guardı geçince bir kez çağrılıyor',tickCalls===1);
 z.zikrPauseSession();
 ok('pause motoru aktif oturumu duraklatıyor',!!root.activeSession&&typeof root.activeSession.pausedAt==='string');
 

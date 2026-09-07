@@ -204,6 +204,7 @@
           filter.type = 'lowpass';
           if (filter.frequency && filter.frequency.setValueAtTime) filter.frequency.setValueAtTime(Number(options.filter), start);
           else if (filter.frequency) filter.frequency.value = Number(options.filter);
+          if (options.filterEnd && filter.frequency && filter.frequency.linearRampToValueAtTime) filter.frequency.linearRampToValueAtTime(Number(options.filterEnd), start + duration);
         }
         var amp = gainValue * Math.max(0, level);
         envelope.gain.setValueAtTime(0, start);
@@ -257,33 +258,42 @@
       return true;
     }catch(e){ return false; }
   }
-  function playTone(freq, duration, type, gainValue, allowReducedMotion){
+  function playTone(freq, duration, type, gainValue, allowReducedMotion, options){
     if (!allowed(allowReducedMotion)) return;
-    playVoice({ freq:freq, type:type || 'sine', dur:duration, attack:0.01, gain:gainValue || 0.12, filter:2800, detune:true, reverb:0.08 });
-    playNoise({ dur:0.022, freq:2600, q:1.4, gain:0.012 });
+    options = options || {};
+    playVoice({ freq:freq, type:type || 'sine', dur:duration, attack:options.attack || 0.01, gain:gainValue || 0.12, filter:options.filter || 2800, filterEnd:options.filterEnd, detune:options.detune !== false, reverb:options.reverb == null ? 0.08 : options.reverb });
+    playNoise({ dur:options.transientDur || 0.022, freq:options.transientFreq || 2600, q:options.transientQ || 1.4, gain:options.transientGain || 0.012 });
   }
-  function playArpeggio(freqs, duration, type){
+  function playArpeggio(freqs, duration, type, options){
     if (!allowed()) return;
-    var step = duration / freqs.length;
+    options = options || {};
+    var step = options.interval == null ? duration / freqs.length : options.interval;
     freqs.forEach(function(freq, index){
-      playVoice({ freq:freq, type:type || 'sine', dur:step * 0.9, delay:index * step, attack:0.01, gain:0.1, filter:3400, detune:true, reverb:0.14 });
+      playVoice({ freq:freq, type:type || 'sine', dur:options.noteDur || step * 0.9, delay:index * step, attack:options.attack || 0.01, gain:options.gain || 0.1, filter:options.filter || 3400, filterEnd:options.filterEnd, detune:options.detune !== false, reverb:options.reverb == null ? 0.14 : options.reverb });
     });
-    playNoise({ dur:0.02, freq:3000, q:1.6, gain:0.01 });
+    playNoise({ dur:options.transientDur || 0.02, freq:options.transientFreq || 3000, q:options.transientQ || 1.6, gain:options.transientGain || 0.01 });
   }
-  // FX2-11: iki partial'lı, reverb send'li yumuşak zil; dış bell() imzası korunur.
+  // FX2-12: altı inharmonik partial'lı metalik çan; dış bell() imzası korunur.
   function playBell(freq, duration){
     if (!allowed()) return;
-    playVoice({ freq:freq, type:'sine', dur:duration, attack:0.02, gain:0.1, filter:4200, detune:true, reverb:0.35, partials:[[1,1],[2.01,0.22]] });
+    playVoice({ freq:freq, type:'sine', dur:duration, attack:0.02, gain:0.1, filter:4800, detune:true, reverb:0.45, partials:[[1,1],[2.76,.6],[5.40,.4],[8.93,.25],[13.34,.15],[18.40,.1]] });
     playNoise({ dur:0.018, freq:3600, q:2.1, gain:0.008 });
   }
 
   window.SeyAudio = {
     // ctx lazy init: her erişimde bootCtx() çağrılır; AudioContext yoksa null döner.
     get ctx(){ return bootCtx(); },
-    tap: function(){ playTone(523, 0.18, 'triangle', 0.09, true); },
-    success: function(){ playArpeggio([523, 784], 0.2, 'sine'); },
-    warning: function(){ playTone(200, 0.25, 'sawtooth', 0.1); },
-    bell: function(){ playBell(880, 0.6); },
+    tick: function(){ if (allowed(true)) playNoise({ dur:0.022, freq:4000, q:2.4, gain:0.012 }); },
+    tap: function(){ playTone(660, 0.045, 'sine', 0.065, true, { transientDur:0.008, transientFreq:4000, transientQ:2.4, transientGain:0.01, filter:3600, filterEnd:3000, reverb:0.03 }); },
+    toggleOn: function(){ playArpeggio([587, 784], 0.09, 'sine', { interval:0.035, noteDur:0.055, gain:0.07, filter:3200, reverb:0.07, transientDur:0.008 }); },
+    toggleOff: function(){ playArpeggio([784, 587], 0.09, 'sine', { interval:0.035, noteDur:0.055, gain:0.06, filter:2800, reverb:0.05, transientDur:0.008 }); },
+    nav: function(){ if (allowed()) { playVoice({ freq:494, type:'sine', dur:0.11, attack:0.008, gain:0.06, filter:1100, filterEnd:3000, detune:true, reverb:0.06 }); playNoise({ dur:0.01, freq:2800, q:1.4, gain:0.007 }); } },
+    sheetOpen: function(){ if (allowed()) { playVoice({ freq:392, type:'sine', dur:0.18, attack:0.012, gain:0.045, filter:2800, filterEnd:900, detune:true, reverb:0.12 }); playNoise({ dur:0.025, freq:1800, q:0.9, gain:0.008 }); } },
+    sheetClose: function(){ if (allowed()) { playVoice({ freq:587, type:'sine', dur:0.14, attack:0.008, gain:0.04, filter:800, filterEnd:3000, detune:true, reverb:0.08 }); playNoise({ dur:0.014, freq:2600, q:1.5, gain:0.006 }); } },
+    success: function(){ playArpeggio([523, 659, 784], 0.42, 'sine', { interval:0.06, noteDur:0.30, gain:0.085, filter:3800, reverb:0.18, transientDur:0.012 }); },
+    bell: function(){ playBell(880, 0.9); },
+    warning: function(){ playTone(392, 0.26, 'triangle', 0.07, false, { filter:2400, filterEnd:1400, reverb:0.05, transientDur:0.012, transientFreq:1900, transientGain:0.008 }); },
+    error: function(){ playArpeggio([330, 294], 0.3, 'triangle', { interval:0.07, noteDur:0.20, gain:0.035, filter:1800, reverb:0.04, transientDur:0.012, transientFreq:1500, transientGain:0.006 }); },
     // FX-P-51: metin tabanlı sesli rehberlik. Web Speech API (speechSynthesis)
     // üzerinden çalışır; yoksa veya gating kapalıysa sessizce false döner.
     isVoiceEnabled: function(){
@@ -637,7 +647,7 @@
     close:       { sound:'sheetClose', haptic:'tap',     ripple:false },
     toggle:      { sound:'toggleOn',   haptic:'tap',     ripple:true  },
     confirm:     { sound:'success',    haptic:'success', ripple:true  },
-    destructive: { sound:'warning',    haptic:'error',   ripple:true  },
+    destructive: { sound:'error',      haptic:'error',   ripple:true  },
     none:        null
   };
   var FX_FALLBACK = { nav:'tap', sheetOpen:'tap', sheetClose:'tap',

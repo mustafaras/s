@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-21** — hava modu (8 WMO sahnesi) |
-| Sıradaki prompt | **FX2-22** — mevsim katmanı |
+| Son tamamlanan prompt | **FX2-22** — mevsim katmanı + günlük varyasyon |
+| Sıradaki prompt | **FX2-23** — (Dalga 5 kapanışı) |
 | Aşama | Dalga 5 — Canlı Zemin |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -485,6 +485,30 @@ yok). `app.js` bu kartta **hiç açılmadı**.
 +6 ile dolar). Push/deploy/browser/server/network/coverage.json yok.
 
 Durum: `FX2-21 → FX2-22`, blokaj yok.
+
+---
+
+## FX2-22 — Tamamlandı (2026-09-07) · Mevsim Katmanı + Günlük Varyasyon
+
+`SeyAmbience.seasonClass(now)` eklendi → 6 `amb-season-*` sahnesi (spring/
+summer/autumn/winter + ramazan + newyear); `SeyTimeTheme.seasonalClass`'a
+**dokunulmadı (I2)** — ayrı ad alanı. `scene().season` artık
+`this.seasonClass(now)` ile dolar. CSS'e 6 `--season-accent` tonu (2 tema,
+toplam ~12 kural) + iki kalıcı yüzeyin (`--elev-3`) kenar ışığı; mevsim
+**yalnız** `--season-accent` yazar, zemine/dokuya/metne karışmaz. `--amb-seed`
+gradient açısını `--amb-angle` (170° ± 8°) ile kaydırır — gün içinde sabit,
+gün gün değişir. Zaman gradientleri `170deg` → `var(--amb-angle)`.
+
+**Kombinasyon:** 4 zaman × 8 hava × 6 mevsim = **192** (hedef ≥ 150).
+
+**Kanıt:** syntax PASS; `amb-season-` styles 14 (≥12), `seasonClass` timeTheme
+3 (≥2), `seasonalClass` korundu 4 (I2), `amb-angle` styles 8 (≥5). Driver
+0 FAIL; `test_premium_time_theme` 53/53; `test_fx2_palette_contrast` 12/12;
+tüm `tests/app/*.js` PASS. **M12 12 → 18 ≥ 18** (seri kapanış kapısı FX2-23'te
+sağlanacak). Cache: styles `20260907f→g`, timeTheme `20260906d→20260907a`.
+Push/deploy/browser/server/network/coverage.json yok.
+
+Durum: `FX2-22 → FX2-23`, blokaj yok.
 
 ---
 

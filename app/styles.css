@@ -1831,17 +1831,22 @@
 .sey-ring-seg{ transition:stroke-dashoffset var(--dur-4) var(--ease-out); }
 @media (prefers-reduced-motion: reduce){ .sey-ring-seg{ transition:none!important; } }
 /* FX2-20: canlı zemin — zaman katmanı. --page'i sahne ezer. */
-#root[class*="amb-time-"]{ transition: background var(--dur-5) var(--ease-glide); }
+/* FX2-22: --amb-seed günlük varyasyon — gradient açısını ±8° kaydırır.
+   apply() zaten --amb-seed yazıyor (gün içinde SABİT, gün gün değişir). */
+#root[class*="amb-time-"]{
+  transition: background var(--dur-5) var(--ease-glide);
+  --amb-angle: calc(170deg + (var(--amb-seed, .5) - .5) * 16deg);
+}
 
-#root.amb-time-dawn { --page: linear-gradient(170deg,#FFF6EC 0%,#FBEBD8 46%,#F4EFF2 100%); }
-#root.amb-time-day  { --page: linear-gradient(170deg,#FDFBF7 0%,#F7F1E8 46%,#F2EFF4 100%); }
-#root.amb-time-dusk { --page: linear-gradient(170deg,#FBF0E4 0%,#F6E4D6 46%,#EFE9F0 100%); }
-#root.amb-time-night{ --page: linear-gradient(170deg,#F4F2F6 0%,#EDEBF2 46%,#E9E9F0 100%); }
+#root.amb-time-dawn { --page: linear-gradient(var(--amb-angle),#FFF6EC 0%,#FBEBD8 46%,#F4EFF2 100%); }
+#root.amb-time-day  { --page: linear-gradient(var(--amb-angle),#FDFBF7 0%,#F7F1E8 46%,#F2EFF4 100%); }
+#root.amb-time-dusk { --page: linear-gradient(var(--amb-angle),#FBF0E4 0%,#F6E4D6 46%,#EFE9F0 100%); }
+#root.amb-time-night{ --page: linear-gradient(var(--amb-angle),#F4F2F6 0%,#EDEBF2 46%,#E9E9F0 100%); }
 
-#root[data-theme="dark"].amb-time-dawn { --page: linear-gradient(170deg,#0B0806 0%,#0A0705 100%); }
+#root[data-theme="dark"].amb-time-dawn { --page: linear-gradient(var(--amb-angle),#0B0806 0%,#0A0705 100%); }
 #root[data-theme="dark"].amb-time-day  { --page:#000000; }
-#root[data-theme="dark"].amb-time-dusk { --page: linear-gradient(170deg,#0A0706 0%,#080607 100%); }
-#root[data-theme="dark"].amb-time-night{ --page: linear-gradient(170deg,#04060A 0%,#000000 100%); }
+#root[data-theme="dark"].amb-time-dusk { --page: linear-gradient(var(--amb-angle),#0A0706 0%,#080607 100%); }
+#root[data-theme="dark"].amb-time-night{ --page: linear-gradient(var(--amb-angle),#04060A 0%,#000000 100%); }
 
 @media (prefers-reduced-motion: reduce){
   #root[class*="amb-time-"]{ transition:none!important; }
@@ -1927,6 +1932,34 @@
 
 /* Batarya: sekme arka plandayken hava animasyonları duraklar. */
 #root.amb-paused #sey-aurora::after{ animation-play-state:paused; }
+
+/* ── FX2-22: mevsim katmanı — yalnız --season-accent ───────────────────
+   Zemin zamanın, doku havanın, AKŞAN mevsimin. Üçü asla aynı özelliği
+   yazmaz — birbirini ezmezler. Mevsim zemini/metni DEĞİŞTİRMEZ. */
+#root.amb-season-spring { --season-accent:#A3B86C; }
+#root.amb-season-summer { --season-accent:#D9B44A; }
+#root.amb-season-autumn { --season-accent:#C08552; }
+#root.amb-season-winter { --season-accent:#8FA6B8; }
+#root.amb-season-ramazan{ --season-accent:#6E9E8A; }
+#root.amb-season-newyear{ --season-accent:#C9A227; }
+
+#root[data-theme="dark"].amb-season-spring { --season-accent:#BCD08A; }
+#root[data-theme="dark"].amb-season-summer { --season-accent:#EBCB6A; }
+#root[data-theme="dark"].amb-season-autumn { --season-accent:#D9A272; }
+#root[data-theme="dark"].amb-season-winter { --season-accent:#AFC2D2; }
+#root[data-theme="dark"].amb-season-ramazan{ --season-accent:#8FBFAB; }
+#root[data-theme="dark"].amb-season-newyear{ --season-accent:#E0BE4E; }
+
+/* Mevsim aksanı yalnız iki kalıcı yüzeyin kenar ışığında görünür —
+   metin veya zemin rengine ASLA karışmaz (contrast riski sıfır). */
+#root[class*="amb-season-"] .sey-appheader{
+  box-shadow: var(--elev-3),
+              0 8px 18px color-mix(in srgb,var(--season-accent) 18%,transparent);
+}
+#root[class*="amb-season-"] .sey-bottomnav-surface{
+  box-shadow: var(--elev-3),
+              0 10px 22px color-mix(in srgb,var(--season-accent) 18%,transparent);
+}
 .sey-enter-delay-1 { animation-delay: 60ms; }
 .sey-enter-delay-2 { animation-delay: 120ms; }
 .sey-enter-delay-3 { animation-delay: 180ms; }

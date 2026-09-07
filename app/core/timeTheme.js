@@ -108,10 +108,29 @@
     return x - Math.floor(x);
   }
 
+  // Mevsim + özel gün. SeyTimeTheme.seasonalClass'a DOKUNMAZ (I2) ; amb-*
+  // ad alanına kendi mantığını çevirir. Yalnız --season-accent'i etkiler.
+  function seasonClass(now){
+    var d = now || new Date();
+    var m = d.getMonth() + 1, day = d.getDate();
+    if (m === 1 && day === 1) return 'amb-season-newyear';
+    try{
+      if (window.HijriCalendarV1 && window.HijriCalendarV1.todayStr){
+        var h = window.HijriCalendarV1.todayStr();
+        if (h && /\b9\b/.test(String(h).split(' ')[1] || '')) return 'amb-season-ramazan';
+      }
+    }catch(e){}
+    if (m >= 3  && m <= 5)  return 'amb-season-spring';
+    if (m >= 6  && m <= 8)  return 'amb-season-summer';
+    if (m >= 9  && m <= 11) return 'amb-season-autumn';
+    return 'amb-season-winter';
+  }
+
   window.SeyAmbience = {
     weatherClass: weatherClass,
     intensity: intensity,
     seed: seed,
+    seasonClass: seasonClass,
     // Saf: girdi verilirse onu kullanır, verilmezse canlı veriyi okur.
     // FX2-20 zaman katmanını ekler, FX2-22 mevsim katmanını dolduracak.
     // Gerçek güneş saatine göre 4 dilim. sunrise/sunset yoksa
@@ -137,7 +156,7 @@
       return {
         time:    this.timeClass(now, spot),
         weather: weatherClass(s && s.code),
-        season:  '',                             // FX2-22 dolduracak
+        season:  this.seasonClass(now),         // FX2-22: mevsim katmanı
         isDay:   s ? s.isDay !== false : true,
         intensity: intensity(s),
         seed:    seed(now)

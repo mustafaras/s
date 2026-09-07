@@ -542,6 +542,27 @@
     var s = settings();
     return isPremiumFxEnabled() && s.uiSounds !== false;
   }
+  var counterValues = Object.create(null);
+  function sweepCounters(){
+    if (!document.querySelectorAll) return;
+    var nodes = document.querySelectorAll('[data-countup]');
+    Array.prototype.forEach.call(nodes, function(el){
+      var to = Number(el.getAttribute('data-countup'));
+      if (isNaN(to)) return;
+      var key = el.getAttribute('data-countup-key') || el.id || '';
+      var prevRaw = key ? counterValues[key] : (el.dataset && el.dataset.prev);
+      if (prevRaw == null){
+        if (key) counterValues[key] = String(to);
+        else if (el.dataset) el.dataset.prev = String(to);
+        return;
+      }
+      var from = Number(prevRaw);
+      if (from === to) return;
+      if (key) counterValues[key] = String(to);
+      else if (el.dataset) el.dataset.prev = String(to);
+      window.SeyFx.countUp({ el: el, from: from, to: to, duration: 500 });
+    });
+  }
 
   window.SeyFx = {
     isPremiumFxEnabled: isPremiumFxEnabled,
@@ -549,6 +570,7 @@
     shouldAnimate: shouldAnimate,
     ambientAllowed: ambientAllowed,
     isSoundAllowed: isSoundAllowed,
+    sweepCounters: sweepCounters,
     countUp: function(options){
       // FX-P-34: sayaç değerlerini yumuşak artışla günceller.
       // reduced-motion'da doğrudan hedef değeri yazar (animasyonu atlar).

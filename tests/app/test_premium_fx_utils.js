@@ -25,7 +25,7 @@ function loadMediaFx(opts){
   var document = {
     createElement: function(tag){ return { className:'', style:{}, classList:{ add:function(){}, remove:function(){} }, remove:function(){}, appendChild:function(){} }; },
     querySelector: function(){ return null; },
-    querySelectorAll: function(){ return []; },
+    querySelectorAll: function(selector){ return selector === '[data-countup]' ? (opts.counterNodes || []) : []; },
     getElementById: function(){ return null; }
   };
   var win = {
@@ -52,7 +52,7 @@ console.log('[1] SeyFx API yüzeyi tanımlı');
   ['isPremiumFxEnabled','prefersReducedMotion','shouldAnimate','ambientAllowed','isSoundAllowed'].forEach(function(f){
     ok('SeyFx.'+f+' fonksiyonu var', typeof SeyFx[f] === 'function');
   });
-  ['countUp','ripple','shimmer'].forEach(function(f){
+  ['countUp','sweepCounters','ripple','shimmer'].forEach(function(f){
     ok('SeyFx.'+f+' fonksiyonu var', typeof SeyFx[f] === 'function');
   });
 })();
@@ -136,6 +136,48 @@ console.log('\n[6] countUp reduced-motion\'da doğrudan hedef yazar');
   var fakeEl = { set textContent(v){ textVal = v; }, get textContent(){ return textVal; } };
   win.SeyFx.countUp({ el: fakeEl, from: 0, to: 1500, duration: 500 });
   ok('reduced-motion\'da doğrudan 1500 yazar', String(textVal) === '1500', 'text: '+textVal);
+})();
+
+// ── Test 6b: sweepCounters ilk boyamayı atlar, değişimi yakalar ─────────────
+console.log('\n[6b] sweepCounters ilk boyama ve değişim sözleşmesi');
+(function(){
+  function counter(key, value, initialText){
+    var text = initialText == null ? String(value) : String(initialText);
+    return {
+      dataset: {},
+      getAttribute: function(name){
+        if(name === 'data-countup') return String(value);
+        if(name === 'data-countup-key') return key;
+        return null;
+      },
+      set textContent(next){ text = String(next); },
+      get textContent(){ return text; }
+    };
+  }
+  var opts = { settings: { premiumAtmosphere: true }, reducedMotion: true, counterNodes: [] };
+  var first = counter('water', 2);
+  opts.counterNodes = [first];
+  var win = loadMediaFx(opts);
+  win.SeyFx.sweepCounters();
+  ok('ilk boyamada hedef metin değişmez', first.textContent === '2', 'text: '+first.textContent);
+
+  var changed = counter('water', 5, 999);
+  opts.counterNodes = [changed];
+  win.SeyFx.sweepCounters();
+  ok('yeni DOM düğümünde önceki değer anahtarla korunur', changed.textContent === '5', 'text: '+changed.textContent);
+  ok('reduced-motion değişimi doğrudan hedefe geçirir', changed.textContent === '5');
+
+  var liveOpts = { settings: { premiumAtmosphere: true }, reducedMotion: false, counterNodes: [] };
+  liveOpts.counterNodes = [counter('streak', 3)];
+  var liveWin = loadMediaFx(liveOpts);
+  liveWin.SeyFx.sweepCounters();
+  var call = null, callCount = 0;
+  liveWin.SeyFx.countUp = function(options){ call = options; callCount++; };
+  liveOpts.counterNodes = [counter('streak', 4)];
+  liveWin.SeyFx.sweepCounters();
+  ok('değer değişince countUp önceki ve hedef değerle çağrılır', callCount === 1 && call.from === 3 && call.to === 4 && call.duration === 500);
+  liveWin.SeyFx.sweepCounters();
+  ok('aynı değer yeniden animasyon başlatmaz', callCount === 1);
 })();
 
 // ── Test 7: shimmer gating açıkken class ekler, kapalıyken eklemez ──────────

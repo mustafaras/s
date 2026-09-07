@@ -1827,6 +1827,9 @@
   animation-delay:calc(var(--i,0) * 35ms);
 }
 @media (prefers-reduced-motion: reduce){ .sey-stagger{ animation:none!important; } }
+/* FX2-18: ringSeg halkaları yalnız stroke-dashoffset üzerinden yumuşar. */
+.sey-ring-seg{ transition:stroke-dashoffset var(--dur-4) var(--ease-out); }
+@media (prefers-reduced-motion: reduce){ .sey-ring-seg{ transition:none!important; } }
 .sey-enter-delay-1 { animation-delay: 60ms; }
 .sey-enter-delay-2 { animation-delay: 120ms; }
 .sey-enter-delay-3 { animation-delay: 180ms; }

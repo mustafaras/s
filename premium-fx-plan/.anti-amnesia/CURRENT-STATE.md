@@ -11,9 +11,9 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-17** — CSS tabanlı sınırlı liste stagger sistemi |
-| Sıradaki prompt | **FX2-18** — sayaç ve halka canlandırma |
-| Aşama | Dalga 4 — Hareket Sistemi |
+| Son tamamlanan prompt | **FX2-18** — sayaç ve halka canlandırma |
+| Sıradaki prompt | **FX2-19** — canlı zemin çekirdeği |
+| Aşama | Dalga 5 — Canlı Zemin |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
 
@@ -358,6 +358,30 @@ ve `onclick=391` korundu. Push/deploy/browser yok.
 
 Durum: `FX2-17 → FX2-18`, blokaj yok.
 
+## FX2-18 — Tamamlandı (2026-09-07)
+
+`SeyFx.sweepCounters()` kalıcı sayaç anahtarlarıyla ilk boyamayı animasyonsuz
+kaydeder; `app.innerHTML` yeniden kurulduğunda önceki değeri koruyup yalnız
+hedef değişiminde `countUp` çalıştırır. Reduced-motion hedef değeri doğrudan
+yazar. `app.js` içinde beslenme, motivasyon, terapi ve hero/ritim yüzeylerine
+10 kaynak satırında `data-countup` bağlandı; `App.waterAdd` içindeki manuel
+çağrı kaldırıldı.
+
+`ringSeg(cx,cy,R,C,color,startFrac,lenFrac,w)` imzası korunarak ürettiği
+circle'a `sey-ring-seg` eklendi; stroke-dashoffset geçişi tokenlı ve
+reduced-motion altında kapalıdır. Cache sürümleri CSS/app `20260907d`,
+mediaFx `20260907c`. Dar `test_premium_fx_utils.js` fixture'ı API, ilk boyama,
+yeni DOM düğümünde değer değişimi, tekrar etmeme ve reduced-motion davranışını
+35/35 ile kilitler.
+
+Kanıt: syntax, driver + `--dump bugun`, zikir 95/95, app 34/34, panel 23/23,
+Panel-v2 27/27, Kur'an 9/9, reminder ve B1/B2/B3 PASS. Salt-okunur kapsam
+M5 **1 → 10 ≥ 8**; `coverage.json` yazılmadı. `App.*=718`, `onclick=391`,
+manuel `SeyFx.countUp`=0; ringSeg/progBar imzaları aynı. Browser/server,
+network, push/deploy yok.
+
+Durum: `FX2-18 → FX2-19`, blokaj yok; Dalga 4 kapandı.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -400,7 +424,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-18.md`](../.prompts/FX2-18.md)
+2. Kart: [`../.prompts/FX2-19.md`](../.prompts/FX2-19.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

@@ -7595,7 +7595,7 @@ App.setMealItemQty=function(key,idx,el){ var day=curDay(); var it=day.mealItems[
 App.setMealItemUnit=function(key,idx,el){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.unit=el.value; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(null,mealItemEventMeta(key,day)); };
 
 // ---- su ----
-App.waterAdd=function(n){ if (n>0 && window.SeyHaptics && typeof window.SeyHaptics.water === 'function') { window.SeyHaptics.water(); } var day=curDay(); var before=Number(day.water)||0; var v=before+n; day.water=Math.max(0,Math.min(20,v)); var nw=syncDerivedHabits(day); if(nw.indexOf('water')>=0){ var g=waterGoalCups(); haptic(16); toast('Su tamam — '+g+'/'+g+' bardak! Su tiki kendiliğinden yeşillendi.'); } day.savedAt=new Date().toISOString(); commit(null,{section:'nutrition',path:'data.days.*.water',operation:'update',summary:'Beslenme kaydı güncellendi',detail:'Su',value:String(day.water)+' bardak',field:'water'}); if(window.SeyFx&&typeof window.SeyFx.countUp==='function'){ var el=document.querySelector('.sey-hero-stat[data-stat="water"]'); if(el){ var valEl=el.querySelector('.sey-hero-stat-val'); if(valEl) window.SeyFx.countUp({el:valEl,from:before,to:day.water,duration:500}); } } };
+App.waterAdd=function(n){ if (n>0 && window.SeyHaptics && typeof window.SeyHaptics.water === 'function') { window.SeyHaptics.water(); } var day=curDay(); var before=Number(day.water)||0; var v=before+n; day.water=Math.max(0,Math.min(20,v)); var nw=syncDerivedHabits(day); if(nw.indexOf('water')>=0){ var g=waterGoalCups(); haptic(16); toast('Su tamam — '+g+'/'+g+' bardak! Su tiki kendiliğinden yeşillendi.'); } day.savedAt=new Date().toISOString(); commit(null,{section:'nutrition',path:'data.days.*.water',operation:'update',summary:'Beslenme kaydı güncellendi',detail:'Su',value:String(day.water)+' bardak',field:'water'}); };
 
 // ---- enerji / stres ----
 App.setEnergy=function(v){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var day=curDay(); day.energy=(day.energy===v?null:v); day.savedAt=new Date().toISOString(); var labels={'1':'Düşük','2':'Az','3':'Orta','4':'Yüksek','5':'Zirve'}; haptic(10); save(false,{message:'Enerji seviyesi güncellendi',meta:{section:'wellness',path:'data.days.*.energy',operation:'update',summary:'Enerji seviyesi güncellendi',detail:'Enerji',value:labels[v]||v,field:'energy'}}); updateCardByKey('mood'); updateCardByKey('mental'); };
@@ -9195,6 +9195,7 @@ function render(){
   if(window.SeyTimeTheme && typeof window.SeyTimeTheme.applySeasonal==='function'){
     try{ window.SeyTimeTheme.applySeasonal(); }catch(e){}
   }
+  try{ if(window.SeyFx && typeof window.SeyFx.sweepCounters==='function') window.SeyFx.sweepCounters(); }catch(e){}
   // iOS/PWA durum çubuğu rengini mevcut tema ile senkronize tut; açık/koyu geçişlerinde flaş azalır.
   // Yalnızca gerçekten tema değiştiğinde meta tag'i güncelle, her render'da değil.
   var tcm=document.querySelector('meta[name="theme-color"]');
@@ -9523,15 +9524,15 @@ function beslenmeCardHTML(rec){
   var incomplete=!(hasName('breakfast')&&hasName('lunch')&&hasName('dinner'));
   var open=cardOpen('beslenme', incomplete);
   var pPct=Math.min(100,Math.round(nu.protein/pg*100));
-  var badge='<div style="text-align:right;"><div id="nutri-badgecal" style="font-size:var(--f-callout);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">kcal</div></div>';
+  var badge='<div style="text-align:right;"><div id="nutri-badgecal" data-countup="'+nu.calories+'" data-countup-key="nutrition-badge-calories" style="font-size:var(--f-callout);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">kcal</div></div>';
   var subtitle='<span id="nutri-subtitle">'+nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ</span>';
   var b='';
   // Makro özeti
   b+='<div style="background:var(--icon);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:10px;">';
   b+='<div style="display:flex;align-items:flex-end;gap:12px;">';
-  b+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:var(--f-caption1);color:var(--muted);font-weight:700;">Protein</span><span id="nutri-protein" style="font-size:var(--f-title2);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:var(--f-caption1);color:var(--faint);">/ '+pg+'g</span></div>';
+  b+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:var(--f-caption1);color:var(--muted);font-weight:700;">Protein</span><span id="nutri-protein" style="font-size:var(--f-title2);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;"><span data-countup="'+nu.protein+'" data-countup-key="nutrition-protein">'+nu.protein+'</span>g</span><span style="font-size:var(--f-caption1);color:var(--faint);">/ '+pg+'g</span></div>';
   b+='<div style="height:8px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;margin-top:5px;"><div id="nutri-bar" style="height:100%;width:'+pPct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .4s ease;"></div></div></div>';
-  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:var(--f-title3);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:var(--f-caption2);color:var(--faint);margin-top:2px;">/ '+cg+' kcal</div></div>';
+  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" data-countup="'+nu.calories+'" data-countup-key="nutrition-calories" style="font-size:var(--f-title3);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:var(--f-caption2);color:var(--faint);margin-top:2px;">/ '+cg+' kcal</div></div>';
   b+='</div>';
   b+='<div id="nutri-macrobar">'+macroBarHTML(nu)+'</div>';
   b+='<div style="display:flex;gap:12px;font-size:var(--f-caption2);color:var(--muted);flex-wrap:wrap;">';
@@ -10370,9 +10371,9 @@ function motivationTodayCardHTML(){
 // metinleri (açıklama, mercek, yansıma sorusu, sabah/akşam/zor gün notları) burada.
 function roomStatsHTML(sum,fi){
   var h='<div style="display:flex;gap:8px;font-size:var(--f-caption1);'+(fi?fi(0.22):'')+'">';
-  h+='<span style="flex:1;background:rgba(233,175,193,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('route',14)+' Yol <b style="margin-left:auto;">'+sum.pathStreak+'</b></span>';
-  h+='<span style="flex:1;background:rgba(201,184,255,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('heart-handshake',14)+' Cesaret <b style="margin-left:auto;">'+sum.courageEvidence+'</b></span>';
-  h+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('rotate-ccw',14)+' Dönüş <b style="margin-left:auto;">'+sum.returnCount+'</b></span>';
+  h+='<span style="flex:1;background:rgba(233,175,193,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('route',14)+' Yol <b data-countup="'+sum.pathStreak+'" data-countup-key="room-path-streak" style="margin-left:auto;">'+sum.pathStreak+'</b></span>';
+  h+='<span style="flex:1;background:rgba(201,184,255,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('heart-handshake',14)+' Cesaret <b data-countup="'+sum.courageEvidence+'" data-countup-key="room-courage" style="margin-left:auto;">'+sum.courageEvidence+'</b></span>';
+  h+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('rotate-ccw',14)+' Dönüş <b data-countup="'+sum.returnCount+'" data-countup-key="room-return-count" style="margin-left:auto;">'+sum.returnCount+'</b></span>';
   h+='</div>';
   return h;
 }
@@ -10406,7 +10407,7 @@ function roomOverlayHTML(){
   h+='</div>';
   h+='<div style="position:relative;display:flex;align-items:center;gap:8px;">';
   h+='<div style="flex:1;min-width:0;font-size:var(--f-footnote);line-height:1.35;"><b style="color:var(--text);font-weight:800;">'+esc(motDayText)+'</b><span style="color:var(--muted);font-weight:700;"> · '+esc(mot.phaseTitle)+' · '+esc(mot.domainLabel)+'</span></div>';
-  h+='<div style="flex-shrink:0;font-size:var(--f-caption2);font-weight:800;padding:3px 10px;border-radius:999px;color:'+(sum.programComplete?'#fff':'var(--muted)')+';background:'+(sum.programComplete?'linear-gradient(135deg,var(--room2),var(--room))':'var(--icon)')+';">%'+pct+'</div>';
+  h+='<div style="flex-shrink:0;font-size:var(--f-caption2);font-weight:800;padding:3px 10px;border-radius:999px;color:'+(sum.programComplete?'#fff':'var(--muted)')+';background:'+(sum.programComplete?'linear-gradient(135deg,var(--room2),var(--room))':'var(--icon)')+';">%<span data-countup="'+pct+'" data-countup-key="motivation-overlay-percent">'+pct+'</span></div>';
   h+='</div>';
   h+='<div style="position:relative;height:6px;border-radius:999px;background:var(--icon);overflow:hidden;box-shadow:0 0 10px var(--room-glow);"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--room2),var(--room));border-radius:999px;position:relative;overflow:hidden;transition:width .4s var(--ease-premium,ease);"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 2.6s ease-in-out infinite;"></span></div></div>';
   h+='</div>';
@@ -11289,7 +11290,7 @@ function heroTargetsHTML(rec){
       +'<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">'
       +'<span style="display:inline-flex;color:'+col+';">'+icon(icName,icSize||13)+'</span>'
       +'</div></div>'
-      +'<div style="display:flex;align-items:baseline;gap:2px;line-height:1;white-space:nowrap;">'+curTxt+'</div>'
+      +'<div style="display:flex;align-items:baseline;gap:2px;line-height:1;white-space:nowrap;">'+(has?('<span data-countup="'+Math.round(cur)+'" data-countup-key="hero-target-'+label+'" style="font-size:var(--f-subhead);font-weight:800;color:var(--text);letter-spacing:-0.3px;">'+Math.round(cur)+'</span><span style="font-size:var(--f-caption2);color:var(--faint);font-weight:700;">/'+Math.round(goal)+'</span>'):curTxt)+'</div>'
       +'<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.35px;color:var(--faint);text-transform:uppercase;">'+label+'</span>'
       +'</div>';
   };
@@ -11346,9 +11347,9 @@ function heroPremiumStatsHTML(viewDate){
   var vline='<span style="width:1px;align-self:stretch;background:var(--card-bd);margin:2px 0;"></span>';
   var h='<div style="background:var(--icon);border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;gap:10px;">';
   h+='<div style="display:flex;align-items:center;">';
-  h+=cell(icon('flame',14),streak+(streak===1?' gün':' gün'),'Seri','#E8894A');
+  h+=cell(icon('flame',14),'<span data-countup="'+streak+'" data-countup-key="hero-streak">'+streak+'</span> gün','Seri','#E8894A');
   h+=vline;
-  h+=cell(null,'%'+wpct,'7 Günlük ritim');
+  h+=cell(null,'%<span data-countup="'+wpct+'" data-countup-key="hero-weekly-rhythm">'+wpct+'</span>','7 Günlük ritim');
   h+=vline;
   h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="sey-tiny-hit" style="display:flex;align-items:center;gap:3px;min-height:16px;">'+moodDots+'</div><span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">Mod · 7 gün</span></div>';
   h+='</div>';
@@ -12717,7 +12718,7 @@ function calcAge(birthDate){
   return age>=0?age:null;
 }
 function profileAgeLabel(birthDate){ var a=calcAge(birthDate); return a!=null?a+' yaş':'<span style="color:var(--faint);">—</span>'; }
-function ringSeg(cx,cy,R,C,color,startFrac,lenFrac,w){ if(lenFrac<=0) return ''; return '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="'+w+'" stroke-dasharray="'+(lenFrac*C).toFixed(2)+' '+(C-lenFrac*C).toFixed(2)+'" stroke-dashoffset="'+(-startFrac*C).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"></circle>'; }
+function ringSeg(cx,cy,R,C,color,startFrac,lenFrac,w){ if(lenFrac<=0) return ''; return '<circle class="sey-ring-seg" cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="'+w+'" stroke-dasharray="'+(lenFrac*C).toFixed(2)+' '+(C-lenFrac*C).toFixed(2)+'" stroke-dashoffset="'+(-startFrac*C).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"></circle>'; }
 
 function activityRings(rec){
   var es=effSteps(rec);

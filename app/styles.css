@@ -1715,6 +1715,36 @@
   }
 }
 
+/* FX2-16: ortak sheet yüzeyleri açılışta alttan gelir; kapanış render()'dan
+   önce SeyFx.sheetClose ile tamamlanır. Mevcut inline seyPop/seyFade
+   animasyonlarını yalnız bu overlay yaşam döngüsünde kasıtlı olarak ezer. */
+.sey-sheet-in,
+#sey-ov-card,#zikr-screen,#quran-screen,#qibla-dialog,#sey-reminder-screen{
+  animation:sey-sheet-in var(--dur-4) var(--ease-spring) !important;
+}
+.sey-sheet-out{
+  animation:sey-sheet-out var(--dur-3) var(--ease-in) forwards !important;
+}
+.sey-backdrop-out{
+  animation:sey-backdrop-out var(--dur-3) var(--ease-in) forwards !important;
+}
+@keyframes sey-sheet-in{
+  from{transform:translateY(100%);opacity:.4;}
+  to{transform:none;opacity:1;}
+}
+@keyframes sey-sheet-out{
+  to{transform:translateY(100%);opacity:0;}
+}
+@keyframes sey-backdrop-out{
+  to{opacity:0;}
+}
+@media (prefers-reduced-motion: reduce){
+  .sey-sheet-in,.sey-sheet-out,.sey-backdrop-out,
+  #sey-ov-card,#zikr-screen,#quran-screen,#qibla-dialog,#sey-reminder-screen{
+    animation:none!important;
+  }
+}
+
 /* FX2-07: `.sey-press` — SeyTouch'ın taktığı basma durumu. Markup değişmez.
    ÖNEMLİ: premiumAtmosphere'a BAĞLI DEĞİLDİR — basma geri bildirimi
    erişilebilirliktir, süs değil (SAFEGUARDS §2). */

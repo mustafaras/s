@@ -319,6 +319,28 @@ yazılmadı. `App.*` 718 (`App._goTimer` dahil), `onclick=391`; `render()`,
 `paint()` ve scroll/odak restorasyonu dokunulmadı. Push/deploy/browser yok.
 Durum: `FX2-15 → FX2-16`, blokaj yok.
 
+## FX2-16 — Tamamlandı (2026-09-07)
+
+On iki hedef overlay kapatıcısı yalnız kendi dış sarmalayıcısında `SeyFx.sheetClose`
+üzerinden çalışır: ortak `#sey-ov-card/#sey-ov-back`, Zikirmatik, Kur'an,
+Kıble ve Reminder yüzeyleri doğru kart/backdrop kimlikleriyle bağlandı. Eski
+kapatma gövdeleri — odak iadesi, scroll kilidi, render ve kayıt sırası dahil —
+aynen `body` callback'i içinde kaldı. Yardımcı premium/reduced-motion kapalıysa
+senkron eski yolu anında kullanır; açıksa kart/backdrop çıkış sınıflarını ekler,
+kartın kendi `animationend` olayını dinler ve 260 ms ağ ile en fazla bir kez
+tamamlar. Çocuk animationend olayları erken kapatmaz, çift kapatma ikinci gövdeyi
+çalıştırmaz.
+
+CSS, ortak ve dört özel sheet yüzeyini tokenlı alttan girişe bağlar; çıkış ve
+backdrop fade aynı tokenlarla çalışır, reduced-motion bunları tamamen kapatır.
+Cache sürümleri CSS/mediaFx/app için `20260907b` oldu. Yeni ağsız
+`tests/app/test_fx2_overlay_motion.js` 7/7; mevcut reduced-motion fixture'ı
+yeni üç sınıfı açıkça kapsar (34/34). Salt-okunur ölçüm M6 **0 → 12 ≥ 10**;
+`coverage.json` yazılmadı. `App.*=718`, `onclick=391`; `render()`, `paint()`,
+modal odak ve scroll kilidi dokunulmadı. Push/deploy/browser yok.
+
+Durum: `FX2-16 → FX2-17`, blokaj yok.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -361,7 +383,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-16.md`](../.prompts/FX2-16.md)
+2. Kart: [`../.prompts/FX2-17.md`](../.prompts/FX2-17.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

@@ -49,7 +49,10 @@ console.log('\n[2] Premium animasyon class’ları reduce-motion kapsamında');
     '.sey-time-theme',
     '.sey-fx-count',
     '.sey-fx-bounce',
-    '.sey-ripple'
+    '.sey-ripple',
+    '.sey-sheet-in',
+    '.sey-sheet-out',
+    '.sey-backdrop-out'
   ];
   // Henüz class'lar CSS'te tanımlı olmayabilir; test kuralı:
   // ya class'lar tanımlı ve reduce bloğunda animation/transition none var,

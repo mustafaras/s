@@ -6650,10 +6650,13 @@ App.openReminderCenter=function(){
   try{ var screen=document.getElementById('sey-reminder-screen'); if(screen&&screen.focus) screen.focus(); }catch(e){}
 };
 App.closeReminderCenter=function(){
-  var returnId=ui.reminderReturnFocusId||'sey-reminder-settings-entry';
-  reminderUnlockBodyScroll(); ui.reminderCenterOpen=false; ui.reminderReturnFocusId=''; ui.reminderTargetReturnFocusId=''; ui.reminderPreviewId=''; ui.reminderPreviewLegacyId=''; ui.reminderTodayMuted=false; ui.reminderCenterNotice=''; ui.reminderCenterUndo=null; ui.reminderAllUndo=null; ui.reminderHistoryUndo=null; ui.reminderTestState=null; ui.reminderDigestOpen=false; ui.reminderDigestState='idle'; ui.reminderDigestReflection=''; render();
-  var trigger=document.getElementById(returnId);
-  if(trigger&&trigger.focus) trigger.focus(); else reminderRestoreFocus(returnId,'sey-reminder-settings-entry');
+  var body=function(){
+    var returnId=ui.reminderReturnFocusId||'sey-reminder-settings-entry';
+    reminderUnlockBodyScroll(); ui.reminderCenterOpen=false; ui.reminderReturnFocusId=''; ui.reminderTargetReturnFocusId=''; ui.reminderPreviewId=''; ui.reminderPreviewLegacyId=''; ui.reminderTodayMuted=false; ui.reminderCenterNotice=''; ui.reminderCenterUndo=null; ui.reminderAllUndo=null; ui.reminderHistoryUndo=null; ui.reminderTestState=null; ui.reminderDigestOpen=false; ui.reminderDigestState='idle'; ui.reminderDigestReflection=''; render();
+    var trigger=document.getElementById(returnId);
+    if(trigger&&trigger.focus) trigger.focus(); else reminderRestoreFocus(returnId,'sey-reminder-settings-entry');
+  };
+  if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-reminder-screen','sey-reminder-overlay',body); else body();
 };
 // Tüm gerçek modallar tek bir klavye sözleşmesini kullanır. Arka plan yalnızca
 // fare/dokunma ile kapatılabilir; odağın kendisi daima role=dialog içindedir.
@@ -7400,7 +7403,7 @@ App.browseSaygiPerson=function(delta){
   var idx=people.findIndex(function(x){ return x.id===person.id; }); if(idx<0) idx=0;
   App.openSaygiCollectionPerson(people[saygiPositiveMod(idx+(Number(delta)||0),people.length)].id);
 };
-App.closeSaygiPerson=function(){ ui.saygiPersonOpen=false; ui.saygiBrowseId=null; ui.saygiRequestId=(ui.saygiRequestId||0)+1; ui.saygiReadReady=false; saygiDisconnectReadObserver(); render(); };
+App.closeSaygiPerson=function(){ var body=function(){ ui.saygiPersonOpen=false; ui.saygiBrowseId=null; ui.saygiRequestId=(ui.saygiRequestId||0)+1; ui.saygiReadReady=false; saygiDisconnectReadObserver(); render(); }; if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-ov-card','sey-ov-back',body); else body(); };
 App.markSaygiRead=function(){
   var person=saygiModalPerson(), article=ui.saygiArticle;
   if(!person||!saygiArticleReadableFor(person,article)){ toast('Biyografi hazır olduğunda tekrar dene.'); return; }
@@ -7615,7 +7618,7 @@ App.setSleepQuality=function(id){ var day=curDay(); day.sleep.quality=(day.sleep
 App.setSleepMed=function(type){ var day=curDay(); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.type=(day.sleep.med.type===type?null:type); if(day.sleep.med.type!=='herbal'&&day.sleep.med.type!=='rx') day.sleep.med.note=''; day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMedNote=function(el){ var v=el.value; debounceSave('sleepMedNote',function(){ var day=curDay(); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.note=v; day.savedAt=new Date().toISOString(); save(); },300); };
 App.openReading=function(options){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var preserve=options&&options.preserveDraft===true; ui.readingOpen=true; if(!preserve) ui.readingView='today'; if(!preserve) ui.logBookId=null; if(!preserve||!ui.readingDraft) ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; reminderLockBodyScroll(); render(); focusModalDialog('sey-ov-card'); };
-App.closeReading=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var targetFocusId=ui.reminderTargetReturnFocusId; reminderUnlockBodyScroll(); ui.readingOpen=false; ui.readingDraft=null; ui.bookEdit=null; ui.quoteDraft=null; ui.logBookId=null; ui.reminderTargetReturnFocusId=''; render(); if(targetFocusId) reminderRestoreFocus(targetFocusId,''); };
+App.closeReading=function(){ var body=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var targetFocusId=ui.reminderTargetReturnFocusId; reminderUnlockBodyScroll(); ui.readingOpen=false; ui.readingDraft=null; ui.bookEdit=null; ui.quoteDraft=null; ui.logBookId=null; ui.reminderTargetReturnFocusId=''; render(); if(targetFocusId) reminderRestoreFocus(targetFocusId,''); }; if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-ov-card','sey-ov-back',body); else body(); };
 App.setReadingView=function(v){ ui.readingView=v; ui.bookEdit=null; ui.quoteDraft=null; render(); };
 App.onReadingField=function(field,el){ if(!ui.readingDraft) ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; ui.readingDraft[field]=el.value; };
 App.pickLogBook=function(id){ var b=findBook(id); if(!b) return; ui.logBookId=(ui.logBookId===id?null:id); if(ui.logBookId){ if(!ui.readingDraft) ui.readingDraft={}; ui.readingDraft.title=b.title; ui.readingDraft.author=b.author; } render(); };
@@ -7676,7 +7679,7 @@ App.copyReplicaById=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array
 
 // ================= NE İZLEDİM =================
 App.openWatching=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } ui.watchOpen=true; ui.watchView='today'; ui.logItemId=null; ui.watchDraft={title:'',kind:'film',episodes:'',minutes:'',note:''}; render(); focusModalDialog('sey-ov-card'); };
-App.closeWatching=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } ui.watchOpen=false; ui.watchDraft=null; ui.titleEdit=null; ui.replicaDraft=null; ui.logItemId=null; render(); };
+App.closeWatching=function(){ var body=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } ui.watchOpen=false; ui.watchDraft=null; ui.titleEdit=null; ui.replicaDraft=null; ui.logItemId=null; render(); }; if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-ov-card','sey-ov-back',body); else body(); };
 App.setWatchView=function(v){ ui.watchView=v; ui.titleEdit=null; ui.replicaDraft=null; render(); };
 App.onWatchField=function(field,el){ if(!ui.watchDraft) ui.watchDraft={title:'',kind:'film',episodes:'',minutes:'',note:''}; ui.watchDraft[field]=el.value; };
 App.setWatchDraftKind=function(k){ if(!ui.watchDraft) ui.watchDraft={}; ui.watchDraft.kind=k; render(); };
@@ -7731,7 +7734,7 @@ App.removeReplica=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.i
 
 // ================= NE DİNLEDİM =================
 App.openListening=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } ui.listeningOpen=true; ui.listeningView='today'; ui.logTrackId=null; ui.trackEdit=null; ui.lyricDraft=null; if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; render(); focusModalDialog('sey-ov-card'); };
-App.closeListening=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } ui.listeningOpen=false; ui.listeningDraft=null; ui.trackEdit=null; ui.lyricDraft=null; ui.logTrackId=null; render(); };
+App.closeListening=function(){ var body=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } ui.listeningOpen=false; ui.listeningDraft=null; ui.trackEdit=null; ui.lyricDraft=null; ui.logTrackId=null; render(); }; if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-ov-card','sey-ov-back',body); else body(); };
 App.setListeningView=function(v){ ui.listeningView=v; ui.trackEdit=null; ui.lyricDraft=null; render(); };
 App.onListeningField=function(field,el){ if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; ui.listeningDraft[field]=el.value; };
 App.setListenDraftKind=function(k){ if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; ui.listeningDraft.kind=(['sarki','album','podcast'].indexOf(k)>=0)?k:'sarki'; render(); };
@@ -7835,12 +7838,15 @@ function zikrUnlockBodyScroll(){
 }
 App.openZikr=function(){ if(!ZIKR_V2_VISIBLE){ ui.zikrOpen=false; toast('Zikirmatik yenileniyor; çok yakında daha iyi haliyle dönecek.'); return; } ui.zikrOpen=true; ui.zikrView=ui.zikrView||'counter'; _zikrCompleteFlash=false; render(); zikrSyncWakeLock(); zikrLockBodyScroll(); try{ var shell=document.getElementById('zikr-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){} };
 App.closeZikr=function(){
-  var targetFocusId=ui.reminderTargetReturnFocusId; zikrPauseSession(); ui.zikrOpen=false; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId=''; zikrSyncWakeLock(); zikrUnlockBodyScroll(); save(); _zikrCompleteFlash=false; ui.reminderTargetReturnFocusId=''; render();
-  // ZP-07 rule 5: odak, açılışta tetikleyen elemana (bilinen giriş noktası:
-  // Saygı hub'ındaki Zikirmatik önizleme kartı) döner. render() tüm #app
-  // innerHTML'ini yeniden ürettiğinden eski DOM referansı tutulamaz; bu
-  // yüzden kapalıktan sonra kararlı id ile yeniden sorgulanır.
-  if(!reminderRestoreFocus(targetFocusId,'zikr-preview-card')){ try{ var trigger=document.getElementById('zikr-preview-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){} }
+  var body=function(){
+    var targetFocusId=ui.reminderTargetReturnFocusId; zikrPauseSession(); ui.zikrOpen=false; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId=''; zikrSyncWakeLock(); zikrUnlockBodyScroll(); save(); _zikrCompleteFlash=false; ui.reminderTargetReturnFocusId=''; render();
+    // ZP-07 rule 5: odak, açılışta tetikleyen elemana (bilinen giriş noktası:
+    // Saygı hub'ındaki Zikirmatik önizleme kartı) döner. render() tüm #app
+    // innerHTML'ini yeniden ürettiğinden eski DOM referansı tutulamaz; bu
+    // yüzden kapalıktan sonra kararlı id ile yeniden sorgulanır.
+    if(!reminderRestoreFocus(targetFocusId,'zikr-preview-card')){ try{ var trigger=document.getElementById('zikr-preview-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){} }
+  };
+  if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('zikr-screen','zikr-overlay',body); else body();
 };
 App.setZikrView=function(v){
   var allowed={counter:1,presets:1,hatims:1,history:1,settings:1};
@@ -8227,7 +8233,7 @@ App.pickSoulPractice=function(type){
   ui.soulActivityDraft={type:type||'pilates',duration:'',note:''};
   render(); focusModalDialog('sey-ov-card');
 };
-App.closeSoulActivity=function(){ ui.soulActivityOpen=false; ui.soulActivityDraft=null; render(); };
+App.closeSoulActivity=function(){ var body=function(){ ui.soulActivityOpen=false; ui.soulActivityDraft=null; render(); }; if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-ov-card','sey-ov-back',body); else body(); };
 App.onSoulField=function(field,el){ if(!ui.soulActivityDraft) ui.soulActivityDraft={type:'pilates',duration:'',note:''}; ui.soulActivityDraft[field]=el.value; };
 App.setSoulType=function(type){ if(!ui.soulActivityDraft) ui.soulActivityDraft={type:'pilates',duration:'',note:''}; ui.soulActivityDraft.type=type; render(); };
 App.saveSoulActivity=function(){
@@ -8251,13 +8257,13 @@ App.removeSoulActivity=function(id){ var day=getDay(data,todayStr(),dayIndexFor(
 
 // ================= ZİHİN-BEDEN ARŞİVİ =================
 App.openSoulArchive=function(){ ui.soulArchiveOpen=true; ui.soulArchiveFilter=null; render(); focusModalDialog('sey-ov-card'); };
-App.closeSoulArchive=function(){ ui.soulArchiveOpen=false; ui.soulArchiveFilter=null; render(); };
+App.closeSoulArchive=function(){ var body=function(){ ui.soulArchiveOpen=false; ui.soulArchiveFilter=null; render(); }; if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-ov-card','sey-ov-back',body); else body(); };
 App.setSoulArchiveFilter=function(type){ ui.soulArchiveFilter=(ui.soulArchiveFilter===type?null:type); render(); };
 App.removeSoulArchiveSession=function(id){ var found=false; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var rec=data.days[date]; if(!rec||!Array.isArray(rec.soulActivities)) return; var i=rec.soulActivities.findIndex(function(a){ return a&&a.id===id; }); if(i>=0){ var removed=rec.soulActivities[i]; unsyncSoulEntry(removed); rec.soulActivities.splice(i,1); rec.savedAt=new Date().toISOString(); found=true; } }); if(found){ commit('Pratik kaydı arşivden silindi'); } };
 
 // ================= İMAN KÖŞESİ =================
 App.openFaithCorner=function(){ ui.faithOpen=true; reminderLockBodyScroll(); render(); focusModalDialog('sey-ov-card'); if(prayerLocation()){ setTimeout(function(){ App.refreshPrayerTimes(); },80); } };
-App.closeFaithCorner=function(){ var targetFocusId=ui.reminderTargetReturnFocusId; reminderUnlockBodyScroll(); ui.faithOpen=false; ui.reminderTargetReturnFocusId=''; render(); if(!targetFocusId||!reminderRestoreFocus(targetFocusId,'')){ try{ var trigger=document.getElementById('faith-preview-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){} } };
+App.closeFaithCorner=function(){ var body=function(){ var targetFocusId=ui.reminderTargetReturnFocusId; reminderUnlockBodyScroll(); ui.faithOpen=false; ui.reminderTargetReturnFocusId=''; render(); if(!targetFocusId||!reminderRestoreFocus(targetFocusId,'')){ try{ var trigger=document.getElementById('faith-preview-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){} } }; if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-ov-card','sey-ov-back',body); else body(); };
 App.setPrayerCity=function(name){
   var c=prayerCityByName(name);
   if(!c){ toast('Şehir bulunamadı'); return; }
@@ -8312,7 +8318,7 @@ App.changeNafile=function(type,delta){
 
 // ================= NE ÖĞRENDİM =================
 App.openLearning=function(){ ui.learningOpen=true; ui.learningDraft={topic:'',source:'',note:''}; render(); focusModalDialog('sey-ov-card'); };
-App.closeLearning=function(){ ui.learningOpen=false; ui.learningDraft=null; render(); };
+App.closeLearning=function(){ var body=function(){ ui.learningOpen=false; ui.learningDraft=null; render(); }; if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('sey-ov-card','sey-ov-back',body); else body(); };
 App.onLearningField=function(field,el){ if(!ui.learningDraft) ui.learningDraft={topic:'',source:'',note:''}; ui.learningDraft[field]=el.value; };
 App.addLearning=function(){
   var d=ui.learningDraft||{};
@@ -14560,16 +14566,19 @@ App.openQuranJourney=function(){
   App.refreshQuranUpdates(true,true);
 };
 App.closeQuranJourney=function(){
-  ui.quranJourneyOpen=false;
-  ui.quranJourneyView='library';
-  ui.quranDetailId='';
-  ui.quranNoteDraft=null;
-  ui.quranPlayerLoadedId='';
-  ui.quranFiltersOpen=false;
-  quranUnlockBodyScroll();
-  render();
-  // Odak, açılışı tetikleyen hub kartına döner (kararlı id ile yeniden sorgulanır).
-  try{ var trigger=document.getElementById('quran-journey-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){}
+  var body=function(){
+    ui.quranJourneyOpen=false;
+    ui.quranJourneyView='library';
+    ui.quranDetailId='';
+    ui.quranNoteDraft=null;
+    ui.quranPlayerLoadedId='';
+    ui.quranFiltersOpen=false;
+    quranUnlockBodyScroll();
+    render();
+    // Odak, açılışı tetikleyen hub kartına döner (kararlı id ile yeniden sorgulanır).
+    try{ var trigger=document.getElementById('quran-journey-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){}
+  };
+  if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('quran-screen','quran-overlay',body); else body();
 };
 App.openQuranSurah=function(id){
   var sid=quranSafeSurahId(id);
@@ -14698,8 +14707,11 @@ App.enableQiblaCompass=function(){
   }catch(e){ ui.qiblaSensorError='Bu cihaz canlı pusulayı desteklemiyor.'; qiblaPaintLive(); toast(ui.qiblaSensorError); }
 };
 App.closeQibla=function(){
-  if(_qiblaOrientationHandler){ try{ window.removeEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.removeEventListener('deviceorientation',_qiblaOrientationHandler,true); }catch(e){} _qiblaOrientationHandler=null; }
-  _qiblaSmoothHeading=null; _qiblaAbsoluteSeen=false; ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; render();
+  var body=function(){
+    if(_qiblaOrientationHandler){ try{ window.removeEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.removeEventListener('deviceorientation',_qiblaOrientationHandler,true); }catch(e){} _qiblaOrientationHandler=null; }
+    _qiblaSmoothHeading=null; _qiblaAbsoluteSeen=false; ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; render();
+  };
+  if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('qibla-dialog','qibla-overlay',body); else body();
 };
 App.qiblaBearing=qiblaBearing; App.qiblaDistanceKm=qiblaDistanceKm; App.qiblaMetrics=qiblaMetrics;
 

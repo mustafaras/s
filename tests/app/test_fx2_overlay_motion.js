@@ -1,0 +1,124 @@
+'use strict';
+
+// FX2-16 — Overlay giriş/çıkış hareketi fixture'ı.
+// Gerçek SeyFx yardımcı fonksiyonu ağsız node:vm içinde çalıştırılır; timer,
+// animationend ve reduced-motion yolları uygulama verisine dokunmadan ölçülür.
+
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const repoRoot = require('../repo-root');
+const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
+const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
+
+let passed = 0;
+let failed = 0;
+function group(name, condition, detail) {
+  if (condition) { passed += 1; console.log(`PASS ${name}`); }
+  else { failed += 1; console.log(`FAIL ${name}${detail ? ` — ${detail}` : ''}`); }
+}
+
+function element() {
+  const values = new Set();
+  const listeners = Object.create(null);
+  return {
+    classList: { add(name) { values.add(name); }, contains(name) { return values.has(name); } },
+    addEventListener(type, handler) { (listeners[type] || (listeners[type] = [])).push(handler); },
+    removeEventListener(type, handler) { listeners[type] = (listeners[type] || []).filter((item) => item !== handler); },
+    emit(type, target) { (listeners[type] || []).slice().forEach((handler) => handler({ type, target: target || this })); },
+    listenerCount(type) { return (listeners[type] || []).length; }
+  };
+}
+
+function runtime(options) {
+  const opts = options || {};
+  const card = element();
+  const back = element();
+  const timers = [];
+  const document = {
+    hidden: false,
+    getElementById(id) { return id === 'card' ? card : id === 'back' ? back : null; },
+    addEventListener() {}, querySelectorAll() { return []; }, querySelector() { return null; },
+    createElement() { return element(); }
+  };
+  const win = {
+    SeymaState: { data: { settings: { premiumAtmosphere: opts.premium !== false } } },
+    matchMedia() { return { matches: !!opts.reduced }; },
+    addEventListener() {}, requestAnimationFrame() {}, setTimeout(fn, ms) { timers.push({ fn, ms }); return timers.length; }, clearTimeout() {}
+  };
+  const sandbox = {
+    window: win, document, navigator: { vibrate() { return true; } },
+    setTimeout: win.setTimeout, clearTimeout: win.clearTimeout, requestAnimationFrame: win.requestAnimationFrame,
+    Date, Math, Number, String, Object, Array, JSON,
+    getComputedStyle() { return { position: 'relative' }; }
+  };
+  vm.runInNewContext(mediaSource, sandbox, { filename: 'mediaFx.js (FX2-16)', timeout: 5000 });
+  return { card, back, timers, fx: win.SeyFx };
+}
+
+const wrappers = [
+  ['closeReading', 'sey-ov-card', 'sey-ov-back'], ['closeWatching', 'sey-ov-card', 'sey-ov-back'],
+  ['closeListening', 'sey-ov-card', 'sey-ov-back'], ['closeZikr', 'zikr-screen', 'zikr-overlay'],
+  ['closeQibla', 'qibla-dialog', 'qibla-overlay'], ['closeFaithCorner', 'sey-ov-card', 'sey-ov-back'],
+  ['closeQuranJourney', 'quran-screen', 'quran-overlay'], ['closeSaygiPerson', 'sey-ov-card', 'sey-ov-back'],
+  ['closeSoulArchive', 'sey-ov-card', 'sey-ov-back'], ['closeSoulActivity', 'sey-ov-card', 'sey-ov-back'],
+  ['closeLearning', 'sey-ov-card', 'sey-ov-back'], ['closeReminderCenter', 'sey-reminder-screen', 'sey-reminder-overlay']
+];
+
+group('FX2-16.1 12 hedef closeX sarmalayıcısı doğru yüzey kimliğine bağlı', wrappers.every(([name, card, back]) => {
+  const start = appSource.indexOf(`App.${name}=function`);
+  const end = start < 0 ? -1 : appSource.indexOf('\nApp.', start + 1);
+  const body = appSource.slice(start, end < 0 ? appSource.length : end);
+  return start >= 0 && /var body=function\(\)/.test(body) && body.includes(`sheetClose('${card}','${back}',body)`);
+}));
+
+group('FX2-16.2 M6 çağrı sayısı en az 10, App/onClick yüzeyi değişmez',
+  (appSource.match(/\bsheetClose\s*\(/g) || []).length >= 10 &&
+  new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 718 &&
+  (appSource.match(/onclick=/g) || []).length === 391
+);
+
+group('FX2-16.3 sheet-in/out/backdrop CSS tokenleri ve reduce-motion koruması var',
+  /#sey-ov-card,#zikr-screen,#quran-screen,#qibla-dialog,#sey-reminder-screen[\s\S]{0,160}animation:sey-sheet-in/.test(cssSource) &&
+  /\.sey-sheet-out\{[\s\S]{0,120}var\(--dur-3\)[\s\S]{0,100}var\(--ease-in\)/.test(cssSource) &&
+  /\.sey-sheet-in,\.sey-sheet-out,\.sey-backdrop-out,[\s\S]{0,220}animation:none!important/.test(cssSource)
+);
+
+{
+  const r = runtime(); let done = 0;
+  r.fx.sheetClose('card', 'back', () => { done += 1; });
+  const armed = r.card.classList.contains('sey-sheet-out') && r.back.classList.contains('sey-backdrop-out') && r.timers.length === 1 && r.timers[0].ms === 260;
+  r.card.emit('animationend', element());
+  const childIgnored = done === 0 && r.card.listenerCount('animationend') === 1;
+  r.card.emit('animationend'); r.timers[0].fn();
+  group('FX2-16.4 animationend karttan gelince tamamlar; child olayı ve timeout çift çalıştırmaz', armed && childIgnored && done === 1 && r.card.listenerCount('animationend') === 0);
+}
+
+{
+  const r = runtime(); let done = 0;
+  r.fx.sheetClose('card', 'back', () => { done += 1; });
+  r.timers[0].fn(); r.timers[0].fn(); r.card.emit('animationend');
+  group('FX2-16.5 260ms timeout ağı animationend yokluğunda akışı bir kez sürdürür', done === 1);
+}
+
+{
+  const off = runtime({ premium: false }); const reduced = runtime({ reduced: true });
+  let offDone = 0; let reducedDone = 0;
+  off.fx.sheetClose('card', 'back', () => { offDone += 1; });
+  reduced.fx.sheetClose('card', 'back', () => { reducedDone += 1; });
+  group('FX2-16.6 premium kapalı veya reduced-motion iken anlık eski davranış',
+    offDone === 1 && reducedDone === 1 && off.timers.length === 0 && reduced.timers.length === 0 &&
+    !off.card.classList.contains('sey-sheet-out') && !reduced.card.classList.contains('sey-sheet-out'));
+}
+
+{
+  const r = runtime(); let first = 0; let second = 0;
+  r.fx.sheetClose('card', 'back', () => { first += 1; });
+  r.fx.sheetClose('card', 'back', () => { second += 1; });
+  r.card.emit('animationend');
+  group('FX2-16.7 çift kapatma isteği eski gövdeyi ikinci kez yürütmez', first === 1 && second === 0 && r.timers.length === 1);
+}
+
+console.log(`Passed: ${passed} / ${passed + failed}`);
+process.exit(failed ? 1 : 0);

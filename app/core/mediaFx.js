@@ -638,6 +638,30 @@
       durationMs = Math.max(0, Math.min(Number(durationMs) || 200, 1000));
       el.style.transition = property + ' ' + durationMs + 'ms ease';
       return el;
+    },
+    sheetClose: function(cardId, backdropId, done){
+      // FX2-16: render() overlay'i anında kaldırmadan önce kart/backdrop
+      // çıkışını oynatır. Gating kapalıysa erişilebilir eski yol anlıktır.
+      if (typeof done !== 'function') return;
+      if (!isPremiumFxEnabled()) { done(); return; }
+      var card = document.getElementById(cardId);
+      var back = backdropId ? document.getElementById(backdropId) : null;
+      if (!card) { done(); return; }
+      // Aynı kapatma eylemi iki kez gelirse ikinci gövde/sav eylemi çalışmaz.
+      if (card._seySheetClosing) return;
+      card._seySheetClosing = true;
+      var fired = false;
+      function go(){
+        if (fired) return;
+        fired = true;
+        try{ card.removeEventListener('animationend', onEnd); }catch(e){}
+        done();
+      }
+      function onEnd(event){ if (event && event.target && event.target !== card) return; go(); }
+      card.classList.add('sey-sheet-out');
+      if (back) back.classList.add('sey-backdrop-out');
+      card.addEventListener('animationend', onEnd);
+      setTimeout(go, 260); // AĞ: animationend gelmezse overlay kilitlenmez.
     }
   };
 

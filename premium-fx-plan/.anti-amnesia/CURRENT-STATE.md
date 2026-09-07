@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-07** — basma durumu ve kart-küçültme düzeltmesi |
-| Sıradaki prompt | **FX2-08** — ripple konteyneri runtime bağlantısı |
+| Son tamamlanan prompt | **FX2-08** — ripple delege katmana bağlandı |
+| Sıradaki prompt | **FX2-09** — haptic delege katmana bağlantısı |
 | Aşama | Dalga 2 — Dokunma Katmanı |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -187,6 +187,21 @@ onun reduced-motion eşleniği tamamen kaldırıldı; `.surface:hover` değişme
 reduced-motion 31/31, driver 0 fail, zikir 95/95, migration 60/60, app 30/30,
 panel 23/23, Panel-v2 27/27, Kur'an 9/9, reminder 20/20 PASS. Sıradaki FX2-08.
 
+## FX2-08 — Tamamlandı (2026-09-07)
+
+`SeyFx.ripple(event, color, targetEl)` delege hedefini kullanmayı sürdürürken
+host'u runtime'da `.sey-ripple` sınıfıyla hazırlıyor; 8 px altındaki ölçülemeyen
+hedefler atlanıyor ve `position:static` elemanlar dalga taşmaması için
+`relative` yapılıyor. `data-fx="destructive"` olan hedeflerde açık renk
+verilmemişse dalga `--drop` tonuna kayıyor. Dalga `animationend` ile veya 600 ms
+timeout ile tek sefer temizleniyor; eski `ripple(event, color)` yolu korunuyor.
+
+`.sey-ripple` konteynerine `isolation:isolate` eklendi. `index.html` cache
+bump'leri `styles.css?v=20260906j` ve `mediaFx.js?v=20260902d` oldu. Canlı
+ölçüm M4 **390/390**; hedef önceki FX2-06 delege bağlantısıyla taban 0'dan
+geçilmişti, bu kart host/taşma/temizleme sözleşmesini tamamlıyor. `app.js`,
+markup ve `coverage.json` değişmedi. Sıradaki FX2-09.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -229,7 +244,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-08.md`](../.prompts/FX2-08.md)
+2. Kart: [`../.prompts/FX2-09.md`](../.prompts/FX2-09.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

@@ -464,13 +464,22 @@
       // FX-P-32: dokunma koordinatlarına göre CSS ripple dalgası üretir.
       // Master switch (premiumAtmosphere) + reduced-motion kapalıyken sessiz.
       if (!isPremiumFxEnabled()) return;
-      // Delege pointer katmanı hedefi üçüncü argümanla verir; eski inline
-      // çağrılar ise event.currentTarget üzerinden aynı davranışı sürdürür.
+      // Delege pointer katmanı targetEl'i üçüncü argümanla verir; eski inline
+      // çağrılar ise targetEl olmadan event.currentTarget üzerinden aynı davranışı sürdürür.
       var el = targetEl || (event && event.currentTarget);
-      if (!el) return;
+      if (!el || !el.getBoundingClientRect) return;
       var rect = el.getBoundingClientRect();
-      var x = (event.clientX || rect.left + rect.width/2) - rect.left;
-      var y = (event.clientY || rect.top + rect.height/2) - rect.top;
+      // Ölçülebilir kutusu olmayan ikon-only elemanlara dalga ekleme.
+      if (rect.width < 8 || rect.height < 8) return;
+      // Delege katmanı markup'ı değiştirmez; ripple host'u runtime'da hazırlanır.
+      if (el.classList && !el.classList.contains('sey-ripple')) el.classList.add('sey-ripple');
+      // Satır içi butonlar position:static olabilir; dalga kutudan taşmasın.
+      if (el.style && typeof getComputedStyle === 'function' && getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      if (!color && el.dataset && el.dataset.fx === 'destructive'){
+        color = 'color-mix(in srgb, var(--drop) 55%, transparent)';
+      }
+      var x = ((event && typeof event.clientX === 'number') ? event.clientX : rect.left + rect.width/2) - rect.left;
+      var y = ((event && typeof event.clientY === 'number') ? event.clientY : rect.top + rect.height/2) - rect.top;
       var d = Math.max(rect.width, rect.height) * 2;
       var wave = document.createElement('span');
       wave.className = 'sey-ripple-wave';
@@ -479,7 +488,10 @@
       wave.style.width = wave.style.height = d + 'px';
       if (color) wave.style.background = color;
       el.appendChild(wave);
-      setTimeout(function(){ wave.remove(); }, 600);
+      var gone = false;
+      function drop(){ if (gone) return; gone = true; try{ wave.remove(); }catch(e){} }
+      if (wave.addEventListener) wave.addEventListener('animationend', drop, { once: true });
+      setTimeout(drop, 600);
     },
     shimmer: function(element){
       // FX-P-33: kutlama/yükleme durumunda geçici shimmer sınıfı ekler.

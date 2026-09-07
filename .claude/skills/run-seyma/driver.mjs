@@ -319,6 +319,10 @@ if (sb2.App && typeof sb2.App.start === 'function') {
 assert('has bottom nav (bugun tab)', /App\.go\(/.test(appHTML) || /bugun/i.test(appHTML));
 
 console.log('\n== drive: interactions ==');
+// FX2-15 sekme çıkışı gerçek transitionend/timeout ister; bu güvenli smoke
+// harness timer'ları kasıtlı no-op olduğundan burada eski senkron yolu sürülür.
+// Geçiş motorunun kendisi ayrı, kontrollü FX2-15 fixture'ında sürülür.
+sb2.SeymaState.data.settings.premiumAtmosphere = false;
 // switch to rapor tab
 if (sb2.App && typeof sb2.App.go === 'function') {
   appHTML = '';

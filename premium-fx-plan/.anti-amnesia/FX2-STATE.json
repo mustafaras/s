@@ -6,9 +6,9 @@
   "branch": "premium-fx-gorsel-yuzey",
   "totalPrompts": 28,
   "waves": 8,
-  "lastCompletedPrompt": "FX2-14",
+  "lastCompletedPrompt": "FX2-15",
   "activePrompt": null,
-  "nextPrompt": "FX2-15",
+  "nextPrompt": "FX2-16",
   "currentPhase": "Dalga 4 — Hareket Sistemi",
   "blockedPrompt": null,
   "implementationComplete": false,
@@ -102,7 +102,7 @@
   "invariants": ["I1","I2","I3","I4","I5","I6","I7","I8"],
   "contract": ["S1","S2","S3","S4","S5","S6","S7","S8"],
   "appSurfaceBaseline": {
-    "AppHandlers": 717,
+    "AppHandlers": 718,
     "AppHandlersAfterFX2_15": 718,
     "onclickCount": 391,
     "buttonCount": 361

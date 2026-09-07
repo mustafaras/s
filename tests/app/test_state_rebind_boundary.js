@@ -322,6 +322,9 @@ ok('SeymaState B1 getters are getter-only', stateDescriptors.every((descriptor) 
 const initialData = live.sandbox.SeymaState.data;
 const initialUi = live.sandbox.SeymaState.ui;
 const initialDark = live.sandbox.SeymaState.dark;
+// FX2-15 gerçek sekme çıkışını transitionend/timeout ile tamamlar; bu B1
+// harness timer'ları bilerek no-op olduğundan burada senkron fallback seçilir.
+live.sandbox.SeymaState.data.settings.premiumAtmosphere = false;
 live.sandbox.App.go('ayarlar');
 live.sandbox.App.setTheme(true);
 ok('ui getter returns fresh mutable view state', live.sandbox.SeymaState.ui === initialUi && live.sandbox.SeymaState.ui.tab === 'ayarlar');

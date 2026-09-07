@@ -1694,6 +1694,27 @@
    fixed nav/splash taşma riski. Regresyonda bu blok tamamen geri alınır. */
 #app{contain:layout style;}
 
+/* FX2-15: sekme geçişi. #app innerHTML ile yıkıldığı için çıkış render()'dan
+   önce oynatılır; giriş yeni kabukta başlar. */
+#app{
+  transition:opacity var(--dur-3) var(--ease-out),
+             transform var(--dur-3) var(--ease-out);
+}
+#app.sey-leaving{
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity var(--dur-2) var(--ease-in),
+             transform var(--dur-2) var(--ease-in);
+}
+#app.sey-entering{opacity:0;transform:translateY(-6px);}
+@media (prefers-reduced-motion: reduce){
+  #app,#app.sey-leaving,#app.sey-entering{
+    transition:none!important;
+    opacity:1!important;
+    transform:none!important;
+  }
+}
+
 /* FX2-07: `.sey-press` — SeyTouch'ın taktığı basma durumu. Markup değişmez.
    ÖNEMLİ: premiumAtmosphere'a BAĞLI DEĞİLDİR — basma geri bildirimi
    erişilebilirliktir, süs değil (SAFEGUARDS §2). */

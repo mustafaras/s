@@ -5861,26 +5861,53 @@ App.start=function(){
   }catch(e){}
 };
 App.go=function(id,event){
-  // İY-B: İlham & İbadet hub'ına her GERÇEK girişte (başka sekmeden gelince —
-  // aynı sekmedeyken tetiklenen alakasız re-render'larda DEĞİL) Kur'an
-  // Yolculuğu kartının âyet vitrini bir sonrakine geçer.
-  if(id==='saygi'&&ui.tab!=='saygi'&&typeof quranAdvanceVerseIndex==='function') quranAdvanceVerseIndex();
-  if(id==='mesaj'&&ui.tab!=='mesaj') ui.aeonScrollBottom=true;
   var tabChanged = ui.tab !== id;
-  ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab');
-  // FX-P-32/37 bağlantısı: gerçek sekme geçişinde kartlara staggered fade-in
-  // (enter) + tab içeriğine yumuşak transition uygula. `ripple` yalnız event
-  // geçilirse (dokunma noktası) çalışır; mevcut onclick'ler event geçmediği
-  // için güvenle atlanır. Tümü SeyFx gating'ine (premiumAtmosphere +
-  // reduced-motion) tabidir.
-  if(tabChanged && window.SeyFx){
-    if(typeof window.SeyFx.enter==='function') window.SeyFx.enter('#app .surface, #app .card, #app .bento', 40);
-    if(typeof window.SeyFx.transition==='function'){
-      var appEl=document.getElementById('app');
-      if(appEl) window.SeyFx.transition(appEl, 'opacity', 180);
+  function commitGo(){
+    // İY-B: İlham & İbadet hub'ına her GERÇEK girişte (başka sekmeden gelince —
+    // aynı sekmedeyken tetiklenen alakasız re-render'larda DEĞİL) Kur'an
+    // Yolculuğu kartının âyet vitrini bir sonrakine geçer.
+    if(id==='saygi'&&ui.tab!=='saygi'&&typeof quranAdvanceVerseIndex==='function') quranAdvanceVerseIndex();
+    if(id==='mesaj'&&ui.tab!=='mesaj') ui.aeonScrollBottom=true;
+    ui.tab=id; render();
+    var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0;
+    tryLocNudge('tab');
+    if(tabChanged && window.SeyFx && typeof window.SeyFx.enter==='function'){
+      window.SeyFx.enter('#app .surface, #app .card, #app .bento', 40);
     }
-    if(event && typeof window.SeyFx.ripple==='function') window.SeyFx.ripple(event);
   }
+  var appEl=document.getElementById('app');
+  var animOk=tabChanged && appEl && window.SeyFx
+    && typeof window.SeyFx.isPremiumFxEnabled==='function'
+    && window.SeyFx.isPremiumFxEnabled();
+  if(!animOk){ commitGo(); return; }
+
+  // FX2-15: #app innerHTML ile yıkılmadan önce çıkış oynar. Hızlı bir ikinci
+  // sekme isteği gelirse yalnız en son hedef commit edilir.
+  if(App._goTimer!=null){
+    clearTimeout(App._goTimer); App._goTimer=null;
+    try{ appEl.classList.remove('sey-leaving'); }catch(e){}
+  }
+  var done=false, timer=null;
+  function finish(){
+    // Eski transitionend işleyicisi hızlı ikinci istekte DOM'da kısa süre
+    // kalabilir; yalnız kendi güncel timer'ı olan istek commit edebilir.
+    if(done || App._goTimer!==timer) return; done=true;
+    clearTimeout(timer); App._goTimer=null;
+    appEl.removeEventListener('transitionend',finish);
+    commitGo();
+    var el=document.getElementById('app');
+    if(el){
+      el.classList.remove('sey-leaving');
+      el.classList.add('sey-entering');
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        el.classList.remove('sey-entering');
+      }); });
+    }
+  }
+  appEl.classList.add('sey-leaving');
+  appEl.addEventListener('transitionend',finish,{once:true});
+  timer=setTimeout(finish,200);
+  App._goTimer=timer;
 };
 
 // ── REM-05 Reminder Center: yalnız ephemeral shell durumu ──

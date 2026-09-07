@@ -102,6 +102,10 @@ function loadInto(sandbox, files) {
     const src = fs.readFileSync(path.join(REPO, f), 'utf8');
     vm.runInContext(src, ctx, { filename: f });
   }
+  // FX2-15 gerçek sekme çıkışını transitionend/timeout ile bitirir; bu harness
+  // timer'ları kasıtlı no-op olduğundan yalnız App.go'nun görsel geçiş kapısı
+  // senkron fallback'e alınır. Ses motorunun kendi premium ayarı korunur.
+  if (sandbox.SeyFx) sandbox.SeyFx.isPremiumFxEnabled = function() { return false; };
   return ctx;
 }
 

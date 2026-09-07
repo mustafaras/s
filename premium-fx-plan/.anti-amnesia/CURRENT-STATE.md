@@ -11,9 +11,9 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-11** — ses motoru v2 (bus / reverb / limiter) |
-| Sıradaki prompt | **FX2-12** — ses paleti v2 (11 ses) |
-| Aşama | Dalga 3 — Ses Kimliği |
+| Son tamamlanan prompt | **FX2-15** — sekme geçiş motoru (çıkış → swap → giriş) |
+| Sıradaki prompt | **FX2-16** — overlay giriş/çıkış hareketi |
+| Aşama | Dalga 4 — Hareket Sistemi |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
 
@@ -294,6 +294,31 @@ assertion'ı haklı olarak düştü; fixture gevşetilmeden mock tamamlandı. So
 `coverage.json` yazılmadı. Dalga 3 kapandı: M3 **408 ≥ 200**, M9 **2 ≥ 2**.
 Sıradaki FX2-15.
 
+## FX2-15 — Tamamlandı (2026-09-07)
+
+`App.go` yalnız kendi gövdesinde çıkış → swap → giriş motoruna taşındı:
+gerçek sekme değişiminde eski `#app` önce `sey-leaving` olur, `transitionend`
+ve 200 ms timeout ağı tek bir commit'e bağlanır, yeni kabuk iki
+`requestAnimationFrame` sonrası `sey-entering` sınıfını bırakır. Hızlı ikinci
+istek eski timer'ı ve bayat `transitionend` işleyicisini timer kimliğiyle
+etkisizleştirir; yalnız son hedef commit edilir. Premium kapalı veya
+reduced-motion durumunda eski senkron davranış korunur. Yeni ses eklenmedi.
+
+`app/styles.css` tokenlı `#app` geçişi ve reduced-motion bypass'ını aldı;
+`index.html` CSS/app cache sürümleri `20260907a` oldu. Yeni ağsız dar fixture
+`tests/app/test_fx2_tab_transition.js` 7/7 ile çıkış sırası, timeout, hızlı
+geçiş, fallback ve I7 yüzeyini kilitler. No-op timer kullanan mevcut driver,
+zikir ve B1 render fixture'ları yalnız kendi eski senkron kapsamları için
+FX kapısını kapatır; motorun asenkron kabul kanıtı yeni fixture'dadır.
+
+Kanıt: syntax temiz; driver fail=0 ve `--dump bugun` nav üretir;
+reduced-motion 31/31; app 33/33, current panel 24/24 (Faz11 dahil),
+Panel-v2 27/27, Kur'an 9/9, reminder 20/20, zikir 95/95, B1/B2/B3 PASS.
+Salt-okunur kapsam raporu M3=408 ve M9=2'yi korur; `coverage.json`
+yazılmadı. `App.*` 718 (`App._goTimer` dahil), `onclick=391`; `render()`,
+`paint()` ve scroll/odak restorasyonu dokunulmadı. Push/deploy/browser yok.
+Durum: `FX2-15 → FX2-16`, blokaj yok.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -336,7 +361,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-15.md`](../.prompts/FX2-15.md)
+2. Kart: [`../.prompts/FX2-16.md`](../.prompts/FX2-16.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

@@ -11,9 +11,9 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-09** — niyet haritası (`data-fx`) |
-| Sıradaki prompt | **FX2-10** — dokunma ayarları ve korumalar |
-| Aşama | Dalga 2 — Dokunma Katmanı |
+| Son tamamlanan prompt | **FX2-10** — dokunma kapsamı fixture'ı |
+| Sıradaki prompt | **FX2-11** — ses motoru v2 (bus / reverb / limiter) |
+| Aşama | Dalga 3 — Ses Kimliği |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
 
@@ -220,6 +220,20 @@ yazılmadı. Sentetik niyet sözleşmesi 9/9, driver 0 fail, zikir 95/95, migrat
 60/60, app 30/30, panel 23/23, Panel-v2 27/27, Kur'an 9/9, reminder 20/20 PASS.
 Sıradaki FX2-10.
 
+## FX2-10 — Tamamlandı (2026-09-07)
+
+Yeni `tests/app/test_fx2_touch_coverage.js` gerçek `app/core/mediaFx.js`
+kaynağını ağsız `node:vm` içinde yükleyerek delege dokunma bağlantısını
+**12/12** grupta kilitler. Katman API'si, idempotent kurulum, seçici ve statik
+buton kapsamı, `preventDefault` yokluğu, dört passive dinleyici, premium-kapalı
+ve reduced-motion davranışları, App/onclick değişmezliği, niyet sözlüğü,
+ripple ölçü/konum güvenliği ve render dışındaki tek boot bağlantısı doğrulandı.
+
+Kaynakta bulunan **360** statik `<button>` seçicideki `button` koluyla %100
+kapsanır; sayım tarihsel bir sabite bağlanmadı. Canlı kapsam ölçümü M2
+**390 ≥ 343**, M4 **390 ≥ 325**, M9 **1 ≥ 1**; `coverage.json` yazılmadı.
+Uygulama kaynakları ve `index.html` değişmedi. Sıradaki FX2-11.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
@@ -262,7 +276,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-10.md`](../.prompts/FX2-10.md)
+2. Kart: [`../.prompts/FX2-11.md`](../.prompts/FX2-11.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

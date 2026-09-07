@@ -460,11 +460,13 @@
       }
       raf(tick);
     },
-    ripple: function(event, color){
+    ripple: function(event, color, targetEl){
       // FX-P-32: dokunma koordinatlarına göre CSS ripple dalgası üretir.
       // Master switch (premiumAtmosphere) + reduced-motion kapalıyken sessiz.
       if (!isPremiumFxEnabled()) return;
-      var el = event && event.currentTarget;
+      // Delege pointer katmanı hedefi üçüncü argümanla verir; eski inline
+      // çağrılar ise event.currentTarget üzerinden aynı davranışı sürdürür.
+      var el = targetEl || (event && event.currentTarget);
       if (!el) return;
       var rect = el.getBoundingClientRect();
       var x = (event.clientX || rect.left + rect.width/2) - rect.left;

@@ -166,6 +166,13 @@ migration 60/60, B1 0 failure, B3 20/20, app 30/30, panel 23/23,
 Panel-v2 27/27, Kur'an 9/9, reminder 20/20 PASS. `coverage.json` yeniden
 yazılmadı; push/deploy/browser yok. Sıradaki kart FX2-07.
 
+FX2-06 denetim düzeltmesi: delege `pointerdown` sırasında `event.currentTarget`
+`#root` olduğu için eski iki argümanlı `SeyFx.ripple` dalgayı root'a ekliyordu.
+`ripple(event, color, targetEl)` artık açık hedefi önceliyor; inline eski
+çağrılar `event.currentTarget` fallback'iyle değişmeden çalışıyor. Bu davranış
+`test_premium_fx_utils.js` içindeki sentetik hedef-host regression'ıyla
+kilitlendi. `mediaFx.js` cache-bump'i `20260902c` oldu.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)

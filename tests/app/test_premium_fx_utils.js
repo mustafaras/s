@@ -37,6 +37,7 @@ function loadMediaFx(opts){
     setTimeout: setTimeout,
     clearTimeout: clearTimeout
   };
+  win.__testDocument = document;
   var ctx = vm.createContext({ window: win, navigator: { vibrate: function(){ return true; } }, document: document, performance: globalThis.performance, setTimeout: setTimeout, clearTimeout: clearTimeout, Math: Math, Date: Date, Number: Number, String: String, JSON: JSON, Object: Object, Array: Array, Promise: Promise });
   vm.runInContext(src, ctx, { timeout: 5000 });
   return ctx.window;
@@ -107,6 +108,24 @@ console.log('\n[5] ripple gating kapalıyken hiçbir şey yapmaz');
   var fakeEvent = { currentTarget: { getBoundingClientRect: function(){ return {left:0,top:0,width:100,height:100}; }, appendChild: function(){ created++; } } };
   win.SeyFx.ripple(fakeEvent, 'red');
   ok("premium kapalıyken ripple DOM'a dalga eklemez", created === 0, 'created: '+created);
+})();
+
+// ── Test 5b: delege katman açık hedefi ripple host'u yapar ─────────────────
+console.log('\n[5b] ripple delege hedefini önceler');
+(function(){
+  var rootAdded = 0, targetAdded = 0;
+  var win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: false });
+  win.__testDocument.createElement = function(){ return { className:'', style:{}, remove:function(){} }; };
+  var root = {
+    getBoundingClientRect: function(){ return { left:0, top:0, width:200, height:400 }; },
+    appendChild: function(){ rootAdded++; }
+  };
+  var target = {
+    getBoundingClientRect: function(){ return { left:10, top:20, width:80, height:40 }; },
+    appendChild: function(){ targetAdded++; }
+  };
+  win.SeyFx.ripple({ currentTarget:root, clientX:30, clientY:40 }, null, target);
+  ok('açık hedef root yerine ripple host olur', targetAdded === 1 && rootAdded === 0, 'root='+rootAdded+', target='+targetAdded);
 })();
 
 // ── Test 6: countUp reduced-motion'da doğrudan hedef yazar ──────────────────

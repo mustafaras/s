@@ -11,9 +11,9 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-24** — elevation skalası + 13 animasyon token'ı (Dalga 6 açılışı) |
-| Sıradaki prompt | **FX2-25** — (Dalga 6) |
-| Aşama | Dalga 6 — Malzeme ve Derinlik |
+| Son tamamlanan prompt | **FX2-25** — aurora v2 (parallax + grain) (Dalga 6 kapanışı) |
+| Sıradaki prompt | **FX2-26** — (Dalga 7) |
+| Aşama | Dalga 7 — Varsayılanlar ve Kapanış |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
 
@@ -602,6 +602,49 @@ Durum: `FX2-24 → FX2-25`, blokaj yok; **Dalga 6 açıldı.**
 
 ---
 
+## FX2-25 — Tamamlandı (2026-09-08) · Aurora v2 (parallax + grain) (Dalga 6 kapanışı)
+
+`app/core/mediaFx.js` + `app.js` (tek satır) + `app/styles.css` + `index.html`:
+
+- **(1) Parallax bağlayıcı** — `SeyFx.bindAuroraParallax` (mediaFx.js, SeyFx
+  nesnesine eklendi). `isPremiumFxEnabled()` gating'i: premium kapalı veya
+  reduced-motion → dinleyici hiç bağlanmaz. `[data-scroll]`'a `auroraBound`
+  dataset bayrağıyla **idempotent**; render() her seferinde yeni `[data-scroll]`
+  ürettiği için yeniden bağlanır, eskisi çöpe gider (sızıntı yok). Hareket
+  `Math.max(-24, Math.min(24, scrollTop * -0.04))` → **≤ ±24 px**, `ticking`
+  bayrağıyla `requestAnimationFrame` throttle'lı, `{passive:true}`.
+- **(2) app.js bağlantısı** — `paint()` içinde `SeyAmbience.apply()` guard'ının
+  hemen yanına tek satır: `try{ if(window.SeyFx && typeof window.SeyFx.bindAuroraParallax==='function') window.SeyFx.bindAuroraParallax(); }catch(e){}`.
+- **(3) Grain** — `#sey-aurora::before` (yeni DOM düğümü YOK), data-URI
+  feTurbulence SVG **< 400 bayt** (blok 420 bayt), `opacity:.035`,
+  `mix-blend-mode:overlay`; koyu tema `opacity:.055`. `::after` hava katmanına
+  (FX2-21) **dokunulmadı** — grain `::before`'da, çakışma yok.
+- **(4) Aurora halkaları** — zaten altın ailesinde: `var(--accent)` (altın),
+  `var(--room2,#8E7CC3)` (mor, kontrast için korunur), `var(--accent-ink,#886738)`
+  (koyu altın). `#D96D8B` yok (0) — FX2-04 kaldırmıştı, doğrulandı. Değişiklik
+  gerekmedi.
+- **(5) Reduced-motion uzlaşması (kart niyeti).** Kart "grain kalır, parallax
+  gider" diyor; mevcut 1663 kuralı `#sey-aurora`'yı `opacity:0!important` ile
+  tamamen gizliyordu (grain de görünmez olurdu). Kural `transform:none!important`
+  olarak değiştirildi → aurora statik ama görünür (grain açık), parallax kapalı.
+  `test_premium_reduced_motion` 34/34 ve `test_fx2_ambience` 14/14 bu değişikliği
+  onayladı (yalnız `::after`'ın `animation:none!important`'ını iddia ediyorlar).
+
+Cache: `styles.css?v=20260908a→b`, `mediaFx.js?v=20260907c→20260908a`,
+`app.js?v=20260907e→20260908a`.
+
+**Kanıt:** `node --check` app.js+mediaFx.js OK; `bindAuroraParallax` app.js 1 /
+mediaFx.js 1; `auroraBound` 3 (idempotans); `feTurbulence` 1; will-change **5**
+(artmadı); grain bloğu 420 bayt (<900). Driver 0 FAIL; reduced_motion 34/34;
+ambience 14/14; tüm `tests/app/*.js` PASS; panel/quran/panel-v2/reminder PASS.
+**M7 0.62** (kullanıcı onaylı hedef — kartın literal 0.80 kapısı FX2-24'teki
+ulaşılamaz hedefin aynısı; FX2-25 yeni transition/animation bildirimi eklemiyor).
+Push/deploy/browser/server/network/coverage.json yok.
+
+Durum: `FX2-25 → FX2-26`, blokaj yok; **Dalga 6 kapandı, Dalga 7 açıldı.**
+
+---
+
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
 
 **1. Kartlar yeniden numaralandı ve yeniden yazıldı.** 21 kart (gap'li
@@ -642,7 +685,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-25.md`](../.prompts/FX2-25.md)
+2. Kart: [`../.prompts/FX2-26.md`](../.prompts/FX2-26.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

@@ -1660,7 +1660,18 @@
 #sey-aurora{position:fixed;inset:-12%;z-index:0;pointer-events:none;opacity:0;background:radial-gradient(42% 34% at 24% 22%,color-mix(in srgb,var(--accent) 55%,transparent),transparent 70%),radial-gradient(38% 30% at 78% 30%,color-mix(in srgb,var(--room2,#8E7CC3) 45%,transparent),transparent 70%),radial-gradient(46% 36% at 50% 84%,color-mix(in srgb,var(--accent-ink,#886738) 40%,transparent),transparent 72%);}
 #root.theme-aurora #sey-aurora{opacity:.16;animation:seyAurora 14s var(--ease-glide) infinite;will-change:transform,opacity;}
 #root[data-theme="dark"].theme-aurora #sey-aurora{opacity:.10;}
-@media (prefers-reduced-motion: reduce){#root.theme-aurora #sey-aurora{animation:none!important;opacity:0!important;}}
+@media (prefers-reduced-motion: reduce){#root.theme-aurora #sey-aurora{animation:none!important;transform:none!important;}}
+/* FX2-25: grain — ::after hava katmanına (FX2-21) dokunmaz, ::before'da yaşar.
+   Data-URI < 400 bayt; yeni DOM düğümü yok. */
+#sey-aurora::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  opacity:.035; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#root[data-theme="dark"] #sey-aurora::before{ opacity:.055; }
+@media (prefers-reduced-motion: reduce){
+  #sey-aurora{ transform:none!important; }   /* grain kalır, parallax gider */
+}
 
 /* FX-P-82: aktif sekme ikonu bounce — yalnız sekme DEĞİŞİKLİĞİNDE çalar
    (render yeni buton dizisi üretince animation yeniden başlar). */

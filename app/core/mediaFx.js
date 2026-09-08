@@ -684,6 +684,28 @@
       if (back) back.classList.add('sey-backdrop-out');
       card.addEventListener('animationend', onEnd);
       setTimeout(go, 260); // AĞ: animationend gelmezse overlay kilitlenmez.
+    },
+    bindAuroraParallax: function(){
+      // FX2-25: #sey-aurora'ya çok ince kaydırma parallax'ı. Gating kapalıysa
+      // dinleyici hiç bağlanmaz. render() her seferinde yeni [data-scroll]
+      // üretir; dataset.auroraBound yeni düğümde yok, bu yüzden yeniden
+      // bağlanır ve eskisi çöpe gider — sızıntı yok.
+      if (!isPremiumFxEnabled()) return false;
+      var sc = document.querySelector('[data-scroll]');
+      var au = document.getElementById('sey-aurora');
+      if (!sc || !au) return false;
+      if (sc.dataset.auroraBound === '1') return true;    // idempotent
+      sc.dataset.auroraBound = '1';
+      var ticking = false;
+      sc.addEventListener('scroll', function(){
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(function(){
+          var y = Math.max(-24, Math.min(24, sc.scrollTop * -0.04));
+          au.style.transform = 'translate3d(0,' + y + 'px,0)';
+          ticking = false;
+        });
+      }, { passive: true });
+      return true;
     }
   };
 

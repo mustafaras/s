@@ -9190,6 +9190,7 @@ function render(){
     try{ window.SeyTimeTheme.apply(); }catch(e){}
   }
   try{ if(window.SeyAmbience && typeof window.SeyAmbience.apply==='function') window.SeyAmbience.apply(); }catch(e){}
+  try{ if(window.SeyFx && typeof window.SeyFx.bindAuroraParallax==='function') window.SeyFx.bindAuroraParallax(); }catch(e){}
   // Mevsim/mübarek gün vurgusu: app/styles.css'teki `#root.theme-season-*` blokları
   // yalnızca applySeasonal() ile takılır; çağrı yazılmadığı için o CSS ölü kalıyordu.
   // apply() ile aynı premiumAtmosphere gating'ini paylaşır.

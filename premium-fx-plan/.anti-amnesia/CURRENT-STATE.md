@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-23** — canlı zemin fixture'ı (Dalga 5 kapanışı) |
-| Sıradaki prompt | **FX2-24** — (Dalga 6 açılışı) |
+| Son tamamlanan prompt | **FX2-24** — elevation skalası + 13 animasyon token'ı (Dalga 6 açılışı) |
+| Sıradaki prompt | **FX2-25** — (Dalga 6) |
 | Aşama | Dalga 6 — Malzeme ve Derinlik |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -551,6 +551,50 @@ Durum: `FX2-23 → FX2-24`, blokaj yok; **Dalga 5 kapandı.**
 
 ---
 
+## FX2-24 — Tamamlandı (2026-09-08) · Elevation Skalası + 13 Animasyon Token'ı (Dalga 6 açılışı)
+
+**Kullanıcı kararı (AskUserQuestion):** Kartın M7 ≥ 0.80 hedefi, kartın
+adımlarıyla matematiksel olarak ulaşılamazdı — elevation box-shadow'ları M7'yi
+hiç etkilemez, mevcut uyumlu `.surface` transition'ı değiştirmek sayıyı
+değiştirmez, 13 gerçek animasyonun tamamı token'a çevrilse bile maks **0.62**
+(120/195) olurdu; 0.80 için 49 bildirim daha gerekirdi ve tek kaynak 75
+`none!important` bildirimiydi (temel reduced-motion yeniden yapılanması
+gerektirir). Kullanıcı **"Elevation + 13 dönüşüm"**ü seçti; kart hedefi 0.62'ye
+güncellendi (kart DOĞRULAMA'sına işlendi).
+
+`app/styles.css` (yalnız; `app.js` DOKUNULMAYACAK karşılandı):
+
+- **(1) Elevation token'ları.** Kartın Adım 1 tablosundaki `.card`/`.bento`/
+  `.field` sınıfları gerçekte **yok** — gerçek yüzeylere eşlendi:
+  `.surface`→`--elev-2`, `.sey-appheader`/`.sey-bottomnav-surface`→`--elev-3`
+  (inset vurgular korunarak birleştirildi), `.qibla-v2-sheet`/`.quran-v2-screen`
+  →`--elev-4`, `.aeon-input-field`/`.sey-auth-field input`→`--elev-1`.
+- **(2) Zaman/mevsim vurguları birleştirildi (silinmedi).** `theme-time-*`
+  appheader+bottomnav accent kurallarına `var(--elev-3),` öneki eklendi;
+  `theme-season-*` appheader+bottomnav accent kurallarına da eklendi.
+  `amb-season-*` box-shadow kurallarına **dokunulmadı** (FX2-22'den zaten
+  `--elev-3` kullanıyor).
+- **(3) Hover derinliği.** `.surface` transition `var(--dur-2) var(--ease-out)`,
+  hover `box-shadow:var(--elev-3)`; mevcut reduced-motion bloğu korundu;
+  `surface:active` 0, will-change 5 (artmadı).
+- **(4) 13 gerçek animasyon token'a çevrildi.** `--ease-linear` token'ı eklendi
+  (yoktu; koyu tema miras alır). seyRoomSheen/seySpin/seyWordSheen/seyQuranSpin/
+  zikrOrbit/sey-ripple-spread/ambRain/ambSnow→`var(--ease-linear)`,
+  ambDrift→`var(--ease-glide)`, qibla needle transition→`var(--ease-linear)`,
+  sg-faith-next-bar width→`var(--ease-out)`.
+
+Cache: `styles.css?v=20260907g→20260908a`.
+
+**Kanıt:** **M7 0.55 → 0.62** (120/195, kullanıcı onaylı hedef); `var(--elev-`
+**15** (≥12), `surface:active` **0**, will-change **5** (artmadı). Driver 0 FAIL;
+`test_fx2_palette_contrast` 12/12; `test_fx2_ambience` 14/14; tüm FX2+premium
+fixture'ları PASS; B1 boundary 64/27/59/31 PASS; CSS brace dengeli.
+Push/deploy/browser/server/network/coverage.json yok.
+
+Durum: `FX2-24 → FX2-25`, blokaj yok; **Dalga 6 açıldı.**
+
+---
+
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
 
 **1. Kartlar yeniden numaralandı ve yeniden yazıldı.** 21 kart (gap'li
@@ -591,7 +635,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-24.md`](../.prompts/FX2-24.md)
+2. Kart: [`../.prompts/FX2-25.md`](../.prompts/FX2-25.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

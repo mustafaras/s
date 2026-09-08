@@ -569,6 +569,13 @@ güncellendi (kart DOĞRULAMA'sına işlendi).
   `.surface`→`--elev-2`, `.sey-appheader`/`.sey-bottomnav-surface`→`--elev-3`
   (inset vurgular korunarak birleştirildi), `.qibla-v2-sheet`/`.quran-v2-screen`
   →`--elev-4`, `.aeon-input-field`/`.sey-auth-field input`→`--elev-1`.
+  **Gap-fix (doğrulama sonrası):** koyu tema override'ları da token'a çevrildi —
+  `#root[data-theme="dark"] .sey-appheader`/`.is-scrolled`/`.sey-bottomnav-surface`
+  (555/557/562) `box-shadow:0 …` yerine `var(--elev-3)` kullanıyor; böylece
+  elevation skalası koyu temada da gerçekten uygulanıyor (özgüllük artık token'ı
+  ezmiyor). Reminder ekranı (1467/1577) bilinçli negatif-ofset bottom-sheet
+  gölgesi ve kartın overlay listesinde olmadığı için kapsam dışı bırakıldı;
+  `--zikr-shadow`/`--reminder-shadow` temalı gölgeler elevation değil.
 - **(2) Zaman/mevsim vurguları birleştirildi (silinmedi).** `theme-time-*`
   appheader+bottomnav accent kurallarına `var(--elev-3),` öneki eklendi;
   `theme-season-*` appheader+bottomnav accent kurallarına da eklendi.
@@ -586,7 +593,7 @@ güncellendi (kart DOĞRULAMA'sına işlendi).
 Cache: `styles.css?v=20260907g→20260908a`.
 
 **Kanıt:** **M7 0.55 → 0.62** (120/195, kullanıcı onaylı hedef); `var(--elev-`
-**15** (≥12), `surface:active` **0**, will-change **5** (artmadı). Driver 0 FAIL;
+**18** (≥12), `surface:active` **0**, will-change **5** (artmadı). Driver 0 FAIL;
 `test_fx2_palette_contrast` 12/12; `test_fx2_ambience` 14/14; tüm FX2+premium
 fixture'ları PASS; B1 boundary 64/27/59/31 PASS; CSS brace dengeli.
 Push/deploy/browser/server/network/coverage.json yok.

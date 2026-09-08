@@ -552,14 +552,14 @@
      rgba(22,22,26,.72) siyah üzerinde ~#101013, yani mevcut --card ile aynı;
      kontrast tokenları değişmez (AD-27 doğrular). */
   #root[data-theme="dark"] .glass{background:rgba(22,22,26,0.72);backdrop-filter:blur(24px) saturate(130%);-webkit-backdrop-filter:blur(24px) saturate(130%);border:1px solid rgba(255,255,255,0.12);box-shadow:none!important;}
-  #root[data-theme="dark"] .sey-appheader{background:#050506;border-bottom-color:rgba(255,255,255,.15);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 8px 18px rgba(0,0,0,.52),inset 0 -1px 0 rgba(255,255,255,.04);}
+  #root[data-theme="dark"] .sey-appheader{background:#050506;border-bottom-color:rgba(255,255,255,.15);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--elev-3),inset 0 -1px 0 rgba(255,255,255,.04);}
   #root[data-theme="dark"] .sey-appheader::before,#root[data-theme="dark"] .sey-appheader::after{display:none;}
-  #root[data-theme="dark"] .sey-appheader.is-scrolled{box-shadow:0 6px 14px rgba(0,0,0,.48);}
+  #root[data-theme="dark"] .sey-appheader.is-scrolled{box-shadow:var(--elev-3);}
   #root[data-theme="dark"] .sey-wordmark{background:linear-gradient(110deg,#FFFFFF 0%,#F5C9DA 42%,#EBD18E 64%,#FFFFFF 100%);background-size:240% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:none;}
   #root[data-theme="dark"] .sey-header-brand .sey-wordmark-flam{filter:none;}
   #root[data-theme="dark"] .sey-bottomnav{background:linear-gradient(180deg,transparent,#000 38%);}
   #root[data-theme="dark"] .sey-bottomnav::before{opacity:.45;}
-  #root[data-theme="dark"] .sey-bottomnav-surface{background:#060607;border-color:rgba(255,255,255,.16);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 10px 22px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.05);}
+  #root[data-theme="dark"] .sey-bottomnav-surface{background:#060607;border-color:rgba(255,255,255,.16);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--elev-3),inset 0 1px 0 rgba(255,255,255,.05);}
   #root[data-theme="dark"] .sey-bottomnav-surface::before,#root[data-theme="dark"] .sey-bottomnav-surface::after{display:none;}
   #root[data-theme="dark"] .sey-bottomnav-item::before{box-shadow:none;}
   #root[data-theme="dark"] .sey-bottomnav-item.is-active .sey-bottomnav-glyph{filter:none;}

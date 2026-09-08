@@ -83,6 +83,14 @@ console.log('\n[2] Kullanıcı tercihi migrate() tarafından ezilmiyor');
 var optedOut = st.sb.window.SeymaState.migrate({ settings: { premiumAtmosphere: false, uiSounds: false } });
 ok('premiumAtmosphere:false korundu', optedOut.settings.premiumAtmosphere === false);
 ok('uiSounds:false korundu', optedOut.settings.uiSounds === false);
+// FX2-26 Adım 4: DEĞİŞTİRİLEN alanlar elle kapatılmışsa asla ezilmez —
+// typeof guard yalnız eksik alanı yazar. launchRitual/voiceLocalFallback
+// varsayılan true'ya döndü ama bilinçli false seçimi korunur.
+var optedFX26 = st.sb.window.SeymaState.migrate({ settings: { launchRitual: false, voiceLocalFallback: false, voiceGuidance: false, ambientSounds: false } });
+ok('launchRitual:false korundu', optedFX26.settings.launchRitual === false);
+ok('voiceLocalFallback:false korundu', optedFX26.settings.voiceLocalFallback === false);
+ok('voiceGuidance:false korundu', optedFX26.settings.voiceGuidance === false);
+ok('ambientSounds:false korundu', optedFX26.settings.ambientSounds === false);
 var idem = st.sb.window.SeymaState.migrate(st.sb.window.SeymaState.migrate({}));
 ok('migrate idempotent (iki geçiş aynı gate)', idem.settings.premiumAtmosphere === true &&
    idem.settings.voiceCloudTts === true && idem.settings.voiceGuidance === false);

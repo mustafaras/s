@@ -703,9 +703,16 @@ davranış sorunu + 2 bayat yorum bulundu, düzeltildi:
 - **test_premium_voice.js:117 yorumu** — "kullanıcı kararı" → fixture'da
   voiceLocalFallback tanımsız (eski state); test kapı davranışını doğrular.
   Assertion'lar değişmedi (geçerliydi).
+- **TEST KAPSAM BOŞLUĞU (Adım 4):** fixture'ın `[2]` bölümü yalnız
+  premiumAtmosphere/uiSounds kapatma-koruma iddiası taşıyordu; FX2-26'nın
+  DEĞİŞTİRDİĞİ alanlar (launchRitual, voiceLocalFallback) ve tercih alanları
+  (voiceGuidance, ambientSounds) için `false` koruma iddiası yoktu — B2 de
+  bu alanları kapsamıyordu. Üretim kodu doğruydu (typeof guard state.js:123,130).
+  `test_premium_fx_gate_defaults.js` `[2]` bölümüne `optedFX26` durumu eklendi;
+  dört alan da migrate'te `false` kalır. Fixture 26→**30**/30.
 
-Yeniden doğrulama: voice 67/67, settings 39/39, gate_defaults 26/26, splash
-16/16, tüm `tests/app/*.js` PASS, driver 0 FAIL, B2 60/60, **M8 = 0 ✅**.
+Yeniden doğrulama: voice 67/67, settings 39/39, gate_defaults 30/30, splash
+16/16, tüm `tests/app/*.js` 35/35 PASS, driver 0 FAIL, B2 60/60, **M8 = 0 ✅**.
 Cache değişmedi (yalnız yorum + toast metni; app.js zaten `20260908b`).
 
 Durum: `FX2-26 → FX2-27`, blokaj yok; **Dalga 7 devam ediyor.**

@@ -804,6 +804,27 @@ kullanıcı kararı gerektirir: (1) push/merge/deploy onayı, (2) cihaz kabulü
 (K3), (3) FX→modularization devri (`MODULARIZATION.md` +
 `docs/monolit-bolumlenme-haritasi.md`).
 
+### Kapanış sonrası düzeltme (2026-09-08) — bayat cache-bust
+
+Kullanıcı talebiyle yapılan tam kontrol denetiminde tek gerçek kusur bulundu
+ve kapatıldı: `c8391fc` (FX2-26 denetim düzeltmesi) `app.js`'te **davranış
+değişikliği** (`App.setVoiceGuidance` toast'ı artık `voiceLocalFallback`'i
+runtime okuyan koşullu ifade) ve `mediaFx.js`'te yorum değişikliği yapmış ama
+`index.html`'e dokunmamıştı → iki asset eski `?v=` altında kalmıştı
+(konvansiyon #5 ihlali). O an gerçek etki sıfırdı (dal hiç push/deploy
+edilmedi) ama deploy anında bayat `app.js` riski taşıyordu.
+
+Düzeltme: `index.html` → `mediaFx.js?v=20260908a→b`, `app.js?v=20260908b→c`.
+Uygulama kodu değişmedi (yalnız query string). `index.html`'deki **30
+asset'in 30'u** commit zaman damgasıyla denetlendi; başka bayat yok. Kanıt:
+`node --check` OK, driver 0 FAIL, tüm `tests/app/*.js` 0 FAIL.
+
+> **Denetim notu:** ilk tarama turu zsh `${a%%\?*}` genişletmesi + sandbox'ın
+> `/tmp` yazma yasağı yüzünden yanlış negatif ("0 bayat") vermişti; `$TMPDIR`
+> ile yeniden koşulunca gerçek sonuç (2 bayat) çıktı. Tarama betiği sonucuna
+> tek başına güvenilmemeli — ham `git log` karşılaştırmasıyla çapraz kontrol
+> edildi.
+
 ---
 
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)

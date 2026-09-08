@@ -33,12 +33,12 @@ function loadMediaFx(opts){
     SeymaState: { data: { settings: opts.settings || {} } },
     SeymaConstants: null,
     SeyAudio: null, SeyHaptics: null, SeyFx: null,
-    requestAnimationFrame: function(fn){ return setTimeout(function(){ fn(Date.now()); }, 0); },
+    requestAnimationFrame: opts.syncRaf ? function(fn){ fn(Date.now()); return 0; } : function(fn){ return setTimeout(function(){ fn(Date.now()); }, 0); },
     setTimeout: setTimeout,
     clearTimeout: clearTimeout
   };
   win.__testDocument = document;
-  var ctx = vm.createContext({ window: win, navigator: { vibrate: function(){ return true; } }, document: document, performance: globalThis.performance, setTimeout: setTimeout, clearTimeout: clearTimeout, Math: Math, Date: Date, Number: Number, String: String, JSON: JSON, Object: Object, Array: Array, Promise: Promise });
+  var ctx = vm.createContext({ window: win, navigator: { vibrate: function(){ return true; } }, document: document, performance: globalThis.performance, requestAnimationFrame: win.requestAnimationFrame, setTimeout: setTimeout, clearTimeout: clearTimeout, Math: Math, Date: Date, Number: Number, String: String, JSON: JSON, Object: Object, Array: Array, Promise: Promise });
   vm.runInContext(src, ctx, { timeout: 5000 });
   return ctx.window;
 }
@@ -208,6 +208,79 @@ console.log('\n[8] FX-P-86 — habits ring + motivation bar shimmer');
                  appSrc.indexOf("getElementById('sey-motivation-bar')") > -1 &&
                  /SeyOnSynced|completeMotivationTask[\s\S]{0,600}?getElementById\('sey-motivation-bar'\)/.test(appSrc) === false || /getElementById\('sey-motivation-bar'\)[\s\S]{0,120}?SeyFx\.shimmer/.test(appSrc);
   ok('motivation bar id + guard\'lı SeyFx.shimmer çağrısı birlikte', barBound);
+})();
+
+// ── Test 9: FX2-25 — bindAuroraParallax (translate, transform DEĞİL) ────────
+console.log('\n[9] FX2-25 — bindAuroraParallax parallax sözleşmesi');
+(function(){
+  function makeScrollHost(){
+    var handler = null;
+    return {
+      dataset: {},
+      scrollTop: 0,
+      addEventListener: function(type, fn){ if(type === 'scroll') handler = fn; },
+      fire: function(){ if(handler) handler(); }
+    };
+  }
+  function makeAurora(){ return { style: {} }; }
+
+  // (1) API yüzeyi
+  var win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: false, syncRaf: true });
+  ok('SeyFx.bindAuroraParallax fonksiyonu var', typeof win.SeyFx.bindAuroraParallax === 'function');
+
+  // (2) premium kapalıyken false döner, dinleyici bağlanmaz
+  win = loadMediaFx({ settings: { premiumAtmosphere: false }, reducedMotion: false, syncRaf: true });
+  var sc = makeScrollHost();
+  win.__testDocument.querySelector = function(){ return sc; };
+  win.__testDocument.getElementById = function(){ return makeAurora(); };
+  ok('premium kapalıyken false döner', win.SeyFx.bindAuroraParallax() === false);
+  ok('premium kapalıyken dinleyici bağlanmaz', sc.dataset.auroraBound === undefined);
+
+  // (3) öğeler yokken false döner
+  win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: false, syncRaf: true });
+  win.__testDocument.querySelector = function(){ return null; };
+  win.__testDocument.getElementById = function(){ return null; };
+  ok('öğeler yokken false döner', win.SeyFx.bindAuroraParallax() === false);
+
+  // (4) bağlanır → true + auroraBound
+  win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: false, syncRaf: true });
+  sc = makeScrollHost();
+  var au = makeAurora();
+  win.__testDocument.querySelector = function(){ return sc; };
+  win.__testDocument.getElementById = function(){ return au; };
+  ok('bağlanınca true döner', win.SeyFx.bindAuroraParallax() === true);
+  ok('auroraBound işaretlenir', sc.dataset.auroraBound === '1');
+
+  // (5) scroll → translate set edilir, transform DEĞİL (seyAurora animasyonu transform\'u ezer)
+  sc.scrollTop = 300;
+  sc.fire();
+  ok('scroll translate özelliğini set eder', au.style.translate === '0 -12px', 'translate: '+au.style.translate);
+  ok('transform DEĞİŞMEZ (animasyonla çakışmaz)', au.style.transform === undefined, 'transform: '+au.style.transform);
+
+  // (6) clamp ±24
+  sc.scrollTop = 2000;
+  sc.fire();
+  ok('üst sınır 24px ile clamp', au.style.translate === '0 -24px', 'translate: '+au.style.translate);
+  sc.scrollTop = -2000;
+  sc.fire();
+  ok('alt sınır -24px ile clamp', au.style.translate === '0 24px', 'translate: '+au.style.translate);
+
+  // (7) idempotent — ikinci çağrı yeniden bağlamaz
+  var boundCount = 0;
+  var sc2 = makeScrollHost();
+  sc2.addEventListener = function(type, fn){ if(type === 'scroll') boundCount++; };
+  win.__testDocument.querySelector = function(){ return sc2; };
+  win.SeyFx.bindAuroraParallax();
+  win.SeyFx.bindAuroraParallax();
+  ok('idempotent — ikinci çağrı dinleyici eklemez', boundCount === 1, 'bound: '+boundCount);
+
+  // (8) reduced-motion → false
+  win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: true, syncRaf: true });
+  sc = makeScrollHost();
+  win.__testDocument.querySelector = function(){ return sc; };
+  win.__testDocument.getElementById = function(){ return makeAurora(); };
+  ok('reduced-motion\'da false döner', win.SeyFx.bindAuroraParallax() === false);
+  ok('reduced-motion\'da dinleyici bağlanmaz', sc.dataset.auroraBound === undefined);
 })();
 
 console.log('\n=== Özet ===');

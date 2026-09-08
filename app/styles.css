@@ -1658,9 +1658,9 @@
    kullanılır. `premiumAtmosphere` kapalıyken katman opacity:0 (görünmez).
    z-index:0 + #app'in kendi background'u katmanı metnin altında tutar. */
 #sey-aurora{position:fixed;inset:-12%;z-index:0;pointer-events:none;opacity:0;background:radial-gradient(42% 34% at 24% 22%,color-mix(in srgb,var(--accent) 55%,transparent),transparent 70%),radial-gradient(38% 30% at 78% 30%,color-mix(in srgb,var(--room2,#8E7CC3) 45%,transparent),transparent 70%),radial-gradient(46% 36% at 50% 84%,color-mix(in srgb,var(--accent-ink,#886738) 40%,transparent),transparent 72%);}
-#root.theme-aurora #sey-aurora{opacity:.16;animation:seyAurora 14s var(--ease-glide) infinite;will-change:transform,opacity;}
+#root.theme-aurora #sey-aurora{opacity:.16;animation:seyAurora 14s var(--ease-glide) infinite;will-change:transform,translate,opacity;}
 #root[data-theme="dark"].theme-aurora #sey-aurora{opacity:.10;}
-@media (prefers-reduced-motion: reduce){#root.theme-aurora #sey-aurora{animation:none!important;transform:none!important;}}
+@media (prefers-reduced-motion: reduce){#root.theme-aurora #sey-aurora{animation:none!important;transform:none!important;translate:none!important;}}
 /* FX2-25: grain — ::after hava katmanına (FX2-21) dokunmaz, ::before'da yaşar.
    Data-URI < 400 bayt; yeni DOM düğümü yok. */
 #sey-aurora::before{
@@ -1670,7 +1670,7 @@
 }
 #root[data-theme="dark"] #sey-aurora::before{ opacity:.055; }
 @media (prefers-reduced-motion: reduce){
-  #sey-aurora{ transform:none!important; }   /* grain kalır, parallax gider */
+  #sey-aurora{ transform:none!important; translate:none!important; }   /* grain kalır, parallax gider */
 }
 
 /* FX-P-82: aktif sekme ikonu bounce — yalnız sekme DEĞİŞİKLİĞİNDE çalar

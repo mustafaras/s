@@ -629,6 +629,20 @@ Durum: `FX2-24 → FX2-25`, blokaj yok; **Dalga 6 açıldı.**
   olarak değiştirildi → aurora statik ama görünür (grain açık), parallax kapalı.
   `test_premium_reduced_motion` 34/34 ve `test_fx2_ambience` 14/14 bu değişikliği
   onayladı (yalnız `::after`'ın `animation:none!important`'ını iddia ediyorlar).
+- **(6) Gap-fix: parallax `transform` yerine `translate` kullanır (kritik).**
+  "Tam ve kusursuz" doğrulaması sırasında bulundu: `seyAurora` animasyonu
+  `transform`'u sonsuz döngüyle eziyor (CSS animasyonları inline stili
+  bastırır) → `au.style.transform` ile yazılan parallax **ölü koddur**. Çözüm:
+  `au.style.translate = '0 ' + y + 'px'` — CSS Transforms spec'e göre
+  `translate` → `rotate` → `scale` → `transform` sırasıyla uygulanır, yani
+  `translate` ayrı bir özellik olduğu için `seyAurora`'nun `transform`'uyla
+  **BİLEŞİR** ve parallax gerçekten çalışır. styles.css 1661 `will-change`'e
+  `translate` eklendi (5'te kaldı); 1663 + kartın reduced-motion kuralına
+  `translate:none!important` eklendi. Regresyon: `test_premium_fx_utils.js`
+  Test 9 (12 iddia) — fonksiyon var, premium kapalı → false + dinleyici yok,
+  öğe yok → false, bağlanınca true + `auroraBound`, scroll → `translate` set
+  (transform DEĞİŞMEZ), ±24 clamp, idempotent, reduced-motion → false.
+  Fixture 48/48 geçti.
 
 Cache: `styles.css?v=20260908a→b`, `mediaFx.js?v=20260907c→20260908a`,
 `app.js?v=20260907e→20260908a`.
@@ -636,7 +650,8 @@ Cache: `styles.css?v=20260908a→b`, `mediaFx.js?v=20260907c→20260908a`,
 **Kanıt:** `node --check` app.js+mediaFx.js OK; `bindAuroraParallax` app.js 1 /
 mediaFx.js 1; `auroraBound` 3 (idempotans); `feTurbulence` 1; will-change **5**
 (artmadı); grain bloğu 420 bayt (<900). Driver 0 FAIL; reduced_motion 34/34;
-ambience 14/14; tüm `tests/app/*.js` PASS; panel/quran/panel-v2/reminder PASS.
+ambience 14/14; `test_premium_fx_utils` **48/48** (Test 9 parallax regresyonu
+dahil); tüm `tests/app/*.js` PASS; panel/quran/panel-v2/reminder PASS.
 **M7 0.62** (kullanıcı onaylı hedef — kartın literal 0.80 kapısı FX2-24'teki
 ulaşılamaz hedefin aynısı; FX2-25 yeni transition/animation bildirimi eklemiyor).
 Push/deploy/browser/server/network/coverage.json yok.

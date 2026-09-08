@@ -690,6 +690,11 @@
       // dinleyici hiç bağlanmaz. render() her seferinde yeni [data-scroll]
       // üretir; dataset.auroraBound yeni düğümde yok, bu yüzden yeniden
       // bağlanır ve eskisi çöpe gider — sızıntı yok.
+      // NOT: `transform` yerine `translate` özelliği kullanılır — seyAurora
+      // animasyonu `transform`'u sonsuz döngüyle ezer (CSS animasyonları inline
+      // stili bastırır); `translate` ayrı bir özellik olduğu için animasyonla
+      // BİLEŞİR (translate → transform sırasıyla uygulanır), parallax gerçekten
+      // çalışır.
       if (!isPremiumFxEnabled()) return false;
       var sc = document.querySelector('[data-scroll]');
       var au = document.getElementById('sey-aurora');
@@ -701,7 +706,7 @@
         if (ticking) return; ticking = true;
         requestAnimationFrame(function(){
           var y = Math.max(-24, Math.min(24, sc.scrollTop * -0.04));
-          au.style.transform = 'translate3d(0,' + y + 'px,0)';
+          au.style.translate = '0 ' + y + 'px';
           ticking = false;
         });
       }, { passive: true });

@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-26** — varsayılan denetimi (Dalga 7 açılışı) |
-| Sıradaki prompt | **FX2-27** — (Dalga 7) |
+| Son tamamlanan prompt | **FX2-27** — tam regresyon ve kapsam raporu (Dalga 7) |
+| Sıradaki prompt | **FX2-28** — seri kapanış belgesi (Dalga 7 kapanışı) |
 | Aşama | Dalga 7 — Varsayılanlar ve Kapanış |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -719,6 +719,52 @@ Durum: `FX2-26 → FX2-27`, blokaj yok; **Dalga 7 devam ediyor.**
 
 ---
 
+## FX2-27 — Tamamlandı (2026-09-08) · Tam Regresyon ve Kapsam Raporu (salt-okur QA)
+
+Kural karşılandı: **hiçbir kaynak dosya değişmedi**; yalnız
+[`../deliverables/FX2-KAPSAM-RAPORU.md`](../deliverables/FX2-KAPSAM-RAPORU.md)
+üretildi (172 satır). Kartı bir önceki oturum raporu üretmiş ama kapatmamıştı
+(`FX2-STATE.json`/`CURRENT-STATE.md`/`LEDGER.md` hâlâ FX2-26'daydı) — bu oturum
+raporun her iddiasını canlı komutlarla yeniden doğrulayıp kapanışı tamamladı.
+
+**Öncesi/sonrası kapsam (M1–M13):** taban `coverageBaseline` (2026-09-06,
+commit `67f95a6`) → şimdi `tools/fx-coverage.mjs --json` (2026-09-08).
+**12/13 metrik eşikte:** M2 0→390 (≥343), M3 18→408 (≥200), M4 0→390 (≥325),
+M5 1→10 (≥8), M6 0→12 (≥10), M8 2→0 (=0), M9 0→2 (≥2), M10 9→0 (=0),
+M11 3→2 (≤2), M12 0→18 (≥18), M13 0→8 (=8). Tek istisna **M7** (`0.13→0.62`):
+aracın literal eşiği `≥0.80`, `--gate` bu yüzden exit 1 döner; FX2-24'te
+kullanıcı "Elevation + 13 dönüşüm"ü seçip gerçek hedefi **0.62**'ye
+güncelledi (matematiksel tavan — 195 geçiş/animate sitesinin 120'si token
+taşıyor, kalan 75'i bloklu keyframe/`none`/`linear`/animasyon-dışı olduğu
+için token'a geçirilemez; S-sözleşmesi yapay bildirim eklemeyi yasaklıyor).
+
+**Bu oturumda bağımsız yeniden doğrulama** (rapor iddialarının hâlâ geçerli
+olduğunu kanıtlamak için): syntax 11/11 OK; I1–I8 grep'leri `App.*`=718,
+`onclick`=391, `<script src="app.js`=1, `preventDefault`=0, `setInterval`=0,
+`timeTheme.js fetch(`=0, `mediaFx.js fetch(`=1, FX-2'nin `sync.js`'e dokunan
+commit sayısı 0 (`git log --grep="fx2:" -- sync.js`) — hepsi rapordaki
+değerlerle birebir eşleşti; fixture aileleri **94 PASS / 0 FAIL**
+(`tests/app`+`tests/panel`+`tests/panel-v2`+`tests/quran`); `driver.mjs` 0
+FAIL; `zikr-harness.mjs` 95/95; reminder smoke 20 curated/73 assertion PASS;
+`--gate` 12/13 (yalnız M7 ❌, kullanıcı onaylı).
+
+**Kanıt seviyesi (K1/K2/K3):** K1 (kaynak/test) ✅ bu rapor; K2 (yerel
+görsel) — kayıt yok, kanonik yol headless `run-seyma`; K3 (cihaz kabulü) ⏳
+kullanıcıdan bekleniyor. Rapor bilinen sınırları dürüstçe listeler: iOS'ta
+`navigator.vibrate` yok, iOS sessiz anahtarı WebAudio'yu susturabilir, bulut
+TTS `openaiKey` gerektirir (yerel fallback FX2-26'dan beri açık), `render()`
+hâlâ tam `innerHTML`, canlı zemin `data.weather` boşken yalnız zaman+mevsimle
+çalışır.
+
+`git status --short` yalnız bu rapor + anti-amnesia dosyalarını gösterir;
+`app.js`/`sync.js`/`app/**`/`tests/**`/`index.html` dokunulmadı.
+Push/deploy/browser/network yok. `FX2-STATE.json` →
+`lastCompletedPrompt:FX2-27`, `nextPrompt:FX2-28`, `blockedPrompt:null`.
+
+Durum: `FX2-27 → FX2-28`, blokaj yok; **Dalga 7 son karta girdi.**
+
+---
+
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
 
 **1. Kartlar yeniden numaralandı ve yeniden yazıldı.** 21 kart (gap'li
@@ -759,7 +805,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-27.md`](../.prompts/FX2-27.md)
+2. Kart: [`../.prompts/FX2-28.md`](../.prompts/FX2-28.md) — seri kapanışı
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

@@ -1,6 +1,6 @@
 # Premium FX — Güncel Durum
 
-**Tarih:** 2026-09-07
+**Tarih:** 2026-09-08
 **Seri:** **FX-2 — "Hissedilir Premium"** (yeni seri açıldı)
 **Dal:** `premium-fx-gorsel-yuzey` · **LOCAL ONLY** (push/merge/deploy yok)
 **Plan sürümü:** FX-2 v2.0 (28 kart, 8 dalga)
@@ -11,9 +11,9 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-22** — mevsim katmanı + günlük varyasyon |
-| Sıradaki prompt | **FX2-23** — (Dalga 5 kapanışı) |
-| Aşama | Dalga 5 — Canlı Zemin |
+| Son tamamlanan prompt | **FX2-23** — canlı zemin fixture'ı (Dalga 5 kapanışı) |
+| Sıradaki prompt | **FX2-24** — (Dalga 6 açılışı) |
+| Aşama | Dalga 6 — Malzeme ve Derinlik |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
 
@@ -512,6 +512,45 @@ Durum: `FX2-22 → FX2-23`, blokaj yok.
 
 ---
 
+## FX2-23 — Tamamlandı (2026-09-08) · Canlı Zemin Fixture'ı (Dalga 5 kapanışı)
+
+Yeni ağsız `tests/app/test_fx2_ambience.js` (14 grup) — **Dalga 5'in kapanış
+kanıtı**. Uygulama dosyasına **hiç dokunulmadı** (kartın DOKUNULMAYACAK
+koşulu karşılandı; `git status` uygulama temiz).
+
+- **Yöntem:** GERÇEK `app/core/timeTheme.js`'i `node:vm` ile sahte
+  `window`/`document` üzerinde yükler; `app/styles.css`'i metin olarak okur.
+  `makeRoot()` sahte root'u `className`/`classList`/`style` senkron tutar;
+  `blocksForSelector()` CSS kural bloklarını (selector + body) ayıklar.
+- **14 grup:** (1) WMO eşlemesi tam — 8 sahne + bilinmeyen/null → `none`;
+  (2) şiddet sınırları 0.15≤x≤1, uçlar doğru (`{0,0}→0.15`, `{99,99}→1`,
+  `null→0.35`, `{4,20}→0.5`); (3) seed determinizmi — aynı gün aynı, farklı
+  gün farklı, 100 gün 0≤s<1; (4) güneş saati 4 dilimin hepsi üretilebiliyor
+  (sunrise 06:00/sunset 18:00 → dawn/day/dusk/night); (5) fallback spot=null
+  yine geçerli `amb-time-*`; (6) fallback `SeyTimeTheme.classForHour` ile
+  eşleşiyor; (7) apply() gating — premium kapalı → tüm `amb-*` silinir + `false`;
+  (8) apply() yazımı — premium açık → 3 katman + 3 değişken
+  (`--wx-intensity`/`--amb-seed`/`--wx-dim`); (9) **katman ayrımı (KRİTİK)** —
+  üç katman aynı özelliği yazmıyor (time: `--page`/`--amb-angle`/transition,
+  wx: yalnız `#sey-aurora::after` üzerinde opacity/background/animation,
+  season: `--season-accent`/box-shadow); (10) opaklık tavanı — hiçbir
+  `amb-wx-*` > 0.09; (11) DOM parçacığı yok — yağmur/kar gradient,
+  `createElement`=0; (12) reduced-motion `animation:none!important`;
+  (13) batarya — `setInterval`=0, `visibilitychange`, `amb-paused`;
+  (14) kontrast M13 — 4 zaman × 2 tema = 8 çift ≥ 4.5:1, duraklar CSS'ten
+  okunur (sabitlenmez).
+
+**Kanıt:** fixture **14/14 PASS**; `test_fx2_palette_contrast` 12/12;
+`test_premium_time_theme` 53/53; tüm `tests/app/*.js` **35/35 PASS**;
+`git status` uygulama temiz. **M12 18 ≥ 18 ✅, M13 8 = 8 ✅** — Dalga 5
+kapanış kapıları sağlandı. M7 (0.55, hedef ≥0.80) ve M8 (2, hedef 0) bilinçli
+olarak sonraki dalgalara ertelendi (Dalga 6/7). Push/deploy/browser/server/
+network/coverage.json yok.
+
+Durum: `FX2-23 → FX2-24`, blokaj yok; **Dalga 5 kapandı.**
+
+---
+
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
 
 **1. Kartlar yeniden numaralandı ve yeniden yazıldı.** 21 kart (gap'li
@@ -552,7 +591,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-19.md`](../.prompts/FX2-19.md)
+2. Kart: [`../.prompts/FX2-24.md`](../.prompts/FX2-24.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

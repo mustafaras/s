@@ -48,7 +48,26 @@
     ctx._seyAudioGraph = { bus:bus, compressor:compressor, limiter:limiter, reverbSend:reverbSend, convolver:convolver };
     return ctx._seyAudioGraph;
   }
-  function outputFor(ctx){ return (ctx && ctx._seyAudioGraph && ctx._seyAudioGraph.bus) || (ctx && ctx.destination); }
+  // TAM-DENETIM B-13: sessiz saatlerde (23:00–07:00) UI sesleri TAM SESTE
+  // çalıyordu. Sözleşme quiet-time'ı bilinçli olarak yalnız `voice` ve
+  // `ambient` ile sınırlıyordu (bkz. isQuietTime yorumu), ama gece 03:00'te
+  // uygulamaya dokunan kullanıcı tam ses tık alıyordu — ölçüldü: tap RMS
+  // 0,02872 (gündüzle aynı). Tamamen susturmak yerine ZAYIFLATMA: kullanıcı
+  // uiSounds'ı bilinçli açtıysa geri bildirim kaybolmamalı, sadece incelmeli.
+  // Tek nokta: master bus kazancı. Ses üretim yolları hiç değişmez.
+  var BUS_GAIN_NORMAL = 0.8, BUS_GAIN_QUIET = 0.28;
+  function syncBusGain(ctx){
+    try{
+      var g = ctx && ctx._seyAudioGraph && ctx._seyAudioGraph.bus;
+      if (!g || !g.gain) return;
+      var want = isQuietTime() ? BUS_GAIN_QUIET : BUS_GAIN_NORMAL;
+      if (g.gain.value !== want) g.gain.value = want;
+    }catch(e){}
+  }
+  function outputFor(ctx){
+    syncBusGain(ctx);
+    return (ctx && ctx._seyAudioGraph && ctx._seyAudioGraph.bus) || (ctx && ctx.destination);
+  }
   function removeActive(entry){
     var index = ACTIVE_VOICES.indexOf(entry);
     if (index >= 0) ACTIVE_VOICES.splice(index,1);
@@ -292,7 +311,12 @@
       try{ var c = bootCtx(); return !!(c && c.state === 'running' && allowed()); }
       catch(e){ return false; }
     },
-    tick: function(){ if (allowed(true)) playNoise({ dur:0.022, freq:4000, q:2.4, gain:0.012 }); },
+    // TAM-DENETIM B-12: ölçülen tepe RMS 0,00085 idi — `tap`ın (0,02584) ~1/30'u
+    // ve taban gürültünün yalnız 11 katı; hoparlörle günlük kullanımda kayboluyordu.
+    // Kazanç 0,012 → 0,055, süre 22 → 30 ms. Tık hâlâ `tap`tan belirgin biçimde
+    // daha sönük kalır (amaç bu: zikir sayacı için arka planda bir nabız), ama
+    // artık gerçekten duyulur.
+    tick: function(){ if (allowed(true)) playNoise({ dur:0.030, freq:4000, q:2.4, gain:0.055 }); },
     tap: function(){ playTone(660, 0.045, 'sine', 0.065, true, { transientDur:0.008, transientFreq:4000, transientQ:2.4, transientGain:0.01, filter:3600, filterEnd:3000, reverb:0.03 }); },
     toggleOn: function(){ playArpeggio([587, 784], 0.09, 'sine', { interval:0.035, noteDur:0.055, gain:0.07, filter:3200, reverb:0.07, transientDur:0.008 }); },
     toggleOff: function(){ playArpeggio([784, 587], 0.09, 'sine', { interval:0.035, noteDur:0.055, gain:0.06, filter:2800, reverb:0.05, transientDur:0.008 }); },

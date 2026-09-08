@@ -721,3 +721,126 @@ kozmetik/karar maddesi.
 - [x] `seyma-data`'ya yazma yok — `api.github.com`'a 0 istek
 - [x] Push / merge / deploy / tag **yok**
 - [ ] **K3 cihaz kabulü — yalnız kullanıcıdan gelir**
+
+---
+
+# EK — DÜZELTME TURU (aynı gün, denetimden sonra)
+
+> Kullanıcı talimatı: *"şimdi tümünü düzelt ve header için hava durumu renk ve
+> diğer dinamik yeniliklerin en premium ve elit bi şekilde headerda da
+> görünmesi… hava durumu ve gün vakitleri headerda tam premium elit bi şekilde
+> anlaşılmalı"*. Bu bölüm salt-okur denetimin **kapanışı değil**, ona verilen
+> yanıttır: 13 bulgunun tamamı ele alındı + header canlı sahnesi eklendi.
+
+## E1. Bulgu bazında sonuç
+
+| # | Bulgu | Durum | Kanıt |
+|---|---|---|---|
+| 🔴 B-01 | Geçici konum hatası kalıcı kilit | **DÜZELTİLDİ** | `locationGatePermanentFailure()` — yalnız `code 1`/`unsupported`/`insecure-context` kalıcı bayrağı düşürür. Repro: geçici timeout → `locationEnabled` **true kaldı**; `code 1` → doğru şekilde `false` |
+| 🔴 B-02 | Kapı ekranlarında zemin yok | **DÜZELTİLDİ** | `paintAmbientShell()` artık `render()`'ın **başında**. Kapıda `rootClass` boş yerine tam sahne: `theme-aurora … amb-time-dusk amb-wx-storm amb-season-autumn` |
+| 🔴 B-03 | Koyu temada sahneler görünmez | **DÜZELTİLDİ (zaman) / KISMİ (hava)** | Zaman: 6/6 çift eşiği geçti (aşağıdaki tablo). Hava: sayfa zemininde 4,8× iyileşti ama sözleşme tavanı nedeniyle 3'ün altında — **asıl hava sinyali header'a taşındı** (5,09) |
+| 🔴 B-04 | `sey-ring-seg` hiçbir yüzeyde yok | **DÜZELTİLDİ** | 4 hero halkasının tamamı elle yazılmış geçişten token sistemine alındı; çalışma zamanı ölçümü `0 → 4` |
+| 🟡 B-05 | Sahne yalnız etkileşimde tazeleniyor | **DÜZELTİLDİ** | `ambienceRefreshTimerId` (30 sn) → `syncHeaderScene()`; tam `render()` yapmaz, taslak/scroll/odak korunur |
+| 🟡 B-06 | `premiumAtmosphere` gating sızıntısı | **DÜZELTİLDİ** | `apply()` + `applySeasonal()` temizliği premium kontrolünden **öne** alındı |
+| 🟡 B-07 | `sey-stagger` ana sekmelerde yok | **NÜANSLANDI + ölü seçici temizlendi** | `SeyFx.enter` zaten `animationDelay=i*40ms` ile kademelendiriyor — **efekt vardı, sınıf yoktu**. Ölü `.card`/`.bento` seçicileri kaldırıldı, header sahnesi sıraya eklendi |
+| 🟡 B-08 | `data-fx` niyet kapsamı ince | **DÜZELTİLDİ** | 41 → **69** kaynak satırı. `destructive` 6→**31**, `confirm` 2→**5** |
+| 🟡 B-09 | İki zaman sistemi çelişiyor | **DÜZELTİLDİ** | `theme-time-*` artık güneş saatinden türetiliyor. Ölçüm: `theme-time-dusk` + `amb-time-dusk` — **uyumlu** (eskiden dusk/day çelişiyordu) |
+| 🔵 B-10 | Çağrılmayan API'ler | **BÜYÜK ÖLÇÜDE ÇÖZÜLDÜ** | B-08 sayesinde `SeyAudio.error`, `SeyHaptics.success/error` artık 31+5 buton üzerinden erişilebilir. `SeyFx.transition` hâlâ 0 (kozmetik borç olarak bırakıldı) |
+| 🔵 B-11 | Ölü CSS sınıfları | **DÜZELTİLDİ + RAPOR HATASI GİDERİLDİ** | `sey-enter-delay-1/2/3` header sahnesinde kullanıma alındı. **`sey-sheet-in` ölü DEĞİLDİ** — bir `@keyframes` adı ve iki fixture ona bağlı (§E3) |
+| 🔵 B-12 | `tick` duyulmuyor | **DÜZELTİLDİ** | `gain` 0,012 → 0,055 · `dur` 22 → 30 ms |
+| 🔵 B-13 | Quiet-time UI sesini susturmuyor | **DÜZELTİLDİ (zayıflatma)** | Master bus kazancı 23:00–07:00 arası 0,8 → **0,28**. Susturma değil incelme: kullanıcı `uiSounds`'ı bilinçli açtıysa geri bildirim kaybolmaz |
+
+## E2. Ölçülen iyileşme
+
+**Koyu tema zaman sahneleri** (ortalama mutlak piksel farkı, eşik ≥ 3):
+
+| Çift | Önce | Sonra | Δ | |
+|---|---:|---:|---:|:--:|
+| şafak ↔ gece | 1,862 | **8,408** | +6,55 | ✅ |
+| gündüz ↔ gece | 2,137 | **6,588** | +4,45 | ✅ |
+| şafak ↔ gündüz | 2,354 | **6,424** | +4,07 | ✅ |
+| akşam ↔ gece | 2,247 | **6,177** | +3,93 | ✅ |
+| **gündüz ↔ akşam** | **0,954** | **6,018** | +5,06 | ✅ |
+| şafak ↔ akşam | 2,146 | **5,113** | +2,97 | ✅ |
+
+**6/6 çift eşiği geçti** (önce 0/6).
+
+**Header bölgesi** (üst 340 pt) — kullanıcının asıl istediği yüzey:
+
+| Ayrım | Ölçüm | |
+|---|---:|:--:|
+| gündüz ↔ akşam (zaman) | **10,872** | ✅ |
+| açık ↔ fırtına (hava) | **5,092** | ✅ |
+| açık ↔ kar (hava) | **4,420** | ✅ |
+
+**Sayfa zemini hava katmanı** — fırtına 0,567 → **2,696** (4,8×), kar 1,921 → **2,769**.
+Hâlâ 3'ün altında ve bu **bilinçli**: `FX2-23.10` sözleşmesi `amb-wx-*` opaklığını
+**≤ 0,30** ile sınırlar (okunabilirlik koruması). Tavanı kırmak yerine hava
+sinyali header'a taşındı — kullanıcının istediği yer de zaten orasıydı.
+
+## E3. Header canlı sahnesi — ne eklendi
+
+Üç katman, tamamı CSS ile sürülür (JS renk hesabı yok, **ağ çağrısı yok**,
+yeni `App.*` handler'ı yok — I1–I6 korunur):
+
+1. **`.sey-hdr-sky`** — 4 zaman × 8 hava = gökyüzü gradienti + hava dokusu
+   (yağmur çizgileri, kar taneleri, sis, fırtına + şimşek). Açık ve koyu tema
+   için ayrı paletler.
+2. **`.sey-hdr-arc`** — güneş yayı: gerçek doğuş→batış ilerlemesi kuadratik
+   Bézier üzerinde bir nokta olarak. Gece gümüş, gündüz altın.
+3. **`.sey-hdr-wx` + `.sey-hdr-phase`** — hava rozeti (ikon · sıcaklık · durum)
+   ve vakit etiketi (ŞAFAK/GÜNDÜZ/AKŞAM/GECE + doğuş veya batış saati).
+
+**Mimari not (önemli):** Header **kendi sınıf ad alanını** kullanır
+(`sky-time-*` / `sky-wx-*`), `amb-*` değil. Neden: `FX2-23.9` sözleşmesi
+`amb-wx-*` seçicilerinin **yalnız** `#sey-aurora::after` hedeflemesini şart
+koşar. İlk denememde header'ı `amb-*` ile sürdüm ve fixture haklı olarak
+düştü — **test gevşetilmedi**, mimari düzeltildi (§10.4 kuralı).
+
+## E4. Bu turda bulduğum kendi hatalarım
+
+1. **`sey-sheet-in` ölü değildi.** Denetim raporunun B-11 maddesi onu "hiçbir
+   kaynakta yok" diye işaretlemişti. Gerçekte bir **`@keyframes` adı**
+   (`animation:sey-sheet-in …`) ve `test_fx2_overlay_motion.js` ile
+   `test_premium_reduced_motion.js` ona bağlı. Grep'im sınıf arıyordu, keyframe
+   tanımlayıcısını değil. **Silinmedi.**
+2. **Coverage kapısı aslında exit 1 veriyor.** Rapor §9'da "exit 0" yazmıştım;
+   `EXIT=$?`'i bir pipe'tan sonra okuduğum için `tail`'in çıkış kodunu almışım.
+   Gerçek: M7 = 0,62 < 0,80 eşiği olduğu için kapı **exit 1** döner. Bu
+   **beklenen ve onaylı** durumdur (FX2-KAPANIS'ta kayıtlı tavan), ama raporun
+   ifadesi yanlıştı.
+3. **CSS yorumu sözleşme tarayıcısını yanılttı.** `amb-wx-*` metnini bir
+   yorumda kullanınca `test_fx2_ambience.js` ardından gelen bloğu hava katmanı
+   sandı. Yorum yeniden yazıldı — testin kaba metin taraması bilinçli olarak
+   muhafazakâr, bu doğru davranış.
+4. **B-07 fazla sert yazılmıştı.** "Ana sekmelerde stagger yok" doğruydu ama
+   yalnız **sınıf** için; kademeli giriş **efekti** `SeyFx.enter`'ın
+   `animationDelay`'i ile zaten çalışıyordu.
+
+## E5. Regresyon kanıtı (düzeltmeler sonrası)
+
+| Kapı | Sonuç |
+|---|---|
+| `tests/app` + `panel` + `panel-v2` + `quran` | **94 fixture, 0 FAIL** |
+| `test_fx2_ambience.js` (sözleşme) | **14/14 PASS** |
+| `tests/reminders/run-reminder-smoke.mjs` | 73 assertion + 20 fixture PASS |
+| `driver.mjs` | **0 FAIL** |
+| `zikr-harness.mjs` | **95/95** |
+| `node --check` × 33 dosya | 0 hata |
+| `fx-coverage --gate` | M7 = 0,62 (onaylı tavan), diğer 12 metrik ✅ |
+| **Değişmezler** | `App.*` **718** · `onclick=` **391** · script tag **1** · `preventDefault` **0** · timeTheme `setInterval` **0** / `fetch(` **0** |
+
+Cache-busting bump edildi: `app.js?v=20260908f`, `styles.css?v=20260908d`,
+`mediaFx.js?v=20260908c`, `timeTheme.js?v=20260908a`.
+
+## E6. Kanıt seviyesi
+
+- **K1 (kaynak/test):** ✅ tam — yukarıdaki kapıların tamamı.
+- **K2 (yerel görsel):** ✅ — `duzeltme-header-aksam-acik-koyu.png`,
+  `duzeltme-header-koyu-aksam-firtina.png`, `duzeltme-header-koyu-gece-kar.png`,
+  `duzeltme-header-koyu-safak-bulut.png`, `duzeltme-konum-kapisi-zeminli.png`
+  + piksel farkı ölçümleri.
+- **K3 (cihaz kabulü):** ⏳ **BEKLİYOR — yalnız kullanıcıdan gelir.**
+  Özellikle iOS haptik ve gerçek GPS zaman aşımı davranışı burada ölçülemez.
+
+**Push / merge / deploy / tag YOK.**

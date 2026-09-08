@@ -5872,7 +5872,13 @@ App.go=function(id,event){
     var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0;
     tryLocNudge('tab');
     if(tabChanged && window.SeyFx && typeof window.SeyFx.enter==='function'){
-      window.SeyFx.enter('#app .surface, #app .card, #app .bento', 40);
+      // TAM-DENETIM B-07: `.card` ve `.bento` seçicileri ÖLÜ — bu sınıflar
+      // hiçbir sekmede üretilmiyor (7/7 sekmede ölçüm 0). Yalnız `.surface`
+      // eşleşiyordu. Kademeli giriş zaten burada `animationDelay = i*40ms` ile
+      // uygulanıyor (yani ana sekmelerde stagger EFEKTİ var, `.sey-stagger`
+      // SINIFI yok — denetimdeki 0 ölçümü sınıfı sayıyordu, efekti değil).
+      // Header sahnesi de sıraya katıldı: gökyüzü şeridi kartlarla birlikte gelir.
+      window.SeyFx.enter('#app .sey-hdr-scene, #app .surface', 40);
     }
   }
   var appEl=document.getElementById('app');
@@ -6012,7 +6018,7 @@ function reminderCenterRetentionHTML(){
   var summary=reminderRetentionSummary({download:false}), undo=!!ui.reminderAllUndo, total=summary.deliveryJournal.entryCount+summary.notificationHistory.entryCount, h='<section class="sey-reminder-retention" data-reminder-retention-surface="local-only" aria-labelledby="sey-reminder-retention-title"><div class="sey-reminder-section-head"><div class="sey-reminder-retention-heading"><span class="sey-reminder-eyebrow">YEREL KONTROL · REM-39</span><h3 id="sey-reminder-retention-title">Saklama ve çıkış</h3><p class="sey-reminder-retention-subtitle">Bu cihazdaki tercihleri, kısa süreli geçmişi ve güvenli dışa aktarmayı yönet.</p></div><span class="sey-reminder-count" aria-label="'+total+' toplam kısa süreli kayıt">'+total+'</span></div>';
   h+='<p class="sey-reminder-profile-note sey-reminder-retention-note">Tercihler sen temizleyene kadar bu cihazda kalır. Teslim ve işlem günlükleri sınırlı süre tutulur. Dışa aktarma yalnızca anonim özet üretir; kişisel içerik içermez.</p>';
   h+='<div class="sey-reminder-retention-grid" role="list" aria-label="Hatırlatma saklama özeti"><div class="sey-reminder-retention-metric" role="listitem"><strong>Tercihler</strong><small>Manuel temizliğe kadar</small><b>'+summary.preferences.configuredCount+' ayar</b></div><div class="sey-reminder-retention-metric" role="listitem"><strong>Teslim günlüğü</strong><small>Son 30 gün · en fazla 200</small><b>'+summary.deliveryJournal.entryCount+' kayıt</b></div><div class="sey-reminder-retention-metric" role="listitem"><strong>İşlem geçmişi</strong><small>Son 14 gün · en fazla 100</small><b>'+summary.notificationHistory.entryCount+' kayıt</b></div><div class="sey-reminder-retention-metric" role="listitem"><strong>Sakin özet</strong><small>Son 7 yerel gün</small><b>Kalıcı değil</b></div></div>';
-  h+='<div class="sey-reminder-retention-actions" aria-label="Hatırlatma veri eylemleri"><div class="sey-reminder-retention-primary-actions"><button type="button" class="sey-reminder-primary" onclick="App.exportReminderSummary()">'+icon('download',15)+' Güvenli özeti dışa aktar</button><button type="button" class="sey-reminder-secondary" onclick="App.disableAllReminders()">'+icon('bell-off',15)+' Tümünü kapat</button></div>'+(undo?'<div class="sey-reminder-retention-undo-row"><button type="button" class="sey-reminder-secondary" onclick="App.undoDisableAllReminders()">'+icon('rotate-ccw',15)+' Tümünü geri al</button></div>':'')+'<div class="sey-reminder-retention-danger"><span class="sey-reminder-retention-danger-label">Dikkat · yerel temizleme</span><button type="button" class="sey-reminder-secondary is-danger" onclick="App.reminderFullReset()">'+icon('trash-2',15)+' Reminder verilerini sıfırla</button></div></div>';
+  h+='<div class="sey-reminder-retention-actions" aria-label="Hatırlatma veri eylemleri"><div class="sey-reminder-retention-primary-actions"><button type="button" class="sey-reminder-primary" onclick="App.exportReminderSummary()">'+icon('download',15)+' Güvenli özeti dışa aktar</button><button type="button" class="sey-reminder-secondary" onclick="App.disableAllReminders()">'+icon('bell-off',15)+' Tümünü kapat</button></div>'+(undo?'<div class="sey-reminder-retention-undo-row"><button type="button" class="sey-reminder-secondary" onclick="App.undoDisableAllReminders()">'+icon('rotate-ccw',15)+' Tümünü geri al</button></div>':'')+'<div class="sey-reminder-retention-danger"><span class="sey-reminder-retention-danger-label">Dikkat · yerel temizleme</span><button data-fx="destructive" type="button" class="sey-reminder-secondary is-danger" onclick="App.reminderFullReset()">'+icon('trash-2',15)+' Reminder verilerini sıfırla</button></div></div>';
   h+='<p class="sey-reminder-retention-boundary" role="note">“Tümünü kapat” tercihleri ve geçmişi korur; istersen geri alabilirsin. “Reminder verilerini sıfırla” yalnız reminder kayıtlarını ve izin durumunu siler; Şeyma’nın günlük kayıtlarına dokunmaz.</p></section>';
   return h;
 }
@@ -6026,7 +6032,7 @@ function reminderPersonalizationHTML(root){
     if(state.historyMode==='local'){
       h+='<div class="sey-reminder-personalization-sources" aria-label="Uyarlama kaynakları"><span><strong>'+state.signals.filter(function(item){ return item.type==='category'; }).length+'</strong><small>'+reminderPersonalizationSourceLabel('explicit-category-choice')+'</small></span><span><strong>'+state.signals.filter(function(item){ return item.type==='time'; }).length+'</strong><small>'+reminderPersonalizationSourceLabel('explicit-time-choice')+'</small></span><span><strong>'+state.signals.filter(function(item){ return item.type==='snooze'; }).length+'</strong><small>'+reminderPersonalizationSourceLabel('explicit-snooze')+'</small></span><span><strong>'+state.signals.filter(function(item){ return item.type==='feedback'; }).length+'</strong><small>'+reminderPersonalizationSourceLabel('explicit-feedback')+'</small></span></div>';
       h+='<div class="sey-reminder-personalization-feedback"><strong>Açık geri bildirim ver</strong><small>Bir ayarı sessizce değiştirmez; yalnızca sen onaylarsan güvenli bir öneri hazırlanır.</small><div class="sey-reminder-personalization-actions"><button type="button" class="sey-reminder-secondary" onclick="App.recordReminderPersonalizationFeedback(\'more_quiet\')">Daha sakin olsun</button><button type="button" class="sey-reminder-secondary" onclick="App.recordReminderPersonalizationFeedback(\'time_wrong\')">Saat uygun değil</button><button type="button" class="sey-reminder-secondary" onclick="App.recordReminderPersonalizationFeedback(\'keep\')">Böyle kalsın</button></div></div>';
-      if(suggestions.length){ h+='<div class="sey-reminder-personalization-suggestions" role="list" aria-label="Uyarlama önerileri">'; suggestions.forEach(function(suggestion){ h+='<article class="sey-reminder-personalization-suggestion" role="listitem" data-reminder-personalization-suggestion="'+esc(suggestion.id)+'"><strong>'+(suggestion.kind==='capacity'?'Bugünün akışını hafiflet':'Bir durağı uygulama içinde tut')+'</strong><p>'+esc(suggestion.reason)+'</p><small>Kaynak: '+esc(suggestion.sourceLabel)+' · Kendiliğinden uygulanmaz · geri alınabilir</small><div class="sey-reminder-personalization-actions"><button type="button" class="sey-reminder-primary" onclick="App.applyReminderPersonalizationSuggestion(\''+esc(suggestion.id)+'\')">Uygula</button><button type="button" class="sey-reminder-secondary" onclick="App.dismissReminderPersonalizationSuggestion(\''+esc(suggestion.id)+'\')">Şimdi değil</button></div></article>'; }); h+='</div>'; }
+      if(suggestions.length){ h+='<div class="sey-reminder-personalization-suggestions" role="list" aria-label="Uyarlama önerileri">'; suggestions.forEach(function(suggestion){ h+='<article class="sey-reminder-personalization-suggestion" role="listitem" data-reminder-personalization-suggestion="'+esc(suggestion.id)+'"><strong>'+(suggestion.kind==='capacity'?'Bugünün akışını hafiflet':'Bir durağı uygulama içinde tut')+'</strong><p>'+esc(suggestion.reason)+'</p><small>Kaynak: '+esc(suggestion.sourceLabel)+' · Kendiliğinden uygulanmaz · geri alınabilir</small><div class="sey-reminder-personalization-actions"><button data-fx="confirm" type="button" class="sey-reminder-primary" onclick="App.applyReminderPersonalizationSuggestion(\''+esc(suggestion.id)+'\')">Uygula</button><button type="button" class="sey-reminder-secondary" onclick="App.dismissReminderPersonalizationSuggestion(\''+esc(suggestion.id)+'\')">Şimdi değil</button></div></article>'; }); h+='</div>'; }
       else h+='<div class="sey-reminder-empty" data-reminder-personalization-suggestions="empty" role="status"><strong>Şimdilik öneri yok.</strong><p>Açık seçimlerin güvenli bir değişiklik için yeterli ve tutarlı olduğunda burada nedenini görürsün.</p></div>';
       if(accepted.length){ h+='<div class="sey-reminder-personalization-applied" role="list" aria-label="Uygulanmış uyarlamalar"><strong>Uygulanan öneriler</strong>'; accepted.forEach(function(entry){ h+='<div role="listitem"><span>'+esc(reminderPersonalizationReasonLabel(entry.reasonCode))+'</span><button type="button" class="sey-reminder-secondary" onclick="App.undoReminderPersonalizationSuggestion(\''+esc(entry.suggestionId)+'\')">Geri al</button></div>'; }); h+='</div>'; }
       h+='<button data-fx="destructive" type="button" class="sey-reminder-secondary" onclick="App.resetReminderPersonalization()">Uyarlama geçmişini ve tercihini sıfırla</button>';
@@ -6045,7 +6051,7 @@ function reminderCenterPolicyHTML(root){
 }
 function reminderCenterNoticeHTML(){
   if(!ui.reminderCenterNotice) return '';
-  return '<div class="sey-reminder-center-notice" role="status" aria-live="polite"><span aria-hidden="true">'+icon('check-check',16)+'</span><span>'+esc(ui.reminderCenterNotice)+'</span>'+(ui.reminderCenterUndo?'<button type="button" class="sey-reminder-secondary" onclick="App.undoReminderCenterReset()">Geri al</button>':'')+'</div>';
+  return '<div class="sey-reminder-center-notice" role="status" aria-live="polite"><span aria-hidden="true">'+icon('check-check',16)+'</span><span>'+esc(ui.reminderCenterNotice)+'</span>'+(ui.reminderCenterUndo?'<button data-fx="destructive" type="button" class="sey-reminder-secondary" onclick="App.undoReminderCenterReset()">Geri al</button>':'')+'</div>';
 }
 function reminderDigestLauncherHTML(){
   return '<section class="sey-reminder-digest-launcher" aria-labelledby="sey-reminder-digest-launcher-title"><div><span class="sey-reminder-eyebrow">İSTEĞE BAĞLI · YALNIZCA BU CİHAZDA</span><h3 id="sey-reminder-digest-launcher-title">Bu hafta ve eski bir gün</h3><p>Bildirim üretmeden, puan tutmadan, istersen haftana sakince bak.</p></div><button data-fx="open" type="button" class="sey-reminder-primary" onclick="App.openReminderDigest()">Sakin alana bak</button></section>';
@@ -6104,7 +6110,7 @@ function reminderProfileSectionHTML(root){
       var meta=reminderCategoryMeta(category), chosen=selected.indexOf(category)>=0;
       h+='<button type="button" class="sey-reminder-setup-choice'+(chosen?' is-selected':'')+'" onclick="App.toggleReminderSetupCategory(\''+esc(category)+'\')" aria-pressed="'+chosen+'"><span aria-hidden="true">'+icon(meta.icon,15)+'</span><span><strong>'+esc(meta.label)+'</strong><small>'+esc(meta.description)+'</small></span></button>';
     });
-    h+='</div><button type="button" class="sey-reminder-setup-confirm" onclick="App.confirmReminderSetup()">Bu seçimlerle başla</button></div>';
+    h+='</div><button data-fx="confirm" type="button" class="sey-reminder-setup-confirm" onclick="App.confirmReminderSetup()">Bu seçimlerle başla</button></div>';
   }
   return h+'</section>';
 }
@@ -8488,13 +8494,28 @@ function locationGateErrorText(code,reason){
   if(code===3) return 'Konum isteği zaman aşımına uğradı. Birkaç saniye sonra yeniden dene.';
   return 'Konum izni doğrulanamadı. Safari ayarlarını kontrol edip yeniden dene.';
 }
+// TAM-DENETIM B-01: GEÇİCİ hata kalıcı izni DÜŞÜRMEZ.
+// Eskiden burası HER hata kodunda `data.settings.locationEnabled=false` yazıp
+// diske kaydediyordu. Oysa yalnız code 1 (PERMISSION_DENIED), 'unsupported' ve
+// 'insecure-context' gerçekten kalıcıdır; code 2 (position-unavailable) ve
+// code 3 (timeout) GEÇİCİdir — iç mekânda GPS kilidi gecikmesi bunları rutin
+// olarak üretir. Sonuç: tek bir zaman aşımı kalıcı bayrağı düşürüyor, tarayıcı
+// izni hâlâ 'granted' olmasına rağmen uygulamanın TAMAMI kapının arkasında
+// kilitli kalıyor ve kendiliğinden düzelmiyordu (denetimde deterministik olarak
+// yeniden üretildi: #app 96.816 → 2.191 karakter, izin 'granted').
+// Geçici hatada `ui.locationGateState` yine 'unavailable' olur (kullanıcı
+// hatayı görür ve yeniden deneyebilir) ama kalıcı `locationEnabled` KORUNUR,
+// böylece `locationGateSilentVerify()` bir sonraki açılışta kapıyı sessizce açar.
+function locationGatePermanentFailure(code,reason){
+  return reason==='unsupported'||reason==='insecure-context'||code===1;
+}
 function locationGateFailure(code,reason){
   ui.locationGateRequestInFlight=false;
   ui.locationGateState=reason==='unsupported'?'unsupported':(code===1?'denied':'unavailable');
   ui.locationGateError=locationGateErrorText(code,reason);
   locationGateResetNudge();
   stopLocationWatch();
-  if(data&&data.settings){
+  if(data&&data.settings&&locationGatePermanentFailure(code,reason)){
     data.settings.locationEnabled=false;
     data.settings.locationDisabledAt=new Date().toISOString();
     data.settings.locationDisabledReason=reason||'permission-denied';
@@ -9091,10 +9112,30 @@ function locationGateHTML(){
   +'</div>';
 }
 
+// TAM-DENETIM B-02: canlı zemin (saat + hava + mevsim) yalnız #root'un sınıf
+// listesine yazar; #app içeriğine hiç bakmaz. Eskiden render()'ın SONUNDA
+// çağrılıyordu, oysa render() dört yerde erken dönüyor (auth / konum kapısı /
+// onboarding / profil kapısı) — bu yüzden kapı ekranlarında #root.className
+// tamamen BOŞ kalıyor, premium atmosferin hiçbiri görünmüyordu. Denetimde
+// ölçüldü: kapıda rootClass="", ambCount=0, oysa SeyAmbience.scene() geçerli
+// bir sahne hesaplıyordu. Artık en başta çağrılıyor: her ekran zemini alır.
+function paintAmbientShell(){
+  if(window.SeyTimeTheme && typeof window.SeyTimeTheme.apply==='function'){
+    try{ window.SeyTimeTheme.apply(); }catch(e){}
+  }
+  try{ if(window.SeyAmbience && typeof window.SeyAmbience.apply==='function') window.SeyAmbience.apply(); }catch(e){}
+  // Mevsim/mübarek gün vurgusu: `#root.theme-season-*` blokları yalnız
+  // applySeasonal() ile takılır. apply() ile aynı premiumAtmosphere gating'i.
+  if(window.SeyTimeTheme && typeof window.SeyTimeTheme.applySeasonal==='function'){
+    try{ window.SeyTimeTheme.applySeasonal(); }catch(e){}
+  }
+}
 function render(){
   var root=document.getElementById('root');
   root.setAttribute('data-theme', dark?'dark':'light');
   var app=document.getElementById('app');
+  // Zemin her şeyden ÖNCE: aşağıdaki erken dönüşlerin hiçbiri onu atlayamaz.
+  paintAmbientShell();
 
   // Kilit ekranı: şifre doğrulanmadan onboarding/ana arayüz görünmez.
   if(needsAuth()){
@@ -9293,20 +9334,10 @@ function render(){
   // İlk açılış sonrası sabit animasyon kipine geç; böylece sonraki sekme değişimlerinde
   // header shimmer, wordmark sheen veya sayfa-giriş fade'ı yeniden başlamaz.
   if(root) root.classList.add('sey-app-booted');
-  // Faz 4 (Time theme): #root'a mevcut saat aralığı sınıfını uygula. render() her
-  // boot'ta ve 30 sn'lik poll loop'ta çağrıldığı için tema değişiklikleri otomatik
-  // senkronize olur. SeyTimeTheme yoksa veya premiumAtmosphere kapalıysa no-op.
-  if(window.SeyTimeTheme && typeof window.SeyTimeTheme.apply==='function'){
-    try{ window.SeyTimeTheme.apply(); }catch(e){}
-  }
-  try{ if(window.SeyAmbience && typeof window.SeyAmbience.apply==='function') window.SeyAmbience.apply(); }catch(e){}
+  // TAM-DENETIM B-02: canlı zemin boyaması artık render()'ın BAŞINDA
+  // (paintAmbientShell) — kapı ekranlarında da uygulanır. Buradaki tekrar
+  // çağrısı kaldırıldı; yalnız DOM'a bağımlı olanlar kaldı.
   try{ if(window.SeyFx && typeof window.SeyFx.bindAuroraParallax==='function') window.SeyFx.bindAuroraParallax(); }catch(e){}
-  // Mevsim/mübarek gün vurgusu: app/styles.css'teki `#root.theme-season-*` blokları
-  // yalnızca applySeasonal() ile takılır; çağrı yazılmadığı için o CSS ölü kalıyordu.
-  // apply() ile aynı premiumAtmosphere gating'ini paylaşır.
-  if(window.SeyTimeTheme && typeof window.SeyTimeTheme.applySeasonal==='function'){
-    try{ window.SeyTimeTheme.applySeasonal(); }catch(e){}
-  }
   try{ if(window.SeyFx && typeof window.SeyFx.sweepCounters==='function') window.SeyFx.sweepCounters(); }catch(e){}
   // iOS/PWA durum çubuğu rengini mevcut tema ile senkronize tut; açık/koyu geçişlerinde flaş azalır.
   // Yalnızca gerçekten tema değiştiğinde meta tag'i güncelle, her render'da değil.
@@ -9669,7 +9700,7 @@ function beslenmeCardHTML(rec){
       b+='<select onchange="App.setMealItemUnit(\''+m.key+'\','+idx+',this)" style="width:60px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:var(--f-footnote);outline:none;color:var(--text);">';
       MEAL_UNITS.forEach(function(u){ b+='<option value="'+u.id+'"'+(it.unit===u.id?' selected':'')+'>'+u.label+'</option>'; });
       b+='</select>';
-      b+='<button onclick="App.removeMealItem(\''+m.key+'\','+idx+')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:var(--f-subhead);">×</button>';
+      b+='<button data-fx="destructive" onclick="App.removeMealItem(\''+m.key+'\','+idx+')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:var(--f-subhead);">×</button>';
       b+='</div>';
     });
     b+='<button onclick="App.addMealItem(\''+m.key+'\')" style="align-self:flex-start;border:1px dashed var(--field-bd);cursor:pointer;padding:7px 13px;border-radius:11px;font-size:var(--f-footnote);font-weight:700;color:var(--muted);background:transparent;">+ '+m.label.toLowerCase()+'\'a ekle</button>';
@@ -10336,7 +10367,7 @@ function vacationCardHTML(rec){
     h+='<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><label style="font-size:var(--f-caption2);font-weight:700;color:var(--faint);">Bitiş</label><input type="date" value="'+esc(v.endAt)+'" onchange="App.setVacationEnd(this.value)" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);font-weight:700;outline:none;color:var(--text);"></div>';
     h+='</div>';
     h+='<div style="display:flex;gap:8px;">';
-    for(var i=0;i<presets.length;i++){ var p=presets[i],sel=v.preset===p.id; h+='<button onclick="App.setVacationPreset(\''+p.id+'\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;border-radius:12px;padding:10px 6px;font-size:var(--f-footnote);font-weight:700;color:'+(sel?'#fff':'var(--text2)')+';background:'+(sel?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';border:1px solid '+(sel?hexA(accentHex,0.4):'var(--field-bd)')+';" data-preset="'+p.id+'">'+icon(p.icon,14)+p.label+'</button>'; }
+    for(var i=0;i<presets.length;i++){ var p=presets[i],sel=v.preset===p.id; h+='<button data-fx="destructive" onclick="App.setVacationPreset(\''+p.id+'\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;border-radius:12px;padding:10px 6px;font-size:var(--f-footnote);font-weight:700;color:'+(sel?'#fff':'var(--text2)')+';background:'+(sel?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';border:1px solid '+(sel?hexA(accentHex,0.4):'var(--field-bd)')+';" data-preset="'+p.id+'">'+icon(p.icon,14)+p.label+'</button>'; }
     h+='</div>';
     h+='<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:var(--f-caption2);font-weight:700;color:var(--faint);">Nereye / not</label><input type="text" value="'+esc(v.reason)+'" oninput="App.setVacationReason(this.value)" placeholder="örn. Bodrum, aile tatili" maxlength="80" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);font-weight:700;outline:none;color:var(--text);"></div>';
     var vacInfoAccent='var(--vacation)';
@@ -10734,7 +10765,7 @@ function roomToolsHTML(fi){
   scBody+='<input id="sey-room-sc" type="text" maxlength="200" value="'+esc(day.selfCompassion.note)+'" placeholder="Kendime şimdi ne söyleyebilirim..." onchange="App.saveSelfCompassion(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:var(--f-subhead);outline:none;color:var(--text);">';
   scBody+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
   ['Bu kadarı yeterli','Zorlanmak insanî','Yarın için biriktiriyorum','Kendime sabırlıyım'].forEach(function(c){
-    scBody+='<button onclick="App.presetSelfCompassion(\''+esc(c.replace(/'/g,"\\'"))+'\')" style="border:1px solid rgba(233,175,193,0.4);background:transparent;cursor:pointer;padding:6px 10px;border-radius:999px;font-size:var(--f-caption1);font-weight:700;color:var(--text2);">'+esc(c)+'</button>';
+    scBody+='<button data-fx="destructive" onclick="App.presetSelfCompassion(\''+esc(c.replace(/'/g,"\\'"))+'\')" style="border:1px solid rgba(233,175,193,0.4);background:transparent;cursor:pointer;padding:6px 10px;border-radius:999px;font-size:var(--f-caption1);font-weight:700;color:var(--text2);">'+esc(c)+'</button>';
   });
   scBody+='</div>';
   if(day.selfCompassion.completedAt) scBody+='<div style="font-size:var(--f-caption2);color:#3F8A4F;display:flex;align-items:center;gap:5px;">'+icon('check',11)+' '+fmtWhen(day.selfCompassion.completedAt)+' kaydedildi</div>';
@@ -11397,7 +11428,7 @@ function heroTargetsHTML(rec){
       +'<div style="position:relative;width:52px;height:52px;filter:drop-shadow(0 2px 4px '+accent+'26);">'
       +'<svg width="52" height="52" viewBox="0 0 52 52" style="transform:rotate(-90deg);">'
       +'<circle cx="26" cy="26" r="'+r+'" fill="none" stroke="var(--card-bd)" stroke-width="4" opacity="0.7"/>'
-      +'<circle cx="26" cy="26" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" style="transition:stroke-dashoffset .5s ease;"/>'
+      +'<circle class="sey-ring-seg" cx="26" cy="26" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'"/>'
       +'</svg>'
       +'<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">'
       +'<span style="display:inline-flex;color:'+col+';">'+icon(icName,icSize||13)+'</span>'
@@ -11646,7 +11677,7 @@ function bugunHTML(){
   h+='<div style="display:flex;align-items:center;gap:8px;">';
   h+='<div style="background:rgba(201,184,255,0.28);color:var(--choc);font-weight:700;font-size:var(--f-footnote);padding:7px 13px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Gün '+curIdx+(!ed&&streak>1?('<span style="display:inline-flex;align-items:center;gap:2px;">'+icon('flame',13)+streak+'</span>'):'')+'</div></div></div>';
   h+='<div style="display:flex;align-items:center;gap:18px;">';
-  h+='<div id="sey-habits-ring-wrap" style="position:relative;width:96px;height:96px;flex-shrink:0;"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="9"></circle><circle cx="48" cy="48" r="42" fill="none" stroke="#E9AFC1" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .6s ease"></circle></svg>';
+  h+='<div id="sey-habits-ring-wrap" style="position:relative;width:96px;height:96px;flex-shrink:0;"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="9"></circle><circle class="sey-ring-seg" cx="48" cy="48" r="42" fill="none" stroke="#E9AFC1" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 48 48)"></circle></svg>';
   h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div style="font-size:var(--f-title1);font-weight:800;line-height:1;">'+pct+'%</div><div style="font-size:var(--f-caption2);color:var(--faint);margin-top:2px;">'+(ed?'o gün':'bugün')+'</div></div></div>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);color:var(--faint);margin-bottom:6px;">'+(ed?'O günün havası':'Bugünün havası')+'</div><div style="font-size:var(--f-title3);font-weight:800;line-height:1.25;">'+esc(badge)+'</div><div style="font-size:var(--f-caption1);color:var(--muted);margin-top:5px;font-weight:600;">'+completed+'/'+ht+' tik bugün</div></div></div>';
   // premium istatistik şeridi (seri · 7 günlük ritim · mod eğilimi · en güçlü/zayıf tik)
@@ -12797,7 +12828,7 @@ function ayarlarHTML(){
   h+='<button onclick="App.saveOpenaiKey()" style="border:none;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);box-shadow:0 8px 18px rgba(155,127,201,0.35);display:flex;align-items:center;justify-content:center;gap:6px;">Kaydet ve doğrula '+icon('check',14)+'</button>';
   h+='<div style="font-size:var(--f-caption1);color:var(--faint);">platform.openai.com → API keys bölümünden alınır.</div>';
   h+='</div>';
-  h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:var(--f-callout);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span style="display:inline-flex;">'+icon('trash-2',16)+'</span></button>';
+  h+='<button data-fx="destructive" onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:var(--f-callout);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span style="display:inline-flex;">'+icon('trash-2',16)+'</span></button>';
   h+=settingsBtn('App.goStart()','Başlangıç ekranına dön',icon('rotate-ccw',17));
   // add to home guide
   h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.4),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:20px;padding:18px;"><div style="font-size:var(--f-callout);font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('phone',16)+' Ana ekrana ekleme rehberi</div><div style="font-size:var(--f-subhead);line-height:1.7;color:var(--text2);">iPhone\'da tek dokunuşla açmak için:<br>1. Bu sayfayı <b>Safari</b>\'de aç<br>2. Paylaş butonuna bas<br>3. <b>Ana Ekrana Ekle</b> seç<br>4. Adı: <b>Şeyma 🦩</b><br>5. Ekle</div></div>';
@@ -12843,7 +12874,10 @@ function activityRings(rec){
   var svg='<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">';
   rings.forEach(function(r,i){ var R=radii[i],C=2*Math.PI*R,f=Math.max(0,Math.min(1,(r.val||0)/r.goal));
     svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="rgba(150,110,120,0.14)" stroke-width="'+w+'"></circle>';
-    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+r.color+'" stroke-width="'+w+'" stroke-linecap="round" stroke-dasharray="'+C.toFixed(2)+'" stroke-dashoffset="'+(C*(1-f)).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')" style="transition:stroke-dashoffset .6s ease"></circle>';
+    // TAM-DENETIM B-04: hero halkaları `sey-ring-seg` sınıfını hiç kullanmıyordu
+    // (7 sekme + 19 overlay ölçümünde 0). Elle yazılmış `.6s ease` yerine artık
+    // token sistemi: --dur-4/--ease-out + reduced-motion desteği sınıftan gelir.
+    svg+='<circle class="sey-ring-seg" cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+r.color+'" stroke-width="'+w+'" stroke-linecap="round" stroke-dasharray="'+C.toFixed(2)+'" stroke-dashoffset="'+(C*(1-f)).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"></circle>';
   });
   svg+='</svg>';
   var legend='<div style="flex:1;display:flex;flex-direction:column;gap:8px;">';
@@ -12920,7 +12954,7 @@ function gaugeBadge(pct,color,big,small,size){
   var s='<div style="position:relative;width:'+size+'px;height:'+size+'px;flex-shrink:0;">';
   s+='<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="transform:rotate(-90deg);display:block;">';
   s+='<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="rgba(130,110,160,0.16)" stroke-width="'+sw+'"/>';
-  s+='<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" style="transition:stroke-dashoffset .55s var(--ease-premium,ease);"/>';
+  s+='<circle class="sey-ring-seg" cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/>';
   s+='</svg>';
   s+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;"><div style="font-size:'+(size>=88?'21px':'17px')+';font-weight:800;color:var(--text);line-height:1;">'+big+'</div>'+(small?'<div style="font-size:var(--f-caption2);color:var(--faint);font-weight:700;letter-spacing:.2px;margin-top:2px;">'+small+'</div>':'')+'</div>';
   s+='</div>';
@@ -12979,7 +13013,7 @@ function caffeineBlock(rec){
   h+='</div>';
   if(drinks.length){
     h+='<div style="display:flex;flex-direction:column;gap:5px;">';
-    drinks.forEach(function(d,i){ var ty=caffeineType(d.type); var mg=ty?ty.mg*Math.max(1,Number(d.qty)||1):0; h+='<div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--card-bd);border-radius:11px;padding:7px 10px;"><span style="display:inline-flex;color:'+A+';">'+icon('coffee',14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+(ty?ty.label:d.type)+' · <span style="color:var(--faint);font-weight:500;">'+Math.round(mg)+' mg</span></div><div style="display:flex;align-items:center;gap:5px;margin-top:3px;"><input type="time" value="'+esc(d.time||'')+'" onchange="App.setCaffeineDrinkTime('+i+',this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:3px 6px;font-size:var(--f-caption1);color:var(--text);outline:none;">'+(d.qty>1?('<span style="font-size:var(--f-caption2);color:var(--faint);">×'+d.qty+'</span>'):'')+'</div></div><button onclick="App.removeCaffeineDrink('+i+')" style="border:none;background:transparent;color:#E25B6A;cursor:pointer;font-size:var(--f-callout);font-weight:800;padding:4px;">×</button></div>'; });
+    drinks.forEach(function(d,i){ var ty=caffeineType(d.type); var mg=ty?ty.mg*Math.max(1,Number(d.qty)||1):0; h+='<div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--card-bd);border-radius:11px;padding:7px 10px;"><span style="display:inline-flex;color:'+A+';">'+icon('coffee',14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+(ty?ty.label:d.type)+' · <span style="color:var(--faint);font-weight:500;">'+Math.round(mg)+' mg</span></div><div style="display:flex;align-items:center;gap:5px;margin-top:3px;"><input type="time" value="'+esc(d.time||'')+'" onchange="App.setCaffeineDrinkTime('+i+',this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:3px 6px;font-size:var(--f-caption1);color:var(--text);outline:none;">'+(d.qty>1?('<span style="font-size:var(--f-caption2);color:var(--faint);">×'+d.qty+'</span>'):'')+'</div></div><button data-fx="destructive" onclick="App.removeCaffeineDrink('+i+')" style="border:none;background:transparent;color:#E25B6A;cursor:pointer;font-size:var(--f-callout);font-weight:800;padding:4px;">×</button></div>'; });
     h+='</div>';
   } else {
     h+='<div style="font-size:var(--f-caption1);color:var(--faint);background:var(--card);border:1px dashed var(--card-bd);border-radius:11px;padding:9px 11px;">Bugün henüz kafein eklenmedi. Yukarıdaki chip\'lerden başlat — mg, kalıntı ve eğri otomatik hesaplanır.</div>';
@@ -13231,7 +13265,7 @@ function discomfortCard(rec){
     h+='<input list="dz-med-list" value="'+(m.name?esc(m.name):'')+'" oninput="App.setDiscomfortMed('+idx+',\'name\',this)" placeholder="İlaç adı" style="flex:2;min-width:120px;border:1px solid var(--field-bd);background:var(--field);border-radius:9px;padding:8px;font-size:var(--f-footnote);outline:none;color:var(--text);">';
     h+='<input value="'+(m.dose?esc(m.dose):'')+'" oninput="App.setDiscomfortMed('+idx+',\'dose\',this)" placeholder="Doz (400 mg)" style="flex:1;min-width:78px;border:1px solid var(--field-bd);background:var(--field);border-radius:9px;padding:8px;font-size:var(--f-footnote);outline:none;color:var(--text);">';
     h+='<input type="time" value="'+(m.time?esc(m.time):'')+'" onchange="App.setDiscomfortMed('+idx+',\'time\',this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:9px;padding:7px;font-size:var(--f-footnote);outline:none;color:var(--text);">';
-    h+='<button onclick="App.removeDiscomfortMed('+idx+')" aria-label="Sil" style="border:none;cursor:pointer;background:rgba(220,120,120,0.1);color:#C0605F;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;">'+icon('trash-2',14)+'</button>';
+    h+='<button data-fx="destructive" onclick="App.removeDiscomfortMed('+idx+')" aria-label="Sil" style="border:none;cursor:pointer;background:rgba(220,120,120,0.1);color:#C0605F;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;">'+icon('trash-2',14)+'</button>';
     h+='</div>';
   });
   h+='<div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.4;">Bu bilgi yalnızca kendi takibin için. Ağrı kesiciyi sık (ayda 10-15+ gün) kullanıyorsan, ilaç aşırı kullanımı baş ağrısını tetikleyebilir — hekimine danış.</div>';
@@ -13601,7 +13635,7 @@ function cycleHTML(){
   ps.slice().reverse().forEach(function(p){ var ri=data.cycle.periods.indexOf(p); h+='<div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(150,110,120,0.12);padding-top:10px;">';
     h+='<div style="flex:1;min-width:115px;"><div style="font-size:var(--f-caption2);color:var(--faint);margin-bottom:3px;">Başlangıç</div><input type="date" value="'+esc(p.start||'')+'" max="'+today+'" onchange="App.setPeriodField('+ri+',\'start\',this)" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;padding:8px;font-size:var(--f-footnote);outline:none;"></div>';
     h+='<div style="flex:1;min-width:115px;"><div style="font-size:var(--f-caption2);color:var(--faint);margin-bottom:3px;">Bitiş</div><input type="date" value="'+esc(p.end||'')+'" max="'+today+'" onchange="App.setPeriodField('+ri+',\'end\',this)" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;padding:8px;font-size:var(--f-footnote);outline:none;"></div>';
-    h+='<button onclick="App.removePeriod('+ri+')" style="border:none;cursor:pointer;background:rgba(220,120,120,0.1);color:#C0605F;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;">'+icon('trash-2',15)+'</button></div>'; });
+    h+='<button data-fx="destructive" onclick="App.removePeriod('+ri+')" style="border:none;cursor:pointer;background:rgba(220,120,120,0.1);color:#C0605F;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;">'+icon('trash-2',15)+'</button></div>'; });
   h+='</div>';
   h+='<div class="surface" style="border-radius:18px;padding:14px;"><div style="font-size:var(--f-footnote);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">4 Faz kısaca '+icon('microscope',15)+'</div>';
   ['menstrual','follicular','ovulation','luteal'].forEach(function(k){ var p=PHASES[k]; h+='<div style="display:flex;gap:8px;margin-bottom:7px;font-size:var(--f-footnote);line-height:1.4;"><span style="flex-shrink:0;">'+p.emoji+'</span><span><b style="color:'+p.color+';">'+esc(p.label)+'</b> — '+esc(p.note)+'</span></div>'; });
@@ -14022,7 +14056,7 @@ function quranLibraryResultsHTML(){
   h+='</div></div></section>';
   h+='<div class="quran-v2-result-note" role="status" aria-live="polite"><span><strong>'+rows.length+'</strong> sûre'+(filter!=='all'?' · '+esc(quranFilterLabel(filter)):'')+(query?' · “'+esc(query)+'”':'')+'</span><span class="result-context">'+((filter==='all'&&!query)?'NÜZUL SIRASIYLA':'EŞLEŞEN DURAKLAR')+'</span></div>';
   if(!rows.length){
-    h+='<div class="quran-v2-empty"><strong>Bu mercekte eşleşme yok.</strong><span>Aramayı temizleyebilir veya filtreyi “Tümü” yapabilirsin.</span><button onclick="App.resetQuranLens()">Filtreyi sıfırla</button></div>';
+    h+='<div class="quran-v2-empty"><strong>Bu mercekte eşleşme yok.</strong><span>Aramayı temizleyebilir veya filtreyi “Tümü” yapabilirsin.</span><button data-fx="destructive" onclick="App.resetQuranLens()">Filtreyi sıfırla</button></div>';
     return h;
   }
   var q=ensureQuranJourney(data);
@@ -14902,9 +14936,107 @@ function appHeaderMeta(){
   return base;
 }
 // Sabit marka başlığı: marka, aktif sayfa kimliği ve tek bağlamsal aksiyon aynı premium yüzeyde.
+// ── Header canlı sahnesi (hava + gün vakti) ────────────────────────────────
+// Kullanıcı isteği: "hava durumu ve gün vakitleri headerda tam premium elit bi
+// şekilde anlaşılmalı". Header artık üç katman taşır:
+//   1) .sey-hdr-sky  — gökyüzü gradienti + hava dokusu (tamamen CSS, #root'un
+//      amb-time-*/amb-wx-* sınıflarından sürülür; JS renk hesabı YOK)
+//   2) .sey-hdr-arc  — güneş yayı: doğuş→batış arasında gerçek ilerleme noktası
+//   3) .sey-hdr-wx   — hava rozeti (ikon + sıcaklık + durum) ve vakit etiketi
+// Ağ çağrısı yok; yalnız zaten canlı olan data.weather okunur (RENK-VE-ZEMIN
+// sözleşmesi). Yeni App.* handler'ı EKLENMEZ (I1–I6): şerit bilgilendiricidir.
+var HDR_PHASE_TR={'amb-time-dawn':'Şafak','amb-time-day':'Gündüz','amb-time-dusk':'Akşam','amb-time-night':'Gece'};
+// Header gökyüzü KENDİ sınıf ad alanını kullanır (`sky-time-*` / `sky-wx-*`).
+// Neden: FX2-23 sözleşmesi `amb-wx-*` seçicilerinin YALNIZ `#sey-aurora::after`
+// hedeflemesini ve opaklıklarının <= 0,30 kalmasını şart koşuyor (katman ayrımı
+// + okunabilirlik koruması). Header'ı `amb-*` ile sürseydik o sözleşmeyi
+// kırardık. Ayrı ad alanı ile hem sözleşme korunur hem header serbest kalır.
+function headerSkyClass(sc){
+  var t=(sc&&sc.time)?sc.time.replace('amb-time-','sky-time-'):'';
+  var w=(sc&&sc.weather)?sc.weather.replace('amb-wx-','sky-wx-'):'';
+  return ('sey-hdr-sky '+t+' '+w).replace(/\s+/g,' ').trim();
+}
+function headerSkyClassNow(){
+  // premiumAtmosphere kapalıysa gökyüzü de sönük kalır (gating sızıntısı yok).
+  if(!data||!data.settings||!data.settings.premiumAtmosphere) return 'sey-hdr-sky';
+  if(!window.SeyAmbience||typeof window.SeyAmbience.scene!=='function') return 'sey-hdr-sky';
+  try{ return headerSkyClass(window.SeyAmbience.scene()); }catch(e){ return 'sey-hdr-sky'; }
+}
+function headerSolarProgress(spot,now){
+  // 0–1: gün doğumu → gün batımı. Veri yoksa null (yay çizilmez).
+  if(!spot||!spot.sunrise||!spot.sunset) return null;
+  var sr=new Date(spot.sunrise).getTime(), ss=new Date(spot.sunset).getTime();
+  if(!isFinite(sr)||!isFinite(ss)||ss<=sr) return null;
+  var t=(now||new Date()).getTime();
+  return Math.max(0,Math.min(1,(t-sr)/(ss-sr)));
+}
+function headerSceneHTML(){
+  if(!window.SeyAmbience||typeof window.SeyAmbience.scene!=='function') return '';
+  // premiumAtmosphere kapalıyken şerit de görünmez — gating sızıntısı olmasın.
+  if(!data||!data.settings||!data.settings.premiumAtmosphere) return '';
+  var sc; try{ sc=window.SeyAmbience.scene(); }catch(e){ return ''; }
+  if(!sc) return '';
+  var spot=(data.weather&&data.weather.spots&&data.weather.spots.length)?data.weather.spots[0]:null;
+  var meta=spot?wxMeta(spot.code,spot.isDay):null;
+  var phase=HDR_PHASE_TR[sc.time]||'Bugün';
+  var isNight=(sc.time==='amb-time-night');
+  var prog=headerSolarProgress(spot);
+
+  var h='<div class="sey-hdr-scene" aria-hidden="false">';
+
+  // — hava rozeti —
+  // TAM-DENETIM B-11: `sey-enter-delay-1/2/3` CSS'te tanımlıydı ama hiçbir
+  // kaynakta kullanılmıyordu (ölü stil). Silmek yerine burada kademeli girişe
+  // bağlandı — üç sahne öğesi sırayla belirir, borç kapanır.
+  h+='<div class="sey-hdr-wx sey-enter sey-enter-delay-1">';
+  h+='<span class="sey-hdr-wx-glyph">'+(meta?meta.emoji:icon(isNight?'moon':'sun',17))+'</span>';
+  if(spot&&spot.temp!=null) h+='<span class="sey-hdr-wx-temp">'+esc(String(Math.round(spot.temp)))+'°</span>';
+  h+='<span class="sey-hdr-wx-label">'+esc(meta?meta.label:'hava bekleniyor')+'</span>';
+  h+='</div>';
+
+  // — güneş yayı: gerçek doğuş/batış ilerlemesi —
+  if(prog!=null){
+    // Kuadratik Bézier P0(6,30) P1(60,-1) P2(114,30) üzerinde nokta.
+    var t=prog, mt=1-t;
+    var dx=mt*mt*6 + 2*mt*t*60 + t*t*114;
+    var dy=mt*mt*30 + 2*mt*t*(-1) + t*t*30;
+    h+='<div class="sey-hdr-arc sey-enter sey-enter-delay-2'+(isNight?' is-night':'')+'">';
+    h+='<svg viewBox="0 0 120 34" preserveAspectRatio="none" focusable="false" aria-hidden="true">';
+    h+='<path class="sey-hdr-arc-track" d="M6,30 Q60,-1 114,30" pathLength="1"/>';
+    h+='<path class="sey-hdr-arc-done" d="M6,30 Q60,-1 114,30" pathLength="1" style="stroke-dasharray:'+t.toFixed(3)+' 1;"/>';
+    h+='<circle class="sey-hdr-arc-dot" cx="'+dx.toFixed(2)+'" cy="'+dy.toFixed(2)+'" r="3.4"/>';
+    h+='</svg></div>';
+  }
+
+  // — vakit etiketi + doğuş/batış saati —
+  h+='<div class="sey-hdr-phase sey-enter sey-enter-delay-3">';
+  h+='<span class="sey-hdr-phase-name">'+esc(phase)+'</span>';
+  if(spot&&spot.sunrise&&spot.sunset){
+    h+='<span class="sey-hdr-phase-time">'+icon(isNight?'sunrise':'sunset',10)+' '+esc(isNight?wxHm(spot.sunrise):wxHm(spot.sunset))+'</span>';
+  }
+  h+='</div>';
+
+  h+='</div>';
+  return h;
+}
+// TAM-DENETIM B-05: sahneyi tam render() olmadan tazele. #root sınıfları CSS'i
+// sürdüğü için gökyüzü/hava katmanı kendiliğinden güncellenir; burada yalnız
+// metinsel vakit bilgisi yamalanır (innerHTML yeniden kurulmaz, taslak kaybolmaz).
+function syncHeaderScene(){
+  paintAmbientShell();
+  // Gökyüzü sınıfları (sky-time-* / sky-wx-*) header markup'ında yaşadığı için
+  // #root sınıflarıyla birlikte kendiliğinden güncellenmez — burada yamalanır.
+  var sky=document.querySelector('.sey-hdr-sky');
+  if(sky){ var want=headerSkyClassNow(); if(sky.className!==want) sky.className=want; }
+  var box=document.querySelector('.sey-hdr-scene'); if(!box) return;
+  var fresh=headerSceneHTML(); if(!fresh) return;
+  var tmp=document.createElement('div'); tmp.innerHTML=fresh;
+  var next=tmp.firstChild; if(next&&next.innerHTML!==box.innerHTML) box.innerHTML=next.innerHTML;
+}
 function appHeaderHTML(){
   var m=appHeaderMeta();
   var h='<header id="sey-appheader" class="sey-appheader" style="--hdr-accent:'+m.accent+';--hdr-accent2:'+m.accent2+';--hdr-ink:'+m.ink+';">';
+  h+='<span class="'+headerSkyClassNow()+'" aria-hidden="true"></span>';
   h+='<div class="sey-header-top">';
   h+='<button data-fx="nav" class="sey-header-brand" onclick="App.go(\'bugun\')" aria-label="Bugüne git"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></button>';
   h+='<div class="sey-header-tools">'+saveButtonHTML()+'<button data-fx="toggle" class="sey-header-mini" onclick="App.toggleTheme()" aria-label="Tema" title="Tema">'+icon(dark?'sun':'moon',16)+'</button></div>';
@@ -14913,7 +15045,9 @@ function appHeaderHTML(){
   h+='<span class="sey-header-icon">'+icon(m.icon,21)+'</span>';
   h+='<div class="sey-header-copy"><div class="sey-header-kicker">'+esc(m.kicker||'Şeyma')+'</div><div class="sey-header-title">'+esc(m.title||'Bugün')+'</div><div class="sey-header-sub">'+esc(m.sub||'')+'</div></div>';
   h+=headerActionHTML(m.action);
-  h+='</div></header>';
+  h+='</div>';
+  h+=headerSceneHTML();
+  h+='</header>';
   return h;
 }
 function wireAppHeaderScroll(sc){
@@ -15036,7 +15170,7 @@ function readingTodayView(){
       h+='<span style="line-height:1.2;display:inline-flex;color:'+(isSaygi?'#826936':'var(--read)')+';">'+icon(isSaygi?'trophy':'book-open',18)+'</span><div style="flex:1;min-width:0;">';
       h+='<div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+chip+'</div>'+(e.author?'<div style="font-size:var(--f-caption1);color:var(--faint);">'+esc(e.author)+'</div>':'')+(meta.length?'<div style="font-size:var(--f-caption1);color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:var(--f-caption1);color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'');
       if(sourceUrl) h+='<a href="'+esc(sourceUrl)+'" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;color:#826936;font-size:var(--f-caption2);font-weight:800;text-decoration:none;">'+icon('external-link',12)+' '+esc(e.sourceLabel||'Wikipedia kaynağı')+'</a>';
-      h+='</div><button onclick="App.removeReading(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>';
+      h+='</div><button data-fx="destructive" onclick="App.removeReading(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>';
     });
     h+='</div>';
   } else {
@@ -15098,7 +15232,7 @@ function readingQuotesView(){
   if(!L.books.length){ h+='<div style="text-align:center;font-size:var(--f-footnote);color:var(--faint);line-height:1.6;padding:16px 10px;">Alıntı eklemek için önce kitaplığına bir kitap ekle</div>'; return h; }
   if(!qs.length){ h+='<div style="text-align:center;font-size:var(--f-footnote);color:var(--faint);line-height:1.6;padding:22px 10px;">Henüz alıntı yok<br>Seni durduran o cümleyi buraya bırak.</div>'; return h; }
   h+='<div style="display:flex;flex-direction:column;gap:10px;">';
-  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(110,85,191,0.07),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:var(--f-subhead);line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:var(--f-caption1);color:var(--muted);flex:1;display:flex;align-items:center;gap:4px;">'+icon('book-open',12)+' '+esc(o.title)+(q.page?' · s.'+q.page:'')+'</span>'; h+='<button onclick="App.copyQuoteById(\''+esc(o.bookId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('copy',12)+'</button>'; h+='<button onclick="App.removeQuote(\''+esc(o.bookId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',12)+'</button></div></div>'; });
+  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(110,85,191,0.07),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:var(--f-subhead);line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:var(--f-caption1);color:var(--muted);flex:1;display:flex;align-items:center;gap:4px;">'+icon('book-open',12)+' '+esc(o.title)+(q.page?' · s.'+q.page:'')+'</span>'; h+='<button onclick="App.copyQuoteById(\''+esc(o.bookId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('copy',12)+'</button>'; h+='<button data-fx="destructive" onclick="App.removeQuote(\''+esc(o.bookId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',12)+'</button></div></div>'; });
   h+='</div>';
   return h;
 }
@@ -15114,7 +15248,7 @@ function bookEditModal(){
   inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; BOOK_GENRES.forEach(function(g){ var on=b.genre===g; inner+='<button onclick="App.pickBookGenre(\''+g+'\')" style="border:1px solid '+(on?'var(--read)':'var(--card-bd)')+';cursor:pointer;padding:6px 10px;border-radius:999px;font-size:var(--f-caption1);font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#6E55BF,#9B7FC9)':'var(--card)')+';">'+g+'</button>'; }); inner+='</div>';
   inner+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:var(--f-footnote);color:var(--text2);flex:1;">Toplam sayfa <span style="color:var(--faint);">(opsiyonel)</span></span><input type="number" inputmode="numeric" min="0" value="'+(b.totalPages!=null&&b.totalPages!==''?esc(b.totalPages):'')+'" oninput="App.onBookEditField(\'totalPages\',this)" placeholder="—" style="width:90px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px;font-size:var(--f-subhead);text-align:center;outline:none;"></div>';
   inner+='<button onclick="App.saveBook()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);">Kaydet</button>';
-  if(!isNew) inner+='<button onclick="App.deleteBook(\''+esc(b.id)+'\')" style="border:none;cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.1);">Kitabı sil</button>';
+  if(!isNew) inner+='<button data-fx="destructive" onclick="App.deleteBook(\''+esc(b.id)+'\')" style="border:none;cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.1);">Kitabı sil</button>';
   return compactModalShell('App.closeBookEdit()','Kitap düzenleme',inner);
 }
 function quoteAddModal(){
@@ -15171,7 +15305,7 @@ function watchTodayView(){
   if(wEntries.length>0){
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:var(--f-footnote);font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+wEntries.length+')</div><div style="font-size:var(--f-caption1);color:var(--faint);">toplam '+fmtDur(totMin)+'</div></div>';
-    wEntries.slice().reverse().forEach(function(e,i){ var meta=[]; if(e.kind==='dizi'&&e.episodes) meta.push(e.episodes+' bölüm'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTitle(e.itemId):null; h+='<div class="sey-stagger" style="--i:'+Math.min(i,8)+';display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--watch-ink);">'+icon('clapperboard',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:var(--f-caption2);color:var(--watch-ink);font-weight:700;">· arşivde</span>':'')+'</div>'+(meta.length?'<div style="font-size:var(--f-caption1);color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:var(--f-caption1);color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeWatching(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
+    wEntries.slice().reverse().forEach(function(e,i){ var meta=[]; if(e.kind==='dizi'&&e.episodes) meta.push(e.episodes+' bölüm'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTitle(e.itemId):null; h+='<div class="sey-stagger" style="--i:'+Math.min(i,8)+';display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--watch-ink);">'+icon('clapperboard',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:var(--f-caption2);color:var(--watch-ink);font-weight:700;">· arşivde</span>':'')+'</div>'+(meta.length?'<div style="font-size:var(--f-caption1);color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:var(--f-caption1);color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button data-fx="destructive" onclick="App.removeWatching(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
     h+='</div>';
   } else {
     h+='<div style="text-align:center;font-size:var(--f-footnote);color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için izleme eklemedin. Bir bölüm bile keyiftir.</div>';
@@ -15232,7 +15366,7 @@ function watchQuotesView(){
   if(!W.items.length){ h+='<div style="text-align:center;font-size:var(--f-footnote);color:var(--faint);line-height:1.6;padding:16px 10px;">Replik eklemek için önce arşivine bir yapım ekle</div>'; return h; }
   if(!qs.length){ h+='<div style="text-align:center;font-size:var(--f-footnote);color:var(--faint);line-height:1.6;padding:22px 10px;">Henüz replik yok<br>O unutamadığın repliği buraya bırak.</div>'; return h; }
   h+='<div style="display:flex;flex-direction:column;gap:10px;">';
-  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(200,143,76,0.08),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:var(--f-subhead);line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:var(--f-caption1);color:var(--muted);flex:1;display:flex;align-items:center;gap:4px;">'+icon('clapperboard',12)+' '+esc(o.title)+'</span>'; h+='<button onclick="App.copyReplicaById(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('copy',12)+'</button>'; h+='<button onclick="App.removeReplica(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',12)+'</button></div></div>'; });
+  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(200,143,76,0.08),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:var(--f-subhead);line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:var(--f-caption1);color:var(--muted);flex:1;display:flex;align-items:center;gap:4px;">'+icon('clapperboard',12)+' '+esc(o.title)+'</span>'; h+='<button onclick="App.copyReplicaById(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('copy',12)+'</button>'; h+='<button data-fx="destructive" onclick="App.removeReplica(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',12)+'</button></div></div>'; });
   h+='</div>';
   return h;
 }
@@ -15244,7 +15378,7 @@ function titleEditModal(){
   inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; TITLE_GENRES.forEach(function(g){ var on=t.genre===g; inner+='<button onclick="App.pickTitleGenre(\''+g+'\')" style="border:1px solid '+(on?'var(--watch)':'var(--card-bd)')+';cursor:pointer;padding:6px 10px;border-radius:999px;font-size:var(--f-caption1);font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--card)')+';">'+g+'</button>'; }); inner+='</div>';
   if(kind==='dizi') inner+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:var(--f-footnote);color:var(--text2);flex:1;">Toplam bölüm <span style="color:var(--faint);">(opsiyonel)</span></span><input type="number" inputmode="numeric" min="0" value="'+(t.totalEp!=null&&t.totalEp!==''?esc(t.totalEp):'')+'" oninput="App.onTitleEditField(\'totalEp\',this)" placeholder="—" style="width:90px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px;font-size:var(--f-subhead);text-align:center;outline:none;"></div>';
   inner+='<button onclick="App.saveTitle()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#C88F4C,#E0B080 55%,#E9AFC1);">Kaydet</button>';
-  if(!isNew) inner+='<button onclick="App.deleteTitle(\''+esc(t.id)+'\')" style="border:none;cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.1);">Yapımı sil</button>';
+  if(!isNew) inner+='<button data-fx="destructive" onclick="App.deleteTitle(\''+esc(t.id)+'\')" style="border:none;cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.1);">Yapımı sil</button>';
   return compactModalShell('App.closeTitleEdit()','İzleme kaydı düzenleme',inner);
 }
 function replicaAddModal(){
@@ -15301,7 +15435,7 @@ function listeningTodayView(){
   if(lEntries.length>0){
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:var(--f-footnote);font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+lEntries.length+')</div><div style="font-size:var(--f-caption1);color:var(--faint);">toplam '+fmtDur(totMin)+'</div></div>';
-    lEntries.slice().reverse().forEach(function(e,i){ var meta=[]; var km=listenKindMeta(e.kind); meta.push(km.label); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTrack(e.itemId):null; h+='<div class="sey-stagger" style="--i:'+Math.min(i,8)+';display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--listen-ink);">'+icon(km.icon,18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:var(--f-caption2);color:var(--listen-ink);font-weight:700;">· favori</span>':'')+'</div>'+(e.artist?'<div style="font-size:var(--f-caption1);color:var(--faint);">'+esc(e.artist)+'</div>':'')+'<div style="font-size:var(--f-caption1);color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>'+(e.note?'<div style="font-size:var(--f-caption1);color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeListening(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
+    lEntries.slice().reverse().forEach(function(e,i){ var meta=[]; var km=listenKindMeta(e.kind); meta.push(km.label); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTrack(e.itemId):null; h+='<div class="sey-stagger" style="--i:'+Math.min(i,8)+';display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--listen-ink);">'+icon(km.icon,18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:var(--f-caption2);color:var(--listen-ink);font-weight:700;">· favori</span>':'')+'</div>'+(e.artist?'<div style="font-size:var(--f-caption1);color:var(--faint);">'+esc(e.artist)+'</div>':'')+'<div style="font-size:var(--f-caption1);color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>'+(e.note?'<div style="font-size:var(--f-caption1);color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button data-fx="destructive" onclick="App.removeListening(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
     h+='</div>';
   } else {
     h+='<div style="text-align:center;font-size:var(--f-footnote);color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için dinleme eklemedin. Bir şarkı bile sayılır.</div>';
@@ -15344,7 +15478,7 @@ function listeningLyricsView(){
   if(!M.items.length){ h+='<div style="text-align:center;font-size:var(--f-footnote);color:var(--faint);line-height:1.6;padding:16px 10px;">Söz eklemek için önce favorilerine bir parça ekle</div>'; return h; }
   if(!qs.length){ h+='<div style="text-align:center;font-size:var(--f-footnote);color:var(--faint);line-height:1.6;padding:22px 10px;">Henüz söz yok<br>İçine işleyen o dizeyi buraya bırak.</div>'; return h; }
   h+='<div style="display:flex;flex-direction:column;gap:10px;">';
-  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(14,154,167,0.08),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:var(--f-subhead);line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:var(--f-caption1);color:var(--muted);flex:1;display:flex;align-items:center;gap:4px;">'+icon('music',12)+' '+esc(o.title)+(o.artist?' · '+esc(o.artist):'')+'</span>'; h+='<button onclick="App.copyLyricById(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('copy',12)+'</button>'; h+='<button onclick="App.removeLyric(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',12)+'</button></div></div>'; });
+  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(14,154,167,0.08),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:var(--f-subhead);line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:var(--f-caption1);color:var(--muted);flex:1;display:flex;align-items:center;gap:4px;">'+icon('music',12)+' '+esc(o.title)+(o.artist?' · '+esc(o.artist):'')+'</span>'; h+='<button onclick="App.copyLyricById(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('copy',12)+'</button>'; h+='<button data-fx="destructive" onclick="App.removeLyric(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',12)+'</button></div></div>'; });
   h+='</div>';
   return h;
 }
@@ -15356,7 +15490,7 @@ function trackEditModal(){
   inner+='<input type="text" value="'+esc(x.artist||'')+'" oninput="App.onTrackEditField(\'artist\',this)" placeholder="Sanatçı / yayıncı" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);outline:none;">';
   inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; MUSIC_GENRES.forEach(function(g){ var on=x.genre===g; inner+='<button onclick="App.pickTrackGenre(\''+esc(g)+'\')" style="border:1px solid '+(on?'var(--listen)':'var(--card-bd)')+';cursor:pointer;padding:6px 10px;border-radius:999px;font-size:var(--f-caption1);font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'var(--card)')+';">'+esc(g)+'</button>'; }); inner+='</div>';
   inner+='<button onclick="App.saveTrack()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#0E9AA7,#2BC4C4);">Kaydet</button>';
-  if(!isNew) inner+='<button onclick="App.deleteTrack(\''+esc(x.id)+'\')" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:var(--drop-ink);background:var(--card);">Sil</button>';
+  if(!isNew) inner+='<button data-fx="destructive" onclick="App.deleteTrack(\''+esc(x.id)+'\')" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:var(--drop-ink);background:var(--card);">Sil</button>';
   return compactModalShell('App.closeTrackEdit()','Favori düzenleme',inner);
 }
 function lyricAddModal(){
@@ -15378,7 +15512,7 @@ function learningEntryCard(e,i){
   if(e.note&&String(e.note).trim()) h+='<div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.45;margin-top:5px;">'+esc(e.note)+'</div>';
   if(when) h+='<div style="font-size:var(--f-caption2);color:var(--faint);margin-top:5px;">'+esc(when)+'</div>';
   h+='</div>';
-  h+='<button onclick="App.removeLearning(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:28px;height:28px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:var(--f-subhead);">\u00d7</button>';
+  h+='<button data-fx="destructive" onclick="App.removeLearning(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:28px;height:28px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:var(--f-subhead);">\u00d7</button>';
   h+='</div>';
   return h;
 }
@@ -15456,7 +15590,7 @@ function soulActivityEntryCard(a,i){
   h+='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+(act?act.label:ucfirst(a.type))+'</span>'+(dur?'<span style="font-size:var(--f-caption2);font-weight:700;color:var(--soul);">'+dur+'</span>':'')+'</div>';
   if(a.note) h+='<div style="font-size:var(--f-caption1);line-height:1.45;color:var(--text2);margin-top:3px;">'+esc(a.note)+'</div>';
   h+='</div>';
-  h+='<button onclick="App.removeSoulActivity(\''+a.id+'\')" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;color:var(--faint);display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;">'+icon('trash-2',15)+'</button>';
+  h+='<button data-fx="destructive" onclick="App.removeSoulActivity(\''+a.id+'\')" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;color:var(--faint);display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;">'+icon('trash-2',15)+'</button>';
   h+='</div>';
   return h;
 }
@@ -15510,7 +15644,7 @@ function soulArchiveOverlayHTML(){
         body+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+esc(shortDate(s.date))+'</span>'+(dur?'<span style="font-size:var(--f-caption2);font-weight:700;color:var(--soul);">'+dur+'</span>':'')+'</div>';
         if(s.note) body+='<div style="font-size:var(--f-caption1);line-height:1.45;color:var(--text2);margin-top:3px;">'+esc(String(s.note))+'</div>';
         body+='</div>';
-        body+='<button onclick="App.removeSoulArchiveSession(\''+s.id+'\')" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;color:var(--faint);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;">'+icon('trash-2',14)+'</button>';
+        body+='<button data-fx="destructive" onclick="App.removeSoulArchiveSession(\''+s.id+'\')" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;color:var(--faint);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;">'+icon('trash-2',14)+'</button>';
         body+='</div>';
       });
       body+='</div>';
@@ -15592,7 +15726,7 @@ function modalsHTML(){
     h+='<div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;">'+icon('map-pin',18)+' Konum paylaşımı</div>';
     h+='<p style="margin:0 0 14px;font-size:var(--f-subhead);line-height:1.55;color:var(--muted);">Açarsan konumun ve hareketlerin (yürüyüş/araç, kat edilen mesafe) <b>uygulama açıkken</b> ölçülür.</p>';
     h+='<p style="margin:0 0 18px;font-size:var(--f-footnote);line-height:1.5;color:var(--faint);">Devam edince tarayıcın ayrıca konum izni isteyecek.</p>';
-    h+='<div style="display:flex;gap:10px;"><button onclick="App.cancelLocationConsent()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.confirmLocationConsent()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);">Onaylıyorum</button></div>';
+    h+='<div style="display:flex;gap:10px;"><button onclick="App.cancelLocationConsent()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button data-fx="confirm" onclick="App.confirmLocationConsent()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);">Onaylıyorum</button></div>';
     h+='</div></div>';
   }
   if(ui.locNudgeOpen){
@@ -15616,7 +15750,7 @@ function modalsHTML(){
   if(ui.resetStep>0){
     var two=ui.resetStep===2;
     h+='<div onclick="App.cancelReset()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
-    h+='<div role="dialog" aria-modal="true" aria-label="Verileri sıfırlama onayı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.cancelReset)" onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:var(--f-subhead);line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
+    h+='<div role="dialog" aria-modal="true" aria-label="Verileri sıfırlama onayı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.cancelReset)" onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:var(--f-subhead);line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button data-fx="destructive" onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
   }
   return h;
 }
@@ -16972,7 +17106,7 @@ function notifCardHTML(n){
   s+='<span style="font-size:var(--f-caption1);color:var(--faint);margin-left:auto;font-weight:600;">'+esc(when)+'</span></div>';
   s+='<div style="font-size:var(--f-subhead);line-height:1.5;color:var(--text2);word-break:break-word;white-space:pre-wrap;">'+esc(String(n.text||''))+'</div>';
   s+='<div style="display:flex;align-items:center;gap:4px;margin-top:10px;"><span style="font-size:var(--f-caption2);color:var(--faint);font-weight:600;display:flex;align-items:center;gap:3px;">'+(n.read?(icon('check-check',12)+' Okundu'):'• Yeni')+'</span>';
-  s+='<button onclick="App.deleteNotif(\''+n.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:6px 12px;border-radius:10px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',12)+' Sil</button></div></div>';
+  s+='<button data-fx="destructive" onclick="App.deleteNotif(\''+n.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:6px 12px;border-radius:10px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',12)+' Sil</button></div></div>';
   return s;
 }
 // Luna = OpenAI destekli kişisel sohbet. WhatsApp tarzı balonlar: kullanıcı sorusu
@@ -17196,7 +17330,7 @@ function aeonItemHTML(it,enterCls){
     h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:3px;font-size:var(--f-caption2);font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:999px;padding:2px 9px;">'+icon('hexagon',11)+' ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:var(--f-caption2);color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
     if(it.mediaKind) h+=aeonMediaSlotHTML(it,'var(--icon)','var(--aeon)');
     else h+='<div style="font-size:var(--f-subhead);line-height:1.55;">'+aeonBubbleText(it.text,'in',bubbleKey)+'</div>';
-    var delBtn=(it.observer&&it.id)?('<button onclick="App.deleteNotif(\''+it.id+'\')" style="border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:4px 10px;border-radius:9px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',11)+' Sil</button>'):'';
+    var delBtn=(it.observer&&it.id)?('<button data-fx="destructive" onclick="App.deleteNotif(\''+it.id+'\')" style="border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:4px 10px;border-radius:9px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',11)+' Sil</button>'):'';
     var textActions='';
     if(!it.mediaKind&&it.text){
       var akKind=it.observer?'notif':'qa', akId=it.observer?it.id:it.qaId, akField=it.observer?'':(it.qaField||'');
@@ -17519,6 +17653,15 @@ function maybePullQuranForeground(force){
 }
 var appPollInitialTimerId=setTimeout(pollRemote,1500);
 var appPollTimerId=setInterval(pollRemote,30000); // ÆON + sağlık + Kur’an teslimleri; reminder timer'ından ayrı
+// TAM-DENETIM B-05: canlı zemin "canlılığı". pollRemote()'un render()'ı
+// `if(added>0||answeredCount>0)` ile kapılıydı — yani sahne YALNIZ yeni bir ÆON
+// mesajı gelince tazeleniyordu. Boşta duran kullanıcı gündüz→akşam geçişini hiç
+// görmüyordu. Bu timer tam render() yapmaz; sadece #root sınıflarını ve header
+// vakit etiketini yamalar (taslak metin, scroll ve odak korunur).
+// NOT: timeTheme.js'e setInterval EKLENMEZ (değişmez: orada 0 kalmalı).
+var ambienceRefreshTimerId=setInterval(function(){
+  try{ if(!document.hidden) syncHeaderScene(); }catch(e){}
+},30000);
 var reminderLifecycleTimerId=setInterval(reminderLifecycleTick,REMINDER_LIFECYCLE_INTERVAL_MS); // yalnız yerel reminder checkpoint'i; ağ polling'i değişmez
 // FX-P-56: zaman dilimi selamlaması — boot ve foreground dönüşünde; günde en
 // fazla 2 kez ve son selamlamadan 4 saat geçmediyse tekrar çalmaz (throttle

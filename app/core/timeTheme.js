@@ -9,17 +9,34 @@
     if (h >= 17 && h <= 20) return 'theme-time-dusk';
     return 'theme-time-night';
   }
+  // TAM-DENETIM B-09: tek zaman kaynağı. `classForHour` SABİT saat aralığı
+  // kullanır (17–20 = dusk); `SeyAmbience.timeClass` ise GERÇEK güneş saatini.
+  // İkisi de görsel katman sürdüğü için `#root` üzerinde eşzamanlı olarak
+  // `theme-time-dusk` + `amb-time-day` gibi çelişen çiftler oluşuyordu.
+  // Artık `theme-time-*` da güneş saatinden türetilir; güneş verisi yoksa
+  // SeyAmbience zaten classForHour'a düşer, yani davranış korunur.
+  // `classForHour`'ın kendi sözleşmesi DEĞİŞMEZ (fixture'lar ona bağlı).
+  function activeTimeClass(now){
+    try{
+      if (window.SeyAmbience && typeof window.SeyAmbience.timeClass === 'function'){
+        var amb = window.SeyAmbience.timeClass(now);
+        if (amb) return amb.replace('amb-time-', 'theme-time-');
+      }
+    }catch(e){}
+    return classForHour((now || new Date()).getHours());
+  }
   function apply(){
     var root = document.getElementById('root');
     if (!root) return;
     var s = settings();
-    // FX-P-81: premium kapalıysa aurora sınıfı da kaldırılır — sınıf root'ta
-    // asılı kalmaz, katman tamamen söner.
-    if (!s.premiumAtmosphere){ root.classList.remove('theme-aurora'); return; }
-    var now = new Date();
-    var cls = classForHour(now.getHours());
+    // TAM-DENETIM B-06: premium kapalıyken sınıflar root'ta ASILI KALMAMALI.
+    // FX-P-81 yorumu bunu vaat ediyordu ama kod yalnız `theme-aurora`'yı
+    // kaldırıp dönüyordu; `theme-time-*` root'ta kalıp gölge tonunu sürmeye
+    // devam ediyordu. Temizlik artık premium kontrolünden ÖNCE yapılıyor —
+    // SeyAmbience.apply()'ın zaten doğru olan kalıbıyla aynı.
     root.classList.remove('theme-time-dawn','theme-time-day','theme-time-dusk','theme-time-night');
-    root.classList.add(cls);
+    if (!s.premiumAtmosphere){ root.classList.remove('theme-aurora'); return; }
+    root.classList.add(activeTimeClass(new Date()));
     root.classList.add('theme-aurora');
   }
   function seasonalClass(d){
@@ -50,8 +67,10 @@
     var root = document.getElementById('root');
     if (!root) return;
     var s = settings();
-    if (!s.premiumAtmosphere) return;
+    // TAM-DENETIM B-06: temizlik premium kontrolünden ÖNCE — eskiden premium
+    // kapalıyken hiç temizlemeden dönüyordu ve `theme-season-*` root'ta kalıyordu.
     root.classList.remove('theme-season-ramazan','theme-season-spring','theme-season-summer','theme-season-autumn','theme-season-winter','theme-season-newyear');
+    if (!s.premiumAtmosphere) return;
     var cls = seasonalClass(d);
     if (cls) root.classList.add(cls);
   }

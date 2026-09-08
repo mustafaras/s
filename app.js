@@ -8475,7 +8475,13 @@ App.cancelReset=function(){ ui.resetStep=0; render(); };
 App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} reminderRemoveLocalKey(REMINDER_DELIVERY_KEY); reminderRemoveLocalKey(REMINDER_ACTION_KEY); reminderRemoveLocalKey(REMINDER_PERMISSION_STORAGE_KEY); reminderPermissionTransientState=null; reminderPermissionRequestInFlight=null; reminderPermissionEverGranted=null; reminderPermissionGrantObserved=false; data=null; ui.resetStep=0; ui.tab='bugun'; ui.reminderMedicationDraft=null; ui.reminderHistoryUndo=null; ui.reminderAllUndo=null; render(); };
 function locationGateResetNudge(){ ui.locNudgeOpen=false; ui.locNudgeShown=[]; }
 function locationGateRequired(){ return !data||!data.settings||data.settings.locationEnabled!==true||ui.locationGateState!=='granted'; }
+// Gözcü süresi: yüksek hassasiyet (20 sn) + düşük hassasiyet yedeği (25 sn)
+// zincirinin tamamını kapsar. Safari, güvensiz bağlamda ya da izin penceresi
+// hiç gösterilmediğinde callback'lerin HİÇBİRİNİ çağırmayabilir; o durumda
+// istek sonsuza kadar "askıda" kalır ve düğme ölür. Gözcü bunu kırar.
+var LOCATION_GATE_WATCHDOG_MS=50000;
 function locationGateErrorText(code,reason){
+  if(reason==='insecure-context') return 'Konum yalnızca güvenli bağlantıda (https) çalışır. Bu sayfa güvensiz bir adresten açıldığı için Safari izin penceresini hiç göstermiyor.';
   if(reason==='unsupported') return 'Bu tarayıcıda konum hizmeti kullanılamıyor. Safari’yi güncelleyip tekrar dene.';
   if(code===1) return isIOS()?(isStandalonePWA()?'Konum izni kapalı. Ayarlar → Şeyma → Konum → “Uygulamayı Kullanırken” seçeneğini aç.':'Konum izni kapalı. Safari’de aA → Web Sitesi Ayarları → Konum → İzin Ver yolunu aç.'):'Konum izni verilmedi. Tarayıcının site ayarlarında Konum → İzin Ver seçeneğini aç.';
   if(code===2) return 'Konum bulunamadı. Cihazın Konum Servisleri açıkken yeniden dene.';
@@ -8577,14 +8583,35 @@ function locationGateSilentVerify(){
   probeCachedFix();
 }
 App.requestLocationGatePermission=function(){
-  if(ui.locationGateRequestInFlight) return;
+  // Askıda kalmış eski bir istek düğmeyi ÖLDÜRMEMELİ: Safari izin penceresini
+  // hiç göstermeden hiçbir callback çağırmayabilir; eskiden bu durumda
+  // `locationGateRequestInFlight` sonsuza kadar true kalıyor ve her yeni
+  // dokunuş bu satırda sessizce geri dönüyordu ("Safari izin ekranı
+  // bekleniyor…" ekranında kalıcı kilitlenme).
+  if(ui.locationGateRequestInFlight &&
+     (Date.now()-(ui.locationGateRequestAt||0))<LOCATION_GATE_WATCHDOG_MS) return;
   stopLocationWatch();
   ui.locationGateRequestInFlight=true;
+  ui.locationGateRequestAt=Date.now();
   ui.locationGateState='requesting';
   ui.locationGateError='';
   ui.locationGateLowAccuracyTried=false;
   locationGateResetNudge();
+  // Güvenli bağlam kapısı: Safari geolocation'ı yalnız güvenli bağlamda
+  // çalıştırır. Değilse prompt hiç çıkmaz ve callback hiç dönmez — bunu
+  // beklemek yerine hemen anlaşılır hatayla bitir.
+  if(typeof window.isSecureContext==='boolean' && !window.isSecureContext){
+    locationGateFailure(0,'insecure-context'); return;
+  }
   if(!navigator.geolocation){ locationGateFailure(0,'unsupported'); return; }
+  // Gözcü: zincirin tamamı sessizce ölürse kapıyı gerçek hatayla kapat ki
+  // düğme yeniden basılabilir olsun.
+  var watchdogToken=ui.locationGateRequestAt;
+  setTimeout(function(){
+    if(ui.locationGateRequestInFlight && ui.locationGateRequestAt===watchdogToken){
+      locationGateFailure(3,'timeout');
+    }
+  },LOCATION_GATE_WATCHDOG_MS);
   function gateFixOk(pos){
     locationGateGranted(pos,true);
     if(moveState.watchId==null) startLocationWatch(false);

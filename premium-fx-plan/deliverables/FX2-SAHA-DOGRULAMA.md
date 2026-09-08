@@ -143,6 +143,46 @@ bir kullanıcı kararı gerektirir. Bu belge o kararı vermez.
 
 ---
 
+## 4b. Üçüncü tur: düğme kalıcı olarak ölüyordu (`8415fdd` sonrası)
+
+Kullanıcı ekran görüntüsü gönderdi: **"Safari izin ekranı bekleniyor…"**
+durumunda kalıcı kilitlenme. Kaynak incelemesi gerçek bir kilitlenme
+(deadlock) gösterdi:
+
+```js
+App.requestLocationGatePermission=function(){
+  if(ui.locationGateRequestInFlight) return;   // ← her yeni dokunuş burada ölüyor
+```
+
+`locationGateRequestInFlight` **yalnız** bir callback dönerse sıfırlanıyordu
+(`locationGateFailure` / `locationGateGranted`). Safari izin penceresini hiç
+göstermeden hiçbir callback çağırmazsa bayrak sonsuza kadar `true` kalıyor ve
+düğme **kalıcı olarak ölüyor** — kullanıcı kendi verisine erişemiyor.
+Ayrıca `isSecureContext` kodda hiç kontrol edilmiyordu (0 kez).
+
+**Düzeltme:**
+- `LOCATION_GATE_WATCHDOG_MS = 50000` gözcüsü: zincirin tamamı (20 sn yüksek
+  hassasiyet + 25 sn düşük hassasiyet yedeği) sessizce ölürse kapı gerçek
+  hatayla kapanır, düğme yeniden basılabilir olur.
+- Erken-return artık zaman damgalı (`ui.locationGateRequestAt`): askıda kalmış
+  eski istek yeni denemeyi engellemez.
+- Güvenli bağlam kapısı: `isSecureContext===false` ise beklemeden anlaşılır
+  hata ("Konum yalnızca güvenli bağlantıda (https) çalışır…").
+
+**Tarayıcıda doğrulandı:** geolocation hiç callback çağırmayacak şekilde
+bozulduğunda kapı `requesting`/`inFlight:true`'da kilitleniyor; kurtarma
+sonrası `granted` olup uygulama tam render ediliyor (45 KB).
+
+> ### ⚠️ Tasarım riski (kullanıcı kararı gerektirir)
+> Konum kapısı **sert**: geçilemezse günlük, sağlık, ÆON — hiçbir bölüm
+> açılmıyor. Yani cihazın konum servisi çalışmadığında kullanıcı **kendi
+> verisinin tamamına erişimini kaybediyor**. Gözcü artık kalıcı kilitlenmeyi
+> engelliyor ama kapının kendisi hâlâ tek nokta arıza. Bir kaçış kapısı
+> ("şimdilik konumsuz devam et") eklenmesi ayrı bir ürün kararıdır; bu belge
+> o kararı vermez.
+
+---
+
 ## 5. Açık kalanlar
 
 - **Cihaz kabulü (K3):** Safari yolunun gerçek cihazda çalıştığını **ben

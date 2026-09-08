@@ -113,8 +113,10 @@ console.log('\n[3] voiceGuidance=true iken sesli rehberlik çalışır');
   setSettings({ premiumAtmosphere: true, voiceGuidance: true });
   setReducedMotion(false);
   loadMediaFx();
-  // Bulut-önce mimarisi: anahtar/voiceCloudTts yokken voice() false döner
-  // (yerel sese düşmez — kullanıcı kararı). speakLocal ise doğrudan çalışır.
+  // Bulut-önce mimarisi: anahtar/voiceCloudTts yokken voice() false döner.
+  // Bu fixture'da voiceLocalFallback tanımsız (eski state) — FX2-26 sonrası
+  // varsayılan true'dur; bu test kapı davranışını (fallback yokken sessizlik)
+  // doğrular. speakLocal ise doğrudan çalışır.
   var r = window.SeyAudio.voice('test', { lang: 'tr-TR', rate: 1 });
   ok('bulut ayarı yokken voice() false (yerel sese düşmez)', r === false);
   var rl = window.SeyAudio.speakLocal('test', { lang: 'tr-TR', rate: 1 });

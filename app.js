@@ -7511,11 +7511,13 @@ App.toggleHaptic=function(on){ if(!data.settings) data.settings={}; data.setting
 App.setVoiceGuidance=function(on){
   if(!data.settings) data.settings={};
   data.settings.voiceGuidance=!!on;
-  // FX-P-57 sessiz-fail bildirimi: kullanıcı sesli rehberliği açtığında bulut
-  // TTS açık ama OpenAI anahtarı yoksa, sesin neden çıkmayacağını nazikçe
-  // söyle (yerel sese düşüş kapalı — D4). Tek seferlik, rahatsız etmez.
+  // FX2-26: voiceLocalFallback varsayılan AÇIK — anahtar olmadan da ses çalışır
+  // (yerel TTS). Anahtar yoksa nazikçe hatırlat: bulut (sinirsel) ses için anahtar
+  // eklenebilir; yerel ses kapatılmışsa anahtar gerçekten gerekli. Tek seferlik.
   if(on && data.settings.voiceCloudTts && !(data.settings.openaiKey&&String(data.settings.openaiKey).trim())){
-    toast('Sesli rehberlik için Ayarlar → OpenAI anahtarı gerekli');
+    toast(data.settings.voiceLocalFallback
+      ? 'Sesli rehberlik açık — bulut sesi için Ayarlar → OpenAI anahtarı ekleyebilirsin'
+      : 'Sesli rehberlik için Ayarlar → OpenAI anahtarı gerekli');
   }
   save(); render();
 };

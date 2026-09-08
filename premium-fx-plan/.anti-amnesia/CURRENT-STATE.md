@@ -690,6 +690,24 @@ settings 39/39, splash 16/16, voice 67/67, gate_defaults 26/26 (güncellendi);
 B2 60/60; driver 0 FAIL; tüm `tests/app/*.js` PASS; panel/quran/panel-v2/
 reminder PASS. Push/deploy/browser/server/network/coverage.json yok.
 
+**Denetim düzeltmesi (2026-09-08):** "tam ve kusursuz" denetiminde 1 gerçek
+davranış sorunu + 2 bayat yorum bulundu, düzeltildi:
+- **app.js `App.setVoiceGuidance` toast'ı** — "Sesli rehberlik için Ayarlar →
+  OpenAI anahtarı gerekli" artık yanlıştı (voiceLocalFallback varsayılan AÇIK;
+  anahtarsız da yerel ses çalışır). Koşullu toast: fallback açıkken "…bulut sesi
+  için Ayarlar → OpenAI anahtarı ekleyebilirsin", kapalıyken "gerekli". ÆON/Luna
+  streamAsk toast'ı (app.js:16517) gerçekten anahtar gerektirir — dokunulmadı.
+- **mediaFx.js `voice()` yorumu** — "yerel sese düşme YOK (kullanıcı kararı)"
+  → "FX2-26: voiceLocalFallback varsayılan AÇIK — bulut başarısızsa yerel sese
+  düşülür, sessizlikten iyidir; kullanıcı kapatırsa sessizce atlanır".
+- **test_premium_voice.js:117 yorumu** — "kullanıcı kararı" → fixture'da
+  voiceLocalFallback tanımsız (eski state); test kapı davranışını doğrular.
+  Assertion'lar değişmedi (geçerliydi).
+
+Yeniden doğrulama: voice 67/67, settings 39/39, gate_defaults 26/26, splash
+16/16, tüm `tests/app/*.js` PASS, driver 0 FAIL, B2 60/60, **M8 = 0 ✅**.
+Cache değişmedi (yalnız yorum + toast metni; app.js zaten `20260908b`).
+
 Durum: `FX2-26 → FX2-27`, blokaj yok; **Dalga 7 devam ediyor.**
 
 ---

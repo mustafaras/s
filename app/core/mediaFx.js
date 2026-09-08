@@ -341,8 +341,9 @@
       // FX-P-52: quiet-time (23:00–07:00) penceresinde sesli rehberlik sessiz.
       if (isQuietTime()) return false;
       // ── Bulut TTS: anahtar varsa HER ZAMAN sinirsel ses kullanılır.
-      // Kullanıcı kararı: yerel sese düşme YOK (voiceLocalFallback=false ile
-      // sessizce atlanır; bulut başarısızsa ses çalmaz, robotik ses duyulmaz).
+      // FX2-26: voiceLocalFallback varsayılan AÇIK — bulut başarısızsa yerel
+      // (robotik) sese düşülür, sessizlikten iyidir. Kullanıcı kapatırsa
+      // (voiceLocalFallback=false) sessizce atlanır, robotik ses duyulmaz.
       if (CLOUD_TTS.enabled() && !opts.localOnly){
         var allowFallback = !!(settings() && settings().voiceLocalFallback);
         try{ if (window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}

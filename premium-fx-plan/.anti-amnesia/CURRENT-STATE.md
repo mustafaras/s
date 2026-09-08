@@ -11,11 +11,11 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-27** — tam regresyon ve kapsam raporu (Dalga 7) |
-| Sıradaki prompt | **FX2-28** — seri kapanış belgesi (Dalga 7 kapanışı) |
-| Aşama | Dalga 7 — Varsayılanlar ve Kapanış |
+| Son tamamlanan prompt | **FX2-28** — kapanış ve doküman senkronu (seri son kartı) |
+| Sıradaki prompt | **yok** — FX-2 serisi tamamlandı (28/28 kart) |
+| Aşama | Dalga 7 — Kapanış (**seri tamamlandı**) |
 | Bloklu | yok |
-| Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
+| Uygulama tamamlandı | **evet** — kod K1 kanıtlı; push/deploy/K3 ayrı onay bekliyor |
 
 **Durum makinesi:** [`FX2-STATE.json`](FX2-STATE.json)
 
@@ -765,6 +765,47 @@ Durum: `FX2-27 → FX2-28`, blokaj yok; **Dalga 7 son karta girdi.**
 
 ---
 
+## FX2-28 — Tamamlandı (2026-09-08) · Kapanış ve Doküman Senkronu (SERİ SONU)
+
+**28/28 kart tamamlandı.** Kapanış belgesi
+[`../deliverables/FX2-KAPANIS.md`](../deliverables/FX2-KAPANIS.md) üretildi:
+tam M1–M13 öncesi/sonrası tablosu (12/13 metrik eşikte, M7 kullanıcı onaylı
+0,62 tavanında), renk kararı, canlı zemin sözleşmesi (192 kombinasyon),
+kaynaktan doğrulanmış nihai API envanteri (`SeyTouch`/`SeyAmbience`/
+`SeyAudio`/`SeyFx`/`SeyHaptics`/`SeyTimeTheme`), `settings` varsayılan
+tablosu, dalga-bazlı özet, fixture envanteri, I1–I8 kanıtları, ölü bağlantı
+taraması, K1/K2/K3 ayrımı, bilinen sınırlar.
+
+`README.md` durum başlığı ve kapsam tablosu "şimdi" sütunuyla güncellendi;
+kök `CLAUDE.md` **ve** `AGENTS.md`'deki premium FX paragrafı (aynı kelime
+kelime metin, iki dosyada da eşleşen) FX-2'nin tamamlandığını ve
+`FX2-KAPANIS.md`'yi yansıtacak şekilde güncellendi; `docs/GELISTIRME-PLANI.md`
+durum tablosuna (§22 Haptik + mikro animasyon) ve değişiklik günlüğüne satır
+eklendi.
+
+**Ölü bağlantı taraması** (`premium-fx-plan/` öneki, `.md`+`.json`): 2 bulgu,
+ikisi de istisna — yalnız `LEDGER.md`'nin FX-1 dönemi satırlarında ve FX-1'in
+dondurulmuş `FX-SERI-KAPANIS-BELGESI.md`'sinde (tarihsel kapanış kaydı,
+geriye dönük düzeltilmez); **canlı belgelerde 0 ölü bağlantı**.
+
+**Bu oturumda yeniden doğrulama:** `--gate` 12/13 (yalnız M7); tüm
+`tests/app/*.js` 0 FAIL; `test_modularization_boundary.js` **64/64**;
+`MODULARIZATION.md` dokunulmadı; `App.*`=718, `onclick`=391 korundu.
+`git log --oneline | grep -c fx2:` = **36** (28 kart + 2 seri-açılış + 6
+denetim/gap-fix düzeltmesi — 1:1 kart:commit varsayımı doğru değildi, gerçek
+sayı dürüstçe kaydedildi, bkz. `FX2-KAPANIS.md` §1).
+
+Push/deploy/browser/network yok. `FX2-STATE.json` →
+`lastCompletedPrompt:FX2-28`, `nextPrompt:null`, `implementationComplete:true`,
+`pushedToRemote:false`, `deployApproved:false`.
+
+**Durum: FX-2 serisi (28 kart, 8 dalga) TAMAMLANDI.** Sıradaki adımlar
+kullanıcı kararı gerektirir: (1) push/merge/deploy onayı, (2) cihaz kabulü
+(K3), (3) FX→modularization devri (`MODULARIZATION.md` +
+`docs/monolit-bolumlenme-haritasi.md`).
+
+---
+
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
 
 **1. Kartlar yeniden numaralandı ve yeniden yazıldı.** 21 kart (gap'li
@@ -803,9 +844,13 @@ renk kararı + canlı zemin sözleşmesi.
 
 ## Sıradaki Oturum İçin
 
-1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
-   → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-28.md`](../.prompts/FX2-28.md) — seri kapanışı
+**FX-2 serisi tamamlandı — sıradaki kart yok.** Yeni bir FX dalı açılırsa
+(örn. bir sonraki FX-3 fikri) buradan başla:
+
+1. Oku: [`../deliverables/FX2-KAPANIS.md`](../deliverables/FX2-KAPANIS.md) —
+   bu serinin kapanış kaydı ve §13 "Sıradaki Adımlar"
+2. Yeni seri açılacaksa: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
+   → yeni bir `FX3-STATE.json` gibi taze bir durum makinesi oluştur
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

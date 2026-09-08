@@ -14,7 +14,7 @@
 - For any reminder release or live action, read [`docs/reminders/APP-REMINDER-APPROVAL-GATE.md`](docs/reminders/APP-REMINDER-APPROVAL-GATE.md). `releaseApproval` remains `NOT_APPROVED`; this frozen program has no active prompt delivery. Push, deploy, tag, force-push, other remotes, external writes and `mustafaras/seyma-data` remain separately gated.
 - For any UI/design work on either surface, start at [`docs/apple-design/APPLE-DESIGN-STATE.json`](docs/apple-design/APPLE-DESIGN-STATE.json) — it names the next prompt and whether anything is blocked. The audit and the binding functionality contract (I1–I6: no design change may alter `data`, `migrate()`, or the `App.<name>` handler surface) live in [`docs/apple-design/IOS27-TASARIM-PLANI.md`](docs/apple-design/IOS27-TASARIM-PLANI.md); the 52 sequential prompts in [`docs/apple-design/UYGULAMA-PROMPTLARI.md`](docs/apple-design/UYGULAMA-PROMPTLARI.md). Run prompts strictly in order and update `.anti-amnesia/LEDGER.md`, `.anti-amnesia/CURRENT-STATE.md` and the state JSON in the same commit. The series is complete (AD-52 done); push/deploy/device acceptance remain separately gated.
 - **For modularization / monolith-splitting work** (splitting the ~18.8k-line `app.js` into `app/core/*` + `app/content/*` modules, e.g. after the premium-FX waves finish): start from [`docs/monolit-bolumlenme-haritasi.md`](docs/monolit-bolumlenme-haritasi.md) — it is the graphify-derived evidence base (true business-domain split of app.js, why graphify community labels are misleading there) and the target-module map. Treat [`premium-fx-plan/MODULARIZATION.md`](premium-fx-plan/MODULARIZATION.md) as the execution strategy. **Trigger:** whenever a task plans to move code out of `app.js`, touch `migrate()`, or add a new `app/core/*` / `app/content/*` module, first read the monolith map and confirm the move follows the recorded domain split (and I1–I6). The premium-FX series is now complete (70 prompts applied, LOCAL-ONLY on `premium-fx-local`); the graphify map is the ready-made input for the FX→modularization handoff.
-- For premium FX work (ses/hareket/tema in `app/core/mediaFx.js` + `app/core/timeTheme.js`): the FX-1 series closed but did **not** deliver the intended feel — start at [`premium-fx-plan/TESHIS.md`](premium-fx-plan/TESHIS.md) (evidence-based root-cause audit: `SeyAudio.tap` has 0 call sites, ripple is untriggerable, `.sey-ripple/.sey-shimmer/.sey-enter` never reach markup, haptics are a no-op on iOS, 4 premium settings ship off — yet 9/9 fixtures were green), then [`premium-fx-plan/PLAN-FX2.md`](premium-fx-plan/PLAN-FX2.md) (the active FX-2 program: 28 sequential cards FX2-01…28, 8 waves, invariants I1–I8, contract S1–S8), [`premium-fx-plan/KAPSAM-OLCUMU.md`](premium-fx-plan/KAPSAM-OLCUMU.md) (coverage metrics M1–M13 — a card that cannot raise its metric is BLOCKED, not done), and [`premium-fx-plan/.anti-amnesia/FX2-STATE.json`](premium-fx-plan/.anti-amnesia/FX2-STATE.json) for the next card. Specs: `RENK-VE-ZEMIN.md` (**colour decision — pink → champagne gold — and the live-background contract: 4 solar-time × 8 WMO-weather × 6 season = 192 scenes, driven entirely by the already-live `data.weather`, no new network call**), `SES-TASARIMI.md` (audio engine + palette), `HAREKET-SISTEMI.md` (motion tokens, transitions, material), `SAFEGUARDS.md`, `LOCAL-ONLY-IMPLEMENTATION.md`. FX-1 history is condensed in [`premium-fx-plan/arsiv/FX1-OZET.md`](premium-fx-plan/arsiv/FX1-OZET.md); its closure record stays at `deliverables/FX-SERI-KAPANIS-BELGESI.md`. **No push, no merge to `main`, no tag, no deploy without explicit user approval**; the deferred FX-P-66/67 and blocked FX-P-88 are out of FX-2 scope.
+- For premium FX work (ses/hareket/tema in `app/core/mediaFx.js` + `app/core/timeTheme.js`): **the FX-2 series is complete** — 28 cards across 8 waves (2026-09-06→09-08), closing the gap FX-1 left (FX-1 shipped an FX API nobody called: `SeyAudio.tap` had 0 call sites, ripple was untriggerable, `.sey-ripple/.sey-shimmer/.sey-enter` never reached markup, haptics were a no-op on iOS, 4 premium settings shipped off — yet 9/9 fixtures were green; root cause in [`premium-fx-plan/TESHIS.md`](premium-fx-plan/TESHIS.md)). Start at [`premium-fx-plan/deliverables/FX2-KAPANIS.md`](premium-fx-plan/deliverables/FX2-KAPANIS.md) — the closure record: full before/after M1–M13 coverage table (12/13 metrics met; M7 at the user-approved 0.62 ceiling, not the coverage tool's literal 0.80), the final API inventory (`SeyTouch`, `SeyAmbience`, `SeyAudio`, `SeyFx`, `SeyHaptics`, `SeyTimeTheme`), `settings` defaults, fixture inventory, and known limits. Background: [`premium-fx-plan/PLAN-FX2.md`](premium-fx-plan/PLAN-FX2.md) (waves, invariants I1–I8, contract S1–S8), [`premium-fx-plan/KAPSAM-OLCUMU.md`](premium-fx-plan/KAPSAM-OLCUMU.md) (the coverage-metric methodology), [`premium-fx-plan/RENK-VE-ZEMIN.md`](premium-fx-plan/RENK-VE-ZEMIN.md) (colour decision — pink → champagne gold — and the live-background contract: 4 solar-time × 8 WMO-weather × 6 season = 192 scenes, driven entirely by the already-live `data.weather`, no new network call), `SES-TASARIMI.md`/`HAREKET-SISTEMI.md` (audio/motion specs), `SAFEGUARDS.md`, `LOCAL-ONLY-IMPLEMENTATION.md`. FX-1 history is condensed in [`premium-fx-plan/arsiv/FX1-OZET.md`](premium-fx-plan/arsiv/FX1-OZET.md); its closure record stays at the frozen `deliverables/FX-SERI-KAPANIS-BELGESI.md` (do not edit retroactively — it documents FX-1-era files intentionally). **No push, no merge to `main`, no tag, no deploy without explicit user approval**; device acceptance (K3) is separately pending. This closes the precondition for the FX→modularization handoff (see the modularization bullet above).
 - Keep this file operational and concise; link to canonical documents instead of copying their full contents into new instructions.
 
 ---
@@ -222,22 +222,26 @@ panel/v2/panel-v2.css  Premium observer design tokens, components and responsive
 panel-v2.html    Premium ÆON observer shell (repo root); loads only
                  quranRevelationOrderV1.js, panelCoverageManifest.js and
                  panel/v2/panel-v2.js — a third, separate regression surface.
-premium-fx-plan/ Premium FX program docs. Active series is **FX-2**
-                 ("hissedilir premium"): TESHIS.md (root-cause audit —
-                 read first), PLAN-FX2.md (waves + invariants),
-                 KAPSAM-OLCUMU.md (coverage metrics that define "done"),
-                 SES-TASARIMI.md + HAREKET-SISTEMI.md (audio/motion specs),
-                 .prompts/FX2-KATALOG.md + 28 sequential FX2-NN.md cards
-                 (each self-contained: copy-ready code, grep anchors,
-                 expected verification output), RENK-VE-ZEMIN.md
+premium-fx-plan/ Premium FX program docs. **FX-2 series complete**
+                 ("hissedilir premium", 28 cards, 8 waves, 2026-09-06→09-08):
+                 TESHIS.md (root-cause audit), PLAN-FX2.md (waves +
+                 invariants), KAPSAM-OLCUMU.md (coverage metrics), SES-TASARIMI.md
+                 + HAREKET-SISTEMI.md (audio/motion specs), .prompts/FX2-KATALOG.md
+                 + 28 FX2-NN.md cards (historical — series closed), RENK-VE-ZEMIN.md
                  (champagne-gold palette + 192-scene live background),
-                 .anti-amnesia/ (FX2-STATE.json + CURRENT-STATE.md + LEDGER.md).
-                 MODULARIZATION.md (module-split strategy — first input for
-                 the FX→modularization handoff; do NOT edit,
+                 tools/fx-coverage.mjs (network-free coverage-metric CLI;
+                 `--gate`/`--save`/`--json`), .anti-amnesia/ (FX2-STATE.json +
+                 CURRENT-STATE.md + LEDGER.md), deliverables/FX2-KAPANIS.md
+                 (series closure record) + FX2-KAPSAM-RAPORU.md (final
+                 regression report). MODULARIZATION.md (module-split strategy —
+                 first input for the FX→modularization handoff; do NOT edit,
                  tests/app/test_modularization_boundary.js asserts on it),
                  SAFEGUARDS.md + LOCAL-ONLY-IMPLEMENTATION.md (no-push/
                  no-deploy gates), arsiv/FX1-OZET.md + deliverables/
-                 FX-SERI-KAPANIS-BELGESI.md (FX-1 history).
+                 FX-SERI-KAPANIS-BELGESI.md (FX-1 history, frozen). New fixture
+                 families from the series: tests/app/test_fx2_*.js
+                 (palette/touch/audio/tab-transition/overlay-motion/ambience,
+                 6 files) + expanded test_premium_*.js.
 files/           Local maintenance area (yedek/ JSON backups, bakim/ scripts).
 graphify-out/    graphify knowledge-graph output for app.js — evidence base
                  behind docs/monolit-bolumlenme-haritasi.md.

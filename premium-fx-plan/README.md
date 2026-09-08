@@ -1,8 +1,9 @@
 # Şeyma Premium FX
 
-**Aktif seri:** **FX-2 — "Hissedilir Premium"** · v2.0 · 28 kart · 2026-09-06
+**Seri:** **FX-2 — "Hissedilir Premium"** · v2.0 · 28 kart · 2026-09-06 → 2026-09-08
 **Dal:** `premium-fx-gorsel-yuzey` · **LOCAL ONLY** (push/merge/deploy yok)
-**Durum:** 🟡 Dalga 0 · sıradaki kart **FX2-01**
+**Durum:** ✅ **Seri tamamlandı** (FX2-01…28) · 12/13 metrik eşikte · kapanış
+belgesi [`deliverables/FX2-KAPANIS.md`](deliverables/FX2-KAPANIS.md)
 
 ---
 
@@ -71,22 +72,43 @@ seviyesinde (11 hex); ~11 tanım 65 kullanım noktasını birden değiştirir.
 
 ---
 
-## Kapsam Tablosu (taban → hedef)
+## Kapsam Tablosu (taban → hedef → **şimdi**, 2026-09-08 seri kapanışı)
 
-| Metrik | Taban | Hedef |
-|---|---:|---:|
-| Basma geri bildirimi alan buton | **0 / 361** | ≥ 343 |
-| Ses çıkaran etkileşim | 13 | ≥ 200 |
-| Ripple çalışan buton | **0** | ≥ 325 |
-| Canlandırılan sayaç | 1 | ≥ 8 |
-| Çıkış animasyonlu overlay | **0 / 13** | ≥ 10 |
-| Hareket token uyumu | 0,21 | ≥ 0,80 |
-| Kapalı gelen premium ayar | 4 | **0** |
-| iOS'ta çalışan geri bildirim kanalı | **0** | ≥ 2 |
-| **Pembe token** | 11 | **0** |
-| **Palet ailesi** | 5 | **≤ 2** |
-| **Canlı zemin sahnesi** | **0** | **≥ 18** (192 kombinasyon) |
-| **Kontrast (8 çift)** | — | **8/8** |
+| Metrik | Taban | Hedef | **Şimdi** | Durum |
+|---|---:|---:|---:|---|
+| Basma geri bildirimi alan buton | **0 / 390** | ≥ 343 | **390** | ✅ |
+| Ses çıkaran etkileşim | 18 | ≥ 200 | **408** | ✅ |
+| Ripple çalışan buton | **0** | ≥ 325 | **390** | ✅ |
+| Canlandırılan sayaç | 1 | ≥ 8 | **10** | ✅ |
+| Çıkış animasyonlu overlay | **0 / 12** | ≥ 10 | **12** | ✅ |
+| Hareket token uyumu | 0,13 | ≥ 0,80 | **0,62** | ⚠️ kullanıcı onaylı tavan |
+| Kapalı gelen premium ayar | 2 | **0** | **0** | ✅ |
+| iOS'ta çalışan geri bildirim kanalı | **0** | ≥ 2 | **2** | ✅ |
+| **Pembe token** | 9 | **0** | **0** | ✅ |
+| **Palet ailesi** | 3 | **≤ 2** | **2** | ✅ |
+| **Canlı zemin sahnesi** | **0** | **≥ 18** (192 kombinasyon) | **18** | ✅ |
+| **Kontrast (8 çift)** | — | **8/8** | **8/8** | ✅ |
+
+**12/13 metrik eşikte.** Tam M1–M13 tablosu ve M7 istisnasının gerekçesi:
+[`deliverables/FX2-KAPANIS.md`](deliverables/FX2-KAPANIS.md) §2.
+
+---
+
+## Seri Tamamlandı (2026-09-08)
+
+28 kart, 8 dalga, 2026-09-06 → 2026-09-08. Kapanış belgesi:
+[`deliverables/FX2-KAPANIS.md`](deliverables/FX2-KAPANIS.md) — kapsam
+tablosu, renk kararı, canlı zemin sözleşmesi, nihai API envanteri,
+`settings` varsayılanları, fixture envanteri, I1–I8 değişmezlik kanıtları,
+bilinen sınırlar, K1/K2/K3 kanıt ayrımı. Detaylı kart-kart kayıt:
+[`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md) (append-only) ve
+[`.anti-amnesia/CURRENT-STATE.md`](.anti-amnesia/CURRENT-STATE.md).
+
+**Push/merge/deploy YAPILMADI** — branch `premium-fx-gorsel-yuzey` local-only
+kalır; main'e merge + Pages deploy ayrı, açık kullanıcı onayı gerektirir.
+Cihaz kabulü (K3) yalnız kullanıcıdan gelir. Sonraki program: FX→
+modularization devri (`MODULARIZATION.md` + kök
+`docs/monolit-bolumlenme-haritasi.md`).
 
 ---
 

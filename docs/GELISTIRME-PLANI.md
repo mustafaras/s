@@ -18,9 +18,29 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-09-02 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `.github/workflows/pages.yml`._
+_Son güncelleme: 2026-09-08 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-08 (FX-2 serisi tamamlandı — "Hissedilir Premium"):** 28 kartlık,
+>   8 dalgalık premium FX programı (2026-09-06 → 2026-09-08) kapandı. FX-1
+>   (91 prompt) bir FX API üretmişti ama hiçbir yere bağlanmamıştı
+>   (`SeyAudio.tap` 0 çağrı, ripple tetiklenemez, haptik iOS'ta no-op — buna
+>   rağmen 9/9 fixture yeşildi). FX-2 kapsamı ölçülebilir metriklerle (M1–M13)
+>   aldı: 361 butonun tamamı basma/ripple/ses geri bildirimi aldı (`SeyTouch`
+>   delege katmanı), 11+ sesli `SeyAudio` v2 (master bus/compressor/limiter/
+>   reverb), sekme geçişi + 12 overlay çıkış animasyonu, sayaç canlandırma,
+>   pembe palet → Şampanya Altını + Füme Mürekkep'e geçiş (5 aileden 2'ye),
+>   `SeyAmbience` canlı zemin (4 güneş dilimi × 8 WMO hava sahnesi × 6 mevsim
+>   = 192 kombinasyon, `data.weather` zaten canlı — yeni ağ çağrısı yok),
+>   elevation/hareket token'ları, 4 premium ayarın varsayılanı düzeltildi
+>   (`launchRitual`/`voiceLocalFallback` artık açık). **12/13 kapsam metriği
+>   eşikte** (M7 hareket token uyumu kullanıcı onaylı 0,62 tavanında — araç
+>   eşiği 0,80 matematiksel olarak ulaşılamazdı). Headless kanıt: syntax
+>   11/11, driver 0 FAIL, zikir 95/95, `tests/app/*.js` 0 FAIL, modularization
+>   boundary 64/64, reminder smoke 20/20. Kapanış belgesi:
+>   `premium-fx-plan/deliverables/FX2-KAPANIS.md`. Branch
+>   `premium-fx-gorsel-yuzey`; **canlıya alınmadı** — push/merge/deploy ve
+>   cihaz kabulü (K3) ayrı, açık kullanıcı onayı bekliyor.
 > - **2026-09-02 (ZP-10 — Zikirmatik elle zikir girişi):** Kullanıcı sayaç dışında (tespih, cemaat, kağıt üzerinde) yaptığı zikirleri uygulamanın içine tek bütünde girmek istedi. Sayaç dock'una dördüncü düğme "Elle ekle" eklendi; dokununca sayaç ekranı İÇİNDE ayrı bir alt panel (sheet) açılıyor — zikir seçimi, −/+ stepper, serbest sayı girişi (`inputmode="numeric"`), akıllı hızlı çipler (core'da +33/+100/+500; Esmâ'da "Kalan N" — hedef aşımı fiziksel olarak imkânsız), canlı önizleme satırı ("Bugün 12 → 45 · Ömürlük 1.245 → 1.278") ve isteğe bağlı tek satır "Nasıl?" notu. Sayım aynı kanallara (sessions.perPreset + journeys.lifetimeCount + esma hatmi) işlenir; tur tamamlanması, streak, gün aynası, panel ve ısı haritası otomatik tutarlı kalır. Her elle kayıt `data.zikr.manualEntries[]` içinde salt-okunur bir olay olarak da yaşar (provenance dürüstlüğü); Geri al tam eşleşen geri yükleme yapar, Geçmiş sekmesinde "Elle Sayım Defteri" bölümünde geri alınabilir listedir. Şema V4→V5 additive/idempotent migration (`migrateZikrV5`, `ZIKR_MIGRATION_VERSION` kasıtlı olarak 'zikr_v2' kalır). `sync.js mergeZikr()` yeni union-temelli formülle genişletildi: `lifetime = max(local−manuelL, remote−manuelR) + manuelUnion` — bayat cihazın max kuralının eşzamanlı-artış körlüğü kapatıldı (A'da elle +33, hiç senkronlaşmamış B'de 50 dokunuş → 83; çift sayım yok; reverted kayıtlar toplama katılmaz; gün düzeyi perPreset/totalCount aynı formülle rebalance edilir; esma hatim başına ayrıştırma kapsam dışı — lifetime düzeltilir). Panel 1 `zikrDetailCardP`'ye "Bugün +N elle" dürüstlük çipi eklendi. Headless kapılar: syntax 2/2; yeni `tests/app/test_zikr_manual_entry.js` 21/21; sync 69/69 (5 yeni ZP-10 vakası); zikr-harness 95/95 (şema beklentileri V5'e güncellendi); driver, premium, panel v1 (14 fixture), panel-v2 (27), Kur'an (9), reminder smoke, boundary B1/B2/B3, kontrast 30, tema 26 — tümü PASS. Branch `zikirmatik-manuel-zikir`; canlıya alma (merge main + Pages deploy) ayrı kapıda, kullanıcı onayı bekleniyor.
 > - **2026-08-24 (🍏 iOS 27 Apple Design programı — AD-01 … AD-52 tamamlandı):** Şeyma ve ÆON yüzeylerinde kontrast, zoom, 44px dokunma hedefleri, klavye erişimi, sistem teması, 11pt tabanı, Liquid Glass katman ayrımı ve rem tabanlı tipografi ölçeği uygulandı. `panel/v2/panel-v2.css` reduced-motion kapsamı, dosyanın sonundaki global güvenlik ağıyla tüm animasyon/geçişleri ve kalan hover/lift dönüşümlerini kapsıyor. Final headless kapı: driver 31/0, Zikirmatik 95/95, tema 26/26, kontrast 30/30, sync 64/64, panel v1 50/50, Panel-v2 27/27; gerçek cihaz/tarayıcı kabulü ve Pages deploy'u ayrıca gatedir.
 > - **2026-08-17 (Konum hard gate):** Konum izni artık uygulama içi nudge değil, ana erişim kapısıdır. Safari’nin native geolocation penceresi yalnızca kullanıcı tıklamasıyla `getCurrentPosition()` üzerinden tetiklenir; izin doğrulanmadan onboarding/ana arayüz render edilmez. Reddetme, timeout, desteklenmeyen tarayıcı ve sonradan kapatma durumları Safari/PWA ayar rehberiyle kilitli ekranda kalır; başarı sonrası `watchPosition()` başlar. Headless driver hard-gate success/deny senaryolarını doğruluyor; local-only, browser/server/network/data write yok; canlıya alınmadı.
@@ -340,9 +360,17 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
 - Doğum günü/yıldönümü konfeti + mesaj (`data.settings.specialDays`).
   **Emek:** Düşük.
 
-### 22. 📳 Haptik + mikro animasyon — 🟡 Kısmen
-- Kayıt/kutlama anlarında `navigator.vibrate` + küçük animasyonlar.
-  **Emek:** Düşük.
+### 22. 📳 Haptik + mikro animasyon — ✅ Tamamlandı (FX-2, canlıya alınmadı)
+- Kayıt/kutlama anlarında `navigator.vibrate` + küçük animasyonlar; **FX-2
+  serisiyle (28 kart, 8 dalga, 2026-09-06→09-08, `premium-fx-gorsel-yuzey`
+  branch) 361 butonun tamamı basma/ripple/ses geri bildirimi aldı**, 11+ ses
+  paleti (`SeyAudio`), zengin haptik kanalı (`SeyHaptics`), sekme geçiş +
+  overlay çıkış animasyonları, sayaç canlandırma ve 192-sahne canlı zemin
+  (`SeyAmbience`) eklendi. Kapsam kanıtı ve API detayları:
+  [`../premium-fx-plan/deliverables/FX2-KAPANIS.md`](../premium-fx-plan/deliverables/FX2-KAPANIS.md).
+  **Canlıya alınmadı** — branch local-only, main'e merge + Pages deploy ve
+  cihaz kabulü (K3) ayrı kullanıcı onayı bekliyor. **Emek:** Düşük (madde
+  tanımı) → gerçekte yüksek (28 kartlık ölçülü kapsam programı).
 
 ---
 

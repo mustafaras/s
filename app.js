@@ -8534,21 +8534,47 @@ function locationGateSilentVerify(){
     locationGateResetNudge();
     render();
   }
-  // SADECE Permissions API'nin açık 'granted' yanıtına güvenilir. Kaydedilmiş
-  // bir koordinatın varlığı iznin HÂLÂ geçerli olduğunun kanıtı değildir;
-  // ona dayanıp kapıyı açmak, izni sonradan kapatmış kullanıcıda kapıyı
-  // yanlışlıkla açardı. API yoksa kullanıcı düğmesi devrede kalır — artık
-  // gevşetilmiş maximumAge + düşük hassasiyet yedeğiyle çok daha sık başarılı.
+  // Kapı YALNIZ gerçek bir doğrulamayla açılır; "kayıtlı koordinat var" tek
+  // başına yeterli sayılmaz (izin sonradan kaldırılmış olabilir).
+  //
+  // Yol 1 — Permissions API: Chromium/Firefox'ta kesin cevap verir. Safari'de
+  // 'geolocation' adı çoğu sürümde desteklenmez ve query() TypeError atar ya
+  // da reject eder; bu yüzden TEK dayanak olamaz (ilk denememde öyleydi ve
+  // Safari'de hiç çalışmadı).
+  //
+  // Yol 2 — sessiz önbellek yoklaması: `locationEnabled` zaten true, yani izin
+  // GEÇMİŞTE verilmiş. İzin hâlâ duruyorsa 15 dk'lık önbellek anında döner ve
+  // izin penceresi AÇILMAZ; izin kaldırılmışsa sessizce başarısız olur ve kapı
+  // kapalı kalır. Boot'u bloklamamak için setTimeout'a ertelenir — headless
+  // harness'larda timer'lar bilinçli olarak ölü stub olduğu için bu yol orada
+  // hiç çalışmaz, mevcut fixture kapsamı aynen korunur.
+  function probeCachedFix(){
+    if(!navigator.geolocation) return;
+    setTimeout(function(){
+      try{
+        navigator.geolocation.getCurrentPosition(
+          function(){ accept(); },
+          function(){},
+          {enableHighAccuracy:false,timeout:8000,maximumAge:900000});
+      }catch(e){}
+    },0);
+  }
   try{
-    if(!navigator.permissions||!navigator.permissions.query) return;
-    navigator.permissions.query({name:'geolocation'}).then(function(st){
-      if(!st) return;
-      if(st.state==='granted'){ accept(); return; }
-      // 'denied' → kapı gerçekten kapalı, kullanıcıya doğru mesajı göster.
-      if(st.state==='denied'){ locationGateFailure(1,'permission-denied'); return; }
-      // 'prompt' → izin penceresi kullanıcı eylemi ister; kapı beklemede kalır.
-    })['catch'](function(){});
+    if(navigator.permissions&&navigator.permissions.query){
+      var q=navigator.permissions.query({name:'geolocation'});
+      if(q&&typeof q.then==='function'){
+        q.then(function(st){
+          if(!st){ probeCachedFix(); return; }
+          if(st.state==='granted'){ accept(); return; }
+          // 'denied' → kapı gerçekten kapalı, kullanıcıya doğru mesajı göster.
+          if(st.state==='denied'){ locationGateFailure(1,'permission-denied'); return; }
+          // 'prompt' → izin penceresi kullanıcı eylemi ister; kapı bekler.
+        })['catch'](function(){ probeCachedFix(); });
+        return;
+      }
+    }
   }catch(e){}
+  probeCachedFix();
 }
 App.requestLocationGatePermission=function(){
   if(ui.locationGateRequestInFlight) return;

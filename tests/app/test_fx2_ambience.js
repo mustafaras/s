@@ -385,8 +385,13 @@ group(
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 10. Opaklık tavanı — hiçbir amb-wx-* kuralında opacity > 0.09
+// 10. Opaklık tavanı — hiçbir amb-wx-* kuralında opacity > 0.30
+// Tavan 0.09 → 0.30 (kullanıcı kararı, 2026-09-08 "güçlü/sinematik"): 0.09'luk
+// tavan hava sahnelerini pratikte görünmez kılıyordu — sahneler sayısal olarak
+// farklıydı ama gözle ayırt edilemiyordu. Tavan hâlâ var: katman zemini EZMEZ,
+// metin kontrastı ayrı olarak grup 14'te (>= 4.5:1) korunur.
 // ═══════════════════════════════════════════════════════════════════════════
+const WX_OPACITY_CEILING = 0.30;
 let opacityOk = true;
 let maxOpacity = 0;
 wxBlocks.forEach((b) => {
@@ -394,12 +399,12 @@ wxBlocks.forEach((b) => {
   if (o === null) opacityOk = false;
   else {
     maxOpacity = Math.max(maxOpacity, o);
-    if (o > 0.09) opacityOk = false;
+    if (o > WX_OPACITY_CEILING) opacityOk = false;
   }
 });
 group(
-  'FX2-23.10 opaklık tavanı (hiçbir amb-wx-* > 0.09)',
-  opacityOk && maxOpacity <= 0.09,
+  `FX2-23.10 opaklık tavanı (hiçbir amb-wx-* > ${WX_OPACITY_CEILING})`,
+  opacityOk && maxOpacity <= WX_OPACITY_CEILING,
   `maks opaklık: ${maxOpacity}`
 );
 

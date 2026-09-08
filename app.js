@@ -8514,24 +8514,79 @@ function locationGateGranted(pos,userInitiated){
   save(userInitiated?undefined:false);
   render();
 }
+// Konum kapısı sessiz doğrulaması. `ui` kalıcı olmadığı için `locationGateState`
+// her açılışta sıfırlanıyor, kapı da izin çoktan verilmiş olsa bile taze bir
+// ölçüm dayatıyordu; ölçüm gecikince uygulama tamamen kilitli kalıyordu.
+// Permissions API izni sessizce söyleyebilir: verilmişse kapıyı kaydedilmiş
+// konumla aç, taze ölçümü arka planda watch getirsin.
+function locationGateSilentVerify(){
+  if(!data||!data.settings||data.settings.locationEnabled!==true) return;
+  if(ui.locationGateState==='granted') return;
+  // Yalnız EFEMER `ui` bayrağını çevirir. `data` yazılmaz, `save()`/senkron
+  // tetiklenmez: kalıcı `locationEnabled` zaten true, eksik olan tek şey her
+  // açılışta sıfırlanan `ui.locationGateState`'ti. Konum izleme mevcut akışta
+  // (foreground/izin akışı) başlar; boot'ta yan etki üretmeyiz.
+  function accept(){
+    if(ui.locationGateState==='granted') return;
+    ui.locationGateState='granted';
+    ui.locationGateError='';
+    ui.locationGateRequestInFlight=false;
+    locationGateResetNudge();
+    render();
+  }
+  // SADECE Permissions API'nin açık 'granted' yanıtına güvenilir. Kaydedilmiş
+  // bir koordinatın varlığı iznin HÂLÂ geçerli olduğunun kanıtı değildir;
+  // ona dayanıp kapıyı açmak, izni sonradan kapatmış kullanıcıda kapıyı
+  // yanlışlıkla açardı. API yoksa kullanıcı düğmesi devrede kalır — artık
+  // gevşetilmiş maximumAge + düşük hassasiyet yedeğiyle çok daha sık başarılı.
+  try{
+    if(!navigator.permissions||!navigator.permissions.query) return;
+    navigator.permissions.query({name:'geolocation'}).then(function(st){
+      if(!st) return;
+      if(st.state==='granted'){ accept(); return; }
+      // 'denied' → kapı gerçekten kapalı, kullanıcıya doğru mesajı göster.
+      if(st.state==='denied'){ locationGateFailure(1,'permission-denied'); return; }
+      // 'prompt' → izin penceresi kullanıcı eylemi ister; kapı beklemede kalır.
+    })['catch'](function(){});
+  }catch(e){}
+}
 App.requestLocationGatePermission=function(){
   if(ui.locationGateRequestInFlight) return;
   stopLocationWatch();
   ui.locationGateRequestInFlight=true;
   ui.locationGateState='requesting';
   ui.locationGateError='';
+  ui.locationGateLowAccuracyTried=false;
   locationGateResetNudge();
   if(!navigator.geolocation){ locationGateFailure(0,'unsupported'); return; }
+  function gateFixOk(pos){
+    locationGateGranted(pos,true);
+    if(moveState.watchId==null) startLocationWatch(false);
+  }
+  function gateFixFail(err){
+    var code=err&&Number(err.code);
+    locationGateFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'request-error');
+  }
   try{
     // Safari native permission promptunu yalnızca bu açık kullanıcı eyleminden
     // sonra çağırıyoruz; sayfa yüklenirken sessiz/tekrarlı prompt yok.
-    navigator.geolocation.getCurrentPosition(function(pos){
-      locationGateGranted(pos,true);
-      if(moveState.watchId==null) startLocationWatch(false);
-    },function(err){
+    // maximumAge 1000 → 300000: 1 sn'lik tazelik dayatması, yüksek hassasiyetle
+    // birlikte iç mekânda/masaüstünde neredeyse her zaman zaman aşımına uğrayıp
+    // uygulamayı kapıda kilitliyordu. 5 dk'lık önbellek konumu kabul edilir.
+    navigator.geolocation.getCurrentPosition(gateFixOk,function(err){
       var code=err&&Number(err.code);
-      locationGateFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'request-error');
-    },{enableHighAccuracy:true,timeout:20000,maximumAge:1000});
+      // Zaman aşımında bir kez de düşük hassasiyetle dene: ağ/WiFi tabanlı konum
+      // kapıyı açmaya fazlasıyla yeter, GPS kilidi beklemek gerekmez.
+      if(code===3&&!ui.locationGateLowAccuracyTried){
+        ui.locationGateLowAccuracyTried=true;
+        try{
+          navigator.geolocation.getCurrentPosition(gateFixOk,gateFixFail,
+            {enableHighAccuracy:false,timeout:25000,maximumAge:600000});
+          return;
+        }catch(e2){}
+      }
+      gateFixFail(err);
+    },{enableHighAccuracy:true,timeout:20000,maximumAge:300000});
   }catch(e){ locationGateFailure(0,'request-error'); return; }
   if(ui.locationGateState==='requesting') render();
 };
@@ -17469,6 +17524,7 @@ window.addEventListener('offline',function(){ var lifecycle=reminderSchedulerDis
 
 render();
 try{ if(window.SeyTouch && typeof window.SeyTouch.install==='function') window.SeyTouch.install(document.getElementById('root')); }catch(e){}
+try{ locationGateSilentVerify(); }catch(e){}
 if(data){ reminderSchedulerDispatch('boot'); }
 if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır
 setTimeout(maybeVoiceGreeting,2200); // FX-P-56: açılış selamlaması (gecikmeli — speech engine boot'u için)

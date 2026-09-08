@@ -1850,15 +1850,21 @@
   --amb-angle: calc(170deg + (var(--amb-seed, .5) - .5) * 16deg);
 }
 
-#root.amb-time-dawn { --page: linear-gradient(var(--amb-angle),#FFF6EC 0%,#FBEBD8 46%,#F4EFF2 100%); }
-#root.amb-time-day  { --page: linear-gradient(var(--amb-angle),#FDFBF7 0%,#F7F1E8 46%,#F2EFF4 100%); }
-#root.amb-time-dusk { --page: linear-gradient(var(--amb-angle),#FBF0E4 0%,#F6E4D6 46%,#EFE9F0 100%); }
-#root.amb-time-night{ --page: linear-gradient(var(--amb-angle),#F4F2F6 0%,#EDEBF2 46%,#E9E9F0 100%); }
+/* Sinematik kalibrasyon: sahneler arası ton farkı gerçekten hissedilir olmalı.
+   Açık temada koyu metin (#2C2426) ile AA için zemin luminansı >= .26 kalır. */
+#root.amb-time-dawn { --page: linear-gradient(var(--amb-angle),#FFEBD0 0%,#FBD9B4 46%,#F2DFE4 100%); }
+#root.amb-time-day  { --page: linear-gradient(var(--amb-angle),#FDFCF9 0%,#F4EFE4 46%,#EAEFF6 100%); }
+#root.amb-time-dusk { --page: linear-gradient(var(--amb-angle),#FBDFC0 0%,#F3C6AC 46%,#E6D2E4 100%); }
+#root.amb-time-night{ --page: linear-gradient(var(--amb-angle),#DFE4F4 0%,#D2D8EE 46%,#C9D0E8 100%); }
 
-#root[data-theme="dark"].amb-time-dawn { --page: linear-gradient(var(--amb-angle),#0B0806 0%,#0A0705 100%); }
-#root[data-theme="dark"].amb-time-day  { --page:#000000; }
-#root[data-theme="dark"].amb-time-dusk { --page: linear-gradient(var(--amb-angle),#0A0706 0%,#080607 100%); }
-#root[data-theme="dark"].amb-time-night{ --page: linear-gradient(var(--amb-angle),#04060A 0%,#000000 100%); }
+/* Koyu tema sinematik: eski değerler (#0B0806 / #000000 / #0A0706 / #04060A)
+   siyahın 11/255 içindeydi — dört sahne gözle ayırt edilemiyordu. Açık metin
+   (#F8F8FA) ile AA sınırı zemin luminansı <= .17; aşağıdakiler <= .05 kalır,
+   yani kontrast payı hâlâ çok geniş (>= 12:1). */
+#root[data-theme="dark"].amb-time-dawn { --page: linear-gradient(var(--amb-angle),#2C1D10 0%,#160E07 100%); }
+#root[data-theme="dark"].amb-time-day  { --page: linear-gradient(var(--amb-angle),#1A1D22 0%,#0B0D10 100%); }
+#root[data-theme="dark"].amb-time-dusk { --page: linear-gradient(var(--amb-angle),#2B1526 0%,#150A13 100%); }
+#root[data-theme="dark"].amb-time-night{ --page: linear-gradient(var(--amb-angle),#0C1734 0%,#04070F 100%); }
 
 @media (prefers-reduced-motion: reduce){
   #root[class*="amb-time-"]{ transition:none!important; }
@@ -1874,14 +1880,14 @@
 
 /* Açık / güneşli — çok ince ışık huzmesi */
 #root.amb-wx-clear #sey-aurora::after{
-  opacity:calc(.05 * var(--wx-dim,1));
+  opacity:calc(.20 * var(--wx-dim,1));
   background:linear-gradient(105deg,transparent 40%,
     color-mix(in srgb,var(--gold-1) 60%,transparent) 50%,transparent 60%);
 }
 
 /* Bulutlu — yumuşak gri kayma, doygunluk düşer */
 #root.amb-wx-cloud #sey-aurora::after{
-  opacity:calc(.06 * var(--wx-dim,1));
+  opacity:calc(.22 * var(--wx-dim,1));
   background:radial-gradient(60% 40% at 30% 30%,rgba(140,145,155,.5),transparent 70%),
              radial-gradient(50% 36% at 72% 44%,rgba(150,155,165,.42),transparent 72%);
   animation:ambDrift calc(48s / max(var(--wx-intensity,.4),.2)) var(--ease-glide) infinite;
@@ -1889,7 +1895,7 @@
 
 /* Sis — süt beyazı bulanıklık */
 #root.amb-wx-fog #sey-aurora::after{
-  opacity:calc(.055 * var(--wx-dim,1));
+  opacity:calc(.22 * var(--wx-dim,1));
   background:linear-gradient(0deg,rgba(230,232,236,.85),rgba(214,218,224,.55));
   animation:ambDrift 70s var(--ease-glide) infinite;
 }
@@ -1897,7 +1903,7 @@
 /* Çiseleme / Yağmur — dikey çizgiler, DOM parçacığı YOK */
 #root.amb-wx-drizzle #sey-aurora::after,
 #root.amb-wx-rain    #sey-aurora::after{
-  opacity:calc(.05 * var(--wx-dim,1));
+  opacity:calc(.20 * var(--wx-dim,1));
   background:repeating-linear-gradient(97deg,
     transparent 0 7px,
     color-mix(in srgb,var(--text) 26%,transparent) 7px 8px,
@@ -1905,11 +1911,11 @@
   background-size:auto 220px;
   animation:ambRain calc(1.7s / max(var(--wx-intensity,.4),.2)) var(--ease-linear) infinite;
 }
-#root.amb-wx-rain #sey-aurora::after{ opacity:calc(.07 * var(--wx-dim,1)); }
+#root.amb-wx-rain #sey-aurora::after{ opacity:calc(.26 * var(--wx-dim,1)); }
 
 /* Kar — yavaş, iri, mavi-beyaz */
 #root.amb-wx-snow #sey-aurora::after{
-  opacity:calc(.09 * var(--wx-dim,1));
+  opacity:calc(.26 * var(--wx-dim,1));
   background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.9) 0 1.6px,transparent 2.4px),
              radial-gradient(circle at 62% 48%,rgba(240,246,255,.85) 0 1.9px,transparent 2.8px),
              radial-gradient(circle at 84% 76%,rgba(255,255,255,.8) 0 1.5px,transparent 2.3px);
@@ -1919,7 +1925,7 @@
 
 /* Fırtına — koyulaşma + ÇOK SEYREK şimşek (>=40sn) */
 #root.amb-wx-storm #sey-aurora::after{
-  opacity:calc(.09 * var(--wx-dim,1));
+  opacity:calc(.28 * var(--wx-dim,1));
   background:repeating-linear-gradient(94deg,
     transparent 0 5px,
     color-mix(in srgb,var(--text) 34%,transparent) 5px 6px,

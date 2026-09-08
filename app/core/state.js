@@ -117,16 +117,17 @@
     if(typeof d.settings.premiumAtmosphere!=='boolean') d.settings.premiumAtmosphere=true;
     if(typeof d.settings.uiSounds!=='boolean') d.settings.uiSounds=true;
     if(typeof d.settings.richHaptics!=='boolean') d.settings.richHaptics=true;
-    // Kapalı kalanlar: sesli rehberlik ve ambiyans kendiliğinden ses çıkardığı için
-    // opt-in; launchRitual'ın ise runtime karşılığı (splash) henüz yazılmadı.
-    if(typeof d.settings.launchRitual!=='boolean') d.settings.launchRitual=false;
+    // FX2-26: launchRitual artık varsayılan AÇIK (splash runtime'ı yazıldı).
+    // voiceGuidance ve ambientSounds opt-in kalır — kendiliğinden ses çıkardıkları
+    // için kapalı gelmeleri doğrudur (M8 daraltması: tercih ayarı, kimlik değil).
+    if(typeof d.settings.launchRitual!=='boolean') d.settings.launchRitual=true;
     if(typeof d.settings.voiceGuidance!=='boolean') d.settings.voiceGuidance=false;
     if(typeof d.settings.ambientSounds!=='boolean') d.settings.ambientSounds=false;
-    // FX kapanış kararı D4 (kullanıcı kararı): bulut TTS varsayılan açık, yerel
-    // sese düşüş kapalı. voiceGuidance kapalıyken ikisi de atıl; kullanıcı sesi
-    // açtığında robotik yerel ses yerine sinirsel ses devreye girer.
+    // FX2-26: voiceLocalFallback artık varsayılan AÇIK — bulut anahtarı olmayan
+    // kullanıcıda sesli rehberlik sessiz kalmasın; anahtar varsa bulut (sinirsel)
+    // ses, yoksa yerel TTS devreye girer. voiceGuidance kapalıyken ikisi de atıl.
     if(typeof d.settings.voiceCloudTts!=='boolean') d.settings.voiceCloudTts=true;
-    if(typeof d.settings.voiceLocalFallback!=='boolean') d.settings.voiceLocalFallback=false;
+    if(typeof d.settings.voiceLocalFallback!=='boolean') d.settings.voiceLocalFallback=true;
     // FX-P-87: yerel TTS pitch (0.7–1.3) ve yerel ses adı backfill'i.
     if(typeof d.settings.voicePitch!=='number') d.settings.voicePitch=1;
     if(typeof d.settings.voiceVoiceName!=='string') d.settings.voiceVoiceName='';
@@ -284,11 +285,10 @@
     if(d.settings.voiceGuidance==null) d.settings.voiceGuidance=false;
     if(d.settings.ambientSounds==null) d.settings.ambientSounds=false;
     if(d.settings.richHaptics==null) d.settings.richHaptics=true;
-    // FX-P-55: launchRitual opt-in'dir (splash her açılışta görünür). migrate()
-    // ile aynı varsayılan (false) kullanılır — yeni kullanıcı splash'i yalnız
-    // açıkça isterse görür; mevcut kullanıcıların aniden splash görmesi sürpriz
-    // olmaz. Splash uygulandı (index.html #sey-splash + app.js hideSplash).
-    if(d.settings.launchRitual==null) d.settings.launchRitual=false;
+    // FX2-26: launchRitual varsayılan AÇIK — yeni kullanıcı açılış ritüelini
+    // görür, istemezse ayarlardan kapatır. migrate() ile aynı varsayılan (true)
+    // kullanılır; splash uygulandı (index.html #sey-splash + app.js hideSplash).
+    if(d.settings.launchRitual==null) d.settings.launchRitual=true;
     // FX-P-52/56 (Faz 5): sesli rehberlik state alanları — additive backfill,
     // idempotent. Yalnızca settings.* altına eklenir; data şekli değişmez (I1/I3).
     if(d.settings.voiceOnboardedAt==null) d.settings.voiceOnboardedAt='';
@@ -300,12 +300,13 @@
     // FX-P-57: sesli rehberlik dil ve hız tercihleri.
     if(d.settings.voiceLang==null) d.settings.voiceLang='tr-TR';
     if(d.settings.voiceRate==null) d.settings.voiceRate=1;
-    // Bulut TTS (premium sinirsel sesler) — varsayılan AÇIK: kullanıcı istedi
-    // ki hep bulut sesi kullanılsın, yerel sese düşülmesin. openaiKey sanitize
+    // Bulut TTS (premium sinirsel sesler) — varsayılan AÇIK: anahtar varsa bulut
+    // sesi kullanılır. FX2-26: voiceLocalFallback de varsayılan AÇIK — anahtar
+    // yoksa yerel TTS'e düşülür, ses katmanı sessiz kalmaz. openaiKey sanitize
     // ile repoya asla gitmez (sync.js delete c.settings.openaiKey).
     if(d.settings.voiceCloudTts==null) d.settings.voiceCloudTts=true;
     if(d.settings.voiceCloudVoice==null) d.settings.voiceCloudVoice='shimmer';
-    if(d.settings.voiceLocalFallback==null) d.settings.voiceLocalFallback=false;
+    if(d.settings.voiceLocalFallback==null) d.settings.voiceLocalFallback=true;
     // FX-P-87: yerel TTS pitch ve ses adı varsayılanları.
     if(d.settings.voicePitch==null) d.settings.voicePitch=1;
     if(d.settings.voiceVoiceName==null) d.settings.voiceVoiceName='';

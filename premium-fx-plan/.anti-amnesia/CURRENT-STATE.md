@@ -11,8 +11,8 @@
 
 | | |
 |---|---|
-| Son tamamlanan prompt | **FX2-25** — aurora v2 (parallax + grain) (Dalga 6 kapanışı) |
-| Sıradaki prompt | **FX2-26** — (Dalga 7) |
+| Son tamamlanan prompt | **FX2-26** — varsayılan denetimi (Dalga 7 açılışı) |
+| Sıradaki prompt | **FX2-27** — (Dalga 7) |
 | Aşama | Dalga 7 — Varsayılanlar ve Kapanış |
 | Bloklu | yok |
 | Uygulama tamamlandı | hayır — FX-2 serisi devam ediyor |
@@ -660,6 +660,40 @@ Durum: `FX2-25 → FX2-26`, blokaj yok; **Dalga 6 kapandı, Dalga 7 açıldı.**
 
 ---
 
+## FX2-26 — Tamamlandı (2026-09-08) · Varsayılan Denetimi (Dalga 7 açılışı)
+
+`app/core/state.js` + `app.js` (yalnız fxRows metni) + `index.html` (cache) +
+`tests/app/test_premium_fx_gate_defaults.js` (eski varsayılan iddiaları güncellendi):
+
+- **(1) `launchRitual` → `true`** — `migrate()` (`typeof` guard) ve
+  `createDefaultData()` (`==null` guard) simetrik. Splash runtime'ı (FX-P-55)
+  yazıldığı için artık varsayılan açık; yeni kullanıcı açılış ritüelini görür,
+  istemezse ayarlardan kapatır.
+- **(2) `voiceLocalFallback` → `true`** — bulut anahtarı olmayan kullanıcıda
+  sesli rehberlik sessiz kalmasın. `voiceCloudTts=true` **kalır**: anahtar varsa
+  bulut (sinirsel) ses, yoksa yerel TTS devreye girer.
+- **(3) `voiceGuidance`/`ambientSounds` KAPALI KALIR** — M8 daraltması zaten
+  FX2-01'de yazılmıştı (fx-coverage.mjs 246-250 + KAPSAM-OLCUMU §4.1); burada
+  doğrulandı. Kimlik ayarları (premiumAtmosphere/uiSounds/richHaptics/
+  launchRitual/voiceLocalFallback) sayılır, tercih ayarları sayılmaz.
+- **(4) Kayıtlı seçim ezilmez** — `typeof` guard korundu; elle `false` yapılmış
+  kullanıcıda alan zaten boolean olduğu için `false` kalır. Gerçek migrate ile
+  kanıtlandı: taze true/true, elle kapatılmış false/false, idempotent true/true.
+- **(5) Ayar kartı metinleri** — fxRows: launchRitual "Açılışta kısa bir
+  karşılama animasyonu ve sesi (varsayılan açık)", voiceGuidance "…bulut sesi
+  yoksa yerel sesle devam eder" (Türkçe, sıcak ton, emoji yok — K1).
+
+Cache: `state.js?v=20260906d→20260908b`, `app.js?v=20260908a→20260908b`.
+
+**Kanıt:** `node --check` state.js+app.js OK; **M8 2→0** (fx-coverage ✅);
+settings 39/39, splash 16/16, voice 67/67, gate_defaults 26/26 (güncellendi);
+B2 60/60; driver 0 FAIL; tüm `tests/app/*.js` PASS; panel/quran/panel-v2/
+reminder PASS. Push/deploy/browser/server/network/coverage.json yok.
+
+Durum: `FX2-26 → FX2-27`, blokaj yok; **Dalga 7 devam ediyor.**
+
+---
+
 ## Bu Turda Eklenenler (2026-09-06, ikinci oturum)
 
 **1. Kartlar yeniden numaralandı ve yeniden yazıldı.** 21 kart (gap'li
@@ -700,7 +734,7 @@ renk kararı + canlı zemin sözleşmesi.
 
 1. Oku: [`../TESHIS.md`](../TESHIS.md) → [`../PLAN-FX2.md`](../PLAN-FX2.md)
    → [`FX2-STATE.json`](FX2-STATE.json)
-2. Kart: [`../.prompts/FX2-26.md`](../.prompts/FX2-26.md)
+2. Kart: [`../.prompts/FX2-27.md`](../.prompts/FX2-27.md)
 3. Sözleşme: S1–S8 (`PLAN-FX2.md` §3) · Değişmezler: I1–I8 (§2)
 4. **S8 kuralı:** her kart kendi hedef metriğini canlı ölçümle yükseltmelidir.
 

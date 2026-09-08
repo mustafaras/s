@@ -12581,8 +12581,8 @@ function ayarlarHTML(){
   var fxRows=[
     ['uiSounds','Arayüz sesleri','Tıklama, başarı ve uyarı tonları','volume-2'],
     ['richHaptics','Dokunmatik geri bildirim','Zenginleştirilmiş titreşim desenleri','vibrate'],
-    ['launchRitual','Açılış ritüeli','Uygulama açılış animasyonu ve sesi','sparkles'],
-    ['voiceGuidance','Sesli rehberlik','Kritik anlarda kısa sesli yönlendirmeler','mic'],
+    ['launchRitual','Açılış ritüeli','Açılışta kısa bir karşılama animasyonu ve sesi (varsayılan açık)','sparkles'],
+    ['voiceGuidance','Sesli rehberlik','Kritik anlarda kısa sesli yönlendirmeler; bulut sesi yoksa yerel sesle devam eder','mic'],
     ['ambientSounds','Ambiyans sesleri','Yağmur, dalga, ney gibi arka plan sesleri','cloud-drizzle']
   ];
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sparkles',15)+' Premium Atmosfer</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tüm premium efektleri tek anahtarla yönet. Kapattığında uygulama sade modda çalışır.</div>';

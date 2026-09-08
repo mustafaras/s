@@ -62,10 +62,15 @@ ok('uiSounds === true', fresh.settings.uiSounds === true,
 ok('richHaptics === true', fresh.settings.richHaptics === true,
    'gerçek değer: ' + JSON.stringify(fresh.settings.richHaptics));
 
-// Opt-in kalanlar açıkça false olmalı (UI ile motor aynı şeyi söylesin).
-[['launchRitual','runtime karşılığı yok'],['voiceGuidance','opt-in'],
- ['ambientSounds','opt-in'],['voiceLocalFallback','FX kararı D4: yerel sese düşüş yok']
+// FX2-26: kimlik ayarları varsayılan AÇIK (M8 daraltması) — launchRitual ve
+// voiceLocalFallback artık true gelir. Tercih ayarları (voiceGuidance,
+// ambientSounds) opt-in kalır — kendiliğinden ses çıkardıkları için false.
+[['launchRitual','kimlik — varsayılan açık'],['voiceLocalFallback','kimlik — varsayılan açık']
 ].forEach(function(row){
+  ok(row[0]+' === true ('+row[1]+')', fresh.settings[row[0]] === true,
+     'gerçek değer: ' + JSON.stringify(fresh.settings[row[0]]));
+});
+[['voiceGuidance','opt-in'],['ambientSounds','opt-in']].forEach(function(row){
   ok(row[0]+' === false ('+row[1]+')', fresh.settings[row[0]] === false,
      'gerçek değer: ' + JSON.stringify(fresh.settings[row[0]]));
 });

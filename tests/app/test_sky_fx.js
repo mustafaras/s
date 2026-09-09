@@ -278,6 +278,31 @@ console.log('\n[SKY-08] kar');
   ok('taneler yatayda savruluyor (sinüs)', JSON.stringify(x1) !== JSON.stringify(x2));
 }
 
+/* SKY-09 — sis ve şimşek */
+console.log('\n[SKY-09] sis ve şimşek');
+{
+  const f = makeEnv();
+  f.Sky.mount(f.host, scene({ weather: 'amb-wx-fog' }));
+  f.ctx.reset(); f.frames(1);
+  ok('sis 3 bant çiziyor', f.ctx.count('fillRect') >= 3);
+
+  const c = makeEnv();
+  c.Sky.mount(c.host, scene({ weather: 'amb-wx-clear' }));
+  c.ctx.reset(); c.frames(1);
+  ok('açık havada sis yok', c.ctx.count('fillRect') === 0);
+}
+{
+  const e = makeEnv();
+  e.Sky.mount(e.host, scene({ weather: 'amb-wx-storm', seed: 0.42 }));
+  let flashFrames = 0, quietFrames = 0;
+  for (let i = 0; i < 260; i++){         // ~4,2 sn
+    e.ctx.reset(); e.frames(1);
+    if (e.ctx.count('fillRect') > 0) flashFrames++; else quietFrames++;
+  }
+  ok('şimşek SEYREK (kare çoğunluğu sakin)', quietFrames > flashFrames * 8);
+  ok('brightness filtresi kullanılmıyor', CODE.indexOf("filter") === -1 || CODE.indexOf('brightness') === -1);
+}
+
 // === SKY test bloğu buraya eklenir (yeni kartlar bu satırın ÜSTÜNE ekler) ===
 
 console.log('\n' + (fail === 0 ? 'SKY FIXTURE PASS' : 'SKY FIXTURE FAIL') + ': ' + pass + ' geçti, ' + fail + ' düştü');

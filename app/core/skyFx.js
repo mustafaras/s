@@ -181,6 +181,47 @@
     ctx.globalAlpha = 1;
     ctx.restore();
   }
+  // Sis: 3 yatay bant, farklı hız ve opaklık → hacim hissi.
+  function drawFog(ctx, w, h, sc, t){
+    if (sc.weather !== 'amb-wx-fog') return;
+    var night = (sc.time === 'amb-time-night');
+    ctx.save();
+    for (var i = 0; i < 3; i++){
+      var speed = 0.004 + i * 0.0035;
+      var off = ((t * speed) % (w + 300)) - 150;
+      var by = h * (0.34 + i * 0.20);
+      var bh = h * (0.16 + i * 0.05);
+      var g = ctx.createLinearGradient(off, by, off + w * 0.9, by);
+      g.addColorStop(0, 'rgba(0,0,0,0)');
+      g.addColorStop(0.5, night ? 'rgba(150,162,180,0.30)' : 'rgba(236,240,246,0.42)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalAlpha = 0.55 - i * 0.11;
+      ctx.fillStyle = g;
+      ctx.fillRect(off, by - bh / 2, w * 0.9, bh);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+  // Şimşek: TÜM katmanı parlatan filtre DEĞİL — yönlü ışık patlaması.
+  // Seyrek (>=30 sn) ve gecikmeli ikincil parlama (gök gürültüsü ritmi).
+  function drawLightning(ctx, w, h, sc, t){
+    if (sc.weather !== 'amb-wx-storm') return;
+    var CYCLE = 31000;
+    var ph = t % CYCLE;
+    var a = 0;
+    if (ph < 110) a = 1 - ph / 110;                 // ana çakış
+    else if (ph > 320 && ph < 430) a = 0.42 * (1 - (ph - 320) / 110);  // ikincil
+    if (a <= 0.01) return;
+    var seed = typeof sc.seed === 'number' ? sc.seed : 0.5;
+    var cx = w * (0.25 + 0.5 * seed);
+    ctx.save();
+    var g = ctx.createRadialGradient(cx, h * 0.12, 0, cx, h * 0.12, h * 1.15);
+    g.addColorStop(0, 'rgba(226,236,255,' + (0.85 * a).toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(226,236,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  }
   // Katman çizimi. Sonraki kartlar buraya katman EKLER.
   function draw(ctx, w, h, sc, t){
     ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
@@ -191,7 +232,8 @@
     drawClouds(ctx, w, h, sc, t);
     drawRain(ctx, w, h, sc, t);
     drawSnow(ctx, w, h, sc, t);
-    // SKY-09 katmanı buraya eklenecek
+    drawFog(ctx, w, h, sc, t);
+    drawLightning(ctx, w, h, sc, t);
     ctx.restore();
   }
 

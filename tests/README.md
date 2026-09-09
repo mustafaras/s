@@ -23,6 +23,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_crisis_boundary.js` — MON-27 `SeymaCrisis` registry’si: güvenlik
   kopyası, üç SOS yüzeyi, salt HTML/state sınırı, App handler kabuğu ve modal
   dialog/focus sözleşmesi; browser, gerçek ağ ve veri yoktur.
+- `app/test_journal_boundary.js` — MON-28 `SeymaJournal` registry’si: Günlük
+  Işığı text/count/streak/savedAt görünümü, journal kartı/modalı, app-owned
+  save sırası, modal focus ve load-safe resolver sınırı; browser, gerçek ağ ve
+  veri yoktur.
 - `app/test_modal_focus_containment.js` — Tüm ortak modal ailesinin odak
   sözleşmesini, metin alanı dahil Tab/Shift+Tab sarma, Escape kapanışı, semantik
   dialog kabuğu ve focusable arka plan regresyonunu ağsız sentetik olarak doğrular.

@@ -9,12 +9,37 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 6 devam ediyor (MON-27 tamamlandı) |
+| Durum | `in_progress` — Dalga 6 devam ediyor (MON-28 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-27` / `MON-28` |
-| Dalga / ilerleme | 6 devam ediyor (2/7) / 27/60 |
+| Son / sıradaki | `MON-28` / `MON-29` |
+| Dalga / ilerleme | 6 devam ediyor (3/7) / 28/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-09 |
+
+## MON-28 kapanışı — journal domain registry
+
+- Karar/kanıt: [`MON-28-JOURNAL-STATE-TRANSITION.md`](../deliverables/MON-28-JOURNAL-STATE-TRANSITION.md).
+- [`app/core/journal.js`](../../app/core/journal.js) `SeymaJournal`
+  registry'si Günlük Işığı'nın 8 modunu, F1–F4 prompt kataloğunu, aktif faz /
+  prompt / science yardımcılarını, `journalStreak`, `fmtDateShort`,
+  `journalLightCardHTML` ve `journalModalHTML` gövdelerini taşır. 10 named live
+  resolver ile load-safe ve lazy content çözümlemelidir; text/count/streak ve
+  savedAt görünümü korunur.
+- `App.openJournalModal`, `closeJournalModal`, `setJournalMode`, `onJournalText`,
+  `useJournalPrompt` ve `saveJournal` ile DOM, focus ve mutation sahipliği
+  app.js'te kaldı. `saveJournal` sırası `text/count/streakAtSave/savedAt` →
+  derived → `save(false,...)` → card/UI/render olarak korundu; data schema,
+  `sync.js`, profile/motivation ve modal/render çekirdeği değişmedi.
+- Parent/current sentetik `bugun` dump'ında journal kartı **1116/1116 byte**,
+  SHA-256 `bc43679fa42eecb0e4029f712daffc502ed737b5be0d052c33a79a7378e40b57`
+  birebir eşittir. Journal boundary `33/33`, modal focus `41/41`,
+  modularization `76/76`, zikr `95/95`, Faz10 sync `69/69` PASS; driver
+  `--dump bugun` ve tam regression aileleri exit 0.
+- Yükleme zinciri `index.html`, driver/zikr `FILES`, state-rebind ve ilgili
+  app-boot fixture'larında `motivation → crisis → journal → mediaFx` olarak
+  hizalandı; `journal.js?v=20260909a` cache-bust kullanıldı. Browser/device,
+  push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı yok; halt yok.
+  Sıradaki `MON-29` (health domain) yeni açık kullanıcı yönü olmadan başlamaz.
 
 ## MON-27 kapanışı — crisis domain registry
 

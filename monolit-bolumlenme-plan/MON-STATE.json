@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-27",
-  "nextPrompt": "MON-28",
+  "lastCompletedPrompt": "MON-28",
+  "nextPrompt": "MON-29",
   "currentWave": "6",
   "totalPrompts": 60,
-  "completedPrompts": 27,
+  "completedPrompts": 28,
   "updatedAt": "2026-09-09",
-  "nextSafeAction": "MON-27 tamamlandi: CRISES/CRISIS_ORDER, rasitActionsHTML ve crisisModalHTML app/core/crisis.js SeymaCrisis registry'sine tasindi; app.js App.openCrisis ve craving state-write handler kabugu korundu. Safety-copy + sweet/food/coffee tile/modal parent-current exact; combined onclick 391 ve unique App 718 birebir; 9 canlı resolver, load-safe registry, index/driver/zikr/state-rebind + app-boot FILES paritesi ve 40 assertion'lı crisis boundary PASS. sync.js/Guard, data, migrate/getDay/default, render/modal altyapısı, reminder/network değişmedi. Tüm kart kapıları PASS; sıradaki sıralı adım MON-28 (journal domain, Dalga 6); approvalRequired: true - yeni açık kullanıcı yönü olmadan başlamaz.",
+  "nextSafeAction": "MON-28 tamamlandi: journalLightCardHTML, journalModalHTML ve text/count/streak/savedAt gorunum yardimcilari app/core/journal.js SeymaJournal registry'sine tasindi; app.js App.openJournalModal, closeJournalModal, setJournalMode, onJournalText, useJournalPrompt ve saveJournal state-write/focus/save sirasi kabugu korundu. Parent/current bugun journal karti 1116 byte ve SHA-256 bc43679fa42eecb0e4029f712daffc502ed737b5be0d052c33a79a7378e40b57 birebir; journal boundary 33/33, modal focus 41/41, driver --dump bugun, zikr 95/95, Faz10 sync 69/69, modularization 76/76 ve tam regression PASS. sync.js/Guard, data semasi, profile/motivation, render/modal altyapisi ve frozen content degismedi; browser/device, remote, push/merge/tag/deploy ve gercek veri deposu yazimi yok. Siradaki sirali adim MON-29 (health domain, Dalga 6); approvalRequired: true - yeni acik kullanici yonu olmadan baslamaz.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -138,6 +138,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-27-CRISIS-ENVANTERI.md",
       "decision": "crisis_registry_exact_safety_copy_html_parity_app_owned_mutation_focus_boundary"
+    },
+    "MON-28": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-28-JOURNAL-STATE-TRANSITION.md",
+      "decision": "journal_registry_lazy_content_live_state_html_parity_app_owned_save_order_focus_boundary"
     }
   },
   "waves": [
@@ -186,7 +191,7 @@
       "prompts": "MON-26..MON-32",
       "topic": "bakim ve terapi domainleri",
       "approvalRequired": true,
-      "completed": 2,
+      "completed": 3,
       "total": 7
     },
     {
@@ -239,7 +244,7 @@
     }
   ],
   "verificationGate": [
-    "node --check app.js && node --check sync.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
+    "node --check app.js && node --check sync.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
     "node .claude/skills/run-seyma/verify-state-helper-boundary.mjs",
     "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
     "node .claude/skills/run-seyma/verify-state-adapter-contract.mjs",
@@ -249,6 +254,7 @@
     "node tests/app/test_saygi_boundary.js",
     "node tests/app/test_motivation_room_accessibility.js",
     "node tests/app/test_crisis_boundary.js",
+    "node tests/app/test_journal_boundary.js",
     "node tests/app/test_modal_focus_containment.js",
     "node tests/app/test_zikr_manual_entry.js",
     "node .claude/skills/run-seyma/driver.mjs",

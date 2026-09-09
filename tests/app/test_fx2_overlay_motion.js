@@ -9,11 +9,12 @@ const path = require('node:path');
 const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
-// MON-26/MON-27: motivation ve crisis görünüm gövdeleri ilgili registry'lere
+// MON-26/MON-27/MON-28: motivation, crisis ve journal görünüm gövdeleri ilgili registry'lere
 // taşındı; sheetClose/onclick/App yüzey sayımları birleşik kaynakta yapılır.
 const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
 const crisisSource = fs.readFileSync(path.join(repoRoot, 'app/core/crisis.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource;
+const journalSource = fs.readFileSync(path.join(repoRoot, 'app/core/journal.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 

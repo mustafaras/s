@@ -158,6 +158,7 @@ const FILES = [
   'app/core/saygi.js',
   'app/core/motivation.js',
   'app/core/crisis.js',
+  'app/core/journal.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/skyFx.js',

@@ -10,11 +10,12 @@ const path = require('node:path');
 const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
-// MON-26/MON-27: motivation ve crisis gövdeleri registry'lerinde; yüzey
+// MON-26/MON-27/MON-28: motivation, crisis ve journal gövdeleri registry'lerinde; yüzey
 // sayımları birleşik kaynakta yapılır (App handler adları app.js'te kalır).
 const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
 const crisisSource = fs.readFileSync(path.join(repoRoot, 'app/core/crisis.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource;
+const journalSource = fs.readFileSync(path.join(repoRoot, 'app/core/journal.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const goMatch = appSource.match(/App\.go=function\(id,event\)\{[\s\S]*?\n\};\n\n\/\/ ── REM-05/);
 

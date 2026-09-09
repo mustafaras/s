@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-09 · **Durum:** `in_progress` · **Uygulanan prompt:** 27/60 (`MON-27`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-09 · **Durum:** `in_progress` · **Uygulanan prompt:** 28/60 (`MON-28`)
 
 Bu klasör, Şeyma'nın `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
@@ -18,7 +18,10 @@ registry'sine aldı (23 shim + App-owned mutation kabuğu; birleşik kaynakta
 onclick 391/App 718 birebir). `MON-27` crisis güvenlik metni, modal HTML'i ve
 craving görünüm yardımcılarını `app/core/crisis.js` SeymaCrisis registry'sine
 aldı; SOS/tile/modal çıktısı parent/current ile birebir, App-owned mutation ve
-focus sınırı korundu. Dalga 6 devam ediyor (`MON-28` journal sırada).
+focus sınırı korundu. `MON-28` journal text/count/streak/savedAt yardımcıları ile
+Günlük Işığı kartı ve modalını `app/core/journal.js` SeymaJournal registry'sine
+aldı; save sırası, modal focus ve `bugun` kartı parent/current ile birebir
+korundu. Dalga 6 devam ediyor (`MON-29` health sırada).
 
 ## Sınır ve otorite
 

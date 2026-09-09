@@ -1,0 +1,44 @@
+{
+  "program": "SKY + PREM",
+  "amac": "Header canvas hava motoru + kalan mekanik premium dokunuslar",
+  "olusturuldu": "2026-09-09",
+  "kaynak": "docs/DEVIR-HEADER-HAVA-VE-PREMIUM.md",
+  "onbilgi": "premium-fx-plan/.prompts/sky/SKY-00-ONBILGI.md",
+  "katalog": "premium-fx-plan/.prompts/sky/SKY-KATALOG.md",
+  "kurallar": {
+    "sirali": true,
+    "kart_basina_commit": true,
+    "push": "YASAK",
+    "test_gevsetme": "YASAK - once kullaniciya sor"
+  },
+  "kartlar": {
+    "SKY-01": "done",
+    "SKY-02": "todo",
+    "SKY-03": "todo",
+    "SKY-04": "todo",
+    "SKY-05": "todo",
+    "SKY-06": "todo",
+    "SKY-07": "todo",
+    "SKY-08": "todo",
+    "SKY-09": "todo",
+    "SKY-10": "todo",
+    "SKY-11": "todo",
+    "SKY-12": "todo",
+    "PREM-01": "todo",
+    "PREM-02": "todo",
+    "PREM-03": "todo"
+  },
+  "degismezler": {
+    "App_handler": 718,
+    "onclick": 391,
+    "app_js_script_tag": 1,
+    "preventDefault_mediaFx": 0,
+    "setInterval_timeTheme": 0,
+    "fetch_timeTheme": 0,
+    "createElement_timeTheme": 0
+  },
+  "onay_bekleyen": [
+    "mesaj/saygi sekmelerini .surface kalibina tasimak",
+    "amb-wx-* opaklik tavanini 0.30 uzerine cikarmak"
+  ]
+}

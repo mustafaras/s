@@ -219,6 +219,37 @@ console.log('\n[SKY-06] bulut katmanı');
   ok('bulutlar kareler arası HAREKET ediyor', JSON.stringify(f1) !== JSON.stringify(f2));
 }
 
+/* SKY-07 — yağmur ve çisenti */
+console.log('\n[SKY-07] yağmur ve çisenti');
+{
+  const r = makeEnv();
+  r.Sky.mount(r.host, scene({ weather: 'amb-wx-rain', intensity: 0.8, wind: 20 }));
+  r.ctx.reset(); r.frames(1);
+  const rainLines = r.ctx.count('lineTo');
+
+  const c = makeEnv();
+  c.Sky.mount(c.host, scene({ weather: 'amb-wx-clear' }));
+  c.ctx.reset(); c.frames(1);
+
+  const d = makeEnv();
+  d.Sky.mount(d.host, scene({ weather: 'amb-wx-drizzle', intensity: 0.3 }));
+  d.ctx.reset(); d.frames(1);
+  const drizLines = d.ctx.count('lineTo');
+
+  ok('yağmurda çok sayıda damla çizgisi', rainLines >= 100);
+  ok('açık havada damla yok', c.ctx.count('lineTo') === 0);
+  ok('çisenti yağmurdan seyrek', drizLines > 0 && drizLines < rainLines);
+}
+{
+  const e = makeEnv();
+  e.Sky.mount(e.host, scene({ weather: 'amb-wx-rain', intensity: 0.6 }));
+  e.ctx.reset(); e.frames(1);
+  const y1 = e.ctx.calls.filter(c => c.fn === 'moveTo').map(c => Math.round(c.args[1]));
+  e.ctx.reset(); e.frames(1);
+  const y2 = e.ctx.calls.filter(c => c.fn === 'moveTo').map(c => Math.round(c.args[1]));
+  ok('damlalar kareler arası düşüyor', JSON.stringify(y1) !== JSON.stringify(y2));
+}
+
 // === SKY test bloğu buraya eklenir (yeni kartlar bu satırın ÜSTÜNE ekler) ===
 
 console.log('\n' + (fail === 0 ? 'SKY FIXTURE PASS' : 'SKY FIXTURE FAIL') + ': ' + pass + ' geçti, ' + fail + ' düştü');

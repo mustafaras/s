@@ -97,6 +97,55 @@
     ctx.globalAlpha = 1;
     ctx.restore();
   }
+  // Damla havuzu. Her damlanın DERİNLİĞİ (d) var: hız, boy ve opaklık ondan
+  // türer — hepsi aynı hızda düşerse şerit gibi görünür (eski CSS'in hatası).
+  function newDrop(w, h, atTop){
+    var d = 0.35 + Math.random() * 0.65;
+    return { x: Math.random()*w*1.25 - w*0.15,
+             y: atTop ? -10 : Math.random()*h,
+             d: d, len: 6 + d*14, sp: 2.2 + d*5.2 };
+  }
+  function ensureDrops(sc, w, h){
+    var wx = sc.weather, inten = typeof sc.intensity === 'number' ? sc.intensity : 0.4;
+    var want = 0;
+    if (wx === 'amb-wx-rain' || wx === 'amb-wx-storm') want = Math.round(70 + 90*inten);
+    else if (wx === 'amb-wx-drizzle') want = Math.round(26 + 26*inten);
+    var arr = S.drops || (S.drops = []);
+    while (arr.length > want) arr.pop();
+    while (arr.length < want) arr.push(newDrop(w, h, false));
+    return arr;
+  }
+  function drawRain(ctx, w, h, sc, t){
+    var arr = ensureDrops(sc, w, h);
+    if (!arr.length) return;
+    var windPx = Math.max(-0.5, Math.min(0.5, (sc.wind || 0) / 60));
+    var storm = (sc.weather === 'amb-wx-storm');
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (var i = 0; i < arr.length; i++){
+      var p = arr[i];
+      p.y += p.sp * (storm ? 1.35 : 1);
+      p.x += windPx * p.sp * 2.4;
+      if (p.y > h){
+        if (p.d > 0.75){                       // yakın damlalar sıçrar
+          ctx.globalAlpha = 0.18 * p.d;
+          ctx.strokeStyle = '#DCEBFF'; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.arc(p.x, h - 1, 2.2, Math.PI, 0); ctx.stroke();
+        }
+        arr[i] = newDrop(w, h, true);
+        continue;
+      }
+      ctx.globalAlpha = 0.16 + 0.42 * p.d;
+      ctx.strokeStyle = storm ? '#CFE0F8' : '#DCE9FB';
+      ctx.lineWidth = 0.7 + p.d * 0.9;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x - windPx * p.len * 2.2, p.y - p.len);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
   // Katman çizimi. Sonraki kartlar buraya katman EKLER.
   function draw(ctx, w, h, sc, t){
     ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
@@ -105,7 +154,8 @@
     drawStars(ctx, w, h, sc, t);
     drawCelestial(ctx, w, h, sc, t);
     drawClouds(ctx, w, h, sc, t);
-    // SKY-07..09 katmanları buraya eklenecek
+    drawRain(ctx, w, h, sc, t);
+    // SKY-08..09 katmanları buraya eklenecek
     ctx.restore();
   }
 

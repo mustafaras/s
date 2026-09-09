@@ -9,12 +9,51 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 5 kapandı, Dalga 6 başlıyor (MON-25 tamamlandı) |
+| Durum | `in_progress` — Dalga 6 devam ediyor (MON-26 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-25` / `MON-26` |
-| Dalga / ilerleme | 6 başlıyor (0/7) / 25/60 |
-| Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir; ZP-10 + 76 SKY/PREM/FX2 commit'i üstünde) — LOCAL-ONLY |
+| Son / sıradaki | `MON-26` / `MON-27` |
+| Dalga / ilerleme | 6 devam ediyor (1/7) / 26/60 |
+| Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-09 |
+
+## MON-26 kapanışı — motivation domain registry
+
+- Karar/kanıt: [`MON-26-MOTIVATION-ENVANTERI.md`](../deliverables/MON-26-MOTIVATION-ENVANTERI.md).
+- [`app/core/motivation.js`](../../app/core/motivation.js) (744 satır)
+  `SeymaMotivation` registry'si 22 saf görünüm üreticisi + 88 öğelik
+  `ROOM_CONTENT_CATALOG` + `parseScientificProfileMD`/`roomValueKey` parser'ını
+  taşır; 13 bağımlılık (`data/ui/dark/getDay/activeDate/diffDays/icon/esc/
+  segTabs/progBar/featuresLive/fmtWhen/fmtDateNice`) canlı resolver bag'i ile
+  çözülür, yükleme anında yan etkisizdir. [`app.js:405-421`](../../app.js)
+  registerMotivation canlı bag'i ve `:10436-10460` 23 imza-koruyan shim'i;
+  `App.openRoom/closeRoom/updateRoom/setRoomTab/toggleRoomTool`,
+  `completeMotivationTask`, `saveDailyWin/copyFlexNudge` ve tüm tools
+  save/timer/fetch handler'ları app-owned kaldı.
+- **Fail-closed bulgu (düzeltildi):** dilim silmede `App.saveDailyWin`/
+  `App.copyFlexNudge` gövdeleri yanlışlıkla silinmişti; fx2 yüzey sayım
+  fixture'ları (combined App 718→716) yakaladı, gövdeler HEAD'den birebir geri
+  getirildi. `copyFlexNudge` gün dizisi hesabı registry `flexNudgeFor`'dan okur
+  (tek nudge kaynağı).
+- Değişmezlik: birleşik kaynakta onclick 391 = 391, unique `App.x=` 718 = 718
+  (I2); gerçek `data=` token 9 = 9 (M2); `--dump bugun` paritesi stokastik MG
+  skoru normalize sonrası birebir. fx2 yüzey sayım fixture'ları (FX2-16.2,
+  FX2-15.7, FX2-10.9) ve motivation_room_accessibility kaynak çıpası
+  birleşik kaynağa/registry'e uyarlandı (MON-S5 geçiş izni, assertion semantiği
+  korunarak).
+- Yükleme paritesi: `index.html` `motivation.js?v=20260909a` (saygi→mediaFx
+  arası), app cache-bust `v=20260909c`; driver/zikr FILES,
+  `test_state_rebind_boundary.js` boot listesi + 12 app-boot fixture listesi
+  (B2 migration, B1 helper, aeon_message_expand, zikr_manual_entry, 8 reminder
+  fixture) motivation ile güncellendi (fail-closed preflight bulguları, üretim
+  failure'ı olmadan).
+- Kapılar: syntax ×3, driver, zikr 95/95, modularization 68/68, B1/B2/B3,
+  rebind 37/37, save 19/19, Faz10 69/69, large-file 15/15, dört manevi
+  boundary, fx2 66/66, premium 249/249, Quran ailesi, reminder smoke 20/20,
+  panel faz11, motivation_room_accessibility, aeon_message_expand 24/24,
+  `git diff --check` — tümü exit 0.
+- Browser/device, push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı yok.
+  Sıradaki `MON-27` (crisis domain); yeni açık kullanıcı yönü olmadan
+  başlatılmaz.
 
 ## MON-25 kapanışı — Dalga 5 kabul denetimi
 

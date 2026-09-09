@@ -9,6 +9,10 @@ const path = require('node:path');
 const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+// MON-26: motivation görünüm gövdeleri app/core/motivation.js'e taşındı;
+// sheetClose/onclick/App yüzey sayımları birleşik kaynak üzerinde yapılır.
+const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
+const combinedSource = appSource + motivationSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 
@@ -74,9 +78,9 @@ group('FX2-16.1 12 hedef closeX sarmalayıcısı doğru yüzey kimliğine bağl�
 }));
 
 group('FX2-16.2 M6 çağrı sayısı en az 10, App/onClick yüzeyi değişmez',
-  (appSource.match(/\bsheetClose\s*\(/g) || []).length >= 10 &&
-  new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 718 &&
-  (appSource.match(/onclick=/g) || []).length === 391
+  (combinedSource.match(/\bsheetClose\s*\(/g) || []).length >= 10 &&
+  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 718 &&
+  (combinedSource.match(/onclick=/g) || []).length === 391
 );
 
 group('FX2-16.3 sheet-in/out/backdrop CSS tokenleri ve reduce-motion koruması var',

@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-09 · **Durum:** `in_progress` · **Uygulanan prompt:** 25/60 (`MON-25`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-09 · **Durum:** `in_progress` · **Uygulanan prompt:** 26/60 (`MON-26`)
 
 Bu klasör, Şeyma'nın `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
@@ -13,8 +13,9 @@ Dalga 5'in dört manevi domaini ayrıldı: `MON-19` prayer, `MON-20/21` zikir
 motor+görünüm, `MON-22` quran, `MON-23` saygı; `MON-24` çapraz regression
 raporuyla, `MON-25` Dalga 5 kabul denetimiyle kapandı (canlı ölçümde I1–I6/M1–M4
 farkı yok; tek onarım: `driver.mjs` FILES listesine SKY serisinin atladığı
-`skyFx.js` eklendi). Dalga 6 (`MON-26..MON-32`, bakım/terapi domainleri)
-sırada.
+`skyFx.js` eklendi). `MON-26` motivation gövdelerini `app/core/motivation.js` SeymaMotivation
+registry'sine aldı (23 shim + App-owned mutation kabuğu; birleşik kaynakta
+onclick 391/App 718 birebir). Dalga 6 devam ediyor (`MON-27` crisis sırada).
 
 ## Sınır ve otorite
 

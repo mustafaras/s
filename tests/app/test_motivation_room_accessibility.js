@@ -7,10 +7,13 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 const source = fs.readFileSync('app.js', 'utf8');
-const roomStart = source.indexOf('function roomOverlayHTML(){');
-const roomEnd = source.indexOf('\nfunction roomBodyHTML', roomStart);
+// MON-26: roomOverlayHTML gövdesi app/core/motivation.js (SeymaMotivation)
+// registrysine taşındı; sözleşme kaynağı oradan okunur.
+const motSource = fs.readFileSync('app/core/motivation.js', 'utf8');
+const roomStart = motSource.indexOf('function roomOverlayHTML(){');
+const roomEnd = motSource.indexOf('\n  function roomBodyHTML', roomStart);
 assert(roomStart >= 0 && roomEnd > roomStart, 'roomOverlayHTML bulunamadı');
-const roomSource = source.slice(roomStart, roomEnd);
+const roomSource = motSource.slice(roomStart, roomEnd);
 
 const handlerStart = source.indexOf('var MODAL_FOCUS_SELECTOR=');
 const handlerEnd = source.indexOf('\nApp.openReminderDigest=', handlerStart);

@@ -9,6 +9,10 @@ const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+// MON-26: motivation gövdeleri app/core/motivation.js'te; onclick sayımları
+// birleşik kaynakta yapılır (App handler atamaları app.js'te kalır).
+const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
+const combinedSource = appSource + motivationSource;
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 let passed = 0;
 let failed = 0;
@@ -204,7 +208,7 @@ group(
 
 // 9. FX2 dokunuşları eski App yüzeyini değiştirmez.
 const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size === 718 && count(/onclick=/g, appSource) === 391);
+group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size === 718 && count(/onclick=/g, combinedSource) === 391);
 
 // 10. Yüksek değerli niyetler sözlükte bulunur; none erken dönüşle sessizdir.
 const intentBody = (mediaSource.match(/var FX_INTENT\s*=\s*\{([\s\S]*?)\n\s*\};/) || [])[1] || '';

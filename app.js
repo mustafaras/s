@@ -9339,6 +9339,7 @@ function render(){
   // çağrısı kaldırıldı; yalnız DOM'a bağımlı olanlar kaldı.
   try{ if(window.SeyFx && typeof window.SeyFx.bindAuroraParallax==='function') window.SeyFx.bindAuroraParallax(); }catch(e){}
   try{ if(window.SeyFx && typeof window.SeyFx.sweepCounters==='function') window.SeyFx.sweepCounters(); }catch(e){}
+  try{ mountSkyCanvas(); }catch(e){}
   // iOS/PWA durum çubuğu rengini mevcut tema ile senkronize tut; açık/koyu geçişlerinde flaş azalır.
   // Yalnızca gerçekten tema değiştiğinde meta tag'i güncelle, her render'da değil.
   var tcm=document.querySelector('meta[name="theme-color"]');
@@ -15032,6 +15033,7 @@ function syncHeaderScene(){
   var fresh=headerSceneHTML(); if(!fresh) return;
   var tmp=document.createElement('div'); tmp.innerHTML=fresh;
   var next=tmp.firstChild; if(next&&next.innerHTML!==box.innerHTML) box.innerHTML=next.innerHTML;
+  mountSkyCanvas();
 }
 function appHeaderHTML(){
   var m=appHeaderMeta();

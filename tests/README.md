@@ -27,6 +27,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   Işığı text/count/streak/savedAt görünümü, journal kartı/modalı, app-owned
   save sırası, modal focus ve load-safe resolver sınırı; browser, gerçek ağ ve
   veri yoktur.
+- `app/test_health_boundary.js` — MON-29 `SeymaHealth` registry’si: su/uyku,
+  beslenme, kafein, magnezyum, adım ve ölçüm hesaplarının sentetik vektörleri,
+  dateUtils resolver, app shim ve state-mutation sınırı; browser, gerçek ağ ve
+  veri yoktur.
 - `app/test_modal_focus_containment.js` — Tüm ortak modal ailesinin odak
   sözleşmesini, metin alanı dahil Tab/Shift+Tab sarma, Escape kapanışı, semantik
   dialog kabuğu ve focusable arka plan regresyonunu ağsız sentetik olarak doğrular.

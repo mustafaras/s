@@ -9,12 +9,40 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 6 devam ediyor (MON-28 tamamlandı) |
+| Durum | `in_progress` — Dalga 6 devam ediyor (MON-29 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-28` / `MON-29` |
-| Dalga / ilerleme | 6 devam ediyor (3/7) / 28/60 |
+| Son / sıradaki | `MON-29` / `MON-30` |
+| Dalga / ilerleme | 6 devam ediyor (4/7) / 29/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-09 |
+
+## MON-29 kapanışı — health hesaplama registry
+
+- Karar/kanıt: [`MON-29-HEALTH-CALCULATION-VECTORS.md`](../deliverables/MON-29-HEALTH-CALCULATION-VECTORS.md).
+- [`app/core/health.js`](../../app/core/health.js) `SeymaHealth` registry'si
+  su, uyku, beslenme, kafein, magnezyum, adım ve beden ölçümü hesaplama
+  gövdelerini taşır: hedef/limit hesapları, besin lookup/makro, movement/step,
+  sleep readiness, BMI/BMR/TDEE, magnezyum nudge/form/istatistik ve empty
+  helper'lar. 8 named live resolver ile `dateUtils` çağrı anında çözülür;
+  load-safe modül storage/DOM/timer/network açmaz.
+- `app.js` `SeymaHealth` dependency bag kaydını, imza-koruyan shimleri,
+  `refreshTargets`, öğün text/save akışını, `recalcLutealHitRate` mutationını,
+  DOM/render ve App handler kabuğunu korur. Data/schema/migrate/getDay,
+  sync.js/Guard, panel, content, profile/motivation ve render/modal altyapısı
+  değişmedi.
+- Sentetik health vector fixture **28/28**; state-rebind **37/37** ve kesin
+  data atama sayımı **9 kaynak satırı / 11 token**. Parent/current kaynak
+  sayımları App ataması **721/721**, doğrudan app.js onclick **349/349**,
+  FX çağrıları değişmeden; driver `--dump bugun`, zikr **95/95**, Faz10 sync
+  **69/69**, bugün kartı **11/11**, modularization **80/80** PASS.
+- Syntax, tam `tests/app`, panel, Panel-v2, Quran, premium ve reminder
+  smoke (**20/20 curated**) exit 0; `git diff --check` temiz. Health load
+  order `motivation → crisis → journal → health → mediaFx`; index cache-bust
+  `health.js?v=20260909a`, app cache-bust `app.js?v=20260909d` ve dört ana
+  FILES listesi güncellendi. Browser/device, remote, push/merge/tag/deploy ve
+  `mustafaras/seyma-data` yazımı yok; sağlık değeri/limit farkı, halt veya
+  blocked yok. Sıradaki `MON-30` health kart/yüzeydir ve yeni açık kullanıcı
+  yönü olmadan başlatılmaz.
 
 ## MON-28 kapanışı — journal domain registry
 

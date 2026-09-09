@@ -10,6 +10,7 @@ const vm = require('node:vm');
 
 const journalSource = fs.readFileSync('app/core/journal.js', 'utf8');
 const appSource = fs.readFileSync('app.js', 'utf8');
+const healthSource = fs.readFileSync('app/core/health.js', 'utf8');
 const indexSource = fs.readFileSync('index.html', 'utf8');
 const driverSource = fs.readFileSync('.claude/skills/run-seyma/driver.mjs', 'utf8');
 const zikrSource = fs.readFileSync('.claude/skills/run-seyma/zikr-harness.mjs', 'utf8');
@@ -143,15 +144,18 @@ ok('journal görünümleri registry shiminden çağrılır',
 ok('eski journal katalog/helper gövdeleri app.jste yeniden sahiplenilmez',
   !/var JOURNAL_MODES=/.test(appSource) && !/var JOURNAL_PHASE_PROMPTS=/.test(appSource));
 
-const indexOrder = ['app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/mediaFx.js'];
+const indexOrder = ['app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/mediaFx.js'];
 const positions = indexOrder.map((file) => indexSource.indexOf('src="' + file));
-ok('index cache-bust ve motivation→crisis→journal→mediaFx sırası korunur',
+ok('index cache-bust ve motivation→crisis→journal→health→mediaFx sırası korunur',
   positions.every((position) => position >= 0) && positions.every((position, i) => i === 0 || positions[i - 1] < position) &&
-  indexSource.includes('app/core/journal.js?v=20260909a'));
-ok('driver/zikr/state-rebind FILES zincirinde journal vardır',
+  indexSource.includes('app/core/journal.js?v=20260909a') && indexSource.includes('app/core/health.js?v=20260909a'));
+ok('driver/zikr/state-rebind FILES zincirinde journal ve health vardır',
   driverSource.includes("'app/core/journal.js'") && zikrSource.includes("'app/core/journal.js'") &&
-  rebindSource.includes("'app/core/journal.js'"));
+  rebindSource.includes("'app/core/journal.js'") && driverSource.includes("'app/core/health.js'") &&
+  zikrSource.includes("'app/core/health.js'") && rebindSource.includes("'app/core/health.js'"));
 ok('app boot registerJournal ve journal registry expose vardır',
   appSource.includes('registerJournal') && appSource.includes('window.SeymaJournal'));
+ok('health registry app boot kaydı vardır',
+  healthSource.includes('window.SeymaHealth') && appSource.includes('registerHealth') && appSource.includes('window.SeymaHealth'));
 
 console.log('\nDone.');

@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-28",
-  "nextPrompt": "MON-29",
+  "lastCompletedPrompt": "MON-29",
+  "nextPrompt": "MON-30",
   "currentWave": "6",
   "totalPrompts": 60,
-  "completedPrompts": 28,
+  "completedPrompts": 29,
   "updatedAt": "2026-09-09",
-  "nextSafeAction": "MON-28 tamamlandi: journalLightCardHTML, journalModalHTML ve text/count/streak/savedAt gorunum yardimcilari app/core/journal.js SeymaJournal registry'sine tasindi; app.js App.openJournalModal, closeJournalModal, setJournalMode, onJournalText, useJournalPrompt ve saveJournal state-write/focus/save sirasi kabugu korundu. Parent/current bugun journal karti 1116 byte ve SHA-256 bc43679fa42eecb0e4029f712daffc502ed737b5be0d052c33a79a7378e40b57 birebir; journal boundary 33/33, modal focus 41/41, driver --dump bugun, zikr 95/95, Faz10 sync 69/69, modularization 76/76 ve tam regression PASS. sync.js/Guard, data semasi, profile/motivation, render/modal altyapisi ve frozen content degismedi; browser/device, remote, push/merge/tag/deploy ve gercek veri deposu yazimi yok. Siradaki sirali adim MON-29 (health domain, Dalga 6); approvalRequired: true - yeni acik kullanici yonu olmadan baslamaz.",
+  "nextSafeAction": "MON-29 tamamlandi: su, uyku, beslenme, kafein, magnezyum, adim ve beden olcumu hesaplama govdeleri app/core/health.js SeymaHealth registry'sine tasindi; app.js state mutation, refreshTargets, meal text/save, recalcLutealHitRate, DOM/render ve App handler kabuklarini korudu. 8 named live resolver ile dateUtils cagri aninda cozuluyor; module load-safe, storage/DOM/timer/network yok. Parent/current App atamalari 721/721, inline onclick 349/349, FX cagri sayilari degismedi; state-rebind 9 data-atama satiri/11 token, health vectors 28/28. driver --dump bugun, zikr 95/95, Faz10 sync 69/69, today preferences 11/11, modularization 80/80, tam tests/app, panel, Panel-v2, Quran, reminder smoke ve premium aileleri PASS; syntax ve diff check temiz. index.html health.js?v=20260909a ve app.js?v=20260909d; driver/zikr/state-rebind ve app-boot FILES zinciri health ile hizali. sync.js/Guard, data semasi, profile/motivation, panel, content ve render/modal altyapisi degismedi; browser/device, remote, push/merge/tag/deploy ve gercek veri deposu yazimi yok. Siradaki sirali adim MON-30 (health kart/yuzey, Dalga 6); approvalRequired: true - yeni acik kullanici yonu olmadan baslamaz.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -143,6 +143,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-28-JOURNAL-STATE-TRANSITION.md",
       "decision": "journal_registry_lazy_content_live_state_html_parity_app_owned_save_order_focus_boundary"
+    },
+    "MON-29": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-29-HEALTH-CALCULATION-VECTORS.md",
+      "decision": "health_registry_pure_calculators_live_data_date_resolvers_app_owned_mutation_no_schema_change"
     }
   },
   "waves": [
@@ -191,7 +196,7 @@
       "prompts": "MON-26..MON-32",
       "topic": "bakim ve terapi domainleri",
       "approvalRequired": true,
-      "completed": 3,
+      "completed": 4,
       "total": 7
     },
     {

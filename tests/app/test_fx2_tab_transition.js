@@ -15,7 +15,8 @@ const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
 const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
 const crisisSource = fs.readFileSync(path.join(repoRoot, 'app/core/crisis.js'), 'utf8');
 const journalSource = fs.readFileSync(path.join(repoRoot, 'app/core/journal.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource;
+const healthSource = fs.readFileSync(path.join(repoRoot, 'app/core/health.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const goMatch = appSource.match(/App\.go=function\(id,event\)\{[\s\S]*?\n\};\n\n\/\/ ── REM-05/);
 

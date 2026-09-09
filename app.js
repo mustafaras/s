@@ -14971,6 +14971,31 @@ function headerSolarProgress(spot,now){
   var t=(now||new Date()).getTime();
   return Math.max(0,Math.min(1,(t-sr)/(ss-sr)));
 }
+// SKY: SeyAmbience sahnesini canvas motorunun beklediği şekle çevirir.
+// Yeni ağ çağrısı YOK — hepsi zaten canlı olan data.weather'dan gelir.
+function skySceneNow(){
+  if(!window.SeyAmbience || typeof window.SeyAmbience.scene!=='function') return null;
+  var sc; try{ sc = window.SeyAmbience.scene(); }catch(e){ return null; }
+  if(!sc) return null;
+  var spot = (data && data.weather && data.weather.spots && data.weather.spots.length)
+    ? data.weather.spots[0] : null;
+  return {
+    time: sc.time, weather: sc.weather, season: sc.season,
+    isDay: sc.isDay, intensity: sc.intensity, seed: sc.seed,
+    solar: headerSolarProgress(spot),
+    wind: spot && spot.wind != null ? Number(spot.wind) : 0
+  };
+}
+// SKY: canvas'ı header gökyüzü host'una bağla. render() header'ı yıktığı için
+// her boyamada yeniden çağrılır; parçacık durumu modülde yaşadığı için
+// süreklilik korunur.
+function mountSkyCanvas(){
+  if(!window.SeySkyFx || typeof window.SeySkyFx.mount!=='function') return;
+  var host = document.querySelector('.sey-hdr-sky');
+  if(!host){ try{ window.SeySkyFx.unmount(); }catch(e){} return; }
+  var sc = skySceneNow(); if(!sc) return;
+  try{ window.SeySkyFx.mount(host, sc); window.SeySkyFx.update(sc); }catch(e){}
+}
 function headerSceneHTML(){
   if(!window.SeyAmbience||typeof window.SeyAmbience.scene!=='function') return '';
   // premiumAtmosphere kapalıyken şerit de görünmez — gating sızıntısı olmasın.

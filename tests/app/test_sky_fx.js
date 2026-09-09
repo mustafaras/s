@@ -193,6 +193,32 @@ console.log('\n[SKY-05] yıldız alanı');
   ok('gündüz yıldız çizilmiyor', dArc < 10);
 }
 
+/* SKY-06 — bulut katmanı */
+console.log('\n[SKY-06] bulut katmanı');
+{
+  const cl = makeEnv();
+  cl.Sky.mount(cl.host, scene({ weather: 'amb-wx-clear' }));
+  cl.ctx.reset(); cl.frames(1);
+  const clearArc = cl.ctx.count('arc');
+
+  const cd = makeEnv();
+  cd.Sky.mount(cd.host, scene({ weather: 'amb-wx-cloud' }));
+  cd.ctx.reset(); cd.frames(1);
+  const cloudArc = cd.ctx.count('arc');
+
+  ok('bulutlu sahne 5 düzlemde puf çiziyor (>=25 arc fark)', cloudArc >= clearArc + 25);
+  ok('açık havada bulut çizilmiyor', clearArc < 10);
+}
+{
+  const e = makeEnv();
+  e.Sky.mount(e.host, scene({ weather: 'amb-wx-cloud' }));
+  e.ctx.reset(); e.frames(1);
+  const f1 = e.ctx.calls.filter(c => c.fn === 'arc').map(c => Math.round(c.args[0]));
+  e.ctx.reset(); e.frames(1);
+  const f2 = e.ctx.calls.filter(c => c.fn === 'arc').map(c => Math.round(c.args[0]));
+  ok('bulutlar kareler arası HAREKET ediyor', JSON.stringify(f1) !== JSON.stringify(f2));
+}
+
 // === SKY test bloğu buraya eklenir (yeni kartlar bu satırın ÜSTÜNE ekler) ===
 
 console.log('\n' + (fail === 0 ? 'SKY FIXTURE PASS' : 'SKY FIXTURE FAIL') + ': ' + pass + ' geçti, ' + fail + ' düştü');

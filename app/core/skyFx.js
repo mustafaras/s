@@ -60,6 +60,43 @@
     ctx.globalAlpha = 1;
     ctx.restore();
   }
+  // İki parallax düzlemde hacimli bulut. Her bulut üst üste binen elipslerden
+  // oluşur (tek blob DEĞİL) — kenarı organik görünsün.
+  function cloudPuff(ctx, x, y, s, alpha, tint){
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = tint;
+    var pts = [[0,0,1],[-0.62,0.12,0.72],[0.60,0.14,0.76],[-0.30,-0.24,0.66],[0.32,-0.20,0.62]];
+    for (var i = 0; i < pts.length; i++){
+      ctx.beginPath();
+      ctx.arc(x + pts[i][0]*s, y + pts[i][1]*s, s*pts[i][2], 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+  function drawClouds(ctx, w, h, sc, t){
+    var wx = sc.weather;
+    if (wx !== 'amb-wx-cloud' && wx !== 'amb-wx-rain' && wx !== 'amb-wx-drizzle' &&
+        wx !== 'amb-wx-storm' && wx !== 'amb-wx-snow') return;
+    var night = (sc.time === 'amb-time-night');
+    var storm = (wx === 'amb-wx-storm');
+    var tint = storm ? (night ? '#2A2740' : '#6E6A86')
+                     : (night ? '#3A4358' : '#E6EAF2');
+    var seed = typeof sc.seed === 'number' ? sc.seed : 0.5;
+    ctx.save();
+    // uzak düzlem — yavaş, küçük, soluk
+    var far = (t * 0.006) % (w + 260);
+    for (var i = 0; i < 3; i++){
+      var fx = ((far + i * (w / 2.4) + seed * 180) % (w + 260)) - 130;
+      cloudPuff(ctx, fx, h * (0.26 + 0.06 * frac(seed * (i + 3))), h * 0.17, 0.30, tint);
+    }
+    // yakın düzlem — hızlı, büyük, belirgin
+    var near = (t * 0.014) % (w + 340);
+    for (var j = 0; j < 2; j++){
+      var nx = ((near + j * (w / 1.5) + seed * 90) % (w + 340)) - 170;
+      cloudPuff(ctx, nx, h * (0.40 + 0.08 * frac(seed * (j + 7))), h * 0.25, 0.46, tint);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
   // Katman çizimi. Sonraki kartlar buraya katman EKLER.
   function draw(ctx, w, h, sc, t){
     ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
@@ -67,7 +104,8 @@
     ctx.scale(S.dpr, S.dpr);
     drawStars(ctx, w, h, sc, t);
     drawCelestial(ctx, w, h, sc, t);
-    // SKY-06..09 katmanları buraya eklenecek
+    drawClouds(ctx, w, h, sc, t);
+    // SKY-07..09 katmanları buraya eklenecek
     ctx.restore();
   }
 

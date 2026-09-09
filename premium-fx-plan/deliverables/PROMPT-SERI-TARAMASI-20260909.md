@@ -57,3 +57,9 @@ Bu belge taramanın kanıtıdır. Kart dosyaları (`.prompts/`) olduğu gibi kor
 geçmiş referans için append-only; yeniden çalıştırılmaz. Serinin "yapılacaklar"
 durumu artık `SKY-STATE.json` (15/15 done) + `FX2-STATE.json` (28/28 complete)
 tarafından taşınır; devir promptları arşiv niteliğindedir.
+
+**Kardeş arşiv:** `app.js` monolit bölümleme programının (MON-01…60) aynı
+günkü taraması ve tek düzeltmesi (driver.mjs S4 skyFx paritesi) için
+[`MONOLIT-TARAMASI-20260909.md`](MONOLIT-TARAMASI-20260909.md) belgesine
+bakılır — o programın canlı durumu `monolit-bolumlenme-plan/MON-STATE.json`
+üzerinden yürütülür (25/60, sıradaki MON-26).

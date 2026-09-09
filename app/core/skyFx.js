@@ -41,13 +41,33 @@
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
     ctx.restore();
   }
+  // Yıldız alanı: yalnız gece. Dağılım sc.seed'den DETERMİNİSTİK üretilir —
+  // gün içinde sabit, gün gün farklı. Parıldama zamana bağlı.
+  function drawStars(ctx, w, h, sc, t){
+    if (sc.time !== 'amb-time-night') return;
+    var seed = typeof sc.seed === 'number' ? sc.seed : 0.5;
+    var n = 46;
+    ctx.save();
+    for (var i = 1; i <= n; i++){
+      var r1 = frac(Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453);
+      var r2 = frac(Math.sin(i * 39.3468 + seed * 11.135) * 24634.6345);
+      var x = r1 * w, y = r2 * h * 0.70;
+      var tw = 0.55 + 0.45 * Math.sin(t / 680 + i);
+      ctx.globalAlpha = (0.22 + 0.55 * r2) * tw;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath(); ctx.arc(x, y, 0.6 + r1 * 1.0, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
   // Katman çizimi. Sonraki kartlar buraya katman EKLER.
   function draw(ctx, w, h, sc, t){
     ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
     ctx.save();
     ctx.scale(S.dpr, S.dpr);
+    drawStars(ctx, w, h, sc, t);
     drawCelestial(ctx, w, h, sc, t);
-    // SKY-05..09 katmanları buraya eklenecek
+    // SKY-06..09 katmanları buraya eklenecek
     ctx.restore();
   }
 

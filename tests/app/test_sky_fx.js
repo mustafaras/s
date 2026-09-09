@@ -176,6 +176,23 @@ console.log('\n[SKY-04] gök cismi');
   ok('gece: ay diski de çiziliyor', e.ctx.count('arc') >= 2);
 }
 
+/* SKY-05 — yıldız alanı */
+console.log('\n[SKY-05] yıldız alanı');
+{
+  const night = makeEnv();
+  night.Sky.mount(night.host, scene({ time: 'amb-time-night', isDay: false, seed: 0.42 }));
+  night.ctx.reset(); night.frames(1);
+  const nArc = night.ctx.count('arc');
+
+  const day = makeEnv();
+  day.Sky.mount(day.host, scene({ time: 'amb-time-day', seed: 0.42 }));
+  day.ctx.reset(); day.frames(1);
+  const dArc = day.ctx.count('arc');
+
+  ok('gece belirgin şekilde daha çok daire çiziyor (yıldızlar)', nArc >= dArc + 30);
+  ok('gündüz yıldız çizilmiyor', dArc < 10);
+}
+
 // === SKY test bloğu buraya eklenir (yeni kartlar bu satırın ÜSTÜNE ekler) ===
 
 console.log('\n' + (fail === 0 ? 'SKY FIXTURE PASS' : 'SKY FIXTURE FAIL') + ': ' + pass + ' geçti, ' + fail + ' düştü');

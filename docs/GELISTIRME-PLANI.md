@@ -18,7 +18,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-09-08 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` + `.github/workflows/pages.yml`._
+_Son güncelleme: 2026-09-09 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-25, 25/60) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
 > - **2026-09-08 (FX-2 serisi tamamlandı — "Hissedilir Premium"):** 28 kartlık,
@@ -360,7 +360,7 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
 - Doğum günü/yıldönümü konfeti + mesaj (`data.settings.specialDays`).
   **Emek:** Düşük.
 
-### 22. 📳 Haptik + mikro animasyon — ✅ Tamamlandı (FX-2, canlıya alınmadı)
+### 22. 📳 Haptik + mikro animasyon — ✅ Tamamlandı (FX-2 + SKY + PREM, canlıya alınmadı)
 - Kayıt/kutlama anlarında `navigator.vibrate` + küçük animasyonlar; **FX-2
   serisiyle (28 kart, 8 dalga, 2026-09-06→09-08, `premium-fx-gorsel-yuzey`
   branch) 361 butonun tamamı basma/ripple/ses geri bildirimi aldı**, 11+ ses
@@ -368,6 +368,10 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
   overlay çıkış animasyonları, sayaç canlandırma ve 192-sahne canlı zemin
   (`SeyAmbience`) eklendi. Kapsam kanıtı ve API detayları:
   [`../premium-fx-plan/deliverables/FX2-KAPANIS.md`](../premium-fx-plan/deliverables/FX2-KAPANIS.md).
+  Üstüne **SKY+PREM serisi (15 kart, 2026-09-09) header hava efektini canvas
+  parçacık motoruna taşıdı** (`app/core/skyFx.js`, 56 sahne) ve kalan premium
+  kozmetikleri kapattı; kanıt:
+  [`../premium-fx-plan/deliverables/HEADER-V2-20260909.md`](../premium-fx-plan/deliverables/HEADER-V2-20260909.md).
   **Canlıya alınmadı** — branch local-only, main'e merge + Pages deploy ve
   cihaz kabulü (K3) ayrı kullanıcı onayı bekliyor. **Emek:** Düşük (madde
   tanımı) → gerçekte yüksek (28 kartlık ölçülü kapsam programı).
@@ -394,6 +398,15 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-09-09** — **✨ SKY+PREM serisi kapandı + monolit programı 25/60**:
+  Header hava efekti canvas parçacık motoruna taşındı (`app/core/skyFx.js`,
+  56 sahne, kanıt `premium-fx-plan/deliverables/HEADER-V2-20260909.md`);
+  kalan premium kozmetikler (PREM-01..03) kapandı. Seri arşivi:
+  `premium-fx-plan/deliverables/PROMPT-SERI-TARAMASI-20260909.md` +
+  `MONOLIT-TARAMASI-20260909.md`. Monolit bölümleme Dalga 5'i kapattı
+  (MON-25 kabul denetimi; tek onarım: `driver.mjs` FILES listesine SKY'nin
+  atladığı `skyFx.js` eklendi) — sıradaki MON-26 motivation. Hâlâ
+  **LOCAL-ONLY**: push/merge/deploy ve cihaz kabulü (K3) ayrı onaylı.
 - **2026-08-24** — **🐛 ÆON mesajı okunmadan kapanıyordu (kalıcı düzeltme)**:
   Uzun ÆON/Luna mesajları `max-height:140px` ile kırpılıyor, "Tümünü göster" ile açılan
   balonun **açık durumu yalnızca DOM'da** (inline style + `data-exp`) tutuluyordu. Üstelik

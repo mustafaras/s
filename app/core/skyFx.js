@@ -21,12 +21,33 @@
     draw(S.ctx, S.w, S.h, S.scene || {}, S.last || 0);
     return true;
   }
+  // 0–1 kesirli parça (deterministik gürültü için).
+  function frac(v){ return v - Math.floor(v); }
+  // Güneş/ay: header yayıyla AYNI Bézier üzerinde konumlanır.
+  function drawCelestial(ctx, w, h, sc, t){
+    var p = Math.max(0, Math.min(1, typeof sc.solar === 'number' ? sc.solar : 0.5));
+    var night = (sc.time === 'amb-time-night');
+    var mt = 1 - p;
+    var x = mt*mt*(0.06*w) + 2*mt*p*(0.50*w) + p*p*(0.94*w);
+    var y = mt*mt*(0.86*h) + 2*mt*p*(-0.05*h) + p*p*(0.86*h);
+    var r = night ? h*0.075 : h*0.095;
+    ctx.save();
+    var g = ctx.createRadialGradient(x, y, 0, x, y, r*3.4);
+    g.addColorStop(0, night ? 'rgba(206,222,252,0.50)' : 'rgba(255,224,150,0.62)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r*3.4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = night ? '#E9EFFC' : '#FFEBAE';
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
   // Katman çizimi. Sonraki kartlar buraya katman EKLER.
   function draw(ctx, w, h, sc, t){
     ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
     ctx.save();
     ctx.scale(S.dpr, S.dpr);
-    // SKY-04..09 katmanları buraya eklenecek
+    drawCelestial(ctx, w, h, sc, t);
+    // SKY-05..09 katmanları buraya eklenecek
     ctx.restore();
   }
 

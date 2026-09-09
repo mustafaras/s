@@ -160,6 +160,22 @@ console.log('\n[SKY-03] döngü ve duraklatma');
   ok('reduced-motion → yine de tek kare çizildi', e.ctx.count('clearRect') >= 1);
 }
 
+/* SKY-04 — gök cismi */
+console.log('\n[SKY-04] gök cismi');
+{
+  const e = makeEnv();
+  e.Sky.mount(e.host, scene({ solar: 0.5 }));
+  e.ctx.reset(); e.frames(1);
+  ok('gündüz: disk + halo çiziliyor (>=2 arc)', e.ctx.count('arc') >= 2);
+  ok('radyal gradient kullanılıyor', e.ctx.count('fill') >= 2);
+}
+{
+  const e = makeEnv();
+  e.Sky.mount(e.host, scene({ time: 'amb-time-night', isDay: false, solar: 0.1 }));
+  e.ctx.reset(); e.frames(1);
+  ok('gece: ay diski de çiziliyor', e.ctx.count('arc') >= 2);
+}
+
 // === SKY test bloğu buraya eklenir (yeni kartlar bu satırın ÜSTÜNE ekler) ===
 
 console.log('\n' + (fail === 0 ? 'SKY FIXTURE PASS' : 'SKY FIXTURE FAIL') + ': ' + pass + ' geçti, ' + fail + ' düştü');

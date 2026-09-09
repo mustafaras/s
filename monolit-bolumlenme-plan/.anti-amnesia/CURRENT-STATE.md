@@ -9,12 +9,44 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 5 devam ediyor (MON-24 tamamlandı) |
+| Durum | `in_progress` — Dalga 5 kapandı, Dalga 6 başlıyor (MON-25 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-24` / `MON-25` |
-| Dalga / ilerleme | 5 devam ediyor (6/7) / 24/60 |
-| Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
-| Güncellendi | 2026-09-04 |
+| Son / sıradaki | `MON-25` / `MON-26` |
+| Dalga / ilerleme | 6 başlıyor (0/7) / 25/60 |
+| Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir; ZP-10 + 76 SKY/PREM/FX2 commit'i üstünde) — LOCAL-ONLY |
+| Güncellendi | 2026-09-09 |
+
+## MON-25 kapanışı — Dalga 5 kabul denetimi
+
+- Karar/kanıt: [`MON-D5-ACCEPTANCE.md`](../deliverables/MON-D5-ACCEPTANCE.md).
+- Canlı ölçüm (MON-24 `5314d38` → HEAD `df6eed8`): app.js 17.332 → 17.804
+  satır; `App.fn` 553 → 556 (yalnız +3 additive voice handler:
+  `App.setVoiceCloudVoice`/`setVoicePitch`/`setVoiceVoiceName`, FX-P-86/87);
+  onclick 354 = 354; gerçek `data=` atama tokeni 9 = 9 (tamamı app.js'te);
+  FX delta `SeyAudio +3/+3`, `SeyFx +21/+26`, `SeyTimeTheme +1` — tamamı
+  MON-24 sonrası dalın 76 lokal SKY/PREM/FX2 commitinin belgelenmiş ekleri
+  (`sky:`/`prem:` önekli; PREM-01 `SeyFx.transition` kaldırımı dahil), manevi
+  registry sahipliğine dokunmaz.
+- **Bulunan ve onarılan bozuk kapı:** SKY serisi `app/core/skyFx.js`'i
+  `index.html` ve `zikr-harness.mjs`'e eklemiş ama `driver.mjs` FILES
+  listesini atlamıştı; `driver.mjs` MON-04 `assertLoadOrder` ile exit 1
+  veriyordu. Tek satırlık harness düzeltmesi (skyFx aynı konuma) sonrası
+  driver exit 0. Ders: S4 parite zinciri dört listedir — `index.html`,
+  `driver.mjs` FILES, `zikr-harness.mjs` FILES, `test_state_rebind_boundary.js`
+  boot listesi.
+- Tüm kapılar PASS: syntax ×2, driver (onarım sonrası), zikr 95/95, B1 0
+  failure / B2 60/60 / B3 20/20, rebind 37/37, modularization 64/64,
+  Faz−1.1 27/27, date-utils 59/59, helpers 31/31, save boundary 19/19,
+  Faz10 69/69, large-file 15/15, manual 21/21, modal focus, dört manevi
+  boundary 19/17/20/20, fx2 ailesi 66/66, premium 249/249, Quran ailesi,
+  reminder smoke 20/20, panel faz11 50/50, `git diff --check` temiz.
+- Üretim kodu, fixture semantiği, sync.js/Guard 1/2, data, cache-bust ve
+  `index.html` bu kartta değişmedi; tek değişiklik driver.mjs harness
+  paritesi + kanıt/durum zinciridir. Browser/device, push/merge/tag/deploy
+  ve `mustafaras/seyma-data` yazımı yok. Sıradaki `MON-26` (motivation,
+  Dalga 6); yeni açık kullanıcı yönü olmadan başlamaz.
+
+## MON-24 kapanışı — manevi domainler çapraz regression
 
 **Bağlayıcı durak:** `MON-15` tamamlandı: MON-11..14 state aktarımının canlı
 getter, rebind ve strict-mode sınırı bağımsız sentetik VM fixture'ı ile kapatıldı.

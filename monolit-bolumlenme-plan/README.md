@@ -1,16 +1,20 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-04 · **Durum:** `in_progress` · **Uygulanan prompt:** 19/60 (`MON-19`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-09 · **Durum:** `in_progress` · **Uygulanan prompt:** 25/60 (`MON-25`)
 
 Bu klasör, Şeyma'nın `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
-bir **kademeli kod uygulama paketidir**: Dalga 1–4 (`MON-01..MON-18`)
+bir **kademeli kod uygulama paketidir**: Dalga 1–5 (`MON-01..MON-25`)
 tamamlandı; `migrate`, `getDay` ve `createDefaultData` state registry'sine
 taşındı, canlı rebind sahipliği app.js'te bırakıldı. `MON-16` syncGlue callback
 sahipliğini app.js'te kilitledi, `MON-17` save gövdesini syncGlue registry'sine
 aldı, `MON-18` state+sync Dalga 4 kapanışını no-network kanıtıyla tamamladı.
-`MON-19` Dalga 5'in ilk domain taşıması olarak prayer gövdesini `SeymaPrayer` registry'sine aldı; app.js
-shimleri, lazy cache/fetch sınırı ve `faith-preview-card` dump paritesi korundu.
+Dalga 5'in dört manevi domaini ayrıldı: `MON-19` prayer, `MON-20/21` zikir
+motor+görünüm, `MON-22` quran, `MON-23` saygı; `MON-24` çapraz regression
+raporuyla, `MON-25` Dalga 5 kabul denetimiyle kapandı (canlı ölçümde I1–I6/M1–M4
+farkı yok; tek onarım: `driver.mjs` FILES listesine SKY serisinin atladığı
+`skyFx.js` eklendi). Dalga 6 (`MON-26..MON-32`, bakım/terapi domainleri)
+sırada.
 
 ## Sınır ve otorite
 
@@ -20,8 +24,10 @@ shimleri, lazy cache/fetch sınırı ve `faith-preview-card` dump paritesi korun
 - 24-hedef-modül haritası `MODULARIZATION.md` v2.1; gerçek iş alanı kanıtı
   `docs/monolit-bolumlenme-haritasi.md`dir. Graphify topluluk etiketi modül
   sınırı değildir.
-- Dal `zikirmatik-manuel-zikir` **LOCAL-ONLY**dir. Push, merge, tag, deploy ve
-  `mustafaras/seyma-data` yazımı ayrı kullanıcı onayı gerektirir.
+- Dal `premium-fx-gorsel-yuzey` **LOCAL-ONLY**dir (MON zinciri
+  `zikirmatik-manuel-zikir` dalını içerir; üstünde 76 lokal SKY/PREM/FX2
+  commit'i var). Push, merge, tag, deploy ve `mustafaras/seyma-data` yazımı
+  ayrı kullanıcı onayı gerektirir.
 - Tarayıcı, gerçek profil, token, gerçek localStorage ve canlı veri yoktur.
   Doğrulama yalnız `run-seyma` Node/VM harness'leri ve sentetik fixture'lardır.
 

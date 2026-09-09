@@ -146,6 +146,41 @@
     ctx.globalAlpha = 1;
     ctx.restore();
   }
+  // Kar: yavaş, DEĞİŞKEN boyutlu, sinüs savrulmalı. Aynı boyutta ve düz düşen
+  // taneler "puantiye" gibi görünür — eski CSS'in hatası buydu.
+  function newFlake(w, h, atTop){
+    var d = 0.3 + Math.random() * 0.7;
+    return { x: Math.random()*w, y: atTop ? -6 : Math.random()*h,
+             d: d, r: 0.8 + d*2.0, sp: 0.35 + d*0.85,
+             ph: Math.random()*Math.PI*2, amp: 6 + d*16 };
+  }
+  function ensureFlakes(sc, w, h){
+    var inten = typeof sc.intensity === 'number' ? sc.intensity : 0.4;
+    var want = (sc.weather === 'amb-wx-snow') ? Math.round(45 + 55*inten) : 0;
+    var arr = S.flakes || (S.flakes = []);
+    while (arr.length > want) arr.pop();
+    while (arr.length < want) arr.push(newFlake(w, h, false));
+    return arr;
+  }
+  function drawSnow(ctx, w, h, sc, t){
+    var arr = ensureFlakes(sc, w, h);
+    if (!arr.length) return;
+    var windPx = Math.max(-0.4, Math.min(0.4, (sc.wind || 0) / 70));
+    ctx.save();
+    ctx.fillStyle = '#FFFFFF';
+    for (var i = 0; i < arr.length; i++){
+      var p = arr[i];
+      p.y += p.sp;
+      p.ph += 0.012 + p.d * 0.010;
+      var sway = Math.sin(p.ph) * p.amp * 0.06;
+      var x = p.x + sway + windPx * p.sp * 6;
+      if (p.y > h + 4){ arr[i] = newFlake(w, h, true); continue; }
+      ctx.globalAlpha = 0.35 + 0.5 * p.d;
+      ctx.beginPath(); ctx.arc(x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
   // Katman çizimi. Sonraki kartlar buraya katman EKLER.
   function draw(ctx, w, h, sc, t){
     ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
@@ -155,7 +190,8 @@
     drawCelestial(ctx, w, h, sc, t);
     drawClouds(ctx, w, h, sc, t);
     drawRain(ctx, w, h, sc, t);
-    // SKY-08..09 katmanları buraya eklenecek
+    drawSnow(ctx, w, h, sc, t);
+    // SKY-09 katmanı buraya eklenecek
     ctx.restore();
   }
 

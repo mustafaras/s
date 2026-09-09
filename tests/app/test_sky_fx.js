@@ -250,6 +250,34 @@ console.log('\n[SKY-07] yağmur ve çisenti');
   ok('damlalar kareler arası düşüyor', JSON.stringify(y1) !== JSON.stringify(y2));
 }
 
+/* SKY-08 — kar */
+console.log('\n[SKY-08] kar');
+{
+  const s = makeEnv();
+  s.Sky.mount(s.host, scene({ weather: 'amb-wx-snow', intensity: 0.7, time: 'amb-time-day' }));
+  s.ctx.reset(); s.frames(1);
+  const snowArcs = s.ctx.count('arc');
+
+  const c = makeEnv();
+  c.Sky.mount(c.host, scene({ weather: 'amb-wx-clear', time: 'amb-time-day' }));
+  c.ctx.reset(); c.frames(1);
+
+  ok('karda çok sayıda tane çiziliyor', snowArcs >= c.ctx.count('arc') + 40);
+  ok('kar taneleri değişken yarıçapta', (function(){
+    const rs = s.ctx.calls.filter(x => x.fn === 'arc').map(x => x.args[2]);
+    return new Set(rs.map(v => Math.round(v * 10))).size >= 8;
+  })());
+}
+{
+  const e = makeEnv();
+  e.Sky.mount(e.host, scene({ weather: 'amb-wx-snow', intensity: 0.6 }));
+  e.ctx.reset(); e.frames(1);
+  const x1 = e.ctx.calls.filter(c => c.fn === 'arc').map(c => c.args[0].toFixed(2));
+  e.ctx.reset(); e.frames(1);
+  const x2 = e.ctx.calls.filter(c => c.fn === 'arc').map(c => c.args[0].toFixed(2));
+  ok('taneler yatayda savruluyor (sinüs)', JSON.stringify(x1) !== JSON.stringify(x2));
+}
+
 // === SKY test bloğu buraya eklenir (yeni kartlar bu satırın ÜSTÜNE ekler) ===
 
 console.log('\n' + (fail === 0 ? 'SKY FIXTURE PASS' : 'SKY FIXTURE FAIL') + ': ' + pass + ' geçti, ' + fail + ' düştü');

@@ -8,6 +8,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 const source = fs.readFileSync('app.js', 'utf8');
+const crisisSource = fs.readFileSync('app/core/crisis.js', 'utf8');
 const saygiSource = fs.readFileSync('app/core/saygi.js', 'utf8');
 
 function ok(name, condition) {
@@ -40,7 +41,7 @@ ok('ortak handler Tab olayını iç modala sınırlandırıyor',
 
 const modalSections = [
   ['Günlük Işığı', section('function journalModalHTML(){', '\nfunction updateJournalUI(){')],
-  ['Kriz Odası', section('function crisisModalHTML(){', '\nfunction haritaHTML')],
+  ['Kriz Odası', section('function crisisModalHTML(){', '\n  window.SeymaCrisis=', crisisSource)],
   ['İman Köşesi', section('function faithCornerOverlayHTML(){', 'function qiblaOverlayHTML', saygiSource)],
   ['Kıble Pusulası', section('function qiblaOverlayHTML(){', '  function saygiPreviewHubHTML', saygiSource)],
   ['Günün Öncüsü', section('function saygiPersonModalHTML(){', '  function saygiFloatingReadHTML', saygiSource)],

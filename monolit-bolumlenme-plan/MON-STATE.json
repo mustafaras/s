@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-26",
-  "nextPrompt": "MON-27",
+  "lastCompletedPrompt": "MON-27",
+  "nextPrompt": "MON-28",
   "currentWave": "6",
   "totalPrompts": 60,
-  "completedPrompts": 26,
+  "completedPrompts": 27,
   "updatedAt": "2026-09-09",
-  "nextSafeAction": "MON-26 tamamlandi: motivation saf görünüm/parser/katalog gövdeleri app/core/motivation.js SeymaMotivation registry'sine tasindi (744 satır, 13 bağımlılık canlı bag); app.js 23 imza-koruyan shim + App-owned mutation kabuğu (completeMotivationTask, save/timer/fetch) korundu. Birleşik kaynakta onclick 391 ve unique App 718 birebir (I2); data= 9 token app.js'te (M2); dump paritesi birebir (stokastik MG skoru normalize). Fail-closed bulgu: dilim silmede App.saveDailyWin/copyFlexNudge yanlışlıkla silinmişti, fx2 fixture'ları yakaladı, HEAD'den geri getirildi. S4 parite zinciri (index/driver/zikr/state-rebind) + 12 app-boot fixture listesi motivation ile güncellendi. Tüm kapılar PASS. Siradaki sirali adim MON-27 (crisis domain, Dalga 6); approvalRequired: true - yeni acik kullanici onayi olmadan baslamaz.",
+  "nextSafeAction": "MON-27 tamamlandi: CRISES/CRISIS_ORDER, rasitActionsHTML ve crisisModalHTML app/core/crisis.js SeymaCrisis registry'sine tasindi; app.js App.openCrisis ve craving state-write handler kabugu korundu. Safety-copy + sweet/food/coffee tile/modal parent-current exact; combined onclick 391 ve unique App 718 birebir; 9 canlı resolver, load-safe registry, index/driver/zikr/state-rebind + app-boot FILES paritesi ve 40 assertion'lı crisis boundary PASS. sync.js/Guard, data, migrate/getDay/default, render/modal altyapısı, reminder/network değişmedi. Tüm kart kapıları PASS; sıradaki sıralı adım MON-28 (journal domain, Dalga 6); approvalRequired: true - yeni açık kullanıcı yönü olmadan başlamaz.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -133,6 +133,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-D5-MANEVI-DOMAIN-RAPORU.md",
       "decision": "manevi_four_registry_cross_regression_no_cycle_no_load_side_effect_no_source_change"
+    },
+    "MON-27": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-27-CRISIS-ENVANTERI.md",
+      "decision": "crisis_registry_exact_safety_copy_html_parity_app_owned_mutation_focus_boundary"
     }
   },
   "waves": [
@@ -181,7 +186,7 @@
       "prompts": "MON-26..MON-32",
       "topic": "bakim ve terapi domainleri",
       "approvalRequired": true,
-      "completed": 1,
+      "completed": 2,
       "total": 7
     },
     {
@@ -234,7 +239,7 @@
     }
   ],
   "verificationGate": [
-    "node --check app.js && node --check sync.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
+    "node --check app.js && node --check sync.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
     "node .claude/skills/run-seyma/verify-state-helper-boundary.mjs",
     "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
     "node .claude/skills/run-seyma/verify-state-adapter-contract.mjs",
@@ -243,6 +248,7 @@
     "node tests/app/test_quran_boundary.js",
     "node tests/app/test_saygi_boundary.js",
     "node tests/app/test_motivation_room_accessibility.js",
+    "node tests/app/test_crisis_boundary.js",
     "node tests/app/test_modal_focus_containment.js",
     "node tests/app/test_zikr_manual_entry.js",
     "node .claude/skills/run-seyma/driver.mjs",

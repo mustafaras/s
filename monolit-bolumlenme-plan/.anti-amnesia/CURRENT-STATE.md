@@ -9,12 +9,37 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 6 devam ediyor (MON-26 tamamlandı) |
+| Durum | `in_progress` — Dalga 6 devam ediyor (MON-27 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-26` / `MON-27` |
-| Dalga / ilerleme | 6 devam ediyor (1/7) / 26/60 |
+| Son / sıradaki | `MON-27` / `MON-28` |
+| Dalga / ilerleme | 6 devam ediyor (2/7) / 27/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-09 |
+
+## MON-27 kapanışı — crisis domain registry
+
+- Karar/kanıt: [`MON-27-CRISIS-ENVANTERI.md`](../deliverables/MON-27-CRISIS-ENVANTERI.md).
+- [`app/core/crisis.js`](../../app/core/crisis.js) `SeymaCrisis` registry'si
+  içinde `CRISES`/`CRISIS_ORDER`, `rasitActionsHTML` ve `crisisModalHTML`
+  gövdelerini taşır. Üç kriz kataloğu, 17 seçenek ve 15 trigger güvenlik
+  kopyası değiştirilmeden korunur; 9 canlı resolver ile load-safe çalışır.
+  `App.openCrisis`, close/toggle/note/complete/reset state-write kabuğu
+  app.js'te kaldı; modal altyapısı, render çekirdeği, migrate ve craving
+  davranışı değişmedi.
+- Parent/current sentetik `sos` dump'ında sweet/food/coffee tile çıktıları
+  `4114/4114` byte, modal çıktıları sırasıyla `20162/20162`, `20439/20439`,
+  `20261/20261` byte birebir eşittir. Birleşik kaynakta `onclick 391/391` ve
+  unique `App 718/718`; crisis boundary `40/40`, modal focus `41/41` PASS.
+- Yükleme zinciri `index.html`, driver/zikr `FILES`, state-rebind boot listesi
+  ve ilgili app-boot fixture'larında aynı `motivation → crisis → mediaFx`
+  konumuna güncellendi; cache-bust `crisis.js?v=20260909a` uygulandı.
+  `sync.js`, Guard, data, frozen content, profile, panel ve remote yüzeyler
+  değişmedi.
+- Syntax, `driver --dump sos`, zikr `95/95`, modularization `72/72`, Faz10
+  sync `69/69`, tüm app/panel/Panel-v2/Quran/reminder/premium aileleri ve
+  `git diff --check` exit 0. Browser/device, push/merge/tag/deploy veya
+  `mustafaras/seyma-data` yazımı yok; halt yok. Sıradaki `MON-28` yeni açık
+  kullanıcı yönü olmadan başlamaz.
 
 ## MON-26 kapanışı — motivation domain registry
 

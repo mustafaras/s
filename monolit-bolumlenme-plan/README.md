@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-09 · **Durum:** `in_progress` · **Uygulanan prompt:** 26/60 (`MON-26`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-09 · **Durum:** `in_progress` · **Uygulanan prompt:** 27/60 (`MON-27`)
 
 Bu klasör, Şeyma'nın `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
@@ -15,7 +15,10 @@ raporuyla, `MON-25` Dalga 5 kabul denetimiyle kapandı (canlı ölçümde I1–I
 farkı yok; tek onarım: `driver.mjs` FILES listesine SKY serisinin atladığı
 `skyFx.js` eklendi). `MON-26` motivation gövdelerini `app/core/motivation.js` SeymaMotivation
 registry'sine aldı (23 shim + App-owned mutation kabuğu; birleşik kaynakta
-onclick 391/App 718 birebir). Dalga 6 devam ediyor (`MON-27` crisis sırada).
+onclick 391/App 718 birebir). `MON-27` crisis güvenlik metni, modal HTML'i ve
+craving görünüm yardımcılarını `app/core/crisis.js` SeymaCrisis registry'sine
+aldı; SOS/tile/modal çıktısı parent/current ile birebir, App-owned mutation ve
+focus sınırı korundu. Dalga 6 devam ediyor (`MON-28` journal sırada).
 
 ## Sınır ve otorite
 

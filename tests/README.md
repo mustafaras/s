@@ -20,6 +20,9 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_motivation_room_accessibility.js` — Terapi Odası dialog semantiği,
   Tab/Shift+Tab focus sarma, Escape kapanışı ve yansıma taslağında yeniden render
   olmaması için ağsız sentetik regresyon fixture’ı.
+- `app/test_crisis_boundary.js` — MON-27 `SeymaCrisis` registry’si: güvenlik
+  kopyası, üç SOS yüzeyi, salt HTML/state sınırı, App handler kabuğu ve modal
+  dialog/focus sözleşmesi; browser, gerçek ağ ve veri yoktur.
 - `app/test_modal_focus_containment.js` — Tüm ortak modal ailesinin odak
   sözleşmesini, metin alanı dahil Tab/Shift+Tab sarma, Escape kapanışı, semantik
   dialog kabuğu ve focusable arka plan regresyonunu ağsız sentetik olarak doğrular.

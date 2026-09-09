@@ -9,10 +9,11 @@ const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
-// MON-26: motivation gövdeleri app/core/motivation.js'te; onclick sayımları
-// birleşik kaynakta yapılır (App handler atamaları app.js'te kalır).
+// MON-26/MON-27: motivation ve crisis gövdeleri registry'lerinde; onclick
+// sayımları birleşik kaynakta yapılır (App handler atamaları app.js'te kalır).
 const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
-const combinedSource = appSource + motivationSource;
+const crisisSource = fs.readFileSync(path.join(repoRoot, 'app/core/crisis.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource;
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 let passed = 0;
 let failed = 0;

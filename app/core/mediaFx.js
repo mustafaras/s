@@ -678,14 +678,6 @@
         el.classList.add('sey-enter');
       });
     },
-    transition: function(el, property, durationMs){
-      // FX-P-37: tek property için CSS transition helper.
-      if (!shouldAnimate()) return;
-      if (!el || !el.style) return el;
-      durationMs = Math.max(0, Math.min(Number(durationMs) || 200, 1000));
-      el.style.transition = property + ' ' + durationMs + 'ms ease';
-      return el;
-    },
     sheetClose: function(cardId, backdropId, done){
       // FX2-16: render() overlay'i anında kaldırmadan önce kart/backdrop
       // çıkışını oynatır. Gating kapalıysa erişilebilir eski yol anlıktır.

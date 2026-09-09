@@ -6,7 +6,29 @@
     try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
     catch(e){ return false; }
   }
-  var S = { canvas:null, ctx:null, host:null, scene:null, running:false, raf:0, dpr:1, w:0, h:0 };
+  var S = { canvas:null, ctx:null, host:null, scene:null, running:false, raf:0, dpr:1, w:0, h:0, last:0 };
+
+  // Kare döngüsü. setInterval YASAK — yalnız rAF (SKY-00 §3 değişmezi).
+  function frame(ts){
+    if(!S.running || !S.ctx) return;
+    S.last = ts || 0;
+    draw(S.ctx, S.w, S.h, S.scene || {}, S.last);
+    S.raf = window.requestAnimationFrame(frame);
+  }
+  // Tek kare çiz (reduced-motion veya duraklatma için).
+  function drawOnce(){
+    if(!S.ctx) return false;
+    draw(S.ctx, S.w, S.h, S.scene || {}, S.last || 0);
+    return true;
+  }
+  // Katman çizimi. Sonraki kartlar buraya katman EKLER.
+  function draw(ctx, w, h, sc, t){
+    ctx.clearRect(0, 0, S.canvas.width, S.canvas.height);
+    ctx.save();
+    ctx.scale(S.dpr, S.dpr);
+    // SKY-04..09 katmanları buraya eklenecek
+    ctx.restore();
+  }
 
   function mount(host, scene){
     if(!host || !premiumOn()) return false;
@@ -24,6 +46,8 @@
     S.ctx = cv.getContext ? cv.getContext('2d') : null;
     if(!S.ctx) return false;
     resize();
+    if(reducedMotion()){ drawOnce(); return true; }   // renk kalır, hareket durur
+    resume();
     return true;
   }
   function resize(){
@@ -34,13 +58,28 @@
     S.canvas.width = Math.round(S.w*S.dpr); S.canvas.height = Math.round(S.h*S.dpr);
   }
   function update(scene){ if(scene) S.scene = scene; return true; }
-  function pause(){ S.running=false; return true; }
-  function resume(){ if(reducedMotion()) return false; S.running=true; return true; }
+  function pause(){
+    S.running = false;
+    if(S.raf) { try{ window.cancelAnimationFrame(S.raf); }catch(e){} S.raf = 0; }
+    return true;
+  }
+  function resume(){
+    if(!S.ctx || reducedMotion()) return false;
+    if(S.running) return true;
+    S.running = true;
+    S.raf = window.requestAnimationFrame(frame);
+    return true;
+  }
   function unmount(){
     S.running=false;
     if(S.canvas && S.canvas.remove) { try{ S.canvas.remove(); }catch(e){} }
     S.canvas=null; S.ctx=null; S.host=null;
     return true;
+  }
+  if(typeof document !== 'undefined' && document.addEventListener){
+    document.addEventListener('visibilitychange', function(){
+      if(document.hidden) pause(); else resume();
+    });
   }
   window.SeySkyFx = { mount:mount, update:update, pause:pause, resume:resume, unmount:unmount, _state:S };
 })();

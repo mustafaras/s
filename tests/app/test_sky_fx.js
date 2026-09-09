@@ -136,6 +136,30 @@ console.log('\n[SKY-01] modül yüzeyi ve gating');
   ok('premium kapalı → canvas eklenmez', e.host.children.length === 0);
 }
 
+/* SKY-03 — döngü ve duraklatma */
+console.log('\n[SKY-03] döngü ve duraklatma');
+{
+  const e = makeEnv();
+  ok('mount true döner', e.Sky.mount(e.host, scene()) === true);
+  ok('canvas eklendi', e.host.children.length === 1);
+  ok('mount sonrası rAF kuyruğa girdi', e.pending() >= 1);
+  e.ctx.reset();
+  e.frames(3);
+  ok('her karede clearRect çağrılıyor', e.ctx.count('clearRect') >= 3);
+  ok('DPR ölçeği uygulanıyor', e.ctx.count('scale') >= 3);
+  e.Sky.pause();
+  const before = e.ctx.count('clearRect');
+  e.frames(3);
+  ok('pause sonrası çizim durdu', e.ctx.count('clearRect') === before);
+  ok('resume tekrar başlatıyor', e.Sky.resume() === true);
+}
+{
+  const e = makeEnv({ reducedMotion: true });
+  e.Sky.mount(e.host, scene());
+  ok('reduced-motion → döngü başlamaz', e.pending() === 0);
+  ok('reduced-motion → yine de tek kare çizildi', e.ctx.count('clearRect') >= 1);
+}
+
 // === SKY test bloğu buraya eklenir (yeni kartlar bu satırın ÜSTÜNE ekler) ===
 
 console.log('\n' + (fail === 0 ? 'SKY FIXTURE PASS' : 'SKY FIXTURE FAIL') + ': ' + pass + ' geçti, ' + fail + ' düştü');

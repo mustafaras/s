@@ -40,6 +40,7 @@ const FILES = [
   'app/core/saygi.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
+  'app/core/skyFx.js',
   'app/core/reminderCatalog.js',
   'app/core/reminderEngine.js',
   'app/core/reminderScheduler.js',

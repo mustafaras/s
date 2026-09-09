@@ -26,7 +26,7 @@
     "SKY-12": "done",
     "PREM-01": "done",
     "PREM-02": "done (M7=0.62 korundu; donusturulebilir bildirim yok — bkz. deliverables/PREM-02-M7-ANALIZ.md)",
-    "PREM-03": "todo"
+    "PREM-03": "done"
   },
   "degismezler": {
     "App_handler": 718,

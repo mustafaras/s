@@ -5878,6 +5878,16 @@ App.go=function(id,event){
       // uygulanıyor (yani ana sekmelerde stagger EFEKTİ var, `.sey-stagger`
       // SINIFI yok — denetimdeki 0 ölçümü sınıfı sayıyordu, efekti değil).
       // Header sahnesi de sıraya katıldı: gökyüzü şeridi kartlarla birlikte gelir.
+      // PREM-03: kademeli giriş artık tek sistemde — .sey-stagger + --i.
+      // (Eskiden SeyFx.enter inline animationDelay yazıyordu; efekt aynıydı
+      //  ama iki ayrı hareket sistemi vardı.)
+      try{
+        var _sf = document.querySelectorAll('#app .sey-hdr-scene, #app .surface');
+        for(var _i=0; _i<_sf.length; _i++){
+          _sf[_i].style.setProperty('--i', String(Math.min(_i, 8)));
+          _sf[_i].classList.add('sey-stagger');
+        }
+      }catch(e){}
       window.SeyFx.enter('#app .sey-hdr-scene, #app .surface', 40);
     }
   }

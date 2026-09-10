@@ -11,10 +11,33 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 7 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-33` / `MON-34` |
-| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (1/7) / 33/60 |
+| Son / sıradaki | `MON-34` / `MON-35` |
+| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (2/7) / 34/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-10 |
+
+## MON-34 kapanışı — report domain registry
+
+- Karar/kanıt: [`MON-34-REPORT-ENVANTERI.md`](../deliverables/MON-34-REPORT-ENVANTERI.md).
+- `lastNDays`, mood dağılımı, trend/KPI kartları, aylık özet, korelasyon,
+  rozet, adım/mesafe ve mood heatmap üreticileri `app/core/report.js`
+  içindeki `SeymaReport` registry'sine alındı: 16 member, 29 read-only
+  dependency. `app.js` registry kaydı ve imza-koruyan shimleri kaldı.
+- `data`/`ui`/`dark` rebind, `migrate`/`getDay`/`save`/`render`, App mutation,
+  print `reportHTML`/`App.printReport`, DOM/timer/network, map/settings/health
+  sahipliği ve chart algoritması değiştirilmedi. Registry `data=` assignment
+  tokenı sıfırdır.
+- BEFORE/AFTER `driver --dump rapor` UTF-8 dump **139278 byte**, SHA-256
+  `5d262bb477ecb2701c6db3287229f2631c4a9f5b63bb9616b0a9b7d88460ac71`;
+  byte parity PASS. Birleşik App assignment 721/721, onclick 220/220 ve
+  FX referansları değişmedi.
+- Report boundary 12 PASS; syntax, driver, zikr 95/95, Faz10 69/69,
+  premium 9 fixture, B1/B2/B3, state-rebind 37/37, tam app/panel/Panel-v2/
+  Quran/reminder regression ve diff check PASS. `index.html`, driver,
+  zikr-harness, state-rebind, migration B2 ve app-boot FILES zincirlerinde
+  `health → library → report → mediaFx` sırası/cache-bust güncel.
+- Browser/device, remote, push/merge/tag/deploy ve `mustafaras/seyma-data`
+  yazımı yok; blocked yok. Sıradaki MON-35 için yeni açık kullanıcı yönü gerekir.
 
 ## MON-33 kapanışı — library domain registry
 

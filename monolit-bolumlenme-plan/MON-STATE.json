@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-33",
-  "nextPrompt": "MON-34",
+  "lastCompletedPrompt": "MON-34",
+  "nextPrompt": "MON-35",
   "currentWave": "7",
   "totalPrompts": 60,
-  "completedPrompts": 33,
+  "completedPrompts": 34,
   "updatedAt": "2026-09-10",
-  "nextSafeAction": "MON-33 tamamlandı: okuma/izleme/dinleme/öğrenme/soul salt-okuma hub ve arşiv görünümleri app/core/library.js içindeki SeymaLibrary registry'sine alındı; App-owned entry mutation, archive sync/backfill, data/ui rebind, 6079 sınırı, modal focus ve ID alanları korundu. library boundary 45 PASS, modal focus 41/41, daily photo 12/12, modularization 84/84, driver --dump bugun, zikr 95/95, tam app/panel/Panel-v2/Quran/reminder regression ve syntax PASS. Cache-bust/FILES dört ana zincirde güncellendi; sync.js, panel, content ve archive backfill değişmedi; browser/device, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-34 için yeni açık kullanıcı yönü gerekir.",
+  "nextSafeAction": "MON-34 tamamlandı: rapor/istatistik/heatmap üreticileri app/core/report.js içindeki SeymaReport registry'sine taşındı; 16 üye, read-only dependency bag, app.js imza-koruyan shimleri, report print/DOM ve data rebind sahipliği korundu. Report boundary, driver --dump rapor byte parity, zikr 95/95, Faz10 sync 69/69, premium, tam app/panel/Panel-v2/Quran/reminder regression, syntax ve diff check PASS. App assignment 721/721, birleşik onclick 220/220, FX referansları değişmedi; registry data= tokenı sıfır. Cache-bust/FILES dört ana zincirde güncellendi; sync.js, panel, content, settings, map ve chart algoritması değişmedi; browser/device, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-35 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -153,6 +153,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-33-LIBRARY-ENVANTERI.md",
       "decision": "library_registry_five_hub_read_only_html_archive_identity_app_owned_mutation_sync_and_6079_boundary"
+    },
+    "MON-34": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-34-REPORT-ENVANTERI.md",
+      "decision": "report_read_only_registry_kpi_heatmap_dump_parity_app_owned_report_print_and_data_rebind"
     }
   },
   "waves": [
@@ -209,7 +214,7 @@
       "prompts": "MON-33..MON-39",
       "topic": "arsiv, analiz ve ayarlar",
       "approvalRequired": true,
-      "completed": 1,
+      "completed": 2,
       "total": 7
     },
     {
@@ -254,7 +259,7 @@
     }
   ],
   "verificationGate": [
-    "node --check app.js && node --check sync.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
+    "node --check app.js && node --check sync.js && node --check app/core/report.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
     "node .claude/skills/run-seyma/verify-state-helper-boundary.mjs",
     "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
     "node .claude/skills/run-seyma/verify-state-adapter-contract.mjs",
@@ -270,6 +275,7 @@
     "node .claude/skills/run-seyma/driver.mjs",
     "node .claude/skills/run-seyma/zikr-harness.mjs",
     "node tests/app/test_modularization_boundary.js",
+    "node tests/app/test_report_boundary.js",
     "node tests/app/test_faz_minus11_boundary.js",
     "node tests/app/test_date_utils_boundary.js",
     "node tests/app/test_helpers_boundary.js",

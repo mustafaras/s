@@ -161,6 +161,7 @@ const FILES = [
   'app/core/journal.js',
   'app/core/health.js',
   'app/core/library.js',
+  'app/core/report.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/skyFx.js',

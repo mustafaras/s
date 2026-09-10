@@ -25,7 +25,7 @@ var repoRoot = require('../repo-root');
 var FILES = [
   'app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js',
   'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js', 'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/saygi.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js',
-  'app/core/library.js', 'app/core/report.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app.js'
+  'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app.js'
 ];
 
 function today(){ var d=new Date(), p=function(n){ return (n<10?'0':'')+n; };
@@ -184,6 +184,7 @@ console.log('== ÆON mesaj okuma kalıcılığı (uzun mesaj genişletme) ==\n')
 var sb=buildSandbox(seedState());
 var ctx=vm.createContext(sb);
 FILES.forEach(function(f){ vm.runInContext(fs.readFileSync(path.join(repoRoot,f),'utf8'),ctx,{filename:f}); });
+sb.App.requestLocationGatePermission(); // MON-35: GPS yalnız explicit user pathinde
 sb.App.start();                 // onboarding kapağını geç
 appHTML=''; sb.App.go('mesaj'); // ÆON akışını aç
 var render1=appHTML;
@@ -267,6 +268,7 @@ assert('10. mesaj metni hâlâ tam olarak render ediliyor (kırpma yalnız görs
 var sb2=buildSandbox(seedState(true));
 var ctx2=vm.createContext(sb2);
 FILES.forEach(function(f){ vm.runInContext(fs.readFileSync(path.join(repoRoot,f),'utf8'),ctx2,{filename:f}); });
+sb2.App.requestLocationGatePermission(); // MON-35: GPS yalnız explicit user pathinde
 sb2.App.start(); appHTML=''; sb2.App.go('mesaj');
 var allIds=extractBubbles(appHTML).map(function(x){ return x.id; });
 

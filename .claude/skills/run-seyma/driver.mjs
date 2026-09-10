@@ -251,6 +251,7 @@ const FILES = [
   'app/core/health.js',
   'app/core/library.js',
   'app/core/report.js',
+  'app/core/map.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/skyFx.js',
@@ -322,6 +323,12 @@ assert('seeded render produced HTML', appHTML.length > 1000);
 if (sb2.App && typeof sb2.App.start === 'function') {
   appHTML = '';
   sb2.App.start();
+}
+// MON-35: persisted location consent no longer starts GPS during boot. A
+// seeded smoke fixture must drive the same explicit user path as the app's
+// location/weather surface before exercising the unlocked tab UI.
+if (sb2.App && typeof sb2.App.requestLocationGatePermission === 'function') {
+  sb2.App.requestLocationGatePermission();
 }
 assert('has bottom nav (bugun tab)', /App\.go\(/.test(appHTML) || /bugun/i.test(appHTML));
 

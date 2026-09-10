@@ -24,6 +24,7 @@ const JOURNAL_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/journal.js"), "
 const HEALTH_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/health.js"), "utf8");
 const LIBRARY_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/library.js"), "utf8");
 const REPORT_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/report.js"), "utf8");
+const MAP_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/map.js"), "utf8");
 
 function fixtureElement(id, htmlState) {
   const attrs = {};
@@ -73,6 +74,7 @@ function boot({ catalog = true, seed = null } = {}) {
   const root = fixtureElement("root");
   const store = seed ? { "seyma-reset-v1": JSON.stringify(seed) } : {};
   let fetchCalls = 0;
+  let geolocationCalls = 0;
   const localStorage = {
     getItem(key) { return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null; },
     setItem(key, value) { store[key] = String(value); },
@@ -99,7 +101,11 @@ function boot({ catalog = true, seed = null } = {}) {
     navigator: {
       userAgent: "rem-44-boot-fixture", vibrate() {},
       clipboard: { writeText() { return Promise.resolve(); } },
-      geolocation: { getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); }, watchPosition() { return 1; }, clearWatch() {} }
+      geolocation: {
+        getCurrentPosition(success) { geolocationCalls += 1; success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); },
+        watchPosition() { geolocationCalls += 1; return 1; },
+        clearWatch() {}
+      }
     },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
@@ -137,9 +143,10 @@ function boot({ catalog = true, seed = null } = {}) {
   vm.runInContext(HEALTH_SOURCE, context, { filename: "app/core/health.js" });
   vm.runInContext(LIBRARY_SOURCE, context, { filename: "app/core/library.js" });
   vm.runInContext(REPORT_SOURCE, context, { filename: "app/core/report.js" });
+  vm.runInContext(MAP_SOURCE, context, { filename: "app/core/map.js" });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });
   vm.runInContext(APP_SOURCE, context, { filename: "app.js" });
-  return { sandbox, app, html: () => htmlState.value, fetchCalls: () => fetchCalls };
+  return { sandbox, app, html: () => htmlState.value, fetchCalls: () => fetchCalls, geolocationCalls: () => geolocationCalls };
 }
 
 function scriptSources() {
@@ -170,6 +177,7 @@ const cases = [
   ["clean boot exposes isolated constants, catalog and App adapters", () => {
     const out = boot();
     assert(out.html().length > 200);
+    assertEqual(out.geolocationCalls(), 0);
     assert(out.sandbox.SeymaConstants && typeof out.sandbox.SeymaConstants.KEY === "string");
     assert(out.sandbox.ReminderCatalogV1 && out.sandbox.ReminderCatalogV1.list().length === 7);
     assert(out.sandbox.App && typeof out.sandbox.App.reminderPolicyForState === "function");
@@ -185,12 +193,14 @@ const cases = [
     const out = boot({ seed: stateSeed() });
     out.sandbox.App.start();
     assert(out.html().length > 500);
+    assertEqual(out.geolocationCalls(), 0);
     assert(typeof out.sandbox.App.reminderPolicyForState() === "object");
     assert(typeof out.sandbox.App.reminderGenerateOccurrence === "function");
   }],
   ["missing catalog boot fails safe without throwing or inventing definitions", () => {
     const out = boot({ catalog: false, seed: stateSeed() });
     out.sandbox.App.start();
+    assertEqual(out.geolocationCalls(), 0);
     assertEqual(typeof out.sandbox.ReminderCatalogV1, "undefined");
     assert(typeof out.sandbox.App.reminderPolicyForState === "function");
     assert(typeof out.sandbox.App.reminderGenerateOccurrence === "function");

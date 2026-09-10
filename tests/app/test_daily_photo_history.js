@@ -49,7 +49,7 @@ var context={
 };
 context.window=context;
 vm.createContext(context);
-vm.runInContext(block('var DAILY_PHOTO_FETCHING=', 'function wxMeta('),context,{filename:'daily-photo-helpers.js'});
+vm.runInContext(block('var DAILY_PHOTO_FETCHING=', '// ── Tatil Modu kartı'),context,{filename:'daily-photo-helpers.js'});
 vm.runInContext(block('App.toggleDailyPhoto=', 'function prefersReducedMotion('),context,{filename:'daily-photo-handlers.js'});
 vm.runInContext(block('function dailyPhotoCardHTML()', 'function bugunHTML('),context,{filename:'daily-photo-card.js'});
 

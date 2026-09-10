@@ -162,7 +162,7 @@ function boot(options) {
   sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
   sandbox.SeySync = sync;
   const context = vm.createContext(sandbox);
-    ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/syncGlue.js", "app/core/helpers.js", "app/core/prayer.js", "app/core/zikir.js", "app/core/quran.js", "app/core/saygi.js", "app/core/motivation.js", "app/core/crisis.js", "app/core/journal.js", "app/core/health.js", "app/core/library.js", "app/core/report.js", "app/core/reminderCatalog.js", "app/core/reminderDelivery.js"]
+    ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/syncGlue.js", "app/core/helpers.js", "app/core/prayer.js", "app/core/zikir.js", "app/core/quran.js", "app/core/saygi.js", "app/core/motivation.js", "app/core/crisis.js", "app/core/journal.js", "app/core/health.js", "app/core/library.js", "app/core/report.js", "app/core/map.js", "app/core/reminderCatalog.js", "app/core/reminderDelivery.js"]
     .forEach((file) => vm.runInContext(fs.readFileSync(path.join(rootDir, file), "utf8"), context, { filename: file }));
   vm.runInContext(appSource, context, { filename: "app.js" });
   sandbox.App.start();

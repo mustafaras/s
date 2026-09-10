@@ -11,10 +11,41 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 7 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-34` / `MON-35` |
-| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (2/7) / 34/60 |
+| Son / sıradaki | `MON-35` / `MON-36` |
+| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (3/7) / 35/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-10 |
+
+## MON-35 kapanışı — map domain registry
+
+- Karar/kanıt: [`MON-35-MAP-ENVANTERI.md`](../deliverables/MON-35-MAP-ENVANTERI.md).
+- `app/core/map.js` içindeki `SeymaMap` registry'si 16 map/konum/hava
+  görünüm ve salt-okuma yardımcı üyesini 23 named dependency ile taşır;
+  modül **336 satır / 33973 byte** ve yüklemede storage/DOM/timer/network/
+  geolocation/data assignment içermez. app.js canlı data/ui/dark rebind,
+  imza-koruyan shimleri, `CARD_BUILDERS.location`, DOM/render ve App-owned
+  permission/network/mutation sahipliğini korur.
+- Persist edilmiş location consent boot'ta GPS watcher veya sessiz probe
+  başlatmaz; kapı `checking` kalır. `App.requestLocationGatePermission`,
+  `App.toggleWeather` üzerinden açık kullanıcı yolu ve mevcut foreground
+  watcher korunur. Kod 1/2/3 ile permission-denied/position-unavailable/
+  timeout hata kopyaları değişmedi; map/health/settings/data schema ve chart
+  algoritması taşınmadı.
+- `index.html` ve dört FILES/load-order zinciri `report → map → mediaFx`
+  olarak güncellendi; map cache-bust `v=20260910a`, app `v=20260910c`.
+  Temiz HEAD/current `driver --dump harita` BEFORE/AFTER **29053 UTF-8 byte**,
+  SHA-256 `f879dcb80ebf7abd2259cb7697388f28126faf0f6ef329ebc2ec7d93c179da9f`,
+  `cmp:0`. App assignment 721/721, inline onclick 216/216, FX refs 78/63/58.
+- `test_map_boundary` 14/14, local visual QA guard, node syntax, driver,
+  zikr 95/95, B1/B2/B3, state-rebind 37/37, Faz10 69/69, full app/panel/
+  Panel-v2/Quran/premium/reminder families and diff check PASS. Seeded boot
+  fixtures, no-boot geolocation counters and explicit user-path unlocks
+  evidence zincirine eklendi; üretim data/network davranışı değiştirilmedi.
+- Gerçek browser/device/GPS/weather API, remote read/write, push/merge/tag/
+  deploy ve `mustafaras/seyma-data` yazımı yok; halt veya blocked yok.
+  **State gerçeği:** `MON-STATE.json` `status=in_progress`, `blockedPrompt=null`,
+  `lastCompletedPrompt=MON-35`, `nextPrompt=MON-36`, Dalga 7 **3/7**, toplam
+  **35/60**. MON-36 kullanıcı yönü olmadan başlatılmaz.
 
 ## MON-34 kapanışı — report domain registry
 

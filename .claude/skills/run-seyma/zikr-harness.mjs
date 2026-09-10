@@ -106,6 +106,12 @@ function loadInto(sandbox, files) {
   // timer'ları kasıtlı no-op olduğundan yalnız App.go'nun görsel geçiş kapısı
   // senkron fallback'e alınır. Ses motorunun kendi premium ayarı korunur.
   if (sandbox.SeyFx) sandbox.SeyFx.isPremiumFxEnabled = function() { return false; };
+  // MON-35: persisted location consent is lazy at boot. This harness exercises
+  // the unlocked faith surfaces, so explicitly drive the same user permission
+  // path before asserting their render output.
+  if (sandbox.App && typeof sandbox.App.requestLocationGatePermission === 'function') {
+    sandbox.App.requestLocationGatePermission();
+  }
   return ctx;
 }
 
@@ -162,6 +168,7 @@ const FILES = [
   'app/core/health.js',
   'app/core/library.js',
   'app/core/report.js',
+  'app/core/map.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/skyFx.js',

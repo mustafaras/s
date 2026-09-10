@@ -144,15 +144,15 @@ ok('journal görünümleri registry shiminden çağrılır',
 ok('eski journal katalog/helper gövdeleri app.jste yeniden sahiplenilmez',
   !/var JOURNAL_MODES=/.test(appSource) && !/var JOURNAL_PHASE_PROMPTS=/.test(appSource));
 
-const indexOrder = ['app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/mediaFx.js'];
+const indexOrder = ['app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app/core/mediaFx.js'];
 const positions = indexOrder.map((file) => indexSource.indexOf('src="' + file));
-ok('index cache-bust ve motivation→crisis→journal→health→library→report→mediaFx sırası korunur',
+ok('index cache-bust ve motivation→crisis→journal→health→library→report→map→mediaFx sırası korunur',
   positions.every((position) => position >= 0) && positions.every((position, i) => i === 0 || positions[i - 1] < position) &&
-  indexSource.includes('app/core/journal.js?v=20260909a') && indexSource.includes('app/core/health.js?v=20260910a') && indexSource.includes('app/core/library.js?v=20260910a') && indexSource.includes('app/core/report.js?v=20260910a'));
-ok('driver/zikr/state-rebind FILES zincirinde journal ve health vardır',
+  indexSource.includes('app/core/journal.js?v=20260909a') && indexSource.includes('app/core/health.js?v=20260910a') && indexSource.includes('app/core/library.js?v=20260910a') && indexSource.includes('app/core/report.js?v=20260910a') && indexSource.includes('app/core/map.js?v=20260910a'));
+ok('driver/zikr/state-rebind FILES zincirinde journal, health ve map vardır',
   driverSource.includes("'app/core/journal.js'") && zikrSource.includes("'app/core/journal.js'") &&
   rebindSource.includes("'app/core/journal.js'") && driverSource.includes("'app/core/health.js'") &&
-  zikrSource.includes("'app/core/health.js'") && rebindSource.includes("'app/core/health.js'") && driverSource.includes("'app/core/library.js'") && zikrSource.includes("'app/core/library.js'") && rebindSource.includes("'app/core/library.js'") && driverSource.includes("'app/core/report.js'") && zikrSource.includes("'app/core/report.js'") && rebindSource.includes("'app/core/report.js'"));
+  zikrSource.includes("'app/core/health.js'") && rebindSource.includes("'app/core/health.js'") && driverSource.includes("'app/core/library.js'") && zikrSource.includes("'app/core/library.js'") && rebindSource.includes("'app/core/library.js'") && driverSource.includes("'app/core/report.js'") && zikrSource.includes("'app/core/report.js'") && rebindSource.includes("'app/core/report.js'") && driverSource.includes("'app/core/map.js'") && zikrSource.includes("'app/core/map.js'") && rebindSource.includes("'app/core/map.js'"));
 ok('app boot registerJournal ve journal registry expose vardır',
   appSource.includes('registerJournal') && appSource.includes('window.SeymaJournal'));
 ok('health registry app boot kaydı vardır',

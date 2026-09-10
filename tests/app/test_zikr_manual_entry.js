@@ -89,7 +89,7 @@ function buildSandbox(seedData) {
   sandbox.AudioContext = function () { return { state: 'running', currentTime: 0, resume() {}, createOscillator() { return { type: '', frequency: { value: 0 }, connect() {}, start() {}, stop() {} }; }, createGain() { return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} }; }, destination: {} }; };
   return sandbox;
 }
-const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/content/saygiPeople.js', 'app/content/hijriCalendar.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js', 'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/saygi.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app/core/mediaFx.js', 'app.js', 'sync.js'];
+const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/content/saygiPeople.js', 'app/content/hijriCalendar.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js', 'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/saygi.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app/core/mediaFx.js', 'app.js', 'sync.js'];
 function loadInto(sandbox, files) {
   const ctx = vm.createContext(sandbox);
   for (const f of files) {
@@ -129,6 +129,7 @@ const presetCount = (st, date, id) => {
 console.log('== ZP-10 · Manuel zikir girişi (elle sayım) ==');
 let sb = buildSandbox(seed);
 loadInto(sb, FILES);
+sb.App.requestLocationGatePermission(); // MON-35: GPS yalnız explicit user pathinde
 sb.App.start();
 
 // 1 · Sheet açma/kapama + dock 4. düğme
@@ -230,10 +231,10 @@ ok('V4 verisi V5 migration ile korunur (idempotent)', (function () {
   legacy.zikr.schemaVersion = 4;
   legacy.zikr.manualEntries = [{ id: 'zm_old', date: y, presetId: 'subhanallah', amount: 77, note: 'eski', source: 'manual', createdAt: y + 'T10:00:00.000Z', updatedAt: y + 'T10:00:00.000Z', revertedAt: null }];
   const legacySb = buildSandbox(legacy);
-  loadInto(legacySb, FILES); legacySb.App.start();
+  loadInto(legacySb, FILES); legacySb.App.requestLocationGatePermission(); legacySb.App.start();
   const once = readState(legacySb);
   const sb2 = buildSandbox(once);
-  loadInto(sb2, FILES); sb2.App.start();
+  loadInto(sb2, FILES); sb2.App.requestLocationGatePermission(); sb2.App.start();
   const twice = readState(sb2);
   return once.zikr.schemaVersion === 5 &&
     once.zikr.manualEntries.length === 1 && once.zikr.manualEntries[0].amount === 77 &&

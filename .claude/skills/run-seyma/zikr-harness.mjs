@@ -160,6 +160,7 @@ const FILES = [
   'app/core/crisis.js',
   'app/core/journal.js',
   'app/core/health.js',
+  'app/core/library.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/skyFx.js',

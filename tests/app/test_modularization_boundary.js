@@ -31,6 +31,7 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
     'app/core/crisis.js',
     'app/core/journal.js',
     'app/core/health.js',
+    'app/core/library.js',
     'app/core/mediaFx.js',
     'app/core/timeTheme.js'
   ];
@@ -127,6 +128,9 @@ var expectedNewModules = [
   ok('MON-29 health modülü taşınmış ve registry hedefinde',
     fs.existsSync(path.join(repoRoot,'app/core/health.js')) &&
     fs.readFileSync(path.join(repoRoot,'app/core/health.js'),'utf8').indexOf('window.SeymaHealth') >= 0);
+  ok('MON-33 library modülü taşınmış ve registry hedefinde',
+    fs.existsSync(path.join(repoRoot,'app/core/library.js')) &&
+    fs.readFileSync(path.join(repoRoot,'app/core/library.js'),'utf8').indexOf('window.SeymaLibrary') >= 0);
 })();
 
 // [5] app.js App.* yüzeyi korunuyor (inline onclick handler referansları)
@@ -255,6 +259,7 @@ var expectedNewModules = [
   vm.runInContext(load('app/core/crisis.js'), ctx, { filename:'crisis.js' });
   vm.runInContext(load('app/core/journal.js'), ctx, { filename:'journal.js' });
   vm.runInContext(load('app/core/health.js'), ctx, { filename:'health.js' });
+  vm.runInContext(load('app/core/library.js'), ctx, { filename:'library.js' });
   vm.runInContext(load('app/core/mediaFx.js'), ctx, { filename:'mediaFx.js' });
   vm.runInContext(load('app/core/timeTheme.js'), ctx, { filename:'timeTheme.js' });
 
@@ -274,6 +279,7 @@ var expectedNewModules = [
   ok('window.SeymaCrisis expose edilmiş', typeof win.SeymaCrisis === 'object' && typeof win.SeymaCrisis.registerCrisis === 'function');
   ok('window.SeymaJournal expose edilmiş', typeof win.SeymaJournal === 'object' && typeof win.SeymaJournal.registerJournal === 'function');
   ok('window.SeymaHealth expose edilmiş', typeof win.SeymaHealth === 'object' && typeof win.SeymaHealth.registerHealth === 'function');
+  ok('window.SeymaLibrary expose edilmiş', typeof win.SeymaLibrary === 'object' && typeof win.SeymaLibrary.registerLibrary === 'function');
   ok('SeymaZikr yüklemede state/DOM/timer çağrısı yok', win.SeymaZikr && win.SeymaZikr.ZIKR_SEED && win.SeymaZikr.ZIKR_SEED.length === 5 && timers.length === 0);
   // B1: Faz -1.1'de data/ui henüz window'da değil → getter undefined
   ok('window.SeymaState.data henüz undefined (B1)', win.SeymaState.data === undefined);

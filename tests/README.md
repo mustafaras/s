@@ -31,6 +31,9 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   beslenme, kafein, magnezyum, adım ve ölçüm hesaplarının sentetik vektörleri,
   dateUtils resolver, app shim ve state-mutation sınırı; browser, gerçek ağ ve
   veri yoktur.
+- `app/test_library_boundary.js` — MON-33 `SeymaLibrary` registry’si: beş hub,
+  entry/archive kimliği, modal focus parity ve read-only mutasyon sınırı; browser,
+  gerçek ağ ve veri yoktur.
 - `app/test_modal_focus_containment.js` — Tüm ortak modal ailesinin odak
   sözleşmesini, metin alanı dahil Tab/Shift+Tab sarma, Escape kapanışı, semantik
   dialog kabuğu ve focusable arka plan regresyonunu ağsız sentetik olarak doğrular.

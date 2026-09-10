@@ -15,7 +15,8 @@ const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivatio
 const crisisSource = fs.readFileSync(path.join(repoRoot, 'app/core/crisis.js'), 'utf8');
 const journalSource = fs.readFileSync(path.join(repoRoot, 'app/core/journal.js'), 'utf8');
 const healthSource = fs.readFileSync(path.join(repoRoot, 'app/core/health.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource;
+const librarySource = fs.readFileSync(path.join(repoRoot, 'app/core/library.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 

@@ -15,7 +15,8 @@ const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivatio
 const crisisSource = fs.readFileSync(path.join(repoRoot, 'app/core/crisis.js'), 'utf8');
 const journalSource = fs.readFileSync(path.join(repoRoot, 'app/core/journal.js'), 'utf8');
 const healthSource = fs.readFileSync(path.join(repoRoot, 'app/core/health.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource;
+const librarySource = fs.readFileSync(path.join(repoRoot, 'app/core/library.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource;
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 let passed = 0;
 let failed = 0;
@@ -216,10 +217,10 @@ group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size 
 // 10. Yüksek değerli niyetler sözlükte bulunur; none erken dönüşle sessizdir.
 const intentBody = (mediaSource.match(/var FX_INTENT\s*=\s*\{([\s\S]*?)\n\s*\};/) || [])[1] || '';
 const intentKeys = new Set([...intentBody.matchAll(/^\s*([a-z]+)\s*:/gm)].map((match) => match[1]));
-const fxValues = [...new Set([...appSource.matchAll(/data-fx="([a-z]+)"/g)].map((match) => match[1]))];
+const fxValues = [...new Set([...combinedSource.matchAll(/data-fx="([a-z]+)"/g)].map((match) => match[1]))];
 group(
   'FX2-10.10 niyet haritası bağlı',
-  count(/data-fx="[a-z]+"/g, appSource) >= 40 &&
+  count(/data-fx="[a-z]+"/g, combinedSource) >= 40 &&
     fxValues.length >= 6 &&
     fxValues.every((value) => intentKeys.has(value)) &&
     /if\s*\(k\s*===\s*'none'\)\s*return\s+null;/.test(mediaSource) &&

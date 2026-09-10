@@ -9,12 +9,37 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 6 tamamlandı |
+| Durum | `in_progress` — Dalga 7 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-32` / `MON-33` |
-| Dalga / ilerleme | 6 kapandı (7/7) / 32/60 |
+| Son / sıradaki | `MON-33` / `MON-34` |
+| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (1/7) / 33/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-10 |
+
+## MON-33 kapanışı — library domain registry
+
+- Karar/kanıt: [`MON-33-LIBRARY-ENVANTERI.md`](../deliverables/MON-33-LIBRARY-ENVANTERI.md).
+- Okuma, izleme, dinleme, öğrenme ve soul hub/arşiv salt-okuma görünüm ve
+  istatistik üreticileri `app/core/library.js` içindeki `SeymaLibrary`
+  registry'sine alındı: 64 member, 666 satır. `app.js` imza-koruyan shimleri,
+  App-owned entry mutation'ları, save/render/DOM/focus kabuğu ve
+  `bookId`/`itemId`/`archiveId` kimlik yolları korundu.
+- `syncEntryTo*`, `unsyncSoulEntry` ve `backfillArchivesFromDays` app.js'te
+  kaldı; `data`/`ui` rebind, migrate/getDay, 6079 try/finally, sync.js/Guard,
+  panel, content ve archive backfill sınırı değiştirilmedi.
+- Library boundary **45**, modal focus **41/41**, günlük fotoğraf **12/12**,
+  modularization **84/84**, zikr **95/95**, Faz10 sync **69/69**; driver
+  `--dump bugun`, syntax, tam app/panel/Panel-v2/Quran/reminder regression ve
+  `git diff --check` PASS. Birleşik App surface **718**, inline onclick
+  **391** olarak kaldı.
+- `index.html`, driver/zikr/state-rebind ve app-boot FILES zinciri
+  `health → library → mediaFx` konumunda hizalandı; cache-bust
+  `library.js?v=20260910a`, app `v=20260910b`. Browser/device acceptance,
+  remote read/write, push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı
+  yapılmadı; halt veya blocked yok.
+- **State gerçeği:** `MON-STATE.json` `status=in_progress`, `blockedPrompt=null`,
+  `lastCompletedPrompt=MON-33`, `nextPrompt=MON-34`, Dalga 7 **1/7**,
+  toplam **33/60**. Kullanıcı yönü olmadan MON-34'e geçilmez.
 
 ## MON-32 kapanışı — Dalga 6 terapi ve bakım çapraz kanıtı
 

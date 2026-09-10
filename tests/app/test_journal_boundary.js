@@ -148,7 +148,7 @@ const indexOrder = ['app/core/motivation.js', 'app/core/crisis.js', 'app/core/jo
 const positions = indexOrder.map((file) => indexSource.indexOf('src="' + file));
 ok('index cache-bust ve motivation→crisis→journal→health→mediaFx sırası korunur',
   positions.every((position) => position >= 0) && positions.every((position, i) => i === 0 || positions[i - 1] < position) &&
-  indexSource.includes('app/core/journal.js?v=20260909a') && indexSource.includes('app/core/health.js?v=20260909a'));
+  indexSource.includes('app/core/journal.js?v=20260909a') && indexSource.includes('app/core/health.js?v=20260910a'));
 ok('driver/zikr/state-rebind FILES zincirinde journal ve health vardır',
   driverSource.includes("'app/core/journal.js'") && zikrSource.includes("'app/core/journal.js'") &&
   rebindSource.includes("'app/core/journal.js'") && driverSource.includes("'app/core/health.js'") &&

@@ -1,4 +1,4 @@
-// MON-29 · SeymaHealth saf hesaplama registry'si ve app.js shim sınırı.
+// MON-30 · SeymaHealth hesaplama + sağlık görünüm registry'si ve app.js shim sınırı.
 // Sentetik VM kullanır; DOM, storage, timer, network ve gerçek kullanıcı verisi yoktur.
 
 'use strict';
@@ -108,6 +108,20 @@ const deps = {
 };
 ok('dependency bag registers once', health && health.registerHealth(deps) === true);
 ok('duplicate registration is rejected', health && health.registerHealth(deps) === false);
+const healthViewMembers = [
+  'ringSeg', 'macroBarHTML', 'nutriInsightHTML', 'beslenmeCardHTML',
+  'targetsCardHTML', 'waterCard', 'magnesiumFeedbackHTML',
+  'magnesiumBannerHTML', 'magnesiumCardHTML', 'magnesiumHeadline',
+  'activityRings', 'sparkCard', 'medFreeBadge', 'gaugeBadge',
+  'caffeineCurveSVG', 'caffeineBlock', 'sleepPrepCard', 'lastWeight',
+  'weightRefMs', 'weightWeekReady', 'nextWeightInDays', 'bodyCard',
+  'labCard', 'discomfortCard', 'moodScore', 'moodColorScore', 'mentalStats',
+  'mentalBalanceCard', 'healthSleepCard', 'healthWalkCard', 'healthAppleCard',
+  'saglikHTML', 'fmtTR', 'cycleWheel', 'cycleHTML',
+];
+ok('health görünüm registry üyeleri ve erişim listesi korunur',
+  health && JSON.stringify(health.HEALTH_VIEW_MEMBERS) === JSON.stringify(healthViewMembers) &&
+  healthViewMembers.every((name) => typeof health[name] === 'function'));
 
 const caffeine = { caffeine: { drinks: [
   { type: 'filter', qty: 1, time: '09:00' },
@@ -170,6 +184,13 @@ ok('app.js exposes health registry shims', [
   'function sleepReadiness(){ return SEYMA_HEALTH.sleepReadiness.apply(null,arguments); }',
   'function calculateMgNudge(){ return SEYMA_HEALTH.calculateMgNudge.apply(null,arguments); }',
   'function bmiFor(){ return SEYMA_HEALTH.bmiFor.apply(null,arguments); }',
+].every((line) => appSource.includes(line)));
+ok('app.js exposes health view shims', [
+  'function waterCard(){ return SEYMA_HEALTH.waterCard.apply(null,arguments); }',
+  'function caffeineBlock(){ return SEYMA_HEALTH.caffeineBlock.apply(null,arguments); }',
+  'function bodyCard(){ return SEYMA_HEALTH.bodyCard.apply(null,arguments); }',
+  'function saglikHTML(){ return SEYMA_HEALTH.saglikHTML.apply(null,arguments); }',
+  'function cycleHTML(){ return SEYMA_HEALTH.cycleHTML.apply(null,arguments); }',
 ].every((line) => appSource.includes(line)));
 
 console.log(`\n${passed}/${passed + failed} geçti.`);

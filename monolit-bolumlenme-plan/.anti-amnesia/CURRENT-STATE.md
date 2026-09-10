@@ -9,12 +9,35 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 6 devam ediyor (MON-29 tamamlandı) |
+| Durum | `in_progress` — Dalga 6 devam ediyor (MON-30 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-29` / `MON-30` |
-| Dalga / ilerleme | 6 devam ediyor (4/7) / 29/60 |
+| Son / sıradaki | `MON-30` / `MON-31` |
+| Dalga / ilerleme | 6 devam ediyor (5/7) / 30/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
-| Güncellendi | 2026-09-09 |
+| Güncellendi | 2026-09-10 |
+
+## MON-30 kapanışı — health kart ve sekme görünüm registry
+
+- Karar/kanıt: MON-30-SAGLIK-DUMP-MANIFESTI.md.
+- app/core/health.js SeymaHealth registry'si MON-29 hesaplama sahipliğini
+  koruyarak 35 sağlık görünüm üyesini de taşır: su, uyku, beslenme, kafein,
+  magnezyum, beden, rahatsızlık, ruhsal denge, yürüyüş, Apple Sağlık ve döngü
+  kartları ile saglikHTML dispatch'i. app.js imza-koruyan shimleri, app-owned
+  mutation/save/DOM/focus/render ve App.* handler yüzeyini korur.
+- saglik dump 65.622/65.622 byte; bilinen rastgele magnezyum skor alanı
+  normalize edilince BEFORE/AFTER parity PASS. Kart sırası, copy, inline
+  App handlerları, theme tokenları ve FX hookları değişmedi: sırasıyla
+  10 kart, 60 handler, 297 token, 10 hook; App assignment 721/721.
+- Health module load-safe taraması PASS. test_health_boundary 30/30,
+  test_today_card_preferences 11/11, premium settings 39/39; syntax,
+  driver --dump saglik, zikr 95/95, state B1/B2/B3/rebind, tam app/panel/
+  Panel-v2/Quran/reminder aileleri ve git diff --check PASS. Health zaten
+  dört FILES zincirinde bulunduğundan yeni FILES üyesi yok; index cache-bust
+  health.js?v=20260910a, app v=20260910a oldu.
+- styles.css, settings schema, report/render çekirdeği, sync.js/Guard, data,
+  panel, content ve migration değişmedi. Browser/device, remote,
+  push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok; halt veya
+  blocked yok. Sıradaki MON-31 ayrıca yeni açık kullanıcı yönü gerektirir.
 
 ## MON-29 kapanışı — health hesaplama registry
 

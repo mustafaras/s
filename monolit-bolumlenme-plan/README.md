@@ -1,10 +1,10 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-09 · **Durum:** `in_progress` · **Uygulanan prompt:** 28/60 (`MON-28`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-10 · **Durum:** `in_progress` · **Uygulanan prompt:** 32/60 (`MON-32`)
 
 Bu klasör, Şeyma'nın `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
-bir **kademeli kod uygulama paketidir**: Dalga 1–5 (`MON-01..MON-25`)
+bir **kademeli kod uygulama paketidir**: Dalga 1–6 (`MON-01..MON-32`)
 tamamlandı; `migrate`, `getDay` ve `createDefaultData` state registry'sine
 taşındı, canlı rebind sahipliği app.js'te bırakıldı. `MON-16` syncGlue callback
 sahipliğini app.js'te kilitledi, `MON-17` save gövdesini syncGlue registry'sine
@@ -14,14 +14,16 @@ motor+görünüm, `MON-22` quran, `MON-23` saygı; `MON-24` çapraz regression
 raporuyla, `MON-25` Dalga 5 kabul denetimiyle kapandı (canlı ölçümde I1–I6/M1–M4
 farkı yok; tek onarım: `driver.mjs` FILES listesine SKY serisinin atladığı
 `skyFx.js` eklendi). `MON-26` motivation gövdelerini `app/core/motivation.js` SeymaMotivation
-registry'sine aldı (23 shim + App-owned mutation kabuğu; birleşik kaynakta
-onclick 391/App 718 birebir). `MON-27` crisis güvenlik metni, modal HTML'i ve
-craving görünüm yardımcılarını `app/core/crisis.js` SeymaCrisis registry'sine
-aldı; SOS/tile/modal çıktısı parent/current ile birebir, App-owned mutation ve
-focus sınırı korundu. `MON-28` journal text/count/streak/savedAt yardımcıları ile
-Günlük Işığı kartı ve modalını `app/core/journal.js` SeymaJournal registry'sine
-aldı; save sırası, modal focus ve `bugun` kartı parent/current ile birebir
-korundu. Dalga 6 devam ediyor (`MON-29` health sırada).
+registry'sine aldı; App-owned mutation, focus ve save kabuğu korundu. `MON-27`
+crisis güvenlik metni, modal HTML'i ve craving görünüm yardımcılarını
+`app/core/crisis.js` SeymaCrisis registry'sine aldı; SOS/tile/modal çıktısı ve
+focus sınırı korundu. `MON-28` journal text/count/streak/savedAt yardımcıları
+ile Günlük Işığı kartı ve modalını `app/core/journal.js` SeymaJournal registry'sine
+aldı; save sırası ve modal focus korundu. `MON-29/30` health hesaplama ve kart
+görünüm registry'sini, `MON-31` malformed health state guard'larını tamamladı.
+`MON-32` dört registry'nin dependency, UI/modal, save/migration ve dump
+kanıtlarını birleştirerek Dalga 6'yı kapattı. Sıradaki kart `MON-33` ve yeni
+açık kullanıcı yönü gerektiriyor.
 
 ## Sınır ve otorite
 

@@ -9,12 +9,33 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-31 tamamlandı |
+| Durum | `in_progress` — Dalga 6 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-31` / `MON-32` |
-| Dalga / ilerleme | 6 devam ediyor (6/7) / 31/60 |
+| Son / sıradaki | `MON-32` / `MON-33` |
+| Dalga / ilerleme | 6 kapandı (7/7) / 32/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-10 |
+
+## MON-32 kapanışı — Dalga 6 terapi ve bakım çapraz kanıtı
+
+- Karar/kanıt: [`MON-D6-TERAPI-BAKIM-RAPORU.md`](../deliverables/MON-D6-TERAPI-BAKIM-RAPORU.md).
+- `SeymaMotivation` (13), `SeymaCrisis` (9), `SeymaJournal` (10) ve
+  `SeymaHealth` (8 çekirdek + 36 görünüm) dependency read contract'ları canlı
+  modül sabitleri ve app.js registration bag'leriyle eşleştirildi. Registry'ler
+  load-safe/lazy kaldı; App-owned data rebind, mutation, save, DOM, render ve
+  modal focus sahipliği değişmedi.
+- Motivation accessibility **12/12**, ortak modal focus **41/41**, save
+  boundary **19/19**, migration **67/67**, health **30/30**, Faz10 sync
+  **69/69**, driver, zikr **95/95**, premium ve tam app/panel/Panel-v2/Quran/
+  reminder regression exit 0. Dump manifestleri ve S1–S8/I1–I6/M1–M4 sınırları
+  rapora bağlandı.
+- Bu kartta yeni modül, UX, data alanı veya cache-bust/FILES üyesi yoktur.
+  Önceki module cache-bust'leri ve dört mevcut load-order listesi korunmuştur;
+  `state.js?v=20260910b` MON-31 kanıtı olarak aynıdır.
+- **State gerçeği:** `MON-STATE.json` `status=in_progress`, `blockedPrompt=null`,
+  `lastCompletedPrompt=MON-32`, `nextPrompt=MON-33`, Dalga 6 `7/7`.
+  Browser/device, deploy, remote, push, merge, tag ve `mustafaras/seyma-data`
+  yazımı yapılmadı; ayrı device kabulü açık risk olarak raporda yazılıdır.
 
 ## MON-31 kapanışı — health migration güvenlik denetimi
 

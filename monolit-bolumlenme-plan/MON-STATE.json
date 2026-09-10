@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-31",
-  "nextPrompt": "MON-32",
-  "currentWave": "6",
+  "lastCompletedPrompt": "MON-32",
+  "nextPrompt": "MON-33",
+  "currentWave": "7",
   "totalPrompts": 60,
-  "completedPrompts": 31,
+  "completedPrompts": 32,
   "updatedAt": "2026-09-10",
-  "nextSafeAction": "MON-31 tamamlandı: getDay() malformed sleep, sleep.windDown ve sleep.windDown.steps object/array guard'larıyla güvenli hale getirildi; verify-state-migration 67/67, Faz10 sync 69/69, panel p3 35/35, driver ve zikr 95/95 PASS; tam app/panel/Panel-v2/Quran/reminder regression exit 0. migrate(), panel, sync, schema ve gerçek veri değişmedi. Sıradaki MON-32 için yeni açık kullanıcı yönü gerekir.",
+  "nextSafeAction": "MON-32 tamamlandı: dört registry dependency read contract'ı, UI/modal focus, save/migration ve dump manifestleri Dalga 6 çapraz raporunda birleştirildi; motivation accessibility 12/12, modal focus 41/41, save 19/19, migration 67/67, health 30/30, Faz10 sync 69/69, driver, zikr 95/95, premium ve tam regression PASS. Yeni modül, UX, data alanı veya cache-bust/FILES üyesi eklenmedi; ayrı device kabulü açık risk. Sıradaki MON-33 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -164,7 +164,7 @@
       "prompts": "MON-07..MON-10",
       "topic": "saf cekirdek",
       "approvalRequired": true,
-      "completed": 5,
+      "completed": 7,
       "total": 4
     },
     {
@@ -196,7 +196,7 @@
       "prompts": "MON-26..MON-32",
       "topic": "bakim ve terapi domainleri",
       "approvalRequired": true,
-      "completed": 5,
+      "completed": 7,
       "total": 7
     },
     {

@@ -2,16 +2,16 @@
   "schemaVersion": 1,
   "planningRevision": "2.1",
   "programId": "MONOLIT-BOLUMLENME",
-  "status": "blocked",
+  "status": "in_progress",
   "activePrompt": null,
-  "blockedPrompt": "MON-31",
-  "lastCompletedPrompt": "MON-30",
-  "nextPrompt": "MON-31",
+  "blockedPrompt": null,
+  "lastCompletedPrompt": "MON-31",
+  "nextPrompt": "MON-32",
   "currentWave": "6",
   "totalPrompts": 60,
-  "completedPrompts": 30,
+  "completedPrompts": 31,
   "updatedAt": "2026-09-10",
-  "nextSafeAction": "MON-31 BLOKE: genişletilmiş health absent/malformed/normal Node VM denetiminde getDay() primitive sleep, sleep.windDown ve sleep.windDown.steps değerlerinde TypeError verdi. verify-state-migration 60/60, Faz10 sync 69/69, panel p3 35/35 ve driver PASS; ancak kart kabulü için malformed sleep kararı çözülmeden başarı state'i veya MON-32 geçişi yok. Üretim kodu, migrate(), panel ve FILES/cache-bust değiştirilmedi; kullanıcı yönü bekleniyor.",
+  "nextSafeAction": "MON-31 tamamlandı: getDay() malformed sleep, sleep.windDown ve sleep.windDown.steps object/array guard'larıyla güvenli hale getirildi; verify-state-migration 67/67, Faz10 sync 69/69, panel p3 35/35, driver ve zikr 95/95 PASS; tam app/panel/Panel-v2/Quran/reminder regression exit 0. migrate(), panel, sync, schema ve gerçek veri değişmedi. Sıradaki MON-32 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -164,7 +164,7 @@
       "prompts": "MON-07..MON-10",
       "topic": "saf cekirdek",
       "approvalRequired": true,
-      "completed": 4,
+      "completed": 5,
       "total": 4
     },
     {
@@ -196,7 +196,7 @@
       "prompts": "MON-26..MON-32",
       "topic": "bakim ve terapi domainleri",
       "approvalRequired": true,
-      "completed": 4,
+      "completed": 5,
       "total": 7
     },
     {

@@ -421,6 +421,28 @@ console.log('\n== B2-4 bozuk tipler / fail-safe ==');
   ok('malformed top-level sentinel korunuyor', d && d.malformedFuture.keep === true);
 }
 
+console.log('\n== B2-4b health sleep malformed roots / getDay fail-safe ==');
+[
+  ['primitive sleep', { sleep: 'bad' }],
+  ['primitive windDown', { sleep: { windDown: 'bad' } }],
+  ['primitive windDown steps', { sleep: { windDown: { steps: 'bad' } } }],
+].forEach(([label, dayPatch]) => {
+  let pair = null;
+  let error = null;
+  try { pair = getDayPair({ days: { [Y]: dayPatch } }, Y, 17); }
+  catch (err) { error = err; }
+  const registryDay = pair && pair.registryResult;
+  const shimDay = pair && pair.shimResult;
+  const safeSleep = (day) => !!day && day.sleep && typeof day.sleep === 'object' &&
+    !Array.isArray(day.sleep) && day.sleep.med && typeof day.sleep.med === 'object' &&
+    day.sleep.windDown && typeof day.sleep.windDown === 'object' &&
+    !Array.isArray(day.sleep.windDown) && day.sleep.windDown.steps &&
+    typeof day.sleep.windDown.steps === 'object' && !Array.isArray(day.sleep.windDown.steps) &&
+    ['light', 'breath', 'dump', 'cool'].every((key) => key in day.sleep.windDown.steps);
+  ok(`${label} getDay çökmüyor`, !error && !!pair, error && error.message);
+  ok(`${label} registry/shim güvenli sleep şekli ve parity`, safeSleep(registryDay) && safeSleep(shimDay) && same(registryDay, shimDay));
+});
+
 console.log('\n== B2-5 legacy/normal/future kök before-after parity ==');
 {
   const legacy = migrationPair(baseSeed({ version: 1, legacyRootField: { keep: 'legacy' } }));
@@ -474,7 +496,7 @@ console.log('\n== B2-7 MON-13 getDay yeni/var gün parity ==');
         mood: 'calm', note: 'DAY_NOTE_SENTINEL', customDayField: nested,
         habits: { water: true, customHabit: 'keep-me' },
         caffeine: { cups: 2, last: '11:20' },
-        sleep: { med: { type: 'none' }, windDown: { steps: { light: true } } },
+        sleep: { hours: 8, quality: 'good', med: { type: 'none' }, windDown: { steps: { light: true } }, futureSleepField: { keep: true } },
         journal: { text: 'keep journal', wordCount: 'bad' },
       },
     },
@@ -488,6 +510,8 @@ console.log('\n== B2-7 MON-13 getDay yeni/var gün parity ==');
   ok('var gün bilinmeyen alan ve kayıt korunuyor', existing.registryResult.mood === 'calm' &&
     existing.registryResult.note === 'DAY_NOTE_SENTINEL' &&
     existing.registryResult.habits.customHabit === 'keep-me');
+  ok('var gün normal sleep alanları ve bilinmeyen nested alan korunuyor', existing.registryResult.sleep.hours === 8 &&
+    existing.registryResult.sleep.quality === 'good' && existing.registryResult.sleep.futureSleepField.keep === true);
   ok('var gün nested defaults normalize ediliyor', existing.registryResult.caffeine.drinks.length === 2 &&
     existing.registryResult.caffeine.cups === 2 && existing.registryResult.journal.wordCount === 0 &&
     existing.registryResult.therapy && existing.registryResult.prayer);

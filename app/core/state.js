@@ -424,11 +424,11 @@
       if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false;
       if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false;
       if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote='';
-      if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()};
-      if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''};
+      if(!r.sleep||typeof r.sleep!=='object'||Array.isArray(r.sleep)) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()};
+      if(!r.sleep.med||typeof r.sleep.med!=='object'||Array.isArray(r.sleep.med)) r.sleep.med={type:null,note:''};
       if(typeof r.sleep.med.note!=='string') r.sleep.med.note='';
-      if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown();
-      if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps;
+      if(!r.sleep.windDown||typeof r.sleep.windDown!=='object'||Array.isArray(r.sleep.windDown)) r.sleep.windDown=emptyWindDown();
+      if(!r.sleep.windDown.steps||typeof r.sleep.windDown.steps!=='object'||Array.isArray(r.sleep.windDown.steps)) r.sleep.windDown.steps=emptyWindDown().steps;
       WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; });
       if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote='';
       if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[];

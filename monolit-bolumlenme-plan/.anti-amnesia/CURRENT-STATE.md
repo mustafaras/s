@@ -9,31 +9,32 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `blocked` — MON-31 health migration denetimi bloke |
-| Aktif / bloke | yok / `MON-31` |
-| Son / sıradaki | `MON-30` / `MON-31` |
-| Dalga / ilerleme | 6 devam ediyor (5/7) / 30/60 |
+| Durum | `in_progress` — MON-31 tamamlandı |
+| Aktif / bloke | yok / yok |
+| Son / sıradaki | `MON-31` / `MON-32` |
+| Dalga / ilerleme | 6 devam ediyor (6/7) / 31/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-10 |
 
-## MON-31 denetimi — health migration blocker
+## MON-31 kapanışı — health migration güvenlik denetimi
 
 - Karar/kanıt: [`MON-D6-HEALTH-RAPORU.md`](../deliverables/MON-D6-HEALTH-RAPORU.md).
 - Genişletilmiş sentetik Node/VM matrix'i nutrition/mealItems, water, caffeine,
   movement/health, magnesium, discomfort/symptoms, body/labResults ve cycle
-  için absent/malformed/normal no-break veya eşdeğerlik verdi. Uyku absent ve
-  normal yolları geçti; primitive `sleep`, `sleep.windDown` ve
-  `sleep.windDown.steps` malformed yolları gerçek `app/core/state.js` içindeki
-  `getDay()` gövdesinde TypeError verdi (`:427-432`).
-- Canonical `verify-state-migration` **60/60**, Faz10 sync **69/69**, panel P3
-  root-modules **35/35** ve driver **PASS**. Canonical malformed fixture primitive
-  sleep nested path'ini kapsamadığından bu ek health kanıtı kabulü bloke eder.
+  için absent/malformed/normal no-break veya eşdeğerlik verdi. İlk koşuda
+  bulunan primitive `sleep`, `sleep.windDown` ve `sleep.windDown.steps` TypeError
+  yolları `getDay()` içindeki dar object/array guard'larıyla kapatıldı.
+- Canonical `verify-state-migration` **67/67**, Faz10 sync **69/69**, panel P3
+  root-modules **35/35**, driver **PASS** ve zikr **95/95**. Registry/shim
+  sleep şekli parity, normal `hours/quality` ve bilinmeyen nested alan korunumu
+  da PASS'tir.
 - `migrate()` davranışı, `app/core/health.js`, `app.js`, `sync.js`, `panel/*`,
-  CSS, settings schema, cache-bust ve FILES listeleri değiştirilmedi. Bu kartın
-  çalışma sayfası `İzinli değişim: kod yok` olduğu için otomatik onarım yapılmadı.
-- **State gerçeği:** `MON-STATE.json` `status=blocked`, `blockedPrompt=MON-31`.
-  Full regression, başarı commit'i ve MON-32 geçişi yapılmadı; kullanıcı yönü
-  olmadan sonraki karta geçilmez.
+  CSS ve settings schema değiştirilmedi. `app/core/state.js` zaten dört FILES
+  zincirinde bulunduğu için yeni üye eklenmedi; yalnız state cache-bust
+  `v=20260910b` yapıldı.
+- **State gerçeği:** `MON-STATE.json` `status=in_progress`, `blockedPrompt=null`,
+  `lastCompletedPrompt=MON-31`, `nextPrompt=MON-32`. Tam regression exit 0;
+  MON-32 başlatılmadı.
 
 ## MON-30 kapanışı — health kart ve sekme görünüm registry
 

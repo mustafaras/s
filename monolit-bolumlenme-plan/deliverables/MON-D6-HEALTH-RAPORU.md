@@ -3,16 +3,18 @@
 Tarih: 2026-09-10
 Dal: `premium-fx-gorsel-yuzey`
 Öncül: MON-30 (`9a9fbda`)
-Durum: **BLOKE — MON-31**
-Kapsam: yalnız sentetik Node/VM kanıtı; üretim kodu, panel source'u ve gerçek veri değişmedi.
+Durum: **TAMAMLANDI — LOCAL-ONLY**
+Kapsam: yalnız sentetik Node/VM kanıtı; gerçek kullanıcı verisi, panel source'u,
+sync ve remote yüzey değişmedi.
 
 ## Karar
 
-MON-31 kapanmadı. Canonical migration fixture'ı normal/legacy/future kökler
-için PASS verse de, kartın zorunlu genişletilmiş malformed health path denetimi
-gerçek `SeymaState.getDay()` gövdesinde üç uyku alt yolunda TypeError üretiyor.
-Halt protokolü gereği `migrate()` veya `getDay()` düzeltilmedi, panel source'una
-dokunulmadı ve sonraki MON kartına geçilmedi.
+MON-31 kapanmıştır. İlk denetimde bulunan üç malformed sleep TypeError yolu,
+yalnız `app/core/state.js` içindeki `getDay()` normalizasyonunda kök/alt kök
+object ve array guard'ları güçlendirilerek kapatıldı. `migrate()` davranışı,
+panel source'u, veri şeması ve sync davranışı değiştirilmedi. Aynı üç fixture
+varyantı canonical B2 migration kanıtına eklendi; registry/shim parity ve
+normal alan korunumu PASS'tir.
 
 ## Health alt alanı matrisi
 
@@ -27,9 +29,9 @@ gösterir.
 | Beslenme / `mealItems` | PASS | PASS | PASS | Eksik veya dizi olmayan öğün listeleri boş listeye iner. |
 | Su / `water` | PASS | PASS | PASS | Sayısal olmayan değer `0` olur. |
 | Kafein / `caffeine` | PASS | PASS | PASS | Bozuk kök fallback alır; geçerli `drinks` ve `cups` korunur. |
-| Uyku / `sleep` | PASS | **FAIL** | PASS | `sleep: 'bad'` için `r.sleep.med` erişimi TypeError. |
-| Uyku geçişi / `sleep.windDown` | PASS | **FAIL** | PASS | `windDown: 'bad'` için `r.sleep.windDown.steps` yazımı TypeError. |
-| Uyku geçiş adımları / `sleep.windDown.steps` | PASS | **FAIL** | PASS | `steps: 'bad'` için `in` operatörü TypeError. |
+| Uyku / `sleep` | PASS | PASS | PASS | Primitive kök güvenli sleep şekline alınır; normal alanlar korunur. |
+| Uyku geçişi / `sleep.windDown` | PASS | PASS | PASS | Primitive alt kök `emptyWindDown()` ile güvenle tamamlanır. |
+| Uyku geçiş adımları / `sleep.windDown.steps` | PASS | PASS | PASS | Primitive/array adımlar güvenli step map'ine alınır. |
 | Hareket / `movement` | PASS | PASS | PASS | Bozuk kök ve sayısal alt alanlar güvenli fallback alır. |
 | Apple Health / `health` | PASS | PASS | PASS | Bozuk kök `emptyHealth()` şekline iner; normal değer korunur. |
 | Magnezyum / `magnesium` | PASS | PASS | PASS | Kök ve alan tipleri default/allowlist ile normalize edilir. |
@@ -38,63 +40,67 @@ gösterir.
 | Tahlil / `labResults` | PASS | PASS | PASS | Kök dizi ve `{id, files}` kayıt allowlist'i korunur. |
 | Döngü / `cycle` | PASS | PASS | PASS | `periods`, `avgCycle`, `avgPeriod` fallback'leri korunur. |
 
-## Bulgunun kaynak kanıtı
+## Uygulanan dar onarım
 
-`app/core/state.js:427-432` yalnızca falsy `r.sleep` kökünü yeniden kuruyor;
-truthy fakat primitive `sleep`/`windDown`/`steps` değerlerini nesneye çevirmeden
-nested alan yazıyor. Gerçek gözlenen hatalar:
+`app/core/state.js` içindeki `getDay()` şu üç yolu artık açıkça doğrular:
 
-```text
-sleep: 'bad'                    → TypeError: Cannot create property 'med' on string 'bad'
-sleep: {windDown: 'bad'}        → TypeError: Cannot create property 'steps' on string 'bad'
-sleep: {windDown: {steps:'bad'}}→ TypeError: Cannot use 'in' operator to search for 'light' in bad
-```
+- `sleep` kökü object değilse veya array ise güvenli sleep default'u,
+- `sleep.windDown` kökü object değilse veya array ise `emptyWindDown()`,
+- `sleep.windDown.steps` object değilse veya array ise güvenli step map'i.
 
-Bu sonuç migration davranışının değiştirilmesini veya yeni şema alanı
-eklenmesini gerektiren bir güvenlik kararıdır; MON-31 çalışma sayfasındaki
-`İzinli değişim: kod yok` sınırı içinde otomatik onarım yapılmadı.
+Geçerli `hours`, `quality`, `med`, mevcut step değerleri ve bilinmeyen nested
+alanlar korunur; yalnız malformed shape yeniden kurulur. `WIND_DOWN_STEPS`
+allowlist'i ve app.js shim sözleşmesi aynı kalır.
 
 ## Sahiplik ve sync/panel sınırı
 
 | Yüzey | Canlı sahip | Sonuç |
 |---|---|---|
 | Health hesap/görünüm registry | `app/core/health.js` / `SeymaHealth` | MON-29/30 sahipliği korunuyor; bu kartta değişmedi. |
-| Migration/getDay | `app/core/state.js`, app.js shim | Health path bulgusu burada; state mutation davranışına dokunulmadı. |
+| Migration/getDay | `app/core/state.js`, app.js shim | Yalnız `getDay()` malformed shape guard'ı güçlendirildi; `migrate()` değişmedi. |
 | Sync | `sync.js` / `SeySync` | Faz10 sync **69/69**, fetch/write yok; sync source değişmedi. |
 | Panel read-only projection | `panel/panelCoverageManifest.js` + `panel/panel.js` | P3 root-modules **35/35**; missing/malformed root alanlarında kart kırılmadı; panel source değişmedi. |
 
 Panel kanıtı health kartı üretimini yeniden yazmaz; field yokluğunda root
 projection'ın `missing`/`malformed` durumlarına düşmesini ve render'ın devam
-etmesini doğrular. Bu nedenle panel PASS, `getDay()` malformed sleep bulgusunu
-örtmez.
+etmesini doğrular. `getDay()` sleep yolları ayrıca canonical B2 fixture'ında
+doğrudan registry/shim ile sınanmıştır.
 
 ## Gate makbuzları
 
 | Komut | Sonuç |
 |---|---:|
-| `node .claude/skills/run-seyma/verify-state-migration-boundary.mjs` | **PASS — 60/60** |
+| `node --check app.js sync.js app/core/state.js app/core/health.js` | **PASS** |
+| `node .claude/skills/run-seyma/verify-state-migration-boundary.mjs` | **PASS — 67/67** |
 | `node tests/app/test_faz10_sync.js` | **PASS — 69/69** |
 | `node tests/panel/test_panel_p3_root_modules.js` | **PASS — 35/35** |
 | `node .claude/skills/run-seyma/driver.mjs` | **PASS** |
-| MON-31 genişletilmiş health absent/malformed/normal probe | **BLOCKED — malformed sleep path** |
+| `node .claude/skills/run-seyma/zikr-harness.mjs` | **PASS — 95/95** |
+| state helper/adaptor, rebind, modularization boundaries | **PASS** |
+| tam `tests/app` ailesi | **PASS — exit 0** |
+| tam `tests/panel` + legacy Faz11 ailesi | **PASS — exit 0** |
+| Panel-v2, Quran ve reminder smoke aileleri | **PASS — exit 0** |
+| `git diff --check` | **PASS** |
 
-Canonical B2 fixture'ının malformed örneği `reading` gibi alanları kapsıyor;
-MON-31 health matrix'inin primitive `sleep` nested path'leri ayrı olarak
-kanıtlandı. Bu ayrım nedeniyle canonical 60/60 sonucu MON-31 kabulünü tek
-başına sağlamaz.
+Canonical B2 fixture'ına üç malformed sleep kökü için doğrudan `getDay()`
+çökmeme + registry/shim güvenli şekil/parity kanıtları ve bir normal sleep
+koruma assertion'ı eklendi. Sonuç 67/67 PASS'tir.
 
 ## Değişmezlik / sınırlar
 
-- `migrate()` davranışı değiştirilmedi.
-- `app/core/health.js`, `app.js`, `sync.js`, `panel/*`, CSS, settings schema,
-  cache-bust ve dört FILES listesi değiştirilmedi.
+- `migrate()` davranışı değiştirilmedi; yeni şema alanı eklenmedi.
+- `app/core/health.js`, `app.js`, `sync.js`, `panel/*`, CSS ve settings schema
+  değiştirilmedi.
+- `app/core/state.js` zaten dört FILES/load-order zincirinde bulunduğu için
+  yeni FILES üyesi eklenmedi; yalnız `index.html` state cache-bust'i
+  `state.js?v=20260910b` oldu.
 - `SeymaHealth` state sahibi yapılmadı; `data`, `ui`, `dark`, `getDay` ve
   mutation/rebind sahipliği app.js/state sözleşmesinde kaldı.
 - Gerçek kullanıcı verisi, token, browser, network, remote, push, merge, tag
   ve deploy kullanılmadı.
-- Full regression ve kapanış commit'i fail-closed olarak çalıştırılmadı;
-  önce malformed sleep blocker'ı çözülmelidir.
+- Kanıt seviyesi source + sentetik headless regression'dır; browser/device ve
+  deployment kabulü yapılmamıştır.
 
-**Sonuç:** MON-31 `blockedPrompt` olarak kaydedilmelidir. Kullanıcı yönü
-olmadan `getDay()` için onarım, migration davranışı değişikliği veya MON-32'ye
-geçiş yapılmaz.
+**Sonuç:** MON-31 başarıyla kapatıldı. State `in_progress`, `blockedPrompt`
+yok, sıradaki plan kartı MON-32'dir; MON-32 bu kullanıcı yönünün kapsamı
+değildir ve başlatılmamıştır.

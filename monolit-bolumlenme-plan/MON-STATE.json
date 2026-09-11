@@ -5,14 +5,14 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-42",
-  "nextPrompt": "MON-43",
-  "currentWave": "8",
+  "lastCompletedPrompt": "MON-43",
+  "nextPrompt": "MON-44",
+  "currentWave": "9",
   "totalPrompts": 60,
-  "completedPrompts": 42,
+  "completedPrompts": 43,
   "updatedAt": "2026-09-11",
-  "nextSafeAction": "MON-42 tamamlandı: MON-42-MESSAGING-CHRONOLOGY-MANIFESTI.md içinde SeymaMessaging frozen read-only registry, Luna/ÆON bubble ve chronology gövdeleri, stable expand identity, answer notification dedupe, scroll/attachment boundary, app-owned handler/mutation sınırı ve dump parity kaydedildi. app/core/messaging.js cache-bust v=20260911a ile index, driver, zikr-harness, state-rebind ve ilgili fixture FILES zincirlerine messaging → app.js sırasıyla eklendi. Messaging 21 public member, 18 named dependency ve 282 satır/30108 byte; App function/all/unique 556/721/718, onclick 391, canonical data 9/11, FX 78/63/58/6 delta 0. `test_aeon_message_expand` 24/24, messaging boundary, driver --dump mesaj 17138 UTF-8 byte SHA 15df13b7138af356d7c5a4d9c80e0b5719eeb0e7d8b7d002bf1998c1b09394da, modal focus, syntax, state-rebind 37/37, Faz10 69/69, zikr 95/95, reminder smoke/acceptance/privacy, panel P3/P4, Quran, Premium ve tam app/panel/Panel-v2 regression PASS. sync.js, profile content, frozen reminder×4, panel, schema, production data ve releaseApproval not_approved değişmedi; privacy/consent, conversation/attachment flow, eager side effect, orphan/çift sahiplik bulunmadı. State gerçeği in_progress, blockedPrompt=null, Dalga 8 3/4, toplam 42/60. Browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-43 için yeni açık kullanıcı yönü gerekir.",
-  "codeTouched": true,
+  "nextSafeAction": "MON-43 Dalga 8 kapanışı tamamlandı: MON-D8-REMINDER-MESAJ-RAPORU.md Reminder runtime/view (SeymaReminders 26 frozen member) ve Messaging (SeymaMessaging 21 frozen member) sahiplik/privacy/no-network ayrığını doğruladı. reminderCatalog → engine → scheduler → delivery → reminders → messaging → app.js sırası, index/driver/zikr/state-rebind FILES zincirlerinde değişmeden korundu. docs/reminders freeze validator PASS; releaseApproval not_approved ve activePrompt null kaldı. Reminder smoke 21 curated fixture / 3,534 reported assertion, test_aeon_message_expand 24/24, messaging boundary, app privacy 194, integrated privacy 78, Faz10 69/69, modularization 99/99, premium 9/9, driver 95/95 zikr, panel 23/23, Panel-v2 27/27 ve Quran 9/9 PASS. driver --dump reminder 97,421 UTF-8 byte SHA 7ecc3b6903af8497d5d2fa9b822b11c6ef0b7192b69d1dbc74312e4875e9ef66 ve --dump mesaj 17,138 byte SHA 15df13b7138af356d7c5a4d9c80e0b5719eeb0e7d8b7d002bf1998c1b09394da önceki kart kanıtlarıyla birebir. app.js App fn/all/unique 556/721/718, fixture combined onclick 391, canonical data 9/11, FX 78/63/58/6 delta 0. Production/code/content/sync/panel/schema/cache-bust/FILES/fixture diff yok; privacy/eager side effect/orphan/çift sahiplik bulunmadı. Browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Kapsamlı tam doğrulama: tests fixture envanteri 125/125 (app 45, panel 23, Panel-v2 27, Quran 9, reminder 21) ve altı canonical .mjs kapısı koşturuldu. İlk mjs turunda B2 verify-state-migration fail-closed 1 FAIL verdi; sentetik FILES zinciri gerçek index önekine hizalandı ve düzeltme sonrası B2 67/67 PASS oldu. Üretim kodu/cache-bust/FILES değişmedi; yalnız B2 fixture FILES listesi pariteye alındı. Sıradaki MON-44 için yeni açık kullanıcı yönü gerekir.",
+  "codeTouched": false,
   "authority": [
     "AGENTS.md",
     "CLAUDE.md",
@@ -193,6 +193,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-42-MESSAGING-CHRONOLOGY-MANIFESTI.md",
       "decision": "messaging_frozen_read_only_registry_chronology_expand_scroll_attachment_boundary_app_owned_handlers_and_dump_parity"
+    },
+    "MON-43": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-D8-REMINDER-MESAJ-RAPORU.md",
+      "decision": "d8_reminder_messaging_closure_disjoint_gates_no_production_delta_b2_files_parity_fix"
     }
   },
   "waves": [
@@ -257,7 +262,7 @@
       "prompts": "MON-40..MON-43",
       "topic": "reminder ve mesajlasma",
       "approvalRequired": true,
-      "completed": 3,
+      "completed": 4,
       "total": 4
     },
     {

@@ -9,12 +9,40 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 8 sürüyor |
+| Durum | `in_progress` — Dalga 9 bekliyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-42 / MON-43 |
-| Dalga / ilerleme | Dalga 7 kapandı; Dalga 8 sürüyor (3/4) / 42/60 |
+| Son / sıradaki | MON-43 / MON-44 |
+| Dalga / ilerleme | Dalga 8 kapandı; Dalga 9 bekliyor (0/6) / 43/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-11 |
+
+## MON-43 kapanışı — Dalga 8 reminder/messaging kabulü
+
+- Karar/kanıt: [`MON-D8-REMINDER-MESAJ-RAPORU.md`](../deliverables/MON-D8-REMINDER-MESAJ-RAPORU.md).
+- `SeymaReminders` (26 frozen member) ve `SeymaMessaging` (21 frozen member)
+  sahiplik tablosu, approval gate, privacy/no-network kanıtı ve load-order
+  ayrığını birleştirdi. Production/kod, cache-bust, index/üretim FILES ve schema
+  değişikliği yoktur; frozen reminder dörtlüsü ve `sync.js` SHA birebir korundu.
+  Kapsamlı tekrarda yalnız B2 fixture `FILES` paritesi düzeltildi.
+- Reminder smoke **21 curated fixture** / **3,534** reported assertion; Aeon
+  expansion **24/24**; messaging boundary, reminder app privacy **194** ve
+  integrated privacy **78** PASS. Faz10 **69/69**, modularization **99/99**,
+  premium **9/9**, full app **45/45**, panel **23/23**, Panel-v2 **27/27**, reminder **21/21**
+  ve Quran **9/9** exit 0; canonical full inventory **125/125**.
+- Kapsamlı tekrarda B2 `verify-state-migration` sentetik FILES zinciri MON-42
+  önekinden geri kaldığı için fail-closed FAIL yakalandı; yalnız B2 fixture
+  `FILES` listesi gerçek index sırasından üretilen 40 dosyaya hizalandı ve
+  B2 **67/67 PASS** oldu. Üretim kodu/cache-bust değişmedi.
+- Driver `--dump reminder` **97,421 UTF-8 byte** /
+  `7ecc3b6903af8497d5d2fa9b822b11c6ef0b7192b69d1dbc74312e4875e9ef66`;
+  `--dump mesaj` **17,138 UTF-8 byte** /
+  `15df13b7138af356d7c5a4d9c80e0b5719eeb0e7d8b7d002bf1998c1b09394da`; her
+  ikisi önceki kart SHA'larıyla birebir. App fn/all/unique **556/721/718**,
+  fixture combined onclick **391**, canonical data **9/11** ve FX
+  **78/63/58/6** delta 0.
+- `releaseApproval=not_approved`, native permission, browser/device, remote,
+  push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı yok. Sıradaki
+  MON-44 render registry'dir ve yeni açık kullanıcı yönü olmadan başlatılmaz.
 
 ## MON-42 kapanışı — messaging domain modülü
 

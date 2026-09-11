@@ -17,7 +17,18 @@ function read(rel) {
 }
 
 function gitParentApp() {
-  return childProcess.execFileSync('git', ['show', 'HEAD^:app.js'], {
+  // This boundary belongs to MON-37, so HEAD^ is not a stable baseline once
+  // later MON cards land. Resolve the commit that first added the settings
+  // registry and compare against its actual parent instead.
+  const settingsCommit = childProcess.execFileSync('git', [
+    'log', '--format=%H', '--all', '--diff-filter=A', '--', 'app/core/settings.js'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024,
+  }).trim().split(/\r?\n/)[0];
+  assert.ok(settingsCommit, 'settings registry introduction commit exists');
+  return childProcess.execFileSync('git', ['show', settingsCommit+'^:app.js'], {
     cwd: repoRoot,
     encoding: 'utf8',
     maxBuffer: 5 * 1024 * 1024,

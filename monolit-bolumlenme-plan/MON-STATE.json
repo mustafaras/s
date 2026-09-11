@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-39",
-  "nextPrompt": "MON-40",
-  "currentWave": "7",
+  "lastCompletedPrompt": "MON-40",
+  "nextPrompt": "MON-41",
+  "currentWave": "8",
   "totalPrompts": 60,
-  "completedPrompts": 39,
+  "completedPrompts": 40,
   "updatedAt": "2026-09-11",
-  "nextSafeAction": "MON-39 tamamlandı: MON-D7-DOMAIN-ENVANTERI.md içinde 15 domain hedefinin canlı owner/delegate, source/API body sayısı, shim, resolver, fixture, dump ve open-risk yüzeyi kaydedildi. Prayer 25/25, Zikr 59/59, Quran 21/21, Saygı 76/76, Library 64/64, Report 16/16, Map 16/16, Profile 30/30, Settings 2/2; Motivation/Crisis/Journal/Health için doğrudan registry edge/internal helper farkları açıklandı. Reminders frozen dört registry + app runtime, Messaging app.js observer/AEON/Luna sahibi olarak gelecekteki MON-40/42'ye yönlendirildi; registry varmış gibi sayılmadı. App/onclick/FX manifesti HEAD/current delta 0; production kodu, content, sync, panel, schema, cache-bust ve FILES değişmedi. Syntax, driver, zikr 95/95, B1/B2/B3, modularization 99/99, Faz-1.1 27/27, state/rebind/save, domain fixtures, premium, panel/P3/P4, Panel-v2, Quran ve reminder aileleri PASS. Current HEAD app loopunda bilinen Settings HEAD^ fixture locatorı dışında kırmızı yok; MON-37 clean worktree replay Settings 13/13 verdi; seq 53 bulgusu açıkça korundu. State gerçeği in_progress, blockedPrompt=null, Dalga 7 7/7, toplam 39/60. Browser/device, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-40 reminders runtime için yeni açık kullanıcı yönü gerekir.",
+  "nextSafeAction": "MON-40 tamamlandı: MON-40-REMINDER-RUNTIME-ENVANTERI.md içinde SeymaReminders 16 read-only runtime adapter üyesi, frozen catalog/engine/scheduler/delivery sınırı, app-owned permission/delivery/sync/schema/DOM/mutation yüzeyi ve cache-bust/FILES zinciri kaydedildi. app/core/reminders.js production index, driver, zikr-harness ve state-rebind FILES zincirine bağlandı. App/onclick/FX manifesti HEAD/current delta 0 (556/721/718, onclick 153, canonical data 9/11, FX 78/63/58/6); frozen dört modül, profile content, sync, panel ve schema değişmedi. 28 syntax, driver + ayarlar dump, zikr 95/95, reminder acceptance 554 assertions, reminder smoke 20/20, app/current panel 67/67, Panel-v2 27/27, Quran 9/9, Premium 9/9, B1/B2/B3 0/67/20 failure, P3 35/35, P4 28/28, Faz10 69/69 ve freeze release=not_approved PASS. MON-37 settings fixture stale HEAD^ locatorı production'a dokunmadan extraction commit parent çözümüne alındı; 13/13 PASS. State gerçeği in_progress, blockedPrompt=null, Dalga 8 1/4, toplam 40/60. Browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-41 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -178,6 +178,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-D7-ANALIZ-ARSIV-RAPORU.md",
       "decision": "d7_five_registry_graph_load_safe_profile_privacy_map_lazy_settings_fx_manifest_no_production_delta"
+    },
+    "MON-40": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-40-REMINDER-RUNTIME-ENVANTERI.md",
+      "decision": "reminders_read_only_runtime_registry_frozen_four_lazy_adapters_app_owned_permission_delivery_sync_schema_dom_and_fallback_parity"
     }
   },
   "waves": [
@@ -234,7 +239,7 @@
       "prompts": "MON-33..MON-39",
       "topic": "arsiv, analiz ve ayarlar",
       "approvalRequired": true,
-      "completed": 6,
+      "completed": 7,
       "total": 7
     },
     {
@@ -242,7 +247,7 @@
       "prompts": "MON-40..MON-43",
       "topic": "reminder ve mesajlasma",
       "approvalRequired": true,
-      "completed": 0,
+      "completed": 1,
       "total": 4
     },
     {
@@ -279,7 +284,7 @@
     }
   ],
   "verificationGate": [
-    "node --check app.js && node --check sync.js && node --check app/core/profile.js && node --check app/core/settings.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
+    "node --check app.js && node --check sync.js && node --check app/core/profile.js && node --check app/core/settings.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/reminders.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
     "node tests/app/test_profile_boundary.js",
     "node tests/app/test_settings_boundary.js",
     "node .claude/skills/run-seyma/verify-state-helper-boundary.mjs",
@@ -314,6 +319,7 @@
     "for f in tests/quran/test_quran_*.js; do node \"$f\"; done",
     "for f in tests/app/test_premium_*.js; do node \"$f\"; done",
     "node .claude/skills/run-seyma/driver.mjs --dump ayarlar",
+    "node tests/reminders/test_reminder_app_acceptance.js",
     "node tests/reminders/run-reminder-smoke.mjs"
   ],
   "separatelyGated": [

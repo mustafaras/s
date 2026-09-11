@@ -178,6 +178,7 @@ const FILES = [
   'app/core/reminderEngine.js',
   'app/core/reminderScheduler.js',
   'app/core/reminderDelivery.js',
+  'app/core/reminders.js',
   'app.js'
 ];
 

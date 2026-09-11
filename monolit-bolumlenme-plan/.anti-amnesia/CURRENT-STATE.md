@@ -9,12 +9,43 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 7 sürüyor |
+| Durum | `in_progress` — Dalga 8 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-39 / MON-40 |
-| Dalga / ilerleme | 7 kapandı; Dalga 8 sürüyor (0/4) / 39/60 |
+| Son / sıradaki | MON-40 / MON-41 |
+| Dalga / ilerleme | Dalga 7 kapandı; Dalga 8 sürüyor (1/4) / 40/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-11 |
+
+## MON-40 kapanışı — reminders runtime bağlantıları
+
+- Karar/kanıt: [`MON-40-REMINDER-RUNTIME-ENVANTERI.md`](../deliverables/MON-40-REMINDER-RUNTIME-ENVANTERI.md).
+- `app/core/reminders.js` içinde `window.SeymaReminders` load-safe registry'si
+  kuruldu: 16 saf/read-only runtime adapter üyesi (226 satır/17,358 byte).
+  Catalog, engine ve
+  scheduler frozen registryleri lazy read olarak bağlandı; frozen dört modül
+  kopyalanmadı/değiştirilmedi. Permission, native delivery, local journal,
+  sync, migrate/schema, data/ui rebind, DOM/render ve App handler sahipliği
+  app.js'te kaldı.
+- Production sırası `reminderCatalog → reminderEngine → reminderScheduler →
+  reminderDelivery → reminders → app.js`; index cache-bust
+  `app/core/reminders.js?v=20260911a`, driver/zikr/state-rebind FILES aynı
+  sırada. Reminder acceptance policy/catalog/occurrence/scheduler/Center
+  fallback parity ile **554 assertions** verdi.
+- App/onclick/FX manifesti HEAD/current delta **0**: App 556/721/718,
+  onclick 153, canonical data inventory 9/11, FX 78/63/58/6. Frozen dört
+  modül, profile content, sync, panel ve schema diff dışıdır.
+- Kanıt: 28 syntax PASS, driver + ayarlar dump (46,190 byte; SHA
+  `c9b61ca64b4905eac1df833af5e125f7e9898a7a123ab6df21c479af84704eb4`),
+  zikr **95/95**, reminder smoke **20/20**, app/current panel **67/67**,
+  Panel-v2 **27/27**, Quran **9/9**, Premium **9/9**, P3 **35/35**, P4
+  **28/28**, Faz10 **69/69**, B1/B2/B3 **0/67/20** failure, freeze
+  `release=not_approved`.
+- MON-37 settings boundary testinin stale `HEAD^` locatorı production'a
+  dokunmadan extraction commit parent çözümlemesine alındı; Settings
+  boundary **13/13** PASS. Browser/device, native permission, remote,
+  push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı yok. State gerçeği
+  `in_progress`, `blockedPrompt=null`, Dalga 8 **1/4**, toplam **40/60**;
+  sıradaki güvenli kart MON-41 ve yeni kullanıcı yönü gerekir.
 
 ## MON-39 kapanışı — 15 domain registry envanteri
 

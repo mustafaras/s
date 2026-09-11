@@ -28,7 +28,8 @@ const RUNTIME_MODULES = [
   { global: "ReminderCatalogV1", file: "app/core/reminderCatalog.js" },
   { global: "ReminderDeliveryV1", file: "app/core/reminderDelivery.js" },
   { global: "ReminderEngineV1", file: "app/core/reminderEngine.js" },
-  { global: "ReminderSchedulerV1", file: "app/core/reminderScheduler.js" }
+  { global: "ReminderSchedulerV1", file: "app/core/reminderScheduler.js" },
+  { global: "SeymaReminders", file: "app/core/reminders.js" }
 ];
 
 const BASE_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/syncGlue.js", "app/core/helpers.js", "app/core/prayer.js", "app/core/zikir.js", "app/core/quran.js", "app/core/saygi.js", "app/core/motivation.js", "app/core/crisis.js", "app/core/journal.js", "app/core/health.js", "app/core/library.js", "app/core/report.js", "app/core/map.js", "app/core/profile.js", "app/core/settings.js"];
@@ -434,6 +435,27 @@ const cases = [
       JSON.stringify(withModule.App.reminderEngineLocalParts(Date.parse("2026-08-18T12:00:00.000Z"), "Europe/Istanbul")),
       JSON.stringify(withoutModule.App.reminderEngineLocalParts(Date.parse("2026-08-18T12:00:00.000Z"), "Europe/Istanbul"))
     );
+  }],
+  ["policy and catalog adapters preserve the inline fallback semantics", () => {
+    const withModule = boot({ seed: seededState() });
+    const withoutModule = boot({ seed: seededState(), modules: ["app/core/reminderCatalog.js"] });
+    const policies = [
+      { definition: { id: "reminder.catalog.v1.faith", category: "ritual", priority: "P1", defaultChannel: "native" }, preference: { enabled: true, channel: "native" }, context: { localTime: "12:00", permissionState: "granted" } },
+      { definition: { id: "reminder.care.v1.water", category: "care", priority: "P2", defaultChannel: "in_app" }, preference: { enabled: true, channel: "native", nativeOptIn: true }, context: { localTime: "23:00", quietHours: { start: "22:30", end: "07:30" }, permissionState: "granted" } },
+      { definition: { id: "reminder.catalog.v1.support", category: "support", priority: "P3", defaultChannel: "in_app" }, preference: { enabled: false, channel: "in_app" }, context: { localTime: "12:00" } }
+    ];
+    policies.forEach((input) => {
+      assert(deepEqual(withModule.App.reminderPolicyEvaluate(input), withoutModule.App.reminderPolicyEvaluate(input)));
+    });
+    const candidates = {
+      candidates: policies,
+      nativeDailyCap: 3,
+      context: { localTime: "12:00", permissionState: "granted" }
+    };
+    assert(deepEqual(withModule.App.reminderSelectNativeCandidates(candidates), withoutModule.App.reminderSelectNativeCandidates(candidates)));
+    assert(deepEqual(withModule.App.reminderQuietHoursState("23:00", { start: "22:30", end: "07:30" }), withoutModule.App.reminderQuietHoursState("23:00", { start: "22:30", end: "07:30" })));
+    assert(deepEqual(withModule.sandbox.SeymaReminders.reminderDefinitions(), withModule.sandbox.ReminderCatalogV1.list()));
+    assertEqual(reminderCenterHTML(withModule), reminderCenterHTML(withoutModule));
   }],
   ["scheduler module and inline fallback account for the same trigger sequence", () => {
     const sequence = ["boot", "foreground", "foreground", "focus", "online", "timer", "manual", "not-a-trigger"];

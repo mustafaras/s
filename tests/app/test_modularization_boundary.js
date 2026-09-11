@@ -34,6 +34,7 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
     'app/core/library.js',
     'app/core/report.js',
     'app/core/map.js',
+    'app/core/profile.js',
     'app/core/mediaFx.js',
     'app/core/timeTheme.js'
   ];
@@ -139,6 +140,9 @@ var expectedNewModules = [
   ok('MON-35 map modülü taşınmış ve registry hedefinde',
     fs.existsSync(path.join(repoRoot,'app/core/map.js')) &&
     fs.readFileSync(path.join(repoRoot,'app/core/map.js'),'utf8').indexOf('window.SeymaMap') >= 0);
+  ok('MON-36 profile modülü taşınmış ve registry hedefinde',
+    fs.existsSync(path.join(repoRoot,'app/core/profile.js')) &&
+    fs.readFileSync(path.join(repoRoot,'app/core/profile.js'),'utf8').indexOf('window.SeymaProfile') >= 0);
 })();
 
 // [5] app.js App.* yüzeyi korunuyor (inline onclick handler referansları)
@@ -270,6 +274,7 @@ var expectedNewModules = [
   vm.runInContext(load('app/core/library.js'), ctx, { filename:'library.js' });
   vm.runInContext(load('app/core/report.js'), ctx, { filename:'report.js' });
   vm.runInContext(load('app/core/map.js'), ctx, { filename:'map.js' });
+  vm.runInContext(load('app/core/profile.js'), ctx, { filename:'profile.js' });
   vm.runInContext(load('app/core/mediaFx.js'), ctx, { filename:'mediaFx.js' });
   vm.runInContext(load('app/core/timeTheme.js'), ctx, { filename:'timeTheme.js' });
 
@@ -282,6 +287,7 @@ var expectedNewModules = [
   ok('window.SeyHaptics expose edilmiş', typeof win.SeyHaptics === 'object');
   ok('window.SeyFx expose edilmiş', typeof win.SeyFx === 'object');
   ok('window.SeyTimeTheme expose edilmiş', typeof win.SeyTimeTheme === 'object');
+  ok('window.SeymaProfile expose edilmiş', typeof win.SeymaProfile === 'object');
   ok('window.SeymaZikr expose edilmiş', typeof win.SeymaZikr === 'object');
   ok('window.SeymaQuran expose edilmiş', typeof win.SeymaQuran === 'object');
   ok('window.SeymaSaygi expose edilmiş', typeof win.SeymaSaygi === 'object' && typeof win.SeymaSaygi.registerSaygi === 'function');

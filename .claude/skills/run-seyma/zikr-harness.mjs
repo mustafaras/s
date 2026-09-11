@@ -169,6 +169,7 @@ const FILES = [
   'app/core/library.js',
   'app/core/report.js',
   'app/core/map.js',
+  'app/core/profile.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/skyFx.js',

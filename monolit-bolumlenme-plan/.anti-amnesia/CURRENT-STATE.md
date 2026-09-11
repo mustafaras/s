@@ -11,10 +11,46 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 7 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-35` / `MON-36` |
-| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (3/7) / 35/60 |
+| Son / sıradaki | `MON-36` / `MON-37` |
+| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (4/7) / 36/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
-| Güncellendi | 2026-09-10 |
+| Güncellendi | 2026-09-11 |
+
+## MON-36 kapanışı — profile domain registry
+
+- Karar/kanıt: [`MON-36-PROFILE-ENVANTERI.md`](../deliverables/MON-36-PROFILE-ENVANTERI.md).
+- `app/core/profile.js` içindeki `SeymaProfile` registry'si 30 saf üye ve 5
+  named live dependency (`data`, `ui`, `save`, `icon`, `esc`) taşır; modül
+  **870 satır / 64171 byte** ve yüklemede DOM/storage/network/sync yan etkisi
+  açmaz. `app/content/profileAssessmentV1.js` frozen içerik kaynağıdır ve
+  yalnızca salt-okunur okunur.
+- Consent kopyası/mandatory gate, tek oturum progress/current-index,
+  174-item render, break/SOS/completion, scoring/quality ve report üreticileri
+  registryde kaldı. `app.js` `SeymaProfile` kaydı ve imza-koruyan shimleri;
+  `data`/`ui` rebind, consent/session mutation, save/render/DOM/App handler,
+  `buildProfilePanelSummary`, sync merge ve schema sahipliği app.js'te kaldı.
+- Eski profil bloğuyla sentetik VM parity: cevaplı progress **7698** JS byte,
+  boş-session progress **7416** JS byte birebir; consent/privacy HTML birebir;
+  scoring ve quality JSON eşdeğer. Gerçek driver `--dump profile` **7416** JS
+  karakter / **7435 UTF-8 byte**, SHA-256
+  `3ab539de5f61c5746375228d20f4bcf579abb127e5c0484e87a0ff1ff9e0b004`;
+  dump `1 / 174 · %0` progress ekranını taşıyor.
+- `index.html` profile script/cache-bust `v=20260911a`, app cache-bust
+  `v=20260911a`; driver, zikr-harness, state-rebind, migration ve app-boot
+  FILES zincirlerine `profile.js` üretim sırasıyla eklendi. Profile boundary,
+  syntax, B1/B2/B3, driver, zikr **95/95**, Faz10 sync **69/69**, panel P4
+  **28/28** + legacy Faz11 **50/50**, tam app/panel/Panel-v2/Quran/premium/
+  reminder regression ve `git diff --check` exit 0.
+- İlk tam koşudaki üç negatif fixture locatorı (FX2-16 overlay, FX2-15 tab,
+  FX2-10 touch) profile registry kaynağını birleşik sayım girdisine ekleyerek
+  düzeltildi; üretim semantiği değişmedi. `profileAssessmentV1`, `sync.js`,
+  panel yüzeyi ve data schema diff dışıdır.
+- Privacy/consent farkı yok; halt/blocked yok. Browser/device acceptance,
+  remote, push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı yapılmadı.
+  **State gerçeği:** `MON-STATE.json` `status=in_progress`,
+  `blockedPrompt=null`, `lastCompletedPrompt=MON-36`, `nextPrompt=MON-37`,
+  Dalga 7 **4/7**, toplam **36/60**. MON-37 yeni açık kullanıcı yönü olmadan
+  başlatılmaz.
 
 ## MON-35 kapanışı — map domain registry
 
@@ -43,9 +79,10 @@
   evidence zincirine eklendi; üretim data/network davranışı değiştirilmedi.
 - Gerçek browser/device/GPS/weather API, remote read/write, push/merge/tag/
   deploy ve `mustafaras/seyma-data` yazımı yok; halt veya blocked yok.
-  **State gerçeği:** `MON-STATE.json` `status=in_progress`, `blockedPrompt=null`,
-  `lastCompletedPrompt=MON-35`, `nextPrompt=MON-36`, Dalga 7 **3/7**, toplam
-  **35/60**. MON-36 kullanıcı yönü olmadan başlatılmaz.
+  **Kapanış anındaki state:** `MON-STATE.json` `status=in_progress`,
+  `blockedPrompt=null`, `lastCompletedPrompt=MON-35`, `nextPrompt=MON-36`,
+  Dalga 7 **3/7**, toplam **35/60** idi; bu kartın ardından canlı state
+  MON-36 kapanışına güncellendi.
 
 ## MON-34 kapanışı — report domain registry
 

@@ -9,8 +9,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
-// MON-26/MON-27/MON-28: motivation, crisis ve journal görünüm gövdeleri ilgili registry'lere
-// taşındı; sheetClose/onclick/App yüzey sayımları birleşik kaynakta yapılır.
+// MON-26/MON-27/MON-28/MON-36: domain görünüm gövdeleri ilgili registry'lere taşındı;
+// sheetClose/onclick/App yüzey sayımları birleşik kaynakta yapılır.
 const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
 const crisisSource = fs.readFileSync(path.join(repoRoot, 'app/core/crisis.js'), 'utf8');
 const journalSource = fs.readFileSync(path.join(repoRoot, 'app/core/journal.js'), 'utf8');
@@ -18,7 +18,8 @@ const healthSource = fs.readFileSync(path.join(repoRoot, 'app/core/health.js'), 
 const librarySource = fs.readFileSync(path.join(repoRoot, 'app/core/library.js'), 'utf8');
 const reportSource = fs.readFileSync(path.join(repoRoot, 'app/core/report.js'), 'utf8');
 const mapSource = fs.readFileSync(path.join(repoRoot, 'app/core/map.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource;
+const profileSource = fs.readFileSync(path.join(repoRoot, 'app/core/profile.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 

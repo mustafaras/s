@@ -252,6 +252,7 @@ const FILES = [
   'app/core/library.js',
   'app/core/report.js',
   'app/core/map.js',
+  'app/core/profile.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/skyFx.js',
@@ -450,7 +451,26 @@ if (sb2.App && typeof sb2.App.openReminderCenter === 'function') {
 
 if (dumpTab && sb2.App && typeof sb2.App.go === 'function') {
   appHTML = '';
-  sb2.App.go(dumpTab);
+  // MON-36: profile dumpı, gerçek seed'i değiştirmeden consent verilmiş aktif
+  // oturumun ilk ilerleme ekranını üretir; içerik ve progress parity kanıtı için.
+  if (dumpTab === 'profile') {
+    const pa = sb2.SeymaState.data.profileAssessment;
+    sb2.SeymaState.data.settings.profileAssessmentInactive = false;
+    pa.status = 'active';
+    pa.completedAt = null;
+    pa.responses = {};
+    pa.currentItemIndex = 0;
+    pa.consent.acceptedAt = '2026-09-11T09:00:00.000Z';
+    pa.consent.profileProcessingAccepted = true;
+    pa.consent.sensitiveDataAccepted = true;
+    pa.consent.panelSummarySharingAccepted = true;
+    sb2.SeymaState.ui.profileAssessmentCompletionShown = false;
+    sb2.SeymaState.ui.profileAssessmentAnswerLocked = false;
+    sb2.SeymaState.ui.profileAssessmentSOS = false;
+    sb2.App.go('bugun');
+  } else {
+    sb2.App.go(dumpTab);
+  }
   fs.writeFileSync('/tmp/seyma-dump.html', appHTML);
   console.log(`\n[dump] tab "${dumpTab}" → /tmp/seyma-dump.html (${appHTML.length} bytes)`);
 }

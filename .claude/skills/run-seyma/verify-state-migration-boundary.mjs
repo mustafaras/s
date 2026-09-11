@@ -143,7 +143,7 @@ function loadInto(sandbox, files) {
 }
 
 // MON-12/13/17: state + save registry üretimdeki yükleme sırasıyla app.js'ten önce gelir.
-const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/content/saygiPeople.js', 'app/content/hijriCalendar.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js', 'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/saygi.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app.js'];
+const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/content/saygiPeople.js', 'app/content/hijriCalendar.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js', 'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/saygi.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app/core/profile.js', 'app.js'];
 
 function defaultSettings() {
   return {

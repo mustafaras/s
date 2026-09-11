@@ -11,16 +11,21 @@ const repoRoot = require('../repo-root');
 
 const profileSource = fs.readFileSync(path.join(repoRoot, 'app/core/profile.js'), 'utf8');
 const contentSource = fs.readFileSync(path.join(repoRoot, 'app/content/profileAssessmentV1.js'), 'utf8');
-// MON-36 baseline is the parent of this card commit. Using HEAD here would
-// compare the extracted module against the already-shimmed post-commit app.js.
-const headAppSource = childProcess.execFileSync('git', ['show', 'HEAD^:app.js'], {
+// MON-36 baseline is pinned by its card commit, so later modularization
+// commits do not move this parity fixture's source anchor.
+const profileCommit = childProcess.execFileSync('git', ['log', '--format=%H', '--grep=^MON-36: extract profile domain registry$', '-1'], {
+  cwd: repoRoot,
+  encoding: 'utf8',
+}).trim();
+assert(profileCommit, 'MON-36 commiti bulunamadı');
+const headAppSource = childProcess.execFileSync('git', ['show', profileCommit + '^:app.js'], {
   cwd: repoRoot,
   encoding: 'utf8',
   maxBuffer: 20 * 1024 * 1024,
 });
 const oldStart = headAppSource.indexOf('// ---------- Profil Değerlendirmesi: veri modeli ve migration');
 const oldEnd = headAppSource.indexOf('\nvar BOOK_GENRES', oldStart);
-assert(oldStart >= 0 && oldEnd > oldStart, 'HEAD profile baseline block bulunamadı');
+assert(oldStart >= 0 && oldEnd > oldStart, 'MON-36 profile baseline block bulunamadı');
 const baselineSource = headAppSource.slice(oldStart, oldEnd);
 
 function esc(value) {

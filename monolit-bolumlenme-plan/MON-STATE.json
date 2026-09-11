@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-36",
-  "nextPrompt": "MON-37",
+  "lastCompletedPrompt": "MON-37",
+  "nextPrompt": "MON-38",
   "currentWave": "7",
   "totalPrompts": 60,
-  "completedPrompts": 36,
+  "completedPrompts": 37,
   "updatedAt": "2026-09-11",
-  "nextSafeAction": "MON-36 tamamlandı: 174 maddelik profil assessment görünüm, consent, progress, scoring ve report saf gövdeleri app/core/profile.js içindeki SeymaProfile registry'sine alındı; frozen ProfileAssessmentV1 salt-okur kaldı. app.js imza-koruyan shimleri, data/ui rebind, consent/session mutation, save/render/DOM/App handler, sync merge, panelSummary ve schema sahipliği korundu. Progress dump ve consent HTML eski blokla birebir; scoring/quality JSON eşdeğer; profile boundary PASS. Index, app cache-bust ve dört ana FILES/load-order zinciri güncellendi. Syntax, B1/B2/B3, driver/profile dump, zikr 95/95, Faz10 69/69, panel P4/legacy, tam app/panel/Panel-v2/Quran/premium/reminder regression ve diff check PASS. profileAssessmentV1, sync.js, panel ve schema değişmedi; browser/device, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-37 için yeni açık kullanıcı yönü gerekir.",
+  "nextSafeAction": "MON-37 tamamlandı: ayarlarHTML ve settingsBtn read-only gövdeleri app/core/settings.js içindeki SeymaSettings registry'sine alındı; app.js state/default/migrate/toggle handlers, render/DOM ve FX/theme/prayer preference mutation sahipliği korundu. Settings HTML production-order driver dumpı parent baseline ile byte-birebir (46190 byte, SHA-256 c9b61ca64b4905eac1df833af5e125f7e9898a7a123ab6df21c479af84704eb4); settings boundary 13/13, premium settings 39/39, time-theme 53/53. Index cache-bust ve FILES/load-order zincirleri güncellendi; sync.js/Guard, panel, profileAssessmentV1, schema ve defaults değişmedi. Full app 44/44, panel/Panel-v2/Quran/reminder families, Faz10 69/69, panel P4 28/28, migration 67/67, zikr 95/95, syntax ve diff check PASS. Browser/device, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-38 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -168,6 +168,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-36-PROFILE-ENVANTERI.md",
       "decision": "profile_read_only_registry_frozen_content_consent_progress_scoring_parity_app_owned_session_mutation_sync_merge_panel_summary_and_schema"
+    },
+    "MON-37": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-37-SETTINGS-ENVANTERI.md",
+      "decision": "settings_read_only_registry_html_dump_parity_app_owned_defaults_migrate_toggles_fx_theme_prayer_preference_mutations"
     }
   },
   "waves": [
@@ -224,7 +229,7 @@
       "prompts": "MON-33..MON-39",
       "topic": "arsiv, analiz ve ayarlar",
       "approvalRequired": true,
-      "completed": 4,
+      "completed": 5,
       "total": 7
     },
     {
@@ -269,8 +274,9 @@
     }
   ],
   "verificationGate": [
-    "node --check app.js && node --check sync.js && node --check app/core/profile.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
+    "node --check app.js && node --check sync.js && node --check app/core/profile.js && node --check app/core/settings.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
     "node tests/app/test_profile_boundary.js",
+    "node tests/app/test_settings_boundary.js",
     "node .claude/skills/run-seyma/verify-state-helper-boundary.mjs",
     "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
     "node .claude/skills/run-seyma/verify-state-adapter-contract.mjs",
@@ -299,6 +305,7 @@
     "node tests/panel/test_faz11_panel.js",
     "for f in tests/quran/test_quran_*.js; do node \"$f\"; done",
     "for f in tests/app/test_premium_*.js; do node \"$f\"; done",
+    "node .claude/skills/run-seyma/driver.mjs --dump ayarlar",
     "node tests/reminders/run-reminder-smoke.mjs"
   ],
   "separatelyGated": [

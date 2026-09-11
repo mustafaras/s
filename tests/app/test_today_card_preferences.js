@@ -9,6 +9,7 @@ var path=require('path');
 var vm=require('node:vm');
 var repoRoot=require('../repo-root');
 var source=fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
+var settingsSource=fs.readFileSync(path.join(repoRoot,'app/core/settings.js'),'utf8');
 var stateSource=fs.readFileSync(path.join(repoRoot,'app/core/state.js'),'utf8');
 var passes=0,failures=0;
 
@@ -47,7 +48,7 @@ assert('eski kayıtlara Tatil Modu kart görünürlük tercihi eklenir',stateSou
 var vacation=between('function vacationCardHTML(rec){','CARD_BUILDERS[\'vacation\']=vacationCardHTML;');
 assert('Tatil Modu kartında erişilebilir Gizle düğmesi vardır',/App\.hideBugunCard\([^)]*vacation/.test(vacation)&&vacation.indexOf('Tatil Modu kartını gizle')>=0&&vacation.indexOf('min-height:44px')>=0);
 
-var settings=between('function ayarlarHTML(){','function settingsBtn(');
+var settings=settingsSource.slice(settingsSource.indexOf('function ayarlarHTML(){'),settingsSource.indexOf('function settingsBtn('));
 assert('Ayarlar, kart gizliyken Tatil Modunu Göster kontrolünü sunar',settings.indexOf('sgh.hideVacationCard')>=0&&/App\.showBugunCard\([^)]*vacation/.test(settings)&&settings.indexOf('Tatil Modunu Göster')>=0);
 
 var hideHandler=lineStarting('App.hideBugunCard=function');

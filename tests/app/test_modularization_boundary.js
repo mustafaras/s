@@ -35,6 +35,7 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
     'app/core/report.js',
     'app/core/map.js',
     'app/core/profile.js',
+    'app/core/settings.js',
     'app/core/mediaFx.js',
     'app/core/timeTheme.js'
   ];
@@ -275,6 +276,7 @@ var expectedNewModules = [
   vm.runInContext(load('app/core/report.js'), ctx, { filename:'report.js' });
   vm.runInContext(load('app/core/map.js'), ctx, { filename:'map.js' });
   vm.runInContext(load('app/core/profile.js'), ctx, { filename:'profile.js' });
+  vm.runInContext(load('app/core/settings.js'), ctx, { filename:'settings.js' });
   vm.runInContext(load('app/core/mediaFx.js'), ctx, { filename:'mediaFx.js' });
   vm.runInContext(load('app/core/timeTheme.js'), ctx, { filename:'timeTheme.js' });
 
@@ -298,6 +300,7 @@ var expectedNewModules = [
   ok('window.SeymaLibrary expose edilmiş', typeof win.SeymaLibrary === 'object' && typeof win.SeymaLibrary.registerLibrary === 'function');
   ok('window.SeymaReport expose edilmiş', typeof win.SeymaReport === 'object' && typeof win.SeymaReport.registerReport === 'function');
   ok('window.SeymaMap expose edilmiş', typeof win.SeymaMap === 'object' && typeof win.SeymaMap.registerMap === 'function');
+  ok('window.SeymaSettings expose edilmiş', typeof win.SeymaSettings === 'object' && typeof win.SeymaSettings.registerSettings === 'function');
   ok('SeymaZikr yüklemede state/DOM/timer çağrısı yok', win.SeymaZikr && win.SeymaZikr.ZIKR_SEED && win.SeymaZikr.ZIKR_SEED.length === 5 && timers.length === 0);
   // B1: Faz -1.1'de data/ui henüz window'da değil → getter undefined
   ok('window.SeymaState.data henüz undefined (B1)', win.SeymaState.data === undefined);

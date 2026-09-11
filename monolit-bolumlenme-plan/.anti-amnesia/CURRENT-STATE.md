@@ -11,10 +11,41 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 7 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-36` / `MON-37` |
-| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (4/7) / 36/60 |
+| Son / sıradaki | MON-37 / MON-38 |
+| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (5/7) / 37/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-11 |
+
+## MON-37 kapanışı — settings domain registry
+
+- Karar/kanıt: MON-37-SETTINGS-ENVANTERI.md (deliverables).
+- app/core/settings.js içindeki SeymaSettings registry'si ayarlarHTML ve
+  settingsBtn read/render gövdelerini, 11 named live dependency (state, view,
+  theme, icon, esc, reminderCopy, daysTracked, countRec, featuresLive,
+  todayStr, syncConfigured) ile taşır. Registry dependency bag'inde doğrudan
+  data alanı yoktur; modül yüklemede DOM/storage/network/sync/state mutation
+  açmaz.
+- Settings HTML, FX toggles, voice controls, hidden-card preference copy,
+  repo/Luna read surface ve theme seçimleri production-order parent dump ile
+  byte-birebir kaldı: 46190 byte, SHA-256
+  c9b61ca64b4905eac1df833af5e125f7e9898a7a123ab6df21c479af84704eb4,
+  cmp:0. Settings boundary 13/13, premium settings 39/39, time-theme 53/53.
+- migrate, createDefaultData, App.setTheme, App.toggleHaptic,
+  App.toggleSetting, App.adjustHijriOffset parent HEAD ile 6/6 byte
+  identical. Settings schema/default, prayer/hijri/toggle mutation, save,
+  render/DOM, sync sanitize ve app data/ui/dark rebind app-owned kaldı.
+- index.html, driver, zikr-harness, state-rebind, migration ve app/reminder/FX
+  boot FILES zincirleri profile → settings → mediaFx sırasıyla güncellendi;
+  settings cache-bust v=20260911a. Full app 44/44, migration 67/67, Faz10
+  sync 69/69, panel P4 28/28, zikr 95/95, B3 20/20, legacy panel/Panel-v2/
+  Quran/reminder aileleri exit 0; syntax ve diff check PASS.
+- profileAssessmentV1, profile consent/session/progress semantics, sync.js/Guard,
+  panel source ve data schema değişmedi. Privacy/consent farkı yok;
+  browser/device, remote, push/merge/tag/deploy ve mustafaras/seyma-data
+  yazımı yok.
+- State gerçeği: MON-STATE.json status=in_progress, blockedPrompt=null,
+  lastCompletedPrompt=MON-37, nextPrompt=MON-38, Dalga 7 5/7, toplam 37/60.
+  MON-38 yeni açık kullanıcı yönü olmadan başlatılmaz.
 
 ## MON-36 kapanışı — profile domain registry
 

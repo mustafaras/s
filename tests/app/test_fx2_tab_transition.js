@@ -20,7 +20,8 @@ const librarySource = fs.readFileSync(path.join(repoRoot, 'app/core/library.js')
 const reportSource = fs.readFileSync(path.join(repoRoot, 'app/core/report.js'), 'utf8');
 const mapSource = fs.readFileSync(path.join(repoRoot, 'app/core/map.js'), 'utf8');
 const profileSource = fs.readFileSync(path.join(repoRoot, 'app/core/profile.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource;
+const settingsSource = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const goMatch = appSource.match(/App\.go=function\(id,event\)\{[\s\S]*?\n\};\n\n\/\/ ── REM-05/);
 

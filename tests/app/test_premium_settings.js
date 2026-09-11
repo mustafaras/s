@@ -161,24 +161,25 @@ console.log('\n[6] richHaptics — haptics gating');
 console.log('\n[7] app.js ayarlar yüzeyi (statik)');
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  var settingsSrc = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
   ok('App.toggleSetting handler tanımlı (FX-P-61)', appSrc.indexOf('App.toggleSetting=function') >= 0);
   ok('toggleSetting beyaz listesi premium alanları içeriyor', appSrc.indexOf("allowed={premiumAtmosphere:1,uiSounds:1,richHaptics:1,launchRitual:1,voiceGuidance:1,ambientSounds:1") >= 0);
-  ok('ayarlar ekranında Premium Atmosfer kartı var', appSrc.indexOf('Premium Atmosfer') >= 0 && appSrc.indexOf("icon('sparkles'") >= 0);
+  ok('ayarlar ekranında Premium Atmosfer kartı var', settingsSrc.indexOf('Premium Atmosfer') >= 0 && settingsSrc.indexOf("icon('sparkles'") >= 0);
   // HTML string içindeki onclick escape'li: App.toggleSetting(\'key\',deger)
   // Segmentli Açık/Kapalı çifti AÇIK DEĞER geçmek zorundadır: her iki düğme de
   // değersiz toggle çağırdığında "Kapalı"ya basmak anahtarı açıyordu.
   ok('master switch "Açık" segmenti açık değer geçiyor',
-     appSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\',true)") >= 0);
+     settingsSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\',true)") >= 0);
   ok('master switch "Kapalı" segmenti açık değer geçiyor',
-     appSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\',false)") >= 0);
+     settingsSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\',false)") >= 0);
   ok('master switch değersiz toggle\'a geri dönmedi',
-     appSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\')") < 0);
+     settingsSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\')") < 0);
   // Alt FX satırları dinamik olarak row[0] ile üretiliyor (fxRows dizisi);
   // statik kontrol: fxRows tanımı tüm 5 anahtarı içeriyor + dinamik onclick şablonu mevcut.
   var fxRowsOk = ['uiSounds','richHaptics','launchRitual','voiceGuidance','ambientSounds'].every(function(k){
-    return appSrc.indexOf("'"+k+"','") >= 0 || appSrc.indexOf("['"+k) >= 0;
+    return settingsSrc.indexOf("'"+k+"','") >= 0 || settingsSrc.indexOf("['"+k) >= 0;
   });
-  var dynTpl = appSrc.indexOf("App.toggleSetting(\\''+row[0]+'\\')") >= 0;
+  var dynTpl = settingsSrc.indexOf("App.toggleSetting(\\''+row[0]+'\\')") >= 0;
   ok('alt FX satırları bağlı (fxRows dizisi + dinamik onclick şablonu)', fxRowsOk && dynTpl);
   ok('bulut ses anahtarı beyaz listede (voiceCloudTts)', appSrc.indexOf('voiceCloudTts:1') >= 0);
 })();
@@ -205,18 +206,18 @@ console.log('\n[8] persistence — settings localStorage kalıcılığı');
 
 console.log('\n[8] FX-P-91 — premium yüzeylerde emoji-ikon temizliği');
 (function(){
-  var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  var settingsSrc = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
   // (1) Ayarlar fxRows bloğunda '🎙️' geçmiyor; 'Sesli rehberlik' metni +
   //     render'da icon('mic' çağrısı geçiyor.
-  var emojiMic = /'[^']*[\u{1F399}\u{1F3A4}][^']*Sesli rehberlik'/u.test(appSrc) || appSrc.indexOf('🎙️ Sesli rehberlik') > -1;
+  var emojiMic = /'[^']*[\u{1F399}\u{1F3A4}][^']*Sesli rehberlik'/u.test(settingsSrc) || settingsSrc.indexOf('🎙️ Sesli rehberlik') > -1;
   ok('fxRows/başlıkta 🎙️ emoji kalmadı', !emojiMic);
-  ok("'Sesli rehberlik' metni mevcut", appSrc.indexOf('Sesli rehberlik') > -1);
-  ok("render'da icon('mic' çağrısı mevcut", appSrc.indexOf("icon('mic'") > -1);
+  ok("'Sesli rehberlik' metni mevcut", settingsSrc.indexOf('Sesli rehberlik') > -1);
+  ok("render'da icon('mic' çağrısı mevcut", settingsSrc.indexOf("icon('mic'") > -1);
   // (2) '✨ Premium Atmosfer' geçmiyor; icon('sparkles' + 'Premium Atmosfer' geçiyor.
-  var emojiSparkles = appSrc.indexOf('✨ Premium Atmosfer') > -1;
+  var emojiSparkles = settingsSrc.indexOf('✨ Premium Atmosfer') > -1;
   ok("'✨ Premium Atmosfer' kalmadı", !emojiSparkles);
-  ok("'Premium Atmosfer' metni mevcut", appSrc.indexOf('Premium Atmosfer') > -1);
-  ok("icon('sparkles' çağrısı mevcut", appSrc.indexOf("icon('sparkles'") > -1);
+  ok("'Premium Atmosfer' metni mevcut", settingsSrc.indexOf('Premium Atmosfer') > -1);
+  ok("icon('sparkles' çağrısı mevcut", settingsSrc.indexOf("icon('sparkles'") > -1);
 })();
 
 console.log('\n=== Özet ===');

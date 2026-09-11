@@ -40,6 +40,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_map_boundary.js` — MON-35 `SeymaMap` registry’si: load-side-effect,
   fixed/live location-weather projection, harita/weather/location HTML, error
   UI ve app-owned geolocation/fetch sınırı; browser, gerçek GPS ve gerçek ağ yoktur.
+- `app/test_settings_boundary.js` — MON-37 `SeymaSettings` registry’si:
+  eski/yeni ayarlar HTML byte parity, FX/theme/prayer-preference read surface,
+  doğrudan data bağı ve state mutation sınırı; browser, gerçek ağ ve gerçek
+  veri yoktur.
 - `app/test_modal_focus_containment.js` — Tüm ortak modal ailesinin odak
   sözleşmesini, metin alanı dahil Tab/Shift+Tab sarma, Escape kapanışı, semantik
   dialog kabuğu ve focusable arka plan regresyonunu ağsız sentetik olarak doğrular.

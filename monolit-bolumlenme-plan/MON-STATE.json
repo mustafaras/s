@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-37",
-  "nextPrompt": "MON-38",
+  "lastCompletedPrompt": "MON-38",
+  "nextPrompt": "MON-39",
   "currentWave": "7",
   "totalPrompts": 60,
-  "completedPrompts": 37,
+  "completedPrompts": 38,
   "updatedAt": "2026-09-11",
-  "nextSafeAction": "MON-37 tamamlandı: ayarlarHTML ve settingsBtn read-only gövdeleri app/core/settings.js içindeki SeymaSettings registry'sine alındı; app.js state/default/migrate/toggle handlers, render/DOM ve FX/theme/prayer preference mutation sahipliği korundu. Settings HTML production-order driver dumpı parent baseline ile byte-birebir (46190 byte, SHA-256 c9b61ca64b4905eac1df833af5e125f7e9898a7a123ab6df21c479af84704eb4); settings boundary 13/13, premium settings 39/39, time-theme 53/53. Index cache-bust ve FILES/load-order zincirleri güncellendi; sync.js/Guard, panel, profileAssessmentV1, schema ve defaults değişmedi. Full app 44/44, panel/Panel-v2/Quran/reminder families, Faz10 69/69, panel P4 28/28, migration 67/67, zikr 95/95, syntax ve diff check PASS. Browser/device, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-38 için yeni açık kullanıcı yönü gerekir.",
+  "nextSafeAction": "MON-38 tamamlandı: MON-D7-ANALIZ-ARSIV-RAPORU.md içinde Library/Report/Map/Profile/Settings beş registry dependency graph, cold-load, profile privacy, map lazy call, settings FX manifesti ve production-order dump kanıtı kapatıldı. Beş registry load-safe; cold-load Proxy window reads=[]; graphte eager cycle, privacy/consent farkı veya eager side effect bulunmadı. Dependency ölçümü Library 64/32, Report 16/29, Map 16/24, Profile 30/5, Settings 2/11; bugun/rapor/harita/profile/ayarlar dump manifesti ve exact hashler raporda. Syntax, driver, five boundary, modularization 99/99, pre-commit app 44/44, premium 9/9, panel 23/23, Panel-v2 27/27, Quran 9/9, reminder 20, zikr 95/95, Faz10 69/69, panel P3 35/35, P4 28/28, migration 67/67 ve cold-load PASS. Commit sonrası doğrudan settings fixture tekrarındaki HEAD^ baseline locator farkı LEDGER seq 53'e yazıldı; MON-37 temiz klonunda parent-history replay Settings 13/13 PASS verdi ve production failure olmadığı doğrulandı. MON-38 production kodu, content, sync, panel, schema, cache-bust veya FILES değiştirmedi; browser/device, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. State gerçeği in_progress, blockedPrompt=null, Dalga 7 6/7, toplam 38/60. Sıradaki MON-39 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -173,6 +173,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-37-SETTINGS-ENVANTERI.md",
       "decision": "settings_read_only_registry_html_dump_parity_app_owned_defaults_migrate_toggles_fx_theme_prayer_preference_mutations"
+    },
+    "MON-38": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-D7-ANALIZ-ARSIV-RAPORU.md",
+      "decision": "d7_five_registry_graph_load_safe_profile_privacy_map_lazy_settings_fx_manifest_no_production_delta"
     }
   },
   "waves": [
@@ -229,7 +234,7 @@
       "prompts": "MON-33..MON-39",
       "topic": "arsiv, analiz ve ayarlar",
       "approvalRequired": true,
-      "completed": 5,
+      "completed": 6,
       "total": 7
     },
     {
@@ -294,6 +299,9 @@
     "node tests/app/test_modularization_boundary.js",
     "node tests/app/test_report_boundary.js",
     "node tests/app/test_map_boundary.js",
+    "node tests/app/test_library_boundary.js",
+    "node tests/panel/test_panel_p3_root_modules.js",
+    "node tests/panel/test_panel_p4_provenance.js",
     "node tests/app/test_local_visual_qa_guard.js",
     "node tests/app/test_faz_minus11_boundary.js",
     "node tests/app/test_date_utils_boundary.js",

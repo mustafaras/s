@@ -11,10 +11,47 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 7 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-37 / MON-38 |
-| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (5/7) / 37/60 |
+| Son / sıradaki | MON-38 / MON-39 |
+| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (6/7) / 38/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-11 |
+
+## MON-38 kapanışı — Dalga 7 registry regression
+
+- Karar/kanıt: [`MON-D7-ANALIZ-ARSIV-RAPORU.md`](../deliverables/MON-D7-ANALIZ-ARSIV-RAPORU.md).
+- Beş D7 registry grafiği canlı app.js registration bag'i, source dependency
+  manifesti ve beş production FILES/load-order zinciriyle eşleştirildi:
+  Library **64/32**, Report **16/29**, Map **16/24**, Profile **30/5**,
+  Settings **2/11**. Eager cycle bulunmadı; Library → Map ve Map → Report/
+  Health/Helpers kenarları çağrı-anı read-only resolver olarak kaldı.
+- Cold-load Proxy auditinde beş registry için DOM/storage/network/timer
+  çağrısı **0/0/0/0**, `window reads=[]`; boundary sonuçları Library **45**,
+  Report **12**, Map **14**, Profile **PASS**, Settings **13/13**. Profile
+  frozen 174/174 content, consent/privacy, progress/scoring ve panel redaction
+  zinciri korundu; privacy/consent farkı veya eager side effect bulunmadı.
+- Production-order driver dump manifesti: `bugun` **112397** /
+  `df74c8ed…3aa0e`, `rapor` **139367** / `65d8c7a4…5eaec`, `harita`
+  **29084** / `fda1652f…5c749`, `profile` **7435** / `3ab539de…0b004`,
+  `ayarlar` **46190** / `c9b61ca6…04eb4`; tam SHA-256 değerleri rapordadır.
+- `bugun` byte sabit olsa da mevcut random günlük skor nedeniyle SHA run-to-run
+  değişebilir; final SHA canonical manifest olarak rapora işlendi ve LEDGER
+  seq 54'e kaydedildi. Diğer dört dump final tekrarında byte+SHA sabit kaldı.
+- Syntax, driver, modularization **99/99**, app **44/44**, premium **9/9**,
+  panel **23/23**, Panel-v2 **27/27**, Quran **9/9**, reminder **20**,
+  zikr **95/95**, Faz10 **69/69**, P3 **35/35**, P4 **28/28**, migration
+  **67/67** ve cold-load PASS. MON-38 production kodu, content, sync, panel,
+  schema, cache-bust veya FILES değiştirmedi; yalnız rapor ve anti-amnesia
+  state zinciri güncelleniyor.
+- Commit sonrası doğrudan Settings fixture tekrarında, `git show HEAD^:app.js`
+  locatorı yeni HEAD'in MON-37 shim'ini baseline seçtiği için `window.SeymaSettings`
+  undefined oldu; bu ürün failure'ı değildir. MON-37'nin temiz yerel klonunda
+  beklenen parent history ile Settings **13/13 PASS** yeniden doğrulandı.
+  Ayrıntı append-only LEDGER seq 53'te; `blockedPrompt=null` korunuyor.
+- **State gerçeği:** `MON-STATE.json` `status=in_progress`,
+  `blockedPrompt=null`, `lastCompletedPrompt=MON-38`, `nextPrompt=MON-39`,
+  Dalga 7 **6/7**, toplam **38/60**. Browser/device, remote, push/merge/tag/
+  deploy ve `mustafaras/seyma-data` yazımı yok; MON-39 yeni açık kullanıcı
+  yönü olmadan başlatılmaz.
 
 ## MON-37 kapanışı — settings domain registry
 

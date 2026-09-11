@@ -8,6 +8,7 @@ const tests = [
   "test_reminder_boot.js",
   "test_reminder_migration.js",
   "test_reminder_app_acceptance.js",
+  "test_reminder_ui_boundary.js",
   "test_reminder_app_privacy.js",
   "test_reminder_app_notification_boundary.js",
   "test_reminder_sync_privacy.js",

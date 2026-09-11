@@ -470,6 +470,11 @@ if (dumpTab && sb2.App && typeof sb2.App.go === 'function') {
     sb2.SeymaState.ui.profileAssessmentAnswerLocked = false;
     sb2.SeymaState.ui.profileAssessmentSOS = false;
     sb2.App.go('bugun');
+  } else if (dumpTab === 'reminder') {
+    // MON-41: dump the actual modal surface after the same explicit app-owned
+    // navigation path used by the Reminder Center smoke gate.
+    sb2.App.go('ayarlar');
+    sb2.App.openReminderCenter();
   } else {
     sb2.App.go(dumpTab);
   }

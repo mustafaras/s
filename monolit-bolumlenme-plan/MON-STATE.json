@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-40",
-  "nextPrompt": "MON-41",
+  "lastCompletedPrompt": "MON-41",
+  "nextPrompt": "MON-42",
   "currentWave": "8",
   "totalPrompts": 60,
-  "completedPrompts": 40,
+  "completedPrompts": 41,
   "updatedAt": "2026-09-11",
-  "nextSafeAction": "MON-40 tamamlandı: MON-40-REMINDER-RUNTIME-ENVANTERI.md içinde SeymaReminders 16 read-only runtime adapter üyesi, frozen catalog/engine/scheduler/delivery sınırı, app-owned permission/delivery/sync/schema/DOM/mutation yüzeyi ve cache-bust/FILES zinciri kaydedildi. app/core/reminders.js production index, driver, zikr-harness ve state-rebind FILES zincirine bağlandı. App/onclick/FX manifesti HEAD/current delta 0 (556/721/718, onclick 153, canonical data 9/11, FX 78/63/58/6); frozen dört modül, profile content, sync, panel ve schema değişmedi. 28 syntax, driver + ayarlar dump, zikr 95/95, reminder acceptance 554 assertions, reminder smoke 20/20, app/current panel 67/67, Panel-v2 27/27, Quran 9/9, Premium 9/9, B1/B2/B3 0/67/20 failure, P3 35/35, P4 28/28, Faz10 69/69 ve freeze release=not_approved PASS. MON-37 settings fixture stale HEAD^ locatorı production'a dokunmadan extraction commit parent çözümüne alındı; 13/13 PASS. State gerçeği in_progress, blockedPrompt=null, Dalga 8 1/4, toplam 40/60. Browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-41 için yeni açık kullanıcı yönü gerekir.",
+  "nextSafeAction": "MON-41 tamamlandı: MON-41-REMINDER-UI-ENVANTERI.md içinde SeymaReminders view registration ve read-only Reminder Center/card üreticileri, Catalog/API tüketimi, app-owned permission/mutation/handler sınırı, modal focus ve reminder dump kanıtı kaydedildi. app/core/reminders.js cache-bust v=20260911b ile güncellendi; driver reminder dump yolu eklendi; yeni FILES üyesi yok, mevcut reminders FILES zinciri aynı sırada kaldı. App/onclick/FX manifesti 556/721/718, onclick 153, canonical data 9/11, FX 78/63/58/6 delta 0; frozen reminder×4, profile content, sync, panel, schema ve releaseApproval not_approved değişmedi. MON-41 view boundary, reminder acceptance 554, reminder smoke, privacy, modal focus, driver + reminder dump, syntax, profile/settings, state/rebind, Faz10, panel P3/P4, Quran, Premium ve tam app/panel/Panel-v2 regression PASS. State gerçeği in_progress, blockedPrompt=null, Dalga 8 2/4, toplam 41/60. Browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-42 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -183,6 +183,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-40-REMINDER-RUNTIME-ENVANTERI.md",
       "decision": "reminders_read_only_runtime_registry_frozen_four_lazy_adapters_app_owned_permission_delivery_sync_schema_dom_and_fallback_parity"
+    },
+    "MON-41": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-41-REMINDER-UI-ENVANTERI.md",
+      "decision": "reminders_read_only_view_registry_catalog_api_copy_card_center_modal_focus_app_owned_handlers_permission_mutation_and_fallback_parity"
     }
   },
   "waves": [
@@ -247,7 +252,7 @@
       "prompts": "MON-40..MON-43",
       "topic": "reminder ve mesajlasma",
       "approvalRequired": true,
-      "completed": 1,
+      "completed": 2,
       "total": 4
     },
     {
@@ -320,6 +325,7 @@
     "for f in tests/app/test_premium_*.js; do node \"$f\"; done",
     "node .claude/skills/run-seyma/driver.mjs --dump ayarlar",
     "node tests/reminders/test_reminder_app_acceptance.js",
+    "node tests/reminders/test_reminder_ui_boundary.js",
     "node tests/reminders/run-reminder-smoke.mjs"
   ],
   "separatelyGated": [

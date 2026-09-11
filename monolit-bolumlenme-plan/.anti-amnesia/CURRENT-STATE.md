@@ -11,10 +11,40 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 8 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-40 / MON-41 |
-| Dalga / ilerleme | Dalga 7 kapandı; Dalga 8 sürüyor (1/4) / 40/60 |
+| Son / sıradaki | MON-41 / MON-42 |
+| Dalga / ilerleme | Dalga 7 kapandı; Dalga 8 sürüyor (2/4) / 41/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-11 |
+
+## MON-41 kapanışı — reminders UI merkezi
+
+- Karar/kanıt: [`MON-41-REMINDER-UI-ENVANTERI.md`](../deliverables/MON-41-REMINDER-UI-ENVANTERI.md).
+- `app/core/reminders.js` içindeki frozen `SeymaReminders` registry'sine
+  `registerReminderView` ve 9 read-only view üreticisi/yardımcısı eklendi:
+  Catalog-backed card, Reminder Center dış kabuğu, pencere/kanal/kategori/
+  kapasite etiketleri ve clone/count yardımcıları. View yalnız Catalog/API
+  resolverlarını tüketir; frozen Catalog private copy'si kopyalanmadı.
+- Permission request, native delivery, preference/draft/history/retention/
+  personalization mutation, local storage, sync/schema, DOM, App handler ve
+  modal focus ownership app.js'te kaldı. `App.openReminderCenter`, close,
+  `onReminderKeydown` ve `requestReminderPermission` değişmedi; modal contract
+  korunuyor. `releaseApproval=not_approved`, frozen reminder×4 ve
+  `docs/reminders` authority değişmedi.
+- Production sırasi aynı kaldı; yalnız `index.html` cache-bust
+  `app/core/reminders.js?v=20260911b` oldu. Driver'a `--dump reminder` yolu
+  eklendi; driver/zikr/state-rebind FILES üyeliği zaten vardı, yeni FILES yok.
+- Kanıt: `test_reminder_ui_boundary` PASS; reminder acceptance **554
+  assertions**; driver + reminder dump PASS (96,260 JS karakter / 97,421
+  UTF-8 byte, SHA-256
+  `7ecc3b6903af8497d5d2fa9b822b11c6ef0b7192b69d1dbc74312e4875e9ef66`);
+  modal focus, reminder privacy/smoke, syntax, profile/settings, state/rebind,
+  Faz10, panel P3/P4, Quran, Premium ve tam app/panel/Panel-v2 regression
+  kapıları PASS.
+- App/onclick/FX manifesti **556/721/718**, direct onclick **153**, canonical
+  data **9/11**, FX **78/63/58/6**; delta 0. Browser/device, native
+  permission, remote, push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı
+  yok. State gerçeği `in_progress`, `blockedPrompt=null`, Dalga 8 **2/4**,
+  toplam **41/60**; sıradaki güvenli kart MON-42 ve yeni kullanıcı yönü gerekir.
 
 ## MON-40 kapanışı — reminders runtime bağlantıları
 

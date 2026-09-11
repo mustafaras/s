@@ -1358,6 +1358,44 @@ if(SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.registerReminders==='function'){
     priorityRank:function(){ return REMINDER_PRIORITY_RANK; }
   });
 }
+// MON-41: Reminder Center/card view registry. The view receives read-only
+// resolver functions and already-rendered app-owned sections; permission,
+// persistence, delivery and every mutation handler stay in this app shell.
+if(SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.registerReminderView==='function'){
+  SEYMA_REMINDERS.registerReminderView({
+    ui:function(){ return ui; },
+    root:function(){ return reminderCurrentRoot(); },
+    definitions:function(){ return reminderDefinitions(); },
+    copy:function(key,fallback){ return reminderCopy(key,fallback); },
+    icon:icon,
+    esc:esc,
+    normalizePolicy:normalizeReminderPolicy,
+    permissionSnapshot:reminderPermissionSnapshot,
+    permissionExplanation:reminderPermissionExplanation,
+    profileLabel:function(id){ return reminderProfileById(id).label; },
+    sections:function(root,permission){ return {
+      notice:reminderCenterNoticeHTML(),
+      systemStatus:reminderSystemStatusHTML(),
+      profile:reminderProfileSectionHTML(root),
+      digestLauncher:reminderDigestLauncherHTML(),
+      digest:ui.reminderDigestOpen?reminderDigestHTML():'',
+      testPreview:reminderTestPreviewHTML(),
+      policy:reminderCenterPolicyHTML(root),
+      personalization:reminderPersonalizationHTML(root),
+      permission:reminderPermissionExplanationHTML(permission),
+      categories:reminderCategoryControlsHTML(root),
+      specialDays:reminderSpecialDaysSectionHTML(root),
+      care:reminderCareControlsHTML(root),
+      medication:reminderMedicationSectionHTML(root),
+      history:reminderCenterHistoryHTML(),
+      retention:reminderCenterRetentionHTML()
+    }; },
+    deepLinkTarget:reminderDeepLinkTarget,
+    previewSafeCopy:reminderPreviewSafeCopyLegacy,
+    channels:function(){ return REMINDER_CHANNELS; },
+    validTime:validReminderTime
+  });
+}
 var reminderPermissionTransientState=null;
 var reminderPermissionRequestInFlight=null;
 var reminderPermissionEverGranted=null;
@@ -5281,7 +5319,7 @@ REMINDER_SPECIAL_NATIVE_BODY=reminderCopy('native.generic.body','İstersen uygul
 REMINDER_NATIVE_ACTIONS.open.title=reminderCopy('inApp.actions.open','Aç');
 REMINDER_NATIVE_ACTIONS.snooze.title=reminderCopy('inApp.snooze.native10m','10 dk ertele');
 REMINDER_NATIVE_ACTIONS.todayOff.title=reminderCopy('inApp.mute.today','Bugün sustur');
-function reminderWindowLabel(def){
+function reminderWindowLabelLegacy(def){
   var w=def&&def.defaultWindow;
   if(!w||typeof w!=='object') return 'Zaman penceresi hazırlanıyor';
   if(w.kind==='offset') return 'Vakit öncesi · '+Number(w.earliestMinutesBefore||0)+'–'+Number(w.latestMinutesBefore||0)+' dk';
@@ -5289,10 +5327,10 @@ function reminderWindowLabel(def){
   if(w.start&&w.end) return String(w.start)+'–'+String(w.end);
   return 'Olayla birlikte';
 }
-function reminderChannelLabel(def){
+function reminderChannelLabelLegacy(def){
   return def&&def.defaultChannel==='native'?'Native + uygulama içi':'Uygulama içi';
 }
-function reminderCategoryState(root,category){
+function reminderCategoryStateLegacy(root,category){
   var defs=reminderDefinitions().filter(function(def){ return String(def.category||'')===String(category||''); }), enabled=0, channel=null, mixed=false;
   defs.forEach(function(def){
     var pref=root&&root.preferences?root.preferences[def.id]:null, isEnabled=!!(pref&&pref.enabled), nextChannel=pref&&REMINDER_CHANNELS[pref.channel]?pref.channel:'in_app';
@@ -5301,19 +5339,19 @@ function reminderCategoryState(root,category){
   });
   return {defs:defs,enabledCount:enabled,total:defs.length,allEnabled:defs.length>0&&enabled===defs.length,someEnabled:enabled>0,channel:mixed?'mixed':(channel||'in_app')};
 }
-function reminderCategoryChannelLabel(channel){
+function reminderCategoryChannelLabelLegacy(channel){
   if(channel==='native') return 'Native · izin varsa; uygulama içi yedek açık';
   if(channel==='mixed') return 'Karışık kanal';
   return 'Uygulama içi';
 }
-function reminderCapacityModeLabel(mode){
+function reminderCapacityModeLabelLegacy(mode){
   var labels={balanced:'Dengeli',light:'Hafif gün',silent:'Sessiz',ritual:'Ritüel odaklı'};
   return labels[mode]||labels.balanced;
 }
-function reminderCenterClone(value){
+function reminderCenterCloneLegacy(value){
   try{ return JSON.parse(JSON.stringify(value)); }catch(e){ return null; }
 }
-function reminderCenterEnabledCount(root,defs){
+function reminderCenterEnabledCountLegacy(root,defs){
   var preferences=root&&root.preferences&&typeof root.preferences==='object'?root.preferences:{}, list=Array.isArray(defs)?defs:[];
   return list.filter(function(def){ var pref=preferences[String(def&&def.id||'')]; return !(pref&&pref.enabled===false); }).length;
 }
@@ -5417,7 +5455,7 @@ function reminderDigestHTML(){
   h+='<p class="sey-reminder-digest-boundary" role="note">Bu alan yalnız cihaz içinde çalışır. Native opt-in’den bağımsızdır, reminder bütçesi ve sessiz saatlerden etkilenmez; sync, analytics ve delivery kaydı oluşturmaz.</p></section>';
   return h;
 }
-function reminderPreviewSafeCopy(def){
+function reminderPreviewSafeCopyLegacy(def){
   var category=reminderCategoryMeta(String(def&&def.category||''));
   return {title:reminderCopy('inApp.preview.syntheticTitle','Şeyma’da küçük bir durak hazır'),detail:category.label+' '+reminderCopy('inApp.preview.syntheticDetail','için yalnızca uygulama içinde gösterilen sentetik test.')};
 }
@@ -5523,7 +5561,7 @@ function reminderMedicationSectionHTML(root){
   h+='<button data-fx="destructive" type="button" class="sey-reminder-medication-clear" onclick="App.clearReminderMedicationLocal()"'+(list.length?'':' disabled')+'>'+esc(reminderCopy('inApp.empty.medicationClear','Yerel ilaç / takviye kayıtlarını temizle'))+'</button></section>';
   return h;
 }
-function reminderCardHTML(def,index){
+function reminderCardHTMLLegacy(def,index){
   var id=String(def.id||'');
   var preview=ui.reminderPreviewId===id;
   var root=reminderCurrentRoot(), pref=root&&root.preferences?root.preferences[id]:null, enabled=!pref||pref.enabled!==false;
@@ -5921,7 +5959,7 @@ function reminderInboxCardHTML(input){
   h+='<p class="sey-reminder-inbox-privacy" role="note">'+esc(reminderCopy('inApp.inbox.privacy','Bu kart yalnız uygulama içinde görünür; native başlık, not veya hassas ayrıntı delivery günlüğüne yazılmaz.'))+'</p></section>';
   return h;
 }
-function reminderCenterOverlayHTML(){
+function reminderCenterOverlayHTMLLegacy(){
   var root=reminderCurrentRoot()||emptyReminderState(), policy=normalizeReminderPolicy(root.policy), defs=reminderDefinitions(), muted=!!ui.reminderTodayMuted, remaining=muted?0:reminderCenterEnabledCount(root,defs), permission=reminderPermissionExplanation(reminderPermissionSnapshot());
   var previewTarget=ui.reminderPreviewId&&defs.some(function(def){ return String(def.id||'')===String(ui.reminderPreviewId); });
   if(!previewTarget) ui.reminderPreviewId='';
@@ -5961,6 +5999,38 @@ function reminderCenterOverlayHTML(){
   h+='<p class="sey-reminder-privacy">Katalog başlığı uygulama içinde görünür. Ayrıntı metni yalnızca yukarıdaki uygulama içi önizlemede gösterilir; kaydedilmez ve dışarı gönderilmez.</p>';
   h+='</main></section></div>';
   return h;
+}
+// MON-41: signatures remain stable for app-owned callers and for the
+// no-module safety fallback used by headless boundary fixtures.
+function reminderWindowLabel(def){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderWindowLabel==='function'?SEYMA_REMINDERS.reminderWindowLabel.apply(null,arguments):reminderWindowLabelLegacy.apply(null,arguments);
+}
+function reminderChannelLabel(def){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderChannelLabel==='function'?SEYMA_REMINDERS.reminderChannelLabel.apply(null,arguments):reminderChannelLabelLegacy.apply(null,arguments);
+}
+function reminderCategoryState(root,category){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderCategoryState==='function'?SEYMA_REMINDERS.reminderCategoryState.apply(null,arguments):reminderCategoryStateLegacy.apply(null,arguments);
+}
+function reminderCategoryChannelLabel(channel){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderCategoryChannelLabel==='function'?SEYMA_REMINDERS.reminderCategoryChannelLabel.apply(null,arguments):reminderCategoryChannelLabelLegacy.apply(null,arguments);
+}
+function reminderCapacityModeLabel(mode){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderCapacityModeLabel==='function'?SEYMA_REMINDERS.reminderCapacityModeLabel.apply(null,arguments):reminderCapacityModeLabelLegacy.apply(null,arguments);
+}
+function reminderCenterClone(value){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderCenterClone==='function'?SEYMA_REMINDERS.reminderCenterClone.apply(null,arguments):reminderCenterCloneLegacy.apply(null,arguments);
+}
+function reminderCenterEnabledCount(root,defs){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderCenterEnabledCount==='function'?SEYMA_REMINDERS.reminderCenterEnabledCount.apply(null,arguments):reminderCenterEnabledCountLegacy.apply(null,arguments);
+}
+function reminderPreviewSafeCopy(def){
+  return reminderPreviewSafeCopyLegacy.apply(null,arguments);
+}
+function reminderCardHTML(def,index){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderCardHTML==='function'?SEYMA_REMINDERS.reminderCardHTML.apply(null,arguments):reminderCardHTMLLegacy.apply(null,arguments);
+}
+function reminderCenterOverlayHTML(){
+  return SEYMA_REMINDERS&&typeof SEYMA_REMINDERS.reminderCenterOverlayHTML==='function'?SEYMA_REMINDERS.reminderCenterOverlayHTML.apply(null,arguments):reminderCenterOverlayHTMLLegacy.apply(null,arguments);
 }
 var _reminderBodyLocked=false, _reminderBodyPrevOverflow='', _reminderBodyPrevOverscrollBehavior='';
 function reminderLockBodyScroll(){

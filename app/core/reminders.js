@@ -1,10 +1,13 @@
 // MON-40 · reminder runtime adapters.
 // Frozen catalog/engine/scheduler/delivery modules remain read-only owners;
-// delivery, permission, sync, persistence and Reminder Center UI stay in app.js.
+// delivery, permission, sync and persistence stay in app.js. The Reminder
+// Center shell/card view below is a read-only adapter over the existing
+// Catalog/API surface; App handlers remain app-owned.
 (function(root){
   'use strict';
 
   var deps=null;
+  var viewDeps=null;
   var REQUIRED_DEPENDENCIES=['catalog','engine','scheduler','validTime','enumHas','policyDefaults','channels','quietBehaviors','capacityModes','priorityRank'];
   var FALLBACK_POLICY_DEFAULTS={
     nativeDailyCap:3,
@@ -23,6 +26,30 @@
     for(var i=0;i<REQUIRED_DEPENDENCIES.length;i++) if(typeof next[REQUIRED_DEPENDENCIES[i]]!=='function') return false;
     deps=next;
     return true;
+  }
+  var REQUIRED_VIEW_DEPENDENCIES=['ui','root','definitions','copy','icon','esc','normalizePolicy','permissionSnapshot','permissionExplanation','profileLabel','sections','deepLinkTarget','previewSafeCopy','channels','validTime'];
+  function registerReminderView(next){
+    if(viewDeps||!next||typeof next!=='object'||Array.isArray(next)) return false;
+    for(var i=0;i<REQUIRED_VIEW_DEPENDENCIES.length;i++) if(typeof next[REQUIRED_VIEW_DEPENDENCIES[i]]!=='function') return false;
+    viewDeps=next;
+    return true;
+  }
+  function viewDep(name,fallback){
+    var value=viewDeps&&viewDeps[name];
+    if(typeof value==='function'){
+      try{return value();}catch(e){return fallback;}
+    }
+    return value===undefined?fallback:value;
+  }
+  function viewCall(name,args,fallback){
+    var value=viewDeps&&viewDeps[name];
+    if(typeof value!=='function') return fallback;
+    try{
+      var result=value.apply(null,args||[]);
+      return result===undefined?fallback:result;
+    }catch(e){
+      return fallback;
+    }
   }
   function dep(name,fallback){
     var value=deps&&deps[name];
@@ -205,8 +232,105 @@
     return source&&typeof source.create==='function'?source.create(options||{}):null;
   }
 
+  // MON-41 view adapters. These functions receive only live read resolvers and
+  // existing app-owned section HTML. They never touch DOM/storage/network,
+  // never request native permission and never mutate data/ui. App.* strings in
+  // the markup are intentionally unchanged handler shims owned by app.js.
+  function reminderWindowLabel(def){
+    var w=def&&def.defaultWindow;
+    if(!w||typeof w!=='object') return 'Zaman penceresi hazırlanıyor';
+    if(w.kind==='offset') return 'Vakit öncesi · '+Number(w.earliestMinutesBefore||0)+'–'+Number(w.latestMinutesBefore||0)+' dk';
+    if(w.time&&viewCall('validTime',[String(w.time)],false)) return 'Saat · '+String(w.time);
+    if(w.start&&w.end) return String(w.start)+'–'+String(w.end);
+    return 'Olayla birlikte';
+  }
+  function reminderChannelLabel(def){
+    return def&&def.defaultChannel==='native'?'Native + uygulama içi':'Uygulama içi';
+  }
+  function reminderCategoryState(rootValue,category){
+    var defs=viewCall('definitions',[],[]), channelMap=viewDep('channels',FALLBACK_CHANNELS), enabled=0, channel=null, mixed=false;
+    defs=(Array.isArray(defs)?defs:[]).filter(function(def){ return String(def.category||'')===String(category||''); });
+    defs.forEach(function(def){
+      var pref=rootValue&&rootValue.preferences?rootValue.preferences[def.id]:null, isEnabled=!!(pref&&pref.enabled), nextChannel=pref&&enumHas(channelMap,pref.channel)?pref.channel:'in_app';
+      if(isEnabled) enabled++;
+      if(channel===null) channel=nextChannel; else if(channel!==nextChannel) mixed=true;
+    });
+    return {defs:defs,enabledCount:enabled,total:defs.length,allEnabled:defs.length>0&&enabled===defs.length,someEnabled:enabled>0,channel:mixed?'mixed':(channel||'in_app')};
+  }
+  function reminderCategoryChannelLabel(channel){
+    if(channel==='native') return 'Native · izin varsa; uygulama içi yedek açık';
+    if(channel==='mixed') return 'Karışık kanal';
+    return 'Uygulama içi';
+  }
+  function reminderCapacityModeLabel(mode){
+    var labels={balanced:'Dengeli',light:'Hafif gün',silent:'Sessiz',ritual:'Ritüel odaklı'};
+    return labels[mode]||labels.balanced;
+  }
+  function reminderCenterClone(value){
+    try{ return JSON.parse(JSON.stringify(value)); }catch(e){ return null; }
+  }
+  function reminderCenterEnabledCount(rootValue,defs){
+    var preferences=rootValue&&rootValue.preferences&&typeof rootValue.preferences==='object'?rootValue.preferences:{}, list=Array.isArray(defs)?defs:[];
+    return list.filter(function(def){ var pref=preferences[String(def&&def.id||'')]; return !(pref&&pref.enabled===false); }).length;
+  }
+  function reminderCardHTML(def,index){
+    var ui=viewDep('ui',{}), rootValue=viewCall('root',[],{}), id=String(def&&def.id||''), preview=ui.reminderPreviewId===id, pref=rootValue&&rootValue.preferences?rootValue.preferences[id]:null, enabled=!pref||pref.enabled!==false;
+    var target=viewCall('deepLinkTarget',[{reminderId:id,deepLink:String(def&&def.deepLink||'')}],{ok:false}), targetState=target&&target.ok?'available':'unavailable';
+    var copy=function(key,fallback){ return viewCall('copy',[key,fallback],fallback); }, icon=function(name,size){ return viewCall('icon',[name,size],''); }, esc=function(value){ return viewCall('esc',[value],String(value==null?'':value)); };
+    var title=String(def&&def.privateTitle||''), safe=viewCall('previewSafeCopy',[def],{detail:''}), body=ui.reminderPreviewLegacyId===id?String(def&&def.privateBody||''):String(safe&&safe.detail||'');
+    var h='<article class="sey-reminder-card sey-stagger" style="--i:'+Math.min(index,8)+'" data-reminder-id="'+esc(id)+'" data-reminder-category="'+esc(String(def&&def.category||''))+'" aria-labelledby="sey-reminder-card-title-'+index+'">';
+    h+='<div class="sey-reminder-card-top"><span class="sey-reminder-card-index" aria-hidden="true">'+(index+1)+'</span><div class="sey-reminder-card-copy"><span class="sey-reminder-card-category">'+esc(String(def&&def.category||'').replace(/_/g,' '))+'</span><h3 id="sey-reminder-card-title-'+index+'">'+esc(title)+'</h3></div><span class="sey-reminder-card-state">'+esc(String(def&&def.priority||'—'))+' · Öneri</span></div>';
+    h+='<div class="sey-reminder-card-meta"><span><b>Tetikleyici</b>'+esc(String(def&&def.triggerType||'—'))+'</span><span><b>Pencere</b>'+esc(reminderWindowLabel(def))+'</span><span><b>Kanal</b>'+esc(reminderChannelLabel(def))+'</span><span data-reminder-target-state="'+targetState+'"><b>Bağlantı</b>'+esc(target&&target.ok?String(def&&def.deepLink||'—'):'Şimdilik kullanılamıyor')+'</span></div>';
+    h+='<small class="sey-reminder-card-version">Tanım v'+esc(String(def&&def.definitionVersion||'—'))+'</small>';
+    if(!target||!target.ok) h+='<div class="sey-reminder-unavailable" data-reminder-target-state="unavailable" role="status"><strong>Bu durak şu anda kullanılamıyor.</strong><span>Hatırlatma ayarı burada korunur; hedef hazır olduğunda yeniden açabilirsin.</span></div>';
+    h+='<div class="sey-reminder-card-actions"><button type="button" class="sey-reminder-secondary" onclick="App.previewReminderSafe(\''+esc(id)+'\')" aria-expanded="'+(preview?'true':'false')+'" aria-controls="sey-reminder-preview-'+index+'">'+esc(preview?copy('inApp.actions.previewClose','Önizlemeyi kapat'):copy('inApp.actions.previewOpen','Uygulama içi önizleme'))+'</button><button type="button" class="sey-reminder-secondary'+(enabled?'':' is-disabled')+'" onclick="App.setReminderEnabled(\''+esc(id)+'\','+(enabled?'false':'true')+')" aria-pressed="'+enabled+'">'+esc(enabled?copy('inApp.actions.disableReminder','Bu durağı kapat'):copy('inApp.actions.enableReminder','Bu durağı tekrar aç'))+'</button></div>';
+    if(preview) h+='<div id="sey-reminder-preview-'+index+'" class="sey-reminder-preview" role="status" aria-live="polite"><span class="sey-reminder-preview-kicker">'+esc(copy('inApp.preview.kicker','UYGULAMA İÇİ ÖNİZLEME · GÜVENLİ'))+'</span><strong>'+esc(title)+'</strong><p>'+esc(body)+'</p><small>'+esc(copy('inApp.preview.bodySuffix','Bu yalnızca uygulama içi bir önizlemedir; native izin, bildirim veya kayıt oluşturmaz. Hassas reminder gövdesi gösterilmez.'))+'</small></div>';
+    h+='</article>';
+    return h;
+  }
+  function reminderCenterOverlayHTML(){
+    var rootValue=viewCall('root',[],{})||{}, policy=viewCall('normalizePolicy',[rootValue.policy],{})||{}, defs=viewCall('definitions',[],[]), ui=viewDep('ui',{})||{}, muted=!!ui.reminderTodayMuted, remaining=muted?0:reminderCenterEnabledCount(rootValue,defs), snapshot=viewCall('permissionSnapshot',[],null), permission=viewCall('permissionExplanation',[snapshot],{})||{}, sections=viewCall('sections',[rootValue,permission],{})||{}, copy=function(key,fallback){ return viewCall('copy',[key,fallback],fallback); }, icon=function(name,size){ return viewCall('icon',[name,size],''); }, esc=function(value){ return viewCall('esc',[value],String(value==null?'':value)); }, profileLabel=String(viewCall('profileLabel',[rootValue.profile],'')||'');
+    var h='<div id="sey-reminder-overlay" class="sey-reminder-overlay" role="dialog" aria-modal="true" aria-labelledby="sey-reminder-title" aria-describedby="sey-reminder-overview-copy" tabindex="-1" onclick="App.closeReminderCenter()" onkeydown="if(event.key===\'Escape\'){event.preventDefault();App.closeReminderCenter();}">';
+    h+='<section id="sey-reminder-screen" class="sey-reminder-screen" tabindex="-1" onkeydown="App.onReminderKeydown(event)" onclick="event.stopPropagation()">';
+    h+='<header class="sey-reminder-header"><div><span class="sey-reminder-eyebrow">ŞEYMA · RİTİM MERKEZİ</span><h2 id="sey-reminder-title">'+esc(copy('inApp.center.title','Hatırlatmalar ve bildirimler'))+'</h2><p>'+esc(copy('inApp.center.subtitle','Günün küçük duraklarını burada sakince gözden geçir.'))+'</p></div><button data-fx="close" type="button" class="sey-reminder-close" onclick="App.closeReminderCenter()" aria-label="'+esc(copy('inApp.center.closeLabel','Hatırlatmalar ve bildirimler merkezini kapat'))+'">'+icon('x',18)+'</button></header>';
+    h+='<main id="sey-reminder-scroll" class="sey-reminder-scroll">';
+    h+=sections.notice||'';
+    h+='<section class="sey-reminder-intro" aria-labelledby="sey-reminder-overview-title"><div class="sey-reminder-intro-mark" aria-hidden="true">'+icon('bell-ring',22)+'</div><div><h3 id="sey-reminder-overview-title">'+esc(copy('inApp.center.introTitle','Kontrol sende'))+'</h3><p id="sey-reminder-overview-copy">'+esc(copy('inApp.center.introBody','Native kanal yalnız açık bir kullanıcı eylemiyle açılır; ilk yüklemede izin istenmez. Uygulama içi önizleme izin gerektirmez.'))+'</p></div></section>';
+    h+=sections.systemStatus||'';
+    h+=sections.profile||'';
+    h+='<section class="sey-reminder-summary" aria-label="Bugünün hatırlatma özeti">';
+    [[ 'sun','Bugünün modu',reminderCapacityModeLabel(policy.capacityMode),'Profil: '+profileLabel],['check-check','Kalan öneri',String(remaining),'Katalog kapsamı · '+defs.length+' tanım'],['circle-check','Native izin',permission.label,permission.meaning],['moon','Sessiz saatler',policy.quietHours.start+'–'+policy.quietHours.end,'Kullanıcı tercihi · quiet interval'],['activity','Native bütçesi','0 / '+policy.nativeDailyCap,'Günlük üst sınır · düşük öncelik '+policy.lowPriorityNativeCap+' · cooldown '+policy.sameCategoryCooldownMinutes+' dk']].forEach(function(item){
+      h+='<div class="sey-reminder-summary-item"><span class="sey-reminder-summary-icon" aria-hidden="true">'+icon(item[0],16)+'</span><span><small>'+esc(item[1])+'</small><strong>'+esc(item[2])+'</strong><em>'+esc(item[3])+'</em></span></div>';
+    });
+    h+='</section>';
+    h+='<section class="sey-reminder-actions" aria-label="Hatırlatma eylemleri"><button type="button" class="sey-reminder-primary" onclick="App.testReminder()">'+icon('play',16)+'<span>Sentetik test reminder · Uygulama içi önizleme/test</span></button><button type="button" class="sey-reminder-mute'+(muted?' is-muted':'')+'" onclick="App.muteReminderToday()" aria-pressed="'+muted+'">'+icon('bell-off',16)+'<span>'+(muted?esc(copy('inApp.mute.todayRestore','Bugün susturuldu · geri getir')):esc(copy('inApp.mute.todayAll','Bugün tümünü sustur')))+'</span></button></section>';
+    h+='<div id="sey-reminder-digest-target">'+(sections.digestLauncher||'')+(sections.digest||'')+'</div>';
+    h+='<div id="sey-reminder-test-preview-target">'+(sections.testPreview||'')+'</div>';
+    h+=sections.policy||'';
+    h+=sections.personalization||'';
+    h+='<p class="sey-reminder-live-note" role="status" aria-live="polite" aria-atomic="true" id="sey-reminder-center-live-region" data-reminder-render-target="reminder-center-live">'+icon('info',14)+' '+esc(copy('inApp.center.liveNote','Native seçimi izin, mahrem kopya ve desteklenen PWA koşullarıyla sınırlıdır; izin kapalıysa uygulama içi kartlar korunur.'))+'</p>';
+    h+=sections.permission||'';
+    h+=sections.categories||'';
+    h+=sections.specialDays||'';
+    h+=sections.care||'';
+    h+=sections.medication||'';
+    h+=sections.history||'';
+    h+=sections.retention||'';
+    h+='<section class="sey-reminder-catalog" aria-labelledby="sey-reminder-catalog-title"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">KATALOGDAN GELEN DURAKLAR</span><h3 id="sey-reminder-catalog-title">Öneri alanları</h3></div><span class="sey-reminder-count">'+defs.length+'</span></div>';
+    if(!defs.length){
+      h+='<div class="sey-reminder-empty" role="status"><span aria-hidden="true">'+icon('sparkles',22)+'</span><strong>'+esc(copy('inApp.empty.catalogTitle','Şimdilik katalogda etkin hatırlatma yok.'))+'</strong><p>'+esc(copy('inApp.empty.catalogBody','Merkez hazır; yeni kayıtlar geldiğinde burada görünür.'))+'</p></div>';
+    } else {
+      h+='<div class="sey-reminder-catalog-list">'; defs.forEach(function(def,index){ h+=reminderCardHTML(def,index); }); h+='</div>';
+    }
+    h+='</section>';
+    h+='<p class="sey-reminder-privacy">Katalog başlığı uygulama içinde görünür. Ayrıntı metni yalnızca yukarıdaki uygulama içi önizlemede gösterilir; kaydedilmez ve dışarı gönderilmez.</p>';
+    h+='</main></section></div>';
+    return h;
+  }
+
   root.SeymaReminders=Object.freeze({
     registerReminders:registerReminders,
+    registerReminderView:registerReminderView,
     reminderDefinitions:reminderDefinitions,
     reminderCopy:reminderCopy,
     reminderPolicyTimeMinutes:reminderPolicyTimeMinutes,
@@ -221,6 +345,15 @@
     reminderPolicySelectNativeCandidates:reminderPolicySelectNativeCandidates,
     reminderEngineLocalParts:reminderEngineLocalParts,
     reminderEngineGenerateOccurrence:reminderEngineGenerateOccurrence,
-    reminderSchedulerCreate:reminderSchedulerCreate
+    reminderSchedulerCreate:reminderSchedulerCreate,
+    reminderWindowLabel:reminderWindowLabel,
+    reminderChannelLabel:reminderChannelLabel,
+    reminderCategoryState:reminderCategoryState,
+    reminderCategoryChannelLabel:reminderCategoryChannelLabel,
+    reminderCapacityModeLabel:reminderCapacityModeLabel,
+    reminderCenterClone:reminderCenterClone,
+    reminderCenterEnabledCount:reminderCenterEnabledCount,
+    reminderCardHTML:reminderCardHTML,
+    reminderCenterOverlayHTML:reminderCenterOverlayHTML
   });
 })(typeof window!=='undefined'?window:this);

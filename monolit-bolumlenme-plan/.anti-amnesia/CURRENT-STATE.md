@@ -11,10 +11,48 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 7 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-38 / MON-39 |
-| Dalga / ilerleme | 6 kapandı; Dalga 7 sürüyor (6/7) / 38/60 |
+| Son / sıradaki | MON-39 / MON-40 |
+| Dalga / ilerleme | 7 kapandı; Dalga 8 sürüyor (0/4) / 39/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-11 |
+
+## MON-39 kapanışı — 15 domain registry envanteri
+
+- Karar/kanıt: [`MON-D7-DOMAIN-ENVANTERI.md`](../deliverables/MON-D7-DOMAIN-ENVANTERI.md).
+- Canlı envanter 13 mevcut registryyi ve iki henüz ayrılmamış hedefi tek tabloya
+  bağladı: Prayer 25/25, Zikr 59/59, Quran 21/21, Saygı 76/76, Motivation
+  24 API (23 shim + doğrudan `flexNudgeFor`), Crisis 5 API (4 shim + `crises`),
+  Journal 11 API (10 shim + `journalPhasePrompts`), Health 84 API (83 external
+  shim + internal `magnesiumCardHTML`), Library 64/64, Report 16/16, Map 16/16,
+  Profile 30/30 ve Settings 2/2. Reminders frozen dört global registry + app.js
+  runtime sahibi; Messaging app.js observer/ÆON/Luna sahibi olarak açıkça
+  kaydedildi; `SeymaReminders`/`SeymaMessaging` varmış gibi sayılmadı.
+- Resolver yüzeyleri Prayer 10, Zikr 22, Quran 1, Saygı 15, Motivation 13,
+  Crisis 9, Journal 10, Health 44, Library 32, Report 29, Map 24, Profile 5,
+  Settings 11 olarak canlı dependency bag'lerinden ölçüldü. Registry graphında
+  beklenmeyen orphan/çift sahiplik, eager side effect veya privacy/consent farkı
+  bulunmadı; app-owned mutation/DOM/permission/network sınırları raporda isimli.
+- Dump kanıtı: `bugun` 112397 (random SHA notu), `saglik` 65868,
+  `saygi` 20383, `sos` 8099, `harita` 29084, `rapor` 139367, `mesaj` 17138,
+  `profile` 7435, `ayarlar` 46190. Tam SHA-256 değerleri deliverable'dadır;
+  profile/settings/rapor/harita sabit, bugun/saygi random yüzey notludur.
+- App/onclick/FX manifesti HEAD/current delta **0**: App function 556/556,
+  tüm App assignment 721/721, unique 718/718, App ref 1137/1137, direct
+  `onclick=...App.` 153/153, `data=` canonical 9 satır/11 token ve FX
+  `SeyAudio/SeyHaptics/SeyFx/SeyTimeTheme` 78/63/58/6 eşit.
+- Gates: syntax, driver, zikr **95/95**, B1/B2/B3, modularization **99/99**,
+  Faz−1.1 **27/27**, dateUtils **59/59**, helpers **31/31**, rebind **37/37**,
+  save **19/19**, Faz10 **69/69**, premium 9/9, panel 23/23/P3 35/35/P4 28/28,
+  Panel-v2 27/27, Quran 9/9, reminder 21/21 + 20 curated smoke PASS. Current
+  app loopunda yalnız Settings fixtureı HEAD^ locator farkı ile kırmızı; temiz
+  MON-37 commit worktree replay'i **13/13** PASS verdi. Bu, MON-38 seq 53'te
+  kayıtlı fixture-history bulgusudur; üretim failure'ı değildir.
+- MON-39 production kodu, content, sync, panel, schema, cache-bust veya FILES
+  değiştirmedi. Browser/device, remote, push/merge/tag/deploy ve
+  `mustafaras/seyma-data` yazımı yok. State gerçeği: `MON-STATE.json`
+  `status=in_progress`, `blockedPrompt=null`, `lastCompletedPrompt=MON-39`,
+  `nextPrompt=MON-40`, Dalga 7 **7/7**, toplam **39/60**. Sonraki MON-40
+  reminders runtime'dır ve ayrıca kullanıcı yönü gerektirir.
 
 ## MON-38 kapanışı — Dalga 7 registry regression
 

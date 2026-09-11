@@ -12,6 +12,7 @@ const crisisSource = fs.readFileSync('app/core/crisis.js', 'utf8');
 const journalSource = fs.readFileSync('app/core/journal.js', 'utf8');
 const saygiSource = fs.readFileSync('app/core/saygi.js', 'utf8');
 const librarySource = fs.readFileSync('app/core/library.js', 'utf8');
+const messagingSource = fs.readFileSync('app/core/messaging.js', 'utf8');
 
 function ok(name, condition) {
   assert.equal(condition, true, name);
@@ -50,7 +51,7 @@ const modalSections = [
   ['Ortak hub kabuğu', section('function overlayShell(', '\nfunction soulOverlayShell(', librarySource)],
   ['Zihin-beden hub kabuğu', section('function soulOverlayShell(', '\nfunction bookStatusChip', librarySource)],
   ['Kısa düzenleme kabuğu', section('function compactModalShell(', '\nfunction bookEditModal', librarySource)],
-  ['ÆON ek sayfası', section('function aeonAttachSheetHTML(){', '\nApp.aeonOpenAttachSheet=')],
+  ['ÆON ek sayfası', section('function attachSheetHTML(){', 'function chatHTML', messagingSource)],
   ['Doğrudan uygulama modalları', section('function modalsHTML(){', '\n// boot')],
 ];
 

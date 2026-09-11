@@ -5,13 +5,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "MON-41",
-  "nextPrompt": "MON-42",
+  "lastCompletedPrompt": "MON-42",
+  "nextPrompt": "MON-43",
   "currentWave": "8",
   "totalPrompts": 60,
-  "completedPrompts": 41,
+  "completedPrompts": 42,
   "updatedAt": "2026-09-11",
-  "nextSafeAction": "MON-41 tamamlandı: MON-41-REMINDER-UI-ENVANTERI.md içinde SeymaReminders view registration ve read-only Reminder Center/card üreticileri, Catalog/API tüketimi, app-owned permission/mutation/handler sınırı, modal focus ve reminder dump kanıtı kaydedildi. app/core/reminders.js cache-bust v=20260911b ile güncellendi; driver reminder dump yolu eklendi; yeni FILES üyesi yok, mevcut reminders FILES zinciri aynı sırada kaldı. App/onclick/FX manifesti 556/721/718, onclick 153, canonical data 9/11, FX 78/63/58/6 delta 0; frozen reminder×4, profile content, sync, panel, schema ve releaseApproval not_approved değişmedi. MON-41 view boundary, reminder acceptance 554, reminder smoke, privacy, modal focus, driver + reminder dump, syntax, profile/settings, state/rebind, Faz10, panel P3/P4, Quran, Premium ve tam app/panel/Panel-v2 regression PASS. State gerçeği in_progress, blockedPrompt=null, Dalga 8 2/4, toplam 41/60. Browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-42 için yeni açık kullanıcı yönü gerekir.",
+  "nextSafeAction": "MON-42 tamamlandı: MON-42-MESSAGING-CHRONOLOGY-MANIFESTI.md içinde SeymaMessaging frozen read-only registry, Luna/ÆON bubble ve chronology gövdeleri, stable expand identity, answer notification dedupe, scroll/attachment boundary, app-owned handler/mutation sınırı ve dump parity kaydedildi. app/core/messaging.js cache-bust v=20260911a ile index, driver, zikr-harness, state-rebind ve ilgili fixture FILES zincirlerine messaging → app.js sırasıyla eklendi. Messaging 21 public member, 18 named dependency ve 282 satır/30108 byte; App function/all/unique 556/721/718, onclick 391, canonical data 9/11, FX 78/63/58/6 delta 0. `test_aeon_message_expand` 24/24, messaging boundary, driver --dump mesaj 17138 UTF-8 byte SHA 15df13b7138af356d7c5a4d9c80e0b5719eeb0e7d8b7d002bf1998c1b09394da, modal focus, syntax, state-rebind 37/37, Faz10 69/69, zikr 95/95, reminder smoke/acceptance/privacy, panel P3/P4, Quran, Premium ve tam app/panel/Panel-v2 regression PASS. sync.js, profile content, frozen reminder×4, panel, schema, production data ve releaseApproval not_approved değişmedi; privacy/consent, conversation/attachment flow, eager side effect, orphan/çift sahiplik bulunmadı. State gerçeği in_progress, blockedPrompt=null, Dalga 8 3/4, toplam 42/60. Browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-43 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -188,6 +188,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-41-REMINDER-UI-ENVANTERI.md",
       "decision": "reminders_read_only_view_registry_catalog_api_copy_card_center_modal_focus_app_owned_handlers_permission_mutation_and_fallback_parity"
+    },
+    "MON-42": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-42-MESSAGING-CHRONOLOGY-MANIFESTI.md",
+      "decision": "messaging_frozen_read_only_registry_chronology_expand_scroll_attachment_boundary_app_owned_handlers_and_dump_parity"
     }
   },
   "waves": [
@@ -252,7 +257,7 @@
       "prompts": "MON-40..MON-43",
       "topic": "reminder ve mesajlasma",
       "approvalRequired": true,
-      "completed": 2,
+      "completed": 3,
       "total": 4
     },
     {

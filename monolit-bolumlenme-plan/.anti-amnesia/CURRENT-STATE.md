@@ -11,10 +11,43 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 8 sürüyor |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-41 / MON-42 |
-| Dalga / ilerleme | Dalga 7 kapandı; Dalga 8 sürüyor (2/4) / 41/60 |
+| Son / sıradaki | MON-42 / MON-43 |
+| Dalga / ilerleme | Dalga 7 kapandı; Dalga 8 sürüyor (3/4) / 42/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-11 |
+
+## MON-42 kapanışı — messaging domain modülü
+
+- Karar/kanıt: [`MON-42-MESSAGING-CHRONOLOGY-MANIFESTI.md`](../deliverables/MON-42-MESSAGING-CHRONOLOGY-MANIFESTI.md).
+- `app/core/messaging.js` içinde frozen `SeymaMessaging` registry'si kuruldu;
+  21 read-only public member ve 18 named resolver ile Luna/ÆON bubble, markdown,
+  clamp, chronology, attachment sheet ve `mesajHTML` gövdeleri taşındı. `app.js`
+  aynı imza/adlarla shim olarak kaldı. `App` handlerları, DOM/timer/scroll,
+  notification request/dedupe mutation, upload/record, provider/network/token,
+  save/render ve state rebind app.js sahipliğinde kaldı.
+- Stable bubble identity + `ui.aeonExpanded`, answer notification `answerMsgId`
+  dedupe, QA answer ordering, 40-item chronology window, scroll-to-bottom
+  markup ve attachment accept parity korunmuştur. Registry doğrudan `data`/`ui`
+  yazmaz; watermark setter'ları app-owned closure sınırını görünür resolver olarak
+  kullanır. Privacy/consent, conversation state ve attachment flow farkı yoktur.
+- `index.html` cache-bust `app/core/messaging.js?v=20260911a`; production/
+  driver/zikr/state-rebind sırası `reminders → messaging → app.js`. İlgili
+  fixture boot listeleri aynı prefix paritesine getirildi. Messaging 282 satır /
+  30,108 byte.
+- Dump parity: `driver --dump mesaj` **17,138 UTF-8 byte**, SHA-256
+  `15df13b7138af356d7c5a4d9c80e0b5719eeb0e7d8b7d002bf1998c1b09394da`, `cmp=0`.
+  `test_aeon_message_expand` **24/24** ve `test_messaging_boundary` PASS;
+  modal focus, syntax, state/rebind **37/37**, Faz10 **69/69**, zikr **95/95**,
+  reminder smoke/acceptance/privacy, panel P3/P4, Quran, Premium ve tam
+  app/panel/Panel-v2 regression PASS.
+- Manifest: App function/all/unique **556/721/718**, inline onclick **391**,
+  canonical data **9/11**, FX **78/63/58/6**, MON-41 delta **0**. Sync.js,
+  profile content, frozen reminder×4, panel, schema, production data ve
+  `releaseApproval=not_approved` değişmedi. Browser/device, native permission,
+  remote, push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı yok.
+- State gerçeği `in_progress`, `blockedPrompt=null`, Dalga 8 **3/4**, toplam
+  **42/60**. Sıradaki MON-43'tür; bu karta geçiş için yeni açık kullanıcı yönü
+  gerekir.
 
 ## MON-41 kapanışı — reminders UI merkezi
 

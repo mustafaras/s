@@ -10,7 +10,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
-// MON-26/MON-27/MON-28/MON-36: domain gövdeleri registry'lerinde; yüzey sayımları
+// MON-26/MON-27/MON-28/MON-36/MON-42: domain gövdeleri registry'lerinde; yüzey sayımları
 // birleşik kaynakta yapılır (App handler adları app.js'te kalır).
 const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
 const crisisSource = fs.readFileSync(path.join(repoRoot, 'app/core/crisis.js'), 'utf8');
@@ -21,7 +21,8 @@ const reportSource = fs.readFileSync(path.join(repoRoot, 'app/core/report.js'), 
 const mapSource = fs.readFileSync(path.join(repoRoot, 'app/core/map.js'), 'utf8');
 const profileSource = fs.readFileSync(path.join(repoRoot, 'app/core/profile.js'), 'utf8');
 const settingsSource = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource;
+const messagingSource = fs.readFileSync(path.join(repoRoot, 'app/core/messaging.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const goMatch = appSource.match(/App\.go=function\(id,event\)\{[\s\S]*?\n\};\n\n\/\/ ── REM-05/);
 

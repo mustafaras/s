@@ -262,6 +262,7 @@ const FILES = [
   'app/core/reminderScheduler.js',
   'app/core/reminderDelivery.js',
   'app/core/reminders.js',
+  'app/core/messaging.js',
   'app.js'
 ];
 

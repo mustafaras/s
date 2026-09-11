@@ -17,6 +17,9 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   bilgisi yalnızca DOM’da tutuluyordu; her arka plan render’ı (30 sn ÆON yoklaması,
   reminder timer’ı, foreground dönüşü, yeni mesaj, panel makbuzu) mesajı kullanıcı
   okurken kapatıyordu. Ağsız, sentetik, `node:vm` tabanlı.
+- `app/test_messaging_boundary.js` — MON-42 `SeymaMessaging` registry’sinin
+  salt-okur chronology/render/attachment sınırını ve source notification dedupe
+  sözleşmesini sentetik resolver bag’iyle doğrular.
 - `app/test_motivation_room_accessibility.js` — Terapi Odası dialog semantiği,
   Tab/Shift+Tab focus sarma, Escape kapanışı ve yansıma taslağında yeniden render
   olmaması için ağsız sentetik regresyon fixture’ı.

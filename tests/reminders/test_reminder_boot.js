@@ -27,6 +27,7 @@ const REPORT_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/report.js"), "ut
 const MAP_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/map.js"), "utf8");
 const PROFILE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/profile.js"), "utf8");
 const SETTINGS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/settings.js"), "utf8");
+const MESSAGING_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/messaging.js"), "utf8");
 
 function fixtureElement(id, htmlState) {
   const attrs = {};
@@ -149,6 +150,7 @@ function boot({ catalog = true, seed = null } = {}) {
   vm.runInContext(PROFILE_SOURCE, context, { filename: "app/core/profile.js" });
   vm.runInContext(SETTINGS_SOURCE, context, { filename: "app/core/settings.js" });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });
+  vm.runInContext(MESSAGING_SOURCE, context, { filename: "app/core/messaging.js" });
   vm.runInContext(APP_SOURCE, context, { filename: "app.js" });
   return { sandbox, app, html: () => htmlState.value, fetchCalls: () => fetchCalls, geolocationCalls: () => geolocationCalls };
 }

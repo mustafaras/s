@@ -114,6 +114,24 @@
     app().saveNow();
   }
 
+  // MON-51: the approved domain-handler shells dispatch only to their
+  // pre-existing domain registries. This module never copies domain logic or
+  // creates another domain owner.
+  var DOMAIN_HANDLER_REGISTRIES={
+    setPrayerCity:'SeymaPrayer',setPrayerMethod:'SeymaPrayer',togglePrayer:'SeymaPrayer',setPrayerNote:'SeymaPrayer',changeNafile:'SeymaPrayer',setZikrPreset:'SeymaZikr',zikrManualApply:'SeymaZikr',toggleZikrPause:'SeymaZikr',startNewZikrHatim:'SeymaZikr',
+    quranNoteField:'SeymaQuran',quranAddNote:'SeymaQuran',openQuranJourney:'SeymaQuran',closeQuranJourney:'SeymaQuran',openQuranSurah:'SeymaQuran',backToQuranLibrary:'SeymaQuran',setQuranQuery:'SeymaQuran',clearQuranQuery:'SeymaQuran',setQuranFilter:'SeymaQuran',resetQuranLens:'SeymaQuran',toggleQuranFilters:'SeymaQuran',onQuranKeydown:'SeymaQuran',
+    openSaygiPreview:'SeymaSaygi',openSaygiCollectionPerson:'SeymaSaygi',browseSaygiPerson:'SeymaSaygi',closeSaygiPerson:'SeymaSaygi',markSaygiRead:'SeymaSaygi',openRoom:'SeymaMotivation',closeRoom:'SeymaMotivation',updateRoom:'SeymaMotivation',setRoomTab:'SeymaMotivation',toggleRoomTool:'SeymaMotivation',toggleMotivationCard:'SeymaMotivation',
+    openCrisis:'SeymaCrisis',closeCrisis:'SeymaCrisis',toggleCrisisDropdown:'SeymaCrisis',toggleCrisisOpt:'SeymaCrisis',toggleCrisisTrigger:'SeymaCrisis',onCrisisNote:'SeymaCrisis',completeCrisis:'SeymaCrisis',resetCrisis:'SeymaCrisis',openJournalModal:'SeymaJournal',closeJournalModal:'SeymaJournal',setJournalMode:'SeymaJournal',onJournalText:'SeymaJournal',useJournalPrompt:'SeymaJournal',saveJournal:'SeymaJournal'
+  };
+  function registerDomainHandlers(handlers){
+    if(!handlers||typeof handlers!=='object'||Array.isArray(handlers)) return false;
+    var names=Object.keys(DOMAIN_HANDLER_REGISTRIES),i,name,registry;
+    for(i=0;i<names.length;i++){ name=names[i]; registry=window[DOMAIN_HANDLER_REGISTRIES[name]]; if(!registry||typeof handlers[name]!=='function'||(typeof registry[name]==='function'&&name!=='zikrManualApply')) return false; }
+    for(i=0;i<names.length;i++){ name=names[i]; if(typeof window[DOMAIN_HANDLER_REGISTRIES[name]][name]!=='function') window[DOMAIN_HANDLER_REGISTRIES[name]][name]=handlers[name]; }
+    return true;
+  }
+  function domainHandler(name,args){ var registry=window[DOMAIN_HANDLER_REGISTRIES[name]],fn=registry&&registry[name]; if(typeof fn!=='function') throw new Error('SeymaAppSurface: domain handler çözümlenemedi '+name); return fn.apply(null,args||[]); }
+
   window.SeymaAppSurface={
     APP_SURFACE_DEPENDENCIES:APP_SURFACE_DEPENDENCIES.slice(),
     registerAppSurface:registerAppSurface,
@@ -121,6 +139,9 @@
     toggleMgHabit:toggleMgHabit,
     explainDerivedHabit:explainDerivedHabit,
     setMood:setMood,
-    saveToday:saveToday
+    saveToday:saveToday,
+    DOMAIN_HANDLER_REGISTRIES:DOMAIN_HANDLER_REGISTRIES,
+    registerDomainHandlers:registerDomainHandlers,
+    domainHandler:domainHandler
   };
 })();

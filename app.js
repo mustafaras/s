@@ -11552,6 +11552,17 @@ App.quranUiState=function(){
     listScroll:ui.quranListScroll,submittingId:ui.quranSubmittingId
   };
 };
+// MON-51: only the approved 46 local domain shells pass through the existing
+// registry owner. App, live data/ui, save/render and DOM/focus sequencing stay
+// app.js-owned; frozen transport, GPS, fetch and notification paths stay out.
+var MON51_DOMAIN_HANDLERS={
+  setPrayerCity:App.setPrayerCity,setPrayerMethod:App.setPrayerMethod,togglePrayer:App.togglePrayer,setPrayerNote:App.setPrayerNote,changeNafile:App.changeNafile,setZikrPreset:App.setZikrPreset,zikrManualApply:App.zikrManualApply,toggleZikrPause:App.toggleZikrPause,startNewZikrHatim:App.startNewZikrHatim,
+  quranNoteField:App.quranNoteField,quranAddNote:App.quranAddNote,openQuranJourney:App.openQuranJourney,closeQuranJourney:App.closeQuranJourney,openQuranSurah:App.openQuranSurah,backToQuranLibrary:App.backToQuranLibrary,setQuranQuery:App.setQuranQuery,clearQuranQuery:App.clearQuranQuery,setQuranFilter:App.setQuranFilter,resetQuranLens:App.resetQuranLens,toggleQuranFilters:App.toggleQuranFilters,onQuranKeydown:App.onQuranKeydown,
+  openSaygiPreview:App.openSaygiPreview,openSaygiCollectionPerson:App.openSaygiCollectionPerson,browseSaygiPerson:App.browseSaygiPerson,closeSaygiPerson:App.closeSaygiPerson,markSaygiRead:App.markSaygiRead,openRoom:App.openRoom,closeRoom:App.closeRoom,updateRoom:App.updateRoom,setRoomTab:App.setRoomTab,toggleRoomTool:App.toggleRoomTool,toggleMotivationCard:App.toggleMotivationCard,
+  openCrisis:App.openCrisis,closeCrisis:App.closeCrisis,toggleCrisisDropdown:App.toggleCrisisDropdown,toggleCrisisOpt:App.toggleCrisisOpt,toggleCrisisTrigger:App.toggleCrisisTrigger,onCrisisNote:App.onCrisisNote,completeCrisis:App.completeCrisis,resetCrisis:App.resetCrisis,openJournalModal:App.openJournalModal,closeJournalModal:App.closeJournalModal,setJournalMode:App.setJournalMode,onJournalText:App.onJournalText,useJournalPrompt:App.useJournalPrompt,saveJournal:App.saveJournal
+};
+if(!SEYMA_APP_SURFACE||typeof SEYMA_APP_SURFACE.registerDomainHandlers!=='function'||!SEYMA_APP_SURFACE.registerDomainHandlers(MON51_DOMAIN_HANDLERS)) throw new Error('MON-51: domain handler registry kurulamadı');
+Object.keys(MON51_DOMAIN_HANDLERS).forEach(function(name){ App[name]=function(){ return SEYMA_APP_SURFACE.domainHandler(name,arguments); }; });
 window.App=App;
 
 // ---------- konum & hareket takibi (yalnızca kullanıcı açık rıza verdiyse) ----------

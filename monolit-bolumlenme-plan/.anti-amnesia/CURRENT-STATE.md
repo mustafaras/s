@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-51 handler matrisi kesinleşti |
-| Aktif / bloke | MON-51 / yok |
-| Son / sıradaki | MON-50 / MON-51 (uygulama sürüyor) |
-| Dalga / ilerleme | Dalga 10 başladı (1/5) / 50/60 |
+| Durum | `in_progress` — MON-51 tamamlandı |
+| Aktif / bloke | yok / yok |
+| Son / sıradaki | MON-51 / MON-52 (yeni açık onay gerekir) |
+| Dalga / ilerleme | Dalga 10 (2/5) / 51/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
 
@@ -36,10 +36,21 @@
   [`MON-51-HANDLER-SCOPE-KARARI.md`](../deliverables/MON-51-HANDLER-SCOPE-KARARI.md)
   ile çözüldü: 46 local UI handler, yedi registryye tekil olarak bağlandı;
   Quran frozen transport, Prayer GPS/ağ, Saygı fetch, notification ve
-  cross-domain yüzeyler açıkça hariçtir. Runtime uygulaması henüz başlamadı.
-- `MON-STATE.json` `status=in_progress`, `activePrompt=MON-51`,
-  `blockedPrompt=null` oldu. Bir sonraki işlem yalnız bu listedeki gövdeleri
-  `SeymaAppSurface`e taşımaktır; MON-52'ye geçilmez.
+  cross-domain yüzeyler açıkça hariçtir.
+- Uygulama: [`MON-51-DOMAIN-HANDLER-MANIFESTI.md`](../deliverables/MON-51-DOMAIN-HANDLER-MANIFESTI.md).
+  `SeymaAppSurface` mapping'i her App çağrısını tek mevcut domain registryye
+  dispatch eder; mevcut handler fonksiyonu ilgili registryye boot sonunda bir
+  kez kaydedilir, ardından App adı/imzası/return yolu shimde korunur.
+  `zikrManualApply` zaten SeymaZikr API'si olduğundan değiştirilmez. `data/ui`,
+  save/render, DOM/focus ve tüm hariç yollar app.js sahibidir.
+- `test_app_surface_domain_boundary` **58/58**; app **49**, Quran **9**,
+  current panel **23**, Panel-v2 **27**, reminder smoke **21**, driver, zikr
+  **95/95**, B1/B2/B3, modularization **101/101**, state-rebind **37/37** ve
+  Faz10 **69/69** PASS. Browser/device, native permission, remote, push,
+  merge, tag, deploy veya `mustafaras/seyma-data` yazımı yoktur.
+- `MON-STATE.json` `status=in_progress`, `activePrompt=null`,
+  `blockedPrompt=null`, `lastCompletedPrompt=MON-51`, `nextPrompt=MON-52`dir.
+  MON-52 yeni açık kullanıcı yönü olmadan başlamaz.
 
 ## MON-50 kapanışı — günlük App handler surface
 

@@ -13,6 +13,7 @@ const journalSource = fs.readFileSync('app/core/journal.js', 'utf8');
 const saygiSource = fs.readFileSync('app/core/saygi.js', 'utf8');
 const librarySource = fs.readFileSync('app/core/library.js', 'utf8');
 const messagingSource = fs.readFileSync('app/core/messaging.js', 'utf8');
+const renderSource = fs.readFileSync('app/core/render.js', 'utf8');
 
 function ok(name, condition) {
   assert.equal(condition, true, name);

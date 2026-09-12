@@ -21,7 +21,8 @@ const mapSource = fs.readFileSync(path.join(repoRoot, 'app/core/map.js'), 'utf8'
 const profileSource = fs.readFileSync(path.join(repoRoot, 'app/core/profile.js'), 'utf8');
 const settingsSource = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
 const messagingSource = fs.readFileSync(path.join(repoRoot, 'app/core/messaging.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource;
+const renderSource = fs.readFileSync(path.join(repoRoot, 'app/core/render.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 

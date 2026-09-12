@@ -166,6 +166,7 @@ ok('Öncü modalı keyboard contract ile render olur', focusContract(personHtml)
 ok('Saygı floating Okudum eylemi korunur', registry.saygiFloatingReadHTML().includes('>Okudum</strong>'));
 ok('arka plan modal kabukları focusable button değildir', ![faithHtml, qiblaHtml, personHtml].some((html) => html.includes('role="button" tabindex="0"')));
 ok('Saygı/İman/Kıble HTML kaynakları registry shiminden gelir',
+  /function saygiHTML\(\)\{ return SEYMA_RENDER\.saygiHTML/.test(appSource) &&
   /function faithCornerOverlayHTML\(\)\{ return window\.SeymaSaygi\.faithCornerOverlayHTML/.test(appSource) &&
   /function qiblaOverlayHTML\(\)\{ return window\.SeymaSaygi\.qiblaOverlayHTML/.test(appSource) &&
   /function saygiPersonModalHTML\(\)\{ return window\.SeymaSaygi\.saygiPersonModalHTML/.test(appSource));

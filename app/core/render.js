@@ -1,7 +1,7 @@
-// MON-45 · render core registry.
-// Onboarding, Bugün, Sağlık, Rapor ve Harita tab kabukları burada; domain kart
-// üreticileri, App handlers, root/app innerHTML, mutation/save/DOM ve modal
-// ownership app.js'te kalır.
+// MON-46 · render core registry.
+// Onboarding, Bugün, Sağlık, Rapor, Harita, Saygı ve Terapi giriş kabukları
+// burada; domain kart üreticileri, App handlers, root/app innerHTML, mutation/
+// save/DOM ve modal ownership app.js'te kalır.
 (function(){
   'use strict';
 
@@ -13,10 +13,11 @@
     'vacationCardHidden','vacationCardHTML','weatherHeaderHTML','journalLightCardHTML',
     'reminderInboxCardHTML','rasitBubbleHTML','rasitContactHTML','dateLabelTR','esc',
     'icon','heroPremiumStatsHTML','heroStatsHTML','heroTargetsHTML','heroScienceLine',
-    'motivationTodayCardHTML','rasitActionsHTML','hubTilesHTML','magnesiumFeedbackHTML',
+    'motivationTodayEntryHTML','rasitActionsHTML','hubTilesHTML','magnesiumFeedbackHTML',
     'magnesiumBannerHTML','moodCardHTML','daily','motivationProgramV2','eveningNudge',
     'habitsCardHTML','stepReminder','beslenmeCardHTML','waterCard','reflectionCardHTML',
-    'onThisDayCard','healthTabHTML','reportTabHTML','mapTabHTML'
+    'onThisDayCard','healthTabHTML','reportTabHTML','mapTabHTML','saygiTabHTML',
+    'roomOverlayEntryHTML'
   ];
 
   function registerRender(deps){
@@ -56,7 +57,7 @@
   function heroStatsHTML(){ return call('heroStatsHTML',arguments); }
   function heroTargetsHTML(){ return call('heroTargetsHTML',arguments); }
   function heroScienceLine(){ return call('heroScienceLine',arguments); }
-  function motivationTodayCardHTML(){ return call('motivationTodayCardHTML',arguments); }
+  function motivationTodayCardHTML(){ return call('motivationTodayEntryHTML',arguments); }
   function rasitActionsHTML(){ return call('rasitActionsHTML',arguments); }
   function hubTilesHTML(){ return call('hubTilesHTML',arguments); }
   function magnesiumFeedbackHTML(){ return call('magnesiumFeedbackHTML',arguments); }
@@ -73,6 +74,8 @@
   function healthTabHTML(){ return call('healthTabHTML',arguments); }
   function reportTabHTML(){ return call('reportTabHTML',arguments); }
   function mapTabHTML(){ return call('mapTabHTML',arguments); }
+  function saygiTabHTML(){ return call('saygiTabHTML',arguments); }
+  function roomOverlayEntryHTML(){ return call('roomOverlayEntryHTML',arguments); }
 
   function onboardingHTML(){
     var dark=liveDark();
@@ -292,10 +295,13 @@
   }
 
   // Domain registry gövdeleri burada yeniden üretilmez. app.js resolverları Health,
-  // Report ve Map kayıtlarını sabitler; Harita'nın ui.calMonth lazy mutasyonu app.js'te kalır.
+  // Report, Map, Saygı ve Motivation kayıtlarını sabitler; Harita'nın ui.calMonth
+  // lazy mutasyonu ile modal/focus sahipliği app.js'te kalır.
   function saglikHTML(){ return healthTabHTML.apply(null,arguments); }
   function raporHTML(){ return reportTabHTML.apply(null,arguments); }
   function haritaHTML(){ return mapTabHTML.apply(null,arguments); }
+  function saygiHTML(){ return saygiTabHTML.apply(null,arguments); }
+  function roomOverlayHTML(){ return roomOverlayEntryHTML.apply(null,arguments); }
 
   window.SeymaRender={
     registerRender:registerRender,
@@ -303,6 +309,9 @@
     bugunHTML:bugunHTML,
     saglikHTML:saglikHTML,
     raporHTML:raporHTML,
-    haritaHTML:haritaHTML
+    haritaHTML:haritaHTML,
+    saygiHTML:saygiHTML,
+    motivationTodayCardHTML:motivationTodayCardHTML,
+    roomOverlayHTML:roomOverlayHTML
   };
 })();

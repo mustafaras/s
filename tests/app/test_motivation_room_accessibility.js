@@ -49,6 +49,9 @@ ok('oda açılırken dialog focus alıyor',
     .includes("getElementById('sey-room-dialog')"));
 ok('yansıma yazarken handler yeniden render etmiyor',
   !source.slice(source.indexOf('App.setMotivationReflection=function(el){'), source.indexOf('\nApp.toggleMotivationExamples=', source.indexOf('App.setMotivationReflection=function(el){'))).includes('render()'));
+ok('Terapi render giriş shimleri SeymaRender üzerinden delege olur',
+  source.includes('function motivationTodayCardHTML(){ return SEYMA_RENDER.motivationTodayCardHTML.apply(null,arguments); }') &&
+  source.includes('function roomOverlayHTML(){ return SEYMA_RENDER.roomOverlayHTML.apply(null,arguments); }'));
 
 const state = { roomClosed: 0, reminderClosed: 0 };
 const documentStub = { activeElement: null };

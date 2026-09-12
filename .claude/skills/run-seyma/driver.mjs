@@ -477,6 +477,11 @@ if (dumpTab && sb2.App && typeof sb2.App.go === 'function') {
     // navigation path used by the Reminder Center smoke gate.
     sb2.App.go('ayarlar');
     sb2.App.openReminderCenter();
+  } else if (dumpTab === 'room') {
+    // MON-46: modal girişini gerçek app-owned openRoom yolu ile üret; focus ve
+    // keyboard contract app.js'te kalır, driver yalnız #app markupını yakalar.
+    sb2.App.go('bugun');
+    sb2.App.openRoom();
   } else {
     sb2.App.go(dumpTab);
   }

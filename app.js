@@ -334,7 +334,7 @@ function faithRaporCardHTML(){ return window.SeymaSaygi.faithRaporCardHTML.apply
 function qiblaHubCardHTML(){ return window.SeymaSaygi.qiblaHubCardHTML.apply(null,arguments); }
 function saygiPreviewHubHTML(person,article,done){ return window.SeymaSaygi.saygiPreviewHubHTML.apply(null,arguments); }
 function faithNavHTML(){ return window.SeymaSaygi.faithNavHTML.apply(null,arguments); }
-function saygiHTML(){ return window.SeymaSaygi.saygiHTML.apply(null,arguments); }
+function saygiHTML(){ return SEYMA_RENDER.saygiHTML.apply(null,arguments); }
 function saygiArticleBodyHTML(person,article,done,wrapCls,includeReadAction){ return window.SeymaSaygi.saygiArticleBodyHTML.apply(null,arguments); }
 function saygiPersonModalHTML(){ return window.SeymaSaygi.saygiPersonModalHTML.apply(null,arguments); }
 function saygiFloatingReadHTML(){ return window.SeymaSaygi.saygiFloatingReadHTML.apply(null,arguments); }
@@ -748,8 +748,8 @@ if(!window.SeymaSettings||typeof window.SeymaSettings.registerSettings!=='functi
   syncConfigured:syncConfigured
 })) throw new Error('MON-37: SeymaSettings registry kurulamadı');
 
-// MON-45: tab render registry. Canlı data/dark resolverları, app-owned card/banner/
-// save/mutation üreticileri ve domain tab resolverları tek dependency bag ile bağlanır.
+// MON-46: render registry. Canlı data/dark resolverları, app-owned card/banner/
+// save/mutation üreticileri ve domain giriş resolverları tek dependency bag ile bağlanır.
 var SEYMA_RENDER=window.SeymaRender||{};
 if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!window.SeymaRender.registerRender({
   data:function(){ return data; },
@@ -781,7 +781,7 @@ if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!
   heroStatsHTML:heroStatsHTML,
   heroTargetsHTML:heroTargetsHTML,
   heroScienceLine:heroScienceLine,
-  motivationTodayCardHTML:motivationTodayCardHTML,
+  motivationTodayEntryHTML:function(){ return window.SeymaMotivation.motivationTodayCardHTML.apply(null,arguments); },
   rasitActionsHTML:rasitActionsHTML,
   hubTilesHTML:hubTilesHTML,
   magnesiumFeedbackHTML:magnesiumFeedbackHTML,
@@ -798,8 +798,10 @@ if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!
   onThisDayCard:onThisDayCard,
   healthTabHTML:function(){ return SEYMA_HEALTH.saglikHTML.apply(null,arguments); },
   reportTabHTML:function(){ return SEYMA_REPORT.raporHTML.apply(null,arguments); },
-  mapTabHTML:function(){ return SEYMA_MAP.haritaHTML.apply(null,arguments); }
-})) throw new Error('MON-45: SeymaRender registry kurulamadı');
+  mapTabHTML:function(){ return SEYMA_MAP.haritaHTML.apply(null,arguments); },
+  saygiTabHTML:function(){ return window.SeymaSaygi.saygiHTML.apply(null,arguments); },
+  roomOverlayEntryHTML:function(){ return window.SeymaMotivation.roomOverlayHTML.apply(null,arguments); }
+})) throw new Error('MON-46: SeymaRender registry kurulamadı');
 // === Kafein hesabı ===
 var CAFFEINE_TYPES=SEYMA_HEALTH.CAFFEINE_TYPES;
 var CAFFEINE_LIMITS=SEYMA_HEALTH.CAFFEINE_LIMITS;
@@ -9497,9 +9499,9 @@ function motivationBadgeHTML(size){ return window.SeymaMotivation.motivationBadg
 function motivationSignHTML(delay){ return window.SeymaMotivation.motivationSignHTML.apply(null,arguments); }
 function motivationQuoteBlockHTML(quote){ return window.SeymaMotivation.motivationQuoteBlockHTML.apply(null,arguments); }
 function motivationComingSoonCardHTML(){ return window.SeymaMotivation.motivationComingSoonCardHTML.apply(null,arguments); }
-function motivationTodayCardHTML(){ return window.SeymaMotivation.motivationTodayCardHTML.apply(null,arguments); }
+function motivationTodayCardHTML(){ return SEYMA_RENDER.motivationTodayCardHTML.apply(null,arguments); }
 function roomStatsHTML(sum,fi){ return window.SeymaMotivation.roomStatsHTML.apply(null,arguments); }
-function roomOverlayHTML(){ return window.SeymaMotivation.roomOverlayHTML.apply(null,arguments); }
+function roomOverlayHTML(){ return SEYMA_RENDER.roomOverlayHTML.apply(null,arguments); }
 function roomBodyHTML(M,mot,sum,st,doneToday,nar,fi){ return window.SeymaMotivation.roomBodyHTML.apply(null,arguments); }
 function roomPathHTML(M,mot,sum,st,doneToday,nar,fi){ return window.SeymaMotivation.roomPathHTML.apply(null,arguments); }
 function roomDailyWinHTML(fi, delay){ return window.SeymaMotivation.roomDailyWinHTML.apply(null,arguments); }

@@ -11,32 +11,32 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 9 başladı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-45 / MON-46 |
-| Dalga / ilerleme | Dalga 9 sürüyor (2/6) / 45/60 |
+| Son / sıradaki | MON-46 / MON-47 |
+| Dalga / ilerleme | Dalga 9 sürüyor (3/6) / 46/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
 
-## MON-45 kapanışı — render Sağlık/Rapor/Harita registry
+## MON-46 kapanışı — render Saygı/Terapi girişleri
 
-- Kanıt: [`MON-45-SAGLIK-RAPOR-HARITA-DUMP-MANIFESTI.md`](../deliverables/MON-45-SAGLIK-RAPOR-HARITA-DUMP-MANIFESTI.md).
-- `SeymaRender.saglikHTML/raporHTML/haritaHTML` yalnız Health/Report/Map domain
-  registrylerini app.js resolverları üzerinden çağırır. Domain gövdeleri ve
-  `render()`, `App.go`, `#root/#app`, handler, CSS, state/save/sync/network
-  sahipliği değişmedi; Harita `ui.calMonth` lazy mutasyonu app.js shimindedir.
-- Mevcut `render.js` FILES sırası değişmeden korundu; cache-bust render/app için
-  `20260912a` oldu. Ayrı HEAD arşiviyle Sağlık/Rapor/Harita dump'ları sırasıyla
-  **65,868/139,456/29,125 byte**, SHA-256
-  `1c9dd4e8…bb438`/`f7fc2ef0…7eaa2`/`1c6f3c77…d993c`, her biri `cmp=0`.
-- App fn/all/unique **556/721/718**, inline onclick **156**, data-fx **29** ve
-  data tokenı **18** delta 0; App.go/render/root-app diff satırı 0. Registry
-  boot no-network/no-storage, eksik/tekrar registration fail-closed; map lazy
-  guard PASS. Syntax, driver onboarding+seeded, zikr **95/95**,
-  modularization **101/101**, state-rebind **37/37**, Faz10 **69/69**, ÆON
-  **24/24**, premium 9 fixture, reminder smoke 21, Health **30/30**,
-  Report/Map, B1/B2/B3 ve diff-check PASS.
+- Kanıt: [`MON-46-SAYGI-TERAPI-FOCUS-MANIFESTI.md`](../deliverables/MON-46-SAYGI-TERAPI-FOCUS-MANIFESTI.md).
+- `SeymaRender.saygiHTML/motivationTodayCardHTML/roomOverlayHTML` yalnız
+  Saygı/Motivation domain registrylerini app.js resolverları üzerinden çağırır.
+  Domain gövdeleri/content, `roomBodyHTML`, App.open/close/updateRoom,
+  shared modal focus/keyboard, `render()`, `App.go`, `#root/#app`, CSS,
+  state/save/sync/network sahipliği değişmedi.
+- `driver --dump room` sentetik kanıt rotası app-owned `App.openRoom()` yolunu
+  kullanır; yeni core dosyası veya FILES sırası değişmedi. render/app cache-bust
+  `20260912b` oldu. Ayrı HEAD arşiviyle Saygı/Bugün-Terapi/room dump'ları
+  **20,593/112,402/136,095 byte**, SHA-256
+  `f4c0fc3a…82599`/`540f103d…07930d`/`6947c9c4…7883ac`, her biri `cmp=0`.
+- App fn/all/unique **556/721/718**, inline onclick/data-fx **156/29**, data
+  tokenı **18** ve App.go/render/root/modal-owner diff satırı 0. Saygı
+  **20/20**, Terapi accessibility, modal-focus, driver onboarding+seeded,
+  zikr **95/95**, modularization **101/101**, state-rebind **37/37**, Faz10
+  **69/69**, ÆON **24/24**, premium/reminder, B1/B2/B3 ve diff-check PASS.
 - Browser/device, native permission, remote, push/merge/tag/deploy veya
   `mustafaras/seyma-data` yazımı yok; `releaseApproval=not_approved` korundu.
-  MON-46 için yeni açık kullanıcı yönü gerekir.
+  MON-47 için yeni açık kullanıcı yönü gerekir.
 
 ## MON-42 kapanışı — messaging domain modülü
 

@@ -344,6 +344,7 @@ console.log('\n[13] FX-P-87 — voicePitch + voiceVoiceName backfill ve handler 
   // (3)+(4)+(5) Handler clamp: App.setVoicePitch/setVoiceVoiceName gövdelerini
   // app.js'ten ayıklayıp data/save/render stub'larıyla çalıştır.
   var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  var renderSrc = fs.readFileSync(path.join(repoRoot, 'app/core/render.js'), 'utf8');
   var settingsSrc = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
   function runHandler(name, arg, initial){
     var start = appSrc.indexOf('App.'+name+'=function');
@@ -376,7 +377,7 @@ console.log('\n[13] FX-P-87 — voicePitch + voiceVoiceName backfill ve handler 
   ok("setVoiceVoiceName(42) değeri değiştirmez", !num.error && num.out.voiceVoiceName === 'eski', 'değer: '+JSON.stringify(num.out && num.out.voiceVoiceName));
   // UI kontrolleri + popülasyon bloğu kaynakta mevcut
   ok('ses kartında Ton slider + Yerel ses select mevcut', settingsSrc.indexOf('id="sey-voice-pitch"') > -1 && settingsSrc.indexOf('id="sey-voice-vname"') > -1);
-  ok('speechSynthesis onvoiceschanged popülasyon bloğu render sonrasında', appSrc.indexOf('speechSynthesis.onvoiceschanged=pop') > -1);
+  ok('speechSynthesis onvoiceschanged popülasyon bloğu render sonrasında', renderSrc.indexOf('speechSynthesis.onvoiceschanged=pop') > -1);
 })();
 
 console.log('\n=== Özet ===');

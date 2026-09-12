@@ -6,14 +6,14 @@
   "activePrompt": null,
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON-48",
-  "nextPrompt": "MON-49",
+  "lastCompletedPrompt": "MON-49",
+  "nextPrompt": "MON-50",
   "currentWave": "9",
   "totalPrompts": 60,
-  "completedPrompts": 48,
+  "completedPrompts": 49,
   "updatedAt": "2026-09-12",
-  "lastCompletedEvidence": "MON-48-RENDER-SHELL-MANIFESTI.md: HEAD/current shell parity header 2612 byte SHA b765b5c6…0c2e31 cmp=0; nav 5690 byte SHA 00d6ca7a…36314e cmp=0; reading overlay shell tail 8799 byte SHA a95e4928…3c2e5c3 cmp=0; render boundary 19/19, modal focus, reduced-motion 34/34, driver and full headless families PASS.",
-  "nextSafeAction": "MON-48 tamamlandı: header/nav gövdeleri SeymaRender registry'sine, overlay shell girişleri mevcut SeymaLibrary sahiplerine named resolver ile bağlandı; app.js shimleri, ARIA/keyboard/focus/save state ve render/modals sınırları korundu. `index.html` render/app cache-bust 20260912d oldu; yeni core/FILES değişikliği yok. `releaseApproval=not_approved`; browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-49 için yeni açık kullanıcı yönü gerekir.",
+  "lastCompletedEvidence": "MON-49-RENDER-CORE-MANIFESTI.md: render 13,467 byte ve modalsHTML 14,289 byte normalize edilmiş gövde SHA'ları HEAD ile cmp=0; bugun 112,404 ve reading 121,203 byte dump'ları tek rastgele N/100 skor tokenı normalize edilince cmp=0; MON-49 boundary 16/16, modal focus, time-theme 53/53, reduced-motion 34/34, driver+zikr 95/95 ve full fixture families PASS.",
+  "nextSafeAction": "MON-49 tamamlandı: SeymaRender.modalsHTML/render registry gövdeleri root update, app innerHTML, overlay lifecycle ve guarded SeyTimeTheme call sırasını koruyarak çalışıyor; app.js shimleri ve renderState live accessorleri app-owned kaldı. `index.html` render/app cache-bust 20260912e oldu; yeni core/FILES değişikliği yok. `releaseApproval=not_approved`; browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-50 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -200,6 +200,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-D8-REMINDER-MESAJ-RAPORU.md",
       "decision": "d8_reminder_messaging_closure_disjoint_gates_no_production_delta_b2_files_parity_fix"
+    },
+    "MON-49": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-49-RENDER-CORE-MANIFESTI.md",
+      "decision": "render_modals_core_registry_exact_call_graph_root_app_dom_order_guarded_theme_live_render_state_accessors_modal_focus_parity"
     }
   },
   "waves": [
@@ -272,7 +277,7 @@
       "prompts": "MON-44..MON-49",
       "topic": "render katmani",
       "approvalRequired": true,
-      "completed": 4,
+      "completed": 6,
       "total": 6
     },
     {
@@ -301,7 +306,7 @@
     }
   ],
   "verificationGate": [
-    "node --check app.js && node --check sync.js && node --check app/core/profile.js && node --check app/core/settings.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/reminders.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
+    "node --check app.js && node --check sync.js && node --check app/core/render.js && node --check app/core/profile.js && node --check app/core/settings.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/reminders.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
     "node tests/app/test_profile_boundary.js",
     "node tests/app/test_settings_boundary.js",
     "node .claude/skills/run-seyma/verify-state-helper-boundary.mjs",
@@ -315,6 +320,8 @@
     "node tests/app/test_crisis_boundary.js",
     "node tests/app/test_journal_boundary.js",
     "node tests/app/test_modal_focus_containment.js",
+    "node tests/app/test_render_core_boundary.js",
+    "node tests/app/test_render_shell_boundary.js",
     "node tests/app/test_zikr_manual_entry.js",
     "node .claude/skills/run-seyma/driver.mjs",
     "node .claude/skills/run-seyma/zikr-harness.mjs",

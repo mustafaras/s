@@ -1,4 +1,4 @@
-// MON-47 · render core registry.
+// MON-49 · render core registry.
 // Onboarding, Bugün, domain tabları ve Library/Terapi modal giriş kabukları
 // burada; domain kart üreticileri, App handlers, root/app innerHTML, mutation/
 // save/DOM ve modal ownership app.js'te kalır.
@@ -24,7 +24,17 @@
     'headerActionHTML','headerSceneHTML','unreadNotifCount','featuresLive',
     'saygiCurrentPerson','saygiHasRead','getDay','ensurePrayerDay',
     'prayerDaySummary','zikrDayCompleted','overlayShellEntryHTML',
-    'soulOverlayShellEntryHTML'
+    'soulOverlayShellEntryHTML','aeonAttachSheetHTML','aeonLoadVisibleMedia',
+    'authGateHTML','crisisModalHTML','editBanner','ensureProfileAssessment',
+    'faithCornerOverlayHTML','journalModalHTML','locationGateHTML',
+    'locationGateRequired','maybeFetchDailyPhoto','mountSkyCanvas','needsAuth',
+    'paintAmbientShell',
+    'qiblaOverlayHTML','quranJourneyOverlayHTML','reminderActiveElementId',
+    'reminderCenterOverlayHTML','reminderRestoreFocus',
+    'renderProfileAssessmentGate','saygiDisconnectReadObserver',
+    'saygiFloatingReadHTML','saygiPersonModalHTML','wireAppHeaderScroll',
+    'wireSaygiReadGate','zikroverlayHTML','locBenefits','renderState',
+    'zikrV2Visible'
   ];
 
   function registerRender(deps){
@@ -108,6 +118,334 @@
   function zikrDayCompleted(){ return call('zikrDayCompleted',arguments); }
   function overlayShellEntryHTML(){ return call('overlayShellEntryHTML',arguments); }
   function soulOverlayShellEntryHTML(){ return call('soulOverlayShellEntryHTML',arguments); }
+  function aeonAttachSheetHTML(){ return call('aeonAttachSheetHTML',arguments); }
+  function aeonLoadVisibleMedia(){ return call('aeonLoadVisibleMedia',arguments); }
+  function authGateHTML(){ return call('authGateHTML',arguments); }
+  function crisisModalHTML(){ return call('crisisModalHTML',arguments); }
+  function editBanner(){ return call('editBanner',arguments); }
+  function ensureProfileAssessment(){ return call('ensureProfileAssessment',arguments); }
+  function faithCornerOverlayHTML(){ return call('faithCornerOverlayHTML',arguments); }
+  function journalModalHTML(){ return call('journalModalHTML',arguments); }
+  function locationGateHTML(){ return call('locationGateHTML',arguments); }
+  function locationGateRequired(){ return call('locationGateRequired',arguments); }
+  function maybeFetchDailyPhoto(){ return call('maybeFetchDailyPhoto',arguments); }
+  function mountSkyCanvas(){ return call('mountSkyCanvas',arguments); }
+  function needsAuth(){ return call('needsAuth',arguments); }
+  function paintAmbientShell(){ return call('paintAmbientShell',arguments); }
+  function qiblaOverlayHTML(){ return call('qiblaOverlayHTML',arguments); }
+  function quranJourneyOverlayHTML(){ return call('quranJourneyOverlayHTML',arguments); }
+  function reminderActiveElementId(){ return call('reminderActiveElementId',arguments); }
+  function reminderCenterOverlayHTML(){ return call('reminderCenterOverlayHTML',arguments); }
+  function reminderRestoreFocus(){ return call('reminderRestoreFocus',arguments); }
+  function renderProfileAssessmentGate(){ return call('renderProfileAssessmentGate',arguments); }
+  function saygiDisconnectReadObserver(){ return call('saygiDisconnectReadObserver',arguments); }
+  function saygiFloatingReadHTML(){ return call('saygiFloatingReadHTML',arguments); }
+  function saygiPersonModalHTML(){ return call('saygiPersonModalHTML',arguments); }
+  function wireAppHeaderScroll(){ return call('wireAppHeaderScroll',arguments); }
+  function wireSaygiReadGate(){ return call('wireSaygiReadGate',arguments); }
+  function zikroverlayHTML(){ return call('zikroverlayHTML',arguments); }
+  function locBenefits(){ return call('locBenefits',arguments); }
+  function renderState(){ return call('renderState',arguments); }
+  function zikrV2Visible(){ return call('zikrV2Visible',arguments); }
+
+function modalsHTML(){
+  var ui=liveUi(), locBenefitsValue=locBenefits(), zikrVisible=zikrV2Visible();
+  var h='';
+  if(ui.reminderCenterOpen){ h+=reminderCenterOverlayHTML(); }
+  if(ui.crisisKind){ h+=crisisModalHTML(); }
+  if(ui.journalOpen){ h+=journalModalHTML(); }
+  if(ui.roomOpen){ h+=roomOverlayHTML(); }
+  if(ui.readingOpen){ h+=readingOverlayHTML(); }
+  if(ui.watchOpen){ h+=watchOverlayHTML(); }
+  if(ui.listeningOpen){ h+=listeningOverlayHTML(); }
+  if(ui.learningOpen){ h+=learningOverlayHTML(); }
+  if(ui.soulPracticePicker){ h+=soulPracticePickerHTML(); }
+  if(ui.soulActivityOpen){ h+=soulActivityOverlayHTML(); }
+  if(ui.soulArchiveOpen){ h+=soulArchiveOverlayHTML(); }
+  if(ui.faithOpen){ h+=faithCornerOverlayHTML(); }
+  if(ui.zikrOpen&&zikrVisible){ h+=zikroverlayHTML(); }
+  if(ui.quranJourneyOpen){ h+=quranJourneyOverlayHTML(); }
+  if(ui.qiblaOpen){ h+=qiblaOverlayHTML(); }
+  if(ui.saygiPersonOpen){ h+=saygiPersonModalHTML(); h+=saygiFloatingReadHTML(); }
+  if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
+  if(ui.emergency){
+    h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';
+    h+='<div id="sey-emergency-dialog" role="dialog" aria-modal="true" aria-label="Zor an desteği" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeEmergency)" onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:var(--f-title2);font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:var(--f-callout);line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-callout);font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">Tamam, devam '+icon('sparkles',15)+'</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-subhead);font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';
+  }
+  if(ui.dayDetail){
+    var d=ui.dayDetail;
+    h+='<div onclick="App.closeDetail()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div role="dialog" aria-modal="true" aria-label="Gün ayrıntısı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeDetail)" onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;max-height:80vh;overflow-y:auto;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><div style="font-size:var(--f-title3);font-weight:800;">'+esc(d.title)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:2px;">'+esc(d.dateLabel)+' \u00b7 '+esc(d.status)+'</div></div><button onclick="App.closeDetail()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:var(--f-callout);color:var(--muted);">\u2715</button></div>';
+    h+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">';
+    d.habits.forEach(function(hb){ h+='<div style="display:flex;align-items:center;gap:10px;font-size:var(--f-subhead);"><span style="font-size:var(--f-body);">'+hb.mark+'</span><span style="color:var(--text2);">'+esc(hb.label)+'</span></div>'; });
+    h+='</div><div style="display:flex;gap:14px;font-size:var(--f-subhead);color:var(--muted);border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;flex-wrap:wrap;"><span>Mod: <b>'+esc(d.moodLabel)+'</b></span><span>Kriz (SOS): <b>'+d.sosCount+'</b></span></div>';
+    var hl=[]; if(d.steps!=null) hl.push({i:'footprints',t:d.steps+' adım'}); if(d.mins!=null) hl.push({i:'timer',t:d.mins+' dk'}); if(d.sleepH!=null) hl.push({i:'moon',t:d.sleepH+' sa'}); if(d.flow) hl.push({i:'droplet',t:d.flow});
+    if(hl.length) h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">'+hl.map(function(x){return '<span style="font-size:var(--f-footnote);background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:5px 11px;color:var(--text2);display:inline-flex;align-items:center;gap:5px;">'+icon(x.i,12)+esc(x.t)+'</span>';}).join('')+'</div>';
+    if(d.syms&&d.syms.length) h+='<div style="margin-top:8px;font-size:var(--f-footnote);color:var(--muted);">Belirti: '+esc(d.syms.join(' · '))+'</div>';
+    if(d.meals&&d.meals.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:10px;display:flex;flex-direction:column;gap:6px;">'; d.meals.forEach(function(m){ h+='<div style="font-size:var(--f-footnote);line-height:1.4;"><span>'+m.icon+'</span> <b style="color:var(--text2);">'+esc(m.label)+':</b> <span style="color:var(--muted);">'+esc(m.text)+'</span></div>'; }); h+='</div>'; }
+    if(d.hasIntention) h+='<div style="margin-top:12px;font-size:var(--f-subhead);line-height:1.5;color:var(--text2);background:linear-gradient(160deg,rgba(255,225,154,0.24),rgba(201,184,255,0.14));border-radius:14px;padding:12px;display:flex;gap:6px;"><span style="flex-shrink:0;">'+icon('target',14)+'</span><span><b>Niyet:</b> '+esc(d.intention)+'</span></div>';
+    if(d.hasNote) h+='<div style="margin-top:12px;font-size:var(--f-subhead);line-height:1.5;color:var(--text2);background:rgba(255,232,163,0.28);border-radius:14px;padding:12px;">'+esc(d.note)+'</div>';
+    if(d.gratitude&&d.gratitude.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:5px;">'+icon('heart-handshake',13)+' O günün güzel şeyleri</div><div style="display:flex;flex-direction:column;gap:5px;">'+d.gratitude.map(function(g,i){return '<div style="font-size:var(--f-footnote);line-height:1.45;color:var(--text2);">'+(i+1)+'. '+esc(String(g).trim())+'</div>';}).join('')+'</div></div>'; }
+    var isTod=!!d.isToday;
+    h+='<button onclick="App.editDay(\''+d.date+'\')" style="margin-top:16px;border:none;cursor:pointer;width:100%;padding:14px;border-radius:16px;font-size:var(--f-subhead);font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9A23C,#E9899F);box-shadow:0 10px 24px rgba(233,150,90,0.38);">'+(isTod?('Bugüne git '+icon('sun',15)):(icon('pen-line',15)+' Bu günü düzenle'))+'</button>';
+    if(!isTod) h+='<div style="margin-top:8px;font-size:var(--f-caption1);color:var(--faint);line-height:1.45;text-align:center;">Geçmiş günü düzenlerken üstte uyarı görürsün; işin bitince “Bugüne dön”e bas. Konum, oturum ve canlı veriler her zaman bugüne yazılır.</div>';
+    h+='</div></div>';
+  }
+  if(ui.locationConsent){
+    h+='<div onclick="App.cancelLocationConsent()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
+    h+='<div role="dialog" aria-modal="true" aria-label="Konum paylaşımı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.cancelLocationConsent)" onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;">';
+    h+='<div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;">'+icon('map-pin',18)+' Konum paylaşımı</div>';
+    h+='<p style="margin:0 0 14px;font-size:var(--f-subhead);line-height:1.55;color:var(--muted);">Açarsan konumun ve hareketlerin (yürüyüş/araç, kat edilen mesafe) <b>uygulama açıkken</b> ölçülür.</p>';
+    h+='<p style="margin:0 0 18px;font-size:var(--f-footnote);line-height:1.5;color:var(--faint);">Devam edince tarayıcın ayrıca konum izni isteyecek.</p>';
+    h+='<div style="display:flex;gap:10px;"><button onclick="App.cancelLocationConsent()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button data-fx="confirm" onclick="App.confirmLocationConsent()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);">Onaylıyorum</button></div>';
+    h+='</div></div>';
+  }
+  if(ui.locNudgeOpen){
+    var lnB=(ui.locNudgeShown&&ui.locNudgeShown.length)?ui.locNudgeShown:[locBenefitsValue[0]];
+    h+='<div onclick="App.locNudgeDismiss()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div role="dialog" aria-modal="true" aria-label="Konum hatırlatıcısı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.locNudgeDismiss)" onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;">';
+    h+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:2px;">';
+    h+='<div style="flex-shrink:0;width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#3F8A4F;background:linear-gradient(135deg,#DFF5DA,#C9E8C4);box-shadow:0 6px 16px rgba(125,190,119,0.35);">'+icon('map-pin',22)+'</div>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-headline);font-weight:800;line-height:1.25;">Hareketini görünür kılalım mı?</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:2px;">Küçük bir dokunuş, sağlığına iyi gelir.</div></div>';
+    h+='<button onclick="App.locNudgeDismiss()" aria-label="Kapat" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button>';
+    h+='</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:9px;margin:14px 0 16px;">';
+    lnB.forEach(function(b){ h+='<div style="display:flex;gap:10px;align-items:flex-start;background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.15;flex-shrink:0;color:#3F8A4F;">'+icon(b.icon||'map-pin',18)+'</span><span style="font-size:var(--f-footnote);line-height:1.5;color:var(--text2);">'+esc(b.t)+'</span></div>'; });
+    h+='</div>';
+    h+='<button onclick="App.locNudgeOpenConsent()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-callout);font-weight:800;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);box-shadow:0 10px 24px rgba(111,179,106,0.4);display:flex;align-items:center;justify-content:center;gap:8px;">Konumu aç '+icon('sparkles',15)+'</button>';
+    h+='<button onclick="App.locNudgeSnooze()" style="margin-top:9px;border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:13px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:var(--text2);background:transparent;">Belki sonra</button>';
+    h+='<div style="text-align:center;margin-top:10px;"><button onclick="App.locNudgeOptOut()" style="border:none;background:none;cursor:pointer;color:var(--faint);font-size:var(--f-caption1);font-weight:600;text-decoration:underline;">Bugün gösterme</button></div>';
+    h+='<div style="margin-top:10px;font-size:var(--f-caption2);color:var(--faint);line-height:1.45;text-align:center;">Ölçüm yalnızca uygulama açıkken yapılır; dilediğinde kapatırsın.</div>';
+    h+='</div></div>';
+  }
+  if(ui.resetStep>0){
+    var two=ui.resetStep===2;
+    h+='<div onclick="App.cancelReset()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
+    h+='<div role="dialog" aria-modal="true" aria-label="Verileri sıfırlama onayı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.cancelReset)" onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:var(--f-subhead);line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button data-fx="destructive" onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
+  }
+  return h;
+}
+
+function render(){
+  var data=liveData(), ui=liveUi(), dark=liveDark(), _renderState=renderState();
+  var root=document.getElementById('root');
+  root.setAttribute('data-theme', dark?'dark':'light');
+  var app=document.getElementById('app');
+  // Zemin her şeyden ÖNCE: aşağıdaki erken dönüşlerin hiçbiri onu atlayamaz.
+  paintAmbientShell();
+
+  // Kilit ekranı: şifre doğrulanmadan onboarding/ana arayüz görünmez.
+  if(needsAuth()){
+    app.innerHTML=authGateHTML();
+    _renderState.lastRenderTab=null; _renderState.lastOverlay=null; _renderState.lastOverlayView=null; _renderState.lastHeaderShown=false;
+    // Hatayı görselleştirdikten sonra bayrağı sıfırla; sarsıntı sınıfı CSS animasyonu kaldırır.
+    if(ui.authError) setTimeout(function(){ ui.authError=false; ui.authErrorMsg=''; },300);
+    return;
+  }
+
+  // Hard gate: Safari konum izni doğrulanmadan hiçbir uygulama yüzeyi açılmaz.
+  if(locationGateRequired()){
+    app.innerHTML=locationGateHTML();
+    _renderState.lastRenderTab=null; _renderState.lastOverlay=null; _renderState.lastOverlayView=null; _renderState.lastHeaderShown=false;
+    try{ var lg=document.getElementById('sey-location-gate'); if(lg&&lg.focus) lg.focus(); }catch(e){}
+    return;
+  }
+
+  if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); _renderState.lastRenderTab=null; _renderState.lastOverlay=null; _renderState.lastOverlayView=null; _renderState.lastHeaderShown=false; return; }
+
+  // Faz 05/06: ANA UYGULAMA KİLİDİ. `data.psych`'ten tamamen ayrı bir mekanizma.
+  // 174/174 tamamlanana (`status==='completed'`) kadar Bugün/Sağlık/Rapor/Mesaj/Harita/
+  // Saygı sekmeleri kilitli — yalnızca Ayarlar (gizlilik/veri-silme/senkron) erişilebilir
+  // kalır (bkz. REPO_INTEGRATION_ARCHITECTURE.md § Erişim). Puanlama/rapor burada YOK
+  // (bkz. Faz 07-09); 174. maddeden sonra yalnızca geçici tamamlanma (completedAt) yazılır.
+  // 2026-07-13: Değerlendirme artık ana arayüzde inaktif; sonuçlar panelde görünür.
+  // Kod ve veri korundu; settings.profileAssessmentInactive ile istenirse yeniden açılabilir.
+  var pa=ensureProfileAssessment(data);
+  if(!data.settings.profileAssessmentInactive && (pa.status!=='completed' || ui.profileAssessmentCompletionShown) && ui.tab!=='ayarlar'){
+    app.innerHTML=renderProfileAssessmentGate()+modalsHTML();
+    _renderState.lastRenderTab=null; _renderState.lastOverlay=null; _renderState.lastOverlayView=null; _renderState.lastHeaderShown=false;
+    try{ var pg=document.getElementById('pa-gate'); if(pg&&pg.focus) pg.focus(); }catch(e){}
+    return;
+  }
+
+  var prevScroll=document.querySelector('[data-scroll]');
+  var prevTop=prevScroll?prevScroll.scrollTop:0;
+  var sameTab=(_renderState.lastRenderTab===ui.tab);
+
+  // Hub overlay (Ne okudum / Ne izledim): sekme degistirirken tam DOM yeniden kurulur;
+  // acik kalan overlay'in scroll'unu yakala ki flash olmadan geri koyalim
+  var prevOvBody=document.getElementById('sey-ov-body');
+  var prevOvTop=prevOvBody?prevOvBody.scrollTop:0;
+  // Zikirmatik v2 ortak bottom-sheet kabuğunu kullanmaz; 100dvh bağımsız ekranının
+  // kendi kaydırma konumunu görünüm bazında korur.
+  var prevZikrScroll=document.getElementById('zikr-scroll');
+  var prevZikrTop=prevZikrScroll?prevZikrScroll.scrollTop:0;
+  // Kur’an Yolculuğu (QY-06) da kendi 100dvh kabuğunu kullanır; kütüphane
+  // kaydırma konumu görünüm bazında korunur (114 satırlık listede kritik).
+  var prevQuranScroll=document.getElementById('quran-scroll');
+  var prevQuranTop=prevQuranScroll?prevQuranScroll.scrollTop:0;
+  var prevReminderScroll=document.getElementById('sey-reminder-scroll');
+  var prevReminderTop=prevReminderScroll?prevReminderScroll.scrollTop:0;
+  var prevReminderFocusId=ui.reminderCenterOpen?reminderActiveElementId():'';
+  // Kriz modalı: etkileşimde (seçenek/tetik işaretleme) modal yeniden kurulur; gövde
+  // scroll'unu yakala ki flash olmadan geri koyalım.
+  var prevCrisisBody=document.getElementById('sey-crisis-body');
+  var prevCrisisTop=prevCrisisBody?prevCrisisBody.scrollTop:0;
+  saygiDisconnectReadObserver();
+  var curOverlay=ui.reminderCenterOpen?'reminderCenter':(ui.saygiPersonOpen?'saygiPerson':(ui.quranJourneyOpen?'quranJourney':(ui.zikrOpen?'zikr':(ui.qiblaOpen?'qibla':(ui.faithOpen?'faith':(ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null))))))))))));
+  var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):(curOverlay==='zikr'?(ui.zikrView||'counter'):(curOverlay==='quranJourney'?(ui.quranJourneyView||'library'):null))));
+
+  var _painted=false;
+  function paint(){
+    if(_painted) return; _painted=true;
+  var html=appHeaderHTML(); // başlangıç ekranı hariç her sekmenin en üstünde sabit marka başlığı
+  // Flex içinde min-height:0 kritik: özellikle uzun Sağlık sayfasında içerik alanı
+  // kabuğu büyütmek yerine kendi içinde kayar; sticky alt nav yerinden oynamaz.
+  html+='<div data-scroll class="scroll sey-main-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px 28px;display:flex;flex-direction:column;gap:14px;">';
+  if(editing()) html+=editBanner();
+  if(ui.tab==='bugun') html+=bugunHTML();
+  else if(ui.tab==='saglik') html+=saglikHTML();
+  else if(ui.tab==='saygi') html+=saygiHTML();
+  else if(ui.tab==='harita') html+=haritaHTML();
+  else if(ui.tab==='rapor') html+=raporHTML();
+  else if(ui.tab==='mesaj') html+=mesajHTML();
+  else if(ui.tab==='ayarlar') html+=ayarlarHTML();
+  html+='</div>';
+  html+=navHTML();
+  html+=modalsHTML();
+  app.innerHTML=html;
+  if(ui.tab==='bugun' && !editing()){ maybeFetchDailyPhoto(); }
+  if(ui.tab==='mesaj') aeonLoadVisibleMedia();
+
+  var newScroll=document.querySelector('[data-scroll]');
+  if(newScroll){
+    wireAppHeaderScroll(newScroll);
+    if(ui.tab==='saygi') wireSaygiReadGate(newScroll);
+    if(ui.saygiPersonOpen){ var modalBody=document.getElementById('sey-ov-body'); if(modalBody) wireSaygiReadGate(modalBody,'-modal'); }
+    if(ui.tab==='mesaj' && (!sameTab || ui.aeonScrollBottom)){
+      // ÆON sohbeti: açılışta ve yeni mesaj/cevap sonrası en alta (en yeni mesaja) kaydır
+      var firstM=newScroll.firstElementChild; if(firstM){ firstM.style.animation='none'; }
+      newScroll.scrollTop=newScroll.scrollHeight;
+      ui.aeonScrollBottom=false;
+    } else if(!sameTab){
+      // Sekme degisimi: per-kart giris animasyonlarini sustur ve scroll'u en uste cek.
+      // Bu sayede kartlar her tab gecisinde yeniden "float-in" yapip "refresh"/parlama hissi vermez.
+      // Ambient (sonsuz) animasyonlar seyShine/seyRoomGlow etkilenmez.
+      var firstEl=newScroll.firstElementChild;
+      if(firstEl){ firstEl.style.animation='none'; }
+      try{
+        var ins=newScroll.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]');
+        for(var _i=0;_i<ins.length;_i++){ ins[_i].style.animation='none'; }
+      }catch(e){}
+      newScroll.scrollTop=0;
+    } else {
+      // Aynı sekmede veri kaydı sonrası: kaydırma konumunu koru ve TÜM giriş animasyonlarını
+      // tekrar oynatma (tik/mod/yazı gibi kayıtlarda kartların "refresh" gibi titremesini önler).
+      var firstEl=newScroll.firstElementChild;
+      if(firstEl){ firstEl.style.animation='none'; }
+      try{
+        var ins=newScroll.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]');
+        for(var _i=0;_i<ins.length;_i++){ ins[_i].style.animation='none'; }
+      }catch(e){}
+      newScroll.scrollTop=prevTop;
+    }
+    if(ui.tab==='mesaj'){
+      // Yukarı kaydırılınca beliren "en alta in" düğmesi (premium WhatsApp-tarzı FAB)
+      var aeonFab=document.getElementById('aeon-scroll-fab');
+      if(aeonFab){
+        var toggleAeonFab=function(){ var nb=(newScroll.scrollHeight-newScroll.scrollTop-newScroll.clientHeight)<160; aeonFab.style.display=nb?'none':'flex'; };
+        newScroll.addEventListener('scroll',toggleAeonFab,{passive:true});
+        toggleAeonFab();
+      }
+    }
+  }
+
+  // Overlay ayni kaldiysa (sekme degisimi veya ic veri aksiyonu): giris animasyonunu tekrar oynatma -> flash yok
+  if(curOverlay && curOverlay===_renderState.lastOverlay){
+    var ovBack=document.getElementById('sey-ov-back');
+    var ovCard=document.getElementById('sey-ov-card');
+    if(ovBack) ovBack.style.animation='none';
+    if(ovCard) ovCard.style.animation='none';
+    var ovBody=document.getElementById('sey-ov-body');
+    // Ayni sekmede kaldiysak scroll'u koru; sekme degistiyse en uste don
+    if(ovBody && curOverlayView===_renderState.lastOverlayView) ovBody.scrollTop=prevOvTop;
+    var zikrScroll=document.getElementById('zikr-scroll');
+    if(zikrScroll && curOverlayView===_renderState.lastOverlayView) zikrScroll.scrollTop=prevZikrTop;
+    var quranScroll=document.getElementById('quran-scroll');
+    if(quranScroll && curOverlayView===_renderState.lastOverlayView) quranScroll.scrollTop=prevQuranTop;
+    var reminderScroll=document.getElementById('sey-reminder-scroll');
+    if(reminderScroll && curOverlay==='reminderCenter'){
+      reminderScroll.scrollTop=prevReminderTop;
+      if(prevReminderFocusId) reminderRestoreFocus(prevReminderFocusId,'');
+    }
+    // Hatırlatma merkezi zaten açıkken yapılan etkileşim render'larında
+    // giriş animasyonunu tekrar oynatma → parlama/flash ve "refresh" hissi yok.
+    if(curOverlay==='reminderCenter' && _renderState.lastOverlay==='reminderCenter'){
+      var remOverlay=document.getElementById('sey-reminder-overlay');
+      var remScreen=document.getElementById('sey-reminder-screen');
+      if(remOverlay) remOverlay.style.animation='none';
+      if(remScreen) remScreen.style.animation='none';
+    }
+  }
+  // Terapi Odası zaten açıkken yapılan etkileşim render'larında (ör. "Görevi küçült")
+  // tek-seferlik giriş animasyonlarını (seyPop/seyFloatIn/seyFade) sustur → parlama/flash yok.
+  // İlk açılışta (_renderState.lastRoomOpen=false) animasyonlar normal oynar; sürekli seyShine parıltısı etkilenmez.
+  if(ui.roomOpen && _renderState.lastRoomOpen){
+    var roomSheet=document.getElementById('sey-room-dialog');
+    var roomBack=document.getElementById('sey-room-overlay');
+    if(roomBack) roomBack.style.animation='none';
+    if(roomSheet){
+      roomSheet.style.animation='none';
+      try{ var rin=roomSheet.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]'); for(var _r=0;_r<rin.length;_r++){ rin[_r].style.animation='none'; } }catch(e){}
+    }
+  }
+  _renderState.lastRoomOpen=ui.roomOpen;
+  // Kriz modalı zaten açıkken yapılan etkileşim render'larında giriş animasyonunu
+  // tekrar oynatma → flash yok; gövde scroll'unu koru.
+  if(ui.crisisKind && _renderState.lastCrisisKind===ui.crisisKind){
+    var crBack=document.getElementById('sey-crisis-back');
+    var crCard=document.getElementById('sey-crisis-card');
+    if(crBack) crBack.style.animation='none';
+    if(crCard){ crCard.style.animation='none'; try{ var cin=crCard.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]'); for(var _c=0;_c<cin.length;_c++){ cin[_c].style.animation='none'; } }catch(e){} }
+    var crBody=document.getElementById('sey-crisis-body');
+    if(crBody){ crBody.scrollTop=prevCrisisTop; } // etkileşimde scroll konumunu koru → flash yok
+  }
+  _renderState.lastCrisisKind=ui.crisisKind;
+  // Sabit marka başlığı: giriş animasyonunu yalnızca ilk görünümde oynat (her render'da tekrar etmesin).
+  if(_renderState.lastHeaderShown){ var _hdr=document.querySelector('.sey-appheader'); if(_hdr) _hdr.style.animation='none'; }
+  _renderState.lastHeaderShown=true;
+  _renderState.lastOverlay=curOverlay;
+  _renderState.lastOverlayView=curOverlayView;
+  _renderState.lastRenderTab=ui.tab;
+  }
+  paint();
+  // FX-P-87: yerel ses listesi popülasyonu — render SONRASI çalışmalı (eleman
+  // innerHTML ile bu noktadan önce oluşur). iOS'ta getVoices async boş döner;
+  // onvoiceschanged ile yeniden doldurulur. Emoji yok, ses çalınmaz.
+  try{
+    if(window.speechSynthesis){
+      var pop=function(){ var vs=speechSynthesis.getVoices().filter(function(v){ return v.lang&&v.lang.indexOf((data.settings.voiceLang||'tr-TR').slice(0,2))===0; }); var sel=document.getElementById('sey-voice-vname'); if(!sel) return; vs.slice(0,20).forEach(function(v){ var o=document.createElement('option'); o.value=v.name; o.textContent=v.name; if(v.name===data.settings.voiceVoiceName) o.selected=true; sel.appendChild(o); }); };
+      pop(); speechSynthesis.onvoiceschanged=pop;
+    }
+  }catch(e){}
+  // İlk açılış sonrası sabit animasyon kipine geç; böylece sonraki sekme değişimlerinde
+  // header shimmer, wordmark sheen veya sayfa-giriş fade'ı yeniden başlamaz.
+  if(root) root.classList.add('sey-app-booted');
+  // TAM-DENETIM B-02: canlı zemin boyaması artık render()'ın BAŞINDA
+  // (paintAmbientShell) — kapı ekranlarında da uygulanır. Buradaki tekrar
+  // çağrısı kaldırıldı; yalnız DOM'a bağımlı olanlar kaldı.
+  try{ if(window.SeyFx && typeof window.SeyFx.bindAuroraParallax==='function') window.SeyFx.bindAuroraParallax(); }catch(e){}
+  try{ if(window.SeyFx && typeof window.SeyFx.sweepCounters==='function') window.SeyFx.sweepCounters(); }catch(e){}
+  try{ mountSkyCanvas(); }catch(e){}
+  // iOS/PWA durum çubuğu rengini mevcut tema ile senkronize tut; açık/koyu geçişlerinde flaş azalır.
+  // Yalnızca gerçekten tema değiştiğinde meta tag'i güncelle, her render'da değil.
+  var tcm=document.querySelector('meta[name="theme-color"]');
+  if(tcm){
+    var targetColor=dark?'#000000':'#FFF8F3';
+    if(tcm.getAttribute('content')!==targetColor) tcm.setAttribute('content',targetColor);
+  }
+}
 
   function appHeaderHTML(){
     var m=appHeaderMeta();
@@ -427,6 +765,8 @@
     appHeaderHTML:appHeaderHTML,
     navHTML:navHTML,
     overlayShell:overlayShellEntryHTML,
-    soulOverlayShell:soulOverlayShellEntryHTML
+    soulOverlayShell:soulOverlayShellEntryHTML,
+    modalsHTML:modalsHTML,
+    render:render
   };
 })();

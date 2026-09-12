@@ -11,10 +11,40 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 9 başladı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-48 / MON-49 |
-| Dalga / ilerleme | Dalga 9 sürüyor (5/6) / 48/60 |
+| Son / sıradaki | MON-49 / MON-50 |
+| Dalga / ilerleme | Dalga 9 tamamlandı (6/6) / 49/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
+
+## MON-49 kapanışı — render modals ve çekirdek
+
+- Kanıt: [`MON-49-RENDER-CORE-MANIFESTI.md`](../deliverables/MON-49-RENDER-CORE-MANIFESTI.md).
+- `SeymaRender.modalsHTML` ve `SeymaRender.render` gövdeleri
+  `app/core/render.js` registry'sine taşındı; app.js aynı ad/imzaları koruyan
+  shimleri tutar. `renderState` canlı accessor bag'i mevcut ephemeral render
+  writerlarını app.js closure'ında bırakır.
+- Root theme update, guarded `SeyTimeTheme.apply()` → `SeyAmbience.apply()` →
+  `SeyTimeTheme.applySeasonal()` sırası, auth/konum/profil erken dönüşleri,
+  tab → nav → modal → `app.innerHTML` akışı, overlay lifecycle/scroll/focus
+  geri dönüşü ve post-DOM adımları korundu. App boot/timer/handler, timeTheme
+  API, modal contract, CSS, save/data/migrate/sync/network değişmedi.
+- Yeni core dosyası veya FILES sırası yoktur; render/app cache-bust `20260912e`
+  oldu. Normalize edilmiş canonical body parity `render` **13,467 byte**,
+  `modalsHTML` **14,289 byte**, her ikisi `cmp=0`.
+- Seeded DOM dump parity: `bugun` **112,404 byte**, `reading` **121,203 byte**;
+  tek mevcut rastgele `N/100` skor tokenı normalize edilince sırasıyla
+  SHA-256 `29f30d80…f9f7c` ve `b10becf3…6972`, `cmp=0`. Ham fark yalnız bu
+  runtime skorudur; registry taşınmasına ait markup farkı yoktur.
+- `test_render_core_boundary` **16/16**, `test_render_shell_boundary`
+  **19/19**, modal focus, time-theme **53/53**, reduced-motion **34/34**,
+  driver, zikr **95/95**, syntax ve app/panel/Panel-v2/Quran/reminder tam
+  aileleri PASS. App ailesi **47 fixture exit 0**, current panel **50
+  assertion**, Panel-v2 **27 fixture**, Quran **9 fixture**, reminder smoke
+  **21/21 curated fixture** exit 0.
+- `releaseApproval=not_approved`, `activePrompt=null`, `blockedPrompt=null`
+  korundu. Browser/device, native permission, remote, push/merge/tag/deploy
+  veya `mustafaras/seyma-data` yazımı yok; MON-50 için yeni açık kullanıcı
+  yönü gerekir.
 
 ## MON-48 kapanışı — render header/nav/overlay shell
 

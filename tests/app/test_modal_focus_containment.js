@@ -53,7 +53,7 @@ const modalSections = [
   ['Zihin-beden hub kabuğu', section('function soulOverlayShell(', '\nfunction bookStatusChip', librarySource)],
   ['Kısa düzenleme kabuğu', section('function compactModalShell(', '\nfunction bookEditModal', librarySource)],
   ['ÆON ek sayfası', section('function attachSheetHTML(){', 'function chatHTML', messagingSource)],
-  ['Doğrudan uygulama modalları', section('function modalsHTML(){', '\n// boot')],
+  ['Doğrudan uygulama modalları', section('function modalsHTML(){', '\n\nfunction render(){', renderSource)],
 ];
 
 modalSections.forEach(([name, text]) => {

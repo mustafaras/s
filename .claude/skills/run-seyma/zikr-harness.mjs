@@ -203,6 +203,7 @@ function assertLoadOrder(files, repoRoot) {
 assertLoadOrder(FILES, REPO);
 const styles = fs.readFileSync(path.join(REPO, 'app/styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
+const renderSource = fs.readFileSync(path.join(REPO, 'app/core/render.js'), 'utf8');
 const saygiSource = fs.readFileSync(path.join(REPO, 'app/core/saygi.js'), 'utf8');
 let sb = buildSandbox(seed);
 let ctx = loadInto(sb, FILES);
@@ -540,7 +541,7 @@ ok('İlham & İbadet koyu tema raporu render', (function () {
 })());
 
 ok('Günün öncüsü modalında sabit Okudum eylemi kod yolu var', (function () {
-  return /function saygiFloatingReadHTML\(\)/.test(saygiSource)&&/z-index:2147483640!important/.test(saygiSource)&&/h\+=saygiPersonModalHTML\(\); h\+=saygiFloatingReadHTML\(\)/.test(appSource);
+  return /function saygiFloatingReadHTML\(\)/.test(saygiSource)&&/z-index:2147483640!important/.test(saygiSource)&&/h\+=saygiPersonModalHTML\(\); h\+=saygiFloatingReadHTML\(\)/.test(renderSource);
 })());
 
 ok('Okudum, Zihnimi Besledim türetilmiş tikini günceller', (function () {

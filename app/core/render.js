@@ -1,6 +1,7 @@
-// MON-44 · render core registry.
-// Onboarding ve Bugün kabuk gövdeleri burada; domain kart üreticileri, App handlers,
-// root/app innerHTML, mutation/save/DOM ve modal ownership app.js'te kalır.
+// MON-45 · render core registry.
+// Onboarding, Bugün, Sağlık, Rapor ve Harita tab kabukları burada; domain kart
+// üreticileri, App handlers, root/app innerHTML, mutation/save/DOM ve modal
+// ownership app.js'te kalır.
 (function(){
   'use strict';
 
@@ -15,7 +16,7 @@
     'motivationTodayCardHTML','rasitActionsHTML','hubTilesHTML','magnesiumFeedbackHTML',
     'magnesiumBannerHTML','moodCardHTML','daily','motivationProgramV2','eveningNudge',
     'habitsCardHTML','stepReminder','beslenmeCardHTML','waterCard','reflectionCardHTML',
-    'onThisDayCard'
+    'onThisDayCard','healthTabHTML','reportTabHTML','mapTabHTML'
   ];
 
   function registerRender(deps){
@@ -69,6 +70,9 @@
   function waterCard(){ return call('waterCard',arguments); }
   function reflectionCardHTML(){ return call('reflectionCardHTML',arguments); }
   function onThisDayCard(){ return call('onThisDayCard',arguments); }
+  function healthTabHTML(){ return call('healthTabHTML',arguments); }
+  function reportTabHTML(){ return call('reportTabHTML',arguments); }
+  function mapTabHTML(){ return call('mapTabHTML',arguments); }
 
   function onboardingHTML(){
     var dark=liveDark();
@@ -287,9 +291,18 @@
 
   }
 
+  // Domain registry gövdeleri burada yeniden üretilmez. app.js resolverları Health,
+  // Report ve Map kayıtlarını sabitler; Harita'nın ui.calMonth lazy mutasyonu app.js'te kalır.
+  function saglikHTML(){ return healthTabHTML.apply(null,arguments); }
+  function raporHTML(){ return reportTabHTML.apply(null,arguments); }
+  function haritaHTML(){ return mapTabHTML.apply(null,arguments); }
+
   window.SeymaRender={
     registerRender:registerRender,
     onboardingHTML:onboardingHTML,
-    bugunHTML:bugunHTML
+    bugunHTML:bugunHTML,
+    saglikHTML:saglikHTML,
+    raporHTML:raporHTML,
+    haritaHTML:haritaHTML
   };
 })();

@@ -687,7 +687,7 @@ function weatherHeaderHTML(){ return SEYMA_MAP.weatherHeaderHTML.apply(null,argu
 function haritaHTML(){
   var today=todayStr();
   if(!ui.calMonth) ui.calMonth=today.slice(0,7);
-  return SEYMA_MAP.haritaHTML.apply(null,arguments);
+  return SEYMA_RENDER.haritaHTML.apply(null,arguments);
 }
 // MON-36: profile assessment content/UI/scoring registry. Consent/session mutation,
 // panel summary, sync merge and data/schema ownership remain app-owned.
@@ -748,8 +748,8 @@ if(!window.SeymaSettings||typeof window.SeymaSettings.registerSettings!=='functi
   syncConfigured:syncConfigured
 })) throw new Error('MON-37: SeymaSettings registry kurulamadı');
 
-// MON-44: onboarding/bugün render core registry. Canlı data/dark resolverları ve
-// app-owned card/banner/save/mutation üreticileri tek dependency bag ile bağlanır.
+// MON-45: tab render registry. Canlı data/dark resolverları, app-owned card/banner/
+// save/mutation üreticileri ve domain tab resolverları tek dependency bag ile bağlanır.
 var SEYMA_RENDER=window.SeymaRender||{};
 if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!window.SeymaRender.registerRender({
   data:function(){ return data; },
@@ -795,8 +795,11 @@ if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!
   beslenmeCardHTML:beslenmeCardHTML,
   waterCard:waterCard,
   reflectionCardHTML:reflectionCardHTML,
-  onThisDayCard:onThisDayCard
-})) throw new Error('MON-44: SeymaRender registry kurulamadı');
+  onThisDayCard:onThisDayCard,
+  healthTabHTML:function(){ return SEYMA_HEALTH.saglikHTML.apply(null,arguments); },
+  reportTabHTML:function(){ return SEYMA_REPORT.raporHTML.apply(null,arguments); },
+  mapTabHTML:function(){ return SEYMA_MAP.haritaHTML.apply(null,arguments); }
+})) throw new Error('MON-45: SeymaRender registry kurulamadı');
 // === Kafein hesabı ===
 var CAFFEINE_TYPES=SEYMA_HEALTH.CAFFEINE_TYPES;
 var CAFFEINE_LIMITS=SEYMA_HEALTH.CAFFEINE_LIMITS;
@@ -10134,7 +10137,7 @@ function badgesGrid(){ return SEYMA_REPORT.badgesGrid.apply(null,arguments); }
 function weeklyStepRecap(){ return SEYMA_REPORT.weeklyStepRecap.apply(null,arguments); }
 function distanceRecapCard(){ return SEYMA_REPORT.distanceRecapCard.apply(null,arguments); }
 function moodHeatmapCard(){ return SEYMA_REPORT.moodHeatmapCard.apply(null,arguments); }
-function raporHTML(){ return SEYMA_REPORT.raporHTML.apply(null,arguments); }
+function raporHTML(){ return SEYMA_RENDER.raporHTML.apply(null,arguments); }
 // MON-37: settings read/render registry. Settings state/default/mutation handlers remain app-owned.
 function ayarlarHTML(){ return window.SeymaSettings.ayarlarHTML.apply(null,arguments); }
 function settingsBtn(onclick,label,icon){ return window.SeymaSettings.settingsBtn.apply(null,arguments); }
@@ -10231,7 +10234,7 @@ CARD_BUILDERS['h-walk']=healthWalkCard;
 function healthAppleCard(){ return SEYMA_HEALTH.healthAppleCard.apply(null,arguments); }
 CARD_BUILDERS['h-apple']=healthAppleCard;
 
-function saglikHTML(){ return SEYMA_HEALTH.saglikHTML.apply(null,arguments); }
+function saglikHTML(){ return SEYMA_RENDER.saglikHTML.apply(null,arguments); }
 
 // ---- magnesium adaptive nudge ----
 // ---- magnesium adaptive nudge ----

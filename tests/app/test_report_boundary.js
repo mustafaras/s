@@ -116,7 +116,7 @@ const first = cold.raporHTML();
 const second = cold.raporHTML();
 ok('rapor HTML deterministik ve temel KPI/heatmap yüzeyini korur', first === second && first.includes('Son 30 gün') && first.includes('Mod ısı haritası') && first.includes('App.heatYear') && first.includes('App.printReport'));
 ok('rapor registry salt-okur state sınırını korur', JSON.stringify(data) === before);
-ok('app.js tüm report üyelerini imza-koruyan shim olarak çağırır', cold.REPORT_MEMBERS.every((name) => appSource.includes('function ' + name + '(') && appSource.includes('SEYMA_REPORT.' + name + '.apply(null,arguments)')));
+ok('app.js report üyelerini imza-koruyan shim olarak çağırır', cold.REPORT_MEMBERS.every((name) => appSource.includes('function ' + name + '(') && (name === 'raporHTML' ? appSource.includes('function raporHTML(){ return SEYMA_RENDER.raporHTML.apply(null,arguments); }') : appSource.includes('SEYMA_REPORT.' + name + '.apply(null,arguments)'))));
 ok('app boot registry kaydı ve cache-bust/load-order vardır', appSource.includes('registerReport') && indexSource.includes('app/core/report.js?v=20260910a') && indexSource.indexOf('app/core/library.js') < indexSource.indexOf('app/core/report.js') && indexSource.indexOf('app/core/report.js') < indexSource.indexOf('app/core/mediaFx.js'));
 
 console.log('\nDone.');

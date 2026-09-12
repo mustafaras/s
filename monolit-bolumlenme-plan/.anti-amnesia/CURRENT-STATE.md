@@ -11,33 +11,32 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 9 başladı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-44 / MON-45 |
-| Dalga / ilerleme | Dalga 9 sürüyor (1/6) / 44/60 |
+| Son / sıradaki | MON-45 / MON-46 |
+| Dalga / ilerleme | Dalga 9 sürüyor (2/6) / 45/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
 
-## MON-44 kapanışı — render onboarding/Bugün registry
+## MON-45 kapanışı — render Sağlık/Rapor/Harita registry
 
-- Kanıt: [`MON-44-ONBOARDING-BUGUN-DUMP-MANIFESTI.md`](../deliverables/MON-44-ONBOARDING-BUGUN-DUMP-MANIFESTI.md).
-- `app/core/render.js` içindeki load-safe `SeymaRender` registry'si yalnız
-  `onboardingHTML` ve `bugunHTML` gövdelerini taşır. `render()`, `App.go`,
-  `#root/#app` DOM sahipliği, inline `App.*` handlerları ve modal/focus yolu
-  app.js'te kaldı; Bugün türetilmiş-habit mutasyonu da shim öncesinde app.js
-  sahipliğindedir.
-- Production/harness FILES sırası `messaging → render → app.js` olarak
-  index, driver, zikr ve state-rebind zincirinde paritelendi. `render.js`
-  cache-bustı `20260911a`, app.js `20260911b` oldu.
-- Deterministik HEAD arşivi karşılaştırmasında Bugün dumpı **112402 byte**,
-  SHA-256 `540f103dc6bf1f3067bd8821cfa9e555eb531d77f44b1e447a53de0baf07930d`
-  ve `cmp=0` ile birebir. App fn/all/unique **556/721/718**, literal inline
-  onclick **135**, FX **78/63/58/6**, data-rebind fixture **37/37** ve registry
-  `data=` **0**: delta yok.
-- Syntax, driver onboarding+seeded, zikr **95/95**, modularization **101/101**,
-  Faz10 **69/69**, ÆON expand **24/24**, premium 9 fixture, reminder smoke 21,
-  B1/B2/B3 ve `git diff --check` PASS. Browser/device, native permission,
-  remote, push/merge/tag/deploy veya `mustafaras/seyma-data` yazımı yok;
-  `releaseApproval=not_approved` korundu. MON-45 için yeni açık kullanıcı
-  yönü gerekir.
+- Kanıt: [`MON-45-SAGLIK-RAPOR-HARITA-DUMP-MANIFESTI.md`](../deliverables/MON-45-SAGLIK-RAPOR-HARITA-DUMP-MANIFESTI.md).
+- `SeymaRender.saglikHTML/raporHTML/haritaHTML` yalnız Health/Report/Map domain
+  registrylerini app.js resolverları üzerinden çağırır. Domain gövdeleri ve
+  `render()`, `App.go`, `#root/#app`, handler, CSS, state/save/sync/network
+  sahipliği değişmedi; Harita `ui.calMonth` lazy mutasyonu app.js shimindedir.
+- Mevcut `render.js` FILES sırası değişmeden korundu; cache-bust render/app için
+  `20260912a` oldu. Ayrı HEAD arşiviyle Sağlık/Rapor/Harita dump'ları sırasıyla
+  **65,868/139,456/29,125 byte**, SHA-256
+  `1c9dd4e8…bb438`/`f7fc2ef0…7eaa2`/`1c6f3c77…d993c`, her biri `cmp=0`.
+- App fn/all/unique **556/721/718**, inline onclick **156**, data-fx **29** ve
+  data tokenı **18** delta 0; App.go/render/root-app diff satırı 0. Registry
+  boot no-network/no-storage, eksik/tekrar registration fail-closed; map lazy
+  guard PASS. Syntax, driver onboarding+seeded, zikr **95/95**,
+  modularization **101/101**, state-rebind **37/37**, Faz10 **69/69**, ÆON
+  **24/24**, premium 9 fixture, reminder smoke 21, Health **30/30**,
+  Report/Map, B1/B2/B3 ve diff-check PASS.
+- Browser/device, native permission, remote, push/merge/tag/deploy veya
+  `mustafaras/seyma-data` yazımı yok; `releaseApproval=not_approved` korundu.
+  MON-46 için yeni açık kullanıcı yönü gerekir.
 
 ## MON-42 kapanışı — messaging domain modülü
 

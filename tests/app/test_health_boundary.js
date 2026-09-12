@@ -189,7 +189,7 @@ ok('app.js exposes health view shims', [
   'function waterCard(){ return SEYMA_HEALTH.waterCard.apply(null,arguments); }',
   'function caffeineBlock(){ return SEYMA_HEALTH.caffeineBlock.apply(null,arguments); }',
   'function bodyCard(){ return SEYMA_HEALTH.bodyCard.apply(null,arguments); }',
-  'function saglikHTML(){ return SEYMA_HEALTH.saglikHTML.apply(null,arguments); }',
+  'function saglikHTML(){ return SEYMA_RENDER.saglikHTML.apply(null,arguments); }',
   'function cycleHTML(){ return SEYMA_HEALTH.cycleHTML.apply(null,arguments); }',
 ].every((line) => appSource.includes(line)));
 

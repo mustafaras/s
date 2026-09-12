@@ -6,14 +6,14 @@
   "activePrompt": null,
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON-46",
-  "nextPrompt": "MON-47",
+  "lastCompletedPrompt": "MON-47",
+  "nextPrompt": "MON-48",
   "currentWave": "9",
   "totalPrompts": 60,
-  "completedPrompts": 46,
+  "completedPrompts": 47,
   "updatedAt": "2026-09-12",
-  "lastCompletedEvidence": "MON-46-SAYGI-TERAPI-FOCUS-MANIFESTI.md: deterministic HEAD/current Saygı/Bugün-Terapi/room dumps 20593/112402/136095 byte; SHA f4c0fc3a…82599/540f103d…07930d/6947c9c4…7883ac; cmp=0; focus and required headless gates PASS; MON-47 requires fresh approval.",
-  "nextSafeAction": "MON-46 tamamlandı: MON-46-SAYGI-TERAPI-FOCUS-MANIFESTI.md load-safe SeymaRender Saygı, Terapi Bugün kartı ve room modal giriş delegelerini; app.js'te korunan modal/focus/keyboard/room-body sahipliğini ve deterministic üç-yüzey markup parity'sini kaydeder. Syntax, driver onboarding+seeded, zikr 95/95, Saygı 20/20, Terapi accessibility, modal focus, modularization 101/101, state-rebind 37/37, Faz10 69/69, Aeon 24/24, premium 9 fixture, reminder smoke 21, B1/B2/B3 ve diff-check PASS. releaseApproval not_approved; browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-47 için yeni açık kullanıcı yönü gerekir.",
+  "lastCompletedEvidence": "MON-47-LIBRARY-SETTINGS-MESAJ-MANIFESTI.md: deterministic HEAD/current Ayarlar/Mesaj/Okuma dumps 46190/17138/121201 byte; SHA ed7ec8bf…16782/15df13b7…94da/1539a78c…85805; cmp=0; onclick SHA dd582bbc…38b7 and required headless gates PASS; MON-48 requires fresh approval.",
+  "nextSafeAction": "MON-47 tamamlandı: MON-47-LIBRARY-SETTINGS-MESAJ-MANIFESTI.md load-safe SeymaRender Kitaplık overlayleri, Ayarlar ve Mesaj tab giriş delegelerini; app.js'te korunan domain/state/message persistence/handler/modal ownership ve deterministic üç-yüzey markup parity'sini kaydeder. Syntax, driver onboarding+seeded, zikr 95/95, Library/Settings/Messaging boundary, Aeon 24/24, modal focus, modularization 101/101, state-rebind 37/37, Faz10 69/69, premium 9 fixture, reminder smoke 21, B1/B2/B3 ve diff-check PASS. releaseApproval not_approved; browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-48 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -272,7 +272,7 @@
       "prompts": "MON-44..MON-49",
       "topic": "render katmani",
       "approvalRequired": true,
-      "completed": 3,
+      "completed": 4,
       "total": 6
     },
     {

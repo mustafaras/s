@@ -1,5 +1,5 @@
-// MON-46 · render core registry.
-// Onboarding, Bugün, Sağlık, Rapor, Harita, Saygı ve Terapi giriş kabukları
+// MON-47 · render core registry.
+// Onboarding, Bugün, domain tabları ve Library/Terapi modal giriş kabukları
 // burada; domain kart üreticileri, App handlers, root/app innerHTML, mutation/
 // save/DOM ve modal ownership app.js'te kalır.
 (function(){
@@ -17,7 +17,10 @@
     'magnesiumBannerHTML','moodCardHTML','daily','motivationProgramV2','eveningNudge',
     'habitsCardHTML','stepReminder','beslenmeCardHTML','waterCard','reflectionCardHTML',
     'onThisDayCard','healthTabHTML','reportTabHTML','mapTabHTML','saygiTabHTML',
-    'roomOverlayEntryHTML'
+    'roomOverlayEntryHTML','readingOverlayEntryHTML','watchOverlayEntryHTML',
+    'listeningOverlayEntryHTML','learningOverlayEntryHTML','soulPracticePickerEntryHTML',
+    'soulActivityOverlayEntryHTML','soulArchiveOverlayEntryHTML','settingsTabHTML',
+    'messageTabHTML'
   ];
 
   function registerRender(deps){
@@ -76,6 +79,15 @@
   function mapTabHTML(){ return call('mapTabHTML',arguments); }
   function saygiTabHTML(){ return call('saygiTabHTML',arguments); }
   function roomOverlayEntryHTML(){ return call('roomOverlayEntryHTML',arguments); }
+  function readingOverlayEntryHTML(){ return call('readingOverlayEntryHTML',arguments); }
+  function watchOverlayEntryHTML(){ return call('watchOverlayEntryHTML',arguments); }
+  function listeningOverlayEntryHTML(){ return call('listeningOverlayEntryHTML',arguments); }
+  function learningOverlayEntryHTML(){ return call('learningOverlayEntryHTML',arguments); }
+  function soulPracticePickerEntryHTML(){ return call('soulPracticePickerEntryHTML',arguments); }
+  function soulActivityOverlayEntryHTML(){ return call('soulActivityOverlayEntryHTML',arguments); }
+  function soulArchiveOverlayEntryHTML(){ return call('soulArchiveOverlayEntryHTML',arguments); }
+  function settingsTabHTML(){ return call('settingsTabHTML',arguments); }
+  function messageTabHTML(){ return call('messageTabHTML',arguments); }
 
   function onboardingHTML(){
     var dark=liveDark();
@@ -294,14 +306,22 @@
 
   }
 
-  // Domain registry gövdeleri burada yeniden üretilmez. app.js resolverları Health,
-  // Report, Map, Saygı ve Motivation kayıtlarını sabitler; Harita'nın ui.calMonth
-  // lazy mutasyonu ile modal/focus sahipliği app.js'te kalır.
+  // Domain registry gövdeleri burada yeniden üretilmez. app.js resolverları domain
+  // kayıtlarını sabitler; modal/focus sahipliği ile app-owned writerlar app.js'te kalır.
   function saglikHTML(){ return healthTabHTML.apply(null,arguments); }
   function raporHTML(){ return reportTabHTML.apply(null,arguments); }
   function haritaHTML(){ return mapTabHTML.apply(null,arguments); }
   function saygiHTML(){ return saygiTabHTML.apply(null,arguments); }
   function roomOverlayHTML(){ return roomOverlayEntryHTML.apply(null,arguments); }
+  function readingOverlayHTML(){ return readingOverlayEntryHTML.apply(null,arguments); }
+  function watchOverlayHTML(){ return watchOverlayEntryHTML.apply(null,arguments); }
+  function listeningOverlayHTML(){ return listeningOverlayEntryHTML.apply(null,arguments); }
+  function learningOverlayHTML(){ return learningOverlayEntryHTML.apply(null,arguments); }
+  function soulPracticePickerHTML(){ return soulPracticePickerEntryHTML.apply(null,arguments); }
+  function soulActivityOverlayHTML(){ return soulActivityOverlayEntryHTML.apply(null,arguments); }
+  function soulArchiveOverlayHTML(){ return soulArchiveOverlayEntryHTML.apply(null,arguments); }
+  function ayarlarHTML(){ return settingsTabHTML.apply(null,arguments); }
+  function mesajHTML(){ return messageTabHTML.apply(null,arguments); }
 
   window.SeymaRender={
     registerRender:registerRender,
@@ -312,6 +332,15 @@
     haritaHTML:haritaHTML,
     saygiHTML:saygiHTML,
     motivationTodayCardHTML:motivationTodayCardHTML,
-    roomOverlayHTML:roomOverlayHTML
+    roomOverlayHTML:roomOverlayHTML,
+    readingOverlayHTML:readingOverlayHTML,
+    watchOverlayHTML:watchOverlayHTML,
+    listeningOverlayHTML:listeningOverlayHTML,
+    learningOverlayHTML:learningOverlayHTML,
+    soulPracticePickerHTML:soulPracticePickerHTML,
+    soulActivityOverlayHTML:soulActivityOverlayHTML,
+    soulArchiveOverlayHTML:soulArchiveOverlayHTML,
+    ayarlarHTML:ayarlarHTML,
+    mesajHTML:mesajHTML
   };
 })();

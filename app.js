@@ -518,7 +518,7 @@ function allLyrics(){ return SEYMA_LIBRARY.allLyrics.apply(null,arguments); }
 function overlayShell(){ return SEYMA_LIBRARY.overlayShell.apply(null,arguments); }
 function soulOverlayShell(){ return SEYMA_LIBRARY.soulOverlayShell.apply(null,arguments); }
 function bookStatusChip(){ return SEYMA_LIBRARY.bookStatusChip.apply(null,arguments); }
-function readingOverlayHTML(){ return SEYMA_LIBRARY.readingOverlayHTML.apply(null,arguments); }
+function readingOverlayHTML(){ return SEYMA_RENDER.readingOverlayHTML.apply(null,arguments); }
 function readingTodayView(){ return SEYMA_LIBRARY.readingTodayView.apply(null,arguments); }
 function bookCard(){ return SEYMA_LIBRARY.bookCard.apply(null,arguments); }
 function readingLibraryView(){ return SEYMA_LIBRARY.readingLibraryView.apply(null,arguments); }
@@ -528,7 +528,7 @@ function compactModalShell(){ return SEYMA_LIBRARY.compactModalShell.apply(null,
 function bookEditModal(){ return SEYMA_LIBRARY.bookEditModal.apply(null,arguments); }
 function quoteAddModal(){ return SEYMA_LIBRARY.quoteAddModal.apply(null,arguments); }
 function titleStatusChip(){ return SEYMA_LIBRARY.titleStatusChip.apply(null,arguments); }
-function watchOverlayHTML(){ return SEYMA_LIBRARY.watchOverlayHTML.apply(null,arguments); }
+function watchOverlayHTML(){ return SEYMA_RENDER.watchOverlayHTML.apply(null,arguments); }
 function watchTodayView(){ return SEYMA_LIBRARY.watchTodayView.apply(null,arguments); }
 function titleCard(){ return SEYMA_LIBRARY.titleCard.apply(null,arguments); }
 function watchArchiveView(){ return SEYMA_LIBRARY.watchArchiveView.apply(null,arguments); }
@@ -537,7 +537,7 @@ function watchQuotesView(){ return SEYMA_LIBRARY.watchQuotesView.apply(null,argu
 function titleEditModal(){ return SEYMA_LIBRARY.titleEditModal.apply(null,arguments); }
 function replicaAddModal(){ return SEYMA_LIBRARY.replicaAddModal.apply(null,arguments); }
 function listenKindMeta(){ return SEYMA_LIBRARY.listenKindMeta.apply(null,arguments); }
-function listeningOverlayHTML(){ return SEYMA_LIBRARY.listeningOverlayHTML.apply(null,arguments); }
+function listeningOverlayHTML(){ return SEYMA_RENDER.listeningOverlayHTML.apply(null,arguments); }
 function listeningTodayView(){ return SEYMA_LIBRARY.listeningTodayView.apply(null,arguments); }
 function trackCard(){ return SEYMA_LIBRARY.trackCard.apply(null,arguments); }
 function listeningFavsView(){ return SEYMA_LIBRARY.listeningFavsView.apply(null,arguments); }
@@ -547,13 +547,13 @@ function trackEditModal(){ return SEYMA_LIBRARY.trackEditModal.apply(null,argume
 function lyricAddModal(){ return SEYMA_LIBRARY.lyricAddModal.apply(null,arguments); }
 function learningEntryCard(){ return SEYMA_LIBRARY.learningEntryCard.apply(null,arguments); }
 function learningTodayView(){ return SEYMA_LIBRARY.learningTodayView.apply(null,arguments); }
-function learningOverlayHTML(){ return SEYMA_LIBRARY.learningOverlayHTML.apply(null,arguments); }
+function learningOverlayHTML(){ return SEYMA_RENDER.learningOverlayHTML.apply(null,arguments); }
 function soulActivityTodayView(){ return SEYMA_LIBRARY.soulActivityTodayView.apply(null,arguments); }
 function soulActivityEntryCard(){ return SEYMA_LIBRARY.soulActivityEntryCard.apply(null,arguments); }
-function soulPracticePickerHTML(){ return SEYMA_LIBRARY.soulPracticePickerHTML.apply(null,arguments); }
-function soulActivityOverlayHTML(){ return SEYMA_LIBRARY.soulActivityOverlayHTML.apply(null,arguments); }
+function soulPracticePickerHTML(){ return SEYMA_RENDER.soulPracticePickerHTML.apply(null,arguments); }
+function soulActivityOverlayHTML(){ return SEYMA_RENDER.soulActivityOverlayHTML.apply(null,arguments); }
 function soulArchiveSessions(){ return SEYMA_LIBRARY.soulArchiveSessions.apply(null,arguments); }
-function soulArchiveOverlayHTML(){ return SEYMA_LIBRARY.soulArchiveOverlayHTML.apply(null,arguments); }
+function soulArchiveOverlayHTML(){ return SEYMA_RENDER.soulArchiveOverlayHTML.apply(null,arguments); }
 
 if(!window.SeymaHealth||typeof window.SeymaHealth.registerHealth!=='function'||!window.SeymaHealth.registerHealth({
   data:function(){ return data; },
@@ -748,7 +748,7 @@ if(!window.SeymaSettings||typeof window.SeymaSettings.registerSettings!=='functi
   syncConfigured:syncConfigured
 })) throw new Error('MON-37: SeymaSettings registry kurulamadı');
 
-// MON-46: render registry. Canlı data/dark resolverları, app-owned card/banner/
+// MON-47: render registry. Canlı data/dark resolverları, app-owned card/banner/
 // save/mutation üreticileri ve domain giriş resolverları tek dependency bag ile bağlanır.
 var SEYMA_RENDER=window.SeymaRender||{};
 if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!window.SeymaRender.registerRender({
@@ -800,8 +800,17 @@ if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!
   reportTabHTML:function(){ return SEYMA_REPORT.raporHTML.apply(null,arguments); },
   mapTabHTML:function(){ return SEYMA_MAP.haritaHTML.apply(null,arguments); },
   saygiTabHTML:function(){ return window.SeymaSaygi.saygiHTML.apply(null,arguments); },
-  roomOverlayEntryHTML:function(){ return window.SeymaMotivation.roomOverlayHTML.apply(null,arguments); }
-})) throw new Error('MON-46: SeymaRender registry kurulamadı');
+  roomOverlayEntryHTML:function(){ return window.SeymaMotivation.roomOverlayHTML.apply(null,arguments); },
+  readingOverlayEntryHTML:function(){ return SEYMA_LIBRARY.readingOverlayHTML.apply(null,arguments); },
+  watchOverlayEntryHTML:function(){ return SEYMA_LIBRARY.watchOverlayHTML.apply(null,arguments); },
+  listeningOverlayEntryHTML:function(){ return SEYMA_LIBRARY.listeningOverlayHTML.apply(null,arguments); },
+  learningOverlayEntryHTML:function(){ return SEYMA_LIBRARY.learningOverlayHTML.apply(null,arguments); },
+  soulPracticePickerEntryHTML:function(){ return SEYMA_LIBRARY.soulPracticePickerHTML.apply(null,arguments); },
+  soulActivityOverlayEntryHTML:function(){ return SEYMA_LIBRARY.soulActivityOverlayHTML.apply(null,arguments); },
+  soulArchiveOverlayEntryHTML:function(){ return SEYMA_LIBRARY.soulArchiveOverlayHTML.apply(null,arguments); },
+  settingsTabHTML:function(){ return window.SeymaSettings.ayarlarHTML.apply(null,arguments); },
+  messageTabHTML:function(){ return SEYMA_MESSAGING.mesajHTML.apply(null,arguments); }
+})) throw new Error('MON-47: SeymaRender registry kurulamadı');
 // === Kafein hesabı ===
 var CAFFEINE_TYPES=SEYMA_HEALTH.CAFFEINE_TYPES;
 var CAFFEINE_LIMITS=SEYMA_HEALTH.CAFFEINE_LIMITS;
@@ -10141,7 +10150,7 @@ function distanceRecapCard(){ return SEYMA_REPORT.distanceRecapCard.apply(null,a
 function moodHeatmapCard(){ return SEYMA_REPORT.moodHeatmapCard.apply(null,arguments); }
 function raporHTML(){ return SEYMA_RENDER.raporHTML.apply(null,arguments); }
 // MON-37: settings read/render registry. Settings state/default/mutation handlers remain app-owned.
-function ayarlarHTML(){ return window.SeymaSettings.ayarlarHTML.apply(null,arguments); }
+function ayarlarHTML(){ return SEYMA_RENDER.ayarlarHTML.apply(null,arguments); }
 function settingsBtn(onclick,label,icon){ return window.SeymaSettings.settingsBtn.apply(null,arguments); }
 
 // ================= SAĞLIK & DÖNGÜ =================
@@ -13237,7 +13246,7 @@ App.aeonSheetPick=function(kind){
 // gözlemci ÆON adına yanıtlar (sol/gelen balon). Gözlemci mesajları da gelen balondur.
 // Tümünü tek kronolojik akışta gösteririz; yazı kutusu altta sabittir.
 function aeonChatHTML(){ return SEYMA_MESSAGING.aeonChatHTML.apply(null,arguments); }
-function mesajHTML(){ return SEYMA_MESSAGING.mesajHTML.apply(null,arguments); }
+function mesajHTML(){ return SEYMA_RENDER.mesajHTML.apply(null,arguments); }
 App.openMesaj=function(){ markNotifsRead(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); ui.tab='mesaj'; ui.aeonScrollBottom=true; render(); };
 App.dismissPopup=function(){ var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; }); pend.forEach(function(n){ n.seen=true; }); if(pend.length) save(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); render(); };
 App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); };

@@ -10,6 +10,7 @@ const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 
 const source = fs.readFileSync(path.join(repoRoot, 'app/core/messaging.js'), 'utf8');
+const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
 const forbidden = [
   /\bfetch\s*\(/, /XMLHttpRequest/, /localStorage/, /navigator/, /\bNotification\b/,
   /SeySync/, /pushNow/, /pushPing/, /\bghToken\b/, /\bopenaiKey\b/, /\bpanel\b/, /\breminder\b/i
@@ -68,6 +69,7 @@ assert.match(M.aeonAttachSheetHTML(), /aeon-attach-dialog/);
 assert.match(html, /id="aeon-file-input"[^>]*accept="\.pdf"/);
 assert.equal(JSON.stringify(data), beforeData, 'render registry does not mutate conversation data');
 assert.equal(JSON.stringify(ui), beforeUi, 'render registry does not mutate UI state');
+assert.match(appSource, /function mesajHTML\(\)\{ return SEYMA_RENDER\.mesajHTML\.apply\(null,arguments\); \}/, 'app mesaj entry keeps the render shim');
 
 const sourceIndex = html.indexOf('Kaynak cevap bildirimi');
 const afterIndex = html.indexOf('Sonraki yeni mesaj');

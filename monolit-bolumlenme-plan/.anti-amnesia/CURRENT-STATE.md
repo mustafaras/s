@@ -11,32 +11,33 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 9 başladı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-46 / MON-47 |
-| Dalga / ilerleme | Dalga 9 sürüyor (3/6) / 46/60 |
+| Son / sıradaki | MON-47 / MON-48 |
+| Dalga / ilerleme | Dalga 9 sürüyor (4/6) / 47/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
 
-## MON-46 kapanışı — render Saygı/Terapi girişleri
+## MON-47 kapanışı — render Kitaplık/Ayarlar/Mesaj girişleri
 
-- Kanıt: [`MON-46-SAYGI-TERAPI-FOCUS-MANIFESTI.md`](../deliverables/MON-46-SAYGI-TERAPI-FOCUS-MANIFESTI.md).
-- `SeymaRender.saygiHTML/motivationTodayCardHTML/roomOverlayHTML` yalnız
-  Saygı/Motivation domain registrylerini app.js resolverları üzerinden çağırır.
-  Domain gövdeleri/content, `roomBodyHTML`, App.open/close/updateRoom,
-  shared modal focus/keyboard, `render()`, `App.go`, `#root/#app`, CSS,
-  state/save/sync/network sahipliği değişmedi.
-- `driver --dump room` sentetik kanıt rotası app-owned `App.openRoom()` yolunu
-  kullanır; yeni core dosyası veya FILES sırası değişmedi. render/app cache-bust
-  `20260912b` oldu. Ayrı HEAD arşiviyle Saygı/Bugün-Terapi/room dump'ları
-  **20,593/112,402/136,095 byte**, SHA-256
-  `f4c0fc3a…82599`/`540f103d…07930d`/`6947c9c4…7883ac`, her biri `cmp=0`.
-- App fn/all/unique **556/721/718**, inline onclick/data-fx **156/29**, data
-  tokenı **18** ve App.go/render/root/modal-owner diff satırı 0. Saygı
-  **20/20**, Terapi accessibility, modal-focus, driver onboarding+seeded,
-  zikr **95/95**, modularization **101/101**, state-rebind **37/37**, Faz10
-  **69/69**, ÆON **24/24**, premium/reminder, B1/B2/B3 ve diff-check PASS.
+- Kanıt: [`MON-47-LIBRARY-SETTINGS-MESAJ-MANIFESTI.md`](../deliverables/MON-47-LIBRARY-SETTINGS-MESAJ-MANIFESTI.md).
+- `SeymaRender` yedi Kitaplık overlay girişini `SeymaLibrary`ye, `ayarlarHTML`yi
+  `SeymaSettings`e ve `mesajHTML`yi `SeymaMessaging`e app.js named resolverları
+  üzerinden delege eder. Domain gövdeleri, settings yazarları, message state ve
+  persistence, App handlerları, inline handlerlar, `render()`/`App.go`, root/app
+  innerHTML, modal/focus/keyboard, CSS, state/save/sync/network değişmedi.
+- Yeni core dosyası veya FILES sırası yoktur; driver yalnız app-owned
+  `App.openReading()` kullanan sentetik `--dump reading` rotası aldı. render/app
+  cache-bust `20260912c` oldu. Ayrı HEAD arşiviyle Ayarlar/Mesaj/Okuma dump'ları
+  **46,190/17,138/121,201 byte**, SHA-256
+  `ed7ec8bf…16782`/`15df13b7…94da`/`1539a78c…85805`, her biri `cmp=0`.
+- App fn/all/unique **556/721/718**, inline onclick **153**, FX **29**, data
+  tokenı **18**, onclick SHA `dd582bbc…38b7` ve render/App.go/root diff satırı
+  0. Library/settings/messaging boundary, ÆON persistence **24/24**, modal focus,
+  driver onboarding+seeded, zikr **95/95**, modularization **101/101**,
+  state-rebind **37/37**, Faz10 **69/69**, premium/reminder, B1/B2/B3 ve
+  diff-check PASS.
 - Browser/device, native permission, remote, push/merge/tag/deploy veya
   `mustafaras/seyma-data` yazımı yok; `releaseApproval=not_approved` korundu.
-  MON-47 için yeni açık kullanıcı yönü gerekir.
+  MON-48 için yeni açık kullanıcı yönü gerekir.
 
 ## MON-42 kapanışı — messaging domain modülü
 

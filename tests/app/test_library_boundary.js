@@ -115,5 +115,8 @@ ok('entry/archive identity alanları app-owned kaynakta durur',
   /archiveId=x\.id/.test(appSource));
 ok('beş hub App-owned mutation surface korunur',
   ['App.addReading', 'App.addWatching', 'App.addListening', 'App.addLearning', 'App.saveSoulActivity'].every((name) => appSource.includes(name)));
+ok('Library render giriş shimleri SeymaRender üzerinden delege olur',
+  ['readingOverlayHTML','watchOverlayHTML','listeningOverlayHTML','learningOverlayHTML','soulPracticePickerHTML','soulActivityOverlayHTML','soulArchiveOverlayHTML']
+    .every((name) => appSource.includes('function '+name+'(){ return SEYMA_RENDER.'+name+'.apply(null,arguments); }')));
 
 console.log('\nDone.');

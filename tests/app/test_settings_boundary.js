@@ -171,8 +171,8 @@ ok('settings modülü doğrudan localStorage/document/fetch kullanmıyor',
   !/localStorage|\bdocument\b|\bfetch\b/.test(settingsSource));
 ok('settings modülü doğrudan state mutation taşımıyor',
   !/data\.[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\s*=(?!=)|\.setItem\(|\.push\(/.test(settingsSource));
-ok('app.js ayarlarHTML imza-koruyan shim olarak kaldı',
-  /function ayarlarHTML\(\)\{ return window\.SeymaSettings\.ayarlarHTML\.apply\(null,arguments\); \}/.test(appSource));
+ok('app.js ayarlarHTML imza-koruyan render shim olarak kaldı',
+  /function ayarlarHTML\(\)\{ return SEYMA_RENDER\.ayarlarHTML\.apply\(null,arguments\); \}/.test(appSource));
 ok('app-owned settings mutation handlerları korunuyor',
   /App\.setTheme=function/.test(appSource) &&
   /App\.toggleHaptic=function/.test(appSource) &&

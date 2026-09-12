@@ -482,6 +482,11 @@ if (dumpTab && sb2.App && typeof sb2.App.go === 'function') {
     // keyboard contract app.js'te kalır, driver yalnız #app markupını yakalar.
     sb2.App.go('bugun');
     sb2.App.openRoom();
+  } else if (dumpTab === 'reading') {
+    // MON-47: Kitaplık girişini gerçek app-owned openReading yolu ile üret;
+    // driver yalnız #app markupını yakalar, draft/mutation sahipliği app.js'tedir.
+    sb2.App.go('bugun');
+    sb2.App.openReading();
   } else {
     sb2.App.go(dumpTab);
   }

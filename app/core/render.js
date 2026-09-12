@@ -7,7 +7,7 @@
 
   var renderDeps=null;
   var RENDER_DEPENDENCIES=[
-    'data','dark','todayStr','editing','activeDate','dayIndexFor','currentStreak',
+    'data','ui','dark','todayStr','editing','activeDate','dayIndexFor','currentStreak',
     'countRec','habitCountOn','gununHavasi','dailyPhotoCardHTML',
     'saveBanner','shouldShowAeonNotifyBanner','aeonNotifyBannerHTML','locationCardHTML',
     'vacationCardHidden','vacationCardHTML','weatherHeaderHTML','journalLightCardHTML',
@@ -20,7 +20,11 @@
     'roomOverlayEntryHTML','readingOverlayEntryHTML','watchOverlayEntryHTML',
     'listeningOverlayEntryHTML','learningOverlayEntryHTML','soulPracticePickerEntryHTML',
     'soulActivityOverlayEntryHTML','soulArchiveOverlayEntryHTML','settingsTabHTML',
-    'messageTabHTML'
+    'messageTabHTML','appHeaderMeta','headerSkyClassNow','saveButtonHTML',
+    'headerActionHTML','headerSceneHTML','unreadNotifCount','featuresLive',
+    'saygiCurrentPerson','saygiHasRead','getDay','ensurePrayerDay',
+    'prayerDaySummary','zikrDayCompleted','overlayShellEntryHTML',
+    'soulOverlayShellEntryHTML'
   ];
 
   function registerRender(deps){
@@ -32,6 +36,7 @@
   function dep(name){ return renderDeps&&typeof renderDeps[name]==='function'?renderDeps[name]:null; }
   function call(name,args){ var f=dep(name); if(f) return f.apply(null,args||[]); throw new Error('SeymaRender: çözümlenemeyen bağımlılık '+name); }
   function liveData(){ return call('data',[]); }
+  function liveUi(){ return call('ui',[]); }
   function liveDark(){ return call('dark',[]); }
   function icon(){ return call('icon',arguments); }
   function esc(){ return call('esc',arguments); }
@@ -88,6 +93,83 @@
   function soulArchiveOverlayEntryHTML(){ return call('soulArchiveOverlayEntryHTML',arguments); }
   function settingsTabHTML(){ return call('settingsTabHTML',arguments); }
   function messageTabHTML(){ return call('messageTabHTML',arguments); }
+  function appHeaderMeta(){ return call('appHeaderMeta',arguments); }
+  function headerSkyClassNow(){ return call('headerSkyClassNow',arguments); }
+  function saveButtonHTML(){ return call('saveButtonHTML',arguments); }
+  function headerActionHTML(){ return call('headerActionHTML',arguments); }
+  function headerSceneHTML(){ return call('headerSceneHTML',arguments); }
+  function unreadNotifCount(){ return call('unreadNotifCount',arguments); }
+  function featuresLive(){ return call('featuresLive',arguments); }
+  function saygiCurrentPerson(){ return call('saygiCurrentPerson',arguments); }
+  function saygiHasRead(){ return call('saygiHasRead',arguments); }
+  function getDay(){ return call('getDay',arguments); }
+  function ensurePrayerDay(){ return call('ensurePrayerDay',arguments); }
+  function prayerDaySummary(){ return call('prayerDaySummary',arguments); }
+  function zikrDayCompleted(){ return call('zikrDayCompleted',arguments); }
+  function overlayShellEntryHTML(){ return call('overlayShellEntryHTML',arguments); }
+  function soulOverlayShellEntryHTML(){ return call('soulOverlayShellEntryHTML',arguments); }
+
+  function appHeaderHTML(){
+    var m=appHeaderMeta();
+    var h='<header id="sey-appheader" class="sey-appheader" style="--hdr-accent:'+m.accent+';--hdr-accent2:'+m.accent2+';--hdr-ink:'+m.ink+';">';
+    h+='<span class="'+headerSkyClassNow()+'" aria-hidden="true"></span>';
+    h+='<div class="sey-header-top">';
+    h+='<button data-fx="nav" class="sey-header-brand" onclick="App.go(\'bugun\')" aria-label="Bugüne git"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></button>';
+    h+='<div class="sey-header-tools">'+saveButtonHTML()+'<button data-fx="toggle" class="sey-header-mini" onclick="App.toggleTheme()" aria-label="Tema" title="Tema">'+icon(liveDark()?'sun':'moon',16)+'</button></div>';
+    h+='</div>';
+    h+='<div class="sey-header-main">';
+    h+='<span class="sey-header-icon">'+icon(m.icon,21)+'</span>';
+    h+='<div class="sey-header-copy"><div class="sey-header-kicker">'+esc(m.kicker||'Şeyma')+'</div><div class="sey-header-title">'+esc(m.title||'Bugün')+'</div><div class="sey-header-sub">'+esc(m.sub||'')+'</div></div>';
+    h+=headerActionHTML(m.action);
+    h+='</div>';
+    h+=headerSceneHTML();
+    h+='</header>';
+    return h;
+  }
+
+  function navHTML(){
+    // Alt bar, aktif sayfanın header aksanını paylaşır: iki yüzey tek bir uygulama kabuğu gibi okunur.
+    var defs=[
+      ['bugun','sun','Bugün','#7B5E2F','#3E433B'],
+      ['saglik','flower-2','Sağlık','#2F6B63','#60695D'],
+      ['mesaj','hexagon','Aeon','#A88444','#30343A'],
+      ['saygi','trophy','İlham·İbadet','#826936','#36454B',true],
+      ['harita','map','Takvim','#59695E','#8A734E'],
+      ['rapor','chart-column','Rapor','#3A4048','#A4824C'],
+      ['ayarlar','settings','Ayarlar','#4A4852','#787064']
+    ];
+    var state=liveUi(), root=liveData(), unread=unreadNotifCount();
+    // Saygı + İman köşesinde tamamlanmamış görev rozeti hesabı.
+    var saygiPending=0;
+    if(featuresLive()){
+      var person=saygiCurrentPerson();
+      if(person&&!saygiHasRead(person)) saygiPending++;
+    }
+    try{
+      var date=todayStr(), day=getDay(root,date,dayIndexFor(date));
+      var p=ensurePrayerDay(day), s=prayerDaySummary(p);
+      if(s.performed<6) saygiPending++;
+      // Zikir: aktif preset hedefi henüz dolmadıysa manevi disiplin bekleniyor
+      if(!zikrDayCompleted(date)) saygiPending++;
+    }catch(e){}
+    var current=defs[0];
+    for(var di=0;di<defs.length;di++){ if(defs[di][0]===state.tab){ current=defs[di]; break; } }
+    var h='<nav class="sey-bottomnav" aria-label="Ana gezinme" style="--nav-active:'+current[3]+';--nav-active2:'+current[4]+';--nav-count:'+defs.length+';">';
+    h+='<div class="sey-bottomnav-surface">';
+    defs.forEach(function(n){
+      var active=state.tab===n[0];
+      var badge='';
+      if(n[0]==='mesaj'&&unread>0) badge='<span class="sey-bottomnav-badge">'+(unread>9?'9+':unread)+'</span>';
+      else if(n[0]==='saygi'&&saygiPending>0) badge='<span class="sey-bottomnav-badge saygi">'+saygiPending+'</span>';
+      var clickFn=n[0]==='mesaj'?'App.openMesaj()':'App.go(\''+n[0]+'\')';
+      h+='<button data-fx="nav" class="sey-bottomnav-item'+(active?' is-active':'')+(n[5]?' is-saygi':'')+'" style="--nav-item-accent:'+n[3]+';--nav-item-accent2:'+n[4]+';" onclick="'+clickFn+'" aria-label="'+n[2]+'"'+(active?' aria-current="page"':'')+'>';
+      h+='<span class="sey-bottomnav-icon"><span class="sey-bottomnav-indicator"></span><span class="sey-bottomnav-glyph">'+icon(n[1],20)+'</span>'+badge+'</span>';
+      h+='<span class="sey-bottomnav-label">'+n[2]+'</span>';
+      h+='</button>';
+    });
+    h+='</div></nav>';
+    return h;
+  }
 
   function onboardingHTML(){
     var dark=liveDark();
@@ -341,6 +423,10 @@
     soulActivityOverlayHTML:soulActivityOverlayHTML,
     soulArchiveOverlayHTML:soulArchiveOverlayHTML,
     ayarlarHTML:ayarlarHTML,
-    mesajHTML:mesajHTML
+    mesajHTML:mesajHTML,
+    appHeaderHTML:appHeaderHTML,
+    navHTML:navHTML,
+    overlayShell:overlayShellEntryHTML,
+    soulOverlayShell:soulOverlayShellEntryHTML
   };
 })();

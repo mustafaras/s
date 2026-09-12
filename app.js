@@ -515,8 +515,8 @@ function weekListen(){ return SEYMA_LIBRARY.weekListen.apply(null,arguments); }
 function listenStreak(){ return SEYMA_LIBRARY.listenStreak.apply(null,arguments); }
 function musicStats(){ return SEYMA_LIBRARY.musicStats.apply(null,arguments); }
 function allLyrics(){ return SEYMA_LIBRARY.allLyrics.apply(null,arguments); }
-function overlayShell(){ return SEYMA_LIBRARY.overlayShell.apply(null,arguments); }
-function soulOverlayShell(){ return SEYMA_LIBRARY.soulOverlayShell.apply(null,arguments); }
+function overlayShell(){ return SEYMA_RENDER.overlayShell.apply(null,arguments); }
+function soulOverlayShell(){ return SEYMA_RENDER.soulOverlayShell.apply(null,arguments); }
 function bookStatusChip(){ return SEYMA_LIBRARY.bookStatusChip.apply(null,arguments); }
 function readingOverlayHTML(){ return SEYMA_RENDER.readingOverlayHTML.apply(null,arguments); }
 function readingTodayView(){ return SEYMA_LIBRARY.readingTodayView.apply(null,arguments); }
@@ -748,11 +748,12 @@ if(!window.SeymaSettings||typeof window.SeymaSettings.registerSettings!=='functi
   syncConfigured:syncConfigured
 })) throw new Error('MON-37: SeymaSettings registry kurulamadı');
 
-// MON-47: render registry. Canlı data/dark resolverları, app-owned card/banner/
+// MON-48: render registry. Canlı data/dark resolverları, app-owned card/banner/
 // save/mutation üreticileri ve domain giriş resolverları tek dependency bag ile bağlanır.
 var SEYMA_RENDER=window.SeymaRender||{};
 if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!window.SeymaRender.registerRender({
   data:function(){ return data; },
+  ui:function(){ return ui; },
   dark:function(){ return dark; },
   todayStr:todayStr,
   editing:editing,
@@ -809,8 +810,23 @@ if(!window.SeymaRender||typeof window.SeymaRender.registerRender!=='function'||!
   soulActivityOverlayEntryHTML:function(){ return SEYMA_LIBRARY.soulActivityOverlayHTML.apply(null,arguments); },
   soulArchiveOverlayEntryHTML:function(){ return SEYMA_LIBRARY.soulArchiveOverlayHTML.apply(null,arguments); },
   settingsTabHTML:function(){ return window.SeymaSettings.ayarlarHTML.apply(null,arguments); },
-  messageTabHTML:function(){ return SEYMA_MESSAGING.mesajHTML.apply(null,arguments); }
-})) throw new Error('MON-47: SeymaRender registry kurulamadı');
+  messageTabHTML:function(){ return SEYMA_MESSAGING.mesajHTML.apply(null,arguments); },
+  appHeaderMeta:function(){ return appHeaderMeta.apply(null,arguments); },
+  headerSkyClassNow:function(){ return headerSkyClassNow.apply(null,arguments); },
+  saveButtonHTML:function(){ return saveButtonHTML.apply(null,arguments); },
+  headerActionHTML:function(){ return headerActionHTML.apply(null,arguments); },
+  headerSceneHTML:function(){ return headerSceneHTML.apply(null,arguments); },
+  unreadNotifCount:function(){ return unreadNotifCount.apply(null,arguments); },
+  featuresLive:function(){ return featuresLive.apply(null,arguments); },
+  saygiCurrentPerson:function(){ return saygiCurrentPerson.apply(null,arguments); },
+  saygiHasRead:function(){ return saygiHasRead.apply(null,arguments); },
+  getDay:function(){ return getDay.apply(null,arguments); },
+  ensurePrayerDay:function(){ return ensurePrayerDay.apply(null,arguments); },
+  prayerDaySummary:function(){ return prayerDaySummary.apply(null,arguments); },
+  zikrDayCompleted:function(){ return zikrDayCompleted.apply(null,arguments); },
+  overlayShellEntryHTML:function(){ return SEYMA_LIBRARY.overlayShell.apply(null,arguments); },
+  soulOverlayShellEntryHTML:function(){ return SEYMA_LIBRARY.soulOverlayShell.apply(null,arguments); }
+})) throw new Error('MON-48: SeymaRender registry kurulamadı');
 // === Kafein hesabı ===
 var CAFFEINE_TYPES=SEYMA_HEALTH.CAFFEINE_TYPES;
 var CAFFEINE_LIMITS=SEYMA_HEALTH.CAFFEINE_LIMITS;
@@ -11692,71 +11708,13 @@ function syncHeaderScene(){
   var next=tmp.firstChild; if(next&&next.innerHTML!==box.innerHTML) box.innerHTML=next.innerHTML;
   mountSkyCanvas();
 }
-function appHeaderHTML(){
-  var m=appHeaderMeta();
-  var h='<header id="sey-appheader" class="sey-appheader" style="--hdr-accent:'+m.accent+';--hdr-accent2:'+m.accent2+';--hdr-ink:'+m.ink+';">';
-  h+='<span class="'+headerSkyClassNow()+'" aria-hidden="true"></span>';
-  h+='<div class="sey-header-top">';
-  h+='<button data-fx="nav" class="sey-header-brand" onclick="App.go(\'bugun\')" aria-label="Bugüne git"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></button>';
-  h+='<div class="sey-header-tools">'+saveButtonHTML()+'<button data-fx="toggle" class="sey-header-mini" onclick="App.toggleTheme()" aria-label="Tema" title="Tema">'+icon(dark?'sun':'moon',16)+'</button></div>';
-  h+='</div>';
-  h+='<div class="sey-header-main">';
-  h+='<span class="sey-header-icon">'+icon(m.icon,21)+'</span>';
-  h+='<div class="sey-header-copy"><div class="sey-header-kicker">'+esc(m.kicker||'Şeyma')+'</div><div class="sey-header-title">'+esc(m.title||'Bugün')+'</div><div class="sey-header-sub">'+esc(m.sub||'')+'</div></div>';
-  h+=headerActionHTML(m.action);
-  h+='</div>';
-  h+=headerSceneHTML();
-  h+='</header>';
-  return h;
-}
+function appHeaderHTML(){ return SEYMA_RENDER.appHeaderHTML.apply(null,arguments); }
 function wireAppHeaderScroll(sc){
   var hdr=document.getElementById('sey-appheader'); if(!hdr||!sc) return;
   function sync(){ if(sc.scrollTop>18) hdr.classList.add('is-scrolled'); else hdr.classList.remove('is-scrolled'); }
   sc.addEventListener('scroll',sync,{passive:true}); sync();
 }
-function navHTML(){
-  // Alt bar, aktif sayfanın header aksanını paylaşır: iki yüzey tek bir uygulama kabuğu gibi okunur.
-  var defs=[
-    ['bugun','sun','Bugün','#7B5E2F','#3E433B'],
-    ['saglik','flower-2','Sağlık','#2F6B63','#60695D'],
-    ['mesaj','hexagon','Aeon','#A88444','#30343A'],
-    ['saygi','trophy','İlham·İbadet','#826936','#36454B',true],
-    ['harita','map','Takvim','#59695E','#8A734E'],
-    ['rapor','chart-column','Rapor','#3A4048','#A4824C'],
-    ['ayarlar','settings','Ayarlar','#4A4852','#787064']
-  ];
-  var unread=unreadNotifCount();
-  // Saygı + İman köşesinde tamamlanmamış görev rozet hesabı.
-  var saygiPending=0;
-  if(featuresLive()){
-    var person=saygiCurrentPerson();
-    if(person&&!saygiHasRead(person)) saygiPending++;
-  }
-  try{
-    var date=todayStr(), day=getDay(data,date,dayIndexFor(date));
-    var p=ensurePrayerDay(day), s=prayerDaySummary(p);
-    if(s.performed<6) saygiPending++;
-    // Zikir: aktif preset hedefi henüz dolmadıysa manevi disiplin bekleniyor
-    if(!zikrDayCompleted(date)) saygiPending++;
-  }catch(e){}
-  var current=defs[0];
-  for(var di=0;di<defs.length;di++){ if(defs[di][0]===ui.tab){ current=defs[di]; break; } }
-  var h='<nav class="sey-bottomnav" aria-label="Ana gezinme" style="--nav-active:'+current[3]+';--nav-active2:'+current[4]+';--nav-count:'+defs.length+';">';
-  h+='<div class="sey-bottomnav-surface">';
-  defs.forEach(function(n){
-    var active=ui.tab===n[0];
-    var badge='';
-    if(n[0]==='mesaj'&&unread>0) badge='<span class="sey-bottomnav-badge">'+(unread>9?'9+':unread)+'</span>';
-    else if(n[0]==='saygi'&&saygiPending>0) badge='<span class="sey-bottomnav-badge saygi">'+saygiPending+'</span>';
-    var clickFn=n[0]==='mesaj'?'App.openMesaj()':'App.go(\''+n[0]+'\')';
-    h+='<button data-fx="nav" class="sey-bottomnav-item'+(active?' is-active':'')+(n[5]?' is-saygi':'')+'" style="--nav-item-accent:'+n[3]+';--nav-item-accent2:'+n[4]+';" onclick="'+clickFn+'" aria-label="'+n[2]+'"'+(active?' aria-current="page"':'')+'>';
-    h+='<span class="sey-bottomnav-icon"><span class="sey-bottomnav-indicator"></span><span class="sey-bottomnav-glyph">'+icon(n[1],20)+'</span>'+badge+'</span>';
-    h+='<span class="sey-bottomnav-label">'+n[2]+'</span>';
-    h+='</button>';
-  });
-  h+='</div></nav>';
-  return h;
-}
+function navHTML(){ return SEYMA_RENDER.navHTML.apply(null,arguments); }
 
 // ================= OKUMA HUB (overlay) =================
 function modalsHTML(){

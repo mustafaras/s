@@ -11,10 +11,40 @@
 | Program | `MONOLIT-BOLUMLENME` |
 | Durum | `in_progress` — Dalga 9 başladı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-47 / MON-48 |
-| Dalga / ilerleme | Dalga 9 sürüyor (4/6) / 47/60 |
+| Son / sıradaki | MON-48 / MON-49 |
+| Dalga / ilerleme | Dalga 9 sürüyor (5/6) / 48/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
+
+## MON-48 kapanışı — render header/nav/overlay shell
+
+- Kanıt: [`MON-48-RENDER-SHELL-MANIFESTI.md`](../deliverables/MON-48-RENDER-SHELL-MANIFESTI.md).
+- `SeymaRender.appHeaderHTML` ve `navHTML` gövdeleri registry'ye taşındı;
+  app.js aynı imza/adlarla shim olarak kaldı. `overlayShell` ve
+  `soulOverlayShell`, mevcut `SeymaLibrary` domain sahiplerine named resolver
+  üzerinden bağlandı. `modalsHTML()` ve `render()` app.js'te kaldı; MON-49'a
+  ait render/root içeriğine girilmedi.
+- Header save state/tema/sky sahnesi; nav landmark, labels, aktif
+  `aria-current`, unread/Saygı rozetleri; overlay dialog, breadcrumb, focus ve
+  escape yolları aynen korundu. Save semantiği, `App.go`, handler adları ve
+  `onclick`, backdrop, CSS, `data`/`migrate()`/DOM, sync/network değişmedi.
+- Yeni core dosyası veya FILES sırası yoktur; yalnız mevcut render/app cache-bust
+  `20260912d` oldu. Seeded HEAD/current shell karşılaştırmasında header
+  **2,612 byte**, nav **5,690 byte**, okuma overlay shell kuyruğu **8,799 byte**;
+  SHA'lar sırasıyla `b765b5c6…0c2e31`, `00d6ca7a…36314e`,
+  `a95e4928…3c2e5c3`; tüm shell parçalarında `cmp=0`.
+- Ham tam dump'lar Bugün **112,402**, Okuma **121,201 byte** oldu; ham `cmp=1`
+  yalnız mevcut rastgele “Günün havası” skorundaki tek karakter farkıdır.
+  Ayrıştırılmış header/nav/overlay kanıtı `cmp=0` olduğundan bu fark kaynak
+  taşınmasına atfedilmemiştir.
+- Yeni `test_render_shell_boundary` **19/19**, modal focus, reduced-motion
+  **34/34**, driver, syntax, app-core/panel/Panel-v2/Quran/reminder/design tam
+  fixture aileleri ve `git diff --check` PASS. App test ailesindeki mevcut
+  `MODULE_TYPELESS_PACKAGE_JSON` uyarısı başarısızlık değildir; exit 0'dır.
+- Browser/device, native permission, remote, push/merge/tag/deploy veya
+  `mustafaras/seyma-data` yazımı yok; `releaseApproval=not_approved`,
+  `activePrompt=null`, `blockedPrompt=null` korundu. MON-49 için yeni açık
+  kullanıcı yönü gerekir.
 
 ## MON-47 kapanışı — render Kitaplık/Ayarlar/Mesaj girişleri
 

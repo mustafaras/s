@@ -9,12 +9,34 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 10 başladı |
-| Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-50 / MON-51 |
+| Durum | `blocked` — MON-51 handler kapsamı belirsiz |
+| Aktif / bloke | MON-51 / MON-51 |
+| Son / sıradaki | MON-50 / MON-51 (yeni sınır kararı bekliyor) |
 | Dalga / ilerleme | Dalga 10 başladı (1/5) / 50/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
+
+## MON-51 halt — domain handler envanteri belirsizliği
+
+- Kullanıcının açık “go next” yönüyle MON-51 preflight'ı yapıldı; çalışma ağacı
+  başlangıçta temiz, `lastCompletedPrompt=MON-50`, `nextPrompt=MON-51` ve
+  `releaseApproval=not_approved` idi.
+- Canlı `App.*=function` envanteri domain adlarıyla en az 143 aday buldu:
+  prayer/faith/qibla/hijri 14, zikir 35, quran 11, saygı 7, room/motivation
+  14, crisis 8 ve journal 6; aynı aralıklarda ilişkili soul/faith ve overlay
+  handlerları da bulunuyor. Kart bu adaylardan hangilerinin MON-51'e ait
+  olduğunu handler-by-handler tanımlamıyor.
+- Bu belirsizlik uygulama kararıyla giderilemez: Quran submit/watch/question
+  yolları frozen transport/outbox/WhatsApp sınırına, Prayer GPS/refresh yolu
+  izin/ağ sınırına, Saygı refresh yolu fetch sınırına; diğer adaylar ise
+  app.js-owned DOM/focus/save/render sırasına dayanır. Kartın "domain gövdesi,
+  frozen transport veya notification değişmez" yasağı altında rastgele bir
+  alt küme seçmek kabul kriterindeki "her handler" iddiasını sahte kılar.
+- Bu nedenle runtime kodu, index/FILES/cache-bust, sync.js, data ve remote
+  değişmeden bırakıldı. `MON-STATE.json` gerçek duruma göre
+  `status=blocked`, `activePrompt=blockedPrompt=MON-51` yapıldı. Kullanıcıdan
+  MON-51 için izinli handler listesi + domain-owner mappingi gerekir; bu
+  olmadan MON-52'ye geçilmez.
 
 ## MON-50 kapanışı — günlük App handler surface
 

@@ -9,14 +9,14 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `blocked` — MON-51 handler kapsamı belirsiz |
-| Aktif / bloke | MON-51 / MON-51 |
-| Son / sıradaki | MON-50 / MON-51 (yeni sınır kararı bekliyor) |
+| Durum | `in_progress` — MON-51 handler matrisi kesinleşti |
+| Aktif / bloke | MON-51 / yok |
+| Son / sıradaki | MON-50 / MON-51 (uygulama sürüyor) |
 | Dalga / ilerleme | Dalga 10 başladı (1/5) / 50/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
 
-## MON-51 halt — domain handler envanteri belirsizliği
+## MON-51 kapsam kararı — domain handler matrisi
 
 - Kullanıcının açık “go next” yönüyle MON-51 preflight'ı yapıldı; çalışma ağacı
   başlangıçta temiz, `lastCompletedPrompt=MON-50`, `nextPrompt=MON-51` ve
@@ -32,11 +32,14 @@
   app.js-owned DOM/focus/save/render sırasına dayanır. Kartın "domain gövdesi,
   frozen transport veya notification değişmez" yasağı altında rastgele bir
   alt küme seçmek kabul kriterindeki "her handler" iddiasını sahte kılar.
-- Bu nedenle runtime kodu, index/FILES/cache-bust, sync.js, data ve remote
-  değişmeden bırakıldı. `MON-STATE.json` gerçek duruma göre
-  `status=blocked`, `activePrompt=blockedPrompt=MON-51` yapıldı. Kullanıcıdan
-  MON-51 için izinli handler listesi + domain-owner mappingi gerekir; bu
-  olmadan MON-52'ye geçilmez.
+- Kullanıcının "en doğru şekilde düzeltelim" yönüyle bu belirsizlik
+  [`MON-51-HANDLER-SCOPE-KARARI.md`](../deliverables/MON-51-HANDLER-SCOPE-KARARI.md)
+  ile çözüldü: 46 local UI handler, yedi registryye tekil olarak bağlandı;
+  Quran frozen transport, Prayer GPS/ağ, Saygı fetch, notification ve
+  cross-domain yüzeyler açıkça hariçtir. Runtime uygulaması henüz başlamadı.
+- `MON-STATE.json` `status=in_progress`, `activePrompt=MON-51`,
+  `blockedPrompt=null` oldu. Bir sonraki işlem yalnız bu listedeki gövdeleri
+  `SeymaAppSurface`e taşımaktır; MON-52'ye geçilmez.
 
 ## MON-50 kapanışı — günlük App handler surface
 

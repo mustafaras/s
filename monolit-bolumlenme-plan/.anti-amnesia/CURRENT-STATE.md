@@ -9,12 +9,40 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 9 başladı |
+| Durum | `in_progress` — Dalga 10 başladı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-49 / MON-50 |
-| Dalga / ilerleme | Dalga 9 tamamlandı (6/6) / 49/60 |
+| Son / sıradaki | MON-50 / MON-51 |
+| Dalga / ilerleme | Dalga 10 başladı (1/5) / 50/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-12 |
+
+## MON-50 kapanışı — günlük App handler surface
+
+- Kanıt: [`MON-50-APP-SURFACE-GUNLUK-MANIFESTI.md`](../deliverables/MON-50-APP-SURFACE-GUNLUK-MANIFESTI.md).
+- `app/core/appSurface.js` load-safe `SeymaAppSurface` registry'sine mevcut
+  `App.toggleHabit(key)`, `App.toggleMgHabit()`,
+  `App.explainDerivedHabit(key,day)`, `App.setMood(id)` ve
+  `App.saveToday()` gövdelerini aldı. App nesnesi, handler isim/imzaları,
+  inline caller yüzeyi, canlı `data`/`ui`/`pulseTimer`, save/commit/render,
+  rebind, DOM/timer sahipliği app.js'te kaldı; yeni handler eklenmedi.
+- Günlük normal habit, türetilmiş habit, magnesium, kriz modalı, mood metadata
+  save/card update ve saveToday → App.saveNow çağrı sıraları sentetik fixture'da
+  doğrulandı. App fn/all/unique **556/721/718**, birleşik inline `onclick`
+  **391**, canonical data **9/11**; HEAD/current delta **0**.
+- `index.html` ve app.js cache-bust `20260912f`; üretim ve driver/zikr/
+  state-rebind/B2 migration/reminder-Aeon boot FILES sırası
+  `render → appSurface → app.js` ile hizalandı. CSS, sync.js, render core,
+  modal contract, App.go, migrate ve üretim verisi değişmedi.
+- `test_app_surface_daily_boundary` **19/19**, driver interaction smoke,
+  zikr **95/95**, modularization **101/101**, state-rebind **37/37**,
+  syntax, full app **48/48**, panel **23**, Panel-v2 **27**, Quran **9**,
+  reminder **21** fixture, reminder freeze **73 assertion** ve Faz10
+  **69/69** PASS. MON-49 HEAD/current seeded `bugun` dump'ı **114,176 byte**;
+  `N/100` normalize SHA `ac5dfe8a…9067d3`, `cmp=0`.
+- `releaseApproval=not_approved`, `activePrompt=null`, `blockedPrompt=null`
+  korundu. Browser/device, native permission, remote, push/merge/tag/deploy
+  veya `mustafaras/seyma-data` yazımı yok; sıradaki MON-51 için yeni açık
+  kullanıcı yönü gerekir.
 
 ## MON-49 kapanışı — render modals ve çekirdek
 

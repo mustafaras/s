@@ -6,14 +6,14 @@
   "activePrompt": null,
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON-49",
-  "nextPrompt": "MON-50",
-  "currentWave": "9",
+  "lastCompletedPrompt": "MON-50",
+  "nextPrompt": "MON-51",
+  "currentWave": "10",
   "totalPrompts": 60,
-  "completedPrompts": 49,
+  "completedPrompts": 50,
   "updatedAt": "2026-09-12",
-  "lastCompletedEvidence": "MON-49-RENDER-CORE-MANIFESTI.md: render 13,467 byte ve modalsHTML 14,289 byte normalize edilmiş gövde SHA'ları HEAD ile cmp=0; bugun 112,404 ve reading 121,203 byte dump'ları tek rastgele N/100 skor tokenı normalize edilince cmp=0; MON-49 boundary 16/16, modal focus, time-theme 53/53, reduced-motion 34/34, driver+zikr 95/95 ve full fixture families PASS.",
-  "nextSafeAction": "MON-49 tamamlandı: SeymaRender.modalsHTML/render registry gövdeleri root update, app innerHTML, overlay lifecycle ve guarded SeyTimeTheme call sırasını koruyarak çalışıyor; app.js shimleri ve renderState live accessorleri app-owned kaldı. `index.html` render/app cache-bust 20260912e oldu; yeni core/FILES değişikliği yok. `releaseApproval=not_approved`; browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-50 için yeni açık kullanıcı yönü gerekir.",
+  "lastCompletedEvidence": "MON-50-APP-SURFACE-GUNLUK-MANIFESTI.md: SeymaAppSurface 34 dependency ile beş günlük App handlerını registryye aldı; App fn/all/unique 556/721/718, birleşik onclick 391, canonical data 9/11 delta 0; MON-50 boundary 19/19, driver, zikr 95/95, modularization 101/101, state-rebind 37/37 ve syntax PASS.",
+  "nextSafeAction": "MON-50 tamamlandı: toggleHabit/toggleMgHabit/explainDerivedHabit/setMood/saveToday gövdeleri SeymaAppSurface registry'sine taşındı; app.js App isim/imza/shimleri, App nesnesi, live data/ui/pulseTimer, save/commit/render ve inline caller yüzeyi app-owned kaldı. `index.html` sırası render → appSurface → app.js ve cache-bust 20260912f; driver, zikr, state-rebind, B2 migration ve reminder/Aeon boot listeleri paritelendi. `releaseApproval=not_approved`; browser/device, native permission, remote, push/merge/tag/deploy ve mustafaras/seyma-data yazımı yok. Sıradaki MON-51 için yeni açık kullanıcı yönü gerekir.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -205,6 +205,11 @@
       "status": "accepted",
       "artifact": "monolit-bolumlenme-plan/deliverables/MON-49-RENDER-CORE-MANIFESTI.md",
       "decision": "render_modals_core_registry_exact_call_graph_root_app_dom_order_guarded_theme_live_render_state_accessors_modal_focus_parity"
+    },
+    "MON-50": {
+      "status": "accepted",
+      "artifact": "monolit-bolumlenme-plan/deliverables/MON-50-APP-SURFACE-GUNLUK-MANIFESTI.md",
+      "decision": "daily_five_handler_registry_live_state_resolvers_app_owned_shims_exact_call_order_and_inline_surface_parity"
     }
   },
   "waves": [
@@ -285,7 +290,7 @@
       "prompts": "MON-50..MON-54",
       "topic": "App yuzeyi ve boot",
       "approvalRequired": true,
-      "completed": 0,
+      "completed": 1,
       "total": 5
     },
     {
@@ -306,7 +311,8 @@
     }
   ],
   "verificationGate": [
-    "node --check app.js && node --check sync.js && node --check app/core/render.js && node --check app/core/profile.js && node --check app/core/settings.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/reminders.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
+    "node --check app.js && node --check sync.js && node --check app/core/render.js && node --check app/core/appSurface.js && node --check app/core/profile.js && node --check app/core/settings.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/reminders.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
+    "node tests/app/test_app_surface_daily_boundary.js",
     "node tests/app/test_profile_boundary.js",
     "node tests/app/test_settings_boundary.js",
     "node .claude/skills/run-seyma/verify-state-helper-boundary.mjs",

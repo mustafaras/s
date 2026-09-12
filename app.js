@@ -5078,6 +5078,46 @@ function confetti(){ return window.SeymaHelpers.confetti.apply(null,arguments); 
 
 // ---------- actions (exposed) ----------
 var App={};
+// MON-50: daily mood/habit handler gövdeleri appSurface registry'sindedir.
+// App nesnesi, data rebind'leri, save/render sırası ve mevcut inline caller
+// yüzeyi app.js'te kalır; bag yalnız canlı app-owned resolverları verir.
+var SEYMA_APP_SURFACE=window.SeymaAppSurface||{};
+if(!window.SeymaAppSurface||typeof window.SeymaAppSurface.registerAppSurface!=='function'||!window.SeymaAppSurface.registerAppSurface({
+  data:function(){ return data; },
+  ui:function(){ return ui; },
+  app:function(){ return App; },
+  activeDate:activeDate,
+  todayStr:todayStr,
+  dayIndexFor:dayIndexFor,
+  getDay:getDay,
+  derivedHabits:function(){ return DERIVED_HABITS; },
+  countRec:countRec,
+  habits:function(){ return HABITS; },
+  find:find,
+  haptic:haptic,
+  commit:commit,
+  editing:editing,
+  htToday:htToday,
+  confetti:confetti,
+  habitProgress:habitProgress,
+  waterGoalCups:waterGoalCups,
+  sleepGoalHours:sleepGoalHours,
+  stepsGoal:stepsGoal,
+  effSteps:effSteps,
+  isVacationDay:isVacationDay,
+  derivedProgText:derivedProgText,
+  maybeStreak:maybeStreak,
+  toast:toast,
+  updateCardByKey:updateCardByKey,
+  render:render,
+  emptyMagnesium:emptyMagnesium,
+  pulseTimer:function(){ return pulseTimer; },
+  setPulseTimer:function(value){ pulseTimer=value; },
+  clearTimeout:clearTimeout,
+  setTimeout:setTimeout,
+  document:function(){ return document; },
+  save:save
+})) throw new Error('MON-50: SeymaAppSurface registry kurulamadı');
 App.eventLog={schemaVersion:EVENT_LOG_SCHEMA_VERSION,ensure:ensureEventLog,normalize:normalizeEventEntry,classify:classifyEvent,append:appendEvent,appendReminder:appendReminderEvent};
 App.reminderEventContract=function(){
   return {
@@ -6999,72 +7039,13 @@ App.setTheme=function(d){
   render();
 };
 App.toggleTheme=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } App.setTheme(!dark); };
-App.toggleHabit=function(key){
-  if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); }
-  var date=activeDate(), idx=dayIndexFor(date), day=getDay(data,date,idx);
-  // Su / uyku / yürüyüş tikleri elle işaretlenmez — yalnızca veri eşiği tutunca yeşillenir.
-  if(DERIVED_HABITS[key]){ App.explainDerivedHabit(key,day); return; }
-  // Magnezyum tik'i hem habits.magnesium hem de magnesium.taken kaydını senkronize eder;
-  // skor/model logu da güncellensin diye mevcut toggleMgHabit akışını kullan.
-  if(key==='magnesium'){ App.toggleMgHabit(); return; }
-  var before=countRec(day); day.habits[key]=!day.habits[key]; day.savedAt=new Date().toISOString(); var after=countRec(day); haptic(14);
-  ui.pulse=key; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
-  var msg='Kaydedildi'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
-  commit(msg);
-  if(editing()) return;
-  var ht=htToday(); if(after>=ht&&before<ht){ confetti(); if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); if(window.SeyFx&&typeof window.SeyFx.shimmer==='function'){ try{ var rw=document.getElementById('sey-habits-ring-wrap'); if(rw) window.SeyFx.shimmer(rw); }catch(e){} } setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); }
-  else if(day.habits[key]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); maybeStreak(); }
-};
-App.toggleMgHabit=function(){
-  var date=activeDate(), day=getDay(data,date,dayIndexFor(date));
-  var before=countRec(day), after;
-  var mg=day.magnesium||emptyMagnesium();
-  if(mg.taken){ App.skipMagnesium(); }
-  else { App.takeMagnesium(null,200); }
-  after=countRec(day);
-  ui.pulse='magnesium'; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
-  // confetti / tamam bildirimi, sadece bugünkü toplam eşiği aşıldıysa
-  if(!editing()){ var ht=htToday(); if(after>=ht&&before<ht){ confetti(); if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); } }
-};
+App.toggleHabit=function(key){ return SEYMA_APP_SURFACE.toggleHabit.apply(null,arguments); };
+App.toggleMgHabit=function(){ return SEYMA_APP_SURFACE.toggleMgHabit.apply(null,arguments); };
 // Türetilmiş tik'e dokunulduğunda: eşik tutuyorsa sıcak onay, tutmuyorsa ne yapılacağını kibarca anlat.
-App.explainDerivedHabit=function(key,day){
-  var p=habitProgress(day,key); if(!p) return; haptic(10);
-  if(p.met){
-    var g=waterGoalCups();
-    var ok={ water:'Su tamam — '+g+'/'+g+' bardak. Bu tik otomatik, ellemene gerek yok.',
-             sleepReg:'Uyku tamam — 7,5+ saat. Bu tik kendiliğinden yeşil kalır.',
-             walked20:'Yürüyüş tamam — 4.500+ adım. Bu tik kendiliğinden yeşil kalır.',
-             journaled:'Not tamam — bugün yazdın. Bu tik kendiliğinden yeşil kalır.',
-             sweetManaged:'Tatlı krizini yönettin — bu tik kendiliğinden yeşil kaldı. Helal sana.',
-             foodManaged:'Yemek/açlık krizini yönettin — bu tik kendiliğinden yeşil kaldı. Kaptan sensin.',
-             coffeeManaged:'Kahve/kafein krizini yönettin — bu tik kendiliğinden yeşil kaldı. Net karar.',
-             mediaFed:'Zihnini besledin — okudun/izledin/dinledin/öğrendin ya da kurs/pratik yaptın. Bu tik otomatik yeşil.',
-             caffeineOk:'Kafein tiki temiz — günlük limit aşılmadı ve son kahve vaktinde. Otomatik yeşil.' };
-    toast(ok[key]||'Bu tik otomatik — eşik tuttuğunda kendiliğinden yeşil kalır.'); return;
-  }
-  // Kriz tikleri: dokununca ilgili kriz odasını (modal) aç — en işlevlisi bu.
-  if(key==='sweetManaged'){ App.openCrisis('sweet'); return; }
-  if(key==='foodManaged'){ App.openCrisis('food'); return; }
-  if(key==='coffeeManaged'){ App.openCrisis('coffee'); return; }
-  var msg;
-  if(key==='water'){ var w=p.cur; var g=p.goal||waterGoalCups(); msg = w<=0
-      ? 'Su tiki otomatik: '+g+' bardağı tamamlayınca kendiliğinden yeşillenir. Aşağıdaki “Su” kartından eklemeye başla.'
-      : 'Su tikine az kaldı — şu an '+w+'/'+g+' bardak. '+(g-w)+' bardak daha, kendiliğinden yeşillenecek.'; }
-  else if(key==='sleepReg'){ var h=p.cur; var sg=(p.goal||sleepGoalHours()); msg = h==null
-      ? 'Uyku tiki otomatik: Sağlık kartına '+String(sg).replace('.',',')+' saat ve üzeri uyku girince kendiliğinden yeşillenir.'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':'')
-      : 'Uyku tiki '+String(sg).replace('.',',')+' saatte yeşillenir'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':'')+' — şu an '+String(h).replace('.',',')+' saat. Girişini güncelleyince otomatik dolar.'; }
-  else if(key==='walked20'){ var s=p.cur; var stg=(p.goal||stepsGoal()); msg = s<=0
-      ? 'Yürüyüş tiki otomatik: '+stg.toLocaleString('tr-TR')+' adım girince kendiliğinden yeşillenir. Sağlık kartından adımını ekleyebilirsin.'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':'')
-      : 'Yürüyüş tikine '+(stg-s).toLocaleString('tr-TR')+' adım kaldı — şu an '+s.toLocaleString('tr-TR')+'/'+stg.toLocaleString('tr-TR')+'. Girince otomatik yeşillenecek.'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':''); }
-  else if(key==='journaled'){ msg='Not tiki otomatik: “Günün yansıması” kartına bir cümle bile yazınca kendiliğinden yeşillenir.'; }
-  else if(key==='mediaFed'){ msg='Zihin tiki otomatik: Okudum / izledim / dinledim / öğrendim / kurs-pratik kutucuklarından birini doldur → yeşillenir.'; }
-  else if(key==='caffeineOk'){ if(!p.amountOk) msg='Kafein tiki otomatik: günlük limit ('+p.goal+' mg) aşıldı — içeceği azaltınca kendiliğinden düzelir.'; else if(!p.timingOk) msg='Kafein tiki otomatik: miktar tamam ama son kahve önerilen saatten geç. Sağlık kartından saatini erkene çekince yeşillenir.'; else msg='Kafein tiki otomatik: bugün temiz — kendiliğinden yeşil.'; }
-  else { msg=derivedProgText(key,p)||'Bu tik otomatik — ilgili veriyi girince kendiliğinden yeşillenir.'; }
-  toast(msg,2800);
-};
+App.explainDerivedHabit=function(key,day){ return SEYMA_APP_SURFACE.explainDerivedHabit.apply(null,arguments); };
 function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak(); if(big[s]) confetti(); if(window.SeyFx&&typeof window.SeyFx.shimmer==='function'){ setTimeout(function(){ var el=document.querySelector('.sey-streak-area')||document.getElementById('app'); if(el) window.SeyFx.shimmer(el); },250); } setTimeout(function(){ toast(m[s],2800); },300); // FX-P-52: kilometre taşında kısa sesli tebrik — günde en fazla 1 kez.
   try{ if(data&&data.settings&&data.settings.voiceStreakDate!==todayStr()){ data.settings.voiceStreakDate=todayStr(); if(window.SeyAudio&&typeof window.SeyAudio.voice==='function') window.SeyAudio.voice('Harikasın! Serin büyüyor. Bu ritmi koru.', { lang:'tr-TR', rate:1 }); save(false); } }catch(e){} } }
-App.setMood=function(id){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); day.savedAt=new Date().toISOString(); var labels={normal:'Normal',iyi:'İyi',mükemmel:'Mükemmel',yorgun:'Yorgun',üzgün:'Üzgün',sinirli:'Sinirli','çok-zorlandim':'Çok zorlandım',kaygili:'Kaygılı', 'huzursuz':'Huzursuz', 'sakin':'Sakin'}; haptic(14); save(false,{message:'Ruh hali güncellendi',meta:{section:'mood',path:'data.days.*.mood',operation:'update',summary:'Ruh hali güncellendi',detail:'Ruh hali',value:labels[id]||id,field:'mood'}}); updateCardByKey('mood'); updateCardByKey('mental'); };
+App.setMood=function(id){ return SEYMA_APP_SURFACE.setMood.apply(null,arguments); };
 App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.note=v; var nw=syncDerivedHabits(day); save(false,{message:'Duygu notu güncellendi',meta:{section:'wellness',path:'data.days.*.note',operation:'update',summary:'Duygu notu güncellendi',detail:'Duygu notu',value:String(v||'').trim().slice(0,60),field:'note'}}); updateCardByKey('habits'); if(nw.indexOf('journaled')>=0){ haptic(14); toast('Duygu notu tiki kendiliğinden yeşillendi.'); } },500); };
 App.onIntention=function(el){ var v=el.value; debounceSave('intention',function(){ var day=curDay(); day.intention=String(v||'').slice(0,140); day.savedAt=new Date().toISOString(); save(false,{message:'Günün niyeti güncellendi',meta:{section:'wellness',path:'data.days.*.intention',operation:'update',summary:'Günün niyeti güncellendi',detail:'Günün niyeti',value:day.intention,field:'intention'}}); },500); };
 App.toggleHaptic=function(on){ if(!data.settings) data.settings={}; data.settings.haptics=!!on; if(on) haptic(18); save(); render(); };
@@ -8538,7 +8519,7 @@ App.saveNow=function(){
   }
 };
 App.headerSync=App.saveNow;
-App.saveToday=function(){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } getDay(data,todayStr(),dayIndexFor(todayStr())); App.saveNow(); };
+App.saveToday=function(){ return SEYMA_APP_SURFACE.saveToday.apply(null,arguments); };
 App.enableKeyEdit=function(){ ui.keyEdit=true; render(); };
 App.cancelKeyEdit=function(){ ui.keyEdit=false; render(); };
 

@@ -57,6 +57,7 @@ const FILES = [
   'app/core/reminders.js',
   'app/core/messaging.js',
   'app/core/render.js',
+  'app/core/appSurface.js',
   'app.js',
 ];
 

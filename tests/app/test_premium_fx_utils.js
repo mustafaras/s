@@ -198,9 +198,11 @@ console.log('\n[7] shimmer gating');
 // ── Test 8: FX-P-86 — ring/bar shimmer bağlama noktaları ───────────────────
 console.log('\n[8] FX-P-86 — habits ring + motivation bar shimmer');
 (function(){
-  // MON-44: Bugün markup'ı render registry'de, handler bağlama noktası app.js'te
-  // kalır. Aynı production boot grafiğinin iki kaynağını birlikte denetle.
+  // MON-50: Bugün markup'ı render registry'de, günlük handler bağlama noktası
+  // appSurface registry'sinde, App yüzeyi ise app.js'te kalır. Aynı production
+  // boot grafiğinin üç kaynağını birlikte denetle.
   var appSrc = fs.readFileSync(path.join(repoRoot, 'app/core/render.js'), 'utf8')+'\n'+
+               fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8')+'\n'+
                fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
   // (1) sey-habits-ring-wrap id'si + guard'lı SeyFx.shimmer çağrısı birlikte geçiyor
   var ringBound = /sey-habits-ring-wrap[\s\S]{0,400}?getElementById\('sey-habits-ring-wrap'\)[\s\S]{0,120}?SeyFx\.shimmer/.test(appSrc) ||

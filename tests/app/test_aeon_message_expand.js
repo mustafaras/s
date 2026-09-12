@@ -25,7 +25,7 @@ var repoRoot = require('../repo-root');
 var FILES = [
   'app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js',
   'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js', 'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/saygi.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js',
-  'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app/core/profile.js', 'app/core/settings.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app/core/reminders.js', 'app/core/messaging.js', 'app/core/render.js', 'app.js'
+  'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app/core/profile.js', 'app/core/settings.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app/core/reminders.js', 'app/core/messaging.js', 'app/core/render.js', 'app/core/appSurface.js', 'app.js'
 ];
 
 function today(){ var d=new Date(), p=function(n){ return (n<10?'0':'')+n; };

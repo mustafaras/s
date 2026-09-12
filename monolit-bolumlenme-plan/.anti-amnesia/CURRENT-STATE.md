@@ -9,40 +9,35 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 9 bekliyor |
+| Durum | `in_progress` — Dalga 9 başladı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-43 / MON-44 |
-| Dalga / ilerleme | Dalga 8 kapandı; Dalga 9 bekliyor (0/6) / 43/60 |
+| Son / sıradaki | MON-44 / MON-45 |
+| Dalga / ilerleme | Dalga 9 sürüyor (1/6) / 44/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
-| Güncellendi | 2026-09-11 |
+| Güncellendi | 2026-09-12 |
 
-## MON-43 kapanışı — Dalga 8 reminder/messaging kabulü
+## MON-44 kapanışı — render onboarding/Bugün registry
 
-- Karar/kanıt: [`MON-D8-REMINDER-MESAJ-RAPORU.md`](../deliverables/MON-D8-REMINDER-MESAJ-RAPORU.md).
-- `SeymaReminders` (26 frozen member) ve `SeymaMessaging` (21 frozen member)
-  sahiplik tablosu, approval gate, privacy/no-network kanıtı ve load-order
-  ayrığını birleştirdi. Production/kod, cache-bust, index/üretim FILES ve schema
-  değişikliği yoktur; frozen reminder dörtlüsü ve `sync.js` SHA birebir korundu.
-  Kapsamlı tekrarda yalnız B2 fixture `FILES` paritesi düzeltildi.
-- Reminder smoke **21 curated fixture** / **3,534** reported assertion; Aeon
-  expansion **24/24**; messaging boundary, reminder app privacy **194** ve
-  integrated privacy **78** PASS. Faz10 **69/69**, modularization **99/99**,
-  premium **9/9**, full app **45/45**, panel **23/23**, Panel-v2 **27/27**, reminder **21/21**
-  ve Quran **9/9** exit 0; canonical full inventory **125/125**.
-- Kapsamlı tekrarda B2 `verify-state-migration` sentetik FILES zinciri MON-42
-  önekinden geri kaldığı için fail-closed FAIL yakalandı; yalnız B2 fixture
-  `FILES` listesi gerçek index sırasından üretilen 40 dosyaya hizalandı ve
-  B2 **67/67 PASS** oldu. Üretim kodu/cache-bust değişmedi.
-- Driver `--dump reminder` **97,421 UTF-8 byte** /
-  `7ecc3b6903af8497d5d2fa9b822b11c6ef0b7192b69d1dbc74312e4875e9ef66`;
-  `--dump mesaj` **17,138 UTF-8 byte** /
-  `15df13b7138af356d7c5a4d9c80e0b5719eeb0e7d8b7d002bf1998c1b09394da`; her
-  ikisi önceki kart SHA'larıyla birebir. App fn/all/unique **556/721/718**,
-  fixture combined onclick **391**, canonical data **9/11** ve FX
-  **78/63/58/6** delta 0.
-- `releaseApproval=not_approved`, native permission, browser/device, remote,
-  push/merge/tag/deploy ve `mustafaras/seyma-data` yazımı yok. Sıradaki
-  MON-44 render registry'dir ve yeni açık kullanıcı yönü olmadan başlatılmaz.
+- Kanıt: [`MON-44-ONBOARDING-BUGUN-DUMP-MANIFESTI.md`](../deliverables/MON-44-ONBOARDING-BUGUN-DUMP-MANIFESTI.md).
+- `app/core/render.js` içindeki load-safe `SeymaRender` registry'si yalnız
+  `onboardingHTML` ve `bugunHTML` gövdelerini taşır. `render()`, `App.go`,
+  `#root/#app` DOM sahipliği, inline `App.*` handlerları ve modal/focus yolu
+  app.js'te kaldı; Bugün türetilmiş-habit mutasyonu da shim öncesinde app.js
+  sahipliğindedir.
+- Production/harness FILES sırası `messaging → render → app.js` olarak
+  index, driver, zikr ve state-rebind zincirinde paritelendi. `render.js`
+  cache-bustı `20260911a`, app.js `20260911b` oldu.
+- Deterministik HEAD arşivi karşılaştırmasında Bugün dumpı **112402 byte**,
+  SHA-256 `540f103dc6bf1f3067bd8821cfa9e555eb531d77f44b1e447a53de0baf07930d`
+  ve `cmp=0` ile birebir. App fn/all/unique **556/721/718**, literal inline
+  onclick **135**, FX **78/63/58/6**, data-rebind fixture **37/37** ve registry
+  `data=` **0**: delta yok.
+- Syntax, driver onboarding+seeded, zikr **95/95**, modularization **101/101**,
+  Faz10 **69/69**, ÆON expand **24/24**, premium 9 fixture, reminder smoke 21,
+  B1/B2/B3 ve `git diff --check` PASS. Browser/device, native permission,
+  remote, push/merge/tag/deploy veya `mustafaras/seyma-data` yazımı yok;
+  `releaseApproval=not_approved` korundu. MON-45 için yeni açık kullanıcı
+  yönü gerekir.
 
 ## MON-42 kapanışı — messaging domain modülü
 

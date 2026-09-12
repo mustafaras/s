@@ -36,6 +36,7 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
     'app/core/map.js',
     'app/core/profile.js',
     'app/core/settings.js',
+    'app/core/render.js',
     'app/core/mediaFx.js',
     'app/core/timeTheme.js'
   ];

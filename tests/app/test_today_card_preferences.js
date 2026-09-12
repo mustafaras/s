@@ -9,6 +9,7 @@ var path=require('path');
 var vm=require('node:vm');
 var repoRoot=require('../repo-root');
 var source=fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
+var renderSource=fs.readFileSync(path.join(repoRoot,'app/core/render.js'),'utf8');
 var settingsSource=fs.readFileSync(path.join(repoRoot,'app/core/settings.js'),'utf8');
 var stateSource=fs.readFileSync(path.join(repoRoot,'app/core/state.js'),'utf8');
 var passes=0,failures=0;
@@ -30,7 +31,10 @@ function lineStarting(text){
 
 console.log('\n== Bugün kart tercihleri ==\n');
 
-var bugun=between('function bugunHTML(){','function ayarlarHTML(){');
+var bugunStart=renderSource.indexOf('function bugunHTML(){');
+var bugunEnd=renderSource.indexOf('\n  window.SeymaRender=',bugunStart);
+if(bugunStart<0||bugunEnd<0) throw new Error('Render registry Bugün gövdesi bulunamadı');
+var bugun=renderSource.slice(bugunStart,bugunEnd);
 var photoAt=bugun.indexOf('h+=dailyPhotoCardHTML()');
 var saveAt=bugun.indexOf('h+=saveBanner()');
 assert('Günün Fotoğrafı Bugün yüzeyindeki ilk karttır',photoAt>=0&&saveAt>=0&&photoAt<saveAt);

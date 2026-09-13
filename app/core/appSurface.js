@@ -320,6 +320,100 @@
   }
   function reminderLifecycleTimer(){ return lifecycleCall('reminderSchedulerDispatch',['timer']); }
 
+  // MON-54: boot/start/late-boot bridges. The registry owns only the
+  // callback bodies; App exposure, data rebinds and the final call site stay
+  // in app.js. Nothing below runs while this file is loading.
+  var bootDeps=null;
+  var BOOT_DEPENDENCIES=[
+    'data','ui','ensureStartData','ensureAuthData','motivation','featuresLive',
+    'commit','reminderSchedulerDispatch','audio','save','render','document',
+    'touch','setTimeout','matchMedia','addDays','todayStr','replayAnswerPopup',
+    'maybeVoiceGreeting','sha256','authHash','toast'
+  ];
+  function registerBootCallbacks(deps){
+    if(bootDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
+    for(var i=0;i<BOOT_DEPENDENCIES.length;i++){
+      if(typeof deps[BOOT_DEPENDENCIES[i]]!=='function') return false;
+    }
+    bootDeps=deps;
+    return true;
+  }
+  function bootDep(name){ return bootDeps&&typeof bootDeps[name]==='function'?bootDeps[name]:null; }
+  function bootCall(name,args){ var fn=bootDep(name); if(!fn) throw new Error('SeymaAppSurface: çözümlenemeyen boot bağımlılığı '+name); return fn.apply(null,args||[]); }
+
+  function start(){
+    var data=bootCall('data'), ui=bootCall('ui');
+    if(data){ ui.forceStart=false; ui.tab='bugun'; bootCall('render'); bootCall('reminderSchedulerDispatch',['boot']); return; }
+    data=bootCall('ensureStartData');
+    var motivation=bootCall('motivation');
+    if(motivation&&bootCall('featuresLive')) motivation.ensureMotivationRoot(data);
+    ui.forceStart=false; ui.tab='bugun'; bootCall('commit',['Hadi başlayalım']); bootCall('reminderSchedulerDispatch',['boot']);
+    try{
+      if(data&&data.settings&&!data.settings.voiceOnboardedAt){
+        data.settings.voiceOnboardedAt=new Date().toISOString();
+        var audio=bootCall('audio');
+        if(audio&&typeof audio.voice==='function') audio.voice('Sevgili Günışığı, hoş geldin. Bugün neler hissediyorsun?',{lang:'tr-TR',rate:1});
+        bootCall('save',[false]);
+      }
+    }catch(e){}
+  }
+
+  function submitAuth(){
+    var doc=bootCall('document');
+    var u=(doc.getElementById('sey-auth-user').value||'').trim();
+    var p=(doc.getElementById('sey-auth-pass').value||'').trim();
+    var ui=bootCall('ui');
+    if(!u||!p){ ui.authError=true; ui.authErrorMsg='Lütfen kullanıcı adını ve parolanı yaz.'; bootCall('render'); return; }
+    if(bootCall('sha256',[u])===bootCall('authHash')&&bootCall('sha256',[p])===bootCall('authHash')){
+      if(!bootCall('data')) bootCall('ensureAuthData');
+      var data=bootCall('data'), a=data.settings.auth;
+      a.usernameHash=bootCall('authHash');
+      a.usernameMask=u.length>2?u.charAt(0)+'*'.repeat(u.length-2)+u.charAt(u.length-1):'***';
+      a.rememberMe=!!ui.authRemember;
+      a.unlockedAt=new Date().toISOString();
+      a.unlockCount=(a.unlockCount||0)+1;
+      ui.authError=false; ui.authErrorMsg=''; ui.authRemember=false; ui.authUnlocked=true;
+      bootCall('save'); bootCall('render'); bootCall('toast',['Hoş geldin, Sevgili Günışığı ✨',2600]);
+    }else{
+      ui.authError=true; ui.authErrorMsg='Giriş bilgileri uyuşmadı. Bir nefes al ve tekrar dene.'; bootCall('render');
+    }
+  }
+  function toggleRememberAuth(){ var ui=bootCall('ui'); ui.authRemember=!ui.authRemember; bootCall('render'); }
+  function dismissAuthError(){ var ui=bootCall('ui'); ui.authError=false; ui.authErrorMsg=''; bootCall('render'); }
+
+  function hideSplash(){
+    var sp=bootCall('document').getElementById('sey-splash');
+    if(!sp) return;
+    sp.style.opacity='0';
+    bootCall('setTimeout',[function(){ sp.style.display='none'; },480]);
+  }
+  function initialRender(){
+    var data=bootCall('data'), doc=bootCall('document');
+    bootCall('render');
+    try{
+      var touch=bootCall('touch');
+      if(touch&&typeof touch.install==='function') touch.install(doc.getElementById('root'));
+    }catch(e){}
+    if(data) bootCall('reminderSchedulerDispatch',['boot']);
+    if(data) bootCall('save',[false]);
+    bootCall('setTimeout',[function(){ bootCall('maybeVoiceGreeting'); },2200]);
+    bootCall('setTimeout',[function(){ bootCall('replayAnswerPopup'); },900]);
+
+    var sp=doc.getElementById('sey-splash');
+    if(!sp) return;
+    var settings=data&&data.settings;
+    var on=!!(settings&&settings.launchRitual);
+    var mm=bootCall('matchMedia');
+    var reduced=mm&&mm('(prefers-reduced-motion: reduce)').matches;
+    if(!on||reduced){ sp.style.display='none'; return; }
+    try{
+      var yd=data&&data.days?data.days[bootCall('addDays',[bootCall('todayStr'),-1])]:null;
+      var ydone=yd&&!!(yd.savedAt||yd.mood||(yd.habits&&Object.keys(yd.habits).some(function(k){return yd.habits[k];}))||(typeof yd.water==='number'&&yd.water>0));
+      if(!ydone){ var nt=doc.getElementById('sey-splash-note'); if(nt) nt.textContent='Dünü de kaydetmeyi unutma'; }
+    }catch(e){}
+    bootCall('setTimeout',[hideSplash,900]);
+  }
+
   window.SeymaAppSurface={
     APP_SURFACE_DEPENDENCIES:APP_SURFACE_DEPENDENCIES.slice(),
     registerAppSurface:registerAppSurface,
@@ -353,6 +447,13 @@
     onWindowOnline:onWindowOnline,
     onWindowOffline:onWindowOffline,
     ambienceRefresh:ambienceRefresh,
-    reminderLifecycleTimer:reminderLifecycleTimer
+    reminderLifecycleTimer:reminderLifecycleTimer,
+    BOOT_DEPENDENCIES:BOOT_DEPENDENCIES.slice(),
+    registerBootCallbacks:registerBootCallbacks,
+    start:start,
+    submitAuth:submitAuth,
+    toggleRememberAuth:toggleRememberAuth,
+    dismissAuthError:dismissAuthError,
+    initialRender:initialRender
   };
 })();

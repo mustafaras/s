@@ -13,7 +13,9 @@ const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
 const source = read('app/core/appSurface.js');
 const app = read('app.js');
 const index = read('index.html');
-const lifecycleSource = source.slice(source.indexOf('// MON-53: global timer/listener/foreground bridges'));
+const lifecycleStart = source.indexOf('// MON-53: global timer/listener/foreground bridges');
+const lifecycleEnd = source.indexOf('// MON-54: boot/start/late-boot bridges', lifecycleStart);
+const lifecycleSource = source.slice(lifecycleStart, lifecycleEnd > lifecycleStart ? lifecycleEnd : source.length);
 const expected = [
   'onUserActivity','sessionHeartbeat','finalizeSession','resetSession',
   'onSessionVisibilityChange','maybeRetrySync','maybePullQuranForeground',
@@ -101,7 +103,7 @@ ok('session teardown listeners stay in their original order',
 ok('sync retry and Quran foreground state no longer duplicate in app.js',
   !/var lastSyncRetryWatchdogAt=|var SYNC_RETRY_WATCHDOG_MS=|var quranLastForegroundPullAt=/.test(app));
 ok('production cache busts the changed registry and app shell together',
-  /app\/core\/appSurface\.js\?v=20260913a/.test(index) && /app\.js\?v=20260913a/.test(index) &&
+  /app\/core\/appSurface\.js\?v=20260913b/.test(index) && /app\.js\?v=20260913b/.test(index) &&
   index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?'));
 
 console.log('\nMON-53 lifecycle boundary: ' + passed + '/' + passed + ' passed');

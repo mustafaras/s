@@ -1,8 +1,8 @@
 // Faz 5 — Sesli rehberlik headless fixture'ı (ağ YOK, gerçek speech YOK)
 // FX-P-54: gerçek app/core/mediaFx.js modülünü VM'de yükler; SeyAudio.voice /
 // isVoiceEnabled / isQuietTime gating'ini, SeyAudio.guides yüzeyini, greeting
-// throttle alanlarını ve ambient motor gating'ini doğrular. app.js içindeki
-// voice çağrı noktaları statik olarak denetlenir (onboarding, streak, zikir).
+// throttle alanlarını ve ambient motor gating'ini doğrular. app.js ve
+// appSurface içindeki voice çağrı noktaları statik olarak denetlenir.
 // Çalıştırma: node tests/app/test_premium_voice.js
 
 'use strict';
@@ -284,12 +284,13 @@ console.log('\n[11] app.js sesli çağrı noktaları (statik)');
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
   var appSurfaceSrc = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
-  ok('onboarding sesli karşılama çağrısı var (FX-P-52)', appSrc.indexOf("voice('Sevgili Günışığı, hoş geldin") >= 0);
+  var stateSrc = fs.readFileSync(path.join(repoRoot, 'app/core/state.js'), 'utf8');
+  ok('onboarding sesli karşılama çağrısı var (FX-P-52)', appSurfaceSrc.indexOf("voice('Sevgili Günışığı, hoş geldin") >= 0);
   ok('streak sesli tebrik çağrısı var (FX-P-52)', appSrc.indexOf("voice('Harikasın! Serin büyüyor") >= 0);
   ok('zikir tamamlama sesli ipucu çağrısı var (FX-P-52)', appSrc.indexOf("voice('Allah kabul etsin") >= 0);
   ok('greeting boot çağrısı var (FX-P-56)', appSrc.indexOf('SeyAudio.greeting') >= 0 || /typeof audio\.greeting/.test(appSurfaceSrc));
   ok('guides çağrı noktaları var (FX-P-55)', appSrc.indexOf('SeyAudio.guides') >= 0);
-  ok('voice settings damgaları migrate backfill ediliyor', appSrc.indexOf('voiceOnboardedAt') >= 0 && appSrc.indexOf('lastVoiceGreetingAt') >= 0);
+  ok('voice settings damgaları migrate backfill ediliyor', stateSrc.indexOf('voiceOnboardedAt') >= 0 && stateSrc.indexOf('lastVoiceGreetingAt') >= 0);
   ok('voice ayarları handler\'ları var (FX-P-57)', appSrc.indexOf('App.setVoiceLang') >= 0 && appSrc.indexOf('App.setVoiceRate') >= 0);
 })();
 

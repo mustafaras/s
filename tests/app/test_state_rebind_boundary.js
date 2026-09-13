@@ -312,8 +312,10 @@ ok('import/reset/location/auth/start data writes remain app.js-owned',
   /App\.importJson=function[\s\S]*?data=d/.test(appSource) &&
   /App\.resetConfirm=function[\s\S]*?data=null/.test(appSource) &&
   /function locationGateGranted\([\s\S]*?data=migrate\(createDefaultData\(\)\)/.test(appSource) &&
-  /App\.submitAuth=function\([\s\S]*?data=migrate\(createDefaultData\(\)\)/.test(appSource) &&
-  /App\.start=function\([\s\S]*?data=migrate\(createDefaultData\(\)\)/.test(appSource));
+  /function ensureAuthData\(\)[\s\S]*?data=migrate\(createDefaultData\(\)\)/.test(appSource) &&
+  /function ensureStartData\(\)[\s\S]*?data=migrate\(createDefaultData\(\)\)/.test(appSource) &&
+  /App\.submitAuth=function\(\)\{ return SEYMA_APP_SURFACE\.submitAuth\.apply\(null,arguments\); \}/.test(appSource) &&
+  /App\.start=function\(\)\{ return SEYMA_APP_SURFACE\.start\.apply\(null,arguments\); \}/.test(appSource));
 ok('state registry contains zero data assignment source lines', stateDataRows.length === 0);
 ok('state registry has no data assignment token', !/\bdata\s*=(?!=)/.test(stateSource.replace(/\/\/.*$/gm, '')));
 const syncGlueCode = read('app/core/syncGlue.js').replace(/\/\/.*$/gm, '');

@@ -9,6 +9,7 @@ const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+const appSurfaceSource = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
 // MON-26/MON-27/MON-28/MON-36/MON-42: domain gövdeleri registry'lerinde; onclick sayımları
 // birleşik kaynakta yapılır (App handler atamaları app.js'te kalır).
 const motivationSource = fs.readFileSync(path.join(repoRoot, 'app/core/motivation.js'), 'utf8');
@@ -244,8 +245,9 @@ group('FX2-10.11 ripple ölçü ve position güvenliği', tiny.appendCount === 0
 // 12. Boot'ta tek bağlama vardır ve render gövdesi bunun dışında kalır.
 group(
   'FX2-10.12 boot bağlantısı render dışında ve tek',
-  count(/window\.SeyTouch\.install\(/g, appSource) === 1 &&
-    /\nrender\(\);\s*\ntry\{\s*if\(window\.SeyTouch[\s\S]{0,140}?SeyTouch\.install\(/.test(appSource)
+  count(/window\.SeyTouch\.install\(/g, appSource) === 0 &&
+    count(/touch\.install\(/g, appSurfaceSource) === 1 &&
+    /bootCall\('render'\)[\s\S]{0,220}?touch\.install\(/.test(appSurfaceSource)
 );
 
 // 13. FX2-13: ilk pointer jesti tek seferlik sessiz buffer ile iOS sesini açar.

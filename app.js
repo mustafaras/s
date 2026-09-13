@@ -5118,6 +5118,36 @@ if(!window.SeymaAppSurface||typeof window.SeymaAppSurface.registerAppSurface!=='
   document:function(){ return document; },
   save:save
 })) throw new Error('MON-50: SeymaAppSurface registry kurulamadı');
+// MON-54: boot/start/late-boot dependency bag. The data rebinds stay in this
+// app.js owner; SeymaAppSurface receives only an explicit callback to perform
+// the existing assignment at the same point in each path.
+function ensureStartData(){ if(!data) data=migrate(createDefaultData()); return data; }
+function ensureAuthData(){ if(!data) data=migrate(createDefaultData()); return data; }
+var MON54_BOOT_DEPS={
+  data:function(){ return data; },
+  ui:function(){ return ui; },
+  ensureStartData:ensureStartData,
+  ensureAuthData:ensureAuthData,
+  motivation:function(){ return window.MotivationProgramV2; },
+  featuresLive:featuresLive,
+  commit:commit,
+  reminderSchedulerDispatch:reminderSchedulerDispatch,
+  audio:function(){ return window.SeyAudio; },
+  save:save,
+  render:render,
+  document:function(){ return document; },
+  touch:function(){ return window.SeyTouch; },
+  setTimeout:setTimeout,
+  matchMedia:function(){ return window.matchMedia; },
+  addDays:addDays,
+  todayStr:todayStr,
+  replayAnswerPopup:replayAnswerPopup,
+  maybeVoiceGreeting:maybeVoiceGreeting,
+  sha256:sha256,
+  authHash:function(){ return AUTH_HASH; },
+  toast:toast
+};
+if(!SEYMA_APP_SURFACE||typeof SEYMA_APP_SURFACE.registerBootCallbacks!=='function'||!SEYMA_APP_SURFACE.registerBootCallbacks(MON54_BOOT_DEPS)) throw new Error('MON-54: boot registry kurulamadı');
 App.eventLog={schemaVersion:EVENT_LOG_SCHEMA_VERSION,ensure:ensureEventLog,normalize:normalizeEventEntry,classify:classifyEvent,append:appendEvent,appendReminder:appendReminderEvent};
 App.reminderEventContract=function(){
   return {
@@ -5388,26 +5418,7 @@ App.profileAnswer=function(itemId,value){
 };
 
 function createDefaultData(){ return window.SeymaState.createDefaultData.apply(null,arguments); }
-App.start=function(){
-  // Karşılama ekranı artık yalnızca Ayarlar > "Başlangıç ekranına dön" veya ilk kurulumda açılır.
-  // Veriyi yeniden kurmak veya save() çağırmak geçmiş günleri silip gereksiz senkron başlatabilirdi.
-  if(data){ ui.forceStart=false; ui.tab='bugun'; render(); reminderSchedulerDispatch('boot'); return; }
-  data=migrate(createDefaultData());
-  if(window.MotivationProgramV2 && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
-  ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım'); reminderSchedulerDispatch('boot');
-  // FX-P-52: onboarding sonrası nazik sesli karşılama. Yalnızca bir kez
-  // (settings.voiceOnboardedAt damgası ile), voiceGuidance kapalıysa veya
-  // quiet-time'da sessizce atlanır (SeyAudio.voice zaten false döner).
-  try{
-    if(data && data.settings && !data.settings.voiceOnboardedAt){
-      data.settings.voiceOnboardedAt=new Date().toISOString();
-      if(window.SeyAudio && typeof window.SeyAudio.voice==='function'){
-        window.SeyAudio.voice('Sevgili Günışığı, hoş geldin. Bugün neler hissediyorsun?', { lang:'tr-TR', rate:1 });
-      }
-      save(false);
-    }
-  }catch(e){}
-};
+App.start=function(){ return SEYMA_APP_SURFACE.start.apply(null,arguments); };
 App.go=function(id,event){
   var tabChanged = ui.tab !== id;
   function commitGo(){
@@ -13090,31 +13101,9 @@ App.setMgTolerated=function(v){
 
 
 // ── Kilit ekranı handler'ları ──
-App.submitAuth=function(){
-  var u=(document.getElementById('sey-auth-user').value||'').trim();
-  var p=(document.getElementById('sey-auth-pass').value||'').trim();
-  if(!u||!p){
-    ui.authError=true; ui.authErrorMsg='Lütfen kullanıcı adını ve parolanı yaz.';
-    render(); return;
-  }
-  if(sha256(u)===AUTH_HASH && sha256(p)===AUTH_HASH){
-    if(!data) data=migrate(createDefaultData());
-    var a=data.settings.auth;
-    a.usernameHash=AUTH_HASH;
-    a.usernameMask=u.length>2?u.charAt(0)+'*'.repeat(u.length-2)+u.charAt(u.length-1):'***';
-    a.rememberMe=!!ui.authRemember;
-    a.unlockedAt=new Date().toISOString();
-    a.unlockCount=(a.unlockCount||0)+1;
-    ui.authError=false; ui.authErrorMsg=''; ui.authRemember=false; ui.authUnlocked=true;
-    save(); render();
-    toast('Hoş geldin, Sevgili Günışığı ✨',2600);
-  } else {
-    ui.authError=true; ui.authErrorMsg='Giriş bilgileri uyuşmadı. Bir nefes al ve tekrar dene.';
-    render();
-  }
-};
-App.toggleRememberAuth=function(){ ui.authRemember=!ui.authRemember; render(); };
-App.dismissAuthError=function(){ ui.authError=false; ui.authErrorMsg=''; render(); };
+App.submitAuth=function(){ return SEYMA_APP_SURFACE.submitAuth.apply(null,arguments); };
+App.toggleRememberAuth=function(){ return SEYMA_APP_SURFACE.toggleRememberAuth.apply(null,arguments); };
+App.dismissAuthError=function(){ return SEYMA_APP_SURFACE.dismissAuthError.apply(null,arguments); };
 
 function maybePullQuranForeground(force){ return SEYMA_APP_SURFACE.maybePullQuranForeground.apply(null,arguments); }
 var appPollInitialTimerId=setTimeout(pollRemote,1500);
@@ -13141,41 +13130,11 @@ window.addEventListener('pageshow',function(){ return SEYMA_APP_SURFACE.onWindow
 window.addEventListener('online',function(){ return SEYMA_APP_SURFACE.onWindowOnline.apply(null,arguments); });   // bağlantı gelince bounded recovery kontrolü
 window.addEventListener('offline',function(){ return SEYMA_APP_SURFACE.onWindowOffline.apply(null,arguments); });
 
-render();
-try{ if(window.SeyTouch && typeof window.SeyTouch.install==='function') window.SeyTouch.install(document.getElementById('root')); }catch(e){}
-if(data){ reminderSchedulerDispatch('boot'); }
-if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır
-setTimeout(maybeVoiceGreeting,2200); // FX-P-56: açılış selamlaması (gecikmeli — speech engine boot'u için)
-setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
-
-// FX-P-55: Açılış ritüeli — `launchRitual` açıkken splash'i kısa animasyonla
-// göster, sonra hideSplash() ile gizle; kapalıyken anında gizle. Emoji yok;
-// premium CSS amblem (index.html #sey-splash). Reduced-motion'da anında gizle.
-function hideSplash(){
-  var sp=document.getElementById('sey-splash');
-  if(!sp) return;
-  sp.style.opacity='0';
-  setTimeout(function(){ sp.style.display='none'; }, 480);
-}
-(function(){
-  var sp=document.getElementById('sey-splash');
-  if(!sp) return;
-  var on=!!(data&&data.settings&&data.settings.launchRitual);
-  var reduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(!on||reduced){ sp.style.display='none'; return; }
-  // FX-P-85: dün kaydedilmemişse nazik hatırlatma (splash görünürken; ses yok,
-  // emoji yok — K1: düz metin, splash'ın premium diline uygun).
-  // Gün kaydı yapısı (migrate/getDay): mood tek string, habits object, water
-  // number, savedAt ISO — `yd.ticks` diye bir alan yok; kartın ydone koşulu
-  // gerçek alanlara göre yazıldı. Dün = addDays(todayStr(),-1) (dateUtils zinciri).
-  try{
-    var yd=data&&data.days?data.days[addDays(todayStr(),-1)]:null;
-    var ydone=yd&&!!(yd.savedAt||yd.mood||(yd.habits&&Object.keys(yd.habits).some(function(k){return yd.habits[k];}))||(typeof yd.water==='number'&&yd.water>0));
-    if(!ydone){ var nt=document.getElementById('sey-splash-note'); if(nt) nt.textContent='Dünü de kaydetmeyi unutma'; }
-  }catch(e){}
-  // Kısa ritüel: 900ms görünür, sonra fade-out.
-  setTimeout(hideSplash, 900);
-})();
+// MON-54: initial render, reminder boot checkpoint, deferred callbacks and
+// splash late-boot guard are delegated only after every App assignment and
+// window.App expose above have completed. The registry preserves this order.
+if(!SEYMA_APP_SURFACE||typeof SEYMA_APP_SURFACE.initialRender!=='function') throw new Error('MON-54: initial boot registry yok');
+SEYMA_APP_SURFACE.initialRender();
 
 // ÆON permission yalnızca mevcut banner üzerindeki açık kullanıcı eyleminden
 // sonra istenir; boot sırasında sessiz permission loop çalıştırılmaz.

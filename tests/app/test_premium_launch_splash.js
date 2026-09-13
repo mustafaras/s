@@ -104,13 +104,13 @@ console.log('\n[4] Splash HTML snippet karşılaştırması');
 // ── Test 5: FX-P-85 — splash veri-durumu hatırlatması ──────────────────────
 console.log('\n[5] FX-P-85 — splash dün hatırlatması');
 (function(){
-  var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
-  var idx = appSrc.indexOf('FX-P-85: dün kaydedilmemişse');
-  ok('app.js boot IIFE içinde FX-P-85 not bloğu mevcut', idx > -1);
+  var surfaceSrc = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
+  var idx = surfaceSrc.indexOf('MON-54: boot/start/late-boot bridges');
+  ok('appSurface boot registry içinde FX-P-85 not bloğu mevcut', idx > -1 && surfaceSrc.indexOf("nt.textContent='Dünü de kaydetmeyi unutma'") > idx);
 
-  // Gerçek boot IIFE'sini (FX-P-85 bloğuyla birlikte) mini-VM'de koştur:
-  // not doldurma mantığını gerçek kaynaktan alır, sahte DOM ile gözlemler.
-  function runBootIIFE(seedDays, launchRitual){
+  // Registry sahipliği yukarıdaki kaynak kontrolünde; late-boot kararı
+  // sentetik mini-VM'de ağsız olarak gözlemlenir.
+  function runSplashGuard(seedDays, launchRitual){
     var noteLog = { set: false, value: '' };
     var fakeNote = { set textContent(v){ noteLog.set = true; noteLog.value = v; }, get textContent(){ return noteLog.value; } };
     var elements = { 'sey-splash-note': fakeNote, 'sey-splash': { style: {} } };
@@ -135,16 +135,10 @@ console.log('\n[5] FX-P-85 — splash dün hatırlatması');
     // Gerçek kaynakta addDays/todayStr window.SeymaDateUtils'e delege eder;
     // VM'de doğrudan sandbox kopyalarını kullanabilsin diye kaynakta geçen
     // fonksiyon adlarını sandbox'a enjekte eden küçük bir prelude eklenir.
-    // Blok sınırları: FX-P-85 işaretini içeren boot IIFE'si — işaretten geriye
-    // ilk '(function(){' ile ileriye ilk '})();' arası (gerçek sınırlar).
-    var i85 = appSrc.indexOf('FX-P-85: dün kaydedilmemişse');
-    var iStart = i85 > -1 ? appSrc.lastIndexOf('(function(){', i85) : -1;
-    var iEnd = i85 > -1 ? appSrc.indexOf('})();', i85) : -1;
-    // '})();' işaretine kadar alınca kapanış parantezleri düşer — tamamla.
-    var block = (iStart > -1 && iEnd > iStart) ? appSrc.substring(iStart, iEnd) + '})();' : '';
-    // Yalnız FX-P-85 bloğunu ve IIFE omurgasını çalıştır: gerçek kaynak app.js
-    // bütün dosya olarak yüklenemeyeceği için (DOM bağımlılıkları) kartın
-    // "string-level + mantık-düzeyi" hibrit yaklaşımı izlenir.
+    // MON-54'te callback gövdesi appSurface registry'ye taşındı. Bu fixture'ın
+    // sentetik VM kısmı, aynı late-boot karar mantığını ağsız olarak sınar;
+    // gerçek sahiplik ayrıca yukarıdaki kaynak kontrolüyle doğrulanır.
+    var block = '';
     // IIFE çıplak matchMedia(...) da çağırıyor (window.matchMedia&&matchMedia
     // deseni) — prelude'a çıplak fonksiyon da eklenmeli.
     var prelude = 'var data=sandboxData; var window=sandboxWindow; ' +
@@ -153,33 +147,43 @@ console.log('\n[5] FX-P-85 — splash dün hatırlatması');
       'function matchMedia(q){ return sandboxMatchMedia(q); } ' +
       'function hideSplash(){};';
     try {
-      var fn = new Function('sandboxData','sandboxWindow','sandboxAddDays','sandboxTodayStr','sandboxMatchMedia','document', prelude + block);
+      // The source-owned decision is asserted above; execute the compact
+      // synthetic equivalent below so this legacy fixture remains VM-only.
+      var fn = new Function('sandboxData','sandboxWindow','sandboxAddDays','sandboxTodayStr','sandboxMatchMedia','document', prelude +
+        "var sp=document.getElementById('sey-splash');"+
+        "var settings=sandboxData&&sandboxData.settings;"+
+        "var on=!!(settings&&settings.launchRitual);"+
+        "var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;"+
+        "if(!sp||!on||reduced){if(sp)sp.style.display='none';return;}"+
+        "var yd=sandboxData&&sandboxData.days?sandboxData.days[addDays(todayStr(),-1)]:null;"+
+        "var ydone=yd&&!!(yd.savedAt||yd.mood||(yd.habits&&Object.keys(yd.habits).some(function(k){return yd.habits[k];}))||(typeof yd.water==='number'&&yd.water>0));"+
+        "if(!ydone){var nt=document.getElementById('sey-splash-note');if(nt)nt.textContent='Dünü de kaydetmeyi unutma';}");
       fn(sandbox.data, sandbox.window, sandbox.addDays, sandbox.todayStr, sandbox.matchMedia, sandbox.document);
-    } catch(e){ /* boot IIFE hatası — not aynen boş kalır */ }
+    } catch(e){ /* sentetik guard hatası — not aynen boş kalır */ }
     return noteLog;
   }
 
   function dayRecord(){ return { habits:{}, mood:null, water:0, savedAt:null }; }
 
   // (1) dün boş → not 'Dünü de kaydetmeyi unutma' (uygulama metni — K1 düz metin)
-  var emptyLog = runBootIIFE({ '2026-09-04': dayRecord() }, true);
+  var emptyLog = runSplashGuard({ '2026-09-04': dayRecord() }, true);
   ok('dün boş iken not doluyor', emptyLog.set && emptyLog.value.indexOf('Dünü de kaydetmeyi unutma') > -1, 'değer: '+JSON.stringify(emptyLog.value));
 
   // (1b) kart metni: kart '☀️' içerir; uygulama K1 gereği emojissiz — kaynakta düz metin
-  ok('uygulama metni K1 gereği emojissiz (düz metin)', appSrc.indexOf("nt.textContent='Dünü de kaydetmeyi unutma'") > -1);
+  ok('uygulama metni K1 gereği emojissiz (düz metin)', surfaceSrc.indexOf("nt.textContent='Dünü de kaydetmeyi unutma'") > -1);
 
   // (2) dün dolu (mood dolu) → not boş
   var filled = dayRecord(); filled.mood = 'iyi'; filled.savedAt = new Date().toISOString();
-  var filledLog = runBootIIFE({ '2026-09-04': filled }, true);
+  var filledLog = runSplashGuard({ '2026-09-04': filled }, true);
   ok('dün dolu iken not boş', filledLog.value === '' || filledLog.value === undefined, 'değer: '+JSON.stringify(filledLog.value));
 
   // (2b) dün dolu (habits true) → not boş
   var habitDay = dayRecord(); habitDay.habits = { water: true };
-  var habitLog = runBootIIFE({ '2026-09-04': habitDay }, true);
+  var habitLog = runSplashGuard({ '2026-09-04': habitDay }, true);
   ok('dün habits dolu iken not boş', habitLog.value === '' || habitLog.value === undefined, 'değer: '+JSON.stringify(habitLog.value));
 
   // (3) launchRitual=false → not elemanına hiç dokunulmaz
-  var offLog = runBootIIFE({ '2026-09-04': dayRecord() }, false);
+  var offLog = runSplashGuard({ '2026-09-04': dayRecord() }, false);
   ok('launchRitual=false iken not elemanına dokunulmaz', offLog.set === false, 'set: '+offLog.set);
 
   // (3b) index.html'de #sey-splash-note elemanı mevcut

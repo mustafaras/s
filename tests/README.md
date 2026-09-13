@@ -21,6 +21,9 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   timer/listener/foreground callback registry’sinin cold-load no-op, fail-closed
   kayıt, timer/listener sahipliği ve cache-bust paritesini ağsız sentetik VM’de
   doğrular.
+- `app/test_app_surface_boot_boundary.js` — MON-54 `SeymaAppSurface` boot/start,
+  `window.App` expose sırası, auth late-boot guard, initial render/splash sırası,
+  fail-closed kayıt ve cache-bust paritesini ağsız sentetik VM’de doğrular.
 - `app/test_messaging_boundary.js` — MON-42 `SeymaMessaging` registry’sinin
   salt-okur chronology/render/attachment sınırını ve source notification dedupe
   sözleşmesini sentetik resolver bag’iyle doğrular.

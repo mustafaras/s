@@ -19,11 +19,7 @@ var ICONS=SEYMA_CONSTANTS.ICONS||{};
 // SVG ikon yardımcısı — emoji yerine tutarlı, tema-uyumlu (currentColor) çizgi ikonlar.
 // size: piksel; cls: ekstra CSS class (opsiyonel, örn. "seyIconSpin"). Bilinmeyen isimde
 // boş kare yerine sessizce boş span döner (uygulama çökmesin).
-function icon(name,size,cls){
-  var body=ICONS[name]; if(!body) return '';
-  size=size||20;
-  return '<svg class="seyIcon'+(cls?(' '+cls):'')+'" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
-}
+function icon(name,size,cls){ return window.SeymaHelpers.icon.apply(null,arguments); }
 var HABITS=[
   {key:'sweetManaged',icon:icon('cookie',22),title:'Tatlı krizini yönettim',sub:'Tatlı seni değil, sen tatlıyı yönettin.',msg:'Tatlı lobisi bugün hafif geriledi. Şeyma 1 - Tatlı 0.'},
   {key:'foodManaged',icon:icon('utensils',22),title:'Yemek/açlık krizini yönettim',sub:'Gerçek açlık mı, duygusal açlık mı — ayırt ettin.',msg:'Açlık dalgasını izledin, boğulmadın. Beden mutlu, sen kaptansın.',since:'2026-07-10'},
@@ -4590,7 +4586,7 @@ function flushFieldTimers(){
 }
 
 // ---------- helpers ----------
-function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s){ return window.SeymaHelpers.esc.apply(null,arguments); }
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function normalizeToken(v){ return String(v||'').replace(/[^\x20-\x7E]/g,'').trim(); }
 // MON-07: saf tarih gövdeleri dateUtils registry'sinin tek sahibidir.
@@ -4809,7 +4805,7 @@ function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spa
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else if(isVacationDay(d.date)){ /* seri dondur; sayaç artmaz, kırılmaz */ } else c=0; }); return b; }
 function topMood(moods){ var k=null,m=0; for(var x in moods){ if(moods[x]>m){m=moods[x];k=x;} } var o=k?find(MOODS,'id',k):null; return o?o.label:'—'; }
 function moodEmoji(id,size){ var o=find(MOODS,'id',id); return o?icon(o.icon,size||22):''; }
-function find(arr,key,val){ for(var i=0;i<arr.length;i++){ if(arr[i][key]===val) return arr[i]; } return null; }
+function find(arr,key,val){ return window.SeymaHelpers.find.apply(null,arguments); }
 function currentStreak(){ var c=0,date=todayStr(); if(countRec(data.days[date])<4&&!isVacationDay(date)) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ if(countRec(data.days[date])>=4){ c++; date=addDays(date,-1); } else if(isVacationDay(date)){ date=addDays(date,-1); } else break; } return c; }
 function daysTracked(){ var n=0; for(var d in data.days){ var r=data.days[d]; if(countRec(r)>0||(r&&r.mood)||(r&&r.note)||(r&&r.intention)||(r&&r.meals&&(r.meals.breakfast||r.meals.lunch||r.meals.dinner||r.meals.snack))) n++; } return n; }
 function syncConfigured(){ var s=data.settings||{}; return !!(s.ghToken&&s.ghRepo); }

@@ -2,28 +2,28 @@
 
 **Kart:** MON-56
 **Tarih:** 2026-09-13
-**Durum:** ⛔ BLOKE — duplicate body bulundu; kaynak kodu değiştirilmedi
+**Durum:** ✅ TAMAMLANDI — tek sahiplik shim düzeltmesi uygulandı
 **Kapsam:** `app/core/*`, `app.js`, 24 hedef registry ve frozen/KORU yüzeyleri
-**Çalışma ağacı başlangıcı:** temiz, `HEAD=23b6dd5` (`docs(mon): close final index and harness parity`)
+**Çalışma ağacı başlangıcı:** temiz, `HEAD=46c211e` (`docs(mon): record MON-56 duplicate owner halt`)
 
 ## Karar
 
-MON-56 kabul edilmedi. Canlı kaynak taraması, `SeymaHelpers` içinde taşınmış
-olması gereken üç saf yardımcı gövdenin `app.js` içinde de gerçek gövde olarak
-yaşadığını gösterdi:
+İlk MON-56 preflight'ında `SeymaHelpers` içinde taşınmış olması gereken üç saf
+yardımcı gövdenin `app.js` içinde de gerçek gövde olarak yaşadığı bulundu.
+Kullanıcı yönüyle doğru düzeltme uygulandı: app.js gövdeleri kaldırılmadı;
+aynı imza/dönüş yolunu koruyan registry shimlerine indirildi:
 
 | Üye | Registry gövdesi | app.js gövdesi | Sonuç |
 |---|---:|---:|---|
-| `icon` | `app/core/helpers.js:7` | `app.js:22` | duplicate body |
-| `esc` | `app/core/helpers.js:3` | `app.js:4593` | duplicate body |
-| `find` | `app/core/helpers.js:12` | `app.js:4812` | duplicate body |
+| `icon` | `app/core/helpers.js:7` | `app.js:22` → `SeymaHelpers.icon.apply(...)` | tek owner |
+| `esc` | `app/core/helpers.js:3` | `app.js:4589` → `SeymaHelpers.esc.apply(...)` | tek owner |
+| `find` | `app/core/helpers.js:12` | `app.js:4808` → `SeymaHelpers.find.apply(...)` | tek owner |
 
-Bu üçü yalnız resolver adı değildir: iki tarafta da executable saf helper
-implementasyonu vardır. `app.js` tarafındaki implementasyonlar başka app-owned
-gövdeler tarafından çağrılıyor olabilir; bu, ikinci registry gövdesini tek
-sahipli hale getirmez. Kartın halt protokolü duplicate bulunduğunda düzeltme
-uygulamayı değil bloke etmeyi emrettiği için bu committe otomatik cleanup,
-shimleştirme, behavior değişikliği veya fixture gevşetmesi yapılmadı.
+Bu üçü yalnız resolver adı değildi; ilk preflight'ta iki executable saf helper
+implementasyonu vardı. Düzeltme, app.js thin-shell kuralına uygun olarak
+yalnızca bu üç gövdeyi signature-preserving shim yaptı. `this`, argümanlar,
+dönüş yolu ve çağrı sırası değişmedi; yeni davranış veya otomatik cleanup
+yapılmadı.
 
 ## Canlı envanter yöntemi ve sınırı
 
@@ -50,7 +50,7 @@ registration bag'leri, constants ve doğrudan adapterler ayrıca belirtilmiştir
 | 1 | `app/core/constants.js:3` → `SeymaConstants` | 4: `KEY,TKEY,FEATURE_GATE_TS,ICONS` | Shim yok; app.js `SEYMA_CONSTANTS` | Mutable data/DOM/timer/ağ yok; sabitler app.js tarafından okunur. |
 | 2 | `app/core/dateUtils.js:48` → `SeymaDateUtils` | 10: `pad,fmt,todayStr,addDays,diffDays,shortDate,dateLabelTR,dayIndexFor,activeDate,curDay` | 10 shim, app.js `4598–4895` | `data/ui` snapshotı yok; `activeDate/curDay` B1 getter üzerinden salt okur. |
 | 3 | `app/core/state.js:513` → `SeymaState` | 9: `data,ui,dark,migrate,getDay,createDefaultData,registerMigrate,registerGetDay,registerCreateDefaultData` | `migrate` app.js `4470`, `getDay` `4660`, `createDefaultData` `5420`; B1 getterler app.js/app-owned | `data` rebind, import/reset/location/auth unlock ve `try/finally` swap app.js'te; state registry mutable root yazmaz. |
-| 4 | `app/core/helpers.js:99` → `SeymaHelpers` | 12: `esc,icon,find,segTabs,progBar,starRow,miniBars,statTile,collapsibleCardHTML,toast,confetti,haptic` | 9 shim, app.js `4802–5077`; `esc/icon/find` doğrudan kullanımlar duplicate blocker | `toast/confetti/haptic` çağrı anında DOM/titreşim yapabilir; load-time side effect yok. `esc/icon/find` için tek-owner kararı eksik. |
+| 4 | `app/core/helpers.js:99` → `SeymaHelpers` | 12: `esc,icon,find,segTabs,progBar,starRow,miniBars,statTile,collapsibleCardHTML,toast,confetti,haptic` | 12 shim; app.js `22`, `4589`, `4802–5077` | `toast/confetti/haptic` çağrı anında DOM/titreşim yapabilir; load-time side effect yok. Tüm helper üyelerinin tek owner'ı core registrydir. |
 | 5 | `app/core/mediaFx.js:305/527/592/832` → `SeyAudio/SeyHaptics/SeyFx/SeyTouch` | `SeyAudio` 25, `SeyHaptics` 6, `SeyFx` 12, `SeyTouch` 3 | Shim yok; mevcut KORU API | FX API yeniden tanımlanmaz/sarılmaz. Audio, pointer ve visibility etkileri mevcut guarded runtime exceptionıdır; app.js call-site/guard sahibi kalır. |
 | 6 | `app/core/timeTheme.js:78/148` → `SeyTimeTheme/SeyAmbience` | 4 + 7: `classForHour,apply,seasonalClass,applySeasonal`; `weatherClass,intensity,seed,seasonClass,timeClass,scene,apply` | Shim yok; mevcut KORU API | Theme/aurora DOM yazımı yalnız çağrıda; timer üretmez. app.js çağrı sırası ve root ownership korunur. |
 | 7 | `app/core/prayer.js:185` → `SeymaPrayer` | 30: registration + `PRAYER_NAMES,PRAYER_ORDER,PRAYER_CITIES,PRAYER_METHODS` + `prayerCityByName,prayerCityOptionsHTML,emptyPrayerEntry,emptyPrayerDay,ensurePrayerDay,prayerSettings,prayerLocation,prayerLocationHash,prayerMethod,prayerAdjustments,fmtPrayerTime,parsePrayerTime,prayerCacheKey,prayerReadCache,prayerWriteCache,prayerTimesFromDay,currentPrayerIndex,fetchAladhanTimes,fetchPrayerTimes,applyPrayerTimesToDay,prayerDaySummary,prayerPerformedCount,prayerAllDone,prayerStreak,nextPrayerInfo` | 25 shim, app.js `84–109` | GPS/permission, data mutation ve handler/save/render app.js'te; fetch fonksiyonu registryde yalnız çağrı zamanında çalışır, load-time ağ yok. |
@@ -94,31 +94,30 @@ media/theme/sky source assignments sırasıyla `mediaFx.js:305/527/592/832`,
 |---|---|---|
 | Registry global assignment | Her hedef/frozen/KORU globali tek source assignment; app.js içinde 24 registry assignment yok | PASS |
 | App shim member collision | Delegate regex setinde duplicate shim adı: `0` | PASS |
-| Helper body ownership | `esc`, `icon`, `find`: core + app.js executable bodies | **FAIL — MON-56 halt** |
+| Helper body ownership | `esc`, `icon`, `find`: core gövdesi + app.js signature-preserving shim | PASS |
 | Nested same-name helper | `app.js:11295 start` yalnız Qibla sensor local helper; appSurface `start` ile lexical/owner olarak ayrıdır | PASS / exception |
 | Render/domain layered names | `saygiHTML`, `ayarlarHTML`, `mesajHTML`, library overlay names: domain owner + render adapter | PASS / documented exception |
 | Direct app-owned helpers | `findBook/findTitle/findTrack/findSoulItem`, data/archive backfill ve handler writers app.js | PASS / documented exception |
 | Reverse dependency | Core registryler `app.js` IIFE'ına veya panel'e import etmez; resolver bags kullanır | PASS |
 | sync boundary | sync.js ve Guard 1/Guard 2 değişmedi; `SeyOnSyncState/SeyOnSynced` syncGlue tarafından set edilmez | PASS |
-| Orphan registry member | Frozen/reminder/render adapters dahil canlı call/registration edge'i olmayan hedef üye bulunmadı | PASS; helper duplicate nedeniyle card kapanmaz |
+| Orphan registry member | Frozen/reminder/render adapters dahil canlı call/registration edge'i olmayan hedef üye bulunmadı | PASS |
 
-### Duplicate kanıtı
+### Duplicate düzeltme kanıtı
 
 ```text
-app.js:22    function icon(name,size,cls){ ... }
-app.js:4593  function esc(s){ ... }
-app.js:4812  function find(arr,key,val){ ... }
+app.js:22    function icon(name,size,cls){ return window.SeymaHelpers.icon.apply(null,arguments); }
+app.js:4589  function esc(s){ return window.SeymaHelpers.esc.apply(null,arguments); }
+app.js:4808  function find(arr,key,val){ return window.SeymaHelpers.find.apply(null,arguments); }
 
-app/core/helpers.js:3   function esc(s){ ... }
-app/core/helpers.js:7   function icon(name,size,cls){ ... }
-app/core/helpers.js:12  function find(arr,key,val){ ... }
+app/core/helpers.js:3   function esc(s){ ... canonical body ... }
+app/core/helpers.js:7   function icon(name,size,cls){ ... canonical body ... }
+app/core/helpers.js:12  function find(arr,key,val){ ... canonical body ... }
 ```
 
-İki taraftaki `esc` ve `find` gövdeleri aynı executable saf davranışı,
-`icon` ise aynı ICONS→SVG üretici davranışını taşır; yalnız isim benzerliği
-değildir. Bu nedenle bunları “dependency adapter exception” diye kabul edip
-MON-56'yı kapatmak yanlış olur. Çözüm kararı kullanıcı yönüyle ayrı bir
-devam adımıdır; bu kartta uygulanmadı.
+İlk preflight'ta görülen ikinci gövdeler kaldırıldı; app.js artık yalnız
+registry shimini taşır. Böylece `esc/icon/find` için executable owner sayısı
+**1**, shim sayısı **1**dir. `app.js:11295` Qibla local `start` helperı ise
+lexical olarak ayrı ve app-owned exception olmaya devam eder.
 
 ## App / onclick / data / FX baseline
 
@@ -147,15 +146,15 @@ sayımına katılmadı; canonical değer `test_state_rebind_boundary.js` ile
 | I3 | migrate shim + state owner ayrımı mevcut; kaynak değişikliği yok |
 | I4 | render/DOM/focus call graph değişmedi; kaynak değişikliği yok |
 | I5 | sync.js/Guard 1/2 değişmedi; ağ/remote yazımı yok |
-| I6 | Bu kart duplicate nedeniyle tamamlanmadı; sonraki kart açılmadı |
-| M1 | Delege deseni çoğunlukla mevcut; `esc/icon/find` tek sahiplik şartı ihlal |
+| I6 | App/core tek sahiplik ve no-network sınırı korundu; sonraki karta geçilmedi |
+| M1 | Tüm taşınan üyeler için app.js signature-preserving delegate; `esc/icon/find` de düzeltildi |
 | M2/M2prime | data declaration, 9 rebind, import/reset/unlock app.js'te |
 | M3 | callback setter sahipliği app.js'te |
 | M4 | FX API/call-site yeniden tanımlanmadı |
 
 ## Koşulan kanıtlar
 
-Duplicate tespitinden önce kaynak değişmeden koşulan kritik kapılar:
+Tek-owner düzeltmesi sonrası koşulan kritik kapılar:
 
 - `node --check app.js`, `node --check sync.js`, tüm `app/core/*.js`: **PASS**
 - `node tests/app/test_modularization_boundary.js`: **101/101 PASS**
@@ -168,21 +167,27 @@ Duplicate tespitinden önce kaynak değişmeden koşulan kritik kapılar:
 - `driver.mjs`: onboarding + seeded + interaction + reminder: **PASS**
 - `zikr-harness.mjs`: **95/95 PASS**
 - Premium fixture ailesi: **PASS**
+- Tam app/panel/Panel-v2/Quran/reminder aileleri: **52 app**, **23 panel**,
+  **27 Panel-v2**, **9 Quran**, reminder smoke/freeze: **PASS**
 
-Bu kapılar runtime parity'nin mevcut olduğunu gösterir; duplicate body
-buluşunu geçersiz kılmaz. MON-56'nın kabulü için duplicate çözülmeden tam
-owner inventory kapanışı verilmemiştir.
+Bu kapılar runtime parity'sini ve tek-owner düzeltmesini doğrular; duplicate
+gövde bulgusu artık çözülmüştür.
 
 ## Cache-bust / FILES / kapsam
 
-Yeni core dosyası veya source behavior değişikliği yapılmadı. Bu nedenle
-`index.html`, driver `FILES`, zikr `FILES`, `app.js`, `sync.js` ve FX manifest
-değişmedi; MON-55'in production/harness parity kanıtı korunur. Cache-bust
-değişikliği yapılmadı. Browser, local server, token, gerçek veri, remote,
-push, merge, tag, deploy ve `mustafaras/seyma-data` write yapılmadı.
+Yeni core dosyası veya FILES sırası eklenmedi. `app.js` source değiştiği için
+production `appSurface.js` + `app.js` cache-bust çifti `index.html` içinde
+`20260913b` → `20260913c` olarak birlikte bump edildi; driver/zikr FILES
+pathleri ve core sırası değişmedi. Cache-bust'i literal doğrulayan MON-50–54
+AppSurface fixture beklentileri de `20260913c` ile hizalandı; load order ve
+runtime sözleşmesi değişmedi.
+MON-55 production/harness parity korunur. `sync.js` ve FX manifest değişmedi.
+Browser, local server, token, gerçek veri, remote, push, merge, tag, deploy ve
+`mustafaras/seyma-data` write yapılmadı.
 
-## Bloke handoff
+## Kapanış
 
-MON-56, `SeymaHelpers.esc/icon/find` için tek owner kararı ve kaynak düzeltmesi
-olmadan MON-57'ye geçemez. Bu kayıtta source cleanup uygulanmadı; kullanıcı
-yönü olmadan sonraki karta geçilmeyecek.
+`SeymaHelpers.esc/icon/find` tek owner düzeltmesi, eşli cache-bust bump ve tam
+headless regression sonrası MON-56 kabul edildi. `index.html` appSurface.js +
+app.js tagleri `20260913c`, driver/zikr FILES sırası aynıdır; `sync.js` son
+script olarak kalır. MON-57, yeni açık kullanıcı yönü gerektirir.

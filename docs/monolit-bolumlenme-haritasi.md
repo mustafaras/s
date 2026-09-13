@@ -3,6 +3,16 @@
 > **Kaynak:** graphify grafik analizi (`graphify-out/graph.json`), 2026-09-01.
 > **Amaç:** 18.805 satırlık tek `app.js` dosyasının gerçek iş bölümlerini, graphify'nin yanıltıcı "topluluk" etiketleri yerine **fonksiyon gerçek amacına** göre ortaya koymak. Bu belge, L2/monolit ayrıştırma çalışmasına (reminder %28 vb.) girdi sağlar.
 
+> **Güncel execution notu (MON-58, 2026-09-13):** Bu belge graphify'nin
+> 2026-09-01 tarihli frozen analizidir; satır/fonksiyon sayıları tarihsel
+> başlangıç baseline'ıdır. Canlı uygulama MON-01..MON-57 sonrasında `app.js`
+> **13.144 satır** ve `app/core/` **29 dosyadır**; 24-hedef sahiplik kararı
+> [`premium-fx-plan/MODULARIZATION.md`](../premium-fx-plan/MODULARIZATION.md),
+> uygulama durumu ve regression kanıtı
+> [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md)
+> ile [`MON-D11-TAM-REGRESSION-RAPORU`](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)
+> içindedir.
+
 ---
 
 ## 1. Neden graphify topluluk etiketlerine güvenilmez (bu repo için)

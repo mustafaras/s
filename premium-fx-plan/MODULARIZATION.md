@@ -10,6 +10,17 @@
 > graphify tarafından üretilen [`docs/monolit-bolumlenme-haritasi.md`](../docs/monolit-bolumlenme-haritasi.md), app.js'in **gerçek iş alanı kırılımını** (reminder %28, zikir/kur'an/saygı/aeon vb.) ve graphify topluluk etiketlerinin neden monolit içinde yanıltıcı olduğunu rakamla gösterir. Bu harita, aşağıdaki hedef modül listesiyle hizalanır ve hangi fonksiyonun hangi modüle gideceğine dair kanıt temelini sağlar.
 > - **Ajanlar FX dalgalarını (örn. Dalga 8 sonu) bitirdiğinde:** sıradaki modularization prompt'unu üretirken önce `docs/monolit-bolumlenme-haritasi.md`'yi oku, buradaki hedef modül listesini o haritayla doğrula ve FX→modülerleştirme devrini bu referansla başlat.
 
+> **Güncel execution notu (MON-58, 2026-09-13):** Bu belge modülerleştirme
+> stratejisinin v2.1 karar kaydıdır; üstteki yaklaşık 18.805 satır ve graphify
+> ölçümleri tarihsel plan baseline'ı olarak korunur. Uygulanan zincir
+> MON-01..MON-57 ile 24 hedefi kapattı; canlı ölçüm `app.js` **13.144** satır,
+> `app/core/` **29** dosyadır. Güncel sahiplik/load-order/regression kanıtı
+> [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md),
+> [`MON-D11-LOAD-SIRASI-RAPORU.md`](../monolit-bolumlenme-plan/deliverables/MON-D11-LOAD-SIRASI-RAPORU.md),
+> [`MON-D11-DELEGE-ENVANTERI.md`](../monolit-bolumlenme-plan/deliverables/MON-D11-DELEGE-ENVANTERI.md)
+> ve [`MON-D11-TAM-REGRESSION-RAPORU.md`](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)
+> içindedir. Bu strateji deployment veya cihaz kabulü değildir.
+
 ---
 
 ## 1. Neden Şimdi?

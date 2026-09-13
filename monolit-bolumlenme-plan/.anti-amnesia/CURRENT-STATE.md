@@ -9,12 +9,27 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-57 tamamlandı |
+| Durum | `in_progress` — MON-58 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-57 / MON-58 (yeni açık onay gerekir) |
-| Dalga / ilerleme | Dalga 11 (3/3) / 57/60 |
+| Son / sıradaki | MON-58 / MON-59 (yeni açık onay gerekir) |
+| Dalga / ilerleme | Dalga 12 (1/3) / 58/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-13 |
+
+## MON-58 kapanışı — dokümantasyon ve roadmap senkronu
+
+- Kanıt: [`MON-D12-DOKUMAN-SENKRON-CHECKLIST.md`](../deliverables/MON-D12-DOKUMAN-SENKRON-CHECKLIST.md).
+  Roadmap üst özeti ve modülerleşme satırı, kök README entrypoint'i, plan
+  README ve v2.1 strategy/module-map belgeleri canlı `58/60`, 24 hedef,
+  `app.js` **13.144** satır ve `app/core/` **29** dosya ile hizalandı.
+- Tarihsel graphify ve FX baseline'ları değiştirilmedi; güncel sahiplik,
+  load-order, delege ve regression karar linkleri görünür hale getirildi.
+  `app.js`, core, sync, index, FILES, fixture ve cache-bust değişmedi.
+- Markdown link scan, JSON parse, MON-D11 referans taraması ve
+  `git diff --check` PASS. Browser/device/deploy/release kanıtı iddia edilmedi.
+- `MON-STATE.json`: `status=in_progress`, active/blocked null,
+  `lastCompletedPrompt=MON-58`, `nextPrompt=MON-59`, **58/60**; Dalga 11
+  **3/3**, Dalga 12 **1/3**. MON-59 yeni açık kullanıcı yönü gerektirir.
 
 ## MON-57 kapanışı — tam regression ve performans sınırı
 
@@ -58,7 +73,7 @@
 
 ## MON-53 kapanışı — timer, listener ve foreground köprüleri
 
-- Kanıt: [`MON-53-TIMER-LISTENER-OWNERSHIP-MANIFESTI.md`](../deliverables/MON-53-TIMER-LISTENER-OWNERSHIP-MANIFESTI.md).
+- Kanıt: [`MON-53-TIMER-LISTENER-OWNERSHIP-MANIFEST.md`](../deliverables/MON-53-TIMER-LISTENER-OWNERSHIP-MANIFEST.md).
   `SeymaAppSurface` lifecycle registry’si global session, polling, sync retry,
   foreground, storage, ambience ve reminder timer callback gövdelerini cold-load
   side effect olmadan taşır. `app.js` canlı dependency bag’ini ve tüm timer /

@@ -1,29 +1,17 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-10 · **Durum:** `in_progress` · **Uygulanan prompt:** 32/60 (`MON-32`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-13 · **Durum:** `in_progress` · **Uygulanan prompt:** 58/60 (`MON-58`)
 
 Bu klasör, Şeyma'nın `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
-bir **kademeli kod uygulama paketidir**: Dalga 1–6 (`MON-01..MON-32`)
-tamamlandı; `migrate`, `getDay` ve `createDefaultData` state registry'sine
-taşındı, canlı rebind sahipliği app.js'te bırakıldı. `MON-16` syncGlue callback
-sahipliğini app.js'te kilitledi, `MON-17` save gövdesini syncGlue registry'sine
-aldı, `MON-18` state+sync Dalga 4 kapanışını no-network kanıtıyla tamamladı.
-Dalga 5'in dört manevi domaini ayrıldı: `MON-19` prayer, `MON-20/21` zikir
-motor+görünüm, `MON-22` quran, `MON-23` saygı; `MON-24` çapraz regression
-raporuyla, `MON-25` Dalga 5 kabul denetimiyle kapandı (canlı ölçümde I1–I6/M1–M4
-farkı yok; tek onarım: `driver.mjs` FILES listesine SKY serisinin atladığı
-`skyFx.js` eklendi). `MON-26` motivation gövdelerini `app/core/motivation.js` SeymaMotivation
-registry'sine aldı; App-owned mutation, focus ve save kabuğu korundu. `MON-27`
-crisis güvenlik metni, modal HTML'i ve craving görünüm yardımcılarını
-`app/core/crisis.js` SeymaCrisis registry'sine aldı; SOS/tile/modal çıktısı ve
-focus sınırı korundu. `MON-28` journal text/count/streak/savedAt yardımcıları
-ile Günlük Işığı kartı ve modalını `app/core/journal.js` SeymaJournal registry'sine
-aldı; save sırası ve modal focus korundu. `MON-29/30` health hesaplama ve kart
-görünüm registry'sini, `MON-31` malformed health state guard'larını tamamladı.
-`MON-32` dört registry'nin dependency, UI/modal, save/migration ve dump
-kanıtlarını birleştirerek Dalga 6'yı kapattı. Sıradaki kart `MON-33` ve yeni
-açık kullanıcı yönü gerektiriyor.
+bir **kademeli kod uygulama paketidir**: Dalga 1–11 (`MON-01..MON-57`)
+tamamlandı; `migrate`, `getDay`, `createDefaultData`, state/sync, domain,
+render ve appSurface registryleri 24 hedef kararına göre ayrıldı. App-owned
+data rebind, save, DOM/focus, timer/listener, network ve `window.App` sıraları
+korundu. `MON-55` production/harness yükleme paritesini, `MON-56` helper tek
+sahipliğini, `MON-57` ise tüm no-network regression zincirini kapattı.
+`MON-58` ile bu uygulama gerçeği roadmap, README, module map ve karar linklerine
+senkronlandı. Sıradaki kart `MON-59` ve yeni açık kullanıcı yönü gerektiriyor.
 
 ## Sınır ve otorite
 
@@ -33,6 +21,11 @@ açık kullanıcı yönü gerektiriyor.
 - 24-hedef-modül haritası `MODULARIZATION.md` v2.1; gerçek iş alanı kanıtı
   `docs/monolit-bolumlenme-haritasi.md`dir. Graphify topluluk etiketi modül
   sınırı değildir.
+- Güncel karar zinciri: [`MON-S3-MODUL-SAHIPLIK-MATRISI.md`](deliverables/MON-S3-MODUL-SAHIPLIK-MATRISI.md),
+  [`MON-D11-LOAD-SIRASI-RAPORU.md`](deliverables/MON-D11-LOAD-SIRASI-RAPORU.md),
+  [`MON-D11-DELEGE-ENVANTERI.md`](deliverables/MON-D11-DELEGE-ENVANTERI.md),
+  [`MON-D11-TAM-REGRESSION-RAPORU.md`](deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)
+  ve [`MON-D12-DOKUMAN-SENKRON-CHECKLIST.md`](deliverables/MON-D12-DOKUMAN-SENKRON-CHECKLIST.md).
 - Dal `premium-fx-gorsel-yuzey` **LOCAL-ONLY**dir (MON zinciri
   `zikirmatik-manuel-zikir` dalını içerir; üstünde 76 lokal SKY/PREM/FX2
   commit'i var). Push, merge, tag, deploy ve `mustafaras/seyma-data` yazımı

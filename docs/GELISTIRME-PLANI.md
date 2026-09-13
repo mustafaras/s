@@ -18,9 +18,19 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-09-09 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-25, 25/60) + `.github/workflows/pages.yml`._
+_Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-13 (MON-58 — modülerleşme dokümantasyon senkronu):**
+>   `app.js` monolit bölümleme zinciri MON-01..MON-57 ile uygulandı ve
+>   MON-57 tam no-network regression ile kapandı; MON-58 bu gerçeği roadmap,
+>   kök README, plan README, graphify module map ve v2.1 strategy belgesine
+>   bağladı. Canlı ölçüm `app.js` 13.144 satır, `app/core/` 29 dosya ve 24
+>   hedef registry'dir. Kanıt zinciri [`MON-STATE.json`](../monolit-bolumlenme-plan/MON-STATE.json),
+>   [`MON-D11-DELEGE-ENVANTERI.md`](../monolit-bolumlenme-plan/deliverables/MON-D11-DELEGE-ENVANTERI.md)
+>   ve [`MON-D11-TAM-REGRESSION-RAPORU.md`](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)
+>   içindedir. Durum **58/60**, LOCAL-ONLY; browser/device, deploy ve release
+>   approval ayrı kapılardır.
 > - **2026-09-08 (FX-2 serisi tamamlandı — "Hissedilir Premium"):** 28 kartlık,
 >   8 dalgalık premium FX programı (2026-09-06 → 2026-09-08) kapandı. FX-1
 >   (91 prompt) bir FX API üretmişti ama hiçbir yere bağlanmamıştı
@@ -84,6 +94,7 @@ _Son güncelleme: 2026-09-09 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 | # | Madde | Sürüm | Durum | Kanıt / Not |
 |---|-------|:-----:|:-----:|-------------|
 | — | Altyapı (sync, panel, tema, Okuma/İzleme hub'ları) | 0 | ✅ | `sync.js`, `panel.html`, `app/styles.css`, hub deseni |
+| MON | 🧱 `app.js` monolit bölümleme | 0 | 🟡 | 24 hedef registry, 29 `app/core` dosyası; MON-01..57 uygulandı, MON-58 docs sync tamamlandı. Güncel kanıt: [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md), [module map](monolit-bolumlenme-haritasi.md), [MON-D11 regression](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
 | 1 | 🎵 Ne Dinledim | 1 | ✅ | `listeningOverlayHTML` hub (Bugün/Favoriler/İstatistik/Sözler) + `data.music` + `data.days[].listening`; `--listen` teal accent; panel "🎧 Dinleme Arşivi" (2026-07-04) |
 | 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ✅ | `App.onGratitude` + `data.days[].gratitude` (≤3); Bugün kartı (geçmiş günde düzenlenebilir); panel gün-detayı bloğu (2026-07-04) |
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |
@@ -121,7 +132,7 @@ _Son güncelleme: 2026-09-09 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 | 34 | 🕌 İlham & İbadet Hub'ı — detaylı namaz takibi + günün öncüsü + zengin modal/kapalı kart tasarımı | 2 | ✅ | `data.days[date].prayer` modeli (6 vakit: `performed`, `inCongregation`, `late`, `madeUp`, `nafile`, `note`, `savedAt`); `data.settings.prayer` (metot, konum, ayarlar) + `migrate()` backfill; vakitler `api.aladhan.com/v1/timings?method=13` (Diyanet) + `Europe/Istanbul` ile çekiliyor, GPS veya 81 il listesi (`PRAYER_CITIES`) ile konum seçimi, 48 saat `localStorage` cache; Saygı sekmesinde "İman Köşesi" premium kartı + tam ekran overlay (kılındı/cemaat/geç/kaza/nafile/not); **iki zengin preview kartlı hub revizyonu**: `saygiPreviewCardHTML()` (günün öncüsü) + `faithCornerCardHTML()` (şehir + vakit pill barı) `saygiPreviewHubHTML()` içinde; **üçüncü pass**: "Günün öncüsü" kartına dokunulunca makale hazır olmasa bile tam ekran modal açılır (`ui.saygiPersonOpen` + `curOverlay`/`lastOverlay`), `saygiArticleBodyHTML()` hem sayfa hem modalde hero/biyografi/kaynaklar/"Okudum" butonu üretir, `saygiReadButtonHTML()`/`wireSaygiReadGate()` `-modal` suffix desteğiyle modal scroll alanında okuma güdümünü korur; Saygı kapalı kartı Wikipedia-bilgi-kartı stiliyle (büyük thumbnail, tür/dönem badge'leri, alan alt başlık, açıklama, kaynak/okuma süresi footer, dekoratif sağ arc); İman Köşesi kapalı kartı gerçek 6 vakit saatlerini 6 satırlık liste + ilerleme dot'ları + performed/cemaat/kaza/geç/streak alt rozetleriyle gösterir; **dördüncü pass (header visual refinement)**: `.sg-header-bar` görsel referansa göre iki katmanlı yapıldı — üstte "Şeyma 🦩" marka + "GÜNÜN ÖNCÜSÜ · X/100" kicker, altta trophy rozeti + büyük "İlham & İbadet" başlık + kişi adı/alan alt başlık + pill "Yenile" butonu; `.sg-mission-card` sekme açılışından kaldırıldı; alt navigasyon "İlham·İbadet" label + `saygiPending` altın badge; panelde "İman Köşesi" bento KPI kartı + gün-detay vakit satırı; `--faith` accent değişkenleri light/dark; yeni `.sg-person-preview-*`, `.sg-faith-preview-*`, `.sg-person-ov-*`, `.sg-header-bar-*` CSS aileleri; `.saygi-preview-hub` hub iskeleti; `.sey-app-booted` kapsamına yeni kart/modal/header elementleri eklendi; cache bump `20260730f` (2026-07-30). **Canlıya alındı.** |
 | AD | 🍏 iOS 27 Apple Design erişilebilirlik programı (AD-01 … AD-52) | 10 | ✅ | Kontrast, zoom, 44px hedefler, klavye, sistem teması, 11pt tabanı, Liquid Glass katmanları, rem tipografi ölçeği ve Panel-v2 reduced-motion kapsamı tamamlandı; final headless kapı geçti. Commit/push/deploy ayrı onay kapılarıdır (2026-08-24). |
 
-**Sayım:** ✅ 27 · 🟡 1 · ❌ 6 _(+ altyapı ✅)_
+**Sayım:** ✅ 27 · 🟡 2 · ❌ 6 _(+ altyapı ✅)_
 
 ---
 

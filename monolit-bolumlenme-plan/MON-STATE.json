@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "planningRevision": "2.1",
   "programId": "MONOLIT-BOLUMLENME",
-  "status": "in_progress",
-  "activePrompt": null,
-  "blockedPrompt": null,
+  "status": "blocked",
+  "activePrompt": "MON-56",
+  "blockedPrompt": "MON-56",
   "releaseApproval": "not_approved",
   "lastCompletedPrompt": "MON-55",
   "nextPrompt": "MON-56",
-  "currentWave": "10",
+  "currentWave": "11",
   "totalPrompts": 60,
   "completedPrompts": 55,
   "updatedAt": "2026-09-13",
   "lastCompletedEvidence": "MON-D11-LOAD-SIRASI-RAPORU.md: live index.html production prefix and driver/zikr FILES are exact-equal: 11 content + 29 cache-busted app/core scripts + app.js, 41 entries in each harness, driver/zikr equality PASS, harness-to-production prefix equality PASS, zero missing core cache-busts, sync.js final in production. No index/harness source delta was needed because MON-S3 parity was already present. Required node --check, driver, zikr, script-order audit, boundary and regression gates PASS; git diff --check PASS.",
-  "nextSafeAction": "MON-56 requires fresh explicit user approval. MON-55 is closed; preserve index/harness parity, app.js thin-shell placement, sync.js final order, content/reminder tags, inline SW, panel manifest and all separately gated release boundaries. releaseApproval=not_approved; no remote/deploy/data write.",
+  "nextSafeAction": "MON-56 is blocked: live duplicate executable bodies remain for SeymaHelpers.esc/icon/find in app/core/helpers.js and app.js. Do not proceed to MON-57. Resolve the single-owner decision with explicit user direction, then rerun the full MON-56 inventory and gates. releaseApproval=not_approved; no remote/deploy/data write.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -290,7 +290,7 @@
       "prompts": "MON-50..MON-54",
       "topic": "App yuzeyi ve boot",
       "approvalRequired": true,
-      "completed": 4,
+      "completed": 5,
       "total": 5
     },
     {
@@ -298,7 +298,7 @@
       "prompts": "MON-55..MON-57",
       "topic": "entegrasyon ve tam regression",
       "approvalRequired": true,
-      "completed": 0,
+      "completed": 1,
       "total": 3
     },
     {

@@ -9,12 +9,38 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-55 tamamlandı |
-| Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-55 / MON-56 (yeni açık onay gerekir) |
-| Dalga / ilerleme | Dalga 10 (5/5) / 55/60 |
+| Durum | `blocked` — MON-56 duplicate body nedeniyle bloke |
+| Aktif / bloke | MON-56 / MON-56 |
+| Son / sıradaki | MON-55 / MON-56 (tek sahiplik kararı olmadan ilerlenmez) |
+| Dalga / ilerleme | Dalga 11 (1/3) / 55/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-13 |
+
+## MON-56 preflight — delege ve eski gövde tamlık envanteri
+
+- Kanıt: [`MON-D11-DELEGE-ENVANTERI.md`](../deliverables/MON-D11-DELEGE-ENVANTERI.md).
+  Canlı 24 hedef registry, frozen reminder dörtlüsü, KORU FX/theme/sky
+  yüzeyleri, app.js shimleri, direct adapterler ve app-owned exceptionlar
+  envanterlendi. Registry assignment sayıları tekil; App shim collision sayısı
+  **0**; ancak `SeymaHelpers.esc`, `icon` ve `find` executable gövdeleri hem
+  `app/core/helpers.js:3/7/12` hem de `app.js:4593/22/4812` içinde yaşıyor.
+- Bu üç bulgu yalnız aynı isimli resolver değildir: iki ayrı saf helper
+  implementasyonudur. `app.js:11295 start` ise Qibla local helper olarak
+  lexical exception'dır ve duplicate sayılmamıştır; render/domain adapterleri
+  de katmanlı API exceptionı olarak belgelenmiştir.
+- Kaynak davranışı, app.js, index/FILES/cache-bust, sync.js, fixture veya
+  production verisi değiştirilmedi. Duplicate bulunduğu için kartın halt
+  protokolü uygulandı; otomatik cleanup/shimleştirme yapılmadı ve MON-57'ye
+  geçilmedi.
+- Kaynak değişmeden kritik kanıtlar: syntax tüm core/app/sync, modularization
+  **101/101**, state-rebind **37/37**, AppSurface **19/58/49/16/21**,
+  FX2 **14/12/7/14/7/12**, ÆON **24/24**, Faz10 **69/69**, driver PASS,
+  zikr **95/95**, premium suite PASS. Bunlar mevcut runtime parity'sini
+  gösterir; duplicate owner ihlalini kapatmaz.
+- `MON-STATE.json`: `status=blocked`, `activePrompt=MON-56`,
+  `blockedPrompt=MON-56`, `lastCompletedPrompt=MON-55`, `nextPrompt=MON-56`,
+  **55/60**; Dalga 10 geriye dönük **5/5**, Dalga 11 **1/3** olarak canlı
+  ilerlemeyle mutabıklandı. Kullanıcı yönü olmadan sonraki karta geçilmez.
 
 ## MON-53 kapanışı — timer, listener ve foreground köprüleri
 

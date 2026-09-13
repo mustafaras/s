@@ -9,12 +9,40 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-51 tamamlandı |
+| Durum | `in_progress` — MON-52 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-51 / MON-52 (yeni açık onay gerekir) |
-| Dalga / ilerleme | Dalga 10 (2/5) / 51/60 |
+| Son / sıradaki | MON-52 / MON-53 (yeni açık onay gerekir) |
+| Dalga / ilerleme | Dalga 10 (3/5) / 52/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
-| Güncellendi | 2026-09-12 |
+| Güncellendi | 2026-09-13 |
+
+## MON-52 kapanışı — overlay, arşiv, ayar ve mesaj handlerları
+
+- Kanıt: [`MON-52-OVERLAY-HANDLER-MANIFESTI.md`](../deliverables/MON-52-OVERLAY-HANDLER-MANIFESTI.md).
+  `SeymaAppSurface` 38 local UI shellini `SeymaLibrary` (19),
+  `SeymaSettings` (10) ve `SeymaMessaging`e (9) bağlar. app.js gerçek
+  closure handlerını bir kez kaydeder; aynı App adı/imzası/dönüş yolu
+  `overlayHandler(name, arguments)` shiminde korunur.
+- `SeymaMessaging` immutable/frozen public API'sine property eklenmez.
+  Dispatcher handler bindingini özel olarak tutar, her çağrıda owner
+  registry varlığını denetler; eksik/bilinmeyen veya ikinci kayıt fail-closed.
+  Böylece frozen API mutasyonsuz kalırken open/close, scroll/focus return ve
+  guarded FX akışı özgün app.js closure gövdesiyle yürür.
+- Profile consent/değerlendirme, native/browser permission, reminder delivery
+  ve settings schema; transport/ağ/send/upload/record; yıkıcı silme ve modal
+  engine ile data/ui rebind, save/render, DOM/focus sahipliği dışarıda ve
+  app.js'tedir. Yeni core dosyası veya FILES sırası yoktur; mevcut
+  appSurface/app cache-bust `20260912h`dir.
+- `test_app_surface_overlay_boundary` **49/49** frozen registry,
+  owner-map, fail-closed registration/dispatch, App ad-imza-dönüş ve hariç
+  yüzeyleri sentetik/no-network VM'de doğrular. Modal focus, ÆON expand,
+  settings/voice, app **50**, Quran **9**, panel **23**, Panel-v2 **27**,
+  driver/zikr ve tam regression kapıları ayrıca PASS'tir.
+  Browser/device, native permission, remote, push/merge/tag/deploy veya
+  `mustafaras/seyma-data` yazımı yoktur.
+- `MON-STATE.json`: `activePrompt=null`, `blockedPrompt=null`,
+  `lastCompletedPrompt=MON-52`, `nextPrompt=MON-53`, 52/60. MON-53 ancak yeni
+  açık kullanıcı onayıyla başlayabilir.
 
 ## MON-51 kapsam kararı — domain handler matrisi
 

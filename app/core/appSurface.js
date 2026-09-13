@@ -132,6 +132,26 @@
   }
   function domainHandler(name,args){ var registry=window[DOMAIN_HANDLER_REGISTRIES[name]],fn=registry&&registry[name]; if(typeof fn!=='function') throw new Error('SeymaAppSurface: domain handler çözümlenemedi '+name); return fn.apply(null,args||[]); }
 
+  // MON-52: overlay and settings shells only. Sensitive profile consent,
+  // notification permission, transport, upload/send and destructive actions
+  // intentionally have no entry here.
+  var OVERLAY_HANDLER_REGISTRIES={
+    openReading:'SeymaLibrary',closeReading:'SeymaLibrary',setReadingView:'SeymaLibrary',openWatching:'SeymaLibrary',closeWatching:'SeymaLibrary',setWatchView:'SeymaLibrary',openListening:'SeymaLibrary',closeListening:'SeymaLibrary',setListeningView:'SeymaLibrary',openLearning:'SeymaLibrary',closeLearning:'SeymaLibrary',openSoulActivity:'SeymaLibrary',closeSoulActivity:'SeymaLibrary',openSoulPracticePicker:'SeymaLibrary',closeSoulPracticePicker:'SeymaLibrary',pickSoulPractice:'SeymaLibrary',openSoulArchive:'SeymaLibrary',closeSoulArchive:'SeymaLibrary',setSoulArchiveFilter:'SeymaLibrary',
+    setTheme:'SeymaSettings',toggleTheme:'SeymaSettings',toggleHaptic:'SeymaSettings',setVoiceGuidance:'SeymaSettings',setVoiceLang:'SeymaSettings',setVoiceRate:'SeymaSettings',setVoiceCloudVoice:'SeymaSettings',setVoicePitch:'SeymaSettings',setVoiceVoiceName:'SeymaSettings',toggleSetting:'SeymaSettings',
+    toggleMsg:'SeymaMessaging',toggleAeonBubble:'SeymaMessaging',openMesaj:'SeymaMessaging',showAeonHistory:'SeymaMessaging',toggleAeonSearch:'SeymaMessaging',clearAeonSearch:'SeymaMessaging',filterAeonSearch:'SeymaMessaging',aeonOpenAttachSheet:'SeymaMessaging',aeonCloseAttachSheet:'SeymaMessaging'
+  };
+  var overlayHandlers=null;
+  function registerOverlayHandlers(handlers){
+    if(!handlers||typeof handlers!=='object'||Array.isArray(handlers)) return false;
+    if(overlayHandlers) return false;
+    var names=Object.keys(OVERLAY_HANDLER_REGISTRIES),i,name,registry;
+    for(i=0;i<names.length;i++){ name=names[i]; registry=window[OVERLAY_HANDLER_REGISTRIES[name]]; if(!registry||typeof handlers[name]!=='function') return false; }
+    overlayHandlers={};
+    for(i=0;i<names.length;i++){ name=names[i]; overlayHandlers[name]=handlers[name]; }
+    return true;
+  }
+  function overlayHandler(name,args){ var registry=window[OVERLAY_HANDLER_REGISTRIES[name]],fn=overlayHandlers&&overlayHandlers[name]; if(!registry||typeof fn!=='function') throw new Error('SeymaAppSurface: overlay handler çözümlenemedi '+name); return fn.apply(null,args||[]); }
+
   window.SeymaAppSurface={
     APP_SURFACE_DEPENDENCIES:APP_SURFACE_DEPENDENCIES.slice(),
     registerAppSurface:registerAppSurface,
@@ -142,6 +162,9 @@
     saveToday:saveToday,
     DOMAIN_HANDLER_REGISTRIES:DOMAIN_HANDLER_REGISTRIES,
     registerDomainHandlers:registerDomainHandlers,
-    domainHandler:domainHandler
+    domainHandler:domainHandler,
+    OVERLAY_HANDLER_REGISTRIES:OVERLAY_HANDLER_REGISTRIES,
+    registerOverlayHandlers:registerOverlayHandlers,
+    overlayHandler:overlayHandler
   };
 })();

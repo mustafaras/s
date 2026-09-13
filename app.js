@@ -12948,6 +12948,17 @@ App.openMesaj=function(){ markNotifsRead(); var ex=document.getElementById('sey-
 App.dismissPopup=function(){ var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; }); pend.forEach(function(n){ n.seen=true; }); if(pend.length) save(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); render(); };
 App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); };
 App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };
+// MON-52: approved non-sensitive overlay/settings/message UI shells. This is
+// intentionally installed after the messaging handlers are defined and before
+// the initial render; profile consent, permission, network/send/upload and
+// destructive actions remain app.js-owned.
+var MON52_OVERLAY_HANDLERS={
+  openReading:App.openReading,closeReading:App.closeReading,setReadingView:App.setReadingView,openWatching:App.openWatching,closeWatching:App.closeWatching,setWatchView:App.setWatchView,openListening:App.openListening,closeListening:App.closeListening,setListeningView:App.setListeningView,openLearning:App.openLearning,closeLearning:App.closeLearning,openSoulActivity:App.openSoulActivity,closeSoulActivity:App.closeSoulActivity,openSoulPracticePicker:App.openSoulPracticePicker,closeSoulPracticePicker:App.closeSoulPracticePicker,pickSoulPractice:App.pickSoulPractice,openSoulArchive:App.openSoulArchive,closeSoulArchive:App.closeSoulArchive,setSoulArchiveFilter:App.setSoulArchiveFilter,
+  setTheme:App.setTheme,toggleTheme:App.toggleTheme,toggleHaptic:App.toggleHaptic,setVoiceGuidance:App.setVoiceGuidance,setVoiceLang:App.setVoiceLang,setVoiceRate:App.setVoiceRate,setVoiceCloudVoice:App.setVoiceCloudVoice,setVoicePitch:App.setVoicePitch,setVoiceVoiceName:App.setVoiceVoiceName,toggleSetting:App.toggleSetting,
+  toggleMsg:App.toggleMsg,toggleAeonBubble:App.toggleAeonBubble,openMesaj:App.openMesaj,showAeonHistory:App.showAeonHistory,toggleAeonSearch:App.toggleAeonSearch,clearAeonSearch:App.clearAeonSearch,filterAeonSearch:App.filterAeonSearch,aeonOpenAttachSheet:App.aeonOpenAttachSheet,aeonCloseAttachSheet:App.aeonCloseAttachSheet
+};
+if(!SEYMA_APP_SURFACE||typeof SEYMA_APP_SURFACE.registerOverlayHandlers!=='function'||!SEYMA_APP_SURFACE.registerOverlayHandlers(MON52_OVERLAY_HANDLERS)) throw new Error('MON-52: overlay handler registry kurulamadı');
+Object.keys(MON52_OVERLAY_HANDLERS).forEach(function(name){ App[name]=function(){ return SEYMA_APP_SURFACE.overlayHandler(name,arguments); }; });
 
 // ── Magnezyum Danışmanı handlerları ──
 function timeHM(){ var d=new Date(); return pad(d.getHours())+':'+pad(d.getMinutes()); }

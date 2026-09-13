@@ -9,12 +9,40 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-52 tamamlandı |
+| Durum | `in_progress` — MON-53 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-52 / MON-53 (yeni açık onay gerekir) |
-| Dalga / ilerleme | Dalga 10 (3/5) / 52/60 |
+| Son / sıradaki | MON-53 / MON-54 (yeni açık onay gerekir) |
+| Dalga / ilerleme | Dalga 10 (4/5) / 53/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-13 |
+
+## MON-53 kapanışı — timer, listener ve foreground köprüleri
+
+- Kanıt: [`MON-53-TIMER-LISTENER-OWNERSHIP-MANIFESTI.md`](../deliverables/MON-53-TIMER-LISTENER-OWNERSHIP-MANIFESTI.md).
+  `SeymaAppSurface` lifecycle registry’si global session, polling, sync retry,
+  foreground, storage, ambience ve reminder timer callback gövdelerini cold-load
+  side effect olmadan taşır. `app.js` canlı dependency bag’ini ve tüm timer /
+  listener kayıtlarını sahibi olarak korur.
+- `click`, `input`, `keydown`, `scroll`, `beforeunload`, `pagehide`,
+  `visibilitychange`, `storage`, `focus`, `pageshow`, `online`, `offline`
+  listener türleri ve kayıt sırası; 1500 ms boot poll, 30 s ÆON/sağlık/Quran
+  poll, ayrı 30 s ambience, reminder interval, 60 s session heartbeat ve 5 dk
+  sync retry watchdog korunmuştur. Feature-local timer/sensor/media ve sync.js
+  listener yüzeyleri bu karta alınmamıştır.
+- `test_app_surface_lifecycle_boundary` **16/16** cold-load/no-op, fail-closed
+  registration, callback delegation, registration ownership and cache-bust
+  parity kanıtı verir. ÆON **24/24**; driver PASS; Faz10 **69/69**; zikr
+  **95/95**; state-rebind **37/37**; B1/B2/B3, modularization **101/101**,
+  app **51/51**, premium, Quran **9**, panel **23**, Panel-v2 **27** ve
+  reminder smoke **21** regression setleri PASS’tir.
+- `app.js` App function/all/unique **556/721/718**, canonical data assignment
+  **9/11**, timer/listener/removal **10/42/24/3** olarak kaldı. `index.html`
+  `appSurface.js` ve app.js cache-bust’i birlikte `20260913a` oldu; yeni core
+  dosyası veya FILES sırası değişmedi. Browser/device, native permission,
+  remote, push/merge/tag/deploy veya `mustafaras/seyma-data` yazımı yoktur.
+- `MON-STATE.json`: `activePrompt=null`, `blockedPrompt=null`,
+  `lastCompletedPrompt=MON-53`, `nextPrompt=MON-54`, **53/60**. MON-54 için
+  yeni açık kullanıcı yönü gerekir.
 
 ## MON-52 kapanışı — overlay, arşiv, ayar ve mesaj handlerları
 

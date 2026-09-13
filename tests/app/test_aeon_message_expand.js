@@ -322,7 +322,7 @@ var triggers=[
   ['applyReceipts → render()', /if\(changed\)\{ save\(\); render\(\); \}/],
   ['30 sn ÆON poll', /setInterval\(pollRemote,30000\)/],
   ['30 sn reminder lifecycle timer', /setInterval\(reminderLifecycleTick,REMINDER_LIFECYCLE_INTERVAL_MS\)/],
-  ['foreground (focus/pageshow/visibilitychange)', /window\.addEventListener\('focus',function\(\)\{ onAppForeground\('focus'\)/]
+  ['foreground (focus/pageshow/visibilitychange)', /window\.addEventListener\('focus',function\(\)\{(?: onAppForeground\('focus'\);| return SEYMA_APP_SURFACE\.onWindowFocus\.apply\(null,arguments\);)/]
 ];
 var found=triggers.filter(function(t){ return t[1].test(appSrc); });
 assert('11. arka plan tam-render tetikleyicileri hâlâ mevcut (kapanma penceresi gerçek)',

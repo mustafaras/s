@@ -152,6 +152,174 @@
   }
   function overlayHandler(name,args){ var registry=window[OVERLAY_HANDLER_REGISTRIES[name]],fn=overlayHandlers&&overlayHandlers[name]; if(!registry||typeof fn!=='function') throw new Error('SeymaAppSurface: overlay handler çözümlenemedi '+name); return fn.apply(null,args||[]); }
 
+  // MON-53: global timer/listener/foreground bridges. Registration remains in
+  // app.js; this registry owns only callback bodies and resolves app state at
+  // callback time. Nothing below runs while this file is loading.
+  var lifecycleDeps=null;
+  var LIFECYCLE_DEPENDENCIES=[
+    'data','ui','document','sync','audio','nowMs','todayStr','getDay','diffDays',
+    'currentActiveSeconds','flushFieldTimers','updateLiveSession','save','render',
+    'maybeAutoExitEdit','startLocationWatch','tryLocNudge','moveState',
+    'fetchObserverInbox','fetchHealthSync','maybeFetchDailyPhoto','syncHeaderScene',
+    'quranHasRemoteRequest','app','reminderSchedulerDispatch','reminderSystemOffline',
+    'mergeReminderLocalState','migrateReminderState','storageKey','reminderDeliveryKey',
+    'getSessionState','setSessionState','getEditHiddenAt','setEditHiddenAt'
+  ];
+  var lifecycleState={lastSyncRetryWatchdogAt:0,quranLastForegroundPullAt:0};
+
+  function registerLifecycleCallbacks(deps){
+    if(lifecycleDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
+    for(var i=0;i<LIFECYCLE_DEPENDENCIES.length;i++){
+      if(typeof deps[LIFECYCLE_DEPENDENCIES[i]]!=='function') return false;
+    }
+    lifecycleDeps=deps;
+    return true;
+  }
+  function lifecycleDep(name){ return lifecycleDeps&&typeof lifecycleDeps[name]==='function'?lifecycleDeps[name]:null; }
+  function lifecycleCall(name,args){ var fn=lifecycleDep(name); if(!fn) throw new Error('SeymaAppSurface: çözümlenemeyen lifecycle bağımlılığı '+name); return fn.apply(null,args||[]); }
+
+  function onUserActivity(){
+    var session=lifecycleCall('getSessionState');
+    if(session) session.lastActivity=lifecycleCall('nowMs');
+  }
+  function sessionHeartbeat(){
+    var session=lifecycleCall('getSessionState'), now=lifecycleCall('nowMs');
+    if(!session) return;
+    var inactiveSince=now-session.lastActivity;
+    if(inactiveSince>300000) session.idleMs=Math.max(session.idleMs,inactiveSince-300000);
+    var ui=lifecycleCall('ui');
+    if(ui.editDate&&inactiveSince>300000) lifecycleCall('maybeAutoExitEdit',['5 dk hareketsizlik — bugüne döndük']);
+    lifecycleCall('updateLiveSession');
+  }
+  function finalizeSession(){
+    lifecycleCall('flushFieldTimers');
+    var audio=lifecycleCall('audio'), ambient=audio&&audio.ambient;
+    if(ambient&&typeof ambient.stop==='function') ambient.stop();
+    var data=lifecycleCall('data'), session=lifecycleCall('getSessionState');
+    if(!data||!session||session.closed) return;
+    var today=lifecycleCall('todayStr');
+    var rec=lifecycleCall('getDay',[data,today,lifecycleCall('diffDays',[data.startDate,today])]);
+    if(!Array.isArray(rec.sessions)) rec.sessions=[];
+    rec.sessions.push({start:session.start,end:lifecycleCall('nowMs'),activeSeconds:lifecycleCall('currentActiveSeconds')});
+    delete rec.liveSession;
+    session.closed=true;
+    lifecycleCall('save');
+  }
+  function resetSession(){
+    lifecycleCall('setSessionState',[{start:lifecycleCall('nowMs'),lastActivity:lifecycleCall('nowMs'),idleMs:0,closed:false}]);
+    lifecycleCall('updateLiveSession');
+  }
+  function onSessionVisibilityChange(){
+    var doc=lifecycleCall('document'), ui=lifecycleCall('ui');
+    if(doc.hidden){
+      finalizeSession();
+      if(ui.editDate) lifecycleCall('setEditHiddenAt',[lifecycleCall('nowMs')]);
+      return;
+    }
+    resetSession();
+    var hiddenAt=lifecycleCall('getEditHiddenAt'), now=lifecycleCall('nowMs');
+    if(ui.editDate&&hiddenAt&&(now-hiddenAt)>120000) lifecycleCall('maybeAutoExitEdit',['Bir süre uzaktaydın — bugüne döndük']);
+    lifecycleCall('setEditHiddenAt',[0]);
+    var data=lifecycleCall('data'), moveState=lifecycleCall('moveState');
+    if(data&&data.settings&&data.settings.locationEnabled&&moveState.watchId==null) lifecycleCall('startLocationWatch',[false]);
+    lifecycleCall('tryLocNudge',['return']);
+  }
+  function maybeRetrySync(){
+    try{
+      var data=lifecycleCall('data'), sync=lifecycleCall('sync');
+      if(!data||!data.syncReceipt||!data.syncReceipt.lastErrorCode) return;
+      if(!sync||typeof sync.retryIfPending!=='function') return;
+      var now=lifecycleCall('nowMs');
+      if(now-lifecycleState.lastSyncRetryWatchdogAt<300000) return;
+      lifecycleState.lastSyncRetryWatchdogAt=now;
+      sync.retryIfPending();
+    }catch(e){}
+  }
+  function maybePullQuranForeground(force){
+    var data=lifecycleCall('data');
+    if(!data||!lifecycleCall('quranHasRemoteRequest')) return;
+    try{ if(lifecycleCall('document').hidden&&!force) return; }catch(e){}
+    var now=lifecycleCall('nowMs');
+    if(!force&&now-lifecycleState.quranLastForegroundPullAt<25000) return;
+    lifecycleState.quranLastForegroundPullAt=now;
+    var app=lifecycleCall('app');
+    if(app&&typeof app.refreshQuranUpdates==='function') app.refreshQuranUpdates(true,!!force);
+  }
+  function pollRemote(skipQuran){
+    lifecycleCall('fetchObserverInbox');
+    lifecycleCall('fetchHealthSync');
+    maybeRetrySync();
+    if(!skipQuran) maybePullQuranForeground(false);
+  }
+  function maybeVoiceGreeting(){
+    try{
+      var data=lifecycleCall('data');
+      if(!data||!data.settings) return;
+      var audio=lifecycleCall('audio');
+      if(audio&&typeof audio.isQuietTime==='function'&&audio.isQuietTime()) return;
+      var s=data.settings, now=lifecycleCall('nowMs'), today=lifecycleCall('todayStr');
+      if(s.voiceGreetingDate!==today){ s.voiceGreetingDate=today; s.voiceGreetingCount=0; }
+      if(s.voiceGreetingCount>=2) return;
+      var last=Date.parse(s.lastVoiceGreetingAt||'')||0;
+      if(last&&(now-last)<4*60*60*1000) return;
+      s.lastVoiceGreetingAt=new Date().toISOString();
+      s.voiceGreetingCount=(s.voiceGreetingCount||0)+1;
+      if(audio&&typeof audio.greeting==='function') audio.greeting();
+      lifecycleCall('save',[false]);
+    }catch(e){}
+  }
+  function onAppForeground(source){
+    var trigger=source||'foreground';
+    var lifecycle=lifecycleCall('reminderSchedulerDispatch',[trigger,{offline:lifecycleCall('reminderSystemOffline')}]);
+    if(lifecycle&&lifecycle.status==='coalesced') return lifecycle;
+    var data=lifecycleCall('data');
+    if(data){
+      data.lastOpenedDate=lifecycleCall('todayStr');
+      data.lastOpenedAt=new Date().toISOString();
+      lifecycleCall('save',[false]);
+    }
+    pollRemote(true);
+    maybePullQuranForeground(true);
+    lifecycleCall('maybeFetchDailyPhoto');
+    maybeVoiceGreeting();
+    return lifecycle;
+  }
+  function reconcileReminderStorageEvent(event){
+    var e=event&&typeof event==='object'?event:{};
+    if(e.key===lifecycleCall('reminderDeliveryKey')){ if(lifecycleCall('ui').reminderCenterOpen) lifecycleCall('render'); return; }
+    var data=lifecycleCall('data');
+    if(e.key!==lifecycleCall('storageKey')||!e.newValue||!data) return;
+    try{
+      var incoming=JSON.parse(e.newValue), before=JSON.stringify(data.reminders), incomingRoot=incoming&&incoming.reminders;
+      if(!incomingRoot) return;
+      data.reminders=lifecycleCall('mergeReminderLocalState',[data.reminders,incomingRoot,data.savedAt,incoming.savedAt]);
+      lifecycleCall('migrateReminderState',[data]);
+      if(before!==JSON.stringify(data.reminders)&&lifecycleCall('ui').reminderCenterOpen) lifecycleCall('render');
+    }catch(error){}
+  }
+  function onDocumentVisibilityChange(){
+    if(lifecycleCall('document').hidden) lifecycleCall('reminderSchedulerDispatch',['hidden']);
+    else onAppForeground('visibilitychange');
+  }
+  function onWindowFocus(){ return onAppForeground('focus'); }
+  function onWindowPageshow(){ return onAppForeground('pageshow'); }
+  function onWindowOnline(){
+    var lifecycle=lifecycleCall('reminderSchedulerDispatch',['online',{online:true,offline:false}]);
+    if(lifecycle&&lifecycle.status==='coalesced') return lifecycle;
+    pollRemote(true);
+    maybePullQuranForeground(true);
+    if(lifecycleCall('ui').reminderCenterOpen) lifecycleCall('render');
+  }
+  function onWindowOffline(){
+    var lifecycle=lifecycleCall('reminderSchedulerDispatch',['offline',{online:false,offline:true}]);
+    if(lifecycle&&lifecycle.status==='coalesced') return lifecycle;
+    if(lifecycleCall('ui').reminderCenterOpen) lifecycleCall('render');
+  }
+  function ambienceRefresh(){
+    try{ if(!lifecycleCall('document').hidden) lifecycleCall('syncHeaderScene'); }catch(e){}
+  }
+  function reminderLifecycleTimer(){ return lifecycleCall('reminderSchedulerDispatch',['timer']); }
+
   window.SeymaAppSurface={
     APP_SURFACE_DEPENDENCIES:APP_SURFACE_DEPENDENCIES.slice(),
     registerAppSurface:registerAppSurface,
@@ -165,6 +333,26 @@
     domainHandler:domainHandler,
     OVERLAY_HANDLER_REGISTRIES:OVERLAY_HANDLER_REGISTRIES,
     registerOverlayHandlers:registerOverlayHandlers,
-    overlayHandler:overlayHandler
+    overlayHandler:overlayHandler,
+    LIFECYCLE_DEPENDENCIES:LIFECYCLE_DEPENDENCIES.slice(),
+    registerLifecycleCallbacks:registerLifecycleCallbacks,
+    onUserActivity:onUserActivity,
+    sessionHeartbeat:sessionHeartbeat,
+    finalizeSession:finalizeSession,
+    resetSession:resetSession,
+    onSessionVisibilityChange:onSessionVisibilityChange,
+    maybeRetrySync:maybeRetrySync,
+    maybePullQuranForeground:maybePullQuranForeground,
+    pollRemote:pollRemote,
+    maybeVoiceGreeting:maybeVoiceGreeting,
+    onAppForeground:onAppForeground,
+    reconcileReminderStorageEvent:reconcileReminderStorageEvent,
+    onDocumentVisibilityChange:onDocumentVisibilityChange,
+    onWindowFocus:onWindowFocus,
+    onWindowPageshow:onWindowPageshow,
+    onWindowOnline:onWindowOnline,
+    onWindowOffline:onWindowOffline,
+    ambienceRefresh:ambienceRefresh,
+    reminderLifecycleTimer:reminderLifecycleTimer
   };
 })();

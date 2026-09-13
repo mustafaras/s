@@ -17,6 +17,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   bilgisi yalnızca DOM’da tutuluyordu; her arka plan render’ı (30 sn ÆON yoklaması,
   reminder timer’ı, foreground dönüşü, yeni mesaj, panel makbuzu) mesajı kullanıcı
   okurken kapatıyordu. Ağsız, sentetik, `node:vm` tabanlı.
+- `app/test_app_surface_lifecycle_boundary.js` — MON-53 `SeymaAppSurface`
+  timer/listener/foreground callback registry’sinin cold-load no-op, fail-closed
+  kayıt, timer/listener sahipliği ve cache-bust paritesini ağsız sentetik VM’de
+  doğrular.
 - `app/test_messaging_boundary.js` — MON-42 `SeymaMessaging` registry’sinin
   salt-okur chronology/render/attachment sınırını ve source notification dedupe
   sözleşmesini sentetik resolver bag’iyle doğrular.

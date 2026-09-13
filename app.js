@@ -4354,7 +4354,7 @@ function reminderSchedulerEnsure(){
 }
 function reminderSchedulerDispatch(source,input){ return reminderSchedulerEnsure().trigger(source,input); }
 function reminderSchedulerSnapshot(){ return reminderSchedulerEnsure().snapshot(); }
-function reminderLifecycleTick(){ return reminderSchedulerDispatch('timer'); }
+function reminderLifecycleTick(){ return SEYMA_APP_SURFACE.reminderLifecycleTimer.apply(null,arguments); }
 // MON-19: prayer registry, app.js'in canlı state/date/save resolver bag'i ile
 // bağlanır. Registry gövdeleri kendi başına load-time fetch/GPS/localStorage
 // çağrısı yapmaz; dış yan etkiler yalnız kullanıcı eyleminin çağrı yolunda açılır.
@@ -11710,6 +11710,7 @@ try{ setTimeout(function(){ tryLocNudge('boot'); }, LOC_NUDGE.dwellMs); }catch(e
 
 // Session tracking
 var sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,closed:false};
+var editHiddenAt=0;
 function nowMs(){ return Date.now(); }
 function currentActiveSeconds(ts){
   var now=ts||nowMs();
@@ -11727,50 +11728,56 @@ function updateLiveSession(){
   // root savedAt/sourceUpdatedAt yalnızca içerik değişimini temsil eder.
   save(false);
 }
-function finalizeSession(){
-  flushFieldTimers();
-  // FX-P-53: sekme kapanırken/gizlenirken ambiyans sesini durdur (arka planda
-  // ses çalmasın). `ambient.stop()` güvenli no-op'tur; motor yoksa sessizce geçer.
-  var amb=window.SeyAudio&&window.SeyAudio.ambient;
-  if(amb&&typeof amb.stop==='function') amb.stop();
-  if(!data || sessionState.closed) return;
-  var today=todayStr();
-  var rec=getDay(data,today,diffDays(data.startDate,today));
-  if(!Array.isArray(rec.sessions)) rec.sessions=[];
-  rec.sessions.push({start:sessionState.start,end:nowMs(),activeSeconds:currentActiveSeconds()});
-  delete rec.liveSession;
-  sessionState.closed=true;
-  save();
-}
-function resetSession(){
-  sessionState={start:nowMs(),lastActivity:nowMs(),idleMs:0,closed:false};
-  updateLiveSession();
-}
-function onUserActivity(){ sessionState.lastActivity=nowMs(); }
+function finalizeSession(){ return SEYMA_APP_SURFACE.finalizeSession.apply(null,arguments); }
+function resetSession(){ return SEYMA_APP_SURFACE.resetSession.apply(null,arguments); }
+function onUserActivity(){ return SEYMA_APP_SURFACE.onUserActivity.apply(null,arguments); }
+function sessionHeartbeat(){ return SEYMA_APP_SURFACE.sessionHeartbeat.apply(null,arguments); }
+function onSessionVisibilityChange(){ return SEYMA_APP_SURFACE.onSessionVisibilityChange.apply(null,arguments); }
+var MON53_LIFECYCLE_DEPS={
+  data:function(){ return data; },
+  ui:function(){ return ui; },
+  document:function(){ return document; },
+  sync:function(){ return window.SeySync; },
+  audio:function(){ return window.SeyAudio; },
+  nowMs:nowMs,
+  todayStr:todayStr,
+  getDay:getDay,
+  diffDays:diffDays,
+  currentActiveSeconds:currentActiveSeconds,
+  flushFieldTimers:flushFieldTimers,
+  updateLiveSession:updateLiveSession,
+  save:save,
+  render:render,
+  maybeAutoExitEdit:function(message){ return App.maybeAutoExitEdit(message); },
+  startLocationWatch:startLocationWatch,
+  tryLocNudge:tryLocNudge,
+  moveState:function(){ return moveState; },
+  fetchObserverInbox:fetchObserverInbox,
+  fetchHealthSync:fetchHealthSync,
+  maybeFetchDailyPhoto:maybeFetchDailyPhoto,
+  syncHeaderScene:syncHeaderScene,
+  quranHasRemoteRequest:quranHasRemoteRequest,
+  app:function(){ return App; },
+  reminderSchedulerDispatch:reminderSchedulerDispatch,
+  reminderSystemOffline:reminderSystemOffline,
+  mergeReminderLocalState:mergeReminderLocalState,
+  migrateReminderState:migrateReminderState,
+  storageKey:function(){ return KEY; },
+  reminderDeliveryKey:function(){ return REMINDER_DELIVERY_KEY; },
+  getSessionState:function(){ return sessionState; },
+  setSessionState:function(value){ sessionState=value; },
+  getEditHiddenAt:function(){ return editHiddenAt; },
+  setEditHiddenAt:function(value){ editHiddenAt=value; }
+};
+if(!SEYMA_APP_SURFACE||typeof SEYMA_APP_SURFACE.registerLifecycleCallbacks!=='function'||!SEYMA_APP_SURFACE.registerLifecycleCallbacks(MON53_LIFECYCLE_DEPS)) throw new Error('MON-53: lifecycle registry kurulamadı');
 document.addEventListener('click',onUserActivity,true);
 document.addEventListener('input',onUserActivity,true);
 document.addEventListener('keydown',onUserActivity,true);
 document.addEventListener('scroll',onUserActivity,true);
-setInterval(function(){
-  var now=nowMs();
-  var inactiveSince=now-sessionState.lastActivity;
-  if(inactiveSince>300000) sessionState.idleMs=Math.max(sessionState.idleMs,inactiveSince-300000);
-  if(ui.editDate && inactiveSince>300000) App.maybeAutoExitEdit('5 dk hareketsizlik — bugüne döndük');
-  updateLiveSession();
-},60000);
+setInterval(sessionHeartbeat,60000);
 window.addEventListener('beforeunload',finalizeSession);
 window.addEventListener('pagehide',finalizeSession);
-var editHiddenAt=0;
-window.addEventListener('visibilitychange',function(){
-  if(document.hidden){ finalizeSession(); if(ui.editDate) editHiddenAt=nowMs(); }
-  else {
-    resetSession();
-    if(ui.editDate && editHiddenAt && (nowMs()-editHiddenAt)>120000) App.maybeAutoExitEdit('Bir süre uzaktaydın — bugüne döndük');
-    editHiddenAt=0;
-    if(data&&data.settings&&data.settings.locationEnabled&&moveState.watchId==null) startLocationWatch(false);
-    tryLocNudge('return');
-  }
-});
+window.addEventListener('visibilitychange',onSessionVisibilityChange);
 updateLiveSession();
 
 // ---------- observer mesajları / bildirimler ----------
@@ -11944,25 +11951,10 @@ function fetchHealthSync(){
     })
     .catch(function(){});
 }
-// Sekme hiç arka plana alınmadan sürekli açık kalırsa visibilitychange/focus/
-// pageshow hiç tetiklenmez, dolayısıyla onAppForeground()'daki doğal retry de
-// devreye girmez. pollRemote zaten 30 sn'de bir çalıştığı için burada da
-// (throttle'lı) bir push-retry denemesi eklemek, hatanın sekme açık kaldığı
-// sürece süresiz asılı kalmasını önler. Guard 1/2 (dev-origin, anti-clobber)
-// retryIfPending'in çağırdığı doPush() içinde zaten korunuyor.
-var lastSyncRetryWatchdogAt=0;
-var SYNC_RETRY_WATCHDOG_MS=300000;
-function maybeRetrySync(){
-  try{
-    if(!data||!data.syncReceipt||!data.syncReceipt.lastErrorCode) return;
-    if(!window.SeySync||typeof window.SeySync.retryIfPending!=='function') return;
-    var now=Date.now();
-    if(now-lastSyncRetryWatchdogAt<SYNC_RETRY_WATCHDOG_MS) return;
-    lastSyncRetryWatchdogAt=now;
-    window.SeySync.retryIfPending();
-  }catch(e){}
-}
-function pollRemote(skipQuran){ fetchObserverInbox(); fetchHealthSync(); maybeRetrySync(); if(!skipQuran) maybePullQuranForeground(false); }
+// MON-53: global polling callback bodies are in SeymaAppSurface. The named
+// shims remain in app.js so existing timer/listener registration stays here.
+function maybeRetrySync(){ return SEYMA_APP_SURFACE.maybeRetrySync.apply(null,arguments); }
+function pollRemote(skipQuran){ return SEYMA_APP_SURFACE.pollRemote.apply(null,arguments); }
 function mergeInbox(msgs){
   if(!data) return;
   if(!Array.isArray(data.notifications)) data.notifications=[];
@@ -13124,15 +13116,7 @@ App.submitAuth=function(){
 App.toggleRememberAuth=function(){ ui.authRemember=!ui.authRemember; render(); };
 App.dismissAuthError=function(){ ui.authError=false; ui.authErrorMsg=''; render(); };
 
-var quranLastForegroundPullAt=0;
-function maybePullQuranForeground(force){
-  if(!data||!quranHasRemoteRequest()) return;
-  try{ if(document.hidden&&!force) return; }catch(e){}
-  var now=Date.now();
-  if(!force&&now-quranLastForegroundPullAt<25000) return;
-  quranLastForegroundPullAt=now;
-  App.refreshQuranUpdates(true,!!force);
-}
+function maybePullQuranForeground(force){ return SEYMA_APP_SURFACE.maybePullQuranForeground.apply(null,arguments); }
 var appPollInitialTimerId=setTimeout(pollRemote,1500);
 var appPollTimerId=setInterval(pollRemote,30000); // ÆON + sağlık + Kur’an teslimleri; reminder timer'ından ayrı
 // TAM-DENETIM B-05: canlı zemin "canlılığı". pollRemote()'un render()'ı
@@ -13141,64 +13125,21 @@ var appPollTimerId=setInterval(pollRemote,30000); // ÆON + sağlık + Kur’an 
 // görmüyordu. Bu timer tam render() yapmaz; sadece #root sınıflarını ve header
 // vakit etiketini yamalar (taslak metin, scroll ve odak korunur).
 // NOT: timeTheme.js'e setInterval EKLENMEZ (değişmez: orada 0 kalmalı).
-var ambienceRefreshTimerId=setInterval(function(){
-  try{ if(!document.hidden) syncHeaderScene(); }catch(e){}
-},30000);
+function ambienceRefresh(){ return SEYMA_APP_SURFACE.ambienceRefresh.apply(null,arguments); }
+var ambienceRefreshTimerId=setInterval(ambienceRefresh,30000);
 var reminderLifecycleTimerId=setInterval(reminderLifecycleTick,REMINDER_LIFECYCLE_INTERVAL_MS); // yalnız yerel reminder checkpoint'i; ağ polling'i değişmez
 // FX-P-56: zaman dilimi selamlaması — boot ve foreground dönüşünde; günde en
 // fazla 2 kez ve son selamlamadan 4 saat geçmediyse tekrar çalmaz (throttle
 // damgaları settings.* altında: lastVoiceGreetingAt/voiceGreetingDate/Count).
-function maybeVoiceGreeting(){
-  try{
-    if(!data || !data.settings) return;
-    if(window.SeyAudio && typeof window.SeyAudio.isQuietTime==='function' && window.SeyAudio.isQuietTime()) return;
-    var s=data.settings, now=Date.now(), today=todayStr();
-    if(s.voiceGreetingDate!==today){ s.voiceGreetingDate=today; s.voiceGreetingCount=0; }
-    if(s.voiceGreetingCount>=2) return;
-    var last=Date.parse(s.lastVoiceGreetingAt||'')||0;
-    if(last && (now-last)<4*60*60*1000) return;
-    s.lastVoiceGreetingAt=new Date().toISOString();
-    s.voiceGreetingCount=(s.voiceGreetingCount||0)+1;
-    if(window.SeyAudio && typeof window.SeyAudio.greeting==='function') window.SeyAudio.greeting();
-    save(false);
-  }catch(e){}
-}
-function onAppForeground(source){
-  // iOS PWA / tarayıcı: arka plandan dönüşte soğuk açılış sayılmaz;
-  // yine de panelde "Son açılış" ve "Canlı takip" hemen güncellensin.
-  var trigger=source||'foreground', lifecycle=reminderSchedulerDispatch(trigger,{offline:reminderSystemOffline()});
-  // Aynı focus/pageshow/visible burst'ü tek reminder evaluation ve tek ağ
-  // yan-akışına iner; ayrı timer'lar birbirini iptal etmez.
-  if(lifecycle&&lifecycle.status==='coalesced') return lifecycle;
-  if(data){
-    data.lastOpenedDate=todayStr();
-    data.lastOpenedAt=new Date().toISOString();
-    save(false);
-  }
-  pollRemote(true);
-  maybePullQuranForeground(true);
-  maybeFetchDailyPhoto();
-  maybeVoiceGreeting(); // FX-P-56
-  return lifecycle;
-}
-function reconcileReminderStorageEvent(event){
-  var e=event&&typeof event==='object'?event:{};
-  if(e.key===REMINDER_DELIVERY_KEY){ if(ui.reminderCenterOpen) render(); return; }
-  if(e.key!==KEY||!e.newValue||!data) return;
-  try{
-    var incoming=JSON.parse(e.newValue), before=JSON.stringify(data.reminders), incomingRoot=incoming&&incoming.reminders;
-    if(!incomingRoot) return;
-    data.reminders=mergeReminderLocalState(data.reminders,incomingRoot,data.savedAt,incoming.savedAt);
-    migrateReminderState(data);
-    if(before!==JSON.stringify(data.reminders)&&ui.reminderCenterOpen) render();
-  }catch(error){}
-}
+function maybeVoiceGreeting(){ return SEYMA_APP_SURFACE.maybeVoiceGreeting.apply(null,arguments); }
+function onAppForeground(source){ return SEYMA_APP_SURFACE.onAppForeground.apply(null,arguments); }
+function reconcileReminderStorageEvent(event){ return SEYMA_APP_SURFACE.reconcileReminderStorageEvent.apply(null,arguments); }
 window.addEventListener('storage',reconcileReminderStorageEvent);
-document.addEventListener('visibilitychange',function(){ if(document.hidden){ reminderSchedulerDispatch('hidden'); } else { onAppForeground('visibilitychange'); } });
-window.addEventListener('focus',function(){ onAppForeground('focus'); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
-window.addEventListener('pageshow',function(){ onAppForeground('pageshow'); }); // bfcache'ten geri dönüşte
-window.addEventListener('online',function(){ var lifecycle=reminderSchedulerDispatch('online',{online:true,offline:false}); if(lifecycle&&lifecycle.status==='coalesced') return; pollRemote(true); maybePullQuranForeground(true); if(ui.reminderCenterOpen) render(); });   // bağlantı gelince bounded recovery kontrolü
-window.addEventListener('offline',function(){ var lifecycle=reminderSchedulerDispatch('offline',{online:false,offline:true}); if(lifecycle&&lifecycle.status==='coalesced') return; if(ui.reminderCenterOpen) render(); });
+document.addEventListener('visibilitychange',function(){ return SEYMA_APP_SURFACE.onDocumentVisibilityChange.apply(null,arguments); });
+window.addEventListener('focus',function(){ return SEYMA_APP_SURFACE.onWindowFocus.apply(null,arguments); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
+window.addEventListener('pageshow',function(){ return SEYMA_APP_SURFACE.onWindowPageshow.apply(null,arguments); }); // bfcache'ten geri dönüşte
+window.addEventListener('online',function(){ return SEYMA_APP_SURFACE.onWindowOnline.apply(null,arguments); });   // bağlantı gelince bounded recovery kontrolü
+window.addEventListener('offline',function(){ return SEYMA_APP_SURFACE.onWindowOffline.apply(null,arguments); });
 
 render();
 try{ if(window.SeyTouch && typeof window.SeyTouch.install==='function') window.SeyTouch.install(document.getElementById('root')); }catch(e){}

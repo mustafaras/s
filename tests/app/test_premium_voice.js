@@ -283,10 +283,11 @@ console.log('\n[10] ambiyans motoru gating');
 console.log('\n[11] app.js sesli çağrı noktaları (statik)');
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  var appSurfaceSrc = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
   ok('onboarding sesli karşılama çağrısı var (FX-P-52)', appSrc.indexOf("voice('Sevgili Günışığı, hoş geldin") >= 0);
   ok('streak sesli tebrik çağrısı var (FX-P-52)', appSrc.indexOf("voice('Harikasın! Serin büyüyor") >= 0);
   ok('zikir tamamlama sesli ipucu çağrısı var (FX-P-52)', appSrc.indexOf("voice('Allah kabul etsin") >= 0);
-  ok('greeting boot çağrısı var (FX-P-56)', appSrc.indexOf('SeyAudio.greeting') >= 0);
+  ok('greeting boot çağrısı var (FX-P-56)', appSrc.indexOf('SeyAudio.greeting') >= 0 || /typeof audio\.greeting/.test(appSurfaceSrc));
   ok('guides çağrı noktaları var (FX-P-55)', appSrc.indexOf('SeyAudio.guides') >= 0);
   ok('voice settings damgaları migrate backfill ediliyor', appSrc.indexOf('voiceOnboardedAt') >= 0 && appSrc.indexOf('lastVoiceGreetingAt') >= 0);
   ok('voice ayarları handler\'ları var (FX-P-57)', appSrc.indexOf('App.setVoiceLang') >= 0 && appSrc.indexOf('App.setVoiceRate') >= 0);

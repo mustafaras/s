@@ -6,14 +6,14 @@
   "activePrompt": null,
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON-52",
-  "nextPrompt": "MON-53",
+  "lastCompletedPrompt": "MON-53",
+  "nextPrompt": "MON-54",
   "currentWave": "10",
   "totalPrompts": 60,
-  "completedPrompts": 52,
+  "completedPrompts": 53,
   "updatedAt": "2026-09-13",
-  "lastCompletedEvidence": "MON-52-OVERLAY-HANDLER-MANIFESTI.md: SeymaAppSurface 38 approved library/settings/messaging overlay App handler shellini immutable owner registrylere mutasyonsuz tekil dispatch ile bağladı; profile consent, permission, transport/send/upload, destructive actions, data/ui, save/render ve DOM/focus sahipliği korundu. MON-52 boundary 49/49; full app, Quran, panel, Panel-v2, reminder, driver/zikr, B1/B2/B3, modularization, state-rebind ve Faz10 regression PASS.",
-  "nextSafeAction": "MON-53 requires fresh explicit user approval. Its only scope is timer/listener and foreground App-surface bridges; preserve registration/teardown order, no-network VM behavior, sync retry, browser listener types, data ownership and all separately gated release boundaries. releaseApproval=not_approved; no remote/deploy/data write.",
+  "lastCompletedEvidence": "MON-53-TIMER-LISTENER-OWNERSHIP-MANIFESTI.md: SeymaAppSurface lifecycle registry callback bodies and app.js-owned timer/listener registration preserve registration order, 10 setInterval/42 setTimeout/24 listener/3 removal counts, no-network cold load and foreground retry semantics. MON-53 boundary 16/16; app 51 files, driver, zikr 95/95, Faz10 69/69, state-rebind 37/37, B1/B2/B3, modularization 101/101, premium, Quran 9, panel 23, Panel-v2 27 and reminder 21 fixture regression PASS.",
+  "nextSafeAction": "MON-54 requires fresh explicit user approval. Its only scope is appSurface boot/window.App/late-boot bridges; preserve App expose order, B1 getters, data assignment sites, sync callbacks, render contract and all separately gated release boundaries. releaseApproval=not_approved; no remote/deploy/data write.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -242,7 +242,7 @@
       "prompts": "MON-16..MON-18",
       "topic": "syncGlue",
       "approvalRequired": true,
-      "completed": 3,
+      "completed": 4,
       "total": 3
     },
     {
@@ -274,7 +274,7 @@
       "prompts": "MON-40..MON-43",
       "topic": "reminder ve mesajlasma",
       "approvalRequired": true,
-      "completed": 4,
+      "completed": 3,
       "total": 4
     },
     {
@@ -290,7 +290,7 @@
       "prompts": "MON-50..MON-54",
       "topic": "App yuzeyi ve boot",
       "approvalRequired": true,
-      "completed": 3,
+      "completed": 4,
       "total": 5
     },
     {
@@ -313,6 +313,7 @@
   "verificationGate": [
     "node --check app.js && node --check sync.js && node --check app/core/render.js && node --check app/core/appSurface.js && node --check app/core/profile.js && node --check app/core/settings.js && node --check app/core/report.js && node --check app/core/map.js && node --check app/core/prayer.js && node --check app/core/zikir.js && node --check app/core/quran.js && node --check app/core/saygi.js && node --check app/core/motivation.js && node --check app/core/crisis.js && node --check app/core/journal.js && node --check app/core/reminders.js && node --check app/core/state.js && node --check app/core/syncGlue.js",
     "node tests/app/test_app_surface_daily_boundary.js",
+    "node tests/app/test_app_surface_lifecycle_boundary.js",
     "node tests/app/test_profile_boundary.js",
     "node tests/app/test_settings_boundary.js",
     "node .claude/skills/run-seyma/verify-state-helper-boundary.mjs",

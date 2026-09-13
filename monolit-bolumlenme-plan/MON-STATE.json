@@ -6,14 +6,14 @@
   "activePrompt": null,
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON-58",
-  "nextPrompt": "MON-59",
+  "lastCompletedPrompt": "MON-59",
+  "nextPrompt": "MON-60",
   "currentWave": "12",
   "totalPrompts": 60,
-  "completedPrompts": 58,
+  "completedPrompts": 59,
   "updatedAt": "2026-09-13",
-  "lastCompletedEvidence": "MON-D12-DOKUMAN-SENKRON-CHECKLIST.md: MON-58 reconciled the live 58/60 state, current app.js 13,144 lines, 29 app/core files and 24-target decision links across roadmap, root/plan README, graphify map and MODULARIZATION strategy. Historical baselines and FX/release claims were preserved; no code/cache-bust/FILES delta. Markdown link scan, JSON parse, MON-D11 references and git diff --check PASS.",
-  "nextSafeAction": "MON-59 requires fresh explicit user approval. MON-58 is closed; preserve historical FX/release evidence, releaseApproval=not_approved and no remote/deploy/data write.",
+  "lastCompletedEvidence": "MON-KARAR-KONSOLIDASYONU.md: MON-59 consolidated MON-S1..S8, rejected options, S1-S8/I1-I6/M1-M4 owner boundaries, MON-51..54 AppSurface decisions, rollback and release limits. No app.js/app/core/index/FILES/cache-bust/sync.js/runtime delta. JSON parse, relative Markdown link scan, decision/full-regression reference scan and git diff --check PASS.",
+  "nextSafeAction": "MON-60 requires fresh explicit user approval. MON-59 is closed; preserve the consolidated decision/release boundary, releaseApproval=not_approved and no remote/deploy/data write.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -306,7 +306,7 @@
       "prompts": "MON-58..MON-60",
       "topic": "belgeleme ve kapanis",
       "approvalRequired": true,
-      "completed": 1,
+      "completed": 2,
       "total": 3
     }
   ],

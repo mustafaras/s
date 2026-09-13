@@ -9,12 +9,31 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-58 tamamlandı |
+| Durum | `in_progress` — MON-59 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-58 / MON-59 (yeni açık onay gerekir) |
-| Dalga / ilerleme | Dalga 12 (1/3) / 58/60 |
+| Son / sıradaki | MON-59 / MON-60 (yeni açık onay gerekir) |
+| Dalga / ilerleme | Dalga 12 (2/3) / 59/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-13 |
+
+## MON-59 kapanışı — karar belgeleri ve release sınırı konsolidasyonu
+
+- Kanıt: [`MON-KARAR-KONSOLIDASYONU.md`](../deliverables/MON-KARAR-KONSOLIDASYONU.md).
+  MON-S1..S8, reddedilen seçenekler, S1–S8 / I1–I6 / M1–M4 owner sınırları,
+  MON-51–54 AppSurface kararları, rollback/reopen koşulları ve release sınırı
+  tek denetlenebilir kayıtta birleştirildi.
+- Canlı baseline korunmuştur: `app.js` **13.144** satır, `app/core/` **29**
+  dosya, App **556/721/718**, onclick **391**, canonical data **9/11**;
+  production app/appSurface cache-bust `20260913c`, core/index/driver/zikr
+  FILES, `sync.js` sırası ve runtime davranışı değişmedi. Cache-bust etkisi ve
+  FILES etkisi yoktur.
+- MON-57 tam no-network regression evidence'i referanslandı; MON-59 özgü
+  JSON parse, relative Markdown link, karar/full-regression referans ve
+  `git diff --check` kapıları PASS'tir. Browser/device/deploy/release veya
+  gerçek veri kabulü iddia edilmedi; `releaseApproval=not_approved` kaldı.
+- `MON-STATE.json`: `status=in_progress`, active/blocked null,
+  `lastCompletedPrompt=MON-59`, `nextPrompt=MON-60`, **59/60**; Dalga 12
+  **2/3**. MON-60 yalnız yeni açık kullanıcı yönüyle başlatılabilir.
 
 ## MON-58 kapanışı — dokümantasyon ve roadmap senkronu
 

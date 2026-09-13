@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-13 · **Durum:** `in_progress` · **Uygulanan prompt:** 58/60 (`MON-58`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-13 · **Durum:** `completed` · **Uygulanan prompt:** 60/60 (`MON-60`)
 
 Bu klasör, Şeyma'nın `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
@@ -11,7 +11,19 @@ data rebind, save, DOM/focus, timer/listener, network ve `window.App` sıraları
 korundu. `MON-55` production/harness yükleme paritesini, `MON-56` helper tek
 sahipliğini, `MON-57` ise tüm no-network regression zincirini kapattı.
 `MON-58` ile bu uygulama gerçeği roadmap, README, module map ve karar linklerine
-senkronlandı. Sıradaki kart `MON-59` ve yeni açık kullanıcı yönü gerektiriyor.
+senkronlandı; `MON-59` kararları ve `MON-60` seri kapanışı ile plan **60/60**
+olarak kapandı. Yerel PASS, release/deploy/device kabulü değildir.
+
+## Seri kapanışı
+
+Kapanış belgesi: [`MON-SERI-KAPANIS-BELGESI.md`](deliverables/MON-SERI-KAPANIS-BELGESI.md).
+Bu belge 12 dalgayı, 24 registry API/owner envanterini, S1–S8 / I1–I6 /
+M1–M4 kararlarını, tam no-network regression kanıtını ve rollback/devir
+protokolünü toplar. `MON-STATE.json` artık `status=completed`,
+`completedPrompts=60` ve `nextPrompt=null` taşır; `releaseApproval=not_approved`
+ve push/deploy, browser/device, gerçek token/veri ve `mustafaras/seyma-data`
+sınırları değişmeden kalır. Yeni çalışma bu serinin devamı olarak varsayılmaz;
+ayrı açık kullanıcı onayı ve kendi state/kanıt zinciri gerekir.
 
 ## Sınır ve otorite
 

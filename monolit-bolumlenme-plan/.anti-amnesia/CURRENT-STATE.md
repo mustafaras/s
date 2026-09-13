@@ -9,12 +9,34 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-59 tamamlandı |
+| Durum | `completed` — MON-60 seri kapanışı tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-59 / MON-60 (yeni açık onay gerekir) |
-| Dalga / ilerleme | Dalga 12 (2/3) / 59/60 |
+| Son / sıradaki | MON-60 / yok (program kapalı; yeni iş ayrı onayla) |
+| Dalga / ilerleme | Dalga 12 (3/3) / 60/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-13 |
+
+## MON-60 kapanışı — seri belgesi ve devir
+
+- Kanıt: [`MON-SERI-KAPANIS-BELGESI.md`](../deliverables/MON-SERI-KAPANIS-BELGESI.md).
+  `UYGULAMA-PROMPTLARI.md` başlık sayısı **60**, `MON-STATE.totalPrompts`
+  **60**, dalga toplamı **60** ve final tablo **MON-01..MON-60 = 60/60**
+  olarak doğrulandı. 24 registry API/owner tablosu, dört frozen reminder
+  owner'ı, S1–S8 / I1–I6 / M1–M4 kararları ve rollback/devir protokolü
+  kapanış belgesine bağlandı.
+- Tam no-network regression yeniden koşuldu: syntax **31/31**, driver,
+  zikr **95/95**, app **52/52**, panel **23/23**, Panel-v2 **27/27**,
+  Quran **9/9**, premium **9/9**, B1/B2/B3, state-rebind, syncGlue, Faz10,
+  ÆON ve reminder smoke/freeze PASS. Browser/device/deploy/release/gerçek
+  veri kabulü iddia edilmedi.
+- MON-60 docs/state-only'dir: `app.js` **13.144**, `app/core` **29**, App
+  **556/721/718**, onclick **391**, data **9/11**; production cache-bust,
+  index/driver/zikr FILES ve `sync.js` sırası değişmedi. Cache-bust/FILES
+  etkisi **0**; `releaseApproval=not_approved` kaldı.
+- `MON-STATE.json`: `status=completed`, active/blocked null,
+  `lastCompletedPrompt=MON-60`, `nextPrompt=null`, **60/60**; Dalga 12
+  **3/3**. Yeni iş bu serinin devamı olarak varsayılmaz; yalnız yeni açık
+  kullanıcı onayı ve ayrı state/kanıt zinciriyle başlatılabilir.
 
 ## MON-59 kapanışı — karar belgeleri ve release sınırı konsolidasyonu
 

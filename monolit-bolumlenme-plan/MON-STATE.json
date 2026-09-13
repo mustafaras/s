@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "planningRevision": "2.1",
   "programId": "MONOLIT-BOLUMLENME",
-  "status": "in_progress",
+  "status": "completed",
   "activePrompt": null,
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON-59",
-  "nextPrompt": "MON-60",
+  "lastCompletedPrompt": "MON-60",
+  "nextPrompt": null,
   "currentWave": "12",
   "totalPrompts": 60,
-  "completedPrompts": 59,
+  "completedPrompts": 60,
   "updatedAt": "2026-09-13",
-  "lastCompletedEvidence": "MON-KARAR-KONSOLIDASYONU.md: MON-59 consolidated MON-S1..S8, rejected options, S1-S8/I1-I6/M1-M4 owner boundaries, MON-51..54 AppSurface decisions, rollback and release limits. No app.js/app/core/index/FILES/cache-bust/sync.js/runtime delta. JSON parse, relative Markdown link scan, decision/full-regression reference scan and git diff --check PASS.",
-  "nextSafeAction": "MON-60 requires fresh explicit user approval. MON-59 is closed; preserve the consolidated decision/release boundary, releaseApproval=not_approved and no remote/deploy/data write.",
+  "lastCompletedEvidence": "MON-SERI-KAPANIS-BELGESI.md: MON-60 closed MON-01..MON-60 at 60/60 with 12 waves, 24 registry API/owner inventory, S1-S8/I1-I6/M1-M4 decisions, full no-network regression and separate release/device boundaries. No runtime, index, FILES, cache-bust or sync.js delta. Prompt count, state totals, JSON parse and final regression gates PASS.",
+  "nextSafeAction": "MONOLIT-BOLUMLENME PROGRAMI TAMAMLANDI (MON-01..MON-60, 60/60). Yeni runtime, release, deploy, browser/device veya data action yalnız yeni açık kullanıcı onayı, dar kapsam ve kendi kanıt/state zinciriyle başlatılabilir; releaseApproval=not_approved.",
   "codeTouched": true,
   "authority": [
     "AGENTS.md",
@@ -226,7 +226,7 @@
       "prompts": "MON-07..MON-10",
       "topic": "saf cekirdek",
       "approvalRequired": true,
-      "completed": 7,
+      "completed": 4,
       "total": 4
     },
     {
@@ -242,7 +242,7 @@
       "prompts": "MON-16..MON-18",
       "topic": "syncGlue",
       "approvalRequired": true,
-      "completed": 5,
+      "completed": 3,
       "total": 3
     },
     {
@@ -274,7 +274,7 @@
       "prompts": "MON-40..MON-43",
       "topic": "reminder ve mesajlasma",
       "approvalRequired": true,
-      "completed": 3,
+      "completed": 4,
       "total": 4
     },
     {
@@ -306,7 +306,7 @@
       "prompts": "MON-58..MON-60",
       "topic": "belgeleme ve kapanis",
       "approvalRequired": true,
-      "completed": 2,
+      "completed": 3,
       "total": 3
     }
   ],

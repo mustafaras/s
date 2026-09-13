@@ -9,12 +9,26 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-56 tamamlandı |
+| Durum | `in_progress` — MON-57 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | MON-56 / MON-57 (yeni açık onay gerekir) |
-| Dalga / ilerleme | Dalga 11 (2/3) / 56/60 |
+| Son / sıradaki | MON-57 / MON-58 (yeni açık onay gerekir) |
+| Dalga / ilerleme | Dalga 11 (3/3) / 57/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
 | Güncellendi | 2026-09-13 |
+
+## MON-57 kapanışı — tam regression ve performans sınırı
+
+- Kanıt: [`MON-D11-TAM-REGRESSION-RAPORU.md`](../deliverables/MON-D11-TAM-REGRESSION-RAPORU.md).
+  MON-56 sonrası temiz `fc96cfd` üzerinden yalnız kanıt/state çalışıldı; kod,
+  cache-bust ve FILES değişmedi.
+- `app.js` **13.144 → 13.144** satır, `app/core/*.js` **29 → 29** dosya,
+  App **556/721/718**, onclick **391**, canonical data **9/11** değişmedi.
+- Syntax **31/31**, driver, zikr **95/95**, app **52**, premium **9**, panel
+  **23**, Panel-v2 **27**, Quran **9**, reminder smoke/freeze ve diff-check
+  PASS. Ayrı browser/device/deploy/benchmark kanıtı iddia edilmedi.
+- `MON-STATE.json`: `status=in_progress`, active/blocked null,
+  `lastCompletedPrompt=MON-57`, `nextPrompt=MON-58`, **57/60**; Dalga 11
+  **3/3**, Dalga 12 **0/3**. MON-58 yeni açık kullanıcı yönü gerektirir.
 
 ## MON-56 kapanışı — delege ve eski gövde tamlık envanteri
 

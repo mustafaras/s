@@ -160,6 +160,14 @@ gerçek ağ, gerçek token, gerçek localStorage ve data repo write kullanmaz;
 zaman duyarlı kontroller sabit/injected clock ya da açıkça bounded benchmark
 sınırıyla çalışır.
 
+Bilinen istisna: `tests/app/test_premium_settings.js` ve
+`tests/app/test_premium_voice.js` sandbox'a gerçek `Date`'i verir; yerel saat
+23:00–07:00 arasındayken `SeyAudio` quiet-time gating'i 1 + 8 assertion'ı
+düşürür (2026-09-14 denetimi, 05:23'te 38/39 ve 59/67). Gece çalıştırırken
+`getHours` döndüren küçük bir `-r` shim'i ile (12 sabitlenince 39/39 ve
+67/67) ya da gündüz tekrar çalıştırarak doğrula; bu bir ürün regresyonu
+değildir.
+
 ## Panel-v2 kapanış notu
 
 Panel-v2 40/40 tamamlanmıştır. Güncel durum ve güncel yollar için

@@ -64,12 +64,6 @@ function soulActivityCountsForDateRange(start,end){
   return {counts:counts,mins:mins};
 }
 function ucfirst(s){ return String(s||'').charAt(0).toUpperCase()+String(s||'').slice(1); }
-function fmtDuration(min){
-  if(min==null||isNaN(min)||min<=0) return '';
-  if(min<60) return min+' dk';
-  var h=Math.floor(min/60), r=min%60;
-  return r===0?h+' saat':h+' saat '+r+' dk';
-}
 
 // ── İman Köşesi — prayer registry sabitleri ve imza-koruyan shimler ──
 var SEYMA_PRAYER=window.SeymaPrayer||{};

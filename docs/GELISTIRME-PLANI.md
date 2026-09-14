@@ -21,6 +21,17 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-14 (MON-60 sonrası kod denetimi ve düzeltme):** 60 promptun
+>   tamamı ledger değil kaynak üzerinden doğrulandı (24 registry, 723 core
+>   gövde, ~497 shim, 21 IIFE load-safe, `data=` 9/11, App fn 556, handler
+>   ve inline-handler kümeleri MON-25 ile birebir; tam kapı seti exit 0).
+>   Bulunan 6 eksik düzeltildi: `app.js` ölü `fmtDuration` kopyası silindi;
+>   `zikir.js` (FX2-12 sonrası) ve `reminderCatalog.js` (REM-36 sonrası)
+>   bayat cache-bust'ları `20260914a`; `CLAUDE.md`/`AGENTS.md`/
+>   `UYGULAMA-PROMPTLARI.md` bayat 25/60–0/60 iddiaları 60/60'a çekildi;
+>   MON-56 istisna tablosuna 22 `reminder*Legacy` gövdesi (MON-40 fallback
+>   kararı) eklendi; LEDGER seq 25 tekrarı not edildi. Kanıt: LEDGER seq 82.
+>   Durum **60/60**, LOCAL-ONLY; push/deploy/device ayrı kapılar.
 > - **2026-09-13 (MON-58 — modülerleşme dokümantasyon senkronu):**
 >   `app.js` monolit bölümleme zinciri MON-01..MON-57 ile uygulandı ve
 >   MON-57 tam no-network regression ile kapandı; MON-58 bu gerçeği roadmap,
@@ -94,7 +105,7 @@ _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 | # | Madde | Sürüm | Durum | Kanıt / Not |
 |---|-------|:-----:|:-----:|-------------|
 | — | Altyapı (sync, panel, tema, Okuma/İzleme hub'ları) | 0 | ✅ | `sync.js`, `panel.html`, `app/styles.css`, hub deseni |
-| MON | 🧱 `app.js` monolit bölümleme | 0 | 🟡 | 24 hedef registry, 29 `app/core` dosyası; MON-01..57 uygulandı, MON-58 docs sync tamamlandı. Güncel kanıt: [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md), [module map](monolit-bolumlenme-haritasi.md), [MON-D11 regression](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
+| MON | 🧱 `app.js` monolit bölümleme | 0 | ✅ | 24 hedef registry, 29 `app/core` dosyası; MON-01..60 uygulandı ve seri 2026-09-13'te kapandı (60/60, [kapanış belgesi](../monolit-bolumlenme-plan/deliverables/MON-SERI-KAPANIS-BELGESI.md)); 2026-09-14 kapanış sonrası kod denetimi düzeltmeleri LEDGER seq 82. Güncel kanıt: [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md), [module map](monolit-bolumlenme-haritasi.md), [MON-D11 regression](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
 | 1 | 🎵 Ne Dinledim | 1 | ✅ | `listeningOverlayHTML` hub (Bugün/Favoriler/İstatistik/Sözler) + `data.music` + `data.days[].listening`; `--listen` teal accent; panel "🎧 Dinleme Arşivi" (2026-07-04) |
 | 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ✅ | `App.onGratitude` + `data.days[].gratitude` (≤3); Bugün kartı (geçmiş günde düzenlenebilir); panel gün-detayı bloğu (2026-07-04) |
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |

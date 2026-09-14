@@ -14,7 +14,27 @@
 | Son / sıradaki | MON-60 / yok (program kapalı; yeni iş ayrı onayla) |
 | Dalga / ilerleme | Dalga 12 (3/3) / 60/60 |
 | Dal | `premium-fx-gorsel-yuzey` (MON zinciri `zikirmatik-manuel-zikir` dalını içerir) — LOCAL-ONLY |
-| Güncellendi | 2026-09-13 |
+| Güncellendi | 2026-09-14 (MON-60 sonrası kod denetimi; program durumu değişmedi) |
+
+## MON-60 sonrası kod denetimi ve düzeltme (2026-09-14)
+
+- Kullanıcı isteğiyle 60 kart ledger değil canlı kaynak üzerinden doğrulandı;
+  kayıt LEDGER **seq 82**. Kod tarafı kartlarla uyumlu: 24 registry, 723 core
+  gövde, ~497 imza-koruyan shim, 21 yeni IIFE load-safe, `data=` 9/11,
+  B1 7 getter, App fn **556**, `App.x=` ad kümesi MON-25 ile 711/711, inline
+  handler kümesi 412/412, `sync.js` ZP-10'dan beri dokunulmamış.
+- Düzeltilen 6 eksik: ölü `fmtDuration` kopyası (app.js:67) silindi;
+  `zikir.js` ve `reminderCatalog.js` bayat cache-bust → `20260914a`
+  (`app.js` de `20260914a`, dört `test_app_surface_*` regex'i eşlendi);
+  MON-D11 eki 22 `reminder*Legacy` gövdesini MON-40 fallback kararına
+  bağladı; `CLAUDE.md`/`AGENTS.md`/`UYGULAMA-PROMPTLARI.md` bayat
+  25/60–0/60 iddiaları 60/60'a çekildi; LEDGER seq 25 tekrarı not edildi.
+- Ortam notu: `tests/app/test_premium_{settings,voice}.js` gerçek `Date`
+  kullanır; 23–07 arasında çalıştırılırsa quiet-time gating 1+8 assertion
+  düşürür (`getHours` sabitlenince 39/39 ve 67/67). `driver.mjs --dump`
+  `/tmp/seyma-dump.html` yazar; sandbox'ta EPERM verebilir.
+- Program durumu değişmedi: `completed`, 60/60, `releaseApproval=not_approved`,
+  LOCAL-ONLY; push/deploy/device ayrı kapılar.
 
 ## MON-60 kapanışı — seri belgesi ve devir
 

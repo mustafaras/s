@@ -191,3 +191,15 @@ Browser, local server, token, gerçek veri, remote, push, merge, tag, deploy ve
 headless regression sonrası MON-56 kabul edildi. `index.html` appSurface.js +
 app.js tagleri `20260913c`, driver/zikr FILES sırası aynıdır; `sync.js` son
 script olarak kalır. MON-57, yeni açık kullanıcı yönü gerektirir.
+
+## Kapanış sonrası denetim eki (2026-09-14)
+
+MON-60 sonrası bağımsız kod denetimi (LEDGER seq 82) MON-56 taramasının üç
+boşluğunu buldu. Yukarıdaki MON-56 kayıtları değiştirilmez; tablo burada
+yalnız-ekleme ilkesiyle tamamlanır.
+
+| Denetim | Canlı sonuç | Karar |
+|---|---|---|
+| `reminder*Legacy` inline gövdeleri | app.js'te 22 `reminder*Legacy` fonksiyonu (`app.js:2079-2173`, `5487-6152`) `SEYMA_REMINDERS.x` yoksa çalışan fail-safe fallback olarak yaşar; `reminders.js` aynı gövdelerin registry sahibidir. Bu yüzden 22 gövde iki yerde yaşar. | PASS / documented exception — MON-40 kararı ("frozen engine yoksa fail-safe fallback korunur", `MON-40-REMINDER-RUNTIME-ENVANTERI.md`) ve `tests/reminders/test_reminder_app_acceptance.js` module↔inline parity assertion'ı. MON-56 tablosunda referanssız kalmıştı; bu ek karar referansını bağlar. |
+| Orphan app.js fonksiyonu | `app.js:67 fmtDuration` — `library.js:49` ile özdeş gövde, app.js içinde sıfır çağrı. MON-56 yalnız registry-üyesi orphan taradı, app.js-tarafı orphan taramadı. | FIXED — app.js kopyası silindi; `app.js?v=20260914a`. `SeymaLibrary` iç kopyası tek owner. |
+| Cache-bust tazeliği | `zikir.js?v=20260904b` FX2-12 (2026-09-07, `SeyAudio.tap→tick`) sonrası bayat; `reminderCatalog.js?v=20260813a` REM-36 (2026-08-16, `COPY_LEXICON`) sonrası bayat. MON-55 `?v=` varlığını denetledi, dosyanın son commit tarihine göre tazeliğini denetlemedi. | FIXED — ikisi de `?v=20260914a`. Kural: bir asset değişince `?v=` aynı committe bump edilir (CLAUDE.md konvansiyon 5); tazelik kontrolü `git log -1 --date=format:%Y%m%d -- <dosya>` ile `?v=` tarihini karşılaştırır. |

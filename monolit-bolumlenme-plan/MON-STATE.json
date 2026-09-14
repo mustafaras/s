@@ -11,10 +11,17 @@
   "currentWave": "12",
   "totalPrompts": 60,
   "completedPrompts": 60,
-  "updatedAt": "2026-09-13",
+  "updatedAt": "2026-09-14",
   "lastCompletedEvidence": "MON-SERI-KAPANIS-BELGESI.md: MON-60 closed MON-01..MON-60 at 60/60 with 12 waves, 24 registry API/owner inventory, S1-S8/I1-I6/M1-M4 decisions, full no-network regression and separate release/device boundaries. No runtime, index, FILES, cache-bust or sync.js delta. Prompt count, state totals, JSON parse and final regression gates PASS.",
   "nextSafeAction": "MONOLIT-BOLUMLENME PROGRAMI TAMAMLANDI (MON-01..MON-60, 60/60). Yeni runtime, release, deploy, browser/device veya data action yalnız yeni açık kullanıcı onayı, dar kapsam ve kendi kanıt/state zinciriyle başlatılabilir; releaseApproval=not_approved.",
   "codeTouched": true,
+  "postClosureAudit": {
+    "date": "2026-09-14",
+    "ledgerSeq": 82,
+    "scope": "code-first verification of MON-01..MON-60; 6 gaps fixed (dead fmtDuration duplicate, stale zikir.js/reminderCatalog.js cache-bust, MON-56 exception reference for 22 reminder*Legacy fallbacks, stale CLAUDE.md/AGENTS.md/UYGULAMA-PROMPTLARI.md claims, LEDGER seq 25 duplicate noted)",
+    "evidence": "monolit-bolumlenme-plan/deliverables/MON-D11-DELEGE-ENVANTERI.md#kapanış-sonrası-denetim-eki-2026-09-14",
+    "programStatusChanged": false
+  },
   "authority": [
     "AGENTS.md",
     "CLAUDE.md",

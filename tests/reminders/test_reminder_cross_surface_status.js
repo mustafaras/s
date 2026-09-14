@@ -17,6 +17,12 @@ const ROOT = path.resolve(__dirname, "../..");
 const APP_SOURCE = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
 const SYNC_SOURCE = fs.readFileSync(path.join(ROOT, "sync.js"), "utf8");
 const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
+// MON2-01 (K8): reminder gövdeleri MON2-02/03 ile app/core/reminders.js ve
+// app/core/reminderSurface.js'e taşınır; adla çıkarma birleşik kaynaktan yapılır.
+// APP_SOURCE üzerindeki includes/indexOf assert'leri app.js sözleşmesi olarak kalır.
+const APP_REMINDER_SOURCE = [APP_SOURCE,
+  fs.readFileSync(path.join(ROOT, "app/core/reminders.js"), "utf8"),
+  fs.readFileSync(path.join(ROOT, "app/core/reminderSurface.js"), "utf8")].join("\n");
 
 function extractFunction(source, name) {
   const start = source.indexOf("function " + name + "(");
@@ -54,7 +60,7 @@ function appContext() {
     "reminderCrossSurfaceStatus"
   ];
   const context = { Object, Array, String, Number, Boolean, Math };
-  vm.runInNewContext(names.map((name) => extractFunction(APP_SOURCE, name)).join("\n"), context, { filename: "app-rem68-status.js" });
+  vm.runInNewContext(names.map((name) => extractFunction(APP_REMINDER_SOURCE, name)).join("\n"), context, { filename: "app-rem68-status.js" });
   return context;
 }
 

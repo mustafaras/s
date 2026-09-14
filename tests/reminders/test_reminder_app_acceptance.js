@@ -29,8 +29,11 @@ const RUNTIME_MODULES = [
   { global: "ReminderDeliveryV1", file: "app/core/reminderDelivery.js" },
   { global: "ReminderEngineV1", file: "app/core/reminderEngine.js" },
   { global: "ReminderSchedulerV1", file: "app/core/reminderScheduler.js" },
-  { global: "SeymaReminders", file: "app/core/reminders.js" }
+  { global: "SeymaReminders", file: "app/core/reminders.js" },
+  { global: "SeymaReminderSurface", file: "app/core/reminderSurface.js" }
 ];
+
+const APP_SHELL_REGISTRIES = ["app/core/reminders.js", "app/core/reminderSurface.js"];
 
 const BASE_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/syncGlue.js", "app/core/helpers.js", "app/core/prayer.js", "app/core/zikir.js", "app/core/quran.js", "app/core/saygi.js", "app/core/motivation.js", "app/core/crisis.js", "app/core/journal.js", "app/core/health.js", "app/core/library.js", "app/core/report.js", "app/core/map.js", "app/core/profile.js", "app/core/settings.js", "app/core/messaging.js", "app/core/render.js", "app/core/appSurface.js"];
 
@@ -257,6 +260,11 @@ function boot(options) {
   BASE_FILES.forEach((file) => vm.runInContext(readSource(file), context, { filename: file }));
   const moduleFiles = opts.modules === undefined ? RUNTIME_MODULES.map((entry) => entry.file) : opts.modules;
   moduleFiles.forEach((file) => vm.runInContext(readSource(file), context, { filename: file }));
+  // MON2-01 (K1/K6): SeymaReminders ve SeymaReminderSurface app kabuğunun
+  // fail-closed registry'leridir (diğer 23 registry gibi); `modules:` override'ı
+  // yalnız frozen motorların (catalog/engine/scheduler/delivery) yokluğunu sınar.
+  APP_SHELL_REGISTRIES.filter((file) => !moduleFiles.includes(file))
+    .forEach((file) => vm.runInContext(readSource(file), context, { filename: file }));
   vm.runInContext(APP_SOURCE, context, { filename: "app.js" });
 
   return {

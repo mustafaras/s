@@ -27,6 +27,8 @@ const REPORT_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/report.js"), "ut
 const MAP_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/map.js"), "utf8");
 const PROFILE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/profile.js"), "utf8");
 const SETTINGS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/settings.js"), "utf8");
+const REMINDERS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/reminders.js"), "utf8");
+const REMINDER_SURFACE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/reminderSurface.js"), "utf8");
 const MESSAGING_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/messaging.js"), "utf8");
 const RENDER_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/render.js"), "utf8");
 const APP_SURFACE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/appSurface.js"), "utf8");
@@ -152,6 +154,8 @@ function boot({ catalog = true, seed = null } = {}) {
   vm.runInContext(PROFILE_SOURCE, context, { filename: "app/core/profile.js" });
   vm.runInContext(SETTINGS_SOURCE, context, { filename: "app/core/settings.js" });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });
+  vm.runInContext(REMINDERS_SOURCE, context, { filename: "app/core/reminders.js" });
+  vm.runInContext(REMINDER_SURFACE_SOURCE, context, { filename: "app/core/reminderSurface.js" });
   vm.runInContext(MESSAGING_SOURCE, context, { filename: "app/core/messaging.js" });
   vm.runInContext(RENDER_SOURCE, context, { filename: "app/core/render.js" });
   vm.runInContext(APP_SURFACE_SOURCE, context, { filename: "app/core/appSurface.js" });

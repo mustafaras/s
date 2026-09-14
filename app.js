@@ -5108,6 +5108,17 @@ if(!window.SeymaAppSurface||typeof window.SeymaAppSurface.registerAppSurface!=='
   document:function(){ return document; },
   save:save
 })) throw new Error('MON-50: SeymaAppSurface registry kurulamadı');
+// MON2-01: reminder yüzey registry bag'i. MON2-03 gövde taşırken bu bag'i
+// genişletir; mutable reminder değişkenleri (K3) app.js'te kalır ve get/set
+// çifti olarak verilir. Registry yoksa fail-closed.
+var SEYMA_REMINDER_SURFACE=window.SeymaReminderSurface||{};
+if(!window.SeymaReminderSurface||typeof window.SeymaReminderSurface.registerReminderSurface!=='function'||!window.SeymaReminderSurface.registerReminderSurface({
+  data:function(){ return data; },
+  ui:function(){ return ui; },
+  app:function(){ return App; },
+  save:function(){ return save(); },
+  render:function(){ return render(); }
+})) throw new Error('MON2-01: SeymaReminderSurface registry kurulamadı');
 // MON-54: boot/start/late-boot dependency bag. The data rebinds stay in this
 // app.js owner; SeymaAppSurface receives only an explicit callback to perform
 // the existing assignment at the same point in each path.

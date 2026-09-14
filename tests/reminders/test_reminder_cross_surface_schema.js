@@ -16,7 +16,7 @@ const {
 } = require("./helpers/reminder-test-helper");
 
 const ROOT = path.resolve(__dirname, "../..");
-const APP_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/content/zikirCoreContentV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/syncGlue.js", "app/core/helpers.js", "app/core/prayer.js", "app/core/zikir.js", "app/core/quran.js", "app/core/saygi.js", "app/core/motivation.js", "app/core/crisis.js", "app/core/journal.js", "app/core/health.js", "app/core/library.js", "app/core/report.js", "app/core/map.js", "app/core/profile.js", "app/core/settings.js", "app/core/messaging.js", "app/core/render.js", "app/core/appSurface.js", "app.js"];
+const APP_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/content/zikirCoreContentV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/syncGlue.js", "app/core/helpers.js", "app/core/prayer.js", "app/core/zikir.js", "app/core/quran.js", "app/core/saygi.js", "app/core/motivation.js", "app/core/crisis.js", "app/core/journal.js", "app/core/health.js", "app/core/library.js", "app/core/report.js", "app/core/map.js", "app/core/profile.js", "app/core/settings.js", "app/core/reminders.js", "app/core/reminderSurface.js", "app/core/messaging.js", "app/core/render.js", "app/core/appSurface.js", "app.js"];
 const APP_SOURCE = APP_FILES.map((file) => ({ file, source: fs.readFileSync(path.join(ROOT, file), "utf8") }));
 const MANIFEST_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panelCoverageManifest.js"), "utf8");
 const SYNC_SOURCE = fs.readFileSync(path.join(ROOT, "sync.js"), "utf8");

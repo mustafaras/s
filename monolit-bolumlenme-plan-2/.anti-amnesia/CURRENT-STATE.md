@@ -1,6 +1,6 @@
 # MON2 · Güncel durum
 
-**Güncelleme:** 2026-09-14 · **Durum:** `planned` · **Aktif kart:** MON2-01 · **Tamamlanan:** 0/8
+**Güncelleme:** 2026-09-14 · **Durum:** `in_progress` · **Aktif kart:** MON2-02 · **Tamamlanan:** 1/8 (MON2-01)
 
 ## Canlı baseline (commit cf42949, `node tools/shell-inventory.mjs`)
 
@@ -10,15 +10,25 @@
 - Reminder: 529 fn / 3.247 satır; 293 fn / 1.770 satır yalnız-iç; 120 sabit / 288 satır
 - `app/core/*` 29 dosya / 11.974 satır; `reminders.js` 360 satır
 
+## MON2-01 sonrası (2026-09-14)
+
+- `app.js` 13.150 satır (11.847 kod) — +8 kod / +3 yorum: `SEYMA_REMINDER_SURFACE` + fail-closed bag (app.js:5111)
+- `app/core/reminderSurface.js` yüklü: index (`?v=20260914a`, reminders.js sonrası), driver/zikr FILES, rebind boot listesi, verify-state-migration
+- `app.js?v=20260914b`; 4 app_surface fixture'ındaki literal sürüm assert'i güncellendi
+- K6 paritesi: 14 fixture + acceptance `APP_SHELL_REGISTRIES` (modules: override'ları yalnız frozen dördü seçer)
+- K7: `test_modularization_boundary [1]` → `shellBudget.maxTotalLines`; K8: cross_surface_status birleşik kaynak
+- Bilinen, kapsam dışı: `test_premium_settings` 38/39, `test_premium_voice` 59/67 — temiz HEAD'de aynı
+
 ## Bütçe (shellBudget)
 
-13.200 satır · 22 Legacy · 3.300 reminder gövde · 1.150 HTML builder → MON2-01 sonrası daraltılacak.
+13.200 satır · 22 Legacy · 3.300 reminder gövde · 1.150 HTML builder (13.150×1.02 > 13.200 → korunur). MON2-02 hedefi: 11.300 / 0 / 1.500 / 1.150.
 
 ## Sonraki güvenli adım
 
-MON2-01 (README §5): `reminderSurface.js` iskeleti, dört yükleme listesi,
-11 fixture yükleme paritesi, `test_reminder_cross_surface_status.js` birleşik
-kaynak, `test_modularization_boundary.js [1]` çevirisi, `--gate` PASS, tek yerel commit.
+MON2-02 (README §5): `REMINDER_*` sabitleri + saf/B1 gövdeler + görünüm →
+`app/core/reminders.js`; 22 `reminder*Legacy` silinir; `--domain reminder`
+yalnız-iç listesi shim'siz; `registerReminderView` sections bag'i kalkar.
+Yalnız aktif kart; push/deploy/browser/gerçek veri yok.
 
 ## Sınırlar
 

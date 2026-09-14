@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Kabuk İnceltme Programı (MON2)
 
-**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `planned` · **Kart:** 0/8 · **Aktif:** `MON2-01`
+**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `in_progress` · **Kart:** 1/8 · **Aktif:** `MON2-02` · **Devir:** [`DEVIR-MON2-02.md`](DEVIR-MON2-02.md)
 
 MON serisi (60 kart) `app.js`'i 18.957 → 13.139 satıra indirdi ama satır sayısı
 hiçbir kartın hedefi değildi; kapanış belgesi 13.144'ü yalnız *baseline* olarak
@@ -453,4 +453,5 @@ Dosya yoksa komut uydurulmaz (`rg --files` ile doğrula).
 | `.anti-amnesia/CURRENT-STATE.md` | İnsan-okur durum |
 | `.anti-amnesia/LEDGER.md` | Yalnız-eklemeli kayıt (seq · kart · önce/sonra · kapı · sapma) |
 | `deliverables/` | MON2-04 ve MON2-08 kapanış belgeleri |
+| `DEVIR-MON2-02.md` | Soğuk-başlangıç brief'i (MON2-02'den devam); her kart kapanışında bir sonraki karta güncellenir |
 | `tools/shell-inventory.mjs` (repo kökü) | Ölçüm/kapı aracı; ağsız, salt-okur |

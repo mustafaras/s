@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Kabuk İnceltme Programı (MON2)
 
-**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `in_progress` · **Kart:** 2/8 · **Aktif:** `MON2-03` · **Devir:** [`DEVIR-MON2-03.md`](DEVIR-MON2-03.md)
+**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `in_progress` · **Kart:** 3/8 · **Aktif:** `MON2-04` · **Devir:** [`DEVIR-MON2-04.md`](DEVIR-MON2-04.md)
 
 MON serisi (60 kart) `app.js`'i 18.957 → 13.139 satıra indirdi ama satır sayısı
 hiçbir kartın hedefi değildi; kapanış belgesi 13.144'ü yalnız *baseline* olarak

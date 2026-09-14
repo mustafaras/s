@@ -85,9 +85,22 @@ const wrappers = [
 ];
 
 group('FX2-16.1 12 hedef closeX sarmalayıcısı doğru yüzey kimliğine bağlı', wrappers.every(([name, card, back]) => {
-  const start = appSource.indexOf(`App.${name}=function`);
-  const end = start < 0 ? -1 : appSource.indexOf('\nApp.', start + 1);
-  const body = appSource.slice(start, end < 0 ? appSource.length : end);
+  // K8 (MON2-03): reminder closeX gövdeleri reminderSurface.js'e taşındı —
+  // sarmalayıcı gövdeyi appSource'ta, yoksa reminderSurfaceSource'ta ara.
+  // K8 (MON2-03): modüle taşınan sarmalayıcı `function App_x(){...}` biçimindedir
+  // (App_ öneki + registry üyesi) — sheetClose guard'lı window.SeyFx.sheetClose olur.
+  let start = appSource.indexOf(`App.${name}=function`);
+  let source = appSource;
+  let end = start < 0 ? -1 : source.indexOf('\nApp.', start + 1);
+  let body = source.slice(start, end < 0 ? source.length : end);
+  if (start < 0 || !/var body=function\(\)/.test(body)) {
+    // K8 (MON2-03): modüle taşınan sarmalayıcı `function App_x(){...}` biçimindedir
+    // (App_ öneki + registry üyesi) — sheetClose guard'lı window.SeyFx.sheetClose olur.
+    start = reminderSurfaceSource.indexOf(`function App_${name}(){`);
+    source = reminderSurfaceSource;
+    end = start < 0 ? -1 : source.indexOf('\nfunction ', start + 1);
+    body = source.slice(start, end < 0 ? source.length : end);
+  }
   return start >= 0 && /var body=function\(\)/.test(body) && body.includes(`sheetClose('${card}','${back}',body)`);
 }));
 

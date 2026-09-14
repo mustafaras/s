@@ -178,7 +178,7 @@ ok('window.App expose and post-expose handlers precede the final initial render'
 ok('data rebinds stay out of the registry and production cache-bust is paired',
   !/\bdata\s*=\s*(?:migrate|createDefaultData|null|d\b)/.test(source) &&
   /app\/core\/appSurface\.js\?v=20260913c/.test(index) &&
-  /app\.js\?v=20260914c/.test(index) &&
+  /app\.js\?v=20260914d/.test(index) &&
   index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?'));
 ok('existing harness FILES keep appSurface immediately before app.js',
   /'app\/core\/appSurface\.js',\s*'app\.js'/.test(read('.claude/skills/run-seyma/driver.mjs')) &&

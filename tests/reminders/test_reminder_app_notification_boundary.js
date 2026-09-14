@@ -601,6 +601,10 @@ runTests([
     assertEqual(out.notification.getCalls().length, before);
 
     // And the reminder sender fails closed rather than emitting off-namespace.
-    assert(appSource.indexOf("return {ok:false,reason:'channel-boundary'") > 0);
+    // MON2-03: reminderNativeDisplay gövdesi (guard dahil)
+    // app/core/reminderSurface.js'e taşındı; app.js hâlâ aeon-guard'ı tutar.
+    const surfaceSource = fs.readFileSync(path.join(rootDir, "app/core/reminderSurface.js"), "utf8");
+    assert(appSource.indexOf("return {ok:false,reason:'channel-boundary'") > 0
+      || surfaceSource.indexOf("return {ok:false,reason:'channel-boundary'") > 0);
   }]
 ]).catch(() => process.exitCode = 1);

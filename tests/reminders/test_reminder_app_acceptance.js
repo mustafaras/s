@@ -337,11 +337,16 @@ const cases = [
     const appIndex = bare.indexOf("app.js");
     assert(appIndex >= 0);
     RUNTIME_MODULES.forEach((entry) => {
-      // app.js bu global'i gerçekten arıyor mu? (indirect `window[key]`
-      // erişimi de sayılır — string kaçamağı sözleşmeyi bozmamalı.)
-      const referenced = APP_SOURCE.includes(`window.${entry.global}`)
-        || APP_SOURCE.includes(`'${entry.global}'`)
-        || APP_SOURCE.includes(`"${entry.global}"`);
+      // app.js (veya MON2-03 sonrası reminder registry kabuğu) bu global'i
+      // gerçekten arıyor mu? (indirect `window[key]` erişimi de sayılır —
+      // string kaçamağı sözleşmeyi bozmamalı.) MON2-03 ile
+      // window.ReminderDeliveryV1 erişimi app/core/reminders.js
+      // registry'sine taşındı; referans zinciri app.js + registry kabuğu.
+      const shellSources = [APP_SOURCE,
+        ...APP_SHELL_REGISTRIES.map((file) => readSource(file))];
+      const referenced = shellSources.some((source) => source.includes(`window.${entry.global}`)
+        || source.includes(`'${entry.global}'`)
+        || source.includes(`"${entry.global}"`));
       assert(referenced);
       const moduleIndex = bare.indexOf(entry.file);
       assert(moduleIndex >= 0);

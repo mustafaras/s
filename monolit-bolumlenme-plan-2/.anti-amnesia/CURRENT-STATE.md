@@ -1,6 +1,6 @@
 # MON2 · Güncel durum
 
-**Güncelleme:** 2026-09-14 · **Durum:** `in_progress` · **Aktif kart:** MON2-03 · **Tamamlanan:** 2/8 (MON2-01, MON2-02)
+**Güncelleme:** 2026-09-14 · **Durum:** `in_progress` · **Aktif kart:** MON2-04 · **Tamamlanan:** 3/8 (MON2-01, MON2-02, MON2-03)
 
 ## Canlı baseline (commit cf42949, `node tools/shell-inventory.mjs`)
 
@@ -31,14 +31,25 @@
 - Fixture devirleri (K8 ilkesi — pin gövdeyi izler): `cross_surface_status` extractFunction (girinti+yorum duyarlı süslü tarama) ve birleşik kaynak sırası [reminders, reminderSurface, app]; `integrated_ux` `sey-reminder-inbox-live` → APP_REMINDER_SOURCE; 3 `test_fx2_*` combinedSource += reminders/reminderSurface (onclick 391 sabit); `ui_boundary` mutation regex ×3 sıkılaştırma
 - Kapı: smoke **21/21** · `--gate` PASS (10.277/0/947/928) · driver+zikr 95/95 · verify-state B1/B2/B3 · tests/app **53/53** · App.x=554 · onclick=391 · dump `bugun/ayarlar` bayt-eşit
 
+## MON2-03 sonrası (2026-09-14)
+
+- `app.js` 10.277 → **9.771 satır** (8.532 kod) — −506 satır; `app/core/reminderSurface.js` 42 → **1004 satır** (K4/K5 iskelet → gerçek gövdeler)
+- Taşınanlar: **35 yan etkili reminder fn** (permission/native/lifecycle/scheduler/storage/action/medication/special-day/digest/sync/surface) + **51 `App.*reminder*` handler gövdesi** (MON-50 appSurface deseni; app.js'te 1-liner `App.x=…SEYMA_REMINDER_SURFACE.x.apply` shim'leri)
+- **with(SCOPE) idiomu:** sabit `Object.create(null)` + `installScopeProperties(s)` — with bağlamı modül-yükleme anındaki objeye statik bağlı; register'da property-getter'lar (Object.defineProperty canlı getter) AYNI objeye eklenir. Register yoksa gövdeler fail-closed ReferenceError. `var SCOPE=buildScope()` modül-yüklemede çalışmaz (deps null).
+- **REM-67 dilim sözleşmesi:** `appendReminderEvent` + `persistReminderEvent` app.js'te **tam gövde** kaldı (test_reminder_end_to_end_lineage app.js'in event-adapter dilimini izole VM'de çağırıyor; fn sayısı 37→35)
+- Deps bag 122 → **123 üye** (+`appendReminderEvent` getter) + 5 setter helper (`setPermissionTransient/InFlight/EverGranted/GrantObserved`, `setSchedulerInstance`); `REMINDER_SURFACE_DEPENDENCIES` 123 ad; K3 mutable değişkenler (K8 pinler: scheduleMoveSync, reminderNotificationChannel, window.ReminderEngineV1, reminderLifecycleTick timer, reconcileReminderStorageEvent, App.onModalKeydown, reminderEventCorrelation, migrateReminderState) app.js'te kaldı
+- Test sözleşme devirleri (K8 — pin gövdeyi izler): acceptance `referenced` shell registry'leri tarar; notification_boundary channel-boundary surfaceSource'ta da kabul; fx2_overlay FX2-16.1 closeX sarmalayıcı modül `function App_x(){}` + guard'lı `window.SeyFx.sheetClose` biçimini tanır
+- Kapı: smoke **20/20** · `--gate` PASS (9.771/0/408/928) · driver+zikr 95/95 · verify-state B1/B2/B3 · tests/app **53/53** (fx2 6/6 dahil) · panel 23/23 · panel-v2 27/27 · quran 9/9 · sync 69/69 · App.x=554 · onclick(kombine)=391 · withModule:false PASS
+- Cache-bust: `reminderSurface.js?v=20260914d`, `app.js?v=20260914d` + 4 app_surface pin'i güncellendi
+
 ## Bütçe (shellBudget)
 
-11.300 satır · 0 Legacy · 1.500 reminder gövde · 1.150 HTML builder (MON2-02 plan bütçesi; ölçüm 10.277/0/947/928 ile altında). MON2-03 hedefi: 10.300 / 0 / 450 / 950.
+10.300 satır · 0 Legacy · 450 reminder gövde · 950 HTML builder (MON2-03 plan bütçesi; ölçüm 9.771/0/408/928 ile altında). MON2-04 (Dalga 1 kapanışı) aynı bütçeyi korur.
 
 ## Sonraki güvenli adım
 
-MON2-03 (README §5): kalan reminder `App.*` handler gövdeleri →
-`reminderSurface.js`/`reminders.js` (App.* shim + atama app.js'te kalır — I1-I6).
+MON2-04 (README §5): Dalga 1 kapanışı — reminder smoke + tüm aileler + `--gate` tekrarı,
+`DEVIR-MON2-04.md` ve LEDGER/CURRENT-STATE/STATE senkronizasyonu.
 Push/deploy/browser/gerçek veri yok.
 
 ## Sınırlar

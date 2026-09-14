@@ -20,15 +20,44 @@ const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 // MON2-01 (K8): reminder gövdeleri MON2-02/03 ile app/core/reminders.js ve
 // app/core/reminderSurface.js'e taşınır; adla çıkarma birleşik kaynaktan yapılır.
 // APP_SOURCE üzerindeki includes/indexOf assert'leri app.js sözleşmesi olarak kalır.
-const APP_REMINDER_SOURCE = [APP_SOURCE,
+// MON2-02: modül kaynakları ÖNE alınır — adla çıkarma gerçek gövdeyi bulsun,
+// app.js shim'i değil (shim SEYMA_REMINDERS'a delege olur, izole vm'de yok).
+const APP_REMINDER_SOURCE = [
   fs.readFileSync(path.join(ROOT, "app/core/reminders.js"), "utf8"),
-  fs.readFileSync(path.join(ROOT, "app/core/reminderSurface.js"), "utf8")].join("\n");
+  fs.readFileSync(path.join(ROOT, "app/core/reminderSurface.js"), "utf8"),
+  APP_SOURCE].join("\n");
 
 function extractFunction(source, name) {
   const start = source.indexOf("function " + name + "(");
   if (start < 0) throw new Error(name + " bulunamadı");
-  const end = source.indexOf("\nfunction ", start + 10);
-  return source.slice(start, end < 0 ? source.length : end).trim();
+  // MON2-02: gövdeler app/core/reminders.js'te girintili; satır başı eşleşmesi
+  // yetmez, ayraç dengesiyle kesi (extractVar ile aynı tarayıcı). Türkçe
+  // yorumlardaki apostroflar (`harness'ları`) tırnak sanılmamalı — yorumlar atlanır.
+  let depth = 0;
+  let quote = null;
+  let started = false;
+  let comment = 0; // 1: satır yorumu, 2: blok yorumu
+  for (let i = start; i < source.length; i += 1) {
+    const c = source[i];
+    const n = source[i + 1];
+    if (comment === 1) { if (c === "\n") comment = 0; continue; }
+    if (comment === 2) { if (c === "*" && n === "/") { i += 1; comment = 0; } continue; }
+    if (quote) {
+      if (c === "\\") i += 1;
+      else if (c === quote) quote = null;
+      continue;
+    }
+    if (c === "/" && n === "/") { comment = 1; i += 1; continue; }
+    if (c === "/" && n === "*") { comment = 2; i += 1; continue; }
+    if (c === "'" || c === '"') { quote = c; continue; }
+    if (c === "{") { depth += 1; started = true; continue; }
+    if (c === "}") {
+      depth -= 1;
+      if (started && depth === 0) return source.slice(start, i + 1).trim();
+      continue;
+    }
+  }
+  return source.slice(start).trim();
 }
 
 function extractVar(source, name) {

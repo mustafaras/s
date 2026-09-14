@@ -26,6 +26,9 @@ const { assert, assertEqual, runTests } = require("./helpers/reminder-test-helpe
 const ROOT = path.resolve(__dirname, "../..");
 const APP_CSS = fs.readFileSync(path.join(ROOT, "app/styles.css"), "utf8");
 const APP_SOURCE = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
+// MON2-02: taşınan gövdeleri de kapsayan birleşik kaynak (K8 pin devri).
+const APP_REMINDER_SOURCE = [fs.readFileSync(path.join(ROOT, "app/core/reminders.js"), "utf8"),
+  fs.readFileSync(path.join(ROOT, "app/core/reminderSurface.js"), "utf8"), APP_SOURCE].join("\n");
 const PANEL_CSS = fs.readFileSync(path.join(ROOT, "panel/panel.css"), "utf8");
 const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 const NOW = "2026-08-20T10:00:00.000Z";
@@ -314,7 +317,7 @@ const cases = [
     assert(APP_CSS.includes("[data-reminder-render-target],[data-reminder-render-target] *"));
     assert(APP_CSS.includes("animation:none!important;transition:none!important"));
     assert(APP_CSS.includes(":focus-visible"));
-    assert(APP_SOURCE.includes("sey-reminder-inbox-live"));
+    assert(APP_REMINDER_SOURCE.includes("sey-reminder-inbox-live"));
     assert(APP_SOURCE.includes("aria-live=\"polite\""));
     assert(PANEL_CSS.includes("button:focus-visible"));
     assert(PANEL_CSS.includes("@media(prefers-reduced-motion:reduce)"));

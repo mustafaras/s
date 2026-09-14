@@ -23,7 +23,11 @@ const profileSource = fs.readFileSync(path.join(repoRoot, 'app/core/profile.js')
 const settingsSource = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
 const messagingSource = fs.readFileSync(path.join(repoRoot, 'app/core/messaging.js'), 'utf8');
 const renderSource = fs.readFileSync(path.join(repoRoot, 'app/core/render.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource;
+// MON2-02: app.js'ten reminders.js/reminderSurface.js'e taşınan gövdeler de
+// combinedSource'a girer — onclick/handler pin'leri gövdeyi izler (K8 ilkesi).
+const remindersSource = fs.readFileSync(path.join(repoRoot, 'app/core/reminders.js'), 'utf8');
+const reminderSurfaceSource = fs.readFileSync(path.join(repoRoot, 'app/core/reminderSurface.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource + remindersSource + reminderSurfaceSource;
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 let passed = 0;
 let failed = 0;

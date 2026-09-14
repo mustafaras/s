@@ -3,14 +3,14 @@
   "planningRevision": "1.0",
   "programId": "MON2-KABUK-INCELTME",
   "status": "in_progress",
-  "activePrompt": "MON2-02",
+  "activePrompt": "MON2-03",
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON2-01",
-  "nextPrompt": "MON2-02",
+  "lastCompletedPrompt": "MON2-02",
+  "nextPrompt": "MON2-03",
   "currentWave": "1",
   "totalPrompts": 8,
-  "completedPrompts": 1,
+  "completedPrompts": 2,
   "updatedAt": "2026-09-14",
   "baseline": {
     "date": "2026-09-14",
@@ -26,9 +26,9 @@
     "tool": "node tools/shell-inventory.mjs"
   },
   "shellBudget": {
-    "maxTotalLines": 13200,
-    "maxLegacyFunctions": 22,
-    "maxReminderFunctionCodeLines": 3300,
+    "maxTotalLines": 11300,
+    "maxLegacyFunctions": 0,
+    "maxReminderFunctionCodeLines": 1500,
     "maxHtmlBuilderCodeLines": 1150,
     "rule": "Her kart kapanışında ölçülen değer + %2 ile daraltılır; asla gevşetilmez."
   },
@@ -164,7 +164,7 @@
     "seyma-data write",
     "real token/data"
   ],
-  "nextSafeAction": "MON2-02'yi uygula (README §5): REMINDER_* sabitleri + saf/B1 gövdeler + görünüm → app/core/reminders.js; 22 reminder*Legacy silinir; yalnız-iç fonksiyonlar shim'siz; --gate bütçesi 11.300/0/1.500/1.150. Push/deploy/browser/gerçek veri yok.",
+  "nextSafeAction": "MON2-03'ü uygula (README §5): kalan reminder App.* handler gövdeleri → app.js App.* shim kalacak şekilde reminderSurface.js/reminders.js; --gate bütçesi 10.300/0/450/950. Push/deploy/browser/gerçek veri yok.",
   "authority": [
     "CLAUDE.md",
     "AGENTS.md",
@@ -175,7 +175,7 @@
     ".claude/skills/run-seyma/SKILL.md"
   ],
   "codeTouched": true,
-  "lastCompletedEvidence": "MON2-01: app/core/reminderSurface.js iskeleti (frozen namespace, registerReminderSurface bag: data/ui/app/save/render, fail-closed throw app.js:5111); dört yükleme listesi + index cache-bust (reminderSurface 20260914a, app.js 20260914b); K6 paritesi 14 fixture + acceptance APP_SHELL_REGISTRIES; K8 cross_surface_status birleşik kaynak; K7 modularization [1] bütçeye bağlandı. Kapı: 3 harness + verify-state×3 + 50/52 app + 9 quran + 23 panel + 20 reminder PASS; test_premium_settings/voice 06:30 koşusunda quiet-time gating yüzünden düştü — fixture saati sabitlendi (LEDGER seq 2), 39/39 ve 68/68. app.js 13.139→13.150 (+8 kod, +3 yorum).",
+  "lastCompletedEvidence": "MON2-02: app.js 13.150→10.277 (-2.873); 22 reminder*Legacy silindi; REMINDER_* sabitleri + saf/B1 gövdeler + görünüm üreticileri app/core/reminders.js'e taşındı (4.189 satır, registry +171 üye); reminderSurface.js K4/K5 iskelet. Deps bag 33→51 getter üye (app.js:1455-1511); view bag app.js:1513-1531; scope getter deps-only; REMINDER_PRAYER_KEYS + REMINDER_PRIVACY_SCHEMAS lazy builder; migrateReminderState/REMINDER_* boot sabitleri app.js'te kaldı. Kapı: reminder smoke 21/21; --gate PASS (10.277/0/947/928); driver+zikr 95/95; verify-state B1/B2/B3; tests/app 53/53; App.x=554; onclick=391; dump bugun/ayarlar bayt-eşit. Fixture devirleri: cross_surface extractFunction + kaynak sırası; integrated_ux inbox-live pin; 3 fx2 combinedSource; ui_boundary regex ×3; cache-bust 20260914a/c.",
   "measurements": {
     "MON2-01": {
       "date": "2026-09-14",
@@ -185,6 +185,16 @@
       "reminderFunctionCodeLines": 3247,
       "htmlBuilderCodeLines": 1129,
       "appHandlerAssignments": 554
+    },
+    "MON2-02": {
+      "date": "2026-09-14",
+      "appTotalLines": 10277,
+      "appCodeLines": 9029,
+      "legacyFunctions": 0,
+      "reminderFunctionCodeLines": 947,
+      "htmlBuilderCodeLines": 928,
+      "appHandlerAssignments": 554,
+      "inlineOnclick": 391
     }
   }
 }

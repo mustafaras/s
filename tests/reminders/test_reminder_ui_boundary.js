@@ -33,8 +33,8 @@ const coldSandbox = { window: {}, console };
 vm.runInNewContext(moduleSource, coldSandbox, { filename: "app/core/reminders.js#cold" });
 const registry = coldSandbox.window.SeymaReminders;
 ok("SeymaReminders view registry yüklemede expose edilir", !!registry && Object.isFrozen(registry));
-ok("module load sırasında DOM/storage/timer/ağ açılmaz", !/\b(?:document|localStorage|fetch|setTimeout|setInterval|navigator\.)\s*\.?\s*\(?/u.test(moduleSource));
-ok("native permission ve remote write API'si view modülünde yok", !/Notification\s*\(|requestPermission\s*\(|\b(?:XMLHttpRequest|WebSocket)\b/u.test(moduleSource));
+ok("module load sırasında DOM/storage/timer/ağ açılmaz", !/\bdocument\s*\.\s*\w|\blocalStorage\s*(?:\.\s*\w|\[)|\bfetch\s*\(|\bsetTimeout\s*\(|\bsetInterval\s*\(|\bnavigator\s*\.\s*\w/u.test(moduleSource));
+ok("native permission ve remote write API'si view modülünde yok", !/\bnew\s+Notification\s*\(|\bNotification\s*\.(?:permission|requestPermission)|\brequestPermission\s*\(|\b(?:XMLHttpRequest|WebSocket)\b/u.test(moduleSource));
 ok("view üyeleri ve tek-seferlik registration API'si vardır",
   typeof registry.registerReminderView === "function" &&
   typeof registry.reminderCardHTML === "function" &&
@@ -139,8 +139,8 @@ ok("registry mevcut Catalog/API resolverlarını gerçekten tüketir",
 ok("view source frozen Catalog private copy'sini kopyalamaz",
   !moduleSource.includes("Katalog başlığı fixture") && !moduleSource.includes("Katalog gövdesi fixture"));
 ok("view source mutation/DOM/storage/network/notification yüzeyine sahip değil",
-  !/\b(?:document|localStorage|fetch|setTimeout|setInterval|navigator\.)\s*\.?\s*\(?/u.test(moduleSource) &&
-  !/Notification\s*\(|requestPermission\s*\(|\.setItem\s*\(|\b(?:save|commit|render)\s*\(/u.test(moduleSource));
+  !/\bdocument\s*\.\s*\w|\blocalStorage\s*(?:\.\s*\w|\[)|\bfetch\s*\(|\bsetTimeout\s*\(|\bsetInterval\s*\(|\bnavigator\s*\.\s*\w/u.test(moduleSource) &&
+  !/\bnew\s+Notification\s*\(|\bNotification\s*\.(?:permission|requestPermission)|\brequestPermission\s*\(|\.setItem\s*\(|\b(?:save|commit|render)\s*\(/u.test(moduleSource));
 
 ok("app.js view shim ve app-owned modal/permission handlerları korunuyor",
   /function reminderCenterOverlayHTML\(\)\{[\s\S]*?SEYMA_REMINDERS\.reminderCenterOverlayHTML/u.test(appSource) &&
@@ -149,7 +149,7 @@ ok("app.js view shim ve app-owned modal/permission handlerları korunuyor",
   /App\.onReminderKeydown=function/u.test(appSource) &&
   /App\.requestReminderPermission=function/u.test(appSource));
 ok("reminder.js cache-bust ve üç headless FILES zinciri güncel",
-  indexSource.includes('app/core/reminders.js?v=20260911b') &&
+  indexSource.includes('app/core/reminders.js?v=20260914a') &&
   driverSource.includes("'app/core/reminders.js'") &&
   zikrSource.includes("'app/core/reminders.js'") &&
   rebindSource.includes("'app/core/reminders.js'"));

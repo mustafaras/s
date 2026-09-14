@@ -10,6 +10,14 @@ var fs = require('fs');
 var path = require('path');
 var repoRoot = require('../repo-root');
 
+// Saat sabitleme: mediaFx.js/timeTheme.js gerçek saati `new Date().getHours()`
+// ile okur; fixture 23:00–07:00 arasında koşarsa quiet-time gating voice
+// assert'lerini yanlış negatife düşürür (2026-09-14 06:30 koşusu: 59/67).
+// Varsayılan 12:00 (gündüz). Quiet-time testi saati açıkça pinHour(23) ile çeker.
+var _pinnedHour = 12;
+Date.prototype.getHours = function(){ return _pinnedHour; };
+function pinHour(h){ _pinnedHour = h; }
+
 // ── Mock ortam ──────────────────────────────────────────────────────────────
 var _ls = {};
 global.localStorage = {
@@ -154,10 +162,20 @@ console.log('\n[5] isQuietTime saat aralıkları');
   ok('isQuietTime(10) false', window.SeyAudio.isQuietTime(10) === false);
   ok('isQuietTime(7) false', window.SeyAudio.isQuietTime(7) === false);
   ok('isQuietTime(22) false', window.SeyAudio.isQuietTime(22) === false);
-  // Quiet-time'da voice çağrısı speak tetiklemez.
+  // Gerçek-saat yolu (h verilmez): sabit 12:00'da speak tetikler, 23:00'da
+  // sessiz kalır; fixture duvar saatinden bağımsızdır.
+  window.speechSynthesis = makeMockSpeech(); // Test 4 undefined bırakır
+  setSettings({ premiumAtmosphere: true, voiceGuidance: true, voiceLocalFallback: true });
+  loadMediaFx();
   resetSpeech();
-  var r = window.SeyAudio.voice('sessiz ol', { lang: 'tr-TR' });
-  ok('quiet-time gerçek saatte değilse voice normal çalışır (sadece API)', r === true || r === false);
+  pinHour(12);
+  var rDay = window.SeyAudio.voice('gündüz', { lang: 'tr-TR' });
+  ok('sabit 12:00 → quiet-time dışı: voice yerel speak tetikler', rDay === true && _speakCalls.length === 1);
+  resetSpeech();
+  pinHour(23);
+  var rNight = window.SeyAudio.voice('sessiz ol', { lang: 'tr-TR' });
+  ok('sabit 23:00 → quiet-time: voice false döner, speak yok', rNight === false && _speakCalls.length === 0);
+  pinHour(12);
 })();
 
 // ── Test 6: speaking iken force olmadan false ───────────────────────────────

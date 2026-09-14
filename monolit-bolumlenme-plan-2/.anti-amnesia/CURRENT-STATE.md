@@ -17,7 +17,7 @@
 - `app.js?v=20260914b`; 4 app_surface fixture'ındaki literal sürüm assert'i güncellendi
 - K6 paritesi: 14 fixture + acceptance `APP_SHELL_REGISTRIES` (modules: override'ları yalnız frozen dördü seçer)
 - K7: `test_modularization_boundary [1]` → `shellBudget.maxTotalLines`; K8: cross_surface_status birleşik kaynak
-- Bilinen, kapsam dışı: `test_premium_settings` 38/39, `test_premium_voice` 59/67 — temiz HEAD'de aynı
+- Düzeltildi (MON2 dışı `test:` commit'i): `test_premium_settings`/`test_premium_voice` 06:30 koşusunda 38/39 ve 59/67 vermişti — sebep kod değil, `mediaFx.js` quiet-time (23–07) gating'inin gerçek saati okuması; fixture'lar saati 12:00'a sabitler, quiet-time bloğu 23'e çekip gerçek-saat yolunu sınar (39/39, 68/68, saatten bağımsız)
 
 ## Bütçe (shellBudget)
 

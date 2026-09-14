@@ -175,7 +175,7 @@
     ".claude/skills/run-seyma/SKILL.md"
   ],
   "codeTouched": true,
-  "lastCompletedEvidence": "MON2-01: app/core/reminderSurface.js iskeleti (frozen namespace, registerReminderSurface bag: data/ui/app/save/render, fail-closed throw app.js:5111); dört yükleme listesi + index cache-bust (reminderSurface 20260914a, app.js 20260914b); K6 paritesi 14 fixture + acceptance APP_SHELL_REGISTRIES; K8 cross_surface_status birleşik kaynak; K7 modularization [1] bütçeye bağlandı. Kapı: 3 harness + verify-state×3 + 50/52 app + 9 quran + 23 panel + 20 reminder PASS; test_premium_settings 38/39 ve test_premium_voice 59/67 temiz HEAD'de de aynı (önceden var, kapsam dışı). app.js 13.139→13.150 (+8 kod, +3 yorum).",
+  "lastCompletedEvidence": "MON2-01: app/core/reminderSurface.js iskeleti (frozen namespace, registerReminderSurface bag: data/ui/app/save/render, fail-closed throw app.js:5111); dört yükleme listesi + index cache-bust (reminderSurface 20260914a, app.js 20260914b); K6 paritesi 14 fixture + acceptance APP_SHELL_REGISTRIES; K8 cross_surface_status birleşik kaynak; K7 modularization [1] bütçeye bağlandı. Kapı: 3 harness + verify-state×3 + 50/52 app + 9 quran + 23 panel + 20 reminder PASS; test_premium_settings/voice 06:30 koşusunda quiet-time gating yüzünden düştü — fixture saati sabitlendi (LEDGER seq 2), 39/39 ve 68/68. app.js 13.139→13.150 (+8 kod, +3 yorum).",
   "measurements": {
     "MON2-01": {
       "date": "2026-09-14",

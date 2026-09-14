@@ -9,6 +9,14 @@ var fs = require('fs');
 var path = require('path');
 var repoRoot = require('../repo-root');
 
+// Saat sabitleme: mediaFx.js/timeTheme.js gerçek saati `new Date().getHours()`
+// ile okur; fixture 23:00–07:00 arasında koşarsa quiet-time gating voice
+// assert'lerini yanlış negatife düşürür (2026-09-14 06:30 koşusu: 59/67).
+// Varsayılan 12:00 (gündüz). Quiet-time testi saati açıkça pinHour(23) ile çeker.
+var _pinnedHour = 12;
+Date.prototype.getHours = function(){ return _pinnedHour; };
+function pinHour(h){ _pinnedHour = h; }
+
 // ── Mock ortam ──────────────────────────────────────────────────────────────
 var _ls = {};
 global.localStorage = {
@@ -104,9 +112,10 @@ console.log('\n[3] voiceGuidance — sesli rehberlik gating');
   // Bulut-önce: anahtar/voiceCloudTts yoksa voice() false — yerel sese düşmez
   var r = window.SeyAudio.voice('x');
   ok('bulut ayarı yokken voice() false (yerel sese düşmez)', r === false);
-  // voiceLocalFallback=true ile düşer
+  // voiceLocalFallback=true ile düşer (quiet-time dışı: saat sabit 12:00)
   setSettings({ premiumAtmosphere: true, voiceGuidance: true, voiceLocalFallback: true });
   loadMediaFx();
+  pinHour(12);
   var rl = window.SeyAudio.voice('x');
   ok('voiceLocalFallback=true iken voice() yerel sese düşer', rl === true);
 })();

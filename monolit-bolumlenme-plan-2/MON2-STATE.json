@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "planningRevision": "1.0",
+  "programId": "MON2-KABUK-INCELTME",
+  "status": "planned",
+  "activePrompt": "MON2-01",
+  "blockedPrompt": null,
+  "releaseApproval": "not_approved",
+  "lastCompletedPrompt": null,
+  "nextPrompt": "MON2-01",
+  "currentWave": "1",
+  "totalPrompts": 8,
+  "completedPrompts": 0,
+  "updatedAt": "2026-09-14",
+  "baseline": {
+    "date": "2026-09-14",
+    "commit": "cf42949",
+    "appTotalLines": 13139,
+    "appCodeLines": 11839,
+    "legacyFunctions": 22,
+    "htmlBuilderCodeLines": 1129,
+    "reminderFunctionCodeLines": 3247,
+    "reminderInternalOnlyCodeLines": 1770,
+    "appHandlerAssignments": 554,
+    "inlineOnclick": 391,
+    "tool": "node tools/shell-inventory.mjs"
+  },
+  "shellBudget": {
+    "maxTotalLines": 13200,
+    "maxLegacyFunctions": 22,
+    "maxReminderFunctionCodeLines": 3300,
+    "maxHtmlBuilderCodeLines": 1150,
+    "rule": "Her kart kapanışında ölçülen değer + %2 ile daraltılır; asla gevşetilmez."
+  },
+  "budgetPlan": {
+    "MON2-01": { "maxTotalLines": 13200, "maxLegacyFunctions": 22, "maxReminderFunctionCodeLines": 3300, "maxHtmlBuilderCodeLines": 1150 },
+    "MON2-02": { "maxTotalLines": 11300, "maxLegacyFunctions": 0, "maxReminderFunctionCodeLines": 1500, "maxHtmlBuilderCodeLines": 1150 },
+    "MON2-03": { "maxTotalLines": 10300, "maxLegacyFunctions": 0, "maxReminderFunctionCodeLines": 450, "maxHtmlBuilderCodeLines": 950 },
+    "MON2-04": { "maxTotalLines": 10300, "maxLegacyFunctions": 0, "maxReminderFunctionCodeLines": 450, "maxHtmlBuilderCodeLines": 950 },
+    "MON2-05": { "maxTotalLines": 9400, "maxLegacyFunctions": 0, "maxReminderFunctionCodeLines": 450, "maxHtmlBuilderCodeLines": 150 },
+    "MON2-06": { "maxTotalLines": 8500, "maxLegacyFunctions": 0, "maxReminderFunctionCodeLines": 450, "maxHtmlBuilderCodeLines": 150 },
+    "MON2-07": { "maxTotalLines": 8000, "maxLegacyFunctions": 0, "maxReminderFunctionCodeLines": 450, "maxHtmlBuilderCodeLines": 150 },
+    "MON2-08": { "maxTotalLines": 8000, "maxLegacyFunctions": 0, "maxReminderFunctionCodeLines": 450, "maxHtmlBuilderCodeLines": 150 }
+  },
+  "waves": [
+    { "id": "1", "title": "Reminder", "prompts": ["MON2-01", "MON2-02", "MON2-03", "MON2-04"], "status": "pending" },
+    { "id": "2", "title": "Görünüm", "prompts": ["MON2-05"], "status": "pending" },
+    { "id": "3", "title": "Alan", "prompts": ["MON2-06", "MON2-07"], "status": "pending" },
+    { "id": "4", "title": "Kapanış", "prompts": ["MON2-08"], "status": "pending" }
+  ],
+  "decisions": ["K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9"],
+  "inheritedContracts": ["S1-S8", "I1-I6", "M1-M4", "MON-K1..K8"],
+  "newCoreFiles": ["app/core/reminderSurface.js"],
+  "frozen": [
+    "app/core/reminderCatalog.js", "app/core/reminderEngine.js", "app/core/reminderScheduler.js",
+    "app/core/reminderDelivery.js", "sync.js", "sw.js", "panel.html", "panel/", "panel-v2.html",
+    "app/content/", "docs/reminders/", "premium-fx-plan/MODULARIZATION.md"
+  ],
+  "separateApprovals": ["push", "merge", "tag", "deploy", "browser", "device", "seyma-data write", "real token/data"],
+  "nextSafeAction": "MON2-01'i uygula: reminderSurface.js iskeleti, dört yükleme listesi, 11 fixture yükleme paritesi, cross_surface_status birleşik kaynak, test_modularization_boundary [1] çevirisi, --gate PASS; tek yerel commit.",
+  "authority": [
+    "CLAUDE.md",
+    "AGENTS.md",
+    "monolit-bolumlenme-plan-2/README.md",
+    "monolit-bolumlenme-plan/UYGULAMA-PROMPTLARI.md",
+    "monolit-bolumlenme-plan/deliverables/MON-SERI-KAPANIS-BELGESI.md",
+    "docs/monolit-bolumlenme-haritasi.md",
+    ".claude/skills/run-seyma/SKILL.md"
+  ]
+}

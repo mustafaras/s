@@ -21,6 +21,18 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-14 (MON2 Dalga 1 kapatıldı — kabuk inceltme Reminder dalgası):**
+>   MON2 programının (8 kart, ölçülen kabuk bütçesi) Dalga 1'i MON2-01…04 ile
+>   tamamlandı. `app.js` 13.139 → 9.771 satır (kod 11.839 → 8.532), 22
+>   `reminder*Legacy` çift gövde emekli edildi (0), reminder fonksiyon
+>   gövdesi 3.247 → 408 kod satırı, `*HTML` builder 1.129 → 928 satır; tek
+>   yeni dosya `app/core/reminderSurface.js` (MON2-03, MON-50 appSurface
+>   deseni + with(SCOPE), 123-dep bag). Runtime delta yok (I1–I6 korunur);
+>   tam kapı seti (smoke 20/20, fx2 6/6, panel 23, panel-v2 27, Kur'an 9,
+>   driver/zikr/B1-B2-B3, `shell-inventory --gate`) PASS. Kapanış belgesi
+>   [`MON2-DALGA1-KAPANIS.md`](../monolit-bolumlenme-plan-2/deliverables/MON2-DALGA1-KAPANIS.md);
+>   sıradaki kart MON2-05 (Görünüm dalı, builder → `render.js`). Program
+>   LOCAL-ONLY; push/deploy/device ayrı kapılar.
 > - **2026-09-14 (MON-60 sonrası kod denetimi ve düzeltme):** 60 promptun
 >   tamamı ledger değil kaynak üzerinden doğrulandı (24 registry, 723 core
 >   gövde, ~497 shim, 21 IIFE load-safe, `data=` 9/11, App fn 556, handler
@@ -106,6 +118,7 @@ _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 |---|-------|:-----:|:-----:|-------------|
 | — | Altyapı (sync, panel, tema, Okuma/İzleme hub'ları) | 0 | ✅ | `sync.js`, `panel.html`, `app/styles.css`, hub deseni |
 | MON | 🧱 `app.js` monolit bölümleme | 0 | ✅ | 24 hedef registry, 29 `app/core` dosyası; MON-01..60 uygulandı ve seri 2026-09-13'te kapandı (60/60, [kapanış belgesi](../monolit-bolumlenme-plan/deliverables/MON-SERI-KAPANIS-BELGESI.md)); 2026-09-14 kapanış sonrası kod denetimi düzeltmeleri LEDGER seq 82. Güncel kanıt: [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md), [module map](monolit-bolumlenme-haritasi.md), [MON-D11 regression](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
+| MON2 | 📉 `app.js` kabuk inceltme (ölçülen bütçe) | 0 | 🟡 | 8 kart, 4 dalga; Dalga 1 (Reminder, MON2-01…04) 2026-09-14'te kapandı: `app.js` 13.139 → 9.771 satır, `*Legacy` 22 → 0, `app/core/reminderSurface.js` eklendi (kapanış belgesi: [MON2-DALGA1-KAPANIS.md](../monolit-bolumlenme-plan-2/deliverables/MON2-DALGA1-KAPANIS.md)). Sıradaki: MON2-05 (builder → `render.js`). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
 | 1 | 🎵 Ne Dinledim | 1 | ✅ | `listeningOverlayHTML` hub (Bugün/Favoriler/İstatistik/Sözler) + `data.music` + `data.days[].listening`; `--listen` teal accent; panel "🎧 Dinleme Arşivi" (2026-07-04) |
 | 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ✅ | `App.onGratitude` + `data.days[].gratitude` (≤3); Bugün kartı (geçmiş günde düzenlenebilir); panel gün-detayı bloğu (2026-07-04) |
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |

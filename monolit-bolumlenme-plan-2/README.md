@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Kabuk İnceltme Programı (MON2)
 
-**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `in_progress` · **Kart:** 3/8 · **Aktif:** `MON2-04` · **Devir:** [`DEVIR-MON2-04.md`](DEVIR-MON2-04.md)
+**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `in_progress` · **Kart:** 4/8 · **Dalga 1 (Reminder) kapandı** · **Aktif:** `MON2-05` · **Devir:** [`DEVIR-MON2-05.md`](DEVIR-MON2-05.md)
 
 MON serisi (60 kart) `app.js`'i 18.957 → 13.139 satıra indirdi ama satır sayısı
 hiçbir kartın hedefi değildi; kapanış belgesi 13.144'ü yalnız *baseline* olarak
@@ -14,18 +14,18 @@ LOCAL-ONLY kalır; push/merge/tag/deploy/`seyma-data` yazımı ayrı onaydır.
 
 ## 1. Teşhis (2026-09-14, `node tools/shell-inventory.mjs`)
 
-| Ölçüm | Değer | Yorum |
-|---|---:|---|
-| `app.js` toplam / kod satırı | 13.139 / 11.839 | 1.140 yorum, 160 boş |
-| Sütun-0 fonksiyon | 1.867 | |
-| Shim (≤2 kod satırı) | 1.091 fn / 1.148 satır | yalnız 261'i registry'ye delege ediyor |
-| Küçük gövde (3–10) | 530 fn / 2.950 satır | **taşınmamış gerçek kod** |
-| Büyük gövde (≥11) | 246 fn / 5.107 satır | **taşınmamış gerçek kod** |
-| `App.*` handler gövdesi | 554 fn / 2.430 satır | |
-| `*Legacy` çift gövde | 22 fn / 208 satır | MON-40 fallback; hiçbir fixture bu yolu pinlemiyor |
-| `*HTML()` builder (>2 satır) | 60 fn / 1.129 satır | `SeymaRender` sözleşmesine rağmen app.js'te |
-| **Reminder ayak izi** | **529 fn / 3.247 satır + 120 sabit / 288 satır** | `app/core/reminders.js` yalnız 360 satır |
-| Reminder yalnız-iç fonksiyon | 293 fn / 1.770 satır | shim'siz taşınabilir |
+| Ölçüm | Değer | Dalga 1 sonrası | Yorum |
+|---|---:|---:|---|
+| `app.js` toplam / kod satırı | 13.139 / 11.839 | 9.771 / 8.532 | 1.140 → 1.078 yorum, 160 boş |
+| Sütun-0 fonksiyon | 1.867 | 1.676 | |
+| Shim (≤2 kod satırı) | 1.091 fn / 1.148 satır | 1.268 fn / 1.280 satır | 35 reminder fn + 51 handler 1-liner'a indi |
+| Küçük gövde (3–10) | 530 fn / 2.950 satır | 250 fn / 1.458 satır | taşınanlar MON2-02/03'te |
+| Büyük gövde (≥11) | 246 fn / 5.107 satır | 158 fn / 3.425 satır | Dalga 2+ hedefi |
+| `App.*` handler gövdesi | 554 fn / 2.430 satır | 554 fn / 2.145 satır | envanter sabit; gövdeler modülde |
+| `*Legacy` çift gövde | 22 fn / 208 satır | 0 / 0 | MON2-01'de emekli (K1) |
+| `*HTML()` builder (>2 satır) | 60 fn / 1.129 satır | 43 fn / 928 satır | Dalga 2 (MON2-05) hedefi 150 |
+| **Reminder ayak izi** | **529 fn / 3.247 satır + 120 sabit / 288 satır** | **355 fn / 408 satır + 121 sabit / 289 satır** | `app/core/reminderSurface.js` 1.004 satır |
+| Reminder yalnız-iç fonksiyon | 293 fn / 1.770 satır | 69 fn / 72 satır | shim'siz taşınanlar modülde |
 
 Alan gövdeleri (büyük fn): reminder 1.715 · quran 437 · aeon 345 · zikr 250 ·
 profile 217 · location 208 · psych 175 · hero/header/health/photo/habit ≈ 470.

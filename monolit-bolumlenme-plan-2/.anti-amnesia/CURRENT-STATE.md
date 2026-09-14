@@ -1,6 +1,6 @@
 # MON2 · Güncel durum
 
-**Güncelleme:** 2026-09-14 · **Durum:** `in_progress` · **Aktif kart:** MON2-04 · **Tamamlanan:** 3/8 (MON2-01, MON2-02, MON2-03)
+**Güncelleme:** 2026-09-14 · **Durum:** `in_progress` · **Aktif kart:** MON2-05 · **Tamamlanan:** 4/8 (MON2-01, MON2-02, MON2-03, MON2-04) · **Dalga 1 (Reminder) kapandı**
 
 ## Canlı baseline (commit cf42949, `node tools/shell-inventory.mjs`)
 
@@ -44,12 +44,18 @@
 
 ## Bütçe (shellBudget)
 
-10.300 satır · 0 Legacy · 450 reminder gövde · 950 HTML builder (MON2-03 plan bütçesi; ölçüm 9.771/0/408/928 ile altında). MON2-04 (Dalga 1 kapanışı) aynı bütçeyi korur.
+Aktif (MON2-05): 9.400 satır · 0 Legacy · 450 reminder gövde · **150 HTML builder**. Ölçüm 9.771/0/408/928 — satır/reminder zaten altında; builder düşüşü MON2-05'in işidir (928 → ≤150, `*HTML` gövdeleri `render.js`'e). Bütçe asla gevşetilmez; ölçüm tutmazsa kart bütçeyi ölçülen değere çeker ve sapmayı LEDGER'a yazar.
+
+## MON2-04 sonrası (2026-09-14 · Dalga 1 kapanışı)
+
+- Kod değişikliği YOK (kart kapanışı): ölçüm MON2-03 ile aynı — 9.771 / 0 / 408 / 928; `--gate` PASS
+- Tam kapı seti koşuldu ve PASS: smoke 20/20, app_surface 4 fixture, modal, aeon, driver+zikr 95/95, verify-state ×3, tests/app (modülerleştirme + premium 8/8 + fx2 6/6), panel 23/23, panel-v2 27/27, quran 9/9, sync 69/69
+- Doküman senkronu: CLAUDE.md/AGENTS.md repo layout (`reminderSurface.js` satırı, Legacy cümlesi silindi; MON2 bullet status/aktif kart güncel), `docs/GELISTIRME-PLANI.md` changelog + durum tablosu MON2 satırı, `tests/README.md` envanter notları, plan README §1 "Dalga 1 sonrası" kolonu
+- Kapanış belgesi: [`deliverables/MON2-DALGA1-KAPANIS.md`](../deliverables/MON2-DALGA1-KAPANIS.md) (önce/sonra envanter, taşınan kod, 22 Legacy listesi, fixture listesi, kapı kanıtı)
 
 ## Sonraki güvenli adım
 
-MON2-04 (README §5): Dalga 1 kapanışı — reminder smoke + tüm aileler + `--gate` tekrarı,
-`DEVIR-MON2-04.md` ve LEDGER/CURRENT-STATE/STATE senkronizasyonu.
+MON2-05 (README §5): `*HTML()` builder'ları → `render.js` — bütçe 9.400 / 0 / 450 / 150. Devir briefi: [`DEVIR-MON2-05.md`](../DEVIR-MON2-05.md).
 Push/deploy/browser/gerçek veri yok.
 
 ## Sınırlar

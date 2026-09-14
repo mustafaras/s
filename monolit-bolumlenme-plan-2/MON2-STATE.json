@@ -3,14 +3,14 @@
   "planningRevision": "1.0",
   "programId": "MON2-KABUK-INCELTME",
   "status": "in_progress",
-  "activePrompt": "MON2-04",
+  "activePrompt": "MON2-05",
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON2-03",
-  "nextPrompt": "MON2-04",
-  "currentWave": "1",
+  "lastCompletedPrompt": "MON2-04",
+  "nextPrompt": "MON2-05",
+  "currentWave": "2",
   "totalPrompts": 8,
-  "completedPrompts": 3,
+  "completedPrompts": 4,
   "updatedAt": "2026-09-14",
   "baseline": {
     "date": "2026-09-14",
@@ -26,10 +26,10 @@
     "tool": "node tools/shell-inventory.mjs"
   },
   "shellBudget": {
-    "maxTotalLines": 10300,
+    "maxTotalLines": 9400,
     "maxLegacyFunctions": 0,
     "maxReminderFunctionCodeLines": 450,
-    "maxHtmlBuilderCodeLines": 950,
+    "maxHtmlBuilderCodeLines": 150,
     "rule": "Her kart kapanışında ölçülen değer + %2 ile daraltılır; asla gevşetilmez."
   },
   "budgetPlan": {
@@ -92,7 +92,7 @@
         "MON2-03",
         "MON2-04"
       ],
-      "status": "in_progress"
+      "status": "completed"
     },
     {
       "id": "2",
@@ -100,7 +100,7 @@
       "prompts": [
         "MON2-05"
       ],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": "3",
@@ -164,7 +164,7 @@
     "seyma-data write",
     "real token/data"
   ],
-  "nextSafeAction": "MON2-04'ü uygula (README §5): Dalga 1 kapanışı — smoke + tüm aileler + --gate tekrar, DEVIR-MON2-04, LEDGER/CURRENT-STATE/STATE senkron. Push/deploy/browser/gerçek veri yok.",
+  "nextSafeAction": "MON2-05'i uygula (README §5): *HTML() builder gövdelerini render.js'e taşı — bütçe 9.400/0/450/150 (builder 928→≤150). DEVIR-MON2-05.md ile başla; push/deploy/browser/gerçek veri yok.",
   "authority": [
     "CLAUDE.md",
     "AGENTS.md",
@@ -175,7 +175,7 @@
     ".claude/skills/run-seyma/SKILL.md"
   ],
   "codeTouched": true,
-  "lastCompletedEvidence": "MON2-03: app.js 10.277→9.771 (-506); 35 yan etkili reminder fn + 51 App.*reminder* handler gövdesi reminderSurface.js'e taşındı (1004 satır; MON-50 appSurface deseni, with(SCOPE) idiomu); appendReminderEvent+persistReminderEvent REM-67 event-adapter sözleşmesiyle app.js'te tam gövde kaldı (fn 37→35); bag 122→123 üye (+appendReminderEvent) + 5 setter; REMINDER_SURFACE_DEPENDENCIES 123 ad; cache-bust 20260914d. Kapı: smoke 20/20; --gate PASS (9.771/0/408/928); driver+zikr 95/95; verify-state B1/B2/B3; tests/app 53/53 + fx2 6/6; panel 23/23; panel-v2 27/27; quran 9/9; sync 69/69; App.x=554; onclick(kombine)=391; withModule:false PASS.",
+  "lastCompletedEvidence": "MON2-04 (Dalga 1 kapanışı): kod taşınmadı, ölçüm MON2-03 ile aynı — 9.771/0/408/928; --gate PASS. Tam kapı seti PASS: smoke 20/20, app_surface 21/58/16/49, modal, aeon 24/24, driver+zikr 95/95, verify-state B1/B2/B3, tests/app (modülerleştirme+premium 8/8+fx2 6/6), panel 23/23, panel-v2 27/27, quran 9/9, sync 69/69. Doküman senkronu: CLAUDE/AGENTS repo layout (reminderSurface satırı, Legacy cümlesi silindi, app.js ~9.8k), GELISTIRME-PLANI changelog + MON2 durum satırı, tests/README, plan README §1 'Dalga 1 sonrası' kolonu. Kapanış belgesi: deliverables/MON2-DALGA1-KAPANIS.md.",
   "measurements": {
     "MON2-01": {
       "date": "2026-09-14",
@@ -205,6 +205,17 @@
       "htmlBuilderCodeLines": 928,
       "appHandlerAssignments": 554,
       "inlineOnclick": 391
+    },
+    "MON2-04": {
+      "date": "2026-09-14",
+      "appTotalLines": 9771,
+      "appCodeLines": 8532,
+      "legacyFunctions": 0,
+      "reminderFunctionCodeLines": 408,
+      "htmlBuilderCodeLines": 928,
+      "appHandlerAssignments": 554,
+      "inlineOnclick": 391,
+      "note": "Dalga 1 kapanışı — kod taşınmadı, doküman senkronu"
     }
   }
 }

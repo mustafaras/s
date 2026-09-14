@@ -63,7 +63,8 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_state_rebind_boundary.js` — MON-15 state Dalga 3 kapanışı: canlı
   B1 getter tazeliği, dokuz `app.js` data atama satırı, registryde sıfır
   `data=` yazımı, import/reset/location/auth late-boot ve 6079 try/finally
-  geri-bind sınırı; sentetik `node:vm`, ağsız.
+  geri-bind sınırı; sentetik `node:vm`, ağsız. Boot listesi MON2-01'den
+  beri `app/core/reminderSurface.js`'i de içerir (MON-25 dört-liste sözleşmesi).
 - `app/test_prayer_boundary.js` — MON-19 `SeymaPrayer` registry sınırı:
   load-safe expose, canlı state/date resolver, cache hit, explicit mock fetch,
   no-op timer ve normalizer davranışı; gerçek ağ/GPS/browser yoktur.
@@ -96,7 +97,11 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   takılı kalma” regresyonu. 2026-08-21’de sahada görülen `ERR_HTTP2_PROTOCOL_ERROR`
   istek seli + “Çekirdek başlatılıyor…” kilitlenmesini kalıcı olarak kapatır.
 - `reminders/` — dondurulmuş reminder programı için 20 seçilmiş ağsız sentetik
-  bakım fixture’ı; runtime, browser ve gerçek veri kullanmaz.
+  bakım fixture'ı; runtime, browser ve gerçek veri kullanmaz. MON2 Dalga 1
+  sonrası aile `app/core/reminderSurface.js`'i de yükler (`test_reminder_boot`
+  123-dep bag, `test_reminder_end_to_end_lineage` REM-67 dilim sözleşmesi,
+  fx2 `test_fx2_overlay_motion` iki aşamalı kaynak araması) ve 22
+  `reminder*Legacy` çift gövdesi emekli edildiği için Legacy yolları 0'dır.
 - `repo-root.js` — root kaynaklarına güvenli, cwd’den bağımsız erişim yardımcısı.
 
 Reminder acceptance’ı üç ayrı scope olarak raporlanır: `tests/reminders/`

@@ -820,7 +820,9 @@ ok('Geri al, son toplu sıfırlamayı tek dokunuşla eksiksiz geri yüklüyor',
   resetRestored.zikr.activeSession.count===3 &&
   !resetRestored.zikr.activeSession.pausedAt);
 ok('Zikirmatik overlay toast geri bildirimi overlay katmanının üstünde görünür',
-  /z-index:10000/.test(appSource)&&/Geri alınacak yeni bir sayım yok/.test(appSource));
+  // MON2-05: konum kapısı gövdesi render.js'e taşındı; z-index sözleşmesi
+  // app.js + render.js birleşik kaynakta aranır.
+  /z-index:10000/.test(appSource+renderSource)&&/Geri alınacak yeni bir sayım yok/.test(appSource));
 
 // ── REM-54: zikir ve Saygı reminder deep-link hedefleri ─────────────────
 const remSb = resetSb;

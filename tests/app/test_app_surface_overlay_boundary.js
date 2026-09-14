@@ -56,6 +56,6 @@ ok('every handler keeps its exact App name through the shared signature-neutral 
 ok('profile consent, permission, transport, send/upload and destructive actions are absent from MON-52 binding',
   !/profileConsent|requestReminderPermission|quranJourneySubmit|send|upload|record|deleteNotif|removeSoulArchiveSession/.test(binding));
 ok('production loads appSurface before app.js with fresh cache versions',
-  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260913c/.test(index) && /app\.js\?v=20260914d/.test(index));
+  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260913c/.test(index) && /app\.js\?v=20260914e/.test(index));
 
 console.log('\nMON-52 overlay App surface boundary: ' + passed + '/' + passed + ' passed');

@@ -49,7 +49,12 @@ var migration=between('function migrate(d){','// ── Tema: üç durumlu terci
 assert('app.js migrate shim imzasını korur',migration.indexOf('return window.SeymaState.migrate(d);')>=0);
 assert('eski kayıtlara Tatil Modu kart görünürlük tercihi eklenir',stateSource.indexOf("if(typeof d.settings.hideVacationCard!=='boolean') d.settings.hideVacationCard=false;")>=0);
 
-var vacation=between('function vacationCardHTML(rec){','CARD_BUILDERS[\'vacation\']=vacationCardHTML;');
+// MON2-05: vacationCardHTML gövdesi app.js'ten app/core/render.js'e taşındı
+// (app.js'te 1-liner shim kaldı); bölüm artık renderSource'tan okunur.
+var vacationStart=renderSource.indexOf('function vacationCardHTML(rec){');
+var vacationEnd=renderSource.indexOf('\nfunction hubTilesHTML(){',vacationStart);
+if(vacationStart<0||vacationEnd<0) throw new Error('Render registry Tatil Modu kartı gövdesi bulunamadı');
+var vacation=renderSource.slice(vacationStart,vacationEnd);
 assert('Tatil Modu kartında erişilebilir Gizle düğmesi vardır',/App\.hideBugunCard\([^)]*vacation/.test(vacation)&&vacation.indexOf('Tatil Modu kartını gizle')>=0&&vacation.indexOf('min-height:44px')>=0);
 
 var settings=settingsSource.slice(settingsSource.indexOf('function ayarlarHTML(){'),settingsSource.indexOf('function settingsBtn('));

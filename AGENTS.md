@@ -162,8 +162,8 @@ app/core/reminder*.js  Frozen REM program modules (`ReminderCatalogV1`,
                  `ReminderDeliveryV1`): pure engine/scheduler/delivery
                  boundaries consumed by app.js; copy lexicon in
                  reminderCatalog.js.
-app.js           The Şeyma runtime shell (single IIFE, ~9.8k lines after the
-                 MON-01…60 split + MON2 Dalga 1). Still the sole owner of `var data/ui/dark`
+app.js           The Şeyma runtime shell (single IIFE, ~9.0k lines after the
+                 MON-01…60 split + MON2 Dalga 1–2). Still the sole owner of `var data/ui/dark`
                  and the 9 `data=` rebind sites, the 7 B1 live getters, the
                  `SeyOnSyncState`/`SeyOnSynced` callbacks, all timer/listener
                  registrations, `window.App=App` and the 554 `App.x=function`

@@ -1,6 +1,6 @@
 # MON2 · Güncel durum
 
-**Güncelleme:** 2026-09-14 · **Durum:** `in_progress` · **Aktif kart:** MON2-05 · **Tamamlanan:** 4/8 (MON2-01, MON2-02, MON2-03, MON2-04) · **Dalga 1 (Reminder) kapandı**
+**Güncelleme:** 2026-09-14 · **Durum:** `in_progress` · **Aktif kart:** MON2-06 · **Tamamlanan:** 5/8 (MON2-01…05) · **Dalga 1 (Reminder) + Dalga 2 (Görünüm) kapandı**
 
 ## Canlı baseline (commit cf42949, `node tools/shell-inventory.mjs`)
 
@@ -44,7 +44,7 @@
 
 ## Bütçe (shellBudget)
 
-Aktif (MON2-05): 9.400 satır · 0 Legacy · 450 reminder gövde · **150 HTML builder**. Ölçüm 9.771/0/408/928 — satır/reminder zaten altında; builder düşüşü MON2-05'in işidir (928 → ≤150, `*HTML` gövdeleri `render.js`'e). Bütçe asla gevşetilmez; ölçüm tutmazsa kart bütçeyi ölçülen değere çeker ve sapmayı LEDGER'a yazar.
+Aktif (MON2-06): 8.500 satır · 0 Legacy · 450 reminder gövde · 150 HTML builder. Ölçüm 8.969/0/408/97 — builder zaten altında (MON2-05 97'ye indirdi); satır düşüşü MON2-06'nın işidir (8.969 → ≤8.500, alan gövdeleri registry'lere). Bütçe asla gevşetilmez; ölçüm tutmazsa kart bütçeyi ölçülen değere çeker ve sapmayı LEDGER'a yazar.
 
 ## MON2-04 sonrası (2026-09-14 · Dalga 1 kapanışı)
 
@@ -53,9 +53,22 @@ Aktif (MON2-05): 9.400 satır · 0 Legacy · 450 reminder gövde · **150 HTML b
 - Doküman senkronu: CLAUDE.md/AGENTS.md repo layout (`reminderSurface.js` satırı, Legacy cümlesi silindi; MON2 bullet status/aktif kart güncel), `docs/GELISTIRME-PLANI.md` changelog + durum tablosu MON2 satırı, `tests/README.md` envanter notları, plan README §1 "Dalga 1 sonrası" kolonu
 - Kapanış belgesi: [`deliverables/MON2-DALGA1-KAPANIS.md`](../deliverables/MON2-DALGA1-KAPANIS.md) (önce/sonra envanter, taşınan kod, 22 Legacy listesi, fixture listesi, kapı kanıtı)
 
+## MON2-05 sonrası (2026-09-14 · Dalga 2 kapanışı)
+
+- `app.js` 9.771 → **8.969 satır** (7.777 kod) — −802 satır; `app/core/render.js` **1.843 satır** (kod 1.620)
+- Taşınanlar: **37 `*HTML` builder gövdesi** (831 kod satırı) → `render.js`; app.js'te 1-liner `SEYMA_RENDER.x.apply(null,arguments)` shim'ler
+- Dep bag genişledi: **61 fn dep** + **14 sabit dep** (MOODS, REFLECT_PROMPTS, HABITS, DERIVED_HABITS, DERIVED_ACCENT, VACATION_WATER_GOAL, NOTES, SHORT_HABIT, WA, TEL, QURAN_DEFAULT_SURAH_ID, QURAN_FILTERS, QURAN_VIDEO_ID_RE, AEON_ICON_URL) + `find` çözücüsü; manifest aynı üye seti; MON-49 fail-closed korunur
+- render.js: `call()`-wrapper'lar (61+1) + taşınan gövdeler (prologue idiomu: `var data=liveData(), ui=liveUi(), dark=liveDark(), CONST=call('CONST',[])`) + export map'e 37 mover + modalsHTML + render
+- Kalan >2-satır `*HTML` builder: **6 fn / 97 satır** (haritaHTML, saveButtonHTML, dailyPhotoCardHTML, bugunHTML(4), headerActionHTML, headerSceneHTML) — bütçe ≤150
+- `App.x=554` sabit; inline onclick fx2 birleşik kaynakta **391** sabit (render.js combinedSource'ta zaten vardı); `data=` 9 rebind, B1 getter, timer/listener kaydı, `window.App=App` app.js'te
+- Dump kanıtı: driver `--dump bugun/rapor/ayarlar/hub` önce/sonra **4/4 BAYT-EŞİT** (31 PASS her iki tarafta). Not: `health.js` `calculateMgNudge`'ta önceden var olan `Math.random` skor satırı (75–95) dump'ı koşum başına değiştiriyordu — kanıt için geçici tmp driver kopyasında Math.random sabitlendi; üretim kodu değişmedi (LEDGER seq 6 sapma 5)
+- Fixture devirleri (K8): `test_today_card_preferences` + `test_modal_focus_containment` bölümleri renderSource'a; `zikr-harness` z-index sözleşmesi birleşik kaynağa
+- Kapı: smoke **21/21** · `--gate` PASS (9.400 bütçesi, 8.969/0/408/97) · driver+zikr **95/95** · verify-state B1/B2/B3 · tests/app **52/52** · panel 23/23 · panel-v2 27/27 · quran 9/9 · sync 69/69 · App.x=554 · onclick(kombine)=391
+- Cache-bust: `render.js?v=20260914e`, `app.js?v=20260914e` + 4 app_surface pin'i güncellendi
+
 ## Sonraki güvenli adım
 
-MON2-05 (README §5): `*HTML()` builder'ları → `render.js` — bütçe 9.400 / 0 / 450 / 150. Devir briefi: [`DEVIR-MON2-05.md`](../DEVIR-MON2-05.md).
+MON2-06 (README §6): alan gövdeleri quran/zikr/profile/psych → ilgili registry'ler — bütçe 8.500 / 0 / 450 / 150. Devir briefi: [`DEVIR-MON2-06.md`](../DEVIR-MON2-06.md).
 Push/deploy/browser/gerçek veri yok.
 
 ## Sınırlar

@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Kabuk İnceltme Programı (MON2)
 
-**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `in_progress` · **Kart:** 4/8 · **Dalga 1 (Reminder) kapandı** · **Aktif:** `MON2-05` · **Devir:** [`DEVIR-MON2-05.md`](DEVIR-MON2-05.md)
+**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `in_progress` · **Kart:** 5/8 · **Dalga 1 + Dalga 2 kapandı** · **Aktif:** `MON2-06` · **Devir:** [`DEVIR-MON2-06.md`](DEVIR-MON2-06.md)
 
 MON serisi (60 kart) `app.js`'i 18.957 → 13.139 satıra indirdi ama satır sayısı
 hiçbir kartın hedefi değildi; kapanış belgesi 13.144'ü yalnız *baseline* olarak
@@ -23,7 +23,7 @@ LOCAL-ONLY kalır; push/merge/tag/deploy/`seyma-data` yazımı ayrı onaydır.
 | Büyük gövde (≥11) | 246 fn / 5.107 satır | 158 fn / 3.425 satır | Dalga 2+ hedefi |
 | `App.*` handler gövdesi | 554 fn / 2.430 satır | 554 fn / 2.145 satır | envanter sabit; gövdeler modülde |
 | `*Legacy` çift gövde | 22 fn / 208 satır | 0 / 0 | MON2-01'de emekli (K1) |
-| `*HTML()` builder (>2 satır) | 60 fn / 1.129 satır | 43 fn / 928 satır | Dalga 2 (MON2-05) hedefi 150 |
+| `*HTML()` builder (>2 satır) | 60 fn / 1.129 satır | 6 fn / 97 satır | MON2-05: 37 builder (831 satır) render.js'e; hedef 150 sağlandı |
 | **Reminder ayak izi** | **529 fn / 3.247 satır + 120 sabit / 288 satır** | **355 fn / 408 satır + 121 sabit / 289 satır** | `app/core/reminderSurface.js` 1.004 satır |
 | Reminder yalnız-iç fonksiyon | 293 fn / 1.770 satır | 69 fn / 72 satır | shim'siz taşınanlar modülde |
 

@@ -63,8 +63,10 @@ modalSections.forEach(([name, text]) => {
   ok(name + ' arka planı focusable button değil', !text.includes('role="button" tabindex="0"'));
 });
 
-const zikr = section('function zikroverlayHTML(){', '\nfunction zikrViewBodyHTML');
-const quran = section('function quranJourneyOverlayHTML(){', '\nfunction quranRemoteStatusHTML');
+// MON2-05: zikroverlayHTML ve quranJourneyOverlayHTML gövdeleri app.js'ten
+// app/core/render.js'e taşındı; bölümler artık renderSource'tan okunur.
+const zikr = section('function zikroverlayHTML(){', '\nfunction quranJourneyHubCardHTML(){', renderSource);
+const quran = section('function quranJourneyOverlayHTML(){', '\nfunction quranRemoteStatusHTML', renderSource);
 ok('Zikirmatik ortak handlerdan yararlanıyor',
   zikr.includes('App.onZikrKeydown(event)') && source.includes('App.onZikrKeydown=function(e){\n  return App.onModalKeydown(e,App.closeZikr);'));
 ok('Kur’an not alanları ortak handlerdan yararlanıyor',

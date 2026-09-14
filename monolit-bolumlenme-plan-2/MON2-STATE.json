@@ -3,14 +3,14 @@
   "planningRevision": "1.0",
   "programId": "MON2-KABUK-INCELTME",
   "status": "in_progress",
-  "activePrompt": "MON2-05",
+  "activePrompt": "MON2-06",
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON2-04",
-  "nextPrompt": "MON2-05",
-  "currentWave": "2",
+  "lastCompletedPrompt": "MON2-05",
+  "nextPrompt": "MON2-06",
+  "currentWave": "3",
   "totalPrompts": 8,
-  "completedPrompts": 4,
+  "completedPrompts": 5,
   "updatedAt": "2026-09-14",
   "baseline": {
     "date": "2026-09-14",
@@ -100,7 +100,7 @@
       "prompts": [
         "MON2-05"
       ],
-      "status": "in_progress"
+      "status": "completed"
     },
     {
       "id": "3",
@@ -109,7 +109,7 @@
         "MON2-06",
         "MON2-07"
       ],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": "4",
@@ -164,7 +164,7 @@
     "seyma-data write",
     "real token/data"
   ],
-  "nextSafeAction": "MON2-05'i uygula (README §5): *HTML() builder gövdelerini render.js'e taşı — bütçe 9.400/0/450/150 (builder 928→≤150). DEVIR-MON2-05.md ile başla; push/deploy/browser/gerçek veri yok.",
+  "nextSafeAction": "MON2-06'ı uygula (README §6): alan gövdelerini quran/zikr/profile/psych registry'lerine taşı — bütçe 8.500/0/450/150 (satır 8.969→≤8.500). DEVIR-MON2-06.md ile başla; push/deploy/browser/gerçek veri yok.",
   "authority": [
     "CLAUDE.md",
     "AGENTS.md",
@@ -175,7 +175,7 @@
     ".claude/skills/run-seyma/SKILL.md"
   ],
   "codeTouched": true,
-  "lastCompletedEvidence": "MON2-04 (Dalga 1 kapanışı): kod taşınmadı, ölçüm MON2-03 ile aynı — 9.771/0/408/928; --gate PASS. Tam kapı seti PASS: smoke 20/20, app_surface 21/58/16/49, modal, aeon 24/24, driver+zikr 95/95, verify-state B1/B2/B3, tests/app (modülerleştirme+premium 8/8+fx2 6/6), panel 23/23, panel-v2 27/27, quran 9/9, sync 69/69. Doküman senkronu: CLAUDE/AGENTS repo layout (reminderSurface satırı, Legacy cümlesi silindi, app.js ~9.8k), GELISTIRME-PLANI changelog + MON2 durum satırı, tests/README, plan README §1 'Dalga 1 sonrası' kolonu. Kapanış belgesi: deliverables/MON2-DALGA1-KAPANIS.md.",
+  "lastCompletedEvidence": "MON2-05 (Dalga 2 kapanışı): 37 *HTML builder gövdesi (831 kod satırı) render.js'e taşındı; ölçüm 9.771/0/408/928 → 8.969/0/408/97; --gate PASS. Dep bag 61 fn dep + 14 sabit dep + find. Dump bugun/rapor/ayarlar/hub 4/4 BAYT-EŞİT (health.js calculateMgNudge önceden-var Math.random skor satırı kanıt için tmp driver'da sabitlendi — üretim kodu değişmedi; LEDGER seq 6 sapma 5). Tam kapı seti PASS: smoke 21/21, driver+zikr 95/95, verify-state B1/B2/B3, tests/app 52/52 (premium 9 + fx2 6 dahil), panel 23/23, panel-v2 27/27, quran 9/9, sync 69/69, App.x=554, onclick(kombine)=391. Fixture devirleri (K8): today_card_preferences, modal_focus_containment, zikr-harness z-index. Cache-bust: render.js/app.js 20260914e + 4 app_surface pin.",
   "measurements": {
     "MON2-01": {
       "date": "2026-09-14",
@@ -216,6 +216,17 @@
       "appHandlerAssignments": 554,
       "inlineOnclick": 391,
       "note": "Dalga 1 kapanışı — kod taşınmadı, doküman senkronu"
+    },
+    "MON2-05": {
+      "date": "2026-09-14",
+      "appTotalLines": 8969,
+      "appCodeLines": 7777,
+      "legacyFunctions": 0,
+      "reminderFunctionCodeLines": 408,
+      "htmlBuilderCodeLines": 97,
+      "appHandlerAssignments": 554,
+      "inlineOnclick": 391,
+      "note": "Dalga 2 kapanışı — 37 builder gövdesi (831 kod satırı) render.js'e; kalan >2-satır builder 6 fn / 97 satır"
     }
   }
 }

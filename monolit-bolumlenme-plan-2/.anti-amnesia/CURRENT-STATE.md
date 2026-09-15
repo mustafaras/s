@@ -1,6 +1,6 @@
 # MON2 · Güncel durum
 
-**Güncelleme:** 2026-09-15 · **Durum:** `in_progress` · **Aktif kart:** MON2-08 (Kapanış) · **Tamamlanan:** 7/8 (MON2-01…07) · **Dalga 1 (Reminder) + 2 (Görünüm) + 3 (Alan) kapandı**
+**Güncelleme:** 2026-09-15 · **Durum:** `completed` · **Aktif kart:** — (seri kapandı) · **Tamamlanan:** 8/8 (MON2-01…08) · **Dalga 1–4 kapandı**
 
 ## Canlı baseline (commit cf42949, `node tools/shell-inventory.mjs`)
 
@@ -93,16 +93,29 @@ Aktif (MON2-07): 8.000 satır · 0 Legacy · 450 reminder gövde · 150 HTML bui
 - Cache-bust: `appSurface.js?v=20260915b`, `app.js?v=20260915b` + **5 app_surface pin'i**. Not: sed ile toplu değişim fazla kaçış ekledi (`appSurface\\.js\\?v=`); perl ile geri alındı
 - Kapı: syntax (app+sync+core×31) · smoke **21/21** (73 assertion) · `--gate` PASS (7.603/0/408/57) · driver+zikr **95/95** · verify-state B1/B2/B3 · tests/app **52/52** · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders 21/21 · sync 69/69 · `App.x=554` · onclick=391 · dump **6/6 BAYT-EŞİT**
 
-## Bütçe (shellBudget)
+## MON2-08 sonrası (2026-09-15 · SERİ KAPANIŞI)
 
-Aktif (MON2-08): 7.800 satır · 0 Legacy · 450 reminder gövde · 150 HTML builder. Ölçüm 7.603/0/408/57 — 7.800'e 197 satır marj. MON2-08 kapanışta bütçeyi dondurur; asla gevşetilmez.
+- **Kod taşımadı.** Yalnız kapanış belgesi + bütçe dondurma + state `completed`
+- `deliverables/MON2-SERI-KAPANIS.md`: seri envanteri (13.139 → **7.603**, −5.536 satır / **%42**), 8 kartın kapanış tablosu, **30 dosya API/owner tablosu**, shim envanteri (1.405 fn / 1.411 satır + 5 sınıf gerekçesi), **8 kalıcı sözleşme**, açık kalanlar, kanıt, seri sınırı
+- `MON2-STATE.json`: `status=completed`, `activePrompt=null`, `nextPrompt=null`, `completedPrompts=8`, `releaseApproval=not_approved`, tüm dalgalar `completed`
+- Kapı seti (commit sonrası da yeşil): syntax · smoke **21/21** · `--gate` PASS · driver 31 PASS · zikr **95/95** · verify-state B1/B2/B3 · tests/app **52/52** · panel **23/23** · panel-v2 **27/27** · quran **9/9** · reminders **21/21** · sync 69/69
+- Değişmezlik: `App.x=554` · `App.x unique(kombine)=718` · `onclick=391` · `data=` 9 satır / 11 token · dump **6/6 BAYT-EŞİT**
+- **Sapma notu:** kart "25 modül tablosu" dedi, gerçek dosya sayısı **30** (24 MON + `reminderSurface` + `mediaFx`/`timeTheme`/`skyFx` + `constants`/`dateUtils`/`syncGlue`); `app/core` toplamı 11.974 → 20.034 satır (kod app.js'ten dağıtıldı; shim+yorum maliyetiyle toplam hacim ~%5 arttı — kazanç app.js okunabilirliği)
+
+## Bütçe (shellBudget) — DONDURULDU
+
+7.800 satır · 0 Legacy · 450 reminder gövde · 150 HTML builder. Ölçüm **7.603 / 0 / 408 / 57** (197 satır marj).
+Bu değerler MON2-08 ile donduruldu; yeni bir program bütçeyi yalnız kendi onayıyla değiştirebilir.
 
 ## Sonraki güvenli adım
 
-MON2-08 (seri kapanışı): tam set + panel/panel-v2 + quran + reminder smoke; `deliverables/MON2-SERI-KAPANIS.md` (son envanter, 25 modül API/owner tablosu, shim envanteri, bütçe dondurma, açık kalanlar). `MON2-STATE.json` `status=completed`, `nextPrompt=null`, `releaseApproval=not_approved`. CLAUDE.md/AGENTS.md modularization bullet'ı "MON2 complete" ile güncellenir.
-Push/deploy/browser/gerçek veri yok.
+**MON2 serisi kapandı.** Sonraki her adım ayrı bir programdır: kendi onayı, state/kanıt zinciri
+ve bütçesi olmalıdır. Açık kapılar:
 
-## Sınırlar
+| Kapı | Durum |
+|---|---|
+| Cihaz kabulü (K3) | Yalnız kullanıcı verebilir |
+| Push / deploy / tag / merge | Yapılmadı — LOCAL-ONLY |
+| `mustafaras/seyma-data` yazımı | Yapılmadı — ayrı onay |
 
-LOCAL-ONLY dal; push/merge/tag/deploy/browser/cihaz/gerçek veri/`seyma-data` yok.
-Frozen: reminder×4, sync.js, sw.js, panel*, app/content, docs/reminders, MODULARIZATION.md.
+Yerel görsel QA için: `.claude/skills/run-seyma/SKILL.md` (port 9000 protokolü + DATA SAFETY kuralları).

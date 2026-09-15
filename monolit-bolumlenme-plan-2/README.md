@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Kabuk İnceltme Programı (MON2)
 
-**Sürüm:** 1.0 · **Tarih:** 2026-09-15 · **Durum:** `in_progress` · **Kart:** 7/8 · **Dalga 1 + Dalga 2 + Dalga 3 (Alan) kapandı** · **Aktif:** `MON2-08` (Kapanış) · **Devir:** [`DEVIR-MON2-08.md`](DEVIR-MON2-08.md)
+**Sürüm:** 1.0 · **Tarih:** 2026-09-15 · **Durum:** `completed` ✅ · **Kart:** 8/8 · **Dalga 1–4 kapandı** · **Kapanış:** [`deliverables/MON2-SERI-KAPANIS.md`](deliverables/MON2-SERI-KAPANIS.md)
 
 MON serisi (60 kart) `app.js`'i 18.957 → 13.139 satıra indirdi ama satır sayısı
 hiçbir kartın hedefi değildi; kapanış belgesi 13.144'ü yalnız *baseline* olarak
@@ -51,7 +51,7 @@ MON-40..43 yalnız 360 satır taşıyabildi.
 | MON2-05 | 9.400 | 0 | 450 | 150 | 8.969 |
 | **MON2-06** | **8.500** | **0** | **450** | **150** | **7.797 ✅** |
 | **MON2-07** | **8.000** | **0** | **450** | **150** | **7.603 ✅** |
-| MON2-08 | 7.800 | 0 | 450 | 150 | — |
+| **MON2-08** | **7.800** | **0** | **450** | **150** | **7.603 ✅ (donduruldu)** |
 
 Bütçe `MON2-STATE.json → shellBudget` alanındadır; her kart kapanışında
 **ölçülen değer + %2** ile daraltılır ve **asla gevşetilmez**. Tahmin tutmazsa
@@ -426,7 +426,15 @@ kalır; `lunaContext`/`psychScore` saf → taşınır.
 **Kabul:** `--gate` PASS (≤8.000); `test_reminder_app_notification_boundary.js`
 kaynak-metin assert'leri PASS.
 
-### MON2-08 · Seri kapanışı
+### MON2-08 · Seri kapanışı — **KAPATILDI (2026-09-15)**
+
+**Sonuç:** Kod taşımadı. `deliverables/MON2-SERI-KAPANIS.md` yazıldı; bütçe
+donduruldu (7.800 / 0 / 450 / 150 — ölçüm **7.603 / 0 / 408 / 57**);
+`MON2-STATE.json` `status=completed`, `nextPrompt=null`,
+`releaseApproval=not_approved`. Tüm dalgalar `completed`.
+
+Seri sonucu: `app.js` **13.139 → 7.603** (−5.536 satır, **%42**); `*Legacy` 22 → 0;
+`*HTML` builder 1.129 → 57 satır. Detay: kapanış belgesi + LEDGER seq 9.
 
 Tam set + panel/panel-v2 + quran + reminder smoke. `deliverables/MON2-SERI-KAPANIS.md`:
 son envanter, 25 modül API/owner tablosu (24 + `reminderSurface`; büyüyen

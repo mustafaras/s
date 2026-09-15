@@ -21,6 +21,18 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (MON2 SERİSİ KAPANDI — 8/8 kart):**
+>   MON2-08 kapanışıyla seri tamamlandı. `app.js` **13.139 → 7.603**
+>   (−5.536 satır, **%42**); `*Legacy` 22 → 0; `*HTML` builder 1.129 → 57 satır;
+>   8 kart boyunca 231 gövde modüllere taşındı (reminder 86, builder 37, alan
+>   146+24 = 170 → toplam ≈293 gövde/sabit bloğu). Kapanış belgesi:
+>   [`MON2-SERI-KAPANIS.md`](../monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md)
+>   — seri envanteri, 8 kartın kapanış tablosu, 30 dosya API/owner tablosu, shim
+>   envanteri (1.405 fn / 1.411 satır), 8 kalıcı sözleşme, açık kalanlar.
+>   **Bütçe donduruldu:** 7.800 / 0 / 450 / 150 (ölçüm 7.603/0/408/57).
+>   `MON2-STATE.json` `status=completed`, `nextPrompt=null`,
+>   `releaseApproval=not_approved`. **LOCAL-ONLY**: push/deploy/tag/merge yok,
+>   cihaz kabulü (K3) yalnız kullanıcı tarafından verilebilir.
 > - **2026-09-15 (MON2 Dalga 3 Alan kapandı — MON2-07 yan etkili alan gövdeleri):**
 >   MON2-07, 24 saf alan gövdesini (aeon/location/header/weather/photo/habit/
 >   hero/luna) `app/core/appSurface.js` alan yüzey bölümüne taşıdı: `app.js`
@@ -152,7 +164,7 @@ _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 |---|-------|:-----:|:-----:|-------------|
 | — | Altyapı (sync, panel, tema, Okuma/İzleme hub'ları) | 0 | ✅ | `sync.js`, `panel.html`, `app/styles.css`, hub deseni |
 | MON | 🧱 `app.js` monolit bölümleme | 0 | ✅ | 24 hedef registry, 29 `app/core` dosyası; MON-01..60 uygulandı ve seri 2026-09-13'te kapandı (60/60, [kapanış belgesi](../monolit-bolumlenme-plan/deliverables/MON-SERI-KAPANIS-BELGESI.md)); 2026-09-14 kapanış sonrası kod denetimi düzeltmeleri LEDGER seq 82. Güncel kanıt: [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md), [module map](monolit-bolumlenme-haritasi.md), [MON-D11 regression](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
-| MON2 | 📉 `app.js` kabuk inceltme (ölçülen bütçe) | 0 | 🟡 | 8 kart, 4 dalga; Dalga 1 (Reminder, MON2-01…04) 2026-09-14'te, **Dalga 2 (Görünüm, MON2-05) + Dalga 3 (Alan, MON2-06) 2026-09-15'te kapandı**: `app.js` 13.139 → **7.797** satır (−5.342), `*Legacy` 22 → 0, `*HTML` builder 1.129 → 97; MON2-05 37 builder'ı `render.js`'e, MON2-06 146 alan gövdesini (quran 52 / zikr 57 / profile 17 + psych 20) ilgili registry'lere taşıdı (`app/core/{zikir,quran,profile}.js`; yan-etkili gövdeler dep-bag takma adı kullanır — `doc`/`defer`/`sync`). Kapanış: [MON2-DALGA1-KAPANIS.md](../monolit-bolumlenme-plan-2/deliverables/MON2-DALGA1-KAPANIS.md). Sıradaki: MON2-07 (yan etkili alan gövdeleri → `appSurface.js`). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
+| MON2 | 📉 `app.js` kabuk inceltme (ölçülen bütçe) | 0 | ✅ | **SERİ KAPANDI (8/8 kart, 2026-09-15)**. `app.js` **13.139 → 7.603** satır (−5.536, **%42**), `*Legacy` 22 → 0, `*HTML` builder 1.129 → 57. 8 kart: MON2-02/03 reminder gövdeleri `reminders.js`+`reminderSurface.js`'e; MON2-05 37 builder `render.js`'e; MON2-06 146 alan gövdesi `zikir/quran/profile.js`'e; MON2-07 24 yan-etkili alan gövdesi `appSurface.js` alan yüzey bölümüne. Dep-bag takma adları (`doc`/`defer`/`sync`) saflık sözleşmelerini korur. **Bütçe donduruldu:** 7.800/0/450/150 (ölçüm 7.603/0/408/57). Kapanış: [MON2-SERI-KAPANIS.md](../monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md). Program LOCAL-ONLY; push/deploy/cihaz kabulü ayrı kapı. |
 | 1 | 🎵 Ne Dinledim | 1 | ✅ | `listeningOverlayHTML` hub (Bugün/Favoriler/İstatistik/Sözler) + `data.music` + `data.days[].listening`; `--listen` teal accent; panel "🎧 Dinleme Arşivi" (2026-07-04) |
 | 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ✅ | `App.onGratitude` + `data.days[].gratitude` (≤3); Bugün kartı (geçmiş günde düzenlenebilir); panel gün-detayı bloğu (2026-07-04) |
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |

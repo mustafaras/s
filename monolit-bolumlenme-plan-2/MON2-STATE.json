@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "planningRevision": "1.0",
   "programId": "MON2-KABUK-INCELTME",
-  "status": "in_progress",
-  "activePrompt": "MON2-08",
+  "status": "completed",
+  "activePrompt": null,
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON2-07",
-  "nextPrompt": "MON2-08",
+  "lastCompletedPrompt": "MON2-08",
+  "nextPrompt": null,
   "currentWave": "4",
   "totalPrompts": 8,
-  "completedPrompts": 7,
+  "completedPrompts": 8,
   "updatedAt": "2026-09-15",
   "baseline": {
     "date": "2026-09-14",
@@ -30,7 +30,7 @@
     "maxLegacyFunctions": 0,
     "maxReminderFunctionCodeLines": 450,
     "maxHtmlBuilderCodeLines": 150,
-    "rule": "Her kart kapanışında ölçülen değer + %2 ile daraltılır; asla gevşetilmez."
+    "rule": "DONDURULDU (MON2-08, 2026-09-15). Ölçüm 7.603/0/408/57. Yeni bir program bütçeyi yalnız kendi onayıyla değiştirebilir."
   },
   "budgetPlan": {
     "MON2-01": {
@@ -117,7 +117,7 @@
       "prompts": [
         "MON2-08"
       ],
-      "status": "in_progress"
+      "status": "completed"
     }
   ],
   "decisions": [
@@ -164,7 +164,7 @@
     "seyma-data write",
     "real token/data"
   ],
-  "nextSafeAction": "MON2-08 (seri kapanışı): tam set + panel/panel-v2 + quran + reminder smoke; deliverables/MON2-SERI-KAPANIS.md (son envanter, 25 modül API/owner tablosu, shim envanteri, bütçe dondurma, açık kalanlar). status=completed, nextPrompt=null. Kullanıcı onayı bekle; push/deploy yok.",
+  "nextSafeAction": "MON2 serisi KAPANDI (deliverables/MON2-SERI-KAPANIS.md). Yeni her adım ayrı bir programdır: kendi onayı, state/kanıt zinciri ve bütçesi olmalı. Açık kapılar: cihaz kabulü (K3, yalnız kullanıcı), push/deploy/tag/merge, mustafaras/seyma-data yazımı.",
   "authority": [
     "CLAUDE.md",
     "AGENTS.md",
@@ -175,7 +175,7 @@
     ".claude/skills/run-seyma/SKILL.md"
   ],
   "codeTouched": true,
-  "lastCompletedEvidence": "MON2-07 (Dalga 3 Alan, kart 7/8): 24 alan gövdesi (aeon/location/header/weather/photo/habit/hero/luna) app/core/appSurface.js alan yüzey bölümüne taşındı; app.js 7.797→7.603 (−194 satır). KÖK DÜZELTME 1: bag üyeleri değer-üretici biçiminde olmalı (function(){ return X; }) — çıplak fn referansı getter tarafından çağrılıp sonucu değer sanılıyordu. KÖK DÜZELTME 2: locationGateGranted gövdesi data=migrate(createDefaultData()) içeriyordu → S3/I1 ihlali; app.js e geri alındı (9 data rebind satırı korundu). KÖK DÜZELTME 3: DOM erişimi doc takma adına çevrildi (K4) — appSurface.js hiç tarayıcı globali adı taşımaz. Kural uygulandı: ağ/GPS/notification çağrısı app.js te kaldı (locationGateSilentVerify, streamAsk, mergeInbox, showNativeAeonNotification, fetchWeather, fetchDailyPhoto); sha256 WebCrypto da kaldı. Kapı: syntax · smoke 21/21 (73 assertion) · --gate PASS (7.603/0/408/57) · driver+zikr 95/95 · verify-state B1/B2/B3 · tests/app 52/52 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders 21/21 · sync 69/69 · App.x=554 · onclick=391 · dump 6/6 BAYT-EŞİT. Fixture devirleri (K8): test_fx2_overlay_motion / test_fx2_tab_transition / test_fx2_touch_coverage combinedSource += appSurface.js. Cache-bust: appSurface.js + app.js → 20260915b + 5 app_surface pin i.",
+  "lastCompletedEvidence": "MON2-08 (seri kapanışı, kod taşımadı): deliverables/MON2-SERI-KAPANIS.md yazıldı — son envanter (13.139→7.603, −5.536 satır / %42), 8 kartın kapanış tablosu, 30 dosya API/owner tablosu, shim envanteri (1.405/1.411), 8 kalıcı sözleşme, açık kalanlar. Bütçe DONDURULDU: 7.800 / 0 / 450 / 150 — ölçüm 7.603/0/408/57. Kapı seti PASS: syntax · smoke 21/21 (73 assertion) · --gate · driver 31 PASS · zikr 95/95 · verify-state B1/B2/B3 · tests/app 52/52 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders 21/21 · sync 69/69. Değişmezlik: App.x=554 · App.x unique(kombine)=718 · onclick(kombine)=391 · data= 9 satır/11 token. Davranış parity: dump 6/6 BAYT-EŞİT (deterministik). MON2-STATE.json status=completed, nextPrompt=null, releaseApproval=not_approved. Dal LOCAL-ONLY; push/deploy yok.",
   "measurements": {
     "MON2-01": {
       "date": "2026-09-14",
@@ -268,6 +268,20 @@
         "locationGateGranted"
       ],
       "gate": "PASS (7800 budget, 7603/0/408/57)"
+    },
+    "MON2-08": {
+      "date": "2026-09-15",
+      "appTotalLines": 7603,
+      "appCodeLines": 6589,
+      "legacyFunctions": 0,
+      "reminderFunctionCodeLines": 408,
+      "htmlBuilderCodeLines": 57,
+      "appHandlerAssignments": 554,
+      "inlineOnclick": 391,
+      "coreFiles": 30,
+      "coreLines": 20034,
+      "movedThisCard": 0,
+      "gate": "PASS (frozen budget, 7603/0/408/57)"
     }
   }
 }

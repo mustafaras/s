@@ -30,6 +30,9 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   **birebir** karşılaştırır ve formül sabitlerini (seri eşiği 4, su 8/10,
   adım 0,72 m, uyku 7,5 sa) doğrular. Run:
   `node tests/app/test_v3_welcome.js`.
+  Hero flamingosunun **gerçek 🦩 emojisi** olduğunu (elle çizilmiş SVG'nin
+  tamamen kaldırıldığını), sayfadaki tek emojinin bu olduğunu ve emojinin
+  renklendirilmediğini de doğrular.
 - `app/test_aeon_message_expand.js` — ÆON/Luna sohbetinde uzun mesajın
   “Tümünü göster” durumunun render’lar arasında yaşadığını doğrular. Kırpılmış
   balonun kimliği eskiden her render’da artan bir sayaçtan üretiliyor ve açık/kapalı

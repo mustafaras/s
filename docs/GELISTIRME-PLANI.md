@@ -21,6 +21,15 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (v3.0 hero flamingosu: SVG → gerçek 🦩):**
+>   Kullanıcı geri bildirimi: elle çizilmiş SVG flamingo "tuhaf kuş" gibi
+>   duruyordu. Kaldırıldı; yerine **gerçek 🦩 emojisi** kondu (uygulamanın
+>   kendi simgesi, menü adı "Şeyma 🦩"). Emoji platformun fontundan gelir —
+>   renk verilmez (renkli emojiyi boyamak bozar), yalnız boyut/gölge/süzülme.
+>   Sayfadaki tek emoji 🦩 oldu (hero + kapanış + footer; fixture sayar) ve
+>   ≤370px'te 68px'e iner. `--fl-*` SVG gradyanları ve path'leri tamamen
+>   silindi. `app.js` DEĞİŞMEDİ. Fixture 176 → **179 kontrol**.
+>   LOCAL-ONLY: push/deploy ayrı onaylı.
 > - **2026-09-15 (v3.0 sayfasına kişisel 85 gün özeti):**
 >   Tanıtım sayfasına **kullanıcının kendi verisiyle** dolan bir bölüm eklendi:
 >   özet sayılar (kayıtlı gün, işaretlenen alışkanlık, kapsam, en uzun seri, tam

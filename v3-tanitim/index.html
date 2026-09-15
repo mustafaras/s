@@ -11,7 +11,7 @@
        çağrısı yapmaz, düzen kayması (CLS) üretmez ve Apple cihazlarda zaten en
        rafine görünen yüzü kullanır. -->
   <link rel="stylesheet" href="../app/styles.css?v=20260909a">
-  <link rel="stylesheet" href="v3.css?v=20260915g">
+  <link rel="stylesheet" href="v3.css?v=20260915h">
 </head>
 <body class="v3-body">
 
@@ -32,43 +32,12 @@
     <div id="app" class="v3-shell" role="main" aria-labelledby="v3-baslik">
 
       <header class="v3-hero">
+        <!-- Marka hayvanı: gerçek 🦩 emojisi (uygulamanın kendi simgesi,
+             menü adı "Şeyma 🦩"). Elle çizilmiş SVG vektör kaldırıldı —
+             emoji hem tanıdık hem de platformun kendi render'ını kullanır. -->
         <div class="v3-flamingo" aria-hidden="true">
           <span class="v3-flamingo__halo"></span>
-          <!-- Flamingo: harici görsel/dosya YOK — saf satır içi SVG.
-               Uygulamanın marka hayvanı (menü adı "Şeyma 🦩"). -->
-          <svg class="v3-flamingo__svg" viewBox="0 0 100 124" role="presentation">
-            <defs>
-              <linearGradient id="v3flBody" x1="0.1" y1="0.1" x2="0.9" y2="0.95">
-                <stop offset="0%" stop-color="#FBD9E4"/>
-                <stop offset="42%" stop-color="#F0A6C0"/>
-                <stop offset="100%" stop-color="#D2638B"/>
-              </linearGradient>
-              <linearGradient id="v3flWing" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#FFF0F5"/>
-                <stop offset="100%" stop-color="#F3B6CC"/>
-              </linearGradient>
-              <linearGradient id="v3flBeak" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#F2DFA8"/>
-                <stop offset="100%" stop-color="#C9A227"/>
-              </linearGradient>
-            </defs>
-            <path d="M50 104 L45 120 M45 120 L38 123 M45 120 L47 124"
-                  fill="none" stroke="#C4758F" stroke-width="3.1" stroke-linecap="round"/>
-            <path d="M62 104 L60 122 M60 122 L53 126 M60 122 L65 127"
-                  fill="none" stroke="#C4758F" stroke-width="3.1" stroke-linecap="round"/>
-            <path d="M16 78 C20 100 46 112 66 102 C79 96 85 78 81 60
-                     C79 48 75 38 79 27 C83 16 70 12 66 23
-                     C63 31 68 45 70 57 C72 69 64 77 52 79
-                     C40 81 24 74 16 78 Z"
-                  fill="url(#v3flBody)"/>
-            <path d="M40 82 C53 73 69 77 71 88 C62 95 47 93 40 82 Z"
-                  fill="url(#v3flWing)" opacity=".92"/>
-            <path d="M17 79 C8 74 5 84 13 90" fill="none" stroke="#D2638B"
-                  stroke-width="5" stroke-linecap="round" opacity=".9"/>
-            <path d="M72 25 L93 34 L71 37 Z" fill="url(#v3flBeak)"/>
-            <path d="M93 34 C96 36 93 39 90 37 Z" fill="#2A1F24"/>
-            <circle cx="70" cy="25" r="2.5" fill="#2A1F24"/>
-          </svg>
+          <span class="v3-flamingo__emoji">🦩</span>
         </div>
 
         <p class="v3-kicker">Sürüm 3.0 · Günışığı yenilendi</p>

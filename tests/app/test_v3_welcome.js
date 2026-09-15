@@ -317,14 +317,16 @@ const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu;
 const pageRendered = pageSource.replace(/<!--[\s\S]*?-->/g, '');
 const pageEmoji = (pageRendered.match(EMOJI) || []);
 const cssEmoji = (cssSource.replace(/\/\*[\s\S]*?\*\//g, '').match(EMOJI) || []);
-ok('görünen metindeki tek emoji flamingo 🦩 (2 kez: kapanış + footer)',
-  pageEmoji.length === 2 && pageEmoji.every((e) => e === '🦩'),
+ok('görünen metindeki tek emoji flamingo 🦩 (3 kez: hero + kapanış + footer)',
+  pageEmoji.length === 3 && pageEmoji.every((e) => e === '🦩'),
   'bulunan: ' + JSON.stringify(pageEmoji));
 ok('CSS\'te dekoratif emoji yok (flamingo sayfa içeriğinde)',
   cssEmoji.length === 0, 'bulunan: ' + JSON.stringify(cssEmoji));
-ok('flamingo vektör olarak da var (SVG, harici dosya değil)',
-  /class="v3-flamingo__svg"/.test(pageSource) &&
-  /viewBox="0 0 100 124"/.test(pageSource));
+ok('hero flamingosu gerçek 🦩 emojisi (elle çizilmiş SVG değil)',
+  /class="v3-flamingo__emoji">🦩</.test(pageSource));
+ok('elle çizilmiş SVG flamingo tamamen kaldırıldı',
+  !/v3-flamingo__svg|v3flBody|v3flWing|v3flBeak/.test(
+    pageSource + cssSource + read('v3-tanitim/v3-charts.js') + read('v3-tanitim/v3-data.js')));
 
 // reduced-motion
 ok('prefers-reduced-motion destekleniyor (CSS)',
@@ -530,8 +532,13 @@ ok('sayaç son değeri hedefe sabitler (yuvarlama hatası kalmaz)',
   /el\.dataset\.v3Target/.test(jsSource));
 
 // Flamingo vektörü
-ok('flamingo SVG\'si satır içi (harici dosya/ağ isteği yok)',
-  /<svg class="v3-flamingo__svg"/.test(pageSource));
+ok('hero flamingosu emoji olarak da animasyonlu (süzülme + hale)',
+  /\.v3-flamingo__emoji\{/.test(cssSource) &&
+  /animation:v3FlamingoFloat/.test(cssSource));
+ok('emoji renkli font ailesiyle ve rem emsalle ölçekleniyor (Dynamic Type)',
+  /Apple Color Emoji/.test(cssSource) && /font-size:84px/.test(cssSource));
+ok('emoji renklendirilmiyor (renkli emojiyi boyamak bozar)',
+  !/\.v3-flamingo__emoji\{[^}]*(?:color|-webkit-text-fill-color)\s*:/.test(cssSource));
 ok('sayfa hâlâ tek harici betik yüklüyor (yeni bağımlılık yok)',
   [...pageSource.matchAll(/<script\s+src="([^"]+)"/g)].every((m) => m[1].startsWith('v3')));
 
@@ -745,7 +752,7 @@ ok('v3.js sayaçları charts enjeksiyonundan SONRA kuruyor (script sırası)',
 /* — CACHE-BUST — */
 ok('yeni modüller cache-bust taşıyor',
   /v3-data\.js\?v=\d+[a-z]/.test(pageSource) && /v3-charts\.js\?v=\d+[a-z]/.test(pageSource));
-ok('v3.css cache-bust güncel', /v3\.css\?v=20260915g/.test(pageSource));
+ok('v3.css cache-bust güncel', /v3\.css\?v=20260915h/.test(pageSource));
 ok('v3.js cache-bust güncel', /v3\.js\?v=20260915g/.test(pageSource));
 
 console.log('\n' + passed + ' kontrol geçti.');

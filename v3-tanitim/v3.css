@@ -341,9 +341,12 @@
   transition:width 90ms linear;
 }
 
-/* ── Flamingo ───────────────────────────────────────────────────────────────*/
+/* ── Flamingo ───────────────────────────────────────────────────────────────
+   Gerçek 🦩 emojisi. Emoji platformun kendi fontundan gelir; bu yüzden renk
+   verilmez (renkli emojiyi boyamak bozar) — yalnız boyut, gölge ve hareket. */
 .v3-flamingo{
-  position:relative;width:118px;height:146px;margin:0 auto 22px;
+  position:relative;width:132px;height:132px;margin:0 auto 20px;
+  display:flex;align-items:center;justify-content:center;
   animation:v3FlamingoFloat 6.5s var(--ease-glide) infinite;
 }
 @keyframes v3FlamingoFloat{
@@ -351,7 +354,7 @@
   50%    { transform:translateY(-9px) rotate(1.1deg); }
 }
 .v3-flamingo__halo{
-  position:absolute;inset:-26px;border-radius:50%;pointer-events:none;
+  position:absolute;inset:-24px;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle at 50% 46%,
     color-mix(in srgb,var(--accent) 20%,transparent) 0%,
     color-mix(in srgb,var(--room) 12%,transparent) 42%,transparent 70%);
@@ -361,8 +364,11 @@
   0%,100%{ opacity:.5; transform:scale(.94); }
   50%    { opacity:.95; transform:scale(1.06); }
 }
-.v3-flamingo__svg{
-  position:relative;width:100%;height:100%;display:block;
+.v3-flamingo__emoji{
+  position:relative;display:block;
+  font-size:84px;line-height:1;
+  /* Emoji emsalleri rem'dir: kullanıcının metin boyutu ayarıyla ölçeklenir. */
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
   filter:drop-shadow(0 12px 26px color-mix(in srgb,var(--room) 34%,transparent));
 }
 
@@ -616,7 +622,8 @@
 @media (max-width:370px){
   .v3-counter__num{ font-size:4.4rem; }
   .v3-stats{ grid-template-columns:repeat(2,1fr); }
-  .v3-flamingo{ width:100px;height:124px; }
+  .v3-flamingo{ width:108px;height:108px; }
+  .v3-flamingo__emoji{ font-size:68px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -844,6 +851,7 @@
   .v3-progress__bar{ transition:none; }
   .v3-flamingo,
   .v3-flamingo__halo,
+  .v3-flamingo__emoji,
   .v3-hero::before,
   .v3-sparks,
   .v3-sparks i,

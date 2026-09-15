@@ -25,6 +25,10 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 
 ## Kutlama katmanı (85. gün)
 
+- **Hero flamingosu:** gerçek 🦩 emojisi (uygulamanın kendi simgesi). Emoji
+  platformun kendi fontundan gelir; bu yüzden **renk verilmez** (renkli emojiyi
+  boyamak bozar) — yalnız boyut, gölge ve süzülme hareketi. Em boyutu `rem`
+  olmadığı için taban 84px'e sabittir ve ≤370px'te 68px'e iner.
 - **Sayaç:** `data-count` taşıyan öğeler hedefe sayar (easeOutCubic). Nihai
   metin HTML'de zaten yazılıdır → JS kapalı veya reduced-motion açıkken de
   doğru görünür, sayı asla "0"a düşmez.
@@ -37,6 +41,9 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
   `prefers-reduced-motion: reduce` altında kapanır ve statik karelerle
   değiştirilir. Fixture **efekt listesini ad ad** doğrular, sayıyı değil —
   böylece bir efekt sessizce silinemez.
+- **Tek emoji:** 🦩 (hero + kapanış + footer). Başka dekoratif emoji yok —
+  fixture bunu sayar. Not: bu, kullanıcının açık isteğiyle uygulamanın
+  "emojisiz prestij tonu" kuralından bilinçli bir sapmadır.
 
 ## 85 rakamı nereden geliyor (kanıt)
 

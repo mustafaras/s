@@ -208,13 +208,16 @@ console.log('\n[4] İzolasyon');
 
 // Yalnız <script src> etiketleri sayılır (satır içi bootstrap yok sayılır).
 const pageScripts = [...pageSource.matchAll(/<script\s+src="([^"]+)"/g)].map((m) => m[1]);
-ok('sayfa kendi betiklerini yüklüyor (v3-data + v3-charts + v3)',
-  pageScripts.length === 3 && pageScripts.every((s) => s.startsWith('v3')),
+ok('sayfa kendi betiklerini yüklüyor (data + stats + charts + statsview + v3)',
+  pageScripts.length === 5 && pageScripts.every((s) => s.startsWith('v3')),
   'yüklenen: ' + JSON.stringify(pageScripts));
-ok('betikler doğru sırada (data → charts → v3)',
+ok('betik sırası doğru (data → stats → charts → statsview → v3)',
   pageScripts[0].startsWith('v3-data.js') &&
-  pageScripts[1].startsWith('v3-charts.js') &&
-  pageScripts[2].startsWith('v3.js'));
+  pageScripts[1].startsWith('v3-stats.js') &&
+  pageScripts[2].startsWith('v3-charts.js') &&
+  pageScripts[3].startsWith('v3-statsview.js') &&
+  pageScripts[4].startsWith('v3.js'),
+  'sıra: ' + JSON.stringify(pageScripts));
 
 const forbidden = ['app.js', 'sync.js', 'app/core/', 'render.js', 'appSurface.js'];
 forbidden.forEach((token) => {
@@ -747,13 +750,110 @@ ok('grafikler yeni bağımlılık getirmiyor (kütüphane/CDN yok)',
 
 /* — SAYAÇ ENTEGRASYONU: charts sayaçları v3.js'ten ÖNCE basar — */
 ok('v3.js sayaçları charts enjeksiyonundan SONRA kuruyor (script sırası)',
-  pageScripts[1].startsWith('v3-charts.js') && pageScripts[2].startsWith('v3.js'));
+  pageScripts.indexOf('v3-charts.js?v=20260915g') < pageScripts.indexOf('v3.js?v=20260915h') &&
+  pageScripts.indexOf('v3-charts.js?v=20260915g') >= 0);
 
 /* — CACHE-BUST — */
 ok('yeni modüller cache-bust taşıyor',
   /v3-data\.js\?v=\d+[a-z]/.test(pageSource) && /v3-charts\.js\?v=\d+[a-z]/.test(pageSource));
 ok('v3.css cache-bust güncel', /v3\.css\?v=20260915h/.test(pageSource));
-ok('v3.js cache-bust güncel', /v3\.js\?v=20260915g/.test(pageSource));
+ok('v3.js cache-bust güncel', /v3\.js\?v=20260915h/.test(pageSource));
+
+// ───────────────────────────────────────────────────────────────────────────
+// [11] Gelişmiş istatistik katmanı (v3-stats.js + v3-statsview.js)
+// ───────────────────────────────────────────────────────────────────────────
+console.log('\n[11] Gelişmiş istatistik (gerçek matematik)');
+
+const statsSrc = read('v3-tanitim/v3-stats.js');
+const statsViewSrc = read('v3-tanitim/v3-statsview.js');
+const statsCode = stripComments(statsSrc);
+const viewCode = stripComments(statsViewSrc);
+
+/* — Matematik FONKSİYONLARI bilinen değerlerle — */
+const mathSandbox = { console, window: {}, Date, JSON, Math, Number, String, Boolean, Array, Object, isNaN };
+mathSandbox.window = mathSandbox;
+vm.runInNewContext(statsSrc, mathSandbox, { filename: 'v3-stats.js' });
+const M = mathSandbox.window.SeymaV3Stats;
+ok('istatistik motoru yükleniyor', !!M && typeof M.build === 'function');
+function near(a, b, tol) { return a != null && Math.abs(a - b) <= (tol || 1e-9); }
+ok('ortalama doğru', near(M.mean([1, 2, 3, 4]), 2.5));
+ok('medyan çift sayıda doğru', near(M.median([1, 2, 3, 4]), 2.5));
+ok('medyan tek sayıda doğru', near(M.median([1, 2, 3]), 2));
+ok('mod doğru', M.mode([1, 2, 2, 3]) === 2);
+ok('örneklem standart sapması doğru (n−1)',
+  near(M.stdDev([2, 4, 4, 4, 5, 5, 7, 9]), 2.138089935299395, 1e-9));
+ok('çeyrekler doğru (tip-7 interpolasyon)',
+  near(M.quartiles([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).q1, 3.25) &&
+  near(M.quartiles([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).q3, 7.75));
+ok('IQR doğru', near(M.quartiles([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).iqr, 4.5));
+ok('aykırı değer IQR kuralıyla bulunuyor',
+  M.outliers([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100]).length === 1);
+ok('değişim katsayısı sabit dizide 0',
+  near(M.cv([10, 10, 10]), 0));
+ok('doğrusal regresyon eğimi doğru (y=2x+1)',
+  near(M.linearRegression([1, 3, 5, 7, 9]).slope, 2));
+ok('regresyon R² tam uyumda 1',
+  near(M.linearRegression([1, 3, 5, 7, 9]).r2, 1));
+ok('Pearson r tam pozitif ilişkide +1',
+  near(M.pearson([1, 2, 3, 4, 5], [2, 4, 6, 8, 10]).r, 1));
+ok('Pearson r tam negatif ilişkide −1',
+  near(M.pearson([1, 2, 3, 4, 5], [10, 8, 6, 4, 2]).r, -1));
+ok('n<3 olan regresyon HESAPLANMAZ (uydurma yok)',
+  M.linearRegression([1, 2]) === null);
+ok('hareketli ortalama pencere dolmadan null döner',
+  M.movingAverage([1, 2, 3, 4, 5, 6, 7, 8], 7).slice(0, 6).every((v) => v === null));
+
+/* — Dürüstlük kuralları kaynakta — */
+ok('eğilim için en az 3 veri noktası şartı kodda',
+  /if \(n < 3\) return null;/.test(statsCode));
+ok('korelasyon güvenilirlik eşiği tanımlı (minNForR)',
+  /function minNForR\(\) \{ return \d+; \}/.test(statsCode));
+ok('sıfıra bölme korumalı (regresyon payda kontrolü)',
+  /if \(den === 0\) return null;/.test(statsCode));
+ok('aykırı değerler GİZLENMEZ, işaretlenir',
+  /outlierCount/.test(statsCode) && /v3-box__out/.test(statsViewSrc));
+ok('korelasyon "nedensellik değildir" uyarısı taşıyor',
+  /nedensellik değildir/.test(statsViewSrc));
+ok('hedef paydası yalnız ölçümün kaydedildiği günler',
+  /yalnız <b>o ölçümün kaydedildiği<\/b> günlerdir/.test(statsViewSrc));
+
+/* — Sayfa bağlantısı — */
+ok('sayfada istatistik bölümü var', /id="v3-istatistik"/.test(pageSource));
+['v3-ist-desc', 'v3-ist-sleep-hist', 'v3-ist-water-hist', 'v3-ist-trends',
+ 'v3-ist-mood-line', 'v3-ist-sleep-line', 'v3-ist-corr', 'v3-ist-weekday',
+ 'v3-ist-goals', 'v3-ist-honest'].forEach((id) => {
+  ok('istatistik hedefi mevcut: ' + id, pageSource.indexOf('id="' + id + '"') >= 0);
+});
+
+/* — İzolasyon: yazma/ağ yok — */
+ok('istatistik modülleri depoya YAZMIYOR',
+  !/setItem|removeItem|localStorage\.clear/.test(statsCode) &&
+  !/setItem|removeItem|localStorage\.clear/.test(viewCode));
+ok('istatistik modülleri AĞ ÇAĞRISI yapmıyor',
+  !/\bfetch\s*\(/.test(statsCode) && !/XMLHttpRequest/.test(statsCode) &&
+  !/\bfetch\s*\(/.test(viewCode) && !/XMLHttpRequest/.test(viewCode));
+
+/* — Gizlilik: ruh hâli ETİKETİ yazılmıyor — */
+const moodLeak = ['cok-iyi', 'iyi', 'normal', 'zorlandim', 'cok-zorlandim']
+  .filter((m) => viewCode.indexOf("'" + m + "'") >= 0);
+ok('istatistik görünümü ruh hâli etiketi yazmıyor', moodLeak.length === 0,
+  'sızan: ' + moodLeak.join(', '));
+ok('ruh hâli yalnız renk eşlemesiyle gösteriliyor',
+  /MOOD_COLOR = \{ 5:/.test(statsViewSrc));
+
+/* — Veri katmanı entegrasyonu — */
+ok('v3-data.js istatistiği motora devrediyor (yoksa null)',
+  /buildAnalytics/.test(dataSource) && /if \(!S \|\| typeof S\.build !== 'function'\) return null;/.test(dataSource));
+ok('çok az gün varsa istatistik üretilmez',
+  /if \(n < 5\) return null;/.test(dataSource));
+ok('motor çökerse sayfa kırılmaz (try/catch)',
+  /catch \(_\) \{\s*return null;\s*\}/.test(dataSource));
+ok('istatistik bölümü veri yoksa sahte grafik çizmez',
+  /İstatistik için henüz yeterli veri yok/.test(statsViewSrc));
+
+/* — Cache-bust — */
+ok('istatistik modülleri cache-bust taşıyor',
+  /v3-stats\.js\?v=\d+[a-z]/.test(pageSource) && /v3-statsview\.js\?v=\d+[a-z]/.test(pageSource));
 
 console.log('\n' + passed + ' kontrol geçti.');
 if (process.exitCode) console.log('SONUÇ: FAIL');

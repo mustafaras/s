@@ -814,6 +814,194 @@
   .v3-hbar__label{ flex-basis:40%; }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   GELİŞMİŞ İSTATİSTİK KATMANI
+   Betimsel tablo, histogram + kutu grafiği, eğilim listesi, korelasyon
+   kartları, haftalık profil, hedef çubukları, hareketli ortalama çizgisi.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.v3-ist{ margin-top:0; }
+.v3-ist__lead{
+  margin:8px 0 18px;max-width:42ch;
+  font-size:var(--f-subhead);line-height:1.65;color:var(--muted);
+}
+
+/* · Betimsel istatistik tablosu */
+.v3-tblwrap{ overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px; }
+.v3-tbl{
+  width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;
+  font-size:var(--f-caption1);
+}
+.v3-tbl th,.v3-tbl td{
+  padding:8px 6px;text-align:right;white-space:nowrap;
+  border-bottom:1px solid color-mix(in srgb,var(--accent) 10%,transparent);
+}
+.v3-tbl thead th{
+  font-size:var(--f-caption2);font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--faint);
+}
+.v3-tbl tbody th{
+  text-align:left;font-weight:700;color:var(--text2);white-space:normal;
+}
+.v3-tbl__u{
+  display:block;font-size:var(--f-caption2);font-weight:600;color:var(--faint);
+}
+.v3-tbl__hi{ color:var(--accent);font-weight:800; }
+.v3-tbl__rng{ color:var(--muted);font-size:var(--f-caption2); }
+.v3-tbl tbody tr:last-child th,.v3-tbl tbody tr:last-child td{ border-bottom:0; }
+
+/* · Histogram */
+.v3-hist{ display:block;width:100%;height:84px;margin-top:2px; }
+.v3-hist__b{ fill:color-mix(in srgb,var(--accent) 44%,transparent); }
+.v3-hist__b:hover{ fill:var(--accent); }
+.v3-hist__n{
+  font-size:9px;font-weight:800;fill:var(--faint);
+  font-variant-numeric:tabular-nums;
+}
+.v3-hist__mean{ stroke:var(--gold-1);stroke-width:1.2;stroke-dasharray:3 2;opacity:.9; }
+.v3-hist__med{ stroke:var(--room);stroke-width:1.2;opacity:.9; }
+.v3-hist__leg{
+  display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;
+  font-size:var(--f-caption2);color:var(--faint);font-weight:700;
+}
+.v3-hist__leg span{ display:inline-flex;align-items:center;gap:5px; }
+.v3-hist__leg i{ width:12px;height:2.5px;border-radius:2px;display:inline-block; }
+.v3-hist__leg .is-mean{ background:var(--gold-1); }
+.v3-hist__leg .is-med{ background:var(--room); }
+.v3-hist__leg .is-out{ width:7px;height:7px;border-radius:50%;background:var(--gold-3); }
+
+/* · Kutu grafiği */
+.v3-box{ display:block;width:100%;height:30px;margin-top:10px; }
+.v3-box__whisk{ stroke:color-mix(in srgb,var(--accent) 40%,transparent);stroke-width:1.4; }
+.v3-box__iqr{ fill:color-mix(in srgb,var(--accent) 26%,transparent);stroke:color-mix(in srgb,var(--accent) 55%,transparent);stroke-width:1; }
+.v3-box__med{ stroke:var(--gold-1);stroke-width:2; }
+.v3-box__out{ fill:var(--room);opacity:.85; }
+
+/* · Eğilim listesi */
+.v3-trendlist{ margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px; }
+.v3-trend{
+  display:grid;grid-template-columns:18px 1fr auto;align-items:baseline;
+  gap:4px 8px;
+}
+.v3-trend__arrow{ font-size:var(--f-footnote);font-weight:900;line-height:1.2; }
+.v3-trend--up .v3-trend__arrow{ color:var(--ok); }
+.v3-trend--down .v3-trend__arrow{ color:var(--drop); }
+.v3-trend--flat .v3-trend__arrow{ color:var(--faint); }
+.v3-trend__l{ font-size:var(--f-footnote);color:var(--text2);font-weight:650; }
+.v3-trend__v{
+  font-size:var(--f-footnote);font-weight:850;color:var(--accent);
+  font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;
+}
+.v3-trend__v--none{ color:var(--faint);font-weight:600;grid-column:2 / -1;text-align:right; }
+.v3-trend__u{ font-weight:600;color:var(--faint);font-size:var(--f-caption2); }
+.v3-trend__meta{
+  grid-column:2 / -1;font-size:var(--f-caption2);color:var(--faint);
+  font-variant-numeric:tabular-nums;
+}
+
+/* · Korelasyon kartları */
+.v3-corrs{ margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px; }
+.v3-corr__top{ display:flex;justify-content:space-between;gap:10px;align-items:baseline; }
+.v3-corr__k{ font-size:var(--f-caption1);font-weight:700;color:var(--text2); }
+.v3-corr__r{
+  font-size:var(--f-caption1);font-weight:850;color:var(--accent);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.v3-corr__bar{
+  height:6px;border-radius:999px;margin-top:6px;overflow:hidden;
+  background:rgba(255,255,255,.08);
+}
+.v3-corr__bar i{
+  display:block;height:100%;width:var(--w,0%);border-radius:999px;
+  background:linear-gradient(90deg,var(--gold-5),var(--gold-3) 55%,var(--gold-1));
+}
+.v3-corr__bar i[data-neg="true"]{
+  background:linear-gradient(90deg,var(--pause),var(--room));
+}
+.v3-corr__meta{ margin-top:5px;font-size:var(--f-caption2);color:var(--faint); }
+.v3-corr__warn{ color:var(--warn); }
+
+/* · Haftanın günü */
+.v3-wd{ display:flex;align-items:flex-end;gap:6px;height:96px;margin-top:2px; }
+.v3-wd__col{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;gap:5px;height:100%;
+}
+.v3-wd__val{
+  font-size:var(--f-caption2);font-weight:800;color:var(--faint);
+  font-variant-numeric:tabular-nums;
+}
+.v3-wd__bar{
+  width:100%;max-width:26px;border-radius:6px 6px 3px 3px;
+  background:color-mix(in srgb,var(--accent) 40%,transparent);
+}
+.v3-wd__bar.is-best{ background:linear-gradient(180deg,var(--gold-1),var(--gold-3)); }
+.v3-wd__bar.is-worst{ background:color-mix(in srgb,var(--pause) 60%,transparent); }
+.v3-wd__lbl{ font-size:var(--f-caption2);font-weight:800;color:var(--muted); }
+
+/* · Hedefler */
+.v3-goals{ margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:13px; }
+.v3-goal__top{
+  display:flex;justify-content:space-between;gap:10px;align-items:baseline;
+  font-size:var(--f-caption1);color:var(--text2);font-weight:650;
+}
+.v3-goal__top span:last-child{ font-weight:900;font-variant-numeric:tabular-nums; }
+.v3-goal__top .is-good{ color:var(--ok); }
+.v3-goal__top .is-mid{ color:var(--accent); }
+.v3-goal__top .is-low{ color:var(--drop); }
+.v3-goal__track{
+  height:7px;border-radius:999px;margin-top:6px;overflow:hidden;
+  background:rgba(255,255,255,.08);
+}
+.v3-goal__track i{
+  display:block;height:100%;width:var(--w,0%);border-radius:999px;
+  background:linear-gradient(90deg,var(--gold-5),var(--gold-3) 60%,var(--gold-1));
+  transition:width var(--dur-4) var(--ease-out);
+}
+.v3-goal__meta{ margin-top:5px;font-size:var(--f-caption2);color:var(--faint); }
+
+/* · Hareketli ortalama çizgisi */
+.v3-line{ display:block;width:100%;height:76px;margin-top:2px; }
+.v3-line__raw{
+  fill:none;stroke:color-mix(in srgb,var(--accent) 34%,transparent);
+  stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;
+}
+.v3-line__dot{ fill:color-mix(in srgb,var(--accent) 55%,transparent); }
+.v3-line__ma{
+  fill:none;stroke:var(--gold-1);stroke-width:2.1;
+  stroke-linejoin:round;stroke-linecap:round;
+  filter:drop-shadow(0 2px 6px color-mix(in srgb,var(--accent) 40%,transparent));
+}
+.v3-line__leg{
+  display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;
+  font-size:var(--f-caption2);color:var(--faint);font-weight:700;
+}
+.v3-line__leg span{ display:inline-flex;align-items:center;gap:5px; }
+.v3-line__leg i{ width:12px;height:2.5px;border-radius:2px;display:inline-block; }
+.v3-line__leg .is-raw{ background:color-mix(in srgb,var(--accent) 40%,transparent); }
+.v3-line__leg .is-ma{ background:var(--gold-1); }
+.v3-line__rng{ margin-left:auto;font-variant-numeric:tabular-nums; }
+
+/* · Dürüstlük notu */
+.v3-honest{
+  padding:16px;border-radius:18px;
+  border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);
+  background:color-mix(in srgb,var(--accent) 5%,transparent);
+}
+.v3-honest p{ margin:0;font-size:var(--f-footnote);line-height:1.65;color:var(--text2); }
+.v3-honest b{ color:var(--accent); }
+.v3-honest ul{
+  margin:10px 0 0;padding-left:18px;
+  font-size:var(--f-caption1);line-height:1.7;color:var(--muted);
+}
+.v3-honest li + li{ margin-top:5px; }
+
+@media (max-width:370px){
+  .v3-tbl th,.v3-tbl td{ padding:7px 4px; }
+  .v3-wd{ gap:3px; }
+  .v3-wd__val{ font-size:9px; }
+}
+
 /* ── Giriş hareketi ─────────────────────────────────────────────────────────
    KRİTİK: gizli başlangıç durumu YALNIZ `html.v3-js` altında uygulanır.
    Betik kapalıysa ya da hata verirse sınıf eklenmez ve içerik olduğu gibi

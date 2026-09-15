@@ -21,6 +21,25 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (v3.0 sayfasına gelişmiş istatistik katmanı):**
+>   İki yeni salt-okur modül: `v3-tanitim/v3-stats.js` (matematik) +
+>   `v3-statsview.js` (görselleştirme). Gerçek yöntemler: betimsel istatistik
+>   (ortalama/medyan/mod/örneklem SS/CV), **çeyrekler + Tukey IQR aykırı analizi**,
+>   **en küçük kareler regresyonu (eğim + R²)**, **Pearson korelasyonu**,
+>   hareketli ortalama, haftanın günü profili, hedef tutturma, histogram + kutu
+>   grafiği. **Dürüstlük koda gömülü:** n<3 → eğilim/korelasyon HESAPLANMAZ;
+>   n<10 → "düşük örneklem"; aykırı değerler gizlenmez; hedef paydası yalnız
+>   ölçümün kaydedildiği günler; "korelasyon nedensellik değildir" uyarısı.
+>   **Gerçek veriyle doğrulandı:** `seyma-data`'dan salt-okur indirilen 84 günlük
+>   gerçek kayıtla uçtan uca test edildi (tamamı `/tmp`'de; repoya/sayfaya
+>   GÖMÜLMEDİ, test sonrası silindi). Sayfanın ürettiği değerler bağımsız Node
+>   hesabıyla birebir aynı (uyku ort 7,54 · medyan 7,50 · SS 1,04; su ort 8,95;
+>   ruh hâli ort 3,39 · CV %24). **BULUNAN KUSUR (uygulamada, düzeltilmedi):**
+>   `report.js` rozeti "7/7 mükemmel" der ama karşılaştırması `countRec >=
+>   habitCountOn(date)` yani bugün 15 alışkanlık; gerçek veride max 12 tik →
+>   tam gün hiç oluşmamış. Etiket eski 7 habitatlık dönemden kalmış; pinlenmiş
+>   yüzeye dokunmamak için bu iş kapsamında düzeltilmedi, kullanıcıya bildirildi.
+>   Fixture 179 → **221 kontrol** (17 matematik birim testi). LOCAL-ONLY.
 > - **2026-09-15 (v3.0 hero flamingosu: SVG → gerçek 🦩):**
 >   Kullanıcı geri bildirimi: elle çizilmiş SVG flamingo "tuhaf kuş" gibi
 >   duruyordu. Kaldırıldı; yerine **gerçek 🦩 emojisi** kondu (uygulamanın

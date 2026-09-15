@@ -332,8 +332,39 @@
       heatCells: heatCells,
       badges: badges,
       earnedCount: badges.filter(function (b) { return b.done; }).length,
-      totalBadges: badges.length
+      totalBadges: badges.length,
+      /* Gelişmiş istatistik — v3-stats.js varsa gerçek matematikle üretilir.
+         Yoksa null; sayfa o bölümü hiç çizmez (yarım/yanlış grafik olmaz). */
+      analytics: buildAnalytics(window, window, data, window, end)
     };
+  }
+
+  /* v3-stats.js motorunu gerçek veriyle çalıştırır. Motor yoksa null. */
+  function buildAnalytics(_w, helpersBag, data, _w2, end) {
+    var S = window.SeymaV3Stats;
+    if (!S || typeof S.build !== 'function') return null;
+    try {
+      var start = data.startDate;
+      if (!start) return null;
+      var n = diffDays(start, end) + 1;
+      if (n < 5) return null;               // çok az gün → istatistik anlamsız
+      var list = [];
+      for (var i = 0; i < n; i++) {
+        var d = addDays(start, i);
+        list.push({ date: d, rec: (data.days || {})[d] || null });
+      }
+      return S.build(list, {
+        countRec: countRec,
+        habitCountOn: function (date) { return habitCountOn(date); },
+        moodScore: function (m) {
+          return ({ 'cok-iyi': 5, 'iyi': 4, 'normal': 3, 'zorlandim': 2, 'cok-zorlandim': 1 })[m] || null;
+        },
+        waterGoalFor: function (date) { return waterGoalFor(date, data); },
+        effSteps: effSteps
+      });
+    } catch (_) {
+      return null;
+    }
   }
 
   window.SeymaV3Data = {

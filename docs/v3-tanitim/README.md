@@ -17,6 +17,8 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 | `v3.css` | Temel düzen + kutlama efekteri. 98 tasarım token'ını **tüketir**. Ham hex yalnızca neredeyse-siyah sahne zeminlerinde ve altın üstü mürekkep için. |
 | `v3.js` | Kalıcılık (yazma + **doğrulama**), scroll-reveal, ilerleme çubuğu, sayaç animasyonu, konfeti. |
 | `v3-data.js` | **Salt-okur** veri katmanı: kullanıcının kendi kayıtlarını özetler. |
+| `v3-stats.js` | **İstatistik motoru**: betimsel istatistik, regresyon, korelasyon, histogram. |
+| `v3-statsview.js` | İstatistik görselleştirme (histogram, kutu grafiği, eğilim, korelasyon). |
 | `v3-charts.js` | Grafik çizimi (ısı haritası, trend, çubuklar, rozetler). |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
 | `../tests/app/test_v3_welcome.js` | **137 kontrollük** sözleşme fixture'ı (kontrast ölçümü dâhil). |
@@ -173,7 +175,50 @@ Fixture canlı `app/styles.css` tokenlarını okuyup ölçer; en zor çift **5.7
 | buton metni / altın (en açık uç) | 15.75:1 |
 | odak halkası / kart (3:1) | 10.04:1 |
 
-## Doğrulama
+## Gelişmiş istatistik ("Sayıların dili")
+
+`v3-stats.js` gerçek matematik yapar; `v3-statsview.js` bunu grafiklere çevirir.
+
+| Yöntem | Nerede |
+|---|---|
+| Ortalama, medyan, mod, **örneklem SS (n−1)**, CV | Betimsel tablo |
+| **Çeyrekler (tip-7 interpolasyon)**, IQR | Kutu grafiği |
+| **Tukey IQR kuralı** ile aykırı değer tespiti | Kutu grafiğinin noktaları |
+| **En küçük kareler regresyonu** (eğim, kesişim, **R²**) | "Zaman içinde yön" |
+| **Pearson r** + güvenilirlik eşiği | "Neyle birlikte değişiyor" |
+| **Hareketli ortalama** (7 gün, pencere dolmadan başlamaz) | Seyir çizgileri |
+| Moment dökümü (son 7 vs önceki 7) | Veri özeti |
+| Haftanın günü profili (ort. oran + ort. ruh hâli) | "Haftanın günleri" |
+
+### Dürüstlük kuralları (koda gömülü)
+
+- **n &lt; 3** → eğilim/korelasyon **hiç hesaplanmaz** (null; "%0" yazılmaz).
+- **n &lt; 10** korelasyonlar **"düşük örneklem"** olarak işaretlenir.
+- Aykırı değerler **gizlenmez**, nokta olarak gösterilir.
+- Hedef paydası yalnız **ölçümün kaydedildiği** günlerdir — boş gün başarısızlık sayılmaz.
+- "Korelasyon **nedensellik değildir**" uyarısı arayüzde durur.
+- Sayıların nasıl üretildiğini anlatan bir **dürüstlük notu** bölüm sonundadır.
+
+### Gerçek veriyle doğrulama (2026-09-15)
+
+Salt-okur olarak `seyma-data`'dan indirilen **84 günlük** gerçek kayıtla uçtan uca
+test edildi (tamamı `/tmp`'de; repoya ya da sayfaya **gömülmedi**). Sayfanın
+ürettiği değerler bağımsız Node hesabıyla birebir aynı çıktı:
+
+| Ölçüm | n | Ort. | Medyan | SS | CV |
+|---|---|---|---|---|---|
+| Ruh hâli (1–5) | 84 | 3,39 | 3,00 | 0,81 | %24 |
+| Uyku (saat) | 81 | 7,54 | 7,50 | 1,04 | %14 |
+| Su (bardak) | 78 | 8,95 | 9,00 | 1,51 | %17 |
+| Adım | 51 | 4.729 | 4.500 | 2.928 | %62 |
+
+> ⚠️ **BULUNAN KUSUR (uygulamada, düzeltilmedi):** `report.js`'in rozeti
+> **"7/7 mükemmel"** diyor ama karşılaştırması `countRec >= habitCountOn(date)`,
+> yani bugün **15** alışkanlık (aktivasyona göre ilk gün 8). Gerçek 84 günde en
+> fazla **12** tik var → "tam gün" hiç oluşmamış. Etiket eski 7 habitatlık
+> dönemden kalmış. **Bu iş kapsamında düzeltilmedi** (uygulama dosyasına ve
+> pinlenmiş yüzeye dokunmamak için); kullanıcıya bildirildi.
+
 
 ```bash
 node tests/app/test_v3_welcome.js          # 176 kontrol (sözleşme + kontrast + kutlama + veri + uygulama içi)

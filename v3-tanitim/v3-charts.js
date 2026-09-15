@@ -229,6 +229,11 @@
 
     var badgeEl = el('v3-veri-badges');
     if (badgeEl) badgeEl.innerHTML = badges(summary.badges, summary.earnedCount, summary.totalBadges);
+
+    /* Gelişmiş istatistik bölümü — v3-statsview.js yüklüyse çizilir. */
+    if (window.SeymaV3StatsView && typeof window.SeymaV3StatsView.init === 'function') {
+      try { window.SeymaV3StatsView.init(summary); } catch (_) {}
+    }
   }
 
   window.SeymaV3Charts = {

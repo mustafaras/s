@@ -234,6 +234,68 @@
         </div>
       </section>
 
+      <!-- ══════════════ GELİŞMİŞ İSTATİSTİK ══════════════
+           Gerçek matematik: betimsel istatistik, en küçük kareler eğilimi,
+           Pearson korelasyonu, hareketli ortalama, IQR aykırı analizi.
+           Tümü yalnız bu cihazdaki kayıtlardan; ağ çağrısı yok. -->
+      <section class="v3-ist" id="v3-istatistik" aria-labelledby="v3-ist-baslik">
+        <h2 class="v3-sectionlabel v3-sectionlabel--gap" id="v3-ist-baslik">Sayıların dili</h2>
+        <p class="v3-ist__lead">Aynı verinin derinlemesine okunuşu: dağılımlar, eğilimler,
+          ilişkiler ve haftalık kalıplar. Hiçbiri tahmin değil — hepsi senin kayıtlarından
+          hesaplandı.</p>
+
+        <div class="v3-veri-body" id="v3-istatistik-body">
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Ölçümlerin özeti</figcaption>
+            <div id="v3-ist-desc"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Uykunun dağılımı</figcaption>
+            <div id="v3-ist-sleep-hist"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Su içme dağılımı</figcaption>
+            <div id="v3-ist-water-hist"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Zaman içinde yön</figcaption>
+            <div id="v3-ist-trends"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Ruh hâlinin seyri</figcaption>
+            <div id="v3-ist-mood-line"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Uykunun seyri</figcaption>
+            <div id="v3-ist-sleep-line"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Neyle birlikte değişiyor</figcaption>
+            <div id="v3-ist-corr"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Haftanın günleri</figcaption>
+            <div id="v3-ist-weekday"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Hedefleri tutturabildin mi</figcaption>
+            <div id="v3-ist-goals"></div>
+          </figure>
+
+          <div id="v3-ist-honest"></div>
+
+        </div>
+      </section>
+
       <!-- ══════════════ KAPANIŞ ══════════════ -->
       <section class="v3-closing v3-reveal" id="v3-kapanis" style="--i:6" aria-labelledby="v3-kapanis-baslik">
         <div class="v3-closing__flamingo" aria-hidden="true">🦩</div>
@@ -258,8 +320,10 @@
     </div>
   </div>
 
-  <script src="v3-data.js?v=20260915f"></script>
-  <script src="v3-charts.js?v=20260915f"></script>
-  <script src="v3.js?v=20260915g"></script>
+  <script src="v3-data.js?v=20260915g"></script>
+  <script src="v3-stats.js?v=20260915g"></script>
+  <script src="v3-charts.js?v=20260915g"></script>
+  <script src="v3-statsview.js?v=20260915g"></script>
+  <script src="v3.js?v=20260915h"></script>
 </body>
 </html>

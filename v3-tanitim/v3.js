@@ -181,6 +181,11 @@
 
       function step(now) {
         if (start === null) start = now;
+        /* Hedef her karede yeniden okunur: uzak veri animasyon sürerken
+           gelirse (v3-source.js data-count'u günceller) sayaç yeni hedefe
+           döner; aksi hâlde bitişte eski statik sayı geri yazılırdı. */
+        var live = parseInt(el.getAttribute('data-count'), 10);
+        if (!isNaN(live)) target = live;
         var t = Math.min(1, (now - start) / duration);
         var eased = 1 - Math.pow(1 - t, 3);   /* easeOutCubic */
         el.textContent = Math.round(target * eased) + suffix;

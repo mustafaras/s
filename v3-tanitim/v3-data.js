@@ -116,6 +116,11 @@
   var MEMORY = null;
   var SOURCE = 'none';        // 'remote' | 'device' | 'none'
   var SOURCE_DETAIL = '';     // teşhis için kısa neden etiketi
+  var REMOTE_FAIL = '';       // v3-source.js'den: uzak okuma neden başarısız (kod)
+
+  /* v3-source.js uzak okumayı başaramayınca nedenini bırakır; rozet bunu
+     kullanıcıya açıkça yazar (ör. "bu tarayıcıda eşitleme anahtarı yok"). */
+  function setRemoteFailure(code) { REMOTE_FAIL = String(code || ''); }
 
   function setData(d) {
     if (!d || typeof d !== 'object') return false;
@@ -145,7 +150,7 @@
     }
   }
 
-  function source() { return { src: SOURCE, detail: SOURCE_DETAIL }; }
+  function source() { return { src: SOURCE, detail: SOURCE_DETAIL, remoteFail: REMOTE_FAIL }; }
 
   /* ── Uygulama formülleri ───────────────────────────────────────────────── */
   function habitCountOn(date, since) {
@@ -506,6 +511,7 @@
     trDate: trDate,
     trWords: trWords,
     setData: setData,
+    setRemoteFailure: setRemoteFailure,
     source: source,
     dynamic: dynamic,
     readData: readData,

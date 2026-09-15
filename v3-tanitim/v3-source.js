@@ -30,7 +30,17 @@
   var KEY = 'seyma-reset-v1';
   var DEFAULT_REPO = 'mustafaras/seyma-data';
   var PATH = 'data/latest.json';
-  var TIMEOUT_MS = 9000;
+  /* 2,2 MB'lık blob mobil bağlantıda 9 s'yi aşabiliyordu → sessizce cihaz
+     kaydına düşülüyordu. 30 s: yavaş ağda da gerçek veri gelsin. */
+  var TIMEOUT_MS = 30000;
+
+  /* Uzak okuma NEDEN başarısız oldu? Sayfa bunu kullanıcıya söyler —
+     "eşitlenmiş veriye ulaşılamadı" tek başına teşhis ettirmiyordu.
+     Kodlar: no-creds · http_<n> · blob-http_<n> · timeout · network ·
+     empty · parse. Token/ham veri asla buraya yazılmaz. */
+  var FAIL = '';
+  function setFail(code) { FAIL = String(code || ''); }
+  function lastFailure() { return FAIL; }
 
   /* ── Kimlik bilgisi: yalnız cihazın kendi deposundan ────────────────────
      Kullanıcıya sorulmaz, ağdan alınmaz. Yok ise çekme denemesi yapılmaz. */
@@ -96,8 +106,20 @@
 
   function get(url, h, signal) {
     return fetch(url, { headers: h, signal: signal, cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.text() : ''; })
-      .catch(function () { return ''; });
+      .then(function (r) {
+        if (!r.ok) return { ok: false, status: r.status, text: '' };
+        return r.text().then(function (t) { return { ok: true, status: r.status, text: t }; });
+      })
+      .catch(function (e) {
+        var aborted = !!(e && (e.name === 'AbortError' || e.code === 20));
+        return { ok: false, status: 0, text: '', err: aborted ? 'timeout' : 'network' };
+      });
+  }
+  function failOf(res, prefix) {
+    if (!res) return 'network';
+    if (res.err) return res.err;
+    if (!res.ok) return (prefix || '') + 'http_' + (res.status || 0);
+    return 'empty';
   }
 
   /* ── GitHub Contents API → gerekirse Blobs API'ye düş ───────────────────
@@ -107,7 +129,8 @@
      aksi hâlde 2,2 MB'lık gerçek dosya sessizce boş okunurdu. */
   function fetchLatest() {
     var c = creds();
-    if (!c) return Promise.resolve(null);
+    setFail('');
+    if (!c) { setFail('no-creds'); return Promise.resolve(null); }
 
     var base = 'https://api.github.com/repos/' +
       encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo);
@@ -125,39 +148,44 @@
 
     return get(base + '/contents/' + PATH + '?ref=' + encodeURIComponent(c.branch),
       headers(c), signal)
-      .then(function (txt) {
-        if (!txt) return null;
+      .then(function (res) {
+        if (!res || !res.ok || !res.text) { setFail(failOf(res)); return null; }
         var g;
-        try { g = JSON.parse(txt); } catch (_) { return null; }
-        if (!g) return null;
+        try { g = JSON.parse(res.text); } catch (_) { setFail('parse'); return null; }
+        if (!g) { setFail('parse'); return null; }
 
         if (g.content) {
           var body = b64decodeUtf8(g.content);
-          return body ? parse(body) : null;
+          var got = body ? parse(body) : null;
+          if (!got) setFail('parse');
+          return got;
         }
 
         /* Gövde yok (>1 MB) — sha ile ham blob'u çek. */
-        if (!g.sha) return null;
+        if (!g.sha) { setFail('empty'); return null; }
         return get(base + '/git/blobs/' + encodeURIComponent(g.sha),
           headers(c, 'application/vnd.github.raw'), signal)
-          .then(function (raw) {
-            if (!raw) return null;
+          .then(function (bres) {
+            if (!bres || !bres.ok || !bres.text) { setFail(failOf(bres, 'blob-')); return null; }
+            var raw = bres.text, out = null;
             /* Bazı vekiller raw Accept'i yok sayıp JSON döndürür. */
             if (raw.charAt(0) === '{' && raw.indexOf('"encoding"') >= 0 &&
                 raw.indexOf('"content"') >= 0) {
               try {
                 var j = JSON.parse(raw);
                 if (j && j.encoding === 'base64' && typeof j.content === 'string') {
-                  return parse(b64decodeUtf8(j.content));
+                  out = parse(b64decodeUtf8(j.content));
                 }
               } catch (_) {}
-              return null;
+            } else {
+              out = parse(raw);
             }
-            return parse(raw);
+            if (!out) setFail('parse');
+            return out;
           });
       })
       .then(done)
-      .catch(function () { return done(null); });
+      .catch(function () { setFail('network'); return done(null); });
   }
 
   /* Bozuk/eksik gövde asla "veri var" sayılmaz. */
@@ -188,12 +216,17 @@
     var charts = window.SeymaV3Charts;
     if (!charts || typeof charts.init !== 'function') return;
 
+    function report(code) {
+      var V3 = window.SeymaV3Data;
+      if (V3 && typeof V3.setRemoteFailure === 'function') V3.setRemoteFailure(code);
+    }
     function settle() {
       charts.init();
       try { updateDynamicText(); } catch (_) {}
     }
 
     if (!creds()) {
+      report('no-creds');
       settle();
       return;
     }
@@ -203,11 +236,14 @@
         if (remote && window.SeymaV3Data &&
             typeof window.SeymaV3Data.setData === 'function') {
           window.SeymaV3Data.setData(remote);
+        } else {
+          report(lastFailure() || 'empty');
         }
         settle();
       })
       .catch(function () {
         /* Ağ/Kimlik hatası → cihaz deposuna düş: sayfa yine çizilir. */
+        report(lastFailure() || 'network');
         settle();
       });
   }
@@ -231,6 +267,10 @@
     if (num) {
       num.setAttribute('data-count', String(d.dayCount));
       num.textContent = String(d.dayCount);
+      /* v3.js sayaç animasyonu hedefini data-count'tan her karede okur ve
+         bitişte v3Target'a sabitler; ikisi de güncellenmezse animasyon
+         uzak veri geldikten SONRA eski (statik) sayıyı geri yazardı. */
+      try { num.dataset.v3Target = String(d.dayCount); } catch (_) {}
     }
     var ord = document.getElementById('v3-counter-ordinal');
     if (ord) ord.textContent = d.dayCount + '.';
@@ -255,6 +295,7 @@
     creds: creds,
     hasLocalData: hasLocalData,
     fetchLatest: fetchLatest,
+    lastFailure: lastFailure,
     boot: boot,
     updateDynamicText: updateDynamicText,
     b64decodeUtf8: b64decodeUtf8

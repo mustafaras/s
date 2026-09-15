@@ -294,16 +294,44 @@ ok('kimlik bilgisi yalnız CİHAZ deposundan okunur (kullanıcıya sorulmaz, ağ
 
 /* — CİHAZ DEPOSU YALNIZ YEDEK: repo esastır (sayfa ömür boyu bir kez gösterilir) — */
 ok('uzak okuma yolu kimlik bilgisine bağlı (cihaz deposuna değil)',
-  /if \(!creds\(\)\) \{\s*settle\(\);\s*return;/.test(sourceCode));
+  /if \(!creds\(\)\) \{\s*report\('no-creds'\);\s*settle\(\);\s*return;/.test(sourceCode));
 ok('ağ hatasında cihaz deposuna düşülür (sayfa bozulmaz)',
   sourceCode.indexOf('.catch(function () {') >= 0 && /settle\(\);/.test(sourceCode));
 ok('kimlik bilgisi yoksa çekme denemesi yapılmaz (ağ imkânsız)',
-  /if \(!c\) return Promise\.resolve\(null\)/.test(sourceCode));
+  /if \(!c\) \{ setFail\('no-creds'\); return Promise\.resolve\(null\); \}/.test(sourceCode));
+/* — TEŞHİS: "eşitlenmiş veriye ulaşılamadı" tek başına yetmiyordu; kullanıcı
+   "neden repo verisini kullanmıyorsun" diye sordu (2026-09-15). Köprü artık
+   nedeni kodlar (no-creds/http_<n>/timeout/network/parse/empty), veri katmanı
+   taşır, rozet/boş durum Türkçe açıklar. Token asla metne girmez. — */
+ok('köprü başarısızlık nedenini kodlar ve veri katmanına bildirir',
+  /var FAIL = '';/.test(sourceCode) && /function lastFailure\(\)/.test(sourceCode) &&
+  /setFail\('timeout'|err: aborted \? 'timeout' : 'network'/.test(sourceCode) &&
+  /V3\.setRemoteFailure\(code\)/.test(sourceCode) &&
+  /function setRemoteFailure\(code\)/.test(read('v3-tanitim/v3-data.js')) &&
+  /remoteFail: REMOTE_FAIL/.test(read('v3-tanitim/v3-data.js')));
+ok('rozet ve boş durum nedeni Türkçe açıklar (anahtar yok / 401-403 / 404 / zaman aşımı / ağ)',
+  (function () {
+    const c = read('v3-tanitim/v3-charts.js');
+    return /function remoteFailText\(code\)/.test(c) &&
+      /bu tarayıcıda eşitleme anahtarı yok/.test(c) &&
+      /eşitleme anahtarı reddedildi \(HTTP/.test(c) &&
+      /depo ya da dosya bulunamadı \(HTTP 404\)/.test(c) &&
+      /zaman aşımı \(30 sn\)/.test(c) && /ağ hatası\. Çevrimdışı/.test(c) &&
+      /Aşağıdaki sayılar bu cihazdaki kayıtla sınırlıdır; eksik olabilir\./.test(c);
+  })());
+ok('neden metnine token/ham veri girmez (yalnız kod)',
+  !/token[^\n]*textContent|textContent[^\n]*token/i.test(read('v3-tanitim/v3-charts.js')) &&
+  !/c\.token/.test(read('v3-tanitim/v3-charts.js')));
+ok('zaman aşımı 2,2 MB blob için 30 sn (9 sn mobilde sessizce cihaza düşürüyordu)',
+  /var TIMEOUT_MS = 30000;/.test(sourceCode));
+ok('sayaç yarışı kapalı: hedef her karede data-count\'tan okunur, v3Target da güncellenir',
+  /var live = parseInt\(el\.getAttribute\('data-count'\), 10\);/.test(jsSource) &&
+  /num\.dataset\.v3Target = String\(d\.dayCount\)/.test(sourceCode));
 
 /* — >1 MB GERÇEK DOSYA: Blobs API yedeği (Contents API gövdesi boş gelir) — */
 ok('1 MB üstü dosya için Blobs API yedeği var (Contents API boş gövde)',
   sourceCode.indexOf('git/blobs/') >= 0 &&
-  /if \(!g\.sha\) return null;/.test(sourceCode));
+  /if \(!g\.sha\) \{ setFail\('empty'\); return null; \}/.test(sourceCode));
 ok('raw Accept bazı vekillerde JSON döner — iki biçim de karşılanır',
   /encoding/.test(sourceCode) && /b64decodeUtf8/.test(sourceCode));
 ok('Türkçe karakter için UTF-8 base64 çözücü (atob tek başına yetmez)',
@@ -938,7 +966,7 @@ ok('yeni modüller cache-bust taşıyor',
   /v3-charts\.js\?v=\d+[a-z]/.test(pageSource) &&
   /v3-source\.js\?v=\d+[a-z]/.test(pageSource));
 ok('v3.css cache-bust güncel', /v3\.css\?v=20260915k/.test(pageSource));
-ok('v3.js cache-bust güncel', /v3\.js\?v=20260915j/.test(pageSource));
+ok('v3.js cache-bust güncel', /v3\.js\?v=20260915k/.test(pageSource));
 
 // ───────────────────────────────────────────────────────────────────────────
 // [11] Gelişmiş istatistik katmanı (v3-stats.js + v3-statsview.js)

@@ -157,9 +157,40 @@
 
   /* ── Boş durum ────────────────────────────────────────────────────────────
      Kayıt yoksa SAHTE grafik çizilmez. Dürüst ve davetkâr bir metin. */
+  /* Uzak okuma neden olmadı? Kod → kullanıcıya anlaşılır Türkçe.
+     Token/ham veri buraya asla girmez; yalnız kısa neden. */
+  function remoteFailText(code) {
+    code = String(code || '');
+    if (!code) return '';
+    if (code === 'no-creds') {
+      return 'bu tarayıcıda eşitleme anahtarı yok. Sayfayı uygulamayı kullandığın ' +
+        'cihazdan (telefondan) aç ya da uygulamayı bu tarayıcıda açıp Ayarlar → ' +
+        'Eşitleme’den anahtarı gir.';
+    }
+    if (/^(blob-)?http_(401|403)$/.test(code)) {
+      return 'eşitleme anahtarı reddedildi (HTTP ' + code.replace(/\D/g, '') +
+        '). Anahtarın süresi dolmuş ya da yetkisi eksik olabilir — Ayarlar → ' +
+        'Eşitleme’den yenile.';
+    }
+    if (/^(blob-)?http_404$/.test(code)) {
+      return 'depo ya da dosya bulunamadı (HTTP 404). Ayarlar → Eşitleme’deki depo ' +
+        'adını kontrol et.';
+    }
+    if (/^(blob-)?http_/.test(code)) {
+      return 'sunucu hatası (HTTP ' + code.replace(/\D/g, '') + '). Sayfayı yenile.';
+    }
+    if (code === 'timeout') return 'zaman aşımı (30 sn). Bağlantı yavaş — sayfayı yenile.';
+    if (code === 'network') return 'ağ hatası. Çevrimdışı olabilirsin — sayfayı yenile.';
+    return 'uzak dosya okunamadı (' + code + '). Sayfayı yenile.';
+  }
+
   function emptyState() {
+    var V3 = window.SeymaV3Data;
+    var s = (V3 && typeof V3.source === 'function') ? V3.source() : null;
+    var why = remoteFailText(s && s.remoteFail);
     return '<div class="v3-empty">' +
       '<p><b>Şu an gösterilecek kayıt bulunamadı.</b></p>' +
+      (why ? '<p><b>Eşitlenmiş veriye ulaşılamadı:</b> ' + esc(why) + '</p>' : '') +
       '<p>Bu sayfa kayıtlarını senin kendi özel veri depondan okumaya çalışır; ' +
       'oraya ulaşamazsa bu tarayıcıdakilere bakar. Hiçbir yere yazmaz, ' +
       'hiçbir şeyi değiştirmez. Uygulamada birkaç gün işaretledikçe burası ' +
@@ -187,9 +218,11 @@
 
     node.removeAttribute('hidden');
     node.setAttribute('data-src', src);
+    var why = src === 'device' ? remoteFailText(s && s.remoteFail) : '';
     node.textContent = src === 'remote'
       ? '✓ Eşitlenmiş veri · kendi özel veri deposundan salt-okur okundu'
-      : 'Bu cihazdaki kayıt · eşitlenmiş veriye ulaşılamadı';
+      : 'Bu cihazdaki kayıt · eşitlenmiş veriye ulaşılamadı' +
+        (why ? ' — ' + why + ' Aşağıdaki sayılar bu cihazdaki kayıtla sınırlıdır; eksik olabilir.' : '');
   }
 
   /* ── Kurulum ─────────────────────────────────────────────────────────────
@@ -271,6 +304,7 @@
     habitBars: habitBars,
     badges: badges,
     emptyState: emptyState,
+    remoteFailText: remoteFailText,
     sourceBadge: sourceBadge,
     init: init
   };

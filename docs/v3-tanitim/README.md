@@ -29,7 +29,7 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 | `v3-statsview.js` | İstatistik görselleştirme (histogram, kutu grafiği, eğilim, korelasyon). |
 | `v3-charts.js` | Grafik çizimi (ısı haritası, trend, çubuklar, rozetler). |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
-| `../tests/app/test_v3_welcome.js` | **268 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
+| `../tests/app/test_v3_welcome.js` | **273 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
 | `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + "3.0'da neler değişti?" köprüsü. |
 | `../app/core/render.js` | Başlangıç ekranı **v3.0** rozeti. |
 
@@ -142,7 +142,21 @@ sessizce cihaz kaydını gösterme yanılsamasına düşülmez:
 | `none` | (rozet `hidden` ile tamamen gizli) | Gösterilecek kayıt yok |
 
 `v3-data.js` durumu `SOURCE` içinde izler (`source()` ile okunur); rozet hem
-dolu hem boş durumda yazılır. Amaç teşhis edilebilirlik: kullanıcı baktığı
+dolu hem boş durumda yazılır.
+
+**Neden ulaşılamadı? (2026-09-15, kullanıcı sorusu: "neden repo verisini
+kullanmıyorsun")** — köprü başarısızlık nedenini kodlar (`no-creds` ·
+`http_<n>` · `blob-http_<n>` · `timeout` · `network` · `parse` · `empty`),
+`SeymaV3Data.setRemoteFailure()` ile veri katmanına bırakır; rozet (`device`)
+ve boş durum (`none`) bunu Türkçe açıklar: *"bu tarayıcıda eşitleme anahtarı
+yok — sayfayı telefondan aç ya da uygulamayı bu tarayıcıda açıp Ayarlar →
+Eşitleme'den anahtarı gir"*, *"anahtar reddedildi (HTTP 401)"*, *"zaman aşımı
+(30 sn)"* vb. Token/ham veri metne asla girmez. En sık senaryo: masaüstü
+tarayıcıda 15 günlük bayat `seyma-reset-v1` + anahtar yok → sayfa "Senin 15
+günün" der ve artık **nedenini** de söyler. Zaman aşımı 9 → **30 sn** (2,2 MB
+blob mobilde sessizce cihaza düşürüyordu). Sayaç yarışı kapatıldı: `v3.js`
+hedefi her karede `data-count`'tan okur, `updateDynamicText` `v3Target`'ı da
+günceller (uzak veri animasyon sürerken gelince eski sayı geri yazılmıyor). Amaç teşhis edilebilirlik: kullanıcı baktığı
 sayının gerçekten `seyma-data`'dan geldiğini görebilmelidir.
 
 ### Uygulamanın kendi formülleri aynalanır
@@ -323,7 +337,7 @@ test edildi (tamamı `/tmp`'de; repoya ya da sayfaya **gömülmedi**). Sayfanın
 
 
 ```bash
-node tests/app/test_v3_welcome.js          # 268 kontrol (sözleşme + kontrast + kutlama + veri + köprü + uygulama içi)
+node tests/app/test_v3_welcome.js          # 273 kontrol (sözleşme + kontrast + kutlama + veri + köprü + uygulama içi)
 node --check v3-tanitim/v3.js
 node .claude/skills/run-seyma/driver.mjs   # exit 0
 node tools/shell-inventory.mjs --gate      # PASS · 7.610 / 0 / 408 / 57

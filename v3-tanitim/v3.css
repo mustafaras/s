@@ -62,75 +62,149 @@
 }
 
 /* ── Açılış bloğu ───────────────────────────────────────────────────────────*/
-.v3-hero{ position:relative; padding-bottom:6px; }
+/* ── Açılış bloğu — marka kompozisyonu ───────────────────────────────────
+   Katmanlar: (1) nefes alan hale + yavaş dönen konik ışık, (2) halkalı
+   flamingo, (3) altın çizgili kicker, (4) iki basamaklı dev başlık,
+   (5) ortalanmış açılış metni, (6) elmaslı süsleme çizgisi.
+   TAMAMI ORTALI; hiyerarşi ağırlık (900/400) + boyut + renk ile kurulur. */
+.v3-hero{
+  position:relative;
+  padding:14px 0 10px;
+  text-align:center;
+}
+.v3-hero > *{ margin-left:auto; margin-right:auto; }
 
-/* Başlık arkasında çok hafif, tek hue'lu altın süzülme. Neon değil; siyahta
-   zar zor seçilen bir "ışık sızması". */
+/* (1a) Yumuşak altın hale — nefes alır. */
 .v3-hero::before{
   content:"";
   position:absolute;
   z-index:-1;
-  top:-140px;
+  top:-130px;
   left:50%;
-  width:420px;
-  height:420px;
+  width:460px;
+  height:460px;
   transform:translateX(-50%);
   pointer-events:none;
   background:radial-gradient(
-    circle at 50% 50%,
-    color-mix(in srgb,var(--accent) 11%,transparent) 0%,
+    circle at 50% 46%,
+    color-mix(in srgb,var(--accent) 15%,transparent) 0%,
+    color-mix(in srgb,var(--room) 7%,transparent) 34%,
     transparent 68%);
-  /* Başlık arkasındaki altın ışık yavaşça nefes alır. */
   animation:v3HaloBreathe 9s var(--ease-glide) infinite;
 }
 @keyframes v3HaloBreathe{
-  0%,100%{ opacity:.62; transform:translateX(-50%) scale(1); }
-  50%    { opacity:1;   transform:translateX(-50%) scale(1.09); }
+  0%,100%{ opacity:.58; transform:translateX(-50%) scale(1); }
+  50%    { opacity:1;   transform:translateX(-50%) scale(1.1); }
 }
 
+/* (1b) Yavaş dönen konik ışık — hale'ye derinlik verir. Disk kenarı siyahta
+   bant izi bırakmasın diye opaklık düşük ve maske ÇOK geniş bir yumuşaklıkla
+   kapanır (40%→100% arası), böylece görünen bir daire sınırı oluşmaz. */
+.v3-hero::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  top:-96px;
+  left:50%;
+  width:360px;
+  height:360px;
+  margin-left:-180px;
+  border-radius:50%;
+  pointer-events:none;
+  opacity:.34;
+  background:conic-gradient(from 0deg,
+    transparent 0deg,
+    color-mix(in srgb,var(--gold-2) 17%,transparent) 44deg,
+    transparent 104deg,
+    transparent 178deg,
+    color-mix(in srgb,var(--room) 12%,transparent) 228deg,
+    transparent 292deg);
+  -webkit-mask-image:radial-gradient(circle,transparent 22%,#000 52%,rgba(0,0,0,.45) 76%,transparent 100%);
+  mask-image:radial-gradient(circle,transparent 22%,#000 52%,rgba(0,0,0,.45) 76%,transparent 100%);
+  animation:v3HeroSweep 34s var(--ease-linear) infinite;
+}
+@keyframes v3HeroSweep{ to{ transform:rotate(360deg); } }
+
+/* (3) Kicker — iki yanında incelen altın çizgi: ortalanmış "etiket" hissi.
+   TEK SATIR KALIR (nowrap): kırılırsa çizgiler anlamsız görünür. Dar ekranda
+   harf aralığı ve çizgi boyu küçülür, metin kırpılmaz. */
 .v3-kicker{
-  margin:0 0 18px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin:0 0 20px;
   font-size:var(--f-caption1);
-  font-weight:800;
-  letter-spacing:.22em;
+  font-weight:850;
+  letter-spacing:.2em;
   text-transform:uppercase;
+  white-space:nowrap;
   color:var(--accent);
 }
+.v3-kicker > span{ min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.v3-kicker::before,
+.v3-kicker::after{
+  content:"";
+  width:clamp(14px,7vw,56px);height:1px;flex:0 1 auto;min-width:14px;
+  background:linear-gradient(90deg,transparent,var(--accent));
+}
+.v3-kicker::after{ background:linear-gradient(90deg,var(--accent),transparent); }
+@media (max-width:420px){
+  .v3-kicker{ letter-spacing:.14em;font-size:var(--f-caption2); }
+}
 
+/* (4) Başlık — iki basamak: dev "Şeyma 3.0" (900) + ince alt başlık (400).
+   Alt başlık metni uygulamanın kendi ifadesidir ve DEĞİŞTİRİLMEZ; tam genişlikte
+   tek satırda kalması için kendi sütununu aşmasına izin verilir (satır
+   bölünmesi `balance` ile dengelenir, kırpma yok). */
 .v3-title{
   margin:0;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
   font-size:var(--f-large);
   font-weight:900;
-  line-height:1.08;
-  letter-spacing:.01em;
+  line-height:1.02;
+  letter-spacing:-.005em;
+  text-wrap:balance;
   color:var(--text);
 }
 .v3-title__sub{
-  display:inline-block;
-  margin-top:8px;
-  font-size:var(--f-title1);
+  display:block;
+  max-width:34ch;
+  font-size:var(--f-title3);
   font-weight:400;           /* ağırlık kontrastı: 900 başlık / 400 gövde */
-  letter-spacing:.03em;
+  line-height:1.4;
+  letter-spacing:.01em;
+  text-wrap:balance;
   color:var(--muted);
 }
 
+/* (5) Açılış metni — ortalanmış, rahat satır aralığı, dengeli bölünme. */
 .v3-lead{
-  margin:22px 0 0;
-  max-width:34ch;
+  margin:22px auto 0;
+  max-width:40ch;
   font-size:var(--f-body);
   font-weight:400;
-  line-height:1.55;
+  line-height:1.65;
+  text-wrap:pretty;
   color:var(--text2);
 }
 
+/* (6) Süsleme — ortada elmas, iki yana incelen saç teli. */
 .v3-hero__rule{
-  margin-top:34px;
+  position:relative;
+  margin:34px auto 0;
+  max-width:340px;
   height:1px;
-  background:linear-gradient(
-    90deg,
-    var(--accent) 0%,
-    color-mix(in srgb,var(--accent) 22%,transparent) 46%,
-    transparent 100%);
+  background:linear-gradient(90deg,transparent 0%,
+    color-mix(in srgb,var(--accent) 55%,transparent) 30%,
+    var(--accent) 50%,
+    color-mix(in srgb,var(--accent) 55%,transparent) 70%,transparent 100%);
+  opacity:.85;
+}
+.v3-hero__rule::after{
+  content:"";
+  position:absolute;top:50%;left:50%;
+  width:7px;height:7px;margin:-3.5px 0 0 -3.5px;
+  background:var(--accent);
+  transform:rotate(45deg);
+  box-shadow:0 0 12px color-mix(in srgb,var(--accent) 65%,transparent);
 }
 
 /* ── Bölüm etiketi ──────────────────────────────────────────────────────────*/
@@ -348,6 +422,17 @@
   position:relative;width:132px;height:132px;margin:0 auto 20px;
   display:flex;align-items:center;justify-content:center;
   animation:v3FlamingoFloat 6.5s var(--ease-glide) infinite;
+}
+/* Flamingonun ARKASINDA ince altın halka — marka “madalyanı” hissi verir.
+   İç gölge + dış ışık; ikisi de nefes alır. */
+.v3-flamingo::before{
+  content:"";
+  position:absolute;inset:9px;border-radius:50%;
+  border:1px solid color-mix(in srgb,var(--accent) 42%,transparent);
+  box-shadow:
+    inset 0 0 0 5px color-mix(in srgb,var(--accent) 6%,transparent),
+    0 0 34px color-mix(in srgb,var(--accent) 22%,transparent);
+  animation:v3FlamingoHalo 4.4s var(--ease-glide) infinite;
 }
 @keyframes v3FlamingoFloat{
   0%,100%{ transform:translateY(0) rotate(-1.1deg); }
@@ -1038,8 +1123,10 @@
   .v3-confetti{ display:none; }
   .v3-progress__bar{ transition:none; }
   .v3-flamingo,
+  .v3-flamingo::before,
   .v3-flamingo__halo,
   .v3-flamingo__emoji,
+  .v3-hero::after,
   .v3-hero::before,
   .v3-sparks,
   .v3-sparks i,

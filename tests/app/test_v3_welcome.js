@@ -756,7 +756,7 @@ ok('v3.js sayaçları charts enjeksiyonundan SONRA kuruyor (script sırası)',
 /* — CACHE-BUST — */
 ok('yeni modüller cache-bust taşıyor',
   /v3-data\.js\?v=\d+[a-z]/.test(pageSource) && /v3-charts\.js\?v=\d+[a-z]/.test(pageSource));
-ok('v3.css cache-bust güncel', /v3\.css\?v=20260915h/.test(pageSource));
+ok('v3.css cache-bust güncel', /v3\.css\?v=20260915i/.test(pageSource));
 ok('v3.js cache-bust güncel', /v3\.js\?v=20260915h/.test(pageSource));
 
 // ───────────────────────────────────────────────────────────────────────────

@@ -199,6 +199,33 @@ Fixture canlı `app/styles.css` tokenlarını okuyup ölçer; en zor çift **5.7
 - "Korelasyon **nedensellik değildir**" uyarısı arayüzde durur.
 - Sayıların nasıl üretildiğini anlatan bir **dürüstlük notu** bölüm sonundadır.
 
+### Hedef eşikleri — SABİT YAZILMAZ
+
+Kullanıcı geri bildirimiyle bulunan gerçek kusur: "Hedefleri tutturabildin mi"
+bölümü eşikleri **sabit** yazıyordu ve **adım hedefi 4.500** alınmıştı. Oysa
+4.500 (`STEP_TICK_MIN`) yürüyüş **tikinİn** eşiğidir; adım **hedefi**
+`stepsGoal()` ile **9.000**'dir (tatilde 12.000/9.000/5.000).
+
+Artık her eşik **her gün için** uygulamanın kendi fonksiyonundan okunur:
+`waterGoal(date)` · `stepsGoal(date)` · `sleepGoalHours(date)`. Böylece
+`settings.targets` doluysa kullanıcı hedefi geçerli olur, tatil günü esnetmesi
+aynen uygulanır ve gerçek veriyle sapma oluşmaz.
+
+**Etki (gerçek 84 gün):** adım tutturma **%55 → %10** — düzeltme önemliydi.
+
+Bölüm ayrıca bunları **açıkça yazar**: kullanılan eşiklerin sayıları
+(7,5 saat · 8 bardak · 9.000 adım · 15 alışkanlık), alışkanlık sayısının yol
+boyunca değiştiği (ilk gün **8** → bugün **15**), "tam gün"ün her gün kendi
+tarihine göre hesaplandığı ve paydanın yalnız o ölçümün kaydedildiği günler
+olduğu.
+
+| Hedef | Gerçek 84 gün |
+|---|---|
+| 7,5+ saat uyku | %69 (56/81) |
+| 8+ bardak su | %96 (75/78) |
+| 9.000+ adım | %10 (5/51) |
+| Günün tüm alışkanlıkları (15) | %0 (0/84) |
+
 ### Gerçek veriyle doğrulama (2026-09-15)
 
 Salt-okur olarak `seyma-data`'dan indirilen **84 günlük** gerçek kayıtla uçtan uca

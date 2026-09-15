@@ -278,16 +278,32 @@
       });
     }
 
-    /* Hedef tutturma oranları (yalnız o gün dolu ise payda sayılır) */
-    function adherence(vals, test) {
+    /* ── Hedef tutturma ──────────────────────────────────────────────────────
+       KRİTİK: eşikler SABİT YAZILMAZ. Her gün için uygulamanın kendi hedef
+       fonksiyonları çağrılır (h.goalFor). Böylece:
+         • settings.targets kullanıcı hedefi varsa o geçerli olur,
+         • tatil günü esnetmesi (adım 12.000/9.000/5.000, su 10) aynen uygulanır,
+         • payda yalnız O ÖLÇÜMÜN kaydedildiği günler olur (boş gün sayılmaz).
+       Eşiği buraya sabit yazmak, gerçek veriden sapma üretir — bir kez yaşandı
+       (adım için 4.500 kullanılmıştı; uygulamanın gerçek hedefi 9.000). */
+    function adherenceByDate(vals, test) {
       var denom = 0, num = 0;
-      vals.forEach(function (v) { if (v == null) return; denom++; if (test(v)) num++; });
+      for (var i = 0; i < vals.length; i++) {
+        if (vals[i] == null) continue;
+        denom++;
+        if (test(vals[i], dayList[i].date)) num++;
+      }
       return { rate: denom ? Math.round(num / denom * 100) : null, hit: num, n: denom };
     }
+
+    /* Pencerenin son günü — hedef/tarih türetmeleri bunu kullanır. */
+    var end = dayList.length ? dayList[dayList.length - 1].date : null;
+    var first = dayList.length ? dayList[0].date : end;
+
     var goals = {
-      sleep75: adherence(series.sleep, function (v) { return v >= 7.5; }),
-      water8: adherence(series.water, function (v) { return v >= 8; }),
-      steps4500: adherence(series.steps, function (v) { return v >= 4500; }),
+      sleep: adherenceByDate(series.sleep, function (v, date) { return v >= h.sleepGoal(date); }),
+      water: adherenceByDate(series.water, function (v, date) { return v >= h.waterGoal(date); }),
+      steps: adherenceByDate(series.steps, function (v, date) { return v >= h.stepsGoal(date); }),
       tickPerfect: (function () {
         var denom = 0, num = 0;
         dayList.forEach(function (d) {
@@ -297,6 +313,16 @@
         });
         return { rate: denom ? Math.round(num / denom * 100) : null, hit: num, n: denom };
       })()
+    };
+    /* Hedeflerin KENDİSİ de raporlanır — sayı ekranda yazılabilsin diye. */
+    goals.thresholds = {
+      sleep: h.sleepGoal(end),
+      water: h.waterGoal(end),
+      steps: h.stepsGoal(end),
+      habitCountToday: h.habitCountOn(end),
+      habitCountFirst: h.habitCountOn(first),
+      startDate: first,
+      endDate: end
     };
 
     /* Hareketli ortalamalar (grafikler için) */

@@ -27,8 +27,12 @@
   var PROTEIN_GOAL = 60;
   var WATER_GOAL = 8;
   var VACATION_WATER_GOAL = 10;
+  /* STEP_TICK_MIN, yürüyüş TİKİNİN eşiğidir. Adım HEDEFİ değildir —
+     adım hedefi stepsGoal() ile 9000 (tatilde 12.000/9.000/5.000) gelir.
+     İkisini karıştırmak gerçek veriden sapma üretir; ayrı tutuluyorlar. */
   var STEP_TICK_MIN = 4500;
-  var SLEEP_TICK_MIN = 7.5;      // habit 'sleepReg' eşiği
+  var STEP_GOAL = 9000;
+  var SLEEP_TICK_MIN = 7.5;      // hem uyku tiki eşiği hem uyku hedefi
   var STEP_LEN_M = 0.72;         // adım uzunluğu (m)
 
   /* ── app.js HABITS[] → {key: since} ────────────────────────────────────────
@@ -164,6 +168,23 @@
     if (isVacationDay(date, data)) return VACATION_WATER_GOAL;
     var t = (data && data.settings && data.settings.targets) || {};
     return (typeof t.waterCups === 'number' && !isNaN(t.waterCups)) ? t.waterCups : WATER_GOAL;
+  }
+  /* health.js stepsGoal(date) — BİREBİR aynı mantık.
+     Varsayılan 9000'dir (STEP_TICK_MIN=4500 yalnız yürüyüş tikinin eşiğidir,
+     hedef DEĞİLDİR; ikisini karıştırmak gerçek veriden sapma üretir). */
+  function stepsGoalFor(date, data) {
+    if (isVacationDay(date, data)) {
+      var p = ((data && data.settings && data.settings.vacation) || {}).preset || 'relaxed';
+      return p === 'active' ? 12000 : (p === 'moderate' ? 9000 : 5000);
+    }
+    var t = (data && data.settings && data.settings.targets) || {};
+    return (typeof t.steps === 'number' && !isNaN(t.steps)) ? t.steps : STEP_GOAL;
+  }
+  /* health.js sleepGoalHours(date) — birebir. */
+  function sleepGoalFor(date, data) {
+    if (isVacationDay(date, data)) return SLEEP_TICK_MIN - 0.5;
+    var t = (data && data.settings && data.settings.targets) || {};
+    return (typeof t.sleepHours === 'number' && !isNaN(t.sleepHours)) ? t.sleepHours : SLEEP_TICK_MIN;
   }
   function readingDays(rec) {
     return !!(rec && rec.reading && Array.isArray(rec.reading.entries) && rec.reading.entries.length > 0);
@@ -360,6 +381,10 @@
           return ({ 'cok-iyi': 5, 'iyi': 4, 'normal': 3, 'zorlandim': 2, 'cok-zorlandim': 1 })[m] || null;
         },
         waterGoalFor: function (date) { return waterGoalFor(date, data); },
+        /* Uygulamanın GERÇEK hedef fonksiyonları — sabit eşik yok. */
+        waterGoal: function (date) { return waterGoalFor(date, data); },
+        stepsGoal: function (date) { return stepsGoalFor(date, data); },
+        sleepGoal: function (date) { return sleepGoalFor(date, data); },
         effSteps: effSteps
       });
     } catch (_) {
@@ -375,6 +400,8 @@
     PROTEIN_GOAL: PROTEIN_GOAL,
     WATER_GOAL: WATER_GOAL,
     VACATION_WATER_GOAL: VACATION_WATER_GOAL,
+    STEP_TICK_MIN: STEP_TICK_MIN,
+    STEP_GOAL: STEP_GOAL,
     SLEEP_TICK_MIN: SLEEP_TICK_MIN,
     STEP_LEN_M: STEP_LEN_M,
     /* salt-okur yardımcılar — fixture'lar bunları tek tek doğrular */
@@ -385,6 +412,8 @@
     medFreeStreak: medFreeStreak,
     effSteps: effSteps,
     waterGoalFor: waterGoalFor,
+    stepsGoalFor: stepsGoalFor,
+    sleepGoalFor: sleepGoalFor,
     isVacationDay: isVacationDay,
     addDays: addDays,
     diffDays: diffDays,

@@ -685,6 +685,29 @@ ok('adım uzunluğu 0,72 m (STEP_LEN_M)',
   /STEP_LEN_M = 0\.72/.test(dataSource) && /w \/ STEP_LEN_M/.test(dataSource));
 ok('uyku eşiği 7,5 saat (SLEEP_TICK_MIN)',
   /SLEEP_TICK_MIN = 7\.5/.test(dataSource));
+
+/* — HEDEF EŞİKLERİ: sabit yazılmaz, uygulamanın fonksiyonlarından okunur — */
+ok('adım HEDEFİ 9000 (STEP_GOAL); tikin eşiği 4500 (STEP_TICK_MIN) ayrı tutuluyor',
+  /STEP_GOAL = 9000/.test(dataSource) && /STEP_TICK_MIN = 4500/.test(dataSource) &&
+  /Adım HEDEFİ değildir/.test(dataSource));
+ok('adım hedefi tatilde 12.000/9.000/5.000 (health.js stepsGoal)',
+  /p === 'active' \? 12000 : \(p === 'moderate' \? 9000 : 5000\)/.test(dataSource));
+ok('adım hedefi kullanıcı hedefi varsa onu kullanır',
+  /typeof t\.steps === 'number'/.test(dataSource));
+ok('uyku hedefi tatilde 7 saat (SLEEP_TICK_MIN − 0,5)',
+  /return SLEEP_TICK_MIN - 0\.5;/.test(dataSource));
+ok('eşikler her GÜN için ayrı hesaplanır (hedef fonksiyonları gün parametreli)',
+  /waterGoal: function \(date\)/.test(dataSource) &&
+  /stepsGoal: function \(date\)/.test(dataSource) &&
+  /sleepGoal: function \(date\)/.test(dataSource));
+ok('hedef eşikleri istatistik çıktısında RAPORLANIR (ekranda yazılabilsin)',
+  /goals\.thresholds = \{/.test(read('v3-tanitim/v3-stats.js')) &&
+  /habitCountFirst/.test(read('v3-tanitim/v3-stats.js')));
+ok('hedef etiketleri sabit metin değil, okunan eşikten üretilir',
+  /tr\(th\.steps\) \+ ' adım ve üzeri'/.test(read('v3-tanitim/v3-statsview.js')) &&
+  !/7,5\+ saat uyku|8\+ bardak su|4\.500\+ adım/.test(read('v3-tanitim/v3-statsview.js')));
+ok('alışkanlık sayısı değişimi kullanıcıya açıklanır (ilk gün 8 → bugün 15)',
+  /Alışkanlık sayısı yol[\s\S]{0,120}boyunca değişti/.test(read('v3-tanitim/v3-statsview.js')));
 ok('ilahsız gece yalnız med.type==="none" sayılıyor',
   /sleep\.med\.type === 'none'/.test(dataSource));
 ok('effSteps önceliği: manuel → health → izlenen',
@@ -815,7 +838,7 @@ ok('aykırı değerler GİZLENMEZ, işaretlenir',
 ok('korelasyon "nedensellik değildir" uyarısı taşıyor',
   /nedensellik değildir/.test(statsViewSrc));
 ok('hedef paydası yalnız ölçümün kaydedildiği günler',
-  /yalnız <b>o ölçümün kaydedildiği<\/b> günlerdir/.test(statsViewSrc));
+  /o ölçümün kaydedildiği/.test(read('v3-tanitim/v3-statsview.js')));
 
 /* — Sayfa bağlantısı — */
 ok('sayfada istatistik bölümü var', /id="v3-istatistik"/.test(pageSource));

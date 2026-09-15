@@ -192,13 +192,18 @@
     return h;
   }
 
-  /* ── 6 · Hedef tutturma ────────────────────────────────────────────────── */
+  /* ── 6 · Hedef tutturma ─────────────────────────────────────────────────
+     Etiketlerdeki eşikler SABİT YAZILMAZ; uygulamanın kendi hedef
+     fonksiyonlarından okunan değerlerle basılır (tatil esnetmesi ve kullanıcı
+     hedefleri dâhil). */
   function goals(g) {
+    var th = g.thresholds || {};
+    var tr = function (v) { return v == null ? '' : Number(v).toLocaleString('tr-TR'); };
     var rows = [
-      { k: 'sleep75', l: '7,5+ saat uyku' },
-      { k: 'water8', l: '8+ bardak su' },
-      { k: 'steps4500', l: '4.500+ adım' },
-      { k: 'tickPerfect', l: 'Günün tüm alışkanlıkları' }
+      { k: 'sleep', l: tr(th.sleep) + ' saat ve üzeri uyku' },
+      { k: 'water', l: tr(th.water) + ' bardak ve üzeri su' },
+      { k: 'steps', l: tr(th.steps) + ' adım ve üzeri' },
+      { k: 'tickPerfect', l: 'Günün tüm alışkanlıkları (' + tr(th.habitCountToday) + ')' }
     ];
     var h = '<ul class="v3-goals">';
     rows.forEach(function (r) {
@@ -211,8 +216,21 @@
         '<div class="v3-goal__meta">' + v.hit + '/' + v.n + ' gün tuttu</div></li>';
     });
     h += '</ul>';
-    h += '<p class="v3-chart__note">Payda yalnız <b>o ölçümün kaydedildiği</b> günlerdir — ' +
-      'boş günler başarısızlık sayılmaz, dürüstlük bunu gerektirir.</p>';
+    h += '<p class="v3-chart__note">Eşikler <b>uygulamanın kendi hedef ' +
+      'fonksiyonlarından</b> okunur (tatil günü esnetmesi ve varsa senin ' +
+      'belirlediğin hedefler dâhil). Payda yalnız <b>o ölçümün kaydedildiği</b> ' +
+      'günlerdir — boş günler başarısızlık sayılmaz, dürüstlük bunu gerektirir.</p>';
+
+    /* Alışkanlık aktivasyonu: bugün 15, ilk gün 8 — "tam gün" eşiği zamanla
+       değiştiği için açıkça yazılır. */
+    if (th.habitCountFirst != null && th.habitCountToday != null &&
+        th.habitCountFirst !== th.habitCountToday) {
+      h += '<p class="v3-chart__note v3-chart__note--warn">Alışkanlık sayısı yol ' +
+        'boyunca değişti: ilk gün <b>' + tr(th.habitCountFirst) + '</b>, bugün <b>' +
+        tr(th.habitCountToday) + '</b> (yeni alışkanlıklar eklendikçe arttı). ' +
+        'Bu yüzden “tam gün” eşiği her gün kendi tarihine göre hesaplanır — ' +
+        'eski günleri bugünün ölçüsüyle yargılamak yanıltıcı olurdu.</p>';
+    }
     return h;
   }
 

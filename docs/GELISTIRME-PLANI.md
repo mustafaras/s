@@ -21,6 +21,25 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (HEDEF EŞİKLERİ DÜZELTİLDİ — gerçek veriyle):**
+>   Kullanıcı geri bildirimi haklıydı: "Hedefleri tutturabildin mi" bölümü
+>   eşikleri **sabit** yazıyordu ve **adım hedefi 4.500** alınmıştı. Oysa 4.500
+>   (`STEP_TICK_MIN`) yürüyüş **tikinİn** eşiğidir; adım **hedefi**
+>   `health.js stepsGoal()` ile **9.000**'dir (tatilde 12.000/9.000/5.000).
+>   Artık her eşik **her gün için** uygulamanın kendi fonksiyonundan okunur
+>   (`waterGoal(date)` / `stepsGoal(date)` / `sleepGoalHours(date)`);
+>   `settings.targets` (gerçek veride hepsi `null`) ve tatil esnetmesi dâhil.
+>   **Etki (gerçek 84 gün): adım tutturma %55 → %10.** Bölüm ayrıca kullanılan
+>   eşikleri, alışkanlık sayısının ilk gün 8 → bugün 15'e çıktığını ve
+>   "tam gün"ün her gün kendi tarihine göre hesaplandığını açıkça yazıyor.
+>   **Gerçek veriyle doğrulandı:** 84 gün → uyku %69 (56/81) · su %96 (75/78) ·
+>   adım %10 (5/51) · tam gün %0 (0/84). Tarayıcıda uçtan uca teyit edildi
+>   (izole loopback; veri /tmp'de tutuldu ve silindi, repoya girmedi).
+>   **Ayrıca uygulamada BAYAT METİN bulundu (düzeltilmedi):**
+>   `app/core/appSurface.js:76` yürüyüş tiki mesajı hâlâ
+>   "Yürüyüş tamam — 4.500+ adım" diyor; gerçek eşik `stepsGoal(date)` = 9.000.
+>   Pinlenmiş yüzeye dokunmamak için kapsam dışı bırakıldı, kullanıcıya bildirildi.
+>   Fixture 221 → **229 kontrol**. LOCAL-ONLY.
 > - **2026-09-15 (v3.0 sayfasına gelişmiş istatistik katmanı):**
 >   İki yeni salt-okur modül: `v3-tanitim/v3-stats.js` (matematik) +
 >   `v3-statsview.js` (görselleştirme). Gerçek yöntemler: betimsel istatistik

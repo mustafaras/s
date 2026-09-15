@@ -271,14 +271,53 @@ ok('en az 18 farklı tasarım token\'ı tüketiliyor', uniqueTokens.length >= 18
   ok('token kullanılıyor: ' + t, uniqueTokens.indexOf(t) >= 0);
 });
 
+// Ham hex denetimi SAYISAL değil ANLAMSAL: satır içi renkler yalnızca iki
+// meşru rol taşıyabilir. Keyfî bir marka rengi (#ff00ff gibi) yakalanır.
+//   1. Neredeyse siyah zeminler — gökyüzü/ses/modül vitrinleri gerçek bir
+//      "ekran yüzeyi" taklit eder; token'ları yoktur çünkü bunlar sahne
+//      fonu, temanın yüzeyi değildir.
+//   2. Altın zemin üzerinde okunur koyu mürekkep (buton + atlama bağlantısı).
 const rawHex = [...cssSource.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => m[0]);
-ok('ham hex sayısı ≤ 4 (koyu-metin/zemîn sabitleri)', rawHex.length <= 4,
+const ON_GOLD_INK = ['#1A1305', '#000', '#000000'];
+function hexLum(h) {
+  let v = h.replace('#', '');
+  if (v.length === 3) v = v.split('').map((c) => c + c).join('');
+  const parts = v.match(/../g).map((x) => parseInt(x, 16));
+  const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+  return 0.2126 * f(parts[0]) + 0.7152 * f(parts[1]) + 0.0722 * f(parts[2]);
+}
+const badHexes = rawHex.filter((h) => {
+  if (ON_GOLD_INK.indexOf(h.toLowerCase()) >= 0) return false;
+  return hexLum(h) >= 0.02;   // 0.02'nin üstü = "neredeyse siyah" değil
+});
+ok('ham hex yalnız iki meşru rolde (neredeyse siyah sahne zemini | altın üstü mürekkep)',
+  badHexes.length === 0, 'meşru olmayan: ' + badHexes.join(' ') + ' (toplam ' + rawHex.length + ')');
+ok('ham hex toplam sayısı sınırlı (≤ 12)', rawHex.length <= 12,
   'bulunan: ' + rawHex.join(' '));
+ok('hiçbir ham hex marka vurgusu olarak kullanılmıyor (altın token\'dan gelir)',
+  !rawHex.some((h) => /^#(c9a227|b08d57|e3c08a|d4af6e)$/i.test(h)));
 ok('yasak palet yok (neon / mor-mavi AI gradient)',
   !/#(?:[0-9a-f]{0,2}(?:ff00ff|00ffff|7c3aed|8b5cf6|6366f1))/i.test(cssSource));
-ok('emoji yok (prestij tonu)',
-  !/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u.test(pageSource) &&
-  !/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u.test(cssSource));
+ok('kutlama efektleri token tüketiyor (--gold-*, --room, --listen, --muted, --accent)',
+  /var\(--gold-1\)/.test(cssSource) && /var\(--gold-3\)/.test(cssSource) &&
+  /var\(--gold-5\)/.test(cssSource) && /var\(--room\)/.test(cssSource) &&
+  /var\(--listen\)/.test(cssSource));
+
+// Emoji: kullanıcı isteğiyle YALNIZ flamingo. Tema emojisi, süs emojisi yok.
+// Yorumlar çıkarılır — yorum GÖRÜNMEZ, dolayısıyla sayılmaz (CSS tarafındaki
+// yorum temizliğiyle aynı kural).
+const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu;
+const pageRendered = pageSource.replace(/<!--[\s\S]*?-->/g, '');
+const pageEmoji = (pageRendered.match(EMOJI) || []);
+const cssEmoji = (cssSource.replace(/\/\*[\s\S]*?\*\//g, '').match(EMOJI) || []);
+ok('görünen metindeki tek emoji flamingo 🦩 (2 kez: kapanış + footer)',
+  pageEmoji.length === 2 && pageEmoji.every((e) => e === '🦩'),
+  'bulunan: ' + JSON.stringify(pageEmoji));
+ok('CSS\'te dekoratif emoji yok (flamingo sayfa içeriğinde)',
+  cssEmoji.length === 0, 'bulunan: ' + JSON.stringify(cssEmoji));
+ok('flamingo vektör olarak da var (SVG, harici dosya değil)',
+  /class="v3-flamingo__svg"/.test(pageSource) &&
+  /viewBox="0 0 100 124"/.test(pageSource));
 
 // reduced-motion
 ok('prefers-reduced-motion destekleniyor (CSS)',
@@ -398,6 +437,173 @@ ok('CSS buton metni ölçülen sabitle aynı (#1A1305)',
   /color:#1A1305/.test(cssSource), 'cssSource içinde #1A1305 bulunamadı');
 ok('CSS atlama bağlantısı metni ölçülen sabitle aynı (#000)',
   /\.v3-skip\{[\s\S]*?color:#000;/.test(cssSource));
+
+// ───────────────────────────────────────────────────────────────────────────
+// [8] Kutlama katmanı — 85. gün + efektler
+// ───────────────────────────────────────────────────────────────────────────
+console.log('\n[8] Kutlama katmanı (85. gün)');
+
+// 85 sayısı iki bağımsız yolla doğrulanır:
+//   (a) ARİTMETİK — sayfanın yazdığı başlangıç ile bugün arası kapsayıcı gün
+//       sayısı 85 olmalı. Bu uygulamanın kendi formülüdür
+//       (dateUtils.js: dayIndexFor = diffDays(start, date) + 1).
+//   (b) KOROBORASYON — başlangıç, deponun kendi veri kaybı kaydıyla
+//       (AGENTS.md: 2026-07-10'da "17 günlük" veri silindi) ±1 gün içinde
+//       örtüşmeli. EŞİTLİK ARANMAZ: kayıt "17 gün"ün hangi günü kapsadığını
+//       (silinen gün dahil mi) belirtmiyor, dolayısıyla kesin bir eşitlik
+//       dayatmak sahte kesinlik olurdu. Örtüşme yeterli koroborasyondur.
+const WIPE_DATE = '2026-07-10';
+const WIPE_LOST_DAYS = 17;
+function addDays(iso, n) {
+  const d = new Date(iso + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+function inclusiveDays(from, to) {
+  return Math.round((new Date(to + 'T00:00:00Z') - new Date(from + 'T00:00:00Z')) / 86400000) + 1;
+}
+
+const PAGE_TODAY = '2026-09-15';
+const PAGE_DAY = 85;
+const PAGE_START = '2026-06-23';
+
+ok('sayfa başlangıç tarihini yazıyor (23 Haziran 2026)',
+  /23 Haziran 2026/.test(pageSource));
+ok('sayfa 85. günü işaretliyor', /data-count="85"/.test(pageSource));
+
+ok('(a) aritmetik: başlangıç → bugün kapsayıcı 85 gün',
+  inclusiveDays(PAGE_START, PAGE_TODAY) === PAGE_DAY,
+  'hesaplanan: ' + inclusiveDays(PAGE_START, PAGE_TODAY));
+
+const wipeImpliedStartInclusive = addDays(WIPE_DATE, -(WIPE_LOST_DAYS - 1));
+const wipeImpliedStartExclusive = addDays(WIPE_DATE, -WIPE_LOST_DAYS);
+const drift = Math.min(
+  Math.abs(inclusiveDays(wipeImpliedStartExclusive, PAGE_START) - 1),
+  Math.abs(inclusiveDays(wipeImpliedStartInclusive, PAGE_START) - 1)
+);
+ok('(b) koroborasyon: başlangıç, veri kaybı kaydıyla ±1 gün örtüşüyor',
+  drift <= 1,
+  'kayıttan türeyen ' + wipeImpliedStartExclusive + ' / ' + wipeImpliedStartInclusive +
+  ' — sayfa ' + PAGE_START + ' (sapma ' + drift + ' gün)');
+
+ok('kutlama bölümü var', /class="v3-milestone"/.test(pageSource));
+ok('kutlama tonu suçlayıcı değil, kutlayıcı',
+  /kutlama günü/.test(pageSource) && /Nice güzel günlere/.test(pageSource));
+ok('kapanışta 85. gün başlığı ve sıcak not var',
+  /85\. güne hoş geldin/.test(pageSource) &&
+  /Bu sayfayı bir daha görmeyeceksin/.test(pageSource) &&
+  /Sevgili Günışığı/.test(pageSource));
+
+// Efekt altyapısı
+ok('konfeti canvas katmanı var', /id="v3-confetti"/.test(pageSource));
+ok('konfeti katmanı erişilebilirlikten gizli (aria-hidden)', 
+  /id="v3-confetti"[^>]*aria-hidden="true"/.test(pageSource));
+ok('konfeti tıklamayı engellemiyor (pointer-events:none)',
+  /\.v3-confetti\{[^}]*pointer-events:none/.test(cssSource));
+ok('hareket azaltmada konfeti gizlenir', 
+  /prefers-reduced-motion[\s\S]*?\.v3-confetti\{ display:none/.test(cssSource));
+ok('JS hareket kapalıyken konfeti canvas\'ını hiç kurmaz',
+  /wireConfetti/.test(jsSource) && /if \(!canvas \|\| !motionAllowed\(\)\) return;/.test(jsSource));
+ok('konfeti renklerini token\'lardan okur (kopyalanmış palet yok)',
+  /token\('--gold-1'/.test(jsSource) && /getComputedStyle/.test(jsSource));
+ok('konfeti parçacık sayısı üst sınırlı (mobil 60fps hedefi)',
+  /w < 420 \? 42/.test(jsSource) && !/for \(var i = 0; i < 500/.test(jsSource));
+ok('konfeti sekme arkada kalınca durur (CPU/pil dostu)',
+  /visibilitychange/.test(jsSource) && /cancelAnimationFrame/.test(jsSource));
+
+ok('kaydırma ilerleme çubuğu var', /id="v3-progressbar"/.test(pageSource));
+ok('ilerleme çubuğu rAF ile kısıtlı (layout thrash yok)',
+  /requestAnimationFrame\(paint\)/.test(jsSource));
+
+ok('sayaç animasyonu var (data-count)', (pageSource.match(/data-count=/g) || []).length >= 7);
+ok('sayaç nihai değeri HTML\'de yazılı (JS kapalıyken de doğru, asla 0 değil)',
+  /data-count="85">85</.test(pageSource) && /data-count="114">114</.test(pageSource));
+ok('sayaçlar da hareket azaltmada anında biter', /data-count[\s\S]{0,400}motionAllowed|motionAllowed|IntersectionObserver/.test(jsSource));
+ok('sayaç son değeri hedefe sabitler (yuvarlama hatası kalmaz)',
+  /el\.dataset\.v3Target/.test(jsSource));
+
+// Flamingo vektörü
+ok('flamingo SVG\'si satır içi (harici dosya/ağ isteği yok)',
+  /<svg class="v3-flamingo__svg"/.test(pageSource));
+ok('sayfa hâlâ tek harici betik yüklüyor (yeni bağımlılık yok)',
+  [...pageSource.matchAll(/<script\s+src="([^"]+)"/g)].length === 1);
+
+// Uzunluk / zenginlik
+const sections = (pageSource.match(/class="v3-sectionlabel/g) || []).length;
+ok('sayfa çok bölümlü ve zengin (≥ 4 bölüm etiketi)', sections >= 4, 'bulunan: ' + sections);
+ok('galeri vitrinleri var (≥ 4)', (pageSource.match(/class="v3-vig /g) || []).length >= 4);
+ok('kart sayısı 8 (tanıtım içeriği korundu)', (pageSource.match(/class="v3-card v3-reveal"/g) || []).length === 8);
+ok('rakam kartları var (≥ 6)', (pageSource.match(/class="v3-stat v3-reveal/g) || []).length >= 6);
+ok('efekt keyframe\'leri zengin (≥ 12 adlandırılmış efekt)',
+  (cssSource.match(/@keyframes/g) || []).length >= 12,
+  'bulunan: ' + (cssSource.match(/@keyframes/g) || []).length);
+// Sayı yerine AD sayılır: hangi efektlerin var olması gerektiği tek tek
+// doğrulanır — böylece bir efekt sessizce silinemez.
+const REQUIRED_EFFECTS = [
+  'v3FlamingoFloat', 'v3FlamingoHalo', 'v3HaloBreathe', 'v3GoldSheen',
+  'v3Spark', 'v3CloudA', 'v3CloudB', 'v3FogDrift', 'v3Drop', 'v3Flash',
+  'v3Eq', 'v3ModPulse', 'v3SkyGlow'
+];
+const missing = REQUIRED_EFFECTS.filter((k) => cssSource.indexOf('@keyframes ' + k) < 0);
+ok('beklenen kutlama efektlerinin TÜMÜ tanımlı (' + REQUIRED_EFFECTS.length + ' adet)',
+  missing.length === 0, 'eksik: ' + missing.join(', '));
+ok('her efekt gerçekten bağlanmış (tanımlı ama kullanılmayan animasyon yok)',
+  REQUIRED_EFFECTS.every((k) => new RegExp('animation:\\s*' + k + '\\b').test(cssSource)));
+ok('animasyonlar token\'lı süreler/eğriler kullanıyor (--ease-*, --dur-*)',
+  /animation:[^;]*var\(--ease-glide\)/.test(cssSource) &&
+  /var\(--ease-linear\)/.test(cssSource));
+
+// ───────────────────────────────────────────────────────────────────────────
+// [9] Uygulama içi v3.0 yüzeyi (sürüm metni + tanıtım köprüsü)
+// ───────────────────────────────────────────────────────────────────────────
+console.log('\n[9] Uygulama içi v3.0 metni');
+
+const settingsSrc = read('app/core/settings.js');
+const renderSrc = read('app/core/render.js');
+
+ok('Ayarlar → Hakkında v3.0 diyor',
+  /Şeyma 🦩 · <b>v3\.0<\/b> — Günışığı yenilendi/.test(settingsSrc));
+ok('kullanıcıya görünen v2.0 metni kalmadı (yorumlar hariç)',
+  !/v2\.0/.test(settingsSrc.replace(/\/\/[^\n]*/g, '')) &&
+  !/>v2\.0</.test(renderSrc) &&
+  !/v2\.0/.test(read('index.html') + read('panel.html') + read('panel-v2.html')));
+
+ok('başlangıç ekranı rozeti v3.0 gösteriyor',
+  /box-shadow:0 6px 18px rgba\(230,193,90,0\.20\);">v3\.0</.test(renderSrc));
+
+ok('Ayarlar\'da tanıtım köprüsü var (v3-tanitim/index.html)',
+  /href="v3-tanitim\/index\.html"/.test(settingsSrc));
+ok('köprü düz <a> — yeni handler/onclick eklenmedi (pinli yüzey korunur)',
+  /<a href="v3-tanitim\/index\.html"/.test(settingsSrc) &&
+  !/<button[^>]*App\.goWelcome/.test(settingsSrc));
+ok('köprü erişilebilir bir metin taşıyor',
+  /3\.0&#8217;da neler değişti\?/.test(settingsSrc) &&
+  /Sürüm tanıtımını yeniden aç/.test(settingsSrc));
+
+// Pinli yüzey: bu iki sayı fx2 fixture'larında sabit. settings.js ve render.js
+// o taramaya dâhildir — burada önden yakalıyoruz ki hata erken görünsün.
+const APP_SURFACE_FILES = [
+  'app.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js',
+  'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/map.js',
+  'app/core/profile.js', 'app/core/settings.js', 'app/core/messaging.js',
+  'app/core/render.js', 'app/core/reminders.js', 'app/core/reminderSurface.js',
+  'app/core/appSurface.js'
+];
+const combined = APP_SURFACE_FILES.map(read).join('');
+const surfaceCount = new Set(
+  (combined.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((s) => s.match(/App\.[A-Za-z0-9_]+/)[0])
+).size;
+ok('App yüzeyi pinli (718) — sürüm köprüsü yeni handler eklemedi',
+  surfaceCount === 718, 'ölçülen: ' + surfaceCount);
+ok('tıklama niteliği sayısı pinli (391)',
+  (combined.match(/onclick=/g) || []).length === 391,
+  'ölçülen: ' + (combined.match(/onclick=/g) || []).length);
+ok('sürüm yorumları pin taramasını kaydırmıyor (yorumda nitelik adı geçmiyor)',
+  !/\/\/[^\n]*(?:App\.[A-Za-z0-9_]+\s*=|onclick=)/.test(settingsSrc));
+
+// Cache-bust: değişen modüller yeni sürüm taşımalı
+ok('settings.js cache-bust güncel', /app\/core\/settings\.js\?v=20260915b/.test(indexSource));
+ok('render.js cache-bust güncel', /app\/core\/render\.js\?v=20260915f/.test(indexSource));
 
 console.log('\n' + passed + ' kontrol geçti.');
 if (process.exitCode) console.log('SONUÇ: FAIL');

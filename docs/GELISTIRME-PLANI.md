@@ -21,6 +21,24 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (v3.0 kutlama sayfası + uygulama içi sürüm):**
+>   `v3-tanitim/` **çok daha zengin** hâle getirildi: 85. gün kutlaması
+>   (sayaç animasyonu, "23 Haziran 2026'da başladın"), 4 görsel vitrin
+>   (altın paleti, canlı gökyüzü, ses dalgası, 30 modül), "Rakamlarla 3.0"
+>   şeridi, konfeti canvas'ı, kaydırma ilerleme çubuğu ve **satır içi SVG
+>   flamingo** (🦩 — kullanıcı isteğiyle metin flamingoları da eklendi).
+>   13 adlandırılmış kutlama efektinin tümü reduced-motion altında kapanır;
+>   konfeti canvas'ı o durumda hiç kurulmaz. Sayfa ~4.2k px uzunluğunda.
+>   **Uygulama içi sürüm yükseltildi:** Ayarlar → Hakkında artık **v3.0 —
+>   Günışığı yenilendi** der ve bir "3.0'da neler değişti?" köprüsü taşır;
+>   başlangıç ekranı rozeti de v3.0. Köprü **düz `<a>`** — yeni App.* handler
+>   ya da tıklama niteliği EKLENMEDİ, çünkü fx2 fixture'ları App yüzeyini (718)
+>   ve tıklama sayısını (391) metin taramasıyla sabitler. **Yaşanan tuzak:**
+>   açıklama yorumuna bu nitelik adını yazmak sayacı +1 kaydırdı ve üç fx2
+>   fixture'ını kırdı — yorumlar da taranıyor. `test_settings_boundary.js`
+>   değişen tek satırlar için dar, **kendini doğrulayan** bir sürüm
+>   normalizasyonu aldı. Fixture `tests/app/test_v3_welcome.js` (137 kontrol).
+>   LOCAL-ONLY: push/deploy/cihaz kabulü ayrı onaylı.
 > - **2026-09-15 (v3.0 "Hoş Geldin" tanıtım sayfası):**
 >   `v3-tanitim/` eklendi — sürüm 3.0 yeniliklerini bir kez anlatan ayrı sayfa;
 >   "Okudum, anladım" → `seyma-v3-welcome-v1` işareti → bir daha gösterilmez.
@@ -488,6 +506,38 @@ notlarını buraya ekleyebiliriz._
 ---
 
 ## 🗒️ Değişiklik günlüğü
+
+- **2026-09-15** — **🎉 v3.0 kutlama sayfası + uygulama içi sürüm yükseltmesi** (LOCAL-ONLY):
+  Ayrı tanıtım sayfası (`v3-tanitim/`) **85. gün kutlamasına** dönüştürüldü:
+  sayaç animasyonuyla büyük "85", "23 Haziran 2026'da başladın — Nice güzel
+  günlere" notu, 4 görsel vitrin (altın paleti / canlı gökyüzü / ses dalgası /
+  30 modül — hepsi saf CSS), "Rakamlarla 3.0" şeridi (114/99/100/192/30/%42),
+  konfeti canvas'ı, kaydırma ilerleme çubuğu, kart ikon rozetleri ve **satır içi
+  SVG flamingo** (harici dosya yok). Flamingo hem vektör hem metin olarak var;
+  sayfadaki tek emojidir (kullanıcı isteği).
+  **85 rakamı kanıtlı:** `dateUtils.js` gün formülü (`diffDays(start,date)+1`)
+  ile 23 Haziran → 15 Eylül kapsayıcı **85**; başlangıç ayrıca deponun veri
+  kaybı kaydıyla (2026-07-10'da silinen "17 günlük" veri) ±1 gün örtüşüyor —
+  fixture bunu **iki bağımsız yolla** doğrular ve kesin eşitlik dayatmaz
+  (kayıt hangi günü kapsadığını belirtmiyor).
+  **Uygulama içi:** Ayarlar → Hakkında **v3.0 — Günışığı yenilendi** + "3.0'da
+  neler değişti?" köprüsü; başlangıç ekranı rozeti v3.0. Köprü bilinçli olarak
+  düz `<a href="v3-tanitim/index.html">` → **yeni `App.*` handler ya da
+  `onclick` eklenmedi** (`app.js` değişmedi, `App.x=554` sabit).
+  **Yaşanan tuzak (kayda değer):** fx2 fixture'ları `combinedSource` üzerinden
+  App yüzeyini (718) ve tıklama niteliği sayısını (391) **düz metin** taramasıyla
+  sabitler ve `settings.js`/`render.js` bu taramaya dâhildir. Açıklama yorumuna
+  bu nitelik adını yazmak her iki sayacı **+1** kaydırdı ve üç fixture kırıldı;
+  yorum düzeltildi ve kalıcı bir uyarı bırakıldı. `test_settings_boundary.js`
+  (MON-37) ise ayarlar HTML'ini **donmuş bir `app.js`**'e karşı byte-karşılaştırır;
+  sürüm satırları değiştiği için **dar ve kendini doğrulayan** bir normalizasyon
+  eklendi: her çıpa tam olarak bir kez bulunmalı, bulunmazsa FAIL — maskeleme
+  sessizce genişleyemez, ayarlar HTML'i üzerindeki pin zayıflamaz.
+  **Kapılar:** tests/app **53/53** · panel 23/23 · panel-v2 27/27 · Kur'an 9/9 ·
+  reminders 21/21 · driver+zikr 95/95 · sync 69/69 · B1/B2/B3 PASS ·
+  `shell-inventory --gate` PASS · **7.610/0/408/57** · `App.x=554` ·
+  yeni fixture **137 kontrol**. Uçtan uca QA loopback'te yapıldı, sunucu
+  kapatıldı. Push/deploy/cihaz kabulü ayrı onaylı.
 
 - **2026-09-15** — **🎉 v3.0 "Hoş Geldin" tanıtım sayfası** (LOCAL-ONLY):
   Sürüm 3.0'ın yeniliklerini bir kez anlatan **ayrı sayfa** eklendi

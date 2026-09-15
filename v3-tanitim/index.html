@@ -11,11 +11,19 @@
        çağrısı yapmaz, düzen kayması (CLS) üretmez ve Apple cihazlarda zaten en
        rafine görünen yüzü kullanır. -->
   <link rel="stylesheet" href="../app/styles.css?v=20260909a">
-  <link rel="stylesheet" href="v3.css?v=20260915d">
+  <link rel="stylesheet" href="v3.css?v=20260915e">
 </head>
 <body class="v3-body">
+
   <!-- Klavye kullanıcıları için: sayfa uzun, doğrudan kapanışa in. -->
   <a class="v3-skip" href="#v3-kapanis">Sona git</a>
+
+  <!-- Konfeti/ışık katmanı. Dekoratif; pointer-events kapalı ve reduced-motion
+       altında JS canvas'ı hiç kurmaz. -->
+  <canvas id="v3-confetti" class="v3-confetti" aria-hidden="true"></canvas>
+
+  <!-- Kaydırma ilerleme çubuğu (ince altın hat). Dekoratif. -->
+  <div class="v3-progress" aria-hidden="true"><span id="v3-progressbar" class="v3-progress__bar"></span></div>
 
   <!-- `#root` + data-theme="dark" ZORUNLU: --page/--text/--gold-*/--f-*/--dur-*
        tokenları app/styles.css'te `#root` üzerinde tanımlı (panel-v2.html ile
@@ -24,13 +32,74 @@
     <div id="app" class="v3-shell" role="main" aria-labelledby="v3-baslik">
 
       <header class="v3-hero">
-        <p class="v3-kicker">Sürüm 3.0</p>
-        <h1 class="v3-title" id="v3-baslik">Şeyma 3.0<br><span class="v3-title__sub">Günışığı yenilendi</span></h1>
-        <p class="v3-lead">Aynı sıcaklık, çok daha sağlam bir temel.</p>
+        <div class="v3-flamingo" aria-hidden="true">
+          <span class="v3-flamingo__halo"></span>
+          <!-- Flamingo: harici görsel/dosya YOK — saf satır içi SVG.
+               Uygulamanın marka hayvanı (menü adı "Şeyma 🦩"). -->
+          <svg class="v3-flamingo__svg" viewBox="0 0 100 124" role="presentation">
+            <defs>
+              <linearGradient id="v3flBody" x1="0.1" y1="0.1" x2="0.9" y2="0.95">
+                <stop offset="0%" stop-color="#FBD9E4"/>
+                <stop offset="42%" stop-color="#F0A6C0"/>
+                <stop offset="100%" stop-color="#D2638B"/>
+              </linearGradient>
+              <linearGradient id="v3flWing" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FFF0F5"/>
+                <stop offset="100%" stop-color="#F3B6CC"/>
+              </linearGradient>
+              <linearGradient id="v3flBeak" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#F2DFA8"/>
+                <stop offset="100%" stop-color="#C9A227"/>
+              </linearGradient>
+            </defs>
+            <path d="M50 104 L45 120 M45 120 L38 123 M45 120 L47 124"
+                  fill="none" stroke="#C4758F" stroke-width="3.1" stroke-linecap="round"/>
+            <path d="M62 104 L60 122 M60 122 L53 126 M60 122 L65 127"
+                  fill="none" stroke="#C4758F" stroke-width="3.1" stroke-linecap="round"/>
+            <path d="M16 78 C20 100 46 112 66 102 C79 96 85 78 81 60
+                     C79 48 75 38 79 27 C83 16 70 12 66 23
+                     C63 31 68 45 70 57 C72 69 64 77 52 79
+                     C40 81 24 74 16 78 Z"
+                  fill="url(#v3flBody)"/>
+            <path d="M40 82 C53 73 69 77 71 88 C62 95 47 93 40 82 Z"
+                  fill="url(#v3flWing)" opacity=".92"/>
+            <path d="M17 79 C8 74 5 84 13 90" fill="none" stroke="#D2638B"
+                  stroke-width="5" stroke-linecap="round" opacity=".9"/>
+            <path d="M72 25 L93 34 L71 37 Z" fill="url(#v3flBeak)"/>
+            <path d="M93 34 C96 36 93 39 90 37 Z" fill="#2A1F24"/>
+            <circle cx="70" cy="25" r="2.5" fill="#2A1F24"/>
+          </svg>
+        </div>
+
+        <p class="v3-kicker">Sürüm 3.0 · Günışığı yenilendi</p>
+        <h1 class="v3-title" id="v3-baslik">
+          <span class="v3-title__line">Şeyma <span class="v3-title__ver">3.0</span></span>
+          <span class="v3-title__sub">Aynı sıcaklık, çok daha sağlam bir temel</span>
+        </h1>
+        <p class="v3-lead">Seksen beş gündür yanındayız. Bu sürümde zemini baştan kurduk,
+          gökyüzünü canlandırdık ve her şeyi biraz daha senin gibi yaptık.</p>
+
         <div class="v3-hero__rule" aria-hidden="true"></div>
       </header>
 
-      <h2 class="v3-sectionlabel" id="v3-yenilikler">Neler değişti</h2>
+      <!-- ══════════════ 85. GÜN KUTLAMASI ══════════════ -->
+      <section class="v3-milestone" aria-labelledby="v3-milestone-baslik">
+        <p class="v3-sectionlabel" id="v3-milestone-baslik">Bugün bir kutlama günü</p>
+
+        <div class="v3-counter">
+          <p class="v3-counter__num" aria-hidden="true" data-count="85">85</p>
+          <p class="v3-counter__label"><span class="v3-sr-only">85.</span><span aria-hidden="true">.</span> gün</p>
+        </div>
+
+        <p class="v3-counter__note">23 Haziran 2026&#8217;da başladın. Bugün 85. gün —
+          ve bu yol boyunca yanında olduğumuz için mutluyuz. Nice güzel günlere.</p>
+
+        <div class="v3-sparks" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+      </section>
+
+      <h2 class="v3-sectionlabel v3-sectionlabel--gap" id="v3-yenilikler">Neler değişti</h2>
 
       <ol class="v3-cards" aria-labelledby="v3-yenilikler">
 
@@ -92,9 +161,71 @@
 
       </ol>
 
-      <section class="v3-closing v3-reveal" id="v3-kapanis" style="--i:8" aria-labelledby="v3-kapanis-baslik">
+      <!-- ══════════════ GÖRSEL GALERİ ══════════════ -->
+      <h2 class="v3-sectionlabel v3-sectionlabel--gap" id="v3-galeri">Yakından bak</h2>
+
+      <div class="v3-gallery" role="group" aria-labelledby="v3-galeri">
+
+        <figure class="v3-vig v3-reveal" style="--i:0">
+          <figcaption class="v3-vig__cap">Altın paleti</figcaption>
+          <div class="v3-vig__frame v3-swatch" aria-hidden="true">
+            <i style="--g:var(--gold-1)"></i><i style="--g:var(--gold-2)"></i>
+            <i style="--g:var(--gold-3)"></i><i style="--g:var(--gold-4)"></i>
+            <i style="--g:var(--gold-5)"></i>
+          </div>
+          <p class="v3-vig__text">Tek bir altın tonun beş basamağı. Uygulamanın her vurgusu bu merdivenden geliyor.</p>
+        </figure>
+
+        <figure class="v3-vig v3-reveal" style="--i:1">
+          <figcaption class="v3-vig__cap">Canlı gökyüzü</figcaption>
+          <div class="v3-vig__frame v3-sky" aria-hidden="true">
+            <span class="v3-sky__glow"></span>
+            <span class="v3-sky__cloud v3-sky__cloud--a"></span>
+            <span class="v3-sky__cloud v3-sky__cloud--b"></span>
+            <span class="v3-sky__fog"></span>
+            <span class="v3-sky__drops"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="v3-sky__flash"></span>
+          </div>
+          <p class="v3-vig__text">Yağmur, kar, bulut, sis ve yıldırım — 192 sahnenin küçük bir örneği.</p>
+        </figure>
+
+        <figure class="v3-vig v3-reveal" style="--i:2">
+          <figcaption class="v3-vig__cap">Sesli rehberlik</figcaption>
+          <div class="v3-vig__frame v3-wave" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <p class="v3-vig__text">Üç canlı an: başlangıç, nefes molası, tamamlanma. Gece 23:00–07:00 arası tamamen sessiz.</p>
+        </figure>
+
+        <figure class="v3-vig v3-reveal" style="--i:3">
+          <figcaption class="v3-vig__cap">Otuz modül</figcaption>
+          <div class="v3-vig__frame v3-mods" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <p class="v3-vig__text">Her kare bir modül. Biri bozulsa öteki yolu bilmez — bu yüzden tek tek ayırdık.</p>
+        </figure>
+
+      </div>
+
+      <!-- ══════════════ RAKAMLAR ══════════════ -->
+      <h2 class="v3-sectionlabel v3-sectionlabel--gap" id="v3-rakamlar">Rakamlarla 3.0</h2>
+
+      <dl class="v3-stats" aria-labelledby="v3-rakamlar">
+        <div class="v3-stat v3-reveal" style="--i:0"><dt>Sûre</dt><dd data-count="114">114</dd></div>
+        <div class="v3-stat v3-reveal" style="--i:1"><dt>Esmâ</dt><dd data-count="99">99</dd></div>
+        <div class="v3-stat v3-reveal" style="--i:2"><dt>Öncü</dt><dd data-count="100">100</dd></div>
+        <div class="v3-stat v3-reveal" style="--i:3"><dt>Sahne</dt><dd data-count="192">192</dd></div>
+        <div class="v3-stat v3-reveal" style="--i:4"><dt>Modül</dt><dd data-count="30">30</dd></div>
+        <div class="v3-stat v3-reveal v3-stat--wide" style="--i:5"><dt>Kalpte büyüyen küçülme</dt><dd data-count="42" data-suffix="%">42%</dd></div>
+      </dl>
+
+      <!-- ══════════════ KAPANIŞ ══════════════ -->
+      <section class="v3-closing v3-reveal" id="v3-kapanis" style="--i:6" aria-labelledby="v3-kapanis-baslik">
+        <div class="v3-closing__flamingo" aria-hidden="true">🦩</div>
         <div class="v3-closing__rule" aria-hidden="true"></div>
-        <h2 class="v3-closing__title" id="v3-kapanis-baslik">Hoş geldin</h2>
+        <h2 class="v3-closing__title" id="v3-kapanis-baslik">85. güne hoş geldin</h2>
         <p class="v3-closing__text">Bu sayfayı bir daha görmeyeceksin. Hoş geldin, Sevgili Günışığı.</p>
 
         <!-- <button>: Enter VE Space ile çalışır (erişilebilirlik sözleşmesi).
@@ -108,12 +239,12 @@
       </section>
 
       <footer class="v3-footer">
-        <p>Şeyma 3.0 · 15 Eylül 2026</p>
+        <p>Şeyma 🦩 · 3.0 · 85. gün</p>
       </footer>
 
     </div>
   </div>
 
-  <script src="v3.js?v=20260915d"></script>
+  <script src="v3.js?v=20260915e"></script>
 </body>
 </html>

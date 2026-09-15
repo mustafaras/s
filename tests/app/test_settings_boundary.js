@@ -161,8 +161,52 @@ function newRender(data, ui, themePref) {
   return { html: ctx.rendered, data: ctx.data, ui: ctx.ui };
 }
 
-console.log('\n=== MON-37 settings boundary ===\n');
+// ───────────────────────────────────────────────────────────────────────────
+// Sürüm köprüsü normalizasyonu (MON-37 parity'si için, TEK ve DAR bir istisna)
+//
+// MON-37 bu fixture'ı, settings registry'sinin ilk eklendiği commit'in
+// EBEVEYNİNDEKİ app.js'e karşı yazdı; o dosya `v2.0` der ve tanıtım köprüsü
+// henüz yoktu. v3.0 sürüm yükseltmesinde bilinçli olarak üç şey değişti:
+// About satırı (v2.0 → v3.0), ve yeni bir "3.0'da neler değişti?" köprüsü.
+//
+// Normalizasyon YALNIZCA bu farkları nötrler — İKİ TARAFTA da maskelenir;
+// ayarlar HTML'inin geri kalanı hâlâ BİREBİR karşılaştırılır.
+//
+// Fixture'ın kendi geçerliliğini korumak için maskeleme KENDİNİ DOĞRULAR:
+// her parça kendi tarafında tam olarak bir kez bulunmalıdır. Kaybolursa ya da
+// çoğalırsa test FAIL verir — böylece maskeleme sessizce genişleyemez ve
+// ayarlar HTML'i üzerindeki pin zayıflamaz.
+const SIDE_ANCHORS = {
+  // Eski (donmuş) baseline: app.js içindeki v2.0 About satırı.
+  old: [
+    'Şeyma 🦩 · <b>v2.0</b> — Minik Denge Günlüğü. İçsel Pusula &amp; Terapi Odası sürümü.'
+  ],
+  // Yeni registry: v3.0 About satırı + tanıtım köprüsünün tamamı.
+  new: [
+    'Şeyma 🦩 · <b>v3.0</b> — Günışığı yenilendi. Aynı sıcaklık, çok daha sağlam bir temel.'
+  ]
+};
 
+function versionBridgeMask(html, side) {
+  let out = html || '';
+  SIDE_ANCHORS[side].forEach((part) => {
+    const hits = out.split(part).length - 1;
+    assert.equal(hits, 1, side + ' tarafında sürüm çıpası tam olarak bir kez bulunmalı: ' + part);
+    out = out.split(part).join('');
+  });
+  if (side === 'new') {
+    // Tanıtım köprüsü tamamen yeni — varlığını ayrıca doğrula, sonra çıkar.
+    assert.equal((out.match(/3\.0&#8217;da neler değişti\?/g) || []).length, 1,
+      'tanıtım köprüsü tam olarak bir kez bulunmalı');
+    const at = out.indexOf('<a href="v3-tanitim/index.html"');
+    const end = out.indexOf('</a>', at);
+    assert.ok(at >= 0 && end > at, 'tanıtım köprüsü bağlantısı iyi biçimli olmalı');
+    out = out.slice(0, at) + out.slice(end + 4);
+  }
+  return out;
+}
+
+console.log('\n=== MON-37 settings boundary ===\n');
 ok('SeymaSettings registry expose edildi', /window\.SeymaSettings=/.test(settingsSource));
 const settingsBag = appSource.match(/window\.SeymaSettings\.registerSettings\(\{([\s\S]*?)\}\)/);
 ok('registry dependency bag doğrudan data alanı taşımıyor',
@@ -199,8 +243,11 @@ for (const vector of cases) {
   const newData = JSON.parse(JSON.stringify(vector.data));
   const newUi = JSON.parse(JSON.stringify(vector.ui));
   const newResult = newRender(newData, newUi, vector.theme);
-  ok(vector.name+' HTML byte parity', newResult.html === oldResult.html,
-    'old='+Buffer.byteLength(oldResult.html||'')+' new='+Buffer.byteLength(newResult.html||''));
+  const comparable = versionBridgeMask(newResult.html, 'new');
+  const baseline = versionBridgeMask(oldResult.html, 'old');
+  ok(vector.name+' HTML byte parity (3.0 sürüm köprüsü hariç)',
+    comparable === baseline,
+    'old='+Buffer.byteLength(baseline||'')+' new='+Buffer.byteLength(comparable||''));
   ok(vector.name+' render state read-only', JSON.stringify(newResult.data) === JSON.stringify(newData) &&
     JSON.stringify(newData) === before && JSON.stringify(newResult.ui) === JSON.stringify(newUi));
 }

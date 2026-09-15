@@ -185,7 +185,15 @@ function ayarlarHTML(){
   var _mpv=window.MotivationProgramV2?window.MotivationProgramV2.version:'—';
   var _mnv=window.MotivationNarratives?window.MotivationNarratives.version:'—';
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sparkles',14)+' Hakkında</div>';
-  h+='<div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.55;">Şeyma 🦩 · <b>v2.0</b> — Minik Denge Günlüğü. İçsel Pusula &amp; Terapi Odası sürümü.</div>';
+  h+='<div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.55;">Şeyma 🦩 · <b>v3.0</b> — Günışığı yenilendi. Aynı sıcaklık, çok daha sağlam bir temel.</div>';
+  // Sürüm tanıtımına köprü. Bilinçli olarak ÇIPLAK <a>: yeni bir App.* handler
+  // ya da onclick eklemek pinlenmiş yüzeyi bozardı — fx2 fixture'ları
+  // settingsSource'u kapsayan metin taramasıyla App yüzeyini ve onclick
+  // sayısını sabitler (bkz. test_fx2_touch_coverage.js combinedSource).
+  // Ayrı sayfa kendi kendine yeter; buradan çağrılacak bir handler'a gerek yok.
+  // DİKKAT: bu yorumların içine tıklama niteliği ya da "App.<ad>=" biçimi
+  // YAZMA — tarama yorumları da sayar ve pin sessizce kayar (bir kez yaşandı).
+  h+='<a href="v3-tanitim/index.html" style="text-decoration:none;cursor:pointer;width:100%;box-sizing:border-box;text-align:left;border:1px solid var(--card-bd);border-radius:14px;padding:11px 13px;background:var(--card);display:flex;align-items:center;justify-content:space-between;gap:10px;"><span style="display:flex;flex-direction:column;gap:2px;min-width:0;"><b style="font-size:var(--f-footnote);color:var(--text);">3.0&#8217;da neler değişti?</b><span style="font-size:var(--f-caption1);color:var(--muted);">Sürüm tanıtımını yeniden aç</span></span><span style="display:inline-flex;flex-shrink:0;">'+icon('sparkles',16)+'</span></a>';
   h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
   [['Program',_mpv],['Anlatı',_mnv]].forEach(function(v){ h+='<span style="font-size:var(--f-caption2);font-weight:700;color:var(--muted);background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:3px 10px;">'+v[0]+' '+esc(v[1])+'</span>'; });
   h+='</div></div>';

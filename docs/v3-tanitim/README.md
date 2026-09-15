@@ -11,13 +11,55 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 
 ## Dosyalar
 
-| Dosya | Rol |
+| Doküman | Rol |
 |---|---|
-| `index.html` | Sayfa kabuğu. **`#root` + `data-theme="dark"` zorunlu** (tokenlar `app/styles.css`'te `#root` üzerinde tanımlı — panel-v2.html ile aynı desen). |
-| `v3.css` | Sayfaya özel düzen. 98 tasarım token'ını **tüketir**, yeniden tanımlamaz. Ham hex yalnız 4 yerde (ikisi zemin, ikisi altın zemin üzerinde okunur koyu metin). |
-| `v3.js` | Üç iş: kalıcılık (yazma + **doğrulama**), kademeli scroll-reveal, ve hiçbir şeye dokunmadan çalışmak. |
+| `index.html` | Sayfa kabuğu. **`#root` + `data-theme="dark"` zorunlu** (tokenlar `app/styles.css`'te `#root` üzerinde tanımlı). Ayrıca konfeti canvas'ı + ilerleme çubuğu. |
+| `v3.css` | Temel düzen + kutlama efekteri. 98 tasarım token'ını **tüketir**. Ham hex yalnızca neredeyse-siyah sahne zeminlerinde ve altın üstü mürekkep için. |
+| `v3.js` | Kalıcılık (yazma + **doğrulama**), kademeli scroll-reveal, kaydırma ilerleme çubuğu, sayaç animasyonu, konfeti motoru. |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
-| `../tests/app/test_v3_welcome.js` | 90 kontrollük sözleşme fixture'ı. |
+| `../tests/app/test_v3_welcome.js` | **137 kontrollük** sözleşme fixture'ı (kontrast ölçümü dâhil). |
+| `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + "3.0'da neler değişti?" köprüsü. |
+| `../app/core/render.js` | Başlangıç ekranı **v3.0** rozeti. |
+
+## Kutlama katmanı (85. gün)
+
+- **Sayaç:** `data-count` taşıyan öğeler hedefe sayar (easeOutCubic). Nihai
+  metin HTML'de zaten yazılıdır → JS kapalı veya reduced-motion açıkken de
+  doğru görünür, sayı asla "0"a düşmez.
+- **Konfeti:** kendi canvas'ında, token'lı altın/pembe palet, viewport'a göre
+  ölçeklenen parçacık (mobil 42 / orta 66 / geniş 88 — üst sınırlı), sekme
+  arkada kalınca `cancelAnimationFrame` ile durur. **Reduced-motion'da canvas
+  hiç kurulmaz.**
+- **13 kutlama efekti** (flamingo süzülmesi, altın parıltı, kıvılcımlar, bulut/
+  sis/yağmur/yıldırım, ses dalgası, modül nabzı, hero halesi): tümü
+  `prefers-reduced-motion: reduce` altında kapanır ve statik karelerle
+  değiştirilir. Fixture **efekt listesini ad ad** doğrular, sayıyı değil —
+  böylece bir efekt sessizce silinemez.
+
+## 85 rakamı nereden geliyor (kanıt)
+
+Uygulamanın kendi formülü (`dateUtils.js`):
+`dayIndexFor(date) = diffDays(startDate, date) + 1`.
+
+- **23 Haziran 2026 → 15 Eylül 2026 = 85 gün** (kapsayıcı).
+- Bağımsız koroborasyon: deponun veri kaybı kaydı (`AGENTS.md`) 2026-07-10'daki
+  ezilmenin **17 günlük** veriyi sildiğini söyler → başlangıç ~23 Haziran.
+  Kayıt hangi günü kapsadığını belirtmediği için fixture **±1 gün örtüşme**
+  arar, kesin eşitlik dayatmaz.
+
+## Uygulama içi sürüm (v3.0)
+
+Ayarlar → Hakkında **"Şeyma 🦩 · v3.0 — Günışığı yenildi"** ve bir
+**"3.0'da neler değişti?"** köprüsü taşır; köprü sayfaya döner (`<a>`).
+
+> ⚠️ **Köprü bilinçli olarak düz `<a>`.** fx2 fixture'ları `combinedSource`
+> üzerinden App yüzeyini **718** ve tıklama niteliği sayısını **391** olarak
+> düz metin taramasıyla sabitler; `settings.js` ve `render.js` bu taramaya
+> dâhildir. Yeni bir handler ya da düğme eklemek bu pinleri kırar.
+>
+> ⚠️ **Daha ince tuzak:** tarama YORUMLARI DA SAYAR. Açıklama yorumuna
+> `App.<ad>=` veya tıklama niteliği adı yazmak sayacı **+1** kaydırır ve üç
+> fx2 fixture'ını düşürür (bir kez yaşandı). Yorumlarda bu biçimleri kullanmayın.
 
 ## Tetikleme akışı
 
@@ -81,7 +123,7 @@ Fixture canlı `app/styles.css` tokenlarını okuyup ölçer; en zor çift **5.7
 ## Doğrulama
 
 ```bash
-node tests/app/test_v3_welcome.js          # 90 kontrol (sözleşme + kontrast)
+node tests/app/test_v3_welcome.js          # 137 kontrol (sözleşme + kontrast + kutlama + uygulama içi)
 node --check v3-tanitim/v3.js
 node .claude/skills/run-seyma/driver.mjs   # exit 0
 node tools/shell-inventory.mjs --gate      # PASS · 7.610 / 0 / 408 / 57

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>Şeyma 3.0 — Günışığı yenilendi</title>
+  <!-- Tipografi app/styles.css'in kendi yığınından miras alınır (SF Pro Display →
+       Inter → system-ui). Ayrı bir web-font isteği bilinçli olarak YOK: ek ağ
+       çağrısı yapmaz, düzen kayması (CLS) üretmez ve Apple cihazlarda zaten en
+       rafine görünen yüzü kullanır. -->
+  <link rel="stylesheet" href="../app/styles.css?v=20260909a">
+  <link rel="stylesheet" href="v3.css?v=20260915d">
+</head>
+<body class="v3-body">
+  <!-- Klavye kullanıcıları için: sayfa uzun, doğrudan kapanışa in. -->
+  <a class="v3-skip" href="#v3-kapanis">Sona git</a>
+
+  <!-- `#root` + data-theme="dark" ZORUNLU: --page/--text/--gold-*/--f-*/--dur-*
+       tokenları app/styles.css'te `#root` üzerinde tanımlı (panel-v2.html ile
+       aynı desen). Bu sarmalayıcı olmadan tokenlar miras alınmaz. -->
+  <div id="root" data-theme="dark">
+    <div id="app" class="v3-shell" role="main" aria-labelledby="v3-baslik">
+
+      <header class="v3-hero">
+        <p class="v3-kicker">Sürüm 3.0</p>
+        <h1 class="v3-title" id="v3-baslik">Şeyma 3.0<br><span class="v3-title__sub">Günışığı yenilendi</span></h1>
+        <p class="v3-lead">Aynı sıcaklık, çok daha sağlam bir temel.</p>
+        <div class="v3-hero__rule" aria-hidden="true"></div>
+      </header>
+
+      <h2 class="v3-sectionlabel" id="v3-yenilikler">Neler değişti</h2>
+
+      <ol class="v3-cards" aria-labelledby="v3-yenilikler">
+
+        <li class="v3-card v3-reveal" style="--i:0">
+          <p class="v3-card__no" aria-hidden="true">01</p>
+          <h3 class="v3-card__title">Zemini baştan kurdum</h3>
+          <p class="v3-card__text">Uygulamanın kalbi olan o dev dosya yarıdan fazla küçüldü. Yaptığı işin tamamı yerinde — yalnızca artık bakımı kolay, bozulması zor.</p>
+          <p class="v3-card__proof">13.139 → 7.610 satır · %42 küçüldü</p>
+        </li>
+
+        <li class="v3-card v3-reveal" style="--i:1">
+          <p class="v3-card__no" aria-hidden="true">02</p>
+          <h3 class="v3-card__title">Her şey kendi evinde</h3>
+          <p class="v3-card__text">Tek dev dosya yerine her konunun kendi evi var: ibadet, sağlık, günlük, zikir, Kur'an, rapor, mesajlar… Biri değişirken öteki bundan etkilenmiyor.</p>
+          <p class="v3-card__proof">30 çekirdek modül + 11 içerik dosyası</p>
+        </li>
+
+        <li class="v3-card v3-reveal" style="--i:2">
+          <p class="v3-card__no" aria-hidden="true">03</p>
+          <h3 class="v3-card__title">Fısıltıyla rehberlik</h3>
+          <p class="v3-card__text">Zikre başlarken “Başla, kalbin yumuşasın.”, yarısında bir nefes molası, bitişte “Tamamladın. Allah kabul etsin.” Gece boyunca ses kendiliğinden susar.</p>
+          <p class="v3-card__proof">3 canlı an · 23:00–07:00 arası sessiz</p>
+        </li>
+
+        <li class="v3-card v3-reveal" style="--i:3">
+          <p class="v3-card__no" aria-hidden="true">04</p>
+          <h3 class="v3-card__title">Canlı gökyüzü</h3>
+          <p class="v3-card__text">Başlık artık gerçek bir gökyüzü: yumuşak yağmur, kar, iki katman bulut, üç bant sis ve ara ara yıldırım. Hepsi elinde zaten olan hava bilgisinden üretiliyor.</p>
+          <p class="v3-card__proof">4 zaman × 8 hava × 6 mevsim = 192 sahne</p>
+        </li>
+
+        <li class="v3-card v3-reveal" style="--i:4">
+          <p class="v3-card__no" aria-hidden="true">05</p>
+          <h3 class="v3-card__title">Dokunulunca hissedilir</h3>
+          <p class="v3-card__text">Altın ve champagne tonlar, ince mikro animasyonlar, yumuşak dokunma geri bildirimi. İstemediğin gün “Premium Atmosfer” anahtarıyla hepsini bir anda susturabilirsin.</p>
+          <p class="v3-card__proof">Tek anahtar · istediğinde kapanır</p>
+        </li>
+
+        <li class="v3-card v3-reveal" style="--i:5">
+          <p class="v3-card__no" aria-hidden="true">06</p>
+          <h3 class="v3-card__title">114 sûre, 99 isim, 100 öncü</h3>
+          <p class="v3-card__text">Kur'an Yolculuğu nüzul sırasıyla ilerliyor; Esmâü'l-Hüsnâ anlamlarıyla açılıyor; her güne bir öncü düşüyor.</p>
+          <p class="v3-card__proof">114 sûre · 99 esmâ · 100 öncü</p>
+        </li>
+
+        <li class="v3-card v3-reveal" style="--i:6">
+          <p class="v3-card__no" aria-hidden="true">07</p>
+          <h3 class="v3-card__title">Zikirmatik yenilendi</h3>
+          <p class="v3-card__text">Sayaç, hatim takibi, geçmiş, esmâ içerikleri ve elle sayım girişi — hepsi tek akışta, tek yerde.</p>
+          <p class="v3-card__proof">Sayaç · hatim · geçmiş · elle giriş</p>
+        </li>
+
+        <li class="v3-card v3-reveal" style="--i:7">
+          <p class="v3-card__no" aria-hidden="true">08</p>
+          <h3 class="v3-card__title">Güvenli ve sessiz</h3>
+          <p class="v3-card__text">Verin senin cihazında durur. Uygulamayı yerel bir önizlemede açsan bile buluta tek satır yazılmaz — bu koruma her açılışta yerinde. Eşitleme anahtarların da yedek dosyasına hiç kopyalanmaz.</p>
+          <p class="v3-card__proof">Yerelden buluta yazma kapalı · anahtarlar yedeğe girmez</p>
+        </li>
+
+      </ol>
+
+      <section class="v3-closing v3-reveal" id="v3-kapanis" style="--i:8" aria-labelledby="v3-kapanis-baslik">
+        <div class="v3-closing__rule" aria-hidden="true"></div>
+        <h2 class="v3-closing__title" id="v3-kapanis-baslik">Hoş geldin</h2>
+        <p class="v3-closing__text">Bu sayfayı bir daha görmeyeceksin. Hoş geldin, Sevgili Günışığı.</p>
+
+        <!-- <button>: Enter VE Space ile çalışır (erişilebilirlik sözleşmesi).
+             Sayfanın en son odaklanabilir öğesidir. -->
+        <button type="button" class="v3-done" id="v3-done">Okudum, anladım</button>
+
+        <noscript>
+          <p class="v3-closing__note">Tarayıcın betikleri kapatmış görünüyor. Aşağıdaki bağlantıyla uygulamaya dönebilirsin; bu sayfa bir sonraki açılışta yeniden gösterilebilir.</p>
+          <p><a class="v3-done v3-done--link" href="../index.html">Şeyma'ya dön</a></p>
+        </noscript>
+      </section>
+
+      <footer class="v3-footer">
+        <p>Şeyma 3.0 · 15 Eylül 2026</p>
+      </footer>
+
+    </div>
+  </div>
+
+  <script src="v3.js?v=20260915d"></script>
+</body>
+</html>

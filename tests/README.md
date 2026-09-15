@@ -11,6 +11,15 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `panel/` — legacy Panel 1 / observer fixture’ları (`test_panel_*.js` ve
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
+- `app/test_v3_welcome.js` — v3.0 "Hoş Geldin" tanıtım sayfasının sözleşmesi
+  (90 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
+  önce), **sonsuz döngü koruması** (`?v3done=1` kaçışı), kalıcılık anahtarı
+  (`seyma-v3-welcome-v1`, `seyma-reset-v1`’den ayrı namespace), depo kapalıyken
+  `markSeen()`’in **yalan söylememesi**, ayrı sayfa izolasyonu (app.js/sync.js/
+  panel yüklenmez), erişilebilirlik + token tüketimi + `prefers-reduced-motion`,
+  ve **canlı `app/styles.css` tokenlarıyla WCAG kontrast ölçümü** (en düşük çift
+  5.76:1). `App.x=554` pinini de doğrular. Run:
+  `node tests/app/test_v3_welcome.js`.
 - `app/test_aeon_message_expand.js` — ÆON/Luna sohbetinde uzun mesajın
   “Tümünü göster” durumunun render’lar arasında yaşadığını doğrular. Kırpılmış
   balonun kimliği eskiden her render’da artan bir sayaçtan üretiliyor ve açık/kapalı

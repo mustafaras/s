@@ -18,9 +18,19 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `.github/workflows/pages.yml`._
+_Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (v3.0 "Hoş Geldin" tanıtım sayfası):**
+>   `v3-tanitim/` eklendi — sürüm 3.0 yeniliklerini bir kez anlatan ayrı sayfa;
+>   "Okudum, anladım" → `seyma-v3-welcome-v1` işareti → bir daha gösterilmez.
+>   `index.html`'e yalnız `<head>`'de 1 inline bootstrap eklendi; **`app.js`'e hiç
+>   dokunulmadı** (`App.x=554`, bütçe **7.610 / 0 / 408 / 57** sabit,
+>   `shell-inventory --gate` PASS). Tanıtım görülmediyse `app.js` hiç çalışmaz.
+>   Depo yazılamıyorsa `?v3done=1` kaçışı → sonsuz döngü imkânsız.
+>   Fixture `tests/app/test_v3_welcome.js` (90 kontrol, canlı token'larla WCAG
+>   ölçümü; en düşük çift 5.76:1). Kanıt/ayrıntı:
+>   [`docs/v3-tanitim/README.md`](v3-tanitim/README.md). LOCAL-ONLY.
 > - **2026-09-15 (MON2 SERİSİ KAPANDI — 8/8 kart):**
 >   MON2-08 kapanışıyla seri tamamlandı. `app.js` **13.139 → 7.603**
 >   (−5.536 satır, **%42**); `*Legacy` 22 → 0; `*HTML` builder 1.129 → 57 satır;
@@ -478,6 +488,33 @@ notlarını buraya ekleyebiliriz._
 ---
 
 ## 🗒️ Değişiklik günlüğü
+
+- **2026-09-15** — **🎉 v3.0 "Hoş Geldin" tanıtım sayfası** (LOCAL-ONLY):
+  Sürüm 3.0'ın yeniliklerini bir kez anlatan **ayrı sayfa** eklendi
+  (`v3-tanitim/index.html` + `v3.css` + `v3.js`, `panel-v2.html` ayrı-sayfa
+  deseniyle). `index.html`'e yalnız **1 inline `<script>`** eklendi — `<head>`'de,
+  tüm asset'lerden ve `app.js`'ten **önce** çalışır; tanıtım görülmediyse app.js
+  hiç *çalışmaz* (ölçüldü: `appBooted=[]`, depo boş), böylece ilk açılışta
+  veri/push riski doğmaz. **`app.js`'e hiç dokunulmadı** — `App.x=554`,
+  `shell-inventory --gate` PASS ve **7.610 / 0 / 408 / 57** sayıları birebir sabit.
+  **Kalıcılık:** `seyma-v3-welcome-v1` (uygulamanın `seyma-reset-v1` anahtarından
+  ayrı namespace; "Verileri sıfırla" silmez). `v3.js` işareti yazdığını
+  **geri okuyarak doğrular**; depo yazılamıyorsa (gizli mod) `?v3done=1` ile
+  döner ve bootstrap o bayrağı görünce bir kez atlar → **sonsuz döngü imkânsız**
+  (uçtan uca ölçüldü: `/` → `/v3-tanitim` → `/index.html?v3done=1` → uygulama).
+  **İçerik:** 8 kart, her biri repodan doğrulanmış rakamla — 13.139 → 7.610
+  (%42), 30 çekirdek + 11 içerik dosyası, 3 canlı sesli ipucu (23:00–07:00
+  sessiz), 192 sahne (4×8×6), 114 sûre / 99 esmâ / 100 öncü (VM'de yüklenip
+  sayıldı). **Doğrulanamayan iddia çıkarıldı:** "parola düz metin saklanmaz"
+  ifadesi düştü — `settings.auth` zaten `usernameHash` kullanıyor ve PIN/gizlilik
+  kilidi `GELISTIRME-PLANI.md`'de ❌ Yok.
+  **Kanıt:** `tests/app/test_v3_welcome.js` (90 kontrol: bootstrap sırası, döngü
+  koruması, izolasyon, a11y, token tüketimi ve **WCAG kontrast ölçümü** — en düşük
+  çift 5.76:1). Uçtan uca QA loopback'te yapıldı, ağ izlemesinde **GitHub'a giden
+  0 istek**; kontrollü port-9000 protokolüne uyuldu ve sunucu kapatıldı.
+  Tüm aileler yeşil: tests/app **53/53** (52 + yeni), panel 23/23, panel-v2 27/27,
+  Kur'an 9/9, reminders 21/21, driver + zikr 95/95, sync 69/69.
+  Push/deploy/cihaz kabulü ayrı onaylı.
 
 - **2026-09-09** — **✨ SKY+PREM serisi kapandı + monolit programı 25/60**:
   Header hava efekti canvas parçacık motoruna taşındı (`app/core/skyFx.js`,

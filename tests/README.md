@@ -12,7 +12,7 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
 - `app/test_v3_welcome.js` — v3.0 tanıtım/kutlama sayfasının sözleşmesi
-  (257 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
+  (263 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
   önce), **sonsuz döngü koruması** (`?v3done=1` kaçışı), kalıcılık anahtarı
   (`seyma-v3-welcome-v1`, `seyma-reset-v1`’den ayrı namespace), depo kapalıyken
   `markSeen()`’in **yalan söylememesi**, ayrı sayfa izolasyonu (app.js/sync.js/

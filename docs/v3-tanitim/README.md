@@ -16,13 +16,13 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 | `index.html` | Sayfa kabuğu. **`#root` + `data-theme="dark"` zorunlu** (tokenlar `app/styles.css`'te `#root` üzerinde tanımlı). Ayrıca konfeti canvas'ı + ilerleme çubuğu. |
 | `v3.css` | Temel düzen + kutlama efekteri. 98 tasarım token'ını **tüketir**. Ham hex yalnızca neredeyse-siyah sahne zeminlerinde ve altın üstü mürekkep için. |
 | `v3.js` | Kalıcılık (yazma + **doğrulama**), scroll-reveal, ilerleme çubuğu, sayaç animasyonu, konfeti. |
-| `v3-data.js` | **Salt-okur** veri katmanı: kullanıcının kendi kayıtlarını özetler. Ağ YOK. |
+| `v3-data.js` | **Salt-okur** veri katmanı: kullanıcının kendi kayıtlarını özetler. Ağ YOK. `SOURCE` ile kaynağı izler. |
 | `v3-source.js` | **Salt-okur uzak kaynak köprüsü.** Cihazda kayıt yoksa uygulamanın zaten sakladığı token'la `data/latest.json`'ı **yalnız-GET** çeker. Yazmaz, diske kaydetmez. |
 | `v3-stats.js` | **İstatistik motoru**: betimsel istatistik, regresyon, korelasyon, histogram. |
 | `v3-statsview.js` | İstatistik görselleştirme (histogram, kutu grafiği, eğilim, korelasyon). |
 | `v3-charts.js` | Grafik çizimi (ısı haritası, trend, çubuklar, rozetler). |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
-| `../tests/app/test_v3_welcome.js` | **257 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
+| `../tests/app/test_v3_welcome.js` | **263 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
 | `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + "3.0'da neler değişti?" köprüsü. |
 | `../app/core/render.js` | Başlangıç ekranı **v3.0** rozeti. |
 
@@ -103,7 +103,6 @@ Bir fixture bu sözleşmenin tamamını kaynak düzeyinde doğrular.
 **Sorun:** uygulama açılışta uzak veriyi **çekmiyor** — yalnız kendi verisini
 **gönderiyor** (`sync.js schedule`). Dolayısıyla deposu boş/eski olan bir cihazda
 sayfa eksik görünüyordu; oysa doğru veri `mustafaras/seyma-data` içindedir.
-
 **Çözüm — sıra:**
 
 1. Cihazda kayıt var mı? → **Var:** çiz, ağa çıkma.
@@ -114,6 +113,21 @@ sayfa eksik görünüyordu; oysa doğru veri `mustafaras/seyma-data` içindedir.
 200 döner ama `content` **boş** gelir (`encoding:"none"`). Köprü bu yüzden
 `sha` ile `git/blobs/<sha>` ham içeriğine düşer (`sync.js ghGetFileSafe` ile aynı
 yol) ve `atob`un bozduğu Türkçe karakterler için UTF-8 `TextDecoder` kullanır.
+
+### Veri kaynağı rozeti
+
+Sayfa **hangi kaynaktan okuduğunu açıkça söyler** — "eşitlenmiş veri" derken
+sessizce cihaz kaydını gösterme yanılsamasına düşülmez:
+
+| `data-src` | Gösterilen | Anlamı |
+|---|---|---|
+| `remote` | ✓ Eşitlenmiş veri · kendi özel veri deposundan salt-okur okundu | Repo'dan okundu |
+| `device` | Bu cihazdaki kayıt · eşitlenmiş veriye ulaşılamadı | Repo'ya ulaşılamadı |
+| `none` | (rozet `hidden` ile tamamen gizli) | Gösterilecek kayıt yok |
+
+`v3-data.js` durumu `SOURCE` içinde izler (`source()` ile okunur); rozet hem
+dolu hem boş durumda yazılır. Amaç teşhis edilebilirlik: kullanıcı baktığı
+sayının gerçekten `seyma-data`'dan geldiğini görebilmelidir.
 
 ### Uygulamanın kendi formülleri aynalanır
 

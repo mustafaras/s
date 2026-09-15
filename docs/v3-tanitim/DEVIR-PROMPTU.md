@@ -47,7 +47,7 @@ git rev-parse --abbrev-ref HEAD
 
 **Mevcut durum (2026-09-15, bu belgenin yazıldığı an):**
 
-- Dal: `premium-fx-gorsel-yuzey` · **LOCAL-ONLY, push edilmedi**
+- Dal: `premium-fx-gorsel-yuzey` · **YAYINDA** — 2026-09-15 main'e fast-forward + `v3.0` tag + Pages deploy (run 35006913049); bu belgedeki "LOCAL-ONLY / push yok" cümleleri o tarihe kadar geçerliydi
 - HEAD: `878d90c`
 - Çalışma ağacı: **temiz**
 - Sayfa dosyaları: `v3-tanitim/{index.html,v3.css,v3.js,v3-data.js,v3-stats.js,v3-statsview.js,v3-charts.js,v3-source.js}`

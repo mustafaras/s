@@ -21,6 +21,12 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (v3.0 CANLIYA ALINDI):** `premium-fx-gorsel-yuzey` → `main`
+>   fast-forward (`d9e4484..2162342`, 269 commit), tag `v3.0`, GitHub Pages run
+>   35006913049 success. Canlı ölçüm: `/s/v3-tanitim/` 200, gömülü anlık görüntü
+>   (84 gün / 680 tik), Ayarlar'da dinamik "N. gün" düğmesi, kök bootstrap.
+>   Aynı gün: statik anlık görüntü + tazelik kuralı + alışkanlık haritası v2
+>   (bkz. `docs/v3-tanitim/README.md`). Cihaz kabulü kullanıcıda.
 > - **2026-09-15 (v3.0 sayfası — DEVİR DENETİMİ, Claude):**
 >   `docs/v3-tanitim/DEVIR-PROMPTU.md` İ-1…İ-9 tek tek doğrulandı; gerçek
 >   `seyma-data` (`latest.json`, salt-okur GET) ile **her gösterilen sayı bağımsız

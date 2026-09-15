@@ -13,6 +13,13 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 >   yazılmıştır; gün sayısı artık veriden türetilir → 84).
 >
 > Bu README tamamlanan işi özetler.
+>
+> **YAYINDA (2026-09-15 18:21 UTC):** `premium-fx-gorsel-yuzey` → `main` fast-forward
+> (`d9e4484..2162342`, 269 commit), tag **`v3.0`**, GitHub Pages run
+> [35006913049](https://github.com/mustafaras/s/actions/runs/35006913049) **success**.
+> Canlı ölçüm: `https://mustafaras.github.io/s/v3-tanitim/` 200 · `v3-snapshot.js` yüklü
+> (84 gün / 680 tik) · `settings.js?v=20260915c` gün düğmesi · kök `index.html` bootstrap.
+> Dal artık LOCAL-ONLY **değil**; sonraki değişiklikler yine main'e push ile yayınlanır.
 
 ---
 
@@ -424,7 +431,7 @@ Port-9000 protokolüne uyulur (`CLAUDE.md` → DATA SAFETY). QA sırasında:
 
 ## Bilinen sınırlar
 
-- **Push/deploy yok.** Bu iş LOCAL-ONLY; push, merge, tag ve cihaz kabulü ayrı onay ister.
+- **Yayında** (bkz. üstteki kayıt). Cihaz kabulü (K3) kullanıcıdan gelir.
 - Sayfa koyu temayı **sabitler** (açık temada `--page` bir gradient olduğu için
   token olarak kullanılamaz).
 - Dosya `file://` üzerinden değil, http(s) üzerinden açılmalıdır (yönlendirme

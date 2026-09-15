@@ -99,7 +99,7 @@ ok('permission/error ve network sahipliği app.jste korunur',
   !/function renderHarita\(/.test(appSource) && !/var WX_SPOTS_FIXED=/.test(appSource));
 ok('app shim ve production cache-bust/load-order map registryye bağlıdır',
   appSource.includes('registerMap') && appSource.includes('SEYMA_MAP.haritaHTML') &&
-  indexSource.includes('app/core/map.js?v=20260910a') &&
+  indexSource.includes('app/core/map.js?v=20260915a') &&
   indexSource.indexOf('app/core/report.js') < indexSource.indexOf('app/core/map.js') &&
   indexSource.indexOf('app/core/map.js') < indexSource.indexOf('app/core/mediaFx.js'));
 

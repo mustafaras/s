@@ -710,6 +710,13 @@ function weatherHeaderHTML(){ return SEYMA_MAP.weatherHeaderHTML.apply(null,argu
 function haritaHTML(){
   var today=todayStr();
   if(!ui.calMonth) ui.calMonth=today.slice(0,7);
+  // NOT (2026-09-15): bu sarmalayıcı render zincirinde ÇAĞRILMIYOR —
+  // render.js kendi `haritaHTML()` (render.js:1767) → `mapTabHTML()` →
+  // app.js:861 → `SEYMA_MAP.haritaHTML()` yolunu kullanır, buraya uğramaz.
+  // Bu yüzden `ui.calMonth` ilk-kurulum koruması asıl sahibi olan
+  // app/core/map.js `renderHarita` içine taşındı (orada savunmalı).
+  // Bloğu silmek MON2 kapsamı dışıdır (kabuk envanteri `*HTML` sayımı pinli);
+  // ölü kod kaydı: monolit-bolumlenme-plan-2/deliverables/MON2-SONRASI-BULGULAR.md
   return SEYMA_RENDER.haritaHTML.apply(null,arguments);
 }
 // MON-36: profile assessment content/UI/scoring registry. Consent/session mutation,

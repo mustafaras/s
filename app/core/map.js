@@ -237,6 +237,12 @@ function renderWeatherHeader(data,ui,dark,greet){
 
 function renderHarita(data,ui,dark){
   var today=todayStr();
+  // İlk açılış koruması: `ui.calMonth` yalnız App.calMove/calToday/heatOpen'da
+  // kurulur; uygulamaya doğrudan harita sekmesiyle girilirse tanımsız kalır ve
+  // `.split` çökerdi. app.js'teki korumalı `haritaHTML` shim'i render zincirinde
+  // çağrılmadığı için (render.js kendi `mapTabHTML` yolunu kullanır) koruma
+  // buraya taşındı.
+  if(!ui.calMonth||typeof ui.calMonth!=='string'||ui.calMonth.indexOf('-')<0) ui.calMonth=today.slice(0,7);
   var ym=ui.calMonth.split('-'); var Y=+ym[0], M=+ym[1];
   var firstDow=(new Date(Y,M-1,1).getDay()+6)%7; // Pzt=0
   var daysInMonth=new Date(Y,M,0).getDate();

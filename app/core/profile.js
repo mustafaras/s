@@ -868,3 +868,580 @@ function buildProfileReport(scores,quality){
     buildProfileReport:buildProfileReport
   };
 }());
+
+// MON2-06 · profile yüzey bölümü — app.js'ten taşınan 17 gövde.
+// MON-50 appSurface deseni (with(SCOPE)); bu IIFE bilinçli olarak sloppy-mode'dur
+// (with yalnız sloppy modda geçerlidir) ve dosyanın strict bölümüne dokunmaz (S5:
+// yükleme anında DOM/ağ/timer/storage erişimi yok). Bag üyeleri getter fn'dir; mut
+// listesindeki app.js pinleri için set_<ad> yazıcısı aynı bag'de verilir.
+(function(){
+  var profile_surfaceDeps=null;
+  var PROFILE_SURFACE_DEPENDENCIES=["App","SEYMA_REMINDER_SURFACE","a","calcAge","data","defer","doc","haptic","icon","render","save","sync","ui"];
+  var PROFILE_MUTABLE_DEPENDENCIES=[];
+  var SCOPE=Object.create(null);
+  function registerProfileSurface(deps){
+    if(profile_surfaceDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
+    for(var i=0;i<PROFILE_SURFACE_DEPENDENCIES.length;i++){ if(typeof deps[PROFILE_SURFACE_DEPENDENCIES[i]]!=='function') return false; }
+    for(var j=0;j<PROFILE_MUTABLE_DEPENDENCIES.length;j++){ if(typeof deps['set_'+PROFILE_MUTABLE_DEPENDENCIES[j]]!=='function') return false; }
+    profile_surfaceDeps=deps; installProfileSurfaceScope(SCOPE); return true;
+  }
+  function isProfileSurfaceReady(){ return !!profile_surfaceDeps; }
+  function installProfileSurfaceScope(s){
+    var seen={},k,d,n;
+    var ns=window.SeymaProfile||{};
+    for(k in ns) if(Object.prototype.hasOwnProperty.call(ns,k)) seen[k]=1;
+    for(d=0;d<PROFILE_SURFACE_DEPENDENCIES.length;d++){ n=PROFILE_SURFACE_DEPENDENCIES[d]; if(n.indexOf('set_')!==0) seen[n]=1; }
+    Object.keys(seen).forEach(function(name){
+      var mut=PROFILE_MUTABLE_DEPENDENCIES.indexOf(name)>=0;
+      Object.defineProperty(s,name,{
+        get:function(){
+          if(profile_surfaceDeps&&Object.prototype.hasOwnProperty.call(profile_surfaceDeps,name)) return profile_surfaceDeps[name]();
+          var live=window.SeymaProfile; return live?live[name]:undefined;
+        },
+        set:mut?function(v){ profile_surfaceDeps['set_'+name](v); }:undefined,
+        configurable:true,enumerable:true
+      });
+    });
+  }
+  with(SCOPE){
+function App_profileItemKeydown(e){
+  if(!data||!e) return;
+  var pa=data.profileAssessment; if(!pa||pa.status==='completed') return;
+  if(ui.profileAssessmentAnswerLocked) return;
+  var items=profileAssessmentItems();
+  var idx=profileItemDisplayIndex();
+  var item=items[idx]; if(!item) return;
+  var k=e.key;
+  if(k>='1'&&k<='7'){
+    var PA=window.ProfileAssessmentV1;
+    var scale=(PA&&PA.scales&&PA.scales[item.scaleId])||{options:[]};
+    var v=parseInt(k,10);
+    if(v>=1&&v<=(scale.options||[]).length){ if(e.preventDefault) e.preventDefault(); App.profileAnswer(item.id,v); }
+    return;
+  }
+  if(k==='ArrowLeft'){ if(e.preventDefault) e.preventDefault(); App.profilePrevious(); }
+};
+
+function App_profilePrevious(){
+  if(!data) return;
+  var pa=data.profileAssessment; if(!pa) return;
+  if(ui.profileAssessmentAnswerLocked) return; // görsel geri bildirim penceresinde gezinme yok
+  var cur=pa.currentItemIndex;
+  if(cur<=0) return; // gidilecek önceki madde yok
+  ui.profileAssessmentReviewIndex=cur-1;
+  // render() yerine sadece #pa-gate'i değiştir (flash yok)
+  var oldGate=doc.getElementById('pa-gate');
+  if(oldGate && oldGate.parentNode){
+    var tmp=doc.createElement('div');
+    tmp.innerHTML=renderProfileAssessmentGate();
+    var newGate=tmp.firstChild;
+    if(newGate){ oldGate.parentNode.replaceChild(newGate, oldGate); try{ if(newGate.focus) newGate.focus(); }catch(e){} }
+    else render();
+  } else render();
+};
+
+function App_dismissProfileCompletion(){
+  if(!data) return;
+  ui.profileAssessmentCompletionShown=false;
+  save();
+  render();
+};
+
+function App_profileBreakContinue(){
+  if(!data) return;
+  var pa=ensureProfileAssessment(data);
+  var brk=profileAssessmentPendingBreak(pa);
+  if(brk){
+    if(!pa.moduleProgress||typeof pa.moduleProgress!=='object') pa.moduleProgress={};
+    if(!pa.moduleProgress[brk.moduleId]||typeof pa.moduleProgress[brk.moduleId]!=='object') pa.moduleProgress[brk.moduleId]={};
+    pa.moduleProgress[brk.moduleId].breakAcknowledged=true;
+    pa.moduleProgress[brk.moduleId].breakAcknowledgedAt=new Date().toISOString();
+  }
+  save();
+  render();
+};
+
+function App_profileAssessmentSOS(){ ui.profileAssessmentSOS=true; ui.profileAssessmentSosSent=false; render(); };
+
+function App_profileAssessmentSOSClose(){ ui.profileAssessmentSOS=false; ui.profileAssessmentSosSent=false; render(); };
+
+function App_profileAssessmentReachCreator(){
+  if(ui.profileAssessmentSosSent) return;
+  ui.profileAssessmentSosSent=true;
+  try{
+    if(sync){
+      var ts=new Date().toISOString(), qid='pasos_'+Date.now().toString(36);
+      var msg='[SOS — Şeyma yardım istedi] Şeyma "Zor hissediyorum" diyerek doğrudan sana ulaşmak istedi (profil değerlendirmesi ekranından SOS butonu). Lütfen en kısa sürede nazikçe yanında ol.';
+      if(typeof sync.pushPing==='function') sync.pushPing({id:qid,question:msg,ts:ts});
+    }
+    haptic([15,60,15]);
+  }catch(e){}
+  render();
+};
+
+function completeProfileAssessmentProvisional(pa){
+  // Faz 07: puanlama. Faz 08: kalite/güven. Faz 09: deterministik rapor metni — hepsi
+  // burada, tek finalizasyon noktasında sırayla üretilir.
+  if(!pa.completedAt) pa.completedAt=new Date().toISOString();
+  try{ pa.scores=scoreProfileAssessment(pa.responses); }catch(e){}
+  try{ pa.quality=scoreProfileAssessmentQuality(pa.responses); }catch(e){}
+  try{ pa.report=buildProfileReport(pa.scores,pa.quality); }catch(e){}
+  // Faz 10: panelSummary — panel.html'in göstereceği güvenli özet (ham cevap yok).
+  // Yalnızca tamamlanmış + panelSummarySharingAccepted ise panelde görünür (Faz 11).
+  try{ pa.panelSummary=buildProfilePanelSummary(pa); }catch(e){}
+}
+
+function buildProfilePanelSummary(pa){
+  if(!pa||pa.status!=='completed') return {};
+  var scores=pa.scores||{}, quality=pa.quality||{}, report=pa.report||{};
+  var C=scores.constructs||{};
+  // Big Five özetleri (sufficient olanlar)
+  var bigFiveSummary={};
+  ['conscientiousness','negative_emotionality','extraversion','agreeableness','open_mindedness'].forEach(function(c){
+    if(C[c]&&C[c].sufficient){ bigFiveSummary[c]={mean:C[c].mean,band:profileBand(C[c].mean)}; }
+  });
+  // RAISEC ilk üç
+  var riasecSummary={};
+  if(scores.riasec&&scores.riasec.topThree) riasecSummary.topThree=scores.riasec.topThree;
+  // Değer öncelikleri (ilk 3)
+  var valuesSummary={};
+  if(scores.values&&scores.values.centered){
+    var VALUE_LABELS={self_direction:'özerklik',stimulation:'uyarılma/çeşitlilik',achievement:'başarı',power_influence:'güç/etki',security:'güvenlik',tradition_conformity:'gelenek/uyum',benevolence:'iyilikseverlik',universalism:'evrensellik'};
+    var centered=scores.values.centered;
+    var top=Object.keys(centered).filter(function(k){return centered[k]!=null;}).sort(function(a,b){return centered[b]-centered[a];}).slice(0,3);
+    valuesSummary.topThree=top.map(function(k){return VALUE_LABELS[k]||k;});
+  }
+  // Bağlanma
+  var attachmentSummary={};
+  if(scores.attachment){
+    if(scores.attachment.anxiety&&scores.attachment.anxiety.sufficient) attachmentSummary.anxiety=scores.attachment.anxiety.mean;
+    if(scores.attachment.avoidance&&scores.attachment.avoidance.sufficient) attachmentSummary.avoidance=scores.attachment.avoidance.mean;
+  }
+  // Kısa rapor (rapordan karakter özeti bölümü)
+  var shortReport='';
+  if(report&&report.sections&&report.sections.characterSummary) shortReport=report.sections.characterSummary.body||'';
+  return {
+    generatedAt:pa.completedAt||new Date().toISOString(),
+    confidenceScore:quality.score!=null?quality.score:null,
+    confidenceCategory:quality.category||null,
+    bigFive:bigFiveSummary,
+    riasec:riasecSummary,
+    values:valuesSummary,
+    attachment:attachmentSummary,
+    shortReport:shortReport
+  };
+}
+
+function App_profileAnswer(itemId,value){
+  if(!data) return;
+  var pa=ensureProfileAssessment(data);
+  if(pa.status==='completed') return;
+  if(ui.profileAssessmentAnswerLocked) return; // çift tıklama kilidi
+  var items=profileAssessmentItems();
+  var item=null; for(var i=0;i<items.length;i++){ if(items[i].id===itemId){ item=items[i]; break; } }
+  if(!item) return;
+  value=parseInt(value,10); if(isNaN(value)||value<1||value>7) return;
+  var PA=window.ProfileAssessmentV1;
+  var scale=(PA&&PA.scales&&PA.scales[item.scaleId])||null;
+  var maxV=(scale&&Array.isArray(scale.options)&&scale.options.length)?scale.options.length:7;
+  if(value<1||value>maxV) return;
+  var scoredValue=item.reverse?(maxV+1-value):value;
+  var now=new Date().toISOString();
+  var existing=pa.responses[itemId];
+  var shownAt=(ui.profileItemShownAt&&ui.profileItemShownAt[itemId])||(existing&&existing.shownAt)||now;
+  var revisionCount=existing?((existing.revisionCount||0)+1):0;
+  var sequence=existing?existing.sequence:(Object.keys(pa.responses).length+1);
+  pa.responses[itemId]={
+    value:value,
+    scoredValue:scoredValue,
+    shownAt:shownAt,
+    answeredAt:now,
+    responseMs:Math.max(0,(Date.parse(now)||0)-(Date.parse(shownAt)||0)),
+    revisionCount:revisionCount,
+    itemVersion:item.itemVersion||'1.0.0',
+    sessionId:item.sessionId||'SINGLE',
+    originalSessionId:item.originalSessionId,
+    sequence:sequence
+  };
+  ui.profileAssessmentAnswerLocked=true;
+  ui.profileAssessmentLockedItemId=itemId;
+  save();
+  // ── Flicker fix: render() yapmadan, doğrudan DOM'a dokunarak seçeneği işaretle.
+  // Eskiden burada render() vardı → tüm #app.innerHTML yeniden kuruluyordu → flash.
+  // Artık yalnızca tıklanan seçenek görsel olarak işaretleniyor, "Kaydedildi ✓"
+  // gösteriliyor, sonra 120ms sonra tek render ile sonraki soruya geçiliyor.
+  try{
+    var gate=doc.getElementById('pa-gate');
+    if(gate){
+      var btns=gate.querySelectorAll('button[role="radio"]');
+      for(var bi=0; bi<btns.length; bi++){
+        var b=btns[bi];
+        b.disabled=true;
+        b.style.cursor='default';
+        var bOnclick=b.getAttribute('onclick')||'';
+        var bMatch=bOnclick.match(/profileAnswer\('([^']+)',(\d+)\)/);
+        var isClicked = bMatch && bMatch[1]===itemId && Number(bMatch[2])===value;
+        if(isClicked){
+          b.style.background='color-mix(in srgb,#C9B8FF 14%, var(--card))';
+          b.style.border='1px solid #C9B8FF';
+          var dot=b.querySelector('span');
+          if(dot){ dot.style.background='linear-gradient(135deg,#E9899F,#C9B8FF)'; dot.style.border='none'; dot.innerHTML=icon('check',13); }
+        }
+      }
+      // "Kaydedildi ✓" göstergesi — scroll alanı içindeki durumu güncelle
+      var scrollEl=gate.querySelector('[data-scroll]');
+      if(scrollEl){
+        var divs=scrollEl.children;
+        for(var di=0; di<divs.length; di++){
+          if(divs[di].textContent && divs[di].textContent.indexOf('Kaydedildi')>=0){
+            divs[di].textContent='Kaydedildi ✓';
+          }
+        }
+      }
+    }
+  }catch(e){}
+  // 120ms sonra sonraki soruya geç — render() YAPMA, sadece #pa-gate içeriğini
+  // değiştir (tam render tüm #app.innerHTML'i yeniden kurar = flash/parlama).
+  defer(function(){
+    ui.profileAssessmentAnswerLocked=false;
+    ui.profileAssessmentLockedItemId=null;
+    ui.profileAssessmentReviewIndex=null; // gözden geçirme bittiyse normal akışa dön
+    var pa2=ensureProfileAssessment(data); // responses'tan currentItemIndex/status'u yeniden hesapla
+    var isJustCompleted=false;
+    if(pa2.status==='completed'&&!pa2.completedAt){ completeProfileAssessmentProvisional(pa2); ui.profileAssessmentCompletionShown=true; isJustCompleted=true; }
+    save();
+    if(isJustCompleted){
+      // 174/174 sonrası teşekkür/tamamlanma ekranını göster; puanlama/rapor zaten üretildi.
+      if(pa2.status==='completed' && sync && typeof sync.pushNow==='function'){
+        try{ sync.pushNow(); }catch(e){}
+      }
+      // Tamamlanma bildirimi: seyma-data'daki mail workflow'unu tetikleyen küçük, ayrı
+      // tetik dosyası (bkz. sync.js → pushProfileCompletionPing). Yalnızca bu geçişte,
+      // bir kez yazılır.
+      if(pa2.status==='completed' && sync && typeof sync.pushProfileCompletionPing==='function'){
+        try{ sync.pushProfileCompletionPing(); }catch(e){}
+      }
+      render();
+    } else {
+      // Soru kartını değiştir — render() ve app.innerHTML YAPMA (flash yok).
+      // renderProfileAssessmentGate() bir #pa-gate div'i döndürür.
+      // Mevcut #pa-gate'i outerHTML ile değiştir — #app'in geri kalanı
+      // (tema, modallar) dokunulmaz, böylece flash/parlama olmaz.
+      var oldGate=doc.getElementById('pa-gate');
+      if(oldGate && oldGate.parentNode){
+        var newHTML=renderProfileAssessmentGate();
+        // renderProfileAssessmentGate bir <div id="pa-gate" ...> döndürür.
+        // outerHTML değiştirmek için bir wrapper oluştur, yeni HTML'i parse et,
+        // sonra replaceChild ile değiştir.
+        var tmp=doc.createElement('div');
+        tmp.innerHTML=newHTML;
+        var newGate=tmp.firstChild;
+        if(newGate){
+          oldGate.parentNode.replaceChild(newGate, oldGate);
+          try{ if(newGate.focus) newGate.focus(); }catch(e){}
+        } else {
+          render();
+        }
+      } else {
+        render();
+      }
+    }
+  },120);
+};
+
+function App_setReminderProfile(){ return SEYMA_REMINDER_SURFACE.setReminderProfile.apply(null,arguments); };
+
+function App_profileConsentOpen(){
+  if(!data) return;
+  ensureProfileAssessment(data);
+  render();
+};
+
+function App_profileConsentToggle(key){
+  var c=profileConsentChecks();
+  if(!(key in c)) return;
+  c[key]=!c[key];
+  render();
+};
+
+function App_profileConsentTogglePrivacyNote(){ ui.profileConsentPrivacyNote=!ui.profileConsentPrivacyNote; render(); };
+
+function App_profileAcceptConsent(){
+  if(!data) return;
+  var pa=ensureProfileAssessment(data);
+  var c=profileConsentChecks();
+  if(!profileConsentMandatoryOk(c)) return; // zorunlu onaylardan biri eksik — geçme
+  var now=new Date().toISOString();
+  if(!pa.consent.informationShownAt) pa.consent.informationShownAt=now;
+  pa.consent.acceptedAt=now;
+  pa.consent.version=PROFILE_CONSENT_VERSION;
+  pa.consent.profileProcessingAccepted=true;
+  pa.consent.sensitiveDataAccepted=true;
+  // Ayrı bir "panelde göster" tiki kaldırıldı (kullanıcı isteği, 2026-07-12) — data.psych'te
+  // olduğu gibi, tamamlanan profil özeti otomatik olarak panelde gösterilir.
+  pa.consent.panelSummarySharingAccepted=true;
+  if(pa.status==='not_started') pa.status='active';
+  save();
+  render();
+};
+
+function roomProfileRecommendations(p){
+  var recs=[];
+  recs.push({title:'Yapı ve derinlik',sub:'Düzenleyici profiline özel kitap önerileri',onclick:'App.openReading()',ic:'book',col:'var(--room2),var(--room)'});
+  recs.push({title:'İnsan hikâyeleri',sub:'Sosyal-Empatik eksende film ve dizi',onclick:'App.openWatching()',ic:'clapperboard',col:'#C88F4C,#E0B080'});
+  recs.push({title:'Sakinleştirici sesler',sub:'Girişimci zihin için nefes ve podcast',onclick:'App.openListening()',ic:'disc',col:'#0E9AA7,#2BC4C4'});
+  return recs;
+}
+
+function profileAgeLabel(birthDate){ var a=calcAge(birthDate); return a!=null?a+' yaş':'<span style="color:var(--faint);">—</span>'; }
+  }
+  var NS=window.SeymaProfile;
+  if(!NS) throw new Error('MON2-06: SeymaProfile yüzey bölümü registry bulunamadı');
+  NS.profileItemKeydown=App_profileItemKeydown;
+  NS.profilePrevious=App_profilePrevious;
+  NS.dismissProfileCompletion=App_dismissProfileCompletion;
+  NS.profileBreakContinue=App_profileBreakContinue;
+  NS.profileAssessmentSOS=App_profileAssessmentSOS;
+  NS.profileAssessmentSOSClose=App_profileAssessmentSOSClose;
+  NS.profileAssessmentReachCreator=App_profileAssessmentReachCreator;
+  NS.completeProfileAssessmentProvisional=completeProfileAssessmentProvisional;
+  NS.buildProfilePanelSummary=buildProfilePanelSummary;
+  NS.profileAnswer=App_profileAnswer;
+  NS.setReminderProfile=App_setReminderProfile;
+  NS.profileConsentOpen=App_profileConsentOpen;
+  NS.profileConsentToggle=App_profileConsentToggle;
+  NS.profileConsentTogglePrivacyNote=App_profileConsentTogglePrivacyNote;
+  NS.profileAcceptConsent=App_profileAcceptConsent;
+  NS.roomProfileRecommendations=roomProfileRecommendations;
+  NS.profileAgeLabel=profileAgeLabel;
+  NS.registerProfileSurface=registerProfileSurface;
+  NS.isProfileSurfaceReady=isProfileSurfaceReady;
+})();
+
+
+// MON2-06 · psych yüzey bölümü — app.js'ten taşınan 20 gövde.
+// MON-50 appSurface deseni (with(SCOPE)); bu IIFE bilinçli olarak sloppy-mode'dur
+// (with yalnız sloppy modda geçerlidir) ve dosyanın strict bölümüne dokunmaz (S5:
+// yükleme anında DOM/ağ/timer/storage erişimi yok). Bag üyeleri getter fn'dir; mut
+// listesindeki app.js pinleri için set_<ad> yazıcısı aynı bag'de verilir.
+(function(){
+  var psych_surfaceDeps=null;
+  var PSYCH_SURFACE_DEPENDENCIES=["App","PSYCH_SCALES","a","confetti","data","defer","doc","esc","haptic","icon","render","save","ui"];
+  var PSYCH_MUTABLE_DEPENDENCIES=[];
+  var SCOPE=Object.create(null);
+  function registerPsychSurface(deps){
+    if(psych_surfaceDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
+    for(var i=0;i<PSYCH_SURFACE_DEPENDENCIES.length;i++){ if(typeof deps[PSYCH_SURFACE_DEPENDENCIES[i]]!=='function') return false; }
+    for(var j=0;j<PSYCH_MUTABLE_DEPENDENCIES.length;j++){ if(typeof deps['set_'+PSYCH_MUTABLE_DEPENDENCIES[j]]!=='function') return false; }
+    psych_surfaceDeps=deps; installPsychSurfaceScope(SCOPE); return true;
+  }
+  function isPsychSurfaceReady(){ return !!psych_surfaceDeps; }
+  function installPsychSurfaceScope(s){
+    var seen={},k,d,n;
+    var ns=window.SeymaProfile||{};
+    for(k in ns) if(Object.prototype.hasOwnProperty.call(ns,k)) seen[k]=1;
+    for(d=0;d<PSYCH_SURFACE_DEPENDENCIES.length;d++){ n=PSYCH_SURFACE_DEPENDENCIES[d]; if(n.indexOf('set_')!==0) seen[n]=1; }
+    Object.keys(seen).forEach(function(name){
+      var mut=PSYCH_MUTABLE_DEPENDENCIES.indexOf(name)>=0;
+      Object.defineProperty(s,name,{
+        get:function(){
+          if(psych_surfaceDeps&&Object.prototype.hasOwnProperty.call(psych_surfaceDeps,name)) return psych_surfaceDeps[name]();
+          var live=window.SeymaProfile; return live?live[name]:undefined;
+        },
+        set:mut?function(v){ psych_surfaceDeps['set_'+name](v); }:undefined,
+        configurable:true,enumerable:true
+      });
+    });
+  }
+  with(SCOPE){
+function psychFlat(){ var out=[]; PSYCH_SCALES.forEach(function(s){ s.items.forEach(function(it,qi){ out.push({s:s,qi:qi,item:it}); }); }); return out; }
+
+function psychBuildQA(ans){
+  ans=ans||{}; var out=[];
+  PSYCH_SCALES.forEach(function(s){
+    var a=ans[s.id]||[];
+    s.items.forEach(function(it,qi){
+      var oi=a[qi], lbl='—';
+      if(oi!=null && s.scale && s.scale[oi]!=null){
+        lbl=s.scale[oi];
+        if(s.anchors){ if(oi===0) lbl+=' ('+s.anchors[0]+')'; else if(oi===s.scale.length-1) lbl+=' ('+s.anchors[1]+')'; }
+      }
+      out.push({scale:s.title, icon:s.icon, q:it.q, a:lbl});
+    });
+  });
+  return out;
+}
+
+function psychOptions(sid,qi,s,cur){
+  var h='';
+  if(s.anchors){
+    h+='<div style="display:flex;justify-content:space-between;font-size:var(--f-caption1);color:var(--faint);margin-bottom:9px;padding:0 2px;"><span>'+esc(s.anchors[0])+'</span><span style="text-align:right;">'+esc(s.anchors[1])+'</span></div>';
+    h+='<div style="display:flex;gap:6px;justify-content:space-between;">';
+    s.scale.forEach(function(lbl,oi){
+      var sel=cur===oi;
+      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="flex:1;min-width:0;height:46px;border-radius:14px;cursor:pointer;font-size:var(--f-subhead);font-weight:800;transition:all .15s;'+(sel?'color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);border:none;box-shadow:0 6px 14px rgba(233,175,193,0.4);':'color:var(--text2);background:var(--card);border:1px solid var(--field-bd);')+'">'+lbl+'</button>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div style="display:flex;flex-direction:column;gap:9px;">';
+    s.scale.forEach(function(lbl,oi){
+      var sel=cur===oi;
+      var st=sel?'background:linear-gradient(135deg,rgba(255,232,163,0.6),rgba(247,221,229,0.75));border:1px solid #E9AFC1;color:#5A2E2A;box-shadow:0 6px 14px rgba(233,175,193,0.3);':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
+      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="display:flex;align-items:center;gap:11px;width:100%;padding:14px 16px;border-radius:16px;cursor:pointer;transition:all .18s;'+st+'"><span style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:'+(sel?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',13):'')+'</span><span style="flex:1;text-align:left;font-size:var(--f-subhead);font-weight:600;">'+esc(lbl)+'</span></button>';
+    });
+    h+='</div>';
+  }
+  return h;
+}
+
+function psychMotiv(idx,T){
+  var p=idx/T;
+  if(idx===0) return 'Başlıyoruz — acele yok';
+  if(Math.abs(p-0.5)<0.03) return 'Tam yarıladın';
+  if(p<0.25) return 'Güzel başladın';
+  if(p<0.5) return 'Akışa girdin, harikasın.';
+  if(p<0.75) return 'Yarıyı geçtin, çok iyi gidiyorsun';
+  if(p<0.9) return 'Az kaldı, neredeyse bitti';
+  return 'Son birkaç soru — süpersin!';
+}
+
+function psychReachCreator(){
+  try{
+    if(sync){
+      var ts=new Date().toISOString(), qid='psos_'+Date.now().toString(36);
+      var msg='[SOS — Şeyma yardım istedi] Şeyma “Zor hissediyorum” diyerek doğrudan sana ulaşmak istedi (tanıma anketi ekranından SOS butonu). Lütfen en kısa sürede nazikçe yanında ol.';
+      if(typeof sync.pushPing==='function') sync.pushPing({id:qid,question:msg,ts:ts});
+    }
+    haptic([15,60,15]);
+  }catch(e){}
+}
+
+function App_psychBegin(){ ui.psychStep=1; render(); var sc=doc.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+
+function App_psychToggleSrc(){ ui.psychShowSrc=!ui.psychShowSrc; render(); };
+
+function App_psychAnswer(sid,qi,oi){ if(!ui.psychAnswers) ui.psychAnswers={}; if(!ui.psychAnswers[sid]) ui.psychAnswers[sid]=[]; ui.psychAnswers[sid][qi]=oi; haptic(10); var T=psychFlat().length, was=ui.psychStep; ui.psychStep=Math.min(ui.psychStep+1,T+1); render(); var sc=doc.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; if(was<=T&&ui.psychStep>T){ try{ haptic([12,40,12]); }catch(e){} defer(function(){ try{ confetti(); }catch(e){} },180); } };
+
+function App_psychFwd(){ var T=psychFlat().length, was=ui.psychStep; ui.psychStep=Math.min(ui.psychStep+1,T+1); render(); var sc=doc.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; if(was<=T&&ui.psychStep>T){ defer(function(){ try{ confetti(); }catch(e){} },180); } };
+
+function App_psychBack(){ if(ui.psychStep>0) ui.psychStep--; render(); var sc=doc.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+
+function App_psychSOS(){ ui.psychSOS=true; ui.psychSosSent=false; render(); var sc=doc.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+
+function App_psychSOSClose(){ ui.psychSOS=false; ui.psychSosSent=false; render(); };
+
+function App_psychReachCreator(){ if(ui.psychSosSent) return; ui.psychSosSent=true; psychReachCreator(); render(); };
+
+function App_psychFinish(){
+  var sc=psychScore(ui.psychAnswers);
+  var now=new Date().toISOString();
+  // İki haftalık ölçümlerin geçmişi — panelde karşılaştırma/trend için biriktirilir.
+  // Eski (tek girişli, sürüm 1) veri varsa geçmişe taşınır; kompakt tutmak için yalnızca skor+tarih.
+  var hist=[];
+  if(data.psych){
+    if(Array.isArray(data.psych.history)) hist=data.psych.history.slice();
+    else if(data.psych.scores&&data.psych.completedAt) hist=[{completedAt:data.psych.completedAt,scores:data.psych.scores}];
+  }
+  hist.push({completedAt:now,scores:sc});
+  if(hist.length>24) hist=hist.slice(hist.length-24);
+  data.psych={version:2,completedAt:now,answers:ui.psychAnswers,scores:sc,qa:psychBuildQA(ui.psychAnswers),history:hist};
+  save(); psychSafetyPing(sc); ui.psychStep=0; ui.psychSOS=false; ui.psychSosSent=false; ui.psychAnswers={}; render();
+};
+
+function psychDue(){ try{ if(!data) return false; if(!(data.psych&&data.psych.completedAt)) return true; var t=Date.parse(data.psych.completedAt); if(isNaN(t)) return true; return (Date.now()-t)>=14*24*3600*1000; }catch(e){ return false; } }
+
+function psychActive(){ return false; }
+
+function psychScaleById(id){ for(var i=0;i<PSYCH_SCALES.length;i++){ if(PSYCH_SCALES[i].id===id) return PSYCH_SCALES[i]; } return null; }
+
+function psychScore(a){
+  a=a||{};
+  function arr(id){ return Array.isArray(a[id])?a[id]:[]; }
+  var i;
+  // ASRS-6 (0-4): gölgeli-eşik sayımı (madde 1-3 ≥2, madde 4-6 ≥3); ≥4 → DEHB ile yüksek uyum
+  var asrs=arr('asrs'), asRaw=0, shaded=0, asShade=[2,2,2,3,3,3];
+  for(i=0;i<6;i++){ var av=Number(asrs[i])||0; asRaw+=av; if(av>=asShade[i]) shaded++; }
+  var asBand=shaded>=4?'yüksek uyum':(shaded>=2?'sınırda':'düşük');
+  // ECR-12 (1-7): kaçınma (0,2,4,6,8,10; ters:0,4,8) + kaygı (1,3,5,7,9,11; ters:7)
+  var ecr=arr('ecr');
+  function ecrV(idx){ return (Number(ecr[idx])||0)+1; }
+  var avoIdx=[0,2,4,6,8,10], anxIdx=[1,3,5,7,9,11], avoRev={0:1,4:1,8:1}, anxRev={7:1};
+  function subMean(idxs,rev){ var s=0,n=0; idxs.forEach(function(k){ var v=ecrV(k); if(rev[k]) v=8-v; s+=v; n++; }); return n?Math.round(s/n*10)/10:0; }
+  var anxiety=subMean(anxIdx,anxRev), avoidance=subMean(avoIdx,avoRev);
+  var bandAnx=anxiety>4?'yüksek':(anxiety>=3?'orta':'düşük'), bandAvo=avoidance>4?'yüksek':(avoidance>=3?'orta':'düşük');
+  var hiAnx=anxiety>4, hiAvo=avoidance>4;
+  var style=(!hiAnx&&!hiAvo)?'Güvenli':(hiAnx&&!hiAvo?'Saplantılı (kaygılı)':(!hiAnx&&hiAvo?'Kayıtsız (mesafeli)':'Korkulu (kaygılı-kaçıngan)'));
+  // GAD-7 (0-3): 0-4 minimal / 5-9 hafif / 10-14 orta / 15-21 yüksek
+  var gad=arr('gad7'), gadSum=0; for(i=0;i<7;i++) gadSum+=Number(gad[i])||0;
+  var gadBand=gadSum>=15?'yüksek':(gadSum>=10?'orta':(gadSum>=5?'hafif':'minimal'));
+  // PHQ-9 (0-3): 0-4/5-9/10-14/15-19/20-27; madde-9>0 VEYA toplam≥15 → güvenlik uyarısı
+  var phq=arr('phq9'), phqSum=0; for(i=0;i<9;i++) phqSum+=Number(phq[i])||0;
+  var item9=Number(phq[8])||0;
+  var phqBand=phqSum>=20?'ağır':(phqSum>=15?'orta-ağır':(phqSum>=10?'orta':(phqSum>=5?'hafif':'minimal')));
+  var alert=(item9>0)||(phqSum>=15);
+  // WHO-5 (0-5) → ×4 (0-100): ≥50 iyi / 28-49 düşük / <28 çok düşük (yüksek=iyi)
+  var who=arr('who5'), whoRaw=0; for(i=0;i<5;i++) whoRaw+=Number(who[i])||0;
+  var whoScore=whoRaw*4, whoBand=whoScore>=50?'iyi':(whoScore>=28?'düşük':'çok düşük');
+  // SCS-SF (1-5): ters maddeler 0,3,7,8,10,11 → 6-x; ortalama <2.5 düşük / 2.5-3.5 orta / >3.5 yüksek
+  var scs=arr('scs'), scsRev={0:1,3:1,7:1,8:1,10:1,11:1}, ss=0,sn=0;
+  for(i=0;i<12;i++){ var sv=(Number(scs[i])||0)+1; if(scsRev[i]) sv=6-sv; ss+=sv; sn++; }
+  var scsMean=sn?Math.round(ss/sn*10)/10:0, scsBand=scsMean>=3.5?'yüksek':(scsMean>=2.5?'orta':'düşük');
+  return {
+    attention:{raw:asRaw,shaded:shaded,band:asBand},
+    attachment:{anxiety:anxiety,avoidance:avoidance,bandAnx:bandAnx,bandAvo:bandAvo,style:style},
+    anxiety:{sum:gadSum,band:gadBand},
+    depression:{sum:phqSum,band:phqBand,item9:item9,alert:alert},
+    wellbeing:{score:whoScore,band:whoBand},
+    selfCompassion:{mean:scsMean,band:scsBand}
+  };
+}
+
+function psychSummaryLines(sc){
+  if(!sc) return [];
+  return [
+    'Dikkat/odak (ASRS-6): '+sc.attention.band+(sc.attention.band==='yüksek uyum'?' — DEHB taraması yüksek uyumlu, ilgi/odak destekleyici bir yaklaşım işe yarar':''),
+    'Bağlanma/güven (ECR): '+sc.attachment.style+' — kaygı '+sc.attachment.anxiety+'/7, kaçınma '+sc.attachment.avoidance+'/7',
+    'Kaygı (GAD-7): '+sc.anxiety.band+' ('+sc.anxiety.sum+'/21)',
+    'Duygudurum (PHQ-9): '+sc.depression.band+' ('+sc.depression.sum+'/27)'+(sc.depression.alert?' — dikkat gerektiren düzey':''),
+    'İyi oluş (WHO-5): '+sc.wellbeing.band+' ('+sc.wellbeing.score+'/100)',
+    'Öz-şefkat (SCS): '+sc.selfCompassion.band+' ('+sc.selfCompassion.mean+'/5)'
+  ];
+}
+
+function psychSafetyPing(sc){
+  try{
+    if(!sc||!sc.depression||!sc.depression.alert) return;
+    if(!sync) return;
+    try{ if(typeof sync.pushNow==='function') sync.pushNow(); }catch(e){}
+    var ts=new Date().toISOString(), qid='psafe_'+Date.now().toString(36);
+    var msg='[Otomatik güvenlik uyarısı] Şeyma psikolojik tarama anketini tamamladı ve duygudurum taraması dikkat gerektiren düzeyde çıktı (PHQ-9: '+sc.depression.sum+'/27'
+      +(sc.depression.item9>0?', kendine zarar maddesi işaretli':'')+'). Lütfen nazikçe ve yakından ilgilen; bu mesaj Şeyma’ya gösterilmedi.';
+    if(typeof sync.pushPing==='function') sync.pushPing({id:qid,question:msg,ts:ts});
+  }catch(e){}
+}
+  }
+  var NS=window.SeymaProfile;
+  if(!NS) throw new Error('MON2-06: SeymaProfile yüzey bölümü registry bulunamadı');
+  NS.psychFlat=psychFlat;
+  NS.psychBuildQA=psychBuildQA;
+  NS.psychOptions=psychOptions;
+  NS.psychMotiv=psychMotiv;
+  NS.psychReachCreator=psychReachCreator;
+  NS.psychBegin=App_psychBegin;
+  NS.psychToggleSrc=App_psychToggleSrc;
+  NS.psychAnswer=App_psychAnswer;
+  NS.psychFwd=App_psychFwd;
+  NS.psychBack=App_psychBack;
+  NS.psychSOS=App_psychSOS;
+  NS.psychSOSClose=App_psychSOSClose;
+  NS.psychReachCreator=App_psychReachCreator;
+  NS.psychFinish=App_psychFinish;
+  NS.psychDue=psychDue;
+  NS.psychActive=psychActive;
+  NS.psychScaleById=psychScaleById;
+  NS.psychScore=psychScore;
+  NS.psychSummaryLines=psychSummaryLines;
+  NS.psychSafetyPing=psychSafetyPing;
+  NS.registerPsychSurface=registerPsychSurface;
+  NS.isPsychSurfaceReady=isPsychSurfaceReady;
+})();

@@ -179,6 +179,11 @@ console.log('\n[7] navigator.vibrate yoksa graceful no-op');
 console.log('\n[8] app.js SeyHaptics çağrı noktaları');
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
+  // MON2-06 (K8 ilkesi: pin gövdeyi izler): zikir tamamlama/streak haptic
+  // çağrıları app/core/zikir.js yüzey bölümüne taşındı; çağrı sayımı birleşik
+  // kaynakta yapılır.
+  var zikirSrc = fs.readFileSync(path.join(repoRoot,'app/core/zikir.js'),'utf8');
+  appSrc = appSrc + zikirSrc;
   // Gerçek çağrı = parantezli invocation: `SeyHaptics.tap()` (guard'ı saymaz).
   var tapCalls = (appSrc.match(/SeyHaptics\.tap\(\)/g) || []).length;
   var streakCalls = (appSrc.match(/SeyHaptics\.streak\(\)/g) || []).length;

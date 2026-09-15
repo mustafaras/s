@@ -1,6 +1,6 @@
 # MON2 · Güncel durum
 
-**Güncelleme:** 2026-09-14 · **Durum:** `in_progress` · **Aktif kart:** MON2-06 · **Tamamlanan:** 5/8 (MON2-01…05) · **Dalga 1 (Reminder) + Dalga 2 (Görünüm) kapandı**
+**Güncelleme:** 2026-09-15 · **Durum:** `in_progress` · **Aktif kart:** MON2-07 · **Tamamlanan:** 6/8 (MON2-01…06) · **Dalga 1 (Reminder) + Dalga 2 (Görünüm) + Dalga 3 (Alan, MON2-06) kapandı**
 
 ## Canlı baseline (commit cf42949, `node tools/shell-inventory.mjs`)
 
@@ -42,9 +42,22 @@
 - Kapı: smoke **20/20** · `--gate` PASS (9.771/0/408/928) · driver+zikr 95/95 · verify-state B1/B2/B3 · tests/app **53/53** (fx2 6/6 dahil) · panel 23/23 · panel-v2 27/27 · quran 9/9 · sync 69/69 · App.x=554 · onclick(kombine)=391 · withModule:false PASS
 - Cache-bust: `reminderSurface.js?v=20260914d`, `app.js?v=20260914d` + 4 app_surface pin'i güncellendi
 
+## MON2-06 sonrası (2026-09-15 · Alan dalgası, kart 6/8)
+
+- `app.js` 8.969 → **7.797 satır** (6.766 kod) — −1.172 satır; bütçe 8.500'ü **703 satır marjla** geçti
+- Taşınanlar: **146 gövde** → `SeymaQuran` 52 (quran.js 363→876), `SeymaZikr` 57 (zikir.js 1.044→1.724), `SeymaProfile` 17 + `SeymaPsych` 20 (profile.js 879→1.447); MON-50 appSurface deseni (sloppy IIFE + `with(SCOPE)` + canlı property-getter'lar). Saf gövdeler + K4 handler gövdeleri modülde; app.js'te **124 adet 1-liner shim** ve dep bag'leri kalır
+- **Kök düzeltme — K4'ün gerçek anlamı (dep bag):** 37 yan-etkili gövde önce ÇIPLAK GLOBAL kullanıyordu (`document`×48+17+10, `setTimeout(`×2+2+3, `window.SeySync`×2+17) → MON-20/21/22/36 saflık sözleşmelerini kırıyordu (4 fixture kırmızı). Gövdeler bag takma adlarına çevrildi: **`document`→`doc`**, **`setTimeout(`→`defer(`**, **`window.SeySync`→`sync`**; üç bag'e `doc`/`defer` (+quran/profile'da `sync`) eklendi. Domain dosyaları artık **hiçbir tarayıcı globali adı taşımaz** → saflık sözleşmeleri zayıflatılmadan PASS
+- **5. app_surface cache-bust pin'i** (`test_app_surface_boot_boundary.js:178`) MON2-01…05'te gözden kaçmıştı; bu kartta yakalandı ve senkronlandı (artık 5 pin)
+- Cache-bust: `zikir.js?v=20260915a`, `quran.js?v=20260915a`, `profile.js?v=20260915a`, `app.js?v=20260915a` + 5 app_surface pin'i
+- Fixture devirleri (K8 — pin gövdeyi izler): `test_zikir_boundary` (zikrTap bölümü → MON2-06 dilimi), `test_zikir_view_boundary` (draft mutation pin'i → dilim), `test_modal_focus_containment` (onZikrKeydown → `function App_onZikrKeydown(e){`), `test_premium_haptics_fx` + `test_premium_voice` (appSrc += zikir.js), `test_fx2_overlay_motion` (closeX araması zikir/quran'ı da tarar; combinedSource'a EKLENMEDİ — onclick=391 pini bu dosyalar hariç ölçüldü), `zikr-harness` (undo toast → `movedSource`)
+- Kapı: syntax (app+sync+core×31) · smoke **21/21** (73 assertion) · `--gate` PASS (7.797/0/408/97) · driver+zikr **95/95** · verify-state B1/B2/B3 · tests/app **52/52** · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders 21/21 · sync 69/69 · `App.x=554` · onclick(kombine)=391 · dump **6/6 BAYT-EŞİT** (deterministik)
+- Dump notu: `bugun`/`reading` ham koşumda tek satır farklıydı — `calculateMgNudge` `Math.random` skoru (MON2-05'te belgelenmiş, önceden var). Geçici tmp sabitlemeyle 6/6 bayt-eşit; üretim kodu değişmedi (LEDGER seq 7 sapma 8)
+- Kalan 3 saf gövde kartın açık kapsam dışı: `zikrSyncWakeLock` (README: app.js'te kalır), `quranOnPlayerStateChange`/`quranAttachPlayer` (YouTube iframe API → MON2-07 ağ kapsamı)
+- Ölçüm dosyaları: `app.js` 7.796 · `app/core/zikir.js` 1.724 · `app/core/quran.js` 876 · `app/core/profile.js` 1.447 · `app/core/appSurface.js` 459
+
 ## Bütçe (shellBudget)
 
-Aktif (MON2-06): 8.500 satır · 0 Legacy · 450 reminder gövde · 150 HTML builder. Ölçüm 8.969/0/408/97 — builder zaten altında (MON2-05 97'ye indirdi); satır düşüşü MON2-06'nın işidir (8.969 → ≤8.500, alan gövdeleri registry'lere). Bütçe asla gevşetilmez; ölçüm tutmazsa kart bütçeyi ölçülen değere çeker ve sapmayı LEDGER'a yazar.
+Aktif (MON2-07): 8.000 satır · 0 Legacy · 450 reminder gövde · 150 HTML builder. Ölçüm 7.797/0/408/97 — 8.000'e 203 satır marj. MON2-07 sonunda bütçe ölçülen+%2 ile daraltılır; asla gevşetilmez.
 
 ## MON2-04 sonrası (2026-09-14 · Dalga 1 kapanışı)
 
@@ -68,7 +81,7 @@ Aktif (MON2-06): 8.500 satır · 0 Legacy · 450 reminder gövde · 150 HTML bui
 
 ## Sonraki güvenli adım
 
-MON2-06 (README §6): alan gövdeleri quran/zikr/profile/psych → ilgili registry'ler — bütçe 8.500 / 0 / 450 / 150. Devir briefi: [`DEVIR-MON2-06.md`](../DEVIR-MON2-06.md).
+MON2-07 (README §5): yan etkili alan gövdeleri (aeon 345, location 208, header/weather/photo/habit/hero kalanları, `mergeInbox`, `lunaContext`, `psychScore`, `streamAsk` sarmalayıcıları) → `SeymaAppSurface`; ağ/GPS/notification **çağrısı** app.js'te kalır, hazırlık/parse/apply gövdesi taşınır. Bütçe **8.000 / 0 / 450 / 150** (ölçüm 7.797). Devir briefi: [`DEVIR-MON2-07.md`](../DEVIR-MON2-07.md).
 Push/deploy/browser/gerçek veri yok.
 
 ## Sınırlar

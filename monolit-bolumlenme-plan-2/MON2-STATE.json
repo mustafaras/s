@@ -3,15 +3,15 @@
   "planningRevision": "1.0",
   "programId": "MON2-KABUK-INCELTME",
   "status": "in_progress",
-  "activePrompt": "MON2-06",
+  "activePrompt": "MON2-07",
   "blockedPrompt": null,
   "releaseApproval": "not_approved",
-  "lastCompletedPrompt": "MON2-05",
-  "nextPrompt": "MON2-06",
+  "lastCompletedPrompt": "MON2-06",
+  "nextPrompt": "MON2-07",
   "currentWave": "3",
   "totalPrompts": 8,
-  "completedPrompts": 5,
-  "updatedAt": "2026-09-14",
+  "completedPrompts": 6,
+  "updatedAt": "2026-09-15",
   "baseline": {
     "date": "2026-09-14",
     "commit": "cf42949",
@@ -26,7 +26,7 @@
     "tool": "node tools/shell-inventory.mjs"
   },
   "shellBudget": {
-    "maxTotalLines": 9400,
+    "maxTotalLines": 8000,
     "maxLegacyFunctions": 0,
     "maxReminderFunctionCodeLines": 450,
     "maxHtmlBuilderCodeLines": 150,
@@ -164,7 +164,7 @@
     "seyma-data write",
     "real token/data"
   ],
-  "nextSafeAction": "MON2-06'ı uygula (README §6): alan gövdelerini quran/zikr/profile/psych registry'lerine taşı — bütçe 8.500/0/450/150 (satır 8.969→≤8.500). DEVIR-MON2-06.md ile başla; push/deploy/browser/gerçek veri yok.",
+  "nextSafeAction": "MON2-07 uygulanacak (README §5): yan etkili alan gövdeleri (aeon/location/header/weather/photo/habit) appSurface.js e; ağ/GPS/notification çağrısı app.js te kalır. Bütçe 8.000/0/450/150 (ölçüm 7.797). DEVIR-MON2-07.md ile başla; push/deploy/browser/gerçek veri yok.",
   "authority": [
     "CLAUDE.md",
     "AGENTS.md",
@@ -175,7 +175,7 @@
     ".claude/skills/run-seyma/SKILL.md"
   ],
   "codeTouched": true,
-  "lastCompletedEvidence": "MON2-05 (Dalga 2 kapanışı): 37 *HTML builder gövdesi (831 kod satırı) render.js'e taşındı; ölçüm 9.771/0/408/928 → 8.969/0/408/97; --gate PASS. Dep bag 61 fn dep + 14 sabit dep + find. Dump bugun/rapor/ayarlar/hub 4/4 BAYT-EŞİT (health.js calculateMgNudge önceden-var Math.random skor satırı kanıt için tmp driver'da sabitlendi — üretim kodu değişmedi; LEDGER seq 6 sapma 5). Tam kapı seti PASS: smoke 21/21, driver+zikr 95/95, verify-state B1/B2/B3, tests/app 52/52 (premium 9 + fx2 6 dahil), panel 23/23, panel-v2 27/27, quran 9/9, sync 69/69, App.x=554, onclick(kombine)=391. Fixture devirleri (K8): today_card_preferences, modal_focus_containment, zikr-harness z-index. Cache-bust: render.js/app.js 20260914e + 4 app_surface pin.",
+  "lastCompletedEvidence": "MON2-06 (Dalga 3 Alan, kart 6/8): 146 gövde (quran 52 / zikr 57 / profile 17 + psych 20) ilgili registry e taşındı; app.js 8.969→7.797 (−1.172 satır). KÖK DÜZELTME: 37 yan-etkili gövde çıplak global kullanıyordu (document / setTimeout / window.SeySync) — MON-20/21/22/36 saflık sözleşmelerini kırıyordu. Gövdeler dep-bag takma adlarına çevrildi: document→doc, setTimeout→defer, window.SeySync→sync; üç bag e doc/defer (+quran/profile sync) üyeleri eklendi. Domain dosyaları artık hiçbir tarayıcı globali adı taşımaz → saflık fixture ları zayıflatılmadan PASS (quran_boundary, profile_boundary). 5. app_surface cache-bust pin i (test_app_surface_boot_boundary.js:178) MON2-01..05 te gözden kaçmıştı; yakalandı ve senkronlandı. Kapı: syntax · smoke 21/21 (73 assertion) · --gate PASS (7.797/0/408/97) · driver+zikr 95/95 · verify-state B1/B2/B3 · tests/app 52/52 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders 21/21 · sync 69/69 · App.x=554 · onclick(kombine)=391 · dump 6/6 BAYT-EŞİT (deterministik). Fixture devirleri (K8): test_zikir_boundary, test_zikir_view_boundary, test_modal_focus_containment, test_premium_haptics_fx, test_premium_voice, test_fx2_overlay_motion, zikr-harness. Cache-bust: zikir.js/quran.js/profile.js/app.js → 20260915a + 5 app_surface pin i. Kapsam dışı kalan 3 saf gövde: zikrSyncWakeLock (kart: app.js te kalır), quranOnPlayerStateChange/quranAttachPlayer (YouTube iframe API → MON2-07).",
   "measurements": {
     "MON2-01": {
       "date": "2026-09-14",
@@ -227,6 +227,23 @@
       "appHandlerAssignments": 554,
       "inlineOnclick": 391,
       "note": "Dalga 2 kapanışı — 37 builder gövdesi (831 kod satırı) render.js'e; kalan >2-satır builder 6 fn / 97 satır"
+    },
+    "MON2-06": {
+      "date": "2026-09-15",
+      "appTotalLines": 7797,
+      "appCodeLines": 6766,
+      "legacyFunctions": 0,
+      "reminderFunctionCodeLines": 408,
+      "htmlBuilderCodeLines": 97,
+      "appHandlerAssignments": 554,
+      "inlineOnclick": 391,
+      "zikirJsLines": 1724,
+      "quranJsLines": 876,
+      "profileJsLines": 1447,
+      "appSurfaceJsLines": 459,
+      "movedBodies": 146,
+      "appJsShims": 124,
+      "gate": "PASS (8000 budget, 7797/0/408/97)"
     }
   }
 }

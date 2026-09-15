@@ -21,6 +21,24 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (MON2 Dalga 2 + Dalga 3 kapatıldı — Görünüm ve Alan dalgaları):**
+>   MON2-05 (Görünüm) 37 `*HTML()` builder gövdesini (831 kod satırı)
+>   `app/core/render.js`'e taşıdı: `app.js` 9.771 → 8.969, builder 928 → 97.
+>   MON2-06 (Alan) 146 gövdeyi ilgili registry'lere taşıdı — quran 52
+>   (`app/core/quran.js` 363→876), zikr 57 (`app/core/zikir.js` 1.044→1.724),
+>   profile 17 + psych 20 (`app/core/profile.js` 879→1.447); `app.js`
+>   8.969 → **7.797** (kod 6.766). Taşıma MON-50 appSurface deseniyle
+>   (sloppy IIFE + `with(SCOPE)` + canlı property-getter) yapıldı; **37
+>   yan-etkili gövde DOM/timer/sync'e çıplak global yerine dep-bag takma
+>   adıyla erişir** (`document`→`doc`, `setTimeout`→`defer`,
+>   `window.SeySync`→`sync`) — böylece MON-20/21/22/36 saflık sözleşmeleri
+>   zayıflatılmadan korundu. Bütçe kapısı 8.500'ü 703 satır marjla geçti.
+>   Tam kapı seti PASS: smoke 21/21, `shell-inventory --gate`, driver+zikr
+>   95/95, verify-state B1/B2/B3, tests/app 52/52, panel 23/23, panel-v2
+>   27/27, Kur'an 9/9, reminders 21/21, sync 69/69, `App.x=554`, onclick=391,
+>   dump 6/6 bayt-eşit (deterministik). Sıradaki kart MON2-07 (yan etkili alan
+>   gövdeleri → `app/core/appSurface.js`). Program LOCAL-ONLY; push/deploy/
+>   device ayrı kapılar.
 > - **2026-09-14 (MON2 Dalga 1 kapatıldı — kabuk inceltme Reminder dalgası):**
 >   MON2 programının (8 kart, ölçülen kabuk bütçesi) Dalga 1'i MON2-01…04 ile
 >   tamamlandı. `app.js` 13.139 → 9.771 satır (kod 11.839 → 8.532), 22
@@ -118,7 +136,7 @@ _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 |---|-------|:-----:|:-----:|-------------|
 | — | Altyapı (sync, panel, tema, Okuma/İzleme hub'ları) | 0 | ✅ | `sync.js`, `panel.html`, `app/styles.css`, hub deseni |
 | MON | 🧱 `app.js` monolit bölümleme | 0 | ✅ | 24 hedef registry, 29 `app/core` dosyası; MON-01..60 uygulandı ve seri 2026-09-13'te kapandı (60/60, [kapanış belgesi](../monolit-bolumlenme-plan/deliverables/MON-SERI-KAPANIS-BELGESI.md)); 2026-09-14 kapanış sonrası kod denetimi düzeltmeleri LEDGER seq 82. Güncel kanıt: [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md), [module map](monolit-bolumlenme-haritasi.md), [MON-D11 regression](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
-| MON2 | 📉 `app.js` kabuk inceltme (ölçülen bütçe) | 0 | 🟡 | 8 kart, 4 dalga; Dalga 1 (Reminder, MON2-01…04) 2026-09-14'te kapandı: `app.js` 13.139 → 9.771 satır, `*Legacy` 22 → 0, `app/core/reminderSurface.js` eklendi (kapanış belgesi: [MON2-DALGA1-KAPANIS.md](../monolit-bolumlenme-plan-2/deliverables/MON2-DALGA1-KAPANIS.md)). Sıradaki: MON2-05 (builder → `render.js`). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
+| MON2 | 📉 `app.js` kabuk inceltme (ölçülen bütçe) | 0 | 🟡 | 8 kart, 4 dalga; Dalga 1 (Reminder, MON2-01…04) 2026-09-14'te, **Dalga 2 (Görünüm, MON2-05) + Dalga 3 (Alan, MON2-06) 2026-09-15'te kapandı**: `app.js` 13.139 → **7.797** satır (−5.342), `*Legacy` 22 → 0, `*HTML` builder 1.129 → 97; MON2-05 37 builder'ı `render.js`'e, MON2-06 146 alan gövdesini (quran 52 / zikr 57 / profile 17 + psych 20) ilgili registry'lere taşıdı (`app/core/{zikir,quran,profile}.js`; yan-etkili gövdeler dep-bag takma adı kullanır — `doc`/`defer`/`sync`). Kapanış: [MON2-DALGA1-KAPANIS.md](../monolit-bolumlenme-plan-2/deliverables/MON2-DALGA1-KAPANIS.md). Sıradaki: MON2-07 (yan etkili alan gövdeleri → `appSurface.js`). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
 | 1 | 🎵 Ne Dinledim | 1 | ✅ | `listeningOverlayHTML` hub (Bugün/Favoriler/İstatistik/Sözler) + `data.music` + `data.days[].listening`; `--listen` teal accent; panel "🎧 Dinleme Arşivi" (2026-07-04) |
 | 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ✅ | `App.onGratitude` + `data.days[].gratitude` (≤3); Bugün kartı (geçmiş günde düzenlenebilir); panel gün-detayı bloğu (2026-07-04) |
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |

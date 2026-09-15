@@ -207,6 +207,13 @@ const styles = fs.readFileSync(path.join(REPO, 'app/styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
 const renderSource = fs.readFileSync(path.join(REPO, 'app/core/render.js'), 'utf8');
 const saygiSource = fs.readFileSync(path.join(REPO, 'app/core/saygi.js'), 'utf8');
+// MON2-06 (K8: pin gövdeyi izler): zikr/quran/profile alan gövdeleri app.js'ten
+// registry'lere taşındı; gövdeyi metin olarak arayan sözleşmeler birleşik
+// kaynakta aranır (MON2-05 render.js modeliyle aynı desen).
+const zikirSource = fs.readFileSync(path.join(REPO, 'app/core/zikir.js'), 'utf8');
+const quranSource = fs.readFileSync(path.join(REPO, 'app/core/quran.js'), 'utf8');
+const profileSource = fs.readFileSync(path.join(REPO, 'app/core/profile.js'), 'utf8');
+const movedSource = appSource + renderSource + zikirSource + quranSource + profileSource;
 let sb = buildSandbox(seed);
 let ctx = loadInto(sb, FILES);
 if (sb.App && typeof sb.App.start === 'function') sb.App.start();
@@ -822,7 +829,8 @@ ok('Geri al, son toplu sıfırlamayı tek dokunuşla eksiksiz geri yüklüyor',
 ok('Zikirmatik overlay toast geri bildirimi overlay katmanının üstünde görünür',
   // MON2-05: konum kapısı gövdesi render.js'e taşındı; z-index sözleşmesi
   // app.js + render.js birleşik kaynakta aranır.
-  /z-index:10000/.test(appSource+renderSource)&&/Geri alınacak yeni bir sayım yok/.test(appSource));
+  // MON2-06 (K8): undo toast metni app/core/zikir.js yüzey bölümünde.
+  /z-index:10000/.test(appSource+renderSource)&&/Geri alınacak yeni bir sayım yok/.test(movedSource));
 
 // ── REM-54: zikir ve Saygı reminder deep-link hedefleri ─────────────────
 const remSb = resetSb;

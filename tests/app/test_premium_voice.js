@@ -301,6 +301,9 @@ console.log('\n[10] ambiyans motoru gating');
 console.log('\n[11] app.js sesli çağrı noktaları (statik)');
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  // MON2-06 (K8 ilkesi: pin gövdeyi izler): zikir tamamlama sesli ipucu ve
+  // guides çağrıları app/core/zikir.js yüzey bölümüne taşındı.
+  appSrc += fs.readFileSync(path.join(repoRoot, 'app/core/zikir.js'), 'utf8');
   var appSurfaceSrc = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
   var stateSrc = fs.readFileSync(path.join(repoRoot, 'app/core/state.js'), 'utf8');
   ok('onboarding sesli karşılama çağrısı var (FX-P-52)', appSurfaceSrc.indexOf("voice('Sevgili Günışığı, hoş geldin") >= 0);

@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Kabuk İnceltme Programı (MON2)
 
-**Sürüm:** 1.0 · **Tarih:** 2026-09-14 · **Durum:** `in_progress` · **Kart:** 5/8 · **Dalga 1 + Dalga 2 kapandı** · **Aktif:** `MON2-06` · **Devir:** [`DEVIR-MON2-06.md`](DEVIR-MON2-06.md)
+**Sürüm:** 1.0 · **Tarih:** 2026-09-15 · **Durum:** `in_progress` · **Kart:** 6/8 · **Dalga 1 + Dalga 2 + Dalga 3 (MON2-06) kapandı** · **Aktif:** `MON2-07` · **Devir:** [`DEVIR-MON2-07.md`](DEVIR-MON2-07.md)
 
 MON serisi (60 kart) `app.js`'i 18.957 → 13.139 satıra indirdi ama satır sayısı
 hiçbir kartın hedefi değildi; kapanış belgesi 13.144'ü yalnız *baseline* olarak
@@ -14,21 +14,22 @@ LOCAL-ONLY kalır; push/merge/tag/deploy/`seyma-data` yazımı ayrı onaydır.
 
 ## 1. Teşhis (2026-09-14, `node tools/shell-inventory.mjs`)
 
-| Ölçüm | Değer | Dalga 1 sonrası | Yorum |
-|---|---:|---:|---|
-| `app.js` toplam / kod satırı | 13.139 / 11.839 | 9.771 / 8.532 | 1.140 → 1.078 yorum, 160 boş |
-| Sütun-0 fonksiyon | 1.867 | 1.676 | |
-| Shim (≤2 kod satırı) | 1.091 fn / 1.148 satır | 1.268 fn / 1.280 satır | 35 reminder fn + 51 handler 1-liner'a indi |
-| Küçük gövde (3–10) | 530 fn / 2.950 satır | 250 fn / 1.458 satır | taşınanlar MON2-02/03'te |
-| Büyük gövde (≥11) | 246 fn / 5.107 satır | 158 fn / 3.425 satır | Dalga 2+ hedefi |
-| `App.*` handler gövdesi | 554 fn / 2.430 satır | 554 fn / 2.145 satır | envanter sabit; gövdeler modülde |
-| `*Legacy` çift gövde | 22 fn / 208 satır | 0 / 0 | MON2-01'de emekli (K1) |
-| `*HTML()` builder (>2 satır) | 60 fn / 1.129 satır | 6 fn / 97 satır | MON2-05: 37 builder (831 satır) render.js'e; hedef 150 sağlandı |
-| **Reminder ayak izi** | **529 fn / 3.247 satır + 120 sabit / 288 satır** | **355 fn / 408 satır + 121 sabit / 289 satır** | `app/core/reminderSurface.js` 1.004 satır |
-| Reminder yalnız-iç fonksiyon | 293 fn / 1.770 satır | 69 fn / 72 satır | shim'siz taşınanlar modülde |
+| Ölçüm | Değer | Dalga 1 sonrası | MON2-06 sonrası | Yorum |
+|---|---:|---:|---:|---|
+| `app.js` toplam / kod satırı | 13.139 / 11.839 | 9.771 / 8.532 | **7.797 / 6.766** | 1.140 → 1.031 yorum |
+| Sütun-0 fonksiyon | 1.867 | 1.676 | 1.652 | |
+| Shim (≤2 kod satırı) | 1.091 fn / 1.148 satır | 1.268 fn / 1.280 satır | 1.383 fn / 1.390 satır | 146 alan gövdesi 1-liner shim'e indi |
+| Küçük gövde (3–10) | 530 fn / 2.950 satır | 250 fn / 1.458 satır | 171 fn / 981 satır | |
+| Büyük gövde (≥11) | 246 fn / 5.107 satır | 158 fn / 3.425 satır | 98 fn / 1.990 satır | |
+| `App.*` handler gövdesi | 554 fn / 2.430 satır | 554 fn / 2.145 satır | 554 fn / 1.638 satır | envanter sabit; gövdeler modülde |
+| `*Legacy` çift gövde | 22 fn / 208 satır | 0 / 0 | 0 / 0 | MON2-01'de emekli (K1) |
+| `*HTML()` builder (>2 satır) | 60 fn / 1.129 satır | 6 fn / 97 satır | 6 fn / 97 satır | hedef 150 sağlandı |
+| **Reminder ayak izi** | **529 fn / 3.247 satır + 120 sabit / 288 satır** | **355 fn / 408 satır + 121 sabit / 289 satır** | 355 / 408 + 121 / 289 | sabit |
+| Reminder yalnız-iç fonksiyon | 293 fn / 1.770 satır | 69 fn / 72 satır | 69 / 72 | sabit |
 
-Alan gövdeleri (büyük fn): reminder 1.715 · quran 437 · aeon 345 · zikr 250 ·
-profile 217 · location 208 · psych 175 · hero/header/health/photo/habit ≈ 470.
+Alan gövdeleri (MON2-06 sonrası, `--domain`): quran 96 fn / 277 · zikr 119 fn / 140 ·
+profile 47 fn / 62 · psych 23 fn / 23 — hepsi 1-liner shim. Taşınan gövdeler
+`app/core/zikir.js` 1.724 · `app/core/quran.js` 876 · `app/core/profile.js` 1.447.
 Planın (c)+(d) sınıfı — `data` rebind, B1 getter, timer/listener kaydı,
 `window.App`, 554 `App.x=` ataması, ~180 `App.reminderX=reminderX` alias
 satırı — ≈ 3–4k satırdır; gerçekçi alt sınır ~7k'dır.
@@ -40,16 +41,16 @@ MON-40..43 yalnız 360 satır taşıyabildi.
 
 ## 2. Hedef ve bütçe
 
-| Kart sonrası | `app.js` ≤ | `*Legacy` | reminder gövde ≤ | `*HTML` builder ≤ |
-|---|---:|---:|---:|---:|
-| MON2-01 | 13.200 | 22 | 3.300 | 1.150 |
-| MON2-02 | 11.300 | 0 | 1.500 | 1.150 |
-| MON2-03 | 10.300 | 0 | 450 | 950 |
-| MON2-04 | 10.300 | 0 | 450 | 950 |
-| MON2-05 | 9.400 | 0 | 450 | 150 |
-| MON2-06 | 8.500 | 0 | 450 | 150 |
-| MON2-07 | 8.000 | 0 | 450 | 150 |
-| MON2-08 | 8.000 | 0 | 450 | 150 |
+| Kart sonrası | `app.js` ≤ | `*Legacy` | reminder gövde ≤ | `*HTML` builder ≤ | Ölçülen |
+|---|---:|---:|---:|---:|---:|
+| MON2-01 | 13.200 | 22 | 3.300 | 1.150 | 13.150 |
+| MON2-02 | 11.300 | 0 | 1.500 | 1.150 | 10.277 |
+| MON2-03 | 10.300 | 0 | 450 | 950 | 9.771 |
+| MON2-04 | 10.300 | 0 | 450 | 950 | 9.771 |
+| MON2-05 | 9.400 | 0 | 450 | 150 | 8.969 |
+| **MON2-06** | **8.500** | **0** | **450** | **150** | **7.797 ✅** |
+| MON2-07 | 8.000 | 0 | 450 | 150 | — |
+| MON2-08 | 8.000 | 0 | 450 | 150 | — |
 
 Bütçe `MON2-STATE.json → shellBudget` alanındadır; her kart kapanışında
 **ölçülen değer + %2** ile daraltılır ve **asla gevşetilmez**. Tahmin tutmazsa
@@ -86,6 +87,17 @@ kart bütçeyi ölçülen değere çeker ve sapmayı LEDGER'a yazar; kart bloke 
    açılır (yan etkili + handler gövdeleri). Dört yükleme listesi (`index.html`,
    `driver.mjs` FILES, `zikr-harness.mjs` FILES, `test_state_rebind_boundary.js`)
    yalnız MON2-01'de bir kez güncellenir. Dalga 2–3 yeni dosya açmaz.
+   **MON2-06 amend (2026-09-15):** Dalga 3'te alan registry'leri (`zikir.js`,
+   `quran.js`, `profile.js`) **kendi içinde** bir yüzey bölümü barındırır
+   (ikinci sloppy-mode IIFE, `with(SCOPE)`, canlı property-getter'lar) — yeni
+   dosya açılmaz, K5 aynen korunur. **Kritik koşul:** bu bölümler
+   DOM/timer/sync'e ÇIPLAK GLOBAL ile değil **dep-bag takma adıyla** erişir
+   (`document`→`doc`, `setTimeout`→`defer`, `window.SeySync`→`sync`), böylece
+   domain dosyaları hiçbir tarayıcı globali adı taşımaz ve MON-20/21/22/36
+   saflık sözleşmeleri (`test_zikir_boundary`, `test_quran_boundary`,
+   `test_profile_boundary`) zayıflatılmadan PASS eder. Bag üyeleri app.js'te
+   `doc:function(){return document;}`, `defer:function(){return setTimeout;}`,
+   `sync:function(){return window.SeySync||null;}` biçimindedir.
 6. **K6 — Fixture yükleme paritesi:** app.js'i bütün olarak `vm`'de çalıştıran
    her fixture, `reminders.js` + `reminderSurface.js`'i yükler. Bu MON2-01'de
    ileriye dönük yapılır (gövdeler taşınmadan önce de çalışır). Liste MON2-01'de.
@@ -123,7 +135,7 @@ Devralınan sözleşme: MON `S1–S8`, `I1–I6`, `M1–M4`, `MON-K1…K8`
 | | MON2-03 | Yan etkili gövdeler + 126 handler gövdesi → `reminderSurface.js` | ~10.1k |
 | | MON2-04 | Dalga 1 kapanışı: tam regression + doküman senkronu | ~10.1k |
 | 2 Görünüm | MON2-05 | 60 kart `*HTML()` builder → `render.js` | ~9.2k |
-| 3 Alan | MON2-06 | quran / zikr / profile / psych gövdeleri → ilgili registry | ~8.3k |
+| 3 Alan | MON2-06 | quran / zikr / profile / psych gövdeleri → ilgili registry (**kapatıldı: 7.797**) | ~8.3k |
 | | MON2-07 | aeon / location / header / weather / photo / habit gövdeleri → `appSurface.js` | ~7.8k |
 | Kapanış | MON2-08 | Seri kapanış belgesi, bütçe dondurma | ~7.8k |
 
@@ -349,7 +361,17 @@ okuyan builder (`appHeaderMeta` gibi) önce okuma kısmı app.js'te bir
 `bugun/rapor/ayarlar/hub` önce/sonra bayt-eşit; `test_fx2_ambience.js` PASS
 (`amb-wx-` yorum tuzağına dikkat).
 
-### MON2-06 · Alan gövdeleri: quran / zikr / profile / psych
+### MON2-06 · Alan gövdeleri: quran / zikr / profile / psych — **KAPATILDI (2026-09-15)**
+
+**Sonuç:** `app.js` 8.969 → **7.797** (−1.172); bütçe 8.500'ü 703 satır marjla geçti.
+Taşınan **146 gövde**: quran 52 → `app/core/quran.js` (363→876), zikr 57 →
+`app/core/zikir.js` (1.044→1.724), profile 17 + psych 20 →
+`app/core/profile.js` (879→1.447). MON-50 appSurface deseni (sloppy IIFE +
+`with(SCOPE)` + canlı property-getter); app.js'te 124 1-liner shim + dep bag'leri.
+**Kök düzeltme:** 37 yan-etkili gövde çıplak global kullanıyordu
+(`document`/`setTimeout`/`window.SeySync`) → dep-bag takma adlarına çevrildi
+(`doc`/`defer`/`sync`); saflık fixture'ları zayıflatılmadan PASS. Detay ve
+sapmalar: `.anti-amnesia/LEDGER.md` seq 7.
 
 **Amaç:** Registry'si olan alanların app.js'te kalan (a)/(b) gövdelerini ve
 handler gövdelerini kendi registry'sine taşımak. quran 107 fn/750 satır

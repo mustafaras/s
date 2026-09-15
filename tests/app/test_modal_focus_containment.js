@@ -67,8 +67,13 @@ modalSections.forEach(([name, text]) => {
 // app/core/render.js'e taşındı; bölümler artık renderSource'tan okunur.
 const zikr = section('function zikroverlayHTML(){', '\nfunction quranJourneyHubCardHTML(){', renderSource);
 const quran = section('function quranJourneyOverlayHTML(){', '\nfunction quranRemoteStatusHTML', renderSource);
+// MON2-06 (K8 ilkesi: pin gövdeyi izler): App.onZikrKeydown / App.closeZikr
+// gövdeleri app/core/zikir.js yüzey bölümüne taşındı; ortak modal handler
+// sözleşmesi app.js shim'i + taşınan gövde birlikte doğrulanır.
+const zikirSource = fs.readFileSync('app/core/zikir.js', 'utf8');
+const zikirSurfaceSource = zikirSource.slice(zikirSource.indexOf('MON2-06'));
 ok('Zikirmatik ortak handlerdan yararlanıyor',
-  zikr.includes('App.onZikrKeydown(event)') && source.includes('App.onZikrKeydown=function(e){\n  return App.onModalKeydown(e,App.closeZikr);'));
+  zikr.includes('App.onZikrKeydown(event)') && zikirSurfaceSource.includes('function App_onZikrKeydown(e){\n  return App.onModalKeydown(e,App.closeZikr);'));
 ok('Kur’an not alanları ortak handlerdan yararlanıyor',
   quran.includes('App.onQuranKeydown(event)') && source.includes('App.onQuranKeydown=function(e){'));
 

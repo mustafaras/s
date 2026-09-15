@@ -115,39 +115,9 @@ var ZIKR_NIYET={
 // (insan editoryal onayı programatik olarak 'reviewed'e çevrilmiyor), yalnız
 // UI'da GÖSTERİLMESİ artık kullanıcının kendi onayıyla gerçekleşiyor.
 var _zikrContentEsmaIdx=null;
-function zikrContentFor(p){
-  if(!p||!p.id) return null;
-  function sourceLabels(refs,sources){
-    return (refs||[]).map(function(sid){ var s=sources&&sources[sid]; return s&&s.institution?s.institution:null; }).filter(Boolean);
-  }
-  if(p.kind==='esma'){
-    var mod=window.EsmaulHusnaV2;
-    if(!mod||!Array.isArray(mod.names)) return null;
-    if(!_zikrContentEsmaIdx){ _zikrContentEsmaIdx={}; mod.names.forEach(function(r){ _zikrContentEsmaIdx[r.id]=r; }); }
-    var rec=_zikrContentEsmaIdx[p.id];
-    if(!rec||!(rec.meaningTr||rec.importanceTr)) return null;
-    return {meaningTr:rec.meaningTr||'',importanceTr:rec.importanceTr||'',reflectionTr:rec.reflectionTr||'',verseNoteTr:'',sourceLabel:sourceLabels(rec.sourceRefs,mod.sources).join(', ')};
-  }
-  var mod2=window.ZikirCoreContentV1;
-  if(!mod2||!mod2.content) return null;
-  var rec2=mod2.content[p.id];
-  if(!rec2||!(rec2.meaningTr||rec2.importanceTr)) return null;
-  return {meaningTr:rec2.meaningTr||'',importanceTr:rec2.importanceTr||'',reflectionTr:rec2.reflectionTr||'',verseNoteTr:rec2.verseNoteTr||'',sourceLabel:sourceLabels(rec2.sourceRefs,mod2.sources).join(', ')};
-}
-// ZP-08.1: "çok daha gelişmiş bir arama" — Türkçe diyakritik-duyarsız normalize
-// (ör. "subhanallah" yazınca "Sübhanallah" bulunsun) + isim/Arapça/ebced'in
-// yanı sıra artık GERÇEK anlam metnini de tarayan çok alanlı arama (ör.
-// "merhamet" yazınca er-Rahmân/er-Rahîm bulunur).
-function zikrNormalizeSearchText(s){
-  return String(s||'').toLocaleLowerCase('tr-TR')
-    .replace(/[İIı]/g,'i').replace(/[üÜ]/g,'u').replace(/[öÖ]/g,'o')
-    .replace(/[çÇ]/g,'c').replace(/[şŞ]/g,'s').replace(/[ğĞ]/g,'g')
-    .replace(/[âÂ]/g,'a').replace(/[îÎ]/g,'i').replace(/[ûÛ]/g,'u');
-}
-function zikrPresetSearchText(x){
-  var c=zikrContentFor(x);
-  return zikrNormalizeSearchText([x.name,x.phrase,x.arabic,x.ebced||x.target,c&&c.meaningTr,c&&c.importanceTr].filter(Boolean).join(' '));
-}
+function zikrContentFor(p){ return window.SeymaZikr.zikrContentFor.apply(null,arguments); }
+function zikrNormalizeSearchText(s){ return window.SeymaZikr.zikrNormalizeSearchText.apply(null,arguments); }
+function zikrPresetSearchText(x){ return window.SeymaZikr.zikrPresetSearchText.apply(null,arguments); }
 // Uzun katalog için "niyet mercekleri": yeni/veri kopyalayan presetler
 // oluşturmak yerine mevcut 104 kaydı yakın anlam kümelerinde keşfettirir.
 var ZIKR_TOPIC_GROUPS=[
@@ -159,20 +129,9 @@ var ZIKR_TOPIC_GROUPS=[
   {id:'tevbe',label:'Af & Arınma',icon:'droplets',terms:['bagisla','affeden','tevbe','gunah','gafur','gaffar','afuv','estagfirullah']},
   {id:'sukur',label:'Şükür & Tesbih',icon:'flower-2',terms:['sukur','ovgu','tesbih','tenzih','yucelt','subhanallah','elhamdulillah','allahu ekber']}
 ];
-function zikrTopicGroup(id){
-  for(var i=0;i<ZIKR_TOPIC_GROUPS.length;i++) if(ZIKR_TOPIC_GROUPS[i].id===id) return ZIKR_TOPIC_GROUPS[i];
-  return ZIKR_TOPIC_GROUPS[0];
-}
-function zikrTopicMatch(x,topicId){
-  var group=zikrTopicGroup(topicId); if(group.id==='all') return true;
-  var text=zikrPresetSearchText(x);
-  for(var i=0;i<group.terms.length;i++) if(text.indexOf(zikrNormalizeSearchText(group.terms[i]))>=0) return true;
-  return false;
-}
-function zikrPresetTopicLabel(x){
-  for(var i=1;i<ZIKR_TOPIC_GROUPS.length;i++) if(zikrTopicMatch(x,ZIKR_TOPIC_GROUPS[i].id)) return ZIKR_TOPIC_GROUPS[i].label;
-  return x.kind==='esma'?'Esmâ-i Hüsnâ':'Temel zikir';
-}
+function zikrTopicGroup(id){ return window.SeymaZikr.zikrTopicGroup.apply(null,arguments); }
+function zikrTopicMatch(x,topicId){ return window.SeymaZikr.zikrTopicMatch.apply(null,arguments); }
+function zikrPresetTopicLabel(x){ return window.SeymaZikr.zikrPresetTopicLabel.apply(null,arguments); }
 // GEÇİCİ ÖNİZLEME (zikirmatik-iphone16-redesign branch'ine özel): redesign
 // ilerlemesini kullanıcı incelemesi için görünür kılmak amacıyla açık
 // bırakıldı. main'e merge/deploy ETMEDEN ÖNCE — ZP-19 kapanışında — bu satır
@@ -251,6 +210,42 @@ if(!window.SeymaZikr.registerZikr({
   noteDraftFor:zikrNoteDraftFor,
   manualDraftFor:zikrManualDraftFor
 })) throw new Error('MON-20: SeymaZikr registry kurulamadı');
+// MON2-06: zikr alan gövdeleri app/core/zikir.js registry'sindedir.
+if(!window.SeymaZikr||typeof window.SeymaZikr.registerZikrSurface!=='function') throw new Error('MON2-06: SeymaZikr yüzey kaydı kurulamadı');
+if(!window.SeymaZikr.registerZikrSurface({
+  App:function(){ return App; },
+  ZIKR_RING_RADIUS:function(){ return ZIKR_RING_RADIUS; },
+  ZIKR_TOPIC_GROUPS:function(){ return ZIKR_TOPIC_GROUPS; },
+  ZIKR_V2_VISIBLE:function(){ return ZIKR_V2_VISIBLE; },
+  _zikrBodyLocked:function(){ return _zikrBodyLocked; },
+  _zikrBodyPrevOverflow:function(){ return _zikrBodyPrevOverflow; },
+  _zikrCompleteFlash:function(){ return _zikrCompleteFlash; },
+  _zikrContentEsmaIdx:function(){ return _zikrContentEsmaIdx; },
+  a:function(){ return a; },
+  data:function(){ return data; },
+  dayIndexFor:function(){ return dayIndexFor; },
+  defer:function(){ return setTimeout; },
+  doc:function(){ return document; },
+  el:function(){ return el; },
+  esc:function(){ return esc; },
+  getDay:function(){ return getDay; },
+  haptic:function(){ return haptic; },
+  icon:function(){ return icon; },
+  input:function(){ return input; },
+  lastOverlayView:function(){ return lastOverlayView; },
+  reminderRestoreFocus:function(){ return reminderRestoreFocus; },
+  render:function(){ return render; },
+  save:function(){ return save; },
+  toast:function(){ return toast; },
+  todayStr:function(){ return todayStr; },
+  ui:function(){ return ui; },
+  zikrSyncWakeLock:function(){ return zikrSyncWakeLock; },
+  set__zikrBodyLocked:function(v){ _zikrBodyLocked=v; },
+  set__zikrBodyPrevOverflow:function(v){ _zikrBodyPrevOverflow=v; },
+  set__zikrCompleteFlash:function(v){ _zikrCompleteFlash=v; },
+  set__zikrContentEsmaIdx:function(v){ _zikrContentEsmaIdx=v; },
+  set_lastOverlayView:function(v){ lastOverlayView=v; },
+})) throw new Error('MON2-06: SeymaZikr yüzey kaydı kurulamadı');
 // MON-23: Saygı / Öncü / İman domain gövdeleri app/core/saygi.js registry'sindedir.
 // app.js yalnız canlı resolver bag'ini ve imza-koruyan delegeleri tutar; data
 // rebind'i, App handlerları ve sensör/DOM kabuğu burada kalır.
@@ -372,6 +367,44 @@ function quranApplyRemoteUpdates(delivery,responses){ return window.SeymaQuran.q
 function quranRandomVerseStart(){ return window.SeymaQuran.quranRandomVerseStart.apply(null,arguments); }
 if(!window.SeymaQuran||typeof window.SeymaQuran.registerQuran!=='function') throw new Error('MON-22: SeymaQuran registry kurulamadı');
 if(!window.SeymaQuran.registerQuran({data:function(){ return data; }})) throw new Error('MON-22: SeymaQuran registry kurulamadı');
+// MON2-06: quran alan gövdeleri app/core/quran.js registry'sindedir.
+if(!window.SeymaQuran||typeof window.SeymaQuran.registerQuranSurface!=='function') throw new Error('MON2-06: SeymaQuran yüzey kaydı kurulamadı');
+if(!window.SeymaQuran.registerQuranSurface({
+  App:function(){ return App; },
+  QURAN_BUCKETS:function(){ return QURAN_BUCKETS; },
+  QURAN_CONFIRM_TIMEOUT_MS:function(){ return QURAN_CONFIRM_TIMEOUT_MS; },
+  QURAN_FILTERS:function(){ return QURAN_FILTERS; },
+  QURAN_REFRESH_TIMEOUT_MS:function(){ return QURAN_REFRESH_TIMEOUT_MS; },
+  QURAN_ROW_STATES:function(){ return QURAN_ROW_STATES; },
+  QURAN_TOTAL_FALLBACK:function(){ return QURAN_TOTAL_FALLBACK; },
+  _quranBodyLocked:function(){ return _quranBodyLocked; },
+  _quranBodyPrevOverflow:function(){ return _quranBodyPrevOverflow; },
+  _quranYtRestartSurahId:function(){ return _quranYtRestartSurahId; },
+  data:function(){ return data; },
+  defer:function(){ return setTimeout; },
+  doc:function(){ return document; },
+  el:function(){ return el; },
+  esc:function(){ return esc; },
+  lastOverlayView:function(){ return lastOverlayView; },
+  quranAttachPlayer:function(){ return quranAttachPlayer; },
+  quranDetailActionsHTML:function(){ return quranDetailActionsHTML; },
+  quranDetailBodyHTML:function(){ return quranDetailBodyHTML; },
+  quranDetailViewHTML:function(){ return quranDetailViewHTML; },
+  quranHeadLeadHTML:function(){ return quranHeadLeadHTML; },
+  quranLibraryResultsHTML:function(){ return quranLibraryResultsHTML; },
+  quranLibraryViewHTML:function(){ return quranLibraryViewHTML; },
+  quranVideoNotesInnerHTML:function(){ return quranVideoNotesInnerHTML; },
+  render:function(){ return render; },
+  save:function(){ return save; },
+  sync:function(){ return window.SeySync||null; },
+  toast:function(){ return toast; },
+  ui:function(){ return ui; },
+  zikrNormalizeSearchText:function(){ return zikrNormalizeSearchText; },
+  set__quranBodyLocked:function(v){ _quranBodyLocked=v; },
+  set__quranBodyPrevOverflow:function(v){ _quranBodyPrevOverflow=v; },
+  set__quranYtRestartSurahId:function(v){ _quranYtRestartSurahId=v; },
+  set_lastOverlayView:function(v){ lastOverlayView=v; },
+})) throw new Error('MON2-06: SeymaQuran yüzey kaydı kurulamadı');
 // MON-23: Saygı / İman domain gövdeleri app/core/saygi.js registry'sindedir.
 // App handlerları, gerçek data rebind'i, prayer sensörleri ve ortak modal focus
 // altyapısı app.js'te kalır; bu bağ yalnızca canlı dependency bag'i verir.
@@ -689,6 +722,42 @@ if(!window.SeymaProfile||typeof window.SeymaProfile.registerProfile!=='function'
   icon:icon,
   esc:esc
 })) throw new Error('MON-36: SeymaProfile dependency bag kurulamadı');
+// MON2-06: profile alan gövdeleri app/core/profile.js registry'sindedir.
+if(!window.SeymaProfile||typeof window.SeymaProfile.registerProfileSurface!=='function') throw new Error('MON2-06: SeymaProfile yüzey kaydı kurulamadı');
+if(!window.SeymaProfile.registerProfileSurface({
+  App:function(){ return App; },
+  SEYMA_REMINDER_SURFACE:function(){ return SEYMA_REMINDER_SURFACE; },
+  a:function(){ return a; },
+  calcAge:function(){ return calcAge; },
+  data:function(){ return data; },
+  defer:function(){ return setTimeout; },
+  doc:function(){ return document; },
+  haptic:function(){ return haptic; },
+  icon:function(){ return icon; },
+  render:function(){ return render; },
+  save:function(){ return save; },
+  sync:function(){ return window.SeySync||null; },
+  ui:function(){ return ui; },
+
+})) throw new Error('MON2-06: SeymaProfile yüzey kaydı kurulamadı');
+// MON2-06: psych alan gövdeleri app/core/profile.js registry'sindedir.
+if(!window.SeymaProfile||typeof window.SeymaProfile.registerPsychSurface!=='function') throw new Error('MON2-06: SeymaProfile yüzey kaydı kurulamadı');
+if(!window.SeymaProfile.registerPsychSurface({
+  App:function(){ return App; },
+  PSYCH_SCALES:function(){ return PSYCH_SCALES; },
+  a:function(){ return a; },
+  confetti:function(){ return confetti; },
+  data:function(){ return data; },
+  defer:function(){ return setTimeout; },
+  doc:function(){ return document; },
+  esc:function(){ return esc; },
+  haptic:function(){ return haptic; },
+  icon:function(){ return icon; },
+  render:function(){ return render; },
+  save:function(){ return save; },
+  ui:function(){ return ui; },
+
+})) throw new Error('MON2-06: SeymaProfile yüzey kaydı kurulamadı');
 var PROFILE_CONSENT_VERSION=SEYMA_PROFILE.PROFILE_CONSENT_VERSION;
 var PROFILE_QUALITY_WEIGHTS=SEYMA_PROFILE.PROFILE_QUALITY_WEIGHTS;
 var PROFILE_CONSTRUCT_NARRATIVE=SEYMA_PROFILE.PROFILE_CONSTRUCT_NARRATIVE;
@@ -2923,246 +2992,14 @@ App.PROFILE_QUALITY_WEIGHTS=PROFILE_QUALITY_WEIGHTS;
 App.buildProfileReport=buildProfileReport;
 App.profileBand=profileBand;
 App.profileAssessmentContradictionNotes=profileAssessmentContradictionNotes;
-// ── Profil Değerlendirmesi: soru-cevap akışı App.* handler'ları (Faz 05) ──
-App.profileItemKeydown=function(e){
-  if(!data||!e) return;
-  var pa=data.profileAssessment; if(!pa||pa.status==='completed') return;
-  if(ui.profileAssessmentAnswerLocked) return;
-  var items=profileAssessmentItems();
-  var idx=profileItemDisplayIndex();
-  var item=items[idx]; if(!item) return;
-  var k=e.key;
-  if(k>='1'&&k<='7'){
-    var PA=window.ProfileAssessmentV1;
-    var scale=(PA&&PA.scales&&PA.scales[item.scaleId])||{options:[]};
-    var v=parseInt(k,10);
-    if(v>=1&&v<=(scale.options||[]).length){ if(e.preventDefault) e.preventDefault(); App.profileAnswer(item.id,v); }
-    return;
-  }
-  if(k==='ArrowLeft'){ if(e.preventDefault) e.preventDefault(); App.profilePrevious(); }
-};
-App.profilePrevious=function(){
-  if(!data) return;
-  var pa=data.profileAssessment; if(!pa) return;
-  if(ui.profileAssessmentAnswerLocked) return; // görsel geri bildirim penceresinde gezinme yok
-  var cur=pa.currentItemIndex;
-  if(cur<=0) return; // gidilecek önceki madde yok
-  ui.profileAssessmentReviewIndex=cur-1;
-  // render() yerine sadece #pa-gate'i değiştir (flash yok)
-  var oldGate=document.getElementById('pa-gate');
-  if(oldGate && oldGate.parentNode){
-    var tmp=document.createElement('div');
-    tmp.innerHTML=renderProfileAssessmentGate();
-    var newGate=tmp.firstChild;
-    if(newGate){ oldGate.parentNode.replaceChild(newGate, oldGate); try{ if(newGate.focus) newGate.focus(); }catch(e){} }
-    else render();
-  } else render();
-};
-// Tamamlanma ekranından ana uygulamaya dönüş (174/174 sonrası).
-App.dismissProfileCompletion=function(){
-  if(!data) return;
-  ui.profileAssessmentCompletionShown=false;
-  save();
-  render();
-};
-// ── Profil Değerlendirmesi: mola + acil yardım (Faz 06) — data.psych'ten tamamen ayrı ──
-App.profileBreakContinue=function(){
-  if(!data) return;
-  var pa=ensureProfileAssessment(data);
-  var brk=profileAssessmentPendingBreak(pa);
-  if(brk){
-    if(!pa.moduleProgress||typeof pa.moduleProgress!=='object') pa.moduleProgress={};
-    if(!pa.moduleProgress[brk.moduleId]||typeof pa.moduleProgress[brk.moduleId]!=='object') pa.moduleProgress[brk.moduleId]={};
-    pa.moduleProgress[brk.moduleId].breakAcknowledged=true;
-    pa.moduleProgress[brk.moduleId].breakAcknowledgedAt=new Date().toISOString();
-  }
-  save();
-  render();
-};
-App.profileAssessmentSOS=function(){ ui.profileAssessmentSOS=true; ui.profileAssessmentSosSent=false; render(); };
-App.profileAssessmentSOSClose=function(){ ui.profileAssessmentSOS=false; ui.profileAssessmentSosSent=false; render(); };
-App.profileAssessmentReachCreator=function(){
-  if(ui.profileAssessmentSosSent) return;
-  ui.profileAssessmentSosSent=true;
-  try{
-    if(window.SeySync){
-      var ts=new Date().toISOString(), qid='pasos_'+Date.now().toString(36);
-      var msg='[SOS — Şeyma yardım istedi] Şeyma "Zor hissediyorum" diyerek doğrudan sana ulaşmak istedi (profil değerlendirmesi ekranından SOS butonu). Lütfen en kısa sürede nazikçe yanında ol.';
-      if(typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:msg,ts:ts});
-    }
-    haptic([15,60,15]);
-  }catch(e){}
-  render();
-};
-function completeProfileAssessmentProvisional(pa){
-  // Faz 07: puanlama. Faz 08: kalite/güven. Faz 09: deterministik rapor metni — hepsi
-  // burada, tek finalizasyon noktasında sırayla üretilir.
-  if(!pa.completedAt) pa.completedAt=new Date().toISOString();
-  try{ pa.scores=scoreProfileAssessment(pa.responses); }catch(e){}
-  try{ pa.quality=scoreProfileAssessmentQuality(pa.responses); }catch(e){}
-  try{ pa.report=buildProfileReport(pa.scores,pa.quality); }catch(e){}
-  // Faz 10: panelSummary — panel.html'in göstereceği güvenli özet (ham cevap yok).
-  // Yalnızca tamamlanmış + panelSummarySharingAccepted ise panelde görünür (Faz 11).
-  try{ pa.panelSummary=buildProfilePanelSummary(pa); }catch(e){}
-}
-// Faz 10 — panel için güvenli özet (ham cevap/hassas madde YOK). Yalnızca boyut
-// özetleri, güven skoru ve kısa rapor. sync.js üzerinden seyma-data'ya yazılır.
-function buildProfilePanelSummary(pa){
-  if(!pa||pa.status!=='completed') return {};
-  var scores=pa.scores||{}, quality=pa.quality||{}, report=pa.report||{};
-  var C=scores.constructs||{};
-  // Big Five özetleri (sufficient olanlar)
-  var bigFiveSummary={};
-  ['conscientiousness','negative_emotionality','extraversion','agreeableness','open_mindedness'].forEach(function(c){
-    if(C[c]&&C[c].sufficient){ bigFiveSummary[c]={mean:C[c].mean,band:profileBand(C[c].mean)}; }
-  });
-  // RAISEC ilk üç
-  var riasecSummary={};
-  if(scores.riasec&&scores.riasec.topThree) riasecSummary.topThree=scores.riasec.topThree;
-  // Değer öncelikleri (ilk 3)
-  var valuesSummary={};
-  if(scores.values&&scores.values.centered){
-    var VALUE_LABELS={self_direction:'özerklik',stimulation:'uyarılma/çeşitlilik',achievement:'başarı',power_influence:'güç/etki',security:'güvenlik',tradition_conformity:'gelenek/uyum',benevolence:'iyilikseverlik',universalism:'evrensellik'};
-    var centered=scores.values.centered;
-    var top=Object.keys(centered).filter(function(k){return centered[k]!=null;}).sort(function(a,b){return centered[b]-centered[a];}).slice(0,3);
-    valuesSummary.topThree=top.map(function(k){return VALUE_LABELS[k]||k;});
-  }
-  // Bağlanma
-  var attachmentSummary={};
-  if(scores.attachment){
-    if(scores.attachment.anxiety&&scores.attachment.anxiety.sufficient) attachmentSummary.anxiety=scores.attachment.anxiety.mean;
-    if(scores.attachment.avoidance&&scores.attachment.avoidance.sufficient) attachmentSummary.avoidance=scores.attachment.avoidance.mean;
-  }
-  // Kısa rapor (rapordan karakter özeti bölümü)
-  var shortReport='';
-  if(report&&report.sections&&report.sections.characterSummary) shortReport=report.sections.characterSummary.body||'';
-  return {
-    generatedAt:pa.completedAt||new Date().toISOString(),
-    confidenceScore:quality.score!=null?quality.score:null,
-    confidenceCategory:quality.category||null,
-    bigFive:bigFiveSummary,
-    riasec:riasecSummary,
-    values:valuesSummary,
-    attachment:attachmentSummary,
-    shortReport:shortReport
-  };
-}
-App.profileAnswer=function(itemId,value){
-  if(!data) return;
-  var pa=ensureProfileAssessment(data);
-  if(pa.status==='completed') return;
-  if(ui.profileAssessmentAnswerLocked) return; // çift tıklama kilidi
-  var items=profileAssessmentItems();
-  var item=null; for(var i=0;i<items.length;i++){ if(items[i].id===itemId){ item=items[i]; break; } }
-  if(!item) return;
-  value=parseInt(value,10); if(isNaN(value)||value<1||value>7) return;
-  var PA=window.ProfileAssessmentV1;
-  var scale=(PA&&PA.scales&&PA.scales[item.scaleId])||null;
-  var maxV=(scale&&Array.isArray(scale.options)&&scale.options.length)?scale.options.length:7;
-  if(value<1||value>maxV) return;
-  var scoredValue=item.reverse?(maxV+1-value):value;
-  var now=new Date().toISOString();
-  var existing=pa.responses[itemId];
-  var shownAt=(ui.profileItemShownAt&&ui.profileItemShownAt[itemId])||(existing&&existing.shownAt)||now;
-  var revisionCount=existing?((existing.revisionCount||0)+1):0;
-  var sequence=existing?existing.sequence:(Object.keys(pa.responses).length+1);
-  pa.responses[itemId]={
-    value:value,
-    scoredValue:scoredValue,
-    shownAt:shownAt,
-    answeredAt:now,
-    responseMs:Math.max(0,(Date.parse(now)||0)-(Date.parse(shownAt)||0)),
-    revisionCount:revisionCount,
-    itemVersion:item.itemVersion||'1.0.0',
-    sessionId:item.sessionId||'SINGLE',
-    originalSessionId:item.originalSessionId,
-    sequence:sequence
-  };
-  ui.profileAssessmentAnswerLocked=true;
-  ui.profileAssessmentLockedItemId=itemId;
-  save();
-  // ── Flicker fix: render() yapmadan, doğrudan DOM'a dokunarak seçeneği işaretle.
-  // Eskiden burada render() vardı → tüm #app.innerHTML yeniden kuruluyordu → flash.
-  // Artık yalnızca tıklanan seçenek görsel olarak işaretleniyor, "Kaydedildi ✓"
-  // gösteriliyor, sonra 120ms sonra tek render ile sonraki soruya geçiliyor.
-  try{
-    var gate=document.getElementById('pa-gate');
-    if(gate){
-      var btns=gate.querySelectorAll('button[role="radio"]');
-      for(var bi=0; bi<btns.length; bi++){
-        var b=btns[bi];
-        b.disabled=true;
-        b.style.cursor='default';
-        var bOnclick=b.getAttribute('onclick')||'';
-        var bMatch=bOnclick.match(/profileAnswer\('([^']+)',(\d+)\)/);
-        var isClicked = bMatch && bMatch[1]===itemId && Number(bMatch[2])===value;
-        if(isClicked){
-          b.style.background='color-mix(in srgb,#C9B8FF 14%, var(--card))';
-          b.style.border='1px solid #C9B8FF';
-          var dot=b.querySelector('span');
-          if(dot){ dot.style.background='linear-gradient(135deg,#E9899F,#C9B8FF)'; dot.style.border='none'; dot.innerHTML=icon('check',13); }
-        }
-      }
-      // "Kaydedildi ✓" göstergesi — scroll alanı içindeki durumu güncelle
-      var scrollEl=gate.querySelector('[data-scroll]');
-      if(scrollEl){
-        var divs=scrollEl.children;
-        for(var di=0; di<divs.length; di++){
-          if(divs[di].textContent && divs[di].textContent.indexOf('Kaydedildi')>=0){
-            divs[di].textContent='Kaydedildi ✓';
-          }
-        }
-      }
-    }
-  }catch(e){}
-  // 120ms sonra sonraki soruya geç — render() YAPMA, sadece #pa-gate içeriğini
-  // değiştir (tam render tüm #app.innerHTML'i yeniden kurar = flash/parlama).
-  setTimeout(function(){
-    ui.profileAssessmentAnswerLocked=false;
-    ui.profileAssessmentLockedItemId=null;
-    ui.profileAssessmentReviewIndex=null; // gözden geçirme bittiyse normal akışa dön
-    var pa2=ensureProfileAssessment(data); // responses'tan currentItemIndex/status'u yeniden hesapla
-    var isJustCompleted=false;
-    if(pa2.status==='completed'&&!pa2.completedAt){ completeProfileAssessmentProvisional(pa2); ui.profileAssessmentCompletionShown=true; isJustCompleted=true; }
-    save();
-    if(isJustCompleted){
-      // 174/174 sonrası teşekkür/tamamlanma ekranını göster; puanlama/rapor zaten üretildi.
-      if(pa2.status==='completed' && window.SeySync && typeof window.SeySync.pushNow==='function'){
-        try{ window.SeySync.pushNow(); }catch(e){}
-      }
-      // Tamamlanma bildirimi: seyma-data'daki mail workflow'unu tetikleyen küçük, ayrı
-      // tetik dosyası (bkz. sync.js → pushProfileCompletionPing). Yalnızca bu geçişte,
-      // bir kez yazılır.
-      if(pa2.status==='completed' && window.SeySync && typeof window.SeySync.pushProfileCompletionPing==='function'){
-        try{ window.SeySync.pushProfileCompletionPing(); }catch(e){}
-      }
-      render();
-    } else {
-      // Soru kartını değiştir — render() ve app.innerHTML YAPMA (flash yok).
-      // renderProfileAssessmentGate() bir #pa-gate div'i döndürür.
-      // Mevcut #pa-gate'i outerHTML ile değiştir — #app'in geri kalanı
-      // (tema, modallar) dokunulmaz, böylece flash/parlama olmaz.
-      var oldGate=document.getElementById('pa-gate');
-      if(oldGate && oldGate.parentNode){
-        var newHTML=renderProfileAssessmentGate();
-        // renderProfileAssessmentGate bir <div id="pa-gate" ...> döndürür.
-        // outerHTML değiştirmek için bir wrapper oluştur, yeni HTML'i parse et,
-        // sonra replaceChild ile değiştir.
-        var tmp=document.createElement('div');
-        tmp.innerHTML=newHTML;
-        var newGate=tmp.firstChild;
-        if(newGate){
-          oldGate.parentNode.replaceChild(newGate, oldGate);
-          try{ if(newGate.focus) newGate.focus(); }catch(e){}
-        } else {
-          render();
-        }
-      } else {
-        render();
-      }
-    }
-  },120);
-};
+App.profileItemKeydown=function(e){ return window.SeymaProfile.profileItemKeydown.apply(null,arguments); };
+App.profilePrevious=function(){ return window.SeymaProfile.profilePrevious.apply(null,arguments); };
+App.dismissProfileCompletion=function(){ return window.SeymaProfile.dismissProfileCompletion.apply(null,arguments); };
+App.profileBreakContinue=function(){ return window.SeymaProfile.profileBreakContinue.apply(null,arguments); };
+App.profileAssessmentSOS=function(){ return window.SeymaProfile.profileAssessmentSOS.apply(null,arguments); };
+App.profileAssessmentSOSClose=function(){ return window.SeymaProfile.profileAssessmentSOSClose.apply(null,arguments); };
+App.profileAssessmentReachCreator=function(){ return window.SeymaProfile.profileAssessmentReachCreator.apply(null,arguments); };
+App.profileAnswer=function(itemId,value){ return window.SeymaProfile.profileAnswer.apply(null,arguments); };
 
 function createDefaultData(){ return window.SeymaState.createDefaultData.apply(null,arguments); }
 App.start=function(){ return SEYMA_APP_SURFACE.start.apply(null,arguments); };
@@ -3578,7 +3415,7 @@ App.setReminderSameCategoryCooldown=function(minutes){ minutes=Number(minutes); 
 App.setReminderCareNativeCategories=function(){ return SEYMA_REMINDER_SURFACE.setReminderCareNativeCategories.apply(null,arguments); };
 App.toggleReminderCareNative=function(){ return SEYMA_REMINDER_SURFACE.toggleReminderCareNative.apply(null,arguments); };
 App.setReminderCareMovementOptIn=function(flag){ updateReminderPolicy(function(policy){ policy.careMovementOptIn=flag===true; }); };
-App.setReminderProfile=function(){ return SEYMA_REMINDER_SURFACE.setReminderProfile.apply(null,arguments); };
+App.setReminderProfile=function(){ return window.SeymaProfile.setReminderProfile.apply(null,arguments); };
 App.toggleReminderSetupCategory=function(){ return SEYMA_REMINDER_SURFACE.toggleReminderSetupCategory.apply(null,arguments); };
 App.confirmReminderSetup=function(){ return SEYMA_REMINDER_SURFACE.confirmReminderSetup.apply(null,arguments); };
 App.setReminderCategoryEnabled=function(){ return SEYMA_REMINDER_SURFACE.setReminderCategoryEnabled.apply(null,arguments); };
@@ -3651,40 +3488,10 @@ App.handleReminderClick=App.handleReminderNativeClick;
 App.reminderInboxPrimary=function(){ return SEYMA_REMINDER_SURFACE.reminderInboxPrimary.apply(null,arguments); };
 App.reminderInboxEveningTarget=function(){ return SEYMA_REMINDER_SURFACE.reminderInboxEveningTarget.apply(null,arguments); };
 App.reminderInboxOverflow=function(){ return SEYMA_REMINDER_SURFACE.reminderInboxOverflow.apply(null,arguments); };
-// ── Profil Değerlendirmesi: bilgilendirme + rıza (Faz 04) — data.psych'ten ayrı ──
-// Faz 05'ten itibaren render() zaten `pa.status!=='completed'`ye göre bu ekranı
-// (veya soru ekranını) OTOMATİK gösterir — bu fonksiyon yalnızca açıkça/programatik
-// tetiklemek için bırakıldı, artık bir ui-bayrağı SET ETMİYOR.
-App.profileConsentOpen=function(){
-  if(!data) return;
-  ensureProfileAssessment(data);
-  render();
-};
-App.profileConsentToggle=function(key){
-  var c=profileConsentChecks();
-  if(!(key in c)) return;
-  c[key]=!c[key];
-  render();
-};
-App.profileConsentTogglePrivacyNote=function(){ ui.profileConsentPrivacyNote=!ui.profileConsentPrivacyNote; render(); };
-App.profileAcceptConsent=function(){
-  if(!data) return;
-  var pa=ensureProfileAssessment(data);
-  var c=profileConsentChecks();
-  if(!profileConsentMandatoryOk(c)) return; // zorunlu onaylardan biri eksik — geçme
-  var now=new Date().toISOString();
-  if(!pa.consent.informationShownAt) pa.consent.informationShownAt=now;
-  pa.consent.acceptedAt=now;
-  pa.consent.version=PROFILE_CONSENT_VERSION;
-  pa.consent.profileProcessingAccepted=true;
-  pa.consent.sensitiveDataAccepted=true;
-  // Ayrı bir "panelde göster" tiki kaldırıldı (kullanıcı isteği, 2026-07-12) — data.psych'te
-  // olduğu gibi, tamamlanan profil özeti otomatik olarak panelde gösterilir.
-  pa.consent.panelSummarySharingAccepted=true;
-  if(pa.status==='not_started') pa.status='active';
-  save();
-  render();
-};
+App.profileConsentOpen=function(){ return window.SeymaProfile.profileConsentOpen.apply(null,arguments); };
+App.profileConsentToggle=function(key){ return window.SeymaProfile.profileConsentToggle.apply(null,arguments); };
+App.profileConsentTogglePrivacyNote=function(){ return window.SeymaProfile.profileConsentTogglePrivacyNote.apply(null,arguments); };
+App.profileAcceptConsent=function(){ return window.SeymaProfile.profileAcceptConsent.apply(null,arguments); };
 App.refreshSaygi=function(){ var person=saygiModalPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
 App.openSaygiReading=function(){ App.openReading(); };
 App.openSaygiPreview=function(){
@@ -4041,25 +3848,6 @@ function zikrSyncWakeLock(){
 }
 var _zikrCompleteFlash=false;
 var ZIKR_RING_RADIUS=108;
-function zikrPaintLive(result){
-  try{
-    var math=result&&result.math, p=result&&result.preset; if(!math||!p) return false;
-    var countEl=document.getElementById('zikr-live-count'), sub=document.getElementById('zikr-live-sub'), kicker=document.getElementById('zikr-live-kicker'), cycle=document.getElementById('zikr-live-cycle'), total=document.getElementById('zikr-live-hatim'), today=document.getElementById('zikr-live-today'), todaySub=document.getElementById('zikr-live-today-sub'), cycleSub=document.getElementById('zikr-live-cycle-sub'), totalSub=document.getElementById('zikr-live-hatim-sub'), sessionEl=document.getElementById('zikr-live-session'), ring=document.getElementById('zikr-live-ring');
-    if(!countEl||!sub||!cycle||!total||!today) return false;
-    countEl.textContent=p.kind==='esma'?math.remainingInCycle:math.cyclePosition;
-    sub.textContent=p.kind==='esma'?'kaldı':'/ '+math.baseTarget;
-    if(kicker) kicker.textContent=math.currentCycleNo+'. TUR · '+math.cyclePosition+' SAYILDI';
-    cycle.textContent=math.complete?(math.baseTarget+' tur tamam'):(math.currentCycleNo+'. tur · '+math.cyclePosition+'/'+math.baseTarget);
-    total.textContent=p.kind==='esma'?(math.count.toLocaleString('tr-TR')+' / '+math.hatimTarget.toLocaleString('tr-TR')):(result.journey.lifetimeCount.toLocaleString('tr-TR')+' ömürlük');
-    today.textContent=zikrInt(result.count).toLocaleString('tr-TR');
-    if(todaySub) todaySub.textContent=zikrInt(result.total).toLocaleString('tr-TR')+' toplam';
-    if(cycleSub) cycleSub.textContent=math.complete?'Yeni hatme hazırsın':math.remainingInCycle+' kaldı';
-    if(totalSub) totalSub.textContent=p.kind==='esma'?(math.remainingInHatim.toLocaleString('tr-TR')+' kaldı'):(Math.floor(result.journey.lifetimeCount/math.baseTarget)+' tur');
-    if(sessionEl){ var active=ensureZikrRoot().activeSession; sessionEl.textContent=(active&&active.presetId===p.id?zikrInt(active.count):0).toLocaleString('tr-TR'); }
-    if(ring){ var C=2*Math.PI*ZIKR_RING_RADIUS, pct=math.baseTarget?math.cyclePosition/math.baseTarget:0; if(math.complete) pct=1; ring.style.strokeDashoffset=(C*(1-pct)).toFixed(1); }
-    return true;
-  }catch(e){ return false; }
-}
 // ZP-03: saf matematik fonksiyonları doğrudan test edilebilir olsun diye App
 // üzerinden de erişilebilir kılınır (App.scoreProfileAssessmentQuality'deki
 // "pure functions exposed on App.* purely for direct testability" deseniyle
@@ -4074,141 +3862,14 @@ App.zikrSessionState=zikrSessionState; // ZP-05: durum makinesi doğrudan test e
 // arkasında yine de rubber-band scroll sızabiliyor; bu, önceki değeri
 // koruyup açılışta kilitleyen/kapanışta geri yükleyen açık bir kilit.
 var _zikrBodyLocked=false, _zikrBodyPrevOverflow='';
-function zikrLockBodyScroll(){
-  if(_zikrBodyLocked||typeof document==='undefined'||!document.body) return;
-  _zikrBodyPrevOverflow=document.body.style.overflow||'';
-  document.body.style.overflow='hidden';
-  _zikrBodyLocked=true;
-}
-function zikrUnlockBodyScroll(){
-  if(!_zikrBodyLocked||typeof document==='undefined'||!document.body) return;
-  document.body.style.overflow=_zikrBodyPrevOverflow;
-  _zikrBodyLocked=false;
-}
-App.openZikr=function(){ if(!ZIKR_V2_VISIBLE){ ui.zikrOpen=false; toast('Zikirmatik yenileniyor; çok yakında daha iyi haliyle dönecek.'); return; } ui.zikrOpen=true; ui.zikrView=ui.zikrView||'counter'; _zikrCompleteFlash=false; render(); zikrSyncWakeLock(); zikrLockBodyScroll(); try{ var shell=document.getElementById('zikr-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){} };
-App.closeZikr=function(){
-  var body=function(){
-    var targetFocusId=ui.reminderTargetReturnFocusId; zikrPauseSession(); ui.zikrOpen=false; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId=''; zikrSyncWakeLock(); zikrUnlockBodyScroll(); save(); _zikrCompleteFlash=false; ui.reminderTargetReturnFocusId=''; render();
-    // ZP-07 rule 5: odak, açılışta tetikleyen elemana (bilinen giriş noktası:
-    // Saygı hub'ındaki Zikirmatik önizleme kartı) döner. render() tüm #app
-    // innerHTML'ini yeniden ürettiğinden eski DOM referansı tutulamaz; bu
-    // yüzden kapalıktan sonra kararlı id ile yeniden sorgulanır.
-    if(!reminderRestoreFocus(targetFocusId,'zikr-preview-card')){ try{ var trigger=document.getElementById('zikr-preview-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){} }
-  };
-  if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('zikr-screen','zikr-overlay',body); else body();
-};
-App.setZikrView=function(v){
-  var allowed={counter:1,presets:1,hatims:1,history:1,settings:1};
-  if(!allowed[v]||ui.zikrView===v) return;
-  ui.zikrView=v;
-  // Zikirmatik kendi tam ekran kabuğuna sahip. İç sekme değişiminde global
-  // render() bütün #app'i ve overlay'i yeniden kurarak görünür bir parlama,
-  // scroll sıçraması ve gereksiz iş üretiyordu. Kabuğu yerinde tutup yalnız
-  // tab durumu + ana içerik alanını boyuyoruz; headless/eski DOM ortamlarında
-  // güvenli biçimde tam render'a düşer.
-  if(!zikrPaintView(v)) render();
-};
-App.toggleZikrDetail=function(){ ui.zikrDetailOpen=!ui.zikrDetailOpen; if(!zikrPaintDetail()) if(!zikrPaintView('counter',true)) render(); };
-App.onZikrKeydown=function(e){
-  return App.onModalKeydown(e,App.closeZikr);
-};
-App.zikrTap=function(){
-  var r=zikrTouchTick(); if(!r) return;
-  if(r.paused){ toast('Sayaç duraklatıldı · devam etmek için Sürdür’e dokun.'); return; }
-  if(r.hatimComplete){ toast('Bu Ebced² Tam Hatim tamamlandı. Hatimlerim’den yeni bir hatim başlatabilirsin.',2800); return; }
-  ui.zikrLastReset=null; ui.zikrActionNote=''; zikrPaintActionNote();
-  zikrTickSound();
-  // FX-P-55: oturumun ilk dokunuşunda nazik başlangıç ipucu (oturum başına 1).
-  try{
-    if(r.sessionStarted && window.SeyAudio && typeof window.SeyAudio.guides==='object' && window.SeyAudio.guides && typeof window.SeyAudio.guides.zikirStart==='function') window.SeyAudio.guides.zikirStart();
-  }catch(e){}
-  if(ensureZikrRoot().settings.haptic){ try{ haptic([8]); }catch(e){} }
-  var spark=false;
-  if(r.doneNow){
-    spark=true;
-    _zikrCompleteFlash=true;
-    if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell();
-    if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak();
-    if(ensureZikrRoot().settings.haptic){ try{ haptic([10,40,10]); }catch(e){} }
-    if(r.hatimDone) toast('Mâşallah · '+r.preset.name+' Ebced² Tam Hatmi tamamlandı.',3200);
-    else toast('Mâşallah · '+r.math.completedCycles+'. tur tamamlandı ('+r.target+')',2300);
-    // FX-P-52: zikir hedefi tamamlandığında kısa nazik sesli ipucu — günde en
-    // fazla 1 kez (settings.voiceZikrDate damgası). FX-P-55: kopya artık
-    // SeyAudio.guides.zikirComplete üzerinden gider (tek kaynak). Quiet-time ve
-    // voiceGuidance gating'i SeyAudio.voice içinde.
-    try{
-      if(data&&data.settings&&data.settings.voiceZikrDate!==todayStr()){
-        data.settings.voiceZikrDate=todayStr();
-        if(window.SeyAudio&&typeof window.SeyAudio.guides==='object'&&window.SeyAudio.guides&&typeof window.SeyAudio.guides.zikirComplete==='function') window.SeyAudio.guides.zikirComplete();
-        else if(window.SeyAudio&&typeof window.SeyAudio.voice==='function') window.SeyAudio.voice('Allah kabul etsin. Güzel bir mola vermek ister misin?', { lang:'tr-TR', rate:1 });
-        save(false);
-      }
-    }catch(e){}
-    // Esmâ'da bir ebced turu, Ebced² tam hatmin yalnızca bir parçasıdır;
-    // 489. sayımda başka isme geçmek Fettâh yolculuğunu böler. Otomatik
-    // ilerleme yalnız normal/core preset turlarında çalışır.
-    if(ensureZikrRoot().settings.autoAdvance&&!r.hatimDone&&r.preset.kind!=='esma'){
-      var z=ensureZikrRoot();
-      var idx=0; for(var i=0;i<z.presets.length;i++){ if(z.presets[i].id===r.preset.id){ idx=i; break; } }
-      var next=z.presets[idx+1]||z.presets[0];
-      z.settings.activePresetId=next.id;
-      setTimeout(function(){ toast('Sıradaki: '+next.name+' ('+next.target+')',2000); },900);
-    }
-  }
-  save();
-  if(!zikrPaintLive(r)) render();
-  zikrPaintPauseButton();
-  // FX-P-55: tur ortası (yarı hedefe geçiş) kısa nefes ipucu — oturum başına
-  // bir kez (ui._voiceZikirHalfGiven oturum-level bayrağı). doneNow ile çakışmaz.
-  try{
-    if(r.halfNow && !ui._voiceZikirHalfGiven){
-      ui._voiceZikirHalfGiven=true;
-      if(window.SeyAudio && window.SeyAudio.guides && typeof window.SeyAudio.guides.zikirHalf==='function') window.SeyAudio.guides.zikirHalf();
-    }
-  }catch(e){}
-  if(spark){
-    try{ var sparkEl=document.querySelector('.zikr-done-spark'); if(sparkEl&&sparkEl.classList) sparkEl.classList.add('on'); }catch(e){}
-    setTimeout(function(){ _zikrCompleteFlash=false; try{ var el=document.querySelector('.zikr-done-spark'); if(el&&el.classList) el.classList.remove('on'); }catch(e){} },1200);
-  }
-};
-App.zikrUndo=function(){
-  var date=todayStr(), day=zikrDay(date), p=zikrActivePreset(); if(!p) return;
-  var reset=ui.zikrLastReset;
-  if(reset&&reset.date===date&&reset.presetId===p.id&&reset.root){
-    data.zikr=JSON.parse(JSON.stringify(reset.root));
-    var restoredDay=getDay(data,date,dayIndexFor(date));
-    if(reset.dayMirror) restoredDay.zikr=JSON.parse(JSON.stringify(reset.dayMirror)); else delete restoredDay.zikr;
-    ui.zikrLastReset=null; ui.zikrActionNote='Sıfırlama geri alındı · '+zikrInt(reset.amount).toLocaleString('tr-TR')+' sayım geri yüklendi.';
-    save();
-    var rp=zikrActivePreset(), rd=zikrDay(date), rpd=zikrPresetDay(rd,rp.id), rjp=zikrJourneyProgress(rp);
-    if(!zikrPaintLive({preset:rp,count:rpd.count,total:rd.totalCount,math:rjp.math,journey:rjp.journey,hatim:rjp.hatim})) if(!zikrPaintView('counter',true)) render();
-    zikrPaintPauseButton(); zikrPaintResetConfirm(); zikrPaintActionNote();
-    toast('Sıfırlama geri alındı.');
-    return;
-  }
-  var pd=zikrPresetDay(day,p.id);
-  if(pd.count<=0){
-    ui.zikrActionNote='Geri alınacak yeni bir sayım yok.';
-    zikrPaintActionNote();
-    toast(ui.zikrActionNote);
-    return;
-  }
-  var jp=zikrJourneyProgress(p), j=jp.journey, h=jp.hatim, before=jp.math, now=new Date().toISOString();
-  if(p.kind==='esma'&&h&&h.count>0){
-    if(h.status==='completed'){ h.status='active'; h.completedAt=null; j.completedHatims=Math.max(0,j.completedHatims-1); }
-    h.count--; h.lastAt=now;
-  }
-  j.lifetimeCount=Math.max(0,j.lifetimeCount-1); j.lastAt=now;
-  pd.count--; pd.lastAt=now; day.totalCount=Math.max(0,day.totalCount-1); day.lastAt=now;
-  var after=zikrMath(p,p.kind==='esma'&&h?h.count:j.lifetimeCount);
-  if(after.completedCycles<before.completedCycles){ pd.completedCycles=Math.max(0,pd.completedCycles-1); day.completedSets=Math.max(0,day.completedSets-1); }
-  var z=ensureZikrRoot(); if(z.activeSession&&z.activeSession.presetId===p.id) z.activeSession.count=Math.max(0,zikrInt(z.activeSession.count)-1);
-  syncZikrDayMirror(date,day);
-  ui.zikrActionNote='Son sayım geri alındı · bugün '+pd.count.toLocaleString('tr-TR')+'.';
-  save();
-  if(!zikrPaintLive({preset:p,count:pd.count,total:day.totalCount,math:after,journey:j,hatim:h})) if(!zikrPaintView('counter',true)) render();
-  zikrPaintActionNote();
-};
+function zikrUnlockBodyScroll(){ return window.SeymaZikr.zikrUnlockBodyScroll.apply(null,arguments); }
+App.openZikr=function(){ return window.SeymaZikr.openZikr.apply(null,arguments); };
+App.closeZikr=function(){ return window.SeymaZikr.closeZikr.apply(null,arguments); };
+App.setZikrView=function(v){ return window.SeymaZikr.setZikrView.apply(null,arguments); };
+App.toggleZikrDetail=function(){ return window.SeymaZikr.toggleZikrDetail.apply(null,arguments); };
+App.onZikrKeydown=function(e){ return window.SeymaZikr.onZikrKeydown.apply(null,arguments); };
+App.zikrTap=function(){ return window.SeymaZikr.zikrTap.apply(null,arguments); };
+App.zikrUndo=function(){ return window.SeymaZikr.zikrUndo.apply(null,arguments); };
 App.setZikrPreset=function(id){ var z=ensureZikrRoot(), found=false; for(var i=0;i<z.presets.length;i++) if(z.presets[i].id===id){ found=true; break; } if(!found) return; zikrPauseSession(); z.settings.activePresetId=id; ui.zikrView='counter'; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; ui.zikrLastReset=null; ui.zikrActionNote=''; ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId=''; ui.zikrNotePresetId=''; ui.zikrNoteDraft=null; ui.zikrNoteStatus=''; save(); if(!zikrPaintView('counter')) render(); };
 
 // ── ZP-10 · Manuel zikir: çekirdek uygulama/geri alma ──
@@ -4217,135 +3878,23 @@ App.setZikrPreset=function(id){ var z=ensureZikrRoot(), found=false; for(var i=0
 // Atomik: tek çağrıda journey+hatim+gün+streak güncellenir, sonra save().
 App.zikrManualActive=zikrManualActive;
 App.zikrManualApply=function(presetId,amount,date,note){ return zikrManualApply(presetId,amount,date,note); };
-App.setZikrPresetFilter=function(el){
-  ui.zikrPresetFilter=String(el&&el.value||'');
-  if(!zikrPaintLibraryResults()) render();
-  try{ var clear=document.getElementById('zikr-search-clear'); if(clear) clear.hidden=!ui.zikrPresetFilter; }catch(e){}
-};
-App.clearZikrPresetFilter=function(){
-  ui.zikrPresetFilter='';
-  if(!zikrPaintLibraryResults()) render();
-  try{ var el=document.getElementById('zikr-search-input'), clear=document.getElementById('zikr-search-clear'); if(el){ el.value=''; if(el.focus) el.focus(); } if(clear) clear.hidden=true; }catch(e){}
-};
-App.setZikrLibFilter=function(mode){ ui.zikrLibFilter=(mode==='active'||mode==='done'||mode==='fav')?mode:'all'; if(!zikrPaintLibraryResults()) render(); };
-App.setZikrTopic=function(topic){ ui.zikrTopic=zikrTopicGroup(topic).id; if(!zikrPaintLibraryResults()) render(); };
-App.toggleZikrFilters=function(){
-  ui.zikrFiltersOpen=!ui.zikrFiltersOpen;
-  try{
-    var shell=document.querySelector('.zikr-v2-filter-expander'), panel=document.getElementById('zikr-filter-panel'), button=shell&&shell.querySelector('.zikr-v2-filter-summary');
-    if(!shell||!panel||!button) throw new Error('filter expander unavailable');
-    shell.classList.toggle('is-open',ui.zikrFiltersOpen);
-    panel.hidden=!ui.zikrFiltersOpen;
-    button.setAttribute('aria-expanded',ui.zikrFiltersOpen?'true':'false');
-  }catch(e){ if(!zikrPaintLibraryResults()) render(); }
-};
-App.toggleZikrNote=function(){
-  ui.zikrNoteOpen=!ui.zikrNoteOpen;
-  if(!zikrPaintNoteRegion()) if(!zikrPaintView('counter',true)) render();
-};
-App.onZikrNoteField=function(field,el){
-  if(field!=='feelings'&&field!=='thoughts'&&field!=='intention') return;
-  var p=zikrActivePreset(), d=zikrNoteDraftFor(p);
-  d[field]=String(el&&el.value||'').slice(0,field==='thoughts'?3000:(field==='feelings'?2000:1000));
-  ui.zikrNoteStatus='';
-  try{
-    var count=document.getElementById('zikr-note-count'), status=document.getElementById('zikr-note-status');
-    if(count) count.textContent=zikrReflectionWordCount(d)+' kelime';
-    if(status){ status.hidden=true; status.textContent=''; }
-  }catch(e){}
-};
-App.setZikrNoteMood=function(mood){
-  var allowed={'huzurlu':1,'şükür':1,'umutlu':1,'dalgın':1,'yorgun':1,'zorlanıyorum':1};
-  if(!allowed[mood]) return;
-  var d=zikrNoteDraftFor(zikrActivePreset()); d.mood=d.mood===mood?'':mood; ui.zikrNoteStatus='';
-  if(!zikrPaintNoteRegion()) if(!zikrPaintView('counter',true)) render();
-};
-App.saveZikrNote=function(){
-  var p=zikrActivePreset(), d=zikrNoteDraftFor(p);
-  d.feelings=String(d.feelings||'').trim(); d.thoughts=String(d.thoughts||'').trim(); d.intention=String(d.intention||'').trim();
-  if(!d.mood&&!d.feelings&&!d.thoughts&&!d.intention){ ui.zikrNoteStatus='Kaydetmek için en az bir duygu veya cümle ekle.'; zikrPaintNoteRegion(); return; }
-  var z=ensureZikrRoot(), date=todayStr(), id=zikrReflectionId(date,p.id), now=new Date().toISOString(), rec=zikrReflection(date,p.id);
-  if(!rec){
-    rec={id:id,date:date,presetId:p.id,presetName:p.name,mood:'',feelings:'',thoughts:'',intention:'',wordCount:0,createdAt:now,updatedAt:now};
-    z.reflections.push(rec);
-  }
-  rec.presetName=p.name; rec.mood=d.mood; rec.feelings=d.feelings; rec.thoughts=d.thoughts; rec.intention=d.intention;
-  rec.wordCount=zikrReflectionWordCount(d); rec.updatedAt=now; if(!rec.createdAt) rec.createdAt=now;
-  var dayRec=getDay(data,date,dayIndexFor(date)); dayRec.zikrReflectionUpdatedAt=now;
-  z.reflections.sort(function(a,b){ return (b.updatedAt||b.createdAt).localeCompare(a.updatedAt||a.createdAt); });
-  ui.zikrNoteStatus='Kaydedildi · '+p.name+' · '+rec.wordCount+' kelime';
-  save();
-  if(!zikrPaintNoteRegion()) if(!zikrPaintView('counter',true)) render();
-  toast('Tefekkür günlüğüne kaydedildi.');
-};
-// ── ZP-10 · Manuel zikir UI handler'ları ──
-App.toggleZikrManual=function(){
-  ui.zikrManualOpen=!ui.zikrManualOpen;
-  if(ui.zikrManualOpen){ ui.zikrManualDraft=null; ui.zikrManualPresetId=''; }
-  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
-  if(ui.zikrManualOpen){
-    try{ var input=document.getElementById('zikr-manual-amount'); if(input&&input.focus) input.focus(); }catch(e){}
-  }
-};
-App.onZikrManualAmount=function(el){
-  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
-  var raw=String(el&&el.value||'').replace(/[^0-9]/g,'').slice(0,7);
-  d.amount=raw; el.value=raw;
-  try{ var prev=document.getElementById('zikr-manual-preview'); if(prev) prev.innerHTML=zikrManualPreviewHTML(p,d); }catch(e){}
-  try{ var save=document.querySelector('#zikr-manual-sheet .primary'); if(save) save.disabled=zikrManualAmountOf(d)<=0; }catch(e){}
-};
-App.onZikrManualNote=function(el){
-  var d=zikrManualDraftFor(zikrActivePreset());
-  d.note=String(el&&el.value||'').slice(0,200);
-};
-App.zikrManualStep=function(dir){
-  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
-  var n=zikrManualAmountOf(d)+dir*10;
-  if(n<0) n=0; if(n>ZIKR_MANUAL_MAX) n=ZIKR_MANUAL_MAX;
-  d.amount=String(n);
-  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
-};
-App.zikrManualChip=function(v){
-  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
-  var n=zikrInt(parseInt(v,10)); if(n<=0) return;
-  d.amount=String(n);
-  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
-};
-App.saveZikrManual=function(){
-  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
-  var amount=zikrManualAmountOf(d);
-  if(amount<=0){ toast('Önce bir miktar yaz.'); return; }
-  var r=zikrManualApply(p.id,amount,todayStr(),d.note);
-  if(!r){ toast('Bu miktar eklenemedi. Hatim tamamlanmış ya da sınır aşılı olabilir.'); return; }
-  ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId='';
-  ui.zikrActionNote='Elle eklendi · '+r.applied.toLocaleString('tr-TR')+' '+p.name+' sayımı işlendi. Geri al ile kurtarabilirsin.';
-  if(r.cyclesGained>0&&window.SeyAudio&&typeof window.SeyAudio.bell==='function'){ try{ window.SeyAudio.bell(); }catch(e){} }
-  var paintOK=zikrPaintView('counter',true);
-  if(!paintOK) render(); else zikrPaintActionNote();
-  toast('Mâşallah · '+r.applied.toLocaleString('tr-TR')+' zikir sayıma eklendi.');
-};
-App.undoZikrManual=function(entryId){
-  var r=zikrManualUndoEntry(entryId);
-  if(!r){ toast('Bu kayıt geri alınamadı.'); return; }
-  ui.zikrActionNote='Elle eklenen '+zikrInt(r.entry.amount).toLocaleString('tr-TR')+' sayım geri alındı.';
-  if(!zikrPaintView('history',true)&&!zikrPaintView('counter',true)) render();
-  zikrPaintActionNote();
-  toast('Elle eklenen sayım geri alındı.');
-};
-App.toggleZikrSetting=function(k){
-  var allowed={soundOn:'Ses',haptic:'Titreşim',focusMode:'Odak modu',breathGuide:'Nefes ritmi',reducedMotion:'Hareketi azalt',keepAwake:'Ekranı uyanık tut',autoAdvance:'Otomatik sıradaki zikir'};
-  if(!allowed[k]) return;
-  var z=ensureZikrRoot(); z.settings[k]=!z.settings[k];
-  ui.zikrSettingsNote=allowed[k]+' '+(z.settings[k]?'açıldı':'kapatıldı')+'.';
-  save();
-  if(k==='soundOn'&&z.settings[k]) zikrTickSound();
-  if(k==='haptic'&&z.settings[k]){ try{ haptic([12]); }catch(e){} }
-  if(k==='keepAwake') zikrSyncWakeLock();
-  if(k==='reducedMotion'){
-    try{ var overlay=document.getElementById('zikr-overlay'); if(overlay&&overlay.classList) overlay.classList.toggle('is-reduced',!!z.settings[k]); }catch(e){}
-  }
-  if(!zikrPaintSetting(k)) if(!zikrPaintView('settings',true)) render();
-};
+App.setZikrPresetFilter=function(el){ return window.SeymaZikr.setZikrPresetFilter.apply(null,arguments); };
+App.clearZikrPresetFilter=function(){ return window.SeymaZikr.clearZikrPresetFilter.apply(null,arguments); };
+App.setZikrLibFilter=function(mode){ return window.SeymaZikr.setZikrLibFilter.apply(null,arguments); };
+App.setZikrTopic=function(topic){ return window.SeymaZikr.setZikrTopic.apply(null,arguments); };
+App.toggleZikrFilters=function(){ return window.SeymaZikr.toggleZikrFilters.apply(null,arguments); };
+App.toggleZikrNote=function(){ return window.SeymaZikr.toggleZikrNote.apply(null,arguments); };
+App.onZikrNoteField=function(field,el){ return window.SeymaZikr.onZikrNoteField.apply(null,arguments); };
+App.setZikrNoteMood=function(mood){ return window.SeymaZikr.setZikrNoteMood.apply(null,arguments); };
+App.saveZikrNote=function(){ return window.SeymaZikr.saveZikrNote.apply(null,arguments); };
+App.toggleZikrManual=function(){ return window.SeymaZikr.toggleZikrManual.apply(null,arguments); };
+App.onZikrManualAmount=function(el){ return window.SeymaZikr.onZikrManualAmount.apply(null,arguments); };
+App.onZikrManualNote=function(el){ return window.SeymaZikr.onZikrManualNote.apply(null,arguments); };
+App.zikrManualStep=function(dir){ return window.SeymaZikr.zikrManualStep.apply(null,arguments); };
+App.zikrManualChip=function(v){ return window.SeymaZikr.zikrManualChip.apply(null,arguments); };
+App.saveZikrManual=function(){ return window.SeymaZikr.saveZikrManual.apply(null,arguments); };
+App.undoZikrManual=function(entryId){ return window.SeymaZikr.undoZikrManual.apply(null,arguments); };
+App.toggleZikrSetting=function(k){ return window.SeymaZikr.toggleZikrSetting.apply(null,arguments); };
 App.toggleZikrPause=function(){
   var z=ensureZikrRoot(), p=zikrActivePreset(), s=z.activeSession, now=new Date().toISOString(), h=zikrActiveHatim(p,false);
   var same=!!(s&&s.presetId===p.id&&(p.kind!=='esma'||s.hatimId===(h&&h.id||'')));
@@ -4362,96 +3911,19 @@ App.startNewZikrHatim=function(){
   if(current&&current.status!=='completed'){ current.status='archived'; current.archivedAt=new Date().toISOString(); }
   var h=zikrNewHatim(p,0,'active'); j.hatims.push(h); j.activeHatimId=h.id; zikrPauseSession(); ui.zikrView='counter'; save(); if(!zikrPaintView('counter')) render(); toast('Yeni '+p.name+' Ebced² Tam Hatmi başladı.');
 };
-App.openZikrHatim=function(presetId,hatimId){
-  var p=zikrPreset(presetId), j=p&&zikrJourney(p,false); if(!p||!j) return;
-  var h=(j.hatims||[]).find(function(x){ return x&&x.id===hatimId&&x.status!=='archived'; }); if(!h) return;
-  zikrPauseSession(); j.activeHatimId=h.id;
-  var z=ensureZikrRoot(); z.settings.activePresetId=p.id;
-  ui.zikrRemovePresetId=''; ui.zikrRemoveHatimId=''; ui.zikrView='counter'; save();
-  if(!zikrPaintView('counter')) render();
-};
-App.requestRemoveZikrHatim=function(presetId,hatimId){
-  var p=zikrPreset(presetId), j=p&&zikrJourney(p,false);
-  if(!p||!j||!(j.hatims||[]).some(function(h){ return h&&h.id===hatimId&&h.status!=='archived'; })) return;
-  ui.zikrRemovePresetId=presetId; ui.zikrRemoveHatimId=hatimId;
-  if(!zikrPaintView('hatims',true)) render();
-};
-App.cancelRemoveZikrHatim=function(){
-  ui.zikrRemovePresetId=''; ui.zikrRemoveHatimId='';
-  if(!zikrPaintView('hatims',true)) render();
-};
-App.confirmRemoveZikrHatim=function(){
-  var p=zikrPreset(ui.zikrRemovePresetId), j=p&&zikrJourney(p,false), h=null;
-  if(j) h=(j.hatims||[]).find(function(x){ return x&&x.id===ui.zikrRemoveHatimId; });
-  if(!p||!j||!h){ App.cancelRemoveZikrHatim(); return; }
-  var now=new Date().toISOString();
-  h.status='archived'; h.archivedAt=now; h.lastAt=now; j.lastAt=now;
-  if(j.activeHatimId===h.id) j.activeHatimId='';
-  var z=ensureZikrRoot();
-  if(z.activeSession&&z.activeSession.presetId===p.id&&z.activeSession.hatimId===h.id) z.activeSession.pausedAt=new Date().toISOString();
-  ui.zikrRemovePresetId=''; ui.zikrRemoveHatimId=''; save();
-  if(!zikrPaintView('hatims',true)) render();
-  toast(p.name+' hatmi listeden kaldırıldı; ömürlük toplam korundu.');
-};
-App.openZikrPresetAdd=function(){ ui.zikrPresetDraft={name:'',target:'100'}; ui.zikrView='presets'; if(!zikrPaintLibraryResults()) render(); };
-App.cancelZikrPresetAdd=function(){ ui.zikrPresetDraft=null; if(!zikrPaintLibraryResults()) render(); };
-App.onZikrPresetField=function(f,el){ if(!ui.zikrPresetDraft) ui.zikrPresetDraft={name:'',target:'100'}; ui.zikrPresetDraft[f]=el.value; };
-App.saveZikrPreset=function(){
-  var d=ui.zikrPresetDraft||{}; var name=String(d.name||'').trim(); if(!name){ toast('Preset adını yaz'); return; }
-  var tgt=parseInt(d.target,10); if(isNaN(tgt)||tgt<1) tgt=100;
-  var z=ensureZikrRoot();
-  var id='z_'+Date.now().toString(36);
-  var nowIso=new Date().toISOString();
-  z.presets.push({id:id,name:name.slice(0,60),phrase:name.slice(0,80),target:Math.min(1000000,tgt),color:'zikr',favorite:false,createdAt:nowIso,updatedAt:nowIso,builtIn:false,kind:'custom',hatimMode:'simple'});
-  z.settings.activePresetId=id; ui.zikrPresetDraft=null; ui.zikrView='counter'; save(); if(!zikrPaintView('counter')) render();
-  toast('Preset eklendi 🌿');
-};
-App.deleteZikrPreset=function(id){
-  var z=ensureZikrRoot();
-  if(z.presets.length<=1){ toast('En az bir preset kalmalı'); return; }
-  var i=z.presets.findIndex(function(p){ return p.id===id; }); if(i<0) return;
-  if(z.presets[i].builtIn){ toast('Hazır zikirler ve Esmâ presetleri korunur; favoriye ekleyebilirsin.'); return; }
-  z.presets.splice(i,1);
-  if(z.settings.activePresetId===id) z.settings.activePresetId=z.presets[0].id;
-  save(); if(!zikrPaintLibraryResults()) render();
-};
-App.toggleZikrFavorite=function(id){ var p=zikrPreset(id); if(!p) return; p.favorite=!p.favorite; p.updatedAt=new Date().toISOString(); save(); if(!zikrPaintLibraryResults()) render(); };
-App.zikrResetToday=function(){
-  var p=zikrActivePreset(), day=zikrDay(todayStr()), pd=zikrPresetDay(day,p.id);
-  if(pd.count<=0){ toast('Bugün '+p.name+' için sıfırlanacak bir sayım yok.'); return; }
-  ui.zikrActionNote=''; zikrPaintActionNote();
-  ui.zikrResetPending=true; ui.zikrResetPresetId=p.id;
-  if(!zikrPaintResetConfirm()) if(!zikrPaintView('counter',true)) render();
-};
-App.cancelZikrReset=function(){
-  ui.zikrResetPending=false; ui.zikrResetPresetId='';
-  if(!zikrPaintResetConfirm()) if(!zikrPaintView('counter',true)) render();
-};
-App.confirmZikrResetToday=function(){
-  var date=todayStr(), p=zikrActivePreset(), day=zikrDay(date), pd=zikrPresetDay(day,p.id);
-  if(!ui.zikrResetPending||ui.zikrResetPresetId!==p.id){ App.cancelZikrReset(); return; }
-  if(pd.count<=0){ App.cancelZikrReset(); toast('Bugün '+p.name+' için sıfırlanacak bir sayım yok.'); return; }
-  var amount=pd.count, jp=zikrJourneyProgress(p), j=jp.journey, h=jp.hatim;
-  var mirrorDay=getDay(data,date,dayIndexFor(date));
-  ui.zikrLastReset={date:date,presetId:p.id,amount:amount,root:JSON.parse(JSON.stringify(ensureZikrRoot())),dayMirror:mirrorDay.zikr?JSON.parse(JSON.stringify(mirrorDay.zikr)):null};
-  if(p.kind==='esma'&&h){
-    if(h.status==='completed'){ h.status='active'; h.completedAt=null; j.completedHatims=Math.max(0,j.completedHatims-1); }
-    h.count=Math.max(0,h.count-amount); h.lastAt=new Date().toISOString();
-  }
-  j.lifetimeCount=Math.max(0,j.lifetimeCount-amount); j.lastAt=new Date().toISOString();
-  day.totalCount=Math.max(0,day.totalCount-amount); day.completedSets=Math.max(0,day.completedSets-pd.completedCycles); delete day.perPreset[p.id]; day.lastAt=new Date().toISOString();
-  var z=ensureZikrRoot();
-  if(z.activeSession&&z.activeSession.presetId===p.id){ z.activeSession.count=0; z.activeSession.pausedAt=new Date().toISOString(); }
-  ui.zikrResetPending=false; ui.zikrResetPresetId='';
-  ui.zikrActionNote=amount.toLocaleString('tr-TR')+' sayım sıfırlandı · Geri al ile kurtarabilirsin.';
-  syncZikrDayMirror(date,day); save();
-  var after=zikrMath(p,p.kind==='esma'&&h?h.count:j.lifetimeCount);
-  if(!zikrPaintLive({preset:p,count:0,total:day.totalCount,math:after,journey:j,hatim:h})) if(!zikrPaintView('counter',true)) render();
-  zikrPaintPauseButton();
-  zikrPaintResetConfirm();
-  zikrPaintActionNote();
-  toast('Bugünkü '+p.name+' sayımı sıfırlandı.');
-};
+App.openZikrHatim=function(presetId,hatimId){ return window.SeymaZikr.openZikrHatim.apply(null,arguments); };
+App.requestRemoveZikrHatim=function(presetId,hatimId){ return window.SeymaZikr.requestRemoveZikrHatim.apply(null,arguments); };
+App.cancelRemoveZikrHatim=function(){ return window.SeymaZikr.cancelRemoveZikrHatim.apply(null,arguments); };
+App.confirmRemoveZikrHatim=function(){ return window.SeymaZikr.confirmRemoveZikrHatim.apply(null,arguments); };
+App.openZikrPresetAdd=function(){ return window.SeymaZikr.openZikrPresetAdd.apply(null,arguments); };
+App.cancelZikrPresetAdd=function(){ return window.SeymaZikr.cancelZikrPresetAdd.apply(null,arguments); };
+App.onZikrPresetField=function(f,el){ return window.SeymaZikr.onZikrPresetField.apply(null,arguments); };
+App.saveZikrPreset=function(){ return window.SeymaZikr.saveZikrPreset.apply(null,arguments); };
+App.deleteZikrPreset=function(id){ return window.SeymaZikr.deleteZikrPreset.apply(null,arguments); };
+App.toggleZikrFavorite=function(id){ return window.SeymaZikr.toggleZikrFavorite.apply(null,arguments); };
+App.zikrResetToday=function(){ return window.SeymaZikr.zikrResetToday.apply(null,arguments); };
+App.cancelZikrReset=function(){ return window.SeymaZikr.cancelZikrReset.apply(null,arguments); };
+App.confirmZikrResetToday=function(){ return window.SeymaZikr.confirmZikrResetToday.apply(null,arguments); };
 
 App.setFaithTab=function(tab){ ui.faithTab=tab||'oz'; render(); };
 App.faithHeatYear=function(delta){
@@ -5303,91 +4775,23 @@ function render(){ return SEYMA_RENDER.render.apply(null,arguments); }
 function onboardingHTML(){ return SEYMA_RENDER.onboardingHTML.apply(null,arguments); }
 
 
-// ── Faz 7: Psikolojik durum tespiti anketi (iki haftada bir, zorunlu, yalnızca-tık) ──
-function psychFlat(){ var out=[]; PSYCH_SCALES.forEach(function(s){ s.items.forEach(function(it,qi){ out.push({s:s,qi:qi,item:it}); }); }); return out; }
-// Panel için okunur soru & cevap dökümü (panelde PSYCH_SCALES yok, bu yüzden burada denormalize edilir)
-function psychBuildQA(ans){
-  ans=ans||{}; var out=[];
-  PSYCH_SCALES.forEach(function(s){
-    var a=ans[s.id]||[];
-    s.items.forEach(function(it,qi){
-      var oi=a[qi], lbl='—';
-      if(oi!=null && s.scale && s.scale[oi]!=null){
-        lbl=s.scale[oi];
-        if(s.anchors){ if(oi===0) lbl+=' ('+s.anchors[0]+')'; else if(oi===s.scale.length-1) lbl+=' ('+s.anchors[1]+')'; }
-      }
-      out.push({scale:s.title, icon:s.icon, q:it.q, a:lbl});
-    });
-  });
-  return out;
-}
-function psychOptions(sid,qi,s,cur){
-  var h='';
-  if(s.anchors){
-    h+='<div style="display:flex;justify-content:space-between;font-size:var(--f-caption1);color:var(--faint);margin-bottom:9px;padding:0 2px;"><span>'+esc(s.anchors[0])+'</span><span style="text-align:right;">'+esc(s.anchors[1])+'</span></div>';
-    h+='<div style="display:flex;gap:6px;justify-content:space-between;">';
-    s.scale.forEach(function(lbl,oi){
-      var sel=cur===oi;
-      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="flex:1;min-width:0;height:46px;border-radius:14px;cursor:pointer;font-size:var(--f-subhead);font-weight:800;transition:all .15s;'+(sel?'color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);border:none;box-shadow:0 6px 14px rgba(233,175,193,0.4);':'color:var(--text2);background:var(--card);border:1px solid var(--field-bd);')+'">'+lbl+'</button>';
-    });
-    h+='</div>';
-  } else {
-    h+='<div style="display:flex;flex-direction:column;gap:9px;">';
-    s.scale.forEach(function(lbl,oi){
-      var sel=cur===oi;
-      var st=sel?'background:linear-gradient(135deg,rgba(255,232,163,0.6),rgba(247,221,229,0.75));border:1px solid #E9AFC1;color:#5A2E2A;box-shadow:0 6px 14px rgba(233,175,193,0.3);':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
-      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="display:flex;align-items:center;gap:11px;width:100%;padding:14px 16px;border-radius:16px;cursor:pointer;transition:all .18s;'+st+'"><span style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:'+(sel?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',13):'')+'</span><span style="flex:1;text-align:left;font-size:var(--f-subhead);font-weight:600;">'+esc(lbl)+'</span></button>';
-    });
-    h+='</div>';
-  }
-  return h;
-}
-function psychMotiv(idx,T){
-  var p=idx/T;
-  if(idx===0) return 'Başlıyoruz — acele yok';
-  if(Math.abs(p-0.5)<0.03) return 'Tam yarıladın';
-  if(p<0.25) return 'Güzel başladın';
-  if(p<0.5) return 'Akışa girdin, harikasın.';
-  if(p<0.75) return 'Yarıyı geçtin, çok iyi gidiyorsun';
-  if(p<0.9) return 'Az kaldı, neredeyse bitti';
-  return 'Son birkaç soru — süpersin!';
-}
-function psychReachCreator(){
-  try{
-    if(window.SeySync){
-      var ts=new Date().toISOString(), qid='psos_'+Date.now().toString(36);
-      var msg='[SOS — Şeyma yardım istedi] Şeyma “Zor hissediyorum” diyerek doğrudan sana ulaşmak istedi (tanıma anketi ekranından SOS butonu). Lütfen en kısa sürede nazikçe yanında ol.';
-      if(typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:msg,ts:ts});
-    }
-    haptic([15,60,15]);
-  }catch(e){}
-}
+function psychFlat(){ return window.SeymaProfile.psychFlat.apply(null,arguments); }
+function psychBuildQA(ans){ return window.SeymaProfile.psychBuildQA.apply(null,arguments); }
+function psychOptions(sid,qi,s,cur){ return window.SeymaProfile.psychOptions.apply(null,arguments); }
+function psychMotiv(idx,T){ return window.SeymaProfile.psychMotiv.apply(null,arguments); }
+function psychReachCreator(){ return window.SeymaProfile.psychReachCreator.apply(null,arguments); }
 function psychSosHTML(){ return SEYMA_RENDER.psychSosHTML.apply(null,arguments); }
 function psychHTML(){ return SEYMA_RENDER.psychHTML.apply(null,arguments); }
 function psychResultHTML(){ return SEYMA_RENDER.psychResultHTML.apply(null,arguments); }
-App.psychBegin=function(){ ui.psychStep=1; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
-App.psychToggleSrc=function(){ ui.psychShowSrc=!ui.psychShowSrc; render(); };
-App.psychAnswer=function(sid,qi,oi){ if(!ui.psychAnswers) ui.psychAnswers={}; if(!ui.psychAnswers[sid]) ui.psychAnswers[sid]=[]; ui.psychAnswers[sid][qi]=oi; haptic(10); var T=psychFlat().length, was=ui.psychStep; ui.psychStep=Math.min(ui.psychStep+1,T+1); render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; if(was<=T&&ui.psychStep>T){ try{ haptic([12,40,12]); }catch(e){} setTimeout(function(){ try{ confetti(); }catch(e){} },180); } };
-App.psychFwd=function(){ var T=psychFlat().length, was=ui.psychStep; ui.psychStep=Math.min(ui.psychStep+1,T+1); render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; if(was<=T&&ui.psychStep>T){ setTimeout(function(){ try{ confetti(); }catch(e){} },180); } };
-App.psychBack=function(){ if(ui.psychStep>0) ui.psychStep--; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
-App.psychSOS=function(){ ui.psychSOS=true; ui.psychSosSent=false; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
-App.psychSOSClose=function(){ ui.psychSOS=false; ui.psychSosSent=false; render(); };
-App.psychReachCreator=function(){ if(ui.psychSosSent) return; ui.psychSosSent=true; psychReachCreator(); render(); };
-App.psychFinish=function(){
-  var sc=psychScore(ui.psychAnswers);
-  var now=new Date().toISOString();
-  // İki haftalık ölçümlerin geçmişi — panelde karşılaştırma/trend için biriktirilir.
-  // Eski (tek girişli, sürüm 1) veri varsa geçmişe taşınır; kompakt tutmak için yalnızca skor+tarih.
-  var hist=[];
-  if(data.psych){
-    if(Array.isArray(data.psych.history)) hist=data.psych.history.slice();
-    else if(data.psych.scores&&data.psych.completedAt) hist=[{completedAt:data.psych.completedAt,scores:data.psych.scores}];
-  }
-  hist.push({completedAt:now,scores:sc});
-  if(hist.length>24) hist=hist.slice(hist.length-24);
-  data.psych={version:2,completedAt:now,answers:ui.psychAnswers,scores:sc,qa:psychBuildQA(ui.psychAnswers),history:hist};
-  save(); psychSafetyPing(sc); ui.psychStep=0; ui.psychSOS=false; ui.psychSosSent=false; ui.psychAnswers={}; render();
-};
+App.psychBegin=function(){ return window.SeymaProfile.psychBegin.apply(null,arguments); };
+App.psychToggleSrc=function(){ return window.SeymaProfile.psychToggleSrc.apply(null,arguments); };
+App.psychAnswer=function(sid,qi,oi){ return window.SeymaProfile.psychAnswer.apply(null,arguments); };
+App.psychFwd=function(){ return window.SeymaProfile.psychFwd.apply(null,arguments); };
+App.psychBack=function(){ return window.SeymaProfile.psychBack.apply(null,arguments); };
+App.psychSOS=function(){ return window.SeymaProfile.psychSOS.apply(null,arguments); };
+App.psychSOSClose=function(){ return window.SeymaProfile.psychSOSClose.apply(null,arguments); };
+App.psychReachCreator=function(){ return window.SeymaProfile.psychReachCreator.apply(null,arguments); };
+App.psychFinish=function(){ return window.SeymaProfile.psychFinish.apply(null,arguments); };
 
 // Makro kalori dağılım çubuğu (protein/karbonhidrat/yağ — kalori payına göre).
 function macroBarHTML(){ return SEYMA_HEALTH.macroBarHTML.apply(null,arguments); }
@@ -5674,13 +5078,6 @@ function roomPrettyValue(v){ return window.SeymaMotivation.roomPrettyValue.apply
 function roomCalendarDayIndex(){ return window.SeymaMotivation.roomCalendarDayIndex.apply(null,arguments); }
 function roomDailyContentHTML(p,fi){ return window.SeymaMotivation.roomDailyContentHTML.apply(null,arguments); }
 function parseScientificProfileMD(md){ return window.SeymaMotivation.parseScientificProfileMD.apply(null,arguments); }
-function roomProfileRecommendations(p){
-  var recs=[];
-  recs.push({title:'Yapı ve derinlik',sub:'Düzenleyici profiline özel kitap önerileri',onclick:'App.openReading()',ic:'book',col:'var(--room2),var(--room)'});
-  recs.push({title:'İnsan hikâyeleri',sub:'Sosyal-Empatik eksende film ve dizi',onclick:'App.openWatching()',ic:'clapperboard',col:'#C88F4C,#E0B080'});
-  recs.push({title:'Sakinleştirici sesler',sub:'Girişimci zihin için nefes ve podcast',onclick:'App.openListening()',ic:'disc',col:'#0E9AA7,#2BC4C4'});
-  return recs;
-}
 function fmtWhen(iso){
   if(!iso) return '';
   try{ var d=new Date(iso); return d.toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return iso.slice(0,16).replace('T',' '); }
@@ -6114,7 +5511,6 @@ function settingsBtn(onclick,label,icon){ return window.SeymaSettings.settingsBt
 // ================= SAĞLIK & DÖNGÜ =================
 function num(v){ return (v===null||v===undefined||v==='')?null:Number(v); }
 function calcAge(){ return SEYMA_HEALTH.calcAge.apply(null,arguments); }
-function profileAgeLabel(birthDate){ var a=calcAge(birthDate); return a!=null?a+' yaş':'<span style="color:var(--faint);">—</span>'; }
 function ringSeg(){ return SEYMA_HEALTH.ringSeg.apply(null,arguments); }
 
 function activityRings(){ return SEYMA_HEALTH.activityRings.apply(null,arguments); }
@@ -6250,121 +5646,13 @@ function zikrPresetsViewHTML(p,z){ return window.SeymaZikr.zikrPresetsViewHTML.a
 function zikrHatimsViewHTML(p,z){ return window.SeymaZikr.zikrHatimsViewHTML.apply(null,arguments); }
 function zikrHistoryViewHTML(z){ return window.SeymaZikr.zikrHistoryViewHTML.apply(null,arguments); }
 function zikrSettingsViewHTML(z){ return window.SeymaZikr.zikrSettingsViewHTML.apply(null,arguments); }
-function zikrNoteDraftFor(p){
-  if(ui.zikrNotePresetId===p.id&&ui.zikrNoteDraft) return ui.zikrNoteDraft;
-  var saved=zikrReflection(todayStr(),p.id);
-  ui.zikrNotePresetId=p.id;
-  ui.zikrNoteDraft={
-    mood:saved&&saved.mood||'',feelings:saved&&saved.feelings||'',
-    thoughts:saved&&saved.thoughts||'',intention:saved&&saved.intention||''
-  };
-  ui.zikrNoteStatus='';
-  return ui.zikrNoteDraft;
-}
-function zikrManualDraftFor(p){
-  if(ui.zikrManualPresetId===p.id&&ui.zikrManualDraft) return ui.zikrManualDraft;
-  ui.zikrManualPresetId=p.id;
-  ui.zikrManualDraft={presetId:p.id,amount:'',note:''};
-  return ui.zikrManualDraft;
-}
+function zikrNoteDraftFor(p){ return window.SeymaZikr.zikrNoteDraftFor.apply(null,arguments); }
+function zikrManualDraftFor(p){ return window.SeymaZikr.zikrManualDraftFor.apply(null,arguments); }
 function zikroverlayHTML(){ return SEYMA_RENDER.zikroverlayHTML.apply(null,arguments); }
 
 function zikrViewBodyHTML(view,p,z){ return window.SeymaZikr.zikrViewBodyHTML.apply(null,arguments); }
-function zikrPaintView(view,keepScroll){
-  try{
-    var body=document.getElementById('zikr-scroll'), tabs=document.getElementById('zikr-tabs');
-    if(!body||!tabs) return false;
-    var prevTop=body.scrollTop||0;
-    var z=ensureZikrRoot(), p=zikrActivePreset();
-    body.innerHTML=zikrViewBodyHTML(view,p,z);
-    body.scrollTop=keepScroll?prevTop:0;
-    var buttons=tabs.querySelectorAll('[data-zikr-view]');
-    for(var i=0;i<buttons.length;i++){
-      var on=buttons[i].getAttribute('data-zikr-view')===view;
-      buttons[i].setAttribute('aria-selected',on?'true':'false');
-      if(buttons[i].classList) buttons[i].classList.toggle('on',on);
-    }
-    // Bir sonraki veri-etkileşimli tam render, görünümü yanlışlıkla "yeni
-    // sekme" sanıp scroll'u sıfırlamasın.
-    lastOverlayView=view;
-    return true;
-  }catch(e){ return false; }
-}
-function zikrPaintLibraryResults(){
-  try{
-    var el=document.getElementById('zikr-library-results'); if(!el) return false;
-    el.innerHTML=zikrPresetsResultsHTML(zikrActivePreset(),ensureZikrRoot());
-    return true;
-  }catch(e){ return false; }
-}
-function zikrPaintDetail(){
-  try{
-    var el=document.getElementById('zikr-detail-region'); if(!el) return false;
-    el.innerHTML=zikrDetailControlsHTML(zikrActivePreset());
-    return true;
-  }catch(e){ return false; }
-}
-function zikrPaintResetConfirm(){
-  try{
-    var p=zikrActivePreset(), el=document.getElementById('zikr-reset-region'), button=document.getElementById('zikr-reset-button'); if(!el||!button) return false;
-    el.innerHTML=zikrResetConfirmHTML(p,zikrPresetDay(zikrDay(todayStr()),p.id));
-    var armed=!!(ui.zikrResetPending&&ui.zikrResetPresetId===p.id);
-    button.classList.toggle('is-armed',armed);
-    button.setAttribute('aria-label',armed?'Sıfırlama onayı bekleniyor':('Bugünkü '+p.name+' sayımını sıfırla'));
-    button.innerHTML=icon('trash-2',17)+'<span>'+(armed?'Onay bekliyor':'Sıfırla')+'</span>';
-    return true;
-  }catch(e){ return false; }
-}
-function zikrPaintActionNote(){
-  try{
-    var el=document.getElementById('zikr-action-region'); if(!el) return false;
-    el.innerHTML=zikrActionNoteHTML();
-    return true;
-  }catch(e){ return false; }
-}
-function zikrPaintNoteRegion(){
-  try{
-    var el=document.getElementById('zikr-note-host'); if(!el) return false;
-    el.innerHTML=zikrNoteEditorHTML(zikrActivePreset());
-    return true;
-  }catch(e){ return false; }
-}
-function zikrPaintManualRegion(){
-  try{
-    var el=document.getElementById('zikr-manual-region'); if(!el) return false;
-    el.innerHTML=zikrManualSheetHTML(zikrActivePreset());
-    var button=document.getElementById('zikr-manual-button');
-    if(button){
-      button.classList.toggle('is-open',!!ui.zikrManualOpen);
-      button.setAttribute('aria-expanded',ui.zikrManualOpen?'true':'false');
-    }
-    return true;
-  }catch(e){ return false; }
-}
-function zikrPaintSetting(key){
-  try{
-    var z=ensureZikrRoot(), button=document.getElementById('zikr-setting-'+key), note=document.getElementById('zikr-settings-note'); if(!button||!note) return false;
-    var on=!!z.settings[key], toggle=button.querySelector('i');
-    button.setAttribute('aria-pressed',on?'true':'false');
-    if(toggle) toggle.className=on?'on':'';
-    note.innerHTML=ui.zikrSettingsNote?(icon('circle-check',14)+'<span>'+esc(ui.zikrSettingsNote)+'</span>'):'';
-    note.hidden=!ui.zikrSettingsNote;
-    return true;
-  }catch(e){ return false; }
-}
-function zikrPaintPauseButton(){
-  try{
-    var el=document.getElementById('zikr-pause-button'), state=zikrSessionState(zikrActivePreset()); if(!el) return false;
-    var label=state==='active'?'Duraklat':(state==='paused'?'Sürdür':'Başlat');
-    el.className='pause '+state;
-    el.setAttribute('aria-label',label);
-    el.innerHTML=icon(state==='active'?'pause':'play',17)+'<span>'+label+'</span>';
-    var tap=document.getElementById('zikr-tap-button'), action=document.getElementById('zikr-live-action');
-    if(tap){ tap.classList.remove('is-idle','is-active','is-paused'); tap.classList.add('is-'+state); }
-    if(action) action.textContent=state==='paused'?'sürdür ve zikret':'dokunarak zikret';
-    return true;
-  }catch(e){ return false; }
-}
+function zikrPaintView(view,keepScroll){ return window.SeymaZikr.zikrPaintView.apply(null,arguments); }
+function zikrPaintPauseButton(){ return window.SeymaZikr.zikrPaintPauseButton.apply(null,arguments); }
 // ═══ Raşit ile Kur’an Yolculuğu — sunum katmanı ═══════════════════════════
 // QY-05 hub kartı · QY-06 tam ekran sûre kütüphanesi · QY-07 sûre ayrıntısı
 // ve duruma göre TEK ana eylem.
@@ -6379,19 +5667,12 @@ function zikrPaintPauseButton(){
 // gitmez" kuralları tek bir yerde kalır.
 
 var QURAN_TOTAL_FALLBACK=114;
-function quranCatalog(){ return (typeof window!=='undefined'&&window.QuranRevelationOrderV1)||null; }
-function quranSurahList(){ var c=quranCatalog(); return (c&&Array.isArray(c.surahs))?c.surahs:[]; }
-function quranSurah(id){ var c=quranCatalog(); return (c&&typeof c.byId==='function')?c.byId(id):null; }
-function quranTotal(){ var n=quranSurahList().length; return n||QURAN_TOTAL_FALLBACK; }
-function quranSurahName(id){ var s=quranSurah(id); return s?s.nameTr:String(id||''); }
-function quranPlaceLabel(x){ return (x&&x.revelationPlace==='Medine')?'Medenî':'Mekkî'; }
-function quranPlaceDisputed(id){ var c=quranCatalog(); return !!(c&&typeof c.isPlaceDisputed==='function'&&c.isPlaceDisputed(id)); }
-// Kütüphaneden gelen her id önce doğrulanır: inline onclick'ten gelen değer
-// asla doğrudan state anahtarı olmaz.
-function quranRequestOf(q,id){
-  var r=(q&&q.requests)?q.requests[id]:null;
-  return (r&&typeof r==='object'&&!Array.isArray(r))?r:quranNewRequest();
-}
+function quranCatalog(){ return window.SeymaQuran.quranCatalog.apply(null,arguments); }
+function quranSurah(id){ return window.SeymaQuran.quranSurah.apply(null,arguments); }
+function quranTotal(){ return window.SeymaQuran.quranTotal.apply(null,arguments); }
+function quranPlaceLabel(x){ return window.SeymaQuran.quranPlaceLabel.apply(null,arguments); }
+function quranPlaceDisputed(id){ return window.SeymaQuran.quranPlaceDisputed.apply(null,arguments); }
+function quranRequestOf(q,id){ return window.SeymaQuran.quranRequestOf.apply(null,arguments); }
 
 // ── Durum → kova eşlemesi (QY-06 filtreleri) ──
 // Plan §4 tam olarak beş filtre ister. Hata durumları (request_error,
@@ -6406,16 +5687,9 @@ var QURAN_BUCKETS={
   watched:'watched',question_opened:'watched'
 };
 var QURAN_FILTERS=[['all','Tümü'],['unrequested','İstenmedi'],['waiting','Bekleniyor'],['ready','Hazır'],['watched','İzlendi']];
-function quranBucket(status){ return QURAN_BUCKETS[status]||'unrequested'; }
-function quranActiveFilter(){
-  var f=String(ui.quranFilter||'all');
-  for(var i=0;i<QURAN_FILTERS.length;i++) if(QURAN_FILTERS[i][0]===f) return f;
-  return 'all';
-}
-function quranFilterLabel(f){
-  for(var i=0;i<QURAN_FILTERS.length;i++) if(QURAN_FILTERS[i][0]===f) return QURAN_FILTERS[i][1];
-  return 'Tümü';
-}
+function quranBucket(status){ return window.SeymaQuran.quranBucket.apply(null,arguments); }
+function quranActiveFilter(){ return window.SeymaQuran.quranActiveFilter.apply(null,arguments); }
+function quranFilterLabel(f){ return window.SeymaQuran.quranFilterLabel.apply(null,arguments); }
 // Satır/rozet tonu ve kullanıcıya gösterilen kısa durum adı. Renk tek başına
 // anlam taşımaz (QY-17): her tonun yanında daima metin vardır.
 var QURAN_ROW_STATES={
@@ -6434,105 +5708,24 @@ var QURAN_ROW_STATES={
   invalid_reply:{tone:'warn',label:'Bağlantı doğrulanamadı'},
   video_unavailable:{tone:'warn',label:'Anlatım erişilemiyor'}
 };
-function quranRowState(status){ return QURAN_ROW_STATES[status]||QURAN_ROW_STATES.idle; }
-// Plan §15 bildirim dili — sistem GERÇEKLEŞTİRMEDİĞİ şeyi söylemez.
-function quranStatusNote(status,name){
-  if(status==='submitting') return 'İsteğin iletiliyor…';
-  if(status==='queued') return 'İsteğin kaydedildi.';
-  if(status==='notified') return 'Raşit’e haber verildi.';
-  if(status==='awaiting_reply') return 'Raşit’in cevabı bekleniyor.';
-  if(status==='validating_reply') return 'Gelen cevap doğrulanıyor.';
-  if(status==='ready') return name+' anlatımı hazır.';
-  if(status==='watching') return 'Anlatımı izlemeye başladın.';
-  if(status==='watched') return 'İzledin; sorunu Raşit’e iletebilirsin.';
-  if(status==='question_opened') return 'WhatsApp açıldı; sorun henüz gönderilmiş sayılmaz.';
-  if(status==='request_error') return 'İstek şu an iletilemedi. Kaydın duruyor; yeniden deneyebilirsin.';
-  if(status==='notification_error') return 'Bildirim gönderilemedi. Kaydın duruyor; yeniden deneyebilirsin.';
-  if(status==='invalid_reply') return 'Gelen bağlantı doğrulanamadı. Güvenli bir bağlantı bekleniyor.';
-  if(status==='video_unavailable') return 'Bu video artık erişilebilir değil. Raşit’ten yeni bağlantı istenecek.';
-  return 'Bu sûre için henüz istek göndermedin.';
-}
+function quranRowState(status){ return window.SeymaQuran.quranRowState.apply(null,arguments); }
+function quranStatusNote(status,name){ return window.SeymaQuran.quranStatusNote.apply(null,arguments); }
 
-// ── Arama ve süzme (QY-06) ──
-// Arama alanları plan §4'te sayılanlarla birebir: Türkçe ad, Arapça ad,
-// mushaf no ve tema. Türkçe diyakritik-duyarsız normalizasyon Zikirmatik
-// kütüphanesiyle ORTAK (zikrNormalizeSearchText) — ikinci bir kopya yok.
-function quranSearchText(x){
-  return zikrNormalizeSearchText([x.nameTr,x.nameAr,String(x.mushafOrder),x.themeTr].join(' '));
-}
-function quranSearchMatches(x,needle){ return !needle||quranSearchText(x).indexOf(needle)>=0; }
-function quranQueryNeedle(){ return zikrNormalizeSearchText(String(ui.quranQuery||'').trim()); }
-// Aramayla daralan küme üzerinden kova sayıları: rozetler daima "buradan
-// ulaşabileceğin" sayıyı gösterir, ölü filtre kalmaz.
-function quranFilterCounts(){
-  var q=ensureQuranJourney(data), needle=quranQueryNeedle();
-  var c={all:0,unrequested:0,waiting:0,ready:0,watched:0};
-  quranSurahList().forEach(function(x){
-    if(!quranSearchMatches(x,needle)) return;
-    c.all++; c[quranBucket(quranRequestOf(q,x.id).status)]++;
-  });
-  return c;
-}
-function quranFilteredSurahs(){
-  var q=ensureQuranJourney(data), filter=quranActiveFilter(), needle=quranQueryNeedle();
-  return quranSurahList().filter(function(x){
-    if(!quranSearchMatches(x,needle)) return false;
-    return filter==='all'||quranBucket(quranRequestOf(q,x.id).status)===filter;
-  });
-}
-function quranJourneyStats(){
-  var q=ensureQuranJourney(data), total=quranTotal();
-  var s={total:total,unrequested:0,waiting:0,ready:0,watched:0,requested:0};
-  quranSurahList().forEach(function(x){
-    var b=quranBucket(quranRequestOf(q,x.id).status);
-    s[b]++; if(b!=='unrequested') s.requested++;
-  });
-  s.pct=total?Math.round(s.watched/total*100):0;
-  return s;
-}
+function quranFilterCounts(){ return window.SeymaQuran.quranFilterCounts.apply(null,arguments); }
+function quranFilteredSurahs(){ return window.SeymaQuran.quranFilteredSurahs.apply(null,arguments); }
+function quranJourneyStats(){ return window.SeymaQuran.quranJourneyStats.apply(null,arguments); }
 
-// ── İY-B hub kartı — Zikirmatik büyük-kart tasarım diliyle (bkz.
-// zikrPreviewCardHTML/.zikr-v2-preview*), yalnız --quran* tema tonlarıyla.
-// Vitrindeki âyet kart her açıldığında (App.go('saygi') ile, bkz. aşağıdaki
-// quranAdvanceVerseIndex çağrı noktası) sıradaki âyete geçer — 100 âyetlik
-// quranStrikingVersesV1.js modülü sırayla, baştan sona turlanır. ui-düzeyinde
-// tutulur (senkronize edilmez): bu salt kozmetik bir vitrin sırası, gerçek
-// yolculuk verisi değil.
-function quranActiveVerse(){
-  var mod=(typeof window!=='undefined')&&window.QuranStrikingVersesV1;
-  if(!mod||!Array.isArray(mod.verses)||!mod.verses.length) return null;
-  var n=mod.verses.length;
-  var idx=((Number(ui.quranVerseIdx)||0)%n+n)%n;
-  return mod.verses[idx];
-}
-function quranAdvanceVerseIndex(){ ui.quranVerseIdx=(Number(ui.quranVerseIdx)||0)+1; }
-// Durum → rozet/kenarlık tonu. quranBucket'ın dört kovasını (unrequested/
-// waiting/ready/watched) kartın kendi tonlama sözlüğüne eşler.
-function quranPreviewToneOf(status){
-  var b=quranBucket(status);
-  return b==='watched'?'done':(b==='ready'?'ready':(b==='waiting'?'wait':'idle'));
-}
+function quranActiveVerse(){ return window.SeymaQuran.quranActiveVerse.apply(null,arguments); }
+function quranAdvanceVerseIndex(){ return window.SeymaQuran.quranAdvanceVerseIndex.apply(null,arguments); }
+function quranPreviewToneOf(status){ return window.SeymaQuran.quranPreviewToneOf.apply(null,arguments); }
 function quranJourneyHubCardHTML(){ return SEYMA_RENDER.quranJourneyHubCardHTML.apply(null,arguments); }
-function quranJourneyCardCopy(status,canReq,req,order,total){
-  if(status==='question_opened') return {kicker:'SÛRE · TEFEKKÜR TAMAMLANDI',line:'Bu durak tamam 🦩',ctaClass:'',ctaLabel:'Kütüphaneyi aç',ctaAction:'App.openQuranJourney()',statusLabel:order+'/'+total+' durak'};
-  if(status==='watched') return {kicker:'SÛRE · İZLENDİ',line:'Raşit’e sormaya hazır',ctaClass:'is-gold',ctaLabel:'Soru aç',ctaAction:'App.quranJourneyQuestion()',statusLabel:'soru bekliyor'};
-  if(status==='watching') return {kicker:'SÛRE · İZLENİYOR',line:'Kaldığı yerden devam et',ctaClass:'is-gold',ctaLabel:'Devam et',ctaAction:'App.quranJourneyWatch()',statusLabel:'izleniyor'};
-  if(status==='ready') return {kicker:'SÛRE · ANLATIM HAZIR',line:'Bu sûre için anlatım var',ctaClass:'is-gold',ctaLabel:'İzlemeye başla',ctaAction:'App.quranJourneyWatch()',statusLabel:'hazır'};
-  if(status==='submitting') return {kicker:'SÛRE · İLETİLİYOR',line:'İsteğin gönderiliyor…',ctaClass:'',ctaLabel:'İletiliyor…',ctaAction:'',statusLabel:'iletiliyor'};
-  if(status==='queued') return {kicker:'SÛRE · İSTEK KAYDEDİLDİ',line:'Raşit’e iletilmeyi bekliyor',ctaClass:'is-outline',ctaLabel:'Durumu aç',ctaAction:'App.openQuranJourney()',statusLabel:'kaydedildi'};
-  if(status==='notified'||status==='awaiting_reply'||status==='validating_reply') return {kicker:'SÛRE · CEVAP BEKLENİYOR',line:'Raşit’in cevabı bekleniyor',ctaClass:'is-outline',ctaLabel:'Durumu aç',ctaAction:'App.openQuranJourney()',statusLabel:'cevap bekleniyor'};
-  if(status==='video_unavailable'||status==='invalid_reply') return {kicker:'SÛRE · YENİ BAĞLANTI',line:'Güvenli bir bağlantı bekleniyor',ctaClass:'',ctaLabel:'Yeniden iste',ctaAction:'App.quranJourneyRequest()',statusLabel:'bağlantı yenilenecek'};
-  if(canReq) return {kicker:'SÛRE · YENİ İSTEK',line:'Raşit’ten anlatım iste',ctaClass:'',ctaLabel:'İste',ctaAction:'App.quranJourneyRequest()',statusLabel:'istenebilir'};
-  return {kicker:'SÛRE · İŞLENİYOR',line:'Birazdan tekrar dene',ctaClass:'is-outline',ctaLabel:'Durumu aç',ctaAction:'App.openQuranJourney()',statusLabel:'işleniyor'};
-}
+function quranJourneyCardCopy(status,canReq,req,order,total){ return window.SeymaQuran.quranJourneyCardCopy.apply(null,arguments); }
 
 // ── QY-06 tam ekran kabuk ──
 function quranJourneyOverlayHTML(){ return SEYMA_RENDER.quranJourneyOverlayHTML.apply(null,arguments); }
 function quranRemoteStatusHTML(){ return SEYMA_RENDER.quranRemoteStatusHTML.apply(null,arguments); }
 function quranHeadLeadHTML(){ return SEYMA_RENDER.quranHeadLeadHTML.apply(null,arguments); }
-function quranViewBodyHTML(){
-  return (ui.quranJourneyView==='detail')?quranDetailViewHTML(ui.quranDetailId):quranLibraryViewHTML();
-}
+function quranViewBodyHTML(){ return window.SeymaQuran.quranViewBodyHTML.apply(null,arguments); }
 
 // ── QY-06 kütüphane görünümü ──
 function quranLibraryViewHTML(){ return SEYMA_RENDER.quranLibraryViewHTML.apply(null,arguments); }
@@ -6541,29 +5734,8 @@ function quranRowHTML(x,q){ return SEYMA_RENDER.quranRowHTML.apply(null,argument
 
 // ── QY-07 sûre ayrıntısı ──
 function quranDetailViewHTML(id){ return SEYMA_RENDER.quranDetailViewHTML.apply(null,arguments); }
-// ── QY-12: güvenli, mahremiyet geliştirilmiş YouTube video kartı ──
-// İlk render'da HİÇBİR iframe basılmaz — yalnız güvenli bir kapak/izin
-// katmanı (thumbnail + "İzlemeye başla"). iframe yalnız kullanıcı AÇIKÇA
-// dokununca `youtube-nocookie.com` ile enjekte edilir (App.quranJourneyWatch).
-// `ui.quranPlayerLoadedId` kalıcı değildir — ekrana her yeniden girişte
-// (openQuranSurah/backToQuranLibrary/openQuranJourney/closeQuranJourney)
-// sıfırlanır, böylece "click-to-load" yalnız ilk açılışa özgü bir istisna
-// olmaz, her ziyarette geçerli kalır.
-function quranVideoThumbUrl(videoId){ return 'https://i.ytimg.com/vi/'+encodeURIComponent(videoId)+'/hqdefault.jpg'; }
-// ── QY-13: YouTube IFrame Player API — gerçek "izlendi" algısı ──
-// Yalnız iframe'in AÇILMASI izlenme sayılmaz (plan QY-13 madde 3); gerçek
-// tamamlama ya API'nin ENDED olayıyla ya da kullanıcının görünür "İzledim"
-// yedeğiyle kaydedilir. Script yalnız bir video GERÇEKTEN yüklendiğinde
-// tembel enjekte edilir — uygulama açılışında asla, sessizce.
-function quranEmbedOrigin(){
-  try{
-    if(typeof location!=='undefined'){
-      if(location.origin) return location.origin;
-      if(location.protocol&&location.hostname) return location.protocol+'//'+location.hostname+(location.port?(':'+location.port):'');
-    }
-  }catch(e){}
-  return '';
-}
+function quranVideoThumbUrl(videoId){ return window.SeymaQuran.quranVideoThumbUrl.apply(null,arguments); }
+function quranEmbedOrigin(){ return window.SeymaQuran.quranEmbedOrigin.apply(null,arguments); }
 var _quranYtApiState='idle'; // idle | loading | ready
 var _quranYtPendingSurahId='';
 var _quranYtRestartSurahId='';
@@ -6614,22 +5786,9 @@ function quranOnPlayerStateChange(surahId,e){
     App.quranMarkWatched(surahId);
   }catch(err){}
 }
-function quranNoteKindMeta(kind){
-  if(kind==='listen') return {label:'Dinlerken',icon:'headphones'};
-  if(kind==='reflection') return {label:'Yansıma',icon:'sparkles'};
-  return {label:'İzlerken',icon:'play'};
-}
-function quranNoteTimeLabel(sec){
-  if(sec===null||sec===undefined||sec==='') return '';
-  var n=Number(sec); if(!isFinite(n)||n<0) return '';
-  n=Math.floor(n); return Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
-}
-function quranNoteDraftFor(sid){
-  if(!ui.quranNoteDraft||ui.quranNoteDraft.surahId!==sid){
-    ui.quranNoteDraft={surahId:sid,kind:'watch',timestamp:'',tag:'',text:''};
-  }
-  return ui.quranNoteDraft;
-}
+function quranNoteKindMeta(kind){ return window.SeymaQuran.quranNoteKindMeta.apply(null,arguments); }
+function quranNoteTimeLabel(sec){ return window.SeymaQuran.quranNoteTimeLabel.apply(null,arguments); }
+function quranNoteDraftFor(sid){ return window.SeymaQuran.quranNoteDraftFor.apply(null,arguments); }
 function quranVideoNotesInnerHTML(x,req){ return SEYMA_RENDER.quranVideoNotesInnerHTML.apply(null,arguments); }
 function quranVideoNotesHTML(x,req){ return SEYMA_RENDER.quranVideoNotesHTML.apply(null,arguments); }
 function quranVideoCardHTML(x,req){ return SEYMA_RENDER.quranVideoCardHTML.apply(null,arguments); }
@@ -6637,29 +5796,8 @@ function quranVideoCardHTML(x,req){ return SEYMA_RENDER.quranVideoCardHTML.apply
 // üretilmez — "kırık alan yerine açıklama" (plan §10).
 function quranVideoUnavailableHTML(){ return SEYMA_RENDER.quranVideoUnavailableHTML.apply(null,arguments); }
 function quranDetailBodyHTML(x){ return SEYMA_RENDER.quranDetailBodyHTML.apply(null,arguments); }
-// Plan §5'teki "duruma göre ana eylem" tablosunun tek kaynağı.
-function quranDetailAction(id,req){
-  var st=req.status||'idle', call="App.quranJourneySubmit('"+id+"')";
-  if(st==='submitting') return {label:'İletiliyor…',disabled:true,icon:'clock',hint:'İstek iletilirken ikinci kayıt oluşturulmaz.'};
-  if(st==='queued') return {label:'İstek kaydedildi',disabled:true,icon:'circle-check',hint:'Raşit’e iletildiğinde bu metin değişecek.'};
-  if(st==='notified'||st==='awaiting_reply'||st==='validating_reply') return {label:'Raşit’in cevabı bekleniyor',disabled:true,icon:'clock',hint:'Cevap geldiğinde anlatım burada açılır.'};
-  if(st==='ready'||st==='watching') return {label:'İzlemeye başla',action:"App.quranJourneyWatch('"+id+"')",icon:'play'};
-  if(st==='watched'||st==='question_opened') return {label:'Raşit’e sor',action:"App.quranJourneyQuestion('"+id+"')",icon:'whatsapp'};
-  if(st==='video_unavailable'||st==='invalid_reply') return {label:'Yeni bağlantı iste',action:call,icon:'rotate-ccw'};
-  if(quranCanRequest(req)) return {label:'Raşit’ten iste',action:call,icon:'send'};
-  return {label:'Durum yenileniyor',disabled:true,icon:'clock'};
-}
-// “Raşit’e sor” video durumundan bağımsız kalıcı WhatsApp eylemidir. Kullanıcı
-// videoyu izlemese bile sûre bağlamını doğrudan Raşit’e iletebilir.
-function quranQuestionAction(id,req){
-  return {
-    label:'Raşit’e sor',
-    action:"App.quranJourneyQuestion('"+id+"')",
-    icon:'whatsapp',
-    disabled:false,
-    hint:''
-  };
-}
+function quranDetailAction(id,req){ return window.SeymaQuran.quranDetailAction.apply(null,arguments); }
+function quranQuestionAction(id,req){ return window.SeymaQuran.quranQuestionAction.apply(null,arguments); }
 function quranCtaButtonHTML(action,extraClass){ return SEYMA_RENDER.quranCtaButtonHTML.apply(null,arguments); }
 // Ayrıntıdaki eylem satırı artık tek bir durum düğümüne bağlı değildir:
 // istek eylemi varsa “Raşit’ten iste” ile kalıcı “Raşit’e sor” yan yana durur.
@@ -6667,61 +5805,9 @@ function quranCtaButtonHTML(action,extraClass){ return SEYMA_RENDER.quranCtaButt
 // devam eder; soru düğmesi her durumda etkin kalır.
 function quranDetailActionsHTML(id,req,ctaReplacedByCard){ return SEYMA_RENDER.quranDetailActionsHTML.apply(null,arguments); }
 
-// ── Hedefli boyama (QY-06: filtre/arama global render tetiklemez) ──
-function quranPaintHeadLead(){
-  try{ var el=document.getElementById('quran-head-lead'); if(!el) return false; el.innerHTML=quranHeadLeadHTML(); return true; }catch(e){ return false; }
-}
-function quranPaintView(view,top){
-  try{
-    var body=document.getElementById('quran-scroll'); if(!body) return false;
-    body.innerHTML=quranViewBodyHTML();
-    body.scrollTop=(typeof top==='number')?top:0;
-    quranPaintHeadLead();
-    // Bir sonraki tam render bu görünümü "yeni sekme" sanıp scroll'u sıfırlamasın.
-    lastOverlayView=view;
-    return true;
-  }catch(e){ return false; }
-}
-function quranPaintLibraryResults(){
-  try{ var el=document.getElementById('quran-library-results'); if(!el) return false; el.innerHTML=quranLibraryResultsHTML(); return true; }catch(e){ return false; }
-}
-function quranPaintDetail(){
-  try{
-    var el=document.getElementById('quran-detail-region'), x=quranSurah(ui.quranDetailId);
-    if(!el||!x) return false;
-    el.innerHTML=quranDetailBodyHTML(x);
-    return true;
-  }catch(e){ return false; }
-}
-function quranPaintWatchedState(sid){
-  try{
-    if(!ui.quranJourneyOpen||ui.quranJourneyView!=='detail'||ui.quranDetailId!==sid) return false;
-    var x=quranSurah(sid), q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
-    var statusEl=document.getElementById('quran-detail-status');
-    var actionEl=document.getElementById('quran-detail-action-region');
-    if(!x||!statusEl||!actionEl) return false;
-    var state=quranRowState(req.status||'idle');
-    statusEl.className='quran-v2-status is-'+state.tone;
-    statusEl.innerHTML='<i class="dot" aria-hidden="true"></i><span><strong>'+esc(state.label)+'</strong><em>'+esc(quranStatusNote(req.status,x.nameTr))+'</em></span>';
-    var hasVideoCard=(req.status==='ready'||req.status==='watching'||req.status==='watched'||req.status==='question_opened')&&QURAN_VIDEO_ID_RE.test(String(req.videoId||''));
-    actionEl.innerHTML=quranDetailActionsHTML(sid,req,hasVideoCard&&(req.status==='ready'||req.status==='watching'));
-    // “Raşit’e sor” artık watching durumunda da çalışır; bu sırada görünür
-    // “İzledim” yedeğini kaldırma. Yedek yalnız gerçekten watched/question_opened
-    // olduğunda tüketilir.
-    var fallback=document.getElementById('quran-watched-fallback');
-    if((req.status==='watched'||req.status==='question_opened')&&fallback&&fallback.remove) fallback.remove();
-    return true;
-  }catch(e){ return false; }
-}
-function quranPaintNotes(sid){
-  try{
-    if(!ui.quranJourneyOpen||ui.quranJourneyView!=='detail'||ui.quranDetailId!==sid) return false;
-    var q=ensureQuranJourney(data), x=quranSurah(sid), req=quranRequestOf(q,sid), el=document.getElementById('quran-video-notes');
-    if(!x||!el) return false;
-    el.innerHTML=quranVideoNotesInnerHTML(x,req);
-    return true;
-  }catch(e){ return false; }
-}
+function quranPaintView(view,top){ return window.SeymaQuran.quranPaintView.apply(null,arguments); }
+function quranPaintLibraryResults(){ return window.SeymaQuran.quranPaintLibraryResults.apply(null,arguments); }
+function quranPaintNotes(sid){ return window.SeymaQuran.quranPaintNotes.apply(null,arguments); }
 App.quranNoteField=function(field,el){
   var sid=ui.quranDetailId; if(!sid) return;
   var draft=quranNoteDraftFor(sid), value=String((el&&el.value)||'');
@@ -6749,36 +5835,7 @@ App.quranAddNote=function(id){
   if(!quranPaintNotes(sid)) quranRepaintAfterChange(sid);
   toast('Not kaydedildi.');
 };
-// Durum değiştikten sonra en dar kapsamı boyar; DOM yoksa (headless/eski
-// tarayıcı) güvenle tam render'a düşer.
-function quranPaintRefreshButton(){
-  try{
-    var b=document.getElementById('quran-refresh-button'); if(!b) return false;
-    b.disabled=!!ui.quranRefreshing;
-    if(b.setAttribute) b.setAttribute('aria-busy',ui.quranRefreshing?'true':'false');
-    if(b.classList) b.classList.toggle('is-spinning',!!ui.quranRefreshing);
-    var statusEl=document.getElementById('quran-remote-status');
-    if(statusEl){
-      var status=String(ui.quranRemoteStatus||'idle'), tone='idle', label='Uzak kayıt hazır';
-      if(status==='checking'){ tone='checking'; label='Kontrol ediliyor…'; }
-      else if(status==='updated'){ tone='updated'; label='Yeni cevap alındı'; }
-      else if(status==='updated_delivery'){ tone='updated'; label='Yeni teslim kaydı'; }
-      else if(status==='updated_warning'){ tone='warning'; label='Cevap alındı · kaynak uyarısı'; }
-      else if(status==='error'){ tone='error'; label='Kontrol başarısız'; }
-      else if(status==='unchanged'){ label='Güncel'; }
-      statusEl.className='quran-v2-remote-status is-'+tone;
-      statusEl.textContent=label;
-      statusEl.title=String(ui.quranRemoteError||label);
-    }
-    return true;
-  }catch(e){ return false; }
-}
-function quranRepaintAfterChange(id){
-  if(!ui.quranJourneyOpen){ render(); return; }
-  if(ui.quranJourneyView==='detail'&&ui.quranDetailId===id&&quranPaintDetail()) return;
-  if(ui.quranJourneyView==='library'&&quranPaintLibraryResults()) return;
-  render();
-}
+function quranRepaintAfterChange(id){ return window.SeymaQuran.quranRepaintAfterChange.apply(null,arguments); }
 
 // ── QY-07 istek hattı ──
 // requestId, QY-04 taşıma sözleşmesindeki /^qr_[A-Za-z0-9_-]{8,64}$/ desenine
@@ -6856,109 +5913,12 @@ function quranJourneySubmitProceed(sid){
     if(ret&&typeof ret.then==='function') ret.then(function(){ settle(true); },function(err){ settle(false,err); });
   }catch(e){ settle(false,e); }
 }
-// QY-21: hükmü YAZAN tek yer. Buraya gelindiğinde karar çoktan verilmiştir.
-function quranRecordSubmitOutcome(sid,okFlag,err){
-  var q=ensureQuranJourney(data), req=quranRequestOf(q,sid), at=new Date().toISOString();
-  var res=quranReduce(req,{type:okFlag?'outbox_written':'outbox_failed',at:at});
-  if(res.changed) q.requests[sid]=res.request;
-  if(ui.quranSubmittingId===sid) ui.quranSubmittingId='';
-  save();
-  quranRepaintAfterChange(sid);
-  toast(okFlag?'İsteğin kaydedildi.':'İstek şu an iletilemedi ('+quranOutboxErrorLabel(err)+'). Kaydın duruyor; yeniden deneyebilirsin.');
-}
-// QY-21: BAŞARISIZLIK HÜKMÜ ARTIK KANITSIZ VERİLMEZ. pushQuranRequest'in
-// hata bildirmesi yazının olmadığını KANITLAMAZ — cevabı kaybolmuş ama
-// sunucuda tamamlanmış bir PUT de, erken ateşleyen bir watchdog da aynı hatayı
-// üretir. Kullanıcıya "iletilemedi" demeden önce outbox'a bakılır: istek
-// oradaysa yazma GERÇEKTEN olmuştur (ve Raşit'e maili gitmiştir), o yüzden
-// doğru cevap "kaydedildi"dir. Yalnız outbox'ta gerçekten yoksa veya
-// doğrulama yapılamıyorsa hata kaydedilir — uygulama emin olmadığı şeyi
-// söylemez ve emin olmadığında da kullanıcıyı yanıltacak şekilde başarı demez.
-function quranSettleSubmit(sid,okFlag,err){
-  if(okFlag){ quranRecordSubmitOutcome(sid,true,null); return; }
-  var q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
-  var rid=(req&&typeof req.requestId==='string')?req.requestId:'';
-  var s=(typeof window!=='undefined')?window.SeySync:null;
-  if(!rid||!s||typeof s.confirmQuranRequest!=='function'){ quranRecordSubmitOutcome(sid,false,err); return; }
-  var settled=false;
-  function done(confirmed){ if(settled) return; settled=true; quranRecordSubmitOutcome(sid,confirmed,err); }
-  // Doğrulama da asılı kalabilir; o zaman ilk hükme dönülür (güvenli taraf:
-  // "iletilemedi" + tekrar deneme açık). Doğrulama sürerken quranSubmittingId
-  // hâlâ dolu olduğu için çift dokunma engeli de bozulmaz.
-  try{ setTimeout(function(){ done(false); },QURAN_CONFIRM_TIMEOUT_MS); }catch(e){}
-  try{
-    s.confirmQuranRequest(rid,function(cerr,r){ done(!cerr&&!!(r&&r.found===true)); });
-  }catch(e){ done(false); }
-}
-App.quranJourneyRequest=function(){ App.quranJourneySubmit(ensureQuranJourney(data).activeSurahId); };
-// QY-13 (IFrame API ENDED izleme doğrulaması, "İzledim" yedeği) ve QY-14
-// (WhatsApp) henüz açılmadı. Uygulama bunu açıkça söyler; sahte bir akış
-// göstermez.
-// QY-12: kapak/izin katmanındaki "İzlemeye başla" dokunuşu — iframe'i enjekte
-// eder VE "izlemeye başladı" durumunu (ready→watching) kaydeder. Zaten
-// watching/watched/question_opened ise quranReduce idempotent biçimde no-op
-// yapar (aşağıdaki `if(res.changed)`); yalnız oynatıcı yeniden yüklenir
-// (rewatch). videoId doğrulanmamışsa (markup state'le uyuşmuyorsa — beklenmez
-// ama savunmacı) sessizce hiçbir şey yapmaz.
-App.quranJourneyWatch=function(id){
-  // Hub kartı (quranJourneyCardCopy) bu eylemi id'siz çağırır (ready/watching
-  // durumunda "İzlemeye başla"/"Devam et"); id yoksa aktif yolculuğa düş —
-  // aksi halde düğme sessizce hiçbir şey yapmazdı (gerçek regresyon, düzeltildi).
-  var q=ensureQuranJourney(data);
-  var sid=quranSafeSurahId(id||q.activeSurahId); if(!sid) return;
-  var req=quranRequestOf(q,sid);
-  if(!QURAN_VIDEO_ID_RE.test(String(req.videoId||''))) return;
-  // İzlenmiş bir anlatım yeniden açılıyorsa YouTube'un oturumdan hatırladığı
-  // konumu değil kesin olarak 0. saniyeyi kullan. İlk izleme normal başlar.
-  _quranYtRestartSurahId=(req.status==='watched'||req.status==='question_opened')?sid:'';
-  ui.quranPlayerLoadedId=sid;
-  var res=quranReduce(req,{type:'watch_start',at:new Date().toISOString()});
-  if(res.changed){ q.requests[sid]=res.request; save(); }
-  if(!quranPaintDetail()) render();
-  // QY-13: iframe artık DOM'da — gerçek ENDED algısı için oynatıcıyı bağla.
-  quranAttachPlayer(sid);
-};
-// QY-13: ENDED olayı VEYA bu görünür yedek — ikisi de aynı tek yola çıkar.
-// quranReduce'un kendi idempotens/monotonluk kuralları sayesinde tekrar
-// tekrar çağrılsa (API + yedek ikisi de tetiklense) bile watchedAt yalnız
-// ilk kez yazılır ve asla geriye gitmez.
-App.quranMarkWatched=function(id){
-  var sid=quranSafeSurahId(id); if(!sid) return;
-  var q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
-  var res=quranReduce(req,{type:'watch_complete',at:new Date().toISOString()});
-  if(!res.changed) return;
-  q.requests[sid]=res.request; save();
-  // Çalışan iframe'i yeniden kurmak videoyu başa sarar. Oynatıcı bu sûre için
-  // hâlâ DOM'daysa yalnız durum/CTA alanlarını güncelle; iframe referansı ve
-  // oynatma zamanı aynen korunsun. DOM yoksa güvenli tam boyamaya düş.
-  if(!(ui.quranPlayerLoadedId===sid&&quranPaintWatchedState(sid))){ if(!quranPaintDetail()) render(); }
-  var x=quranSurah(sid);
-  toast('Mâşallah · '+(x?x.nameTr:'anlatım')+' izlendi olarak işaretlendi.');
-};
-// QY-14: sûre bağlamlı WhatsApp mesaj şablonu (plan §14 birebir).
-function quranAskMessage(x){
-  var name=x?x.nameTr:'bu sûre', order=x?x.revelationOrder:'';
-  return 'Selam Raşit, Kur’an Yolculuğu’nda '+name+' Sûresi\n('+order+'. durak) hakkında sana şunu sormak istiyorum:';
-}
-// QY-14/QY-20: video durumundan bağımsız WhatsApp deep-link'i. Reducer yalnız
-// watched/question_opened için soru zamanını kaydeder; diğer durumlarda state
-// değişmez, fakat kullanıcı yine de WhatsApp'ı her seferinde açabilir.
-// Hub kartı bu eylemi id'siz çağırır; id yoksa aktif yolculuğa düşer.
-App.quranJourneyQuestion=function(id){
-  var q=ensureQuranJourney(data);
-  var sid=quranSafeSurahId(id||q.activeSurahId); if(!sid) return;
-  var req=quranRequestOf(q,sid);
-  var x=quranSurah(sid);
-  var url='https://wa.me/'+QURAN_WHATSAPP_NUMBER+'?text='+encodeURIComponent(quranAskMessage(x));
-  var res=quranReduce(req,{type:'question_open',at:new Date().toISOString()});
-  if(res.changed){ q.requests[sid]=res.request; save(); }
-  try{ if(typeof window!=='undefined'&&typeof window.open==='function') window.open(url,'_blank','noopener,noreferrer'); }catch(e){}
-  // Soru eylemi video oynarken de modal içinde görünür kalabilir. Tam
-  // quranPaintDetail() iframe'i yeniden kurup oynatma konumunu sıfırlardı;
-  // yalnız durum/eylem bölgelerini boyayarak çalışan oynatıcıyı koru.
-  if(!quranPaintWatchedState(sid)) quranRepaintAfterChange(sid);
-  toast('WhatsApp açıldı.');
-};
+function quranSettleSubmit(sid,okFlag,err){ return window.SeymaQuran.quranSettleSubmit.apply(null,arguments); }
+App.quranJourneyRequest=function(){ return window.SeymaQuran.quranJourneyRequest.apply(null,arguments); };
+App.quranJourneyWatch=function(id){ return window.SeymaQuran.quranJourneyWatch.apply(null,arguments); };
+App.quranMarkWatched=function(id){ return window.SeymaQuran.quranMarkWatched.apply(null,arguments); };
+function quranAskMessage(x){ return window.SeymaQuran.quranAskMessage.apply(null,arguments); }
+App.quranJourneyQuestion=function(id){ return window.SeymaQuran.quranJourneyQuestion.apply(null,arguments); };
 
 // ── QY-11: uzak teslim/yanıt dosyalarını yerel duruma güvenle uygula ──
 // Girdi ZATEN QuranTransportV1 ile ayrıştırılmış/doğrulanmış yapılardır; bu
@@ -6978,56 +5938,8 @@ App.quranJourneyQuestion=function(id){
 //     (eski bir anlatım yeniden istendikten sonra geri canlanamaz),
 //   • zaman damgası olmayan kayıt asla kabul edilmez.
 var QURAN_REFRESH_TIMEOUT_MS=20000;
-function quranHasRemoteRequest(){
-  var q=ensureQuranJourney(data), reqs=q&&q.requests?q.requests:{};
-  return Object.keys(reqs).some(function(sid){
-    var req=reqs[sid];
-    return req&&req.requestId&&req.status!=='question_opened';
-  });
-}
-function quranRemoteErrorText(result,err){
-  if(err) return 'Ağ veya yetki hatası';
-  var errors=[];
-  if(result&&Array.isArray(result.deliveryErrors)) errors=errors.concat(result.deliveryErrors);
-  if(result&&Array.isArray(result.responseErrors)) errors=errors.concat(result.responseErrors);
-  return errors.length?'Uzak kayıt doğrulanamadı ('+errors.length+' uyarı)':'';
-}
-App.refreshQuranUpdates=function(silent,force){
-  if(ui.quranRefreshing) return;
-  if(!force&&!quranHasRemoteRequest()){
-    ui.quranRemoteStatus='unchanged'; ui.quranRemoteError='Bekleyen Kur’an isteği yok'; ui.quranRemoteCheckedAt=new Date().toISOString();
-    quranPaintRefreshButton();
-    if(!silent) toast('Kontrol edilecek bekleyen Kur’an isteği yok.');
-    return;
-  }
-  var s=(typeof window!=='undefined')?window.SeySync:null;
-  if(!s||typeof s.pullQuranUpdates!=='function'){
-    ui.quranRemoteStatus='error'; ui.quranRemoteError='Senkron yapılandırılmamış'; ui.quranRemoteCheckedAt=new Date().toISOString(); quranPaintRefreshButton();
-    if(!silent) toast('Senkron yapılandırılmamış; güncelleme kontrol edilemedi.');
-    return;
-  }
-  ui.quranRefreshing=true;
-  ui.quranRemoteStatus='checking'; ui.quranRemoteError='';
-  quranPaintRefreshButton();
-  var settled=false;
-  function settle(fn){ if(settled) return; settled=true; ui.quranRefreshing=false; ui.quranRemoteCheckedAt=new Date().toISOString(); quranPaintRefreshButton(); fn(); }
-  try{ setTimeout(function(){ settle(function(){ ui.quranRemoteStatus='error'; ui.quranRemoteError='Uzak kayıt zaman aşımına uğradı'; quranPaintRefreshButton(); if(!silent) toast('Güncelleme kontrol edilemedi; bağlantını kontrol edip tekrar deneyebilirsin.'); }); },QURAN_REFRESH_TIMEOUT_MS); }catch(e){}
-  try{
-    s.pullQuranUpdates(function(err,result){
-      settle(function(){
-        if(err||!result){ ui.quranRemoteStatus='error'; ui.quranRemoteError=quranRemoteErrorText(result,err)||'Uzak kayıt okunamadı'; if(!silent) toast('Güncelleme kontrol edilemedi; bağlantını kontrol edip tekrar deneyebilirsin.'); quranPaintRefreshButton(); return; }
-        var remoteResult=quranApplyRemoteUpdates(result.delivery,result.responses), changed=!!(remoteResult&&remoteResult.changed);
-        if(changed){ save(); quranRepaintAfterChange(ui.quranJourneyView==='detail'?ui.quranDetailId:''); if(!silent) toast(remoteResult.responseChanged?'Kur’an cevabı geldi.':'Kur’an teslim kaydı güncellendi.'); }
-        var warning=quranRemoteErrorText(result,null);
-        ui.quranRemoteStatus=warning?(changed?'updated_warning':'error'):(changed?(remoteResult.responseChanged?'updated':'updated_delivery'):'unchanged');
-        ui.quranRemoteError=warning||'';
-        quranPaintRefreshButton();
-        if(!changed&&!silent&&!warning) toast('Yeni bir güncelleme yok.');
-        else if(warning&&!silent) toast(changed?'Yanıt alındı; kaynakta doğrulama uyarısı var.':'Güncelleme doğrulanamadı; tekrar deneyebilirsin.');
-      });
-    });
-  }catch(e){ settle(function(){ ui.quranRemoteStatus='error'; ui.quranRemoteError='Uzak kayıt okunamadı'; quranPaintRefreshButton(); }); }
-};
+function quranHasRemoteRequest(){ return window.SeymaQuran.quranHasRemoteRequest.apply(null,arguments); }
+App.refreshQuranUpdates=function(silent,force){ return window.SeymaQuran.refreshQuranUpdates.apply(null,arguments); };
 
 // ── Overlay ve kütüphane etkileşimleri ──
 App.openQuranJourney=function(){
@@ -7126,17 +6038,8 @@ App.onQuranKeydown=function(e){
   return App.onModalKeydown(e,App.closeQuranJourney);
 };
 var _quranBodyLocked=false,_quranBodyPrevOverflow='';
-function quranLockBodyScroll(){
-  if(_quranBodyLocked||typeof document==='undefined'||!document.body) return;
-  _quranBodyPrevOverflow=document.body.style.overflow||'';
-  document.body.style.overflow='hidden';
-  _quranBodyLocked=true;
-}
-function quranUnlockBodyScroll(){
-  if(!_quranBodyLocked||typeof document==='undefined'||!document.body) return;
-  document.body.style.overflow=_quranBodyPrevOverflow;
-  _quranBodyLocked=false;
-}
+function quranLockBodyScroll(){ return window.SeymaQuran.quranLockBodyScroll.apply(null,arguments); }
+function quranUnlockBodyScroll(){ return window.SeymaQuran.quranUnlockBodyScroll.apply(null,arguments); }
 App.openQibla=function(){ ui.qiblaOpen=true; ui.qiblaSensorError=''; render(); focusModalDialog('qibla-dialog'); };
 var _qiblaOrientationHandler=null, _qiblaLastPaint=0, _qiblaSmoothHeading=null, _qiblaAbsoluteSeen=false;
 function qiblaSmoothAngle(previous,next,weight){
@@ -7422,15 +6325,7 @@ App.quranRowState=quranRowState;
 App.quranNewRequestId=quranNewRequestId;
 // QY-11 kabul kapısı için: uzak teslim/yanıt uygulayıcısı (harness okur).
 App.quranApplyRemoteUpdates=quranApplyRemoteUpdates;
-// Kalıcı OLMAYAN görünüm durumunun salt-okunur anlık kopyası. `ui` tek yazar
-// olarak app.js içinde kalır; harness yalnız okur, asla yazmaz.
-App.quranUiState=function(){
-  return {
-    open:!!ui.quranJourneyOpen,view:ui.quranJourneyView,detailId:ui.quranDetailId,
-    query:ui.quranQuery,filter:ui.quranFilter,filtersOpen:!!ui.quranFiltersOpen,
-    listScroll:ui.quranListScroll,submittingId:ui.quranSubmittingId
-  };
-};
+App.quranUiState=function(){ return window.SeymaQuran.quranUiState.apply(null,arguments); };
 // MON-51: only the approved 46 local domain shells pass through the existing
 // registry owner. App, live data/ui, save/render and DOM/focus sequencing stay
 // app.js-owned; frozen transport, GPS, fetch and notification paths stay out.
@@ -7903,13 +6798,8 @@ function applyReceipts(rc){
   });
   if(changed){ save(); render(); }
 }
-// Faz 7 anketi artık otomatik/zorunlu tetiklenmiyor (render() bu bayrağı dinlemiyor);
-// data.psych (geçmiş/skorlar) ve panelin gösterimi bozulmadan korunuyor.
-// psychDue() bilgi amaçlı bırakıldı; psychActive() her zaman false döner ki eski
-// "zorunlu anket açıkken arka plan popup'ı bastır" korumaları artık popup'ları
-// sonsuza dek susturmasın.
-function psychDue(){ try{ if(!data) return false; if(!(data.psych&&data.psych.completedAt)) return true; var t=Date.parse(data.psych.completedAt); if(isNaN(t)) return true; return (Date.now()-t)>=14*24*3600*1000; }catch(e){ return false; } }
-function psychActive(){ return false; }
+function psychDue(){ return window.SeymaProfile.psychDue.apply(null,arguments); }
+function psychActive(){ return window.SeymaProfile.psychActive.apply(null,arguments); }
 // Metni cihazın paylaşım sayfasına gönderir (Web Share API); desteklenmeyen
 // tarayıcılarda (çoğu masaüstü, eski iOS) panoya kopyalayıp haber verir —
 // böylece "paylaş" hiçbir cihazda sessizce hiçbir şey yapmamış olmaz.
@@ -8211,72 +7101,10 @@ var PSYCH_SCALES=[
       {q:'Kişiliğimin hoşlanmadığım yönlerine karşı hoşgörüsüz ve sabırsızım.', r:true}
     ] }
 ];
-function psychScaleById(id){ for(var i=0;i<PSYCH_SCALES.length;i++){ if(PSYCH_SCALES[i].id===id) return PSYCH_SCALES[i]; } return null; }
-function psychScore(a){
-  a=a||{};
-  function arr(id){ return Array.isArray(a[id])?a[id]:[]; }
-  var i;
-  // ASRS-6 (0-4): gölgeli-eşik sayımı (madde 1-3 ≥2, madde 4-6 ≥3); ≥4 → DEHB ile yüksek uyum
-  var asrs=arr('asrs'), asRaw=0, shaded=0, asShade=[2,2,2,3,3,3];
-  for(i=0;i<6;i++){ var av=Number(asrs[i])||0; asRaw+=av; if(av>=asShade[i]) shaded++; }
-  var asBand=shaded>=4?'yüksek uyum':(shaded>=2?'sınırda':'düşük');
-  // ECR-12 (1-7): kaçınma (0,2,4,6,8,10; ters:0,4,8) + kaygı (1,3,5,7,9,11; ters:7)
-  var ecr=arr('ecr');
-  function ecrV(idx){ return (Number(ecr[idx])||0)+1; }
-  var avoIdx=[0,2,4,6,8,10], anxIdx=[1,3,5,7,9,11], avoRev={0:1,4:1,8:1}, anxRev={7:1};
-  function subMean(idxs,rev){ var s=0,n=0; idxs.forEach(function(k){ var v=ecrV(k); if(rev[k]) v=8-v; s+=v; n++; }); return n?Math.round(s/n*10)/10:0; }
-  var anxiety=subMean(anxIdx,anxRev), avoidance=subMean(avoIdx,avoRev);
-  var bandAnx=anxiety>4?'yüksek':(anxiety>=3?'orta':'düşük'), bandAvo=avoidance>4?'yüksek':(avoidance>=3?'orta':'düşük');
-  var hiAnx=anxiety>4, hiAvo=avoidance>4;
-  var style=(!hiAnx&&!hiAvo)?'Güvenli':(hiAnx&&!hiAvo?'Saplantılı (kaygılı)':(!hiAnx&&hiAvo?'Kayıtsız (mesafeli)':'Korkulu (kaygılı-kaçıngan)'));
-  // GAD-7 (0-3): 0-4 minimal / 5-9 hafif / 10-14 orta / 15-21 yüksek
-  var gad=arr('gad7'), gadSum=0; for(i=0;i<7;i++) gadSum+=Number(gad[i])||0;
-  var gadBand=gadSum>=15?'yüksek':(gadSum>=10?'orta':(gadSum>=5?'hafif':'minimal'));
-  // PHQ-9 (0-3): 0-4/5-9/10-14/15-19/20-27; madde-9>0 VEYA toplam≥15 → güvenlik uyarısı
-  var phq=arr('phq9'), phqSum=0; for(i=0;i<9;i++) phqSum+=Number(phq[i])||0;
-  var item9=Number(phq[8])||0;
-  var phqBand=phqSum>=20?'ağır':(phqSum>=15?'orta-ağır':(phqSum>=10?'orta':(phqSum>=5?'hafif':'minimal')));
-  var alert=(item9>0)||(phqSum>=15);
-  // WHO-5 (0-5) → ×4 (0-100): ≥50 iyi / 28-49 düşük / <28 çok düşük (yüksek=iyi)
-  var who=arr('who5'), whoRaw=0; for(i=0;i<5;i++) whoRaw+=Number(who[i])||0;
-  var whoScore=whoRaw*4, whoBand=whoScore>=50?'iyi':(whoScore>=28?'düşük':'çok düşük');
-  // SCS-SF (1-5): ters maddeler 0,3,7,8,10,11 → 6-x; ortalama <2.5 düşük / 2.5-3.5 orta / >3.5 yüksek
-  var scs=arr('scs'), scsRev={0:1,3:1,7:1,8:1,10:1,11:1}, ss=0,sn=0;
-  for(i=0;i<12;i++){ var sv=(Number(scs[i])||0)+1; if(scsRev[i]) sv=6-sv; ss+=sv; sn++; }
-  var scsMean=sn?Math.round(ss/sn*10)/10:0, scsBand=scsMean>=3.5?'yüksek':(scsMean>=2.5?'orta':'düşük');
-  return {
-    attention:{raw:asRaw,shaded:shaded,band:asBand},
-    attachment:{anxiety:anxiety,avoidance:avoidance,bandAnx:bandAnx,bandAvo:bandAvo,style:style},
-    anxiety:{sum:gadSum,band:gadBand},
-    depression:{sum:phqSum,band:phqBand,item9:item9,alert:alert},
-    wellbeing:{score:whoScore,band:whoBand},
-    selfCompassion:{mean:scsMean,band:scsBand}
-  };
-}
-function psychSummaryLines(sc){
-  if(!sc) return [];
-  return [
-    'Dikkat/odak (ASRS-6): '+sc.attention.band+(sc.attention.band==='yüksek uyum'?' — DEHB taraması yüksek uyumlu, ilgi/odak destekleyici bir yaklaşım işe yarar':''),
-    'Bağlanma/güven (ECR): '+sc.attachment.style+' — kaygı '+sc.attachment.anxiety+'/7, kaçınma '+sc.attachment.avoidance+'/7',
-    'Kaygı (GAD-7): '+sc.anxiety.band+' ('+sc.anxiety.sum+'/21)',
-    'Duygudurum (PHQ-9): '+sc.depression.band+' ('+sc.depression.sum+'/27)'+(sc.depression.alert?' — dikkat gerektiren düzey':''),
-    'İyi oluş (WHO-5): '+sc.wellbeing.band+' ('+sc.wellbeing.score+'/100)',
-    'Öz-şefkat (SCS): '+sc.selfCompassion.band+' ('+sc.selfCompassion.mean+'/5)'
-  ];
-}
-// PHQ-9 pozitifse SESSİZ güvenlik uyarısı: data.aeon.qa'ya YAZMAZ, Şeyma'ya toast çıkarmaz;
-// yalnızca mevcut aeon-outbox.json→Actions→e-posta hattını tetikler (Faz 5 gözlemci bildirimi).
-function psychSafetyPing(sc){
-  try{
-    if(!sc||!sc.depression||!sc.depression.alert) return;
-    if(!window.SeySync) return;
-    try{ if(typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
-    var ts=new Date().toISOString(), qid='psafe_'+Date.now().toString(36);
-    var msg='[Otomatik güvenlik uyarısı] Şeyma psikolojik tarama anketini tamamladı ve duygudurum taraması dikkat gerektiren düzeyde çıktı (PHQ-9: '+sc.depression.sum+'/27'
-      +(sc.depression.item9>0?', kendine zarar maddesi işaretli':'')+'). Lütfen nazikçe ve yakından ilgilen; bu mesaj Şeyma’ya gösterilmedi.';
-    if(typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:msg,ts:ts});
-  }catch(e){}
-}
+function psychScaleById(id){ return window.SeymaProfile.psychScaleById.apply(null,arguments); }
+function psychScore(a){ return window.SeymaProfile.psychScore.apply(null,arguments); }
+function psychSummaryLines(sc){ return window.SeymaProfile.psychSummaryLines.apply(null,arguments); }
+function psychSafetyPing(sc){ return window.SeymaProfile.psychSafetyPing.apply(null,arguments); }
 var LUNA_SYSTEM='Sen Luna’sın — Şeyma’nın sıcak, sakin ve bilge kişisel sağlık ve yaşam yoldaşı. '
 +'Şeyma’ya HER ZAMAN "Sevgili Günışığı" diye hitap et (başka isim ya da hitap kullanma). '
 +'Şeyma seninle gün içinde sohbet ediyor (günde birkaç soru sorabilir), bu yüzden bir mesajlaşma gibi sıcak ve akıcı konuş. '

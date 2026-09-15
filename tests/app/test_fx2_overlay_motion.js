@@ -26,6 +26,13 @@ const renderSource = fs.readFileSync(path.join(repoRoot, 'app/core/render.js'), 
 // combinedSource'a girer — onclick/handler pin'leri gövdeyi izler (K8 ilkesi).
 const remindersSource = fs.readFileSync(path.join(repoRoot, 'app/core/reminders.js'), 'utf8');
 const reminderSurfaceSource = fs.readFileSync(path.join(repoRoot, 'app/core/reminderSurface.js'), 'utf8');
+// MON2-06 (K8 ilkesi: pin gövdeyi izler): zikir/kuran kapatma sarmalayıcıları
+// app/core/zikir.js ve app/core/quran.js yüzey bölümlerine taşındı. Bu iki
+// dosya yalnız closeX sarmalayıcı aramasında kullanılır — combinedSource'a
+// EKLENMEZ, çünkü onclick=391 pini bu dosyalar hariç ölçülmüştür (zikir/kuran
+// görünüm gövdeleri kendi onclick metinlerini zaten taşır).
+const zikirSource = fs.readFileSync(path.join(repoRoot, 'app/core/zikir.js'), 'utf8');
+const quranSource = fs.readFileSync(path.join(repoRoot, 'app/core/quran.js'), 'utf8');
 const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource + remindersSource + reminderSurfaceSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
@@ -94,12 +101,20 @@ group('FX2-16.1 12 hedef closeX sarmalayıcısı doğru yüzey kimliğine bağl�
   let end = start < 0 ? -1 : source.indexOf('\nApp.', start + 1);
   let body = source.slice(start, end < 0 ? source.length : end);
   if (start < 0 || !/var body=function\(\)/.test(body)) {
-    // K8 (MON2-03): modüle taşınan sarmalayıcı `function App_x(){...}` biçimindedir
-    // (App_ öneki + registry üyesi) — sheetClose guard'lı window.SeyFx.sheetClose olur.
-    start = reminderSurfaceSource.indexOf(`function App_${name}(){`);
-    source = reminderSurfaceSource;
-    end = start < 0 ? -1 : source.indexOf('\nfunction ', start + 1);
-    body = source.slice(start, end < 0 ? source.length : end);
+    // K8 (MON2-03/MON2-06): modüle taşınan sarmalayıcı `function App_x(){...}`
+    // biçimindedir (App_ öneki + registry üyesi). Önce reminderSurface, sonra
+    // MON2-06'nın alan registry'leri (zikir/quran/profile) denenir.
+    const movedSources = [reminderSurfaceSource, zikirSource, quranSource, profileSource];
+    for (const candidate of movedSources) {
+      const at = candidate.indexOf(`function App_${name}(){`);
+      if (at < 0) continue;
+      const stop = candidate.indexOf('\nfunction ', at + 1);
+      const slice = candidate.slice(at, stop < 0 ? candidate.length : stop);
+      if (/var body=function\(\)/.test(slice) && slice.includes(`sheetClose('${card}','${back}',body)`)) {
+        return true;
+      }
+    }
+    return false;
   }
   return start >= 0 && /var body=function\(\)/.test(body) && body.includes(`sheetClose('${card}','${back}',body)`);
 }));

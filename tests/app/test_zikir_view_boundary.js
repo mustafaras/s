@@ -93,7 +93,11 @@ var f=fixture(),z=f.z;
 var moved=['zikrPreviewCardHTML','zikrDetailControlsHTML','zikrResetConfirmHTML','zikrActionNoteHTML','zikrNoteEditorHTML','zikrManualAmountOf','zikrManualQuickChips','zikrManualPreviewHTML','zikrManualSheetHTML','zikrCounterViewHTML','zikrPresetsResultsHTML','zikrPresetsViewHTML','zikrHatimsViewHTML','zikrHistoryViewHTML','zikrSettingsViewHTML','zikrViewBodyHTML'];
 ok('registry tüm motor + görünüm üyelerini açıyor',moved.every(function(name){ return typeof z[name]==='function'; }));
 ok('view registry yüklemede dış yan etki açmıyor',source.indexOf('document')<0&&source.indexOf('fetch(')<0&&source.indexOf('localStorage')<0&&source.indexOf('setTimeout(')<0&&source.indexOf('setInterval(')<0&&!/^[ \t]*(?:var[ \t]+)?data[ \t]*=/m.test(source));
-ok('view resolverları state mutation yerine app-owned bag kullanıyor',/function zikrNoteDraftFor\(p\)\{ return viewCall\('noteDraftFor',\[p\]\); \}/.test(source)&&/function zikrManualDraftFor\(p\)\{ return viewCall\('manualDraftFor',\[p\]\); \}/.test(source)&&/function zikrNoteDraftFor\(p\)[\s\S]*ui\.zikrNotePresetId/.test(appSource)&&/function zikrManualDraftFor\(p\)[\s\S]*ui\.zikrManualPresetId/.test(appSource));
+// MON2-06 (K8 ilkesi: pin gövdeyi izler): zikrNoteDraftFor/zikrManualDraftFor
+// gövdeleri app/core/zikir.js yüzey bölümüne taşındı; draft mutation'ının
+// app-owned bag (ui) üzerinden yapıldığı artık o bölümde doğrulanır.
+var zikirSurfaceSource=source.slice(source.indexOf('MON2-06'));
+ok('view resolverları state mutation yerine app-owned bag kullanıyor',/function zikrNoteDraftFor\(p\)\{ return viewCall\('noteDraftFor',\[p\]\); \}/.test(source)&&/function zikrManualDraftFor\(p\)\{ return viewCall\('manualDraftFor',\[p\]\); \}/.test(source)&&/function zikrNoteDraftFor\(p\)[\s\S]*ui\.zikrNotePresetId/.test(zikirSurfaceSource)&&/function zikrManualDraftFor\(p\)[\s\S]*ui\.zikrManualPresetId/.test(zikirSurfaceSource));
 ok('overlay ve yerinde paint kabuğu app-owned kaldı',/function zikroverlayHTML\(/.test(appSource)&&/function zikrPaintView\(/.test(appSource));
 ok('tüm view shimleri imza ve apply yüzeyini koruyor',moved.every(function(name){ return new RegExp('function '+name+'\\([^)]*\\)\\{ return window\\.SeymaZikr\\.'+name+'\\.apply\\(null,arguments\\); \\}').test(appSource); }));
 

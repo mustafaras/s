@@ -64,7 +64,12 @@ ok('SeyAudio.tick yalnız soundOn guardı geçince bir kez çağrılıyor',tickC
 z.zikrPauseSession();
 ok('pause motoru aktif oturumu duraklatıyor',!!root.activeSession&&typeof root.activeSession.pausedAt==='string');
 
-var appTap=appSource.slice(appSource.indexOf('App.zikrTap=function'),appSource.indexOf('App.zikrUndo=function'));
+// MON2-06 (K8 ilkesi: pin gövdeyi izler): zikir alan gövdeleri (zikrTap,
+// zikrUndo, paint kabuğu) app/core/zikir.js yüzey bölümüne taşındı; gövdeyi
+// metin olarak arayan sözleşmeler `movedSource`ta aranır.
+var zikirSource=fs.readFileSync(path.join(repoRoot,'app/core/zikir.js'),'utf8');
+var zikirSurface=zikirSource.slice(zikirSource.indexOf('MON2-06'));
+var appTap=zikirSurface.slice(zikirSurface.indexOf('function App_zikrTap('),zikirSurface.indexOf('function App_zikrUndo('));
 ok('guide başlangıç/tamamlanma/yarı-hedef çağrıları app-owned kabukta',appTap.indexOf('guides.zikirStart')>=0&&appTap.indexOf('guides.zikirComplete')>=0&&appTap.indexOf('guides.zikirHalf')>=0);
 ok('streak haptic ve bell çağrıları app-owned kabukta',appTap.indexOf('SeyHaptics.streak')>=0&&appTap.indexOf('SeyAudio.bell')>=0);
 ok('view gövdeleri registryde, overlay/paint kabuğu app-owned',

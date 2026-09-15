@@ -1038,3 +1038,687 @@ function zikrViewBodyHTML(view,p,z){
     zikrManualEntryCountFor:zikrManualEntryCountFor
   };
 })();
+
+// MON2-06 · zikr yüzey bölümü — app.js'ten taşınan 57 gövde.
+// MON-50 appSurface deseni (with(SCOPE)); bu IIFE bilinçli olarak sloppy-mode'dur
+// (with yalnız sloppy modda geçerlidir) ve dosyanın strict bölümüne dokunmaz (S5:
+// yükleme anında DOM/ağ/timer/storage erişimi yok). Bag üyeleri getter fn'dir; mut
+// listesindeki app.js pinleri için set_<ad> yazıcısı aynı bag'de verilir.
+// K4: DOM/timer erişimi ÇIPLAK GLOBAL DEĞİL, bag üzerinden yapılır (`doc`,
+// `defer`) — böylece dosya hiçbir tarayıcı globali adı taşımaz.
+(function(){
+  var zikr_surfaceDeps=null;
+  var ZIKR_SURFACE_DEPENDENCIES=["App","ZIKR_RING_RADIUS","ZIKR_TOPIC_GROUPS","ZIKR_V2_VISIBLE","_zikrBodyLocked","_zikrBodyPrevOverflow","_zikrCompleteFlash","_zikrContentEsmaIdx","a","data","dayIndexFor","defer","doc","el","esc","getDay","haptic","icon","input","lastOverlayView","reminderRestoreFocus","render","save","toast","todayStr","ui","zikrSyncWakeLock"];
+  var ZIKR_MUTABLE_DEPENDENCIES=["_zikrBodyLocked","_zikrBodyPrevOverflow","_zikrCompleteFlash","_zikrContentEsmaIdx","lastOverlayView"];
+  var SCOPE=Object.create(null);
+  function registerZikrSurface(deps){
+    if(zikr_surfaceDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
+    for(var i=0;i<ZIKR_SURFACE_DEPENDENCIES.length;i++){ if(typeof deps[ZIKR_SURFACE_DEPENDENCIES[i]]!=='function') return false; }
+    for(var j=0;j<ZIKR_MUTABLE_DEPENDENCIES.length;j++){ if(typeof deps['set_'+ZIKR_MUTABLE_DEPENDENCIES[j]]!=='function') return false; }
+    zikr_surfaceDeps=deps; installZikrSurfaceScope(SCOPE); return true;
+  }
+  function isZikrSurfaceReady(){ return !!zikr_surfaceDeps; }
+  function installZikrSurfaceScope(s){
+    var seen={},k,d,n;
+    var ns=window.SeymaZikr||{};
+    for(k in ns) if(Object.prototype.hasOwnProperty.call(ns,k)) seen[k]=1;
+    for(d=0;d<ZIKR_SURFACE_DEPENDENCIES.length;d++){ n=ZIKR_SURFACE_DEPENDENCIES[d]; if(n.indexOf('set_')!==0) seen[n]=1; }
+    Object.keys(seen).forEach(function(name){
+      var mut=ZIKR_MUTABLE_DEPENDENCIES.indexOf(name)>=0;
+      Object.defineProperty(s,name,{
+        get:function(){
+          if(zikr_surfaceDeps&&Object.prototype.hasOwnProperty.call(zikr_surfaceDeps,name)) return zikr_surfaceDeps[name]();
+          var live=window.SeymaZikr; return live?live[name]:undefined;
+        },
+        set:mut?function(v){ zikr_surfaceDeps['set_'+name](v); }:undefined,
+        configurable:true,enumerable:true
+      });
+    });
+  }
+  with(SCOPE){
+function zikrContentFor(p){
+  if(!p||!p.id) return null;
+  function sourceLabels(refs,sources){
+    return (refs||[]).map(function(sid){ var s=sources&&sources[sid]; return s&&s.institution?s.institution:null; }).filter(Boolean);
+  }
+  if(p.kind==='esma'){
+    var mod=window.EsmaulHusnaV2;
+    if(!mod||!Array.isArray(mod.names)) return null;
+    if(!_zikrContentEsmaIdx){ _zikrContentEsmaIdx={}; mod.names.forEach(function(r){ _zikrContentEsmaIdx[r.id]=r; }); }
+    var rec=_zikrContentEsmaIdx[p.id];
+    if(!rec||!(rec.meaningTr||rec.importanceTr)) return null;
+    return {meaningTr:rec.meaningTr||'',importanceTr:rec.importanceTr||'',reflectionTr:rec.reflectionTr||'',verseNoteTr:'',sourceLabel:sourceLabels(rec.sourceRefs,mod.sources).join(', ')};
+  }
+  var mod2=window.ZikirCoreContentV1;
+  if(!mod2||!mod2.content) return null;
+  var rec2=mod2.content[p.id];
+  if(!rec2||!(rec2.meaningTr||rec2.importanceTr)) return null;
+  return {meaningTr:rec2.meaningTr||'',importanceTr:rec2.importanceTr||'',reflectionTr:rec2.reflectionTr||'',verseNoteTr:rec2.verseNoteTr||'',sourceLabel:sourceLabels(rec2.sourceRefs,mod2.sources).join(', ')};
+}
+
+function zikrNormalizeSearchText(s){
+  return String(s||'').toLocaleLowerCase('tr-TR')
+    .replace(/[İIı]/g,'i').replace(/[üÜ]/g,'u').replace(/[öÖ]/g,'o')
+    .replace(/[çÇ]/g,'c').replace(/[şŞ]/g,'s').replace(/[ğĞ]/g,'g')
+    .replace(/[âÂ]/g,'a').replace(/[îÎ]/g,'i').replace(/[ûÛ]/g,'u');
+}
+
+function zikrPresetSearchText(x){
+  var c=zikrContentFor(x);
+  return zikrNormalizeSearchText([x.name,x.phrase,x.arabic,x.ebced||x.target,c&&c.meaningTr,c&&c.importanceTr].filter(Boolean).join(' '));
+}
+
+function zikrTopicGroup(id){
+  for(var i=0;i<ZIKR_TOPIC_GROUPS.length;i++) if(ZIKR_TOPIC_GROUPS[i].id===id) return ZIKR_TOPIC_GROUPS[i];
+  return ZIKR_TOPIC_GROUPS[0];
+}
+
+function zikrTopicMatch(x,topicId){
+  var group=zikrTopicGroup(topicId); if(group.id==='all') return true;
+  var text=zikrPresetSearchText(x);
+  for(var i=0;i<group.terms.length;i++) if(text.indexOf(zikrNormalizeSearchText(group.terms[i]))>=0) return true;
+  return false;
+}
+
+function zikrPresetTopicLabel(x){
+  for(var i=1;i<ZIKR_TOPIC_GROUPS.length;i++) if(zikrTopicMatch(x,ZIKR_TOPIC_GROUPS[i].id)) return ZIKR_TOPIC_GROUPS[i].label;
+  return x.kind==='esma'?'Esmâ-i Hüsnâ':'Temel zikir';
+}
+
+function zikrPaintLive(result){
+  try{
+    var math=result&&result.math, p=result&&result.preset; if(!math||!p) return false;
+    var countEl=doc.getElementById('zikr-live-count'), sub=doc.getElementById('zikr-live-sub'), kicker=doc.getElementById('zikr-live-kicker'), cycle=doc.getElementById('zikr-live-cycle'), total=doc.getElementById('zikr-live-hatim'), today=doc.getElementById('zikr-live-today'), todaySub=doc.getElementById('zikr-live-today-sub'), cycleSub=doc.getElementById('zikr-live-cycle-sub'), totalSub=doc.getElementById('zikr-live-hatim-sub'), sessionEl=doc.getElementById('zikr-live-session'), ring=doc.getElementById('zikr-live-ring');
+    if(!countEl||!sub||!cycle||!total||!today) return false;
+    countEl.textContent=p.kind==='esma'?math.remainingInCycle:math.cyclePosition;
+    sub.textContent=p.kind==='esma'?'kaldı':'/ '+math.baseTarget;
+    if(kicker) kicker.textContent=math.currentCycleNo+'. TUR · '+math.cyclePosition+' SAYILDI';
+    cycle.textContent=math.complete?(math.baseTarget+' tur tamam'):(math.currentCycleNo+'. tur · '+math.cyclePosition+'/'+math.baseTarget);
+    total.textContent=p.kind==='esma'?(math.count.toLocaleString('tr-TR')+' / '+math.hatimTarget.toLocaleString('tr-TR')):(result.journey.lifetimeCount.toLocaleString('tr-TR')+' ömürlük');
+    today.textContent=zikrInt(result.count).toLocaleString('tr-TR');
+    if(todaySub) todaySub.textContent=zikrInt(result.total).toLocaleString('tr-TR')+' toplam';
+    if(cycleSub) cycleSub.textContent=math.complete?'Yeni hatme hazırsın':math.remainingInCycle+' kaldı';
+    if(totalSub) totalSub.textContent=p.kind==='esma'?(math.remainingInHatim.toLocaleString('tr-TR')+' kaldı'):(Math.floor(result.journey.lifetimeCount/math.baseTarget)+' tur');
+    if(sessionEl){ var active=ensureZikrRoot().activeSession; sessionEl.textContent=(active&&active.presetId===p.id?zikrInt(active.count):0).toLocaleString('tr-TR'); }
+    if(ring){ var C=2*Math.PI*ZIKR_RING_RADIUS, pct=math.baseTarget?math.cyclePosition/math.baseTarget:0; if(math.complete) pct=1; ring.style.strokeDashoffset=(C*(1-pct)).toFixed(1); }
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrLockBodyScroll(){
+  if(_zikrBodyLocked||typeof doc==='undefined'||!doc.body) return;
+  _zikrBodyPrevOverflow=doc.body.style.overflow||'';
+  doc.body.style.overflow='hidden';
+  _zikrBodyLocked=true;
+}
+
+function zikrUnlockBodyScroll(){
+  if(!_zikrBodyLocked||typeof doc==='undefined'||!doc.body) return;
+  doc.body.style.overflow=_zikrBodyPrevOverflow;
+  _zikrBodyLocked=false;
+}
+
+function App_openZikr(){ if(!ZIKR_V2_VISIBLE){ ui.zikrOpen=false; toast('Zikirmatik yenileniyor; çok yakında daha iyi haliyle dönecek.'); return; } ui.zikrOpen=true; ui.zikrView=ui.zikrView||'counter'; _zikrCompleteFlash=false; render(); zikrSyncWakeLock(); zikrLockBodyScroll(); try{ var shell=doc.getElementById('zikr-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){} };
+
+function App_closeZikr(){
+  var body=function(){
+    var targetFocusId=ui.reminderTargetReturnFocusId; zikrPauseSession(); ui.zikrOpen=false; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId=''; zikrSyncWakeLock(); zikrUnlockBodyScroll(); save(); _zikrCompleteFlash=false; ui.reminderTargetReturnFocusId=''; render();
+    // ZP-07 rule 5: odak, açılışta tetikleyen elemana (bilinen giriş noktası:
+    // Saygı hub'ındaki Zikirmatik önizleme kartı) döner. render() tüm #app
+    // innerHTML'ini yeniden ürettiğinden eski DOM referansı tutulamaz; bu
+    // yüzden kapalıktan sonra kararlı id ile yeniden sorgulanır.
+    if(!reminderRestoreFocus(targetFocusId,'zikr-preview-card')){ try{ var trigger=doc.getElementById('zikr-preview-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){} }
+  };
+  if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('zikr-screen','zikr-overlay',body); else body();
+};
+
+function App_setZikrView(v){
+  var allowed={counter:1,presets:1,hatims:1,history:1,settings:1};
+  if(!allowed[v]||ui.zikrView===v) return;
+  ui.zikrView=v;
+  // Zikirmatik kendi tam ekran kabuğuna sahip. İç sekme değişiminde global
+  // render() bütün #app'i ve overlay'i yeniden kurarak görünür bir parlama,
+  // scroll sıçraması ve gereksiz iş üretiyordu. Kabuğu yerinde tutup yalnız
+  // tab durumu + ana içerik alanını boyuyoruz; headless/eski DOM ortamlarında
+  // güvenli biçimde tam render'a düşer.
+  if(!zikrPaintView(v)) render();
+};
+
+function App_toggleZikrDetail(){ ui.zikrDetailOpen=!ui.zikrDetailOpen; if(!zikrPaintDetail()) if(!zikrPaintView('counter',true)) render(); };
+
+function App_onZikrKeydown(e){
+  return App.onModalKeydown(e,App.closeZikr);
+};
+
+function App_zikrTap(){
+  var r=zikrTouchTick(); if(!r) return;
+  if(r.paused){ toast('Sayaç duraklatıldı · devam etmek için Sürdür’e dokun.'); return; }
+  if(r.hatimComplete){ toast('Bu Ebced² Tam Hatim tamamlandı. Hatimlerim’den yeni bir hatim başlatabilirsin.',2800); return; }
+  ui.zikrLastReset=null; ui.zikrActionNote=''; zikrPaintActionNote();
+  zikrTickSound();
+  // FX-P-55: oturumun ilk dokunuşunda nazik başlangıç ipucu (oturum başına 1).
+  try{
+    if(r.sessionStarted && window.SeyAudio && typeof window.SeyAudio.guides==='object' && window.SeyAudio.guides && typeof window.SeyAudio.guides.zikirStart==='function') window.SeyAudio.guides.zikirStart();
+  }catch(e){}
+  if(ensureZikrRoot().settings.haptic){ try{ haptic([8]); }catch(e){} }
+  var spark=false;
+  if(r.doneNow){
+    spark=true;
+    _zikrCompleteFlash=true;
+    if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell();
+    if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak();
+    if(ensureZikrRoot().settings.haptic){ try{ haptic([10,40,10]); }catch(e){} }
+    if(r.hatimDone) toast('Mâşallah · '+r.preset.name+' Ebced² Tam Hatmi tamamlandı.',3200);
+    else toast('Mâşallah · '+r.math.completedCycles+'. tur tamamlandı ('+r.target+')',2300);
+    // FX-P-52: zikir hedefi tamamlandığında kısa nazik sesli ipucu — günde en
+    // fazla 1 kez (settings.voiceZikrDate damgası). FX-P-55: kopya artık
+    // SeyAudio.guides.zikirComplete üzerinden gider (tek kaynak). Quiet-time ve
+    // voiceGuidance gating'i SeyAudio.voice içinde.
+    try{
+      if(data&&data.settings&&data.settings.voiceZikrDate!==todayStr()){
+        data.settings.voiceZikrDate=todayStr();
+        if(window.SeyAudio&&typeof window.SeyAudio.guides==='object'&&window.SeyAudio.guides&&typeof window.SeyAudio.guides.zikirComplete==='function') window.SeyAudio.guides.zikirComplete();
+        else if(window.SeyAudio&&typeof window.SeyAudio.voice==='function') window.SeyAudio.voice('Allah kabul etsin. Güzel bir mola vermek ister misin?', { lang:'tr-TR', rate:1 });
+        save(false);
+      }
+    }catch(e){}
+    // Esmâ'da bir ebced turu, Ebced² tam hatmin yalnızca bir parçasıdır;
+    // 489. sayımda başka isme geçmek Fettâh yolculuğunu böler. Otomatik
+    // ilerleme yalnız normal/core preset turlarında çalışır.
+    if(ensureZikrRoot().settings.autoAdvance&&!r.hatimDone&&r.preset.kind!=='esma'){
+      var z=ensureZikrRoot();
+      var idx=0; for(var i=0;i<z.presets.length;i++){ if(z.presets[i].id===r.preset.id){ idx=i; break; } }
+      var next=z.presets[idx+1]||z.presets[0];
+      z.settings.activePresetId=next.id;
+      defer(function(){ toast('Sıradaki: '+next.name+' ('+next.target+')',2000); },900);
+    }
+  }
+  save();
+  if(!zikrPaintLive(r)) render();
+  zikrPaintPauseButton();
+  // FX-P-55: tur ortası (yarı hedefe geçiş) kısa nefes ipucu — oturum başına
+  // bir kez (ui._voiceZikirHalfGiven oturum-level bayrağı). doneNow ile çakışmaz.
+  try{
+    if(r.halfNow && !ui._voiceZikirHalfGiven){
+      ui._voiceZikirHalfGiven=true;
+      if(window.SeyAudio && window.SeyAudio.guides && typeof window.SeyAudio.guides.zikirHalf==='function') window.SeyAudio.guides.zikirHalf();
+    }
+  }catch(e){}
+  if(spark){
+    try{ var sparkEl=doc.querySelector('.zikr-done-spark'); if(sparkEl&&sparkEl.classList) sparkEl.classList.add('on'); }catch(e){}
+    defer(function(){ _zikrCompleteFlash=false; try{ var el=doc.querySelector('.zikr-done-spark'); if(el&&el.classList) el.classList.remove('on'); }catch(e){} },1200);
+  }
+};
+
+function App_zikrUndo(){
+  var date=todayStr(), day=zikrDay(date), p=zikrActivePreset(); if(!p) return;
+  var reset=ui.zikrLastReset;
+  if(reset&&reset.date===date&&reset.presetId===p.id&&reset.root){
+    data.zikr=JSON.parse(JSON.stringify(reset.root));
+    var restoredDay=getDay(data,date,dayIndexFor(date));
+    if(reset.dayMirror) restoredDay.zikr=JSON.parse(JSON.stringify(reset.dayMirror)); else delete restoredDay.zikr;
+    ui.zikrLastReset=null; ui.zikrActionNote='Sıfırlama geri alındı · '+zikrInt(reset.amount).toLocaleString('tr-TR')+' sayım geri yüklendi.';
+    save();
+    var rp=zikrActivePreset(), rd=zikrDay(date), rpd=zikrPresetDay(rd,rp.id), rjp=zikrJourneyProgress(rp);
+    if(!zikrPaintLive({preset:rp,count:rpd.count,total:rd.totalCount,math:rjp.math,journey:rjp.journey,hatim:rjp.hatim})) if(!zikrPaintView('counter',true)) render();
+    zikrPaintPauseButton(); zikrPaintResetConfirm(); zikrPaintActionNote();
+    toast('Sıfırlama geri alındı.');
+    return;
+  }
+  var pd=zikrPresetDay(day,p.id);
+  if(pd.count<=0){
+    ui.zikrActionNote='Geri alınacak yeni bir sayım yok.';
+    zikrPaintActionNote();
+    toast(ui.zikrActionNote);
+    return;
+  }
+  var jp=zikrJourneyProgress(p), j=jp.journey, h=jp.hatim, before=jp.math, now=new Date().toISOString();
+  if(p.kind==='esma'&&h&&h.count>0){
+    if(h.status==='completed'){ h.status='active'; h.completedAt=null; j.completedHatims=Math.max(0,j.completedHatims-1); }
+    h.count--; h.lastAt=now;
+  }
+  j.lifetimeCount=Math.max(0,j.lifetimeCount-1); j.lastAt=now;
+  pd.count--; pd.lastAt=now; day.totalCount=Math.max(0,day.totalCount-1); day.lastAt=now;
+  var after=zikrMath(p,p.kind==='esma'&&h?h.count:j.lifetimeCount);
+  if(after.completedCycles<before.completedCycles){ pd.completedCycles=Math.max(0,pd.completedCycles-1); day.completedSets=Math.max(0,day.completedSets-1); }
+  var z=ensureZikrRoot(); if(z.activeSession&&z.activeSession.presetId===p.id) z.activeSession.count=Math.max(0,zikrInt(z.activeSession.count)-1);
+  syncZikrDayMirror(date,day);
+  ui.zikrActionNote='Son sayım geri alındı · bugün '+pd.count.toLocaleString('tr-TR')+'.';
+  save();
+  if(!zikrPaintLive({preset:p,count:pd.count,total:day.totalCount,math:after,journey:j,hatim:h})) if(!zikrPaintView('counter',true)) render();
+  zikrPaintActionNote();
+};
+
+function App_setZikrPresetFilter(el){
+  ui.zikrPresetFilter=String(el&&el.value||'');
+  if(!zikrPaintLibraryResults()) render();
+  try{ var clear=doc.getElementById('zikr-search-clear'); if(clear) clear.hidden=!ui.zikrPresetFilter; }catch(e){}
+};
+
+function App_clearZikrPresetFilter(){
+  ui.zikrPresetFilter='';
+  if(!zikrPaintLibraryResults()) render();
+  try{ var el=doc.getElementById('zikr-search-input'), clear=doc.getElementById('zikr-search-clear'); if(el){ el.value=''; if(el.focus) el.focus(); } if(clear) clear.hidden=true; }catch(e){}
+};
+
+function App_setZikrLibFilter(mode){ ui.zikrLibFilter=(mode==='active'||mode==='done'||mode==='fav')?mode:'all'; if(!zikrPaintLibraryResults()) render(); };
+
+function App_setZikrTopic(topic){ ui.zikrTopic=zikrTopicGroup(topic).id; if(!zikrPaintLibraryResults()) render(); };
+
+function App_toggleZikrFilters(){
+  ui.zikrFiltersOpen=!ui.zikrFiltersOpen;
+  try{
+    var shell=doc.querySelector('.zikr-v2-filter-expander'), panel=doc.getElementById('zikr-filter-panel'), button=shell&&shell.querySelector('.zikr-v2-filter-summary');
+    if(!shell||!panel||!button) throw new Error('filter expander unavailable');
+    shell.classList.toggle('is-open',ui.zikrFiltersOpen);
+    panel.hidden=!ui.zikrFiltersOpen;
+    button.setAttribute('aria-expanded',ui.zikrFiltersOpen?'true':'false');
+  }catch(e){ if(!zikrPaintLibraryResults()) render(); }
+};
+
+function App_toggleZikrNote(){
+  ui.zikrNoteOpen=!ui.zikrNoteOpen;
+  if(!zikrPaintNoteRegion()) if(!zikrPaintView('counter',true)) render();
+};
+
+function App_onZikrNoteField(field,el){
+  if(field!=='feelings'&&field!=='thoughts'&&field!=='intention') return;
+  var p=zikrActivePreset(), d=zikrNoteDraftFor(p);
+  d[field]=String(el&&el.value||'').slice(0,field==='thoughts'?3000:(field==='feelings'?2000:1000));
+  ui.zikrNoteStatus='';
+  try{
+    var count=doc.getElementById('zikr-note-count'), status=doc.getElementById('zikr-note-status');
+    if(count) count.textContent=zikrReflectionWordCount(d)+' kelime';
+    if(status){ status.hidden=true; status.textContent=''; }
+  }catch(e){}
+};
+
+function App_setZikrNoteMood(mood){
+  var allowed={'huzurlu':1,'şükür':1,'umutlu':1,'dalgın':1,'yorgun':1,'zorlanıyorum':1};
+  if(!allowed[mood]) return;
+  var d=zikrNoteDraftFor(zikrActivePreset()); d.mood=d.mood===mood?'':mood; ui.zikrNoteStatus='';
+  if(!zikrPaintNoteRegion()) if(!zikrPaintView('counter',true)) render();
+};
+
+function App_saveZikrNote(){
+  var p=zikrActivePreset(), d=zikrNoteDraftFor(p);
+  d.feelings=String(d.feelings||'').trim(); d.thoughts=String(d.thoughts||'').trim(); d.intention=String(d.intention||'').trim();
+  if(!d.mood&&!d.feelings&&!d.thoughts&&!d.intention){ ui.zikrNoteStatus='Kaydetmek için en az bir duygu veya cümle ekle.'; zikrPaintNoteRegion(); return; }
+  var z=ensureZikrRoot(), date=todayStr(), id=zikrReflectionId(date,p.id), now=new Date().toISOString(), rec=zikrReflection(date,p.id);
+  if(!rec){
+    rec={id:id,date:date,presetId:p.id,presetName:p.name,mood:'',feelings:'',thoughts:'',intention:'',wordCount:0,createdAt:now,updatedAt:now};
+    z.reflections.push(rec);
+  }
+  rec.presetName=p.name; rec.mood=d.mood; rec.feelings=d.feelings; rec.thoughts=d.thoughts; rec.intention=d.intention;
+  rec.wordCount=zikrReflectionWordCount(d); rec.updatedAt=now; if(!rec.createdAt) rec.createdAt=now;
+  var dayRec=getDay(data,date,dayIndexFor(date)); dayRec.zikrReflectionUpdatedAt=now;
+  z.reflections.sort(function(a,b){ return (b.updatedAt||b.createdAt).localeCompare(a.updatedAt||a.createdAt); });
+  ui.zikrNoteStatus='Kaydedildi · '+p.name+' · '+rec.wordCount+' kelime';
+  save();
+  if(!zikrPaintNoteRegion()) if(!zikrPaintView('counter',true)) render();
+  toast('Tefekkür günlüğüne kaydedildi.');
+};
+
+function App_toggleZikrManual(){
+  ui.zikrManualOpen=!ui.zikrManualOpen;
+  if(ui.zikrManualOpen){ ui.zikrManualDraft=null; ui.zikrManualPresetId=''; }
+  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
+  if(ui.zikrManualOpen){
+    try{ var input=doc.getElementById('zikr-manual-amount'); if(input&&input.focus) input.focus(); }catch(e){}
+  }
+};
+
+function App_onZikrManualAmount(el){
+  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
+  var raw=String(el&&el.value||'').replace(/[^0-9]/g,'').slice(0,7);
+  d.amount=raw; el.value=raw;
+  try{ var prev=doc.getElementById('zikr-manual-preview'); if(prev) prev.innerHTML=zikrManualPreviewHTML(p,d); }catch(e){}
+  try{ var save=doc.querySelector('#zikr-manual-sheet .primary'); if(save) save.disabled=zikrManualAmountOf(d)<=0; }catch(e){}
+};
+
+function App_onZikrManualNote(el){
+  var d=zikrManualDraftFor(zikrActivePreset());
+  d.note=String(el&&el.value||'').slice(0,200);
+};
+
+function App_zikrManualStep(dir){
+  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
+  var n=zikrManualAmountOf(d)+dir*10;
+  if(n<0) n=0; if(n>ZIKR_MANUAL_MAX) n=ZIKR_MANUAL_MAX;
+  d.amount=String(n);
+  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
+};
+
+function App_zikrManualChip(v){
+  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
+  var n=zikrInt(parseInt(v,10)); if(n<=0) return;
+  d.amount=String(n);
+  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
+};
+
+function App_saveZikrManual(){
+  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
+  var amount=zikrManualAmountOf(d);
+  if(amount<=0){ toast('Önce bir miktar yaz.'); return; }
+  var r=zikrManualApply(p.id,amount,todayStr(),d.note);
+  if(!r){ toast('Bu miktar eklenemedi. Hatim tamamlanmış ya da sınır aşılı olabilir.'); return; }
+  ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId='';
+  ui.zikrActionNote='Elle eklendi · '+r.applied.toLocaleString('tr-TR')+' '+p.name+' sayımı işlendi. Geri al ile kurtarabilirsin.';
+  if(r.cyclesGained>0&&window.SeyAudio&&typeof window.SeyAudio.bell==='function'){ try{ window.SeyAudio.bell(); }catch(e){} }
+  var paintOK=zikrPaintView('counter',true);
+  if(!paintOK) render(); else zikrPaintActionNote();
+  toast('Mâşallah · '+r.applied.toLocaleString('tr-TR')+' zikir sayıma eklendi.');
+};
+
+function App_undoZikrManual(entryId){
+  var r=zikrManualUndoEntry(entryId);
+  if(!r){ toast('Bu kayıt geri alınamadı.'); return; }
+  ui.zikrActionNote='Elle eklenen '+zikrInt(r.entry.amount).toLocaleString('tr-TR')+' sayım geri alındı.';
+  if(!zikrPaintView('history',true)&&!zikrPaintView('counter',true)) render();
+  zikrPaintActionNote();
+  toast('Elle eklenen sayım geri alındı.');
+};
+
+function App_toggleZikrSetting(k){
+  var allowed={soundOn:'Ses',haptic:'Titreşim',focusMode:'Odak modu',breathGuide:'Nefes ritmi',reducedMotion:'Hareketi azalt',keepAwake:'Ekranı uyanık tut',autoAdvance:'Otomatik sıradaki zikir'};
+  if(!allowed[k]) return;
+  var z=ensureZikrRoot(); z.settings[k]=!z.settings[k];
+  ui.zikrSettingsNote=allowed[k]+' '+(z.settings[k]?'açıldı':'kapatıldı')+'.';
+  save();
+  if(k==='soundOn'&&z.settings[k]) zikrTickSound();
+  if(k==='haptic'&&z.settings[k]){ try{ haptic([12]); }catch(e){} }
+  if(k==='keepAwake') zikrSyncWakeLock();
+  if(k==='reducedMotion'){
+    try{ var overlay=doc.getElementById('zikr-overlay'); if(overlay&&overlay.classList) overlay.classList.toggle('is-reduced',!!z.settings[k]); }catch(e){}
+  }
+  if(!zikrPaintSetting(k)) if(!zikrPaintView('settings',true)) render();
+};
+
+function App_openZikrHatim(presetId,hatimId){
+  var p=zikrPreset(presetId), j=p&&zikrJourney(p,false); if(!p||!j) return;
+  var h=(j.hatims||[]).find(function(x){ return x&&x.id===hatimId&&x.status!=='archived'; }); if(!h) return;
+  zikrPauseSession(); j.activeHatimId=h.id;
+  var z=ensureZikrRoot(); z.settings.activePresetId=p.id;
+  ui.zikrRemovePresetId=''; ui.zikrRemoveHatimId=''; ui.zikrView='counter'; save();
+  if(!zikrPaintView('counter')) render();
+};
+
+function App_requestRemoveZikrHatim(presetId,hatimId){
+  var p=zikrPreset(presetId), j=p&&zikrJourney(p,false);
+  if(!p||!j||!(j.hatims||[]).some(function(h){ return h&&h.id===hatimId&&h.status!=='archived'; })) return;
+  ui.zikrRemovePresetId=presetId; ui.zikrRemoveHatimId=hatimId;
+  if(!zikrPaintView('hatims',true)) render();
+};
+
+function App_cancelRemoveZikrHatim(){
+  ui.zikrRemovePresetId=''; ui.zikrRemoveHatimId='';
+  if(!zikrPaintView('hatims',true)) render();
+};
+
+function App_confirmRemoveZikrHatim(){
+  var p=zikrPreset(ui.zikrRemovePresetId), j=p&&zikrJourney(p,false), h=null;
+  if(j) h=(j.hatims||[]).find(function(x){ return x&&x.id===ui.zikrRemoveHatimId; });
+  if(!p||!j||!h){ App.cancelRemoveZikrHatim(); return; }
+  var now=new Date().toISOString();
+  h.status='archived'; h.archivedAt=now; h.lastAt=now; j.lastAt=now;
+  if(j.activeHatimId===h.id) j.activeHatimId='';
+  var z=ensureZikrRoot();
+  if(z.activeSession&&z.activeSession.presetId===p.id&&z.activeSession.hatimId===h.id) z.activeSession.pausedAt=new Date().toISOString();
+  ui.zikrRemovePresetId=''; ui.zikrRemoveHatimId=''; save();
+  if(!zikrPaintView('hatims',true)) render();
+  toast(p.name+' hatmi listeden kaldırıldı; ömürlük toplam korundu.');
+};
+
+function App_openZikrPresetAdd(){ ui.zikrPresetDraft={name:'',target:'100'}; ui.zikrView='presets'; if(!zikrPaintLibraryResults()) render(); };
+
+function App_cancelZikrPresetAdd(){ ui.zikrPresetDraft=null; if(!zikrPaintLibraryResults()) render(); };
+
+function App_onZikrPresetField(f,el){ if(!ui.zikrPresetDraft) ui.zikrPresetDraft={name:'',target:'100'}; ui.zikrPresetDraft[f]=el.value; };
+
+function App_saveZikrPreset(){
+  var d=ui.zikrPresetDraft||{}; var name=String(d.name||'').trim(); if(!name){ toast('Preset adını yaz'); return; }
+  var tgt=parseInt(d.target,10); if(isNaN(tgt)||tgt<1) tgt=100;
+  var z=ensureZikrRoot();
+  var id='z_'+Date.now().toString(36);
+  var nowIso=new Date().toISOString();
+  z.presets.push({id:id,name:name.slice(0,60),phrase:name.slice(0,80),target:Math.min(1000000,tgt),color:'zikr',favorite:false,createdAt:nowIso,updatedAt:nowIso,builtIn:false,kind:'custom',hatimMode:'simple'});
+  z.settings.activePresetId=id; ui.zikrPresetDraft=null; ui.zikrView='counter'; save(); if(!zikrPaintView('counter')) render();
+  toast('Preset eklendi 🌿');
+};
+
+function App_deleteZikrPreset(id){
+  var z=ensureZikrRoot();
+  if(z.presets.length<=1){ toast('En az bir preset kalmalı'); return; }
+  var i=z.presets.findIndex(function(p){ return p.id===id; }); if(i<0) return;
+  if(z.presets[i].builtIn){ toast('Hazır zikirler ve Esmâ presetleri korunur; favoriye ekleyebilirsin.'); return; }
+  z.presets.splice(i,1);
+  if(z.settings.activePresetId===id) z.settings.activePresetId=z.presets[0].id;
+  save(); if(!zikrPaintLibraryResults()) render();
+};
+
+function App_toggleZikrFavorite(id){ var p=zikrPreset(id); if(!p) return; p.favorite=!p.favorite; p.updatedAt=new Date().toISOString(); save(); if(!zikrPaintLibraryResults()) render(); };
+
+function App_zikrResetToday(){
+  var p=zikrActivePreset(), day=zikrDay(todayStr()), pd=zikrPresetDay(day,p.id);
+  if(pd.count<=0){ toast('Bugün '+p.name+' için sıfırlanacak bir sayım yok.'); return; }
+  ui.zikrActionNote=''; zikrPaintActionNote();
+  ui.zikrResetPending=true; ui.zikrResetPresetId=p.id;
+  if(!zikrPaintResetConfirm()) if(!zikrPaintView('counter',true)) render();
+};
+
+function App_cancelZikrReset(){
+  ui.zikrResetPending=false; ui.zikrResetPresetId='';
+  if(!zikrPaintResetConfirm()) if(!zikrPaintView('counter',true)) render();
+};
+
+function App_confirmZikrResetToday(){
+  var date=todayStr(), p=zikrActivePreset(), day=zikrDay(date), pd=zikrPresetDay(day,p.id);
+  if(!ui.zikrResetPending||ui.zikrResetPresetId!==p.id){ App.cancelZikrReset(); return; }
+  if(pd.count<=0){ App.cancelZikrReset(); toast('Bugün '+p.name+' için sıfırlanacak bir sayım yok.'); return; }
+  var amount=pd.count, jp=zikrJourneyProgress(p), j=jp.journey, h=jp.hatim;
+  var mirrorDay=getDay(data,date,dayIndexFor(date));
+  ui.zikrLastReset={date:date,presetId:p.id,amount:amount,root:JSON.parse(JSON.stringify(ensureZikrRoot())),dayMirror:mirrorDay.zikr?JSON.parse(JSON.stringify(mirrorDay.zikr)):null};
+  if(p.kind==='esma'&&h){
+    if(h.status==='completed'){ h.status='active'; h.completedAt=null; j.completedHatims=Math.max(0,j.completedHatims-1); }
+    h.count=Math.max(0,h.count-amount); h.lastAt=new Date().toISOString();
+  }
+  j.lifetimeCount=Math.max(0,j.lifetimeCount-amount); j.lastAt=new Date().toISOString();
+  day.totalCount=Math.max(0,day.totalCount-amount); day.completedSets=Math.max(0,day.completedSets-pd.completedCycles); delete day.perPreset[p.id]; day.lastAt=new Date().toISOString();
+  var z=ensureZikrRoot();
+  if(z.activeSession&&z.activeSession.presetId===p.id){ z.activeSession.count=0; z.activeSession.pausedAt=new Date().toISOString(); }
+  ui.zikrResetPending=false; ui.zikrResetPresetId='';
+  ui.zikrActionNote=amount.toLocaleString('tr-TR')+' sayım sıfırlandı · Geri al ile kurtarabilirsin.';
+  syncZikrDayMirror(date,day); save();
+  var after=zikrMath(p,p.kind==='esma'&&h?h.count:j.lifetimeCount);
+  if(!zikrPaintLive({preset:p,count:0,total:day.totalCount,math:after,journey:j,hatim:h})) if(!zikrPaintView('counter',true)) render();
+  zikrPaintPauseButton();
+  zikrPaintResetConfirm();
+  zikrPaintActionNote();
+  toast('Bugünkü '+p.name+' sayımı sıfırlandı.');
+};
+
+function zikrNoteDraftFor(p){
+  if(ui.zikrNotePresetId===p.id&&ui.zikrNoteDraft) return ui.zikrNoteDraft;
+  var saved=zikrReflection(todayStr(),p.id);
+  ui.zikrNotePresetId=p.id;
+  ui.zikrNoteDraft={
+    mood:saved&&saved.mood||'',feelings:saved&&saved.feelings||'',
+    thoughts:saved&&saved.thoughts||'',intention:saved&&saved.intention||''
+  };
+  ui.zikrNoteStatus='';
+  return ui.zikrNoteDraft;
+}
+
+function zikrManualDraftFor(p){
+  if(ui.zikrManualPresetId===p.id&&ui.zikrManualDraft) return ui.zikrManualDraft;
+  ui.zikrManualPresetId=p.id;
+  ui.zikrManualDraft={presetId:p.id,amount:'',note:''};
+  return ui.zikrManualDraft;
+}
+
+function zikrPaintView(view,keepScroll){
+  try{
+    var body=doc.getElementById('zikr-scroll'), tabs=doc.getElementById('zikr-tabs');
+    if(!body||!tabs) return false;
+    var prevTop=body.scrollTop||0;
+    var z=ensureZikrRoot(), p=zikrActivePreset();
+    body.innerHTML=zikrViewBodyHTML(view,p,z);
+    body.scrollTop=keepScroll?prevTop:0;
+    var buttons=tabs.querySelectorAll('[data-zikr-view]');
+    for(var i=0;i<buttons.length;i++){
+      var on=buttons[i].getAttribute('data-zikr-view')===view;
+      buttons[i].setAttribute('aria-selected',on?'true':'false');
+      if(buttons[i].classList) buttons[i].classList.toggle('on',on);
+    }
+    // Bir sonraki veri-etkileşimli tam render, görünümü yanlışlıkla "yeni
+    // sekme" sanıp scroll'u sıfırlamasın.
+    lastOverlayView=view;
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrPaintLibraryResults(){
+  try{
+    var el=doc.getElementById('zikr-library-results'); if(!el) return false;
+    el.innerHTML=zikrPresetsResultsHTML(zikrActivePreset(),ensureZikrRoot());
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrPaintDetail(){
+  try{
+    var el=doc.getElementById('zikr-detail-region'); if(!el) return false;
+    el.innerHTML=zikrDetailControlsHTML(zikrActivePreset());
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrPaintResetConfirm(){
+  try{
+    var p=zikrActivePreset(), el=doc.getElementById('zikr-reset-region'), button=doc.getElementById('zikr-reset-button'); if(!el||!button) return false;
+    el.innerHTML=zikrResetConfirmHTML(p,zikrPresetDay(zikrDay(todayStr()),p.id));
+    var armed=!!(ui.zikrResetPending&&ui.zikrResetPresetId===p.id);
+    button.classList.toggle('is-armed',armed);
+    button.setAttribute('aria-label',armed?'Sıfırlama onayı bekleniyor':('Bugünkü '+p.name+' sayımını sıfırla'));
+    button.innerHTML=icon('trash-2',17)+'<span>'+(armed?'Onay bekliyor':'Sıfırla')+'</span>';
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrPaintActionNote(){
+  try{
+    var el=doc.getElementById('zikr-action-region'); if(!el) return false;
+    el.innerHTML=zikrActionNoteHTML();
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrPaintNoteRegion(){
+  try{
+    var el=doc.getElementById('zikr-note-host'); if(!el) return false;
+    el.innerHTML=zikrNoteEditorHTML(zikrActivePreset());
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrPaintManualRegion(){
+  try{
+    var el=doc.getElementById('zikr-manual-region'); if(!el) return false;
+    el.innerHTML=zikrManualSheetHTML(zikrActivePreset());
+    var button=doc.getElementById('zikr-manual-button');
+    if(button){
+      button.classList.toggle('is-open',!!ui.zikrManualOpen);
+      button.setAttribute('aria-expanded',ui.zikrManualOpen?'true':'false');
+    }
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrPaintSetting(key){
+  try{
+    var z=ensureZikrRoot(), button=doc.getElementById('zikr-setting-'+key), note=doc.getElementById('zikr-settings-note'); if(!button||!note) return false;
+    var on=!!z.settings[key], toggle=button.querySelector('i');
+    button.setAttribute('aria-pressed',on?'true':'false');
+    if(toggle) toggle.className=on?'on':'';
+    note.innerHTML=ui.zikrSettingsNote?(icon('circle-check',14)+'<span>'+esc(ui.zikrSettingsNote)+'</span>'):'';
+    note.hidden=!ui.zikrSettingsNote;
+    return true;
+  }catch(e){ return false; }
+}
+
+function zikrPaintPauseButton(){
+  try{
+    var el=doc.getElementById('zikr-pause-button'), state=zikrSessionState(zikrActivePreset()); if(!el) return false;
+    var label=state==='active'?'Duraklat':(state==='paused'?'Sürdür':'Başlat');
+    el.className='pause '+state;
+    el.setAttribute('aria-label',label);
+    el.innerHTML=icon(state==='active'?'pause':'play',17)+'<span>'+label+'</span>';
+    var tap=doc.getElementById('zikr-tap-button'), action=doc.getElementById('zikr-live-action');
+    if(tap){ tap.classList.remove('is-idle','is-active','is-paused'); tap.classList.add('is-'+state); }
+    if(action) action.textContent=state==='paused'?'sürdür ve zikret':'dokunarak zikret';
+    return true;
+  }catch(e){ return false; }
+}
+  }
+  var NS=window.SeymaZikr;
+  if(!NS) throw new Error('MON2-06: SeymaZikr yüzey bölümü registry bulunamadı');
+  NS.zikrContentFor=zikrContentFor;
+  NS.zikrNormalizeSearchText=zikrNormalizeSearchText;
+  NS.zikrPresetSearchText=zikrPresetSearchText;
+  NS.zikrTopicGroup=zikrTopicGroup;
+  NS.zikrTopicMatch=zikrTopicMatch;
+  NS.zikrPresetTopicLabel=zikrPresetTopicLabel;
+  NS.zikrPaintLive=zikrPaintLive;
+  NS.zikrLockBodyScroll=zikrLockBodyScroll;
+  NS.zikrUnlockBodyScroll=zikrUnlockBodyScroll;
+  NS.openZikr=App_openZikr;
+  NS.closeZikr=App_closeZikr;
+  NS.setZikrView=App_setZikrView;
+  NS.toggleZikrDetail=App_toggleZikrDetail;
+  NS.onZikrKeydown=App_onZikrKeydown;
+  NS.zikrTap=App_zikrTap;
+  NS.zikrUndo=App_zikrUndo;
+  NS.setZikrPresetFilter=App_setZikrPresetFilter;
+  NS.clearZikrPresetFilter=App_clearZikrPresetFilter;
+  NS.setZikrLibFilter=App_setZikrLibFilter;
+  NS.setZikrTopic=App_setZikrTopic;
+  NS.toggleZikrFilters=App_toggleZikrFilters;
+  NS.toggleZikrNote=App_toggleZikrNote;
+  NS.onZikrNoteField=App_onZikrNoteField;
+  NS.setZikrNoteMood=App_setZikrNoteMood;
+  NS.saveZikrNote=App_saveZikrNote;
+  NS.toggleZikrManual=App_toggleZikrManual;
+  NS.onZikrManualAmount=App_onZikrManualAmount;
+  NS.onZikrManualNote=App_onZikrManualNote;
+  NS.zikrManualStep=App_zikrManualStep;
+  NS.zikrManualChip=App_zikrManualChip;
+  NS.saveZikrManual=App_saveZikrManual;
+  NS.undoZikrManual=App_undoZikrManual;
+  NS.toggleZikrSetting=App_toggleZikrSetting;
+  NS.openZikrHatim=App_openZikrHatim;
+  NS.requestRemoveZikrHatim=App_requestRemoveZikrHatim;
+  NS.cancelRemoveZikrHatim=App_cancelRemoveZikrHatim;
+  NS.confirmRemoveZikrHatim=App_confirmRemoveZikrHatim;
+  NS.openZikrPresetAdd=App_openZikrPresetAdd;
+  NS.cancelZikrPresetAdd=App_cancelZikrPresetAdd;
+  NS.onZikrPresetField=App_onZikrPresetField;
+  NS.saveZikrPreset=App_saveZikrPreset;
+  NS.deleteZikrPreset=App_deleteZikrPreset;
+  NS.toggleZikrFavorite=App_toggleZikrFavorite;
+  NS.zikrResetToday=App_zikrResetToday;
+  NS.cancelZikrReset=App_cancelZikrReset;
+  NS.confirmZikrResetToday=App_confirmZikrResetToday;
+  NS.zikrNoteDraftFor=zikrNoteDraftFor;
+  NS.zikrManualDraftFor=zikrManualDraftFor;
+  NS.zikrPaintView=zikrPaintView;
+  NS.zikrPaintLibraryResults=zikrPaintLibraryResults;
+  NS.zikrPaintDetail=zikrPaintDetail;
+  NS.zikrPaintResetConfirm=zikrPaintResetConfirm;
+  NS.zikrPaintActionNote=zikrPaintActionNote;
+  NS.zikrPaintNoteRegion=zikrPaintNoteRegion;
+  NS.zikrPaintManualRegion=zikrPaintManualRegion;
+  NS.zikrPaintSetting=zikrPaintSetting;
+  NS.zikrPaintPauseButton=zikrPaintPauseButton;
+  NS.registerZikrSurface=registerZikrSurface;
+  NS.isZikrSurfaceReady=isZikrSurfaceReady;
+})();

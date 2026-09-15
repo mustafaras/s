@@ -208,9 +208,13 @@ console.log('\n[4] İzolasyon');
 
 // Yalnız <script src> etiketleri sayılır (satır içi bootstrap yok sayılır).
 const pageScripts = [...pageSource.matchAll(/<script\s+src="([^"]+)"/g)].map((m) => m[1]);
-ok('sayfa tam olarak bir harici betik yüklüyor', pageScripts.length === 1,
+ok('sayfa kendi betiklerini yüklüyor (v3-data + v3-charts + v3)',
+  pageScripts.length === 3 && pageScripts.every((s) => s.startsWith('v3')),
   'yüklenen: ' + JSON.stringify(pageScripts));
-ok('o betik de kendi dosyası (v3.js)', pageScripts[0] && pageScripts[0].startsWith('v3.js'));
+ok('betikler doğru sırada (data → charts → v3)',
+  pageScripts[0].startsWith('v3-data.js') &&
+  pageScripts[1].startsWith('v3-charts.js') &&
+  pageScripts[2].startsWith('v3.js'));
 
 const forbidden = ['app.js', 'sync.js', 'app/core/', 'render.js', 'appSurface.js'];
 forbidden.forEach((token) => {
@@ -233,8 +237,11 @@ ok('v3.js hiçbir uygulama anahtarına yazmıyor',
 ok('v3.js hiçbir yere setItem ile uygulama verisi yazmıyor (yalnız kendi anahtarı)',
   (jsCode.match(/setItem\(/g) || []).length === 1 &&
   /setItem\(SEEN_KEY,\s*SEEN_VALUE\)/.test(jsCode));
-ok('v3.css panel yüzeylerine referans vermiyor',
-  !/panel/i.test(cssSource.replace(/\/\*[\s\S]*?\*\//g, '')));
+// Panel YÜZEYLERİNE referans yok. Not: ".v3-panel" sayfanın kendi sınıfıdır,
+// yasak olan app'in panel* dosya/yüzeyleridir — bu yüzden yol/sınıf adı aranır.
+const cssCode = cssSource.replace(/\/\*[\s\S]*?\*\//g, '');
+ok('v3.css app\'in panel yüzeylerine referans vermiyor',
+  !/panel-v2|panel\.html|panel\/|ae-/.test(cssCode) && !/\.ae-[a-z]/.test(cssCode));
 
 // Panel dosyaları bu değişiklikte hiç dâhil olmadı
 ok('tanıtım sayfası panel-v2.html desenini izliyor (#root + data-theme)',
@@ -526,7 +533,7 @@ ok('sayaç son değeri hedefe sabitler (yuvarlama hatası kalmaz)',
 ok('flamingo SVG\'si satır içi (harici dosya/ağ isteği yok)',
   /<svg class="v3-flamingo__svg"/.test(pageSource));
 ok('sayfa hâlâ tek harici betik yüklüyor (yeni bağımlılık yok)',
-  [...pageSource.matchAll(/<script\s+src="([^"]+)"/g)].length === 1);
+  [...pageSource.matchAll(/<script\s+src="([^"]+)"/g)].every((m) => m[1].startsWith('v3')));
 
 // Uzunluk / zenginlik
 const sections = (pageSource.match(/class="v3-sectionlabel/g) || []).length;
@@ -604,6 +611,142 @@ ok('sürüm yorumları pin taramasını kaydırmıyor (yorumda nitelik adı geç
 // Cache-bust: değişen modüller yeni sürüm taşımalı
 ok('settings.js cache-bust güncel', /app\/core\/settings\.js\?v=20260915b/.test(indexSource));
 ok('render.js cache-bust güncel', /app\/core\/render\.js\?v=20260915f/.test(indexSource));
+
+// ───────────────────────────────────────────────────────────────────────────
+// [10] Kişisel 85 gün özeti (v3-data.js + v3-charts.js)
+// ───────────────────────────────────────────────────────────────────────────
+console.log('\n[10] Kişisel veri özeti');
+
+const dataSource = read('v3-tanitim/v3-data.js');
+const chartsSource = read('v3-tanitim/v3-charts.js');
+
+/* — GÜVENLİK SÖZLEŞMESİ: bunlar pazarlıksız — */
+ok('v3-data.js depoya YAZMIYOR (setItem/removeItem/clear yok)',
+  !/setItem|removeItem|localStorage\.clear/.test(stripComments(dataSource)),
+  'veri katmanı salt-okur olmalı');
+ok('v3-charts.js de depoya yazmıyor',
+  !/setItem|removeItem|localStorage\.clear/.test(stripComments(chartsSource)));
+ok('veri katmanı yalnız kendi anahtarını okuyor',
+  /getItem\(KEY\)/.test(dataSource) && /KEY = 'seyma-reset-v1'/.test(dataSource));
+ok('iki dosyada da AĞ ÇAĞRISI yok (fetch/XHR/beacon)',
+  !/\bfetch\s*\(/.test(dataSource) && !/XMLHttpRequest/.test(dataSource) &&
+  !/sendBeacon/.test(dataSource) &&
+  !/\bfetch\s*\(/.test(chartsSource) && !/XMLHttpRequest/.test(chartsSource));
+
+/* — GİZLİLİK: kişisel metin alanları ekrana çıkmamalı — */
+// Görüntü katmanı bu alanları NE OKUR NE YAZAR. Sınıf adlarındaki "note"
+// (ör. v3-panel__note) sayılmaz — aranan şey VERİ ALANI erişimidir.
+const chartsCode = stripComments(chartsSource);
+const MOOD_IDS = ['cok-iyi', 'iyi', 'normal', 'zorlandim', 'cok-zorlandim'];
+const privateFields = ['note', 'journal', 'intention', 'meals'];
+const leakedFields = privateFields.filter((f) =>
+  new RegExp('\\.' + f + '\\b').test(chartsCode));
+ok('grafik katmanı kişisel metin alanlarını okumuyor',
+  leakedFields.length === 0, 'sızan: ' + leakedFields.join(', '));
+/* `nickname` bilinçli TEK istisnadır: kullanıcının kendi takma adı, uygulamanın
+   her ekranında zaten görünür ve cihazdan çıkmaz. Selamlamada kullanılır. */
+ok('tek istisna `nickname` ve yalnız selamlamada kullanılıyor',
+  /greeting\.textContent = summary\.nickname/.test(chartsCode) &&
+  (chartsCode.match(/nickname/g) || []).length === 1);
+const moodLabelLeak = MOOD_IDS.filter((m) => chartsCode.indexOf("'" + m + "'") >= 0);
+ok('grafik katmanı ruh hâli ETİKETİ yazmıyor (yalnız 1–5 sayısal seviye)',
+  moodLabelLeak.length === 0, 'sızan: ' + moodLabelLeak.join(', '));
+ok('grafik katmanı yalnız özet nesnesini tüketiyor (ham kayıt okumaz)',
+  !/localStorage/.test(chartsCode) && /SeymaV3Data\.summarize|summary\./.test(chartsCode));
+ok('isı haritası hücreleri yalnız sayı + tarih taşıyor (etiket değil)',
+  /ticks:\s*countRec\(cr\)/.test(dataSource) &&
+  /hasMood:\s*!!\(cr && cr\.mood\)/.test(dataSource));
+ok('veri katmanı kişisel alanları yalnız SAYAR, içeriğini taşımaz',
+  /* daysTracked uygulamayla birebir; özet nesnesine metin kopyalanmıyor */
+  !/note:\s*r\.note|journal:\s*|intention:\s*r\.intention/.test(dataSource));
+
+/* — FORMÜL SADAKATİ: uygulamanın kendi tanımları — */
+ok('seri eşiği 4 (countRec>=4) — report.js ile aynı',
+  /countRec\(d\.rec\) >= 4/.test(dataSource));
+ok('mevcut seri bugünden geriye, bugün zayıfsa dünden başlıyor',
+  /countRec\(\(data\.days \|\| \{\}\)\[date\]\) < 4/.test(dataSource));
+ok('tatil günü seriyi donduruyor (isVacationDay)',
+  /isVacationDay/.test(dataSource) && /seri donar/.test(dataSource));
+ok('su hedefi tatilde 10, normalde 8, kullanıcı hedefi varsa o (health.js)',
+  /WATER_GOAL = 8/.test(dataSource) && /VACATION_WATER_GOAL = 10/.test(dataSource) &&
+  /if \(isVacationDay\(date, data\)\) return VACATION_WATER_GOAL;/.test(dataSource) &&
+  /typeof t\.waterCups === 'number'/.test(dataSource));
+ok('adım uzunluğu 0,72 m (STEP_LEN_M)',
+  /STEP_LEN_M = 0\.72/.test(dataSource) && /w \/ STEP_LEN_M/.test(dataSource));
+ok('uyku eşiği 7,5 saat (SLEEP_TICK_MIN)',
+  /SLEEP_TICK_MIN = 7\.5/.test(dataSource));
+ok('ilahsız gece yalnız med.type==="none" sayılıyor',
+  /sleep\.med\.type === 'none'/.test(dataSource));
+ok('effSteps önceliği: manuel → health → izlenen',
+  dataSource.indexOf('rec.walk.steps') < dataSource.indexOf('rec.health.steps') &&
+  dataSource.indexOf('rec.health.steps') < dataSource.indexOf('movement.walkM'));
+
+/* — HABIT_SINCE tablosu app.js ile birebir mi? (gerçek kaynaktan okunur) — */
+const appSrc = read('app.js');
+const habitsStart = appSrc.indexOf('var HABITS=[');
+const habitsBlock = appSrc.slice(habitsStart, appSrc.indexOf('];', habitsStart));
+const appSince = {};
+habitsBlock.split(/\{key:/).slice(1).forEach((chunk) => {
+  const k = chunk.match(/^'([a-zA-Z0-9]+)'/);
+  const s = chunk.match(/since:'([0-9-]+)'/);
+  if (k) appSince[k[1]] = s ? s[1] : null;
+});
+const pageSince = {};
+(dataSource.match(/HABIT_SINCE = \{[\s\S]*?\n  \};/) || [''])[0]
+  .split(/\n/)
+  .forEach((line) => {
+    const m = line.match(/^\s*([a-zA-Z0-9]+):\s*(?:'([0-9-]+)'|null)/);
+    if (m) pageSince[m[1]] = m[2] || null;
+  });
+const sinceKeys = Object.keys(appSince);
+ok('HABIT_SINCE tablosu app.js ile birebir (alışkanlık sayısı)',
+  sinceKeys.length === 15 && Object.keys(pageSince).length === 15,
+  'app=' + sinceKeys.length + ' sayfa=' + Object.keys(pageSince).length);
+const sinceDrift = sinceKeys.filter((k) => appSince[k] !== pageSince[k]);
+ok('her alışkanlığın since tarihi app.js ile aynı',
+  sinceDrift.length === 0,
+  'sapma: ' + sinceDrift.map((k) => k + ' app=' + appSince[k] + ' sayfa=' + pageSince[k]).join(', '));
+ok('since yalnız 7 alışkanlıkta var, kalanı her zaman aktif',
+  sinceKeys.filter((k) => appSince[k]).length === 7);
+
+/* — ROZETLER — */
+ok('rozet eşikleri report.js ile aynı (7/30/100 seri, 7 ilaçsız, 7 okuma)',
+  /best >= 7/.test(dataSource) && /best >= 30/.test(dataSource) &&
+  /best >= 100/.test(dataSource) && /med >= 7/.test(dataSource) &&
+  /readingDayCount >= 7/.test(dataSource));
+ok('protein rozeti DÜRÜSTÇE dışarıda bırakıldı (FOOD_DB çözülemez)',
+  /protein.*DIŞARIDA|bilinçli olarak DIŞARIDA/i.test(dataSource) &&
+  !/proteinGoalMet/.test(dataSource));
+ok('rozet toplamı 8', /totalBadges: 8/.test(dataSource));
+
+/* — BOŞ DURUM — */
+ok('veri yoksa sahte grafik çizilmez, dürüst boş-durum gelir',
+  /emptyState/.test(chartsSource) &&
+  /henüz kayıt görünmüyor/i.test(chartsSource));
+ok('boş durumda bölüm yine de görünür kalıyor (gizlenmiyor)',
+  /data-state', 'empty'/.test(chartsSource) && !/style\.display\s*=\s*'none'/.test(chartsSource));
+ok('veri katmanı bozuk JSON\'da çökmüyor (try/catch + null)',
+  /catch \(_\) \{\s*return null;\s*\}/.test(dataSource));
+
+/* — SAYFA BAĞLANTISI — */
+ok('sayfada kişisel veri bölümü var', /id="v3-veri"/.test(pageSource));
+['v3-veri-stats', 'v3-veri-heat', 'v3-veri-mood', 'v3-veri-habits', 'v3-veri-badges']
+  .forEach((id) => ok('bölüm hedefi mevcut: ' + id, pageSource.indexOf('id="' + id + '"') >= 0));
+ok('bölüm gizlilik sözünü kullanıcıya açıkça söylüyor',
+  /yalnız senin cihazından geliyor/i.test(pageSource) &&
+  /Hiçbir yere\s+gönderilmedi/i.test(pageSource));
+ok('grafikler yeni bağımlılık getirmiyor (kütüphane/CDN yok)',
+  !/<script src="https?:/.test(pageSource) && !/cdn|unpkg|jsdelivr/i.test(pageSource));
+
+/* — SAYAÇ ENTEGRASYONU: charts sayaçları v3.js'ten ÖNCE basar — */
+ok('v3.js sayaçları charts enjeksiyonundan SONRA kuruyor (script sırası)',
+  pageScripts[1].startsWith('v3-charts.js') && pageScripts[2].startsWith('v3.js'));
+
+/* — CACHE-BUST — */
+ok('yeni modüller cache-bust taşıyor',
+  /v3-data\.js\?v=\d+[a-z]/.test(pageSource) && /v3-charts\.js\?v=\d+[a-z]/.test(pageSource));
+ok('v3.css cache-bust güncel', /v3\.css\?v=20260915g/.test(pageSource));
+ok('v3.js cache-bust güncel', /v3\.js\?v=20260915g/.test(pageSource));
 
 console.log('\n' + passed + ' kontrol geçti.');
 if (process.exitCode) console.log('SONUÇ: FAIL');

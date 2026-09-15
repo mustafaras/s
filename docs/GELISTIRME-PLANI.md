@@ -21,6 +21,29 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (v3.0 sayfasına kişisel 85 gün özeti):**
+>   Tanıtım sayfasına **kullanıcının kendi verisiyle** dolan bir bölüm eklendi:
+>   özet sayılar (kayıtlı gün, işaretlenen alışkanlık, kapsam, en uzun seri, tam
+>   gün, ruh hâli işareti), **85 hücrelik alışkanlık ısı haritası**, son 30 günün
+>   yönü, en çok tutunulan alışkanlıklar ve **kazanılan rozetler** (8 rozet).
+>   İki yeni salt-okur modül: `v3-tanitim/v3-data.js` + `v3-charts.js`.
+>   **Güvenlik:** yalnız `seyma-reset-v1` okunur; depoya **yazma yok**, **ağ
+>   çağrısı yok**; `note`/`journal`/`intention`/`meals` ekrana çıkmaz; ruh hâli
+>   yalnız sayısal seviye olarak çizilir (etiket yazılmaz). Tek istisna
+>   `nickname` (kendi takma adı, yalnız selamlamada, cihazda kalır).
+>   **Formül sadakati:** seri (`countRec>=4`, tatil dondurur), alışkanlık
+>   `since` tablosu, su hedefi (8/10/kullanıcı), adım (0,72 m), ilaçsız gece ve
+>   rozet eşikleri uygulamanın kendi tanımlarından aynalandı; `HABIT_SINCE`
+>   tablosu fixture'da `app.js HABITS[]` ile **birebir** karşılaştırılır.
+>   **Dürüstlük:** `report.js`'in "protein hedefi" rozeti bırakıldı (`FOOD_DB`
+>   çözülemez); yerine herkese açık "85. güne ulaşmak" rozeti kondu — toplam 8.
+>   Veri yoksa **sahte grafik çizilmez**, dürüst boş-durum gelir.
+>   **Doğrulama:** fixture'a 39 yeni kontrol (toplam **176**); ayrıca sentetik
+>   85 günlük veri setiyle VM'de sayısal doğrulama (tik 975, seri 65, su 65,
+>   okuma 55 — hepsi beklendiği gibi) ve tarayıcıda grafik ölçeklendirmesi.
+>   QA sırasında bulunan kusur düzeltildi: rozet adları kırpılıyordu → artık
+>   sarıyor (başarı adı yarım okunmamalı). `app.js` DEĞİŞMEDİ.
+>   LOCAL-ONLY: push/deploy/cihaz kabulü ayrı onaylı.
 > - **2026-09-15 (v3.0 kutlama sayfası + uygulama içi sürüm):**
 >   `v3-tanitim/` **çok daha zengin** hâle getirildi: 85. gün kutlaması
 >   (sayaç animasyonu, "23 Haziran 2026'da başladın"), 4 görsel vitrin

@@ -11,7 +11,7 @@
        çağrısı yapmaz, düzen kayması (CLS) üretmez ve Apple cihazlarda zaten en
        rafine görünen yüzü kullanır. -->
   <link rel="stylesheet" href="../app/styles.css?v=20260909a">
-  <link rel="stylesheet" href="v3.css?v=20260915e">
+  <link rel="stylesheet" href="v3.css?v=20260915g">
 </head>
 <body class="v3-body">
 
@@ -221,6 +221,50 @@
         <div class="v3-stat v3-reveal v3-stat--wide" style="--i:5"><dt>Kalpte büyüyen küçülme</dt><dd data-count="42" data-suffix="%">42%</dd></div>
       </dl>
 
+      <!-- ══════════════ KİŞİSEL 85 GÜN ÖZETİ ══════════════
+           Bu bölüm SENİN kayıtlarını okur: yalnız bu cihazdaki localStorage.
+           Ağa hiçbir şey gitmez, hiçbir şey değiştirilmez. Grafikler sayı ve
+           tarih gösterir; ruh hâli etiketi, not veya günlük metni göstermez.
+           Kayıt yoksa bölüm dürüst bir boş-durum metniyle gelir. -->
+      <section class="v3-veri" id="v3-veri" aria-labelledby="v3-veri-baslik">
+        <h2 class="v3-sectionlabel v3-sectionlabel--gap" id="v3-veri-baslik">Senin 85 günün</h2>
+
+        <p class="v3-veri__lead">
+          <span class="v3-veri__hi" id="v3-veri-greeting">Sevgili Günışığı</span>,
+          bu ekrandaki her şey yalnız senin cihazından geliyor. Hiçbir yere
+          gönderilmedi, hiçbir şey değiştirilmedi — sadece yolculuğuna bir bakış.
+        </p>
+
+        <div class="v3-veri-body" id="v3-veri-body">
+
+          <dl class="v3-vstats" id="v3-veri-stats" aria-label="Özet sayılar"></dl>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Alışkanlık haritası</figcaption>
+            <div id="v3-veri-heat" class="v3-panel__heat"></div>
+            <p class="v3-panel__sub" id="v3-veri-heat-cap"></p>
+            <p class="v3-panel__note">Kareler yalnızca o gün işaretlediğin
+              alışkanlık sayısını gösterir; hangi gün nasıl hissettiğin burada yazmaz.</p>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Son 30 günün yönü</figcaption>
+            <div id="v3-veri-mood" class="v3-panel__chart"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">En çok tutunduğun alışkanlıklar</figcaption>
+            <div id="v3-veri-habits" class="v3-panel__chart"></div>
+          </figure>
+
+          <figure class="v3-panel">
+            <figcaption class="v3-panel__cap">Kazandığın rozetler</figcaption>
+            <div id="v3-veri-badges" class="v3-panel__badges"></div>
+          </figure>
+
+        </div>
+      </section>
+
       <!-- ══════════════ KAPANIŞ ══════════════ -->
       <section class="v3-closing v3-reveal" id="v3-kapanis" style="--i:6" aria-labelledby="v3-kapanis-baslik">
         <div class="v3-closing__flamingo" aria-hidden="true">🦩</div>
@@ -245,6 +289,8 @@
     </div>
   </div>
 
-  <script src="v3.js?v=20260915e"></script>
+  <script src="v3-data.js?v=20260915f"></script>
+  <script src="v3-charts.js?v=20260915f"></script>
+  <script src="v3.js?v=20260915g"></script>
 </body>
 </html>

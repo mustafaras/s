@@ -15,7 +15,9 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 |---|---|
 | `index.html` | Sayfa kabuğu. **`#root` + `data-theme="dark"` zorunlu** (tokenlar `app/styles.css`'te `#root` üzerinde tanımlı). Ayrıca konfeti canvas'ı + ilerleme çubuğu. |
 | `v3.css` | Temel düzen + kutlama efekteri. 98 tasarım token'ını **tüketir**. Ham hex yalnızca neredeyse-siyah sahne zeminlerinde ve altın üstü mürekkep için. |
-| `v3.js` | Kalıcılık (yazma + **doğrulama**), kademeli scroll-reveal, kaydırma ilerleme çubuğu, sayaç animasyonu, konfeti motoru. |
+| `v3.js` | Kalıcılık (yazma + **doğrulama**), scroll-reveal, ilerleme çubuğu, sayaç animasyonu, konfeti. |
+| `v3-data.js` | **Salt-okur** veri katmanı: kullanıcının kendi kayıtlarını özetler. |
+| `v3-charts.js` | Grafik çizimi (ısı haritası, trend, çubuklar, rozetler). |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
 | `../tests/app/test_v3_welcome.js` | **137 kontrollük** sözleşme fixture'ı (kontrast ölçümü dâhil). |
 | `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + "3.0'da neler değişti?" köprüsü. |
@@ -46,6 +48,50 @@ Uygulamanın kendi formülü (`dateUtils.js`):
   ezilmenin **17 günlük** veriyi sildiğini söyler → başlangıç ~23 Haziran.
   Kayıt hangi günü kapsadığını belirtmediği için fixture **±1 gün örtüşme**
   arar, kesin eşitlik dayatmaz.
+
+## Kişisel 85 gün özeti (v3-data.js + v3-charts.js)
+
+Sayfa, kullanıcının **kendi kayıtlarını** okur ve yolculuğunu görselleştirir:
+özet sayılar, **alışkanlık ısı haritası** (85 hücre), son 30 günün yönü,
+en çok tutunduğu alışkanlıklar ve **kazandığı rozetler**.
+
+### Güvenlik sözleşmesi (pazarlıksız)
+
+| Kural | Durum |
+|---|---|
+| Depoya yazma | **Yok** — iki dosyada `setItem`/`removeItem`/`clear` hiç geçmez |
+| Ağ çağrısı | **Yok** — `fetch`/XHR/`sendBeacon` hiç geçmez |
+| Okunan anahtar | Yalnız `seyma-reset-v1` |
+| Kişisel metin | `note`/`journal`/`intention`/`meals` **ekrana çıkmaz** |
+| Ruh hâli | Yalnız **sayısal seviye** (1–5) ve oran; **etiket yazılmaz** |
+| Tek istisna | `nickname` — kullanıcının kendi takma adı, yalnız selamlamada, cihazda kalır |
+
+Bir fixture bu sözleşmenin tamamını kaynak düzeyinde doğrular.
+
+### Uygulamanın kendi formülleri aynalanır
+
+Uydurma metrik yoktur; her sayı uygulamanın kendi tanımını kullanır:
+
+| Metrik | Kaynak |
+|---|---|
+| Seri (`countRec>=4`, tatil dondurur) | `app.js bestStreak`, `report.js` |
+| Alışkanlık sayısı + `since` aktivasyonu | `app.js habitCountOn` + `HABITS[]` |
+| Su hedefi (8 / tatilde 10 / kullanıcı hedefi) | `health.js waterGoalCups` |
+| Adım (manuel → health → izlenen, 0,72 m) | `health.js effSteps` |
+| İlaçsız gece serisi | `health.js medFreeStreak` |
+| Rozet eşikleri | `report.js badgesGrid` |
+
+> **Dürüstlük notu:** `report.js`'in 8 rozetinden **`protein hedefi`
+bırakıldı** — `dayNutrition()` bir besin veritabanına (`FOOD_DB`) dayanır ve bu
+sayfa onu dürüstçe çözemez. Yerine herkese açık bir rozet kondu
+("85. güne ulaşmak"), böylece toplam yine 8 kaldı.
+
+### Boş durum
+
+Orijin başına `localStorage` boş olabilir (ör. uygulamaya farklı bir kökenden
+bakıldıysa). Bu durumda **sahte grafik çizilmez**; bölüm dürüst bir metinle
+gelir: kayıtların yalnız bu cihazda olduğunu ve uygulamada işaretledikçe
+dolacağını söyler.
 
 ## Uygulama içi sürüm (v3.0)
 
@@ -123,7 +169,7 @@ Fixture canlı `app/styles.css` tokenlarını okuyup ölçer; en zor çift **5.7
 ## Doğrulama
 
 ```bash
-node tests/app/test_v3_welcome.js          # 137 kontrol (sözleşme + kontrast + kutlama + uygulama içi)
+node tests/app/test_v3_welcome.js          # 176 kontrol (sözleşme + kontrast + kutlama + veri + uygulama içi)
 node --check v3-tanitim/v3.js
 node .claude/skills/run-seyma/driver.mjs   # exit 0
 node tools/shell-inventory.mjs --gate      # PASS · 7.610 / 0 / 408 / 57

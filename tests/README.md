@@ -22,7 +22,14 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   konfeti/sayaç/ilerleme çubuğu, 13 adlandırılmış efektin ad ad kontrolü) ve
   **uygulama içi v3.0 metni** (Ayarlar → Hakkında, başlangıç rozeti, köprü).
   `App.x=554` ve fx2 pinlerini (App yüzeyi 718, tıklama 391) de önden doğrular.
-  Run: `node tests/app/test_v3_welcome.js`.
+  **Kişisel veri katmanı (v3-data.js + v3-charts.js)** bölümü salt-okurluk
+  sözleşmesini kaynak düzeyinde doğrular: depoya yazma yok, ağ çağrısı yok,
+  kişisel metin alanları (`note`/`journal`/`intention`/`meals`) ekrana çıkmıyor,
+  ruh hâli yalnız sayısal seviye (etiket yazılmıyor), tek istisna `nickname`
+  yalnız selamlamada. Ayrıca `HABIT_SINCE` tablosunu `app.js HABITS[]` ile
+  **birebir** karşılaştırır ve formül sabitlerini (seri eşiği 4, su 8/10,
+  adım 0,72 m, uyku 7,5 sa) doğrular. Run:
+  `node tests/app/test_v3_welcome.js`.
 - `app/test_aeon_message_expand.js` — ÆON/Luna sohbetinde uzun mesajın
   “Tümünü göster” durumunun render’lar arasında yaşadığını doğrular. Kırpılmış
   balonun kimliği eskiden her render’da artan bir sayaçtan üretiliyor ve açık/kapalı

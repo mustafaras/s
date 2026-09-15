@@ -4,8 +4,15 @@ Sürüm 3.0'ın yeniliklerini kullanıcıya **bir kez** anlatan, ayrı bir yüze
 Kullanıcı en sondaki **"Okudum, anladım"** düğmesine bastığında kalıcı olarak
 işaretlenir ve bu cihazda bir daha gösterilmez.
 
-> Devir belgesi: [`STARTER.md`](STARTER.md) — görevin tam sözleşmesi, tuzaklar ve
-> kabul kriterleri. Bu README tamamlanan işi özetler.
+> Devir belgeleri:
+> - [`DEVIR-PROMPTU.md`](DEVIR-PROMPTU.md) — **Claude'a verilecek devir promptu.**
+>   Kullanıcının bu iş boyunca istediği her şeyi birebir listeler, her birinin
+>   nasıl doğrulanacağını söyler, gerçek `seyma-data` referans değerlerini verir ve
+>   kanıt üretmeden "bitti" denmesini yasaklar.
+> - [`STARTER.md`](STARTER.md) — ilk görevin sözleşmesi (85 gün varsayımıyla
+>   yazılmıştır; gün sayısı artık veriden türetilir → 84).
+>
+> Bu README tamamlanan işi özetler.
 
 ---
 

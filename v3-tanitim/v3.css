@@ -382,7 +382,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   3.0 KUTLAMA KATMANI — 85. gün
+   3.0 KUTLAMA KATMANI — gün sayısı
    Yukarıdaki temel düzenin üstüne eklenir; hiçbir eski kuralı tekrar etmez.
    Tümü saf CSS: harici görsel, dosya veya ağ isteği YOK. Flamingo dışındaki
    hiçbir öğe emoji değildir; flamingo bilinçli bir istisnadır (uygulamanın
@@ -469,7 +469,7 @@
 }
 @keyframes v3GoldSheen{ 0%{background-position:0% 50%;} 100%{background-position:220% 50%;} }
 
-/* ── 85. gün kutlaması ─────────────────────────────────────────────────────*/
+/* ── kutlama günü ─────────────────────────────────────────────────────*/
 .v3-milestone{
   position:relative;margin-top:44px;padding:30px 20px 26px;
   border-radius:26px;text-align:center;overflow:hidden;
@@ -712,7 +712,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   KİŞİSEL 85 GÜN ÖZETİ
+   KİŞİSEL VERİ ÖZETİ
    Isı haritası, trend, alışkanlık çubukları, rozetler. Hepsi token'lı;
    veri yoksa bölüm boş-durum metniyle gelir (sahte grafik çizilmez).
    ═══════════════════════════════════════════════════════════════════════════ */

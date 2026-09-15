@@ -1,14 +1,17 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Şeyma 3.0 · Kişisel veri özeti (85 gün)
+   Şeyma 3.0 · Kişisel veri özeti
    ───────────────────────────────────────────────────────────────────────────
-   Bu modül kullanıcının KENDİ kayıtlarını okur ve 85 günlük yolculuğun
-   özetini, ısı haritasını, serilerini ve rozetlerini üretir.
+   Bu modül kullanıcının KENDİ kayıtlarını okur ve yolculuğun özetini,
+   ısı haritasını, serilerini ve rozetlerini üretir. Gün sayısı SABİT DEĞİL:
+   `data.startDate` ile bugün arasından hesaplanır (bkz. summarize/dynamic).
 
    TEMEL İLKELER
    ─────────────
    • SALT-OKUR. localStorage'a ASLA yazmaz. Yalnız `seyma-reset-v1` anahtarını
      okur. Tek istisna yoktur — bu dosyada `setItem` hiç geçmez.
-   • AĞ YOK. fetch/XHR yok; hiçbir veri cihazdan çıkmaz.
+   • AĞ YOK. fetch/XHR yok. Cihazda veri bulunmadığında uzak veriyi getiren
+     tek yer izole `v3-source.js` modülüdür; bulduğu nesne `setData()` ile
+     yalnız BELLEĞE bırakılır — depoya asla yazılmaz.
    • AYNI FORMÜLLER. Her metrik uygulamanın kendi tanımını aynalar
      (app/core/report.js + app/core/health.js + app.js). Uydurma metrik yok;
      nerede sapma varsa yorumda açıkça yazılıdır.
@@ -82,8 +85,44 @@
   }
   function todayISO() { return toISO(new Date()); }
 
-  /* ── Okuma ─────────────────────────────────────────────────────────────── */
+  var MONTHS_TR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+  function trDate(iso) {
+    var p = String(iso || '').split('-').map(Number);
+    if (p.length !== 3 || !p[0]) return '';
+    return p[2] + ' ' + (MONTHS_TR[p[1] - 1] || '') + ' ' + p[0];
+  }
+
+  /* Türkçe sayı sözcüğü (84 → "seksen dört"). Gün sayısı sabit olmadığı için
+     başlık metni de sabit olamaz; sözcük buradan türetilir. */
+  function trWords(n) {
+    n = Math.round(Number(n) || 0);
+    if (n <= 0) return '';
+    var ones = ['', 'bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz'];
+    var tens = ['', 'on', 'yirmi', 'otuz', 'kırk', 'elli', 'altmış', 'yetmiş', 'seksen', 'doksan'];
+    var out = [];
+    var h = Math.floor(n / 100), t = Math.floor((n % 100) / 10), o = n % 10;
+    if (h > 0) out.push(h === 1 ? 'yüz' : ones[h] + ' yüz');
+    if (t > 0) out.push(tens[t]);
+    if (o > 0) out.push(ones[o]);
+    return out.join(' ');
+  }
+
+  /* ── Okuma ────────────────────────────────────────────────────────────────
+     Sıra: BELLEK (uzak, salt-okur) → cihaz deposu. Uzak nesne yalnız bu
+     oturumda yaşar; depoya yazılmaz, sayfa yenilenince yeniden çekilir. */
+  var MEMORY = null;
+
+  function setData(d) {
+    if (!d || typeof d !== 'object') return false;
+    if (!d.days || typeof d.days !== 'object') return false;
+    if (!Object.keys(d.days).length) return false;
+    MEMORY = d;
+    return true;
+  }
+
   function readData() {
+    if (MEMORY) return MEMORY;
     try {
       var raw = window.localStorage.getItem(KEY);
       if (!raw) return null;
@@ -203,7 +242,7 @@
   /* ── Özet ──────────────────────────────────────────────────────────────── */
   var EMPTY = {
     available: false,
-    dayCount: 85,
+    dayCount: null,
     startDate: null,
     endDate: null,
     nickname: '',
@@ -232,9 +271,13 @@
     var data = readData();
     if (!data) return EMPTY;
 
-    var start = data.startDate || null;
+    /* Başlangıç: `startDate` varsa o; yoksa kayıtlı EN ERKEN gün. Sabit bir
+       gün sayısı VARSAYILMAZ — veri ne diyorsa o. */
+    var known = Object.keys(data.days || {}).sort();
+    var start = data.startDate || (known.length ? known[0] : null);
     var end = today;
-    var dayCount = (start && diffDays(start, end) >= 0) ? (diffDays(start, end) + 1) : 85;
+    var dayCount = (start && diffDays(start, end) >= 0) ? (diffDays(start, end) + 1) : null;
+    if (!dayCount) return EMPTY;
 
     /* Kayıtlı günler — yalnız pencerede */
     var window = [];
@@ -327,7 +370,9 @@
       { l: 'Su hedefi', done: waterGoalDays >= 1, sub: waterGoalDays > 0 ? waterGoalDays + ' gün' : 'henüz yok' },
       { l: 'Okuma tutkunu', done: readingDayCount >= 7, sub: readingDayCount >= 7 ? 'tamam' : readingDayCount + '/7' },
       { l: '7/7 mükemmel', done: perfectDays >= 1, sub: perfectDays > 0 ? perfectDays + ' gün' : 'henüz yok' },
-      { l: '85. güne ulaşmak', done: dayCount >= 85, sub: dayCount >= 85 ? 'tamam' : dayCount + '/85' }
+      /* "Bugün kaçıncı gündesin" rozeti — sabit bir eşik DEĞİL, gerçek gün
+         sayısından türetilir; bu yüzden asla yanlış bir sayı gösteremez. */
+      { l: dayCount + '. güne ulaşmak', done: true, sub: 'bugün' }
     ];
 
     return {
@@ -357,6 +402,30 @@
       /* Gelişmiş istatistik — v3-stats.js varsa gerçek matematikle üretilir.
          Yoksa null; sayfa o bölümü hiç çizmez (yarım/yanlış grafik olmaz). */
       analytics: buildAnalytics(window, window, data, window, end)
+    };
+  }
+
+  /* ── Dinamik metinler ───────────────────────────────────────────────────
+     Gün sayısı sabit olmadığı için hero/kapanış/footer metinleri de sabit
+     olamaz. v3-source.js veri bulduğunda bu nesneyle sayfayı günceller.
+     Veri yoksa null döner ve statik HTML (geçerli varsayılan) dokunulmadan
+     kalır — JS kapalıyken de sayfa doğru okunur. */
+  function dynamic() {
+    var s = summarize();
+    if (!s || !s.available || !s.dayCount) return null;
+    var n = s.dayCount;
+    var word = trWords(n);
+    return {
+      dayCount: n,
+      startDate: s.startDate,
+      lead: (word.charAt(0).toUpperCase() + word.slice(1)) + ' gündür yanındayız. ' +
+        'Bu sürümde zemini baştan kurduk, gökyüzünü canlandırdık ve her şeyi ' +
+        'biraz daha senin gibi yaptık.',
+      counterNote: trDate(s.startDate) + '’da başladın. Bugün ' + n + '. gün — ' +
+        've bu yol boyunca yanında olduğumuz için mutluyuz. Nice güzel günlere.',
+      dataHeading: 'Senin ' + n + ' günün',
+      closingTitle: n + '. güne hoş geldin',
+      footer: 'Şeyma 🦩 · 3.0 · ' + n + '. gün'
     };
   }
 
@@ -417,6 +486,10 @@
     isVacationDay: isVacationDay,
     addDays: addDays,
     diffDays: diffDays,
+    trDate: trDate,
+    trWords: trWords,
+    setData: setData,
+    dynamic: dynamic,
     readData: readData,
     summarize: summarize
   };

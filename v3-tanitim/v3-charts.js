@@ -26,7 +26,7 @@
     return p[2] + ' ' + (MONTHS[p[1] - 1] || '') + ' ' + p[0];
   }
 
-  /* ── Isı haritası (85 hücre, haftalık sütunlar) ──────────────────────────
+  /* ── Isı haritası (haftalık sütunlar) ─────────────────────────────────────
      GitHub katkı grafiği mantığı: sütun = hafta, satır = haftanın günü.
      Yoğunluk = o gün işaretlenen alışkanlık sayısı / o gün aktif olan sayı. */
   function heatmap(cells) {
@@ -51,7 +51,7 @@
 
     var out = '<svg class="v3-heat" viewBox="0 0 ' + w + ' ' + h + '" ' +
       'width="100%" preserveAspectRatio="xMidYMid meet" role="img" ' +
-      'aria-label="85 günlük alışkanlık ısı haritası: ' +
+      'aria-label="' + cells.length + ' günlük alışkanlık ısı haritası: ' +
       cells.length + ' gün, koyu hücre daha çok işaretlenen alışkanlık demektir">';
 
     for (var c = 0; c < cols.length; c++) {
@@ -159,10 +159,11 @@
      Kayıt yoksa SAHTE grafik çizilmez. Dürüst ve davetkâr bir metin. */
   function emptyState() {
     return '<div class="v3-empty">' +
-      '<p><b>Bu cihazda henüz kayıt görünmüyor.</b></p>' +
-      '<p>Bu sayfa yalnız senin tarayıcındaki kayıtları okur — hiçbir yere ' +
-      'göndermez, hiçbir şeyi değiştirmez. Uygulamada birkaç gün işaretledikçe ' +
-      'burası kendi yolculuğunla dolar.</p>' +
+      '<p><b>Şu an gösterilecek kayıt bulunamadı.</b></p>' +
+      '<p>Bu sayfa kayıtlarını senin kendi özel veri depondan okumaya çalışır; ' +
+      'oraya ulaşamazsa bu tarayıcıdakilere bakar. Hiçbir yere yazmaz, ' +
+      'hiçbir şeyi değiştirmez. Uygulamada birkaç gün işaretledikçe burası ' +
+      'kendi yolculuğunla dolar.</p>' +
       '</div>';
   }
 
@@ -190,7 +191,7 @@
 
     section.setAttribute('data-state', 'ready');
 
-    /* Selamlama adı yalnız kendi cihazındaki takma ad — ağa çıkmaz. */
+    /* Selamlama adı yalnız kullanıcının kendi takma adından gelir. */
     var greeting = el('v3-veri-greeting');
     if (greeting) greeting.textContent = summary.nickname;
 
@@ -246,9 +247,18 @@
     init: init
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  /* Kendi kendine kurulum. `v3-source.js` yüklüyse boot'u O sahiplenir:
+     önce uzak veriyi bir kez (salt-okur) çeker; olmazsa cihaz deposuna düşer,
+     sonra `init()` çağırır. Kaynak modül yoksa sayfa tek başına çalışır —
+     bu dosya hiçbir koşulda ağa çıkmaz. */
+  function autoboot() {
+    if (window.SeymaV3Source) return;
     init();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoboot);
+  } else {
+    autoboot();
   }
 })();

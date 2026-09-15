@@ -268,11 +268,14 @@
     return h;
   }
 
-  /* ── 8 · Dürüstlük notu ────────────────────────────────────────────────── */
+  /* ── 8 · Dürüstlük notu ──────────────────────────────────────────────────
+     Kaynağı doğru anlatır: sayfa kendi özel veri deposundan (salt-okur) ya da
+     bu cihazdaki kayıttan okur — hangisi geldiyse ondan. "Yalnız bu cihaz"
+     demek artık yanlış olurdu. */
   function honestyNote(days, analytics) {
     var low = analytics.correlations.filter(function (c) { return !c.reliable; }).length;
     return '<div class="v3-honest">' +
-      '<p><b>Nasıl hesaplandı?</b> Bütün sayılar bu cihazdaki <b>' + days +
+      '<p><b>Nasıl hesaplandı?</b> Bütün sayılar <b>' + days +
       ' günlük</b> kayıttan, uygulamanın kendi tanımlarıyla üretildi.</p>' +
       '<ul>' +
       '<li>Ortalama, medyan, standart sapma, CV ve çeyrekler <b>yalnız o ölçümün dolu olduğu günlerle</b> hesaplanır; boş günler 0 sayılmaz.</li>' +

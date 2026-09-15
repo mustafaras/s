@@ -11,7 +11,7 @@
        çağrısı yapmaz, düzen kayması (CLS) üretmez ve Apple cihazlarda zaten en
        rafine görünen yüzü kullanır. -->
   <link rel="stylesheet" href="../app/styles.css?v=20260909a">
-  <link rel="stylesheet" href="v3.css?v=20260915i">
+  <link rel="stylesheet" href="v3.css?v=20260915j">
 </head>
 <body class="v3-body">
 
@@ -45,7 +45,7 @@
           <span class="v3-title__line">Şeyma <span class="v3-title__ver">3.0</span></span>
           <span class="v3-title__sub">Aynı sıcaklık, çok daha sağlam bir temel</span>
         </h1>
-        <p class="v3-lead">Seksen beş gündür yanındayız. Bu sürümde zemini baştan kurduk,
+        <p class="v3-lead" id="v3-lead">Seksen beş gündür yanındayız. Bu sürümde zemini baştan kurduk,
           gökyüzünü canlandırdık ve her şeyi biraz daha senin gibi yaptık.</p>
 
         <div class="v3-hero__rule" aria-hidden="true"></div>
@@ -56,11 +56,11 @@
         <p class="v3-sectionlabel" id="v3-milestone-baslik">Bugün bir kutlama günü</p>
 
         <div class="v3-counter">
-          <p class="v3-counter__num" aria-hidden="true" data-count="85">85</p>
-          <p class="v3-counter__label"><span class="v3-sr-only">85.</span><span aria-hidden="true">.</span> gün</p>
+          <p class="v3-counter__num" id="v3-counter-num" aria-hidden="true" data-count="85">85</p>
+          <p class="v3-counter__label"><span class="v3-sr-only" id="v3-counter-ordinal">85.</span><span aria-hidden="true">.</span> gün</p>
         </div>
 
-        <p class="v3-counter__note">23 Haziran 2026&#8217;da başladın. Bugün 85. gün —
+        <p class="v3-counter__note" id="v3-counter-note">23 Haziran 2026&#8217;da başladın. Bugün 85. gün —
           ve bu yol boyunca yanında olduğumuz için mutluyuz. Nice güzel günlere.</p>
 
         <div class="v3-sparks" aria-hidden="true">
@@ -190,9 +190,11 @@
         <div class="v3-stat v3-reveal v3-stat--wide" style="--i:5"><dt>Kalpte büyüyen küçülme</dt><dd data-count="42" data-suffix="%">42%</dd></div>
       </dl>
 
-      <!-- ══════════════ KİŞİSEL 85 GÜN ÖZETİ ══════════════
-           Bu bölüm SENİN kayıtlarını okur: yalnız bu cihazdaki localStorage.
-           Ağa hiçbir şey gitmez, hiçbir şey değiştirilmez. Grafikler sayı ve
+      <!-- ══════════════ KİŞİSEL VERİ ÖZETİ ══════════════
+           Bu bölüm SENİN kayıtlarını okur. Öncelik: uygulamaya zaten kaydettiğin
+           token'la kendi özel veri depondaki data/latest.json SALT-OKUR çekilir;
+           oraya ulaşılamazsa bu cihazdaki localStorage'a düşülür.
+           Hiçbir yere YAZILMAZ, hiçbir şey değiştirilmez. Grafikler sayı ve
            tarih gösterir; ruh hâli etiketi, not veya günlük metni göstermez.
            Kayıt yoksa bölüm dürüst bir boş-durum metniyle gelir. -->
       <section class="v3-veri" id="v3-veri" aria-labelledby="v3-veri-baslik">
@@ -200,7 +202,7 @@
 
         <p class="v3-veri__lead">
           <span class="v3-veri__hi" id="v3-veri-greeting">Sevgili Günışığı</span>,
-          bu ekrandaki her şey yalnız senin cihazından geliyor. Hiçbir yere
+          bu ekrandaki her şey senin kendi kayıtlarından geliyor. Hiçbir yere
           gönderilmedi, hiçbir şey değiştirilmedi — sadece yolculuğuna bir bakış.
         </p>
 
@@ -237,7 +239,7 @@
       <!-- ══════════════ GELİŞMİŞ İSTATİSTİK ══════════════
            Gerçek matematik: betimsel istatistik, en küçük kareler eğilimi,
            Pearson korelasyonu, hareketli ortalama, IQR aykırı analizi.
-           Tümü yalnız bu cihazdaki kayıtlardan; ağ çağrısı yok. -->
+           Tümü yalnız senin kendi kayıtlarından; sayfa hiçbir yere yazmaz. -->
       <section class="v3-ist" id="v3-istatistik" aria-labelledby="v3-ist-baslik">
         <h2 class="v3-sectionlabel v3-sectionlabel--gap" id="v3-ist-baslik">Sayıların dili</h2>
         <p class="v3-ist__lead">Aynı verinin derinlemesine okunuşu: dağılımlar, eğilimler,
@@ -314,16 +316,17 @@
       </section>
 
       <footer class="v3-footer">
-        <p>Şeyma 🦩 · 3.0 · 85. gün</p>
+        <p id="v3-footer-days">Şeyma 🦩 · 3.0 · 85. gün</p>
       </footer>
 
     </div>
   </div>
 
-  <script src="v3-data.js?v=20260915g"></script>
-  <script src="v3-stats.js?v=20260915g"></script>
-  <script src="v3-charts.js?v=20260915g"></script>
-  <script src="v3-statsview.js?v=20260915g"></script>
-  <script src="v3.js?v=20260915h"></script>
+  <script src="v3-data.js?v=20260915j"></script>
+  <script src="v3-stats.js?v=20260915j"></script>
+  <script src="v3-source.js?v=20260915a"></script>
+  <script src="v3-statsview.js?v=20260915m"></script>
+  <script src="v3-charts.js?v=20260915m"></script>
+  <script src="v3.js?v=20260915j"></script>
 </body>
 </html>

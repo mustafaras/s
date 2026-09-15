@@ -12,23 +12,35 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
 - `app/test_v3_welcome.js` — v3.0 tanıtım/kutlama sayfasının sözleşmesi
-  (137 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
+  (257 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
   önce), **sonsuz döngü koruması** (`?v3done=1` kaçışı), kalıcılık anahtarı
   (`seyma-v3-welcome-v1`, `seyma-reset-v1`’den ayrı namespace), depo kapalıyken
   `markSeen()`’in **yalan söylememesi**, ayrı sayfa izolasyonu (app.js/sync.js/
   panel yüklenmez), erişilebilirlik + token tüketimi + `prefers-reduced-motion`,
   **canlı `app/styles.css` tokenlarıyla WCAG kontrast ölçümü** (en düşük çift
-  5.76:1), **kutlama katmanı** (85. günün iki bağımsız yolla doğrulanması,
-  konfeti/sayaç/ilerleme çubuğu, 13 adlandırılmış efektin ad ad kontrolü) ve
-  **uygulama içi v3.0 metni** (Ayarlar → Hakkında, başlangıç rozeti, köprü).
+  5.76:1), **kutlama katmanı** (konfeti/sayaç/ilerleme çubuğu, 13 adlandırılmış
+  efektin ad ad kontrolü) ve **uygulama içi v3.0 metni** (Ayarlar → Hakkında,
+  başlangıç rozeti, köprü).
   `App.x=554` ve fx2 pinlerini (App yüzeyi 718, tıklama 391) de önden doğrular.
+  **Salt-okur uzak kaynak köprüsü (v3-source.js)** bölümü ağın güvenli sınırda
+  kaldığını doğrular: yalnız GET (`PUT`/`POST`/`PATCH`/`DELETE` yok), depoya
+  yazma yok, `sync.js`/push yolu kapalı, token yalnız `Authorization`
+  başlığında (console/DOM/metne sızmaz), kimlik yalnız cihaz deposundan,
+  **cihazda veri varsa ağa hiç çıkılmaz**, 1 MB üstü dosya için `git/blobs`
+  yedeği + UTF-8 `TextDecoder`, ağ hatasında sayfa yine çizilir.
   **Kişisel veri katmanı (v3-data.js + v3-charts.js)** bölümü salt-okurluk
-  sözleşmesini kaynak düzeyinde doğrular: depoya yazma yok, ağ çağrısı yok,
-  kişisel metin alanları (`note`/`journal`/`intention`/`meals`) ekrana çıkmıyor,
-  ruh hâli yalnız sayısal seviye (etiket yazılmıyor), tek istisna `nickname`
-  yalnız selamlamada. Ayrıca `HABIT_SINCE` tablosunu `app.js HABITS[]` ile
-  **birebir** karşılaştırır ve formül sabitlerini (seri eşiği 4, su 8/10,
-  adım 0,72 m, uyku 7,5 sa) doğrular. Run:
+  sözleşmesini kaynak düzeyinde doğrular: `v3-data.js` ağdan muaf ve uzak veriyi
+  yalnız belleğe alır (`setData`), kişisel metin alanları
+  (`note`/`journal`/`intention`/`meals`) ekrana çıkmıyor, ruh hâli yalnız
+  sayısal seviye (etiket yazılmıyor), tek istisna `nickname` yalnız selamlamada.
+  Ayrıca `HABIT_SINCE` tablosunu `app.js HABITS[]` ile **birebir** karşılaştırır
+  ve formül sabitlerini (seri eşiği 4, su 8/10, adım 0,72 m, uyku 7,5 sa)
+  doğrular. **Gün sayısı dinamikliği:** `dayCount` sabit yazılmadığını, veriden
+  türetildiğini (`diffDays(startDate, bugün) + 1`), `startDate` yoksa en erken
+  kayıtlı günün kullanıldığını, türetilemezse sahte sayı gösterilmediğini
+  (`dayCount: null`), rozetin de gerçek sayıdan üretildiğini ve dinamik
+  güncelleme düğümlerinin (hero/sayaç/kapanış/footer) var olduğunu doğrular.
+  Run:
   `node tests/app/test_v3_welcome.js`.
   Hero flamingosunun **gerçek 🦩 emojisi** olduğunu (elle çizilmiş SVG'nin
   tamamen kaldırıldığını), sayfadaki tek emojinin bu olduğunu ve emojinin

@@ -16,16 +16,17 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 | `index.html` | Sayfa kabuğu. **`#root` + `data-theme="dark"` zorunlu** (tokenlar `app/styles.css`'te `#root` üzerinde tanımlı). Ayrıca konfeti canvas'ı + ilerleme çubuğu. |
 | `v3.css` | Temel düzen + kutlama efekteri. 98 tasarım token'ını **tüketir**. Ham hex yalnızca neredeyse-siyah sahne zeminlerinde ve altın üstü mürekkep için. |
 | `v3.js` | Kalıcılık (yazma + **doğrulama**), scroll-reveal, ilerleme çubuğu, sayaç animasyonu, konfeti. |
-| `v3-data.js` | **Salt-okur** veri katmanı: kullanıcının kendi kayıtlarını özetler. |
+| `v3-data.js` | **Salt-okur** veri katmanı: kullanıcının kendi kayıtlarını özetler. Ağ YOK. |
+| `v3-source.js` | **Salt-okur uzak kaynak köprüsü.** Cihazda kayıt yoksa uygulamanın zaten sakladığı token'la `data/latest.json`'ı **yalnız-GET** çeker. Yazmaz, diske kaydetmez. |
 | `v3-stats.js` | **İstatistik motoru**: betimsel istatistik, regresyon, korelasyon, histogram. |
 | `v3-statsview.js` | İstatistik görselleştirme (histogram, kutu grafiği, eğilim, korelasyon). |
 | `v3-charts.js` | Grafik çizimi (ısı haritası, trend, çubuklar, rozetler). |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
-| `../tests/app/test_v3_welcome.js` | **137 kontrollük** sözleşme fixture'ı (kontrast ölçümü dâhil). |
+| `../tests/app/test_v3_welcome.js` | **257 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
 | `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + "3.0'da neler değişti?" köprüsü. |
 | `../app/core/render.js` | Başlangıç ekranı **v3.0** rozeti. |
 
-## Kutlama katmanı (85. gün)
+## Kutlama katmanı (gün sayısı)
 
 - **Hero flamingosu:** gerçek 🦩 emojisi (uygulamanın kendi simgesi). Emoji
   platformun kendi fontundan gelir; bu yüzden **renk verilmez** (renkli emojiyi
@@ -47,35 +48,72 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
   fixture bunu sayar. Not: bu, kullanıcının açık isteğiyle uygulamanın
   "emojisiz prestij tonu" kuralından bilinçli bir sapmadır.
 
-## 85 rakamı nereden geliyor (kanıt)
+## Gün sayısı nereden geliyor (kanıt)
 
-Uygulamanın kendi formülü (`dateUtils.js`):
-`dayIndexFor(date) = diffDays(startDate, date) + 1`.
+Gün sayısı **artık sabit değil** — kaynak veriden türetilir:
 
-- **23 Haziran 2026 → 15 Eylül 2026 = 85 gün** (kapsayıcı).
+```
+dayCount = diffDays(data.startDate, bugün) + 1
+```
+
+Bu, uygulamanın kendi formülüdür (`dateUtils.js`:
+`dayIndexFor(date) = diffDays(startDate, date) + 1`).
+
+- **Gerçek veri (`mustafaras/seyma-data`, 2026-09-15):** `startDate = 2026-06-24`
+  → **84 gün** (ilk kayıtlı gün `2026-06-24`, son gün `2026-09-15`, boşluk yok).
+- Statik HTML geçerli bir **varsayılan** taşır (JS kapalıyken de sayı görünür);
+  JS açıkken gerçek sayıya düzeltilir — hero, sayaç, kapanış başlığı ve footer
+  dâhil (`trWords()` Türkçe sayı sözcüğünü üretir: 84 → "seksen dört").
+- `startDate` yoksa **en erken kayıtlı gün** kullanılır; hiç yoksa sahte sayı
+  gösterilmez (`dayCount: null` → dürüst boş durum).
 - Bağımsız koroborasyon: deponun veri kaybı kaydı (`AGENTS.md`) 2026-07-10'daki
   ezilmenin **17 günlük** veriyi sildiğini söyler → başlangıç ~23 Haziran.
-  Kayıt hangi günü kapsadığını belirtmediği için fixture **±1 gün örtüşme**
-  arar, kesin eşitlik dayatmaz.
+  Fixture **±1 gün örtüşme** arar, kesin eşitlik dayatmaz.
 
-## Kişisel 85 gün özeti (v3-data.js + v3-charts.js)
+> **Neden değişti:** sayfa eskiden `85`'i sabit yazıyordu. Gerçek veri
+> `startDate = 2026-06-24` dediği için doğru sayı **84**'tür; sabit yazım bu
+> yüzden bir gün fazla gösteriyordu. Artık sayı veriden gelir, sabit değildir.
+
+## Kişisel veri özeti (v3-data.js + v3-charts.js)
 
 Sayfa, kullanıcının **kendi kayıtlarını** okur ve yolculuğunu görselleştirir:
-özet sayılar, **alışkanlık ısı haritası** (85 hücre), son 30 günün yönü,
-en çok tutunduğu alışkanlıklar ve **kazandığı rozetler**.
+özet sayılar, **alışkanlık ısı haritası**, son 30 günün yönü, en çok tutunduğu
+alışkanlıklar ve **kazandığı rozetler**.
 
 ### Güvenlik sözleşmesi (pazarlıksız)
 
 | Kural | Durum |
 |---|---|
-| Depoya yazma | **Yok** — iki dosyada `setItem`/`removeItem`/`clear` hiç geçmez |
-| Ağ çağrısı | **Yok** — `fetch`/XHR/`sendBeacon` hiç geçmez |
+| Depoya yazma | **Yok** — hiçbir modülde `setItem`/`removeItem`/`clear` geçmez |
+| Ağ çağrısı | Yalnız **`v3-source.js`**, yalnız **GET** (`v3-data.js`/`v3-charts.js`/`v3-stats*.js` ağdan muaftır) |
+| Uzak veri kalıcılığı | **Yok** — yalnız bellekte (`setData`); sayfa yenilenince yeniden çekilir, diske yazılmaz |
+| Yazma yöntemi | **Yok** — `PUT`/`POST`/`PATCH`/`DELETE` hiçbir modülde geçmez |
+| Token sızması | **Yok** — token yalnız `Authorization` başlığında; console/DOM/metne yazılmaz |
+| Kimlik kaynağı | Yalnız **cihazın kendi deposundaki** `settings.ghToken`/`ghRepo` (kullanıcıya sorulmaz) |
+| Gereksiz istek | Cihazda kayıt **varsa ağa hiç çıkılmaz** |
 | Okunan anahtar | Yalnız `seyma-reset-v1` |
 | Kişisel metin | `note`/`journal`/`intention`/`meals` **ekrana çıkmaz** |
 | Ruh hâli | Yalnız **sayısal seviye** (1–5) ve oran; **etiket yazılmaz** |
-| Tek istisna | `nickname` — kullanıcının kendi takma adı, yalnız selamlamada, cihazda kalır |
+| Tek istisna | `nickname` — kullanıcının kendi takma adı, yalnız selamlamada |
 
 Bir fixture bu sözleşmenin tamamını kaynak düzeyinde doğrular.
+
+### Uzak kaynak köprüsü (`v3-source.js`)
+
+**Sorun:** uygulama açılışta uzak veriyi **çekmiyor** — yalnız kendi verisini
+**gönderiyor** (`sync.js schedule`). Dolayısıyla deposu boş/eski olan bir cihazda
+sayfa eksik görünüyordu; oysa doğru veri `mustafaras/seyma-data` içindedir.
+
+**Çözüm — sıra:**
+
+1. Cihazda kayıt var mı? → **Var:** çiz, ağa çıkma.
+2. Yok ve token var mı? → **Var:** `data/latest.json`'ı bir kez GET et → çiz.
+3. Yok ve token yok / ağ hatası → dürüst boş durum.
+
+**1 MB üstü dosya tuzağı:** `data/latest.json` 2,2 MB'dir; GitHub Contents API
+200 döner ama `content` **boş** gelir (`encoding:"none"`). Köprü bu yüzden
+`sha` ile `git/blobs/<sha>` ham içeriğine düşer (`sync.js ghGetFileSafe` ile aynı
+yol) ve `atob`un bozduğu Türkçe karakterler için UTF-8 `TextDecoder` kullanır.
 
 ### Uygulamanın kendi formülleri aynalanır
 
@@ -93,14 +131,13 @@ Uydurma metrik yoktur; her sayı uygulamanın kendi tanımını kullanır:
 > **Dürüstlük notu:** `report.js`'in 8 rozetinden **`protein hedefi`
 bırakıldı** — `dayNutrition()` bir besin veritabanına (`FOOD_DB`) dayanır ve bu
 sayfa onu dürüstçe çözemez. Yerine herkese açık bir rozet kondu
-("85. güne ulaşmak"), böylece toplam yine 8 kaldı.
+("<gün>. güne ulaşmak", sayı gerçek veriden gelir), böylece toplam yine 8 kaldı.
 
 ### Boş durum
 
 Orijin başına `localStorage` boş olabilir (ör. uygulamaya farklı bir kökenden
-bakıldıysa). Bu durumda **sahte grafik çizilmez**; bölüm dürüst bir metinle
-gelir: kayıtların yalnız bu cihazda olduğunu ve uygulamada işaretledikçe
-dolacağını söyler.
+bakıldıysa). Bu durumda önce **salt-okur repo okuması** denenir; o da mümkün
+değilse **sahte grafik çizilmez** ve bölüm dürüst bir metinle gelir.
 
 ## Uygulama içi sürüm (v3.0)
 

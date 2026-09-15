@@ -208,15 +208,16 @@ console.log('\n[4] İzolasyon');
 
 // Yalnız <script src> etiketleri sayılır (satır içi bootstrap yok sayılır).
 const pageScripts = [...pageSource.matchAll(/<script\s+src="([^"]+)"/g)].map((m) => m[1]);
-ok('sayfa kendi betiklerini yüklüyor (data + stats + charts + statsview + v3)',
-  pageScripts.length === 5 && pageScripts.every((s) => s.startsWith('v3')),
+ok('sayfa kendi betiklerini yüklüyor (data + stats + source + statsview + charts + v3)',
+  pageScripts.length === 6 && pageScripts.every((s) => s.startsWith('v3')),
   'yüklenen: ' + JSON.stringify(pageScripts));
-ok('betik sırası doğru (data → stats → charts → statsview → v3)',
+ok('betik sırası doğru (data → stats → source → statsview → charts → v3)',
   pageScripts[0].startsWith('v3-data.js') &&
   pageScripts[1].startsWith('v3-stats.js') &&
-  pageScripts[2].startsWith('v3-charts.js') &&
+  pageScripts[2].startsWith('v3-source.js') &&
   pageScripts[3].startsWith('v3-statsview.js') &&
-  pageScripts[4].startsWith('v3.js'),
+  pageScripts[4].startsWith('v3-charts.js') &&
+  pageScripts[5].startsWith('v3.js'),
   'sıra: ' + JSON.stringify(pageScripts));
 
 const forbidden = ['app.js', 'sync.js', 'app/core/', 'render.js', 'appSurface.js'];
@@ -250,6 +251,79 @@ ok('v3.css app\'in panel yüzeylerine referans vermiyor',
 ok('tanıtım sayfası panel-v2.html desenini izliyor (#root + data-theme)',
   /id="root"\s+data-theme="dark"/.test(pageSource) ||
   (/id="root"/.test(pageSource) && /data-theme="dark"/.test(pageSource)));
+
+// ───────────────────────────────────────────────────────────────────────────
+// [4b] SALT-OKUR uzak kaynak köprüsü (v3-source.js)
+// ───────────────────────────────────────────────────────────────────────────
+// SORUN: sayfa yalnız cihaz deposunu okuyordu; depo boşsa gerçek veri hiç
+// görünmüyordu. Köprü, uygulamanın ZATEN sakladığı kimlik bilgileriyle
+// data/latest.json'ı BİR KEZ, YALNIZ-OKUR çeker. Aşağıdaki sözleşme ağın
+// güvenli sınırlar içinde kaldığını kanıtlar.
+console.log('\n[4b] Salt-okur uzak kaynak köprüsü');
+
+const sourceSource = read('v3-tanitim/v3-source.js');
+const sourceCode = stripComments(sourceSource);
+
+ok('kaynak modülü sayfada yükleniyor ve sırası doğru',
+  pageScripts.some((s) => s.startsWith('v3-source.js')) &&
+  pageScripts.findIndex((s) => s.startsWith('v3-source.js')) === 2);
+
+/* — GET-ONLY: hiçbir yazma yöntemi geçmez — */
+['PUT', 'POST', 'PATCH', 'DELETE'].forEach((verb) => {
+  ok('kaynak modülü ' + verb + ' kullanmıyor (yalnız GET)',
+    sourceCode.indexOf("'" + verb + "'") < 0 && sourceCode.indexOf('"' + verb + '"') < 0);
+});
+ok('kaynak modülü fetch çağrısında yöntem belirtmiyor (varsayılan GET)',
+  (sourceCode.match(/fetch\(/g) || []).length >= 1 && !/method\s*:/.test(sourceCode));
+
+/* — DEPOYA YAZMAZ: uzak veri yalnız bellekte yaşar — */
+ok('kaynak modülü depoya YAZMIYOR (setItem/removeItem/clear yok)',
+  !/setItem|removeItem|localStorage\.clear/.test(sourceCode),
+  'uzak veri diske yazılırsa bir sonraki açılışta bayat veri gösterilirdi');
+ok('kaynak modülü sync.js yüklemiyor / çağırmıyor (push yolu kapalı)',
+  !/SeySync/.test(sourceCode) && !/pushNow|\.schedule\(/.test(sourceCode));
+
+/* — TOKEN YALNIZ BAŞLIKTA: console/DOM/metne sızmaz — */
+ok('token yalnız Authorization başlığında kullanılıyor',
+  /'Authorization': 'Bearer ' \+ c\.token/.test(sourceCode));
+ok('token console.log/DOM/metne yazılmıyor',
+  !/console\.(log|warn|error|info)/.test(sourceCode) &&
+  !/textContent\s*=\s*c\.token|innerHTML[^\n]*c\.token/.test(sourceCode));
+ok('kimlik bilgisi yalnız CİHAZ deposundan okunur (kullanıcıya sorulmaz, ağdan alınmaz)',
+  /localStorage\.getItem\(KEY\)/.test(sourceCode) && /s\.ghToken/.test(sourceCode));
+
+/* — CİHAZ DEPOSU YALNIZ YEDEK: repo esastır (sayfa ömür boyu bir kez gösterilir) — */
+ok('uzak okuma yolu kimlik bilgisine bağlı (cihaz deposuna değil)',
+  /if \(!creds\(\)\) \{\s*settle\(\);\s*return;/.test(sourceCode));
+ok('ağ hatasında cihaz deposuna düşülür (sayfa bozulmaz)',
+  sourceCode.indexOf('.catch(function () {') >= 0 && /settle\(\);/.test(sourceCode));
+ok('kimlik bilgisi yoksa çekme denemesi yapılmaz (ağ imkânsız)',
+  /if \(!c\) return Promise\.resolve\(null\)/.test(sourceCode));
+
+/* — >1 MB GERÇEK DOSYA: Blobs API yedeği (Contents API gövdesi boş gelir) — */
+ok('1 MB üstü dosya için Blobs API yedeği var (Contents API boş gövde)',
+  sourceCode.indexOf('git/blobs/') >= 0 &&
+  /if \(!g\.sha\) return null;/.test(sourceCode));
+ok('raw Accept bazı vekillerde JSON döner — iki biçim de karşılanır',
+  /encoding/.test(sourceCode) && /b64decodeUtf8/.test(sourceCode));
+ok('Türkçe karakter için UTF-8 base64 çözücü (atob tek başına yetmez)',
+  /TextDecoder/.test(sourceCode) && /new Uint8Array/.test(sourceCode));
+
+/* — HATA DÜŞÜŞÜ: ağ/kimlik hatası sayfayı kırmaz — */
+ok('ağ hatasında sessiz düşüş + sayfa yine çizilir',
+  sourceSource.indexOf('.catch(function () {') >= 0 &&
+  sourceSource.indexOf('settle();') >= 0);
+ok('istek zaman aşımına karşı korumalı (AbortController)',
+  /AbortController/.test(sourceCode) && /clearTimeout/.test(sourceCode));
+
+/* — v3-data.js SALT-OKUR KALIR: ağ ORADA değil, İZOLE modülde — */
+const dataSrcForBridge = read('v3-tanitim/v3-data.js');
+ok('v3-data.js hâlâ ağ çağrısı yapmıyor (köprü izole)',
+  !/\bfetch\s*\(/.test(dataSrcForBridge) &&
+  !/XMLHttpRequest/.test(dataSrcForBridge));
+ok('v3-data.js uzak veriyi yalnız BELLEĞE alır (setData), diske yazmaz',
+  /function setData\(d\)/.test(dataSrcForBridge) &&
+  /MEMORY = d;/.test(dataSrcForBridge));
 
 // ───────────────────────────────────────────────────────────────────────────
 // [5] Erişilebilirlik + tasarım sözleşmesi
@@ -451,19 +525,24 @@ ok('CSS atlama bağlantısı metni ölçülen sabitle aynı (#000)',
   /\.v3-skip\{[\s\S]*?color:#000;/.test(cssSource));
 
 // ───────────────────────────────────────────────────────────────────────────
-// [8] Kutlama katmanı — 85. gün + efektler
+// [8] Kutlama katmanı — gün sayısı + efektler
 // ───────────────────────────────────────────────────────────────────────────
-console.log('\n[8] Kutlama katmanı (85. gün)');
+console.log('\n[8] Kutlama katmanı (gün sayısı)');
 
-// 85 sayısı iki bağımsız yolla doğrulanır:
-//   (a) ARİTMETİK — sayfanın yazdığı başlangıç ile bugün arası kapsayıcı gün
-//       sayısı 85 olmalı. Bu uygulamanın kendi formülüdür
+// GÜN SAYISI ARTIK SABİT DEĞİL — kaynak veriden türetilir
+// (v3-data.js: dayCount = diffDays(startDate, bugün) + 1). Statik HTML
+// geçerli bir VARSAYILAN taşır; JS açıkken gerçek sayıya düzeltilir.
+//
+//   (a) ARİTMETİK — statik varsayılan, yazdığı başlangıç ile tutarlı olmalı
+//       (kapsayıcı gün sayısı). Bu uygulamanın kendi formülüdür
 //       (dateUtils.js: dayIndexFor = diffDays(start, date) + 1).
 //   (b) KOROBORASYON — başlangıç, deponun kendi veri kaybı kaydıyla
 //       (AGENTS.md: 2026-07-10'da "17 günlük" veri silindi) ±1 gün içinde
 //       örtüşmeli. EŞİTLİK ARANMAZ: kayıt "17 gün"ün hangi günü kapsadığını
 //       (silinen gün dahil mi) belirtmiyor, dolayısıyla kesin bir eşitlik
 //       dayatmak sahte kesinlik olurdu. Örtüşme yeterli koroborasyondur.
+//   (c) DİNAMİKLİK — sayfa sabit bir sayı yazmakla kalmamalı; veriden gelen
+//       sayıyı yazabilecek ID'li düğümler ve güncelleme yolu bulunmalı.
 const WIPE_DATE = '2026-07-10';
 const WIPE_LOST_DAYS = 17;
 function addDays(iso, n) {
@@ -475,15 +554,18 @@ function inclusiveDays(from, to) {
   return Math.round((new Date(to + 'T00:00:00Z') - new Date(from + 'T00:00:00Z')) / 86400000) + 1;
 }
 
+// Statik varsayılan: kutlama günü için geçerli bir sayı taşınır.
 const PAGE_TODAY = '2026-09-15';
-const PAGE_DAY = 85;
 const PAGE_START = '2026-06-23';
+const PAGE_DAY = inclusiveDays(PAGE_START, PAGE_TODAY);   // 85
 
 ok('sayfa başlangıç tarihini yazıyor (23 Haziran 2026)',
   /23 Haziran 2026/.test(pageSource));
-ok('sayfa 85. günü işaretliyor', /data-count="85"/.test(pageSource));
+ok('statik varsayılan gün sayısı HTML\'de yazılı (JS kapalıyken de geçerli)',
+  new RegExp('data-count="' + PAGE_DAY + '"').test(pageSource) &&
+  new RegExp(PAGE_DAY + '\\. güne hoş geldin').test(pageSource));
 
-ok('(a) aritmetik: başlangıç → bugün kapsayıcı 85 gün',
+ok('(a) aritmetik: statik başlangıç → kutlama günü kapsayıcı ' + PAGE_DAY + ' gün',
   inclusiveDays(PAGE_START, PAGE_TODAY) === PAGE_DAY,
   'hesaplanan: ' + inclusiveDays(PAGE_START, PAGE_TODAY));
 
@@ -498,11 +580,32 @@ ok('(b) koroborasyon: başlangıç, veri kaybı kaydıyla ±1 gün örtüşüyor
   'kayıttan türeyen ' + wipeImpliedStartExclusive + ' / ' + wipeImpliedStartInclusive +
   ' — sayfa ' + PAGE_START + ' (sapma ' + drift + ' gün)');
 
+/* (c) DİNAMİKLİK — sabit sayı tuzağına düşülmesin */
+ok('gün sayısı veriden türetilir, sabit yazılmaz (v3-data.js)',
+  /var dayCount = \(start && diffDays\(start, end\) >= 0\) \? \(diffDays\(start, end\) \+ 1\) : null;/
+    .test(read('v3-tanitim/v3-data.js')) &&
+  !/dayCount: 85/.test(read('v3-tanitim/v3-data.js')));
+ok('başlangıç yoksa en erken kayıtlı gün kullanılır (sabit varsayım yok)',
+  /var start = data\.startDate \|\| \(known\.length \? known\[0\] : null\);/
+    .test(read('v3-tanitim/v3-data.js')));
+ok('gün sayısı türetilemezse sahte sayı gösterilmez (EMPTY)',
+  /dayCount: null/.test(read('v3-tanitim/v3-data.js')) &&
+  /if \(!dayCount\) return EMPTY;/.test(read('v3-tanitim/v3-data.js')));
+ok('rozet de sabit eşik değil, gerçek gün sayısından türetilir',
+  dataSrcForBridge.indexOf("l: dayCount + '. güne ulaşmak'") >= 0 &&
+  dataSrcForBridge.indexOf("'85. güne ulaşmak'") < 0);
+ok('dinamik güncelleme için ID\'li düğümler var (hero/kapanış/footer)',
+  ['v3-lead', 'v3-counter-num', 'v3-counter-ordinal', 'v3-counter-note',
+   'v3-veri-baslik', 'v3-kapanis-baslik', 'v3-footer-days'].every(
+    (id) => pageSource.indexOf('id="' + id + '"') >= 0));
+ok('sayı sözcüğü Türkçe üretilir (84 → "seksen dört")',
+  /function trWords\(n\)/.test(read('v3-tanitim/v3-data.js')) &&
+  /'seksen'/.test(read('v3-tanitim/v3-data.js')));
+
 ok('kutlama bölümü var', /class="v3-milestone"/.test(pageSource));
 ok('kutlama tonu suçlayıcı değil, kutlayıcı',
   /kutlama günü/.test(pageSource) && /Nice güzel günlere/.test(pageSource));
-ok('kapanışta 85. gün başlığı ve sıcak not var',
-  /85\. güne hoş geldin/.test(pageSource) &&
+ok('kapanışta sıcak not var',
   /Bu sayfayı bir daha görmeyeceksin/.test(pageSource) &&
   /Sevgili Günışığı/.test(pageSource));
 
@@ -755,7 +858,7 @@ ok('rozet toplamı 8', /totalBadges: 8/.test(dataSource));
 /* — BOŞ DURUM — */
 ok('veri yoksa sahte grafik çizilmez, dürüst boş-durum gelir',
   /emptyState/.test(chartsSource) &&
-  /henüz kayıt görünmüyor/i.test(chartsSource));
+  /gösterilecek kayıt bulunamadı/i.test(chartsSource));
 ok('boş durumda bölüm yine de görünür kalıyor (gizlenmiyor)',
   /data-state', 'empty'/.test(chartsSource) && !/style\.display\s*=\s*'none'/.test(chartsSource));
 ok('veri katmanı bozuk JSON\'da çökmüyor (try/catch + null)',
@@ -766,21 +869,31 @@ ok('sayfada kişisel veri bölümü var', /id="v3-veri"/.test(pageSource));
 ['v3-veri-stats', 'v3-veri-heat', 'v3-veri-mood', 'v3-veri-habits', 'v3-veri-badges']
   .forEach((id) => ok('bölüm hedefi mevcut: ' + id, pageSource.indexOf('id="' + id + '"') >= 0));
 ok('bölüm gizlilik sözünü kullanıcıya açıkça söylüyor',
-  /yalnız senin cihazından geliyor/i.test(pageSource) &&
+  /senin kendi kayıtlarından geliyor/i.test(pageSource) &&
   /Hiçbir yere\s+gönderilmedi/i.test(pageSource));
+/* Kaynak açıkça anlatılır: önce cihaz, gerekirse salt-okur repo okuması. */
+ok('veri kaynağı kullanıcıya dürüstçe açıklanıyor (cihaz → gerekirse salt-okur)',
+  /SALT-OKUR çekilir/i.test(pageSource) &&
+  /Hiçbir yere YAZILMAZ/i.test(pageSource));
+ok('boş-durum da kaynağı dürütçe anlatıyor (yalnız cihaz iddiası yok)',
+  /gösterilecek kayıt bulunamadı/i.test(chartsSource) &&
+  /özel veri depondan/i.test(chartsSource));
 ok('grafikler yeni bağımlılık getirmiyor (kütüphane/CDN yok)',
   !/<script src="https?:/.test(pageSource) && !/cdn|unpkg|jsdelivr/i.test(pageSource));
 
 /* — SAYAÇ ENTEGRASYONU: charts sayaçları v3.js'ten ÖNCE basar — */
 ok('v3.js sayaçları charts enjeksiyonundan SONRA kuruyor (script sırası)',
-  pageScripts.indexOf('v3-charts.js?v=20260915g') < pageScripts.indexOf('v3.js?v=20260915h') &&
-  pageScripts.indexOf('v3-charts.js?v=20260915g') >= 0);
+  pageScripts.findIndex((s) => s.startsWith('v3-charts.js')) <
+  pageScripts.findIndex((s) => s.startsWith('v3.js')) &&
+  pageScripts.findIndex((s) => s.startsWith('v3-charts.js')) >= 0);
 
 /* — CACHE-BUST — */
 ok('yeni modüller cache-bust taşıyor',
-  /v3-data\.js\?v=\d+[a-z]/.test(pageSource) && /v3-charts\.js\?v=\d+[a-z]/.test(pageSource));
-ok('v3.css cache-bust güncel', /v3\.css\?v=20260915i/.test(pageSource));
-ok('v3.js cache-bust güncel', /v3\.js\?v=20260915h/.test(pageSource));
+  /v3-data\.js\?v=\d+[a-z]/.test(pageSource) &&
+  /v3-charts\.js\?v=\d+[a-z]/.test(pageSource) &&
+  /v3-source\.js\?v=\d+[a-z]/.test(pageSource));
+ok('v3.css cache-bust güncel', /v3\.css\?v=20260915j/.test(pageSource));
+ok('v3.js cache-bust güncel', /v3\.js\?v=20260915j/.test(pageSource));
 
 // ───────────────────────────────────────────────────────────────────────────
 // [11] Gelişmiş istatistik katmanı (v3-stats.js + v3-statsview.js)
@@ -877,7 +990,6 @@ ok('istatistik bölümü veri yoksa sahte grafik çizmez',
 /* — Cache-bust — */
 ok('istatistik modülleri cache-bust taşıyor',
   /v3-stats\.js\?v=\d+[a-z]/.test(pageSource) && /v3-statsview\.js\?v=\d+[a-z]/.test(pageSource));
-
 console.log('\n' + passed + ' kontrol geçti.');
 if (process.exitCode) console.log('SONUÇ: FAIL');
 else console.log('SONUÇ: PASS');

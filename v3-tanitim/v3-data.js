@@ -132,22 +132,68 @@
     return true;
   }
 
-  function readData() {
-    if (MEMORY) return MEMORY;
+  /* Cihaz deposunu OKUR, kaynak durumuna dokunmaz (seçim summarize'da). */
+  function readDevice() {
     try {
       var raw = window.localStorage.getItem(KEY);
-      if (!raw) { SOURCE = 'none'; SOURCE_DETAIL = 'cihazda-anahtar-yok'; return null; }
+      if (!raw) return { data: null, why: 'cihazda-anahtar-yok' };
       var parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') { SOURCE = 'none'; SOURCE_DETAIL = 'bozuk-json'; return null; }
-      if (!parsed.days || typeof parsed.days !== 'object') { SOURCE = 'none'; SOURCE_DETAIL = 'gun-yok'; return null; }
-      if (!Object.keys(parsed.days).length) { SOURCE = 'none'; SOURCE_DETAIL = 'bos-depo'; return null; }
-      SOURCE = 'device';
-      SOURCE_DETAIL = 'cihaz-kaydi';
-      return parsed;
+      if (!parsed || typeof parsed !== 'object') return { data: null, why: 'bozuk-json' };
+      if (!parsed.days || typeof parsed.days !== 'object') return { data: null, why: 'gun-yok' };
+      if (!Object.keys(parsed.days).length) return { data: null, why: 'bos-depo' };
+      return { data: parsed, why: 'cihaz-kaydi' };
     } catch (_) {
-      SOURCE = 'none'; SOURCE_DETAIL = 'okuma-hatasi';
-      return null;
+      return { data: null, why: 'okuma-hatasi' };
     }
+  }
+  function readData() {
+    if (MEMORY) return MEMORY;
+    var r = readDevice();
+    if (r.data) { SOURCE = 'device'; SOURCE_DETAIL = r.why; return r.data; }
+    SOURCE = 'none'; SOURCE_DETAIL = r.why;
+    return null;
+  }
+
+  /* ── Tazelik: hangi kaynak daha güncel? ─────────────────────────────────
+     Kullanıcı isteği (2026-09-15): sayfa Ayarlar'daki "N. gün" düğmesinden
+     tekrar tekrar açılacak ve istatistikler ZAMANLA GÜNCELLENMELİ. Gömülü
+     anlık görüntü (v3-snapshot.js) TABANDIR; ama uygulamanın kendi cihazında
+     (telefon) depo her gün büyür → o daha tazedir ve KAZANIR. Masaüstünde
+     15 günlük bayat bir kayıt varsa anlık görüntü kazanır. Uzak veri (token
+     ile) geldiyse o da yarışa girer. Ölçü: son kayıtlı gün, eşitse kayıtlı gün
+     sayısı. Hiçbir kaynak sessizce ötekinin yerine geçmez; rozet hangisinin
+     kazandığını ve tarihini yazar. */
+  function freshnessOfData(data) {
+    if (!data || !data.days) return null;
+    var last = '', n = 0;
+    for (var d in data.days) {
+      var r = data.days[d];
+      if (!r) continue;
+      if (countRec(r) > 0 || r.mood || r.note || r.intention ||
+          (r.meals && (r.meals.breakfast || r.meals.lunch || r.meals.dinner || r.meals.snack))) {
+        n++;
+        if (d > last) last = d;
+      }
+    }
+    return n ? { last: last, n: n } : null;
+  }
+  function freshnessOfSnapshot(snap) {
+    if (!snap) return null;
+    return { last: snap.endDate || '', n: snap.daysRecorded || 0 };
+  }
+  function fresher(a, b) {           /* a, b'den daha taze mi (ya da eşit)? */
+    if (!a) return false;
+    if (!b) return true;
+    if (a.last !== b.last) return a.last > b.last;
+    return a.n >= b.n;
+  }
+  function freshness() {
+    var dev = readDevice();
+    return {
+      snapshot: freshnessOfSnapshot(snapshot()),
+      device: freshnessOfData(dev.data),
+      remote: freshnessOfData(MEMORY)
+    };
   }
 
   function source() { return { src: SOURCE, detail: SOURCE_DETAIL, remoteFail: REMOTE_FAIL }; }
@@ -332,8 +378,28 @@
   function summarize() {
     var today = todayISO();
     var snap = snapshot();
-    if (snap) return fromSnapshot(snap, today);
-    var data = readData();
+    var data = null;
+
+    /* Kaynak seçimi: EN TAZE kazanır — son kayıtlı gün, eşitse kayıtlı gün
+       sayısı; tam eşitlikte sıra uzak → cihaz → anlık görüntü. */
+    var fr = freshness();
+    var dev = readDevice();
+    var cands = [];
+    if (MEMORY && fr.remote) cands.push({ k: 'remote', f: fr.remote });
+    if (dev.data && fr.device) cands.push({ k: 'device', f: fr.device });
+    if (snap && fr.snapshot) cands.push({ k: 'snapshot', f: fr.snapshot });
+    var pick = null;
+    for (var ci = 0; ci < cands.length; ci++) {
+      var cf = cands[ci].f;
+      if (!pick || cf.last > pick.f.last || (cf.last === pick.f.last && cf.n > pick.f.n)) pick = cands[ci];
+    }
+    var best = pick ? pick.k : null;
+
+    if (best === 'snapshot') return fromSnapshot(snap, today);
+    if (best === 'remote') { data = MEMORY; SOURCE = 'remote'; SOURCE_DETAIL = fr.remote.last; }
+    else if (best === 'device') { data = dev.data; SOURCE = 'device'; SOURCE_DETAIL = snap ? 'fresh:' + fr.device.last : dev.why; }
+    else if (snap) return fromSnapshot(snap, today);
+    else { data = readData(); }
     if (!data) return EMPTY;
 
     /* Başlangıç: `startDate` varsa o; yoksa kayıtlı EN ERKEN gün. Sabit bir
@@ -560,6 +626,8 @@
     trWords: trWords,
     setData: setData,
     snapshot: snapshot,
+    freshness: freshness,
+    fresher: fresher,
     setRemoteFailure: setRemoteFailure,
     source: source,
     dynamic: dynamic,

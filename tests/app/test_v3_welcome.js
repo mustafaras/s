@@ -253,11 +253,25 @@ ok('GİZLİLİK: anlık görüntüde ham kayıt / not / etiket / token / konum Y
   ].every((t) => snapSource.indexOf(t) < 0));
 ok('anlık görüntü yalnız SAYISAL ruh hâli taşır (moodTrend.score 1–5|null)',
   snap && snap.moodTrend.every((m) => m.score === null || (m.score >= 1 && m.score <= 5)));
-ok('veri katmanı anlık görüntüyü ÖNCELİKLİ okur (ağ/cihaz deposundan önce)',
-  /var snap = snapshot\(\);\s*if \(snap\) return fromSnapshot\(snap, today\);/.test(read('v3-tanitim/v3-data.js')) &&
-  /SOURCE = 'snapshot';/.test(read('v3-tanitim/v3-data.js')));
-ok('köprü anlık görüntü varken ağa HİÇ çıkmaz',
-  /if \(window\.SeymaV3Snapshot\) \{\s*settle\(\);\s*return;\s*\}/.test(read('v3-tanitim/v3-source.js')));
+/* Tazelik kuralı (kullanıcı 2026-09-15: "dinamik olarak istatistikler
+   güncellensin zaman içerisinde"): anlık görüntü TABAN; uygulamanın kendi
+   cihazındaki depo ondan tazeyse o kazanır; bayat cihaz kaydı asla anlık
+   görüntüyü ezemez; uzak veri geldiyse yarışa girer. */
+ok('veri katmanı kaynakları TAZELİĞE göre seçer (son gün, eşitse kayıt sayısı; uzak → cihaz → anlık görüntü)',
+  (function () {
+    const d = read('v3-tanitim/v3-data.js');
+    return /function freshness\(\)/.test(d) && /function fresher\(a, b\)/.test(d) &&
+      /cands\.push\(\{ k: 'remote'/.test(d) && /cands\.push\(\{ k: 'device'/.test(d) &&
+      /cands\.push\(\{ k: 'snapshot'/.test(d) &&
+      /cf\.last > pick\.f\.last \|\| \(cf\.last === pick\.f\.last && cf\.n > pick\.f\.n\)/.test(d) &&
+      /SOURCE = 'snapshot';/.test(d) && /'fresh:' \+ fr\.device\.last/.test(d);
+  })());
+ok('köprü anlık görüntü varken ağa yalnız İYİLEŞTİREBİLECEKSE çıkar (cihaz tazeyse ya da kimlik yoksa ağ yok)',
+  /var deviceWins = !!\(fr && fr\.device && \(!fr\.snapshot \|\| V3f\.fresher\(fr\.device, fr\.snapshot\)\)\);\s*if \(deviceWins \|\| !creds\(\)\) \{\s*settle\(\);\s*return;/.test(read('v3-tanitim/v3-source.js')));
+ok('cihaz kaydı tazeyse rozet bunu "güncel veri" olarak söyler (ağ yok)',
+  /Güncel veri · bu cihazdaki uygulama kaydı · son gün/.test(read('v3-tanitim/v3-charts.js')));
+ok('tekrar açılışta kapanış düğmesi "Uygulamaya dön" der (işaret zaten yazılı)',
+  /if \(isSeen\(\)\) \{[\s\S]{0,200}doneBtn\.textContent = 'Uygulamaya dön'/.test(jsSource));
 ok('rozet gömülü anlık görüntüyü tarihiyle söyler',
   /anlık görüntüsü · sayfaya gömülü, salt-okur \(ağ yok\)/.test(read('v3-tanitim/v3-charts.js')));
 ok('üretici araç yalnız GET kullanır ve yazmadan önce yasaklı alan tarar',
@@ -813,7 +827,13 @@ ok('köprü düz <a> — yeni handler/onclick eklenmedi (pinli yüzey korunur)',
   !/<button[^>]*App\.goWelcome/.test(settingsSrc));
 ok('köprü erişilebilir bir metin taşıyor',
   /3\.0&#8217;da neler değişti\?/.test(settingsSrc) &&
-  /Sürüm tanıtımını yeniden aç/.test(settingsSrc));
+  /Yolculuğunun özeti/.test(settingsSrc));
+/* "N. gün" düğmesi (kullanıcı 2026-09-15): sayı SABİT DEĞİL — uygulamanın
+   kendi dayIndexFor formülünden gelir; düz <a>, handler/onclick yok. */
+ok('Ayarlar\'daki gün düğmesi dinamik (dayIndexFor) ve sabit sayı taşımaz',
+  /window\.SeymaDateUtils\.dayIndexFor\(todayStr\(\)\)/.test(settingsSrc) &&
+  /_dayN\+'\. gün'/.test(settingsSrc) && /id="sey-day-journey"/.test(settingsSrc) &&
+  !/8[45]\. gün/.test(settingsSrc));
 
 // Pinli yüzey: bu iki sayı fx2 fixture'larında sabit. settings.js ve render.js
 // o taramaya dâhildir — burada önden yakalıyoruz ki hata erken görünsün.
@@ -837,7 +857,7 @@ ok('sürüm yorumları pin taramasını kaydırmıyor (yorumda nitelik adı geç
   !/\/\/[^\n]*(?:App\.[A-Za-z0-9_]+\s*=|onclick=)/.test(settingsSrc));
 
 // Cache-bust: değişen modüller yeni sürüm taşımalı
-ok('settings.js cache-bust güncel', /app\/core\/settings\.js\?v=20260915b/.test(indexSource));
+ok('settings.js cache-bust güncel', /app\/core\/settings\.js\?v=20260915c/.test(indexSource));
 ok('render.js cache-bust güncel', /app\/core\/render\.js\?v=20260915f/.test(indexSource));
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -1015,7 +1035,7 @@ ok('yeni modüller cache-bust taşıyor',
   /v3-charts\.js\?v=\d+[a-z]/.test(pageSource) &&
   /v3-source\.js\?v=\d+[a-z]/.test(pageSource));
 ok('v3.css cache-bust güncel', /v3\.css\?v=20260915l/.test(pageSource));
-ok('v3.js cache-bust güncel', /v3\.js\?v=20260915k/.test(pageSource));
+ok('v3.js cache-bust güncel', /v3\.js\?v=20260915l/.test(pageSource));
 
 // ───────────────────────────────────────────────────────────────────────────
 // [11] Gelişmiş istatistik katmanı (v3-stats.js + v3-statsview.js)

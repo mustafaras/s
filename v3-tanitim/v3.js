@@ -334,6 +334,15 @@
 
   /* ── Kurulum ─────────────────────────────────────────────────────────────*/
   function init() {
+    /* Ayarlar'daki "N. gün" düğmesinden tekrar açıldıysa (işaret zaten
+       yazılı) kapanış düğmesi "Okudum, anladım" değil "Uygulamaya dön" der.
+       Davranış aynı: işaret (yeniden) yazılır, uygulamaya dönülür. */
+    try {
+      if (isSeen()) {
+        var doneBtn = document.getElementById('v3-done');
+        if (doneBtn) doneBtn.textContent = 'Uygulamaya dön';
+      }
+    } catch (_) {}
     wireReveal();
     wireProgress();
     wireCounters();

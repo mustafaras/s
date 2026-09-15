@@ -30,8 +30,8 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 | `v3-statsview.js` | İstatistik görselleştirme (histogram, kutu grafiği, eğilim, korelasyon). |
 | `v3-charts.js` | Grafik çizimi (ısı haritası, trend, çubuklar, rozetler). |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
-| `../tests/app/test_v3_welcome.js` | **284 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
-| `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + "3.0'da neler değişti?" köprüsü. |
+| `../tests/app/test_v3_welcome.js` | **287 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
+| `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + dinamik **"N. gün"** düğmesi (`dayIndexFor`, düz `<a>`). |
 | `../app/core/render.js` | Başlangıç ekranı **v3.0** rozeti. |
 
 ## Statik anlık görüntü — neden ve nasıl (2026-09-15)
@@ -43,8 +43,9 @@ masaüstünde 15 günlük bayat cihaz kaydı görünüyordu. Artık:
 1. `node tools/v3-snapshot-build.mjs` → `v3-tanitim/v3-snapshot.js` (≈16 KB).
    Sayılar canlı yolla **birebir** aynıdır: aynı `v3-data.js`/`v3-stats.js`
    kodu, gerçek veriyle, node:vm içinde çalıştırılır; çıktı budanır.
-2. Sayfa `window.SeymaV3Snapshot` görünce **hiç ağ isteği yapmaz** (fixture +
-   headless CDP ölçümü: dış istek 0, localStorage 0).
+2. Sayfa `window.SeymaV3Snapshot` görünce ağa yalnız **iyileştirebilecekse**
+   çıkar (bkz. "Tazelik kuralı"); boş/bayat masaüstü tarayıcıda hiç çıkmaz
+   (headless CDP ölçümü: dış istek 0, localStorage 0).
 3. Rozet: *"✓ Eşitlenmiş veri · 15 Eylül 2026 anlık görüntüsü · sayfaya
    gömülü, salt-okur (ağ yok)"*.
 4. "Kaçıncı gün" sayacı yine uygulamanın formülüyle **bugüne** göre türetilir
@@ -57,6 +58,34 @@ masaüstünde 15 günlük bayat cihaz kaydı görünüyordu. Artık:
 > **girmez** — üretici yazmadan önce tarar, fixture dosyayı metin düzeyinde
 > yeniden tarar. Yine de kişiye ait sağlık sayılarıdır: **push kararı
 > kullanıcınındır** (dal LOCAL-ONLY). Yenilemek için aracı tekrar çalıştır.
+
+## Tazelik kuralı + Ayarlar'daki "N. gün" düğmesi (2026-09-15)
+
+Kullanıcı isteği: *"okudum dedikten sonra açılışta görmesin, ayarlara 84. gün
+butonu koyalım ve istatistikler zaman içinde dinamik güncellensin."*
+
+- **Açılışta görmeme:** değişmedi — `seyma-v3-welcome-v1=done` yazılınca kök
+  bootstrap yönlendirmez. Sayfa tekrar açıldığında kapanış düğmesi
+  **"Uygulamaya dön"** der (`v3.js`, `isSeen()`).
+- **Ayarlar → "N. gün" düğmesi** (`app/core/settings.js`, `#sey-day-journey`):
+  sayı **sabit değil**, `SeymaDateUtils.dayIndexFor(bugün)` ile her açılışta
+  hesaplanır (84 → yarın 85). Düz `<a>`; yeni handler/onclick yok (pinler
+  718/391/554 korunur). Altın rozet + "Yolculuğunun özeti · 3.0'da neler
+  değişti?".
+- **Tazelik kuralı** (`v3-data.js summarize()`): üç aday — uzak (token ile
+  okunduysa), **cihaz deposu** (uygulamanın kendi kaydı), **gömülü anlık
+  görüntü** — ve **en taze olan kazanır**: son kayıtlı gün, eşitse kayıtlı gün
+  sayısı; tam eşitlikte uzak → cihaz → anlık görüntü. Sonuç:
+  | Nerede | Kaynak | Ağ |
+  |---|---|---|
+  | Telefon (uygulamanın cihazı, depo her gün büyür) | **cihaz** — istatistikler zamanla güncellenir | yok |
+  | Masaüstü, 15 günlük bayat kayıt, anahtar yok | **anlık görüntü** (84 gün) | yok |
+  | Masaüstü, bayat kayıt + anahtar | uzak okuma denenir; taze ise **uzak**, 401/ağ hatasında **anlık görüntü** | 1–2 GET |
+  | Boş tarayıcı | **anlık görüntü**; sayaç yine bugüne göre (5 gün sonra 89) | yok |
+  Rozet hangisinin kazandığını ve **son gün** tarihini yazar
+  (*"✓ Güncel veri · bu cihazdaki uygulama kaydı · son gün 18 Eylül 2026"*).
+  8 senaryoluk headless matris (telefon/masaüstü/token/401/boş/5 gün sonra/
+  anlık görüntü yok) PASS.
 
 ## Alışkanlık haritası v2 (2026-09-15)
 
@@ -371,7 +400,7 @@ test edildi (tamamı `/tmp`'de; repoya ya da sayfaya **gömülmedi**). Sayfanın
 
 
 ```bash
-node tests/app/test_v3_welcome.js          # 284 kontrol (sözleşme + kontrast + kutlama + veri + köprü + uygulama içi)
+node tests/app/test_v3_welcome.js          # 287 kontrol (sözleşme + kontrast + kutlama + veri + köprü + uygulama içi)
 node --check v3-tanitim/v3.js
 node .claude/skills/run-seyma/driver.mjs   # exit 0
 node tools/shell-inventory.mjs --gate      # PASS · 7.610 / 0 / 408 / 57

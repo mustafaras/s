@@ -267,8 +267,15 @@
         ' anlık görüntüsü · sayfaya gömülü, salt-okur (ağ yok)';
       return;
     }
+    if (src === 'device' && /^fresh:/.test(s.detail || '')) {
+      /* Cihaz kaydı anlık görüntüden daha taze — uygulamanın kendi verisi. */
+      node.textContent = '✓ Güncel veri · bu cihazdaki uygulama kaydı · son gün ' +
+        trDate(s.detail.slice(6)) + ' (ağ yok)';
+      return;
+    }
     node.textContent = src === 'remote'
-      ? '✓ Eşitlenmiş veri · kendi özel veri deposundan salt-okur okundu'
+      ? '✓ Eşitlenmiş veri · kendi özel veri deposundan salt-okur okundu' +
+        (s.detail ? ' · son gün ' + trDate(s.detail) : '')
       : 'Bu cihazdaki kayıt · eşitlenmiş veriye ulaşılamadı' +
         (why ? ' — ' + why + ' Aşağıdaki sayılar bu cihazdaki kayıtla sınırlıdır; eksik olabilir.' : '');
   }

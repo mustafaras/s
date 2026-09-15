@@ -225,10 +225,18 @@
       try { updateDynamicText(); } catch (_) {}
     }
 
-    /* Gömülü anlık görüntü varsa ağa HİÇ çıkılmaz (kullanıcı isteği: statik). */
+    /* Gömülü anlık görüntü varsa ağa yalnız İYİLEŞTİREBİLECEKSE çıkılır:
+       cihaz deposu anlık görüntüden taze/eşitse (telefon) → ağ yok, cihaz
+       kazanır (istatistikler zamanla güncellenir). Cihaz bayatsa ve kimlik
+       varsa → uzak okuma denenir; en taze olan kazanır (v3-data.js). */
     if (window.SeymaV3Snapshot) {
-      settle();
-      return;
+      var V3f = window.SeymaV3Data;
+      var fr = (V3f && typeof V3f.freshness === 'function') ? V3f.freshness() : null;
+      var deviceWins = !!(fr && fr.device && (!fr.snapshot || V3f.fresher(fr.device, fr.snapshot)));
+      if (deviceWins || !creds()) {
+        settle();
+        return;
+      }
     }
 
     if (!creds()) {

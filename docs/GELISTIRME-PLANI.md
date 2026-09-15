@@ -21,6 +21,22 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-13 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (MON2 Dalga 3 Alan kapandı — MON2-07 yan etkili alan gövdeleri):**
+>   MON2-07, 24 saf alan gövdesini (aeon/location/header/weather/photo/habit/
+>   hero/luna) `app/core/appSurface.js` alan yüzey bölümüne taşıdı: `app.js`
+>   7.797 → **7.603** (kod 6.589), `appSurface.js` 459 → 840. Yeni dosya yok (K5).
+>   **Ağ/GPS/notification kuralı uygulandı:** `locationGateSilentVerify`,
+>   `streamAsk`, `mergeInbox`, `showNativeAeonNotification`, `fetchWeather`,
+>   `fetchDailyPhoto` ve `sha256` app.js'te kaldı. **Kök düzeltme:**
+>   `locationGateGranted` gövdesi `data=migrate(createDefaultData())` içerdiği
+>   için (data rebind app.js sahipliğinde) geri alındı; bag üyeleri
+>   değer-üretici (`function(){ return X; }`) biçimine çevrildi. `*HTML`
+>   builder sayımı 6/97 → 4/57. Tam kapı seti PASS: smoke 21/21,
+>   `shell-inventory --gate`, driver+zikr 95/95, verify-state B1/B2/B3,
+>   tests/app 52/52, panel 23/23, panel-v2 27/27, Kur'an 9/9, reminders 21/21,
+>   sync 69/69, `App.x=554`, onclick=391, dump 6/6 bayt-eşit. Sıradaki kart
+>   MON2-08 (seri kapanışı). Program LOCAL-ONLY; push/deploy/device ayrı
+>   kapılar.
 > - **2026-09-15 (MON2 Dalga 2 + Dalga 3 kapatıldı — Görünüm ve Alan dalgaları):**
 >   MON2-05 (Görünüm) 37 `*HTML()` builder gövdesini (831 kod satırı)
 >   `app/core/render.js`'e taşıdı: `app.js` 9.771 → 8.969, builder 928 → 97.

@@ -1,6 +1,6 @@
 # MON2 · Güncel durum
 
-**Güncelleme:** 2026-09-15 · **Durum:** `in_progress` · **Aktif kart:** MON2-07 · **Tamamlanan:** 6/8 (MON2-01…06) · **Dalga 1 (Reminder) + Dalga 2 (Görünüm) + Dalga 3 (Alan, MON2-06) kapandı**
+**Güncelleme:** 2026-09-15 · **Durum:** `in_progress` · **Aktif kart:** MON2-08 (Kapanış) · **Tamamlanan:** 7/8 (MON2-01…07) · **Dalga 1 (Reminder) + 2 (Görünüm) + 3 (Alan) kapandı**
 
 ## Canlı baseline (commit cf42949, `node tools/shell-inventory.mjs`)
 
@@ -79,9 +79,27 @@ Aktif (MON2-07): 8.000 satır · 0 Legacy · 450 reminder gövde · 150 HTML bui
 - Kapı: smoke **21/21** · `--gate` PASS (9.400 bütçesi, 8.969/0/408/97) · driver+zikr **95/95** · verify-state B1/B2/B3 · tests/app **52/52** · panel 23/23 · panel-v2 27/27 · quran 9/9 · sync 69/69 · App.x=554 · onclick(kombine)=391
 - Cache-bust: `render.js?v=20260914e`, `app.js?v=20260914e` + 4 app_surface pin'i güncellendi
 
+## MON2-07 sonrası (2026-09-15 · Alan dalgası, kart 7/8)
+
+- `app.js` 7.797 → **7.603 satır** (6.589 kod) — −194 satır; bütçe 7.800'e 197 satır marj
+- `app/core/appSurface.js` 459 → **840 satır**: yeni **alan yüzey bölümü** (24 gövde, aeon/location/header/weather/photo/habit/hero/luna). Yeni dosya YOK (K5)
+- Desen: ikinci **sloppy IIFE, DOSYA SONUNDA** (`with(FIELD_SCOPE)` + canlı property-getter'lar). Ana IIFE `'use strict'` taşıdığı için `with` oraya konamaz (ilk denemede SyntaxError — dosya sonu zorunlu)
+- **KÖK DÜZELTME 1 — bag üyeleri değer-üretici olmalı:** ilk yazımda `activeDate:activeDate` biçimindeydi; FIELD_SCOPE getter'ı üyeyi **çağırıp** sonucu değer sanıyor → `locationGateResetNudge is not a function`. MON2-06 deseni gereği **hepsi** `function(){ return X; }` yapıldı
+- **KÖK DÜZELTME 2 — S3/I1 ihlali geri alındı:** `locationGateGranted` gövdesi `data=migrate(createDefaultData())` içeriyordu (data rebind app.js'te kalır). app.js'e geri alındı; `test_state_rebind_boundary` yeniden 9 rebind satırı + 11 token görüyor; dep listesinden çıkarıldı
+- **KÖK DÜZELTME 3 — K4 (dep bag):** 3 `document.` kullanımı `doc` takma adına çevrildi + `doc:function(){ return document; }` bag üyesi. appSurface.js hiç tarayıcı globali adı taşımaz
+- **Ağ/GPS/notification kuralı uygulandı** — app.js'te kalanlar: `locationGateSilentVerify` (57), `streamAsk` (34), `mergeInbox` (48), `showNativeAeonNotification` (52), `fetchWeather` (40), `fetchDailyPhoto` (38); `sha256` WebCrypto da kaldı (kart hükmü)
+- `*HTML` builder gölge sayımı 6/97 → **4/57** (headerSceneHTML 49 + headerActionHTML 6 taşındı; bunlar builder ölçütüne giriyordu)
+- Fixture devirleri (K8 — pin gövdeyi izler): `test_fx2_overlay_motion`, `test_fx2_tab_transition`, `test_fx2_touch_coverage` → `combinedSource += appSurface.js` (onclick=391 sabit kaldı — appSurface'te onclick yok)
+- Cache-bust: `appSurface.js?v=20260915b`, `app.js?v=20260915b` + **5 app_surface pin'i**. Not: sed ile toplu değişim fazla kaçış ekledi (`appSurface\\.js\\?v=`); perl ile geri alındı
+- Kapı: syntax (app+sync+core×31) · smoke **21/21** (73 assertion) · `--gate` PASS (7.603/0/408/57) · driver+zikr **95/95** · verify-state B1/B2/B3 · tests/app **52/52** · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders 21/21 · sync 69/69 · `App.x=554` · onclick=391 · dump **6/6 BAYT-EŞİT**
+
+## Bütçe (shellBudget)
+
+Aktif (MON2-08): 7.800 satır · 0 Legacy · 450 reminder gövde · 150 HTML builder. Ölçüm 7.603/0/408/57 — 7.800'e 197 satır marj. MON2-08 kapanışta bütçeyi dondurur; asla gevşetilmez.
+
 ## Sonraki güvenli adım
 
-MON2-07 (README §5): yan etkili alan gövdeleri (aeon 345, location 208, header/weather/photo/habit/hero kalanları, `mergeInbox`, `lunaContext`, `psychScore`, `streamAsk` sarmalayıcıları) → `SeymaAppSurface`; ağ/GPS/notification **çağrısı** app.js'te kalır, hazırlık/parse/apply gövdesi taşınır. Bütçe **8.000 / 0 / 450 / 150** (ölçüm 7.797). Devir briefi: [`DEVIR-MON2-07.md`](../DEVIR-MON2-07.md).
+MON2-08 (seri kapanışı): tam set + panel/panel-v2 + quran + reminder smoke; `deliverables/MON2-SERI-KAPANIS.md` (son envanter, 25 modül API/owner tablosu, shim envanteri, bütçe dondurma, açık kalanlar). `MON2-STATE.json` `status=completed`, `nextPrompt=null`, `releaseApproval=not_approved`. CLAUDE.md/AGENTS.md modularization bullet'ı "MON2 complete" ile güncellenir.
 Push/deploy/browser/gerçek veri yok.
 
 ## Sınırlar

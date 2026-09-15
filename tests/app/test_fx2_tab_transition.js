@@ -27,7 +27,9 @@ const renderSource = fs.readFileSync(path.join(repoRoot, 'app/core/render.js'), 
 // combinedSource'a girer — onclick/handler pin'leri gövdeyi izler (K8 ilkesi).
 const remindersSource = fs.readFileSync(path.join(repoRoot, 'app/core/reminders.js'), 'utf8');
 const reminderSurfaceSource = fs.readFileSync(path.join(repoRoot, 'app/core/reminderSurface.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource + remindersSource + reminderSurfaceSource;
+// MON2-07 (K8 ilkesi: pin gövdeyi izler): alan gövdeleri appSurface.js'e taşındı.
+const appSurfaceFieldSource = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource + remindersSource + reminderSurfaceSource + appSurfaceFieldSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const goMatch = appSource.match(/App\.go=function\(id,event\)\{[\s\S]*?\n\};\n\n\/\/ ── REM-05/);
 

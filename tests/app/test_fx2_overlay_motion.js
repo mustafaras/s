@@ -33,7 +33,11 @@ const reminderSurfaceSource = fs.readFileSync(path.join(repoRoot, 'app/core/remi
 // görünüm gövdeleri kendi onclick metinlerini zaten taşır).
 const zikirSource = fs.readFileSync(path.join(repoRoot, 'app/core/zikir.js'), 'utf8');
 const quranSource = fs.readFileSync(path.join(repoRoot, 'app/core/quran.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource + remindersSource + reminderSurfaceSource;
+// MON2-07 (K8 ilkesi: pin gövdeyi izler): aeon/location/header/habit/hero
+// gövdeleri app/core/appSurface.js alan yüzey bölümüne taşındı; onclick/App
+// yüzey sayımı birleşik kaynakta yapılır (appSurface.js'te onclick taşımaz).
+const appSurfaceFieldSource = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource + remindersSource + reminderSurfaceSource + appSurfaceFieldSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 

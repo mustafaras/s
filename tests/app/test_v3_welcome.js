@@ -598,6 +598,22 @@ ok('dinamik güncelleme için ID\'li düğümler var (hero/kapanış/footer)',
   ['v3-lead', 'v3-counter-num', 'v3-counter-ordinal', 'v3-counter-note',
    'v3-veri-baslik', 'v3-kapanis-baslik', 'v3-footer-days'].every(
     (id) => pageSource.indexOf('id="' + id + '"') >= 0));
+/* Kaynak rozeti: sayfa hangi kaynaktan okuduğunu söyler — "eşitlenmiş veri"
+   derken sessizce cihaz kaydını gösterme yanılsamasına düşülemez. */
+ok('veri kaynağı rozeti var ve başlangıçta nötr (data-src="none")',
+  /id="v3-veri-src"[^>]*data-src="none"/.test(pageSource));
+ok('veri katmanı kaynağı izler (remote/device/none)',
+  /var SOURCE = 'none';/.test(read('v3-tanitim/v3-data.js')) &&
+  /SOURCE = 'remote';/.test(read('v3-tanitim/v3-data.js')) &&
+  /SOURCE = 'device';/.test(read('v3-tanitim/v3-data.js')));
+ok('kaynak rozeti gerçek kaynağa göre yazılır (iki ayrı metin)',
+  /Eşitlenmiş veri · kendi özel veri deposundan salt-okur okundu/.test(read('v3-tanitim/v3-charts.js')) &&
+  /Bu cihazdaki kayıt · eşitlenmiş veriye ulaşılamadı/.test(read('v3-tanitim/v3-charts.js')));
+ok('kaynak yoksa rozet gizlenir (boş satır kalmaz)',
+  /node\.hidden = true/.test(read('v3-tanitim/v3-charts.js')) &&
+  /\[hidden\]\{ display:none; \}/.test(cssSource));
+ok('kaynak rozeti hem dolu hem boş durumda güncellenir',
+  (read('v3-tanitim/v3-charts.js').match(/sourceBadge\(\);/g) || []).length === 2);
 ok('sayı sözcüğü Türkçe üretilir (84 → "seksen dört")',
   /function trWords\(n\)/.test(read('v3-tanitim/v3-data.js')) &&
   /'seksen'/.test(read('v3-tanitim/v3-data.js')));
@@ -892,7 +908,7 @@ ok('yeni modüller cache-bust taşıyor',
   /v3-data\.js\?v=\d+[a-z]/.test(pageSource) &&
   /v3-charts\.js\?v=\d+[a-z]/.test(pageSource) &&
   /v3-source\.js\?v=\d+[a-z]/.test(pageSource));
-ok('v3.css cache-bust güncel', /v3\.css\?v=20260915j/.test(pageSource));
+ok('v3.css cache-bust güncel', /v3\.css\?v=20260915k/.test(pageSource));
 ok('v3.js cache-bust güncel', /v3\.js\?v=20260915j/.test(pageSource));
 
 // ───────────────────────────────────────────────────────────────────────────

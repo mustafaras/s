@@ -11,7 +11,7 @@
        çağrısı yapmaz, düzen kayması (CLS) üretmez ve Apple cihazlarda zaten en
        rafine görünen yüzü kullanır. -->
   <link rel="stylesheet" href="../app/styles.css?v=20260909a">
-  <link rel="stylesheet" href="v3.css?v=20260915j">
+  <link rel="stylesheet" href="v3.css?v=20260915k">
 </head>
 <body class="v3-body">
 
@@ -206,6 +206,11 @@
           gönderilmedi, hiçbir şey değiştirilmedi — sadece yolculuğuna bir bakış.
         </p>
 
+        <!-- Veri KAYNAĞI rozeti: sayıların nereden okunduğunu dürüstçe söyler.
+             "Eşitlenmiş veri" = kendi özel veri deposundan salt-okur okundu.
+             "Bu cihaz" = repo'ya ulaşılamadı, cihazdaki kayıt gösteriliyor. -->
+        <p class="v3-veri__src" id="v3-veri-src" data-src="none"></p>
+
         <div class="v3-veri-body" id="v3-veri-body">
 
           <dl class="v3-vstats" id="v3-veri-stats" aria-label="Özet sayılar"></dl>
@@ -322,11 +327,11 @@
     </div>
   </div>
 
-  <script src="v3-data.js?v=20260915j"></script>
+  <script src="v3-data.js?v=20260915n"></script>
   <script src="v3-stats.js?v=20260915j"></script>
   <script src="v3-source.js?v=20260915a"></script>
   <script src="v3-statsview.js?v=20260915m"></script>
-  <script src="v3-charts.js?v=20260915m"></script>
+  <script src="v3-charts.js?v=20260915n"></script>
   <script src="v3.js?v=20260915j"></script>
 </body>
 </html>

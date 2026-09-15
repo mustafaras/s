@@ -723,6 +723,23 @@
   font-size:var(--f-subhead);line-height:1.65;color:var(--muted);
 }
 .v3-veri__hi{ color:var(--accent);font-weight:700; }
+
+/* · Veri kaynağı rozeti — sayıların nereden okunduğunu dürüstçe söyler.
+     `hidden` özniteliğiyle tamamen gizlenir (kaynak yoksa boş satır kalmaz). */
+.v3-veri__src{
+  display:inline-block;margin:0 0 16px;
+  padding:6px 12px;border-radius:999px;
+  font-size:var(--f-footnote);line-height:1.45;
+  border:1px solid color-mix(in srgb,var(--accent) 34%,transparent);
+  background:color-mix(in srgb,var(--accent) 9%,transparent);
+  color:var(--accent);
+}
+.v3-veri__src[hidden]{ display:none; }
+.v3-veri__src[data-src="device"]{
+  border-color:color-mix(in srgb,var(--muted) 32%,transparent);
+  background:color-mix(in srgb,var(--muted) 8%,transparent);
+  color:var(--muted);
+}
 .v3-veri-body{ display:flex;flex-direction:column;gap:14px; }
 
 /* · Özet sayı döşemeleri */

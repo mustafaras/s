@@ -110,14 +110,20 @@
 
   /* ── Okuma ────────────────────────────────────────────────────────────────
      Sıra: BELLEK (uzak, salt-okur) → cihaz deposu. Uzak nesne yalnız bu
-     oturumda yaşar; depoya yazılmaz, sayfa yenilenince yeniden çekilir. */
+     oturumda yaşar; depoya yazılmaz, sayfa yenilenince yeniden çekilir.
+     `SOURCE` gösterilen sayıların NEREDEN geldiğini söyler — böylece sayfa
+     "eşitlenmiş veri" derken cihaz kaydını göstermiş olamaz. */
   var MEMORY = null;
+  var SOURCE = 'none';        // 'remote' | 'device' | 'none'
+  var SOURCE_DETAIL = '';     // teşhis için kısa neden etiketi
 
   function setData(d) {
     if (!d || typeof d !== 'object') return false;
     if (!d.days || typeof d.days !== 'object') return false;
     if (!Object.keys(d.days).length) return false;
     MEMORY = d;
+    SOURCE = 'remote';
+    SOURCE_DETAIL = '';
     return true;
   }
 
@@ -125,15 +131,21 @@
     if (MEMORY) return MEMORY;
     try {
       var raw = window.localStorage.getItem(KEY);
-      if (!raw) return null;
+      if (!raw) { SOURCE = 'none'; SOURCE_DETAIL = 'cihazda-anahtar-yok'; return null; }
       var parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') return null;
-      if (!parsed.days || typeof parsed.days !== 'object') return null;
+      if (!parsed || typeof parsed !== 'object') { SOURCE = 'none'; SOURCE_DETAIL = 'bozuk-json'; return null; }
+      if (!parsed.days || typeof parsed.days !== 'object') { SOURCE = 'none'; SOURCE_DETAIL = 'gun-yok'; return null; }
+      if (!Object.keys(parsed.days).length) { SOURCE = 'none'; SOURCE_DETAIL = 'bos-depo'; return null; }
+      SOURCE = 'device';
+      SOURCE_DETAIL = 'cihaz-kaydi';
       return parsed;
     } catch (_) {
+      SOURCE = 'none'; SOURCE_DETAIL = 'okuma-hatasi';
       return null;
     }
   }
+
+  function source() { return { src: SOURCE, detail: SOURCE_DETAIL }; }
 
   /* ── Uygulama formülleri ───────────────────────────────────────────────── */
   function habitCountOn(date, since) {
@@ -489,6 +501,7 @@
     trDate: trDate,
     trWords: trWords,
     setData: setData,
+    source: source,
     dynamic: dynamic,
     readData: readData,
     summarize: summarize

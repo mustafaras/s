@@ -167,6 +167,31 @@
       '</div>';
   }
 
+  /* ── Veri kaynağı rozeti ──────────────────────────────────────────────────
+     Sayfa hangi kaynaktan okuduğunu AÇIKÇA söyler. Amaç: "eşitlenmiş veri"
+     derken sessizce cihaz kaydını göstermek gibi bir yanılsamaya düşmemek.
+     `none` durumunda yazı gösterilmez (boş durum zaten kendi metnini verir). */
+  function sourceBadge() {
+    var node = el('v3-veri-src');
+    if (!node) return;
+    var V3 = window.SeymaV3Data;
+    var s = (V3 && typeof V3.source === 'function') ? V3.source() : null;
+    var src = (s && s.src) || 'none';
+
+    if (src === 'none') {
+      node.setAttribute('data-src', 'none');
+      node.hidden = true;
+      node.textContent = '';
+      return;
+    }
+
+    node.removeAttribute('hidden');
+    node.setAttribute('data-src', src);
+    node.textContent = src === 'remote'
+      ? '✓ Eşitlenmiş veri · kendi özel veri deposundan salt-okur okundu'
+      : 'Bu cihazdaki kayıt · eşitlenmiş veriye ulaşılamadı';
+  }
+
   /* ── Kurulum ─────────────────────────────────────────────────────────────
      Veri gelmezse/hata olursa bölüm GİZLENİR — sayfanın geri kalanı aynen
      kalır, yarım grafik görünmez. */
@@ -186,10 +211,12 @@
       var bodyEmpty = el('v3-veri-body');
       if (bodyEmpty) bodyEmpty.innerHTML = emptyState();
       section.setAttribute('data-state', 'empty');
+      sourceBadge();
       return;
     }
 
     section.setAttribute('data-state', 'ready');
+    sourceBadge();
 
     /* Selamlama adı yalnız kullanıcının kendi takma adından gelir. */
     var greeting = el('v3-veri-greeting');
@@ -244,6 +271,7 @@
     habitBars: habitBars,
     badges: badges,
     emptyState: emptyState,
+    sourceBadge: sourceBadge,
     init: init
   };
 

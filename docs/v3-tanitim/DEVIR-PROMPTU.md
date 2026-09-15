@@ -51,7 +51,7 @@ git rev-parse --abbrev-ref HEAD
 - HEAD: `878d90c`
 - Çalışma ağacı: **temiz**
 - Sayfa dosyaları: `v3-tanitim/{index.html,v3.css,v3.js,v3-data.js,v3-stats.js,v3-statsview.js,v3-charts.js,v3-source.js}`
-- Fixture: `tests/app/test_v3_welcome.js` → **273 kontrol, PASS** (2026-09-15 Claude denetimi: 263 → 273)
+- Fixture: `tests/app/test_v3_welcome.js` → **284 kontrol, PASS** (2026-09-15 Claude denetimi: 263 → 284; veri artık `v3-snapshot.js` ile statik — bkz. README §Statik anlık görüntü)
 - `app.js` / `sync.js` / `app/` / `panel/` bu iş boyunca **hiç değişmedi**
 
 ---
@@ -436,7 +436,7 @@ node /tmp/bridge-test.js; echo "exit=$?"
 ```bash
 cd /Users/m_ras/Desktop/seyma
 
-# Ana fixture (273 kontrol) — bu sayfanın sözleşmesi
+# Ana fixture (284 kontrol) — bu sayfanın sözleşmesi
 node tests/app/test_v3_welcome.js
 
 # Tüm aileler (regresyon)
@@ -462,7 +462,7 @@ for f in v3-tanitim/*.js app.js sync.js; do node --check "$f" || echo "SYNTAX FA
 **Beklenen taban (2026-09-15):**
 `tests/app 53/53` · `panel 23/23` · `panel-v2 27/27` · `quran 9/9` · `reminders OK` ·
 `driver exit 0` · `zikr 95/95` · `B1/B2/B3 OK` · `shell-inventory --gate PASS` ·
-`test_v3_welcome 273 kontrol PASS`
+`test_v3_welcome 284 kontrol PASS`
 
 ### Kritik pinler — BUNLARI KAYDIRMA
 
@@ -600,7 +600,7 @@ Kaynak modül yoksa sayfa tek başına çalışır.
 Hepsi **aynı anda** doğru olmalı:
 
 - [ ] `node /tmp/bridge-test.js` → **PASS** (B satırı: 84 gün / 679 tik / remote)
-- [ ] `node tests/app/test_v3_welcome.js` → **PASS** (≥273 kontrol)
+- [ ] `node tests/app/test_v3_welcome.js` → **PASS** (≥284 kontrol)
 - [ ] Tüm fixture aileleri yeşil (app 53 / panel 23 / panel-v2 27 / quran 9 / reminders)
 - [ ] `driver.mjs` **exit 0** · `zikr-harness` 95/95 · B1/B2/B3 OK
 - [ ] `node tools/shell-inventory.mjs --gate` → **PASS** (7610/0/408/57)

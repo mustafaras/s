@@ -114,7 +114,7 @@
      `SOURCE` gösterilen sayıların NEREDEN geldiğini söyler — böylece sayfa
      "eşitlenmiş veri" derken cihaz kaydını göstermiş olamaz. */
   var MEMORY = null;
-  var SOURCE = 'none';        // 'remote' | 'device' | 'none'
+  var SOURCE = 'none';        // 'snapshot' | 'remote' | 'device' | 'none'
   var SOURCE_DETAIL = '';     // teşhis için kısa neden etiketi
   var REMOTE_FAIL = '';       // v3-source.js'den: uzak okuma neden başarısız (kod)
 
@@ -283,8 +283,56 @@
     totalBadges: 8
   };
 
+  /* ── STATİK ANLIK GÖRÜNTÜ (öncelikli) ─────────────────────────────────
+     Kullanıcı isteği (2026-09-15): veri sayfaya GÖMÜLÜ olsun; ağ, anahtar,
+     cihaz deposu aranmasın — her cihazda aynı sayılar. `v3-snapshot.js`
+     (tools/v3-snapshot-build.mjs üretir) window.SeymaV3Snapshot'ı kurar.
+     Sayılar anlık görüntü tarihine aittir; yalnız "kaçıncı gün" sayacı
+     uygulamanın formülüyle bugüne göre türetilir (kutlama bugünündür). */
+  function snapshot() {
+    var snap = window.SeymaV3Snapshot;
+    if (!snap || typeof snap !== 'object' || !snap.startDate || !snap.heatCells) return null;
+    return snap;
+  }
+  function fromSnapshot(snap, today) {
+    var live = diffDays(snap.startDate, today) + 1;
+    var frozen = diffDays(snap.startDate, snap.endDate) + 1;
+    var dayCount = Math.max(live, frozen);
+    if (!(dayCount > 0)) return EMPTY;
+    SOURCE = 'snapshot';
+    SOURCE_DETAIL = snap.endDate;
+    return {
+      available: true,
+      dayCount: dayCount,
+      startDate: snap.startDate,
+      endDate: snap.endDate,
+      nickname: snap.nickname || 'Sevgili Günışığı',
+      daysRecorded: snap.daysRecorded,
+      coverage: frozen > 0 ? Math.round(snap.daysRecorded / frozen * 100) : 0,
+      ticks: snap.ticks,
+      perfectDays: snap.perfectDays,
+      currentStreak: snap.currentStreak,
+      bestStreak: snap.bestStreak,
+      medFreeStreak: snap.medFreeStreak,
+      moodCounts: {},
+      moodTotal: snap.moodTotal,
+      topMood: null,
+      moodTrend: snap.moodTrend || [],
+      habitSeries: snap.habitSeries || [],
+      waterGoalDays: snap.waterGoalDays,
+      readingDays: snap.readingDays,
+      heatCells: snap.heatCells,
+      badges: snap.badges || [],
+      earnedCount: snap.earnedCount,
+      totalBadges: snap.totalBadges,
+      analytics: snap.analytics || null
+    };
+  }
+
   function summarize() {
     var today = todayISO();
+    var snap = snapshot();
+    if (snap) return fromSnapshot(snap, today);
     var data = readData();
     if (!data) return EMPTY;
 
@@ -511,6 +559,7 @@
     trDate: trDate,
     trWords: trWords,
     setData: setData,
+    snapshot: snapshot,
     setRemoteFailure: setRemoteFailure,
     source: source,
     dynamic: dynamic,

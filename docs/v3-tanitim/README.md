@@ -23,15 +23,49 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 | `index.html` | Sayfa kabuğu. **`#root` + `data-theme="dark"` zorunlu** (tokenlar `app/styles.css`'te `#root` üzerinde tanımlı). Ayrıca konfeti canvas'ı + ilerleme çubuğu. |
 | `v3.css` | Temel düzen + kutlama efekteri. 98 tasarım token'ını **tüketir**. Ham hex yalnızca neredeyse-siyah sahne zeminlerinde ve altın üstü mürekkep için. |
 | `v3.js` | Kalıcılık (yazma + **doğrulama**), scroll-reveal, ilerleme çubuğu, sayaç animasyonu, konfeti. |
-| `v3-data.js` | **Salt-okur** veri katmanı: kullanıcının kendi kayıtlarını özetler. Ağ YOK. `SOURCE` ile kaynağı izler. |
+| `v3-snapshot.js` | **STATİK ANLIK GÖRÜNTÜ (üretilmiş dosya, elle düzenlenmez).** `node tools/v3-snapshot-build.mjs` seyma-data'yı salt-okur GET eder, sayfanın kendi modülleriyle özetler, **yalnız sayısal** çıktıyı yazar (not/günlük/etiket/ham kayıt/token YOK; yazmadan önce yasaklı alan taraması). Sayfa bunu görünce **ağa çıkmaz, anahtar aramaz, cihaz deposuna bakmaz** — her cihazda aynı sayılar. `--check` güncelliği doğrular. |
+| `v3-data.js` | **Salt-okur** veri katmanı. Öncelik: **anlık görüntü** → bellek (uzak) → cihaz deposu. Ağ YOK. `SOURCE` ile kaynağı izler (`snapshot`/`remote`/`device`/`none`). |
 | `v3-source.js` | **Salt-okur uzak kaynak köprüsü.** Uygulamanın zaten sakladığı token varsa `data/latest.json`'ı **yalnız-GET** çeker — **repo esastır**, cihaz kaydı yalnız yedektir. Yazmaz, diske kaydetmez. |
 | `v3-stats.js` | **İstatistik motoru**: betimsel istatistik, regresyon, korelasyon, histogram. |
 | `v3-statsview.js` | İstatistik görselleştirme (histogram, kutu grafiği, eğilim, korelasyon). |
 | `v3-charts.js` | Grafik çizimi (ısı haritası, trend, çubuklar, rozetler). |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
-| `../tests/app/test_v3_welcome.js` | **273 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
+| `../tests/app/test_v3_welcome.js` | **284 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
 | `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + "3.0'da neler değişti?" köprüsü. |
 | `../app/core/render.js` | Başlangıç ekranı **v3.0** rozeti. |
+
+## Statik anlık görüntü — neden ve nasıl (2026-09-15)
+
+Kullanıcı isteği: *"o veriyi çek ve SADECE bu sayfada STATİK olarak göster."*
+Canlı köprü (token ile GET) yalnız anahtarın bulunduğu tarayıcıda çalışıyordu;
+masaüstünde 15 günlük bayat cihaz kaydı görünüyordu. Artık:
+
+1. `node tools/v3-snapshot-build.mjs` → `v3-tanitim/v3-snapshot.js` (≈16 KB).
+   Sayılar canlı yolla **birebir** aynıdır: aynı `v3-data.js`/`v3-stats.js`
+   kodu, gerçek veriyle, node:vm içinde çalıştırılır; çıktı budanır.
+2. Sayfa `window.SeymaV3Snapshot` görünce **hiç ağ isteği yapmaz** (fixture +
+   headless CDP ölçümü: dış istek 0, localStorage 0).
+3. Rozet: *"✓ Eşitlenmiş veri · 15 Eylül 2026 anlık görüntüsü · sayfaya
+   gömülü, salt-okur (ağ yok)"*.
+4. "Kaçıncı gün" sayacı yine uygulamanın formülüyle **bugüne** göre türetilir
+   (kutlama bugünündür); veri özeti anlık görüntü tarihine aittir ve kart
+   altında *"… → 15 Eylül 2026 · 84 kayıtlı gün"* yazar.
+
+> ⚠️ **Gizlilik:** `mustafaras/s` public'tir. Dosyaya yalnız sayısal özet
+> girer (günlük tik sayısı, ruh hâli **puanı** 1–5, uyku saati, oranlar,
+> rozetler, istatistik tablosu); not/günlük/niyet/öğün/ilaç/etiket/konum/token
+> **girmez** — üretici yazmadan önce tarar, fixture dosyayı metin düzeyinde
+> yeniden tarar. Yine de kişiye ait sağlık sayılarıdır: **push kararı
+> kullanıcınındır** (dal LOCAL-ONLY). Yenilemek için aracı tekrar çalıştır.
+
+## Alışkanlık haritası v2 (2026-09-15)
+
+Gün etiketleri (Pt/Ça/Cu/Pz) sabit 11px HTML satırlarıydı; SVG ızgara
+genişliğe göre ölçeklendiği için satırlar kayıyordu → etiketler artık **SVG
+içinde**, hücreyle aynı koordinat sisteminde. Üstte ay işaretleri (3 sütundan
+kısa aylar yazılmaz — Haz/Tem çakışması). 84/84 günde bulunan ve bilgi
+taşımayan altın "ruh hâli" çerçevesi kaldırıldı; 5 kademeli tek-ton altın
+ölçek; altta tek satır özet ("12/15 en dolu gün · %59 ortalama doluluk").
 
 ## Kutlama katmanı (gün sayısı)
 
@@ -337,7 +371,7 @@ test edildi (tamamı `/tmp`'de; repoya ya da sayfaya **gömülmedi**). Sayfanın
 
 
 ```bash
-node tests/app/test_v3_welcome.js          # 273 kontrol (sözleşme + kontrast + kutlama + veri + köprü + uygulama içi)
+node tests/app/test_v3_welcome.js          # 284 kontrol (sözleşme + kontrast + kutlama + veri + köprü + uygulama içi)
 node --check v3-tanitim/v3.js
 node .claude/skills/run-seyma/driver.mjs   # exit 0
 node tools/shell-inventory.mjs --gate      # PASS · 7.610 / 0 / 408 / 57

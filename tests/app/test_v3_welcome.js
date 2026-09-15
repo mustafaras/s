@@ -206,19 +206,68 @@ ok('finish() çift tetiklemeye karşı kilitli (aria-disabled)',
 // ───────────────────────────────────────────────────────────────────────────
 console.log('\n[4] İzolasyon');
 
+const REAL_START_DATE_EARLY = '2026-06-24';   // gerçek seyma-data startDate (DEVIR-PROMPTU §4)
+function inclusiveDaysEarly(from, to) {
+  return Math.round((new Date(to + 'T00:00:00Z') - new Date(from + 'T00:00:00Z')) / 86400000) + 1;
+}
 // Yalnız <script src> etiketleri sayılır (satır içi bootstrap yok sayılır).
 const pageScripts = [...pageSource.matchAll(/<script\s+src="([^"]+)"/g)].map((m) => m[1]);
-ok('sayfa kendi betiklerini yüklüyor (data + stats + source + statsview + charts + v3)',
-  pageScripts.length === 6 && pageScripts.every((s) => s.startsWith('v3')),
+ok('sayfa kendi betiklerini yüklüyor (snapshot + data + stats + source + statsview + charts + v3)',
+  pageScripts.length === 7 && pageScripts.every((s) => s.startsWith('v3')),
   'yüklenen: ' + JSON.stringify(pageScripts));
-ok('betik sırası doğru (data → stats → source → statsview → charts → v3)',
-  pageScripts[0].startsWith('v3-data.js') &&
-  pageScripts[1].startsWith('v3-stats.js') &&
-  pageScripts[2].startsWith('v3-source.js') &&
-  pageScripts[3].startsWith('v3-statsview.js') &&
-  pageScripts[4].startsWith('v3-charts.js') &&
-  pageScripts[5].startsWith('v3.js'),
+ok('betik sırası doğru (snapshot → data → stats → source → statsview → charts → v3)',
+  pageScripts[0].startsWith('v3-snapshot.js') &&
+  pageScripts[1].startsWith('v3-data.js') &&
+  pageScripts[2].startsWith('v3-stats.js') &&
+  pageScripts[3].startsWith('v3-source.js') &&
+  pageScripts[4].startsWith('v3-statsview.js') &&
+  pageScripts[5].startsWith('v3-charts.js') &&
+  pageScripts[6].startsWith('v3.js'),
   'sıra: ' + JSON.stringify(pageScripts));
+
+/* ── STATİK ANLIK GÖRÜNTÜ (kullanıcı isteği 2026-09-15: "o veriyi çek ve
+   SADECE bu sayfada STATİK olarak göster") ─────────────────────────────────
+   v3-snapshot.js tools/v3-snapshot-build.mjs tarafından üretilir; sayfa onu
+   görünce ağa çıkmaz, anahtar aramaz, cihaz deposuna bakmaz. Repo PUBLIC
+   olduğu için dosya YALNIZ sayısal özet taşımalıdır. */
+console.log('\n[1b] Statik anlık görüntü');
+const snapSource = read('v3-tanitim/v3-snapshot.js');
+const snapVm = { window: {} };
+vm.runInNewContext(snapSource, snapVm, { filename: 'v3-snapshot.js' });
+const snap = snapVm.window.SeymaV3Snapshot;
+ok('v3-snapshot.js window.SeymaV3Snapshot kurar (startDate + endDate + heatCells)',
+  !!snap && typeof snap.startDate === 'string' && typeof snap.endDate === 'string' &&
+  Array.isArray(snap.heatCells) && snap.heatCells.length > 0);
+ok('anlık görüntü gerçek startDate ile aynı (2026-06-24)',
+  snap && snap.startDate === REAL_START_DATE_EARLY, 'startDate: ' + (snap && snap.startDate));
+ok('anlık görüntü iç tutarlı: heatCells sayısı = startDate→endDate gün sayısı = daysRecorded',
+  snap && snap.heatCells.length === inclusiveDaysEarly(snap.startDate, snap.endDate) &&
+  snap.daysRecorded === snap.heatCells.length,
+  'cells ' + (snap && snap.heatCells.length) + ' / recorded ' + (snap && snap.daysRecorded));
+ok('anlık görüntü tik toplamı = heatCells tik toplamı (aynı kaynaktan)',
+  snap && snap.ticks === snap.heatCells.reduce((a, c) => a + (c.ticks || 0), 0));
+ok('GİZLİLİK: anlık görüntüde ham kayıt / not / etiket / token / konum YOK',
+  ['"note"', '"journal"', '"intention"', '"meals"', '"ghToken"', '"token"', '"rec"', '"values"',
+   '"med"', '"habits"', '"cok-iyi"', '"cok-zorlandim"', '"zorlandim"', '"moodCounts"', '"moodDist"',
+   '"streaks"', '"lat"', '"lng"', '"location"', 'ghp_', 'github_pat_'
+  ].every((t) => snapSource.indexOf(t) < 0));
+ok('anlık görüntü yalnız SAYISAL ruh hâli taşır (moodTrend.score 1–5|null)',
+  snap && snap.moodTrend.every((m) => m.score === null || (m.score >= 1 && m.score <= 5)));
+ok('veri katmanı anlık görüntüyü ÖNCELİKLİ okur (ağ/cihaz deposundan önce)',
+  /var snap = snapshot\(\);\s*if \(snap\) return fromSnapshot\(snap, today\);/.test(read('v3-tanitim/v3-data.js')) &&
+  /SOURCE = 'snapshot';/.test(read('v3-tanitim/v3-data.js')));
+ok('köprü anlık görüntü varken ağa HİÇ çıkmaz',
+  /if \(window\.SeymaV3Snapshot\) \{\s*settle\(\);\s*return;\s*\}/.test(read('v3-tanitim/v3-source.js')));
+ok('rozet gömülü anlık görüntüyü tarihiyle söyler',
+  /anlık görüntüsü · sayfaya gömülü, salt-okur \(ağ yok\)/.test(read('v3-tanitim/v3-charts.js')));
+ok('üretici araç yalnız GET kullanır ve yazmadan önce yasaklı alan tarar',
+  (function () {
+    const t = read('tools/v3-snapshot-build.mjs');
+    return /gh', \['api', endpoint, '-H'/.test(t) && !/-X|--method|PUT|POST|PATCH|DELETE/.test(t) &&
+      /const FORBIDDEN = \[/.test(t) && /GİZLİLİK: yasaklı alan bulundu/.test(t);
+  })());
+ok('kaynak rozeti başlangıçta nötr kalır (data-src="none"); snapshot çalışma anında yazılır',
+  /id="v3-veri-src"[^>]*data-src="none"/.test(pageSource));
 
 const forbidden = ['app.js', 'sync.js', 'app/core/', 'render.js', 'appSurface.js'];
 forbidden.forEach((token) => {
@@ -266,7 +315,7 @@ const sourceCode = stripComments(sourceSource);
 
 ok('kaynak modülü sayfada yükleniyor ve sırası doğru',
   pageScripts.some((s) => s.startsWith('v3-source.js')) &&
-  pageScripts.findIndex((s) => s.startsWith('v3-source.js')) === 2);
+  pageScripts.findIndex((s) => s.startsWith('v3-source.js')) === 3);
 
 /* — GET-ONLY: hiçbir yazma yöntemi geçmez — */
 ['PUT', 'POST', 'PATCH', 'DELETE'].forEach((verb) => {
@@ -965,7 +1014,7 @@ ok('yeni modüller cache-bust taşıyor',
   /v3-data\.js\?v=\d+[a-z]/.test(pageSource) &&
   /v3-charts\.js\?v=\d+[a-z]/.test(pageSource) &&
   /v3-source\.js\?v=\d+[a-z]/.test(pageSource));
-ok('v3.css cache-bust güncel', /v3\.css\?v=20260915k/.test(pageSource));
+ok('v3.css cache-bust güncel', /v3\.css\?v=20260915l/.test(pageSource));
 ok('v3.js cache-bust güncel', /v3\.js\?v=20260915k/.test(pageSource));
 
 // ───────────────────────────────────────────────────────────────────────────

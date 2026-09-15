@@ -28,10 +28,19 @@
 
   /* ── Isı haritası (haftalık sütunlar) ─────────────────────────────────────
      GitHub katkı grafiği mantığı: sütun = hafta, satır = haftanın günü.
-     Yoğunluk = o gün işaretlenen alışkanlık sayısı / o gün aktif olan sayı. */
+     Yoğunluk = o gün işaretlenen alışkanlık sayısı / o gün aktif olan sayı.
+
+     v2 (2026-09-15, kullanıcı: "daha minimal, doğru ve premium"):
+     · Gün etiketleri artık SVG'nin İÇİNDE — eski sürümde sabit 11px HTML
+       satırlarıydı, ızgara ise genişliğe göre ölçeklendiği için satırlar
+       kayıyordu (Pt/Ça/Cu/Pz yanlış satırın hizasına düşüyordu).
+     · Üstte ay işaretleri (ayın ilk gününü içeren sütun).
+     · Ruh hâli çerçevesi kaldırıldı: 84/84 günde vardı, bilgi taşımıyordu.
+     · 5 kademeli tek-ton altın ölçek; tatil günü yalnız hafif kesikli çerçeve. */
   function heatmap(cells) {
     if (!cells || !cells.length) return '';
-    var dayNames = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'];
+    var dayNames = ['Pt', '', 'Ça', '', 'Cu', '', 'Pz'];
+    var monthShort = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
 
     /* İlk hücrenin haftanın hangi günü olduğunu bul (Pazartesi=0). */
     var first = new Date(cells[0].date + 'T00:00:00');
@@ -45,47 +54,81 @@
     }
     if (col.length) { while (col.length < 7) col.push(null); cols.push(col); }
 
-    var CELL = 11, GAP = 3;
-    var w = cols.length * (CELL + GAP) - GAP;
-    var h = 7 * (CELL + GAP) - GAP;
+    var CELL = 12, GAP = 3, STEP = CELL + GAP;
+    var GUT_L = 24, GUT_T = 15;                       /* etiket boşlukları (SVG birimi) */
+    var w = GUT_L + cols.length * STEP - GAP;
+    var h = GUT_T + 7 * STEP - GAP;
 
     var out = '<svg class="v3-heat" viewBox="0 0 ' + w + ' ' + h + '" ' +
       'width="100%" preserveAspectRatio="xMidYMid meet" role="img" ' +
-      'aria-label="' + cells.length + ' günlük alışkanlık ısı haritası: ' +
-      cells.length + ' gün, koyu hücre daha çok işaretlenen alışkanlık demektir">';
+      'aria-label="' + cells.length + ' günlük alışkanlık haritası; koyu hücre, o gün daha çok alışkanlık işaretlendi demektir">';
+
+    /* Gün etiketleri — hücreyle AYNI koordinat sisteminde, tam ortada. */
+    for (var r0 = 0; r0 < 7; r0++) {
+      if (!dayNames[r0]) continue;
+      out += '<text class="v3-heat__lbl" x="0" y="' + (GUT_T + r0 * STEP + CELL / 2) + '" ' +
+        'dominant-baseline="central">' + dayNames[r0] + '</text>';
+    }
+
+    /* Ay işaretleri — ayın ilk hücresini içeren sütunun üstüne. Bir aya
+       3 sütundan az yer düşüyorsa (ör. 24 Haziran'da başlayan tek haftalık
+       Haziran) etiketi yazma: komşu ayla üst üste biner. */
+    var starts = [], seenMonth = '';
+    for (var mc = 0; mc < cols.length; mc++) {
+      for (var mr = 0; mr < 7; mr++) {
+        var mcell = cols[mc][mr];
+        if (!mcell) continue;
+        var ym = mcell.date.slice(0, 7);
+        if (ym !== seenMonth) { seenMonth = ym; starts.push({ col: mc, m: Number(mcell.date.slice(5, 7)) }); }
+      }
+    }
+    for (var si = 0; si < starts.length; si++) {
+      var next = starts[si + 1];
+      if (next && next.col - starts[si].col < 3) continue;
+      out += '<text class="v3-heat__lbl v3-heat__lbl--m" x="' + (GUT_L + starts[si].col * STEP) + '" y="' +
+        (GUT_T - 6) + '">' + monthShort[starts[si].m - 1] + '</text>';
+    }
 
     for (var c = 0; c < cols.length; c++) {
       for (var r = 0; r < 7; r++) {
         var cell = cols[c][r];
         if (!cell) continue;
-        var x = c * (CELL + GAP), y = r * (CELL + GAP);
+        var x = GUT_L + c * STEP, y = GUT_T + r * STEP;
         var ratio = cell.max > 0 ? cell.ticks / cell.max : 0;
         var cls = 'v3-heat__c';
         if (cell.ticks <= 0) cls += ' is-empty';
-        else if (ratio >= 0.85) cls += ' is-full';
-        else if (ratio >= 0.55) cls += ' is-high';
-        else if (ratio >= 0.3) cls += ' is-mid';
+        else if (ratio >= 0.75) cls += ' is-full';
+        else if (ratio >= 0.5) cls += ' is-high';
+        else if (ratio >= 0.25) cls += ' is-mid';
         else cls += ' is-low';
-        if (cell.hasMood) cls += ' has-mood';
         if (cell.vacation) cls += ' is-vacation';
         out += '<rect class="' + cls + '" x="' + x + '" y="' + y + '" ' +
-          'width="' + CELL + '" height="' + CELL + '" rx="2.5">' +
-          '<title>' + trDate(cell.date) + ' · ' + cell.ticks + '/' + cell.max + '</title>' +
+          'width="' + CELL + '" height="' + CELL + '" rx="3">' +
+          '<title>' + trDate(cell.date) + ' · ' + cell.ticks + '/' + cell.max + ' alışkanlık</title>' +
           '</rect>';
       }
     }
     out += '</svg>';
 
-    /* Gün etiketleri (sol) + yoğunluk açıklaması */
-    var labels = '<div class="v3-heat__days" aria-hidden="true">' + dayNames.map(function (n, idx) {
-      /* Yalnız 1,3,5 satırlarını yaz — dar ekranda okunur kalsın. */
-      return '<span>' + (idx % 2 === 0 ? n : '') + '</span>';
-    }).join('') + '</div>';
+    /* Tek satır özet: en dolu gün + günlük ortalama (yalnız kayıtlı günler). */
+    var best = null, sumR = 0, nR = 0;
+    for (var k = 0; k < cells.length; k++) {
+      var ck = cells[k];
+      if (ck.max > 0 && ck.ticks > 0) { sumR += ck.ticks / ck.max; nR++; }
+      if (!best || ck.ticks > best.ticks) best = ck;
+    }
+    var facts = '';
+    if (best && best.ticks > 0) {
+      facts = '<div class="v3-heat__facts">' +
+        '<span><b>' + best.ticks + '/' + best.max + '</b> en dolu gün · ' + trDate(best.date) + '</span>' +
+        '<span><b>%' + Math.round(sumR / Math.max(1, nR) * 100) + '</b> ortalama doluluk</span>' +
+        '</div>';
+    }
 
-    return '<div class="v3-heat__wrap">' + labels + '<div class="v3-heat__grid">' + out + '</div></div>' +
+    return '<div class="v3-heat__grid">' + out + '</div>' +
       '<div class="v3-heat__legend" aria-hidden="true">' +
       '<span>Az</span><i class="is-empty"></i><i class="is-low"></i><i class="is-mid"></i>' +
-      '<i class="is-high"></i><i class="is-full"></i><span>Çok</span></div>';
+      '<i class="is-high"></i><i class="is-full"></i><span>Çok</span></div>' + facts;
   }
 
   /* ── Ruh hâli trendi (30 gün, yalnız YÜKSEKLİK — etiket yok) ──────────── */
@@ -219,6 +262,11 @@
     node.removeAttribute('hidden');
     node.setAttribute('data-src', src);
     var why = src === 'device' ? remoteFailText(s && s.remoteFail) : '';
+    if (src === 'snapshot') {
+      node.textContent = '✓ Eşitlenmiş veri · ' + trDate(s.detail) +
+        ' anlık görüntüsü · sayfaya gömülü, salt-okur (ağ yok)';
+      return;
+    }
     node.textContent = src === 'remote'
       ? '✓ Eşitlenmiş veri · kendi özel veri deposundan salt-okur okundu'
       : 'Bu cihazdaki kayıt · eşitlenmiş veriye ulaşılamadı' +
@@ -279,7 +327,7 @@
     var heatCap = el('v3-veri-heat-cap');
     if (heatCap) {
       heatCap.textContent = trDate(summary.startDate) + ' → ' + trDate(summary.endDate) +
-        ' · ' + summary.dayCount + ' gün';
+        ' · ' + summary.daysRecorded + ' kayıtlı gün';
     }
 
     var trendEl = el('v3-veri-mood');

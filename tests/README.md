@@ -12,7 +12,7 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
 - `app/test_v3_welcome.js` — v3.0 tanıtım/kutlama sayfasının sözleşmesi
-  (273 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
+  (284 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
   önce), **sonsuz döngü koruması** (`?v3done=1` kaçışı), kalıcılık anahtarı
   (`seyma-v3-welcome-v1`, `seyma-reset-v1`’den ayrı namespace), depo kapalıyken
   `markSeen()`’in **yalan söylememesi**, ayrı sayfa izolasyonu (app.js/sync.js/
@@ -43,6 +43,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   güncelleme düğümlerinin (hero/sayaç/kapanış/footer) var olduğunu doğrular;
   statik HTML varsayılanının gerçek `startDate` ile eşit olmasını
   (**24 Haziran 2026 / 84** — eski "23 Haziran / 85" geri gelemez) zorunlu kılar.
+  **Statik anlık görüntü (2026-09-15):** `v3-snapshot.js`'i VM'de yükleyip iç tutarlılık
+  (hücre = gün = kayıtlı gün; tik toplamı), gerçek `startDate`, yasaklı alan
+  taraması (not/günlük/etiket/token/ham kayıt yok), veri katmanının snapshot
+  önceliği ve köprünün ağa çıkmamasını doğrular.
   **B1/B2 korumaları (2026-09-15):** "tam gün" rozeti sabit "7/7" değil gerçek
   alışkanlık sayısından üretilir; uygulama metinlerinde bayat "4.500 adım"
   kalmadı (yürüyüş tiki `stepsGoal` ile dolar).

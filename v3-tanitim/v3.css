@@ -791,38 +791,41 @@
   font-size:var(--f-caption2);color:var(--faint);font-variant-numeric:tabular-nums;
 }
 
-/* · Isı haritası */
-.v3-panel__heat{ margin-top:2px; }
-.v3-heat__wrap{ display:flex;gap:8px;align-items:stretch; }
-.v3-heat__days{
-  display:flex;flex-direction:column;gap:3px;flex-shrink:0;
-  font-size:var(--f-caption2);line-height:11px;color:var(--faint);font-weight:700;
-}
-.v3-heat__days span{ height:11px;display:flex;align-items:center; }
-.v3-heat__grid{ flex:1;min-width:0; }
+/* · Isı haritası — v2: etiketler SVG içinde (hizalama ölçekten bağımsız),
+   tek-ton altın ölçek, gürültüsüz. Tokenlar: --accent, --faint, --listen. */
+.v3-panel__heat{ margin-top:6px; }
+.v3-heat__grid{ min-width:0; }
 .v3-heat{ display:block;width:100%;height:auto; }
-.v3-heat__c{ fill:color-mix(in srgb,var(--accent) 16%,transparent); }
-.v3-heat__c.is-empty{ fill:rgba(255,255,255,.07); }
-.v3-heat__c.is-low{ fill:color-mix(in srgb,var(--accent) 26%,transparent); }
-.v3-heat__c.is-mid{ fill:color-mix(in srgb,var(--accent) 46%,transparent); }
-.v3-heat__c.is-high{ fill:color-mix(in srgb,var(--accent) 68%,transparent); }
+.v3-heat__lbl{
+  fill:var(--faint);font-size:7.5px;font-weight:700;letter-spacing:.2px;
+  font-family:inherit;
+}
+.v3-heat__lbl--m{ fill:var(--muted);font-size:7px;letter-spacing:.6px;text-transform:uppercase; }
+.v3-heat__c{ fill:color-mix(in srgb,var(--accent) 16%,transparent);transition:opacity var(--dur-fast,160ms) var(--ease-out,ease); }
+.v3-heat__c.is-empty{ fill:rgba(255,255,255,.055); }
+.v3-heat__c.is-low{ fill:color-mix(in srgb,var(--accent) 22%,transparent); }
+.v3-heat__c.is-mid{ fill:color-mix(in srgb,var(--accent) 42%,transparent); }
+.v3-heat__c.is-high{ fill:color-mix(in srgb,var(--accent) 66%,transparent); }
 .v3-heat__c.is-full{ fill:var(--accent); }
-/* Ruh hâli işaretli günler: ince altın çerçeve — ETİKET DEĞİL, yalnız "o gün
-   bir şey kaydedilmiş" bilgisi. Gizlilik sözleşmesi gereği hangi ruh hâli
-   olduğu hiçbir yerde yazmaz. */
-.v3-heat__c.has-mood{ stroke:var(--gold-1);stroke-width:1;stroke-opacity:.85; }
-.v3-heat__c.is-vacation{ stroke:var(--listen);stroke-width:1;stroke-opacity:.7; }
+/* Tatil günü: yalnız hafif kesikli çerçeve — renk ölçeğine karışmaz. */
+.v3-heat__c.is-vacation{ stroke:var(--listen);stroke-width:.8;stroke-dasharray:1.5 1.5;stroke-opacity:.7; }
 .v3-heat__legend{
-  display:flex;align-items:center;gap:5px;margin-top:11px;
+  display:flex;align-items:center;gap:4px;margin-top:10px;
   font-size:var(--f-caption2);color:var(--faint);font-weight:700;
 }
-.v3-heat__legend i{ width:10px;height:10px;border-radius:2.5px;display:inline-block; }
-.v3-heat__legend .is-empty{ background:rgba(255,255,255,.07); }
-.v3-heat__legend .is-low{ background:color-mix(in srgb,var(--accent) 26%,transparent); }
-.v3-heat__legend .is-mid{ background:color-mix(in srgb,var(--accent) 46%,transparent); }
-.v3-heat__legend .is-high{ background:color-mix(in srgb,var(--accent) 68%,transparent); }
+.v3-heat__legend i{ width:10px;height:10px;border-radius:3px;display:inline-block; }
+.v3-heat__legend .is-empty{ background:rgba(255,255,255,.055); }
+.v3-heat__legend .is-low{ background:color-mix(in srgb,var(--accent) 22%,transparent); }
+.v3-heat__legend .is-mid{ background:color-mix(in srgb,var(--accent) 42%,transparent); }
+.v3-heat__legend .is-high{ background:color-mix(in srgb,var(--accent) 66%,transparent); }
 .v3-heat__legend .is-full{ background:var(--accent); }
 .v3-heat__legend span{ margin:0 3px; }
+.v3-heat__facts{
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;
+  padding-top:10px;border-top:1px solid color-mix(in srgb,var(--accent) 14%,transparent);
+  font-size:var(--f-caption1);color:var(--muted);font-variant-numeric:tabular-nums;
+}
+.v3-heat__facts b{ color:var(--text);font-weight:700; }
 
 /* · Ruh hâli trendi */
 .v3-panel__chart{ margin-top:2px; }

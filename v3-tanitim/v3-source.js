@@ -225,6 +225,12 @@
       try { updateDynamicText(); } catch (_) {}
     }
 
+    /* Gömülü anlık görüntü varsa ağa HİÇ çıkılmaz (kullanıcı isteği: statik). */
+    if (window.SeymaV3Snapshot) {
+      settle();
+      return;
+    }
+
     if (!creds()) {
       report('no-creds');
       settle();

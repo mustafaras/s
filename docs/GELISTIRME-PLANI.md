@@ -21,6 +21,28 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-15 (v3.0 sayfası — DEVİR DENETİMİ, Claude):**
+>   `docs/v3-tanitim/DEVIR-PROMPTU.md` İ-1…İ-9 tek tek doğrulandı; gerçek
+>   `seyma-data` (`latest.json`, salt-okur GET) ile **her gösterilen sayı bağımsız
+>   hesapla birebir** çıktı (84 gün · 679 tik · en uzun seri 53 · su 75 gün ·
+>   uyku %69 56/81 · su %96 75/78 · adım %10 5/51 · tam gün 0/84). Köprü
+>   senaryoları A–F PASS. **Bulunan ve düzeltilen kusurlar:** (1) statik HTML
+>   varsayılanı **"23 Haziran / 85"** diyordu — gerçek `startDate` 24 Haziran →
+>   84; veri/token olmayan tarayıcıda JS bunu düzeltemediği için kullanıcı yanlış
+>   sayıyı görüyordu → **24 Haziran / 84**'e sabitlendi, fixture gerçek
+>   `startDate` ile eşitliği zorunlu kılıyor. (2) `v3-source.js` başlığı,
+>   README, CLAUDE.md ve AGENTS.md eski "cihazda veri varsa ağa çıkılmaz"
+>   politikasını anlatıyordu; kod **repo esastır** (kimlik varsa tek GET) —
+>   metinler koda eşitlendi. (3) **B1:** sayfa rozeti "7/7 mükemmel" → gerçek
+>   paydadan "Tüm alışkanlıklar (15/15)". (4) **B2 (kullanıcı onayıyla, uygulama):**
+>   yürüyüş tiki `habitProgress → stepsGoal(date)` = 9.000 ile dolar,
+>   `STEP_TICK_MIN=4500` hiçbir yerde okunmuyor; gerçek veri de bunu doğruluyor
+>   (24 Temmuz'dan beri 4.500–7.250 adımlı hiçbir gün tiklenmemiş). Dört bayat
+>   "4.500" metni düzeltildi: `appSurface.js:76` ve `app.js` `derivedProgText` /
+>   `setWalkSteps` toast'ı artık gerçek hedeften üretiliyor; HABITS kart başlığı
+>   "En az 9.000 adım yürüdüm". Pinler korundu (App 718 / onclick 391 /
+>   `App.x=` 554), `shell-inventory --gate` PASS (7.610). Fixture 263 → **268**.
+>   LOCAL-ONLY; cihaz kabulü kullanıcıda.
 > - **2026-09-15 (HEDEF EŞİKLERİ DÜZELTİLDİ — gerçek veriyle):**
 >   Kullanıcı geri bildirimi haklıydı: "Hedefleri tutturabildin mi" bölümü
 >   eşikleri **sabit** yazıyordu ve **adım hedefi 4.500** alınmıştı. Oysa 4.500
@@ -35,10 +57,10 @@ _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 >   **Gerçek veriyle doğrulandı:** 84 gün → uyku %69 (56/81) · su %96 (75/78) ·
 >   adım %10 (5/51) · tam gün %0 (0/84). Tarayıcıda uçtan uca teyit edildi
 >   (izole loopback; veri /tmp'de tutuldu ve silindi, repoya girmedi).
->   **Ayrıca uygulamada BAYAT METİN bulundu (düzeltilmedi):**
->   `app/core/appSurface.js:76` yürüyüş tiki mesajı hâlâ
->   "Yürüyüş tamam — 4.500+ adım" diyor; gerçek eşik `stepsGoal(date)` = 9.000.
->   Pinlenmiş yüzeye dokunmamak için kapsam dışı bırakıldı, kullanıcıya bildirildi.
+>   **Ayrıca uygulamada BAYAT METİN bulundu:** `app/core/appSurface.js:76`
+>   yürüyüş tiki mesajı "Yürüyüş tamam — 4.500+ adım" diyordu; gerçek eşik
+>   `stepsGoal(date)` = 9.000. O gün kapsam dışı bırakıldı; **aynı gün Claude
+>   denetiminde (B2) kullanıcı onayıyla düzeltildi** (yukarıdaki madde).
 >   Fixture 221 → **229 kontrol**. LOCAL-ONLY.
 > - **2026-09-15 (v3.0 sayfasına gelişmiş istatistik katmanı):**
 >   İki yeni salt-okur modül: `v3-tanitim/v3-stats.js` (matematik) +

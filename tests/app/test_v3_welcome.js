@@ -442,9 +442,19 @@ ok('app.js tanıtım sayfasına referans vermiyor',
 ok('sync.js tanıtım anahtarına dokunmuyor',
   read('sync.js').indexOf(V3_KEY) < 0);
 
-// styles.css'e dokunulmadı (paylaşılan yüzey)
-ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260915c)',
-  /app\.js\?v=20260915c/.test(indexSource));
+// styles.css'e dokunulmadı (paylaşılan yüzey). app.js/appSurface.js sürümleri
+// B2 (DEVIR-PROMPTU §8) düzeltmesiyle 2026-09-15'te bump edildi: "4.500 adım"
+// metinleri gerçek adım hedefine (stepsGoal → 9.000) çekildi.
+ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260915d)',
+  /app\.js\?v=20260915d/.test(indexSource));
+ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
+  /app\/core\/appSurface\.js\?v=20260915c/.test(indexSource));
+/* B2: yürüyüş tikinin kullanıcıya söylediği eşik, tikin GERÇEK eşiğiyle aynı
+   olmalı. Tik habitProgress → stepsGoal(date) ile dolar (varsayılan 9.000);
+   STEP_TICK_MIN=4500 hiçbir yerde okunmaz. "4.500" metni geri gelmemeli. */
+ok('uygulama metinlerinde bayat "4.500 adım" kalmadı (gerçek eşik stepsGoal)',
+  !/4\.500/.test(appSource) && !/4\.500/.test(read('app/core/appSurface.js')) &&
+  /walked20:'Yürüyüş tamam — '\+\(p\.goal\|\|9000\)/.test(read('app/core/appSurface.js')));
 
 // ───────────────────────────────────────────────────────────────────────────
 // [7] Kontrast — WCAG AA (gövde ≥4.5:1, büyük başlık ≥3:1)
@@ -555,12 +565,23 @@ function inclusiveDays(from, to) {
 }
 
 // Statik varsayılan: kutlama günü için geçerli bir sayı taşınır.
+// KAYNAK: gerçek `seyma-data` → data/latest.json → startDate = 2026-06-24
+// (2026-09-15'te salt-okur doğrulandı; docs/v3-tanitim/DEVIR-PROMPTU.md §4).
+// Eski statik varsayılan 2026-06-23/85 idi — gerçek veriyle bir gün sapıyordu;
+// veri/token olmayan bir tarayıcıda JS bunu düzeltemediği için kullanıcı
+// yanlış sayıyı görüyordu. Statik varsayılan gerçek başlangıca sabitlenir.
 const PAGE_TODAY = '2026-09-15';
-const PAGE_START = '2026-06-23';
-const PAGE_DAY = inclusiveDays(PAGE_START, PAGE_TODAY);   // 85
+const REAL_START_DATE = '2026-06-24';
+const PAGE_START = REAL_START_DATE;
+const PAGE_DAY = inclusiveDays(PAGE_START, PAGE_TODAY);   // 84
 
-ok('sayfa başlangıç tarihini yazıyor (23 Haziran 2026)',
-  /23 Haziran 2026/.test(pageSource));
+ok('sayfa başlangıç tarihini yazıyor (24 Haziran 2026 — gerçek startDate)',
+  /24 Haziran 2026/.test(pageSource));
+ok('eski yanlış statik başlangıç (23 Haziran / 85) sayfada kalmadı',
+  !/23 Haziran 2026/.test(pageSource) &&
+  !/85\. gün|85 gün|Seksen beş/.test(pageSource));
+ok('statik varsayılan gün sayısı gerçek startDate ile tutarlı (84, 85 değil)',
+  PAGE_DAY === 84);
 ok('statik varsayılan gün sayısı HTML\'de yazılı (JS kapalıyken de geçerli)',
   new RegExp('data-count="' + PAGE_DAY + '"').test(pageSource) &&
   new RegExp(PAGE_DAY + '\\. güne hoş geldin').test(pageSource));
@@ -648,7 +669,8 @@ ok('ilerleme çubuğu rAF ile kısıtlı (layout thrash yok)',
 
 ok('sayaç animasyonu var (data-count)', (pageSource.match(/data-count=/g) || []).length >= 7);
 ok('sayaç nihai değeri HTML\'de yazılı (JS kapalıyken de doğru, asla 0 değil)',
-  /data-count="85">85</.test(pageSource) && /data-count="114">114</.test(pageSource));
+  new RegExp('data-count="' + PAGE_DAY + '">' + PAGE_DAY + '<').test(pageSource) &&
+  /data-count="114">114</.test(pageSource));
 ok('sayaçlar da hareket azaltmada anında biter', /data-count[\s\S]{0,400}motionAllowed|motionAllowed|IntersectionObserver/.test(jsSource));
 ok('sayaç son değeri hedefe sabitler (yuvarlama hatası kalmaz)',
   /el\.dataset\.v3Target/.test(jsSource));
@@ -870,6 +892,13 @@ ok('protein rozeti DÜRÜSTÇE dışarıda bırakıldı (FOOD_DB çözülemez)',
   /protein.*DIŞARIDA|bilinçli olarak DIŞARIDA/i.test(dataSource) &&
   !/proteinGoalMet/.test(dataSource));
 ok('rozet toplamı 8', /totalBadges: 8/.test(dataSource));
+/* B1 (DEVIR-PROMPTU §8): uygulamanın "7/7 mükemmel" etiketi yanlış — eşik
+   habitCountOn(date) (bugün 15). Sayfa eşiği aynalar ama etiketi gerçek
+   paydadan üretir; sabit "7/7" yazımı geri gelmemeli. */
+ok('"tam gün" rozeti sabit 7/7 değil, gerçek alışkanlık sayısından üretilir',
+  dataSource.indexOf("'7/7 mükemmel'") < 0 &&
+  /habitCountOn\(end\) \+ '\/' \+ habitCountOn\(end\)/.test(dataSource) &&
+  /countRec\(rec\) >= habitCountOn\(window\[j\]\.date\)\) perfectDays\+\+/.test(dataSource));
 
 /* — BOŞ DURUM — */
 ok('veri yoksa sahte grafik çizilmez, dürüst boş-durum gelir',

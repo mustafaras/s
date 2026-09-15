@@ -73,7 +73,7 @@
       var g=call('waterGoalCups');
       var ok={ water:'Su tamam — '+g+'/'+g+' bardak. Bu tik otomatik, ellemene gerek yok.',
                sleepReg:'Uyku tamam — 7,5+ saat. Bu tik kendiliğinden yeşil kalır.',
-               walked20:'Yürüyüş tamam — 4.500+ adım. Bu tik kendiliğinden yeşil kalır.',
+               walked20:'Yürüyüş tamam — '+(p.goal||9000).toLocaleString('tr-TR')+'+ adım. Bu tik kendiliğinden yeşil kalır.',
                journaled:'Not tamam — bugün yazdın. Bu tik kendiliğinden yeşil kalır.',
                sweetManaged:'Tatlı krizini yönettin — bu tik kendiliğinden yeşil kaldı. Helal sana.',
                foodManaged:'Yemek/açlık krizini yönettin — bu tik kendiliğinden yeşil kaldı. Kaptan sensin.',

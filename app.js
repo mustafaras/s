@@ -25,7 +25,7 @@ var HABITS=[
   {key:'foodManaged',icon:icon('utensils',22),title:'Yemek/açlık krizini yönettim',sub:'Gerçek açlık mı, duygusal açlık mı — ayırt ettin.',msg:'Açlık dalgasını izledin, boğulmadın. Beden mutlu, sen kaptansın.',since:'2026-07-10'},
   {key:'coffeeManaged',icon:icon('coffee',22),title:'Kahve/kafein krizini yönettim',sub:'Gerçek yorgunluk mu, alışkanlık mı — sen karar verdin.',msg:'Kafein isteğine sen yön verdin. Uykun bunu unutmayacak.',since:'2026-07-10'},
   {key:'eveningControl',icon:icon('moon',22),title:"Akşam 7'den sonra gereksiz atıştırmadım",sub:'Gerçek açlık başka, dolapla duygusal bağ başka.',msg:'Mutfak seferi iptal. Operasyon başarılı.'},
-  {key:'walked20',icon:icon('footprints',22),title:'En az 4.500 adım yürüdüm',sub:'Günlük 4.500 adım, bedenine tatlı bir eşik.',msg:'Yürüyüş tamam. Metabolizma "bunu not ettim" dedi.'},
+  {key:'walked20',icon:icon('footprints',22),title:'En az 9.000 adım yürüdüm',sub:'Günlük 9.000 adım, bedenine tatlı bir eşik (tatilde ve kendi hedefinde esner).',msg:'Yürüyüş tamam. Metabolizma "bunu not ettim" dedi.'},
   {key:'protein',icon:icon('egg',22),title:'2 ana öğünde protein vardı',sub:'Tokluk ekibi göreve başladı.',msg:'Protein geldi, krizlerin beli hafif büküldü.'},
   {key:'water',icon:icon('droplet',22),title:'Su içmeyi ihmal etmedim',sub:'Küçük şey, büyük fark.',msg:'Su tamam. Cilt bariyeri sessizce teşekkür ediyor.'},
   {key:'vitaminD',icon:icon('sun',22),title:'D₃K₂ damla takviyemi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D₃K₂ damla tamam. Güneş desteği kayda geçti.'},
@@ -2483,7 +2483,7 @@ function habitRowHTML(o){ return SEYMA_RENDER.habitRowHTML.apply(null,arguments)
 function derivedProgText(key,prog){
   if(key==='water'){ var g=prog.goal||WATER_GOAL; return prog.cur<=0?'Su ekle · '+g+' bardakta otomatik yeşil':prog.cur+'/'+g+' bardak · dolunca otomatik yeşil'; }
   if(key==='sleepReg') return prog.cur==null?'Uyku gir · 7,5 saatte otomatik yeşil':String(prog.cur).replace('.',',')+' saat · 7,5 saatte otomatik yeşil';
-  if(key==='walked20') return prog.cur<=0?'Adım gir · 4.500 adımda otomatik yeşil':prog.cur.toLocaleString('tr-TR')+' / 4.500 adım · otomatik yeşil';
+  if(key==='walked20'){ var sg=(prog.goal||9000).toLocaleString('tr-TR'); return prog.cur<=0?'Adım gir · '+sg+' adımda otomatik yeşil':prog.cur.toLocaleString('tr-TR')+' / '+sg+' adım · otomatik yeşil'; }
   if(key==='journaled') return 'Yansıma kartına bir not yaz → kendiliğinden yeşillenir';
   if(key==='sweetManaged') return 'Tatlı krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
   if(key==='foodManaged') return 'Yemek/açlık krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
@@ -4111,7 +4111,7 @@ App.removeLearning=function(id){ var day=getDay(data,todayStr(),dayIndexFor(toda
 App.onGratitude=function(i,el){ var v=el.value; i=Number(i)||0; debounceSave('grat'+i,function(){ var day=curDay(); if(!Array.isArray(day.gratitude)) day.gratitude=[]; day.gratitude[i]=String(v||'').slice(0,160); day.savedAt=new Date().toISOString(); save(); },500); };
 
 
-App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); var nw=syncDerivedHabits(day); if(nw.indexOf('walked20')>=0){ haptic(16); toast('Yürüyüş tiki kendiliğinden yeşillendi. 4.500+ adım, harika!'); } day.savedAt=new Date().toISOString(); save(); }); };
+App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); var nw=syncDerivedHabits(day); if(nw.indexOf('walked20')>=0){ haptic(16); toast('Yürüyüş tiki kendiliğinden yeşillendi. '+stepsGoal(activeDate()).toLocaleString('tr-TR')+'+ adım, harika!'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.hideStepNudge=function(){ ui.stepNudgeHidden=true; render(); };
 // Kalıcı kart gizleme/geri getirme (settings'te tutulur; Ayarlar > Gizlenen kartlar'dan geri gelir).
 App.hideBugunCard=function(which){ if(!data.settings) data.settings={}; if(which==='location'){ data.settings.hideLocationCard=true; toast('Konum & Hareket gizlendi · Ayarlar’dan geri getirebilirsin'); } else if(which==='repo'){ data.settings.hideRepoBanner=true; toast('Repoya bağlan gizlendi · Ayarlar’dan geri getirebilirsin'); } else if(which==='vacation'){ data.settings.hideVacationCard=true; toast('Tatil Modu gizlendi · Ayarlar’dan geri getirebilirsin'); } haptic(10); save(); render(); };

@@ -7,9 +7,10 @@
    eski olan bir cihazda sayfa eksik/yanlış görünüyordu; kullanıcı ise
    `mustafaras/seyma-data` içindeki GERÇEK veriyi görmek istiyor.
 
-   ÇÖZÜM: cihazda veri yoksa uygulamanın ZATEN sakladığı kimlik bilgileriyle
-   (`settings.ghToken` / `ghRepo` / `ghBranch`) `data/latest.json`'ı bir kez,
-   salt-okur olarak çeker. Cihazda veri varsa AĞA HİÇ ÇIKILMAZ.
+   ÇÖZÜM: uygulamanın ZATEN sakladığı kimlik bilgileri (`settings.ghToken` /
+   `ghRepo` / `ghBranch`) varsa `data/latest.json`'ı bir kez, salt-okur olarak
+   çeker — REPO ESASTIR, cihazda kayıt olsa bile (cihaz kaydı bayat olabilir).
+   Cihaz deposu yalnız kimlik yoksa ya da ağ/okuma hatasında YEDEKTİR.
 
    DEĞİŞMEZ KURALLAR
    ─────────────────
@@ -182,7 +183,7 @@
        (Ağ/kimlik hatasında cihaz deposuna düşülür — sayfa asla bozulmaz.)
 
      Her yolda son adım aynıdır: gün sayısı metinlerini GERÇEK sayıya göre
-     düzelt (statik HTML 85 der; veri 84 diyorsa 84 yazılır). */
+     düzelt (statik HTML yalnız bir varsayılan taşır; veri ne diyorsa o yazılır). */
   function boot() {
     var charts = window.SeymaV3Charts;
     if (!charts || typeof charts.init !== 'function') return;

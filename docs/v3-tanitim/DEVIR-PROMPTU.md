@@ -51,7 +51,7 @@ git rev-parse --abbrev-ref HEAD
 - HEAD: `878d90c`
 - Çalışma ağacı: **temiz**
 - Sayfa dosyaları: `v3-tanitim/{index.html,v3.css,v3.js,v3-data.js,v3-stats.js,v3-statsview.js,v3-charts.js,v3-source.js}`
-- Fixture: `tests/app/test_v3_welcome.js` → **263 kontrol, PASS**
+- Fixture: `tests/app/test_v3_welcome.js` → **268 kontrol, PASS** (2026-09-15 Claude denetimi: 263 → 268)
 - `app.js` / `sync.js` / `app/` / `panel/` bu iş boyunca **hiç değişmedi**
 
 ---
@@ -436,7 +436,7 @@ node /tmp/bridge-test.js; echo "exit=$?"
 ```bash
 cd /Users/m_ras/Desktop/seyma
 
-# Ana fixture (263 kontrol) — bu sayfanın sözleşmesi
+# Ana fixture (268 kontrol) — bu sayfanın sözleşmesi
 node tests/app/test_v3_welcome.js
 
 # Tüm aileler (regresyon)
@@ -462,7 +462,7 @@ for f in v3-tanitim/*.js app.js sync.js; do node --check "$f" || echo "SYNTAX FA
 **Beklenen taban (2026-09-15):**
 `tests/app 53/53` · `panel 23/23` · `panel-v2 27/27` · `quran 9/9` · `reminders OK` ·
 `driver exit 0` · `zikr 95/95` · `B1/B2/B3 OK` · `shell-inventory --gate PASS` ·
-`test_v3_welcome 263 kontrol PASS`
+`test_v3_welcome 268 kontrol PASS`
 
 ### Kritik pinler — BUNLARI KAYDIRMA
 
@@ -479,7 +479,15 @@ for f in v3-tanitim/*.js app.js sync.js; do node --check "$f" || echo "SYNTAX FA
 
 ---
 
-## 8. Bilinen AMA UYGULANMAMIŞ eksikler — kullanıcı onayı bekliyor
+## 8. Bilinen eksikler — B1 ve B2 kullanıcı onayıyla DÜZELTİLDİ (2026-09-15, Claude)
+
+> **Durum:** B1 → `v3-data.js` rozeti "Tüm alışkanlıklar (15/15)"; B2 → dört
+> bayat "4.500" metni (`appSurface.js:76`, `app.js derivedProgText`,
+> `setWalkSteps` toast'ı, HABITS başlığı) gerçek `stepsGoal` hedefine çekildi.
+> Kanıt: tik `habitProgress → stepsGoal(date)` ile dolar; `STEP_TICK_MIN=4500`
+> hiçbir yerde okunmaz; gerçek veride 24 Temmuz'dan beri 4.500–7.250 adımlı
+> hiçbir gün tiklenmemiş, 9.000+ günler tiklenmiş. B3 açık (uygulama kapsamı).
+> Aşağısı tarihsel tespit metnidir.
 
 Bunlar önceki ajan tarafından **bulundu ama düzeltilmedi** (pinned yüzeylere
 dokunuyorlar; kullanıcı onayı + dikkatli pin muhasebesi gerekiyor).
@@ -592,21 +600,22 @@ Kaynak modül yoksa sayfa tek başına çalışır.
 Hepsi **aynı anda** doğru olmalı:
 
 - [ ] `node /tmp/bridge-test.js` → **PASS** (B satırı: 84 gün / 679 tik / remote)
-- [ ] `node tests/app/test_v3_welcome.js` → **PASS** (≥263 kontrol)
+- [ ] `node tests/app/test_v3_welcome.js` → **PASS** (≥268 kontrol)
 - [ ] Tüm fixture aileleri yeşil (app 53 / panel 23 / panel-v2 27 / quran 9 / reminders)
 - [ ] `driver.mjs` **exit 0** · `zikr-harness` 95/95 · B1/B2/B3 OK
 - [ ] `node tools/shell-inventory.mjs --gate` → **PASS** (7610/0/408/57)
 - [ ] fx2 pinleri **korundu**: App yüzeyi **718**, `onclick=` **391**
 - [ ] `git diff --name-only` → `app.js`/`sync.js`/`app/`/`panel/` **hiç değişmedi**
       (B2'yi kullanıcı onayıyla düzeltmediysen)
-- [ ] Sayfada **hiçbir sabit `85`** kalmadı (yalnız statik varsayılan; JS düzeltir)
+- [ ] Sayfada **hiçbir `85` / `23 Haziran`** kalmadı — statik varsayılan artık
+      gerçek `startDate`'e sabit (**24 Haziran 2026 / 84**), JS yine veriden düzeltir
       ```bash
-      # YALNIZ index.html'de 5 adet olmalı: hero + sayaç + veri başlığı +
-      # kapanış + footer. Hepsi JS'in yazacağı ID'li düğümlerdir → statik
-      # varsayılan. Kalan 85'ler (font-weight:850, opacity:.85) değer, metin değil.
-      grep -rn "85\. gün\|85 gün\|Seksen beş" v3-tanitim/ | grep -v "font-weight:850"
-      # → tam olarak bu 5 satır çıkmalı ve HEPSİ id= taşımalı:
-      grep -rn "85\. gün\|85 gün\|Seksen beş" v3-tanitim/ | grep -c 'id='   # 5
+      # 2026-09-15 düzeltmesi: statik metin "23 Haziran / 85" diyordu — gerçek
+      # veriyle bir gün sapıyordu ve veri/token olmayan tarayıcıda JS bunu
+      # düzeltemiyordu (kullanıcının gördüğü "yine hatalı" ekranı buydu).
+      grep -rn "85\. gün\|85 gün\|Seksen beş\|23 Haziran" v3-tanitim/   # → 0 satır
+      # Statik varsayılan: 5 ID'li düğüm (hero + sayaç + veri başlığı + kapanış + footer)
+      grep -rn "84\. gün\|84 gün\|Seksen dört" v3-tanitim/index.html | grep -c 'id='   # 5
       ```
 - [ ] `#v3-veri-src` rozeti gerçek kaynağı söylüyor
 - [ ] Gerçek veri `/tmp`'den **silindi** · çalışan sunucu **yok**

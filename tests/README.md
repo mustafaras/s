@@ -12,7 +12,7 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
 - `app/test_v3_welcome.js` — v3.0 tanıtım/kutlama sayfasının sözleşmesi
-  (263 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
+  (268 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
   önce), **sonsuz döngü koruması** (`?v3done=1` kaçışı), kalıcılık anahtarı
   (`seyma-v3-welcome-v1`, `seyma-reset-v1`’den ayrı namespace), depo kapalıyken
   `markSeen()`’in **yalan söylememesi**, ayrı sayfa izolasyonu (app.js/sync.js/
@@ -26,7 +26,8 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   kaldığını doğrular: yalnız GET (`PUT`/`POST`/`PATCH`/`DELETE` yok), depoya
   yazma yok, `sync.js`/push yolu kapalı, token yalnız `Authorization`
   başlığında (console/DOM/metne sızmaz), kimlik yalnız cihaz deposundan,
-  **cihazda veri varsa ağa hiç çıkılmaz**, 1 MB üstü dosya için `git/blobs`
+  **kimlik varsa repo esastır** (tek GET; cihaz kaydı yalnız kimlik yokken ya
+  da ağ hatasında yedek), 1 MB üstü dosya için `git/blobs`
   yedeği + UTF-8 `TextDecoder`, ağ hatasında sayfa yine çizilir.
   **Kişisel veri katmanı (v3-data.js + v3-charts.js)** bölümü salt-okurluk
   sözleşmesini kaynak düzeyinde doğrular: `v3-data.js` ağdan muaf ve uzak veriyi
@@ -39,7 +40,12 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   türetildiğini (`diffDays(startDate, bugün) + 1`), `startDate` yoksa en erken
   kayıtlı günün kullanıldığını, türetilemezse sahte sayı gösterilmediğini
   (`dayCount: null`), rozetin de gerçek sayıdan üretildiğini ve dinamik
-  güncelleme düğümlerinin (hero/sayaç/kapanış/footer) var olduğunu doğrular.
+  güncelleme düğümlerinin (hero/sayaç/kapanış/footer) var olduğunu doğrular;
+  statik HTML varsayılanının gerçek `startDate` ile eşit olmasını
+  (**24 Haziran 2026 / 84** — eski "23 Haziran / 85" geri gelemez) zorunlu kılar.
+  **B1/B2 korumaları (2026-09-15):** "tam gün" rozeti sabit "7/7" değil gerçek
+  alışkanlık sayısından üretilir; uygulama metinlerinde bayat "4.500 adım"
+  kalmadı (yürüyüş tiki `stepsGoal` ile dolar).
   Run:
   `node tests/app/test_v3_welcome.js`.
   Hero flamingosunun **gerçek 🦩 emojisi** olduğunu (elle çizilmiş SVG'nin

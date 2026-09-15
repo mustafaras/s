@@ -381,7 +381,12 @@
       { l: '7 gece ilaçsız', done: med >= 7, sub: med >= 7 ? 'tamam' : med + '/7' },
       { l: 'Su hedefi', done: waterGoalDays >= 1, sub: waterGoalDays > 0 ? waterGoalDays + ' gün' : 'henüz yok' },
       { l: 'Okuma tutkunu', done: readingDayCount >= 7, sub: readingDayCount >= 7 ? 'tamam' : readingDayCount + '/7' },
-      { l: '7/7 mükemmel', done: perfectDays >= 1, sub: perfectDays > 0 ? perfectDays + ' gün' : 'henüz yok' },
+      /* Uygulamanın rozeti "7/7 mükemmel" der ama eşiği countRec>=habitCountOn
+         (bugün 15, ilk gün 8) — etiket 7 alışkanlıklı dönemden kalmış ve
+         yanıltıcı. Sayfa eşiği AYNEN aynalar, etiketi ise gerçek paydadan
+         üretir; ölçü yol boyunca değiştiği için bugünkü sayı yazılır. */
+      { l: 'Tüm alışkanlıklar (' + habitCountOn(end) + '/' + habitCountOn(end) + ')',
+        done: perfectDays >= 1, sub: perfectDays > 0 ? perfectDays + ' gün' : 'henüz yok' },
       /* "Bugün kaçıncı gündesin" rozeti — sabit bir eşik DEĞİL, gerçek gün
          sayısından türetilir; bu yüzden asla yanlış bir sayı gösteremez. */
       { l: dayCount + '. güne ulaşmak', done: true, sub: 'bugün' }

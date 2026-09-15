@@ -24,12 +24,12 @@ işaretlenir ve bu cihazda bir daha gösterilmez.
 | `v3.css` | Temel düzen + kutlama efekteri. 98 tasarım token'ını **tüketir**. Ham hex yalnızca neredeyse-siyah sahne zeminlerinde ve altın üstü mürekkep için. |
 | `v3.js` | Kalıcılık (yazma + **doğrulama**), scroll-reveal, ilerleme çubuğu, sayaç animasyonu, konfeti. |
 | `v3-data.js` | **Salt-okur** veri katmanı: kullanıcının kendi kayıtlarını özetler. Ağ YOK. `SOURCE` ile kaynağı izler. |
-| `v3-source.js` | **Salt-okur uzak kaynak köprüsü.** Cihazda kayıt yoksa uygulamanın zaten sakladığı token'la `data/latest.json`'ı **yalnız-GET** çeker. Yazmaz, diske kaydetmez. |
+| `v3-source.js` | **Salt-okur uzak kaynak köprüsü.** Uygulamanın zaten sakladığı token varsa `data/latest.json`'ı **yalnız-GET** çeker — **repo esastır**, cihaz kaydı yalnız yedektir. Yazmaz, diske kaydetmez. |
 | `v3-stats.js` | **İstatistik motoru**: betimsel istatistik, regresyon, korelasyon, histogram. |
 | `v3-statsview.js` | İstatistik görselleştirme (histogram, kutu grafiği, eğilim, korelasyon). |
 | `v3-charts.js` | Grafik çizimi (ısı haritası, trend, çubuklar, rozetler). |
 | `../index.html` (kök) | Tek ekleme: `<head>`'de 1 inline bootstrap `<script>` (yönlendirme kararı). |
-| `../tests/app/test_v3_welcome.js` | **263 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
+| `../tests/app/test_v3_welcome.js` | **268 kontrollük** sözleşme fixture'ı (kontrast ölçümü + köprü sözleşmesi dâhil). |
 | `../app/core/settings.js` | Ayarlar → Hakkında **v3.0** metni + "3.0'da neler değişti?" köprüsü. |
 | `../app/core/render.js` | Başlangıç ekranı **v3.0** rozeti. |
 
@@ -68,7 +68,11 @@ Bu, uygulamanın kendi formülüdür (`dateUtils.js`:
 
 - **Gerçek veri (`mustafaras/seyma-data`, 2026-09-15):** `startDate = 2026-06-24`
   → **84 gün** (ilk kayıtlı gün `2026-06-24`, son gün `2026-09-15`, boşluk yok).
-- Statik HTML geçerli bir **varsayılan** taşır (JS kapalıyken de sayı görünür);
+- Statik HTML geçerli bir **varsayılan** taşır (JS kapalıyken de sayı görünür):
+  **24 Haziran 2026 / 84** — gerçek `startDate` ile aynı. (2026-09-15'e kadar
+  statik metin `23 Haziran / 85` diyordu; veri/token olmayan bir tarayıcıda JS
+  bunu düzeltemediği için kullanıcı yanlış sayıyı görüyordu — düzeltildi, fixture
+  artık statik başlangıcın gerçek `startDate` ile eşit olmasını zorunlu kılar.)
   JS açıkken gerçek sayıya düzeltilir — hero, sayaç, kapanış başlığı ve footer
   dâhil (`trWords()` Türkçe sayı sözcüğünü üretir: 84 → "seksen dört").
 - `startDate` yoksa **en erken kayıtlı gün** kullanılır; hiç yoksa sahte sayı
@@ -97,7 +101,7 @@ alışkanlıklar ve **kazandığı rozetler**.
 | Yazma yöntemi | **Yok** — `PUT`/`POST`/`PATCH`/`DELETE` hiçbir modülde geçmez |
 | Token sızması | **Yok** — token yalnız `Authorization` başlığında; console/DOM/metne yazılmaz |
 | Kimlik kaynağı | Yalnız **cihazın kendi deposundaki** `settings.ghToken`/`ghRepo` (kullanıcıya sorulmaz) |
-| Gereksiz istek | Cihazda kayıt **varsa ağa hiç çıkılmaz** |
+| İstek politikası | Kimlik **varsa repo esastır** (tek GET, sayfa ömür boyu bir kez gösterilir); kimlik yoksa ağa **hiç çıkılmaz** |
 | Okunan anahtar | Yalnız `seyma-reset-v1` |
 | Kişisel metin | `note`/`journal`/`intention`/`meals` **ekrana çıkmaz** |
 | Ruh hâli | Yalnız **sayısal seviye** (1–5) ve oran; **etiket yazılmaz** |
@@ -110,11 +114,16 @@ Bir fixture bu sözleşmenin tamamını kaynak düzeyinde doğrular.
 **Sorun:** uygulama açılışta uzak veriyi **çekmiyor** — yalnız kendi verisini
 **gönderiyor** (`sync.js schedule`). Dolayısıyla deposu boş/eski olan bir cihazda
 sayfa eksik görünüyordu; oysa doğru veri `mustafaras/seyma-data` içindedir.
-**Çözüm — sıra:**
+**Çözüm — sıra (repo esastır):**
 
-1. Cihazda kayıt var mı? → **Var:** çiz, ağa çıkma.
-2. Yok ve token var mı? → **Var:** `data/latest.json`'ı bir kez GET et → çiz.
-3. Yok ve token yok / ağ hatası → dürüst boş durum.
+1. Cihazda `settings.ghToken` var mı? → **Var:** `data/latest.json`'ı bir kez
+   GET et → başarılıysa **onu** çiz (cihazda kayıt olsa bile — bayat olabilir).
+2. Token yok, ya da ağ/okuma hatası → **cihaz kaydı** varsa onunla çiz
+   (rozet `device`).
+3. İkisi de yok → dürüst boş durum (rozet gizli).
+
+DEVIR-PROMPTU §6'daki 6 senaryo (A–F) bu sırayı headless olarak doğrular; sayfa
+ömür boyu bir kez gösterildiği için tek GET'in maliyeti ihmal edilebilir.
 
 **1 MB üstü dosya tuzağı:** `data/latest.json` 2,2 MB'dir; GitHub Contents API
 200 döner ama `content` **boş** gelir (`encoding:"none"`). Köprü bu yüzden
@@ -297,16 +306,24 @@ test edildi (tamamı `/tmp`'de; repoya ya da sayfaya **gömülmedi**). Sayfanın
 | Su (bardak) | 78 | 8,95 | 9,00 | 1,51 | %17 |
 | Adım | 51 | 4.729 | 4.500 | 2.928 | %62 |
 
-> ⚠️ **BULUNAN KUSUR (uygulamada, düzeltilmedi):** `report.js`'in rozeti
-> **"7/7 mükemmel"** diyor ama karşılaştırması `countRec >= habitCountOn(date)`,
-> yani bugün **15** alışkanlık (aktivasyona göre ilk gün 8). Gerçek 84 günde en
-> fazla **12** tik var → "tam gün" hiç oluşmamış. Etiket eski 7 habitatlık
-> dönemden kalmış. **Bu iş kapsamında düzeltilmedi** (uygulama dosyasına ve
-> pinlenmiş yüzeye dokunmamak için); kullanıcıya bildirildi.
+> ⚠️ **BULUNAN KUSUR:** `report.js`'in rozeti **"7/7 mükemmel"** diyor ama
+> karşılaştırması `countRec >= habitCountOn(date)`, yani bugün **15** alışkanlık
+> (aktivasyona göre ilk gün 8). Gerçek 84 günde en fazla **12** tik var → "tam
+> gün" hiç oluşmamış. Etiket eski 7 habitatlık dönemden kalmış.
+> **Sayfa tarafı düzeltildi (B1, 2026-09-15):** `v3-data.js` eşiği aynen aynalar,
+> etiketi gerçek paydadan üretir → **"Tüm alışkanlıklar (15/15)"**; fixture sabit
+> "7/7" yazımının geri gelmemesini zorunlu kılar. `report.js`'teki uygulama
+> etiketi ayrı bir karttır, dokunulmadı.
+>
+> **B2 (uygulama, kullanıcı onayıyla düzeltildi):** yürüyüş tiki
+> `habitProgress → stepsGoal(date)` (9.000) ile dolar; `STEP_TICK_MIN=4500`
+> hiçbir yerde okunmuyordu. `appSurface.js:76`, `app.js` `derivedProgText`,
+> `setWalkSteps` toast'ı ve HABITS kart başlığındaki bayat "4.500" metinleri
+> gerçek hedefe çekildi (pinler 718/391/554 korundu).
 
 
 ```bash
-node tests/app/test_v3_welcome.js          # 176 kontrol (sözleşme + kontrast + kutlama + veri + uygulama içi)
+node tests/app/test_v3_welcome.js          # 268 kontrol (sözleşme + kontrast + kutlama + veri + köprü + uygulama içi)
 node --check v3-tanitim/v3.js
 node .claude/skills/run-seyma/driver.mjs   # exit 0
 node tools/shell-inventory.mjs --gate      # PASS · 7.610 / 0 / 408 / 57

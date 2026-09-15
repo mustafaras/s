@@ -103,7 +103,7 @@ ok('session teardown listeners stay in their original order',
 ok('sync retry and Quran foreground state no longer duplicate in app.js',
   !/var lastSyncRetryWatchdogAt=|var SYNC_RETRY_WATCHDOG_MS=|var quranLastForegroundPullAt=/.test(app));
 ok('production cache busts the changed registry and app shell together',
-  /app\/core\/appSurface\.js\?v=20260915b/.test(index) && /app\.js\?v=20260915c/.test(index) &&
+  /app\/core\/appSurface\.js\?v=20260915c/.test(index) && /app\.js\?v=20260915d/.test(index) &&
   index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?'));
 
 console.log('\nMON-53 lifecycle boundary: ' + passed + '/' + passed + ' passed');

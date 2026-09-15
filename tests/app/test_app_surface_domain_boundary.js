@@ -59,6 +59,6 @@ ok('every handler keeps its exact App name through the shared signature-neutral 
 ok('forbidden GPS, transport, fetch and notification paths are absent from MON-51 binding',
   !/fetchPrayerLocationGPS|refreshPrayerTimes|quranJourneySubmit|quranJourneyWatch|quranJourneyQuestion|refreshQuranUpdates|refreshSaygi|requestReminderPermission/.test(app.slice(app.indexOf('var MON51_DOMAIN_HANDLERS'), app.indexOf('window.App=App'))));
 ok('production loads appSurface before app.js with fresh cache versions',
-  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260915b/.test(index) && /app\.js\?v=20260915c/.test(index));
+  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260915c/.test(index) && /app\.js\?v=20260915d/.test(index));
 
 console.log('\nMON-51 domain App surface boundary: ' + passed + '/' + passed + ' passed');

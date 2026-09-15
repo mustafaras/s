@@ -17,7 +17,7 @@
   }
   function el(id) { return document.getElementById(id); }
 
-  /* Türkçe tarih: 23 Haziran 2026 */
+  /* Türkçe tarih: ör. 24 Haziran 2026 */
   var MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
     'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
   function trDate(iso) {

@@ -14,6 +14,13 @@ işlerin kısa, agent-okunabilir özetlerini tutar.
   bu dosyayı buradan okur). Kapanış: `deliverables/MON2-SERI-KAPANIS.md`.
   Her iki klasör 2026-09-16'da kökten buraya taşındı; yeni bir bölümleme
   programı kendi klasörü ve onayıyla başlar.
+- `premium-fx-plan/` — FX2 (28 kart) + SKY/PREM (15 kart) premium FX serileri
+  (2026-09-06→09-09 kapandı): TESHIS/PLAN-FX2/KAPSAM-OLCUMU/RENK-VE-ZEMIN,
+  `.anti-amnesia/` (FX2-STATE.json + coverage.json — `tools/fx-coverage.mjs`
+  buradan okur), `deliverables/FX2-KAPANIS.md`, HEADER-V2 ekran görüntüleri
+  (`assets/`). `MODULARIZATION.md` **düzenlenmez**
+  (`tests/app/test_modularization_boundary.js` içeriğini pinler). 2026-09-16'da
+  kökten taşındı; klasör içi göreli bağlantılar tarihsel olarak kök varsayar.
 
 Güncel Panel-v2 başlangıç noktası
 [`PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md)

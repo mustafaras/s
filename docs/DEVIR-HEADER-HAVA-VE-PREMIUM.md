@@ -14,9 +14,9 @@
 | Dosya | Neden |
 |---|---|
 | `CLAUDE.md` → **DATA SAFETY** | Veri kaybı geçmişi var (2026-07-10). Kuralları ihlal etme. |
-| `premium-fx-plan/deliverables/TAM-DENETIM-20260908.md` | **Devraldığın durumun tamamı.** §8 bulgular, §E ek bölümü düzeltme turu. |
-| `premium-fx-plan/RENK-VE-ZEMIN.md` | Şampanya altını paleti + 192 sahne sözleşmesi |
-| `premium-fx-plan/PLAN-FX2.md` | Değişmezler I1–I8, sözleşme S1–S8 |
+| `archive/premium-fx-plan/deliverables/TAM-DENETIM-20260908.md` | **Devraldığın durumun tamamı.** §8 bulgular, §E ek bölümü düzeltme turu. |
+| `archive/premium-fx-plan/RENK-VE-ZEMIN.md` | Şampanya altını paleti + 192 sahne sözleşmesi |
+| `archive/premium-fx-plan/PLAN-FX2.md` | Değişmezler I1–I8, sözleşme S1–S8 |
 | `tests/app/test_fx2_ambience.js` | **Katman ayrımı sözleşmesi.** GÖREV A'nın en sert kısıtı burada. |
 | `docs/apple-design/IOS27-TASARIM-PLANI.md` | I1–I6 fonksiyonellik sözleşmesi |
 
@@ -282,7 +282,7 @@ Kontrollü yerel QA (CLAUDE.md istisnası): `127.0.0.1:9000`, cache'siz sunucu,
 izole tarayıcı bağlamı, sentetik veri, viewport `414x896x2,mobile,touch`.
 
 **Çekilecek matris — 7 hava × 4 vakit × 2 tema:**
-`premium-fx-plan/assets/header-v2-<YYYYMMDD>/` altına
+`archive/premium-fx-plan/assets/header-v2-<YYYYMMDD>/` altına
 `hdr-<hava>-<vakit>-<tema>.png` adlandırmasıyla.
 
 **Ölçülecek:**
@@ -297,13 +297,13 @@ izole tarayıcı bağlamı, sentetik veri, viewport `414x896x2,mobile,touch`.
 | Sızıntı | Sekmeyi gizle | rAF durur |
 
 Öncesi/sonrası karşılaştırma için mevcut görüntüler:
-`premium-fx-plan/assets/tam-denetim-20260908/duzeltme-header-*.png`
+`archive/premium-fx-plan/assets/tam-denetim-20260908/duzeltme-header-*.png`
 
 ---
 
 ## 7. ÇIKTI
 
-`premium-fx-plan/deliverables/HEADER-V2-<YYYYMMDD>.md`:
+`archive/premium-fx-plan/deliverables/HEADER-V2-<YYYYMMDD>.md`:
 
 1. **Seçilen teknik yaklaşım ve gerekçesi** (canvas/WebGL/CSS; §3.4'teki
    render-yıkımı sorununa hangi çözüm ve neden)

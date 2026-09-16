@@ -7,7 +7,7 @@ import {
 import { join, resolve } from 'node:path';
 
 const ROOT = resolve(process.cwd());
-const COVERAGE_PATH = join(ROOT, 'premium-fx-plan', '.anti-amnesia', 'coverage.json');
+const COVERAGE_PATH = join(ROOT, 'archive', 'premium-fx-plan', '.anti-amnesia', 'coverage.json');
 
 const METRICS = [
   ['M1', 'interactiveTotal'],

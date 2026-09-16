@@ -214,7 +214,7 @@ Tasarım hedefi **≤460px viewport** (uygulamanın kuralı). Masaüstünde orta
 | v3.0'ın sayısal kanıtı | `archive/monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md` |
 | Post-MON2 bulgular (yaşanmış tuzaklar) | `archive/monolit-bolumlenme-plan-2/deliverables/MON2-SONRASI-BULGULAR.md` |
 | Sesli rehberlik mekanizması | aynı belge → "Sesli rehberlik nasıl çalışıyor" |
-| FX/SKY/PREM kapanışları | `premium-fx-plan/deliverables/FX2-KAPANIS.md`, `HEADER-V2-20260909.md` |
+| FX/SKY/PREM kapanışları | `archive/premium-fx-plan/deliverables/FX2-KAPANIS.md`, `HEADER-V2-20260909.md` |
 | Headless doğrulama harness'i | `.claude/skills/run-seyma/SKILL.md`, `driver.mjs` |
 | Yol haritası (changelog buraya) | `docs/GELISTIRME-PLANI.md` |
 

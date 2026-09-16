@@ -7,7 +7,7 @@
 > 2026-09-01 tarihli frozen analizidir; satır/fonksiyon sayıları tarihsel
 > başlangıç baseline'ıdır. Canlı uygulama MON-01..MON-57 sonrasında `app.js`
 > **13.144 satır** ve `app/core/` **29 dosyadır**; 24-hedef sahiplik kararı
-> [`premium-fx-plan/MODULARIZATION.md`](../premium-fx-plan/MODULARIZATION.md),
+> [`archive/premium-fx-plan/MODULARIZATION.md`](../archive/premium-fx-plan/MODULARIZATION.md),
 > uygulama durumu ve regression kanıtı
 > [`archive/monolit-bolumlenme-plan/README.md`](../archive/monolit-bolumlenme-plan/README.md)
 > ile [`MON-D11-TAM-REGRESSION-RAPORU`](../archive/monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)

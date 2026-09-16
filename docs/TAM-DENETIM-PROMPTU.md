@@ -15,10 +15,10 @@
 |---|---|
 | `CLAUDE.md` → **DATA SAFETY** | Veri kaybı geçmişi var; kuralları ihlal etme |
 | `docs/GELISTIRME-PLANI.md` | Özellik listesi + durum tablosu (denetimin özellik envanteri) |
-| `premium-fx-plan/TESHIS.md` | FX-1 neden başarısız oldu: *"fixture modülü test etti, bağlantıyı test etmedi"* |
-| `premium-fx-plan/PLAN-FX2.md` | 28 kart, değişmezler I1–I8, sözleşme S1–S8 |
-| `premium-fx-plan/KAPSAM-OLCUMU.md` | M1–M13 metrikleri **ve neden yanıltıcı olabildikleri** |
-| `premium-fx-plan/deliverables/FX2-BAGLANTI-DENETIMI.md` | Önceki **EKSİK** denetim (B1–B8). Doğrula ama bununla yetinme |
+| `archive/premium-fx-plan/TESHIS.md` | FX-1 neden başarısız oldu: *"fixture modülü test etti, bağlantıyı test etmedi"* |
+| `archive/premium-fx-plan/PLAN-FX2.md` | 28 kart, değişmezler I1–I8, sözleşme S1–S8 |
+| `archive/premium-fx-plan/KAPSAM-OLCUMU.md` | M1–M13 metrikleri **ve neden yanıltıcı olabildikleri** |
+| `archive/premium-fx-plan/deliverables/FX2-BAGLANTI-DENETIMI.md` | Önceki **EKSİK** denetim (B1–B8). Doğrula ama bununla yetinme |
 | `tests/README.md` | Mevcut fixture envanteri |
 
 ---
@@ -294,7 +294,7 @@ ile aç, ana kartların render olduğunu ekran görüntüsüyle belgele.
 ## 7. EKRAN GÖRÜNTÜSÜ KURALLARI (zorunlu)
 
 **Her özellik en az bir görüntüyle belgelenir.** Kayıt yeri:
-`premium-fx-plan/assets/tam-denetim-<YYYYMMDD>/`
+`archive/premium-fx-plan/assets/tam-denetim-<YYYYMMDD>/`
 
 Adlandırma: `<alan>-<özellik>-<durum>.png`
 
@@ -344,7 +344,7 @@ node .claude/skills/run-seyma/zikr-harness.mjs 2>&1 | tail -1     # 95/95
 
 ---
 
-## 9. ÇIKTI — `premium-fx-plan/deliverables/TAM-DENETIM-<YYYYMMDD>.md`
+## 9. ÇIKTI — `archive/premium-fx-plan/deliverables/TAM-DENETIM-<YYYYMMDD>.md`
 
 Şema (bu sırayla):
 
@@ -396,7 +396,7 @@ node .claude/skills/run-seyma/zikr-harness.mjs 2>&1 | tail -1     # 95/95
 ## 11. BİTİRME
 
 - [ ] Sunucuyu durdur (`pkill -f nocache.py`) — **turn bitmeden**
-- [ ] Ekran görüntüleri `premium-fx-plan/assets/tam-denetim-<tarih>/` altında
+- [ ] Ekran görüntüleri `archive/premium-fx-plan/assets/tam-denetim-<tarih>/` altında
 - [ ] Rapor yazıldı ve her bulgu bir görüntüye referans veriyor
 - [ ] Commit: `denetim: tam kod + uygulama görünürlük denetimi`
 - [ ] **Push / deploy YOK**

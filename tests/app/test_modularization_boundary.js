@@ -205,7 +205,7 @@ var expectedNewModules = [
 
 // [7] Modülerleştirme planı belgesi mevcut ve güncel
 (function(){
-  var p = path.join(repoRoot,'premium-fx-plan/MODULARIZATION.md');
+  var p = path.join(repoRoot,'archive/premium-fx-plan/MODULARIZATION.md');
   ok('MODULARIZATION.md mevcut', fs.existsSync(p));
   var txt = fs.readFileSync(p,'utf8');
   ok('MODULARIZATION.md v2.1', txt.indexOf('**Sürüm:** 2.1') >= 0);

@@ -18,7 +18,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `archive/monolit-bolumlenme-plan/` (MON-58, 58/60) + `archive/monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
+_Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `archive/premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `archive/premium-fx-plan/deliverables/`) + `archive/monolit-bolumlenme-plan/` (MON-58, 58/60) + `archive/monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
 > - **2026-09-15 (v3.0 CANLIYA ALINDI):** `premium-fx-gorsel-yuzey` → `main`
@@ -243,7 +243,7 @@ _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 >   eşiği 0,80 matematiksel olarak ulaşılamazdı). Headless kanıt: syntax
 >   11/11, driver 0 FAIL, zikir 95/95, `tests/app/*.js` 0 FAIL, modularization
 >   boundary 64/64, reminder smoke 20/20. Kapanış belgesi:
->   `premium-fx-plan/deliverables/FX2-KAPANIS.md`. Branch
+>   `archive/premium-fx-plan/deliverables/FX2-KAPANIS.md`. Branch
 >   `premium-fx-gorsel-yuzey`; **canlıya alınmadı** — push/merge/deploy ve
 >   cihaz kabulü (K3) ayrı, açık kullanıcı onayı bekliyor.
 > - **2026-09-02 (ZP-10 — Zikirmatik elle zikir girişi):** Kullanıcı sayaç dışında (tespih, cemaat, kağıt üzerinde) yaptığı zikirleri uygulamanın içine tek bütünde girmek istedi. Sayaç dock'una dördüncü düğme "Elle ekle" eklendi; dokununca sayaç ekranı İÇİNDE ayrı bir alt panel (sheet) açılıyor — zikir seçimi, −/+ stepper, serbest sayı girişi (`inputmode="numeric"`), akıllı hızlı çipler (core'da +33/+100/+500; Esmâ'da "Kalan N" — hedef aşımı fiziksel olarak imkânsız), canlı önizleme satırı ("Bugün 12 → 45 · Ömürlük 1.245 → 1.278") ve isteğe bağlı tek satır "Nasıl?" notu. Sayım aynı kanallara (sessions.perPreset + journeys.lifetimeCount + esma hatmi) işlenir; tur tamamlanması, streak, gün aynası, panel ve ısı haritası otomatik tutarlı kalır. Her elle kayıt `data.zikr.manualEntries[]` içinde salt-okunur bir olay olarak da yaşar (provenance dürüstlüğü); Geri al tam eşleşen geri yükleme yapar, Geçmiş sekmesinde "Elle Sayım Defteri" bölümünde geri alınabilir listedir. Şema V4→V5 additive/idempotent migration (`migrateZikrV5`, `ZIKR_MIGRATION_VERSION` kasıtlı olarak 'zikr_v2' kalır). `sync.js mergeZikr()` yeni union-temelli formülle genişletildi: `lifetime = max(local−manuelL, remote−manuelR) + manuelUnion` — bayat cihazın max kuralının eşzamanlı-artış körlüğü kapatıldı (A'da elle +33, hiç senkronlaşmamış B'de 50 dokunuş → 83; çift sayım yok; reverted kayıtlar toplama katılmaz; gün düzeyi perPreset/totalCount aynı formülle rebalance edilir; esma hatim başına ayrıştırma kapsam dışı — lifetime düzeltilir). Panel 1 `zikrDetailCardP`'ye "Bugün +N elle" dürüstlük çipi eklendi. Headless kapılar: syntax 2/2; yeni `tests/app/test_zikr_manual_entry.js` 21/21; sync 69/69 (5 yeni ZP-10 vakası); zikr-harness 95/95 (şema beklentileri V5'e güncellendi); driver, premium, panel v1 (14 fixture), panel-v2 (27), Kur'an (9), reminder smoke, boundary B1/B2/B3, kontrast 30, tema 26 — tümü PASS. Branch `zikirmatik-manuel-zikir`; canlıya alma (merge main + Pages deploy) ayrı kapıda, kullanıcı onayı bekleniyor.
@@ -574,11 +574,11 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
   paleti (`SeyAudio`), zengin haptik kanalı (`SeyHaptics`), sekme geçiş +
   overlay çıkış animasyonları, sayaç canlandırma ve 192-sahne canlı zemin
   (`SeyAmbience`) eklendi. Kapsam kanıtı ve API detayları:
-  [`../premium-fx-plan/deliverables/FX2-KAPANIS.md`](../premium-fx-plan/deliverables/FX2-KAPANIS.md).
+  [`../premium-fx-plan/deliverables/FX2-KAPANIS.md`](../archive/premium-fx-plan/deliverables/FX2-KAPANIS.md).
   Üstüne **SKY+PREM serisi (15 kart, 2026-09-09) header hava efektini canvas
   parçacık motoruna taşıdı** (`app/core/skyFx.js`, 56 sahne) ve kalan premium
   kozmetikleri kapattı; kanıt:
-  [`../premium-fx-plan/deliverables/HEADER-V2-20260909.md`](../premium-fx-plan/deliverables/HEADER-V2-20260909.md).
+  [`../premium-fx-plan/deliverables/HEADER-V2-20260909.md`](../archive/premium-fx-plan/deliverables/HEADER-V2-20260909.md).
   **Canlıya alınmadı** — branch local-only, main'e merge + Pages deploy ve
   cihaz kabulü (K3) ayrı kullanıcı onayı bekliyor. **Emek:** Düşük (madde
   tanımı) → gerçekte yüksek (28 kartlık ölçülü kapsam programı).
@@ -666,9 +666,9 @@ notlarını buraya ekleyebiliriz._
 
 - **2026-09-09** — **✨ SKY+PREM serisi kapandı + monolit programı 25/60**:
   Header hava efekti canvas parçacık motoruna taşındı (`app/core/skyFx.js`,
-  56 sahne, kanıt `premium-fx-plan/deliverables/HEADER-V2-20260909.md`);
+  56 sahne, kanıt `archive/premium-fx-plan/deliverables/HEADER-V2-20260909.md`);
   kalan premium kozmetikler (PREM-01..03) kapandı. Seri arşivi:
-  `premium-fx-plan/deliverables/PROMPT-SERI-TARAMASI-20260909.md` +
+  `archive/premium-fx-plan/deliverables/PROMPT-SERI-TARAMASI-20260909.md` +
   `MONOLIT-TARAMASI-20260909.md`. Monolit bölümleme Dalga 5'i kapattı
   (MON-25 kabul denetimi; tek onarım: `driver.mjs` FILES listesine SKY'nin
   atladığı `skyFx.js` eklendi) — sıradaki MON-26 motivation. Hâlâ

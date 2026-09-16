@@ -271,10 +271,11 @@ premium-fx-plan/ Premium FX program docs. **FX-2 series complete**
                  (palette/touch/audio/tab-transition/overlay-motion/ambience,
                  6 files) + expanded test_premium_*.js.
 files/           Local maintenance area (yedek/ JSON backups, bakim/ scripts).
-graphify-out/    graphify knowledge-graph output for app.js — evidence base
-                 behind docs/monolit-bolumlenme-haritasi.md.
 archive/         Frozen program archives (Panel-v2 Premium design, panel
-                 denetim merkezi, demos) with their own .anti-amnesia/ states.
+                 denetim merkezi, demos, MON + MON2 monolith-splitting plans) with
+                 their own .anti-amnesia/ states. (graphify-out/ was deleted
+                 2026-09-16; regenerate with /graphify if a graph is ever needed —
+                 docs/monolit-bolumlenme-haritasi.md keeps the derived map.)
 app/styles.css       Shared CSS variables (light/dark theme) + small set of
                  global rules/keyframes used by index.html's app.
 assets/aeon-icon-*.png PWA and ÆON panel icon assets referenced by manifest.json.

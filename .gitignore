@@ -1,7 +1,8 @@
 .DS_Store
-files/
+files/*
+!files/bakim/
+!files/bakim/**
 .impeccable/
 __pycache__/
 *.pyc
 graphify-out/
-

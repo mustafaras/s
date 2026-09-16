@@ -18,7 +18,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `monolit-bolumlenme-plan/` (MON-58, 58/60) + `monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
+_Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `premium-fx-plan/deliverables/`) + `archive/monolit-bolumlenme-plan/` (MON-58, 58/60) + `archive/monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
 > - **2026-09-15 (v3.0 CANLIYA ALINDI):** `premium-fx-gorsel-yuzey` → `main`
@@ -152,7 +152,7 @@ _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 >   (−5.536 satır, **%42**); `*Legacy` 22 → 0; `*HTML` builder 1.129 → 57 satır;
 >   8 kart boyunca 231 gövde modüllere taşındı (reminder 86, builder 37, alan
 >   146+24 = 170 → toplam ≈293 gövde/sabit bloğu). Kapanış belgesi:
->   [`MON2-SERI-KAPANIS.md`](../monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md)
+>   [`MON2-SERI-KAPANIS.md`](../archive/monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md)
 >   — seri envanteri, 8 kartın kapanış tablosu, 30 dosya API/owner tablosu, shim
 >   envanteri (1.405 fn / 1.411 satır), 8 kalıcı sözleşme, açık kalanlar.
 >   **Bütçe donduruldu:** 7.800 / 0 / 450 / 150 (ölçüm 7.603/0/408/57).
@@ -202,7 +202,7 @@ _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 >   deseni + with(SCOPE), 123-dep bag). Runtime delta yok (I1–I6 korunur);
 >   tam kapı seti (smoke 20/20, fx2 6/6, panel 23, panel-v2 27, Kur'an 9,
 >   driver/zikr/B1-B2-B3, `shell-inventory --gate`) PASS. Kapanış belgesi
->   [`MON2-DALGA1-KAPANIS.md`](../monolit-bolumlenme-plan-2/deliverables/MON2-DALGA1-KAPANIS.md);
+>   [`MON2-DALGA1-KAPANIS.md`](../archive/monolit-bolumlenme-plan-2/deliverables/MON2-DALGA1-KAPANIS.md);
 >   sıradaki kart MON2-05 (Görünüm dalı, builder → `render.js`). Program
 >   LOCAL-ONLY; push/deploy/device ayrı kapılar.
 > - **2026-09-14 (MON-60 sonrası kod denetimi ve düzeltme):** 60 promptun
@@ -221,9 +221,9 @@ _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 >   MON-57 tam no-network regression ile kapandı; MON-58 bu gerçeği roadmap,
 >   kök README, plan README, graphify module map ve v2.1 strategy belgesine
 >   bağladı. Canlı ölçüm `app.js` 13.144 satır, `app/core/` 29 dosya ve 24
->   hedef registry'dir. Kanıt zinciri [`MON-STATE.json`](../monolit-bolumlenme-plan/MON-STATE.json),
->   [`MON-D11-DELEGE-ENVANTERI.md`](../monolit-bolumlenme-plan/deliverables/MON-D11-DELEGE-ENVANTERI.md)
->   ve [`MON-D11-TAM-REGRESSION-RAPORU.md`](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)
+>   hedef registry'dir. Kanıt zinciri [`MON-STATE.json`](../archive/monolit-bolumlenme-plan/MON-STATE.json),
+>   [`MON-D11-DELEGE-ENVANTERI.md`](../archive/monolit-bolumlenme-plan/deliverables/MON-D11-DELEGE-ENVANTERI.md)
+>   ve [`MON-D11-TAM-REGRESSION-RAPORU.md`](../archive/monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)
 >   içindedir. Durum **58/60**, LOCAL-ONLY; browser/device, deploy ve release
 >   approval ayrı kapılardır.
 > - **2026-09-08 (FX-2 serisi tamamlandı — "Hissedilir Premium"):** 28 kartlık,
@@ -289,8 +289,8 @@ _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 | # | Madde | Sürüm | Durum | Kanıt / Not |
 |---|-------|:-----:|:-----:|-------------|
 | — | Altyapı (sync, panel, tema, Okuma/İzleme hub'ları) | 0 | ✅ | `sync.js`, `panel.html`, `app/styles.css`, hub deseni |
-| MON | 🧱 `app.js` monolit bölümleme | 0 | ✅ | 24 hedef registry, 29 `app/core` dosyası; MON-01..60 uygulandı ve seri 2026-09-13'te kapandı (60/60, [kapanış belgesi](../monolit-bolumlenme-plan/deliverables/MON-SERI-KAPANIS-BELGESI.md)); 2026-09-14 kapanış sonrası kod denetimi düzeltmeleri LEDGER seq 82. Güncel kanıt: [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md), [module map](monolit-bolumlenme-haritasi.md), [MON-D11 regression](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
-| MON2 | 📉 `app.js` kabuk inceltme (ölçülen bütçe) | 0 | ✅ | **SERİ KAPANDI (8/8 kart, 2026-09-15)**. `app.js` **13.139 → 7.603** satır (−5.536, **%42**), `*Legacy` 22 → 0, `*HTML` builder 1.129 → 57. 8 kart: MON2-02/03 reminder gövdeleri `reminders.js`+`reminderSurface.js`'e; MON2-05 37 builder `render.js`'e; MON2-06 146 alan gövdesi `zikir/quran/profile.js`'e; MON2-07 24 yan-etkili alan gövdesi `appSurface.js` alan yüzey bölümüne. Dep-bag takma adları (`doc`/`defer`/`sync`) saflık sözleşmelerini korur. **Bütçe donduruldu:** 7.800/0/450/150 (ölçüm 7.603/0/408/57). Kapanış: [MON2-SERI-KAPANIS.md](../monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md). Program LOCAL-ONLY; push/deploy/cihaz kabulü ayrı kapı. |
+| MON | 🧱 `app.js` monolit bölümleme | 0 | ✅ | 24 hedef registry, 29 `app/core` dosyası; MON-01..60 uygulandı ve seri 2026-09-13'te kapandı (60/60, [kapanış belgesi](../archive/monolit-bolumlenme-plan/deliverables/MON-SERI-KAPANIS-BELGESI.md)); 2026-09-14 kapanış sonrası kod denetimi düzeltmeleri LEDGER seq 82. Güncel kanıt: [`archive/monolit-bolumlenme-plan/README.md`](../archive/monolit-bolumlenme-plan/README.md), [module map](monolit-bolumlenme-haritasi.md), [MON-D11 regression](../archive/monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md). Program LOCAL-ONLY; cihaz/deploy ayrı kapı. |
+| MON2 | 📉 `app.js` kabuk inceltme (ölçülen bütçe) | 0 | ✅ | **SERİ KAPANDI (8/8 kart, 2026-09-15)**. `app.js` **13.139 → 7.603** satır (−5.536, **%42**), `*Legacy` 22 → 0, `*HTML` builder 1.129 → 57. 8 kart: MON2-02/03 reminder gövdeleri `reminders.js`+`reminderSurface.js`'e; MON2-05 37 builder `render.js`'e; MON2-06 146 alan gövdesi `zikir/quran/profile.js`'e; MON2-07 24 yan-etkili alan gövdesi `appSurface.js` alan yüzey bölümüne. Dep-bag takma adları (`doc`/`defer`/`sync`) saflık sözleşmelerini korur. **Bütçe donduruldu:** 7.800/0/450/150 (ölçüm 7.603/0/408/57). Kapanış: [MON2-SERI-KAPANIS.md](../archive/monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md). Program LOCAL-ONLY; push/deploy/cihaz kabulü ayrı kapı. |
 | 1 | 🎵 Ne Dinledim | 1 | ✅ | `listeningOverlayHTML` hub (Bugün/Favoriler/İstatistik/Sözler) + `data.music` + `data.days[].listening`; `--listen` teal accent; panel "🎧 Dinleme Arşivi" (2026-07-04) |
 | 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ✅ | `App.onGratitude` + `data.days[].gratitude` (≤3); Bugün kartı (geçmiş günde düzenlenebilir); panel gün-detayı bloğu (2026-07-04) |
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |

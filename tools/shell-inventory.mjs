@@ -1,7 +1,7 @@
 // MON2 · app.js kabuk envanteri.
 // Ağsız, salt-okur ölçüm aracı: app.js'in sütun-0 blok yapısını sayar ve
 // MON2 kartlarının önce/sonra kanıtını üretir. Hiçbir dosyaya yazmaz; --gate
-// yalnız monolit-bolumlenme-plan-2/MON2-STATE.json bütçesine karşı exit 1 verir.
+// yalnız archive/monolit-bolumlenme-plan-2/MON2-STATE.json bütçesine karşı exit 1 verir.
 //
 //   node tools/shell-inventory.mjs            insan-okur tablo
 //   node tools/shell-inventory.mjs --json     makine-okur ölçüm
@@ -12,7 +12,7 @@ import { join, resolve } from 'node:path';
 
 const ROOT = resolve(process.cwd());
 const APP_PATH = join(ROOT, 'app.js');
-const STATE_PATH = join(ROOT, 'monolit-bolumlenme-plan-2', 'MON2-STATE.json');
+const STATE_PATH = join(ROOT, 'archive', 'monolit-bolumlenme-plan-2', 'MON2-STATE.json');
 const SHIM_MAX_CODE_LINES = 2;
 const BIG_MIN_CODE_LINES = 11;
 

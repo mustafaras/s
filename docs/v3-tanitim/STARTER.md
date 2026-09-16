@@ -15,7 +15,7 @@ Bu sırayla oku:
 2. `CLAUDE.md` → "DATA SAFETY" bölümü (port 9000 kuralı) ve "Conventions" (madde 2, 5, 7)
 3. `app/styles.css` → ilk 120 satır (98 tasarım token'ı: `--accent-*`, `--f-*`, `--dur-*`, `--ease-*`, `--elev-*`)
 4. `panel-v2.html` (ayrı sayfa deseninin canlı örneği — 30 satır)
-5. `monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md` §1 (v3.0'ın sayısal kanıtı)
+5. `archive/monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md` §1 (v3.0'ın sayısal kanıtı)
 
 **Başlamadan önce:** `git status --short --branch` → çalışma ağacı temiz olmalı. Değilse **dur** ve kullanıcıya sor.
 
@@ -211,8 +211,8 @@ Tasarım hedefi **≤460px viewport** (uygulamanın kuralı). Masaüstünde orta
 | Uygulama kuralları + DATA SAFETY | `CLAUDE.md`, `AGENTS.md` |
 | Tasarım token'ları (98 adet) | `app/styles.css` (ilk 120 satır) |
 | Ayrı sayfa örneği | `panel-v2.html`, `panel/v2/panel-v2.css` |
-| v3.0'ın sayısal kanıtı | `monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md` |
-| Post-MON2 bulgular (yaşanmış tuzaklar) | `monolit-bolumlenme-plan-2/deliverables/MON2-SONRASI-BULGULAR.md` |
+| v3.0'ın sayısal kanıtı | `archive/monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md` |
+| Post-MON2 bulgular (yaşanmış tuzaklar) | `archive/monolit-bolumlenme-plan-2/deliverables/MON2-SONRASI-BULGULAR.md` |
 | Sesli rehberlik mekanizması | aynı belge → "Sesli rehberlik nasıl çalışıyor" |
 | FX/SKY/PREM kapanışları | `premium-fx-plan/deliverables/FX2-KAPANIS.md`, `HEADER-V2-20260909.md` |
 | Headless doğrulama harness'i | `.claude/skills/run-seyma/SKILL.md`, `driver.mjs` |

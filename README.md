@@ -39,7 +39,7 @@
 | Understand the Quran learning protocol | [Quran Journey](#quran-journey) |
 | See the interface language | [Interface gallery](#interface-gallery) |
 | Understand the system | [Architecture](#architecture) and [Data lifecycle](#data-lifecycle) |
-| Inspect `app.js` modularization | [`monolit-bolumlenme-plan/README.md`](monolit-bolumlenme-plan/README.md), [module map](docs/monolit-bolumlenme-haritasi.md) and [strategy](premium-fx-plan/MODULARIZATION.md) |
+| Inspect `app.js` modularization | [`archive/monolit-bolumlenme-plan/README.md`](archive/monolit-bolumlenme-plan/README.md), [module map](docs/monolit-bolumlenme-haritasi.md) and [strategy](premium-fx-plan/MODULARIZATION.md) |
 | Resume safe repository work | [Agent entrypoint](#agent-entrypoint) and [`AGENTS.md`](AGENTS.md) |
 | Run verification | [Verification](#verification) |
 | Change reminders or notification UX | [`docs/reminders/README.md`](docs/reminders/README.md) |

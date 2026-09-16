@@ -9,8 +9,8 @@
 > **13.144 satır** ve `app/core/` **29 dosyadır**; 24-hedef sahiplik kararı
 > [`premium-fx-plan/MODULARIZATION.md`](../premium-fx-plan/MODULARIZATION.md),
 > uygulama durumu ve regression kanıtı
-> [`monolit-bolumlenme-plan/README.md`](../monolit-bolumlenme-plan/README.md)
-> ile [`MON-D11-TAM-REGRESSION-RAPORU`](../monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)
+> [`archive/monolit-bolumlenme-plan/README.md`](../archive/monolit-bolumlenme-plan/README.md)
+> ile [`MON-D11-TAM-REGRESSION-RAPORU`](../archive/monolit-bolumlenme-plan/deliverables/MON-D11-TAM-REGRESSION-RAPORU.md)
 > içindedir.
 
 ---

@@ -716,7 +716,7 @@ function haritaHTML(){
   // Bu yüzden `ui.calMonth` ilk-kurulum koruması asıl sahibi olan
   // app/core/map.js `renderHarita` içine taşındı (orada savunmalı).
   // Bloğu silmek MON2 kapsamı dışıdır (kabuk envanteri `*HTML` sayımı pinli);
-  // ölü kod kaydı: monolit-bolumlenme-plan-2/deliverables/MON2-SONRASI-BULGULAR.md
+  // ölü kod kaydı: archive/monolit-bolumlenme-plan-2/deliverables/MON2-SONRASI-BULGULAR.md
   return SEYMA_RENDER.haritaHTML.apply(null,arguments);
 }
 // MON-36: profile assessment content/UI/scoring registry. Consent/session mutation,

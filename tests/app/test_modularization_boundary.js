@@ -51,13 +51,13 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
 
 // [1] app.js hâlâ var ve MON2 kabuk bütçesi içinde
 // MON2-01 (K7): MON döneminin "10.000+ satır" varsayımı, ölçülen kabuk
-// bütçesiyle değiştirildi (monolit-bolumlenme-plan-2/MON2-STATE.json →
+// bütçesiyle değiştirildi (archive/monolit-bolumlenme-plan-2/MON2-STATE.json →
 // shellBudget.maxTotalLines; her kartta daraltılır, gevşetilmez).
 (function(){
   var appPath = path.join(repoRoot,'app.js');
   ok('app.js mevcut', fs.existsSync(appPath));
   var lines = fs.readFileSync(appPath,'utf8').split(/\r?\n/);
-  var statePath = path.join(repoRoot,'monolit-bolumlenme-plan-2','MON2-STATE.json');
+  var statePath = path.join(repoRoot,'archive','monolit-bolumlenme-plan-2','MON2-STATE.json');
   var budget = JSON.parse(fs.readFileSync(statePath,'utf8')).shellBudget || {};
   ok('MON2 shellBudget.maxTotalLines tanımlı', typeof budget.maxTotalLines === 'number');
   ok('app.js kabuk bütçesi içinde (≤'+budget.maxTotalLines+')',

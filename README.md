@@ -39,7 +39,8 @@
 | Understand the Quran learning protocol | [Quran Journey](#quran-journey) |
 | See the interface language | [Interface gallery](#interface-gallery) |
 | Understand the system | [Architecture](#architecture) and [Data lifecycle](#data-lifecycle) |
-| Inspect `app.js` modularization | [`archive/monolit-bolumlenme-plan/README.md`](archive/monolit-bolumlenme-plan/README.md), [module map](docs/monolit-bolumlenme-haritasi.md) and [strategy](archive/premium-fx-plan/MODULARIZATION.md) |
+| Inspect current `app.js` modularization | [`archive/monolit-bolumlenme-plan-2/README.md`](archive/monolit-bolumlenme-plan-2/README.md), [MON2 closure](archive/monolit-bolumlenme-plan-2/deliverables/MON2-SERI-KAPANIS.md), [module map](docs/monolit-bolumlenme-haritasi.md) and [historical strategy](archive/premium-fx-plan/MODULARIZATION.md) |
+| Inspect the v3.0 welcome surface | [`v3-tanitim/`](v3-tanitim/) and [`docs/v3-tanitim/README.md`](docs/v3-tanitim/README.md) |
 | Resume safe repository work | [Agent entrypoint](#agent-entrypoint) and [`AGENTS.md`](AGENTS.md) |
 | Run verification | [Verification](#verification) |
 | Change reminders or notification UX | [`docs/reminders/README.md`](docs/reminders/README.md) |
@@ -73,6 +74,7 @@ personal routine into a score of human worth.
 | **Şeyma** | Private mood, rhythm, notes, routines and reflection | Local personal source of truth |
 | **ÆON Current Panel** | Readable observer summaries and operational status | Redacted projection; read-only observer surface |
 | **ÆON Panel-v2 Premium** | Premium visual system for trends, archives and system state | Independent panel runtime and contract suite |
+| **v3.0 Welcome surface** | Standalone release introduction and personal celebration page | Separate page; it bypasses the app runtime until the welcome marker is recorded |
 | **Sync layer** | Explicit, sanitized transport and conflict-aware merge | Guarded full-replace boundary with receipts |
 | **Verification layer** | Deterministic Node fixtures and VM harnesses | Synthetic data, mocked transport, no browser boot |
 
@@ -408,7 +410,11 @@ boundaries inspectable by both humans and deterministic fixtures.
 flowchart LR
     HTML["index.html<br/>public shell"] --> APP["app.js<br/>Şeyma runtime"]
     HTML --> CONTENT["app/content/*<br/>frozen content modules"]
-    HTML --> CORE["app/core/*<br/>constants + reminder adapters"]
+    HTML --> CORE["app/core/*<br/>state · domain registries · surfaces · FX"]
+    HTML --> STYLE["app/styles.css<br/>shared design tokens"]
+    HTML --> PWA["manifest.json + sw.js<br/>PWA shell and notification routing"]
+    HTML --> V3["v3-tanitim/index.html<br/>standalone v3.0 surface"]
+    V3 --> V3STORE["localStorage<br/>seyma-v3-welcome-v1"]
     APP --> STORE["localStorage<br/>seyma-reset-v1"]
     APP --> SYNC["sync.js<br/>sanitize · merge · receipt"]
     SYNC --> REMOTE["approved transport boundary"]
@@ -425,9 +431,9 @@ flowchart LR
     classDef storage fill:#24362f,stroke:#73d6b2,color:#fff;
     classDef observer fill:#3a3022,stroke:#e9bb70,color:#fff;
     classDef delivery fill:#302a42,stroke:#b9a0ff,color:#fff;
-    class HTML,CONTENT,CORE shell;
+    class HTML,CONTENT,CORE,STYLE,PWA,V3 shell;
     class APP,SYNC runtime;
-    class STORE,REMOTE,PROJ storage;
+    class STORE,V3STORE,REMOTE,PROJ storage;
     class PANEL,V2,CSS1,CSS2 observer;
     class CI,SITE delivery;
 ```
@@ -436,14 +442,54 @@ flowchart LR
 
 | Surface | Owns | Must not silently own |
 | --- | --- | --- |
-| [`app.js`](app.js) | UI, state reads/writes, migration entrypoint and `App` handlers | A second persistent store or Panel-v2 rendering |
+| [`app.js`](app.js) | Runtime shell: mutable state, persistence/migration bridges, data rebinds, timer/listener registration, `App` exposure/assignments and compatibility shims | Domain/render/reminder bodies, a second persistent store or Panel-v2 rendering |
 | [`sync.js`](sync.js) | Sanitized transport, merge helpers, receipts and bounded retries | Raw secrets or unapproved data-repository writes |
-| [`app/core/`](app/core/) | Boot constants and reminder runtime contracts | Panel projection or native detail leakage |
-| [`app/content/`](app/content/) | Frozen catalogs and domain content modules | Runtime persistence, network or secret discovery |
+| [`app/core/`](app/core/) | State/save/date/helper registries, domain registries, reminder stack, render/app surfaces and premium FX/time/sky modules | A second persistent store, Panel projection or raw private-detail leakage |
+| [`app/core/render.js`](app/core/render.js) | Tab, shell, modal HTML builders and the render body through `SeymaRender` | Persistence, sync, timer/listener registration or `App` assignment |
+| [`app/core/appSurface.js`](app/core/appSurface.js) | Daily/domain/overlay handler bodies, lifecycle callbacks and boot bridges through `SeymaAppSurface` | Global handler registration, `window.App` exposure or independent state ownership |
+| [`app/core/reminderSurface.js`](app/core/reminderSurface.js) | Reminder side-effect bodies and reminder handler bodies through `SeymaReminderSurface` | A second reminder state store or unapproved external writes |
+| [`app/content/`](app/content/) | Frozen catalogs, content layers and pure transport contracts | Runtime persistence, secret discovery or unbounded side effects |
 | [`panel/panel.js`](panel/panel.js) | Current Panel observer projection and UI | Panel-v2 component contracts |
 | [`panel/v2/panel-v2.js`](panel/v2/panel-v2.js) | Premium observer rendering, polling, charts and controls | Şeyma local-save semantics |
 | [`panel/panelCoverageManifest.js`](panel/panelCoverageManifest.js) | Coverage, redaction and safe projection adapter | Network, DOM mutation or raw secret discovery |
 | [`tests/`](tests/) | Synthetic contracts, regression fixtures and parity checks | Production runtime behavior |
+
+### Module and load-order contract
+
+`app/core/` uses classic scripts with explicit order; files are not discovered
+automatically. When a new core module is added or an existing module is moved,
+update the same load-order contract in all four places:
+
+1. [`index.html`](index.html) production script order and cache-bust.
+2. [`.claude/skills/run-seyma/driver.mjs`](.claude/skills/run-seyma/driver.mjs) VM boot list.
+3. [`.claude/skills/run-seyma/zikr-harness.mjs`](.claude/skills/run-seyma/zikr-harness.mjs) fixture boot list.
+4. [`tests/app/test_state_rebind_boundary.js`](tests/app/test_state_rebind_boundary.js) state-rebind boot list.
+
+The registry must be loaded before `app.js`; the app shell remains the owner of
+mutable state, persistence, rebinds and global handler registration.
+
+### Current module inventory
+
+The production app is an explicit classic-script runtime with **30 `app/core/`
+modules** and **11 `app/content/` modules**. The groups below are the live
+source map; the four boot lists above are the executable load-order contract.
+
+| Layer | Files | Responsibility |
+| --- | --- | --- |
+| Core boot/state (5) | `constants.js`, `state.js`, `syncGlue.js`, `dateUtils.js`, `helpers.js` | Boot constants, migration/state body, save bridge, dates and shared view helpers |
+| Core domain registries (14) | `prayer.js`, `zikir.js`, `quran.js`, `saygi.js`, `motivation.js`, `crisis.js`, `journal.js`, `health.js`, `library.js`, `report.js`, `map.js`, `profile.js`, `settings.js`, `messaging.js` | Domain calculations and HTML bodies exposed through `Seyma*` registries; app-owned mutation and persistence remain in `app.js` |
+| Core reminder stack (6) | `reminderCatalog.js`, `reminderEngine.js`, `reminderScheduler.js`, `reminderDelivery.js`, `reminders.js`, `reminderSurface.js` | Frozen reminder contracts, catalog/policy/engine/delivery adapters, views and reminder side effects |
+| Core FX and scene (3) | `mediaFx.js`, `timeTheme.js`, `skyFx.js` | Audio, haptics, motion, time/season theme and live weather-sky rendering |
+| Core surfaces (2) | `render.js`, `appSurface.js` | Render builders, `render()`, daily/domain/overlay bodies, lifecycle callbacks and boot bridges |
+| Content/program (4) | `motivationProgramV2.js`, `motivationNarratives.js`, `saygiPeople.js`, `profileAssessmentV1.js` | Frozen motivation, narrative, inspirational-figure and profile-assessment content |
+| Content/calendar and Quran (4) | `hijriCalendar.js`, `quranRevelationOrderV1.js`, `quranStrikingVersesV1.js`, `quranTransportV1.js` | Calendar/catalog data, verse showcase and pure Quran transport contract |
+| Content faith catalogs (3) | `esmaulHusnaV1.js`, `esmaulHusnaV2.js`, `zikirCoreContentV1.js` | Frozen Esmâ and core zikir content layers |
+
+The independent public surfaces are `index.html` + `app.js`/`sync.js`,
+`panel.html` + `panel/`, `panel-v2.html` + `panel/v2/`, and
+`v3-tanitim/index.html` + its own `v3-*.js`/`v3.css` modules. They share
+allowlisted contracts where documented, but they are not one runtime and must
+not be treated as interchangeable acceptance evidence.
 
 ## Data lifecycle
 
@@ -525,7 +571,9 @@ state and the next valid action.
 The current implementation keeps the catalogue in
 `app/content/quranRevelationOrderV1.js`, the optional rotating verse content in
 `app/content/quranStrikingVersesV1.js`, the transport contract in
-`app/content/quranTransportV1.js` and the user-facing runtime in `app.js`.
+`app/content/quranTransportV1.js`, and the user-facing domain runtime in
+`app/core/quran.js` through `SeymaQuran`. `app.js` retains the app-owned
+mutation, persistence and `App` handler bridge around that registry.
 The archived deterministic demo is [`archive/demos/quran-flow-demo.html`](archive/demos/quran-flow-demo.html).
 
 ### 2. The three-document transport topology
@@ -1046,9 +1094,12 @@ The most important feature is the boundary itself.
   in the app.
 - **No clinical authority:** the product does not choose doses, interactions,
   treatment, catch-up actions or missed-dose decisions.
-- **No browser verification:** opening the app in a browser can load stale
-  localStorage and schedule a full replacement. Verification uses the committed
-  Node VM harnesses instead.
+- **No generic browser verification:** opening the app in an existing browser
+  profile can load stale localStorage and schedule a full replacement. The
+  default remains the committed Node VM harnesses. A screenshot request may use
+  only the controlled loopback visual-QA path on port `9000`, a disposable
+  browser profile, and the Guard 1 source/test contract; this is not device
+  acceptance or production verification.
 
 ```mermaid
 flowchart LR
@@ -1092,6 +1143,15 @@ node --check sw.js
 node .claude/skills/run-seyma/driver.mjs
 node .claude/skills/run-seyma/zikr-harness.mjs
 
+# Modular shell budget and load-order gate
+node tools/shell-inventory.mjs --gate
+
+# App, v3.0 and reminder contracts
+for f in tests/app/test_*.js; do node "$f" || exit $?; done
+node docs/reminders/verify-reminder-freeze.mjs
+node tests/reminders/run-reminder-smoke.mjs
+node tests/app/test_v3_welcome.js
+
 # Focused Panel-v2 suite
 for f in tests/panel-v2/test_panel_v2_*.js; do node "$f" || exit $?; done
 
@@ -1116,6 +1176,7 @@ git diff --check
 | Panel-v2 Premium | [`tests/panel-v2/`](tests/panel-v2/) | Tokens, components, accessibility, performance and page contracts |
 | Quran transport | [`tests/quran/`](tests/quran/) | Catalog, outbox, delivery, response, merge and panel parity |
 | Reminder program | [`tests/reminders/`](tests/reminders/) | Local-only UX, permission, privacy, sync and current-panel boundaries |
+| v3.0 welcome surface | [`tests/app/test_v3_welcome.js`](tests/app/test_v3_welcome.js) | Bootstrap isolation, welcome persistence, snapshot/source safety and celebration-page contracts |
 | State harnesses | [`.claude/skills/run-seyma/`](.claude/skills/run-seyma/) | Isolated VM boot, migration and dependency-bag contracts |
 
 Test evidence is synthetic and deterministic. It is deliberately not a claim
@@ -1203,13 +1264,19 @@ Every release claim should identify its evidence level:
 .
 ├── index.html / panel.html      public Şeyma and Current Panel shells
 ├── panel-v2.html                Premium observer shell
-├── app/                         app core, content modules and shared styles
+├── v3-tanitim/                  standalone v3.0 welcome and celebration surface
+├── app/                         app core and frozen content modules
+├── app/styles.css               shared app design tokens and global styles
 ├── panel/                       Current Panel + Panel-v2 implementation assets
 ├── app.js / sync.js / sw.js     runtime entrypoints and guarded synchronization
+├── manifest.json                PWA metadata and install surface
+├── tools/                       network-free shell, coverage and snapshot utilities
 ├── assets/                      public ÆON/PWA icons
 ├── tests/                       committed headless Node fixtures by surface
 ├── docs/                        roadmap, contracts, summaries and previews
 ├── archive/                     completed work and historical context
+├── .github/workflows/            Pages validation and deployment workflow
+├── files/                       local maintenance scripts and backups
 ├── .claude/skills/run-seyma/    data-safe VM verification harnesses
 ├── AGENTS.md / CLAUDE.md        operational and engineering guidance
 └── README.md                   product, architecture and verification entrypoint
@@ -1229,8 +1296,12 @@ Before changing anything:
 4. For reminders, read [`docs/reminders/README.md`](docs/reminders/README.md)
    and its approval gate before any release action.
 5. Inspect `git status --short --branch`; preserve existing user changes.
-6. Use synthetic headless evidence. Never open the Şeyma app in a browser to
-   “check whether it runs.”
+6. Use synthetic headless evidence. Never open the Şeyma app generically in a
+   browser to “check whether it runs.” For an explicitly requested screenshot,
+   use only the port-9000 disposable-profile path after checking the Guard 1
+   contract; see [`tests/app/test_local_visual_qa_guard.js`](tests/app/test_local_visual_qa_guard.js).
+7. If a core module or load order changes, update all four boot lists described
+   in [Module and load-order contract](#module-and-load-order-contract).
 
 When a change touches persisted state, extend `migrate()` additively, preserve
 unknown fields, decide the sync/projection class explicitly and add fixtures for

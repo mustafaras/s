@@ -1018,9 +1018,10 @@ function cycleHTML(){
     {id:'corba-kasigi',label:'çorba kaşığı'},{id:'tatli-kasigi',label:'tatlı kaşığı'},
     {id:'cay-kasigi',label:'çay kaşığı'},{id:'bardak',label:'bardak'},
     {id:'su-bardagi',label:'su bardağı'},{id:'cay-bardagi',label:'çay bardağı'},
-    {id:'avuc',label:'avuç'},{id:'dilim',label:'dilim'},{id:'paket',label:'paket'}
+    {id:'avuc',label:'avuç'},{id:'dilim',label:'dilim'},
+    {id:'kare',label:'kare'},{id:'catal',label:'çatal'},{id:'paket',label:'paket'}
   ];
-  var DEFAULT_UNIT_GRAMS={porsiyon:150,tabak:200,kase:200,kasik:15,'corba-kasigi':15,'tatli-kasigi':5,'cay-kasigi':3,bardak:200,'su-bardagi':200,'cay-bardagi':100,avuc:30,dilim:30,paket:25};
+  var DEFAULT_UNIT_GRAMS={porsiyon:150,tabak:200,kase:200,kasik:15,'corba-kasigi':15,'tatli-kasigi':5,'cay-kasigi':3,bardak:200,'su-bardagi':200,'cay-bardagi':100,avuc:30,dilim:30,kare:30,catal:15,paket:25};
   var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, VACATION_WATER_GOAL=10, STEP_TICK_MIN=4500, SLEEP_TICK_MIN=7.5, STEP_LEN_M=0.72;
   function foodLookup(name){
     var n=String(name||'').toLowerCase().trim(); if(!n) return null;

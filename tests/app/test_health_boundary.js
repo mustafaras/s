@@ -105,6 +105,15 @@ const deps = {
   readingStats,
   num(value) { return value === null || value === undefined || value === '' ? null : Number(value); },
   windDownSteps: () => [{}, {}, {}, {}],
+  // Görünüm katmanı stub'ları (saf; DOM/storage/timer/ağ yok). Beslenme kartının
+  // ölçü menüsünü üretim gövdesiyle render edip kare/çatal seçeneklerini
+  // doğrulayabilmek için.
+  cardOpen: () => true,
+  collapsibleCardHTML: (o) => `<div data-cardkey="${o.key}" data-open="1">${o.body || ''}</div>`,
+  emptyMealItems: () => ({ breakfast: [], lunch: [], dinner: [], snack: [] }),
+  meals: () => [{ key: 'breakfast', label: 'Kahvaltı', icon: '', ph: 'örn. yumurta' }],
+  icon: () => '',
+  esc(value) { return String(value === null || value === undefined ? '' : value); },
 };
 ok('dependency bag registers once', health && health.registerHealth(deps) === true);
 ok('duplicate registration is rejected', health && health.registerHealth(deps) === false);
@@ -146,6 +155,19 @@ ok('nutrition known item vector is equivalent', egg.grams === 100 && egg.protein
 ok('nutrition fallback vector is equivalent', unknown.known === false && unknown.protein === 7 && unknown.carbs === 18 && unknown.fat === 5 && unknown.calories === 145);
 ok('nutrition daily rounding/item count is equivalent', JSON.stringify(nutrition) === JSON.stringify({ protein: 30, carbs: 29, fat: 23, calories: 440, items: 3 }));
 ok('meal unit labels remain unchanged', health.unitLabel('kasik') === 'kaşık' && health.unitLabel('missing') === 'missing');
+
+const kareUnit = health.MEAL_UNITS.filter((u) => u.id === 'kare')[0];
+const catalUnit = health.MEAL_UNITS.filter((u) => u.id === 'catal')[0];
+ok('kare/çatal are selectable meal units with their own labels', !!kareUnit && kareUnit.label === 'kare' && !!catalUnit && catalUnit.label === 'çatal' && health.unitLabel('kare') === 'kare' && health.unitLabel('catal') === 'çatal');
+ok('kare/çatal resolve grams for a known and an unknown food', health.mealItemNutr({ name: 'çikolata', unit: 'kare', qty: 1 }).grams === 10 && health.mealItemNutr({ name: 'bilinmeyen yiyecek', unit: 'kare', qty: 1 }).grams === health.DEFAULT_UNIT_GRAMS.kare && health.mealItemNutr({ name: 'bilinmeyen yiyecek', unit: 'catal', qty: 1 }).grams === health.DEFAULT_UNIT_GRAMS.catal);
+ok('kare/çatal fallbacks stay well below the plate fallback', health.DEFAULT_UNIT_GRAMS.kare < health.FOOD_FALLBACK.plate && health.DEFAULT_UNIT_GRAMS.catal < health.FOOD_FALLBACK.plate);
+
+const mealCard = health.beslenmeCardHTML({ mealItems: { breakfast: [{ name: 'çikolata', qty: 1, unit: 'kare' }], lunch: [], dinner: [], snack: [] } });
+const orderIdx = ['dilim', 'kare', 'catal', 'paket'].map((id) => mealCard.indexOf(`<option value="${id}"`));
+ok('Beslenme ölçü menüsü kare ve çatalı dilim ile paket arasında render eder',
+  orderIdx.every((i) => i >= 0) && orderIdx.every((i, n) => n === 0 || orderIdx[n - 1] < i));
+ok('çatal seçeneği etiketiyle render edilir', mealCard.includes('<option value="catal">çatal</option>'));
+ok('kaydedilmiş kare ölçüsü menüde seçili gelir', mealCard.includes('<option value="kare" selected>kare</option>'));
 
 const age = health.calcAge('1990-01-01');
 const targets = health.calcTargets();

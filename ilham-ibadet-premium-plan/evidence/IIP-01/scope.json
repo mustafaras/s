@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-01",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-01/scope.md",
+  "verifiedHead": "e794e7bcc637b2431dcfae29f645ef1b02a2b51c",
+  "diffHash": "457d12a18553e03e5b174f158257aa84524d514f144a164e2db5bbc59dcc5818",
+  "createdAt": "2026-09-19T14:43:09Z",
+  "requirements": [],
+  "commands": [
+    {"command": "git -c core.fsmonitor=false status --short --branch", "exitCode": 0},
+    {"command": "git -c core.fsmonitor=false diff --check", "exitCode": 0}
+  ],
+  "limitations": "Plan evidence only; production and test allowlists are empty.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "cc5e8392803838a7707fd0a48fe639b4b6b27ad2d9e6ff927a56d59b18ca78d4",
+  "details": {
+    "changedFiles": [
+      "ilham-ibadet-premium-plan/evidence/IIP-01/inventory.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/baseline.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/u-baseline.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/scope.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/requirements.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/commands.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/scope.json",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/requirements.json",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/review.json",
+      "ilham-ibadet-premium-plan/evidence/IIP-01/HANDOFF.md",
+      "ilham-ibadet-premium-plan/IIP-STATE.json",
+      "ilham-ibadet-premium-plan/tracking/LEDGER.jsonl",
+      "ilham-ibadet-premium-plan/tracking/CURRENT-STATE.md"
+    ],
+    "scopeReviewedBy": "Codex / integrator"
+  }
+}

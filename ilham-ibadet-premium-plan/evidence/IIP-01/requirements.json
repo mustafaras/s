@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-01",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-01/requirements.md",
+  "verifiedHead": "e794e7bcc637b2431dcfae29f645ef1b02a2b51c",
+  "diffHash": "457d12a18553e03e5b174f158257aa84524d514f144a164e2db5bbc59dcc5818",
+  "createdAt": "2026-09-19T14:43:09Z",
+  "requirements": ["REQ-001", "REQ-002"],
+  "commands": [
+    {"command": "node .claude/skills/run-seyma/zikr-harness.mjs", "exitCode": 0},
+    {"command": "node tests/reminders/run-reminder-smoke.mjs", "exitCode": 0},
+    {"command": "node tests/panel/test_faz11_panel.js", "exitCode": 0}
+  ],
+  "limitations": "Source/synthetic baseline; U01-U08 device and human task evidence remains pending.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "e6340efcc6b87002eb9f9f849bbbf29946174cba563db9ab1571d2192a0b9ee0",
+  "details": {
+    "results": [
+      {"requirementId": "REQ-001", "testId": "TC-001", "result": "pass"},
+      {"requirementId": "REQ-002", "testId": "TC-002", "result": "pass"}
+    ]
+  }
+}

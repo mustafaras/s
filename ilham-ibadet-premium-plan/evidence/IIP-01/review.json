@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-01",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-01/review.md",
+  "verifiedHead": "e794e7bcc637b2431dcfae29f645ef1b02a2b51c",
+  "diffHash": "457d12a18553e03e5b174f158257aa84524d514f144a164e2db5bbc59dcc5818",
+  "createdAt": "2026-09-19T14:43:09Z",
+  "requirements": ["REQ-001", "REQ-002"],
+  "commands": [
+    {"command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs", "exitCode": 0},
+    {"command": "git -c core.fsmonitor=false diff --check", "exitCode": 0}
+  ],
+  "limitations": "Review closes only the IIP-01 source/synthetic baseline; it does not close device or release acceptance.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "a66925d7f75f6047366f11bd92d8c3ba536b5f703ba0ba6982bd63834ffc31f5",
+  "details": {
+    "findings": [
+      {"severity": "medium", "finding": "U02 search/filter entrypoint is absent in the current baseline; IIP-10 owns it."},
+      {"severity": "medium", "finding": "U07 report copy/denominator semantic risk remains recorded for IIP-03/14/15."}
+    ],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "Codex / integrator"
+  }
+}

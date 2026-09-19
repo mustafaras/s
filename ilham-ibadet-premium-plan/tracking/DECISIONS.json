@@ -1,0 +1,56 @@
+[
+  {
+    "id": "DEC-01",
+    "title": "Sıcak kütüphane tasarım yönü",
+    "ownerCard": "IIP-02",
+    "status": "proposed",
+    "source": null,
+    "evidence": null,
+    "reviewer": null
+  },
+  {
+    "id": "DEC-02",
+    "title": "Beş bölüm hedef mimarisi",
+    "ownerCard": "IIP-09",
+    "status": "proposed",
+    "source": null,
+    "evidence": null,
+    "reviewer": null
+  },
+  {
+    "id": "DEC-03",
+    "title": "Tarihsel kayıt ve payda politikası",
+    "ownerCard": "IIP-03",
+    "status": "proposed",
+    "source": null,
+    "evidence": null,
+    "reviewer": null
+  },
+  {
+    "id": "DEC-04",
+    "title": "İçerik pilotu kaynak/hak/inceleme",
+    "ownerCard": "IIP-16",
+    "status": "proposed",
+    "source": null,
+    "evidence": null,
+    "reviewer": null
+  },
+  {
+    "id": "DEC-05",
+    "title": "Yeni kalıcı veri ve paylaşım şeması",
+    "ownerCard": "IIP-19",
+    "status": "proposed",
+    "source": null,
+    "evidence": null,
+    "reviewer": null
+  },
+  {
+    "id": "DEC-06",
+    "title": "Offline genel içerik kapsamı",
+    "ownerCard": "IIP-22",
+    "status": "proposed",
+    "source": null,
+    "evidence": null,
+    "reviewer": null
+  }
+]

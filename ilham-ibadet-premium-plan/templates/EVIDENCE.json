@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-NN",
+  "gate": "source",
+  "status": "pending",
+  "artifact": "evidence/IIP-NN/source.log",
+  "verifiedHead": null,
+  "diffHash": null,
+  "createdAt": null,
+  "requirements": [],
+  "commands": [
+    {
+      "command": "",
+      "exitCode": null
+    }
+  ],
+  "limitations": "Bu bir şablondur, kanıt değildir.",
+  "reviewer": null,
+  "artifactSha256": null,
+  "details": {}
+}

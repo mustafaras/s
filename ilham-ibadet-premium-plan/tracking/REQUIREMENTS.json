@@ -1,0 +1,482 @@
+[
+  {
+    "id": "REQ-001",
+    "tag": "ENV",
+    "title": "Tüm mevcut girişlerin envanteri",
+    "ownerCard": "IIP-01",
+    "priority": "P1",
+    "acceptance": "Bugün, beş iç sekme, overlay ve reminder girişlerinin her biri sahip fonksiyon/DOM/veri/test satırına bağlı.",
+    "testId": "TC-001",
+    "negativeCase": "Kaynakta bir giriş eksik bırakıldığında envanter incelemesi başarısız sayılır."
+  },
+  {
+    "id": "REQ-002",
+    "tag": "PIN",
+    "title": "Değişmezlerin ölçülmesi",
+    "ownerCard": "IIP-01",
+    "priority": "P1",
+    "acceptance": "App isim/imza, çağrı grafiği, data rebind, shell ve yükleme listesi baseline olarak kaydedilir.",
+    "testId": "TC-002",
+    "negativeCase": "Değişmiş handler veya eksik script-list girişi dar fixture tarafından yakalanır."
+  },
+  {
+    "id": "REQ-003",
+    "tag": "ART",
+    "title": "Özgün görsel yön",
+    "ownerCard": "IIP-02",
+    "priority": "P1",
+    "acceptance": "12 ekranın ana varyantları; ışık/koyu ve büyük yazı için görsel referans üretilecek.",
+    "testId": "TC-003",
+    "negativeCase": "Sadece güzel hero olup hata/okuyucu/kayıt ekranı tasarlanmamışsa kabul yok."
+  },
+  {
+    "id": "REQ-004",
+    "tag": "TOKEN",
+    "title": "Bileşen/token eşlemesi",
+    "ownerCard": "IIP-02",
+    "priority": "P1",
+    "acceptance": "Her bileşenin renk/font/boşluk/radius/hareket rolü mevcut tokena veya gerekçeli öneriye bağlı.",
+    "testId": "TC-004",
+    "negativeCase": "Hardcoded renk, değişik ikon dili ve ölçülmemiş kontrast listede açık kalır."
+  },
+  {
+    "id": "REQ-005",
+    "tag": "SEM",
+    "title": "Zaman ve kayıt anlamı",
+    "ownerCard": "IIP-03",
+    "priority": "P0",
+    "acceptance": "fajr/sunrise dahil altı alanın tarihsel UI, API ve panel anlamı belgelenir.",
+    "testId": "TC-005",
+    "negativeCase": "Sunrise eski kaydı belirsizse beş vakte otomatik dönüştürülmez."
+  },
+  {
+    "id": "REQ-006",
+    "tag": "DEN",
+    "title": "Payda belirsizliği",
+    "ownerCard": "IIP-03",
+    "priority": "P0",
+    "acceptance": "Nesne varlığı gerçek kayıt sayılmaz; bilinmeyen gün, sıfır ve zaman kapsamı ayrı tanımlanır.",
+    "testId": "TC-006",
+    "negativeCase": "Migration ile oluşmuş boş prayer nesnesi bilinçli sıfır diye raporlanmaz."
+  },
+  {
+    "id": "REQ-007",
+    "tag": "HIER",
+    "title": "Hiyerarşi ve erişim",
+    "ownerCard": "IIP-04",
+    "priority": "P1",
+    "acceptance": "Mevcut sıra korunarak araçlar kompakt, seçili içerik belirgin; her kontrol görünür.",
+    "testId": "TC-007",
+    "negativeCase": "320 px ve yüzde 200 metinde başlık/eylem kesilmez."
+  },
+  {
+    "id": "REQ-008",
+    "tag": "NAV",
+    "title": "Navigasyon semantiği",
+    "ownerCard": "IIP-04",
+    "priority": "P1",
+    "acceptance": "Seçili bölüm metin ve semantikle belirtilir; klavye/odak mevcut davranışı korur.",
+    "testId": "TC-008",
+    "negativeCase": "Sadece altın renkli seçim veya odak görünmezliği kabul edilmez."
+  },
+  {
+    "id": "REQ-009",
+    "tag": "READ",
+    "title": "Okuma yüzeyi",
+    "ownerCard": "IIP-05",
+    "priority": "P1",
+    "acceptance": "Metin 45–75 karakter hedefinde; paragraf, alıntı ve kaynak görsel olarak ayrılır.",
+    "testId": "TC-009",
+    "negativeCase": "Uzun Türkçe başlık, portresiz kişi ve uzun kaynak footer ile kesilme yok."
+  },
+  {
+    "id": "REQ-010",
+    "tag": "CTA",
+    "title": "Okudum eylemi",
+    "ownerCard": "IIP-05",
+    "priority": "P1",
+    "acceptance": "Sabit eylem safe-area alanında son paragrafı örtmez; kilit nedeni görünür.",
+    "testId": "TC-010",
+    "negativeCase": "Yükleniyor/uzun içerik/okundu durumunda düğmenin işlevi mevcut kontratla aynı."
+  },
+  {
+    "id": "REQ-011",
+    "tag": "PRUI",
+    "title": "Vakit kayıt sunumu",
+    "ownerCard": "IIP-06",
+    "priority": "P1",
+    "acceptance": "Saat, kaynak, kayıt durumu, ayrıntı birbirine karışmaz; altı eski alan erişilir.",
+    "testId": "TC-011",
+    "negativeCase": "Büyük yazıda saat ve kayıt kontrolü üst üste binmez."
+  },
+  {
+    "id": "REQ-012",
+    "tag": "QIB",
+    "title": "Kıble güveni",
+    "ownerCard": "IIP-06",
+    "priority": "P1",
+    "acceptance": "Hesaplanan yön, cihaz yönü, hassasiyet ve sensör reddi ayrı okunur.",
+    "testId": "TC-012",
+    "negativeCase": "Sensör yokken sahte canlı ibre gösterilmez; var olan hesap korunur."
+  },
+  {
+    "id": "REQ-013",
+    "tag": "ZCONT",
+    "title": "Zikir kesintisizliği",
+    "ownerCard": "IIP-07",
+    "priority": "P1",
+    "acceptance": "Mevcut sayaç, hatim, manuel giriş, geri alma ve notlar aynı davranışla korunur.",
+    "testId": "TC-013",
+    "negativeCase": "100 hızlı giriş, arka plan render ve hatim sınırı testi kayıpsız geçer."
+  },
+  {
+    "id": "REQ-014",
+    "tag": "QCONT",
+    "title": "Kur’an kesintisizliği",
+    "ownerCard": "IIP-07",
+    "priority": "P1",
+    "acceptance": "Sûre durumu, video ve notlar görsel iyileştirme sırasında korunur.",
+    "testId": "TC-014",
+    "negativeCase": "Not caret ve video düğümü arka plan güncellemesinde yeniden kurulmaz."
+  },
+  {
+    "id": "REQ-015",
+    "tag": "APASS",
+    "title": "A paketi işlev kabulü",
+    "ownerCard": "IIP-08",
+    "priority": "P1",
+    "acceptance": "İlgili dar testler, VM, syntax, bütçe ve diff kanıtı dosyalanır.",
+    "testId": "TC-015",
+    "negativeCase": "Bir FAIL varken A kabulü kapanmaz; fixture pinleri gerekçesiz güncellenmez."
+  },
+  {
+    "id": "REQ-016",
+    "tag": "AVIS",
+    "title": "A paketi görsel kabulü",
+    "ownerCard": "IIP-08",
+    "priority": "P1",
+    "acceptance": "Planlanan ekran matrisi gerçek render üzerinde incelenir; cihaz kanıtı ayrı tutulur.",
+    "testId": "TC-016",
+    "negativeCase": "VM PASS ekran görüntüsü veya cihaz kabulü diye etiketlenmez."
+  },
+  {
+    "id": "REQ-017",
+    "tag": "IA",
+    "title": "Beş bölüm hedef mimarisi",
+    "ownerCard": "IIP-09",
+    "priority": "P1",
+    "acceptance": "Bugün/İlham/İbadet/Zikir/Ritim; Kur’an ve kıble hedefleri en çok iki dokunuş.",
+    "testId": "TC-017",
+    "negativeCase": "Eski deep-link ve dönüş bağlamı aynı hedefe gider; hiçbir işlev kaybolmaz."
+  },
+  {
+    "id": "REQ-018",
+    "tag": "RETURN",
+    "title": "Geri dönüş bağlamı",
+    "ownerCard": "IIP-09",
+    "priority": "P1",
+    "acceptance": "Modal kapanınca açan kontrol, seçili sekme ve scroll korunur.",
+    "testId": "TC-018",
+    "negativeCase": "Hızlı aç/kapa ve tarayıcı geri hareketi çift modal veya boş kabuk üretmez."
+  },
+  {
+    "id": "REQ-019",
+    "tag": "SEARCH",
+    "title": "Öncü keşfi",
+    "ownerCard": "IIP-10",
+    "priority": "P1",
+    "acceptance": "100 kişi isim/alan/okundu ile aranır; Türkçe normalizasyon yalnız arama indeksine uygulanır.",
+    "testId": "TC-019",
+    "negativeCase": "I/İ/ı/i, boş sorgu, birden fazla filtre ve sıfır sonuç geçer."
+  },
+  {
+    "id": "REQ-020",
+    "tag": "COLL",
+    "title": "Koleksiyon ergonomisi",
+    "ownerCard": "IIP-10",
+    "priority": "P1",
+    "acceptance": "İsimli liste birincil; grid ikincil özet; bütün kişiler eşdeğer erişilebilir.",
+    "testId": "TC-020",
+    "negativeCase": "Koleksiyon klavyeyle 100 anlamsız numara zincirine mahkûm etmez."
+  },
+  {
+    "id": "REQ-021",
+    "tag": "RAA",
+    "title": "Okuyucu kontrolü",
+    "ownerCard": "IIP-11",
+    "priority": "P1",
+    "acceptance": "Oturumluk Aa, bölüm atlama ve konum koruma; varsayılana dönme var.",
+    "testId": "TC-021",
+    "negativeCase": "Büyütme sırasında metin ankrajı kaybolmaz; RTL ayrı dil yönü taşır."
+  },
+  {
+    "id": "REQ-022",
+    "tag": "RACK",
+    "title": "Okuma beyanı",
+    "ownerCard": "IIP-11",
+    "priority": "P1",
+    "acceptance": "Mevcut gate A’da korunur; B’de erişilebilir alternatif açık ürün kararıyla eklenir.",
+    "testId": "TC-022",
+    "negativeCase": "Kaydırma/ekran okuyucu erişimi otomatik okudum kaydı oluşturmaz."
+  },
+  {
+    "id": "REQ-023",
+    "tag": "FOCUS",
+    "title": "Günün kürasyonu",
+    "ownerCard": "IIP-12",
+    "priority": "P1",
+    "acceptance": "Tek odak önerisi kaynak/süre ve seçim gerekçesiyle; deterministik seçilir.",
+    "testId": "TC-023",
+    "negativeCase": "Aynı gün yeniden render öneriyi rastgele değiştirmez; içerik yoksa dürüst boş hâl."
+  },
+  {
+    "id": "REQ-024",
+    "tag": "RESUME",
+    "title": "Devam etme",
+    "ownerCard": "IIP-12",
+    "priority": "P1",
+    "acceptance": "Yalnız mevcut geçerli aktif zikir/Kur’an kaydı; yeni state kopyası yok.",
+    "testId": "TC-024",
+    "negativeCase": "Boş/bozuk/arşivlenmiş kayda giden Devam düğmesi oluşmaz."
+  },
+  {
+    "id": "REQ-025",
+    "tag": "FRESH",
+    "title": "Vakit tazeliği",
+    "ownerCard": "IIP-13",
+    "priority": "P1",
+    "acceptance": "Tarih/şehir/yöntem eşleşmeyen cache açıkça eski olarak gösterilir.",
+    "testId": "TC-025",
+    "negativeCase": "Gece yarısı, şehir değişimi, timeout ve yöntem değişimi sahte güncel saat üretmez."
+  },
+  {
+    "id": "REQ-026",
+    "tag": "TZ",
+    "title": "Saat dilimi sınırı",
+    "ownerCard": "IIP-13",
+    "priority": "P1",
+    "acceptance": "Türkiye kapsamı açık; seyahat için otomatik destek iddiası yok.",
+    "testId": "TC-026",
+    "negativeCase": "GPS yurtdışında olsa bile Istanbul saati yerel saat diye sunulmaz."
+  },
+  {
+    "id": "REQ-027",
+    "tag": "LEGACY",
+    "title": "Kayıpsız eski kayıt",
+    "ownerCard": "IIP-14",
+    "priority": "P0",
+    "acceptance": "B’de yalnız sunum adaptörü; eski sunrise kayıtları ayrı tarihsel kayıt olarak kalır.",
+    "testId": "TC-027",
+    "negativeCase": "Girdi JSON önce/sonra aynı; belirsiz kayıttan yeni ibadet sınıfı türetilmez."
+  },
+  {
+    "id": "REQ-028",
+    "tag": "RECORD",
+    "title": "Kayıt eylemi doğruluğu",
+    "ownerCard": "IIP-14",
+    "priority": "P0",
+    "acceptance": "Mevcut kaydet/düzelt eylemleri tek kez uygulanır; yeni namaz şeması program dışı ayrı ADR/backlog konusudur.",
+    "testId": "TC-028",
+    "negativeCase": "Çift tıklama, cancel ve geçmiş gün düzenleme kayıt çoğaltmaz."
+  },
+  {
+    "id": "REQ-029",
+    "tag": "RHYTHM",
+    "title": "Dürüst rapor",
+    "ownerCard": "IIP-15",
+    "priority": "P1",
+    "acceptance": "Vakit/zikir/okuma ayrı toplam; anlamsız birleşik skor veya belirsiz yüzde yok.",
+    "testId": "TC-029",
+    "negativeCase": "Gün yok, yalnız not, artık yıl ve eski kayıt örneği bağımsız hesapla aynı."
+  },
+  {
+    "id": "REQ-030",
+    "tag": "PARITY",
+    "title": "Panel eşliği",
+    "ownerCard": "IIP-15",
+    "priority": "P1",
+    "acceptance": "Current-panel ile uygulama aynı kayıt tanımını kullanır; Panel-v2 ayrı regresyon.",
+    "testId": "TC-030",
+    "negativeCase": "Eski veri ve karma kayıtlar iki yüzeyde anlam değiştirmez."
+  },
+  {
+    "id": "REQ-031",
+    "tag": "EDITOR",
+    "title": "Editoryal pilot",
+    "ownerCard": "IIP-16",
+    "priority": "P1",
+    "acceptance": "10 öncü/12 dua/6 tema için kaynak, hak, bağlam ve insan incelemesi dosyalanır.",
+    "testId": "TC-031",
+    "negativeCase": "İncelenmemiş metin published durumuna geçmez; uydurma alıntı reddedilir."
+  },
+  {
+    "id": "REQ-032",
+    "tag": "CONTENTID",
+    "title": "İçerik yaşam döngüsü",
+    "ownerCard": "IIP-16",
+    "priority": "P1",
+    "acceptance": "Kararlı id/sürüm, tür, lisans, düzeltme ve geri çekme kuralları vardır.",
+    "testId": "TC-032",
+    "negativeCase": "Kaynak geri çekilse geçmiş okuma kaydı silinmez; frozen katalog sessiz değişmez."
+  },
+  {
+    "id": "REQ-033",
+    "tag": "DUA",
+    "title": "Dua ve tema okuyucusu",
+    "ownerCard": "IIP-17",
+    "priority": "P1",
+    "acceptance": "Arapça/okunuş/meal/yorum ayrılır; kaynak bir eylemle açılır.",
+    "testId": "TC-033",
+    "negativeCase": "Hareke, RTL, font yok, yüklenemeyen içerik ve uzun referans geçer."
+  },
+  {
+    "id": "REQ-034",
+    "tag": "DEPTH",
+    "title": "Derinleşme bağlantısı",
+    "ownerCard": "IIP-17",
+    "priority": "P1",
+    "acceptance": "İçerik türleri birbiriyle karıştırılmadan tematik bağlantıyla sunulur.",
+    "testId": "TC-034",
+    "negativeCase": "Editoryal tefekkür dinî metinmiş gibi aynı blokta görünmez."
+  },
+  {
+    "id": "REQ-035",
+    "tag": "BPASS",
+    "title": "B paket kabulü",
+    "ownerCard": "IIP-18",
+    "priority": "P1",
+    "acceptance": "Akış, rapor, kaynak ve panel kanıtı birlikte incelenir.",
+    "testId": "TC-035",
+    "negativeCase": "14–19 arasında koşullu bağımlılık döngüsü veya gizli migration bulunmaz."
+  },
+  {
+    "id": "REQ-036",
+    "tag": "BTRUST",
+    "title": "İçerik yayın güveni",
+    "ownerCard": "IIP-18",
+    "priority": "P1",
+    "acceptance": "Pilot lisans/uzman incelemesi ve erişilebilirliği tamamlanmadan ürün yayını yok.",
+    "testId": "TC-036",
+    "negativeCase": "Taslak içerik üretimi yayın onayı diye işaretlenmez."
+  },
+  {
+    "id": "REQ-037",
+    "tag": "SCHEMA",
+    "title": "Kalıcı veri tasarımı",
+    "ownerCard": "IIP-19",
+    "priority": "P0",
+    "acceptance": "Yeni alanlar için kimlik/sürüm/tombstone/merge/eski istemci/rollback tanımlı.",
+    "testId": "TC-037",
+    "negativeCase": "Aynı içerik için çift depo ve tarihsel veri kaybı tasarım incelemesinde engellenir."
+  },
+  {
+    "id": "REQ-038",
+    "tag": "PRIVACY",
+    "title": "Paylaşım sınırı",
+    "ownerCard": "IIP-19",
+    "priority": "P0",
+    "acceptance": "Yeni her alan için cihaz/data/panel/snapshot matrisi ve kullanıcı kararı var.",
+    "testId": "TC-038",
+    "negativeCase": "Özel not ya da tercih otomatik observer snapshot kapsamına eklenmez."
+  },
+  {
+    "id": "REQ-039",
+    "tag": "BOOKMARK",
+    "title": "Yer imi kalıcılığı",
+    "ownerCard": "IIP-20",
+    "priority": "P1",
+    "acceptance": "Yer imi ve okuyucu tercihleri tek şemada; silme ve geri dönüş tanımlı.",
+    "testId": "TC-039",
+    "negativeCase": "İki cihaz çatışması, eski istemci ve migration ikinci çalışması test edilir."
+  },
+  {
+    "id": "REQ-040",
+    "tag": "ANCHOR",
+    "title": "Okuma konumu sürümü",
+    "ownerCard": "IIP-20",
+    "priority": "P1",
+    "acceptance": "Konum contentId+revision+blockId ile; sürüm uyuşmazlığında güvenli başa dönüş.",
+    "testId": "TC-040",
+    "negativeCase": "Eski paragraf numarası yeni metinde rastgele konuma atlatmaz."
+  },
+  {
+    "id": "REQ-041",
+    "tag": "JOURNEY",
+    "title": "Yedi günlük pilot",
+    "ownerCard": "IIP-21",
+    "priority": "P1",
+    "acceptance": "Bir program, durdur/devam et, atlanan günde ceza yok; tamamlama açık eylem.",
+    "testId": "TC-041",
+    "negativeCase": "Çift tamamla ve içerik sürüm değişimi ilerlemeyi çoğaltmaz/silmez."
+  },
+  {
+    "id": "REQ-042",
+    "tag": "REVISIT",
+    "title": "Yeniden ziyaret",
+    "ownerCard": "IIP-21",
+    "priority": "P1",
+    "acceptance": "Programın tamamlanması yeniden okumayı engellemez; içerik arşivi ulaşılır.",
+    "testId": "TC-042",
+    "negativeCase": "Program kapatılınca eski kayıt ve yer imleri korunur."
+  },
+  {
+    "id": "REQ-043",
+    "tag": "OFFLINE",
+    "title": "Genel offline paket",
+    "ownerCard": "IIP-22",
+    "priority": "P0",
+    "acceptance": "Yalnız onaylı genel içerik; boyut/sürüm/kota/kaldırma ve kurulum durumu açık.",
+    "testId": "TC-043",
+    "negativeCase": "Tokenlı cevap veya kişisel JSON cache manifestine giremez."
+  },
+  {
+    "id": "REQ-044",
+    "tag": "UPDATE",
+    "title": "Güvenli güncelleme",
+    "ownerCard": "IIP-22",
+    "priority": "P0",
+    "acceptance": "Aktif sayaç/not sırasında yeni SW sürümü zorla reload yapmaz.",
+    "testId": "TC-044",
+    "negativeCase": "Kısmi paket, kota hatası ve eski manifestten dönüş kullanımı kilitlemez."
+  },
+  {
+    "id": "REQ-045",
+    "tag": "END2END",
+    "title": "Tam zincir kabul",
+    "ownerCard": "IIP-23",
+    "priority": "P1",
+    "acceptance": "App/current-panel/Panel-v2, state/sync ve görsel kanıt ayrı raporlu.",
+    "testId": "TC-045",
+    "negativeCase": "Önemli bir fonksiyonun yalnız markup varlığıyla geçtiği kabul edilmez."
+  },
+  {
+    "id": "REQ-046",
+    "tag": "DEVICE",
+    "title": "Gerçek cihaz sınırı",
+    "ownerCard": "IIP-23",
+    "priority": "P1",
+    "acceptance": "iPhone Safari/PWA, Android Chrome ve klavye/ekran okuyucu örnekleri kayıtlı.",
+    "testId": "TC-046",
+    "negativeCase": "Ajan VM çıktısı kullanıcı cihazı sonucu diye doldurulmaz."
+  },
+  {
+    "id": "REQ-047",
+    "tag": "RELEASE",
+    "title": "Yayın adayı izlenebilirliği",
+    "ownerCard": "IIP-24",
+    "priority": "P0",
+    "acceptance": "Gereksinim→kart→test→kanıt→revizyon zinciri; bilinen sınırlar ve geri alma hazır.",
+    "testId": "TC-047",
+    "negativeCase": "Eksik kritik kabul, içerik hakkı veya yetki varken yayın hazır denmez."
+  },
+  {
+    "id": "REQ-048",
+    "tag": "GOV",
+    "title": "Ajan takip tutarlılığı",
+    "ownerCard": "IIP-24",
+    "priority": "P1",
+    "acceptance": "Tek state, sahiplik, bağımlılık, kanıt ve ledger aynı teslimde tutarlı.",
+    "testId": "TC-048",
+    "negativeCase": "Sahte done, döngü, eksik kanıt ve çakışan dosya kilidi denetimle yakalanır."
+  }
+]

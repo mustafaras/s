@@ -3,10 +3,10 @@
     "id": "DEC-01",
     "title": "Sıcak kütüphane tasarım yönü",
     "ownerCard": "IIP-02",
-    "status": "proposed",
-    "source": null,
-    "evidence": null,
-    "reviewer": null
+    "status": "approved",
+    "source": "2026-09-20 user message: 02 yi tamamlayalım; IIP-02 için sıcak kütüphane yönünü onaylayan ürün/tasarım kararı.",
+    "evidence": "evidence/IIP-02/decision-approval.md",
+    "reviewer": "User (product/design decision owner; explicit current-turn approval)"
   },
   {
     "id": "DEC-02",

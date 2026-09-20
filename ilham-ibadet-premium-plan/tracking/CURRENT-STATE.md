@@ -2,7 +2,7 @@
 
 Kaynak: `IIP-STATE.json`. Elle düzenleme; `node ilham-ibadet-premium-plan/tools/plan-check.mjs --render`.
 
-Plan v2.1 · in_progress · Uygulama 1/24.
+Plan v2.1 · in_progress · Uygulama 2/24.
 
 Yetki: **approved** · Çalıştırılabilir sıradaki: **yok** · Önerilen ilk: IIP-01.
 
@@ -11,7 +11,7 @@ Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
 | Kart | Paket | Durum | Sahip | Önkoşul | Engel |
 |---|---|---|---|---|---|
 | [IIP-01 — Başlangıç ve davranış envanteri](../cards/IIP-01.md) | A | done | codex | — | — |
-| [IIP-02 — Görsel yön ve token eşlemesi](../cards/IIP-02.md) | A | planned | — | IIP-01 | — |
+| [IIP-02 — Görsel yön ve token eşlemesi](../cards/IIP-02.md) | A | done | codex | IIP-01 | — |
 | [IIP-03 — Anlam denetimi ve erken güven düzeltmesi](../cards/IIP-03.md) | A | planned | — | IIP-01 | — |
 | [IIP-04 — Hub görsel hiyerarşisi](../cards/IIP-04.md) | A | planned | — | IIP-02, IIP-03 | — |
 | [IIP-05 — Öncü okuyucusu görsel kalite](../cards/IIP-05.md) | A | planned | — | IIP-04 | — |

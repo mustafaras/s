@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-02",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-02/review.md",
+  "verifiedHead": "03a854475e98c5afd7cadf2ee670425ebb7c62c0",
+  "diffHash": "a396362d945b482f4f7aa7cee3660830061862fb8082daebb5a38d86c7be9277",
+  "createdAt": "2026-09-19T15:06:41Z",
+  "requirements": ["REQ-003", "REQ-004"],
+  "commands": [
+    {"command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs", "exitCode": 0},
+    {"command": "git -c core.fsmonitor=false diff --check", "exitCode": 0}
+  ],
+  "limitations": "Single reviewer; medium design-to-render and decision findings remain open.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "cdb9b06ccb57c9d2494f538db7923d6034de7b09d2e18c20790f35d532ed46b2",
+  "details": {
+    "findings": [
+      {"severity": "medium", "finding": "Prototype is not actual app DOM or device render; actual render card remains required."},
+      {"severity": "medium", "finding": "Existing inline/hardcoded source styles remain because IIP-02 production allowlist is empty."},
+      {"severity": "medium", "finding": "DEC-01 is proposed and lacks reviewer/source evidence; card cannot be done."},
+      {"severity": "low", "finding": "Alpha contrast and independent second review remain for actual render acceptance."}
+    ],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "Codex / integrator"
+  }
+}

@@ -2,15 +2,15 @@
   "schemaVersion": 2,
   "programId": "IIP",
   "planVersion": "2.1",
-  "updatedAt": "2026-09-19",
+  "updatedAt": "2026-09-20",
   "status": "in_progress",
   "planStatus": "in_progress",
   "baselineHead": "e794e7bcc637b2431dcfae29f645ef1b02a2b51c",
   "productionCodeTouched": false,
   "implementationApproval": {
     "status": "approved",
-    "cardIds": ["IIP-01"],
-    "source": "2026-09-19 user message: yalnız IIP-01 uygula; doğrulamaları ve durum/devir kayıtlarını güncelle; commit/push/deploy yapma."
+    "cardIds": ["IIP-01", "IIP-02"],
+    "source": "2026-09-19 user message: yalnız IIP-02 adımını uygula; REQ/TC ve gate'leri tamamla; sonraki adıma geçme; commit/push/deploy yapma."
   },
   "releaseApproval": {
     "status": "approved",
@@ -23,7 +23,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 1,
+  "completedCards": 2,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -79,13 +79,13 @@
       "id": "IIP-02",
       "title": "Görsel yön ve token eşlemesi",
       "package": "A",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-01"
       ],
       "path": "cards/IIP-02.md",
       "role": "design",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [],
       "requirements": [
@@ -98,19 +98,24 @@
         "review",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-02/scope.json",
+        "evidence/IIP-02/requirements.json",
+        "evidence/IIP-02/review.json",
+        "evidence/IIP-02/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-19T15:06:41Z",
+      "completedAt": "2026-09-20T10:10:23Z",
+      "verifiedHead": "03a854475e98c5afd7cadf2ee670425ebb7c62c0",
+      "handoff": "evidence/IIP-02/HANDOFF.md",
       "fixtureFiles": [],
       "allowedTestFiles": [],
       "decisionIds": [
         "DEC-01"
       ],
       "estimatedSize": "L",
-      "diffHash": null,
+      "diffHash": "a396362d945b482f4f7aa7cee3660830061862fb8082daebb5a38d86c7be9277",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

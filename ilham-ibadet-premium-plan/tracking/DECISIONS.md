@@ -4,7 +4,7 @@ Kaynak: `DECISIONS.json`. Proposed kabul edilmiş demek değildir; approved içi
 
 | ID | Karar | Sahip kart | Durum | Kanıt |
 |---|---|---|---|---|
-| DEC-01 | Sıcak kütüphane tasarım yönü | IIP-02 | proposed | yok |
+| DEC-01 | Sıcak kütüphane tasarım yönü | IIP-02 | approved | [Kanıt](../evidence/IIP-02/decision-approval.md) |
 | DEC-02 | Beş bölüm hedef mimarisi | IIP-09 | proposed | yok |
 | DEC-03 | Tarihsel kayıt ve payda politikası | IIP-03 | proposed | yok |
 | DEC-04 | İçerik pilotu kaynak/hak/inceleme | IIP-16 | proposed | yok |

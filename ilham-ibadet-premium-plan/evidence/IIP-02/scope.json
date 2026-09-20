@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-02",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-02/scope.md",
+  "verifiedHead": "03a854475e98c5afd7cadf2ee670425ebb7c62c0",
+  "diffHash": "a396362d945b482f4f7aa7cee3660830061862fb8082daebb5a38d86c7be9277",
+  "createdAt": "2026-09-19T15:06:41Z",
+  "requirements": [],
+  "commands": [
+    {"command": "git -c core.fsmonitor=false status --short --branch", "exitCode": 0},
+    {"command": "git -c core.fsmonitor=false diff --check", "exitCode": 0}
+  ],
+  "limitations": "Plan artifact scope only; production/test allowlists are empty and DEC-01 remains proposed.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "41c8386834445211188b7301bb0cd8820bebbedb2b13e6d41f9e921b893aa41c",
+  "details": {
+    "changedFiles": [
+      "ilham-ibadet-premium-plan/evidence/IIP-02/source-baseline.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/composition-matrix.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/token-map.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/quality-review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/render-boundary.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/prototype.html",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/commands.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/scope.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/requirements.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/visual.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/HANDOFF.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/scope.json",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/requirements.json",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/review.json",
+      "ilham-ibadet-premium-plan/evidence/IIP-02/visual.json",
+      "ilham-ibadet-premium-plan/IIP-STATE.json",
+      "ilham-ibadet-premium-plan/tracking/LEDGER.jsonl",
+      "ilham-ibadet-premium-plan/tracking/CURRENT-STATE.md",
+      "ilham-ibadet-premium-plan/tracking/TRACEABILITY.md"
+    ],
+    "scopeReviewedBy": "Codex / integrator"
+  }
+}

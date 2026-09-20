@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-02",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-02/requirements.md",
+  "verifiedHead": "03a854475e98c5afd7cadf2ee670425ebb7c62c0",
+  "diffHash": "a396362d945b482f4f7aa7cee3660830061862fb8082daebb5a38d86c7be9277",
+  "createdAt": "2026-09-19T15:06:41Z",
+  "requirements": ["REQ-003", "REQ-004"],
+  "commands": [
+    {"command": "node -e prototype static coverage check", "exitCode": 0},
+    {"command": "node -e token contrast calculation", "exitCode": 0}
+  ],
+  "limitations": "Design artifact acceptance; actual app DOM, device and user task evidence remain open.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "187cbc590f9ebf4bbedb29ba8b7e6d7e4d2b79abacbf50d4f0eafcd56e7011d3",
+  "details": {
+    "results": [
+      {"requirementId": "REQ-003", "testId": "TC-003", "result": "pass"},
+      {"requirementId": "REQ-004", "testId": "TC-004", "result": "pass"}
+    ]
+  }
+}

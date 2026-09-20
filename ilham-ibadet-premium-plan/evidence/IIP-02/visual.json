@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-02",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-02/prototype.html",
+  "verifiedHead": "03a854475e98c5afd7cadf2ee670425ebb7c62c0",
+  "diffHash": "a396362d945b482f4f7aa7cee3660830061862fb8082daebb5a38d86c7be9277",
+  "createdAt": "2026-09-19T15:06:41Z",
+  "requirements": ["REQ-003", "REQ-004"],
+  "commands": [
+    {"command": "node -e prototype static coverage check", "exitCode": 0}
+  ],
+  "limitations": "Prototype visual evidence only; no browser screenshot, real DOM, device or VoiceOver acceptance.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "3eecb970e72577ed642e406d780324e5367c7cfe4665020aac96143006fe1c84",
+  "details": {
+    "themes": ["light", "dark"],
+    "viewports": ["390x844", "1024x900 layout reference", "large-type 200% target"],
+    "syntheticDataset": "SYN-IIP02-01",
+    "artifactKind": "prototype",
+    "observations": "Twelve A/B artboards share one synthetic dataset; reader, record, error, empty, status and offline compositions are included; target uses one primary CTA and token-bound hierarchy."
+  }
+}

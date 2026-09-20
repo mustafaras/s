@@ -2308,3 +2308,24 @@
 #root[data-theme="dark"] .sey-splash-amblem {
   box-shadow: 0 18px 44px color-mix(in srgb, var(--accent, #F2B8A0) 30%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--accent, #F2B8A0) 26%, transparent);
 }
+
+/* IIP-07: ibadet yüzeyleri için ortak geçiş dili. Zikir ve Kur'an kendi
+   teal/altın ve zeytin/altın tonlarını korur; bu katman yalnızca başlık,
+   eylem, durum ve kaynakların aynı ritüel rail'inde buluşmasını sağlar. */
+.iip-07-title{min-width:0}
+.iip-07-title strong,.iip-07-title small{overflow-wrap:anywhere}
+.iip-07-button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.iip-07-source{overflow-wrap:anywhere;text-wrap:pretty}
+.iip-07-state{min-width:0;overflow-wrap:anywhere;text-wrap:pretty}
+.iip-07-state:not(.iip-07-state-remote){border-left:3px solid color-mix(in srgb,currentColor 42%,transparent)}
+.iip-07-state-empty{border-style:dashed}
+.iip-07-state-error{border-color:color-mix(in srgb,currentColor 46%,transparent)}
+.iip-07-state-remote{flex:0 1 auto;line-height:1.25}
+@media(max-width:389px){
+  .quran-v2-header .iip-07-title strong,.quran-v2-header .iip-07-title small{white-space:normal}
+  .quran-v2-remote-status.iip-07-state-remote{max-width:112px}
+  .zikr-v2-header .iip-07-title small{white-space:normal}
+}
+@media(prefers-reduced-motion:reduce){
+  .iip-07-button{scroll-behavior:auto}
+}

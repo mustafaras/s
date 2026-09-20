@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-07",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-07/visual-render.html",
+  "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
+  "diffHash": "db51d9443c532e2abd4a30ac38c995cbfa02a783290c7de3634bdd19b8d29eb4",
+  "createdAt": "2026-09-20T15:59:13Z",
+  "requirements": ["REQ-013", "REQ-014"],
+  "commands": [],
+  "limitations": "Sentetik render artifact’idir; browser screenshot, cihaz ve VoiceOver kabulü değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "d8df9e5082257bb01e68941493f33af98e1dede36200ca0967dcbd65be9d0105",
+  "details": {
+    "themes": ["light", "dark"],
+    "viewports": ["460px mobile fixture", "narrow text-wrap fixture"],
+    "syntheticDataset": "Kişisel veri/token içermeyen sentetik zikir ve Bakara sûre durumları.",
+    "observations": "Başlık, buton, kaynak, checking, boş/kilitli, hata ve dönüş yüzeyleri aynı iip-07 rail diliyle görünür; zikir sayaç ve Kur’an video/not yüzeyleri korunur.",
+    "artifactKind": "render"
+  }
+}

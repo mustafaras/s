@@ -9,8 +9,8 @@
   "productionCodeTouched": true,
   "implementationApproval": {
     "status": "approved",
-    "cardIds": ["IIP-01", "IIP-02", "IIP-03", "IIP-04", "IIP-05", "IIP-06"],
-    "source": "2026-09-20 user message: yalnız IIP-06 adımını uygula; commit/push/deploy yok."
+    "cardIds": ["IIP-01", "IIP-02", "IIP-03", "IIP-04", "IIP-05", "IIP-06", "IIP-07", "IIP-08"],
+    "source": "2026-09-20 user message: go next be perfect push commit merge deploy; yalnız IIP-08 adımı."
   },
   "releaseApproval": {
     "status": "approved",
@@ -23,7 +23,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 6,
+  "completedCards": 8,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -343,13 +343,13 @@
       "id": "IIP-07",
       "title": "Zikir ve Kur’an geçiş tutarlılığı",
       "package": "A",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-04"
       ],
       "path": "cards/IIP-07.md",
       "role": "frontend",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/zikir.js",
@@ -367,16 +367,23 @@
         "source",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-07/scope.json",
+        "evidence/IIP-07/requirements.json",
+        "evidence/IIP-07/review.json",
+        "evidence/IIP-07/source.json",
+        "evidence/IIP-07/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-20T14:05:09Z",
+      "completedAt": "2026-09-20T15:59:13Z",
+      "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
+      "handoff": "evidence/IIP-07/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_zikir_boundary.js",
-        "tests/app/test_quran_boundary.js"
+        "tests/app/test_quran_boundary.js",
+        "tests/app/test_iip_07.js"
       ],
       "allowedTestFiles": [
         "tests/app/test_saygi_boundary.js",
@@ -386,7 +393,7 @@
       ],
       "decisionIds": [],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "db51d9443c532e2abd4a30ac38c995cbfa02a783290c7de3634bdd19b8d29eb4",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false
@@ -395,7 +402,7 @@
       "id": "IIP-08",
       "title": "İlk paket kabulü",
       "package": "A",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-05",
         "IIP-06",
@@ -403,7 +410,7 @@
       ],
       "path": "cards/IIP-08.md",
       "role": "reviewer",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [],
       "requirements": [
@@ -416,12 +423,17 @@
         "review",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-08/scope.json",
+        "evidence/IIP-08/requirements.json",
+        "evidence/IIP-08/review.json",
+        "evidence/IIP-08/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-20T16:12:00Z",
+      "completedAt": "2026-09-20T16:52:16Z",
+      "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
+      "handoff": "evidence/IIP-08/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_prayer_boundary.js",
@@ -438,7 +450,7 @@
       ],
       "decisionIds": [],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "68e0dd8bcea4eb629e81aa655ec8ccc68868e8aff5c63fc463cc200e3a16f1f3",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

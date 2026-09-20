@@ -16,10 +16,10 @@
 | REQ-010 / TC-010 | [IIP-05](../cards/IIP-05.md) | Sabit eylem safe-area alanında son paragrafı örtmez; kilit nedeni görünür. | Yükleniyor/uzun içerik/okundu durumunda düğmenin işlevi mevcut kontratla aynı. | 5 |
 | REQ-011 / TC-011 | [IIP-06](../cards/IIP-06.md) | Saat, kaynak, kayıt durumu, ayrıntı birbirine karışmaz; altı eski alan erişilir. | Büyük yazıda saat ve kayıt kontrolü üst üste binmez. | 5 |
 | REQ-012 / TC-012 | [IIP-06](../cards/IIP-06.md) | Hesaplanan yön, cihaz yönü, hassasiyet ve sensör reddi ayrı okunur. | Sensör yokken sahte canlı ibre gösterilmez; var olan hesap korunur. | 5 |
-| REQ-013 / TC-013 | [IIP-07](../cards/IIP-07.md) | Mevcut sayaç, hatim, manuel giriş, geri alma ve notlar aynı davranışla korunur. | 100 hızlı giriş, arka plan render ve hatim sınırı testi kayıpsız geçer. | 0 |
-| REQ-014 / TC-014 | [IIP-07](../cards/IIP-07.md) | Sûre durumu, video ve notlar görsel iyileştirme sırasında korunur. | Not caret ve video düğümü arka plan güncellemesinde yeniden kurulmaz. | 0 |
-| REQ-015 / TC-015 | [IIP-08](../cards/IIP-08.md) | İlgili dar testler, VM, syntax, bütçe ve diff kanıtı dosyalanır. | Bir FAIL varken A kabulü kapanmaz; fixture pinleri gerekçesiz güncellenmez. | 0 |
-| REQ-016 / TC-016 | [IIP-08](../cards/IIP-08.md) | Planlanan ekran matrisi gerçek render üzerinde incelenir; cihaz kanıtı ayrı tutulur. | VM PASS ekran görüntüsü veya cihaz kabulü diye etiketlenmez. | 0 |
+| REQ-013 / TC-013 | [IIP-07](../cards/IIP-07.md) | Mevcut sayaç, hatim, manuel giriş, geri alma ve notlar aynı davranışla korunur. | 100 hızlı giriş, arka plan render ve hatim sınırı testi kayıpsız geçer. | 5 |
+| REQ-014 / TC-014 | [IIP-07](../cards/IIP-07.md) | Sûre durumu, video ve notlar görsel iyileştirme sırasında korunur. | Not caret ve video düğümü arka plan güncellemesinde yeniden kurulmaz. | 5 |
+| REQ-015 / TC-015 | [IIP-08](../cards/IIP-08.md) | İlgili dar testler, VM, syntax, bütçe ve diff kanıtı dosyalanır. | Bir FAIL varken A kabulü kapanmaz; fixture pinleri gerekçesiz güncellenmez. | 4 |
+| REQ-016 / TC-016 | [IIP-08](../cards/IIP-08.md) | Planlanan ekran matrisi gerçek render üzerinde incelenir; cihaz kanıtı ayrı tutulur. | VM PASS ekran görüntüsü veya cihaz kabulü diye etiketlenmez. | 4 |
 | REQ-017 / TC-017 | [IIP-09](../cards/IIP-09.md) | Bugün/İlham/İbadet/Zikir/Ritim; Kur’an ve kıble hedefleri en çok iki dokunuş. | Eski deep-link ve dönüş bağlamı aynı hedefe gider; hiçbir işlev kaybolmaz. | 0 |
 | REQ-018 / TC-018 | [IIP-09](../cards/IIP-09.md) | Modal kapanınca açan kontrol, seçili sekme ve scroll korunur. | Hızlı aç/kapa ve tarayıcı geri hareketi çift modal veya boş kabuk üretmez. | 0 |
 | REQ-019 / TC-019 | [IIP-10](../cards/IIP-10.md) | 100 kişi isim/alan/okundu ile aranır; Türkçe normalizasyon yalnız arama indeksine uygulanır. | I/İ/ı/i, boş sorgu, birden fazla filtre ve sıfır sonuç geçer. | 0 |

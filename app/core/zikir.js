@@ -630,7 +630,7 @@ function zikrDetailControlsHTML(p){
   var ui=viewUi();
   var content=viewContentFor(p);
   var hasRichContent=!!(content&&(content.importanceTr||content.reflectionTr||content.sourceLabel));
-  var h='<button class="zikr-v2-detail-toggle" onclick="App.toggleZikrDetail()" aria-expanded="'+(!!ui.zikrDetailOpen)+'" aria-controls="zikr-detail-sheet">'+(hasRichContent?(ui.zikrDetailOpen?'Önemi ve tefekkür ▲':'Önemi ve tefekkür ▾'):(ui.zikrDetailOpen?'Anlamı ve önemi ▲':'Anlamı ve önemi ▾'))+'</button>';
+  var h='<button class="zikr-v2-detail-toggle iip-07-button" onclick="App.toggleZikrDetail()" aria-expanded="'+(!!ui.zikrDetailOpen)+'" aria-controls="zikr-detail-sheet">'+(hasRichContent?(ui.zikrDetailOpen?'Önemi ve tefekkür ▲':'Önemi ve tefekkür ▾'):(ui.zikrDetailOpen?'Anlamı ve önemi ▲':'Anlamı ve önemi ▾'))+'</button>';
   if(ui.zikrDetailOpen){
     h+='<div id="zikr-detail-sheet" class="zikr-v2-detail-sheet" role="region" aria-label="'+esc(p.name)+' önemi ve tefekkür">';
     if(hasRichContent){
@@ -638,7 +638,7 @@ function zikrDetailControlsHTML(p){
       if(content.reflectionTr) h+='<p class="reflect">'+esc(content.reflectionTr)+'</p>';
       if(content.verseNoteTr) h+='<p class="verse">'+esc(content.verseNoteTr)+'</p>';
       if(p.kind==='esma') h+='<p class="disclaimer">Ebced², geleneksel ebced hesabına dayalı kişisel bir tamamlama yolculuğudur; dua ve zikrin kabulü için zorunlu bir sayı değildir.</p>';
-      if(content.sourceLabel) h+='<p class="source">Kaynak: '+esc(content.sourceLabel)+'</p>';
+      if(content.sourceLabel) h+='<p class="source iip-07-source">Kaynak: <span>'+esc(content.sourceLabel)+'</span></p>';
     } else h+='Ebced değerleri geleneksel harf hesabıdır; ibadetin kabulü veya dinî bir zorunluluk için bilimsel ölçü değildir. Sayaç yalnızca kişisel takip aracıdır.';
     h+='</div>';
   }
@@ -673,7 +673,7 @@ function zikrNoteEditorHTML(p){
     h+='<label><span>Hislerim</span><small>Bu zikri çekerken kalbinde ve bedeninde ne vardı?</small><textarea maxlength="2000" rows="3" placeholder="Olduğu gibi yazabilirsin…" oninput="App.onZikrNoteField(\'feelings\',this)">'+esc(d.feelings)+'</textarea></label>';
     h+='<label><span>Düşüncelerim</span><small>Zihninden geçen, fark ettiğin ya da anlam verdiğin şeyler.</small><textarea maxlength="3000" rows="4" placeholder="Bugün zihnimde kalan…" oninput="App.onZikrNoteField(\'thoughts\',this)">'+esc(d.thoughts)+'</textarea></label>';
     h+='<label><span>Duam · niyetim</span><small>Yanında taşımak istediğin kısa cümle.</small><textarea maxlength="1000" rows="2" placeholder="Allah’ım…" oninput="App.onZikrNoteField(\'intention\',this)">'+esc(d.intention)+'</textarea></label>';
-    h+='<div class="zikr-v2-note-foot"><span id="zikr-note-count">'+words+' kelime</span><button onclick="App.saveZikrNote()">'+icon('save',15)+(saved?'Notu güncelle':'Günlüğe kaydet')+'</button></div>';
+  h+='<div class="zikr-v2-note-foot"><span id="zikr-note-count">'+words+' kelime</span><button class="iip-07-button" onclick="App.saveZikrNote()">'+icon('save',15)+(saved?'Notu güncelle':'Günlüğe kaydet')+'</button></div>';
     h+='<div id="zikr-note-status" class="zikr-v2-note-status" role="status" aria-live="polite"'+(ui.zikrNoteStatus?'':' hidden')+'>'+esc(ui.zikrNoteStatus)+'</div>';
     h+='</div>';
   } else if(saved){
@@ -737,7 +737,7 @@ function zikrManualSheetHTML(p){
   h+='<div id="zikr-manual-preview">'+zikrManualPreviewHTML(p,d)+'</div>';
   h+='<label class="zikr-v2-manual-note"><span>Nasıl? <em>(isteğe bağlı)</em></span><input type="text" maxlength="200" value="'+esc(d.note||'')+'" oninput="App.onZikrManualNote(this)" placeholder="Tespihle, cemaatle…"></label>';
   if(todayManual>0) h+='<div class="zikr-v2-manual-today">'+icon('feather',13)+' Bugün elle eklenen: <b>'+todayManual.toLocaleString('tr-TR')+'</b></div>';
-  h+='<div class="zikr-v2-manual-actions"><button class="ghost" onclick="App.toggleZikrManual()">Vazgeç</button><button class="primary" onclick="App.saveZikrManual()"'+(amount<=0?' disabled':'')+'>'+icon('check',15)+' Sayıma ekle</button></div>';
+  h+='<div class="zikr-v2-manual-actions"><button class="ghost iip-07-button" onclick="App.toggleZikrManual()">Vazgeç</button><button class="primary iip-07-button" onclick="App.saveZikrManual()"'+(amount<=0?' disabled':'')+'>'+icon('check',15)+' Sayıma ekle</button></div>';
   h+='</section>';
   return h;
 }
@@ -852,7 +852,7 @@ function zikrPresetsResultsHTML(p,z){
     if(!x.builtIn) h+='<button class="remove" onclick="App.deleteZikrPreset(\''+esc(x.id)+'\')" aria-label="'+esc(x.name)+' presetini sil">×</button>';
     h+='</article>';
   });
-  if(!visible.length) h+='<div class="zikr-v2-empty"><strong>Bu mercekte eşleşme yok.</strong><span>Aramayı temizleyebilir veya başka bir niyet konusu seçebilirsin.</span></div>';
+  if(!visible.length) h+='<div class="zikr-v2-empty iip-07-state iip-07-state-empty"><strong>Bu mercekte eşleşme yok.</strong><span>Aramayı temizleyebilir veya başka bir niyet konusu seçebilirsin.</span></div>';
   h+='</div>';
   if(ui.zikrPresetDraft) h+='<div class="zikr-v2-custom"><h3>Kişisel zikir</h3><input value="'+esc(ui.zikrPresetDraft.name||'')+'" oninput="App.onZikrPresetField(\'name\',this)" placeholder="Zikir adı"><input value="'+esc(ui.zikrPresetDraft.target||'100')+'" type="number" min="1" max="1000000" inputmode="numeric" oninput="App.onZikrPresetField(\'target\',this)" placeholder="Tur hedefi"><div><button onclick="App.saveZikrPreset()">Kaydet</button><button class="ghost" onclick="App.cancelZikrPresetAdd()">Vazgeç</button></div></div>';
   else h+='<button class="zikr-v2-add" onclick="App.openZikrPresetAdd()">'+icon('sparkles',15)+' Kişisel zikir oluştur</button>';
@@ -863,7 +863,7 @@ function zikrPresetsViewHTML(p,z){
   var h='<section class="zikr-v2-library"><div class="zikr-v2-section-head"><div><span>ESMÂ KÜTÜPHANESİ</span><h2>İsmi değil, anlamı keşfet</h2><p>99 Esmâ ve temel zikirler; niyet, anlam ve devam eden yolculuklarına göre düzenlendi.</p></div></div>';
   h+='<label class="zikr-v2-search">'+icon('search',16)+'<input id="zikr-search-input" value="'+esc(ui.zikrPresetFilter||'')+'" oninput="App.setZikrPresetFilter(this)" placeholder="İsim, anlam, Arapça veya ebced ara" aria-label="Zikir ara"><button id="zikr-search-clear" class="clear" onclick="App.clearZikrPresetFilter()" aria-label="Aramayı temizle"'+(ui.zikrPresetFilter?'':' hidden')+'>'+icon('x',13)+'</button></label>';
   h+='<div id="zikr-library-results">'+zikrPresetsResultsHTML(p,z)+'</div>';
-  h+='<p class="zikr-v2-disclaimer">Esmâ anlamları sabit editoryal içerikten gelir. Konu grupları keşif içindir; dinî hüküm veya reçeteli sayı önerisi değildir.</p></section>';
+  h+='<p class="zikr-v2-disclaimer iip-07-source">Esmâ anlamları sabit editoryal içerikten gelir. Konu grupları keşif içindir; dinî hüküm veya reçeteli sayı önerisi değildir.</p></section>';
   return h;
 }
 function zikrHatimsViewHTML(p,z){
@@ -878,7 +878,7 @@ function zikrHatimsViewHTML(p,z){
     c+='<div class="hatim-metrics"><div><span>SAYILAN</span><strong>'+m.count.toLocaleString('tr-TR')+'</strong></div><div><span>TUR</span><strong>'+m.completedCycles+' / '+m.baseTarget+'</strong></div><div><span>KALAN</span><strong>'+m.remainingInHatim.toLocaleString('tr-TR')+'</strong></div></div>';
     c+='<div class="progress-head"><span>Ebced² hedef · '+m.hatimTarget.toLocaleString('tr-TR')+'</span><b>%'+(pct<10?pct.toFixed(1).replace('.',','):Math.round(pct))+'</b></div><div class="bar"><i style="width:'+Math.round(pct)+'%"></i></div>';
     c+='<div class="foot"><span>'+m.cyclePosition+' / '+m.baseTarget+' bu tur</span><span>'+zikrInt(j.completedHatims)+' tam hatim</span></div>';
-    c+='<div class="actions"><button class="primary" onclick="App.openZikrHatim(\''+esc(x.id)+'\',\''+esc(h.id)+'\')">'+(done?'Görüntüle':'Devam et')+'</button><button class="remove" onclick="App.requestRemoveZikrHatim(\''+esc(x.id)+'\',\''+esc(h.id)+'\')">'+icon('trash-2',14)+' Kaldır</button></div>';
+    c+='<div class="actions"><button class="primary iip-07-button" onclick="App.openZikrHatim(\''+esc(x.id)+'\',\''+esc(h.id)+'\')">'+(done?'Görüntüle':'Devam et')+'</button><button class="remove iip-07-button" onclick="App.requestRemoveZikrHatim(\''+esc(x.id)+'\',\''+esc(h.id)+'\')">'+icon('trash-2',14)+' Kaldır</button></div>';
     if(armed) c+='<div class="remove-confirm" role="alert"><strong>Bu hatmi listeden kaldır?</strong><span>Ömürlük toplamın korunur; kayıt arşivlenir.</span><div><button onclick="App.cancelRemoveZikrHatim()">Vazgeç</button><button class="danger" onclick="App.confirmRemoveZikrHatim()">Kaldır</button></div></div>';
     c+='</article>';
     return c;
@@ -896,7 +896,7 @@ function zikrHatimsViewHTML(p,z){
     if(ongoing) out+='<div class="zikr-v2-group"><h3>Devam edenler</h3>'+ongoing+'</div>';
     if(archive) out+='<div class="zikr-v2-group"><h3>Arşiv · tamamlananlar</h3>'+archive+'</div>';
   } else {
-    out+='<div class="zikr-v2-empty"><strong>Henüz başlayan bir Esmâ hatmi yok.</strong><span>Kütüphaneden bir isim seçip ilk dokunuşunla başlayabilirsin.</span><button onclick="App.setZikrView(\'presets\')">99 Esmâ’yı aç</button></div>';
+    out+='<div class="zikr-v2-empty iip-07-state iip-07-state-empty"><strong>Henüz başlayan bir Esmâ hatmi yok.</strong><span>Kütüphaneden bir isim seçip ilk dokunuşunla başlayabilirsin.</span><button class="iip-07-button" onclick="App.setZikrView(\'presets\')">99 Esmâ’yı aç</button></div>';
   }
   out+='</section>'; return out;
 }
@@ -922,7 +922,7 @@ function zikrHistoryViewHTML(z){
     if(n.thoughts) h+='<p><b>Düşüncelerim</b>'+esc(n.thoughts)+'</p>';
     if(n.intention) h+='<p class="intention"><b>Duam · niyetim</b>'+esc(n.intention)+'</p>';
     h+='<footer>'+n.wordCount+' kelime · '+esc((n.updatedAt||'').slice(11,16))+'</footer></article>';
-  }); else h+='<div class="zikr-v2-empty"><strong>Henüz tefekkür kaydı yok.</strong><span>Sayaç ekranında ilk notunu yazdığında burada tarih ve zikir adına göre arşivlenecek.</span></div>';
+  }); else h+='<div class="zikr-v2-empty iip-07-state iip-07-state-empty"><strong>Henüz tefekkür kaydı yok.</strong><span>Sayaç ekranında ilk notunu yazdığında burada tarih ve zikir adına göre arşivlenecek.</span></div>';
   h+='</div>';
   // ZP-10: elle sayım defteri — provenance dürüstlüğü. Her kayıt salt-okunur
   // bir olaydır; geri alınanlar (revertedAt) soluk tonla "geri alındı" yazar.
@@ -935,7 +935,7 @@ function zikrHistoryViewHTML(z){
     h+='<footer>'+(done?'Elle eklendi':'Geri alındı · '+esc((e.revertedAt||'').slice(11,16)))+' · '+esc((e.updatedAt||e.createdAt||'').slice(11,16))+'</footer>';
     if(done) h+='<div class="undo-row"><button onclick="App.undoZikrManual(\''+esc(e.id)+'\')">'+icon('rotate-ccw',13)+' Bu kaydı geri al</button></div>';
     h+='</article>';
-  }); else h+='<div class="zikr-v2-empty"><strong>Henüz elle sayım eklenmedi.</strong><span>Sayaçta "Elle ekle" ile tespih ya da cemaat zikirlerini kaydettiğinde defter burada tutulur.</span></div>';
+  }); else h+='<div class="zikr-v2-empty iip-07-state iip-07-state-empty"><strong>Henüz elle sayım eklenmedi.</strong><span>Sayaçta "Elle ekle" ile tespih ya da cemaat zikirlerini kaydettiğinde defter burada tutulur.</span></div>';
   h+='</div>';
   h+='</section>'; return h;
 }
@@ -963,7 +963,7 @@ function zikrSettingsViewHTML(z){
   h+=row('autoAdvance','Otomatik sıradaki zikir','Yalnız normal tur tamamlanınca');
   h+='</div>';
   h+='<div id="zikr-settings-note" class="zikr-v2-settings-note" role="status" aria-live="polite"'+(ui.zikrSettingsNote?'':' hidden')+'>'+(ui.zikrSettingsNote?(icon('circle-check',14)+'<span>'+esc(ui.zikrSettingsNote)+'</span>'):'')+'</div>';
-  h+='<p class="zikr-v2-disclaimer">Ebced², geleneksel ebced hesabına dayalı kişisel bir tamamlama yolculuğudur; dua ve zikrin kabulü için zorunlu bir sayı değildir.</p>';
+  h+='<p class="zikr-v2-disclaimer iip-07-source">Ebced², geleneksel ebced hesabına dayalı kişisel bir tamamlama yolculuğudur; dua ve zikrin kabulü için zorunlu bir sayı değildir.</p>';
   h+='</section>'; return h;
 }
 function zikrViewBodyHTML(view,p,z){

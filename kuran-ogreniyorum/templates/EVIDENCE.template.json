@@ -1,0 +1,15 @@
+{
+  "card": "KAO-NN",
+  "head": "<git rev-parse HEAD>",
+  "diffHash": "<git diff HEAD~1 HEAD | shasum -a 256>",
+  "date": "YYYY-MM-DD",
+  "agent": "<model/oturum>",
+  "checks": [
+    { "cmd": "node --check app/core/quranLearn.js", "exit": 0, "note": "" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "PASS" }
+  ],
+  "requirements": { "R-XX": "met|partial|n/a", "note": "" },
+  "filesTouched": ["..."],
+  "userTaskPending": false,
+  "knownLimits": ["..."]
+}

@@ -1,0 +1,1170 @@
+{
+  "program": "KAO",
+  "title": "Kur'an Arapçası Öğreniyorum",
+  "version": "plan-v4",
+  "plannedAt": "2026-09-20",
+  "baseline": {
+    "commit": "0436405",
+    "branch": "main"
+  },
+  "status": "planned",
+  "releaseApproval": "NOT_APPROVED",
+  "nextCard": "KAO-P00",
+  "userApprovalRequired": true,
+  "invariants": [
+    "no network calls in module; all content packaged under app/content",
+    "single data object: data.quranLearn via ensureQuranLearn in migrate()",
+    "App.kao* handlers + ui.kao* ephemeral state; overlay template + onModalKeydown",
+    "Arabic content only from corpus/Tanzil via tools/kao-lexicon-build.mjs; verified:true per record",
+    "new app/core file added to 4 load lists in one commit (index.html, driver.mjs, zikr-harness.mjs, test_state_rebind_boundary.js)",
+    "no push/merge/tag/deploy/seyma-data write without explicit user approval",
+    "KAO owns only its files; IIP files untouched except one composition line in Dalga 5 (11-BAGIMSIZLIK)",
+    "audio: same-origin read-only clips under assets/kao/audio; microphone recording memory-only, never persisted or synced; no TTS for Quranic Arabic",
+    "12-EK-GEREKSINIMLER R-xx maddeleri bağlayıcıdır; kabul kontrolü geçmeyen kart kapanmaz"
+  ],
+  "decisions": {
+    "D-01": {
+      "q": "QAC (GPL) verisinden türetilmiş sıklık/kök etiketleri + atıf",
+      "status": "open"
+    },
+    "D-02": {
+      "q": "Tanzil metni kesitleri (CC BY 3.0) + âyet referansı + link",
+      "status": "open"
+    },
+    "D-03": {
+      "q": "KAO stili ayrı app/kao.css (IIP ile çakışmasız) mı, styles.css bloğu mu",
+      "status": "open",
+      "recommended": "app/kao.css (IIP sürerken)"
+    },
+    "D-04": {
+      "q": "FSRS saf JS portu, ts-fsrs MIT atıfı",
+      "status": "open"
+    },
+    "D-05": {
+      "q": "Repo LICENSE kararı; lexicon public push öncesi",
+      "status": "open"
+    },
+    "D-06": {
+      "q": "Geçici giriş Ayarlar satırı; kalıcı giriş hub kartı (Dalga 5, IIP koordinasyonu)",
+      "status": "open"
+    },
+    "D-07": {
+      "q": "Seviye 6 (tam Kur'an kelime kelime, ~3 MB) bu programın dışında",
+      "status": "open",
+      "recommended": "dışarıda"
+    },
+    "D-08": {
+      "q": "Ses veri seti köken/lisans doğrulaması (HF zaibihassan Apache 2.0, okuyucu kökeni belirsiz) — yayına girmeden önce",
+      "status": "open"
+    },
+    "D-09": {
+      "q": "Ses klipleri repo içinde (~16 MB, assets/kao/audio) mi, ayrı public depo/CDN mi (yine salt-GET)",
+      "status": "open",
+      "recommended": "repo içinde alt küme; büyürse ayrı depo"
+    },
+    "D-10": {
+      "q": "Gölgeleme için mikrofon: bellek-içi kayıt, izin metni; kullanıcı istemezse özellik tamamen kapalı",
+      "status": "open",
+      "recommended": "açık, varsayılan kapalı ayar"
+    }
+  },
+  "waves": {
+    "1": {
+      "cards": [
+        "KAO-01",
+        "KAO-02",
+        "KAO-03",
+        "KAO-04",
+        "KAO-23",
+        "KAO-24",
+        "KAO-25"
+      ],
+      "status": "pending"
+    },
+    "2": {
+      "cards": [
+        "KAO-05",
+        "KAO-06",
+        "KAO-07",
+        "KAO-08",
+        "KAO-09"
+      ],
+      "status": "pending"
+    },
+    "3": {
+      "cards": [
+        "KAO-10",
+        "KAO-11",
+        "KAO-12",
+        "KAO-13",
+        "KAO-14",
+        "KAO-15",
+        "KAO-16",
+        "KAO-17",
+        "KAO-26",
+        "KAO-27",
+        "KAO-28",
+        "KAO-28b",
+        "KAO-16b"
+      ],
+      "status": "pending"
+    },
+    "4": {
+      "cards": [
+        "KAO-18",
+        "KAO-19",
+        "KAO-20"
+      ],
+      "status": "pending"
+    },
+    "5": {
+      "cards": [
+        "KAO-21"
+      ],
+      "status": "pending",
+      "gate": "IIP hub/nav landed or IIP owner approval"
+    },
+    "6": {
+      "cards": [
+        "KAO-22"
+      ],
+      "status": "pending"
+    }
+  },
+  "cards": {
+    "KAO-01": {
+      "title": "Sözlük derleme aracı (ağsız)",
+      "wave": 1,
+      "files": [
+        "tools/kao-lexicon-build.mjs",
+        "kuran-ogreniyorum/content/README.md",
+        "kuran-ogreniyorum/content/.gitignore",
+        "kuran-ogreniyorum/evidence/KAO-01/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tools/kao-lexicon-build.mjs --self-test",
+        "node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs (girdi yoksa exit 2 ve açık mesaj)"
+      ],
+      "req": [],
+      "deps": [],
+      "status": "pending"
+    },
+    "KAO-02": {
+      "title": "Aday liste, kognat/komşu önerisi, inceleme tablosu",
+      "wave": 1,
+      "files": [
+        "tools/kao-lexicon-build.mjs",
+        "kuran-ogreniyorum/content/lexicon.draft.json",
+        "kuran-ogreniyorum/content/lexicon.review.md",
+        "kuran-ogreniyorum/evidence/KAO-02/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tools/kao-lexicon-build.mjs --draft → lexicon.draft.json (aday≈530, kova A/B/C/D raporu)",
+        "node tools/kao-lexicon-build.mjs --review-md"
+      ],
+      "req": [
+        "R-A5",
+        "R-A8"
+      ],
+      "deps": [
+        "KAO-01"
+      ],
+      "status": "pending"
+    },
+    "KAO-03": {
+      "title": "İnsan doğrulaması (kullanıcı görevi) ve içe alma",
+      "wave": 1,
+      "files": [
+        "kuran-ogreniyorum/content/lexicon.verified.json",
+        "kuran-ogreniyorum/content/lexicon.review.md",
+        "kuran-ogreniyorum/evidence/KAO-03/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tools/kao-lexicon-build.mjs --import-md → verified.json; verifiedBy boş satır = 0"
+      ],
+      "req": [
+        "R-A8"
+      ],
+      "deps": [
+        "KAO-02"
+      ],
+      "userTask": true,
+      "status": "pending"
+    },
+    "KAO-04": {
+      "title": "Gramer içeriği (24 mikro-kavram + G0.5)",
+      "wave": 1,
+      "files": [
+        "kuran-ogreniyorum/content/grammar.draft.json",
+        "kuran-ogreniyorum/content/grammar.verified.json",
+        "kuran-ogreniyorum/content/grammar.review.md",
+        "kuran-ogreniyorum/evidence/KAO-04/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "her kavramda ≥3 alıştırma şablonu; g0_5 mevcut; insan onayı alanları dolu"
+      ],
+      "req": [
+        "R-A7",
+        "R-A8"
+      ],
+      "deps": [
+        "KAO-01"
+      ],
+      "status": "pending"
+    },
+    "KAO-23": {
+      "title": "Fonetik içeriği + mahreç SVG",
+      "wave": 1,
+      "files": [
+        "kuran-ogreniyorum/content/phonics.draft.json",
+        "kuran-ogreniyorum/content/phonics.verified.json",
+        "kuran-ogreniyorum/content/phonics.review.md",
+        "assets/kao/svg/**",
+        "kuran-ogreniyorum/evidence/KAO-23/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "28 harf; her B/C harfinde ≥1 minimal çift; 13 SVG ≤4 KB, fill=currentColor"
+      ],
+      "req": [
+        "R-B6",
+        "R-A9"
+      ],
+      "deps": [
+        "KAO-01"
+      ],
+      "status": "pending"
+    },
+    "KAO-24": {
+      "title": "Ses varlık hattı (alt küme + AAC)",
+      "wave": 1,
+      "files": [
+        "tools/kao-audio-build.mjs",
+        "kuran-ogreniyorum/content/audio-manifest.json",
+        "assets/kao/audio/**",
+        "kuran-ogreniyorum/evidence/KAO-24/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "toplam ≤16 MB; .m4a; manifest klip sayısı = dosya sayısı; köken/lisans kaydı"
+      ],
+      "req": [
+        "R-C2"
+      ],
+      "deps": [
+        "KAO-02",
+        "KAO-23"
+      ],
+      "gate": "D-08 ve D-09 kullanıcı onayı",
+      "status": "pending"
+    },
+    "KAO-25": {
+      "title": "Plan denetleyici (kao-plan-check) sertleştirme",
+      "wave": 1,
+      "files": [
+        "kuran-ogreniyorum/tools/kao-plan-check.mjs",
+        "kuran-ogreniyorum/tools/kao-plan-check.test.mjs",
+        "kuran-ogreniyorum/evidence/KAO-25/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node kuran-ogreniyorum/tools/kao-plan-check.mjs --self-test"
+      ],
+      "req": [],
+      "deps": [],
+      "status": "pending"
+    },
+    "KAO-05": {
+      "title": "quranLexiconV1.js dondurma + 4 yükleme listesi",
+      "wave": 2,
+      "files": [
+        "app/content/quranLexiconV1.js",
+        "index.html",
+        ".claude/skills/run-seyma/driver.mjs",
+        ".claude/skills/run-seyma/zikr-harness.mjs",
+        "tests/app/test_state_rebind_boundary.js",
+        "tests/kao/test_kao_lexicon_contract.js",
+        "tests/kao/test_kao_lexicon_coverage.js",
+        "kuran-ogreniyorum/evidence/KAO-05/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_lexicon_contract.js",
+        "node tests/kao/test_kao_lexicon_coverage.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [],
+      "deps": [
+        "KAO-03"
+      ],
+      "status": "pending"
+    },
+    "KAO-06": {
+      "title": "quranGrammarV1 + quranShortSurahsV1 + quranPhonicsV1 (+prayerTexts)",
+      "wave": 2,
+      "files": [
+        "app/content/quranGrammarV1.js",
+        "app/content/quranShortSurahsV1.js",
+        "app/content/quranPhonicsV1.js",
+        "index.html",
+        ".claude/skills/run-seyma/driver.mjs",
+        ".claude/skills/run-seyma/zikr-harness.mjs",
+        "tests/app/test_state_rebind_boundary.js",
+        "tests/kao/test_kao_phonics_contract.js",
+        "tests/kao/test_kao_lexicon_contract.js",
+        "kuran-ogreniyorum/evidence/KAO-06/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_phonics_contract.js",
+        "node tests/kao/test_kao_lexicon_contract.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-A6",
+        "R-B2"
+      ],
+      "deps": [
+        "KAO-04",
+        "KAO-23"
+      ],
+      "status": "pending"
+    },
+    "KAO-07": {
+      "title": "Registry iskeleti + ensureQuranLearn + migrate kancası",
+      "wave": 2,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/core/state.js",
+        "app.js",
+        "index.html",
+        ".claude/skills/run-seyma/driver.mjs",
+        ".claude/skills/run-seyma/zikr-harness.mjs",
+        "tests/app/test_state_rebind_boundary.js",
+        "tests/kao/test_kao_migration.js",
+        "tests/kao/test_kao_boundary.js",
+        "tests/kao/test_kao_independence.js",
+        "kuran-ogreniyorum/evidence/KAO-07/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_migration.js",
+        "node tests/kao/test_kao_boundary.js",
+        "node tests/kao/test_kao_independence.js",
+        "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-C7"
+      ],
+      "deps": [
+        "KAO-05"
+      ],
+      "status": "pending"
+    },
+    "KAO-08": {
+      "title": "FSRS saf JS portu",
+      "wave": 2,
+      "files": [
+        "app/core/quranLearn.js",
+        "tests/kao/test_kao_fsrs.js",
+        "tests/kao/fixtures/fsrs-vectors.json",
+        "kuran-ogreniyorum/evidence/KAO-08/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_fsrs.js"
+      ],
+      "req": [
+        "R-A3"
+      ],
+      "deps": [
+        "KAO-07"
+      ],
+      "status": "pending"
+    },
+    "KAO-09": {
+      "title": "Kuyruk, görev üretici, çeldirici, gece tekrarı",
+      "wave": 2,
+      "files": [
+        "app/core/quranLearn.js",
+        "tests/kao/test_kao_queue.js",
+        "tests/kao/test_kao_requirements.js",
+        "kuran-ogreniyorum/evidence/KAO-09/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_queue.js",
+        "node tests/kao/test_kao_requirements.js"
+      ],
+      "req": [
+        "R-A1",
+        "R-A2",
+        "R-A5"
+      ],
+      "deps": [
+        "KAO-08"
+      ],
+      "status": "pending"
+    },
+    "KAO-10": {
+      "title": "Overlay kabuğu + E1 Home + geçici Ayarlar girişi",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "app/core/settings.js",
+        "index.html",
+        "tests/kao/test_kao_render.js",
+        "tests/app/test_fx2_*.js",
+        "kuran-ogreniyorum/evidence/KAO-10/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js (dialog/aria/Tab/Shift+Tab/Escape/odak dönüşü)",
+        "for f in tests/app/test_fx2_*.js; do node $f; done (pin güncel)",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [],
+      "deps": [
+        "KAO-09"
+      ],
+      "status": "pending"
+    },
+    "KAO-11": {
+      "title": "E2 oturum çekirdeği: anlam seç / Arapça seç, ses düğmesi, geri al",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_requirements.js",
+        "tests/kao/test_kao_privacy.js",
+        "kuran-ogreniyorum/evidence/KAO-11/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_requirements.js",
+        "node tests/kao/test_kao_privacy.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-A4",
+        "R-B7",
+        "R-B8",
+        "R-C2",
+        "R-C3",
+        "R-C5"
+      ],
+      "deps": [
+        "KAO-10"
+      ],
+      "status": "pending"
+    },
+    "KAO-12": {
+      "title": "E2 gramer görevleri",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_queue.js",
+        "kuran-ogreniyorum/evidence/KAO-12/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_queue.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [],
+      "deps": [
+        "KAO-11"
+      ],
+      "status": "pending"
+    },
+    "KAO-13": {
+      "title": "E2 parça görevleri + E3 Done + kalibrasyon kaydı",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_requirements.js",
+        "kuran-ogreniyorum/evidence/KAO-13/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_requirements.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-A3",
+        "R-A7",
+        "R-B4"
+      ],
+      "deps": [
+        "KAO-12"
+      ],
+      "status": "pending"
+    },
+    "KAO-14": {
+      "title": "E4 Üniteler + E5 Kelime (üç dokunuş, kök ağacı, bayrak)",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_requirements.js",
+        "kuran-ogreniyorum/evidence/KAO-14/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_requirements.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-A8",
+        "R-B3",
+        "R-B7",
+        "R-C1"
+      ],
+      "deps": [
+        "KAO-13"
+      ],
+      "status": "pending"
+    },
+    "KAO-15": {
+      "title": "Seviye 0 kapısı (harf–ses–hareke) + renkli hareke",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "kuran-ogreniyorum/evidence/KAO-15/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-A9"
+      ],
+      "deps": [
+        "KAO-14"
+      ],
+      "status": "pending"
+    },
+    "KAO-16": {
+      "title": "E6 Okuyucu (20 kısa sûre) + vakıf noktaları + gecikmeli test kaydı",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_requirements.js",
+        "kuran-ogreniyorum/evidence/KAO-16/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_requirements.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-A6",
+        "R-C6"
+      ],
+      "deps": [
+        "KAO-15"
+      ],
+      "status": "pending"
+    },
+    "KAO-17": {
+      "title": "E7 Ayarlar + ses stili + soldurma + CSV",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_requirements.js",
+        "tests/kao/test_kao_privacy.js",
+        "kuran-ogreniyorum/evidence/KAO-17/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_requirements.js",
+        "node tests/kao/test_kao_privacy.js",
+        "for f in tests/app/test_premium_*.js; do node $f; done",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-A4",
+        "R-A9",
+        "R-B5",
+        "R-B8",
+        "R-C4"
+      ],
+      "deps": [
+        "KAO-16"
+      ],
+      "status": "pending"
+    },
+    "KAO-26": {
+      "title": "E8 Telaffuz stüdyosu",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_phonics_contract.js",
+        "kuran-ogreniyorum/evidence/KAO-26/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_phonics_contract.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-B6",
+        "R-C2"
+      ],
+      "deps": [
+        "KAO-17"
+      ],
+      "status": "pending"
+    },
+    "KAO-27": {
+      "title": "Gölgeleme (bellek-içi kayıt)",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_privacy.js",
+        "kuran-ogreniyorum/evidence/KAO-27/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_privacy.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [],
+      "deps": [
+        "KAO-26"
+      ],
+      "gate": "D-10 kullanıcı onayı",
+      "status": "pending"
+    },
+    "KAO-28": {
+      "title": "E9 Anlayabildiğin âyet",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_queue.js",
+        "tests/kao/test_kao_lexicon_coverage.js",
+        "kuran-ogreniyorum/evidence/KAO-28/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_queue.js",
+        "node tests/kao/test_kao_lexicon_coverage.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [],
+      "deps": [
+        "KAO-27"
+      ],
+      "status": "pending"
+    },
+    "KAO-28b": {
+      "title": "E10 Mushaf ısı haritası + gecikmeli sûre testi",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_requirements.js",
+        "kuran-ogreniyorum/evidence/KAO-28b/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_requirements.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-B1",
+        "R-C6"
+      ],
+      "deps": [
+        "KAO-28"
+      ],
+      "status": "pending"
+    },
+    "KAO-16b": {
+      "title": "E11 Namazda ne diyorum",
+      "wave": 3,
+      "files": [
+        "app/core/quranLearn.js",
+        "app/kao.css",
+        "app.js",
+        "tests/kao/test_kao_render.js",
+        "kuran-ogreniyorum/evidence/KAO-16b/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_render.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-B2"
+      ],
+      "deps": [
+        "KAO-28b"
+      ],
+      "status": "pending"
+    },
+    "KAO-18": {
+      "title": "Kontrast ve erişilebilirlik ölçümü",
+      "wave": 4,
+      "files": [
+        "kuran-ogreniyorum/tools/kao-verify-contrast.mjs",
+        "app/kao.css",
+        "tests/kao/test_kao_render.js",
+        "kuran-ogreniyorum/evidence/KAO-18/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node kuran-ogreniyorum/tools/kao-verify-contrast.mjs (tüm çiftler ≥4.5:1 metin / 3:1 UI, 3 hareke tonu × 2 tema)"
+      ],
+      "req": [
+        "R-A9"
+      ],
+      "deps": [
+        "KAO-16b"
+      ],
+      "status": "pending"
+    },
+    "KAO-19": {
+      "title": "Panel aynası (manifest + özet projeksiyon)",
+      "wave": 4,
+      "files": [
+        "panel/panelCoverageManifest.js",
+        "panel/panel.js",
+        "tests/kao/test_kao_panel_projection.js",
+        "tests/panel/test_panel_p1_projection.js",
+        "kuran-ogreniyorum/evidence/KAO-19/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_panel_projection.js",
+        "for f in tests/panel/test_panel_*.js; do node $f; done",
+        "for f in tests/panel-v2/test_panel_v2_*.js; do node $f; done"
+      ],
+      "req": [
+        "R-C1",
+        "R-C8"
+      ],
+      "deps": [
+        "KAO-18"
+      ],
+      "status": "pending"
+    },
+    "KAO-20": {
+      "title": "Tam regresyon + kullanıcı görevleri + kalibrasyon raporu",
+      "wave": 4,
+      "files": [
+        "tests/kao/test_kao_user_tasks.js",
+        "kuran-ogreniyorum/deliverables/KAO-REGRESYON.md",
+        "kuran-ogreniyorum/evidence/KAO-20/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_user_tasks.js",
+        "for f in tests/kao/*.js; do node $f; done",
+        "tüm mevcut aileler (tests/app, tests/panel, tests/panel-v2, tests/quran, reminders smoke)",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [
+        "R-A1",
+        "R-A3",
+        "R-C5",
+        "R-C9"
+      ],
+      "deps": [
+        "KAO-19"
+      ],
+      "status": "pending"
+    },
+    "KAO-21": {
+      "title": "Hub kartı bileşimi + köprüler (IIP koordineli)",
+      "wave": 5,
+      "files": [
+        "app/core/saygi.js",
+        "app.js",
+        "app/core/settings.js",
+        "app/core/quranLearn.js",
+        "tests/kao/test_kao_independence.js",
+        "tests/kao/test_kao_render.js",
+        "kuran-ogreniyorum/evidence/KAO-21/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node tests/kao/test_kao_independence.js",
+        "node tests/kao/test_kao_render.js",
+        "node .claude/skills/run-seyma/driver.mjs",
+        "node .claude/skills/run-seyma/zikr-harness.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "node tools/shell-inventory.mjs --gate"
+      ],
+      "req": [],
+      "deps": [
+        "KAO-20"
+      ],
+      "gate": "IIP hub/nav main'de ya da IIP sahibi onayı; saygi.js'e yalnız 1 bileşim satırı + 1 dep satırı",
+      "status": "pending"
+    },
+    "KAO-22": {
+      "title": "Kapanış belgesi",
+      "wave": 6,
+      "files": [
+        "kuran-ogreniyorum/deliverables/KAO-KAPANIS.md",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/**",
+        "README.md",
+        "CLAUDE.md",
+        "AGENTS.md",
+        "kuran-ogreniyorum/evidence/KAO-22/**",
+        "kuran-ogreniyorum/KAO-STATE.json",
+        "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+        "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+      ],
+      "checks": [
+        "node kuran-ogreniyorum/tools/kao-plan-check.mjs (status=completed tutarlı)"
+      ],
+      "req": [
+        "R-C9"
+      ],
+      "deps": [
+        "KAO-21"
+      ],
+      "status": "pending"
+    }
+  },
+  "targets": {
+    "lemmas": 530,
+    "tokenCoverage": 0.8,
+    "corpusTokens": 77430,
+    "desiredRetention": 0.9,
+    "dailyNewDefault": 10,
+    "contentBudgetKB": 410,
+    "stateBudgetKB": 100,
+    "phonicsLetters": 28,
+    "minimalPairsMin": 12,
+    "audioClipsApprox": 2300,
+    "audioBudgetMB": 16,
+    "ayahComprehensionCoverage": 0.95,
+    "talkersMin": 2
+  },
+  "evidence": [],
+  "userDecisions": {
+    "independentFromIIP": true,
+    "entry": "single hub card in İlham & İbadet; content in own overlay",
+    "audience": "absolute beginner, Turkish L1",
+    "goal": "understand Quranic Arabic in Turkish; pronunciation is a core layer",
+    "qualityTarget": "world-class as evidence conditions (08), not a claimed result"
+  },
+  "requirements": {
+    "source": "12-EK-GEREKSINIMLER.md",
+    "binding": true,
+    "ids": [
+      "R-A1",
+      "R-A2",
+      "R-A3",
+      "R-A4",
+      "R-A5",
+      "R-A6",
+      "R-A7",
+      "R-A8",
+      "R-A9",
+      "R-B1",
+      "R-B2",
+      "R-B3",
+      "R-B4",
+      "R-B5",
+      "R-B6",
+      "R-B7",
+      "R-B8",
+      "R-C1",
+      "R-C2",
+      "R-C3",
+      "R-C4",
+      "R-C5",
+      "R-C6",
+      "R-C7",
+      "R-C8",
+      "R-C9"
+    ],
+    "status": {
+      "R-A1": "pending",
+      "R-A2": "pending",
+      "R-A3": "pending",
+      "R-A4": "pending",
+      "R-A5": "pending",
+      "R-A6": "pending",
+      "R-A7": "pending",
+      "R-A8": "pending",
+      "R-A9": "pending",
+      "R-B1": "pending",
+      "R-B2": "pending",
+      "R-B3": "pending",
+      "R-B4": "pending",
+      "R-B5": "pending",
+      "R-B6": "pending",
+      "R-B7": "pending",
+      "R-B8": "pending",
+      "R-C1": "pending",
+      "R-C2": "pending",
+      "R-C3": "pending",
+      "R-C4": "pending",
+      "R-C5": "pending",
+      "R-C6": "pending",
+      "R-C7": "pending",
+      "R-C8": "pending",
+      "R-C9": "pending"
+    }
+  },
+  "commonChecks": [
+    "node --check <değişen her .js/.mjs>",
+    "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+    "git -c core.fsmonitor=false diff --check"
+  ],
+  "promptOrder": [
+    "KAO-P00",
+    "KAO-01",
+    "KAO-25",
+    "KAO-02",
+    "KAO-03",
+    "KAO-04",
+    "KAO-23",
+    "KAO-24",
+    "KAO-05",
+    "KAO-06",
+    "KAO-07",
+    "KAO-08",
+    "KAO-09",
+    "KAO-10",
+    "KAO-11",
+    "KAO-12",
+    "KAO-13",
+    "KAO-14",
+    "KAO-15",
+    "KAO-16",
+    "KAO-17",
+    "KAO-26",
+    "KAO-27",
+    "KAO-28",
+    "KAO-28b",
+    "KAO-16b",
+    "KAO-18",
+    "KAO-19",
+    "KAO-20",
+    "KAO-21",
+    "KAO-22",
+    "KAO-D1",
+    "KAO-D2",
+    "KAO-D3",
+    "KAO-D4",
+    "KAO-D5",
+    "KAO-D6"
+  ],
+  "auditPrompts": {
+    "KAO-D1": {
+      "after": "KAO-24",
+      "wave": 1
+    },
+    "KAO-D2": {
+      "after": "KAO-09",
+      "wave": 2
+    },
+    "KAO-D3": {
+      "after": "KAO-16b",
+      "wave": 3
+    },
+    "KAO-D4": {
+      "after": "KAO-20",
+      "wave": 4
+    },
+    "KAO-D5": {
+      "after": "KAO-21",
+      "wave": 5
+    },
+    "KAO-D6": {
+      "after": "KAO-22",
+      "wave": 6
+    }
+  },
+  "activePrompt": null,
+  "lastCompletedPrompt": null,
+  "blockedPrompt": null,
+  "bootstrap": {
+    "id": "KAO-P00",
+    "files": [
+      "tests/kao/README.md",
+      "kuran-ogreniyorum/content/.gitignore",
+      "kuran-ogreniyorum/evidence/KAO-P00/**",
+      "kuran-ogreniyorum/KAO-STATE.json",
+      "kuran-ogreniyorum/.anti-amnesia/**"
+    ],
+    "checks": [
+      "node kuran-ogreniyorum/tools/kao-plan-check.mjs --self-test",
+      "node tests/quran/test_quran_catalog.js"
+    ]
+  },
+  "auditScope": {
+    "files": [
+      "kuran-ogreniyorum/evidence/KAO-D*/**",
+      "kuran-ogreniyorum/KAO-STATE.json",
+      "kuran-ogreniyorum/.anti-amnesia/**"
+    ]
+  },
+  "auditStatus": {
+    "KAO-D1": "pending",
+    "KAO-D2": "pending",
+    "KAO-D3": "pending",
+    "KAO-D4": "pending",
+    "KAO-D5": "pending",
+    "KAO-D6": "pending"
+  }
+}

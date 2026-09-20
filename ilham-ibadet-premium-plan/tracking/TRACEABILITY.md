@@ -14,8 +14,8 @@
 | REQ-008 / TC-008 | [IIP-04](../cards/IIP-04.md) | Seçili bölüm metin ve semantikle belirtilir; klavye/odak mevcut davranışı korur. | Sadece altın renkli seçim veya odak görünmezliği kabul edilmez. | 5 |
 | REQ-009 / TC-009 | [IIP-05](../cards/IIP-05.md) | Metin 45–75 karakter hedefinde; paragraf, alıntı ve kaynak görsel olarak ayrılır. | Uzun Türkçe başlık, portresiz kişi ve uzun kaynak footer ile kesilme yok. | 5 |
 | REQ-010 / TC-010 | [IIP-05](../cards/IIP-05.md) | Sabit eylem safe-area alanında son paragrafı örtmez; kilit nedeni görünür. | Yükleniyor/uzun içerik/okundu durumunda düğmenin işlevi mevcut kontratla aynı. | 5 |
-| REQ-011 / TC-011 | [IIP-06](../cards/IIP-06.md) | Saat, kaynak, kayıt durumu, ayrıntı birbirine karışmaz; altı eski alan erişilir. | Büyük yazıda saat ve kayıt kontrolü üst üste binmez. | 0 |
-| REQ-012 / TC-012 | [IIP-06](../cards/IIP-06.md) | Hesaplanan yön, cihaz yönü, hassasiyet ve sensör reddi ayrı okunur. | Sensör yokken sahte canlı ibre gösterilmez; var olan hesap korunur. | 0 |
+| REQ-011 / TC-011 | [IIP-06](../cards/IIP-06.md) | Saat, kaynak, kayıt durumu, ayrıntı birbirine karışmaz; altı eski alan erişilir. | Büyük yazıda saat ve kayıt kontrolü üst üste binmez. | 5 |
+| REQ-012 / TC-012 | [IIP-06](../cards/IIP-06.md) | Hesaplanan yön, cihaz yönü, hassasiyet ve sensör reddi ayrı okunur. | Sensör yokken sahte canlı ibre gösterilmez; var olan hesap korunur. | 5 |
 | REQ-013 / TC-013 | [IIP-07](../cards/IIP-07.md) | Mevcut sayaç, hatim, manuel giriş, geri alma ve notlar aynı davranışla korunur. | 100 hızlı giriş, arka plan render ve hatim sınırı testi kayıpsız geçer. | 0 |
 | REQ-014 / TC-014 | [IIP-07](../cards/IIP-07.md) | Sûre durumu, video ve notlar görsel iyileştirme sırasında korunur. | Not caret ve video düğümü arka plan güncellemesinde yeniden kurulmaz. | 0 |
 | REQ-015 / TC-015 | [IIP-08](../cards/IIP-08.md) | İlgili dar testler, VM, syntax, bütçe ve diff kanıtı dosyalanır. | Bir FAIL varken A kabulü kapanmaz; fixture pinleri gerekçesiz güncellenmez. | 0 |

@@ -141,6 +141,17 @@ ok('auth late-boot preserves app-owned data rebind callback and state',
   currentData.settings.auth.rememberMe === true && ui.authUnlocked === true &&
   calls.map((entry) => entry[0]).join(',') === 'ensureAuthData,save,render,toast');
 
+// A fast second tap can arrive after the successful render removed the auth
+// inputs from the DOM. The stale click must be harmless instead of reading
+// `.value` from null and surfacing an intermittent login error.
+delete fields['sey-auth-user'];
+delete fields['sey-auth-pass'];
+calls.length = 0;
+assert.doesNotThrow(() => surface.submitAuth(), 'stale auth submit after rerender is ignored');
+ok('stale auth submit after successful rerender is a no-op', calls.length === 0);
+fields['sey-auth-user'] = { value: 'secret' };
+fields['sey-auth-pass'] = { value: 'secret' };
+
 ui.authRemember = false;
 surface.toggleRememberAuth();
 ok('post-expose remember handler remains delegated', ui.authRemember === true);
@@ -177,7 +188,7 @@ ok('window.App expose and post-expose handlers precede the final initial render'
   initialRender < app.indexOf("navigator.serviceWorker.addEventListener('message'"));
 ok('data rebinds stay out of the registry and production cache-bust is paired',
   !/\bdata\s*=\s*(?:migrate|createDefaultData|null|d\b)/.test(source) &&
-  /app\/core\/appSurface\.js\?v=20260915c/.test(index) &&
+  /app\/core\/appSurface\.js\?v=20260920a/.test(index) &&
   /app\.js\?v=20260916a/.test(index) &&
   index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?'));
 ok('existing harness FILES keep appSurface immediately before app.js',

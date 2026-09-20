@@ -360,8 +360,14 @@
 
   function submitAuth(){
     var doc=bootCall('document');
-    var u=(doc.getElementById('sey-auth-user').value||'').trim();
-    var p=(doc.getElementById('sey-auth-pass').value||'').trim();
+    var userEl=doc.getElementById('sey-auth-user');
+    var passEl=doc.getElementById('sey-auth-pass');
+    // Başarılı giriş render() ile kapıyı eşzamanlı kaldırır. Eski düğmeden
+    // kuyruğa girmiş ikinci bir dokunuş gelirse alanlar artık DOM'da yoktur;
+    // bu geç submit'i sessizce yok say, null.value hatasına dönüştürme.
+    if(!userEl||!passEl) return;
+    var u=(userEl.value||'').trim();
+    var p=(passEl.value||'').trim();
     var ui=bootCall('ui');
     if(!u||!p){ ui.authError=true; ui.authErrorMsg='Lütfen kullanıcı adını ve parolanı yaz.'; bootCall('render'); return; }
     if(bootCall('sha256',[u])===bootCall('authHash')&&bootCall('sha256',[p])===bootCall('authHash')){

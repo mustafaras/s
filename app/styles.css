@@ -753,6 +753,48 @@
 .sg-person-ov-card .saygi-article-modal .saygi-hero-media{min-height:110px;max-height:150px;border-radius:16px;}
 .sg-person-read-fab.is-done{background:linear-gradient(135deg,#50784E,#2E5942)!important;}
 
+/* IIP-05 — Öncü okuyucusu: sakin okuma genişliği, dürüst görsel fallback ve güvenli eylem alanı. */
+.saygi-article{width:100%;max-width:43rem;margin-inline:auto;}
+.saygi-hero h2{overflow-wrap:anywhere;text-wrap:balance;}
+.saygi-hero-media-caption{display:block;position:absolute!important;left:7px!important;right:7px!important;bottom:7px!important;}
+.saygi-hero-media-fallback{display:none;position:relative!important;inset:auto!important;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center;}
+.saygi-hero-media-fallback strong,.saygi-hero-media-fallback small{display:block;max-width:18ch;}
+.saygi-hero-media-fallback strong{font-size:var(--f-footnote);line-height:1.2;}
+.saygi-hero-media-fallback small{font-size:var(--f-caption2);font-weight:700;line-height:1.3;opacity:.86;}
+.saygi-hero-media-fallback svg{flex:none;opacity:.9;}
+.saygi-hero-media .saygi-hero-media-fallback.is-visible,.saygi-hero-media.is-broken .saygi-hero-media-fallback{display:flex;flex-direction:column;}
+.saygi-hero-media.is-broken .saygi-hero-media-caption{display:none;}
+.saygi-biography{width:100%;max-width:43rem;margin-inline:auto;}
+.saygi-biography p{max-width:68ch;margin-inline:auto;font-size:clamp(.9375rem,1.8vw,1.0625rem);line-height:1.78;letter-spacing:.005em;overflow-wrap:anywhere;}
+.saygi-biography h3{max-width:68ch;margin-inline:auto;overflow-wrap:anywhere;}
+.saygi-lead{max-width:68ch;padding:12px 14px 12px 16px;border-left:3px solid var(--saygi-gold);border-radius:4px 14px 14px 4px;background:color-mix(in srgb,var(--saygi-gold) 8%,var(--card));font-style:italic;overflow-wrap:anywhere;}
+.saygi-attribution{align-items:flex-start;gap:9px;margin-top:2px;padding:12px 13px;border:1px solid color-mix(in srgb,var(--saygi-ink) 18%,var(--card-bd));border-radius:15px;background:color-mix(in srgb,var(--saygi-ink) 5%,var(--card));overflow-wrap:anywhere;}
+.saygi-attribution-icon{display:inline-flex!important;flex:0 0 auto!important;margin-top:1px;color:var(--saygi-gold);}
+.saygi-attribution-copy{display:flex;min-width:0;flex:1;flex-direction:column;gap:3px;overflow-wrap:anywhere;}
+.saygi-attribution-copy strong{color:var(--text);font-size:var(--f-caption1);line-height:1.2;}
+.saygi-attribution-copy>span{color:var(--faint);font-size:var(--f-caption2);line-height:1.48;overflow-wrap:anywhere;}
+.saygi-attribution-copy a,.saygi-attribution>a{overflow-wrap:anywhere;word-break:break-word;}
+.saygi-link-label,.saygi-link-sub{white-space:normal;overflow-wrap:anywhere;}
+.saygi-read-sentinel{scroll-margin-bottom:calc(142px + env(safe-area-inset-bottom));}
+.sg-person-ov-body{padding:18px 18px calc(142px + env(safe-area-inset-bottom));}
+.sg-person-read-fab{position:fixed;z-index:560;left:50%;bottom:calc(12px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;visibility:visible;pointer-events:auto;box-sizing:border-box;width:calc(100vw - 32px);max-width:484px;min-height:58px;align-items:center;justify-content:center;gap:10px;padding:10px 16px;border:1px solid rgba(255,255,255,.34);border-radius:18px;color:#FFF9EC;background:linear-gradient(135deg,#C4A35A,#826936);box-shadow:0 14px 34px rgba(52,39,18,.38);font:inherit;cursor:pointer;transition:transform .2s var(--ease-premium,cubic-bezier(.16,1,.3,1)),opacity .2s ease,filter .2s ease;}
+.sg-person-read-fab>span:last-child{display:flex;min-width:0;flex-direction:column;align-items:flex-start;text-align:left;}
+.sg-person-read-fab strong{font-size:var(--f-subhead);line-height:1.1;overflow-wrap:anywhere;}
+.sg-person-read-fab small{margin-top:3px;color:rgba(255,249,236,.84);font-size:var(--f-caption2);font-weight:700;line-height:1.3;overflow-wrap:anywhere;}
+.sg-person-read-fab.is-locked{cursor:not-allowed;opacity:.72;filter:grayscale(.3);}
+.sg-person-read-fab.is-ready:hover,.sg-person-read-fab.is-done:hover{transform:translateX(-50%) translateY(-1px);}
+.sg-person-read-fab:active:not(:disabled){transform:translateX(-50%) translateY(1px) scale(.985);}
+.sg-person-read-fab:focus-visible{outline:3px solid var(--saygi-gold2);outline-offset:3px;}
+@media (max-width:380px){
+  .saygi-hero h2{font-size:var(--f-title3);line-height:1.08;}
+  .saygi-biography{padding:16px 14px;}
+  .saygi-biography p{max-width:none;}
+  .sg-person-ov-body{padding-inline:12px;}
+  .sg-person-read-fab{width:calc(100vw - 24px);padding-inline:12px;border-radius:16px;}
+}
+@media (prefers-reduced-motion:reduce){.saygi-source-card,.saygi-read-button,.sg-person-read-fab{transition:none!important;}.sg-person-read-fab.is-ready:hover,.sg-person-read-fab.is-done:hover,.sg-person-read-fab:active:not(:disabled){transform:translateX(-50%);}}
+#root[data-theme="dark"] .sg-person-read-fab{box-shadow:none;}
+
 .sey-app-booted .sg-mission-card,
 .sey-app-booted .sg-person-preview-card,
 .sey-app-booted .sg-faith-preview-card,

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-05",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-05/requirements.md",
+  "verifiedHead": "aded41ea85150826bc340ad6ad86717b65a00d80",
+  "diffHash": "fbca8b0b992598ca94663788aadf5a68dde0d04c9011901131229a7302332199",
+  "createdAt": "2026-09-20T12:20:30Z",
+  "requirements": ["REQ-009", "REQ-010"],
+  "commands": [
+    {"command": "node tests/app/test_iip_05.js", "exitCode": 0}
+  ],
+  "limitations": "REQ/TC sonuçları sentetik no-network fixture kapsamındadır.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "567538268578731bf18dfb25638932d90980c6016d37e9b0af63c73b11cc2d8e",
+  "details": {
+    "results": [
+      {"requirementId": "REQ-009", "testId": "TC-009", "result": "pass"},
+      {"requirementId": "REQ-010", "testId": "TC-010", "result": "pass"}
+    ]
+  }
+}

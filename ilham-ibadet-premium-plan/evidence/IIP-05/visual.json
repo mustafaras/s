@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-05",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-05/visual.md",
+  "verifiedHead": "aded41ea85150826bc340ad6ad86717b65a00d80",
+  "diffHash": "fbca8b0b992598ca94663788aadf5a68dde0d04c9011901131229a7302332199",
+  "createdAt": "2026-09-20T12:20:30Z",
+  "requirements": ["REQ-009", "REQ-010"],
+  "commands": [
+    {"command": "node tests/app/test_iip_05.js", "exitCode": 0},
+    {"command": "node .claude/skills/run-seyma/zikr-harness.mjs", "exitCode": 0}
+  ],
+  "limitations": "Source/style render contract; no browser screenshot, VoiceOver or physical device acceptance.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "7a65ad7c39c4e8ab1237ac4268970515dd32b3e8429ca09e52e1f5b010ac2f80",
+  "details": {
+    "themes": ["light", "dark"],
+    "viewports": ["320px", "390px", "768px", "320px at 200% text target"],
+    "syntheticDataset": "IIP05-SYN-01",
+    "artifactKind": "render",
+    "observations": "28 source/style checks plus 95/95 headless assertions cover long copy, fallback, loading/error/return, locked/ready/done and reduced-motion contracts; physical/browser render remains separately gated."
+  }
+}

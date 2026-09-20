@@ -9,8 +9,8 @@
   "productionCodeTouched": true,
   "implementationApproval": {
     "status": "approved",
-    "cardIds": ["IIP-01", "IIP-02", "IIP-03", "IIP-04"],
-    "source": "2026-09-20 user message: IIP-03 tamamlığını doğrula; push/commit/merge/deploy sonrasında IIP-04'e geç."
+    "cardIds": ["IIP-01", "IIP-02", "IIP-03", "IIP-04", "IIP-05"],
+    "source": "2026-09-20 user message: yalnız IIP-05 adımını uygula; commit/push/deploy yok."
   },
   "releaseApproval": {
     "status": "approved",
@@ -23,7 +23,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 4,
+  "completedCards": 5,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -216,7 +216,8 @@
       "verifiedHead": "fe8b35a82525cfb137a0fabf504a775285d4bbc5",
       "handoff": "evidence/IIP-04/HANDOFF.md",
       "fixtureFiles": [
-        "tests/app/test_saygi_boundary.js"
+        "tests/app/test_saygi_boundary.js",
+        "tests/app/test_iip_05.js"
       ],
       "allowedTestFiles": [
         "tests/app/test_saygi_boundary.js",
@@ -233,13 +234,13 @@
       "id": "IIP-05",
       "title": "Öncü okuyucusu görsel kalite",
       "package": "A",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-04"
       ],
       "path": "cards/IIP-05.md",
       "role": "reader",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/saygi.js",
@@ -256,12 +257,18 @@
         "source",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-05/scope.json",
+        "evidence/IIP-05/requirements.json",
+        "evidence/IIP-05/review.json",
+        "evidence/IIP-05/source.json",
+        "evidence/IIP-05/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-20T12:11:09Z",
+      "completedAt": "2026-09-20T12:20:30Z",
+      "verifiedHead": "aded41ea85150826bc340ad6ad86717b65a00d80",
+      "handoff": "evidence/IIP-05/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js"
       ],
@@ -271,7 +278,7 @@
       ],
       "decisionIds": [],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "fbca8b0b992598ca94663788aadf5a68dde0d04c9011901131229a7302332199",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

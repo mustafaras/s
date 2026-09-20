@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-04",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-04/requirements.md",
+  "verifiedHead": "fe8b35a82525cfb137a0fabf504a775285d4bbc5",
+  "diffHash": "7b6882216ebbb8cc10c02bcf3e765ffd85f92c58e61ac4009d7f227ae9ad2ffd",
+  "createdAt": "2026-09-20T11:08:44Z",
+  "requirements": ["REQ-007", "REQ-008"],
+  "commands": [
+    {"command": "node tests/app/test_iip_04.js", "exitCode": 0},
+    {"command": "node tests/app/test_saygi_boundary.js", "exitCode": 0}
+  ],
+  "limitations": "Network-free source/style contract; no real user data or device rendering.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "dd4c36722432d90995f985e4f229e2876189ae762c279dee1d8597cdd91fed7f",
+  "details": {
+    "results": [
+      {"requirementId": "REQ-007", "testId": "TC-007", "result": "pass"},
+      {"requirementId": "REQ-008", "testId": "TC-008", "result": "pass"}
+    ]
+  }
+}

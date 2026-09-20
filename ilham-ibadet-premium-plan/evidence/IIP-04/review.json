@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-04",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-04/review.md",
+  "verifiedHead": "fe8b35a82525cfb137a0fabf504a775285d4bbc5",
+  "diffHash": "7b6882216ebbb8cc10c02bcf3e765ffd85f92c58e61ac4009d7f227ae9ad2ffd",
+  "createdAt": "2026-09-20T11:08:44Z",
+  "requirements": ["REQ-007", "REQ-008"],
+  "commands": [
+    {"command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs --render", "exitCode": 0},
+    {"command": "git -c core.fsmonitor=false diff --check", "exitCode": 0}
+  ],
+  "limitations": "Static/headless review; actual browser, VoiceOver and device acceptance are separate.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "3fa25d3e70b4d73ef195544a4f46df594410080d9028e4bc098be89a2fbdff65",
+  "details": {
+    "findings": [
+      {"severity": "low", "finding": "Browser screenshot and VoiceOver acceptance remain outside the no-browser IIP-04 contract."}
+    ],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "Codex / integrator"
+  }
+}

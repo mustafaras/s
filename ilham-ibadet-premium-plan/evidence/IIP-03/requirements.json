@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-03",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-03/requirements.md",
+  "verifiedHead": "0436405cfad6e0910caf345dfe8e1ad52c6f64c0",
+  "diffHash": "2a1c97f1bd426de20eb33813f83dc76c4dc34cfb836711d2bef7efa839bc9d57",
+  "createdAt": "2026-09-20T10:49:00Z",
+  "requirements": ["REQ-005", "REQ-006"],
+  "commands": [
+    {"command": "node tests/app/test_iip_03.js", "exitCode": 0},
+    {"command": "node tests/app/test_prayer_boundary.js", "exitCode": 0}
+  ],
+  "limitations": "Synthetic source/contract evidence; no personal data, device or remote behavior was exercised.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "df007b8019b71789aa77c2cd7f469ec9797730d85e21458dce155fa270ba94c4",
+  "details": {
+    "results": [
+      {"requirementId": "REQ-005", "testId": "TC-005", "result": "pass"},
+      {"requirementId": "REQ-006", "testId": "TC-006", "result": "pass"}
+    ]
+  }
+}

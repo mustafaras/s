@@ -6,11 +6,11 @@
   "status": "in_progress",
   "planStatus": "in_progress",
   "baselineHead": "e794e7bcc637b2431dcfae29f645ef1b02a2b51c",
-  "productionCodeTouched": false,
+  "productionCodeTouched": true,
   "implementationApproval": {
     "status": "approved",
-    "cardIds": ["IIP-01", "IIP-02"],
-    "source": "2026-09-19 user message: yalnız IIP-02 adımını uygula; REQ/TC ve gate'leri tamamla; sonraki adıma geçme; commit/push/deploy yapma."
+    "cardIds": ["IIP-01", "IIP-02", "IIP-03"],
+    "source": "2026-09-20 user message: yalnız IIP-03 adımını uygula; REQ/TC ve gate'leri tamamla; sonraki adıma geçme; commit/push/deploy yapma."
   },
   "releaseApproval": {
     "status": "approved",
@@ -23,7 +23,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 2,
+  "completedCards": 3,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -124,13 +124,13 @@
       "id": "IIP-03",
       "title": "Anlam denetimi ve erken güven düzeltmesi",
       "package": "A",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-01"
       ],
       "path": "cards/IIP-03.md",
       "role": "domain-review",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/saygi.js",
@@ -146,12 +146,17 @@
         "review",
         "source"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-03/scope.json",
+        "evidence/IIP-03/requirements.json",
+        "evidence/IIP-03/review.json",
+        "evidence/IIP-03/source.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-20T10:49:00Z",
+      "completedAt": "2026-09-20T10:49:00Z",
+      "verifiedHead": "0436405cfad6e0910caf345dfe8e1ad52c6f64c0",
+      "handoff": "evidence/IIP-03/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_prayer_boundary.js"
@@ -165,7 +170,7 @@
         "DEC-03"
       ],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "2a1c97f1bd426de20eb33813f83dc76c4dc34cfb836711d2bef7efa839bc9d57",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

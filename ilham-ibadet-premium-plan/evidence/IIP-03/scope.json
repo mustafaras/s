@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-03",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-03/scope.md",
+  "verifiedHead": "0436405cfad6e0910caf345dfe8e1ad52c6f64c0",
+  "diffHash": "2a1c97f1bd426de20eb33813f83dc76c4dc34cfb836711d2bef7efa839bc9d57",
+  "createdAt": "2026-09-20T10:49:00Z",
+  "requirements": [],
+  "commands": [
+    {"command": "git -c core.fsmonitor=false status --short --branch", "exitCode": 0},
+    {"command": "git -c core.fsmonitor=false diff --check", "exitCode": 0}
+  ],
+  "limitations": "IIP-03 scope only; denominator resolution, device and release acceptance remain outside this card.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "8642f926cb43d626007b5ae42df15896a84ca4dd3850c2897c78b3cb071d0770",
+  "details": {
+    "changedFiles": [
+      "app/core/saygi.js",
+      "panel/panel.js",
+      "tests/app/test_iip_03.js",
+      "ilham-ibadet-premium-plan/evidence/IIP-03/source-baseline.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-03/decision-approval.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-03/scope.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-03/requirements.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-03/review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-03/source.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-03/commands.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-03/HANDOFF.md",
+      "ilham-ibadet-premium-plan/IIP-STATE.json",
+      "ilham-ibadet-premium-plan/tracking/DECISIONS.json",
+      "ilham-ibadet-premium-plan/tracking/LEDGER.jsonl"
+    ],
+    "scopeReviewedBy": "Codex / integrator"
+  }
+}

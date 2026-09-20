@@ -21,10 +21,10 @@
     "id": "DEC-03",
     "title": "Tarihsel kayıt ve payda politikası",
     "ownerCard": "IIP-03",
-    "status": "proposed",
-    "source": null,
-    "evidence": null,
-    "reviewer": null
+    "status": "approved",
+    "source": "2026-09-20 user message: IIP-03'te tarihsel anlamı belgelemek, belirsiz oran kopyasını güvenli betimleyici ifadeye çevirmek, hesap/alan/call graph'ı değiştirmemek ve çözülmeyen payda hesabını IIP-14/15'e bırakmak.",
+    "evidence": "evidence/IIP-03/decision-approval.md",
+    "reviewer": "User (product/domain decision owner; explicit current-turn approval)"
   },
   {
     "id": "DEC-04",

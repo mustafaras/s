@@ -8,8 +8,8 @@
 | REQ-002 / TC-002 | [IIP-01](../cards/IIP-01.md) | App isim/imza, çağrı grafiği, data rebind, shell ve yükleme listesi baseline olarak kaydedilir. | Değişmiş handler veya eksik script-list girişi dar fixture tarafından yakalanır. | 3 |
 | REQ-003 / TC-003 | [IIP-02](../cards/IIP-02.md) | 12 ekranın ana varyantları; ışık/koyu ve büyük yazı için görsel referans üretilecek. | Sadece güzel hero olup hata/okuyucu/kayıt ekranı tasarlanmamışsa kabul yok. | 4 |
 | REQ-004 / TC-004 | [IIP-02](../cards/IIP-02.md) | Her bileşenin renk/font/boşluk/radius/hareket rolü mevcut tokena veya gerekçeli öneriye bağlı. | Hardcoded renk, değişik ikon dili ve ölçülmemiş kontrast listede açık kalır. | 4 |
-| REQ-005 / TC-005 | [IIP-03](../cards/IIP-03.md) | fajr/sunrise dahil altı alanın tarihsel UI, API ve panel anlamı belgelenir. | Sunrise eski kaydı belirsizse beş vakte otomatik dönüştürülmez. | 0 |
-| REQ-006 / TC-006 | [IIP-03](../cards/IIP-03.md) | Nesne varlığı gerçek kayıt sayılmaz; bilinmeyen gün, sıfır ve zaman kapsamı ayrı tanımlanır. | Migration ile oluşmuş boş prayer nesnesi bilinçli sıfır diye raporlanmaz. | 0 |
+| REQ-005 / TC-005 | [IIP-03](../cards/IIP-03.md) | fajr/sunrise dahil altı alanın tarihsel UI, API ve panel anlamı belgelenir. | Sunrise eski kaydı belirsizse beş vakte otomatik dönüştürülmez. | 4 |
+| REQ-006 / TC-006 | [IIP-03](../cards/IIP-03.md) | Nesne varlığı gerçek kayıt sayılmaz; bilinmeyen gün, sıfır ve zaman kapsamı ayrı tanımlanır. | Migration ile oluşmuş boş prayer nesnesi bilinçli sıfır diye raporlanmaz. | 4 |
 | REQ-007 / TC-007 | [IIP-04](../cards/IIP-04.md) | Mevcut sıra korunarak araçlar kompakt, seçili içerik belirgin; her kontrol görünür. | 320 px ve yüzde 200 metinde başlık/eylem kesilmez. | 0 |
 | REQ-008 / TC-008 | [IIP-04](../cards/IIP-04.md) | Seçili bölüm metin ve semantikle belirtilir; klavye/odak mevcut davranışı korur. | Sadece altın renkli seçim veya odak görünmezliği kabul edilmez. | 0 |
 | REQ-009 / TC-009 | [IIP-05](../cards/IIP-05.md) | Metin 45–75 karakter hedefinde; paragraf, alıntı ve kaynak görsel olarak ayrılır. | Uzun Türkçe başlık, portresiz kişi ve uzun kaynak footer ile kesilme yok. | 0 |

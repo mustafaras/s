@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-03",
+  "gate": "source",
+  "status": "pass",
+  "artifact": "evidence/IIP-03/source.md",
+  "verifiedHead": "0436405cfad6e0910caf345dfe8e1ad52c6f64c0",
+  "diffHash": "2a1c97f1bd426de20eb33813f83dc76c4dc34cfb836711d2bef7efa839bc9d57",
+  "createdAt": "2026-09-20T10:49:00Z",
+  "requirements": ["REQ-005", "REQ-006"],
+  "commands": [
+    {"command": "node --check app/core/saygi.js", "exitCode": 0},
+    {"command": "node --check panel/panel.js", "exitCode": 0},
+    {"command": "node tests/app/test_saygi_boundary.js", "exitCode": 0}
+  ],
+  "limitations": "Source and synthetic fixture evidence only; no live personal data or user-device behavior was read.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "684dc233bb20f5e06c98514b47389d60d168b7f3767c4cac9c504aa5b11cbc38",
+  "details": {
+    "sourceFiles": ["app/core/prayer.js", "app/core/state.js", "app/core/saygi.js", "panel/panel.js"],
+    "mapping": "fajr/Fajr and sunrise/Sunrise remain separate",
+    "denominator": "existing dayCount*6 and days*6 retained; IIP-14/15 open",
+    "copy": "kayıtlı vakit payı / kayıtlı vakit"
+  }
+}

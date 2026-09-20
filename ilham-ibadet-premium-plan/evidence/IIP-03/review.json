@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-03",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-03/review.md",
+  "verifiedHead": "0436405cfad6e0910caf345dfe8e1ad52c6f64c0",
+  "diffHash": "2a1c97f1bd426de20eb33813f83dc76c4dc34cfb836711d2bef7efa839bc9d57",
+  "createdAt": "2026-09-20T10:49:00Z",
+  "requirements": ["REQ-005", "REQ-006"],
+  "commands": [
+    {"command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs --render", "exitCode": 0},
+    {"command": "git -c core.fsmonitor=false diff --check", "exitCode": 0}
+  ],
+  "limitations": "Single local reviewer; denominator policy remains an explicit IIP-14/15 open issue; device and release acceptance are not claimed.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "953e3fd28f3d4c5ce82f65a49934cd29dec7d7e41c60b234f35ef785194bcdff",
+  "details": {
+    "findings": [
+      {"severity": "medium", "finding": "Historical denominator semantics remain unresolved and are explicitly handed to IIP-14/15."},
+      {"severity": "low", "finding": "Browser/device/release acceptance was not in IIP-03 scope."}
+    ],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "Codex / integrator"
+  }
+}

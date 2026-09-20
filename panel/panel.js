@@ -4303,7 +4303,7 @@ function render(){
     var locTxt=(loc&&loc.cityName)?esc(loc.cityName):((loc&&loc.lat)?'Konum ayarlı':'Konum bekleniyor');
     var extra='<span class="tchip fl">'+prayerStreakP()+'g seri</span>';
     var cap=[];
-    if(rng.days>0) cap.push('<span>'+rng.performed+'/'+rng.total+' son '+rng.days+' gün</span>');
+    if(rng.days>0) cap.push('<span>'+rng.performed+'/'+rng.total+' kayıtlı vakit · '+rng.days+' gün kapsamı</span>');
     if(ps.congregation>0) cap.push('<span><b style="color:var(--t2);">'+ps.congregation+'</b> cemaat</span>');
     if(ps.late>0) cap.push('<span><b style="color:var(--amber);">'+ps.late+'</b> geç</span>');
     if(ps.madeUp>0) cap.push('<span><b style="color:var(--t2);">'+ps.madeUp+'</b> kaza</span>');
@@ -4328,7 +4328,7 @@ function render(){
     if(js&&js.completedHatims>0) cap.push('<span><b style="color:var(--faith);">'+js.completedHatims+'</b> tam hatim</span>');
     if(js&&js.lifetime>0) cap.push('<span><b style="color:var(--t2);">'+js.lifetime.toLocaleString('tr-TR')+'</b> ömürlük</span>');
     if(znotes.length) cap.push('<span><b style="color:var(--zikr);">'+znotes.length+'</b> tefekkür notu</span>');
-    if(k.prays>0) cap.push('<span><b style="color:var(--faith);">'+k.prays+'/'+k.max+'</b> vakit</span>');
+    if(k.prays>0) cap.push('<span><b style="color:var(--faith);">'+k.prays+'/'+k.max+'</b> kayıtlı vakit</span>');
     if(k.cong>0) cap.push('<span><b style="color:var(--t2);">'+k.cong+'</b> cemaat</span>');
     h+=kpi('Zikirmatik · Ebced²',val,'var(--zikr)',extra,null,cap.join(''));
   })();

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-09",
+  "gate": "source",
+  "status": "pass",
+  "artifact": "evidence/IIP-09/source.md",
+  "verifiedHead": "6a8729312d70121d11bb5549e2521941df1162a9",
+  "diffHash": "57aa6b577e9028fb5f68de03a56ffcb16146cdbd44537a7c71ac8f161bced24c",
+  "createdAt": "2026-09-21T12:00:00Z",
+  "requirements": [
+    "REQ-017",
+    "REQ-018"
+  ],
+  "commands": [
+    {
+      "command": "node tests/app/test_iip_09.js",
+      "exitCode": 0
+    },
+    {
+      "command": "node tests/app/test_iip_04.js",
+      "exitCode": 0
+    },
+    {
+      "command": "node tests/app/test_saygi_boundary.js",
+      "exitCode": 0
+    },
+    {
+      "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node .claude/skills/run-seyma/driver.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node tests/app/test_modal_focus_containment.js",
+      "exitCode": 0
+    },
+    {
+      "command": "node tests/app/test_state_rebind_boundary.js",
+      "exitCode": 0
+    },
+    {
+      "command": "node tools/shell-inventory.mjs --gate",
+      "exitCode": 0
+    },
+    {
+      "command": "git -c core.fsmonitor=false diff --check",
+      "exitCode": 0
+    }
+  ],
+  "limitations": "Ağsız headless/VM ve kaynak kapılarıdır; cihaz/VoiceOver/yayın kanıtı değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "81e1511afb4f254ead7cce013c140684022ca61b5082fcb49a106864853d6b68",
+  "details": {}
+}

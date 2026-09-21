@@ -1,6 +1,6 @@
 # IIP-04 görsel kanıt fişi
 
-Artifact türü: `render` — ağsız kaynak/CSS render sözleşmesi. Bu artifact gerçek browser screenshot, VoiceOver veya kullanıcı cihazı kabulü değildir.
+Artifact türü: `render`. Gerçek üretim yakalaması: [`visual-render.html`](visual-render.html). `zikr-harness.mjs`, boot edilmiş uygulamanın beş legacy sekmesini onaylı görünür adlarla ağsız VM içinde render edip bu dosyaya seri hale getirir. Browser screenshot, VoiceOver veya kullanıcı cihazı kabulü değildir.
 
 ## Risk matrisi
 
@@ -8,7 +8,7 @@ Artifact türü: `render` — ağsız kaynak/CSS render sözleşmesi. Bu artifac
 |---|---:|---:|---:|---:|---:|---:|
 | Hub/nav normal | PASS | PASS | PASS | PASS | PASS | PASS |
 | Seçili bölüm | PASS | PASS | PASS | PASS | PASS | PASS |
-| Öz/Öncü/İman/Zikir/Rapor dönüşü | PASS | PASS | PASS | PASS | PASS | PASS |
+| Bugün/İlham/İbadet/Zikir/Ritim dönüşü | PASS | PASS | PASS | PASS | PASS | PASS |
 | Boş / loading / hata | PASS | PASS | PASS | PASS | PASS | PASS |
 | Focus / reduced motion | PASS | PASS | PASS | PASS | PASS | PASS |
 

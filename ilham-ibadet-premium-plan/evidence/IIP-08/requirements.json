@@ -7,15 +7,28 @@
   "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
   "diffHash": "68e0dd8bcea4eb629e81aa655ec8ccc68868e8aff5c63fc463cc200e3a16f1f3",
   "createdAt": "2026-09-20T16:52:16Z",
-  "requirements": ["REQ-015", "REQ-016"],
+  "requirements": [
+    "REQ-015",
+    "REQ-016"
+  ],
   "commands": [],
   "limitations": "TC kanıtı ağsız sentetik fixture/render ve yerel gate çıktılarıdır; gerçek cihaz kabulü değildir.",
   "reviewer": "codex",
-  "artifactSha256": "b1b99118137dee64af11704cab6e674e3e63bc0ac2d112e7a681372b8b5c9f4b",
+  "artifactSha256": "7c533805ee56c6f2971d02dbc7893ba6e53598ff13166d72f9e2a8f84c4a458c",
   "details": {
     "results": [
-      {"requirementId": "REQ-015", "testId": "TC-015", "result": "pass", "summary": "Paket sınır fixture'ları, VM/harness, syntax, shell budget ve diff kanıtı temiz."},
-      {"requirementId": "REQ-016", "testId": "TC-016", "result": "pass", "summary": "Light/dark, dar/büyük görünüm, %200 metin, reduced-motion ve durum matrisi render artifact'inde işlendi."}
+      {
+        "requirementId": "REQ-015",
+        "testId": "TC-015",
+        "result": "pass",
+        "summary": "Paket sınır fixture'ları, VM/harness, syntax, shell budget ve diff kanıtı temiz."
+      },
+      {
+        "requirementId": "REQ-016",
+        "testId": "TC-016",
+        "result": "pass",
+        "summary": "Light/dark, dar/büyük görünüm, %200 metin, reduced-motion ve durum matrisi render artifact'inde işlendi."
+      }
     ]
   }
 }

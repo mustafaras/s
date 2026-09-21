@@ -985,6 +985,7 @@
 
 /* İlham & İbadet hub — Zikirmatik ile ortak büyük-kart dili. */
 .faith-v2-nav{position:sticky;top:0;z-index:8;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:4px;padding:5px;border:1px solid color-mix(in srgb,var(--faith) 22%,var(--card-bd));border-radius:17px;background:var(--card);box-shadow:0 10px 28px color-mix(in srgb,var(--faith) 12%,transparent)}
+.iip-09-route-rail{display:flex;flex-direction:column;gap:12px;scroll-margin-top:8px}.iip-09-section{display:flex;flex-direction:column;gap:12px}.iip-09-today-continue{display:flex;flex-direction:column;gap:12px}.iip-09-today-continue:empty{display:none}
 .faith-v2-nav button{appearance:none;min-width:0;min-height:50px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:0;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer}
 .faith-v2-nav button span{height:18px;display:grid;place-items:center}.faith-v2-nav button b{font-size:var(--f-caption2);font-weight:850;white-space:normal;line-height:1.1;overflow-wrap:anywhere;text-align:center}
 .faith-v2-nav button.on{position:relative;background:var(--faith);color:var(--card);box-shadow:0 6px 15px color-mix(in srgb,var(--faith) 24%,transparent)}.faith-v2-nav button.on::after{content:"";position:absolute;left:50%;bottom:3px;width:18px;height:2px;transform:translateX(-50%);border-radius:99px;background:currentColor;opacity:.72}

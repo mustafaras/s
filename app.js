@@ -5924,6 +5924,19 @@ App.quranMarkWatched=function(id){ return window.SeymaQuran.quranMarkWatched.app
 function quranAskMessage(x){ return window.SeymaQuran.quranAskMessage.apply(null,arguments); }
 App.quranJourneyQuestion=function(id){ return window.SeymaQuran.quranJourneyQuestion.apply(null,arguments); };
 
+var _iipModalReturn={focusId:'',scrollTop:0};
+function iipRememberModalReturn(fallbackId){
+  var active=null, sc=null;
+  try{ active=document.activeElement; sc=document.querySelector('[data-scroll]'); }catch(e){}
+  _iipModalReturn.focusId=String(active&&active.id||fallbackId||'');
+  _iipModalReturn.scrollTop=sc?Number(sc.scrollTop||0):0;
+}
+function iipRestoreModalReturn(fallbackId){
+  var focusId=_iipModalReturn.focusId||fallbackId||'', scrollTop=_iipModalReturn.scrollTop||0, sc=null, trigger=null;
+  _iipModalReturn={focusId:'',scrollTop:0};
+  try{ sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=scrollTop; trigger=focusId?document.getElementById(focusId):null; if(!trigger&&fallbackId) trigger=document.getElementById(fallbackId); if(trigger&&trigger.focus) trigger.focus(); }catch(e){}
+}
+
 // ── QY-11: uzak teslim/yanıt dosyalarını yerel duruma güvenle uygula ──
 // Girdi ZATEN QuranTransportV1 ile ayrıştırılmış/doğrulanmış yapılardır; bu
 // fonksiyon ham JSON/ağ hiç görmez. Her geçiş quranReduce() üzerinden gider,
@@ -5947,6 +5960,8 @@ App.refreshQuranUpdates=function(silent,force){ return window.SeymaQuran.refresh
 
 // ── Overlay ve kütüphane etkileşimleri ──
 App.openQuranJourney=function(){
+  if(ui.quranJourneyOpen) return;
+  iipRememberModalReturn('quran-journey-card');
   ui.quranJourneyOpen=true;
   ui.quranJourneyView='library';
   ui.quranDetailId='';
@@ -5961,6 +5976,7 @@ App.openQuranJourney=function(){
   App.refreshQuranUpdates(true,true);
 };
 App.closeQuranJourney=function(){
+  if(!ui.quranJourneyOpen) return;
   var body=function(){
     ui.quranJourneyOpen=false;
     ui.quranJourneyView='library';
@@ -5970,8 +5986,7 @@ App.closeQuranJourney=function(){
     ui.quranFiltersOpen=false;
     quranUnlockBodyScroll();
     render();
-    // Odak, açılışı tetikleyen hub kartına döner (kararlı id ile yeniden sorgulanır).
-    try{ var trigger=document.getElementById('quran-journey-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){}
+    iipRestoreModalReturn('quran-journey-card');
   };
   if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('quran-screen','quran-overlay',body); else body();
 };
@@ -6044,7 +6059,7 @@ App.onQuranKeydown=function(e){
 var _quranBodyLocked=false,_quranBodyPrevOverflow='';
 function quranLockBodyScroll(){ return window.SeymaQuran.quranLockBodyScroll.apply(null,arguments); }
 function quranUnlockBodyScroll(){ return window.SeymaQuran.quranUnlockBodyScroll.apply(null,arguments); }
-App.openQibla=function(){ ui.qiblaOpen=true; ui.qiblaSensorError=''; render(); focusModalDialog('qibla-dialog'); };
+App.openQibla=function(){ if(ui.qiblaOpen) return; iipRememberModalReturn('qibla-card'); ui.qiblaOpen=true; ui.qiblaSensorError=''; render(); focusModalDialog('qibla-dialog'); };
 var _qiblaOrientationHandler=null, _qiblaLastPaint=0, _qiblaSmoothHeading=null, _qiblaAbsoluteSeen=false;
 function qiblaSmoothAngle(previous,next,weight){
   if(previous==null) return next;
@@ -6093,9 +6108,10 @@ App.enableQiblaCompass=function(){
   }catch(e){ ui.qiblaSensorError='Bu cihaz canlı pusulayı desteklemiyor.'; qiblaPaintLive(); toast(ui.qiblaSensorError); }
 };
 App.closeQibla=function(){
+  if(!ui.qiblaOpen) return;
   var body=function(){
     if(_qiblaOrientationHandler){ try{ window.removeEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.removeEventListener('deviceorientation',_qiblaOrientationHandler,true); }catch(e){} _qiblaOrientationHandler=null; }
-    _qiblaSmoothHeading=null; _qiblaAbsoluteSeen=false; ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; render();
+    _qiblaSmoothHeading=null; _qiblaAbsoluteSeen=false; ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; render(); iipRestoreModalReturn('qibla-card');
   };
   if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('qibla-dialog','qibla-overlay',body); else body();
 };
@@ -7590,6 +7606,7 @@ window.addEventListener('focus',function(){ return SEYMA_APP_SURFACE.onWindowFoc
 window.addEventListener('pageshow',function(){ return SEYMA_APP_SURFACE.onWindowPageshow.apply(null,arguments); }); // bfcache'ten geri dönüşte
 window.addEventListener('online',function(){ return SEYMA_APP_SURFACE.onWindowOnline.apply(null,arguments); });   // bağlantı gelince bounded recovery kontrolü
 window.addEventListener('offline',function(){ return SEYMA_APP_SURFACE.onWindowOffline.apply(null,arguments); });
+window.addEventListener('popstate',function(){ if(ui.quranJourneyOpen){ App.closeQuranJourney(); return; } if(ui.qiblaOpen) App.closeQibla(); });
 
 // MON-54: initial render, reminder boot checkpoint, deferred callbacks and
 // splash late-boot guard are delegated only after every App assignment and

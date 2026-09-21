@@ -1,6 +1,6 @@
 # IIP-05 görsel kanıt fişi
 
-Artifact türü: `render` — ağsız kaynak/CSS render sözleşmesi. Bu artifact gerçek browser screenshot, VoiceOver veya kullanıcı cihazı kabulü değildir.
+Artifact türü: `render`. Gerçek registry yakalaması: [`visual-render.html`](visual-render.html). `test_iip_05.js`, ready/loading/error/return durumlarını üretim `SeymaSaygi` HTML üreticilerinden ağsız VM içinde üretip bu dosyaya seri hale getirir. Browser screenshot, VoiceOver veya kullanıcı cihazı kabulü değildir.
 
 ## Risk matrisi
 

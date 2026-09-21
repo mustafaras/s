@@ -433,13 +433,12 @@ ok('Sonraki vakit hesabı güvenli (spiritBarHTML render ile doğrulandı)', (fu
   return /mosque|kandil|spirit|İlham/i.test(appHTML);
 })());
 
-ok('Premium nav sayfanın en üstünde, vakit şeridi ve Kıble kartından önce render olur', (function () {
-  appHTML = ''; sb.App.go('saygi');
+ok('Premium nav ve vakit şeridi Bugün girişlerinden önce render olur', (function () {
+  appHTML = ''; sb.App.go('saygi'); sb.App.setFaithTab('oz');
   const navAt=appHTML.indexOf('faith-v2-nav');
   const spiritAt=appHTML.indexOf('sg-spirit-bar');
-  const qiblaAt=appHTML.indexOf('sg-qibla-card');
   const quranAt=appHTML.indexOf('quran-v2-preview');
-  return navAt>=0 && spiritAt>navAt && qiblaAt>spiritAt && quranAt>qiblaAt;
+  return navAt>=0 && spiritAt>navAt && quranAt>spiritAt && appHTML.indexOf('sg-qibla-card')<0;
 })());
 
 ok('Saygı kartı Zikirmatik ile aynı beş katmanlı büyük-kart dilini kullanır', (function () {
@@ -475,8 +474,8 @@ ok('Premium nav ve yeni kart hareketleri reduced-motion altında kapanır',
   /@media\(prefers-reduced-motion:reduce\)\{\.faith-v2-nav button,\.hub-v2-preview,[^}]*transition:none!important/.test(styles)&&
   /\.hub-v2-preview:hover,\.hub-v2-preview:active\{transform:none\}/.test(styles));
 
-ok('Üst kıble kartı bilimsel hesap özetini gösterir', (function () {
-  appHTML = ''; sb.App.go('saygi');
+ok('İbadet kıble aracı bilimsel hesap özetini gösterir', (function () {
+  sb.App.setFaithTab('iman');
   return /KIBLE · GERÇEK KUZEY/.test(appHTML) && /Büyük daire/.test(appHTML) &&
     /Kâbe[\s\S]*km/.test(appHTML) && /(GPS|Şehir merkezi|Geçici Ankara)/.test(appHTML);
 })());
@@ -853,6 +852,18 @@ if (remSb.App && typeof remSb.App.reminderDeepLinkTargets === 'function') {
       .every((name) => remSb[name] && typeof remSb[name] === 'object'));
   ok('Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık',
     remSb.App.reminderNotificationBoundary().disjoint.ok === true);
+}
+
+if (process.env.IIP04_RENDER_OUT) {
+  const captures = [];
+  for (const tab of ['oz', 'oncu', 'iman', 'zikir', 'rapor']) {
+    appHTML = '';
+    sb.App.go('saygi');
+    sb.App.setFaithTab(tab);
+    captures.push('<section class="capture" data-faith-tab="' + tab + '">' + appHTML + '</section>');
+  }
+  const artifact = '<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IIP-04 VM render capture</title><link rel="stylesheet" href="../../../app/styles.css"><style>body{padding:24px;background:var(--bg);color:var(--ink)}main{display:grid;gap:24px;max-width:900px;margin:auto}.capture{position:relative;min-height:360px;padding:18px;border:1px solid var(--card-bd);border-radius:24px;background:var(--card);overflow:auto}.capture [data-scroll]{max-height:760px}</style></head><body><main><h1>IIP-04 · VM render capture</h1><p>Beş legacy kimliğin onaylı görünür adlarla üretim render çıktısı; sentetik veri, ağsız.</p>' + captures.join('') + '</main></body></html>';
+  fs.writeFileSync(path.resolve(REPO, process.env.IIP04_RENDER_OUT), artifact);
 }
 
 console.log('\n' + (failed ? '⚠️ ' + failed + ' başarısız, ' : '✅ ') + passed + '/' + (passed + failed) + ' assertion pass');

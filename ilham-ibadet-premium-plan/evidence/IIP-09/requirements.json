@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-09",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-09/requirements.md",
+  "verifiedHead": "6a8729312d70121d11bb5549e2521941df1162a9",
+  "diffHash": "57aa6b577e9028fb5f68de03a56ffcb16146cdbd44537a7c71ac8f161bced24c",
+  "createdAt": "2026-09-21T12:00:00Z",
+  "requirements": [
+    "REQ-017",
+    "REQ-018"
+  ],
+  "commands": [],
+  "limitations": "Fixture/VM kanıtıdır; browser ve cihaz kabulü değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "20239f1d9bd561bf6cf7d9bcc76499b7c7fd4aa01dd9bad92d62e76afcbd2594",
+  "details": {
+    "results": [
+      {
+        "requirementId": "REQ-017",
+        "testId": "TC-017",
+        "result": "pass",
+        "summary": "Beş görünen ad, legacy handler kimlikleri, route rail ve bölüm gövdeleri doğrulandı."
+      },
+      {
+        "requirementId": "REQ-018",
+        "testId": "TC-018",
+        "result": "pass",
+        "summary": "Deep-link, modal close, focus dönüşü, selected tab ve stable trigger sözleşmeleri korundu."
+      }
+    ]
+  }
+}

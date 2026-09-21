@@ -195,5 +195,10 @@ check('style contract: narrow view and reduced motion remain explicit', cssSourc
 check('scope contract: no App assignment or migration change was introduced', !/App\.[A-Za-z0-9_]+\s*=/.test(saygiSource) && !saygiSource.includes('migrate('));
 check('scope contract: no network was used while rendering all fixture states', counters.fetch === 0);
 
+if (process.env.IIP05_RENDER_OUT) {
+  const artifact = '<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IIP-05 VM render capture</title><link rel="stylesheet" href="../../../app/styles.css"><style>body{padding:24px;background:var(--bg);color:var(--ink)}main{display:grid;gap:24px;max-width:900px;margin:auto}.capture{position:relative;min-height:360px;padding:18px;border:1px solid var(--card-bd);border-radius:24px;background:var(--card);overflow:auto}.capture>.sg-person-ov-back{position:relative!important;inset:auto!important}.sg-person-read-fab{position:relative!important;inset:auto!important;margin-top:12px}</style></head><body><main><h1>IIP-05 · VM render capture</h1><p>Üretim registry çıktısı; sentetik veri, ağsız.</p><section class="capture" data-state="ready">'+textArticle+lockedFab+'</section><section class="capture" data-state="loading">'+loadingHtml+'</section><section class="capture" data-state="error">'+errorHtml+'</section><section class="capture" data-state="return">'+returnModal+doneFab+'</section></main></body></html>';
+  fs.writeFileSync(path.resolve(repoRoot, process.env.IIP05_RENDER_OUT), artifact);
+}
+
 console.log(`\nIIP-05 visual reader contract: ${passed} PASS, ${failed} FAIL`);
 if (failed) process.exitCode = 1;

@@ -7,16 +7,29 @@
   "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
   "diffHash": "68e0dd8bcea4eb629e81aa655ec8ccc68868e8aff5c63fc463cc200e3a16f1f3",
   "createdAt": "2026-09-20T16:52:16Z",
-  "requirements": ["REQ-015", "REQ-016"],
+  "requirements": [
+    "REQ-015",
+    "REQ-016"
+  ],
   "commands": [],
   "limitations": "Sentetik headless render artifact'idir; browser screenshot, fiziksel cihaz, VoiceOver ve kullanıcı kabulü değildir.",
   "reviewer": "codex",
-  "artifactSha256": "d0195d6db4ed391e466d2b7d4a8164c99e1fda28718c4e9e17550b2eda57f0d4",
+  "artifactSha256": "946bf24fb5123cc878335ab730541d7c892d0cb51ad633a6ee19fcd07b071b1e",
   "details": {
-    "themes": ["light", "dark"],
-    "viewports": ["320px", "390px", "768px", "430px shared boundary", "1280px shared boundary", "320px at 200% text"],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "viewports": [
+      "320px",
+      "390px",
+      "768px",
+      "430px shared boundary",
+      "1280px shared boundary",
+      "320px at 200% text"
+    ],
     "syntheticDataset": "IIP08-SYN-01; kişisel veri/token/GPS/ağ içermeyen paket yüzey durumu fixture'ı.",
-    "observations": "Vakit/kıble, zikir, Kur'an ve öncü okuyucusu için ready/loading/empty/error/return, reduced-motion ve metin sarma riskleri aynı kabul matrisiyle görünür.",
+    "observations": "Index links IIP-04/05/06/07 real VM or registry visual-render artifacts; package regression is fully green.",
     "artifactKind": "render"
   }
 }

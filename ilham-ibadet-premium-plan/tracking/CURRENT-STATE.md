@@ -2,7 +2,7 @@
 
 Kaynak: `IIP-STATE.json`. Elle düzenleme; `node ilham-ibadet-premium-plan/tools/plan-check.mjs --render`.
 
-Plan v2.1 · in_progress · Uygulama 8/24.
+Plan v2.1 · in_progress · Uygulama 9/24.
 
 Yetki: **approved** · Çalıştırılabilir sıradaki: **yok** · Önerilen ilk: IIP-01.
 
@@ -18,7 +18,7 @@ Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
 | [IIP-06 — İbadet ve kıble görsel birlik](../cards/IIP-06.md) | A | done | codex | IIP-04 | — |
 | [IIP-07 — Zikir ve Kur’an geçiş tutarlılığı](../cards/IIP-07.md) | A | done | codex | IIP-04 | — |
 | [IIP-08 — İlk paket kabulü](../cards/IIP-08.md) | A | done | codex | IIP-05, IIP-06, IIP-07 | — |
-| [IIP-09 — Hedef bilgi mimarisi](../cards/IIP-09.md) | B | planned | — | IIP-08 | — |
+| [IIP-09 — Hedef bilgi mimarisi](../cards/IIP-09.md) | B | done | codex | IIP-08 | — |
 | [IIP-10 — Öncü arama ve filtre](../cards/IIP-10.md) | B | planned | — | IIP-09 | — |
 | [IIP-11 — Okuyucu etkileşimleri](../cards/IIP-11.md) | B | planned | — | IIP-10 | — |
 | [IIP-12 — Günlük odak ve devam et](../cards/IIP-12.md) | B | planned | — | IIP-09, IIP-11 | — |

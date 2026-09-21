@@ -6,7 +6,7 @@
 
 ## REQ-016 / TC-016 — görsel kabul matrisi
 
-Light/dark, 320/390/768 px, %200 metin dar sarma, reduced-motion ve ready/empty/loading/error/return durumları risk-temelli render matrisiyle işlendi. 430 px ve 1280 px ortak yerleşim sınırları ayrıca kaydedildi. Artifact headless sentetik render'dır; browser screenshot, fiziksel cihaz veya VoiceOver kabulü değildir.
+Light/dark, 320/390/768 px, %200 metin dar sarma, reduced-motion ve ready/empty/loading/error/return durumları risk-temelli matriste işlendi. Matris, IIP-04/05/06/07 üretim registry/VM çıktısından alınan dört `visual-render.html` dosyasına bağlanır; kırık veya yalnız öz-beyan bağlantısı bırakılmaz. Browser screenshot, fiziksel cihaz veya VoiceOver kabulü değildir.
 
 ## Sonuç
 

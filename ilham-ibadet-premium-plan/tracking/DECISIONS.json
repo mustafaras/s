@@ -12,10 +12,10 @@
     "id": "DEC-02",
     "title": "Beş bölüm hedef mimarisi",
     "ownerCard": "IIP-09",
-    "status": "proposed",
-    "source": null,
-    "evidence": null,
-    "reviewer": null
+    "status": "approved",
+    "source": "2026-09-20 user message: IIP-09 hedef bilgi mimarisini yalnız bu kart kapsamında uygula; go apply be perfect.",
+    "evidence": "evidence/IIP-09/decision-approval.md",
+    "reviewer": "User (product/design decision owner; explicit current-turn approval)"
   },
   {
     "id": "DEC-03",

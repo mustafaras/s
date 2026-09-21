@@ -25,10 +25,10 @@ function check(condition, message) {
 }
 
 check(navStart >= 0 && navEnd > navStart, 'faith navigation function remains an isolated source boundary');
-check(nav.includes("[['oz','Öz'],['oncu','Öncü'],['iman','İman'],['zikir','Zikir'],['rapor','Rapor']]"),
-  'five existing hub sections remain in their current order');
-check(nav.includes("[['oz','Öz'],['oncu','Öncü'],['iman','İman'],['rapor','Rapor']]"),
-  'feature-hidden fallback keeps the existing four-section order');
+check(nav.includes("[['oz','Bugün','Öz'],['oncu','İlham','Öncü'],['iman','İbadet','İman'],['zikir','Zikir','Zikir'],['rapor','Ritim','Rapor']]"),
+  'five legacy hub ids remain in order behind the approved visible names');
+check(nav.includes("[['oz','Bugün','Öz'],['oncu','İlham','Öncü'],['iman','İbadet','İman'],['rapor','Ritim','Rapor']]"),
+  'feature-hidden fallback keeps the four legacy ids in order');
 check(/onclick="App\.setFaithTab\(\\'.*?x\[0\].*?\\'\)"/.test(nav), 'existing tab handler call graph is preserved');
 check(nav.includes("aria-current=\"'+(on?'page':'false')+'\""), 'selected section keeps explicit current-page semantics');
 check(nav.includes("aria-pressed=\"'+(on?'true':'false')+'\""), 'selected section has a machine-readable pressed state');
@@ -44,8 +44,10 @@ check(source.includes('function saygiLoadingHTML(){return \'<div class="saygi-lo
 check(source.includes('class="saygi-error"') && source.includes('App.refreshSaygi()'),
   'source-error state keeps visible retry behavior');
 check(source.includes('Yakında açılıyor'), 'empty/not-live state remains explicit');
-check(source.includes("return '<section class=\"saygi-page\">'+faithNavHTML()+spiritBarHTML()+qiblaHubCardHTML()+quranHub()+saygiPreviewHubHTML"),
-  'existing hub call order remains unchanged');
+check(source.includes("return '<section class=\"saygi-page\">'+faithNavHTML()+spiritBarHTML()+saygiPreviewHubHTML"),
+  'hub shell order remains nav, spirit bar and selected section');
+check(/tab==='iman'.*qiblaHubCardHTML\(\)/.test(hub) && /else body=.*quranHub\(\)/.test(hub),
+  'approved IIP-09 ownership keeps qibla in worship and Quran in today');
 
 check(css.includes('grid-template-columns:repeat(auto-fit,minmax(0,1fr))'),
   'four- and five-section navs share the same compact responsive grid');

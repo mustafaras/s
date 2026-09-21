@@ -2,15 +2,25 @@
   "schemaVersion": 2,
   "programId": "IIP",
   "planVersion": "2.1",
-  "updatedAt": "2026-09-20",
+  "updatedAt": "2026-09-21",
   "status": "in_progress",
   "planStatus": "in_progress",
   "baselineHead": "e794e7bcc637b2431dcfae29f645ef1b02a2b51c",
   "productionCodeTouched": true,
   "implementationApproval": {
     "status": "approved",
-    "cardIds": ["IIP-01", "IIP-02", "IIP-03", "IIP-04", "IIP-05", "IIP-06", "IIP-07", "IIP-08"],
-    "source": "2026-09-20 user message: go next be perfect push commit merge deploy; yalnız IIP-08 adımı."
+    "cardIds": [
+      "IIP-01",
+      "IIP-02",
+      "IIP-03",
+      "IIP-04",
+      "IIP-05",
+      "IIP-06",
+      "IIP-07",
+      "IIP-08",
+      "IIP-09"
+    ],
+    "source": "2026-09-20 user message: yalnız IIP-09 hedef bilgi mimarisini uygula; go apply be perfect."
   },
   "releaseApproval": {
     "status": "approved",
@@ -23,7 +33,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 8,
+  "completedCards": 9,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -459,13 +469,13 @@
       "id": "IIP-09",
       "title": "Hedef bilgi mimarisi",
       "package": "B",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-08"
       ],
       "path": "cards/IIP-09.md",
       "role": "frontend",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/saygi.js",
@@ -484,12 +494,18 @@
         "source",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-09/scope.json",
+        "evidence/IIP-09/requirements.json",
+        "evidence/IIP-09/review.json",
+        "evidence/IIP-09/source.json",
+        "evidence/IIP-09/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-20T17:12:00Z",
+      "completedAt": "2026-09-21T12:00:00Z",
+      "verifiedHead": "6a8729312d70121d11bb5549e2521941df1162a9",
+      "handoff": "evidence/IIP-09/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js"
       ],
@@ -501,7 +517,7 @@
         "DEC-02"
       ],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "57aa6b577e9028fb5f68de03a56ffcb16146cdbd44537a7c71ac8f161bced24c",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

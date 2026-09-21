@@ -30,10 +30,10 @@
     "id": "DEC-04",
     "title": "İçerik pilotu kaynak/hak/inceleme",
     "ownerCard": "IIP-16",
-    "status": "proposed",
-    "source": null,
-    "evidence": null,
-    "reviewer": null
+    "status": "approved",
+    "source": "2026-09-21 user message: daha önce 'inceledim ve onaylıyorum' dediğini açıkça teyit etti; IIP-16 pilotu kaynak/hak/alan kararı.",
+    "evidence": "evidence/IIP-16/decision-approval.md",
+    "reviewer": "User (product/domain decision owner; explicit approval)"
   },
   {
     "id": "DEC-07",

@@ -36,8 +36,8 @@
 | REQ-030 / TC-030 | [IIP-15](../cards/IIP-15.md) | Current-panel ile uygulama aynı kayıt tanımını kullanır; Panel-v2 ayrı regresyon. | Eski veri ve karma kayıtlar iki yüzeyde anlam değiştirmez. | 5 |
 | REQ-031 / TC-031 | [IIP-16](../cards/IIP-16.md) | 10 öncü/12 dua/6 tema için kaynak, hak, bağlam ve insan incelemesi dosyalanır. | İncelenmemiş metin published durumuna geçmez; uydurma alıntı reddedilir. | 4 |
 | REQ-032 / TC-032 | [IIP-16](../cards/IIP-16.md) | Kararlı id/sürüm, tür, lisans, düzeltme ve geri çekme kuralları vardır. | Kaynak geri çekilse geçmiş okuma kaydı silinmez; frozen katalog sessiz değişmez. | 4 |
-| REQ-033 / TC-033 | [IIP-17](../cards/IIP-17.md) | Arapça/okunuş/meal/yorum ayrılır; kaynak bir eylemle açılır. | Hareke, RTL, font yok, yüklenemeyen içerik ve uzun referans geçer. | 0 |
-| REQ-034 / TC-034 | [IIP-17](../cards/IIP-17.md) | İçerik türleri birbiriyle karıştırılmadan tematik bağlantıyla sunulur. | Editoryal tefekkür dinî metinmiş gibi aynı blokta görünmez. | 0 |
+| REQ-033 / TC-033 | [IIP-17](../cards/IIP-17.md) | Arapça/okunuş/meal/yorum ayrılır; kaynak bir eylemle açılır. | Hareke, RTL, font yok, yüklenemeyen içerik ve uzun referans geçer. | 6 |
+| REQ-034 / TC-034 | [IIP-17](../cards/IIP-17.md) | İçerik türleri birbiriyle karıştırılmadan tematik bağlantıyla sunulur. | Editoryal tefekkür dinî metinmiş gibi aynı blokta görünmez. | 6 |
 | REQ-035 / TC-035 | [IIP-18](../cards/IIP-18.md) | Akış, rapor, kaynak ve panel kanıtı birlikte incelenir. | 14–19 arasında koşullu bağımlılık döngüsü veya gizli migration bulunmaz. | 0 |
 | REQ-036 / TC-036 | [IIP-18](../cards/IIP-18.md) | Pilot lisans/uzman incelemesi ve erişilebilirliği tamamlanmadan ürün yayını yok. | Taslak içerik üretimi yayın onayı diye işaretlenmez. | 0 |
 | REQ-037 / TC-037 | [IIP-19](../cards/IIP-19.md) | Yeni alanlar için kimlik/sürüm/tombstone/merge/eski istemci/rollback tanımlı. | Aynı içerik için çift depo ve tarihsel veri kaybı tasarım incelemesinde engellenir. | 0 |

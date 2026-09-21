@@ -509,6 +509,33 @@ function faithCornerOverlayHTML(){
       '<span class="saygi-link-copy"><span class="saygi-link-label">GÜNÜN ODAĞI · '+escHtml(f.source.label)+'</span><span class="saygi-link-sub">'+escHtml(f.source.minutes+' · '+f.reason+' · '+f.source.cta)+'</span></span>'+
       '<span class="saygi-link-arrow">'+iconHtml('chevron-right',14)+'</span></button>';
   }
+  // IIP-17 — Kaynaklı günlük dua/âyet okuyucusu. İçerik yalnız insan
+  // doğrulamalı, dondurulmuş QuranStrikingVersesV1 kataloğundan okunur.
+  // Okunuş katalogda bulunmadığı için uydurulmaz; yokluk açıkça gösterilir.
+  var IIP17_PILOT_IDS=['bakara-255','ihlas-1','fatiha-5','fatiha-6-7','bakara-286','bakara-153','bakara-186','bakara-152','kehf-10','taha-25','taha-114','yusuf-87'];
+  var IIP17_SOURCE_URL='https://kuran.diyanet.gov.tr/';
+  function iip17Selection(date,catalog){
+    var cat=arguments.length>1?catalog:window.QuranStrikingVersesV1;
+    if(!cat||typeof cat.byId!=='function') return {state:'unavailable',reason:'Kaynaklı seçki şu anda yüklenemedi.'};
+    var id=IIP17_PILOT_IDS[saygiDaySeed(date||todayStr())%IIP17_PILOT_IDS.length],verse=cat.byId(id);
+    if(!verse||verse.verified!==true||!verse.arabic||!verse.meal) return {state:'unavailable',reason:'Bugünün doğrulanmış metni bulunamadı.'};
+    return {state:'ready',verse:verse,reference:String(verse.surahNameTr||'')+' '+String(verse.ayetNo||''),theme:String(verse.themeTr||'')};
+  }
+  function iip17ReaderHTML(date,catalog){
+    var pick=iip17Selection(date||todayStr(),arguments.length>1?catalog:window.QuranStrikingVersesV1);
+    if(pick.state!=='ready') return '<section class="iip17-reader iip17-reader-unavailable" aria-labelledby="iip17-title"><div class="iip17-kicker">BUGÜNÜN KAYNAKLI SEÇKİSİ</div><h3 id="iip17-title">Metin gösterilemiyor</h3><p role="status">'+escHtml(pick.reason)+'</p><small>Ana İlham &amp; İbadet araçları kullanılmaya devam edebilir.</small></section>';
+    var v=pick.verse, themes=pick.theme.split('·').map(function(x){return x.trim();}).filter(Boolean), themeHTML='';
+    themes.forEach(function(theme){themeHTML+='<span class="iip17-theme-chip">'+escHtml(theme)+'</span>';});
+    return '<article class="iip17-reader" aria-labelledby="iip17-title">'+
+      '<header class="iip17-reader-head"><div><div class="iip17-kicker">BUGÜNÜN KAYNAKLI SEÇKİSİ</div><h3 id="iip17-title">'+escHtml(pick.reference)+'</h3></div><span class="iip17-verified">İnsan doğrulamalı</span></header>'+
+      '<section class="iip17-text-block iip17-arabic-block" aria-labelledby="iip17-arabic-label"><h4 id="iip17-arabic-label">Arapça</h4><p class="iip17-arabic" lang="ar" dir="rtl">'+escHtml(v.arabic)+'</p></section>'+
+      '<section class="iip17-text-block iip17-reading-block" aria-labelledby="iip17-reading-label"><h4 id="iip17-reading-label">Okunuş</h4><p lang="tr" dir="ltr">Bu seçkide doğrulanmış Latin harfli okunuş yayımlanmadı.</p></section>'+
+      '<section class="iip17-text-block iip17-meal-block" aria-labelledby="iip17-meal-label"><h4 id="iip17-meal-label">Diyanet meali</h4><p lang="tr" dir="ltr">'+escHtml(v.meal)+'</p></section>'+
+      '<aside class="iip17-reflection" aria-labelledby="iip17-reflection-label"><div><span class="iip17-editorial-tag">EDİTORYAL · TEFSİR DEĞİLDİR</span><h4 id="iip17-reflection-label">Tefekkür izi</h4><p>Tema etiketleri metinden ayrı bir keşif yolu sunar; dinî metnin parçası değildir.</p></div><div class="iip17-theme-list" aria-label="Tematik bağlantılar">'+themeHTML+'</div></aside>'+
+      '<div class="iip17-attribution"><span>Diyanet İşleri Başkanlığı · Kur’an-ı Kerim Meali · '+escHtml(pick.reference)+'</span><small>Türkçe meal · Arapça mushaf metni · doğrulama: '+escHtml(v.verifiedAt||'kayıtlı')+'</small></div>'+
+      '<details class="iip17-source"><summary>Kaynak ayrıntısını aç</summary><div><dl><dt>Kurum / eser</dt><dd>Diyanet İşleri Başkanlığı · Kur’an-ı Kerim Meali</dd><dt>Referans</dt><dd>'+escHtml(pick.reference)+'</dd><dt>Tür / dil</dt><dd>Âyet · Arapça asıl metin ve Türkçe meal</dd><dt>Kayıt açıklaması</dt><dd>Dondurulmuş katalog; insan tarafından satır satır doğrulanmış kayıt. Kaynak kurumun kullanım koşulları geçerlidir.</dd></dl><a href="'+IIP17_SOURCE_URL+'" target="_blank" rel="noopener noreferrer" aria-label="Diyanet Kur’an kaynağını yeni sekmede aç">Diyanet Kur’an kaynağını aç '+iconHtml('external-link',13)+'</a></div></details>'+
+    '</article>';
+  }
   // Devam satırı: en çok iki satır (Zikir → Kur'an sabit sırası). Yalnız
   // gerçek durum yazılır; sahte ilerleme yüzdesi yok (tasarım sözleşmesi).
   function saygiContinueRows(){
@@ -575,7 +602,7 @@ function qiblaOverlayHTML(){
   h+='</div></section></div>';
   return h;
 }
-  function saygiPreviewHubHTML(person,article,done){var u=stateUi()||{},tab=u.faithTab||'oz',body='';if(!zikrVisible()&&tab==='zikir'){tab='oz';u.faithTab='oz';}if(tab==='oncu')body=saygiPreviewCardHTML(person,done,article)+saygiCollectionCardHTML(person);else if(tab==='iman')body=faithCornerCardHTML()+'<section class="iip-09-route-rail" aria-label="İbadet araçları">'+qiblaHubCardHTML()+'</section>';else if(tab==='zikir'&&zikrVisible())body=zikrPreview();else if(tab==='rapor')body=faithRaporCardHTML();else body=saygiDailyFocusHTML()+'<section class="iip-09-route-rail" aria-label="Bugün girişleri">'+quranHub()+'</section><section class="iip-09-today-continue" aria-label="Bugün · Kaldığın yer">'+(zikrVisible()?zikrPreview():'')+'</section>'+saygiContinueHTML();return '<div class="saygi-preview-hub iip-09-section iip-09-section-'+tab+'" data-faith-tab="'+escHtml(tab)+'">'+body+'</div>';}
+  function saygiPreviewHubHTML(person,article,done){var u=stateUi()||{},tab=u.faithTab||'oz',body='';if(!zikrVisible()&&tab==='zikir'){tab='oz';u.faithTab='oz';}if(tab==='oncu')body=saygiPreviewCardHTML(person,done,article)+saygiCollectionCardHTML(person);else if(tab==='iman')body=faithCornerCardHTML()+'<section class="iip-09-route-rail" aria-label="İbadet araçları">'+qiblaHubCardHTML()+'</section>';else if(tab==='zikir'&&zikrVisible())body=zikrPreview();else if(tab==='rapor')body=faithRaporCardHTML();else body=saygiDailyFocusHTML()+iip17ReaderHTML(todayStr())+'<section class="iip-09-route-rail" aria-label="Bugün girişleri">'+quranHub()+'</section><section class="iip-09-today-continue" aria-label="Bugün · Kaldığın yer">'+(zikrVisible()?zikrPreview():'')+'</section>'+saygiContinueHTML();return '<div class="saygi-preview-hub iip-09-section iip-09-section-'+tab+'" data-faith-tab="'+escHtml(tab)+'">'+body+'</div>';}
   function faithNavHTML(){var tabs=zikrVisible()?[['oz','Bugün','Öz'],['oncu','İlham','Öncü'],['iman','İbadet','İman'],['zikir','Zikir','Zikir'],['rapor','Ritim','Rapor']]:[['oz','Bugün','Öz'],['oncu','İlham','Öncü'],['iman','İbadet','İman'],['rapor','Ritim','Rapor']],u=stateUi()||{},tab=u.faithTab||'oz',icons={oz:'sun',oncu:'trophy',iman:'mosque',zikir:'sparkles',rapor:'chart-column'},h='<nav class="faith-v2-nav" aria-label="İlham ve İbadet bölümleri">';tabs.forEach(function(x){var on=x[0]===tab;h+='<button class="'+(on?'on':'')+'" data-legacy-label="'+x[2]+'" onclick="App.setFaithTab(\''+x[0]+'\')" aria-current="'+(on?'page':'false')+'" aria-pressed="'+(on?'true':'false')+'"><span>'+iconHtml(icons[x[0]]||'circle',16)+'</span><b>'+x[1]+'</b></button>';});return h+'</nav>';}
   function saygiHTML(){if(!featureLive())return saygiComingSoonHTML();var person=saygiCurrentPerson();if(!person)return '<div class="saygi-empty">'+iconHtml('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';var u=stateUi()||{};if(!u.saygiPersonOpen)saygiEnsureArticle(person);var article=(!u.saygiPersonOpen&&u.saygiArticle&&u.saygiArticle.personId===person.id)?u.saygiArticle:null,done=saygiHasRead(person);return '<section class="saygi-page">'+faithNavHTML()+spiritBarHTML()+saygiPreviewHubHTML(person,article,done)+'</section>';}
   function saygiHeroMediaHTML(article){var title=String(article&&article.title||'Günün öncüsü'),thumb=saygiSafeUrl(article&&article.thumbnail,['upload.wikimedia.org']);if(!thumb)return '<div class="saygi-hero-media is-empty" role="img" aria-label="'+escHtml(title)+' portresi yok"><span class="saygi-hero-media-fallback is-visible" aria-hidden="true">'+iconHtml('image',30)+'<strong>Portre yok</strong><small>Metinli okuma devam ediyor</small></span></div>';return '<div class="saygi-hero-media"><img src="'+escHtml(thumb)+'" alt="'+escHtml(title)+' portresi" loading="eager" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add(\'is-broken\');"><span class="saygi-hero-media-caption">Görsel · Wikipedia</span><span class="saygi-hero-media-fallback" aria-hidden="true">'+iconHtml('image',30)+'<strong>Portre yüklenemedi</strong><small>Metinli okuma devam ediyor</small></span></div>';}
@@ -650,7 +677,7 @@ function qiblaOverlayHTML(){
     saygiScaleToolHTML:saygiScaleToolHTML,saygiTopButtonHTML:saygiTopButtonHTML,
     faithWeekKPIs:faithWeekKPIs,faithRhythmDay:faithRhythmDay,faithRhythmWeek:faithRhythmWeek,faithDayHeat:faithDayHeat,qiblaBearing:qiblaBearing,qiblaDistanceKm:qiblaDistanceKm,qiblaDirectionLabel:qiblaDirectionLabel,
     qiblaMetrics:qiblaMetrics,qiblaLocationPrecision:qiblaLocationPrecision,qiblaAlignmentCopy:qiblaAlignmentCopy,qiblaScreenAngle:qiblaScreenAngle,qiblaOverlayHTML:qiblaOverlayHTML,
-    saygiDailyFocus:saygiDailyFocus,saygiDailyFocusHTML:saygiDailyFocusHTML,saygiContinueRows:saygiContinueRows,saygiContinueHTML:saygiContinueHTML,
+    saygiDailyFocus:saygiDailyFocus,saygiDailyFocusHTML:saygiDailyFocusHTML,iip17Selection:iip17Selection,iip17ReaderHTML:iip17ReaderHTML,saygiContinueRows:saygiContinueRows,saygiContinueHTML:saygiContinueHTML,
     saygiSourceFallback:saygiSourceFallback,saygiSourceCardHTML:saygiSourceCardHTML,saygiReadButtonHTML:saygiReadButtonHTML,saygiReadActionHTML:saygiReadActionHTML,
     saygiLoadingHTML:saygiLoadingHTML,saygiComingSoonHTML:saygiComingSoonHTML,faithSummaryBadges:faithSummaryBadges,faithCornerCardHTML:faithCornerCardHTML,
     saygiPreviewCardHTML:saygiPreviewCardHTML,saygiMissionCardHTML:saygiMissionCardHTML,faithCornerInlineHTML:faithCornerInlineHTML,prayerRowHTML:prayerRowHTML,

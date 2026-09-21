@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const root=require('../repo-root');
+const source=fs.readFileSync(path.join(root,'app/core/saygi.js'),'utf8');
+const css=fs.readFileSync(path.join(root,'app/styles.css'),'utf8');
+let passed=0;
+function test(name,fn){try{fn();passed++;console.log('PASS  '+name);}catch(e){console.error('FAIL  '+name+' — '+e.message);process.exitCode=1;}}
+const sandbox={console,Date,Math,JSON,Object,Array,String,Number,Boolean,RegExp,Error,Promise,Set,Map,Intl,URL,URLSearchParams,encodeURIComponent,decodeURIComponent,isFinite,isNaN,document:{}};
+sandbox.window=sandbox;sandbox.self=sandbox;sandbox.globalThis=sandbox;
+vm.runInContext(source,vm.createContext(sandbox),{filename:'saygi.js'});
+const r=sandbox.SeymaSaygi;
+const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+assert.equal(r.registerSaygi({data:()=>({}),ui:()=>({faithTab:'oz'}),getDay:()=>({}),todayStr:()=> '2026-09-21',addDays:()=>'',diffDays:()=>0,dayIndexFor:()=>0,dateLabelTR:v=>v,icon:n=>'<i>'+esc(n)+'</i>',esc,featuresLive:()=>true,render:()=>{},quranJourneyHubCardHTML:()=>'',zikrVisible:()=>false,zikrPreviewCardHTML:()=>''}),true);
+const verse={id:'x',surahNameTr:'Çok Uzun & <Sûre>',ayetNo:'1-200',arabic:'رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا',meal:'Meal <güvenli>',themeTr:'Dua · Sabır',verified:true,verifiedAt:'2026-08-01'};
+const catalog={byId:()=>verse};
+const html=r.iip17ReaderHTML('2026-09-21',catalog);
+test('Arapça RTL ve hareke korunur',()=>{assert.match(html,/lang="ar" dir="rtl"/);assert.ok(html.includes(verse.arabic));assert.match(css,/letter-spacing:normal/);});
+test('okunuş ve meal ayrı başlıklardır',()=>{assert.match(html,/>Okunuş</);assert.match(html,/>Diyanet meali</);assert.ok(!html.includes('Meal <güvenli>'));assert.ok(html.includes('Meal &lt;güvenli&gt;'));});
+test('editoryal tefekkür dinî metinden ayrı ve açık etiketlidir',()=>{assert.match(html,/<aside class="iip17-reflection"/);assert.match(html,/EDİTORYAL · TEFSİR DEĞİLDİR/);assert.match(html,/Tematik bağlantılar/);});
+test('temalar ayrı bağlantı çipleridir',()=>{assert.match(html,/>Dua</);assert.match(html,/>Sabır</);assert.equal((html.match(/iip17-theme-chip/g)||[]).length,2);});
+test('temel atıf ayrıntı açılmadan görünür',()=>{assert.match(html,/iip17-attribution/);assert.match(html,/Diyanet İşleri Başkanlığı/);assert.match(html,/<details class="iip17-source">/);assert.match(html,/yeni sekmede aç/);});
+test('uzun referans kaçışlı ve taşmaya dayanıklı',()=>{assert.ok(html.includes('Çok Uzun &amp; &lt;Sûre&gt; 1-200'));assert.match(css,/overflow-wrap:anywhere/);});
+test('font fallback zinciri vardır',()=>{assert.match(css,/Noto Naskh Arabic/);assert.match(css,/Geeza Pro/);assert.match(css,/serif/);});
+test('katalog yüklenmezse ana yüzey güvenli hata verir',()=>{const out=r.iip17ReaderHTML('2026-09-21',null);assert.match(out,/Kaynaklı seçki şu anda yüklenemedi/);assert.match(out,/Ana İlham &amp; İbadet araçları/);assert.ok(!out.includes('<details'));});
+test('doğrulanmamış kayıt gösterilmez',()=>{const out=r.iip17ReaderHTML('2026-09-21',{byId:()=>({...verse,verified:false})});assert.match(out,/Bugünün doğrulanmış metni bulunamadı/);assert.ok(!out.includes(verse.arabic));});
+test('okunuş yokluğu uydurma metin yerine açıklanır',()=>{assert.match(html,/doğrulanmış Latin harfli okunuş yayımlanmadı/);});
+if(process.exitCode)process.exit(1);console.log('PASS: IIP-17 '+passed+'/10');

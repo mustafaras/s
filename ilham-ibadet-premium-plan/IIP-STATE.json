@@ -25,9 +25,10 @@
       "IIP-13",
       "IIP-14",
       "IIP-15",
-      "IIP-16"
+      "IIP-16",
+      "IIP-17"
     ],
-    "source": "2026-09-21 user messages: IIP-15 — Ritim raporu doğruluğu (\"go apply be perfect\") and IIP-16 — Editoryal pilot üretimi (\"go next prompt be perfect\"). Each card only; commit/push/deploy not authorized by card prompts."
+    "source": "2026-09-21 user messages: IIP-15 — Ritim raporu doğruluğu; IIP-16 — Editoryal pilot üretimi ve açık inceleme/onay teyidi; IIP-17 — '17 ye geçebilirsin'. Her kart yalnız kendi kapsamındadır; commit/push/deploy yetkisi değildir."
   },
   "releaseApproval": {
     "status": "approved",
@@ -40,7 +41,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 15,
+  "completedCards": 17,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -886,7 +887,7 @@
       "id": "IIP-16",
       "title": "Editoryal pilot üretimi",
       "package": "B",
-      "status": "in_review",
+      "status": "done",
       "dependsOn": [
         "IIP-08"
       ],
@@ -911,10 +912,10 @@
         "evidence/IIP-16/review.json",
         "evidence/IIP-16/content.json"
       ],
-      "blockedReason": "DEC-04 proposed; 10 öncü/12 dua/6 tema için lisans ve yetkin alan incelemesi insan tarafından atanıp tamamlanmadı.",
+      "blockedReason": null,
       "startedAt": "2026-09-21T15:30:00Z",
-      "completedAt": null,
-      "verifiedHead": null,
+      "completedAt": "2026-09-21T18:27:54Z",
+      "verifiedHead": "bf02bbfab079d3d8597d592518b7bdb86bb0509b",
       "handoff": "evidence/IIP-16/HANDOFF.md",
       "fixtureFiles": [],
       "allowedTestFiles": [],
@@ -922,7 +923,7 @@
         "DEC-04"
       ],
       "estimatedSize": "L",
-      "diffHash": null,
+      "diffHash": "1ae2bc6c7c959431cf51d87677d13f7c67c78c2a19139c5c15248c9fbd6caadf",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false
@@ -931,14 +932,14 @@
       "id": "IIP-17",
       "title": "Kaynaklı seçki ve dua yüzeyi",
       "package": "B",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-12",
         "IIP-16"
       ],
       "path": "cards/IIP-17.md",
       "role": "frontend",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/saygi.js",
@@ -957,12 +958,19 @@
         "visual",
         "content"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-17/scope.json",
+        "evidence/IIP-17/requirements.json",
+        "evidence/IIP-17/review.json",
+        "evidence/IIP-17/source.json",
+        "evidence/IIP-17/visual.json",
+        "evidence/IIP-17/content.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-21T18:00:00Z",
+      "completedAt": "2026-09-21T18:27:54Z",
+      "verifiedHead": "bf02bbfab079d3d8597d592518b7bdb86bb0509b",
+      "handoff": "evidence/IIP-17/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js"
       ],
@@ -974,7 +982,7 @@
         "DEC-04"
       ],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "6679180ef6f2c56019e900558cb6d6398ca32f2a856d79a84f3d6ab4a3b7cb2e",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

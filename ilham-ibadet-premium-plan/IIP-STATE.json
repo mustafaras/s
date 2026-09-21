@@ -24,9 +24,10 @@
       "IIP-12",
       "IIP-13",
       "IIP-14",
-      "IIP-15"
+      "IIP-15",
+      "IIP-16"
     ],
-    "source": "2026-09-21 user message: IIP-15 — Ritim raporu doğruluğu (\"go apply be perfect\"). Yalnız IIP-15; commit/push/deploy yetkili değil."
+    "source": "2026-09-21 user messages: IIP-15 — Ritim raporu doğruluğu (\"go apply be perfect\") and IIP-16 — Editoryal pilot üretimi (\"go next prompt be perfect\"). Each card only; commit/push/deploy not authorized by card prompts."
   },
   "releaseApproval": {
     "status": "approved",
@@ -885,13 +886,13 @@
       "id": "IIP-16",
       "title": "Editoryal pilot üretimi",
       "package": "B",
-      "status": "planned",
+      "status": "in_progress",
       "dependsOn": [
         "IIP-08"
       ],
       "path": "cards/IIP-16.md",
       "role": "editorial",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [],
       "requirements": [
@@ -904,12 +905,17 @@
         "review",
         "content"
       ],
-      "evidence": [],
-      "blockedReason": null,
-      "startedAt": null,
+      "evidence": [
+        "evidence/IIP-16/scope.json",
+        "evidence/IIP-16/requirements.json",
+        "evidence/IIP-16/review.json",
+        "evidence/IIP-16/content.json"
+      ],
+      "blockedReason": "DEC-04 proposed; 10 öncü/12 dua/6 tema için lisans ve yetkin alan incelemesi insan tarafından atanıp tamamlanmadı.",
+      "startedAt": "2026-09-21T15:30:00Z",
       "completedAt": null,
       "verifiedHead": null,
-      "handoff": null,
+      "handoff": "evidence/IIP-16/HANDOFF.md",
       "fixtureFiles": [],
       "allowedTestFiles": [],
       "decisionIds": [

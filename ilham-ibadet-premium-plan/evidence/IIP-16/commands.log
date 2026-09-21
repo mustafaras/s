@@ -1,0 +1,7 @@
+PASS node ilham-ibadet-premium-plan/tools/session-brief.mjs IIP-16
+PASS pilot manifest oracle: 10 pioneers / 12 dua-ayat / 6 themes / 0 published
+PASS source-id existence check against SaygiPeople and QuranStrikingVersesV1
+PASS node ilham-ibadet-premium-plan/tools/plan-check.mjs --render
+PASS node ilham-ibadet-premium-plan/tools/plan-check.mjs
+PASS git -c core.fsmonitor=false diff --check
+BLOCKED DEC-04 proposed; rights and qualified domain review pending

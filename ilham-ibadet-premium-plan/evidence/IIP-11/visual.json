@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-11",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-11/render-matrix.html",
+  "verifiedHead": "5e958998391487dcba98c3da4d77ea1160fafa6b",
+  "diffHash": "5c21e99860169594b4924fc2769e94bd3b5129650bdaaf93345b22909afb380c",
+  "createdAt": "2026-09-21T14:30:00Z",
+  "requirements": [
+    "REQ-021",
+    "REQ-022"
+  ],
+  "commands": [],
+  "limitations": "Sentetik render artifact'idir; gerçek ekran görüntüsü, ekran okuyucu, cihaz ve kullanıcı kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "64c3fed8cb519d0470c392c016afa3575516642ff6dde44ac68dba930140334b",
+  "details": {
+    "themes": [
+      "light",
+      "dark (token parity)"
+    ],
+    "viewports": [
+      "320px",
+      "390px",
+      "430px shared boundary",
+      "768px",
+      "1280px shared boundary",
+      "320px at 200% text"
+    ],
+    "syntheticDataset": "IIP11-SYN-01; 1 sentetik kişi, 3 metin (uzun/kısa/RTL). Kişisel veri, token, GPS, ağ veya cihaz depolaması içermez.",
+    "observations": "8 sahne: ölçek 100/112/125/140/160, başlıksız kısa metin (bölüm çubuğu yok), RTL yön ve kapsayıcı alternatif hazır durumu. Aa aracı, bölüm atlama ve alternatif gerçek registry çıktısıdır.",
+    "artifactKind": "render"
+  }
+}

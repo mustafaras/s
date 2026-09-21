@@ -19,9 +19,10 @@
       "IIP-07",
       "IIP-08",
       "IIP-09",
-      "IIP-10"
+      "IIP-10",
+      "IIP-11"
     ],
-    "source": "2026-09-21 user message: yalnız IIP-10 adımını uygula (Öncü arama ve filtre); go apply be perfect."
+    "source": "2026-09-21 user message: go next be per perfect → IIP-10 done, sıradaki kart IIP-11 (Okuyucu etkileşimleri) yetkilendirildi."
   },
   "releaseApproval": {
     "status": "approved",
@@ -34,7 +35,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 10,
+  "completedCards": 11,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -593,13 +594,13 @@
       "id": "IIP-11",
       "title": "Okuyucu etkileşimleri",
       "package": "B",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-10"
       ],
       "path": "cards/IIP-11.md",
       "role": "reader",
-      "owner": null,
+      "owner": "copilot",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/saygi.js",
@@ -617,22 +618,33 @@
         "source",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-11/scope.json",
+        "evidence/IIP-11/requirements.json",
+        "evidence/IIP-11/review.json",
+        "evidence/IIP-11/source.json",
+        "evidence/IIP-11/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-21T14:00:00Z",
+      "completedAt": "2026-09-21T14:30:00Z",
+      "verifiedHead": "5e958998391487dcba98c3da4d77ea1160fafa6b",
+      "handoff": "evidence/IIP-11/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js"
       ],
       "allowedTestFiles": [
         "tests/app/test_saygi_boundary.js",
-        "tests/app/test_iip_11.js"
+        "tests/app/test_iip_11.js",
+        "tests/app/test_fx2_overlay_motion.js",
+        "tests/app/test_fx2_tab_transition.js",
+        "tests/app/test_fx2_touch_coverage.js",
+        "tests/app/test_app_surface_daily_boundary.js",
+        "tests/app/test_v3_welcome.js"
       ],
       "decisionIds": [],
       "estimatedSize": "L",
-      "diffHash": null,
+      "diffHash": "5c21e99860169594b4924fc2769e94bd3b5129650bdaaf93345b22909afb380c",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

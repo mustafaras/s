@@ -24,8 +24,8 @@
 | REQ-018 / TC-018 | [IIP-09](../cards/IIP-09.md) | Modal kapanınca açan kontrol, seçili sekme ve scroll korunur. | Hızlı aç/kapa ve tarayıcı geri hareketi çift modal veya boş kabuk üretmez. | 5 |
 | REQ-019 / TC-019 | [IIP-10](../cards/IIP-10.md) | 100 kişi isim/alan/okundu ile aranır; Türkçe normalizasyon yalnız arama indeksine uygulanır. | I/İ/ı/i, boş sorgu, birden fazla filtre ve sıfır sonuç geçer. | 5 |
 | REQ-020 / TC-020 | [IIP-10](../cards/IIP-10.md) | İsimli liste birincil; grid ikincil özet; bütün kişiler eşdeğer erişilebilir. | Koleksiyon klavyeyle 100 anlamsız numara zincirine mahkûm etmez. | 5 |
-| REQ-021 / TC-021 | [IIP-11](../cards/IIP-11.md) | Oturumluk Aa, bölüm atlama ve konum koruma; varsayılana dönme var. | Büyütme sırasında metin ankrajı kaybolmaz; RTL ayrı dil yönü taşır. | 0 |
-| REQ-022 / TC-022 | [IIP-11](../cards/IIP-11.md) | Mevcut gate A’da korunur; B’de erişilebilir alternatif açık ürün kararıyla eklenir. | Kaydırma/ekran okuyucu erişimi otomatik okudum kaydı oluşturmaz. | 0 |
+| REQ-021 / TC-021 | [IIP-11](../cards/IIP-11.md) | Oturumluk Aa, bölüm atlama ve konum koruma; varsayılana dönme var. | Büyütme sırasında metin ankrajı kaybolmaz; RTL ayrı dil yönü taşır. | 5 |
+| REQ-022 / TC-022 | [IIP-11](../cards/IIP-11.md) | Mevcut gate A’da korunur; B’de erişilebilir alternatif açık ürün kararıyla eklenir. | Kaydırma/ekran okuyucu erişimi otomatik okudum kaydı oluşturmaz. | 5 |
 | REQ-023 / TC-023 | [IIP-12](../cards/IIP-12.md) | Tek odak önerisi kaynak/süre ve seçim gerekçesiyle; deterministik seçilir. | Aynı gün yeniden render öneriyi rastgele değiştirmez; içerik yoksa dürüst boş hâl. | 0 |
 | REQ-024 / TC-024 | [IIP-12](../cards/IIP-12.md) | Yalnız mevcut geçerli aktif zikir/Kur’an kaydı; yeni state kopyası yok. | Boş/bozuk/arşivlenmiş kayda giden Devam düğmesi oluşmaz. | 0 |
 | REQ-025 / TC-025 | [IIP-13](../cards/IIP-13.md) | Tarih/şehir/yöntem eşleşmeyen cache açıkça eski olarak gösterilir. | Gece yarısı, şehir değişimi, timeout ve yöntem değişimi sahte güncel saat üretmez. | 0 |

@@ -322,6 +322,25 @@ function saygiLens(){ return window.SeymaSaygi.saygiLens.apply(null,arguments); 
 function saygiFilterSummary(){ return window.SeymaSaygi.saygiFilterSummary.apply(null,arguments); }
 function saygiFilter(raw){ return window.SeymaSaygi.saygiFilter.apply(null,arguments); }
 function saygiReadFilter(raw){ return window.SeymaSaygi.saygiReadFilter.apply(null,arguments); }
+function saygiScalePercent(){ return window.SeymaSaygi.saygiScalePercent.apply(null,arguments); }
+function saygiScaleIndex(){ return window.SeymaSaygi.saygiScaleIndex.apply(null,arguments); }
+function saygiScaleLabel(){ return window.SeymaSaygi.saygiScaleLabel.apply(null,arguments); }
+function saygiScaleIsDefault(){ return window.SeymaSaygi.saygiScaleIsDefault.apply(null,arguments); }
+function saygiAnchorId(person,index){ return window.SeymaSaygi.saygiAnchorId.apply(null,arguments); }
+function saygiSections(article,person){ return window.SeymaSaygi.saygiSections.apply(null,arguments); }
+function saygiHasSections(article,person){ return window.SeymaSaygi.saygiHasSections.apply(null,arguments); }
+function saygiFirstHeadingAnchor(article,person){ return window.SeymaSaygi.saygiFirstHeadingAnchor.apply(null,arguments); }
+function saygiSectionSkipHTML(article,person,suffix){ return window.SeymaSaygi.saygiSectionSkipHTML.apply(null,arguments); }
+function saygiPosition(){ return window.SeymaSaygi.saygiPosition.apply(null,arguments); }
+function saygiHasPosition(){ return window.SeymaSaygi.saygiHasPosition.apply(null,arguments); }
+function saygiRememberPosition(anchorId,ratio){ return window.SeymaSaygi.saygiRememberPosition.apply(null,arguments); }
+function saygiClearPosition(){ return window.SeymaSaygi.saygiClearPosition.apply(null,arguments); }
+function saygiReadingDirection(article){ return window.SeymaSaygi.saygiReadingDirection.apply(null,arguments); }
+function saygiIsRtl(article){ return window.SeymaSaygi.saygiIsRtl.apply(null,arguments); }
+function saygiDirectionLabel(article){ return window.SeymaSaygi.saygiDirectionLabel.apply(null,arguments); }
+function saygiA11yAlternativeOn(){ return window.SeymaSaygi.saygiA11yAlternativeOn.apply(null,arguments); }
+function saygiA11yAltHTML(suffix,ready){ return window.SeymaSaygi.saygiA11yAltHTML.apply(null,arguments); }
+function saygiScaleToolHTML(){ return window.SeymaSaygi.saygiScaleToolHTML.apply(null,arguments); }
 function faithAnnualHeatmapHTML(){ return window.SeymaSaygi.faithAnnualHeatmapHTML.apply(null,arguments); }
 function faithRaporCardHTML(){ return window.SeymaSaygi.faithRaporCardHTML.apply(null,arguments); }
 function qiblaHubCardHTML(){ return window.SeymaSaygi.qiblaHubCardHTML.apply(null,arguments); }
@@ -3601,6 +3620,91 @@ App.saygiLens=function(action,value){
     try{ var el=document.getElementById('saygi-search-input'); if(el){ el.value=ui.saygiQuery; if(el.focus) el.focus(); } }catch(e){}
   }
 };
+// ── IIP-11 · Okuyucu etkileşimleri (REQ-021 / REQ-022) ──
+// Tek dispatcher: yazı büyütme, bölüme atlama, konumu hatırlama/geri dönme,
+// kapsayıcı tamamlama alternatifi ve RTL bilgisi. Tıpkı App.saygiLens gibi,
+// yeni bir okuyucu denetimi eklemek yeni bir App üyesi GEREKTİRMEZ — yalnız
+// aşağıdaki eylem listesine bir dal eklenir.
+// Hiçbiri kalıcı veriye yazmaz: metin ölçeği ve okuma konumu oturumluktur.
+var SAYGI_READER_ACTIONS={scale:1,reset:1,goto:1,top:1,'a11y-end':1};
+function saygiReaderScrollBody(){ try{ return document.querySelector('.sg-person-ov-card [data-scroll]')||document.getElementById('sey-ov-body')||null; }catch(e){ return null; } }
+function saygiReaderAnchorEl(anchorId){ try{ return anchorId?document.getElementById(anchorId):null; }catch(e){ return null; } }
+// Aa değişiminde ilk görünür paragraf ankrajı korunur: kaydırma konumu orana
+// çevrilir, ölçek uygulandıktan sonra aynı ankraja geri dönülür.
+function saygiReaderCaptureAnchor(){
+  var body=saygiReaderScrollBody(); if(!body) return null;
+  var person=saygiModalPerson(), article=ui.saygiArticle, anchors=saygiBlockAnchors(article);
+  var top=body.scrollTop, chosen='', ratio=0;
+  for(var i=0;i<anchors.length;i++){
+    var el=saygiReaderAnchorEl(saygiAnchorId(person,i));
+    if(!el) continue;
+    if(el.offsetTop<=top+2){ chosen=saygiAnchorId(person,i); ratio=(el.offsetTop-(top))/-Math.max(1,body.clientHeight); }
+    else break;
+  }
+  if(!chosen&&anchors.length) chosen=saygiAnchorId(person,0);
+  return chosen?{anchorId:chosen,ratio:Math.max(-1,Math.min(0,ratio))}:null;
+}
+function saygiReaderRestoreAnchor(anchorId){
+  var el=saygiReaderAnchorEl(anchorId); if(!el||!el.scrollIntoView) return;
+  try{ el.scrollIntoView({block:'start',behavior:'auto'}); }catch(e){ try{ el.scrollIntoView(); }catch(e2){} }
+}
+App.saygiReader=function(action,value){
+  var act=String(action||'');
+  if(!SAYGI_READER_ACTIONS[act]) return;
+  if(act==='scale'){
+    var idx=saygiScaleIndex(), next=String(value)==='down'?(idx-1):(idx+1);
+    next=Math.max(0,Math.min(4,next));
+    var captured=saygiReaderCaptureAnchor();
+    ui.saygiScaleIndex=next;
+    if(!saygiPaintReader()) render();
+    if(captured){ saygiRememberPosition(captured.anchorId,captured.ratio); saygiReaderRestoreAnchor(captured.anchorId); }
+    try{ var lbl=document.getElementById('saygi-scale-value'); if(lbl) lbl.textContent=saygiScaleLabel(); var dn=document.getElementById('saygi-scale-down'), up=document.getElementById('saygi-scale-up'); if(dn) dn.disabled=(next<=0); if(up) up.disabled=(next>=4); }catch(e){}
+    return;
+  }
+  if(act==='reset'){
+    ui.saygiScaleIndex=0; saygiClearPosition();
+    if(!saygiPaintReader()) render();
+    try{ var lbl2=document.getElementById('saygi-scale-value'); if(lbl2) lbl2.textContent=saygiScaleLabel(); }catch(e){}
+    return;
+  }
+  if(act==='goto'){
+    var id=String(value||''); if(!id) return; saygiReaderRestoreAnchor(id);
+    return;
+  }
+  if(act==='top'){
+    var body=saygiReaderScrollBody(); if(body) body.scrollTop=0;
+    return;
+  }
+  if(act==='a11y-end'){
+    var body2=saygiReaderScrollBody();
+    if(body2) body2.scrollTop=body2.scrollHeight;
+    // Bu yol KAYIT OLUŞTURMAZ; yalnız konumu sona alır ve durumu bildirir.
+    ui.saygiReadReady=true;
+    try{
+      var s=document.getElementById('saygi-a11y-status-modal')||document.getElementById('saygi-a11y-status');
+      if(s) s.textContent='Bölüm sonundasın. Kaydı istediğin zaman "Okudum" ile atabilirsin.';
+      var fab=document.getElementById('saygi-read-button-modal');
+      if(fab) saygiUnlockReadButton(fab);
+    }catch(e){}
+    return;
+  }
+};
+// Aa aracı + bölüm atlama yeniden boyanır; makale gövdesi yeniden kurulur ki
+// --saygi-scale gerçekten uygulansın.
+function saygiPaintReader(){
+  try{
+    var person=saygiModalPerson(); if(!person) return false;
+    var host=document.getElementById('saygi-reader-region'); if(!host) return false;
+    var article=ui.saygiArticle; if(!article||article.personId!==person.id) return false;
+    var view=Object.create(article); view.suffix='-modal';
+    host.innerHTML=saygiArticleBodyHTML(person,view,saygiHasRead(person),'saygi-article-modal',false);
+    return true;
+  }catch(e){ return false; }
+}
+// Açık okuma kaydına köprü. IIP-11 sırasında yanlışlıkla silinmişti:
+// saygi.js markup'ı bunu İKİ yerde çağırıyor (okunmuş içerikte "Okudum" →
+// "Ne okudum kaydını aç"), yüzey sayısı 719=719 kaldığı için hiçbir pin
+// yakalamadı — bu yüzden açıkça geri konur ve fixture ile sabitlenir.
 App.openSaygiReading=function(){ App.openReading(); };
 App.openSaygiPreview=function(){
   var person=saygiCurrentPerson(); if(!person) return;

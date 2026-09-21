@@ -1307,6 +1307,61 @@
   .sg-p-chip{padding:6px 10px;}
 }
 .sg-nudge{font-size:var(--f-caption1);color:var(--text2);background:var(--faith-bg);border:1px solid color-mix(in srgb,var(--faith) 20%,transparent);border-radius:12px;padding:9px 11px;line-height:1.45;}
+/* ── IIP-11 · Okuyucu etkileşimleri (REQ-021 / REQ-022) ──
+   Ölçek yalnız OKUMA GÖVDESİNE uygulanır (hero başlığı ve açıklaması ölçeklenmez).
+   ÖNEMLİ: ölçek, her bloğun GERÇEK taban boyutuyla çarpılır. `font-size:1em * scale`
+   yazmak iki hataya yol açıyordu: (a) özgün tabanı (clamp/.token) eziyordu,
+   (b) `1em` ebeveynin boyutuna göre çözüldüğü için taban kayıyordu.
+   Ayrıca okuyucu modal'ı `.saygi-article-modal` sınıfını kullanır — kural iki
+   sınıfı da kapsar, yoksa ölçek asıl yüzeyde hiç etki etmez. */
+.saygi-article,.saygi-article-modal{--saygi-scale:1;}
+.saygi-article .saygi-biography p,.saygi-article-modal .saygi-biography p{
+  font-size:calc(clamp(.9375rem,1.8vw,1.0625rem) * var(--saygi-scale,1));
+}
+.saygi-article .saygi-biography h3,.saygi-article-modal .saygi-biography h3{
+  font-size:calc(var(--f-callout) * var(--saygi-scale,1));
+}
+.saygi-article .saygi-list-block,.saygi-article-modal .saygi-list-block,
+.saygi-article .saygi-lead,.saygi-article-modal .saygi-lead{
+  font-size:calc(var(--f-footnote) * var(--saygi-scale,1));
+}
+@media(max-width:380px){
+  /* Dar ekranda özgün taban --f-footnote'a düşer; ölçek yine uygulanır. */
+  .saygi-article .saygi-biography p,.saygi-article-modal .saygi-biography p{
+    font-size:calc(var(--f-footnote) * var(--saygi-scale,1));
+  }
+}
+.saygi-article[dir="rtl"],.saygi-article-modal[dir="rtl"]{text-align:right;}
+.saygi-article[dir="rtl"] .saygi-attribution,.saygi-article-modal[dir="rtl"] .saygi-attribution,
+.saygi-article[dir="rtl"] .saygi-meta,.saygi-article-modal[dir="rtl"] .saygi-meta{text-align:right;}
+.saygi-dir-tag{background:color-mix(in srgb,var(--faith) 16%,transparent);color:var(--faith2);border-radius:999px;padding:2px 8px;font-size:var(--f-caption2);font-weight:800;}
+.saygi-aa{display:inline-flex;align-items:center;gap:2px;padding:2px;border-radius:999px;background:var(--field);border:1px solid var(--field-bd);}
+.saygi-aa-btn{appearance:none;border:0;background:transparent;color:var(--text2);font-size:var(--f-caption1);font-weight:800;min-width:30px;height:28px;border-radius:999px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.saygi-aa-btn:disabled{opacity:.38;cursor:default;}
+.saygi-aa-btn:focus-visible{outline:2px solid var(--faith2);outline-offset:1px;}
+.saygi-aa-value{font-size:var(--f-caption2);font-weight:800;color:var(--muted);min-width:34px;text-align:center;font-variant-numeric:tabular-nums;}
+.saygi-aa-reset{appearance:none;border:0;background:transparent;color:var(--faith2);font-size:var(--f-caption1);font-weight:800;width:26px;height:28px;border-radius:999px;cursor:pointer;}
+.saygi-aa-reset:focus-visible{outline:2px solid var(--faith2);outline-offset:1px;}
+.saygi-top-btn{appearance:none;border:0;background:transparent;color:var(--muted);width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
+.saygi-top-btn:focus-visible{outline:2px solid var(--faith2);outline-offset:1px;}
+.saygi-skip{display:flex;flex-direction:column;gap:5px;padding:10px 12px;border-radius:14px;background:var(--field);border:1px solid var(--field-bd);}
+.saygi-skip-label{display:inline-flex;align-items:center;gap:6px;font-size:var(--f-caption1);font-weight:750;color:var(--muted);}
+.saygi-skip-select{width:100%;box-sizing:border-box;min-height:38px;padding:8px 10px;border-radius:11px;border:1px solid var(--card-bd);background:var(--card);color:var(--text);font-size:var(--f-subhead);}
+.saygi-skip-select:focus-visible{outline:2px solid var(--faith2);outline-offset:1px;}
+.saygi-a11y-alt{display:flex;flex-direction:column;gap:8px;margin-top:14px;padding:12px;border-radius:14px;background:var(--faith-bg);border:1px solid color-mix(in srgb,var(--faith) 22%,transparent);}
+.saygi-a11y-alt-note{margin:0;font-size:var(--f-caption1);line-height:1.45;color:var(--muted);}
+.saygi-a11y-end{appearance:none;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:7px 13px;border-radius:999px;border:1px solid color-mix(in srgb,var(--faith) 34%,transparent);background:var(--card);color:var(--faith2);font-size:var(--f-caption1);font-weight:800;cursor:pointer;}
+.saygi-a11y-end:focus-visible{outline:2px solid var(--faith2);outline-offset:2px;}
+.saygi-a11y-status{margin:0;font-size:var(--f-caption2);line-height:1.4;color:var(--text2);}
+@media(prefers-reduced-motion:reduce){
+  .saygi-aa,.saygi-aa-btn,.saygi-aa-reset,.saygi-top-btn,.saygi-a11y-end{transition:none!important;transform:none!important;}
+  .saygi-biography{scroll-behavior:auto!important;}
+}
+@media(max-width:389px){
+  .sg-person-ov-card .sg-person-ov-head{flex-wrap:wrap;gap:8px;}
+  .sg-person-ov-card .sg-person-ov-nav{flex-wrap:wrap;justify-content:flex-end;}
+  .saygi-aa-value{min-width:30px;}
+}
 
 /* Sonraki vakit geri sayım */
 .sg-faith-next{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border-radius:14px;background:color-mix(in srgb,var(--faith) 9%,var(--card));border:1px solid color-mix(in srgb,var(--faith) 24%,transparent);}

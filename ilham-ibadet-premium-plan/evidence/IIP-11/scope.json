@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-11",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-11/scope.md",
+  "verifiedHead": "5e958998391487dcba98c3da4d77ea1160fafa6b",
+  "diffHash": "5c21e99860169594b4924fc2769e94bd3b5129650bdaaf93345b22909afb380c",
+  "createdAt": "2026-09-21T14:30:00Z",
+  "requirements": [
+    "REQ-021",
+    "REQ-022"
+  ],
+  "commands": [],
+  "limitations": "Yayın, cihaz ve ekran okuyucu kabulü bu receipt'in kapsamı dışındadır.",
+  "reviewer": "copilot",
+  "artifactSha256": "155083b80e1b3b55cefafcbdb6402baa66309e4f107ed609e964117c7a404203",
+  "details": {
+    "changedFiles": [
+      "app/core/saygi.js",
+      "app.js",
+      "app/styles.css",
+      "tests/app/test_iip_11.js",
+      "ilham-ibadet-premium-plan/IIP-STATE.json",
+      "ilham-ibadet-premium-plan/cards/IIP-11.md",
+      "ilham-ibadet-premium-plan/tracking/CURRENT-STATE.md",
+      "ilham-ibadet-premium-plan/tracking/LEDGER.jsonl",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/scope.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/requirements.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/source.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/visual.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/render-matrix.html",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/commands.log",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/manifest.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-11/HANDOFF.md",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_app_surface_daily_boundary.js",
+      "tests/app/test_v3_welcome.js"
+    ],
+    "scopeReviewedBy": "copilot"
+  }
+}

@@ -528,7 +528,8 @@ console.log('\n[6] app.js yüzeyi pinli');
 const appSource = read('app.js');
 const handlerCount = (appSource.match(/^App\.[A-Za-z0-9_$]+\s*=\s*function/gm) || []).length;
 // IIP-10 / DEC-07: App.saygiLens eklendi; 554 → 555.
-ok('App.* handler yüzeyi bozulmadı (555)', handlerCount === 555, 'ölçülen: ' + handlerCount);
+// IIP-11: App.saygiReader eklendi; 555 → 556, 719 → 720.
+ok('App.* handler yüzeyi bozulmadı (556)', handlerCount === 556, 'ölçülen: ' + handlerCount);
 ok('app.js tanıtım sayfasına referans vermiyor',
   appSource.indexOf('v3-tanitim') < 0 && appSource.indexOf(V3_KEY) < 0);
 ok('sync.js tanıtım anahtarına dokunmuyor',
@@ -537,8 +538,8 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // styles.css'e dokunulmadı (paylaşılan yüzey). app.js/appSurface.js sürümleri
 // B2 (DEVIR-PROMPTU §8) düzeltmesiyle 2026-09-15'te bump edildi: "4.500 adım"
 // metinleri gerçek adım hedefine (stepsGoal → 9.000) çekildi.
-ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260921a)',
-  /app\.js\?v=20260921a/.test(indexSource));
+ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260921b)',
+  /app\.js\?v=20260921b/.test(indexSource));
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
   /app\/core\/appSurface\.js\?v=20260920a/.test(indexSource));
 /* B2: yürüyüş tikinin kullanıcıya söylediği eşik, tikin GERÇEK eşiğiyle aynı
@@ -849,8 +850,8 @@ const combined = APP_SURFACE_FILES.map(read).join('');
 const surfaceCount = new Set(
   (combined.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((s) => s.match(/App\.[A-Za-z0-9_]+/)[0])
 ).size;
-ok('App yüzeyi pinli (719) — sürüm köprüsü yeni handler eklemedi',
-  surfaceCount === 719, 'ölçülen: ' + surfaceCount);
+ok('App yüzeyi pinli (720) — sürüm köprüsü yeni handler eklemedi',
+  surfaceCount === 720, 'ölçülen: ' + surfaceCount);
 ok('tıklama niteliği sayısı pinli (391)',
   (combined.match(/onclick=/g) || []).length === 391,
   'ölçülen: ' + (combined.match(/onclick=/g) || []).length);

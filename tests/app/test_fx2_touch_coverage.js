@@ -227,7 +227,8 @@ group(
 const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
 // IIP-10 / DEC-07: App.saygiLens tek dispatcher handler'ı 718 → 719 yaptı;
 // onclick=391 pini değişmedi.
-group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size === 719 && count(/onclick=/g, combinedSource) === 391);
+// IIP-11: App.saygiReader tek dispatcher handler'ı 719 → 720 yaptı; onclick=391 değişmedi.
+group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size === 720 && count(/onclick=/g, combinedSource) === 391);
 
 // 10. Yüksek değerli niyetler sözlükte bulunur; none erken dönüşle sessizdir.
 const intentBody = (mediaSource.match(/var FX_INTENT\s*=\s*\{([\s\S]*?)\n\s*\};/) || [])[1] || '';

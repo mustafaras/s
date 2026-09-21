@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-11",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-11/review.md",
+  "verifiedHead": "5e958998391487dcba98c3da4d77ea1160fafa6b",
+  "diffHash": "5c21e99860169594b4924fc2769e94bd3b5129650bdaaf93345b22909afb380c",
+  "createdAt": "2026-09-21T14:30:00Z",
+  "requirements": [
+    "REQ-021",
+    "REQ-022"
+  ],
+  "commands": [],
+  "limitations": "Sentetik/headless incelemedir; fiziksel cihaz, ekran okuyucu ve yayın kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "f1bf63ee0dc6e35b21a9ebb57e6ca1c84a62122bae609e50085786442146013e",
+  "details": {
+    "findings": [
+      {
+        "id": "IIP11-REV-03",
+        "severity": "high",
+        "summary": "Ölçek CSS'i yanlış sarmalayıcıyı hedefliyordu (.saygi-article ≠ okuyucu modal'ının .saygi-article-modal sınıfı) → ölçek asıl yüzeyde hiç uygulanmıyordu; 1em * scale özgün taban boyutunu da eziyordu.",
+        "resolution": "fixed"
+      },
+      {
+        "id": "IIP11-REV-02",
+        "severity": "high",
+        "summary": "App.openSaygiReading yanlışlıkla silinmişti; markup onu iki yerde çağırıyordu ve okuma kaydı köprüsü kırıktı. Yüzey 719=719 kaldığı için hiçbir pin yakalamadı.",
+        "resolution": "fixed"
+      },
+      {
+        "id": "IIP11-REV-01",
+        "severity": "medium",
+        "summary": "Okuma konumu oranı [0,1]'e kırpılıyordu; doğru aralık [-1,1].",
+        "resolution": "fixed"
+      }
+    ],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "copilot"
+  }
+}

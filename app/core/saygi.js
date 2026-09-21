@@ -283,6 +283,67 @@
     return '<p class="sg-p-search-foot">'+escHtml(lens.results.length)+' öncü gösteriliyor · '+escHtml(String(lens.readCount))+'/'+escHtml(String(lens.total))+' okundu'+(lens.hasLens?' · filtre açık':'')+'</p>';
   }
 
+  // ── IIP-11 · Okuyucu etkileşimleri (REQ-021 / REQ-022) ──
+  // Yazı büyütme, bölüm atlama ve okuma konumu YALNIZ `ui` oturumluk kanalında
+  // yaşar: hiçbiri `data`'ya, kalıcı depoya, sync'e veya geçişe (migration)
+  // yazılmaz. Bu, metin ölçeğinin "oturumluk" olması kuralını kodda sabitler.
+  var SAYGI_SCALE_STEPS=[100,112,125,140,160];
+  function saygiScaleIndex(){ var u=stateUi()||{}, n=Number(u.saygiScaleIndex); return (isFinite(n)&&n>=0&&n<SAYGI_SCALE_STEPS.length)?Math.floor(n):0; }
+  function saygiScalePercent(){ return SAYGI_SCALE_STEPS[saygiScaleIndex()]; }
+  function saygiScaleLabel(){ return saygiScalePercent()+'%'; }
+  function saygiScaleIsDefault(){ return saygiScaleIndex()===0; }
+  function saygiAnchorId(person,index){ return 'saygi-blok-'+String(person&&person.id||'kisi')+'-'+String(index); }
+  // Görünür bir paragraf/başlık ankrajı hesaplanır; Aa değişiminden sonra bu
+  // ankraj korunur (spec: "Aa değişiminde ilk görünür paragraf anchor olarak korunur").
+  function saygiBlockAnchors(article){
+    var blocks=(article&&article.blocks)||[];
+    return blocks.filter(function(b){ return b&&typeof b.text==='string'&&b.text; });
+  }
+  function saygiSections(article,person){
+    var anchors=saygiBlockAnchors(article), out=[], seen=0;
+    for(var i=0;i<anchors.length;i++){
+      if(anchors[i].type!=='h') continue;
+      seen++;
+      out.push({index:i,anchorId:saygiAnchorId(person,i),label:String(anchors[i].text||''),number:seen});
+    }
+    return out;
+  }
+  function saygiHasSections(article,person){ return saygiSections(article,person).length>0; }
+  function saygiFirstHeadingAnchor(article,person){
+    var s=saygiSections(article,person); return s.length?s[0].anchorId:'';
+  }
+  // Okuma konumu: paragraf/sayfa değil, ANKRAJ + göreli oran saklanır. Böylece
+  // Aa değişiminde yükseklik değişse de okuyucu aynı yerde kalır.
+  function saygiPosition(){ var u=stateUi()||{}, p=u.saygiPosition; return (p&&typeof p==='object')?p:null; }
+  function saygiHasPosition(){ var p=saygiPosition(); return !!(p&&p.anchorId); }
+  function saygiRememberPosition(anchorId,ratio){
+    var u=stateUi(); if(!u) return;
+    // Oran [-1, 1] aralığındadır: negatif değer ankrajın görünümün ÜSTÜNDE
+    // kaldığını, pozitif ALTINDA kaldığını söyler. [0,1]'e kırpmak negatif
+    // yarıyı yok eder ve Aa sonrası geri dönüşü bozardı.
+    u.saygiPosition={anchorId:String(anchorId||''),ratio:Math.max(-1,Math.min(1,Number(ratio)||0))};
+  }
+  function saygiClearPosition(){ var u=stateUi(); if(u) u.saygiPosition=null; }
+  // "Başa dön" Aa ile birleşmez; açık ve ayrı bir eylemdir.
+  function saygiIsRtl(article){ return !!(article&&article.rtl===true); }
+  function saygiReadingDirection(article){ return saygiIsRtl(article)?'rtl':'ltr'; }
+  function saygiDirectionLabel(article){ return saygiIsRtl(article)?'Sağdan sola yazı yönü':'Soldan sağa yazı yönü'; }
+
+  // ── IIP-11 · kapsayıcı tamamlama alternatifi (REQ-022 / B) ──
+  // Kaydırma kapısı (A) hiç değişmez. B, yanında EŞDEĞER ve bağımsız bir yol
+  // açar: bölüm sonuna klavyeyle git + açık tamamladım beyanı. Bu yol hiçbir
+  // zaman otomatik "okudum" kaydı oluşturmaz; kayıt yine açık eylemle atılır.
+  function saygiA11yAlternativeOn(){ var u=stateUi()||{}; return u.saygiA11yAlt!==false; }
+  function saygiA11yAltHTML(suffix,ready){
+    if(!saygiA11yAlternativeOn()) return '';
+    return '<div class="saygi-a11y-alt"'+(ready?' data-ready="1"':'')+'>'+
+      '<p class="saygi-a11y-alt-note">Metni kaydırmakta zorlanıyorsan bu yol eşdeğerdir; kayıt yine yalnız senin açık eyleminle atılır.</p>'+
+      '<button type="button" id="saygi-a11y-end'+suffix+'" class="saygi-a11y-end" onclick="App.saygiReader(\'a11y-end\')">'+iconHtml('chevron-down',14)+' Bölüm sonuna git</button>'+
+      '<p id="saygi-a11y-status'+suffix+'" class="saygi-a11y-status" role="status" aria-live="polite">'+
+        (ready?'Bölüm sonundasın. Kaydı istediğin zaman "Okudum" ile atabilirsin.':'Bölüm sonuna gitmek kaydı kendiliğinden oluşturmaz.')+
+      '</p></div>';
+  }
+
   function faithWeekKPIs(date){
     date=date||todayStr();var d=stateData()||{},days=d.days||{},order=prayerValue('PRAYER_ORDER',[]),prays=0,cong=0,made=0,late=0,nafile=0,dayCount=0;
     for(var i=0;i<7;i++){var key=addDays(date,-i),rec=days[key];if(!rec||!rec.prayer)continue;dayCount++;order.forEach(function(k){var e=rec.prayer[k];if(!e)return;if(e.performed){prays++;if(e.inCongregation)cong++;if(e.late)late++;if(e.madeUp)made++;}nafile+=Math.max(0,Number(e.nafile)||0);});}
@@ -392,8 +453,50 @@ function qiblaOverlayHTML(){
   function faithNavHTML(){var tabs=zikrVisible()?[['oz','Bugün','Öz'],['oncu','İlham','Öncü'],['iman','İbadet','İman'],['zikir','Zikir','Zikir'],['rapor','Ritim','Rapor']]:[['oz','Bugün','Öz'],['oncu','İlham','Öncü'],['iman','İbadet','İman'],['rapor','Ritim','Rapor']],u=stateUi()||{},tab=u.faithTab||'oz',icons={oz:'sun',oncu:'trophy',iman:'mosque',zikir:'sparkles',rapor:'chart-column'},h='<nav class="faith-v2-nav" aria-label="İlham ve İbadet bölümleri">';tabs.forEach(function(x){var on=x[0]===tab;h+='<button class="'+(on?'on':'')+'" data-legacy-label="'+x[2]+'" onclick="App.setFaithTab(\''+x[0]+'\')" aria-current="'+(on?'page':'false')+'" aria-pressed="'+(on?'true':'false')+'"><span>'+iconHtml(icons[x[0]]||'circle',16)+'</span><b>'+x[1]+'</b></button>';});return h+'</nav>';}
   function saygiHTML(){if(!featureLive())return saygiComingSoonHTML();var person=saygiCurrentPerson();if(!person)return '<div class="saygi-empty">'+iconHtml('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';var u=stateUi()||{};if(!u.saygiPersonOpen)saygiEnsureArticle(person);var article=(!u.saygiPersonOpen&&u.saygiArticle&&u.saygiArticle.personId===person.id)?u.saygiArticle:null,done=saygiHasRead(person);return '<section class="saygi-page">'+faithNavHTML()+spiritBarHTML()+saygiPreviewHubHTML(person,article,done)+'</section>';}
   function saygiHeroMediaHTML(article){var title=String(article&&article.title||'Günün öncüsü'),thumb=saygiSafeUrl(article&&article.thumbnail,['upload.wikimedia.org']);if(!thumb)return '<div class="saygi-hero-media is-empty" role="img" aria-label="'+escHtml(title)+' portresi yok"><span class="saygi-hero-media-fallback is-visible" aria-hidden="true">'+iconHtml('image',30)+'<strong>Portre yok</strong><small>Metinli okuma devam ediyor</small></span></div>';return '<div class="saygi-hero-media"><img src="'+escHtml(thumb)+'" alt="'+escHtml(title)+' portresi" loading="eager" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add(\'is-broken\');"><span class="saygi-hero-media-caption">Görsel · Wikipedia</span><span class="saygi-hero-media-fallback" aria-hidden="true">'+iconHtml('image',30)+'<strong>Portre yüklenemedi</strong><small>Metinli okuma devam ediyor</small></span></div>';}
-  function saygiArticleBodyHTML(person,article,done,wrapCls,includeReadAction){var heroLead=article.lead,first=article.blocks&&article.blocks[0];if(first&&heroLead&&first.text.slice(0,90)===heroLead.slice(0,90))heroLead='';var h='<article class="'+(wrapCls||'saygi-article')+'"><header class="saygi-hero">'+saygiHeroMediaHTML(article)+'<div class="saygi-hero-copy"><div class="saygi-tags"><span>'+escHtml(person.kind)+'</span><span>'+escHtml(person.era)+'</span></div><h2>'+escHtml(article.title)+'</h2><div class="saygi-discipline">'+iconHtml(person.kind==='Bilim'?'microscope':'feather',15)+' '+escHtml(person.field)+'</div>'+(article.description?'<p class="saygi-description">'+escHtml(article.description)+'</p>':'')+(heroLead?'<p class="saygi-lead">'+escHtml(heroLead)+'</p>':'')+'<div class="saygi-meta"><span>'+iconHtml('clock',13)+' yaklaşık '+saygiReadMinutes(article)+' dk</span><span>'+iconHtml('book-open',13)+' '+(article.lang==='tr'?'Türkçe Wikipedia':'English Wikipedia')+'</span></div></div></header><div class="saygi-biography">';article.blocks.forEach(function(block){if(!block||!block.text)return;if(block.type==='h')h+='<h3>'+escHtml(block.text)+'</h3>';else if(block.type==='list')h+='<div class="saygi-list-block">'+iconHtml('sparkles',14)+'<span>'+escHtml(block.text)+'</span></div>';else h+='<p>'+escHtml(block.text)+'</p>';});h+='</div><section class="saygi-sources"><div class="saygi-section-title"><span>'+iconHtml('link-2',16)+'</span><div><strong>Kaynakta daha derine in</strong><small>Wikipedia maddesi ve maddede yer alan seçili dış bağlantılar</small></div></div><div class="saygi-source-grid">'+saygiSourceCardHTML(article,null,true);(article.links||[]).forEach(function(link){h+=saygiSourceCardHTML(article,link,false);});return h+'</div></section><footer class="saygi-attribution"><span class="saygi-attribution-icon" aria-hidden="true">'+iconHtml('file-text',13)+'</span><span class="saygi-attribution-copy"><strong>Kaynak ve lisans</strong><span>Metin <a href="'+escHtml(article.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Wikipedia katkıda bulunanlarından</a> alınır; '+escHtml(article.licenseTitle)+' lisansı ile paylaşılır.</span></span><a href="'+escHtml(article.licenseUrl)+'" target="_blank" rel="noopener noreferrer" aria-label="Lisans ayrıntısı">'+iconHtml('external-link',13)+'</a></footer>'+(includeReadAction!==false?saygiReadButtonHTML(person,done,article.suffix||''):'')+'</article>';}
-  function saygiPersonModalHTML(){var u=stateUi()||{},person=saygiModalPerson();if(!person)return '';var article=(u.saygiArticle&&u.saygiArticle.personId===person.id)?u.saygiArticle:null,done=saygiHasRead(person),people=saygiPeople(),personIndex=people.findIndex(function(x){return x.id===person.id;}),head='<div class="sg-person-ov-head"><div><div class="sg-person-ov-title"><span>'+iconHtml('trophy',16)+'</span>'+escHtml(person.name)+'</div><small class="sg-person-ov-count">'+(personIndex+1)+' / '+people.length+' · Öncü koleksiyonu</small></div><div class="sg-person-ov-nav"><button onclick="App.browseSaygiPerson(-1)" aria-label="Önceki öncü">‹</button><button onclick="App.browseSaygiPerson(1)" aria-label="Sonraki öncü">›</button><button onclick="App.closeSaygiPerson()" aria-label="Kapat">'+iconHtml('x',16)+'</button></div></div>',body='';if(u.saygiLoading||!article){body+='<div style="padding:18px 4px;">';if(u.saygiLoading)body+=saygiLoadingHTML();else body+='<div class="saygi-error"><span>'+iconHtml('cloud-rain',22)+'</span><div><strong>Bugünün kaynağına ulaşamadık.</strong><p>'+escHtml(u.saygiError||'Birazdan yeniden deneyebilirsin.')+'</p><div class="saygi-error-actions"><button onclick="App.refreshSaygi()">'+iconHtml('rotate-ccw',14)+' Yeniden dene</button><a href="'+escHtml(saygiSourceFallback(person))+'" target="_blank" rel="noopener noreferrer">Wikipedia’da aç '+iconHtml('external-link',13)+'</a></div></div></div>';body+='</div>';}else{article=Object.create(article);article.suffix='-modal';body+=saygiArticleBodyHTML(person,article,done,'saygi-article-modal',false);body+='<div id="saygi-read-sentinel-modal" class="saygi-read-sentinel" aria-hidden="true"></div>';}return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" role="dialog" aria-modal="true" aria-label="Günün öncüsü" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeSaygiPerson)" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:520px;height:92vh;max-height:900px;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">'+body+'</div></div></div>';}
+  function saygiArticleBodyHTML(person,article,done,wrapCls,includeReadAction){var heroLead=article.lead,first=article.blocks&&article.blocks[0];if(first&&heroLead&&first.text.slice(0,90)===heroLead.slice(0,90))heroLead='';var dir=saygiReadingDirection(article),scale=saygiScalePercent(),suffix=article.suffix||'';
+    var h='<article class="'+(wrapCls||'saygi-article')+'" dir="'+dir+'" lang="'+(article.lang||'tr')+'" data-saygi-scale="'+scale+'" style="--saygi-scale:'+(scale/100).toFixed(2)+';">'+
+      '<header class="saygi-hero">'+saygiHeroMediaHTML(article)+'<div class="saygi-hero-copy"><div class="saygi-tags"><span>'+escHtml(person.kind)+'</span><span>'+escHtml(person.era)+'</span>'+(article.rtl?'<span class="saygi-dir-tag">'+escHtml(saygiDirectionLabel(article))+'</span>':'')+'</div><h2>'+escHtml(article.title)+'</h2><div class="saygi-discipline">'+iconHtml(person.kind==='Bilim'?'microscope':'feather',15)+' '+escHtml(person.field)+'</div>'+(article.description?'<p class="saygi-description">'+escHtml(article.description)+'</p>':'')+(heroLead?'<p class="saygi-lead">'+escHtml(heroLead)+'</p>':'')+'<div class="saygi-meta"><span>'+iconHtml('clock',13)+' yaklaşık '+saygiReadMinutes(article)+' dk</span><span>'+iconHtml('book-open',13)+' '+(article.lang==='tr'?'Türkçe Wikipedia':'English Wikipedia')+'</span></div></div></header>'+
+      saygiSectionSkipHTML(article,person,suffix)+
+      '<div class="saygi-biography">';
+    article.blocks.forEach(function(block,i){if(!block||!block.text)return;var id=saygiAnchorId(person,i);
+      if(block.type==='h')h+='<h3 id="'+escHtml(id)+'" tabindex="-1">'+escHtml(block.text)+'</h3>';
+      else if(block.type==='list')h+='<div id="'+escHtml(id)+'" class="saygi-list-block">'+iconHtml('sparkles',14)+'<span>'+escHtml(block.text)+'</span></div>';
+      else h+='<p id="'+escHtml(id)+'">'+escHtml(block.text)+'</p>';});
+    h+='</div><section class="saygi-sources"><div class="saygi-section-title"><span>'+iconHtml('link-2',16)+'</span><div><strong>Kaynakta daha derine in</strong><small>Wikipedia maddesi ve maddede yer alan seçili dış bağlantılar</small></div></div><div class="saygi-source-grid">'+saygiSourceCardHTML(article,null,true);(article.links||[]).forEach(function(link){h+=saygiSourceCardHTML(article,link,false);});return h+'</div></section><footer class="saygi-attribution"><span class="saygi-attribution-icon" aria-hidden="true">'+iconHtml('file-text',13)+'</span><span class="saygi-attribution-copy"><strong>Kaynak ve lisans</strong><span>Metin <a href="'+escHtml(article.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Wikipedia katkıda bulunanlarından</a> alınır; '+escHtml(article.licenseTitle)+' lisansı ile paylaşılır.</span></span><a href="'+escHtml(article.licenseUrl)+'" target="_blank" rel="noopener noreferrer" aria-label="Lisans ayrıntısı">'+iconHtml('external-link',13)+'</a></footer>'+
+      saygiA11yAltHTML(suffix,done)+
+      (includeReadAction!==false?saygiReadButtonHTML(person,done,suffix):'')+'</article>';}
+
+  // ── IIP-11 · bölüm atlama (varsa) ──
+  // Bölüm yoksa (tek bloklu kısa metin) hiç çizilmez: boş bir araç çubuğu göstermek
+  // kullanıcıyı yanıltırdı.
+  function saygiSectionSkipHTML(article,person,suffix){
+    var sections=saygiSections(article,person);
+    if(!sections.length) return '';
+    var opts='';
+    for(var i=0;i<sections.length;i++) opts+='<option value="'+escHtml(sections[i].anchorId)+'">'+sections[i].number+'. '+escHtml(sections[i].label)+'</option>';
+    return '<div class="saygi-skip">'+
+      '<label class="saygi-skip-label" for="saygi-skip-select'+suffix+'">'+iconHtml('route',14)+' Bölüme atla</label>'+
+      '<select id="saygi-skip-select'+suffix+'" class="saygi-skip-select" onchange="App.saygiReader(\'goto\',this.value)">'+
+        '<option value="">Bölüm seç…</option>'+opts+
+      '</select></div>';
+  }
+  // ── IIP-11 · Aa aracı ve başa dön (ayrı eylemler) ──
+  // Aa ile "başa dön" birleştirilmez: biri metin ölçeği, diğeri konumdur.
+  function saygiScaleToolHTML(){
+    var pct=saygiScalePercent(), isDefault=saygiScaleIsDefault();
+    return '<div class="saygi-aa" role="group" aria-label="Yazı boyutu">'+
+      '<button type="button" id="saygi-scale-down" class="saygi-aa-btn" onclick="App.saygiReader(\'scale\',\'down\')" aria-label="Yazıyı küçült"'+(pct<=100?' disabled':'')+'>A−</button>'+
+      '<span id="saygi-scale-value" class="saygi-aa-value" aria-live="polite">'+pct+'%</span>'+
+      '<button type="button" id="saygi-scale-up" class="saygi-aa-btn" onclick="App.saygiReader(\'scale\',\'up\')" aria-label="Yazıyı büyüt"'+(pct>=160?' disabled':'')+'>A+</button>'+
+      (isDefault?'':'<button type="button" id="saygi-scale-reset" class="saygi-aa-reset" onclick="App.saygiReader(\'reset\')" aria-label="Varsayılan yazı boyutuna dön">↺</button>')+
+    '</div>';
+  }
+  function saygiTopButtonHTML(){
+    return '<button type="button" id="saygi-top-btn" class="saygi-top-btn" onclick="App.saygiReader(\'top\')" aria-label="Başa dön">'+iconHtml('chevron-up',15)+'</button>';
+  }
+  function saygiScaleTool(){ return saygiScaleToolHTML(); }
+
+  function saygiPersonModalHTML(){var u=stateUi()||{},person=saygiModalPerson();if(!person)return '';var article=(u.saygiArticle&&u.saygiArticle.personId===person.id)?u.saygiArticle:null,done=saygiHasRead(person),people=saygiPeople(),personIndex=people.findIndex(function(x){return x.id===person.id;}),head='<div class="sg-person-ov-head"><div><div class="sg-person-ov-title"><span>'+iconHtml('trophy',16)+'</span>'+escHtml(person.name)+'</div><small class="sg-person-ov-count">'+(personIndex+1)+' / '+people.length+' · Öncü koleksiyonu</small></div><div class="sg-person-ov-nav">'+saygiScaleToolHTML()+saygiTopButtonHTML()+'<button onclick="App.browseSaygiPerson(-1)" aria-label="Önceki öncü">‹</button><button onclick="App.browseSaygiPerson(1)" aria-label="Sonraki öncü">›</button><button onclick="App.closeSaygiPerson()" aria-label="Kapat">'+iconHtml('x',16)+'</button></div></div>',body='';if(u.saygiLoading||!article){body+='<div style="padding:18px 4px;">';if(u.saygiLoading)body+=saygiLoadingHTML();else body+='<div class="saygi-error"><span>'+iconHtml('cloud-rain',22)+'</span><div><strong>Bugünün kaynağına ulaşamadık.</strong><p>'+escHtml(u.saygiError||'Birazdan yeniden deneyebilirsin.')+'</p><div class="saygi-error-actions"><button onclick="App.refreshSaygi()">'+iconHtml('rotate-ccw',14)+' Yeniden dene</button><a href="'+escHtml(saygiSourceFallback(person))+'" target="_blank" rel="noopener noreferrer">Wikipedia’da aç '+iconHtml('external-link',13)+'</a></div></div></div>';body+='</div>';}else{article=Object.create(article);article.suffix='-modal';body+='<div id="saygi-reader-region">'+saygiArticleBodyHTML(person,article,done,'saygi-article-modal',false)+'</div>';body+='<div id="saygi-read-sentinel-modal" class="saygi-read-sentinel" aria-hidden="true"></div>';}return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" role="dialog" aria-modal="true" aria-label="Günün öncüsü" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeSaygiPerson)" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:520px;height:92vh;max-height:900px;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">'+body+'</div></div></div>';}
   function saygiFloatingReadHTML(){var person=saygiModalPerson();if(!person)return '';var u=stateUi()||{},article=u.saygiArticle&&u.saygiArticle.personId===person.id?u.saygiArticle:null,done=saygiHasRead(person),ready=!!u.saygiReadReady,disabled=!done&&(!article||!ready),sub=done?'Ne okudum kaydını aç':(!article?(u.saygiLoading?'Biyografi hazırlanıyor':'Biyografi yüklenince açılır'):(ready?'Bugünün kaydına ekle':'Yazının sonuna inince açılır'));return '<!-- z-index:2147483640!important -->'+'<button id="saygi-read-button-modal" class="sg-person-read-fab'+(done?' is-done':(ready?' is-ready':' is-locked'))+'" '+(disabled?'disabled':'')+' aria-describedby="saygi-read-sub-modal" onclick="'+(done?'App.openSaygiReading()':'App.markSaygiRead()')+'"><span class="saygi-read-button-icon">'+iconHtml(done?'circle-check':'book-open',20)+'</span><span><strong data-saygi-read-copy>Okudum</strong><small id="saygi-read-sub-modal" data-saygi-read-sub>'+escHtml(sub)+'</small></span></button>';}
   function saygiUnlockReadButton(btn){var u=stateUi()||{};if(!btn||btn.disabled===false&&u.saygiReadReady)return;u.saygiReadReady=true;btn.disabled=false;btn.classList.remove('is-locked');btn.classList.add('is-ready');var copy=btn.querySelector('[data-saygi-read-copy]'),sub=btn.querySelector('[data-saygi-read-sub]');if(copy)copy.textContent='Okudum';if(sub)sub.textContent='Bugünün kaydına ekle';var ic=btn.querySelector('.saygi-read-button-icon');if(ic)ic.innerHTML=iconHtml('circle-check',19);}
   function saygiDisconnectReadObserver(){if(saygiReadObserver){try{saygiReadObserver.disconnect();}catch(e){}saygiReadObserver=null;}}
@@ -414,6 +517,11 @@ function qiblaOverlayHTML(){
     saygiPersonRowHTML:saygiPersonRowHTML,saygiPersonListHTML:saygiPersonListHTML,saygiPersonListFooterHTML:saygiPersonListFooterHTML,
     saygiResultCountHTML:saygiResultCountHTML,saygiResultCountText:saygiResultCountText,saygiSearchControlsHTML:saygiSearchControlsHTML,saygiSearchEmptyHTML:saygiSearchEmptyHTML,saygiFilteredResultsHTML:saygiFilteredResultsHTML,
     saygiCollectionGridHTML:saygiCollectionGridHTML,
+    saygiScaleSteps:SAYGI_SCALE_STEPS,saygiScaleIndex:saygiScaleIndex,saygiScalePercent:saygiScalePercent,saygiScaleLabel:saygiScaleLabel,saygiScaleIsDefault:saygiScaleIsDefault,
+    saygiAnchorId:saygiAnchorId,saygiBlockAnchors:saygiBlockAnchors,saygiSections:saygiSections,saygiHasSections:saygiHasSections,saygiFirstHeadingAnchor:saygiFirstHeadingAnchor,
+    saygiSectionSkipHTML:saygiSectionSkipHTML,saygiPosition:saygiPosition,saygiHasPosition:saygiHasPosition,saygiRememberPosition:saygiRememberPosition,saygiClearPosition:saygiClearPosition,
+    saygiIsRtl:saygiIsRtl,saygiReadingDirection:saygiReadingDirection,saygiDirectionLabel:saygiDirectionLabel,saygiA11yAlternativeOn:saygiA11yAlternativeOn,saygiA11yAltHTML:saygiA11yAltHTML,
+    saygiScaleToolHTML:saygiScaleToolHTML,saygiTopButtonHTML:saygiTopButtonHTML,
     faithWeekKPIs:faithWeekKPIs,faithDayHeat:faithDayHeat,qiblaBearing:qiblaBearing,qiblaDistanceKm:qiblaDistanceKm,qiblaDirectionLabel:qiblaDirectionLabel,
     qiblaMetrics:qiblaMetrics,qiblaLocationPrecision:qiblaLocationPrecision,qiblaAlignmentCopy:qiblaAlignmentCopy,qiblaScreenAngle:qiblaScreenAngle,qiblaOverlayHTML:qiblaOverlayHTML,
     saygiSourceFallback:saygiSourceFallback,saygiSourceCardHTML:saygiSourceCardHTML,saygiReadButtonHTML:saygiReadButtonHTML,saygiReadActionHTML:saygiReadActionHTML,

@@ -395,6 +395,14 @@
   }
   function initialRender(){
     var data=bootCall('data'), doc=bootCall('document');
+    // Kapı sessiz doğrulaması: izin geçmişte verilmişse (data.settings.locationEnabled)
+    // kapıyı TAZE konum beklemeden aç (Permissions API → granted ise anında; aksi
+    // hâlde 15 dk önbellek yoklaması). Bu yol bir boot sırasında kaldırılmıştı ve
+    // kapının tek çıkışı taze getCurrentPosition'a bağlı kalmıştı: OS düzeyinde
+    // konum kapalıyken (kod 2) izinli kullanıcı kapıda KİLİTLİ kalıyordu.
+    // Konum özelliğini kullanmayan kullanıcıya dokunmaz (locationEnabled kontrolü
+    // fonksiyonun içindedir) ve watch yalnızca verilmişse başlar (onLocationFix).
+    try{ lifecycleCall('locationGateSilentVerify'); }catch(e){}
     bootCall('render');
     try{
       var touch=bootCall('touch');
@@ -561,6 +569,10 @@ function locationGatePermanentFailure(code,reason){
 }
 
 function locationGateFailure(code,reason){
+  // Geçici hatada retry hakkı YENİLENİR: kapı her kapanışta bir kez daha
+  // düşük-hassasiyetli deneme yapabilmeli; yoksa ikinci hatadan sonra kullanıcı
+  // yalnız elle "tekrar dene"ye mahkûm kalır.
+  ui.locationGateLowAccuracyTried=false;
   // POSITION_UNAVAILABLE (2) genellikle GEÇİCİDİR: konum servisi henüz ısınmadı,
   // GPS kilidi yok (iç mekân) veya OS düzeyinde konum kapalı. Tek seferlik
   // düşük hassasiyetli (ağ/WiFi tabanlı) yeniden deneme çoğu durumda kapıyı açar.

@@ -4467,6 +4467,10 @@ function locationGateSilentVerify(){
     ui.locationGateError='';
     ui.locationGateRequestInFlight=false;
     locationGateResetNudge();
+    // Kapı açılınca canlı izleme de başlasın: aksi hâlde sessiz doğrulamayla
+    // açılan oturumda hareket/adım verisi bir sonraki foreground olayına kadar
+    // boş kalırdı. (Burada moveState/startLocationWatch app.js kapsamındadır.)
+    try{ if(moveState.watchId==null) startLocationWatch(false); }catch(e){}
     render();
   }
   // Kapı YALNIZ gerçek bir doğrulamayla açılır; "kayıtlı koordinat var" tek

@@ -1,0 +1,16 @@
+PASS node --check app/core/saygi.js
+PASS node --check panel/panel.js
+PASS node --check panel/v2/panel-v2.js
+PASS node tests/app/test_iip_15.js (13/13)
+PASS node tests/app/test_iip_14.js (17/17)
+PASS node tests/app/test_saygi_boundary.js (22/22)
+PASS node tests/app/test_prayer_boundary.js (22/22)
+PASS node .claude/skills/run-seyma/driver.mjs
+PASS node .claude/skills/run-seyma/verify-state-migration-boundary.mjs (67/67)
+PASS node .claude/skills/run-seyma/zikr-harness.mjs (95/95)
+PASS all tests/panel/test_*.js
+PASS all tests/panel-v2/test_*.js
+PASS all tests/app/test_*.js except tests/app/test_iip_03.js
+EXPECTED STALE FAIL tests/app/test_iip_03.js: historical fixture requires removed max:days*6 and k.prays+'/'+k.max strings; file is outside IIP-15 allowlist
+PASS node tools/shell-inventory.mjs --gate
+PASS git -c core.fsmonitor=false diff --check

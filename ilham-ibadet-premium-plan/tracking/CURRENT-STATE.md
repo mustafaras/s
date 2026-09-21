@@ -2,7 +2,7 @@
 
 Kaynak: `IIP-STATE.json`. Elle düzenleme; `node ilham-ibadet-premium-plan/tools/plan-check.mjs --render`.
 
-Plan v2.1 · in_progress · Uygulama 14/24.
+Plan v2.1 · in_progress · Uygulama 15/24.
 
 Yetki: **approved** · Çalıştırılabilir sıradaki: **yok** · Önerilen ilk: IIP-01.
 
@@ -24,7 +24,7 @@ Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
 | [IIP-12 — Günlük odak ve devam et](../cards/IIP-12.md) | B | done | copilot | IIP-09, IIP-11 | — |
 | [IIP-13 — Vakit kaynağı ve tazelik](../cards/IIP-13.md) | B | done | copilot | IIP-03, IIP-09 | — |
 | [IIP-14 — Kayıpsız tarihsel kayıt sunumu](../cards/IIP-14.md) | B | done | codex | IIP-03, IIP-13 | — |
-| [IIP-15 — Ritim raporu doğruluğu](../cards/IIP-15.md) | B | planned | — | IIP-14 | — |
+| [IIP-15 — Ritim raporu doğruluğu](../cards/IIP-15.md) | B | done | codex | IIP-14 | — |
 | [IIP-16 — Editoryal pilot üretimi](../cards/IIP-16.md) | B | planned | — | IIP-08 | — |
 | [IIP-17 — Kaynaklı seçki ve dua yüzeyi](../cards/IIP-17.md) | B | planned | — | IIP-12, IIP-16 | — |
 | [IIP-18 — İkinci paket kabulü](../cards/IIP-18.md) | B | planned | — | IIP-11, IIP-12, IIP-13, IIP-14, IIP-15, IIP-17 | — |

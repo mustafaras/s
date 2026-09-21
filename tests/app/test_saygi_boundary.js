@@ -138,6 +138,7 @@ sandbox.HijriCalendarV1 = {
 ok('HijriCalendar registry sonrası çağrı anında çözülür', registry.hijriTodayStr() === 'Hicri 2026-09-04 +1');
 ok('kandil shimi lazy content ile çalışır', registry.kandilBadgeFor('2026-09-04') === 'Kandil fixture');
 ok('tarihsel KPI güvenilmez payda/yüzde üretmez', (function () { const k = registry.faithWeekKPIs('2026-09-04'); return k.maxPrays === null && k.rate === null && k.denominatorReliable === false; })());
+ok('ritim modeli üç faaliyeti ayırır ve güvenilmez yüzdeyi kapatır', (function () { const k = registry.faithRhythmWeek('2026-09-04'); return k.totals && typeof k.totals.vakit === 'number' && typeof k.totals.zikr === 'number' && typeof k.totals.okuma === 'number' && k.rate === null && k.denominatorReliable === false; })());
 
 const person = sandbox.SaygiPeople[0];
 const previewDump = registry.saygiPreviewCardHTML(person, false, null);

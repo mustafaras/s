@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-12",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-12/requirements.md",
+  "verifiedHead": "faa65857cfc0fdbf67c6719e6f677bbda67cbb1a",
+  "diffHash": "0a7f44f8987566f88fb97462fa68d0d564f5b4f528b350285669f6136a14e598",
+  "createdAt": "2026-09-21T11:57:39Z",
+  "requirements": [
+    "REQ-023",
+    "REQ-024"
+  ],
+  "commands": [],
+  "limitations": "Fixture/VM kanıtıdır; tarayıcı, cihaz ve ekran okuyucu kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "e61d8d801a20007d94337cb52a36509506587b01e2031b60bf351075ddfbfa2d",
+  "details": {
+    "results": [
+      {
+        "requirementId": "REQ-023",
+        "testId": "TC-023",
+        "result": "pass",
+        "summary": "92 kontrol içinde kürasyon bölümü: tek öneri, kaynak+süre+gerekçe, determinizm (bağımsız iki sandbox + tekrar render), yalnız oncu/ayet kaynağı, gerçek (no-op olmayan) CTA, gün geçişi. Olumsuz: içerik yokken empty + gerekçe ve HİÇ CTA yok; tekil içerik kaynağı altı güne çakılmaz."
+      },
+      {
+        "requirementId": "REQ-024",
+        "testId": "TC-024",
+        "result": "pass",
+        "summary": "Devam satırları: en çok iki satır, sabit sıra Zikir→Kur'an, gerçek durum metni, durum→eylem yönlendirmesi (watched→soru, ready→izle, watching→aç). Olumsuz: 20 bozuk/geçersiz durumda satır YOK (arşiv, bozuk nesne, geçersiz sûre, idle/hata durumları, bekleme durumları, question_opened, hedefi 0). Kilit: render öncesi/sonrası data bit bit aynı, yeni kalıcı alan yok, ağ/depo/timer açılmaz."
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-12",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-12/review.md",
+  "verifiedHead": "faa65857cfc0fdbf67c6719e6f677bbda67cbb1a",
+  "diffHash": "0a7f44f8987566f88fb97462fa68d0d564f5b4f528b350285669f6136a14e598",
+  "createdAt": "2026-09-21T11:57:39Z",
+  "requirements": [
+    "REQ-023",
+    "REQ-024"
+  ],
+  "commands": [],
+  "limitations": "Sentetik/headless incelemedir; fiziksel cihaz, ekran okuyucu ve yayın kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "f869cbc9b84a622beb6f1c8852fc78f3685ccb75ddc3edbf9675181707eb4480",
+  "details": {
+    "findings": [
+      {
+        "id": "IIP12-REV-02",
+        "severity": "high",
+        "summary": "Kur'an \"devam\" kümesi bekleme durumlarını (submitting/queued/notified/awaiting_reply/validating_reply) da sayıyordu; bunlar kullanıcı için devam değildir ve aynı sekmedeki yolculuk kartıyla çakışırdı. Ayrıca watched durumunda App.openQuranJourney() açmak yanlış yüzeydi.",
+        "resolution": "fixed"
+      },
+      {
+        "id": "IIP12-REV-01",
+        "severity": "medium",
+        "summary": "Âyet kaynağının CTA'sı App.setFaithTab('oz') idi; kart zaten Bugün sekmesinde olduğu için no-op'tu.",
+        "resolution": "fixed"
+      },
+      {
+        "id": "IIP12-REV-03",
+        "severity": "medium",
+        "summary": "İlk taslak app/styles.css izinli olmadığı hâlde yeni CSS sınıfları (sg-daily-focus*, sg-continue*) üretiyordu — IIP-11 REV-03 hatasının tekrarı.",
+        "resolution": "fixed"
+      }
+    ],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "copilot"
+  }
+}

@@ -424,6 +424,89 @@ function faithCornerOverlayHTML(){
   '</div>';
   return h;
 }
+  // ── IIP-12 · Günlük odak + Devam et ──────────────────────────────────────
+  // Seçim YALNIZ mevcut, kabul edilmiş kayıt/kataloglardan türetilir; yeni
+  // içerik, yeni kayıt, streak veya `data` alanı ÜRETMEZ. Determinizm gün +
+  // katalog kimliğinden gelir; aynı gün tekrar render seçimi değiştirmez
+  // (REQ-023/TC-023). Tematik seçki içeriği plana göre yazılmamıştır
+  // (04-ICERIK-STRATEJISI: "bu planla içerik yazılmış/onaylanmış değildir"),
+  // bu yüzden öneri yalnız kabul edilmiş kataloglardan (öncü + âyet) gelir;
+  // tema içeriği uydurulmaz.
+  var SAYGI_DAILY_SOURCES=[
+    {id:'oncu',label:'Günün öncüsü',minutes:'5–10 dk',cta:'Biyografiyi aç',action:"App.openSaygiPreview()"},
+    {id:'ayet',label:'Âyet vitrini',minutes:'2–3 dk',cta:'Yolculuğu aç',action:"App.openQuranJourney()"}
+  ];
+  // Kur'an: YALNIZ kullanıcının gerçekten bıraktığı yer. "Bekleme" durumları
+  // (submitting/queued/notified/awaiting_reply/validating_reply) Devam DEĞİLDİR —
+  // kullanıcının yapacağı bir şey yoktur ve aynı sekmedeki yolculuk kartı bunları
+  // zaten gösterir. idle/request_error/notification_error/invalid_reply/
+  // video_unavailable bozuk/başarısız kayıttır; Devam düğmesi üretilmez
+  // (TC-024 olumsuz kontrol).
+  var SAYGI_QURAN_RESUME_STATUSES={ready:1,watching:1,watched:1};
+  var SAYGI_QURAN_STATUS_LABELS={ready:'Anlatım hazır · yeni',watching:'İzleniyor · kaldığın yer',watched:'İzlendi · soru bekliyor'};
+  function quranRead(name,args){ var q=window.SeymaQuran,f=dep('quran:'+name); if(f)return f.apply(null,args||[]); return q&&typeof q[name]==='function'?q[name].apply(q,args||[]):null; }
+  function saygiDaySeed(date){
+    var people=saygiPeople(), stamp=String(people.length)+':'+String((people[0]&&people[0].id)||'')+':'+String((people[people.length-1]&&people[people.length-1].id)||'');
+    var n=0,s=String(date||'')+'|'+stamp;
+    for(var i=0;i<s.length;i++) n=(n*31+s.charCodeAt(i))>>>0;
+    return n;
+  }
+  function saygiDailyFocus(date){
+    if(!saygiPeople().length) return {state:'empty',source:null,reason:'Bugünün seçkisi için kabul edilmiş içerik bulunamadı.'};
+    return {state:'ready',source:SAYGI_DAILY_SOURCES[saygiDaySeed(date||todayStr())%SAYGI_DAILY_SOURCES.length],reason:'Bugünün seçkisi · gün + katalog kimliğinden deterministik'};
+  }
+  function saygiDailyFocusHTML(date){
+    var f=saygiDailyFocus(date||todayStr());
+    if(f.state!=='ready') return '<div class="sg-collect-empty" role="status">'+iconHtml('sparkles',13)+' '+escHtml(f.reason)+'</div>';
+    // Tek baskın eylem: kartın tamamı bir düğmedir. Görsel dil mevcut
+    // `saygi-source-card` sınıfından gelir; yalnız buton font eşitlemesi inline
+    // eklenir (bu sınıf normalde <a> için yazılmıştır).
+    return '<button class="saygi-source-card" style="font:inherit;text-align:left;cursor:pointer" aria-label="Günün odağı: '+escHtml(f.source.label+' · '+f.source.cta)+'" onclick="'+f.source.action+'">'+
+      '<span class="saygi-link-thumb">'+iconHtml('sparkles',19)+'</span>'+
+      '<span class="saygi-link-copy"><span class="saygi-link-label">GÜNÜN ODAĞI · '+escHtml(f.source.label)+'</span><span class="saygi-link-sub">'+escHtml(f.source.minutes+' · '+f.reason+' · '+f.source.cta)+'</span></span>'+
+      '<span class="saygi-link-arrow">'+iconHtml('chevron-right',14)+'</span></button>';
+  }
+  // Devam satırı: en çok iki satır (Zikir → Kur'an sabit sırası). Yalnız
+  // gerçek durum yazılır; sahte ilerleme yüzdesi yok (tasarım sözleşmesi).
+  function saygiContinueRows(){
+    var rows=[];
+    if(zikrVisible()){
+      try{
+        var p=zikrCall('zikrActivePreset',[]), jp=p?zikrCall('zikrJourneyProgress',[p]):null, j=jp&&jp.journey, h=jp&&jp.hatim;
+        if(p&&j&&h&&h.status!=='archived'&&h.target>0){
+          var n=Math.max(0,Number(h.count)||0), done=h.status==='completed'||n>=h.target;
+          rows.push({icon:'sparkles',label:String(p.name||'Zikir'),status:done?'Hatim tamamlandı':(Math.round(n/h.target*100)+'% · hatim ilerliyor'),action:"App.openZikr()"});
+        }
+      }catch(e){}
+    }
+    try{
+      var d=stateData(), jr=d&&d.quranJourney;
+      if(jr&&typeof jr==='object'&&!Array.isArray(jr)){
+        var sid=String(jr.activeSurahId||'').toLocaleLowerCase('tr-TR'), cat=window.QuranRevelationOrderV1;
+        var req=jr.requests&&jr.requests[sid], status=req&&typeof req.status==='string'?req.status:'idle';
+        if(cat&&typeof cat.byId==='function'&&cat.byId(sid)&&SAYGI_QURAN_RESUME_STATUSES[status]){
+          var sname=quranRead('quranSurahName',[sid]);
+          // Durum → doğru eylem: izlenmiş durağın devamı soru sormaktır;
+          // açmak yanlış yüzey olurdu.
+          var naction=status==='watched'?"App.quranJourneyQuestion()":(status==='ready'?"App.quranJourneyWatch()":"App.openQuranJourney()");
+          rows.push({icon:'book-open',label:sname||'Kur’an Yolculuğu',status:SAYGI_QURAN_STATUS_LABELS[status]||'Devam ediyor',action:naction});
+        }
+      }
+    }catch(e){}
+    return rows;
+  }
+  function saygiContinueHTML(){
+    var rows=saygiContinueRows();
+    if(!rows.length) return ''; // Yoksa görünmez; sahte ilerleme yok (TC-024)
+    var h='<div style="display:flex;flex-direction:column;gap:12px;" role="group" aria-label="Kaldığın yer · devam et">';
+    rows.forEach(function(r){
+      h+='<button class="saygi-source-card" style="font:inherit;text-align:left;cursor:pointer" aria-label="Devam et: '+escHtml(r.label+' · '+r.status)+'" onclick="'+r.action+'">'+
+        '<span class="saygi-link-thumb">'+iconHtml(r.icon,19)+'</span>'+
+        '<span class="saygi-link-copy"><span class="saygi-link-label">'+escHtml(r.label)+'</span><span class="saygi-link-sub">'+escHtml(r.status)+'</span></span>'+
+        '<span class="saygi-link-arrow">'+iconHtml('chevron-right',14)+'</span></button>';
+    });
+    return h+'</div>';
+  }
   function faithAnnualHeatmapHTML(){var u=stateUi()||{},dta=stateData()||{},now=todayStr(),nowY=new Date().getFullYear(),startY=+(dta.startDate?String(dta.startDate).slice(0,4):nowY),year=+(u.faithHeatYear||nowY);year=Math.max(startY,Math.min(nowY,year));u.faithHeatYear=year;var first=year+'-01-01',last=year+'-12-31',firstDow=(new Date(year,0,1).getDay()+6)%7,cells='',totals={days:0,prayers:0,zikr:0};for(var blank=0;blank<firstDow;blank++)cells+='<span class="c blank" aria-hidden="true"></span>';for(var d=first;d<=last;d=addDays(d,1)){var f=faithDayHeat(d),future=d>now,tip=dateLabelTR(d)+' · '+f.performed+' vakit'+(f.zikr?' · '+f.zikr+' zikir':'');if(f.performed||f.zikr){totals.days++;totals.prayers+=f.performed;totals.zikr+=f.zikr;}cells+='<button class="c'+(future?' future':'')+'" data-l="'+f.level+'" '+(future?'disabled':'onclick="App.openFaithHeatDay(\''+d+'\')"')+' title="'+escHtml(tip)+'" aria-label="'+escHtml(tip)+'"></button>';}var prev=year>startY,next=year<nowY,h='<section class="sg-faith-year"><div class="sg-faith-year-head"><div><strong>'+year+' · Yıllık İbadet Isısı</strong><small>'+totals.days+' aktif gün · '+totals.prayers+' vakit · '+totals.zikr+' zikir</small></div><div><button '+(prev?'onclick="App.faithHeatYear(-1)"':'disabled')+' aria-label="Önceki yıl">‹</button><button '+(next?'onclick="App.faithHeatYear(1)"':'disabled')+' aria-label="Sonraki yıl">›</button></div></div><div class="sg-faith-year-scroll"><div class="sg-faith-months"><span>Oca</span><span>Şub</span><span>Mar</span><span>Nis</span><span>May</span><span>Haz</span><span>Tem</span><span>Ağu</span><span>Eyl</span><span>Eki</span><span>Kas</span><span>Ara</span></div><div class="sg-faith-heat" role="grid" aria-label="'+year+' yıllık ibadet ısı haritası">'+cells+'</div></div><div class="sg-faith-legend"><span>Sakin</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>Yoğun</span></div><p>Renk, günün kılınan vakit sayısını; zikir kaydı varsa bir kademe daha güçlü ritmi gösterir. Bir güne dokununca gün ayrıntısı açılır.</p></section>';return h;}
   function faithRaporCardHTML(){var k=faithWeekKPIs(todayStr()),streak=zikrCall('zikrStreak',[])||0,pct=k.maxPrays>0?Math.round(k.prays/k.maxPrays*100):0,h='<div class="sg-faith-hero sg-gradient-border sg-glow"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--faith);display:flex;align-items:center;gap:7px;">'+iconHtml('bar-chart',16)+' Bu Haftanın İbadet Ritmi</div><div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;">Vakit · cemaat · zikir · seri</div></div><div style="text-align:right;flex-shrink:0;"><div style="font-size:var(--f-title1);font-weight:800;color:var(--faith);">%'+pct+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">kayıtlı vakit payı</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;"><div class="sg-faith-kpi"><div style="font-size:var(--f-title3);font-weight:800;color:var(--faith);">'+k.prays+'/'+k.maxPrays+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">vakit</div></div><div class="sg-faith-kpi"><div style="font-size:var(--f-title3);font-weight:800;color:var(--faith2);">'+k.cong+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">cemaat</div></div><div class="sg-faith-kpi"><div style="font-size:var(--f-title3);font-weight:800;color:var(--zikr);">'+k.zikrTotal+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">zikir</div></div><div class="sg-faith-kpi"><div style="font-size:var(--f-title3);font-weight:800;color:var(--kandil);">'+(streak||0)+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">seri</div></div></div><div style="display:flex;align-items:flex-end;gap:5px;height:64px;margin-top:4px;">';var dta=stateData()||{},max=1,vals=[];for(var i=6;i>=0;i--){var date=addDays(todayStr(),-i),rec=dta.days&&dta.days[date],c=0,order=prayerValue('PRAYER_ORDER',[]);if(rec&&rec.prayer)order.forEach(function(x){if(rec.prayer[x]&&rec.prayer[x].performed)c++;});vals.push(c);if(c>max)max=c;}vals.forEach(function(v,i2){var hp=max>0?Math.round(v/max*52)+6:6,wd=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][new Date(Date.parse(addDays(todayStr(),-6+i2))).getDay()];h+=(v>0?'<span style="font-size:var(--f-caption2);font-weight:700;color:var(--faint);">'+v+'</span>':'')+'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;max-width:24px;height:'+hp+'px;border-radius:6px;background:'+(v>0?'linear-gradient(180deg,var(--faith2),var(--faith))':'var(--icon)')+';transition:height .3s;"></div><span style="font-size:var(--f-caption2);color:'+(i2===6?'var(--faith)':'var(--faint)')+';font-weight:'+(i2===6?'800':'600')+';">'+wd+'</span></div>';});return h+'</div>'+faithAnnualHeatmapHTML()+'</div>';}
   function qiblaHubCardHTML(){var m=qiblaMetrics(prayerCall('prayerLocation',[]),null),loc=m.location||{},h='<button id="qibla-card" class="sg-qibla-card" onclick="App.openQibla()" aria-label="Kıble pusulasını aç"><span class="sg-qibla-card-dial" aria-hidden="true"><i class="north">K</i><i class="arrow" style="transform:rotate('+m.bearing+'deg)">'+iconHtml('navigation',18)+'</i></span><span class="sg-qibla-card-copy"><small>KIBLE · GERÇEK KUZEY</small><strong>'+m.bearing.toLocaleString('tr-TR')+'° · '+escHtml(m.direction)+'</strong><em>'+escHtml(loc.cityName||'Konum')+' · Kâbe '+m.distanceKm.toLocaleString('tr-TR')+' km</em></span><span class="sg-qibla-card-method"><b>'+iconHtml('route',12)+' Büyük daire</b><em>'+escHtml(qiblaLocationPrecision(m))+'</em></span><span class="sg-qibla-card-action">'+(m.isFallback?'Konumu doğrula':'Pusulayı aç')+' '+iconHtml('chevron-right',15)+'</span></button>';return h;}
@@ -449,7 +532,7 @@ function qiblaOverlayHTML(){
   h+='</div></section></div>';
   return h;
 }
-  function saygiPreviewHubHTML(person,article,done){var u=stateUi()||{},tab=u.faithTab||'oz',body='';if(!zikrVisible()&&tab==='zikir'){tab='oz';u.faithTab='oz';}if(tab==='oncu')body=saygiPreviewCardHTML(person,done,article)+saygiCollectionCardHTML(person);else if(tab==='iman')body=faithCornerCardHTML()+'<section class="iip-09-route-rail" aria-label="İbadet araçları">'+qiblaHubCardHTML()+'</section>';else if(tab==='zikir'&&zikrVisible())body=zikrPreview();else if(tab==='rapor')body=faithRaporCardHTML();else body='<section class="iip-09-route-rail" aria-label="Bugün girişleri">'+quranHub()+'</section><section class="iip-09-today-continue" aria-label="Bugün · Kaldığın yer">'+(zikrVisible()?zikrPreview():'')+'</section>';return '<div class="saygi-preview-hub iip-09-section iip-09-section-'+tab+'" data-faith-tab="'+escHtml(tab)+'">'+body+'</div>';}
+  function saygiPreviewHubHTML(person,article,done){var u=stateUi()||{},tab=u.faithTab||'oz',body='';if(!zikrVisible()&&tab==='zikir'){tab='oz';u.faithTab='oz';}if(tab==='oncu')body=saygiPreviewCardHTML(person,done,article)+saygiCollectionCardHTML(person);else if(tab==='iman')body=faithCornerCardHTML()+'<section class="iip-09-route-rail" aria-label="İbadet araçları">'+qiblaHubCardHTML()+'</section>';else if(tab==='zikir'&&zikrVisible())body=zikrPreview();else if(tab==='rapor')body=faithRaporCardHTML();else body=saygiDailyFocusHTML()+'<section class="iip-09-route-rail" aria-label="Bugün girişleri">'+quranHub()+'</section><section class="iip-09-today-continue" aria-label="Bugün · Kaldığın yer">'+(zikrVisible()?zikrPreview():'')+'</section>'+saygiContinueHTML();return '<div class="saygi-preview-hub iip-09-section iip-09-section-'+tab+'" data-faith-tab="'+escHtml(tab)+'">'+body+'</div>';}
   function faithNavHTML(){var tabs=zikrVisible()?[['oz','Bugün','Öz'],['oncu','İlham','Öncü'],['iman','İbadet','İman'],['zikir','Zikir','Zikir'],['rapor','Ritim','Rapor']]:[['oz','Bugün','Öz'],['oncu','İlham','Öncü'],['iman','İbadet','İman'],['rapor','Ritim','Rapor']],u=stateUi()||{},tab=u.faithTab||'oz',icons={oz:'sun',oncu:'trophy',iman:'mosque',zikir:'sparkles',rapor:'chart-column'},h='<nav class="faith-v2-nav" aria-label="İlham ve İbadet bölümleri">';tabs.forEach(function(x){var on=x[0]===tab;h+='<button class="'+(on?'on':'')+'" data-legacy-label="'+x[2]+'" onclick="App.setFaithTab(\''+x[0]+'\')" aria-current="'+(on?'page':'false')+'" aria-pressed="'+(on?'true':'false')+'"><span>'+iconHtml(icons[x[0]]||'circle',16)+'</span><b>'+x[1]+'</b></button>';});return h+'</nav>';}
   function saygiHTML(){if(!featureLive())return saygiComingSoonHTML();var person=saygiCurrentPerson();if(!person)return '<div class="saygi-empty">'+iconHtml('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';var u=stateUi()||{};if(!u.saygiPersonOpen)saygiEnsureArticle(person);var article=(!u.saygiPersonOpen&&u.saygiArticle&&u.saygiArticle.personId===person.id)?u.saygiArticle:null,done=saygiHasRead(person);return '<section class="saygi-page">'+faithNavHTML()+spiritBarHTML()+saygiPreviewHubHTML(person,article,done)+'</section>';}
   function saygiHeroMediaHTML(article){var title=String(article&&article.title||'Günün öncüsü'),thumb=saygiSafeUrl(article&&article.thumbnail,['upload.wikimedia.org']);if(!thumb)return '<div class="saygi-hero-media is-empty" role="img" aria-label="'+escHtml(title)+' portresi yok"><span class="saygi-hero-media-fallback is-visible" aria-hidden="true">'+iconHtml('image',30)+'<strong>Portre yok</strong><small>Metinli okuma devam ediyor</small></span></div>';return '<div class="saygi-hero-media"><img src="'+escHtml(thumb)+'" alt="'+escHtml(title)+' portresi" loading="eager" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add(\'is-broken\');"><span class="saygi-hero-media-caption">Görsel · Wikipedia</span><span class="saygi-hero-media-fallback" aria-hidden="true">'+iconHtml('image',30)+'<strong>Portre yüklenemedi</strong><small>Metinli okuma devam ediyor</small></span></div>';}
@@ -524,6 +607,7 @@ function qiblaOverlayHTML(){
     saygiScaleToolHTML:saygiScaleToolHTML,saygiTopButtonHTML:saygiTopButtonHTML,
     faithWeekKPIs:faithWeekKPIs,faithDayHeat:faithDayHeat,qiblaBearing:qiblaBearing,qiblaDistanceKm:qiblaDistanceKm,qiblaDirectionLabel:qiblaDirectionLabel,
     qiblaMetrics:qiblaMetrics,qiblaLocationPrecision:qiblaLocationPrecision,qiblaAlignmentCopy:qiblaAlignmentCopy,qiblaScreenAngle:qiblaScreenAngle,qiblaOverlayHTML:qiblaOverlayHTML,
+    saygiDailyFocus:saygiDailyFocus,saygiDailyFocusHTML:saygiDailyFocusHTML,saygiContinueRows:saygiContinueRows,saygiContinueHTML:saygiContinueHTML,
     saygiSourceFallback:saygiSourceFallback,saygiSourceCardHTML:saygiSourceCardHTML,saygiReadButtonHTML:saygiReadButtonHTML,saygiReadActionHTML:saygiReadActionHTML,
     saygiLoadingHTML:saygiLoadingHTML,saygiComingSoonHTML:saygiComingSoonHTML,faithSummaryBadges:faithSummaryBadges,faithCornerCardHTML:faithCornerCardHTML,
     saygiPreviewCardHTML:saygiPreviewCardHTML,saygiMissionCardHTML:saygiMissionCardHTML,faithCornerInlineHTML:faithCornerInlineHTML,prayerRowHTML:prayerRowHTML,

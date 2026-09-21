@@ -1,0 +1,178 @@
+# IIP-12 · doğrulama komutları (hepsi repo kökünden, ağsız)
+# HEAD: faa65857cfc0fdbf67c6719e6f677bbda67cbb1a
+# Tarih: 2026-09-21T14:46:08+0300
+
+$ node ilham-ibadet-premium-plan/tools/plan-check.mjs
+PASS: 24 cards, 48 requirements, DAG, scope, approval, evidence, ledger, generated views and local links.
+[exit 0]
+
+$ node --check app/core/saygi.js
+
+[exit 0]
+
+$ node --check app/core/render.js
+
+[exit 0]
+
+$ node --check app.js
+
+[exit 0]
+
+$ node --check tests/app/test_iip_12.js
+
+[exit 0]
+
+$ node tests/app/test_iip_12.js
+[8] Durum matrisi — boş, yükleniyor, hata, dönüş
+PASS  yükleniyor: odak kartı yine basılır
+PASS  hata: odak kartı yine basılır
+PASS  hata: devam yüzeyi korunur
+PASS  boş: hub çökmeden boş hâl basar
+PASS  boş: Devam grubu (satırlar) yok
+PASS  boş: hiç Devam düğmesi yok
+PASS  dönüş: iki bağımsız render bit bit aynı
+PASS  dönüş: hub çıktı hash sabit (deterministik)
+INFO  IIP-12 Bugün hub sha256=d40a7f8a76116d89d9a9686ed0e6fd6cf3cd1d5c87fae2fcafc7c8b4403f67e7 bytes=926
+
+IIP-12 daily focus and continue contract: 92 PASS, 0 FAIL
+[exit 0]
+
+$ node tests/app/test_saygi_boundary.js
+PASS  Saygı preview dumpı deterministic ve temel kimlikleri taşır
+PASS  Saygı root okunmuş kayıt için tek state yüzeyini kullanır
+PASS  kıble saf metrikleri registryde
+PASS  İman modalı keyboard contract ile render olur
+PASS  Kıble modalı keyboard contract ile render olur
+PASS  Öncü modalı keyboard contract ile render olur
+PASS  Saygı floating Okudum eylemi korunur
+PASS  arka plan modal kabukları focusable button değildir
+PASS  Saygı/İman/Kıble HTML kaynakları registry shiminden gelir
+PASS  index saygi registryyi quran sonrasında cache-bust ile yükler
+
+MON-23 Saygı sınırı: 20 PASS, 0 FAIL
+[exit 0]
+
+$ node tests/app/test_zikir_boundary.js
+  ✓ ensureZikrRoot canlı roota beş çekirdek seed kuruyor
+  ✓ zikrTouchTick hedef/sayaç/oturum eşdeğerini koruyor
+  ✓ gün aynası getDay resolverından geçiyor
+  ✓ SeyAudio.tick yalnız soundOn guardı geçince bir kez çağrılıyor
+  ✓ pause motoru aktif oturumu duraklatıyor
+  ✓ guide başlangıç/tamamlanma/yarı-hedef çağrıları app-owned kabukta
+  ✓ streak haptic ve bell çağrıları app-owned kabukta
+  ✓ view gövdeleri registryde, overlay/paint kabuğu app-owned
+  ✓ motor save resolverı explicit manual çağrıda çalışıyor
+
+=== Özet ===
+Passed: 17 / 17
+[exit 0]
+
+$ node tests/app/test_quran_boundary.js
+  ✓ request → outbox → delivery → response geçişi ready üretir
+  ✓ reducer input state mutasyonunu korur
+  ✓ aynı response ikinci kez uygulandığında idempotent kalır
+  ✓ read-only remote apply ilk geçişte ready ve responseChanged üretir
+  ✓ read-only remote apply 200→304→200 tekrarında duplicate üretmez
+  ✓ remote apply save/network çağırmaz
+  ✓ app.js request/response shimleri registryye bağlı
+  ✓ UI handler kabuğu app.jste kalır
+  ✓ index quran.js cache-bust ile app.js öncesinde yüklenir
+
+=== Özet ===
+Passed: 20 / 20
+[exit 0]
+
+$ node tests/app/test_iip_09.js
+PASS  REQ-017 route ownership is tab-scoped instead of a shared rail
+PASS  REQ-018 tab anchor is explicit and narrow
+PASS  TC-017 loading state stays inside the Bugün Quran entry
+PASS  TC-017 error state stays inside the Bugün Quran entry
+PASS  TC-017 empty state stays inside the Bugün Quran entry
+PASS  TC-018 rapid Quran open/close is idempotent and restores focus/scroll/tab
+PASS  TC-018 browser back closes one qibla modal without a duplicate or empty shell
+PASS  TC-017 pioneer modal renders a real loading shell
+PASS  TC-017 pioneer modal renders a real error and retry shell
+PASS  scope contract: no migration/storage/network behavior was added
+
+IIP-09 information architecture contract: 22 PASS, 0 FAIL
+[exit 0]
+
+$ node tests/app/test_iip_10.js
+PASS  scope contract: search reads the query through the existing ui channel only
+PASS  scope contract: the query never leaves the ephemeral ui channel
+PASS  scope contract: saygi.js still owns no App assignment, migration or storage write
+PASS  scope contract: one dispatcher handler serves every search interaction
+PASS  scope contract: search markup routes through the single dispatcher
+PASS  scope contract: an unknown dispatcher action is a safe no-op
+PASS  scope contract: the search region is painted in place so caret and focus survive typing
+PASS  style contract: search, chips, named rows and secondary grid are fully token-styled
+PASS  style contract: narrow viewport and reduced-motion variants are explicit
+PASS  style contract: the named row keeps a single tap target for one biography
+
+IIP-10 search and filter contract: 61 PASS, 0 FAIL
+[exit 0]
+
+$ node tests/app/test_iip_11.js
+PASS  REQ-022 orphan guard: every App.* handler the markup calls is defined in app.js
+PASS  REQ-022 orphan guard: the reading-record bridge survived the reader work
+PASS  REQ-022 orphan guard: the guard is not vacuous (it sees the real call graph)
+PASS  REQ-021 every scale rule covers the reader modal wrapper
+PASS  REQ-021 scale CSS covers BOTH article wrappers (modal included)
+PASS  REQ-021 scale multiplies each block’s REAL base (no 1em trap)
+PASS  REQ-021 scale CSS never uses the parent-relative 1em form
+PASS  REQ-021 the reading body scales but the hero title does not
+PASS  REQ-021 the narrow-viewport base override keeps the scale applied
+PASS  REQ-021 at the default step the scale multiplier is exactly 1
+
+IIP-11 reader interaction contract: 55 PASS, 0 FAIL
+[exit 0]
+
+$ node .claude/skills/run-seyma/zikr-harness.mjs
+  ✓ Sıfırla ilk dokunuşta native confirm yerine görünür uygulama içi onay açıyor
+  ✓ Sayaç araçlarında görünür Sıfırla düğmesi var
+  ✓ Sıfırla yalnız bugünkü aktif preset sayımını onaylı biçimde geri alıyor
+  ✓ Geri al, son toplu sıfırlamayı tek dokunuşla eksiksiz geri yüklüyor
+  ✓ Zikirmatik overlay toast geri bildirimi overlay katmanının üstünde görünür
+  ✓ Reminder deep-link tablosu zikir hedefini gerçek bir handler ile taşıyor
+  ✓ Reminder deep-link tablosu Saygı hedefini gerçek bir handler ile taşıyor
+  ✓ Zikir hatırlatmasını açmak zikir sayımını/streak’ini değiştirmiyor
+  ✓ Reminder modülleri zikir harness boot’unda da canlı
+  ✓ Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık
+
+✅ 95/95 assertion pass
+[exit 0]
+
+$ node .claude/skills/run-seyma/driver.mjs
+PASS  faith corner opens as a reminder deep-link target
+PASS  reading hub opens as a reminder deep-link target
+PASS  every reminder deep-link target names a real handler kind
+PASS  reminder payload classifies to the reminder channel
+PASS  AEON payload still classifies to the aeon channel
+PASS  unknown notification payload is not silently routed
+PASS  delivery module is the live boundary owner (not the inline fallback)
+PASS  reminder and AEON channels stay disjoint
+PASS  reminder background capability is still reported as unsupported
+PASS  reminder in-app path stays available
+
+Done.
+[exit 0]
+
+$ node tools/shell-inventory.mjs --gate
+  küçük (3–10)                       162 / 924
+  büyük (≥11)                        93 / 1910
+App.* handler gövdesi               556 / 1701
+*Legacy fonksiyon                        0 / 0
+*HTML builder (>2 satır)                4 / 57
+var blokları                         286 / 906
+-- reminder ayak izi --
+fonksiyon / kod satırı               355 / 408
+  App.* handler                            126
+  yalnız-iç (shim gerekmez)            69 / 72
+sabit blok / satır                   121 / 289
+shell-inventory --gate PASS {"maxTotalLines":7800,"maxLegacyFunctions":0,"maxReminderFunctionCodeLines":450,"maxHtmlBuilderCodeLines":150,"rule":"DONDURULDU (MON2-08, 2026-09-15). Ölçüm 7.603/0/408/57. Yeni bir program bütçeyi yalnız kendi onayıyla değiştirebilir."}
+[exit 0]
+
+$ git -c core.fsmonitor=false diff --check
+
+[exit 0]
+

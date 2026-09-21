@@ -41,11 +41,11 @@
     {"id":"yusuf-87","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"ümit · rahmet","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"}
   ],
   "themes": [
-    {"id":"sabir","version":"1.0.0-draft","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["bakara-153","al-i-imran-200"],"status":"draft"},
-    {"id":"sukur","version":"1.0.0-draft","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["bakara-152","ibrahim-7"],"status":"draft"},
-    {"id":"merhamet","version":"1.0.0-draft","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["al-i-imran-159","enbiya-107"],"status":"draft"},
-    {"id":"emanet","version":"1.0.0-draft","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["nisa-58"],"status":"draft"},
-    {"id":"ogrenme","version":"1.0.0-draft","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["taha-114","al-i-imran-190"],"status":"draft"},
-    {"id":"umut","version":"1.0.0-draft","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["yusuf-87","araf-56"],"status":"draft"}
+    {"id":"sabir","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["bakara-153","al-i-imran-200"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"sukur","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["bakara-152","ibrahim-7"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"merhamet","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["al-i-imran-159","enbiya-107"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"emanet","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["nisa-58"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"ogrenme","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["taha-114","al-i-imran-190"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"umut","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["yusuf-87","araf-56"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"}
   ]
 }

@@ -5,3 +5,8 @@ PASS node ilham-ibadet-premium-plan/tools/plan-check.mjs --render
 PASS node ilham-ibadet-premium-plan/tools/plan-check.mjs
 PASS git -c core.fsmonitor=false diff --check
 BLOCKED DEC-04 proposed; rights and qualified domain review pending
+PASS IIP-16 manifest oracle (10/12/6 counts, source IDs, id+version+type, theme sequence, review fields, 0 published)
+PASS node ilham-ibadet-premium-plan/tools/plan-check.mjs (post-review evidence)
+PASS node ilham-ibadet-premium-plan/tools/plan-check.mjs --render (generated views unchanged)
+PASS git -c core.fsmonitor=false diff --check (post-review evidence)
+BLOCKED technical pre-review complete; DEC-04, licence evidence and human domain review remain pending

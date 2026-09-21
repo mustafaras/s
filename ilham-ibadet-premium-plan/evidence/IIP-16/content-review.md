@@ -12,4 +12,16 @@ Her aday için: içerik id, sürüm, tür, dil, yazar/özgün bölüm, asıl kay
 
 ## İnsan incelemesi kuyruğu
 
-`pilot-catalog.json` içindeki 28 kaydın tamamında `editorReview`, `domainReview`, `rightsEvidence` ve `reviewerDecision` alanları bilinçli olarak `pending`/`null`dır. Bu, eksiklik değil güvenlik kapısıdır: insan incelemesi yapılmadan içerik yayımlanamaz.
+`pilot-catalog.json` içindeki 28 kaydın tamamında `editorReview`,
+`domainReview`, `rightsEvidence` ve `reviewerDecision` alanları bilinçli olarak
+`pending`/`null`dır. Teknik ön incelemede tema kayıtlarının bu alanları ve
+`type=theme` kimliği eksik bulundu; manifestte tamamlandı. Bu, içerik onayı
+değildir: insan incelemesi yapılmadan içerik yayımlanamaz.
+
+## Codex ön inceleme sonucu — 2026-09-21
+
+Kaynak kimlikleri ağsız olarak mevcut `SaygiPeople` ve
+`QuranStrikingVersesV1` kataloglarına karşı doğrulandı; 10/12/6 sayıları ve
+üç aşamalı tema sırası geçti. Her kayıt hâlâ draft/sourced sınırında. Meal
+attribution/lisans kapsamı, editör kararı ve yetkin dinî alan kararı
+`pending`; bunlar tamamlanmadan `approved` veya `published` sonucu verilemez.

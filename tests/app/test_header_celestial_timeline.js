@@ -35,7 +35,7 @@ check('dar ekran vakit açıklamasını kademeli sadeleştiriyor',
 check('gece kapsülü açık temada korumalı koyu zemin alıyor',
   css.includes('sky-time-night ~ .sey-hdr-scene .sey-hdr-phase{'));
 check('CSS ve appSurface cache sürümleri yükseltildi',
-  html.includes('app/styles.css?v=20260921e') && html.includes('app/core/appSurface.js?v=20260921c'));
+  html.includes('app/styles.css?v=20260921f') && html.includes('app/core/appSurface.js?v=20260921c'));
 
 console.log('Passed: '+passed+' / '+(passed+failed));
 if(failed) process.exit(1);

@@ -36,6 +36,15 @@
     "reviewer": null
   },
   {
+    "id": "DEC-07",
+    "title": "Öncü arama dispatcher'ı ve FX2 App yüzey pin güncellemesi",
+    "ownerCard": "IIP-10",
+    "status": "approved",
+    "source": "2026-09-21 user message: yalnız IIP-10 adımını uygula (Öncü arama ve filtre); go apply be perfect.",
+    "evidence": "evidence/IIP-10/decision-approval.md",
+    "reviewer": "User (product/design decision owner; explicit current-turn approval)"
+  },
+  {
     "id": "DEC-05",
     "title": "Yeni kalıcı veri ve paylaşım şeması",
     "ownerCard": "IIP-19",

@@ -314,6 +314,14 @@ function kandilBadgeFor(date){ return window.SeymaSaygi.kandilBadgeFor.apply(nul
 function spiritBarHTML(){ return window.SeymaSaygi.spiritBarHTML.apply(null,arguments); }
 function faithCornerOverlayHTML(){ return window.SeymaSaygi.faithCornerOverlayHTML.apply(null,arguments); }
 function saygiCollectionCardHTML(person){ return window.SeymaSaygi.saygiCollectionCardHTML.apply(null,arguments); }
+function saygiCollectionGridHTML(person,coll,read,total){ return window.SeymaSaygi.saygiCollectionGridHTML.apply(null,arguments); }
+function saygiFilteredResultsHTML(lens,todayId){ return window.SeymaSaygi.saygiFilteredResultsHTML.apply(null,arguments); }
+function saygiNormalize(text){ return window.SeymaSaygi.saygiNormalize.apply(null,arguments); }
+function saygiFold(str){ return window.SeymaSaygi.saygiFold.apply(null,arguments); }
+function saygiLens(){ return window.SeymaSaygi.saygiLens.apply(null,arguments); }
+function saygiFilterSummary(){ return window.SeymaSaygi.saygiFilterSummary.apply(null,arguments); }
+function saygiFilter(raw){ return window.SeymaSaygi.saygiFilter.apply(null,arguments); }
+function saygiReadFilter(raw){ return window.SeymaSaygi.saygiReadFilter.apply(null,arguments); }
 function faithAnnualHeatmapHTML(){ return window.SeymaSaygi.faithAnnualHeatmapHTML.apply(null,arguments); }
 function faithRaporCardHTML(){ return window.SeymaSaygi.faithRaporCardHTML.apply(null,arguments); }
 function qiblaHubCardHTML(){ return window.SeymaSaygi.qiblaHubCardHTML.apply(null,arguments); }
@@ -2297,7 +2305,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, aeonExpanded:{}, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderTargetReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, aeonExpanded:{}, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, saygiQuery:'', saygiKindFilter:'all', saygiReadFilter:'all', saygiGridOpen:false, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderTargetReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
 ui.dailyPhotoOpen=true; ui.dailyPhotoDate='';
 // MON-35: persisted consent keeps the gate in its existing checking state, but
 // does not initiate a permission probe or watcher during load. Verification and
@@ -3544,6 +3552,55 @@ App.profileConsentToggle=function(key){ return window.SeymaProfile.profileConsen
 App.profileConsentTogglePrivacyNote=function(){ return window.SeymaProfile.profileConsentTogglePrivacyNote.apply(null,arguments); };
 App.profileAcceptConsent=function(){ return window.SeymaProfile.profileAcceptConsent.apply(null,arguments); };
 App.refreshSaygi=function(){ var person=saygiModalPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
+// ── IIP-10 · Öncü arama ve filtre (REQ-019 / REQ-020) ──
+// Sorgu ve filtreler YALNIZ `ui` oturumluk durumunda tutulur: kalıcı depo,
+// `data`, migrate() ve sync yolu değişmez. Arama hedef bölgesi varsa tam render
+// yerine yalnız o bölge boyanır; böylece yazarken odak ve caret sabit kalır ve
+// ilgisiz her tuşta bütün uygulama yeniden render edilmez (C07). Bölge yoksa
+// güvenli tam render devreye girer.
+// Tek bir dispatcher handler kullanılır (App.saygiLens): altı ayrı handler
+// eklemek App.* yüzey sözleşmesini büyütürdü. Yeni bir arama alanı eklemek yeni
+// bir App üyesi GEREKTİRMEZ — yalnız aşağıdaki eylem listesine bir dal eklenir.
+var SAYGI_LENS_ACTIONS={query:1,key:1,clear:1,reset:1,kind:1,read:1,grid:1};
+function saygiSearchRegionHTML(lens,todayId){ return window.SeymaSaygi.saygiFilteredResultsHTML(lens,todayId); }
+function saygiPaintLens(){
+  try{
+    var region=document.getElementById('saygi-search-region');
+    if(!region) return false;
+    var lens=saygiLens(), person=saygiCurrentPerson();
+    region.innerHTML=saygiSearchRegionHTML(lens,person&&person.id);
+    var count=document.getElementById('saygi-result-count');
+    if(count){ count.textContent=window.SeymaSaygi.saygiResultCountText(lens); count.setAttribute('data-tone',lens.results.length?'ok':'empty'); }
+    var reset=document.getElementById('saygi-search-reset'); if(reset) reset.hidden=!lens.hasLens;
+    var clear=document.getElementById('saygi-search-clear'); if(clear) clear.hidden=!ui.saygiQuery;
+    var chips={ 'saygi-chip-kind-all':lens.kind==='all', 'saygi-chip-kind-Bilim':lens.kind==='Bilim', 'saygi-chip-kind-Sanat':lens.kind==='Sanat', 'saygi-chip-read-all':lens.read==='all', 'saygi-chip-read-read':lens.read==='read', 'saygi-chip-read-unread':lens.read==='unread' };
+    for(var id in chips){ if(!Object.prototype.hasOwnProperty.call(chips,id)) continue; var chip=document.getElementById(id); if(!chip) continue; if(chips[id]) chip.classList.add('on'); else chip.classList.remove('on'); chip.setAttribute('aria-pressed',chips[id]?'true':'false'); }
+    return true;
+  }catch(e){ return false; }
+}
+// `action` bilinmeyen bir değerse hiçbir şey yapılmaz: bilinmeyen bir DOM
+// niteliği oturumluk aramayı sessizce bozmaz.
+App.saygiLens=function(action,value){
+  var act=String(action||'');
+  if(!SAYGI_LENS_ACTIONS[act]) return;
+  if(act==='query') ui.saygiQuery=String(value==null?'':value).slice(0,80);
+  else if(act==='key'){
+    var e=value;
+    if(!e||!e.key) return;
+    if(e.key==='Escape'&&String(ui.saygiQuery||'').length){ if(e.preventDefault) e.preventDefault(); ui.saygiQuery=''; }
+    else if(e.key==='Enter'){ var first=saygiLens().results[0]; if(!first) return; if(e.preventDefault) e.preventDefault(); App.openSaygiCollectionPerson(first.id); return; }
+    else return;
+  }
+  else if(act==='clear') ui.saygiQuery='';
+  else if(act==='reset'){ ui.saygiQuery=''; ui.saygiKindFilter='all'; ui.saygiReadFilter='all'; }
+  else if(act==='kind') ui.saygiKindFilter=saygiFilter(value);
+  else if(act==='read') ui.saygiReadFilter=saygiReadFilter(value);
+  else if(act==='grid'){ ui.saygiGridOpen=!!value; return; }
+  if(!saygiPaintLens()) render();
+  if(act==='clear'||act==='reset'||act==='key'){
+    try{ var el=document.getElementById('saygi-search-input'); if(el){ el.value=ui.saygiQuery; if(el.focus) el.focus(); } }catch(e){}
+  }
+};
 App.openSaygiReading=function(){ App.openReading(); };
 App.openSaygiPreview=function(){
   var person=saygiCurrentPerson(); if(!person) return;

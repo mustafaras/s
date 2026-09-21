@@ -18,9 +18,10 @@
       "IIP-06",
       "IIP-07",
       "IIP-08",
-      "IIP-09"
+      "IIP-09",
+      "IIP-10"
     ],
-    "source": "2026-09-20 user message: yalnız IIP-09 hedef bilgi mimarisini uygula; go apply be perfect."
+    "source": "2026-09-21 user message: yalnız IIP-10 adımını uygula (Öncü arama ve filtre); go apply be perfect."
   },
   "releaseApproval": {
     "status": "approved",
@@ -33,7 +34,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 9,
+  "completedCards": 10,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -526,13 +527,13 @@
       "id": "IIP-10",
       "title": "Öncü arama ve filtre",
       "package": "B",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-09"
       ],
       "path": "cards/IIP-10.md",
       "role": "frontend",
-      "owner": null,
+      "owner": "copilot",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/saygi.js",
@@ -550,22 +551,40 @@
         "source",
         "visual"
       ],
-      "evidence": [],
-      "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
-      "fixtureFiles": [
-        "tests/app/test_saygi_boundary.js"
+      "evidence": [
+        "evidence/IIP-10/scope.json",
+        "evidence/IIP-10/requirements.json",
+        "evidence/IIP-10/review.json",
+        "evidence/IIP-10/source.json",
+        "evidence/IIP-10/visual.json"
       ],
-      "allowedTestFiles": [
+      "blockedReason": null,
+      "startedAt": "2026-09-21T13:00:00Z",
+      "completedAt": "2026-09-21T08:10:00Z",
+      "verifiedHead": "3ccfa70411a30ac15d1d9241874895ec41226dab",
+      "handoff": "evidence/IIP-10/HANDOFF.md",
+      "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_iip_10.js"
       ],
-      "decisionIds": [],
+      "allowedTestFiles": [
+        "tests/app/test_saygi_boundary.js",
+        "tests/app/test_iip_10.js",
+        "tests/app/test_fx2_overlay_motion.js",
+        "tests/app/test_fx2_tab_transition.js",
+        "tests/app/test_fx2_touch_coverage.js",
+        "tests/app/test_app_surface_boot_boundary.js",
+        "tests/app/test_app_surface_daily_boundary.js",
+        "tests/app/test_app_surface_domain_boundary.js",
+        "tests/app/test_app_surface_lifecycle_boundary.js",
+        "tests/app/test_app_surface_overlay_boundary.js",
+        "tests/app/test_v3_welcome.js"
+      ],
+      "decisionIds": [
+        "DEC-07"
+      ],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "fec078b9a770188c53934662b145ed55b98a5cee0de52b93742473b187c33e28",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

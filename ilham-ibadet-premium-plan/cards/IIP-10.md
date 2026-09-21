@@ -21,11 +21,11 @@ Görev metninin tek kaynağı: [UYGULAMA-PROMPTLARI.md](../UYGULAMA-PROMPTLARI.m
 
 **Bağımlılıklar:** IIP-09.
 
-**Rol:** frontend · **Kararlar:** yok.
+**Rol:** frontend · **Kararlar:** DEC-07.
 
 **Üretim allowlist:** `app/core/saygi.js`, `app.js`, `app/styles.css`.
 
-**Test allowlist:** `tests/app/test_saygi_boundary.js`, `tests/app/test_iip_10.js`.
+**Test allowlist:** `tests/app/test_saygi_boundary.js`, `tests/app/test_iip_10.js`, `tests/app/test_fx2_overlay_motion.js`, `tests/app/test_fx2_tab_transition.js`, `tests/app/test_fx2_touch_coverage.js`, `tests/app/test_app_surface_boot_boundary.js`, `tests/app/test_app_surface_daily_boundary.js`, `tests/app/test_app_surface_domain_boundary.js`, `tests/app/test_app_surface_lifecycle_boundary.js`, `tests/app/test_app_surface_overlay_boundary.js`, `tests/app/test_v3_welcome.js`.
 
 **Gerekli gate:** scope, requirements, review, source, visual. **Veri etkili yazıcı:** false.
 

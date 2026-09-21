@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-10",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-10/requirements.md",
+  "verifiedHead": "3ccfa70411a30ac15d1d9241874895ec41226dab",
+  "diffHash": "fec078b9a770188c53934662b145ed55b98a5cee0de52b93742473b187c33e28",
+  "createdAt": "2026-09-21T08:10:00Z",
+  "requirements": [
+    "REQ-019",
+    "REQ-020"
+  ],
+  "commands": [],
+  "limitations": "Fixture/VM kanıtıdır; tarayıcı, cihaz ve ekran okuyucu kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "30caafd058dc16a73fa74314e20ccbebacdabcd10684bb610deb40642b782d13",
+  "details": {
+    "results": [
+      {
+        "requirementId": "REQ-019",
+        "testId": "TC-019",
+        "result": "pass",
+        "summary": "61 kontrol; isim/alan/okundu araması, Türkçe İ/İ/ı/i katlaması, boş sorgu, çok filtre, sıfır sonuç ve tek karakter durumları geçti."
+      },
+      {
+        "requirementId": "REQ-020",
+        "testId": "TC-020",
+        "result": "pass",
+        "summary": "İsimli liste birincil; numara gridi kapalı ikincil özet; klavye 100 anlamsız numara zincirine mahkûm değil; okundu beyanı doğru."
+      }
+    ]
+  }
+}

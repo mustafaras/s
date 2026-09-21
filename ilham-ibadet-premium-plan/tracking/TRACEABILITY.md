@@ -22,8 +22,8 @@
 | REQ-016 / TC-016 | [IIP-08](../cards/IIP-08.md) | Planlanan ekran matrisi gerçek render üzerinde incelenir; cihaz kanıtı ayrı tutulur. | VM PASS ekran görüntüsü veya cihaz kabulü diye etiketlenmez. | 4 |
 | REQ-017 / TC-017 | [IIP-09](../cards/IIP-09.md) | Bugün/İlham/İbadet/Zikir/Ritim; Kur’an ve kıble hedefleri en çok iki dokunuş. | Eski deep-link ve dönüş bağlamı aynı hedefe gider; hiçbir işlev kaybolmaz. | 5 |
 | REQ-018 / TC-018 | [IIP-09](../cards/IIP-09.md) | Modal kapanınca açan kontrol, seçili sekme ve scroll korunur. | Hızlı aç/kapa ve tarayıcı geri hareketi çift modal veya boş kabuk üretmez. | 5 |
-| REQ-019 / TC-019 | [IIP-10](../cards/IIP-10.md) | 100 kişi isim/alan/okundu ile aranır; Türkçe normalizasyon yalnız arama indeksine uygulanır. | I/İ/ı/i, boş sorgu, birden fazla filtre ve sıfır sonuç geçer. | 0 |
-| REQ-020 / TC-020 | [IIP-10](../cards/IIP-10.md) | İsimli liste birincil; grid ikincil özet; bütün kişiler eşdeğer erişilebilir. | Koleksiyon klavyeyle 100 anlamsız numara zincirine mahkûm etmez. | 0 |
+| REQ-019 / TC-019 | [IIP-10](../cards/IIP-10.md) | 100 kişi isim/alan/okundu ile aranır; Türkçe normalizasyon yalnız arama indeksine uygulanır. | I/İ/ı/i, boş sorgu, birden fazla filtre ve sıfır sonuç geçer. | 5 |
+| REQ-020 / TC-020 | [IIP-10](../cards/IIP-10.md) | İsimli liste birincil; grid ikincil özet; bütün kişiler eşdeğer erişilebilir. | Koleksiyon klavyeyle 100 anlamsız numara zincirine mahkûm etmez. | 5 |
 | REQ-021 / TC-021 | [IIP-11](../cards/IIP-11.md) | Oturumluk Aa, bölüm atlama ve konum koruma; varsayılana dönme var. | Büyütme sırasında metin ankrajı kaybolmaz; RTL ayrı dil yönü taşır. | 0 |
 | REQ-022 / TC-022 | [IIP-11](../cards/IIP-11.md) | Mevcut gate A’da korunur; B’de erişilebilir alternatif açık ürün kararıyla eklenir. | Kaydırma/ekran okuyucu erişimi otomatik okudum kaydı oluşturmaz. | 0 |
 | REQ-023 / TC-023 | [IIP-12](../cards/IIP-12.md) | Tek odak önerisi kaynak/süre ve seçim gerekçesiyle; deterministik seçilir. | Aynı gün yeniden render öneriyi rastgele değiştirmez; içerik yoksa dürüst boş hâl. | 0 |

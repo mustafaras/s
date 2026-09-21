@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-10",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-10/scope.md",
+  "verifiedHead": "3ccfa70411a30ac15d1d9241874895ec41226dab",
+  "diffHash": "fec078b9a770188c53934662b145ed55b98a5cee0de52b93742473b187c33e28",
+  "createdAt": "2026-09-21T08:10:00Z",
+  "requirements": [
+    "REQ-019",
+    "REQ-020"
+  ],
+  "commands": [],
+  "limitations": "Yayın, cihaz ve ekran okuyucu kabulü bu receipt'in kapsamı dışındadır.",
+  "reviewer": "copilot",
+  "artifactSha256": "85abe420f3f5d2c18b565aef3a1310ca8ccc3b1af086685aab0ce4b9816df696",
+  "details": {
+    "changedFiles": [
+      "app/core/saygi.js",
+      "app.js",
+      "app/styles.css",
+      "tests/app/test_iip_10.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "ilham-ibadet-premium-plan/IIP-STATE.json",
+      "ilham-ibadet-premium-plan/cards/IIP-10.md",
+      "ilham-ibadet-premium-plan/tracking/CURRENT-STATE.md",
+      "ilham-ibadet-premium-plan/tracking/DECISIONS.json",
+      "ilham-ibadet-premium-plan/tracking/DECISIONS.md",
+      "ilham-ibadet-premium-plan/tracking/LEDGER.jsonl",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/scope.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/requirements.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/source.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/visual.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/render-matrix.html",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/commands.log",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/decision-approval.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/manifest.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-10/HANDOFF.md",
+      "tests/app/test_app_surface_boot_boundary.js",
+      "tests/app/test_app_surface_daily_boundary.js",
+      "tests/app/test_app_surface_domain_boundary.js",
+      "tests/app/test_app_surface_lifecycle_boundary.js",
+      "tests/app/test_app_surface_overlay_boundary.js",
+      "tests/app/test_v3_welcome.js"
+    ],
+    "scopeReviewedBy": "copilot"
+  }
+}

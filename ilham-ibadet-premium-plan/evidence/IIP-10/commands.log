@@ -1,0 +1,116 @@
+# IIP-10 komut kaydı — 2026-09-21 11:17:06 +0300
+# HEAD: 3ccfa70411a30ac15d1d9241874895ec41226dab
+
+$ node ilham-ibadet-premium-plan/tools/plan-check.mjs
+PASS: 24 cards, 48 requirements, DAG, scope, approval, evidence, ledger, generated views and local links.
+exit=0
+---
+$ node --check app/core/saygi.js
+exit=0
+---
+$ node --check app.js
+exit=0
+---
+$ node --check sync.js
+exit=0
+---
+$ node --check tests/app/test_iip_10.js
+exit=0
+---
+$ node tests/app/test_iip_10.js
+PASS  style contract: the named row keeps a single tap target for one biography
+
+IIP-10 search and filter contract: 61 PASS, 0 FAIL
+exit=0
+---
+$ node tests/app/test_saygi_boundary.js
+PASS  index saygi registryyi quran sonrasında cache-bust ile yükler
+
+MON-23 Saygı sınırı: 20 PASS, 0 FAIL
+exit=0
+---
+$ node tests/app/test_iip_04.js
+IIP-04 source/style contract: PASS (26 checks; no personal data read)
+exit=0
+---
+$ node tests/app/test_iip_09.js
+PASS  scope contract: no migration/storage/network behavior was added
+
+IIP-09 information architecture contract: 22 PASS, 0 FAIL
+exit=0
+---
+$ node tests/app/test_fx2_overlay_motion.js
+PASS FX2-16.6 premium kapalı veya reduced-motion iken anlık eski davranış
+PASS FX2-16.7 çift kapatma isteği eski gövdeyi ikinci kez yürütmez
+Passed: 7 / 7
+exit=0
+---
+$ node tests/app/test_fx2_tab_transition.js
+PASS FX2-15.6 premium kapalıyken eski senkron davranış korunur
+PASS FX2-15.7 App yüzeyi 719, onclick 391 ve render/paint gövdeleri değişmedi
+Passed: 7 / 7
+exit=0
+---
+$ node tests/app/test_fx2_touch_coverage.js
+PASS FX2-13.1 iOS kilit açma once + sessiz buffer
+PASS FX2-13.2 visibility suspend/resume yönetimi
+Passed: 14 / 14
+exit=0
+---
+$ node tests/app/test_app_surface_daily_boundary.js
+PASS  registry file is wired into the production harnesses
+
+MON-50 daily App surface boundary: 19/19 passed
+exit=0
+---
+$ node tests/app/test_v3_welcome.js
+
+287 kontrol geçti.
+SONUÇ: PASS
+exit=0
+---
+$ node .claude/skills/run-seyma/zikr-harness.mjs
+  ✓ Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık
+
+✅ 95/95 assertion pass
+exit=0
+---
+$ node .claude/skills/run-seyma/driver.mjs
+PASS  reminder in-app path stays available
+
+Done.
+exit=0
+---
+$ node tools/shell-inventory.mjs --gate
+  yalnız-iç (shim gerekmez)            69 / 72
+sabit blok / satır                   121 / 289
+shell-inventory --gate PASS {"maxTotalLines":7800,"maxLegacyFunctions":0,"maxReminderFunctionCodeLines":450,"maxHtmlBuilderCodeLines":150,"rule":"DONDURULDU (MON2-08, 2026-09-15). Ölçüm 7.603/0/408/57. Yeni bir program bütçeyi yalnız kendi onayıyla değiştirebilir."}
+exit=0
+---
+$ node tests/app/test_modal_focus_containment.js
+PASS  kalıcı ekip kuralı CLAUDE.md içinde eşlenik
+
+Done.
+exit=0
+---
+$ node tests/app/test_state_rebind_boundary.js
+PASS  state fixture uses no sync.js and cannot resolve network fetch
+
+MON-15 result: PASS (37 passed, 0 failed)
+exit=0
+---
+$ node tests/app/test_modularization_boundary.js
+
+=== Özet ===
+Passed: 102 / 102
+exit=0
+---
+$ git -c core.fsmonitor=false diff --check
+exit=0
+---
+# TAM REGRESYON
+tests/app: 60/60 PASS
+tests/panel: 23/23 PASS
+tests/panel-v2: 27/27 PASS
+tests/quran: 9/9 PASS
+tests/reminders: PASS

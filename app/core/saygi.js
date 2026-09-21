@@ -11,6 +11,13 @@
   var SAYGI_EPOCH='2026-07-13', SAYGI_CACHE_PREFIX='seyma-saygi-v1:';
   var saygiDeps=null, saygiMemoryCache={}, saygiReadObserver=null;
   var SAYGI_DEPENDENCIES=['data','ui','getDay','todayStr','addDays','diffDays','dayIndexFor','dateLabelTR','icon','esc','featuresLive','render','quranJourneyHubCardHTML','zikrVisible','zikrPreviewCardHTML'];
+  // IIP-10 (REQ-019): Türkçe arama normalizasyonu YALNIZ bu indekste uygulanır.
+  // SaygiPeople içeriği, `data` şeması, geçiş (migration) ve sync sözleşmesi
+  // değişmez; sorgu yalnız `ui` oturumluk durumunda tutulur, kalıcı depoya
+  // yazılmaz. Kayıtlı bağımlılık sözleşmesi de büyümez — sorgu mevcut `ui`
+  // kanalından okunur ve arama indeksi yalnız görünüm çağrı anında üretilir.
+  var SAYGI_QUERY_MAX=80;
+  var SAYGI_TURKISH_FOLD={'İ':'i','I':'i','ı':'i','i':'i','Ş':'s','ş':'s','Ğ':'g','ğ':'g','Ç':'c','ç':'c','Ö':'o','ö':'o','Ü':'u','ü':'u','Â':'a','â':'a','Î':'i','î':'i','Û':'u','û':'u'};
 
   function registerSaygi(deps){
     if(saygiDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
@@ -151,6 +158,131 @@
   function saygiHasRead(person){ var d=stateData(),day=d&&d.days&&d.days[todayStr()];if(!day||!person)return false;var entry=saygiReadingEntry(day,person);if(!entry)return false;var st=ensureSaygiDay(day);if(st.readingEntryId!==entry.id){st.personId=person.id;st.readingEntryId=entry.id;st.readAt=entry.ts||st.readAt||new Date().toISOString();}return true; }
   function saygiDomainTone(host){ var colors=['#735F37','#4B6670','#76536A','#526753','#6B5B86','#8B6047'],n=0,s=String(host||'');for(var i=0;i<s.length;i++)n=(n*31+s.charCodeAt(i))>>>0;return colors[n%colors.length]; }
 
+  // ── IIP-10 · Öncü arama ve filtre (REQ-019 / REQ-020) ──
+  // Arama ve filtre YALNIZ okuma yolundadır: indeks görünüm çağrı anında üretilir,
+  // hiçbir yazma yolundan (save/migrate/sync) tetiklenmez ve kalıcı veri taşımaz.
+  function saygiFold(str){
+    var s=String(str==null?'':str), out='';
+    for(var i=0;i<s.length;i++){ var ch=s.charAt(i); out+=SAYGI_TURKISH_FOLD[ch]!=null?SAYGI_TURKISH_FOLD[ch]:ch; }
+    return out.toLowerCase();
+  }
+  // Türkçe i/İ/ı/I ayrımı sayfa klavyesinde yazılamaz: "ibn" da "İbn"i bulmalı.
+  function saygiNormalize(text){ return saygiFold(text).replace(/\s+/g,' ').replace(/^ +| +$/g,''); }
+  // "Matematik · Bilgisayar bilimi" tek alan gibi değil, iki bağımsız etiket gibi
+  // aranır; aksi hâlde "matematik bilgisayar" birleşik sorgusu eşleşmez.
+  function saygiFieldTokens(field){
+    return saygiNormalize(field).split(' · ').filter(function(part){ return !!part; }).map(function(part,idx){ return {token:part,index:idx}; });
+  }
+  // İki harften kısa sorgu tüm listeyi döndürüp gürültü yapar; yine de "hepsi"
+  // görünümü korunur — sessizce sıfır sonuç gösterilmez.
+  function saygiQueryTooShort(q){ return saygiNormalize(q).length<2; }
+
+  // İndeks kişi başına bir kez üretilir ve kimliğe bağlanır; arama sırasında
+  // yeniden normalizasyon yapılmaz (yüz kişide her tuşta tekrar maliyeti yok).
+  var saygiIndexCache=[], saygiIndexStamp='';
+  function saygiIndex(){
+    var people=saygiPeople(), stamp=String(people.length)+':'+String((people[0]&&people[0].id)||'')+':'+String((people[people.length-1]&&people[people.length-1].id)||'');
+    if(saygiIndexStamp===stamp&&saygiIndexCache.length===people.length) return saygiIndexCache;
+    saygiIndexCache=people.map(function(person){
+      return {person:person,name:saygiNormalize(person.name),field:saygiNormalize(person.field),kind:saygiNormalize(person.kind),era:saygiNormalize(person.era),tokens:saygiFieldTokens(person.field).map(function(part){return part.token;})};
+    });
+    saygiIndexStamp=stamp;
+    return saygiIndexCache;
+  }
+  // Sorgu mevcut `ui` kanalından okunur (saygiPersonOpen/saygiBrowseId gibi):
+  // yeni bir bag üyesi eklenmez, böylece kayıtlı bağımlılık sözleşmesi büyümez.
+  function saygiUiQuery(){ var u=stateUi(); return (u&&u.saygiQuery!=null)?String(u.saygiQuery):''; }
+  function saygiQuery(){ return saygiNormalize(saygiUiQuery()).slice(0,SAYGI_QUERY_MAX); }
+  // "all" dışındaki her değer bilinmeyen girdiyi sessizce "Tümü"ye indirir.
+  function saygiFilter(raw){
+    var f=String(raw==null?'':raw), u=stateUi()||{}, source=f||String(u.saygiKindFilter||'all');
+    if(source!=='Bilim'&&source!=='Sanat') return 'all';
+    return source;
+  }
+  function saygiReadFilter(raw){
+    var f=String(raw==null?'':raw), u=stateUi()||{}, source=f||String(u.saygiReadFilter||'all');
+    if(source!=='read'&&source!=='unread') return 'all';
+    return source;
+  }
+  function saygiFilterSummary(){ var parts=[]; if(saygiFilter()!=='all')parts.push(saygiFilter()); if(saygiReadFilter()==='read')parts.push('Okunanlar'); if(saygiReadFilter()==='unread')parts.push('Okunmayanlar'); return parts.join(' · '); }
+  // Çok kelimeli sorgu ("matematik bilgisayar") alan etiketinin TAMAMINI tek
+  // parça gibi aramaz; her kelime kendi başına herhangi bir alanda bulunmalıdır.
+  function saygiRowMatches(row,terms){
+    for(var i=0;i<terms.length;i++){
+      var term=terms[i], hit=row.name.indexOf(term)>-1||row.field.indexOf(term)>-1||row.kind.indexOf(term)>-1||row.era.indexOf(term)>-1;
+      if(!hit){ for(var t=0;t<row.tokens.length;t++) if(row.tokens[t].indexOf(term)>-1){ hit=true; break; } }
+      if(!hit) return false;
+    }
+    return true;
+  }
+  function saygiLens(){
+    var raw=saygiNormalize(saygiUiQuery()).slice(0,SAYGI_QUERY_MAX), q=raw,
+        tooShort=(q.length>0&&saygiQueryTooShort(q)), kind=saygiFilter(), read=saygiReadFilter(), coll=saygiCollection(), index=saygiIndex(), active=0,
+        terms=(!tooShort&&q)?q.split(' '):null;
+    if(kind!=='all')active++; if(read!=='all')active++;
+    var rows=index.filter(function(row){
+      if(kind!=='all'&&row.kind!==saygiNormalize(kind)) return false;
+      if(read==='read'&&!coll[row.person.id]) return false;
+      if(read==='unread'&&coll[row.person.id]) return false;
+      if(terms) return saygiRowMatches(row,terms);
+      return true;
+    }).map(function(row){ return row.person; });
+    return {query:raw,kind:kind,read:read,tooShort:tooShort,activeCount:active,hasLens:!!q||active>0,total:index.length,readCount:saygiReadCount(),results:rows};
+  }
+  function saygiPersonRowHTML(person,done,todayId){
+    var isToday=person&&person.id===todayId;
+    var media=person&&person.name?'<span class="sg-p-search-monogram" aria-hidden="true">'+escHtml(person.name.charAt(0))+'</span>':'';
+    return '<li class="sg-p-search-row"><button id="saygi-person-'+escHtml(person&&person.id||'')+'" class="sg-p-search-person'+(isToday?' todayd':'')+(done?' read':'')+'" onclick="App.openSaygiCollectionPerson(\''+escHtml(person.id)+'\')" aria-label="'+escHtml(person.name+(done?' · okundu':' · okunmadı')+' · biyografiyi aç')+'">'+media+'<span class="sg-p-search-copy"><span class="sg-p-search-name">'+escHtml(person.name)+'</span><span class="sg-p-search-field">'+escHtml(person.field)+'</span><span class="sg-p-search-desc">'+escHtml(person.kind)+' · '+escHtml(person.era)+'</span></span>'+'<span class="sg-p-search-state">'+(done?'<span class="read">'+iconHtml('circle-check',14)+' Okundu</span>':'<span class="unread">Okunmadı</span>')+'</span>'+'</button></li>';
+  }
+  function saygiPersonListHTML(lens,todayId){
+    var coll=saygiCollection(), rows=lens.results.map(function(person){ return saygiPersonRowHTML(person,!!coll[person.id],todayId); }).join('');
+    return '<ul id="saygi-person-list" class="sg-p-search-list" aria-label="Öncü sonuçları">'+(rows||'')+'</ul>';
+  }
+  function saygiResultCountText(lens){
+    var shown=lens.results.length;
+    if(!lens.total) return 'Koleksiyon hazırlanıyor';
+    if(lens.tooShort) return shown+' öncü · aramak için iki harf yeter';
+    if(!lens.hasLens) return shown+' öncü · hepsi listede';
+    if(!shown) return 'Aramaya uyan öncü yok';
+    return shown+' sonuç / '+lens.total+' öncü';
+  }
+  function saygiResultCountHTML(lens){
+    return '<p id="saygi-result-count" class="sg-p-search-count" role="status" data-tone="'+(lens.results.length?'ok':'empty')+'">'+escHtml(saygiResultCountText(lens))+'</p>';
+  }
+  function saygiSearchControlsHTML(lens){
+    var q=lens.query;
+    return '<div class="sg-p-search-head">'+
+      '<div class="sg-p-search-field"><label class="sg-p-search-label" for="saygi-search-input">'+iconHtml('search',14)+' Öncü ara</label><span class="sg-p-search-input-wrap"><input id="saygi-search-input" class="sg-p-search-input" type="search" inputmode="search" autocomplete="off" enterkeyhint="search" placeholder="İsim ya da alan yaz" aria-describedby="saygi-search-help" value="'+escHtml(saygiUiQuery())+'" oninput="App.saygiLens(\'query\',this.value)" onkeydown="App.saygiLens(\'key\',event)"><button id="saygi-search-clear" class="sg-p-search-clear" type="button" aria-label="Aramayı temizle" '+(q?'':'hidden')+' onclick="App.saygiLens(\'clear\')">'+iconHtml('x',14)+'</button></span></div>'+
+      '<p id="saygi-search-help" class="sg-p-search-help">İsim, alan ya da çağa göre ara. “İ/I” ayrımı gözetilmez.</p>'+
+      '<div class="sg-p-search-chips" role="group" aria-label="Öncü filtreleri">'+
+        '<span class="sg-p-search-chips-label">Alan</span>'+
+        '<button type="button" id="saygi-chip-kind-all" class="sg-p-chip'+(lens.kind==='all'?' on':'')+'" aria-pressed="'+(lens.kind==='all'?'true':'false')+'" onclick="App.saygiLens(\'kind\',\'all\')">Tümü</button>'+
+        '<button type="button" id="saygi-chip-kind-Bilim" class="sg-p-chip'+(lens.kind==='Bilim'?' on':'')+'" aria-pressed="'+(lens.kind==='Bilim'?'true':'false')+'" onclick="App.saygiLens(\'kind\',\'Bilim\')">'+iconHtml('microscope',12)+' Bilim</button>'+
+        '<button type="button" id="saygi-chip-kind-Sanat" class="sg-p-chip'+(lens.kind==='Sanat'?' on':'')+'" aria-pressed="'+(lens.kind==='Sanat'?'true':'false')+'" onclick="App.saygiLens(\'kind\',\'Sanat\')">'+iconHtml('feather',12)+' Sanat</button>'+
+        '<span class="sg-p-search-chips-label">Okuma</span>'+
+        '<button type="button" id="saygi-chip-read-all" class="sg-p-chip'+(lens.read==='all'?' on':'')+'" aria-pressed="'+(lens.read==='all'?'true':'false')+'" onclick="App.saygiLens(\'read\',\'all\')">Tümü</button>'+
+        '<button type="button" id="saygi-chip-read-read" class="sg-p-chip'+(lens.read==='read'?' on':'')+'" aria-pressed="'+(lens.read==='read'?'true':'false')+'" onclick="App.saygiLens(\'read\',\'read\')">'+iconHtml('circle-check',12)+' Okunanlar</button>'+
+        '<button type="button" id="saygi-chip-read-unread" class="sg-p-chip'+(lens.read==='unread'?' on':'')+'" aria-pressed="'+(lens.read==='unread'?'true':'false')+'" onclick="App.saygiLens(\'read\',\'unread\')">Okunmayanlar</button>'+
+      '</div>'+
+      '<div class="sg-p-search-summary">'+saygiResultCountHTML(lens)+'<button type="button" id="saygi-search-reset" class="sg-p-search-reset" '+(lens.hasLens?'':'hidden')+' onclick="App.saygiLens(\'reset\')">'+iconHtml('x',13)+' Tüm filtreleri temizle</button></div>'+
+    '</div>';
+  }
+  function saygiSearchEmptyHTML(lens){
+    if(!lens.total) return '<div class="sg-p-search-empty" role="status"><span>'+iconHtml('trophy',22)+'</span><div><strong>Koleksiyon henüz hazırlanıyor</strong><small>100 öncü listesi yüklendiğinde arama burada çalışacak.</small></div></div>';
+    if(lens.tooShort&&!lens.query) return '<div class="sg-p-search-empty is-hint" role="status"><span>'+iconHtml('search',20)+'</span><div><strong>Aramaya başla</strong><small>İki harf yeter: “ibn”, “fizik”, “ressam” gibi.</small></div></div>';
+    var summary=saygiFilterSummary(), why=(lens.query?'“'+escHtml(lens.query)+'”':'')+(lens.query&&summary?' ve ':'')+(summary?escHtml(summary):'');
+    return '<div id="saygi-search-empty" class="sg-p-search-empty" role="status"><span>'+iconHtml('search',20)+'</span><div><strong id="saygi-search-empty-title">Sonuç yok</strong><small>'+(why||'Seçili filtre')+' için öncü bulunamadı. Aramayı genişletmeyi dene.</small></div><button type="button" class="sg-p-search-reset" onclick="App.saygiLens(\'reset\')">'+iconHtml('x',13)+' Tüm filtreleri temizle</button></div>';
+  }
+  function saygiFilteredResultsHTML(lens,todayId){
+    if(!lens.total||!lens.results.length) return saygiSearchEmptyHTML(lens);
+    return saygiPersonListHTML(lens,todayId)+saygiPersonListFooterHTML(lens);
+  }
+  // Alt satır: “Okundu” işaretleri yalnız gerçekten okunmuş kişilerde; aksi hâlde
+  // sonuç listesi kendi kendini yanlış beyan eder.
+  function saygiPersonListFooterHTML(lens){
+    return '<p class="sg-p-search-foot">'+escHtml(lens.results.length)+' öncü gösteriliyor · '+escHtml(String(lens.readCount))+'/'+escHtml(String(lens.total))+' okundu'+(lens.hasLens?' · filtre açık':'')+'</p>';
+  }
+
   function faithWeekKPIs(date){
     date=date||todayStr();var d=stateData()||{},days=d.days||{},order=prayerValue('PRAYER_ORDER',[]),prays=0,cong=0,made=0,late=0,nafile=0,dayCount=0;
     for(var i=0;i<7;i++){var key=addDays(date,-i),rec=days[key];if(!rec||!rec.prayer)continue;dayCount++;order.forEach(function(k){var e=rec.prayer[k];if(!e)return;if(e.performed){prays++;if(e.inCongregation)cong++;if(e.late)late++;if(e.madeUp)made++;}nafile+=Math.max(0,Number(e.nafile)||0);});}
@@ -210,7 +342,27 @@ function faithCornerOverlayHTML(){
   body+='</div>';
   return '<div id="sey-ov-back" class="sey-faith-ov-back sg-faith-ov-back" onclick="App.closeFaithCorner()"><div id="sey-ov-card" class="sey-faith-ov-card sg-faith-ov-card" role="dialog" aria-modal="true" aria-label="İman köşesi" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeFaithCorner)" onclick="event.stopPropagation()">'+head+'<div id="sey-ov-body" class="scroll sg-faith-ov-body">'+body+'</div></div></div>';
 }
-  function saygiCollectionCardHTML(person){var coll=saygiCollection(),read=saygiReadCount(),streak=saygiStreak(),people=saygiPeople(),total=people.length,bilim=0,sanat=0;people.forEach(function(x){if(coll[x.id]){if(x.kind==='Sanat')sanat++;else bilim++;}});var nudge='';if(read>=6){var totalRead=bilim+sanat;if(totalRead>0&&bilim/totalRead>0.72)nudge='Ağırlık bilimde ('+bilim+') — biraz sanat da keşfet 🎨';else if(totalRead>0&&sanat/totalRead>0.72)nudge='Ağırlık sanatta ('+sanat+') — biraz bilim de keşfet 🔬';}var h='<div class="sg-collect"><div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;">'+iconHtml('trophy',15)+' 100 Öncü Koleksiyonu</div><div class="streak">'+(streak?streak+' gün seri':'&nbsp;')+'</div></div><div class="sg-collect-grid">',todayId=person&&person.id;people.forEach(function(x,idx){var r=coll[x.id],hcl=r?' read':'';if(x.id===todayId)hcl+=' todayd';h+='<button class="d'+hcl+'" onclick="App.openSaygiCollectionPerson(\''+escHtml(x.id)+'\')" title="'+escHtml((idx+1)+'. '+x.name+(r?' · okundu':' · keşfedilmeyi bekliyor'))+'" aria-label="'+escHtml((idx+1)+'. '+x.name+(r?' okundu':' okunmadı')+' · biyografiyi aç')+'"><span>'+(r?'✓':(idx+1))+'</span></button>';});h+='</div><div style="display:flex;justify-content:space-between;align-items:center;font-size:var(--f-caption1);color:var(--muted);"><span>'+read+'/'+total+' okundu</span><span style="color:var(--faith2);font-weight:800;">'+(read>=total?'Tamamlandı 🌟':'Devam')+'</span></div>';if(!read)h+='<div class="sg-collect-empty">Her kutu bir öncüyü temsil ediyor. Bugünün biyografisini “Okudum” diye kaydedince kutusu altın renkle dolacak.</div>';if(nudge)h+='<div class="sg-nudge">'+escHtml(nudge)+'</div>';return h+'</div>';}
+  // ── IIP-10 · koleksiyon: isimli liste birincil, numara gridi ikincil ──
+  function saygiCollectionGridHTML(person,coll,read,total){
+    var todayId=person&&person.id, cells='';
+    saygiPeople().forEach(function(x,idx){
+      var r=coll[x.id], hcl=r?' read':''; if(x.id===todayId)hcl+=' todayd';
+      cells+='<button class="d'+hcl+'" onclick="App.openSaygiCollectionPerson(\''+escHtml(x.id)+'\')" title="'+escHtml((idx+1)+'. '+x.name+(r?' · okundu':' · keşfedilmeyi bekliyor'))+'" aria-label="'+escHtml((idx+1)+'. '+x.name+(r?' okundu':' okunmadı')+' · biyografiyi aç')+'"><span>'+(r?'✓':(idx+1))+'</span></button>';
+    });
+    return '<div class="sg-collect-grid" role="group" aria-label="100 öncü sayı düzeni · ikincil görünüm">'+cells+'</div>'+
+      '<div class="sg-collect-meta"><span>'+read+'/'+total+' okundu</span><span class="sg-collect-meta-state">'+(read>=total?'Tamamlandı 🌟':'Devam')+'</span></div>'+
+      (read?'':'<div class="sg-collect-empty">Her kutu bir öncüyü temsil ediyor. Bugünün biyografisini “Okudum” diye kaydedince kutusu altın renkle dolacak.</div>');
+  }
+  function saygiCollectionCardHTML(person){var coll=saygiCollection(),read=saygiReadCount(),streak=saygiStreak(),people=saygiPeople(),total=people.length,bilim=0,sanat=0;people.forEach(function(x){if(coll[x.id]){if(x.kind==='Sanat')sanat++;else bilim++;}});var nudge='';if(read>=6){var totalRead=bilim+sanat;if(totalRead>0&&bilim/totalRead>0.72)nudge='Ağırlık bilimde ('+bilim+') — biraz sanat da keşfet 🎨';else if(totalRead>0&&sanat/totalRead>0.72)nudge='Ağırlık sanatta ('+sanat+') — biraz bilim de keşfet 🔬';}var lens=saygiLens(), gridOpen=!!(stateUi()||{}).saygiGridOpen;
+  var h='<div class="sg-collect">'+
+    '<div class="sg-collect-head"><div class="sg-collect-title">'+iconHtml('trophy',15)+' 100 Öncü Koleksiyonu</div><div class="streak">'+(streak?streak+' gün seri':'&nbsp;')+'</div></div>'+
+    saygiSearchControlsHTML(lens)+
+    '<div id="saygi-search-region" class="sg-p-search-region">'+saygiFilteredResultsHTML(lens,person&&person.id)+'</div>'+
+    '<details id="saygi-grid-details" class="sg-collect-grid-wrap"'+(gridOpen?' open':'')+' ontoggle="App.saygiLens(\'grid\',this.open)"><summary class="sg-collect-grid-summary"><span>'+iconHtml('trophy',13)+' Sayı düzeni · 100 kutu</span><small>İkincil özet görünümü</small></summary>'+saygiCollectionGridHTML(person,coll,read,total)+'</details>'+
+    (nudge?'<div class="sg-nudge">'+escHtml(nudge)+'</div>':'')+
+  '</div>';
+  return h;
+}
   function faithAnnualHeatmapHTML(){var u=stateUi()||{},dta=stateData()||{},now=todayStr(),nowY=new Date().getFullYear(),startY=+(dta.startDate?String(dta.startDate).slice(0,4):nowY),year=+(u.faithHeatYear||nowY);year=Math.max(startY,Math.min(nowY,year));u.faithHeatYear=year;var first=year+'-01-01',last=year+'-12-31',firstDow=(new Date(year,0,1).getDay()+6)%7,cells='',totals={days:0,prayers:0,zikr:0};for(var blank=0;blank<firstDow;blank++)cells+='<span class="c blank" aria-hidden="true"></span>';for(var d=first;d<=last;d=addDays(d,1)){var f=faithDayHeat(d),future=d>now,tip=dateLabelTR(d)+' · '+f.performed+' vakit'+(f.zikr?' · '+f.zikr+' zikir':'');if(f.performed||f.zikr){totals.days++;totals.prayers+=f.performed;totals.zikr+=f.zikr;}cells+='<button class="c'+(future?' future':'')+'" data-l="'+f.level+'" '+(future?'disabled':'onclick="App.openFaithHeatDay(\''+d+'\')"')+' title="'+escHtml(tip)+'" aria-label="'+escHtml(tip)+'"></button>';}var prev=year>startY,next=year<nowY,h='<section class="sg-faith-year"><div class="sg-faith-year-head"><div><strong>'+year+' · Yıllık İbadet Isısı</strong><small>'+totals.days+' aktif gün · '+totals.prayers+' vakit · '+totals.zikr+' zikir</small></div><div><button '+(prev?'onclick="App.faithHeatYear(-1)"':'disabled')+' aria-label="Önceki yıl">‹</button><button '+(next?'onclick="App.faithHeatYear(1)"':'disabled')+' aria-label="Sonraki yıl">›</button></div></div><div class="sg-faith-year-scroll"><div class="sg-faith-months"><span>Oca</span><span>Şub</span><span>Mar</span><span>Nis</span><span>May</span><span>Haz</span><span>Tem</span><span>Ağu</span><span>Eyl</span><span>Eki</span><span>Kas</span><span>Ara</span></div><div class="sg-faith-heat" role="grid" aria-label="'+year+' yıllık ibadet ısı haritası">'+cells+'</div></div><div class="sg-faith-legend"><span>Sakin</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>Yoğun</span></div><p>Renk, günün kılınan vakit sayısını; zikir kaydı varsa bir kademe daha güçlü ritmi gösterir. Bir güne dokununca gün ayrıntısı açılır.</p></section>';return h;}
   function faithRaporCardHTML(){var k=faithWeekKPIs(todayStr()),streak=zikrCall('zikrStreak',[])||0,pct=k.maxPrays>0?Math.round(k.prays/k.maxPrays*100):0,h='<div class="sg-faith-hero sg-gradient-border sg-glow"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--faith);display:flex;align-items:center;gap:7px;">'+iconHtml('bar-chart',16)+' Bu Haftanın İbadet Ritmi</div><div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;">Vakit · cemaat · zikir · seri</div></div><div style="text-align:right;flex-shrink:0;"><div style="font-size:var(--f-title1);font-weight:800;color:var(--faith);">%'+pct+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">kayıtlı vakit payı</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;"><div class="sg-faith-kpi"><div style="font-size:var(--f-title3);font-weight:800;color:var(--faith);">'+k.prays+'/'+k.maxPrays+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">vakit</div></div><div class="sg-faith-kpi"><div style="font-size:var(--f-title3);font-weight:800;color:var(--faith2);">'+k.cong+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">cemaat</div></div><div class="sg-faith-kpi"><div style="font-size:var(--f-title3);font-weight:800;color:var(--zikr);">'+k.zikrTotal+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">zikir</div></div><div class="sg-faith-kpi"><div style="font-size:var(--f-title3);font-weight:800;color:var(--kandil);">'+(streak||0)+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">seri</div></div></div><div style="display:flex;align-items:flex-end;gap:5px;height:64px;margin-top:4px;">';var dta=stateData()||{},max=1,vals=[];for(var i=6;i>=0;i--){var date=addDays(todayStr(),-i),rec=dta.days&&dta.days[date],c=0,order=prayerValue('PRAYER_ORDER',[]);if(rec&&rec.prayer)order.forEach(function(x){if(rec.prayer[x]&&rec.prayer[x].performed)c++;});vals.push(c);if(c>max)max=c;}vals.forEach(function(v,i2){var hp=max>0?Math.round(v/max*52)+6:6,wd=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][new Date(Date.parse(addDays(todayStr(),-6+i2))).getDay()];h+=(v>0?'<span style="font-size:var(--f-caption2);font-weight:700;color:var(--faint);">'+v+'</span>':'')+'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;max-width:24px;height:'+hp+'px;border-radius:6px;background:'+(v>0?'linear-gradient(180deg,var(--faith2),var(--faith))':'var(--icon)')+';transition:height .3s;"></div><span style="font-size:var(--f-caption2);color:'+(i2===6?'var(--faith)':'var(--faint)')+';font-weight:'+(i2===6?'800':'600')+';">'+wd+'</span></div>';});return h+'</div>'+faithAnnualHeatmapHTML()+'</div>';}
   function qiblaHubCardHTML(){var m=qiblaMetrics(prayerCall('prayerLocation',[]),null),loc=m.location||{},h='<button id="qibla-card" class="sg-qibla-card" onclick="App.openQibla()" aria-label="Kıble pusulasını aç"><span class="sg-qibla-card-dial" aria-hidden="true"><i class="north">K</i><i class="arrow" style="transform:rotate('+m.bearing+'deg)">'+iconHtml('navigation',18)+'</i></span><span class="sg-qibla-card-copy"><small>KIBLE · GERÇEK KUZEY</small><strong>'+m.bearing.toLocaleString('tr-TR')+'° · '+escHtml(m.direction)+'</strong><em>'+escHtml(loc.cityName||'Konum')+' · Kâbe '+m.distanceKm.toLocaleString('tr-TR')+' km</em></span><span class="sg-qibla-card-method"><b>'+iconHtml('route',12)+' Büyük daire</b><em>'+escHtml(qiblaLocationPrecision(m))+'</em></span><span class="sg-qibla-card-action">'+(m.isFallback?'Konumu doğrula':'Pusulayı aç')+' '+iconHtml('chevron-right',15)+'</span></button>';return h;}
@@ -257,6 +409,11 @@ function qiblaOverlayHTML(){
     saygiStopHeading:saygiStopHeading,saygiBioBlocks:saygiBioBlocks,saygiExternalLinks:saygiExternalLinks,saygiArticleFrom:saygiArticleFrom,
     saygiArticleReadableFor:saygiArticleReadableFor,saygiRequestIsCurrent:saygiRequestIsCurrent,saygiLoadArticle:saygiLoadArticle,saygiEnsureArticle:saygiEnsureArticle,
     saygiReadMinutes:saygiReadMinutes,saygiReadingEntry:saygiReadingEntry,saygiHasRead:saygiHasRead,saygiDomainTone:saygiDomainTone,
+    saygiFold:saygiFold,saygiNormalize:saygiNormalize,saygiQueryTooShort:saygiQueryTooShort,saygiFieldTokens:saygiFieldTokens,saygiIndex:saygiIndex,
+    saygiQuery:saygiQuery,saygiFilter:saygiFilter,saygiReadFilter:saygiReadFilter,saygiFilterSummary:saygiFilterSummary,saygiLens:saygiLens,
+    saygiPersonRowHTML:saygiPersonRowHTML,saygiPersonListHTML:saygiPersonListHTML,saygiPersonListFooterHTML:saygiPersonListFooterHTML,
+    saygiResultCountHTML:saygiResultCountHTML,saygiResultCountText:saygiResultCountText,saygiSearchControlsHTML:saygiSearchControlsHTML,saygiSearchEmptyHTML:saygiSearchEmptyHTML,saygiFilteredResultsHTML:saygiFilteredResultsHTML,
+    saygiCollectionGridHTML:saygiCollectionGridHTML,
     faithWeekKPIs:faithWeekKPIs,faithDayHeat:faithDayHeat,qiblaBearing:qiblaBearing,qiblaDistanceKm:qiblaDistanceKm,qiblaDirectionLabel:qiblaDirectionLabel,
     qiblaMetrics:qiblaMetrics,qiblaLocationPrecision:qiblaLocationPrecision,qiblaAlignmentCopy:qiblaAlignmentCopy,qiblaScreenAngle:qiblaScreenAngle,qiblaOverlayHTML:qiblaOverlayHTML,
     saygiSourceFallback:saygiSourceFallback,saygiSourceCardHTML:saygiSourceCardHTML,saygiReadButtonHTML:saygiReadButtonHTML,saygiReadActionHTML:saygiReadActionHTML,

@@ -25,7 +25,7 @@ Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
 | [IIP-13 — Vakit kaynağı ve tazelik](../cards/IIP-13.md) | B | done | copilot | IIP-03, IIP-09 | — |
 | [IIP-14 — Kayıpsız tarihsel kayıt sunumu](../cards/IIP-14.md) | B | done | codex | IIP-03, IIP-13 | — |
 | [IIP-15 — Ritim raporu doğruluğu](../cards/IIP-15.md) | B | done | codex | IIP-14 | — |
-| [IIP-16 — Editoryal pilot üretimi](../cards/IIP-16.md) | B | in_progress | codex | IIP-08 | DEC-04 proposed; 10 öncü/12 dua/6 tema için lisans ve yetkin alan incelemesi insan tarafından atanıp tamamlanmadı. |
+| [IIP-16 — Editoryal pilot üretimi](../cards/IIP-16.md) | B | in_review | codex | IIP-08 | DEC-04 proposed; 10 öncü/12 dua/6 tema için lisans ve yetkin alan incelemesi insan tarafından atanıp tamamlanmadı. |
 | [IIP-17 — Kaynaklı seçki ve dua yüzeyi](../cards/IIP-17.md) | B | planned | — | IIP-12, IIP-16 | — |
 | [IIP-18 — İkinci paket kabulü](../cards/IIP-18.md) | B | planned | — | IIP-11, IIP-12, IIP-13, IIP-14, IIP-15, IIP-17 | — |
 | [IIP-19 — Kalıcı genişletme sözleşmesi](../cards/IIP-19.md) | C | planned | — | IIP-18 | — |

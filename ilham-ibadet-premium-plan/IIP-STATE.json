@@ -886,7 +886,7 @@
       "id": "IIP-16",
       "title": "Editoryal pilot üretimi",
       "package": "B",
-      "status": "in_progress",
+      "status": "in_review",
       "dependsOn": [
         "IIP-08"
       ],

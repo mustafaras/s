@@ -4208,14 +4208,19 @@ App.setPrayerCity=function(name){
 App.fetchPrayerLocationGPS=function(){
   if(!navigator||!navigator.geolocation){ toast('Cihaz konum servisi bulunamadı'); return; }
   toast('Konum alınıyor…');
-  navigator.geolocation.getCurrentPosition(function(pos){
-    var lat=pos&&pos.coords&&pos.coords.latitude, lon=pos&&pos.coords&&pos.coords.longitude;
-    if(lat==null||lon==null){ toast('Konum alınamadı'); return; }
+  // Kapı akışıyla aynı iki düzeltme: (a) ham `err.message` (İngilizce) yerine OS
+  // düzeyi ipucunu içeren ANLAŞILIR metin, (b) zaman aşımında tek seferlik düşük
+  // hassasiyet denemesi. Öncesinde ikisi de yoktu; izin verilse de hata görünüyordu.
+  function prayerGpsFail(err){ var c=err&&Number(err.code);
+    if(c===3&&!ui.prayerGpsLowTried){ ui.prayerGpsLowTried=true; try{ navigator.geolocation.getCurrentPosition(prayerGpsOk,prayerGpsFail,{enableHighAccuracy:false,timeout:25000,maximumAge:600000}); return; }catch(e2){} }
+    toast(locationGateErrorText(c===1||c===2||c===3?c:0,c===1?'permission-denied':c===2?'position-unavailable':c===3?'timeout':'request-error'),6500); }
+  function prayerGpsOk(pos){ var lat=pos&&pos.coords&&pos.coords.latitude, lon=pos&&pos.coords&&pos.coords.longitude;
+    if(lat==null||lon==null){ toast('Konum alınamadı. Yeniden deneyebilirsin.'); return; }
     if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
-    var acc=Math.round(Number(pos.coords.accuracy)||0);
-    data.settings.prayer.location={lat:lat,lon:lon,cityName:'GPS Konum',source:'gps',accuracy:acc||null,capturedAt:new Date().toISOString()};
-    save(); render(); App.refreshPrayerTimes();
-  },function(err){ if(err&&err.code===1) toastLocationDenied(); else toast('Konum alınamadı: '+String(err&&err.message||'bilinmiyor')); },{enableHighAccuracy:true,timeout:15000,maximumAge:120000});
+    data.settings.prayer.location={lat:lat,lon:lon,cityName:'GPS Konum',source:'gps',accuracy:Math.round(Number(pos.coords.accuracy)||0)||null,capturedAt:new Date().toISOString()};
+    ui.prayerGpsLowTried=false; save(); render(); App.refreshPrayerTimes(); }
+  ui.prayerGpsLowTried=false;
+  navigator.geolocation.getCurrentPosition(prayerGpsOk,prayerGpsFail,{enableHighAccuracy:true,timeout:15000,maximumAge:120000});
 };
 App.setPrayerMethod=function(method){
   if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};

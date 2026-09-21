@@ -537,11 +537,21 @@ function headerSaveState(){
   return {cls:'is-clean',icon:'rotate-ccw',label:'Eşitle',aria:'Panel ile şimdi eşitle',title:'Panel ile şimdi eşitle'+seen};
 }
 
+// İşletim sistemi düzeyinde konum servisleri kapalıyken tarayıcı izni verilmiş
+// olsa bile geolocation POSITION_UNAVAILABLE (2) döner. Kullanıcıya hangi
+// menüyü açacağını somut söylemek, "izin verdim ama olmuyor" döngüsünü kırar.
+function osLocationHint(){
+  if(isIOS()) return isStandalonePWA()
+    ? 'Ayarlar → Gizlilik ve Güvenlik → Konum Servisleri açık mı, ve Şeyma için “Uygulamayı Kullanırken” seçili mi?'
+    : 'Ayarlar → Gizlilik ve Güvenlik → Konum Servisleri ve Safari için konum izni açık mı?';
+  return 'Sistem Ayarları → Gizlilik ve Güvenlik → Konum Servisleri açık mı, ve kullandığın tarayıcı için konum izni verilmiş mi?';
+}
+
 function locationGateErrorText(code,reason){
   if(reason==='insecure-context') return 'Konum yalnızca güvenli bağlantıda (https) çalışır. Bu sayfa güvensiz bir adresten açıldığı için Safari izin penceresini hiç göstermiyor.';
   if(reason==='unsupported') return 'Bu tarayıcıda konum hizmeti kullanılamıyor. Safari’yi güncelleyip tekrar dene.';
   if(code===1) return isIOS()?(isStandalonePWA()?'Konum izni kapalı. Ayarlar → Şeyma → Konum → “Uygulamayı Kullanırken” seçeneğini aç.':'Konum izni kapalı. Safari’de aA → Web Sitesi Ayarları → Konum → İzin Ver yolunu aç.'):'Konum izni verilmedi. Tarayıcının site ayarlarında Konum → İzin Ver seçeneğini aç.';
-  if(code===2) return 'Konum bulunamadı. Cihazın Konum Servisleri açıkken yeniden dene.';
+  if(code===2) return 'Konum bulunamadı. Çoğu zaman işletim sistemi düzeyinde konum servisleri kapalıdır: '+osLocationHint()+' Açıp yeniden dene.';
   if(code===3) return 'Konum isteği zaman aşımına uğradı. Birkaç saniye sonra yeniden dene.';
   return 'Konum izni doğrulanamadı. Safari ayarlarını kontrol edip yeniden dene.';
 }
@@ -551,6 +561,27 @@ function locationGatePermanentFailure(code,reason){
 }
 
 function locationGateFailure(code,reason){
+  // POSITION_UNAVAILABLE (2) genellikle GEÇİCİDİR: konum servisi henüz ısınmadı,
+  // GPS kilidi yok (iç mekân) veya OS düzeyinde konum kapalı. Tek seferlik
+  // düşük hassasiyetli (ağ/WiFi tabanlı) yeniden deneme çoğu durumda kapıyı açar.
+  // Daha önce ilk denemede hata gösterilip kullanıcıdan yeniden dokunması
+  // bekleniyordu — "izin verdim ama çalışmıyor" şikâyetinin kaynağı buydu.
+  if(code===2&&reason==='position-unavailable'&&!ui.locationGateLowAccuracyTried&&navigator.geolocation){
+    ui.locationGateLowAccuracyTried=true;
+    try{
+      navigator.geolocation.getCurrentPosition(
+        function(pos){ locationGateGranted(pos,true); },
+        function(err2){
+          var c2=err2&&Number(err2.code);
+          locationGateFailure(c2===1||c2===2||c2===3?c2:0,c2===1?'permission-denied':c2===2?'position-unavailable':c2===3?'timeout':'request-error');
+        },
+        {enableHighAccuracy:false,timeout:25000,maximumAge:600000});
+      // İstek askıda kalmasın: durum "requesting" kalır, mevcut gözcü korur.
+      ui.locationGateError='';
+      render();
+      return;
+    }catch(e){}
+  }
   ui.locationGateRequestInFlight=false;
   ui.locationGateState=reason==='unsupported'?'unsupported':(code===1?'denied':'unavailable');
   ui.locationGateError=locationGateErrorText(code,reason);

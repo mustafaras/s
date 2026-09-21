@@ -12,6 +12,8 @@
 //   A) Kurtarma yolu çağrılır (tanımlı olmak yetmez).
 //   B) Kod 2 geçici hatası tek seferlik düşük-hassasiyet denemesiyle telafi edilir
 //      ve retry hakkı her hata kapanışında yenilenir.
+//   C) İzin verildikten sonraki watchPosition kod 2/3 hataları uygulamayı yeniden
+//      konum kapısına düşürmez; yalnız gerçek izin iptali (kod 1) kapıyı kapatır.
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -102,6 +104,20 @@ console.log('[4] Sınırlar — sw.js fetch yasağı, yeni App üyesi yok');
     /'startLocationWatch','tryLocNudge','moveState'/.test(surface));
   ok('watch başlatma kapı açıldığında yapılır (accept içinde)',
     /function accept\(\)\{[\s\S]{0,900}startLocationWatch\(false\)/.test(app));
+}
+
+// ── [5] Arka plan izleme hatası kapıyı yeniden kapatamaz ───────────────────
+console.log('[5] Geçici watchPosition hatası konum kapısını yeniden açmaz');
+{
+  ok('watch hataları ayrı bir işleyiciye gider',
+    /function locationWatchFailure\(code,reason\)\{/.test(app) &&
+    /watchPosition\([\s\S]{0,700}locationWatchFailure\(/.test(app));
+  ok('watch kod 1 gerçek izin iptali olarak kapı işleyicisine gider',
+    /function locationWatchFailure\(code,reason\)\{[\s\S]{0,900}code===1[\s\S]{0,180}locationGateFailure\(1,'permission-denied'\)/.test(app));
+  ok('watch kod 2/3 kapı durumunu unavailable yapmaz',
+    /function locationWatchFailure\(code,reason\)\{[\s\S]{0,700}ui\.locationGateState='granted'/.test(app));
+  ok('watch kod 2/3 konum izlemeyi sessizce sonlandırır',
+    /function locationWatchFailure\(code,reason\)\{[\s\S]{0,700}stopLocationWatch\(\)/.test(app));
 }
 
 console.log('\nLocation gate recovery contract: ' + passed + ' PASS, ' + failed + ' FAIL');

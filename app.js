@@ -6580,6 +6580,8 @@ function toastLocationDenied(){
     toast('Konum izni verilmedi · tarayıcı site ayarlarından izin ver',4000);
   }
 }
+// Geçici watch hatası verilmiş izni bozmaz; yalnız PERMISSION_DENIED kapıyı kapatır.
+function locationWatchFailure(code,reason){ if(code===1){ locationGateFailure(1,'permission-denied'); return; } if(data&&data.settings&&data.settings.locationEnabled===true&&ui.locationGateState==='granted'){ stopLocationWatch(); ui.locationGateRequestInFlight=false; ui.locationGateState='granted'; ui.locationGateError=''; return; } locationGateFailure(code===2||code===3?code:0,reason||'watch-error'); }
 function startLocationWatch(announce){
   if(!navigator.geolocation){ locationGateFailure(0,'unsupported'); return; }
   if(moveState.watchId!=null) return;
@@ -6592,7 +6594,7 @@ function startLocationWatch(announce){
     },
     function(err){
       var code=err&&Number(err.code);
-      locationGateFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'watch-error');
+      locationWatchFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'watch-error');
     },
     {enableHighAccuracy:true,timeout:20000,maximumAge:1000}
   );

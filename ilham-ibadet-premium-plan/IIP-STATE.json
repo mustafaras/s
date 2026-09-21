@@ -22,9 +22,10 @@
       "IIP-10",
       "IIP-11",
       "IIP-12",
-      "IIP-13"
+      "IIP-13",
+      "IIP-14"
     ],
-    "source": "2026-09-21 user message: IIP-13 — Vakit kaynağı ve tazelik (\"go next be perfect\"). Yalnız IIP-13; commit/push/deploy yetkili değil."
+    "source": "2026-09-21 user message: IIP-14 — Kayıpsız tarihsel kayıt sunumu (\"go apply be perfect\"). Yalnız IIP-14; commit/push/deploy yetkili değil."
   },
   "releaseApproval": {
     "status": "approved",
@@ -37,7 +38,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 13,
+  "completedCards": 14,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -769,14 +770,14 @@
       "id": "IIP-14",
       "title": "Kayıpsız tarihsel kayıt sunumu",
       "package": "B",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-03",
         "IIP-13"
       ],
       "path": "cards/IIP-14.md",
       "role": "domain",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/prayer.js",
@@ -792,12 +793,17 @@
         "review",
         "source"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-14/scope.json",
+        "evidence/IIP-14/requirements.json",
+        "evidence/IIP-14/review.json",
+        "evidence/IIP-14/source.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-21T14:23:55Z",
+      "completedAt": "2026-09-21T14:31:46Z",
+      "verifiedHead": "b130643c4503780da3fb5795684834d9eb81acd3",
+      "handoff": "evidence/IIP-14/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_prayer_boundary.js"
@@ -811,7 +817,7 @@
         "DEC-03"
       ],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "dad0243a95684162e6e56976f82cdbfc574dcab0e9f240b495dbb5546e1994ab",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

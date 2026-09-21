@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-14",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-14/scope.md",
+  "verifiedHead": "b130643c4503780da3fb5795684834d9eb81acd3",
+  "diffHash": "dad0243a95684162e6e56976f82cdbfc574dcab0e9f240b495dbb5546e1994ab",
+  "createdAt": "2026-09-21T14:30:08Z",
+  "requirements": ["REQ-027", "REQ-028"],
+  "commands": [{"command": "git diff -- app/core/prayer.js app/core/saygi.js tests/app/test_prayer_boundary.js tests/app/test_saygi_boundary.js tests/app/test_iip_14.js", "exitCode": 0}],
+  "limitations": "Plan/evidence/state/ledger teslim dosyaları üretim allowlist'i değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "45198cc0b8b80f97e7a6cba3df95b528b5e37cafcdfc2dadef6e41a1430fd005",
+  "details": {"changedFiles": ["app/core/prayer.js", "app/core/saygi.js", "tests/app/test_prayer_boundary.js", "tests/app/test_saygi_boundary.js", "tests/app/test_iip_14.js"], "scopeReviewedBy": "codex"}
+}

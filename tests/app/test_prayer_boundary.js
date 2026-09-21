@@ -46,6 +46,7 @@ ok('eksik resolver bag fail-closed reddediliyor', prayer.registerPrayer({})===fa
 ok('şehir ve vakit sabitleri doğru kardinalitede', prayer.PRAYER_ORDER.length===6&&prayer.PRAYER_CITIES.length===81&&Object.keys(prayer.PRAYER_NAMES).length===6);
 ok('şehir adı normalizasyonu korunuyor', prayer.prayerCityByName('  ankara  ').name==='Ankara');
 ok('boş prayer günü altı vakti ve cache alanlarını kuruyor', (function(){ var p=prayer.emptyPrayerDay(); return prayer.PRAYER_ORDER.every(function(k){ return p[k]&&p[k].time===''&&p[k].performed===false; })&&p.fetchedAt===''&&p.fetchedFor===''&&p.fetchedMethod===''&&p.fetchError===''; })());
+ok('tarihsel sunum beş izlenen vakti Güneş anahtarından ayırır', prayer.PRAYER_TRACKED_ORDER.join(',')==='fajr,dhuhr,asr,maghrib,isha'&&typeof prayer.prayerHistoryPresentation==='function');
 
 var rootA={startDate:'2026-09-01',settings:{prayer:{method:'MWL',location:{lat:39.9,lon:32.8,cityName:'Ankara'}}},days:{'2026-09-04':{prayer:{}}}};
 var rootB={startDate:'2026-09-01',settings:{prayer:{method:'isna',location:{lat:38.4,lon:27.1,cityName:'İzmir'}}},days:{'2026-09-04':{prayer:{}}}};
@@ -80,6 +81,10 @@ async function run(){
   var malformed={prayer:{fajr:{performed:'yes'},futurePrayerField:'keep'}};
   var normalized=prayer.ensurePrayerDay(malformed);
   ok('ensurePrayerDay normalizer unknown alanı koruyup alanları düzeltir', normalized.futurePrayerField==='keep'&&normalized.fajr.performed===false&&normalized.isha&&normalized.isha.time==='');
+  var historical={fajr:{performed:true,savedAt:'2026-07-01T05:00:00Z'},sunrise:{performed:true,note:'eski alan'},dhuhr:{performed:false}};
+  var before=JSON.stringify(historical), view=prayer.prayerHistoryPresentation(historical);
+  ok('tarihsel adaptör Güneş kaydını çevirmeden ayrı tutar', view.trackedPerformed===1&&view.sourceRecordCount===2&&view.historicalSunrise&&view.historicalSunrise.kind==='historical_sunrise');
+  ok('tarihsel adaptör mutation ve güvenilmez oran üretmez', JSON.stringify(historical)===before&&view.denominatorReliable===false&&view.rate===null);
   console.log('\n=== Özet ===');
   console.log('Passed: '+passed+' / '+(passed+failed));
   if(failed) process.exitCode=1;

@@ -86,6 +86,7 @@ const sandbox = {
     prayerLocation() { return { lat: 39.9334, lon: 32.8597, cityName: 'Ankara', source: 'fixture' }; },
     ensurePrayerDay(day) { return day && day.prayer || {}; },
     prayerDaySummary() { return { performed: 2, congregation: 1, madeUp: 0 }; },
+    prayerHistoryPresentation() { return { records: [], trackedPerformed: 0, sourceRecordCount: 0, historicalSunrise: null, denominatorReliable: false, rate: null, uncertainty: 'Belirsiz tarihsel kayıt.' }; },
     prayerStreak() { return 3; },
     prayerTimesFromDay() { return { fajr: { time: '05:12' }, dhuhr: { time: '13:02' } }; },
     currentPrayerIndex() { return 0; },
@@ -136,6 +137,7 @@ sandbox.HijriCalendarV1 = {
 };
 ok('HijriCalendar registry sonrası çağrı anında çözülür', registry.hijriTodayStr() === 'Hicri 2026-09-04 +1');
 ok('kandil shimi lazy content ile çalışır', registry.kandilBadgeFor('2026-09-04') === 'Kandil fixture');
+ok('tarihsel KPI güvenilmez payda/yüzde üretmez', (function () { const k = registry.faithWeekKPIs('2026-09-04'); return k.maxPrays === null && k.rate === null && k.denominatorReliable === false; })());
 
 const person = sandbox.SaygiPeople[0];
 const previewDump = registry.saygiPreviewCardHTML(person, false, null);

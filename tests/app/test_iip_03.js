@@ -35,13 +35,13 @@ check(prayer.includes("performed:false,inCongregation:false,late:false,madeUp:fa
   'empty prayer entries are explicitly unperformed and blank');
 check(state.includes('if(day&&typeof day===\'object\') ensurePrayerDay(day);'),
   'migration normalizes historical day records through the existing prayer adapter');
-check(saygi.includes('maxPrays:dayCount*6'),
-  'app weekly denominator remains unchanged and is documented as unresolved');
+check(saygi.includes('maxPrays:null') && saygi.includes('denominatorReliable:false'),
+  'app historical presentation suppresses unreliable weekly denominator');
 check(panel.includes('max:days*6'),
   'panel weekly denominator remains unchanged and is documented as unresolved');
 
-check(saygi.includes('>kayıtlı vakit payı</div>'),
-  'app ratio copy is descriptive rather than success/adherence language');
+check(!saygi.includes('>kayıtlı vakit payı</div>') && saygi.includes('kaynak kayıt'),
+  'app historical report uses source-record copy without a ratio');
 check(!saygi.includes('>uyum</div>'), 'app no longer labels the ratio as uyum');
 check(panel.includes("k.prays+'/'+k.max+'</b> kayıtlı vakit"),
   'panel mirrors the descriptive recorded-vakit copy');

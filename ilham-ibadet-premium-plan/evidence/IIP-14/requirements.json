@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-14",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-14/requirements.md",
+  "verifiedHead": "b130643c4503780da3fb5795684834d9eb81acd3",
+  "diffHash": "dad0243a95684162e6e56976f82cdbfc574dcab0e9f240b495dbb5546e1994ab",
+  "createdAt": "2026-09-21T14:30:08Z",
+  "requirements": ["REQ-027", "REQ-028"],
+  "commands": [{"command": "node tests/app/test_iip_14.js", "exitCode": 0}],
+  "limitations": "Sentetik VM kanıtıdır; cihaz kabulü değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "1410854e75a9cb664ac1a579a45d7d336830b1f818afa3468b88626c6d2b0775",
+  "details": {"results": [{"requirementId": "REQ-027", "testId": "TC-027", "result": "pass"}, {"requirementId": "REQ-028", "testId": "TC-028", "result": "pass"}]}
+}

@@ -538,8 +538,8 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // styles.css'e dokunulmadı (paylaşılan yüzey). app.js/appSurface.js sürümleri
 // B2 (DEVIR-PROMPTU §8) düzeltmesiyle 2026-09-15'te bump edildi: "4.500 adım"
 // metinleri gerçek adım hedefine (stepsGoal → 9.000) çekildi.
-ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260921d)',
-  /app\.js\?v=20260921d/.test(indexSource));
+ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260921e)',
+  /app\.js\?v=20260921e/.test(indexSource));
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
   /app\/core\/appSurface\.js\?v=20260921b/.test(indexSource));
 /* B2: yürüyüş tikinin kullanıcıya söylediği eşik, tikin GERÇEK eşiğiyle aynı

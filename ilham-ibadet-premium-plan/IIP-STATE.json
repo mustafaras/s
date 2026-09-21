@@ -802,7 +802,7 @@
       "blockedReason": null,
       "startedAt": "2026-09-21T14:23:55Z",
       "completedAt": "2026-09-21T14:31:46Z",
-      "verifiedHead": "b130643c4503780da3fb5795684834d9eb81acd3",
+      "verifiedHead": "15b30bf55234ed973772fc1f2c1cbf5d00277231",
       "handoff": "evidence/IIP-14/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",

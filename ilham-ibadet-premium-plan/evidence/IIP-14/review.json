@@ -4,7 +4,7 @@
   "gate": "review",
   "status": "pass",
   "artifact": "evidence/IIP-14/review.md",
-  "verifiedHead": "b130643c4503780da3fb5795684834d9eb81acd3",
+  "verifiedHead": "15b30bf55234ed973772fc1f2c1cbf5d00277231",
   "diffHash": "dad0243a95684162e6e56976f82cdbfc574dcab0e9f240b495dbb5546e1994ab",
   "createdAt": "2026-09-21T14:30:08Z",
   "requirements": ["REQ-027", "REQ-028"],

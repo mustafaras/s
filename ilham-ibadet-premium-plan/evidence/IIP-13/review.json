@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-13",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-13/review.md",
+  "verifiedHead": "705fc135879f5b9f89274f8ac12c67b149cc5f40",
+  "diffHash": "823d8d07afb8445acd72f7731386071d841825c963ab4617aeec3a082c010c39",
+  "createdAt": "2026-09-21T12:13:56Z",
+  "requirements": [
+    "REQ-025",
+    "REQ-026"
+  ],
+  "commands": [],
+  "limitations": "Sentetik/headless incelemedir; fiziksel cihaz, ekran okuyucu ve yayın kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "ff275e7f98701b6ef5ae32b854e6a5861ac996750bfcb621d2a8f4fa020d71f7",
+  "details": {
+    "findings": [
+      {
+        "id": "IIP13-REV-01",
+        "severity": "high",
+        "summary": "faithPrayerFetchMeta tazelik etiketini yaş üzerinden GERÇEK saatle (Date.now) hesaplıyordu: render yoluna gizli cihaz-saati bağımlılığı sokuyor, aynı data ile çıktı cihaz saatine göre değişebiliyordu. Fixture sabit sentetik gün kullandığı için kusur testte birebir ortaya çıktı.",
+        "resolution": "fixed"
+      },
+      {
+        "id": "IIP13-REV-02",
+        "severity": "medium",
+        "summary": "Yeni \"stale\" durumu için CSS sınıfı gerekebilirdi; app/styles.css kartın izin listesinde değil.",
+        "resolution": "accepted-scope-decision (mevcut stilli is-error kullanıldı; yeni sınıf yazılmadı)"
+      },
+      {
+        "id": "IIP13-REV-03",
+        "severity": "low",
+        "summary": "Sentetik artifact S02 sahnesi \"başka güne ait\" diyordu ama kayıt tarihi uygulama günüyle aynıydı; kanıt iddia ettiği davranışı göstermiyordu.",
+        "resolution": "fixed"
+      }
+    ],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "copilot"
+  }
+}

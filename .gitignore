@@ -6,3 +6,7 @@ files/*
 __pycache__/
 *.pyc
 graphify-out/
+
+# Üretilmiş ikili belge çıktıları (kaynak .md tracked kalır).
+# Tam yol: geniş *.pdf kuralı istenmeyen dosyaları gizlemesin.
+ilham-ibadet-premium-plan/UYGULAMA-PROMPTLARI.pdf

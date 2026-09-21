@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-13",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-13/requirements.md",
+  "verifiedHead": "705fc135879f5b9f89274f8ac12c67b149cc5f40",
+  "diffHash": "823d8d07afb8445acd72f7731386071d841825c963ab4617aeec3a082c010c39",
+  "createdAt": "2026-09-21T12:13:56Z",
+  "requirements": [
+    "REQ-025",
+    "REQ-026"
+  ],
+  "commands": [],
+  "limitations": "Fixture/VM kanıtıdır; tarayıcı, cihaz ve ekran okuyucu kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "ca64da49a075bfdc785921a05bef7a4b73235f2c8f580306cb80a323ecb3e92a",
+  "details": {
+    "results": [
+      {
+        "requirementId": "REQ-025",
+        "testId": "TC-025",
+        "result": "pass",
+        "summary": "80 kontrol içinde tazelik bölümü: cache geçerliliği gün+konum+yöntem eşleşmesiyle; taze/yaşlı(48s)/yöntem-uyuşmazlığı/şehir-değişimi/gün-değişimi/bozuk damga. Olumsuz: gece yarısı \"otherday\", şehir değişimi kaydı bulmaz (sızma yok), timeout/hata \"eski saatler gösterilmiyor\" der ve \"Önbellek hazır\"/\"Bugüne ait\" YAZMAZ, yöntem değişimi iki yöntem adıyla \"eski\" gösterilir — hiçbiri sahte güncel saat üretmez. Salt-okur: depo yazımı ve save() artmaz, fetch 0."
+      },
+      {
+        "requirementId": "REQ-026",
+        "testId": "TC-026",
+        "result": "pass",
+        "summary": "Kapsam: TR kutusu (35.6-42.4 en, 25.5-45.0 boy) İstanbul/Ankara içinde, Berlin/Londra dışında; TR içi \"81 il + Diyanet\" ayrıntısı ve needsOwnTimezone=false; yurtdışı \"yerel saat olarak sunulmaz\" ve needsOwnTimezone=true. Olumsuz: GPS Berlin overlay'de \"Türkiye dışı\" gösterilir, \"Türkiye kapsamı içinde\" YAZMAZ; konum yokken \"Konum yok\" ve hücre tam 1 kez basılır."
+      }
+    ]
+  }
+}

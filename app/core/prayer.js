@@ -122,6 +122,68 @@
   function prayerWriteCache(date,locHash,method,val){
     try{ var s=storage(); if(s) s.setItem(prayerCacheKey(date,locHash),JSON.stringify({date:date,locHash:locHash,method:method||'',times:val,fetchedAt:new Date().toISOString()})); }catch(e){}
   }
+
+  // ── IIP-13 · Tazelik ve kapsam (salt-okur) ────────────────────────────────
+  // Cache geçerliliği yalnız yaşa göre değil GÜN + KONUM(şehir/koordinat) +
+  // YÖNTEM eşleşmesine göre değerlendirilir; uyuşmazlıkta kayıt "güncel"
+  // sayılmaz (REQ-025). Bu yardımcılar kayıt oluşturmaz, ağa çıkmaz, state
+  // yazmaz ve `Date.now()` yerine verilen `nowMs`'i kullanabilir (deterministik
+  // test). Türkiye kapsamı açıkça raporlanır; yurtdışı konum için yerel saat
+  // iddiası kurulmaz (REQ-026).
+  var PRAYER_STALE_HOURS=48;
+  function prayerAgeInfo(fetchedAt,nowMs){
+    var t=Date.parse(String(fetchedAt||''));
+    if(!isFinite(t)) return {ageH:null,stale:true};
+    var base=isFinite(Number(nowMs))?Number(nowMs):Date.now();
+    var ageH=(base-t)/3600000;
+    if(!isFinite(ageH)||ageH<0) ageH=0;
+    return {ageH:Math.round(ageH*10)/10,stale:ageH>=PRAYER_STALE_HOURS};
+  }
+  function prayerMethodLabel(method){
+    var labels={diyanet:'Diyanet yöntemi',mwl:'Muslim World League',isna:'ISNA',karachi:'Karachi',makkah:'Umm al-Qura',egypt:'Egyptian General Authority',tehran:'Tehran',ghana:'Ghana',kosovo:'Kosovo'};
+    var key=String(method||'diyanet').toLowerCase();
+    return labels[key]||'Diyanet yöntemi';
+  }
+  function prayerCacheEntry(date,locHash){
+    var v=prayerReadCache(date||dateCall('todayStr',[],function(){ return ''; }),locHash===undefined?prayerLocationHash():locHash);
+    if(!v||typeof v!=='object') return null;
+    return {times:v.times||null,method:String(v.method||''),fetchedAt:String(v.fetchedAt||''),locHash:String(v.locHash||''),date:String(v.date||'')};
+  }
+  function prayerCacheFreshness(o){
+    o=o||{};
+    var locHash=o.locHash===undefined?prayerLocationHash():String(o.locHash||'');
+    var method=o.method===undefined?prayerMethod():String(o.method||'');
+    var date=o.date||dateCall('todayStr',[],function(){ return ''; });
+    var entry=prayerCacheEntry(date,locHash);
+    if(!entry||!entry.times) return {state:'none',label:'Önbellek yok',detail:'Bu gün ve konum için kayıtlı vakit yok',stale:true,usable:false,ageH:null};
+    if(entry.method!==method) return {state:'mismatch',label:'Yöntem uyuşmuyor',detail:'Kayıt '+prayerMethodLabel(entry.method)+', seçili '+prayerMethodLabel(method)+' · eski önbellek kullanılmaz',stale:true,usable:false,ageH:null};
+    var age=prayerAgeInfo(entry.fetchedAt,o.nowMs), stamp=String(entry.fetchedAt).slice(0,16).replace('T',' '), ago='~'+String(Math.round(age.ageH))+' saat önce';
+    if(age.stale) return {state:'stale',label:'Eski önbellek',detail:'Son kayıt '+stamp+' · '+ago,stale:true,usable:false,ageH:age.ageH};
+    return {state:'fresh',label:'Güncel önbellek',detail:'Son kayıt '+stamp+' · '+ago,stale:false,usable:true,ageH:age.ageH};
+  }
+  // Uygulamanın kendi gün hesabı: kayıt tarihi bugün değilse gün dönmemiştir
+  // (gece yarısı uyarısı). Başka güne ait kayıt güncel saat sayılmaz.
+  function prayerDayFreshness(fetchedAt,date,nowMs){
+    var dt=date||dateCall('todayStr',[],function(){ return ''; });
+    if(!fetchedAt) return {state:'none',label:'Vakit yok',detail:'Kayıt henüz dolmadı',stale:true,dayMatch:false,ageH:null};
+    if(String(fetchedAt).slice(0,10)!==String(dt)) return {state:'otherday',label:'Başka güne ait',detail:'Kayıt tarihi '+String(fetchedAt).slice(0,10)+' · bugün '+String(dt),stale:true,dayMatch:false,ageH:null};
+    var age=prayerAgeInfo(fetchedAt,nowMs);
+    return {state:age.stale?'stale':'fresh',label:age.stale?'Eski kayıt':'Bugüne ait',detail:'Son kayıt '+String(fetchedAt).slice(0,16).replace('T',' '),stale:age.stale,dayMatch:true,ageH:age.ageH};
+  }
+  // Türkiye kapsamı: şehir listesi yalnız 81 il içindir ve hesap yöntemi
+  // Diyanet'tir. Koordinat TR kutusunun dışındaysa yerel saat iddiası kurulmaz.
+  function prayerInTurkey(lat,lon){
+    var la=Number(lat),lo=Number(lon);
+    if(!isFinite(la)||!isFinite(lo)) return false;
+    return la>=35.6&&la<=42.4&&lo>=25.5&&lo<=45.0;
+  }
+  function prayerCoverage(loc){
+    var l=loc||prayerLocation();
+    if(!l||typeof l!=='object'||isNaN(+l.lat)||isNaN(+l.lon)) return {state:'none',label:'Konum yok',detail:'Şehir seçilince kapsam doğrulanır',inTurkey:false,needsOwnTimezone:false};
+    var tr=prayerInTurkey(l.lat,l.lon), gps=String(l.source||'').toLowerCase()==='gps', name=l.cityName?String(l.cityName):'konum';
+    if(!tr) return {state:'outside',label:'Türkiye dışı',detail:(gps?'GPS '+name:name)+' · Türkiye listesi dışında · yerel saat olarak sunulmaz',inTurkey:false,needsOwnTimezone:true};
+    return {state:'inside',label:'Türkiye kapsamı içinde',detail:(l.cityName?String(l.cityName)+' · ':'')+'81 il listesi ve Diyanet yöntemi',inTurkey:true,needsOwnTimezone:false};
+  }
   function prayerTimesFromDay(p){ var out={}; PRAYER_ORDER.forEach(function(k){ out[k]=(p[k]&&p[k].time)||''; }); return out; }
   function currentPrayerIndex(times){
     var now=new Date(), curMin=now.getHours()*60+now.getMinutes(), best=-1;
@@ -203,6 +265,14 @@
     prayerCacheKey:prayerCacheKey,
     prayerReadCache:prayerReadCache,
     prayerWriteCache:prayerWriteCache,
+    PRAYER_STALE_HOURS:PRAYER_STALE_HOURS,
+    prayerAgeInfo:prayerAgeInfo,
+    prayerMethodLabel:prayerMethodLabel,
+    prayerCacheEntry:prayerCacheEntry,
+    prayerCacheFreshness:prayerCacheFreshness,
+    prayerDayFreshness:prayerDayFreshness,
+    prayerInTurkey:prayerInTurkey,
+    prayerCoverage:prayerCoverage,
     prayerTimesFromDay:prayerTimesFromDay,
     currentPrayerIndex:currentPrayerIndex,
     fetchAladhanTimes:fetchAladhanTimes,

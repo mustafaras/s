@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-13",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-13/render-matrix.html",
+  "verifiedHead": "705fc135879f5b9f89274f8ac12c67b149cc5f40",
+  "diffHash": "823d8d07afb8445acd72f7731386071d841825c963ab4617aeec3a082c010c39",
+  "createdAt": "2026-09-21T12:13:56Z",
+  "requirements": [
+    "REQ-025",
+    "REQ-026"
+  ],
+  "commands": [],
+  "limitations": "Sentetik render artifact'idir; gerçek ekran görüntüsü, ekran okuyucu, cihaz ve kullanıcı kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "4233da527e5522cb04382cc6520b4c1e2eb2b8e5de3231ae3f7852736b74ca77",
+  "details": {
+    "themes": [
+      "light",
+      "dark (token parity — yeni renk kuralı eklenmedi)"
+    ],
+    "viewports": [
+      "320px (tek sütun)",
+      "390px",
+      "430px",
+      "768px",
+      "1280px",
+      "320px %200 metin"
+    ],
+    "syntheticDataset": "IIP13-SYN-01; 4 konum (İstanbul, Ankara, Berlin-GPS, Londra-GPS) + 6 kayıt durumu (taze/başka gün/yöntem/konum/hata/yok). Kişisel veri, token, GPS izi, ağ veya cihaz depolaması içermez. Yasaklı alan taraması temiz.",
+    "observations": "8 sahne: taze+TR içi, gece yarısı (Başka güne ait), yöntem uyuşmazlığı, konum uyuşmazlığı, timeout/hata, kayıt yok, GPS yurtdışı (Türkiye dışı + yerel saat iddiası yok), kapsam karar tablosu. Tümü gerçek prayer.js + saygi.js registry çıktısıdır.",
+    "artifactKind": "render"
+  }
+}

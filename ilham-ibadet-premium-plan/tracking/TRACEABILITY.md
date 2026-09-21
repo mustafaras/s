@@ -28,8 +28,8 @@
 | REQ-022 / TC-022 | [IIP-11](../cards/IIP-11.md) | Mevcut gate A’da korunur; B’de erişilebilir alternatif açık ürün kararıyla eklenir. | Kaydırma/ekran okuyucu erişimi otomatik okudum kaydı oluşturmaz. | 5 |
 | REQ-023 / TC-023 | [IIP-12](../cards/IIP-12.md) | Tek odak önerisi kaynak/süre ve seçim gerekçesiyle; deterministik seçilir. | Aynı gün yeniden render öneriyi rastgele değiştirmez; içerik yoksa dürüst boş hâl. | 5 |
 | REQ-024 / TC-024 | [IIP-12](../cards/IIP-12.md) | Yalnız mevcut geçerli aktif zikir/Kur’an kaydı; yeni state kopyası yok. | Boş/bozuk/arşivlenmiş kayda giden Devam düğmesi oluşmaz. | 5 |
-| REQ-025 / TC-025 | [IIP-13](../cards/IIP-13.md) | Tarih/şehir/yöntem eşleşmeyen cache açıkça eski olarak gösterilir. | Gece yarısı, şehir değişimi, timeout ve yöntem değişimi sahte güncel saat üretmez. | 0 |
-| REQ-026 / TC-026 | [IIP-13](../cards/IIP-13.md) | Türkiye kapsamı açık; seyahat için otomatik destek iddiası yok. | GPS yurtdışında olsa bile Istanbul saati yerel saat diye sunulmaz. | 0 |
+| REQ-025 / TC-025 | [IIP-13](../cards/IIP-13.md) | Tarih/şehir/yöntem eşleşmeyen cache açıkça eski olarak gösterilir. | Gece yarısı, şehir değişimi, timeout ve yöntem değişimi sahte güncel saat üretmez. | 5 |
+| REQ-026 / TC-026 | [IIP-13](../cards/IIP-13.md) | Türkiye kapsamı açık; seyahat için otomatik destek iddiası yok. | GPS yurtdışında olsa bile Istanbul saati yerel saat diye sunulmaz. | 5 |
 | REQ-027 / TC-027 | [IIP-14](../cards/IIP-14.md) | B’de yalnız sunum adaptörü; eski sunrise kayıtları ayrı tarihsel kayıt olarak kalır. | Girdi JSON önce/sonra aynı; belirsiz kayıttan yeni ibadet sınıfı türetilmez. | 0 |
 | REQ-028 / TC-028 | [IIP-14](../cards/IIP-14.md) | Mevcut kaydet/düzelt eylemleri tek kez uygulanır; yeni namaz şeması program dışı ayrı ADR/backlog konusudur. | Çift tıklama, cancel ve geçmiş gün düzenleme kayıt çoğaltmaz. | 0 |
 | REQ-029 / TC-029 | [IIP-15](../cards/IIP-15.md) | Vakit/zikir/okuma ayrı toplam; anlamsız birleşik skor veya belirsiz yüzde yok. | Gün yok, yalnız not, artık yıl ve eski kayıt örneği bağımsız hesapla aynı. | 0 |

@@ -21,9 +21,10 @@
       "IIP-09",
       "IIP-10",
       "IIP-11",
-      "IIP-12"
+      "IIP-12",
+      "IIP-13"
     ],
-    "source": "2026-09-21 user message: IIP-12 — Günlük odak ve devam et (UYGULAMA-PROMPTLARI.md ortak kuralları; \"go apply be perfect\"). Yalnız IIP-12; commit/push/deploy yetkili değil."
+    "source": "2026-09-21 user message: IIP-13 — Vakit kaynağı ve tazelik (\"go next be perfect\"). Yalnız IIP-13; commit/push/deploy yetkili değil."
   },
   "releaseApproval": {
     "status": "approved",
@@ -36,7 +37,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 12,
+  "completedCards": 13,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -712,14 +713,14 @@
       "id": "IIP-13",
       "title": "Vakit kaynağı ve tazelik",
       "package": "B",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-03",
         "IIP-09"
       ],
       "path": "cards/IIP-13.md",
       "role": "domain",
-      "owner": null,
+      "owner": "copilot",
       "locks": [],
       "allowedProductionFiles": [
         "app/core/prayer.js",
@@ -736,12 +737,18 @@
         "source",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-13/scope.json",
+        "evidence/IIP-13/requirements.json",
+        "evidence/IIP-13/review.json",
+        "evidence/IIP-13/source.json",
+        "evidence/IIP-13/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-21T15:20:00Z",
+      "completedAt": "2026-09-21T15:45:00Z",
+      "verifiedHead": "705fc135879f5b9f89274f8ac12c67b149cc5f40",
+      "handoff": "evidence/IIP-13/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_prayer_boundary.js"
@@ -753,7 +760,7 @@
       ],
       "decisionIds": [],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "823d8d07afb8445acd72f7731386071d841825c963ab4617aeec3a082c010c39",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

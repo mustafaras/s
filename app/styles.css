@@ -2517,6 +2517,76 @@
 #root[data-theme="dark"] .sey-hdr-phase-time{ color:rgba(243,239,232,.72); }
 #root[data-theme="dark"] .sey-hdr-arc-track{ stroke:rgba(255,255,255,.22); }
 
+/* Açık tema seçiliyken gece sahnesi yine koyu bir gökyüzüdür. Kontrastı tema
+   adına göre değil, metnin gerçekten üstünde durduğu sahneye göre kur: marka,
+   başlık, eylemler ve hava şeridi aynı gece mürekkebi ailesini paylaşır. */
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-wordmark{
+  background:linear-gradient(110deg,#FFFFFF 0%,#F7E4B2 48%,#D9E5FF 72%,#FFFFFF 100%);
+  background-size:240% auto; -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#FFFFFF;
+  filter:drop-shadow(0 1px 1px rgba(4,9,22,.72)) drop-shadow(0 3px 9px rgba(4,9,22,.34));
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-wordmark-flam{
+  filter:drop-shadow(0 2px 5px rgba(4,9,22,.72));
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-header-mini{
+  color:#F4D98F; background:rgba(7,13,29,.54); border:1px solid rgba(244,217,143,.28);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-header-mini:hover{
+  color:#FFF4CE; background:rgba(7,13,29,.72); border-color:rgba(244,217,143,.48);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-header-save{
+  color:#F8F6F1; background:rgba(7,13,29,.68); border-color:rgba(231,237,250,.38);
+  box-shadow:0 4px 14px rgba(4,9,22,.24);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-header-save:hover{
+  color:#FFFFFF; background:rgba(7,13,29,.82); border-color:rgba(231,237,250,.58);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-header-save.is-dirty,
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-header-save.is-error{
+  color:#FFE1E3; background:rgba(77,13,27,.78); border-color:#FF929A;
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-header-save.is-local,
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-top .sey-header-save.is-synced{
+  color:#E2F8EA; background:rgba(12,57,42,.76); border-color:#8DDBAF;
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-main .sey-header-icon,
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-main .sey-header-kicker{
+  color:#F4D98F; text-shadow:0 1px 2px rgba(4,9,22,.72);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-main .sey-header-title{
+  color:#FAF8F4; text-shadow:0 1px 2px rgba(4,9,22,.78);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-main .sey-header-sub{
+  color:#D7DFEF; text-shadow:0 1px 2px rgba(4,9,22,.72);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-main .sey-header-action{
+  color:#F4D98F; background:rgba(7,13,29,.68); border-color:rgba(244,217,143,.38);
+  box-shadow:0 4px 14px rgba(4,9,22,.22);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-header-main .sey-header-action:hover{
+  color:#FFF4CE; background:rgba(7,13,29,.82); border-color:rgba(244,217,143,.58);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-hdr-scene{
+  border-top-color:rgba(231,237,250,.22);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-hdr-scene .sey-hdr-wx{
+  background:rgba(7,13,29,.62); border-color:rgba(231,237,250,.24);
+  box-shadow:0 3px 12px rgba(4,9,22,.22);
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-hdr-scene .sey-hdr-wx-glyph,
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-hdr-scene .sey-hdr-wx-temp,
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-hdr-scene .sey-hdr-phase-name{
+  color:#FAF8F4;
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-hdr-scene .sey-hdr-wx-label,
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-hdr-scene .sey-hdr-phase-time{
+  color:#D7DFEF;
+}
+#root:not([data-theme="dark"]) .sey-hdr-sky.sky-time-night ~ .sey-hdr-scene .sey-hdr-arc-track{
+  stroke:rgba(231,237,250,.34);
+}
+
 /* Dar ekranda durum etiketi düşer, rozet ve vakit kalır. */
 @media (max-width:359px){ .sey-hdr-wx-label{ display:none; } }
 /* Hareket duyarlılığı: RENK kalır, HAREKET durur. */

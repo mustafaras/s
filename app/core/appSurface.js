@@ -668,6 +668,19 @@ function headerSolarProgress(spot,now){
   return Math.max(0,Math.min(1,(t-sr)/(ss-sr)));
 }
 
+function headerNightProgress(spot,now){
+  // Gün batımı → ertesi gün doğumu. Weather kaydı aynı günün doğuş/batışını
+  // taşıdığı için gece yarısının iki tarafını 24 saatlik komşu güne bağla.
+  if(!spot||!spot.sunrise||!spot.sunset) return null;
+  var sr=new Date(spot.sunrise).getTime(), ss=new Date(spot.sunset).getTime();
+  if(!isFinite(sr)||!isFinite(ss)||ss<=sr) return null;
+  var t=(now||new Date()).getTime(), start, end;
+  if(t>=ss){ start=ss; end=sr+86400000; }
+  else if(t<=sr){ start=ss-86400000; end=sr; }
+  else return null;
+  return Math.max(0,Math.min(1,(t-start)/(end-start)));
+}
+
 function headerSceneHTML(){
   if(!window.SeyAmbience||typeof window.SeyAmbience.scene!=='function') return '';
   // premiumAtmosphere kapalıyken şerit de görünmez — gating sızıntısı olmasın.
@@ -678,7 +691,7 @@ function headerSceneHTML(){
   var meta=spot?wxMeta(spot.code,spot.isDay):null;
   var phase=HDR_PHASE_TR[sc.time]||'Bugün';
   var isNight=(sc.time==='amb-time-night');
-  var prog=headerSolarProgress(spot);
+  var prog=isNight?headerNightProgress(spot):headerSolarProgress(spot);
 
   var h='<div class="sey-hdr-scene" aria-hidden="false">';
 
@@ -692,27 +705,32 @@ function headerSceneHTML(){
   h+='<span class="sey-hdr-wx-label">'+esc(meta?meta.label:'hava bekleniyor')+'</span>';
   h+='</div>';
 
-  // — güneş yayı: gerçek doğuş/batış ilerlemesi —
+  // — göksel yörünge: gündüz doğuş→batış, gece batış→ertesi doğuş —
   if(prog!=null){
-    // Kuadratik Bézier P0(6,30) P1(60,-1) P2(114,30) üzerinde nokta.
+    // Kuadratik Bézier P0(8,27) P1(80,-3) P2(152,27) üzerinde nokta.
     var t=prog, mt=1-t;
-    var dx=mt*mt*6 + 2*mt*t*60 + t*t*114;
-    var dy=mt*mt*30 + 2*mt*t*(-1) + t*t*30;
+    var dx=mt*mt*8 + 2*mt*t*80 + t*t*152;
+    var dy=mt*mt*27 + 2*mt*t*(-3) + t*t*27;
     h+='<div class="sey-hdr-arc sey-enter sey-enter-delay-2'+(isNight?' is-night':'')+'">';
-    h+='<svg viewBox="0 0 120 34" preserveAspectRatio="none" focusable="false" aria-hidden="true">';
-    h+='<path class="sey-hdr-arc-track" d="M6,30 Q60,-1 114,30" pathLength="1"/>';
-    h+='<path class="sey-hdr-arc-done" d="M6,30 Q60,-1 114,30" pathLength="1" style="stroke-dasharray:'+t.toFixed(3)+' 1;"/>';
-    h+='<circle class="sey-hdr-arc-dot" cx="'+dx.toFixed(2)+'" cy="'+dy.toFixed(2)+'" r="3.4"/>';
+    h+='<span class="sey-hdr-orbit-label">'+(isNight?'Gece yolculuğu':'Gün ışığı')+'</span>';
+    h+='<svg viewBox="0 0 160 34" preserveAspectRatio="none" focusable="false" aria-hidden="true">';
+    h+='<line class="sey-hdr-horizon" x1="8" y1="28" x2="152" y2="28"/>';
+    h+='<circle class="sey-hdr-orbit-edge" cx="8" cy="27" r="2"/><circle class="sey-hdr-orbit-edge" cx="152" cy="27" r="2"/>';
+    h+='<path class="sey-hdr-arc-track" d="M8,27 Q80,-3 152,27" pathLength="1"/>';
+    h+='<path class="sey-hdr-arc-done" d="M8,27 Q80,-3 152,27" pathLength="1" style="stroke-dasharray:'+t.toFixed(3)+' 1;"/>';
+    h+='<circle class="sey-hdr-arc-halo" cx="'+dx.toFixed(2)+'" cy="'+dy.toFixed(2)+'" r="6.8"/>';
+    h+='<circle class="sey-hdr-arc-dot" cx="'+dx.toFixed(2)+'" cy="'+dy.toFixed(2)+'" r="3.6"/>';
     h+='</svg></div>';
   }
 
-  // — vakit etiketi + doğuş/batış saati —
+  // — korumalı vakit kapsülü + sıradaki güneş olayı —
   h+='<div class="sey-hdr-phase sey-enter sey-enter-delay-3">';
-  h+='<span class="sey-hdr-phase-name">'+esc(phase)+'</span>';
+  h+='<span class="sey-hdr-phase-glyph">'+icon(isNight?'moon':'sun',14)+'</span>';
+  h+='<span class="sey-hdr-phase-copy"><span class="sey-hdr-phase-name">'+esc(phase)+'</span>';
   if(spot&&spot.sunrise&&spot.sunset){
-    h+='<span class="sey-hdr-phase-time">'+icon(isNight?'sunrise':'sunset',10)+' '+esc(isNight?wxHm(spot.sunrise):wxHm(spot.sunset))+'</span>';
+    h+='<span class="sey-hdr-phase-time"><b>'+esc(isNight?wxHm(spot.sunrise):wxHm(spot.sunset))+'</b><em>'+(isNight?'gün doğumu':'gün batımı')+'</em></span>';
   }
-  h+='</div>';
+  h+='</span></div>';
 
   h+='</div>';
   return h;

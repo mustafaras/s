@@ -42,6 +42,14 @@
   }catch(e){}
 })();
 </script>
+<style>
+#sey-offline-tools{position:fixed;top:calc(10px + env(safe-area-inset-top));right:10px;z-index:9000;color:var(--text);font:600 12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#sey-offline-tools>summary{list-style:none;cursor:pointer;padding:7px 10px;border:1px solid color-mix(in srgb,var(--text) 14%,transparent);border-radius:999px;background:color-mix(in srgb,var(--bg) 92%,transparent);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+#sey-offline-tools>summary::-webkit-details-marker{display:none}
+#sey-offline-tools[open]>summary{border-radius:14px 14px 0 0}
+.sey-offline-panel{width:min(310px,calc(100vw - 20px));padding:14px;border:1px solid color-mix(in srgb,var(--text) 14%,transparent);border-radius:14px 0 14px 14px;background:var(--bg);box-shadow:0 12px 36px rgba(0,0,0,.18)}
+.sey-offline-panel h2{margin:0 0 10px;font-size:16px}.sey-offline-panel dl{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:0}.sey-offline-panel dt{color:var(--text2)}.sey-offline-panel dd{margin:0;text-align:right}.sey-offline-panel p{margin:10px 0;color:var(--text2);font-weight:500}.sey-offline-actions{display:flex;flex-wrap:wrap;gap:7px}.sey-offline-actions button{min-height:36px;padding:7px 10px;border:1px solid color-mix(in srgb,var(--text) 18%,transparent);border-radius:10px;background:var(--card);color:var(--text);font:inherit;cursor:pointer}.sey-offline-actions button:disabled{opacity:.5;cursor:default}
+</style>
 </head>
 <body>
 <div id="root" data-theme="light" style="min-height:100dvh;height:100dvh;width:100%;display:flex;justify-content:center;background:var(--page);overflow:hidden;">
@@ -64,6 +72,25 @@
     </div>
   </div>
 </div>
+<details id="sey-offline-tools">
+  <summary>Offline</summary>
+  <section class="sey-offline-panel" aria-labelledby="sey-offline-title">
+    <h2 id="sey-offline-title">Offline araçları</h2>
+    <dl>
+      <dt>Paket durumu</dt><dd id="sey-offline-status">Denetleniyor</dd>
+      <dt>Sürüm</dt><dd id="sey-offline-version">—</dd>
+      <dt>Tahmini boyut</dt><dd id="sey-offline-size">—</dd>
+      <dt>Depolama kotası</dt><dd id="sey-offline-quota">—</dd>
+    </dl>
+    <p id="sey-offline-note">Yalnız genel uygulama kabuğu ve onaylı genel içerik saklanır. Tokenlı ve kişisel yanıtlar pakete girmez.</p>
+    <p>Güncelleme hazırsa açık sayaç ve not korunur; zorla yenileme yapılmaz. İşini kaydedip uygulamayı kapatıp yeniden açabilirsin.</p>
+    <div class="sey-offline-actions">
+      <button type="button" id="sey-offline-install">Paketi kur / yenile</button>
+      <button type="button" id="sey-offline-check">Güncellemeyi denetle</button>
+      <button type="button" id="sey-offline-remove">Offline paketi kaldır</button>
+    </div>
+  </section>
+</details>
 <script>
 /* AD-31-FIX-2: ilk boyamadan ÖNCE temayı çöz.
    #root statik olarak data-theme="light" taşıyor (JS'siz yedek). app.js boot edene
@@ -129,9 +156,57 @@
 <script src="app/core/render.js?v=20260915f"></script>
 <script src="app/core/appSurface.js?v=20260921c"></script>
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=2026080402').catch(function (err) { console.warn('SW register failed', err); });
-}
+(function(){
+  var tools=document.getElementById('sey-offline-tools');
+  var statusEl=document.getElementById('sey-offline-status');
+  var versionEl=document.getElementById('sey-offline-version');
+  var sizeEl=document.getElementById('sey-offline-size');
+  var quotaEl=document.getElementById('sey-offline-quota');
+  var noteEl=document.getElementById('sey-offline-note');
+  var installBtn=document.getElementById('sey-offline-install');
+  var checkBtn=document.getElementById('sey-offline-check');
+  var removeBtn=document.getElementById('sey-offline-remove');
+  var registration=null;
+  function setBusy(value){ installBtn.disabled=value;checkBtn.disabled=value;removeBtn.disabled=value; }
+  function formatBytes(value){ if(!Number.isFinite(value)||value<0)return '—';return (value/1048576).toLocaleString('tr-TR',{maximumFractionDigits:1})+' MB'; }
+  function worker(){ return registration&&(registration.active||navigator.serviceWorker.controller); }
+  function ask(type){
+    return new Promise(function(resolve,reject){
+      var target=worker();
+      if(!target||typeof MessageChannel==='undefined'){reject(new Error('worker-not-ready'));return;}
+      var channel=new MessageChannel(),timer=setTimeout(function(){reject(new Error('worker-timeout'));},2500);
+      channel.port1.onmessage=function(event){clearTimeout(timer);resolve(event.data||{});};
+      target.postMessage({type:type},[channel.port2]);
+    });
+  }
+  function render(info){
+    var labels={ready:'Hazır',rollback:'Önceki sürüm hazır',absent:'İndirilmedi',quota:'Kota yetersiz',incomplete:'Eksik paket',partial:'Kısmen kaldırıldı',removed:'Kaldırıldı'};
+    statusEl.textContent=labels[info.status]||'Kuruluyor';
+    versionEl.textContent=info.version||'—';
+    sizeEl.textContent=formatBytes(info.estimatedBytes);
+    if(registration&&registration.waiting) noteEl.textContent='Yeni sürüm hazır. Açık sayaç/not kesilmez; uygulamayı kapatıp yeniden açınca devreye girer.';
+  }
+  function refresh(){
+    var quota=Promise.resolve(null);
+    if(navigator.storage&&navigator.storage.estimate)quota=navigator.storage.estimate().catch(function(){return null;});
+    quota.then(function(info){quotaEl.textContent=info&&info.quota?formatBytes(info.usage||0)+' / '+formatBytes(info.quota):'Bilinmiyor';});
+    return ask('SEYMA_OFFLINE_STATUS').then(render,function(){render({status:registration&&registration.installing?'installing':'absent'});});
+  }
+  function action(type){setBusy(true);ask(type).then(render,function(){render({status:'incomplete'});}).finally(function(){setBusy(false);refresh();});}
+  if(!('serviceWorker' in navigator)){
+    statusEl.textContent='Desteklenmiyor';setBusy(true);return;
+  }
+  navigator.serviceWorker.register('sw.js?v=20260922a').then(function(reg){
+    registration=reg;
+    if(reg.installing)reg.installing.addEventListener('statechange',refresh);
+    reg.addEventListener('updatefound',function(){refresh();});
+    refresh();
+  }).catch(function(err){statusEl.textContent='Kurulamadı';console.warn('SW register failed',err);});
+  tools.addEventListener('toggle',function(){if(tools.open)refresh();});
+  installBtn.addEventListener('click',function(){action('SEYMA_OFFLINE_INSTALL');});
+  removeBtn.addEventListener('click',function(){action('SEYMA_OFFLINE_REMOVE');});
+  checkBtn.addEventListener('click',function(){if(registration)registration.update().then(refresh,refresh);});
+})();
 </script>
 <script src="panel/panelCoverageManifest.js?v=20260820d"></script>
 <script src="app.js?v=20260921e"></script>

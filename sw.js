@@ -5,7 +5,172 @@
  * gösterilen native bildirimler sw.showNotification() üzerinden buradan geçer.
  */
 
-const SW_VERSION = '20260818a';
+const SW_VERSION = '20260922a';
+
+// IIP-22: controlled, public-only offline package. This is deliberately an
+// exact allowlist, not a runtime cache. Personal data, authenticated responses,
+// panel payloads, media and third-party responses can never enter this cache.
+const SW_OFFLINE_VERSION = 'iip22-20260922a';
+const SW_OFFLINE_PREFIX = 'seyma-offline-v1-';
+const SW_OFFLINE_CACHE = SW_OFFLINE_PREFIX + SW_OFFLINE_VERSION;
+const SW_OFFLINE_TEMP = SW_OFFLINE_CACHE + '-temp';
+const SW_OFFLINE_ESTIMATED_BYTES = 3800000;
+const SW_OFFLINE_MANIFEST = Object.freeze([
+  './',
+  './index.html',
+  './manifest.json?v=20260730f',
+  './app/styles.css?v=20260922a',
+  './assets/aeon-icon-192.png',
+  './assets/aeon-icon-512.png',
+  './app/content/motivationProgramV2.js?v=20260730p',
+  './app/content/motivationNarratives.js?v=20260730p',
+  './app/content/saygiPeople.js?v=20260730p',
+  './app/content/profileAssessmentV1.js?v=20260730p',
+  './app/content/hijriCalendar.js?v=20260730p',
+  './app/content/quranRevelationOrderV1.js?v=20260730p',
+  './app/content/quranTransportV1.js?v=20260730p',
+  './app/content/quranStrikingVersesV1.js?v=20260922b',
+  './app/content/esmaulHusnaV1.js?v=20260730p',
+  './app/content/esmaulHusnaV2.js?v=20260730p',
+  './app/content/zikirCoreContentV1.js?v=20260730p',
+  './app/core/constants.js?v=20260824a',
+  './app/core/dateUtils.js?v=20260903b',
+  './app/core/state.js?v=20260910b',
+  './app/core/syncGlue.js?v=20260904a',
+  './app/core/helpers.js?v=20260903b',
+  './app/core/prayer.js?v=20260921f',
+  './app/core/zikir.js?v=20260915a',
+  './app/core/quran.js?v=20260915a',
+  './app/core/saygi.js?v=20260922b',
+  './app/core/motivation.js?v=20260909a',
+  './app/core/crisis.js?v=20260909a',
+  './app/core/journal.js?v=20260909a',
+  './app/core/health.js?v=20260918a',
+  './app/core/library.js?v=20260910a',
+  './app/core/report.js?v=20260910a',
+  './app/core/map.js?v=20260915a',
+  './app/core/profile.js?v=20260915a',
+  './app/core/settings.js?v=20260915c',
+  './app/core/mediaFx.js?v=20260909a',
+  './app/core/timeTheme.js?v=20260908a',
+  './app/core/skyFx.js?v=20260909a',
+  './app/core/reminderCatalog.js?v=20260914a',
+  './app/core/reminderEngine.js?v=20260818a',
+  './app/core/reminderScheduler.js?v=20260818a',
+  './app/core/reminderDelivery.js?v=20260818a',
+  './app/core/reminders.js?v=20260914a',
+  './app/core/reminderSurface.js?v=20260914d',
+  './app/core/messaging.js?v=20260911a',
+  './app/core/render.js?v=20260915f',
+  './app/core/appSurface.js?v=20260921c',
+  './app.js?v=20260921e',
+  './sync.js?v=20260902a'
+]);
+
+function swManifestDescriptor() {
+  return {
+    version: SW_OFFLINE_VERSION,
+    cacheName: SW_OFFLINE_CACHE,
+    estimatedBytes: SW_OFFLINE_ESTIMATED_BYTES,
+    entries: SW_OFFLINE_MANIFEST.slice()
+  };
+}
+
+function swSensitiveUrl(url) {
+  if (url.origin !== new URL(self.registration.scope).origin) return true;
+  if (/\/(?:data|panel|v3-tanitim)(?:\/|\.|$)/i.test(url.pathname)) return true;
+  if (/\.(?:mp4|webm|mov|m4a|mp3|wav|json)$/i.test(url.pathname) && !/\/manifest\.json$/i.test(url.pathname)) return true;
+  for (const key of url.searchParams.keys()) {
+    if (/(?:token|auth|secret|credential|signature|access[_-]?key|api[_-]?key)/i.test(key)) return true;
+  }
+  return false;
+}
+
+function swOfflineManifestUrls() {
+  return SW_OFFLINE_MANIFEST.map(function (entry) { return new URL(entry, self.registration.scope).href; });
+}
+
+function swOfflineRequestKey(request) {
+  if (!request || String(request.method || 'GET').toUpperCase() !== 'GET') return '';
+  let url;
+  try { url = new URL(request.url); } catch (error) { return ''; }
+  if (swSensitiveUrl(url)) return '';
+  const scope = new URL(self.registration.scope);
+  const safeNavigation = request.mode === 'navigate' &&
+    (url.pathname === scope.pathname || url.pathname === scope.pathname + 'index.html');
+  const key = safeNavigation ? new URL('./index.html', scope).href : url.href;
+  return swOfflineManifestUrls().indexOf(key) >= 0 ? key : '';
+}
+
+async function swInstallOfflinePackage() {
+  const urls = swOfflineManifestUrls();
+  await caches.delete(SW_OFFLINE_TEMP);
+  const temporary = await caches.open(SW_OFFLINE_TEMP);
+  try {
+    await temporary.addAll(urls);
+    const downloaded = await temporary.keys();
+    if (downloaded.length !== urls.length) throw new Error('offline package incomplete');
+    await caches.delete(SW_OFFLINE_CACHE);
+    const target = await caches.open(SW_OFFLINE_CACHE);
+    for (const request of downloaded) {
+      const response = await temporary.match(request);
+      if (!response) throw new Error('offline package response missing');
+      await target.put(request, response);
+    }
+    const installed = await target.keys();
+    if (installed.length !== urls.length) throw new Error('offline package copy incomplete');
+    await caches.delete(SW_OFFLINE_TEMP);
+    return { status: 'ready', version: SW_OFFLINE_VERSION, entries: installed.length };
+  } catch (error) {
+    await caches.delete(SW_OFFLINE_TEMP);
+    await caches.delete(SW_OFFLINE_CACHE);
+    throw error;
+  }
+}
+
+async function swOfflineCacheNames() {
+  const names = await caches.keys();
+  return names.filter(function (name) {
+    return name.indexOf(SW_OFFLINE_PREFIX) === 0 && !name.endsWith('-temp');
+  });
+}
+
+async function swMatchOfflineRequest(request) {
+  const key = swOfflineRequestKey(request);
+  if (!key) return undefined;
+  const names = await swOfflineCacheNames();
+  names.sort(function (a, b) {
+    if (a === SW_OFFLINE_CACHE) return -1;
+    if (b === SW_OFFLINE_CACHE) return 1;
+    return b.localeCompare(a);
+  });
+  for (const name of names) {
+    const response = await caches.match(key, { cacheName: name });
+    if (response) return response;
+  }
+  return undefined;
+}
+
+async function swOfflineStatus() {
+  const names = await swOfflineCacheNames();
+  const current = names.indexOf(SW_OFFLINE_CACHE) >= 0;
+  return {
+    status: current ? 'ready' : (names.length ? 'rollback' : 'absent'),
+    version: SW_OFFLINE_VERSION,
+    estimatedBytes: SW_OFFLINE_ESTIMATED_BYTES,
+    installedVersions: names.slice().sort(),
+    updatePolicy: 'no-forced-reload'
+  };
+}
+
+async function swRemoveOfflinePackage() {
+  const names = (await caches.keys()).filter(function (name) { return name.indexOf(SW_OFFLINE_PREFIX) === 0; });
+  const failed = [];
+  for (const name of names) {
+    try { if (!await caches.delete(name)) failed.push(name); } catch (error) { failed.push(name); }
+  }
+  return { status: failed.length ? 'partial' : 'removed', failed: failed };
+}
 
 // Reminder notifications are delivered by the foreground app. The service
 // worker only transports an already-created click back to the app; it never
@@ -139,11 +304,38 @@ function swRouteNotificationClick(event, message) {
 }
 
 self.addEventListener('install', function (event) {
-  self.skipWaiting();
+  // A new worker waits normally. It must not replace/reload an active counter
+  // or note session. Failed or quota-limited installs reject atomically, so the
+  // previous worker and its package remain available.
+  event.waitUntil(swInstallOfflinePackage());
 });
 
 self.addEventListener('activate', function (event) {
   event.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', function (event) {
+  const key = swOfflineRequestKey(event.request);
+  if (!key) return;
+  event.respondWith(swMatchOfflineRequest(event.request).then(function (response) {
+    // Exact public allowlist only; the network fallback is never written back.
+    return response || self['fetch'](event.request);
+  }));
+});
+
+self.addEventListener('message', function (event) {
+  const data = event.data && typeof event.data === 'object' ? event.data : {};
+  const reply = event.ports && event.ports[0]
+    ? function (payload) { event.ports[0].postMessage(payload); }
+    : function (payload) { if (event.source && event.source.postMessage) event.source.postMessage(payload); };
+  let task;
+  if (data.type === 'SEYMA_OFFLINE_STATUS') task = swOfflineStatus();
+  else if (data.type === 'SEYMA_OFFLINE_INSTALL') task = swInstallOfflinePackage();
+  else if (data.type === 'SEYMA_OFFLINE_REMOVE') task = swRemoveOfflinePackage();
+  else return;
+  event.waitUntil(Promise.resolve(task).then(reply, function (error) {
+    reply({ status: error && error.name === 'QuotaExceededError' ? 'quota' : 'incomplete', error: 'offline-package-failed' });
+  }));
 });
 
 self.addEventListener('push', function (event) {

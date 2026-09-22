@@ -108,7 +108,7 @@ function test(name, fn) {
     assert.equal(key(new SyntheticRequest('https://example.test/s/panel.html')), '');
     assert.equal(key(new SyntheticRequest('https://example.test/s/movie.mp4')), '');
     assert.equal(key(new SyntheticRequest('https://api.example.org/content')), '');
-    assert.equal(key(new SyntheticRequest('https://example.test/s/app.js?v=20260921e')), 'https://example.test/s/app.js?v=20260921e');
+    assert.equal(key(new SyntheticRequest('https://example.test/s/app.js?v=20260922a')), 'https://example.test/s/app.js?v=20260922a');
   });
   await test('install atomiktir; kesik indirme geçici cache bırakmaz', async () => {
     const runtime = loadSw({ failAddAt: 2 });
@@ -128,7 +128,7 @@ function test(name, fn) {
   await test('eski sürüme dönüş exact allowlist isteğini kullanıma açık tutar', async () => {
     const runtime = loadSw();
     const old = await runtime.caches.open('seyma-offline-v1-iip22-old');
-    const url = 'https://example.test/s/app.js?v=20260921e';
+    const url = 'https://example.test/s/app.js?v=20260922a';
     await old.put(url, new SyntheticResponse('old-shell'));
     const response = await runtime.sandbox.swMatchOfflineRequest(new SyntheticRequest(url));
     assert.equal(response.body, 'old-shell');

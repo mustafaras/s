@@ -273,10 +273,24 @@ function pad(n){ return (n<10?'0':'')+n; }
 function timeStr(iso){ try{ var d=new Date(iso); return pad(d.getHours())+':'+pad(d.getMinutes()); }catch(e){ return ''; } }
 function statusText(){
   var c=cfg();
-  if(!c) return 'Bağlı değil';
+  // Tanı: "Bağlı değil" tek başına HANGİ girdinin eksik olduğunu söylemiyordu.
+  // Kullanıcı "anahtarı girdim ama olmuyor" diyordu; hangi kapının kapalı
+  // olduğu (anahtar / repo adresi / yerel adres) artık metnin kendisinde.
+  if(!c){
+    var s=settings(), tok=((s&&s.ghToken)||'').trim(), repo=((s&&s.ghRepo)||'').trim();
+    if(!tok) return 'Bağlı değil · GitHub anahtarı girilmemiş';
+    if(!repo||repo.indexOf('/')<1||repo.split('/').length!==2) return 'Bağlı değil · repo adresi geçersiz (sahip/repo)';
+    return 'Bağlı değil · bağlantı ayarları eksik';
+  }
+  if(devOrigin() && !syncForced()) return 'Bulut kapalı · yerel adres (veri güvenliği)';
   if(state.status==='saving') return 'Kaydediliyor…';
   if(state.status==='ok') return 'Uzak kayda alındı ✓ '+timeStr(state.last);
-  if(state.status==='error') return SYNC_STATUS_TEXT[state.error]||'Senkron hatası';
+  if(state.status==='error'){
+    // Yetki hatası en sık karışan durum: hangi iznin gerektiğini söyle.
+    if(state.error==='forbidden'||state.error==='unauthorized'||state.error==='permission') return 'Yetki gerekli · anahtarda Contents: Read and write olmalı';
+    if(state.error==='not_found') return 'Repo/dosya bulunamadı · repo adı ve anahtar erişimini kontrol et';
+    return SYNC_STATUS_TEXT[state.error]||'Senkron hatası';
+  }
   return 'Bağlantı hazır';
 }
 function paint(){ var el=document.getElementById('sey-sync-status'); if(el) el.textContent=statusText(); }

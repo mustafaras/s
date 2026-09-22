@@ -30,9 +30,10 @@
       "IIP-18",
       "IIP-19",
       "IIP-20",
-      "IIP-21"
+      "IIP-21",
+      "IIP-22"
     ],
-    "source": "2026-09-22 user message: go next be perfect; IIP-21'e geçiş ve her prompt sonunda canlıya alma çalışma biçimi onaylandı."
+    "source": "2026-09-22 user message: yalnız IIP-22 kontrollü offline paket adımını uygula; capability spike sonrası genel kabuk/içerik paketi, güvenli güncelleme ve olumsuz senaryolar onaylandı; commit/push/deploy yok."
   },
   "releaseApproval": {
     "status": "approved",
@@ -45,7 +46,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 21,
+  "completedCards": 22,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -1238,13 +1239,13 @@
       "id": "IIP-22",
       "title": "Kontrollü offline paket",
       "package": "C",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-19"
       ],
       "path": "cards/IIP-22.md",
       "role": "platform",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [
         "sw.js",
@@ -1261,12 +1262,18 @@
         "source",
         "offline"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-22/scope.json",
+        "evidence/IIP-22/requirements.json",
+        "evidence/IIP-22/review.json",
+        "evidence/IIP-22/source.json",
+        "evidence/IIP-22/offline.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-22T11:52:35Z",
+      "completedAt": "2026-09-22T12:05:27Z",
+      "verifiedHead": "3523e1ada09d31d1297b5848bb228688be134228",
+      "handoff": "evidence/IIP-22/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js"
       ],
@@ -1278,7 +1285,7 @@
         "DEC-06"
       ],
       "estimatedSize": "L",
-      "diffHash": null,
+      "diffHash": "72def7153945af36f79caf4371747a388d670f9cfd2b5c8e128621ed4018d245",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

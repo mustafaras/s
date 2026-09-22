@@ -1,0 +1,7 @@
+# IIP-22 devir
+
+Codex/platform, 2026-09-22. Kullanıcının “yalnız IIP-22”, capability spike önce talimatıyla `/Users/m_ras/Desktop/seyma`, `main`, başlangıç HEAD `a70437997222c82fbb48e392e771309056bb4ffb`, doğrulanmış uygulama HEAD `3523e1ada09d31d1297b5848bb228688be134228` üzerinde çalışıldı. Başlangıç worktree temizdi. Kart `done`; owner `codex`; lock’lar kapatıldı. İlk yerel kapanıştan sonra kullanıcı commit/push/deploy için ayrıca açık onay verdi.
+
+Değişen üretim/test dosyaları: `sw.js`, `index.html`, `tests/app/test_iip_22.js`. 49 girdilik exact public manifest (`iip22-20260922a`), 3,8 MB tahmin, atomik temp→final install, kota/kesinti temizliği, eski sürüm fallback, kullanıcı kaldırma ve durum/kota araç paneli eklendi. Tokenlı/kişisel/panel/media/dış-origin yanıtları dışlanır; runtime fetch cache’e yazılmaz. `skipWaiting`, `controllerchange` reload ve aktif sayaç/not zorlaması yoktur. Birleşik dosya hash’i `72def715…d245`, manifest hash’i `88d336fb…f169`.
+
+PASS: IIP-22 11/11, Saygı 22/22, location/SW 28/28, zikir 95/95, driver, shell gate, SW ve inline-script syntax, plan-check, diff-check. REQ-043/TC-043 ve REQ-044/TC-044 geçti; DEC-06 kullanıcı kararıyla approved. Browser/gerçek localStorage/ağ kullanılmadı; sunucu başlatılmadı. Cihaz PWA/kota/eviction kabulü ve yayın doğrulaması yapılmadı. Geri alma bu üç dosya ile state/evidence değişikliklerini geri döndürür; veri şeması değişmedi. Sonraki kart kendiliğinden başlatılmayacak; IIP-23 ayrı kullanıcı yetkisi ister.

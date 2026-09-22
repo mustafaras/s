@@ -57,9 +57,9 @@
     "id": "DEC-06",
     "title": "Offline genel içerik kapsamı",
     "ownerCard": "IIP-22",
-    "status": "proposed",
-    "source": null,
-    "evidence": null,
-    "reviewer": null
+    "status": "approved",
+    "source": "2026-09-22 user message: yalnız IIP-22'yi uygula; önce capability spike, sonra yalnız genel kabuk/içerik paketi, geniş runtime fetch cache'i olmadan güvenli yaşam döngüsü ve olumsuz senaryolar.",
+    "evidence": "evidence/IIP-22/decision-approval.md",
+    "reviewer": "User (product/platform decision owner; explicit current-turn approval)"
   }
 ]

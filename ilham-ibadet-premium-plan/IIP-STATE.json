@@ -1416,8 +1416,13 @@
     ],
     "source": "2026-09-22 user message: ikisini de yaptım sorun yok",
     "agentVerified": false,
-    "note": "Ajan cihaz doğrulaması YAPAMAZ (kök kural). Bu kayıt kullanıcının beyanıdır. Hedef cihaz p50/p95 ölçülmedi.",
-    "ledgerSeq": 51
+    "note": "Ajan cihaz doğrulaması YAPAMAZ (kök kural). Bu kayıt kullanıcının beyanıdır. Model bilindi; hedef cihaz p50/p95 sayıları HENÜZ ÖLÇÜLMEDİ.",
+    "ledgerSeq": 52,
+    "models": [
+      "iPhone 15 Pro Max",
+      "masaüstü (Mac)"
+    ],
+    "modelSource": "2026-09-22 user message: iphone 15 pro max"
   },
   "localVisualQa": {
     "status": "passed",

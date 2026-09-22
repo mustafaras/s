@@ -44,7 +44,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 19,
+  "completedCards": 20,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -1107,21 +1107,14 @@
       "id": "IIP-20",
       "title": "Yer imleri ve okuyucu tercihi",
       "package": "C",
-      "status": "in_progress",
+      "status": "done",
       "dependsOn": [
         "IIP-19"
       ],
       "path": "cards/IIP-20.md",
       "role": "data",
       "owner": "codex",
-      "locks": [
-        "app/core/state.js",
-        "app/core/saygi.js",
-        "sync.js",
-        "panel/panelCoverageManifest.js",
-        "app.js",
-        "tests/app/test_iip_20.js"
-      ],
+      "locks": [],
       "allowedProductionFiles": [
         "app/core/state.js",
         "app/core/saygi.js",
@@ -1142,12 +1135,19 @@
         "visual",
         "data"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-20/scope.json",
+        "evidence/IIP-20/requirements.json",
+        "evidence/IIP-20/review.json",
+        "evidence/IIP-20/source.json",
+        "evidence/IIP-20/visual.json",
+        "evidence/IIP-20/data.json"
+      ],
       "blockedReason": null,
       "startedAt": "2026-09-22T09:20:00Z",
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "completedAt": "2026-09-22T09:35:00Z",
+      "verifiedHead": "8449cc24787135f5a9db08a987e16f4fe672a0f5",
+      "handoff": "evidence/IIP-20/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_faz10_sync.js",
@@ -1163,16 +1163,9 @@
         "DEC-05"
       ],
       "estimatedSize": "L",
-      "diffHash": null,
-      "plannedWriteFiles": [
-        "app/core/state.js",
-        "app/core/saygi.js",
-        "sync.js",
-        "panel/panelCoverageManifest.js",
-        "app.js",
-        "tests/app/test_iip_20.js"
-      ],
-      "resourceLocks": ["data-writer"],
+      "diffHash": "dd1013b75bb1e48b6575fac0151c55cb12f5376f89c0a301692fad621b929949",
+      "plannedWriteFiles": [],
+      "resourceLocks": [],
       "dataAffecting": true
     },
     {
@@ -1228,7 +1221,7 @@
         "DEC-05"
       ],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "dd1013b75bb1e48b6575fac0151c55cb12f5376f89c0a301692fad621b929949",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": true

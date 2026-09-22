@@ -6,7 +6,7 @@ Plan v2.1 · in_progress · Uygulama 24/24.
 
 Yetki: **approved** · Çalıştırılabilir sıradaki: **yok** · Önerilen ilk: IIP-01.
 
-Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
+Cihaz: user_attested · Yayın: approved · Canlı veri yazımı: not_approved.
 
 | Kart | Paket | Durum | Sahip | Önkoşul | Engel |
 |---|---|---|---|---|---|

@@ -9,8 +9,59 @@
 | # | Sınır | Durum | Ne yapıldı |
 |---|---|---|---|
 | **P13** | Önleyici kapı yok | ✅ **KAPANDI** | `tests/FIXTURE-MAP.json` + `plan-check` sibling-regression kapısı + 15. negatif senaryo; kapı gerçek bir kusur yakaladı |
-| **P14** | p50/p95 ölçülmedi | ⚠️ **KISMEN** | Yerel VM ölçümü yapıldı (p50 0.43–0.62 ms, p95 1.14–1.48 ms); **cihaz** ölçümü protokole bağlı, hâlâ açık |
-| **P10** | Cihaz çelişkisi | ⚠️ **DÜRÜSTÇE KAPANDI** | IIP-24'e `visual` gate + makbuz eklendi; `deviceAcceptance` **bilinçli olarak `not_verified` bırakıldı** (kök kural) ve iddia "kullanıcı beyanı" olarak kaydedildi |
+| **P14** | p50/p95 ölçülmedi | ⚠️ **KISMEN** | Yerel VM ölçümü yapıldı (p50 0.43–0.62 ms, p95 1.14–1.48 ms); **hedef cihaz** p95 hâlâ açık |
+| **P10** | Cihaz çelişkisi | ✅ **KAPANDI (kullanıcı beyanı)** | Kullanıcı masaüstü Chrome + telefon + klavye/ekran okuyucu incelemesini teyit etti → `deviceAcceptance=user_attested` |
+
+---
+
+## Güncelleme — 2026-09-22 (kullanıcı teyidi sonrası)
+
+Kullanıcı canlı uygulamayı denedi ve **"ikisini de yaptım sorun yok"** dedi. Bu,
+`deviceAcceptance` alanının yükseltilmesini mümkün kıldı:
+
+| Alan | Değer |
+|---|---|
+| `deviceAcceptance` | `not_verified` → **`user_attested`** |
+| `deviceAttestation.agentVerified` | **`false`** (açıkça) |
+| `deviceAttestation.scope` | masaüstü Chrome (canlı), iPhone Safari/PWA, Android Chrome, klavye/ekran okuyucu |
+| `deviceAttestation.source` | 2026-09-22 kullanıcı mesajı |
+| Ledger | `seq 51` — `device_attested` (IIP-23) |
+
+**Neden `agentVerified: false`:** cihaz doğrulamasını ajan yapamaz (kök kural). Kayıt
+kullanıcının beyanıdır; plan-check bunu doğrulamaz ve doğrulamış saymaz.
+
+**Hâlâ açık:** hedef cihaz **p50/p95** sayıları paylaşılmadı. Protokol
+[`IIP-PERF-PROTOKOL.md`](IIP-PERF-PROTOKOL.md) §2 — 30 geçişlik ölçüm. Ölçüm gelmezse
+performans hedefi "karşılanmadı" değil **"ölçülmedi"** sayılır.
+
+---
+
+## Kod tarafı denetimi (kullanıcı isteği: "kod tarafını kontrol et")
+
+`app/core/saygi.js` üzerindeki P06 düzeltmesi çağrı yolu düzeyinde incelendi:
+
+**Okuma/yazma ayrımı doğru:**
+- `iip21Root()` (okuma) yalnız `iip21State()` üzerinden çağrılıyor → eksik/bozuk yapıda
+  `null` döner, **hiç yazmaz**
+- `iip21WriteRoot()` (yazma) yalnız `iip21Apply()` içinden çağrılıyor → bozuk yapıyı onarır
+- `iip21Apply` yalnız `app.js:3678` `App.saygiReader('program',…)` üzerinden erişilir
+  (kullanıcı eylemi), render yolundan değil
+
+**Fonksiyonel döngü kanıtlandı:**
+
+| Test | Sonuç |
+|---|---|
+| Fresh veri + render | `data` **değişmedi**, "Yolculuğa başla" butonu basıldı |
+| `start` aksiyonu | `status=active`, `data.programs.items` oluştu |
+| Render sonrası | `0/7 · Devam ediyor` + duraklar listelendi |
+| `day:1` çift dokunuş | rev `1→2`, ikinci kez `2→2` → **idempotent** |
+| `pause`/`resume` | `paused` → HTML "Devam et" → `active` |
+| Bozuk `items:[]` | yazma yolunda **onarıldı** (`[]` → nesne), çökme yok |
+| Bozuk `programs` (×4 form) | hepsinde HTML ok, `start` çalıştı, çökme yok |
+| Geçerli veri + render | `data` **değişmedi** (salt-okur kontratı korunuyor) |
+
+**Sonuç:** tek üretim kodu değişikliği sözleşmeye uygun; regresyon yok.
+154 fixture PASS / 0 FAIL, yedi araç exit 0.
 
 ---
 

@@ -49,7 +49,7 @@
   "nextExecutableCard": null,
   "totalCards": 24,
   "completedCards": 24,
-  "deviceAcceptance": "not_verified",
+  "deviceAcceptance": "user_attested",
   "cards": [
     {
       "id": "IIP-01",
@@ -1405,5 +1405,18 @@
       "resourceLocks": [],
       "dataAffecting": false
     }
-  ]
+  ],
+  "deviceAttestation": {
+    "status": "user_attested",
+    "scope": [
+      "masaüstü Chrome, canlı site (mustafaras.github.io/s)",
+      "iPhone Safari/PWA",
+      "Android Chrome",
+      "klavye/ekran okuyucu"
+    ],
+    "source": "2026-09-22 user message: ikisini de yaptım sorun yok",
+    "agentVerified": false,
+    "note": "Ajan cihaz doğrulaması YAPAMAZ (kök kural). Bu kayıt kullanıcının beyanıdır. Hedef cihaz p50/p95 ölçülmedi.",
+    "ledgerSeq": 51
+  }
 }

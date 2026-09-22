@@ -1,0 +1,2615 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tools/fixture-map-build.mjs",
+  "note": "Fixture -> production-file map derived from committed sources (literal + path.join + local-helper transitive). Read-only scan; regenerate after adding fixtures or helpers. Consumed by ilham-ibadet-premium-plan/tools/plan-check.mjs sibling-regression gate.",
+  "families": {
+    "app": 73,
+    "panel": 23,
+    "panel-v2": 27,
+    "quran": 9,
+    "reminders": 21
+  },
+  "byFixture": {
+    "tests/app/test_aeon_message_expand.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/content/motivationProgramV2.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderDelivery.js",
+        "app/core/reminderEngine.js",
+        "app/core/reminderScheduler.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/app/test_app_surface_boot_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_app_surface_daily_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_app_surface_domain_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_app_surface_lifecycle_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_app_surface_overlay_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_crisis_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/crisis.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_daily_photo_history.js": {
+      "family": "app",
+      "production": [
+        "app.js"
+      ]
+    },
+    "tests/app/test_date_utils_boundary.js": {
+      "family": "app",
+      "production": [
+        "app/core/constants.js",
+        "app/core/dateUtils.js",
+        "app/core/helpers.js",
+        "app/core/mediaFx.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/timeTheme.js"
+      ]
+    },
+    "tests/app/test_faz10_sync.js": {
+      "family": "app",
+      "production": [
+        "sync.js"
+      ]
+    },
+    "tests/app/test_faz_minus11_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/dateUtils.js",
+        "app/core/helpers.js",
+        "app/core/mediaFx.js",
+        "app/core/prayer.js",
+        "app/core/quran.js",
+        "app/core/saygi.js",
+        "app/core/timeTheme.js",
+        "app/core/zikir.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_fx2_ambience.js": {
+      "family": "app",
+      "production": [
+        "app/core/timeTheme.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_fx2_audio_engine.js": {
+      "family": "app",
+      "production": [
+        "app/core/mediaFx.js"
+      ]
+    },
+    "tests/app/test_fx2_overlay_motion.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/crisis.js",
+        "app/core/health.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/mediaFx.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/settings.js",
+        "app/core/zikir.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_fx2_palette_contrast.js": {
+      "family": "app",
+      "production": [
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_fx2_tab_transition.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/crisis.js",
+        "app/core/health.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/profile.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/settings.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_fx2_touch_coverage.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/crisis.js",
+        "app/core/health.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/mediaFx.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/profile.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/settings.js"
+      ]
+    },
+    "tests/app/test_header_celestial_timeline.js": {
+      "family": "app",
+      "production": [
+        "app/core/appSurface.js",
+        "app/styles.css",
+        "index.html"
+      ]
+    },
+    "tests/app/test_header_minimal_controls.js": {
+      "family": "app",
+      "production": [
+        "app/core/appSurface.js",
+        "app/core/render.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_header_night_contrast.js": {
+      "family": "app",
+      "production": [
+        "app/styles.css",
+        "index.html"
+      ]
+    },
+    "tests/app/test_health_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/health.js"
+      ]
+    },
+    "tests/app/test_helpers_boundary.js": {
+      "family": "app",
+      "production": [
+        "app/core/constants.js",
+        "app/core/dateUtils.js",
+        "app/core/helpers.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js"
+      ]
+    },
+    "tests/app/test_iip_03.js": {
+      "family": "app",
+      "production": [
+        "app/core/prayer.js",
+        "app/core/saygi.js",
+        "app/core/state.js",
+        "panel/panel.js"
+      ]
+    },
+    "tests/app/test_iip_04.js": {
+      "family": "app",
+      "production": [
+        "app/core/saygi.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_05.js": {
+      "family": "app",
+      "production": [
+        "app/core/saygi.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_06.js": {
+      "family": "app",
+      "production": [
+        "app/core/saygi.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_07.js": {
+      "family": "app",
+      "production": [
+        "app/core/quran.js",
+        "app/core/render.js",
+        "app/core/zikir.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_09.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/saygi.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_10.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/saygi.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_11.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/crisis.js",
+        "app/core/health.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/zikir.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_12.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/saygi.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_13.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/prayer.js",
+        "app/core/saygi.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_14.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/prayer.js",
+        "app/core/saygi.js"
+      ]
+    },
+    "tests/app/test_iip_15.js": {
+      "family": "app",
+      "production": [
+        "app/core/saygi.js",
+        "panel/panel.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/app/test_iip_17.js": {
+      "family": "app",
+      "production": [
+        "app/content/quranStrikingVersesV1.js",
+        "app/core/saygi.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_iip_20.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/saygi.js",
+        "app/core/state.js",
+        "panel/panelCoverageManifest.js",
+        "sync.js"
+      ]
+    },
+    "tests/app/test_iip_21.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/saygi.js",
+        "app/core/state.js"
+      ]
+    },
+    "tests/app/test_iip_22.js": {
+      "family": "app",
+      "production": [
+        "app/content/quranStrikingVersesV1.js",
+        "index.html",
+        "sw.js"
+      ]
+    },
+    "tests/app/test_journal_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/crisis.js",
+        "app/core/health.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/mediaFx.js",
+        "app/core/motivation.js",
+        "app/core/report.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_library_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/library.js"
+      ]
+    },
+    "tests/app/test_local_visual_qa_guard.js": {
+      "family": "app",
+      "production": [
+        "sync.js"
+      ]
+    },
+    "tests/app/test_location_gate_recovery.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "sw.js"
+      ]
+    },
+    "tests/app/test_map_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/map.js",
+        "app/core/mediaFx.js",
+        "app/core/report.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_messaging_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/messaging.js"
+      ]
+    },
+    "tests/app/test_modal_focus_containment.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/crisis.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/messaging.js",
+        "app/core/render.js",
+        "app/core/saygi.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/app/test_modularization_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/mediaFx.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/timeTheme.js",
+        "app/core/zikir.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_motivation_room_accessibility.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/motivation.js"
+      ]
+    },
+    "tests/app/test_prayer_boundary.js": {
+      "family": "app",
+      "production": [
+        "app/core/prayer.js"
+      ]
+    },
+    "tests/app/test_premium_audio_fx.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/mediaFx.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/app/test_premium_fx_gate_defaults.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/mediaFx.js",
+        "app/core/state.js",
+        "app/core/timeTheme.js",
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_premium_fx_utils.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/mediaFx.js",
+        "app/core/render.js"
+      ]
+    },
+    "tests/app/test_premium_haptics_fx.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/mediaFx.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/app/test_premium_launch_splash.js": {
+      "family": "app",
+      "production": [
+        "app/core/appSurface.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_premium_reduced_motion.js": {
+      "family": "app",
+      "production": [
+        "app/styles.css"
+      ]
+    },
+    "tests/app/test_premium_settings.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/mediaFx.js",
+        "app/core/settings.js",
+        "app/core/timeTheme.js"
+      ]
+    },
+    "tests/app/test_premium_time_theme.js": {
+      "family": "app",
+      "production": [
+        "app/core/timeTheme.js",
+        "app/styles.css",
+        "index.html"
+      ]
+    },
+    "tests/app/test_premium_voice.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/mediaFx.js",
+        "app/core/render.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/timeTheme.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/app/test_profile_boundary.js": {
+      "family": "app",
+      "production": [
+        "app/content/profileAssessmentV1.js",
+        "app/core/profile.js"
+      ]
+    },
+    "tests/app/test_quran_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/quran.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_render_core_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/render.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_render_shell_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/render.js",
+        "app/styles.css",
+        "index.html"
+      ]
+    },
+    "tests/app/test_report_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/library.js",
+        "app/core/mediaFx.js",
+        "app/core/report.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_saygi_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/saygi.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_settings_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/settings.js"
+      ]
+    },
+    "tests/app/test_sky_fx.js": {
+      "family": "app",
+      "production": [
+        "app/core/skyFx.js"
+      ]
+    },
+    "tests/app/test_state_rebind_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/esmaulHusnaV2.js",
+        "app/content/hijriCalendar.js",
+        "app/content/motivationNarratives.js",
+        "app/content/motivationProgramV2.js",
+        "app/content/profileAssessmentV1.js",
+        "app/content/quranRevelationOrderV1.js",
+        "app/content/quranStrikingVersesV1.js",
+        "app/content/quranTransportV1.js",
+        "app/content/saygiPeople.js",
+        "app/content/zikirCoreContentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/mediaFx.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderDelivery.js",
+        "app/core/reminderEngine.js",
+        "app/core/reminderScheduler.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/skyFx.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/timeTheme.js",
+        "app/core/zikir.js",
+        "index.html"
+      ]
+    },
+    "tests/app/test_syncGlue_save_boundary.js": {
+      "family": "app",
+      "production": [
+        "app/core/syncGlue.js"
+      ]
+    },
+    "tests/app/test_sync_large_file.js": {
+      "family": "app",
+      "production": [
+        "sync.js"
+      ]
+    },
+    "tests/app/test_today_card_preferences.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/render.js",
+        "app/core/settings.js",
+        "app/core/state.js"
+      ]
+    },
+    "tests/app/test_v3_welcome.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/crisis.js",
+        "app/core/health.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/profile.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/settings.js",
+        "app/styles.css",
+        "index.html",
+        "panel-v2.html",
+        "panel.html",
+        "sync.js",
+        "v3-tanitim/index.html",
+        "v3-tanitim/v3-charts.js",
+        "v3-tanitim/v3-data.js",
+        "v3-tanitim/v3-snapshot.js",
+        "v3-tanitim/v3-source.js",
+        "v3-tanitim/v3-stats.js",
+        "v3-tanitim/v3-statsview.js",
+        "v3-tanitim/v3.css",
+        "v3-tanitim/v3.js"
+      ]
+    },
+    "tests/app/test_zikir_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/app/test_zikir_view_boundary.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/app/test_zikr_manual_entry.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/esmaulHusnaV2.js",
+        "app/content/hijriCalendar.js",
+        "app/content/motivationProgramV2.js",
+        "app/content/profileAssessmentV1.js",
+        "app/content/saygiPeople.js",
+        "app/content/zikirCoreContentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/mediaFx.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderDelivery.js",
+        "app/core/reminderEngine.js",
+        "app/core/reminderScheduler.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js",
+        "sync.js"
+      ]
+    },
+    "tests/panel/test_faz11_panel.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_boot_resilience.js": {
+      "family": "panel",
+      "production": [
+        "panel.html",
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/panel/test_panel_curated_change_log.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_dev_mode_trigger.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_discomfort_trend.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_event_focus.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_focus_location.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/panel/test_panel_milestones.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_monthly_heatmap.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_needs_attention.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_p0_sync.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js",
+        "sync.js"
+      ]
+    },
+    "tests/panel/test_panel_p1_projection.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/panel/test_panel_p2_event_log.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/panel/test_panel_p2_polling.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_p2_sync.js": {
+      "family": "panel",
+      "production": [
+        "sync.js"
+      ]
+    },
+    "tests/panel/test_panel_p3_root_modules.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/panel/test_panel_p3_timeline_drawer.js": {
+      "family": "panel",
+      "production": [
+        "panel.html",
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_p4_module_cards.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_p4_provenance.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/panel/test_panel_p5_responsive_a11y.js": {
+      "family": "panel",
+      "production": [
+        "panel.html",
+        "panel/panel.css",
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_p6_qa_release.js": {
+      "family": "panel",
+      "production": [
+        "panel.html",
+        "panel/panel.css",
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js",
+        "sync.js"
+      ]
+    },
+    "tests/panel/test_panel_staleness_badge.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel/test_panel_weekly_digest.js": {
+      "family": "panel",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_accessibility.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel-v2.html",
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.css",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_archives.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_audit.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_compare.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_component_contracts.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_components.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_contrast.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.css",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_count_up.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_css.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.css",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_day_detail.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_event_log.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_history.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_hit_areas.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel-v2.html",
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.css",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_notification_lifecycle.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_performance.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel-v2.html",
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.css",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_polling_telemetry.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_polling_tests.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_pull_refresh.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_settings.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_skeleton.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel-v2.html",
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.css",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_swipe.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_sync_health.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_system.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_system_subtabs.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_tabs.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_today.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/panel-v2/test_panel_v2_trends.js": {
+      "family": "panel-v2",
+      "production": [
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/quran/test_quran_a11y_contrast.js": {
+      "family": "quran",
+      "production": [
+        "app/styles.css"
+      ]
+    },
+    "tests/quran/test_quran_catalog.js": {
+      "family": "quran",
+      "production": [
+        "app/content/quranRevelationOrderV1.js"
+      ]
+    },
+    "tests/quran/test_quran_flow_demo.js": {
+      "family": "quran",
+      "production": []
+    },
+    "tests/quran/test_quran_merge.js": {
+      "family": "quran",
+      "production": [
+        "app/core/quran.js",
+        "sync.js"
+      ]
+    },
+    "tests/quran/test_quran_outbox_sync.js": {
+      "family": "quran",
+      "production": [
+        "app/content/quranTransportV1.js",
+        "sync.js"
+      ]
+    },
+    "tests/quran/test_quran_panel_parity.js": {
+      "family": "quran",
+      "production": [
+        "panel-v2.html",
+        "panel.html",
+        "panel/panel.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/quran/test_quran_pull_sync.js": {
+      "family": "quran",
+      "production": [
+        "app/content/quranTransportV1.js",
+        "sync.js"
+      ]
+    },
+    "tests/quran/test_quran_striking_verses.js": {
+      "family": "quran",
+      "production": [
+        "app/content/quranRevelationOrderV1.js",
+        "app/content/quranStrikingVersesV1.js"
+      ]
+    },
+    "tests/quran/test_quran_transport.js": {
+      "family": "quran",
+      "production": [
+        "app/content/quranTransportV1.js"
+      ]
+    },
+    "tests/reminders/test_reminder_app_acceptance.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderDelivery.js",
+        "app/core/reminderEngine.js",
+        "app/core/reminderScheduler.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js",
+        "app/styles.css",
+        "index.html",
+        "panel/panel.css",
+        "panel/panel.js",
+        "sync.js"
+      ]
+    },
+    "tests/reminders/test_reminder_app_notification_boundary.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderDelivery.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js",
+        "sw.js"
+      ]
+    },
+    "tests/reminders/test_reminder_app_privacy.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderDelivery.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/reminders/test_reminder_boot.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderState.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js",
+        "index.html",
+        "sync.js"
+      ]
+    },
+    "tests/reminders/test_reminder_concurrency.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js",
+        "sync.js"
+      ]
+    },
+    "tests/reminders/test_reminder_cross_surface_schema.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/content/zikirCoreContentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js",
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js",
+        "sync.js"
+      ]
+    },
+    "tests/reminders/test_reminder_cross_surface_status.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "panel/panel.js",
+        "sync.js"
+      ]
+    },
+    "tests/reminders/test_reminder_end_to_end_lineage.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js",
+        "sync.js"
+      ]
+    },
+    "tests/reminders/test_reminder_integrated_privacy.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderDelivery.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js",
+        "panel.html",
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js",
+        "sw.js",
+        "sync.js"
+      ]
+    },
+    "tests/reminders/test_reminder_integrated_ux.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderCatalog.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js",
+        "app/styles.css",
+        "panel/panel.css",
+        "panel/panel.js"
+      ]
+    },
+    "tests/reminders/test_reminder_migration.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/profileAssessmentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/zikir.js"
+      ]
+    },
+    "tests/reminders/test_reminder_panel_a11y.js": {
+      "family": "reminders",
+      "production": [
+        "panel.html",
+        "panel/panel.css",
+        "panel/panel.js"
+      ]
+    },
+    "tests/reminders/test_reminder_panel_coverage.js": {
+      "family": "reminders",
+      "production": [
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.js"
+      ]
+    },
+    "tests/reminders/test_reminder_panel_fixture_architecture.js": {
+      "family": "reminders",
+      "production": []
+    },
+    "tests/reminders/test_reminder_panel_performance.js": {
+      "family": "reminders",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/reminders/test_reminder_panel_polling.js": {
+      "family": "reminders",
+      "production": [
+        "panel/panel.js"
+      ]
+    },
+    "tests/reminders/test_reminder_panel_privacy.js": {
+      "family": "reminders",
+      "production": [
+        "panel.html",
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/reminders/test_reminder_panel_redaction.js": {
+      "family": "reminders",
+      "production": [
+        "panel.html",
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/reminders/test_reminder_panel_source.js": {
+      "family": "reminders",
+      "production": [
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js"
+      ]
+    },
+    "tests/reminders/test_reminder_sync_privacy.js": {
+      "family": "reminders",
+      "production": [
+        "sync.js"
+      ]
+    },
+    "tests/reminders/test_reminder_ui_boundary.js": {
+      "family": "reminders",
+      "production": [
+        "app.js",
+        "app/core/reminders.js",
+        "index.html"
+      ]
+    }
+  },
+  "byProduction": {
+    "app.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_app_surface_boot_boundary.js",
+      "tests/app/test_app_surface_daily_boundary.js",
+      "tests/app/test_app_surface_domain_boundary.js",
+      "tests/app/test_app_surface_lifecycle_boundary.js",
+      "tests/app/test_app_surface_overlay_boundary.js",
+      "tests/app/test_crisis_boundary.js",
+      "tests/app/test_daily_photo_history.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_health_boundary.js",
+      "tests/app/test_iip_09.js",
+      "tests/app/test_iip_10.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_iip_12.js",
+      "tests/app/test_iip_13.js",
+      "tests/app/test_iip_14.js",
+      "tests/app/test_iip_20.js",
+      "tests/app/test_iip_21.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_library_boundary.js",
+      "tests/app/test_location_gate_recovery.js",
+      "tests/app/test_map_boundary.js",
+      "tests/app/test_messaging_boundary.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_motivation_room_accessibility.js",
+      "tests/app/test_premium_audio_fx.js",
+      "tests/app/test_premium_fx_gate_defaults.js",
+      "tests/app/test_premium_fx_utils.js",
+      "tests/app/test_premium_haptics_fx.js",
+      "tests/app/test_premium_settings.js",
+      "tests/app/test_premium_voice.js",
+      "tests/app/test_quran_boundary.js",
+      "tests/app/test_render_core_boundary.js",
+      "tests/app/test_render_shell_boundary.js",
+      "tests/app/test_report_boundary.js",
+      "tests/app/test_saygi_boundary.js",
+      "tests/app/test_settings_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_today_card_preferences.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikir_boundary.js",
+      "tests/app/test_zikir_view_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_cross_surface_status.js",
+      "tests/reminders/test_reminder_end_to_end_lineage.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js",
+      "tests/reminders/test_reminder_ui_boundary.js"
+    ],
+    "app/content/motivationProgramV2.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js"
+    ],
+    "app/content/profileAssessmentV1.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_profile_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/appSurface.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_app_surface_boot_boundary.js",
+      "tests/app/test_app_surface_daily_boundary.js",
+      "tests/app/test_app_surface_domain_boundary.js",
+      "tests/app/test_app_surface_lifecycle_boundary.js",
+      "tests/app/test_app_surface_overlay_boundary.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_header_celestial_timeline.js",
+      "tests/app/test_header_minimal_controls.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_location_gate_recovery.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_premium_fx_utils.js",
+      "tests/app/test_premium_launch_splash.js",
+      "tests/app/test_premium_voice.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/constants.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_date_utils_boundary.js",
+      "tests/app/test_helpers_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/crisis.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_crisis_boundary.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/dateUtils.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_date_utils_boundary.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_helpers_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/health.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_health_boundary.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/helpers.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_date_utils_boundary.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_helpers_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/journal.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/library.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_library_boundary.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_report_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/map.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_map_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/messaging.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_messaging_boundary.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/motivation.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_motivation_room_accessibility.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/prayer.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_iip_03.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_iip_13.js",
+      "tests/app/test_iip_14.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_prayer_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/profile.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_profile_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/quran.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_iip_07.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_quran_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/quran/test_quran_merge.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/reminderCatalog.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js"
+    ],
+    "app/core/reminderDelivery.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_integrated_privacy.js"
+    ],
+    "app/core/reminderEngine.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js"
+    ],
+    "app/core/reminderScheduler.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js"
+    ],
+    "app/core/reminderSurface.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_cross_surface_status.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/reminders.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_cross_surface_status.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js",
+      "tests/reminders/test_reminder_ui_boundary.js"
+    ],
+    "app/core/render.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_header_minimal_controls.js",
+      "tests/app/test_iip_07.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_premium_fx_utils.js",
+      "tests/app/test_premium_voice.js",
+      "tests/app/test_render_core_boundary.js",
+      "tests/app/test_render_shell_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_today_card_preferences.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/report.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_map_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_report_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/saygi.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_iip_03.js",
+      "tests/app/test_iip_04.js",
+      "tests/app/test_iip_05.js",
+      "tests/app/test_iip_06.js",
+      "tests/app/test_iip_09.js",
+      "tests/app/test_iip_10.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_iip_12.js",
+      "tests/app/test_iip_13.js",
+      "tests/app/test_iip_14.js",
+      "tests/app/test_iip_15.js",
+      "tests/app/test_iip_17.js",
+      "tests/app/test_iip_20.js",
+      "tests/app/test_iip_21.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_saygi_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/settings.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_premium_settings.js",
+      "tests/app/test_premium_voice.js",
+      "tests/app/test_settings_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_today_card_preferences.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/state.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_date_utils_boundary.js",
+      "tests/app/test_helpers_boundary.js",
+      "tests/app/test_iip_03.js",
+      "tests/app/test_iip_20.js",
+      "tests/app/test_iip_21.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_premium_fx_gate_defaults.js",
+      "tests/app/test_premium_voice.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_today_card_preferences.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/syncGlue.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_date_utils_boundary.js",
+      "tests/app/test_helpers_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_syncGlue_save_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/zikir.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_iip_07.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_premium_audio_fx.js",
+      "tests/app/test_premium_haptics_fx.js",
+      "tests/app/test_premium_voice.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikir_boundary.js",
+      "tests/app/test_zikir_view_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "index.html": [
+      "tests/app/test_app_surface_boot_boundary.js",
+      "tests/app/test_app_surface_daily_boundary.js",
+      "tests/app/test_app_surface_domain_boundary.js",
+      "tests/app/test_app_surface_lifecycle_boundary.js",
+      "tests/app/test_app_surface_overlay_boundary.js",
+      "tests/app/test_crisis_boundary.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_header_celestial_timeline.js",
+      "tests/app/test_header_night_contrast.js",
+      "tests/app/test_iip_22.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_map_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_premium_launch_splash.js",
+      "tests/app/test_premium_time_theme.js",
+      "tests/app/test_quran_boundary.js",
+      "tests/app/test_render_core_boundary.js",
+      "tests/app/test_render_shell_boundary.js",
+      "tests/app/test_report_boundary.js",
+      "tests/app/test_saygi_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_ui_boundary.js"
+    ],
+    "app/core/mediaFx.js": [
+      "tests/app/test_date_utils_boundary.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_fx2_audio_engine.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_journal_boundary.js",
+      "tests/app/test_map_boundary.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_premium_audio_fx.js",
+      "tests/app/test_premium_fx_gate_defaults.js",
+      "tests/app/test_premium_fx_utils.js",
+      "tests/app/test_premium_haptics_fx.js",
+      "tests/app/test_premium_settings.js",
+      "tests/app/test_premium_voice.js",
+      "tests/app/test_report_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js"
+    ],
+    "app/core/timeTheme.js": [
+      "tests/app/test_date_utils_boundary.js",
+      "tests/app/test_faz_minus11_boundary.js",
+      "tests/app/test_fx2_ambience.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_premium_fx_gate_defaults.js",
+      "tests/app/test_premium_settings.js",
+      "tests/app/test_premium_time_theme.js",
+      "tests/app/test_premium_voice.js",
+      "tests/app/test_state_rebind_boundary.js"
+    ],
+    "sync.js": [
+      "tests/app/test_faz10_sync.js",
+      "tests/app/test_iip_20.js",
+      "tests/app/test_local_visual_qa_guard.js",
+      "tests/app/test_sync_large_file.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/panel/test_panel_p0_sync.js",
+      "tests/panel/test_panel_p2_sync.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/quran/test_quran_merge.js",
+      "tests/quran/test_quran_outbox_sync.js",
+      "tests/quran/test_quran_pull_sync.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_cross_surface_status.js",
+      "tests/reminders/test_reminder_end_to_end_lineage.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_sync_privacy.js"
+    ],
+    "app/styles.css": [
+      "tests/app/test_fx2_ambience.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_palette_contrast.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_header_celestial_timeline.js",
+      "tests/app/test_header_minimal_controls.js",
+      "tests/app/test_header_night_contrast.js",
+      "tests/app/test_iip_04.js",
+      "tests/app/test_iip_05.js",
+      "tests/app/test_iip_06.js",
+      "tests/app/test_iip_07.js",
+      "tests/app/test_iip_09.js",
+      "tests/app/test_iip_10.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_iip_12.js",
+      "tests/app/test_iip_13.js",
+      "tests/app/test_iip_17.js",
+      "tests/app/test_premium_fx_gate_defaults.js",
+      "tests/app/test_premium_reduced_motion.js",
+      "tests/app/test_premium_time_theme.js",
+      "tests/app/test_render_shell_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/quran/test_quran_a11y_contrast.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_integrated_ux.js"
+    ],
+    "panel/panel.js": [
+      "tests/app/test_iip_03.js",
+      "tests/app/test_iip_15.js",
+      "tests/panel/test_faz11_panel.js",
+      "tests/panel/test_panel_boot_resilience.js",
+      "tests/panel/test_panel_curated_change_log.js",
+      "tests/panel/test_panel_dev_mode_trigger.js",
+      "tests/panel/test_panel_discomfort_trend.js",
+      "tests/panel/test_panel_event_focus.js",
+      "tests/panel/test_panel_focus_location.js",
+      "tests/panel/test_panel_milestones.js",
+      "tests/panel/test_panel_monthly_heatmap.js",
+      "tests/panel/test_panel_needs_attention.js",
+      "tests/panel/test_panel_p0_sync.js",
+      "tests/panel/test_panel_p1_projection.js",
+      "tests/panel/test_panel_p2_event_log.js",
+      "tests/panel/test_panel_p2_polling.js",
+      "tests/panel/test_panel_p3_root_modules.js",
+      "tests/panel/test_panel_p3_timeline_drawer.js",
+      "tests/panel/test_panel_p4_module_cards.js",
+      "tests/panel/test_panel_p4_provenance.js",
+      "tests/panel/test_panel_p5_responsive_a11y.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/panel/test_panel_staleness_badge.js",
+      "tests/panel/test_panel_weekly_digest.js",
+      "tests/quran/test_quran_panel_parity.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_cross_surface_status.js",
+      "tests/reminders/test_reminder_end_to_end_lineage.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_panel_a11y.js",
+      "tests/reminders/test_reminder_panel_coverage.js",
+      "tests/reminders/test_reminder_panel_performance.js",
+      "tests/reminders/test_reminder_panel_polling.js",
+      "tests/reminders/test_reminder_panel_privacy.js",
+      "tests/reminders/test_reminder_panel_redaction.js",
+      "tests/reminders/test_reminder_panel_source.js"
+    ],
+    "panel/v2/panel-v2.js": [
+      "tests/app/test_iip_15.js",
+      "tests/panel-v2/test_panel_v2_accessibility.js",
+      "tests/panel-v2/test_panel_v2_archives.js",
+      "tests/panel-v2/test_panel_v2_audit.js",
+      "tests/panel-v2/test_panel_v2_compare.js",
+      "tests/panel-v2/test_panel_v2_component_contracts.js",
+      "tests/panel-v2/test_panel_v2_components.js",
+      "tests/panel-v2/test_panel_v2_contrast.js",
+      "tests/panel-v2/test_panel_v2_count_up.js",
+      "tests/panel-v2/test_panel_v2_css.js",
+      "tests/panel-v2/test_panel_v2_day_detail.js",
+      "tests/panel-v2/test_panel_v2_event_log.js",
+      "tests/panel-v2/test_panel_v2_history.js",
+      "tests/panel-v2/test_panel_v2_hit_areas.js",
+      "tests/panel-v2/test_panel_v2_notification_lifecycle.js",
+      "tests/panel-v2/test_panel_v2_performance.js",
+      "tests/panel-v2/test_panel_v2_polling_telemetry.js",
+      "tests/panel-v2/test_panel_v2_polling_tests.js",
+      "tests/panel-v2/test_panel_v2_pull_refresh.js",
+      "tests/panel-v2/test_panel_v2_settings.js",
+      "tests/panel-v2/test_panel_v2_skeleton.js",
+      "tests/panel-v2/test_panel_v2_swipe.js",
+      "tests/panel-v2/test_panel_v2_sync_health.js",
+      "tests/panel-v2/test_panel_v2_system.js",
+      "tests/panel-v2/test_panel_v2_system_subtabs.js",
+      "tests/panel-v2/test_panel_v2_tabs.js",
+      "tests/panel-v2/test_panel_v2_today.js",
+      "tests/panel-v2/test_panel_v2_trends.js",
+      "tests/quran/test_quran_panel_parity.js",
+      "tests/reminders/test_reminder_panel_coverage.js"
+    ],
+    "app/content/quranStrikingVersesV1.js": [
+      "tests/app/test_iip_17.js",
+      "tests/app/test_iip_22.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/quran/test_quran_striking_verses.js"
+    ],
+    "panel/panelCoverageManifest.js": [
+      "tests/app/test_iip_20.js",
+      "tests/panel/test_panel_boot_resilience.js",
+      "tests/panel/test_panel_focus_location.js",
+      "tests/panel/test_panel_p0_sync.js",
+      "tests/panel/test_panel_p1_projection.js",
+      "tests/panel/test_panel_p2_event_log.js",
+      "tests/panel/test_panel_p3_root_modules.js",
+      "tests/panel/test_panel_p4_provenance.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/panel-v2/test_panel_v2_accessibility.js",
+      "tests/panel-v2/test_panel_v2_archives.js",
+      "tests/panel-v2/test_panel_v2_audit.js",
+      "tests/panel-v2/test_panel_v2_compare.js",
+      "tests/panel-v2/test_panel_v2_component_contracts.js",
+      "tests/panel-v2/test_panel_v2_components.js",
+      "tests/panel-v2/test_panel_v2_contrast.js",
+      "tests/panel-v2/test_panel_v2_count_up.js",
+      "tests/panel-v2/test_panel_v2_css.js",
+      "tests/panel-v2/test_panel_v2_day_detail.js",
+      "tests/panel-v2/test_panel_v2_event_log.js",
+      "tests/panel-v2/test_panel_v2_history.js",
+      "tests/panel-v2/test_panel_v2_hit_areas.js",
+      "tests/panel-v2/test_panel_v2_notification_lifecycle.js",
+      "tests/panel-v2/test_panel_v2_performance.js",
+      "tests/panel-v2/test_panel_v2_polling_telemetry.js",
+      "tests/panel-v2/test_panel_v2_polling_tests.js",
+      "tests/panel-v2/test_panel_v2_pull_refresh.js",
+      "tests/panel-v2/test_panel_v2_settings.js",
+      "tests/panel-v2/test_panel_v2_skeleton.js",
+      "tests/panel-v2/test_panel_v2_swipe.js",
+      "tests/panel-v2/test_panel_v2_sync_health.js",
+      "tests/panel-v2/test_panel_v2_system.js",
+      "tests/panel-v2/test_panel_v2_system_subtabs.js",
+      "tests/panel-v2/test_panel_v2_tabs.js",
+      "tests/panel-v2/test_panel_v2_today.js",
+      "tests/panel-v2/test_panel_v2_trends.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_end_to_end_lineage.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_panel_coverage.js",
+      "tests/reminders/test_reminder_panel_privacy.js",
+      "tests/reminders/test_reminder_panel_redaction.js",
+      "tests/reminders/test_reminder_panel_source.js"
+    ],
+    "sw.js": [
+      "tests/app/test_iip_22.js",
+      "tests/app/test_location_gate_recovery.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_integrated_privacy.js"
+    ],
+    "app/core/skyFx.js": [
+      "tests/app/test_sky_fx.js",
+      "tests/app/test_state_rebind_boundary.js"
+    ],
+    "app/content/esmaulHusnaV1.js": [
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/content/esmaulHusnaV2.js": [
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js"
+    ],
+    "app/content/hijriCalendar.js": [
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js"
+    ],
+    "app/content/motivationNarratives.js": [
+      "tests/app/test_state_rebind_boundary.js"
+    ],
+    "app/content/quranRevelationOrderV1.js": [
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/quran/test_quran_catalog.js",
+      "tests/quran/test_quran_striking_verses.js"
+    ],
+    "app/content/quranTransportV1.js": [
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/quran/test_quran_outbox_sync.js",
+      "tests/quran/test_quran_pull_sync.js",
+      "tests/quran/test_quran_transport.js"
+    ],
+    "app/content/saygiPeople.js": [
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js"
+    ],
+    "app/content/zikirCoreContentV1.js": [
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js"
+    ],
+    "panel-v2.html": [
+      "tests/app/test_v3_welcome.js",
+      "tests/panel-v2/test_panel_v2_accessibility.js",
+      "tests/panel-v2/test_panel_v2_hit_areas.js",
+      "tests/panel-v2/test_panel_v2_performance.js",
+      "tests/panel-v2/test_panel_v2_skeleton.js",
+      "tests/quran/test_quran_panel_parity.js"
+    ],
+    "panel.html": [
+      "tests/app/test_v3_welcome.js",
+      "tests/panel/test_panel_boot_resilience.js",
+      "tests/panel/test_panel_p3_timeline_drawer.js",
+      "tests/panel/test_panel_p5_responsive_a11y.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/quran/test_quran_panel_parity.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_panel_a11y.js",
+      "tests/reminders/test_reminder_panel_privacy.js",
+      "tests/reminders/test_reminder_panel_redaction.js"
+    ],
+    "v3-tanitim/index.html": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "v3-tanitim/v3-charts.js": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "v3-tanitim/v3-data.js": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "v3-tanitim/v3-snapshot.js": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "v3-tanitim/v3-source.js": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "v3-tanitim/v3-stats.js": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "v3-tanitim/v3-statsview.js": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "v3-tanitim/v3.css": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "v3-tanitim/v3.js": [
+      "tests/app/test_v3_welcome.js"
+    ],
+    "panel/panel.css": [
+      "tests/panel/test_panel_p5_responsive_a11y.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_panel_a11y.js"
+    ],
+    "panel/v2/panel-v2.css": [
+      "tests/panel-v2/test_panel_v2_accessibility.js",
+      "tests/panel-v2/test_panel_v2_contrast.js",
+      "tests/panel-v2/test_panel_v2_css.js",
+      "tests/panel-v2/test_panel_v2_hit_areas.js",
+      "tests/panel-v2/test_panel_v2_performance.js",
+      "tests/panel-v2/test_panel_v2_skeleton.js"
+    ],
+    "app/core/reminderState.js": [
+      "tests/reminders/test_reminder_boot.js"
+    ]
+  }
+}

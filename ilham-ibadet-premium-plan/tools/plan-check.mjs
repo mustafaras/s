@@ -18,6 +18,14 @@ const state = readJSON('IIP-STATE.json');
 const requirements = readJSON('tracking/REQUIREMENTS.json');
 const decisions = readJSON('tracking/DECISIONS.json');
 const ledger = fs.readFileSync(path.join(root, 'tracking/LEDGER.jsonl'), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
+// P13 — sibling-regression data. tests/FIXTURE-MAP.json maps every committed
+// fixture to the production files it actually loads. If a card writes a shared
+// production file, every fixture that depends on that file must be in the
+// card's fixtureFiles list, otherwise the card silently regresses its siblings
+// (the IIP-20/21 → saygi.js failure). Absent map degrades to a warning, never a
+// false failure.
+let fixtureMap = null;
+try { fixtureMap = JSON.parse(fs.readFileSync(path.join(repo, 'tests/FIXTURE-MAP.json'), 'utf8')); } catch { fixtureMap = null; }
 
 function validate(s, reqs, events, checkFiles = true) {
   const errors = [], fail = message => errors.push(message);
@@ -134,6 +142,47 @@ function validate(s, reqs, events, checkFiles = true) {
     visiting.delete(id); visited.add(id);
   }
   ids.forEach(visit);
+  /* P13 — sibling-regression gate.
+     A card that writes a shared production file must re-run that file's GUARD
+     fixtures. Without this rule IIP-20/21 wrote app/core/saygi.js and silently
+     broke 13 sibling fixtures (tests/FIXTURE-MAP.json shows 30 fixtures depend
+     on saygi.js; IIP-20/21 declared only 3).
+
+     "Guard fixture" = a fixture whose own name identifies the production module
+     (saygi.js -> test_saygi_boundary.js; zikir.js -> test_zikir_boundary.js,
+     test_zikr_manual_entry.js). This keeps the requirement small, precise and
+     retro-fillable. The full transitive dependent set is reported as an
+     advisory count on the card's line, never as a failure — demanding all 73
+     transitive app.js fixtures would be arbitrary.
+
+     Only cards that DECLARE production writes are checked, so cards that touch
+     nothing are never flagged. Generic tokens (app, core, panel, main…) are
+     ignored so root shell files do not produce bogus name matches. */
+  if (fixtureMap?.byProduction && fixtureMap?.byFixture) {
+    const STOP = new Set(['app', 'core', 'panel', 'main', 'index', 'test', 'tests', 'v2', 'js', 'css', 'html', 'boundary', 'state', 'sync', 'helpers', 'render', 'settings']);
+    const tokens = name => new Set(String(name).replace(/\.(js|css|html|json)$/i, '').split(/[^a-zA-Z0-9]+/).map(t => t.toLowerCase()).filter(t => t.length >= 4 && !STOP.has(t)));
+    for (const c of cards) {
+      const declared = [...new Set([...(c.allowedProductionFiles || []), ...(c.locks || [])])]
+        .filter(f => fixtureMap.byProduction[f]);
+      if (!declared.length) continue;
+      const listed = new Set(c.fixtureFiles || []);
+      const needed = new Set();
+      let transitive = 0;
+      for (const file of declared) {
+        const fileTokens = tokens(file.split('/').pop());
+        transitive += fixtureMap.byProduction[file].length;
+        if (!fileTokens.size) continue;
+        for (const fixture of fixtureMap.byProduction[file]) {
+          const fixtureTokens = tokens(fixture.split('/').pop());
+          if ([...fileTokens].some(t => fixtureTokens.has(t))) needed.add(fixture);
+        }
+      }
+      const missing = [...needed].filter(f => !listed.has(f)).sort();
+      if (missing.length) fail(`sibling regression ${c.id}: undeclared guard fixture(s) for ${declared.join(', ')} — ${missing.join(', ')}`);
+    }
+  } else {
+    fail('fixture-map missing: run node tools/fixture-map-build.mjs --write');
+  }
   events.forEach((e,i)=>{ if(e.seq!==i+1 || !e.event || !e.at || (e.cardId && !ids.has(e.cardId))) fail('invalid ledger sequence/event'); });
   const executable = cards.filter(c=>c.status==='planned' && approved.has(c.id) && c.dependsOn.every(d=>map.get(d)?.status==='done'));
   if (s.nextExecutableCard !== (executable[0]?.id || null)) fail('nextExecutableCard drift');
@@ -195,7 +244,13 @@ if (args.has('--self-test')) {
        ve nihai validate(state,...) çağrısını bozardı. */
     ['decision gate',s=>{const orig=decisions[0].status;s.cards[1].status='done';s.completedCards=1;decisions[0].status='proposed';return ()=>{decisions[0].status=orig;};},'unapproved decision'],
     ['write lock drift',s=>s.cards[0].plannedWriteFiles=['app.js'],'write/lock mismatch'],
-    ['data writer conflict',s=>{for(const c of [s.cards[19],s.cards[20]]){c.owner='a';c.status='blocked';c.blockedReason='test';c.resourceLocks=['data-writer'];}},'resource lock conflict']
+    ['data writer conflict',s=>{for(const c of [s.cards[19],s.cards[20]]){c.owner='a';c.status='blocked';c.blockedReason='test';c.resourceLocks=['data-writer'];}},'resource lock conflict'],
+    /* P13 — kardeş-kart regresyon kapısının kendi negatif senaryosu.
+       IIP-07 app/core/zikir.js'e yazar; zikir.js'i ADIYLA koruyan fixture
+       (test_zikir_view_boundary.js) fixtureFiles'tan çıkarılınca kapı bunu
+       yakalamalı. Bu, IIP-20/21 → saygi.js kusurunun minyatür eşdeğeridir ve
+       gerçek plan üzerinde de bir kez bulgu üretmiştir. */
+    ['sibling regression',s=>{const c=s.cards.find(x=>x.id==='IIP-07');c.fixtureFiles=(c.fixtureFiles||[]).filter(f=>f!=='tests/app/test_zikir_view_boundary.js');},'sibling regression IIP-07']
   ];
   for (const [name,mutate,expected] of cases) {
     const copy=structuredClone(state);

@@ -1,0 +1,35 @@
+{
+ "schemaVersion": 1,
+ "cardId": "IIP-24",
+ "gate": "visual",
+ "status": "pass",
+ "artifact": "evidence/IIP-24/visual.md",
+ "artifactSha256": "19238b3f967b2a72142d4159336e6ffd13483071fe7d624185a9277624d9e13f",
+ "verifiedHead": "bc4372fb02d42f89521740569195f0133dc5ee2a",
+ "diffHash": "16942ad4721bd025d6ba69155d0bb173e87a1fe05007af3a4ab4b01cacb8816e",
+ "createdAt": "2026-09-22T15:15:29.865Z",
+ "requirements": [
+  "REQ-047",
+  "REQ-048"
+ ],
+ "commands": [],
+ "limitations": "Görsel gate yalnız kaynak/sentetik seviyeyi kapsar. Cihaz kabulü not_verified (yalnız kullanıcı verebilir); hedef cihaz p95 ölçülmedi.",
+ "reviewer": "codex",
+ "details": {
+  "themes": [
+   "light",
+   "dark"
+  ],
+  "viewports": [
+   "375px",
+   "390px",
+   "430px"
+  ],
+  "syntheticDataset": "IIP-23 8 sahnelik sentetik render matrisi (bos/yukleniyor/hata/donus) miras alındı; kişisel veri okunmadı, ağ kapalı.",
+  "observations": "Kaynak/sentetik seviye yeşil: 16 IIP fixture + tests/app ailesi PASS. Cihaz teyidi IIP-23 makbuzu ve ledger seq 48 ile KULLANICI BEYANI olarak kayıtlı; ajan doğrulaması DEĞİLDİR. deviceAcceptance not_verified kalır.",
+  "artifactKind": "render",
+  "deviceClaimSource": "evidence/IIP-23/visual.json + tracking/LEDGER.jsonl seq 48 (kullanıcı beyanı, ajan doğrulaması yok)",
+  "deviceAcceptance": "not_verified",
+  "performance": "yerel VM p50 0.43-0.62ms / p95 1.14-1.48ms (IIP-PERF-LOCAL.json); hedef cihaz p95 OLCULMEDI (IIP-PERF-PROTOKOL.md)"
+ }
+}

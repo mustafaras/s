@@ -50,5 +50,5 @@
 | REQ-044 / TC-044 | [IIP-22](../cards/IIP-22.md) | Aktif sayaç/not sırasında yeni SW sürümü zorla reload yapmaz. | Kısmi paket, kota hatası ve eski manifestten dönüş kullanımı kilitlemez. | 5 |
 | REQ-045 / TC-045 | [IIP-23](../cards/IIP-23.md) | App/current-panel/Panel-v2, state/sync ve görsel kanıt ayrı raporlu. | Önemli bir fonksiyonun yalnız markup varlığıyla geçtiği kabul edilmez. | 4 |
 | REQ-046 / TC-046 | [IIP-23](../cards/IIP-23.md) | iPhone Safari/PWA, Android Chrome ve klavye/ekran okuyucu örnekleri kayıtlı. | Ajan VM çıktısı kullanıcı cihazı sonucu diye doldurulmaz. | 4 |
-| REQ-047 / TC-047 | [IIP-24](../cards/IIP-24.md) | Gereksinim→kart→test→kanıt→revizyon zinciri; bilinen sınırlar ve geri alma hazır. | Eksik kritik kabul, içerik hakkı veya yetki varken yayın hazır denmez. | 3 |
-| REQ-048 / TC-048 | [IIP-24](../cards/IIP-24.md) | Tek state, sahiplik, bağımlılık, kanıt ve ledger aynı teslimde tutarlı. | Sahte done, döngü, eksik kanıt ve çakışan dosya kilidi denetimle yakalanır. | 3 |
+| REQ-047 / TC-047 | [IIP-24](../cards/IIP-24.md) | Gereksinim→kart→test→kanıt→revizyon zinciri; bilinen sınırlar ve geri alma hazır. | Eksik kritik kabul, içerik hakkı veya yetki varken yayın hazır denmez. | 4 |
+| REQ-048 / TC-048 | [IIP-24](../cards/IIP-24.md) | Tek state, sahiplik, bağımlılık, kanıt ve ledger aynı teslimde tutarlı. | Sahte done, döngü, eksik kanıt ve çakışan dosya kilidi denetimle yakalanır. | 4 |

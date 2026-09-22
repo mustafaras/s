@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "local-vm-render-cost",
+  "harness": "tests/app/test_iip_perf_measure.js",
+  "measuredAt": "2026-09-22T15:14:09.382Z",
+  "environment": {
+    "runtime": "node v26.3.1",
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M5",
+    "cores": 10,
+    "scope": "Node VM, driver-parity module graph, real render() path, network disabled"
+  },
+  "method": {
+    "warmup": 5,
+    "samples": 30,
+    "transition": "hub tab switch (bugun <-> saygi) via App.render()"
+  },
+  "result": {
+    "p50Ms": 0.621,
+    "p95Ms": 1.141,
+    "minMs": 0.266,
+    "maxMs": 2.554,
+    "meanMs": 0.635
+  },
+  "target": {
+    "p95Ms": 200,
+    "source": "07-KALITE-VE-KABUL.md"
+  },
+  "evidenceBoundary": [
+    "LOCAL VM ONLY. This is not device performance evidence.",
+    "A desktop Node VM is not an iPhone Safari/PWA: no compositor, no GPU raster, no PWA install, no thermal budget.",
+    "The plan target (p95 <= 200 ms on the target device) stays OPEN until the user runs the device protocol.",
+    "Do not report this number as a device PASS."
+  ],
+  "measuredHead": "fc6f265a25697b2df0e1b12f499ab11621fb0ad5",
+  "harnessFiles": [
+    "tests/app/test_iip_perf_measure.js"
+  ],
+  "gatesBypassed": [
+    "needsAuth -> ui.authUnlocked=true (driver ile ayni)",
+    "locationGateRequired -> data.settings.locationEnabled=true + ui.locationGateState=granted",
+    "SeyFx.isPremiumFxEnabled=false -> App.go senkron commitGo (reduced-motion yolu)"
+  ]
+}

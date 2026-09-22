@@ -407,6 +407,7 @@
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_zikir_boundary.js",
+        "tests/app/test_zikir_view_boundary.js",
         "tests/app/test_quran_boundary.js",
         "tests/app/test_iip_07.js"
       ],
@@ -1369,12 +1370,14 @@
       "requiredGates": [
         "scope",
         "requirements",
-        "review"
+        "review",
+        "visual"
       ],
       "evidence": [
         "evidence/IIP-24/scope.json",
         "evidence/IIP-24/requirements.json",
-        "evidence/IIP-24/review.json"
+        "evidence/IIP-24/review.json",
+        "evidence/IIP-24/visual.json"
       ],
       "blockedReason": null,
       "startedAt": "2026-09-22T14:20:00Z",

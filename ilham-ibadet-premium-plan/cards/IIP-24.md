@@ -28,7 +28,7 @@ Görev metninin tek kaynağı: [UYGULAMA-PROMPTLARI.md](../UYGULAMA-PROMPTLARI.m
 
 **Test allowlist:** `tests/app/test_saygi_boundary.js`, `tests/app/test_prayer_boundary.js`, `tests/app/test_zikir_boundary.js`, `tests/app/test_quran_boundary.js`, `tests/panel/test_faz11_panel.js`.
 
-**Gerekli gate:** scope, requirements, review. **Veri etkili yazıcı:** false.
+**Gerekli gate:** scope, requirements, review, visual. **Veri etkili yazıcı:** false.
 
 Plan artifactleri: `evidence/IIP-24/`. State/ledger tek yazarı integratör. Allowlist dışı üretim değişimi ve canlı veri yazımı yok. Yeni dosya ihtiyacı kapsam kaydıyla çözülür; var olan yetki tekrar sorulmaz.
 

@@ -259,7 +259,18 @@ console.log('[5] REQ-024 — render salt-okurdur; yeni state kopyası/kaydı yok
   const after = JSON.stringify(data);
   ok('odak render `data`yı değiştirmez', before === after);
   ok('devam render `data`yı değiştirmez', JSON.stringify(data.quranJourney) === '{"activeSurahId":"alak","requests":{"alak":{"status":"watching"}}}');
-  ok('yeni kalıcı alan açılmaz', Object.keys(data).sort().join(',') === 'days,quranJourney,saygi', Object.keys(data).join(','));
+  /* P03: IIP-12'nin ASIL amacı "render data'yı mutasyona uğratmaz" (yukarıdaki
+     before===after). Sabit alan listesi, sonraki kartların ONAYLI şema
+     genişletmeleriyle çelişiyordu:
+       - bookmarks, reader → IIP-20 (app/core/state.js:316,331)
+       - programs          → IIP-21 (app/core/state.js:354)
+     Bu yüzden liste, bilinen şema allowlist'i olarak ifade edilir: render
+     KENDİSİ yeni alan açmaz, ama onaylı alanlar bulunabilir. */
+  const IIP12_KNOWN_SCHEMA_KEYS = ['bookmarks', 'days', 'programs', 'quranJourney', 'reader', 'saygi'];
+  const actualKeys = Object.keys(data).sort();
+  ok('yeni kalıcı alan açılmaz (bilinen şema allowlist)',
+    actualKeys.every(k => IIP12_KNOWN_SCHEMA_KEYS.includes(k)),
+    actualKeys.join(','));
   ok('ağ/depo/timer açılmaz', s.counters.fetch === 0 && s.counters.storage === 0 && s.counters.timers === 0,
     JSON.stringify(s.counters));
 }
@@ -304,7 +315,9 @@ console.log('[7] Bekçi — yeni App.* handler ve yeni CSS sınıfı yok');
   const src = source;
 
   // Saygı registry'si App.* tanımlamaz; yalnız mevcut handlerları çağırır.
-  ok('saygi.js yeni App üyesi ATAMAZ', !/App\.[A-Za-z]+\s*=/.test(src));
+  // P02: regex '=(?!=)' — çıplak `=` `==` karşılaştırmasının ilk karakterini de
+  // yakalıyordu (ör. `window.App.saygiReader==='function'` meşru okuması).
+  ok('saygi.js yeni App üyesi ATAMAZ', !/App\.[A-Za-z0-9_]+\s*=(?!=)/.test(src));
   const calls = Array.from(new Set((src.match(/App\.[A-Za-z]+\(/g) || []).map(s => s.slice(4, -1))));
   const missing = calls.filter(n => appSource.indexOf('App.' + n + '=function') === -1);
   ok('çağrılan her App handler app.js\'te tanımlı', missing.length === 0, missing.join(','));

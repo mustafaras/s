@@ -63,7 +63,11 @@ ok(!!V, 'window.QuranStrikingVersesV1 tanımlı');
 if (!V) { console.error('\nModül yok, test durdu.'); process.exit(1); }
 
 section('2. Üst düzey sözleşme');
-ok(V.catalogVersion === 'quran-striking-verses-tr-v1', 'catalogVersion doğru', V.catalogVersion);
+/* P05: catalogVersion v1 -> v2. Meşru: commit 0ecc2cb ("feat(iip-17): add
+   approved Latin readings") IIP-17 kapsamında onaylı Latin harfli okunuşları
+   ekledi ve katalog sürümünü v2'ye çıkardı (app/content/quranStrikingVersesV1.js:186).
+   Test pini v1'de kalmıştı (bayat). */
+ok(V.catalogVersion === 'quran-striking-verses-tr-v2', 'catalogVersion doğru', V.catalogVersion);
 ok(V.totalCount === EXPECTED_TOTAL, 'totalCount === 100', V.totalCount);
 ok(Array.isArray(V.verses) && V.verses.length === EXPECTED_TOTAL, 'verses dizisi tam 100 kayıt', V.verses && V.verses.length);
 ok(typeof V.methodologyTr === 'string' && V.methodologyTr.length > 40, 'methodologyTr dolu ve anlamlı uzunlukta');

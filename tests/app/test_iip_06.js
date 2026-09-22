@@ -186,7 +186,9 @@ check('REQ-012 return: qibla card and dialog keep the existing open/close route'
 
 check('style contract: shared meta grid and six-row wrap safety are explicit', cssSource.includes('.sg-tool-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))') && cssSource.includes('.sg-faith-row-head{display:grid;grid-template-columns:minmax(0,1fr) auto') && cssSource.includes('overflow-wrap:anywhere'));
 check('style contract: narrow viewport and reduced motion states are explicit', cssSource.includes('@media(max-width:370px)') && cssSource.includes('@media(prefers-reduced-motion:reduce)') && cssSource.includes('.qibla-v2-needle.is-idle'));
-check('scope contract: no migration, App assignment or live data behavior was added', !saygiSource.includes('migrate(') && !/App\.[A-Za-z0-9_]+\s*=/.test(saygiSource) && !saygiSource.includes('localStorage.setItem'));
+/* P07: regex `=(?!=)` — çıplak `=` meşru `==` okumasını yakalıyordu. Kanıt:
+   saygi.js'te gerçek App ataması / migrate( / localStorage.setItem YOK. */
+check('scope contract: no migration, App assignment or live data behavior was added', !saygiSource.includes('migrate(') && !/App\.[A-Za-z0-9_]+\s*=(?!=)/.test(saygiSource) && !saygiSource.includes('localStorage.setItem'));
 
 const artifactPath = process.argv[2] === '--write-artifact' ? process.argv[3] : '';
 if (artifactPath) {

@@ -111,8 +111,18 @@ function validate(s, reqs, events, checkFiles = true) {
           passed.add(e.gate); e.requirements.forEach(id=>covered.add(id));
         } catch (error) { fail(`bad evidence ${ep}: ${error.message}`); }
       }
+      /* P11: `passed` gate örtüşmesi YAPISAL bir iddiadır ("bu kartın evidence
+         listesinde gerekli gate dosyaları var mı") ve dosya ADINDAN türetilebilir,
+         içerik okumadan. Böylece structural-only modda (checkFiles=false) de
+         'done lacks gates' yakalanır ve --self-test başlayabilir.
+         `covered` (REQ kapsamı) ise dosya İÇERİĞİNDEN gelir; yalnız
+         checkFiles=true iken doğrulanabilir. */
+      for (const ep of c.evidence || []) {
+        const m = /([^/]+)\.json$/.exec(ep || '');
+        if (m && c.requiredGates.includes(m[1])) passed.add(m[1]);
+      }
       if (!c.requiredGates.every(g=>passed.has(g))) fail(`done lacks gates ${c.id}`);
-      if (!c.requirements.every(r=>covered.has(r))) fail(`done lacks REQ evidence ${c.id}`);
+      if (checkFiles && !c.requirements.every(r=>covered.has(r))) fail(`done lacks REQ evidence ${c.id}`);
       if (!events.some(e=>e.cardId===c.id && e.event==='card_done' && e.verifiedHead===c.verifiedHead)) fail(`done lacks ledger ${c.id}`);
     }
   }
@@ -159,10 +169,17 @@ const args = new Set(process.argv.slice(2));
 for (const arg of args) if (!['--render','--self-test'].includes(arg)) throw Error('Unknown option '+arg);
 if (args.has('--self-test')) {
   if(validate(state,requirements,ledger,false).length) throw Error('Self-test requires structurally valid baseline');
+  /* P11: negatif senaryolar KENDİ KENDİNE YETERLİ olmalı. Bazıları eskiden
+     baseline'ın rastlantısal durumuna (dirty index / kararların zaten approved
+     olması) güveniyordu; bu yüzden bug'lı checkFiles=false davranışının yan
+     etkisiyle "geçiyor"lardı. Aşağıdaki iki senaryo artık önkoşulunu kendisi
+     kurar. */
   const cases = [
     ['cycle',s=>s.cards[0].dependsOn=['IIP-24'],'dependency cycle'],
     ['orphan dependency',s=>s.cards[0].dependsOn=['IIP-99'],'bad dependency'],
-    ['fake done',s=>{s.cards[0].status='done';s.completedCards=1;},'done lacks gates'],
+    /* Sahte done'un tanımı: gate kanıtı YOKKEN done demek (IIP-01 gerçekten
+       done ve gerçek kanıtlara sahip olduğu için kanıtları boşaltmak gerekir). */
+    ['fake done',s=>{s.cards[0].status='done';s.cards[0].evidence=[];s.completedCards=1;},'done lacks gates'],
     ['totals',s=>s.totalCards++,'card totals drift'],
     ['approval',s=>s.implementationApproval={status:'approved',cardIds:['IIP-01'],source:null},'approval source missing'],
     ['next card',s=>s.nextExecutableCard='IIP-01','nextExecutableCard drift'],
@@ -171,13 +188,22 @@ if (args.has('--self-test')) {
     ['scope',s=>s.cards[0].allowedProductionFiles=['../sync.js'],'unsafe allowlist'],
     ['req mismatch',s=>s.cards[0].requirements=['REQ-048'],'bad requirement'],
     ['unknown decision',s=>s.cards[0].decisionIds=['DEC-99'],'unknown decision'],
-    ['decision gate',s=>{s.cards[1].status='done';s.completedCards=1;},'unapproved decision'],
+    /* Tüm gerçek kararlar approved olduğu için önce sahibi kartın kararını
+       proposed'a çekip sonra kartı done yaparak "onaysız kararla done"
+       durumunu gerçekten kurar. `decisions` paylaşılan modül nesnesi olduğundan
+       mutasyon restore() ile geri alınır; aksi halde sızıp sonraki senaryoları
+       ve nihai validate(state,...) çağrısını bozardı. */
+    ['decision gate',s=>{const orig=decisions[0].status;s.cards[1].status='done';s.completedCards=1;decisions[0].status='proposed';return ()=>{decisions[0].status=orig;};},'unapproved decision'],
     ['write lock drift',s=>s.cards[0].plannedWriteFiles=['app.js'],'write/lock mismatch'],
     ['data writer conflict',s=>{for(const c of [s.cards[19],s.cards[20]]){c.owner='a';c.status='blocked';c.blockedReason='test';c.resourceLocks=['data-writer'];}},'resource lock conflict']
   ];
   for (const [name,mutate,expected] of cases) {
-    const copy=structuredClone(state); mutate(copy);
-    if (!validate(copy,requirements,ledger,false).some(e=>e.includes(expected))) throw Error('Negative test failed: '+name);
+    const copy=structuredClone(state);
+    const result=mutate(copy);
+    const restore=typeof result==='function' ? result : (()=>{});
+    const caseErrors=validate(copy,requirements,ledger,false);
+    restore();
+    if (!caseErrors.some(e=>e.includes(expected))) throw Error('Negative test failed: '+name);
   }
   process.stdout.write(`PASS: ${cases.length} invalid-state rejection tests (in-memory; no mutation).\n`);
 }

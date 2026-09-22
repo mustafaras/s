@@ -102,8 +102,10 @@ ok('session teardown listeners stay in their original order',
   app.indexOf("window.addEventListener('pagehide',finalizeSession)") < app.indexOf("window.addEventListener('visibilitychange',onSessionVisibilityChange)"));
 ok('sync retry and Quran foreground state no longer duplicate in app.js',
   !/var lastSyncRetryWatchdogAt=|var SYNC_RETRY_WATCHDOG_MS=|var quranLastForegroundPullAt=/.test(app));
+/* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
+   gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('production cache busts the changed registry and app shell together',
-  /app\/core\/appSurface\.js\?v=20260921b/.test(index) && /app\.js\?v=20260921e/.test(index) &&
+  /app\/core\/appSurface\.js\?v=20260921c/.test(index) && /app\.js\?v=20260921e/.test(index) &&
   index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?'));
 
 console.log('\nMON-53 lifecycle boundary: ' + passed + '/' + passed + ' passed');

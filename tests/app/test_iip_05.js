@@ -192,7 +192,10 @@ check('style contract: portrait fallback states are visible and distinct', cssSo
 check('style contract: fixed action uses safe-area and bounded z-index', cssSource.includes('.sg-person-read-fab{position:fixed;z-index:560') && cssSource.includes('bottom:calc(12px + env(safe-area-inset-bottom))'));
 check('style contract: modal body reserves space below fixed action', cssSource.includes('.sg-person-ov-body{padding:18px 18px calc(142px + env(safe-area-inset-bottom))'));
 check('style contract: narrow view and reduced motion remain explicit', cssSource.includes('@media (max-width:380px)') && cssSource.includes('@media (prefers-reduced-motion:reduce)') && cssSource.includes('.sg-person-read-fab'));
-check('scope contract: no App assignment or migration change was introduced', !/App\.[A-Za-z0-9_]+\s*=/.test(saygiSource) && !saygiSource.includes('migrate('));
+/* P07: `App\.[A-Za-z0-9_]+\s*=` regex'i `==` karşılaştırmasının ilk '='ini de
+   yakalıyordu (meşru okuma: `typeof window.App.saygiReader==='function'`).
+   Kanıtlandı: saygi.js'te gerçek App ataması, migrate( ve fetch( YOK (hepsi 0). */
+check('scope contract: no App assignment or migration change was introduced', !/App\.[A-Za-z0-9_]+\s*=(?!=)/.test(saygiSource) && !saygiSource.includes('migrate('));
 check('scope contract: no network was used while rendering all fixture states', counters.fetch === 0);
 
 if (process.env.IIP05_RENDER_OUT) {

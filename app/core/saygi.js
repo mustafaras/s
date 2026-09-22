@@ -583,7 +583,24 @@ function faithCornerOverlayHTML(){
   var IIP21_PROGRAM_ID='iip21-seven-day-pilot', IIP21_PROGRAM_VERSION='quran-striking-verses-tr-v2', IIP21_CONTENT_IDS=['bakara-255','ihlas-1','fatiha-5','bakara-286','kehf-10','taha-25','yusuf-87'];
   function iip21Catalog(){ return window.QuranStrikingVersesV1; }
   function iip21CatalogVersion(cat){ return String(cat&&cat.catalogVersion||IIP21_PROGRAM_VERSION).slice(0,96); }
-  function iip21Root(){ var d=stateData(); if(!d)return null; if(!d.programs||typeof d.programs!=='object'||Array.isArray(d.programs))d.programs={schemaVersion:1,items:{}}; if(!d.programs.items||typeof d.programs.items!=='object'||Array.isArray(d.programs.items))d.programs.items={}; return d.programs; }
+  /* P06: OKUMA yolu salt-okur olmalı. Eskiden iip21Root() data.programs yokken
+     onu OLUŞTURUYORDU; bu, IIP-12'nin "render data'yı mutasyona uğratmaz"
+     kontratını bozuyordu (render sırasında programs alanı doğuyordu).
+     Artık: okuma için eksik/yetim yapıda null döner (dürüst boş hâl),
+     yalnız YAZMA yolu (iip21WriteRoot, sadece iip21Apply içinde) oluşturur. */
+  function iip21Root(){
+    var d=stateData(); if(!d)return null;
+    var r=d.programs;
+    if(!r||typeof r!=='object'||Array.isArray(r))return null;
+    if(!r.items||typeof r.items!=='object'||Array.isArray(r.items))return null;
+    return r;
+  }
+  function iip21WriteRoot(){
+    var d=stateData(); if(!d)return null;
+    if(!d.programs||typeof d.programs!=='object'||Array.isArray(d.programs))d.programs={schemaVersion:1,items:{}};
+    if(!d.programs.items||typeof d.programs.items!=='object'||Array.isArray(d.programs.items))d.programs.items={};
+    return d.programs;
+  }
   function iip21State(){ var r=iip21Root(),p=r&&r.items[IIP21_PROGRAM_ID]; return p&&typeof p==='object'&&!Array.isArray(p)?p:null; }
   function iip21Ids(p){ var ids=p&&Array.isArray(p.contentIds)?p.contentIds.filter(Boolean):[]; return ids.length===7?ids.slice(0,7):IIP21_CONTENT_IDS.slice(); }
   function iip21DoneCount(p){ var days=p&&p.completedDays&&typeof p.completedDays==='object'?p.completedDays:{},n=0; for(var i=1;i<=7;i++)if(days[i])n++; return n; }
@@ -593,7 +610,8 @@ function faithCornerOverlayHTML(){
   function iip21Device(){ var d=stateData()||{}; return String(d.eventLog&&d.eventLog.sourceDeviceId||'').slice(0,96); }
   function iip21NewState(){ var now=iip21Now(),cat=iip21Catalog(); return {id:IIP21_PROGRAM_ID,version:1,status:'active',contentVersion:iip21CatalogVersion(cat),contentIds:IIP21_CONTENT_IDS.slice(),completedDays:{},startedAt:now,pausedAt:null,completedAt:null,revision:1,updatedAt:now,deviceId:iip21Device()}; }
   function iip21Apply(action){
-    var root=iip21Root(),raw=String(action||''),parts=raw.split(':'),a=parts[0],requestedDay=Number(parts[1])||0,p=iip21State(); if(!root)return null;
+    /* P06: bu bir YAZMA yoludur; kökü burada (ve yalnız burada) oluştur/onar. */
+    var root=iip21WriteRoot(),raw=String(action||''),parts=raw.split(':'),a=parts[0],requestedDay=Number(parts[1])||0,p=iip21State(); if(!root)return null;
     if(a==='start'){ if(p)return p; p=iip21NewState(); root.items[IIP21_PROGRAM_ID]=p; return p; }
     if(!p)return null;
     var now=iip21Now(), changed=false, day;

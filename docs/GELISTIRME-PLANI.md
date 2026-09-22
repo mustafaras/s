@@ -21,6 +21,23 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `archive/premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `archive/premium-fx-plan/deliverables/`) + `archive/monolit-bolumlenme-plan/` (MON-58, 58/60) + `archive/monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-22 (🕌 İlham & İbadet Premium / IIP — DENETİM + ARAÇ ONARIMI):** Bağımsız
+>   denetim, 24 kartlık IIP programının "24/24 done" beyanının **doğrulanamaz** olduğunu
+>   gösterdi. Kök neden: IIP-20 ve IIP-21 aynı dosyaya (`app/core/saygi.js`) yazdı ama
+>   önceki kartların (IIP-05/06/09/12/13) fixture'larını yeniden koşmadı; programda
+>   "kardeş kart regresyonu" kapısı yoktu. **Bu turda kapatılanlar:** 7 bayat cache-bust
+>   test pini (`index.html` doğruydu; `appSurface` 20260921b→20260921c, `styles.css`
+>   20260921f→20260922a), `App\.[…]\s*=` regex'inin `==` yanlış-pozitifi (4 fixture,
+>   mutasyonla doğrulandı), IIP-12 şema allowlist'i **ve** gerçek kusur: `iip21Root()`
+>   okuma yolunda `data.programs` oluşturuyordu → okuma/yazma ayrıldı (`iip21WriteRoot`),
+>   IIP-03 panel payda kontratı, `tests/quran` striking-verses catalogVersion v1→v2
+>   (IIP-17 onaylı içerik), `plan-check.mjs --self-test` (yapısal çalışıyor, 14 senaryo)
+>   ve `plan-check.integration.py` (`FileExistsError` + 24/24 baseline uyumu). Sonuç:
+>   **`tests/app` 0 FAIL**, `tests/quran` 9/9, üç plan aracı exit 0. **AÇIK KALAN:**
+>   `deviceAcceptance=not_verified` (cihaz teyidi yok), p50/p95 ölçülmedi, FIXTURE-MAP
+>   tabanlı önleyici kapı (P13) yok. Ayrıntı:
+>   [`ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md`](../ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md)
+>   ve [`evidence/DENETIM-BASELINE.md`](../ilham-ibadet-premium-plan/evidence/DENETIM-BASELINE.md).
 > - **2026-09-15 (v3.0 CANLIYA ALINDI):** `premium-fx-gorsel-yuzey` → `main`
 >   fast-forward (`d9e4484..2162342`, 269 commit), tag `v3.0`, GitHub Pages run
 >   35006913049 success. Canlı ölçüm: `/s/v3-tanitim/` 200, gömülü anlık görüntü

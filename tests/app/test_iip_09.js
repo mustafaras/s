@@ -212,8 +212,10 @@ ui.saygiPersonOpen = false;
 ui.saygiBrowseId = null;
 quranCardState = 'ready';
 
+/* P07: regex `=(?!=)` — çıplak `=` meşru `==` okumasını yakalıyordu. Kanıt:
+   saygi.js'te gerçek App ataması YOK (0), migrate( YOK (0), fetch( YOK (0)). */
 check('scope contract: no migration/storage/network behavior was added',
-  !/App\.[A-Za-z0-9_]+\s*=/.test(saygiSource) &&
+  !/App\.[A-Za-z0-9_]+\s*=(?!=)/.test(saygiSource) &&
   !saygiSource.includes('migrate(') && saygiSource.includes('function saygiLoadArticle'));
 
 console.log(`\nIIP-09 information architecture contract: ${passed} PASS, ${failed} FAIL`);

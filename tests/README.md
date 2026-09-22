@@ -11,6 +11,22 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `panel/` — legacy Panel 1 / observer fixture’ları (`test_panel_*.js` ve
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
+- `app/test_iip_*.js` — **İlham & İbadet Premium (IIP)** ailesi, 16 fixture.
+  Program: [`ilham-ibadet-premium-plan/`](../ilham-ibadet-premium-plan/README.md);
+  durum [`IIP-STATE.json`](../ilham-ibadet-premium-plan/IIP-STATE.json);
+  denetim tablosu [`evidence/DENETIM-BASELINE.md`](../ilham-ibadet-premium-plan/evidence/DENETIM-BASELINE.md);
+  kapatma adımları [`DUZELTME-PROMPTLARI.md`](../ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md).
+  Kapsam: `test_iip_03` (anlam denetimi, payda bastırma), `04` (hub hiyerarşi),
+  `05` (öncü okuyucu görsel sözleşmesi), `06` (ibadet/kıble birlik), `07`
+  (zikir–Kur’an geçiş), `09` (bilgi mimarisi), `10` (öncü arama/filtre), `11`
+  (okuyucu etkileşimi), `12` (günlük odak + Devam), `13` (vakit tazeliği),
+  `14` (tarihsel kayıt sunumu), `15` (ritim doğruluğu), `17` (kaynaklı seçki),
+  `20` (yer imi/okuyucu tercihi), `21` (yedi duraklı yolculuk), `22` (offline
+  paket).
+  **Kural:** `app/core/saygi.js` paylaşılan bir üretim dosyasıdır; bir kart ona
+  yazdığında o dosyaya bağlı ÖNCEKİ kartların fixture’larını da yeniden koş.
+  IIP-20/21 bunu atladığı için `test_iip_05/06/09/12/13` gate’leri sessizce
+  bozuldu ve ancak 2026-09-22 denetiminde yakalandı.
 - `app/test_v3_welcome.js` — v3.0 tanıtım/kutlama sayfasının sözleşmesi
   (287 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
   önce), **sonsuz döngü koruması** (`?v3done=1` kaçışı), kalıcılık anahtarı

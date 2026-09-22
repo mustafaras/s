@@ -540,8 +540,10 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // metinleri gerçek adım hedefine (stepsGoal → 9.000) çekildi.
 ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260921e)',
   /app\.js\?v=20260921e/.test(indexSource));
+/* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
+   gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
-  /app\/core\/appSurface\.js\?v=20260921b/.test(indexSource));
+  /app\/core\/appSurface\.js\?v=20260921c/.test(indexSource));
 /* B2: yürüyüş tikinin kullanıcıya söylediği eşik, tikin GERÇEK eşiğiyle aynı
    olmalı. Tik habitProgress → stepsGoal(date) ile dolar (varsayılan 9.000);
    STEP_TICK_MIN=4500 hiçbir yerde okunmaz. "4.500" metni geri gelmemeli. */

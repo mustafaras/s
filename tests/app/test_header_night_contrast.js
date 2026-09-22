@@ -67,7 +67,9 @@ const nightStops = ['#243A6E', '#101A33'];
 
 check('gündüz/şafak/akşam seçicileri gece override kapsamına alınmadı',
   !scope.includes('sky-time-day') && !scope.includes('sky-time-dawn') && !scope.includes('sky-time-dusk'));
-check('stylesheet cache sürümü yükseltildi', html.includes('app/styles.css?v=20260921f'));
+/* P01: app/styles.css 20260921f -> 20260922a (commit 3df00c8 styles.css'i
+   gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
+check('stylesheet cache sürümü yükseltildi', html.includes('app/styles.css?v=20260922a'));
 
 console.log('Passed: ' + passed + ' / ' + (passed + failed));
 if (failed) process.exit(1);

@@ -7,9 +7,24 @@ for child in repo.iterdir():
  if child.name!='ilham-ibadet-premium-plan': (tmp/child.name).symlink_to(child,target_is_directory=child.is_dir())
 p=tmp/'ilham-ibadet-premium-plan'; shutil.copytree(repo/p.name,p)
 s=json.loads((p/'IIP-STATE.json').read_text()); c=s['cards'][0]
+# P12: baseline artık 24/24 done (plan tamamlanmış durumda). Sentetik senaryonun
+# kendi TEMİZ başlangıcını kurması gerekir; aksi halde "card totals drift" ve
+# "unauthorized status IIP-02..24" hataları üretir ve senaryo kendi amacını
+# (yapısal olarak geçerli tek done kart) test edemez. Bu sıfırlama yalnız
+# /private/tmp içindeki izole kopyada çalışır; üretim planına dokunmaz.
+for _card in s['cards']:
+  _card.update(status='planned',verifiedHead=None,diffHash=None,completedAt=None,
+               startedAt=None,owner=None,locks=[],plannedWriteFiles=[],
+               resourceLocks=[],blockedReason=None,evidence=[])
+s['completedCards']=0;s['nextExecutableCard']=None
 s['implementationApproval']={'status':'approved','cardIds':['IIP-01'],'source':'SYNTHETIC VALIDATOR TEST ONLY'}
 s['completedCards']=1;c.update(status='done',verifiedHead=s['baselineHead'],diffHash='0'*64,completedAt='2026-09-19',handoff='evidence/IIP-01/HANDOFF.md')
-e=p/'evidence/IIP-01';e.mkdir();(e/'HANDOFF.md').write_text('Synthetic fixture, not product evidence.\n')
+# P12: shutil.copytree zaten evidence/IIP-01'i kopyaladığı için çıplak mkdir()
+# FileExistsError veriyordu. Sentetik fixture için dizini TEMİZLE, sonra kur.
+e=p/'evidence/IIP-01'
+if e.exists(): shutil.rmtree(e)
+e.mkdir(parents=True)
+(e/'HANDOFF.md').write_text('Synthetic fixture, not product evidence.\n')
 for gate in c['requiredGates']:
  artifact=f'evidence/IIP-01/{gate}.log'; (p/artifact).write_text('Synthetic '+gate+' fixture, not product proof.\n')
  details={'scope':{'changedFiles':[],'scopeReviewedBy':'fixture'},'requirements':{'results':[{'requirementId':rid,'testId':'TC-'+rid.split('-')[1],'result':'pass'} for rid in c['requirements']]},'review':{'findings':[],'openCritical':0,'openHigh':0,'reviewedBy':'fixture'}}[gate]

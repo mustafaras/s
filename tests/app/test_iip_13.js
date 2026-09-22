@@ -305,8 +305,10 @@ console.log('[5] REQ-026 olumsuz — GPS yurtdışı olsa bile Istanbul saati ye
 console.log('[6] Bekçi — salt-okur, yeni App.* ve stilli sınıf');
 {
   const appSource = fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8');
-  ok('prayer.js yeni App üyesi ATAMAZ', !/App\.[A-Za-z]+\s*=/.test(prayerSource));
-  ok('saygi.js yeni App üyesi ATAMAZ', !/App\.[A-Za-z]+\s*=/.test(saygiSource));
+  // P02: regex '=(?!=)' — çıplak `=` `==` karşılaştırmasının ilk karakterini de
+  // yakalıyordu (ör. `window.App.saygiReader==='function'` meşru okuması).
+  ok('prayer.js yeni App üyesi ATAMAZ', !/App\.[A-Za-z0-9_]+\s*=(?!=)/.test(prayerSource));
+  ok('saygi.js yeni App üyesi ATAMAZ', !/App\.[A-Za-z0-9_]+\s*=(?!=)/.test(saygiSource));
   const calls = Array.from(new Set((saygiSource.match(/App\.[A-Za-z]+\(/g) || []).map(s => s.slice(4, -1))));
   ok('çağrılan her App handler app.js\'te tanımlı',
     calls.filter(n => appSource.indexOf('App.' + n + '=function') === -1).length === 0,

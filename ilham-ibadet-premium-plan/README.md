@@ -85,6 +85,38 @@ node ilham-ibadet-premium-plan/tools/plan-check.mjs --render
 
 ## Şu an ne hazır, ne bekliyor?
 
-Hazır: ayrıntılı plan ve ajan takip altyapısı. Bekleyen: ekran prototiplerinin üretilmesi, üretim kartları, yeni içerik incelemesi, gerçek görsel/cihaz kabulü ve yayın. Önceki turdaki **95/95 bölüm testi ve shell PASS** başlangıç kanıtıdır; bu planın yeni özelliklerinin test sonucu değildir.
+**2026-09-22 güncellemesi (denetim + araç onarımı sonrası):**
 
-Kaynak baseline: `e794e7bcc637b2431dcfae29f645ef1b02a2b51c`, `main`. Tüm yeni dosyalar bu klasörde; üretim kodu, kişisel veri ve eski program durumları değişmedi. Geçerli kullanıcı yetkisi olmadan hiçbir kart otomatik başlatılmaz; verilmiş yetki de tekrar sorulmaz.
+Hazır: ayrıntılı plan, ajan takip altyapısı, 16 IIP fixture'ı ve üretim kodu (Saygı okuyucusu,
+günlük odak/Devam yüzeyi, vakit tazeliği, yer imi/okuyucu tercihi, yedi duraklı yolculuk,
+kontrollü offline paket).
+
+Ölçülen durum:
+
+| Kontrol | Sonuç |
+|---|---|
+| `plan-check.mjs` | ✅ exit 0 |
+| `plan-check.mjs --self-test` | ✅ exit 0 (14 negatif senaryo) |
+| `plan-check.integration.py` | ✅ exit 0 (4 PASS) |
+| `tests/app` | ✅ 0 FAIL (73 fixture) |
+| `tests/quran` | ✅ 9/9 |
+| `tests/panel` / `tests/panel-v2` | ✅ 23/23 · 27/27 |
+
+**Hâlâ bekleyen (kullanıcı/ayrı yetki gerektirir):**
+
+- **Cihaz kabulü yok:** `IIP-STATE.json` → `deviceAcceptance=not_verified`. Kök kural gereği
+  cihaz onayını yalnız kullanıcı verebilir; ajan kendi başına teyit edemez.
+- **Performans ölçülmedi:** p95 ≤200 ms hedefi için p50/p95 sayısı yok (yerel VM ölçümü cihaz
+  hızı kanıtı değildir).
+- **Önleyici kapı yok (P13):** "aynı üretim dosyasına yazan sonraki kart, önceki kartların
+  fixture'larını yeniden koşar" kuralını `plan-check` otomatik doğrulamıyor. Kök neden bu
+  yüzden sessizce birikmişti.
+
+Ayrıntılı ölçüm tablosu: [`evidence/DENETIM-BASELINE.md`](evidence/DENETIM-BASELINE.md).
+Sıralı kapatma adımları: [`DUZELTME-PROMPTLARI.md`](DUZELTME-PROMPTLARI.md).
+
+Önceki turdaki **95/95 bölüm testi ve shell PASS** başlangıç kanıtıdır; bu planın
+yeni özelliklerinin test sonucu değildir.
+
+Kaynak baseline: `e794e7bcc637b2431dcfae29f645ef1b02a2b51c`, `main`. Geçerli kullanıcı
+yetkisi olmadan hiçbir kart otomatik başlatılmaz; verilmiş yetki de tekrar sorulmaz.

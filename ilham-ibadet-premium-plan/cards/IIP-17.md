@@ -23,7 +23,7 @@ Görev metninin tek kaynağı: [UYGULAMA-PROMPTLARI.md](../UYGULAMA-PROMPTLARI.m
 
 **Rol:** frontend · **Kararlar:** DEC-04.
 
-**Üretim allowlist:** `app/core/saygi.js`, `app/core/render.js`, `app/styles.css`.
+**Üretim allowlist:** `app/content/quranStrikingVersesV1.js`, `app/core/saygi.js`, `app/core/render.js`, `app/styles.css`, `index.html`.
 
 **Test allowlist:** `tests/app/test_saygi_boundary.js`, `tests/app/test_iip_17.js`.
 

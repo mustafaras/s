@@ -38,6 +38,24 @@
     'insan-taraf-satir-satir-dogrulama-zorunlu'
   ]);
 
+  // IIP-17 · Alan sahibi tarafından 2026-09-22'de onaylanan, yalnız 12 pilot
+  // kayıt için Türkçe Latin harfli okunuş katmanı. Bu alan meal değildir;
+  // Arapça metni değiştirmez ve pilot dışı kayıtlarda null kalır.
+  var PILOT_TRANSLITERATIONS = Object.freeze({
+    'bakara-255':'Allâhü lâ ilâhe illâ hüvel hayyül kayyûm. Lâ te’huzühû sinetün velâ nevm. Lehû mâ fis semâvâti ve mâ fil ard.',
+    'ihlas-1':'Kul hüvallâhü ehad.',
+    'fatiha-5':'İyyâke na‘büdü ve iyyâke nesteîn.',
+    'fatiha-6-7':'İhdinas sırâtal müstakîm. Sırâtallezîne en‘amte aleyhim.',
+    'bakara-286':'Rabbenâ lâ tüâhiznâ in nesînâ ev ahta’nâ.',
+    'bakara-153':'Yâ eyyühellezîne âmenû isteînû bis sabri ves salâh. İnnallâhe meas sâbirîn.',
+    'bakara-186':'Ve izâ seeleke ibâdî annî fe innî karîb. Ücîbü da‘veted dâi izâ deân.',
+    'bakara-152':'Fezkürûnî ezkürküm veşkürû lî ve lâ tekfürûn.',
+    'kehf-10':'Rabbenâ âtinâ min ledünke rahmeten ve heyyi’ lenâ min emrinâ raşedâ.',
+    'taha-25':'Rabbişrah lî sadrî ve yessir lî emrî.',
+    'taha-114':'Ve kul rabbi zidnî ilmâ.',
+    'yusuf-87':'Lâ tey’esû min ravhillâh. İnnehû lâ yey’esü min ravhillâhi illel kavmül kâfirûn.'
+  });
+
   // Alan sırası: [id, surahId, surahNameTr, ayetNo, arabic, meal, themeTr]
   var ROWS = [
     ['bakara-255','bakara','Bakara','255','اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ','Allah, kendisinden başka hiçbir ilâh olmayandır. Diridir, kayyûmdur. O’nu ne bir uyuklama tutar ne de uyku. Göklerdeki her şey, yerdeki her şey O’nundur.','Tevhid · Allah’ın ilmi ve kudreti (Âyet-el Kürsî)'],
@@ -149,6 +167,9 @@
     var rec = Object.freeze({
       id: r[0], surahId: r[1], surahNameTr: r[2], ayetNo: r[3],
       arabic: r[4], meal: r[5], themeTr: r[6],
+      transliterationTr: PILOT_TRANSLITERATIONS[r[0]] || null,
+      transliterationVerifiedAt: PILOT_TRANSLITERATIONS[r[0]] ? '2026-09-22' : null,
+      transliterationReviewer: PILOT_TRANSLITERATIONS[r[0]] ? 'user-domain-owner' : null,
       sourceRefs: SOURCE_REFS, verified: true, verifiedAt: '2026-08-01'
     });
     VERSES.push(rec);
@@ -162,7 +183,7 @@
   }
 
   window.QuranStrikingVersesV1 = Object.freeze({
-    catalogVersion: 'quran-striking-verses-tr-v1',
+    catalogVersion: 'quran-striking-verses-tr-v2',
     totalCount: VERSES.length,
     methodologyTr: METHODOLOGY_TR,
     sourceRefs: SOURCE_REFS,

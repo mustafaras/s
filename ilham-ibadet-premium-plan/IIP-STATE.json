@@ -941,14 +941,18 @@
       "role": "frontend",
       "owner": "codex",
       "locks": [
+        "app/content/quranStrikingVersesV1.js",
         "app/core/saygi.js",
         "app/styles.css",
+        "index.html",
         "tests/app/test_iip_17.js"
       ],
       "allowedProductionFiles": [
+        "app/content/quranStrikingVersesV1.js",
         "app/core/saygi.js",
         "app/core/render.js",
-        "app/styles.css"
+        "app/styles.css",
+        "index.html"
       ],
       "requirements": [
         "REQ-033",
@@ -970,7 +974,7 @@
         "evidence/IIP-17/visual.json",
         "evidence/IIP-17/content.json"
       ],
-      "blockedReason": "Kullanıcının belirttiği doğrulanmış Latin harfli okunuş kaynağı repo/katalogda bulunamadı; 12 pilot kayıt için kaynak dosyası veya onaylı metin gerekli. Sentetik render matrisi üretildi ancak izole browser QA sağlayıcısı açılamadı.",
+      "blockedReason": "12 pilot Latin harfli okunuş alan sahibi tarafından onaylandı ve kataloğa eklendi. Sentetik render matrisi üretildi ancak izole browser QA sağlayıcısı açılamadığı için görsel gate yeniden incelemede.",
       "startedAt": "2026-09-21T18:00:00Z",
       "completedAt": null,
       "verifiedHead": null,
@@ -988,8 +992,10 @@
       "estimatedSize": "M",
       "diffHash": null,
       "plannedWriteFiles": [
+        "app/content/quranStrikingVersesV1.js",
         "app/core/saygi.js",
         "app/styles.css",
+        "index.html",
         "tests/app/test_iip_17.js"
       ],
       "resourceLocks": [],

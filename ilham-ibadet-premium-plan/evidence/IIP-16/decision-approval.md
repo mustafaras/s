@@ -7,3 +7,7 @@
 - Karar: `approved`.
 
 Bu kayıt kullanıcının ürün/alan kabulünü belgeler; Codex tarafından verilmiş bağımsız hukuk görüşü değildir. IIP-17 yalnız mevcut, insan doğrulamalı dondurulmuş katalog metinlerini kullanır; yeni dinî metin veya okunuş üretmez.
+
+## 2026-09-22 okunuş eki
+
+Kullanıcı alan sahibi olarak “Latin okunuşları sen hazırla; ben alan sahibi olarak bunları onaylıyorum” diyerek 12 pilot kayıt için Türkçe Latin harfli okunuş katmanının hazırlanmasını ve kullanılmasını açıkça onayladı. Okunuşlar mealden ayrı tutulur; Arapça asıl metni değiştirmez.

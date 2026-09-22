@@ -27,9 +27,10 @@
       "IIP-15",
       "IIP-16",
       "IIP-17",
-      "IIP-18"
+      "IIP-18",
+      "IIP-19"
     ],
-    "source": "2026-09-21 user messages: IIP-15 — Ritim raporu doğruluğu; IIP-16 — Editoryal pilot üretimi ve açık inceleme/onay teyidi; IIP-17 — '17 ye geçebilirsin'. Her kart yalnız kendi kapsamındadır; commit/push/deploy yetkisi değildir."
+    "source": "2026-09-22 user message: yalnız IIP-19 adımını uygula; kalıcı genişletme sözleşmesi. Her kart yalnız kendi kapsamındadır; commit/push/deploy yetkisi değildir."
   },
   "releaseApproval": {
     "status": "approved",
@@ -1054,13 +1055,13 @@
       "id": "IIP-19",
       "title": "Kalıcı genişletme sözleşmesi",
       "package": "C",
-      "status": "planned",
+      "status": "in_review",
       "dependsOn": [
         "IIP-18"
       ],
       "path": "cards/IIP-19.md",
       "role": "data",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [],
       "requirements": [
@@ -1073,12 +1074,17 @@
         "review",
         "data"
       ],
-      "evidence": [],
-      "blockedReason": null,
-      "startedAt": null,
+      "evidence": [
+        "evidence/IIP-19/scope.json",
+        "evidence/IIP-19/requirements.json",
+        "evidence/IIP-19/review.json",
+        "evidence/IIP-19/data.json"
+      ],
+      "blockedReason": "DEC-05 yeni kalıcı veri ve paylaşım şeması olarak proposed; kullanıcı/ürün kararı ve veri gate'i onaylanmadan IIP-19 done veya IIP-20 başlangıcı verilemez.",
+      "startedAt": "2026-09-22T08:10:00Z",
       "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "verifiedHead": "d8178b347f67bc90df88402e0afc52f80794126b",
+      "handoff": "evidence/IIP-19/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_faz10_sync.js",
         "tests/app/test_state_rebind_boundary.js"
@@ -1091,7 +1097,7 @@
         "DEC-05"
       ],
       "estimatedSize": "L",
-      "diffHash": null,
+      "diffHash": "959a8b74f47c5c41cca7c971449538a65b325e6fb6170e81a0e0ad952181d292",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

@@ -18,14 +18,24 @@ assert.equal(r.registerSaygi({data:()=>({}),ui:()=>({faithTab:'oz'}),getDay:()=>
 const verse={id:'x',surahNameTr:'Çok Uzun & <Sûre>',ayetNo:'1-200',arabic:'رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا',meal:'Meal <güvenli>',themeTr:'Dua · Sabır',verified:true,verifiedAt:'2026-08-01'};
 const catalog={byId:()=>verse};
 const html=r.iip17ReaderHTML('2026-09-21',catalog);
+let visualSpirit='';
 test('Arapça RTL ve hareke korunur',()=>{assert.match(html,/lang="ar" dir="rtl"/);assert.ok(html.includes(verse.arabic));assert.match(css,/letter-spacing:normal/);});
 test('okunuş ve meal ayrı başlıklardır',()=>{assert.match(html,/>Okunuş</);assert.match(html,/>Diyanet meali</);assert.ok(!html.includes('Meal <güvenli>'));assert.ok(html.includes('Meal &lt;güvenli&gt;'));});
-test('editoryal tefekkür dinî metinden ayrı ve açık etiketlidir',()=>{assert.match(html,/<aside class="iip17-reflection"/);assert.match(html,/EDİTORYAL · TEFSİR DEĞİLDİR/);assert.match(html,/Tematik bağlantılar/);});
-test('temalar ayrı bağlantı çipleridir',()=>{assert.match(html,/>Dua</);assert.match(html,/>Sabır</);assert.equal((html.match(/iip17-theme-chip/g)||[]).length,2);});
+test('editoryal tefekkür dinî metinden ayrı ve açık etiketlidir',()=>{assert.match(html,/<aside class="iip17-reflection"/);assert.match(html,/EDİTORYAL · TEFSİR DEĞİLDİR/);assert.match(html,/Tematik izler/);});
+test('temalar ve gerçek derinleşme eylemi ayrıdır',()=>{assert.match(html,/>Dua</);assert.match(html,/>Sabır</);assert.equal((html.match(/iip17-theme-chip/g)||[]).length,2);assert.match(html,/<button type="button" class="iip17-deepen"/);assert.match(html,/App\.openQuranJourney\(\)/);});
 test('temel atıf ayrıntı açılmadan görünür',()=>{assert.match(html,/iip17-attribution/);assert.match(html,/Diyanet İşleri Başkanlığı/);assert.match(html,/<details class="iip17-source">/);assert.match(html,/yeni sekmede aç/);});
 test('uzun referans kaçışlı ve taşmaya dayanıklı',()=>{assert.ok(html.includes('Çok Uzun &amp; &lt;Sûre&gt; 1-200'));assert.match(css,/overflow-wrap:anywhere/);});
 test('font fallback zinciri vardır',()=>{assert.match(css,/Noto Naskh Arabic/);assert.match(css,/Geeza Pro/);assert.match(css,/serif/);});
 test('katalog yüklenmezse ana yüzey güvenli hata verir',()=>{const out=r.iip17ReaderHTML('2026-09-21',null);assert.match(out,/Kaynaklı seçki şu anda yüklenemedi/);assert.match(out,/Ana İlham &amp; İbadet araçları/);assert.ok(!out.includes('<details'));});
 test('doğrulanmamış kayıt gösterilmez',()=>{const out=r.iip17ReaderHTML('2026-09-21',{byId:()=>({...verse,verified:false})});assert.match(out,/Bugünün doğrulanmış metni bulunamadı/);assert.ok(!out.includes(verse.arabic));});
 test('okunuş yokluğu uydurma metin yerine açıklanır',()=>{assert.match(html,/doğrulanmış Latin harfli okunuş yayımlanmadı/);});
-if(process.exitCode)process.exit(1);console.log('PASS: IIP-17 '+passed+'/10');
+test('otomatik doğrulandı rozeti üretilmez',()=>{assert.ok(!html.includes('iip17-verified'));assert.ok(!html.includes('İnsan doğrulamalı'));assert.match(html,/ÂYET · DUA/);});
+test('manevi özet emojisiz, yapılandırılmış vakit ve ay döngüsü sunar',()=>{sandbox.HijriCalendarV1={hijriFrom:()=>({day:12,monthName:'Rebiülevvel',year:1448}),holyDay:()=>''};visualSpirit=r.spiritBarHTML();assert.match(visualSpirit,/SIRADAKİ VAKİT/);assert.match(visualSpirit,/HİCRÎ TARİH/);assert.match(visualSpirit,/12 Rebiülevvel 1448/);assert.match(visualSpirit,/İlk dördün sonrası/);assert.ok(!/[🌙☽☾🌒🌓🌔🌕🌖🌗🌘]/u.test(visualSpirit));});
+if(process.exitCode)process.exit(1);
+if(process.argv.includes('--render')){
+  const artifact='<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IIP-17 render matrisi</title><link rel="stylesheet" href="../../../app/styles.css"><style>body{margin:0;padding:24px;background:#d9dce8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.matrix{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}.shot{max-width:430px;margin:auto;border-radius:32px;overflow:hidden;box-shadow:0 22px 70px rgba(20,24,40,.24)}.shot>header{padding:12px 18px;background:#202942;color:#fff;font-weight:800}.shot #root{padding:16px;display:grid;gap:14px;min-height:900px;background:var(--bg);color:var(--text)}@media(max-width:520px){body{padding:8px}.matrix{grid-template-columns:1fr;gap:12px}}</style></head><body><main class="matrix"><section class="shot"><header>Açık tema · 375 px</header><div id="root" data-theme="light">'+visualSpirit+html+'</div></section><section class="shot"><header>Koyu tema · 430 px</header><div id="root" data-theme="dark">'+visualSpirit+html+'</div></section></main></body></html>';
+  const out=path.join(root,'ilham-ibadet-premium-plan/evidence/IIP-17/render-matrix.html');
+  fs.writeFileSync(out,artifact);
+  console.log('RENDER '+out);
+}
+console.log('PASS: IIP-17 '+passed+'/12');

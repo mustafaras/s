@@ -41,7 +41,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 17,
+  "completedCards": 16,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -932,7 +932,7 @@
       "id": "IIP-17",
       "title": "Kaynaklı seçki ve dua yüzeyi",
       "package": "B",
-      "status": "done",
+      "status": "in_review",
       "dependsOn": [
         "IIP-12",
         "IIP-16"
@@ -940,7 +940,11 @@
       "path": "cards/IIP-17.md",
       "role": "frontend",
       "owner": "codex",
-      "locks": [],
+      "locks": [
+        "app/core/saygi.js",
+        "app/styles.css",
+        "tests/app/test_iip_17.js"
+      ],
       "allowedProductionFiles": [
         "app/core/saygi.js",
         "app/core/render.js",
@@ -966,10 +970,10 @@
         "evidence/IIP-17/visual.json",
         "evidence/IIP-17/content.json"
       ],
-      "blockedReason": null,
+      "blockedReason": "Kullanıcının belirttiği doğrulanmış Latin harfli okunuş kaynağı repo/katalogda bulunamadı; 12 pilot kayıt için kaynak dosyası veya onaylı metin gerekli. Sentetik render matrisi üretildi ancak izole browser QA sağlayıcısı açılamadı.",
       "startedAt": "2026-09-21T18:00:00Z",
-      "completedAt": "2026-09-21T18:27:54Z",
-      "verifiedHead": "bf02bbfab079d3d8597d592518b7bdb86bb0509b",
+      "completedAt": null,
+      "verifiedHead": null,
       "handoff": "evidence/IIP-17/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js"
@@ -982,8 +986,12 @@
         "DEC-04"
       ],
       "estimatedSize": "M",
-      "diffHash": "6679180ef6f2c56019e900558cb6d6398ca32f2a856d79a84f3d6ab4a3b7cb2e",
-      "plannedWriteFiles": [],
+      "diffHash": null,
+      "plannedWriteFiles": [
+        "app/core/saygi.js",
+        "app/styles.css",
+        "tests/app/test_iip_17.js"
+      ],
       "resourceLocks": [],
       "dataAffecting": false
     },

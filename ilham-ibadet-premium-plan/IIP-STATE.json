@@ -1433,5 +1433,17 @@
     "agentTaken": true,
     "notDeviceAcceptance": true,
     "note": "Masaüstü tarayıcı ölçümü cihaz kabulünün YERİNE GEÇMEZ (kök kural). Cihaz kabulü ayrı: deviceAttestation (kullanıcı beyanı). Auth kapısında duruldu; token/parola alanı okunmadı/doldurulmadı."
+  },
+  "performanceAcceptance": {
+    "status": "user_accepted",
+    "device": "iPhone 15 Pro Max",
+    "numericEvidence": null,
+    "p50Ms": null,
+    "p95Ms": null,
+    "targetP95Ms": 200,
+    "source": "2026-09-22 user message: yapıldı say ve kapat yeter artık",
+    "agentVerified": false,
+    "note": "Kullanıcı maddeyi kabul ederek kapattı. p50/p95 SAYILARI YOK; bu bir kabul, ölçüm değil. Hedef (cihazda p95 <=200 ms) sayısal olarak doğrulanmadı. Cihaz modeli: iPhone 15 Pro Max. Protokol ileride ölçüm istenirse: evidence/IIP-PERF-PROTOKOL.md.",
+    "ledgerSeq": 53
   }
 }

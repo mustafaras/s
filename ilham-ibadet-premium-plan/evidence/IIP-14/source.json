@@ -1,28 +1,74 @@
 {
-  "schemaVersion": 1,
-  "cardId": "IIP-14",
-  "gate": "source",
-  "status": "pass",
-  "artifact": "evidence/IIP-14/source.md",
-  "verifiedHead": "15b30bf55234ed973772fc1f2c1cbf5d00277231",
-  "diffHash": "dad0243a95684162e6e56976f82cdbfc574dcab0e9f240b495dbb5546e1994ab",
-  "createdAt": "2026-09-21T14:30:08Z",
-  "requirements": ["REQ-027", "REQ-028"],
-  "commands": [
-    {"command": "node --check app/core/prayer.js", "exitCode": 0},
-    {"command": "node --check app/core/saygi.js", "exitCode": 0},
-    {"command": "node --check tests/app/test_iip_14.js", "exitCode": 0},
-    {"command": "node tests/app/test_iip_14.js", "exitCode": 0},
-    {"command": "node tests/app/test_prayer_boundary.js", "exitCode": 0},
-    {"command": "node tests/app/test_saygi_boundary.js", "exitCode": 0},
-    {"command": "node .claude/skills/run-seyma/driver.mjs", "exitCode": 0},
-    {"command": "node .claude/skills/run-seyma/zikr-harness.mjs", "exitCode": 0},
-    {"command": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs", "exitCode": 0},
-    {"command": "node tools/shell-inventory.mjs --gate", "exitCode": 0},
-    {"command": "git -c core.fsmonitor=false diff --check", "exitCode": 0}
-  ],
-  "limitations": "Kaynak ve headless kanıttır; gerçek tarayıcı, cihaz ve yayın kabulü değildir.",
-  "reviewer": "codex",
-  "artifactSha256": "44eee05ee0d4658468d6cbb446ea9f049e79512877d3be1ce17d8e824ebf9af3",
-  "details": {}
+ "schemaVersion": 1,
+ "cardId": "IIP-14",
+ "gate": "source",
+ "status": "pass",
+ "artifact": "evidence/IIP-14/source.md",
+ "verifiedHead": "15b30bf55234ed973772fc1f2c1cbf5d00277231",
+ "diffHash": "dad0243a95684162e6e56976f82cdbfc574dcab0e9f240b495dbb5546e1994ab",
+ "createdAt": "2026-09-21T14:30:08Z",
+ "requirements": [
+  "REQ-027",
+  "REQ-028"
+ ],
+ "commands": [
+  {
+   "command": "node --check app/core/prayer.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app/core/saygi.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check tests/app/test_iip_14.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_14.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_prayer_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_saygi_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/driver.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node tools/shell-inventory.mjs --gate",
+   "exitCode": 0
+  },
+  {
+   "command": "git -c core.fsmonitor=false diff --check",
+   "exitCode": 0
+  }
+ ],
+ "limitations": "Kaynak ve headless kanıttır; gerçek tarayıcı, cihaz ve yayın kabulü değildir.",
+ "reviewer": "codex",
+ "artifactSha256": "44eee05ee0d4658468d6cbb446ea9f049e79512877d3be1ce17d8e824ebf9af3",
+ "details": {},
+ "reconciliation": {
+  "reconciledAt": "2026-09-22T16:06:28.599Z",
+  "reconciledHead": "242938bf98a53a237ee3520132037f91f7764883",
+  "method": "every recorded command re-run in the live tree; recorded exitCode compared with the live exit code",
+  "commandsRerun": 11,
+  "driftCount": 0,
+  "verdict": "no drift — every recorded command still exits with the recorded code",
+  "drift": [],
+  "note": "Append-only: the original commands[] array above is unchanged. This block records a later re-run, not a rewrite of history."
+ }
 }

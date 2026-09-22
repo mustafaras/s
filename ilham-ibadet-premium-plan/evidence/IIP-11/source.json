@@ -1,100 +1,110 @@
 {
-  "schemaVersion": 1,
-  "cardId": "IIP-11",
-  "gate": "source",
-  "status": "pass",
-  "artifact": "evidence/IIP-11/source.md",
-  "verifiedHead": "5e958998391487dcba98c3da4d77ea1160fafa6b",
-  "diffHash": "5c21e99860169594b4924fc2769e94bd3b5129650bdaaf93345b22909afb380c",
-  "createdAt": "2026-09-21T14:30:00Z",
-  "requirements": [
-    "REQ-021",
-    "REQ-022"
-  ],
-  "commands": [
-    {
-      "command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs",
-      "exitCode": 0
-    },
-    {
-      "command": "node --check app/core/saygi.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node --check app.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node --check tests/app/test_iip_11.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_iip_11.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_saygi_boundary.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_iip_10.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_iip_04.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_iip_05.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_iip_09.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_modal_focus_containment.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
-      "exitCode": 0
-    },
-    {
-      "command": "node .claude/skills/run-seyma/driver.mjs",
-      "exitCode": 0
-    },
-    {
-      "command": "node tools/shell-inventory.mjs --gate",
-      "exitCode": 0
-    },
-    {
-      "command": "git -c core.fsmonitor=false diff --check",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_fx2_overlay_motion.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_fx2_tab_transition.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_fx2_touch_coverage.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_app_surface_daily_boundary.js",
-      "exitCode": 0
-    },
-    {
-      "command": "node tests/app/test_v3_welcome.js",
-      "exitCode": 0
-    }
-  ],
-  "limitations": "Ağsız headless/VM ve kaynak kapılarıdır; cihaz/ekran okuyucu/yayın kanıtı değildir.",
-  "reviewer": "copilot",
-  "artifactSha256": "c6b5a537c4ef0b99bf98b31affeb37c206fd57ed4ea20fb6eccc1266e3fad223",
-  "details": {}
+ "schemaVersion": 1,
+ "cardId": "IIP-11",
+ "gate": "source",
+ "status": "pass",
+ "artifact": "evidence/IIP-11/source.md",
+ "verifiedHead": "5e958998391487dcba98c3da4d77ea1160fafa6b",
+ "diffHash": "5c21e99860169594b4924fc2769e94bd3b5129650bdaaf93345b22909afb380c",
+ "createdAt": "2026-09-21T14:30:00Z",
+ "requirements": [
+  "REQ-021",
+  "REQ-022"
+ ],
+ "commands": [
+  {
+   "command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app/core/saygi.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check tests/app/test_iip_11.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_11.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_saygi_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_10.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_04.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_05.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_09.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_modal_focus_containment.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/driver.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node tools/shell-inventory.mjs --gate",
+   "exitCode": 0
+  },
+  {
+   "command": "git -c core.fsmonitor=false diff --check",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_fx2_overlay_motion.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_fx2_tab_transition.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_fx2_touch_coverage.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_app_surface_daily_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_v3_welcome.js",
+   "exitCode": 0
+  }
+ ],
+ "limitations": "Ağsız headless/VM ve kaynak kapılarıdır; cihaz/ekran okuyucu/yayın kanıtı değildir.",
+ "reviewer": "copilot",
+ "artifactSha256": "c6b5a537c4ef0b99bf98b31affeb37c206fd57ed4ea20fb6eccc1266e3fad223",
+ "details": {},
+ "reconciliation": {
+  "reconciledAt": "2026-09-22T16:06:28.599Z",
+  "reconciledHead": "242938bf98a53a237ee3520132037f91f7764883",
+  "method": "every recorded command re-run in the live tree; recorded exitCode compared with the live exit code",
+  "commandsRerun": 20,
+  "driftCount": 0,
+  "verdict": "no drift — every recorded command still exits with the recorded code",
+  "drift": [],
+  "note": "Append-only: the original commands[] array above is unchanged. This block records a later re-run, not a rewrite of history."
+ }
 }

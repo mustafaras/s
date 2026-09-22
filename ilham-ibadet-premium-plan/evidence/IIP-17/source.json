@@ -1,1 +1,38 @@
-{"schemaVersion":1,"cardId":"IIP-17","gate":"source","status":"pass","artifact":"evidence/IIP-17/source.md","verifiedHead":"0ecc2cb7ffc1995b365afcf405892ad12d458357","diffHash":"e107420a4fbe2d2506d8155ec1ae8ea05a5ee7eb6c0aa605c338feb87a6332d0","createdAt":"2026-09-22T07:00:00Z","requirements":["REQ-033","REQ-034"],"commands":[{"command":"node tests/app/test_iip_17.js","exitCode":0}],"limitations":"Kaynak erişimi ağdan test edilmedi; katalog ve bağlantı sözleşmesi yerel doğrulandı.","reviewer":"codex","artifactSha256":"b77cfa0459821caab74c3b5596f88525fc7eb64ce206912a1e1d748cba37f01f","details":{"catalog":"QuranStrikingVersesV1","institution":"Diyanet İşleri Başkanlığı","decision":"DEC-04 approved"}}
+{
+ "schemaVersion": 1,
+ "cardId": "IIP-17",
+ "gate": "source",
+ "status": "pass",
+ "artifact": "evidence/IIP-17/source.md",
+ "verifiedHead": "0ecc2cb7ffc1995b365afcf405892ad12d458357",
+ "diffHash": "e107420a4fbe2d2506d8155ec1ae8ea05a5ee7eb6c0aa605c338feb87a6332d0",
+ "createdAt": "2026-09-22T07:00:00Z",
+ "requirements": [
+  "REQ-033",
+  "REQ-034"
+ ],
+ "commands": [
+  {
+   "command": "node tests/app/test_iip_17.js",
+   "exitCode": 0
+  }
+ ],
+ "limitations": "Kaynak erişimi ağdan test edilmedi; katalog ve bağlantı sözleşmesi yerel doğrulandı.",
+ "reviewer": "codex",
+ "artifactSha256": "b77cfa0459821caab74c3b5596f88525fc7eb64ce206912a1e1d748cba37f01f",
+ "details": {
+  "catalog": "QuranStrikingVersesV1",
+  "institution": "Diyanet İşleri Başkanlığı",
+  "decision": "DEC-04 approved"
+ },
+ "reconciliation": {
+  "reconciledAt": "2026-09-22T16:06:28.599Z",
+  "reconciledHead": "242938bf98a53a237ee3520132037f91f7764883",
+  "method": "every recorded command re-run in the live tree; recorded exitCode compared with the live exit code",
+  "commandsRerun": 1,
+  "driftCount": 0,
+  "verdict": "no drift — every recorded command still exits with the recorded code",
+  "drift": [],
+  "note": "Append-only: the original commands[] array above is unchanged. This block records a later re-run, not a rewrite of history."
+ }
+}

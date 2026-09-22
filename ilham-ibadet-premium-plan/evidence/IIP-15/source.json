@@ -1,1 +1,58 @@
-{"schemaVersion":1,"cardId":"IIP-15","gate":"source","status":"pass","artifact":"evidence/IIP-15/source.md","verifiedHead":"ad1d1483e1e30809e47ae324caef74518493c5f6","diffHash":"b6b3740dc557ddf393482a2545587c72d8959521b61e9eb197f3613355a1aa80","createdAt":"2026-09-21T15:03:35Z","requirements":["REQ-029","REQ-030"],"commands":[{"command":"node --check app/core/saygi.js && node --check panel/panel.js && node --check panel/v2/panel-v2.js","exitCode":0},{"command":"node tests/app/test_iip_15.js","exitCode":0},{"command":"node .claude/skills/run-seyma/driver.mjs","exitCode":0},{"command":"node .claude/skills/run-seyma/verify-state-migration-boundary.mjs","exitCode":0},{"command":"node .claude/skills/run-seyma/zikr-harness.mjs","exitCode":0},{"command":"node tools/shell-inventory.mjs --gate","exitCode":0},{"command":"git -c core.fsmonitor=false diff --check","exitCode":0}],"limitations":"Kaynak/headless kanıtıdır; gerçek tarayıcı, cihaz ve yayın kabulü değildir.","reviewer":"codex","artifactSha256":"d17cd4d299b6fd4c18ddbba7d738f51a1ebef5de8d578d80db721636c13e0aea","details":{}}
+{
+ "schemaVersion": 1,
+ "cardId": "IIP-15",
+ "gate": "source",
+ "status": "pass",
+ "artifact": "evidence/IIP-15/source.md",
+ "verifiedHead": "ad1d1483e1e30809e47ae324caef74518493c5f6",
+ "diffHash": "b6b3740dc557ddf393482a2545587c72d8959521b61e9eb197f3613355a1aa80",
+ "createdAt": "2026-09-21T15:03:35Z",
+ "requirements": [
+  "REQ-029",
+  "REQ-030"
+ ],
+ "commands": [
+  {
+   "command": "node --check app/core/saygi.js && node --check panel/panel.js && node --check panel/v2/panel-v2.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_15.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/driver.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node tools/shell-inventory.mjs --gate",
+   "exitCode": 0
+  },
+  {
+   "command": "git -c core.fsmonitor=false diff --check",
+   "exitCode": 0
+  }
+ ],
+ "limitations": "Kaynak/headless kanıtıdır; gerçek tarayıcı, cihaz ve yayın kabulü değildir.",
+ "reviewer": "codex",
+ "artifactSha256": "d17cd4d299b6fd4c18ddbba7d738f51a1ebef5de8d578d80db721636c13e0aea",
+ "details": {},
+ "reconciliation": {
+  "reconciledAt": "2026-09-22T16:06:28.599Z",
+  "reconciledHead": "242938bf98a53a237ee3520132037f91f7764883",
+  "method": "every recorded command re-run in the live tree; recorded exitCode compared with the live exit code",
+  "commandsRerun": 7,
+  "driftCount": 0,
+  "verdict": "no drift — every recorded command still exits with the recorded code",
+  "drift": [],
+  "note": "Append-only: the original commands[] array above is unchanged. This block records a later re-run, not a rewrite of history."
+ }
+}

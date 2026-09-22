@@ -1,29 +1,70 @@
 {
-  "schemaVersion": 1,
-  "cardId": "IIP-05",
-  "gate": "source",
-  "status": "pass",
-  "artifact": "evidence/IIP-05/source.md",
-  "verifiedHead": "aded41ea85150826bc340ad6ad86717b65a00d80",
-  "diffHash": "fbca8b0b992598ca94663788aadf5a68dde0d04c9011901131229a7302332199",
-  "createdAt": "2026-09-20T12:20:30Z",
-  "requirements": ["REQ-009", "REQ-010"],
-  "commands": [
-    {"command": "node --check app/core/saygi.js", "exitCode": 0},
-    {"command": "node tests/app/test_iip_05.js", "exitCode": 0},
-    {"command": "node tests/app/test_iip_04.js", "exitCode": 0},
-    {"command": "node tests/app/test_saygi_boundary.js", "exitCode": 0},
-    {"command": "node .claude/skills/run-seyma/zikr-harness.mjs", "exitCode": 0},
-    {"command": "node .claude/skills/run-seyma/driver.mjs", "exitCode": 0},
-    {"command": "node tools/shell-inventory.mjs --gate", "exitCode": 0},
-    {"command": "git diff --check", "exitCode": 0}
-  ],
-  "limitations": "No browser/device/network/private data; source gate does not prove physical rendering.",
-  "reviewer": "Codex / integrator",
-  "artifactSha256": "19829903d050477478e3128752faf688b940220818d0812cc84ef4f2cb340e40",
-  "details": {
-    "sourceFiles": ["app/core/saygi.js", "app/styles.css", "tests/app/test_iip_05.js"],
-    "callOrder": "saygiArticleBodyHTML -> saygiPersonModalHTML -> saygiFloatingReadHTML",
-    "invariants": "scroll-gate, mark-read handler, reading return and modal keyboard shell preserved"
+ "schemaVersion": 1,
+ "cardId": "IIP-05",
+ "gate": "source",
+ "status": "pass",
+ "artifact": "evidence/IIP-05/source.md",
+ "verifiedHead": "aded41ea85150826bc340ad6ad86717b65a00d80",
+ "diffHash": "fbca8b0b992598ca94663788aadf5a68dde0d04c9011901131229a7302332199",
+ "createdAt": "2026-09-20T12:20:30Z",
+ "requirements": [
+  "REQ-009",
+  "REQ-010"
+ ],
+ "commands": [
+  {
+   "command": "node --check app/core/saygi.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_05.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_04.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_saygi_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/driver.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node tools/shell-inventory.mjs --gate",
+   "exitCode": 0
+  },
+  {
+   "command": "git diff --check",
+   "exitCode": 0
   }
+ ],
+ "limitations": "No browser/device/network/private data; source gate does not prove physical rendering.",
+ "reviewer": "Codex / integrator",
+ "artifactSha256": "19829903d050477478e3128752faf688b940220818d0812cc84ef4f2cb340e40",
+ "details": {
+  "sourceFiles": [
+   "app/core/saygi.js",
+   "app/styles.css",
+   "tests/app/test_iip_05.js"
+  ],
+  "callOrder": "saygiArticleBodyHTML -> saygiPersonModalHTML -> saygiFloatingReadHTML",
+  "invariants": "scroll-gate, mark-read handler, reading return and modal keyboard shell preserved"
+ },
+ "reconciliation": {
+  "reconciledAt": "2026-09-22T16:06:28.599Z",
+  "reconciledHead": "242938bf98a53a237ee3520132037f91f7764883",
+  "method": "every recorded command re-run in the live tree; recorded exitCode compared with the live exit code",
+  "commandsRerun": 8,
+  "driftCount": 0,
+  "verdict": "no drift — every recorded command still exits with the recorded code",
+  "drift": [],
+  "note": "Append-only: the original commands[] array above is unchanged. This block records a later re-run, not a rewrite of history."
+ }
 }

@@ -521,11 +521,17 @@ console.log('\n== B2-8 MON-14 createDefaultData root/settings/tarih parity ==');
 {
   const defaults = defaultDataPair();
   const registryJson = JSON.stringify(defaults.registryResult);
+  /* P08: `bookmarks`, `reader`, `programs` eklendi (IIP-20 commit 8449cc2,
+     IIP-21 commit de59f03) ve root sırası `aeon`'dan sonra bunları taşıyor.
+     Pin 2026-09-03 hâlini tutuyordu → bayat. Kanıt: 47a9575 (öncesi) root
+     alanlarında üçü YOK, bugünkü state.js'te VAR (createDefaultData gövdesi).
+     Hash aynı nedenle güncellendi; alan sırası createDefaultData'daki gerçek
+     literal sırayı birebir yansıtır. */
   const expectedRootKeys = [
     'version', 'startDate', 'lastOpenedDate', 'lastOpenedAt', 'savedAt',
     'syncReceipt', 'eventLog', 'days', 'notifications', 'reminders', 'luna',
-    'aeon', 'settings', 'cycle', 'library', 'watchlist', 'music', 'body',
-    'labResults',
+    'aeon', 'bookmarks', 'reader', 'programs', 'settings', 'cycle', 'library',
+    'watchlist', 'music', 'body', 'labResults',
   ];
   const expectedSettings = {
     nickname: 'Sevgili Günışığı', notificationsWanted: false, haptics: true,
@@ -537,7 +543,7 @@ console.log('\n== B2-8 MON-14 createDefaultData root/settings/tarih parity ==');
 
   ok('createDefaultData registry kaydı erişilebilir', typeof defaults.sandbox.SeymaState.createDefaultData === 'function');
   ok('registry/shim default root JSON eşdeğer', registryJson === JSON.stringify(defaults.shimResult));
-  ok('default root tam snapshot hash değişmedi', crypto.createHash('sha256').update(registryJson).digest('hex') === '5294f6a84f99d7a7d135f784ce13a9a956984b383417745141945a7da7f48000');
+  ok('default root tam snapshot hash değişmedi', crypto.createHash('sha256').update(registryJson).digest('hex') === '378afb148be301ef5b116373645515b453073ef5aa6a4b29d999ed09da6964cf');
   ok('default root alan sırası ve kapsamı korunuyor', defaults.registryResult && Object.keys(defaults.registryResult).join('|') === expectedRootKeys.join('|'));
   ok('default settings alan/değerleri korunuyor', same(defaults.registryResult.settings, expectedSettings));
   ok('default tarih bağımlılıkları aynı ISO damgasını kullanıyor', defaults.registryResult.startDate === '2026-09-03' &&
@@ -556,4 +562,16 @@ ok('fixture fetch sayısı sıfır', probe.counters.fetches === 0);
 ok('fixture yalnız sentetik localStorage stub kullandı', probe.counters.sets > 0);
 
 console.log(`\nB2 result: ${failed ? 'FAIL' : 'PASS'} (${passed} passed, ${failed} failed)`);
+/* P08: pinler bayatladığında yeni değeri güvenli biçimde üretmek için.
+   Kullanım: node …/verify-state-migration-boundary.mjs --print-hash
+   Kanonik pinleri asla elle tahmin etme; bu bayrağın çıktısını kullan. */
+if (process.argv.includes('--print-hash')) {
+  const snapshot = defaultDataPair();
+  const json = JSON.stringify(snapshot.registryResult);
+  console.log('\n--print-hash (canonical pin values) --');
+  console.log('expectedRootKeys:');
+  console.log('  ' + Object.keys(snapshot.registryResult).map(k => `'${k}'`).join(', '));
+  console.log('default root snapshot hash:');
+  console.log('  ' + crypto.createHash('sha256').update(json).digest('hex'));
+}
 if (failed) process.exitCode = 1;

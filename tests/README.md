@@ -128,6 +128,18 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_local_visual_qa_guard.js` — Ajanın ekran görüntüsü alabilen yerel
   QA istisnasının Guard 1, force-sync ve gerçek profil sınırlarını kaynak
   düzeyinde ağsız doğrular.
+- `app/test_deploy_surface_contract.js` — Pages yayın yüzeyi sözleşmesi
+  (2026-09-22): `.github/workflows/pages.yml`’in “Stage runtime-only site”
+  adımından **gerçek** `--exclude` bayraklarını çıkarır, aynı rsync’i geçici bir
+  dizinde **çalıştırır** ve staged ağacı denetler. İç dizinlerden biri
+  (`docs tests archive .claude tools files ilham-ibadet-premium-plan
+  kuran-ogreniyorum jev-gate`) sızarsa, zorunlu çalışma zamanı varlıklarından
+  biri (`index.html`, `app.js`, `app/styles.css`, `panel/…`, `v3` istisnası
+  dâhil) düşerse veya staged ağaçta bir `.md` kalırsa FAIL eder. Guard adımının
+  dizin listesi rsync dışlama listesiyle tutarsızsa da FAIL eder. Metin
+  taraması değil yürütülebilir kanıt üretir; ağsız ve salt-okurdur (repo ağacına
+  yazmaz, yalnız `os.tmpdir()`’e). Mutasyonla doğrulandı: bir `--exclude`
+  kaldırılınca sızıntı yakalanır. `node tests/app/test_deploy_surface_contract.js`.
 - `app/test_state_rebind_boundary.js` — MON-15 state Dalga 3 kapanışı: canlı
   B1 getter tazeliği, dokuz `app.js` data atama satırı, registryde sıfır
   `data=` yazımı, import/reset/location/auth late-boot ve 6079 try/finally

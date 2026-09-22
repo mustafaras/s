@@ -3,7 +3,7 @@
   "generatedBy": "tools/fixture-map-build.mjs",
   "note": "Fixture -> production-file map derived from committed sources (literal + path.join + local-helper transitive). Read-only scan; regenerate after adding fixtures or helpers. Consumed by ilham-ibadet-premium-plan/tools/plan-check.mjs sibling-regression gate.",
   "families": {
-    "app": 73,
+    "app": 75,
     "panel": 23,
     "panel-v2": 27,
     "quran": 9,
@@ -109,6 +109,29 @@
         "app/core/state.js",
         "app/core/syncGlue.js",
         "app/core/timeTheme.js"
+      ]
+    },
+    "tests/app/test_deploy_surface_contract.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/content/profileAssessmentV1.js",
+        "app/content/quranRevelationOrderV1.js",
+        "app/core/constants.js",
+        "app/styles.css",
+        "assets/aeon-icon-192.png",
+        "assets/aeon-icon-512.png",
+        "index.html",
+        "manifest.json",
+        "panel-v2.html",
+        "panel.html",
+        "panel/panel.css",
+        "panel/panel.js",
+        "panel/panelCoverageManifest.js",
+        "panel/v2/panel-v2.css",
+        "panel/v2/panel-v2.js",
+        "sw.js",
+        "sync.js"
       ]
     },
     "tests/app/test_faz10_sync.js": {
@@ -402,6 +425,49 @@
         "app/content/quranStrikingVersesV1.js",
         "index.html",
         "sw.js"
+      ]
+    },
+    "tests/app/test_iip_perf_measure.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/content/esmaulHusnaV1.js",
+        "app/content/esmaulHusnaV2.js",
+        "app/content/hijriCalendar.js",
+        "app/content/motivationNarratives.js",
+        "app/content/motivationProgramV2.js",
+        "app/content/profileAssessmentV1.js",
+        "app/content/quranRevelationOrderV1.js",
+        "app/content/quranStrikingVersesV1.js",
+        "app/content/quranTransportV1.js",
+        "app/content/saygiPeople.js",
+        "app/content/zikirCoreContentV1.js",
+        "app/core/appSurface.js",
+        "app/core/constants.js",
+        "app/core/crisis.js",
+        "app/core/dateUtils.js",
+        "app/core/health.js",
+        "app/core/helpers.js",
+        "app/core/journal.js",
+        "app/core/library.js",
+        "app/core/map.js",
+        "app/core/mediaFx.js",
+        "app/core/messaging.js",
+        "app/core/motivation.js",
+        "app/core/prayer.js",
+        "app/core/profile.js",
+        "app/core/quran.js",
+        "app/core/reminderSurface.js",
+        "app/core/reminders.js",
+        "app/core/render.js",
+        "app/core/report.js",
+        "app/core/saygi.js",
+        "app/core/settings.js",
+        "app/core/skyFx.js",
+        "app/core/state.js",
+        "app/core/syncGlue.js",
+        "app/core/timeTheme.js",
+        "app/core/zikir.js"
       ]
     },
     "tests/app/test_journal_boundary.js": {
@@ -1639,6 +1705,7 @@
       "tests/app/test_app_surface_overlay_boundary.js",
       "tests/app/test_crisis_boundary.js",
       "tests/app/test_daily_photo_history.js",
+      "tests/app/test_deploy_surface_contract.js",
       "tests/app/test_faz_minus11_boundary.js",
       "tests/app/test_fx2_overlay_motion.js",
       "tests/app/test_fx2_tab_transition.js",
@@ -1652,6 +1719,7 @@
       "tests/app/test_iip_14.js",
       "tests/app/test_iip_20.js",
       "tests/app/test_iip_21.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_library_boundary.js",
       "tests/app/test_location_gate_recovery.js",
@@ -1693,11 +1761,14 @@
     ],
     "app/content/motivationProgramV2.js": [
       "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js"
     ],
     "app/content/profileAssessmentV1.js": [
       "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_profile_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js",
@@ -1724,6 +1795,7 @@
       "tests/app/test_header_celestial_timeline.js",
       "tests/app/test_header_minimal_controls.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_location_gate_recovery.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_premium_fx_utils.js",
@@ -1745,7 +1817,9 @@
     "app/core/constants.js": [
       "tests/app/test_aeon_message_expand.js",
       "tests/app/test_date_utils_boundary.js",
+      "tests/app/test_deploy_surface_contract.js",
       "tests/app/test_helpers_boundary.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js",
@@ -1766,6 +1840,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_modal_focus_containment.js",
       "tests/app/test_modularization_boundary.js",
@@ -1787,6 +1862,7 @@
       "tests/app/test_date_utils_boundary.js",
       "tests/app/test_faz_minus11_boundary.js",
       "tests/app/test_helpers_boundary.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js",
@@ -1807,6 +1883,7 @@
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_health_boundary.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
@@ -1827,6 +1904,7 @@
       "tests/app/test_date_utils_boundary.js",
       "tests/app/test_faz_minus11_boundary.js",
       "tests/app/test_helpers_boundary.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js",
@@ -1846,6 +1924,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_modal_focus_containment.js",
       "tests/app/test_modularization_boundary.js",
@@ -1868,6 +1947,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_library_boundary.js",
       "tests/app/test_modal_focus_containment.js",
@@ -1892,6 +1972,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_map_boundary.js",
       "tests/app/test_modularization_boundary.js",
@@ -1914,6 +1995,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_messaging_boundary.js",
       "tests/app/test_modal_focus_containment.js",
       "tests/app/test_modularization_boundary.js",
@@ -1936,6 +2018,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_motivation_room_accessibility.js",
@@ -1959,6 +2042,7 @@
       "tests/app/test_iip_11.js",
       "tests/app/test_iip_13.js",
       "tests/app/test_iip_14.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_prayer_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
@@ -1979,6 +2063,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_profile_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
@@ -2000,6 +2085,7 @@
       "tests/app/test_fx2_overlay_motion.js",
       "tests/app/test_iip_07.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_quran_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
@@ -2054,6 +2140,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_v3_welcome.js",
       "tests/app/test_zikr_manual_entry.js",
@@ -2074,6 +2161,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_v3_welcome.js",
@@ -2098,6 +2186,7 @@
       "tests/app/test_header_minimal_controls.js",
       "tests/app/test_iip_07.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modal_focus_containment.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_premium_fx_utils.js",
@@ -2124,6 +2213,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_map_boundary.js",
       "tests/app/test_modularization_boundary.js",
@@ -2158,6 +2248,7 @@
       "tests/app/test_iip_17.js",
       "tests/app/test_iip_20.js",
       "tests/app/test_iip_21.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modal_focus_containment.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_saygi_boundary.js",
@@ -2179,6 +2270,7 @@
       "tests/app/test_fx2_tab_transition.js",
       "tests/app/test_fx2_touch_coverage.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_premium_settings.js",
       "tests/app/test_premium_voice.js",
@@ -2204,6 +2296,7 @@
       "tests/app/test_iip_03.js",
       "tests/app/test_iip_20.js",
       "tests/app/test_iip_21.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_premium_fx_gate_defaults.js",
       "tests/app/test_premium_voice.js",
@@ -2224,6 +2317,7 @@
       "tests/app/test_aeon_message_expand.js",
       "tests/app/test_date_utils_boundary.js",
       "tests/app/test_helpers_boundary.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_syncGlue_save_boundary.js",
@@ -2244,6 +2338,7 @@
       "tests/app/test_fx2_overlay_motion.js",
       "tests/app/test_iip_07.js",
       "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modal_focus_containment.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_premium_audio_fx.js",
@@ -2270,6 +2365,7 @@
       "tests/app/test_app_surface_lifecycle_boundary.js",
       "tests/app/test_app_surface_overlay_boundary.js",
       "tests/app/test_crisis_boundary.js",
+      "tests/app/test_deploy_surface_contract.js",
       "tests/app/test_faz_minus11_boundary.js",
       "tests/app/test_header_celestial_timeline.js",
       "tests/app/test_header_night_contrast.js",
@@ -2296,6 +2392,7 @@
       "tests/app/test_fx2_audio_engine.js",
       "tests/app/test_fx2_overlay_motion.js",
       "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_map_boundary.js",
       "tests/app/test_modularization_boundary.js",
@@ -2313,6 +2410,7 @@
       "tests/app/test_date_utils_boundary.js",
       "tests/app/test_faz_minus11_boundary.js",
       "tests/app/test_fx2_ambience.js",
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_premium_fx_gate_defaults.js",
       "tests/app/test_premium_settings.js",
@@ -2320,29 +2418,15 @@
       "tests/app/test_premium_voice.js",
       "tests/app/test_state_rebind_boundary.js"
     ],
-    "sync.js": [
-      "tests/app/test_faz10_sync.js",
-      "tests/app/test_iip_20.js",
-      "tests/app/test_local_visual_qa_guard.js",
-      "tests/app/test_sync_large_file.js",
-      "tests/app/test_v3_welcome.js",
-      "tests/app/test_zikr_manual_entry.js",
-      "tests/panel/test_panel_p0_sync.js",
-      "tests/panel/test_panel_p2_sync.js",
-      "tests/panel/test_panel_p6_qa_release.js",
-      "tests/quran/test_quran_merge.js",
-      "tests/quran/test_quran_outbox_sync.js",
-      "tests/quran/test_quran_pull_sync.js",
-      "tests/reminders/test_reminder_app_acceptance.js",
-      "tests/reminders/test_reminder_boot.js",
-      "tests/reminders/test_reminder_concurrency.js",
-      "tests/reminders/test_reminder_cross_surface_schema.js",
-      "tests/reminders/test_reminder_cross_surface_status.js",
-      "tests/reminders/test_reminder_end_to_end_lineage.js",
-      "tests/reminders/test_reminder_integrated_privacy.js",
-      "tests/reminders/test_reminder_sync_privacy.js"
+    "app/content/quranRevelationOrderV1.js": [
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/app/test_iip_perf_measure.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/quran/test_quran_catalog.js",
+      "tests/quran/test_quran_striking_verses.js"
     ],
     "app/styles.css": [
+      "tests/app/test_deploy_surface_contract.js",
       "tests/app/test_fx2_ambience.js",
       "tests/app/test_fx2_overlay_motion.js",
       "tests/app/test_fx2_palette_contrast.js",
@@ -2369,7 +2453,47 @@
       "tests/reminders/test_reminder_app_acceptance.js",
       "tests/reminders/test_reminder_integrated_ux.js"
     ],
+    "assets/aeon-icon-192.png": [
+      "tests/app/test_deploy_surface_contract.js"
+    ],
+    "assets/aeon-icon-512.png": [
+      "tests/app/test_deploy_surface_contract.js"
+    ],
+    "manifest.json": [
+      "tests/app/test_deploy_surface_contract.js"
+    ],
+    "panel-v2.html": [
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/panel-v2/test_panel_v2_accessibility.js",
+      "tests/panel-v2/test_panel_v2_hit_areas.js",
+      "tests/panel-v2/test_panel_v2_performance.js",
+      "tests/panel-v2/test_panel_v2_skeleton.js",
+      "tests/quran/test_quran_panel_parity.js"
+    ],
+    "panel.html": [
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/panel/test_panel_boot_resilience.js",
+      "tests/panel/test_panel_p3_timeline_drawer.js",
+      "tests/panel/test_panel_p5_responsive_a11y.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/quran/test_quran_panel_parity.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_panel_a11y.js",
+      "tests/reminders/test_reminder_panel_privacy.js",
+      "tests/reminders/test_reminder_panel_redaction.js"
+    ],
+    "panel/panel.css": [
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/panel/test_panel_p5_responsive_a11y.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_panel_a11y.js"
+    ],
     "panel/panel.js": [
+      "tests/app/test_deploy_surface_contract.js",
       "tests/app/test_iip_03.js",
       "tests/app/test_iip_15.js",
       "tests/panel/test_faz11_panel.js",
@@ -2409,45 +2533,8 @@
       "tests/reminders/test_reminder_panel_redaction.js",
       "tests/reminders/test_reminder_panel_source.js"
     ],
-    "panel/v2/panel-v2.js": [
-      "tests/app/test_iip_15.js",
-      "tests/panel-v2/test_panel_v2_accessibility.js",
-      "tests/panel-v2/test_panel_v2_archives.js",
-      "tests/panel-v2/test_panel_v2_audit.js",
-      "tests/panel-v2/test_panel_v2_compare.js",
-      "tests/panel-v2/test_panel_v2_component_contracts.js",
-      "tests/panel-v2/test_panel_v2_components.js",
-      "tests/panel-v2/test_panel_v2_contrast.js",
-      "tests/panel-v2/test_panel_v2_count_up.js",
-      "tests/panel-v2/test_panel_v2_css.js",
-      "tests/panel-v2/test_panel_v2_day_detail.js",
-      "tests/panel-v2/test_panel_v2_event_log.js",
-      "tests/panel-v2/test_panel_v2_history.js",
-      "tests/panel-v2/test_panel_v2_hit_areas.js",
-      "tests/panel-v2/test_panel_v2_notification_lifecycle.js",
-      "tests/panel-v2/test_panel_v2_performance.js",
-      "tests/panel-v2/test_panel_v2_polling_telemetry.js",
-      "tests/panel-v2/test_panel_v2_polling_tests.js",
-      "tests/panel-v2/test_panel_v2_pull_refresh.js",
-      "tests/panel-v2/test_panel_v2_settings.js",
-      "tests/panel-v2/test_panel_v2_skeleton.js",
-      "tests/panel-v2/test_panel_v2_swipe.js",
-      "tests/panel-v2/test_panel_v2_sync_health.js",
-      "tests/panel-v2/test_panel_v2_system.js",
-      "tests/panel-v2/test_panel_v2_system_subtabs.js",
-      "tests/panel-v2/test_panel_v2_tabs.js",
-      "tests/panel-v2/test_panel_v2_today.js",
-      "tests/panel-v2/test_panel_v2_trends.js",
-      "tests/quran/test_quran_panel_parity.js",
-      "tests/reminders/test_reminder_panel_coverage.js"
-    ],
-    "app/content/quranStrikingVersesV1.js": [
-      "tests/app/test_iip_17.js",
-      "tests/app/test_iip_22.js",
-      "tests/app/test_state_rebind_boundary.js",
-      "tests/quran/test_quran_striking_verses.js"
-    ],
     "panel/panelCoverageManifest.js": [
+      "tests/app/test_deploy_surface_contract.js",
       "tests/app/test_iip_20.js",
       "tests/panel/test_panel_boot_resilience.js",
       "tests/panel/test_panel_focus_location.js",
@@ -2492,17 +2579,87 @@
       "tests/reminders/test_reminder_panel_redaction.js",
       "tests/reminders/test_reminder_panel_source.js"
     ],
+    "panel/v2/panel-v2.css": [
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/panel-v2/test_panel_v2_accessibility.js",
+      "tests/panel-v2/test_panel_v2_contrast.js",
+      "tests/panel-v2/test_panel_v2_css.js",
+      "tests/panel-v2/test_panel_v2_hit_areas.js",
+      "tests/panel-v2/test_panel_v2_performance.js",
+      "tests/panel-v2/test_panel_v2_skeleton.js"
+    ],
+    "panel/v2/panel-v2.js": [
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/app/test_iip_15.js",
+      "tests/panel-v2/test_panel_v2_accessibility.js",
+      "tests/panel-v2/test_panel_v2_archives.js",
+      "tests/panel-v2/test_panel_v2_audit.js",
+      "tests/panel-v2/test_panel_v2_compare.js",
+      "tests/panel-v2/test_panel_v2_component_contracts.js",
+      "tests/panel-v2/test_panel_v2_components.js",
+      "tests/panel-v2/test_panel_v2_contrast.js",
+      "tests/panel-v2/test_panel_v2_count_up.js",
+      "tests/panel-v2/test_panel_v2_css.js",
+      "tests/panel-v2/test_panel_v2_day_detail.js",
+      "tests/panel-v2/test_panel_v2_event_log.js",
+      "tests/panel-v2/test_panel_v2_history.js",
+      "tests/panel-v2/test_panel_v2_hit_areas.js",
+      "tests/panel-v2/test_panel_v2_notification_lifecycle.js",
+      "tests/panel-v2/test_panel_v2_performance.js",
+      "tests/panel-v2/test_panel_v2_polling_telemetry.js",
+      "tests/panel-v2/test_panel_v2_polling_tests.js",
+      "tests/panel-v2/test_panel_v2_pull_refresh.js",
+      "tests/panel-v2/test_panel_v2_settings.js",
+      "tests/panel-v2/test_panel_v2_skeleton.js",
+      "tests/panel-v2/test_panel_v2_swipe.js",
+      "tests/panel-v2/test_panel_v2_sync_health.js",
+      "tests/panel-v2/test_panel_v2_system.js",
+      "tests/panel-v2/test_panel_v2_system_subtabs.js",
+      "tests/panel-v2/test_panel_v2_tabs.js",
+      "tests/panel-v2/test_panel_v2_today.js",
+      "tests/panel-v2/test_panel_v2_trends.js",
+      "tests/quran/test_quran_panel_parity.js",
+      "tests/reminders/test_reminder_panel_coverage.js"
+    ],
     "sw.js": [
+      "tests/app/test_deploy_surface_contract.js",
       "tests/app/test_iip_22.js",
       "tests/app/test_location_gate_recovery.js",
       "tests/reminders/test_reminder_app_notification_boundary.js",
       "tests/reminders/test_reminder_integrated_privacy.js"
     ],
-    "app/core/skyFx.js": [
-      "tests/app/test_sky_fx.js",
-      "tests/app/test_state_rebind_boundary.js"
+    "sync.js": [
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/app/test_faz10_sync.js",
+      "tests/app/test_iip_20.js",
+      "tests/app/test_local_visual_qa_guard.js",
+      "tests/app/test_sync_large_file.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/panel/test_panel_p0_sync.js",
+      "tests/panel/test_panel_p2_sync.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/quran/test_quran_merge.js",
+      "tests/quran/test_quran_outbox_sync.js",
+      "tests/quran/test_quran_pull_sync.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_cross_surface_status.js",
+      "tests/reminders/test_reminder_end_to_end_lineage.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_sync_privacy.js"
+    ],
+    "app/content/quranStrikingVersesV1.js": [
+      "tests/app/test_iip_17.js",
+      "tests/app/test_iip_22.js",
+      "tests/app/test_iip_perf_measure.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/quran/test_quran_striking_verses.js"
     ],
     "app/content/esmaulHusnaV1.js": [
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js",
       "tests/reminders/test_reminder_app_acceptance.js",
@@ -2516,55 +2673,41 @@
       "tests/reminders/test_reminder_migration.js"
     ],
     "app/content/esmaulHusnaV2.js": [
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js"
     ],
     "app/content/hijriCalendar.js": [
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js"
     ],
     "app/content/motivationNarratives.js": [
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js"
     ],
-    "app/content/quranRevelationOrderV1.js": [
-      "tests/app/test_state_rebind_boundary.js",
-      "tests/quran/test_quran_catalog.js",
-      "tests/quran/test_quran_striking_verses.js"
-    ],
     "app/content/quranTransportV1.js": [
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/quran/test_quran_outbox_sync.js",
       "tests/quran/test_quran_pull_sync.js",
       "tests/quran/test_quran_transport.js"
     ],
     "app/content/saygiPeople.js": [
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js"
     ],
     "app/content/zikirCoreContentV1.js": [
+      "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js",
       "tests/reminders/test_reminder_cross_surface_schema.js"
     ],
-    "panel-v2.html": [
-      "tests/app/test_v3_welcome.js",
-      "tests/panel-v2/test_panel_v2_accessibility.js",
-      "tests/panel-v2/test_panel_v2_hit_areas.js",
-      "tests/panel-v2/test_panel_v2_performance.js",
-      "tests/panel-v2/test_panel_v2_skeleton.js",
-      "tests/quran/test_quran_panel_parity.js"
-    ],
-    "panel.html": [
-      "tests/app/test_v3_welcome.js",
-      "tests/panel/test_panel_boot_resilience.js",
-      "tests/panel/test_panel_p3_timeline_drawer.js",
-      "tests/panel/test_panel_p5_responsive_a11y.js",
-      "tests/panel/test_panel_p6_qa_release.js",
-      "tests/quran/test_quran_panel_parity.js",
-      "tests/reminders/test_reminder_integrated_privacy.js",
-      "tests/reminders/test_reminder_panel_a11y.js",
-      "tests/reminders/test_reminder_panel_privacy.js",
-      "tests/reminders/test_reminder_panel_redaction.js"
+    "app/core/skyFx.js": [
+      "tests/app/test_iip_perf_measure.js",
+      "tests/app/test_sky_fx.js",
+      "tests/app/test_state_rebind_boundary.js"
     ],
     "v3-tanitim/index.html": [
       "tests/app/test_v3_welcome.js"
@@ -2592,21 +2735,6 @@
     ],
     "v3-tanitim/v3.js": [
       "tests/app/test_v3_welcome.js"
-    ],
-    "panel/panel.css": [
-      "tests/panel/test_panel_p5_responsive_a11y.js",
-      "tests/panel/test_panel_p6_qa_release.js",
-      "tests/reminders/test_reminder_app_acceptance.js",
-      "tests/reminders/test_reminder_integrated_ux.js",
-      "tests/reminders/test_reminder_panel_a11y.js"
-    ],
-    "panel/v2/panel-v2.css": [
-      "tests/panel-v2/test_panel_v2_accessibility.js",
-      "tests/panel-v2/test_panel_v2_contrast.js",
-      "tests/panel-v2/test_panel_v2_css.js",
-      "tests/panel-v2/test_panel_v2_hit_areas.js",
-      "tests/panel-v2/test_panel_v2_performance.js",
-      "tests/panel-v2/test_panel_v2_skeleton.js"
     ],
     "app/core/reminderState.js": [
       "tests/reminders/test_reminder_boot.js"

@@ -61,6 +61,14 @@ jobs:
       # ic malzeme herkese acik URL'de servis ediliyordu. Calisma zamaninda
       # hicbiri kullanilmiyor; app.js'in cektigi tek .md dosyasi Pages'ten degil
       # veri repo'sundan GitHub API ile geliyor.
+      #
+      # Ikinci tur (2026-09-22): ayni desenle tools/, files/, ilham-ibadet-
+      # premium-plan/, kuran-ogreniyorum/ ve jev-gate/ de acikta kalmisti. Canli
+      # dogrulama: tools/evidence-reconcile.mjs ve uc plan state JSON'u 200
+      # donuyordu. Bunlar ajan/plan malzemesi, calisma zamani varligi DEGIL;
+      # v3-tanitim'daki 'tools/...' gecisleri yalnizca YORUM satiri. Sir veya
+      # kisisel veri yoktu. NOT: files/yedek/*.json git'te takipli DEGIL, zaten
+      # yayinlanmiyordu (404).
       - name: Stage runtime-only site
         run: |
           mkdir -p _site
@@ -71,6 +79,11 @@ jobs:
             --exclude 'docs' \
             --exclude 'tests' \
             --exclude 'archive' \
+            --exclude 'tools' \
+            --exclude 'files' \
+            --exclude 'ilham-ibadet-premium-plan' \
+            --exclude 'kuran-ogreniyorum' \
+            --exclude 'jev-gate' \
             --exclude '_site' \
             --exclude '*.md' \
             ./ _site/
@@ -97,7 +110,8 @@ jobs:
             [ -f "_site/$f" ] || { echo "EKSIK: $f"; exit 1; }
           done
           [ -z "$(find _site -name '*.md' -print -quit)" ] || { echo "_site icinde .md kaldi"; exit 1; }
-          for d in docs tests archive .claude; do
+          for d in docs tests archive .claude tools files \
+                   ilham-ibadet-premium-plan kuran-ogreniyorum jev-gate; do
             [ ! -e "_site/$d" ] || { echo "_site icinde $d kaldi"; exit 1; }
           done
           echo "runtime guard OK"

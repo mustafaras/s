@@ -120,3 +120,42 @@ Program kapandı. **Yeni bir IIP işi başlatılmaz**; aşağıdaki iki durumda
 `plan-check.mjs` yine de **taşımaya dayanıklı** hale getirildi (repo kökü artık
 `app.js` sembolünden çözülüyor, sabit varsayım yok) — ileride taşınma kararı
 verilirse araç hazır.
+
+---
+
+## 8. Kapanış sonrası: yayın yüzeyi sızıntısı (2026-09-22)
+
+Program kapandıktan sonra, kapanışı izleyen yayın doğrulaması sırasında
+`pages.yml` ile ilgili **ayrı bir kusur** bulundu. Bu bir IIP kartı değildir ve
+IIP kapsamını yeniden açmaz; buraya yalnız kayıt için yazılmıştır.
+
+**Kusur.** `pages.yml` depo kökünü "olduğu gibi" yayınlıyordu. İlk sertleştirme
+turunda `docs/` `tests/` `archive/` `.claude/` dışlanmıştı; aynı desenle
+`tools/` `files/` `ilham-ibadet-premium-plan/` `kuran-ogreniyorum/` `jev-gate/`
+**açıkta kaldı**.
+
+**Kanıt (curl).** Deploy öncesi canlı sorgu:
+
+| URL | Kod |
+|---|---|
+| `tools/evidence-reconcile.mjs` | `200` |
+| `ilham-ibadet-premium-plan/IIP-STATE.json` | `200` |
+| `kuran-ogreniyorum/KAO-STATE.json` | `200` |
+| `jev-gate/JEV-GATE-STATE.json` | `200` |
+| `v3-tanitim/` (kasıtlı yayında) | `200` |
+| `docs/ tests/ archive/ files/ panel/ .github/ .claude/ app/ assets/` | `404` |
+| `README.md` | `404` (`.md` dışlı) |
+
+**Sır veya kişisel veri açığa çıkmadı.** `files/yedek/latest-*.json` (kişisel
+veri yedeği) git'te **takipli değil** — bu yüzden zaten yayınlanmıyordu (`404`).
+Açıkta kalanlar plan durum JSON'ları, kanıt dosyaları ve ajan araçlarıydı.
+
+**Düzeltme.** Beş `--exclude` + guard dizin listesine eklendi. Ölçüm: staged
+ağaç **233 → 69 dosya**.
+
+**Kalıcı koruma.** Yeni fixture `tests/app/test_deploy_surface_contract.js`
+(73 kontrol) iddiayı metin taramasıyla değil, `pages.yml`'den çıkarılan gerçek
+rsync bayraklarıyla staged ağacı kurarak doğrular. Mutasyonla kanıtlandı: bir
+`--exclude` kaldırılınca sızıntı yakalanır. `tests/FIXTURE-MAP.json` yeniden
+üretildi; `tests/README.md` envanterine eklendi.
+

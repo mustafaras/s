@@ -3624,7 +3624,7 @@ App.saygiLens=function(action,value){
 // kapsayıcı tamamlama alternatifi ve RTL bilgisi. Tıpkı App.saygiLens gibi,
 // yeni bir okuyucu denetimi eklemek yeni bir App üyesi GEREKTİRMEZ — yalnız
 // aşağıdaki eylem listesine bir dal eklenir.
-var SAYGI_READER_ACTIONS={scale:1,reset:1,goto:1,top:1,scroll:1,restore:1,'a11y-end':1};
+var SAYGI_READER_ACTIONS={scale:1,reset:1,goto:1,top:1,scroll:1,restore:1,program:1,'a11y-end':1};
 function saygiReaderScrollBody(){ try{ return document.querySelector('.sg-person-ov-card [data-scroll]')||document.getElementById('sey-ov-body')||null; }catch(e){ return null; } }
 function saygiReaderAnchorEl(anchorId){ try{ return anchorId?document.getElementById(anchorId):null; }catch(e){ return null; } }
 // Aa değişiminde ilk görünür paragraf ankrajı korunur: kaydırma konumu orana
@@ -3675,7 +3675,7 @@ App.saygiReader=function(action,value){
     return;
   }
   if(act==='scroll'){ var capturedScroll=saygiReaderCaptureAnchor(); if(capturedScroll){saygiRememberPosition(capturedScroll.anchorId,capturedScroll.ratio);save(false);} return; }
-  if(act==='restore'){ saygiReaderRestoreSaved(); return; } if(act==='bookmark'){ var bm=window.SeymaSaygi.saygiToggleBookmark(saygiModalPerson(),ui.saygiArticle); if(!bm)return; save(false); render(); focusModalDialog('sey-ov-card'); toast(bm.tombstone?'Yer imi kaldırıldı.':'Yer imi kaydedildi.'); return; }
+  if(act==='restore'){ saygiReaderRestoreSaved(); return; } if(act==='bookmark'){ var bm=window.SeymaSaygi.saygiToggleBookmark(saygiModalPerson(),ui.saygiArticle); if(!bm)return; save(false); render(); focusModalDialog('sey-ov-card'); toast(bm.tombstone?'Yer imi kaldırıldı.':'Yer imi kaydedildi.'); return; } if(act==='program'){ var pa=String(value||''); if(pa==='archive'){ui.saygiProgramArchive=!ui.saygiProgramArchive;render();return;} var before=window.SeymaSaygi.iip21ProgramState(),beforeRev=before&&Number(before.revision)||0,beforeStatus=before&&before.status,after=window.SeymaSaygi.iip21ProgramApply(pa); if(!after)return; if(!before||Number(after.revision)!==beforeRev||after.status!==beforeStatus){save(false);render();toast(pa==='start'?'Yolculuk başladı.':pa.indexOf('day')===0?'Durak tamamlandı.':pa==='finish'?'Yolculuk tamamlandı.':pa==='pause'?'Yolculuk durduruldu.':pa==='resume'?'Yolculuk devam ediyor.':'');} return; }
   if(act==='a11y-end'){
     var body2=saygiReaderScrollBody();
     if(body2) body2.scrollTop=body2.scrollHeight;

@@ -30,7 +30,7 @@ Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
 | [IIP-18 — İkinci paket kabulü](../cards/IIP-18.md) | B | done | codex | IIP-11, IIP-12, IIP-13, IIP-14, IIP-15, IIP-17 | — |
 | [IIP-19 — Kalıcı genişletme sözleşmesi](../cards/IIP-19.md) | C | done | codex | IIP-18 | — |
 | [IIP-20 — Yer imleri ve okuyucu tercihi](../cards/IIP-20.md) | C | done | codex | IIP-19 | — |
-| [IIP-21 — Kısa içerik yolculukları](../cards/IIP-21.md) | C | planned | — | IIP-17, IIP-19, IIP-20 | — |
+| [IIP-21 — Kısa içerik yolculukları](../cards/IIP-21.md) | C | in_progress | codex | IIP-17, IIP-19, IIP-20 | — |
 | [IIP-22 — Kontrollü offline paket](../cards/IIP-22.md) | C | planned | — | IIP-19 | — |
 | [IIP-23 — Tam zincir ve cihaz hazırlığı](../cards/IIP-23.md) | C | planned | — | IIP-20, IIP-21, IIP-22 | — |
 | [IIP-24 — Teslim ve yayın adayı](../cards/IIP-24.md) | C | planned | — | IIP-23 | — |

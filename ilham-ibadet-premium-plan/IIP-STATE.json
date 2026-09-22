@@ -29,9 +29,10 @@
       "IIP-17",
       "IIP-18",
       "IIP-19",
-      "IIP-20"
+      "IIP-20",
+      "IIP-21"
     ],
-    "source": "2026-09-22 user message: review tamam; IIP-19 kararı onaylandı, IIP-20'ye devam edilebilir ve her prompt sonunda canlıya alınır."
+    "source": "2026-09-22 user message: go next be perfect; IIP-21'e geçiş ve her prompt sonunda canlıya alma çalışma biçimi onaylandı."
   },
   "releaseApproval": {
     "status": "approved",
@@ -1172,7 +1173,7 @@
       "id": "IIP-21",
       "title": "Kısa içerik yolculukları",
       "package": "C",
-      "status": "planned",
+      "status": "in_progress",
       "dependsOn": [
         "IIP-17",
         "IIP-19",
@@ -1180,8 +1181,13 @@
       ],
       "path": "cards/IIP-21.md",
       "role": "data",
-      "owner": null,
-      "locks": [],
+      "owner": "codex",
+      "locks": [
+        "app/core/state.js",
+        "app/core/saygi.js",
+        "app.js",
+        "tests/app/test_iip_21.js"
+      ],
       "allowedProductionFiles": [
         "app/core/state.js",
         "app/core/saygi.js",
@@ -1202,7 +1208,7 @@
       ],
       "evidence": [],
       "blockedReason": null,
-      "startedAt": null,
+      "startedAt": "2026-09-22T10:00:00Z",
       "completedAt": null,
       "verifiedHead": null,
       "handoff": null,
@@ -1221,9 +1227,14 @@
         "DEC-05"
       ],
       "estimatedSize": "M",
-      "diffHash": "dd1013b75bb1e48b6575fac0151c55cb12f5376f89c0a301692fad621b929949",
-      "plannedWriteFiles": [],
-      "resourceLocks": [],
+      "diffHash": null,
+      "plannedWriteFiles": [
+        "app/core/state.js",
+        "app/core/saygi.js",
+        "app.js",
+        "tests/app/test_iip_21.js"
+      ],
+      "resourceLocks": ["data-writer"],
       "dataAffecting": true
     },
     {

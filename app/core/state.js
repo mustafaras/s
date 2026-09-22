@@ -354,6 +354,23 @@
     if(!d.programs||typeof d.programs!=='object'||Array.isArray(d.programs)) d.programs={schemaVersion:1,items:{}};
     d.programs.schemaVersion=1;
     if(!d.programs.items||typeof d.programs.items!=='object'||Array.isArray(d.programs.items)) d.programs.items={};
+    // IIP-21: program records remain additive and preserve unknown programs.
+    // The seven-day pilot owns only its namespaced record; skipped calendar
+    // days never mutate progress and completion is an explicit action.
+    var pilot=d.programs.items['iip21-seven-day-pilot'];
+    if(pilot&&typeof pilot==='object'&&!Array.isArray(pilot)){
+      pilot.id='iip21-seven-day-pilot';
+      pilot.status=pilot.status==='paused'||pilot.status==='completed'||pilot.status==='active'?''+pilot.status:'not_started';
+      pilot.contentVersion=String(pilot.contentVersion||'').slice(0,96);
+      pilot.revision=Number.isFinite(Number(pilot.revision))?Math.max(0,Math.floor(Number(pilot.revision))):0;
+      pilot.updatedAt=typeof pilot.updatedAt==='string'?pilot.updatedAt:'';
+      pilot.startedAt=typeof pilot.startedAt==='string'?pilot.startedAt:null;
+      pilot.pausedAt=typeof pilot.pausedAt==='string'?pilot.pausedAt:null;
+      pilot.completedAt=typeof pilot.completedAt==='string'?pilot.completedAt:null;
+      pilot.deviceId=String(pilot.deviceId||'').slice(0,96);
+      pilot.contentIds=Array.isArray(pilot.contentIds)?pilot.contentIds.map(function(id){return String(id||'').slice(0,96);}).filter(Boolean).slice(0,7):[];
+      if(!pilot.completedDays||typeof pilot.completedDays!=='object'||Array.isArray(pilot.completedDays)) pilot.completedDays={};
+    }
     d.version=2;
     return d;
   }

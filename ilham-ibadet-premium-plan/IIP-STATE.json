@@ -1418,5 +1418,15 @@
     "agentVerified": false,
     "note": "Ajan cihaz doğrulaması YAPAMAZ (kök kural). Bu kayıt kullanıcının beyanıdır. Hedef cihaz p50/p95 ölçülmedi.",
     "ledgerSeq": 51
+  },
+  "localVisualQa": {
+    "status": "passed",
+    "level": 2,
+    "scope": "auth kapısı, koyu tema, 127.0.0.1:9000 kontrollü protokol",
+    "date": "2026-09-22",
+    "evidence": "evidence/QA-LOCAL-VISUAL-20260922.md",
+    "agentTaken": true,
+    "notDeviceAcceptance": true,
+    "note": "Masaüstü tarayıcı ölçümü cihaz kabulünün YERİNE GEÇMEZ (kök kural). Cihaz kabulü ayrı: deviceAttestation (kullanıcı beyanı). Auth kapısında duruldu; token/parola alanı okunmadı/doldurulmadı."
   }
 }

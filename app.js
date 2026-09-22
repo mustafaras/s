@@ -4869,7 +4869,7 @@ function syncFailureText(){
   if(code==='unauthorized'||code==='forbidden'||code==='permission') return 'Bağlantı izni geçersiz · Ayarlar\'dan repo bağlantını yenile.';
   if(code==='not_found') return 'Repo veya dosya bulunamadı · Ayarlar\'daki repo adını kontrol et.';
   if(code==='rate_limited') return 'Sunucu sınırı · birkaç dakika sonra kendiliğinden yeniden denenecek.';
-  if(code==='offline'||code==='network') return 'Bağlantı yok · çevrimiçi olunca kendiliğinden gönderilecek.';
+  if(code==='offline'||code==='network'||code==='timeout') return 'Bağlantı yok veya çok yavaş · çevrimiçi olunca kendiliğinden gönderilecek.';
   if(code==='receipt_failed') return 'Veri gitti ama uzak kabul makbuzu alınamadı · tekrar dene.';
   return 'Eşitlenemedi · verin cihazında güvende, birazdan tekrar dene.';
 }
@@ -4885,7 +4885,7 @@ App.saveNow=function(){
     ui.saveState='saving'; updateHeaderSave();
     try{
       var pending=window.SeySync.pushNow();
-      if(pending&&typeof pending.catch==='function') pending.catch(function(){ ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } toast(syncFailureText(),3800); });
+      if(pending&&typeof pending.then==='function') pending.then(function(rc){ if(rc) return; ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } toast(syncFailureText(),3800); },function(){ ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } toast(syncFailureText(),3800); });
     }catch(e){ ui.saveActionPending=false; ui.saveState='error'; updateHeaderSave(); toast(syncFailureText(),3800); }
     toast('Panel ile eşitleniyor…');
   } else {

@@ -63,8 +63,8 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/messaging.js?v=20260911a',
   './app/core/render.js?v=20260915f',
   './app/core/appSurface.js?v=20260921c',
-  './app.js?v=20260922a',
-  './sync.js?v=20260922a'
+  './app.js?v=20260922b',
+  './sync.js?v=20260922b'
 ]);
 
 function swManifestDescriptor() {

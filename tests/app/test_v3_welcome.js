@@ -538,8 +538,8 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // styles.css'e dokunulmadı (paylaşılan yüzey). app.js/appSurface.js sürümleri
 // B2 (DEVIR-PROMPTU §8) düzeltmesiyle 2026-09-15'te bump edildi: "4.500 adım"
 // metinleri gerçek adım hedefine (stepsGoal → 9.000) çekildi.
-ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260922a)',
-  /app\.js\?v=20260922a/.test(indexSource));
+ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260922b)',
+  /app\.js\?v=20260922b/.test(indexSource));
 /* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
    gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',

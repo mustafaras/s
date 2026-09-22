@@ -16,9 +16,9 @@ var PROJECTION_PATH='data/observer-snapshot.json';
 var timer=null, lastPayload=null;
 var state={status:'idle', last:null, error:null};
 
-var SYNC_STATUS_TEXT={remote_unreadable:'Uzak kayıt okunamadı · tekrar denenecek',idle:'Bağlı değil',local_saved:'Yerel kayıt bekliyor',queued:'Gönderilmek üzere bekliyor',saving:'Kaydediliyor…',retrying:'Yeniden deneniyor…',accepted:'Uzak kayda alındı',error:'Senkron hatası',offline:'Çevrimdışı',permission:'Yetki gerekli',unauthorized:'Yetki gerekli',forbidden:'Yetki gerekli',not_found:'Repo veya dosya bulunamadı',conflict:'Çakışma bekliyor',anti_clobber:'Veri kaybını önlemek için durduruldu',rate_limited:'Sunucu sınırı; sonra yeniden denenecek',receipt_failed:'Uzak kabul makbuzu alınamadı'};
+var SYNC_STATUS_TEXT={remote_unreadable:'Uzak kayıt okunamadı · tekrar denenecek',idle:'Bağlı değil',local_saved:'Yerel kayıt bekliyor',queued:'Gönderilmek üzere bekliyor',saving:'Kaydediliyor…',retrying:'Yeniden deneniyor…',accepted:'Uzak kayda alındı',error:'Senkron hatası',offline:'Çevrimdışı',permission:'Yetki gerekli',unauthorized:'Yetki gerekli',forbidden:'Yetki gerekli',not_found:'Repo veya dosya bulunamadı',conflict:'Çakışma bekliyor',anti_clobber:'Veri kaybını önlemek için durduruldu',rate_limited:'Sunucu sınırı; sonra yeniden denenecek',timeout:'Zaman aşımı · bağlantı yavaş, tekrar denenecek',receipt_failed:'Uzak kabul makbuzu alınamadı'};
 var SYNC_RECEIPT_STATUSES={idle:1,local_saved:1,queued:1,saving:1,retrying:1,accepted:1,error:1,offline:1,permission:1,conflict:1,anti_clobber:1};
-var SYNC_ERROR_CODES={remote_unreadable:1,offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
+var SYNC_ERROR_CODES={remote_unreadable:1,offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,timeout:1,receipt_failed:1,unknown:1};
 function emptySyncReceipt(){ return {schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null,lastErrorDetail:null}; }
 function safeReceiptString(v,max){ return typeof v==='string'&&v&&v.length<=(max||160)&&/^[a-f0-9]{7,128}$/i.test(v)?v:null; }
 function safeReceiptIso(v){ if(typeof v!=='string'||!v||v.length>40) return null; var t=Date.parse(v); return isNaN(t)?null:new Date(t).toISOString(); }
@@ -288,6 +288,7 @@ function statusText(){
   if(state.status==='error'){
     // Yetki hatası en sık karışan durum: hangi iznin gerektiğini söyle.
     if(state.error==='forbidden'||state.error==='unauthorized'||state.error==='permission') return 'Yetki gerekli · anahtarda Contents: Read and write olmalı';
+    if(state.error==='timeout') return 'Zaman aşımı · bağlantı yavaş görünüyor, tekrar denenecek';
     if(state.error==='not_found') return 'Repo/dosya bulunamadı · repo adı ve anahtar erişimini kontrol et';
     return SYNC_STATUS_TEXT[state.error]||'Senkron hatası';
   }
@@ -300,6 +301,44 @@ function setStatus(s,err){ state.status=s; if(s==='ok'){ state.last=new Date().t
 function b64(str){ var bytes=new TextEncoder().encode(str); var bin=''; for(var i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return btoa(bin); }
 
 function ghHeaders(c){ return {'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}; }
+// ── ZAMAN AŞIMI (2026-09-22) ──────────────────────────────────────────────
+// Panelde vardı (panelFetchP → AbortController), uygulamada YOKTU. Takılan bir
+// istek (3,2 MB'lık latest.json PUT'u gibi) ne çözer ne reddeder; doPush'un
+// inFlight kilidi hiç açılmaz → "Kaydediliyor…" sonsuza kadar döner ve SONRAKİ
+// tüm push'lar da aynı promise'e bağlandığı için kilit kalıcı olur.
+// Burada IIFE içinde `fetch` gölgelenir: 10 çağrı yerinin hiçbiri değişmez,
+// hepsi sınırlı hâle gelir. `globalThis`/`window` üzerinden gerçek fetch okunur
+// (fonksiyon bildirimi hoist edildiği için ada göre okumak kendini çağırırdı).
+var GH_FETCH_TIMEOUT_MS=60000;
+function fetch(url,opts,timeoutMs){
+  // GERÇEK fetch her ÇAĞRIDA çözülür — yükleme anında yakalanmaz. Fixture'lar
+  // `global.fetch`'i testler arasında yeniden atar; yükleme anında yakalamak
+  // bayat mock'a takılı kalırdı (quran_outbox_sync / panel_p2_sync yakaladı).
+  // `impl!==fetch` kendini çağırma korumasıdır.
+  var impl=null;
+  try{
+    var g=typeof globalThis!=='undefined'?globalThis:null;
+    var w=typeof window!=='undefined'?window:null;
+    impl=(g&&typeof g.fetch==='function'&&g.fetch!==fetch&&g.fetch)||(w&&typeof w.fetch==='function'&&w.fetch!==fetch&&w.fetch)||null;
+  }catch(e){ impl=null; }
+  if(typeof impl!=='function') throw new Error('fetch kullanilamiyor');
+  var ms=typeof timeoutMs==='number'&&timeoutMs>0?timeoutMs:GH_FETCH_TIMEOUT_MS, ctrl=null;
+  try{ if(typeof AbortController==='function'){ ctrl=new AbortController(); opts=opts||{}; opts.signal=ctrl.signal; } }catch(e){ ctrl=null; }
+  // SENKRON FIRLATMA KORUNUR: bazı çağıranlar `try{ fetch() }catch(e){ cb(e) }`
+  // deseniyle yakalar (pushQuranRequest). executor içinde çağırmak fırlatmayı
+  // asenkron redde çevirip o catch'i ölü bırakırdı.
+  var pending=impl(url,opts);
+  if(!pending||typeof pending.then!=='function') return Promise.resolve(pending);
+  return new Promise(function(resolve,reject){
+    var settled=false;
+    var timer=setTimeout(function(){
+      if(settled) return; settled=true;
+      try{ if(ctrl&&typeof ctrl.abort==='function') ctrl.abort(); }catch(e){}
+      var e=new Error('istek zaman asimina ugradi (timeout)'); e.code='timeout'; e.timeout=true; reject(e);
+    },ms);
+    pending.then(function(r){ if(settled) return; settled=true; try{ clearTimeout(timer); }catch(e){} resolve(r); },function(e){ if(settled) return; settled=true; try{ clearTimeout(timer); }catch(e){} reject(e); });
+  });
+}
 function ghPut(c, path, contentStr, attempt){
   attempt=attempt||0;
   var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path;

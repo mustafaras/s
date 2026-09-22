@@ -44,8 +44,8 @@
 | REQ-038 / TC-038 | [IIP-19](../cards/IIP-19.md) | Yeni her alan için cihaz/data/panel/snapshot matrisi ve kullanıcı kararı var. | Özel not ya da tercih otomatik observer snapshot kapsamına eklenmez. | 4 |
 | REQ-039 / TC-039 | [IIP-20](../cards/IIP-20.md) | Yer imi ve okuyucu tercihleri tek şemada; silme ve geri dönüş tanımlı. | İki cihaz çatışması, eski istemci ve migration ikinci çalışması test edilir. | 6 |
 | REQ-040 / TC-040 | [IIP-20](../cards/IIP-20.md) | Konum contentId+revision+blockId ile; sürüm uyuşmazlığında güvenli başa dönüş. | Eski paragraf numarası yeni metinde rastgele konuma atlatmaz. | 6 |
-| REQ-041 / TC-041 | [IIP-21](../cards/IIP-21.md) | Bir program, durdur/devam et, atlanan günde ceza yok; tamamlama açık eylem. | Çift tamamla ve içerik sürüm değişimi ilerlemeyi çoğaltmaz/silmez. | 0 |
-| REQ-042 / TC-042 | [IIP-21](../cards/IIP-21.md) | Programın tamamlanması yeniden okumayı engellemez; içerik arşivi ulaşılır. | Program kapatılınca eski kayıt ve yer imleri korunur. | 0 |
+| REQ-041 / TC-041 | [IIP-21](../cards/IIP-21.md) | Bir program, durdur/devam et, atlanan günde ceza yok; tamamlama açık eylem. | Çift tamamla ve içerik sürüm değişimi ilerlemeyi çoğaltmaz/silmez. | 6 |
+| REQ-042 / TC-042 | [IIP-21](../cards/IIP-21.md) | Programın tamamlanması yeniden okumayı engellemez; içerik arşivi ulaşılır. | Program kapatılınca eski kayıt ve yer imleri korunur. | 6 |
 | REQ-043 / TC-043 | [IIP-22](../cards/IIP-22.md) | Yalnız onaylı genel içerik; boyut/sürüm/kota/kaldırma ve kurulum durumu açık. | Tokenlı cevap veya kişisel JSON cache manifestine giremez. | 0 |
 | REQ-044 / TC-044 | [IIP-22](../cards/IIP-22.md) | Aktif sayaç/not sırasında yeni SW sürümü zorla reload yapmaz. | Kısmi paket, kota hatası ve eski manifestten dönüş kullanımı kilitlemez. | 0 |
 | REQ-045 / TC-045 | [IIP-23](../cards/IIP-23.md) | App/current-panel/Panel-v2, state/sync ve görsel kanıt ayrı raporlu. | Önemli bir fonksiyonun yalnız markup varlığıyla geçtiği kabul edilmez. | 0 |

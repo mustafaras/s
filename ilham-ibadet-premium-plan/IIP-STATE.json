@@ -45,7 +45,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 20,
+  "completedCards": 21,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -1173,7 +1173,7 @@
       "id": "IIP-21",
       "title": "Kısa içerik yolculukları",
       "package": "C",
-      "status": "in_progress",
+      "status": "done",
       "dependsOn": [
         "IIP-17",
         "IIP-19",
@@ -1182,12 +1182,7 @@
       "path": "cards/IIP-21.md",
       "role": "data",
       "owner": "codex",
-      "locks": [
-        "app/core/state.js",
-        "app/core/saygi.js",
-        "app.js",
-        "tests/app/test_iip_21.js"
-      ],
+      "locks": [],
       "allowedProductionFiles": [
         "app/core/state.js",
         "app/core/saygi.js",
@@ -1206,12 +1201,19 @@
         "visual",
         "data"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-21/scope.json",
+        "evidence/IIP-21/requirements.json",
+        "evidence/IIP-21/review.json",
+        "evidence/IIP-21/source.json",
+        "evidence/IIP-21/visual.json",
+        "evidence/IIP-21/data.json"
+      ],
       "blockedReason": null,
       "startedAt": "2026-09-22T10:00:00Z",
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "completedAt": "2026-09-22T10:30:00Z",
+      "verifiedHead": "de59f03fd117124de088e987b1274d304efcd547",
+      "handoff": "evidence/IIP-21/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_faz10_sync.js",
@@ -1227,14 +1229,9 @@
         "DEC-05"
       ],
       "estimatedSize": "M",
-      "diffHash": null,
-      "plannedWriteFiles": [
-        "app/core/state.js",
-        "app/core/saygi.js",
-        "app.js",
-        "tests/app/test_iip_21.js"
-      ],
-      "resourceLocks": ["data-writer"],
+      "diffHash": "7c4adb6d252fea115ca247c58f96ccdc25c0aa1c814b9d6d5ec9828b97390540",
+      "plannedWriteFiles": [],
+      "resourceLocks": [],
       "dataAffecting": true
     },
     {

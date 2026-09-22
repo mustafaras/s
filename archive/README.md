@@ -22,6 +22,23 @@ işlerin kısa, agent-okunabilir özetlerini tutar.
   (`tests/app/test_modularization_boundary.js` içeriğini pinler). 2026-09-16'da
   kökten taşındı; klasör içi göreli bağlantılar tarihsel olarak kök varsayar.
 
+## Kapanmış ama TAŞINMAMIŞ program: IIP
+
+- **İlham & İbadet Premium (IIP)** — 24 kart + P00–P17 düzeltmeleri
+  (**2026-09-22 kapandı**). Kapanış: [`docs/IIP-KAPANIS.md`](../docs/IIP-KAPANIS.md).
+  Klasör **kök altında** kalıyor: [`ilham-ibadet-premium-plan/`](../ilham-ibadet-premium-plan/README.md).
+
+  **Neden taşınmadı (2026-09-22'de simülasyonla ölçüldü):** taşıma şunları kırar —
+  16 kanıt makbuzu `commands[]` içinde `ilham-ibadet-premium-plan/tools/plan-check.mjs`
+  yolunu kaydeder (uzlaştırma aracı bunları yeniden koşar); `tests/app/test_iip_17.js`
+  IIP-17 render artifact'ini plan klasörüne yazar; plan-içi göreli bağlantılar
+  (`../docs/`, `../tests/`, `../archive/`); `tools/evidence-reconcile.mjs` ve
+  `tools/fixture-map-build.mjs` yol sabitleri. Bu program diğerlerinden farklı olarak
+  **hâlâ koşulan araçlar ve fixture'larla canlı bağlıdır** — arşive taşınan MON/MON2/FX2
+  setleri ise yalnız tarihsel belge tutar.
+  `plan-check.mjs` yine de taşımaya dayanıklı hale getirildi (repo kökü `app.js`
+  sembolünden çözülür); ileride taşınma kararı verilirse araç hazırdır.
+
 Güncel Panel-v2 başlangıç noktası
 [`PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md)
 dosyasıdır; ardından `LEDGER.md` okunur. Ayrıntılı tarihsel belgeler çalışma

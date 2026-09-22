@@ -6,7 +6,20 @@ import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const repo = path.dirname(root);
+// Repo root is found by walking up to the directory that actually contains the
+// application shell, instead of assuming this plan sits one level below it.
+// That assumption broke when the plan was archived under archive/ — the checker
+// kept working because it resolves the real root at runtime. See archive/README.md.
+const repo = (() => {
+  let dir = path.dirname(root);
+  for (let i = 0; i < 4; i++) {
+    if (fs.existsSync(path.join(dir, 'app.js'))) return dir;
+    const up = path.dirname(dir);
+    if (up === dir) break;
+    dir = up;
+  }
+  return path.dirname(root); // fall back to the historical layout
+})();
 const readJSON = name => JSON.parse(fs.readFileSync(path.join(root, name), 'utf8'));
 const exists = name => fs.existsSync(path.join(root, name));
 const safe = name => typeof name === 'string' && name.length > 0 && !path.isAbsolute(name) && !name.split(/[\\/]/).includes('..');

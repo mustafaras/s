@@ -2,15 +2,22 @@
 
 **19 Eylül 2026 · Planlama teslimatı · Üretim uygulaması 0/24.**
 
-> ### ⛔ ÖNCE BUNU OKU — 2026-09-22 denetimi
-> Program `IIP-STATE.json`'da **24/24 done** beyan ediyor, ancak bu beyan **doğrulanabilir değil**:
-> `plan-check.mjs` **exit 1**, `--self-test` **exit 1**, `.integration.py` **exit 1**,
-> `tests/app` **13 FAIL** (6 IIP + 4 appSurface + 2 header + v3), kök neden: IIP-20/21 önceki
+> ### 🏁 KAPANDI — 2026-09-22
+> **24/24 kart + 18 düzeltme promptu (P00–P17) tamamlandı. Kalan iş YOK.**
+> Kapanış belgesi: [`docs/IIP-KAPANIS.md`](../docs/IIP-KAPANIS.md) · Durum: [`IIP-STATE.json`](IIP-STATE.json) (`nextExecutableCard: null`)
+> Ölçüm: **154 fixture PASS / 0 FAIL** · `plan-check.mjs` + `--self-test` + `.integration.py` **exit 0**
+> **Dürüstçe açık:** hedef cihaz p50/p95 sayısı yok (`user_accepted`); cihaz kabulü kullanıcı beyanı (`user_attested`, `agentVerified:false`).
+> Bu klasör **taşınmadı** — taşıma 16 kanıt makbuzunun komut yolunu, `test_iip_17.js`'in yazma yolunu ve plan-içi bağlantıları kırar (gerekçe + ölçüm: kapanış belgesi §7). Yeni bir IIP işi ayrı kapsam onayı ister.
+
+> ### ⛔ Denetim kaydı (tarihsel — ARTIK GEÇERSİZ)
+> Aşağıdaki bulgular **2026-09-22'de düzeltildi**; kayıt olarak duruyor.
+> Denetim o gün şunu göstermişti: `plan-check.mjs` exit 1, `--self-test` exit 1,
+> `.integration.py` exit 1, `tests/app` 13 FAIL. Kök neden: IIP-20/21 önceki
 > kartların dosyasına yazdı ama önceki fixture'ları yeniden koşmadı.
 >
-> **Sıralı düzeltme programı: [DUZELTME-PROMPTLARI.md](DUZELTME-PROMPTLARI.md)** — 18 süper odaklı
-> prompt (P00→P17), her biri tek oturum, kanıt tabanlı, commit/push yetkisi içermez.
-> Aşağıdaki planlama dosyaları geçerlidir; ancak "hazır" beyanları bu denetimle sınırlıdır.
+> **Kapatıldı:** [DUZELTME-PROMPTLARI.md](DUZELTME-PROMPTLARI.md) (P00→P17) ·
+> [evidence/DENETIM-BASELINE.md](evidence/DENETIM-BASELINE.md) (önce) ·
+> [evidence/DENETIM-SONRASI.md](evidence/DENETIM-SONRASI.md) (sonra)
 
 Hedef, İlham & İbadet'i nitelikli içerik, kesintisiz okuma, güvenilir kayıt ve sakin bir görsel kimlikle her gün dönmek isteyeceğin bir alana taşımak. “World-class / top-tier” hedefini ekran, davranış, içerik ve kanıt koşullarına çevirdik; henüz elde edilmiş kalite sonucu olarak kullanmıyoruz.
 

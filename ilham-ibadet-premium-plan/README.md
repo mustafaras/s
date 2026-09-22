@@ -2,6 +2,16 @@
 
 **19 Eylül 2026 · Planlama teslimatı · Üretim uygulaması 0/24.**
 
+> ### ⛔ ÖNCE BUNU OKU — 2026-09-22 denetimi
+> Program `IIP-STATE.json`'da **24/24 done** beyan ediyor, ancak bu beyan **doğrulanabilir değil**:
+> `plan-check.mjs` **exit 1**, `--self-test` **exit 1**, `.integration.py` **exit 1**,
+> `tests/app` **13 FAIL** (6 IIP + 4 appSurface + 2 header + v3), kök neden: IIP-20/21 önceki
+> kartların dosyasına yazdı ama önceki fixture'ları yeniden koşmadı.
+>
+> **Sıralı düzeltme programı: [DUZELTME-PROMPTLARI.md](DUZELTME-PROMPTLARI.md)** — 18 süper odaklı
+> prompt (P00→P17), her biri tek oturum, kanıt tabanlı, commit/push yetkisi içermez.
+> Aşağıdaki planlama dosyaları geçerlidir; ancak "hazır" beyanları bu denetimle sınırlıdır.
+
 Hedef, İlham & İbadet'i nitelikli içerik, kesintisiz okuma, güvenilir kayıt ve sakin bir görsel kimlikle her gün dönmek isteyeceğin bir alana taşımak. “World-class / top-tier” hedefini ekran, davranış, içerik ve kanıt koşullarına çevirdik; henüz elde edilmiş kalite sonucu olarak kullanmıyoruz.
 
 **Ajan için giriş:** [START-HERE](START-HERE.md). **Kullanıcı için ilk okuma:** [ürün vizyonu](specs/01-URUN-VIZYONU.md) → [12 ekran şartnamesi](specs/02-EKRAN-SARTNAMESI.md) → [kalite hedefleri](specs/05-KALITE-SKOR-KARTI.md).

@@ -2,7 +2,7 @@
 
 Kaynak: `IIP-STATE.json`. Elle düzenleme; `node ilham-ibadet-premium-plan/tools/plan-check.mjs --render`.
 
-Plan v2.1 · in_progress · Uygulama 22/24.
+Plan v2.1 · in_progress · Uygulama 24/24.
 
 Yetki: **approved** · Çalıştırılabilir sıradaki: **yok** · Önerilen ilk: IIP-01.
 
@@ -32,5 +32,5 @@ Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
 | [IIP-20 — Yer imleri ve okuyucu tercihi](../cards/IIP-20.md) | C | done | codex | IIP-19 | — |
 | [IIP-21 — Kısa içerik yolculukları](../cards/IIP-21.md) | C | done | codex | IIP-17, IIP-19, IIP-20 | — |
 | [IIP-22 — Kontrollü offline paket](../cards/IIP-22.md) | C | done | codex | IIP-19 | — |
-| [IIP-23 — Tam zincir ve cihaz hazırlığı](../cards/IIP-23.md) | C | planned | — | IIP-20, IIP-21, IIP-22 | — |
-| [IIP-24 — Teslim ve yayın adayı](../cards/IIP-24.md) | C | planned | — | IIP-23 | — |
+| [IIP-23 — Tam zincir ve cihaz hazırlığı](../cards/IIP-23.md) | C | done | codex | IIP-20, IIP-21, IIP-22 | — |
+| [IIP-24 — Teslim ve yayın adayı](../cards/IIP-24.md) | C | done | codex | IIP-23 | — |

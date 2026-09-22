@@ -1,5 +1,12 @@
 # Tek giriş — düşük bağlamlı oturum
 
+> ### ⛔ ÖNCE OKU — 2026-09-22 denetimi
+> 24/24 done beyanı **doğrulanabilir değil**: `plan-check.mjs` exit 1, `--self-test` exit 1,
+> `.integration.py` exit 1, `tests/app` 13 FAIL. IIP-01…24 uygulama zinciri tamamlanmış sayılmaz.
+> **Yeni bir oturum açıyorsan önce [DUZELTME-PROMPTLARI.md](DUZELTME-PROMPTLARI.md)** (P00→P17)
+> programını oku ve seçtiğin düzeltme adımını uygula. Aşağıdaki IIP akışı ancak düzeltmelerden
+> sonra yeniden anlamlıdır.
+
 **Kullanıcı:** [UYGULAMA-PROMPTLARI.md](UYGULAMA-PROMPTLARI.md) dosyasındaki IIP-01 bloğunu yeni oturuma yapıştır. Bittikçe IIP-02…24. Yarım kalırsa aynı blok. Her seferinde bütün dosyayı yapıştırma.
 
 **Ajan:** kök AGENTS ve roadmap'in ilgili teknik ilkelerini uygula; bu klasörün kısa AGENTS yönergesini ve yalnız seçili adımın brief çıktısını oku.

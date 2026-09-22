@@ -1,3 +1,4 @@
+
 # IIP-24 — Teslim ve yayın adayı
 
 **Paket:** C · **Rol:** integrator · **Boyut:** M · **Durum:** yalnız [IIP-STATE.json](../IIP-STATE.json) üzerinden okunur.

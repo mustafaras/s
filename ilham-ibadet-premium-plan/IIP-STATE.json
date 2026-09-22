@@ -31,9 +31,11 @@
       "IIP-19",
       "IIP-20",
       "IIP-21",
-      "IIP-22"
+      "IIP-22",
+      "IIP-23",
+      "IIP-24"
     ],
-    "source": "2026-09-22 user message: yalnız IIP-22 kontrollü offline paket adımını uygula; capability spike sonrası genel kabuk/içerik paketi, güvenli güncelleme ve olumsuz senaryolar onaylandı; commit/push/deploy yok."
+    "source": "2026-09-22 user message: yalnız IIP-22 kontrollü offline paket adımını uygula; capability spike sonrası genel kabuk/içerik paketi, güvenli güncelleme ve olumsuz senaryolar onaylandı; commit/push/deploy yok. 2026-09-22 user message: go next be perfect; IIP-22 sonrası yalnız sıradaki IIP-23 kartına geçiş onaylandı, cihaz kabulü ayrı tutulacak. 2026-09-22 user message: sıradakini uygula; IIP-23 tamamlandıktan sonra yalnız IIP-24 teslim/yayın adayı kartına geçiş onaylandı, commit/push/deploy yok."
   },
   "releaseApproval": {
     "status": "approved",
@@ -46,7 +48,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 22,
+  "completedCards": 24,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -1294,7 +1296,7 @@
       "id": "IIP-23",
       "title": "Tam zincir ve cihaz hazırlığı",
       "package": "C",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-20",
         "IIP-21",
@@ -1302,7 +1304,7 @@
       ],
       "path": "cards/IIP-23.md",
       "role": "reviewer",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [],
       "requirements": [
@@ -1315,12 +1317,17 @@
         "review",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-23/scope.json",
+        "evidence/IIP-23/requirements.json",
+        "evidence/IIP-23/review.json",
+        "evidence/IIP-23/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-22T13:20:00Z",
+      "completedAt": "2026-09-22T14:12:59Z",
+      "verifiedHead": "bc4372fb02d42f89521740569195f0133dc5ee2a",
+      "handoff": "evidence/IIP-23/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_prayer_boundary.js",
@@ -1337,7 +1344,7 @@
       ],
       "decisionIds": [],
       "estimatedSize": "L",
-      "diffHash": null,
+      "diffHash": "fc819b6069b1970132875a85f570b969511cb011493db647d8b3785e59dce1fa",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false
@@ -1346,13 +1353,13 @@
       "id": "IIP-24",
       "title": "Teslim ve yayın adayı",
       "package": "C",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-23"
       ],
       "path": "cards/IIP-24.md",
       "role": "integrator",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [],
       "requirements": [
@@ -1364,12 +1371,16 @@
         "requirements",
         "review"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-24/scope.json",
+        "evidence/IIP-24/requirements.json",
+        "evidence/IIP-24/review.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-22T14:20:00Z",
+      "completedAt": "2026-09-22T14:35:00Z",
+      "verifiedHead": "bc4372fb02d42f89521740569195f0133dc5ee2a",
+      "handoff": "evidence/IIP-24/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_prayer_boundary.js",
@@ -1386,7 +1397,7 @@
       ],
       "decisionIds": [],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "16942ad4721bd025d6ba69155d0bb173e87a1fe05007af3a4ab4b01cacb8816e",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

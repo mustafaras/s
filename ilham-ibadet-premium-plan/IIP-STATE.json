@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "programId": "IIP",
   "planVersion": "2.1",
-  "updatedAt": "2026-09-21",
+  "updatedAt": "2026-09-22",
   "status": "in_progress",
   "planStatus": "in_progress",
   "baselineHead": "e794e7bcc637b2431dcfae29f645ef1b02a2b51c",
@@ -26,7 +26,8 @@
       "IIP-14",
       "IIP-15",
       "IIP-16",
-      "IIP-17"
+      "IIP-17",
+      "IIP-18"
     ],
     "source": "2026-09-21 user messages: IIP-15 — Ritim raporu doğruluğu; IIP-16 — Editoryal pilot üretimi ve açık inceleme/onay teyidi; IIP-17 — '17 ye geçebilirsin'. Her kart yalnız kendi kapsamındadır; commit/push/deploy yetkisi değildir."
   },
@@ -41,7 +42,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 16,
+  "completedCards": 18,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -932,7 +933,7 @@
       "id": "IIP-17",
       "title": "Kaynaklı seçki ve dua yüzeyi",
       "package": "B",
-      "status": "in_review",
+      "status": "done",
       "dependsOn": [
         "IIP-12",
         "IIP-16"
@@ -940,13 +941,7 @@
       "path": "cards/IIP-17.md",
       "role": "frontend",
       "owner": "codex",
-      "locks": [
-        "app/content/quranStrikingVersesV1.js",
-        "app/core/saygi.js",
-        "app/styles.css",
-        "index.html",
-        "tests/app/test_iip_17.js"
-      ],
+      "locks": [],
       "allowedProductionFiles": [
         "app/content/quranStrikingVersesV1.js",
         "app/core/saygi.js",
@@ -974,10 +969,10 @@
         "evidence/IIP-17/visual.json",
         "evidence/IIP-17/content.json"
       ],
-      "blockedReason": "12 pilot Latin harfli okunuş alan sahibi tarafından onaylandı ve kataloğa eklendi. Sentetik render matrisi üretildi ancak izole browser QA sağlayıcısı açılamadığı için görsel gate yeniden incelemede.",
+      "blockedReason": null,
       "startedAt": "2026-09-21T18:00:00Z",
-      "completedAt": null,
-      "verifiedHead": null,
+      "completedAt": "2026-09-22T07:00:00Z",
+      "verifiedHead": "0ecc2cb7ffc1995b365afcf405892ad12d458357",
       "handoff": "evidence/IIP-17/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js"
@@ -990,14 +985,8 @@
         "DEC-04"
       ],
       "estimatedSize": "M",
-      "diffHash": null,
-      "plannedWriteFiles": [
-        "app/content/quranStrikingVersesV1.js",
-        "app/core/saygi.js",
-        "app/styles.css",
-        "index.html",
-        "tests/app/test_iip_17.js"
-      ],
+      "diffHash": "e107420a4fbe2d2506d8155ec1ae8ea05a5ee7eb6c0aa605c338feb87a6332d0",
+      "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false
     },
@@ -1005,7 +994,7 @@
       "id": "IIP-18",
       "title": "İkinci paket kabulü",
       "package": "B",
-      "status": "planned",
+      "status": "done",
       "dependsOn": [
         "IIP-11",
         "IIP-12",
@@ -1016,7 +1005,7 @@
       ],
       "path": "cards/IIP-18.md",
       "role": "reviewer",
-      "owner": null,
+      "owner": "codex",
       "locks": [],
       "allowedProductionFiles": [],
       "requirements": [
@@ -1029,12 +1018,17 @@
         "review",
         "visual"
       ],
-      "evidence": [],
+      "evidence": [
+        "evidence/IIP-18/scope.json",
+        "evidence/IIP-18/requirements.json",
+        "evidence/IIP-18/review.json",
+        "evidence/IIP-18/visual.json"
+      ],
       "blockedReason": null,
-      "startedAt": null,
-      "completedAt": null,
-      "verifiedHead": null,
-      "handoff": null,
+      "startedAt": "2026-09-22T07:10:00Z",
+      "completedAt": "2026-09-22T07:15:00Z",
+      "verifiedHead": "0ecc2cb7ffc1995b365afcf405892ad12d458357",
+      "handoff": "evidence/IIP-18/HANDOFF.md",
       "fixtureFiles": [
         "tests/app/test_saygi_boundary.js",
         "tests/app/test_prayer_boundary.js",
@@ -1051,7 +1045,7 @@
       ],
       "decisionIds": [],
       "estimatedSize": "M",
-      "diffHash": null,
+      "diffHash": "04944f3c7a45e0816fa72e893ee5ad2fdf06b3820e8d36c2677c29752ae7a936",
       "plannedWriteFiles": [],
       "resourceLocks": [],
       "dataAffecting": false

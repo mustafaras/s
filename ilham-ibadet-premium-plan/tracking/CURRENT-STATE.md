@@ -2,7 +2,7 @@
 
 Kaynak: `IIP-STATE.json`. Elle düzenleme; `node ilham-ibadet-premium-plan/tools/plan-check.mjs --render`.
 
-Plan v2.1 · in_progress · Uygulama 16/24.
+Plan v2.1 · in_progress · Uygulama 18/24.
 
 Yetki: **approved** · Çalıştırılabilir sıradaki: **yok** · Önerilen ilk: IIP-01.
 
@@ -26,8 +26,8 @@ Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
 | [IIP-14 — Kayıpsız tarihsel kayıt sunumu](../cards/IIP-14.md) | B | done | codex | IIP-03, IIP-13 | — |
 | [IIP-15 — Ritim raporu doğruluğu](../cards/IIP-15.md) | B | done | codex | IIP-14 | — |
 | [IIP-16 — Editoryal pilot üretimi](../cards/IIP-16.md) | B | done | codex | IIP-08 | — |
-| [IIP-17 — Kaynaklı seçki ve dua yüzeyi](../cards/IIP-17.md) | B | in_review | codex | IIP-12, IIP-16 | 12 pilot Latin harfli okunuş alan sahibi tarafından onaylandı ve kataloğa eklendi. Sentetik render matrisi üretildi ancak izole browser QA sağlayıcısı açılamadığı için görsel gate yeniden incelemede. |
-| [IIP-18 — İkinci paket kabulü](../cards/IIP-18.md) | B | planned | — | IIP-11, IIP-12, IIP-13, IIP-14, IIP-15, IIP-17 | — |
+| [IIP-17 — Kaynaklı seçki ve dua yüzeyi](../cards/IIP-17.md) | B | done | codex | IIP-12, IIP-16 | — |
+| [IIP-18 — İkinci paket kabulü](../cards/IIP-18.md) | B | done | codex | IIP-11, IIP-12, IIP-13, IIP-14, IIP-15, IIP-17 | — |
 | [IIP-19 — Kalıcı genişletme sözleşmesi](../cards/IIP-19.md) | C | planned | — | IIP-18 | — |
 | [IIP-20 — Yer imleri ve okuyucu tercihi](../cards/IIP-20.md) | C | planned | — | IIP-19 | — |
 | [IIP-21 — Kısa içerik yolculukları](../cards/IIP-21.md) | C | planned | — | IIP-17, IIP-19, IIP-20 | — |

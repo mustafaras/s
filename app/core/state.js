@@ -310,6 +310,50 @@
     // FX-P-87: yerel TTS pitch ve ses adı varsayılanları.
     if(d.settings.voicePitch==null) d.settings.voicePitch=1;
     if(d.settings.voiceVoiceName==null) d.settings.voiceVoiceName='';
+    // IIP-20: kalıcı okuyucu sözleşmesi. Üç namespace tek data kökünde
+    // sürümlüdür; migration additive/idempotent'tir ve namaz alanlarına
+    // dokunmaz. Eski istemciler bilmedikleri namespace'leri düşürmemelidir.
+    if(!d.bookmarks||typeof d.bookmarks!=='object'||Array.isArray(d.bookmarks)) d.bookmarks={schemaVersion:1,items:[]};
+    if(!Array.isArray(d.bookmarks.items)) d.bookmarks.items=[];
+    d.bookmarks.schemaVersion=1;
+    d.bookmarks.items=d.bookmarks.items.filter(function(item){return item&&typeof item==='object';}).map(function(item){
+      var id=String(item.bookmarkId||item.id||'').trim(); if(!id) return null;
+      item.bookmarkId=id.slice(0,160);
+      item.contentId=String(item.contentId||'').slice(0,200);
+      item.revision=Number.isFinite(Number(item.revision))?Math.max(0,Math.floor(Number(item.revision))):0;
+      item.blockId=String(item.blockId||'').slice(0,160);
+      item.updatedAt=typeof item.updatedAt==='string'?item.updatedAt:'';
+      item.deletedAt=typeof item.deletedAt==='string'?item.deletedAt:null;
+      item.tombstone=item.tombstone===true||!!item.deletedAt;
+      item.deviceId=String(item.deviceId||'').slice(0,96);
+      return item;
+    }).filter(Boolean);
+    if(!d.reader||typeof d.reader!=='object'||Array.isArray(d.reader)) d.reader={schemaVersion:1,preferences:{},positions:{}};
+    d.reader.schemaVersion=1;
+    if(!d.reader.preferences||typeof d.reader.preferences!=='object'||Array.isArray(d.reader.preferences)) d.reader.preferences={};
+    var rp=d.reader.preferences;
+    if(typeof rp.scaleIndex!=='number'||!isFinite(rp.scaleIndex)) rp.scaleIndex=0;
+    rp.scaleIndex=Math.max(0,Math.min(4,Math.floor(rp.scaleIndex)));
+    if(rp.direction!=='auto'&&rp.direction!=='ltr'&&rp.direction!=='rtl') rp.direction='auto';
+    if(typeof rp.revision!=='number'||!isFinite(rp.revision)) rp.revision=0;
+    rp.revision=Math.max(0,Math.floor(rp.revision));
+    if(typeof rp.updatedAt!=='string') rp.updatedAt='';
+    if(typeof rp.deviceId!=='string') rp.deviceId='';
+    if(!d.reader.positions||typeof d.reader.positions!=='object'||Array.isArray(d.reader.positions)) d.reader.positions={};
+    Object.keys(d.reader.positions).forEach(function(key){
+      var p=d.reader.positions[key];
+      if(!p||typeof p!=='object'||Array.isArray(p)){ delete d.reader.positions[key]; return; }
+      p.contentId=String(p.contentId||key).slice(0,200);
+      p.revision=String(p.revision||'').slice(0,160);
+      p.writeRevision=Number.isFinite(Number(p.writeRevision))?Math.max(0,Math.floor(Number(p.writeRevision))):0;
+      p.blockId=String(p.blockId||'').slice(0,160);
+      p.ratio=Math.max(-1,Math.min(1,Number(p.ratio)||0));
+      p.updatedAt=typeof p.updatedAt==='string'?p.updatedAt:'';
+      p.deviceId=String(p.deviceId||'').slice(0,96);
+    });
+    if(!d.programs||typeof d.programs!=='object'||Array.isArray(d.programs)) d.programs={schemaVersion:1,items:{}};
+    d.programs.schemaVersion=1;
+    if(!d.programs.items||typeof d.programs.items!=='object'||Array.isArray(d.programs.items)) d.programs.items={};
     d.version=2;
     return d;
   }
@@ -507,7 +551,7 @@
     if(!createDefaultDataDeps) return null;
     var dep=createDefaultDataDeps;
     var t=dep.todayStr(), nowIso=dep.nowIso();
-    return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:dep.emptySyncReceipt(),eventLog:dep.emptyEventLog(),days:{},notifications:[],reminders:dep.emptyReminderState(),luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:dep.emptyLibrary(),watchlist:dep.emptyWatchlist(),music:dep.emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
+    return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:dep.emptySyncReceipt(),eventLog:dep.emptyEventLog(),days:{},notifications:[],reminders:dep.emptyReminderState(),luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},bookmarks:{schemaVersion:1,items:[]},reader:{schemaVersion:1,preferences:{scaleIndex:0,direction:'auto',revision:0,updatedAt:'',deviceId:''},positions:{}},programs:{schemaVersion:1,items:{}},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:dep.emptyLibrary(),watchlist:dep.emptyWatchlist(),music:dep.emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
   }
 
   window.SeymaState = {

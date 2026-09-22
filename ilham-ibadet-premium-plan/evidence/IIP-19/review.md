@@ -15,4 +15,4 @@
 - Eski istemci bilmediği namespace'i yazarken düşürmemelidir; mevcut bilinmeyen alan koruma testi referans alınır. Uyumlu olmayan tam-replace istemci tespit edilirse yazma fail-closed olur.
 - Rollback kodu önceki sürüme dönse bile yeni alanları silmez; migration yalnız ileri ve idempotent olur. Gerekirse bilinen son veri snapshot'ı geri yüklenir; merge kanıtı olmadan otomatik restore yapılmaz.
 
-Açık karar: DEC-05 `proposed`; bağımsız kullanıcı/ürün kararı olmadan IIP-20 başlatılmaz. Açık teknik kritik bulgu yoktur, ancak karar onayı beklemektedir.
+Açık karar: DEC-05 kullanıcı tarafından onaylandı. IIP-20 yalnız tanımlanan namespace, merge/tombstone ve redaction sınırları içinde başlatıldı. Açık kritik veya yüksek teknik bulgu yoktur.

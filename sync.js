@@ -894,6 +894,48 @@ function mergeQuranJourney(localQ, remoteQ){
   }
   return out;
 }
+// IIP-20 — yer imi/okuyucu namespace'leri. Merge anahtarı kararlı kimliktir;
+// saat tek otorite değildir: önce monotonic writeRevision/revision, sonra
+// updatedAt, son olarak deviceId deterministik eşitlik bozucu olur. Tombstone
+// kayıtları canlı kayıttan ayırmadan korunur; eski istemci namespace'i
+// tanımadığı için yerel alanı silemez.
+function iip20Tie(a,b){
+  var at=String(a&&a.updatedAt||''), bt=String(b&&b.updatedAt||'');
+  if(bt!==at) return bt>at?b:a;
+  var ad=String(a&&a.deviceId||''), bd=String(b&&b.deviceId||'');
+  if(bd!==ad) return bd>ad?b:a;
+  var aj='',bj=''; try{aj=JSON.stringify(a||{});}catch(e){} try{bj=JSON.stringify(b||{});}catch(e){}
+  return bj>aj?b:a;
+}
+function iip20Winner(a,b,field){
+  if(!a) return b?JSON.parse(JSON.stringify(b)):null;
+  if(!b) return JSON.parse(JSON.stringify(a));
+  var ar=Number(a&&a[field])||0, br=Number(b&&b[field])||0;
+  if(br!==ar) return br>ar?JSON.parse(JSON.stringify(b)):JSON.parse(JSON.stringify(a));
+  return JSON.parse(JSON.stringify(iip20Tie(a,b)));
+}
+function mergeIip20Bookmarks(localB,remoteB){
+  var l=localB&&typeof localB==='object'?localB:{}, r=remoteB&&typeof remoteB==='object'?remoteB:{}, out=JSON.parse(JSON.stringify(l));
+  out.schemaVersion=Math.max(Number(l.schemaVersion)||1,Number(r.schemaVersion)||1); var map={};
+  (Array.isArray(l.items)?l.items:[]).forEach(function(x){if(x&&x.bookmarkId)map[x.bookmarkId]=x;});
+  (Array.isArray(r.items)?r.items:[]).forEach(function(x){if(!x||!x.bookmarkId)return;map[x.bookmarkId]=iip20Winner(map[x.bookmarkId],x,'revision');});
+  out.items=Object.keys(map).sort().map(function(k){return map[k];}); return out;
+}
+function mergeIip20Reader(localR,remoteR){
+  var l=localR&&typeof localR==='object'?localR:{}, r=remoteR&&typeof remoteR==='object'?remoteR:{}, out=JSON.parse(JSON.stringify(l));
+  out.schemaVersion=Math.max(Number(l.schemaVersion)||1,Number(r.schemaVersion)||1);
+  out.preferences=iip20Winner(l.preferences,r.preferences,'revision')||{scaleIndex:0,direction:'auto',revision:0,updatedAt:'',deviceId:''};
+  out.positions=out.positions&&typeof out.positions==='object'&&!Array.isArray(out.positions)?out.positions:{};
+  var ids={}; Object.keys(out.positions).forEach(function(k){ids[k]=1;}); Object.keys(r.positions&&typeof r.positions==='object'&&!Array.isArray(r.positions)?r.positions:{}).forEach(function(k){ids[k]=1;});
+  Object.keys(ids).forEach(function(k){out.positions[k]=iip20Winner(l.positions&&l.positions[k],r.positions&&r.positions[k],'writeRevision');});
+  return out;
+}
+function mergeIip20Programs(localP,remoteP){
+  var l=localP&&typeof localP==='object'?localP:{}, r=remoteP&&typeof remoteP==='object'?remoteP:{}, out=JSON.parse(JSON.stringify(l));
+  out.schemaVersion=Math.max(Number(l.schemaVersion)||1,Number(r.schemaVersion)||1); out.items=out.items&&typeof out.items==='object'&&!Array.isArray(out.items)?out.items:{};
+  var ids={}; Object.keys(out.items).forEach(function(k){ids[k]=1;}); Object.keys(r.items&&typeof r.items==='object'&&!Array.isArray(r.items)?r.items:{}).forEach(function(k){ids[k]=1;});
+  Object.keys(ids).forEach(function(k){out.items[k]=iip20Winner(l.items&&l.items[k],r.items&&r.items[k],'revision');}); return out;
+}
 function mergeData(localData, remoteData){
   if(!remoteData || typeof remoteData!=='object') return localData;
   // Merge yalnızca aynı remote projection'ı tüketir; böylece çağıran yanlışlıkla
@@ -933,6 +975,9 @@ function mergeData(localData, remoteData){
   if(remoteData.quranJourney && typeof remoteData.quranJourney==='object'){
     merged.quranJourney=mergeQuranJourney(merged.quranJourney,remoteData.quranJourney);
   }
+  if(remoteData.bookmarks && typeof remoteData.bookmarks==='object') merged.bookmarks=mergeIip20Bookmarks(merged.bookmarks,remoteData.bookmarks);
+  if(remoteData.reader && typeof remoteData.reader==='object') merged.reader=mergeIip20Reader(merged.reader,remoteData.reader);
+  if(remoteData.programs && typeof remoteData.programs==='object') merged.programs=mergeIip20Programs(merged.programs,remoteData.programs);
   if(remoteData.eventLog && typeof remoteData.eventLog==='object'){
     merged.eventLog=mergeEventLog(merged.eventLog,remoteData.eventLog);
   }
@@ -1262,6 +1307,9 @@ window.SeySync={
   // QY-16 — Kur’an Yolculuğu çoklu cihaz birleştirmesi (headless testlerden çağrılır).
   mergeQuranJourney:mergeQuranJourney,
   mergeQuranRequest:mergeQuranRequest,
+  mergeIip20Bookmarks:mergeIip20Bookmarks,
+  mergeIip20Reader:mergeIip20Reader,
+  mergeIip20Programs:mergeIip20Programs,
   // Faz 10 — offline reconnect: bağlantı geldiğinde bekleyen push'u tetikler.
   // Gerçek network çağrısı yapmaz; yalnızca schedule/pushNow'u çağırır.
   retryIfPending:function(){ if(lastPayload && cfg() && !devOrigin()){ localReceipt(lastPayload,{status:'retrying',lastErrorCode:null}); clearTimeout(timer); timer=setTimeout(function(){ doPush(lastPayload); }, 500); } }

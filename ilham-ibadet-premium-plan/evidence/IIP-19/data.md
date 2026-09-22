@@ -12,4 +12,4 @@
 
 ## Onay durumu
 
-DEC-05 öneridir. Bu belge şema uygulama izni değildir; state/migration/sync/panel koduna geçiş ancak kullanıcı kararı, rollback kanıtı ve eski istemci testiyle ayrı kartta yapılabilir.
+DEC-05 kullanıcı/alan sahibi tarafından onaylandı. State/migration/sync/panel uygulaması IIP-20'de yapılır; rollback, eski istemci ve redaction kanıtları IIP-20'nin sentetik gate'lerinde ayrıca doğrulanır.

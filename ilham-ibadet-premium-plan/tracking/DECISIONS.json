@@ -48,10 +48,10 @@
     "id": "DEC-05",
     "title": "Yeni kalıcı veri ve paylaşım şeması",
     "ownerCard": "IIP-19",
-    "status": "proposed",
-    "source": null,
-    "evidence": null,
-    "reviewer": null
+    "status": "approved",
+    "source": "2026-09-22 user message: review tamam; bu review nedeniyle devam edememe durumu kaldırıldı ve IIP-20 uygulamasına geçiş onaylandı.",
+    "evidence": "evidence/IIP-19/decision-approval.md",
+    "reviewer": "User (product/data decision owner; explicit current-turn approval)"
   },
   {
     "id": "DEC-06",

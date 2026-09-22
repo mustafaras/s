@@ -28,9 +28,10 @@
       "IIP-16",
       "IIP-17",
       "IIP-18",
-      "IIP-19"
+      "IIP-19",
+      "IIP-20"
     ],
-    "source": "2026-09-22 user message: yalnız IIP-19 adımını uygula; kalıcı genişletme sözleşmesi. Her kart yalnız kendi kapsamındadır; commit/push/deploy yetkisi değildir."
+    "source": "2026-09-22 user message: review tamam; IIP-19 kararı onaylandı, IIP-20'ye devam edilebilir ve her prompt sonunda canlıya alınır."
   },
   "releaseApproval": {
     "status": "approved",
@@ -43,7 +44,7 @@
   "recommendedFirstCard": "IIP-01",
   "nextExecutableCard": null,
   "totalCards": 24,
-  "completedCards": 18,
+  "completedCards": 19,
   "deviceAcceptance": "not_verified",
   "cards": [
     {
@@ -1055,7 +1056,7 @@
       "id": "IIP-19",
       "title": "Kalıcı genişletme sözleşmesi",
       "package": "C",
-      "status": "in_review",
+      "status": "done",
       "dependsOn": [
         "IIP-18"
       ],
@@ -1080,9 +1081,9 @@
         "evidence/IIP-19/review.json",
         "evidence/IIP-19/data.json"
       ],
-      "blockedReason": "DEC-05 yeni kalıcı veri ve paylaşım şeması olarak proposed; kullanıcı/ürün kararı ve veri gate'i onaylanmadan IIP-19 done veya IIP-20 başlangıcı verilemez.",
+      "blockedReason": null,
       "startedAt": "2026-09-22T08:10:00Z",
-      "completedAt": null,
+      "completedAt": "2026-09-22T09:20:00Z",
       "verifiedHead": "d8178b347f67bc90df88402e0afc52f80794126b",
       "handoff": "evidence/IIP-19/HANDOFF.md",
       "fixtureFiles": [
@@ -1106,14 +1107,21 @@
       "id": "IIP-20",
       "title": "Yer imleri ve okuyucu tercihi",
       "package": "C",
-      "status": "planned",
+      "status": "in_progress",
       "dependsOn": [
         "IIP-19"
       ],
       "path": "cards/IIP-20.md",
       "role": "data",
-      "owner": null,
-      "locks": [],
+      "owner": "codex",
+      "locks": [
+        "app/core/state.js",
+        "app/core/saygi.js",
+        "sync.js",
+        "panel/panelCoverageManifest.js",
+        "app.js",
+        "tests/app/test_iip_20.js"
+      ],
       "allowedProductionFiles": [
         "app/core/state.js",
         "app/core/saygi.js",
@@ -1136,7 +1144,7 @@
       ],
       "evidence": [],
       "blockedReason": null,
-      "startedAt": null,
+      "startedAt": "2026-09-22T09:20:00Z",
       "completedAt": null,
       "verifiedHead": null,
       "handoff": null,
@@ -1156,8 +1164,15 @@
       ],
       "estimatedSize": "L",
       "diffHash": null,
-      "plannedWriteFiles": [],
-      "resourceLocks": [],
+      "plannedWriteFiles": [
+        "app/core/state.js",
+        "app/core/saygi.js",
+        "sync.js",
+        "panel/panelCoverageManifest.js",
+        "app.js",
+        "tests/app/test_iip_20.js"
+      ],
+      "resourceLocks": ["data-writer"],
       "dataAffecting": true
     },
     {

@@ -2,7 +2,7 @@
 
 Kaynak: `IIP-STATE.json`. Elle düzenleme; `node ilham-ibadet-premium-plan/tools/plan-check.mjs --render`.
 
-Plan v2.1 · in_progress · Uygulama 18/24.
+Plan v2.1 · in_progress · Uygulama 19/24.
 
 Yetki: **approved** · Çalıştırılabilir sıradaki: **yok** · Önerilen ilk: IIP-01.
 
@@ -28,8 +28,8 @@ Cihaz: not_verified · Yayın: approved · Canlı veri yazımı: not_approved.
 | [IIP-16 — Editoryal pilot üretimi](../cards/IIP-16.md) | B | done | codex | IIP-08 | — |
 | [IIP-17 — Kaynaklı seçki ve dua yüzeyi](../cards/IIP-17.md) | B | done | codex | IIP-12, IIP-16 | — |
 | [IIP-18 — İkinci paket kabulü](../cards/IIP-18.md) | B | done | codex | IIP-11, IIP-12, IIP-13, IIP-14, IIP-15, IIP-17 | — |
-| [IIP-19 — Kalıcı genişletme sözleşmesi](../cards/IIP-19.md) | C | in_review | codex | IIP-18 | DEC-05 yeni kalıcı veri ve paylaşım şeması olarak proposed; kullanıcı/ürün kararı ve veri gate'i onaylanmadan IIP-19 done veya IIP-20 başlangıcı verilemez. |
-| [IIP-20 — Yer imleri ve okuyucu tercihi](../cards/IIP-20.md) | C | planned | — | IIP-19 | — |
+| [IIP-19 — Kalıcı genişletme sözleşmesi](../cards/IIP-19.md) | C | done | codex | IIP-18 | — |
+| [IIP-20 — Yer imleri ve okuyucu tercihi](../cards/IIP-20.md) | C | in_progress | codex | IIP-19 | — |
 | [IIP-21 — Kısa içerik yolculukları](../cards/IIP-21.md) | C | planned | — | IIP-17, IIP-19, IIP-20 | — |
 | [IIP-22 — Kontrollü offline paket](../cards/IIP-22.md) | C | planned | — | IIP-19 | — |
 | [IIP-23 — Tam zincir ve cihaz hazırlığı](../cards/IIP-23.md) | C | planned | — | IIP-20, IIP-21, IIP-22 | — |

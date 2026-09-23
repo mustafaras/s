@@ -314,6 +314,33 @@ function kandilBadgeFor(date){ return window.SeymaSaygi.kandilBadgeFor.apply(nul
 function spiritBarHTML(){ return window.SeymaSaygi.spiritBarHTML.apply(null,arguments); }
 function faithCornerOverlayHTML(){ return window.SeymaSaygi.faithCornerOverlayHTML.apply(null,arguments); }
 function saygiCollectionCardHTML(person){ return window.SeymaSaygi.saygiCollectionCardHTML.apply(null,arguments); }
+function saygiCollectionGridHTML(person,coll,read,total){ return window.SeymaSaygi.saygiCollectionGridHTML.apply(null,arguments); }
+function saygiFilteredResultsHTML(lens,todayId){ return window.SeymaSaygi.saygiFilteredResultsHTML.apply(null,arguments); }
+function saygiNormalize(text){ return window.SeymaSaygi.saygiNormalize.apply(null,arguments); }
+function saygiFold(str){ return window.SeymaSaygi.saygiFold.apply(null,arguments); }
+function saygiLens(){ return window.SeymaSaygi.saygiLens.apply(null,arguments); }
+function saygiFilterSummary(){ return window.SeymaSaygi.saygiFilterSummary.apply(null,arguments); }
+function saygiFilter(raw){ return window.SeymaSaygi.saygiFilter.apply(null,arguments); }
+function saygiReadFilter(raw){ return window.SeymaSaygi.saygiReadFilter.apply(null,arguments); }
+function saygiScalePercent(){ return window.SeymaSaygi.saygiScalePercent.apply(null,arguments); }
+function saygiScaleIndex(){ return window.SeymaSaygi.saygiScaleIndex.apply(null,arguments); }
+function saygiScaleLabel(){ return window.SeymaSaygi.saygiScaleLabel.apply(null,arguments); }
+function saygiScaleIsDefault(){ return window.SeymaSaygi.saygiScaleIsDefault.apply(null,arguments); }
+function saygiAnchorId(person,index){ return window.SeymaSaygi.saygiAnchorId.apply(null,arguments); }
+function saygiSections(article,person){ return window.SeymaSaygi.saygiSections.apply(null,arguments); }
+function saygiHasSections(article,person){ return window.SeymaSaygi.saygiHasSections.apply(null,arguments); }
+function saygiFirstHeadingAnchor(article,person){ return window.SeymaSaygi.saygiFirstHeadingAnchor.apply(null,arguments); }
+function saygiSectionSkipHTML(article,person,suffix){ return window.SeymaSaygi.saygiSectionSkipHTML.apply(null,arguments); }
+function saygiPosition(){ return window.SeymaSaygi.saygiPosition.apply(null,arguments); }
+function saygiHasPosition(){ return window.SeymaSaygi.saygiHasPosition.apply(null,arguments); }
+function saygiRememberPosition(anchorId,ratio){ return window.SeymaSaygi.saygiRememberPosition.apply(null,arguments); }
+function saygiClearPosition(){ return window.SeymaSaygi.saygiClearPosition.apply(null,arguments); }
+function saygiReadingDirection(article){ return window.SeymaSaygi.saygiReadingDirection.apply(null,arguments); }
+function saygiIsRtl(article){ return window.SeymaSaygi.saygiIsRtl.apply(null,arguments); }
+function saygiDirectionLabel(article){ return window.SeymaSaygi.saygiDirectionLabel.apply(null,arguments); }
+function saygiA11yAlternativeOn(){ return window.SeymaSaygi.saygiA11yAlternativeOn.apply(null,arguments); }
+function saygiA11yAltHTML(suffix,ready){ return window.SeymaSaygi.saygiA11yAltHTML.apply(null,arguments); }
+function saygiScaleToolHTML(){ return window.SeymaSaygi.saygiScaleToolHTML.apply(null,arguments); }
 function faithAnnualHeatmapHTML(){ return window.SeymaSaygi.faithAnnualHeatmapHTML.apply(null,arguments); }
 function faithRaporCardHTML(){ return window.SeymaSaygi.faithRaporCardHTML.apply(null,arguments); }
 function qiblaHubCardHTML(){ return window.SeymaSaygi.qiblaHubCardHTML.apply(null,arguments); }
@@ -426,7 +453,6 @@ if(!window.SeymaSaygi.registerSaygi({
   zikrVisible:function(){ return ZIKR_V2_VISIBLE; },
   zikrPreviewCardHTML:zikrPreviewCardHTML
 })) throw new Error('MON-23: SeymaSaygi dependency bag kurulamadı');
-
 if(!window.SeymaMotivation||typeof window.SeymaMotivation.registerMotivation!=='function') throw new Error('MON-26: SeymaMotivation registry kurulamadı');
 if(!window.SeymaMotivation.registerMotivation({
   data:function(){ return data; },
@@ -2297,8 +2323,8 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, aeonExpanded:{}, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderTargetReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
-ui.dailyPhotoOpen=true; ui.dailyPhotoDate='';
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, aeonExpanded:{}, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, saygiQuery:'', saygiKindFilter:'all', saygiReadFilter:'all', saygiGridOpen:false, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderTargetReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
+ui.saygiScaleIndex=(data&&data.reader&&data.reader.preferences)?Math.max(0,Math.min(4,Number(data.reader.preferences.scaleIndex)||0)):0; ui.saygiPosition=null; ui.dailyPhotoOpen=true; ui.dailyPhotoDate='';
 // MON-35: persisted consent keeps the gate in its existing checking state, but
 // does not initiate a permission probe or watcher during load. Verification and
 // live location resume only from an explicit user path or a foreground return.
@@ -2573,7 +2599,7 @@ function saveBanner(){
     if(data.settings&&data.settings.hideRepoBanner) return '';
     return '<div id="sey-save-banner" class="surface" onclick="App.go(\'ayarlar\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.go(\'ayarlar\');}" style="cursor:pointer;border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid color-mix(in srgb,var(--warn) 48%, var(--card-bd));box-shadow:0 8px 22px rgba(229,72,77,0.10),inset 0 1px 0 rgba(255,255,255,0.3);"><span style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--warn-ink);background:color-mix(in srgb,var(--warn) 14%, var(--icon));">'+icon('link-2',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">Repoya bağlan</div><div style="font-size:var(--f-caption1);color:var(--muted);line-height:1.35;">Verilerin kaydedilsin diye Ayarlar\'dan bir kez bağlan.</div></div>'+hidePill('repo')+'<span style="font-size:var(--f-title3);color:var(--warn-ink);font-weight:700;line-height:1;">›</span></div>';
   }
-  if(savedToday()) return '<div id="sey-save-banner" style="background:rgba(143,191,138,0.16);border:1px solid rgba(143,191,138,0.4);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:9px;"><span style="color:#3F8A4F;display:inline-flex;">'+icon('circle-check',17)+'</span><span style="font-size:var(--f-footnote);font-weight:600;color:var(--text2);">Bugün repoya kaydedildi. Harika.</span></div>';
+  if(ui.saveState==='error') return '<div id="sey-save-banner" style="background:rgba(229,72,77,0.14);border:1px solid rgba(229,72,77,0.45);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:9px;"><span style="color:var(--warn-ink);display:inline-flex;">'+icon('triangle-alert',17)+'</span><span style="font-size:var(--f-footnote);font-weight:600;color:var(--text2);">'+esc(syncFailureText())+'</span></div>'; if(savedToday()) return '<div id="sey-save-banner" style="background:rgba(143,191,138,0.16);border:1px solid rgba(143,191,138,0.4);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:9px;"><span style="color:#3F8A4F;display:inline-flex;">'+icon('circle-check',17)+'</span><span style="font-size:var(--f-footnote);font-weight:600;color:var(--text2);">Bugün repoya kaydedildi. Harika.</span></div>';
   return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="display:inline-flex;">'+icon('map-pin',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:var(--f-caption1);color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button data-fx="confirm" onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:var(--f-footnote);padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
 }
 function updateSaveBanner(){ var el=document.getElementById('sey-save-banner'); if(el){ var t=document.createElement('div'); t.innerHTML=saveBanner(); if(t.firstChild) el.replaceWith(t.firstChild); } }
@@ -3544,6 +3570,142 @@ App.profileConsentToggle=function(key){ return window.SeymaProfile.profileConsen
 App.profileConsentTogglePrivacyNote=function(){ return window.SeymaProfile.profileConsentTogglePrivacyNote.apply(null,arguments); };
 App.profileAcceptConsent=function(){ return window.SeymaProfile.profileAcceptConsent.apply(null,arguments); };
 App.refreshSaygi=function(){ var person=saygiModalPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
+// ── IIP-10 · Öncü arama ve filtre (REQ-019 / REQ-020) ──
+// Sorgu ve filtreler YALNIZ `ui` oturumluk durumunda tutulur: kalıcı depo,
+// `data`, migrate() ve sync yolu değişmez. Arama hedef bölgesi varsa tam render
+// yerine yalnız o bölge boyanır; böylece yazarken odak ve caret sabit kalır ve
+// ilgisiz her tuşta bütün uygulama yeniden render edilmez (C07). Bölge yoksa
+// güvenli tam render devreye girer.
+// Tek bir dispatcher handler kullanılır (App.saygiLens): altı ayrı handler
+// eklemek App.* yüzey sözleşmesini büyütürdü. Yeni bir arama alanı eklemek yeni
+// bir App üyesi GEREKTİRMEZ — yalnız aşağıdaki eylem listesine bir dal eklenir.
+var SAYGI_LENS_ACTIONS={query:1,key:1,clear:1,reset:1,kind:1,read:1,grid:1};
+function saygiSearchRegionHTML(lens,todayId){ return window.SeymaSaygi.saygiFilteredResultsHTML(lens,todayId); }
+function saygiPaintLens(){
+  try{
+    var region=document.getElementById('saygi-search-region');
+    if(!region) return false;
+    var lens=saygiLens(), person=saygiCurrentPerson();
+    region.innerHTML=saygiSearchRegionHTML(lens,person&&person.id);
+    var count=document.getElementById('saygi-result-count');
+    if(count){ count.textContent=window.SeymaSaygi.saygiResultCountText(lens); count.setAttribute('data-tone',lens.results.length?'ok':'empty'); }
+    var reset=document.getElementById('saygi-search-reset'); if(reset) reset.hidden=!lens.hasLens;
+    var clear=document.getElementById('saygi-search-clear'); if(clear) clear.hidden=!ui.saygiQuery;
+    var chips={ 'saygi-chip-kind-all':lens.kind==='all', 'saygi-chip-kind-Bilim':lens.kind==='Bilim', 'saygi-chip-kind-Sanat':lens.kind==='Sanat', 'saygi-chip-read-all':lens.read==='all', 'saygi-chip-read-read':lens.read==='read', 'saygi-chip-read-unread':lens.read==='unread' };
+    for(var id in chips){ if(!Object.prototype.hasOwnProperty.call(chips,id)) continue; var chip=document.getElementById(id); if(!chip) continue; if(chips[id]) chip.classList.add('on'); else chip.classList.remove('on'); chip.setAttribute('aria-pressed',chips[id]?'true':'false'); }
+    return true;
+  }catch(e){ return false; }
+}
+// `action` bilinmeyen bir değerse hiçbir şey yapılmaz: bilinmeyen bir DOM
+// niteliği oturumluk aramayı sessizce bozmaz.
+App.saygiLens=function(action,value){
+  var act=String(action||'');
+  if(!SAYGI_LENS_ACTIONS[act]) return;
+  if(act==='query') ui.saygiQuery=String(value==null?'':value).slice(0,80);
+  else if(act==='key'){
+    var e=value;
+    if(!e||!e.key) return;
+    if(e.key==='Escape'&&String(ui.saygiQuery||'').length){ if(e.preventDefault) e.preventDefault(); ui.saygiQuery=''; }
+    else if(e.key==='Enter'){ var first=saygiLens().results[0]; if(!first) return; if(e.preventDefault) e.preventDefault(); App.openSaygiCollectionPerson(first.id); return; }
+    else return;
+  }
+  else if(act==='clear') ui.saygiQuery='';
+  else if(act==='reset'){ ui.saygiQuery=''; ui.saygiKindFilter='all'; ui.saygiReadFilter='all'; }
+  else if(act==='kind') ui.saygiKindFilter=saygiFilter(value);
+  else if(act==='read') ui.saygiReadFilter=saygiReadFilter(value);
+  else if(act==='grid'){ ui.saygiGridOpen=!!value; return; }
+  if(!saygiPaintLens()) render();
+  if(act==='clear'||act==='reset'||act==='key'){
+    try{ var el=document.getElementById('saygi-search-input'); if(el){ el.value=ui.saygiQuery; if(el.focus) el.focus(); } }catch(e){}
+  }
+};
+// ── IIP-11 · Okuyucu etkileşimleri (REQ-021 / REQ-022) ──
+// Tek dispatcher: yazı büyütme, bölüme atlama, konumu hatırlama/geri dönme,
+// kapsayıcı tamamlama alternatifi ve RTL bilgisi. Tıpkı App.saygiLens gibi,
+// yeni bir okuyucu denetimi eklemek yeni bir App üyesi GEREKTİRMEZ — yalnız
+// aşağıdaki eylem listesine bir dal eklenir.
+var SAYGI_READER_ACTIONS={scale:1,reset:1,goto:1,top:1,scroll:1,restore:1,program:1,'a11y-end':1};
+function saygiReaderScrollBody(){ try{ return document.querySelector('.sg-person-ov-card [data-scroll]')||document.getElementById('sey-ov-body')||null; }catch(e){ return null; } }
+function saygiReaderAnchorEl(anchorId){ try{ return anchorId?document.getElementById(anchorId):null; }catch(e){ return null; } }
+// Aa değişiminde ilk görünür paragraf ankrajı korunur: kaydırma konumu orana
+// çevrilir, ölçek uygulandıktan sonra aynı ankraja geri dönülür.
+function saygiReaderCaptureAnchor(){
+  var body=saygiReaderScrollBody(); if(!body) return null;
+  var person=saygiModalPerson(), article=ui.saygiArticle, anchors=saygiBlockAnchors(article);
+  var top=body.scrollTop, chosen='', ratio=0;
+  for(var i=0;i<anchors.length;i++){
+    var el=saygiReaderAnchorEl(saygiAnchorId(person,i));
+    if(!el) continue;
+    if(el.offsetTop<=top+2){ chosen=saygiAnchorId(person,i); ratio=(el.offsetTop-(top))/-Math.max(1,body.clientHeight); }
+    else break;
+  }
+  if(!chosen&&anchors.length) chosen=saygiAnchorId(person,0);
+  return chosen?{anchorId:chosen,ratio:Math.max(-1,Math.min(0,ratio))}:null;
+}
+function saygiReaderRestoreAnchor(anchorId){
+  var el=saygiReaderAnchorEl(anchorId); if(!el||!el.scrollIntoView) return;
+  try{ el.scrollIntoView({block:'start',behavior:'auto'}); }catch(e){ try{ el.scrollIntoView(); }catch(e2){} }
+}
+function saygiReaderRestoreSaved(){ var p=saygiPosition(),ref=window.SeymaSaygi.saygiContentRef(saygiModalPerson(),ui.saygiArticle); if(!p||!p.anchorId||!ref||String(p.contentId||'')!==String(ref.contentId||'')||String(p.revision||'')!==String(ref.revision||''))return; setTimeout(function(){if(saygiReaderAnchorEl(p.anchorId))saygiReaderRestoreAnchor(p.anchorId);},0); } function persistSaygiPreference(scale){ if(!data)return; if(!data.reader||typeof data.reader!=='object')data.reader={schemaVersion:1,preferences:{},positions:{}}; if(!data.reader.preferences||typeof data.reader.preferences!=='object')data.reader.preferences={}; var p=data.reader.preferences; p.scaleIndex=scale; p.revision=Math.max(0,Number(p.revision)||0)+1; p.updatedAt=new Date().toISOString(); p.deviceId=String(data.eventLog&&data.eventLog.sourceDeviceId||'').slice(0,96); save(false); }
+App.saygiReader=function(action,value){
+  var act=String(action||'');
+  if(!SAYGI_READER_ACTIONS[act]) return;
+  if(act==='scale'){
+    var idx=saygiScaleIndex(), next=String(value)==='down'?(idx-1):(idx+1);
+    next=Math.max(0,Math.min(4,next));
+    var captured=saygiReaderCaptureAnchor();
+    ui.saygiScaleIndex=next; persistSaygiPreference(next);
+    if(!saygiPaintReader()) render();
+    if(captured){ saygiRememberPosition(captured.anchorId,captured.ratio); saygiReaderRestoreAnchor(captured.anchorId); }
+    try{ var lbl=document.getElementById('saygi-scale-value'); if(lbl) lbl.textContent=saygiScaleLabel(); var dn=document.getElementById('saygi-scale-down'), up=document.getElementById('saygi-scale-up'); if(dn) dn.disabled=(next<=0); if(up) up.disabled=(next>=4); }catch(e){}
+    return;
+  }
+  if(act==='reset'){
+    ui.saygiScaleIndex=0; saygiClearPosition(); persistSaygiPreference(0);
+    if(!saygiPaintReader()) render();
+    try{ var lbl2=document.getElementById('saygi-scale-value'); if(lbl2) lbl2.textContent=saygiScaleLabel(); }catch(e){}
+    return;
+  }
+  if(act==='goto'){
+    var id=String(value||''); if(!id) return; saygiReaderRestoreAnchor(id);
+    return;
+  }
+  if(act==='top'){
+    var body=saygiReaderScrollBody(); if(body) body.scrollTop=0;
+    return;
+  }
+  if(act==='scroll'){ var capturedScroll=saygiReaderCaptureAnchor(); if(capturedScroll){saygiRememberPosition(capturedScroll.anchorId,capturedScroll.ratio);save(false);} return; }
+  if(act==='restore'){ saygiReaderRestoreSaved(); return; } if(act==='bookmark'){ var bm=window.SeymaSaygi.saygiToggleBookmark(saygiModalPerson(),ui.saygiArticle); if(!bm)return; save(false); render(); focusModalDialog('sey-ov-card'); toast(bm.tombstone?'Yer imi kaldırıldı.':'Yer imi kaydedildi.'); return; } if(act==='program'){ var pa=String(value||''); if(pa==='archive'){ui.saygiProgramArchive=!ui.saygiProgramArchive;render();return;} var before=window.SeymaSaygi.iip21ProgramState(),beforeRev=before&&Number(before.revision)||0,beforeStatus=before&&before.status,after=window.SeymaSaygi.iip21ProgramApply(pa); if(!after)return; if(!before||Number(after.revision)!==beforeRev||after.status!==beforeStatus){save(false);render();toast(pa==='start'?'Yolculuk başladı.':pa.indexOf('day')===0?'Durak tamamlandı.':pa==='finish'?'Yolculuk tamamlandı.':pa==='pause'?'Yolculuk durduruldu.':pa==='resume'?'Yolculuk devam ediyor.':'');} return; }
+  if(act==='a11y-end'){
+    var body2=saygiReaderScrollBody();
+    if(body2) body2.scrollTop=body2.scrollHeight;
+    // Bu yol KAYIT OLUŞTURMAZ; yalnız konumu sona alır ve durumu bildirir.
+    ui.saygiReadReady=true;
+    try{
+      var s=document.getElementById('saygi-a11y-status-modal')||document.getElementById('saygi-a11y-status');
+      if(s) s.textContent='Bölüm sonundasın. Kaydı istediğin zaman "Okudum" ile atabilirsin.';
+      var fab=document.getElementById('saygi-read-button-modal');
+      if(fab) saygiUnlockReadButton(fab);
+    }catch(e){}
+    return;
+  }
+};
+// Aa aracı + bölüm atlama yeniden boyanır; makale gövdesi yeniden kurulur ki
+// --saygi-scale gerçekten uygulansın.
+function saygiPaintReader(){
+  try{
+    var person=saygiModalPerson(); if(!person) return false;
+    var host=document.getElementById('saygi-reader-region'); if(!host) return false;
+    var article=ui.saygiArticle; if(!article||article.personId!==person.id) return false;
+    var view=Object.create(article); view.suffix='-modal';
+    host.innerHTML=saygiArticleBodyHTML(person,view,saygiHasRead(person),'saygi-article-modal',false);
+    return true;
+  }catch(e){ return false; }
+}
+// Açık okuma kaydına köprü. IIP-11 sırasında yanlışlıkla silinmişti:
+// saygi.js markup'ı bunu İKİ yerde çağırıyor (okunmuş içerikte "Okudum" →
+// "Ne okudum kaydını aç"), yüzey sayısı 719=719 kaldığı için hiçbir pin
+// yakalamadı — bu yüzden açıkça geri konur ve fixture ile sabitlenir.
 App.openSaygiReading=function(){ App.openReading(); };
 App.openSaygiPreview=function(){
   var person=saygiCurrentPerson(); if(!person) return;
@@ -3551,16 +3713,16 @@ App.openSaygiPreview=function(){
   ui.saygiBrowseId=person.id;
   ui.saygiPersonOpen=true;
   if(ui.saygiKey!==key||!ui.saygiArticle||ui.saygiArticle.personId!==person.id){
-    ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; ui.saygiReadReady=false; App.refreshSaygi(); focusModalDialog('sey-ov-card');
+    ui.saygiKey=key; ui.saygiPosition=null; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; ui.saygiReadReady=false; App.refreshSaygi(); focusModalDialog('sey-ov-card');
   }
-  else { render(); focusModalDialog('sey-ov-card'); }
+  else { render(); focusModalDialog('sey-ov-card'); saygiReaderRestoreSaved(); }
 };
 App.openSaygiCollectionPerson=function(id){
   var person=saygiPersonById(id); if(!person) return;
   var key=saygiDayKey(person);
   ui.saygiBrowseId=person.id; ui.saygiPersonOpen=true; ui.saygiReadReady=false;
-  if(ui.saygiKey!==key||!ui.saygiArticle){ ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; saygiLoadArticle(person,false); }
-  render(); focusModalDialog('sey-ov-card');
+  if(ui.saygiKey!==key||!ui.saygiArticle){ ui.saygiKey=key; ui.saygiPosition=null; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; saygiLoadArticle(person,false); }
+  render(); focusModalDialog('sey-ov-card'); saygiReaderRestoreSaved();
 };
 App.browseSaygiPerson=function(delta){
   var people=saygiPeople(), person=saygiModalPerson(); if(!people.length||!person) return;
@@ -4047,14 +4209,19 @@ App.setPrayerCity=function(name){
 App.fetchPrayerLocationGPS=function(){
   if(!navigator||!navigator.geolocation){ toast('Cihaz konum servisi bulunamadı'); return; }
   toast('Konum alınıyor…');
-  navigator.geolocation.getCurrentPosition(function(pos){
-    var lat=pos&&pos.coords&&pos.coords.latitude, lon=pos&&pos.coords&&pos.coords.longitude;
-    if(lat==null||lon==null){ toast('Konum alınamadı'); return; }
+  // Kapı akışıyla aynı iki düzeltme: (a) ham `err.message` (İngilizce) yerine OS
+  // düzeyi ipucunu içeren ANLAŞILIR metin, (b) zaman aşımında tek seferlik düşük
+  // hassasiyet denemesi. Öncesinde ikisi de yoktu; izin verilse de hata görünüyordu.
+  function prayerGpsFail(err){ var c=err&&Number(err.code);
+    if(c===3&&!ui.prayerGpsLowTried){ ui.prayerGpsLowTried=true; try{ navigator.geolocation.getCurrentPosition(prayerGpsOk,prayerGpsFail,{enableHighAccuracy:false,timeout:25000,maximumAge:600000}); return; }catch(e2){} }
+    toast(locationGateErrorText(c===1||c===2||c===3?c:0,c===1?'permission-denied':c===2?'position-unavailable':c===3?'timeout':'request-error'),6500); }
+  function prayerGpsOk(pos){ var lat=pos&&pos.coords&&pos.coords.latitude, lon=pos&&pos.coords&&pos.coords.longitude;
+    if(lat==null||lon==null){ toast('Konum alınamadı. Yeniden deneyebilirsin.'); return; }
     if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
-    var acc=Math.round(Number(pos.coords.accuracy)||0);
-    data.settings.prayer.location={lat:lat,lon:lon,cityName:'GPS Konum',source:'gps',accuracy:acc||null,capturedAt:new Date().toISOString()};
-    save(); render(); App.refreshPrayerTimes();
-  },function(err){ if(err&&err.code===1) toastLocationDenied(); else toast('Konum alınamadı: '+String(err&&err.message||'bilinmiyor')); },{enableHighAccuracy:true,timeout:15000,maximumAge:120000});
+    data.settings.prayer.location={lat:lat,lon:lon,cityName:'GPS Konum',source:'gps',accuracy:Math.round(Number(pos.coords.accuracy)||0)||null,capturedAt:new Date().toISOString()};
+    ui.prayerGpsLowTried=false; save(); render(); App.refreshPrayerTimes(); }
+  ui.prayerGpsLowTried=false;
+  navigator.geolocation.getCurrentPosition(prayerGpsOk,prayerGpsFail,{enableHighAccuracy:true,timeout:15000,maximumAge:120000});
 };
 App.setPrayerMethod=function(method){
   if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
@@ -4301,6 +4468,10 @@ function locationGateSilentVerify(){
     ui.locationGateError='';
     ui.locationGateRequestInFlight=false;
     locationGateResetNudge();
+    // Kapı açılınca canlı izleme de başlasın: aksi hâlde sessiz doğrulamayla
+    // açılan oturumda hareket/adım verisi bir sonraki foreground olayına kadar
+    // boş kalırdı. (Burada moveState/startLocationWatch app.js kapsamındadır.)
+    try{ if(moveState.watchId==null) startLocationWatch(false); }catch(e){}
     render();
   }
   // Kapı YALNIZ gerçek bir doğrulamayla açılır; "kayıtlı koordinat var" tek
@@ -4698,7 +4869,7 @@ function syncFailureText(){
   if(code==='unauthorized'||code==='forbidden'||code==='permission') return 'Bağlantı izni geçersiz · Ayarlar\'dan repo bağlantını yenile.';
   if(code==='not_found') return 'Repo veya dosya bulunamadı · Ayarlar\'daki repo adını kontrol et.';
   if(code==='rate_limited') return 'Sunucu sınırı · birkaç dakika sonra kendiliğinden yeniden denenecek.';
-  if(code==='offline'||code==='network') return 'Bağlantı yok · çevrimiçi olunca kendiliğinden gönderilecek.';
+  if(code==='offline'||code==='network'||code==='timeout') return 'Bağlantı yok veya çok yavaş · çevrimiçi olunca kendiliğinden gönderilecek.';
   if(code==='receipt_failed') return 'Veri gitti ama uzak kabul makbuzu alınamadı · tekrar dene.';
   return 'Eşitlenemedi · verin cihazında güvende, birazdan tekrar dene.';
 }
@@ -4714,7 +4885,7 @@ App.saveNow=function(){
     ui.saveState='saving'; updateHeaderSave();
     try{
       var pending=window.SeySync.pushNow();
-      if(pending&&typeof pending.catch==='function') pending.catch(function(){ ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } toast(syncFailureText(),3800); });
+      if(pending&&typeof pending.then==='function') pending.then(function(rc){ if(rc) return; ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } toast(syncFailureText(),3800); },function(){ ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } toast(syncFailureText(),3800); });
     }catch(e){ ui.saveActionPending=false; ui.saveState='error'; updateHeaderSave(); toast(syncFailureText(),3800); }
     toast('Panel ile eşitleniyor…');
   } else {
@@ -5924,6 +6095,19 @@ App.quranMarkWatched=function(id){ return window.SeymaQuran.quranMarkWatched.app
 function quranAskMessage(x){ return window.SeymaQuran.quranAskMessage.apply(null,arguments); }
 App.quranJourneyQuestion=function(id){ return window.SeymaQuran.quranJourneyQuestion.apply(null,arguments); };
 
+var _iipModalReturn={focusId:'',scrollTop:0};
+function iipRememberModalReturn(fallbackId){
+  var active=null, sc=null;
+  try{ active=document.activeElement; sc=document.querySelector('[data-scroll]'); }catch(e){}
+  _iipModalReturn.focusId=String(active&&active.id||fallbackId||'');
+  _iipModalReturn.scrollTop=sc?Number(sc.scrollTop||0):0;
+}
+function iipRestoreModalReturn(fallbackId){
+  var focusId=_iipModalReturn.focusId||fallbackId||'', scrollTop=_iipModalReturn.scrollTop||0, sc=null, trigger=null;
+  _iipModalReturn={focusId:'',scrollTop:0};
+  try{ sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=scrollTop; trigger=focusId?document.getElementById(focusId):null; if(!trigger&&fallbackId) trigger=document.getElementById(fallbackId); if(trigger&&trigger.focus) trigger.focus(); }catch(e){}
+}
+
 // ── QY-11: uzak teslim/yanıt dosyalarını yerel duruma güvenle uygula ──
 // Girdi ZATEN QuranTransportV1 ile ayrıştırılmış/doğrulanmış yapılardır; bu
 // fonksiyon ham JSON/ağ hiç görmez. Her geçiş quranReduce() üzerinden gider,
@@ -5947,6 +6131,8 @@ App.refreshQuranUpdates=function(silent,force){ return window.SeymaQuran.refresh
 
 // ── Overlay ve kütüphane etkileşimleri ──
 App.openQuranJourney=function(){
+  if(ui.quranJourneyOpen) return;
+  iipRememberModalReturn('quran-journey-card');
   ui.quranJourneyOpen=true;
   ui.quranJourneyView='library';
   ui.quranDetailId='';
@@ -5961,6 +6147,7 @@ App.openQuranJourney=function(){
   App.refreshQuranUpdates(true,true);
 };
 App.closeQuranJourney=function(){
+  if(!ui.quranJourneyOpen) return;
   var body=function(){
     ui.quranJourneyOpen=false;
     ui.quranJourneyView='library';
@@ -5970,8 +6157,7 @@ App.closeQuranJourney=function(){
     ui.quranFiltersOpen=false;
     quranUnlockBodyScroll();
     render();
-    // Odak, açılışı tetikleyen hub kartına döner (kararlı id ile yeniden sorgulanır).
-    try{ var trigger=document.getElementById('quran-journey-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){}
+    iipRestoreModalReturn('quran-journey-card');
   };
   if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('quran-screen','quran-overlay',body); else body();
 };
@@ -6044,7 +6230,7 @@ App.onQuranKeydown=function(e){
 var _quranBodyLocked=false,_quranBodyPrevOverflow='';
 function quranLockBodyScroll(){ return window.SeymaQuran.quranLockBodyScroll.apply(null,arguments); }
 function quranUnlockBodyScroll(){ return window.SeymaQuran.quranUnlockBodyScroll.apply(null,arguments); }
-App.openQibla=function(){ ui.qiblaOpen=true; ui.qiblaSensorError=''; render(); focusModalDialog('qibla-dialog'); };
+App.openQibla=function(){ if(ui.qiblaOpen) return; iipRememberModalReturn('qibla-card'); ui.qiblaOpen=true; ui.qiblaSensorError=''; render(); focusModalDialog('qibla-dialog'); };
 var _qiblaOrientationHandler=null, _qiblaLastPaint=0, _qiblaSmoothHeading=null, _qiblaAbsoluteSeen=false;
 function qiblaSmoothAngle(previous,next,weight){
   if(previous==null) return next;
@@ -6093,9 +6279,10 @@ App.enableQiblaCompass=function(){
   }catch(e){ ui.qiblaSensorError='Bu cihaz canlı pusulayı desteklemiyor.'; qiblaPaintLive(); toast(ui.qiblaSensorError); }
 };
 App.closeQibla=function(){
+  if(!ui.qiblaOpen) return;
   var body=function(){
     if(_qiblaOrientationHandler){ try{ window.removeEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.removeEventListener('deviceorientation',_qiblaOrientationHandler,true); }catch(e){} _qiblaOrientationHandler=null; }
-    _qiblaSmoothHeading=null; _qiblaAbsoluteSeen=false; ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; render();
+    _qiblaSmoothHeading=null; _qiblaAbsoluteSeen=false; ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; render(); iipRestoreModalReturn('qibla-card');
   };
   if(window.SeyFx&&typeof window.SeyFx.sheetClose==='function') window.SeyFx.sheetClose('qibla-dialog','qibla-overlay',body); else body();
 };
@@ -6394,6 +6581,8 @@ function toastLocationDenied(){
     toast('Konum izni verilmedi · tarayıcı site ayarlarından izin ver',4000);
   }
 }
+// Geçici watch hatası verilmiş izni bozmaz; yalnız PERMISSION_DENIED kapıyı kapatır.
+function locationWatchFailure(code,reason){ if(code===1){ locationGateFailure(1,'permission-denied'); return; } if(data&&data.settings&&data.settings.locationEnabled===true&&ui.locationGateState==='granted'){ stopLocationWatch(); ui.locationGateRequestInFlight=false; ui.locationGateState='granted'; ui.locationGateError=''; return; } locationGateFailure(code===2||code===3?code:0,reason||'watch-error'); }
 function startLocationWatch(announce){
   if(!navigator.geolocation){ locationGateFailure(0,'unsupported'); return; }
   if(moveState.watchId!=null) return;
@@ -6406,7 +6595,7 @@ function startLocationWatch(announce){
     },
     function(err){
       var code=err&&Number(err.code);
-      locationGateFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'watch-error');
+      locationWatchFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'watch-error');
     },
     {enableHighAccuracy:true,timeout:20000,maximumAge:1000}
   );
@@ -7590,6 +7779,7 @@ window.addEventListener('focus',function(){ return SEYMA_APP_SURFACE.onWindowFoc
 window.addEventListener('pageshow',function(){ return SEYMA_APP_SURFACE.onWindowPageshow.apply(null,arguments); }); // bfcache'ten geri dönüşte
 window.addEventListener('online',function(){ return SEYMA_APP_SURFACE.onWindowOnline.apply(null,arguments); });   // bağlantı gelince bounded recovery kontrolü
 window.addEventListener('offline',function(){ return SEYMA_APP_SURFACE.onWindowOffline.apply(null,arguments); });
+window.addEventListener('popstate',function(){ if(ui.quranJourneyOpen){ App.closeQuranJourney(); return; } if(ui.qiblaOpen) App.closeQibla(); });
 
 // MON-54: initial render, reminder boot checkpoint, deferred callbacks and
 // splash late-boot guard are delegated only after every App assignment and

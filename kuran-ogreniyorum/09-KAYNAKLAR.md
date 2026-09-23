@@ -50,7 +50,7 @@ Erişim tarihi 20 Eylül 2026. "Kullanım" sütunu bu plandaki rolünü söyler.
 ## Repo içi
 
 `CLAUDE.md` (veri güvenliği, MON-25 dört liste, fx2 pin tuzağı),
-`ilham-ibadet-premium-plan/01-MEVCUT-DURUM.md` ve `03-TASARIM-SISTEMI.md`
+`archive/ilham-ibadet-premium-plan/01-MEVCUT-DURUM.md` ve `03-TASARIM-SISTEMI.md`
 (hub durumu, Arapça tipografi ölçüleri), `app/core/quran.js` (registry
 kalıbı), `app/content/quranStrikingVersesV1.js` (insan doğrulama notu),
 `app/core/state.js` (`MIGRATE_DEPENDENCIES`), `panel/panelCoverageManifest.js`

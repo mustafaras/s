@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IIP-09 · Hedef bilgi mimarisi · sentetik render</title>
+  <style>
+    :root{color-scheme:light;--bg:#f7f3ed;--card:#fffdf9;--ink:#28231f;--muted:#736960;--line:#ded4c8;--gold:#886728;--faith:#4f6b67;--soft:#eee6dc;--ok:#266c4c}
+    [data-theme=dark]{color-scheme:dark;--bg:#1c1917;--card:#28221f;--ink:#f5eee6;--muted:#c0b3a8;--line:#51453d;--gold:#e0b568;--faith:#9ec4bc;--soft:#382e28;--ok:#87d6ad}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{width:min(calc(100% - 24px),1100px);margin:auto;padding:28px 0 60px}header{display:grid;gap:8px;margin-bottom:20px}h1,h2,h3,p{margin:0}h1{font-size:clamp(1.7rem,4vw,2.8rem);line-height:1.08;letter-spacing:-.04em}.eyebrow{color:var(--gold);font-size:.75rem;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.muted{color:var(--muted)}.pass{color:var(--ok);font-weight:800}
+    .nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:5px;border:1px solid var(--line);border-radius:17px;background:var(--card)}.nav span{min-height:48px;display:grid;place-items:center;border-radius:12px;color:var(--muted);font-size:.82rem;font-weight:800;text-align:center}.nav .active{background:var(--faith);color:#fff}.rail,.surface{display:grid;gap:10px;margin-top:12px}.rail{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--card);box-shadow:0 10px 28px #6143210d}.card strong{display:block}.card small{display:block;margin-top:4px;color:var(--muted)}.route{border-left:4px solid var(--gold)}.route b{color:var(--gold)}.matrix{width:100%;margin-top:18px;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--card)}th,td{padding:11px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;background:var(--soft)}tr:last-child td{border-bottom:0}.tag{display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;border-radius:8px;background:var(--soft);font-size:.78rem}.foot{margin-top:20px;padding-top:15px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+    @media(max-width:520px){main{padding-top:18px}.nav span{font-size:.72rem;overflow-wrap:anywhere}.rail{grid-template-columns:1fr}th,td{padding:9px 8px;font-size:.9rem}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main>
+    <header><span class="eyebrow">IIP-09 · sentetik render</span><h1>Hedef bilgi mimarisi</h1><p class="muted">Eski handler kimliklerini koruyan beş bölüm ve sekmeye ait giriş yüzeyleri.</p><span class="pass">REQ-017 / REQ-018 davranış fixture’ı PASS · DEC-02 approved</span></header>
+    <nav class="nav" aria-label="İlham ve İbadet bölümleri"><span class="active">☀<br>Bugün</span><span>✦<br>İlham</span><span>☾<br>İbadet</span><span>✧<br>Zikir</span><span>▦<br>Ritim</span></nav>
+    <section class="rail" aria-label="Sekmeye ait girişler"><article class="card route"><b>İbadet · kıble aracı</b><strong>Gerçek kuzeyden hedef doğrultu</strong><small>Yalnız İbadet gövdesinde; hazır / sensör bekliyor / hata / dönüş.</small></article><article class="card route"><b>Bugün · tam Kur’an kartı</b><strong>Kur’an Yolculuğu</strong><small>Yalnız Bugün girişinde; boş / yükleniyor / hata / dönüş odağı korunur.</small></article></section>
+    <section class="surface"><article class="card"><h2>Bugün · Kaldığın yer</h2><p class="muted">Zikirmatik devam kartı ve günün ortak odak rail’i.</p></article><article class="card"><h2>İlham / İbadet / Zikir / Ritim</h2><p class="muted">Her bölüm yalnız kendi gövdesini boyar; modal close, deep-link ve focus dönüşleri handler kimlikleriyle korunur.</p></article></section>
+    <table class="matrix"><thead><tr><th>Risk</th><th>ready / boş / hata / dönüş</th><th>Genişlik</th></tr></thead><tbody><tr><td><strong>Route rail</strong></td><td><span class="tag">ready</span><span class="tag">loading</span><span class="tag">error</span><span class="tag">return</span></td><td>320 · 390 · 768 px</td></tr><tr><td><strong>Modal ve odak</strong></td><td><span class="tag">close</span><span class="tag">deep-link</span><span class="tag">scroll anchor</span></td><td>%200 metin · reduced-motion</td></tr><tr><td><strong>Tema</strong></td><td><span class="tag">light</span><span class="tag">dark</span></td><td>430 / 1280 ortak yerleşim sınırı</td></tr></tbody></table>
+    <footer class="foot">Bu dosya ağsız sentetik headless render artifact’idir; browser screenshot’ı, fiziksel cihaz, VoiceOver veya kullanıcı kabulü değildir. IIP-10 başlatılmadı.</footer>
+  </main>
+</body>
+</html>

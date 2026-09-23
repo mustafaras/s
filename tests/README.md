@@ -11,6 +11,22 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `panel/` — legacy Panel 1 / observer fixture’ları (`test_panel_*.js` ve
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
+- `app/test_iip_*.js` — **İlham & İbadet Premium (IIP)** ailesi, 16 fixture.
+  Program: [`archive/ilham-ibadet-premium-plan/`](../archive/ilham-ibadet-premium-plan/README.md);
+  durum [`IIP-STATE.json`](../archive/ilham-ibadet-premium-plan/IIP-STATE.json);
+  denetim tablosu [`evidence/DENETIM-BASELINE.md`](../archive/ilham-ibadet-premium-plan/evidence/DENETIM-BASELINE.md);
+  kapatma adımları [`DUZELTME-PROMPTLARI.md`](../archive/ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md).
+  Kapsam: `test_iip_03` (anlam denetimi, payda bastırma), `04` (hub hiyerarşi),
+  `05` (öncü okuyucu görsel sözleşmesi), `06` (ibadet/kıble birlik), `07`
+  (zikir–Kur’an geçiş), `09` (bilgi mimarisi), `10` (öncü arama/filtre), `11`
+  (okuyucu etkileşimi), `12` (günlük odak + Devam), `13` (vakit tazeliği),
+  `14` (tarihsel kayıt sunumu), `15` (ritim doğruluğu), `17` (kaynaklı seçki),
+  `20` (yer imi/okuyucu tercihi), `21` (yedi duraklı yolculuk), `22` (offline
+  paket).
+  **Kural:** `app/core/saygi.js` paylaşılan bir üretim dosyasıdır; bir kart ona
+  yazdığında o dosyaya bağlı ÖNCEKİ kartların fixture’larını da yeniden koş.
+  IIP-20/21 bunu atladığı için `test_iip_05/06/09/12/13` gate’leri sessizce
+  bozuldu ve ancak 2026-09-22 denetiminde yakalandı.
 - `app/test_v3_welcome.js` — v3.0 tanıtım/kutlama sayfasının sözleşmesi
   (287 kontrol, ağsız/sentetik): `index.html` bootstrap sırası (head + app.js’ten
   önce), **sonsuz döngü koruması** (`?v3done=1` kaçışı), kalıcılık anahtarı
@@ -112,6 +128,18 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_local_visual_qa_guard.js` — Ajanın ekran görüntüsü alabilen yerel
   QA istisnasının Guard 1, force-sync ve gerçek profil sınırlarını kaynak
   düzeyinde ağsız doğrular.
+- `app/test_deploy_surface_contract.js` — Pages yayın yüzeyi sözleşmesi
+  (2026-09-22): `.github/workflows/pages.yml`’in “Stage runtime-only site”
+  adımından **gerçek** `--exclude` bayraklarını çıkarır, aynı rsync’i geçici bir
+  dizinde **çalıştırır** ve staged ağacı denetler. İç dizinlerden biri
+  (`docs tests archive .claude tools files kuran-ogreniyorum jev-gate
+  kuran-ogreniyorum jev-gate`) sızarsa, zorunlu çalışma zamanı varlıklarından
+  biri (`index.html`, `app.js`, `app/styles.css`, `panel/…`, `v3` istisnası
+  dâhil) düşerse veya staged ağaçta bir `.md` kalırsa FAIL eder. Guard adımının
+  dizin listesi rsync dışlama listesiyle tutarsızsa da FAIL eder. Metin
+  taraması değil yürütülebilir kanıt üretir; ağsız ve salt-okurdur (repo ağacına
+  yazmaz, yalnız `os.tmpdir()`’e). Mutasyonla doğrulandı: bir `--exclude`
+  kaldırılınca sızıntı yakalanır. `node tests/app/test_deploy_surface_contract.js`.
 - `app/test_state_rebind_boundary.js` — MON-15 state Dalga 3 kapanışı: canlı
   B1 getter tazeliği, dokuz `app.js` data atama satırı, registryde sıfır
   `data=` yazımı, import/reset/location/auth late-boot ve 6079 try/finally

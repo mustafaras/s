@@ -22,6 +22,26 @@ işlerin kısa, agent-okunabilir özetlerini tutar.
   (`tests/app/test_modularization_boundary.js` içeriğini pinler). 2026-09-16'da
   kökten taşındı; klasör içi göreli bağlantılar tarihsel olarak kök varsayar.
 
+## Kapanmış ve TAŞINMIŞ program: IIP
+
+- **İlham & İbadet Premium (IIP)** — 24 kart + P00–P17 düzeltmeleri
+  (**2026-09-22 kapandı**, **2026-09-23'te bu arşive taşındı**). Kapanış:
+  [`docs/IIP-KAPANIS.md`](../docs/IIP-KAPANIS.md).
+  Klasör: [`archive/ilham-ibadet-premium-plan/`](ilham-ibadet-premium-plan/README.md).
+
+  **Taşıma nasıl mımkün oldu:** bağımlılık araç kodundaydı, kanıtta değil;
+  dört nokta arşiv-farkındalıklı hâle getirildi → `plan-check.mjs` kart dosyası
+  ve link çözümü, `tools/evidence-reconcile.mjs` yol sabiti,
+  `plan-check.integration.py` kök çözümü, `tests/app/test_iip_17.js` yazma yolu.
+  **41 makbuz komutu yeniden yazılmadı** (hash'ler komut yolunu kapsamaz).
+
+  **Doğrulama:** taşıma sonrası **6 kapı exit 0** (plan-check · --self-test ·
+  integration.py · evidence-reconcile · fixture-map · test_iip_17) ve
+  **156 fixture PASS / 0 FAIL**. Ölçüm: kapanış belgesi §9.
+
+  Önceki “taşınmaz” değerlendirmesi (2026-09-22 simülasyonu) **geçersiz**;
+  bağımlılık araç kodunda olduğu için çözülebilirdi.
+
 Güncel Panel-v2 başlangıç noktası
 [`PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md)
 dosyasıdır; ardından `LEDGER.md` okunur. Ayrıntılı tarihsel belgeler çalışma

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "iip16-editorial-pilot",
+  "version": "0.1.0-draft",
+  "status": "in_review",
+  "lifecycle": ["draft", "sourced", "rights_checked", "editorial_review", "domain_review", "approved", "published"],
+  "negativeStates": ["needs_revision", "rejected", "withdrawn"],
+  "rules": {
+    "publishedRequires": ["rightsEvidence", "editorReview", "domainReview", "reviewerDecision=approved"],
+    "stableIdentity": "id + version + type",
+    "frozenCatalog": "sessiz değişiklik yok; değişiklik yeni version ve düzeltme kaydı ister",
+    "withdrawal": "kaydı silmez; eski okumada güncellendi/kaldırıldı durumu gösterilir"
+  },
+  "pioneers": [
+    {"id":"ada-lovelace","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · matematik","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"albert-einstein","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · fizik","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"alan-turing","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · bilgisayar","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"aziz-sancar","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · biyokimya","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"barbara-mcclintock","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · genetik","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"cahit-arf","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · matematik","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"carl-sagan","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · astronomi","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"dorothy-hodgkin","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · kimya","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"aristotle","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"felsefe · düşünce","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"archimedes","version":"1.0.0-draft","type":"pioneer","language":"tr","source":"existing:SaygiPeople","context":"bilim · matematik","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"}
+  ],
+  "duas": [
+    "bakara-255","ihlas-1","fatiha-5","fatiha-6-7","bakara-286","bakara-153","bakara-186","bakara-152","kehf-10","taha-25","taha-114","yusuf-87"
+  ],
+  "duaRecords": [
+    {"id":"bakara-255","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"tevhid","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"ihlas-1","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"tevhid","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"fatiha-5","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"kulluk · dua","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"fatiha-6-7","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"hidayet","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"bakara-286","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"bağışlanma","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"bakara-153","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"sabır · namaz","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"bakara-186","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"dua · yakınlık","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"bakara-152","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"zikir · şükür","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"kehf-10","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"rahmet · doğru yol","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"taha-25","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"kolaylık","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"taha-114","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"ilim","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"},
+    {"id":"yusuf-87","version":"1.0.0-candidate","type":"dua-ayat","language":"ar-tr","source":"existing:QuranStrikingVersesV1","context":"ümit · rahmet","rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"sourced"}
+  ],
+  "themes": [
+    {"id":"sabir","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["bakara-153","al-i-imran-200"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"sukur","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["bakara-152","ibrahim-7"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"merhamet","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["al-i-imran-159","enbiya-107"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"emanet","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["nisa-58"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"ogrenme","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["taha-114","al-i-imran-190"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"},
+    {"id":"umut","version":"1.0.0-draft","type":"theme","sequence":["baslangic","derinlesme","dusunme"],"sourceCandidates":["yusuf-87","araf-56"],"rightsEvidence":"pending","editorReview":null,"domainReview":null,"reviewerDecision":"pending","status":"draft"}
+  ]
+}

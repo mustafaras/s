@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "programId": "JEV-GATE",
+  "updatedAt": "2026-09-20",
+  "status": "discovery",
+  "currentGate": 0,
+  "selectedUseCase": null,
+  "liveInference": false,
+  "networkEnabled": false,
+  "realUserDataAllowed": false,
+  "browserCredentialAllowed": false,
+  "serverAdapterApproved": false,
+  "externalWritesAllowed": false,
+  "nextDecision": "Select one bounded, low-risk typed judgment before Gate 1.",
+  "prohibitedDecisions": [
+    "health_or_psychological_diagnosis",
+    "treatment_decision",
+    "crisis_decision",
+    "religious_ruling",
+    "permission_or_release_approval",
+    "autonomous_external_write"
+  ]
+}
+

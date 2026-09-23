@@ -407,6 +407,8 @@ function applyPollRenderP(sig,dataChanged,outcome,startedAt,meta){
 // ── İman Köşesi — panel aynası ──
 var PRAYER_NAMES_P={fajr:'İmsak',sunrise:'Güneş',dhuhr:'Öğle',asr:'İkindi',maghrib:'Akşam',isha:'Yatsı'};
 var PRAYER_ORDER_P=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+var PRAYER_TRACKED_ORDER_P=['fajr','dhuhr','asr','maghrib','isha'];
+function prayerEntryHasSourceRecordP(entry){ return !!(entry&&typeof entry==='object'&&(entry.performed===true||entry.inCongregation===true||entry.late===true||entry.madeUp===true||Math.max(0,Number(entry.nafile)||0)>0||String(entry.note||'').trim()||String(entry.savedAt||'').trim())); }
 function emptyPrayerEntryP(){ return {time:'',performed:false,inCongregation:false,late:false,madeUp:false,nafile:0,note:'',savedAt:''}; }
 function ensurePrayerDayP(rec){
   if(!rec) return null;
@@ -609,14 +611,32 @@ function zikrManualTodayP(date){
 }
 function faithWeekKPIsP(date){
   date=date||today();
-  var prays=0, cong=0, made=0, late=0, nafile=0, days=0;
+  var prays=0, cong=0, made=0, late=0, nafile=0, sourceRecords=0, historicalSunriseRecords=0;
   for(var i=0;i<7;i++){
     var d=addDays(date,-i), rec=D&&D.days?D.days[d]:null;
-    if(!rec||!rec.prayer) continue; days++;
-    PRAYER_ORDER_P.forEach(function(k){ var e=rec.prayer[k]; if(!e) return; if(e.performed){ prays++; if(e.inCongregation)cong++; if(e.late)late++; if(e.madeUp)made++; } nafile+=Math.max(0,Number(e.nafile)||0); });
+    if(!rec||!rec.prayer) continue;
+    PRAYER_TRACKED_ORDER_P.forEach(function(k){ var e=rec.prayer[k]; if(!e||typeof e!=='object') return; if(prayerEntryHasSourceRecordP(e)) sourceRecords++; if(e.performed){ prays++; if(e.inCongregation)cong++; if(e.late)late++; if(e.madeUp)made++; } nafile+=Math.max(0,Number(e.nafile)||0); });
+    if(prayerEntryHasSourceRecordP(rec.prayer.sunrise)) historicalSunriseRecords++;
   }
   var zw=zikrWeekTotalP(date);
-  return {prays:prays,max:days*6,cong:cong,madeUp:made,late:late,nafile:nafile,zikr:zw.total,zikrDays:zw.days};
+  return {prays:prays,max:null,rate:null,denominatorReliable:false,sourceRecords:sourceRecords,historicalSunriseRecords:historicalSunriseRecords,cong:cong,madeUp:made,late:late,nafile:nafile,zikr:zw.total,zikrDays:zw.days};
+}
+function faithRhythmDayP(date){
+  var rec=D&&D.days?D.days[date]:null, prayer=rec&&rec.prayer, vakit=0, sourceRecords=0;
+  PRAYER_TRACKED_ORDER_P.forEach(function(k){ var e=prayer&&prayer[k]; if(!e||typeof e!=='object') return; if(prayerEntryHasSourceRecordP(e)) sourceRecords++; if(e.performed) vakit++; });
+  var historicalSunrise=prayerEntryHasSourceRecordP(prayer&&prayer.sunrise), z=D&&D.zikr&&D.zikr.sessions&&D.zikr.sessions[date], zikr=z?Math.max(0,Number(z.totalCount)||0):0, entries=rec&&rec.reading&&Array.isArray(rec.reading.entries)?rec.reading.entries:[], okuma=entries.length, known=!!(sourceRecords||historicalSunrise||zikr||okuma);
+  return {date:date,known:known,vakit:vakit,sourceRecords:sourceRecords,historicalSunrise:historicalSunrise,zikr:zikr,okuma:okuma,label:known?'Kayıtlı':'Bilinmiyor · faaliyet kaydı yok'};
+}
+function faithRhythmWeekP(date){
+  date=date||today();var rows=[],totals={vakit:0,zikr:0,okuma:0,knownDays:0,unknownDays:0};
+  for(var i=6;i>=0;i--){var row=faithRhythmDayP(addDays(date,-i));rows.push(row);totals.vakit+=row.vakit;totals.zikr+=row.zikr;totals.okuma+=row.okuma;if(row.known)totals.knownDays++;else totals.unknownDays++;}
+  return {rows:rows,totals:totals,denominatorReliable:false,rate:null,compatibilityLabel:'Payda bilinmiyor · uyum yüzdesi hesaplanmadı'};
+}
+function faithRhythmPanelCardP(){
+  var r=faithRhythmWeekP(today()),t=r.totals,details='<div class="faith-rhythm-days" role="list" aria-label="Son 7 gün ritim kayıtları">';
+  r.rows.forEach(function(x){details+='<div role="listitem" style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--bd2);"><b>'+esc(shortD(x.date))+'</b><span>'+(x.known?(x.vakit+' vakit · '+x.zikr+' zikir · '+x.okuma+' okuma'):esc(x.label))+'</span></div>';});
+  details+='</div><p class="muted">Boş gün ile bilinçli sıfır eski kayıtlarda ayrışmadığı için yüzde veya birleşik başarı puanı yoktur.</p>';
+  return cardWrap({key:'faith-rhythm-week',icon:icon('bar-chart',18),title:'7 Günlük İbadet Ritmi',span:12,order:19,summary:'<span class="tchip fl">'+t.vakit+' vakit</span><span class="tchip">'+t.zikr+' zikir</span><span class="tchip">'+t.okuma+' okuma</span><span class="tchip">'+t.unknownDays+' bilinmeyen gün</span><span class="tchip">'+esc(r.compatibilityLabel)+'</span>',details:details});
 }
 function faithDayHeatP(date){
   var rec=D&&D.days?D.days[date]:null, performed=0;
@@ -4328,10 +4348,11 @@ function render(){
     if(js&&js.completedHatims>0) cap.push('<span><b style="color:var(--faith);">'+js.completedHatims+'</b> tam hatim</span>');
     if(js&&js.lifetime>0) cap.push('<span><b style="color:var(--t2);">'+js.lifetime.toLocaleString('tr-TR')+'</b> ömürlük</span>');
     if(znotes.length) cap.push('<span><b style="color:var(--zikr);">'+znotes.length+'</b> tefekkür notu</span>');
-    if(k.prays>0) cap.push('<span><b style="color:var(--faith);">'+k.prays+'/'+k.max+'</b> kayıtlı vakit</span>');
+    if(k.prays>0) cap.push('<span><b style="color:var(--faith);">'+k.prays+'</b> kılınan vakit · payda bilinmiyor</span>');
     if(k.cong>0) cap.push('<span><b style="color:var(--t2);">'+k.cong+'</b> cemaat</span>');
     h+=kpi('Zikirmatik · Ebced²',val,'var(--zikr)',extra,null,cap.join(''));
   })();
+  h+=faithRhythmPanelCardP();
   h+=faithAnnualPanelCardP();
   h+=hijriPanelCardP();
   h+=quranJourneyPanelCardHTML();

@@ -1,0 +1,110 @@
+{
+ "schemaVersion": 1,
+ "cardId": "IIP-10",
+ "gate": "source",
+ "status": "pass",
+ "artifact": "evidence/IIP-10/source.md",
+ "verifiedHead": "3ccfa70411a30ac15d1d9241874895ec41226dab",
+ "diffHash": "fec078b9a770188c53934662b145ed55b98a5cee0de52b93742473b187c33e28",
+ "createdAt": "2026-09-21T08:10:00Z",
+ "requirements": [
+  "REQ-019",
+  "REQ-020"
+ ],
+ "commands": [
+  {
+   "command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app/core/saygi.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check tests/app/test_iip_10.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_10.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_saygi_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_04.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_09.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_fx2_overlay_motion.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_fx2_tab_transition.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_fx2_touch_coverage.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/driver.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node tools/shell-inventory.mjs --gate",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_modal_focus_containment.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_state_rebind_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_modularization_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "git -c core.fsmonitor=false diff --check",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_app_surface_daily_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_v3_welcome.js",
+   "exitCode": 0
+  }
+ ],
+ "limitations": "Ağsız headless/VM ve kaynak kapılarıdır; cihaz/ekran okuyucu/yayın kanıtı değildir.",
+ "reviewer": "copilot",
+ "artifactSha256": "2e8161ba8db50ede2863908230a0f12ce6557899448566f8200ec61548af2c26",
+ "details": {},
+ "reconciliation": {
+  "reconciledAt": "2026-09-22T16:06:28.599Z",
+  "reconciledHead": "242938bf98a53a237ee3520132037f91f7764883",
+  "method": "every recorded command re-run in the live tree; recorded exitCode compared with the live exit code",
+  "commandsRerun": 20,
+  "driftCount": 0,
+  "verdict": "no drift — every recorded command still exits with the recorded code",
+  "drift": [],
+  "note": "Append-only: the original commands[] array above is unchanged. This block records a later re-run, not a rewrite of history."
+ }
+}

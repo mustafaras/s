@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-08",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-08/scope.md",
+  "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
+  "diffHash": "68e0dd8bcea4eb629e81aa655ec8ccc68868e8aff5c63fc463cc200e3a16f1f3",
+  "createdAt": "2026-09-20T16:52:16Z",
+  "requirements": ["REQ-015", "REQ-016"],
+  "commands": [],
+  "limitations": "IIP-08 yeni üretim/test dosyası değiştirmez; browser/device/VoiceOver/yayın kabulü ayrı sınırdır.",
+  "reviewer": "codex",
+  "artifactSha256": "7cc3fd9a9705a102f9e50cc4bb5348ae6abd4db065c704a3fe427a0512042d4f",
+  "details": {
+    "changedFiles": [
+      "ilham-ibadet-premium-plan/IIP-STATE.json",
+      "ilham-ibadet-premium-plan/tracking/CURRENT-STATE.md",
+      "ilham-ibadet-premium-plan/tracking/LEDGER.jsonl",
+      "ilham-ibadet-premium-plan/tracking/TRACEABILITY.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-08/scope.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-08/requirements.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-08/review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-08/visual.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-08/commands.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-08/no-code-change.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-08/render-matrix.html",
+      "ilham-ibadet-premium-plan/evidence/IIP-08/HANDOFF.md"
+    ],
+    "scopeReviewedBy": "codex"
+  }
+}

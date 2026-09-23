@@ -1,0 +1,99 @@
+# IIP-11 komut kaydı — 2026-09-21 14:20:54 +0300
+# HEAD: 5e958998391487dcba98c3da4d77ea1160fafa6b
+
+$ node ilham-ibadet-premium-plan/tools/plan-check.mjs
+PASS: 24 cards, 48 requirements, DAG, scope, approval, evidence, ledger, generated views and local links.
+exit=0
+---
+$ node --check app/core/saygi.js
+exit=0
+---
+$ node --check app.js
+exit=0
+---
+$ node --check tests/app/test_iip_11.js
+exit=0
+---
+$ node tests/app/test_iip_11.js
+
+IIP-11 reader interaction contract: 55 PASS, 0 FAIL
+exit=0
+---
+$ node tests/app/test_saygi_boundary.js
+
+MON-23 Saygı sınırı: 20 PASS, 0 FAIL
+exit=0
+---
+$ node tests/app/test_iip_10.js
+
+IIP-10 search and filter contract: 61 PASS, 0 FAIL
+exit=0
+---
+$ node tests/app/test_iip_04.js
+IIP-04 source/style contract: PASS (26 checks; no personal data read)
+exit=0
+---
+$ node tests/app/test_iip_05.js
+
+IIP-05 visual reader contract: 28 PASS, 0 FAIL
+exit=0
+---
+$ node tests/app/test_iip_09.js
+
+IIP-09 information architecture contract: 22 PASS, 0 FAIL
+exit=0
+---
+$ node tests/app/test_modal_focus_containment.js
+
+Done.
+exit=0
+---
+$ node tests/app/test_fx2_overlay_motion.js
+PASS FX2-16.7 çift kapatma isteği eski gövdeyi ikinci kez yürütmez
+Passed: 7 / 7
+exit=0
+---
+$ node tests/app/test_fx2_tab_transition.js
+PASS FX2-15.7 App yüzeyi 720, onclick 391 ve render/paint gövdeleri değişmedi
+Passed: 7 / 7
+exit=0
+---
+$ node tests/app/test_fx2_touch_coverage.js
+PASS FX2-13.2 visibility suspend/resume yönetimi
+Passed: 14 / 14
+exit=0
+---
+$ node tests/app/test_app_surface_daily_boundary.js
+
+MON-50 daily App surface boundary: 19/19 passed
+exit=0
+---
+$ node tests/app/test_v3_welcome.js
+287 kontrol geçti.
+SONUÇ: PASS
+exit=0
+---
+$ node .claude/skills/run-seyma/zikr-harness.mjs
+
+✅ 95/95 assertion pass
+exit=0
+---
+$ node .claude/skills/run-seyma/driver.mjs
+
+Done.
+exit=0
+---
+$ node tools/shell-inventory.mjs --gate
+sabit blok / satır                   121 / 289
+shell-inventory --gate PASS {"maxTotalLines":7800,"maxLegacyFunctions":0,"maxReminderFunctionCodeLines":450,"maxHtmlBuilderCodeLines":150,"rule":"DONDURULDU (MON2-08, 2026-09-15). Ölçüm 7.603/0/408/57. Yeni bir program bütçeyi yalnız kendi onayıyla değiştirebilir."}
+exit=0
+---
+$ git -c core.fsmonitor=false diff --check
+exit=0
+---
+# TAM REGRESYON
+tests/app: 61/61 PASS
+tests/panel: 23/23 PASS
+tests/panel-v2: 27/27 PASS
+tests/quran: 9/9 PASS
+tests/reminders: PASS

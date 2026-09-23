@@ -103,12 +103,12 @@ ok('tüm view shimleri imza ve apply yüzeyini koruyor',moved.every(function(nam
 
 var p=z.zikrActivePreset(),root=f.root.zikr;
 var cases=[
-  ['counter','zikrCounterViewHTML',[p,root],'7b5889d77a927463efe0aab16ad76b88384908fee0090a277f0ea4168e6a16a3',29],
-  ['presets','zikrPresetsViewHTML',[p,root],'dc1a3175dc54733001d67a9b8f147f36569c5827e60e938a446350102dbdef4b',29],
-  ['hatims','zikrHatimsViewHTML',[p,root],'7eebfdbfe2eafeda2518cc098b3d7f7c74b582d33deaea0eecf6e59bc9851c4d',4],
+  ['counter','zikrCounterViewHTML',[p,root],'59a89e2eeb90545f6b522956f1a2bfc812c12666e9f73ef7d9c69128d0a046e1',29],
+  ['presets','zikrPresetsViewHTML',[p,root],'e266e3c1f083c6f7fa08d9d51c41fa6ee6c2bf261e0dab27f01b85265e9f0ec2',29],
+  ['hatims','zikrHatimsViewHTML',[p,root],'92706de84244bb3c197db3218411120960c634ca424ebf8092740456d0a58cfa',4],
   ['history','zikrHistoryViewHTML',[root],'60e0b7cd7cc21a4b21e33f97899103385f23e1d21d34661254883213d03a4755',1],
-  ['settings','zikrSettingsViewHTML',[root],'80dfd44d0225f18e32589f2e36154a08529e507779e80935e23b173bf9d47a26',7],
-  ['body','zikrViewBodyHTML',['counter',p,root],'7b5889d77a927463efe0aab16ad76b88384908fee0090a277f0ea4168e6a16a3',29]
+  ['settings','zikrSettingsViewHTML',[root],'352e380813453ce46c20449b7a8c79749ba4900b1d3ebc1a47e1f6bf5c0742d1',7],
+  ['body','zikrViewBodyHTML',['counter',p,root],'59a89e2eeb90545f6b522956f1a2bfc812c12666e9f73ef7d9c69128d0a046e1',29]
 ];
 cases.forEach(function(c){
   var html=z[c[1]].apply(null,c[2]), handlers=handlerList(html);

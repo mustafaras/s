@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-14",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-14/review.md",
+  "verifiedHead": "15b30bf55234ed973772fc1f2c1cbf5d00277231",
+  "diffHash": "dad0243a95684162e6e56976f82cdbfc574dcab0e9f240b495dbb5546e1994ab",
+  "createdAt": "2026-09-21T14:30:08Z",
+  "requirements": ["REQ-027", "REQ-028"],
+  "commands": [{"command": "node tests/app/test_iip_14.js", "exitCode": 0}, {"command": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs", "exitCode": 0}],
+  "limitations": "Geniş app taramasındaki kapsam dışı drift review.md içinde ayrıdır.",
+  "reviewer": "codex",
+  "artifactSha256": "6fe61ac7d82880a7120da65a5841bea794ee0ad8c568479b0b126149659ef99f",
+  "details": {"findings": ["IIP14-REV-01 resolved", "IIP14-REV-02 pre-existing out-of-scope", "IIP14-REV-03 superseded historical assertion"], "openCritical": 0, "openHigh": 0, "reviewedBy": "codex"}
+}

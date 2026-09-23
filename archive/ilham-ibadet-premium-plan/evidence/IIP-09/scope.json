@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-09",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-09/scope.md",
+  "verifiedHead": "6a8729312d70121d11bb5549e2521941df1162a9",
+  "diffHash": "57aa6b577e9028fb5f68de03a56ffcb16146cdbd44537a7c71ac8f161bced24c",
+  "createdAt": "2026-09-21T12:00:00Z",
+  "requirements": [
+    "REQ-017",
+    "REQ-018"
+  ],
+  "commands": [],
+  "limitations": "Yayın, cihaz ve VoiceOver kabulü bu receipt'in kapsamı dışındadır.",
+  "reviewer": "codex",
+  "artifactSha256": "1d238f4801ac54e73554b912f1157552fa4bf240933e6abb56999e6f947c8cd4",
+  "details": {
+    "changedFiles": [
+      "app/core/saygi.js",
+      "app/styles.css",
+      "tests/app/test_iip_09.js",
+      "ilham-ibadet-premium-plan/IIP-STATE.json",
+      "ilham-ibadet-premium-plan/tracking/CURRENT-STATE.md",
+      "ilham-ibadet-premium-plan/tracking/LEDGER.jsonl",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/scope.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/requirements.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/source.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/visual.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/commands.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/render-matrix.html",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/manifest.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/HANDOFF.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-09/decision-approval.md"
+    ],
+    "scopeReviewedBy": "codex"
+  }
+}

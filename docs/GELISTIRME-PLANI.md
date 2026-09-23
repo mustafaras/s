@@ -21,6 +21,36 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html` + `sync.js` + `index.html` + `v3-tanitim/` + `docs/v3-tanitim/` + `docs/apple-design/` + `archive/premium-fx-plan/` (FX2/SKY/PREM serileri kapandı, arşiv: `archive/premium-fx-plan/deliverables/`) + `archive/monolit-bolumlenme-plan/` (MON-58, 58/60) + `archive/monolit-bolumlenme-plan-2/` (MON2 kapandı, 8/8) + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-09-22 (🏁 İlham & İbadet Premium / IIP — KAPANDI):** Program tamamlandı ve kapatıldı;
+>   **kalan iş yok**. 24/24 kart + 18 düzeltme promptu (P00–P17). Kapanışta ölçüm:
+>   **154 fixture PASS / 0 FAIL** (denetim öncesi 123/16 FAIL), `plan-check.mjs` + `--self-test` +
+>   `.integration.py` üçü de exit 0, `evidence-reconcile.mjs` 16 makbuzda 166 komut koştu → **0 drift**.
+>   Kapatılan gerçek kusurlar: `iip21Root()` okuma yolunda veri yazıyordu; IIP-20/21'in kırdığı
+>   13 kardeş fixture (yeni **P13 kardeş-kart regresyon kapısı** artık otomatik yakalıyor);
+>   7 bayat cache-bust pini; 4 fixture'da `==` yanlış-pozitifi; IIP-22'de çalıştırılamaz komut;
+>   IIP-14/15 bayat snapshot pini. **Dürüstçe açık:** hedef cihaz p50/p95 sayısı yok
+>   (`performanceAcceptance: user_accepted`); cihaz kabulü kullanıcı beyanı
+>   (`deviceAcceptance: user_attested`, `agentVerified:false`); gerçek ekran okuyucu testi ajan
+>   tarafından yapılmadı. Kapanış belgesi: [`docs/IIP-KAPANIS.md`](IIP-KAPANIS.md).
+>   Program klasörü **taşınmadı** (taşıma 16 makbuz yolunu + `test_iip_17.js` yazma yolunu +
+>   plan-içi bağlantıları kırar; ölçüm ve gerekçe kapanış belgesi §7).
+> - **2026-09-22 (🕌 İlham & İbadet Premium / IIP — DENETİM + ARAÇ ONARIMI):** Bağımsız
+>   denetim, 24 kartlık IIP programının "24/24 done" beyanının **doğrulanamaz** olduğunu
+>   gösterdi. Kök neden: IIP-20 ve IIP-21 aynı dosyaya (`app/core/saygi.js`) yazdı ama
+>   önceki kartların (IIP-05/06/09/12/13) fixture'larını yeniden koşmadı; programda
+>   "kardeş kart regresyonu" kapısı yoktu. **Bu turda kapatılanlar:** 7 bayat cache-bust
+>   test pini (`index.html` doğruydu; `appSurface` 20260921b→20260921c, `styles.css`
+>   20260921f→20260922a), `App\.[…]\s*=` regex'inin `==` yanlış-pozitifi (4 fixture,
+>   mutasyonla doğrulandı), IIP-12 şema allowlist'i **ve** gerçek kusur: `iip21Root()`
+>   okuma yolunda `data.programs` oluşturuyordu → okuma/yazma ayrıldı (`iip21WriteRoot`),
+>   IIP-03 panel payda kontratı, `tests/quran` striking-verses catalogVersion v1→v2
+>   (IIP-17 onaylı içerik), `plan-check.mjs --self-test` (yapısal çalışıyor, 14 senaryo)
+>   ve `plan-check.integration.py` (`FileExistsError` + 24/24 baseline uyumu). Sonuç:
+>   **`tests/app` 0 FAIL**, `tests/quran` 9/9, üç plan aracı exit 0. **AÇIK KALAN:**
+>   `deviceAcceptance=not_verified` (cihaz teyidi yok), p50/p95 ölçülmedi, FIXTURE-MAP
+>   tabanlı önleyici kapı (P13) yok. Ayrıntı:
+>   [`archive/ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md`](../archive/ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md)
+>   ve [`evidence/DENETIM-BASELINE.md`](../archive/ilham-ibadet-premium-plan/evidence/DENETIM-BASELINE.md).
 > - **2026-09-15 (v3.0 CANLIYA ALINDI):** `premium-fx-gorsel-yuzey` → `main`
 >   fast-forward (`d9e4484..2162342`, 269 commit), tag `v3.0`, GitHub Pages run
 >   35006913049 success. Canlı ölçüm: `/s/v3-tanitim/` 200, gömülü anlık görüntü

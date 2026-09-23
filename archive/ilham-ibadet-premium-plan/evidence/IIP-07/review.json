@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-07",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-07/review.md",
+  "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
+  "diffHash": "db51d9443c532e2abd4a30ac38c995cbfa02a783290c7de3634bdd19b8d29eb4",
+  "createdAt": "2026-09-20T15:59:13Z",
+  "requirements": ["REQ-013", "REQ-014"],
+  "commands": [],
+  "limitations": "İnsan cihaz/VoiceOver kabulü ayrıca bekler.",
+  "reviewer": "codex",
+  "artifactSha256": "d81a2ca7f40b2e604f1d4627a026c06978e607c1ffb43f6eb8d347e704fd8b2b",
+  "details": {
+    "findings": [],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "codex"
+  }
+}

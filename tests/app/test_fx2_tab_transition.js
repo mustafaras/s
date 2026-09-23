@@ -150,8 +150,9 @@ group('FX2-15.2 çıkış/giriş CSS token ve reduced-motion sözleşmesi var',
 }
 
 const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-group('FX2-15.7 App yüzeyi 718, onclick 391 ve render/paint gövdeleri değişmedi',
-  handlers.size === 718 && (combinedSource.match(/onclick=/g) || []).length === 391 &&
+group('FX2-15.7 App yüzeyi 720, onclick 391 ve render/paint gövdeleri değişmedi',
+  // IIP-10 / DEC-07: App.saygiLens 718 → 719. IIP-11: App.saygiReader 719 → 720.
+  handlers.size === 720 && (combinedSource.match(/onclick=/g) || []).length === 391 &&
   !/function render\(\)[\s\S]{0,180}sey-leaving/.test(appSource) &&
   !/function paint\(\)[\s\S]{0,180}sey-leaving/.test(appSource));
 

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-05",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-05/visual-render.html",
+  "verifiedHead": "aded41ea85150826bc340ad6ad86717b65a00d80",
+  "diffHash": "fbca8b0b992598ca94663788aadf5a68dde0d04c9011901131229a7302332199",
+  "createdAt": "2026-09-20T12:20:30Z",
+  "requirements": [
+    "REQ-009",
+    "REQ-010"
+  ],
+  "commands": [
+    {
+      "command": "node tests/app/test_iip_05.js",
+      "exitCode": 0
+    },
+    {
+      "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+      "exitCode": 0
+    }
+  ],
+  "limitations": "Source/style render contract; no browser screenshot, VoiceOver or physical device acceptance.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "10685f93c418b18cdd536fa7a89b247d1dddead9a1d4fc4f200301af9e0b81aa",
+  "details": {
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "viewports": [
+      "320px",
+      "390px",
+      "768px",
+      "320px at 200% text target"
+    ],
+    "syntheticDataset": "IIP05-SYN-01",
+    "artifactKind": "render",
+    "observations": "28 registry/source checks; ready/loading/error/return production registry outputs are serialized in visual-render.html."
+  }
+}

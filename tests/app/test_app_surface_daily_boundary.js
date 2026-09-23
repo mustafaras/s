@@ -152,10 +152,12 @@ ok('saveToday preserves today lookup then App.saveNow order',
 
 const assignmentPattern = /App\.([A-Za-z0-9_$]+)\s*=\s*(?:function|async\s+function)/g;
 const currentAssignments = [...appSource.matchAll(assignmentPattern)].map((match) => match[1]);
-ok('App function assignment count remains 556', currentAssignments.length === 556);
+// IIP-10 / DEC-07: App.saygiLens tek dispatcher handler'ı eklendi; 556 → 557.
+// IIP-11: App.saygiReader tek dispatcher handler'ı eklendi; 557 → 558, 719 → 720.
+ok('App function assignment count remains 558', currentAssignments.length === 558);
 const handlerSurface = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || [])
   .map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-ok('unique App handler surface remains 718', handlerSurface.size === 718);
+ok('unique App handler surface remains 720', handlerSurface.size === 720);
 ok('the five daily handlers keep exact signature-preserving shims',
   handlerNames.every((name) => new RegExp('App\\.' + name + '=function').test(appSource) &&
     new RegExp('SEYMA_APP_SURFACE\\.' + name + '\\.apply\\(null,arguments\\)').test(appSource)));

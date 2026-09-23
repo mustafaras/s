@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-12",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-12/scope.md",
+  "verifiedHead": "faa65857cfc0fdbf67c6719e6f677bbda67cbb1a",
+  "diffHash": "0a7f44f8987566f88fb97462fa68d0d564f5b4f528b350285669f6136a14e598",
+  "createdAt": "2026-09-21T11:57:39Z",
+  "requirements": [
+    "REQ-023",
+    "REQ-024"
+  ],
+  "commands": [],
+  "limitations": "Yayın, cihaz ve ekran okuyucu kabulü bu receipt'in kapsamı dışındadır.",
+  "reviewer": "copilot",
+  "artifactSha256": "18cc2312b7dff611268863a54f52648847ab427287f6048934d5370d822ca07e",
+  "details": {
+    "changedFiles": [
+      "app/core/saygi.js",
+      "tests/app/test_iip_12.js",
+      "ilham-ibadet-premium-plan/IIP-STATE.json",
+      "ilham-ibadet-premium-plan/cards/IIP-12.md",
+      "ilham-ibadet-premium-plan/tracking/CURRENT-STATE.md",
+      "ilham-ibadet-premium-plan/tracking/LEDGER.jsonl",
+      "ilham-ibadet-premium-plan/tracking/TRACEABILITY.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/scope.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/requirements.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/review.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/source.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/visual.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/render-matrix.html",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/build-render-matrix.js",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/commands.log",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/manifest.md",
+      "ilham-ibadet-premium-plan/evidence/IIP-12/HANDOFF.md"
+    ],
+    "scopeReviewedBy": "copilot"
+  }
+}

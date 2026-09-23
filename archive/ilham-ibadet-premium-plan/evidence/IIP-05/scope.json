@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-05",
+  "gate": "scope",
+  "status": "pass",
+  "artifact": "evidence/IIP-05/scope.md",
+  "verifiedHead": "aded41ea85150826bc340ad6ad86717b65a00d80",
+  "diffHash": "fbca8b0b992598ca94663788aadf5a68dde0d04c9011901131229a7302332199",
+  "createdAt": "2026-09-20T12:20:30Z",
+  "requirements": ["REQ-009", "REQ-010"],
+  "commands": [],
+  "limitations": "Kapsam kanıtı; browser/device/yayın kabulü değildir.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "95114272173641371b9b7a8671c16ddf84c8a58c41c05817529c41121d0a2b81",
+  "details": {
+    "changedFiles": ["app/core/saygi.js", "app/styles.css", "tests/app/test_saygi_boundary.js", "tests/app/test_iip_05.js"],
+    "scopeReviewedBy": "Codex / integrator"
+  }
+}

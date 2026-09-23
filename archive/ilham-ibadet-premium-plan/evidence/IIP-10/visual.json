@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-10",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-10/render-matrix.html",
+  "verifiedHead": "3ccfa70411a30ac15d1d9241874895ec41226dab",
+  "diffHash": "fec078b9a770188c53934662b145ed55b98a5cee0de52b93742473b187c33e28",
+  "createdAt": "2026-09-21T08:10:00Z",
+  "requirements": [
+    "REQ-019",
+    "REQ-020"
+  ],
+  "commands": [],
+  "limitations": "Sentetik render artifact'idir; gerçek tarayıcı ekran görüntüsü, ekran okuyucu, fiziksel cihaz ve kullanıcı kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "ca28c9253dfc87da9c5b974f85caea39eaf0a401a3c33f0983d02d948e97da51",
+  "details": {
+    "themes": [
+      "light",
+      "dark (token parity)"
+    ],
+    "viewports": [
+      "320px",
+      "390px",
+      "430px shared boundary",
+      "768px",
+      "1280px shared boundary",
+      "320px at 200% text"
+    ],
+    "syntheticDataset": "IIP10-SYN-01; 100 uydurma kişi + 3 sentetik okundu kaydı. Kişisel veri, token, GPS, ağ veya cihaz depolaması içermez.",
+    "observations": "12 sahne: varsayılan (tam 100 satır, kısaltılmadı), tek sonuç, Türkçe i/İ/ı/i katlama, aksan katlama, tek karakter, sıfır sonuç, alan filtresi, okundu/okunmadı filtreleri, çok filtre, çok kelimeli sorgu ve açık ikincil grid. Uzun listeler sahne başına kısaltıldı; kısaltma artifact içinde yazılıdır ve tam 100 satırı fixture doğrular. Dar ekran ve reduced-motion varyantları app/styles.css içinde tanımlıdır.",
+    "artifactKind": "render"
+  }
+}

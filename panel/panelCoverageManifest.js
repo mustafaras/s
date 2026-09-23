@@ -92,6 +92,13 @@ var MANIFEST={
     {path:"eventLog.events",owner:"sync",source:"event_log",privacy:"metadata",mode:"summary",fallback:"event_files"},
     {path:"quranJourney",owner:"quran",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
     {path:"saygi",owner:"saygi",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
+    // IIP-20: kişisel yer imi, ham okuyucu konumu ve tercih ayrıntıları
+    // observer snapshot'a çıkmaz; yalnız uygulama cihazında tutulur.
+    {path:"bookmarks",owner:"reader",source:"user_read_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"reader",owner:"reader",source:"user_read_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"reader.preferences",owner:"reader",source:"user_pref",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"reader.positions",owner:"reader",source:"user_read_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"programs",owner:"program",source:"user_progress",privacy:"local_only",mode:"redacted",fallback:"never"},
     // Prayer-time reminder toggle/offset are pre-existing *synced* preferences
     // (data.settings.prayer), not personal reminder-engine state. They carry no
     // private copy, so they stay explicitly summary instead of being swept up

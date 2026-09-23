@@ -1,0 +1,81 @@
+{
+ "schemaVersion": 1,
+ "cardId": "IIP-21",
+ "gate": "source",
+ "status": "pass",
+ "artifact": "evidence/IIP-21/source.md",
+ "verifiedHead": "de59f03fd117124de088e987b1274d304efcd547",
+ "diffHash": "7c4adb6d252fea115ca247c58f96ccdc25c0aa1c814b9d6d5ec9828b97390540",
+ "createdAt": "2026-09-22T10:20:00Z",
+ "requirements": [
+  "REQ-041",
+  "REQ-042"
+ ],
+ "commands": [
+  {
+   "command": "node --check app/core/state.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app/core/saygi.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app/core/render.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_21.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_saygi_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_faz10_sync.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_state_rebind_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node tools/shell-inventory.mjs --gate",
+   "exitCode": 0
+  },
+  {
+   "command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "git -c core.fsmonitor=false diff --check",
+   "exitCode": 0
+  }
+ ],
+ "limitations": "Ağsız/headless doğrulama; canlı dağıtım ayrı kanıttır.",
+ "reviewer": "codex",
+ "artifactSha256": "2a79fa8936d1dc5100f6dd0c8aa1b10ac9845d83c5a75d9fb29e6fb1846ae7fb",
+ "details": {
+  "testMode": "no-network synthetic VM",
+  "shellBudget": "7800 total lines"
+ },
+ "reconciliation": {
+  "reconciledAt": "2026-09-22T16:06:28.599Z",
+  "reconciledHead": "242938bf98a53a237ee3520132037f91f7764883",
+  "method": "every recorded command re-run in the live tree; recorded exitCode compared with the live exit code",
+  "commandsRerun": 12,
+  "driftCount": 0,
+  "verdict": "no drift — every recorded command still exits with the recorded code",
+  "drift": [],
+  "note": "Append-only: the original commands[] array above is unchanged. This block records a later re-run, not a rewrite of history."
+ }
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-09",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-09/render-matrix.html",
+  "verifiedHead": "6a8729312d70121d11bb5549e2521941df1162a9",
+  "diffHash": "57aa6b577e9028fb5f68de03a56ffcb16146cdbd44537a7c71ac8f161bced24c",
+  "createdAt": "2026-09-21T12:00:00Z",
+  "requirements": [
+    "REQ-017",
+    "REQ-018"
+  ],
+  "commands": [],
+  "limitations": "Sentetik render artifact'idir; browser screenshot, VoiceOver, fiziksel cihaz ve kullanıcı kabulü değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "0ddf42b44d7eb05dbbe94dc8afef34fc3cca74984592132a7dfbb83c8adb8997",
+  "details": {
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "viewports": [
+      "320px",
+      "390px",
+      "768px",
+      "430px shared boundary",
+      "1280px shared boundary",
+      "320px at 200% text"
+    ],
+    "syntheticDataset": "IIP09-SYN-01; kişisel veri, token, GPS, ağ veya cihaz depolaması içermez.",
+    "observations": "Beş görünür tab, route rail, kıble/Kur’an girişleri, modal dönüş bağlamı, ready/empty/error/return ve reduced-motion notları render matrisinde işlenmiştir.",
+    "artifactKind": "render"
+  }
+}

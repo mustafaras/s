@@ -360,8 +360,14 @@
 
   function submitAuth(){
     var doc=bootCall('document');
-    var u=(doc.getElementById('sey-auth-user').value||'').trim();
-    var p=(doc.getElementById('sey-auth-pass').value||'').trim();
+    var userEl=doc.getElementById('sey-auth-user');
+    var passEl=doc.getElementById('sey-auth-pass');
+    // Başarılı giriş render() ile kapıyı eşzamanlı kaldırır. Eski düğmeden
+    // kuyruğa girmiş ikinci bir dokunuş gelirse alanlar artık DOM'da yoktur;
+    // bu geç submit'i sessizce yok say, null.value hatasına dönüştürme.
+    if(!userEl||!passEl) return;
+    var u=(userEl.value||'').trim();
+    var p=(passEl.value||'').trim();
     var ui=bootCall('ui');
     if(!u||!p){ ui.authError=true; ui.authErrorMsg='Lütfen kullanıcı adını ve parolanı yaz.'; bootCall('render'); return; }
     if(bootCall('sha256',[u])===bootCall('authHash')&&bootCall('sha256',[p])===bootCall('authHash')){
@@ -389,6 +395,14 @@
   }
   function initialRender(){
     var data=bootCall('data'), doc=bootCall('document');
+    // Kapı sessiz doğrulaması: izin geçmişte verilmişse (data.settings.locationEnabled)
+    // kapıyı TAZE konum beklemeden aç (Permissions API → granted ise anında; aksi
+    // hâlde 15 dk önbellek yoklaması). Bu yol bir boot sırasında kaldırılmıştı ve
+    // kapının tek çıkışı taze getCurrentPosition'a bağlı kalmıştı: OS düzeyinde
+    // konum kapalıyken (kod 2) izinli kullanıcı kapıda KİLİTLİ kalıyordu.
+    // Konum özelliğini kullanmayan kullanıcıya dokunmaz (locationEnabled kontrolü
+    // fonksiyonun içindedir) ve watch yalnızca verilmişse başlar (onLocationFix).
+    try{ lifecycleCall('locationGateSilentVerify'); }catch(e){}
     bootCall('render');
     try{
       var touch=bootCall('touch');
@@ -531,11 +545,21 @@ function headerSaveState(){
   return {cls:'is-clean',icon:'rotate-ccw',label:'Eşitle',aria:'Panel ile şimdi eşitle',title:'Panel ile şimdi eşitle'+seen};
 }
 
+// İşletim sistemi düzeyinde konum servisleri kapalıyken tarayıcı izni verilmiş
+// olsa bile geolocation POSITION_UNAVAILABLE (2) döner. Kullanıcıya hangi
+// menüyü açacağını somut söylemek, "izin verdim ama olmuyor" döngüsünü kırar.
+function osLocationHint(){
+  if(isIOS()) return isStandalonePWA()
+    ? 'Ayarlar → Gizlilik ve Güvenlik → Konum Servisleri açık mı, ve Şeyma için “Uygulamayı Kullanırken” seçili mi?'
+    : 'Ayarlar → Gizlilik ve Güvenlik → Konum Servisleri ve Safari için konum izni açık mı?';
+  return 'Sistem Ayarları → Gizlilik ve Güvenlik → Konum Servisleri açık mı, ve kullandığın tarayıcı için konum izni verilmiş mi?';
+}
+
 function locationGateErrorText(code,reason){
   if(reason==='insecure-context') return 'Konum yalnızca güvenli bağlantıda (https) çalışır. Bu sayfa güvensiz bir adresten açıldığı için Safari izin penceresini hiç göstermiyor.';
   if(reason==='unsupported') return 'Bu tarayıcıda konum hizmeti kullanılamıyor. Safari’yi güncelleyip tekrar dene.';
   if(code===1) return isIOS()?(isStandalonePWA()?'Konum izni kapalı. Ayarlar → Şeyma → Konum → “Uygulamayı Kullanırken” seçeneğini aç.':'Konum izni kapalı. Safari’de aA → Web Sitesi Ayarları → Konum → İzin Ver yolunu aç.'):'Konum izni verilmedi. Tarayıcının site ayarlarında Konum → İzin Ver seçeneğini aç.';
-  if(code===2) return 'Konum bulunamadı. Cihazın Konum Servisleri açıkken yeniden dene.';
+  if(code===2) return 'Konum bulunamadı. Çoğu zaman işletim sistemi düzeyinde konum servisleri kapalıdır: '+osLocationHint()+' Açıp yeniden dene.';
   if(code===3) return 'Konum isteği zaman aşımına uğradı. Birkaç saniye sonra yeniden dene.';
   return 'Konum izni doğrulanamadı. Safari ayarlarını kontrol edip yeniden dene.';
 }
@@ -545,6 +569,31 @@ function locationGatePermanentFailure(code,reason){
 }
 
 function locationGateFailure(code,reason){
+  // Geçici hatada retry hakkı YENİLENİR: kapı her kapanışta bir kez daha
+  // düşük-hassasiyetli deneme yapabilmeli; yoksa ikinci hatadan sonra kullanıcı
+  // yalnız elle "tekrar dene"ye mahkûm kalır.
+  ui.locationGateLowAccuracyTried=false;
+  // POSITION_UNAVAILABLE (2) genellikle GEÇİCİDİR: konum servisi henüz ısınmadı,
+  // GPS kilidi yok (iç mekân) veya OS düzeyinde konum kapalı. Tek seferlik
+  // düşük hassasiyetli (ağ/WiFi tabanlı) yeniden deneme çoğu durumda kapıyı açar.
+  // Daha önce ilk denemede hata gösterilip kullanıcıdan yeniden dokunması
+  // bekleniyordu — "izin verdim ama çalışmıyor" şikâyetinin kaynağı buydu.
+  if(code===2&&reason==='position-unavailable'&&!ui.locationGateLowAccuracyTried&&navigator.geolocation){
+    ui.locationGateLowAccuracyTried=true;
+    try{
+      navigator.geolocation.getCurrentPosition(
+        function(pos){ locationGateGranted(pos,true); },
+        function(err2){
+          var c2=err2&&Number(err2.code);
+          locationGateFailure(c2===1||c2===2||c2===3?c2:0,c2===1?'permission-denied':c2===2?'position-unavailable':c2===3?'timeout':'request-error');
+        },
+        {enableHighAccuracy:false,timeout:25000,maximumAge:600000});
+      // İstek askıda kalmasın: durum "requesting" kalır, mevcut gözcü korur.
+      ui.locationGateError='';
+      render();
+      return;
+    }catch(e){}
+  }
   ui.locationGateRequestInFlight=false;
   ui.locationGateState=reason==='unsupported'?'unsupported':(code===1?'denied':'unavailable');
   ui.locationGateError=locationGateErrorText(code,reason);
@@ -619,6 +668,19 @@ function headerSolarProgress(spot,now){
   return Math.max(0,Math.min(1,(t-sr)/(ss-sr)));
 }
 
+function headerNightProgress(spot,now){
+  // Gün batımı → ertesi gün doğumu. Weather kaydı aynı günün doğuş/batışını
+  // taşıdığı için gece yarısının iki tarafını 24 saatlik komşu güne bağla.
+  if(!spot||!spot.sunrise||!spot.sunset) return null;
+  var sr=new Date(spot.sunrise).getTime(), ss=new Date(spot.sunset).getTime();
+  if(!isFinite(sr)||!isFinite(ss)||ss<=sr) return null;
+  var t=(now||new Date()).getTime(), start, end;
+  if(t>=ss){ start=ss; end=sr+86400000; }
+  else if(t<=sr){ start=ss-86400000; end=sr; }
+  else return null;
+  return Math.max(0,Math.min(1,(t-start)/(end-start)));
+}
+
 function headerSceneHTML(){
   if(!window.SeyAmbience||typeof window.SeyAmbience.scene!=='function') return '';
   // premiumAtmosphere kapalıyken şerit de görünmez — gating sızıntısı olmasın.
@@ -629,7 +691,7 @@ function headerSceneHTML(){
   var meta=spot?wxMeta(spot.code,spot.isDay):null;
   var phase=HDR_PHASE_TR[sc.time]||'Bugün';
   var isNight=(sc.time==='amb-time-night');
-  var prog=headerSolarProgress(spot);
+  var prog=isNight?headerNightProgress(spot):headerSolarProgress(spot);
 
   var h='<div class="sey-hdr-scene" aria-hidden="false">';
 
@@ -643,27 +705,32 @@ function headerSceneHTML(){
   h+='<span class="sey-hdr-wx-label">'+esc(meta?meta.label:'hava bekleniyor')+'</span>';
   h+='</div>';
 
-  // — güneş yayı: gerçek doğuş/batış ilerlemesi —
+  // — göksel yörünge: gündüz doğuş→batış, gece batış→ertesi doğuş —
   if(prog!=null){
-    // Kuadratik Bézier P0(6,30) P1(60,-1) P2(114,30) üzerinde nokta.
+    // Kuadratik Bézier P0(8,27) P1(80,-3) P2(152,27) üzerinde nokta.
     var t=prog, mt=1-t;
-    var dx=mt*mt*6 + 2*mt*t*60 + t*t*114;
-    var dy=mt*mt*30 + 2*mt*t*(-1) + t*t*30;
+    var dx=mt*mt*8 + 2*mt*t*80 + t*t*152;
+    var dy=mt*mt*27 + 2*mt*t*(-3) + t*t*27;
     h+='<div class="sey-hdr-arc sey-enter sey-enter-delay-2'+(isNight?' is-night':'')+'">';
-    h+='<svg viewBox="0 0 120 34" preserveAspectRatio="none" focusable="false" aria-hidden="true">';
-    h+='<path class="sey-hdr-arc-track" d="M6,30 Q60,-1 114,30" pathLength="1"/>';
-    h+='<path class="sey-hdr-arc-done" d="M6,30 Q60,-1 114,30" pathLength="1" style="stroke-dasharray:'+t.toFixed(3)+' 1;"/>';
-    h+='<circle class="sey-hdr-arc-dot" cx="'+dx.toFixed(2)+'" cy="'+dy.toFixed(2)+'" r="3.4"/>';
+    h+='<span class="sey-hdr-orbit-label">'+(isNight?'Gece yolculuğu':'Gün ışığı')+'</span>';
+    h+='<svg viewBox="0 0 160 34" preserveAspectRatio="none" focusable="false" aria-hidden="true">';
+    h+='<line class="sey-hdr-horizon" x1="8" y1="28" x2="152" y2="28"/>';
+    h+='<circle class="sey-hdr-orbit-edge" cx="8" cy="27" r="2"/><circle class="sey-hdr-orbit-edge" cx="152" cy="27" r="2"/>';
+    h+='<path class="sey-hdr-arc-track" d="M8,27 Q80,-3 152,27" pathLength="1"/>';
+    h+='<path class="sey-hdr-arc-done" d="M8,27 Q80,-3 152,27" pathLength="1" style="stroke-dasharray:'+t.toFixed(3)+' 1;"/>';
+    h+='<circle class="sey-hdr-arc-halo" cx="'+dx.toFixed(2)+'" cy="'+dy.toFixed(2)+'" r="6.8"/>';
+    h+='<circle class="sey-hdr-arc-dot" cx="'+dx.toFixed(2)+'" cy="'+dy.toFixed(2)+'" r="3.6"/>';
     h+='</svg></div>';
   }
 
-  // — vakit etiketi + doğuş/batış saati —
+  // — korumalı vakit kapsülü + sıradaki güneş olayı —
   h+='<div class="sey-hdr-phase sey-enter sey-enter-delay-3">';
-  h+='<span class="sey-hdr-phase-name">'+esc(phase)+'</span>';
+  h+='<span class="sey-hdr-phase-glyph">'+icon(isNight?'moon':'sun',14)+'</span>';
+  h+='<span class="sey-hdr-phase-copy"><span class="sey-hdr-phase-name">'+esc(phase)+'</span>';
   if(spot&&spot.sunrise&&spot.sunset){
-    h+='<span class="sey-hdr-phase-time">'+icon(isNight?'sunrise':'sunset',10)+' '+esc(isNight?wxHm(spot.sunrise):wxHm(spot.sunset))+'</span>';
+    h+='<span class="sey-hdr-phase-time"><b>'+esc(isNight?wxHm(spot.sunrise):wxHm(spot.sunset))+'</b><em>'+(isNight?'gün doğumu':'gün batımı')+'</em></span>';
   }
-  h+='</div>';
+  h+='</span></div>';
 
   h+='</div>';
   return h;

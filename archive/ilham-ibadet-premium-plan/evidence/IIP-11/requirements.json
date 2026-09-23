@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-11",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-11/requirements.md",
+  "verifiedHead": "5e958998391487dcba98c3da4d77ea1160fafa6b",
+  "diffHash": "5c21e99860169594b4924fc2769e94bd3b5129650bdaaf93345b22909afb380c",
+  "createdAt": "2026-09-21T14:30:00Z",
+  "requirements": [
+    "REQ-021",
+    "REQ-022"
+  ],
+  "commands": [],
+  "limitations": "Fixture/VM kanıtıdır; tarayıcı, cihaz ve ekran okuyucu kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "af8106163493eec11d1c96076b8f2b6dcc92cb9c3bf0140b6e6d29079f473d9c",
+  "details": {
+    "results": [
+      {
+        "requirementId": "REQ-021",
+        "testId": "TC-021",
+        "result": "pass",
+        "summary": "55 kontrol; oturumluk Aa (5 adım, iki sarmalayıcıda), bölüm atlama, ankraj+oran konum, RTL, kapsayıcı alternatif, ölçek CSS matematiği ve yetim-handler bekçisi. Olumsuz: büyütmede ankraj korunur, RTL ayrı yön taşır, kaydırma/ekran okuyucu erişimi otomatik kayıt oluşturmaz, ölçek tabanı ezmez."
+      },
+      {
+        "requirementId": "REQ-022",
+        "testId": "TC-022",
+        "result": "pass",
+        "summary": "Gate A (IntersectionObserver .72 + fallback) birebir korundu; B alternatifi kapatılabilir ve yalnız hazır olma sinyali verir. Olumsuz: kaydırma/ekran okuyucu erişimi OTOMATİK kayıt oluşturmaz."
+      }
+    ]
+  }
+}

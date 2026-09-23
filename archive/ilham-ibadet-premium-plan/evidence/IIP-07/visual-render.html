@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IIP-07 sentetik görsel render</title>
+  <link rel="stylesheet" href="../../app/styles.css">
+  <style>
+    :root{color-scheme:light}body{margin:0;padding:16px;background:#f5f1ea;color:#2d2924;font:16px/1.45 system-ui,sans-serif}main{display:grid;gap:16px;max-width:460px;margin:0 auto}.fixture{padding:14px;border:1px solid #d9d0c4;border-radius:24px;background:#fff;box-shadow:0 12px 28px rgba(45,41,36,.08)}.fixture>h1{margin:0 0 12px;font-size:14px;letter-spacing:.08em;text-transform:uppercase}.fixture>h2{margin:18px 0 8px;font-size:13px}.quran-v2-screen,.zikr-v2-screen{min-height:0;height:auto;border-radius:18px;overflow:hidden}.quran-v2-screen{background:#f9f7f2}.fixture[data-theme="dark"]{background:#1c2024;color:#f1eee7}.fixture[data-theme="dark"] .quran-v2-screen{background:#242a2c}.preview-state{margin-top:10px}
+  </style>
+</head>
+<body>
+<main>
+  <section class="fixture">
+    <h1>Açık tema · ortak ritüel rail</h1>
+    <div class="zikr-v2-screen">
+      <header class="zikr-v2-header iip-07-header">
+        <div class="brand iip-07-title"><span aria-hidden="true">✦</span><div><strong>Zikirmatik</strong><small>Kalıcı, odaklı ve sana ait</small></div></div>
+        <button class="close iip-07-button" type="button">Kapat</button>
+      </header>
+      <div class="preview-state iip-07-state iip-07-state-empty"><strong>Henüz tefekkür kaydı yok.</strong><span>İlk notunu yazdığında burada tarih ve zikir adına göre arşivlenecek.</span></div>
+      <p class="iip-07-source">Kaynak: sentetik zikir içerik fişi</p>
+    </div>
+    <h2>Kur’an · yükleniyor / kaynak</h2>
+    <div class="quran-v2-screen">
+      <header class="quran-v2-header iip-07-header">
+        <div class="lead"><span class="mark" aria-hidden="true">◈</span><span class="copy iip-07-title"><strong>Kur’an Yolculuğu</strong><small>Raşit’in anlatımıyla · nüzul arşivi</small></span></div>
+        <span class="quran-v2-remote-status iip-07-state iip-07-state-remote is-checking" role="status">Kontrol ediliyor…</span>
+        <button class="close iip-07-button" type="button">Kapat</button>
+      </header>
+      <div class="quran-v2-method-note iip-07-source iip-07-source-card"><strong>Katalog yöntemi</strong><small>Yaygın nüzul tertibi · sûreler tek tek doğrulanabilir.</small></div>
+    </div>
+  </section>
+  <section class="fixture" data-theme="dark">
+    <h1>Koyu tema · hata / dönüş</h1>
+    <div class="quran-v2-screen">
+      <div class="quran-v2-empty iip-07-state iip-07-state-error"><strong>Bu sûre bulunamadı.</strong><span>Kütüphaneden yeniden seçebilirsin.</span><button class="iip-07-button" type="button">Kütüphaneye dön</button></div>
+      <div class="quran-v2-video is-unavailable iip-07-state iip-07-state-error preview-state" role="status"><p><strong>Bu anlatım artık erişilebilir değil.</strong><br>Yeni bir bağlantı istenebilir.</p></div>
+      <div class="quran-v2-notes preview-state"><p class="quran-v2-notes-empty iip-07-state iip-07-state-empty">Video geldiğinde burada not tutabileceksin.</p><button class="quran-v2-note-save iip-07-button" disabled>Video hazır olduğunda açılır</button></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

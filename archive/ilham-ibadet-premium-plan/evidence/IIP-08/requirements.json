@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-08",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-08/requirements.md",
+  "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
+  "diffHash": "68e0dd8bcea4eb629e81aa655ec8ccc68868e8aff5c63fc463cc200e3a16f1f3",
+  "createdAt": "2026-09-20T16:52:16Z",
+  "requirements": [
+    "REQ-015",
+    "REQ-016"
+  ],
+  "commands": [],
+  "limitations": "TC kanıtı ağsız sentetik fixture/render ve yerel gate çıktılarıdır; gerçek cihaz kabulü değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "7c533805ee56c6f2971d02dbc7893ba6e53598ff13166d72f9e2a8f84c4a458c",
+  "details": {
+    "results": [
+      {
+        "requirementId": "REQ-015",
+        "testId": "TC-015",
+        "result": "pass",
+        "summary": "Paket sınır fixture'ları, VM/harness, syntax, shell budget ve diff kanıtı temiz."
+      },
+      {
+        "requirementId": "REQ-016",
+        "testId": "TC-016",
+        "result": "pass",
+        "summary": "Light/dark, dar/büyük görünüm, %200 metin, reduced-motion ve durum matrisi render artifact'inde işlendi."
+      }
+    ]
+  }
+}

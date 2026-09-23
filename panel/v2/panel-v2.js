@@ -3502,17 +3502,31 @@
 
   var PRAYER_LABELS = { fajr: "İmsak", sunrise: "Güneş", dhuhr: "Öğle", asr: "İkindi", maghrib: "Akşam", isha: "Yatsı" };
 
+  function faithRhythmDayV2(date) {
+    var day = getDay(date), p = day && getPrayer(day) || {}, tracked = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
+    var sourceRecords = 0, vakit = 0;
+    function hasRecord(e) { return !!(e && typeof e === "object" && (e.performed === true || e.inCongregation === true || e.late === true || e.madeUp === true || Math.max(0, Number(e.nafile) || 0) > 0 || String(e.note || "").trim() || String(e.savedAt || "").trim())); }
+    tracked.forEach(function(k) { var e = p[k]; if (!e || typeof e !== "object") return; if (hasRecord(e)) sourceRecords++; if (e.performed) vakit++; });
+    var zCount = getZikrCount(date), reading = day ? contentEntries(day, "reading") : [];
+    var historicalSunrise = hasRecord(p.sunrise), zikr = zCount !== null ? Math.max(0, Number(zCount) || 0) : 0, okuma = reading.length;
+    return { known: !!(sourceRecords || historicalSunrise || zikr || okuma), vakit: vakit, zikr: zikr, okuma: okuma, historicalSunrise: historicalSunrise, denominatorReliable: false, rate: null };
+  }
+
   function renderPrayer(date) {
     var day = getDay(date) || {};
     var chips = [];
     var p = getPrayer(day) || {};
-    var vakitNames = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"];
-    var done = vakitNames.filter(function(k) { var e = p[k]; return e && e.performed; }).length;
+    var vakitNames = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
+    var rhythm = faithRhythmDayV2(date);
+    var done = rhythm.vakit;
     if (done > 0 || p.fajr != null || p.dhuhr != null || p.asr != null || p.maghrib != null || p.isha != null) {
-      chips.push(renderChip("Namaz: " + done + "/5", false));
+      chips.push(renderChip(done === 5 ? "Namaz: 5/5 · beş olumlu kayıt" : "Vakit: " + done + " · payda bilinmiyor", false));
     }
-    var zCount = getZikrCount(date);
+    var zCount = rhythm.zikr;
     if (zCount !== null && zCount > 0) chips.push(renderChip("Zikir: " + zCount.toLocaleString("tr-TR"), false));
+    if (rhythm.okuma > 0) chips.push(renderChip("Okuma: " + rhythm.okuma, false));
+    if (!rhythm.known) chips.push(renderChip("Ritim: Bilinmiyor · faaliyet kaydı yok", false));
+    if (rhythm.historicalSunrise) chips.push(renderChip("Güneş: tarihsel kayıt", false));
     var s = getSaygiInfo(day);
     if (s && s.name) {
       chips.push(renderChip("Öncü: " + safeText(s.name, 40), false));
@@ -3522,6 +3536,7 @@
     if (Array.isArray(q) && q.length) chips.push(renderChip("Kur'an yolculuğu", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+    if (!rhythm.known) html += '<div class="detail-section__empty">Bugün için ibadet, zikir veya Saygı kaydı yok.</div>';
 
     vakitNames.forEach(function(k) {
       var e = p[k];
@@ -3536,6 +3551,11 @@
       var meta = (e.time ? "Vakit: " + e.time : "Vakit yok") + (status.length ? " · " + status.join(", ") : "");
       html += DetailBlock({ icon: "prayer", title: label, body: meta + (e.note ? "<br>Not: " + escapeHtml(e.note) : "") });
     });
+
+    if (rhythm.historicalSunrise) {
+      var sunrise = p.sunrise || {};
+      html += DetailBlock({ icon: "clock", title: "Güneş · tarihsel kayıt", body: "Takip edilen beş vakit toplamına katılmaz." + (sunrise.note ? "<br>Not: " + escapeHtml(sunrise.note) : "") });
+    }
 
     var zikrDetail = renderZikrDetail(date);
     if (zikrDetail) html += zikrDetail;

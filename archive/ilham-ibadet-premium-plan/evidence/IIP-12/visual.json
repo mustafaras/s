@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-12",
+  "gate": "visual",
+  "status": "pass",
+  "artifact": "evidence/IIP-12/render-matrix.html",
+  "verifiedHead": "faa65857cfc0fdbf67c6719e6f677bbda67cbb1a",
+  "diffHash": "0a7f44f8987566f88fb97462fa68d0d564f5b4f528b350285669f6136a14e598",
+  "createdAt": "2026-09-21T11:57:39Z",
+  "requirements": [
+    "REQ-023",
+    "REQ-024"
+  ],
+  "commands": [],
+  "limitations": "Sentetik render artifact'idir; gerçek ekran görüntüsü, ekran okuyucu, cihaz ve kullanıcı kabulü değildir.",
+  "reviewer": "copilot",
+  "artifactSha256": "c87f9b9cba321bc8cf2ceebe45f6995a1064607edea65fe3d01a63a1bb27218f",
+  "details": {
+    "themes": [
+      "light",
+      "dark (token parity — yeni renk kuralı eklenmedi)"
+    ],
+    "viewports": [
+      "320px",
+      "390px",
+      "430px paylaşılan sınır",
+      "768px",
+      "1280px paylaşılan sınır",
+      "320px %200 metin"
+    ],
+    "syntheticDataset": "IIP12-SYN-01; 2 sentetik öncü + sabit gün damgası. Kişisel veri, token, GPS, ağ veya cihaz depolaması içermez. Yasaklı alan taraması temiz.",
+    "observations": "8 sahne: odak öncü/âyet kaynağı, odak boş hâl, Devam (zikir+Kur'an), Devam Kur'an-hazır, Devam bozuk+arşiv (bölüm YOK), Bugün tam hub, Öncü sekmesi (odak/devam görünmez). Tümü gerçek saygi.js registry çıktısıdır.",
+    "artifactKind": "render"
+  }
+}

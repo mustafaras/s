@@ -1411,14 +1411,14 @@ function zikroverlayHTML(){
   // kısa Türkçe etiket). Eski tek "Özet" sekmesi Geçmiş (istatistik/ısı) ve
   // Ayarlar (tüm toggle'lar) olarak ikiye ayrıldı — her ekranın tek bir işi var.
   var tabs=[['counter','Sayaç'],['presets','Esmâ'],['hatims','Hatimlerim'],['history','Geçmiş'],['settings','Ayarlar']];
-  var head='<header class="zikr-v2-header"><div class="brand"><span>'+icon('sparkles',18)+'</span><div><strong>Zikirmatik</strong><small>Kalıcı, odaklı ve sana ait</small></div></div><button data-fx="close" class="close" onclick="App.closeZikr()" aria-label="Zikirmatiği kapat">'+icon('x',18)+'</button></header>';
+  var head='<header class="zikr-v2-header iip-07-header"><div class="brand iip-07-title"><span>'+icon('sparkles',18)+'</span><div><strong>Zikirmatik</strong><small>Kalıcı, odaklı ve sana ait</small></div></div><button data-fx="close" class="close iip-07-button" onclick="App.closeZikr()" aria-label="Zikirmatiği kapat">'+icon('x',18)+'</button></header>';
   // ZP-08.2: paylaşımlı segTabs() aktif sekmeye INLINE `background:linear-
   // gradient(...)` yazıyordu; inline stil sınıf seçicisini yendiği için
   // ZP-08'in opak/gradientsiz kuralı bu tek noktada UYGULANAMIYORDU (gerçek
   // bir hata). Zikirmatik artık kendi sınıf-tabanlı sekmelerini üretir.
   head+='<nav id="zikr-tabs" class="zikr-v2-tabs" aria-label="Zikirmatik bölümleri"><div class="seg" role="tablist">';
   tabs.forEach(function(d){
-    head+='<button role="tab" data-zikr-view="'+d[0]+'" aria-selected="'+(view===d[0])+'" class="'+(view===d[0]?'on':'')+'" onclick="App.setZikrView(\''+d[0]+'\')">'+d[1]+'</button>';
+    head+='<button role="tab" data-zikr-view="'+d[0]+'" aria-selected="'+(view===d[0])+'" class="iip-07-button '+(view===d[0]?'on':'')+'" onclick="App.setZikrView(\''+d[0]+'\')">'+d[1]+'</button>';
   });
   head+='</div></nav>';
   return '<div id="zikr-overlay" class="zikr-v2-overlay'+(z.settings.reducedMotion?' is-reduced':'')+'" role="dialog" aria-modal="true" aria-label="Tam ekran Zikirmatik"><div id="zikr-screen" class="zikr-v2-screen" tabindex="-1" onkeydown="App.onZikrKeydown(event)">'+head+'<main id="zikr-scroll" class="scroll zikr-v2-scroll">'+body+'</main></div></div>';
@@ -1465,10 +1465,10 @@ function quranJourneyHubCardHTML(){
 
 function quranJourneyOverlayHTML(){
   var ui=liveUi();
-  var head='<header class="quran-v2-header"><div id="quran-head-lead" class="lead">'+quranHeadLeadHTML()+'</div>';
-  head+='<button id="quran-refresh-button" class="refresh'+(ui.quranRefreshing?' is-spinning':'')+'" onclick="App.refreshQuranUpdates()" aria-label="Güncellemeleri kontrol et" aria-busy="'+(!!ui.quranRefreshing)+'"'+(ui.quranRefreshing?' disabled':'')+'>'+icon('rotate-ccw',17)+'</button>';
+  var head='<header class="quran-v2-header iip-07-header"><div id="quran-head-lead" class="lead">'+quranHeadLeadHTML()+'</div>';
+  head+='<button id="quran-refresh-button" class="refresh iip-07-button'+(ui.quranRefreshing?' is-spinning':'')+'" onclick="App.refreshQuranUpdates()" aria-label="Güncellemeleri kontrol et" aria-busy="'+(!!ui.quranRefreshing)+'"'+(ui.quranRefreshing?' disabled':'')+'>'+icon('rotate-ccw',17)+'</button>';
   head+=quranRemoteStatusHTML();
-  head+='<button data-fx="close" class="close" onclick="App.closeQuranJourney()" aria-label="Kur’an Yolculuğunu kapat">'+icon('x',18)+'</button></header>';
+  head+='<button data-fx="close" class="close iip-07-button" onclick="App.closeQuranJourney()" aria-label="Kur’an Yolculuğunu kapat">'+icon('x',18)+'</button></header>';
   return '<div id="quran-overlay" class="quran-v2-overlay" role="dialog" aria-modal="true" aria-label="Raşit ile Kur’an Yolculuğu">'
     +'<div id="quran-screen" class="quran-v2-screen" tabindex="-1" onkeydown="App.onQuranKeydown(event)">'
     +head+'<main id="quran-scroll" class="scroll quran-v2-scroll">'+quranViewBodyHTML()+'</main></div></div>';
@@ -1483,17 +1483,17 @@ function quranRemoteStatusHTML(){
   else if(status==='updated_warning'){ label='Cevap alındı · kaynak uyarısı'; tone='warning'; }
   else if(status==='unchanged'){ label='Güncel'; tone='idle'; }
   else if(status==='error'){ label='Kontrol başarısız'; tone='error'; }
-  return '<span id="quran-remote-status" class="quran-v2-remote-status is-'+tone+'" role="status" aria-live="polite" title="'+esc(ui.quranRemoteError||label)+'">'+esc(label)+'</span>';
+  return '<span id="quran-remote-status" class="quran-v2-remote-status iip-07-state iip-07-state-remote is-'+tone+'" role="status" aria-live="polite" title="'+esc(ui.quranRemoteError||label)+'">'+esc(label)+'</span>';
 }
 
 function quranHeadLeadHTML(){
   var ui=liveUi();
   if(ui.quranJourneyView==='detail'){
     var x=quranSurah(ui.quranDetailId);
-    return '<button class="back" onclick="App.backToQuranLibrary()" aria-label="Sûre kütüphanesine dön">'+icon('chevron-left',18)+'</button>'
-      +'<span class="copy"><strong>'+esc(x?(x.nameTr+' Sûresi'):'Sûre')+'</strong><small>'+esc(x?(x.revelationOrder+'. durak · '+quranTotal()+' sûrelik yolculuk'):'Kur’an Yolculuğu')+'</small></span>';
+    return '<button class="back iip-07-button" onclick="App.backToQuranLibrary()" aria-label="Sûre kütüphanesine dön">'+icon('chevron-left',18)+'</button>'
+      +'<span class="copy iip-07-title"><strong>'+esc(x?(x.nameTr+' Sûresi'):'Sûre')+'</strong><small>'+esc(x?(x.revelationOrder+'. durak · '+quranTotal()+' sûrelik yolculuk'):'Kur’an Yolculuğu')+'</small></span>';
   }
-  return '<span class="mark" aria-hidden="true"><span>'+icon('book-open',20)+'</span><i></i></span><span class="copy"><strong>Kur’an Yolculuğu</strong><small>Raşit’in anlatımıyla · nüzul arşivi</small></span>';
+  return '<span class="mark" aria-hidden="true"><span>'+icon('book-open',20)+'</span><i></i></span><span class="copy iip-07-title"><strong>Kur’an Yolculuğu</strong><small>Raşit’in anlatımıyla · nüzul arşivi</small></span>';
 }
 
 function quranLibraryViewHTML(){
@@ -1506,11 +1506,11 @@ function quranLibraryViewHTML(){
   h+='<i aria-hidden="true"><b style="width:'+s.pct+'%"></b></i>';
   h+='<span><strong>'+s.watched+' / '+s.total+'</strong> izlendi · '+s.requested+' sûre için istek açıldı</span>';
   h+='</div>';
-  h+='<div class="quran-v2-method-note" role="note"><span class="method-icon" aria-hidden="true">'+icon('scale',16)+'</span><span><strong>Katalog yöntemi</strong><small>Yaygın nüzul tertibi · sûreler tek tek doğrulanabilir · durumlar kullanıcı ilerlemesinden hesaplanır.</small></span><b aria-hidden="true">'+icon('chevron-right',14)+'</b></div>';
+  h+='<div class="quran-v2-method-note iip-07-source iip-07-source-card" role="note"><span class="method-icon" aria-hidden="true">'+icon('scale',16)+'</span><span><strong>Katalog yöntemi</strong><small>Yaygın nüzul tertibi · sûreler tek tek doğrulanabilir · durumlar kullanıcı ilerlemesinden hesaplanır.</small></span><b aria-hidden="true">'+icon('chevron-right',14)+'</b></div>';
   h+='<label class="quran-v2-search">'+icon('search',16)+'<input id="quran-search-input" value="'+esc(ui.quranQuery||'')+'" oninput="App.setQuranQuery(this)" placeholder="Sûre adı, Arapça ad, mushaf no veya konu" aria-label="Sûre ara">';
   h+='<button id="quran-search-clear" class="clear" onclick="App.clearQuranQuery()" aria-label="Aramayı temizle"'+(ui.quranQuery?'':' hidden')+'>'+icon('x',13)+'</button></label>';
   h+='<div id="quran-library-results">'+quranLibraryResultsHTML()+'</div>';
-  h+='<p class="quran-v2-disclaimer">'+esc((cat&&cat.methodologyTr)||'Sıralama yaygın nüzul tertibine dayanır; klasik kaynaklar arasında bazı sûrelerin yeri ihtilaflıdır.')+'</p>';
+  h+='<p class="quran-v2-disclaimer iip-07-source">'+esc((cat&&cat.methodologyTr)||'Sıralama yaygın nüzul tertibine dayanır; klasik kaynaklar arasında bazı sûrelerin yeri ihtilaflıdır.')+'</p>';
   h+='</section>';
   return h;
 }
@@ -1533,7 +1533,7 @@ function quranLibraryResultsHTML(){
   h+='</div></div></section>';
   h+='<div class="quran-v2-result-note" role="status" aria-live="polite"><span><strong>'+rows.length+'</strong> sûre'+(filter!=='all'?' · '+esc(quranFilterLabel(filter)):'')+(query?' · “'+esc(query)+'”':'')+'</span><span class="result-context">'+((filter==='all'&&!query)?'NÜZUL SIRASIYLA':'EŞLEŞEN DURAKLAR')+'</span></div>';
   if(!rows.length){
-    h+='<div class="quran-v2-empty"><strong>Bu mercekte eşleşme yok.</strong><span>Aramayı temizleyebilir veya filtreyi “Tümü” yapabilirsin.</span><button data-fx="destructive" onclick="App.resetQuranLens()">Filtreyi sıfırla</button></div>';
+    h+='<div class="quran-v2-empty iip-07-state iip-07-state-empty"><strong>Bu mercekte eşleşme yok.</strong><span>Aramayı temizleyebilir veya filtreyi “Tümü” yapabilirsin.</span><button class="iip-07-button" data-fx="destructive" onclick="App.resetQuranLens()">Filtreyi sıfırla</button></div>';
     return h;
   }
   var q=ensureQuranJourney(data);
@@ -1560,7 +1560,7 @@ function quranRowHTML(x,q){
 
 function quranDetailViewHTML(id){
   var x=quranSurah(id);
-  if(!x) return '<section class="quran-v2-detail"><div class="quran-v2-empty"><strong>Sûre bulunamadı.</strong><span>Kütüphaneden yeniden seçebilirsin.</span><button onclick="App.backToQuranLibrary()">Kütüphaneye dön</button></div></section>';
+  if(!x) return '<section class="quran-v2-detail"><div class="quran-v2-empty iip-07-state iip-07-state-error"><strong>Sûre bulunamadı.</strong><span>Kütüphaneden yeniden seçebilirsin.</span><button class="iip-07-button" onclick="App.backToQuranLibrary()">Kütüphaneye dön</button></div></section>';
   return '<section class="quran-v2-detail"><div id="quran-detail-region">'+quranDetailBodyHTML(x)+'</div></section>';
 }
 
@@ -1570,7 +1570,7 @@ function quranVideoNotesInnerHTML(x,req){
   var status=String(req.status||'idle');
   var canEdit=['ready','watching','watched','question_opened'].indexOf(status)>=0&&QURAN_VIDEO_ID_RE.test(String(req.videoId||''));
   var draft=quranNoteDraftFor(x.id), notes=quranSortNotes(req.notes).slice(0,12), h='';
-  h+='<div class="quran-v2-notes-head"><div><strong>'+icon('pen-line',15)+' İzlerken / dinlerken notlar</strong><span>Bağlamı yakala, sonra panelden birlikte takip edelim.</span>'+(canEdit?'':'<span class="quran-v2-notes-lock">'+icon('lock',12)+' Video hazır olduğunda not yazma açılır.</span>')+'</div><b>'+((Array.isArray(req.notes))?req.notes.length:0)+'</b></div>';
+  h+='<div class="quran-v2-notes-head"><div><strong>'+icon('pen-line',15)+' İzlerken / dinlerken notlar</strong><span>Bağlamı yakala, sonra panelden birlikte takip edelim.</span>'+(canEdit?'':'<span class="quran-v2-notes-lock iip-07-state">'+icon('lock',12)+' Video hazır olduğunda not yazma açılır.</span>')+'</div><b>'+((Array.isArray(req.notes))?req.notes.length:0)+'</b></div>';
   if(notes.length){
     h+='<div class="quran-v2-note-list" aria-live="polite">';
     notes.forEach(function(n){
@@ -1580,13 +1580,13 @@ function quranVideoNotesInnerHTML(x,req){
     h+='</div>';
     if((req.notes||[]).length>notes.length) h+='<p class="quran-v2-notes-more">Son 12 not gösteriliyor; toplam '+req.notes.length+' not cihazlar arasında korunuyor.</p>';
   } else {
-    h+='<p class="quran-v2-notes-empty">'+(canEdit?'Henüz not yok. Videonun bir anını, duyduğun bir cümleyi veya aklına düşeni buraya bırak.':'Video geldiğinde burada izlerken ve dinlerken not tutabileceksin.')+'</p>';
+    h+='<p class="quran-v2-notes-empty iip-07-state iip-07-state-empty">'+(canEdit?'Henüz not yok. Videonun bir anını, duyduğun bir cümleyi veya aklına düşeni buraya bırak.':'Video geldiğinde burada izlerken ve dinlerken not tutabileceksin.')+'</p>';
   }
   var disabled=canEdit?'':' disabled';
   h+='<form class="quran-v2-note-compose'+(canEdit?'':' is-locked')+'" onsubmit="event.preventDefault();App.quranAddNote(\''+esc(x.id)+'\')">';
   h+='<div class="quran-v2-note-fields"><label>Not türü<select'+disabled+' onchange="App.quranNoteField(\'kind\',this)"><option value="watch"'+(draft.kind==='watch'?' selected':'')+'>İzlerken</option><option value="listen"'+(draft.kind==='listen'?' selected':'')+'>Dinlerken</option><option value="reflection"'+(draft.kind==='reflection'?' selected':'')+'>Yansıma</option></select></label><label>Video saniyesi<input'+disabled+' type="number" min="0" step="1" inputmode="numeric" placeholder="opsiyonel" value="'+esc(draft.timestamp)+'" oninput="App.quranNoteField(\'timestamp\',this)"></label><label>Etiket<input'+disabled+' type="text" maxlength="40" placeholder="ör. sabır" value="'+esc(draft.tag)+'" oninput="App.quranNoteField(\'tag\',this)"></label></div>';
   h+='<label class="quran-v2-note-text">Notun<textarea'+disabled+' rows="3" maxlength="2000" placeholder="Bu anlatımda sende ne kaldı?" oninput="App.quranNoteField(\'text\',this)">'+esc(draft.text)+'</textarea></label>';
-  h+='<button type="submit" class="quran-v2-note-save"'+(canEdit?'':' disabled aria-disabled="true"')+'>'+icon(canEdit?'save':'lock',15)+'<span>'+(canEdit?'Notu kaydet':'Video hazır olduğunda açılır')+'</span></button></form>';
+  h+='<button type="submit" class="quran-v2-note-save iip-07-button"'+(canEdit?'':' disabled aria-disabled="true"')+'>'+icon(canEdit?'save':'lock',15)+'<span>'+(canEdit?'Notu kaydet':'Video hazır olduğunda açılır')+'</span></button></form>';
   return h;
 }
 
@@ -1619,7 +1619,7 @@ function quranVideoCardHTML(x,req){
       +'referrerpolicy="strict-origin-when-cross-origin" '
       +'sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"></iframe>';
   } else {
-    h+='<button class="cover" onclick="App.quranJourneyWatch(\''+esc(x.id)+'\')" aria-label="'+esc(x.nameTr)+' Sûresi anlatımını oynat">';
+    h+='<button class="cover iip-07-button" onclick="App.quranJourneyWatch(\''+esc(x.id)+'\')" aria-label="'+esc(x.nameTr)+' Sûresi anlatımını oynat">';
     h+='<img src="'+quranVideoThumbUrl(vid)+'" alt="" loading="lazy" onerror="this.hidden=true;this.parentNode.classList.add(\'no-thumb\')">';
     h+='<span class="play" aria-hidden="true">'+icon('play',22)+'</span>';
     h+='<span class="cta-label">İzlemeye başla</span>';
@@ -1631,7 +1631,7 @@ function quranVideoCardHTML(x,req){
   // "İzledim" istemek kafa karıştırıcı olur (repaint bu durumu otomatik
   // düşürür, ayrı bir gizleme mantığı gerekmez).
   if(loaded&&req.status==='watching'){
-    h+='<button id="quran-watched-fallback" class="quran-v2-watched-fallback" onclick="App.quranMarkWatched(\''+esc(x.id)+'\')">'+icon('circle-check',15)+'<span>İzledim</span></button>';
+    h+='<button id="quran-watched-fallback" class="quran-v2-watched-fallback iip-07-button" onclick="App.quranMarkWatched(\''+esc(x.id)+'\')">'+icon('circle-check',15)+'<span>İzledim</span></button>';
   }
   if(req.readyAt) h+='<p class="quran-v2-video-meta">Hazır: '+esc(fmtDateNice(req.readyAt))+'</p>';
   h+='</section>';
@@ -1639,7 +1639,7 @@ function quranVideoCardHTML(x,req){
 }
 
 function quranVideoUnavailableHTML(){
-  return '<section class="quran-v2-video is-unavailable" role="status" aria-live="polite">'
+  return '<section class="quran-v2-video is-unavailable iip-07-state iip-07-state-error" role="status" aria-live="polite">'
     +'<p><strong>Bu anlatım artık erişilebilir değil.</strong><br>Raşit’ten yeni bir bağlantı istenebilir.</p></section>';
 }
 
@@ -1658,8 +1658,8 @@ function quranDetailBodyHTML(x){
   h+='<div><dt>Âyet sayısı</dt><dd>'+x.ayahCount+'</dd></div>';
   h+='</dl>';
   h+='<p class="quran-v2-theme">'+esc(x.themeTr)+'</p>';
-  if(disputed) h+='<p class="quran-v2-foot">* Bu sûrenin Mekkî/Medenî nitelemesi klasik kaynaklarda ihtilaflıdır.</p>';
-  h+='<div id="quran-detail-status" class="quran-v2-status is-'+state.tone+'" role="status" aria-live="polite"><i class="dot" aria-hidden="true"></i>';
+  if(disputed) h+='<p class="quran-v2-foot iip-07-source">* Bu sûrenin Mekkî/Medenî nitelemesi klasik kaynaklarda ihtilaflıdır.</p>';
+  h+='<div id="quran-detail-status" class="quran-v2-status iip-07-state is-'+state.tone+'" role="status" aria-live="polite"><i class="dot" aria-hidden="true"></i>';
   h+='<span><strong>'+esc(state.label)+'</strong><em>'+esc(quranStatusNote(st,x.nameTr))+'</em></span></div>';
   // QY-12/QY-19/QY-20: video kartı hazır/izleniyor durumlarında
   // “İzlemeye başla” birincil eylemdir; kalıcı WhatsApp “Raşit’e sor” eylemi
@@ -1681,13 +1681,13 @@ function quranDetailBodyHTML(x){
     });
     h+='</ul></div>';
   }
-  h+='<button class="quran-v2-back-link" onclick="App.backToQuranLibrary()">'+icon('chevron-left',14)+'<span>Kütüphaneye dön</span></button>';
+  h+='<button class="quran-v2-back-link iip-07-button" onclick="App.backToQuranLibrary()">'+icon('chevron-left',14)+'<span>Kütüphaneye dön</span></button>';
   return h;
 }
 
 function quranCtaButtonHTML(action,extraClass){
   var disabled=!!action.disabled;
-  var klass='quran-v2-cta'+(extraClass?' '+extraClass:'')+(disabled?' is-disabled':'');
+  var klass='quran-v2-cta iip-07-button'+(extraClass?' '+extraClass:'')+(disabled?' is-disabled':'');
   var attrs=disabled?' disabled aria-disabled="true"':' onclick="'+action.action+'"';
   return '<button class="'+klass+'"'+attrs+'>'+icon(action.icon||'send',16)+'<span>'+esc(action.label)+'</span></button>';
 }

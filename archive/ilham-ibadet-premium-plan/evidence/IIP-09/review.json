@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-09",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-09/review.md",
+  "verifiedHead": "6a8729312d70121d11bb5549e2521941df1162a9",
+  "diffHash": "57aa6b577e9028fb5f68de03a56ffcb16146cdbd44537a7c71ac8f161bced24c",
+  "createdAt": "2026-09-21T12:00:00Z",
+  "requirements": [
+    "REQ-017",
+    "REQ-018"
+  ],
+  "commands": [],
+  "limitations": "Sentetik/headless incelemedir; fiziksel cihaz, VoiceOver ve yayın kabulü değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "6c4b3ab11feca932e42a3a490649116fb44c8b951c9d07fd9a9260343ce3412e",
+  "details": {
+    "findings": [],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "codex"
+  }
+}

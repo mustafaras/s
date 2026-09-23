@@ -1,0 +1,78 @@
+{
+ "schemaVersion": 1,
+ "cardId": "IIP-13",
+ "gate": "source",
+ "status": "pass",
+ "artifact": "evidence/IIP-13/source.md",
+ "verifiedHead": "705fc135879f5b9f89274f8ac12c67b149cc5f40",
+ "diffHash": "823d8d07afb8445acd72f7731386071d841825c963ab4617aeec3a082c010c39",
+ "createdAt": "2026-09-21T12:13:56Z",
+ "requirements": [
+  "REQ-025",
+  "REQ-026"
+ ],
+ "commands": [
+  {
+   "command": "node ilham-ibadet-premium-plan/tools/plan-check.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app/core/prayer.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check app/core/saygi.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node --check tests/app/test_iip_13.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_13.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_prayer_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_saygi_boundary.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node tests/app/test_iip_12.js",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node .claude/skills/run-seyma/driver.mjs",
+   "exitCode": 0
+  },
+  {
+   "command": "node tools/shell-inventory.mjs --gate",
+   "exitCode": 0
+  },
+  {
+   "command": "git -c core.fsmonitor=false diff --check",
+   "exitCode": 0
+  }
+ ],
+ "limitations": "Fixture/VM kanıtıdır; tarayıcı, cihaz ve ekran okuyucu kabulü değildir.",
+ "reviewer": "copilot",
+ "artifactSha256": "3662b2b76e78d3029cfae5340889848cb4768a5a963a42acccb875707d7fa649",
+ "details": {},
+ "reconciliation": {
+  "reconciledAt": "2026-09-22T16:06:28.599Z",
+  "reconciledHead": "242938bf98a53a237ee3520132037f91f7764883",
+  "method": "every recorded command re-run in the live tree; recorded exitCode compared with the live exit code",
+  "commandsRerun": 12,
+  "driftCount": 0,
+  "verdict": "no drift — every recorded command still exits with the recorded code",
+  "drift": [],
+  "note": "Append-only: the original commands[] array above is unchanged. This block records a later re-run, not a rewrite of history."
+ }
+}

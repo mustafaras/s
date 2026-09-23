@@ -1,0 +1,16 @@
+2026-09-21T14:30:08Z IIP-14 doğrulama özeti
+PASS node --check app/core/prayer.js
+PASS node --check app/core/saygi.js
+PASS node --check tests/app/test_iip_14.js
+PASS node tests/app/test_iip_14.js (17/17)
+PASS node tests/app/test_prayer_boundary.js (22/22)
+PASS node tests/app/test_saygi_boundary.js (21/21)
+PASS node .claude/skills/run-seyma/driver.mjs
+PASS node .claude/skills/run-seyma/zikr-harness.mjs
+PASS node .claude/skills/run-seyma/verify-state-migration-boundary.mjs (67/67)
+PASS node .claude/skills/run-seyma/verify-state-helper-boundary.mjs
+PASS node .claude/skills/run-seyma/verify-state-adapter-contract.mjs (20/20)
+PASS node tools/shell-inventory.mjs --gate
+PASS git -c core.fsmonitor=false diff --check
+EXPECTED FAIL initial plan-check: invalid resource lock IIP-14; state kaydı düzeltildi.
+EXPECTED DRIFT tests/app: 59/65 PASS; 5 eski app.js cache pin fixture'ı + 1 IIP-03 devredilmiş payda assertion'ı.

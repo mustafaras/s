@@ -58,7 +58,9 @@ ok('every handler keeps its exact App name through the shared signature-neutral 
   /Object\.keys\(MON51_DOMAIN_HANDLERS\)\.forEach\(function\(name\)\{ App\[name\]=function\(\)\{ return SEYMA_APP_SURFACE\.domainHandler\(name,arguments\); \}; \}\);/.test(app));
 ok('forbidden GPS, transport, fetch and notification paths are absent from MON-51 binding',
   !/fetchPrayerLocationGPS|refreshPrayerTimes|quranJourneySubmit|quranJourneyWatch|quranJourneyQuestion|refreshQuranUpdates|refreshSaygi|requestReminderPermission/.test(app.slice(app.indexOf('var MON51_DOMAIN_HANDLERS'), app.indexOf('window.App=App'))));
+/* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
+   gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('production loads appSurface before app.js with fresh cache versions',
-  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260915c/.test(index) && /app\.js\?v=20260916a/.test(index));
+  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260921c/.test(index) && /app\.js\?v=20260922b/.test(index));
 
 console.log('\nMON-51 domain App surface boundary: ' + passed + '/' + passed + ' passed');

@@ -125,7 +125,11 @@ group('FX2-16.1 12 hedef closeX sarmalayıcısı doğru yüzey kimliğine bağl�
 
 group('FX2-16.2 M6 çağrı sayısı en az 10, App/onClick yüzeyi değişmez',
   (combinedSource.match(/\bsheetClose\s*\(/g) || []).length >= 10 &&
-  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 718 &&
+  // IIP-10 / DEC-07: öncü araması TEK dispatcher handler ekledi (App.saygiLens).
+  // 718 → 719 artışı tam olarak bu addır; onclick=391 değişmedi.
+  // IIP-11: App.saygiReader tek dispatcher handler'ı eklendi; 719 → 720.
+  // 720 − 719 = tam olarak App.saygiReader; onclick=391 değişmedi.
+  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 720 &&
   (combinedSource.match(/onclick=/g) || []).length === 391
 );
 

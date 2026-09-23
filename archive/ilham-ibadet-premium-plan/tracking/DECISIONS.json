@@ -1,0 +1,65 @@
+[
+  {
+    "id": "DEC-01",
+    "title": "Sıcak kütüphane tasarım yönü",
+    "ownerCard": "IIP-02",
+    "status": "approved",
+    "source": "2026-09-20 user message: 02 yi tamamlayalım; IIP-02 için sıcak kütüphane yönünü onaylayan ürün/tasarım kararı.",
+    "evidence": "evidence/IIP-02/decision-approval.md",
+    "reviewer": "User (product/design decision owner; explicit current-turn approval)"
+  },
+  {
+    "id": "DEC-02",
+    "title": "Beş bölüm hedef mimarisi",
+    "ownerCard": "IIP-09",
+    "status": "approved",
+    "source": "2026-09-20 user message: IIP-09 hedef bilgi mimarisini yalnız bu kart kapsamında uygula; go apply be perfect.",
+    "evidence": "evidence/IIP-09/decision-approval.md",
+    "reviewer": "User (product/design decision owner; explicit current-turn approval)"
+  },
+  {
+    "id": "DEC-03",
+    "title": "Tarihsel kayıt ve payda politikası",
+    "ownerCard": "IIP-03",
+    "status": "approved",
+    "source": "2026-09-20 user message: IIP-03'te tarihsel anlamı belgelemek, belirsiz oran kopyasını güvenli betimleyici ifadeye çevirmek, hesap/alan/call graph'ı değiştirmemek ve çözülmeyen payda hesabını IIP-14/15'e bırakmak.",
+    "evidence": "evidence/IIP-03/decision-approval.md",
+    "reviewer": "User (product/domain decision owner; explicit current-turn approval)"
+  },
+  {
+    "id": "DEC-04",
+    "title": "İçerik pilotu kaynak/hak/inceleme",
+    "ownerCard": "IIP-16",
+    "status": "approved",
+    "source": "2026-09-21 user message: daha önce 'inceledim ve onaylıyorum' dediğini açıkça teyit etti; IIP-16 pilotu kaynak/hak/alan kararı.",
+    "evidence": "evidence/IIP-16/decision-approval.md",
+    "reviewer": "User (product/domain decision owner; explicit approval)"
+  },
+  {
+    "id": "DEC-07",
+    "title": "Öncü arama dispatcher'ı ve FX2 App yüzey pin güncellemesi",
+    "ownerCard": "IIP-10",
+    "status": "approved",
+    "source": "2026-09-21 user message: yalnız IIP-10 adımını uygula (Öncü arama ve filtre); go apply be perfect.",
+    "evidence": "evidence/IIP-10/decision-approval.md",
+    "reviewer": "User (product/design decision owner; explicit current-turn approval)"
+  },
+  {
+    "id": "DEC-05",
+    "title": "Yeni kalıcı veri ve paylaşım şeması",
+    "ownerCard": "IIP-19",
+    "status": "approved",
+    "source": "2026-09-22 user message: review tamam; bu review nedeniyle devam edememe durumu kaldırıldı ve IIP-20 uygulamasına geçiş onaylandı.",
+    "evidence": "evidence/IIP-19/decision-approval.md",
+    "reviewer": "User (product/data decision owner; explicit current-turn approval)"
+  },
+  {
+    "id": "DEC-06",
+    "title": "Offline genel içerik kapsamı",
+    "ownerCard": "IIP-22",
+    "status": "approved",
+    "source": "2026-09-22 user message: yalnız IIP-22'yi uygula; önce capability spike, sonra yalnız genel kabuk/içerik paketi, geniş runtime fetch cache'i olmadan güvenli yaşam döngüsü ve olumsuz senaryolar.",
+    "evidence": "evidence/IIP-22/decision-approval.md",
+    "reviewer": "User (product/platform decision owner; explicit current-turn approval)"
+  }
+]

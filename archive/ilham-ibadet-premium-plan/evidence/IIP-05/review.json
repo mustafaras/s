@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-05",
+  "gate": "review",
+  "status": "pass",
+  "artifact": "evidence/IIP-05/review.md",
+  "verifiedHead": "aded41ea85150826bc340ad6ad86717b65a00d80",
+  "diffHash": "fbca8b0b992598ca94663788aadf5a68dde0d04c9011901131229a7302332199",
+  "createdAt": "2026-09-20T12:20:30Z",
+  "requirements": ["REQ-009", "REQ-010"],
+  "commands": [],
+  "limitations": "Kod incelemesi ve headless regression; cihaz/VoiceOver incelemesi değildir.",
+  "reviewer": "Codex / integrator",
+  "artifactSha256": "afd71f2d538181ee3b26386016001fb0df1503e049a42c4df2eefd8faa847e63",
+  "details": {
+    "findings": [],
+    "openCritical": 0,
+    "openHigh": 0,
+    "reviewedBy": "Codex / integrator"
+  }
+}

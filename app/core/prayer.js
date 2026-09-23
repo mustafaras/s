@@ -10,6 +10,7 @@
   // tutulmaz ve fetch yolu yalnız kullanıcı eylemiyle açılır.
   var PRAYER_NAMES={fajr:'İmsak',sunrise:'Güneş',dhuhr:'Öğle',asr:'İkindi',maghrib:'Akşam',isha:'Yatsı'};
   var PRAYER_ORDER=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+  var PRAYER_TRACKED_ORDER=['fajr','dhuhr','asr','maghrib','isha'];
   var PRAYER_CITIES=[
     {name:'Adana',lat:37.0,lon:35.3213},{name:'Adıyaman',lat:37.7644,lon:38.2763},{name:'Afyonkarahisar',lat:38.7507,lon:30.5567},{name:'Ağrı',lat:39.7191,lon:43.0503},{name:'Amasya',lat:40.6499,lon:35.8353},{name:'Ankara',lat:39.9334,lon:32.8597},{name:'Antalya',lat:36.8969,lon:30.7133},{name:'Artvin',lat:41.1800,lon:41.8200},{name:'Aydın',lat:37.8380,lon:27.8456},{name:'Balıkesir',lat:39.6492,lon:27.8861},{name:'Bilecik',lat:40.1457,lon:29.9794},{name:'Bingöl',lat:38.8845,lon:40.4939},{name:'Bitlis',lat:38.4000,lon:42.1200},{name:'Bolu',lat:40.7350,lon:31.6061},{name:'Burdur',lat:37.7203,lon:30.2908},{name:'Bursa',lat:40.1826,lon:29.0665},{name:'Çanakkale',lat:40.1553,lon:26.4142},{name:'Çankırı',lat:40.6013,lon:33.6134},{name:'Çorum',lat:40.5506,lon:34.9556},{name:'Denizli',lat:37.7765,lon:29.0864},{name:'Diyarbakır',lat:37.9143,lon:40.2306},{name:'Edirne',lat:41.6772,lon:26.5557},{name:'Elazığ',lat:38.6748,lon:39.2225},{name:'Erzincan',lat:39.7463,lon:39.4911},{name:'Erzurum',lat:39.9043,lon:41.2679},{name:'Eskişehir',lat:39.7667,lon:30.5256},{name:'Gaziantep',lat:37.0662,lon:37.3833},{name:'Giresun',lat:40.9128,lon:38.3895},{name:'Gümüşhane',lat:40.4608,lon:39.4814},{name:'Hakkari',lat:37.5833,lon:43.7333},{name:'Hatay',lat:36.2026,lon:36.1604},{name:'Isparta',lat:37.7644,lon:30.5522},{name:'Mersin',lat:36.8121,lon:34.6415},{name:'İstanbul',lat:41.0082,lon:28.9784},{name:'İzmir',lat:38.4192,lon:27.1287},{name:'Kars',lat:40.6013,lon:43.0945},{name:'Kastamonu',lat:41.3887,lon:33.7827},{name:'Kayseri',lat:38.7205,lon:35.4826},{name:'Kırklareli',lat:41.7333,lon:27.2167},{name:'Kırşehir',lat:39.1425,lon:34.1709},{name:'Kocaeli',lat:40.7654,lon:29.9408},{name:'Konya',lat:37.8667,lon:32.4833},{name:'Kütahya',lat:39.4167,lon:29.9833},{name:'Malatya',lat:38.3552,lon:38.3095},{name:'Manisa',lat:38.6191,lon:27.4289},{name:'Kahramanmaraş',lat:37.5858,lon:36.9371},{name:'Mardin',lat:37.3212,lon:40.7245},{name:'Muğla',lat:37.2153,lon:28.3636},{name:'Muş',lat:38.7432,lon:41.5064},{name:'Nevşehir',lat:38.6247,lon:34.7142},{name:'Niğde',lat:37.9667,lon:34.6833},{name:'Ordu',lat:40.9839,lon:37.8764},{name:'Rize',lat:41.0201,lon:40.5235},{name:'Sakarya',lat:40.7563,lon:30.3783},{name:'Samsun',lat:41.2928,lon:36.3313},{name:'Siirt',lat:37.9293,lon:41.9420},{name:'Sinop',lat:42.0265,lon:35.1511},{name:'Sivas',lat:39.7477,lon:37.0179},{name:'Tekirdağ',lat:40.9780,lon:27.5111},{name:'Tokat',lat:40.3167,lon:36.5544},{name:'Trabzon',lat:41.0015,lon:39.7178},{name:'Tunceli',lat:39.1079,lon:39.5401},{name:'Şanlıurfa',lat:37.1591,lon:38.7969},{name:'Uşak',lat:38.6823,lon:29.4082},{name:'Van',lat:38.5012,lon:43.3727},{name:'Yozgat',lat:39.8181,lon:34.8147},{name:'Zonguldak',lat:41.4564,lon:31.7987},{name:'Aksaray',lat:38.3687,lon:34.0360},{name:'Bayburt',lat:40.2552,lon:40.2249},{name:'Karaman',lat:37.1811,lon:33.2150},{name:'Kırıkkale',lat:39.8508,lon:33.5063},{name:'Batman',lat:37.8812,lon:41.1301},{name:'Şırnak',lat:37.4187,lon:42.4918},{name:'Bartın',lat:41.6358,lon:32.3375},{name:'Ardahan',lat:41.1105,lon:42.7022},{name:'Iğdır',lat:39.9208,lon:44.0450},{name:'Yalova',lat:40.6500,lon:29.2667},{name:'Karabük',lat:41.2000,lon:32.6333},{name:'Kilis',lat:36.7184,lon:37.1212},{name:'Osmaniye',lat:37.0741,lon:36.2462},{name:'Düzce',lat:40.8438,lon:31.1565}
   ];
@@ -122,6 +123,68 @@
   function prayerWriteCache(date,locHash,method,val){
     try{ var s=storage(); if(s) s.setItem(prayerCacheKey(date,locHash),JSON.stringify({date:date,locHash:locHash,method:method||'',times:val,fetchedAt:new Date().toISOString()})); }catch(e){}
   }
+
+  // ── IIP-13 · Tazelik ve kapsam (salt-okur) ────────────────────────────────
+  // Cache geçerliliği yalnız yaşa göre değil GÜN + KONUM(şehir/koordinat) +
+  // YÖNTEM eşleşmesine göre değerlendirilir; uyuşmazlıkta kayıt "güncel"
+  // sayılmaz (REQ-025). Bu yardımcılar kayıt oluşturmaz, ağa çıkmaz, state
+  // yazmaz ve `Date.now()` yerine verilen `nowMs`'i kullanabilir (deterministik
+  // test). Türkiye kapsamı açıkça raporlanır; yurtdışı konum için yerel saat
+  // iddiası kurulmaz (REQ-026).
+  var PRAYER_STALE_HOURS=48;
+  function prayerAgeInfo(fetchedAt,nowMs){
+    var t=Date.parse(String(fetchedAt||''));
+    if(!isFinite(t)) return {ageH:null,stale:true};
+    var base=isFinite(Number(nowMs))?Number(nowMs):Date.now();
+    var ageH=(base-t)/3600000;
+    if(!isFinite(ageH)||ageH<0) ageH=0;
+    return {ageH:Math.round(ageH*10)/10,stale:ageH>=PRAYER_STALE_HOURS};
+  }
+  function prayerMethodLabel(method){
+    var labels={diyanet:'Diyanet yöntemi',mwl:'Muslim World League',isna:'ISNA',karachi:'Karachi',makkah:'Umm al-Qura',egypt:'Egyptian General Authority',tehran:'Tehran',ghana:'Ghana',kosovo:'Kosovo'};
+    var key=String(method||'diyanet').toLowerCase();
+    return labels[key]||'Diyanet yöntemi';
+  }
+  function prayerCacheEntry(date,locHash){
+    var v=prayerReadCache(date||dateCall('todayStr',[],function(){ return ''; }),locHash===undefined?prayerLocationHash():locHash);
+    if(!v||typeof v!=='object') return null;
+    return {times:v.times||null,method:String(v.method||''),fetchedAt:String(v.fetchedAt||''),locHash:String(v.locHash||''),date:String(v.date||'')};
+  }
+  function prayerCacheFreshness(o){
+    o=o||{};
+    var locHash=o.locHash===undefined?prayerLocationHash():String(o.locHash||'');
+    var method=o.method===undefined?prayerMethod():String(o.method||'');
+    var date=o.date||dateCall('todayStr',[],function(){ return ''; });
+    var entry=prayerCacheEntry(date,locHash);
+    if(!entry||!entry.times) return {state:'none',label:'Önbellek yok',detail:'Bu gün ve konum için kayıtlı vakit yok',stale:true,usable:false,ageH:null};
+    if(entry.method!==method) return {state:'mismatch',label:'Yöntem uyuşmuyor',detail:'Kayıt '+prayerMethodLabel(entry.method)+', seçili '+prayerMethodLabel(method)+' · eski önbellek kullanılmaz',stale:true,usable:false,ageH:null};
+    var age=prayerAgeInfo(entry.fetchedAt,o.nowMs), stamp=String(entry.fetchedAt).slice(0,16).replace('T',' '), ago='~'+String(Math.round(age.ageH))+' saat önce';
+    if(age.stale) return {state:'stale',label:'Eski önbellek',detail:'Son kayıt '+stamp+' · '+ago,stale:true,usable:false,ageH:age.ageH};
+    return {state:'fresh',label:'Güncel önbellek',detail:'Son kayıt '+stamp+' · '+ago,stale:false,usable:true,ageH:age.ageH};
+  }
+  // Uygulamanın kendi gün hesabı: kayıt tarihi bugün değilse gün dönmemiştir
+  // (gece yarısı uyarısı). Başka güne ait kayıt güncel saat sayılmaz.
+  function prayerDayFreshness(fetchedAt,date,nowMs){
+    var dt=date||dateCall('todayStr',[],function(){ return ''; });
+    if(!fetchedAt) return {state:'none',label:'Vakit yok',detail:'Kayıt henüz dolmadı',stale:true,dayMatch:false,ageH:null};
+    if(String(fetchedAt).slice(0,10)!==String(dt)) return {state:'otherday',label:'Başka güne ait',detail:'Kayıt tarihi '+String(fetchedAt).slice(0,10)+' · bugün '+String(dt),stale:true,dayMatch:false,ageH:null};
+    var age=prayerAgeInfo(fetchedAt,nowMs);
+    return {state:age.stale?'stale':'fresh',label:age.stale?'Eski kayıt':'Bugüne ait',detail:'Son kayıt '+String(fetchedAt).slice(0,16).replace('T',' '),stale:age.stale,dayMatch:true,ageH:age.ageH};
+  }
+  // Türkiye kapsamı: şehir listesi yalnız 81 il içindir ve hesap yöntemi
+  // Diyanet'tir. Koordinat TR kutusunun dışındaysa yerel saat iddiası kurulmaz.
+  function prayerInTurkey(lat,lon){
+    var la=Number(lat),lo=Number(lon);
+    if(!isFinite(la)||!isFinite(lo)) return false;
+    return la>=35.6&&la<=42.4&&lo>=25.5&&lo<=45.0;
+  }
+  function prayerCoverage(loc){
+    var l=loc||prayerLocation();
+    if(!l||typeof l!=='object'||isNaN(+l.lat)||isNaN(+l.lon)) return {state:'none',label:'Konum yok',detail:'Şehir seçilince kapsam doğrulanır',inTurkey:false,needsOwnTimezone:false};
+    var tr=prayerInTurkey(l.lat,l.lon), gps=String(l.source||'').toLowerCase()==='gps', name=l.cityName?String(l.cityName):'konum';
+    if(!tr) return {state:'outside',label:'Türkiye dışı',detail:(gps?'GPS '+name:name)+' · Türkiye listesi dışında · yerel saat olarak sunulmaz',inTurkey:false,needsOwnTimezone:true};
+    return {state:'inside',label:'Türkiye kapsamı içinde',detail:(l.cityName?String(l.cityName)+' · ':'')+'81 il listesi ve Diyanet yöntemi',inTurkey:true,needsOwnTimezone:false};
+  }
   function prayerTimesFromDay(p){ var out={}; PRAYER_ORDER.forEach(function(k){ out[k]=(p[k]&&p[k].time)||''; }); return out; }
   function currentPrayerIndex(times){
     var now=new Date(), curMin=now.getHours()*60+now.getMinutes(), best=-1;
@@ -166,6 +229,36 @@
     PRAYER_ORDER.forEach(function(k){ var e=p&&p[k]; if(!e) return; total++; if(e.performed){ performed++; if(e.inCongregation) congregation++; if(e.late) late++; if(e.madeUp) madeUp++; } nafile+=Math.max(0,Number(e.nafile)||0); });
     return {total:total,performed:performed,congregation:congregation,late:late,madeUp:madeUp,nafile:nafile};
   }
+  // IIP-14 · Eski altı anahtarı yalnız sunum için okur. `sunrise` tarihsel
+  // kaynak kaydıdır; beş vakitten birine çevrilmez. Boş/migration kaynaklı
+  // nesne ile bilinçli sıfır ayrılamadığı için bu adaptör payda veya oran
+  // üretmez ve girdi nesnesini hiçbir biçimde tamamlamaz/değiştirmez.
+  function prayerEntryHasSourceRecord(entry){
+    return !!(entry&&typeof entry==='object'&&(
+      entry.performed===true||entry.inCongregation===true||entry.late===true||
+      entry.madeUp===true||Math.max(0,Number(entry.nafile)||0)>0||
+      String(entry.note||'').trim()||String(entry.savedAt||'').trim()
+    ));
+  }
+  function prayerHistoryPresentation(p){
+    var source=(p&&typeof p==='object'&&!Array.isArray(p))?p:{}, records=[], trackedPerformed=0, sourceRecordCount=0;
+    PRAYER_ORDER.forEach(function(key){
+      var entry=source[key], hasRecord=prayerEntryHasSourceRecord(entry);
+      if(hasRecord) sourceRecordCount++;
+      if(key!=='sunrise'&&entry&&entry.performed===true) trackedPerformed++;
+      records.push({key:key,label:PRAYER_NAMES[key]||key,kind:key==='sunrise'?'historical_sunrise':'tracked_prayer',hasRecord:hasRecord,performed:!!(entry&&entry.performed===true),savedAt:entry&&typeof entry.savedAt==='string'?entry.savedAt:''});
+    });
+    var sunrise=records[1];
+    return {
+      records:records,
+      trackedPerformed:trackedPerformed,
+      sourceRecordCount:sourceRecordCount,
+      historicalSunrise:sunrise.hasRecord?sunrise:null,
+      denominatorReliable:false,
+      rate:null,
+      uncertainty:'Eski kayıtlarda boş gün, dönüştürülmüş boş kayıt ve bilinçli sıfır güvenle ayrılamıyor; bu nedenle toplam veya yüzde hesaplanmıyor.'
+    };
+  }
   function prayerPerformedCount(p){ var n=0; PRAYER_ORDER.forEach(function(k){ if(p&&p[k]&&p[k].performed) n++; }); return n; }
   function prayerAllDone(p){ return prayerPerformedCount(p)>=5; }
   function prayerStreak(){
@@ -186,6 +279,7 @@
     registerPrayer:registerPrayer,
     PRAYER_NAMES:PRAYER_NAMES,
     PRAYER_ORDER:PRAYER_ORDER,
+    PRAYER_TRACKED_ORDER:PRAYER_TRACKED_ORDER,
     PRAYER_CITIES:PRAYER_CITIES,
     PRAYER_METHODS:PRAYER_METHODS,
     prayerCityByName:prayerCityByName,
@@ -203,12 +297,22 @@
     prayerCacheKey:prayerCacheKey,
     prayerReadCache:prayerReadCache,
     prayerWriteCache:prayerWriteCache,
+    PRAYER_STALE_HOURS:PRAYER_STALE_HOURS,
+    prayerAgeInfo:prayerAgeInfo,
+    prayerMethodLabel:prayerMethodLabel,
+    prayerCacheEntry:prayerCacheEntry,
+    prayerCacheFreshness:prayerCacheFreshness,
+    prayerDayFreshness:prayerDayFreshness,
+    prayerInTurkey:prayerInTurkey,
+    prayerCoverage:prayerCoverage,
     prayerTimesFromDay:prayerTimesFromDay,
     currentPrayerIndex:currentPrayerIndex,
     fetchAladhanTimes:fetchAladhanTimes,
     fetchPrayerTimes:fetchPrayerTimes,
     applyPrayerTimesToDay:applyPrayerTimesToDay,
     prayerDaySummary:prayerDaySummary,
+    prayerEntryHasSourceRecord:prayerEntryHasSourceRecord,
+    prayerHistoryPresentation:prayerHistoryPresentation,
     prayerPerformedCount:prayerPerformedCount,
     prayerAllDone:prayerAllDone,
     prayerStreak:prayerStreak,

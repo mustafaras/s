@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "cardId": "IIP-07",
+  "gate": "requirements",
+  "status": "pass",
+  "artifact": "evidence/IIP-07/requirements.md",
+  "verifiedHead": "fd4704ab8d5064055c04e07014547c5cf6027601",
+  "diffHash": "db51d9443c532e2abd4a30ac38c995cbfa02a783290c7de3634bdd19b8d29eb4",
+  "createdAt": "2026-09-20T15:59:13Z",
+  "requirements": ["REQ-013", "REQ-014"],
+  "commands": [],
+  "limitations": "TC kanıtı ağsız sentetik fixture’dır; gerçek cihaz kabulü değildir.",
+  "reviewer": "codex",
+  "artifactSha256": "69ae80b4e414c3b0fc722ab6998cc26ba9c446387c660870dbdcdfbed2d76b1a",
+  "details": {
+    "results": [
+      {"requirementId": "REQ-013", "testId": "TC-013", "result": "pass", "summary": "Sayaç, manual, undo, note ve boş/dönüş yüzeyleri korundu."},
+      {"requirementId": "REQ-014", "testId": "TC-014", "result": "pass", "summary": "Remote/video/note/error/return durumları ve hedefli repaint korundu."}
+    ]
+  }
+}

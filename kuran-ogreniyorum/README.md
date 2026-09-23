@@ -14,7 +14,7 @@ Kur'an'ın kelimelerini, anlamlarını ve gramerini **bilimsel öğrenme
 ilkeleriyle** öğreten, **ayrı bir modül** eklemenin planıdır. Bu klasör yalnız
 plan ve araştırma içerir; `app.js`, `app/core/*`, `app/content/*`, `index.html`
 ve testlere **dokunulmamıştır**. Repoda eş zamanlı çalışan diğer ajanların
-alanlarına (`ilham-ibadet-premium-plan/`, `app/core/saygi.js` vb.) girilmez.
+alanlarına (`archive/ilham-ibadet-premium-plan/`, `app/core/saygi.js` vb.) girilmez.
 
 ## Bir cümlede
 

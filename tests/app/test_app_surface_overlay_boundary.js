@@ -55,7 +55,9 @@ ok('every handler keeps its exact App name through the shared signature-neutral 
   /Object\.keys\(MON52_OVERLAY_HANDLERS\)\.forEach\(function\(name\)\{ App\[name\]=function\(\)\{ return SEYMA_APP_SURFACE\.overlayHandler\(name,arguments\); \}; \}\);/.test(binding));
 ok('profile consent, permission, transport, send/upload and destructive actions are absent from MON-52 binding',
   !/profileConsent|requestReminderPermission|quranJourneySubmit|send|upload|record|deleteNotif|removeSoulArchiveSession/.test(binding));
+/* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
+   gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('production loads appSurface before app.js with fresh cache versions',
-  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260915c/.test(index) && /app\.js\?v=20260916a/.test(index));
+  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260921c/.test(index) && /app\.js\?v=20260922b/.test(index));
 
 console.log('\nMON-52 overlay App surface boundary: ' + passed + '/' + passed + ' passed');

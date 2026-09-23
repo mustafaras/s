@@ -1,21 +1,11 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
 **Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 3/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-02 · **blockedPrompt:** — · **Sıradaki:** **KAO-03**
+**activePrompt:** KAO-03 · **lastCompletedPrompt:** KAO-02 · **blockedPrompt:** — · **Sıradaki:** **KAO-03**
 **releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
-- **D-01** — QAC (GPL) verisinden türetilmiş sıklık/kök etiketleri + atıf
-- **D-02** — Tanzil metni kesitleri (CC BY 3.0) + âyet referansı + link
-- **D-11** — Hedef kapsam %80: ölçüm 503 adayla LEM havuzunun %78.7'si; içerik sıra eşiğini 500→600 yükseltmek hedefi tutturur (rapor: coverage.alternatives) _(öneri: eşiği yükseltme kararı kullanıcıya bırakıldı; araç kendi kendine değiştirmez)_
-- **D-03** — KAO stili ayrı app/kao.css (IIP ile çakışmasız) mı, styles.css bloğu mu _(öneri: app/kao.css (IIP sürerken))_
-- **D-04** — FSRS saf JS portu, ts-fsrs MIT atıfı
-- **D-05** — Repo LICENSE kararı; lexicon public push öncesi
-- **D-06** — Geçici giriş Ayarlar satırı; kalıcı giriş hub kartı (Dalga 5, IIP koordinasyonu)
-- **D-07** — Seviye 6 (tam Kur'an kelime kelime, ~3 MB) bu programın dışında _(öneri: dışarıda)_
-- **D-08** — Ses veri seti köken/lisans doğrulaması (HF zaibihassan Apache 2.0, okuyucu kökeni belirsiz) — yayına girmeden önce
-- **D-09** — Ses klipleri repo içinde (~16 MB, assets/kao/audio) mi, ayrı public depo/CDN mi (yine salt-GET) _(öneri: repo içinde alt küme; büyürse ayrı depo)_
-- **D-10** — Gölgeleme için mikrofon: bellek-içi kayıt, izin metni; kullanıcı istemezse özellik tamamen kapalı _(öneri: açık, varsayılan kapalı ayar)_
+- (yok)
 
 ## Prompt sırası ve durum
 | Prompt | Başlık | Durum | Gereksinimler |
@@ -24,7 +14,7 @@
 | KAO-01 | Sözlük derleme aracı (ağsız) | done | — |
 | KAO-25 | Plan denetleyici (kao-plan-check) sertleştirme | done | — |
 | KAO-02 | Aday liste, kognat/komşu önerisi, inceleme tablosu | done | R-A5 R-A8 |
-| KAO-03 | İnsan doğrulaması (kullanıcı görevi) ve içe alma | pending | R-A8 |
+| KAO-03 | İnsan doğrulaması (kullanıcı görevi) ve içe alma | waiting_user | R-A8 |
 | KAO-04 | Gramer içeriği (24 mikro-kavram + G0.5) | pending | R-A7 R-A8 |
 | KAO-23 | Fonetik içeriği + mahreç SVG | pending | R-B6 R-A9 |
 | KAO-24 | Ses varlık hattı (alt küme + AAC) | pending | R-C2 |
@@ -62,4 +52,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:pending · R-A8:pending · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 16 | 2026-09-23 | KAO-02 tamamlandı: 503 aday (A=22 B=0 C=418 D=63), inceleme tablosu (25 sütun), kapsam %78.7; bağımsız denetim 7 kusur buldu ve kapattı (kimlik çakışması, eksik örnek sütunları, sessiz yinelenen kimlik, bildirilmeyen kısa örnekler, yok sayılan verifiedAt, tutarsız B kovası, hermetik olmayan self-test). | `evidence/KAO-02/EVIDENCE.json#hardening`; self-test PASS; 12/12 kapı exit 0; 22 maddelik denetim 0 açık bulgu |
+| 19 | 2026-09-23 | KAO-03 waiting_user: tablo 600 satır, verified=0 (ajan tek içerik yazmadı). Kart kullanıcı girdisi bekliyor; `activePrompt=KAO-03`. | `--import-md`: rows=600 duplicates=0 unknown=0 verified=0; plan-check PASS |

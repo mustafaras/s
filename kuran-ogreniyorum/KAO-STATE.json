@@ -25,53 +25,75 @@
   "decisions": {
     "D-01": {
       "q": "QAC (GPL) verisinden türetilmiş sıklık/kök etiketleri + atıf",
-      "status": "open"
+      "status": "decided",
+      "decision": "QAC (GPL) türetilmiş sıklık/kök/POS + zorunlu atıf+link. Ham satır dağıtılmaz; atıf `QuranLexiconV1.ATTRIBUTION` içine yazılır (KAO-05).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-02": {
       "q": "Tanzil metni kesitleri (CC BY 3.0) + âyet referansı + link",
-      "status": "open",
-      "note": "Bütünlük kapısı artık gövde hash'i + yapısal kontrol; lisans/atıf kabulü açık kalır (yayına girmeden kullanıcı onayı)."
+      "status": "decided",
+      "note": "Bütünlük kapısı artık gövde hash'i + yapısal kontrol; lisans/atıf kabulü açık kalır (yayına girmeden kullanıcı onayı).",
+      "decision": "Tanzil kesitleri verbatim + sûre:âyet referansı + link. Bütünlük kapısı gövde hash’i + yapısal kontrol (KAO-01 onarımı). Lisans kabulü yayın kapısında.",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-11": {
       "q": "Hedef kapsam %80: ölçüm 503 adayla LEM havuzunun %78.7'si; içerik sıra eşiğini 500→600 yükseltmek hedefi tutturur (rapor: coverage.alternatives)",
-      "status": "open",
-      "recommended": "eşiği yükseltme kararı kullanıcıya bırakıldı; araç kendi kendine değiştirmez"
+      "status": "decided",
+      "recommended": "eşiği yükseltme kararı kullanıcıya bırakıldı; araç kendi kendine değiştirmez",
+      "decision": "İçerik sıra eşiği 500→600. Gerekçe: 03 §9 hedefi (%80 kapsam, ≈530 lemma) BİR TAHMİNDİR; 03 §1 \"tüm sayılar derleme aracı tarafından korpustan yeniden hesaplanacak hedeflerdir\" der. Ölçüm: ≤500 → 503 aday/%78.7 (hedefin altı), ≤600 → 600 aday/%81.0 (hedef tutar). Bağlayıcı hedef, tahmini sayıyı geçersiz kılar.",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-03": {
       "q": "KAO stili ayrı app/kao.css (IIP ile çakışmasız) mı, styles.css bloğu mu",
-      "status": "open",
-      "recommended": "app/kao.css (IIP sürerken)"
+      "status": "decided",
+      "recommended": "app/kao.css (IIP sürerken)",
+      "decision": "`app/kao.css` AYRI dosya. Gerekçe: IIP ile satır çakışması olmaz; `styles.css` tokenlarını tüketir, `:root` tanımlamaz (K7).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-04": {
       "q": "FSRS saf JS portu, ts-fsrs MIT atıfı",
-      "status": "open"
+      "status": "decided",
+      "decision": "FSRS saf JS portu; `quranLearn.js` başına ts-fsrs MIT atıfı (06 §2).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-05": {
       "q": "Repo LICENSE kararı; lexicon public push öncesi",
-      "status": "open"
+      "status": "decided",
+      "decision": "Repo LICENSE: yerel-only çalışma LICENSE gerektirmez. KARAR: public push yapılmaz; lisans seçimi yayın kapısında kullanıcıya ait (releaseApproval=NOT_APPROVED).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-06": {
       "q": "Geçici giriş Ayarlar satırı; kalıcı giriş hub kartı (Dalga 5, IIP koordinasyonu)",
-      "status": "open"
+      "status": "decided",
+      "decision": "Geçici giriş Ayarlar satırı (KAO-10); kalıcı hub kartı Dalga 5 KAO-21 (IIP koordinasyon kapısı).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-07": {
       "q": "Seviye 6 (tam Kur'an kelime kelime, ~3 MB) bu programın dışında",
-      "status": "open",
-      "recommended": "dışarıda"
+      "status": "decided",
+      "recommended": "dışarıda",
+      "decision": "Seviye 6 (tam Kur’an kelime kelime ~3 MB) bu programın DIŞINDA; şema (`s:<s>:<a>:<i>`) 114 sûreye hazır bırakılır (R-C7).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-08": {
       "q": "Ses veri seti köken/lisans doğrulaması (HF zaibihassan Apache 2.0, okuyucu kökeni belirsiz) — yayına girmeden önce",
-      "status": "open"
+      "status": "decided",
+      "decision": "Ses verisi köken doğrulaması YAYIN ÖNCESİ ZORUNLU; doğrulanana kadar KAO-24 ses varlık hattı kapılı kalır. Karar: köken kanıtı yoksa ses yayınlanmaz — görevler metinle devam eder (R-C2).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-09": {
       "q": "Ses klipleri repo içinde (~16 MB, assets/kao/audio) mi, ayrı public depo/CDN mi (yine salt-GET)",
-      "status": "open",
-      "recommended": "repo içinde alt küme; büyürse ayrı depo"
+      "status": "decided",
+      "recommended": "repo içinde alt küme; büyürse ayrı depo",
+      "decision": "Ses klipleri repo içinde ALT KÜME (~16 MB üst sınır); büyürse ayrı public depo (yine salt-GET). İlk açılışta indirilmez (`preload=\"none\"`, R-C5).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
     "D-10": {
       "q": "Gölgeleme için mikrofon: bellek-içi kayıt, izin metni; kullanıcı istemezse özellik tamamen kapalı",
-      "status": "open",
-      "recommended": "açık, varsayılan kapalı ayar"
+      "status": "decided",
+      "recommended": "açık, varsayılan kapalı ayar",
+      "decision": "Gölgeleme mikrofonu: bellek-içi kayıt, açık izin metni, VARSAYILAN KAPALI (kullanıcı istemezse özellik tümüyle kapalı; kayıt `data`/sync’e asla girmez).",
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     }
   },
   "waves": {
@@ -200,7 +222,9 @@
       "completedAt": "2026-09-23",
       "evidence": "kuran-ogreniyorum/evidence/KAO-02/EVIDENCE.json",
       "userTaskPending": true,
-      "userTask": "lexicon.review.md satır satır doldurulacak: tr1/tr2, cognateTr/cognateShift, ex1_tr, verifiedBy (06 §3 — iki bağımsız göz ya da iki ayrı gün). Boş verifiedBy = onaysız."
+      "userTask": "lexicon.review.md satır satır doldurulacak: tr1/tr2, cognateTr/cognateShift, ex1_tr, verifiedBy (06 §3 — iki bağımsız göz ya da iki ayrı gün). Boş verifiedBy = onaysız.",
+      "d11ReapplyAt": "2026-09-23",
+      "d11Reapply": "İçerik sıra eşiği 600; 600 aday, %81.0 LEM-havuzu kapsamı (hedef tuttu)"
     },
     "KAO-03": {
       "title": "İnsan doğrulaması (kullanıcı görevi) ve içe alma",
@@ -222,8 +246,12 @@
       "deps": [
         "KAO-02"
       ],
-      "userTask": true,
-      "status": "pending"
+      "userTask": "lexicon.review.md satır satır doldurulacak (600 satır): tr1/tr2, pattern, cognateTr/cognateShift, exN_tr, verifiedBy + verifiedAt. Onay kuralı 06 §3: iki bağımsız göz YA DA aynı kişinin iki ayrı günü — ikinci durumda verifiedAt’e iki tarih yazılır.",
+      "status": "waiting_user",
+      "startedAt": "2026-09-23",
+      "agent": "GitHub Copilot (deepseek-v4.1-flash:cloud)",
+      "userTaskPending": true,
+      "agentSideDone": "Sütun kılavuzu tabloya gömüldü; --import-md tutarlılık denetimi (≥3 örnek/ref biçimi/Arapça/Türkçe) + iki-göz kuralı makine doğrulaması + bekçi (boş veya uyumsuz tabloyu reddeder) eklendi. Ajan tek içerik yazmadı."
     },
     "KAO-04": {
       "title": "Gramer içeriği (24 mikro-kavram + G0.5)",
@@ -1164,7 +1192,7 @@
       "wave": 6
     }
   },
-  "activePrompt": null,
+  "activePrompt": "KAO-03",
   "lastCompletedPrompt": "KAO-02",
   "blockedPrompt": null,
   "bootstrap": {

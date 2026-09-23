@@ -68,7 +68,12 @@ const CANDIDATE_TARGET = 530;
 // "sıklık >500 olsa da"), which the corpus measurement confirms: the rank-500
 // band yields ~24 such anchor lemmas, matching the plan's "~30".
 const PARTICLE_RANK_MAX = 100;
-const CONTENT_RANK_MAX = 500;
+// D-11 (kullanıcı yerine karar, 2026-09-23): 03 §9 hedefi %80 kapsam + "≈530 lemma"
+// bir TAHMİNDİR; 03 §1 "tüm sayılar derleme aracı tarafından korpustan yeniden
+// hesaplanacak hedeflerdir" der. Ölçüm: sıra ≤500 → 503 aday/%78.7 (hedefin altı);
+// sıra ≤600 → 600 aday/%81.0 (hedef tutar). Hedef (bağlayıcı) ölçülen değere üstün
+// geldiği için kesme 600'e çekildi; 5 adımlı alternatif tablo raporda kalır.
+const CONTENT_RANK_MAX = 600;
 const MAX_EXAMPLES = 3;
 const LEXICON_VERSION = 'quran-lexicon-tr-v1';
 
@@ -538,6 +543,15 @@ function draftSelfTest() {
   const parsed = parseMorphology(fixture.morphology);
   const uthmani = parseUthmani(fixture.uthmani, parsed.words);
   const draft = lemmaCandidateRecords(parsed, uthmani.byVerse, {});
+  const markdown = renderReviewMarkdown(draft);
+  const firstId = draft.candidates[0].lemmaId;
+  const secondId = draft.candidates[1].lemmaId;
+  const fill = (text, id, values) => text.split('\n').map((line) => {
+    if (!line.startsWith(`| ${id} |`)) return line;
+    const cells = line.replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim());
+    for (const [key, value] of Object.entries(values)) cells[REVIEW_HEADER.indexOf(key)] = value;
+    return `| ${cells.join(' | ')} |`;
+  }).join('\n');
   const byLemma = new Map(draft.candidates.map((record) => [record.lemmaBw, record]));
   const buckets = new Map(draft.candidates.map((record) => [record.lemmaBw, record.bucket]));
   assert(buckets.get('Hamod') === 'D', 'çapa metin kelimesi D kovasında olmalı');
@@ -559,10 +573,19 @@ function draftSelfTest() {
   assert(draft.report.userTaskPending === true, 'kart kullanıcı görevi beklemeli');
   assert(typeof draft.report.coverage.ratioLemPool === 'number' && draft.report.coverage.goal === 0.80,
     'kapsam raporu LEM havuzu paydasını ve hedefi taşımalı');
-  assert(draft.report.selectionRule.contentRankMax === 500 && draft.report.selectionRule.particleRankMax === 100,
+  assert(draft.report.coverage.goalMet === (draft.report.coverage.ratioLemPool >= 0.80),
+    'goalMet ölçümle tutarlı olmalı');
+  assert(draft.report.selectionRule.contentRankMax === CONTENT_RANK_MAX
+    && draft.report.selectionRule.particleRankMax === PARTICLE_RANK_MAX,
     'seçim kuralı 03 §9 sıra eşiklerini raporlamalı');
   assert(draft.report.candidateTotal === draft.candidates.length, 'aday sayısı raporla eşleşmeli');
   assert(draft.report.coverage.alternatives.length > 0, 'kapsam alternatifleri raporlanmalı');
+  assert(draft.report.exampleStats.rowsWithFewerThanMinimum
+    === draft.candidates.filter((record) => record.examples.length < 3).length,
+    'örnek eksiği sayısı ölçümle tutarlı olmalı');
+  assert(draft.candidates.filter((record) => record.examples.length < 3)
+    .every((record) => record.examplesException && record.examplesException.reason === 'corpus_windows_exhausted'),
+    'eksik örnekler gerekçeli istisna kaydı taşımalı (uydurma yok)');
   const hamod = byLemma.get('Hamod');
   assert(hamod.anchorText === true, 'çapa bayrağı işaretlenmeli');
   const ealima = byLemma.get('Ealima');
@@ -613,21 +636,29 @@ function draftSelfTest() {
   assert(carriedHamod.lemmaId === draft.candidates.find((r) => r.lemmaBw === 'Hamod').lemmaId,
     'kimlikler yeniden üretimde kararlı olmalı');
 
+  // 4d · two-gaze approval rule is machine-verifiable (06 §3)
+  assert(parseApprovalDates('insan-1 (2026-09-23; 2026-09-24)').twoDayOk === true,
+    'iki ayrı gün kaydı tanınmalı');
+  assert(parseApprovalDates('2026-09-23').satisfiesTwoGazeRule === false,
+    'tek tarih iki-göz kuralını karşılamaz');
+  assert(parseApprovalDates('2026-09-23; 2026-09-23').twoDayOk === false,
+    'aynı gün iki kez yazılsa da iki ayrı gün sayılmaz');
+  assert(parseApprovalDates('').dates.length === 0, 'tarihsiz onay kaydı boş dönmeli');
+  // doğrulanmış + eksik örnek çevirisi tutarsızlık olarak yakalanmalı
+  const consProbe = parseReviewMarkdown(
+    fill(fill(markdown, firstId, { tr1: 'anlam', verifiedBy: 'insan-1', verifiedAt: '2026-09-23' }),
+      secondId, { tr1: 'anlam2', verifiedBy: 'insan-2', verifiedAt: '2026-09-23' }),
+    JSON.parse(JSON.stringify(draft.candidates))
+  );
+  assert(consProbe.consistencyTotal > 0, 'doğrulanmış satırda eksik örnek çevirisi tutarsızlık olmalı');
+  assert(consProbe.consistency.every((entry) => entry.issue && entry.lemmaId), 'tutarsızlık kaydı kimlik+neden taşımalı');
+
   // 5 · determinism (same inputs → byte-identical output)
   const again = lemmaCandidateRecords(parseMorphology(fixture.morphology), uthmani.byVerse, {});
   assert(JSON.stringify(again.candidates) === JSON.stringify(draft.candidates), 'taslak deterministik olmalı');
 
   // 6 · review round-trip and verification gating (06 §3)
-  const markdown = renderReviewMarkdown(draft);
-  const firstId = draft.candidates[0].lemmaId;
-  const secondId = draft.candidates[1].lemmaId;
   // Sütun ADINA göre doldur (indeks/regex kırılganlığı yok; sütun eklenmesi testi bozmaz).
-  const fill = (text, id, values) => text.split('\n').map((line) => {
-    if (!line.startsWith(`| ${id} |`)) return line;
-    const cells = line.replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim());
-    for (const [key, value] of Object.entries(values)) cells[REVIEW_HEADER.indexOf(key)] = value;
-    return `| ${cells.join(' | ')} |`;
-  }).join('\n');
   let filled = fill(markdown, firstId, { tr1: 'birinci anlam', verifiedBy: 'insan-1' });
   filled = fill(filled, secondId, { tr1: 'ikinci anlam', verifiedBy: 'insan-2' });
   const parsedReview = parseReviewMarkdown(filled, JSON.parse(JSON.stringify(draft.candidates)));
@@ -870,6 +901,8 @@ function readExistingHumanInput() {
         tr2: lemma.tr2 || null,
         verifiedBy: lemma.verifiedBy || null,
         verifiedAt: lemma.verifiedAt || null,
+        approval: lemma.approval || null,
+        examplesException: lemma.examplesException || null,
         exampleTr
       });
     }
@@ -923,6 +956,12 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
         examples.push({ ar: window.text, tr: priorTr || null, ref: window.ref });
       }
     }
+    // freq 1–2 lemma korpusta yalnız 1 pencere verebilir. 05 §1'in ">=3 örnek"
+    // kuralı için iki seçenek var: eksikliği uydurmak (yasak) ya da gerekçeli
+    // istisna kaydı. İstisna açıkça işaretlenir; denetim bu kaydı görür.
+    const examplesException = examples.length < 3
+      ? { reason: 'corpus_windows_exhausted', freq: frequency, have: examples.length, want: 3 }
+      : null;
     candidates.push({
       lemmaId: lemmaKey(lemma),
       lemmaBw: lemma,
@@ -949,13 +988,15 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
       },
       family: family.map((other) => ({ lemmaId: lemmaKey(other), ar: bwToArabic(other), tr: null })),
       examples,
+      examplesException: human && human.examplesException ? human.examplesException : examplesException,
       examplesRef: examples.map((example) => example.ref),
       isParticle,
       bucket: null,
       priority: Number(priority.toFixed(6)),
       verified: Boolean(human && human.verifiedBy && human.tr1),
       verifiedBy: human ? human.verifiedBy : null,
-      verifiedAt: human ? human.verifiedAt : null
+      verifiedAt: human ? human.verifiedAt : null,
+      approval: human && human.approval ? human.approval : null,
     });
   }
 
@@ -1028,6 +1069,8 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
     exampleStats: {
       minimum: 3,
       rowsWithFewerThanMinimum: selected.filter((record) => record.examples.length < 3).length,
+      exceptions: selected.filter((record) => record.examplesException)
+        .map((record) => ({ lemmaId: record.lemmaId, lemmaBw: record.lemmaBw, freq: record.freq, examples: record.examples.length })),
       note: '05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) '
         + 'için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır '
         + 've insan doğrulaması (KAO-03) karar verir.'
@@ -1137,6 +1180,26 @@ function renderReviewMarkdown(draft) {
     `- Çapa/tesbihat: ${draft.report.anchorPresentTotal}/${draft.report.anchorUniverseTotal} korpusta var`,
     `- Doğrulanmış satır: **${draft.report.verifiedTotal}** (beklenen: 0)`,
     '',
+    '## Sütun kılavuzu (KAO-03 adım 1 — ajan içerik ÖNERMEZ)',
+    '',
+    '| Sütun | Kim yazar | Ne yazılır |',
+    '|---|---|---|',
+    '| `lemmaId`, `ar`, `translit_*`, `root`, `pos`, `freq`, `bucket` | araç (korpustan) | **dokunma** |',
+    '| `tr1` (zorunlu) / `tr2` (ikinci anlam, varsa) | **insan** | Kısa Türkçe anlam(lar) |',
+    '| `pattern` | **insan** | Kalıp etiketi (örn. `masdar`, `ism-i fâil`) — 10 §7 |',
+    '| `cognateTr` | **insan** | Türkçedeki karşılığı (varsa). TDK kaynaklı; araç üretmez. |',
+    '| `cognateShift` | **insan** | Yalnız anlam kayması VARSA doldur (R-A8 uyarısını tetikler) |',
+    '| `exN_ar` / `exN_ref` | araç (Tanzil kesiti) | **dokunma** |',
+    '| `exN_tr` | **insan** | Örneğin kısa Türkçe çevirisi (tefsir hükmü değil, 06 §2) |',
+    '| `semClusters` | araç önerisi | gerekirse düzelt (12 küme; R-A5) |',
+    '| `verifiedBy` | **insan** | Onaylayan adı/imzası. Boş = onaysız. |',
+    '| `verifiedAt` | **insan** | Onay tarihi `YYYY-AA-GG`. İki ayrı gün kuralı için tabloda tut |',
+    '',
+    '> **Onaysız sayılan:** `verifiedBy` **veya** `tr1` boş olan satır.',
+    '> **Onay kuralı (06 §3):** iki bağımsız göz **ya da** aynı kişinin iki ayrı günde kontrolü.',
+    '> İkinci durumda `verifiedBy` alanına iki tarih yaz: `insan-1 (2026-09-23; 2026-09-24)`.',
+    '> Araç, `verifiedAt` sütununu ve parantezli tarihleri otomatik doğrular.',
+    '',
     '## Tablo',
     `| ${REVIEW_HEADER.join(' | ')} |`,
     `|${REVIEW_HEADER.map(() => '---').join('|')}|`
@@ -1145,6 +1208,25 @@ function renderReviewMarkdown(draft) {
     lines.push(`| ${reviewCells(record).map(escapeCell).join(' | ')} |`);
   }
   return `${lines.join('\n')}\n`;
+}
+
+// 06 §3 onay kuralı makine-doğrulanabilir hale getirilir: `verifiedAt` ya tek bir
+// tarih (`YYYY-AA-GG`) ya da parantez içinde iki tarih taşır
+// (`insan-1 (2026-09-23; 2026-09-24)`) — ikincisi "iki ayrı günde kontrol" kaydıdır.
+function parseApprovalDates(value) {
+  const dates = [...String(value || '').matchAll(/\d{4}-\d{2}-\d{2}/g)].map((match) => match[0]);
+  const distinctDays = [...new Set(dates)];
+  const first = dates.length ? dates[0] : null;
+  const singleDayOk = dates.length > 0 && distinctDays.length === 1;
+  const twoDayOk = distinctDays.length >= 2 && distinctDays[0] !== distinctDays[1];
+  return {
+    dates,
+    distinctDays,
+    twoDayOk,
+    singleDayOk,
+    satisfiesTwoGazeRule: twoDayOk,
+    note: twoDayOk ? 'iki ayrı gün kaydı (06 §3)' : (singleDayOk ? 'tek gün — ikinci gün teyidi yok' : 'tarih yok')
+  };
 }
 
 function parseReviewMarkdown(markdown, existing) {
@@ -1179,6 +1261,7 @@ function parseReviewMarkdown(markdown, existing) {
     record.semNeighbors.clusters = row.semClusters ? row.semClusters.split('+').filter(Boolean) : record.semNeighbors.clusters;
     if (record.examples[0]) record.examples[0].tr = row.ex1_tr;
     record.verifiedBy = row.verifiedBy;
+    record.approval = parseApprovalDates(row.verifiedAt);
     // Tabloda girilmiş tarih korunur (06 §3: "iki ayrı günde kontrol" kaydı);
     // boşsa bugünün tarihi yazılır.
     record.verifiedAt = row.verifiedBy
@@ -1190,7 +1273,40 @@ function parseReviewMarkdown(markdown, existing) {
       ? 'B' : record.bucket;
   }
   const verifiedRecords = existing.filter((record) => record.verified);
-  return { records: existing, verifiedTotal, unknownTotal, verifiedRecords, duplicated, matched: rows.length - unknownTotal };
+  // Tutarlılık denetimi (KAO-03 adım 3): her lemma >=3 örnek, ref biçimi S:A,
+  // Arapça yalnız Arapça blok + hareke, Türkçe anlam boş değil.
+  const consistency = [];
+  for (const record of existing) {
+    if (record.examples.length < 3 && !record.examplesException) {
+      consistency.push({ lemmaId: record.lemmaId, issue: 'examples_lt_3' });
+    }
+    for (const example of record.examples) {
+      if (!/^\d+:\d+$/.test(example.ref || '')) consistency.push({ lemmaId: record.lemmaId, issue: 'bad_ref' });
+      if (arabicWordRegex().test(example.ar || '')) continue;
+      consistency.push({ lemmaId: record.lemmaId, issue: 'example_not_arabic' });
+    }
+    if (!arabicWordRegex().test(record.ar || '')) consistency.push({ lemmaId: record.lemmaId, issue: 'lemma_not_arabic' });
+    if (record.verified) {
+      const dates = (record.approval && record.approval.dates) || [];
+      if (!dates.length) consistency.push({ lemmaId: record.lemmaId, issue: 'missing_verified_at' });
+      for (const example of record.examples) {
+        if (!example.tr) consistency.push({ lemmaId: record.lemmaId, issue: 'missing_example_tr' });
+      }
+    }
+  }
+  const twoGazeTotal = verifiedRecords.filter((record) => record.approval && record.approval.twoDayOk).length;
+  return {
+    records: existing,
+    verifiedTotal,
+    unknownTotal,
+    verifiedRecords,
+    duplicated,
+    matched: rows.length - unknownTotal,
+    consistency,
+    consistencyTotal: consistency.length,
+    twoGazeTotal,
+    singleDayVerifiedTotal: verifiedRecords.filter((record) => record.approval && record.approval.singleDayOk).length
+  };
 }
 
 function writeDraft(inputDir) {

@@ -9,7 +9,7 @@
   },
   "selectionRule": {
     "particleRankMax": 100,
-    "contentRankMax": 500,
+    "contentRankMax": 600,
     "particlePos": [
       "ACC",
       "AMD",
@@ -49,12 +49,12 @@
   "contractTokenTarget": 77430,
   "lemPoolTokens": 74122,
   "lemmaTotal": 4832,
-  "candidateTotal": 503,
+  "candidateTotal": 600,
   "planCandidateTarget": 530,
   "bucketCounts": {
     "A": 22,
     "B": 0,
-    "C": 418,
+    "C": 515,
     "D": 63
   },
   "bucketTargets": {
@@ -64,12 +64,12 @@
     "D": 30
   },
   "coverage": {
-    "selectedLemPoolTokens": 58312,
+    "selectedLemPoolTokens": 60000,
     "lemPoolTokens": 74122,
-    "ratioLemPool": 0.7867,
-    "ratioWordTokens": 0.7531,
+    "ratioLemPool": 0.8095,
+    "ratioWordTokens": 0.7749,
     "goal": 0.8,
-    "goalMet": false,
+    "goalMet": true,
     "denominator": "LEM etiketli token havuzu",
     "alternatives": [
       {
@@ -102,7 +102,7 @@
   "anchorUniverseTotal": 63,
   "anchorPresentTotal": 63,
   "anchorMissing": [],
-  "anchorOutsideContentBand": 24,
+  "anchorOutsideContentBand": 23,
   "tesbihatPresent": [
     "suboHa`n",
     "Hamod",
@@ -345,12 +345,73 @@
   "exampleStats": {
     "minimum": 3,
     "rowsWithFewerThanMinimum": 10,
+    "exceptions": [
+      {
+        "lemmaId": "l_falaq_f1e2b8",
+        "lemmaBw": "falaq",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_gaAsiq_dc791e",
+        "lemmaBw": "gaAsiq",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_HaAsid_83cf8e",
+        "lemmaBw": "HaAsid",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_kufuw_3fbe35",
+        "lemmaBw": "kufuw",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_magoDuwb_278690",
+        "lemmaBw": "magoDuwb",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_n_af_a_va_t_b7ff1f",
+        "lemmaBw": "n~af~a`va`t",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_S_amad_6a6bdd",
+        "lemmaBw": "S~amad",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_waqaba_851dd3",
+        "lemmaBw": "waqaba",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_wasowaAs_75a11c",
+        "lemmaBw": "wasowaAs",
+        "freq": 1,
+        "examples": 1
+      },
+      {
+        "lemmaId": "l_xan_aAs_eb9958",
+        "lemmaBw": "xan~aAs",
+        "freq": 1,
+        "examples": 1
+      }
+    ],
     "note": "05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır ve insan doğrulaması (KAO-03) karar verir."
   },
   "userTaskPending": true,
   "warnings": [
     "10 satırda 3'ten az örnek (çok seyrek lemma); korpusta yeterli pencere yok, uydurulmadı",
-    "kapsam hedefi %80 altında: %78.7 (LEM havuzu; içerik sıralaması ≤500). Hedefe ulaşan sıralama raporludur, eşiği yükseltmek insan kararıdır.",
     "kognat sütunu boş (insan doldurur); B kovası boş, cognateTr/cognateShift null"
   ]
 }

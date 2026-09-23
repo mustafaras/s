@@ -32,7 +32,7 @@
     "D-02": {
       "q": "Tanzil metni kesitleri (CC BY 3.0) + âyet referansı + link",
       "status": "decided",
-      "note": "Bütünlük kapısı artık gövde hash'i + yapısal kontrol; lisans/atıf kabulü açık kalır (yayına girmeden kullanıcı onayı).",
+      "note": "Bütünlük kapısı artık gövde hash'i + yapısal kontrol; lisans/atıf kabulü açık kalır (yayına girmeden kullanıcı onayı). | 2026-09-23: Türkçe kelime-kelime REFERANS katmanı eklendi (quran.com, language=tr). 06 §2 gereği yalnız doğrulayıcı referansı; üretim paketine girmez, git dışında tutulur.",
       "decision": "Tanzil kesitleri verbatim + sûre:âyet referansı + link. Bütünlük kapısı gövde hash’i + yapısal kontrol (KAO-01 onarımı). Lisans kabulü yayın kapısında.",
       "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
     },
@@ -202,6 +202,7 @@
         "kuran-ogreniyorum/content/lexicon.draft.json",
         "kuran-ogreniyorum/content/lexicon.review.md",
         "kuran-ogreniyorum/content/lexicon.workbook.md",
+        "kuran-ogreniyorum/content/.gitignore",
         "kuran-ogreniyorum/evidence/KAO-02/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -230,7 +231,7 @@
       "d11Reapply": "İçerik sıra eşiği 600; 600 aday, %81.0 LEM-havuzu kapsamı (hedef tuttu)",
       "selectionFixAt": "2026-09-23",
       "selectionFix": "POS kapısı kaldırıldı (21 yüksek sıklıklı lemma dışarıda kalıyordu; en kötüsü <il~aA sıra 15/freq 663). Kesme 600→500. Sonuç: 524 aday, %80.9 kapsam, goalMet=true. Regresyon: self-test seçimin POS'a bağlı olmadığını zorlar.",
-      "scopeNote": "2026-09-23: `lexicon.workbook.md` eklendi. Aynı içeriğin (lexicon.review.md) insan için YENİDEN DÜZENLENMİŞ hâli: kademeli bantlar (03 §1) + cümle bağlamı (02 §2.6). Yeni veri üretmez; kullanıcı incelemesini hızlandırmak için ikinci bir biçimdir. KAO-02 zaten sözlük içerik dosyalarının sahibidir."
+      "scopeNote": "2026-09-23: `lexicon.workbook.md` eklendi. Aynı içeriğin (lexicon.review.md) insan için YENİDEN DÜZENLENMİŞ hâli: kademeli bantlar (03 §1) + cümle bağlamı (02 §2.6). Yeni veri üretmez; kullanıcı incelemesini hızlandırmak için ikinci bir biçimdir. KAO-02 zaten sözlük içerik dosyalarının sahibidir. | 2026-09-23: `content/.gitignore` eklendi (KAO-01 de sahibi). Gerekçe: üçüncü taraf Türkçe REFERANS verisi (`lexicon.reference.json`) git dışında tutulmalı — ham korpus girdileriyle aynı desen. Yeni üretim dosyası değil, depo hijyeni satırı."
     },
     "KAO-03": {
       "title": "İnsan doğrulaması (kullanıcı görevi) ve içe alma",
@@ -1265,6 +1266,39 @@
       "fix": "rankBand POS kapısısız: sıra ≤ cutoff (tüm POS) ∪ çapa/tesbihat. Kesme 500. Sonuç 524 lemma / %80.9; plan sayıları tutar.",
       "evidence": "self-test regresyonu: 'seçim POS'a bağlı olmamalı'; draft-report.coverage.goalMet=true",
       "planCheckVerifiesThis": false
+    },
+    {
+      "id": "GAP-04",
+      "foundAt": "2026-09-23",
+      "foundBy": "agent (yapıcı çözüm)",
+      "where": "KAO-03 inceleme yükü",
+      "issue": "Kullanıcıdan 524 (önce 600) satırı sıfırdan doldurması isteniyordu; referanssız anlam yazmak hem yavaş hem hata kaynağıydı.",
+      "fix": "quran.com kelime-kelime Türkçe REFERANS katmanı eklendi (87 kelime, çapa sûreler) ve iki tabloya (review.md + workbook.md) REFERANS sütunu olarak bağlandı. 06 §2 bunu açıkça meşru kılar; kopyalama değil, insan kendi anlamını yazar.",
+      "evidence": "lexicon.reference.json (87 kelime, 87 ses); review.md 27 sütun; workbook ref_tr dolu",
+      "planCheckVerifiesThis": false
     }
-  ]
+  ],
+  "referenceLayer": {
+    "addedAt": "2026-09-23",
+    "purpose": "İnsan doğrulayıcının REFERANSI (06 §2: \"Türkçe mealler kopyalanmaz, yalnız insan doğrulayıcının referansı\"). Üretim paketine GİRMEZ.",
+    "provider": "quran.com (Quran.com API v4)",
+    "endpoint": "api.quran.com/api/v4/verses/by_chapter/<n>?words=true&language=tr&word_fields=text_uthmani&per_page=all",
+    "language": "turkish",
+    "scope": "reference-only (git dışı: content/.gitignore)",
+    "content": {
+      "chapters": [
+        1,
+        112,
+        113,
+        114
+      ],
+      "words": 87,
+      "withAudio": 87
+    },
+    "fetchCommand": "node tools/kao-lexicon-build.mjs --reference",
+    "networkIsolation": "Tek ağ noktası: fetchReference(). Self-test, türetim yolunun (draft/workbook/import) ağsız olduğunu ve dosyada TEK fetch çağrısı bulunduğunu zorlar.",
+    "bonus": "Her kelime nesnesi resmî kelime-sesi (audio_url: wbw/<s>_<a>_<w>.mp3) taşır — D-08/D-09 ses hattı için aday.",
+    "attribution": "quran.com — atıf zorunlu; veri git dışında tutulur.",
+    "notCopied": true
+  }
 }

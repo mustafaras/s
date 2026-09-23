@@ -63,6 +63,20 @@ const DRAFT_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.draf
 const REVIEW_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.review.md');
 const VERIFIED_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.verified.json');
 const WORKBOOK_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.workbook.md');
+// 06 §2 karar tablosu: "Türkçe mealler (Diyanet, Elmalılı...) — Kopyalanmaz.
+// Yalnız insan doğrulayıcının REFERANSI". Bu yüzden ikinci bir kaynak tutulur ve
+// üretim paketine (lexicon.verified.json) ASLA girmez; insanın `tr1` yazmasına
+// yardımcı bir referanstır. Kaynak: quran.com kelime-kelime API (language=tr),
+// kelime başına resmî ses de sağlar (D-08/D-09 için aday).
+const REFERENCE_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.reference.json');
+const REFERENCE_SOURCE = Object.freeze({
+  api: 'https://api.quran.com/api/v4/verses/by_chapter/<n>?words=true&language=tr&word_fields=text_uthmani&per_page=all',
+  provider: 'quran.com (Quran.com API v4)',
+  wordTranslationLanguage: 'turkish',
+  scope: 'reference-only',
+  note: 'Doğrulayıcı REFERANSI; kopyalanmaz, üretim paketine girmez (06 §2). Atıf zorunlu.',
+  audio: 'her kelime nesnesi audio_url tasir (wbw/<s>_<a>_<w>.mp3) — D-08/D-09 ses hatti icin aday'
+});
 const DRAFT_REPORT_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'evidence', 'KAO-02', 'draft-report.json');
 const CANDIDATE_TARGET = 530;
 // 03 §9 reads "sıklık ≤500" as a LEMMA RANK cut-off (bucket D is explicitly
@@ -301,7 +315,7 @@ function parseUthmani(source, qacWords) {
   return { byVerse, diagnostics };
 }
 
-function exampleWindow(word, uthmaniByVerse) {
+function exampleWindow(word, uthmaniByVerse, referenceByRef = new Map()) {
   const ref = `${word.surah}:${word.ayah}`;
   const verseWords = uthmaniByVerse.get(ref);
   if (!verseWords || !verseWords.length) return null;
@@ -313,13 +327,26 @@ function exampleWindow(word, uthmaniByVerse) {
     else if (end < verseWords.length) end += 1;
     else break;
   }
-  return {
+  const window = {
     ref,
     word: word.wordIndex,
     startWord: start + 1,
     endWord: end,
     text: verseWords.slice(start, end).join(' ')
   };
+  // Referans çevirisi (varsa) AYNI konum aralığından dilimlenir; üretim paketine
+  // girmez, yalnız insan doğrulayıcının okumasını hızlandırır (06 §2).
+  const referenceWords = referenceByRef.get(ref);
+  if (referenceWords) {
+    window.referenceTr = referenceWords
+      .filter((entry) => entry.position >= window.startWord && entry.position <= window.endWord)
+      .map((entry) => entry.tr)
+      .filter(Boolean)
+      .join(' ');
+    const focus = referenceWords.find((entry) => entry.position === word.wordIndex);
+    window.referenceWordTr = focus ? focus.tr : null;
+  }
+  return window;
 }
 
 function buildStats(morphologySource, uthmaniSource, sourceHashes, generatedBy = 'local-inputs') {
@@ -469,14 +496,32 @@ function selfTest() {
     || lemma.lemmaBw === 'baEodamaA'), 'prefix etiketi lemma POS dağılımına sızmamalı');
 
   const source = fs.readFileSync(fileURLToPath(import.meta.url), 'utf8');
-  assert(!/\bfetch\s*\(/.test(source), 'fetch çağrısı bulunmamalı');
+  // Ağ GÜÇLÜ biçimde sınırlanır: `fetch(` yalnız `fetchReference` fonksiyonunda
+  // bulunabilir. Böylece türetim yolu (--draft/--workbook/--import-md/--self-test)
+  // ağsız kalır (06 §1) ama kaynaklı referans çekimi meşru tek noktadan yapılır.
+  // Yorumları sıyır, sonra tara (sıradan bağımsız; self-test kendi metnini eşlemez).
+  const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const fetchCalls = (code.match(/\bfetch\s*\(/g) || []).length;
+  assert(/async function fetchReference\(/.test(code),
+    'fetchReference fonksiyonu bulunmalı (tek ağ noktası)');
+  assert(fetchCalls === 1, `tek fetch çağrısı beklenir, bulunan: ${fetchCalls}`);
+  const withoutRefFn = code.replace(/async function fetchReference\([^]*?\n\}/, '');
+  assert(!/\bfetch\s*\(/.test(withoutRefFn),
+    'fetch yalnız fetchReference içinde olmalı (türetim yolu ağsız kalmalı)');
   assert(!/from\s+['"](?:node:)?https?['"]/.test(source), 'http/https importu bulunmamalı');
   const xhrName = ['XML', 'HttpRequest'].join('');
   assert(!source.includes(xhrName), `${xhrName} bulunmamalı`);
 
   draftSelfTest();
-  workbookSelfTest(lemmaCandidateRecords(parseMorphology(draftFixture().morphology),
-    parseUthmani(draftFixture().uthmani, parseMorphology(draftFixture().morphology).words).byVerse, {}));
+  const wbFixture = draftFixture();
+  const wbParsed = parseMorphology(wbFixture.morphology);
+  const wbUthmani = parseUthmani(wbFixture.uthmani, wbParsed.words);
+  const wbRef = { words: [
+    { ref: '1:1', position: 1, tr: 'REF-AD' }, { ref: '1:1', position: 2, tr: 'REF-ALLAH' },
+    { ref: '1:1', position: 3, tr: 'REF-RAHMAN' }, { ref: '1:1', position: 4, tr: 'REF-RAHIM' },
+    { ref: '1:1', position: 5, tr: 'REF-HAMD'
+    }] };
+  workbookSelfTest(lemmaCandidateRecords(wbParsed, wbUthmani.byVerse, {}, new Map(), new Map([['1:1', wbRef.words]])), wbRef);
   console.log('KAO lexicon self-test: PASS (50 satır, çok-segment STEM POS, lemma paydası, besmele/vakıf/split hizası,'
     + ' Tanzil gövde kapısı, taslak kovaları, inceleme turu, ağ yok)');
 }
@@ -534,6 +579,10 @@ function draftSelfTest() {
     'hançer elifi (Y`) tek uzun ünlü üretmeli');
   assert(transliterate('<in~', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'inn',
     'şedde (ّ) önceki harfi ikilemeli');
+  assert(transliterate('{ll~ah', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'allah',
+    'Buckwalter geminate zaten yazılıysa şedde üçlemez (alllah -> allah)');
+  assert(translitTr('r~aHoma`n') === 'rahmân',
+    'Türkçe okunuşta belirteç assimilasyonu yazılmaz (rrahmân -> rahmân)');
   assert(transliterate('yawom', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'yavm',
     'sözcük başı/ünlü öncesi y (ya) ünsüz kalmalı');
   assert(transliterate('yaquwlu', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS).includes('û'),
@@ -794,8 +843,15 @@ function transliterate(lemmaBw, table, longTable, shortSet) {
   const out = [];
   for (let index = 0; index < characters.length; index += 1) {
     const character = characters[index];
-    if (character === '~') { // şedde: önceki harfi ikiler (rab~ → rabb)
-      if (out.length) out.push(out[out.length - 1]);
+    if (character === '~') { // şedde
+      // Buckwalter geminate harfi bazen ZATEN iki kez yazar (`{ll~ah`). Bu durumda
+      // tekrar ikilemeyiz (alllah -> allah). Diğer durumda ikiler (rab~ -> rabb).
+      const prevBase = characters.slice(0, index).reverse()
+        .find((c) => !TRANSLIT_IGNORE.has(c) && c !== '~');
+      const beforePrevBase = characters.slice(0, index).reverse()
+        .filter((c) => !TRANSLIT_IGNORE.has(c) && c !== '~')[1];
+      const alreadyWritten = prevBase && beforePrevBase && prevBase === beforePrevBase;
+      if (out.length && !alreadyWritten) out.push(out[out.length - 1]);
       continue;
     }
     if (TRANSLIT_IGNORE.has(character)) continue;
@@ -819,7 +875,12 @@ function transliterate(lemmaBw, table, longTable, shortSet) {
   return out.join('');
 }
 
-function translitTr(lemmaBw) { return transliterate(lemmaBw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS); }
+function translitTr(lemmaBw) {
+  const raw = transliterate(lemmaBw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS);
+  // Türkçe okunuş imlâsı assimilasyonu yazmaz: baştaki çift ünsüzü teke indirir
+  // (Diyanet: "Rahman", "Samad" — "RRahman" değil). DİA katmanı ham kalır.
+  return raw.replace(/^([bcçdfgğhjklmnprsştvyz])\1/u, '$1');
+}
 function translitDia(lemmaBw) { return transliterate(lemmaBw, TRANSLIT_DIA, TRANSLIT_DIA_LONG, DIA_SHORT_VOWELS); }
 
 function lemmaSlug(lemmaBw) {
@@ -835,6 +896,71 @@ function shortHash(value) {
 }
 
 function lemmaKey(lemmaBw) { return `l_${lemmaSlug(lemmaBw)}_${shortHash(lemmaBw)}`; }
+
+// ---------------------------------------------------------------------------
+// Referans katmanı (yalnız insan doğrulayıcı için; üretim paketine girmez)
+// ---------------------------------------------------------------------------
+function readReference() {
+  if (!fs.existsSync(REFERENCE_PATH)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(REFERENCE_PATH, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+// Sûre listesini (varsayılan: çapa + tesbihat sûreleri) quran.com API'sinden
+// çeker. TEK AĞ NOKTASI: bu fonksiyon; derleyicinin geri kalanı ağsızdır ve
+// self-test/`--draft` ağa çıkmaz.
+function referenceChapters() {
+  const chapters = new Set([1, 112, 113, 114]);
+  return [...chapters].sort((a, b) => a - b);
+}
+
+async function fetchReference(chapter) {
+  const url = REFERENCE_SOURCE.api.replace('<n>', String(chapter));
+  const response = await fetch(url, { headers: { accept: 'application/json' } });
+  if (!response.ok) throw new CliError(`referans indirilemedi (${chapter}): HTTP ${response.status}`, 2);
+  const body = await response.json();
+  const words = [];
+  for (const verse of body.verses || []) {
+    for (const word of verse.words || []) {
+      if (word.char_type_name !== 'word') continue;
+      words.push({
+        ref: `${verse.chapter_id ?? chapter}:${verse.verse_number}`,
+        position: word.position,
+        ar: word.text_uthmani || null,
+        tr: (word.translation && word.translation.text) || null,
+        trLanguage: (word.translation && word.translation.language_name) || null,
+        translit: (word.transliteration && word.transliteration.text) || null,
+        audio: word.audio_url || null
+      });
+    }
+  }
+  return words;
+}
+
+async function writeReference() {
+  const chapters = referenceChapters();
+  const words = [];
+  for (const chapter of chapters) {
+    const fetched = await fetchReference(chapter);
+    words.push(...fetched);
+    console.log(`  sûre ${chapter}: ${fetched.length} kelime`);
+  }
+  const payload = {
+    schemaVersion: 1,
+    fetchedAt: new Date().toISOString().slice(0, 10),
+    source: REFERENCE_SOURCE,
+    chapterTotal: chapters.length,
+    wordTotal: words.length,
+    words
+  };
+  fs.mkdirSync(path.dirname(REFERENCE_PATH), { recursive: true });
+  fs.writeFileSync(REFERENCE_PATH, `${JSON.stringify(payload, null, 2)}\n`);
+  console.log(`KAO reference: ${path.relative(ROOT, REFERENCE_PATH)} (${words.length} kelime)`);
+  console.log(`  kaynak: ${REFERENCE_SOURCE.provider} · dil=${REFERENCE_SOURCE.wordTranslationLanguage}`);
+}
 
 function countLemmaMap(parsed) {
   const frequency = new Map();
@@ -922,7 +1048,7 @@ function readExistingHumanInput() {
 
 // Pure core: no file IO. Human-owned fields arrive as a parameter so tests remain
 // hermetic and a re-draft cannot silently reach into the repository.
-function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemma = new Map()) {
+function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemma = new Map(), referenceByRef = new Map()) {
   const counts = countLemmaMap(parsed);
   const maxFrequency = Math.max(...counts.frequency.values());
   const rank = new Map([...counts.frequency.entries()]
@@ -961,10 +1087,16 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
     const family = rootBw ? (rootIndex.get(rootBw) || []).filter((other) => other !== lemma) : [];
     const examples = [];
     for (const word of counts.positions.get(lemma) || []) {
-      const window = exampleWindow(word, uthmaniByVerse);
+      const window = exampleWindow(word, uthmaniByVerse, referenceByRef);
       if (window) {
         const priorTr = human && human.exampleTr ? human.exampleTr[examples.length] : null;
-        examples.push({ ar: window.text, tr: priorTr || null, ref: window.ref });
+        examples.push({
+          ar: window.text,
+          tr: priorTr || null,
+          ref: window.ref,
+          referenceTr: window.referenceTr || null,
+          referenceWordTr: window.referenceWordTr || null
+        });
       }
     }
     // freq 1–2 lemma korpusta yalnız 1 pencere verebilir. 05 §1'in ">=3 örnek"
@@ -1114,11 +1246,17 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
 function buildDraft(morphologySource, uthmaniSource, sourceHashes, options = {}) {
   const parsed = parseMorphology(morphologySource);
   const uthmani = parseUthmani(uthmaniSource, parsed.words);
+  const reference = options.reference === undefined ? readReference() : options.reference;
+  const referenceByRef = new Map();
+  for (const entry of (reference && reference.words) || []) {
+    if (!referenceByRef.has(entry.ref)) referenceByRef.set(entry.ref, []);
+    referenceByRef.get(entry.ref).push(entry);
+  }
   // The cognate/meaning/example columns are human-owned (06 §3). Re-running
   // --draft must not destroy work already entered, so it is carried over from
   // the existing draft unless the caller opts out (tests do).
   const carried = options.carryHuman === false ? new Map() : readExistingHumanInput();
-  return lemmaCandidateRecords(parsed, uthmani.byVerse, sourceHashes, carried);
+  return lemmaCandidateRecords(parsed, uthmani.byVerse, sourceHashes, carried, referenceByRef);
 }
 
 function exampleCells(record, index) {
@@ -1141,6 +1279,8 @@ function reviewCells(record) {
     String(record.freq),
     record.cognateTr || '',
     record.cognateShift || '',
+    record.examples[0] ? (record.examples[0].referenceWordTr || '') : '',
+    record.examples[0] ? (record.examples[0].referenceTr || '') : '',
     ...exampleCells(record, 0),
     ...exampleCells(record, 1),
     ...exampleCells(record, 2),
@@ -1154,6 +1294,7 @@ function reviewCells(record) {
 const REVIEW_HEADER = Object.freeze([
   'lemmaId', 'ar', 'translit_tr', 'translit_dia', 'tr1', 'tr2', 'root', 'pattern',
   'pos', 'freq', 'cognateTr', 'cognateShift',
+  'ref1_tr', 'ref1_context_tr',
   'ex1_ar', 'ex1_tr', 'ex1_ref',
   'ex2_ar', 'ex2_tr', 'ex2_ref',
   'ex3_ar', 'ex3_tr', 'ex3_ref',
@@ -1205,6 +1346,8 @@ function renderReviewMarkdown(draft) {
     '| `semClusters` | araç önerisi | gerekirse düzelt (12 küme; R-A5) |',
     '| `verifiedBy` | **insan** | Onaylayan adı/imzası. Boş = onaysız. |',
     '| `verifiedAt` | **insan** | Onay tarihi `YYYY-AA-GG`. İki ayrı gün kuralı için tabloda tut |',
+    '',
+    '| `ref1_tr` · `ref1_context_tr` | **REFERANS** (quran.com tr kelime-kelime) | Kopyalama; kendi anlamını yaz — 06 §2 gereği referans, üretim içeriği değil |',
     '',
     '> **Onaysız sayılan:** `verifiedBy` **veya** `tr1` boş olan satır.',
     '> **Onay kuralı (06 §3):** iki bağımsız göz **ya da** aynı kişinin iki ayrı günde kontrolü.',
@@ -1396,7 +1539,7 @@ function workbookBand(record) {
   return 'X';
 }
 
-function renderWorkbook(draft) {
+function renderWorkbook(draft, reference) {
   const order = ['D', 'A', 'C1', 'C2', 'C3', 'X'];
   const groups = new Map(order.map((key) => [key, []]));
   for (const record of draft.candidates) {
@@ -1416,7 +1559,10 @@ function renderWorkbook(draft) {
   // Yalnız çevrilecek sütunlar + bağlam; lemmaId gizli değil ama en sonda.
   // `translit_tr` ve `root` MEKANİK üretilir (Buckwalter tablosu / korpus kökü) —
   // içerik değildir, insanın Arapçayı okumasını/aramısını kolaylaştırır.
-  const cols = ['ar', 'translit_tr', 'root', 'context_ar', 'context_ref', 'tr1', 'tr2', 'pattern',
+  // `ref_tr` / `context_ref_tr` = quran.com Türkçe kelime-kelime REFERANSI (06 §2).
+  // Üretim paketine GİRMEZ; insanın `tr1`/`context_tr` yazmasına bakış kolaylığı.
+  const cols = ['ar', 'translit_tr', 'root', 'context_ar', 'context_ref',
+    'ref_tr', 'context_ref_tr', 'tr1', 'tr2', 'pattern',
     'cognateTr', 'cognateShift', 'context_tr', 'verifiedBy', 'verifiedAt', 'lemmaId'];
   const lines = [
     '# KAO · Seviyeli kelime çalışma kitabı (taslak)',
@@ -1428,6 +1574,7 @@ function renderWorkbook(draft) {
     '| Sütun | Yazılacak |',
     '|---|---|',
     '| `ar` · `translit_tr` · `root` · `context_ar` · `context_ref` | **mekanik** (korpustan) — dokunma |',
+    '| `ref_tr` · `context_ref_tr` | **REFERANS** (quran.com tr kelime-kelime, 06 §2) — kopyalama, kendi anlamını yaz |',
     '| `tr1` | kelimenin kısa Türkçe anlamı **zorunlu** |',
     '| `tr2` | ikinci anlam (varsa) |',
     '| `pattern` | kalıp etiketi (örn. `masdar`) |',
@@ -1454,6 +1601,8 @@ function renderWorkbook(draft) {
         record.root || '',
         context.ar || '',
         context.ref || '',
+        context.referenceWordTr || '',
+        context.referenceTr || '',
         '', '',
         '', '', '',
         '',
@@ -1467,8 +1616,8 @@ function renderWorkbook(draft) {
 }
 
 // self-test: D bölümü okuma sırasında (1:1 önce) ve Fâtiha kelimeleri başta olmalı.
-function workbookSelfTest(draft) {
-  const text = renderWorkbook(draft);
+function workbookSelfTest(draft, reference) {
+  const text = renderWorkbook(draft, reference);
   const dSection = text.slice(text.indexOf('Kova D ·'), text.indexOf('\n### Kova A'));
   const refs = [...dSection.matchAll(/\| (\d+):(\d+) \|/g)].map((m) => [Number(m[1]), Number(m[2])]);
   assert(refs.length > 0, 'workbook D bölümünde bağlam referansı olmalı');
@@ -1478,6 +1627,11 @@ function workbookSelfTest(draft) {
       'workbook D bölümü sûre:âyet okuma sırasında olmalı');
   }
   assert(dSection.includes('| 1:1 |'), 'Fâtiha 1:1 D bölümünde bulunmalı');
+  // Referans katmanı varsa `ref_tr` kolonu Fâtiha satırlarında dolu olmalı
+  if (reference && reference.words && reference.words.length) {
+    assert(/\| REF-/.test(text),
+      'referans katmanı varsa workbook ref_tr kolonu dolu olmalı');
+  }
   // mekanik alanlar boş kalmamalı (insanın okumasını kolaylaştırırlar)
   const rowsAll = text.split('\n').filter((line) => line.startsWith('| ') && !line.startsWith('| ar') && !line.startsWith('|---')
     && /\| [\u0600-\u06FF]/.test(line));
@@ -1550,6 +1704,7 @@ function usage() {
     '  node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs [--stats]',
     '  node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs --draft',
     '  node tools/kao-lexicon-build.mjs --review-md',
+    '  node tools/kao-lexicon-build.mjs --reference   # TEK ağ noktası: quran.com tr kelime-kelime referansı',
     '  node tools/kao-lexicon-build.mjs --workbook',
     '  node tools/kao-lexicon-build.mjs --import-md'
   ].join('\n');
@@ -1568,7 +1723,7 @@ function rejectUnknown(argv, allowed) {
   if (unknown.length) throw new CliError(`Bilinmeyen argüman: ${unknown.join(', ')}\n${usage()}`, 64);
 }
 
-function main(argv) {
+async function main(argv) {
   if (argv.includes('--self-test')) {
     if (argv.length !== 1) throw new CliError(`--self-test başka argüman almaz\n${usage()}`, 64);
     selfTest();
@@ -1577,6 +1732,11 @@ function main(argv) {
   if (argv.includes('--review-md')) {
     rejectUnknown(argv, new Set(['--review-md']));
     renderReviewFromDraft();
+    return;
+  }
+  if (argv.includes('--reference')) {
+    rejectUnknown(argv, new Set(['--reference']));
+    await writeReference();
     return;
   }
   if (argv.includes('--workbook')) {
@@ -1598,12 +1758,12 @@ function main(argv) {
   else compile(inputArg.resolved);
 }
 
-export { buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate };
+export { buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand };
 
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (IS_MAIN) {
   try {
-    main(process.argv.slice(2));
+    await main(process.argv.slice(2));
   } catch (error) {
     console.error(error && error.message ? error.message : String(error));
     process.exitCode = error instanceof CliError ? error.exitCode : 1;

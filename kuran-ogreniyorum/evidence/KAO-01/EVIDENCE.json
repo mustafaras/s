@@ -1,0 +1,59 @@
+{
+  "card": "KAO-01",
+  "head": "70923c44e1eb4087ebceb61d677af4d26893ac9d",
+  "diffHash": "0ad20c9eccc8d7fe3374a6c4fe1fa6d02a35d8a914337890da2a5c227f836be6",
+  "date": "2026-09-23",
+  "agent": "Codex (GPT-5)",
+  "checks": [
+    {
+      "cmd": "node --check tools/kao-lexicon-build.mjs",
+      "exit": 0,
+      "note": "syntax PASS"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --self-test",
+      "exit": 0,
+      "note": "50 sentetik veri satırı, 50 token, 5 lemma, 5 kök; üç örnek ve 3-7 kelime pencere; ağ API taraması PASS"
+    },
+    {
+      "cmd": "node -e import('./tools/kao-lexicon-build.mjs')",
+      "exit": 0,
+      "note": "ESM import yan etkisiz; buildStats, bwToArabic ve parseMorphology exportları mevcut"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs",
+      "exit": 2,
+      "note": "beklenen kabul dalı: iki yerel girdi yok; iki resmî adres ve sabit SHA-256 açıkça raporlandı"
+    },
+    {
+      "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+      "exit": 0,
+      "note": "PASS (0 warn), kanıt dosyaları eklendikten sonra"
+    },
+    {
+      "cmd": "git -c core.fsmonitor=false diff --check",
+      "exit": 0,
+      "note": "çıktı yok"
+    }
+  ],
+  "requirements": {
+    "note": "KAO-01 bağlayıcı R-id kapatmaz"
+  },
+  "filesTouched": [
+    "tools/kao-lexicon-build.mjs",
+    "kuran-ogreniyorum/content/README.md",
+    "kuran-ogreniyorum/evidence/KAO-01/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-01/HANDOFF.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "Lisans kabulü gerektiren gerçek QAC/Tanzil girdileri yerelde yoktu; promptun tanımladığı exit 2 kabul dalı doğrulandı ve stats.json üretilmedi.",
+    "Plan 77.430 token hedefler; QAC v0.4 resmî sürüm notu 77.429 kelime bildirir. Araç bu değerleri ayrı alanlarda tutar ve farkı gizlemez.",
+    "01-ARASTIRMA §1 ilk 25 ifadesine rağmen yalnız 10 somut lemma/frekans çifti verir; araç kalan 15 referansı uydurmaz.",
+    "D-01 ve D-02 lisans/atıf kararları açık kalır; bu kart verified üretim içeriği üretmez.",
+    "head kanıt hazırlanırken geçerli başlangıç commitidir; diffHash kanıt dosyaları eklenmeden önceki staged KAO-01 farkıdır, çünkü aynı commit kendi nihai hashini içeremez."
+  ]
+}

@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 0/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-P00 · **blockedPrompt:** — · **Sıradaki:** **KAO-01**
+**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 1/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-01 · **blockedPrompt:** — · **Sıradaki:** **KAO-25**
 **releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -20,7 +20,7 @@
 | Prompt | Başlık | Durum | Gereksinimler |
 |---|---|---|---|
 | KAO-P00 | Başlangıç (branch, tests/kao iskeleti, plan-check) | done | — |
-| KAO-01 | Sözlük derleme aracı (ağsız) | pending | — |
+| KAO-01 | Sözlük derleme aracı (ağsız) | done | — |
 | KAO-25 | Plan denetleyici (kao-plan-check) sertleştirme | pending | — |
 | KAO-02 | Aday liste, kognat/komşu önerisi, inceleme tablosu | pending | R-A5 R-A8 |
 | KAO-03 | İnsan doğrulaması (kullanıcı görevi) ve içe alma | pending | R-A8 |
@@ -61,4 +61,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:pending · R-A8:pending · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 8 | 2026-09-23 | KAO-P00 tamamlandı: `tests/kao/README.md` içinde 13 fixture planlandı; ham korpus girdileri `content/inputs/` ile Git dışında bırakıldı; üretim dosyası değişmedi. | `kao-plan-check` PASS (0 warn); self-test 13/13; Kur'an kataloğu 70/70; `git diff --check` PASS; `evidence/KAO-P00/EVIDENCE.json` |
+| 10 | 2026-09-23 | KAO-01 tamamlandı: sıfır bağımlılıklı ESM derleyici QAC TSV'yi kelime/lemma/kök/POS olarak grupluyor, Tanzil'den 3–7 kelimelik örnek pencereleri kuruyor, Buckwalter tablosundan Arapça üretiyor, SHA-256'yı fail-closed doğruluyor. 50 satırlık gömülü korpus self-test PASS; gerçek girdiler yok, zorunlu komut iki resmî kaynak+hash ile beklenen exit 2 verdi; `stats.json` üretilmedi. | `evidence/KAO-01/EVIDENCE.json`; plan-check PASS; üretim dosyası değişmedi |

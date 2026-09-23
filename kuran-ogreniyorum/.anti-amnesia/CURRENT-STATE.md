@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 1/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-01 · **blockedPrompt:** — · **Sıradaki:** **KAO-25**
+**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 2/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-25 · **blockedPrompt:** — · **Sıradaki:** **KAO-02**
 **releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -21,7 +21,7 @@
 |---|---|---|---|
 | KAO-P00 | Başlangıç (branch, tests/kao iskeleti, plan-check) | done | — |
 | KAO-01 | Sözlük derleme aracı (ağsız) | done | — |
-| KAO-25 | Plan denetleyici (kao-plan-check) sertleştirme | pending | — |
+| KAO-25 | Plan denetleyici (kao-plan-check) sertleştirme | done | — |
 | KAO-02 | Aday liste, kognat/komşu önerisi, inceleme tablosu | pending | R-A5 R-A8 |
 | KAO-03 | İnsan doğrulaması (kullanıcı görevi) ve içe alma | pending | R-A8 |
 | KAO-04 | Gramer içeriği (24 mikro-kavram + G0.5) | pending | R-A7 R-A8 |
@@ -61,4 +61,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:pending · R-A8:pending · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 12 | 2026-09-23 | KAO-01 düzeltmesi kapandı: POS yalnız STEM'den (yoksa kontrollü fallback), `LEM`-siz 3.307 token lemma havuzu dışında, Tanzil hizası bağımsız işaretleri süzüp 112 sûre besmelesini ve sürüm-bölünmüş kelimeleri mantıksal konuma birleştiriyor; eşleşmeyen âyet fail-closed. Gömülü regresyon ve tam korpus iki varyantta 6.236/6.236 PASS. | `lemmaCount=4.832`; v1.0.2 merge=1, v1.1 metin varyantı merge=4; `evidence/KAO-01/EVIDENCE.json#repairs` |
+| 14 | 2026-09-23 | KAO-25 tamamlandı: 13 gömülü self-test ayrı test dosyasına taşındı, IIP kapsam ihlali / `SeyAudio.say` / prompt sırası için 3 regresyon eklendi; kapsam ihlali artık izinli desenleri açıklıyor; `--card` bağımlılık ve kapı durumundan `startable` üretiyor. | self-test 16/16 PASS; `--card KAO-02`: KAO-01 done, gate approved, `startable=true`; `evidence/KAO-25/EVIDENCE.json` |

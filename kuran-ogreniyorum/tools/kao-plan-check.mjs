@@ -34,6 +34,31 @@ function globToRe(g) {
 function inScope(file, globs) { return globs.some(g => globToRe(g).test(file)); }
 function promptIndex(state, id) { return state.promptOrder.indexOf(id); }
 
+export function cardSummary(state, id) {
+  const card = state.cards[id];
+  if (!card) return null;
+  const dependencyStatuses = (card.deps || []).map(depId => ({
+    id: depId,
+    status: state.cards[depId] ? state.cards[depId].status : 'missing',
+    done: Boolean(state.cards[depId] && state.cards[depId].status === 'done'),
+  }));
+  const gateStatus = {
+    required: Boolean(card.gate),
+    name: card.gate || null,
+    approved: !card.gate || Boolean(card.gateApproval && card.gateApproval.by && card.gateApproval.at),
+  };
+  return {
+    id,
+    ...card,
+    dependencyStatuses,
+    gateStatus,
+    startable: dependencyStatuses.every(dep => dep.done) && gateStatus.approved,
+    commonChecks: state.commonChecks,
+    position: promptIndex(state, id) + 1,
+    of: state.promptOrder.length,
+  };
+}
+
 export function check(state, ctx) {
   const fails = [], warns = [];
   const fail = (m) => fails.push(m), warn = (m) => warns.push(m);
@@ -100,7 +125,7 @@ export function check(state, ctx) {
     const id = m[1];
     const scope = cards[id] ? cards[id].files : (id === 'KAO-P00' ? (state.bootstrap && state.bootstrap.files) : (state.auditScope && state.auditScope.files));
     if (!scope) { fail(`commit ${cm.hash.slice(0, 7)} tanımsız karta atıf: ${id}`); continue; }
-    for (const f of cm.files) if (!inScope(f, scope)) fail(`commit ${cm.hash.slice(0, 7)} (${id}) kapsam dışı dosya: ${f}`);
+    for (const f of cm.files) if (!inScope(f, scope)) fail(`commit ${cm.hash.slice(0, 7)} (${id}) kapsam dışı dosya: ${f}; izinli kapsam: ${scope.join(', ')}`);
   }
   // 7 · kaynak yasakları ve yükleme listeleri
   for (const f of KAO_SOURCE_FILES) {
@@ -165,40 +190,19 @@ ${lastLedger}
   return out;
 }
 
-function selfTest() {
-  const base = readJson(STATE_PATH);
-  const clone = () => JSON.parse(JSON.stringify(base));
-  const ctx0 = { prompts: null, ledger: '| 1 | d | e | k |', reqDoc: null, evidenceExists: () => true, readSource: () => null, commits: [] };
-  const cases = [
-    ['temiz state geçer', clone(), ctx0, (r) => r.fails.length === 0],
-    ['bağımlılık sırası', (() => { const s = clone(); s.cards['KAO-01'].deps = ['KAO-22']; return s; })(), ctx0, (r) => r.fails.some(f => f.includes('sırada sonra'))],
-    ['sahipsiz gereksinim', (() => { const s = clone(); for (const c of Object.values(s.cards)) c.req = (c.req || []).filter(r => r !== 'R-C9'); return s; })(), ctx0, (r) => r.fails.some(f => f.includes('R-C9'))],
-    ['sıra atlama', (() => { const s = clone(); s.lastCompletedPrompt = 'KAO-01'; s.activePrompt = 'KAO-05'; return s; })(), ctx0, (r) => r.fails.some(f => f.includes('sıradaki değil'))],
-    ['kapılı kart onaysız', (() => { const s = clone(); s.lastCompletedPrompt = 'KAO-23'; s.activePrompt = 'KAO-24'; s.cards['KAO-24'].status = 'active'; return s; })(), ctx0, (r) => r.fails.some(f => f.includes('gateApproval'))],
-    ['done ama evidence yok', (() => { const s = clone(); s.cards['KAO-01'].status = 'done'; return s; })(), { ...ctx0, evidenceExists: () => false }, (r) => r.fails.some(f => f.includes('EVIDENCE.json'))],
-    ['commit kapsamı', clone(), { ...ctx0, commits: [{ hash: 'abc1234def', subject: 'KAO-08: fsrs', files: ['app/core/saygi.js'] }] }, (r) => r.fails.some(f => f.includes('kapsam dışı'))],
-    ['fetch yasağı + yükleme listesi', clone(), { ...ctx0, readSource: (f) => f === 'app/core/quranLearn.js' ? 'fetch("https://x")' : (LOAD_LISTS.includes(f) ? 'quranLearn.js' : null) }, (r) => r.fails.some(f => f.includes('fetch yalnız')) && !r.fails.some(f => f.includes('yükleme listesinde'))],
-    ['yükleme listesi eksik', clone(), { ...ctx0, readSource: (f) => f === 'app/core/quranLearn.js' ? '' : (LOAD_LISTS.includes(f) ? '' : null) }, (r) => r.fails.filter(f => f.includes('yükleme listesinde')).length === 4],
-    ['verified:false paket', clone(), { ...ctx0, readSource: (f) => f === 'app/content/quranLexiconV1.js' ? '{verified:false}' : (LOAD_LISTS.includes(f) ? 'quranLexiconV1.js' : null) }, (r) => r.fails.some(f => f.includes('verified:false'))],
-    ['P00 kapsamı', clone(), { ...ctx0, commits: [{ hash: 'p00p00p00', subject: 'KAO-P00: iskelet', files: ['app.js'] }] }, (r) => r.fails.some(f => f.includes('kapsam dışı'))],
-    ['chore(kao) kapsamı', clone(), { ...ctx0, commits: [{ hash: 'c0c0c0c0c', subject: 'chore(kao): state', files: ['app.js'] }] }, (r) => r.fails.some(f => f.includes('chore(kao) kapsam dışı'))],
-    ['ledger seq atlama', clone(), { ...ctx0, ledger: '| 1 | a | b | c |\n| 3 | a | b | c |' }, (r) => r.fails.some(f => f.includes('seq atlıyor'))],
-  ];
-  let ok = 0;
-  for (const [name, st, ctx, pred] of cases) { const pass = pred(check(st, ctx)); console.log(`${pass ? 'PASS' : 'FAIL'} self-test: ${name}`); if (pass) ok++; }
-  console.log(`self-test ${ok}/${cases.length}`); process.exit(ok === cases.length ? 0 : 1);
-}
-
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 const args = process.argv.slice(2);
 if (!IS_MAIN) { /* import edildi (test/simülasyon): CLI çalışmaz */ }
-else if (args.includes('--self-test')) selfTest();
+else if (args.includes('--self-test')) {
+  const { runSelfTests } = await import('./kao-plan-check.test.mjs');
+  process.exitCode = runSelfTests({ check, cardSummary }, readJson(STATE_PATH)) ? 0 : 1;
+}
 else {
   const state = readJson(STATE_PATH);
   if (args.includes('--card')) {
-    const id = args[args.indexOf('--card') + 1]; const c = state.cards[id];
-    if (!c) { console.error('kart yok: ' + id); process.exit(1); }
-    console.log(JSON.stringify({ id, ...c, commonChecks: state.commonChecks, position: promptIndex(state, id) + 1, of: state.promptOrder.length }, null, 2));
+    const id = args[args.indexOf('--card') + 1]; const summary = cardSummary(state, id);
+    if (!summary) { console.error('kart yok: ' + id); process.exit(1); }
+    console.log(JSON.stringify(summary, null, 2));
     process.exit(0);
   }
   const { fails, warns } = check(state, realCtx());

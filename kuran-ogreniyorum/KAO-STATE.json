@@ -426,7 +426,10 @@
         "KAO-23"
       ],
       "gate": "D-08 ve D-09 kullanıcı onayı",
-      "status": "pending"
+      "status": "blocked",
+      "blockedAt": "2026-09-23",
+      "blockedReason": "D-08/D-09 gateApproval kaydı yok; D-08 kararına göre okuyucu/kayıt kökeni kanıtlanmadan ses varlığı yayınlanamaz.",
+      "requiredUserDecision": "Kaynağın okuyucu/kayıt kökeni ve lisans kanıtı görüldükten sonra D-08 ve D-09 için açık gateApproval."
     },
     "KAO-25": {
       "title": "Plan denetleyici (kao-plan-check) sertleştirme",
@@ -1295,7 +1298,7 @@
   },
   "activePrompt": null,
   "lastCompletedPrompt": "KAO-23",
-  "blockedPrompt": null,
+  "blockedPrompt": "KAO-24",
   "bootstrap": {
     "id": "KAO-P00",
     "files": [

@@ -1,0 +1,63 @@
+{
+  "card": "KAO-03",
+  "head": "f6964fc",
+  "diffHash": "8f1eb65431ca2641c065d1b0750abef33de8f2de67a99943fad868cf08c04bbb",
+  "diffHashScope": "git diff <head> <KAO-03 commit'i> -- . ':(exclude)kuran-ogreniyorum/evidence/**'",
+  "hashNote": "Bu kart bir ARADA durumdur (waiting_user): kanıt dosyası kendi commit'inin içinde olduğu için hash yerine (a) başlangıç `head`i ve (b) değişmez commit'ler arası komut listesi kanıt olarak tutulur (KAO-01/02 ile aynı desen).",
+  "date": "2026-09-23",
+  "agent": "GitHub Copilot (deepseek-v4.1-flash:cloud)",
+  "status": "waiting_user",
+  "agentWroteContent": false,
+  "whatAgentDid": [
+    "İnceleme tablosunu 600 satıra çıkardı (D-11 kararı: içerik sıra eşiği 500→600, kapsam %78.7→%81.0).",
+    "Tabloya 'Sütun kılavuzu' gömüldü: her sütunun kim tarafından yazılacağı + onay kuralı (06 §3).",
+    "--import-md'ye tutarlılık denetimi eklendi: her lemma ≥3 örnek (gerekçeli istisna hariç), ref biçimi S:A, Arapça blok bütünlüğü, doğrulanmış satırda Türkçe anlam + örnek çevirisi zorunlu.",
+    "06 §3 onay kuralı MAKİNE-DOĞRULANABİLİR hale getirildi: verifiedAt tek tarih ya da parantezli iki tarih taşır; iki ayrı gün kaydı otomatik tanınır (twoGazeTotal).",
+    "Bekçi: tablo boş ya da kimlikler uyumsuzsa --import-md uyarır; yinelenen lemmaId atlanır ve raporlanır.",
+    "freq 1–2 lemma için '>=3 örnek' kuralı gerekçeli istisna olarak kaydedildi (examplesException: corpus_windows_exhausted) — eksik alan UYDURULMADI."
+  ],
+  "checks": [
+    {
+      "cmd": "node --check tools/kao-lexicon-build.mjs",
+      "exit": 0,
+      "note": "syntax PASS"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --self-test",
+      "exit": 0,
+      "note": "PASS — iki-göz kuralı, tutarlılık denetimi, istisna kaydı, determinizm dahil"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs --draft",
+      "exit": 0,
+      "note": "candidates=600 bucket={A:22,B:0,C:515,D:63} coverageLemPool=%81.0 goalMet=true verified=0"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --import-md",
+      "exit": 0,
+      "note": "verified=0 rows=600 duplicates=0 of=600 → kart waiting_user (06 §3)"
+    },
+    {
+      "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+      "exit": 0,
+      "note": "PASS (0 warn)"
+    },
+    {
+      "cmd": "git -c core.fsmonitor=false diff --check",
+      "exit": 0,
+      "note": "çıktı yok"
+    }
+  ],
+  "requirements": {
+    "R-A8": "partial",
+    "note": "Şema, kalıp sütunu ve kognat sütunları hazır ve doğrulanabilir; ≥60 kök için kalıp etiketli Türkçe türev LİSTESİ insan girdisidir (bu kartta 0 satır doğrulandı)."
+  },
+  "userTaskPending": true,
+  "userTask": "lexicon.review.md içindeki 600 satır doldurulacak: tr1 (zorunlu), tr2, pattern, cognateTr, cognateShift, exN_tr, verifiedBy, verifiedAt. Onay kuralı: iki bağımsız göz YA DA aynı kişinin iki ayrı günü (verifiedAt'e iki tarih). Doldurduktan sonra: node tools/kao-lexicon-build.mjs --import-md",
+  "knownLimits": [
+    "Bu kart kullanıcı görevi olmadan DONE olamaz; ajan içerik yazmadı (ledger'da kayıtlı).",
+    "10 lemma (freq 1–2) korpusta 3. örnek penceresi vermiyor; gerekçeli istisna olarak kayıtlı, uydurulmadı.",
+    "Kalan kararlar ajan tarafından (kullanıcı yetkilendirmesiyle) kapandı; D-05/D-08 YAYIN kapısında kullanıcıya aittir ve releaseApproval=NOT_APPROVED olarak kalır."
+  ],
+  "agentCommit": "3632034"
+}

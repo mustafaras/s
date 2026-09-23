@@ -99,8 +99,7 @@
     ],
     "knownLimits": [
       "Onay D-12 (kullanıcı kararı): insan teyidi yok; tek YZ doğrulayıcı, tek tarih.",
-      "B kovası 346 (03 §9 tahmini ~225); kognat kuralı kök düzeyi türevleri kabul eder (06 §3.1).",
-      "freq 1–2 olan 10 lemmada 3. örnek yok (gerekçeli istisna)."
+      "B kovası 346 (03 §9 tahmini ~225); kognat kuralı kök düzeyi türevleri kabul eder (06 §3.1)."
     ]
   },
   "correction": {
@@ -144,5 +143,21 @@
         "exit": 0
       }
     ]
+  },
+  "d13": {
+    "date": "2026-09-23",
+    "rootExampleTranslations": 11,
+    "finalExceptions": [
+      "كُفُو (kök 1)",
+      "نَّفَّٰثَٰت (kök 1)",
+      "صَّمَد (kök 1)",
+      "وَقَبَ (kök 1)",
+      "خَنَّاس (kök 2)"
+    ],
+    "result": {
+      "verified": 524,
+      "consistency": 0,
+      "examplesMissingTr": 0
+    }
   }
 }

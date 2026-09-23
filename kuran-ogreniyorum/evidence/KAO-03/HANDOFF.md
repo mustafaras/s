@@ -20,10 +20,12 @@ tutarlılık denetimi 0. Alan kuralları 06 §3.1 (kalıp sözlüğü, kognat bi
 - Transliterasyon araçta düzeltildi (80 lemma: salât, huden, av, şay', hadâ, mu'min …).
 - `--draft` artık doğrulanmış alanları `verified.json`'dan taşır: yeniden taslak veri silmez.
 
+## Seyrek lemmalar (D-13) — kapandı
+10 istisnadan 5'i aynı kökten Kur'an örnekleriyle 3'e tamamlandı (11 örnek); 5'inin kökü Kur'an'da 1–2 kez geçer → kalıcı, eksiksiz sayılır.
+
 ## Bilinen sınırlar
 1. B kovası 346 (03 §9 tahmini ~225): 06 §3.1 kök düzeyindeki türevleri kognat sayar; kayma olan 113 kart SRS'e girer.
-2. freq 1–2 olan 10 lemmada korpus 3. örneği vermiyor → gerekçeli istisna (uydurulmadı).
-3. R-A8 `partial`: türev başına ayrı kalıp etiketi listesi KAO-04/KAO-14 kapsamında.
+2. R-A8 `partial`: türev başına ayrı kalıp etiketi listesi KAO-04/KAO-14 kapsamında.
 
 ## Sonraki yetkili eylem
 `node kuran-ogreniyorum/tools/kao-plan-check.mjs --card KAO-04`. Push/merge/tag/deploy yapılmadı.

@@ -61,6 +61,16 @@
         "UYGULAMA-PROMPTLARI KAO-03/04/06/Dalga denetimi"
       ]
     },
+    "D-13": {
+      "q": "Kur'an'da 1–2 kez geçen lemmalarda 05 §1 \"≥3 örnek\" kuralı nasıl karşılanır?",
+      "status": "decided",
+      "decision": "Önce aynı kökün diğer lemmalarının Kur'an pencereleri (farklı âyet, source:root, viaLemmaId) eklenir; kök Kur'an'da <3 âyette geçiyorsa kökün tüm geçişleri eksiksiz sayılır (examplesException.final=true, reason root_exhausted). Arapça uydurulmaz. Sonuç: 10 istisnadan 5'i kök akrabasıyla 3 örneğe tamamlandı (falak, gâsik, hâsid, magdûb, vesvâs; 11 örnek); 5'i kalıcı (kufuw, naffâsât, samad, vakaba: kök 1 kez; hannâs: kök 2 kez).",
+      "decidedBy": "kullanıcı (2026-09-23: \"bunu da bir şekilde çöz, geri dönmeyelim\")",
+      "docs": [
+        "05 §1 tablo + fixture satırı",
+        "06 §3.1"
+      ]
+    },
     "D-03": {
       "q": "KAO stili ayrı app/kao.css (IIP ile çakışmasız) mı, styles.css bloğu mu",
       "status": "decided",
@@ -249,7 +259,9 @@
       "selectionFix": "POS kapısı kaldırıldı (21 yüksek sıklıklı lemma dışarıda kalıyordu; en kötüsü <il~aA sıra 15/freq 663). Kesme 600→500. Sonuç: 524 aday, %80.9 kapsam, goalMet=true. Regresyon: self-test seçimin POS'a bağlı olmadığını zorlar.",
       "scopeNote": "2026-09-23: `lexicon.workbook.md` eklendi. Aynı içeriğin (lexicon.review.md) insan için YENİDEN DÜZENLENMİŞ hâli: kademeli bantlar (03 §1) + cümle bağlamı (02 §2.6). Yeni veri üretmez; kullanıcı incelemesini hızlandırmak için ikinci bir biçimdir. KAO-02 zaten sözlük içerik dosyalarının sahibidir. | 2026-09-23: `content/.gitignore` eklendi (KAO-01 de sahibi). Gerekçe: üçüncü taraf Türkçe REFERANS verisi (`lexicon.reference.json`) git dışında tutulmalı — ham korpus girdileriyle aynı desen. Yeni üretim dosyası değil, depo hijyeni satırı.",
       "d12FixAt": "2026-09-23",
-      "d12Fix": "Araç: (1) transliterasyon — ta marbûta (salât/rahmet), tenvin taşıyıcısı sessiz (hüden), diftong (av/şay'), elif maksûre â (hadâ), kelime içi hemze ', QAC rakamı düşer (80 lemma); (2) --draft insan/doğrulayıcı alanlarını verified.json'dan taşır (yeniden taslakta veri kaybı yok); (3) --import-md ex2_tr/ex3_tr alır; (4) onay D-12 (parseApproval, iki-gün kaldırıldı); (5) kalıp sözlüğü + kognat biçim denetimi; (6) consistency CLI raporu; (7) tablo/kitap metinleri, kitap dolu değerleri gösterir. Self-test regresyonları eklendi."
+      "d12Fix": "Araç: (1) transliterasyon — ta marbûta (salât/rahmet), tenvin taşıyıcısı sessiz (hüden), diftong (av/şay'), elif maksûre â (hadâ), kelime içi hemze ', QAC rakamı düşer (80 lemma); (2) --draft insan/doğrulayıcı alanlarını verified.json'dan taşır (yeniden taslakta veri kaybı yok); (3) --import-md ex2_tr/ex3_tr alır; (4) onay D-12 (parseApproval, iki-gün kaldırıldı); (5) kalıp sözlüğü + kognat biçim denetimi; (6) consistency CLI raporu; (7) tablo/kitap metinleri, kitap dolu değerleri gösterir. Self-test regresyonları eklendi.",
+      "d13FixAt": "2026-09-23",
+      "d13Fix": "Araç: 3'ten az örnekli lemmaya aynı kökten Kur'an pencereleri (source:root) eklenir; istisna korpustan her üretimde yeniden hesaplanır (reason root_exhausted, final); self-test: aynı âyet tekrarı yok, kök örneği kaynak lemmayı taşır."
     },
     "KAO-03": {
       "title": "Yapay zekâ doğrulaması ve içe alma (D-12)",
@@ -296,11 +308,12 @@
           "B": 346,
           "C": 93,
           "D": 63
-        }
+        },
+        "rootExamples": 11,
+        "examplesFinalException": 5
       },
       "knownLimits": [
         "B kovası 346 (03 §9 tahmini ~225): 06 §3.1 kognat kuralı kök düzeyinde türev kabul eder (R-A8); anlam kayması olan 113 kart 03 gereği SRS'e girer.",
-        "freq 1–2 olan 10 lemmada korpus 3. örnek vermez; gerekçeli istisna (uydurulmadı).",
         "R-A8 partial: kognatlar lemma düzeyinde; her Türkçe türev için ayrı kalıp etiketi listesi KAO-04/KAO-14 kapsamında."
       ]
     },

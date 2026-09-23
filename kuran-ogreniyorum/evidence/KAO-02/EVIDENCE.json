@@ -1,0 +1,109 @@
+{
+  "card": "KAO-02",
+  "head": "f1e89d7ee70275d237dafd69c59ec0f4424efe1a",
+  "diffHash": "17ee7c5608b3f5c49d2411159e14671ad3d66410fd670be9903c6b6144138478",
+  "date": "2026-09-23",
+  "agent": "GitHub Copilot (deepseek-v4.1-flash:cloud)",
+  "checks": [
+    {
+      "cmd": "node --check tools/kao-lexicon-build.mjs",
+      "exit": 0,
+      "note": "syntax PASS"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --self-test",
+      "exit": 0,
+      "note": "PASS — 50 satırlık gömülü korpus + Tanzil gövde kapısı + kova/taslak/inceleme regresyonları"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs",
+      "exit": 0,
+      "note": "QAC + Tanzil ile stats.json: token=77429 lemma=4832 root=1642 verse=6236"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs --draft",
+      "exit": 0,
+      "note": "candidates=503 bucket={A:22,B:0,C:418,D:63} coverageLemPool=%78.7 verified=0"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --review-md",
+      "exit": 0,
+      "note": "lexicon.review.md — 503 satır, 18 sütun (06 §3)"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --import-md",
+      "exit": 0,
+      "note": "verified=0 → kart waiting_user; lexicon.verified.json (KAO-03 dosyası) doğrulama sonrası SİLİNDİ"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --inputs <girdi-yok>",
+      "exit": 2,
+      "note": "fail-closed eksik-girdi dalı: her dosyanın resmî adresi, indirme tarifi ve beklenen hash'i raporlanır"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --inputs <hash-uyuşmazlığı>",
+      "exit": 3,
+      "note": "fail-closed bütünlük dalı: gövde hash'i tutmazsa kutsal metin sessizce kabul edilmez"
+    },
+    {
+      "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+      "exit": 0,
+      "note": "PASS (0 warn) — kanıt dosyası eklendikten sonra"
+    },
+    {
+      "cmd": "node tests/quran/test_quran_catalog.js",
+      "exit": 0,
+      "note": "70/70 PASS (regresyon: Kur'an modülleri etkilenmedi)"
+    },
+    {
+      "cmd": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
+      "exit": 0,
+      "note": "B2 PASS — 67 passed / 0 failed"
+    },
+    {
+      "cmd": "node tests/app/test_state_rebind_boundary.js",
+      "exit": 0,
+      "note": "MON-15 PASS — 37 passed / 0 failed (dört yükleme listesi dokunulmadı)"
+    },
+    {
+      "cmd": "git -c core.fsmonitor=false diff --check",
+      "exit": 0,
+      "note": "çıktı yok"
+    }
+  ],
+  "tanzilPinRootCause": {
+    "symptom": "content/README.md'de sabitlenmiş Tanzil tam-dosya sha256 hiçbir gerçek indirmeyle eşleşmiyordu",
+    "measurement": "12 seçenek kombinasyonu × 4 quranType × 3 outType denendi; ayrıca telif bloğu yılı 2015–2026 arası tarandı → 0 eşleşme",
+    "cause": "Tanzil telif bloğu (aynen korunması zorunlu) yuvarlanan yıl taşır: '#  Copyright (C) 2007-2026 Tanzil Project'. Tam-dosya SHA-256 bu yüzden ilkesel olarak üretilemez; pinlenen değer hiçbir sürüme karşılık gelmiyordu.",
+    "fix": "Kapı iki parçalı: (1) yorumsuz gövde SHA-256 = 7f429d485cb43f0ac78e2830789f6634709725010922c535035a221e531708de; (2) yapısal kapı — âyet satırı sayısı QAC âyet sayısına eşit ve her satırda Arapça olmalı.",
+    "evidence": "gerçek Tanzil 1.1 indirmesi: 6236 veri satırı, 6236/6236 âyet QAC ile hizalı, 77.429 token"
+  },
+  "requirements": {
+    "R-A5": "partial",
+    "R-A8": "partial",
+    "note": "R-A5: `semNeighbors[]` üretildi (aynı kök kardeşleri + 12 anlam kümesi, korpustan doğrulanmış 42 kök; tümü proposed:true). Aynı oturum/3-gün serpiştirme kuralı kuyruk motorunun sahipliğinde (KAO-09). R-A8: kalıp etiketli Türkçe türevler insan içeriğidir — şema (cognate/cognateTr/cognateShift/pattern) ve inceleme sütunları hazır; ≥60 kök listesi KAO-03/KAO-04'te doldurulacak."
+  },
+  "filesTouched": [
+    "tools/kao-lexicon-build.mjs",
+    "kuran-ogreniyorum/content/lexicon.draft.json",
+    "kuran-ogreniyorum/content/lexicon.review.md",
+    "kuran-ogreniyorum/evidence/KAO-02/draft-report.json",
+    "kuran-ogreniyorum/evidence/KAO-02/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-02/HANDOFF.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": true,
+  "userTask": "lexicon.review.md satır satır doldurulacak: tr1/tr2 (Türkçe anlam), cognateTr/cognateShift (kognat + anlam kayması), ex1_tr (örnek çevirisi), verifiedBy (onay). Onay kuralı 06 §3: iki bağımsız göz ya da kullanıcının iki ayrı günde kontrolü. Boş verifiedBy = onaysız; KAO-05 bu onay olmadan açılmaz.",
+  "knownLimits": [
+    "Hiçbir satır doğrulanmadı (verified=0, verifiedBy boş) — kart üretim içeriği üretmez, yalnız taslak.",
+    "Hedef kapsam %80 ölçülen %78.7 (LEM etiketli token havuzu, 74.122). İçerik sıra eşiği 500→600 yükseltilirse hedef tutar; karar kullanıcıya bırakıldı (D-11). Araç kendi kendine eşik değiştirmez.",
+    "B kovası boştur: kognat kararı insan girdisidir (06 §3); araç TDK listesini hafızadan üretmez.",
+    "Arapça ve transliterasyon mekanik üretilir (`translit.auto:true`); insan doğru okunuşu onaylamalı.",
+    "`--import-md` KAO-03'ün dosyasını (lexicon.verified.json) yazar; bu kartta yalnız doğrulama yolu sınandı, çıktı silindi.",
+    "Tanzil gövde pini yıldan bağımsızdır; yapısal kapı bozuk indirmeyi yakalar ama âyet metninin içeriğini insan gözetimi dışında kanıtlamaz — Tanzil'in kendi doğrulama süreci esastır (D-02 açık)."
+  ],
+  "diffHashScope": "git diff HEAD~1 HEAD -- . ':(exclude)kuran-ogreniyorum/evidence/**'",
+  "hashNote": "Kanıt dosyası kendi commit'inin içindedir; bu yüzden (a) `head` kartın BAŞLANGIÇ commit'idir ve (b) `diffHash` kanıt dizini HARİÇ kod farkını kapsar. İkisi de yukarıdaki komutla yeniden üretilebilir (KAO-01 ile aynı desen)."
+}

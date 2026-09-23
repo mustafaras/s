@@ -1,12 +1,13 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 2/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-25 · **blockedPrompt:** — · **Sıradaki:** **KAO-02**
+**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 3/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-02 · **blockedPrompt:** — · **Sıradaki:** **KAO-03**
 **releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
 - **D-01** — QAC (GPL) verisinden türetilmiş sıklık/kök etiketleri + atıf
 - **D-02** — Tanzil metni kesitleri (CC BY 3.0) + âyet referansı + link
+- **D-11** — Hedef kapsam %80: ölçüm 503 adayla LEM havuzunun %78.7'si; içerik sıra eşiğini 500→600 yükseltmek hedefi tutturur (rapor: coverage.alternatives) _(öneri: eşiği yükseltme kararı kullanıcıya bırakıldı; araç kendi kendine değiştirmez)_
 - **D-03** — KAO stili ayrı app/kao.css (IIP ile çakışmasız) mı, styles.css bloğu mu _(öneri: app/kao.css (IIP sürerken))_
 - **D-04** — FSRS saf JS portu, ts-fsrs MIT atıfı
 - **D-05** — Repo LICENSE kararı; lexicon public push öncesi
@@ -22,7 +23,7 @@
 | KAO-P00 | Başlangıç (branch, tests/kao iskeleti, plan-check) | done | — |
 | KAO-01 | Sözlük derleme aracı (ağsız) | done | — |
 | KAO-25 | Plan denetleyici (kao-plan-check) sertleştirme | done | — |
-| KAO-02 | Aday liste, kognat/komşu önerisi, inceleme tablosu | pending | R-A5 R-A8 |
+| KAO-02 | Aday liste, kognat/komşu önerisi, inceleme tablosu | done | R-A5 R-A8 |
 | KAO-03 | İnsan doğrulaması (kullanıcı görevi) ve içe alma | pending | R-A8 |
 | KAO-04 | Gramer içeriği (24 mikro-kavram + G0.5) | pending | R-A7 R-A8 |
 | KAO-23 | Fonetik içeriği + mahreç SVG | pending | R-B6 R-A9 |

@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "kao-lexicon-build --draft",
+  "version": "quran-lexicon-tr-v1",
+  "sourceHashes": {
+    "morphology": "a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+    "uthmani": "829083f684ecb5c71853029ca1970946a12c2dc90528d6e0e3cd6dbc41204b7c",
+    "uthmaniBodySha256": "7f429d485cb43f0ac78e2830789f6634709725010922c535035a221e531708de"
+  },
+  "selectionRule": {
+    "particleRankMax": 100,
+    "contentRankMax": 500,
+    "particlePos": [
+      "ACC",
+      "AMD",
+      "ANS",
+      "AVR",
+      "CERT",
+      "COND",
+      "CONJ",
+      "DEM",
+      "EXH",
+      "EXL",
+      "FUT",
+      "INC",
+      "INTG",
+      "LOC",
+      "NEG",
+      "P",
+      "PREV",
+      "PRO",
+      "PRON",
+      "REL",
+      "RES",
+      "RET",
+      "SUB",
+      "T"
+    ],
+    "contentPos": [
+      "ADJ",
+      "N",
+      "PN",
+      "V"
+    ],
+    "anchorVerses": 22,
+    "note": "03 §9: A = sıklık ilk 100 parçacık, B/C = sıklık ≤500 içerik, D = çapa/tesbihat (sıralamadan bağımsız)."
+  },
+  "tokenTotal": 77429,
+  "contractTokenTarget": 77430,
+  "lemPoolTokens": 74122,
+  "lemmaTotal": 4832,
+  "candidateTotal": 503,
+  "planCandidateTarget": 530,
+  "bucketCounts": {
+    "A": 22,
+    "B": 0,
+    "C": 418,
+    "D": 63
+  },
+  "bucketTargets": {
+    "A": 60,
+    "B": 225,
+    "C": 215,
+    "D": 30
+  },
+  "coverage": {
+    "selectedLemPoolTokens": 58312,
+    "lemPoolTokens": 74122,
+    "ratioLemPool": 0.7867,
+    "ratioWordTokens": 0.7531,
+    "goal": 0.8,
+    "goalMet": false,
+    "denominator": "LEM etiketli token havuzu",
+    "alternatives": [
+      {
+        "contentRankMax": 500,
+        "lemmas": 503,
+        "ratioLemPool": 0.7867
+      },
+      {
+        "contentRankMax": 600,
+        "lemmas": 600,
+        "ratioLemPool": 0.8095
+      },
+      {
+        "contentRankMax": 700,
+        "lemmas": 694,
+        "ratioLemPool": 0.827
+      },
+      {
+        "contentRankMax": 800,
+        "lemmas": 794,
+        "ratioLemPool": 0.8423
+      },
+      {
+        "contentRankMax": 1000,
+        "lemmas": 986,
+        "ratioLemPool": 0.8654
+      }
+    ]
+  },
+  "anchorUniverseTotal": 63,
+  "anchorPresentTotal": 63,
+  "anchorMissing": [],
+  "anchorOutsideContentBand": 24,
+  "tesbihatPresent": [
+    "suboHa`n",
+    "Hamod",
+    ">akobar",
+    "taHiy~ap",
+    "Salaw`p",
+    "Tay~ibap",
+    "sala`m",
+    "raHomap",
+    "baraka`t",
+    "Eabod",
+    "rasuwl",
+    "$ahida",
+    "<ila`h"
+  ],
+  "clusterRootDiagnostics": [
+    {
+      "cluster": "KORKU_TAKVA",
+      "rootBw": "wqy",
+      "known": true,
+      "lemmaCount": 8
+    },
+    {
+      "cluster": "KORKU_TAKVA",
+      "rootBw": "x$y",
+      "known": true,
+      "lemmaCount": 2
+    },
+    {
+      "cluster": "KORKU_TAKVA",
+      "rootBw": "xwf",
+      "known": true,
+      "lemmaCount": 7
+    },
+    {
+      "cluster": "KORKU_TAKVA",
+      "rootBw": "wjl",
+      "known": true,
+      "lemmaCount": 3
+    },
+    {
+      "cluster": "IMAN_KUFUR",
+      "rootBw": "Amn",
+      "known": true,
+      "lemmaCount": 17
+    },
+    {
+      "cluster": "IMAN_KUFUR",
+      "rootBw": "kfr",
+      "known": true,
+      "lemmaCount": 14
+    },
+    {
+      "cluster": "IMAN_KUFUR",
+      "rootBw": "$rk",
+      "known": true,
+      "lemmaCount": 8
+    },
+    {
+      "cluster": "IMAN_KUFUR",
+      "rootBw": "nfq",
+      "known": true,
+      "lemmaCount": 10
+    },
+    {
+      "cluster": "ILIM_CEHALET",
+      "rootBw": "Elm",
+      "known": true,
+      "lemmaCount": 14
+    },
+    {
+      "cluster": "ILIM_CEHALET",
+      "rootBw": "jhl",
+      "known": true,
+      "lemmaCount": 6
+    },
+    {
+      "cluster": "ILIM_CEHALET",
+      "rootBw": "Eql",
+      "known": true,
+      "lemmaCount": 1
+    },
+    {
+      "cluster": "ILIM_CEHALET",
+      "rootBw": "fkr",
+      "known": true,
+      "lemmaCount": 2
+    },
+    {
+      "cluster": "RAHMET_ZULUM",
+      "rootBw": "rHm",
+      "known": true,
+      "lemmaCount": 9
+    },
+    {
+      "cluster": "RAHMET_ZULUM",
+      "rootBw": "Zlm",
+      "known": true,
+      "lemmaCount": 12
+    },
+    {
+      "cluster": "HIDAYET_DALALET",
+      "rootBw": "hdy",
+      "known": true,
+      "lemmaCount": 12
+    },
+    {
+      "cluster": "HIDAYET_DALALET",
+      "rootBw": "Dll",
+      "known": true,
+      "lemmaCount": 8
+    },
+    {
+      "cluster": "AMEL_KARSILIK",
+      "rootBw": "Eml",
+      "known": true,
+      "lemmaCount": 4
+    },
+    {
+      "cluster": "AMEL_KARSILIK",
+      "rootBw": "Ajr",
+      "known": true,
+      "lemmaCount": 3
+    },
+    {
+      "cluster": "AMEL_KARSILIK",
+      "rootBw": "E*b",
+      "known": true,
+      "lemmaCount": 5
+    },
+    {
+      "cluster": "AMEL_KARSILIK",
+      "rootBw": "Hsb",
+      "known": true,
+      "lemmaCount": 8
+    },
+    {
+      "cluster": "HAYAT_OLUM",
+      "rootBw": "Hyy",
+      "known": true,
+      "lemmaCount": 12
+    },
+    {
+      "cluster": "HAYAT_OLUM",
+      "rootBw": "mwt",
+      "known": true,
+      "lemmaCount": 8
+    },
+    {
+      "cluster": "ALGI_ISITME_GORME",
+      "rootBw": "smE",
+      "known": true,
+      "lemmaCount": 10
+    },
+    {
+      "cluster": "ALGI_ISITME_GORME",
+      "rootBw": "bSr",
+      "known": true,
+      "lemmaCount": 10
+    },
+    {
+      "cluster": "ALGI_ISITME_GORME",
+      "rootBw": "nZr",
+      "known": true,
+      "lemmaCount": 10
+    },
+    {
+      "cluster": "NEFIS_KALP",
+      "rootBw": "nfs",
+      "known": true,
+      "lemmaCount": 4
+    },
+    {
+      "cluster": "NEFIS_KALP",
+      "rootBw": "rwH",
+      "known": true,
+      "lemmaCount": 6
+    },
+    {
+      "cluster": "NEFIS_KALP",
+      "rootBw": "qlb",
+      "known": true,
+      "lemmaCount": 9
+    },
+    {
+      "cluster": "SOZ_EMIR",
+      "rootBw": "qwl",
+      "known": true,
+      "lemmaCount": 6
+    },
+    {
+      "cluster": "SOZ_EMIR",
+      "rootBw": "Amr",
+      "known": true,
+      "lemmaCount": 6
+    },
+    {
+      "cluster": "KULLUK_DUA",
+      "rootBw": "Ebd",
+      "known": true,
+      "lemmaCount": 6
+    },
+    {
+      "cluster": "KULLUK_DUA",
+      "rootBw": "dEw",
+      "known": true,
+      "lemmaCount": 7
+    },
+    {
+      "cluster": "KULLUK_DUA",
+      "rootBw": "$kr",
+      "known": true,
+      "lemmaCount": 6
+    },
+    {
+      "cluster": "SABIR_ITAAT",
+      "rootBw": "Sbr",
+      "known": true,
+      "lemmaCount": 8
+    },
+    {
+      "cluster": "SABIR_ITAAT",
+      "rootBw": "TwE",
+      "known": true,
+      "lemmaCount": 10
+    },
+    {
+      "cluster": "SABIR_ITAAT",
+      "rootBw": "TEm",
+      "known": true,
+      "lemmaCount": 7
+    }
+  ],
+  "cognate": {
+    "channel": "inceleme tablosu (lexicon.review.md) — cognateTr / cognateShift sütunları",
+    "matchedTotal": 0,
+    "note": "Kognat eşlemesi ÖNERİdir ve yalnız insan yazar (06 §3); araç TDK listesini hafızadan üretmez."
+  },
+  "verifiedTotal": 0,
+  "userTaskPending": true,
+  "warnings": [
+    "kapsam hedefi %80 altında: %78.7 (LEM havuzu; içerik sıralaması ≤500). Hedefe ulaşan sıralama raporludur, eşiği yükseltmek insan kararıdır.",
+    "kognat sütunu boş (insan doldurur); B kovası boş, cognateTr/cognateShift null"
+  ]
+}

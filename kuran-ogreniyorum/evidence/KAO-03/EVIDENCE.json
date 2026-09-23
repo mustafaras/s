@@ -53,11 +53,12 @@
     "note": "Şema, kalıp sütunu ve kognat sütunları hazır ve doğrulanabilir; ≥60 kök için kalıp etiketli Türkçe türev LİSTESİ insan girdisidir (bu kartta 0 satır doğrulandı)."
   },
   "userTaskPending": true,
-  "userTask": "lexicon.review.md içindeki 600 satır doldurulacak: tr1 (zorunlu), tr2, pattern, cognateTr, cognateShift, exN_tr, verifiedBy, verifiedAt. Onay kuralı: iki bağımsız göz YA DA aynı kişinin iki ayrı günü (verifiedAt'e iki tarih). Doldurduktan sonra: node tools/kao-lexicon-build.mjs --import-md",
+  "userTask": "content/lexicon.workbook.md (seviyeli, cümle bağlamlı) doldurulacak. Kademeli: Kova D 63 kelime = KAO-05 için yeterli asgari; tamamı 524 kelime = %80.9 kapsam. Sütunlar: tr1(zorunlu), tr2, pattern, cognateTr, cognateShift, context_tr, verifiedBy, verifiedAt.",
   "knownLimits": [
     "Bu kart kullanıcı görevi olmadan DONE olamaz; ajan içerik yazmadı (ledger'da kayıtlı).",
     "10 lemma (freq 1–2) korpusta 3. örnek penceresi vermiyor; gerekçeli istisna olarak kayıtlı, uydurulmadı.",
     "Kalan kararlar ajan tarafından (kullanıcı yetkilendirmesiyle) kapandı; D-05/D-08 YAYIN kapısında kullanıcıya aittir ve releaseApproval=NOT_APPROVED olarak kalır."
   ],
-  "agentCommit": "3632034"
+  "agentCommit": "3632034",
+  "agentSideDone": " | 2026-09-23: `--workbook` modu (kademeli bantlar + cümle bağlamı + Fâtiha okuma sırası) eklendi; inceleme yükü 63/140/524 seviyelerine indirildi; kök neden (POS kapısı) düzeltildi → 524 aday / %80.9 kapsam."
 }

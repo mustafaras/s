@@ -5,40 +5,29 @@
 
 ---
 
-## 🧑‍💻 SENDEN İSTENEN (tek adım)
+## 🧑‍💻 SENDEN İSTENEN (kademeli — istediğin seviyeden başla)
 
-**Dosya:** `kuran-ogreniyorum/content/lexicon.review.md` — **600 satır**
+**Dosya:** `kuran-ogreniyorum/content/lexicon.workbook.md`
 
-Tablodaki şu sütunları doldur (kalanlar araç tarafından üretildi, **dokunma**):
+| Seviye | Bant | Kelime | Ne olur |
+|---|---|---|---|
+| **1** | Kova D | **63** | KAO-05 açılır; Fâtiha + kısa sûreler + tesbihat öğretilebilir hâle gelir |
+| **2** | + A + C₁ | ~140 | Kur'an'ın en sık kelimeleri hazır |
+| **3** | + C₂ + C₃ | 524 | %80,9 kapsam (plan hedefi %80 ✓) |
 
-| Doldurulacak sütun | Ne yazılır |
-|---|---|
-| `tr1` | **Kısa Türkçe anlam** (zorunlu) |
-| `tr2` | İkinci anlam (varsa) |
-| `pattern` | Kalıp etiketi (`masdar`, `ism-i fâil`, …) — 10 §7 |
-| `cognateTr` | Türkçedeki karşılığı (varsa) — TDK kaynaklı |
-| `cognateShift` | Yalnız anlam kayması **varsa** (R-A8 uyarısını tetikler) |
-| `exN_tr` | Örneklerin kısa Türkçe çevirisi |
-| `verifiedBy` | Onaylayan adın/imza |
-| `verifiedAt` | Onay tarihi `YYYY-AA-GG` |
+Her satırda doldurulacak: `tr1` (zorunlu), `tr2`, `pattern`, `cognateTr`,
+`cognateShift`, `context_tr` (cümlenin çevirisi), `verifiedBy`, `verifiedAt`.
 
-**Onay kuralı (06 §3)** — ikisinden biri:
-1. **İki bağımsız göz**, ya da
-2. **Aynı kişinin iki ayrı günde kontrolü** → `verifiedAt`'e iki tarih yaz:
-   `verifiedBy` = `insan-1 (2026-09-23; 2026-09-24)`
+**Onay kuralı (06 §3):** iki bağımsız göz **ya da** aynı kişinin iki ayrı günü
+(ikinci durumda `verifiedAt`'e iki tarih: `insan-1 (2026-09-23; 2026-09-24)`).
 
-> Araç iki tarihi otomatik tanır (`twoGazeTotal`) ve aynı gün iki kez yazılırsa
-> iki-göz kuralını **karşılanmış saymaz**.
-
-**Doldurduktan sonra çalıştır:**
-
+Doldurduktan sonra (birincil doldurma yolu `lexicon.review.md`'dir; workbook okuma
+kolaylığı içindir):
 ```sh
-node tools/kao-lexicon-build.mjs --import-md
+node tools/kao-lexicon-build.mjs --import-md    # lexicon.review.md → lexicon.verified.json
 ```
-
-Beklenen: `verified=<N> unknown=0 rows=600 duplicates=0`. Tutarsızlık varsa
-(eksik Türkçe, bozuk `ref`, doğrulanmış satırda eksik örnek çevirisi) araç
-**listeleyip** döner.
+Kısmi onay da geçerlidir: `--import-md` yalnız **doğrulanmış** satırları sayar;
+kalan satırlar `waiting_user` olarak kalır ve kademeli açılır.
 
 ---
 

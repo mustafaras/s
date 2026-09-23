@@ -7,7 +7,7 @@ dokunmadan önce onaylanacak **plan**dır; hiçbir dosya değişmedi.
 
 | Dosya | Tür | Boyut hedefi | Sorumluluk |
 |---|---|---|---|
-| `app/content/quranLexiconV1.js` | Donmuş içerik (`window.QuranLexiconV1`) | ≤ 260 KB | ~530 lemma: Arapça (harekeli), transliterasyon, Türkçe anlam(lar), kök, kalıp, POS, sıklık, kognat notu, ≥3 âyet parçası (Arapça + Türkçe + referans), `verified` |
+| `app/content/quranLexiconV1.js` | Donmuş içerik (`window.QuranLexiconV1`) | ≤ 260 KB | ~530 lemma: Arapça (harekeli), transliterasyon, Türkçe anlam(lar), kök, kalıp, POS, sıklık, kognat notu, ≥3 âyet parçası (Arapça + Türkçe + referans; D-13: gerekirse aynı kökten `source:'root'`, kök Kur'an'da <3 geçiyorsa kökün tüm geçişleri), `verified` |
 | `app/content/quranGrammarV1.js` | Donmuş içerik (`window.QuranGrammarV1`) | ≤ 60 KB | 24 mikro-kavram: açıklama (Türkçe, terimsiz + terimli), tablolar (zamir/çekim), alıştırma şablonları |
 | `app/content/quranShortSurahsV1.js` | Donmuş içerik (`window.QuranShortSurahsV1`) | ≤ 90 KB | Seviye 5'in 20 kısa sûresi kelime kelime: `{surahId, ayah, i, ar, lemmaId, tr}` |
 | `app/content/quranPhonicsV1.js` | Donmuş içerik (`window.QuranPhonicsV1`) | ≤ 40 KB | 28 harf × kova/mahreç/Türkçe ipucu/SVG id, minimal çift listesi, 7 okuma kuralı, transliterasyon tablosu (okunuş + DİA) |
@@ -128,7 +128,7 @@ render'ı için `will-change` yok; 60 fps ölçümü SKY kalıbıyla.
 
 | Fixture | Ne doğrular |
 |---|---|
-| `test_kao_lexicon_contract.js` | İçerik şeması: her lemma id benzersiz, Arapça yalnız Arapça blok + hareke, `verified` bayrağı, ≥3 örnek, kaynak/atıf alanı, boyut bütçesi |
+| `test_kao_lexicon_contract.js` | İçerik şeması: her lemma id benzersiz, Arapça yalnız Arapça blok + hareke, `verified` bayrağı, ≥3 örnek (ya da D-13 `examplesException.final`), kaynak/atıf alanı, boyut bütçesi |
 | `test_kao_lexicon_coverage.js` | Sıklık toplamı / 77.430 hedef kapsam bantları (ünite eşikleri) |
 | `test_kao_migration.js` | `ensureQuranLearn` boş/eski/bozuk/idempotent; orphan koruması |
 | `test_kao_fsrs.js` | Zamanlayıcı ts-fsrs referans vektörleriyle ±1e-6; monotonluk |

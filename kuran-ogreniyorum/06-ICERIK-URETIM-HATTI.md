@@ -84,6 +84,11 @@ toptan değil; içerik değişirse yeniden doğrulama.
   sözcük yok. Kognat doluysa kelime B kovasına girer (03 §9).
 - **`cognateShift`** — yalnız Türkçedeki ana anlam Arapçadakinden belirgin
   biçimde ayrılıyorsa; kognat yoksa boş.
+- **Örnek sayısı (D-13)** — her lemma 3 örnek taşır. Lemmanın kendi âyeti yetmezse
+  aynı kökün diğer lemmalarının Kur'an pencereleri eklenir (farklı âyet, `source:'root'`,
+  `viaLemmaId`). Kök Kur'an'da 3'ten az âyette geçiyorsa (ör. صمد, وقب, نفث, كفأ) 3.
+  örnek yoktur; `examplesException {reason:'root_exhausted', final:true}` kalıcıdır ve
+  eksiksiz sayılır. Arapça asla uydurulmaz.
 - **`exN_tr`** — kesitin kısa Türkçesi. Parantez yalnız **aynı âyetin** kesit
   dışındaki sözünü tamamlar; açıklama/tefsir notu yazılmaz (§2).
 

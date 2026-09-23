@@ -1,7 +1,7 @@
 {
   "card": "KAO-02",
-  "head": "f1e89d7ee70275d237dafd69c59ec0f4424efe1a",
-  "diffHash": "17ee7c5608b3f5c49d2411159e14671ad3d66410fd670be9903c6b6144138478",
+  "head": "aee9ec219dbd03f806a76bb38bc01c040b323705",
+  "diffHash": "dc571b79f91092fc7213a5b865a011787f43c4150ae06c52757dcce663e376f5",
   "date": "2026-09-23",
   "agent": "GitHub Copilot (deepseek-v4.1-flash:cloud)",
   "checks": [
@@ -104,6 +104,72 @@
     "`--import-md` KAO-03'ün dosyasını (lexicon.verified.json) yazar; bu kartta yalnız doğrulama yolu sınandı, çıktı silindi.",
     "Tanzil gövde pini yıldan bağımsızdır; yapısal kapı bozuk indirmeyi yakalar ama âyet metninin içeriğini insan gözetimi dışında kanıtlamaz — Tanzil'in kendi doğrulama süreci esastır (D-02 açık)."
   ],
-  "diffHashScope": "git diff HEAD~1 HEAD -- . ':(exclude)kuran-ogreniyorum/evidence/**'",
-  "hashNote": "Kanıt dosyası kendi commit'inin içindedir; bu yüzden (a) `head` kartın BAŞLANGIÇ commit'idir ve (b) `diffHash` kanıt dizini HARİÇ kod farkını kapsar. İkisi de yukarıdaki komutla yeniden üretilebilir (KAO-01 ile aynı desen)."
+  "diffHashScope": "git diff <head> <kart commit'i> -- . ':(exclude)kuran-ogreniyorum/evidence/**'",
+  "hashNote": "Kanıt dosyası kendi commit'inin içindedir, bu yüzden doğrulanabilirlik şu desenle sağlanır: `head` kartın BAŞLANGIÇ commit'idir ve `diffHash` kanıt dizini HARİÇ kod farkını kapsar. İkisi de DEĞİŞMEZ commit'ler arasında hesaplandığı için yeniden üretilebilir (KAO-01 ile aynı desen). Kartın deliverable commit'i: f6964fc.",
+  "hardening": {
+    "date": "2026-09-23",
+    "reason": "Bağımsız denetim turu: 'tam ve kusursuz' iddiası çürütülmeye çalışıldı; 6 gerçek kusur bulundu ve kapatıldı.",
+    "findings": [
+      {
+        "id": "H1",
+        "issue": "lemmaId çakışması (5 örnek: l_in, l_an, l_maA, l_akara, l_ka_ib) — Buckwalter 'i' hem kesra hem <in~, 'a' hem fetha hem >an~ temsil eder; slug tek başına benzersiz değil (05 §2: kart id'leri lemmaId'ye bağlı)",
+        "fix": "lemmaId = l_<slug>_<6-hex sha256(lemmaBw)> — deterministik ve çakışmasız",
+        "evidence": "duplicate lemmaId: 5 → 0; self-test: 'slug çakışsa bile kimlik benzersiz olmalı'"
+      },
+      {
+        "id": "H2",
+        "issue": "İnceleme tablosunda 05 §1'in 3 örnek sütunundan yalnız 1'i vardı; verifiedAt sütunu yoktu",
+        "fix": "25 sütun: ex1/2/3_ar|tr|ref + verifiedAt",
+        "evidence": "SPEC columns missing: 7 → 0"
+      },
+      {
+        "id": "H3",
+        "issue": "parseReviewMarkdown yinelenen lemmaId'yi sessizce ezebiliyordu; tablo bozuk/uyumsuzsa uyarı yoktu",
+        "fix": "ilk kayıt kazanır + duplicated raporlanır; --import-md rows/duplicates/of sayaçları ve boş-tablo uyarısı",
+        "evidence": "dupProbe regresyonu; --import-md çıktısı 'rows=503 duplicates=0 of=503'"
+      },
+      {
+        "id": "H4",
+        "issue": "10 satırda 3'ten az örnek var (05 §1 ≥3 ister) ve durum hiçbir yerde bildirilmiyordu",
+        "fix": "report.exampleStats + koşullu warning; eksik alan uydurulmadı",
+        "evidence": "exampleStats.rowsWithFewerThanMinimum=10; hepsi freq 1–2 (korpusta yeterli pencere yok)"
+      },
+      {
+        "id": "H5",
+        "issue": "Tabloda girilen verifiedAt yok sayılıp bugünün tarihi yazılıyordu → 06 §3 'iki ayrı günde kontrol' kaydı tutulamıyordu",
+        "fix": "girilen tarih korunur, boşsa bugün yazılır",
+        "evidence": "regresyon: verifiedAt 2026-09-20 tablodan içe alınır"
+      },
+      {
+        "id": "H6",
+        "issue": "Araç 'cognateTr dolu ama B kovası boş' diye uyarıyordu, oysa kognatlı kaydı kendisi B'ye atayabilir (tutarsız yönlendirme)",
+        "fix": "kognatlı satır B kovasına atanır; D>A>B>C önceliği; uyarı yalnız D/A'ya düşen kognat sayısını bildirir",
+        "evidence": "kova döngüsü + uyarı metni güncellendi"
+      },
+      {
+        "id": "H7",
+        "issue": "Taslak üretimi içeriden gerçek depo dosyasını okuyordu → self-test hermetik değildi (deney sırasında canlı taslağa tohum ekleyince yanlışlıkla kırmızı verdi)",
+        "fix": "IO kenara taşındı: lemmaCandidateRecords saf çekirdek, insan girdisi parametre; buildDraft enjekte eder (carryHuman seçeneği)",
+        "evidence": "self-test depo durumundan bağımsız PASS"
+      }
+    ],
+    "hardeningValidation": {
+      "selfTest": "PASS (gömülü korpus + Tanzil kapısı + kovalar + 3 örnek sütunu + kimlik benzersizliği + dedupe + insan-girdisi koruma + determinizm)",
+      "audit": "yeniden koşulan 22 maddelik denetimde 0 açık bulgu",
+      "gateSuite": "12/12 exit 0 (self-test, plan-check, plan-check --self-test, Kur'an kataloğu, migration 67/67, helper, rebind 37/37, modularization, date-utils, helpers, diff --check)"
+    },
+    "verification": {
+      "commands": [
+        "node tools/kao-lexicon-build.mjs --self-test",
+        "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+        "node tests/quran/test_quran_catalog.js",
+        "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
+        "node tests/app/test_state_rebind_boundary.js",
+        "git -c core.fsmonitor=false diff --check",
+        "audit (22 madde)"
+      ],
+      "result": "7/7 exit 0 · audit 0 açık bulgu",
+      "note": "Sertleştirme commit'i dalın ucudur; kanıt bloğu (bu dosya) kendi commit'i içinde olduğundan hash yerine komut listesiyle doğrulanır."
+    }
+  }
 }

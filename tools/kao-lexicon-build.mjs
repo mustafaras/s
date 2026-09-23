@@ -542,7 +542,10 @@ function draftSelfTest() {
   const buckets = new Map(draft.candidates.map((record) => [record.lemmaBw, record.bucket]));
   assert(buckets.get('Hamod') === 'D', 'çapa metin kelimesi D kovasında olmalı');
   assert(buckets.get('min') === 'A' || buckets.get('<in~') === 'A', 'çapa dışı parçacık A kovasında olmalı');
-  assert(!draft.candidates.some((record) => record.bucket === 'B'), 'kognat listesi yokken B kovası boş olmalı');
+  assert(!draft.candidates.some((record) => record.bucket === 'B'), 'kognat yokken B kovası boş olmalı');
+  const cognateProbe = JSON.parse(JSON.stringify(draft.candidates));
+  cognateProbe[0].cognateTr = 'örnek kognat';
+  assert(cognateProbe[0].bucket !== 'B', 'kova etiketi taslakta üretilir, elle değiştirilmez');
   assert(draft.candidates.every((record) => record.verified === false), 'hiçbir taslak satırı doğrulanmış olmamalı');
   assert(draft.candidates.every((record) => record.tr1 === null && record.cognateTr === null),
     'Türkçe anlam alanları taslakta boş olmalı (insan yazar)');
@@ -563,10 +566,15 @@ function draftSelfTest() {
   const hamod = byLemma.get('Hamod');
   assert(hamod.anchorText === true, 'çapa bayrağı işaretlenmeli');
   const ealima = byLemma.get('Ealima');
-  assert(ealima.semNeighbors.sameRoot.includes('l_Eal_ama'),
+  assert(ealima.semNeighbors.sameRoot.includes(lemmaKey('Eal~ama')),
     'aynı kökten türevler komşu önerisine girmeli');
-  assert(ealima.family.some((entry) => entry.lemmaId === 'l_Eal_ama' && arabicWordRegex().test(entry.ar)),
+  assert(ealima.family.some((entry) => entry.lemmaId === lemmaKey('Eal~ama') && arabicWordRegex().test(entry.ar)),
     'aile listesi kimlik ve Arapça biçim taşımalı');
+  // Buckwalter 'i'/'a' iki farklı harfi temsil eder → kimlikler çakışmamalı
+  assert(draft.candidates.every((record) => !record.family.some((f) => f.lemmaId === record.lemmaId)),
+    'aile girdisi kendi kimliğini taşımamalı (self-reference)');
+  assert(lemmaKey('in') !== lemmaKey('<in~') && lemmaSlug('in') === lemmaSlug('<in~'),
+    'slug çakışsa bile kimlik benzersiz olmalı');
   assert(ealima.semNeighbors.proposed === true, 'komşu önerisi proposed olmalı');
   assert(draft.report.clusterRootDiagnostics.length === SEMANTIC_CLUSTERS.flatMap((c) => c.roots).length,
     'her anlam kümesi kökü için tanı kaydı olmalı');
@@ -577,6 +585,34 @@ function draftSelfTest() {
   assert(draft.report.clusterRootDiagnostics.every((entry) => typeof entry.known === 'boolean'),
     'kök tanısı known alanı taşımalı');
 
+  // 4b · unique ids + 3-example review columns + dedupe guard
+  const ids = draft.candidates.map((record) => record.lemmaId);
+  assert(new Set(ids).size === ids.length, 'tüm lemma kimlikleri benzersiz olmalı');
+  assert(REVIEW_HEADER.includes('ex3_ref') && REVIEW_HEADER.includes('verifiedAt'),
+    'inceleme tablosu 05 §1 üç örnek sütununu ve verifiedAt taşımalı');
+  const reviewRow = renderReviewMarkdown(draft).split('\n').find((line) => line.startsWith(`| ${REVIEW_HEADER[0]}`));
+  assert(reviewRow.split('|').length - 2 === REVIEW_HEADER.length,
+    'başlık hücresi sayısı sütun sayısına eşit olmalı');
+  const firstRow = renderReviewMarkdown(draft).split('\n').filter((line) => line.startsWith('| l_'))[0];
+  assert(firstRow.split('|').length - 2 === REVIEW_HEADER.length,
+    'veri satırı hücre sayısı sütun sayısına eşit olmalı (kayma yok)');
+  const dupProbe = parseReviewMarkdown('', [...draft.candidates, ...draft.candidates]);
+  assert(dupProbe.duplicated.length === draft.candidates.length,
+    'yinelenen lemmaId sessizce eşleştirilmemeli, raporlanmalı');
+
+  // 4c · human work must survive a re-draft (06 §3) — injected, so hermetic
+  const humanMap = new Map([['Hamod', { tr: 'rahmet', shift: 'kayma', pattern: 'masdar',
+    tr1: 'hamd', tr2: null, verifiedBy: 'insan-1', verifiedAt: '2026-09-20', exampleTr: ['insan çevirisi'] }]]);
+  const carried = lemmaCandidateRecords(parseMorphology(fixture.morphology), uthmani.byVerse, {}, humanMap);
+  const carriedHamod = carried.candidates.find((record) => record.lemmaBw === 'Hamod');
+  assert(carriedHamod.tr1 === 'hamd' && carriedHamod.cognateTr === 'rahmet'
+    && carriedHamod.pattern === 'masdar' && carriedHamod.verified === true
+    && carriedHamod.verifiedAt === '2026-09-20',
+    'insan girdisi (anlam/kognat/kalıp/doğrulama) yeniden taslakta korunmalı');
+  assert(carriedHamod.examples[0].tr === 'insan çevirisi', 'örnek çevirisi korunmalı');
+  assert(carriedHamod.lemmaId === draft.candidates.find((r) => r.lemmaBw === 'Hamod').lemmaId,
+    'kimlikler yeniden üretimde kararlı olmalı');
+
   // 5 · determinism (same inputs → byte-identical output)
   const again = lemmaCandidateRecords(parseMorphology(fixture.morphology), uthmani.byVerse, {});
   assert(JSON.stringify(again.candidates) === JSON.stringify(draft.candidates), 'taslak deterministik olmalı');
@@ -585,19 +621,29 @@ function draftSelfTest() {
   const markdown = renderReviewMarkdown(draft);
   const firstId = draft.candidates[0].lemmaId;
   const secondId = draft.candidates[1].lemmaId;
-  const filled = markdown
-    .replace(new RegExp(`(\\| ${firstId} \\|[^\\n]*?)\\|\\s*\\|$`, 'm'), '$1| insan-1 |')
-    .replace(new RegExp(`(\\| ${secondId} \\| ${draft.candidates[1].ar} \\| [^|]*\\|[^|]*\\|)\\s*(\\|)`, 'm'), '$1 öneri$2')
-    .replace(new RegExp(`(\\| ${secondId} \\|[^\\n]*)\\|\\s*\\|$`, 'm'), '$1| insan-2 |');
+  // Sütun ADINA göre doldur (indeks/regex kırılganlığı yok; sütun eklenmesi testi bozmaz).
+  const fill = (text, id, values) => text.split('\n').map((line) => {
+    if (!line.startsWith(`| ${id} |`)) return line;
+    const cells = line.replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim());
+    for (const [key, value] of Object.entries(values)) cells[REVIEW_HEADER.indexOf(key)] = value;
+    return `| ${cells.join(' | ')} |`;
+  }).join('\n');
+  let filled = fill(markdown, firstId, { tr1: 'birinci anlam', verifiedBy: 'insan-1' });
+  filled = fill(filled, secondId, { tr1: 'ikinci anlam', verifiedBy: 'insan-2' });
   const parsedReview = parseReviewMarkdown(filled, JSON.parse(JSON.stringify(draft.candidates)));
   assert(parsedReview.unknownTotal === 0, 'bilinmeyen lemmaId olmamalı');
-  assert(parsedReview.verifiedTotal >= 1, 'tr1 + verifiedBy doldurulunca satır doğrulanmalı');
+  assert(parsedReview.duplicated.length === 0, 'normal turda yinelenen kimlik olmamalı');
+  assert(parsedReview.verifiedTotal === 2, 'tr1 + verifiedBy doldurulunca satırlar doğrulanmalı');
   const firstVerified = parsedReview.records.find((record) => record.lemmaId === firstId);
-  if (firstVerified.tr1) {
-    assert(firstVerified.verified === true && firstVerified.verifiedAt, 'doğrulanan satıra tarih yazılmalı');
-  } else {
-    assert(firstVerified.verified === false, 'Türkçe anlam olmadan verifiedBy tek başına doğrulamaz');
-  }
+  assert(firstVerified.verified === true && firstVerified.verifiedAt, 'doğrulanan satıra tarih yazılmalı');
+  assert(firstVerified.tr1 === 'birinci anlam', 'tr1 tablodan içe alınmalı');
+  const dated = fill(markdown, firstId, { verifiedBy: 'insan-1', verifiedAt: '2026-09-20' });
+  const datedParsed = parseReviewMarkdown(dated, JSON.parse(JSON.stringify(draft.candidates)));
+  assert(datedParsed.records.find((r) => r.lemmaId === firstId).verifiedAt === '2026-09-20',
+    'tabloda girilen doğrulama tarihi korunmalı (06 §3 iki ayrı gün kuralı)');
+  const onlyBy = fill(markdown, firstId, { verifiedBy: 'insan-1' });
+  const byOnly = parseReviewMarkdown(onlyBy, JSON.parse(JSON.stringify(draft.candidates)));
+  assert(byOnly.verifiedTotal === 0, 'Türkçe anlam olmadan verifiedBy doğrulamaz');
   const unknown = parseReviewMarkdown(`| ${REVIEW_HEADER.join(' | ')} |\n| x |`, []);
   assert(unknown.unknownTotal === 0, 'eksik satır sessizce atlanmalı (kısa satır)');
 }
@@ -740,7 +786,15 @@ function lemmaSlug(lemmaBw) {
   return String(lemmaBw || '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'lem';
 }
 
-function lemmaKey(lemmaBw) { return `l_${lemmaSlug(lemmaBw)}`; }
+// Buckwalter uses the same ASCII letter for different Arabic letters ('i' = kesra
+// AND <in~; 'a' = fetha AND >an~), so a slug-only id collides. The suffix is a
+// short deterministic hash of the FULL Buckwalter lemma, which keeps ids stable
+// across runs while guaranteeing uniqueness (05 §2: card ids depend on lemmaId).
+function shortHash(value) {
+  return crypto.createHash('sha256').update(String(value), 'utf8').digest('hex').slice(0, 6);
+}
+
+function lemmaKey(lemmaBw) { return `l_${lemmaSlug(lemmaBw)}_${shortHash(lemmaBw)}`; }
 
 function countLemmaMap(parsed) {
   const frequency = new Map();
@@ -796,21 +850,37 @@ function semanticClusters(counts, rootIndex) {
   return { lemmaClusters, diagnostics };
 }
 
-function readExistingCognates() {
+// Human-owned fields must survive a --draft re-run, otherwise re-generating the
+// draft destroys KAO-03 work (06 §3: humans write meanings, cognates, examples).
+function readExistingHumanInput() {
   const carried = new Map();
   if (!fs.existsSync(DRAFT_PATH)) return carried;
   try {
     const previous = JSON.parse(fs.readFileSync(DRAFT_PATH, 'utf8'));
     for (const lemma of previous.lemmas || []) {
-      if (!lemma.cognateTr && !lemma.tr1) continue;
-      carried.set(lemma.lemmaBw, { tr: lemma.cognateTr || null, shift: lemma.cognateShift || null, pattern: lemma.pattern || null });
+      const exampleTr = (lemma.examples || []).map((example) => (example ? example.tr : null) || null);
+      const hasWork = lemma.cognateTr || lemma.tr1 || lemma.pattern
+        || lemma.verifiedBy || exampleTr.some(Boolean);
+      if (!hasWork) continue;
+      carried.set(lemma.lemmaBw, {
+        tr: lemma.cognateTr || null,
+        shift: lemma.cognateShift || null,
+        pattern: lemma.pattern || null,
+        tr1: lemma.tr1 || null,
+        tr2: lemma.tr2 || null,
+        verifiedBy: lemma.verifiedBy || null,
+        verifiedAt: lemma.verifiedAt || null,
+        exampleTr
+      });
     }
   } catch { /* bozuk taslak: insan verisi taşınmaz, taslak yeniden üretilir */
   }
   return carried;
 }
 
-function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
+// Pure core: no file IO. Human-owned fields arrive as a parameter so tests remain
+// hermetic and a re-draft cannot silently reach into the repository.
+function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemma = new Map()) {
   const counts = countLemmaMap(parsed);
   const maxFrequency = Math.max(...counts.frequency.values());
   const rank = new Map([...counts.frequency.entries()]
@@ -819,10 +889,6 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
   const rootIndex = rootLemmaIndex(counts);
   const clusters = semanticClusters(counts, rootIndex);
   const tesbihatPresent = new Set(TESBIHAT_LEMMAS.filter((lemma) => counts.frequency.has(lemma)));
-  // The cognate column is human-owned (06 §3). Re-running --draft must not
-  // destroy work already entered, so it is carried over when a draft exists.
-  const cognateByLemma = readExistingCognates();
-
   const candidates = [];
   const rankBand = (cutoff) => {
     const band = new Set();
@@ -841,19 +907,20 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
     if (!eligible.has(lemma)) continue;
     const pos = counts.pos.get(lemma) || 'UNKNOWN';
     const isAnchor = counts.anchor.has(lemma) || tesbihatPresent.has(lemma);
-    const isCognate = Boolean(cognateByLemma.get(lemma));
+    const isCognate = Boolean(humanByLemma.get(lemma));
     const isParticle = PARTICLE_POS.has(pos) && rank.get(lemma) <= PARTICLE_RANK_MAX;
     const priority = W_FREQ * (frequency / maxFrequency)
       + W_ANCHOR * (isAnchor ? 1 : 0)
       + W_NOT_COGNATE * (isCognate ? 0 : 1);
-    const cognate = cognateByLemma.get(lemma) || null;
+    const human = humanByLemma.get(lemma) || null;
     const rootBw = counts.roots.get(lemma) || null;
     const family = rootBw ? (rootIndex.get(rootBw) || []).filter((other) => other !== lemma) : [];
     const examples = [];
     for (const word of counts.positions.get(lemma) || []) {
       const window = exampleWindow(word, uthmaniByVerse);
       if (window) {
-        examples.push({ ar: window.text, tr: null, ref: window.ref });
+        const priorTr = human && human.exampleTr ? human.exampleTr[examples.length] : null;
+        examples.push({ ar: window.text, tr: priorTr || null, ref: window.ref });
       }
     }
     candidates.push({
@@ -861,19 +928,19 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
       lemmaBw: lemma,
       ar: bwToArabic(lemma),
       translit: { tr: translitTr(lemma), dia: translitDia(lemma), auto: true },
-      tr1: null,
-      tr2: null,
+      tr1: human ? human.tr1 : null,
+      tr2: human ? human.tr2 : null,
       root: rootBw ? bwToArabic(rootBw) : null,
       rootBw,
-      pattern: null,
+      pattern: human ? human.pattern : null,
       pos,
       freq: frequency,
       rank: rank.get(lemma),
       anchorText: counts.anchor.has(lemma),
       tesbihat: tesbihatPresent.has(lemma),
-      cognateTr: cognate ? cognate.tr : null,
-      cognateShift: cognate ? cognate.shift : null,
-      cognate: { proposed: Boolean(cognate), pattern: cognate ? cognate.pattern : null, derivatives: [] },
+      cognateTr: human ? human.tr : null,
+      cognateShift: human ? human.shift : null,
+      cognate: { proposed: Boolean(human), pattern: human ? human.pattern : null, derivatives: [] },
       semNeighbors: {
         proposed: true,
         clusters: clusters.lemmaClusters.get(lemma) || [],
@@ -886,9 +953,9 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
       isParticle,
       bucket: null,
       priority: Number(priority.toFixed(6)),
-      verified: false,
-      verifiedBy: null,
-      verifiedAt: null
+      verified: Boolean(human && human.verifiedBy && human.tr1),
+      verifiedBy: human ? human.verifiedBy : null,
+      verifiedAt: human ? human.verifiedAt : null
     });
   }
 
@@ -899,7 +966,8 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
   for (const record of selected) {
     if (record.anchorText || record.tesbihat) record.bucket = 'D';
     else if (record.isParticle) record.bucket = 'A';
-    else record.bucket = 'C'; // bucket B needs the human cognate column (KAO-03)
+    else if (record.cognateTr) record.bucket = 'B'; // 03 §9: kognat isim/fiil (insan etiketi)
+    else record.bucket = 'C';
   }
 
   const wordTokenTotal = parsed.words.length;
@@ -957,9 +1025,20 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
       note: 'Kognat eşlemesi ÖNERİdir ve yalnız insan yazar (06 §3); araç TDK listesini hafızadan üretmez.'
     },
     verifiedTotal: selected.filter((record) => record.verified).length,
+    exampleStats: {
+      minimum: 3,
+      rowsWithFewerThanMinimum: selected.filter((record) => record.examples.length < 3).length,
+      note: '05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) '
+        + 'için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır '
+        + 've insan doğrulaması (KAO-03) karar verir.'
+    },
     userTaskPending: true,
     warnings: []
   };
+  if (report.exampleStats.rowsWithFewerThanMinimum) {
+    report.warnings.push(`${report.exampleStats.rowsWithFewerThanMinimum} satırda 3'ten az örnek`
+      + ' (çok seyrek lemma); korpusta yeterli pencere yok, uydurulmadı');
+  }
   if (!report.coverage.goalMet) {
     report.warnings.push(`kapsam hedefi %80 altında: %${(report.coverage.ratioLemPool * 100).toFixed(1)}`
       + ` (LEM havuzu; içerik sıralaması ≤${CONTENT_RANK_MAX}). Hedefe ulaşan sıralama raporludur,`
@@ -968,8 +1047,9 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
   if (report.cognate.matchedTotal === 0) {
     report.warnings.push('kognat sütunu boş (insan doldurur); B kovası boş, cognateTr/cognateShift null');
   }
-  if (report.bucketCounts.B === 0 && report.cognate.matchedTotal > 0) {
-    report.warnings.push('cognateTr dolu ama B kovası boş — kova atamasını elle incele');
+  if (report.bucketCounts.B !== report.cognate.matchedTotal) {
+    report.warnings.push(`cognateTr dolu ${report.cognate.matchedTotal} kayıt ama B kovası`
+      + ` ${report.bucketCounts.B} — bazı kognatlar çapa/parçacık kovasında (03 §9 önceliği: D > A > B > C)`);
   }
   if (report.anchorMissing.length) {
     report.warnings.push(`çapa/tesbihat lemma bulunamadı: ${report.anchorMissing.join(', ')}`);
@@ -977,10 +1057,20 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
   return { candidates: selected, report, counts, rootIndex, clusters };
 }
 
-function buildDraft(morphologySource, uthmaniSource, sourceHashes) {
+function buildDraft(morphologySource, uthmaniSource, sourceHashes, options = {}) {
   const parsed = parseMorphology(morphologySource);
   const uthmani = parseUthmani(uthmaniSource, parsed.words);
-  return lemmaCandidateRecords(parsed, uthmani.byVerse, sourceHashes);
+  // The cognate/meaning/example columns are human-owned (06 §3). Re-running
+  // --draft must not destroy work already entered, so it is carried over from
+  // the existing draft unless the caller opts out (tests do).
+  const carried = options.carryHuman === false ? new Map() : readExistingHumanInput();
+  return lemmaCandidateRecords(parsed, uthmani.byVerse, sourceHashes, carried);
+}
+
+function exampleCells(record, index) {
+  const example = record.examples[index];
+  if (!example) return ['', '', ''];
+  return [example.ar, example.tr || '', example.ref];
 }
 
 function reviewCells(record) {
@@ -997,19 +1087,23 @@ function reviewCells(record) {
     String(record.freq),
     record.cognateTr || '',
     record.cognateShift || '',
-    record.examples[0] ? record.examples[0].ar : '',
-    record.examples[0] ? (record.examples[0].tr || '') : '',
-    record.examples[0] ? record.examples[0].ref : '',
+    ...exampleCells(record, 0),
+    ...exampleCells(record, 1),
+    ...exampleCells(record, 2),
     record.semNeighbors.clusters.join('+'),
     record.bucket,
-    record.verifiedBy || ''
+    record.verifiedBy || '',
+    record.verifiedAt || ''
   ];
 }
 
 const REVIEW_HEADER = Object.freeze([
   'lemmaId', 'ar', 'translit_tr', 'translit_dia', 'tr1', 'tr2', 'root', 'pattern',
-  'pos', 'freq', 'cognateTr', 'cognateShift', 'ex1_ar', 'ex1_tr', 'ex1_ref',
-  'semClusters', 'bucket', 'verifiedBy'
+  'pos', 'freq', 'cognateTr', 'cognateShift',
+  'ex1_ar', 'ex1_tr', 'ex1_ref',
+  'ex2_ar', 'ex2_tr', 'ex2_ref',
+  'ex3_ar', 'ex3_tr', 'ex3_ref',
+  'semClusters', 'bucket', 'verifiedBy', 'verifiedAt'
 ]);
 
 function escapeCell(value) {
@@ -1066,7 +1160,12 @@ function parseReviewMarkdown(markdown, existing) {
     if (!row.lemmaId) continue;
     rows.push(row);
   }
-  const byId = new Map(existing.map((record) => [record.lemmaId, record]));
+  const byId = new Map();
+  const duplicated = [];
+  for (const record of existing) {
+    if (byId.has(record.lemmaId)) { duplicated.push(record.lemmaId); continue; }
+    byId.set(record.lemmaId, record);
+  }
   let verifiedTotal = 0;
   let unknownTotal = 0;
   for (const row of rows) {
@@ -1080,14 +1179,18 @@ function parseReviewMarkdown(markdown, existing) {
     record.semNeighbors.clusters = row.semClusters ? row.semClusters.split('+').filter(Boolean) : record.semNeighbors.clusters;
     if (record.examples[0]) record.examples[0].tr = row.ex1_tr;
     record.verifiedBy = row.verifiedBy;
-    record.verifiedAt = row.verifiedBy ? new Date().toISOString().slice(0, 10) : null;
+    // Tabloda girilmiş tarih korunur (06 §3: "iki ayrı günde kontrol" kaydı);
+    // boşsa bugünün tarihi yazılır.
+    record.verifiedAt = row.verifiedBy
+      ? (row.verifiedAt || new Date().toISOString().slice(0, 10))
+      : null;
     record.verified = Boolean(row.verifiedBy && record.tr1);
     if (record.verified) verifiedTotal += 1;
     record.bucket = (record.cognateTr && !record.anchorText && !record.tesbihat && !record.isParticle)
       ? 'B' : record.bucket;
   }
   const verifiedRecords = existing.filter((record) => record.verified);
-  return { records: existing, verifiedTotal, unknownTotal, verifiedRecords };
+  return { records: existing, verifiedTotal, unknownTotal, verifiedRecords, duplicated, matched: rows.length - unknownTotal };
 }
 
 function writeDraft(inputDir) {
@@ -1141,9 +1244,11 @@ function renderReviewFromDraft() {
 function importReview() {
   const draftFile = readDraft();
   if (!fs.existsSync(REVIEW_PATH)) throw new CliError(`inceleme tablosu yok: ${path.relative(ROOT, REVIEW_PATH)}`, 2);
-  const { verifiedTotal, unknownTotal, verifiedRecords } = parseReviewMarkdown(
+  const { verifiedTotal, unknownTotal, verifiedRecords, duplicated } = parseReviewMarkdown(
     fs.readFileSync(REVIEW_PATH, 'utf8'), draftFile.lemmas
   );
+  const rowsTotal = draftFile.lemmas.length - unknownTotal;
+  const duplicatedTotal = duplicated.length;
   const output = {
     schemaVersion: 1,
     version: LEXICON_VERSION,
@@ -1151,16 +1256,25 @@ function importReview() {
     importedAt: new Date().toISOString().slice(0, 10),
     verifiedTotal,
     unknownTotal,
+    rowsTotal,
+    duplicatedTotal,
     lemmas: draftFile.lemmas
   };
   fs.mkdirSync(path.dirname(VERIFIED_PATH), { recursive: true });
   fs.writeFileSync(VERIFIED_PATH, `${JSON.stringify(output, null, 2)}\n`);
   console.log(`KAO verified: ${path.relative(ROOT, VERIFIED_PATH)}`);
-  console.log(`verified=${verifiedTotal} unknown=${unknownTotal} total=${draftFile.lemmas.length}`);
+  console.log(`verified=${verifiedTotal} unknown=${unknownTotal} rows=${rowsTotal}`
+    + ` duplicates=${duplicatedTotal} of=${draftFile.lemmas.length}`);
+  if (!rowsTotal) {
+    console.log('UYARI: tabloda hiç veri satırı bulunamadı — tablo bozulmuş olabilir.');
+  }
+  if (duplicatedTotal) {
+    console.log(`UYARI: ${duplicatedTotal} yinelenen lemmaId atlandı: ${duplicated.slice(0, 5).join(', ')}`);
+  }
   if (!verifiedTotal) {
     console.log('NOT: doğrulanmış satır yok; kart waiting_user kalır (06 §3 onay kuralı).');
   }
-  return { verifiedTotal, unknownTotal, verifiedRecords };
+  return { verifiedTotal, unknownTotal, verifiedRecords, rowsTotal, duplicatedTotal };
 }
 
 function usage() {

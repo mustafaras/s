@@ -61,3 +61,23 @@
 inceleme tablosunu tüketir ve **kullanıcı girdisi olmadan kapanamaz**.
 
 Push/merge/tag/deploy yapılmadı; `releaseApproval` = `NOT_APPROVED`.
+
+## Sertleştirme turu (2026-09-23) — 7 kusur kapatıldı
+
+"Tam ve kusursuz" iddiası bağımsız denetimle çürütülmeye çalışıldı; gerçek kusurlar bulundu:
+
+| # | Kusur | Düzeltme |
+|---|---|---|
+| H1 | `lemmaId` çakışması (5 örnek) — Buckwalter `i`/`a` iki farklı harfi temsil eder | kimlik = `l_<slug>_<sha256[:6]>` (deterministik, çakışmasız) |
+| H2 | İnceleme tablosunda 3 örnek sütunundan 1'i vardı; `verifiedAt` yoktu | 25 sütun: ex1/2/3 + verifiedAt |
+| H3 | Yinelenen `lemmaId` sessizce ezilebiliyordu | ilk kayıt kazanır + `duplicated` raporlanır; boş-tablo uyarısı |
+| H4 | 10 satır 05 §1'in ≥3 örnek kuralını tutmuyordu ve bildirilmiyordu | `exampleStats` + uyarı; alan uydurulmadı |
+| H5 | Tabloda girilen `verifiedAt` yok sayılıyordu (06 §3 iki-ayrı-gün kaydı) | girilen tarih korunur |
+| H6 | Araç "B kovasını elle incele" diyordu ama B'yi kendisi atayabilirdi | kognatlı satır B'ye atanır (D>A>B>C önceliği) |
+| H7 | Self-test hermetik değildi (gerçek depo dosyasını okuyordu) | IO kenara taşındı; insan girdisi parametre (`carryHuman`) |
+
+**Ek güvence:** yeniden `--draft` koşmak insan girdisini (tr1/tr2, kognat, kalıp,
+örnek çevirisi, verifiedBy/At) **korumaz** değil — korur; bu davranış regresyonla bağlandı
+(`carryHuman:false` test modu). Aksi halde KAO-03 işi kaybolurdu.
+
+**Doğrulama:** self-test PASS · 22 maddelik denetim 0 açık bulgu · 12/12 kapı exit 0.

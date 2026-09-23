@@ -1,0 +1,52 @@
+{
+  "card": "KAO-P00",
+  "head": "aded41ea85150826bc340ad6ad86717b65a00d80",
+  "diffHash": "95a7c85b7ebca0cbaae9559ab378e03e86bd412503265ad12556c31c380cd09b",
+  "date": "2026-09-23",
+  "agent": "Codex (GPT-5)",
+  "checks": [
+    {
+      "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+      "exit": 0,
+      "note": "PASS (0 warn)"
+    },
+    {
+      "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs --self-test",
+      "exit": 0,
+      "note": "13/13 PASS; prompttaki eski 11/11 beklentisinden daha geniş güncel set"
+    },
+    {
+      "cmd": "node tests/quran/test_quran_catalog.js",
+      "exit": 0,
+      "note": "70/70 PASS"
+    },
+    {
+      "cmd": "git -c core.fsmonitor=false diff --check",
+      "exit": 0,
+      "note": "çıktı yok"
+    },
+    {
+      "cmd": "git diff --stat HEAD -- app app.js index.html sync.js",
+      "exit": 0,
+      "note": "çıktı yok; üretim dosyası değişmedi"
+    }
+  ],
+  "requirements": {
+    "note": "KAO-P00 bağlayıcı R-id kapatmaz"
+  },
+  "filesTouched": [
+    "tests/kao/README.md",
+    "kuran-ogreniyorum/content/.gitignore",
+    "kuran-ogreniyorum/evidence/KAO-P00/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-P00/HANDOFF.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "P00 üretim davranışı eklemez; cihaz veya deploy kabulü bu promptun kapsamında değildir.",
+    "kao-plan-check --card KAO-P00, bootstrap kapsamı mevcut olmasına rağmen kart yok diyerek exit 1 veriyor; kapsam STATE bootstrap.files üzerinden doğrulandı.",
+    "head, kanıt üretilirken geçerli olan commit; diffHash kanıt dosyaları eklenmeden önceki staged P00 farkının SHA-256 değeridir, çünkü aynı commit kendi nihai hashini içeremez."
+  ]
+}

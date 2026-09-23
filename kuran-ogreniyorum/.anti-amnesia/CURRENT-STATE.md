@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-20 · **Durum:** `planned` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 0/30
-**activePrompt:** — · **lastCompletedPrompt:** — · **blockedPrompt:** — · **Sıradaki:** **KAO-P00**
+**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 0/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-P00 · **blockedPrompt:** — · **Sıradaki:** **KAO-01**
 **releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -19,7 +19,7 @@
 ## Prompt sırası ve durum
 | Prompt | Başlık | Durum | Gereksinimler |
 |---|---|---|---|
-| KAO-P00 | Başlangıç (branch, tests/kao iskeleti, plan-check) | pending | — |
+| KAO-P00 | Başlangıç (branch, tests/kao iskeleti, plan-check) | done | — |
 | KAO-01 | Sözlük derleme aracı (ağsız) | pending | — |
 | KAO-25 | Plan denetleyici (kao-plan-check) sertleştirme | pending | — |
 | KAO-02 | Aday liste, kognat/komşu önerisi, inceleme tablosu | pending | R-A5 R-A8 |
@@ -61,4 +61,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:pending · R-A8:pending · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 6 | 2026-09-20 | Başlangıç öncesi kapsamlı kontrol: 10 repo dosya/satır atfı ve 3 yükleme listesi doğrulandı; prompt bölüm atıfları (01–12 §x) eksiksiz; prompt ↔ STATE dosya/kontrol/req listeleri birebir (0 fark); denetleyici yaşam döngüsü simülasyonu 21/21 (başlat/bitir/sıra atlama/kapı/waiting_user/deps/kapsam/yasak ifade/4 liste). Bulunup düzeltilen: (1) modül import edilince CLI çalışıp exit ediyordu → IS_MAIN koruması; (2) `tests/kao/repo-root.js` gereksizdi → ortak `tests/repo-root.js`; (3) sessiz saat API'si `SeyAudio.isQuietTime()` olarak düzeltildi; (4) `chore(kao)` commit'leri de kapsam denetimine alındı (self-test 13/13). Üretim kodu değişmedi. | `kao-plan-check --render` PASS (0 warn); lifecycle sim ALL PASS |
+| 8 | 2026-09-23 | KAO-P00 tamamlandı: `tests/kao/README.md` içinde 13 fixture planlandı; ham korpus girdileri `content/inputs/` ile Git dışında bırakıldı; üretim dosyası değişmedi. | `kao-plan-check` PASS (0 warn); self-test 13/13; Kur'an kataloğu 70/70; `git diff --check` PASS; `evidence/KAO-P00/EVIDENCE.json` |

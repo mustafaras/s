@@ -7,10 +7,10 @@
     "commit": "0436405",
     "branch": "main"
   },
-  "status": "planned",
+  "status": "in_progress",
   "releaseApproval": "NOT_APPROVED",
-  "nextCard": "KAO-P00",
-  "userApprovalRequired": true,
+  "nextCard": "KAO-01",
+  "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
     "single data object: data.quranLearn via ensureQuranLearn in migrate()",
@@ -1136,7 +1136,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": null,
+  "lastCompletedPrompt": "KAO-P00",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

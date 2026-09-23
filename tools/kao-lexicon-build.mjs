@@ -10,6 +10,14 @@ const STATS_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'evidence', 'KAO-01', 's
 const CONTRACT_TOKEN_TARGET = 77_430;
 const OFFICIAL_RELEASE_WORD_TOTAL = 77_429;
 
+// Tanzil 1.1 Uthmani, comments stripped (see stripTanzilBoilerplate).
+// A WHOLE-FILE pin is impossible: the Tanzil copyright block carries a rolling
+// year (`Copyright (C) 2007-<current year>`) inside its own verbatim-required
+// header, so the same text hashes differently every year. The integrity gate is
+// therefore the verse body plus two structural checks (verse count must equal the
+// QAC verse count, and every verse line must contain Arabic script).
+const UTHMANI_BODY_SHA256 = '7f429d485cb43f0ac78e2830789f6634709725010922c535035a221e531708de';
+
 const INPUTS = Object.freeze({
   morphology: Object.freeze({
     file: 'quranic-corpus-morphology-0.4.txt',
@@ -19,9 +27,11 @@ const INPUTS = Object.freeze({
   }),
   uthmani: Object.freeze({
     file: 'quran-uthmani.txt',
-    sha256: '7f30c647331a61100ebf24a80507dc0fcdd9f2df97f1312b5b2dfcb982a7f326',
+    bodySha256: UTHMANI_BODY_SHA256,
     url: 'https://tanzil.net/download/',
-    license: 'Tanzil terms / CC BY-ND 3.0; verbatim text, attribution and link required'
+    download: 'quranType=uthmani · outType=txt · agree=true · alef/marks/sajdah/tatweel açık (Tanzil varsayılanı)',
+    license: 'Tanzil terms / CC BY 3.0; verbatim text, attribution and link required',
+    note: 'Tam-dosya hash yok (telif bloğu dinamik yıl taşır); kapı = yorumsuz gövde SHA-256 + âyet sayısı + Arapça bütünlüğü'
   })
 });
 
@@ -44,6 +54,101 @@ const RESEARCH_REFERENCE = Object.freeze([
   ['EalaY`', 1445], ['{l~a*iY', 1442], ['laA', 1364], ['maA', 1266],
   ['rab~', 975], ['<ilaY`', 742]
 ]);
+
+// ---------------------------------------------------------------------------
+// KAO-02 candidate-list configuration (03 §9 buckets, 02 §2.1 priority).
+// ---------------------------------------------------------------------------
+
+const DRAFT_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.draft.json');
+const REVIEW_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.review.md');
+const VERIFIED_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.verified.json');
+const DRAFT_REPORT_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'evidence', 'KAO-02', 'draft-report.json');
+const CANDIDATE_TARGET = 530;
+// 03 §9 reads "sıklık ≤500" as a LEMMA RANK cut-off (bucket D is explicitly
+// "sıklık >500 olsa da"), which the corpus measurement confirms: the rank-500
+// band yields ~24 such anchor lemmas, matching the plan's "~30".
+const PARTICLE_RANK_MAX = 100;
+const CONTENT_RANK_MAX = 500;
+const MAX_EXAMPLES = 3;
+const LEXICON_VERSION = 'quran-lexicon-tr-v1';
+
+// 03 §3 anchor text: al-Fatiha (1:1-7) + al-Ikhlas/al-Falaq/an-Nas (112-114).
+const ANCHOR_VERSES = Object.freeze(new Set([
+  ...[1, 2, 3, 4, 5, 6, 7].map((ayah) => `1:${ayah}`),
+  ...[1, 2, 3, 4].map((ayah) => `112:${ayah}`),
+  ...[1, 2, 3, 4, 5].map((ayah) => `113:${ayah}`),
+  ...[1, 2, 3, 4, 5, 6].map((ayah) => `114:${ayah}`)
+]));
+
+// 03 §3 unit 2 tasbihat. These lemma ids are checked against the corpus at
+// runtime (clusterRootDiagnostics); nothing is asserted from memory.
+const TESBIHAT_LEMMAS = Object.freeze([
+  'suboHa`n', 'Hamod', '>akobar', 'taHiy~ap', 'Salaw`p', 'Tay~ibap',
+  'sala`m', 'raHomap', 'baraka`t', 'Eabod', 'rasuwl', '$ahida', '<ila`h'
+]);
+
+// 03 §9 bucket A: particles (preposition / pronoun / conjunction / adverb …).
+// Content POS (N, V, PN, ADJ) is never bucket A.
+const PARTICLE_POS = Object.freeze(new Set([
+  'P', 'CONJ', 'SUB', 'NEG', 'PRON', 'REL', 'DEM', 'COND', 'INTG', 'ACC',
+  'CERT', 'EXL', 'EXH', 'AVR', 'INC', 'AMD', 'ANS', 'PREV', 'RES', 'RET',
+  'PRO', 'LOC', 'T', 'FUT'
+]));
+
+const CONTENT_POS = Object.freeze(new Set(['N', 'V', 'PN', 'ADJ']));
+
+// 02 §2.1: priority = 0.55·sıklıkNorm + 0.30·namazMetnindeGeçiyor + 0.15·kognatDeğil
+const W_FREQ = 0.55;
+const W_ANCHOR = 0.30;
+const W_NOT_COGNATE = 0.15;
+
+// 02 §5.7 error taxonomy + R-A5 semantic neighbours. Twelve meaning clusters,
+// each keyed by QAC root (Buckwalter). Roots are verified against the corpus and
+// any unknown root is reported in clusterRootDiagnostics instead of being assumed.
+const SEMANTIC_CLUSTERS = Object.freeze([
+  { id: 'KORKU_TAKVA', roots: ['wqy', 'x$y', 'xwf', 'wjl'] },
+  { id: 'IMAN_KUFUR', roots: ['Amn', 'kfr', '$rk', 'nfq'] },
+  { id: 'ILIM_CEHALET', roots: ['Elm', 'jhl', 'Eql', 'fkr'] },
+  { id: 'RAHMET_ZULUM', roots: ['rHm', 'Zlm'] },
+  { id: 'HIDAYET_DALALET', roots: ['hdy', 'Dll'] },
+  { id: 'AMEL_KARSILIK', roots: ['Eml', 'Ajr', 'E*b', 'Hsb'] },
+  { id: 'HAYAT_OLUM', roots: ['Hyy', 'mwt'] },
+  { id: 'ALGI_ISITME_GORME', roots: ['smE', 'bSr', 'nZr'] },
+  { id: 'NEFIS_KALP', roots: ['nfs', 'rwH', 'qlb'] },
+  { id: 'SOZ_EMIR', roots: ['qwl', 'Amr'] },
+  { id: 'KULLUK_DUA', roots: ['Ebd', 'dEw', '$kr'] },
+  { id: 'SABIR_ITAAT', roots: ['Sbr', 'TwE', 'TEm'] }
+]);
+
+// 10-TELAFFUZ §7 — mechanical two-layer transliteration, Buckwalter driven.
+// `tr` = Turkish reading (Diyanet style, â î û), `dia` = DİA/İSAM scientific.
+// Both are PROPOSALS (`auto:true`); the human verifies or replaces them.
+const TRANSLIT_IGNORE = Object.freeze(new Set(['_', '^', '#', '@', '"', '[', ';', ',', '.', '!', '-', '+', '%', ']', 'o']));
+const TRANSLIT_TR = Object.freeze({
+  "'": '', '|': 'â', '>': '', '&': '', '<': '', '}': '', A: 'â', b: 'b', p: 'e',
+  t: 't', v: 's', j: 'c', H: 'h', x: 'h', d: 'd', '*': 'z', r: 'r', z: 'z', s: 's',
+  '$': 'ş', S: 's', D: 'd', T: 't', Z: 'z', E: 'ʿ', g: 'g', f: 'f', q: 'k', k: 'k',
+  l: 'l', m: 'm', n: 'n', h: 'h', w: 'v', Y: 'î', y: 'y', F: 'en', N: 'un', K: 'in',
+  a: 'a', u: 'u', i: 'i', '`': 'â', '{': 'a'
+});
+const TRANSLIT_DIA = Object.freeze({
+  "'": 'ʾ', '|': 'ā', '>': 'ʾ', '&': 'ʾ', '<': 'ʾ', '}': 'ʾ', A: 'ā', b: 'b', p: 't',
+  t: 't', v: 's̱', j: 'c', H: 'ḥ', x: 'ḫ', d: 'd', '*': 'ẕ', r: 'r', z: 'z', s: 's',
+  '$': 'ş', S: 'ṣ', D: 'ḍ', T: 'ṭ', Z: 'ẓ', E: 'ʿ', g: 'ġ', f: 'f', q: 'ḳ', k: 'k',
+  l: 'l', m: 'm', n: 'n', h: 'h', w: 'v', Y: 'ī', y: 'y', F: 'an', N: 'un', K: 'in',
+  a: 'a', u: 'u', i: 'i', '`': 'ā', '{': 'a'
+});
+// Long vowels are handled separately so absorption works (10-TELAFFUZ §7).
+// `w`/`y` are only long when NOT followed by sukun (`o`): qawom → kavm, yaquwlu → ...û...
+const TRANSLIT_TR_LONG = Object.freeze({ A: 'â', Y: 'î', w: 'û', y: 'î', '|': 'â', '`': 'â' });
+const TRANSLIT_DIA_LONG = Object.freeze({ A: 'ā', Y: 'ī', w: 'ū', y: 'ī', '|': 'ā', '`': 'ā' });
+// Glides that become consonants before a short vowel/tanwin/sukun; the rest are long.
+const GLIDE_LONG = Object.freeze(new Set(['w', 'y']));
+const GLIDE_CONSONANT_NEXT = Object.freeze(new Set(['a', 'i', 'u', 'F', 'N', 'K', 'o']));
+// A dagger alef (`) already carries the long vowel: عَلَىٰ `EalaY` → ʿalâ.
+const DAGGER_PAIR = Object.freeze(new Set(['Y', 'y']));
+const TR_SHORT_VOWELS = Object.freeze(new Set(['a', 'e', 'u', 'ü', 'i', 'ı']));
+const DIA_SHORT_VOWELS = Object.freeze(new Set(['a', 'u', 'i']));
 
 class CliError extends Error {
   constructor(message, exitCode) {
@@ -362,7 +467,139 @@ function selfTest() {
   assert(!/from\s+['"](?:node:)?https?['"]/.test(source), 'http/https importu bulunmamalı');
   const xhrName = ['XML', 'HttpRequest'].join('');
   assert(!source.includes(xhrName), `${xhrName} bulunmamalı`);
-  console.log('KAO lexicon self-test: PASS (50 satır, çok-segment STEM POS, lemma paydası, besmele/vakıf/split hizası, ağ yok)');
+
+  draftSelfTest();
+  console.log('KAO lexicon self-test: PASS (50 satır, çok-segment STEM POS, lemma paydası, besmele/vakıf/split hizası,'
+    + ' Tanzil gövde kapısı, taslak kovaları, inceleme turu, ağ yok)');
+}
+
+// --- KAO-02 self-tests -----------------------------------------------------
+
+function syntheticVerses(entries) {
+  const morphology = ['LOCATION\tFORM\tTAG\tFEATURES'];
+  const uthmani = [];
+  for (const [ref, words] of entries) {
+    const [surah, ayah] = ref.split(':').map(Number);
+    const arabic = [];
+    words.forEach(([lemma, root, pos], index) => {
+      morphology.push(`(${surah}:${ayah}:${index + 1}:1)\t${lemma}\t${pos}\tSTEM|POS:${pos}|LEM:${lemma}|ROOT:${root}`);
+      arabic.push(bwToArabic(lemma));
+    });
+    uthmani.push(arabic.join(' '));
+  }
+  return { morphology: morphology.join('\n'), uthmani: uthmani.join('\n') };
+}
+
+function draftFixture() {
+  const anchor = [1, 2, 3, 4, 5, 6, 7].map((ayah) => [`1:${ayah}`, [
+    ['Hamod', 'Hmd', 'N'], ['rab~', 'rbb', 'N'], ['{ll~ah', 'Alh', 'PN'],
+    ['yawom', 'ywm', 'N'], ['diyn', 'dyn', 'N']
+  ]]);
+  const rest = [
+    ['2:1', [['min', 'min', 'P'], ['kitaAb', 'ktb', 'N'], ['qawom', 'qwm', 'N'], ['Ealima', 'Elm', 'V']]],
+    ['2:2', [['min', 'min', 'P'], ['kitaAb', 'ktb', 'N'], ['qawom', 'qwm', 'N'], ['Ealima', 'Elm', 'V']]],
+    ['2:3', [['<in~', '<n', 'SUB'], ['kataba', 'ktb', 'V'], ['>aroD', 'ArD', 'N'], ['Ealima', 'Elm', 'V'], ['Eal~ama', 'Elm', 'V']]]
+  ];
+  return syntheticVerses([...anchor, ...rest]);
+}
+
+function draftSelfTest() {
+  const fixture = draftFixture();
+
+  // 1 · Tanzil boilerplate gate (comments are not part of the pinned body)
+  const raw = '# (C) 2007-2026 Tanzil\r\n# link\r\n' + bwToArabic('bisomi') + '\r\n' + bwToArabic('Hamodu') + '\r\n';
+  const body = stripTanzilBoilerplate(raw);
+  assert(!body.includes('#'), 'telif bloğu gövdeden çıkarılmalı');
+  assert(!body.includes('\r'), 'CRLF normalize edilmeli');
+  assert(body === `${bwToArabic('bisomi')}\n${bwToArabic('Hamodu')}`, 'gövde yalnız âyet satırlarını içermeli');
+
+  // 2 · structural gate
+  assert(tanzilStructuralMismatch(body, 2) === null, 'iki âyet iki satırla eşleşmeli');
+  assert(tanzilStructuralMismatch(body, 3) !== null, 'âyet sayısı uyuşmazlığı yakalanmalı');
+  assert(tanzilStructuralMismatch('NOT ARABIC\nNOT ARABIC', 2) !== null, 'Arapça olmayan gövde reddedilmeli');
+
+  // 3 · transliteration is mechanical, deterministic and two-layer
+  assert(transliterate('Hamod', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'hamd', 'okunuş katmanı tablo üzerinden üretilmeli');
+  const maA = 'maA';
+  assert(transliterate(maA, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'mâ', 'uzun ünlü önceki kısa ünlüyü soğurmalı');
+  assert(transliterate('EalaY`', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'ʿalâ',
+    'hançer elifi (Y`) tek uzun ünlü üretmeli');
+  assert(transliterate('<in~', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'inn',
+    'şedde (ّ) önceki harfi ikilemeli');
+  assert(transliterate('yawom', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'yavm',
+    'sözcük başı/ünlü öncesi y (ya) ünsüz kalmalı');
+  assert(transliterate('yaquwlu', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS).includes('û'),
+    'ünsüz öncesi w uzun û üretmeli');
+  assert(transliterate('o~', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === '', 'yalnız hareke/şedde taşıyan girdi boş dizge üretmeli');
+  assert(transliterate('maA', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) !== transliterate('maA', TRANSLIT_DIA, TRANSLIT_DIA_LONG, DIA_SHORT_VOWELS),
+    'okunuş ve DİA katmanları ayrışmalı');
+
+  // 4 · draft: buckets, no verification, coverage, family/cluster proposals
+  const parsed = parseMorphology(fixture.morphology);
+  const uthmani = parseUthmani(fixture.uthmani, parsed.words);
+  const draft = lemmaCandidateRecords(parsed, uthmani.byVerse, {});
+  const byLemma = new Map(draft.candidates.map((record) => [record.lemmaBw, record]));
+  const buckets = new Map(draft.candidates.map((record) => [record.lemmaBw, record.bucket]));
+  assert(buckets.get('Hamod') === 'D', 'çapa metin kelimesi D kovasında olmalı');
+  assert(buckets.get('min') === 'A' || buckets.get('<in~') === 'A', 'çapa dışı parçacık A kovasında olmalı');
+  assert(!draft.candidates.some((record) => record.bucket === 'B'), 'kognat listesi yokken B kovası boş olmalı');
+  assert(draft.candidates.every((record) => record.verified === false), 'hiçbir taslak satırı doğrulanmış olmamalı');
+  assert(draft.candidates.every((record) => record.tr1 === null && record.cognateTr === null),
+    'Türkçe anlam alanları taslakta boş olmalı (insan yazar)');
+  assert(draft.candidates.every((record) => record.translit.tr && record.translit.dia && record.translit.auto === true),
+    'transliterasyon önerisi iki katmanlı ve auto işaretli olmalı');
+  assert(draft.candidates.every((record) => !arabicWordRegex().test(record.lemmaBw) && arabicWordRegex().test(record.ar)),
+    'lemmaBw ASCII, ar Arapça olmalı');
+  assert(draft.candidates.every((record) => record.examples.length >= 1 && record.examples.every((e) => e.tr === null)),
+    'örnek pencere korpustan gelmeli, çevirisi boş olmalı');
+  assert(draft.report.verifiedTotal === 0, 'rapor doğrulanmış satır 0 bildirmeli');
+  assert(draft.report.userTaskPending === true, 'kart kullanıcı görevi beklemeli');
+  assert(typeof draft.report.coverage.ratioLemPool === 'number' && draft.report.coverage.goal === 0.80,
+    'kapsam raporu LEM havuzu paydasını ve hedefi taşımalı');
+  assert(draft.report.selectionRule.contentRankMax === 500 && draft.report.selectionRule.particleRankMax === 100,
+    'seçim kuralı 03 §9 sıra eşiklerini raporlamalı');
+  assert(draft.report.candidateTotal === draft.candidates.length, 'aday sayısı raporla eşleşmeli');
+  assert(draft.report.coverage.alternatives.length > 0, 'kapsam alternatifleri raporlanmalı');
+  const hamod = byLemma.get('Hamod');
+  assert(hamod.anchorText === true, 'çapa bayrağı işaretlenmeli');
+  const ealima = byLemma.get('Ealima');
+  assert(ealima.semNeighbors.sameRoot.includes('l_Eal_ama'),
+    'aynı kökten türevler komşu önerisine girmeli');
+  assert(ealima.family.some((entry) => entry.lemmaId === 'l_Eal_ama' && arabicWordRegex().test(entry.ar)),
+    'aile listesi kimlik ve Arapça biçim taşımalı');
+  assert(ealima.semNeighbors.proposed === true, 'komşu önerisi proposed olmalı');
+  assert(draft.report.clusterRootDiagnostics.length === SEMANTIC_CLUSTERS.flatMap((c) => c.roots).length,
+    'her anlam kümesi kökü için tanı kaydı olmalı');
+  assert(draft.candidates.every((record) => record.bucket === 'D' || record.rank <= CONTENT_RANK_MAX),
+    'D dışındaki adaylar içerik sıra eşiğinde olmalı');
+  assert(draft.candidates.every((record) => record.bucket !== 'A' || record.rank <= PARTICLE_RANK_MAX),
+    'A kovası yalnız parçacık sıra eşiğinde olmalı');
+  assert(draft.report.clusterRootDiagnostics.every((entry) => typeof entry.known === 'boolean'),
+    'kök tanısı known alanı taşımalı');
+
+  // 5 · determinism (same inputs → byte-identical output)
+  const again = lemmaCandidateRecords(parseMorphology(fixture.morphology), uthmani.byVerse, {});
+  assert(JSON.stringify(again.candidates) === JSON.stringify(draft.candidates), 'taslak deterministik olmalı');
+
+  // 6 · review round-trip and verification gating (06 §3)
+  const markdown = renderReviewMarkdown(draft);
+  const firstId = draft.candidates[0].lemmaId;
+  const secondId = draft.candidates[1].lemmaId;
+  const filled = markdown
+    .replace(new RegExp(`(\\| ${firstId} \\|[^\\n]*?)\\|\\s*\\|$`, 'm'), '$1| insan-1 |')
+    .replace(new RegExp(`(\\| ${secondId} \\| ${draft.candidates[1].ar} \\| [^|]*\\|[^|]*\\|)\\s*(\\|)`, 'm'), '$1 öneri$2')
+    .replace(new RegExp(`(\\| ${secondId} \\|[^\\n]*)\\|\\s*\\|$`, 'm'), '$1| insan-2 |');
+  const parsedReview = parseReviewMarkdown(filled, JSON.parse(JSON.stringify(draft.candidates)));
+  assert(parsedReview.unknownTotal === 0, 'bilinmeyen lemmaId olmamalı');
+  assert(parsedReview.verifiedTotal >= 1, 'tr1 + verifiedBy doldurulunca satır doğrulanmalı');
+  const firstVerified = parsedReview.records.find((record) => record.lemmaId === firstId);
+  if (firstVerified.tr1) {
+    assert(firstVerified.verified === true && firstVerified.verifiedAt, 'doğrulanan satıra tarih yazılmalı');
+  } else {
+    assert(firstVerified.verified === false, 'Türkçe anlam olmadan verifiedBy tek başına doğrulamaz');
+  }
+  const unknown = parseReviewMarkdown(`| ${REVIEW_HEADER.join(' | ')} |\n| x |`, []);
+  assert(unknown.unknownTotal === 0, 'eksik satır sessizce atlanmalı (kısa satır)');
 }
 
 function missingInputs(inputDir) {
@@ -377,7 +614,9 @@ function missingMessage(inputDir, missing) {
   for (const input of missing) {
     lines.push(`- ${input.file}`);
     lines.push(`  kaynak: ${input.url}`);
-    lines.push(`  beklenen sha256: ${input.sha256}`);
+    if (input.sha256) lines.push(`  beklenen sha256: ${input.sha256}`);
+    else lines.push(`  beklenen gövde sha256: ${input.bodySha256} (telif bloğu hariç)`);
+    if (input.download) lines.push(`  indirme: ${input.download}`);
   }
   lines.push('Ham dosyaları değiştirme ve Git’e ekleme; content/inputs/ ignore kapsamındadır.');
   return lines.join('\n');
@@ -396,14 +635,58 @@ function readPinnedInput(inputDir, input) {
   return { text: buffer.toString('utf8'), sha256: actual };
 }
 
+// Tanzil ships its verbatim-only copyright block as leading `#` lines that carry
+// a rolling copyright year. Integrity is checked on the verse body only.
+function stripTanzilBoilerplate(text) {
+  return text.replace(/\r\n/g, '\n').split('\n')
+    .filter((line) => !line.startsWith('#'))
+    .join('\n').trim();
+}
+
+function tanzilStructuralMismatch(text, expectedVerseTotal) {
+  const normalized = text.replace(/\r\n/g, '\n').trim();
+  const lines = normalized.split('\n').map((line) => line.trim()).filter(Boolean);
+  const bodyLines = lines.filter((line) => !line.startsWith('#'));
+  if (bodyLines.length !== expectedVerseTotal) {
+    return `Tanzil âyet satırı sayısı ${bodyLines.length}; QAC âyet sayısı ${expectedVerseTotal} ile eşleşmiyor`;
+  }
+  const badIndex = bodyLines.findIndex((line) => !/[\u0600-\u06FF]/u.test(line));
+  if (badIndex !== -1) {
+    return `Tanzil ${badIndex + 1}. veri satırında Arapça yazı yok (bozuk indirme veya HTML gövdesi)`;
+  }
+  return null;
+}
+
+function readUthmaniInput(inputDir, expectedVerseTotal) {
+  const input = INPUTS.uthmani;
+  const filePath = path.join(inputDir, input.file);
+  const buffer = fs.readFileSync(filePath);
+  const text = buffer.toString('utf8');
+  const body = stripTanzilBoilerplate(text);
+  const bodyHash = sha256(Buffer.from(body, 'utf8'));
+  if (bodyHash !== input.bodySha256) {
+    throw new CliError(
+      `${input.file}: gövde sha256 uyuşmuyor\nbeklenen: ${input.bodySha256}\ngözlenen: ${bodyHash}\n`
+      + `İndirme: ${input.download}\nTelif bloğu (#'li satırlar) hash'e katılmaz.`,
+      3
+    );
+  }
+  const structural = tanzilStructuralMismatch(text, expectedVerseTotal);
+  if (structural) throw new CliError(`${input.file}: ${structural}\nBeklenen âyet: ${expectedVerseTotal}`, 3);
+  return { text, sha256: sha256(buffer), bodySha256: bodyHash };
+}
+
 function compile(inputDir) {
   const missing = missingInputs(inputDir);
   if (missing.length) throw new CliError(missingMessage(inputDir, missing), 2);
   const morphology = readPinnedInput(inputDir, INPUTS.morphology);
-  const uthmani = readPinnedInput(inputDir, INPUTS.uthmani);
+  const parsed = parseMorphology(morphology.text);
+  const expectedVerseTotal = new Set(parsed.words.map((word) => `${word.surah}:${word.ayah}`)).size;
+  const uthmani = readUthmaniInput(inputDir, expectedVerseTotal);
   const stats = buildStats(morphology.text, uthmani.text, {
     morphology: morphology.sha256,
-    uthmani: uthmani.sha256
+    uthmani: uthmani.sha256,
+    uthmaniBodySha256: uthmani.bodySha256
   });
   fs.mkdirSync(path.dirname(STATS_PATH), { recursive: true });
   fs.writeFileSync(STATS_PATH, `${JSON.stringify(stats, null, 2)}\n`);
@@ -414,12 +697,494 @@ function compile(inputDir) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// KAO-02 — candidate list, cognate/neighbour proposal, review table
+// ---------------------------------------------------------------------------
+
+function arabicWordRegex() { return /[\u0600-\u06FF]/u; }
+
+function transliterate(lemmaBw, table, longTable, shortSet) {
+  const characters = Array.from(lemmaBw || '');
+  const out = [];
+  for (let index = 0; index < characters.length; index += 1) {
+    const character = characters[index];
+    if (character === '~') { // şedde: önceki harfi ikiler (rab~ → rabb)
+      if (out.length) out.push(out[out.length - 1]);
+      continue;
+    }
+    if (TRANSLIT_IGNORE.has(character)) continue;
+    const next = characters[index + 1];
+    const long = longTable[character];
+    const glideIsConsonant = GLIDE_LONG.has(character) && GLIDE_CONSONANT_NEXT.has(next);
+    const daggerHandlesIt = DAGGER_PAIR.has(character) && next === '`';
+    if (long && daggerHandlesIt) {
+      // hançer elifi (`) uzun ünlüyü kendisi verir: Y` → tek â
+      continue;
+    }
+    if (long && !glideIsConsonant) {
+      // uzun ünlü kendinden önceki kısa ünlüyü soğurur (maA → mâ); ikilenmez
+      if (out.length && shortSet.has(out[out.length - 1])) out.pop();
+      if (out[out.length - 1] === long) continue;
+      out.push(long);
+      continue;
+    }
+    if (Object.prototype.hasOwnProperty.call(table, character)) out.push(table[character]);
+  }
+  return out.join('');
+}
+
+function translitTr(lemmaBw) { return transliterate(lemmaBw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS); }
+function translitDia(lemmaBw) { return transliterate(lemmaBw, TRANSLIT_DIA, TRANSLIT_DIA_LONG, DIA_SHORT_VOWELS); }
+
+function lemmaSlug(lemmaBw) {
+  return String(lemmaBw || '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'lem';
+}
+
+function lemmaKey(lemmaBw) { return `l_${lemmaSlug(lemmaBw)}`; }
+
+function countLemmaMap(parsed) {
+  const frequency = new Map();
+  const positions = new Map();
+  const roots = new Map();
+  const pos = new Map();
+  const anchor = new Set();
+  const examples = new Map();
+  for (const word of parsed.words) {
+    if (word.lemmaSource !== 'LEM') continue;
+    const lemma = word.lemmaBw;
+    frequency.set(lemma, (frequency.get(lemma) || 0) + 1);
+    if (!positions.has(lemma)) positions.set(lemma, []);
+    if (positions.get(lemma).length < MAX_EXAMPLES) {
+      positions.get(lemma).push(word);
+    }
+    if (word.rootBw) roots.set(lemma, word.rootBw);
+    pos.set(lemma, word.pos || 'UNKNOWN');
+    if (ANCHOR_VERSES.has(`${word.surah}:${word.ayah}`)) anchor.add(lemma);
+  }
+  return { frequency, positions, roots, pos, anchor, examples };
+}
+
+function rootLemmaIndex(counts) {
+  const index = new Map();
+  for (const [lemma, rootBw] of counts.roots) {
+    if (!rootBw) continue;
+    if (!index.has(rootBw)) index.set(rootBw, []);
+    index.get(rootBw).push(lemma);
+  }
+  return index;
+}
+
+function semanticClusters(counts, rootIndex) {
+  const diagnostics = [];
+  const lemmaClusters = new Map();
+  for (const cluster of SEMANTIC_CLUSTERS) {
+    const members = [];
+    for (const rootBw of cluster.roots) {
+      const lemmas = rootIndex.get(rootBw);
+      if (!lemmas) {
+        diagnostics.push({ cluster: cluster.id, rootBw, known: false });
+        continue;
+      }
+      diagnostics.push({ cluster: cluster.id, rootBw, known: true, lemmaCount: lemmas.length });
+      members.push(...lemmas);
+    }
+    for (const lemma of members) {
+      if (!lemmaClusters.has(lemma)) lemmaClusters.set(lemma, []);
+      lemmaClusters.get(lemma).push(cluster.id);
+    }
+  }
+  return { lemmaClusters, diagnostics };
+}
+
+function readExistingCognates() {
+  const carried = new Map();
+  if (!fs.existsSync(DRAFT_PATH)) return carried;
+  try {
+    const previous = JSON.parse(fs.readFileSync(DRAFT_PATH, 'utf8'));
+    for (const lemma of previous.lemmas || []) {
+      if (!lemma.cognateTr && !lemma.tr1) continue;
+      carried.set(lemma.lemmaBw, { tr: lemma.cognateTr || null, shift: lemma.cognateShift || null, pattern: lemma.pattern || null });
+    }
+  } catch { /* bozuk taslak: insan verisi taşınmaz, taslak yeniden üretilir */
+  }
+  return carried;
+}
+
+function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes) {
+  const counts = countLemmaMap(parsed);
+  const maxFrequency = Math.max(...counts.frequency.values());
+  const rank = new Map([...counts.frequency.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .map(([lemma], index) => [lemma, index + 1]));
+  const rootIndex = rootLemmaIndex(counts);
+  const clusters = semanticClusters(counts, rootIndex);
+  const tesbihatPresent = new Set(TESBIHAT_LEMMAS.filter((lemma) => counts.frequency.has(lemma)));
+  // The cognate column is human-owned (06 §3). Re-running --draft must not
+  // destroy work already entered, so it is carried over when a draft exists.
+  const cognateByLemma = readExistingCognates();
+
+  const candidates = [];
+  const rankBand = (cutoff) => {
+    const band = new Set();
+    for (const [lemma, value] of counts.frequency) {
+      const lemmaRank = rank.get(lemma);
+      const pos = counts.pos.get(lemma) || 'UNKNOWN';
+      const isAnchor = counts.anchor.has(lemma) || tesbihatPresent.has(lemma);
+      const isParticle = PARTICLE_POS.has(pos) && lemmaRank <= PARTICLE_RANK_MAX;
+      const isContent = CONTENT_POS.has(pos) && lemmaRank <= cutoff;
+      if (isAnchor || isParticle || isContent) band.add(lemma);
+    }
+    return band;
+  };
+  const eligible = rankBand(CONTENT_RANK_MAX);
+  for (const [lemma, frequency] of counts.frequency) {
+    if (!eligible.has(lemma)) continue;
+    const pos = counts.pos.get(lemma) || 'UNKNOWN';
+    const isAnchor = counts.anchor.has(lemma) || tesbihatPresent.has(lemma);
+    const isCognate = Boolean(cognateByLemma.get(lemma));
+    const isParticle = PARTICLE_POS.has(pos) && rank.get(lemma) <= PARTICLE_RANK_MAX;
+    const priority = W_FREQ * (frequency / maxFrequency)
+      + W_ANCHOR * (isAnchor ? 1 : 0)
+      + W_NOT_COGNATE * (isCognate ? 0 : 1);
+    const cognate = cognateByLemma.get(lemma) || null;
+    const rootBw = counts.roots.get(lemma) || null;
+    const family = rootBw ? (rootIndex.get(rootBw) || []).filter((other) => other !== lemma) : [];
+    const examples = [];
+    for (const word of counts.positions.get(lemma) || []) {
+      const window = exampleWindow(word, uthmaniByVerse);
+      if (window) {
+        examples.push({ ar: window.text, tr: null, ref: window.ref });
+      }
+    }
+    candidates.push({
+      lemmaId: lemmaKey(lemma),
+      lemmaBw: lemma,
+      ar: bwToArabic(lemma),
+      translit: { tr: translitTr(lemma), dia: translitDia(lemma), auto: true },
+      tr1: null,
+      tr2: null,
+      root: rootBw ? bwToArabic(rootBw) : null,
+      rootBw,
+      pattern: null,
+      pos,
+      freq: frequency,
+      rank: rank.get(lemma),
+      anchorText: counts.anchor.has(lemma),
+      tesbihat: tesbihatPresent.has(lemma),
+      cognateTr: cognate ? cognate.tr : null,
+      cognateShift: cognate ? cognate.shift : null,
+      cognate: { proposed: Boolean(cognate), pattern: cognate ? cognate.pattern : null, derivatives: [] },
+      semNeighbors: {
+        proposed: true,
+        clusters: clusters.lemmaClusters.get(lemma) || [],
+        sameRoot: family.map((other) => lemmaKey(other)),
+        sameRootAr: family.map((other) => bwToArabic(other))
+      },
+      family: family.map((other) => ({ lemmaId: lemmaKey(other), ar: bwToArabic(other), tr: null })),
+      examples,
+      examplesRef: examples.map((example) => example.ref),
+      isParticle,
+      bucket: null,
+      priority: Number(priority.toFixed(6)),
+      verified: false,
+      verifiedBy: null,
+      verifiedAt: null
+    });
+  }
+
+  candidates.sort((left, right) => (
+    left.rank - right.rank || left.lemmaBw.localeCompare(right.lemmaBw)
+  ));
+  const selected = candidates;
+  for (const record of selected) {
+    if (record.anchorText || record.tesbihat) record.bucket = 'D';
+    else if (record.isParticle) record.bucket = 'A';
+    else record.bucket = 'C'; // bucket B needs the human cognate column (KAO-03)
+  }
+
+  const wordTokenTotal = parsed.words.length;
+  const lemPoolTokens = [...counts.frequency.values()].reduce((sum, value) => sum + value, 0);
+  const selectedLemPoolTokens = selected.reduce((sum, record) => sum + record.freq, 0);
+  const bucketCounts = { A: 0, B: 0, C: 0, D: 0 };
+  for (const record of selected) bucketCounts[record.bucket] += 1;
+  const anchorUniverse = new Set([...counts.anchor, ...TESBIHAT_LEMMAS]);
+  const anchorCovered = [...anchorUniverse].filter((lemma) => counts.frequency.has(lemma));
+  const coverageByRank = [500, 600, 700, 800, 1000].map((cutoff) => {
+    const band = rankBand(cutoff);
+    const tokens = [...band].reduce((sum, lemma) => sum + counts.frequency.get(lemma), 0);
+    return { contentRankMax: cutoff, lemmas: band.size, ratioLemPool: Number((tokens / lemPoolTokens).toFixed(4)) };
+  });
+  const report = {
+    schemaVersion: 1,
+    generatedBy: 'kao-lexicon-build --draft',
+    version: LEXICON_VERSION,
+    sourceHashes,
+    selectionRule: {
+      particleRankMax: PARTICLE_RANK_MAX,
+      contentRankMax: CONTENT_RANK_MAX,
+      particlePos: [...PARTICLE_POS].sort(),
+      contentPos: [...CONTENT_POS].sort(),
+      anchorVerses: [...ANCHOR_VERSES].length,
+      note: '03 §9: A = sıklık ilk 100 parçacık, B/C = sıklık ≤500 içerik, D = çapa/tesbihat (sıralamadan bağımsız).'
+    },
+    tokenTotal: wordTokenTotal,
+    contractTokenTarget: CONTRACT_TOKEN_TARGET,
+    lemPoolTokens,
+    lemmaTotal: counts.frequency.size,
+    candidateTotal: selected.length,
+    planCandidateTarget: CANDIDATE_TARGET,
+    bucketCounts,
+    bucketTargets: { A: 60, B: 225, C: 215, D: 30 },
+    coverage: {
+      selectedLemPoolTokens,
+      lemPoolTokens,
+      ratioLemPool: Number((selectedLemPoolTokens / lemPoolTokens).toFixed(4)),
+      ratioWordTokens: Number((selectedLemPoolTokens / wordTokenTotal).toFixed(4)),
+      goal: 0.80,
+      goalMet: selectedLemPoolTokens / lemPoolTokens >= 0.80,
+      denominator: 'LEM etiketli token havuzu',
+      alternatives: coverageByRank
+    },
+    anchorUniverseTotal: anchorUniverse.size,
+    anchorPresentTotal: anchorCovered.length,
+    anchorMissing: [...anchorUniverse].filter((lemma) => !counts.frequency.has(lemma)),
+    anchorOutsideContentBand: anchorCovered.filter((lemma) => rank.get(lemma) > CONTENT_RANK_MAX).length,
+    tesbihatPresent: [...tesbihatPresent],
+    clusterRootDiagnostics: clusters.diagnostics,
+    cognate: {
+      channel: 'inceleme tablosu (lexicon.review.md) — cognateTr / cognateShift sütunları',
+      matchedTotal: selected.filter((record) => record.cognateTr).length,
+      note: 'Kognat eşlemesi ÖNERİdir ve yalnız insan yazar (06 §3); araç TDK listesini hafızadan üretmez.'
+    },
+    verifiedTotal: selected.filter((record) => record.verified).length,
+    userTaskPending: true,
+    warnings: []
+  };
+  if (!report.coverage.goalMet) {
+    report.warnings.push(`kapsam hedefi %80 altında: %${(report.coverage.ratioLemPool * 100).toFixed(1)}`
+      + ` (LEM havuzu; içerik sıralaması ≤${CONTENT_RANK_MAX}). Hedefe ulaşan sıralama raporludur,`
+      + ' eşiği yükseltmek insan kararıdır.');
+  }
+  if (report.cognate.matchedTotal === 0) {
+    report.warnings.push('kognat sütunu boş (insan doldurur); B kovası boş, cognateTr/cognateShift null');
+  }
+  if (report.bucketCounts.B === 0 && report.cognate.matchedTotal > 0) {
+    report.warnings.push('cognateTr dolu ama B kovası boş — kova atamasını elle incele');
+  }
+  if (report.anchorMissing.length) {
+    report.warnings.push(`çapa/tesbihat lemma bulunamadı: ${report.anchorMissing.join(', ')}`);
+  }
+  return { candidates: selected, report, counts, rootIndex, clusters };
+}
+
+function buildDraft(morphologySource, uthmaniSource, sourceHashes) {
+  const parsed = parseMorphology(morphologySource);
+  const uthmani = parseUthmani(uthmaniSource, parsed.words);
+  return lemmaCandidateRecords(parsed, uthmani.byVerse, sourceHashes);
+}
+
+function reviewCells(record) {
+  return [
+    record.lemmaId,
+    record.ar,
+    record.translit.tr,
+    record.translit.dia,
+    record.tr1 || '',
+    record.tr2 || '',
+    record.root || '',
+    record.pattern || '',
+    record.pos,
+    String(record.freq),
+    record.cognateTr || '',
+    record.cognateShift || '',
+    record.examples[0] ? record.examples[0].ar : '',
+    record.examples[0] ? (record.examples[0].tr || '') : '',
+    record.examples[0] ? record.examples[0].ref : '',
+    record.semNeighbors.clusters.join('+'),
+    record.bucket,
+    record.verifiedBy || ''
+  ];
+}
+
+const REVIEW_HEADER = Object.freeze([
+  'lemmaId', 'ar', 'translit_tr', 'translit_dia', 'tr1', 'tr2', 'root', 'pattern',
+  'pos', 'freq', 'cognateTr', 'cognateShift', 'ex1_ar', 'ex1_tr', 'ex1_ref',
+  'semClusters', 'bucket', 'verifiedBy'
+]);
+
+function escapeCell(value) {
+  return String(value == null ? '' : value).replace(/\|/g, '\\|');
+}
+
+function renderReviewMarkdown(draft) {
+  const lines = [
+    '# KAO-02 · İnsan inceleme tablosu (taslak)',
+    '',
+    '> **Durum:** `verified:false` — bu tabloda **hiçbir satır onaylı değildir.**',
+    '> Arapça ve transliterasyon korpustan **mekanik** üretilir; Türkçe anlamlar (`tr1`, `tr2`)',
+    '> ve örnek çevirileri (`ex1_tr`) **boştur** ve insan tarafından doldurulur (06 §3, KAO-03).',
+    '> `verifiedBy` boş kalan satır onaylanmamış sayılır; onay kuralı 06 §3 (iki bağımsız göz',
+    '> ya da iki ayrı gün).',
+    '',
+    '## Kova tanımları (03 §9)',
+    '| Kova | Ne | Bu taslakta |',
+    '|---|---|---|',
+    '| A · Parçacıklar (edat/zamir/bağlaç) | lemma sıralamasında ilk 100 işlev kelimesi | korpustan etiketli |',
+    '| B · Kognat isim/fiil | sıralama ≤500 ∧ Türkçede karşılığı var | **boş** — `cognateTr` sütunu boş |',
+    '| C · Kognat olmayan isim/fiil | sıralama ≤500 ∧ kognat değil | adaylar (`cognateTr=null`) |',
+    '| D · Çapa metin kelimeleri | Fâtiha + 112–114 + tesbihat (sıralamadan bağımsız) | korpustan kesişim |',
+    '',
+    '## Rapor',
+    `- Aday havuzu: **${draft.report.candidateTotal}** lemma (plan hedefi ${draft.report.planCandidateTarget}) · toplam lemma: ${draft.report.lemmaTotal}`,
+    `- Kovalar: A=${draft.report.bucketCounts.A} · B=${draft.report.bucketCounts.B} · C=${draft.report.bucketCounts.C} · D=${draft.report.bucketCounts.D}`,
+    `- Seçim kuralı: parçacık sıra ≤${draft.report.selectionRule.particleRankMax} · içerik sıra ≤${draft.report.selectionRule.contentRankMax} · çapa sıralamadan bağımsız`,
+    `- Kapsam (LEM havuzu): **%${(draft.report.coverage.ratioLemPool * 100).toFixed(1)}** (hedef %80) → ${draft.report.coverage.goalMet ? 'TUTTU' : 'TUTMADI'}`,
+    `- Kapsam (kelime token): %${(draft.report.coverage.ratioWordTokens * 100).toFixed(1)} · çapa dışı (sıra >${draft.report.selectionRule.contentRankMax}): ${draft.report.anchorOutsideContentBand}`,
+    `- Çapa/tesbihat: ${draft.report.anchorPresentTotal}/${draft.report.anchorUniverseTotal} korpusta var`,
+    `- Doğrulanmış satır: **${draft.report.verifiedTotal}** (beklenen: 0)`,
+    '',
+    '## Tablo',
+    `| ${REVIEW_HEADER.join(' | ')} |`,
+    `|${REVIEW_HEADER.map(() => '---').join('|')}|`
+  ];
+  for (const record of draft.candidates) {
+    lines.push(`| ${reviewCells(record).map(escapeCell).join(' | ')} |`);
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function parseReviewMarkdown(markdown, existing) {
+  const rows = [];
+  for (const line of markdown.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('|')) continue;
+    const cells = trimmed.replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim().replace(/\\\|/g, '|'));
+    if (cells.length < REVIEW_HEADER.length) continue;
+    if (cells[0] === REVIEW_HEADER[0] || /^-+$/.test(cells[0])) continue;
+    const row = {};
+    for (const [index, key] of REVIEW_HEADER.entries()) row[key] = cells[index] === '' ? null : cells[index];
+    if (!row.lemmaId) continue;
+    rows.push(row);
+  }
+  const byId = new Map(existing.map((record) => [record.lemmaId, record]));
+  let verifiedTotal = 0;
+  let unknownTotal = 0;
+  for (const row of rows) {
+    const record = byId.get(row.lemmaId);
+    if (!record) { unknownTotal += 1; continue; }
+    record.tr1 = row.tr1;
+    record.tr2 = row.tr2;
+    record.pattern = row.pattern;
+    record.cognateTr = row.cognateTr;
+    record.cognateShift = row.cognateShift;
+    record.semNeighbors.clusters = row.semClusters ? row.semClusters.split('+').filter(Boolean) : record.semNeighbors.clusters;
+    if (record.examples[0]) record.examples[0].tr = row.ex1_tr;
+    record.verifiedBy = row.verifiedBy;
+    record.verifiedAt = row.verifiedBy ? new Date().toISOString().slice(0, 10) : null;
+    record.verified = Boolean(row.verifiedBy && record.tr1);
+    if (record.verified) verifiedTotal += 1;
+    record.bucket = (record.cognateTr && !record.anchorText && !record.tesbihat && !record.isParticle)
+      ? 'B' : record.bucket;
+  }
+  const verifiedRecords = existing.filter((record) => record.verified);
+  return { records: existing, verifiedTotal, unknownTotal, verifiedRecords };
+}
+
+function writeDraft(inputDir) {
+  const missing = missingInputs(inputDir);
+  if (missing.length) throw new CliError(missingMessage(inputDir, missing), 2);
+  const morphology = readPinnedInput(inputDir, INPUTS.morphology);
+  const parsed = parseMorphology(morphology.text);
+  const expectedVerseTotal = new Set(parsed.words.map((word) => `${word.surah}:${word.ayah}`)).size;
+  const uthmani = readUthmaniInput(inputDir, expectedVerseTotal);
+  const draft = buildDraft(morphology.text, uthmani.text, {
+    morphology: morphology.sha256,
+    uthmani: uthmani.sha256,
+    uthmaniBodySha256: uthmani.bodySha256
+  });
+  const output = {
+    schemaVersion: 1,
+    version: LEXICON_VERSION,
+    generatedBy: 'kao-lexicon-build --draft',
+    generatedAt: new Date().toISOString().slice(0, 10),
+    status: 'draft',
+    verifiedTotal: draft.report.verifiedTotal,
+    report: draft.report,
+    lemmas: draft.candidates
+  };
+  fs.mkdirSync(path.dirname(DRAFT_PATH), { recursive: true });
+  fs.writeFileSync(DRAFT_PATH, `${JSON.stringify(output, null, 2)}\n`);
+  fs.mkdirSync(path.dirname(DRAFT_REPORT_PATH), { recursive: true });
+  fs.writeFileSync(DRAFT_REPORT_PATH, `${JSON.stringify(draft.report, null, 2)}\n`);
+  fs.mkdirSync(path.dirname(REVIEW_PATH), { recursive: true });
+  fs.writeFileSync(REVIEW_PATH, renderReviewMarkdown(draft));
+  console.log(`KAO draft: ${path.relative(ROOT, DRAFT_PATH)}`);
+  console.log(`KAO report: ${path.relative(ROOT, DRAFT_REPORT_PATH)}`);
+  console.log(`KAO review: ${path.relative(ROOT, REVIEW_PATH)}`);
+  console.log(`candidates=${draft.report.candidateTotal} bucket=${JSON.stringify(draft.report.bucketCounts)}`
+    + ` coverageLemPool=%${(draft.report.coverage.ratioLemPool * 100).toFixed(1)} verified=${draft.report.verifiedTotal}`);
+  for (const warning of draft.report.warnings) console.log(`WARN ${warning}`);
+}
+
+function readDraft() {
+  if (!fs.existsSync(DRAFT_PATH)) throw new CliError(`taslak yok: ${path.relative(ROOT, DRAFT_PATH)} — önce --draft koş`, 2);
+  return JSON.parse(fs.readFileSync(DRAFT_PATH, 'utf8'));
+}
+
+function renderReviewFromDraft() {
+  const draftFile = readDraft();
+  const draft = { candidates: draftFile.lemmas, report: draftFile.report };
+  fs.writeFileSync(REVIEW_PATH, renderReviewMarkdown(draft));
+  console.log(`KAO review: ${path.relative(ROOT, REVIEW_PATH)} (${draftFile.lemmas.length} satır)`);
+}
+
+function importReview() {
+  const draftFile = readDraft();
+  if (!fs.existsSync(REVIEW_PATH)) throw new CliError(`inceleme tablosu yok: ${path.relative(ROOT, REVIEW_PATH)}`, 2);
+  const { verifiedTotal, unknownTotal, verifiedRecords } = parseReviewMarkdown(
+    fs.readFileSync(REVIEW_PATH, 'utf8'), draftFile.lemmas
+  );
+  const output = {
+    schemaVersion: 1,
+    version: LEXICON_VERSION,
+    importedBy: 'kao-lexicon-build --import-md',
+    importedAt: new Date().toISOString().slice(0, 10),
+    verifiedTotal,
+    unknownTotal,
+    lemmas: draftFile.lemmas
+  };
+  fs.mkdirSync(path.dirname(VERIFIED_PATH), { recursive: true });
+  fs.writeFileSync(VERIFIED_PATH, `${JSON.stringify(output, null, 2)}\n`);
+  console.log(`KAO verified: ${path.relative(ROOT, VERIFIED_PATH)}`);
+  console.log(`verified=${verifiedTotal} unknown=${unknownTotal} total=${draftFile.lemmas.length}`);
+  if (!verifiedTotal) {
+    console.log('NOT: doğrulanmış satır yok; kart waiting_user kalır (06 §3 onay kuralı).');
+  }
+  return { verifiedTotal, unknownTotal, verifiedRecords };
+}
+
 function usage() {
   return [
     'Kullanım:',
     '  node tools/kao-lexicon-build.mjs --self-test',
-    '  node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs [--stats]'
+    '  node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs [--stats]',
+    '  node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs --draft',
+    '  node tools/kao-lexicon-build.mjs --review-md',
+    '  node tools/kao-lexicon-build.mjs --import-md'
   ].join('\n');
+}
+
+function inputsPath(argv) {
+  const index = argv.indexOf('--inputs');
+  if (index === -1 || !argv[index + 1] || argv[index + 1].startsWith('--')) {
+    throw new CliError(`--inputs <dizin> gerekli\n${usage()}`, 64);
+  }
+  return { raw: argv[index + 1], resolved: path.resolve(ROOT, argv[index + 1]) };
+}
+
+function rejectUnknown(argv, allowed) {
+  const unknown = argv.filter((arg) => !allowed.has(arg));
+  if (unknown.length) throw new CliError(`Bilinmeyen argüman: ${unknown.join(', ')}\n${usage()}`, 64);
 }
 
 function main(argv) {
@@ -428,17 +1193,26 @@ function main(argv) {
     selfTest();
     return;
   }
-  const inputIndex = argv.indexOf('--inputs');
-  if (inputIndex === -1 || !argv[inputIndex + 1] || argv[inputIndex + 1].startsWith('--')) {
-    throw new CliError(usage(), 64);
+  if (argv.includes('--review-md')) {
+    rejectUnknown(argv, new Set(['--review-md']));
+    renderReviewFromDraft();
+    return;
   }
-  const allowed = new Set(['--inputs', '--stats', argv[inputIndex + 1]]);
-  const unknown = argv.filter((arg) => !allowed.has(arg));
-  if (unknown.length) throw new CliError(`Bilinmeyen argüman: ${unknown.join(', ')}\n${usage()}`, 64);
-  compile(path.resolve(ROOT, argv[inputIndex + 1]));
+  if (argv.includes('--import-md')) {
+    rejectUnknown(argv, new Set(['--import-md']));
+    importReview();
+    return;
+  }
+  const inputArg = inputsPath(argv);
+  const allowed = new Set(['--inputs', inputArg.raw, '--stats', '--draft']);
+  rejectUnknown(argv, allowed);
+  const modes = ['--stats', '--draft'].filter((flag) => argv.includes(flag));
+  if (modes.length > 1) throw new CliError(`--stats ve --draft birlikte kullanılamaz\n${usage()}`, 64);
+  if (modes[0] === '--draft') writeDraft(inputArg.resolved);
+  else compile(inputArg.resolved);
 }
 
-export { buildStats, bwToArabic, parseMorphology };
+export { buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate };
 
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (IS_MAIN) {

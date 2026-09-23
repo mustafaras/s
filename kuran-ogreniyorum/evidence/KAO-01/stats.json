@@ -1,0 +1,1168 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "local-inputs",
+  "sourceHashes": {
+    "morphology": "a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+    "uthmani": "829083f684ecb5c71853029ca1970946a12c2dc90528d6e0e3cd6dbc41204b7c",
+    "uthmaniBodySha256": "7f429d485cb43f0ac78e2830789f6634709725010922c535035a221e531708de"
+  },
+  "tokenTotal": 77429,
+  "contractTokenTarget": 77430,
+  "officialReleaseWordTotal": 77429,
+  "contractTokenTargetMatch": false,
+  "officialReleaseWordTotalMatch": true,
+  "morphologySegmentTotal": 128219,
+  "annotatedTokenTotal": 74122,
+  "fallbackTokenTotal": 3307,
+  "lemmaCount": 4832,
+  "rootCount": 1642,
+  "verseCount": 6236,
+  "alignment": {
+    "ignoredStandaloneMarkTotal": 4379,
+    "removedBasmalaTokenTotal": 448,
+    "mergedTanzilTokenTotal": 4,
+    "alignedVerseTotal": 6236
+  },
+  "topLemmas": [
+    {
+      "rank": 1,
+      "lemmaBw": "min",
+      "lemmaAr": "مِن",
+      "frequency": 3226,
+      "annotatedFrequency": 3226,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "P",
+          "count": 3067
+        },
+        {
+          "tag": "REL",
+          "count": 158
+        },
+        {
+          "tag": "PREV",
+          "count": 1
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:3",
+          "word": 6,
+          "startWord": 4,
+          "endWord": 8,
+          "text": "وَيُقِيمُونَ ٱلصَّلَوٰةَ وَمِمَّا رَزَقْنَـٰهُمْ يُنفِقُونَ"
+        },
+        {
+          "ref": "2:4",
+          "word": 8,
+          "startWord": 6,
+          "endWord": 10,
+          "text": "وَمَآ أُنزِلَ مِن قَبْلِكَ وَبِٱلْـَٔاخِرَةِ"
+        },
+        {
+          "ref": "2:5",
+          "word": 4,
+          "startWord": 2,
+          "endWord": 6,
+          "text": "عَلَىٰ هُدًى مِّن رَّبِّهِمْ وَأُو۟لَـٰٓئِكَ"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "lemmaBw": "{ll~ah",
+      "lemmaAr": "ٱللَّه",
+      "frequency": 2699,
+      "annotatedFrequency": 2699,
+      "rootsBw": [
+        "Alh"
+      ],
+      "pos": [
+        {
+          "tag": "PN",
+          "count": 2699
+        }
+      ],
+      "examples": [
+        {
+          "ref": "1:1",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ"
+        },
+        {
+          "ref": "1:2",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ"
+        },
+        {
+          "ref": "2:7",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "خَتَمَ ٱللَّهُ عَلَىٰ قُلُوبِهِمْ"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "lemmaBw": "maA",
+      "lemmaAr": "مَا",
+      "frequency": 2177,
+      "annotatedFrequency": 2177,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "REL",
+          "count": 1266
+        },
+        {
+          "tag": "NEG",
+          "count": 704
+        },
+        {
+          "tag": "INTG",
+          "count": 92
+        },
+        {
+          "tag": "SUB",
+          "count": 79
+        },
+        {
+          "tag": "COND",
+          "count": 23
+        },
+        {
+          "tag": "SUP",
+          "count": 13
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:4",
+          "word": 3,
+          "startWord": 1,
+          "endWord": 5,
+          "text": "وَٱلَّذِينَ يُؤْمِنُونَ بِمَآ أُنزِلَ إِلَيْكَ"
+        },
+        {
+          "ref": "2:4",
+          "word": 6,
+          "startWord": 4,
+          "endWord": 8,
+          "text": "أُنزِلَ إِلَيْكَ وَمَآ أُنزِلَ مِن"
+        },
+        {
+          "ref": "2:8",
+          "word": 9,
+          "startWord": 7,
+          "endWord": 11,
+          "text": "وَبِٱلْيَوْمِ ٱلْـَٔاخِرِ وَمَا هُم بِمُؤْمِنِينَ"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "lemmaBw": "fiY",
+      "lemmaAr": "فِى",
+      "frequency": 1701,
+      "annotatedFrequency": 1701,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "P",
+          "count": 1675
+        },
+        {
+          "tag": "REL",
+          "count": 24
+        },
+        {
+          "tag": "INTG",
+          "count": 2
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:2",
+          "word": 5,
+          "startWord": 3,
+          "endWord": 7,
+          "text": "لَا رَيْبَ فِيهِ هُدًى لِّلْمُتَّقِينَ"
+        },
+        {
+          "ref": "2:10",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "فِى قُلُوبِهِم مَّرَضٌ"
+        },
+        {
+          "ref": "2:11",
+          "word": 6,
+          "startWord": 4,
+          "endWord": 8,
+          "text": "لَا تُفْسِدُوا۟ فِى ٱلْأَرْضِ قَالُوٓا۟"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "lemmaBw": "laA",
+      "lemmaAr": "لَا",
+      "frequency": 1691,
+      "annotatedFrequency": 1691,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "NEG",
+          "count": 1364
+        },
+        {
+          "tag": "PRO",
+          "count": 327
+        }
+      ],
+      "examples": [
+        {
+          "ref": "1:7",
+          "word": 8,
+          "startWord": 6,
+          "endWord": 9,
+          "text": "ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ"
+        },
+        {
+          "ref": "2:2",
+          "word": 3,
+          "startWord": 1,
+          "endWord": 5,
+          "text": "ذَٰلِكَ ٱلْكِتَـٰبُ لَا رَيْبَ فِيهِ"
+        },
+        {
+          "ref": "2:6",
+          "word": 10,
+          "startWord": 8,
+          "endWord": 11,
+          "text": "لَمْ تُنذِرْهُمْ لَا يُؤْمِنُونَ"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "lemmaBw": "<in~",
+      "lemmaAr": "إِنّ",
+      "frequency": 1682,
+      "annotatedFrequency": 1682,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "ACC",
+          "count": 1536
+        },
+        {
+          "tag": "PREV",
+          "count": 143
+        },
+        {
+          "tag": "REL",
+          "count": 3
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:6",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "إِنَّ ٱلَّذِينَ كَفَرُوا۟"
+        },
+        {
+          "ref": "2:11",
+          "word": 9,
+          "startWord": 7,
+          "endWord": 11,
+          "text": "ٱلْأَرْضِ قَالُوٓا۟ إِنَّمَا نَحْنُ مُصْلِحُونَ"
+        },
+        {
+          "ref": "2:12",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "أَلَآ إِنَّهُمْ هُمُ ٱلْمُفْسِدُونَ"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "lemmaBw": "qaAla",
+      "lemmaAr": "قَالَ",
+      "frequency": 1618,
+      "annotatedFrequency": 1618,
+      "rootsBw": [
+        "qwl"
+      ],
+      "pos": [
+        {
+          "tag": "V",
+          "count": 1618
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:8",
+          "word": 4,
+          "startWord": 2,
+          "endWord": 6,
+          "text": "ٱلنَّاسِ مَن يَقُولُ ءَامَنَّا بِٱللَّهِ"
+        },
+        {
+          "ref": "2:11",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "وَإِذَا قِيلَ لَهُمْ لَا"
+        },
+        {
+          "ref": "2:11",
+          "word": 8,
+          "startWord": 6,
+          "endWord": 10,
+          "text": "فِى ٱلْأَرْضِ قَالُوٓا۟ إِنَّمَا نَحْنُ"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "lemmaBw": "{l~a*iY",
+      "lemmaAr": "ٱلَّذِى",
+      "frequency": 1464,
+      "annotatedFrequency": 1464,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "REL",
+          "count": 1442
+        },
+        {
+          "tag": "COND",
+          "count": 22
+        }
+      ],
+      "examples": [
+        {
+          "ref": "1:7",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ"
+        },
+        {
+          "ref": "2:3",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "ٱلَّذِينَ يُؤْمِنُونَ بِٱلْغَيْبِ"
+        },
+        {
+          "ref": "2:4",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "وَٱلَّذِينَ يُؤْمِنُونَ بِمَآ"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "lemmaBw": "EalaY`",
+      "lemmaAr": "عَلَىٰ",
+      "frequency": 1445,
+      "annotatedFrequency": 1445,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "P",
+          "count": 1445
+        }
+      ],
+      "examples": [
+        {
+          "ref": "1:7",
+          "word": 4,
+          "startWord": 2,
+          "endWord": 6,
+          "text": "ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ"
+        },
+        {
+          "ref": "1:7",
+          "word": 7,
+          "startWord": 5,
+          "endWord": 9,
+          "text": "غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ"
+        },
+        {
+          "ref": "2:5",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "أُو۟لَـٰٓئِكَ عَلَىٰ هُدًى مِّن"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "lemmaBw": "kaAna",
+      "lemmaAr": "كَانَ",
+      "frequency": 1358,
+      "annotatedFrequency": 1358,
+      "rootsBw": [
+        "kwn"
+      ],
+      "pos": [
+        {
+          "tag": "V",
+          "count": 1358
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:10",
+          "word": 11,
+          "startWord": 9,
+          "endWord": 12,
+          "text": "أَلِيمٌۢ بِمَا كَانُوا۟ يَكْذِبُونَ"
+        },
+        {
+          "ref": "2:16",
+          "word": 10,
+          "startWord": 8,
+          "endWord": 11,
+          "text": "تِّجَـٰرَتُهُمْ وَمَا كَانُوا۟ مُهْتَدِينَ"
+        },
+        {
+          "ref": "2:23",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "وَإِن كُنتُمْ فِى رَيْبٍ"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "lemmaBw": "rab~",
+      "lemmaAr": "رَبّ",
+      "frequency": 975,
+      "annotatedFrequency": 975,
+      "rootsBw": [
+        "rbb"
+      ],
+      "pos": [
+        {
+          "tag": "N",
+          "count": 975
+        }
+      ],
+      "examples": [
+        {
+          "ref": "1:2",
+          "word": 3,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ"
+        },
+        {
+          "ref": "2:5",
+          "word": 5,
+          "startWord": 3,
+          "endWord": 7,
+          "text": "هُدًى مِّن رَّبِّهِمْ وَأُو۟لَـٰٓئِكَ هُمُ"
+        },
+        {
+          "ref": "2:21",
+          "word": 4,
+          "startWord": 2,
+          "endWord": 6,
+          "text": "ٱلنَّاسُ ٱعْبُدُوا۟ رَبَّكُمُ ٱلَّذِى خَلَقَكُمْ"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "lemmaBw": "man",
+      "lemmaAr": "مَن",
+      "frequency": 824,
+      "annotatedFrequency": 824,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "REL",
+          "count": 606
+        },
+        {
+          "tag": "COND",
+          "count": 184
+        },
+        {
+          "tag": "INTG",
+          "count": 34
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:8",
+          "word": 3,
+          "startWord": 1,
+          "endWord": 5,
+          "text": "وَمِنَ ٱلنَّاسِ مَن يَقُولُ ءَامَنَّا"
+        },
+        {
+          "ref": "2:30",
+          "word": 13,
+          "startWord": 11,
+          "endWord": 15,
+          "text": "أَتَجْعَلُ فِيهَا مَن يُفْسِدُ فِيهَا"
+        },
+        {
+          "ref": "2:38",
+          "word": 9,
+          "startWord": 7,
+          "endWord": 11,
+          "text": "مِّنِّى هُدًى فَمَن تَبِعَ هُدَاىَ"
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "lemmaBw": "<ilaY`",
+      "lemmaAr": "إِلَىٰ",
+      "frequency": 742,
+      "annotatedFrequency": 742,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "P",
+          "count": 742
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:4",
+          "word": 5,
+          "startWord": 3,
+          "endWord": 7,
+          "text": "بِمَآ أُنزِلَ إِلَيْكَ وَمَآ أُنزِلَ"
+        },
+        {
+          "ref": "2:14",
+          "word": 9,
+          "startWord": 7,
+          "endWord": 11,
+          "text": "وَإِذَا خَلَوْا۟ إِلَىٰ شَيَـٰطِينِهِمْ قَالُوٓا۟"
+        },
+        {
+          "ref": "2:28",
+          "word": 12,
+          "startWord": 10,
+          "endWord": 13,
+          "text": "يُحْيِيكُمْ ثُمَّ إِلَيْهِ تُرْجَعُونَ"
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "lemmaBw": "<in",
+      "lemmaAr": "إِن",
+      "frequency": 697,
+      "annotatedFrequency": 697,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "COND",
+          "count": 571
+        },
+        {
+          "tag": "NEG",
+          "count": 115
+        },
+        {
+          "tag": "SUP",
+          "count": 6
+        },
+        {
+          "tag": "CERT",
+          "count": 5
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:23",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "وَإِن كُنتُمْ فِى"
+        },
+        {
+          "ref": "2:23",
+          "word": 18,
+          "startWord": 16,
+          "endWord": 20,
+          "text": "دُونِ ٱللَّهِ إِن كُنتُمْ صَـٰدِقِينَ"
+        },
+        {
+          "ref": "2:24",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "فَإِن لَّمْ تَفْعَلُوا۟"
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "lemmaBw": "<il~aA",
+      "lemmaAr": "إِلَّا",
+      "frequency": 663,
+      "annotatedFrequency": 663,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "RES",
+          "count": 558
+        },
+        {
+          "tag": "EXP",
+          "count": 102
+        },
+        {
+          "tag": "CERT",
+          "count": 3
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:9",
+          "word": 7,
+          "startWord": 5,
+          "endWord": 9,
+          "text": "وَمَا يَخْدَعُونَ إِلَّآ أَنفُسَهُمْ وَمَا"
+        },
+        {
+          "ref": "2:26",
+          "word": 38,
+          "startWord": 36,
+          "endWord": 39,
+          "text": "يُضِلُّ بِهِۦٓ إِلَّا ٱلْفَـٰسِقِينَ"
+        },
+        {
+          "ref": "2:32",
+          "word": 6,
+          "startWord": 4,
+          "endWord": 8,
+          "text": "عِلْمَ لَنَآ إِلَّا مَا عَلَّمْتَنَآ"
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "lemmaBw": ">an",
+      "lemmaAr": "أَن",
+      "frequency": 625,
+      "annotatedFrequency": 625,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "SUB",
+          "count": 535
+        },
+        {
+          "tag": "INT",
+          "count": 42
+        },
+        {
+          "tag": "NEG",
+          "count": 42
+        },
+        {
+          "tag": "PRO",
+          "count": 5
+        },
+        {
+          "tag": "COND",
+          "count": 1
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:26",
+          "word": 5,
+          "startWord": 3,
+          "endWord": 7,
+          "text": "لَا يَسْتَحْىِۦٓ أَن يَضْرِبَ مَثَلًا"
+        },
+        {
+          "ref": "2:27",
+          "word": 13,
+          "startWord": 11,
+          "endWord": 15,
+          "text": "ٱللَّهُ بِهِۦٓ أَن يُوصَلَ وَيُفْسِدُونَ"
+        },
+        {
+          "ref": "2:67",
+          "word": 8,
+          "startWord": 6,
+          "endWord": 10,
+          "text": "ٱللَّهَ يَأْمُرُكُمْ أَن تَذْبَحُوا۟ بَقَرَةً"
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "lemmaBw": "'aAmana",
+      "lemmaAr": "ءَامَنَ",
+      "frequency": 537,
+      "annotatedFrequency": 537,
+      "rootsBw": [
+        "Amn"
+      ],
+      "pos": [
+        {
+          "tag": "V",
+          "count": 537
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:3",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "ٱلَّذِينَ يُؤْمِنُونَ بِٱلْغَيْبِ وَيُقِيمُونَ"
+        },
+        {
+          "ref": "2:4",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "وَٱلَّذِينَ يُؤْمِنُونَ بِمَآ أُنزِلَ"
+        },
+        {
+          "ref": "2:6",
+          "word": 11,
+          "startWord": 9,
+          "endWord": 11,
+          "text": "تُنذِرْهُمْ لَا يُؤْمِنُونَ"
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "lemmaBw": "*a`lik",
+      "lemmaAr": "ذَٰلِك",
+      "frequency": 520,
+      "annotatedFrequency": 520,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "DEM",
+          "count": 520
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:2",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "ذَٰلِكَ ٱلْكِتَـٰبُ لَا"
+        },
+        {
+          "ref": "2:49",
+          "word": 14,
+          "startWord": 12,
+          "endWord": 16,
+          "text": "نِسَآءَكُمْ وَفِى ذَٰلِكُم بَلَآءٌ مِّن"
+        },
+        {
+          "ref": "2:52",
+          "word": 6,
+          "startWord": 4,
+          "endWord": 8,
+          "text": "مِّنۢ بَعْدِ ذَٰلِكَ لَعَلَّكُمْ تَشْكُرُونَ"
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "lemmaBw": "Ean",
+      "lemmaAr": "عَن",
+      "frequency": 465,
+      "annotatedFrequency": 465,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "P",
+          "count": 417
+        },
+        {
+          "tag": "REL",
+          "count": 46
+        },
+        {
+          "tag": "INTG",
+          "count": 1
+        },
+        {
+          "tag": "SUB",
+          "count": 1
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:36",
+          "word": 3,
+          "startWord": 1,
+          "endWord": 5,
+          "text": "فَأَزَلَّهُمَا ٱلشَّيْطَـٰنُ عَنْهَا فَأَخْرَجَهُمَا مِمَّا"
+        },
+        {
+          "ref": "2:48",
+          "word": 6,
+          "startWord": 4,
+          "endWord": 8,
+          "text": "تَجْزِى نَفْسٌ عَن نَّفْسٍ شَيْـًٔا"
+        },
+        {
+          "ref": "2:52",
+          "word": 3,
+          "startWord": 1,
+          "endWord": 5,
+          "text": "ثُمَّ عَفَوْنَا عَنكُم مِّنۢ بَعْدِ"
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "lemmaBw": ">aroD",
+      "lemmaAr": "أَرْض",
+      "frequency": 461,
+      "annotatedFrequency": 461,
+      "rootsBw": [
+        "ArD"
+      ],
+      "pos": [
+        {
+          "tag": "N",
+          "count": 461
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:11",
+          "word": 7,
+          "startWord": 5,
+          "endWord": 9,
+          "text": "تُفْسِدُوا۟ فِى ٱلْأَرْضِ قَالُوٓا۟ إِنَّمَا"
+        },
+        {
+          "ref": "2:22",
+          "word": 4,
+          "startWord": 2,
+          "endWord": 6,
+          "text": "جَعَلَ لَكُمُ ٱلْأَرْضَ فِرَٰشًا وَٱلسَّمَآءَ"
+        },
+        {
+          "ref": "2:27",
+          "word": 17,
+          "startWord": 15,
+          "endWord": 19,
+          "text": "وَيُفْسِدُونَ فِى ٱلْأَرْضِ أُو۟لَـٰٓئِكَ هُمُ"
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "lemmaBw": "<i*aA",
+      "lemmaAr": "إِذَا",
+      "frequency": 409,
+      "annotatedFrequency": 409,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "T",
+          "count": 405
+        },
+        {
+          "tag": "SUR",
+          "count": 3
+        },
+        {
+          "tag": "COND",
+          "count": 1
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:11",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "وَإِذَا قِيلَ لَهُمْ"
+        },
+        {
+          "ref": "2:13",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "وَإِذَا قِيلَ لَهُمْ"
+        },
+        {
+          "ref": "2:14",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "وَإِذَا لَقُوا۟ ٱلَّذِينَ"
+        }
+      ]
+    },
+    {
+      "rank": 22,
+      "lemmaBw": "qad",
+      "lemmaAr": "قَد",
+      "frequency": 406,
+      "annotatedFrequency": 406,
+      "rootsBw": [],
+      "pos": [
+        {
+          "tag": "CERT",
+          "count": 406
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:60",
+          "word": 14,
+          "startWord": 12,
+          "endWord": 16,
+          "text": "عَشْرَةَ عَيْنًا قَدْ عَلِمَ كُلُّ"
+        },
+        {
+          "ref": "2:65",
+          "word": 1,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "وَلَقَدْ عَلِمْتُمُ ٱلَّذِينَ"
+        },
+        {
+          "ref": "2:75",
+          "word": 5,
+          "startWord": 3,
+          "endWord": 7,
+          "text": "يُؤْمِنُوا۟ لَكُمْ وَقَدْ كَانَ فَرِيقٌ"
+        }
+      ]
+    },
+    {
+      "rank": 23,
+      "lemmaBw": "yawom",
+      "lemmaAr": "يَوْم",
+      "frequency": 405,
+      "annotatedFrequency": 405,
+      "rootsBw": [
+        "ywm"
+      ],
+      "pos": [
+        {
+          "tag": "N",
+          "count": 325
+        },
+        {
+          "tag": "T",
+          "count": 80
+        }
+      ],
+      "examples": [
+        {
+          "ref": "1:4",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 3,
+          "text": "مَـٰلِكِ يَوْمِ ٱلدِّينِ"
+        },
+        {
+          "ref": "2:8",
+          "word": 7,
+          "startWord": 5,
+          "endWord": 9,
+          "text": "ءَامَنَّا بِٱللَّهِ وَبِٱلْيَوْمِ ٱلْـَٔاخِرِ وَمَا"
+        },
+        {
+          "ref": "2:48",
+          "word": 2,
+          "startWord": 1,
+          "endWord": 4,
+          "text": "وَٱتَّقُوا۟ يَوْمًا لَّا تَجْزِى"
+        }
+      ]
+    },
+    {
+      "rank": 24,
+      "lemmaBw": "qawom",
+      "lemmaAr": "قَوْم",
+      "frequency": 383,
+      "annotatedFrequency": 383,
+      "rootsBw": [
+        "qwm"
+      ],
+      "pos": [
+        {
+          "tag": "N",
+          "count": 383
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:54",
+          "word": 4,
+          "startWord": 2,
+          "endWord": 6,
+          "text": "قَالَ مُوسَىٰ لِقَوْمِهِۦ يَـٰقَوْمِ إِنَّكُمْ"
+        },
+        {
+          "ref": "2:54",
+          "word": 5,
+          "startWord": 3,
+          "endWord": 7,
+          "text": "مُوسَىٰ لِقَوْمِهِۦ يَـٰقَوْمِ إِنَّكُمْ ظَلَمْتُمْ"
+        },
+        {
+          "ref": "2:60",
+          "word": 4,
+          "startWord": 2,
+          "endWord": 6,
+          "text": "ٱسْتَسْقَىٰ مُوسَىٰ لِقَوْمِهِۦ فَقُلْنَا ٱضْرِب"
+        }
+      ]
+    },
+    {
+      "rank": 25,
+      "lemmaBw": "'aAyap",
+      "lemmaAr": "ءَايَة",
+      "frequency": 382,
+      "annotatedFrequency": 382,
+      "rootsBw": [
+        "Ayy"
+      ],
+      "pos": [
+        {
+          "tag": "N",
+          "count": 382
+        }
+      ],
+      "examples": [
+        {
+          "ref": "2:39",
+          "word": 4,
+          "startWord": 2,
+          "endWord": 6,
+          "text": "كَفَرُوا۟ وَكَذَّبُوا۟ بِـَٔايَـٰتِنَآ أُو۟لَـٰٓئِكَ أَصْحَـٰبُ"
+        },
+        {
+          "ref": "2:41",
+          "word": 14,
+          "startWord": 12,
+          "endWord": 16,
+          "text": "وَلَا تَشْتَرُوا۟ بِـَٔايَـٰتِى ثَمَنًا قَلِيلًا"
+        },
+        {
+          "ref": "2:61",
+          "word": 49,
+          "startWord": 47,
+          "endWord": 51,
+          "text": "كَانُوا۟ يَكْفُرُونَ بِـَٔايَـٰتِ ٱللَّهِ وَيَقْتُلُونَ"
+        }
+      ]
+    }
+  ],
+  "researchReference": {
+    "publishedPairs": 10,
+    "requestedTopCount": 25,
+    "note": "01-ARASTIRMA §1 yalnız 10 somut lemma/frekans çifti yayımlar; kalan 15 için karşılaştırma uydurulmadı.",
+    "comparison": [
+      {
+        "lemmaBw": "min",
+        "expected": 3226,
+        "observed": 3226,
+        "delta": 0,
+        "matches": true
+      },
+      {
+        "lemmaBw": "{ll~ah",
+        "expected": 2699,
+        "observed": 2699,
+        "delta": 0,
+        "matches": true
+      },
+      {
+        "lemmaBw": "fiY",
+        "expected": 1701,
+        "observed": 1701,
+        "delta": 0,
+        "matches": true
+      },
+      {
+        "lemmaBw": "<in~",
+        "expected": 1682,
+        "observed": 1682,
+        "delta": 0,
+        "matches": true
+      },
+      {
+        "lemmaBw": "EalaY`",
+        "expected": 1445,
+        "observed": 1445,
+        "delta": 0,
+        "matches": true
+      },
+      {
+        "lemmaBw": "{l~a*iY",
+        "expected": 1442,
+        "observed": 1464,
+        "delta": 22,
+        "matches": false
+      },
+      {
+        "lemmaBw": "laA",
+        "expected": 1364,
+        "observed": 1691,
+        "delta": 327,
+        "matches": false
+      },
+      {
+        "lemmaBw": "maA",
+        "expected": 1266,
+        "observed": 2177,
+        "delta": 911,
+        "matches": false
+      },
+      {
+        "lemmaBw": "rab~",
+        "expected": 975,
+        "observed": 975,
+        "delta": 0,
+        "matches": true
+      },
+      {
+        "lemmaBw": "<ilaY`",
+        "expected": 742,
+        "observed": 742,
+        "delta": 0,
+        "matches": true
+      }
+    ]
+  }
+}

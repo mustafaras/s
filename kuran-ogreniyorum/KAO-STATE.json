@@ -317,7 +317,7 @@
         "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
       ],
       "checks": [
-        "her kavramda ≥3 alıştırma şablonu; g0_5 mevcut; insan onayı alanları dolu"
+        "her kavramda ≥3 alıştırma şablonu; g0_5 mevcut; onay alanları dolu (06 §3, D-12)"
       ],
       "req": [
         "R-A7",
@@ -1344,7 +1344,7 @@
   ],
   "referenceLayer": {
     "addedAt": "2026-09-23",
-    "purpose": "İnsan doğrulayıcının REFERANSI (06 §2: \"Türkçe mealler kopyalanmaz, yalnız insan doğrulayıcının referansı\"). Üretim paketine GİRMEZ.",
+    "purpose": "Doğrulayıcının REFERANSI (06 §2: \"Türkçe mealler kopyalanmaz, yalnız doğrulayıcının referansı\"). Üretim paketine GİRMEZ.",
     "provider": "quran.com (Quran.com API v4)",
     "endpoint": "api.quran.com/api/v4/verses/by_chapter/<n>?words=true&language=tr&word_fields=text_uthmani&per_page=all",
     "language": "turkish",

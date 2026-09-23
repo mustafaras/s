@@ -52,4 +52,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:pending · R-A8:pending · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 32 | 2026-09-23 | KAO-03 içerik düzeltmesi: 524 kalıp sabit sözlüğe; kognat denetimi 453→385 (farklı kök/parantez/bilinmeyen biçim çıkarıldı), 113 kayma; tefsire kayan 4 örnek ve 2 tr1 düzeltildi. Kovalar A=22 B=346 C=93 D=63. | `--import-md`: verified=524 consistency=0 copiedFromReference=0; gidiş-dönüş alan farkı 0; `evidence/KAO-03/EVIDENCE.json#correction` |
+| 33 | 2026-09-23 | D-12 artığı: STATE'te KAO-04 kontrol metni ve referans katmanı açıklamasındaki "insan onayı/doğrulayıcı" ifadeleri D-12'ye hizalandı (UYGULAMA-PROMPTLARI ile birebir). | `KAO-STATE.json`; kao-plan-check PASS |

@@ -90,17 +90,18 @@ function parseMorphology(source) {
     const key = `${surah}:${ayah}:${wordIndex}`;
     const word = words.get(key) || {
       key, surah, ayah, wordIndex, segments: [], lemmaBw: null,
-      rootBw: null, pos: null
+      rootBw: null, pos: null, fallbackPos: null
     };
 
     word.segments.push({ segmentIndex, form, tag, features });
     const lemma = feature(features, 'LEM');
     const root = feature(features, 'ROOT');
     const pos = feature(features, 'POS');
+    const isStem = features.split('|').includes('STEM');
     if (!word.lemmaBw && lemma) word.lemmaBw = lemma;
     if (!word.rootBw && root) word.rootBw = root;
-    if (!word.pos && features.split('|').includes('STEM')) word.pos = pos || tag;
-    if (!word.pos) word.pos = pos || tag;
+    if (isStem) word.pos = pos || tag;
+    else if (!word.fallbackPos) word.fallbackPos = pos || tag;
     words.set(key, word);
     dataLineCount += 1;
   }
@@ -112,21 +113,81 @@ function parseMorphology(source) {
     word.segments.sort((left, right) => left.segmentIndex - right.segmentIndex);
     word.formBw = word.segments.map((segment) => segment.form).join('');
     word.lemmaSource = word.lemmaBw ? 'LEM' : 'FORM_FALLBACK';
-    if (!word.lemmaBw) word.lemmaBw = word.formBw;
+    if (!word.pos) word.pos = word.fallbackPos || 'UNKNOWN';
+    delete word.fallbackPos;
   }
 
   if (!orderedWords.length) throw new Error('QAC girdisinde morfoloji satırı bulunamadı');
   return { words: orderedWords, dataLineCount };
 }
 
-function parseUthmani(source, verseRefs) {
+function normalizeArabic(value) {
+  return String(value || '').normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .replace(/\s+/gu, '')
+    .replace(/ـ/gu, '')
+    .replace(/[ٱأإآ]/gu, 'ا')
+    .replace(/ى/gu, 'ي');
+}
+
+function parseUthmani(source, qacWords) {
   const lines = source.split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line && !line.startsWith('#'));
+  const wordsByVerse = new Map();
+  for (const word of qacWords) {
+    const ref = `${word.surah}:${word.ayah}`;
+    if (!wordsByVerse.has(ref)) wordsByVerse.set(ref, []);
+    wordsByVerse.get(ref).push(word);
+  }
+  const verseRefs = [...wordsByVerse.keys()];
   if (lines.length !== verseRefs.length) {
     throw new Error(`Tanzil satır sayısı (${lines.length}) QAC âyet sayısıyla (${verseRefs.length}) eşleşmiyor`);
   }
-  return new Map(verseRefs.map((reference, index) => [reference, lines[index].split(/\s+/)]));
+  const diagnostics = {
+    ignoredStandaloneMarkTotal: 0,
+    removedBasmalaTokenTotal: 0,
+    mergedTanzilTokenTotal: 0,
+    alignedVerseTotal: 0
+  };
+  const byVerse = new Map();
+
+  for (const [index, reference] of verseRefs.entries()) {
+    const qacVerseWords = wordsByVerse.get(reference);
+    let tokens = lines[index].split(/\s+/).filter((token) => {
+      const isWord = /\p{L}/u.test(token);
+      if (!isWord) diagnostics.ignoredStandaloneMarkTotal += 1;
+      return isWord;
+    });
+    const firstWord = qacVerseWords[0];
+    if (firstWord.ayah === 1 && firstWord.surah !== 1 && firstWord.surah !== 9
+      && tokens.length >= qacVerseWords.length + 4) {
+      tokens = tokens.slice(4);
+      diagnostics.removedBasmalaTokenTotal += 4;
+    }
+
+    while (tokens.length > qacVerseWords.length) {
+      let mergeIndex = -1;
+      for (let candidate = 0; candidate < qacVerseWords.length && candidate + 1 < tokens.length; candidate += 1) {
+        const combined = normalizeArabic(tokens[candidate] + tokens[candidate + 1]);
+        const qacForm = normalizeArabic(bwToArabic(qacVerseWords[candidate].formBw));
+        if (combined === qacForm) {
+          mergeIndex = candidate;
+          break;
+        }
+      }
+      if (mergeIndex === -1) break;
+      tokens.splice(mergeIndex, 2, `${tokens[mergeIndex]} ${tokens[mergeIndex + 1]}`);
+      diagnostics.mergedTanzilTokenTotal += 1;
+    }
+
+    if (tokens.length !== qacVerseWords.length) {
+      throw new Error(`Tanzil/QAC kelime hizası bozuk ${reference}: Tanzil ${tokens.length}, QAC ${qacVerseWords.length}`);
+    }
+    byVerse.set(reference, tokens);
+    diagnostics.alignedVerseTotal += 1;
+  }
+  return { byVerse, diagnostics };
 }
 
 function exampleWindow(word, uthmaniByVerse) {
@@ -153,7 +214,7 @@ function exampleWindow(word, uthmaniByVerse) {
 function buildStats(morphologySource, uthmaniSource, sourceHashes, generatedBy = 'local-inputs') {
   const parsed = parseMorphology(morphologySource);
   const verseRefs = [...new Set(parsed.words.map((word) => `${word.surah}:${word.ayah}`))];
-  const uthmaniByVerse = parseUthmani(uthmaniSource, verseRefs);
+  const uthmani = parseUthmani(uthmaniSource, parsed.words);
   const lemmas = new Map();
   const roots = new Set();
   let annotatedTokenTotal = 0;
@@ -161,6 +222,7 @@ function buildStats(morphologySource, uthmaniSource, sourceHashes, generatedBy =
   for (const word of parsed.words) {
     if (word.lemmaSource === 'LEM') annotatedTokenTotal += 1;
     if (word.rootBw) roots.add(word.rootBw);
+    if (word.lemmaSource !== 'LEM') continue;
     const lemma = lemmas.get(word.lemmaBw) || {
       lemmaBw: word.lemmaBw,
       lemmaAr: bwToArabic(word.lemmaBw),
@@ -171,11 +233,11 @@ function buildStats(morphologySource, uthmaniSource, sourceHashes, generatedBy =
       examples: []
     };
     lemma.frequency += 1;
-    if (word.lemmaSource === 'LEM') lemma.annotatedFrequency += 1;
+    lemma.annotatedFrequency += 1;
     if (word.rootBw) lemma.roots.add(word.rootBw);
     lemma.pos.set(word.pos || 'UNKNOWN', (lemma.pos.get(word.pos || 'UNKNOWN') || 0) + 1);
     if (lemma.examples.length < 3) {
-      const example = exampleWindow(word, uthmaniByVerse);
+      const example = exampleWindow(word, uthmani.byVerse);
       if (example) lemma.examples.push(example);
     }
     lemmas.set(word.lemmaBw, lemma);
@@ -217,6 +279,7 @@ function buildStats(morphologySource, uthmaniSource, sourceHashes, generatedBy =
     lemmaCount: lemmas.size,
     rootCount: roots.size,
     verseCount: verseRefs.length,
+    alignment: uthmani.diagnostics,
     topLemmas,
     researchReference: {
       publishedPairs: RESEARCH_REFERENCE.length,
@@ -270,12 +333,36 @@ function selfTest() {
   assert(bwToArabic('bsm') === [BUCKWALTER_TO_ARABIC.b, BUCKWALTER_TO_ARABIC.s, BUCKWALTER_TO_ARABIC.m].join(''),
     'Buckwalter dönüşümü tablo üzerinden çalışmalı');
 
+  const regressionMorphology = [
+    'LOCATION\tFORM\tTAG\tFEATURES',
+    '(2:1:1:1)\tbi\tP\tPREFIX|bi+',
+    '(2:1:1:2)\tsomi\tN\tSTEM|POS:N|LEM:{som|ROOT:smw|M|GEN',
+    '(2:1:2:1)\trab~i\tN\tSTEM|POS:N|LEM:rab~|ROOT:rbb|M|GEN',
+    '(2:1:3:1)\tkitAbi\tN\tSTEM|POS:N|LEM:kitaAb|ROOT:ktb|M|GEN',
+    '(2:1:4:1)\tbaEoda maA\tP\tSTEM|POS:P|LEM:baEodamaA',
+    '(2:1:5:1)\txayor\tN\tSTEM|POS:N|ROOT:xyr|M|GEN'
+  ].join('\n');
+  const basmala = ['bi', 'somi', '{ll~ahi', '{lraHiymi'].map(bwToArabic);
+  const regressionUthmani = [...basmala, bwToArabic('bisomi'), bwToArabic('rab~i'),
+    BUCKWALTER_TO_ARABIC[';'], bwToArabic('kitAbi'), bwToArabic('baEoda'), bwToArabic('maA'),
+    bwToArabic('xayor')].join(' ');
+  const regressionParsed = parseMorphology(regressionMorphology);
+  const regressionStats = buildStats(regressionMorphology, regressionUthmani, {}, 'embedded-regression');
+  assert(regressionParsed.words[0].pos === 'N', 'prefix POS yerine STEM POS seçilmeli');
+  assert(regressionStats.lemmaCount === 4, 'LEM içermeyen yüzey biçimi lemma sayılmamalı');
+  assert(regressionStats.fallbackTokenTotal === 1, 'LEM içermeyen token ayrı paydada sayılmalı');
+  assert(regressionStats.alignment.removedBasmalaTokenTotal === 4, 'ekli besmele QAC indeksinden çıkarılmalı');
+  assert(regressionStats.alignment.ignoredStandaloneMarkTotal === 1, 'bağımsız vakıf işareti kelime sayılmamalı');
+  assert(regressionStats.alignment.mergedTanzilTokenTotal === 1, 'Tanzil 1.1 bölünmüş kelimesi QAC konumuna birleşmeli');
+  assert(regressionStats.topLemmas.every((lemma) => lemma.pos.every((entry) => entry.tag !== 'P')
+    || lemma.lemmaBw === 'baEodamaA'), 'prefix etiketi lemma POS dağılımına sızmamalı');
+
   const source = fs.readFileSync(fileURLToPath(import.meta.url), 'utf8');
   assert(!/\bfetch\s*\(/.test(source), 'fetch çağrısı bulunmamalı');
   assert(!/from\s+['"](?:node:)?https?['"]/.test(source), 'http/https importu bulunmamalı');
   const xhrName = ['XML', 'HttpRequest'].join('');
   assert(!source.includes(xhrName), `${xhrName} bulunmamalı`);
-  console.log('KAO lexicon self-test: PASS (50 satır, 50 token, 5 lemma, 5 kök, ağ yok)');
+  console.log('KAO lexicon self-test: PASS (50 satır, çok-segment STEM POS, lemma paydası, besmele/vakıf/split hizası, ağ yok)');
 }
 
 function missingInputs(inputDir) {

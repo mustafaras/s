@@ -36,6 +36,56 @@
       "note": "çıktı yok"
     }
   ],
+  "repairs": [
+    {
+      "date": "2026-09-23",
+      "baseHead": "544d245ecf75dd84e827f58c67372a5596ea7962",
+      "diffHash": "508dad720d3f4039017452a58c7c06485d689916c56700ba8f6c1b6cee0b9a5f",
+      "reason": "tam-korpus denetiminde STEM POS, LEM fallback ve Tanzil-QAC kelime hizalama kusurları",
+      "checks": [
+        {
+          "cmd": "node tools/kao-lexicon-build.mjs --self-test (regresyon eklenmeden sonraki kırmızı koşu)",
+          "exit": 1,
+          "note": "beklenen RED: prefix POS yerine STEM POS seçilmeli"
+        },
+        {
+          "cmd": "node --check tools/kao-lexicon-build.mjs",
+          "exit": 0,
+          "note": "syntax PASS"
+        },
+        {
+          "cmd": "node tools/kao-lexicon-build.mjs --self-test",
+          "exit": 0,
+          "note": "çok-segment STEM POS, LEM paydası, besmele, bağımsız vakıf işareti ve split-token hizası PASS"
+        },
+        {
+          "cmd": "buildStats(QAC v0.4, Tanzil v1.0.2 tam korpus; salt-okur geçici girdiler)",
+          "exit": 0,
+          "note": "77.429 token, 128.219 segment, 4.832 lemma, 6.236/6.236 âyet hizalı; standalone=4.578, basmala=448 token, merge=1"
+        },
+        {
+          "cmd": "buildStats(QAC v0.4, Tanzil v1.1 metin varyantı tam korpus; salt-okur geçici girdiler)",
+          "exit": 0,
+          "note": "77.429 token, 4.832 lemma, 6.236/6.236 âyet hizalı; split merge=4"
+        },
+        {
+          "cmd": "node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs",
+          "exit": 2,
+          "note": "beklenen eksik-girdi kabul dalı"
+        },
+        {
+          "cmd": "node tools/kao-lexicon-build.mjs --inputs <geçici hash-uyuşmazlığı dizini>",
+          "exit": 3,
+          "note": "Tanzil hash mismatch fail-closed PASS"
+        },
+        {
+          "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+          "exit": 0,
+          "note": "PASS (0 warn)"
+        }
+      ]
+    }
+  ],
   "requirements": {
     "note": "KAO-01 bağlayıcı R-id kapatmaz"
   },
@@ -54,6 +104,7 @@
     "Plan 77.430 token hedefler; QAC v0.4 resmî sürüm notu 77.429 kelime bildirir. Araç bu değerleri ayrı alanlarda tutar ve farkı gizlemez.",
     "01-ARASTIRMA §1 ilk 25 ifadesine rağmen yalnız 10 somut lemma/frekans çifti verir; araç kalan 15 referansı uydurmaz.",
     "D-01 ve D-02 lisans/atıf kararları açık kalır; bu kart verified üretim içeriği üretmez.",
+    "Tam-korpus hizalama denetimi salt-okur geçici aynalarla yapıldı; repo içine ham korpus veya gerçek stats.json yazılmadı. Sabitlenmiş resmî Tanzil 1.1 dosyası yerelde olmadığından CLI'nin hash kapısı exit 2/3 dallarıyla doğrulandı.",
     "head kanıt hazırlanırken geçerli başlangıç commitidir; diffHash kanıt dosyaları eklenmeden önceki staged KAO-01 farkıdır, çünkü aynı commit kendi nihai hashini içeremez."
   ]
 }

@@ -34,6 +34,11 @@ node tools/kao-lexicon-build.mjs \
 Çıktı yalnız `kuran-ogreniyorum/evidence/KAO-01/stats.json` olur. İçerdiği
 başlıca alanlar: gerçek token/lemma/kök/âyet sayıları, ilk 25 lemma, kök/POS
 dağılımı ve Tanzil metninden değişmeden kesilmiş 3–7 kelimelik örnekler.
+`alignment` makbuzu; bağımsız vakıf işaretlerini, sûre başındaki ekli besmele
+tokenlarını ve Tanzil sürümünde bölünmüş fakat QAC'de tek konum olan kelimeleri
+ayrı sayaçlarla raporlar. Her âyet QAC kelime sayısına fail-closed hizalanmadan
+istatistik dosyası yazılmaz. `LEM` taşımayan tokenlar `fallbackTokenTotal`
+paydasında kalır; yüzey biçimi yeni bir lemma gibi sayılmaz.
 
 Çıkış kodları:
 

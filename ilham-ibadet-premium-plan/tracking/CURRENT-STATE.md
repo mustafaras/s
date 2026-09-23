@@ -2,7 +2,7 @@
 
 Kaynak: `IIP-STATE.json`. Elle düzenleme; `node ilham-ibadet-premium-plan/tools/plan-check.mjs --render`.
 
-Plan v2.1 · in_progress · Uygulama 24/24.
+Plan v2.1 · done · Uygulama 24/24.
 
 Yetki: **approved** · Çalıştırılabilir sıradaki: **yok** · Önerilen ilk: IIP-01.
 

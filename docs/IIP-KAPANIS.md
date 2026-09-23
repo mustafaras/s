@@ -123,6 +123,85 @@ verilirse araç hazır.
 
 ---
 
+## 8. Son kontrol ve kapanış notu (2026-09-23)
+
+Kullanıcı isteğiyle son bir kontrol yapıldı: **uygulanmamış iş kalmadığı
+doğrulandı** ve iki bayat durum alanı düzeltildi.
+
+### Uygulanmayan iş: YOK — ölçülmüş kanıt
+
+| Kontrol | Sonuç |
+|---|---|
+| `done` olmayan kart | **0** (24/24 `done`) |
+| Kilit / `plannedWriteFiles` taşıyan kart (yani süren iş) | **0** |
+| `P00–P17` düzeltme promptları | 18/18 kapandı (122 referans) |
+| Kapanıştan sonra plana eklenen yeni iş | **yok** (son plan commit'i `34c5131`, kapanış kaydı) |
+| `nextExecutableCard` | `null` |
+
+### Düzeltilen bayat alanlar
+
+`IIP-STATE.json` içinde iki alan kapanışta güncellenmemiş kalmıştı:
+
+| Alan | Önce | Sonra |
+|---|---|---|
+| `status` | `in_progress` | **`done`** |
+| `planStatus` | `in_progress` | **`done`** |
+| `updatedAt` | `2026-09-22` | `2026-09-23` |
+
+`planStatus` üretilen görünüme yansıdığı için `tracking/CURRENT-STATE.md`
+yeniden üretildi (`plan-check.mjs --render`). `recommendedFirstCard: "IIP-01"`
+**bilinçli olarak korundu** — `plan-check` onun geçerli bir kart kimliği olmasını
+zorunlu kılar ve program kapanınca "ilk kart" yerine `nextExecutableCard: null`
+anlamlı birincil sinyaldir.
+
+> **Ders:** Kart durumları doğru olsa bile üst düzey `status`/`planStatus`
+> kapanışta elle güncellenmeli. `plan-check` bu iki alanı *doğrulamaz* — bu
+> yüzden sapma sessizce kalır. Kapanış damgası atarken üst düzey durumu da
+> damgala.
+
+### Doğrulama (2026-09-23)
+
+- **156 fixture PASS / 0 FAIL** (app + panel + panel-v2 + quran + reminders)
+- **9 araç kapısı exit 0:** `plan-check` · `plan-check --self-test` ·
+  `plan-check.integration.py` · `evidence-reconcile` · `fixture-map-build` ·
+  `driver.mjs` · `zikr-harness.mjs` · `shell-inventory --gate` ·
+  `run-reminder-smoke`
+
+---
+
+## 9. Klasör neden kökte kalıyor (taşıma reddi — 2026-09-23)
+
+Kullanıcı "yoksa kaldır/taşı" dedi. **Taşıma yapılmadı**; gerekçe ölçülmüş
+bağımlılık, tercih değil.
+
+Ölçüm (2026-09-23):
+
+| Bağımlılık | Sayı / konum |
+|---|---|
+| Kanıt makbuzu `commands[]` içinde plan-check yolu | **20 dizin / 41 dosya** |
+| `tools/evidence-reconcile.mjs` | kök yolu sabit: `ilham-ibadet-premium-plan/evidence` |
+| `tools/fixture-map-build.mjs` | plan yolu + `note` alanı |
+| `tests/FIXTURE-MAP.json` | `note` alanı plan-check'e atıf |
+| `tests/app/test_iip_17.js` | render artifact'ini **plan klasörüne YAZAR** |
+| Kök dokümanlar | `AGENTS.md`(1) · `CLAUDE.md`(1) · `tests/README.md`(5) · `archive/README.md`(2) |
+
+**Kritik ayrım — kardeş programlarla farkı:** `archive/` altındaki MON · MON2 ·
+FX2 klasörlerine `tools/`+`tests/` içinden **yalnız 2'şer referans** var (ad
+gеçişi). IIP'te ise **20 makbuz dizini (41 dosya) canlı bir aracın yolunu
+kaydeder** ve bu yollar `evidence-reconcile.mjs` tarafından **bugün hâlâ yeniden
+koşulur**. Taşıma bu kayıtları "command not found" durumuna düşürür.
+
+Ek olarak `docs/IIP-KAPANIS.md` §7'de kayıtlı taşıma simülasyonu zaten
+yapılmıştı (aynı sonuçlar). Bu bölüm o kararı **ölçümle yeniden doğrular**.
+
+> **Sonuç:** IIP kökte kalır. Arşiv statüsü zaten `status: done` + kapanış
+> belgesi + `archive/README.md`'deki "Kapanmış ama TAŞINMAMIŞ program" bölümüyle
+> ilan edilmiştir. Taşıma ancak 41 makbuzun yolları toplu yeniden yazılıp
+> `evidence-reconcile` yeşil kalırsa gündeme gelebilir — ayrı bir onay ister.
+
+
+---
+
 ## 8. Kapanış sonrası: yayın yüzeyi sızıntısı (2026-09-22)
 
 Program kapandıktan sonra, kapanışı izleyen yayın doğrulaması sırasında

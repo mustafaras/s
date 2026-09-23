@@ -733,6 +733,17 @@ function draftSelfTest() {
   const datedParsed = parseReviewMarkdown(dated, JSON.parse(JSON.stringify(draft.candidates)));
   assert(datedParsed.records.find((r) => r.lemmaId === firstId).verifiedAt === '2026-09-20',
     'tabloda girilen doğrulama tarihi korunmalı (06 §3 iki ayrı gün kuralı)');
+  // 06 §2 bekçisi: referansı birebir kopyalayan tr1 doğrulanmış SAYILMAZ.
+  const refWord = draft.candidates[0].examples[0] && draft.candidates[0].examples[0].referenceWordTr;
+  if (refWord) {
+    const copied = fill(markdown, firstId, { tr1: refWord, verifiedBy: 'insan-1' });
+    const copiedParsed = parseReviewMarkdown(copied, JSON.parse(JSON.stringify(draft.candidates)));
+    const copiedRecord = copiedParsed.records.find((r) => r.lemmaId === firstId);
+    assert(copiedRecord.copiedFromReference === true && copiedRecord.verified === false,
+      'referansı kopyalayan tr1 doğrulanmış sayılmamalı (06 §2)');
+    assert(copiedParsed.copiedFromReferenceTotal === 1,
+      'kopya sayısı raporlanmalı');
+  }
   const onlyBy = fill(markdown, firstId, { verifiedBy: 'insan-1' });
   const byOnly = parseReviewMarkdown(onlyBy, JSON.parse(JSON.stringify(draft.candidates)));
   assert(byOnly.verifiedTotal === 0, 'Türkçe anlam olmadan verifiedBy doğrulamaz');
@@ -1427,6 +1438,7 @@ function parseReviewMarkdown(markdown, existing) {
   }
   let verifiedTotal = 0;
   let unknownTotal = 0;
+  const consistencyCopy = [];
   for (const row of rows) {
     const record = byId.get(row.lemmaId);
     if (!record) { unknownTotal += 1; continue; }
@@ -1439,13 +1451,23 @@ function parseReviewMarkdown(markdown, existing) {
     if (record.examples[0]) record.examples[0].tr = row.ex1_tr;
     record.verifiedBy = row.verifiedBy;
     record.approval = parseApprovalDates(row.verifiedAt);
+    // --- 06 §2 bekçisi: "Türkçe mealler KOPYALANMAZ" ---
+    // `tr1`, referans çevirisiyle birebir aynıysa bu bir kopyadır, doğrulama değil.
+    const refWord = record.examples[0] ? record.examples[0].referenceWordTr : null;
+    const normalize = (v) => String(v || '').trim().toLocaleLowerCase('tr').replace(/\s+/g, ' ');
+    const copiedFromReference = Boolean(row.tr1 && refWord && normalize(row.tr1) === normalize(refWord));
+    record.copiedFromReference = copiedFromReference;
     // Tabloda girilmiş tarih korunur (06 §3: "iki ayrı günde kontrol" kaydı);
     // boşsa bugünün tarihi yazılır.
     record.verifiedAt = row.verifiedBy
       ? (row.verifiedAt || new Date().toISOString().slice(0, 10))
       : null;
-    record.verified = Boolean(row.verifiedBy && record.tr1);
+    record.verified = Boolean(row.verifiedBy && record.tr1) && !copiedFromReference;
     if (record.verified) verifiedTotal += 1;
+    if (copiedFromReference) {
+      consistencyCopy.push({ lemmaId: record.lemmaId, issue: 'copied_from_reference',
+        note: '06 §2: referans kopyalanmaz — kendi ifadeni yaz' });
+    }
     record.bucket = (record.cognateTr && !record.anchorText && !record.tesbihat && !record.isParticle)
       ? 'B' : record.bucket;
   }
@@ -1471,6 +1493,7 @@ function parseReviewMarkdown(markdown, existing) {
       }
     }
   }
+  consistency.push(...consistencyCopy);
   const twoGazeTotal = verifiedRecords.filter((record) => record.approval && record.approval.twoDayOk).length;
   return {
     records: existing,
@@ -1482,7 +1505,8 @@ function parseReviewMarkdown(markdown, existing) {
     consistency,
     consistencyTotal: consistency.length,
     twoGazeTotal,
-    singleDayVerifiedTotal: verifiedRecords.filter((record) => record.approval && record.approval.singleDayOk).length
+    singleDayVerifiedTotal: verifiedRecords.filter((record) => record.approval && record.approval.singleDayOk).length,
+    copiedFromReferenceTotal: consistencyCopy.length
   };
 }
 
@@ -1692,6 +1716,7 @@ function importReview() {
   );
   const rowsTotal = draftFile.lemmas.length - unknownTotal;
   const duplicatedTotal = duplicated.length;
+  const copiedFromReferenceTotal = draftFile.lemmas.filter((r) => r.copiedFromReference).length;
   const output = {
     schemaVersion: 1,
     version: LEXICON_VERSION,
@@ -1701,6 +1726,7 @@ function importReview() {
     unknownTotal,
     rowsTotal,
     duplicatedTotal,
+    copiedFromReferenceTotal,
     lemmas: draftFile.lemmas
   };
   fs.mkdirSync(path.dirname(VERIFIED_PATH), { recursive: true });
@@ -1713,6 +1739,10 @@ function importReview() {
   }
   if (duplicatedTotal) {
     console.log(`UYARI: ${duplicatedTotal} yinelenen lemmaId atlandı: ${duplicated.slice(0, 5).join(', ')}`);
+  }
+  if (copiedFromReferenceTotal) {
+    console.log(`UYARI: ${copiedFromReferenceTotal} satır REFERANSI birebir kopyalamış`
+      + ' → doğrulanmış SAYILMADI (06 §2: "Türkçe mealler kopyalanmaz").');
   }
   if (!verifiedTotal) {
     console.log('NOT: doğrulanmış satır yok; kart waiting_user kalır (06 §3 onay kuralı).');

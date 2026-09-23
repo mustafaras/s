@@ -1276,6 +1276,16 @@
       "fix": "quran.com kelime-kelime Türkçe REFERANS katmanı eklendi (87 kelime, çapa sûreler) ve iki tabloya (review.md + workbook.md) REFERANS sütunu olarak bağlandı. 06 §2 bunu açıkça meşru kılar; kopyalama değil, insan kendi anlamını yazar.",
       "evidence": "lexicon.reference.json (87 kelime, 87 ses); review.md 27 sütun; workbook ref_tr dolu",
       "planCheckVerifiesThis": false
+    },
+    {
+      "id": "GAP-05",
+      "foundAt": "2026-09-23",
+      "foundBy": "agent (kalite denetimi)",
+      "where": "transliterate() Türkçe okunuş katmanı",
+      "issue": "Şeddeli glide yanlış okunuyordu: إِيَّا → \"îîâ\" (uzun ünlü) — doğrusu \"iyyâ\" (çift ünsüz). Aynı aile: قُوَّة → \"kûve\" yerine \"kuvve\".",
+      "fix": "GLIDE_CONSONANT_NEXT kümesine `~` (şedde) eklendi; şeddeli glide artık ünsüz sayılır.",
+      "evidence": "self-test regresyonu: translitTr('<iy~aA') === 'iyyâ'",
+      "planCheckVerifiesThis": false
     }
   ],
   "referenceLayer": {
@@ -1286,19 +1296,16 @@
     "language": "turkish",
     "scope": "reference-only (git dışı: content/.gitignore)",
     "content": {
-      "chapters": [
-        1,
-        112,
-        113,
-        114
-      ],
-      "words": 87,
-      "withAudio": 87
+      "chapters": "1..114 (tüm Kur’an)",
+      "words": 77429,
+      "withAudio": 77428,
+      "coverageOfCandidates": "524/524 (%100) — hem kelime hem bağlam referansı"
     },
     "fetchCommand": "node tools/kao-lexicon-build.mjs --reference",
     "networkIsolation": "Tek ağ noktası: fetchReference(). Self-test, türetim yolunun (draft/workbook/import) ağsız olduğunu ve dosyada TEK fetch çağrısı bulunduğunu zorlar.",
     "bonus": "Her kelime nesnesi resmî kelime-sesi (audio_url: wbw/<s>_<a>_<w>.mp3) taşır — D-08/D-09 ses hattı için aday.",
     "attribution": "quran.com — atıf zorunlu; veri git dışında tutulur.",
-    "notCopied": true
+    "notCopied": true,
+    "fetchNote": "Tüm Kur’an: 77.429 kelime çekildi, başarısız sûre 0. Resmî sürüm toplamıyla (77.429) birebir aynı. Ardışık istekler arasında 120 ms bekleme."
   }
 }

@@ -52,4 +52,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:pending · R-A8:pending · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 25 | 2026-09-23 | Referans iki tabloya bağlandı: `lexicon.review.md` (27 sütun, ref1_tr/ref1_context_tr) ve `lexicon.workbook.md` (ref_tr/context_ref_tr). Şedde + Türkçe okunuş assimilasyonu düzeltildi (allah · rahmân · illâ · allazî). | `--review-md` 524 satır; `--workbook` 524 satır; 8/8 kapı exit 0 |
+| 27 | 2026-09-23 | Kalite denetimi bir transliterasyon kusuru buldu (GAP-05): şeddeli glide uzun ünlü okunuyordu (إِيَّا → îîâ); doğrusu iyyâ. Düzeltildi + regresyon eklendi. | self-test `translitTr('<iy~aA')==='iyyâ'`; 8/8 kapı exit 0 |

@@ -164,7 +164,8 @@ const TRANSLIT_TR_LONG = Object.freeze({ A: 'â', Y: 'î', w: 'û', y: 'î', '|'
 const TRANSLIT_DIA_LONG = Object.freeze({ A: 'ā', Y: 'ī', w: 'ū', y: 'ī', '|': 'ā', '`': 'ā' });
 // Glides that become consonants before a short vowel/tanwin/sukun; the rest are long.
 const GLIDE_LONG = Object.freeze(new Set(['w', 'y']));
-const GLIDE_CONSONANT_NEXT = Object.freeze(new Set(['a', 'i', 'u', 'F', 'N', 'K', 'o']));
+// `~` (şedde) de sayılır: şeddeli glide çift ünsüzdür (iyyâ, kuvve).
+const GLIDE_CONSONANT_NEXT = Object.freeze(new Set(['a', 'i', 'u', 'F', 'N', 'K', 'o', '~']));
 // A dagger alef (`) already carries the long vowel: عَلَىٰ `EalaY` → ʿalâ.
 const DAGGER_PAIR = Object.freeze(new Set(['Y', 'y']));
 const TR_SHORT_VOWELS = Object.freeze(new Set(['a', 'e', 'u', 'ü', 'i', 'ı']));
@@ -581,6 +582,8 @@ function draftSelfTest() {
     'şedde (ّ) önceki harfi ikilemeli');
   assert(transliterate('{ll~ah', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'allah',
     'Buckwalter geminate zaten yazılıysa şedde üçlemez (alllah -> allah)');
+  assert(translitTr('<iy~aA') === 'iyyâ',
+    'şeddeli glide çift ünsüz okunur (iyyâ; îîâ değil)');
   assert(translitTr('r~aHoma`n') === 'rahmân',
     'Türkçe okunuşta belirteç assimilasyonu yazılmaz (rrahmân -> rahmân)');
   assert(transliterate('yawom', TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS) === 'yavm',
@@ -912,9 +915,16 @@ function readReference() {
 // Sûre listesini (varsayılan: çapa + tesbihat sûreleri) quran.com API'sinden
 // çeker. TEK AĞ NOKTASI: bu fonksiyon; derleyicinin geri kalanı ağsızdır ve
 // self-test/`--draft` ağa çıkmaz.
+// Varsayılan: TÜM Kur'an (1..114). Sözlükteki 524 aday kelime Kur'an'ın her
+// yerine dağılmıştır; insan doğrulayıcının her satırda referansı olmalı (06 §2).
+// Küçük bir alt küme için KAO_REFERENCE_CHAPTERS ortam değişkeni kullanılabilir.
 function referenceChapters() {
-  const chapters = new Set([1, 112, 113, 114]);
-  return [...chapters].sort((a, b) => a - b);
+  const override = process.env.KAO_REFERENCE_CHAPTERS;
+  if (override) {
+    return [...new Set(override.split(',').map((n) => Number(n.trim())).filter((n) => n >= 1 && n <= 114))]
+      .sort((a, b) => a - b);
+  }
+  return Array.from({ length: 114 }, (_, i) => i + 1);
 }
 
 async function fetchReference(chapter) {
@@ -943,16 +953,29 @@ async function fetchReference(chapter) {
 async function writeReference() {
   const chapters = referenceChapters();
   const words = [];
+  const failures = [];
   for (const chapter of chapters) {
-    const fetched = await fetchReference(chapter);
-    words.push(...fetched);
-    console.log(`  sûre ${chapter}: ${fetched.length} kelime`);
+    try {
+      const fetched = await fetchReference(chapter);
+      words.push(...fetched);
+      if (chapters.length <= 10 || chapter % 10 === 0) {
+        console.log(`  sûre ${chapter}/${chapters.length}: +${fetched.length} kelime (toplam ${words.length})`);
+      }
+    } catch (error) {
+      failures.push({ chapter, error: String(error && error.message ? error.message : error) });
+    }
+    // Kaynağa kibar davran: ardışık istekler arasında kısa bekleme.
+    await new Promise((resolve) => { setTimeout(resolve, 120); });
+  }
+  if (failures.length) {
+    console.log(`WARN ${failures.length} sûre indirilemedi: ${failures.slice(0, 5).map((f) => f.chapter).join(', ')}`);
   }
   const payload = {
     schemaVersion: 1,
     fetchedAt: new Date().toISOString().slice(0, 10),
     source: REFERENCE_SOURCE,
     chapterTotal: chapters.length,
+    chapterFailed: failures.map((f) => f.chapter),
     wordTotal: words.length,
     words
   };

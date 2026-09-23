@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 5/30
-**activePrompt:** KAO-23 · **lastCompletedPrompt:** KAO-04 · **blockedPrompt:** — · **Sıradaki:** **KAO-23**
+**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 6/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-23 · **blockedPrompt:** — · **Sıradaki:** **KAO-24**
 **releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -16,7 +16,7 @@
 | KAO-02 | Aday liste, kognat/komşu önerisi, inceleme tablosu | done | R-A5 R-A8 |
 | KAO-03 | Yapay zekâ doğrulaması ve içe alma (D-12) | done | R-A8 |
 | KAO-04 | Gramer içeriği (24 mikro-kavram + G0.5) | done | R-A7 R-A8 |
-| KAO-23 | Fonetik içeriği + mahreç SVG | pending | R-B6 R-A9 |
+| KAO-23 | Fonetik içeriği + mahreç SVG | done | R-B6 R-A9 |
 | KAO-24 | Ses varlık hattı (alt küme + AAC) | pending | R-C2 |
 | KAO-05 | quranLexiconV1.js dondurma + 4 yükleme listesi | pending | — |
 | KAO-06 | quranGrammarV1 + quranShortSurahsV1 + quranPhonicsV1 (+prayerTexts) | pending | R-A6 R-B2 |
@@ -49,7 +49,7 @@
 | KAO-D6 | Dalga 6 denetimi | pending | — |
 
 ## Gereksinim durumu (12-EK-GEREKSINIMLER)
-R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:partial · R-A8:partial · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
+R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 35 | 2026-09-23 | KAO-04 bitti: `tools/kao-grammar-build.mjs` (yeni) + `grammar.draft/review/verified`. 25 kavram (g0_5 + G1–G24), 86 şablon (02 §2.3 türleri), 93 örnek, Ünite 11 = 73 kök / 242 kalıp etiketli türev. Taslakta Arapça yazılmadı; tümü Tanzil+QAC+sözlükten çözüldü. GAP-01'in KAO-04 kısmı kapandı (araç files listesine eklendi). | `--build` issues=0; `--import-grammar` verified=26/26 consistency=0; `evidence/KAO-04/EVIDENCE.json` |
+| 37 | 2026-09-23 | KAO-23 bitti: 28 benzersiz harf (A=16/B=4/C=8), 12 algı çiftiyle B/C hedef kapsamı 12/12, 7 okuma kuralı, 28 anahtarlı okunuş+DİA tablosu ve 13 ortak-siluet mahreç SVG'si. Qaf'ın B karşılaştırma + C yeni-ses ikili rolü veri tekilliği korunarak iki görsel varyantla uzlaştırıldı. D-12 ile YZ doğrulaması tamamlandı. | `evidence/KAO-23/EVIDENCE.json`; contract fail=0; plan-check PASS |

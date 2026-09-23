@@ -9,7 +9,7 @@
   },
   "status": "in_progress",
   "releaseApproval": "NOT_APPROVED",
-  "nextCard": "KAO-23",
+  "nextCard": "KAO-24",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -384,7 +384,24 @@
       "deps": [
         "KAO-01"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-23",
+      "completedAt": "2026-09-23",
+      "agent": "gpt-5-codex",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-23/EVIDENCE.json",
+      "result": {
+        "letters": 28,
+        "buckets": {"A": 16, "B": 4, "C": 8},
+        "minimalListeningPairs": 12,
+        "bcTargetsCovered": "12/12",
+        "rules": 7,
+        "translitKeys": 28,
+        "diaUnique": 28,
+        "svg": 13,
+        "maxSvgBytes": 450,
+        "verification": "D-12 / gpt-5-codex"
+      },
+      "countReconciliation": "10-TELAFFUZ satırı 16 A harfi listeler; qaf hem B karşılaştırması hem C sesi rolündedir. Benzersiz veri 16+4+8=28; 13 SVG = 12 B/C harfi + qaf B-karşılaştırma varyantı."
     },
     "KAO-24": {
       "title": "Ses varlık hattı (alt küme + AAC)",
@@ -1186,13 +1203,13 @@
       "R-A6": "pending",
       "R-A7": "partial",
       "R-A8": "partial",
-      "R-A9": "pending",
+      "R-A9": "partial",
       "R-B1": "pending",
       "R-B2": "pending",
       "R-B3": "pending",
       "R-B4": "pending",
       "R-B5": "pending",
-      "R-B6": "pending",
+      "R-B6": "partial",
       "R-B7": "pending",
       "R-B8": "pending",
       "R-C1": "pending",
@@ -1276,8 +1293,8 @@
       "wave": 6
     }
   },
-  "activePrompt": "KAO-23",
-  "lastCompletedPrompt": "KAO-04",
+  "activePrompt": null,
+  "lastCompletedPrompt": "KAO-23",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

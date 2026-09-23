@@ -1,0 +1,67 @@
+{
+  "card": "KAO-23",
+  "date": "2026-09-23",
+  "agent": "gpt-5-codex",
+  "startHead": "7e1ef8d",
+  "status": "done",
+  "approvalRule": "D-12: program-geneli yapay zekâ doğrulaması; insan/iki-göz koşulu yok",
+  "sourcePolicy": "Harfler 10-TELAFFUZ + KAO-01 bw-table; kelime örnekleri quranLexiconV1 kimlikleri; hafızadan Arapça yok",
+  "result": {
+    "letters": 28,
+    "buckets": {"A": 16, "B": 4, "C": 8},
+    "pairs": 12,
+    "bcTargets": 12,
+    "bcTargetsCovered": 12,
+    "rules": 7,
+    "translitKeys": 28,
+    "diaUnique": 28,
+    "svg": 13,
+    "maxSvgBytes": 450,
+    "unknownWordIds": 0,
+    "contractFailures": 0
+  },
+  "checks": [
+    {"cmd":"node --check <değişen her .js/.mjs>","exit":0,"note":"Değişen JS/MJS yok; uygulanabilir dosya yok (N/A)."},
+    {"cmd":"node -e JSON.parse(phonics.draft.json + phonics.verified.json)","exit":0,"note":"Her iki JSON geçerli."},
+    {"cmd":"inline Node KAO-23 contract check","exit":0,"note":"28 harf; A=16/B=4/C=8; B/C 12/12; 12 çift; 7 kural; 28 DİA değeri benzersiz; 13 SVG; en büyük 450 B; sözlükte bilinmeyen kimlik 0; fail=0."},
+    {"cmd":"for f in assets/kao/svg/*.svg; do xmllint --noout \"$f\"; done","exit":0,"note":"13/13 iyi biçimli XML."},
+    {"cmd":"node tools/kao-lexicon-build.mjs --self-test","exit":0,"note":"PASS (50 satır; kaynak sözlük ve ağ-yok kapıları)."},
+    {"cmd":"node kuran-ogreniyorum/tools/kao-plan-check.mjs --self-test","exit":0,"note":"16/16 PASS."},
+    {"cmd":"node kuran-ogreniyorum/tools/kao-plan-check.mjs","exit":0,"note":"PASS (0 warn)."},
+    {"cmd":"git -c core.fsmonitor=false diff --check","exit":0,"note":"PASS."}
+  ],
+  "requirements": {
+    "R-B6": "partial — 13 tek-çizgi/currentColor/≤4 KB SVG tamam; E8 render kullanımı KAO-26",
+    "R-A9": "partial — harf ipuçları ve iki katmanlı transliterasyon tamam; okunabilirlik ayarları/kontrast KAO-15/17/18"
+  },
+  "filesTouched": [
+    "kuran-ogreniyorum/content/phonics.draft.json",
+    "kuran-ogreniyorum/content/phonics.verified.json",
+    "kuran-ogreniyorum/content/phonics.review.md",
+    "assets/kao/svg/mahrec-tta.svg",
+    "assets/kao/svg/mahrec-dad.svg",
+    "assets/kao/svg/mahrec-sad.svg",
+    "assets/kao/svg/mahrec-hah.svg",
+    "assets/kao/svg/mahrec-tha.svg",
+    "assets/kao/svg/mahrec-dhal.svg",
+    "assets/kao/svg/mahrec-zah.svg",
+    "assets/kao/svg/mahrec-ayn.svg",
+    "assets/kao/svg/mahrec-ghayn.svg",
+    "assets/kao/svg/mahrec-khah.svg",
+    "assets/kao/svg/mahrec-hamza.svg",
+    "assets/kao/svg/mahrec-qaf-b.svg",
+    "assets/kao/svg/mahrec-qaf-c.svg",
+    "kuran-ogreniyorum/evidence/KAO-23/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-23/HANDOFF.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": false,
+  "visualInspection": "mahrec-qaf-c.svg yerel raster önizlemede incelendi; temel siluet, dil yolu ve vurgu yolu okunur; cihaz kabulü değildir.",
+  "knownLimits": [
+    "R-B6 ancak KAO-26 ekranında SVG render fixture'ıyla tamamen kapanır.",
+    "R-A9 okunabilirlik ayarları ve 6 kontrast ölçümü KAO-15/17/18'e aittir.",
+    "Cihaz kabulü ve gerçek telaffuz pedagojisi kullanıcı cihazında doğrulanmadı."
+  ]
+}

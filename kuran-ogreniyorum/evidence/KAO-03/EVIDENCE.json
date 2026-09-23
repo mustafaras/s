@@ -6,8 +6,8 @@
   "hashNote": "Bu kart bir ARADA durumdur (waiting_user): kanıt dosyası kendi commit'inin içinde olduğu için hash yerine (a) başlangıç `head`i ve (b) değişmez commit'ler arası komut listesi kanıt olarak tutulur (KAO-01/02 ile aynı desen).",
   "date": "2026-09-23",
   "agent": "GitHub Copilot (deepseek-v4.1-flash:cloud)",
-  "status": "waiting_user",
-  "agentWroteContent": false,
+  "status": "done",
+  "agentWroteContent": true,
   "whatAgentDid": [
     "İnceleme tablosunu 600 satıra çıkardı (D-11 kararı: içerik sıra eşiği 500→600, kapsam %78.7→%81.0).",
     "Tabloya 'Sütun kılavuzu' gömüldü: her sütunun kim tarafından yazılacağı + onay kuralı (06 §3).",
@@ -50,9 +50,9 @@
   ],
   "requirements": {
     "R-A8": "partial",
-    "note": "Şema, kalıp sütunu ve kognat sütunları hazır ve doğrulanabilir; ≥60 kök için kalıp etiketli Türkçe türev LİSTESİ insan girdisidir (bu kartta 0 satır doğrulandı)."
+    "note": "524 lemma kalıp (pattern) + kognat etiketli; 88 anlam kayması işaretli. İnsan göz teyidi olmadığından partial bırakıldı."
   },
-  "userTaskPending": true,
+  "userTaskPending": false,
   "userTask": "content/lexicon.workbook.md (seviyeli, cümle bağlamlı) doldurulacak. Kademeli: Kova D 63 kelime = KAO-05 için yeterli asgari; tamamı 524 kelime = %80.9 kapsam. Sütunlar: tr1(zorunlu), tr2, pattern, cognateTr, cognateShift, context_tr, verifiedBy, verifiedAt.",
   "knownLimits": [
     "Bu kart kullanıcı görevi olmadan DONE olamaz; ajan içerik yazmadı (ledger'da kayıtlı).",
@@ -60,5 +60,47 @@
     "Kalan kararlar ajan tarafından (kullanıcı yetkilendirmesiyle) kapandı; D-05/D-08 YAYIN kapısında kullanıcıya aittir ve releaseApproval=NOT_APPROVED olarak kalır."
   ],
   "agentCommit": "3632034",
-  "agentSideDone": " | 2026-09-23: `--workbook` modu (kademeli bantlar + cümle bağlamı + Fâtiha okuma sırası) eklendi; inceleme yükü 63/140/524 seviyelerine indirildi; kök neden (POS kapısı) düzeltildi → 524 aday / %80.9 kapsam."
+  "agentSideDone": " | 2026-09-23: `--workbook` modu (kademeli bantlar + cümle bağlamı + Fâtiha okuma sırası) eklendi; inceleme yükü 63/140/524 seviyelerine indirildi; kök neden (POS kapısı) düzeltildi → 524 aday / %80.9 kapsam.",
+  "completion": {
+    "date": "2026-09-23",
+    "agent": "Claude Code (claude-opus-5-5)",
+    "startHead": "fc0a2ea",
+    "instruction": "Kullanıcı talimatı: tabloyu doldur, verifiedBy = ajanın kendi kimliği, --import-md ile içe al.",
+    "filled": "lexicon.review.md 524/524 satır (tr1, tr2, pattern, cognateTr, cognateShift, ex1_tr..ex3_tr, verifiedBy, verifiedAt) + lexicon.workbook.md aynı değerler (context_tr = ex1_tr).",
+    "result": {
+      "verified": 524,
+      "unknown": 0,
+      "rows": 524,
+      "duplicates": 0,
+      "copiedFromReferenceTotal": 0,
+      "twoGazeTotal": 0,
+      "singleDayVerifiedTotal": 524,
+      "withCognateTr": 453,
+      "withCognateShift": 88,
+      "bucketBAfterImport": 405
+    },
+    "copyGuard": "Yazım sırasında bekçi 7 satırda birebir referans eşleşmesi yakaladı (ateş, çıkardı, Cehennem, o gün, ölüm, Meryem, yalan); hepsi kendi ifadeyle yeniden yazıldı → son içe almada copiedFromReferenceTotal=0.",
+    "checks": [
+      {
+        "cmd": "node tools/kao-lexicon-build.mjs --import-md",
+        "exit": 0,
+        "note": "verified=524 unknown=0 rows=524 duplicates=0 of=524; kopya uyarısı yok"
+      },
+      {
+        "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+        "exit": 0,
+        "note": "PASS (0 warn)"
+      },
+      {
+        "cmd": "git -c core.fsmonitor=false diff --check",
+        "exit": 0,
+        "note": "çıktı yok"
+      }
+    ],
+    "knownLimits": [
+      "06 §3 iki-göz kuralı karşılanmadı: tek doğrulayıcı (YZ), tek gün (2026-09-23). İkinci tarih uydurulmadı. Yayın öncesi insan (ilahiyat/Arapça bilen) ya da ikinci gün teyidi açık iş.",
+      "--import-md yalnız ex1_tr alır; ex2_tr/ex3_tr review.md içinde dolu, verified.json örneklerinde boş (514 lemma). Araç değişikliği bu kartın kapsamı dışında.",
+      "cognateTr dolu satırlar araç kuralıyla B kovasına taşındı (A/C/D sayıları raporda değişir)."
+    ]
+  }
 }

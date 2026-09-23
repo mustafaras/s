@@ -9,7 +9,7 @@
   },
   "status": "in_progress",
   "releaseApproval": "NOT_APPROVED",
-  "nextCard": "KAO-03",
+  "nextCard": "KAO-04",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -239,6 +239,7 @@
       "files": [
         "kuran-ogreniyorum/content/lexicon.verified.json",
         "kuran-ogreniyorum/content/lexicon.review.md",
+        "kuran-ogreniyorum/content/lexicon.workbook.md",
         "kuran-ogreniyorum/evidence/KAO-03/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -254,11 +255,31 @@
         "KAO-02"
       ],
       "userTask": "lexicon.review.md satır satır doldurulacak (600 satır): tr1/tr2, pattern, cognateTr/cognateShift, exN_tr, verifiedBy + verifiedAt. Onay kuralı 06 §3: iki bağımsız göz YA DA aynı kişinin iki ayrı günü — ikinci durumda verifiedAt’e iki tarih yazılır.",
-      "status": "waiting_user",
+      "status": "done",
       "startedAt": "2026-09-23",
       "agent": "GitHub Copilot (deepseek-v4.1-flash:cloud)",
-      "userTaskPending": true,
-      "agentSideDone": "Sütun kılavuzu tabloya gömüldü; --import-md tutarlılık denetimi (≥3 örnek/ref biçimi/Arapça/Türkçe) + iki-göz kuralı makine doğrulaması + bekçi (boş veya uyumsuz tabloyu reddeder) eklendi. Ajan tek içerik yazmadı."
+      "userTaskPending": false,
+      "agentSideDone": "Sütun kılavuzu tabloya gömüldü; --import-md tutarlılık denetimi (≥3 örnek/ref biçimi/Arapça/Türkçe) + iki-göz kuralı makine doğrulaması + bekçi (boş veya uyumsuz tabloyu reddeder) eklendi. Ajan tek içerik yazmadı.",
+      "completedAt": "2026-09-23",
+      "completedBy": "claude-opus-5-5 (Claude Code) — kullanıcı talimatıyla doğrulayıcı",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-03/EVIDENCE.json",
+      "verification": {
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-23",
+        "verifiedTotal": 524,
+        "rows": 524,
+        "unknown": 0,
+        "duplicates": 0,
+        "copiedFromReferenceTotal": 0,
+        "twoGazeTotal": 0,
+        "singleDayVerifiedTotal": 524,
+        "note": "Kullanıcı 2026-09-23 talimatıyla doğrulamayı ajana verdi; verifiedBy ajan kimliği. Tek gün, tek göz (YZ): 06 §3 iki-göz kuralı KARŞILANMADI (twoGazeTotal=0). İnsan/ikinci gün teyidi yayın öncesi açık iş olarak kalır."
+      },
+      "knownLimits": [
+        "ex2_tr/ex3_tr review.md içinde dolu, ama --import-md yalnız ex1_tr alanını verified.json'a alıyor (araç sınırı; tools/ bu kartın izinli dosyası değil).",
+        "cognateTr doldurulan satırlar aracın kuralıyla B kovasına geçti (bucketB=405).",
+        "Anlamlar YZ tarafından yazıldı; ilahiyat/Arapça bilen insan göz teyidi yok."
+      ]
     },
     "KAO-04": {
       "title": "Gramer içeriği (24 mikro-kavram + G0.5)",
@@ -1199,8 +1220,8 @@
       "wave": 6
     }
   },
-  "activePrompt": "KAO-03",
-  "lastCompletedPrompt": "KAO-02",
+  "activePrompt": "KAO-04",
+  "lastCompletedPrompt": "KAO-03",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

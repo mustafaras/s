@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 3/30
-**activePrompt:** KAO-03 · **lastCompletedPrompt:** KAO-02 · **blockedPrompt:** — · **Sıradaki:** **KAO-03**
+**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 4/30
+**activePrompt:** KAO-04 · **lastCompletedPrompt:** KAO-03 · **blockedPrompt:** — · **Sıradaki:** **KAO-04**
 **releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -14,7 +14,7 @@
 | KAO-01 | Sözlük derleme aracı (ağsız) | done | — |
 | KAO-25 | Plan denetleyici (kao-plan-check) sertleştirme | done | — |
 | KAO-02 | Aday liste, kognat/komşu önerisi, inceleme tablosu | done | R-A5 R-A8 |
-| KAO-03 | İnsan doğrulaması (kullanıcı görevi) ve içe alma | waiting_user | R-A8 |
+| KAO-03 | İnsan doğrulaması (kullanıcı görevi) ve içe alma | done | R-A8 |
 | KAO-04 | Gramer içeriği (24 mikro-kavram + G0.5) | pending | R-A7 R-A8 |
 | KAO-23 | Fonetik içeriği + mahreç SVG | pending | R-B6 R-A9 |
 | KAO-24 | Ses varlık hattı (alt küme + AAC) | pending | R-C2 |
@@ -52,4 +52,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:pending · R-A8:pending · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 28 | 2026-09-23 | 06 §2 kuralı makineyle zorlanır hâle getirildi (GAP-06): `tr1` referansın birebir kopyasıysa satır doğrulanmış SAYILMAZ. DENEYLE kanıtlandı (kopya yazıldı → verifiedTotal=0, copiedFromReferenceTotal=1). Ayrıca: `consistencyCopy` başlatma sırası hatası düzeltildi. | `KAO-STATE.json#knownPlanGaps.GAP-06`; self-test regresyonu; 8/8 kapı exit 0 |
+| 29 | 2026-09-23 | KAO-03 kapandı (kullanıcı talimatıyla ajan doğruladı): `lexicon.review.md` + `workbook.md` 524/524 satır dolduruldu (tr1/tr2/kalıp/kognat/kayma/3 örnek çevirisi), `verifiedBy=claude-opus-5-5`, `verifiedAt=2026-09-23`. Kopya bekçisi 7 satır yakaladı, yeniden yazıldı. İki-göz kuralı KARŞILANMADI (tek YZ gözü, tek gün) — insan teyidi yayın öncesi açık. KAO-05 bağımlılığı açıldı. | `--import-md`: verified=524 unknown=0 duplicates=0 copiedFromReference=0; `kao-plan-check` PASS (0 warn); `evidence/KAO-03/EVIDENCE.json` |

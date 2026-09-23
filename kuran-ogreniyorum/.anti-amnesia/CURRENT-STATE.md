@@ -52,4 +52,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:pending · R-A8:pending · R-A9:pending · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:pending · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 19 | 2026-09-23 | KAO-03 waiting_user: tablo 600 satır, verified=0 (ajan tek içerik yazmadı). Kart kullanıcı girdisi bekliyor; `activePrompt=KAO-03`. | `--import-md`: rows=600 duplicates=0 unknown=0 verified=0; plan-check PASS |
+| 20 | 2026-09-23 | Otonom denetim 2 plan boşluğu buldu (STATE.knownPlanGaps). GAP-01: KAO-04/05/06 planı araçta olmayan `--example`/`--freeze*` komutlarına atıf yapıyor ve bu komutların SAHİBİ yok (araç yalnız KAO-01/02'nin). GAP-02: `activePrompt` doluyken sıradaki karta atlanamıyor (deneyle kanıtlandı). İçerik uydurulmadı, sıra çiğnenmedi. | `KAO-STATE.json#knownPlanGaps`; deney çıktısı: FAIL 'activePrompt KAO-04 sıradaki değil (son: KAO-02)' |

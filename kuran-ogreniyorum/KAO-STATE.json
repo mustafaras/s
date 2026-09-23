@@ -1223,5 +1223,31 @@
     "KAO-D4": "pending",
     "KAO-D5": "pending",
     "KAO-D6": "pending"
-  }
+  },
+  "knownPlanGaps": [
+    {
+      "id": "GAP-01",
+      "foundAt": "2026-09-23",
+      "foundBy": "agent (otonom denetim)",
+      "where": "UYGULAMA-PROMPTLARI KAO-04 adım 2 · KAO-05 adım 1 · KAO-06 adım 1",
+      "issue": "Plan, araçta BULUNMAYAN alt komutlara atıf yapıyor: `--example` (KAO-04), `--freeze` (KAO-05), `--freeze-grammar`/`--freeze-surahs`/`--freeze-phonics` (KAO-06). Araçta yalnız `--self-test`, `--inputs[--stats|--draft]`, `--review-md`, `--import-md` var.",
+      "impact": "KAO-04/05/06'nın 'Kontroller' listeleri bugünkü araçla koşulamaz.",
+      "ownerGap": "`tools/kao-lexicon-build.mjs` yalnız KAO-01 ve KAO-02'nin izinli dosyasıdır; KAO-04/05/06 bu aracı SAHİPLENMİYOR → söz konusu komutların sahibi tanımsız. Önden yazmak, kapsam uydurmak olur.",
+      "evidence": "`node tools/kao-lexicon-build.mjs --help` → 5 mod; araç kaynağında '--example' / '--freeze' araması → 0 eşleşme",
+      "decisionNeeded": "Komutlar hangi kartın kapsamında yazılacak? (KAO-01/02 kapandı → yeni iş kaydı; ya da KAO-04/05/06'nın `files` listesine araç eklenerek.) Kullanıcı kararı.",
+      "planCheckVerifiesThis": false,
+      "note": "plan-check bu alanı DOĞRULAMAZ (bilinçli: dokümantasyon, tamamlanma iddiası değil)."
+    },
+    {
+      "id": "GAP-02",
+      "foundAt": "2026-09-23",
+      "foundBy": "agent (otonom denetim)",
+      "where": "ortak sözleşme §0 (activePrompt disiplini)",
+      "issue": "`activePrompt` doluyken sıradaki karta atlanamaz: `kao-plan-check` exit 1 verir.",
+      "evidence": "deney: activePrompt=KAO-04 yapıldığında → `FAIL activePrompt KAO-04 sıradaki değil (son: KAO-02)`; geri alındığında PASS.",
+      "impact": "KAO-03 `waiting_user` kaldığı sürece içerik zinciri (KAO-04→23→24→05→06) ilerleyemez.",
+      "decisionNeeded": "Kullanıcı `lexicon.review.md`'yi doldurup `--import-md` koşacak; kart `done` olunca kapı açılır.",
+      "planCheckVerifiesThis": true
+    }
+  ]
 }

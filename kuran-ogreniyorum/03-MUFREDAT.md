@@ -3,7 +3,7 @@
 Tüm sayılar derleme aracı ([06](06-ICERIK-URETIM-HATTI.md)) tarafından
 korpustan yeniden hesaplanacak hedeflerdir. Örnek Arapça kelimeler burada
 yalnız **plan okunabilirliği** içindir; üretim içeriği hafızadan değil,
-korpustan gelir ve insan doğrulamasından geçer.
+korpustan gelir ve doğrulamadan geçer (06 §3, D-12).
 
 ## 1. Yapı
 
@@ -104,7 +104,7 @@ Seviye 5 sûreleri paketlenir ve Seviye 6 sonraki program olur.
 | Kova | Adet (hedef) | Nasıl seçilir | Döngü |
 |---|---|---|---|
 | A · Parçacıklar (edat/zamir/bağlaç) | ~60 | Sıklık ilk 100'den POS filtresi | Tam SRS + gramer görevleri |
-| B · Kognat isim/fiil | ~225 | Sıklık ≤500 ∧ Türkçe karşılığı var (insan etiketi) | "Zaten biliyorsun" turu; yalnız anlam kayması olanlar SRS'e |
+| B · Kognat isim/fiil | ~225 | Sıklık ≤500 ∧ Türkçe karşılığı var (doğrulayıcı etiketi, 06 §3.1) | "Zaten biliyorsun" turu; yalnız anlam kayması olanlar SRS'e |
 | C · Kognat olmayan isim/fiil | ~215 | Sıklık ≤500 ∧ kognat değil | Tam SRS |
 | D · Çapa metin kelimeleri (sıklık >500 olsa da) | ~30 | Fâtiha/namaz sûreleri/tesbihat kesişimi | Tam SRS (ünite 1–3'te) |
 

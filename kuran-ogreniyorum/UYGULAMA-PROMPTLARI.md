@@ -82,7 +82,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 2. **KAO-01** — Sözlük derleme aracı (ağsız)
 3. **KAO-25** — Plan denetleyici (kao-plan-check) sertleştirme
 4. **KAO-02** — Aday liste, kognat/komşu önerisi, inceleme tablosu
-5. **KAO-03** — İnsan doğrulaması (kullanıcı görevi) ve içe alma
+5. **KAO-03** — Yapay zekâ doğrulaması ve içe alma (D-12)
 6. **KAO-04** — Gramer içeriği (24 mikro-kavram + G0.5)
 7. **KAO-23** — Fonetik içeriği + mahreç SVG
 8. **KAO-24** — Ses varlık hattı (alt küme + AAC)
@@ -297,7 +297,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 
 ---
 
-## KAO-03 — İnsan doğrulaması (kullanıcı görevi) ve içe alma
+## KAO-03 — Yapay zekâ doğrulaması ve içe alma (D-12)
 
 **Yeni oturuma yapıştır:**
 ```text
@@ -305,12 +305,12 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 ```
 
 **Dalga:** 1 · **Bağımlılık:** KAO-02 · **Gereksinimler:** R-A8
-**Kullanıcı görevi içerir:** ajan içerik üretmez; `waiting_user` ara durumu izinlidir.
+**Doğrulayıcı:** ajan (yapay zekâ) — D-12; insan teyidi yoktur. Eksik satır kalırsa `waiting_user` ara durumu izinlidir.
 
-**Amaç:** **Kullanıcı görevi:** inceleme tablosunu satır satır onaylamak (Arapça hareke, Türkçe anlam, okunuş, kognat/anlam kayması, kalıp etiketi, 3 örnek parçanın Türkçesi). Ajan yalnız içe alma ve tutarlılık kontrolü yapar.
+**Amaç:** Ajan inceleme tablosunu satır satır doldurur ve onaylar (Türkçe anlam, kalıp etiketi, kognat/anlam kayması, 3 örnek parçanın Türkçesi); okunuş ve Arapça araçtan gelir. Sonra içe alır ve tutarlılık denetimini 0'a indirir.
 
 **Oku (yalnız bunlar; yollar `kuran-ogreniyorum/` göreli, repo dosyaları kökten):**
-- 06 §3 (onay kuralı: iki göz ya da iki gün)
+- 06 §3 + §3.1 (onay kuralı D-12 ve alan kuralları)
 - content/lexicon.review.md
 
 **İzinli dosyalar (STATE ile birebir):**
@@ -322,18 +322,18 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `kuran-ogreniyorum/.anti-amnesia/LEDGER.md`
 
 **Adımlar:**
-1. Ajan: kullanıcıya inceleme dosyasının yolunu ve sütun kılavuzunu ver; **Arapça/anlam önermez, doldurmaz**.
-2. Kullanıcı doldurunca: `--import-md` → `lexicon.verified.json`; `verifiedBy` boş satır sayısı 0 değilse **waiting_user** durumunda kal.
+1. Ajan: `lexicon.review.md` satırlarını 06 §3.1 kurallarıyla doldurur; `verifiedBy` = ajan kimliği, `verifiedAt` = tek tarih; referansı kopyalamaz (06 §2). Arapça yazmaz (araçtan gelir).
+2. `--import-md` → `lexicon.verified.json`; `verifiedBy` boş satır ya da `consistency` > 0 ise **waiting_user** durumunda kal.
 3. Tutarlılık: her lemma ≥3 örnek, `ref` biçimi `S:A`, Arapça yalnız Arapça blok + hareke, Türkçe boş değil.
-4. STATE: `cards['KAO-03'].status='waiting_user'` ara durum izinlidir; kart yalnız tam onayla `done`.
+4. STATE: `cards['KAO-03'].status='waiting_user'` ara durum izinlidir; kart yalnız tam onay + tutarlılık 0 ile `done`.
 
 **Kontroller (hepsi exit 0; STATE ile birebir):**
 - `node --check <değişen her .js/.mjs>`
 - `node kuran-ogreniyorum/tools/kao-plan-check.mjs`
 - `git -c core.fsmonitor=false diff --check`
-- `node tools/kao-lexicon-build.mjs --import-md → verified.json; verifiedBy boş satır = 0`
+- `node tools/kao-lexicon-build.mjs --import-md → verified.json; verifiedBy boş satır = 0; consistency = 0`
 
-**Bitti sayılır:** lexicon.verified.json tüm satırları `verifiedBy`+`verifiedAt` ile; ajan içerik yazmadı (ledger'da açıkça).
+**Bitti sayılır:** lexicon.verified.json tüm satırları `verifiedBy`+`verifiedAt` ile, `copiedFromReferenceTotal=0`, `consistency=0`.
 
 **Kanıt:** `evidence/KAO-03/EVIDENCE.json` + `HANDOFF.md` (S6); commit konusu `KAO-03: …` (S7); STATE/ledger (S8).
 
@@ -375,7 +375,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `node --check <değişen her .js/.mjs>`
 - `node kuran-ogreniyorum/tools/kao-plan-check.mjs`
 - `git -c core.fsmonitor=false diff --check`
-- `her kavramda ≥3 alıştırma şablonu; g0_5 mevcut; insan onayı alanları dolu`
+- `her kavramda ≥3 alıştırma şablonu; g0_5 mevcut; onay alanları dolu (06 §3, D-12)`
 
 **Bitti sayılır:** grammar.verified.json onaylı; g0_5 mevcut; Ünite 11 Türkçe türev tablosu ≥60 kök.
 
@@ -557,7 +557,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 
 **Adımlar:**
 1. `--freeze-grammar`, `--freeze-surahs` (Tanzil penceresi; vakıf işaretleri ۚ ۖ ۗ korunur; her kelime `lemmaId`), `--freeze-phonics`.
-2. `prayerTexts`: tekbir → Sübhâneke → Fâtiha → zamm-ı sûre → rükû → secde → tahiyyat → selâm; her kelime `lemmaId` ile sözlüğe bağlı; insan onayı KAO-23/04 kapsamında alınmış olmalı, değilse `waiting_user`.
+2. `prayerTexts`: tekbir → Sübhâneke → Fâtiha → zamm-ı sûre → rükû → secde → tahiyyat → selâm; her kelime `lemmaId` ile sözlüğe bağlı; onay (06 §3, D-12) KAO-23/04 kapsamında alınmış olmalı, değilse `waiting_user`.
 3. Üç dosya 4 listeye aynı commit'te; `?v=` bump.
 4. `tests/kao/test_kao_phonics_contract.js`; lexicon contract fixture'ına sûre kelime→lemma referans bütünlüğü ekle.
 
@@ -1621,7 +1621,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 
 - Hiçbir üretim dosyası değişmedi: `git diff --stat main -- app app.js index.html sync.js panel` boş.
 - Hiçbir Arapça dizgi ajan tarafından elle yazılmadı: `lexicon.verified.json`/`grammar.verified.json`/`phonics.verified.json` her kaydın `source` alanı (`tanzil:S:A:W` ya da `bw-table`) dolu; `verifiedBy` boş = 0.
-- Kova raporu: A/B/C/D sayıları ve kapsam ≥0,78; komşu/kalıp etiketleri insan onaylı (`proposed:false`).
+- Kova raporu: A/B/C/D sayıları ve kapsam ≥0,78; komşu/kalıp etiketleri doğrulanmış (`proposed:false`; 06 §3, D-12).
 - Ses: D-08/D-09 kaydı yoksa KAO-24 `blocked` — bu **kabul edilebilir** bir dalga sonucudur; sonraki dalgalar sessiz modla ilerler.
 - Ledger seq kesintisiz; her kartın `evidence/KAO-xx/EVIDENCE.json` + `HANDOFF.md` var; `diffHash` gerçek.
 

@@ -99,7 +99,7 @@ kelime kelime ve âyet bütün sesle.
 | **DİA/İSAM bilimsel** (ayar) | *kitāb · raḥmān · el-ḥamdü lillāh · ʿilm · ẕikr · ṣalāt* | Ayrımı görmek isteyen için; harf-ses eşlemesi birebir |
 
 Tek dönüşüm tablosu (`QuranLexiconV1.translit` iki alan: `tr`, `dia`) —
-derleme aracı Buckwalter'dan deterministik üretir, insan doğrular.
+derleme aracı Buckwalter'dan deterministik üretir, doğrulayıcı denetler (06 §3, D-12).
 
 ## 8. Ses varlıkları — kaynak, lisans, format, bütçe
 

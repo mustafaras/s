@@ -56,7 +56,7 @@ izinli dosyalarına dokunması, 26 gereksinimin sahibi olması, ledger seq
 sürekliliği, `done` için EVIDENCE.json, KAO kaynaklarında yasak ifadeler
 (`SeyAudio.say`, `localStorage`, dış `fetch`, `verified:false`) ve dört yükleme
 listesi eşitliği. İçeriğin dinî/dilbilimsel doğruluğunu ve ekran kalitesini
-otomatik kanıtlayamaz — onlar insan doğrulaması ve cihaz kabulüdür.
+otomatik kanıtlayamaz — içerik doğrulaması 06 §3 (D-12, yapay zekâ doğrulayıcı), ekran kalitesi cihaz kabulüdür.
 
 ## Okuma sırası
 
@@ -67,7 +67,7 @@ otomatik kanıtlayamaz — onlar insan doğrulaması ve cihaz kabulüdür.
 | 3 | [03-MUFREDAT.md](03-MUFREDAT.md) | 0. seviyeden 6. seviyeye müfredat: harf/hareke kapısı, 12 ünite, 24 gramer mikro-kavramı, 500 kelimelik envanter planı, kilometre taşları |
 | 4 | [04-DENEYIM-VE-TASARIM.md](04-DENEYIM-VE-TASARIM.md) | Uygulamaya yerleşim, 11 ekran, 390 px wireframe'ler, token/tipografi/hareket/erişilebilirlik sözleşmesi |
 | 5 | [05-VERI-MODELI-VE-TEKNIK.md](05-VERI-MODELI-VE-TEKNIK.md) | `data.quranLearn` şeması, `migrate()` kancası, registry/içerik modülleri, yükleme sırası, panel aynası, sync bütçesi, fixture'lar |
-| 6 | [06-ICERIK-URETIM-HATTI.md](06-ICERIK-URETIM-HATTI.md) | Korpus → sözlük derleme aracı → insan doğrulaması → dondurma; lisans karar tablosu |
+| 6 | [06-ICERIK-URETIM-HATTI.md](06-ICERIK-URETIM-HATTI.md) | Korpus → sözlük derleme aracı → doğrulama (D-12) → dondurma; lisans karar tablosu |
 | 7 | [07-UYGULAMA-KARTLARI.md](07-UYGULAMA-KARTLARI.md) | 6 dalga / 30 kart, bağımlılık, durma noktaları, onay kapıları |
 | 8 | [08-KALITE-VE-KABUL.md](08-KALITE-VE-KABUL.md) | Kanıt düzeyleri, pedagojik ölçütler, test/kontrast/harness kapıları |
 | 9 | [09-KAYNAKLAR.md](09-KAYNAKLAR.md) | Tüm kaynak bağlantıları ve ne için kullanıldıkları |
@@ -98,7 +98,7 @@ otomatik kanıtlayamaz — onlar insan doğrulaması ve cihaz kabulüdür.
    Arapça yığın `"Noto Naskh Arabic","Amiri","Scheherazade New"` mevcut
    yığındır. Yeni token yalnız açık/koyu çiftle ve gerçek ihtiyaçta.
 5. **İçerik doğruluğu** — Arapça harf/hareke ve Türkçe anlam, korpustan
-   türetilir ve **satır satır insan doğrulaması** olmadan `verified:true`
+   türetilir ve **satır satır doğrulama** (06 §3, D-12) olmadan `verified:true`
    alamaz (`quranStrikingVersesV1.js` ile aynı disiplin). Hafızadan yazılmış
    Arapça içerik üretim koduna giremez.
 6. **Onay kapıları** — push, deploy, tag, `main`'e merge ve veri deposuna yazma

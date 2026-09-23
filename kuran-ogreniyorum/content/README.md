@@ -86,12 +86,13 @@ node tools/kao-lexicon-build.mjs --import-md      # kullanıcı tabloyu doldurdu
 | Çıktı | İçerik |
 |---|---|
 | `content/lexicon.draft.json` | ~530 aday lemma: korpustan Arapça/translit/kök/POS/sıklık/örnek, kova etiketi |
-| `content/lexicon.review.md` | 06 §3 sütunlarıyla insan inceleme tablosu |
+| `content/lexicon.review.md` | 06 §3 sütunlarıyla inceleme tablosu (birincil doldurma yolu) |
 | `evidence/KAO-02/draft-report.json` | Kova sayıları, kapsam oranı, kök tanısı, `verifiedTotal` |
 
-**Altın kural:** taslakta `tr1`/`tr2`/`ex1_tr`/`cognateTr` **boştur** ve `verified`
-her satırda `false`. Türkçe anlam, kognat notu ve örnek çevirisini **insan yazar**
-(06 §3); araç yalnız korpustan **mekanik** alanları üretir.
+**Altın kural:** araç yalnız korpustan **mekanik** alanları üretir; Türkçe anlam,
+kalıp, kognat notu ve örnek çevirilerini **doğrulayıcı yazar** (06 §3, D-12: yapay
+zekâ doğrulayıcı). `--import-md` sonucu `lexicon.verified.json`'a yazılır; `--draft`
+yeniden üretimde doğrulanmış alanları oradan taşır (emek kaybolmaz).
 
 **Seçim kuralı (03 §9):** A = lemma sıralamasında ilk 100 işlev kelimesi ·
 B/C = sıralamada ≤500 içerik kelimesi · D = çapa/tesbihat, sıralamadan bağımsız.
@@ -102,18 +103,16 @@ tanımıdır ("sıklık >500 olsa da").
 kelime token'ının 74.608'i LEM taşır). Rapor ayrıca `ratioWordTokens` ve
 sıra eşiğini yükselten alternatifleri (`coverage.alternatives`) yanında verir;
 hedef %80 tutmazsa bu **açıkça** `warnings` + `coverage.goalMet:false` ile
-bildirilir — eşiği yükseltmek insan kararıdır, araç kendi kendine değiştirmez.
+bildirilir — eşiği yükseltmek kullanıcı kararıdır, araç kendi kendine değiştirmez.
 
 Kova tanımları (03 §9): **A** işlev kelimeleri (edat/zamir/bağlaç) · **B** kognat
 isim/fiil (Türkçe karşılığı var) · **C** kognat olmayan isim/fiil · **D** çapa metin
 (Fâtiha + 112–114 + tesbihat).
 
 **Kognat kanalı tektir:** inceleme tablosunun `cognateTr` / `cognateShift`
-sütunları. Kognat iddiası kaynak ister; bu yüzden **ajan listeyi hafızadan
-doldurmaz** — kullanıcı TDK verisinden yazar (06 §3). Sütun boş kaldığı sürece B
-kovası boştur, `cognateTr` `null` kalır ve durum `draft-report.json` içinde
-`cognate.matchedTotal: 0` + `warnings` ile **açıkça** raporlanır (sessiz varsayım
-yok). Anlam kayması (`cognateShift`) doluysa R-A8 uyarısı — pastil + "dikkat"
+sütunları; biçim kuralı 06 §3.1 (aynı kökten güncel Türkçe sözcük, en çok 3,
+parantez yok) ve araç biçimi denetler. Kognat dolu satır B kovasına girer;
+sayı `draft-report.json` içinde `cognate.matchedTotal` ile raporlanır. Anlam kayması (`cognateShift`) doluysa R-A8 uyarısı — pastil + "dikkat"
 metni — devreye girer; yalnız o kart için.
 
 Çıkış kodları:

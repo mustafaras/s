@@ -123,7 +123,7 @@ ilerler; rekabet/lig/puan yok.
 |---|---|---|---|
 | **Quranic Arabic Corpus v0.4** (Leeds) | 77.430 kelimenin morfolojisi: kök, lemma, POS, hareke'li Buckwalter | GNU GPL; "verbatim kopya serbest, değiştirme yasak"; kaynak + link zorunlu | Sıklık listesi, kök/lemma/POS **türetme** (derleme aracı girdisi). Ham dosya repo'ya konmaz; türetilmiş sözlükte kaynak + link |
 | **Tanzil** Kur'an metni (Uthmani/simple) | Harekeli metin | CC BY 3.0 (verbatim; değiştirme yok; tanzil.net linki) | Örnek âyet parçaları; atıf |
-| **Tanzil / QUL Türkçe mealler** (Diyanet #148, Elmalılı #233, Muslim Şahin, Ş. Britch) | Âyet meali | QUL: "kaynağa göre değişir, her kaynağın lisansını kontrol et" | Örnek parça Türkçesi — **lisans tek tek doğrulanmadan** kullanılmaz; alternatif: kendi kısa çeviri + insan doğrulaması |
+| **Tanzil / QUL Türkçe mealler** (Diyanet #148, Elmalılı #233, Muslim Şahin, Ş. Britch) | Âyet meali | QUL: "kaynağa göre değişir, her kaynağın lisansını kontrol et" | Örnek parça Türkçesi — **lisans tek tek doğrulanmadan** kullanılmaz; alternatif: kendi kısa çeviri + doğrulama (06 §3, D-12) |
 | **QUL Türkçe kelime-kelime (#99)** | Kelime kelime Türkçe | Belirsiz (sayfada yok) | Doğrulama referansı; doğrudan kopya yok |
 | **QUL morfoloji** (kök/stem/lemma sqlite) | QAC türevi | QAC lisansına tabi | Alternatif girdi |
 | **Fontlar** | Noto Naskh Arabic, Amiri, Scheherazade New | SIL OFL | Zaten mevcut yığın; yeni font paketlenmez |
@@ -162,7 +162,7 @@ kendi editoryal derlemesi (Arapça yazım Tanzil'den, anlam kendi Türkçe
 ## 8. Sınırlar / bilinmeyenler
 
 - Kitapçığın "225 kognat" sayısı editoryaldir; KAO derleme aracı kendi
-  kognat etiketini insan onayıyla verir.
+  kognat etiketini doğrulayıcı onayıyla verir (06 §3, D-12).
 - Tüm kapsam yüzdeleri **token** kapsamıdır, anlama oranı değildir
   (UQ: "%50 kelime bilmek %50 anlamak demek değildir"). UI bu farkı açıkça
   söyler.

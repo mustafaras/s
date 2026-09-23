@@ -20,7 +20,7 @@ render.js, styles.css, app.js hub bölümleri) yalnız Dalga 5'te ve koordineli.
 |---|---|---|---|---|
 | KAO-01 Derleme aracı | `tools/kao-lexicon-build.mjs`: QAC + Tanzil okur, lemma sıklığı/kök/POS/örnek pencere çıkarır, `content/lexicon.draft.json` yazar; ağsız; girdi yoksa açık hata | `tools/`, `kuran-ogreniyorum/content/` | `--self-test` sentetik 50 satırlık mini korpusla; kapsam toplamı = 77.430 | Taslak JSON üretildi; henüz `app/content` yok |
 | KAO-02 Aday liste ve kognat önerisi | Sıklık ≤500 + çapa metin kesişimi; TDK Arapça kökenli eşleme *önerisi*; inceleme Markdown'u | `content/` | Aday ≈ 530; kova A/B/C/D sayıları raporlanır | Kullanıcı inceleme tablosunu alır |
-| KAO-03 İnsan doğrulaması (kullanıcı görevi) | Tablo satır satır onay; kendi Türkçe parça çevirileri | `content/lexicon.verified.json` | `verifiedBy` boş satır 0 | Onay tamamlanmadan KAO-05 açılmaz |
+| KAO-03 Yapay zekâ doğrulaması ve içe alma (D-12) | Tablo satır satır onay; kendi Türkçe parça çevirileri | `content/lexicon.verified.json` | `verifiedBy` boş satır 0; tutarlılık 0 | Onay tamamlanmadan KAO-05 açılmaz |
 | KAO-04 Gramer içeriği | 24 mikro-kavram metni + tablolar (Türkçe, terimsiz/terimli çift) → `grammar.verified.json` | `content/` | Her kavram ≥3 alıştırma şablonu | İnsan onayı |
 | KAO-23 Fonetik içeriği | 28 harf kova/mahreç/ipucu, minimal çift listesi, 7 okuma kuralı, transliterasyon tablosu (okunuş + DİA) → `phonics.verified.json`; mahreç SVG'leri | `content/`, `assets/kao/svg/` | Her B/C harfinde ≥1 çift; SVG ≤4 KB | İnsan onayı (Arapça bilen) |
 | KAO-24 Ses varlık hattı | `tools/kao-audio-build.mjs`: kaynak veri setinden alt küme seçimi (lemma/sûre/çift), Opus→AAC dönüşüm, adlandırma `assets/kao/audio/<id>.m4a`, manifest + boyut raporu; köken/lisans kaydı | `tools/`, `assets/kao/audio/` | Toplam ≤16 MB; iOS'ta çalınabilir format; manifest = klip sayısı | **D-08/D-09 onayı** olmadan repo'ya ses girmez |
@@ -51,7 +51,7 @@ render.js, styles.css, app.js hub bölümleri) yalnız Dalga 5'te ve koordineli.
 | KAO-26 E8 Telaffuz stüdyosu | Harf kovaları, mahreç SVG, minimal çift dinleme görevleri, FSRS ses kartları | aynı | `test_kao_phonics_contract.js`, render fixture | — |
 | KAO-27 Gölgeleme | `MediaRecorder` bellek-içi kayıt/dinle/at; izin metni; ağ/depo yolu yok | aynı | `test_kao_privacy.js` | — |
 | KAO-28b E10 Mushaf ısı haritası + gecikmeli sûre testi | 114 sûre haritası (R-B1), 7 gün sonra 5 soruluk test (R-C6) | aynı | render + surah fixture | — |
-| KAO-16b E11 "Namazda ne diyorum" | Rekât sırası görünümü, bilinen/bilinmeyen kelime (R-B2); içerik `prayerTexts` KAO-06'da | aynı | içerik insan doğrulamalı; render fixture | — |
+| KAO-16b E11 "Namazda ne diyorum" | Rekât sırası görünümü, bilinen/bilinmeyen kelime (R-B2); içerik `prayerTexts` KAO-06'da | aynı | içerik doğrulanmış (06 §3, D-12); render fixture | — |
 | KAO-28 E9 Anlayabildiğin âyet | ≥%95 kapsamlı âyet seçici (deterministik, günlük), kelime kelime ses + Türkçe; hub kartında satır | aynı | `test_kao_queue.js` (seçici), coverage fixture | — |
 
 ## Dalga 4 — Kalite

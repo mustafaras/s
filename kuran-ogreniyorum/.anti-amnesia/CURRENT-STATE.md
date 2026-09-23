@@ -52,4 +52,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 38 | 2026-09-23 | KAO-24 başlatılmadı; zorunlu D-08/D-09 `gateApproval` kaydı yok. D-08 kararı okuyucu/kayıt kökeni kanıtlanmadan ses yayınını yasaklıyor. Kart `blocked` kaydedildi; araç, manifest veya ses dosyası üretilmedi. | `--card KAO-24`: approved=false, startable=false; kullanıcının açık kapı kararı bekleniyor |
+| 39 | 2026-09-23 | Kullanıcı KAO-24 için tüm repo/uygulama yetkilerini verdi; birincil kaynak denetimi yapıldı. Hedef HF seti `apache-2.0` etiketli fakat okuyucu kimliği, orijinal master kökeni ve ses baytı yeniden dağıtım hakkı kanıtlanamadı. Kullanıcı yetkisi üçüncü taraf hakkı yaratmadığından D-08 açılmadı; ses/manifest/araç üretilmedi. | `evidence/KAO-24/SOURCE-AUDIT.md`; gateApprovalCreated=false; kart blocked |

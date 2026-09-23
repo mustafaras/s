@@ -428,8 +428,24 @@
       "gate": "D-08 ve D-09 kullanıcı onayı",
       "status": "blocked",
       "blockedAt": "2026-09-23",
-      "blockedReason": "D-08/D-09 gateApproval kaydı yok; D-08 kararına göre okuyucu/kayıt kökeni kanıtlanmadan ses varlığı yayınlanamaz.",
-      "requiredUserDecision": "Kaynağın okuyucu/kayıt kökeni ve lisans kanıtı görüldükten sonra D-08 ve D-09 için açık gateApproval."
+      "blockedReason": "D-08 kaynak denetimi yetersiz: hedef set Apache-2.0 etiketi taşısa da okuyucu kimliği, orijinal master kökeni ve ses baytlarını yeniden dağıtma hakkı kanıtlanamadı.",
+      "requiredUserDecision": "Adlandırılmış okuyucu + kayıt/master kaynağı + yeniden dağıtım izni kanıtlandıktan sonra D-08/D-09 gateApproval.",
+      "userAuthorization": {
+        "by": "user",
+        "at": "2026-09-23",
+        "source": "yap tum yetkileri veriyorum",
+        "scope": "KAO-24 kaynak araştırması ve kanıt yeterliyse uygulama",
+        "thirdPartyRightsGranted": false
+      },
+      "sourceAudit": {
+        "status": "insufficient",
+        "evidence": "kuran-ogreniyorum/evidence/KAO-24/SOURCE-AUDIT.md",
+        "targetDatasetLicenseLabel": "Apache-2.0",
+        "reciterIdentityVerified": false,
+        "masterOriginVerified": false,
+        "audioRedistributionRightVerified": false,
+        "gateApprovalCreated": false
+      }
     },
     "KAO-25": {
       "title": "Plan denetleyici (kao-plan-check) sertleştirme",

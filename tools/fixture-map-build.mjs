@@ -32,7 +32,7 @@ const PRODUCTION_DIRS = ['app/', 'panel/', 'v3-tanitim/', 'assets/'];
 
 const isProductionPath = value => {
   if (!value || typeof value !== 'string') return false;
-  if (value.startsWith('tests/') || value.startsWith('ilham-ibadet-premium-plan/')) return false;
+  if (value.startsWith('tests/') || value.startsWith('archive/ilham-ibadet-premium-plan/') || value.startsWith('archive/')) return false;
   if (!/\.(js|css|html|json|png|svg)$/.test(value)) return false;
   return PRODUCTION_ROOTS.includes(value) || PRODUCTION_DIRS.some(prefix => value.startsWith(prefix));
 };
@@ -111,7 +111,7 @@ for (const [fixture, entry] of Object.entries(map)) {
 const artifact = {
   schemaVersion: 1,
   generatedBy: 'tools/fixture-map-build.mjs',
-  note: 'Fixture -> production-file map derived from committed sources (literal + path.join + local-helper transitive). Read-only scan; regenerate after adding fixtures or helpers. Consumed by ilham-ibadet-premium-plan/tools/plan-check.mjs sibling-regression gate.',
+  note: 'Fixture -> production-file map derived from committed sources (literal + path.join + local-helper transitive). Read-only scan; regenerate after adding fixtures or helpers. Consumed by archive/ilham-ibadet-premium-plan/tools/plan-check.mjs sibling-regression gate.',
   families: familyTotals,
   byFixture: map,
   byProduction,

@@ -49,8 +49,8 @@ _Son güncelleme: 2026-09-15 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 >   **`tests/app` 0 FAIL**, `tests/quran` 9/9, üç plan aracı exit 0. **AÇIK KALAN:**
 >   `deviceAcceptance=not_verified` (cihaz teyidi yok), p50/p95 ölçülmedi, FIXTURE-MAP
 >   tabanlı önleyici kapı (P13) yok. Ayrıntı:
->   [`ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md`](../ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md)
->   ve [`evidence/DENETIM-BASELINE.md`](../ilham-ibadet-premium-plan/evidence/DENETIM-BASELINE.md).
+>   [`archive/ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md`](../archive/ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md)
+>   ve [`evidence/DENETIM-BASELINE.md`](../archive/ilham-ibadet-premium-plan/evidence/DENETIM-BASELINE.md).
 > - **2026-09-15 (v3.0 CANLIYA ALINDI):** `premium-fx-gorsel-yuzey` → `main`
 >   fast-forward (`d9e4484..2162342`, 269 commit), tag `v3.0`, GitHub Pages run
 >   35006913049 success. Canlı ölçüm: `/s/v3-tanitim/` 200, gömülü anlık görüntü

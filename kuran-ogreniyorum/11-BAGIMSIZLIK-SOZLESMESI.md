@@ -12,7 +12,7 @@ kart** eklenir; kartın açtığı her şey KAO'nun kendi overlay'inde yaşar.
 | `app/content/quranLexiconV1.js` · `quranGrammarV1.js` · `quranShortSurahsV1.js` · `quranPhonicsV1.js` | `app/core/quran.js` (Kur'an Yolculuğu) — yalnız **okunur** |
 | `app/kao.css` (bağımsız stil dosyası; `styles.css` tokenlarını **tüketir**, tanımlamaz) | `app/styles.css` — yalnız D-03 kapanınca ve IIP bittikten sonra taşınabilir |
 | `assets/kao/audio/**`, `assets/kao/svg/**` | `app/core/render.js`, `appSurface.js` (IIP alanı) |
-| `tools/kao-*.mjs` · `tests/kao/**` · `kuran-ogreniyorum/**` | `ilham-ibadet-premium-plan/**` (hiçbir zaman) |
+| `tools/kao-*.mjs` · `tests/kao/**` · `kuran-ogreniyorum/**` | `archive/ilham-ibadet-premium-plan/**` (hiçbir zaman) |
 | `data.quranLearn` (tek kök) | `data.saygi`, `data.zikr`, `data.prayer`, `data.quranJourney` — yalnız okunur |
 | `App.kao*` (~27 handler) ve `ui.kao*` | Mevcut `App.*` isimleri |
 

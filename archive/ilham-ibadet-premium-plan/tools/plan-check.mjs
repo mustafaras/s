@@ -22,6 +22,15 @@ const repo = (() => {
 })();
 const readJSON = name => JSON.parse(fs.readFileSync(path.join(root, name), 'utf8'));
 const exists = name => fs.existsSync(path.join(root, name));
+// Kart dosyası iki olası konumda: kökte (`<plan>/cards/`) veya arşivde
+// (`archive/<plan>/cards/`). Arşiv-farkındalıklı çözüm; taşımadan önce de doğru.
+const cardFile = name => {
+  const direct = path.join(root, name);
+  if (fs.existsSync(direct)) return direct;
+  const archived = path.join(repo, 'archive', path.basename(root), name);
+  if (fs.existsSync(archived)) return archived;
+  return direct;
+};
 const safe = name => typeof name === 'string' && name.length > 0 && !path.isAbsolute(name) && !name.split(/[\\/]/).includes('..');
 const sha = buffer => crypto.createHash('sha256').update(buffer).digest('hex');
 const statuses = new Set(['planned', 'in_progress', 'implemented', 'in_review', 'blocked', 'done']);
@@ -278,7 +287,7 @@ if (args.has('--self-test')) {
 const errors=validate(state,requirements,ledger);
 if (!errors.length) {
   for (const c of state.cards) {
-    const file=path.join(root,c.path), body=fs.readFileSync(file,'utf8');
+    const file=cardFile(c.path), body=fs.readFileSync(file,'utf8');
     const re=/<!-- CONTRACT:START -->[\s\S]*?<!-- CONTRACT:END -->/;
     const expected=contract(c,requirements), actual=body.match(re)?.[0];
     if(!actual) errors.push('card contract marker missing '+c.id);
@@ -291,6 +300,11 @@ if (!errors.length) {
   }
 }
 function scan(dir) {
+  // Arşiv farkındalığı: plan `archive/` altına taşınınca `../docs/...` gibi
+  // göreli linkler bir seviye şaşar (archive/<plan>/../docs = archive/docs).
+  // Çözüm: link önce dosyanın GERÇEK konumuna göre denenir; bulunamazsa plan
+  // TARİHSEL (arşiv öncesi) konumuna göre çözülür — `../docs/X` yine repo
+  // köküne düşer. Taşımadan önce de doğrudur (ilk çözüm tutar).
   for (const ent of fs.readdirSync(dir,{withFileTypes:true})) {
     const file=path.join(dir,ent.name);
     if(ent.isDirectory()) scan(file);
@@ -298,8 +312,10 @@ function scan(dir) {
       const text=fs.readFileSync(file,'utf8');
       for(const [,href] of text.matchAll(/\]\(([^)]+)\)/g)) {
         if (/^(https?:|#)/.test(href)) continue;
-        const target=path.resolve(path.dirname(file),href.split('#')[0]);
-        if(!fs.existsSync(target)) errors.push('broken link: '+path.relative(root,file)+' -> '+href);
+        const rel=href.split('#')[0];
+        if(fs.existsSync(path.resolve(path.dirname(file),rel))) continue;
+        if(fs.existsSync(path.resolve(repo,path.basename(root),rel))) continue;
+        errors.push('broken link: '+path.relative(root,file)+' -> '+href);
       }
     }
   }

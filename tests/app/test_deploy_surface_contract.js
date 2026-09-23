@@ -37,7 +37,7 @@ var raw = fs.readFileSync(workflowPath, 'utf8');
 // ---------------------------------------------------------------------------
 var INTERNAL_DIRS = [
   'docs', 'tests', 'archive', '.claude', 'tools', 'files',
-  'ilham-ibadet-premium-plan', 'kuran-ogreniyorum', 'jev-gate'
+  'kuran-ogreniyorum', 'jev-gate'
 ];
 
 var REQUIRED_ASSETS = [

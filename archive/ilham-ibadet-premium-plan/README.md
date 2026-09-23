@@ -7,7 +7,15 @@
 > Kapanış belgesi: [`docs/IIP-KAPANIS.md`](../docs/IIP-KAPANIS.md) · Durum: [`IIP-STATE.json`](IIP-STATE.json) (`nextExecutableCard: null`)
 > Ölçüm: **154 fixture PASS / 0 FAIL** · `plan-check.mjs` + `--self-test` + `.integration.py` **exit 0**
 > **Dürüstçe açık:** hedef cihaz p50/p95 sayısı yok (`user_accepted`); cihaz kabulü kullanıcı beyanı (`user_attested`, `agentVerified:false`).
-> Bu klasör **taşınmadı** — taşıma 16 kanıt makbuzunun komut yolunu, `test_iip_17.js`'in yazma yolunu ve plan-içi bağlantıları kırar (gerekçe + ölçüm: kapanış belgesi §7). Yeni bir IIP işi ayrı kapsam onayı ister.
+> Bu klasör **2026-09-23'te `archive/` altına TAŞINDI** — kullanıcı kararı ve
+> ölçümle doğrulandı. Taşımanın kırdığı dört nokta çözüldü: (1) `plan-check.mjs`
+> kök çözümü zaten `app.js` sembolündeydi, kart dosyası ve link çözümü
+> arşiv-farkındalıklı yapıldı; (2) `evidence-reconcile.mjs` yol sabiti arşiv
+> farkındalıklı; (3) `plan-check.integration.py` kökü `app.js`'ten çözüyor;
+> (4) `test_iip_17.js` yazma yolu güncellendi. **Kapılar taşımadan sonra da
+> exit 0** (plan-check · --self-test · integration.py · evidence-reconcile ·
+> fixture-map) ve **156 fixture PASS / 0 FAIL**. Ölçüm: kapanış belgesi §10.
+> Yeni bir IIP işi ayrı kapsam onayı ister.
 
 > ### ⛔ Denetim kaydı (tarihsel — ARTIK GEÇERSİZ)
 > Aşağıdaki bulgular **2026-09-22'de düzeltildi**; kayıt olarak duruyor.

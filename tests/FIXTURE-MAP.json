@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "generatedBy": "tools/fixture-map-build.mjs",
-  "note": "Fixture -> production-file map derived from committed sources (literal + path.join + local-helper transitive). Read-only scan; regenerate after adding fixtures or helpers. Consumed by ilham-ibadet-premium-plan/tools/plan-check.mjs sibling-regression gate.",
+  "note": "Fixture -> production-file map derived from committed sources (literal + path.join + local-helper transitive). Read-only scan; regenerate after adding fixtures or helpers. Consumed by archive/ilham-ibadet-premium-plan/tools/plan-check.mjs sibling-regression gate.",
   "families": {
-    "app": 75,
+    "app": 76,
     "panel": 23,
     "panel-v2": 27,
     "quran": 9,
@@ -773,6 +773,13 @@
       "family": "app",
       "production": [
         "app/core/syncGlue.js"
+      ]
+    },
+    "tests/app/test_sync_fetch_timeout.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "sync.js"
       ]
     },
     "tests/app/test_sync_large_file.js": {
@@ -1741,6 +1748,7 @@
       "tests/app/test_saygi_boundary.js",
       "tests/app/test_settings_boundary.js",
       "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_sync_fetch_timeout.js",
       "tests/app/test_today_card_preferences.js",
       "tests/app/test_v3_welcome.js",
       "tests/app/test_zikir_boundary.js",
@@ -2633,6 +2641,7 @@
       "tests/app/test_faz10_sync.js",
       "tests/app/test_iip_20.js",
       "tests/app/test_local_visual_qa_guard.js",
+      "tests/app/test_sync_fetch_timeout.js",
       "tests/app/test_sync_large_file.js",
       "tests/app/test_v3_welcome.js",
       "tests/app/test_zikr_manual_entry.js",

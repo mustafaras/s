@@ -12,10 +12,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
 - `app/test_iip_*.js` — **İlham & İbadet Premium (IIP)** ailesi, 16 fixture.
-  Program: [`ilham-ibadet-premium-plan/`](../ilham-ibadet-premium-plan/README.md);
-  durum [`IIP-STATE.json`](../ilham-ibadet-premium-plan/IIP-STATE.json);
-  denetim tablosu [`evidence/DENETIM-BASELINE.md`](../ilham-ibadet-premium-plan/evidence/DENETIM-BASELINE.md);
-  kapatma adımları [`DUZELTME-PROMPTLARI.md`](../ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md).
+  Program: [`archive/ilham-ibadet-premium-plan/`](../archive/ilham-ibadet-premium-plan/README.md);
+  durum [`IIP-STATE.json`](../archive/ilham-ibadet-premium-plan/IIP-STATE.json);
+  denetim tablosu [`evidence/DENETIM-BASELINE.md`](../archive/ilham-ibadet-premium-plan/evidence/DENETIM-BASELINE.md);
+  kapatma adımları [`DUZELTME-PROMPTLARI.md`](../archive/ilham-ibadet-premium-plan/DUZELTME-PROMPTLARI.md).
   Kapsam: `test_iip_03` (anlam denetimi, payda bastırma), `04` (hub hiyerarşi),
   `05` (öncü okuyucu görsel sözleşmesi), `06` (ibadet/kıble birlik), `07`
   (zikir–Kur’an geçiş), `09` (bilgi mimarisi), `10` (öncü arama/filtre), `11`
@@ -132,7 +132,7 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   (2026-09-22): `.github/workflows/pages.yml`’in “Stage runtime-only site”
   adımından **gerçek** `--exclude` bayraklarını çıkarır, aynı rsync’i geçici bir
   dizinde **çalıştırır** ve staged ağacı denetler. İç dizinlerden biri
-  (`docs tests archive .claude tools files ilham-ibadet-premium-plan
+  (`docs tests archive .claude tools files kuran-ogreniyorum jev-gate
   kuran-ogreniyorum jev-gate`) sızarsa, zorunlu çalışma zamanı varlıklarından
   biri (`index.html`, `app.js`, `app/styles.css`, `panel/…`, `v3` istisnası
   dâhil) düşerse veya staged ağaçta bir `.md` kalırsa FAIL eder. Guard adımının

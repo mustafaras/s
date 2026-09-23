@@ -15,7 +15,12 @@ import { fileURLToPath } from 'node:url';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const apply = process.argv.includes('--apply');
-const root = path.join(repo, 'ilham-ibadet-premium-plan', 'evidence');
+// Arşiv farkındalığı: plan  altına taşınırsa yol bir seviye şaşar.
+const root = (() => {
+  const direct = path.join(repo, 'ilham-ibadet-premium-plan', 'evidence');
+  if (fs.existsSync(direct)) return direct;
+  return path.join(repo, 'archive', 'ilham-ibadet-premium-plan', 'evidence');
+})();
 
 // Commands that only make sense at the moment they were run (they inspect the
 // working tree as it was). Re-running them today is still meaningful, but a

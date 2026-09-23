@@ -2,10 +2,31 @@
 # Validator-only synthetic tests; never executes product code or contacts the network.
 from pathlib import Path
 import tempfile,shutil,json,hashlib,subprocess
-repo=Path(__file__).resolve().parents[2]; tmp=Path(tempfile.mkdtemp(prefix='iip-validator-',dir='/private/tmp'))
+# Arşiv farkındalığı: plan `archive/` altına taşınırsa `parents[2]` repo kökü
+# yerine `archive/` verir. Kök, `app.js` sembolü yukarı yürünerek bulunur —
+# taşımadan önce de doğrudur.
+def _find_repo(p):
+ for d in [p]+list(p.parents):
+  if (d/'app.js').is_file(): return d
+ return p.parents[1]
+repo=_find_repo(Path(__file__).resolve().parent)
+tmp=Path(tempfile.mkdtemp(prefix='iip-validator-',dir='/private/tmp'))
+p=tmp/'ilham-ibadet-premium-plan'
+# Plan kaynağı GERÇEK konumudur (kökte veya archive/ altında); validator her
+# koşuda tarihsel düzeni (plan kökte) kurar.
+plan_src=Path(__file__).resolve().parents[1]
 for child in repo.iterdir():
- if child.name!='ilham-ibadet-premium-plan': (tmp/child.name).symlink_to(child,target_is_directory=child.is_dir())
-p=tmp/'ilham-ibadet-premium-plan'; shutil.copytree(repo/p.name,p)
+ if child.name=='ilham-ibadet-premium-plan': continue
+ if child.name=='archive':
+  # archive/ korunur (plan içinden `../archive/...` linkleri hedeflenir) ama
+  # ALTINDAKI plan kopyası atlanır — aksi halde ikinci kopya çift sayım olur.
+  (tmp/'archive').mkdir(exist_ok=True)
+  for sub in child.iterdir():
+   if sub.name=='ilham-ibadet-premium-plan': continue
+   (tmp/'archive'/sub.name).symlink_to(sub,target_is_directory=sub.is_dir())
+  continue
+ (tmp/child.name).symlink_to(child,target_is_directory=child.is_dir())
+shutil.copytree(plan_src,p)
 s=json.loads((p/'IIP-STATE.json').read_text()); c=s['cards'][0]
 # P12: baseline artık 24/24 done (plan tamamlanmış durumda). Sentetik senaryonun
 # kendi TEMİZ başlangıcını kurması gerekir; aksi halde "card totals drift" ve

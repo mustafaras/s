@@ -35,7 +35,7 @@ Aşağıdaki adımlar her promptta geçerlidir; prompt gövdelerinde tekrar edil
 ### S1 · Değişmezler (ihlali commit'i iptal ettirir)
 | | Kural |
 |---|---|
-| K1 | **Bağımsızlık** — [11](11-BAGIMSIZLIK-SOZLESMESI.md): KAO yalnız kendi dosyalarına yazar; `ilham-ibadet-premium-plan/**`'a asla; `saygi.js`'e yalnız KAO-21'de ≤3 satır |
+| K1 | **Bağımsızlık** — [11](11-BAGIMSIZLIK-SOZLESMESI.md): KAO yalnız kendi dosyalarına yazar; `archive/ilham-ibadet-premium-plan/**`'a asla; `saygi.js`'e yalnız KAO-21'de ≤3 satır |
 | K2 | **Tek `data` kökü** — yalnız `data.quranLearn`; başka köke yazma yok; `migrate()` yalnız `ensureQuranLearn` çağrısı |
 | K3 | **App yüzeyi** — `App.kao*` handler + `ui.kao*`; `addEventListener` ile yeni bağlama yok; overlay şablonu + `App.onModalKeydown` |
 | K4 | **Ağ** — `quranLearn.js`'te `fetch` yalnız `assets/kao/`; `localStorage`/`SeySync`/token erişimi yok; mikrofon kaydı bellek-içi |
@@ -1522,7 +1522,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 **Oku (yalnız bunlar; yollar `kuran-ogreniyorum/` göreli, repo dosyaları kökten):**
 - 11 §2, §4 (kart sözleşmesi ve zamanlama)
 - `app/core/saygi.js` `saygiHTML` satırı ve `SAYGI_DEPENDENCIES` (güncel HEAD'de yeniden bul; satır numarası değişmiş olabilir)
-- `ilham-ibadet-premium-plan/IIP-STATE.json` yalnız `status`/`activeCard` alanları (IIP'nin saygi.js yazma penceresi açık mı)
+- `archive/ilham-ibadet-premium-plan/IIP-STATE.json` yalnız `status`/`activeCard` alanları (IIP'nin saygi.js yazma penceresi açık mı)
 
 **İzinli dosyalar (STATE ile birebir):**
 - `app/core/saygi.js`
@@ -1701,7 +1701,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - Kontrast tablosu: her çift ve 3 hareke tonu × 2 tema ≥ eşik.
 - Panel: izinli alan dışı anahtar yok; panel/panel-v2 aileleri yeşil; kelime düzeyi veri sızmıyor (projeksiyon fixture).
 - KAO-REGRESYON.md: tüm aile komutları exit kodlarıyla; M7 tavanı açıkça; R-C9 headless PASS; kalibrasyon raporu 10 bant.
-- `git diff --stat main -- ilham-ibadet-premium-plan` **boş** (IIP'ye hiç dokunulmadı).
+- `git diff --stat main -- archive/ilham-ibadet-premium-plan` **boş** (IIP'ye hiç dokunulmadı).
 
 **Kontroller:** ortak (`node --check` yok — kod yok), `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`, `git diff --check`; kapsamdaki her kartın **kendi kontrol listesi yeniden çalıştırılır** (`--card` ile al).
 

@@ -109,17 +109,18 @@ Program kapandı. **Yeni bir IIP işi başlatılmaz**; aşağıdaki iki durumda
 2. **Yeni içerik/kart ihtiyacı** doğarsa → ayrı kapsam değişikliği ve kullanıcı onayı gerekir
    (plan kuralı: "yeni içerik ihtiyacı insan incelemesi ister").
 
-**Klasör taşınmadı, bilinçli olarak.** Program kökünde kalıyor çünkü taşıma
-şunları kırar (2026-09-22'de simülasyonla ölçüldü):
+**Klasör 2026-09-23'te `archive/` altına TAŞINDI.** §7'deki "taşınmaz" gerekçesi
+**geçersiz** — bağımlılık araç kodundaydı ve §9'da arşiv-farkındalıklı hâle
+getirilerek çözüldü. Aşağıdaki liste taşımanın **kırdığı noktaları** gösterir
+(hepsi çözüldü):
 - `tests/app/test_iip_17.js` — IIP-17 render artifact'ini kendi klasörüne yazar
-- 16 kanıt makbuzu — `commands[]` içinde `ilham-ibadet-premium-plan/tools/plan-check.mjs` yolunu kaydeder
+- 20 makbuz dizini / 41 dosya — `commands[]` içinde `archive/ilham-ibadet-premium-plan/tools/plan-check.mjs` yolunu kaydeder
 - `tools/evidence-reconcile.mjs` · `tools/fixture-map-build.mjs` — yol sabitleri
 - Plan-içi bağlantılar (`../docs/`, `../tests/`, `../archive/`)
 - `tests/README.md` · `AGENTS.md` · `CLAUDE.md` yönlendirme maddeleri
 
-`plan-check.mjs` yine de **taşımaya dayanıklı** hale getirildi (repo kökü artık
-`app.js` sembolünden çözülüyor, sabit varsayım yok) — ileride taşınma kararı
-verilirse araç hazır.
+`plan-check.mjs` **taşımaya dayanıklı** hâle getirildi (repo kökü `app.js`
+sembolünden, kart dosyası ve linkler arşiv-farkındalıklı).
 
 ---
 
@@ -169,30 +170,61 @@ anlamlı birincil sinyaldir.
 
 ---
 
-## 9. Klasör neden kökte kalıyor (taşıma reddi — 2026-09-23)
+## 9. Klasör taşındı — arşiv-farkındalıklı hâle getirildi (2026-09-23)
 
-Kullanıcı "yoksa kaldır/taşı" dedi. **Taşıma yapılmadı**; gerekçe ölçülmüş
-bağımlılık, tercih değil.
+**Sonuç: TAŞINDI.** Kullanıcı kararı ("taşımamız gerekiyor") üzerine klasör
+`ilham-ibadet-premium-plan/` → **`archive/ilham-ibadet-premium-plan/`** oldu.
 
-Ölçüm (2026-09-23):
+Önceki (§7) "taşınmaz" değerlendirmesi, bağımlılığın **araç kodunda** olduğu
+varsayımına dayanıyordu. Ölçüm bunu **çürüttü**: bağımlılık **4 somut noktada**
+toplanıyor ve hepsi çözülebilir. Taşıma deneyi (git mv → ölç → geri al) yapıldı,
+sahte bir engel olmadığı doğrulandı.
 
-| Bağımlılık | Sayı / konum |
+### Taşımanın kırdığı 4 nokta ve çözümü
+
+| # | Nokta | Önce | Çözüm |
+|---|---|---|---|
+| 1 | `plan-check.mjs` **kart dosyası** | `path.join(root,c.path)` | `cardFile()` — arşiv-farkındalıklı |
+| 2 | `plan-check.mjs` **link tarayıcı** | yalnız dosyaya göreli çözüm | 2. deneme: planın **tarihsel** konumu (`repo/<planAdı>/`) |
+| 3 | `evidence-reconcile.mjs` **yol sabiti** | `repo/ilham-ibadet-premium-plan/evidence` | kökte yoksa `archive/…` (çift yol) |
+| 4 | `plan-check.integration.py` **kök** | `parents[2]` (arşivde `archive/` oluyordu) | `app.js` sembolünden yukarı yürüme + plan kaynağı gerçek konum + `archive/` linkleri korunur |
+
+Ek: `test_iip_17.js` yazma yolu, `fixture-map-build.mjs` dizin filtresi ve
+doküman referansları güncellendi. **41 makbuz komutu yeniden yazılmadı** —
+çözüm aracı taşımaya duyarlı yapmak oldu, kanıtı kurcalamak değil.
+
+### Kritik ayrım (önceki değerlendirmenin hatası)
+
+| | Ölçüm |
 |---|---|
-| Kanıt makbuzu `commands[]` içinde plan-check yolu | **20 dizin / 41 dosya** |
-| `tools/evidence-reconcile.mjs` | kök yolu sabit: `ilham-ibadet-premium-plan/evidence` |
-| `tools/fixture-map-build.mjs` | plan yolu + `note` alanı |
-| `tests/FIXTURE-MAP.json` | `note` alanı plan-check'e atıf |
-| `tests/app/test_iip_17.js` | render artifact'ini **plan klasörüne YAZAR** |
-| Kök dokümanlar | `AGENTS.md`(1) · `CLAUDE.md`(1) · `tests/README.md`(5) · `archive/README.md`(2) |
+| Plan içi göreli link (taşımadan etkilenmez) | **245** |
+| Dışarı bakan link (kırılırdı) | **6** — 3 dosyada |
+| Makbuz komut yolu (araç farkındalığıyla çözüldü) | 20 dizin / 41 dosya |
 
-**Kritik ayrım — kardeş programlarla farkı:** `archive/` altındaki MON · MON2 ·
-FX2 klasörlerine `tools/`+`tests/` içinden **yalnız 2'şer referans** var (ad
-gеçişi). IIP'te ise **20 makbuz dizini (41 dosya) canlı bir aracın yolunu
-kaydeder** ve bu yollar `evidence-reconcile.mjs` tarafından **bugün hâlâ yeniden
-koşulur**. Taşıma bu kayıtları "command not found" durumuna düşürür.
+Makbuzların `artifactSha256`/`diffHash` alanları **hash'lenen içerik**tir; komut
+yolları bunlara girmez ⇒ araç kodunu düzeltmek yeterli, kanıtı değiştirmek
+gerekmedi.
 
-Ek olarak `docs/IIP-KAPANIS.md` §7'de kayıtlı taşıma simülasyonu zaten
-yapılmıştı (aynı sonuçlar). Bu bölüm o kararı **ölçümle yeniden doğrular**.
+### Doğrulama (taşıma sonrası)
+
+| Kapı | Sonuç |
+|---|---|
+| `plan-check.mjs` | **exit 0** |
+| `plan-check.mjs --self-test` | **exit 0** |
+| `plan-check.integration.py` | **exit 0** |
+| `tools/evidence-reconcile.mjs` | **exit 0** |
+| `tools/fixture-map-build.mjs` | **exit 0** |
+| `tests/app/test_iip_17.js` | **exit 0** |
+| Fixture bataryası | **156 PASS / 0 FAIL** |
+
+Bu, `archive/` altındaki MON · MON2 · FX2 · PANEL-V2 ile **aynı düzene** getirir.
+
+---
+
+## 10. Taşıma kararının önceki kaydı (2026-09-23, artık GEÇERSİZ)
+
+Aşağıdaki bölüm, taşımadan **önce** yapılan değerlendirmeyi kaydeder. **Geçersiz:**
+bağımlılık araç kodundaydı ve §9'da çözüldü.
 
 > **Sonuç:** IIP kökte kalır. Arşiv statüsü zaten `status: done` + kapanış
 > belgesi + `archive/README.md`'deki "Kapanmış ama TAŞINMAMIŞ program" bölümüyle
@@ -210,7 +242,7 @@ IIP kapsamını yeniden açmaz; buraya yalnız kayıt için yazılmıştır.
 
 **Kusur.** `pages.yml` depo kökünü "olduğu gibi" yayınlıyordu. İlk sertleştirme
 turunda `docs/` `tests/` `archive/` `.claude/` dışlanmıştı; aynı desenle
-`tools/` `files/` `ilham-ibadet-premium-plan/` `kuran-ogreniyorum/` `jev-gate/`
+`tools/` `files/` `archive/ilham-ibadet-premium-plan/` `kuran-ogreniyorum/` `jev-gate/`
 **açıkta kaldı**.
 
 **Kanıt (curl).** Deploy öncesi canlı sorgu:
@@ -218,7 +250,7 @@ turunda `docs/` `tests/` `archive/` `.claude/` dışlanmıştı; aynı desenle
 | URL | Kod |
 |---|---|
 | `tools/evidence-reconcile.mjs` | `200` |
-| `ilham-ibadet-premium-plan/IIP-STATE.json` | `200` |
+| `archive/ilham-ibadet-premium-plan/IIP-STATE.json` | `200` |
 | `kuran-ogreniyorum/KAO-STATE.json` | `200` |
 | `jev-gate/JEV-GATE-STATE.json` | `200` |
 | `v3-tanitim/` (kasıtlı yayında) | `200` |

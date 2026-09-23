@@ -37,7 +37,7 @@ test('12 pilot kaydın tamamında alan sahibi onaylı okunuş vardır',()=>{cons
 if(process.exitCode)process.exit(1);
 if(process.argv.includes('--render')){
   const artifact='<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IIP-17 render matrisi</title><link rel="stylesheet" href="../../../app/styles.css"><style>body{margin:0;padding:24px;background:#d9dce8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.matrix{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}.shot{max-width:430px;margin:auto;border-radius:32px;overflow:hidden;box-shadow:0 22px 70px rgba(20,24,40,.24)}.shot>header{padding:12px 18px;background:#202942;color:#fff;font-weight:800}.shot #root{padding:16px;display:grid;gap:14px;min-height:900px;background:var(--bg);color:var(--text)}@media(max-width:520px){body{padding:8px}.matrix{grid-template-columns:1fr;gap:12px}}</style></head><body><main class="matrix"><section class="shot"><header>Açık tema · 375 px</header><div id="root" data-theme="light">'+visualSpirit+html+'</div></section><section class="shot"><header>Koyu tema · 430 px</header><div id="root" data-theme="dark">'+visualSpirit+html+'</div></section></main></body></html>';
-  const out=path.join(root,'ilham-ibadet-premium-plan/evidence/IIP-17/render-matrix.html');
+  const out=path.join(root,'archive/ilham-ibadet-premium-plan/evidence/IIP-17/render-matrix.html');
   fs.writeFileSync(out,artifact);
   console.log('RENDER '+out);
 }

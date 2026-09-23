@@ -166,8 +166,16 @@ const TRANSLIT_DIA_LONG = Object.freeze({ A: 'ā', Y: 'ī', w: 'ū', y: 'ī', '|
 const GLIDE_LONG = Object.freeze(new Set(['w', 'y']));
 // `~` (şedde) de sayılır: şeddeli glide çift ünsüzdür (iyyâ, kuvve).
 const GLIDE_CONSONANT_NEXT = Object.freeze(new Set(['a', 'i', 'u', 'F', 'N', 'K', 'o', '~']));
-// A dagger alef (`) already carries the long vowel: عَلَىٰ `EalaY` → ʿalâ.
-const DAGGER_PAIR = Object.freeze(new Set(['Y', 'y']));
+// A dagger alef (`) already carries the long vowel: عَلَىٰ `EalaY` → ʿalâ;
+// Uthmani `w` + dagger is the same (صَلَوٰة `Salaw`p` → salât, the vav is silent).
+const DAGGER_PAIR = Object.freeze(new Set(['Y', 'y', 'w']));
+// Consonant value of a glide (w → v, y/Y → y). `Y` (elif maksûre) is a consonant
+// only before a vowel/sukun/şedde: شَىْء `$aYo'` → şay', أَىّ `>aY~` → ayy.
+const GLIDE_CONSONANT = Object.freeze({ w: 'v', y: 'y', Y: 'y' });
+// Tenvinin taşıyıcısı (elif / elif maksûre / hançer) okunmaz: هُدًى → hüden, أَبَدًا → ebeden.
+const TANWIN_SEAT = Object.freeze(new Set(['A', 'Y', '`']));
+// Kelime içi/sonu hemze okunuş katmanında ' ile gösterilir (10 §7); kelime başında yazılmaz.
+const HAMZA_SEATS = Object.freeze(new Set(["'", '>', '<', '&', '}']));
 const TR_SHORT_VOWELS = Object.freeze(new Set(['a', 'e', 'u', 'ü', 'i', 'ı']));
 const DIA_SHORT_VOWELS = Object.freeze(new Set(['a', 'u', 'i']));
 
@@ -183,7 +191,8 @@ function sha256(buffer) {
 }
 
 function bwToArabic(value) {
-  return Array.from(value || '', (character) => (
+  // QAC ayırt edici rakamı (`EaAd2`) Arapça yazıya girmez.
+  return Array.from(String(value || '').replace(/[0-9]/g, ''), (character) => (
     Object.prototype.hasOwnProperty.call(BUCKWALTER_TO_ARABIC, character)
       ? BUCKWALTER_TO_ARABIC[character]
       : character
@@ -617,7 +626,7 @@ function draftSelfTest() {
   assert(cognateProbe[0].bucket !== 'B', 'kova etiketi taslakta üretilir, elle değiştirilmez');
   assert(draft.candidates.every((record) => record.verified === false), 'hiçbir taslak satırı doğrulanmış olmamalı');
   assert(draft.candidates.every((record) => record.tr1 === null && record.cognateTr === null),
-    'Türkçe anlam alanları taslakta boş olmalı (insan yazar)');
+    'Türkçe anlam alanları taslakta boş olmalı (doğrulayıcı yazar)');
   assert(draft.candidates.every((record) => record.translit.tr && record.translit.dia && record.translit.auto === true),
     'transliterasyon önerisi iki katmanlı ve auto işaretli olmalı');
   assert(draft.candidates.every((record) => !arabicWordRegex().test(record.lemmaBw) && arabicWordRegex().test(record.ar)),
@@ -684,31 +693,47 @@ function draftSelfTest() {
   assert(dupProbe.duplicated.length === draft.candidates.length,
     'yinelenen lemmaId sessizce eşleştirilmemeli, raporlanmalı');
 
-  // 4c · human work must survive a re-draft (06 §3) — injected, so hermetic
+  // 4c · verifier work must survive a re-draft (06 §3) — injected, so hermetic
   const humanMap = new Map([['Hamod', { tr: 'rahmet', shift: 'kayma', pattern: 'masdar',
-    tr1: 'hamd', tr2: null, verifiedBy: 'insan-1', verifiedAt: '2026-09-20', exampleTr: ['insan çevirisi'] }]]);
+    tr1: 'hamd', tr2: null, verifiedBy: 'dogrulayici-1', verifiedAt: '2026-09-20', exampleTr: ['doğrulayıcı çevirisi'] }]]);
   const carried = lemmaCandidateRecords(parseMorphology(fixture.morphology), uthmani.byVerse, {}, humanMap);
   const carriedHamod = carried.candidates.find((record) => record.lemmaBw === 'Hamod');
   assert(carriedHamod.tr1 === 'hamd' && carriedHamod.cognateTr === 'rahmet'
     && carriedHamod.pattern === 'masdar' && carriedHamod.verified === true
     && carriedHamod.verifiedAt === '2026-09-20',
-    'insan girdisi (anlam/kognat/kalıp/doğrulama) yeniden taslakta korunmalı');
-  assert(carriedHamod.examples[0].tr === 'insan çevirisi', 'örnek çevirisi korunmalı');
+    'doğrulayıcı girdisi (anlam/kognat/kalıp/doğrulama) yeniden taslakta korunmalı');
+  assert(carriedHamod.examples[0].tr === 'doğrulayıcı çevirisi', 'örnek çevirisi korunmalı');
   assert(carriedHamod.lemmaId === draft.candidates.find((r) => r.lemmaBw === 'Hamod').lemmaId,
     'kimlikler yeniden üretimde kararlı olmalı');
 
-  // 4d · two-gaze approval rule is machine-verifiable (06 §3)
-  assert(parseApprovalDates('insan-1 (2026-09-23; 2026-09-24)').twoDayOk === true,
-    'iki ayrı gün kaydı tanınmalı');
-  assert(parseApprovalDates('2026-09-23').satisfiesTwoGazeRule === false,
-    'tek tarih iki-göz kuralını karşılamaz');
-  assert(parseApprovalDates('2026-09-23; 2026-09-23').twoDayOk === false,
-    'aynı gün iki kez yazılsa da iki ayrı gün sayılmaz');
-  assert(parseApprovalDates('').dates.length === 0, 'tarihsiz onay kaydı boş dönmeli');
+  // 4d · onay kuralı D-12 (06 §3): tek doğrulayıcı + tek geçerli tarih
+  assert(parseApproval('2026-09-23').valid === true && parseApproval('2026-09-23').date === '2026-09-23',
+    'tek geçerli tarih onay için yeterli olmalı (D-12)');
+  assert(parseApproval('2026-02-30').valid === false, 'takvimde olmayan tarih reddedilmeli');
+  assert(parseApproval('x (2026-09-23; 2026-09-24)').valid === false, 'çok tarihli/serbest metin onay tarihi değildir');
+  assert(parseApproval('').valid === false, 'tarihsiz onay geçersiz olmalı');
+  // 4e · kalıp sözlüğü ve kognat biçimi (06 §3.1)
+  assert(validatePattern("fiil I (fa'ala) · ecvef") && validatePattern('harf-i cer')
+    && validatePattern("sıfat-ı müşebbehe (fa'îl)") && validatePattern("fiil IV (ef'ale) · mehmûz, nâkıs"),
+    'sözlükteki kalıp etiketleri geçerli olmalı');
+  assert(!validatePattern("fa'l") && !validatePattern("masdar (fa'l) · ecvef") && !validatePattern('')
+    && !validatePattern("fiil I (fa'ala) · uydurma"), 'sözlük dışı etiket/illet reddedilmeli');
+  assert(validateCognate('rahmet; merhamet') && validateCognate('') && validateCognate(null),
+    'geçerli kognat biçimi kabul edilmeli');
+  assert(!validateCognate('Rahîm (esmâ)') && !validateCognate('a; b; c; d'), 'parantezli/4+ parçalı kognat reddedilmeli');
+  // 4f · transliterasyon düzeltmeleri (10 §7)
+  assert(translitTr('Salaw`p') === 'salât' && translitTr('raHomap') === 'rahmet' && translitTr("'aAyap") === 'âyet',
+    'ta marbûta: salât / rahmet / âyet');
+  assert(translitTr('hudFY') === 'huden' && translitTr('>abadFA') === 'abaden', 'tenvin taşıyıcısı okunmamalı');
+  assert(translitTr('>aw') === 'av' && translitTr("$aYo'") === "şay'" && translitTr('>aY~') === 'ayy',
+    'diftong ve ünsüz ye');
+  assert(translitTr('hadaY') === 'hadâ' && translitTr('fiY') === 'fî', 'elif maksûre fethadan sonra â');
+  assert(translitTr('mu&omin') === "mu'min" && translitTr('>aHad') === 'ahad', 'kelime içi hemze gösterilir, baştaki gösterilmez');
+  assert(translitTr('EaAd2') === 'ʿâd' && bwToArabic('EaAd2') === bwToArabic('EaAd'), 'QAC ayırt edici rakamı düşer');
   // doğrulanmış + eksik örnek çevirisi tutarsızlık olarak yakalanmalı
   const consProbe = parseReviewMarkdown(
-    fill(fill(markdown, firstId, { tr1: 'anlam', verifiedBy: 'insan-1', verifiedAt: '2026-09-23' }),
-      secondId, { tr1: 'anlam2', verifiedBy: 'insan-2', verifiedAt: '2026-09-23' }),
+    fill(fill(markdown, firstId, { tr1: 'anlam', verifiedBy: 'dogrulayici-1', verifiedAt: '2026-09-23' }),
+      secondId, { tr1: 'anlam2', verifiedBy: 'dogrulayici-2', verifiedAt: '2026-09-23' }),
     JSON.parse(JSON.stringify(draft.candidates))
   );
   assert(consProbe.consistencyTotal > 0, 'doğrulanmış satırda eksik örnek çevirisi tutarsızlık olmalı');
@@ -720,8 +745,8 @@ function draftSelfTest() {
 
   // 6 · review round-trip and verification gating (06 §3)
   // Sütun ADINA göre doldur (indeks/regex kırılganlığı yok; sütun eklenmesi testi bozmaz).
-  let filled = fill(markdown, firstId, { tr1: 'birinci anlam', verifiedBy: 'insan-1' });
-  filled = fill(filled, secondId, { tr1: 'ikinci anlam', verifiedBy: 'insan-2' });
+  let filled = fill(markdown, firstId, { tr1: 'birinci anlam', verifiedBy: 'dogrulayici-1' });
+  filled = fill(filled, secondId, { tr1: 'ikinci anlam', verifiedBy: 'dogrulayici-2' });
   const parsedReview = parseReviewMarkdown(filled, JSON.parse(JSON.stringify(draft.candidates)));
   assert(parsedReview.unknownTotal === 0, 'bilinmeyen lemmaId olmamalı');
   assert(parsedReview.duplicated.length === 0, 'normal turda yinelenen kimlik olmamalı');
@@ -729,14 +754,20 @@ function draftSelfTest() {
   const firstVerified = parsedReview.records.find((record) => record.lemmaId === firstId);
   assert(firstVerified.verified === true && firstVerified.verifiedAt, 'doğrulanan satıra tarih yazılmalı');
   assert(firstVerified.tr1 === 'birinci anlam', 'tr1 tablodan içe alınmalı');
-  const dated = fill(markdown, firstId, { verifiedBy: 'insan-1', verifiedAt: '2026-09-20' });
+  const exProbe = fill(markdown, firstId, { tr1: 'anlam', verifiedBy: 'yz-1', ex1_tr: 'bir', ex2_tr: 'iki', ex3_tr: 'üç' });
+  const exParsed = parseReviewMarkdown(exProbe, JSON.parse(JSON.stringify(draft.candidates)));
+  const exRecord = exParsed.records.find((record) => record.lemmaId === firstId);
+  assert(exRecord.examples.map((example) => example.tr).slice(0, exRecord.examples.length).join('|')
+    === ['bir', 'iki', 'üç'].slice(0, exRecord.examples.length).join('|'),
+    'ex1_tr–ex3_tr üç örnek çevirisi de içe alınmalı');
+  const dated = fill(markdown, firstId, { verifiedBy: 'dogrulayici-1', verifiedAt: '2026-09-20' });
   const datedParsed = parseReviewMarkdown(dated, JSON.parse(JSON.stringify(draft.candidates)));
   assert(datedParsed.records.find((r) => r.lemmaId === firstId).verifiedAt === '2026-09-20',
-    'tabloda girilen doğrulama tarihi korunmalı (06 §3 iki ayrı gün kuralı)');
+    'tabloda girilen doğrulama tarihi korunmalı (D-12)');
   // 06 §2 bekçisi: referansı birebir kopyalayan tr1 doğrulanmış SAYILMAZ.
   const refWord = draft.candidates[0].examples[0] && draft.candidates[0].examples[0].referenceWordTr;
   if (refWord) {
-    const copied = fill(markdown, firstId, { tr1: refWord, verifiedBy: 'insan-1' });
+    const copied = fill(markdown, firstId, { tr1: refWord, verifiedBy: 'dogrulayici-1' });
     const copiedParsed = parseReviewMarkdown(copied, JSON.parse(JSON.stringify(draft.candidates)));
     const copiedRecord = copiedParsed.records.find((r) => r.lemmaId === firstId);
     assert(copiedRecord.copiedFromReference === true && copiedRecord.verified === false,
@@ -744,7 +775,7 @@ function draftSelfTest() {
     assert(copiedParsed.copiedFromReferenceTotal === 1,
       'kopya sayısı raporlanmalı');
   }
-  const onlyBy = fill(markdown, firstId, { verifiedBy: 'insan-1' });
+  const onlyBy = fill(markdown, firstId, { verifiedBy: 'dogrulayici-1' });
   const byOnly = parseReviewMarkdown(onlyBy, JSON.parse(JSON.stringify(draft.candidates)));
   assert(byOnly.verifiedTotal === 0, 'Türkçe anlam olmadan verifiedBy doğrulamaz');
   const unknown = parseReviewMarkdown(`| ${REVIEW_HEADER.join(' | ')} |\n| x |`, []);
@@ -852,11 +883,27 @@ function compile(inputDir) {
 
 function arabicWordRegex() { return /[\u0600-\u06FF]/u; }
 
-function transliterate(lemmaBw, table, longTable, shortSet) {
-  const characters = Array.from(lemmaBw || '');
+function transliterate(lemmaBw, table, longTable, shortSet, options = {}) {
+  // QAC bazı lemmaları rakamla ayırt eder (`EaAd2`); rakam okunuşa girmez.
+  const characters = Array.from(String(lemmaBw || '').replace(/[0-9]/g, ''));
   const out = [];
+  let prevBase = null; // en son işlenen (yok sayılmayan) Buckwalter harfi
   for (let index = 0; index < characters.length; index += 1) {
     const character = characters[index];
+    const lastBase = prevBase;
+    if (!TRANSLIT_IGNORE.has(character) && character !== '~') prevBase = character;
+    if (TANWIN_SEAT.has(character) && lastBase === 'F') continue;
+    if (options.hamzaMark && HAMZA_SEATS.has(character)) {
+      if (out.length) out.push("'");
+      continue;
+    }
+    if (character === 'p') { // ta marbûta
+      if (options.taMarbutaTr) {
+        if (out.length && out[out.length - 1] === 'a') out[out.length - 1] = 'e';
+        out.push('t');
+        continue;
+      }
+    }
     if (character === '~') { // şedde
       // Buckwalter geminate harfi bazen ZATEN iki kez yazar (`{ll~ah`). Bu durumda
       // tekrar ikilemeyiz (alllah -> allah). Diğer durumda ikiler (rab~ -> rabb).
@@ -870,14 +917,27 @@ function transliterate(lemmaBw, table, longTable, shortSet) {
     }
     if (TRANSLIT_IGNORE.has(character)) continue;
     const next = characters[index + 1];
-    const long = longTable[character];
-    const glideIsConsonant = GLIDE_LONG.has(character) && GLIDE_CONSONANT_NEXT.has(next);
     const daggerHandlesIt = DAGGER_PAIR.has(character) && next === '`';
-    if (long && daggerHandlesIt) {
-      // hançer elifi (`) uzun ünlüyü kendisi verir: Y` → tek â
+    if (longTable[character] && daggerHandlesIt) {
+      // hançer elifi (`) uzun ünlüyü kendisi verir: Y` → tek â, w` → tek â
       continue;
     }
-    if (long && !glideIsConsonant) {
+    const afterFatha = lastBase === 'a';
+    // w / y: ünlü/sukun/şedde önünde ünsüz; fethadan sonra ünlü gelmiyorsa diftong (lav, şay').
+    // Y (elif maksûre): yalnız ünlü/sukun/şedde önünde ünsüz; aksi hâlde uzun ünlüdür.
+    const glideIsConsonant = GLIDE_CONSONANT[character] && (
+      GLIDE_CONSONANT_NEXT.has(next)
+      || (GLIDE_LONG.has(character) && afterFatha && !['A', 'Y', '`', 'a', 'i', 'u'].includes(next))
+    );
+    if (glideIsConsonant) {
+      out.push(table === TRANSLIT_TR ? GLIDE_CONSONANT[character] : (character === 'w' ? 'v' : 'y'));
+      continue;
+    }
+    // elif maksûre fethadan sonra â, kesreden sonra î okunur: هَدَى hadâ, فِى fî
+    const long = character === 'Y' && afterFatha
+      ? (table === TRANSLIT_TR ? 'â' : 'ā')
+      : longTable[character];
+    if (long) {
       // uzun ünlü kendinden önceki kısa ünlüyü soğurur (maA → mâ); ikilenmez
       if (out.length && shortSet.has(out[out.length - 1])) out.pop();
       if (out[out.length - 1] === long) continue;
@@ -890,7 +950,8 @@ function transliterate(lemmaBw, table, longTable, shortSet) {
 }
 
 function translitTr(lemmaBw) {
-  const raw = transliterate(lemmaBw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS);
+  const raw = transliterate(lemmaBw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS,
+    { hamzaMark: true, taMarbutaTr: true });
   // Türkçe okunuş imlâsı assimilasyonu yazmaz: baştaki çift ünsüzü teke indirir
   // (Diyanet: "Rahman", "Samad" — "RRahman" değil). DİA katmanı ham kalır.
   return raw.replace(/^([bcçdfgğhjklmnprsştvyz])\1/u, '$1');
@@ -1054,9 +1115,12 @@ function semanticClusters(counts, rootIndex) {
 // draft destroys KAO-03 work (06 §3: humans write meanings, cognates, examples).
 function readExistingHumanInput() {
   const carried = new Map();
-  if (!fs.existsSync(DRAFT_PATH)) return carried;
+  // --import-md doğrulanmış alanları verified.json'a yazar; yeniden taslak onları
+  // oradan taşımalıdır (yoksa her --draft doğrulama emeğini siler). Yedek: eski taslak.
+  const source = [VERIFIED_PATH, DRAFT_PATH].find((file) => fs.existsSync(file));
+  if (!source) return carried;
   try {
-    const previous = JSON.parse(fs.readFileSync(DRAFT_PATH, 'utf8'));
+    const previous = JSON.parse(fs.readFileSync(source, 'utf8'));
     for (const lemma of previous.lemmas || []) {
       const exampleTr = (lemma.examples || []).map((example) => (example ? example.tr : null) || null);
       const hasWork = lemma.cognateTr || lemma.tr1 || lemma.pattern
@@ -1184,7 +1248,7 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
   for (const record of selected) {
     if (record.anchorText || record.tesbihat) record.bucket = 'D';
     else if (record.isParticle) record.bucket = 'A';
-    else if (record.cognateTr) record.bucket = 'B'; // 03 §9: kognat isim/fiil (insan etiketi)
+    else if (record.cognateTr) record.bucket = 'B'; // 03 §9: kognat isim/fiil (doğrulayıcı etiketi)
     else record.bucket = 'C';
   }
 
@@ -1240,7 +1304,7 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
     cognate: {
       channel: 'inceleme tablosu (lexicon.review.md) — cognateTr / cognateShift sütunları',
       matchedTotal: selected.filter((record) => record.cognateTr).length,
-      note: 'Kognat eşlemesi ÖNERİdir ve yalnız insan yazar (06 §3); araç TDK listesini hafızadan üretmez.'
+      note: 'Kognat eşlemesi doğrulayıcı tarafından yazılır (06 §3, D-12); araç kognat üretmez.'
     },
     verifiedTotal: selected.filter((record) => record.verified).length,
     exampleStats: {
@@ -1250,9 +1314,9 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
         .map((record) => ({ lemmaId: record.lemmaId, lemmaBw: record.lemmaBw, freq: record.freq, examples: record.examples.length })),
       note: '05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) '
         + 'için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır '
-        + 've insan doğrulaması (KAO-03) karar verir.'
+        + 've doğrulama (KAO-03) karar verir.'
     },
-    userTaskPending: true,
+    userTaskPending: selected.some((record) => !record.verified),
     warnings: []
   };
   if (report.exampleStats.rowsWithFewerThanMinimum) {
@@ -1262,10 +1326,10 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
   if (!report.coverage.goalMet) {
     report.warnings.push(`kapsam hedefi %80 altında: %${(report.coverage.ratioLemPool * 100).toFixed(1)}`
       + ` (LEM havuzu; içerik sıralaması ≤${CONTENT_RANK_MAX}). Hedefe ulaşan sıralama raporludur,`
-      + ' eşiği yükseltmek insan kararıdır.');
+      + ' eşiği yükseltmek kullanıcı kararıdır.');
   }
   if (report.cognate.matchedTotal === 0) {
-    report.warnings.push('kognat sütunu boş (insan doldurur); B kovası boş, cognateTr/cognateShift null');
+    report.warnings.push('kognat sütunu boş (doğrulayıcı doldurur); B kovası boş, cognateTr/cognateShift null');
   }
   if (report.bucketCounts.B !== report.cognate.matchedTotal) {
     report.warnings.push(`cognateTr dolu ${report.cognate.matchedTotal} kayıt ama B kovası`
@@ -1341,20 +1405,20 @@ function escapeCell(value) {
 
 function renderReviewMarkdown(draft) {
   const lines = [
-    '# KAO-02 · İnsan inceleme tablosu (taslak)',
+    '# KAO · Sözlük inceleme tablosu',
     '',
-    '> **Durum:** `verified:false` — bu tabloda **hiçbir satır onaylı değildir.**',
-    '> Arapça ve transliterasyon korpustan **mekanik** üretilir; Türkçe anlamlar (`tr1`, `tr2`)',
-    '> ve örnek çevirileri (`ex1_tr`) **boştur** ve insan tarafından doldurulur (06 §3, KAO-03).',
-    '> `verifiedBy` boş kalan satır onaylanmamış sayılır; onay kuralı 06 §3 (iki bağımsız göz',
-    '> ya da iki ayrı gün).',
+    `> **Durum:** ${draft.report.verifiedTotal}/${draft.report.candidateTotal} satır doğrulanmış.`,
+    '> Arapça ve transliterasyon korpustan **mekanik** üretilir; Türkçe anlamlar (`tr1`, `tr2`),',
+    '> kalıp, kognat ve örnek çevirileri (`ex1_tr`–`ex3_tr`) doğrulayıcı tarafından yazılır (06 §3, KAO-03).',
+    '> Onay kuralı **D-12**: tek doğrulayıcı (yapay zekâ kimliği kabul) + tek tarih; satır ayrıca',
+    '> tutarlılık denetiminden geçer.',
     '',
     '## Kova tanımları (03 §9)',
     '| Kova | Ne | Bu taslakta |',
     '|---|---|---|',
     '| A · Parçacıklar (edat/zamir/bağlaç) | lemma sıralamasında ilk 100 işlev kelimesi | korpustan etiketli |',
-    '| B · Kognat isim/fiil | sıralama ≤500 ∧ Türkçede karşılığı var | **boş** — `cognateTr` sütunu boş |',
-    '| C · Kognat olmayan isim/fiil | sıralama ≤500 ∧ kognat değil | adaylar (`cognateTr=null`) |',
+    '| B · Kognat isim/fiil | sıralama ≤500 ∧ Türkçede karşılığı var | `cognateTr` dolu |',
+    '| C · Kognat olmayan isim/fiil | sıralama ≤500 ∧ kognat değil | `cognateTr` boş |',
     '| D · Çapa metin kelimeleri | Fâtiha + 112–114 + tesbihat (sıralamadan bağımsız) | korpustan kesişim |',
     '',
     '## Rapor',
@@ -1364,29 +1428,29 @@ function renderReviewMarkdown(draft) {
     `- Kapsam (LEM havuzu): **%${(draft.report.coverage.ratioLemPool * 100).toFixed(1)}** (hedef %80) → ${draft.report.coverage.goalMet ? 'TUTTU' : 'TUTMADI'}`,
     `- Kapsam (kelime token): %${(draft.report.coverage.ratioWordTokens * 100).toFixed(1)} · çapa dışı (sıra >${draft.report.selectionRule.contentRankMax}): ${draft.report.anchorOutsideContentBand}`,
     `- Çapa/tesbihat: ${draft.report.anchorPresentTotal}/${draft.report.anchorUniverseTotal} korpusta var`,
-    `- Doğrulanmış satır: **${draft.report.verifiedTotal}** (beklenen: 0)`,
+    `- Doğrulanmış satır: **${draft.report.verifiedTotal}**`,
     '',
-    '## Sütun kılavuzu (KAO-03 adım 1 — ajan içerik ÖNERMEZ)',
+    '## Sütun kılavuzu (06 §3)',
     '',
     '| Sütun | Kim yazar | Ne yazılır |',
     '|---|---|---|',
     '| `lemmaId`, `ar`, `translit_*`, `root`, `pos`, `freq`, `bucket` | araç (korpustan) | **dokunma** |',
-    '| `tr1` (zorunlu) / `tr2` (ikinci anlam, varsa) | **insan** | Kısa Türkçe anlam(lar) |',
-    '| `pattern` | **insan** | Kalıp etiketi (örn. `masdar`, `ism-i fâil`) — 10 §7 |',
-    '| `cognateTr` | **insan** | Türkçedeki karşılığı (varsa). TDK kaynaklı; araç üretmez. |',
-    '| `cognateShift` | **insan** | Yalnız anlam kayması VARSA doldur (R-A8 uyarısını tetikler) |',
+    '| `tr1` (zorunlu) / `tr2` (ikinci anlam, varsa) | doğrulayıcı | Kısa Türkçe anlam(lar) |',
+    '| `pattern` | doğrulayıcı | Kalıp sözlüğünden etiket (06 §3.1): `etiket (vezin) · illet` |',
+    '| `cognateTr` | doğrulayıcı | Aynı kökten güncel Türkçe sözcük(ler), `;` ile en çok 3; parantez yok |',
+    '| `cognateShift` | doğrulayıcı | Yalnız anlam kayması VARSA (R-A8 uyarısı) |',
     '| `exN_ar` / `exN_ref` | araç (Tanzil kesiti) | **dokunma** |',
-    '| `exN_tr` | **insan** | Örneğin kısa Türkçe çevirisi (tefsir hükmü değil, 06 §2) |',
+    '| `exN_tr` | doğrulayıcı | Kesitin kısa Türkçesi; parantez yalnız aynı âyetten tamamlama (06 §2) |',
     '| `semClusters` | araç önerisi | gerekirse düzelt (12 küme; R-A5) |',
-    '| `verifiedBy` | **insan** | Onaylayan adı/imzası. Boş = onaysız. |',
-    '| `verifiedAt` | **insan** | Onay tarihi `YYYY-AA-GG`. İki ayrı gün kuralı için tabloda tut |',
+    '| `verifiedBy` | doğrulayıcı | Onaylayan kimlik (yapay zekâ kimliği kabul). Boş = onaysız. |',
+    '| `verifiedAt` | doğrulayıcı | Onay tarihi `YYYY-AA-GG` (tek tarih) |',
     '',
     '| `ref1_tr` · `ref1_context_tr` | **REFERANS** (quran.com tr kelime-kelime) | Kopyalama; kendi anlamını yaz — 06 §2 gereği referans, üretim içeriği değil |',
     '',
-    '> **Onaysız sayılan:** `verifiedBy` **veya** `tr1` boş olan satır.',
-    '> **Onay kuralı (06 §3):** iki bağımsız göz **ya da** aynı kişinin iki ayrı günde kontrolü.',
-    '> İkinci durumda `verifiedBy` alanına iki tarih yaz: `insan-1 (2026-09-23; 2026-09-24)`.',
-    '> Araç, `verifiedAt` sütununu ve parantezli tarihleri otomatik doğrular.',
+    '> **Onaysız sayılan:** `verifiedBy` **veya** `tr1` boş ya da `verifiedAt` geçersiz olan satır;',
+    '> `tr1` referansın birebir kopyasıysa satır doğrulanmış sayılmaz (06 §2).',
+    '> **Onay kuralı (06 §3, D-12):** tek doğrulayıcı + tek tarih; `--import-md` tutarlılık',
+    '> denetimi 0 sorun bildirmelidir.',
     '',
     '## Tablo',
     `| ${REVIEW_HEADER.join(' | ')} |`,
@@ -1398,23 +1462,48 @@ function renderReviewMarkdown(draft) {
   return `${lines.join('\n')}\n`;
 }
 
-// 06 §3 onay kuralı makine-doğrulanabilir hale getirilir: `verifiedAt` ya tek bir
-// tarih (`YYYY-AA-GG`) ya da parantez içinde iki tarih taşır
-// (`insan-1 (2026-09-23; 2026-09-24)`) — ikincisi "iki ayrı günde kontrol" kaydıdır.
-function parseApprovalDates(value) {
-  const dates = [...String(value || '').matchAll(/\d{4}-\d{2}-\d{2}/g)].map((match) => match[0]);
-  const distinctDays = [...new Set(dates)];
-  const first = dates.length ? dates[0] : null;
-  const singleDayOk = dates.length > 0 && distinctDays.length === 1;
-  const twoDayOk = distinctDays.length >= 2 && distinctDays[0] !== distinctDays[1];
-  return {
-    dates,
-    distinctDays,
-    twoDayOk,
-    singleDayOk,
-    satisfiesTwoGazeRule: twoDayOk,
-    note: twoDayOk ? 'iki ayrı gün kaydı (06 §3)' : (singleDayOk ? 'tek gün — ikinci gün teyidi yok' : 'tarih yok')
-  };
+// 06 §3 onay kuralı (D-12): tek doğrulayıcı (yapay zekâ kimliği kabul) + tek geçerli
+// tarih (`YYYY-AA-GG`). İki-göz / iki-gün şartı yoktur; kalite, satır düzeyindeki
+// tutarlılık denetimiyle (örnek çevirileri, kalıp sözlüğü, kognat biçimi, kopya bekçisi) sağlanır.
+function parseApproval(value) {
+  const text = String(value || '').trim();
+  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const valid = Boolean(match) && !Number.isNaN(Date.parse(`${text}T00:00:00Z`))
+    && new Date(`${text}T00:00:00Z`).toISOString().slice(0, 10) === text;
+  return { date: valid ? text : null, valid, rule: 'D-12' };
+}
+
+// 06 §3.1 kalıp sözlüğü: `etiket[ (vezin/not)][ · illet[, illet]]`. Etiket sabit listedendir.
+const PATTERN_LABELS = Object.freeze(new Set([
+  'fiil I', 'fiil II', 'fiil III', 'fiil IV', 'fiil V', 'fiil VI', 'fiil VII', 'fiil VIII', 'fiil IX', 'fiil X',
+  'fiil dörtlü', 'câmid fiil',
+  'masdar', 'ism-i fâil', "ism-i mef'ûl", 'sıfat-ı müşebbehe', 'ism-i tafdîl', 'mübalağa', 'ism-i mekân',
+  'ism-i zaman', 'ism-i âlet', 'çoğul', 'câmid isim', 'özel isim', 'sayı ismi',
+  'zamir', 'ism-i işaret', 'ism-i mevsûl', 'soru ismi', 'şart ismi', 'zarf', 'ünlem ismi',
+  'harf-i cer', 'atıf harfi', 'olumsuzluk harfi', 'nasb harfi', 'cezm harfi', 'harf-i müşebbehe',
+  'istisna edatı', 'cevap harfi', 'tenbih harfi', 'nidâ edatı', 'istikbal harfi', 'tahkik harfi',
+  'tafsil harfi', 'idrâb harfi', 'gaye harfi', 'reddiye harfi', 'masdar harfi', 'istidrâk harfi',
+  'soru harfi', 'şart harfi'
+]));
+const ILLET_LABELS = Object.freeze(new Set(['mehmûz', 'muzaaf', 'misal', 'ecvef', 'nâkıs', 'lefif']));
+
+function validatePattern(value) {
+  const text = String(value || '').trim();
+  const match = text.match(/^([^()·]+?)(?: \(([^()]+)\))?(?: · ([^()·]+))?$/u);
+  if (!match) return false;
+  const [, label, , illet] = match;
+  if (!PATTERN_LABELS.has(label.trim())) return false;
+  if (illet && !illet.split(',').map((part) => part.trim()).every((part) => ILLET_LABELS.has(part))) return false;
+  if (illet && !/^fiil /.test(label)) return false;
+  return true;
+}
+
+// Kognat biçimi: `;` ile ayrılmış 1–3 güncel Türkçe sözcük; parantez/köşeli ayraç yok.
+function validateCognate(value) {
+  if (value == null || value === '') return true;
+  const parts = String(value).split(';').map((part) => part.trim());
+  return parts.length >= 1 && parts.length <= 3
+    && parts.every((part) => part && !/[()[\]]/.test(part) && part.length <= 30);
 }
 
 function parseReviewMarkdown(markdown, existing) {
@@ -1449,27 +1538,29 @@ function parseReviewMarkdown(markdown, existing) {
     record.cognateShift = row.cognateShift;
     record.semNeighbors.clusters = row.semClusters ? row.semClusters.split('+').filter(Boolean) : record.semNeighbors.clusters;
     if (record.examples[0]) record.examples[0].tr = row.ex1_tr;
+    if (record.examples[1]) record.examples[1].tr = row.ex2_tr;
+    if (record.examples[2]) record.examples[2].tr = row.ex3_tr;
     record.verifiedBy = row.verifiedBy;
-    record.approval = parseApprovalDates(row.verifiedAt);
+    record.approval = row.verifiedBy
+      ? parseApproval(row.verifiedAt || new Date().toISOString().slice(0, 10))
+      : null;
     // --- 06 §2 bekçisi: "Türkçe mealler KOPYALANMAZ" ---
     // `tr1`, referans çevirisiyle birebir aynıysa bu bir kopyadır, doğrulama değil.
     const refWord = record.examples[0] ? record.examples[0].referenceWordTr : null;
     const normalize = (v) => String(v || '').trim().toLocaleLowerCase('tr').replace(/\s+/g, ' ');
     const copiedFromReference = Boolean(row.tr1 && refWord && normalize(row.tr1) === normalize(refWord));
     record.copiedFromReference = copiedFromReference;
-    // Tabloda girilmiş tarih korunur (06 §3: "iki ayrı günde kontrol" kaydı);
-    // boşsa bugünün tarihi yazılır.
-    record.verifiedAt = row.verifiedBy
-      ? (row.verifiedAt || new Date().toISOString().slice(0, 10))
-      : null;
-    record.verified = Boolean(row.verifiedBy && record.tr1) && !copiedFromReference;
+    // Tabloda girilmiş tarih korunur; boşsa bugünün tarihi yazılır (D-12: tek tarih).
+    record.verifiedAt = record.approval ? record.approval.date : null;
+    record.verified = Boolean(row.verifiedBy && record.tr1 && record.approval && record.approval.valid)
+      && !copiedFromReference;
     if (record.verified) verifiedTotal += 1;
     if (copiedFromReference) {
       consistencyCopy.push({ lemmaId: record.lemmaId, issue: 'copied_from_reference',
         note: '06 §2: referans kopyalanmaz — kendi ifadeni yaz' });
     }
-    record.bucket = (record.cognateTr && !record.anchorText && !record.tesbihat && !record.isParticle)
-      ? 'B' : record.bucket;
+    const fixedBucket = record.anchorText || record.tesbihat ? 'D' : (record.isParticle ? 'A' : null);
+    record.bucket = fixedBucket || (record.cognateTr ? 'B' : 'C');
   }
   const verifiedRecords = existing.filter((record) => record.verified);
   // Tutarlılık denetimi (KAO-03 adım 3): her lemma >=3 örnek, ref biçimi S:A,
@@ -1486,15 +1577,21 @@ function parseReviewMarkdown(markdown, existing) {
     }
     if (!arabicWordRegex().test(record.ar || '')) consistency.push({ lemmaId: record.lemmaId, issue: 'lemma_not_arabic' });
     if (record.verified) {
-      const dates = (record.approval && record.approval.dates) || [];
-      if (!dates.length) consistency.push({ lemmaId: record.lemmaId, issue: 'missing_verified_at' });
+      if (!record.verifiedAt) consistency.push({ lemmaId: record.lemmaId, issue: 'missing_verified_at' });
       for (const example of record.examples) {
         if (!example.tr) consistency.push({ lemmaId: record.lemmaId, issue: 'missing_example_tr' });
       }
+      if (!validatePattern(record.pattern)) consistency.push({ lemmaId: record.lemmaId, issue: 'invalid_pattern' });
+    }
+    if (record.verifiedBy && record.approval && !record.approval.valid) {
+      consistency.push({ lemmaId: record.lemmaId, issue: 'invalid_verified_at' });
+    }
+    if (!validateCognate(record.cognateTr)) consistency.push({ lemmaId: record.lemmaId, issue: 'invalid_cognate' });
+    if (record.cognateShift && !record.cognateTr) {
+      consistency.push({ lemmaId: record.lemmaId, issue: 'shift_without_cognate' });
     }
   }
   consistency.push(...consistencyCopy);
-  const twoGazeTotal = verifiedRecords.filter((record) => record.approval && record.approval.twoDayOk).length;
   return {
     records: existing,
     verifiedTotal,
@@ -1504,8 +1601,6 @@ function parseReviewMarkdown(markdown, existing) {
     matched: rows.length - unknownTotal,
     consistency,
     consistencyTotal: consistency.length,
-    twoGazeTotal,
-    singleDayVerifiedTotal: verifiedRecords.filter((record) => record.approval && record.approval.singleDayOk).length,
     copiedFromReferenceTotal: consistencyCopy.length
   };
 }
@@ -1624,14 +1719,14 @@ function renderWorkbook(draft, reference) {
     '| `ref_tr` · `context_ref_tr` | **REFERANS** (quran.com tr kelime-kelime, 06 §2) — kopyalama, kendi anlamını yaz |',
     '| `tr1` | kelimenin kısa Türkçe anlamı **zorunlu** |',
     '| `tr2` | ikinci anlam (varsa) |',
-    '| `pattern` | kalıp etiketi (örn. `masdar`) |',
-    '| `cognateTr` | Türkçedeki karşılığı (varsa) |',
+    '| `pattern` | kalıp sözlüğünden etiket (06 §3.1) |',
+    '| `cognateTr` | aynı kökten güncel Türkçe sözcük(ler) (varsa) |',
     '| `cognateShift` | yalnız anlam kayması varsa |',
-    '| `context_tr` | `context_ar` cümlesinin kısa çevirisi |',
-    '| `verifiedBy` | onaylayan ad |',
-    '| `verifiedAt` | onay tarihi `YYYY-AA-GG` (iki ayrı gün: iki tarih) |',
+    '| `context_tr` | `context_ar` kesitinin kısa çevirisi |',
+    '| `verifiedBy` | onaylayan kimlik (yapay zekâ kimliği kabul) |',
+    '| `verifiedAt` | onay tarihi `YYYY-AA-GG` (tek tarih) |',
     '',
-    'Onay kuralı 06 §3: iki bağımsız göz **ya da** aynı kişinin iki ayrı günü.',
+    'Bu kitap okuma kolaylığıdır; birincil kayıt `lexicon.review.md`dir (06 §3). Onay kuralı D-12.',
     '',
     '## Sıra (03 §1: kademeli seviyeler)'
   ];
@@ -1650,10 +1745,10 @@ function renderWorkbook(draft, reference) {
         context.ref || '',
         context.referenceWordTr || '',
         context.referenceTr || '',
-        '', '',
-        '', '', '',
-        '',
-        '', '',
+        record.tr1 || '', record.tr2 || '',
+        record.pattern || '', record.cognateTr || '', record.cognateShift || '',
+        context.tr || '',
+        record.verifiedBy || '', record.verifiedAt || '',
         record.lemmaId
       ];
       lines.push(`| ${cells.map(escapeCell).join(' | ')} |`);
@@ -1711,7 +1806,7 @@ function renderReviewFromDraft() {
 function importReview() {
   const draftFile = readDraft();
   if (!fs.existsSync(REVIEW_PATH)) throw new CliError(`inceleme tablosu yok: ${path.relative(ROOT, REVIEW_PATH)}`, 2);
-  const { verifiedTotal, unknownTotal, verifiedRecords, duplicated } = parseReviewMarkdown(
+  const { verifiedTotal, unknownTotal, verifiedRecords, duplicated, consistency } = parseReviewMarkdown(
     fs.readFileSync(REVIEW_PATH, 'utf8'), draftFile.lemmas
   );
   const rowsTotal = draftFile.lemmas.length - unknownTotal;
@@ -1727,6 +1822,9 @@ function importReview() {
     rowsTotal,
     duplicatedTotal,
     copiedFromReferenceTotal,
+    consistencyTotal: consistency.length,
+    consistency,
+    approvalRule: 'D-12 (06 §3): tek doğrulayıcı + tek tarih + tutarlılık denetimi',
     lemmas: draftFile.lemmas
   };
   fs.mkdirSync(path.dirname(VERIFIED_PATH), { recursive: true });
@@ -1744,6 +1842,9 @@ function importReview() {
     console.log(`UYARI: ${copiedFromReferenceTotal} satır REFERANSI birebir kopyalamış`
       + ' → doğrulanmış SAYILMADI (06 §2: "Türkçe mealler kopyalanmaz").');
   }
+  const issueCounts = consistency.reduce((acc, entry) => ({ ...acc, [entry.issue]: (acc[entry.issue] || 0) + 1 }), {});
+  console.log(`consistency=${consistency.length} ${JSON.stringify(issueCounts)}`);
+  for (const entry of consistency.slice(0, 10)) console.log(`  ${entry.lemmaId}: ${entry.issue}`);
   if (!verifiedTotal) {
     console.log('NOT: doğrulanmış satır yok; kart waiting_user kalır (06 §3 onay kuralı).');
   }
@@ -1811,7 +1912,7 @@ async function main(argv) {
   else compile(inputArg.resolved);
 }
 
-export { buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand };
+export { translitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand };
 
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (IS_MAIN) {

@@ -53,8 +53,8 @@
   "planCandidateTarget": 530,
   "bucketCounts": {
     "A": 22,
-    "B": 0,
-    "C": 439,
+    "B": 346,
+    "C": 93,
     "D": 63
   },
   "bucketTargets": {
@@ -338,10 +338,10 @@
   ],
   "cognate": {
     "channel": "inceleme tablosu (lexicon.review.md) — cognateTr / cognateShift sütunları",
-    "matchedTotal": 0,
-    "note": "Kognat eşlemesi ÖNERİdir ve yalnız insan yazar (06 §3); araç TDK listesini hafızadan üretmez."
+    "matchedTotal": 385,
+    "note": "Kognat eşlemesi doğrulayıcı tarafından yazılır (06 §3, D-12); araç kognat üretmez."
   },
-  "verifiedTotal": 0,
+  "verifiedTotal": 524,
   "exampleStats": {
     "minimum": 3,
     "rowsWithFewerThanMinimum": 10,
@@ -407,11 +407,11 @@
         "examples": 1
       }
     ],
-    "note": "05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır ve insan doğrulaması (KAO-03) karar verir."
+    "note": "05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır ve doğrulama (KAO-03) karar verir."
   },
-  "userTaskPending": true,
+  "userTaskPending": false,
   "warnings": [
     "10 satırda 3'ten az örnek (çok seyrek lemma); korpusta yeterli pencere yok, uydurulmadı",
-    "kognat sütunu boş (insan doldurur); B kovası boş, cognateTr/cognateShift null"
+    "cognateTr dolu 385 kayıt ama B kovası 346 — bazı kognatlar çapa/parçacık kovasında (03 §9 önceliği: D > A > B > C)"
   ]
 }

@@ -344,35 +344,11 @@
   "verifiedTotal": 524,
   "exampleStats": {
     "minimum": 3,
-    "rowsWithFewerThanMinimum": 10,
+    "rowsWithFewerThanMinimum": 5,
     "exceptions": [
-      {
-        "lemmaId": "l_falaq_f1e2b8",
-        "lemmaBw": "falaq",
-        "freq": 1,
-        "examples": 1
-      },
-      {
-        "lemmaId": "l_gaAsiq_dc791e",
-        "lemmaBw": "gaAsiq",
-        "freq": 1,
-        "examples": 1
-      },
-      {
-        "lemmaId": "l_HaAsid_83cf8e",
-        "lemmaBw": "HaAsid",
-        "freq": 1,
-        "examples": 1
-      },
       {
         "lemmaId": "l_kufuw_3fbe35",
         "lemmaBw": "kufuw",
-        "freq": 1,
-        "examples": 1
-      },
-      {
-        "lemmaId": "l_magoDuwb_278690",
-        "lemmaBw": "magoDuwb",
         "freq": 1,
         "examples": 1
       },
@@ -395,23 +371,16 @@
         "examples": 1
       },
       {
-        "lemmaId": "l_wasowaAs_75a11c",
-        "lemmaBw": "wasowaAs",
-        "freq": 1,
-        "examples": 1
-      },
-      {
         "lemmaId": "l_xan_aAs_eb9958",
         "lemmaBw": "xan~aAs",
         "freq": 1,
-        "examples": 1
+        "examples": 2
       }
     ],
-    "note": "05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır ve doğrulama (KAO-03) karar verir."
+    "note": "05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) için önce aynı kökün diğer lemmalarından örnek alınır (D-13, source:root); kök de tükenirse kayıt kalıcı istisnadır (uydurulmaz)."
   },
   "userTaskPending": false,
   "warnings": [
-    "10 satırda 3'ten az örnek (çok seyrek lemma); korpusta yeterli pencere yok, uydurulmadı",
     "cognateTr dolu 385 kayıt ama B kovası 346 — bazı kognatlar çapa/parçacık kovasında (03 §9 önceliği: D > A > B > C)"
   ]
 }

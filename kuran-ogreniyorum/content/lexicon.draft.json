@@ -351,35 +351,11 @@
     "verifiedTotal": 524,
     "exampleStats": {
       "minimum": 3,
-      "rowsWithFewerThanMinimum": 10,
+      "rowsWithFewerThanMinimum": 5,
       "exceptions": [
-        {
-          "lemmaId": "l_falaq_f1e2b8",
-          "lemmaBw": "falaq",
-          "freq": 1,
-          "examples": 1
-        },
-        {
-          "lemmaId": "l_gaAsiq_dc791e",
-          "lemmaBw": "gaAsiq",
-          "freq": 1,
-          "examples": 1
-        },
-        {
-          "lemmaId": "l_HaAsid_83cf8e",
-          "lemmaBw": "HaAsid",
-          "freq": 1,
-          "examples": 1
-        },
         {
           "lemmaId": "l_kufuw_3fbe35",
           "lemmaBw": "kufuw",
-          "freq": 1,
-          "examples": 1
-        },
-        {
-          "lemmaId": "l_magoDuwb_278690",
-          "lemmaBw": "magoDuwb",
           "freq": 1,
           "examples": 1
         },
@@ -402,23 +378,16 @@
           "examples": 1
         },
         {
-          "lemmaId": "l_wasowaAs_75a11c",
-          "lemmaBw": "wasowaAs",
-          "freq": 1,
-          "examples": 1
-        },
-        {
           "lemmaId": "l_xan_aAs_eb9958",
           "lemmaBw": "xan~aAs",
           "freq": 1,
-          "examples": 1
+          "examples": 2
         }
       ],
-      "note": "05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır ve doğrulama (KAO-03) karar verir."
+      "note": "05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) için önce aynı kökün diğer lemmalarından örnek alınır (D-13, source:root); kök de tükenirse kayıt kalıcı istisnadır (uydurulmaz)."
     },
     "userTaskPending": false,
     "warnings": [
-      "10 satırda 3'ten az örnek (çok seyrek lemma); korpusta yeterli pencere yok, uydurulmadı",
       "cognateTr dolu 385 kayıt ama B kovası 346 — bazı kognatlar çapa/parçacık kovasında (03 §9 önceliği: D > A > B > C)"
     ]
   },
@@ -58819,16 +58788,33 @@
           "ref": "113:1",
           "referenceTr": "sığınırım ben Rabbe karanlığı yarıp sabahı ortaya çıkaran",
           "referenceWordTr": "karanlığı yarıp sabahı ortaya çıkaran"
+        },
+        {
+          "ar": "إِنَّ ٱللَّهَ فَالِقُ ٱلْحَبِّ وَٱلنَّوَىٰ",
+          "tr": "şüphesiz Allah taneyi ve çekirdeği yarandır",
+          "ref": "6:95",
+          "referenceTr": "şüphesiz Allah'tır yaran daneyi ve çekirdeği",
+          "referenceWordTr": "yaran",
+          "source": "root",
+          "viaLemmaId": "l_faAliq_9edb01",
+          "viaAr": "فَالِق"
+        },
+        {
+          "ar": "فَالِقُ ٱلْإِصْبَاحِ وَجَعَلَ",
+          "tr": "sabahı yarıp çıkaran; ve (geceyi dinlenme) kıldı",
+          "ref": "6:96",
+          "referenceTr": "karanlığı yarıp sabahı ortaya çıkarmış ve kılmıştır",
+          "referenceWordTr": "karanlığı yarıp",
+          "source": "root",
+          "viaLemmaId": "l_faAliq_9edb01",
+          "viaAr": "فَالِق"
         }
       ],
-      "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
-        "have": 1,
-        "want": 3
-      },
+      "examplesException": null,
       "examplesRef": [
-        "113:1"
+        "113:1",
+        "6:95",
+        "6:96"
       ],
       "isParticle": false,
       "bucket": "D",
@@ -58899,16 +58885,33 @@
           "ref": "113:3",
           "referenceTr": "ve şerrinden gecenin zaman karanlığı çöktüğü",
           "referenceWordTr": "gecenin"
+        },
+        {
+          "ar": "فَلْيَذُوقُوهُ حَمِيمٌ وَغَسَّاقٌ",
+          "tr": "tatsınlar onu: kaynar su ve koyu, pis bir sıvı",
+          "ref": "38:57",
+          "referenceTr": "onu tadsınlar kaynar ve kokuşmuşdur",
+          "referenceWordTr": "ve kokuşmuşdur",
+          "source": "root",
+          "viaLemmaId": "l_gas_aAq_05bbf0",
+          "viaAr": "غَسَّاق"
+        },
+        {
+          "ar": "إِلَّا حَمِيمًا وَغَسَّاقًا",
+          "tr": "ancak kaynar su ve koyu, pis bir sıvı (tadarlar)",
+          "ref": "78:25",
+          "referenceTr": "yalnız (içerler) kaynar su ve irin",
+          "referenceWordTr": "ve irin",
+          "source": "root",
+          "viaLemmaId": "l_gas_aAq_05bbf0",
+          "viaAr": "غَسَّاق"
         }
       ],
-      "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
-        "have": 1,
-        "want": 3
-      },
+      "examplesException": null,
       "examplesRef": [
-        "113:3"
+        "113:3",
+        "38:57",
+        "78:25"
       ],
       "isParticle": false,
       "bucket": "D",
@@ -58979,16 +58982,33 @@
           "ref": "113:5",
           "referenceTr": "ve şerrinden hasedcinin zaman hased ettiği",
           "referenceWordTr": "hasedcinin"
+        },
+        {
+          "ar": "أَمْ يَحْسُدُونَ ٱلنَّاسَ عَلَىٰ",
+          "tr": "yoksa insanları (Allah'ın verdiği lütuf) yüzünden kıskanıyorlar mı",
+          "ref": "4:54",
+          "referenceTr": "yoksa kıskanıyorlar mı insanlara yüzünden",
+          "referenceWordTr": "kıskanıyorlar mı",
+          "source": "root",
+          "viaLemmaId": "l_Hasada_76834c",
+          "viaAr": "حَسَدَ"
+        },
+        {
+          "ar": "فَسَيَقُولُونَ بَلْ تَحْسُدُونَنَا بَلْ كَانُوا۟",
+          "tr": "diyecekler: hayır, siz bizi kıskanıyorsunuz; hayır, onlar",
+          "ref": "48:15",
+          "referenceTr": "onlar diyecekler hayır bizi çekemiyorsunuz hayır onlar",
+          "referenceWordTr": "bizi çekemiyorsunuz",
+          "source": "root",
+          "viaLemmaId": "l_Hasada_76834c",
+          "viaAr": "حَسَدَ"
         }
       ],
-      "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
-        "have": 1,
-        "want": 3
-      },
+      "examplesException": null,
       "examplesRef": [
-        "113:5"
+        "113:5",
+        "4:54",
+        "48:15"
       ],
       "isParticle": false,
       "bucket": "D",
@@ -59045,8 +59065,10 @@
         }
       ],
       "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
+        "reason": "root_exhausted",
+        "rule": "D-13",
+        "final": true,
+        "rootOccurrences": 1,
         "have": 1,
         "want": 3
       },
@@ -59136,16 +59158,33 @@
           "ref": "1:7",
           "referenceTr": "kimselerin değil gazabedilmiş olanların kendilerine ve değil",
           "referenceWordTr": "gazabedilmiş olanların"
+        },
+        {
+          "ar": "وَٱلْمَسْكَنَةُ وَبَآءُو بِغَضَبٍ مِّنَ ٱللَّهِ",
+          "tr": "ve düşkünlük (üzerlerine vuruldu); Allah'tan bir gazaba uğradılar",
+          "ref": "2:61",
+          "referenceTr": "ve yoksulluk (damgası) ve uğradılar bir gazaba Allahtan Allah",
+          "referenceWordTr": "bir gazaba",
+          "source": "root",
+          "viaLemmaId": "l_gaDab_4a3280",
+          "viaAr": "غَضَب"
+        },
+        {
+          "ar": "عِبَادِهِۦ فَبَآءُو بِغَضَبٍ عَلَىٰ غَضَبٍ",
+          "tr": "kullarından (dilediğine); böylece gazap üstüne gazaba uğradılar",
+          "ref": "2:90",
+          "referenceTr": "His servants uğradılar gazab üstüne gazaba",
+          "referenceWordTr": "gazab",
+          "source": "root",
+          "viaLemmaId": "l_gaDab_4a3280",
+          "viaAr": "غَضَب"
         }
       ],
-      "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
-        "have": 1,
-        "want": 3
-      },
+      "examplesException": null,
       "examplesRef": [
-        "1:7"
+        "1:7",
+        "2:61",
+        "2:90"
       ],
       "isParticle": false,
       "bucket": "D",
@@ -59202,8 +59241,10 @@
         }
       ],
       "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
+        "reason": "root_exhausted",
+        "rule": "D-13",
+        "final": true,
+        "rootOccurrences": 1,
         "have": 1,
         "want": 3
       },
@@ -59265,8 +59306,10 @@
         }
       ],
       "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
+        "reason": "root_exhausted",
+        "rule": "D-13",
+        "final": true,
+        "rootOccurrences": 1,
         "have": 1,
         "want": 3
       },
@@ -59328,8 +59371,10 @@
         }
       ],
       "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
+        "reason": "root_exhausted",
+        "rule": "D-13",
+        "final": true,
+        "rootOccurrences": 1,
         "have": 1,
         "want": 3
       },
@@ -59398,16 +59443,33 @@
           "ref": "114:4",
           "referenceTr": "şerrinden (the) evil vesvesecinin sinsi",
           "referenceWordTr": "vesvesecinin"
+        },
+        {
+          "ar": "فَوَسْوَسَ لَهُمَا ٱلشَّيْطَـٰنُ",
+          "tr": "şeytan ikisine fısıldadı",
+          "ref": "7:20",
+          "referenceTr": "derken fısıldadı onlara şeytan",
+          "referenceWordTr": "derken fısıldadı",
+          "source": "root",
+          "viaLemmaId": "l_wasowasa_aeaf29",
+          "viaAr": "وَسْوَسَ"
+        },
+        {
+          "ar": "فَوَسْوَسَ إِلَيْهِ ٱلشَّيْطَـٰنُ",
+          "tr": "şeytan ona fısıldadı",
+          "ref": "20:120",
+          "referenceTr": "nihayet fısıldadı ona şeytan",
+          "referenceWordTr": "nihayet fısıldadı",
+          "source": "root",
+          "viaLemmaId": "l_wasowasa_aeaf29",
+          "viaAr": "وَسْوَسَ"
         }
       ],
-      "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
-        "have": 1,
-        "want": 3
-      },
+      "examplesException": null,
       "examplesRef": [
-        "114:4"
+        "114:4",
+        "7:20",
+        "20:120"
       ],
       "isParticle": false,
       "bucket": "D",
@@ -59471,16 +59533,29 @@
           "ref": "114:4",
           "referenceTr": "(the) evil vesvesecinin sinsi",
           "referenceWordTr": "sinsi"
+        },
+        {
+          "ar": "فَلَآ أُقْسِمُ بِٱلْخُنَّسِ",
+          "tr": "sinip gizlenenlere yemin ederim",
+          "ref": "81:15",
+          "referenceTr": "hayır yemin ederim geri kalıp gizlenenlere",
+          "referenceWordTr": "geri kalıp gizlenenlere",
+          "source": "root",
+          "viaLemmaId": "l_xun_as_476989",
+          "viaAr": "خُنَّس"
         }
       ],
       "examplesException": {
-        "reason": "corpus_windows_exhausted",
-        "freq": 1,
-        "have": 1,
+        "reason": "root_exhausted",
+        "rule": "D-13",
+        "final": true,
+        "rootOccurrences": 2,
+        "have": 2,
         "want": 3
       },
       "examplesRef": [
-        "114:4"
+        "114:4",
+        "81:15"
       ],
       "isParticle": false,
       "bucket": "D",

@@ -654,8 +654,18 @@ function draftSelfTest() {
     === draft.candidates.filter((record) => record.examples.length < 3).length,
     'örnek eksiği sayısı ölçümle tutarlı olmalı');
   assert(draft.candidates.filter((record) => record.examples.length < 3)
-    .every((record) => record.examplesException && record.examplesException.reason === 'corpus_windows_exhausted'),
-    'eksik örnekler gerekçeli istisna kaydı taşımalı (uydurma yok)');
+    .every((record) => record.examplesException && record.examplesException.reason === 'root_exhausted'
+      && record.examplesException.rule === 'D-13' && record.examplesException.final === true),
+    'eksik örnekler D-13 kalıcı istisna kaydı taşımalı (uydurma yok)');
+  // D-13: kök akrabası örnekleri farklı âyetten, korpustan ve işaretli olmalı
+  for (const record of draft.candidates) {
+    const refs = record.examples.map((example) => example.ref);
+    assert(new Set(refs).size === refs.length, 'aynı âyet iki kez örnek olmamalı');
+    for (const example of record.examples.filter((item) => item.source === 'root')) {
+      assert(example.viaLemmaId && example.viaLemmaId !== record.lemmaId && arabicWordRegex().test(example.ar),
+        'kök akrabası örneği kaynak lemmayı ve korpus Arapçasını taşımalı');
+    }
+  }
   const hamod = byLemma.get('Hamod');
   assert(hamod.anchorText === true, 'çapa bayrağı işaretlenmeli');
   const ealima = byLemma.get('Ealima');
@@ -1197,11 +1207,41 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
         });
       }
     }
-    // freq 1–2 lemma korpusta yalnız 1 pencere verebilir. 05 §1'in ">=3 örnek"
-    // kuralı için iki seçenek var: eksikliği uydurmak (yasak) ya da gerekçeli
-    // istisna kaydı. İstisna açıkça işaretlenir; denetim bu kaydı görür.
+    // D-13 (05 §1 ">=3 örnek"): lemmanın kendi penceresi yetmezse aynı kökün diğer
+    // lemmalarının Kur'an pencereleriyle (kök akrabası) tamamlanır — farklı âyet,
+    // korpustan, `source:'root'` işaretli. Arapça uydurulmaz.
+    if (examples.length < MAX_EXAMPLES && family.length) {
+      const usedRefs = new Set(examples.map((example) => example.ref));
+      const siblings = family.slice().sort((left, right) => (
+        (counts.frequency.get(right) || 0) - (counts.frequency.get(left) || 0) || left.localeCompare(right)
+      ));
+      for (const other of siblings) {
+        for (const word of counts.positions.get(other) || []) {
+          if (examples.length >= MAX_EXAMPLES) break;
+          const ref = `${word.surah}:${word.ayah}`;
+          if (usedRefs.has(ref)) continue;
+          const window = exampleWindow(word, uthmaniByVerse, referenceByRef);
+          if (!window) continue;
+          usedRefs.add(ref);
+          const priorTr = human && human.exampleTr ? human.exampleTr[examples.length] : null;
+          examples.push({
+            ar: window.text,
+            tr: priorTr || null,
+            ref: window.ref,
+            referenceTr: window.referenceTr || null,
+            referenceWordTr: window.referenceWordTr || null,
+            source: 'root',
+            viaLemmaId: lemmaKey(other),
+            viaAr: bwToArabic(other)
+          });
+        }
+      }
+    }
+    // Kök Kur'an'da 3'ten az âyette geçiyorsa 3. örnek YOKTUR (uydurulamaz): D-13
+    // gereği bu kayıt kalıcıdır ve eksiksiz sayılır (açık iş değildir).
+    const rootOccurrences = [lemma, ...family].reduce((sum, other) => sum + (counts.frequency.get(other) || 0), 0);
     const examplesException = examples.length < 3
-      ? { reason: 'corpus_windows_exhausted', freq: frequency, have: examples.length, want: 3 }
+      ? { reason: 'root_exhausted', rule: 'D-13', final: true, rootOccurrences, have: examples.length, want: 3 }
       : null;
     candidates.push({
       lemmaId: lemmaKey(lemma),
@@ -1229,7 +1269,7 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
       },
       family: family.map((other) => ({ lemmaId: lemmaKey(other), ar: bwToArabic(other), tr: null })),
       examples,
-      examplesException: human && human.examplesException ? human.examplesException : examplesException,
+      examplesException, // korpustan her üretimde yeniden hesaplanır (taşınmaz)
       examplesRef: examples.map((example) => example.ref),
       isParticle,
       bucket: null,
@@ -1313,15 +1353,15 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
       exceptions: selected.filter((record) => record.examplesException)
         .map((record) => ({ lemmaId: record.lemmaId, lemmaBw: record.lemmaBw, freq: record.freq, examples: record.examples.length })),
       note: '05 §1 nihai sözlükte kart başına ≥3 örnek ister. Çok seyrek lemma (freq 1–2) '
-        + 'için korpusta yeterli pencere yoksa araç eksik alanı uydurmaz; sayı burada açıkça raporlanır '
-        + 've doğrulama (KAO-03) karar verir.'
+        + 'için önce aynı kökün diğer lemmalarından örnek alınır (D-13, source:root); kök de tükenirse '
+        + 'kayıt kalıcı istisnadır (uydurulmaz).'
     },
     userTaskPending: selected.some((record) => !record.verified),
     warnings: []
   };
-  if (report.exampleStats.rowsWithFewerThanMinimum) {
-    report.warnings.push(`${report.exampleStats.rowsWithFewerThanMinimum} satırda 3'ten az örnek`
-      + ' (çok seyrek lemma); korpusta yeterli pencere yok, uydurulmadı');
+  // D-13: kökü tükenmiş lemma kalıcı istisnadır; uyarı değil, exampleStats'ta bilgi.
+  if (selected.some((record) => record.examples.length < 3 && !(record.examplesException && record.examplesException.final))) {
+    report.warnings.push('3\'ten az örnekli ama D-13 istisnası taşımayan satır var');
   }
   if (!report.coverage.goalMet) {
     report.warnings.push(`kapsam hedefi %80 altında: %${(report.coverage.ratioLemPool * 100).toFixed(1)}`

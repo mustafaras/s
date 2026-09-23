@@ -198,5 +198,21 @@
         "note": "524 satır, dolu değerlerle"
       }
     ]
+  },
+  "d13Fix": {
+    "date": "2026-09-23",
+    "change": "Araç: 3'ten az örnekli lemmaya aynı kökten Kur'an pencereleri (source:root) eklenir; istisna korpustan her üretimde yeniden hesaplanır (reason root_exhausted, final); self-test: aynı âyet tekrarı yok, kök örneği kaynak lemmayı taşır.",
+    "result": "rootExamples=11; kalıcı istisna 5 (kök 1–2 kez)",
+    "checks": [
+      {
+        "cmd": "node tools/kao-lexicon-build.mjs --self-test",
+        "exit": 0
+      },
+      {
+        "cmd": "… --draft",
+        "exit": 0,
+        "note": "verified=524, 3'ten az örnek uyarısı kalktı"
+      }
+    ]
   }
 }

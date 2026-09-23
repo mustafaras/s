@@ -9,7 +9,7 @@
   },
   "status": "in_progress",
   "releaseApproval": "NOT_APPROVED",
-  "nextCard": "KAO-04",
+  "nextCard": "KAO-23",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -321,6 +321,8 @@
       "title": "Gramer içeriği (24 mikro-kavram + G0.5)",
       "wave": 1,
       "files": [
+        "tools/kao-grammar-build.mjs",
+        "tools/kao-lexicon-build.mjs",
         "kuran-ogreniyorum/content/grammar.draft.json",
         "kuran-ogreniyorum/content/grammar.verified.json",
         "kuran-ogreniyorum/content/grammar.review.md",
@@ -330,7 +332,9 @@
         "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
       ],
       "checks": [
-        "her kavramda ≥3 alıştırma şablonu; g0_5 mevcut; onay alanları dolu (06 §3, D-12)"
+        "node tools/kao-grammar-build.mjs --self-test",
+        "node tools/kao-grammar-build.mjs --build → issues=0 (her kavramda ≥3 alıştırma şablonu, ≥2 tür; g0_5 mevcut)",
+        "node tools/kao-grammar-build.mjs --import-grammar → verified=26/26, consistency=0; onay alanları dolu (06 §3, D-12)"
       ],
       "req": [
         "R-A7",
@@ -339,7 +343,23 @@
       "deps": [
         "KAO-01"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-23",
+      "completedAt": "2026-09-23",
+      "agent": "Claude Code (claude-opus-5-5)",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-04/EVIDENCE.json",
+      "result": {
+        "concepts": 25,
+        "templates": 86,
+        "examples": 93,
+        "unit11Roots": 73,
+        "unit11Derivatives": 242,
+        "verified": "26/26",
+        "consistency": 0,
+        "arabicAuthored": 0,
+        "unattestedCells": 26
+      },
+      "planGapResolution": "GAP-01 (KAO-04 kısmı): `--example` ve `--import-grammar` ayrı bir araçta (tools/kao-grammar-build.mjs) yazıldı; araç ve sözlük aracının dışa aktarım satırı bu kartın files listesine eklendi."
     },
     "KAO-23": {
       "title": "Fonetik içeriği + mahreç SVG",
@@ -1164,8 +1184,8 @@
       "R-A4": "pending",
       "R-A5": "pending",
       "R-A6": "pending",
-      "R-A7": "pending",
-      "R-A8": "pending",
+      "R-A7": "partial",
+      "R-A8": "partial",
       "R-A9": "pending",
       "R-B1": "pending",
       "R-B2": "pending",
@@ -1256,8 +1276,8 @@
       "wave": 6
     }
   },
-  "activePrompt": "KAO-04",
-  "lastCompletedPrompt": "KAO-03",
+  "activePrompt": "KAO-23",
+  "lastCompletedPrompt": "KAO-04",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",
@@ -1300,7 +1320,12 @@
       "evidence": "`node tools/kao-lexicon-build.mjs --help` → 5 mod; araç kaynağında '--example' / '--freeze' araması → 0 eşleşme",
       "decisionNeeded": "Komutlar hangi kartın kapsamında yazılacak? (KAO-01/02 kapandı → yeni iş kaydı; ya da KAO-04/05/06'nın `files` listesine araç eklenerek.) Kullanıcı kararı.",
       "planCheckVerifiesThis": false,
-      "note": "plan-check bu alanı DOĞRULAMAZ (bilinçli: dokümantasyon, tamamlanma iddiası değil)."
+      "note": "plan-check bu alanı DOĞRULAMAZ (bilinçli: dokümantasyon, tamamlanma iddiası değil).",
+      "partialResolution": {
+        "at": "2026-09-23",
+        "card": "KAO-04",
+        "note": "KAO-04 için karar uygulandı: araç KAO-04 files listesine eklendi; `--example` tools/kao-grammar-build.mjs içinde. KAO-05 (--freeze) ve KAO-06 (--freeze-grammar/surahs/phonics) AÇIK."
+      }
     },
     {
       "id": "GAP-02",

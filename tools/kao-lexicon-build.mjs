@@ -1952,7 +1952,7 @@ async function main(argv) {
   else compile(inputArg.resolved);
 }
 
-export { translitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand };
+export { INPUTS, CliError, readPinnedInput, readUthmaniInput, parseUthmani, missingInputs, missingMessage, validatePattern, parseApproval, arabicWordRegex, translitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand };
 
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (IS_MAIN) {

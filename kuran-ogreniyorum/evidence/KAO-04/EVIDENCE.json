@@ -1,0 +1,80 @@
+{
+  "card": "KAO-04",
+  "date": "2026-09-23",
+  "agent": "Claude Code (claude-opus-5-5)",
+  "startHead": "71e759c",
+  "status": "done",
+  "approvalRule": "D-12 (06 §3): tek doğrulayıcı + tek tarih + kavram denetimi 0",
+  "design": [
+    "Taslakta Arapça YAZILMAZ: her Arapça metin word/ref/query/lemmaId referansından `--build` ile Tanzil+QAC+doğrulanmış sözlükten çözülür; Türkçe alanlara Arapça sızarsa araç reddeder.",
+    "Çekim tabloları QAC sorgusuyla kurulur (siyga, bab, sağlam kök, özne/nesne eki ayrımı); Kur'an'da geçmeyen siyga uydurulmaz, \"Kur'an'da geçmez\" gösterilir (26 hücre).",
+    "Şablon türleri 02 §2.3 adlarıyla birebir; her kavramda ≥3 şablon ve ≥2 tür (serpiştirme); en çok 4 seçenek (02 §5.9).",
+    "Terim geciktirme (02 §2.9): ünite <3 kavramlarda termVisible=false.",
+    "g0_5 (R-A7): Ünite 1, errorClass=order, iki Kelime dizme şablonu.",
+    "Ünite 11 (R-A8): 73 kök, 242 Türkçe türev, her biri 06 §3.1 kalıp sözlüğünden etiketli."
+  ],
+  "result": {
+    "concepts": 25,
+    "templates": 86,
+    "examples": 93,
+    "unit11Roots": 73,
+    "unit11Derivatives": 242,
+    "verified": "26/26",
+    "consistency": 0,
+    "arabicAuthored": 0,
+    "unattestedCells": 26
+  },
+  "corpusFindings": [
+    "QAC 2. şahıs ikili çoğunlukla cinsiyetsiz \"2D\" etiketler → pgnAny ile karşılandı.",
+    "QAC 4:113:28 ta'lemu 3FS etiketli ama âyette 2MS anlamında → tabloda skipRefs ile dışlandı (gerekçeli).",
+    "Nesne eki özne ekiyle aynı şahıstan olabilir (تنفعها) → siyga kuralı (subjectSuffixExpected) eklendi."
+  ],
+  "checks": [
+    {
+      "cmd": "node --check tools/kao-grammar-build.mjs",
+      "exit": 0
+    },
+    {
+      "cmd": "node --check tools/kao-lexicon-build.mjs",
+      "exit": 0
+    },
+    {
+      "cmd": "node tools/kao-grammar-build.mjs --self-test",
+      "exit": 0,
+      "note": "PASS"
+    },
+    {
+      "cmd": "node tools/kao-lexicon-build.mjs --self-test",
+      "exit": 0,
+      "note": "PASS (yalnız dışa aktarım değişti)"
+    },
+    {
+      "cmd": "node tools/kao-grammar-build.mjs --build",
+      "exit": 0,
+      "note": "concepts=25 templates=86 examples=93 unit11Roots=73 issues=0; iki kez koşuldu, aynı sonuç (idempotent)"
+    },
+    {
+      "cmd": "node tools/kao-grammar-build.mjs --import-grammar",
+      "exit": 0,
+      "note": "verified=26/26 unsigned=0 consistency=0"
+    },
+    {
+      "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+      "exit": 0,
+      "note": "PASS (0 warn)"
+    },
+    {
+      "cmd": "git -c core.fsmonitor=false diff --check",
+      "exit": 0
+    }
+  ],
+  "requirements": {
+    "R-A7": "partial — g0_5 içeriği tam; hata taksonomisine \"order\" eklenmesi KAO-13",
+    "R-A8": "partial — Ünite 11 türev tablosu 73 kök (≥60); fixture sayımı KAO-14"
+  },
+  "knownLimits": [
+    "Çekim tablolarında 26 hücre Kur'an'da geçmez (ör. 2FS, 2FD, 2FP); kural gereği boş.",
+    "Önekli seçilen 5 tablo hücresi gövde+ek olarak QAC bölütlerinden gösterilir (source: qac-segments)."
+  ],
+  "gap": "GAP-01 KAO-04 kısmı kapandı; KAO-05/06 kısmı açık."
+}

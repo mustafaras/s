@@ -9,7 +9,7 @@
   },
   "selectionRule": {
     "particleRankMax": 100,
-    "contentRankMax": 600,
+    "contentRankMax": 500,
     "particlePos": [
       "ACC",
       "AMD",
@@ -49,12 +49,12 @@
   "contractTokenTarget": 77430,
   "lemPoolTokens": 74122,
   "lemmaTotal": 4832,
-  "candidateTotal": 600,
+  "candidateTotal": 524,
   "planCandidateTarget": 530,
   "bucketCounts": {
     "A": 22,
     "B": 0,
-    "C": 515,
+    "C": 439,
     "D": 63
   },
   "bucketTargets": {
@@ -64,45 +64,45 @@
     "D": 30
   },
   "coverage": {
-    "selectedLemPoolTokens": 60000,
+    "selectedLemPoolTokens": 59948,
     "lemPoolTokens": 74122,
-    "ratioLemPool": 0.8095,
-    "ratioWordTokens": 0.7749,
+    "ratioLemPool": 0.8088,
+    "ratioWordTokens": 0.7742,
     "goal": 0.8,
     "goalMet": true,
     "denominator": "LEM etiketli token havuzu",
     "alternatives": [
       {
         "contentRankMax": 500,
-        "lemmas": 503,
-        "ratioLemPool": 0.7867
+        "lemmas": 524,
+        "ratioLemPool": 0.8088
       },
       {
         "contentRankMax": 600,
-        "lemmas": 600,
-        "ratioLemPool": 0.8095
+        "lemmas": 623,
+        "ratioLemPool": 0.8321
       },
       {
         "contentRankMax": 700,
-        "lemmas": 694,
-        "ratioLemPool": 0.827
+        "lemmas": 721,
+        "ratioLemPool": 0.8503
       },
       {
         "contentRankMax": 800,
-        "lemmas": 794,
-        "ratioLemPool": 0.8423
+        "lemmas": 821,
+        "ratioLemPool": 0.8656
       },
       {
         "contentRankMax": 1000,
-        "lemmas": 986,
-        "ratioLemPool": 0.8654
+        "lemmas": 1017,
+        "ratioLemPool": 0.8892
       }
     ]
   },
   "anchorUniverseTotal": 63,
   "anchorPresentTotal": 63,
   "anchorMissing": [],
-  "anchorOutsideContentBand": 23,
+  "anchorOutsideContentBand": 24,
   "tesbihatPresent": [
     "suboHa`n",
     "Hamod",

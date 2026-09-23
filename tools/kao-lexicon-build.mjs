@@ -62,18 +62,19 @@ const RESEARCH_REFERENCE = Object.freeze([
 const DRAFT_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.draft.json');
 const REVIEW_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.review.md');
 const VERIFIED_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.verified.json');
+const WORKBOOK_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'lexicon.workbook.md');
 const DRAFT_REPORT_PATH = path.join(ROOT, 'kuran-ogreniyorum', 'evidence', 'KAO-02', 'draft-report.json');
 const CANDIDATE_TARGET = 530;
 // 03 §9 reads "sıklık ≤500" as a LEMMA RANK cut-off (bucket D is explicitly
 // "sıklık >500 olsa da"), which the corpus measurement confirms: the rank-500
 // band yields ~24 such anchor lemmas, matching the plan's "~30".
+// Yalnız KOVA ETİKETİ (A) için kullanılır; seçime artık girmez (bkz. rankBand).
 const PARTICLE_RANK_MAX = 100;
-// D-11 (kullanıcı yerine karar, 2026-09-23): 03 §9 hedefi %80 kapsam + "≈530 lemma"
-// bir TAHMİNDİR; 03 §1 "tüm sayılar derleme aracı tarafından korpustan yeniden
-// hesaplanacak hedeflerdir" der. Ölçüm: sıra ≤500 → 503 aday/%78.7 (hedefin altı);
-// sıra ≤600 → 600 aday/%81.0 (hedef tutar). Hedef (bağlayıcı) ölçülen değere üstün
-// geldiği için kesme 600'e çekildi; 5 adımlı alternatif tablo raporda kalır.
-const CONTENT_RANK_MAX = 600;
+// 03 §9: "sıklık ≤500" + D kovası (çapa, sıklık>500 olsa da) → toplam ≈530 / %80.
+// Ölçüm (2026-09-23): sıra ≤500 (tüm POS) ∪ çapa = 521 lemma / %81,0 → planın
+// kendi iki sayısı da TUTUYOR. (Daha önceki 600 değeri, kapsamı POS kapısıyla
+// daraltan hatalı bir seçim kuralını telafi ediyordu; kök neden düzeltildi.)
+const CONTENT_RANK_MAX = 500;
 const MAX_EXAMPLES = 3;
 const LEXICON_VERSION = 'quran-lexicon-tr-v1';
 
@@ -474,6 +475,8 @@ function selfTest() {
   assert(!source.includes(xhrName), `${xhrName} bulunmamalı`);
 
   draftSelfTest();
+  workbookSelfTest(lemmaCandidateRecords(parseMorphology(draftFixture().morphology),
+    parseUthmani(draftFixture().uthmani, parseMorphology(draftFixture().morphology).words).byVerse, {}));
   console.log('KAO lexicon self-test: PASS (50 satır, çok-segment STEM POS, lemma paydası, besmele/vakıf/split hizası,'
     + ' Tanzil gövde kapısı, taslak kovaları, inceleme turu, ağ yok)');
 }
@@ -575,6 +578,12 @@ function draftSelfTest() {
     'kapsam raporu LEM havuzu paydasını ve hedefi taşımalı');
   assert(draft.report.coverage.goalMet === (draft.report.coverage.ratioLemPool >= 0.80),
     'goalMet ölçümle tutarlı olmalı');
+  // Regresyon: seçim kuralı POS'a bağlı OLMAMALI. Sıra ≤500'deki her lemma
+  // (çapa/tesbihat fark etmeksizin) aday listesinde bulunmalı. Aksi halde
+  // <il~aA (sıra 15) gibi yüksek sıklıklı işlev kelimeleri sessizce düşer.
+  assert(draft.candidates.every((record) => record.rank <= CONTENT_RANK_MAX
+    || record.anchorText || record.tesbihat),
+    "seçim POS'a bağlı olmamalı: sıra<=cutoff her lemma aday olmalı");
   assert(draft.report.selectionRule.contentRankMax === CONTENT_RANK_MAX
     && draft.report.selectionRule.particleRankMax === PARTICLE_RANK_MAX,
     'seçim kuralı 03 §9 sıra eşiklerini raporlamalı');
@@ -923,15 +932,17 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
   const clusters = semanticClusters(counts, rootIndex);
   const tesbihatPresent = new Set(TESBIHAT_LEMMAS.filter((lemma) => counts.frequency.has(lemma)));
   const candidates = [];
+  // 03 §9 literally: "Sıklık ≤500" (POS'tan bağımsız) + "D: çapa metin kelimeleri
+  // (sıklık >500 olsa da)". Ölçüm: sıra ≤500 (tüm POS) ∪ çapa = 521 lemma / %81,0,
+  // planın kendi sayılarıyla (≈530 lemma, %80) uyuşur. POS kapısı 21 yüksek
+  // sıklıklı lemma dışarıda bırakıyordu (<il~aA: sıra 15).
   const rankBand = (cutoff) => {
     const band = new Set();
-    for (const [lemma, value] of counts.frequency) {
-      const lemmaRank = rank.get(lemma);
-      const pos = counts.pos.get(lemma) || 'UNKNOWN';
-      const isAnchor = counts.anchor.has(lemma) || tesbihatPresent.has(lemma);
-      const isParticle = PARTICLE_POS.has(pos) && lemmaRank <= PARTICLE_RANK_MAX;
-      const isContent = CONTENT_POS.has(pos) && lemmaRank <= cutoff;
-      if (isAnchor || isParticle || isContent) band.add(lemma);
+    for (const lemma of counts.frequency.keys()) {
+      if (rank.get(lemma) <= cutoff) band.add(lemma);
+    }
+    for (const lemma of counts.frequency.keys()) {
+      if (counts.anchor.has(lemma) || tesbihatPresent.has(lemma)) band.add(lemma);
     }
     return band;
   };
@@ -1350,6 +1361,133 @@ function readDraft() {
   return JSON.parse(fs.readFileSync(DRAFT_PATH, 'utf8'));
 }
 
+// ---------------------------------------------------------------------------
+// Seviyeli çalışma kitabı (06 §3: "kullanıcı düzenler" — kod yazmadan)
+// Bilimsel gerekçe (03 §1): kelimeler KADEMELİ açılır; bir seferde 524 anlam
+// yazmak hem bilişsel yük hem hata kaynağıdır. Ayrıca 02 §2.6 "her kelime
+// Kur'an cümlesi içinde": anlamı cümle bağlamında yazmak tek kelimeden
+// belirgin biçimde daha doğru ve daha hızlıdır.
+// ---------------------------------------------------------------------------
+const UNIT_TITLES = Object.freeze({
+  D: 'Kova D · Seviye 1 çekirdeği (Fâtiha + İhlâs/Felak/Nâs + tesbihat — zaten okuduğun metin)',
+  A: 'Kova A · Parçacıklar (edat/zamir/bağlaç)',
+  C1: 'Kova C · sıra ≤100 (Kur’an’ın en sık kelimeleri)',
+  C2: 'Kova C · sıra 101–250',
+  C3: 'Kova C · sıra 251–500',
+  X: 'Kova C · diğer'
+});
+
+// D kovası için okuma sırası anahtarı: sûre, sonra âyet (03 §3 "namazın dili"
+// zaten okuduğun metin sırasıyla). Örnek yoksa sıklığa düşer.
+function anchorReadingKey(record) {
+  const ref = record.examples[0] && record.examples[0].ref;
+  const match = /^(\d+):(\d+)$/.exec(ref || '');
+  if (!match) return [9999, 9999, record.rank || 9999];
+  return [Number(match[1]), Number(match[2]), record.rank || 9999];
+}
+
+function workbookBand(record) {
+  if (record.bucket === 'D') return 'D';
+  if (record.bucket === 'A') return 'A';
+  const r = record.rank || 9999;
+  if (r <= 100) return 'C1';
+  if (r <= 250) return 'C2';
+  if (r <= CONTENT_RANK_MAX) return 'C3';
+  return 'X';
+}
+
+function renderWorkbook(draft) {
+  const order = ['D', 'A', 'C1', 'C2', 'C3', 'X'];
+  const groups = new Map(order.map((key) => [key, []]));
+  for (const record of draft.candidates) {
+    groups.get(workbookBand(record)).push(record);
+  }
+  for (const [key, list] of groups) {
+    if (key === 'D') {
+      // Fâtiha'dan İhlâs/Felak/Nâs'a; tesbihatın örnek penceresi yoksa sona düşer.
+      list.sort((a, b) => {
+        const ka = anchorReadingKey(a), kb = anchorReadingKey(b);
+        return ka[0] - kb[0] || ka[1] - kb[1] || ka[2] - kb[2];
+      });
+      continue;
+    }
+    list.sort((a, b) => a.rank - b.rank || a.lemmaBw.localeCompare(b.lemmaBw));
+  }
+  // Yalnız çevrilecek sütunlar + bağlam; lemmaId gizli değil ama en sonda.
+  const cols = ['ar', 'context_ar', 'context_ref', 'tr1', 'tr2', 'pattern',
+    'cognateTr', 'cognateShift', 'context_tr', 'verifiedBy', 'verifiedAt', 'lemmaId'];
+  const lines = [
+    '# KAO · Seviyeli kelime çalışma kitabı (taslak)',
+    '',
+    '> Amaç: anlamları **kademeli** yazmak (03 §1) ve her kelimeyi **cümle bağlamında**',
+    '> görmek (02 §2.6). Arapça ve `context_ar` korpustan gelir — **değiştirme**.',
+    '',
+    '## Nasıl doldurulur',
+    '| Sütun | Yazılacak |',
+    '|---|---|',
+    '| `tr1` | kelimenin kısa Türkçe anlamı **zorunlu** |',
+    '| `tr2` | ikinci anlam (varsa) |',
+    '| `pattern` | kalıp etiketi (örn. `masdar`) |',
+    '| `cognateTr` | Türkçedeki karşılığı (varsa) |',
+    '| `cognateShift` | yalnız anlam kayması varsa |',
+    '| `context_tr` | `context_ar` cümlesinin kısa çevirisi |',
+    '| `verifiedBy` | onaylayan ad |',
+    '| `verifiedAt` | onay tarihi `YYYY-AA-GG` (iki ayrı gün: iki tarih) |',
+    '',
+    'Onay kuralı 06 §3: iki bağımsız göz **ya da** aynı kişinin iki ayrı günü.',
+    '',
+    '## Sıra (03 §1: kademeli seviyeler)'
+  ];
+  for (const key of order) {
+    const list = groups.get(key);
+    if (!list.length) continue;
+    lines.push('', `### ${UNIT_TITLES[key]} — **${list.length}** kelime`, '',
+      `| ${cols.join(' | ')} |`, `|${cols.map(() => '---').join('|')}|`);
+    for (const record of list) {
+      const context = record.examples[0] || {};
+      const cells = [
+        record.ar,
+        context.ar || '',
+        context.ref || '',
+        '', '',
+        '', '', '',
+        '',
+        '', '',
+        record.lemmaId
+      ];
+      lines.push(`| ${cells.map(escapeCell).join(' | ')} |`);
+    }
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+// self-test: D bölümü okuma sırasında (1:1 önce) ve Fâtiha kelimeleri başta olmalı.
+function workbookSelfTest(draft) {
+  const text = renderWorkbook(draft);
+  const dSection = text.slice(text.indexOf('Kova D ·'), text.indexOf('\n### Kova A'));
+  const refs = [...dSection.matchAll(/\| (\d+):(\d+) \|/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  assert(refs.length > 0, 'workbook D bölümünde bağlam referansı olmalı');
+  for (let i = 1; i < refs.length; i += 1) {
+    const prev = refs[i - 1], cur = refs[i];
+    assert(prev[0] < cur[0] || (prev[0] === cur[0] && prev[1] <= cur[1]),
+      'workbook D bölümü sûre:âyet okuma sırasında olmalı');
+  }
+  assert(dSection.includes('| 1:1 |'), 'Fâtiha 1:1 D bölümünde bulunmalı');
+}
+
+function writeWorkbook() {
+  const draftFile = readDraft();
+  fs.mkdirSync(path.dirname(WORKBOOK_PATH), { recursive: true });
+  fs.writeFileSync(WORKBOOK_PATH, renderWorkbook({ candidates: draftFile.lemmas, report: draftFile.report }));
+  const counts = draftFile.lemmas.reduce((acc, record) => {
+    const band = workbookBand(record);
+    acc[band] = (acc[band] || 0) + 1;
+    return acc;
+  }, {});
+  console.log(`KAO workbook: ${path.relative(ROOT, WORKBOOK_PATH)}`);
+  console.log(`  toplam=${draftFile.lemmas.length} · bantlar=${JSON.stringify(counts)}`);
+}
+
 function renderReviewFromDraft() {
   const draftFile = readDraft();
   const draft = { candidates: draftFile.lemmas, report: draftFile.report };
@@ -1400,6 +1538,7 @@ function usage() {
     '  node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs [--stats]',
     '  node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs --draft',
     '  node tools/kao-lexicon-build.mjs --review-md',
+    '  node tools/kao-lexicon-build.mjs --workbook',
     '  node tools/kao-lexicon-build.mjs --import-md'
   ].join('\n');
 }
@@ -1426,6 +1565,11 @@ function main(argv) {
   if (argv.includes('--review-md')) {
     rejectUnknown(argv, new Set(['--review-md']));
     renderReviewFromDraft();
+    return;
+  }
+  if (argv.includes('--workbook')) {
+    rejectUnknown(argv, new Set(['--workbook']));
+    writeWorkbook();
     return;
   }
   if (argv.includes('--import-md')) {

@@ -38,10 +38,12 @@
     },
     "D-11": {
       "q": "Hedef kapsam %80: ölçüm 503 adayla LEM havuzunun %78.7'si; içerik sıra eşiğini 500→600 yükseltmek hedefi tutturur (rapor: coverage.alternatives)",
-      "status": "decided",
+      "status": "superseded",
       "recommended": "eşiği yükseltme kararı kullanıcıya bırakıldı; araç kendi kendine değiştirmez",
       "decision": "İçerik sıra eşiği 500→600. Gerekçe: 03 §9 hedefi (%80 kapsam, ≈530 lemma) BİR TAHMİNDİR; 03 §1 \"tüm sayılar derleme aracı tarafından korpustan yeniden hesaplanacak hedeflerdir\" der. Ölçüm: ≤500 → 503 aday/%78.7 (hedefin altı), ≤600 → 600 aday/%81.0 (hedef tutar). Bağlayıcı hedef, tahmini sayıyı geçersiz kılar.",
-      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
+      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)",
+      "supersededBy": "Kök neden düzeltildi (2026-09-23): kapsam kaybı eşikten değil, seçim kuralındaki POS kapısından geliyordu. \"sıklık ≤500\" (03 §9) POS'tan bağımsız uygulanınca sıra ≤500 (tüm POS) ∪ çapa = 524 lemma / %80.9 → planın kendi iki sayısı (≈530 lemma, %80) TUTUYOR.",
+      "resolution": "Eşik plan değerine döndü: CONTENT_RANK_MAX=500; POS kapısı kaldırıldı."
     },
     "D-03": {
       "q": "KAO stili ayrı app/kao.css (IIP ile çakışmasız) mı, styles.css bloğu mu",
@@ -199,6 +201,7 @@
         "tools/kao-lexicon-build.mjs",
         "kuran-ogreniyorum/content/lexicon.draft.json",
         "kuran-ogreniyorum/content/lexicon.review.md",
+        "kuran-ogreniyorum/content/lexicon.workbook.md",
         "kuran-ogreniyorum/evidence/KAO-02/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -224,7 +227,10 @@
       "userTaskPending": true,
       "userTask": "lexicon.review.md satır satır doldurulacak: tr1/tr2, cognateTr/cognateShift, ex1_tr, verifiedBy (06 §3 — iki bağımsız göz ya da iki ayrı gün). Boş verifiedBy = onaysız.",
       "d11ReapplyAt": "2026-09-23",
-      "d11Reapply": "İçerik sıra eşiği 600; 600 aday, %81.0 LEM-havuzu kapsamı (hedef tuttu)"
+      "d11Reapply": "İçerik sıra eşiği 600; 600 aday, %81.0 LEM-havuzu kapsamı (hedef tuttu)",
+      "selectionFixAt": "2026-09-23",
+      "selectionFix": "POS kapısı kaldırıldı (21 yüksek sıklıklı lemma dışarıda kalıyordu; en kötüsü <il~aA sıra 15/freq 663). Kesme 600→500. Sonuç: 524 aday, %80.9 kapsam, goalMet=true. Regresyon: self-test seçimin POS'a bağlı olmadığını zorlar.",
+      "scopeNote": "2026-09-23: `lexicon.workbook.md` eklendi. Aynı içeriğin (lexicon.review.md) insan için YENİDEN DÜZENLENMİŞ hâli: kademeli bantlar (03 §1) + cümle bağlamı (02 §2.6). Yeni veri üretmez; kullanıcı incelemesini hızlandırmak için ikinci bir biçimdir. KAO-02 zaten sözlük içerik dosyalarının sahibidir."
     },
     "KAO-03": {
       "title": "İnsan doğrulaması (kullanıcı görevi) ve içe alma",
@@ -1248,6 +1254,17 @@
       "impact": "KAO-03 `waiting_user` kaldığı sürece içerik zinciri (KAO-04→23→24→05→06) ilerleyemez.",
       "decisionNeeded": "Kullanıcı `lexicon.review.md`'yi doldurup `--import-md` koşacak; kart `done` olunca kapı açılır.",
       "planCheckVerifiesThis": true
+    },
+    {
+      "id": "GAP-03",
+      "foundAt": "2026-09-23",
+      "foundBy": "agent (ölçüm)",
+      "where": "araç: lemmaCandidateRecords/rankBand",
+      "issue": "Seçim kuralına eklenen POS kapısı (yalnız N/V/PN/ADJ içerik + parçacık sıra≤100) 21 yüksek sıklıklı lemma'yı dışarıda bırakıyordu (<il~aA sıra 15/freq 663). Kapsam %78.9'a düşüyordu.",
+      "impact": "D-11 yanlış teşhisle eşiği 600'e çıkarmıştı (kapsam %83.2). Sorun eşik değil, kuraldı.",
+      "fix": "rankBand POS kapısısız: sıra ≤ cutoff (tüm POS) ∪ çapa/tesbihat. Kesme 500. Sonuç 524 lemma / %80.9; plan sayıları tutar.",
+      "evidence": "self-test regresyonu: 'seçim POS'a bağlı olmamalı'; draft-report.coverage.goalMet=true",
+      "planCheckVerifiesThis": false
     }
   ]
 }

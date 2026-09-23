@@ -1414,7 +1414,9 @@ function renderWorkbook(draft) {
     list.sort((a, b) => a.rank - b.rank || a.lemmaBw.localeCompare(b.lemmaBw));
   }
   // Yalnız çevrilecek sütunlar + bağlam; lemmaId gizli değil ama en sonda.
-  const cols = ['ar', 'context_ar', 'context_ref', 'tr1', 'tr2', 'pattern',
+  // `translit_tr` ve `root` MEKANİK üretilir (Buckwalter tablosu / korpus kökü) —
+  // içerik değildir, insanın Arapçayı okumasını/aramısını kolaylaştırır.
+  const cols = ['ar', 'translit_tr', 'root', 'context_ar', 'context_ref', 'tr1', 'tr2', 'pattern',
     'cognateTr', 'cognateShift', 'context_tr', 'verifiedBy', 'verifiedAt', 'lemmaId'];
   const lines = [
     '# KAO · Seviyeli kelime çalışma kitabı (taslak)',
@@ -1425,6 +1427,7 @@ function renderWorkbook(draft) {
     '## Nasıl doldurulur',
     '| Sütun | Yazılacak |',
     '|---|---|',
+    '| `ar` · `translit_tr` · `root` · `context_ar` · `context_ref` | **mekanik** (korpustan) — dokunma |',
     '| `tr1` | kelimenin kısa Türkçe anlamı **zorunlu** |',
     '| `tr2` | ikinci anlam (varsa) |',
     '| `pattern` | kalıp etiketi (örn. `masdar`) |',
@@ -1447,6 +1450,8 @@ function renderWorkbook(draft) {
       const context = record.examples[0] || {};
       const cells = [
         record.ar,
+        record.translit.tr || '',
+        record.root || '',
         context.ar || '',
         context.ref || '',
         '', '',
@@ -1473,6 +1478,13 @@ function workbookSelfTest(draft) {
       'workbook D bölümü sûre:âyet okuma sırasında olmalı');
   }
   assert(dSection.includes('| 1:1 |'), 'Fâtiha 1:1 D bölümünde bulunmalı');
+  // mekanik alanlar boş kalmamalı (insanın okumasını kolaylaştırırlar)
+  const rowsAll = text.split('\n').filter((line) => line.startsWith('| ') && !line.startsWith('| ar') && !line.startsWith('|---')
+    && /\| [\u0600-\u06FF]/.test(line));
+  assert(rowsAll.every((line) => {
+    const cells = line.replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
+    return cells[1] && cells[3] && cells[4]; // translit_tr, context_ar, context_ref
+  }), 'workbook mekanik alanları (translit/context) dolu olmalı');
 }
 
 function writeWorkbook() {

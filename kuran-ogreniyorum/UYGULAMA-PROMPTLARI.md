@@ -357,6 +357,8 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - content/lexicon.verified.json (varsa; kalıp etiketli türevler)
 
 **İzinli dosyalar (STATE ile birebir):**
+- `tools/kao-grammar-build.mjs`
+- `tools/kao-lexicon-build.mjs` (yalnız dışa aktarım)
 - `kuran-ogreniyorum/content/grammar.draft.json`
 - `kuran-ogreniyorum/content/grammar.verified.json`
 - `kuran-ogreniyorum/content/grammar.review.md`
@@ -367,15 +369,17 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 
 **Adımlar:**
 1. `content/grammar.draft.json`: `{id:'g1',unit:1,title,plainTr,termTr,tables[],templates[≥3],examples[]}`; `g0_5` dâhil (SOV↔VSO ok şeması metni).
-2. Örnek Arapça **yalnız** verified sözlükten/`--example` alt komutundan (Tanzil pencereleri); ajan hafızadan âyet yazmaz.
-3. `grammar.review.md` → kullanıcı/ikinci göz onayı → `--import-grammar` → `grammar.verified.json`.
+2. Örnek Arapça **yalnız** verified sözlükten / korpus referansından (`tools/kao-grammar-build.mjs --build`, `--example`); ajan hafızadan âyet yazmaz.
+3. `grammar.review.md` → doğrulayıcı onayı (D-12) → `--import-grammar` → `grammar.verified.json`.
 4. Şablon türleri 02 §2.3 tablosundaki adlarla birebir (ek çöz, çekim tablosu, kök bul, kalıp eşle…).
 
 **Kontroller (hepsi exit 0; STATE ile birebir):**
 - `node --check <değişen her .js/.mjs>`
 - `node kuran-ogreniyorum/tools/kao-plan-check.mjs`
 - `git -c core.fsmonitor=false diff --check`
-- `her kavramda ≥3 alıştırma şablonu; g0_5 mevcut; onay alanları dolu (06 §3, D-12)`
+- `node tools/kao-grammar-build.mjs --self-test`
+- `node tools/kao-grammar-build.mjs --build → issues=0 (her kavramda ≥3 alıştırma şablonu, ≥2 tür; g0_5 mevcut)`
+- `node tools/kao-grammar-build.mjs --import-grammar → verified=26/26, consistency=0; onay alanları dolu (06 §3, D-12)`
 
 **Bitti sayılır:** grammar.verified.json onaylı; g0_5 mevcut; Ünite 11 Türkçe türev tablosu ≥60 kök.
 

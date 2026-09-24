@@ -34,9 +34,9 @@ check('dar ekran vakit açıklamasını kademeli sadeleştiriyor',
   css.includes('@media(max-width:389px)') && css.includes('.sey-hdr-phase-time em{ display:none; }'));
 check('gece kapsülü açık temada korumalı koyu zemin alıyor',
   css.includes('sky-time-night ~ .sey-hdr-scene .sey-hdr-phase{'));
-/* IIP-21 okuma levhası styles.css pinini yükseltti; appSurface pini değişmedi. */
+/* IIP-17 günlük seçki yüzeyi styles.css pinini yükseltti; appSurface pini değişmedi. */
 check('CSS ve appSurface cache sürümleri yükseltildi',
-  html.includes('app/styles.css?v=20260924c') && html.includes('app/core/appSurface.js?v=20260924d'));
+  html.includes('app/styles.css?v=20260924d') && html.includes('app/core/appSurface.js?v=20260924d'));
 
 console.log('Passed: '+passed+' / '+(passed+failed));
 if(failed) process.exit(1);

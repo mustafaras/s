@@ -67,8 +67,8 @@ const nightStops = ['#243A6E', '#101A33'];
 
 check('gündüz/şafak/akşam seçicileri gece override kapsamına alınmadı',
   !scope.includes('sky-time-day') && !scope.includes('sky-time-dawn') && !scope.includes('sky-time-dusk'));
-/* IIP-21 okuma levhası styles.css'i değiştirdi; index pini aynı teslimde yükselir. */
-check('stylesheet cache sürümü yükseltildi', html.includes('app/styles.css?v=20260924c'));
+/* IIP-17 günlük seçki yüzeyi styles.css'i değiştirdi; index pini aynı teslimde yükselir. */
+check('stylesheet cache sürümü yükseltildi', html.includes('app/styles.css?v=20260924d'));
 
 console.log('Passed: ' + passed + ' / ' + (passed + failed));
 if (failed) process.exit(1);

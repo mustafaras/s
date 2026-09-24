@@ -32,6 +32,8 @@ test('doğrulanmamış kayıt gösterilmez',()=>{const out=r.iip17ReaderHTML('20
 test('onaylı Latin harfli okunuş ayrı alanda gösterilir',()=>{assert.match(html,/Rabbenâ lâ tüâhiznâ in nesînâ ev ahta’nâ/);});
 test('okunuşu olmayan kayıt güvenli boş durum gösterir',()=>{const out=r.iip17ReaderHTML('2026-09-21',{byId:()=>({...verse,transliterationTr:null})});assert.match(out,/onaylı Latin harfli okunuş bulunmuyor/);});
 test('otomatik doğrulandı rozeti üretilmez',()=>{assert.ok(!html.includes('iip17-verified'));assert.ok(!html.includes('İnsan doğrulamalı'));assert.match(html,/ÂYET · DUA/);});
+test('günlük seçki kendi Apple okuma yüzeyi kimliğini ve tek kopya grubunu taşır',()=>{assert.match(html,/<article class="iip17-reader iip17-daily"/);assert.match(html,/<div class="iip17-copy-stack">/);assert.match(html,/class="iip17-verse-mark" aria-hidden="true">۞<\/span>/);});
+test('günlük seçki altın vurgu, zümrüt Arapça odak ve belirgin ana eylem kullanır',()=>{assert.match(css,/\.iip17-daily\{[^}]*border-left:5px solid var\(--quran2\)/);assert.match(css,/\.iip17-daily \.iip17-arabic-block\{[^}]*background:linear-gradient/);assert.match(css,/\.iip17-daily \.iip17-arabic\{[^}]*text-align:center/);assert.match(css,/\.iip17-daily \.iip17-deepen\{[^}]*min-height:48px[^}]*background:var\(--quran\)/);});
 test('manevi özet emojisiz, yapılandırılmış vakit ve ay döngüsü sunar',()=>{sandbox.HijriCalendarV1={hijriFrom:()=>({day:12,monthName:'Rebiülevvel',year:1448}),holyDay:()=>''};visualSpirit=r.spiritBarHTML();assert.match(visualSpirit,/SIRADAKİ VAKİT/);assert.match(visualSpirit,/HİCRÎ TARİH/);assert.match(visualSpirit,/12 Rebiülevvel 1448/);assert.match(visualSpirit,/İlk dördün sonrası/);assert.ok(!/[🌙☽☾🌒🌓🌔🌕🌖🌗🌘]/u.test(visualSpirit));});
 test('12 pilot kaydın tamamında alan sahibi onaylı okunuş vardır',()=>{const contentSandbox={window:{},Object};vm.runInNewContext(quranSource,contentSandbox,{filename:'quranStrikingVersesV1.js'});const ids=['bakara-255','ihlas-1','fatiha-5','fatiha-6-7','bakara-286','bakara-153','bakara-186','bakara-152','kehf-10','taha-25','taha-114','yusuf-87'];for(const id of ids){const item=contentSandbox.window.QuranStrikingVersesV1.byId(id);assert.ok(item.transliterationTr,id);assert.equal(item.transliterationVerifiedAt,'2026-09-22');assert.equal(item.transliterationReviewer,'user-domain-owner');}assert.equal(contentSandbox.window.QuranStrikingVersesV1.catalogVersion,'quran-striking-verses-tr-v2');});
 if(process.exitCode)process.exit(1);
@@ -41,4 +43,4 @@ if(process.argv.includes('--render')){
   fs.writeFileSync(out,artifact);
   console.log('RENDER '+out);
 }
-console.log('PASS: IIP-17 '+passed+'/14');
+console.log('PASS: IIP-17 '+passed+'/16');

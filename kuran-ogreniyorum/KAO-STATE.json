@@ -144,7 +144,9 @@
         "KAO-24",
         "KAO-25"
       ],
-      "status": "pending"
+      "status": "active",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)"
     },
     "2": {
       "cards": [
@@ -825,7 +827,11 @@
       "deps": [
         "KAO-12"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-13/EVIDENCE.json"
     },
     "KAO-14": {
       "title": "E4 Üniteler + E5 Kelime (üç dokunuş, kök ağacı, bayrak)",
@@ -1395,7 +1401,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-12",
+  "lastCompletedPrompt": "KAO-13",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

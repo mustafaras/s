@@ -1,0 +1,39 @@
+{
+  "card": "KAO-13",
+  "date": "2026-09-24",
+  "status": "PASS",
+  "scope": "E2 parça görevleri, E3 oturum sonu ve kalibrasyon kaydı",
+  "results": {
+    "fragmentSource": "QuranShortSurahsV1.words",
+    "fragmentTasks": ["kelime dizme", "parça çevir"],
+    "orderChipRange": "4-6",
+    "orderErrorClass": "order",
+    "orderHint": "G0.5 Fiil önce gelir",
+    "doneText": "Bugün N kelime daha kalıcı oldu",
+    "durabilityThresholdDays": 21,
+    "doneActions": ["Bugün yeter", "5 dakika daha"],
+    "rewardStringsAbsent": ["puan", "XP"],
+    "calibration": "daily[date].calib accumulates pred, ok, and n on every graded answer",
+    "undo": "card, daily calibration, errors, queue, and durability count restored"
+  },
+  "checks": [
+    "node --check app/core/quranLearn.js",
+    "node --check tests/kao/test_kao_render.js",
+    "node --check tests/kao/test_kao_requirements.js",
+    "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+    "git -c core.fsmonitor=false diff --check",
+    "node tests/kao/test_kao_render.js",
+    "node tests/kao/test_kao_requirements.js",
+    "node .claude/skills/run-seyma/driver.mjs",
+    "node .claude/skills/run-seyma/zikr-harness.mjs",
+    "node tests/app/test_state_rebind_boundary.js",
+    "node tools/shell-inventory.mjs --gate"
+  ],
+  "boundaries": {
+    "network": "none",
+    "browser": "headless fixtures only",
+    "personalData": "not accessed",
+    "deviceAcceptance": "not_verified",
+    "delivery": "local changes only; no KAO-13 push, merge, tag, or deploy authority"
+  }
+}

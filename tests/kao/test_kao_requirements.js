@@ -9,7 +9,7 @@ const repoRoot = require('../repo-root');
 function loadApi(extraDeps) {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/core/quranLearn.js']) {
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) {
     vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
   }
   const api = sandbox.window.SeymaQuranLearn;
@@ -98,9 +98,11 @@ sessionData.quranLearn.settings.audio = false;
 sessionData.quranLearn.daily['2026-09-24'] = { seed: 'bit-bit korunmalı' };
 assert.ok(sessionApi.kaoStart() >= 2, 'R-A4: iki yönlü ilk kelime oturumu başlamalı');
 assert.equal(fullRenders, 1);
-const directions = new Set(sessionUi.kaoQueue.map((item) => sessionApi.kaoBuildTask(item, sessionData, { seed: item.id }).direction));
+const directions = new Set(sessionUi.kaoQueue.map((item) => sessionApi.kaoBuildTask(item, sessionData, { seed: item.id }).direction).filter(Boolean));
 assert.deepEqual([...directions].sort(), ['ar>tr', 'tr>ar'], 'tam oturum iki görev türünü taşımalı');
-const firstItem = sessionUi.kaoQueue[0];
+const firstItem = sessionUi.kaoQueue.find((item) => item.type !== 'fragment' && sessionApi.kaoBuildTask(item, sessionData, { seed: item.id }).clipId);
+assert.ok(firstItem, 'sesli kelime görevi bulunmalı');
+sessionUi.kaoTaskIndex = sessionUi.kaoQueue.indexOf(firstItem);
 const firstTask = sessionApi.kaoBuildTask(firstItem, sessionData, { seed: firstItem.id });
 const beforeCard = JSON.stringify(sessionData.quranLearn.cards[firstTask.cardId]);
 const beforeDaily = JSON.stringify(sessionData.quranLearn.daily['2026-09-24']);
@@ -111,6 +113,7 @@ const transitionMs = Number(process.hrtime.bigint() - transitionStart) / 1e6;
 assert.ok(transitionMs < 50, `R-C5: hedefli geçiş ${transitionMs.toFixed(3)} ms`);
 assert.equal(fullRenders, 1, 'cevap tam render çağırmamalı');
 assert.ok(taskNode.innerHTML.length > 0, '#kao-task alt ağacı yenilenmeli');
+assert.deepEqual(JSON.parse(JSON.stringify(sessionData.quranLearn.daily['2026-09-24'].calib)), { pred: 1, ok: 1, n: 1 }, 'R-A3: her cevap kalibrasyon toplamına eklenmeli');
 assert.equal(sessionApi.kaoUndo(), true);
 assert.equal(JSON.stringify(sessionData.quranLearn.cards[firstTask.cardId]), beforeCard, 'R-C3: kart bit-bit geri sarılmalı');
 assert.equal(JSON.stringify(sessionData.quranLearn.daily['2026-09-24']), beforeDaily, 'R-C3: günlük kayıt bit-bit geri sarılmalı');
@@ -124,14 +127,34 @@ assert.equal(sessionApi.kaoShouldAutoplay(firstTask, sessionData), false, 'sessi
 quiet = false; sessionData.quranLearn.settings.audio = false;
 assert.equal(sessionApi.kaoShouldAutoplay(firstTask, sessionData), false, 'ses ayarı kapalıysa otomatik ses olmamalı');
 
+const fragmentKinds = new Set(sessionUi.kaoQueue.filter((item) => item.type === 'fragment').map((item) => item.fragmentKind));
+assert.deepEqual([...fragmentKinds].sort(), ['order', 'translate'], 'E2 kelime dizme ve parça çeviri aynı tam oturumda bulunmalı');
+
+const thresholdCardId = sessionUi.kaoQueue.find((item) => item.type !== 'fragment').cardId;
+sessionData.quranLearn.cards[thresholdCardId] = { state: 'review', s: 20, d: 5, r: '2026-08-01T00:00:00.000Z', due: '2026-08-02T00:00:00.000Z', reps: 3, lapses: 0 };
+sessionUi.kaoDurableCount = 0;
+sessionUi.kaoTaskIndex = 0;
+
 while (sessionUi.kaoTaskIndex < sessionUi.kaoQueue.length) {
   const item = sessionUi.kaoQueue[sessionUi.kaoTaskIndex];
   const task = sessionApi.kaoBuildTask(item, sessionData, { seed: item.id });
-  const correct = task.choices.find((choice) => choice.correct);
-  assert.ok(correct);
-  sessionApi.kaoAnswer(task.id, correct.choiceId);
+  if (task.kind === 'order') {
+    task.choices.slice().sort((a, b) => a.ordinal - b.ordinal).forEach((choice) => sessionApi.kaoAnswer(task.id, choice.choiceId));
+  } else {
+    const correct = task.choices.find((choice) => choice.correct);
+    assert.ok(correct);
+    sessionApi.kaoAnswer(task.id, correct.choiceId);
+  }
 }
-assert.match(sessionApi.kaoTaskHTML(null), /Oturum tamamlandı/);
+const doneHtml = sessionApi.kaoTaskHTML(null);
+assert.equal(sessionUi.kaoDurableCount, 1, 'R-B4: yalnız s<21 iken s>=21 olan kart sayılmalı');
+assert.match(doneHtml, new RegExp(`Bugün ${sessionUi.kaoDurableCount} kelime daha kalıcı oldu`), 'R-B4: sayı oturum eşik sayacından gelmeli');
+assert.match(doneHtml, /Bugün yeter/);
+assert.match(doneHtml, /5 dakika daha/);
+assert.doesNotMatch(doneHtml, /puan|XP/i);
+const calib = sessionData.quranLearn.daily['2026-09-24'].calib;
+assert.equal(calib.n, sessionData.quranLearn.daily['2026-09-24'].answered, 'R-A3: kalibrasyon n tüm cevapları saymalı');
+assert.ok(calib.pred >= 0 && calib.pred <= calib.n && calib.ok >= 0 && calib.ok <= calib.n);
 assert.ok(saves >= sessionUi.kaoQueue.length + 1, 'sessiz modda tam oturum kalıcı ilerlemeli');
 
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5, R-C2/C3/C5; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

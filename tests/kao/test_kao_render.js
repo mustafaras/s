@@ -18,6 +18,7 @@ const sandbox = { window: {}, Date, Math, Number, String, Object, Array, JSON };
 vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranLexiconV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranGrammarV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranGrammarV1.js' });
+vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranShortSurahsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranShortSurahsV1.js' });
 vm.runInContext(source, sandbox, { filename: relative });
 const api = sandbox.window.SeymaQuranLearn;
 
@@ -121,6 +122,31 @@ assert.match(grammarHtml, /class="kao-chip"/);
 assert.match(grammarHtml, /aria-live="polite"/);
 assert.doesNotMatch(grammarHtml, /<(?:input|textarea|select)\b/i, 'gramer görevleri klavyesiz olmalı');
 assert.match(cssSource, /\.kao-choices \.kao-chip\{min-height:44px\}/);
+
+const fragmentCandidates = api.kaoFragmentCandidates();
+const orderCandidate = fragmentCandidates.find((item) => item.fragmentKind === 'order');
+const translateCandidate = fragmentCandidates.find((item) => item.fragmentKind === 'translate');
+assert.ok(orderCandidate && translateCandidate, 'E2 iki parça görevi üretmeli');
+const orderItem = { id: 'fragment-order', cardId: orderCandidate.id, type: 'fragment', fragmentKind: 'order', isNew: true };
+const translateItem = { id: 'fragment-translate', cardId: translateCandidate.id, type: 'fragment', fragmentKind: 'translate', isNew: true };
+const orderTask = api.kaoBuildTask(orderItem, { quranLearn }, { seed: orderItem.id });
+const translateTask = api.kaoBuildTask(translateItem, { quranLearn }, { seed: translateItem.id });
+assert.equal(orderTask.kind, 'order');
+assert.ok(orderTask.choices.length >= 4 && orderTask.choices.length <= 6, 'kelime dizme 4–6 çip olmalı');
+const orderHtml = api.kaoTaskHTML(orderTask);
+assert.match(orderHtml, /Kelimeleri sırayla seç/);
+assert.match(orderHtml, /class="kao-order-target"/);
+assert.match(orderHtml, /aria-pressed="false"/);
+assert.equal(translateTask.kind, 'translate');
+assert.match(api.kaoTaskHTML(translateTask), /Parçayı çevir/);
+assert.doesNotMatch(orderHtml, /<(?:input|textarea|select)\b/i, 'parça görevi klavyesiz olmalı');
+
+ui.kaoDurableCount = 3;
+const doneHtml = api.kaoTaskHTML(null);
+assert.match(doneHtml, /Bugün 3 kelime daha kalıcı oldu/);
+assert.match(doneHtml, /Bugün yeter/);
+assert.match(doneHtml, /5 dakika daha/);
+assert.doesNotMatch(doneHtml, /puan|XP/i);
 api.ensureQuranLearn({ quranLearn });
 for (const errorClass of ['affix', 'root', 'rule']) {
   const candidate = api.kaoGrammarCandidates().find((item) => api.kaoBuildGrammarTask({ cardId: item.id }, { quranLearn }, { seed: item.id }).errorClass === errorClass);
@@ -132,6 +158,13 @@ for (const errorClass of ['affix', 'root', 'rule']) {
   api.kaoAnswer(grammarTask.id, wrong.choiceId);
   assert.equal(quranLearn.errors[errorClass], before + 1, `${errorClass} hata sayacı artmalı`);
 }
+
+ui.kaoQueue = [orderItem]; ui.kaoTasks = { [orderItem.id]: orderTask }; ui.kaoTaskIndex = 0; ui.kaoTaskStartedAt = Date.now(); ui.kaoUndo = null; ui.kaoOrderDraft = [];
+const wrongOrder = orderTask.choices.slice().sort((a, b) => b.ordinal - a.ordinal);
+const orderErrorsBefore = quranLearn.errors.order;
+for (const choice of wrongOrder) api.kaoAnswer(orderTask.id, choice.choiceId);
+assert.equal(quranLearn.errors.order, orderErrorsBefore + 1, 'SOV/dizilim hatası sıra sınıfına yazılmalı');
+assert.match(ui.kaoFeedback, /Fiil önce gelir/);
 
 api.kaoMount(new Date('2026-09-24T22:15:00'));
 assert.match(mounted, /id="sey-ov-card"/);

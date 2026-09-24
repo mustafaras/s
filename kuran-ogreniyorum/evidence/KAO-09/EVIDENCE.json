@@ -1,0 +1,71 @@
+{
+  "card": "KAO-09",
+  "head": "35e31cfd63619bf4f0c9a41810ea289b55e13d13",
+  "diffHashBeforeEvidence": "03e5217ba89b5bf62a490144954bac05191e5bc47abf83559c9f7aaa2b4af61d",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "result": {
+    "api": ["kaoBuildQueue", "kaoPickDistractors", "kaoBuildTask", "kaoNightWindow"],
+    "queueFixtureTasks": 17,
+    "dueLimit": 60,
+    "dailyNewLimit": "settings.dailyNew",
+    "grammarLimit": 3,
+    "fragmentLimit": 2,
+    "sameTypeRunLimit": 2,
+    "semanticClusters": 12,
+    "semanticClusterMembers": 79,
+    "semanticSpacingDays": 3,
+    "distractorSyntheticSessions": 1000,
+    "distractorViolations": 0,
+    "semanticSyntheticSessions": 1000,
+    "semanticViolations": 0,
+    "nightWindowMinutes": 90,
+    "nightReviewMaxCards": 8,
+    "moduleLines": 479,
+    "moduleBudgetLines": 800,
+    "moduleSha256": "14a7ba0c4bde971ca0d9fa86c0c973616b4d7c9ed47142cd1904b77cc2f51acf"
+  },
+  "semanticProvenance": {
+    "clusters": "The 12 verified cluster labels from lexicon.verified.json are represented only by lemma IDs in quranLearn.js.",
+    "sameRoot": "Derived at runtime from the frozen QuranLexiconV1 root index.",
+    "reason": "The KAO-05 frozen lemma projection did not expose semNeighbors; KAO-09 stays inside its allowlist without editing frozen content."
+  },
+  "checks": [
+    { "cmd": "node --check app/core/quranLearn.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node --check tests/kao/test_kao_queue.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node --check tests/kao/test_kao_requirements.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_queue.js", "exit": 0, "note": "deterministic queue, budgets, interleave, 12 clusters, same-root spacing and task generator PASS" },
+    { "cmd": "node tests/kao/test_kao_requirements.js", "exit": 0, "note": "R-A1 window, R-A2 1000/0, R-A5 1000/0 PASS" },
+    { "cmd": "node tests/kao/test_kao_fsrs.js", "exit": 0, "note": "KAO-08 regression: 24 vectors PASS" },
+    { "cmd": "node tests/kao/test_kao_boundary.js", "exit": 0, "note": "registry boundary PASS" },
+    { "cmd": "node tests/kao/test_kao_migration.js", "exit": 0, "note": "migration fixture PASS" },
+    { "cmd": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs", "exit": 0, "note": "67 passed, 0 failed" },
+    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "headless app boot/interactions PASS" },
+    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95 PASS" },
+    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37 passed, 0 failed" },
+    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "PASS at 7800-line shell ceiling" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "PASS (0 warn)" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0, "note": "no output" }
+  ],
+  "requirements": {
+    "R-A1": "partial: pure night-window/helper contract complete; app dep-bag wiring and UI presentation remain KAO-10/KAO-20.",
+    "R-A2": "done: only review cards with s>=21, same POS and different root; previous distractors excluded; 1000 sessions with 0 violations.",
+    "R-A5": "done: 12 semantic clusters plus same-root neighbors are separated in-session and for 3 days; 1000 sessions with 0 violations."
+  },
+  "filesTouched": [
+    "app/core/quranLearn.js",
+    "tests/kao/test_kao_queue.js",
+    "tests/kao/test_kao_requirements.js",
+    "kuran-ogreniyorum/evidence/KAO-09/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-09/HANDOFF.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "The current production registerQuranLearn call does not yet pass caffeineTargetBed; KAO-10 is the first app.js-authorized integration card.",
+    "Source/headless evidence is complete; device acceptance is not claimed.",
+    "No push, merge, tag or deploy was performed."
+  ]
+}

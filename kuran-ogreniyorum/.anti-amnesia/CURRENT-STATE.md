@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 11/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-08 · **blockedPrompt:** — · **Sıradaki:** **KAO-09**
+**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 12/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-09 · **blockedPrompt:** — · **Sıradaki:** **KAO-10**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -22,7 +22,7 @@
 | KAO-06 | quranGrammarV1 + quranShortSurahsV1 + quranPhonicsV1 (+prayerTexts) | done | R-A6 R-B2 |
 | KAO-07 | Registry iskeleti + ensureQuranLearn + migrate kancası | done | R-C7 |
 | KAO-08 | FSRS saf JS portu | done | R-A3 |
-| KAO-09 | Kuyruk, görev üretici, çeldirici, gece tekrarı | pending | R-A1 R-A2 R-A5 |
+| KAO-09 | Kuyruk, görev üretici, çeldirici, gece tekrarı | done | R-A1 R-A2 R-A5 |
 | KAO-10 | Overlay kabuğu + E1 Home + geçici Ayarlar girişi | pending | — |
 | KAO-11 | E2 oturum çekirdeği: anlam seç / Arapça seç, ses düğmesi, geri al | pending | R-A4 R-B7 R-B8 R-C2 R-C3 R-C5 |
 | KAO-12 | E2 gramer görevleri | pending | — |
@@ -49,7 +49,7 @@
 | KAO-D6 | Dalga 6 denetimi | pending | — |
 
 ## Gereksinim durumu (12-EK-GEREKSINIMLER)
-R-A1:pending · R-A2:pending · R-A3:partial · R-A4:pending · R-A5:pending · R-A6:partial · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:partial · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
+R-A1:partial · R-A2:done · R-A3:partial · R-A4:pending · R-A5:done · R-A6:partial · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:partial · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 52 | 2026-09-24 | KAO-08 bitti: `ts-fsrs@4.5.2` BasicScheduler davranışı 19 sabit parametre ve hedef R=0,90 ile saf JS'e taşındı; otomatik Again/Hard/Good/Easy eşlemesi ve kalibrasyon için `predictedR` eklendi. | 24 yayımlanmış vektör ±1e-6 PASS; monotonluk/grade/predictedR PASS; npm MIT/gitHead ve git tag eşit; `evidence/KAO-08/EVIDENCE.json` |
+| 54 | 2026-09-24 | KAO-09 bitti: gün+kart kimlikli xorshift kuyruk, due/yeni/gramer/parça bütçeleri, ≤2 tür serpiştirme, güvenli çeldirici, görev üretici, 12 küme+aynı-kök komşu ayrımı ve 90 dk gece penceresi tamamlandı. | iki fixture PASS; R-A2 1.000/0, R-A5 1.000/0; driver/zikr/migration/rebind/shell PASS; `evidence/KAO-09/EVIDENCE.json` |

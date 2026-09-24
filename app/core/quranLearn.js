@@ -36,6 +36,27 @@
     0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,
     0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621
   ];
+  var KAO_SEMANTIC_CLUSTERS={
+    SOZ_EMIR:['l_qaAla_657dd3','l_amor_9fbe48','l_qawol_58e075','l_amara_3fab3c'],
+    IMAN_KUFUR:['l_aAmana_966a5c','l_kafara_af1746','l_mu_omin_870b47','l_ka_firuwn_165d2d','l_a_oraka_c73d6e','l_anfaqa_0b12ad','l_iyma_n_4151c0','l_mu_orik_2ba276','l_ariyk_5de5f5','l_kufor_1c9ee6','l_kaAfir_9b3cf0','l_muna_fiquwn_bdda5c','l_m_u_omina_t_b9c5a2','l_amina_0a79a6'],
+    ILIM_CEHALET:['l_Ealima_ceb6d7','l_Ealiym_c50d0d','l_Eilom_2f0f9d','l_Ea_lamiyn_c337cf','l_aEolam_db561d','l_Eaqalu_36636d','l_Eal_ama_5c04b6'],
+    AMEL_KARSILIK:['l_Ea_aAb_4b9936','l_Eamila_50319c','l_ajor_c798df','l_Eamal_8215bb','l_Hasiba_a4ca56','l_Ea_aba_be4552','l_HisaAb_b41eae'],
+    NEFIS_KALP:['l_nafos_fde475','l_qalob_e14dcc','l_riyH_14b7a7','l_ruwH_1d9882'],
+    KULLUK_DUA:['l_daEaA_f5ec67','l_Eabod_3558c0','l_Eabada_557021','l_akara_350195','l_duEaA_bcbfae'],
+    KORKU_TAKVA:['l_t_aqaY_bc8006','l_xaAfa_29d6b0','l_mut_aqiyn_afd23b','l_xa_iYa_982ede','l_xawof_3af862'],
+    HIDAYET_DALALET:['l_hadaY_a88771','l_hudFY_2e4b07','l_aDal_a_5ed954','l_Dal_a_2775a8','l_hotadaY_132fd7','l_Dala_l_fc4484','l_DaA_l_145c36'],
+    RAHMET_ZULUM:['l_ZaAlim_fae7dd','l_r_aHiym_ecdbe9','l_raHomap_490a24','l_Zalama_7a9278','l_r_aHoma_n_c13ea2','l_r_aHima_870005','l_Zuluma_t_933b08'],
+    ALGI_ISITME_GORME:['l_n_aZara_cdb6f4','l_samiEa_640570','l_baSiyr_69e5a4','l_baSar_691898','l_samiyE_d49cf3','l_aboSara_9f0224','l_samoE_5d4faf'],
+    HAYAT_OLUM:['l_Hayaw_p_e08aa3','l_aHoyaA_35079e','l_mawot_7aa65a','l_m_aAta_a0f90e','l_m_ay_it_fb6ea2','l_Hay_3dc2a8','l_amaAta_5bf411','l_taHiy_ap_de08b0'],
+    SABIR_ITAAT:['l_aTaAEa_74ca26','l_Sabara_34dfc2','l_sotaTaAEa_d34f23','l_TaEaAm_f85a5a']
+  };
+  var KAO_CLUSTER_BY_LEMMA=Object.create(null);
+  Object.keys(KAO_SEMANTIC_CLUSTERS).forEach(function(cluster){
+    KAO_SEMANTIC_CLUSTERS[cluster].forEach(function(id){
+      if(!KAO_CLUSTER_BY_LEMMA[id]) KAO_CLUSTER_BY_LEMMA[id]=[];
+      KAO_CLUSTER_BY_LEMMA[id].push(cluster);
+    });
+  });
   var REQUIRED_DEPS=['data','ui','save','render','todayStr','esc','icon','getDay'];
   var quranLearnDeps=null;
 
@@ -186,6 +207,164 @@
     if(nonNegativeNumber(responseMs,0)<2500&&nonNegativeNumber(reps,0)>=3) return 4;
     return 3;
   }
+  function quranLearnRoot(d){
+    if(!d||typeof d!=='object'||Array.isArray(d)) return {};
+    return d.quranLearn&&typeof d.quranLearn==='object'&&!Array.isArray(d.quranLearn)?d.quranLearn:d;
+  }
+  function cardType(id,explicit){
+    if(explicit==='grammar'||explicit==='fragment'||explicit==='word') return explicit;
+    if(/^g:/.test(id)) return 'grammar';
+    if(/^s:/.test(id)) return 'fragment';
+    return 'word';
+  }
+  function lemmaIdForCard(id){
+    var match=String(id||'').match(/^w:([^:]+):(ar>tr|tr>ar)$/);
+    return match?match[1]:null;
+  }
+  function metaFor(id,raw,opts){
+    var catalog=opts&&opts.catalog&&typeof opts.catalog==='object'?opts.catalog:{};
+    var meta=Object.assign({},catalog[id]||{},raw||{});
+    var lemmaId=lemmaIdForCard(id),lex=window.QuranLexiconV1;
+    var lemma=lemmaId&&lex&&typeof lex.byId==='function'?lex.byId(lemmaId):null;
+    if(lemma){
+      if(!meta.pos) meta.pos=lemma.pos;
+      if(!meta.root) meta.root=lemma.root;
+      if(!meta.meanings) meta.meanings=lemma.meanings;
+      if(!meta.ar) meta.ar=lemma.ar;
+    }
+    return meta;
+  }
+  function semanticInfo(id,raw,opts){
+    var meta=metaFor(id,raw,opts),lemmaId=lemmaIdForCard(id),keys=[],neighbors=[];
+    if(meta.root) keys.push('root:'+meta.root);
+    (KAO_CLUSTER_BY_LEMMA[lemmaId]||[]).forEach(function(value){ keys.push('cluster:'+value); });
+    var sem=meta.semNeighbors;
+    if(Array.isArray(sem)) neighbors=neighbors.concat(sem);
+    else if(sem&&typeof sem==='object'){
+      (Array.isArray(sem.clusters)?sem.clusters:[]).forEach(function(value){ keys.push('cluster:'+value); });
+      neighbors=neighbors.concat(Array.isArray(sem.sameRoot)?sem.sameRoot:[]);
+    }
+    return {id:id,lemmaId:lemmaId,keys:Array.from(new Set(keys)),neighbors:Array.from(new Set(neighbors))};
+  }
+  function semanticNeighbors(a,b){
+    if(a.keys.some(function(key){ return b.keys.indexOf(key)>=0; })) return true;
+    return a.neighbors.indexOf(b.id)>=0||a.neighbors.indexOf(b.lemmaId)>=0||b.neighbors.indexOf(a.id)>=0||b.neighbors.indexOf(a.lemmaId)>=0;
+  }
+  function hashSeed(text){
+    var hash=2166136261;
+    for(var i=0;i<text.length;i+=1){ hash^=text.charCodeAt(i); hash=Math.imul(hash,16777619); }
+    return hash>>>0;
+  }
+  function xorshift(value){
+    var x=value>>>0||0x9e3779b9;
+    x^=x<<13; x^=x>>>17; x^=x<<5;
+    return x>>>0;
+  }
+  function seededRank(seed,id){ return xorshift(hashSeed(String(seed)+'|'+String(id))); }
+  function daySeed(now){ return now.toISOString().slice(0,10); }
+  function candidateRecord(raw,cards,opts){
+    var id=String(raw&&raw.cardId||raw&&raw.id||'');
+    if(!id) return null;
+    var card=cards[id]&&typeof cards[id]==='object'?cards[id]:{};
+    var isNew=typeof raw.isNew==='boolean'?raw.isNew:(!cards[id]||card.state==='new'||card.st==='new'||(!card.reps&&card.state!=='review'&&card.st!=='review'));
+    return {cardId:id,type:cardType(id,raw.type),isNew:isNew,card:card,raw:raw,semantic:semanticInfo(id,raw,opts)};
+  }
+  function recentNeighbor(candidate,cards,now,opts){
+    var ids=Object.keys(cards);
+    for(var i=0;i<ids.length;i+=1){
+      var other=cards[ids[i]],introduced=other&&(other.introducedAt||other.firstSeenAt);
+      if(!introduced) continue;
+      var at=new Date(introduced);
+      if(!isFinite(at.getTime())||now.getTime()-at.getTime()>=3*DAY_MS) continue;
+      if(semanticNeighbors(candidate.semantic,semanticInfo(ids[i],null,opts))) return true;
+    }
+    return false;
+  }
+  function kaoBuildQueue(d,nowValue,options){
+    var opts=options&&typeof options==='object'?options:{};
+    var now=validDate(nowValue,'now'),q=quranLearnRoot(d),cards=objectOr(q.cards,{});
+    var source=Array.isArray(opts.candidates)?opts.candidates:Object.keys(cards).map(function(id){ return {id:id}; });
+    var records=source.map(function(raw){ return candidateRecord(raw,cards,opts); }).filter(Boolean);
+    var seed=daySeed(now)+'|'+String(opts.sessionId||'');
+    records.sort(function(a,b){ return seededRank(seed,a.cardId)-seededRank(seed,b.cardId)||a.cardId.localeCompare(b.cardId); });
+    var due=records.filter(function(item){
+      if(item.isNew||item.card.orphan===true) return false;
+      var date=new Date(item.card.due||0);
+      return isFinite(date.getTime())&&date.getTime()<=now.getTime();
+    }).slice(0,60);
+    var dailyNew=Math.max(0,Math.floor(nonNegativeNumber(q.settings&&q.settings.dailyNew,10)));
+    var selectedNew=[];
+    records.filter(function(item){ return item.isNew; }).some(function(item){
+      if(selectedNew.length>=dailyNew) return true;
+      if(recentNeighbor(item,cards,now,opts)) return false;
+      if(selectedNew.some(function(other){ return semanticNeighbors(item.semantic,other.semantic); })) return false;
+      selectedNew.push(item);
+      return false;
+    });
+    var remaining=due.concat(selectedNew),out=[],typeCounts={grammar:0,fragment:0,word:0};
+    while(remaining.length){
+      var index=-1;
+      for(var i=0;i<remaining.length;i+=1){
+        var item=remaining[i];
+        if(item.type==='grammar'&&typeCounts.grammar>=3) continue;
+        if(item.type==='fragment'&&typeCounts.fragment>=2) continue;
+        var n=out.length;
+        if(n>=2&&out[n-1].type===item.type&&out[n-2].type===item.type) continue;
+        index=i; break;
+      }
+      if(index<0) break;
+      var chosen=remaining.splice(index,1)[0];
+      typeCounts[chosen.type]+=1;
+      out.push({id:'kao:'+daySeed(now)+':'+chosen.cardId,cardId:chosen.cardId,type:chosen.type,isNew:chosen.isNew});
+    }
+    return out;
+  }
+  function kaoPickDistractors(d,targetId,count,options){
+    var opts=options&&typeof options==='object'?options:{},q=quranLearnRoot(d),cards=objectOr(q.cards,{});
+    var targetCard=objectOr(cards[targetId],{}),target=metaFor(targetId,null,opts);
+    var previousMap=opts.previousDistractors&&typeof opts.previousDistractors==='object'?opts.previousDistractors:{};
+    var previous=Array.isArray(previousMap[targetId])?previousMap[targetId]:(Array.isArray(targetCard.lastDistractors)?targetCard.lastDistractors:[]);
+    var limit=Math.max(0,Math.floor(nonNegativeNumber(count,3)));
+    return Object.keys(cards).filter(function(id){
+      if(id===targetId||previous.indexOf(id)>=0) return false;
+      var card=cards[id],meta=metaFor(id,null,opts);
+      return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=21&&!!target.pos&&meta.pos===target.pos&&!!target.root&&!!meta.root&&meta.root!==target.root;
+    }).sort(function(a,b){
+      return seededRank(String(opts.seed||'')+'|'+targetId,a)-seededRank(String(opts.seed||'')+'|'+targetId,b)||a.localeCompare(b);
+    }).slice(0,limit).map(function(id){
+      var meta=metaFor(id,null,opts),meanings=Array.isArray(meta.meanings)?meta.meanings:[];
+      return {cardId:id,label:String(meanings[0]||meta.meaning||id)};
+    });
+  }
+  function kaoBuildTask(queueItem,d,options){
+    var opts=options&&typeof options==='object'?options:{};
+    var id=String(queueItem&&queueItem.cardId||queueItem&&queueItem.id||'');
+    var meta=metaFor(id,queueItem,opts),meanings=Array.isArray(meta.meanings)?meta.meanings:[];
+    var answer=String(meanings[0]||meta.meaning||meta.ar||id);
+    var choices=[{cardId:id,label:answer,correct:true}].concat(kaoPickDistractors(d,id,3,opts).map(function(item){ return {cardId:item.cardId,label:item.label,correct:false}; }));
+    choices.sort(function(a,b){ return seededRank(String(opts.seed||'')+'|task|'+id,a.cardId)-seededRank(String(opts.seed||'')+'|task|'+id,b.cardId); });
+    return {id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),answer:answer,choices:choices};
+  }
+  function minuteOfDay(value){
+    if(typeof value!=='string'||!/^\d{2}:\d{2}$/.test(value)) return null;
+    var parts=value.split(':'),hour=Number(parts[0]),minute=Number(parts[1]);
+    return hour<24&&minute<60?hour*60+minute:null;
+  }
+  function minuteLabel(value){
+    var normalized=((value%1440)+1440)%1440;
+    return String(Math.floor(normalized/60)).padStart(2,'0')+':'+String(normalized%60).padStart(2,'0');
+  }
+  function kaoNightWindow(d,nowValue){
+    if(!d||!d.settings||typeof d.settings.targetBed!=='string') return false;
+    if(!quranLearnDeps||typeof quranLearnDeps.caffeineTargetBed!=='function') return false;
+    var target;
+    try{ target=quranLearnDeps.caffeineTargetBed(); }catch(_error){ return false; }
+    var bed=minuteOfDay(target),now=validDate(nowValue,'now');
+    if(bed==null) return false;
+    var current=now.getHours()*60+now.getMinutes(),until=(bed-current+1440)%1440;
+    if(until>90) return false;
+    return {active:true,targetBed:target,startsAt:minuteLabel(bed-90),durationMinutes:3,maxCards:8,reviewOnly:true};
+  }
   function emptyQuranLearn(){
     return {
       schemaVersion:SCHEMA_VERSION,
@@ -291,6 +470,10 @@
     emptyQuranLearn:emptyQuranLearn,
     ensureQuranLearn:ensureQuranLearn,
     kaoGrade:kaoGrade,
-    kaoSchedule:kaoSchedule
+    kaoSchedule:kaoSchedule,
+    kaoBuildQueue:kaoBuildQueue,
+    kaoPickDistractors:kaoPickDistractors,
+    kaoBuildTask:kaoBuildTask,
+    kaoNightWindow:kaoNightWindow
   };
 })();

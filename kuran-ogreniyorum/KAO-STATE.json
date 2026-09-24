@@ -674,7 +674,11 @@
       "deps": [
         "KAO-08"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-09/EVIDENCE.json"
     },
     "KAO-10": {
       "title": "Overlay kabuğu + E1 Home + geçici Ayarlar girişi",
@@ -1269,11 +1273,11 @@
       "R-C9"
     ],
     "status": {
-      "R-A1": "pending",
-      "R-A2": "pending",
+      "R-A1": "partial",
+      "R-A2": "done",
       "R-A3": "partial",
       "R-A4": "pending",
-      "R-A5": "pending",
+      "R-A5": "done",
       "R-A6": "partial",
       "R-A7": "partial",
       "R-A8": "partial",
@@ -1368,7 +1372,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-08",
+  "lastCompletedPrompt": "KAO-09",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

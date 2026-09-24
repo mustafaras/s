@@ -1,0 +1,78 @@
+{
+  "card": "KAO-14",
+  "head": "7012caed3d349c6d2dfd56060549445b0907d511",
+  "diffHash": "5d406346dafe4664ae9f7072fd4addcecdaf19a488cd8a11784034581ac4c80f",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "status": "PASS",
+  "scope": "E4 kilitsiz ünite listesi ve E5 üç katmanlı kelime detayı, kök akrabaları, bayrak",
+  "results": {
+    "units": 12,
+    "locking": "none",
+    "suggestedOrder": true,
+    "journeyBadge": "read-only; watched/question_opened only",
+    "wordLayers": [
+      "Arabic, audio, Turkish",
+      "root tree and pattern-labelled Turkish derivatives",
+      "three Quran examples and next review"
+    ],
+    "rootCatalog": "73 frozen QuranGrammarV1 Unit 11 roots; all overlap QuranLexiconV1 roots",
+    "flag": "cards[id].flagged={at,kind}; bounded kinds; no free text",
+    "fx2SurfacePin": "730 App handlers / 392 onclick"
+  },
+  "checks": [
+    { "cmd": "node --check app/core/quranLearn.js", "exit": 0 },
+    { "cmd": "node --check app.js", "exit": 0 },
+    { "cmd": "node --check tests/kao/test_kao_render.js", "exit": 0 },
+    { "cmd": "node --check tests/kao/test_kao_requirements.js", "exit": 0 },
+    { "cmd": "node --check tests/app/test_fx2_tab_transition.js", "exit": 0 },
+    { "cmd": "node --check tests/app/test_fx2_overlay_motion.js", "exit": 0 },
+    { "cmd": "node --check tests/app/test_fx2_touch_coverage.js", "exit": 0 },
+    { "cmd": "node tests/kao/test_kao_render.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_requirements.js", "exit": 0, "note": "PASS; targeted transition 0.519 ms" },
+    { "cmd": "node tests/app/test_fx2_tab_transition.js", "exit": 0, "note": "7/7" },
+    { "cmd": "node tests/app/test_fx2_overlay_motion.js", "exit": 0, "note": "7/7" },
+    { "cmd": "node tests/app/test_fx2_touch_coverage.js", "exit": 0, "note": "14/14" },
+    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "PASS" },
+    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95" },
+    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37/37" },
+    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "PASS; app.js 7800 lines" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "PASS, 0 warn" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0 }
+  ],
+  "requirements": {
+    "R-A8": "met",
+    "R-B3": "met",
+    "R-B7": "met",
+    "R-C1": "partial",
+    "note": "R-C1 kart tarafındaki bayrak ve serbest-metinsiz kayıtla karşılandı; panel flaggedCount projeksiyonu KAO-19 kapsamındadır."
+  },
+  "filesTouched": [
+    "app/core/quranLearn.js",
+    "app/kao.css",
+    "app.js",
+    "tests/kao/test_kao_render.js",
+    "tests/kao/test_kao_requirements.js",
+    "tests/app/test_fx2_tab_transition.js",
+    "tests/app/test_fx2_overlay_motion.js",
+    "tests/app/test_fx2_touch_coverage.js",
+    "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md",
+    "kuran-ogreniyorum/evidence/KAO-14/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-14/HANDOFF.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "No physical-device, VoiceOver, or real audio listening acceptance was performed.",
+    "R-C1 panel flaggedCount projection remains assigned to KAO-19."
+  ],
+  "boundaries": {
+    "network": "none during app verification",
+    "browser": "headless fixtures only",
+    "personalData": "not accessed",
+    "deviceAcceptance": "not_verified",
+    "delivery": "authorized separately by user on 2026-09-24"
+  }
+}

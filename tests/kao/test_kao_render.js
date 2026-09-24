@@ -19,6 +19,7 @@ vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranLexiconV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranGrammarV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranGrammarV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranShortSurahsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranShortSurahsV1.js' });
+vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranRevelationOrderV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranRevelationOrderV1.js' });
 vm.runInContext(source, sandbox, { filename: relative });
 const api = sandbox.window.SeymaQuranLearn;
 
@@ -28,9 +29,10 @@ const quranLearn = {
   ayahs: { understood: [] }
 };
 const ui = { kaoOpen: false, kaoView: 'home', kaoReturnFocusId: '', kaoQueue: [], kaoTaskIndex: 0, kaoTaskStartedAt: 0, kaoUndo: null, kaoFeedback: '', kaoAudioFailed: false };
+const appData = { quranLearn, settings: { targetBed: '23:00' }, quranJourney: { requests: {} } };
 let rendered = 0;
 assert.equal(api.registerQuranLearn({
-  data() { return { quranLearn, settings: { targetBed: '23:00' } }; },
+  data() { return appData; },
   ui() { return ui; }, save() {}, render() { rendered += 1; },
   todayStr() { return '2026-09-24'; }, esc(value) { return String(value); },
   icon(name) { return `<i>${name}</i>`; }, getDay() { return {}; }
@@ -42,6 +44,7 @@ let focused = '';
 let restored = '';
 let mounted = '';
 let closeBody = null;
+let toastMessage = '';
 const taskNode = { innerHTML: '', attrs: {}, setAttribute(name, value) { this.attrs[name] = value; }, querySelector() { return null; } };
 const audios = [];
 assert.equal(api.registerQuranLearnSurface({
@@ -51,7 +54,7 @@ assert.equal(api.registerQuranLearnSurface({
   sheetClose(card, back, body) { assert.equal(card, 'sey-ov-card'); assert.equal(back, 'sey-ov-back'); closeBody = body; },
   mount(html) { mounted = html; }, taskElement() { return taskNode; },
   createAudio(src) { const audio = { src, preload: '', listeners: {}, addEventListener(name, fn) { this.listeners[name] = fn; }, play() { if (this.listeners.playing) this.listeners.playing(); return Promise.resolve(); } }; audios.push(audio); return audio; },
-  isQuietTime() { return false; }, setTimer(fn, ms) { if (ms === 0) fn(); return ms; }, clearTimer() {}
+  isQuietTime() { return false; }, setTimer(fn, ms) { if (ms === 0) fn(); return ms; }, clearTimer() {}, toast(message) { toastMessage = message; }
 }), true);
 assert.equal(api.registerCaffeineTargetBed(() => '23:00'), true);
 
@@ -166,11 +169,68 @@ for (const choice of wrongOrder) api.kaoAnswer(orderTask.id, choice.choiceId);
 assert.equal(quranLearn.errors.order, orderErrorsBefore + 1, 'SOV/dizilim hatası sıra sınıfına yazılmalı');
 assert.match(ui.kaoFeedback, /Fiil önce gelir/);
 
+const layeredLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.root && lemma.cognate && lemma.examples.length >= 3 && sandbox.window.QuranGrammarV1.unit11.roots.some((root) => root.root === lemma.root));
+assert.ok(layeredLemma, 'üç katmanlı kelime fixture lemması bulunmalı');
+const layeredCardId = `w:${layeredLemma.id}:ar>tr`;
+quranLearn.cards[layeredCardId] = { state: 'review', s: 24, reps: 4, due: '2026-09-28T12:00:00.000Z' };
+assert.equal(api.kaoOpenWord(layeredLemma.id), true);
+assert.equal(ui.kaoView, 'word');
+assert.equal(ui.kaoWordLayer, 1);
+const wordLayer1 = api.kaoWordHTML();
+assert.match(wordLayer1, /data-word-layer="1"/);
+assert.match(wordLayer1, new RegExp(layeredLemma.ar));
+assert.match(wordLayer1, new RegExp(layeredLemma.meanings[0]));
+assert.doesNotMatch(wordLayer1, /kao-root-tree|kao-word-examples/, 'ilk dokunuşta yalnız katman 1 DOM’da olmalı');
+assert.equal(api.kaoWordLayer(3), false, 'katman 1’den doğrudan 3’e atlanmamalı');
+
+assert.equal(api.kaoWordLayer(2), true);
+const wordLayer2 = api.kaoWordHTML();
+assert.match(wordLayer2, /data-word-layer="2"/);
+assert.match(wordLayer2, /class="kao-root-tree"/);
+assert.match(wordLayer2, /Türkçedeki akrabaları/);
+assert.match(wordLayer2, /class="kao-pattern"/);
+assert.doesNotMatch(wordLayer2, /kao-word-examples/, 'ikinci dokunuşta örnekler DOM’da olmamalı');
+
+assert.equal(api.kaoWordLayer(3), true);
+const wordLayer3 = api.kaoWordHTML();
+assert.match(wordLayer3, /data-word-layer="3"/);
+assert.equal((wordLayer3.match(/class="kao-word-example"/g) || []).length, 3);
+assert.match(wordLayer3, /Sonraki tekrar/);
+assert.doesNotMatch(wordLayer3, /kao-root-tree/, 'üçüncü dokunuşta kök katmanı DOM’da kalmamalı');
+
+const shiftedWord = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift && sandbox.window.QuranGrammarV1.unit11.roots.some((root) => root.root === lemma.root));
+assert.ok(shiftedWord);
+api.kaoOpenWord(shiftedWord.id);
+api.kaoWordLayer(2);
+const shiftedWordHtml = api.kaoWordHTML();
+assert.match(shiftedWordHtml, /kao-cognate is-shift/);
+assert.match(shiftedWordHtml, /alert-triangle/);
+assert.match(shiftedWordHtml, /dikkat/);
+
+api.kaoOpenWord(layeredLemma.id);
+assert.match(api.kaoWordHTML(), /Hata bildir/);
+assert.equal(api.kaoFlag(layeredCardId, 'meaning'), true);
+assert.equal(quranLearn.cards[layeredCardId].flagged.kind, 'meaning');
+assert.match(quranLearn.cards[layeredCardId].flagged.at, /^\d{4}-\d{2}-\d{2}T/);
+assert.equal(toastMessage, 'Teşekkürler, sonraki içerik sürümünde bakılacak');
+
+const firstUnit = api.kaoUnits()[0];
+appData.quranJourney.requests[firstUnit.surahId] = { status: 'ready' };
+assert.doesNotMatch(api.kaoUnitsHTML(), /İzlendi/);
+appData.quranJourney.requests[firstUnit.surahId] = { status: 'watched' };
+const unitsHtml = api.kaoUnitsHTML();
+assert.equal((unitsHtml.match(/class="kao-unit-card/g) || []).length, 12);
+assert.match(unitsHtml, /Sıra önerisi/);
+assert.match(unitsHtml, /İzlendi/);
+assert.doesNotMatch(unitsHtml, /\bdisabled\b|Kilitli/i, 'ünitelerde kilit olmamalı');
+assert.match(unitsHtml, /Seviye 0.*Seviye 5.*Seviye 6/s);
+
 api.kaoMount(new Date('2026-09-24T22:15:00'));
 assert.match(mounted, /id="sey-ov-card"/);
+const renderedBeforeHome = rendered;
 api.kaoSetView('home');
 assert.equal(ui.kaoView, 'home');
-assert.equal(rendered, 2);
+assert.equal(rendered, renderedBeforeHome + 1);
 api.kaoClose();
 assert.equal(typeof closeBody, 'function');
 closeBody();
@@ -181,12 +241,12 @@ assert.equal(restored, 'kao-hub-entry');
 assert.match(appSource, /App\.kaoOpen=function\(view\)\{ return window\.SeymaQuranLearn\.kaoOpen\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoClose=function\(\)\{ return window\.SeymaQuranLearn\.kaoClose\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoSetView=function\(v\)\{ return window\.SeymaQuranLearn\.kaoSetView\.apply\(null,arguments\); \};/);
-for (const name of ['kaoStart', 'kaoAnswer', 'kaoUndo', 'kaoPlay']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
+for (const name of ['kaoStart', 'kaoAnswer', 'kaoUndo', 'kaoPlay', 'kaoOpenWord', 'kaoWordLayer', 'kaoFlag']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
 assert.doesNotMatch(settingsSource, /kao-settings-entry|App\.kaoOpen\(\)/, 'geçici Ayarlar girişi kaldırılmalı');
 assert.match(appSource, /kaoHubCardHTML:function\(\)\{ return window\.SeymaQuranLearn\?window\.SeymaQuranLearn\.kaoHubCardHTML\(\):''; \}/);
 assert.match(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'Kur’an öğrenme kartı Bugün girişlerinde Kur’an Yolculuğu sonrasında olmalı');
 assert.match(indexSource, /app\/kao\.css\?v=\d{8}[a-z]/);
-for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-dialog-frame', '.kao-header-mark', '.kao-hero-rosette', '.kao-time-chip']) assert.ok(cssSource.includes(selector), selector);
+for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-dialog-frame', '.kao-header-mark', '.kao-hero-rosette', '.kao-time-chip', '.kao-unit-card', '.kao-word-hero', '.kao-root-tree', '.kao-word-example']) assert.ok(cssSource.includes(selector), selector);
 assert.doesNotMatch(cssSource, /:root\s*\{/);
 assert.doesNotMatch(cssSource, /#[0-9a-f]{3,8}\b/i);
 const cssVars = [...cssSource.matchAll(/var\((--[a-z0-9-]+)/gi)].map((match) => match[1]);

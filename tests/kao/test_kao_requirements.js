@@ -9,7 +9,7 @@ const repoRoot = require('../repo-root');
 function loadApi(extraDeps) {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) {
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearn.js']) {
     vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
   }
   const api = sandbox.window.SeymaQuranLearn;
@@ -91,7 +91,7 @@ const taskNode = { innerHTML: '', attrs: {}, setAttribute(name, value) { this.at
 assert.equal(sessionApi.registerQuranLearnSurface({
   lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose(_card, _back, body) { body(); }, mount() {},
   taskElement() { return taskNode; }, createAudio() { return { addEventListener() {}, play() { return Promise.resolve(); } }; },
-  isQuietTime() { return quiet; }, setTimer(fn, ms) { if (ms === 0) fn(); return ms; }, clearTimer() {}
+  isQuietTime() { return quiet; }, setTimer(fn, ms) { if (ms === 0) fn(); return ms; }, clearTimer() {}, toast() {}
 }), true);
 sessionApi.ensureQuranLearn(sessionData);
 sessionData.quranLearn.settings.audio = false;
@@ -156,5 +156,26 @@ const calib = sessionData.quranLearn.daily['2026-09-24'].calib;
 assert.equal(calib.n, sessionData.quranLearn.daily['2026-09-24'].answered, 'R-A3: kalibrasyon n tüm cevapları saymalı');
 assert.ok(calib.pred >= 0 && calib.pred <= calib.n && calib.ok >= 0 && calib.ok <= calib.n);
 assert.ok(saves >= sessionUi.kaoQueue.length + 1, 'sessiz modda tam oturum kalıcı ilerlemeli');
+
+const rootsWithPatterns = sessionApi.kaoRootCatalog().filter((root) => root.derivatives.length && root.derivatives.every((item) => item.tr && item.pattern));
+assert.ok(rootsWithPatterns.length >= 60, 'R-A8: en az 60 kök kalıp etiketli Türkçe türev taşımalı');
+assert.ok(rootsWithPatterns.every((root) => sandboxSafeLexRoot(sessionApi, root.root)), 'R-A8: türev kökleri sözlük kökleriyle kesişmeli');
+
+function sandboxSafeLexRoot(apiUnderTest, root) {
+  return apiUnderTest.kaoRootLemmaIds(root).length > 0;
+}
+
+const flagData = { quranLearn: sessionApi.emptyQuranLearn() };
+const flagUi = {};
+const flagApi = loadApi({
+  data() { return flagData; }, ui() { return flagUi; }, save() {}, render() {}, todayStr() { return '2026-09-24'; }, esc(value) { return String(value); }, icon() { return ''; }, getDay() { return {}; }
+});
+assert.equal(flagApi.registerQuranLearnSurface({ lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose(_c, _b, body) { body(); }, mount() {}, toast() {} }), true);
+const flagLemma = rootsWithPatterns.map((root) => flagApi.kaoRootLemmaIds(root.root)[0]).find(Boolean);
+const flagCardId = `w:${flagLemma}:ar>tr`;
+assert.equal(flagApi.kaoFlag(flagCardId, 'free text must fail'), false, 'R-C1: serbest metin türü reddedilmeli');
+assert.equal(flagData.quranLearn.cards[flagCardId], undefined);
+assert.equal(flagApi.kaoFlag(flagCardId, 'example'), true);
+assert.deepEqual(Object.keys(flagData.quranLearn.cards[flagCardId].flagged).sort(), ['at', 'kind']);
 
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5, R-C2/C3/C5; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

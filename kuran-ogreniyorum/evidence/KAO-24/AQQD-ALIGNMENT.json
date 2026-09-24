@@ -1,0 +1,28 @@
+{
+  "dataset": "AQQD-v2",
+  "doi": "10.7910/DVN/A8GM5Y",
+  "license": "CC0 1.0",
+  "reader": "R000 controlled single reciter; personal name not published",
+  "target": {
+    "surah": 1,
+    "ayah": 7,
+    "word": 6,
+    "lemmaId": "l_magoDuwb_278690"
+  },
+  "clips": [
+    {
+      "style": "measured",
+      "archiveMember": "R000/Surah_001/R000_S10_Surah_001_Aya7.wav",
+      "startSeconds": 4.83,
+      "endSeconds": 6.3,
+      "alignment": "local Whisper base-model token timestamps; target span manually bounded"
+    },
+    {
+      "style": "flowing",
+      "archiveMember": "R000/Surah_001/R000_S9_Surah_001_Aya7.wav",
+      "startSeconds": 4.89,
+      "endSeconds": 5.98,
+      "alignment": "local Whisper base-model token timestamps; target span manually bounded"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "card": "KAO-24",
+  "head": "5655bb9871f2ee2558b1583c6ef5618604783cd3",
+  "diffHash": "262e35eaf899cc9290a139d03154267e5c66db935abc98888f9960ce473b6602",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "result": {
+    "clips": 1678,
+    "bytes": 10950329,
+    "budgetBytes": 16777216,
+    "budgetRemainingBytes": 5826887,
+    "counts": {
+      "lemma": 1048,
+      "shortSurah": 618,
+      "minimalPair": 12
+    },
+    "sourceRows": 600,
+    "codec": "AAC-LC",
+    "sampleRateHz": 16000,
+    "channels": 1,
+    "bitrateKbps": 32
+  },
+  "checks": [
+    {
+      "cmd": "node --check tools/kao-audio-build.mjs",
+      "exit": 0,
+      "note": "syntax PASS"
+    },
+    {
+      "cmd": "node tools/kao-audio-build.mjs --self-test",
+      "exit": 0,
+      "note": "4 sentetik klip; lemma, kısa-sûre ve minimal-çift yolları PASS"
+    },
+    {
+      "cmd": "node tools/kao-audio-build.mjs --source /tmp/kao24-source --out assets/kao/audio --manifest kuran-ogreniyorum/content/audio-manifest.json",
+      "exit": 0,
+      "note": "1678 klip; 10950329/16777216 bayt"
+    },
+    {
+      "cmd": "manifest/file/hash contract check",
+      "exit": 0,
+      "note": "manifest=dosya=hash 1678/1678; .m4a dışı 0; lisans ve reader.origin eksik 0"
+    },
+    {
+      "cmd": "ffprobe all assets/kao/audio/*.m4a",
+      "exit": 0,
+      "note": "1678/1678 codec=aac, sample_rate=16000, channels=1"
+    },
+    {
+      "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+      "exit": 0,
+      "note": "PASS (0 warn)"
+    },
+    {
+      "cmd": "git -c core.fsmonitor=false diff --check",
+      "exit": 0,
+      "note": "çıktı yok"
+    }
+  ],
+  "requirements": {
+    "R-C2": "partial — ses varlıkları aynı-origin ve opsiyonel üretildi; audio=false ile tam oturum/sessiz-mod runtime fixture'ı KAO-11 ve KAO-26 kapsamındadır"
+  },
+  "filesTouched": [
+    "tools/kao-audio-build.mjs",
+    "kuran-ogreniyorum/content/audio-manifest.json",
+    "assets/kao/audio/**",
+    "kuran-ogreniyorum/evidence/KAO-24/**",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "Tadabur yayıncısı ses dâhil veri kümesini CC BY-NC 4.0 ile dağıtır; yayıncıdan önceki stüdyo/master sözleşmeleri tek tek yayımlanmamıştır.",
+    "Tadabur hizaları otomatiktir; 0.20-4.00 s kalite penceresi, 4 s kısa-sûre aykırı sınırı ve belgeli 106:2 istisnası insan telaffuz kabulü değildir.",
+    "AQQD R000 kişisel okuyucu adını yayımlamaz; kurum, kararlı kod ve arşiv üye yolu korunur.",
+    "R-C2 sessiz-mod runtime kapanışı KAO-11/KAO-26'da; cihaz kabulü, push, merge, tag ve deploy yapılmadı.",
+    "head başlangıç commitidir; diffHash EVIDENCE/HANDOFF eklenmeden önceki staged KAO-24 farkıdır, çünkü aynı commit kendi nihai hashini içeremez."
+  ]
+}

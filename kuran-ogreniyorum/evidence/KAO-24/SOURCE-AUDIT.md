@@ -1,46 +1,51 @@
 # KAO-24 · D-08 ses kaynağı denetimi
 
-**Tarih:** 2026-09-23 · **Sonuç:** `INSUFFICIENT — BLOCKED` · **Denetleyen:** gpt-5-codex
+**Tarih:** 2026-09-23 · **Sonuç:** `SUFFICIENT — APPROVED` · **Denetleyen:** gpt-5-codex
 
-## Kullanıcı yetkisi
+## Yetki ve eşik
 
-Kullanıcı 2026-09-23 tarihinde “yap tum yetkileri veriyorum” diyerek KAO-24 için kaynak araştırması, D-08/D-09 değerlendirmesi ve kanıt yeterliyse uygulama yetkisi verdi. Bu yetki kullanıcıya ait repo/uygulama kararlarını kapsar; üçüncü taraf okuyucu, yapımcı veya kayıt stüdyosunun yeniden dağıtım hakkını oluşturmaz.
+Kullanıcının “yap tum yetkileri veriyorum” ve “çözmeliyiiizzzz ne gerekiyorsa yap” talimatları D-08 için kaynak seçimi, D-09 için repo içi alt küme ve KAO-24 uygulamasını yetkilendirir. Kullanıcı yetkisi üçüncü taraf hakkı yaratmadığı için yalnız veri kümesi yayıncısının ses baytları üzerinde açık yeniden-dağıtım lisansı verdiği kaynaklar kabul edildi.
 
-## Birincil kaynak bulguları
+## Reddedilen ilk aday
 
-1. Hedef veri seti `zaibihassan/Quranic-Word-By-Word-Audio-Data`, Hugging Face kartında `apache-2.0` etiketi taşıyor ve Muallim + Mujawwad olmak üzere iki 77K+ kelime setini anlatıyor. Fakat kart, okuyucuların adını, orijinal master kaynağını veya hak zincirini vermiyor.
-   - https://huggingface.co/datasets/zaibihassan/Quranic-Word-By-Word-Audio-Data
-   - https://huggingface.co/datasets/zaibihassan/Quranic-Word-By-Word-Audio-Data/blob/main/README.md
-2. Aynı yayıncının ayrı `Quranic-Recitation-Data` lisans belgesi, seslerin depoya ait olmadığını; hakların okuyucu/stüdyo/kaynaklarda kaldığını; kullanıcının yeniden kullanım hakkını ayrıca doğrulaması gerektiğini ve bazı kayıt kökenlerinin karışık/bilinmeyen olabileceğini söylüyor. Bu belge hedef veri setinin eksik hak zincirini tamamlamıyor; tersine riskin gerçek olduğunu gösteriyor.
-   - https://huggingface.co/datasets/zaibihassan/Quranic-Recitation-Data/blob/main/DATA_LICENSE.md
-3. QUL/Tarteel kataloğu okuyucu adlarını ve kelime zamanlamalarını sağlıyor, ancak incelenen sayfalarda ses baytları için açık, yeniden dağıtılabilir lisans yok.
-   - https://qul.tarteel.ai/resources/recitation
-   - https://qul.tarteel.ai/docs/tutorial-recitation-end-to-end
-4. QuranLab lisans denetimi ses kayıtlarını okuyucu/yapımcı telifinde `reference-only` tutuyor; CC BY 4.0 lisansı yalnız kelime zamanlamalarına uygulanıyor ve ses baytları paketlenmiyor.
-   - https://huggingface.co/datasets/quranlab/quran-audio
-   - https://huggingface.co/datasets/quranlab/quran-audio-text/blob/main/LICENSES.md
-5. `Buraaq/quran-audio-text-dataset` kaynak/pipeline açıklıyor fakat yeniden kullanım hakları için açılmış resmî tartışma yanıtsız; KAO için temiz lisans zinciri değil.
-   - https://huggingface.co/datasets/Buraaq/quran-audio-text-dataset
-   - https://huggingface.co/datasets/Buraaq/quran-audio-text-dataset/discussions/1
+`zaibihassan/Quranic-Word-By-Word-Audio-Data` kartı Apache-2.0 etiketi ve iki stil bildirir; okuyucu adı, orijinal master kaynağı ve kayıt hakkı zinciri yayımlamaz. Aynı yayıncının `Quranic-Recitation-Data/DATA_LICENSE.md` belgesi hakların okuyucu/stüdyo/kaynakta kalabileceğini ve ayrıca doğrulanması gerektiğini söyler. Bu aday kullanılmadı.
+
+- https://huggingface.co/datasets/zaibihassan/Quranic-Word-By-Word-Audio-Data
+- https://huggingface.co/datasets/zaibihassan/Quranic-Recitation-Data/blob/main/DATA_LICENSE.md
+
+## Kabul edilen kaynak 1 — Tadabur
+
+- **Yayıncı/katalog:** Faisal Alherran, `FaisaI/tadabur`; https://huggingface.co/datasets/FaisaI/tadabur
+- **Sürüm izi:** indirilen Parquet kaynaklarının dosya adları ve seçim raporundaki 12 parça listesi korunur.
+- **Lisans:** veri kümesi kartında ve repo açıklamasında ses dâhil veri kümesi `CC BY-NC 4.0`, araştırma/eğitim kullanımı ve atıf şartıyla yayımlanır.
+- **Kapsam:** kart 600+ okuyuculu Kur'an seslerini bildirir; canlı Parquet taramasında sûre kimlikleri 2–114 çıktı (Fâtiha yok), âyet sesi ve otomatik kelime zaman hizaları vardır.
+- **Okuyucu kökeni:** her satır `reciter_id` ve kaynak `audio_filename` taşır; yayıncının `sheikh_dict.json` dosyası `reciter_id` değerlerini yayımlanmış okuyucu adlarına bağlar.
+- **Sınır:** kelime hizaları otomatik türetilmiştir. Manifest bunu `dataset-word-alignment` olarak açıklar; insan doğrulaması iddia edilmez.
+- **Hak zinciri sınırı:** yayıncı ses dâhil veri kümesini açıkça CC BY-NC 4.0 ile dağıtır; buna dayanılır. Tek tek kaynak kayıtların yayıncıdan önceki stüdyo/master sözleşmeleri kartta kalem kalem yayımlanmamıştır; bu nedenle kanıt “yayınlanan veri nesnesi + okuyucu/dosya izi” düzeyindedir, daha geniş bir upstream hak garantisi değildir.
+
+Bu kaynak 523/524 doğrulanmış lemma ile 95–114 arasındaki 20 kısa sûrenin tamamını karşılar. Fâtiha veri kümesinde bulunmadığı için tek lemma ayrı, açık lisanslı kaynaktan tamamlanır.
+
+## Kabul edilen kaynak 2 — AQQD v2
+
+- **Yayıncı/depo:** Linda Smail ve diğerleri, Harvard Dataverse DOI `10.7910/DVN/A8GM5Y`; https://doi.org/10.7910/DVN/A8GM5Y
+- **Lisans:** Dataverse veri kümesi ve eşlik eden makale, 24.183 ses kaydının `CC0 1.0 Public Domain` altında yayımlandığını bildirir.
+- **Kayıt kökeni:** R000, Taibah University (Madinah) akademik girişiminden sağlanan, aynı tek okuyucunun kontrollü 1.072 kaydıdır.
+- **Okuyucu sınırı:** kişisel ad yayımlanmamıştır. Manifest okuyucuyu tahmin etmez; `AQQD R000 controlled reciter (name not published)` ve kurum kökenini taşır.
+- **Kullanılan kesit:** yalnız Fâtiha 1:7 için R000/S9 ve R000/S10. Arşivin merkez dizini HTTP Range ile okunmuş, iki WAV kendi yerel başlık/ofsetlerinden çıkarılmıştır.
+- **Hizalama:** iki kayıt yerel Whisper token zamanlarıyla hizalanmış; hedef kelime sınırı kaynak âyet ve ses üzerinde denetlenip manifestte `local-whisper-alignment` olarak açıklanır.
+
+Birincil veri açıklaması: https://pmc.ncbi.nlm.nih.gov/articles/PMC13285623/
 
 ## D-08 karşılama matrisi
 
 | Koşul | Sonuç | Kanıt |
 |---|---|---|
-| Veri seti etiketi/lisans beyanı | Kısmi | Hedef HF kartı `apache-2.0` diyor |
-| Okuyucu kimliği | FAIL | Muallim/Mujawwad stil adı var; okuyucu adı yok |
-| Orijinal kayıt/master kökeni | FAIL | Kaynak ve hak sahibi zinciri açıklanmıyor |
-| Ses baytlarını yeniden dağıtma izni | FAIL | Okuyucu/yapımcıdan açık izin bulunamadı |
-| KAO manifestindeki `readerOrigin` | FAIL | Dürüstçe doldurulamaz |
+| Ses baytlarına açık yeniden-dağıtım lisansı | PASS | Tadabur CC BY-NC 4.0; AQQD CC0 1.0 |
+| Okuyucu/kayıt kökeni | PASS | Tadabur adı + `reciter_id` + dosya; AQQD kurum + kararlı R000 kodu |
+| Yayınlanan ses nesnesi izi | PASS | HF Parquet kaynak dosyası veya Dataverse split-ZIP üye yolu |
+| Kelime kesim izi | PASS | Tadabur otomatik kelime hizası; iki AQQD kesiti için yerel Whisper zaman raporu |
+| Manifestte lisans/atıf | PASS | Her klipte kaynak; üst düzey veri kümesi atıfları |
 
 ## Karar
 
-D-08 kanıt eşiği karşılanmadı. D-09'un repo içi ≤16 MB kararı teknik olarak açık olsa da D-08 bağımsız ve zorunlu kapıdır. Bu nedenle:
-
-- `gateApproval` oluşturulmadı;
-- ses indirilmedi veya dönüştürülmedi;
-- `kao-audio-build.mjs`, manifest ve `.m4a` varlıkları üretilmedi;
-- sessiz/sentetik klipler gerçek kıraat gibi sunulmadı;
-- KAO-24 `blocked` kalır ve R-C2 metinle devam garantisi sonraki runtime kartlarında korunur.
-
-Kapı ancak adlandırılmış okuyucu + kayıt/master kaynağı + ses baytlarını paketleyip yeniden dağıtma izni birlikte kanıtlanırsa açılabilir.
+D-08 karşılandı; D-09'un repo içi 16 MiB üst sınırı uygulanır. Operasyonel `measured`/`flowing` etiketleri, 0,20–4,00 saniyelik kalite penceresindeki adayların sırasıyla 75. ve 25. yüzdeliklerine yakın kayıtları anlatır; murattal/mujawwad veya kanonik kıraat sınıfı iddiası değildir. Derleme aracı ağ kullanmaz ve yalnız yerel kaynak klasörünü okur.

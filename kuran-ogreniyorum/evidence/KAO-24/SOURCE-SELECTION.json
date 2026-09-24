@@ -1,0 +1,42 @@
+{
+  "card": "KAO-24",
+  "date": "2026-09-24",
+  "sourceIndexSha256": "94f5985ff19beda0b6f9a80c675ff265853f33ec36bb2375cc1f8c5ac895c1d6",
+  "datasets": [
+    {
+      "id": "FaisaI/tadabur",
+      "license": "CC BY-NC 4.0",
+      "source": "https://huggingface.co/datasets/FaisaI/tadabur",
+      "readerMap": "sheikh_dict.json",
+      "shards": [0, 10, 25, 51, 61, 74, 81, 110, 204, 237, 273, 359]
+    },
+    {
+      "id": "AQQD-v2",
+      "license": "CC0 1.0",
+      "source": "https://doi.org/10.7910/DVN/A8GM5Y",
+      "reader": "R000 controlled single reciter; personal name not published"
+    }
+  ],
+  "sourceRows": {
+    "total": 600,
+    "tadabur": 598,
+    "aqqd": 2
+  },
+  "targets": {
+    "lemmas": 524,
+    "lemmaClips": 1048,
+    "shortSurahWordClips": 618,
+    "minimalPairClips": 12,
+    "totalClips": 1678
+  },
+  "selectionPolicy": {
+    "lemma": "0.20-4.00 s valid publisher spans; measured near p75, flowing near p25 from a different reader; Fatiha fallback uses two R000 styles",
+    "shortSurah": "one clip per QAC word in surahs 95-114; publisher spans capped at 4.00 s when outlying",
+    "labels": "operational timing labels only; no canonical qiraat-class claim"
+  },
+  "alignmentExceptions": [
+    "QAC 109:1 word 2 joins Tadabur alignment words 2+3; QAC word 3 maps to alignment word 4.",
+    "Tadabur 106:2:3-4 invalid/excess spans were re-anchored using local Whisper and audio-end evidence.",
+    "AQQD Fatiha 1:7 target spans were located with local Whisper token timestamps."
+  ]
+}

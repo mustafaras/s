@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-23 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 6/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-23 · **blockedPrompt:** KAO-24 · **Sıradaki:** **KAO-24**
+**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 7/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-24 · **blockedPrompt:** — · **Sıradaki:** **KAO-05**
 **releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -17,7 +17,7 @@
 | KAO-03 | Yapay zekâ doğrulaması ve içe alma (D-12) | done | R-A8 |
 | KAO-04 | Gramer içeriği (24 mikro-kavram + G0.5) | done | R-A7 R-A8 |
 | KAO-23 | Fonetik içeriği + mahreç SVG | done | R-B6 R-A9 |
-| KAO-24 | Ses varlık hattı (alt küme + AAC) | blocked | R-C2 |
+| KAO-24 | Ses varlık hattı (alt küme + AAC) | done | R-C2 |
 | KAO-05 | quranLexiconV1.js dondurma + 4 yükleme listesi | pending | — |
 | KAO-06 | quranGrammarV1 + quranShortSurahsV1 + quranPhonicsV1 (+prayerTexts) | pending | R-A6 R-B2 |
 | KAO-07 | Registry iskeleti + ensureQuranLearn + migrate kancası | pending | R-C7 |
@@ -49,7 +49,7 @@
 | KAO-D6 | Dalga 6 denetimi | pending | — |
 
 ## Gereksinim durumu (12-EK-GEREKSINIMLER)
-R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:pending · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
+R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:partial · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 39 | 2026-09-23 | Kullanıcı KAO-24 için tüm repo/uygulama yetkilerini verdi; birincil kaynak denetimi yapıldı. Hedef HF seti `apache-2.0` etiketli fakat okuyucu kimliği, orijinal master kökeni ve ses baytı yeniden dağıtım hakkı kanıtlanamadı. Kullanıcı yetkisi üçüncü taraf hakkı yaratmadığından D-08 açılmadı; ses/manifest/araç üretilmedi. | `evidence/KAO-24/SOURCE-AUDIT.md`; gateApprovalCreated=false; kart blocked |
+| 41 | 2026-09-24 | KAO-24 bitti: 600 lisans/köken kayıtlı kaynak satırından 1.678 AAC-LC klip üretildi (lemma 1.048, kısa sûre 618, minimal çift 12). Otomatik hizalama aykırıları 0,20–4,00 sn kalite penceresi ve belgeli istisnalarla sınırlandı. Toplam 10.950.329 B; 16 MiB bütçe içinde. | `content/audio-manifest.json`; `assets/kao/audio/`; `evidence/KAO-24/EVIDENCE.json`; manifest/hash/ffprobe 1.678/1.678 PASS |

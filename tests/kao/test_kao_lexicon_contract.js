@@ -54,6 +54,19 @@ for (const [root, rootIds] of Object.entries(lexicon.roots)) {
   for (const id of rootIds) assert.equal(lexicon.byId(id).root, root);
 }
 
+const shortSurahPath = path.join(repoRoot, 'app/content/quranShortSurahsV1.js');
+assert.ok(fs.existsSync(shortSurahPath), 'quranShortSurahsV1.js bulunmalı');
+vm.runInContext(fs.readFileSync(shortSurahPath, 'utf8'), sandbox, { filename: 'app/content/quranShortSurahsV1.js' });
+const shortSurahs = sandbox.window.QuranShortSurahsV1;
+assert.ok(shortSurahs && typeof shortSurahs.lemmaById === 'function');
+for (const word of shortSurahs.words) {
+  assert.ok(typeof word.lemmaId === 'string' && word.lemmaId.length > 3, `${word.id}: lemmaId gerekli`);
+  const linked = lexicon.byId(word.lemmaId) || shortSurahs.lemmaById(word.lemmaId);
+  assert.ok(linked, `${word.id}: ${word.lemmaId} sözlükte çözümlenmeli`);
+  assert.equal(linked.verified, true, `${word.id}: ${word.lemmaId} doğrulanmış olmalı`);
+  assert.ok(typeof word.tr === 'string' && word.tr.length > 0, `${word.id}: Türkçe kelime karşılığı gerekli`);
+}
+
 assert.ok(!/\b(?:fetch|XMLHttpRequest|localStorage|sessionStorage|indexedDB)\b/.test(source),
   'donmuş içerik modülü ağ/depo API kullanmamalı');
 console.log(`KAO lexicon contract: PASS (${lexicon.lemmas.length} lemma, ${fs.statSync(modulePath).size} bayt)`);

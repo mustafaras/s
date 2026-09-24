@@ -15,13 +15,13 @@
     "source": "canlıya alalım push commit merge deploy; doğru olan neyse onu yap",
     "scope": "KAO-05 commitini kuran-ogreniyorum dalına push, main'e fast-forward merge, origin/main push ve GitHub Pages deploy"
   },
-  "nextCard": "KAO-06",
+  "nextCard": "KAO-07",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
     "single data object: data.quranLearn via ensureQuranLearn in migrate()",
     "App.kao* handlers + ui.kao* ephemeral state; overlay template + onModalKeydown",
-    "Arabic content only from corpus/Tanzil via tools/kao-lexicon-build.mjs; verified:true per record",
+    "Quranic Arabic only from pinned corpus/Tanzil; prayerTexts only from cited official Diyanet publications; D-12 verified per record",
     "new app/core file added to 4 load lists in one commit (index.html, driver.mjs, zikr-harness.mjs, test_state_rebind_boundary.js)",
     "no push/merge/tag/deploy/seyma-data write without explicit user approval",
     "KAO owns only its files; IIP files untouched except one composition line in Dalga 5 (11-BAGIMSIZLIK)",
@@ -542,6 +542,8 @@
         "app/content/quranGrammarV1.js",
         "app/content/quranShortSurahsV1.js",
         "app/content/quranPhonicsV1.js",
+        "tools/kao-content-freeze.mjs",
+        "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
         "index.html",
         ".claude/skills/run-seyma/driver.mjs",
         ".claude/skills/run-seyma/zikr-harness.mjs",
@@ -569,7 +571,11 @@
         "KAO-04",
         "KAO-23"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-06/EVIDENCE.json"
     },
     "KAO-07": {
       "title": "Registry iskeleti + ensureQuranLearn + migrate kancası",
@@ -1255,12 +1261,12 @@
       "R-A3": "pending",
       "R-A4": "pending",
       "R-A5": "pending",
-      "R-A6": "pending",
+      "R-A6": "partial",
       "R-A7": "partial",
       "R-A8": "partial",
       "R-A9": "partial",
       "R-B1": "pending",
-      "R-B2": "pending",
+      "R-B2": "partial",
       "R-B3": "pending",
       "R-B4": "pending",
       "R-B5": "pending",
@@ -1349,7 +1355,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-05",
+  "lastCompletedPrompt": "KAO-06",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",
@@ -1395,9 +1401,21 @@
       "note": "plan-check bu alanı DOĞRULAMAZ (bilinçli: dokümantasyon, tamamlanma iddiası değil).",
       "partialResolution": {
         "at": "2026-09-24",
-        "cards": ["KAO-04", "KAO-05"],
-        "note": "KAO-04 için `--example`, KAO-05 için kullanıcı onaylı kapsam onarımıyla `--freeze` uygulandı. KAO-06 (--freeze-grammar/surahs/phonics) AÇIK."
+        "cards": ["KAO-04", "KAO-05", "KAO-06"],
+        "note": "KAO-04 için `--example`, KAO-05 için `--freeze`, KAO-06 için kullanıcı onaylı kapsam onarımıyla tek sahip `tools/kao-content-freeze.mjs` ve üç dondurma komutu tanımlandı."
       }
+    },
+    {
+      "id": "GAP-07",
+      "foundAt": "2026-09-24",
+      "foundBy": "Codex (GPT-5)",
+      "where": "KAO-06 adım 1/2 · 05 §1 kısa sûre şeması",
+      "issue": "20 kısa sûredeki 618 kelimenin 190'ı mevcut 524 maddelik ana sözlükte çözülemiyordu; her kelimeyi ana sözlüğe bağlama ifadesi veriyle birlikte sağlanamazdı.",
+      "impact": "Yanlış lemma eşleme, lemmaId boşluğu veya KAO-05'in doğrulanmış/boyut-sınırlı modülünü kapsam dışı değiştirme riski.",
+      "decisionNeeded": "Çözüldü: kullanıcı tüm KAO-06 engellerinin çözümünü onayladı.",
+      "resolution": "Ana sözlük değişmeden korundu. Eksik QAC lemmaları quranShortSurahsV1 içindeki kaynak kayıtlı tamamlayıcı sözlüğe alındı; lemmaById ana sözlük ve tamamlayıcı dizini tek salt-okur çözümleyicide birleştirir.",
+      "planCheckVerifiesThis": false,
+      "evidence": "evidence/KAO-06/EVIDENCE.json#lemmaIntegrity"
     },
     {
       "id": "GAP-02",

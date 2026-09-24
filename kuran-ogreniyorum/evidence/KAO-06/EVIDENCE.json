@@ -1,0 +1,48 @@
+{
+  "card": "KAO-06",
+  "head": "0f7ce3b7b47fcd7db390b4ae274de2b96cd18217",
+  "diffHashBeforeEvidence": "41a0111e670bcb24c798893bf69ca9f778d00fe4c378296e5bed81df9981af40",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "result": {
+    "grammar": { "concepts": 25, "unit11Roots": 73, "unit11Derivatives": 242, "bytes": 47442, "budgetBytes": 61440, "sha256": "4e3bd8856ca8b6a2305a01ea200b172fabe575fe22a983e1467392988f5a823d" },
+    "shortSurahs": { "surahs": 20, "words": 618, "mainLexiconLinks": 428, "supplementalLemmaLinks": 190, "waqfMarks": 6, "waqfCounts": { "ۚ": 4, "ۖ": 2 }, "bytes": 75678, "budgetBytes": 92160, "sha256": "873e1038dab5a78289a82bf57e41a0773e20454907c26cdff4667d1e78649285" },
+    "phonics": { "letters": 28, "pairs": 12, "rules": 7, "bytes": 9552, "budgetBytes": 40960, "sha256": "3dfead88d140844266ecc007dc860c5eb7e720985556cd502669a478d8b3c7b9" },
+    "prayerTexts": { "steps": 8, "order": ["tekbir", "subhaneke", "fatiha", "zamm_sure", "ruku", "secde", "tahiyyat", "selam"], "unresolvedLemmaLinks": 0, "verification": "D-12" },
+    "loadLists": 4,
+    "deterministicGeneration": true
+  },
+  "sources": [
+    { "name": "Tanzil Uthmani", "purpose": "Quranic Arabic and waqf marks", "license": "CC BY 3.0", "url": "https://tanzil.net/download/" },
+    { "name": "Quranic Arabic Corpus 0.4", "purpose": "word alignment and lemma morphology", "license": "GNU GPL", "url": "https://corpus.quran.com/download/" },
+    { "name": "Diyanet Namaz Duaları", "purpose": "Subhaneke and Tahiyyat Arabic", "url": "https://dijital.diyanet.gov.tr/File/Download?id=6054&path=6054_1.pdf" },
+    { "name": "Diyanet Temel Dini Bilgiler", "purpose": "prayer sequence, ruku and secde readings", "url": "https://dijital.diyanet.gov.tr/File/Download?id=4218&path=4218_1.pdf" }
+  ],
+  "lemmaIntegrity": {
+    "gap": "GAP-07",
+    "finding": "618 short-surah tokens include 190 tokens whose QAC lemmas are outside the verified 524-entry main lexicon.",
+    "resolution": "The main lexicon remains unchanged. Stable QAC-derived IDs and a source-labelled, D-12 verified supplemental index are packaged in QuranShortSurahsV1; lemmaById resolves both stores without false equivalence.",
+    "unresolved": 0
+  },
+  "checks": [
+    { "cmd": "node tools/kao-content-freeze.mjs --freeze-grammar|--freeze-surahs|--freeze-phonics (two consecutive runs)", "exit": 0, "note": "all three SHA-256 values stable" },
+    { "cmd": "node tests/kao/test_kao_phonics_contract.js", "exit": 0, "note": "grammar/surah/phonics/prayer/budget/waqf contract PASS" },
+    { "cmd": "node tests/kao/test_kao_lexicon_contract.js", "exit": 0, "note": "524 main lemmas plus 618/618 surah lemma references PASS" },
+    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "Done" },
+    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95 assertion pass" },
+    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37 passed, 0 failed; four load lists equal" },
+    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "PASS; 7800/0/408/57 frozen budget" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "closure PASS (0 warn)" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0, "note": "no output" }
+  ],
+  "requirements": {
+    "R-A6": "partial: KAO-06 preserves all 6 waqf marks present in pinned Tanzil for surahs 95-114; UI rendering remains KAO-16.",
+    "R-B2": "partial: eight-step verified prayerTexts and lemma links are complete; UI rendering remains KAO-16b."
+  },
+  "userTaskPending": false,
+  "knownLimits": [
+    "This is source and headless-test evidence; device acceptance is not claimed.",
+    "R-A6 and R-B2 remain partial until their later UI cards render the frozen content.",
+    "Push, merge, tag and deploy were not performed for KAO-06."
+  ]
+}

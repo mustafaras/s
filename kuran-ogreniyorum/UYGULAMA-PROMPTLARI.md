@@ -550,6 +550,8 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `app/content/quranGrammarV1.js`
 - `app/content/quranShortSurahsV1.js`
 - `app/content/quranPhonicsV1.js`
+- `tools/kao-content-freeze.mjs`
+- `kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md`
 - `index.html`
 - `.claude/skills/run-seyma/driver.mjs`
 - `.claude/skills/run-seyma/zikr-harness.mjs`
@@ -562,7 +564,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `kuran-ogreniyorum/.anti-amnesia/LEDGER.md`
 
 **Adımlar:**
-1. `--freeze-grammar`, `--freeze-surahs` (Tanzil penceresi; vakıf işaretleri ۚ ۖ ۗ korunur; her kelime `lemmaId`), `--freeze-phonics`.
+1. `tools/kao-content-freeze.mjs` sahibiyle `--freeze-grammar`, `--freeze-surahs` (Tanzil penceresi; kaynakta bulunan vakıf işaretleri ۚ ۖ ۗ korunur; her kelime `lemmaId`), `--freeze-phonics`. Ana 524 sözlükte olmayan sûre lemmaları, yanlış eşleme yapılmadan sûre modülünün kaynak kayıtlı tamamlayıcı sözlüğünde çözülür (GAP-07).
 2. `prayerTexts`: tekbir → Sübhâneke → Fâtiha → zamm-ı sûre → rükû → secde → tahiyyat → selâm; her kelime `lemmaId` ile sözlüğe bağlı; onay (06 §3, D-12) KAO-23/04 kapsamında alınmış olmalı, değilse `waiting_user`.
 3. Üç dosya 4 listeye aynı commit'te; `?v=` bump.
 4. `tests/kao/test_kao_phonics_contract.js`; lexicon contract fixture'ına sûre kelime→lemma referans bütünlüğü ekle.

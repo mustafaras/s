@@ -617,6 +617,18 @@
     h+='<section class="kao-summary"><div><p class="kao-eyebrow">Sıradaki ünite</p><h2>'+esc(kaoUnitLabel(q))+'</h2></div><p class="kao-milestone">'+icon('flag',15)+' '+esc(kaoMilestoneLabel(q))+'</p></section></main>';
     return h;
   }
+  function kaoHubCardHTML(){
+    if(!quranLearnDeps) return '';
+    var d=quranLearnDeps.data()||{},q=d.quranLearn&&typeof d.quranLearn==='object'&&!Array.isArray(d.quranLearn)?d.quranLearn:{},cards=objectOr(q.cards,{}),known=Object.create(null);
+    Object.keys(cards).forEach(function(id){ var card=cards[id]||{},lemma=lemmaIdForCard(id); if(lemma&&card.orphan!==true&&nonNegativeNumber(card.reps,0)>0) known[lemma]=1; });
+    var learned=Object.keys(known).length,today=quranLearnDeps.todayStr(),daily=objectOr(objectOr(q.daily,{})[today],{}),answered=Math.floor(nonNegativeNumber(daily.answered,0)),started=!!q.startedAt||learned>0||answered>0;
+    var icon=quranLearnDeps.icon,status=learned?learned+' kelime tanıdık':(answered?answered+' cevap bugün':'İlk oturum hazır'),action=started?'Devam et':'Öğrenmeye başla';
+    return '<button type="button" id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()" aria-haspopup="dialog" aria-label="Kur’an Arapçası Öğreniyorum; '+status+'; '+action+'">'+
+      '<span class="kao-hub-frame" aria-hidden="true"></span><span class="kao-hub-head"><span class="kao-hub-seal">'+icon('book-open',21)+'</span><span class="kao-hub-kicker"><small>KUR’AN ARAPÇASI</small><strong>Kur’an Arapçası Öğreniyorum</strong></span><span class="kao-hub-status">'+status+'</span></span>'+
+      '<span class="kao-hub-copy">Kelimeleri tanı, kökleri keşfet; âyetlerin anlamına adım adım yaklaş.</span>'+
+      '<span class="kao-hub-path" aria-label="Öğrenme yolu"><span><i></i><b>Kelime</b></span><span><i></i><b>Kök</b></span><span><i></i><b>Gramer</b></span><span><i></i><b>Âyet</b></span></span>'+
+      '<span class="kao-hub-foot"><span>'+(answered?answered+' cevap bugün':'Günde yaklaşık 6 dakika')+'</span><b>'+action+' '+icon('arrow-right',15)+'</b></span></button>';
+  }
   function kaoOverlayHTML(nowValue){
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),icon=quranLearnDeps.icon;
@@ -771,6 +783,7 @@
     kaoUndo:kaoUndo,
     kaoPlay:kaoPlay,
     kaoNightWindow:kaoNightWindow,
+    kaoHubCardHTML:kaoHubCardHTML,
     kaoHomeHTML:kaoHomeHTML,
     kaoOverlayHTML:kaoOverlayHTML,
     kaoMount:kaoMount,

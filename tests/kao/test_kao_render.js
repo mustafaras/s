@@ -9,6 +9,7 @@ const repoRoot = require('../repo-root');
 const relative = 'app/core/quranLearn.js';
 const source = fs.readFileSync(path.join(repoRoot, relative), 'utf8');
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+const saygiSource = fs.readFileSync(path.join(repoRoot, 'app/core/saygi.js'), 'utf8');
 const settingsSource = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/kao.css'), 'utf8');
 const indexSource = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
@@ -44,7 +45,7 @@ const taskNode = { innerHTML: '', attrs: {}, setAttribute(name, value) { this.at
 const audios = [];
 assert.equal(api.registerQuranLearnSurface({
   lockBody() { locked += 1; }, unlockBody() { unlocked += 1; },
-  focusDialog(id) { focused = id; }, activeElementId() { return 'kao-settings-entry'; },
+  focusDialog(id) { focused = id; }, activeElementId() { return 'kao-hub-entry'; },
   restoreFocus(id) { restored = id; },
   sheetClose(card, back, body) { assert.equal(card, 'sey-ov-card'); assert.equal(back, 'sey-ov-back'); closeBody = body; },
   mount(html) { mounted = html; }, taskElement() { return taskNode; },
@@ -56,7 +57,7 @@ assert.equal(api.registerCaffeineTargetBed(() => '23:00'), true);
 api.kaoOpen();
 assert.equal(ui.kaoOpen, true);
 assert.equal(ui.kaoView, 'home');
-assert.equal(ui.kaoReturnFocusId, 'kao-settings-entry');
+assert.equal(ui.kaoReturnFocusId, 'kao-hub-entry');
 assert.equal(locked, 1);
 assert.equal(focused, 'sey-ov-card');
 assert.equal(rendered, 1);
@@ -72,6 +73,21 @@ assert.match(html, /10 yeni/);
 assert.match(html, /Gece tekrarı/);
 assert.match(html, /App\.kaoStart\(\)/);
 assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
+
+const firstHubHtml = api.kaoHubCardHTML();
+assert.match(firstHubHtml, /id="kao-hub-entry"/);
+assert.match(firstHubHtml, /Kur’an Arapçası Öğreniyorum/);
+assert.match(firstHubHtml, /Kelime<\/b>.*Kök<\/b>.*Gramer<\/b>.*Âyet<\/b>/);
+assert.match(firstHubHtml, /İlk oturum hazır/);
+assert.match(firstHubHtml, /onclick="App\.kaoOpen\(\)"[^>]*aria-haspopup="dialog"/);
+const firstLemma = sandbox.window.QuranLexiconV1.lemmas[0];
+quranLearn.startedAt = '2026-09-24T12:00:00.000Z';
+quranLearn.cards[`w:${firstLemma.id}:ar>tr`] = { reps: 2, state: 'review' };
+quranLearn.daily['2026-09-24'] = { answered: 3 };
+const resumeHubHtml = api.kaoHubCardHTML();
+assert.match(resumeHubHtml, /1 kelime tanıdık/);
+assert.match(resumeHubHtml, /3 cevap bugün/);
+assert.match(resumeHubHtml, /Devam et/);
 
 const shiftLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift);
 const otherLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.id !== shiftLemma.id && lemma.pos === shiftLemma.pos && lemma.root !== shiftLemma.root);
@@ -121,14 +137,17 @@ assert.equal(typeof closeBody, 'function');
 closeBody();
 assert.equal(ui.kaoOpen, false);
 assert.equal(unlocked, 1);
-assert.equal(restored, 'kao-settings-entry');
+assert.equal(restored, 'kao-hub-entry');
 
 assert.match(appSource, /App\.kaoOpen=function\(view\)\{ return window\.SeymaQuranLearn\.kaoOpen\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoClose=function\(\)\{ return window\.SeymaQuranLearn\.kaoClose\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoSetView=function\(v\)\{ return window\.SeymaQuranLearn\.kaoSetView\.apply\(null,arguments\); \};/);
 for (const name of ['kaoStart', 'kaoAnswer', 'kaoUndo', 'kaoPlay']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
-assert.match(settingsSource, /id="kao-settings-entry"[^>]*onclick="App\.kaoOpen\(\)"/);
+assert.doesNotMatch(settingsSource, /kao-settings-entry|App\.kaoOpen\(\)/, 'geçici Ayarlar girişi kaldırılmalı');
+assert.match(appSource, /kaoHubCardHTML:function\(\)\{ return window\.SeymaQuranLearn\?window\.SeymaQuranLearn\.kaoHubCardHTML\(\):''; \}/);
+assert.match(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'Kur’an öğrenme kartı Bugün girişlerinde Kur’an Yolculuğu sonrasında olmalı');
 assert.match(indexSource, /app\/kao\.css\?v=\d{8}[a-z]/);
+for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot']) assert.ok(cssSource.includes(selector), selector);
 assert.doesNotMatch(cssSource, /:root\s*\{/);
 assert.doesNotMatch(cssSource, /#[0-9a-f]{3,8}\b/i);
 const cssVars = [...cssSource.matchAll(/var\((--[a-z0-9-]+)/gi)].map((match) => match[1]);
@@ -156,4 +175,4 @@ keySandbox.App.onModalKeydown({ key: 'Escape', currentTarget: dialog, preventDef
 assert.equal(escaped, 1, 'Escape kapatma callbackini çalıştırmalı');
 assert.ok(prevented >= 3 && stopped >= 3);
 
-console.log('KAO render: PASS (dialog/aria, E1, Tab/Shift+Tab/Escape, focus return, CSS/settings wiring)');
+console.log('KAO render: PASS (hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');

@@ -449,7 +449,7 @@ if(!window.SeymaSaygi.registerSaygi({
   esc:esc,
   featuresLive:featuresLive,
   render:render,
-  quranJourneyHubCardHTML:quranJourneyHubCardHTML,
+  quranJourneyHubCardHTML:quranJourneyHubCardHTML, kaoHubCardHTML:function(){ return window.SeymaQuranLearn?window.SeymaQuranLearn.kaoHubCardHTML():''; },
   zikrVisible:function(){ return ZIKR_V2_VISIBLE; },
   zikrPreviewCardHTML:zikrPreviewCardHTML
 })) throw new Error('MON-23: SeymaSaygi dependency bag kurulamadı');

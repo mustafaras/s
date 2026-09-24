@@ -20,6 +20,8 @@ const reportSource = fs.readFileSync(path.join(repoRoot, 'app/core/report.js'), 
 const mapSource = fs.readFileSync(path.join(repoRoot, 'app/core/map.js'), 'utf8');
 const profileSource = fs.readFileSync(path.join(repoRoot, 'app/core/profile.js'), 'utf8');
 const settingsSource = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
+const quranLearnSource = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8');
+const quranLearnHubSource = quranLearnSource.slice(quranLearnSource.indexOf('function kaoHubCardHTML'), quranLearnSource.indexOf('function kaoOverlayHTML'));
 const messagingSource = fs.readFileSync(path.join(repoRoot, 'app/core/messaging.js'), 'utf8');
 const renderSource = fs.readFileSync(path.join(repoRoot, 'app/core/render.js'), 'utf8');
 // MON2-02: app.js'ten reminders.js/reminderSurface.js'e taşınan gövdeler de
@@ -37,7 +39,7 @@ const quranSource = fs.readFileSync(path.join(repoRoot, 'app/core/quran.js'), 'u
 // gövdeleri app/core/appSurface.js alan yüzey bölümüne taşındı; onclick/App
 // yüzey sayımı birleşik kaynakta yapılır (appSurface.js'te onclick taşımaz).
 const appSurfaceFieldSource = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
-const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + messagingSource + renderSource + remindersSource + reminderSurfaceSource + appSurfaceFieldSource;
+const combinedSource = appSource + motivationSource + crisisSource + journalSource + healthSource + librarySource + reportSource + mapSource + profileSource + settingsSource + quranLearnHubSource + messagingSource + renderSource + remindersSource + reminderSurfaceSource + appSurfaceFieldSource;
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const mediaSource = fs.readFileSync(path.join(repoRoot, 'app/core/mediaFx.js'), 'utf8');
 

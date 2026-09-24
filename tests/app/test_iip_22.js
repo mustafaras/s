@@ -151,11 +151,10 @@ function test(name, fn) {
     assert.doesNotMatch(indexSource, /controllerchange[\s\S]{0,200}(reload|location\s*=)/);
     assert.doesNotMatch(indexSource, /\.skipWaiting\s*\(/);
   });
-  await test('index ayrı araç panelinde durum, sürüm, boyut, kota ve kaldırmayı açıklar', () => {
-    for (const token of ['sey-offline-tools', 'Paket durumu', 'Sürüm', 'Tahmini boyut', 'Depolama kotası', 'Offline paketi kaldır']) assert.ok(indexSource.includes(token), token);
-    assert.match(indexSource, /navigator\.storage\.estimate/);
-    assert.match(indexSource, /SEYMA_OFFLINE_STATUS/);
-    assert.match(indexSource, /SEYMA_OFFLINE_REMOVE/);
+  await test('kalıcı yüzen Offline paneli kaldırılır; güvenli SW kaydı korunur', () => {
+    for (const token of ['sey-offline-tools', 'sey-offline-panel', 'Offline araçları', 'Offline paketi kaldır']) assert.ok(!indexSource.includes(token), token);
+    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20260922a'\)/);
+    assert.doesNotMatch(indexSource, /SEYMA_OFFLINE_(?:STATUS|INSTALL|REMOVE)/);
   });
   await test('fetch politikası geniş runtime cache yakalaması yapmaz', () => {
     assert.doesNotMatch(swSource, /cache\.put\s*\([^)]*event\.request/);
@@ -165,7 +164,8 @@ function test(name, fn) {
   await test('aktif sayaç/not durumu SW güncellemesinden bağımsızdır', () => {
     const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20260922a')"));
     assert.doesNotMatch(registrationBlock, /location\.reload|skipWaiting/);
-    assert.match(indexSource, /Güncelleme hazırsa açık sayaç ve not korunur/);
+    assert.doesNotMatch(indexSource, /controllerchange/);
+    assert.doesNotMatch(indexSource, /sey-offline-tools/);
   });
   if (process.exitCode) process.exit(1);
   console.log('\nPASS: IIP-22 ' + passed + '/11');

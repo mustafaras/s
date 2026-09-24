@@ -1,0 +1,52 @@
+{
+  "id": "KAO-UI-REMEDIATION-20260924",
+  "date": "2026-09-24",
+  "status": "PASS",
+  "scope": [
+    "remove the persistent floating Offline tools control",
+    "move the Quran Arabic learning entry from Settings to the Ilham and Ibadet Today hub"
+  ],
+  "results": {
+    "offlineControl": "removed from index.html",
+    "serviceWorkerRegistration": "preserved without forced reload or private caching changes",
+    "hubPlacement": "Ilham and Ibadet > Bugun entries, immediately after Quran Journey",
+    "settingsEntry": "removed",
+    "cardState": "read-only learned-word and today-answer counts; no render-time state mutation",
+    "accessibility": "button semantics, dialog relationship, focus return, 44px action, narrow layout, reduced motion",
+    "design": "existing Quran navy, gold and parchment tokens with a word-root-grammar-ayah learning path"
+  },
+  "invariants": {
+    "dataShape": "unchanged",
+    "migration": "unchanged",
+    "appHandlers": 727,
+    "onclickSurface": 392,
+    "sync": "unchanged",
+    "appJsLines": 7800
+  },
+  "checks": [
+    "11 tests/kao fixtures",
+    "tests/app/test_iip_04.js",
+    "tests/app/test_iip_09.js",
+    "tests/app/test_iip_12.js",
+    "tests/app/test_iip_17.js",
+    "tests/app/test_iip_21.js",
+    "tests/app/test_iip_22.js",
+    "all tests/app/test_fx2_*.js",
+    "four tests/app/test_app_surface_* cache and ownership fixtures affected by app.js cache bump",
+    "node .claude/skills/run-seyma/driver.mjs",
+    "node .claude/skills/run-seyma/zikr-harness.mjs",
+    "node tests/app/test_state_rebind_boundary.js",
+    "node tools/shell-inventory.mjs --gate",
+    "node docs/apple-design/verify-theme-tristate.mjs",
+    "node docs/apple-design/verify-contrast.mjs",
+    "node tests/app/test_v3_welcome.js",
+    "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+    "git -c core.fsmonitor=false diff --check"
+  ],
+  "boundaries": {
+    "programOrder": "KAO-21 remains pending; next executable card remains KAO-13",
+    "browser": "not opened; headless and source-level verification only",
+    "deviceAcceptance": "not_verified",
+    "delivery": "local commit only; no push, merge, tag or deploy authority"
+  }
+}

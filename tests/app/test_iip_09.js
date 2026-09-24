@@ -70,6 +70,7 @@ const deps = {
   addDays: addDaysFixture, diffDays: () => 0, dayIndexFor: () => 1,
   dateLabelTR: value => value, icon: name => '<svg data-icon="' + esc(name) + '"></svg>', esc,
   featuresLive: () => true, render: () => {}, quranJourneyHubCardHTML: () => '<article id="quran-journey-card" class="quran-v2-preview" data-state="' + quranCardState + '">Kur’an kartı</article>',
+  kaoHubCardHTML: () => '<button id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()">Kur’an Arapçası Öğreniyorum</button>',
   zikrVisible: () => true, zikrPreviewCardHTML: () => '<article class="zikr-v2-preview">Zikir</article>',
   prayer: true
 };
@@ -92,6 +93,8 @@ check('REQ-017 Bugün keeps a continuation surface',
   today.includes('zikr-v2-preview'));
 check('REQ-017 full Quran card belongs to Bugün and qibla does not',
   today.includes('quran-journey-card') && !today.includes('qibla-card'));
+check('KAO UI remediation: learning card follows Quran Journey in Bugün',
+  today.includes('kao-hub-entry') && today.indexOf('quran-journey-card') < today.indexOf('kao-hub-entry'));
 
 ui.faithTab = 'oncu';
 const inspiration = registry.saygiPreviewHubHTML(person, null, false);
@@ -102,7 +105,7 @@ ui.faithTab = 'iman';
 const worship = registry.saygiPreviewHubHTML(person, null, false);
 check('REQ-017 İbadet keeps prayer and owns the qibla tool only',
   worship.includes('data-faith-tab="iman"') && worship.includes('faith-preview-card') &&
-  worship.includes('qibla-card') && !worship.includes('quran-journey-card'));
+  worship.includes('qibla-card') && !worship.includes('quran-journey-card') && !worship.includes('kao-hub-entry'));
 
 ui.faithTab = 'zikir';
 const zikr = registry.saygiPreviewHubHTML(person, null, false);

@@ -528,18 +528,17 @@ console.log('\n[6] app.js yüzeyi pinli');
 const appSource = read('app.js');
 const handlerCount = (appSource.match(/^App\.[A-Za-z0-9_$]+\s*=\s*function/gm) || []).length;
 // IIP-10 / DEC-07: App.saygiLens eklendi; 554 → 555.
-// IIP-11: App.saygiReader eklendi; 555 → 556, 719 → 720.
+// IIP-11 sonrası KAO-10/11 yedi öğrenme handler'ı ekledi; toplam 727.
 ok('App.* handler yüzeyi bozulmadı (556)', handlerCount === 556, 'ölçülen: ' + handlerCount);
 ok('app.js tanıtım sayfasına referans vermiyor',
   appSource.indexOf('v3-tanitim') < 0 && appSource.indexOf(V3_KEY) < 0);
 ok('sync.js tanıtım anahtarına dokunmuyor',
   read('sync.js').indexOf(V3_KEY) < 0);
 
-// styles.css'e dokunulmadı (paylaşılan yüzey). app.js/appSurface.js sürümleri
-// B2 (DEVIR-PROMPTU §8) düzeltmesiyle 2026-09-15'te bump edildi: "4.500 adım"
-// metinleri gerçek adım hedefine (stepsGoal → 9.000) çekildi.
-ok('index.html mevcut asset sürümleri korunmuş (app.js v=20260922b)',
-  /app\.js\?v=20260922b/.test(indexSource));
+// KAO hub kartı dependency bag'e eklendi; app.js cache pini bu kaynak değişikliğiyle
+// aynı düzeltmede ilerletildi. Handler yüzeyi yukarıdaki ayrı kapıda sabit kalır.
+ok('index.html app.js cache-bust güncel (KAO hub köprüsü)',
+  /app\.js\?v=20260924b/.test(indexSource));
 /* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
    gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
@@ -848,20 +847,22 @@ const APP_SURFACE_FILES = [
   'app/core/render.js', 'app/core/reminders.js', 'app/core/reminderSurface.js',
   'app/core/appSurface.js'
 ];
-const combined = APP_SURFACE_FILES.map(read).join('');
+const quranLearnSrc = read('app/core/quranLearn.js');
+const quranLearnHubSrc = quranLearnSrc.slice(quranLearnSrc.indexOf('function kaoHubCardHTML'), quranLearnSrc.indexOf('function kaoOverlayHTML'));
+const combined = APP_SURFACE_FILES.map(read).join('') + quranLearnHubSrc;
 const surfaceCount = new Set(
   (combined.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((s) => s.match(/App\.[A-Za-z0-9_]+/)[0])
 ).size;
-ok('App yüzeyi pinli (720) — sürüm köprüsü yeni handler eklemedi',
-  surfaceCount === 720, 'ölçülen: ' + surfaceCount);
-ok('tıklama niteliği sayısı pinli (391)',
-  (combined.match(/onclick=/g) || []).length === 391,
+ok('App yüzeyi pinli (727) — KAO hub taşıması yeni handler eklemedi',
+  surfaceCount === 727, 'ölçülen: ' + surfaceCount);
+ok('tıklama niteliği sayısı pinli (392)',
+  (combined.match(/onclick=/g) || []).length === 392,
   'ölçülen: ' + (combined.match(/onclick=/g) || []).length);
 ok('sürüm yorumları pin taramasını kaydırmıyor (yorumda nitelik adı geçmiyor)',
   !/\/\/[^\n]*(?:App\.[A-Za-z0-9_]+\s*=|onclick=)/.test(settingsSrc));
 
 // Cache-bust: değişen modüller yeni sürüm taşımalı
-ok('settings.js cache-bust güncel', /app\/core\/settings\.js\?v=20260915c/.test(indexSource));
+ok('settings.js cache-bust güncel', /app\/core\/settings\.js\?v=20260924b/.test(indexSource));
 ok('render.js cache-bust güncel', /app\/core\/render\.js\?v=20260915f/.test(indexSource));
 
 // ───────────────────────────────────────────────────────────────────────────

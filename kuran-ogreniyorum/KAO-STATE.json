@@ -8,7 +8,13 @@
     "branch": "main"
   },
   "status": "in_progress",
-  "releaseApproval": "NOT_APPROVED",
+  "releaseApproval": "APPROVED",
+  "releaseApprovalRecord": {
+    "by": "user",
+    "at": "2026-09-24",
+    "source": "canlıya alalım push commit merge deploy; doğru olan neyse onu yap",
+    "scope": "KAO-05 commitini kuran-ogreniyorum dalına push, main'e fast-forward merge, origin/main push ve GitHub Pages deploy"
+  },
   "nextCard": "KAO-06",
   "userApprovalRequired": false,
   "invariants": [
@@ -87,8 +93,8 @@
     "D-05": {
       "q": "Repo LICENSE kararı; lexicon public push öncesi",
       "status": "decided",
-      "decision": "Repo LICENSE: yerel-only çalışma LICENSE gerektirmez. KARAR: public push yapılmaz; lisans seçimi yayın kapısında kullanıcıya ait (releaseApproval=NOT_APPROVED).",
-      "decidedBy": "agent (kullanıcı yetkilendirdi, 2026-09-23)"
+      "decision": "Mevcut repo lisans yapısı korunur; yeni genel LICENSE eklenmez. KAO üretim modülü kaynak/atıf ve üçüncü taraf lisans adlarını kendi ATTRIBUTION alanında taşır. Kullanıcı 2026-09-24 tarihinde public push + main merge + Pages deploy yetkisi verdi.",
+      "decidedBy": "agent (kullanıcının doğru olanı yap ve canlıya al yetkilendirmesi, 2026-09-24)"
     },
     "D-06": {
       "q": "Geçici giriş Ayarlar satırı; kalıcı giriş hub kartı (Dalga 5, IIP koordinasyonu)",

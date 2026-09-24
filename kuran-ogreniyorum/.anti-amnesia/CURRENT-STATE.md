@@ -2,7 +2,7 @@
 
 **Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 8/30
 **activePrompt:** — · **lastCompletedPrompt:** KAO-05 · **blockedPrompt:** — · **Sıradaki:** **KAO-06**
-**releaseApproval:** NOT_APPROVED · **Baseline:** 0436405 (main)
+**releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
 - (yok)
@@ -52,4 +52,4 @@
 R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:pending · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:pending · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:partial · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 43 | 2026-09-24 | KAO-05 bitti: 524 doğrulanmış lemma 256.327 baytlık salt içerik modülüne donduruldu; kimlik, harekeli Arapça, anlam, kök/kalıp/POS/sıklık/kognat, örnek ve D-13 istisnaları korundu. Dört yükleme listesi eşitlendi; sözleşme/kapsam/driver/zikr/rebind/shell kapıları geçti. | `evidence/KAO-05/EVIDENCE.json`; contract 524 PASS; coverage 59.948/77.430=%77,42; tüm zorunlu kontroller exit 0 |
+| 44 | 2026-09-24 | Kullanıcı KAO-05 için yayın yetkisi verdi: özellik dalı push, `main`e fast-forward merge, `origin/main` push ve GitHub Pages deploy. Mevcut repo lisans yapısı korunur; modül içi ATTRIBUTION üçüncü taraf kaynak/lisanslarını taşır. | `releaseApproval=APPROVED`; `releaseApprovalRecord`; push/merge/deploy kapsamı kullanıcı mesajıyla sınırlı |

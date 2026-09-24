@@ -16,6 +16,7 @@ const indexSource = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
 const sandbox = { window: {}, Date, Math, Number, String, Object, Array, JSON };
 vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranLexiconV1.js' });
+vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranGrammarV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranGrammarV1.js' });
 vm.runInContext(source, sandbox, { filename: relative });
 const api = sandbox.window.SeymaQuranLearn;
 
@@ -88,6 +89,27 @@ assert.match(arabicHtml, /event\.shiftKey\?'flowing':'measured'/);
 assert.match(arabicHtml, /kao-cognate is-shift/);
 assert.match(arabicHtml, /dikkat/);
 assert.match(arabicHtml, /Türkçede var/);
+
+const grammarHtml = api.kaoGrammarCandidates().map((candidate) => {
+  const grammarTask = api.kaoBuildGrammarTask({ id: `render:${candidate.id}`, cardId: candidate.id, type: 'grammar', isNew: true }, { quranLearn }, { seed: candidate.id });
+  return api.kaoTaskHTML(grammarTask);
+}).join('\n');
+for (const label of ['Ek çöz', 'Çekim tablosu', 'Kök bul', 'Kalıp eşle']) assert.match(grammarHtml, new RegExp(label));
+assert.match(grammarHtml, /class="kao-chip"/);
+assert.match(grammarHtml, /aria-live="polite"/);
+assert.doesNotMatch(grammarHtml, /<(?:input|textarea|select)\b/i, 'gramer görevleri klavyesiz olmalı');
+assert.match(cssSource, /\.kao-choices \.kao-chip\{min-height:44px\}/);
+api.ensureQuranLearn({ quranLearn });
+for (const errorClass of ['affix', 'root', 'rule']) {
+  const candidate = api.kaoGrammarCandidates().find((item) => api.kaoBuildGrammarTask({ cardId: item.id }, { quranLearn }, { seed: item.id }).errorClass === errorClass);
+  const queueItem = { id: `error:${errorClass}`, cardId: candidate.id, type: 'grammar', isNew: true };
+  ui.kaoQueue = [queueItem]; ui.kaoTasks = {}; ui.kaoTaskIndex = 0; ui.kaoTaskStartedAt = Date.now(); ui.kaoUndo = null;
+  const grammarTask = api.kaoBuildGrammarTask(queueItem, { quranLearn }, { seed: queueItem.id });
+  const wrong = grammarTask.choices.find((choice) => !choice.correct);
+  const before = quranLearn.errors[errorClass];
+  api.kaoAnswer(grammarTask.id, wrong.choiceId);
+  assert.equal(quranLearn.errors[errorClass], before + 1, `${errorClass} hata sayacı artmalı`);
+}
 
 api.kaoMount(new Date('2026-09-24T22:15:00'));
 assert.match(mounted, /id="sey-ov-card"/);

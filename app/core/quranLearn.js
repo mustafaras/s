@@ -36,6 +36,7 @@
     0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,
     0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621
   ];
+  var KAO_GRAMMAR_TYPES=['Ek çöz','Çekim tablosu','Kök bul','Kalıp eşle'];
   var KAO_SEMANTIC_CLUSTERS={
     SOZ_EMIR:['l_qaAla_657dd3','l_amor_9fbe48','l_qawol_58e075','l_amara_3fab3c'],
     IMAN_KUFUR:['l_aAmana_966a5c','l_kafara_af1746','l_mu_omin_870b47','l_ka_firuwn_165d2d','l_a_oraka_c73d6e','l_anfaqa_0b12ad','l_iyma_n_4151c0','l_mu_orik_2ba276','l_ariyk_5de5f5','l_kufor_1c9ee6','l_kaAfir_9b3cf0','l_muna_fiquwn_bdda5c','l_m_u_omina_t_b9c5a2','l_amina_0a79a6'],
@@ -283,7 +284,7 @@
     if(!id) return null;
     var card=cards[id]&&typeof cards[id]==='object'?cards[id]:{};
     var isNew=typeof raw.isNew==='boolean'?raw.isNew:(!cards[id]||card.state==='new'||card.st==='new'||(!card.reps&&card.state!=='review'&&card.st!=='review'));
-    return {cardId:id,type:cardType(id,raw.type),isNew:isNew,card:card,raw:raw,semantic:semanticInfo(id,raw,opts)};
+    return {cardId:id,type:cardType(id,raw.type),isNew:isNew,priority:nonNegativeNumber(raw.priority,0),card:card,raw:raw,semantic:semanticInfo(id,raw,opts)};
   }
   function recentNeighbor(candidate,cards,now,opts){
     var ids=Object.keys(cards);
@@ -302,7 +303,7 @@
     var source=Array.isArray(opts.candidates)?opts.candidates:Object.keys(cards).map(function(id){ return {id:id}; });
     var records=source.map(function(raw){ return candidateRecord(raw,cards,opts); }).filter(Boolean);
     var seed=daySeed(now)+'|'+String(opts.sessionId||'');
-    records.sort(function(a,b){ return seededRank(seed,a.cardId)-seededRank(seed,b.cardId)||a.cardId.localeCompare(b.cardId); });
+    records.sort(function(a,b){ return b.priority-a.priority||seededRank(seed,a.cardId)-seededRank(seed,b.cardId)||a.cardId.localeCompare(b.cardId); });
     var due=records.filter(function(item){
       if(item.isNew||item.card.orphan===true) return false;
       var date=new Date(item.card.due||0);
@@ -322,10 +323,10 @@
       var index=-1;
       for(var i=0;i<remaining.length;i+=1){
         var item=remaining[i];
-        if(item.type==='grammar'&&typeCounts.grammar>=3) continue;
+        if(item.type==='grammar'&&typeCounts.grammar>=4) continue;
         if(item.type==='fragment'&&typeCounts.fragment>=2) continue;
         var n=out.length;
-        if(n>=2&&out[n-1].type===item.type&&out[n-2].type===item.type) continue;
+        if(item.type!=='grammar'&&n>=2&&out[n-1].type===item.type&&out[n-2].type===item.type) continue;
         index=i; break;
       }
       if(index<0) break;
@@ -355,6 +356,7 @@
   function kaoBuildTask(queueItem,d,options){
     var opts=options&&typeof options==='object'?options:{};
     var id=String(queueItem&&queueItem.cardId||queueItem&&queueItem.id||'');
+    if(/^g:/.test(id)) return kaoBuildGrammarTask(queueItem,d,opts);
     var meta=metaFor(id,queueItem,opts),meanings=Array.isArray(meta.meanings)?meta.meanings:[];
     var direction=/:tr>ar$/.test(id)?'tr>ar':'ar>tr';
     var answer=direction==='tr>ar'?String(meta.ar||id):String(meanings[0]||meta.meaning||id);
@@ -418,10 +420,74 @@
     return String(unit.title||unit.label||('Ünite '+String(unit.order||1)));
   }
   function cloneValue(value){ return value==null?value:JSON.parse(JSON.stringify(value)); }
+  function grammarRecord(cardId){
+    var match=String(cardId||'').match(/^g:([^:]+):(.+)$/),grammar=window.QuranGrammarV1;
+    if(!match||!grammar||typeof grammar.byId!=='function') return null;
+    var concept=grammar.byId(match[1]);
+    if(!concept||!Array.isArray(concept.templates)) return null;
+    var template=concept.templates.find(function(item){ return item.id===match[2]; });
+    return template?{concept:concept,template:template}:null;
+  }
+  function grammarCandidates(){
+    var grammar=window.QuranGrammarV1,out=[];
+    if(!grammar||!Array.isArray(grammar.concepts)) return out;
+    KAO_GRAMMAR_TYPES.forEach(function(type){
+      if(type==='Kalıp eşle'){
+        var patternConcept=grammar.byId&&grammar.byId('g21'),patternTemplate=patternConcept&&(patternConcept.templates||[]).find(function(item){ return item.type===type; });
+        if(patternTemplate){ out.push({id:'g:'+patternConcept.id+':'+patternTemplate.id,type:'grammar',priority:1}); return; }
+      }
+      for(var i=0;i<grammar.concepts.length;i+=1){
+        var concept=grammar.concepts[i],template=(concept.templates||[]).find(function(item){ return item.type===type; });
+        if(template){ out.push({id:'g:'+concept.id+':'+template.id,type:'grammar',priority:1}); break; }
+      }
+    });
+    return out;
+  }
+  function cellText(cell){ return Array.isArray(cell)?String(cell[1]||''):(typeof cell==='string'?cell:''); }
+  function choiceList(values,answer,seed,taskId){
+    var seen=Object.create(null),list=[];
+    [answer].concat(values).forEach(function(value){ value=String(value||''); if(value&&!seen[value]){ seen[value]=1; list.push(value); } });
+    list=list.slice(0,4).map(function(label){ return {label:label,correct:label===answer}; });
+    list.sort(function(a,b){ return seededRank(seed+'|grammar',a.label)-seededRank(seed+'|grammar',b.label)||a.label.localeCompare(b.label); });
+    list.forEach(function(choice,index){ choice.choiceId=taskId+':choice:'+index; });
+    return list;
+  }
+  function rootForLabel(label){
+    var grammar=window.QuranGrammarV1,roots=grammar&&grammar.unit11&&Array.isArray(grammar.unit11.roots)?grammar.unit11.roots:[];
+    var base=String(label||'').replace(/\s*\(.+\)\s*$/,'').split(',')[0].trim();
+    return roots.find(function(item){ return String(item.meaning||'').split(',').some(function(value){ return value.trim()===base; }); })||null;
+  }
+  function kaoBuildGrammarTask(queueItem,d,options){
+    var opts=options&&typeof options==='object'?options:{},cardId=String(queueItem&&queueItem.cardId||queueItem&&queueItem.id||''),record=grammarRecord(cardId);
+    if(!record) return null;
+    var concept=record.concept,template=record.template,type=template.type,table=(concept.tables||[])[0],rows=table&&Array.isArray(table.rows)?table.rows:[];
+    var taskId=String(queueItem&&queueItem.id||'task:'+cardId),seed=String(opts.seed||taskId),index=rows.length?seededRank(seed,template.id)%rows.length:0;
+    var row=rows[index]||{},answer='',stimulus='',context=[],alternatives=[],errorClass=type==='Ek çöz'?'affix':type==='Kök bul'?'root':'rule';
+    if(type==='Ek çöz'){
+      var cells=(row.cells||[]).map(function(cell,cellIndex){ return {text:cellText(cell),label:String((table.columns||[])[cellIndex+1]||row.label||'parça')}; }).filter(function(item){ return item.text; });
+      var picked=cells[cells.length-1]||{text:String(row.label||''),label:String(row.label||'')};
+      stimulus=picked.text; answer='el + '+String(row.label||'kelime'); alternatives=rows.map(function(item){ return 'el + '+String(item.label||'kelime'); }).concat([String(row.label||''),picked.label]);
+      context=['el = o bilinen',String(row.label||concept.title)];
+    }else if(type==='Çekim tablosu'){
+      var arabic=(row.cells||[]).map(cellText).filter(function(value){ return /[\u0600-\u06ff]/.test(value); });
+      answer=arabic[0]||String(row.label||''); stimulus=String(row.label||''); alternatives=rows.flatMap(function(item){ return (item.cells||[]).map(cellText).filter(function(value){ return /[\u0600-\u06ff]/.test(value); }); });
+      context=[String(table.title||concept.title)];
+    }else if(type==='Kök bul'){
+      var root=rootForLabel(row.label),arabicWord=(row.cells||[]).map(cellText).find(function(value){ return /[\u0600-\u06ff]/.test(value); });
+      stimulus=arabicWord||String(row.label||''); answer=root?Array.from(root.root).join('–'):String(row.label||'');
+      var roots=window.QuranGrammarV1&&window.QuranGrammarV1.unit11&&window.QuranGrammarV1.unit11.roots||[];
+      alternatives=roots.slice(0,12).map(function(item){ return Array.from(item.root).join('–'); }); context=[String(row.label||concept.title)];
+    }else{
+      var matches=rows.map(function(item){ var arabic=(item.cells||[]).map(cellText).filter(function(value){ return /[\u0600-\u06ff]/.test(value); }),shift=(item.cells||[]).map(cellText).find(function(value){ return /^[IVX]+:/.test(value); }); return {word:arabic[1]||arabic[0]||'',meaning:shift?shift.replace(/^[IVX]+:\s*/, ''):String(item.label||'')}; }).filter(function(item){ return item.word&&item.meaning; }).slice(0,3);
+      var selected=matches[seededRank(seed,template.id)%Math.max(1,matches.length)]||{word:'',meaning:''};
+      stimulus=selected.word; answer=selected.meaning; alternatives=matches.map(function(item){ return item.meaning; }); context=matches.map(function(item){ return item.word; });
+    }
+    return {id:taskId,cardId:cardId,type:'grammar',grammarType:type,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:String(template.prompt||type),stimulus:stimulus,context:context,errorClass:errorClass,answer:answer,clipId:'',choices:choiceList(alternatives,answer,seed,taskId)};
+  }
   function kaoCandidates(){
     var lex=window.QuranLexiconV1;
     if(!lex||!Array.isArray(lex.lemmas)) return [];
-    var candidates=lex.lemmas.map(function(lemma,index){ var direction=index%2?'tr>ar':'ar>tr'; return {id:'w:'+lemma.id+':'+direction,type:direction==='tr>ar'?'arabic':'meaning'}; }),cards=objectOr(quranLearnRoot(quranLearnDeps.data()).cards,{});
+    var candidates=grammarCandidates().concat(lex.lemmas.map(function(lemma,index){ var direction=index%2?'tr>ar':'ar>tr'; return {id:'w:'+lemma.id+':'+direction,type:direction==='tr>ar'?'arabic':'meaning'}; })),cards=objectOr(quranLearnRoot(quranLearnDeps.data()).cards,{});
     Object.keys(cards).forEach(function(id){ if(candidates.every(function(item){ return item.id!==id; })) candidates.push({id:id}); });
     return candidates;
   }
@@ -433,7 +499,7 @@
   }
   function kaoShouldAutoplay(task,d){
     var q=quranLearnRoot(d),card=objectOr(objectOr(q.cards,{})[task&&task.cardId],{});
-    return !!(task&&task.isNew&&nonNegativeNumber(card.reps,0)<2&&kaoAudioEnabled());
+    return !!(task&&task.clipId&&task.isNew&&nonNegativeNumber(card.reps,0)<2&&kaoAudioEnabled());
   }
   function kaoCognateHTML(task){
     if(!task||!task.cognate||!task.cognate.tr) return '';
@@ -444,14 +510,15 @@
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),esc=quranLearnDeps.esc;
     if(!task) return '<section id="kao-task" class="kao-task"><h2>Oturum tamamlandı</h2><button type="button" class="kao-primary" onclick="App.kaoSetView(\'home\')">Ana ekrana dön</button></section>';
-    var autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),prompt=task.direction==='tr>ar'?task.meaning:task.ar;
+    var autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,prompt=isGrammar?task.prompt:(task.direction==='tr>ar'?task.meaning:task.ar);
     var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
-    h+='<div class="kao-task-top"><span>'+(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç')+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
-    h+='<h2 class="kao-question'+(autoplay&&task.direction==='ar>tr'?' kao-audio-pending':'')+'"'+(task.direction==='ar>tr'?' lang="ar" dir="rtl" data-kao-ar':'')+'>'+esc(prompt)+'</h2>';
+    h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç'))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
+    h+='<h2 class="kao-question'+(autoplay&&task.direction==='ar>tr'?' kao-audio-pending':'')+'"'+(!isGrammar&&task.direction==='ar>tr'?' lang="ar" dir="rtl" data-kao-ar':'')+'>'+esc(prompt)+'</h2>';
+    if(isGrammar){ h+='<p class="kao-grammar-stimulus"'+(/[\u0600-\u06ff]/.test(task.stimulus)?' lang="ar" dir="rtl"':'')+'>'+esc(task.stimulus)+'</p>'; if(task.context&&task.context.length) h+='<div class="kao-grammar-context">'+task.context.map(function(item){ return '<span>'+esc(item)+'</span>'; }).join('')+'</div>'; }
     if(task.translit&&task.direction==='ar>tr') h+='<p class="kao-translit">'+esc(task.translit)+'</p>';
     if(task.clipId) h+='<button type="button" class="kao-audio" aria-label="Yavaş dinlemek için dokun; doğal hız için 350 milisaniye basılı tut" onpointerdown="this.dataset.kaoLong=\'\';this._kaoHold=setTimeout(()=>{this.dataset.kaoLong=\'1\';App.kaoPlay(\''+task.clipId+'\',\'flowing\')},350)" onpointerup="clearTimeout(this._kaoHold)" onpointercancel="clearTimeout(this._kaoHold)" onclick="if(this.dataset.kaoLong!==\'1\')App.kaoPlay(\''+task.clipId+'\',\'measured\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.kaoPlay(\''+task.clipId+'\',event.shiftKey?\'flowing\':\'measured\')}">'+quranLearnDeps.icon('volume-2',17)+' Dinle</button>';
     h+=kaoCognateHTML(task)+'<div class="kao-choices">';
-    task.choices.forEach(function(choice){ h+='<button type="button"'+(task.direction==='tr>ar'?' lang="ar" dir="rtl" data-kao-ar'+(autoplay?' class="kao-audio-pending"':''):'')+' onclick="App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')">'+esc(choice.label)+'</button>'; });
+    task.choices.forEach(function(choice){ h+='<button type="button"'+(isGrammar?' class="kao-chip"':(task.direction==='tr>ar'?' lang="ar" dir="rtl" data-kao-ar'+(autoplay?' class="kao-audio-pending"':''):''))+' onclick="App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')">'+esc(choice.label)+'</button>'; });
     h+='</div><p class="kao-live" aria-live="polite">'+esc(ui.kaoFeedback||'')+'</p>';
     if(ui.kaoUndo) h+='<button type="button" class="kao-undo" onclick="App.kaoUndo()">Geri al · 3 sn</button>';
     h+='</section>';
@@ -499,11 +566,12 @@
     var choice=task.choices.find(function(item){ return item.choiceId===choiceId; });
     if(!choice) return false;
     var d=quranLearnDeps.data(),q=ensureQuranLearn(d),cards=q.cards,key=quranLearnDeps.todayStr(),now=new Date(),hadCard=Object.prototype.hasOwnProperty.call(cards,task.cardId),hadDaily=Object.prototype.hasOwnProperty.call(q.daily,key);
-    ui.kaoUndo={expiresAt:now.getTime()+3000,cardId:task.cardId,hadCard:hadCard,card:cloneValue(cards[task.cardId]),dailyKey:key,hadDaily:hadDaily,daily:cloneValue(q.daily[key]),taskIndex:ui.kaoTaskIndex,queue:cloneValue(ui.kaoQueue)};
+    ui.kaoUndo={expiresAt:now.getTime()+3000,cardId:task.cardId,hadCard:hadCard,card:cloneValue(cards[task.cardId]),dailyKey:key,hadDaily:hadDaily,daily:cloneValue(q.daily[key]),errors:cloneValue(q.errors),taskIndex:ui.kaoTaskIndex,queue:cloneValue(ui.kaoQueue)};
     var previous=objectOr(cards[task.cardId],{}),correct=choice.correct===true,grade=kaoGrade(correct,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime())),previous.reps);
     cards[task.cardId]=kaoSchedule(previous,grade,now);
     var daily=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{}));
     daily.answered+=1; if(correct) daily.correct+=1; if(task.isNew) daily.new+=1; else daily.reviewed+=1; q.daily[key]=daily;
+    if(!correct&&task.errorClass&&Object.prototype.hasOwnProperty.call(q.errors,task.errorClass)) q.errors[task.errorClass]+=1;
     if(!correct&&!task.retry) ui.kaoQueue.push(Object.assign({},ui.kaoQueue[ui.kaoTaskIndex],{id:task.id+':retry',retry:true,isNew:false}));
     ui.kaoFeedback=correct?'Doğru':'Doğru cevap: '+task.answer; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime();
     quranLearnDeps.save(); paintTask(); startTaskPresentation();
@@ -520,6 +588,7 @@
     var q=ensureQuranLearn(quranLearnDeps.data());
     if(undo.hadCard) q.cards[undo.cardId]=cloneValue(undo.card); else delete q.cards[undo.cardId];
     if(undo.hadDaily) q.daily[undo.dailyKey]=cloneValue(undo.daily); else delete q.daily[undo.dailyKey];
+    if(undo.errors) q.errors=cloneValue(undo.errors);
     ui.kaoQueue=cloneValue(undo.queue); ui.kaoTaskIndex=undo.taskIndex; ui.kaoTaskStartedAt=Date.now(); ui.kaoUndo=null; ui.kaoFeedback='Geri alındı';
     quranLearnDeps.save(); paintTask(); return true;
   }
@@ -693,6 +762,8 @@
     kaoBuildQueue:kaoBuildQueue,
     kaoPickDistractors:kaoPickDistractors,
     kaoBuildTask:kaoBuildTask,
+    kaoGrammarCandidates:grammarCandidates,
+    kaoBuildGrammarTask:kaoBuildGrammarTask,
     kaoShouldAutoplay:kaoShouldAutoplay,
     kaoTaskHTML:kaoTaskHTML,
     kaoStart:kaoStart,

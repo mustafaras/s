@@ -9,7 +9,7 @@ const repoRoot = require('../repo-root');
 function loadApi() {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/core/quranLearn.js']) {
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/core/quranLearn.js']) {
     vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
   }
   return sandbox.window.SeymaQuranLearn;
@@ -46,10 +46,10 @@ assert.deepEqual(first, second, 'aynı gün+kart kimlikleri deterministik olmal�
 assert.ok(first.length > 0);
 assert.ok(first.filter((item) => !item.isNew).length <= 60, 'due üst sınırı 60');
 assert.ok(first.filter((item) => item.isNew).length <= 10, 'yeni üst sınırı dailyNew');
-assert.ok(first.filter((item) => item.type === 'grammar').length <= 3, 'gramer üst sınırı 3');
+assert.ok(first.filter((item) => item.type === 'grammar').length <= 4, 'KAO-12 gramer üst sınırı 4');
 assert.ok(first.filter((item) => item.type === 'fragment').length <= 2, 'parça üst sınırı 2');
 for (let i = 2; i < first.length; i += 1) {
-  assert.ok(!(first[i].type === first[i - 1].type && first[i].type === first[i - 2].type), 'aynı tür ardışık en çok 2');
+  assert.ok(first[i].type === 'grammar' || !(first[i].type === first[i - 1].type && first[i].type === first[i - 2].type), 'gramer dışı aynı tür ardışık en çok 2');
 }
 assert.ok(!first.some((item) => item.cardId === 'w:l_aAmana_966a5c:ar>tr') || !first.some((item) => item.cardId === 'w:l_kafara_af1746:ar>tr'), 'aynı semantik kümeden iki yeni kart aynı oturumda olmamalı');
 
@@ -100,4 +100,35 @@ assert.equal(task.cardId, 'target');
 assert.equal(task.choices.filter((choice) => choice.correct).length, 1);
 assert.ok(task.choices.every((choice) => typeof choice.label === 'string' && choice.label));
 
-console.log(`KAO queue: PASS (${first.length} deterministic tasks, budgets/interleave/semantic spacing/task generator)`);
+const grammarCandidates = JSON.parse(JSON.stringify(api.kaoGrammarCandidates()));
+assert.equal(grammarCandidates.length, 4, 'dört gramer türü için birer donmuş şablon seçilmeli');
+const grammarTypes = new Set();
+const errorClasses = new Set();
+for (const candidate of grammarCandidates) {
+  const grammarTask = JSON.parse(JSON.stringify(api.kaoBuildGrammarTask({ id: `fixture:${candidate.id}`, cardId: candidate.id, type: 'grammar', isNew: true }, { quranLearn: { cards: {} } }, { seed: candidate.id })));
+  assert.ok(grammarTask);
+  grammarTypes.add(grammarTask.grammarType);
+  errorClasses.add(grammarTask.errorClass);
+  assert.equal(grammarTask.choices.filter((choice) => choice.correct).length, 1);
+  assert.ok(grammarTask.choices.length >= 3 && grammarTask.choices.length <= 4);
+  assert.ok(grammarTask.prompt && grammarTask.stimulus && grammarTask.answer);
+  if (grammarTask.grammarType === 'Ek çöz') assert.match(grammarTask.answer, /^el \+ /);
+  if (grammarTask.grammarType === 'Kalıp eşle') {
+    assert.match(grammarTask.stimulus, /[\u0600-\u06ff]/);
+    assert.equal(grammarTask.context.length, 3);
+    assert.doesNotMatch(grammarTask.answer, /ism-i|masdar|bab/iu, 'kalıp eşle anlamla eşleştirmeli');
+  }
+}
+assert.deepEqual([...grammarTypes].sort(), ['Ek çöz', 'Kalıp eşle', 'Kök bul', 'Çekim tablosu'].sort());
+assert.deepEqual([...errorClasses].sort(), ['affix', 'root', 'rule']);
+
+const grammarQueue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew: 10 }, cards: {} } }, now, { candidates: grammarCandidates, sessionId: 'grammar-four' });
+assert.equal(grammarQueue.length, 4, 'dört gramer türü aynı oturuma girmeli');
+assert.deepEqual(new Set(grammarQueue.map((item) => api.kaoBuildGrammarTask(item, { quranLearn: { cards: {} } }, { seed: item.id }).grammarType)), grammarTypes);
+const mixedGrammarQueue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew: 10 }, cards: {} } }, now, {
+  candidates: grammarCandidates.concat(Array.from({ length: 20 }, (_, i) => ({ id: `w:mixed-${i}:ar>tr`, type: 'word', isNew: true, pos: 'N', root: `mixed-root-${i}` }))),
+  sessionId: 'grammar-mixed'
+});
+assert.equal(mixedGrammarQueue.filter((item) => item.type === 'grammar').length, 4, 'karma gerçek oturum dört gramer türünü korumalı');
+
+console.log(`KAO queue: PASS (${first.length} deterministic tasks + 4 grammar types, budgets/interleave/semantic spacing)`);

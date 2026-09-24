@@ -788,7 +788,12 @@
       "deps": [
         "KAO-11"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "scopeNote": "KAO-12'nin dört gramer türünü aynı oturumda gösterme kabulü, KAO-09'daki geçici gramer görev bütçisini 3→4 olarak ilerletir.",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-12/EVIDENCE.json"
     },
     "KAO-13": {
       "title": "E2 parça görevleri + E3 Done + kalibrasyon kaydı",
@@ -1249,7 +1254,8 @@
     "talkersMin": 2
   },
   "evidence": [
-    "kuran-ogreniyorum/evidence/KAO-11/EVIDENCE.json"
+    "kuran-ogreniyorum/evidence/KAO-11/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-12/EVIDENCE.json"
   ],
   "userDecisions": {
     "independentFromIIP": true,
@@ -1389,7 +1395,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-11",
+  "lastCompletedPrompt": "KAO-12",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

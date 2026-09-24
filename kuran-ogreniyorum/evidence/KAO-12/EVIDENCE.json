@@ -1,0 +1,44 @@
+{
+  "card": "KAO-12",
+  "date": "2026-09-24",
+  "status": "PASS",
+  "scope": "E2 gramer görevleri",
+  "source": "window.QuranGrammarV1.templates",
+  "results": {
+    "taskTypes": ["Ek çöz", "Çekim tablosu", "Kök bul", "Kalıp eşle"],
+    "sameSession": true,
+    "grammarBudget": 4,
+    "interaction": "button chips only; no input, textarea, or select",
+    "minimumChipHeightPx": 44,
+    "feedback": "aria-live=polite",
+    "errorClasses": {
+      "Ek çöz": "affix",
+      "Kök bul": "root",
+      "Çekim tablosu": "rule",
+      "Kalıp eşle": "rule"
+    },
+    "undo": "errors snapshot restored with card, daily, and queue"
+  },
+  "checks": [
+    "node --check app/core/quranLearn.js",
+    "node --check tests/kao/test_kao_render.js",
+    "node --check tests/kao/test_kao_queue.js",
+    "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+    "node tests/kao/test_kao_render.js",
+    "node tests/kao/test_kao_queue.js",
+    "node tests/kao/test_kao_requirements.js",
+    "node tests/kao/test_kao_privacy.js",
+    "node .claude/skills/run-seyma/driver.mjs",
+    "node .claude/skills/run-seyma/zikr-harness.mjs",
+    "node tests/app/test_state_rebind_boundary.js",
+    "node tools/shell-inventory.mjs --gate",
+    "git -c core.fsmonitor=false diff --check"
+  ],
+  "boundaries": {
+    "network": "none",
+    "browser": "headless fixtures only",
+    "personalData": "not accessed",
+    "deviceAcceptance": "not_verified",
+    "delivery": "local commit only; no KAO-12 push, merge, tag, or deploy authority"
+  }
+}

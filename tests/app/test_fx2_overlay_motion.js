@@ -128,8 +128,8 @@ group('FX2-16.2 M6 çağrı sayısı en az 10, App/onClick yüzeyi değişmez',
   // IIP-10 / DEC-07: öncü araması TEK dispatcher handler ekledi (App.saygiLens).
   // 718 → 719 artışı tam olarak bu addır; onclick=391 değişmedi.
   // IIP-11: App.saygiReader tek dispatcher handler'ı eklendi; 719 → 720.
-  // KAO-10: üç öğrenme handler'ı ve tek Ayarlar girişi → 723 / 392.
-  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 723 &&
+  // KAO-10: üç öğrenme handler'ı ve tek Ayarlar girişi; KAO-11 dört oturum handler'ı → 727 / 392.
+  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 727 &&
   (combinedSource.match(/onclick=/g) || []).length === 392
 );
 

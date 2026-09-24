@@ -15,6 +15,7 @@ const indexSource = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
 
 const sandbox = { window: {}, Date, Math, Number, String, Object, Array, JSON };
 vm.createContext(sandbox);
+vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranLexiconV1.js' });
 vm.runInContext(source, sandbox, { filename: relative });
 const api = sandbox.window.SeymaQuranLearn;
 
@@ -23,7 +24,7 @@ const quranLearn = {
   milestones: { fatiha: null, namaz: null, half: null, twoThirds: null, eighty: null, shortSurahs: null },
   ayahs: { understood: [] }
 };
-const ui = { kaoOpen: false, kaoView: 'home', kaoReturnFocusId: '' };
+const ui = { kaoOpen: false, kaoView: 'home', kaoReturnFocusId: '', kaoQueue: [], kaoTaskIndex: 0, kaoTaskStartedAt: 0, kaoUndo: null, kaoFeedback: '', kaoAudioFailed: false };
 let rendered = 0;
 assert.equal(api.registerQuranLearn({
   data() { return { quranLearn, settings: { targetBed: '23:00' } }; },
@@ -38,12 +39,16 @@ let focused = '';
 let restored = '';
 let mounted = '';
 let closeBody = null;
+const taskNode = { innerHTML: '', attrs: {}, setAttribute(name, value) { this.attrs[name] = value; }, querySelector() { return null; } };
+const audios = [];
 assert.equal(api.registerQuranLearnSurface({
   lockBody() { locked += 1; }, unlockBody() { unlocked += 1; },
   focusDialog(id) { focused = id; }, activeElementId() { return 'kao-settings-entry'; },
   restoreFocus(id) { restored = id; },
   sheetClose(card, back, body) { assert.equal(card, 'sey-ov-card'); assert.equal(back, 'sey-ov-back'); closeBody = body; },
-  mount(html) { mounted = html; }
+  mount(html) { mounted = html; }, taskElement() { return taskNode; },
+  createAudio(src) { const audio = { src, preload: '', listeners: {}, addEventListener(name, fn) { this.listeners[name] = fn; }, play() { if (this.listeners.playing) this.listeners.playing(); return Promise.resolve(); } }; audios.push(audio); return audio; },
+  isQuietTime() { return false; }, setTimer(fn, ms) { if (ms === 0) fn(); return ms; }, clearTimer() {}
 }), true);
 assert.equal(api.registerCaffeineTargetBed(() => '23:00'), true);
 
@@ -64,11 +69,28 @@ assert.match(html, /Kapsam/i);
 assert.match(html, /anlaş/iu);
 assert.match(html, /10 yeni/);
 assert.match(html, /Gece tekrarı/);
-assert.match(html, /App\.kaoSetView\('session'\)/);
+assert.match(html, /App\.kaoStart\(\)/);
 assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 
+const shiftLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift);
+const otherLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.id !== shiftLemma.id && lemma.pos === shiftLemma.pos && lemma.root !== shiftLemma.root);
+quranLearn.cards[`w:${otherLemma.id}:ar>tr`] = { state: 'review', s: 25, reps: 3 };
+const meaningTask = api.kaoBuildTask({ id: 'meaning-task', cardId: `w:${shiftLemma.id}:ar>tr`, isNew: true }, { quranLearn }, { seed: 'render' });
+const arabicTask = api.kaoBuildTask({ id: 'arabic-task', cardId: `w:${shiftLemma.id}:tr>ar`, isNew: true }, { quranLearn }, { seed: 'render' });
+const meaningHtml = api.kaoTaskHTML(meaningTask);
+const arabicHtml = api.kaoTaskHTML(arabicTask);
+assert.match(meaningHtml, /Anlamı seç/);
+assert.match(meaningHtml, /lang="ar" dir="rtl" data-kao-ar/);
+assert.match(arabicHtml, /Arapçayı seç/);
+assert.match(arabicHtml, /aria-live="polite"/);
+assert.match(arabicHtml, /onpointerdown=.*350/);
+assert.match(arabicHtml, /event\.shiftKey\?'flowing':'measured'/);
+assert.match(arabicHtml, /kao-cognate is-shift/);
+assert.match(arabicHtml, /dikkat/);
+assert.match(arabicHtml, /Türkçede var/);
+
 api.kaoMount(new Date('2026-09-24T22:15:00'));
-assert.equal(mounted, html);
+assert.match(mounted, /id="sey-ov-card"/);
 api.kaoSetView('home');
 assert.equal(ui.kaoView, 'home');
 assert.equal(rendered, 2);
@@ -82,6 +104,7 @@ assert.equal(restored, 'kao-settings-entry');
 assert.match(appSource, /App\.kaoOpen=function\(view\)\{ return window\.SeymaQuranLearn\.kaoOpen\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoClose=function\(\)\{ return window\.SeymaQuranLearn\.kaoClose\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoSetView=function\(v\)\{ return window\.SeymaQuranLearn\.kaoSetView\.apply\(null,arguments\); \};/);
+for (const name of ['kaoStart', 'kaoAnswer', 'kaoUndo', 'kaoPlay']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
 assert.match(settingsSource, /id="kao-settings-entry"[^>]*onclick="App\.kaoOpen\(\)"/);
 assert.match(indexSource, /app\/kao\.css\?v=\d{8}[a-z]/);
 assert.doesNotMatch(cssSource, /:root\s*\{/);

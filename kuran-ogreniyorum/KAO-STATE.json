@@ -724,6 +724,9 @@
         "tests/kao/test_kao_render.js",
         "tests/kao/test_kao_requirements.js",
         "tests/kao/test_kao_privacy.js",
+        "tests/app/test_fx2_tab_transition.js",
+        "tests/app/test_fx2_overlay_motion.js",
+        "tests/app/test_fx2_touch_coverage.js",
         "kuran-ogreniyorum/evidence/KAO-11/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -733,6 +736,9 @@
         "node tests/kao/test_kao_render.js",
         "node tests/kao/test_kao_requirements.js",
         "node tests/kao/test_kao_privacy.js",
+        "node tests/app/test_fx2_tab_transition.js (App yüzeyi 727, onclick 392)",
+        "node tests/app/test_fx2_overlay_motion.js (App yüzeyi 727, onclick 392)",
+        "node tests/app/test_fx2_touch_coverage.js (App yüzeyi 727, onclick 392)",
         "node .claude/skills/run-seyma/driver.mjs",
         "node .claude/skills/run-seyma/zikr-harness.mjs",
         "node tests/app/test_state_rebind_boundary.js",
@@ -749,7 +755,12 @@
       "deps": [
         "KAO-10"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "scopeNote": "KAO-11 dört yeni App.kao* shim'i eklediği için mevcut FX2 App-yüzeyi pini 723→727 güncellenir; aksi hâlde kardeş regresyon fixture'ı yanlış negatif verir.",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-11/EVIDENCE.json"
     },
     "KAO-12": {
       "title": "E2 gramer görevleri",
@@ -1237,7 +1248,9 @@
     "ayahComprehensionCoverage": 0.95,
     "talkersMin": 2
   },
-  "evidence": [],
+  "evidence": [
+    "kuran-ogreniyorum/evidence/KAO-11/EVIDENCE.json"
+  ],
   "userDecisions": {
     "independentFromIIP": true,
     "entry": "single hub card in İlham & İbadet; content in own overlay",
@@ -1280,7 +1293,7 @@
       "R-A1": "partial",
       "R-A2": "done",
       "R-A3": "partial",
-      "R-A4": "pending",
+      "R-A4": "partial",
       "R-A5": "done",
       "R-A6": "partial",
       "R-A7": "partial",
@@ -1292,13 +1305,13 @@
       "R-B4": "pending",
       "R-B5": "pending",
       "R-B6": "partial",
-      "R-B7": "pending",
-      "R-B8": "pending",
+      "R-B7": "partial",
+      "R-B8": "partial",
       "R-C1": "pending",
       "R-C2": "partial",
-      "R-C3": "pending",
+      "R-C3": "done",
       "R-C4": "pending",
-      "R-C5": "pending",
+      "R-C5": "partial",
       "R-C6": "pending",
       "R-C7": "done",
       "R-C8": "pending",
@@ -1376,7 +1389,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-10",
+  "lastCompletedPrompt": "KAO-11",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

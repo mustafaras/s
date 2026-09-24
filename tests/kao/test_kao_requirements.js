@@ -78,4 +78,60 @@ for (let session = 0; session < 1000; session += 1) {
 }
 assert.equal(neighborViolations, 0, 'R-A5: 1.000 sentetik oturum ihlal 0');
 
-console.log('KAO requirements: PASS (R-A1 night window, R-A2 1000 sessions, R-A5 1000 sessions)');
+const sessionData = { quranLearn: null };
+const sessionUi = { kaoQueue: [], kaoTaskIndex: 0, kaoTaskStartedAt: 0, kaoUndo: null, kaoFeedback: '', kaoAudioFailed: false };
+let saves = 0;
+let fullRenders = 0;
+let quiet = false;
+const sessionApi = loadApi({
+  data() { return sessionData; }, ui() { return sessionUi; }, save() { saves += 1; }, render() { fullRenders += 1; },
+  todayStr() { return '2026-09-24'; }, esc(value) { return String(value); }, icon() { return ''; }, getDay() { return {}; }
+});
+const taskNode = { innerHTML: '', attrs: {}, setAttribute(name, value) { this.attrs[name] = value; }, querySelector() { return null; } };
+assert.equal(sessionApi.registerQuranLearnSurface({
+  lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose(_card, _back, body) { body(); }, mount() {},
+  taskElement() { return taskNode; }, createAudio() { return { addEventListener() {}, play() { return Promise.resolve(); } }; },
+  isQuietTime() { return quiet; }, setTimer(fn, ms) { if (ms === 0) fn(); return ms; }, clearTimer() {}
+}), true);
+sessionApi.ensureQuranLearn(sessionData);
+sessionData.quranLearn.settings.audio = false;
+sessionData.quranLearn.daily['2026-09-24'] = { seed: 'bit-bit korunmalı' };
+assert.ok(sessionApi.kaoStart() >= 2, 'R-A4: iki yönlü ilk kelime oturumu başlamalı');
+assert.equal(fullRenders, 1);
+const directions = new Set(sessionUi.kaoQueue.map((item) => sessionApi.kaoBuildTask(item, sessionData, { seed: item.id }).direction));
+assert.deepEqual([...directions].sort(), ['ar>tr', 'tr>ar'], 'tam oturum iki görev türünü taşımalı');
+const firstItem = sessionUi.kaoQueue[0];
+const firstTask = sessionApi.kaoBuildTask(firstItem, sessionData, { seed: firstItem.id });
+const beforeCard = JSON.stringify(sessionData.quranLearn.cards[firstTask.cardId]);
+const beforeDaily = JSON.stringify(sessionData.quranLearn.daily['2026-09-24']);
+const correctChoice = firstTask.choices.find((choice) => choice.correct);
+const transitionStart = process.hrtime.bigint();
+assert.equal(sessionApi.kaoAnswer(firstTask.id, correctChoice.choiceId).correct, true);
+const transitionMs = Number(process.hrtime.bigint() - transitionStart) / 1e6;
+assert.ok(transitionMs < 50, `R-C5: hedefli geçiş ${transitionMs.toFixed(3)} ms`);
+assert.equal(fullRenders, 1, 'cevap tam render çağırmamalı');
+assert.ok(taskNode.innerHTML.length > 0, '#kao-task alt ağacı yenilenmeli');
+assert.equal(sessionApi.kaoUndo(), true);
+assert.equal(JSON.stringify(sessionData.quranLearn.cards[firstTask.cardId]), beforeCard, 'R-C3: kart bit-bit geri sarılmalı');
+assert.equal(JSON.stringify(sessionData.quranLearn.daily['2026-09-24']), beforeDaily, 'R-C3: günlük kayıt bit-bit geri sarılmalı');
+
+sessionData.quranLearn.settings.audio = true;
+assert.equal(sessionApi.kaoShouldAutoplay(firstTask, sessionData), true, 'R-A4: n<2 yeni kartta otomatik ses');
+sessionData.quranLearn.cards[firstTask.cardId] = { reps: 2 };
+assert.equal(sessionApi.kaoShouldAutoplay(firstTask, sessionData), false, 'n>=2 otomatik ses olmamalı');
+delete sessionData.quranLearn.cards[firstTask.cardId]; quiet = true;
+assert.equal(sessionApi.kaoShouldAutoplay(firstTask, sessionData), false, 'sessiz saatte otomatik ses olmamalı');
+quiet = false; sessionData.quranLearn.settings.audio = false;
+assert.equal(sessionApi.kaoShouldAutoplay(firstTask, sessionData), false, 'ses ayarı kapalıysa otomatik ses olmamalı');
+
+while (sessionUi.kaoTaskIndex < sessionUi.kaoQueue.length) {
+  const item = sessionUi.kaoQueue[sessionUi.kaoTaskIndex];
+  const task = sessionApi.kaoBuildTask(item, sessionData, { seed: item.id });
+  const correct = task.choices.find((choice) => choice.correct);
+  assert.ok(correct);
+  sessionApi.kaoAnswer(task.id, correct.choiceId);
+}
+assert.match(sessionApi.kaoTaskHTML(null), /Oturum tamamlandı/);
+assert.ok(saves >= sessionUi.kaoQueue.length + 1, 'sessiz modda tam oturum kalıcı ilerlemeli');
+
+console.log(`KAO requirements: PASS (R-A1/A2/A4/A5, R-C2/C3/C5; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

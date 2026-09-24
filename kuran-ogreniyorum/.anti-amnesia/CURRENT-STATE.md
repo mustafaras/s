@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 13/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-10 · **blockedPrompt:** — · **Sıradaki:** **KAO-11**
+**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 14/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-11 · **blockedPrompt:** — · **Sıradaki:** **KAO-12**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -24,7 +24,7 @@
 | KAO-08 | FSRS saf JS portu | done | R-A3 |
 | KAO-09 | Kuyruk, görev üretici, çeldirici, gece tekrarı | done | R-A1 R-A2 R-A5 |
 | KAO-10 | Overlay kabuğu + E1 Home + geçici Ayarlar girişi | done | — |
-| KAO-11 | E2 oturum çekirdeği: anlam seç / Arapça seç, ses düğmesi, geri al | pending | R-A4 R-B7 R-B8 R-C2 R-C3 R-C5 |
+| KAO-11 | E2 oturum çekirdeği: anlam seç / Arapça seç, ses düğmesi, geri al | done | R-A4 R-B7 R-B8 R-C2 R-C3 R-C5 |
 | KAO-12 | E2 gramer görevleri | pending | — |
 | KAO-13 | E2 parça görevleri + E3 Done + kalibrasyon kaydı | pending | R-A3 R-A7 R-B4 |
 | KAO-14 | E4 Üniteler + E5 Kelime (üç dokunuş, kök ağacı, bayrak) | pending | R-A8 R-B3 R-B7 R-C1 |
@@ -49,7 +49,7 @@
 | KAO-D6 | Dalga 6 denetimi | pending | — |
 
 ## Gereksinim durumu (12-EK-GEREKSINIMLER)
-R-A1:partial · R-A2:done · R-A3:partial · R-A4:pending · R-A5:done · R-A6:partial · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:partial · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
+R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:partial · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:partial · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 56 | 2026-09-24 | KAO-10 bitti: erişilebilir overlay kabuğu, E1 kapsam/âyet/günlük iş/ünite/kilometre taşı görünümü, gece tekrarı satırı, tek CTA ve geçici Ayarlar girişi bağlandı. KAO-09 gece helper'ı üretim `caffeineTargetBed` resolverına bağlandı. | `evidence/KAO-10/EVIDENCE.json`; render/fx2/driver/zikr/rebind/migration/shell/panel kapıları PASS; App 723, onclick 392 |
+| 59 | 2026-09-24 | KAO-11 bitti: anlam→Arapça ve Arapça→anlam görevleri, dört seçenek, FSRS cevap kaydı, yanlış kartı tek tekrar, yalnız `#kao-task` boyaması, 3 sn bit-bit geri alma, aria-live, aynı-köken/kayma rozeti, dokun/uzun bas/klavye sesleri ve sessiz-saat duyarlı ilk sunum tamamlandı. | `evidence/KAO-11/EVIDENCE.json`; hedefli geçiş 0,480 ms; kart kapıları + tüm FX2 fixture'ları PASS; cihaz kabulü yapılmadı |

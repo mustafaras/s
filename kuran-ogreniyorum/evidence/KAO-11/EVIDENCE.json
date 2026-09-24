@@ -1,0 +1,49 @@
+{
+  "card": "KAO-11",
+  "date": "2026-09-24",
+  "status": "PASS",
+  "scope": "E2 kelime oturum çekirdeği",
+  "results": {
+    "taskDirections": ["ar>tr", "tr>ar"],
+    "targetedUpdate": "#kao-task only; App.kaoAnswer does not call render",
+    "transitionMs": 0.704,
+    "transitionLimitMs": 50,
+    "undoWindowMs": 3000,
+    "undo": "card and daily JSON restored bit-for-bit",
+    "audio": {
+      "preload": "none",
+      "root": "assets/kao/audio/",
+      "manual": "tap/Enter/Space measured; >=350ms hold or Shift+Enter flowing",
+      "autoplay": "new card reps<2 only; disabled by audio setting or quiet time",
+      "failure": "ui.kaoAudioFailed=true; text task continues"
+    },
+    "cognate": "pill; semantic shift uses --quran-warn plus icon and dikkat text",
+    "appSurface": 727,
+    "onclickSurface": 392,
+    "shellLines": 7800
+  },
+  "checks": [
+    "node --check app/core/quranLearn.js",
+    "node --check app.js",
+    "node --check tests/kao/test_kao_render.js",
+    "node --check tests/kao/test_kao_requirements.js",
+    "node --check tests/kao/test_kao_privacy.js",
+    "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+    "node tests/kao/test_kao_render.js",
+    "node tests/kao/test_kao_requirements.js",
+    "node tests/kao/test_kao_privacy.js",
+    "for f in tests/app/test_fx2_*.js; do node $f; done",
+    "node .claude/skills/run-seyma/driver.mjs",
+    "node .claude/skills/run-seyma/zikr-harness.mjs",
+    "node tests/app/test_state_rebind_boundary.js",
+    "node tools/shell-inventory.mjs --gate",
+    "git -c core.fsmonitor=false diff --check"
+  ],
+  "boundaries": {
+    "network": "none",
+    "browser": "headless fixtures only",
+    "personalData": "not accessed",
+    "deviceAcceptance": "not_verified",
+    "delivery": "local commit only; no KAO-11 push, merge, tag, or deploy authority"
+  }
+}

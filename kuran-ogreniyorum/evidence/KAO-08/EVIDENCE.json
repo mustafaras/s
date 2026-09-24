@@ -1,0 +1,68 @@
+{
+  "card": "KAO-08",
+  "head": "4d71eb19bdd22d54974b65b8951b5df5665dddb9",
+  "diffHashBeforeEvidence": "af0baadf96f260e1033663cf6cff59fe305ecc873d5df727242154bd81db4ff2",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "result": {
+    "api": ["kaoSchedule", "kaoGrade"],
+    "algorithm": "FSRS-5.0 as published by ts-fsrs v4.5.2",
+    "weights": 19,
+    "requestRetention": 0.9,
+    "publishedVectors": 24,
+    "tolerance": 0.000001,
+    "moduleLines": 296,
+    "moduleBudgetLines": 800,
+    "moduleSha256": "d8b6d149b1ebc43244c7e26e7bf3899e43240173ec55366e4c4e3590b49b677d",
+    "fixtureSha256": "25c2c3d31c50ea735ebbca3ce96c93f515a787eb192b9fa617a5f2d4b6df9ecf"
+  },
+  "reference": {
+    "repository": "https://github.com/open-spaced-repetition/ts-fsrs",
+    "tag": "v4.5.2",
+    "commit": "cdd9158eedf81f3b962bf63f8d49346fcdccf8e6",
+    "npmPackage": "ts-fsrs@4.5.2",
+    "npmIntegrity": "sha512-7rVB2RxYoAyDbvH9jAoieM+BrvpnA88nZq7kTnoQ0jjkMHtoINZox4XwoIIkP6yHU9WRX4D4LFrP6YKMHdKDhw==",
+    "testPath": "__tests__/FSRSV5.test.ts",
+    "license": "MIT",
+    "licenseCopyright": "Copyright (c) 2024 Open Spaced Repetition",
+    "verification": "npm registry gitHead, remote v4.5.2 tag and fixture commit are identical"
+  },
+  "versionResolution": {
+    "finding": "The plan says FSRS-4.5 with 19 parameters, while the algorithm specification defines FSRS-4.5 with 17 parameters.",
+    "resolution": "The explicit ts-fsrs and 19-parameter constraints resolve to ts-fsrs v4.5.2, whose version constant is v4.5.2 using FSRS-5.0. The port names that exact implementation."
+  },
+  "gradeMapping": {
+    "incorrect": "Again",
+    "correctOver8Seconds": "Hard",
+    "correctDefault": "Good",
+    "correctUnder2_5SecondsAndRepsAtLeast3": "Easy"
+  },
+  "checks": [
+    { "cmd": "node --check app/core/quranLearn.js", "exit": 0, "note": "syntax PASS" },
+    { "cmd": "node --check tests/kao/test_kao_fsrs.js", "exit": 0, "note": "syntax PASS" },
+    { "cmd": "node tests/kao/test_kao_fsrs.js", "exit": 0, "note": "24 published vectors ±1e-6, monotonicity, grade mapping and predictedR PASS" },
+    { "cmd": "node tests/kao/test_kao_boundary.js", "exit": 0, "note": "load purity and registry boundary PASS" },
+    { "cmd": "node tests/kao/test_kao_migration.js", "exit": 0, "note": "migration regression PASS" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "PASS (0 warn)" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0, "note": "no output" }
+  ],
+  "requirements": {
+    "R-A3": "partial: scheduler emits reference-verified predictedR; aggregation and 2/6-week reporting remain assigned to KAO-13 and KAO-20."
+  },
+  "filesTouched": [
+    "app/core/quranLearn.js",
+    "tests/kao/test_kao_fsrs.js",
+    "tests/kao/fixtures/fsrs-vectors.json",
+    "kuran-ogreniyorum/evidence/KAO-08/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-08/HANDOFF.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "KAO-08 is a pure scheduler card and adds no user interface.",
+    "Source and headless fixture evidence is complete; device acceptance is not claimed.",
+    "No push, merge, tag or deploy was performed."
+  ]
+}

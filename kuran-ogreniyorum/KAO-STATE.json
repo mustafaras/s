@@ -644,7 +644,11 @@
       "deps": [
         "KAO-07"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-08/EVIDENCE.json"
     },
     "KAO-09": {
       "title": "Kuyruk, görev üretici, çeldirici, gece tekrarı",
@@ -1267,7 +1271,7 @@
     "status": {
       "R-A1": "pending",
       "R-A2": "pending",
-      "R-A3": "pending",
+      "R-A3": "partial",
       "R-A4": "pending",
       "R-A5": "pending",
       "R-A6": "partial",
@@ -1364,7 +1368,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-07",
+  "lastCompletedPrompt": "KAO-08",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

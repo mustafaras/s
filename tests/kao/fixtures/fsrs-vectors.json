@@ -1,0 +1,647 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "repository": "https://github.com/open-spaced-repetition/ts-fsrs",
+    "tag": "v4.5.2",
+    "commit": "cdd9158eedf81f3b962bf63f8d49346fcdccf8e6",
+    "packageVersion": "4.5.2",
+    "algorithm": "FSRS-5.0 (ts-fsrs v4.5.2)",
+    "license": "MIT",
+    "licensePath": "LICENSE",
+    "testPath": "__tests__/FSRSV5.test.ts",
+    "npmTarball": "ts-fsrs-4.5.2.tgz",
+    "note": "Expected values reproduced from the immutable published package using its published first repeat, ivl_history, and memory state sequences; no hand-authored expected values."
+  },
+  "weights": [
+    0.40255,
+    1.18385,
+    3.173,
+    15.69105,
+    7.1949,
+    0.5345,
+    1.4604,
+    0.0046,
+    1.54575,
+    0.1192,
+    1.01925,
+    1.9395,
+    0.11,
+    0.29605,
+    2.2698,
+    0.2315,
+    2.9898,
+    0.51655,
+    0.6621
+  ],
+  "requestRetention": 0.9,
+  "tolerance": 0.000001,
+  "retrievabilityVectors": [
+    { "sourceVector": "first-1", "nowFrom": "due", "expected": 1 },
+    { "sourceVector": "first-2", "nowFrom": "due", "expected": 1 },
+    { "sourceVector": "first-3", "nowFrom": "due", "expected": 1 },
+    { "sourceVector": "first-4", "nowFrom": "due", "expected": 0.89832125 }
+  ],
+  "count": 24,
+  "vectors": [
+    {
+      "id": "first-1",
+      "sequence": "FSRSV5 first repeat",
+      "card": {
+        "s": 0,
+        "d": 0,
+        "r": null,
+        "due": "2022-12-29T12:30:00.000Z",
+        "reps": 0,
+        "lapses": 0,
+        "state": "new"
+      },
+      "grade": 1,
+      "now": "2022-12-29T12:30:00.000Z",
+      "expected": {
+        "s": 0.40255,
+        "d": 7.1949,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-29T12:31:00.000Z",
+        "interval": 0,
+        "reps": 1,
+        "lapses": 0,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "first-2",
+      "sequence": "FSRSV5 first repeat",
+      "card": {
+        "s": 0,
+        "d": 0,
+        "r": null,
+        "due": "2022-12-29T12:30:00.000Z",
+        "reps": 0,
+        "lapses": 0,
+        "state": "new"
+      },
+      "grade": 2,
+      "now": "2022-12-29T12:30:00.000Z",
+      "expected": {
+        "s": 1.18385,
+        "d": 6.48830527,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-29T12:35:00.000Z",
+        "interval": 0,
+        "reps": 1,
+        "lapses": 0,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "first-3",
+      "sequence": "FSRSV5 first repeat",
+      "card": {
+        "s": 0,
+        "d": 0,
+        "r": null,
+        "due": "2022-12-29T12:30:00.000Z",
+        "reps": 0,
+        "lapses": 0,
+        "state": "new"
+      },
+      "grade": 3,
+      "now": "2022-12-29T12:30:00.000Z",
+      "expected": {
+        "s": 3.173,
+        "d": 5.28243442,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-29T12:40:00.000Z",
+        "interval": 0,
+        "reps": 1,
+        "lapses": 0,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "first-4",
+      "sequence": "FSRSV5 first repeat",
+      "card": {
+        "s": 0,
+        "d": 0,
+        "r": null,
+        "due": "2022-12-29T12:30:00.000Z",
+        "reps": 0,
+        "lapses": 0,
+        "state": "new"
+      },
+      "grade": 4,
+      "now": "2022-12-29T12:30:00.000Z",
+      "expected": {
+        "s": 15.69105,
+        "d": 3.22450159,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2023-01-14T12:30:00.000Z",
+        "interval": 16,
+        "reps": 1,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-1",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 0,
+        "d": 0,
+        "r": null,
+        "due": "2022-12-29T12:30:00.000Z",
+        "reps": 0,
+        "lapses": 0,
+        "state": "new"
+      },
+      "grade": 3,
+      "now": "2022-12-29T12:30:00.000Z",
+      "expected": {
+        "s": 3.173,
+        "d": 5.28243442,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-29T12:40:00.000Z",
+        "interval": 0,
+        "reps": 1,
+        "lapses": 0,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "interval-history-2",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 3.173,
+        "d": 5.28243442,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-29T12:40:00.000Z",
+        "reps": 1,
+        "lapses": 0,
+        "state": "learning"
+      },
+      "grade": 3,
+      "now": "2022-12-29T12:40:00.000Z",
+      "expected": {
+        "s": 4.46685806,
+        "d": 5.27296793,
+        "r": "2022-12-29T12:40:00.000Z",
+        "due": "2023-01-02T12:40:00.000Z",
+        "interval": 4,
+        "reps": 2,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-3",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 4.46685806,
+        "d": 5.27296793,
+        "r": "2022-12-29T12:40:00.000Z",
+        "due": "2023-01-02T12:40:00.000Z",
+        "reps": 2,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2023-01-02T12:40:00.000Z",
+      "expected": {
+        "s": 14.21728391,
+        "d": 5.26354498,
+        "r": "2023-01-02T12:40:00.000Z",
+        "due": "2023-01-16T12:40:00.000Z",
+        "interval": 14,
+        "reps": 3,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-4",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 14.21728391,
+        "d": 5.26354498,
+        "r": "2023-01-02T12:40:00.000Z",
+        "due": "2023-01-16T12:40:00.000Z",
+        "reps": 3,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2023-01-16T12:40:00.000Z",
+      "expected": {
+        "s": 43.7250927,
+        "d": 5.25416538,
+        "r": "2023-01-16T12:40:00.000Z",
+        "due": "2023-03-01T12:40:00.000Z",
+        "interval": 44,
+        "reps": 4,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-5",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 43.7250927,
+        "d": 5.25416538,
+        "r": "2023-01-16T12:40:00.000Z",
+        "due": "2023-03-01T12:40:00.000Z",
+        "reps": 4,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2023-03-01T12:40:00.000Z",
+      "expected": {
+        "s": 124.79655286,
+        "d": 5.24482893,
+        "r": "2023-03-01T12:40:00.000Z",
+        "due": "2023-07-04T12:40:00.000Z",
+        "interval": 125,
+        "reps": 5,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-6",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 124.79655286,
+        "d": 5.24482893,
+        "r": "2023-03-01T12:40:00.000Z",
+        "due": "2023-07-04T12:40:00.000Z",
+        "reps": 5,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2023-07-04T12:40:00.000Z",
+      "expected": {
+        "s": 328.47343304,
+        "d": 5.23553542,
+        "r": "2023-07-04T12:40:00.000Z",
+        "due": "2024-05-27T12:40:00.000Z",
+        "interval": 328,
+        "reps": 6,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-7",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 328.47343304,
+        "d": 5.23553542,
+        "r": "2023-07-04T12:40:00.000Z",
+        "due": "2024-05-27T12:40:00.000Z",
+        "reps": 6,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 1,
+      "now": "2024-05-27T12:40:00.000Z",
+      "expected": {
+        "s": 9.25594883,
+        "d": 6.76539959,
+        "r": "2024-05-27T12:40:00.000Z",
+        "due": "2024-05-27T12:45:00.000Z",
+        "interval": 0,
+        "reps": 7,
+        "lapses": 1,
+        "state": "relearning"
+      }
+    },
+    {
+      "id": "interval-history-8",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 9.25594883,
+        "d": 6.76539959,
+        "r": "2024-05-27T12:40:00.000Z",
+        "due": "2024-05-27T12:45:00.000Z",
+        "reps": 7,
+        "lapses": 1,
+        "state": "relearning"
+      },
+      "grade": 1,
+      "now": "2024-05-27T12:45:00.000Z",
+      "expected": {
+        "s": 4.63749438,
+        "d": 7.79401833,
+        "r": "2024-05-27T12:45:00.000Z",
+        "due": "2024-05-27T12:50:00.000Z",
+        "interval": 0,
+        "reps": 8,
+        "lapses": 1,
+        "state": "relearning"
+      }
+    },
+    {
+      "id": "interval-history-9",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 4.63749438,
+        "d": 7.79401833,
+        "r": "2024-05-27T12:45:00.000Z",
+        "due": "2024-05-27T12:50:00.000Z",
+        "reps": 8,
+        "lapses": 1,
+        "state": "relearning"
+      },
+      "grade": 3,
+      "now": "2024-05-27T12:50:00.000Z",
+      "expected": {
+        "s": 6.5285311,
+        "d": 7.77299855,
+        "r": "2024-05-27T12:50:00.000Z",
+        "due": "2024-06-03T12:50:00.000Z",
+        "interval": 7,
+        "reps": 9,
+        "lapses": 1,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-10",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 6.5285311,
+        "d": 7.77299855,
+        "r": "2024-05-27T12:50:00.000Z",
+        "due": "2024-06-03T12:50:00.000Z",
+        "reps": 9,
+        "lapses": 1,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2024-06-03T12:50:00.000Z",
+      "expected": {
+        "s": 15.55546765,
+        "d": 7.75207546,
+        "r": "2024-06-03T12:50:00.000Z",
+        "due": "2024-06-19T12:50:00.000Z",
+        "interval": 16,
+        "reps": 10,
+        "lapses": 1,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-11",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 15.55546765,
+        "d": 7.75207546,
+        "r": "2024-06-03T12:50:00.000Z",
+        "due": "2024-06-19T12:50:00.000Z",
+        "reps": 10,
+        "lapses": 1,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2024-06-19T12:50:00.000Z",
+      "expected": {
+        "s": 34.36241506,
+        "d": 7.73124862,
+        "r": "2024-06-19T12:50:00.000Z",
+        "due": "2024-07-23T12:50:00.000Z",
+        "interval": 34,
+        "reps": 11,
+        "lapses": 1,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-12",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 34.36241506,
+        "d": 7.73124862,
+        "r": "2024-06-19T12:50:00.000Z",
+        "due": "2024-07-23T12:50:00.000Z",
+        "reps": 11,
+        "lapses": 1,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2024-07-23T12:50:00.000Z",
+      "expected": {
+        "s": 71.10191819,
+        "d": 7.71051758,
+        "r": "2024-07-23T12:50:00.000Z",
+        "due": "2024-10-02T12:50:00.000Z",
+        "interval": 71,
+        "reps": 12,
+        "lapses": 1,
+        "state": "review"
+      }
+    },
+    {
+      "id": "interval-history-13",
+      "sequence": "FSRSV5 ivl_history",
+      "card": {
+        "s": 71.10191819,
+        "d": 7.71051758,
+        "r": "2024-07-23T12:50:00.000Z",
+        "due": "2024-10-02T12:50:00.000Z",
+        "reps": 12,
+        "lapses": 1,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2024-10-02T12:50:00.000Z",
+      "expected": {
+        "s": 141.83400645,
+        "d": 7.68988191,
+        "r": "2024-10-02T12:50:00.000Z",
+        "due": "2025-02-21T12:50:00.000Z",
+        "interval": 142,
+        "reps": 13,
+        "lapses": 1,
+        "state": "review"
+      }
+    },
+    {
+      "id": "memory-state-1",
+      "sequence": "FSRSV5 memory state",
+      "card": {
+        "s": 0,
+        "d": 0,
+        "r": null,
+        "due": "2022-12-29T12:30:00.000Z",
+        "reps": 0,
+        "lapses": 0,
+        "state": "new"
+      },
+      "grade": 1,
+      "now": "2022-12-29T12:30:00.000Z",
+      "expected": {
+        "s": 0.40255,
+        "d": 7.1949,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-29T12:31:00.000Z",
+        "interval": 0,
+        "reps": 1,
+        "lapses": 0,
+        "state": "learning"
+      }
+    },
+    {
+      "id": "memory-state-2",
+      "sequence": "FSRSV5 memory state",
+      "card": {
+        "s": 0.40255,
+        "d": 7.1949,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-29T12:31:00.000Z",
+        "reps": 1,
+        "lapses": 0,
+        "state": "learning"
+      },
+      "grade": 3,
+      "now": "2022-12-29T12:30:00.000Z",
+      "expected": {
+        "s": 0.5666983,
+        "d": 7.17663617,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-30T12:30:00.000Z",
+        "interval": 1,
+        "reps": 2,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "memory-state-3",
+      "sequence": "FSRSV5 memory state",
+      "card": {
+        "s": 0.5666983,
+        "d": 7.17663617,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-30T12:30:00.000Z",
+        "reps": 2,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2022-12-29T12:30:00.000Z",
+      "expected": {
+        "s": 0.5666983,
+        "d": 7.15845635,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-31T12:30:00.000Z",
+        "interval": 2,
+        "reps": 3,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "memory-state-4",
+      "sequence": "FSRSV5 memory state",
+      "card": {
+        "s": 0.5666983,
+        "d": 7.15845635,
+        "r": "2022-12-29T12:30:00.000Z",
+        "due": "2022-12-31T12:30:00.000Z",
+        "reps": 3,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2022-12-30T12:30:00.000Z",
+      "expected": {
+        "s": 2.48961869,
+        "d": 7.14036016,
+        "r": "2022-12-30T12:30:00.000Z",
+        "due": "2023-01-01T12:30:00.000Z",
+        "interval": 2,
+        "reps": 4,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "memory-state-5",
+      "sequence": "FSRSV5 memory state",
+      "card": {
+        "s": 2.48961869,
+        "d": 7.14036016,
+        "r": "2022-12-30T12:30:00.000Z",
+        "due": "2023-01-01T12:30:00.000Z",
+        "reps": 4,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2023-01-02T12:30:00.000Z",
+      "expected": {
+        "s": 7.61251898,
+        "d": 7.12234721,
+        "r": "2023-01-02T12:30:00.000Z",
+        "due": "2023-01-10T12:30:00.000Z",
+        "interval": 8,
+        "reps": 5,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "memory-state-6",
+      "sequence": "FSRSV5 memory state",
+      "card": {
+        "s": 7.61251898,
+        "d": 7.12234721,
+        "r": "2023-01-02T12:30:00.000Z",
+        "due": "2023-01-10T12:30:00.000Z",
+        "reps": 5,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2023-01-10T12:30:00.000Z",
+      "expected": {
+        "s": 19.81012305,
+        "d": 7.10441712,
+        "r": "2023-01-10T12:30:00.000Z",
+        "due": "2023-01-30T12:30:00.000Z",
+        "interval": 20,
+        "reps": 6,
+        "lapses": 0,
+        "state": "review"
+      }
+    },
+    {
+      "id": "memory-state-preview-good",
+      "sequence": "FSRSV5 memory state final preview",
+      "card": {
+        "s": 19.81012305,
+        "d": 7.10441712,
+        "r": "2023-01-10T12:30:00.000Z",
+        "due": "2023-01-30T12:30:00.000Z",
+        "reps": 6,
+        "lapses": 0,
+        "state": "review"
+      },
+      "grade": 3,
+      "now": "2023-01-31T12:30:00.000Z",
+      "expected": {
+        "s": 48.4848186,
+        "d": 7.08656951,
+        "r": "2023-01-31T12:30:00.000Z",
+        "due": "2023-03-20T12:30:00.000Z",
+        "interval": 48,
+        "reps": 7,
+        "lapses": 0,
+        "state": "review"
+      }
+    }
+  ]
+}

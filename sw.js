@@ -5,12 +5,12 @@
  * gösterilen native bildirimler sw.showNotification() üzerinden buradan geçer.
  */
 
-const SW_VERSION = '20260924a';
+const SW_VERSION = '20260924b';
 
 // IIP-22: controlled, public-only offline package. This is deliberately an
 // exact allowlist, not a runtime cache. Personal data, authenticated responses,
 // panel payloads, media and third-party responses can never enter this cache.
-const SW_OFFLINE_VERSION = 'iip22-20260924a';
+const SW_OFFLINE_VERSION = 'iip22-20260924b';
 const SW_OFFLINE_PREFIX = 'seyma-offline-v1-';
 const SW_OFFLINE_CACHE = SW_OFFLINE_PREFIX + SW_OFFLINE_VERSION;
 const SW_OFFLINE_TEMP = SW_OFFLINE_CACHE + '-temp';
@@ -20,7 +20,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './index.html',
   './manifest.json?v=20260730f',
   './app/styles.css?v=20260922a',
-  './app/kao.css?v=20260924b',
+  './app/kao.css?v=20260924c',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',
   './app/content/motivationProgramV2.js?v=20260730p',
@@ -46,7 +46,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/prayer.js?v=20260921f',
   './app/core/zikir.js?v=20260915a',
   './app/core/quran.js?v=20260915a',
-  './app/core/quranLearn.js?v=20260924c',
+  './app/core/quranLearn.js?v=20260924d',
   './app/core/saygi.js?v=20260924a',
   './app/core/motivation.js?v=20260909a',
   './app/core/crisis.js?v=20260909a',

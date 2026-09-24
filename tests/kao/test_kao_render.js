@@ -72,12 +72,18 @@ assert.match(html, /anlaş/iu);
 assert.match(html, /10 yeni/);
 assert.match(html, /Gece tekrarı/);
 assert.match(html, /App\.kaoStart\(\)/);
+assert.match(html, /class="kao-header-mark"[^>]*aria-hidden="true"/);
+assert.match(html, /class="kao-hero-rosette"[^>]*aria-hidden="true"/);
+assert.match(html, /class="kao-time-chip"/);
+assert.match(html, /class="kao-summary-mark"[^>]*aria-hidden="true"/);
 assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 
 const firstHubHtml = api.kaoHubCardHTML();
 assert.match(firstHubHtml, /id="kao-hub-entry"/);
 assert.match(firstHubHtml, /Kur’an Arapçası Öğreniyorum/);
 assert.match(firstHubHtml, /Kelime<\/b>.*Kök<\/b>.*Gramer<\/b>.*Âyet<\/b>/);
+assert.match(firstHubHtml, /class="kao-hub-spine"[^>]*aria-hidden="true"/);
+assert.match(firstHubHtml, /class="kao-hub-ornament"[^>]*aria-hidden="true"/);
 assert.match(firstHubHtml, /İlk oturum hazır/);
 assert.match(firstHubHtml, /onclick="App\.kaoOpen\(\)"[^>]*aria-haspopup="dialog"/);
 const firstLemma = sandbox.window.QuranLexiconV1.lemmas[0];
@@ -147,7 +153,7 @@ assert.doesNotMatch(settingsSource, /kao-settings-entry|App\.kaoOpen\(\)/, 'geç
 assert.match(appSource, /kaoHubCardHTML:function\(\)\{ return window\.SeymaQuranLearn\?window\.SeymaQuranLearn\.kaoHubCardHTML\(\):''; \}/);
 assert.match(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'Kur’an öğrenme kartı Bugün girişlerinde Kur’an Yolculuğu sonrasında olmalı');
 assert.match(indexSource, /app\/kao\.css\?v=\d{8}[a-z]/);
-for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot']) assert.ok(cssSource.includes(selector), selector);
+for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-dialog-frame', '.kao-header-mark', '.kao-hero-rosette', '.kao-time-chip']) assert.ok(cssSource.includes(selector), selector);
 assert.doesNotMatch(cssSource, /:root\s*\{/);
 assert.doesNotMatch(cssSource, /#[0-9a-f]{3,8}\b/i);
 const cssVars = [...cssSource.matchAll(/var\((--[a-z0-9-]+)/gi)].map((match) => match[1]);

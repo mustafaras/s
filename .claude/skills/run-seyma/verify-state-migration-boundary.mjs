@@ -143,7 +143,7 @@ function loadInto(sandbox, files) {
 }
 
 // MON-12/13/17: state + save registry üretimdeki yükleme sırasıyla app.js'ten önce gelir.
-const FILES = ['app/content/motivationProgramV2.js', 'app/content/motivationNarratives.js', 'app/content/saygiPeople.js', 'app/content/profileAssessmentV1.js', 'app/content/hijriCalendar.js', 'app/content/quranRevelationOrderV1.js', 'app/content/quranTransportV1.js', 'app/content/quranStrikingVersesV1.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js', 'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/saygi.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app/core/profile.js', 'app/core/settings.js', 'app/core/mediaFx.js', 'app/core/timeTheme.js', 'app/core/skyFx.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app/core/reminders.js', 'app/core/reminderSurface.js', 'app/core/messaging.js', 'app/core/render.js', 'app/core/appSurface.js', 'panel/panelCoverageManifest.js', 'app.js'];
+const FILES = ['app/content/motivationProgramV2.js', 'app/content/motivationNarratives.js', 'app/content/saygiPeople.js', 'app/content/profileAssessmentV1.js', 'app/content/hijriCalendar.js', 'app/content/quranRevelationOrderV1.js', 'app/content/quranTransportV1.js', 'app/content/quranStrikingVersesV1.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js', 'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/quranLearn.js', 'app/core/saygi.js', 'app/core/motivation.js', 'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js', 'app/core/map.js', 'app/core/profile.js', 'app/core/settings.js', 'app/core/mediaFx.js', 'app/core/timeTheme.js', 'app/core/skyFx.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app/core/reminders.js', 'app/core/reminderSurface.js', 'app/core/messaging.js', 'app/core/render.js', 'app/core/appSurface.js', 'panel/panelCoverageManifest.js', 'app.js'];
 
 function defaultSettings() {
   return {
@@ -370,7 +370,7 @@ console.log('== B2-1 minimal eski kayıt ==');
   ok('minimal fixture boot çökmüyor', !out.error && !!out.data, out.error && out.error.message);
   ok('version 2 korunuyor', out.data && out.data.version === 2);
   ok('settings güvenli varsayılanları backfill ediyor', out.data && out.data.settings.ghRepo === 'mustafaras/seyma-data' && out.data.settings.ghBranch === 'main');
-  ok('zikr/saygi/quran root oluşuyor', out.data && out.data.zikr && out.data.saygi && out.data.quranJourney);
+  ok('zikr/saygi/quran/KAO root oluşuyor', out.data && out.data.zikr && out.data.saygi && out.data.quranJourney && out.data.quranLearn && out.data.quranLearn.schemaVersion === 1);
   ok('bilinmeyen top-level sentinel korunuyor', out.data && out.data.__b2Sentinel.nested.keep === true);
   ok('minimal migration ağ çağrısı yapmıyor', out.counters.fetches === 0);
 }

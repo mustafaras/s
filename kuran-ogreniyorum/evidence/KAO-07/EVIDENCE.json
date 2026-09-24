@@ -1,0 +1,60 @@
+{
+  "card": "KAO-07",
+  "head": "c1ebb5e3ca3517d4b267741c8543d87d9144bd44",
+  "diffHashBeforeEvidence": "f0cec7ce5b89b5e99fabbaa787c42ea1729ddfb8303089acaef5f92d376c8154",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "result": {
+    "registry": "window.SeymaQuranLearn",
+    "schemaVersion": 1,
+    "lexiconVersion": "quran-lexicon-tr-v1",
+    "moduleLines": 129,
+    "moduleBytes": 5376,
+    "moduleBudgetLines": 800,
+    "moduleSha256": "76795a31ee2551379a43d8e25c7df8881f99e2a493884f5ad758fe946c2b83cf",
+    "loadLists": 4,
+    "migrationParityAssertions": 67,
+    "stateRebindAssertions": 37,
+    "zikrAssertions": 95,
+    "shellTotalLines": 7800
+  },
+  "schema": {
+    "roots": ["gate", "settings", "cards", "units", "surahs", "daily", "milestones", "phonics", "errors", "ayahs", "readability"],
+    "properties": ["additive", "idempotent", "unknown fields preserved", "unknown cards retained with orphan:true on lexicon version change", "114-surah synthetic map preserved"]
+  },
+  "scopeRepair": {
+    "finding": "The mandatory verify-state-migration-boundary harness owns a separate fixed boot list but was absent from the original KAO-07 allowlist.",
+    "resolution": "The harness and prompt file were added to the STATE/prompt allowlist, then quranLearn.js was inserted after quran.js in that boot list.",
+    "firstFailure": "KAO-07: SeymaQuranLearn registry kurulamadı",
+    "final": "67 passed, 0 failed"
+  },
+  "releaseReceiptBeforeCard": {
+    "card": "KAO-06",
+    "commit": "c1ebb5e3ca3517d4b267741c8543d87d9144bd44",
+    "pagesRun": 35978035375,
+    "result": "success",
+    "remoteParity": true,
+    "liveAssetHashesMatched": 3
+  },
+  "checks": [
+    { "cmd": "node tests/kao/test_kao_migration.js", "exit": 0, "note": "empty/old/broken/idempotent/orphan/114-surah PASS" },
+    { "cmd": "node tests/kao/test_kao_boundary.js", "exit": 0, "note": "load purity, fail-closed deps, four lists and shims PASS" },
+    { "cmd": "node tests/kao/test_kao_independence.js", "exit": 0, "note": "IIP/state/network/DOM coupling absent" },
+    { "cmd": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs", "exit": 0, "note": "67 passed, 0 failed; old state creates quranLearn" },
+    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "Done" },
+    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95 assertion pass" },
+    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37 passed, 0 failed; B1 ownership and load-order parity" },
+    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "PASS at frozen 7800-line ceiling" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "closure PASS (0 warn)" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0, "note": "no output" }
+  ],
+  "requirements": {
+    "R-C7": "done: s:<surah>:<ayah>:<i> IDs are recognized from packaged content and a synthetic 114-surah map survives migration unchanged."
+  },
+  "userTaskPending": false,
+  "knownLimits": [
+    "KAO-07 establishes schema and migration only; it intentionally adds no user interface.",
+    "Source/headless evidence is complete; device acceptance is not claimed.",
+    "KAO-07 was committed locally only; no push, merge, tag or deploy authority was inferred for this card."
+  ]
+}

@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 9/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-06 · **blockedPrompt:** — · **Sıradaki:** **KAO-07**
+**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 10/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-07 · **blockedPrompt:** — · **Sıradaki:** **KAO-08**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -20,7 +20,7 @@
 | KAO-24 | Ses varlık hattı (alt küme + AAC) | done | R-C2 |
 | KAO-05 | quranLexiconV1.js dondurma + 4 yükleme listesi | done | — |
 | KAO-06 | quranGrammarV1 + quranShortSurahsV1 + quranPhonicsV1 (+prayerTexts) | done | R-A6 R-B2 |
-| KAO-07 | Registry iskeleti + ensureQuranLearn + migrate kancası | pending | R-C7 |
+| KAO-07 | Registry iskeleti + ensureQuranLearn + migrate kancası | done | R-C7 |
 | KAO-08 | FSRS saf JS portu | pending | R-A3 |
 | KAO-09 | Kuyruk, görev üretici, çeldirici, gece tekrarı | pending | R-A1 R-A2 R-A5 |
 | KAO-10 | Overlay kabuğu + E1 Home + geçici Ayarlar girişi | pending | — |
@@ -49,7 +49,7 @@
 | KAO-D6 | Dalga 6 denetimi | pending | — |
 
 ## Gereksinim durumu (12-EK-GEREKSINIMLER)
-R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:partial · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:partial · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:pending · R-C8:pending · R-C9:pending
+R-A1:pending · R-A2:pending · R-A3:pending · R-A4:pending · R-A5:pending · R-A6:partial · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:partial · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 46 | 2026-09-24 | KAO-06 bitti: 25 kavram + Ünite 11 grameri, 20 kısa sûrenin 618 kelimesi ve kaynakta bulunan 6 vakıf işareti, 28 harf/12 çift/7 kural fonetik içeriği ile 8 aşamalı namaz metni donduruldu. GAP-07, 190 tamamlayıcı lemma ile yanlış eşleme yapmadan kapandı; üretim deterministik. | `evidence/KAO-06/EVIDENCE.json`; modüller 47.442/75.678/9.552 B; kart fixture'ları ve ortak kapılar PASS; push/merge/tag/deploy yapılmadı |
+| 50 | 2026-09-24 | KAO-07 bitti: 129 satırlık `SeymaQuranLearn` registry, fail-closed sekizli dep-bag, additive/idempotent v1 şema, sürüm-farkında orphan koruması, state migration kancası ve dört yükleme listesi tamamlandı. R-C7 114 sûre sentetik fixture'ıyla kapandı; donmuş app.js bütçesi yükseltilmeden 7800'de korundu. | `evidence/KAO-07/EVIDENCE.json`; üç KAO fixture PASS; migration 67/67, zikr 95/95, rebind 37/37, shell/plan/diff PASS; KAO-07 yayınlanmadı |

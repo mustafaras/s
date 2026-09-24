@@ -12,10 +12,13 @@
   "releaseApprovalRecord": {
     "by": "user",
     "at": "2026-09-24",
-    "source": "canlıya alalım push commit merge deploy; doğru olan neyse onu yap",
-    "scope": "KAO-05 commitini kuran-ogreniyorum dalına push, main'e fast-forward merge, origin/main push ve GitHub Pages deploy"
+    "source": "canlıya al ve sıradakine gec",
+    "scope": "KAO-06 commitini kuran-ogreniyorum dalına push, main'e fast-forward merge, origin/main push ve GitHub Pages deploy",
+    "commit": "c1ebb5e3ca3517d4b267741c8543d87d9144bd44",
+    "pagesRun": 35978035375,
+    "result": "success"
   },
-  "nextCard": "KAO-07",
+  "nextCard": "KAO-08",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -591,6 +594,8 @@
         "tests/kao/test_kao_migration.js",
         "tests/kao/test_kao_boundary.js",
         "tests/kao/test_kao_independence.js",
+        ".claude/skills/run-seyma/verify-state-migration-boundary.mjs",
+        "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
         "kuran-ogreniyorum/evidence/KAO-07/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -612,7 +617,11 @@
       "deps": [
         "KAO-05"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-07/EVIDENCE.json"
     },
     "KAO-08": {
       "title": "FSRS saf JS portu",
@@ -1279,7 +1288,7 @@
       "R-C4": "pending",
       "R-C5": "pending",
       "R-C6": "pending",
-      "R-C7": "pending",
+      "R-C7": "done",
       "R-C8": "pending",
       "R-C9": "pending"
     }
@@ -1355,7 +1364,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-06",
+  "lastCompletedPrompt": "KAO-07",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

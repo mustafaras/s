@@ -616,6 +616,8 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `tests/kao/test_kao_migration.js`
 - `tests/kao/test_kao_boundary.js`
 - `tests/kao/test_kao_independence.js`
+- `.claude/skills/run-seyma/verify-state-migration-boundary.mjs`
+- `kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md`
 - `kuran-ogreniyorum/evidence/KAO-07/**`
 - `kuran-ogreniyorum/KAO-STATE.json`
 - `kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md`

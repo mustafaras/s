@@ -380,7 +380,7 @@ function normQuranNote(n){ return window.SeymaQuran.normQuranNote.apply(null,arg
 function quranSortNotes(list){ return window.SeymaQuran.quranSortNotes.apply(null,arguments); }
 function quranStatusFromStamps(r){ return window.SeymaQuran.quranStatusFromStamps.apply(null,arguments); }
 function normQuranRequest(r){ return window.SeymaQuran.normQuranRequest.apply(null,arguments); }
-function ensureQuranJourney(d){ return window.SeymaQuran.ensureQuranJourney.apply(null,arguments); }
+function ensureQuranJourney(d){ return window.SeymaQuran.ensureQuranJourney.apply(null,arguments); } function ensureQuranLearn(d){ return window.SeymaQuranLearn.ensureQuranLearn.apply(null,arguments); }
 function quranStatusRank(s){ return window.SeymaQuran.quranStatusRank.apply(null,arguments); }
 function quranNewRequest(){ return window.SeymaQuran.quranNewRequest.apply(null,arguments); }
 function quranCanRequest(r){ return window.SeymaQuran.quranCanRequest.apply(null,arguments); }
@@ -393,7 +393,7 @@ function quranResponseForSurah(rs,sid,req){ return window.SeymaQuran.quranRespon
 function quranApplyRemoteUpdates(delivery,responses){ return window.SeymaQuran.quranApplyRemoteUpdates.apply(null,arguments); }
 function quranRandomVerseStart(){ return window.SeymaQuran.quranRandomVerseStart.apply(null,arguments); }
 if(!window.SeymaQuran||typeof window.SeymaQuran.registerQuran!=='function') throw new Error('MON-22: SeymaQuran registry kurulamadı');
-if(!window.SeymaQuran.registerQuran({data:function(){ return data; }})) throw new Error('MON-22: SeymaQuran registry kurulamadı');
+if(!window.SeymaQuran.registerQuran({data:function(){ return data; }})) throw new Error('MON-22: SeymaQuran registry kurulamadı'); if(!window.SeymaQuranLearn||typeof window.SeymaQuranLearn.registerQuranLearn!=='function') throw new Error('KAO-07: SeymaQuranLearn registry kurulamadı'); if(!window.SeymaQuranLearn.registerQuranLearn({data:function(){ return data; },ui:function(){ return ui; },save:save,render:render,todayStr:todayStr,esc:esc,icon:icon,getDay:getDay})) throw new Error('KAO-07: SeymaQuranLearn registry kurulamadı');
 // MON2-06: quran alan gövdeleri app/core/quran.js registry'sindedir.
 if(!window.SeymaQuran||typeof window.SeymaQuran.registerQuranSurface!=='function') throw new Error('MON2-06: SeymaQuran yüzey kaydı kurulamadı');
 if(!window.SeymaQuran.registerQuranSurface({
@@ -2162,7 +2162,7 @@ if(!window.SeymaState||typeof window.SeymaState.registerMigrate!=='function'||!w
   migrateZikrV2:migrateZikrV2,
   ensureSaygiDay:ensureSaygiDay,
   emptySaygiRoot:emptySaygiRoot,
-  ensureQuranJourney:ensureQuranJourney,
+  ensureQuranJourney:ensureQuranJourney,ensureQuranLearn:ensureQuranLearn,
   emptyLibrary:emptyLibrary,
   normBook:normBook,
   emptyWatchlist:emptyWatchlist,

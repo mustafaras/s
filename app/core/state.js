@@ -27,7 +27,7 @@
   var migrateDeps = null;
   var MIGRATE_DEPENDENCIES = [
     'migrateReminderState', 'normalizeSyncReceipt', 'ensureEventLog',
-    'emptyZikrRoot', 'migrateZikrV2', 'ensureSaygiDay', 'emptySaygiRoot', 'ensureQuranJourney',
+    'emptyZikrRoot', 'migrateZikrV2', 'ensureSaygiDay', 'emptySaygiRoot', 'ensureQuranJourney', 'ensureQuranLearn',
     'emptyLibrary', 'normBook', 'emptyWatchlist', 'normTitle', 'emptyMusic',
     'normTrack', 'emptySoulArchive', 'normSoulItem', 'backfillArchivesFromDays',
     'todayStr', 'syncDerivedHabits', 'ensureProfileAssessment',
@@ -56,6 +56,7 @@
     var ensureSaygiDay=dep.ensureSaygiDay;
     var emptySaygiRoot=dep.emptySaygiRoot;
     var ensureQuranJourney=dep.ensureQuranJourney;
+    var ensureQuranLearn=dep.ensureQuranLearn;
     var emptyLibrary=dep.emptyLibrary;
     var normBook=dep.normBook;
     var emptyWatchlist=dep.emptyWatchlist;
@@ -152,6 +153,7 @@
     if(!d.saygi||typeof d.saygi!=='object') d.saygi=emptySaygiRoot();
     // Raşit ile Kur’an Yolculuğu (QY-02): V1 şema backfill — additive ve idempotent.
     try{ ensureQuranJourney(d); }catch(e){ try{ console.warn('[Kur’an] migration uygulanamadı',e); }catch(_e){} }
+    try{ ensureQuranLearn(d); }catch(e){ try{ console.warn('[KAO] migration uygulanamadı',e); }catch(_e){} }
     if(!d.library||typeof d.library!=='object') d.library=emptyLibrary();
     if(!Array.isArray(d.library.books)) d.library.books=[];
     if(!d.library.goal||typeof d.library.goal!=='object') d.library.goal={dailyPages:20,yearlyBooks:null};

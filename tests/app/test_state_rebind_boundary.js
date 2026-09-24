@@ -41,6 +41,7 @@ const FILES = [
   'app/core/prayer.js',
   'app/core/zikir.js',
   'app/core/quran.js',
+  'app/core/quranLearn.js',
   'app/core/saygi.js',
   'app/core/motivation.js',
   'app/core/crisis.js',

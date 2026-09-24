@@ -708,7 +708,11 @@
       "deps": [
         "KAO-09"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-10/EVIDENCE.json"
     },
     "KAO-11": {
       "title": "E2 oturum çekirdeği: anlam seç / Arapça seç, ses düğmesi, geri al",
@@ -1372,7 +1376,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-09",
+  "lastCompletedPrompt": "KAO-10",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

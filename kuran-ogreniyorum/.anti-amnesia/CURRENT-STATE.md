@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 12/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-09 · **blockedPrompt:** — · **Sıradaki:** **KAO-10**
+**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 13/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-10 · **blockedPrompt:** — · **Sıradaki:** **KAO-11**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -23,7 +23,7 @@
 | KAO-07 | Registry iskeleti + ensureQuranLearn + migrate kancası | done | R-C7 |
 | KAO-08 | FSRS saf JS portu | done | R-A3 |
 | KAO-09 | Kuyruk, görev üretici, çeldirici, gece tekrarı | done | R-A1 R-A2 R-A5 |
-| KAO-10 | Overlay kabuğu + E1 Home + geçici Ayarlar girişi | pending | — |
+| KAO-10 | Overlay kabuğu + E1 Home + geçici Ayarlar girişi | done | — |
 | KAO-11 | E2 oturum çekirdeği: anlam seç / Arapça seç, ses düğmesi, geri al | pending | R-A4 R-B7 R-B8 R-C2 R-C3 R-C5 |
 | KAO-12 | E2 gramer görevleri | pending | — |
 | KAO-13 | E2 parça görevleri + E3 Done + kalibrasyon kaydı | pending | R-A3 R-A7 R-B4 |
@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:pending · R-A5:done · R-A6:partial · R-A7:partial · R-A8:partial · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:pending · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:pending · R-B8:pending · R-C1:pending · R-C2:partial · R-C3:pending · R-C4:pending · R-C5:pending · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 54 | 2026-09-24 | KAO-09 bitti: gün+kart kimlikli xorshift kuyruk, due/yeni/gramer/parça bütçeleri, ≤2 tür serpiştirme, güvenli çeldirici, görev üretici, 12 küme+aynı-kök komşu ayrımı ve 90 dk gece penceresi tamamlandı. | iki fixture PASS; R-A2 1.000/0, R-A5 1.000/0; driver/zikr/migration/rebind/shell PASS; `evidence/KAO-09/EVIDENCE.json` |
+| 56 | 2026-09-24 | KAO-10 bitti: erişilebilir overlay kabuğu, E1 kapsam/âyet/günlük iş/ünite/kilometre taşı görünümü, gece tekrarı satırı, tek CTA ve geçici Ayarlar girişi bağlandı. KAO-09 gece helper'ı üretim `caffeineTargetBed` resolverına bağlandı. | `evidence/KAO-10/EVIDENCE.json`; render/fx2/driver/zikr/rebind/migration/shell/panel kapıları PASS; App 723, onclick 392 |

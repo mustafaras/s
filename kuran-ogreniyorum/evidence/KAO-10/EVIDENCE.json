@@ -1,0 +1,60 @@
+{
+  "card": "KAO-10",
+  "head": "140bccd6ed8f6f118b98ebacf02e61cad6e5fd5d",
+  "diffHashBeforeEvidence": "a9c768f429720881a9c837d3042bad43a2f651e90421f6a465e540176854b5aa",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "result": {
+    "overlay": "#sey-ov-back + #sey-ov-card, shared modal keyboard contract",
+    "views": ["home"],
+    "handlers": ["App.kaoOpen", "App.kaoClose", "App.kaoSetView"],
+    "focusReturn": true,
+    "bodyScrollLock": true,
+    "sheetClose": true,
+    "homeMetrics": ["coveragePercent", "understoodAyahCount", "dueReviews", "dailyNew", "estimatedMinutes", "unit", "milestone", "nightReview"],
+    "settingsEntry": true,
+    "cssTokenFamilies": ["--quran*", "--faith*", "--f-*", "--dur-*"],
+    "appSurfaceHandlers": 723,
+    "onclickPin": 392,
+    "appShellLines": 7800
+  },
+  "checks": [
+    { "cmd": "node --check app.js && node --check sync.js && node --check app/core/quranLearn.js && node --check app/core/settings.js && node --check tests/kao/test_kao_render.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_render.js", "exit": 0, "note": "dialog/aria, E1, Tab/Shift+Tab/Escape, focus return, CSS/settings wiring PASS" },
+    { "cmd": "for f in tests/app/test_fx2_*.js; do node $f; done", "exit": 0, "note": "all six FX2 fixtures PASS; pins 723/392" },
+    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "onboarding/seeded boot, light-dark interaction and reminder smoke PASS" },
+    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95 PASS" },
+    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37/37 PASS" },
+    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "7800-line frozen shell budget PASS" },
+    { "cmd": "node tests/kao/test_kao_boundary.js && node tests/kao/test_kao_migration.js && node tests/kao/test_kao_fsrs.js && node tests/kao/test_kao_queue.js && node tests/kao/test_kao_requirements.js", "exit": 0, "note": "KAO boundary/migration/24 FSRS vectors/queue/requirements PASS" },
+    { "cmd": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs", "exit": 0, "note": "67/67 PASS" },
+    { "cmd": "for f in tests/panel/test_*.js tests/panel-v2/test_*.js; do node $f; done", "exit": 0, "note": "current and Panel-v2 headless suites PASS" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "PASS (0 warn)" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0, "note": "no output" }
+  ],
+  "requirements": {
+    "R-A1": "partial: production bedtime resolver and E1 night-review presentation are complete; KAO-20 calibration/acceptance remains the closing owner."
+  },
+  "filesTouched": [
+    "app/core/quranLearn.js",
+    "app/kao.css",
+    "app.js",
+    "app/core/settings.js",
+    "index.html",
+    "tests/kao/test_kao_render.js",
+    "tests/app/test_fx2_overlay_motion.js",
+    "tests/app/test_fx2_tab_transition.js",
+    "tests/app/test_fx2_touch_coverage.js",
+    "kuran-ogreniyorum/evidence/KAO-10/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-10/HANDOFF.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "Source and headless evidence is complete; real-device and assistive-technology acceptance is not claimed.",
+    "R-A1 remains partial until its KAO-20 calibration/acceptance owner runs.",
+    "No tag is authorized or created."
+  ]
+}

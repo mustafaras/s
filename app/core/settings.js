@@ -29,6 +29,7 @@
 function ayarlarHTML(){
   var data=liveData(), ui=liveUi(), themePref=liveTheme();
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
+  h+='<button data-fx="open" type="button" id="kao-settings-entry" class="kao-settings-entry" onclick="App.kaoOpen()" aria-haspopup="dialog"><span aria-hidden="true">'+icon('book-open',19)+'</span><span><strong>Kur’an Arapçası Öğreniyorum</strong><small>Kelimelerini tanı, âyetleri daha yakından anla.</small></span><span aria-hidden="true">'+icon('chevron-right',16)+'</span></button>';
   h+='<button data-fx="open" type="button" id="sey-reminder-settings-entry" class="sey-reminder-settings-entry" onclick="App.openReminderCenter()" aria-haspopup="dialog"><span class="sey-reminder-settings-icon" aria-hidden="true">'+icon('bell-ring',19)+'</span><span class="sey-reminder-settings-copy"><strong>'+esc(reminderCopy('inApp.center.title','Hatırlatmalar ve bildirimler'))+'</strong><small>'+esc(reminderCopy('inApp.center.settingsSubtitle','Günün duraklarını, uygulama içi önizlemeyi ve izin sınırını gör.'))+'</small></span><span class="sey-reminder-settings-action">'+esc(reminderCopy('inApp.actions.open','Aç'))+' '+icon('chevron-right',15)+'</span></button>';
   // ── Veri & senkron özeti (teknik detay) ──
   var _dtracked=daysTracked(), _totalTicks=0,_dayRecs=0;

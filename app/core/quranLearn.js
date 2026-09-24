@@ -59,6 +59,8 @@
   });
   var REQUIRED_DEPS=['data','ui','save','render','todayStr','esc','icon','getDay'];
   var quranLearnDeps=null;
+  var quranLearnSurfaceDeps=null;
+  var caffeineTargetBedResolver=null;
 
   function registerQuranLearn(deps){
     if(quranLearnDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
@@ -66,6 +68,18 @@
       if(typeof deps[REQUIRED_DEPS[i]]!=='function') return false;
     }
     quranLearnDeps=deps;
+    return true;
+  }
+  function registerQuranLearnSurface(deps){
+    var required=['lockBody','unlockBody','focusDialog','activeElementId','restoreFocus','sheetClose','mount'];
+    if(quranLearnSurfaceDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
+    for(var i=0;i<required.length;i+=1) if(typeof deps[required[i]]!=='function') return false;
+    quranLearnSurfaceDeps=deps;
+    return true;
+  }
+  function registerCaffeineTargetBed(resolver){
+    if(caffeineTargetBedResolver||typeof resolver!=='function') return false;
+    caffeineTargetBedResolver=resolver;
     return true;
   }
 
@@ -356,14 +370,84 @@
   }
   function kaoNightWindow(d,nowValue){
     if(!d||!d.settings||typeof d.settings.targetBed!=='string') return false;
-    if(!quranLearnDeps||typeof quranLearnDeps.caffeineTargetBed!=='function') return false;
+    var resolver=caffeineTargetBedResolver||(quranLearnDeps&&quranLearnDeps.caffeineTargetBed);
+    if(typeof resolver!=='function') return false;
     var target;
-    try{ target=quranLearnDeps.caffeineTargetBed(); }catch(_error){ return false; }
+    try{ target=resolver(); }catch(_error){ return false; }
     var bed=minuteOfDay(target),now=validDate(nowValue,'now');
     if(bed==null) return false;
     var current=now.getHours()*60+now.getMinutes(),until=(bed-current+1440)%1440;
     if(until>90) return false;
     return {active:true,targetBed:target,startsAt:minuteLabel(bed-90),durationMinutes:3,maxCards:8,reviewOnly:true};
+  }
+  function kaoTodayStats(d,nowValue){
+    var now=validDate(nowValue,'now'),q=ensureQuranLearn(d),cards=objectOr(q&&q.cards,{}),ids=Object.keys(cards);
+    var due=0,known=Object.create(null);
+    ids.forEach(function(id){
+      var card=cards[id]||{},date=new Date(card.due||0),lemma=lemmaIdForCard(id);
+      if(card.orphan!==true&&!(/^new$/.test(card.state||card.st))&&isFinite(date.getTime())&&date.getTime()<=now.getTime()) due+=1;
+      if(lemma&&(card.state==='review'||card.st==='review'||nonNegativeNumber(card.reps,0)>0)) known[lemma]=1;
+    });
+    var fresh=Math.max(0,Math.floor(nonNegativeNumber(q.settings&&q.settings.dailyNew,10)));
+    return {due:Math.min(due,60),fresh:fresh,minutes:Math.max(1,Math.ceil((Math.min(due,60)+fresh)*0.55)),known:Object.keys(known).length};
+  }
+  function kaoMilestoneLabel(q){
+    var labels={fatiha:'Fâtiha’yı anlıyorum',namaz:'Namazda ne dediğimi anlıyorum',half:'Kelimelerin yarısı tanıdık',twoThirds:'Üçte iki kapsam',eighty:'%80 kapsam',shortSurahs:'Kısa sûreler tamam'};
+    var keys=['shortSurahs','eighty','twoThirds','half','namaz','fatiha'];
+    for(var i=0;i<keys.length;i+=1) if(q.milestones&&q.milestones[keys[i]]) return labels[keys[i]];
+    return 'İlk kilometre taşı: Fâtiha';
+  }
+  function kaoUnitLabel(q){
+    var ids=Object.keys(objectOr(q.units,{})).sort(),id=ids[0],unit=id&&q.units[id];
+    if(!unit||typeof unit!=='object') return 'Ünite 1 · Kur’an’a giriş';
+    return String(unit.title||unit.label||('Ünite '+String(unit.order||1)));
+  }
+  function kaoHomeHTML(nowValue){
+    if(!quranLearnDeps) return '';
+    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),now=nowValue?validDate(nowValue,'now'):new Date();
+    var stats=kaoTodayStats(d,now),understood=(q.ayahs&&Array.isArray(q.ayahs.understood))?q.ayahs.understood.length:0;
+    var percent=Math.min(100,Math.round(stats.known/524*100)),night=kaoNightWindow(d,now),esc=quranLearnDeps.esc,icon=quranLearnDeps.icon;
+    var h='<main class="kao-home" aria-labelledby="kao-title">';
+    h+='<section class="kao-hero"><p class="kao-eyebrow">Kapsam</p><div class="kao-coverage"><strong>'+percent+'%</strong><span>Kur’an kelimelerinin %'+percent+' kadarını tanıyorsun</span></div><div class="kao-progress" role="progressbar" aria-label="Kur’an kelime kapsamı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent+'"><span style="width:'+percent+'%"></span></div><p class="kao-ayah-count">Anlaşılan âyet sayısı: '+understood+'</p></section>';
+    h+='<section class="kao-today"><p class="kao-eyebrow">Bugün</p><h2>'+stats.due+' tekrar · '+stats.fresh+' yeni · ~'+stats.minutes+' dk</h2>';
+    if(night) h+='<p class="kao-night">'+icon('moon',15)+' Gece tekrarı açık · '+night.durationMinutes+' dk, en fazla '+night.maxCards+' tekrar</p>';
+    h+='<button type="button" class="kao-primary" onclick="App.kaoSetView(\'session\')">Bugünkü oturuma başla '+icon('arrow-right',16)+'</button></section>';
+    h+='<section class="kao-summary"><div><p class="kao-eyebrow">Sıradaki ünite</p><h2>'+esc(kaoUnitLabel(q))+'</h2></div><p class="kao-milestone">'+icon('flag',15)+' '+esc(kaoMilestoneLabel(q))+'</p></section></main>';
+    return h;
+  }
+  function kaoOverlayHTML(nowValue){
+    if(!quranLearnDeps) return '';
+    var ui=quranLearnDeps.ui(),icon=quranLearnDeps.icon;
+    var body=(ui.kaoView||'home')==='home'?kaoHomeHTML(nowValue):'<main class="kao-home"><section class="kao-summary"><h2>Bu bölüm sıradaki kartta açılacak.</h2></section></main>';
+    return '<div id="sey-ov-back" class="kao-overlay" onclick="App.kaoClose()"><div id="sey-ov-card" class="kao-dialog" role="dialog" aria-modal="true" aria-labelledby="kao-title" tabindex="-1" onkeydown="App.onModalKeydown(event,App.kaoClose)" onclick="event.stopPropagation()"><header class="kao-header"><button type="button" class="kao-close" onclick="App.kaoClose()" aria-label="Kur’an Arapçası penceresini kapat">'+icon('x',18)+'</button><div><p>Kur’an Arapçası</p><h1 id="kao-title">Kelimelerini tanı, âyetleri anla</h1></div></header><div id="sey-ov-body" class="kao-body scroll">'+body+'</div></div></div>';
+  }
+  function kaoMount(nowValue){
+    if(!quranLearnDeps||!quranLearnSurfaceDeps||!quranLearnDeps.ui().kaoOpen) return false;
+    quranLearnSurfaceDeps.mount(kaoOverlayHTML(nowValue));
+    return true;
+  }
+  function kaoOpen(view){
+    if(!quranLearnDeps||!quranLearnSurfaceDeps) return false;
+    var ui=quranLearnDeps.ui();
+    ui.kaoReturnFocusId=quranLearnSurfaceDeps.activeElementId()||'';
+    ui.kaoOpen=true; ui.kaoView=typeof view==='string'&&view?view:'home';
+    quranLearnSurfaceDeps.lockBody(); quranLearnDeps.render(); quranLearnSurfaceDeps.focusDialog('sey-ov-card');
+    return true;
+  }
+  function kaoClose(){
+    if(!quranLearnDeps||!quranLearnSurfaceDeps) return false;
+    var body=function(){
+      var ui=quranLearnDeps.ui(),returnId=ui.kaoReturnFocusId||'';
+      quranLearnSurfaceDeps.unlockBody(); ui.kaoOpen=false; ui.kaoView='home'; ui.kaoReturnFocusId='';
+      quranLearnDeps.render(); if(returnId) quranLearnSurfaceDeps.restoreFocus(returnId);
+    };
+    quranLearnSurfaceDeps.sheetClose('sey-ov-card','sey-ov-back',body);
+    return true;
+  }
+  function kaoSetView(view){
+    if(!quranLearnDeps) return false;
+    quranLearnDeps.ui().kaoView=typeof view==='string'&&view?view:'home'; quranLearnDeps.render();
+    return true;
   }
   function emptyQuranLearn(){
     return {
@@ -467,6 +551,8 @@
     fsrsWeights:FSRS_WEIGHTS.slice(),
     fsrsRequestRetention:FSRS_RETENTION,
     registerQuranLearn:registerQuranLearn,
+    registerQuranLearnSurface:registerQuranLearnSurface,
+    registerCaffeineTargetBed:registerCaffeineTargetBed,
     emptyQuranLearn:emptyQuranLearn,
     ensureQuranLearn:ensureQuranLearn,
     kaoGrade:kaoGrade,
@@ -474,6 +560,12 @@
     kaoBuildQueue:kaoBuildQueue,
     kaoPickDistractors:kaoPickDistractors,
     kaoBuildTask:kaoBuildTask,
-    kaoNightWindow:kaoNightWindow
+    kaoNightWindow:kaoNightWindow,
+    kaoHomeHTML:kaoHomeHTML,
+    kaoOverlayHTML:kaoOverlayHTML,
+    kaoMount:kaoMount,
+    kaoOpen:kaoOpen,
+    kaoClose:kaoClose,
+    kaoSetView:kaoSetView
   };
 })();

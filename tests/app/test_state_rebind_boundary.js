@@ -26,6 +26,7 @@ const FILES = [
   'app/content/quranRevelationOrderV1.js',
   'app/content/quranTransportV1.js',
   'app/content/quranStrikingVersesV1.js',
+  'app/content/quranLexiconV1.js',
   'app/content/esmaulHusnaV1.js',
   'app/content/esmaulHusnaV2.js',
   'app/content/zikirCoreContentV1.js',

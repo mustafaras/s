@@ -1,0 +1,59 @@
+{
+  "card": "KAO-05",
+  "head": "62551fc5c1813078ed01e2bd2e29eb6b6ea131a4",
+  "diffHash": "a4211d1188ffffa46ee4fa79c077a0372970b0b718b98e21d19262240fc603f0",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "result": {
+    "version": "quran-lexicon-tr-v1",
+    "lemmas": 524,
+    "moduleBytes": 256327,
+    "budgetBytes": 266240,
+    "frequencySum": 59948,
+    "tokenDenominator": 77430,
+    "coverageRatio": 0.7742,
+    "moduleSha256": "4a46fc44e0291bd89962933f53856fca77a058c2491806ddfe8adc2994e44371",
+    "loadLists": 4
+  },
+  "checks": [
+    { "cmd": "node --check tools/kao-lexicon-build.mjs", "exit": 0, "note": "syntax PASS" },
+    { "cmd": "node --check app/content/quranLexiconV1.js", "exit": 0, "note": "syntax PASS" },
+    { "cmd": "node --check tests/kao/test_kao_lexicon_contract.js", "exit": 0, "note": "syntax PASS" },
+    { "cmd": "node --check tests/kao/test_kao_lexicon_coverage.js", "exit": 0, "note": "syntax PASS" },
+    { "cmd": "node tools/kao-lexicon-build.mjs --self-test", "exit": 0, "note": "50 satırlık hermetik derleyici regresyonu PASS" },
+    { "cmd": "node tools/kao-lexicon-build.mjs --freeze", "exit": 0, "note": "524 lemma, 256327 bayt; art arda iki üretimde aynı SHA-256" },
+    { "cmd": "node tests/kao/test_kao_lexicon_contract.js", "exit": 0, "note": "524 lemma; kimlik/Arapça/hareke/verified/örnek/atıf/boyut/API PASS" },
+    { "cmd": "node tests/kao/test_kao_lexicon_coverage.js", "exit": 0, "note": "59948/77430 = %77,42; seviye bantları PASS" },
+    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "Done." },
+    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95 assertion pass" },
+    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37 passed, 0 failed" },
+    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "PASS; 7603/0/408/57 donmuş bütçe" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "kapanış durumu PASS (0 warn)" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0, "note": "çıktı yok" }
+  ],
+  "requirements": {
+    "note": "KAO-05 kartına atanmış R-id yok; kart sözleşmesi ve iki içerik fixture'ı karşılandı."
+  },
+  "filesTouched": [
+    "tools/kao-lexicon-build.mjs",
+    "app/content/quranLexiconV1.js",
+    "index.html",
+    ".claude/skills/run-seyma/driver.mjs",
+    ".claude/skills/run-seyma/zikr-harness.mjs",
+    "tests/app/test_state_rebind_boundary.js",
+    "tests/kao/test_kao_lexicon_contract.js",
+    "tests/kao/test_kao_lexicon_coverage.js",
+    "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
+    "kuran-ogreniyorum/evidence/KAO-05/**",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "Müfredatın yaklaşık yüzde 80 hedefi resmî 77430 paydasında yüzde 77,42; 74122 LEM etiketli token paydasında yüzde 80,88'dir. Fixture resmî paydayı ve yaklaşık hedef toleransını açıkça raporlar.",
+    "Kaynak/test kanıtı tamamlandı; gerçek cihaz veya üretim kabulü yapılmadı.",
+    "Push, merge, tag ve deploy yapılmadı.",
+    "head başlangıç commitidir; diffHash EVIDENCE/HANDOFF eklenmeden önceki staged KAO-05 farkıdır, çünkü aynı commit kendi nihai hashini içeremez."
+  ]
+}

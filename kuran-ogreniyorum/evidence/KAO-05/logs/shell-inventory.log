@@ -1,0 +1,18 @@
+== app.js kabuk envanteri ==
+toplam satır                              7800
+kod satırı (yorum/boş hariç)              6748
+yorum satırı                               903
+fonksiyon (sütun-0)                       1692
+  shim (≤2 kod satırı)             1437 / 1443
+  küçük (3–10)                       162 / 924
+  büyük (≥11)                        93 / 1915
+App.* handler gövdesi               556 / 1705
+*Legacy fonksiyon                        0 / 0
+*HTML builder (>2 satır)                4 / 57
+var blokları                         286 / 906
+-- reminder ayak izi --
+fonksiyon / kod satırı               355 / 408
+  App.* handler                            126
+  yalnız-iç (shim gerekmez)            69 / 72
+sabit blok / satır                   121 / 289
+shell-inventory --gate PASS {"maxTotalLines":7800,"maxLegacyFunctions":0,"maxReminderFunctionCodeLines":450,"maxHtmlBuilderCodeLines":150,"rule":"DONDURULDU (MON2-08, 2026-09-15). Ölçüm 7.603/0/408/57. Yeni bir program bütçeyi yalnız kendi onayıyla değiştirebilir."}

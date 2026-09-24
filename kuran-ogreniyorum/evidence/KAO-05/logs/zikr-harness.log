@@ -1,0 +1,98 @@
+== İlham & İbadet · Zikirmatik v2 headless test ==
+  ✓ Saygı/İlham sekmesi render ediliyor
+  ✓ Zikir preview kartı render
+  ✓ Beşli hub sekmesi render
+  ✓ Rapor kartı + yıllık ısı haritası render
+  ✓ Koleksiyon kartı numaralı 100 hücreyle render
+  ✓ Koleksiyon hücresi istenen öncünün modalını açar
+  ✓ Okudum eylemi biyografi yüklenirken bile modal altında görünür
+  ✓ Sonraki vakit geri sayım (spirit bar)
+  ✓ App.openZikr overlay render
+  ✓ 99 Esmâ preset kütüphanesi yüklü
+  ✓ Esmâ ebced sayacı geri sayar
+  ✓ zikrTap count artırır
+  ✓ zikrTap 33 kez sonra presetDone + streak
+  ✓ aynı hedef ikinci kez dolunca ikinci set kaydolur
+  ✓ v1 sayımı v2 nesne kaydına dönüşür
+  ✓ zikr v2 migration idempotent
+  ✓ el-Fettâh 489. sayımda ilk turu tamamlar
+  ✓ 489 sınırında geri al turu güvenle geri çeker
+  ✓ el-Fettâh 489² = 239.121 tam hatim sınırı
+  ✓ tamamlanan hatimde dokunma otomatik yeni hatim açmaz
+  ✓ yeni hatim ömürlük toplamı silmez
+  ✓ hızlı 100 sayaç çağrısı tam 100 artar
+  ✓ preset A → B → A ayrı ilerlemeyi korur
+  ✓ reload sayaç ve aktif preseti korur
+  ✓ gün değişince hatim sürer, bugünün sayacı sıfır başlar
+  ✓ kullanıcı hareketi azalt ayarı tam ekrana uygulanır
+  ✓ Zikirmatik koyu temada tam ekran render olur
+  ✓ saygiMarkRead koleksiyonu günceller
+  ✓ saygiStreak okundu günde artar
+  ✓ Kıble hesabı Ankara için doğru azimut ve mesafeyi verir
+  ✓ Kıble metriği gerçek kuzeyi, yön dilimini ve sensör durumunu ayırır
+  ✓ Sonraki vakit hesabı güvenli (spiritBarHTML render ile doğrulandı)
+  ✓ Premium nav ve vakit şeridi Bugün girişlerinden önce render olur
+  ✓ Saygı kartı Zikirmatik ile aynı beş katmanlı büyük-kart dilini kullanır
+  ✓ İman Köşesi kartı Zikirmatik ile aynı beş katmanlı büyük-kart dilini kullanır
+  ✓ Premium nav erişilebilir bölüm adı ve seçili sayfa semantiği taşır
+  ✓ Premium nav ve yeni kartlar en az 44px dokunma hedefi taşır
+  ✓ Yeni hub kartları 389px dar ekran uyarlaması taşır
+  ✓ Premium nav ve yeni kart hareketleri reduced-motion altında kapanır
+  ✓ İbadet kıble aracı bilimsel hesap özetini gösterir
+  ✓ Eski İman Köşesi kıble düğmesi kaldırıldı
+  ✓ Kıble overlay gelişmiş pusula ve yöntem açıklamasıyla render olur
+  ✓ Kıble sensörü tam render yerine hedefli DOM güncellemesi kullanır
+  ✓ Canlı kıble olayı ibreyi güncellerken sayfayı yeniden render etmez
+  ✓ İbadet raporu (haftalık zikir/vakit toplamı)
+  ✓ Hicri takvim modülü yüklü
+  ✓ Hicri ±2 gün kullanıcı ayarı kaydolur
+  ✓ İlham & İbadet koyu tema raporu render
+  ✓ Günün öncüsü modalında sabit Okudum eylemi kod yolu var
+  ✓ Okudum, Zihnimi Besledim türetilmiş tikini günceller
+  ✓ Seçilen öncü başlığı ve biyografisi aynı kalır
+  ✓ Okudum gerçek akışta Zihnimi Besledim tikini yeşillendirir
+  ✓ İleri okunda hem başlık hem içerik birlikte değişir
+  ✓ migrate eski veriye zikr/saygi backfill yapar
+  ✓ Zikirmatik sekme geçişi global #app/overlay kabuğunu yeniden kurmuyor
+  ✓ Zikirmatik sekme geçişi yalnız içerik alanını yerinde boyuyor
+  ✓ Zikirmatik yerel tab boyaması aria-selected durumunu güncelliyor
+  ✓ Eski çekirdek preset kaydı gerçek Arapça ile migrate ediliyor
+  ✓ Esmâ kütüphanesi niyet konularına göre süzülebiliyor
+  ✓ Keşif filtreleri kapalıyken seçimi özetleyen erişilebilir expander render ediliyor
+  ✓ Keşif filtresi expanderı global render olmadan yerinde açılıyor
+  ✓ Premium tezhip sayaç yüzeyi render ediliyor
+  ✓ Minimal Zikirmatik kartı anlamlı durum, özet ve ilerleme sunuyor
+  ✓ Sayaç ve özet kart animasyonları reduced-motion ile güvenle kapanıyor
+  ✓ Esmâ expander seçenekleri yatay kaydırma yerine tam genişlikte alt alta diziliyor
+  ✓ Zikirmatik özet kartı ortak faith cam/blur perdesini kesin olarak geçersiz kılıyor
+  ✓ V3 kayıt additive biçimde V4/V5 tefekkür şemasına taşınıyor
+  ✓ Sayaç altında zikir adına ve güne bağlı gelişmiş tefekkür editörü render ediliyor
+  ✓ Not yazarken global ekran yenilenmiyor ve kelime sayacı yerinde güncelleniyor
+  ✓ Duygu, his, düşünce ve niyet tek günlük zikir kaydında kalıcı saklanıyor
+  ✓ Yalnız not yazılan gün de panel takviminde görünmesi için günlük bağlam oluşturuyor
+  ✓ Aynı gün iki farklı Esmâ için ayrı notlar korunuyor
+  ✓ Zikirmatik Geçmiş sekmesi notları tarih, zikir ve yapılandırılmış alanlarla arşivliyor
+  ✓ Ayarlar ekranındaki yedi anahtarın tamamı gerçek state'i değiştirip kalıcı kaydediyor
+  ✓ Ses ve titreşim açılırken anlık işlev önizlemesi çalışıyor
+  ✓ Ekranı uyanık tut gerçek Wake Lock isteği yapıyor
+  ✓ Hareketi azalt modal sınıfını tam render beklemeden anında güncelliyor
+  ✓ Ayar anahtarları erişilebilir kimlik ve görünür durum mesajı taşıyor
+  ✓ Ayar tıklaması global modalı yenilemeden yalnız ilgili switch ve mesajı güncelliyor
+  ✓ Odak modu ve nefes ritmi sayaç yüzeyinde gerçek davranış sınıflarını etkinleştiriyor
+  ✓ Otomatik sıradaki zikir normal tur hedefinde gerçekten sonraki presete geçiyor
+  ✓ Hatimlerim kartı kategori, Türkçe anlam ve üç ayrıntılı metriği gösteriyor
+  ✓ Devam et yanında görünür Kaldır eylemi var
+  ✓ Kaldır ilk dokunuşta ömürlük toplamı silmeden kart içi onay açıyor
+  ✓ Kaldır onayı hatmi arşivliyor, listeden çıkarıyor ve ömürlük toplamı koruyor
+  ✓ Sıfırla ilk dokunuşta native confirm yerine görünür uygulama içi onay açıyor
+  ✓ Sayaç araçlarında görünür Sıfırla düğmesi var
+  ✓ Sıfırla yalnız bugünkü aktif preset sayımını onaylı biçimde geri alıyor
+  ✓ Geri al, son toplu sıfırlamayı tek dokunuşla eksiksiz geri yüklüyor
+  ✓ Zikirmatik overlay toast geri bildirimi overlay katmanının üstünde görünür
+  ✓ Reminder deep-link tablosu zikir hedefini gerçek bir handler ile taşıyor
+  ✓ Reminder deep-link tablosu Saygı hedefini gerçek bir handler ile taşıyor
+  ✓ Zikir hatırlatmasını açmak zikir sayımını/streak’ini değiştirmiyor
+  ✓ Reminder modülleri zikir harness boot’unda da canlı
+  ✓ Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık
+
+✅ 95/95 assertion pass

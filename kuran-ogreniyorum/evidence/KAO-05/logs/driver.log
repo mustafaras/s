@@ -1,0 +1,42 @@
+== boot: onboarding (no saved data) ==
+PASS  onboarding render produced HTML
+PASS  window.App exposed
+
+== location hard gate ==
+PASS  location gate blocks app before permission
+PASS  location permission success unlocks app
+PASS  denied location keeps the gate closed
+
+== boot: seeded state ==
+PASS  seeded render produced HTML
+PASS  has bottom nav (bugun tab)
+
+== drive: interactions ==
+PASS  App.go("rapor") re-rendered
+PASS  theme toggle re-rendered (dark)
+PASS  header save button exists on rapor
+PASS  header save button marks local changes as dirty
+PASS  header save button confirms device save when repo is not configured
+PASS  automatic sync does not hide manual save reminder
+PASS  manual header sync clears reminder after accepted sync
+PASS  manual header sync shows a visible confirmation
+PASS  header action is labelled as sync, not save
+
+== REM-54: reminder center, ritual surfaces, notification actions ==
+PASS  reminder modules loaded in the same order as index.html
+PASS  Reminder Center overlay renders
+PASS  Reminder Center shows the system status block
+PASS  Reminder Center offers a close control
+PASS  Reminder Center closes back to the app
+PASS  faith corner opens as a reminder deep-link target
+PASS  reading hub opens as a reminder deep-link target
+PASS  every reminder deep-link target names a real handler kind
+PASS  reminder payload classifies to the reminder channel
+PASS  AEON payload still classifies to the aeon channel
+PASS  unknown notification payload is not silently routed
+PASS  delivery module is the live boundary owner (not the inline fallback)
+PASS  reminder and AEON channels stay disjoint
+PASS  reminder background capability is still reported as unsupported
+PASS  reminder in-app path stays available
+
+Done.

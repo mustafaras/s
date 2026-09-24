@@ -1,0 +1,52 @@
+=== MON-15 state rebind / B1 ownership boundary ===
+INFO  app.js data assignment source-lines=9 tokens=11
+INFO  app.js:1908 ×1 var data=null;
+INFO  app.js:2235 ×2 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
+INFO  app.js:2236 ×1 if(data) data=migrate(data);
+INFO  app.js:2554 ×2 function backfillArchivesFromDays(d){ var savedData=data; try{ data=d; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var day=data.days[date]; if(!day||typeof day!=='object') return; if(day.reading&&Array.isArray(day.reading.entries)) day.reading.entries.forEach(syncEntryToLibrary); if(day.watching&&Array.isArray(day.watching.entries)) day.watching.entries.forEach(syncEntryToWatchlist); if(day.listening&&Array.isArray(day.listening.entries)) day.listening.entries.forEach(syncEntryToMusic); if(Array.isArray(day.soulActivities)) day.soulActivities.forEach(syncEntryToSoulArchive); }); }finally{ data=savedData; } }
+INFO  app.js:3026 ×1 function ensureStartData(){ if(!data) data=migrate(createDefaultData()); return data; }
+INFO  app.js:3027 ×1 function ensureAuthData(){ if(!data) data=migrate(createDefaultData()); return data; }
+INFO  app.js:4408 ×1 App.importJson=function(el){ var f=el.files&&el.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(){ try{ var d=JSON.parse(r.result); if(d&&d.version&&d.days&&d.startDate){ data=d; ui.tab='bugun'; commit('Yedek yüklendi'); } else toast('Dosya okunamadı'); }catch(err){ toast('Dosya okunamadı'); } }; r.readAsText(f); el.value=''; };
+INFO  app.js:4412 ×1 App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} reminderRemoveLocalKey(REMINDER_DELIVERY_KEY); reminderRemoveLocalKey(REMINDER_ACTION_KEY); reminderRemoveLocalKey(REMINDER_PERMISSION_STORAGE_KEY); reminderPermissionTransientState=null; reminderPermissionRequestInFlight=null; reminderPermissionEverGranted=null; reminderPermissionGrantObserved=false; data=null; ui.resetStep=0; ui.tab='bugun'; ui.reminderMedicationDraft=null; ui.reminderHistoryUndo=null; ui.reminderAllUndo=null; render(); };
+INFO  app.js:4437 ×1 if(!data) data=migrate(createDefaultData());
+INFO  state.js data assignment source-lines=0
+PASS  index/production FILES load order remains equal
+PASS  app.js has exactly nine data assignment source lines
+PASS  app.js data assignment token inventory is eleven
+PASS  data declaration remains app.js-owned
+PASS  6079 try/finally data swap remains app.js-owned
+PASS  import/reset/location/auth/start data writes remain app.js-owned
+PASS  state registry contains zero data assignment source lines
+PASS  state registry has no data assignment token
+PASS  syncGlue does not own SeyOnSyncState/SeyOnSynced setters
+INFO  setter ownership ui source-lines=1, dark source-lines=3
+PASS  ui initialization remains app.js-owned
+PASS  dark initialization/rebinds remain app.js-owned
+PASS  app B1 getters are getter-only and configurable
+PASS  SeymaState B1 getters are getter-only
+PASS  ui getter returns fresh mutable view state
+PASS  dark getter returns fresh resolved theme value
+PASS  data getter remains the current closure root
+PASS  strict-mode window.data descriptor rejects writes
+PASS  strict-mode window.ui descriptor rejects writes
+PASS  strict-mode window.dark descriptor rejects writes
+PASS  strict-mode window.migrate descriptor rejects writes
+PASS  strict-mode window.getDay descriptor rejects writes
+PASS  strict-mode window.createDefaultData descriptor rejects writes
+PASS  strict-mode window.save descriptor rejects writes
+PASS  strict-mode SeymaState.data write is rejected
+PASS  import rebind produces a fresh current root
+PASS  import rebind is reflected by the live data getter
+PASS  reset rebinds the live data getter to null
+PASS  reset removes only the synthetic localStorage key
+PASS  location late-boot creates current root through app.js
+PASS  location late-boot getter is fresh and not a snapshot
+PASS  auth unlock late-boot creates current root
+PASS  auth unlock late-boot marks live session unlocked
+PASS  auth sandbox hash replacement did not alter production source
+PASS  6079 migrate callback returns the candidate root
+PASS  6079 try/finally restores the original closure root
+PASS  6079 candidate backfill remains isolated from closure root
+PASS  state fixture uses no sync.js and cannot resolve network fetch
+
+MON-15 result: PASS (37 passed, 0 failed)

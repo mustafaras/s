@@ -492,6 +492,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - CLAUDE.md 'Load-order lesson (MON-25)'
 
 **İzinli dosyalar (STATE ile birebir):**
+- `tools/kao-lexicon-build.mjs`
 - `app/content/quranLexiconV1.js`
 - `index.html`
 - `.claude/skills/run-seyma/driver.mjs`
@@ -500,6 +501,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `tests/kao/test_kao_lexicon_contract.js`
 - `tests/kao/test_kao_lexicon_coverage.js`
 - `kuran-ogreniyorum/evidence/KAO-05/**`
+- `kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md`
 - `kuran-ogreniyorum/KAO-STATE.json`
 - `kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md`
 - `kuran-ogreniyorum/.anti-amnesia/LEDGER.md`

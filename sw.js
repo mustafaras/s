@@ -5,12 +5,12 @@
  * gösterilen native bildirimler sw.showNotification() üzerinden buradan geçer.
  */
 
-const SW_VERSION = '20260924c';
+const SW_VERSION = '20260924d';
 
 // IIP-22: controlled, public-only offline package. This is deliberately an
 // exact allowlist, not a runtime cache. Personal data, authenticated responses,
 // panel payloads, media and third-party responses can never enter this cache.
-const SW_OFFLINE_VERSION = 'iip22-20260924c';
+const SW_OFFLINE_VERSION = 'iip22-20260924d';
 const SW_OFFLINE_PREFIX = 'seyma-offline-v1-';
 const SW_OFFLINE_CACHE = SW_OFFLINE_PREFIX + SW_OFFLINE_VERSION;
 const SW_OFFLINE_TEMP = SW_OFFLINE_CACHE + '-temp';
@@ -19,7 +19,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './',
   './index.html',
   './manifest.json?v=20260730f',
-  './app/styles.css?v=20260924a',
+  './app/styles.css?v=20260924b',
   './app/kao.css?v=20260924c',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',
@@ -47,7 +47,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/zikir.js?v=20260915a',
   './app/core/quran.js?v=20260915a',
   './app/core/quranLearn.js?v=20260924d',
-  './app/core/saygi.js?v=20260924b',
+  './app/core/saygi.js?v=20260924c',
   './app/core/motivation.js?v=20260909a',
   './app/core/crisis.js?v=20260909a',
   './app/core/journal.js?v=20260909a',
@@ -155,6 +155,14 @@ async function swMatchOfflineRequest(request) {
     if (response) return response;
   }
   return undefined;
+}
+
+async function swNetworkFirstNavigation(request) {
+  try {
+    const response = await self['fetch'](request);
+    if (response) return response;
+  } catch (error) {}
+  return swMatchOfflineRequest(request);
 }
 
 async function swOfflineStatus() {
@@ -323,6 +331,12 @@ self.addEventListener('activate', function (event) {
 self.addEventListener('fetch', function (event) {
   const key = swOfflineRequestKey(event.request);
   if (!key) return;
+  if (event.request.mode === 'navigate') {
+    // Navigations check the network without writing the response to CacheStorage.
+    // This prevents an installed offline shell from hiding later deployments.
+    event.respondWith(swNetworkFirstNavigation(event.request));
+    return;
+  }
   event.respondWith(swMatchOfflineRequest(event.request).then(function (response) {
     // Exact public allowlist only; the network fallback is never written back.
     return response || self['fetch'](event.request);

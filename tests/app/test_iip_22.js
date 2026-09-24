@@ -162,16 +162,19 @@ function test(name, fn) {
   });
   await test('kalıcı yüzen Offline paneli kaldırılır; güvenli SW kaydı korunur', () => {
     for (const token of ['sey-offline-tools', 'sey-offline-panel', 'Offline araçları', 'Offline paketi kaldır']) assert.ok(!indexSource.includes(token), token);
-    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20260924c'\)/);
+    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20260924d'\)/);
     assert.doesNotMatch(indexSource, /SEYMA_OFFLINE_(?:STATUS|INSTALL|REMOVE)/);
   });
   await test('fetch politikası geniş runtime cache yakalaması yapmaz', () => {
     assert.doesNotMatch(swSource, /cache\.put\s*\([^)]*event\.request/);
     assert.doesNotMatch(swSource, /respondWith\s*\([^;]*(?:fetch\s*\(|\.add\s*\()/);
     assert.match(swSource, /swOfflineRequestKey/);
+    assert.match(swSource, /swNetworkFirstNavigation/);
+    assert.match(swSource, /event\.request\.mode === 'navigate'/);
+    assert.doesNotMatch(swSource, /swNetworkFirstNavigation[\s\S]{0,500}cache\.put/);
   });
   await test('aktif sayaç/not durumu SW güncellemesinden bağımsızdır', () => {
-    const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20260924c')"));
+    const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20260924d')"));
     assert.doesNotMatch(registrationBlock, /location\.reload|skipWaiting/);
     assert.doesNotMatch(indexSource, /controllerchange/);
     assert.doesNotMatch(indexSource, /sey-offline-tools/);

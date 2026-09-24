@@ -872,7 +872,7 @@ function locationGateHTML(){
     var steps=isIOS()?(isStandalonePWA()?'Ayarlar → Şeyma → Konum → “Uygulamayı Kullanırken”':'Safari’de aA → Web Sitesi Ayarları → Konum → İzin Ver'):'Tarayıcı site ayarları → Konum → İzin Ver';
     help='<div style="margin-top:16px;border:1px solid var(--field-bd);background:var(--field);border-radius:16px;padding:12px 13px;text-align:left;"><div style="font-size:var(--f-caption2);letter-spacing:.7px;font-weight:800;color:var(--faint);margin-bottom:5px;">SAFARİ AYARLARI</div><div style="font-size:var(--f-footnote);line-height:1.45;color:var(--text2);">'+esc(steps)+'</div><div style="font-size:var(--f-caption2);line-height:1.45;color:var(--faint);margin-top:5px;">Ayarı değiştirdikten sonra buraya dönüp tekrar dene.</div></div>';
   }
-  var button=busy?'Safari izin ekranı bekleniyor…':state==='checking'?'Konum iznini yeniden doğrula':state==='denied'?'İzin verildi, tekrar dene':state==='unsupported'?'Safari desteğini yeniden kontrol et':'Safari’de konum iznini aç';
+  var button=busy?'İzin ekranı açılmadıysa tekrar dene':state==='checking'?'Konum iznini yeniden doğrula':state==='denied'?'İzin verildi, tekrar dene':state==='unsupported'?'Safari desteğini yeniden kontrol et':'Safari’de konum iznini aç';
   return '<div id="sey-location-gate" data-location-gate-state="'+esc(state)+'" role="dialog" aria-modal="true" aria-labelledby="sey-location-gate-title" tabindex="-1" style="position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;overflow:auto;padding:24px;background:var(--page);color:var(--text);">'
     +'<div style="width:100%;max-width:410px;border:1px solid var(--card-bd);border-radius:28px;padding:26px 22px 22px;background:var(--modal);box-shadow:0 24px 70px rgba(0,0,0,.22);text-align:center;backdrop-filter:blur(18px);">'
       +'<div style="font-size:42px;line-height:1;margin-bottom:13px;">📍</div>'
@@ -882,7 +882,7 @@ function locationGateHTML(){
       +'<div style="margin-top:15px;padding:12px 13px;border-radius:15px;background:color-mix(in srgb,#8FBF8A 14%,var(--modal));border:1px solid color-mix(in srgb,#6FB36A 28%,var(--card-bd));font-size:var(--f-footnote);line-height:1.5;color:var(--text2);text-align:left;">Konum ve hareket ölçümü yalnızca uygulama açıkken yapılır. Safari’nin izin penceresinde <b>İzin Ver</b> seçilmeden devam edilemez.</div>'
       +(state==='denied'||state==='unavailable'||state==='unsupported'?'<div role="alert" style="margin-top:12px;font-size:var(--f-footnote);line-height:1.45;color:#A34F4D;">'+esc(copy)+'</div>':'')
       +help
-      +'<button type="button" onclick="App.requestLocationGatePermission()" '+(busy?'disabled':'')+' style="margin-top:19px;border:none;cursor:'+(busy?'wait':'pointer')+';width:100%;padding:15px 16px;border-radius:16px;font-size:var(--f-subhead);font-weight:850;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);box-shadow:0 10px 24px rgba(111,179,106,.34);">'+esc(button)+'</button>'
+      +'<button type="button" onclick="App.requestLocationGatePermission()" style="margin-top:19px;border:none;cursor:pointer;width:100%;padding:15px 16px;border-radius:16px;font-size:var(--f-subhead);font-weight:850;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);box-shadow:0 10px 24px rgba(111,179,106,.34);">'+esc(button)+'</button>'
       +'<div style="margin-top:12px;font-size:var(--f-caption2);line-height:1.45;color:var(--faint);">Bu izin verilmeden günlük kayıtların ve diğer bölümlerin içeriği açılmaz.</div>'
     +'</div>'
   +'</div>';

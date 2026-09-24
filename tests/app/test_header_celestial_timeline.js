@@ -39,7 +39,7 @@ check('gece kapsülü açık temada korumalı koyu zemin alıyor',
    değiştirdi; index.html sürümü bu commit'te '20260922a'ya çıktı. Pin 'f'de
    kalmıştı (bayat). appSurface 20260921c doğruydu. */
 check('CSS ve appSurface cache sürümleri yükseltildi',
-  html.includes('app/styles.css?v=20260922a') && html.includes('app/core/appSurface.js?v=20260921c'));
+  html.includes('app/styles.css?v=20260922a') && html.includes('app/core/appSurface.js?v=20260924d'));
 
 console.log('Passed: '+passed+' / '+(passed+failed));
 if(failed) process.exit(1);

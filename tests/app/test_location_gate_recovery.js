@@ -20,6 +20,7 @@ const path = require('node:path');
 const ROOT = path.join(__dirname, '..', '..');
 const app = fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8');
 const surface = fs.readFileSync(path.join(ROOT, 'app/core/appSurface.js'), 'utf8');
+const render = fs.readFileSync(path.join(ROOT, 'app/core/render.js'), 'utf8');
 const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
 
 let passed = 0, failed = 0;
@@ -66,11 +67,11 @@ console.log('[2] Kod 2 geçici hatası düşük-hassasiyet denemesiyle telafi ed
   ok('kapıda kod 2 dalı vardır',
     /if\(code===2&&reason==='position-unavailable'/.test(surface));
   ok('kod 2 dalı düşük hassasiyetle yeniden dener',
-    /code===2&&reason==='position-unavailable'[\s\S]{0,700}enableHighAccuracy:false,timeout:25000,maximumAge:600000/.test(surface));
+    /code===2&&reason==='position-unavailable'[\s\S]{0,1200}enableHighAccuracy:false,timeout:25000,maximumAge:600000/.test(surface));
   ok('yeniden deneme HATA gösterip beklemez (erken döner)',
     /code===2&&reason==='position-unavailable'[\s\S]{0,900}render\(\);\s*return;/.test(surface));
   ok('retry hakkı her hata kapanışında YENİLENİR (kalıcı kilit yok)',
-    /function locationGateFailure\(code,reason\)\{[\s\S]{0,400}ui\.locationGateLowAccuracyTried=false;/.test(surface));
+    /function locationGateFailure\(code,reason\)\{[\s\S]*?ui\.locationGateRequestInFlight=false;[\s\S]{0,400}ui\.locationGateLowAccuracyTried=false;[\s\S]*?function heroStatTile/.test(surface));
   // Vakit GPS akışı (kapı dışındaki ikinci yol) aynı telafiyi almalı.
   ok('App.fetchPrayerLocationGPS zaman aşımında yeniden dener',
     /App\.fetchPrayerLocationGPS[\s\S]{0,1200}prayerGpsLowTried/.test(app));
@@ -118,6 +119,28 @@ console.log('[5] Geçici watchPosition hatası konum kapısını yeniden açmaz'
     /function locationWatchFailure\(code,reason\)\{[\s\S]{0,700}ui\.locationGateState='granted'/.test(app));
   ok('watch kod 2/3 konum izlemeyi sessizce sonlandırır',
     /function locationWatchFailure\(code,reason\)\{[\s\S]{0,700}stopLocationWatch\(\)/.test(app));
+}
+
+// ── [6] Safari sessiz-kalma kurtarması ────────────────────────────────────
+console.log('[6] Safari callback üretmezse kullanıcı kapıda kilitlenmez');
+{
+  ok('istek sürerken yeniden deneme düğmesi devre dışı bırakılmaz',
+    !/\+\(busy\?'disabled':' '\)\+/.test(render) &&
+    !/\+\(busy\?'disabled':''\)\+/.test(render));
+  ok('bekleme metni kullanıcıya yeniden deneme yolunu söyler',
+    /busy\?'[^']*[Tt]ekrar dene/.test(render));
+  ok('askıda istek için watchdogdan kısa ayrı retry eşiği vardır',
+    /\bLOCATION_GATE_RETRY_MS=\d+;/.test(app) &&
+    /LOCATION_GATE_RETRY_MS\) return;/.test(app));
+  ok('her açık istek benzersiz nesil numarası taşır',
+    /locationGateRequestSeq=\(ui\.locationGateRequestSeq\|\|0\)\+1/.test(app));
+  ok('başarı ve hata callbackleri yalnız güncel isteği değiştirebilir',
+    /function gateRequestIsCurrent\(\)[\s\S]{0,240}locationGateRequestSeq===requestToken/.test(app) &&
+    /function gateFixOk\(pos\)\{\s*if\(!gateRequestIsCurrent\(\)\) return;/.test(app) &&
+    /function gateFixFail\(err\)\{\s*if\(!gateRequestIsCurrent\(\)\) return;/.test(app));
+  ok('kod 2 yedeği yalnız bir kez çalışır; hak yalnız kapanışta yenilenir',
+    /function locationGateFailure\(code,reason\)\{[\s\S]{0,700}if\(code===2[\s\S]{0,500}ui\.locationGateLowAccuracyTried=true/.test(surface) &&
+    /ui\.locationGateRequestInFlight=false;[\s\S]{0,400}ui\.locationGateLowAccuracyTried=false;/.test(surface));
 }
 
 console.log('\nLocation gate recovery contract: ' + passed + ' PASS, ' + failed + ' FAIL');

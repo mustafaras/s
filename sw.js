@@ -5,12 +5,12 @@
  * gösterilen native bildirimler sw.showNotification() üzerinden buradan geçer.
  */
 
-const SW_VERSION = '20260922a';
+const SW_VERSION = '20260924a';
 
 // IIP-22: controlled, public-only offline package. This is deliberately an
 // exact allowlist, not a runtime cache. Personal data, authenticated responses,
 // panel payloads, media and third-party responses can never enter this cache.
-const SW_OFFLINE_VERSION = 'iip22-20260922a';
+const SW_OFFLINE_VERSION = 'iip22-20260924a';
 const SW_OFFLINE_PREFIX = 'seyma-offline-v1-';
 const SW_OFFLINE_CACHE = SW_OFFLINE_PREFIX + SW_OFFLINE_VERSION;
 const SW_OFFLINE_TEMP = SW_OFFLINE_CACHE + '-temp';
@@ -20,6 +20,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './index.html',
   './manifest.json?v=20260730f',
   './app/styles.css?v=20260922a',
+  './app/kao.css?v=20260924b',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',
   './app/content/motivationProgramV2.js?v=20260730p',
@@ -30,6 +31,10 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/content/quranRevelationOrderV1.js?v=20260730p',
   './app/content/quranTransportV1.js?v=20260730p',
   './app/content/quranStrikingVersesV1.js?v=20260922b',
+  './app/content/quranLexiconV1.js?v=20260924a',
+  './app/content/quranGrammarV1.js?v=20260924b',
+  './app/content/quranShortSurahsV1.js?v=20260924b',
+  './app/content/quranPhonicsV1.js?v=20260924b',
   './app/content/esmaulHusnaV1.js?v=20260730p',
   './app/content/esmaulHusnaV2.js?v=20260730p',
   './app/content/zikirCoreContentV1.js?v=20260730p',
@@ -41,7 +46,8 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/prayer.js?v=20260921f',
   './app/core/zikir.js?v=20260915a',
   './app/core/quran.js?v=20260915a',
-  './app/core/saygi.js?v=20260922b',
+  './app/core/quranLearn.js?v=20260924c',
+  './app/core/saygi.js?v=20260924a',
   './app/core/motivation.js?v=20260909a',
   './app/core/crisis.js?v=20260909a',
   './app/core/journal.js?v=20260909a',
@@ -50,7 +56,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/report.js?v=20260910a',
   './app/core/map.js?v=20260915a',
   './app/core/profile.js?v=20260915a',
-  './app/core/settings.js?v=20260915c',
+  './app/core/settings.js?v=20260924b',
   './app/core/mediaFx.js?v=20260909a',
   './app/core/timeTheme.js?v=20260908a',
   './app/core/skyFx.js?v=20260909a',
@@ -61,9 +67,9 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/reminders.js?v=20260914a',
   './app/core/reminderSurface.js?v=20260914d',
   './app/core/messaging.js?v=20260911a',
-  './app/core/render.js?v=20260915f',
-  './app/core/appSurface.js?v=20260921c',
-  './app.js?v=20260922b',
+  './app/core/render.js?v=20260924a',
+  './app/core/appSurface.js?v=20260924d',
+  './app.js?v=20260924c',
   './sync.js?v=20260922b'
 ]);
 

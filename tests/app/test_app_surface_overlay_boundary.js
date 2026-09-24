@@ -58,6 +58,6 @@ ok('profile consent, permission, transport, send/upload and destructive actions 
 /* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
    gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('production loads appSurface before app.js with fresh cache versions',
-  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260921c/.test(index) && /app\.js\?v=20260924b/.test(index));
+  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260924d/.test(index) && /app\.js\?v=20260924c/.test(index));
 
 console.log('\nMON-52 overlay App surface boundary: ' + passed + '/' + passed + ' passed');

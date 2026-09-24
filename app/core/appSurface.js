@@ -569,10 +569,6 @@ function locationGatePermanentFailure(code,reason){
 }
 
 function locationGateFailure(code,reason){
-  // Geçici hatada retry hakkı YENİLENİR: kapı her kapanışta bir kez daha
-  // düşük-hassasiyetli deneme yapabilmeli; yoksa ikinci hatadan sonra kullanıcı
-  // yalnız elle "tekrar dene"ye mahkûm kalır.
-  ui.locationGateLowAccuracyTried=false;
   // POSITION_UNAVAILABLE (2) genellikle GEÇİCİDİR: konum servisi henüz ısınmadı,
   // GPS kilidi yok (iç mekân) veya OS düzeyinde konum kapalı. Tek seferlik
   // düşük hassasiyetli (ağ/WiFi tabanlı) yeniden deneme çoğu durumda kapıyı açar.
@@ -580,10 +576,15 @@ function locationGateFailure(code,reason){
   // bekleniyordu — "izin verdim ama çalışmıyor" şikâyetinin kaynağı buydu.
   if(code===2&&reason==='position-unavailable'&&!ui.locationGateLowAccuracyTried&&navigator.geolocation){
     ui.locationGateLowAccuracyTried=true;
+    var lowRetryToken=ui.locationGateRequestSeq||0;
     try{
       navigator.geolocation.getCurrentPosition(
-        function(pos){ locationGateGranted(pos,true); },
+        function(pos){
+          if(!ui.locationGateRequestInFlight||ui.locationGateRequestSeq!==lowRetryToken) return;
+          locationGateGranted(pos,true);
+        },
         function(err2){
+          if(!ui.locationGateRequestInFlight||ui.locationGateRequestSeq!==lowRetryToken) return;
           var c2=err2&&Number(err2.code);
           locationGateFailure(c2===1||c2===2||c2===3?c2:0,c2===1?'permission-denied':c2===2?'position-unavailable':c2===3?'timeout':'request-error');
         },
@@ -595,6 +596,10 @@ function locationGateFailure(code,reason){
     }catch(e){}
   }
   ui.locationGateRequestInFlight=false;
+  // Bir sonraki açık kullanıcı denemesi yeniden tek bir düşük-hassasiyet
+  // yedeği kullanabilir. Bu sıfırlama retry dalından SONRA olmalıdır; aksi
+  // hâlde kod 2 her callback'te hakkı yenileyip sonsuz istek döngüsü kurar.
+  ui.locationGateLowAccuracyTried=false;
   ui.locationGateState=reason==='unsupported'?'unsupported':(code===1?'denied':'unavailable');
   ui.locationGateError=locationGateErrorText(code,reason);
   locationGateResetNudge();

@@ -4416,7 +4416,7 @@ function locationGateRequired(){ return !data||!data.settings||data.settings.loc
 // zincirinin tamamını kapsar. Safari, güvensiz bağlamda ya da izin penceresi
 // hiç gösterilmediğinde callback'lerin HİÇBİRİNİ çağırmayabilir; o durumda
 // istek sonsuza kadar "askıda" kalır ve düğme ölür. Gözcü bunu kırar.
-var LOCATION_GATE_WATCHDOG_MS=50000;
+var LOCATION_GATE_WATCHDOG_MS=50000, LOCATION_GATE_RETRY_MS=1500;
 function locationGateErrorText(){ return window.SeymaAppSurface.locationGateErrorText.apply(null,arguments); }
 // TAM-DENETIM B-01: GEÇİCİ hata kalıcı izni DÜŞÜRMEZ.
 // Eskiden burası HER hata kodunda `data.settings.locationEnabled=false` yazıp
@@ -4522,11 +4522,11 @@ App.requestLocationGatePermission=function(){
   // `locationGateRequestInFlight` sonsuza kadar true kalıyor ve her yeni
   // dokunuş bu satırda sessizce geri dönüyordu ("Safari izin ekranı
   // bekleniyor…" ekranında kalıcı kilitlenme).
-  if(ui.locationGateRequestInFlight &&
-     (Date.now()-(ui.locationGateRequestAt||0))<LOCATION_GATE_WATCHDOG_MS) return;
+  if(ui.locationGateRequestInFlight&&(Date.now()-(ui.locationGateRequestAt||0))<LOCATION_GATE_RETRY_MS) return;
   stopLocationWatch();
   ui.locationGateRequestInFlight=true;
   ui.locationGateRequestAt=Date.now();
+  ui.locationGateRequestSeq=(ui.locationGateRequestSeq||0)+1;
   ui.locationGateState='requesting';
   ui.locationGateError='';
   ui.locationGateLowAccuracyTried=false;
@@ -4540,17 +4540,16 @@ App.requestLocationGatePermission=function(){
   if(!navigator.geolocation){ locationGateFailure(0,'unsupported'); return; }
   // Gözcü: zincirin tamamı sessizce ölürse kapıyı gerçek hatayla kapat ki
   // düğme yeniden basılabilir olsun.
-  var watchdogToken=ui.locationGateRequestAt;
-  setTimeout(function(){
-    if(ui.locationGateRequestInFlight && ui.locationGateRequestAt===watchdogToken){
-      locationGateFailure(3,'timeout');
-    }
-  },LOCATION_GATE_WATCHDOG_MS);
+  var requestToken=ui.locationGateRequestSeq;
+  function gateRequestIsCurrent(){ return ui.locationGateRequestInFlight&&ui.locationGateRequestSeq===requestToken; }
+  setTimeout(function(){ if(gateRequestIsCurrent()) locationGateFailure(3,'timeout'); },LOCATION_GATE_WATCHDOG_MS);
   function gateFixOk(pos){
+    if(!gateRequestIsCurrent()) return;
     locationGateGranted(pos,true);
     if(moveState.watchId==null) startLocationWatch(false);
   }
   function gateFixFail(err){
+    if(!gateRequestIsCurrent()) return;
     var code=err&&Number(err.code);
     locationGateFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'request-error');
   }
@@ -4561,6 +4560,7 @@ App.requestLocationGatePermission=function(){
     // birlikte iç mekânda/masaüstünde neredeyse her zaman zaman aşımına uğrayıp
     // uygulamayı kapıda kilitliyordu. 5 dk'lık önbellek konumu kabul edilir.
     navigator.geolocation.getCurrentPosition(gateFixOk,function(err){
+      if(!gateRequestIsCurrent()) return;
       var code=err&&Number(err.code);
       // Zaman aşımında bir kez de düşük hassasiyetle dene: ağ/WiFi tabanlı konum
       // kapıyı açmaya fazlasıyla yeter, GPS kilidi beklemek gerekmez.

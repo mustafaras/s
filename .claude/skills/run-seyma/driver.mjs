@@ -118,13 +118,17 @@ function buildSandbox(seedData, options = {}) {
   const localStorage = makeLocalStorage(seed);
   const geoMode = options.geolocation || 'success';
   const geoPosition = { coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } };
+  const geoRequests = [];
+  const capturedTimers = [];
   const geolocation = geoMode === 'none' ? null : {
     getCurrentPosition(success, error) {
-      if (geoMode === 'denied') error({ code: 1 });
+      if (geoMode === 'controlled') geoRequests.push({ success, error });
+      else if (geoMode === 'denied') error({ code: 1 });
       else if (geoMode === 'timeout') error({ code: 3 });
       else success(geoPosition);
     },
     watchPosition(success, error) {
+      if (geoMode === 'controlled') return 1;
       if (geoMode === 'denied') error({ code: 1 });
       else if (geoMode === 'timeout') error({ code: 3 });
       else success(geoPosition);
@@ -147,7 +151,7 @@ function buildSandbox(seedData, options = {}) {
     // fetch NEVER resolves → pollRemote / sync no-op, zero network.
     fetch() { return new Promise(() => {}); },
     // timers are no-ops → suppress pollRemote / replayAnswerPopup loops
-    setTimeout() { return 0; }, clearTimeout() {},
+    setTimeout(fn, ms) { if (options.captureTimers) capturedTimers.push({ fn, ms }); return capturedTimers.length; }, clearTimeout() {},
     setInterval() { return 0; }, clearInterval() {},
     requestAnimationFrame() { return 0; }, cancelAnimationFrame() {},
     crypto: { getRandomValues(a) { for (let i = 0; i < a.length; i++) a[i] = (Math.random() * 256) | 0; return a; },
@@ -160,6 +164,9 @@ function buildSandbox(seedData, options = {}) {
     Date, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error,
     parseInt, parseFloat, isNaN, isFinite, encodeURIComponent, decodeURIComponent,
     Promise, Set, Map, Symbol, Intl,
+    __geoRequests: geoRequests,
+    __geoPosition: geoPosition,
+    __capturedTimers: capturedTimers,
   };
   sandbox.window = sandbox;
   sandbox.self = sandbox;
@@ -318,6 +325,36 @@ const sbDenied = buildSandbox(deniedState, { geolocation: 'denied' });
 loadInto(sbDenied, FILES);
 sbDenied.App.requestLocationGatePermission();
 assert('denied location keeps the gate closed', /id="sey-location-gate"/.test(appHTML) && /data-location-gate-state="denied"/.test(appHTML));
+
+const pendingState = seedState();
+pendingState.settings.locationEnabled = false;
+appHTML = '';
+const sbPending = buildSandbox(pendingState, { geolocation: 'controlled', captureTimers: true });
+loadInto(sbPending, FILES);
+sbPending.App.requestLocationGatePermission();
+assert('silent Safari request keeps an actionable retry button',
+  /İzin ekranı açılmadıysa tekrar dene/.test(appHTML) && !/<button[^>]*disabled[^>]*>[^<]*İzin ekranı/.test(appHTML));
+const firstWatchdog = sbPending.__capturedTimers.find(timer => timer.ms === 50000);
+sbPending.ui.locationGateRequestAt = Date.now() - 2000;
+sbPending.App.requestLocationGatePermission();
+assert('silent Safari request can be retried before the long watchdog', sbPending.__geoRequests.length === 2);
+sbPending.__geoRequests[1].success(sbPending.__geoPosition);
+sbPending.__geoRequests[0].error({ code: 1 });
+if (firstWatchdog) firstWatchdog.fn();
+assert('late callback and watchdog from the old request cannot close a successful retry',
+  sbPending.ui.locationGateState === 'granted' && !/id="sey-location-gate"/.test(appHTML));
+
+const unavailableState = seedState();
+unavailableState.settings.locationEnabled = false;
+appHTML = '';
+const sbUnavailable = buildSandbox(unavailableState, { geolocation: 'controlled' });
+loadInto(sbUnavailable, FILES);
+sbUnavailable.App.requestLocationGatePermission();
+sbUnavailable.__geoRequests[0].error({ code: 2 });
+sbUnavailable.__geoRequests[1].error({ code: 2 });
+assert('position unavailable uses one low-accuracy fallback and then stops',
+  sbUnavailable.__geoRequests.length === 2 && sbUnavailable.ui.locationGateState === 'unavailable' &&
+  sbUnavailable.ui.locationGateRequestInFlight === false && sbUnavailable.ui.locationGateLowAccuracyTried === false);
 
 console.log('\n== boot: seeded state ==');
 appHTML = '';

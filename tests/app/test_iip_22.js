@@ -101,6 +101,15 @@ function test(name, fn) {
     assert.ok(entries.some(item => item.includes('app/content/quranStrikingVersesV1.js')));
     assert.ok(entries.every(item => !/data\/|panel|token|auth|video|latest\.json|observer/i.test(item)));
   });
+  await test('index çalışma zamanı varlıkları offline allowlist ile birebir eşleşir', () => {
+    const entries = new Set(Array.from(base.sandbox.swManifestDescriptor().entries).map(item => item.replace(/^\.\//, '')));
+    const runtimeAssets = Array.from(indexSource.matchAll(/(?:src|href)="([^"#]+\?v=[^"]+)"/g))
+      .map(match => match[1])
+      // Panel manifesti kişisel gözlem yüzeyine aittir ve IIP-22 sözleşmesi
+      // gereği kontrollü genel offline paketine bilinçli olarak alınmaz.
+      .filter(item => !item.startsWith('panel/'));
+    assert.deepEqual(runtimeAssets.filter(item => !entries.has(item)), []);
+  });
   await test('tokenlı, kişisel, panel, video ve dış URL cache dışıdır', () => {
     const key = base.sandbox.swOfflineRequestKey;
     assert.equal(key(new SyntheticRequest('https://example.test/s/index.html?token=secret')), '');
@@ -108,7 +117,7 @@ function test(name, fn) {
     assert.equal(key(new SyntheticRequest('https://example.test/s/panel.html')), '');
     assert.equal(key(new SyntheticRequest('https://example.test/s/movie.mp4')), '');
     assert.equal(key(new SyntheticRequest('https://api.example.org/content')), '');
-    assert.equal(key(new SyntheticRequest('https://example.test/s/app.js?v=20260922b')), 'https://example.test/s/app.js?v=20260922b');
+    assert.equal(key(new SyntheticRequest('https://example.test/s/app.js?v=20260924c')), 'https://example.test/s/app.js?v=20260924c');
   });
   await test('install atomiktir; kesik indirme geçici cache bırakmaz', async () => {
     const runtime = loadSw({ failAddAt: 2 });
@@ -128,7 +137,7 @@ function test(name, fn) {
   await test('eski sürüme dönüş exact allowlist isteğini kullanıma açık tutar', async () => {
     const runtime = loadSw();
     const old = await runtime.caches.open('seyma-offline-v1-iip22-old');
-    const url = 'https://example.test/s/app.js?v=20260922b';
+    const url = 'https://example.test/s/app.js?v=20260924c';
     await old.put(url, new SyntheticResponse('old-shell'));
     const response = await runtime.sandbox.swMatchOfflineRequest(new SyntheticRequest(url));
     assert.equal(response.body, 'old-shell');
@@ -153,7 +162,7 @@ function test(name, fn) {
   });
   await test('kalıcı yüzen Offline paneli kaldırılır; güvenli SW kaydı korunur', () => {
     for (const token of ['sey-offline-tools', 'sey-offline-panel', 'Offline araçları', 'Offline paketi kaldır']) assert.ok(!indexSource.includes(token), token);
-    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20260922a'\)/);
+    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20260924a'\)/);
     assert.doesNotMatch(indexSource, /SEYMA_OFFLINE_(?:STATUS|INSTALL|REMOVE)/);
   });
   await test('fetch politikası geniş runtime cache yakalaması yapmaz', () => {
@@ -162,11 +171,11 @@ function test(name, fn) {
     assert.match(swSource, /swOfflineRequestKey/);
   });
   await test('aktif sayaç/not durumu SW güncellemesinden bağımsızdır', () => {
-    const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20260922a')"));
+    const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20260924a')"));
     assert.doesNotMatch(registrationBlock, /location\.reload|skipWaiting/);
     assert.doesNotMatch(indexSource, /controllerchange/);
     assert.doesNotMatch(indexSource, /sey-offline-tools/);
   });
   if (process.exitCode) process.exit(1);
-  console.log('\nPASS: IIP-22 ' + passed + '/11');
+  console.log('\nPASS: IIP-22 ' + passed + '/12');
 }());

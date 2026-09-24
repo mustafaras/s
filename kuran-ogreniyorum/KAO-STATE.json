@@ -886,6 +886,10 @@
         "app/kao.css",
         "app.js",
         "tests/kao/test_kao_render.js",
+        "tests/app/test_fx2_tab_transition.js",
+        "tests/app/test_fx2_overlay_motion.js",
+        "tests/app/test_fx2_touch_coverage.js",
+        "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
         "kuran-ogreniyorum/evidence/KAO-15/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -893,6 +897,9 @@
       ],
       "checks": [
         "node tests/kao/test_kao_render.js",
+        "node tests/app/test_fx2_tab_transition.js",
+        "node tests/app/test_fx2_overlay_motion.js",
+        "node tests/app/test_fx2_touch_coverage.js",
         "node .claude/skills/run-seyma/driver.mjs",
         "node .claude/skills/run-seyma/zikr-harness.mjs",
         "node tests/app/test_state_rebind_boundary.js",
@@ -904,7 +911,12 @@
       "deps": [
         "KAO-14"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-24",
+      "agent": "Codex (GPT-5)",
+      "scopeNote": "K10 gereği zorunlu App.kaoGate handler'ının 730→731 yüzey pini üç FX2 fixture'ında aynı kartta güncellenir.",
+      "completedAt": "2026-09-24",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-15/EVIDENCE.json"
     },
     "KAO-16": {
       "title": "E6 Okuyucu (20 kısa sûre) + vakıf noktaları + gecikmeli test kaydı",
@@ -1413,7 +1425,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-14",
+  "lastCompletedPrompt": "KAO-15",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

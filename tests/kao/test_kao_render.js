@@ -20,6 +20,7 @@ vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranGrammarV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranGrammarV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranShortSurahsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranShortSurahsV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranRevelationOrderV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranRevelationOrderV1.js' });
+vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranPhonicsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranPhonicsV1.js' });
 vm.runInContext(source, sandbox, { filename: relative });
 const api = sandbox.window.SeymaQuranLearn;
 
@@ -225,6 +226,45 @@ assert.match(unitsHtml, /İzlendi/);
 assert.doesNotMatch(unitsHtml, /\bdisabled\b|Kilitli/i, 'ünitelerde kilit olmamalı');
 assert.match(unitsHtml, /Seviye 0.*Seviye 5.*Seviye 6/s);
 
+const gateTasks = api.kaoGateTasks();
+assert.equal(gateTasks.reading.length, 20, 'giriş kontrolü 20 okunuş sorusu taşımalı');
+assert.equal(gateTasks.listening.length, 12, 'giriş kontrolü 12 minimal çift taşımalı');
+assert.equal(gateTasks.lessons.length, 12, 'Seviye 0 tam 12 mini ders taşımalı');
+assert.ok(gateTasks.lessons.every((lesson) => lesson.sounds.length <= 3), 'ders başına en çok üç yeni ses olmalı');
+const colored = api.kaoColorHarakat('بَ بِ بُ');
+assert.equal(colored.replace(/<[^>]+>/g, ''), 'بَ بِ بُ', 'hareke sarıcı metni değiştirmemeli');
+for (const className of ['kao-h-fatha', 'kao-h-kesra', 'kao-h-damma']) assert.match(colored, new RegExp(className));
+
+assert.equal(api.kaoGate('start'), true);
+assert.equal(ui.kaoView, 'gate');
+assert.equal(ui.kaoGatePhase, 'reading');
+for (const task of gateTasks.reading) assert.equal(api.kaoGate('answer', task.answer), true);
+assert.equal(ui.kaoGatePhase, 'listening');
+for (const task of gateTasks.listening.slice(0, 10)) assert.equal(api.kaoGate('answer', task.answer), true);
+for (const task of gateTasks.listening.slice(10)) assert.equal(api.kaoGate('answer', 'wrong'), true);
+assert.equal(quranLearn.gate.passed, true);
+assert.equal(quranLearn.gate.skipped, true);
+assert.equal(quranLearn.gate.score, 30);
+assert.match(quranLearn.gate.at, /^\d{4}-\d{2}-\d{2}T/);
+
+quranLearn.gate = { passed: false, skipped: false, score: null, at: null };
+api.kaoGate('start');
+for (const task of gateTasks.reading.slice(0, 18)) api.kaoGate('answer', task.answer);
+for (const task of gateTasks.reading.slice(18)) api.kaoGate('answer', 'wrong');
+ui.kaoAudioFailed = true;
+assert.equal(api.kaoGate('audio-unavailable'), true);
+assert.equal(quranLearn.gate.passed, true, 'ses yüklenemezse 18/20 okuma kapıyı geçirmeli');
+assert.equal(quranLearn.gate.skipped, false, 'ses bölümü ertelenmiş olarak kalmalı');
+assert.match(api.kaoGateHTML(), /ilk ses erişiminde|ertelendi/i);
+
+assert.equal(api.kaoGate('readability', { lineHeight: '2.5', wordSpacing: 'wide', coloredHarakat: false }), true);
+assert.equal(quranLearn.readability.lineHeight, '2.5');
+assert.equal(quranLearn.readability.wordSpacing, 'wide');
+assert.equal(quranLearn.readability.coloredHarakat, false);
+assert.match(api.kaoReadabilityStyle(), /--kao-ar-lh:2\.5/);
+assert.match(api.kaoReadabilityStyle(), /--kao-ar-ws:\.18em/);
+assert.match(api.kaoGateHTML(), /İstersen hızlıca hatırlayalım/);
+
 api.kaoMount(new Date('2026-09-24T22:15:00'));
 assert.match(mounted, /id="sey-ov-card"/);
 const renderedBeforeHome = rendered;
@@ -241,16 +281,16 @@ assert.equal(restored, 'kao-hub-entry');
 assert.match(appSource, /App\.kaoOpen=function\(view\)\{ return window\.SeymaQuranLearn\.kaoOpen\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoClose=function\(\)\{ return window\.SeymaQuranLearn\.kaoClose\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoSetView=function\(v\)\{ return window\.SeymaQuranLearn\.kaoSetView\.apply\(null,arguments\); \};/);
-for (const name of ['kaoStart', 'kaoAnswer', 'kaoUndo', 'kaoPlay', 'kaoOpenWord', 'kaoWordLayer', 'kaoFlag']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
+for (const name of ['kaoStart', 'kaoAnswer', 'kaoUndo', 'kaoPlay', 'kaoOpenWord', 'kaoWordLayer', 'kaoFlag', 'kaoGate']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
 assert.doesNotMatch(settingsSource, /kao-settings-entry|App\.kaoOpen\(\)/, 'geçici Ayarlar girişi kaldırılmalı');
 assert.match(appSource, /kaoHubCardHTML:function\(\)\{ return window\.SeymaQuranLearn\?window\.SeymaQuranLearn\.kaoHubCardHTML\(\):''; \}/);
 assert.match(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'Kur’an öğrenme kartı Bugün girişlerinde Kur’an Yolculuğu sonrasında olmalı');
 assert.match(indexSource, /app\/kao\.css\?v=\d{8}[a-z]/);
-for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-dialog-frame', '.kao-header-mark', '.kao-hero-rosette', '.kao-time-chip', '.kao-unit-card', '.kao-word-hero', '.kao-root-tree', '.kao-word-example']) assert.ok(cssSource.includes(selector), selector);
+for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-dialog-frame', '.kao-header-mark', '.kao-hero-rosette', '.kao-time-chip', '.kao-unit-card', '.kao-word-hero', '.kao-root-tree', '.kao-word-example', '.kao-gate', '.kao-h-fatha', '.kao-h-kesra', '.kao-h-damma']) assert.ok(cssSource.includes(selector), selector);
 assert.doesNotMatch(cssSource, /:root\s*\{/);
 assert.doesNotMatch(cssSource, /#[0-9a-f]{3,8}\b/i);
 const cssVars = [...cssSource.matchAll(/var\((--[a-z0-9-]+)/gi)].map((match) => match[1]);
-assert.ok(cssVars.length > 0 && cssVars.every((name) => /^--(?:quran|faith|f-|dur-)/.test(name)), 'KAO CSS yalnız izinli token ailelerini tüketmeli');
+assert.ok(cssVars.length > 0 && cssVars.every((name) => /^--(?:quran|faith|f-|dur-|kao-ar-)/.test(name)), 'KAO CSS yalnız izinli token ailelerini veya kartın okunabilirlik değişkenlerini tüketmeli');
 
 const selectorStart = appSource.indexOf('var MODAL_FOCUS_SELECTOR=');
 const handlerEnd = appSource.indexOf('\nApp.onReminderKeydown=', selectorStart);

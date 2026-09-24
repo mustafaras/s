@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 17/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-14 · **blockedPrompt:** — · **Sıradaki:** **KAO-15**
+**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 18/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-15 · **blockedPrompt:** — · **Sıradaki:** **KAO-16**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -28,7 +28,7 @@
 | KAO-12 | E2 gramer görevleri | done | — |
 | KAO-13 | E2 parça görevleri + E3 Done + kalibrasyon kaydı | done | R-A3 R-A7 R-B4 |
 | KAO-14 | E4 Üniteler + E5 Kelime (üç dokunuş, kök ağacı, bayrak) | done | R-A8 R-B3 R-B7 R-C1 |
-| KAO-15 | Seviye 0 kapısı (harf–ses–hareke) + renkli hareke | pending | R-A9 |
+| KAO-15 | Seviye 0 kapısı (harf–ses–hareke) + renkli hareke | done | R-A9 |
 | KAO-16 | E6 Okuyucu (20 kısa sûre) + vakıf noktaları + gecikmeli test kaydı | pending | R-A6 R-C6 |
 | KAO-17 | E7 Ayarlar + ses stili + soldurma + CSV | pending | R-A4 R-A9 R-B5 R-B8 R-C4 |
 | KAO-26 | E8 Telaffuz stüdyosu | pending | R-B6 R-C2 |
@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:partial · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 68 | 2026-09-24 | KAO-14 bitti: 12 kilitsiz ünite, sıra önerisi, salt-okur yolculuk rozeti; üç ayrı kelime katmanı; 73 köklük kalıp etiketli Türkçe akraba ağı ve serbest-metinsiz içerik bayrağı tamamlandı. | `evidence/KAO-14/EVIDENCE.json`; KAO/FX2/driver/zikr/rebind/shell/plan/diff PASS; R-C1 panel sayımı KAO-19'a kaldı |
+| 71 | 2026-09-24 | KAO-15 bitti: 20+12 soruluk iki parçalı kapı, ses yoksa erteleme, en çok üç yeni sesli 12 mini ders, metni koruyan renkli hareke ve Arapça okunabilirlik ayarları tamamlandı. | `evidence/KAO-15/EVIDENCE.json`; KAO/FX2/driver/zikr/rebind/shell/plan/diff PASS; R-A9 kontrast ölçümü KAO-18'e kaldı |

@@ -1,0 +1,53 @@
+{
+  "card": "KAO-15",
+  "head": "4e4ec3639ecb221e9e68e20c8e1bed16d680cba0",
+  "diffHash": "dc9c5ec1e48b974f10fcdd640d6f42c0790b9c17fcacde20bb37c10d2a64312c",
+  "date": "2026-09-24",
+  "agent": "Codex (GPT-5)",
+  "status": "PASS",
+  "scope": "Seviye 0 giriş kontrolü, 12 mini ders, renkli hareke ve Arapça okunabilirlik değişkenleri",
+  "results": {
+    "readingGate": "20 items; threshold 18",
+    "listeningGate": "12 minimal pairs; threshold 10; fail-soft deferral",
+    "lessons": "12; at most 3 new sounds each; frozen QuranPhonicsV1",
+    "harakat": "pure wrapper for fatha/kesra/damma; text preserved",
+    "readability": "line height 1.9/2.2/2.5; normal/wide word spacing; colored harakat toggle",
+    "fx2SurfacePin": "731 App handlers / 392 onclick"
+  },
+  "checks": [
+    { "cmd": "node --check app/core/quranLearn.js", "exit": 0 },
+    { "cmd": "node --check app.js", "exit": 0 },
+    { "cmd": "node --check tests/kao/test_kao_render.js", "exit": 0 },
+    { "cmd": "node tests/kao/test_kao_render.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_migration.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_requirements.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_privacy.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_boundary.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_independence.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/app/test_fx2_tab_transition.js", "exit": 0, "note": "7/7" },
+    { "cmd": "node tests/app/test_fx2_overlay_motion.js", "exit": 0, "note": "7/7" },
+    { "cmd": "node tests/app/test_fx2_touch_coverage.js", "exit": 0, "note": "14/14" },
+    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "PASS" },
+    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95" },
+    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37/37" },
+    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "PASS; app.js 7800 lines" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "PASS, 0 warn" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0 }
+  ],
+  "requirements": {
+    "R-A9": "partial",
+    "note": "Runtime settings and colored-harakat behavior are implemented; six light/dark contrast measurements remain KAO-18 and the full settings surface remains KAO-17."
+  },
+  "userTaskPending": false,
+  "knownLimits": [
+    "Physical-device, VoiceOver, and real listening acceptance were not performed.",
+    "R-A9 contrast measurement remains assigned to KAO-18."
+  ],
+  "boundaries": {
+    "network": "none",
+    "browser": "headless fixtures only",
+    "personalData": "not accessed",
+    "deviceAcceptance": "not_verified",
+    "delivery": "local KAO-15 commit only; no push, merge, tag, or deploy authority"
+  }
+}

@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-25 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 19/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-16 · **blockedPrompt:** — · **Sıradaki:** **KAO-17**
+**Güncelleme:** 2026-09-25 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 20/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-17 · **blockedPrompt:** — · **Sıradaki:** **KAO-26**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -30,7 +30,7 @@
 | KAO-14 | E4 Üniteler + E5 Kelime (üç dokunuş, kök ağacı, bayrak) | done | R-A8 R-B3 R-B7 R-C1 |
 | KAO-15 | Seviye 0 kapısı (harf–ses–hareke) + renkli hareke | done | R-A9 |
 | KAO-16 | E6 Okuyucu (20 kısa sûre) + vakıf noktaları + gecikmeli test kaydı | done | R-A6 R-C6 |
-| KAO-17 | E7 Ayarlar + ses stili + soldurma + CSV | pending | R-A4 R-A9 R-B5 R-B8 R-C4 |
+| KAO-17 | E7 Ayarlar + ses stili + soldurma + CSV | done | R-A4 R-A9 R-B5 R-B8 R-C4 |
 | KAO-26 | E8 Telaffuz stüdyosu | pending | R-B6 R-C2 |
 | KAO-27 | Gölgeleme (bellek-içi kayıt) | pending | — |
 | KAO-28 | E9 Anlayabildiğin âyet | pending | — |
@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 78 | 2026-09-25 | GAP-09 yayın/keşif onarımı: KAO hub kartına 20 kısa sûre görünür adlandırma eklendi; değişen KAO runtime/content dosyaları index.html ve sw.js offline manifestte tek `20260925c` pininde eşlendi; SW sürümü `iip22-20260925c` olarak yükseltildi; App/pin kardeş fixture'ları güncel 572/734 yüzeyine ve render KAO-mount sözleşmesine taşındı; 9 reminder kardeş harness boot listesine quranLearn.js eklendi. | Test önce kırmızı: IIP-22 allowlist dışı 5 KAO varlığı, hub metni yok, App yüzeyi 558/720, reminder boot SeymaQuranLearn fail-closed; sonra tüm kardeşler, 12 KAO fixture, FX2 7/7+7/7+14/14, driver/zikr/rebind/shell, plan ve diff PASS |
+| 79 | 2026-09-25 | KAO-17 bitti: E7 Ayarlar (günlük yeni, ses stili, hareke/soldurma, Okunuş/DİA, okunabilirlik, Seviye 0'ı yeniden aç) ve yerel CSV dışa aktarma; DİA çalışma zamanı dönüşümü 524/524 doğrulanmış çıktıyla birebir; önbellek pini 20260925d; App pini 742/580; KAO-07'den kalan 6 harness borcu onarıldı. | `evidence/KAO-17/EVIDENCE.json`; R-A4/B5/B8/C4 done, R-A9 partial (KAO-18); KAO/premium 9/9/FX2/iip/v3/driver/zikr/rebind/shell/panel/reminder PASS; tam app+kao+quran 97/97 |

@@ -1206,6 +1206,26 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `tests/kao/test_kao_render.js`
 - `tests/kao/test_kao_requirements.js`
 - `tests/kao/test_kao_privacy.js`
+- `index.html`
+- `sw.js`
+- `tests/kao/test_kao_migration.js`
+- `tests/app/test_fx2_tab_transition.js`
+- `tests/app/test_fx2_overlay_motion.js`
+- `tests/app/test_fx2_touch_coverage.js`
+- `tests/app/test_premium_fx_gate_defaults.js`
+- `tests/app/test_premium_voice.js`
+- `tests/app/test_iip_22.js`
+- `tests/app/test_v3_welcome.js`
+- `tests/app/test_app_surface_boot_boundary.js`
+- `tests/app/test_app_surface_daily_boundary.js`
+- `tests/app/test_app_surface_domain_boundary.js`
+- `tests/app/test_app_surface_lifecycle_boundary.js`
+- `tests/app/test_app_surface_overlay_boundary.js`
+- `tests/app/test_aeon_message_expand.js`
+- `tests/app/test_iip_20.js`
+- `tests/app/test_iip_perf_measure.js`
+- `tests/app/test_zikr_manual_entry.js`
+- `kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md`
 - `kuran-ogreniyorum/evidence/KAO-17/**`
 - `kuran-ogreniyorum/KAO-STATE.json`
 - `kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md`
@@ -1224,6 +1244,18 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `node tests/kao/test_kao_requirements.js`
 - `node tests/kao/test_kao_privacy.js`
 - `for f in tests/app/test_premium_*.js; do node $f; done`
+- `node tests/kao/test_kao_render.js`
+- `node tests/kao/test_kao_migration.js`
+- `node tests/app/test_fx2_tab_transition.js`
+- `node tests/app/test_fx2_overlay_motion.js`
+- `node tests/app/test_fx2_touch_coverage.js`
+- `node tests/app/test_iip_22.js`
+- `node tests/app/test_v3_welcome.js`
+- `node tests/app/test_app_surface_daily_boundary.js`
+- `node tests/app/test_aeon_message_expand.js`
+- `node tests/app/test_iip_20.js`
+- `node tests/app/test_iip_perf_measure.js`
+- `node tests/app/test_zikr_manual_entry.js`
 - `node .claude/skills/run-seyma/driver.mjs`
 - `node .claude/skills/run-seyma/zikr-harness.mjs`
 - `node tests/app/test_state_rebind_boundary.js`

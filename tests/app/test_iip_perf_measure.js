@@ -38,7 +38,7 @@ const FILES = [
   'app/content/quranTransportV1.js', 'app/content/quranStrikingVersesV1.js', 'app/content/esmaulHusnaV1.js',
   'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js',
   'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app/core/helpers.js',
-  'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/saygi.js', 'app/core/motivation.js',
+  'app/core/prayer.js', 'app/core/zikir.js', 'app/core/quran.js', 'app/core/quranLearn.js', 'app/core/saygi.js', 'app/core/motivation.js',
   'app/core/crisis.js', 'app/core/journal.js', 'app/core/health.js', 'app/core/library.js', 'app/core/report.js',
   'app/core/map.js', 'app/core/profile.js', 'app/core/settings.js', 'app/core/mediaFx.js', 'app/core/timeTheme.js',
   'app/core/skyFx.js', 'app/core/messaging.js', 'app/core/render.js', 'app/core/appSurface.js', 'app/core/reminders.js',

@@ -210,4 +210,118 @@ assert.equal(delayedData.quranLearn.surahs['112'].delayedScore, 4);
 assert.match(delayedData.quranLearn.surahs['112'].confirmedAt, /^\d{4}-\d{2}-\d{2}T/, 'R-C6: 4/5 anlaşılmayı kesinleştirmeli');
 assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
 
-console.log(`KAO requirements: PASS (R-A1/A2/A4/A5, R-C2/C3/C5; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);
+
+// ── KAO-17 · E7 ayarlar: R-A4, R-A9, R-B5, R-B8, R-C4 ─────────────────────────
+{
+  const e7Data = { settings: { premiumAtmosphere: true }, quranLearn: null };
+  const e7Ui = {};
+  let saves = 0, renders = 0, quiet = false;
+  const played = [];
+  const e7 = loadApi({ data() { return e7Data; }, ui() { return e7Ui; }, save() { saves += 1; }, render() { renders += 1; }, todayStr() { return '2026-09-25'; }, esc(value) { return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }, icon() { return ''; } });
+  assert.equal(e7.registerQuranLearnSurface({ lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose(_c, _b, body) { body(); }, mount() {}, taskElement() { return null; }, createAudio(src) { played.push(src); return { src, addEventListener() {}, play() { return { catch() {} }; } }; }, isQuietTime() { return quiet; }, setTimer() { return 1; }, clearTimer() {} }), true);
+  const q = e7.ensureQuranLearn(e7Data);
+  assert.equal(q.settings.audioStyle, 'measured');
+  assert.equal(q.settings.translitLayer, 'tr');
+
+  // Kalıcılık: her ayar data.quranLearn.settings/readability'ye yazılır, save+render çağrılır.
+  for (const bad of [0, 7, 20, null, 'on', undefined]) assert.equal(e7.kaoSetDailyNew(bad), false, 'dailyNew yalnız 5/10/15');
+  assert.equal(e7.kaoSetDailyNew(15), true); assert.equal(q.settings.dailyNew, 15);
+  assert.equal(e7.kaoSetAudioStyle('loud'), false);
+  assert.equal(e7.kaoSetAudioStyle('flowing'), true); assert.equal(q.settings.audio, true); assert.equal(q.settings.audioStyle, 'flowing');
+  assert.equal(e7.kaoSetAudioStyle('off'), true); assert.equal(q.settings.audio, false); assert.equal(q.settings.audioStyle, 'flowing', 'kapatmak stili unutmaz');
+  assert.equal(e7.kaoToggleHarakat(), true); assert.equal(q.settings.harakat, false);
+  assert.equal(e7.kaoToggleHarakat(), true); assert.equal(q.settings.harakat, true);
+  assert.equal(e7.kaoToggleFade(), true); assert.equal(q.readability.fadeHarakat, true);
+  assert.equal(e7.kaoSetTranslit('latin'), false);
+  assert.equal(e7.kaoSetTranslit('dia'), true); assert.equal(q.settings.translitLayer, 'dia');
+  assert.equal(e7.kaoSetReadability('lineHeight', '3'), false);
+  assert.equal(e7.kaoSetReadability('fontSize', 'big'), false);
+  assert.equal(e7.kaoSetReadability('lineHeight', '2.5'), true); assert.equal(q.readability.lineHeight, '2.5');
+  assert.equal(e7.kaoSetReadability('wordSpacing', 'wide'), true);
+  assert.equal(e7.kaoSetReadability('coloredHarakat', false), true); assert.equal(q.readability.coloredHarakat, false);
+  assert.equal(saves, 10, 'her geçerli ayar tam bir kez kaydedilir'); assert.equal(renders, 10);
+  const persisted = JSON.parse(JSON.stringify(e7Data));
+  const reloaded = e7.ensureQuranLearn(persisted);
+  assert.deepEqual([reloaded.settings.dailyNew, reloaded.settings.audioStyle, reloaded.settings.translitLayer, reloaded.readability.lineHeight, reloaded.readability.wordSpacing, reloaded.readability.fadeHarakat], [15, 'flowing', 'dia', '2.5', 'wide', true], 'ayarlar JSON gidiş-dönüşünde korunur');
+  const broken = e7.ensureQuranLearn({ quranLearn: { settings: { audioStyle: 'x', translitLayer: 7 } } });
+  assert.deepEqual([broken.settings.audioStyle, broken.settings.translitLayer], ['measured', 'tr'], 'bozuk ayar varsayılana döner');
+
+  // R-A9: okunabilirlik değişkenleri diyalogun tamamına uygulanır; ayar ekranı eksiksiz.
+  e7Ui.kaoOpen = true; e7Ui.kaoView = 'settings';
+  const settingsHtml = e7.kaoOverlayHTML('2026-09-25T10:00:00');
+  assert.match(settingsHtml, /class="kao-dialog" style="--kao-ar-lh:2\.5;--kao-ar-ws:\.18em"/);
+  for (const handler of ['kaoSetDailyNew(15)', "kaoSetAudioStyle('flowing')", "kaoSetTranslit('dia')", 'kaoToggleHarakat()', 'kaoToggleFade()', "kaoSetReadability('lineHeight','2.5')", "kaoSetReadability('wordSpacing','wide')", "kaoSetReadability('coloredHarakat',true)", 'kaoReopenGate()', 'kaoExportCsv()']) assert.ok(settingsHtml.includes('App.' + handler), handler);
+  assert.equal((settingsHtml.match(/aria-pressed="true"/g) || []).length, 7, 'her grupta tek seçili düğme + açık anahtarlar');
+  assert.match(settingsHtml, /role="group" aria-label="Günlük yeni kelime"/);
+  assert.match(e7.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoSetView\('settings'\)/, 'E1 ana ekrandan ayarlara geçiş');
+  assert.equal(e7.kaoReopenGate(), true); assert.equal(e7Ui.kaoView, 'gate', 'Seviye 0 tekrar açılır');
+  assert.equal(q.gate.passed, false);
+
+  // DİA katmanı: çalışma zamanı dönüşümü derleme aracının doğrulanmış çıktısıyla 524/524 aynı.
+  const verified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8'));
+  const verifiedLemmas = Array.isArray(verified.lemmas) ? verified.lemmas : Object.values(verified.lemmas || verified);
+  const mismatches = verifiedLemmas.filter((record) => e7.kaoDiaReading(record.ar) !== record.translit.dia);
+  assert.equal(verifiedLemmas.length, 524); assert.deepEqual(mismatches.map((record) => record.lemmaId), [], 'DİA sapması yok');
+  const sampleLemma = verifiedLemmas.find((record) => record.translit.dia !== record.translit.tr);
+  assert.equal(e7.kaoLemmaReading(sampleLemma.lemmaId, 'x'), sampleLemma.translit.dia, 'DİA seçiliyken kelime okunuşu DİA');
+  e7.kaoSetTranslit('tr');
+  assert.equal(e7.kaoLemmaReading(sampleLemma.lemmaId, 'x'), sampleLemma.translit.tr);
+  assert.equal(e7.kaoLemmaReading('l_yok_000000', 'yedek'), 'yedek', 'sözlük dışı kayıt kendi doğrulanmış okunuşunu korur');
+
+  // Hareke kapalı / soldurma (R-B5) / hareket ayarı ve reduced-motion dalı.
+  const lemma = e7Data.quranLearn && sandboxLemma(e7, sampleLemma.lemmaId);
+  const reviewTask = e7.kaoBuildTask({ id: 'w:' + lemma.id + ':ar>tr', isNew: false }, e7Data, { seed: 'e7' });
+  const newTask = e7.kaoBuildTask({ id: 'w:' + lemma.id + ':ar>tr', isNew: true }, e7Data, { seed: 'e7' });
+  e7Ui.kaoQueue = [{ id: reviewTask.id }]; e7Ui.kaoTaskIndex = 0;
+  let html = e7.kaoTaskHTML(reviewTask);
+  assert.match(html, /class="kao-fade" aria-label="Harekeler soluyor; geri getirmek için dokun" onclick="this\.classList\.add\('is-back'\)"><span class="kao-fade-base" aria-hidden="true">([^<]+)<\/span><span class="kao-fade-full">/);
+  assert.equal(RegExp.$1, e7.kaoStripHarakat(lemma.ar));
+  assert.doesNotMatch(e7.kaoTaskHTML(newTask), /kao-fade/, 'yeni kartta soldurma yok');
+  e7Data.settings.premiumAtmosphere = false;
+  assert.match(e7.kaoTaskHTML(reviewTask), /class="kao-fade is-instant"/, 'uygulama hareket ayarı kapalıyken anında');
+  e7Data.settings.premiumAtmosphere = true;
+  e7.kaoToggleFade();
+  assert.doesNotMatch(e7.kaoTaskHTML(reviewTask), /kao-fade/, 'ayar kapalıyken soldurma yok');
+  e7.kaoToggleHarakat();
+  html = e7.kaoTaskHTML(reviewTask);
+  assert.ok(html.includes('>' + e7.kaoStripHarakat(lemma.ar) + '<') && !/[ً-ْ]/.test(html.match(/kao-arabic-text[^>]*>([^<]*)</)[1]), 'hareke kapalıyken harekesiz metin');
+  e7.kaoToggleHarakat();
+  const css = fs.readFileSync(path.join(repoRoot, 'app/kao.css'), 'utf8');
+  assert.match(css, /\.kao-fade-full\{[^}]*animation:kaoHarakatFade var\(--dur-5\)/, 'R-B5: --dur-5 tokenı');
+  assert.match(css, /@media \(prefers-reduced-motion:reduce\)\{\.kao-fade-full\{animation:none;opacity:0\}/, 'reduced-motion: anında');
+  assert.match(css, /\.kao-fade\.is-back \.kao-fade-full,\.kao-fade\.is-instant\.is-back \.kao-fade-full\{animation:none;opacity:1\}/, 'dokununca geri');
+
+  // R-A4 + ses stili: otomatik ses seçilen stille ve sessiz saatte hiç çalmaz; R-B8 iki hız düğmesi korunur.
+  e7.kaoSetAudioStyle('flowing');
+  const withClip = Object.assign({}, newTask, { clipId: 'w-' + lemma.id });
+  assert.equal(e7.kaoShouldAutoplay(withClip, e7Data), true);
+  assert.match(e7.kaoTaskHTML(withClip), /data-autoplay="1"/);
+  quiet = true; assert.equal(e7.kaoShouldAutoplay(withClip, e7Data), false, 'sessiz saatte otomatik ses yok'); assert.doesNotMatch(e7.kaoTaskHTML(withClip), /data-autoplay/); quiet = false;
+  e7.kaoSetAudioStyle('off'); assert.equal(e7.kaoShouldAutoplay(withClip, e7Data), false, 'ses kapalıyken otomatik ses yok');
+  const audioButton = e7.kaoTaskHTML(withClip);
+  assert.match(audioButton, /App\.kaoPlay\('w-[^']+','flowing'\)/); assert.match(audioButton, /App\.kaoPlay\('w-[^']+','measured'\)/); assert.match(audioButton, /event\.shiftKey/);
+  e7.kaoSetAudioStyle('flowing'); e7Ui.kaoWordId = lemma.id; e7Ui.kaoWordLayer = 1;
+  assert.match(e7.kaoWordHTML(), /App\.kaoPlay\('w-[^']+','flowing'\)/, 'kelime kartı tek düğmesi seçilen stili çalar');
+
+  // R-C4: CSV başlığı + satır sayısı = bilinen (tekilleştirilmiş) kelime kartı.
+  const lex = verifiedLemmas.slice(0, 4);
+  q.cards = {};
+  q.cards['w:' + lex[0].lemmaId + ':ar>tr'] = { reps: 2 };
+  q.cards['w:' + lex[0].lemmaId + ':tr>ar'] = { reps: 1 };
+  q.cards['w:' + lex[1].lemmaId + ':ar>tr'] = { reps: 1 };
+  q.cards['w:' + lex[2].lemmaId + ':ar>tr'] = { reps: 1, readerUnknown: true };
+  q.cards['w:' + lex[3].lemmaId + ':ar>tr'] = { reps: 3, orphan: true };
+  q.cards['g:g0_5:1'] = { reps: 4 };
+  const csv = e7.kaoCsv(e7Data).trimEnd().split('\r\n');
+  assert.equal(csv[0], 'ar,tr,translit,root,tags');
+  assert.equal(csv.length - 1, 2, 'satır = bilinen kelime (yön tekil, okuyucu-bilinmeyen/yetim hariç)');
+  assert.ok(csv.slice(1).every((row) => row.split(',').length >= 5));
+  assert.ok(csv.some((row) => row.startsWith(lex[0].ar + ',')));
+}
+
+function sandboxLemma(api, lemmaId) {
+  const html = api.kaoCsv({ quranLearn: { cards: { ['w:' + lemmaId + ':ar>tr']: { reps: 1 } } } }).split('\r\n')[1];
+  return { id: lemmaId, ar: html.split(',')[0] };
+}
+
+console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B5/B8, R-C2/C3/C4/C5; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

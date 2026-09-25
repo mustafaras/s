@@ -338,7 +338,7 @@ console.log('\n[13] FX-P-87 — voicePitch + voiceVoiceName backfill ve handler 
   var migrated = (function(){
     var MIGRATE_DEPS = [
       'migrateReminderState','normalizeSyncReceipt','ensureEventLog','emptyZikrRoot',
-      'migrateZikrV2','ensureSaygiDay','emptySaygiRoot','ensureQuranJourney','emptyLibrary',
+      'migrateZikrV2','ensureSaygiDay','emptySaygiRoot','ensureQuranJourney','ensureQuranLearn','emptyLibrary',
       'normBook','emptyWatchlist','normTitle','emptyMusic','normTrack','emptySoulArchive',
       'normSoulItem','backfillArchivesFromDays','todayStr','syncDerivedHabits',
       'ensureProfileAssessment','dailyPhotoCopy','ensureTherapyAllDays','ensurePrayerDay'

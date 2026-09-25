@@ -27,7 +27,7 @@ console.log('\n[1] migrate() FX gate alanlarını dolduruyor');
 
 var MIGRATE_DEPS = [
   'migrateReminderState','normalizeSyncReceipt','ensureEventLog','emptyZikrRoot',
-  'migrateZikrV2','ensureSaygiDay','emptySaygiRoot','ensureQuranJourney','emptyLibrary',
+  'migrateZikrV2','ensureSaygiDay','emptySaygiRoot','ensureQuranJourney','ensureQuranLearn','emptyLibrary',
   'normBook','emptyWatchlist','normTitle','emptyMusic','normTrack','emptySoulArchive',
   'normSoulItem','backfillArchivesFromDays','todayStr','syncDerivedHabits',
   'ensureProfileAssessment','dailyPhotoCopy','ensureTherapyAllDays','ensurePrayerDay'

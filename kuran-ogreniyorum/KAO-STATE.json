@@ -18,7 +18,7 @@
     "pagesRun": 35978035375,
     "result": "success"
   },
-  "nextCard": "KAO-08",
+  "nextCard": "KAO-17",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -939,6 +939,10 @@
         "app.js",
         "tests/kao/test_kao_render.js",
         "tests/kao/test_kao_requirements.js",
+        "tests/app/test_fx2_tab_transition.js",
+        "tests/app/test_fx2_overlay_motion.js",
+        "tests/app/test_fx2_touch_coverage.js",
+        "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
         "kuran-ogreniyorum/evidence/KAO-16/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -947,6 +951,9 @@
       "checks": [
         "node tests/kao/test_kao_render.js",
         "node tests/kao/test_kao_requirements.js",
+        "node tests/app/test_fx2_tab_transition.js",
+        "node tests/app/test_fx2_overlay_motion.js",
+        "node tests/app/test_fx2_touch_coverage.js",
         "node .claude/skills/run-seyma/driver.mjs",
         "node .claude/skills/run-seyma/zikr-harness.mjs",
         "node tests/app/test_state_rebind_boundary.js",
@@ -959,7 +966,12 @@
       "deps": [
         "KAO-15"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-25",
+      "agent": "Codex (GPT-5)",
+      "scopeNote": "GAP-08 için kullanıcı 2026-09-25'te üç App yüzeyi pin fixture'ının KAO-16 files/checks kapsamına eklenmesini açıkça onayladı; kapsam yalnız tests/app/test_fx2_tab_transition.js, test_fx2_overlay_motion.js ve test_fx2_touch_coverage.js ile sınırlıdır.",
+      "completedAt": "2026-09-25",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-16/EVIDENCE.json"
     },
     "KAO-17": {
       "title": "E7 Ayarlar + ses stili + soldurma + CSV",
@@ -1343,7 +1355,7 @@
       "R-A3": "partial",
       "R-A4": "partial",
       "R-A5": "done",
-      "R-A6": "partial",
+      "R-A6": "done",
       "R-A7": "partial",
       "R-A8": "done",
       "R-A9": "partial",
@@ -1360,7 +1372,7 @@
       "R-C3": "done",
       "R-C4": "pending",
       "R-C5": "partial",
-      "R-C6": "pending",
+      "R-C6": "partial",
       "R-C7": "done",
       "R-C8": "pending",
       "R-C9": "pending"
@@ -1437,7 +1449,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-15",
+  "lastCompletedPrompt": "KAO-16",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",
@@ -1549,6 +1561,20 @@
       "issue": "06 §2 \"Türkçe mealler kopyalanmaz\" kuralı makine tarafından zorlanmıyordu. Doğrulayıcı, referans sütununu (`ref1_tr`) `tr1`'e kopyalayıp `verifiedBy` yazsa satır \"doğrulanmış\" sayılırdı — kural sessizce delinebilirdi.",
       "fix": "Kopya bekçisi eklendi: `tr1` referansla (tr-TR normalize sonrası) birebir aynıysa satır `copiedFromReference` işaretlenir, verified SAYILMAZ ve rapor edilir.",
       "evidence": "DENEYLE KANITLANDI: tabloya kopya yazıldı → `--import-md` çıktısı \"UYARI: 1 satır REFERANSI birebir kopyalamış → doğrulanmış SAYILMADI\"; verifiedTotal=0, copiedFromReferenceTotal=1",
+      "planCheckVerifiesThis": false
+    },
+    {
+      "id": "GAP-08",
+      "foundAt": "2026-09-25",
+      "foundBy": "Codex (GPT-5)",
+      "where": "KAO-16 adım 1 · K10 App yüzeyi pinleri",
+      "issue": "KAO-16 zorunlu `App.kaoOpenSurah`, `App.kaoRevealWord` ve `App.kaoMarkUnderstood` handler'larını ekler; bu App yüzeyini 731'den 734'e çıkarır. Sayıyı bağlayıcı olarak pinleyen üç FX2 fixture dosyası KAO-16 izinli dosya ve kontrol listesinde yok.",
+      "impact": "Kart kendi zorunlu handler'larını eklerse kardeş fixture'lar kırılır; fixture'ları izinsiz güncellemek S4/S9 kapsam ihlalidir.",
+      "evidence": "tests/app/test_fx2_tab_transition.js:155-158; tests/app/test_fx2_overlay_motion.js:133-134; tests/app/test_fx2_touch_coverage.js:233-234",
+      "decisionNeeded": "Üç FX2 fixture dosyasının KAO-16 files/checks kapsamına alınması için kullanıcı onayı.",
+      "resolution": "Kullanıcı 2026-09-25'te üç fixture'ın KAO-16 files/checks kapsamına eklenmesini açıkça onayladı; üretim uygulaması kırmızı fixture kanıtından sonra ilerleyebilir.",
+      "resolvedAt": "2026-09-25",
+      "resolvedBy": "user",
       "planCheckVerifiesThis": false
     }
   ],

@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-25 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 18/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-15 · **blockedPrompt:** — · **Sıradaki:** **KAO-16**
+**Güncelleme:** 2026-09-25 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 19/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-16 · **blockedPrompt:** — · **Sıradaki:** **KAO-17**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -29,7 +29,7 @@
 | KAO-13 | E2 parça görevleri + E3 Done + kalibrasyon kaydı | done | R-A3 R-A7 R-B4 |
 | KAO-14 | E4 Üniteler + E5 Kelime (üç dokunuş, kök ağacı, bayrak) | done | R-A8 R-B3 R-B7 R-C1 |
 | KAO-15 | Seviye 0 kapısı (harf–ses–hareke) + renkli hareke | done | R-A9 |
-| KAO-16 | E6 Okuyucu (20 kısa sûre) + vakıf noktaları + gecikmeli test kaydı | pending | R-A6 R-C6 |
+| KAO-16 | E6 Okuyucu (20 kısa sûre) + vakıf noktaları + gecikmeli test kaydı | done | R-A6 R-C6 |
 | KAO-17 | E7 Ayarlar + ses stili + soldurma + CSV | pending | R-A4 R-A9 R-B5 R-B8 R-C4 |
 | KAO-26 | E8 Telaffuz stüdyosu | pending | R-B6 R-C2 |
 | KAO-27 | Gölgeleme (bellek-içi kayıt) | pending | — |
@@ -49,7 +49,7 @@
 | KAO-D6 | Dalga 6 denetimi | pending | — |
 
 ## Gereksinim durumu (12-EK-GEREKSINIMLER)
-R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:partial · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
+R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 73 | 2026-09-25 | KAO-15 yapısal telaffuz onarımı: K11 görünür okunuş değişmezi eklendi; kelime seçenekleri, dört gramer görevi, kelime dizme, parça çeviri, kök ve 1.563 örnek cümlede her Arapça birim kaynaklı Latin okunuşla eşlendi. Dondurma hattı okunuş eksikliğinde fail-closed oldu; örnek-cümle katmanı için sözlük üst bütçesi belgeli biçimde 340 KB'ye çıktı (gerçek 320.754 B). | Önce kırmızı sözleşme testi `s-95-1-1` eksikliğini yakaladı; 12 KAO fixture dosyası, deterministik yeniden dondurma, FX2 7/7+7/7+14/14, driver, zikr 95/95, rebind 37/37, shell, plan ve diff PASS; yayın yetkisi yok |
+| 77 | 2026-09-25 | KAO-16 bitti: 20 kısa sûre okuyucusu, her Arapça kelimenin görünür kaynaklı Latin okunuşu, bilinen/bilinmeyen açma akışı, altı vakıf açıklaması, bilinmeyeni yarına alma, “anladım” kaydı ve +7 günde 5 parçalık gecikmeli test tamamlandı. | `evidence/KAO-16/EVIDENCE.json`; R-A6 done, R-C6 partial (ısı haritası KAO-28b); KAO/FX2/driver/zikr/rebind/migration/shell/panel/plan/diff PASS; App 734 / onclick 392; push/deploy yok |

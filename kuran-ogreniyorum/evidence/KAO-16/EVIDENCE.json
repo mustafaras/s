@@ -1,0 +1,73 @@
+{
+  "card": "KAO-16",
+  "head": "75208480b8458d9494f9a57b2ad8dcf471774150",
+  "diffHash": "fc5aa0a81b5e62190b1d5b33fbc2bf34cb6d7df0dc7332147ae94e10fad2433f",
+  "date": "2026-09-25",
+  "agent": "Codex (GPT-5)",
+  "status": "PASS",
+  "scope": "E6 okuyucu, kelime açma ve yarın kuyruğu, vakıf açıklamaları, anladım kaydı ve beş soruluk +7 gün gecikmeli sûre testi",
+  "results": {
+    "reader": "20 frozen kısa sûre; 618/618 kelime görünür kaynaklı Latin okunuşla eşlenir",
+    "wordFlow": "bilinen anlam açık; bilinmeyen anlam dokunmayla açılır ve ertesi güne planlanır",
+    "waqf": "frozen içerikteki 6/6 işaret .kao-waqf kontrolü ve anlam-sınırı açıklaması taşır",
+    "delayedTest": "anladım kaydı +7 gün; vadesinde 5 parça-çevir görevi; 4/5 confirmedAt; düşük skor needsReread",
+    "fx2SurfacePin": "734 App handlers / 392 onclick"
+  },
+  "testFirst": {
+    "red": [
+      "test_kao_render: kaoSurahs API yok (exit 1)",
+      "test_kao_requirements: gecikmeli kuyruk 0 !== 5 (exit 1)",
+      "FX2 tab/overlay/touch: App yüzeyi 731 olduğu için sırasıyla 6/7, 6/7, 13/14"
+    ],
+    "green": "KAO render/requirements ve üç FX2 kardeş fixture üretim uygulaması sonrası exit 0"
+  },
+  "checks": [
+    { "cmd": "node --check <değişen her .js>", "exit": 0, "note": "7/7 changed JavaScript files" },
+    { "cmd": "for t in tests/kao/test_kao_*.js; do node \"$t\"; done", "exit": 0, "note": "12/12 fixture files PASS" },
+    { "cmd": "node tests/app/test_fx2_tab_transition.js", "exit": 0, "note": "7/7" },
+    { "cmd": "node tests/app/test_fx2_overlay_motion.js", "exit": 0, "note": "7/7" },
+    { "cmd": "node tests/app/test_fx2_touch_coverage.js", "exit": 0, "note": "14/14" },
+    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "PASS; no browser, token, personal data or network write" },
+    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95" },
+    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37/37" },
+    { "cmd": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs", "exit": 0, "note": "67/67" },
+    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "PASS; app.js 7800 lines" },
+    { "cmd": "node tests/panel/test_faz11_panel.js", "exit": 0, "note": "50/50" },
+    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "PASS, 0 warn" },
+    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0 }
+  ],
+  "requirements": {
+    "R-A6": "met",
+    "R-C6": "partial",
+    "note": "Beş soruluk +7 gün testi ve >=4/5 kesinleştirme tamam; ısı haritasında koyulaştırma KAO-28b kapsamındadır."
+  },
+  "filesTouched": [
+    "app/core/quranLearn.js",
+    "app/kao.css",
+    "app.js",
+    "tests/kao/test_kao_render.js",
+    "tests/kao/test_kao_requirements.js",
+    "tests/app/test_fx2_tab_transition.js",
+    "tests/app/test_fx2_overlay_motion.js",
+    "tests/app/test_fx2_touch_coverage.js",
+    "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
+    "kuran-ogreniyorum/KAO-STATE.json",
+    "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
+    "kuran-ogreniyorum/.anti-amnesia/LEDGER.md",
+    "kuran-ogreniyorum/evidence/KAO-16/EVIDENCE.json",
+    "kuran-ogreniyorum/evidence/KAO-16/HANDOFF.md"
+  ],
+  "userTaskPending": false,
+  "knownLimits": [
+    "Physical-device and real VoiceOver acceptance were not performed.",
+    "R-C6 heat-map darkening remains assigned to KAO-28b.",
+    "No push, merge, tag or deploy was authorized or performed."
+  ],
+  "boundaries": {
+    "network": "none",
+    "browser": "headless fixtures only",
+    "personalData": "not accessed",
+    "deviceAcceptance": "not_verified",
+    "delivery": "local commit only; push/merge/tag/deploy not authorized"
+  }
+}

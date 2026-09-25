@@ -152,10 +152,10 @@ group('FX2-15.2 çıkış/giriş CSS token ve reduced-motion sözleşmesi var',
 }
 
 const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-group('FX2-15.7 App yüzeyi 731, onclick 392 ve render/paint gövdeleri değişmedi',
+group('FX2-15.7 App yüzeyi 734, onclick 392 ve render/paint gövdeleri değişmedi',
   // IIP-10 / DEC-07: App.saygiLens 718 → 719. IIP-11: App.saygiReader 719 → 720.
   // KAO-14 yüzeyi 730'a çıktı; KAO-15 Seviye 0 dispatcher'ı ekledi.
-  handlers.size === 731 && (combinedSource.match(/onclick=/g) || []).length === 392 &&
+  handlers.size === 734 && (combinedSource.match(/onclick=/g) || []).length === 392 &&
   !/function render\(\)[\s\S]{0,180}sey-leaving/.test(appSource) &&
   !/function paint\(\)[\s\S]{0,180}sey-leaving/.test(appSource));
 

@@ -230,8 +230,8 @@ const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).
 // IIP-10 / DEC-07: App.saygiLens tek dispatcher handler'ı 718 → 719 yaptı;
 // onclick=391 pini değişmedi.
 // IIP-11: App.saygiReader tek dispatcher handler'ı 719 → 720 yaptı.
-// KAO-14 yüzeyi 730'a çıktı; KAO-15 Seviye 0 dispatcher'ı ekledi → 731 / 392.
-group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size === 731 && count(/onclick=/g, combinedSource) === 392);
+// KAO-16 okuyucu yüzeyi üç handler ekledi; güncel pin 734 / 392.
+group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size === 734 && count(/onclick=/g, combinedSource) === 392);
 
 // 10. Yüksek değerli niyetler sözlükte bulunur; none erken dönüşle sessizdir.
 const intentBody = (mediaSource.match(/var FX_INTENT\s*=\s*\{([\s\S]*?)\n\s*\};/) || [])[1] || '';

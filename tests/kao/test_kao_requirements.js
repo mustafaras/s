@@ -178,4 +178,36 @@ assert.equal(flagData.quranLearn.cards[flagCardId], undefined);
 assert.equal(flagApi.kaoFlag(flagCardId, 'example'), true);
 assert.deepEqual(Object.keys(flagData.quranLearn.cards[flagCardId].flagged).sort(), ['at', 'kind']);
 
+const delayedData = { quranLearn: null };
+const delayedUi = { kaoQueue: [], kaoTaskIndex: 0, kaoTaskStartedAt: 0, kaoUndo: null, kaoFeedback: '', kaoAudioFailed: false };
+const delayedApi = loadApi({
+  data() { return delayedData; }, ui() { return delayedUi; }, save() {}, render() {},
+  todayStr() { return '2026-09-25'; }, esc(value) { return String(value); }, icon() { return ''; }, getDay() { return {}; }
+});
+const delayedTaskNode = { innerHTML: '', attrs: {}, setAttribute(name, value) { this.attrs[name] = value; }, removeAttribute(name) { delete this.attrs[name]; }, querySelectorAll() { return []; } };
+assert.equal(delayedApi.registerQuranLearnSurface({
+  lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose(_c, _b, body) { body(); }, mount() {},
+  taskElement() { return delayedTaskNode; }, createAudio() { return null; }, isQuietTime() { return false; }, setTimer(fn, ms) { if (ms === 0) fn(); return ms; }, clearTimer() {}, toast() {}
+}), true);
+delayedApi.ensureQuranLearn(delayedData);
+delayedData.quranLearn.surahs['112'] = {
+  understoodAt: '2026-09-17T12:00:00.000Z', delayedTestAt: '2026-09-24T12:00:00.000Z', delayedScore: null
+};
+const delayedQueue = delayedApi.kaoBuildQueue(delayedData, '2026-09-25T12:00:00.000Z', { candidates: [] });
+assert.equal(delayedQueue.length, 5, 'R-C6: vadesi gelen sûre tam beş parça-çevir görevi üretmeli');
+assert.ok(delayedQueue.every((item) => item.delayedSurahId === 112 && item.fragmentKind === 'delayed'));
+const delayedTasks = delayedQueue.map((item) => delayedApi.kaoBuildTask(item, delayedData, { seed: item.id }));
+assert.ok(delayedTasks.every((task) => task && task.kind === 'translate' && task.pronunciation && task.choices.length === 4), 'gecikmeli görevler gerçek Arapça, okunuş ve dört seçenek taşımalı');
+delayedUi.kaoQueue = delayedQueue;
+delayedUi.kaoTasks = Object.fromEntries(delayedTasks.map((task) => [task.id, task]));
+for (let index = 0; index < delayedTasks.length; index += 1) {
+  const task = delayedTasks[index];
+  const choice = index < 4 ? task.choices.find((item) => item.correct) : task.choices.find((item) => !item.correct);
+  const result = delayedApi.kaoAnswer(task.id, choice.choiceId);
+  assert.equal(result.correct, index < 4);
+}
+assert.equal(delayedData.quranLearn.surahs['112'].delayedScore, 4);
+assert.match(delayedData.quranLearn.surahs['112'].confirmedAt, /^\d{4}-\d{2}-\d{2}T/, 'R-C6: 4/5 anlaşılmayı kesinleştirmeli');
+assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
+
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5, R-C2/C3/C5; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

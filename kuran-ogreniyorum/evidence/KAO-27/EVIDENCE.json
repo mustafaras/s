@@ -1,0 +1,60 @@
+{
+  "card": "KAO-27",
+  "head": "6734443a8c76ec6acb57d3e516e17582fbce6ecb",
+  "diffHash": "9c9693412d262bb7b5855e20a407e2f4abc09992eb00e4d6da6e8cc363a9f3a2",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-25",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "gate": {
+    "name": "D-10 kullanıcı onayı",
+    "approvedBy": "user",
+    "at": "2026-09-25"
+  },
+  "scope": "Gölgeleme: model 2× → bellek-içi kayıt (≤10 sn) → kendi kaydını ve modeli dinle → Yakın / Tekrar öz-değerlendirme; Telaffuz stüdyosu harf derslerindeki örnek kelimelerde; ayar varsayılan kapalı",
+  "handlers": [
+    "kaoRecordStart(clipId)",
+    "kaoRecordStop()",
+    "kaoRecordPlay(self|model)",
+    "kaoRecordDiscard(near|again|—)",
+    "kaoToggleShadowing()"
+  ],
+  "privacy": {
+    "storage": "Kayıt yalnız ui.kaoShadow içinde Blob URL; data/localStorage/sync/ağ yok (kaynak taraması + çalışma zamanı: data JSON ve save sayısı değişmez)",
+    "microphone": "Ayar kapalıyken getUserMedia hiç çağrılmaz; desteklemeyen cihazda izin istenmez; kayıt bitince/iptalde tüm izler durdurulur",
+    "revoke": "Sil, Tekrar, ayar kapatma, görünüm değişimi ve overlay kapanışında URL.revokeObjectURL",
+    "limit": "10 000 ms zamanlayıcı, elle bitirince iptal",
+    "consentText": "Ayarlar → Gölgeleme (mikrofon): Türkçe amaç ve saklama açıklaması; kayıt sırasında panel metni"
+  },
+  "persisted": "Yalnız settings.shadowing (boolean, varsayılan false); öz-değerlendirme puanlanmaz ve kaydedilmez",
+  "cache": {
+    "release": "20260925e → 20260925f"
+  },
+  "surfacePins": {
+    "appHandlers": "744 → 749",
+    "appAssignments": "582 → 587"
+  },
+  "checks": {
+    "node --check": "exit 0",
+    "git diff --check": "exit 0",
+    "test_kao_privacy": "PASS (gölgeleme dahil)",
+    "tests/kao tümü": "PASS",
+    "FX2 üçlü / iip_22 / v3 / surface-daily": "PASS",
+    "driver.mjs": "PASS",
+    "zikr-harness.mjs": "exit 0",
+    "test_state_rebind_boundary": "PASS",
+    "verify-state-* (3)": "exit 0",
+    "shell-inventory --gate": "PASS (app.js 7.799)",
+    "fullRegression": "tests/app+kao+quran+panel 120/120, reminder smoke exit 0"
+  },
+  "evidenceLevels": {
+    "source": "headless fixture (MediaRecorder/getUserMedia sahte)",
+    "deploy": "yok",
+    "device": "yok — gerçek mikrofon izni, iOS Safari MediaRecorder biçimi ve kayıt kalitesi kullanıcı kabulünde"
+  },
+  "planCheckWarning": {
+    "text": "app/core/quranLearn.js: MediaRecorder ve save birlikte — elle incele (05 §4)",
+    "review": "Elle incelendi: save() çağrıları yalnız KAO-17 ayar/FSRS yollarında; gölgeleme bloğu (// KAO-27 · Gölgeleme … kaoToggleShadowing öncesi) save/SeymaSave/localStorage/SeySync/fetch/data() içermez — test_kao_privacy.js kaynak taramasıyla ve çalışma zamanında (data JSON + save sayısı değişmez) sabitler. Uyarı dosya düzeyinde sezgisel; kalıcı yol yok.",
+    "verdict": "kabul — kalıcı yol yok"
+  }
+}

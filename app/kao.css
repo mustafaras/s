@@ -62,3 +62,6 @@
 .kao-ph-fragment{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:0;padding:14px;border-radius:18px;background:color-mix(in srgb,var(--quran2) 8%,var(--quran-surface));direction:rtl}.kao-ph-fragment li{direction:ltr}
 .kao-ph-attention ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}.kao-ph-attention li button{width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border:1px solid color-mix(in srgb,var(--quran-warn) 40%,transparent);border-radius:14px;background:var(--quran-surface);color:var(--quran-ink);font:inherit;cursor:pointer}
 @media (max-width:389px){.kao-ph-lesson{grid-template-columns:1fr;justify-items:center}}
+
+/* KAO-27 · Gölgeleme paneli (bellek-içi kayıt). */
+.kao-shadow{display:grid;gap:10px;margin:4px 0 10px;padding:14px;border:1px dashed color-mix(in srgb,var(--quran2) 55%,transparent);border-radius:16px;background:color-mix(in srgb,var(--quran2) 7%,var(--quran-surface))}.kao-shadow p{margin:0;line-height:1.55;color:var(--quran-ink)}.kao-shadow .kao-primary{margin-top:0}

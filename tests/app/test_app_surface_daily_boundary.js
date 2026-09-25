@@ -152,11 +152,11 @@ ok('saveToday preserves today lookup then App.saveNow order',
 
 const assignmentPattern = /App\.([A-Za-z0-9_$]+)\s*=\s*(?:function|async\s+function)/g;
 const currentAssignments = [...appSource.matchAll(assignmentPattern)].map((match) => match[1]);
-// IIP-10/11 sonrası KAO-10…16 yüzeyi 14 handler ekledi; 558 → 572. KAO-17 E7 ayarları 8 handler: 572 → 580.
-ok('App function assignment count remains 580', currentAssignments.length === 580);
+// IIP-10/11 sonrası KAO-10…16 yüzeyi 14 handler ekledi; 558 → 572. KAO-17 E7 ayarları 8 handler: 572 → 580. KAO-26 stüdyo 2 handler: 580 → 582.
+ok('App function assignment count remains 582', currentAssignments.length === 582);
 const handlerSurface = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || [])
   .map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-ok('unique App handler surface remains 742', handlerSurface.size === 742);
+ok('unique App handler surface remains 744', handlerSurface.size === 744);
 ok('the five daily handlers keep exact signature-preserving shims',
   handlerNames.every((name) => new RegExp('App\\.' + name + '=function').test(appSource) &&
     new RegExp('SEYMA_APP_SURFACE\\.' + name + '\\.apply\\(null,arguments\\)').test(appSource)));

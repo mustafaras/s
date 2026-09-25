@@ -1,0 +1,65 @@
+{
+  "card": "KAO-26",
+  "head": "b56bec35d3d688845bc17709c3d708e26847f5eb",
+  "diffHash": "325f4dd6a074187921b02cfae839605eb89e1fca8646b4e4245b42ef66b9e285",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-25",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "scope": "E8 Telaffuz stüdyosu: harf kovaları (B/C), inline mahreç SVG dersleri, altı algı görevi, FSRS telaffuz kartları, yanlış duyulan harf → dikkat kelime listesi, sessiz mod",
+  "handlers": [
+    "kaoOpenPhonics(letterId?)",
+    "kaoPhonics(action,value) — start/play/answer/silent/lesson/home dağıtıcısı"
+  ],
+  "tasks": {
+    "letter": "Hangi harf? — minimal çiftin örnek kelimesi (yavaş/doğal dönüşümlü) → 3 harf çipi (çift + aynı kovalardan seed'li çeldirici)",
+    "word": "Hangi kelime? — aynı klip → çiftin iki örnek kelimesi",
+    "medd": "Uzun mu kısa mı? — cevap doğrulanmış okunuştaki â/î/û'dan",
+    "shadda": "Şedde var mı? — cevap Arapça metindeki şedde işaretinden",
+    "order": "Dinle-diz — kısa sûreden aynı âyette ardışık 3 kelime klibi sırayla çalar; çipler sıraya dizilir",
+    "waqf": "Vakıf-vasıl — sessiz görev: parçadaki durak işaretinin yeri (veri: waqfMarks.afterWordId); açıklama r5_waqf kuralı"
+  },
+  "contentBoundary": "Yeni Arapça/ses içeriği üretilmedi; tüm uyaran ve cevaplar dondurulmuş QuranPhonicsV1/QuranLexiconV1/QuranShortSurahsV1 ve paketli klipler üzerinden. Tek harf/hece klibi ve ikinci okuyucu pakette yok; çok stil, aynı kelimenin yavaş/doğal iki modeliyle sağlandı. Aynı parçanın iki okunuşu (vakıf/vasıl) kaydı olmadığından vakıf görevi görsel.",
+  "persistence": {
+    "cards": "quranLearn.phonics['p:<çift>'|'p:medd'|'p:shadda'|'p:order'|'p:waqf'] — kaoSchedule/kaoGrade (mevcut FSRS)",
+    "misheard": "quranLearn.phonics.misheard{harfId:sayı}",
+    "migration": "p:* nesne değilse silinir; misheard pozitif tamsayıya normalize"
+  },
+  "results": {
+    "R-B6": "13 SVG ≤4 KB, fill=currentColor, sabit renk/betik yok; quranLearn.js içine birebir gömülü (eşitlik fixture'ı), <img> yok, renk --quran tokenından",
+    "R-C2": "Klip hatası/sessiz seçim → kalan görevler yalnız görsel; bilgi metni; oturum done'a ulaşır (fixture)"
+  },
+  "repair": {
+    "icons": "quranLearn.js'te ikon haritasında olmayan adlar düzeltildi: alert-triangle→triangle-alert, volume-2→headphones, flag→target. Render stub'ı adı yankıladığı için yakalanmıyordu; artık kullanılan her ikonun haritada olduğu fixture'la sabit."
+  },
+  "cache": {
+    "release": "20260925d → 20260925e"
+  },
+  "surfacePins": {
+    "appHandlers": "742 → 744",
+    "appAssignments": "580 → 582"
+  },
+  "checks": {
+    "node --check": "exit 0",
+    "git diff --check": "exit 0",
+    "test_kao_render": "PASS",
+    "test_kao_phonics_contract": "PASS",
+    "test_kao_migration": "PASS",
+    "tests/kao tümü": "PASS",
+    "FX2 üçlü": "PASS",
+    "test_iip_22": "PASS",
+    "test_v3_welcome": "PASS",
+    "test_app_surface_daily_boundary": "PASS",
+    "driver.mjs": "PASS",
+    "zikr-harness.mjs": "exit 0",
+    "test_state_rebind_boundary": "PASS",
+    "verify-state-* (3)": "exit 0",
+    "shell-inventory --gate": "PASS (app.js 7.799)",
+    "fullRegression": "tests/app+kao+quran+panel 120/120, reminder smoke exit 0"
+  },
+  "evidenceLevels": {
+    "source": "headless fixture",
+    "deploy": "yok",
+    "device": "yok — gerçek seste ayırt edilebilirlik, SVG görünümü ve VoiceOver kullanıcı kabulünde"
+  }
+}

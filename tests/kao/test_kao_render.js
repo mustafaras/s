@@ -220,7 +220,7 @@ api.kaoOpenWord(shiftedWord.id);
 api.kaoWordLayer(2);
 const shiftedWordHtml = api.kaoWordHTML();
 assert.match(shiftedWordHtml, /kao-cognate is-shift/);
-assert.match(shiftedWordHtml, /alert-triangle/);
+assert.match(shiftedWordHtml, /triangle-alert/);
 assert.match(shiftedWordHtml, /dikkat/);
 
 api.kaoOpenWord(layeredLemma.id);
@@ -360,4 +360,37 @@ keySandbox.App.onModalKeydown({ key: 'Escape', currentTarget: dialog, preventDef
 assert.equal(escaped, 1, 'Escape kapatma callbackini çalıştırmalı');
 assert.ok(prevented >= 3 && stopped >= 3);
 
-console.log('KAO render: PASS (hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');
+
+// KAO-26 · E8 Telaffuz stüdyosu render sözleşmesi.
+{
+  const constantsBox = { window: {} };
+  vm.createContext(constantsBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/core/constants.js'), 'utf8'), constantsBox);
+  const iconNames = new Set(Object.keys(constantsBox.window.SeymaConstants.ICONS));
+  const usedIcons = [...new Set([...source.matchAll(/icon\('([a-z0-9-]+)'/g)].map((match) => match[1]))];
+  assert.deepEqual(usedIcons.filter((name) => !iconNames.has(name)), [], 'KAO kullandığı her ikon ikon haritasında olmalı (simge + metin)');
+  ui.kaoOpen = true; ui.kaoAudioFailed = false;
+  assert.equal(api.kaoOpenPhonics(), true);
+  assert.equal(ui.kaoView, 'phonics');
+  const phonicsHome = api.kaoOverlayHTML('2026-09-25T10:00:00');
+  assert.match(phonicsHome, /aria-labelledby="kao-phonics-title"/);
+  assert.match(phonicsHome, /Kova B · Yakın ama farklı[\s\S]*Kova C · Türkçede yok/);
+  const bcLetters = sandbox.window.QuranPhonicsV1.letters.filter((letter) => letter.bucket === 'B' || letter.bucket === 'C');
+  assert.equal((phonicsHome.match(/App\.kaoPhonics\('lesson','/g) || []).length, bcLetters.length, 'her B/C harfinin dersi');
+  assert.match(phonicsHome, /App\.kaoPhonics\('start'\)/); assert.match(phonicsHome, /App\.kaoPhonics\('silent'\)/);
+  assert.match(api.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoOpenPhonics\(\)/, 'E1 ana ekrandan stüdyo girişi');
+  assert.equal(api.kaoOpenPhonics('ayn'), true);
+  const lesson = api.kaoPhonicsHTML();
+  assert.match(lesson, /<span class="kao-mahrec"><svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"[^>]*role="img" fill="currentColor"><title>/, 'R-B6: inline SVG currentColor');
+  assert.doesNotMatch(lesson, /<img/);
+  assert.match(lesson, /Karıştırılan çift/); assert.match(lesson, /kao-pronunciation-line/);
+  assert.match(cssSource, /\.kao-mahrec\{display:block;color:var\(--quran\)\}/, 'SVG rengi tema tokenından');
+  api.kaoPhonics('start');
+  const taskHtml = api.kaoPhonicsHTML();
+  assert.match(taskHtml, /id="kao-phonics-task"/); assert.match(taskHtml, /App\.kaoPhonics\('play'\)/); assert.match(taskHtml, /aria-live="polite"/);
+  assert.match(taskHtml, /Sessiz devam et/);
+  for (const name of ['kaoOpenPhonics', 'kaoPhonics']) assert.match(appSource, new RegExp(`App\\.${name}=function\\([^)]*\\)\\{ return window\\.SeymaQuranLearn\\.${name}\\.apply\\(null,arguments\\); \\};`));
+  ui.kaoPhonics = { phase: 'home' }; ui.kaoView = 'home'; ui.kaoOpen = false;
+}
+
+console.log('KAO render: PASS (E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');

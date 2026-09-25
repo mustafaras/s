@@ -32,7 +32,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(fresh)), {
   settings: { dailyNew: 10, audio: false, audioStyle: 'measured', harakat: true, translit: true, translitLayer: 'tr' },
   cards: {}, units: {}, surahs: {}, daily: {},
   milestones: { fatiha: null, namaz: null, half: null, twoThirds: null, eighty: null, shortSurahs: null },
-  phonics: { style: 'muallim' },
+  phonics: { style: 'muallim', misheard: {} },
   errors: { sound: 0, root: 0, affix: 0, cognate: 0, rule: 0, order: 0 },
   ayahs: { understood: [] },
   readability: { lineHeight: 'normal', wordSpacing: 'normal', coloredHarakat: true, fadeHarakat: false }

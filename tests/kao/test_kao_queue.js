@@ -131,4 +131,66 @@ const mixedGrammarQueue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew
 });
 assert.equal(mixedGrammarQueue.filter((item) => item.type === 'grammar').length, 4, 'karma gerçek oturum dört gramer türünü korumalı');
 
+
+// KAO-28 · E9 kaoPickAyah: yalnız kısa sûreler, kapsam ≥%95, görülmemiş öncelikli, deterministik; understood ≤400.
+{
+  const box = { window: {} };
+  vm.createContext(box);
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  const e9 = box.window.SeymaQuranLearn, shorts = box.window.QuranShortSurahsV1;
+  const groups = e9.kaoAyahGroups();
+  assert.ok(groups.length > 100 && groups.every((group) => group.words.every((word) => word.surahId === group.surahId && word.ayah === group.ayah && word.pronunciation && word.tr)), 'âyet grupları yalnız kısa sûre verisinden ve eksiksiz');
+  assert.equal(e9.kaoPickAyah({ quranLearn: { cards: {} } }, '2026-09-25'), null, 'bilinen kelime yokken âyet yok');
+  const knowAll = (keys) => { const cards = {}; for (const group of groups.filter((item) => keys.includes(item.key))) for (const word of group.words) cards[`w:${word.lemmaId}:ar>tr`] = { reps: 1 }; return cards; };
+  const target = groups.find((group) => group.words.length >= 20) || groups.reduce((a, b) => (b.words.length > a.words.length ? b : a));
+  const cards = knowAll([target.key]);
+  const pickedFull = e9.kaoPickAyah({ quranLearn: { cards } }, '2026-09-25');
+  assert.ok(pickedFull && pickedFull.coverage.ratio >= 0.95);
+  // Eşik: tam 1 kelime eksik — oran ≥0,95 ise seçilir, değilse seçilmez.
+  const oneMissing = Object.assign({}, cards); delete oneMissing[`w:${target.words[0].lemmaId}:ar>tr`];
+  const sharedLemma = target.words.filter((word) => word.lemmaId === target.words[0].lemmaId).length;
+  const ratio = (target.words.length - sharedLemma) / target.words.length;
+  const picked = e9.kaoPickAyah({ quranLearn: { cards: oneMissing } }, '2026-09-25');
+  const pickedKeys = groups.filter((group) => e9.kaoCoverage({ quranLearn: { cards: oneMissing } }, group.words).ratio >= 0.95).map((group) => group.key);
+  assert.equal(pickedKeys.includes(target.key), ratio >= 0.95, `eşik ${ratio.toFixed(3)}`);
+  if (picked) assert.ok(e9.kaoCoverage({ quranLearn: { cards: oneMissing } }, picked.words).ratio >= 0.95);
+  // Determinizm + görülmemiş önceliği.
+  const many = knowAll(groups.map((group) => group.key));
+  const a = e9.kaoPickAyah({ quranLearn: { cards: many } }, '2026-09-25'), b = e9.kaoPickAyah({ quranLearn: { cards: many } }, '2026-09-25');
+  assert.equal(a.key, b.key, 'aynı gün aynı âyet');
+  const days = new Set(Array.from({ length: 14 }, (_, i) => e9.kaoPickAyah({ quranLearn: { cards: many } }, `2026-10-${String(i + 1).padStart(2, '0')}`).key));
+  assert.ok(days.size > 7, 'günler arasında dönüşüm');
+  const allButOne = groups.map((group) => group.key).filter((key) => key !== groups[5].key);
+  assert.equal(e9.kaoPickAyah({ quranLearn: { cards: many, ayahs: { understood: allButOne } } }, '2026-09-25').key, groups[5].key, 'görülmemiş âyet önce');
+  assert.ok(e9.kaoPickAyah({ quranLearn: { cards: many, ayahs: { understood: groups.map((group) => group.key) } } }, '2026-09-25'), 'hepsi görüldüyse yine bir âyet');
+  // "Anladım" kaydı: tekil, en çok 400, E1 sayacında.
+  const data = { quranLearn: { cards: many, ayahs: { understood: Array.from({ length: 400 }, (_, i) => `x:${i}`) } }, settings: {} };
+  const ui = { kaoOpen: true, kaoView: 'ayah' };
+  let saves = 0;
+  assert.equal(e9.registerQuranLearn({ data() { return data; }, ui() { return ui; }, save() { saves += 1; }, render() {}, todayStr() { return '2026-09-25'; }, esc(value) { return String(value); }, icon() { return ''; }, getDay() { return {}; } }), true);
+  const today = e9.kaoPickAyah(data, '2026-09-25');
+  assert.equal(e9.kaoAyahHTML().includes(today.words[0].tr), true, 'E9 günün seçimini gösterir');
+  assert.equal(e9.kaoAyah('understood'), true); assert.equal(e9.kaoAyah('understood'), true);
+  assert.equal(data.quranLearn.ayahs.understood.length, 400); assert.equal(data.quranLearn.ayahs.understood.at(-1), today.key);
+  assert.equal(data.quranLearn.ayahs.understood.filter((key) => key === today.key).length, 1, 'tekil'); assert.equal(saves, 2);
+  assert.match(e9.kaoAyahHTML(), new RegExp(today.words[0].tr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), 'Anladım sonrası günün âyeti değişmez');
+  const html = e9.kaoAyahHTML();
+  assert.match(html, /aria-labelledby="kao-ayah-title"/); assert.match(html, /Anladın ✓/);
+  assert.equal((html.match(/App\.kaoAyah\('play',\d+\)/g) || []).length, today.words.length, 'kelime kelime ses');
+  assert.equal((html.match(/kao-ayah-tr/g) || []).length, today.words.length, 'kelime kelime Türkçe');
+  assert.match(e9.kaoHomeHTML('2026-09-25T10:00:00'), /Bugün anlayabildiğin âyet[\s\S]*App\.kaoOpenAyah\(\)/, 'E1 satırı');
+  assert.match(e9.kaoHomeHTML('2026-09-25T10:00:00'), /Anlaşılan âyet sayısı: <strong>400<\/strong>/, 'sayaç E1’de');
+  assert.match(e9.kaoHubCardHTML(), /Bugün anlayabildiğin âyet:/, 'hub kartı satırı');
+  const emptyData = { quranLearn: { cards: {} }, settings: {} };
+  data.quranLearn = emptyData.quranLearn; ui.kaoAyahToday = null;
+  assert.match(e9.kaoAyahHTML(), /Henüz hazır âyet yok[\s\S]*En yakın âyet/, 'hazır âyet yokken yol gösterir');
+  assert.equal(e9.kaoAyah('understood'), false, 'âyet yokken kayıt yok');
+  // R-C2: ses yoksa metinle sürer.
+  data.quranLearn = { cards: many, ayahs: { understood: [] } };
+  assert.equal(e9.registerQuranLearnSurface({ lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose(_c, _b, body) { body(); }, mount() {}, createAudio(src) { const l = {}; return { src, addEventListener(n, f) { l[n] = f; }, play() { l.error(); return { catch() {} }; } }; } }), true);
+  assert.equal(e9.kaoAyah('play', 'all'), true);
+  assert.equal(ui.kaoAudioFailed, true); assert.match(e9.kaoAyahHTML(), /Ses yüklenemedi/);
+  assert.ok(shorts.words.length === 618);
+}
+
 console.log(`KAO queue: PASS (${first.length} deterministic tasks + 4 grammar types, budgets/interleave/semantic spacing)`);

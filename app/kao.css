@@ -65,3 +65,9 @@
 
 /* KAO-27 · Gölgeleme paneli (bellek-içi kayıt). */
 .kao-shadow{display:grid;gap:10px;margin:4px 0 10px;padding:14px;border:1px dashed color-mix(in srgb,var(--quran2) 55%,transparent);border-radius:16px;background:color-mix(in srgb,var(--quran2) 7%,var(--quran-surface))}.kao-shadow p{margin:0;line-height:1.55;color:var(--quran-ink)}.kao-shadow .kao-primary{margin-top:0}
+
+/* KAO-28 · E9 Bugün anlayabildiğin âyet. */
+.kao-ayah{display:grid;gap:14px;max-width:460px;margin:0 auto}.kao-ayah-coverage{margin:0;display:flex;align-items:center;gap:7px;font-size:var(--f-footnote);font-weight:800;color:var(--quran)}
+.kao-ayah-words{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin:0;padding:16px 10px;list-style:none;direction:rtl;border:1px solid color-mix(in srgb,var(--quran) 16%,transparent);border-radius:22px;background:var(--quran-surface)}.kao-ayah-words li{direction:ltr}.kao-ayah-words button{min-height:44px;display:grid;justify-items:center;gap:3px;padding:8px 10px;border:1px solid color-mix(in srgb,var(--quran) 14%,transparent);border-radius:14px;background:color-mix(in srgb,var(--quran2) 5%,var(--quran-surface));color:var(--quran-ink);font:inherit;cursor:pointer}.kao-ayah-tr{font-size:var(--f-caption1);color:color-mix(in srgb,var(--quran-ink) 72%,transparent)}
+.kao-ayah-empty,.kao-today-ayah{padding:18px;border:1px solid color-mix(in srgb,var(--quran) 18%,transparent);border-radius:22px;background:var(--quran-surface)}.kao-ayah-empty p,.kao-today-ayah p:not(.kao-eyebrow){margin:6px 0 0;line-height:1.55;color:color-mix(in srgb,var(--quran-ink) 76%,transparent)}
+.kao-hub-ayah{position:relative;z-index:1;font-size:var(--f-footnote);color:var(--quran-ink)}.kao-hub-ayah b{color:var(--quran)}

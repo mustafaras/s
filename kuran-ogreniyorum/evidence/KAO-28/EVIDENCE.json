@@ -1,0 +1,50 @@
+{
+  "card": "KAO-28",
+  "head": "e9f01ecf7de8be21471de88470a3ae432beb7e22",
+  "diffHash": "54e8c0086f18299be23905320e025fa66bdbd16aae234fa50799e6d7c41fd9ed",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-25",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "scope": "E9 'Bugün anlayabildiğin âyet': kısa sûrelerin (Seviye 6 yok) 138 âyetinden kelimelerinin ≥%95'i bilinen biri deterministik seçilir; kelime kelime okunuş + Türkçe + ses; 'Anladım' ayahs.understood'a (tekil, en çok 400); E1 bölümü + sayaç, hub kartı satırı",
+  "functions": {
+    "kaoKnownLemmaSet": "tek bilinen-kelime kuralı (yetim ve okuyucu-bilinmeyen hariç; reps>0 veya review); E1 istatistiği, üniteler, okuyucu, hub, CSV, E9 bunu kullanır",
+    "kaoCoverage": "token kapsamı: (d) → bilinen lemma frekansı / 77.430 (01-ARASTIRMA, QAC); (d, words) → âyet kelimelerinde bilinen oranı",
+    "kaoPickAyah": "≥0,95; görülmemiş önce; aynı tohumda deterministik",
+    "kaoTodayAyah": "günün seçimi ui'de gün boyu sabit ('Anladım' sonrası başka âyete atlamaz)"
+  },
+  "behaviourChange": {
+    "E1": "Kapsam yüzdesi 'bilinen lemma / 524' yerine token kapsamı (01-ARASTIRMA §166: tüm kapsam yüzdeleri token kapsamıdır). Tüm sözlük bilinse %77'de durur; eski hesap %100 gösteriyordu.",
+    "bugCaughtByTest": "İlk sürümde 'Anladım' sonrası günün âyeti değişiyordu; fixture yakaladı, ui önbelleğiyle düzeltildi."
+  },
+  "results": {
+    "E9": "seçici, eşik, determinizm, görülmemiş önceliği, understood tekil/400, E1 sayacı, hub satırı, hazır âyet yokken en yakın âyet yol gösterimi",
+    "R-C2": "ses yüklenemezse bilgi + metinle devam"
+  },
+  "cache": {
+    "release": "20260925f → 20260925g"
+  },
+  "surfacePins": {
+    "appHandlers": "749 → 751",
+    "appAssignments": "587 → 589"
+  },
+  "checks": {
+    "node --check": "exit 0",
+    "git diff --check": "exit 0",
+    "test_kao_queue": "PASS (E9 seçici dahil)",
+    "test_kao_lexicon_coverage": "PASS (ortak kaoCoverage dahil)",
+    "tests/kao tümü": "PASS",
+    "FX2 üçlü / iip_22 / v3 / surface-daily": "PASS",
+    "driver.mjs": "PASS",
+    "zikr-harness.mjs": "exit 0",
+    "test_state_rebind_boundary": "PASS",
+    "verify-state-* (3)": "exit 0",
+    "shell-inventory --gate": "PASS (app.js 7.799)",
+    "fullRegression": "tests/app+kao+quran+panel 120/120, reminder smoke exit 0"
+  },
+  "evidenceLevels": {
+    "source": "headless fixture",
+    "deploy": "yok (bu commit)",
+    "device": "yok"
+  }
+}

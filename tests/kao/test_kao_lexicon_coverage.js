@@ -31,4 +31,31 @@ for (const checkpoint of checkpoints) {
 
 const selectedFrequency = lemmas.reduce((sum, lemma) => sum + lemma.freq, 0);
 assert.equal(selectedFrequency, 59948, 'dondurulan frekans toplamı doğrulanmış girdiden sapmamalı');
+
+// KAO-28 · ortak kaoCoverage: E1 ve E9 aynı token paydasını ve aynı bilinen-kelime kuralını kullanır.
+{
+  const box = { window: {} };
+  vm.createContext(box);
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  const api = box.window.SeymaQuranLearn;
+  const top = lemmas.slice(0, 10);
+  const cards = Object.fromEntries(top.map((lemma) => [`w:${lemma.id}:ar>tr`, { reps: 1 }]));
+  cards[`w:${lemmas[10].id}:ar>tr`] = { reps: 3, orphan: true };
+  cards[`w:${lemmas[11].id}:tr>ar`] = { reps: 1, readerUnknown: true };
+  const data = { quranLearn: { cards } };
+  const whole = api.kaoCoverage(data);
+  assert.equal(whole.total, TOKEN_DENOMINATOR, 'E1 paydası QAC token sayısı');
+  assert.equal(whole.known, top.reduce((sum, lemma) => sum + lemma.freq, 0), 'yetim ve okuyucu-bilinmeyen sayılmaz');
+  assert.equal(whole.ratio, whole.known / TOKEN_DENOMINATOR);
+  const everything = api.kaoCoverage({ quranLearn: { cards: Object.fromEntries(lemmas.map((lemma) => [`w:${lemma.id}:tr>ar`, { state: 'review' }])) } });
+  assert.equal(everything.known, selectedFrequency, 'tüm sözlük = %77,42 (üst sınır)');
+  const words = [{ lemmaId: top[0].id }, { lemmaId: top[1].id }, { lemmaId: 'l_yok_000000' }, { lemmaId: lemmas[10].id }];
+  assert.deepEqual(JSON.parse(JSON.stringify(api.kaoCoverage(data, words))), { known: 2, total: 4, ratio: 0.5 }, 'âyet kapsamı token düzeyinde');
+  assert.deepEqual(JSON.parse(JSON.stringify(api.kaoCoverage(data, []))), { known: 0, total: 0, ratio: 0 });
+  const source = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8');
+  assert.match(source, /percent=Math\.min\(100,Math\.floor\(kaoCoverage\(d\)\.ratio\*100\)\)/, 'E1 yüzdesi ortak kaoCoverage');
+  assert.doesNotMatch(source, /stats\.known\/524/, 'eski lemma/524 yüzdesi kalmadı');
+  assert.equal((source.match(/card\.readerUnknown!==true/g) || []).length, 1, 'bilinen-kelime kuralı tek yerde (kaoKnownLemmaSet)');
+}
+
 console.log(`KAO lexicon coverage: PASS (${selectedFrequency}/${TOKEN_DENOMINATOR} = ${(selectedFrequency / TOKEN_DENOMINATOR * 100).toFixed(2)}%)`);

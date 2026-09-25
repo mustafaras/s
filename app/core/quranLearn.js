@@ -520,17 +520,38 @@
     var days=Math.max(0,Math.ceil((due.getTime()-now.getTime())/DAY_MS));
     return days===0?'Bugün':days+' gün';
   }
+  function normalizeArabicForPronunciation(value){
+    return String(value||'').normalize('NFKD')
+      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\s.،؛؟ۚۖ]/g,'')
+      .replace(/[ٱأإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه');
+  }
+  function kaoVerifiedAyahPronunciation(example){
+    var match=String(example&&example.ref||'').match(/^(\d+):(\d+(?:-\d+)?)$/),order=window.QuranRevelationOrderV1,catalog=window.QuranStrikingVersesV1;
+    if(!match||!order||!Array.isArray(order.surahs)||!catalog||!Array.isArray(catalog.verses)) return '';
+    var surah=order.surahs.find(function(item){ return item.mushafOrder===Number(match[1]); });
+    if(!surah) return '';
+    var verse=catalog.verses.find(function(item){
+      return item.surahId===surah.id&&String(item.ayetNo)===match[2]&&item.transliterationTr&&item.transliterationVerifiedAt&&item.transliterationReviewer;
+    });
+    if(!verse||normalizeArabicForPronunciation(verse.arabic)!==normalizeArabicForPronunciation(example.ar)) return '';
+    return String(verse.transliterationTr);
+  }
+  function kaoExamplePronunciationHTML(example,lemma,esc){
+    var ayahPronunciation=kaoVerifiedAyahPronunciation(example);
+    if(ayahPronunciation) return '<div class="kao-example-pronunciation is-verified"><small>Âyetin okunuşu</small><p lang="tr" dir="ltr">'+esc(ayahPronunciation)+'</p></div>';
+    return '<div class="kao-example-pronunciation"><small>Öğrendiğin kelimenin okunuşu</small><p lang="tr" dir="ltr">'+esc(lemma.translit||'Doğrulanmış okunuş henüz yok')+'</p><span>Bu alıntının tam okunuşu henüz doğrulanmadı.</span></div>';
+  }
   function kaoWordHTML(){
     if(!quranLearnDeps) return '';
     var d=quranLearnDeps.data(),q=ensureQuranLearn(d),ui=quranLearnDeps.ui(),lex=window.QuranLexiconV1,lemma=lex&&lex.byId&&lex.byId(ui.kaoWordId),layer=Math.max(1,Math.min(3,Math.floor(nonNegativeNumber(ui.kaoWordLayer,1)))),esc=quranLearnDeps.esc;
     if(!lemma) return kaoUnitsHTML();
     var cardId=wordCardId(q,lemma.id),card=objectOr(q.cards[cardId],{}),root=rootDetail(lemma.root),h='<main class="kao-word" data-word-layer="'+layer+'" aria-labelledby="kao-word-title"><div class="kao-view-head"><button type="button" class="kao-back" onclick="App.kaoSetView(\'units\')">Üniteler</button><span>Katman '+layer+' / 3</span></div>';
     if(layer===1){
-      h+='<section class="kao-word-hero"><p id="kao-word-title" lang="ar" dir="rtl">'+esc(lemma.ar)+'</p><button type="button" class="kao-audio" onclick="App.kaoPlay(\'w-'+esc(lemma.id)+'\',\'measured\')">'+quranLearnDeps.icon('volume-2',17)+' Dinle</button><h2>'+esc(lemma.meanings[0]||'')+'</h2>'+(lemma.meanings[1]?'<p>'+esc(lemma.meanings[1])+'</p>':'')+'</section><button type="button" class="kao-primary" onclick="App.kaoWordLayer(2)">Kökünü ve akrabalarını gör</button>';
+      h+='<section class="kao-word-hero"><p id="kao-word-title" lang="ar" dir="rtl">'+esc(lemma.ar)+'</p><div class="kao-pronunciation"><small>Okunuş</small><strong lang="tr" dir="ltr">'+esc(lemma.translit||'Doğrulanmış okunuş henüz yok')+'</strong></div><button type="button" class="kao-audio" aria-label="'+esc(lemma.ar)+' Arapça telaffuzunu dinle" onclick="App.kaoPlay(\'w-'+esc(lemma.id)+'\',\'measured\')">'+quranLearnDeps.icon('volume-2',17)+' Telaffuzu dinle</button><h2>'+esc(lemma.meanings[0]||'')+'</h2>'+(lemma.meanings[1]?'<p>'+esc(lemma.meanings[1])+'</p>':'')+'</section><button type="button" class="kao-primary" onclick="App.kaoWordLayer(2)">Kökünü ve akrabalarını gör</button>';
     }else if(layer===2){
       h+='<section class="kao-root-tree"><p class="kao-eyebrow">Kök</p><h2 id="kao-word-title" lang="ar" dir="rtl">'+esc(Array.from(lemma.root||'').join('–'))+'</h2><p>'+esc(root&&root.meaning||lemma.pattern||'')+'</p><h3>Türkçedeki akrabaları</h3><div class="kao-derivatives">'+(root?root.derivatives.map(function(item){ return '<span><b>'+esc(item.tr)+'</b><small class="kao-pattern">'+esc(item.pattern)+'</small></span>'; }).join(''):'')+'</div>'+kaoCognateHTML(lemma)+'</section><button type="button" class="kao-primary" onclick="App.kaoWordLayer(3)">Kur’an’dan örnekleri gör</button>';
     }else{
-      h+='<section class="kao-word-examples"><p class="kao-eyebrow">Kur’an’da</p><h2 id="kao-word-title">Üç bağlam</h2>'+lemma.examples.slice(0,3).map(function(example){ return '<article class="kao-word-example"><p lang="ar" dir="rtl">'+esc(example.ar)+'</p><p>'+esc(example.tr)+'</p><small>'+esc(example.ref)+'</small></article>'; }).join('')+'<p class="kao-next-review">Sonraki tekrar: <strong>'+esc(nextReviewText(card))+'</strong></p></section>';
+      h+='<section class="kao-word-examples"><p class="kao-eyebrow">Kur’an’da</p><h2 id="kao-word-title">Üç bağlam</h2>'+lemma.examples.slice(0,3).map(function(example){ return '<article class="kao-word-example"><p lang="ar" dir="rtl">'+esc(example.ar)+'</p>'+kaoExamplePronunciationHTML(example,lemma,esc)+'<p>'+esc(example.tr)+'</p><small>'+esc(example.ref)+'</small></article>'; }).join('')+'<p class="kao-next-review">Sonraki tekrar: <strong>'+esc(nextReviewText(card))+'</strong></p></section>';
     }
     h+='<details class="kao-flag"><summary>Hata bildir</summary><div><button type="button" onclick="App.kaoFlag(\''+esc(cardId)+'\',\'meaning\')">Anlamı bildir</button><button type="button" onclick="App.kaoFlag(\''+esc(cardId)+'\',\'example\')">Örneği bildir</button></div></details></main>';
     return h;
@@ -991,6 +1012,7 @@
     kaoUnitsHTML:kaoUnitsHTML,
     kaoOpenWord:kaoOpenWord,
     kaoWordLayer:kaoWordLayer,
+    kaoVerifiedAyahPronunciation:kaoVerifiedAyahPronunciation,
     kaoWordHTML:kaoWordHTML,
     kaoFlag:kaoFlag,
     kaoHubCardHTML:kaoHubCardHTML,

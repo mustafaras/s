@@ -1,6 +1,6 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-24 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 18/30
+**Güncelleme:** 2026-09-25 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 18/30
 **activePrompt:** — · **lastCompletedPrompt:** KAO-15 · **blockedPrompt:** — · **Sıradaki:** **KAO-16**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:partial · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:pending · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 71 | 2026-09-24 | KAO-15 bitti: 20+12 soruluk iki parçalı kapı, ses yoksa erteleme, en çok üç yeni sesli 12 mini ders, metni koruyan renkli hareke ve Arapça okunabilirlik ayarları tamamlandı. | `evidence/KAO-15/EVIDENCE.json`; KAO/FX2/driver/zikr/rebind/shell/plan/diff PASS; R-A9 kontrast ölçümü KAO-18'e kaldı |
+| 72 | 2026-09-25 | KAO-15 telaffuz onarımı: E5 kelime kartına doğrulanmış görünür okunuş ve açık ses etiketi; üç âyet bağlamına kaynak-sınırını koruyan okunuş katmanı eklendi. Tam âyet okunuşu yalnız alan-sahibi onaylı pilot katalogla Arapça metni birebir eşleşirse gösterilir; diğer kayıtta hedef kelime okunuşu ve doğrulama sınırı görünür. | Test önce kırmızı (`kao-pronunciation` yok), sonra KAO/FX2/driver/zikr/rebind/shell/plan/diff PASS; kullanıcı commit/push/ff-merge/Pages deploy yetkisi verdi |

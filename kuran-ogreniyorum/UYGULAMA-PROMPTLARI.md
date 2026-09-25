@@ -758,9 +758,9 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 **İzinli dosyalar (STATE ile birebir):**
 - `app/core/quranLearn.js`
 - `app/kao.css`
+- `index.html`
 - `app.js`
 - `app/core/settings.js`
-- `index.html`
 - `tests/kao/test_kao_render.js`
 - `tests/app/test_fx2_*.js`
 - `kuran-ogreniyorum/evidence/KAO-10/**`
@@ -812,6 +812,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 **İzinli dosyalar (STATE ile birebir):**
 - `app/core/quranLearn.js`
 - `app/kao.css`
+- `index.html`
 - `app.js`
 - `tests/kao/test_kao_render.js`
 - `tests/kao/test_kao_requirements.js`
@@ -1036,6 +1037,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 2. 12 ders: içerik `QuranPhonicsV1` + sözlük; ders başına en çok 3 yeni ses.
 3. `readability.coloredHarakat` (Seviye 0–1 varsayılan açık): hareke `<span class="kao-h-fatha|kesra|damma">` ile sarılır — sarma aracı **saf fonksiyon**, harf değiştirmez (fixture: sarma öncesi/sonrası metin eşit).
 4. Satır aralığı / kelime boşluğu ayarları CSS değişkeniyle (`--kao-ar-lh`, `--kao-ar-ws`).
+5. Kapanış sonrası telaffuz onarımı: E5 kelime katmanında doğrulanmış `translit` görünür olur; ses kontrolü açıkça etiketlenir. Âyet bağlamında yalnız alan-sahibi onaylı katalogla Arapça metni birebir eşleşen tam okunuş gösterilir; diğer kayıtlarda öğrenilen kelimenin doğrulanmış okunuşu ve tam âyet doğrulama sınırı sunulur. `index.html` yalnız bu onarımın önbellek sürümünü yükseltmek için kapsamdadır.
 
 **Kontroller (hepsi exit 0; STATE ile birebir):**
 - `node --check <değişen her .js/.mjs>`

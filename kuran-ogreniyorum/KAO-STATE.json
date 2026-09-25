@@ -688,9 +688,9 @@
       "files": [
         "app/core/quranLearn.js",
         "app/kao.css",
+        "index.html",
         "app.js",
         "app/core/settings.js",
-        "index.html",
         "tests/kao/test_kao_render.js",
         "tests/app/test_fx2_*.js",
         "kuran-ogreniyorum/evidence/KAO-10/**",
@@ -884,6 +884,7 @@
       "files": [
         "app/core/quranLearn.js",
         "app/kao.css",
+        "index.html",
         "app.js",
         "tests/kao/test_kao_render.js",
         "tests/app/test_fx2_tab_transition.js",
@@ -914,7 +915,7 @@
       "status": "done",
       "startedAt": "2026-09-24",
       "agent": "Codex (GPT-5)",
-      "scopeNote": "K10 gereği zorunlu App.kaoGate handler'ının 730→731 yüzey pini üç FX2 fixture'ında aynı kartta güncellenir.",
+      "scopeNote": "K10 gereği zorunlu App.kaoGate handler'ının 730→731 yüzey pini üç FX2 fixture'ında aynı kartta güncellenir. 2026-09-25 kullanıcı bildirimiyle E5 kelime/âyet bağlamı telaffuz onarımı aynı karta işlendi; index.html yalnız quranLearn.js ve kao.css önbellek sürümü için kapsamda.",
       "completedAt": "2026-09-24",
       "evidence": "kuran-ogreniyorum/evidence/KAO-15/EVIDENCE.json"
     },

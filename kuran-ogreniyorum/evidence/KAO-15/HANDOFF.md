@@ -1,6 +1,6 @@
 # KAO-15 · Devir
 
-**Tarih:** 2026-09-24 · **Doğrulama tabanı:** `4e4ec3639ecb221e9e68e20c8e1bed16d680cba0` · **Durum:** done
+**Tarih:** 2026-09-25 · **Doğrulama tabanı:** `4e4ec3639ecb221e9e68e20c8e1bed16d680cba0` · **Durum:** done + telaffuz onarımı
 
 ## Ne yapıldı
 
@@ -9,6 +9,8 @@
 - Dondurulmuş `QuranPhonicsV1` kaynağından 12 mini ders üretildi; hiçbir ders üçten fazla yeni ses göstermiyor.
 - Saf renkli-hareke sarıcısı fetha, kesra ve dammayı ayrı sınıflara alıyor; etiketler çıkarıldığında Arapça metin birebir aynı kalıyor.
 - Satır aralığı `1.9/2.2/2.5`, kelime boşluğu normal/geniş ve renkli hareke ayarı `--kao-ar-*` değişkenleriyle çalışıyor.
+- E5 kelime kartında doğrulanmış Latin harfli okunuş ve erişilebilir “Telaffuzu dinle” kontrolü görünür.
+- Âyet bağlamları okunuş alanı taşır: Arapça metni alan-sahibi onaylı pilotla tam eşleşen kayıtta âyet okunuşu, diğerlerinde doğrulanmış hedef-kelime okunuşu ve açık doğrulama sınırı gösterilir; hiçbir tam âyet okunuşu uydurulmaz.
 
 ## Kontrol sonuçları
 
@@ -25,7 +27,7 @@
 
 ## Kalan sınır
 
-Fiziksel cihaz, VoiceOver ve gerçek ses dinleme kabulü yapılmadı. KAO-15 için push/merge/tag/deploy yetkisi verilmedi.
+Fiziksel cihaz, VoiceOver ve gerçek ses dinleme kabulü yapılmadı. Kullanıcı 2026-09-25'te KAO-15 ile telaffuz onarımının push/fast-forward merge/Pages yayınını açıkça yetkilendirdi; yayın makbuzu işlem sonunda ayrıca raporlanır.
 
 ## Sonraki yetkili eylem
 

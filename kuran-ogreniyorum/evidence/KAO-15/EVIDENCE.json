@@ -14,6 +14,18 @@
     "readability": "line height 1.9/2.2/2.5; normal/wide word spacing; colored harakat toggle",
     "fx2SurfacePin": "731 App handlers / 392 onclick"
   },
+  "repair20260925": {
+    "trigger": "Kullanıcı, kelime ve âyet bağlamlarında Arapça telaffuzun görünmediğini bildirdi.",
+    "implementation": [
+      "E5 kelime katmanında doğrulanmış lemma.translit görünür Okunuş alanına taşındı.",
+      "Lisanslı aynı-köken kelime sesi kontrolü Telaffuzu dinle metni ve erişilebilir adıyla açıklaştırıldı.",
+      "Üç âyet bağlamının her birinde okunuş alanı eklendi: alan-sahibi onaylı katalogdaki Arapça metin birebir eşleşiyorsa tam âyet okunuşu, değilse öğrenilen kelimenin doğrulanmış okunuşu ve doğrulama sınırı gösteriliyor.",
+      "quranLearn.js ve kao.css önbellek sürümü 20260925a olarak yükseltildi."
+    ],
+    "testFirst": "Yeni render beklentileri üretim değişikliğinden önce çalıştırıldı ve kao-pronunciation eksikliğiyle beklendiği gibi başarısız oldu.",
+    "sourceBoundary": "Yeni telaffuz içeriği üretilmedi; QuranLexiconV1 translit alanları ve QuranStrikingVersesV1 içindeki alan-sahibi onaylı 12 pilot okunuş kullanıldı. Kısmi ya da metni eşleşmeyen âyet için tam okunuş türetilmedi.",
+    "checks": "KAO render/migration/requirements/privacy/boundary/independence; FX2 7/7, 7/7, 14/14; driver; zikr 95/95; state-rebind 37/37; shell; plan; diff PASS"
+  },
   "checks": [
     { "cmd": "node --check app/core/quranLearn.js", "exit": 0 },
     { "cmd": "node --check app.js", "exit": 0 },
@@ -48,6 +60,6 @@
     "browser": "headless fixtures only",
     "personalData": "not accessed",
     "deviceAcceptance": "not_verified",
-    "delivery": "local KAO-15 commit only; no push, merge, tag, or deploy authority"
+    "delivery": "2026-09-25 kullanıcı mesajıyla KAO-15 ve telaffuz onarımı için commit/push/fast-forward merge/Pages deploy yetkili; çalıştırma makbuzu final yanıtta ayrı raporlanır"
   }
 }

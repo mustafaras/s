@@ -20,6 +20,7 @@ vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranGrammarV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranGrammarV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranShortSurahsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranShortSurahsV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranRevelationOrderV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranRevelationOrderV1.js' });
+vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranStrikingVersesV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranStrikingVersesV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranPhonicsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranPhonicsV1.js' });
 vm.runInContext(source, sandbox, { filename: relative });
 const api = sandbox.window.SeymaQuranLearn;
@@ -181,6 +182,11 @@ const wordLayer1 = api.kaoWordHTML();
 assert.match(wordLayer1, /data-word-layer="1"/);
 assert.match(wordLayer1, new RegExp(layeredLemma.ar));
 assert.match(wordLayer1, new RegExp(layeredLemma.meanings[0]));
+assert.match(wordLayer1, /class="kao-pronunciation"/);
+assert.match(wordLayer1, new RegExp(layeredLemma.translit));
+assert.match(wordLayer1, /Okunuş/);
+assert.match(wordLayer1, /aria-label="[^"]*Arapça telaffuzunu dinle"/);
+assert.match(wordLayer1, /Telaffuzu dinle/);
 assert.doesNotMatch(wordLayer1, /kao-root-tree|kao-word-examples/, 'ilk dokunuşta yalnız katman 1 DOM’da olmalı');
 assert.equal(api.kaoWordLayer(3), false, 'katman 1’den doğrudan 3’e atlanmamalı');
 
@@ -196,8 +202,14 @@ assert.equal(api.kaoWordLayer(3), true);
 const wordLayer3 = api.kaoWordHTML();
 assert.match(wordLayer3, /data-word-layer="3"/);
 assert.equal((wordLayer3.match(/class="kao-word-example"/g) || []).length, 3);
+assert.equal((wordLayer3.match(/class="kao-example-pronunciation/g) || []).length, 3);
+assert.match(wordLayer3, /Öğrendiğin kelimenin okunuşu/);
 assert.match(wordLayer3, /Sonraki tekrar/);
 assert.doesNotMatch(wordLayer3, /kao-root-tree/, 'üçüncü dokunuşta kök katmanı DOM’da kalmamalı');
+
+const verifiedAyahExample = { ref: '1:5', ar: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ' };
+assert.equal(api.kaoVerifiedAyahPronunciation(verifiedAyahExample), 'İyyâke na‘büdü ve iyyâke nesteîn.');
+assert.equal(api.kaoVerifiedAyahPronunciation({ ref: '2:3', ar: 'وَيُقِيمُونَ ٱلصَّلَوٰةَ' }), '', 'kısmi veya doğrulanmamış âyet için okunuş uydurulmamalı');
 
 const shiftedWord = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift && sandbox.window.QuranGrammarV1.unit11.roots.some((root) => root.root === lemma.root));
 assert.ok(shiftedWord);

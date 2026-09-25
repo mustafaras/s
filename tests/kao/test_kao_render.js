@@ -87,6 +87,7 @@ assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 const firstHubHtml = api.kaoHubCardHTML();
 assert.match(firstHubHtml, /id="kao-hub-entry"/);
 assert.match(firstHubHtml, /Kur’an Arapçası Öğreniyorum/);
+assert.match(firstHubHtml, /20 kısa sûre/, 'KAO-16 okuyucusu ana hub kartında keşfedilebilir olmalı');
 assert.match(firstHubHtml, /Kelime<\/b>.*Kök<\/b>.*Gramer<\/b>.*Âyet<\/b>/);
 assert.match(firstHubHtml, /class="kao-hub-spine"[^>]*aria-hidden="true"/);
 assert.match(firstHubHtml, /class="kao-hub-ornament"[^>]*aria-hidden="true"/);

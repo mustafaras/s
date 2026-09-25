@@ -129,7 +129,7 @@ const appModalArea = between(appSource, 'function modalsHTML(){', '\n\n// boot')
 const themeBody = between(appSource, 'function paintAmbientShell(){', 'function render(){');
 
 ok('app.js keeps signature-preserving modals/render shims',
-  /function render\(\)\{ return SEYMA_RENDER\.render\.apply\(null,arguments\); \}/.test(appRenderArea) &&
+  /function render\(\)\{ var result=SEYMA_RENDER\.render\.apply\(null,arguments\); if\(ui\.kaoOpen\) window\.SeymaQuranLearn\.kaoMount\(\); return result; \}/.test(appRenderArea) &&
   /function modalsHTML\(\)\{ return SEYMA_RENDER\.modalsHTML\.apply\(null,arguments\); \}/.test(appModalArea));
 ok('render and modal bodies have one canonical owner',
   (appSource.match(/function render\(\)/g) || []).length === 1 &&

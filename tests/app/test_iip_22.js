@@ -75,8 +75,9 @@ function loadSw(options) {
   return { sandbox, listeners, messages, caches: sandbox.caches };
 }
 
-let passed = 0;
+let passed = 0, total = 0;
 function test(name, fn) {
+  total++;
   return Promise.resolve().then(fn).then(() => {
     passed++; console.log('PASS  ' + name);
   }, error => {
@@ -110,6 +111,17 @@ function test(name, fn) {
       .filter(item => !item.startsWith('panel/'));
     assert.deepEqual(runtimeAssets.filter(item => !entries.has(item)), []);
   });
+  await test('KAO-16 runtime ve service worker tek yayın sürümünü kullanır', () => {
+    const release = '20260925c';
+    for (const asset of ['app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js', 'app.js']) {
+      assert.ok(indexSource.includes(`${asset}?v=${release}`), asset + ' index pini');
+      assert.ok(Array.from(base.sandbox.swManifestDescriptor().entries).includes(`./${asset}?v=${release}`), asset + ' offline pini');
+    }
+    assert.match(indexSource, new RegExp(`navigator\\.serviceWorker\\.register\\('sw\\.js\\?v=${release}'\\)`));
+    const swVersion = swSource.match(/const SW_VERSION = '([^']+)'/);
+    assert.equal(swVersion && swVersion[1], release);
+    assert.equal(base.sandbox.swManifestDescriptor().version, `iip22-${release}`);
+  });
   await test('tokenlı, kişisel, panel, video ve dış URL cache dışıdır', () => {
     const key = base.sandbox.swOfflineRequestKey;
     assert.equal(key(new SyntheticRequest('https://example.test/s/index.html?token=secret')), '');
@@ -117,7 +129,7 @@ function test(name, fn) {
     assert.equal(key(new SyntheticRequest('https://example.test/s/panel.html')), '');
     assert.equal(key(new SyntheticRequest('https://example.test/s/movie.mp4')), '');
     assert.equal(key(new SyntheticRequest('https://api.example.org/content')), '');
-    assert.equal(key(new SyntheticRequest('https://example.test/s/app.js?v=20260924c')), 'https://example.test/s/app.js?v=20260924c');
+    assert.equal(key(new SyntheticRequest('https://example.test/s/app.js?v=20260925c')), 'https://example.test/s/app.js?v=20260925c');
   });
   await test('install atomiktir; kesik indirme geçici cache bırakmaz', async () => {
     const runtime = loadSw({ failAddAt: 2 });
@@ -137,7 +149,7 @@ function test(name, fn) {
   await test('eski sürüme dönüş exact allowlist isteğini kullanıma açık tutar', async () => {
     const runtime = loadSw();
     const old = await runtime.caches.open('seyma-offline-v1-iip22-old');
-    const url = 'https://example.test/s/app.js?v=20260924c';
+    const url = 'https://example.test/s/app.js?v=20260925c';
     await old.put(url, new SyntheticResponse('old-shell'));
     const response = await runtime.sandbox.swMatchOfflineRequest(new SyntheticRequest(url));
     assert.equal(response.body, 'old-shell');
@@ -162,7 +174,7 @@ function test(name, fn) {
   });
   await test('kalıcı yüzen Offline paneli kaldırılır; güvenli SW kaydı korunur', () => {
     for (const token of ['sey-offline-tools', 'sey-offline-panel', 'Offline araçları', 'Offline paketi kaldır']) assert.ok(!indexSource.includes(token), token);
-    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20260924f'\)/);
+    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20260925c'\)/);
     assert.doesNotMatch(indexSource, /SEYMA_OFFLINE_(?:STATUS|INSTALL|REMOVE)/);
   });
   await test('fetch politikası geniş runtime cache yakalaması yapmaz', () => {
@@ -174,11 +186,11 @@ function test(name, fn) {
     assert.doesNotMatch(swSource, /swNetworkFirstNavigation[\s\S]{0,500}cache\.put/);
   });
   await test('aktif sayaç/not durumu SW güncellemesinden bağımsızdır', () => {
-    const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20260924f')"));
+    const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20260925c')"));
     assert.doesNotMatch(registrationBlock, /location\.reload|skipWaiting/);
     assert.doesNotMatch(indexSource, /controllerchange/);
     assert.doesNotMatch(indexSource, /sey-offline-tools/);
   });
   if (process.exitCode) process.exit(1);
-  console.log('\nPASS: IIP-22 ' + passed + '/12');
+  console.log('\nPASS: IIP-22 ' + passed + '/' + total);
 }());

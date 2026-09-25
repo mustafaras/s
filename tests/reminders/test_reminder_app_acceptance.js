@@ -35,7 +35,7 @@ const RUNTIME_MODULES = [
 
 const APP_SHELL_REGISTRIES = ["app/core/reminders.js", "app/core/reminderSurface.js"];
 
-const BASE_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/syncGlue.js", "app/core/helpers.js", "app/core/prayer.js", "app/core/zikir.js", "app/core/quran.js", "app/core/saygi.js", "app/core/motivation.js", "app/core/crisis.js", "app/core/journal.js", "app/core/health.js", "app/core/library.js", "app/core/report.js", "app/core/map.js", "app/core/profile.js", "app/core/settings.js", "app/core/messaging.js", "app/core/render.js", "app/core/appSurface.js"];
+const BASE_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/syncGlue.js", "app/core/helpers.js", "app/core/prayer.js", "app/core/zikir.js", "app/core/quran.js", "app/core/quranLearn.js", "app/core/saygi.js", "app/core/motivation.js", "app/core/crisis.js", "app/core/journal.js", "app/core/health.js", "app/core/library.js", "app/core/report.js", "app/core/map.js", "app/core/profile.js", "app/core/settings.js", "app/core/messaging.js", "app/core/render.js", "app/core/appSurface.js"];
 
 function readSource(file) {
   return fs.readFileSync(path.join(ROOT, file), "utf8");

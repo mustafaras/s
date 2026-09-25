@@ -32,3 +32,10 @@ Fiziksel cihaz ve gerçek VoiceOver kabulü yapılmadı. Push, merge, tag veya d
 ## Sonraki yetkili eylem
 
 `node kuran-ogreniyorum/tools/kao-plan-check.mjs --card KAO-17` yalnız yeni kullanıcı yetkisiyle uygulanır; KAO-17 bu oturumda başlatılmadı.
+
+## GAP-09 · Yayın/keşif hotfix (2026-09-25)
+
+Kullanıcı "bu aşamaya kadar tüm eksiklikleri gider" yetkisiyle: KAO hub kartında 20 kısa sûre okuyucusu görünür adlandırıldı; `kao.css`, üç KAO content modülü, `quranLearn.js` ve `app.js` tek `20260925c` pininde eşlendi; `sw.js` sürümü `iip22-20260925c` oldu ve offline manifest index paritesine döndü. Eski App/pin kardeşleri 572/734 güncel yüzeye, `render()` KAO mount sözleşmesine ve reminder boot-listlerine `quranLearn.js` eklendi.
+
+Kanıt: kırmızı `test_iip_22` (5 varlık parite dışı) ve `test_kao_render` (hub metni yok); sonrasında IIP-22 13/13, 25 index/sw kardeşi, reminder kardeşleri, 12 KAO fixture, FX2 7/7+7/7+14/14, driver/zikr/rebind/shell, plan-check ve diff-check exit 0.
+

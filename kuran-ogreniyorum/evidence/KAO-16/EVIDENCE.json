@@ -22,19 +22,70 @@
     "green": "KAO render/requirements ve üç FX2 kardeş fixture üretim uygulaması sonrası exit 0"
   },
   "checks": [
-    { "cmd": "node --check <değişen her .js>", "exit": 0, "note": "7/7 changed JavaScript files" },
-    { "cmd": "for t in tests/kao/test_kao_*.js; do node \"$t\"; done", "exit": 0, "note": "12/12 fixture files PASS" },
-    { "cmd": "node tests/app/test_fx2_tab_transition.js", "exit": 0, "note": "7/7" },
-    { "cmd": "node tests/app/test_fx2_overlay_motion.js", "exit": 0, "note": "7/7" },
-    { "cmd": "node tests/app/test_fx2_touch_coverage.js", "exit": 0, "note": "14/14" },
-    { "cmd": "node .claude/skills/run-seyma/driver.mjs", "exit": 0, "note": "PASS; no browser, token, personal data or network write" },
-    { "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs", "exit": 0, "note": "95/95" },
-    { "cmd": "node tests/app/test_state_rebind_boundary.js", "exit": 0, "note": "37/37" },
-    { "cmd": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs", "exit": 0, "note": "67/67" },
-    { "cmd": "node tools/shell-inventory.mjs --gate", "exit": 0, "note": "PASS; app.js 7800 lines" },
-    { "cmd": "node tests/panel/test_faz11_panel.js", "exit": 0, "note": "50/50" },
-    { "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs", "exit": 0, "note": "PASS, 0 warn" },
-    { "cmd": "git -c core.fsmonitor=false diff --check", "exit": 0 }
+    {
+      "cmd": "node --check <değişen her .js>",
+      "exit": 0,
+      "note": "7/7 changed JavaScript files"
+    },
+    {
+      "cmd": "for t in tests/kao/test_kao_*.js; do node \"$t\"; done",
+      "exit": 0,
+      "note": "12/12 fixture files PASS"
+    },
+    {
+      "cmd": "node tests/app/test_fx2_tab_transition.js",
+      "exit": 0,
+      "note": "7/7"
+    },
+    {
+      "cmd": "node tests/app/test_fx2_overlay_motion.js",
+      "exit": 0,
+      "note": "7/7"
+    },
+    {
+      "cmd": "node tests/app/test_fx2_touch_coverage.js",
+      "exit": 0,
+      "note": "14/14"
+    },
+    {
+      "cmd": "node .claude/skills/run-seyma/driver.mjs",
+      "exit": 0,
+      "note": "PASS; no browser, token, personal data or network write"
+    },
+    {
+      "cmd": "node .claude/skills/run-seyma/zikr-harness.mjs",
+      "exit": 0,
+      "note": "95/95"
+    },
+    {
+      "cmd": "node tests/app/test_state_rebind_boundary.js",
+      "exit": 0,
+      "note": "37/37"
+    },
+    {
+      "cmd": "node .claude/skills/run-seyma/verify-state-migration-boundary.mjs",
+      "exit": 0,
+      "note": "67/67"
+    },
+    {
+      "cmd": "node tools/shell-inventory.mjs --gate",
+      "exit": 0,
+      "note": "PASS; app.js 7800 lines"
+    },
+    {
+      "cmd": "node tests/panel/test_faz11_panel.js",
+      "exit": 0,
+      "note": "50/50"
+    },
+    {
+      "cmd": "node kuran-ogreniyorum/tools/kao-plan-check.mjs",
+      "exit": 0,
+      "note": "PASS, 0 warn"
+    },
+    {
+      "cmd": "git -c core.fsmonitor=false diff --check",
+      "exit": 0
+    }
   ],
   "requirements": {
     "R-A6": "met",
@@ -68,6 +119,63 @@
     "browser": "headless fixtures only",
     "personalData": "not accessed",
     "deviceAcceptance": "not_verified",
-    "delivery": "local commit only; push/merge/tag/deploy not authorized"
+    "delivery": "KAO-16 hotfix; kullanıcı oturum içi push/merge/deploy yetkisiyle ayrı teslim adımında yayımlanır"
+  },
+  "gap09": {
+    "scope": "KAO-15/16 cache-pin paritesi, service worker sürümü, offline allowlist ve hub keşfedilebilirliği hotfix",
+    "userApproval": "2026-09-25 \"bu aşamaya kadar tüm eksiklikleri gider o zaman\" (GAP-09, KAO-17 kapsam dışı)",
+    "releasePin": "20260925c",
+    "results": {
+      "hubDiscovery": "KAO hub kartı artık \"20 kısa sûreyi görünür okunuşla oku\" metnini taşır",
+      "pinParity": "kao.css, 3 KAO content modülü, quranLearn.js, app.js index.html ve SW offline manifestte aynı pinde",
+      "swVersion": "SW_VERSION ve SW_OFFLINE_VERSION iip22-20260925c; index kayıt pini sw.js?v=20260925c",
+      "siblingFixtures": "App/pin kardeşleri ve reminder boot-list kardeşleri güncel gerçek yüzeye bağlandı"
+    },
+    "testFirst": {
+      "red": [
+        "test_iip_22: index/offline allowlist dışında 5 KAO varlığı",
+        "test_kao_render: hub kartında 20 kısa sûre metni yok",
+        "test_app_surface_daily_boundary: App yüzeyi eski 558/720 pini",
+        "test_reminder_app_acceptance: quranLearn boot listesi eksik, SeymaQuranLearn fail-closed"
+      ],
+      "green": "KAO-16 kart kapıları, index/sw kardeşleri ve reminder kardeşleri exit 0"
+    },
+    "checks": [
+      {
+        "cmd": "node tests/app/test_iip_22.js",
+        "exit": 0,
+        "note": "13/13"
+      },
+      {
+        "cmd": "node tests/kao/test_kao_render.js",
+        "exit": 0
+      },
+      {
+        "cmd": "index+sw kardeş taraması (25 fixture)",
+        "exit": 0
+      },
+      {
+        "cmd": "reminder kardeş taraması",
+        "exit": 0
+      },
+      {
+        "cmd": "for t in tests/kao/test_kao_*.js; do node \"$t\"; done",
+        "exit": 0,
+        "note": "12/12"
+      },
+      {
+        "cmd": "FX2 tab/overlay/touch",
+        "exit": 0,
+        "note": "7/7, 7/7, 14/14"
+      },
+      {
+        "cmd": "driver + zikr + state-rebind + shell gate",
+        "exit": 0
+      },
+      {
+        "cmd": "kao-plan-check + git diff --check",
+        "exit": 0
+      }
+    ]
   }
 }

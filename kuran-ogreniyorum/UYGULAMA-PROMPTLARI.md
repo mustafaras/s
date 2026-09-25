@@ -1090,8 +1090,35 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `app/core/quranLearn.js`
 - `app/kao.css`
 - `app.js`
+- `index.html`
+- `sw.js`
 - `tests/kao/test_kao_render.js`
 - `tests/kao/test_kao_requirements.js`
+- `tests/app/test_iip_22.js`
+- `tests/app/test_app_surface_boot_boundary.js`
+- `tests/app/test_app_surface_daily_boundary.js`
+- `tests/app/test_app_surface_domain_boundary.js`
+- `tests/app/test_app_surface_lifecycle_boundary.js`
+- `tests/app/test_app_surface_overlay_boundary.js`
+- `tests/app/test_render_core_boundary.js`
+- `tests/app/test_v3_welcome.js`
+- `tests/reminders/test_reminder_app_acceptance.js`
+- `tests/reminders/test_reminder_app_notification_boundary.js`
+- `tests/reminders/test_reminder_app_privacy.js`
+- `tests/reminders/test_reminder_boot.js`
+- `tests/reminders/test_reminder_concurrency.js`
+- `tests/reminders/test_reminder_cross_surface_schema.js`
+- `tests/reminders/test_reminder_integrated_privacy.js`
+- `tests/reminders/test_reminder_integrated_ux.js`
+- `tests/reminders/test_reminder_migration.js`
+- `tests/reminders/test_reminder_app_notification_boundary.js`
+- `tests/reminders/test_reminder_app_privacy.js`
+- `tests/reminders/test_reminder_boot.js`
+- `tests/reminders/test_reminder_concurrency.js`
+- `tests/reminders/test_reminder_cross_surface_schema.js`
+- `tests/reminders/test_reminder_integrated_privacy.js`
+- `tests/reminders/test_reminder_integrated_ux.js`
+- `tests/reminders/test_reminder_migration.js`
 - `tests/app/test_fx2_tab_transition.js`
 - `tests/app/test_fx2_overlay_motion.js`
 - `tests/app/test_fx2_touch_coverage.js`
@@ -1106,6 +1133,7 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 2. Vakıf: `.kao-waqf` düğmeleri, dokununca açıklama (10 §4 madde 5).
 3. Gecikmeli test: vadesi gelince kuyruğa 5 parça-çevir görevi; `delayedScore`; ≥4/5 → 'anlaşıldı' kesinleşir.
 4. Bilinmeyen kelimeye dokunma → 'yarın tekrar' kuyruğuna (yeni kart bütçesi içinde).
+5. GAP-09 yayın hotfix'i: hub kartında 20 kısa sûre okuyucusunu görünür adlandır; değişen KAO runtime dosyalarını `index.html` ve `sw.js` içinde tek yeni cache sürümünde eşle; SW kayıt/cache sürümünü yükselt.
 
 **Kontroller (hepsi exit 0; STATE ile birebir):**
 - `node --check <değişen her .js/.mjs>`
@@ -1113,6 +1141,34 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `git -c core.fsmonitor=false diff --check`
 - `node tests/kao/test_kao_render.js`
 - `node tests/kao/test_kao_requirements.js`
+- `node tests/app/test_iip_22.js`
+- `node tests/app/test_app_surface_boot_boundary.js`
+- `node tests/app/test_app_surface_daily_boundary.js`
+- `node tests/app/test_app_surface_domain_boundary.js`
+- `node tests/app/test_app_surface_lifecycle_boundary.js`
+- `node tests/app/test_app_surface_overlay_boundary.js`
+- `node tests/app/test_render_core_boundary.js`
+- `node tests/app/test_v3_welcome.js`
+- `node tests/reminders/test_reminder_app_acceptance.js`
+- `node tests/reminders/test_reminder_app_notification_boundary.js`
+- `node tests/reminders/test_reminder_app_privacy.js`
+- `node tests/reminders/test_reminder_boot.js`
+- `node tests/reminders/test_reminder_concurrency.js`
+- `node tests/reminders/test_reminder_cross_surface_schema.js`
+- `node tests/reminders/test_reminder_integrated_privacy.js`
+- `node tests/reminders/test_reminder_integrated_ux.js`
+- `node tests/reminders/test_reminder_migration.js`
+- `node tests/reminders/test_reminder_app_notification_boundary.js`
+- `node tests/reminders/test_reminder_app_privacy.js`
+- `node tests/reminders/test_reminder_boot.js`
+- `node tests/reminders/test_reminder_concurrency.js`
+- `node tests/reminders/test_reminder_cross_surface_schema.js`
+- `node tests/reminders/test_reminder_integrated_privacy.js`
+- `node tests/reminders/test_reminder_integrated_ux.js`
+- `node tests/reminders/test_reminder_migration.js`
+- `node tests/app/test_deploy_surface_contract.js`
+- `node tests/app/test_quran_boundary.js`
+- `node tests/app/test_saygi_boundary.js`
 - `node tests/app/test_fx2_tab_transition.js`
 - `node tests/app/test_fx2_overlay_motion.js`
 - `node tests/app/test_fx2_touch_coverage.js`

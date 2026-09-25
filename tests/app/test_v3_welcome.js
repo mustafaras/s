@@ -528,7 +528,7 @@ console.log('\n[6] app.js yüzeyi pinli');
 const appSource = read('app.js');
 const handlerCount = (appSource.match(/^App\.[A-Za-z0-9_$]+\s*=\s*function/gm) || []).length;
 // IIP-10 / DEC-07: App.saygiLens eklendi; 554 → 555.
-// IIP-11 sonrası KAO-10/11 yedi öğrenme handler'ı ekledi; toplam 727.
+// Satır-başı assignment sayımı, aynı satırdaki KAO shimlerini ayrı saymaz.
 ok('App.* handler yüzeyi bozulmadı (556)', handlerCount === 556, 'ölçülen: ' + handlerCount);
 ok('app.js tanıtım sayfasına referans vermiyor',
   appSource.indexOf('v3-tanitim') < 0 && appSource.indexOf(V3_KEY) < 0);
@@ -538,7 +538,7 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // KAO hub kartı dependency bag'e eklendi; app.js cache pini bu kaynak değişikliğiyle
 // aynı düzeltmede ilerletildi. Handler yüzeyi yukarıdaki ayrı kapıda sabit kalır.
 ok('index.html app.js cache-bust güncel (KAO hub köprüsü)',
-  /app\.js\?v=20260924c/.test(indexSource));
+  /app\.js\?v=20260925c/.test(indexSource));
 /* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
    gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
@@ -853,8 +853,8 @@ const combined = APP_SURFACE_FILES.map(read).join('') + quranLearnHubSrc;
 const surfaceCount = new Set(
   (combined.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((s) => s.match(/App\.[A-Za-z0-9_]+/)[0])
 ).size;
-ok('App yüzeyi pinli (727) — KAO hub taşıması yeni handler eklemedi',
-  surfaceCount === 727, 'ölçülen: ' + surfaceCount);
+ok('App yüzeyi pinli (734) — KAO-16 okuyucu handlerları dahil',
+  surfaceCount === 734, 'ölçülen: ' + surfaceCount);
 ok('tıklama niteliği sayısı pinli (392)',
   (combined.match(/onclick=/g) || []).length === 392,
   'ölçülen: ' + (combined.match(/onclick=/g) || []).length);

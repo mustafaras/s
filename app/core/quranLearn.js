@@ -963,7 +963,7 @@
     var icon=quranLearnDeps.icon,status=learned?learned+' kelime tanıdık':(answered?answered+' cevap bugün':'İlk oturum hazır'),action=started?'Devam et':'Öğrenmeye başla';
     return '<button type="button" id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()" aria-haspopup="dialog" aria-label="Kur’an Arapçası Öğreniyorum; '+status+'; '+action+'">'+
       '<span class="kao-hub-spine" aria-hidden="true"></span><span class="kao-hub-frame" aria-hidden="true"></span><span class="kao-hub-ornament" aria-hidden="true">✦</span><span class="kao-hub-head"><span class="kao-hub-seal">'+icon('book-open',21)+'</span><span class="kao-hub-kicker"><small>KUR’AN ARAPÇASI</small><strong>Kur’an Arapçası Öğreniyorum</strong></span><span class="kao-hub-status">'+status+'</span></span>'+
-      '<span class="kao-hub-copy">Kelimeleri tanı, kökleri keşfet; âyetlerin anlamına adım adım yaklaş.</span>'+
+      '<span class="kao-hub-copy">20 kısa sûreyi görünür okunuşla oku; kelimeleri tanı, kökleri keşfet.</span>'+
       '<span class="kao-hub-path" aria-label="Öğrenme yolu"><span><i></i><b>Kelime</b></span><span><i></i><b>Kök</b></span><span><i></i><b>Gramer</b></span><span><i></i><b>Âyet</b></span></span>'+
       '<span class="kao-hub-foot"><span>'+(answered?answered+' cevap bugün':'Günde yaklaşık 6 dakika')+'</span><b>'+action+' '+icon('arrow-right',15)+'</b></span></button>';
   }

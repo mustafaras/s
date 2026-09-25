@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-25 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 23/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-28 · **blockedPrompt:** — · **Sıradaki:** **KAO-28b**
+**Güncelleme:** 2026-09-25 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 24/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-28b · **blockedPrompt:** — · **Sıradaki:** **KAO-16b**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -34,7 +34,7 @@
 | KAO-26 | E8 Telaffuz stüdyosu | done | R-B6 R-C2 |
 | KAO-27 | Gölgeleme (bellek-içi kayıt) | done | — |
 | KAO-28 | E9 Anlayabildiğin âyet | done | — |
-| KAO-28b | E10 Mushaf ısı haritası + gecikmeli sûre testi | pending | R-B1 R-C6 |
+| KAO-28b | E10 Mushaf ısı haritası + gecikmeli sûre testi | done | R-B1 R-C6 |
 | KAO-16b | E11 Namazda ne diyorum | pending | R-B2 |
 | KAO-18 | Kontrast ve erişilebilirlik ölçümü | pending | R-A9 |
 | KAO-19 | Panel aynası (manifest + özet projeksiyon) | pending | R-C1 R-C8 |
@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 84 | 2026-09-25 | KAO-28 bitti: E9 günün âyeti (≥%95, görülmemiş önce, gün boyu sabit), kelime kelime ses + Türkçe, Anladım (tekil, ≤400), E1/hub satırı; ortak kaoCoverage/kaoKnownLemmaSet; E1 yüzdesi token kapsamına düzeltildi; önbellek 20260925g; App pini 751/589. | `evidence/KAO-28/EVIDENCE.json`; tam regresyon 120/120 PASS |
+| 86 | 2026-09-25 | KAO-28b bitti: E10 Mushaf ısı haritası (114 hücre, renk + yüzde, boş hücre, ≥4/5 koyu, eşdeğer liste); önbellek 20260925h; App pini 752/590. | `evidence/KAO-28b/EVIDENCE.json`; R-B1/R-C6 done; tam regresyon 147/147 |

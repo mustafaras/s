@@ -1,0 +1,37 @@
+{
+  "card": "KAO-28b",
+  "head": "59a53d9875790a469c9274218fc071067db2f980",
+  "diffHash": "e89a1f583f14615fb2b4a01168e371225ce294fce08541ed9abf30da4bfb9b95",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-25",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "scope": "E10 Mushaf ısı haritası: 114 sûre × 'Anladım' denen âyet oranı; renk + yüzde; veri yoksa boş hücre; 7 gün sonraki testte ≥4/5 (confirmedAt) koyu; eşdeğer metin listesi; kısa sûre hücreleri okuyucuya açılır; kilit yok",
+  "data": "Yeni kalıcı alan yok: quranLearn.ayahs.understood ('sûre:âyet') + quranLearn.surahs[n] (KAO-16 gecikmeli test alanları) okunur; âyet sayısı/adı QuranRevelationOrderV1'den",
+  "results": {
+    "R-B1": "114 hücre, aria-label 'Sûre adı: %n anlaşıldı', veri yoksa boş, eşdeğer metin listesi (render fixture)",
+    "R-C6": "delayedScore≥4 ve confirmedAt → koyu (data-l=5, %100); 4/5 altı 'tekrar oku'; bekleyen test durumu listede (requirements fixture)"
+  },
+  "validation": "Geçersiz anahtar ve âyet sayısını aşan âyet numarası sayılmaz; tekrarlı kayıt tekilleşir",
+  "cache": {
+    "release": "20260925g → 20260925h"
+  },
+  "surfacePins": {
+    "appHandlers": "751 → 752",
+    "appAssignments": "589 → 590"
+  },
+  "checks": {
+    "tests/kao tümü": "PASS",
+    "FX2 / iip_22 / v3 / surface-daily": "PASS",
+    "driver.mjs": "PASS",
+    "zikr-harness.mjs": "exit 0",
+    "verify-* (tümü)": "exit 0",
+    "shell-inventory --gate": "PASS",
+    "fullRegression": "tests/app+kao+quran+panel+panel-v2 147/147, reminder smoke exit 0"
+  },
+  "evidenceLevels": {
+    "source": "headless fixture",
+    "deploy": "yok (bu commit)",
+    "device": "yok"
+  }
+}

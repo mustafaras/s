@@ -324,4 +324,21 @@ function sandboxLemma(api, lemmaId) {
   return { id: lemmaId, ar: html.split(',')[0] };
 }
 
-console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B5/B8, R-C2/C3/C4/C5; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);
+
+// KAO-28b · R-C6: gecikmeli sûre testi ısı haritasına yansır (≥4/5 koyu, altı "tekrar oku").
+{
+  const box = { window: {} };
+  vm.createContext(box);
+  for (const relative of ['app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  const mapApi = box.window.SeymaQuranLearn;
+  const cell = (record, understood) => mapApi.kaoSurahMap({ quranLearn: { surahs: { '108': record }, ayahs: { understood: understood || [] } } })[107];
+  assert.equal(mapApi.kaoSurahMap({ quranLearn: {} }).length, 114);
+  assert.ok(mapApi.kaoSurahMap({ quranLearn: {} }).every((item) => item.level === 0 && !item.hasData && item.percent === 0), 'boş veri: tüm hücreler boş');
+  assert.equal(cell({ understoodAt: 'x', delayedScore: 4, confirmedAt: 'y' }).level, 5, '4/5 → koyu');
+  assert.equal(cell({ understoodAt: 'x', delayedScore: 4 }).level < 5, true, 'confirmedAt olmadan koyulaşmaz');
+  assert.equal(cell({ understoodAt: 'x', delayedScore: 3, needsReread: true }, ['108:1']).status, 'gecikmeli test 3/5 · tekrar oku');
+  assert.equal(cell({ understoodAt: 'x', delayedTestAt: 'z' }).status, '7 günlük test bekliyor');
+  assert.deepEqual([cell({}, ['108:1']).percent, cell({}, ['108:1', '108:2', '108:3']).percent], [33, 100], 'Kevser 3 âyet');
+}
+
+console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

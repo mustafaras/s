@@ -393,4 +393,33 @@ assert.ok(prevented >= 3 && stopped >= 3);
   ui.kaoPhonics = { phase: 'home' }; ui.kaoView = 'home'; ui.kaoOpen = false;
 }
 
-console.log('KAO render: PASS (E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');
+
+// KAO-28b · E10 Mushaf ısı haritası render sözleşmesi (R-B1).
+{
+  const mapData = { quranLearn: { cards: {}, ayahs: { understood: ['112:1', '112:2', '112:2', '1:1', '1:9', 'x:1', '114:1'] }, surahs: {
+    '112': { understoodAt: '2026-09-10T10:00:00.000Z', delayedTestAt: '2026-09-17T10:00:00.000Z', delayedScore: 5, confirmedAt: '2026-09-17T10:05:00.000Z' },
+    '114': { understoodAt: '2026-09-10T10:00:00.000Z', delayedTestAt: '2026-09-17T10:00:00.000Z', delayedScore: 2, needsReread: true },
+    '113': { understoodAt: '2026-09-24T10:00:00.000Z', delayedTestAt: '2026-10-01T10:00:00.000Z', delayedScore: null } } } };
+  const saved = appData.quranLearn; appData.quranLearn = mapData.quranLearn;
+  ui.kaoOpen = true; assert.equal(api.kaoOpenMap(), true); assert.equal(ui.kaoView, 'map');
+  const mapHtml = api.kaoOverlayHTML('2026-09-25T10:00:00');
+  const cells = [...mapHtml.matchAll(/class="kao-map-cell" data-l="(\d)" aria-label="([^"]+)"/g)];
+  assert.equal(cells.length, 114, '114 hücre');
+  assert.ok(cells.every((match) => /^.+: %\d{1,3} anlaşıldı$/.test(match[2])), 'aria-label "Sûre adı: %n anlaşıldı"');
+  const byName = (name) => cells.find((match) => match[2].startsWith(name + ':'));
+  assert.equal(byName('Fâtiha')[2], 'Fâtiha: %14 anlaşıldı', 'geçersiz âyet no (1:9) sayılmaz; 1/7'); assert.equal(byName('Fâtiha')[1], '1');
+  assert.equal(byName('İhlâs')[1], '5', 'gecikmeli testi 5/5 geçen sûre koyu'); assert.equal(byName('İhlâs')[2], 'İhlâs: %100 anlaşıldı');
+  assert.equal(byName('Nâs')[1], '1', 'testi geçemeyen sûre koyulaşmaz');
+  assert.ok(Number(byName('Felak')[1]) >= 1, 'Anladım kaydı olan sûre veri sayılır');
+  assert.equal(byName('Bakara')[1], '0', 'veri yoksa boş'); assert.match(mapHtml, /aria-label="Bakara: %0 anlaşıldı"[^>]*role="img"><small>2<\/small><b><\/b>/);
+  assert.match(mapHtml, /aria-label="İhlâs: %100 anlaşıldı"[^>]*onclick="App\.kaoOpenSurah\(112\)"><small>112<\/small><b>%100<\/b>/, 'renk + sayı; kısa sûre okuyucuya açılır');
+  assert.match(mapHtml, /<li value="112">İhlâs — %100 anlaşıldı \(2 \/ 4 âyet\) · gecikmeli test 5\/5 · kesinleşti<\/li>/, 'eşdeğer metin listesi');
+  assert.match(mapHtml, /<li value="114">Nâs — %\d+ anlaşıldı \(1 \/ 6 âyet\) · gecikmeli test 2\/5 · tekrar oku<\/li>/);
+  assert.match(mapHtml, /110 sûrede henüz veri yok/);
+  assert.match(api.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoOpenMap\(\)/, 'E1 girişi');
+  assert.match(appSource, /App\.kaoOpenMap=function\(\)\{ return window\.SeymaQuranLearn\.kaoOpenMap\.apply\(null,arguments\); \};/);
+  assert.match(cssSource, /\.kao-map-cell\[data-l="5"\],\.kao-map-legend i\[data-l="5"\]\{background:var\(--quran\);color:var\(--quran-surface\)\}/);
+  appData.quranLearn = saved; ui.kaoView = 'home'; ui.kaoOpen = false;
+}
+
+console.log('KAO render: PASS (E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');

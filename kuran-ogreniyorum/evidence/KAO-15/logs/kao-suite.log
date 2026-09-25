@@ -1,0 +1,24 @@
+RUN tests/kao/test_kao_boundary.js
+KAO boundary: PASS (load purity, fail-closed deps, four lists, shims)
+RUN tests/kao/test_kao_fsrs.js
+KAO FSRS: PASS (24 published vectors, ±0.000001, monotonic, grade mapping, predictedR)
+RUN tests/kao/test_kao_independence.js
+KAO independence: PASS (IIP/state/network coupling ve load-time DOM/timer etkisi yok)
+RUN tests/kao/test_kao_lexicon_contract.js
+KAO lexicon contract: PASS (524 lemma, 320754 bayt)
+RUN tests/kao/test_kao_lexicon_coverage.js
+KAO lexicon coverage: PASS (59948/77430 = 77.42%)
+RUN tests/kao/test_kao_migration.js
+KAO migration: PASS (empty/old/broken/idempotent/orphan/114 surah)
+RUN tests/kao/test_kao_phonics_contract.js
+KAO content contract: PASS (grammar=51358, surahs=82249, phonics=9552)
+RUN tests/kao/test_kao_privacy.js
+KAO privacy: PASS (ağ/depo yok, assets/kao-only ses, preload none, fail-soft sessiz mod)
+RUN tests/kao/test_kao_pronunciation_contract.js
+KAO pronunciation contract: PASS (content + task objects + visible paired rendering)
+RUN tests/kao/test_kao_queue.js
+KAO queue: PASS (20 deterministic tasks + 4 grammar types, budgets/interleave/semantic spacing)
+RUN tests/kao/test_kao_render.js
+KAO render: PASS (hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)
+RUN tests/kao/test_kao_requirements.js
+KAO requirements: PASS (R-A1/A2/A4/A5, R-C2/C3/C5; iki yön, bit-bit undo, hedefli 0.507 ms <50 ms)

@@ -45,6 +45,7 @@ Aşağıdaki adımlar her promptta geçerlidir; prompt gövdelerinde tekrar edil
 | K8 | **Veri güvenliği** — CLAUDE.md DATA SAFETY; tarayıcıda açma; gerçek token/kişisel veri yok; `seyma-data` yazma yok |
 | K9 | **Yayın** — commit yerel branch `kuran-ogreniyorum`'a; push/merge/tag/deploy bu promptlarla yetkili **değildir** |
 | K10 | **fx2 tuzağı** — yorum satırında `App.kao…=` ya da tıklama niteliği adı yazma; pin değişirse fixture'daki sayıyı gerekçesiyle güncelle |
+| K11 | **Görünür okunuş** — KAO öğrenme görevinde gösterilen her Arapça kelime, seçenek, parça ve cümlenin hemen yanında kaynaklı Latin okunuş bulunur; ses metnin yerini tutmaz; eksik okunuş sessizce yayımlanmaz |
 
 ### S2 · Okuma disiplini
 Yalnız promptun **Oku** listesi + `--card` çıktısı + varsa önceki kartın `HANDOFF.md`. Tüm planı, tüm STATE'i, tüm ledger'ı yükleme. Üretim fonksiyonlarını `rg`/Grep ile bul, dar aralık oku (CLAUDE.md 'Working in the huge files').
@@ -1020,9 +1021,16 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 
 **İzinli dosyalar (STATE ile birebir):**
 - `app/core/quranLearn.js`
+- `app/content/quranLexiconV1.js`
+- `app/content/quranGrammarV1.js`
+- `app/content/quranShortSurahsV1.js`
 - `app/kao.css`
 - `app.js`
+- `tools/kao-content-freeze.mjs`
+- `tools/kao-lexicon-build.mjs`
 - `tests/kao/test_kao_render.js`
+- `tests/kao/test_kao_pronunciation_contract.js`
+- `tests/kao/test_kao_lexicon_contract.js`
 - `tests/app/test_fx2_tab_transition.js`
 - `tests/app/test_fx2_overlay_motion.js`
 - `tests/app/test_fx2_touch_coverage.js`
@@ -1038,12 +1046,16 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 3. `readability.coloredHarakat` (Seviye 0–1 varsayılan açık): hareke `<span class="kao-h-fatha|kesra|damma">` ile sarılır — sarma aracı **saf fonksiyon**, harf değiştirmez (fixture: sarma öncesi/sonrası metin eşit).
 4. Satır aralığı / kelime boşluğu ayarları CSS değişkeniyle (`--kao-ar-lh`, `--kao-ar-ws`).
 5. Kapanış sonrası telaffuz onarımı: E5 kelime katmanında doğrulanmış `translit` görünür olur; ses kontrolü açıkça etiketlenir. Âyet bağlamında yalnız alan-sahibi onaylı katalogla Arapça metni birebir eşleşen tam okunuş gösterilir; diğer kayıtlarda öğrenilen kelimenin doğrulanmış okunuşu ve tam âyet doğrulama sınırı sunulur. `index.html` yalnız bu onarımın önbellek sürümünü yükseltmek için kapsamdadır.
+6. K11 yapısal okunuş kapısı: dondurulmuş sözlükteki 1.563 örnek cümle, gramer hücreleri ve kısa sûre kelimeleri sabitlenmiş QAC yüzeyinden Latin okunuş taşır; kelime, gramer ve parça görev üreticileri bu alanı kaybetmeden görünür ikili satır olarak sunar. Okunuşu olmayan Arapça görev içeriği derlemede hata verir, çalışma zamanında Arapça tek başına gösterilmez. Örnek-cümle okunuşları nedeniyle sözlük bütçesi 260 KB → 340 KB'dir (gerçek 320.754 bayt).
 
 **Kontroller (hepsi exit 0; STATE ile birebir):**
 - `node --check <değişen her .js/.mjs>`
 - `node kuran-ogreniyorum/tools/kao-plan-check.mjs`
 - `git -c core.fsmonitor=false diff --check`
 - `node tests/kao/test_kao_render.js`
+- `node tests/kao/test_kao_pronunciation_contract.js`
+- `node tests/kao/test_kao_lexicon_contract.js`
+- `node tools/kao-lexicon-build.mjs --freeze`
 - `node tests/app/test_fx2_tab_transition.js`
 - `node tests/app/test_fx2_overlay_motion.js`
 - `node tests/app/test_fx2_touch_coverage.js`

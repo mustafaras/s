@@ -5,7 +5,7 @@
   "date": "2026-09-24",
   "agent": "Codex (GPT-5)",
   "status": "PASS",
-  "scope": "Seviye 0 giriş kontrolü, 12 mini ders, renkli hareke ve Arapça okunabilirlik değişkenleri",
+  "scope": "Seviye 0 giriş kontrolü, görünür kaynaklı Latin okunuş sözleşmesi, 12 mini ders, renkli hareke ve Arapça okunabilirlik değişkenleri",
   "results": {
     "readingGate": "20 items; threshold 18",
     "listeningGate": "12 minimal pairs; threshold 10; fail-soft deferral",
@@ -26,11 +26,30 @@
     "sourceBoundary": "Yeni telaffuz içeriği üretilmedi; QuranLexiconV1 translit alanları ve QuranStrikingVersesV1 içindeki alan-sahibi onaylı 12 pilot okunuş kullanıldı. Kısmi ya da metni eşleşmeyen âyet için tam okunuş türetilmedi.",
     "checks": "KAO render/migration/requirements/privacy/boundary/independence; FX2 7/7, 7/7, 14/14; driver; zikr 95/95; state-rebind 37/37; shell; plan; diff PASS"
   },
+  "structuralPronunciationRepair20260925": {
+    "trigger": "Kullanıcı, sıfırdan başlayan kişinin kelime ve cümleleri Latin okunuş olmadan okuyamayacağını bildirip bunu yapısal düstur olarak istedi.",
+    "contract": "K11: KAO öğrenme görevinde gösterilen her Arapça kelime, seçenek, parça ve cümlenin hemen yanında kaynaklı görünür Latin okunuş bulunur; ses metnin yerini tutmaz; eksik okunuş sessizce yayımlanmaz.",
+    "source": "Sabitlenmiş QAC 0.4 Buckwalter yüzey biçimlerinden D-12 deterministik Türkçe-Latin izdüşüm ve doğrulanmış QuranLexiconV1 lemma okunuşları; referans-only Quran.com transliterasyonu üretim paketine taşınmadı.",
+    "implementation": [
+      "quranGrammarV1 hücreleri [referans, Arapça, okunuş], kısa sûre kelimeleri pronunciation alanı taşır.",
+      "QuranLexiconV1 içindeki 1.563 örnek cümle QAC/Tanzil hizasından tam Latin okunuş taşır; 320.754 baytlık gerçek çıktı için belgeli üst bütçe 340 KB'dir.",
+      "Kelime seçimleri, dört gramer türü, kelime dizme ve parça çeviri görevleri okunuşu görev nesnesinde korur.",
+      "Merkezi kaoArabicPairHTML her Arapça birimi aynı denetim içinde Latin okunuşla eşler; kelime ayrıntısındaki kök ve üç örnek cümle de aynı görünür-okunuş kuralına bağlıdır; erişilebilir ad iki katmanı birlikte söyler.",
+      "Dondurma aracı okunuşu olmayan Arapça gramer hücresinde ve kısa sûre kelimesinde hata verir; önek-ayrılmış biçimin okunuşu gösterilen yüzeyle eşleştirilir.",
+      "Apple uyumlu hiyerarşide Arapça birincil, Latin okunuş okunabilir ikincil satırdır; seçenekler en az 64 px olur."
+    ],
+    "testFirst": "tests/kao/test_kao_pronunciation_contract.js üretim değişikliğinden önce s-95-1-1 okunuş eksikliğiyle exit 1 verdi; uygulama sonrası kaynak, görev nesnesi ve görünür eşleme kapıları PASS.",
+    "determinism": "Gramer ve kısa sûre dondurma komutları ikinci koşuda aynı SHA-256 değerlerini üretti.",
+    "checks": "Tüm tests/kao/test_kao_*.js; üç FX2 kardeş fixture; driver; zikr 95/95; state-rebind 37/37; shell; plan; diff PASS"
+  },
   "checks": [
     { "cmd": "node --check app/core/quranLearn.js", "exit": 0 },
     { "cmd": "node --check app.js", "exit": 0 },
     { "cmd": "node --check tests/kao/test_kao_render.js", "exit": 0 },
     { "cmd": "node tests/kao/test_kao_render.js", "exit": 0, "note": "PASS" },
+    { "cmd": "node tests/kao/test_kao_pronunciation_contract.js", "exit": 0, "note": "PASS; content + task objects + visible paired rendering" },
+    { "cmd": "for t in tests/kao/test_kao_*.js; do node $t; done", "exit": 0, "note": "12/12 fixture files PASS" },
+    { "cmd": "node tools/kao-lexicon-build.mjs --freeze && node tools/kao-content-freeze.mjs --freeze-grammar && node tools/kao-content-freeze.mjs --freeze-surahs", "exit": 0, "note": "deterministic SHA-256 parity PASS" },
     { "cmd": "node tests/kao/test_kao_migration.js", "exit": 0, "note": "PASS" },
     { "cmd": "node tests/kao/test_kao_requirements.js", "exit": 0, "note": "PASS" },
     { "cmd": "node tests/kao/test_kao_privacy.js", "exit": 0, "note": "PASS" },
@@ -53,7 +72,8 @@
   "userTaskPending": false,
   "knownLimits": [
     "Physical-device, VoiceOver, and real listening acceptance were not performed.",
-    "R-A9 contrast measurement remains assigned to KAO-18."
+    "R-A9 contrast measurement remains assigned to KAO-18.",
+    "Bu onarım etkileşimli kelime, gramer ve kısa sûre görevlerini kapsar; KAO-16 sonrası okuyucu yüzeyi ayrıca kendi kart kapılarından geçecektir."
   ],
   "boundaries": {
     "network": "none",

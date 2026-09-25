@@ -369,9 +369,9 @@
         return false;
       });
     }
-    var choices=[{cardId:id,label:answer,correct:true}].concat(picked.map(function(item){
+    var choices=[{cardId:id,label:answer,pronunciation:direction==='tr>ar'?String(meta.translit||''):'',correct:true}].concat(picked.map(function(item){
       var itemMeta=metaFor(item.cardId,null,opts);
-      return {cardId:item.cardId,label:direction==='tr>ar'?String(itemMeta.ar||item.label):String(item.label),correct:false};
+      return {cardId:item.cardId,label:direction==='tr>ar'?String(itemMeta.ar||item.label):String(item.label),pronunciation:direction==='tr>ar'?String(itemMeta.translit||''):'',correct:false};
     }));
     choices.sort(function(a,b){ return seededRank(String(opts.seed||'')+'|task|'+id,a.cardId)-seededRank(String(opts.seed||'')+'|task|'+id,b.cardId); });
     choices.forEach(function(choice,index){ choice.choiceId=String(queueItem&&queueItem.id||'task:'+id)+':choice:'+index; });
@@ -466,7 +466,7 @@
   }
   function kaoRootCatalog(){
     var grammar=window.QuranGrammarV1,roots=grammar&&grammar.unit11&&Array.isArray(grammar.unit11.roots)?grammar.unit11.roots:[];
-    return roots.map(function(item){ return {root:String(item.root||''),meaning:String(item.meaning||''),derivatives:(Array.isArray(item.derivatives)?item.derivatives:[]).map(function(derivative){ return {tr:String(derivative.tr||''),pattern:String(derivative.pattern||'')}; })}; }).filter(function(item){ return item.root; });
+    return roots.map(function(item){ return {root:String(item.root||''),pronunciation:String(item.pronunciation||''),meaning:String(item.meaning||''),derivatives:(Array.isArray(item.derivatives)?item.derivatives:[]).map(function(derivative){ return {tr:String(derivative.tr||''),pattern:String(derivative.pattern||'')}; })}; }).filter(function(item){ return item.root; });
   }
   function kaoRootLemmaIds(root){
     var lex=window.QuranLexiconV1,ids=lex&&lex.roots&&lex.roots[root];
@@ -537,9 +537,9 @@
     return String(verse.transliterationTr);
   }
   function kaoExamplePronunciationHTML(example,lemma,esc){
-    var ayahPronunciation=kaoVerifiedAyahPronunciation(example);
-    if(ayahPronunciation) return '<div class="kao-example-pronunciation is-verified"><small>Âyetin okunuşu</small><p lang="tr" dir="ltr">'+esc(ayahPronunciation)+'</p></div>';
-    return '<div class="kao-example-pronunciation"><small>Öğrendiğin kelimenin okunuşu</small><p lang="tr" dir="ltr">'+esc(lemma.translit||'Doğrulanmış okunuş henüz yok')+'</p><span>Bu alıntının tam okunuşu henüz doğrulanmadı.</span></div>';
+    var ayahPronunciation=kaoVerifiedAyahPronunciation(example),reading=ayahPronunciation||String(example&&example.pronunciation||'');
+    if(!reading) return '';
+    return '<div class="kao-example-pronunciation '+(ayahPronunciation?'is-verified':'is-corpus')+'"><small>Cümlenin okunuşu</small><p lang="tr" dir="ltr">'+esc(reading)+'</p></div>';
   }
   function kaoWordHTML(){
     if(!quranLearnDeps) return '';
@@ -549,9 +549,9 @@
     if(layer===1){
       h+='<section class="kao-word-hero"><p id="kao-word-title" lang="ar" dir="rtl">'+esc(lemma.ar)+'</p><div class="kao-pronunciation"><small>Okunuş</small><strong lang="tr" dir="ltr">'+esc(lemma.translit||'Doğrulanmış okunuş henüz yok')+'</strong></div><button type="button" class="kao-audio" aria-label="'+esc(lemma.ar)+' Arapça telaffuzunu dinle" onclick="App.kaoPlay(\'w-'+esc(lemma.id)+'\',\'measured\')">'+quranLearnDeps.icon('volume-2',17)+' Telaffuzu dinle</button><h2>'+esc(lemma.meanings[0]||'')+'</h2>'+(lemma.meanings[1]?'<p>'+esc(lemma.meanings[1])+'</p>':'')+'</section><button type="button" class="kao-primary" onclick="App.kaoWordLayer(2)">Kökünü ve akrabalarını gör</button>';
     }else if(layer===2){
-      h+='<section class="kao-root-tree"><p class="kao-eyebrow">Kök</p><h2 id="kao-word-title" lang="ar" dir="rtl">'+esc(Array.from(lemma.root||'').join('–'))+'</h2><p>'+esc(root&&root.meaning||lemma.pattern||'')+'</p><h3>Türkçedeki akrabaları</h3><div class="kao-derivatives">'+(root?root.derivatives.map(function(item){ return '<span><b>'+esc(item.tr)+'</b><small class="kao-pattern">'+esc(item.pattern)+'</small></span>'; }).join(''):'')+'</div>'+kaoCognateHTML(lemma)+'</section><button type="button" class="kao-primary" onclick="App.kaoWordLayer(3)">Kur’an’dan örnekleri gör</button>';
+      h+='<section class="kao-root-tree"><p class="kao-eyebrow">Kök</p><h2 id="kao-word-title">'+kaoArabicPairHTML(Array.from(lemma.root||'').join('–'),root&&root.pronunciation,'kao-root-pair')+'</h2><p>'+esc(root&&root.meaning||lemma.pattern||'')+'</p><h3>Türkçedeki akrabaları</h3><div class="kao-derivatives">'+(root?root.derivatives.map(function(item){ return '<span><b>'+esc(item.tr)+'</b><small class="kao-pattern">'+esc(item.pattern)+'</small></span>'; }).join(''):'')+'</div>'+kaoCognateHTML(lemma)+'</section><button type="button" class="kao-primary" onclick="App.kaoWordLayer(3)">Kur’an’dan örnekleri gör</button>';
     }else{
-      h+='<section class="kao-word-examples"><p class="kao-eyebrow">Kur’an’da</p><h2 id="kao-word-title">Üç bağlam</h2>'+lemma.examples.slice(0,3).map(function(example){ return '<article class="kao-word-example"><p lang="ar" dir="rtl">'+esc(example.ar)+'</p>'+kaoExamplePronunciationHTML(example,lemma,esc)+'<p>'+esc(example.tr)+'</p><small>'+esc(example.ref)+'</small></article>'; }).join('')+'<p class="kao-next-review">Sonraki tekrar: <strong>'+esc(nextReviewText(card))+'</strong></p></section>';
+      h+='<section class="kao-word-examples"><p class="kao-eyebrow">Kur’an’da</p><h2 id="kao-word-title">Üç bağlam</h2>'+lemma.examples.slice(0,3).map(function(example){ var pronunciation=kaoExamplePronunciationHTML(example,lemma,esc); return pronunciation?'<article class="kao-word-example"><p lang="ar" dir="rtl">'+esc(example.ar)+'</p>'+pronunciation+'<p>'+esc(example.tr)+'</p><small>'+esc(example.ref)+'</small></article>':'<article class="kao-word-example"><span class="kao-content-error" role="alert">Bu cümle, Latin okunuşu doğrulanmadan gösterilemez.</span></article>'; }).join('')+'<p class="kao-next-review">Sonraki tekrar: <strong>'+esc(nextReviewText(card))+'</strong></p></section>';
     }
     h+='<details class="kao-flag"><summary>Hata bildir</summary><div><button type="button" onclick="App.kaoFlag(\''+esc(cardId)+'\',\'meaning\')">Anlamı bildir</button><button type="button" onclick="App.kaoFlag(\''+esc(cardId)+'\',\'example\')">Örneği bildir</button></div></details></main>';
     return h;
@@ -618,22 +618,24 @@
     var opts=options&&typeof options==='object'?options:{},cardId=String(queueItem&&queueItem.cardId||queueItem&&queueItem.id||''),record=fragmentRecord(cardId);
     if(!record) return null;
     var taskId=String(queueItem&&queueItem.id||'task:'+cardId),kind=queueItem&&queueItem.fragmentKind==='translate'?'translate':'order',seed=String(opts.seed||taskId);
-    var answerAr=record.words.map(function(word){ return word.ar; }).join(' '),answerTr=record.words.map(function(word){ return word.tr; }).join(' '),choices;
+    var answerAr=record.words.map(function(word){ return word.ar; }).join(' '),answerTr=record.words.map(function(word){ return word.tr; }).join(' '),pronunciation=record.words.map(function(word){ return word.pronunciation; }).join(' '),choices;
     if(kind==='order'){
-      choices=record.words.map(function(word,index){ return {label:String(word.ar),ordinal:index,tokenId:String(word.id||index)}; });
+      choices=record.words.map(function(word,index){ return {label:String(word.ar),pronunciation:String(word.pronunciation||''),ordinal:index,tokenId:String(word.id||index)}; });
       choices.sort(function(a,b){ return seededRank(seed+'|fragment-order',a.tokenId)-seededRank(seed+'|fragment-order',b.tokenId)||a.ordinal-b.ordinal; });
     }else{
       var alternatives=fragmentGroups().filter(function(group){ return group.id!==cardId; }).slice(0,8).map(function(group){ return group.words.map(function(word){ return word.tr; }).join(' '); });
       choices=choiceList(alternatives,answerTr,seed,taskId);
     }
     choices.forEach(function(choice,index){ choice.choiceId=taskId+':choice:'+index; });
-    return {id:taskId,cardId:cardId,type:'fragment',kind:kind,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:kind==='order'?'Kelimeleri sırayla seç':'Parçayı çevir',answer:kind==='order'?answerAr:answerTr,ar:answerAr,meaning:answerTr,errorClass:kind==='order'?'order':'rule',clipId:'',choices:choices};
+    return {id:taskId,cardId:cardId,type:'fragment',kind:kind,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:kind==='order'?'Kelimeleri sırayla seç':'Parçayı çevir',answer:kind==='order'?answerAr:answerTr,ar:answerAr,pronunciation:pronunciation,meaning:answerTr,errorClass:kind==='order'?'order':'rule',clipId:'',choices:choices};
   }
   function cellText(cell){ return Array.isArray(cell)?String(cell[1]||''):(typeof cell==='string'?cell:''); }
+  function cellPronunciation(cell){ return Array.isArray(cell)?String(cell[2]||''):''; }
+  function choiceValue(value){ return value&&typeof value==='object'?{label:String(value.label||''),pronunciation:String(value.pronunciation||'')}:{label:String(value||''),pronunciation:''}; }
   function choiceList(values,answer,seed,taskId){
-    var seen=Object.create(null),list=[];
-    [answer].concat(values).forEach(function(value){ value=String(value||''); if(value&&!seen[value]){ seen[value]=1; list.push(value); } });
-    list=list.slice(0,4).map(function(label){ return {label:label,correct:label===answer}; });
+    var seen=Object.create(null),list=[],answerValue=choiceValue(answer);
+    [answer].concat(values).forEach(function(value){ value=choiceValue(value); if(value.label&&!seen[value.label]){ seen[value.label]=1; list.push(value); } });
+    list=list.slice(0,4).map(function(value){ return {label:value.label,pronunciation:value.pronunciation,correct:value.label===answerValue.label}; });
     list.sort(function(a,b){ return seededRank(seed+'|grammar',a.label)-seededRank(seed+'|grammar',b.label)||a.label.localeCompare(b.label); });
     list.forEach(function(choice,index){ choice.choiceId=taskId+':choice:'+index; });
     return list;
@@ -648,27 +650,28 @@
     if(!record) return null;
     var concept=record.concept,template=record.template,type=template.type,table=(concept.tables||[])[0],rows=table&&Array.isArray(table.rows)?table.rows:[];
     var taskId=String(queueItem&&queueItem.id||'task:'+cardId),seed=String(opts.seed||taskId),index=rows.length?seededRank(seed,template.id)%rows.length:0;
-    var row=rows[index]||{},answer='',stimulus='',context=[],alternatives=[],errorClass=type==='Ek çöz'?'affix':type==='Kök bul'?'root':'rule';
+    var row=rows[index]||{},answer='',stimulus='',stimulusPronunciation='',context=[],alternatives=[],errorClass=type==='Ek çöz'?'affix':type==='Kök bul'?'root':'rule';
     if(type==='Ek çöz'){
-      var cells=(row.cells||[]).map(function(cell,cellIndex){ return {text:cellText(cell),label:String((table.columns||[])[cellIndex+1]||row.label||'parça')}; }).filter(function(item){ return item.text; });
+      var cells=(row.cells||[]).map(function(cell,cellIndex){ return {text:cellText(cell),pronunciation:cellPronunciation(cell),label:String((table.columns||[])[cellIndex+1]||row.label||'parça')}; }).filter(function(item){ return item.text; });
       var picked=cells[cells.length-1]||{text:String(row.label||''),label:String(row.label||'')};
-      stimulus=picked.text; answer='el + '+String(row.label||'kelime'); alternatives=rows.map(function(item){ return 'el + '+String(item.label||'kelime'); }).concat([String(row.label||''),picked.label]);
-      context=['el = o bilinen',String(row.label||concept.title)];
+      stimulus=picked.text; stimulusPronunciation=picked.pronunciation||''; answer='el + '+String(row.label||'kelime'); alternatives=rows.map(function(item){ return 'el + '+String(item.label||'kelime'); }).concat([String(row.label||''),picked.label]);
+      context=[{label:'el = o bilinen',pronunciation:''},{label:String(row.label||concept.title),pronunciation:''}];
     }else if(type==='Çekim tablosu'){
-      var arabic=(row.cells||[]).map(cellText).filter(function(value){ return /[\u0600-\u06ff]/.test(value); });
-      answer=arabic[0]||String(row.label||''); stimulus=String(row.label||''); alternatives=rows.flatMap(function(item){ return (item.cells||[]).map(cellText).filter(function(value){ return /[\u0600-\u06ff]/.test(value); }); });
-      context=[String(table.title||concept.title)];
+      var arabic=(row.cells||[]).map(function(cell){ return {label:cellText(cell),pronunciation:cellPronunciation(cell)}; }).filter(function(value){ return /[\u0600-\u06ff]/.test(value.label); });
+      answer=arabic[0]||{label:String(row.label||''),pronunciation:''}; stimulus=String(row.label||''); alternatives=rows.flatMap(function(item){ return (item.cells||[]).map(function(cell){ return {label:cellText(cell),pronunciation:cellPronunciation(cell)}; }).filter(function(value){ return /[\u0600-\u06ff]/.test(value.label); }); });
+      context=[{label:String(table.title||concept.title),pronunciation:''}];
     }else if(type==='Kök bul'){
-      var root=rootForLabel(row.label),arabicWord=(row.cells||[]).map(cellText).find(function(value){ return /[\u0600-\u06ff]/.test(value); });
-      stimulus=arabicWord||String(row.label||''); answer=root?Array.from(root.root).join('–'):String(row.label||'');
+      var root=rootForLabel(row.label),arabicCell=(row.cells||[]).find(function(value){ return /[\u0600-\u06ff]/.test(cellText(value)); });
+      stimulus=cellText(arabicCell)||String(row.label||''); stimulusPronunciation=cellPronunciation(arabicCell); answer=root?{label:Array.from(root.root).join('–'),pronunciation:String(root.pronunciation||'')}:{label:String(row.label||''),pronunciation:''};
       var roots=window.QuranGrammarV1&&window.QuranGrammarV1.unit11&&window.QuranGrammarV1.unit11.roots||[];
-      alternatives=roots.slice(0,12).map(function(item){ return Array.from(item.root).join('–'); }); context=[String(row.label||concept.title)];
+      alternatives=roots.slice(0,12).map(function(item){ return {label:Array.from(item.root).join('–'),pronunciation:String(item.pronunciation||'')}; }); context=[{label:String(row.label||concept.title),pronunciation:''}];
     }else{
-      var matches=rows.map(function(item){ var arabic=(item.cells||[]).map(cellText).filter(function(value){ return /[\u0600-\u06ff]/.test(value); }),shift=(item.cells||[]).map(cellText).find(function(value){ return /^[IVX]+:/.test(value); }); return {word:arabic[1]||arabic[0]||'',meaning:shift?shift.replace(/^[IVX]+:\s*/, ''):String(item.label||'')}; }).filter(function(item){ return item.word&&item.meaning; }).slice(0,3);
+      var matches=rows.map(function(item){ var arabic=(item.cells||[]).map(function(cell){ return {label:cellText(cell),pronunciation:cellPronunciation(cell)}; }).filter(function(value){ return /[\u0600-\u06ff]/.test(value.label); }),shift=(item.cells||[]).map(cellText).find(function(value){ return /^[IVX]+:/.test(value); }); return {word:(arabic[1]||arabic[0]||{}).label||'',pronunciation:(arabic[1]||arabic[0]||{}).pronunciation||'',meaning:shift?shift.replace(/^[IVX]+:\s*/, ''):String(item.label||'')}; }).filter(function(item){ return item.word&&item.meaning; }).slice(0,3);
       var selected=matches[seededRank(seed,template.id)%Math.max(1,matches.length)]||{word:'',meaning:''};
-      stimulus=selected.word; answer=selected.meaning; alternatives=matches.map(function(item){ return item.meaning; }); context=matches.map(function(item){ return item.word; });
+      stimulus=selected.word; stimulusPronunciation=selected.pronunciation||''; answer=selected.meaning; alternatives=matches.map(function(item){ return item.meaning; }); context=matches.map(function(item){ return {label:item.word,pronunciation:item.pronunciation}; });
     }
-    return {id:taskId,cardId:cardId,type:'grammar',grammarType:type,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:String(template.prompt||type),stimulus:stimulus,context:context,errorClass:errorClass,answer:answer,clipId:'',choices:choiceList(alternatives,answer,seed,taskId)};
+    var answerValue=choiceValue(answer);
+    return {id:taskId,cardId:cardId,type:'grammar',grammarType:type,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:String(template.prompt||type),stimulus:stimulus,stimulusPronunciation:stimulusPronunciation,context:context,errorClass:errorClass,answer:answerValue.label,clipId:'',choices:choiceList(alternatives,answerValue,seed,taskId)};
   }
   function kaoCandidates(){
     var lex=window.QuranLexiconV1;
@@ -692,6 +695,11 @@
     var esc=quranLearnDeps.esc,warning=!!task.cognate.shift;
     return '<p class="kao-cognate'+(warning?' is-shift':'')+'">'+(warning?quranLearnDeps.icon('alert-triangle',14)+' dikkat · ':'')+'Türkçede var: '+esc(task.cognate.tr)+(warning?' · '+esc(task.cognate.shift):'')+'</p>';
   }
+  function kaoArabicPairHTML(ar,pronunciation,className){
+    var esc=quranLearnDeps.esc,label=String(ar||''),reading=String(pronunciation||'');
+    if(!reading) return '<span class="kao-content-error" role="alert">Bu Arapça içerik, Latin okunuşu doğrulanmadan gösterilemez.</span>';
+    return '<span class="kao-arabic-stack'+(className?' '+className:'')+'"><span class="kao-arabic-text" lang="ar" dir="rtl">'+esc(label)+'</span><span class="kao-pronunciation-line" lang="tr">'+esc(reading)+'</span></span>';
+  }
   function kaoTaskHTML(task){
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),esc=quranLearnDeps.esc;
@@ -702,19 +710,22 @@
     var autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',prompt=isGrammar||isFragment?task.prompt:(task.direction==='tr>ar'?task.meaning:task.ar);
     var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
     h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(isFragment?(task.kind==='order'?'Kelime dizme':'Parça çevir'):(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç')))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
-    h+='<h2 class="kao-question'+(autoplay&&task.direction==='ar>tr'?' kao-audio-pending':'')+'"'+(!isGrammar&&!isFragment&&task.direction==='ar>tr'?' lang="ar" dir="rtl" data-kao-ar':'')+'>'+esc(prompt)+'</h2>';
-    if(isGrammar){ h+='<p class="kao-grammar-stimulus"'+(/[\u0600-\u06ff]/.test(task.stimulus)?' lang="ar" dir="rtl"':'')+'>'+esc(task.stimulus)+'</p>'; if(task.context&&task.context.length) h+='<div class="kao-grammar-context">'+task.context.map(function(item){ return '<span>'+esc(item)+'</span>'; }).join('')+'</div>'; }
-    if(isFragment&&task.kind==='translate') h+='<p class="kao-fragment-stimulus" lang="ar" dir="rtl">'+esc(task.ar)+'</p>';
+    if(!isGrammar&&!isFragment&&task.direction==='ar>tr') h+='<h2 class="kao-question'+(autoplay?' kao-audio-pending':'')+'" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair')+'</h2>';
+    else h+='<h2 class="kao-question">'+esc(prompt)+'</h2>';
+    if(isGrammar){ h+='<div class="kao-grammar-stimulus">'+(/[\u0600-\u06ff]/.test(task.stimulus)?kaoArabicPairHTML(task.stimulus,task.stimulusPronunciation,'kao-stimulus-pair'):esc(task.stimulus))+'</div>'; if(task.context&&task.context.length) h+='<div class="kao-grammar-context">'+task.context.map(function(item){ var value=item&&typeof item==='object'?item:{label:item,pronunciation:''}; return /[\u0600-\u06ff]/.test(value.label)?'<span>'+kaoArabicPairHTML(value.label,value.pronunciation,'kao-context-pair')+'</span>':'<span>'+esc(value.label)+'</span>'; }).join('')+'</div>'; }
+    if(isFragment&&task.kind==='translate') h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair')+'</div>';
     if(isFragment&&task.kind==='order'){
       var draft=Array.isArray(ui.kaoOrderDraft)?ui.kaoOrderDraft:[];
-      h+='<div class="kao-order-target" aria-label="Seçilen kelime sırası">'+(draft.length?draft.map(function(choiceId){ var selected=task.choices.find(function(choice){ return choice.choiceId===choiceId; }); return selected?'<span lang="ar" dir="rtl">'+esc(selected.label)+'</span>':''; }).join(''):'<span class="kao-order-empty">Önce fiili seç</span>')+'</div>';
+      h+='<div class="kao-order-target" aria-label="Seçilen kelime sırası">'+(draft.length?draft.map(function(choiceId){ var selected=task.choices.find(function(choice){ return choice.choiceId===choiceId; }); return selected?'<span>'+kaoArabicPairHTML(selected.label,selected.pronunciation,'kao-order-pair')+'</span>':''; }).join(''):'<span class="kao-order-empty">Önce fiili seç</span>')+'</div>';
     }
-    if(task.translit&&task.direction==='ar>tr') h+='<p class="kao-translit">'+esc(task.translit)+'</p>';
     if(task.clipId) h+='<button type="button" class="kao-audio" aria-label="Yavaş dinlemek için dokun; doğal hız için 350 milisaniye basılı tut" onpointerdown="this.dataset.kaoLong=\'\';this._kaoHold=setTimeout(()=>{this.dataset.kaoLong=\'1\';App.kaoPlay(\''+task.clipId+'\',\'flowing\')},350)" onpointerup="clearTimeout(this._kaoHold)" onpointercancel="clearTimeout(this._kaoHold)" onclick="if(this.dataset.kaoLong!==\'1\')App.kaoPlay(\''+task.clipId+'\',\'measured\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.kaoPlay(\''+task.clipId+'\',event.shiftKey?\'flowing\':\'measured\')}">'+quranLearnDeps.icon('volume-2',17)+' Dinle</button>';
     h+=kaoCognateHTML(task)+'<div class="kao-choices">';
     task.choices.forEach(function(choice){
       var selected=isFragment&&task.kind==='order'&&Array.isArray(ui.kaoOrderDraft)&&ui.kaoOrderDraft.indexOf(choice.choiceId)>=0;
-      h+='<button type="button"'+(isGrammar||isFragment?' class="kao-chip"':'')+(isFragment&&task.kind==='order'?' lang="ar" dir="rtl" aria-pressed="'+(selected?'true':'false')+'"'+(selected?' disabled':''):(task.direction==='tr>ar'?' lang="ar" dir="rtl" data-kao-ar'+(autoplay?' class="kao-audio-pending"':''):''))+' onclick="App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')">'+esc(choice.label)+'</button>';
+      var arabic=/[\u0600-\u06ff]/.test(choice.label),classes=[];
+      if(isGrammar||isFragment) classes.push('kao-chip');
+      if(autoplay&&task.direction==='tr>ar') classes.push('kao-audio-pending');
+      h+='<button type="button"'+(classes.length?' class="'+classes.join(' ')+'"':'')+(isFragment&&task.kind==='order'?' aria-pressed="'+(selected?'true':'false')+'"'+(selected?' disabled':''):'')+(arabic?' data-kao-ar aria-label="'+esc(choice.label+', okunuşu '+choice.pronunciation)+'"':'')+' onclick="App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')">'+(arabic?kaoArabicPairHTML(choice.label,choice.pronunciation,'kao-choice-pair'):esc(choice.label))+'</button>';
     });
     h+='</div><p class="kao-live" aria-live="polite">'+esc(ui.kaoFeedback||'')+'</p>';
     if(ui.kaoUndo) h+='<button type="button" class="kao-undo" onclick="App.kaoUndo()">Geri al · 3 sn</button>';

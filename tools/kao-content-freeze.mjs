@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { INPUTS, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic } from './kao-lexicon-build.mjs';
+import { INPUTS, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic, translitTr, wordTranslitTr } from './kao-lexicon-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = path.join(ROOT, 'kuran-ogreniyorum/content');
@@ -36,19 +36,43 @@ function write(relative, source, budget) {
   fs.writeFileSync(path.join(ROOT, relative), source);
   console.log(`${relative}: ${bytes} bayt`);
 }
-function compactCell(cell) {
+function turkishPronunciation(value) {
+  return String(value || '').toLowerCase()
+    .replace(/sh/g, 'ş').replace(/kh/g, 'h').replace(/gh/g, 'g')
+    .replace(/th/g, 's').replace(/dh/g, 'z')
+    .replace(/q/g, 'k').replace(/w/g, 'v').replace(/j/g, 'c')
+    .replace(/ā/g, 'â').replace(/ī/g, 'î').replace(/ū/g, 'û')
+    .replace(/ḥ/g, 'h').replace(/ṣ/g, 's').replace(/ḍ/g, 'd').replace(/ṭ/g, 't').replace(/ẓ/g, 'z');
+}
+function qacPronunciation(word, includePrefixes = true) {
+  return turkishPronunciation(wordTranslitTr(word, includePrefixes));
+}
+function compactCell(cell, pronunciationSources) {
   if (cell.text) return cell.text;
-  return [cell.resolved?.ref || null, cell.resolved?.ar || null];
+  const resolved = cell.resolved || {};
+  let pronunciation = resolved.translit || '';
+  if (!pronunciation && resolved.ref) {
+    const qac = pronunciationSources.qac.get(resolved.ref);
+    if (qac) {
+      const all = qac.segments.map((segment) => segment.form).join('');
+      pronunciation = qacPronunciation(qac, normalizedArabic(bwToArabic(all)) === normalizedArabic(resolved.ar));
+    }
+  }
+  pronunciation = turkishPronunciation(pronunciation);
+  if (resolved.ar && !pronunciation) throw new Error(`${resolved.ref || resolved.lemmaId || 'hücre'}: Arapça hücre okunuşsuz dondurulamaz`);
+  return [resolved.ref || null, resolved.ar || null, pronunciation || null];
 }
 function freezeGrammar() {
   const input = readJson('grammar.verified.json');
   if (input.consistencyTotal !== 0 || input.verifiedTotal !== 26) throw new Error('grammar.verified doğrulama kapısı geçmedi');
+  const qac = parseMorphology(readPinnedInput(path.dirname(QAC), INPUTS.morphology).text).words;
+  const pronunciationSources = { qac: new Map(qac.map((word) => [word.key, word])) };
   const concepts = input.concepts.map((item) => ({
     id: item.id, unit: item.unit, order: item.order, title: item.title,
     plainTr: item.plainTr, termTr: item.termTr,
     tables: item.tables.map((table) => ({
       title: table.title, columns: table.columns,
-      rows: table.rows.map((row) => ({ label: row.label, cells: row.cells.map(compactCell) }))
+      rows: table.rows.map((row) => ({ label: row.label, cells: row.cells.map((cell) => compactCell(cell, pronunciationSources)) }))
     })),
     templates: item.templates.map((template) => ({
       id: template.id, type: template.type, exampleId: template.exampleId,
@@ -58,13 +82,13 @@ function freezeGrammar() {
   const unit11 = {
     id: input.unit11.id, title: input.unit11.title, note: input.unit11.note,
     roots: input.unit11.roots.map((root) => ({
-      root: root.resolved.root, meaning: root.meaning,
+      root: root.resolved.root, pronunciation: Array.from(turkishPronunciation(translitTr(root.rootBw))).join('–'), meaning: root.meaning,
       derivatives: root.derivatives.map((item) => ({ tr: item.tr, pattern: item.pattern }))
     })), verified: true
   };
   const data = {
     METHODOLOGY_TR: 'KAO-04 D-12 doğrulanmış gramer katmanının boyut-bütçeli, ağsız ve salt çalışma zamanı izdüşümüdür.',
-    ATTRIBUTION: { source: 'grammar.verified.json', verification: 'D-12', generatedAt: '2026-09-24' },
+    ATTRIBUTION: { source: 'grammar.verified.json', pronunciation: 'Pinned QAC 0.4 Buckwalter surface forms; deterministic D-12 Turkish-Latin projection', verification: 'D-12', generatedAt: '2026-09-25' },
     concepts, unit11
   };
   const extras = "var byId=Object.create(null);data.concepts.forEach(function(x){byId[x.id]=x;});data.byId=function(id){return byId[id]||null;};";
@@ -131,7 +155,9 @@ function freezeSurahs() {
       id: lemmaId, ar: bwToArabic(qac.lemmaBw || qac.formBw), tr: translated.tr,
       lemmaBw: qac.lemmaBw, source: 'QAC lemma + D-12 verified Quran.com Turkish word reference'
     });
-    words.push({ id: `s-${qac.surah}-${qac.ayah}-${qac.wordIndex}`, surahId: qac.surah, ayah: qac.ayah, i: qac.wordIndex, ar, lemmaId, tr: translated.tr });
+    const pronunciation = qacPronunciation(qac);
+    if (!pronunciation) throw new Error(`${ref}:${qac.wordIndex}: Latin okunuş yok`);
+    words.push({ id: `s-${qac.surah}-${qac.ayah}-${qac.wordIndex}`, surahId: qac.surah, ayah: qac.ayah, i: qac.wordIndex, ar, lemmaId, tr: translated.tr, pronunciation });
   }
   for (const ref of refs.filter((value) => Number(value.split(':')[0]) >= 95)) {
     const [surah, ayah] = ref.split(':').map(Number);
@@ -155,14 +181,16 @@ function freezeSurahs() {
     const known = knownByBw.get(qac.lemmaBw); const lemmaId = known ? known.lemmaId : lemmaKey(qac.lemmaBw || qac.formBw);
     const translated = reference.get(`${ref}:${qac.wordIndex}`);
     if (!known && !supplements.has(lemmaId)) supplements.set(lemmaId, { id: lemmaId, ar: bwToArabic(qac.lemmaBw || qac.formBw), tr: translated.tr, source: 'QAC lemma + D-12 verified reference' });
-    fatiha.push({ ar, tr: translated.tr, lemmaId });
+    const pronunciation = qacPronunciation(qac);
+    if (!pronunciation) throw new Error(`${ref}:${qac.wordIndex}: Fâtiha Latin okunuşu yok`);
+    fatiha.push({ ar, tr: translated.tr, lemmaId, pronunciation });
   }
   const p = (id, title, text, meanings) => prayerLine(id, title, text, meanings, verified, supplements);
   const prayerTexts = [
     p('tekbir', 'İftitah tekbiri', 'اللَّهُ أَكْبَرُ', ['Allah', 'en büyüktür']),
     p('subhaneke', 'Sübhâneke', 'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلَهَ غَيْرُكَ', ['seni tenzih ederim', 'Allahım', 'hamdinle', 'bereketlidir', 'adın', 'yücedir', 'şanın', 've yoktur', 'ilah', 'senden başka']),
     { id: 'fatiha', title: 'Fâtiha', words: fatiha },
-    { id: 'zamm_sure', title: 'Zamm-ı sûre (İhlâs)', words: words.filter((word) => word.surahId === 112).map(({ ar, tr, lemmaId }) => ({ ar, tr, lemmaId })) },
+    { id: 'zamm_sure', title: 'Zamm-ı sûre (İhlâs)', words: words.filter((word) => word.surahId === 112).map(({ ar, tr, lemmaId, pronunciation }) => ({ ar, tr, lemmaId, pronunciation })) },
     p('ruku', 'Rükû tesbihi', 'سُبْحَانَ رَبِّيَ الْعَظِيمِ', ['tenzih ederim', 'Rabbimi', 'yüce']),
     p('secde', 'Secde tesbihi', 'سُبْحَانَ رَبِّيَ الْأَعْلَى', ['tenzih ederim', 'Rabbimi', 'en yüce']),
     p('tahiyyat', 'Tahiyyat', 'التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ', ['hürmetler', 'Allah içindir', 'dualar', 'güzel sözler', 'selam', 'senin üzerine', 'ey', 'peygamber', 'rahmeti', 'Allahın', 'bereketleri', 'selam', 'bizim üzerimize', 've üzerine', 'kullarının', 'Allahın', 'salihlerin', 'şahitlik ederim', 'ki', 'yoktur', 'ilah', 'başka', 'Allah', 've şahitlik ederim', 'ki', 'Muhammed', 'kuludur', 'elçisidir']),
@@ -178,12 +206,12 @@ function freezeSurahs() {
       { name: 'Diyanet Namaz Duaları', url: DIANET_DUALAR }, { name: 'Diyanet Temel Dini Bilgiler', url: DIANET_NAMAZ }
     ], verification: 'D-12' },
     S: surahs.map((item) => [item.id, item.name]),
-    W: words.map((item) => [item.id, item.surahId, item.ayah, item.i, item.ar, item.lemmaId, item.tr]),
+    W: words.map((item) => [item.id, item.surahId, item.ayah, item.i, item.ar, item.lemmaId, item.tr, item.pronunciation]),
     M: waqfMarks.map((item) => [item.mark, item.afterWordId]),
     L: [...supplements.values()].map((item) => [item.id, item.ar, item.tr, item.lemmaBw || null, item.source, true]),
     P: prayerTexts.map((item) => [item.id, item.title, item.words.map((word) => [word.ar, word.tr, word.lemmaId])])
   };
-  const extras = "data.surahs=data.S.map(function(x){return{id:x[0],name:x[1]};});data.words=data.W.map(function(x){return{id:x[0],surahId:x[1],ayah:x[2],i:x[3],ar:x[4],lemmaId:x[5],tr:x[6]};});data.waqfMarks=data.M.map(function(x){return{mark:x[0],afterWordId:x[1]};});data.supplements=data.L.map(function(x){return{id:x[0],ar:x[1],tr:x[2],lemmaBw:x[3],source:x[4],verified:x[5]===true};});data.prayerTexts=data.P.map(function(x){return{id:x[0],title:x[1],verified:true,words:x[2].map(function(w){return{ar:w[0],tr:w[1],lemmaId:w[2]};})};});delete data.S;delete data.W;delete data.M;delete data.L;delete data.P;var supplementIndex=Object.create(null);data.supplements.forEach(function(x){supplementIndex[x.id]=x;});data.lemmaById=function(id){return (window.QuranLexiconV1&&window.QuranLexiconV1.byId(id))||supplementIndex[id]||null;};";
+  const extras = "data.surahs=data.S.map(function(x){return{id:x[0],name:x[1]};});data.words=data.W.map(function(x){return{id:x[0],surahId:x[1],ayah:x[2],i:x[3],ar:x[4],lemmaId:x[5],tr:x[6],pronunciation:x[7]};});data.waqfMarks=data.M.map(function(x){return{mark:x[0],afterWordId:x[1]};});data.supplements=data.L.map(function(x){return{id:x[0],ar:x[1],tr:x[2],lemmaBw:x[3],source:x[4],verified:x[5]===true};});data.prayerTexts=data.P.map(function(x){return{id:x[0],title:x[1],verified:true,words:x[2].map(function(w){return{ar:w[0],tr:w[1],lemmaId:w[2]};})};});delete data.S;delete data.W;delete data.M;delete data.L;delete data.P;var supplementIndex=Object.create(null);data.supplements.forEach(function(x){supplementIndex[x.id]=x;});data.lemmaById=function(id){return (window.QuranLexiconV1&&window.QuranLexiconV1.byId(id))||supplementIndex[id]||null;};";
   write('app/content/quranShortSurahsV1.js', wrapper('QuranShortSurahsV1', 'quran-short-surahs-tr-v1', data, extras), 90 * 1024);
 }
 

@@ -8,7 +8,7 @@ const repoRoot = require('../repo-root');
 
 const modulePath = path.join(repoRoot, 'app/content/quranLexiconV1.js');
 assert.ok(fs.existsSync(modulePath), 'quranLexiconV1.js bulunmalı');
-assert.ok(fs.statSync(modulePath).size <= 260 * 1024, 'modül 260 KB bütçesini aşmamalı');
+assert.ok(fs.statSync(modulePath).size <= 340 * 1024, 'görünür örnek-cümle okunuşlarıyla modül 340 KB bütçesini aşmamalı');
 
 const source = fs.readFileSync(modulePath, 'utf8');
 const sandbox = { window: {} };

@@ -1,0 +1,247 @@
+PASS FX2-15.1 App.go gövdesi bulunuyor
+PASS FX2-15.2 çıkış/giriş CSS token ve reduced-motion sözleşmesi var
+PASS FX2-15.3 çıkış → transitionend → swap → giriş sırası
+PASS FX2-15.4 200ms timeout ağı transitionend olmadan commit eder
+PASS FX2-15.5 hızlı sekme değişimi eski timer ve transitionend işleyicisini iptal eder
+PASS FX2-15.6 premium kapalıyken eski senkron davranış korunur
+PASS FX2-15.7 App yüzeyi 731, onclick 392 ve render/paint gövdeleri değişmedi
+Passed: 7 / 7
+PASS FX2-16.1 12 hedef closeX sarmalayıcısı doğru yüzey kimliğine bağlı
+PASS FX2-16.2 M6 çağrı sayısı en az 10, App/onClick yüzeyi değişmez
+PASS FX2-16.3 sheet-in/out/backdrop CSS tokenleri ve reduce-motion koruması var
+PASS FX2-16.4 animationend karttan gelince tamamlar; child olayı ve timeout çift çalıştırmaz
+PASS FX2-16.5 260ms timeout ağı animationend yokluğunda akışı bir kez sürdürür
+PASS FX2-16.6 premium kapalı veya reduced-motion iken anlık eski davranış
+PASS FX2-16.7 çift kapatma isteği eski gövdeyi ikinci kez yürütmez
+Passed: 7 / 7
+PASS FX2-10.1 SeyTouch katmanı var
+PASS FX2-10.2 install idempotent
+PASS FX2-10.3 seçici kapsamı
+PASS FX2-10.4 statik dokunma kapsamı >= %95
+PASS FX2-10.5 SeyTouch preventDefault kullanmaz
+PASS FX2-10.6 beş passive dokunma dinleyicisi var
+PASS FX2-10.7 premium kapalıyken basma erişilebilir, FX sessiz
+PASS FX2-10.8 reduced-motion ripple yok, tap sesi var
+PASS FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)
+PASS FX2-10.10 niyet haritası bağlı
+PASS FX2-10.11 ripple ölçü ve position güvenliği
+PASS FX2-10.12 boot bağlantısı render dışında ve tek
+PASS FX2-13.1 iOS kilit açma once + sessiz buffer
+PASS FX2-13.2 visibility suspend/resume yönetimi
+Passed: 14 / 14
+== boot: onboarding (no saved data) ==
+PASS  onboarding render produced HTML
+PASS  window.App exposed
+
+== location hard gate ==
+PASS  location gate blocks app before permission
+PASS  location permission success unlocks app
+PASS  denied location keeps the gate closed
+PASS  silent Safari request keeps an actionable retry button
+PASS  silent Safari request can be retried before the long watchdog
+PASS  late callback and watchdog from the old request cannot close a successful retry
+PASS  position unavailable uses one low-accuracy fallback and then stops
+
+== boot: seeded state ==
+PASS  seeded render produced HTML
+PASS  has bottom nav (bugun tab)
+
+== drive: interactions ==
+PASS  App.go("rapor") re-rendered
+PASS  theme toggle re-rendered (dark)
+PASS  header save button exists on rapor
+PASS  header save button marks local changes as dirty
+PASS  header save button confirms device save when repo is not configured
+PASS  automatic sync does not hide manual save reminder
+PASS  manual header sync clears reminder after accepted sync
+PASS  manual header sync shows a visible confirmation
+PASS  header action is labelled as sync, not save
+
+== REM-54: reminder center, ritual surfaces, notification actions ==
+PASS  reminder modules loaded in the same order as index.html
+PASS  Reminder Center overlay renders
+PASS  Reminder Center shows the system status block
+PASS  Reminder Center offers a close control
+PASS  Reminder Center closes back to the app
+PASS  faith corner opens as a reminder deep-link target
+PASS  reading hub opens as a reminder deep-link target
+PASS  every reminder deep-link target names a real handler kind
+PASS  reminder payload classifies to the reminder channel
+PASS  AEON payload still classifies to the aeon channel
+PASS  unknown notification payload is not silently routed
+PASS  delivery module is the live boundary owner (not the inline fallback)
+PASS  reminder and AEON channels stay disjoint
+PASS  reminder background capability is still reported as unsupported
+PASS  reminder in-app path stays available
+
+Done.
+== İlham & İbadet · Zikirmatik v2 headless test ==
+  ✓ Saygı/İlham sekmesi render ediliyor
+  ✓ Zikir preview kartı render
+  ✓ Beşli hub sekmesi render
+  ✓ Rapor kartı + yıllık ısı haritası render
+  ✓ Koleksiyon kartı numaralı 100 hücreyle render
+  ✓ Koleksiyon hücresi istenen öncünün modalını açar
+  ✓ Okudum eylemi biyografi yüklenirken bile modal altında görünür
+  ✓ Sonraki vakit geri sayım (spirit bar)
+  ✓ App.openZikr overlay render
+  ✓ 99 Esmâ preset kütüphanesi yüklü
+  ✓ Esmâ ebced sayacı geri sayar
+  ✓ zikrTap count artırır
+  ✓ zikrTap 33 kez sonra presetDone + streak
+  ✓ aynı hedef ikinci kez dolunca ikinci set kaydolur
+  ✓ v1 sayımı v2 nesne kaydına dönüşür
+  ✓ zikr v2 migration idempotent
+  ✓ el-Fettâh 489. sayımda ilk turu tamamlar
+  ✓ 489 sınırında geri al turu güvenle geri çeker
+  ✓ el-Fettâh 489² = 239.121 tam hatim sınırı
+  ✓ tamamlanan hatimde dokunma otomatik yeni hatim açmaz
+  ✓ yeni hatim ömürlük toplamı silmez
+  ✓ hızlı 100 sayaç çağrısı tam 100 artar
+  ✓ preset A → B → A ayrı ilerlemeyi korur
+  ✓ reload sayaç ve aktif preseti korur
+  ✓ gün değişince hatim sürer, bugünün sayacı sıfır başlar
+  ✓ kullanıcı hareketi azalt ayarı tam ekrana uygulanır
+  ✓ Zikirmatik koyu temada tam ekran render olur
+  ✓ saygiMarkRead koleksiyonu günceller
+  ✓ saygiStreak okundu günde artar
+  ✓ Kıble hesabı Ankara için doğru azimut ve mesafeyi verir
+  ✓ Kıble metriği gerçek kuzeyi, yön dilimini ve sensör durumunu ayırır
+  ✓ Sonraki vakit hesabı güvenli (spiritBarHTML render ile doğrulandı)
+  ✓ Premium nav ve vakit şeridi Bugün girişlerinden önce render olur
+  ✓ Saygı kartı Zikirmatik ile aynı beş katmanlı büyük-kart dilini kullanır
+  ✓ İman Köşesi kartı Zikirmatik ile aynı beş katmanlı büyük-kart dilini kullanır
+  ✓ Premium nav erişilebilir bölüm adı ve seçili sayfa semantiği taşır
+  ✓ Premium nav ve yeni kartlar en az 44px dokunma hedefi taşır
+  ✓ Yeni hub kartları 389px dar ekran uyarlaması taşır
+  ✓ Premium nav ve yeni kart hareketleri reduced-motion altında kapanır
+  ✓ İbadet kıble aracı bilimsel hesap özetini gösterir
+  ✓ Eski İman Köşesi kıble düğmesi kaldırıldı
+  ✓ Kıble overlay gelişmiş pusula ve yöntem açıklamasıyla render olur
+  ✓ Kıble sensörü tam render yerine hedefli DOM güncellemesi kullanır
+  ✓ Canlı kıble olayı ibreyi güncellerken sayfayı yeniden render etmez
+  ✓ İbadet raporu (haftalık zikir/vakit toplamı)
+  ✓ Hicri takvim modülü yüklü
+  ✓ Hicri ±2 gün kullanıcı ayarı kaydolur
+  ✓ İlham & İbadet koyu tema raporu render
+  ✓ Günün öncüsü modalında sabit Okudum eylemi kod yolu var
+  ✓ Okudum, Zihnimi Besledim türetilmiş tikini günceller
+  ✓ Seçilen öncü başlığı ve biyografisi aynı kalır
+  ✓ Okudum gerçek akışta Zihnimi Besledim tikini yeşillendirir
+  ✓ İleri okunda hem başlık hem içerik birlikte değişir
+  ✓ migrate eski veriye zikr/saygi backfill yapar
+  ✓ Zikirmatik sekme geçişi global #app/overlay kabuğunu yeniden kurmuyor
+  ✓ Zikirmatik sekme geçişi yalnız içerik alanını yerinde boyuyor
+  ✓ Zikirmatik yerel tab boyaması aria-selected durumunu güncelliyor
+  ✓ Eski çekirdek preset kaydı gerçek Arapça ile migrate ediliyor
+  ✓ Esmâ kütüphanesi niyet konularına göre süzülebiliyor
+  ✓ Keşif filtreleri kapalıyken seçimi özetleyen erişilebilir expander render ediliyor
+  ✓ Keşif filtresi expanderı global render olmadan yerinde açılıyor
+  ✓ Premium tezhip sayaç yüzeyi render ediliyor
+  ✓ Minimal Zikirmatik kartı anlamlı durum, özet ve ilerleme sunuyor
+  ✓ Sayaç ve özet kart animasyonları reduced-motion ile güvenle kapanıyor
+  ✓ Esmâ expander seçenekleri yatay kaydırma yerine tam genişlikte alt alta diziliyor
+  ✓ Zikirmatik özet kartı ortak faith cam/blur perdesini kesin olarak geçersiz kılıyor
+  ✓ V3 kayıt additive biçimde V4/V5 tefekkür şemasına taşınıyor
+  ✓ Sayaç altında zikir adına ve güne bağlı gelişmiş tefekkür editörü render ediliyor
+  ✓ Not yazarken global ekran yenilenmiyor ve kelime sayacı yerinde güncelleniyor
+  ✓ Duygu, his, düşünce ve niyet tek günlük zikir kaydında kalıcı saklanıyor
+  ✓ Yalnız not yazılan gün de panel takviminde görünmesi için günlük bağlam oluşturuyor
+  ✓ Aynı gün iki farklı Esmâ için ayrı notlar korunuyor
+  ✓ Zikirmatik Geçmiş sekmesi notları tarih, zikir ve yapılandırılmış alanlarla arşivliyor
+  ✓ Ayarlar ekranındaki yedi anahtarın tamamı gerçek state'i değiştirip kalıcı kaydediyor
+  ✓ Ses ve titreşim açılırken anlık işlev önizlemesi çalışıyor
+  ✓ Ekranı uyanık tut gerçek Wake Lock isteği yapıyor
+  ✓ Hareketi azalt modal sınıfını tam render beklemeden anında güncelliyor
+  ✓ Ayar anahtarları erişilebilir kimlik ve görünür durum mesajı taşıyor
+  ✓ Ayar tıklaması global modalı yenilemeden yalnız ilgili switch ve mesajı güncelliyor
+  ✓ Odak modu ve nefes ritmi sayaç yüzeyinde gerçek davranış sınıflarını etkinleştiriyor
+  ✓ Otomatik sıradaki zikir normal tur hedefinde gerçekten sonraki presete geçiyor
+  ✓ Hatimlerim kartı kategori, Türkçe anlam ve üç ayrıntılı metriği gösteriyor
+  ✓ Devam et yanında görünür Kaldır eylemi var
+  ✓ Kaldır ilk dokunuşta ömürlük toplamı silmeden kart içi onay açıyor
+  ✓ Kaldır onayı hatmi arşivliyor, listeden çıkarıyor ve ömürlük toplamı koruyor
+  ✓ Sıfırla ilk dokunuşta native confirm yerine görünür uygulama içi onay açıyor
+  ✓ Sayaç araçlarında görünür Sıfırla düğmesi var
+  ✓ Sıfırla yalnız bugünkü aktif preset sayımını onaylı biçimde geri alıyor
+  ✓ Geri al, son toplu sıfırlamayı tek dokunuşla eksiksiz geri yüklüyor
+  ✓ Zikirmatik overlay toast geri bildirimi overlay katmanının üstünde görünür
+  ✓ Reminder deep-link tablosu zikir hedefini gerçek bir handler ile taşıyor
+  ✓ Reminder deep-link tablosu Saygı hedefini gerçek bir handler ile taşıyor
+  ✓ Zikir hatırlatmasını açmak zikir sayımını/streak’ini değiştirmiyor
+  ✓ Reminder modülleri zikir harness boot’unda da canlı
+  ✓ Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık
+
+✅ 95/95 assertion pass
+=== MON-15 state rebind / B1 ownership boundary ===
+INFO  app.js data assignment source-lines=9 tokens=11
+INFO  app.js:1908 ×1 var data=null;
+INFO  app.js:2235 ×2 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
+INFO  app.js:2236 ×1 if(data) data=migrate(data);
+INFO  app.js:2554 ×2 function backfillArchivesFromDays(d){ var savedData=data; try{ data=d; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var day=data.days[date]; if(!day||typeof day!=='object') return; if(day.reading&&Array.isArray(day.reading.entries)) day.reading.entries.forEach(syncEntryToLibrary); if(day.watching&&Array.isArray(day.watching.entries)) day.watching.entries.forEach(syncEntryToWatchlist); if(day.listening&&Array.isArray(day.listening.entries)) day.listening.entries.forEach(syncEntryToMusic); if(Array.isArray(day.soulActivities)) day.soulActivities.forEach(syncEntryToSoulArchive); }); }finally{ data=savedData; } }
+INFO  app.js:3026 ×1 function ensureStartData(){ if(!data) data=migrate(createDefaultData()); return data; }
+INFO  app.js:3027 ×1 function ensureAuthData(){ if(!data) data=migrate(createDefaultData()); return data; }
+INFO  app.js:4408 ×1 App.importJson=function(el){ var f=el.files&&el.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(){ try{ var d=JSON.parse(r.result); if(d&&d.version&&d.days&&d.startDate){ data=d; ui.tab='bugun'; commit('Yedek yüklendi'); } else toast('Dosya okunamadı'); }catch(err){ toast('Dosya okunamadı'); } }; r.readAsText(f); el.value=''; };
+INFO  app.js:4412 ×1 App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} reminderRemoveLocalKey(REMINDER_DELIVERY_KEY); reminderRemoveLocalKey(REMINDER_ACTION_KEY); reminderRemoveLocalKey(REMINDER_PERMISSION_STORAGE_KEY); reminderPermissionTransientState=null; reminderPermissionRequestInFlight=null; reminderPermissionEverGranted=null; reminderPermissionGrantObserved=false; data=null; ui.resetStep=0; ui.tab='bugun'; ui.reminderMedicationDraft=null; ui.reminderHistoryUndo=null; ui.reminderAllUndo=null; render(); };
+INFO  app.js:4437 ×1 if(!data) data=migrate(createDefaultData());
+INFO  state.js data assignment source-lines=0
+PASS  index/production FILES load order remains equal
+PASS  app.js has exactly nine data assignment source lines
+PASS  app.js data assignment token inventory is eleven
+PASS  data declaration remains app.js-owned
+PASS  6079 try/finally data swap remains app.js-owned
+PASS  import/reset/location/auth/start data writes remain app.js-owned
+PASS  state registry contains zero data assignment source lines
+PASS  state registry has no data assignment token
+PASS  syncGlue does not own SeyOnSyncState/SeyOnSynced setters
+INFO  setter ownership ui source-lines=1, dark source-lines=3
+PASS  ui initialization remains app.js-owned
+PASS  dark initialization/rebinds remain app.js-owned
+PASS  app B1 getters are getter-only and configurable
+PASS  SeymaState B1 getters are getter-only
+PASS  ui getter returns fresh mutable view state
+PASS  dark getter returns fresh resolved theme value
+PASS  data getter remains the current closure root
+PASS  strict-mode window.data descriptor rejects writes
+PASS  strict-mode window.ui descriptor rejects writes
+PASS  strict-mode window.dark descriptor rejects writes
+PASS  strict-mode window.migrate descriptor rejects writes
+PASS  strict-mode window.getDay descriptor rejects writes
+PASS  strict-mode window.createDefaultData descriptor rejects writes
+PASS  strict-mode window.save descriptor rejects writes
+PASS  strict-mode SeymaState.data write is rejected
+PASS  import rebind produces a fresh current root
+PASS  import rebind is reflected by the live data getter
+PASS  reset rebinds the live data getter to null
+PASS  reset removes only the synthetic localStorage key
+PASS  location late-boot creates current root through app.js
+PASS  location late-boot getter is fresh and not a snapshot
+PASS  auth unlock late-boot creates current root
+PASS  auth unlock late-boot marks live session unlocked
+PASS  auth sandbox hash replacement did not alter production source
+PASS  6079 migrate callback returns the candidate root
+PASS  6079 try/finally restores the original closure root
+PASS  6079 candidate backfill remains isolated from closure root
+PASS  state fixture uses no sync.js and cannot resolve network fetch
+
+MON-15 result: PASS (37 passed, 0 failed)
+== app.js kabuk envanteri ==
+toplam satır                              7800
+kod satırı (yorum/boş hariç)              6748
+yorum satırı                               903
+fonksiyon (sütun-0)                       1692
+  shim (≤2 kod satırı)             1437 / 1443
+  küçük (3–10)                       162 / 924
+  büyük (≥11)                        93 / 1915
+App.* handler gövdesi               556 / 1705
+*Legacy fonksiyon                        0 / 0
+*HTML builder (>2 satır)                4 / 57
+var blokları                         286 / 906
+-- reminder ayak izi --
+fonksiyon / kod satırı               355 / 408
+  App.* handler                            126
+  yalnız-iç (shim gerekmez)            69 / 72
+sabit blok / satır                   121 / 289
+shell-inventory --gate PASS {"maxTotalLines":7800,"maxLegacyFunctions":0,"maxReminderFunctionCodeLines":450,"maxHtmlBuilderCodeLines":150,"rule":"DONDURULDU (MON2-08, 2026-09-15). Ölçüm 7.603/0/408/57. Yeni bir program bütçeyi yalnız kendi onayıyla değiştirebilir."}
+rendered .anti-amnesia/CURRENT-STATE.md
+kao-plan-check: PASS (0 warn)

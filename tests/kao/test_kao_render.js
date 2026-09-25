@@ -109,7 +109,8 @@ const arabicTask = api.kaoBuildTask({ id: 'arabic-task', cardId: `w:${shiftLemma
 const meaningHtml = api.kaoTaskHTML(meaningTask);
 const arabicHtml = api.kaoTaskHTML(arabicTask);
 assert.match(meaningHtml, /Anlamı seç/);
-assert.match(meaningHtml, /lang="ar" dir="rtl" data-kao-ar/);
+assert.match(meaningHtml, /data-kao-ar>.*class="kao-arabic-text" lang="ar" dir="rtl"/);
+assert.match(meaningHtml, /class="kao-pronunciation-line"[^>]*>[^<]+<\/span>/);
 assert.match(arabicHtml, /Arapçayı seç/);
 assert.match(arabicHtml, /aria-live="polite"/);
 assert.match(arabicHtml, /onpointerdown=.*350/);
@@ -126,7 +127,7 @@ for (const label of ['Ek çöz', 'Çekim tablosu', 'Kök bul', 'Kalıp eşle']) 
 assert.match(grammarHtml, /class="kao-chip"/);
 assert.match(grammarHtml, /aria-live="polite"/);
 assert.doesNotMatch(grammarHtml, /<(?:input|textarea|select)\b/i, 'gramer görevleri klavyesiz olmalı');
-assert.match(cssSource, /\.kao-choices \.kao-chip\{min-height:44px\}/);
+assert.match(cssSource, /\.kao-choices \.kao-chip\{min-height:64px\}/);
 
 const fragmentCandidates = api.kaoFragmentCandidates();
 const orderCandidate = fragmentCandidates.find((item) => item.fragmentKind === 'order');
@@ -203,7 +204,8 @@ const wordLayer3 = api.kaoWordHTML();
 assert.match(wordLayer3, /data-word-layer="3"/);
 assert.equal((wordLayer3.match(/class="kao-word-example"/g) || []).length, 3);
 assert.equal((wordLayer3.match(/class="kao-example-pronunciation/g) || []).length, 3);
-assert.match(wordLayer3, /Öğrendiğin kelimenin okunuşu/);
+assert.equal((wordLayer3.match(/Cümlenin okunuşu/g) || []).length, 3);
+assert.doesNotMatch(wordLayer3, /tam okunuşu henüz doğrulanmadı/);
 assert.match(wordLayer3, /Sonraki tekrar/);
 assert.doesNotMatch(wordLayer3, /kao-root-tree/, 'üçüncü dokunuşta kök katmanı DOM’da kalmamalı');
 

@@ -29,7 +29,8 @@
     "no push/merge/tag/deploy/seyma-data write without explicit user approval",
     "KAO owns only its files; IIP files untouched except one composition line in Dalga 5 (11-BAGIMSIZLIK)",
     "audio: same-origin read-only clips under assets/kao/audio; microphone recording memory-only, never persisted or synced; no TTS for Quranic Arabic",
-    "12-EK-GEREKSINIMLER R-xx maddeleri bağlayıcıdır; kabul kontrolü geçmeyen kart kapanmaz"
+    "12-EK-GEREKSINIMLER R-xx maddeleri bağlayıcıdır; kabul kontrolü geçmeyen kart kapanmaz",
+    "Every Arabic word, choice, fragment, or sentence rendered in a KAO learning task has an adjacent visible verified Latin pronunciation; audio never substitutes for text; missing pronunciation fails closed"
   ],
   "decisions": {
     "D-01": {
@@ -883,10 +884,17 @@
       "wave": 3,
       "files": [
         "app/core/quranLearn.js",
+        "app/content/quranLexiconV1.js",
+        "app/content/quranGrammarV1.js",
+        "app/content/quranShortSurahsV1.js",
         "app/kao.css",
         "index.html",
         "app.js",
+        "tools/kao-content-freeze.mjs",
+        "tools/kao-lexicon-build.mjs",
         "tests/kao/test_kao_render.js",
+        "tests/kao/test_kao_pronunciation_contract.js",
+        "tests/kao/test_kao_lexicon_contract.js",
         "tests/app/test_fx2_tab_transition.js",
         "tests/app/test_fx2_overlay_motion.js",
         "tests/app/test_fx2_touch_coverage.js",
@@ -898,6 +906,9 @@
       ],
       "checks": [
         "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_pronunciation_contract.js",
+        "node tests/kao/test_kao_lexicon_contract.js",
+        "node tools/kao-lexicon-build.mjs --freeze",
         "node tests/app/test_fx2_tab_transition.js",
         "node tests/app/test_fx2_overlay_motion.js",
         "node tests/app/test_fx2_touch_coverage.js",
@@ -915,7 +926,7 @@
       "status": "done",
       "startedAt": "2026-09-24",
       "agent": "Codex (GPT-5)",
-      "scopeNote": "K10 gereği zorunlu App.kaoGate handler'ının 730→731 yüzey pini üç FX2 fixture'ında aynı kartta güncellenir. 2026-09-25 kullanıcı bildirimiyle E5 kelime/âyet bağlamı telaffuz onarımı aynı karta işlendi; index.html yalnız quranLearn.js ve kao.css önbellek sürümü için kapsamda.",
+      "scopeNote": "K10 gereği zorunlu App.kaoGate handler'ının 730→731 yüzey pini üç FX2 fixture'ında aynı kartta güncellenir. 2026-09-25 kullanıcı bildirimleriyle telaffuz sözleşmesi yapısallaştırıldı: E5 ayrıntısı yanında tüm etkileşimli kelime, gramer seçeneği, kısa sûre parçası ve 1.563 örnek cümle kaynaklı Latin okunuş taşır; içerik dondurma araçları okunuş eksikliğinde fail-closed olur; özel sözleşme fixture'ı bunu kaynak, görev nesnesi ve görünür eşleme katmanlarında tarar. Eklenen cümle okunuşları nedeniyle dondurulmuş sözlük üst bütçesi 260 KB'den 340 KB'ye çıkarıldı (gerçek 320.754 bayt). index.html yalnız değişen KAO varlıklarının önbellek sürümü için kapsamda.",
       "completedAt": "2026-09-24",
       "evidence": "kuran-ogreniyorum/evidence/KAO-15/EVIDENCE.json"
     },

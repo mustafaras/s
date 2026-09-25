@@ -967,6 +967,16 @@ function translitTr(lemmaBw) {
   // (Diyanet: "Rahman", "Samad" — "RRahman" değil). DİA katmanı ham kalır.
   return raw.replace(/^([bcçdfgğhjklmnprsştvyz])\1/u, '$1');
 }
+function wordTranslitTr(word, includePrefixes = true) {
+  const segments = (word && Array.isArray(word.segments) ? word.segments : [])
+    .filter((segment) => includePrefixes || !String(segment.features || '').startsWith('PREFIX|'));
+  const prefixes = segments.filter((segment) => String(segment.features || '').startsWith('PREFIX|'));
+  const core = segments.filter((segment) => !String(segment.features || '').startsWith('PREFIX|'));
+  let out = prefixes.map((segment) => translitTr(segment.form)).filter(Boolean).join('-');
+  const coreReading = translitTr(core.map((segment) => segment.form).join(''));
+  if (out && coreReading) out += '-';
+  return (out + coreReading).replace(/-+/g, '-').replace(/^-|-$/g, '');
+}
 function translitDia(lemmaBw) { return transliterate(lemmaBw, TRANSLIT_DIA, TRANSLIT_DIA_LONG, DIA_SHORT_VOWELS); }
 
 function lemmaSlug(lemmaBw) {
@@ -1892,7 +1902,42 @@ function importReview() {
   return { verifiedTotal, unknownTotal, verifiedRecords, rowsTotal, duplicatedTotal };
 }
 
-function frozenRows(verified) {
+function buildExamplePronunciations(verified) {
+  const inputDir = path.join(ROOT, 'kuran-ogreniyorum', 'content', 'inputs');
+  const parsed = parseMorphology(readPinnedInput(inputDir, INPUTS.morphology).text);
+  const verseTotal = new Set(parsed.words.map((word) => `${word.surah}:${word.ayah}`)).size;
+  const aligned = parseUthmani(readUthmaniInput(inputDir, verseTotal).text, parsed.words).byVerse;
+  const wordsByVerse = new Map();
+  for (const word of parsed.words) {
+    const ref = `${word.surah}:${word.ayah}`;
+    if (!wordsByVerse.has(ref)) wordsByVerse.set(ref, []);
+    wordsByVerse.get(ref).push(word);
+  }
+  const out = new Map();
+  for (const record of verified.lemmas) {
+    for (const example of record.examples || []) {
+      const verse = aligned.get(example.ref) || [];
+      const qac = wordsByVerse.get(example.ref) || [];
+      let start = -1, end = -1;
+      for (let left = 0; left < verse.length && start < 0; left += 1) {
+        for (let right = left + 1; right <= Math.min(verse.length, left + 7); right += 1) {
+          if (normalizeArabic(verse.slice(left, right).join(' ')) === normalizeArabic(example.ar)) {
+            start = left; end = right; break;
+          }
+        }
+      }
+      if (start < 0 || end > qac.length) {
+        throw new Error(`${record.lemmaId}/${example.ref}: örnek cümle QAC/Tanzil hizasında bulunamadı`);
+      }
+      const pronunciation = qac.slice(start, end).map((word) => wordTranslitTr(word)).join(' ');
+      if (!pronunciation) throw new Error(`${record.lemmaId}/${example.ref}: örnek cümle Latin okunuşsuz dondurulamaz`);
+      out.set(`${example.ref}\u0000${example.ar}`, pronunciation);
+    }
+  }
+  return out;
+}
+
+function frozenRows(verified, examplePronunciations) {
   assert(verified && verified.version === LEXICON_VERSION, 'doğrulanmış sözlük sürümü uyumsuz');
   assert(Array.isArray(verified.lemmas) && verified.lemmas.length >= 500,
     'doğrulanmış sözlükte en az 500 lemma olmalı');
@@ -1911,7 +1956,11 @@ function frozenRows(verified) {
       record.freq,
       record.cognateTr,
       record.cognateShift,
-      record.examples.map((example) => [example.ar, example.tr, example.ref]),
+      record.examples.map((example) => {
+        const pronunciation = examplePronunciations && examplePronunciations.get(`${example.ref}\u0000${example.ar}`);
+        assert(pronunciation, `${record.lemmaId}/${example.ref}: örnek cümle okunuşu gerekli`);
+        return [example.ar, example.tr, example.ref, pronunciation];
+      }),
       record.examplesException ? {
         reason: record.examplesException.reason,
         rule: record.examplesException.rule,
@@ -1949,8 +1998,8 @@ function packFrozenRows(rows) {
   return { dictionary, packed };
 }
 
-function renderFrozenLexicon(verified) {
-  const { dictionary, packed } = packFrozenRows(frozenRows(verified));
+function renderFrozenLexicon(verified, examplePronunciations) {
+  const { dictionary, packed } = packFrozenRows(frozenRows(verified, examplePronunciations));
   const packedTemplate = packed
     .replaceAll('\\', '\\\\')
     .replaceAll('`', '\\`')
@@ -1980,7 +2029,7 @@ function renderFrozenLexicon(verified) {
       root:row[4], pattern:row[5], pos:row[6], freq:row[7],
       cognate:row[8] ? Object.freeze({ tr:row[8], shift:row[9] || null }) : null,
       examples:Object.freeze(row[10].map(function(example){
-        return Object.freeze({ ar:example[0], tr:example[1], ref:example[2] });
+        return Object.freeze({ ar:example[0], tr:example[1], ref:example[2], pronunciation:example[3] });
       })),
       examplesException:row[11] ? Object.freeze(row[11]) : null,
       verified:row[12] === true
@@ -2010,9 +2059,9 @@ function renderFrozenLexicon(verified) {
 
 function freezeLexicon() {
   const verified = JSON.parse(fs.readFileSync(VERIFIED_PATH, 'utf8'));
-  const source = renderFrozenLexicon(verified);
+  const source = renderFrozenLexicon(verified, buildExamplePronunciations(verified));
   const size = Buffer.byteLength(source);
-  assert(size <= 260 * 1024, `quranLexiconV1.js boyut bütçesi aşıldı: ${size} bayt`);
+  assert(size <= 340 * 1024, `quranLexiconV1.js boyut bütçesi aşıldı: ${size} bayt`);
   fs.mkdirSync(path.dirname(FROZEN_LEXICON_PATH), { recursive: true });
   fs.writeFileSync(FROZEN_LEXICON_PATH, source);
   console.log(`KAO frozen lexicon: ${path.relative(ROOT, FROZEN_LEXICON_PATH)}`);
@@ -2086,7 +2135,7 @@ async function main(argv) {
   else compile(inputArg.resolved);
 }
 
-export { INPUTS, CliError, readPinnedInput, readUthmaniInput, parseUthmani, missingInputs, missingMessage, validatePattern, parseApproval, arabicWordRegex, translitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand, frozenRows, packFrozenRows, renderFrozenLexicon };
+export { INPUTS, CliError, readPinnedInput, readUthmaniInput, parseUthmani, missingInputs, missingMessage, validatePattern, parseApproval, arabicWordRegex, translitTr, wordTranslitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand, frozenRows, packFrozenRows, renderFrozenLexicon };
 
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (IS_MAIN) {

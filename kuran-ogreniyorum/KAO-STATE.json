@@ -18,7 +18,7 @@
     "pagesRun": 35978035375,
     "result": "success"
   },
-  "nextCard": "KAO-21",
+  "nextCard": "KAO-22",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -1542,6 +1542,22 @@
         "app/core/quranLearn.js",
         "tests/kao/test_kao_independence.js",
         "tests/kao/test_kao_render.js",
+        "index.html",
+        "sw.js",
+        "app/kao.css",
+        "tests/kao/test_kao_migration.js",
+        "tests/kao/test_kao_requirements.js",
+        "tests/app/test_fx2_tab_transition.js",
+        "tests/app/test_fx2_overlay_motion.js",
+        "tests/app/test_fx2_touch_coverage.js",
+        "tests/app/test_iip_22.js",
+        "tests/app/test_v3_welcome.js",
+        "tests/app/test_app_surface_boot_boundary.js",
+        "tests/app/test_app_surface_daily_boundary.js",
+        "tests/app/test_app_surface_domain_boundary.js",
+        "tests/app/test_app_surface_lifecycle_boundary.js",
+        "tests/app/test_app_surface_overlay_boundary.js",
+        "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
         "kuran-ogreniyorum/evidence/KAO-21/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -1550,6 +1566,13 @@
       "checks": [
         "node tests/kao/test_kao_independence.js",
         "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_migration.js",
+        "node tests/kao/test_kao_requirements.js",
+        "node tests/app/test_fx2_tab_transition.js",
+        "node tests/app/test_fx2_overlay_motion.js",
+        "node tests/app/test_fx2_touch_coverage.js",
+        "node tests/app/test_v3_welcome.js",
+        "node tests/app/test_app_surface_daily_boundary.js",
         "node .claude/skills/run-seyma/driver.mjs",
         "node .claude/skills/run-seyma/zikr-harness.mjs",
         "node tests/app/test_state_rebind_boundary.js",
@@ -1560,7 +1583,17 @@
         "KAO-20"
       ],
       "gate": "IIP hub/nav main'de ya da IIP sahibi onayı; saygi.js'e yalnız 1 bileşim satırı + 1 dep satırı",
-      "status": "pending"
+      "status": "done",
+      "gateApproval": {
+        "by": "koşul: IIP main'de",
+        "at": "2026-09-26",
+        "basis": "archive/ilham-ibadet-premium-plan/IIP-STATE.json status=done, activeCard=null; IIP commit'leri main ve kuran-ogreniyorum dallarında. Kapı metni 'IIP hub/nav main'de ya da IIP sahibi onayı' — ilk koşul olgusal olarak sağlandı; saygi.js'te bu kartta 0 satır değişti."
+      },
+      "startedAt": "2026-09-26",
+      "agent": "Claude (Opus 5.5)",
+      "scopeNote": "Adım 2–3 (saygi.js bileşimi + app.js dep) a9fa40c 'fix(ui): move Quran learning into faith hub' ile zaten main'deydi; bu kart doğruladı ve bayt-eşitlik fixture'ını ekledi. kaoHubCardHTML SAYGI_DEPENDENCIES'e EKLENMEDİ: zorunlu bağımlılık kayıt eksikken saygi kaydını fail-closed düşürür ve adım 6'nın 'yokken bayt-eşit' şartıyla çelişir; isteğe bağlı dep() kalıbı korundu. Adım 4: geçici Ayarlar girişi zaten yoktu; settings.kaoVisible E7'de + gizliyken uygulama Ayarları → Gizlenen kartlar satırı (settings.js, mevcut showBugunCard kalıbı). Adım 5 köprüleri (Kur'an Yolculuğu 'kelimelerini öğren', Esmâ kök notu) quran.js / Esmâ dosyalarına dokunmayı gerektirdiği için prompt gereği ATLANDI ve raporlandı. Pinler: App 754→755 / 592→593, onclick 392→393 (settings.js satırı), settings.js 20260926a, yayın 20260925m.",
+      "completedAt": "2026-09-26",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-21/EVIDENCE.json"
     },
     "KAO-22": {
       "title": "Kapanış belgesi",
@@ -1746,7 +1779,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-20",
+  "lastCompletedPrompt": "KAO-21",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

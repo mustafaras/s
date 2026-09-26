@@ -1,0 +1,30 @@
+{
+  "card": "KAO-21",
+  "head": "0de4d043f15fba09bc37f2bd9895a9c94ed20c82",
+  "diffHash": "00134836f079afe1fc0164434b3784f3caa67d17814151bc6edcd1b6916fc622",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-26",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "scope": "Hub kartı bileşimi doğrulandı (saygi.js 0 satır), bayt-eşitlik fixture'ı, settings.kaoVisible + geri getirme yolu",
+  "results": {
+    "independence": "saygiHTML: kaoHubCardHTML yokken ve '' dönerken 3497 bayt birebir; varken tek kez ve quranHub() ardından",
+    "visibility": "E7 anahtarı; gizliyken kaoHubCardHTML ''; uygulama Ayarları'nda 'Kur’an Arapçası kartını geri getir'; bozuk değer görünür sayılır",
+    "saygiDiff": "0 satır (≤3)"
+  },
+  "skipped": {
+    "quranJourneyBridge": "quran.js QY sahipliği — prompt: dokunmadan mümkün değilse atla ve raporla",
+    "esmaRootNote": "Esmâ içerik/görünüm dosyaları kart kapsamı dışı — aynı kural"
+  },
+  "checks": {
+    "test_kao_independence": "PASS",
+    "test_kao_render": "PASS",
+    "tests/kao tümü": "PASS",
+    "fullRegression": "tests/app+kao+quran+panel+panel-v2 149/149, reminder smoke, driver, zikr, verify-*, shell, kontrast PASS"
+  },
+  "evidenceLevels": {
+    "source": "headless fixture",
+    "deploy": "yok (bu commit)",
+    "device": "yok"
+  }
+}

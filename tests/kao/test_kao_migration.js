@@ -29,7 +29,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(fresh)), {
   lexiconVersion: 'quran-lexicon-tr-v1',
   startedAt: null,
   gate: { passed: false, skipped: false, score: null, at: null },
-  settings: { dailyNew: 10, audio: false, audioStyle: 'measured', harakat: true, translit: true, translitLayer: 'tr', shadowing: false },
+  settings: { dailyNew: 10, audio: false, audioStyle: 'measured', harakat: true, translit: true, translitLayer: 'tr', shadowing: false, kaoVisible: true },
   cards: {}, units: {}, surahs: {}, daily: {},
   milestones: { fatiha: null, namaz: null, half: null, twoThirds: null, eighty: null, shortSurahs: null },
   phonics: { style: 'muallim', misheard: {} },

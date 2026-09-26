@@ -251,7 +251,7 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   const settingsHtml = e7.kaoOverlayHTML('2026-09-25T10:00:00');
   assert.match(settingsHtml, /class="kao-dialog" style="--kao-ar-lh:2\.5;--kao-ar-ws:\.18em"/);
   for (const handler of ['kaoSetDailyNew(15)', "kaoSetAudioStyle('flowing')", "kaoSetTranslit('dia')", 'kaoToggleHarakat()', 'kaoToggleFade()', "kaoSetReadability('lineHeight','2.5')", "kaoSetReadability('wordSpacing','wide')", "kaoSetReadability('coloredHarakat',true)", 'kaoReopenGate()', 'kaoExportCsv()']) assert.ok(settingsHtml.includes('App.' + handler), handler);
-  assert.equal((settingsHtml.match(/aria-pressed="true"/g) || []).length, 7, 'her grupta tek seçili düğme + açık anahtarlar');
+  assert.equal((settingsHtml.match(/aria-pressed="true"/g) || []).length, 8, 'her grupta tek seçili düğme + açık anahtarlar (görünürlük dahil)');
   assert.match(settingsHtml, /role="group" aria-label="Günlük yeni kelime"/);
   assert.match(e7.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoSetView\('settings'\)/, 'E1 ana ekrandan ayarlara geçiş');
   assert.equal(e7.kaoReopenGate(), true); assert.equal(e7Ui.kaoView, 'gate', 'Seviye 0 tekrar açılır');

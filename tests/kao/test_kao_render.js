@@ -493,4 +493,21 @@ assert.ok(prevented >= 3 && stopped >= 3);
   for (const tone of ['Hareke · fetha', 'Hareke · kesra', 'Hareke · damma']) for (const theme of ['AÇIK', 'KOYU']) assert.ok(report.results.some((row) => row.label === tone && row.theme === theme && row.pass), `${tone} × ${theme}`);
 }
 
+// KAO-21 · hub görünürlüğü (settings.kaoVisible) ve geri getirme yolu.
+{
+  const saved = appData.quranLearn;
+  appData.quranLearn = { settings: { kaoVisible: true }, cards: {}, ayahs: { understood: [] } };
+  api.ensureQuranLearn(appData);
+  assert.match(api.kaoHubCardHTML(), /id="kao-hub-entry"/);
+  assert.match(api.kaoSettingsHTML(), /App\.kaoToggleVisible\(\)[^>]*>İlham & İbadet’te kartı göster: açık/);
+  assert.equal(api.kaoToggleVisible(), true); assert.equal(appData.quranLearn.settings.kaoVisible, false);
+  assert.equal(api.kaoHubCardHTML(), '', 'gizliyken hub kartı yok');
+  assert.equal(api.kaoToggleVisible(), true); assert.equal(appData.quranLearn.settings.kaoVisible, true);
+  assert.equal(api.ensureQuranLearn({ quranLearn: { settings: { kaoVisible: 'x' } } }).settings.kaoVisible, true, 'bozuk değer görünür sayılır');
+  assert.match(settingsSource, /var kaoHidden=!!\(data\.quranLearn&&data\.quranLearn\.settings&&data\.quranLearn\.settings\.kaoVisible===false\);/);
+  assert.match(settingsSource, /if\(kaoHidden\) h\+='<button onclick="App\.kaoToggleVisible\(\)"[\s\S]*?Kur’an Arapçası kartını geri getir/, 'uygulama Ayarları → Gizlenen kartlar');
+  assert.match(appSource, /App\.kaoToggleVisible=function\(\)\{ return window\.SeymaQuranLearn\.kaoToggleVisible\.apply\(null,arguments\); \};/);
+  appData.quranLearn = saved;
+}
+
 console.log('KAO render: PASS (KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');

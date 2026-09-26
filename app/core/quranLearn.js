@@ -1009,6 +1009,7 @@
     h+='<section><h3>Ses</h3>'+kaoSegHTML('Yeni kelimede otomatik ses',[['off','Kapalı',"'off'"],['measured','Yavaş',"'measured'"],['flowing','Doğal',"'flowing'"]],audio,'kaoSetAudioStyle')+'<p class="kao-setting-hint">Ses düğmesinde dokunmak yavaş, basılı tutmak doğal hızı çalar. Sessiz saatte otomatik ses çalmaz.</p></section>';
     h+='<section><h3>Okunuş ve hareke</h3>'+kaoSegHTML('Latin okunuş katmanı',[['tr','Okunuş',"'tr'"],['dia','DİA',"'dia'"]],kaoTranslitLayer(),'kaoSetTranslit')+'<p class="kao-setting-hint">DİA katmanı kelime kartlarında harfleri birebir ayırır (ḥ, ṣ, ʿ); âyet ve parça okunuşları Okunuş katmanında kalır.</p>';
     h+='<div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(s.harakat!==false?'true':'false')+'" onclick="App.kaoToggleHarakat()">Harekeleri göster: '+(s.harakat!==false?'açık':'kapalı')+'</button><button type="button" class="kao-toggle" aria-pressed="'+(r.fadeHarakat?'true':'false')+'" onclick="App.kaoToggleFade()">Tekrarda harekeyi soldur: '+(r.fadeHarakat?'açık':'kapalı')+'</button></div></section>';
+    h+='<section><h3>Görünürlük</h3><div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(s.kaoVisible!==false?'true':'false')+'" onclick="App.kaoToggleVisible()">İlham & İbadet’te kartı göster: '+(s.kaoVisible!==false?'açık':'kapalı')+'</button></div><p class="kao-setting-hint">Kapatırsan kart gizlenir, verilerin korunur; uygulama Ayarları → Gizlenen kartlar bölümünden geri getirebilirsin.</p></section>';
     h+='<section><h3>Gölgeleme (mikrofon)</h3><div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(s.shadowing===true?'true':'false')+'" onclick="App.kaoToggleShadowing()">Gölgeleme: '+(s.shadowing===true?'açık':'kapalı')+'</button></div><p class="kao-setting-hint">Açıkken Telaffuz stüdyosunda modeli dinleyip kendi sesini en çok 10 saniye kaydedebilirsin. Mikrofon yalnız sen başlatınca açılır; kayıt yalnız bu ekranda bellekte durur, hiçbir yere kaydedilmez ya da gönderilmez ve pencereyi kapatınca silinir.</p></section>';
     h+='<section><h3>Okunabilirlik</h3><p class="kao-gate-ar kao-settings-sample" lang="ar" dir="rtl" style="'+kaoReadabilityStyle()+'">'+(r.coloredHarakat?kaoColorHarakat(sample):esc(sample))+'</p>'+kaoSegHTML('Arapça satır aralığı',KAO_LINE_HEIGHTS.map(function(v){ return [v,v==='1.9'?'Sıkı':(v==='2.2'?'Rahat':'Geniş'),"'lineHeight','"+v+"'"]; }),line,'kaoSetReadability')+kaoSegHTML('Kelime boşluğu',[['normal','Normal',"'wordSpacing','normal'"],['wide','Geniş',"'wordSpacing','wide'"]],r.wordSpacing,'kaoSetReadability')+'<div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(r.coloredHarakat?'true':'false')+'" onclick="App.kaoSetReadability(\'coloredHarakat\','+(r.coloredHarakat?'false':'true')+')">Renkli hareke (Seviye 0): '+(r.coloredHarakat?'açık':'kapalı')+'</button></div></section>';
     h+='<section><h3>Seviye 0 ve dışa aktarma</h3><div class="kao-setting-row"><button type="button" class="kao-secondary" onclick="App.kaoReopenGate()">Seviye 0 kontrolünü yeniden aç</button><button type="button" class="kao-secondary" onclick="App.kaoExportCsv()">Kelimelerimi indir (CSV)</button></div><p class="kao-setting-hint">CSV yalnız bu cihazda oluşturulur; Anki uyumlu sütunlar: ar, tr, translit, root, tags.</p><p class="kao-live" aria-live="polite">'+esc(ui.kaoSettingsNote||'')+'</p></section></main>';
@@ -1231,6 +1232,8 @@
     else ui.kaoShadowNote='Kaydın silindi.';
     quranLearnDeps.render(); return true;
   }
+  // KAO-21: İlham & İbadet hub kartının görünürlüğü; gizliyken uygulama Ayarları'ndaki "Gizlenen kartlar" geri getirir.
+  function kaoToggleVisible(){ return kaoCommitSetting(function(q){ q.settings.kaoVisible=q.settings.kaoVisible===false; }); }
   function kaoToggleShadowing(){ var result=kaoCommitSetting(function(q){ q.settings.shadowing=q.settings.shadowing!==true; }); if(!kaoShadowEnabled()) kaoShadowCleanup(); return result; }
   function kaoShadowHTML(clipId){
     if(!quranLearnDeps) return '';
@@ -1533,6 +1536,7 @@
   function kaoHubCardHTML(){
     if(!quranLearnDeps) return '';
     var d=quranLearnDeps.data()||{},q=d.quranLearn&&typeof d.quranLearn==='object'&&!Array.isArray(d.quranLearn)?d.quranLearn:{},cards=objectOr(q.cards,{}),known=kaoKnownLemmaSet(d);
+    if(q.settings&&q.settings.kaoVisible===false) return '';
     var learned=Object.keys(known).length,today=quranLearnDeps.todayStr(),daily=objectOr(objectOr(q.daily,{})[today],{}),answered=Math.floor(nonNegativeNumber(daily.answered,0)),started=!!q.startedAt||learned>0||answered>0;
     var hubAyah=kaoTodayAyah(),hubNight=kaoNightWindow(d,new Date()),icon=quranLearnDeps.icon,status=learned?learned+' kelime tanıdık':(answered?answered+' cevap bugün':'İlk oturum hazır'),action=started?'Devam et':'Öğrenmeye başla';
     return '<button type="button" id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()" aria-haspopup="dialog" aria-label="Kur’an Arapçası Öğreniyorum; '+status+'; '+action+'">'+
@@ -1581,7 +1585,7 @@
       lexiconVersion:LEXICON_VERSION,
       startedAt:null,
       gate:{passed:false,skipped:false,score:null,at:null},
-      settings:{dailyNew:10,audio:false,audioStyle:'measured',harakat:true,translit:true,translitLayer:'tr',shadowing:false},
+      settings:{dailyNew:10,audio:false,audioStyle:'measured',harakat:true,translit:true,translitLayer:'tr',shadowing:false,kaoVisible:true},
       cards:{},units:{},surahs:{},daily:{},
       milestones:{fatiha:null,namaz:null,half:null,twoThirds:null,eighty:null,shortSurahs:null},
       phonics:{style:'muallim',misheard:{}},
@@ -1643,6 +1647,7 @@
     if(q.settings.audioStyle!=='flowing') q.settings.audioStyle='measured';
     if(q.settings.translitLayer!=='dia') q.settings.translitLayer='tr';
     q.settings.shadowing=q.settings.shadowing===true;
+    q.settings.kaoVisible=q.settings.kaoVisible!==false;
 
     q.cards=objectOr(q.cards,{});
     q.units=objectOr(q.units,{});
@@ -1777,6 +1782,7 @@
     kaoRecordPlay:kaoRecordPlay,
     kaoRecordDiscard:kaoRecordDiscard,
     kaoToggleShadowing:kaoToggleShadowing,
+    kaoToggleVisible:kaoToggleVisible,
     kaoShadowHTML:kaoShadowHTML,
     kaoShadowCleanup:kaoShadowCleanup
   };

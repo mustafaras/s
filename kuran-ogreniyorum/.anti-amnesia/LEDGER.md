@@ -100,3 +100,4 @@
 | 96 | 2026-09-26 | KAO-D3 denetimi: pass. 13 kart / 170 kontrol PASS; 12 görünüm modal sözleşmesinde, 35/35 shim, pin tuzağı yok, mikrofon gizliliği, CSS token kuralı ve gereksinim fixture eşlemesi doğrulandı. | `evidence/KAO-D3/AUDIT.md` |
 | 97 | 2026-09-26 | KAO-20 devamı: kalibrasyon tablosu yalnız dolu bantları gösteriyordu; artık 10 R-bandının tamamı (boşlar n=0, "—") hem fixture raporunda hem KAO-REGRESYON.md'de. | KAO-D4 hazırlığında bulundu; test_kao_user_tasks PASS |
 | 98 | 2026-09-26 | KAO-D4 denetimi: pass. 21/21 kart kontrolü PASS; kontrast 328/328, panel projeksiyonu ve aileler, rapor içeriği (10 bant düzeltmesi sonrası) ve IIP dokunulmazlığı doğrulandı. | `evidence/KAO-D4/AUDIT.md` |
+| 99 | 2026-09-26 | KAO-D5 denetimi: findings. 13/13 kart kontrolü PASS; 1 bulgu: saygi.js'teki 3 satırlık KAO izi KAO-21 değil a9fa40c (fix(ui)) commit'iyle gelmiş — sınır (≤3 satır) karşılanıyor, izlenebilirlik sapması belgeli. | `evidence/KAO-D5/AUDIT.md` |

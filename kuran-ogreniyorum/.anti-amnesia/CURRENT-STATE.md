@@ -45,11 +45,11 @@
 | KAO-D2 | Dalga 2 denetimi | pass | — |
 | KAO-D3 | Dalga 3 denetimi | pass | — |
 | KAO-D4 | Dalga 4 denetimi | pass | — |
-| KAO-D5 | Dalga 5 denetimi | pending | — |
+| KAO-D5 | Dalga 5 denetimi | findings | — |
 | KAO-D6 | Dalga 6 denetimi | pending | — |
 
 ## Gereksinim durumu (12-EK-GEREKSINIMLER)
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 98 | 2026-09-26 | KAO-D4 denetimi: pass. 21/21 kart kontrolü PASS; kontrast 328/328, panel projeksiyonu ve aileler, rapor içeriği (10 bant düzeltmesi sonrası) ve IIP dokunulmazlığı doğrulandı. | `evidence/KAO-D4/AUDIT.md` |
+| 99 | 2026-09-26 | KAO-D5 denetimi: findings. 13/13 kart kontrolü PASS; 1 bulgu: saygi.js'teki 3 satırlık KAO izi KAO-21 değil a9fa40c (fix(ui)) commit'iyle gelmiş — sınır (≤3 satır) karşılanıyor, izlenebilirlik sapması belgeli. | `evidence/KAO-D5/AUDIT.md` |

@@ -1816,7 +1816,7 @@
     "KAO-D2": "pass",
     "KAO-D3": "pass",
     "KAO-D4": "pass",
-    "KAO-D5": "pending",
+    "KAO-D5": "findings",
     "KAO-D6": "pending"
   },
   "knownPlanGaps": [

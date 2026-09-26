@@ -95,10 +95,11 @@ assert.match(firstHubHtml, /İlk oturum hazır/);
 assert.match(firstHubHtml, /onclick="App\.kaoOpen\(\)"[^>]*aria-haspopup="dialog"/);
 const firstLemma = sandbox.window.QuranLexiconV1.lemmas[0];
 quranLearn.startedAt = '2026-09-24T12:00:00.000Z';
-quranLearn.cards[`w:${firstLemma.id}:ar>tr`] = { reps: 2, state: 'review' };
+quranLearn.cards[`w:${firstLemma.id}:ar>tr`] = { reps: 2, state: 'review', s: 21 };
+quranLearn.cards[`w:${firstLemma.id}:tr>ar`] = { reps: 2, state: 'review', s: 21 };
 quranLearn.daily['2026-09-24'] = { answered: 3 };
 const resumeHubHtml = api.kaoHubCardHTML();
-assert.match(resumeHubHtml, /1 kelime tanıdık/);
+assert.match(resumeHubHtml, /1 kelime kalıcı/);
 assert.match(resumeHubHtml, /3 cevap bugün/);
 assert.match(resumeHubHtml, /Devam et/);
 
@@ -253,13 +254,13 @@ assert.equal((nasHtml.match(/class="kao-pronunciation-line/g) || []).length, nas
 assert.doesNotMatch(nasHtml, /kao-content-error/, 'dondurulmuş 20 sûre okunuş eksiği taşımamalı');
 assert.match(nasHtml, /bilinmeyen kelime, dokunarak aç/);
 const unknown = nasWords[1];
-const knownBeforeReveal = Number((api.kaoHubCardHTML().match(/(\d+) kelime tanıdık/) || [])[1] || 0);
+const knownBeforeReveal = Number((api.kaoHubCardHTML().match(/(\d+) kelime kalıcı/) || [])[1] || 0);
 const revealStarted = Date.now();
 assert.equal(api.kaoRevealWord(1), true);
 assert.match(quranLearn.surahs['114'].words[unknown.id].revealedAt, /^\d{4}-\d{2}-\d{2}T/);
 assert.equal(quranLearn.surahs['114'].words[unknown.id].status, 'unknown');
 assert.ok(new Date(quranLearn.cards[`w:${unknown.lemmaId}:ar>tr`].due).getTime() >= revealStarted + 86400000 - 1000, 'bilinmeyen kelime yarın kuyruğuna alınmalı');
-assert.equal(Number((api.kaoHubCardHTML().match(/(\d+) kelime tanıdık/) || [])[1] || 0), knownBeforeReveal, 'yarın kuyruğundaki bilinmeyen kelime tanıdık sayacını artırmamalı');
+assert.equal(Number((api.kaoHubCardHTML().match(/(\d+) kelime kalıcı/) || [])[1] || 0), knownBeforeReveal, 'yarın kuyruğundaki bilinmeyen kelime kalıcı sayacını artırmamalı');
 assert.match(api.kaoReaderHTML(), new RegExp(unknown.tr));
 assert.equal(api.kaoOpenSurah(98), true);
 const waqfHtml = api.kaoReaderHTML();
@@ -429,7 +430,8 @@ assert.ok(prevented >= 3 && stopped >= 3);
   assert.deepEqual(Array.from(prayers, (item) => item.id), ['tekbir', 'subhaneke', 'fatiha', 'zamm_sure', 'ruku', 'secde', 'tahiyyat', 'selam'], 'rekât sırası');
   const lex = sandbox.window.QuranLexiconV1;
   const knownLemma = prayers[0].words[0].lemmaId; // Allah
-  const prayerData = { quranLearn: { cards: { [`w:${knownLemma}:ar>tr`]: { reps: 2, state: 'review' } }, ayahs: { understood: [] } } };
+  // KAO-FIX-07 (02 §3): açık kelime = iki yönde review ∧ s≥21.
+  const prayerData = { quranLearn: { cards: { [`w:${knownLemma}:ar>tr`]: { reps: 2, state: 'review', s: 21 }, [`w:${knownLemma}:tr>ar`]: { reps: 2, state: 'review', s: 21 } }, ayahs: { understood: [] } } };
   const saved = appData.quranLearn; appData.quranLearn = prayerData.quranLearn;
   ui.kaoOpen = true; assert.equal(api.kaoOpenPrayer(), true); assert.equal(ui.kaoView, 'prayer');
   let html = api.kaoOverlayHTML('2026-09-25T10:00:00');

@@ -915,7 +915,7 @@
     // R-A3: tekrar cevapları 10 R-bandında öngörü/gerçek; R-A1: gece tekrarı sayısı ve bir sonraki tekrarın doğruluğu (gece sonrası / diğer).
     if(reviewed){ var bands=Array.isArray(calib.bands)&&calib.bands.length===10?calib.bands:Array.from({length:10},function(){ return {pred:0,ok:0,n:0}; }),band=bands[Math.min(9,Math.floor(nonNegativeNumber(scheduled.predictedR,0)*10))]; band.pred=round8(band.pred+nonNegativeNumber(scheduled.predictedR,0)); band.ok+=correct?1:0; band.n+=1; calib.bands=bands; var follow=afterNight?'nightFollow':'dayFollow'; daily[follow]=Object.assign({n:0,ok:0},objectOr(daily[follow],{})); daily[follow].n+=1; daily[follow].ok+=correct?1:0; }
     if(ui.kaoNight) daily.nightRev=Math.floor(nonNegativeNumber(daily.nightRev,0))+1;
-    if(nonNegativeNumber(previous.s,0)<21&&nonNegativeNumber(scheduled.s,0)>=21) ui.kaoDurableCount=Math.floor(nonNegativeNumber(ui.kaoDurableCount,0))+1;
+    if(!isDurable(previous)&&isDurable(scheduled)) ui.kaoDurableCount=Math.floor(nonNegativeNumber(ui.kaoDurableCount,0))+1;
     if(!correct&&task.errorClass&&Object.prototype.hasOwnProperty.call(q.errors,task.errorClass)) q.errors[task.errorClass]+=1;
     if(!correct&&!task.retry) ui.kaoQueue.push(Object.assign({},ui.kaoQueue[ui.kaoTaskIndex],{id:task.id+':retry',retry:true,isNew:false}));
     ui.kaoFeedback=correct?'Doğru':(task.kind==='order'?'Fiil önce gelir: Arapçada çoğu kez fiil–özne–nesne sırası kullanılır.':'Doğru cevap: '+task.answer); ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoOrderDraft=[];
@@ -1254,9 +1254,16 @@
   }
   // KAO-28 · E9 Anlayabildiğin âyet: kapsam token düzeyindedir (01-ARASTIRMA: QAC 77.430 token; 02 §5.1 ≥%95 eşiği).
   var KAO_QURAN_TOKENS=77430,KAO_AYAH_THRESHOLD=0.95,KAO_UNDERSTOOD_MAX=400;
+  // 02 §3 (Y-1): kalıcı kart = review ∧ s≥21, yetim ya da okuyucu-bilinmeyen değil. Tek tanım; E3 sayacı da kullanır.
+  function isDurable(card){
+    card=card&&typeof card==='object'?card:{};
+    return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=21&&card.orphan!==true&&card.readerUnknown!==true;
+  }
+  // Bilinen lemma = her iki yönde (ar>tr ve tr>ar) kalıcı kart. E1, hub, E9, panel ve CSV bu kümeyi kullanır.
   function kaoKnownLemmaSet(d){
-    var cards=objectOr(quranLearnRoot(d).cards,{}),known=Object.create(null);
-    Object.keys(cards).forEach(function(id){ var card=cards[id]||{},lemmaId=lemmaIdForCard(id); if(lemmaId&&card.orphan!==true&&card.readerUnknown!==true&&(nonNegativeNumber(card.reps,0)>0||card.state==='review'||card.st==='review')) known[lemmaId]=1; });
+    var cards=objectOr(quranLearnRoot(d).cards,{}),durable=Object.create(null),known=Object.create(null);
+    Object.keys(cards).forEach(function(id){ var match=String(id).match(/^w:([^:]+):(ar>tr|tr>ar)$/); if(match&&isDurable(cards[id])) (durable[match[1]]=durable[match[1]]||{})[match[2]]=1; });
+    Object.keys(durable).forEach(function(lemmaId){ if(durable[lemmaId]['ar>tr']&&durable[lemmaId]['tr>ar']) known[lemmaId]=1; });
     return known;
   }
   function kaoCoverage(d,words){
@@ -1544,7 +1551,7 @@
     var d=quranLearnDeps.data()||{},q=d.quranLearn&&typeof d.quranLearn==='object'&&!Array.isArray(d.quranLearn)?d.quranLearn:{},cards=objectOr(q.cards,{}),known=kaoKnownLemmaSet(d);
     if(q.settings&&q.settings.kaoVisible===false) return '';
     var learned=Object.keys(known).length,today=quranLearnDeps.todayStr(),daily=objectOr(objectOr(q.daily,{})[today],{}),answered=Math.floor(nonNegativeNumber(daily.answered,0)),started=!!q.startedAt||learned>0||answered>0;
-    var hubAyah=kaoTodayAyah(),hubNight=kaoNightWindow(d,new Date()),icon=quranLearnDeps.icon,status=learned?learned+' kelime tanıdık':(answered?answered+' cevap bugün':'İlk oturum hazır'),action=started?'Devam et':'Öğrenmeye başla';
+    var hubAyah=kaoTodayAyah(),hubNight=kaoNightWindow(d,new Date()),icon=quranLearnDeps.icon,status=learned?learned+' kelime kalıcı':(answered?answered+' cevap bugün':'İlk oturum hazır'),action=started?'Devam et':'Öğrenmeye başla';
     return '<button type="button" id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()" aria-haspopup="dialog" aria-label="Kur’an Arapçası Öğreniyorum; '+status+'; '+action+'">'+
       '<span class="kao-hub-spine" aria-hidden="true"></span><span class="kao-hub-frame" aria-hidden="true"></span><span class="kao-hub-ornament" aria-hidden="true">✦</span><span class="kao-hub-head"><span class="kao-hub-seal">'+icon('book-open',21)+'</span><span class="kao-hub-kicker"><small>KUR’AN ARAPÇASI</small><strong>Kur’an Arapçası Öğreniyorum</strong></span><span class="kao-hub-status">'+status+'</span></span>'+
       '<span class="kao-hub-copy">20 kısa sûreyi görünür okunuşla oku; kelimeleri tanı, kökleri keşfet.</span>'+(hubNight?'<span class="kao-hub-ayah"><b>Gece tekrarı açık:</b> '+hubNight.durationMinutes+' dk, en çok '+hubNight.maxCards+' kart</span>':'')+(hubAyah?'<span class="kao-hub-ayah"><b>Bugün anlayabildiğin âyet:</b> '+quranLearnDeps.esc(kaoSurahName(hubAyah.surahId))+' '+hubAyah.ayah+'</span>':'')+

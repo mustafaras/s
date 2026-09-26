@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-07** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`b1d081c` (FIX-05, kullanıcı onayı 2026-09-26, Pages run `36259211222` success, canlı pin `20260926d`); sonraki her push/deploy yine ayrı onay
-**Güncelleme:** 2026-09-26 · KAO-FIX-06 done
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-08** · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`50afcc2` (FIX-06, kullanıcı onayı 2026-09-26, Pages run `36260478682` success, canlı pin `20260926e`); sonraki her push/deploy yine ayrı onay
+**Güncelleme:** 2026-09-26 · KAO-FIX-07 done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -20,8 +20,8 @@
 | KAO-FIX-03/D | K-1, Y-3 | done | `9f9163c` | Fâtiha 29 + tamamlayıcı 190; import 837/837, copy 0, language 0 |
 | KAO-FIX-04 | K-1, Y-3 | done | `0ac1837` | dondurma + atıf + pin `20260926c`; kopya 618→0, İngilizce 26→0 |
 | KAO-FIX-05 | Y-4, D-6 | done | `b1d081c` + ek `2ad2a4c` | şeddeli başlık 26→0 (+17 tamamlayıcı), DİA çift 26→0, D-6 belgeli istisna; `m~a$a` → not ile kalır (kullanıcı kararı) |
-| KAO-FIX-06 | Y-2 | done | `git log --grep=KAO-FIX-06` | iki yönlü kart; sim 365 g iki yön 524/524, plan bilinen 0→505 |
-| KAO-FIX-07 | Y-1 | todo | | bilinen/kapsam tanımı |
+| KAO-FIX-06 | Y-2 | done | `7ef9f6e` + durum `50afcc2` | iki yönlü kart; sim 365 g iki yön 524/524, plan bilinen 0→505 |
+| KAO-FIX-07 | Y-1 | done | `git log --grep=KAO-FIX-07` | bilinen = iki yönde review∧s≥21; sim kod=plan 505; M10 YAKALANDI |
 | KAO-FIX-08 | O-1 | todo | | lastDistractors |
 | KAO-FIX-09 | O-2 | todo | | daily budama ≤100 KB |
 | KAO-FIX-10 | O-3 | todo | | kilometre taşları |
@@ -59,7 +59,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260926e`** (FIX-06) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260926f`** (FIX-07) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 
@@ -78,6 +78,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 11. **Kopya kapısı tek karşılıklı kelimede eş anlamlı ister;** A'da seçilenler: `Allah Teâlâ`, `Kadr`, `melâike`, `sen oku`, `asla` (kellâ), `o Kitap`/`kitabın`. B–D'de aynı karşılıkları kullan (tutarlılık).
 12. **Başlık biçimi `headwordBw` (FIX-05):** `readDraft` bayat taslağı normalize eder; `--draft` koşma (evidence/KAO-02'ye yazar, V8). `family` (286, `headwordAr`) ve `lexicon.workbook.md` de düzeltildi (FIX-05 ek, kullanıcı isteği).
 13. **`introducedAt` artık `kaoAnswer` ilk cevabında yazılır (FIX-06);** öncesinde ana yolda yazılmadığı için R-A5 anlamsal aralık fiilen işlemiyordu. Veri 365 günde 394 KB → FIX-09.
+14. **`isDurable` tek kalıcılık kuralı (FIX-07);** bilinen lemma iki yönde kalıcı. Mutasyon M04/M09 hâlâ KAÇTI → FIX-11.
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

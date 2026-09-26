@@ -141,7 +141,9 @@ assert.equal(mixedGrammarQueue.filter((item) => item.type === 'grammar').length,
   const groups = e9.kaoAyahGroups();
   assert.ok(groups.length > 100 && groups.every((group) => group.words.every((word) => word.surahId === group.surahId && word.ayah === group.ayah && word.pronunciation && word.tr)), 'âyet grupları yalnız kısa sûre verisinden ve eksiksiz');
   assert.equal(e9.kaoPickAyah({ quranLearn: { cards: {} } }, '2026-09-25'), null, 'bilinen kelime yokken âyet yok');
-  const knowAll = (keys) => { const cards = {}; for (const group of groups.filter((item) => keys.includes(item.key))) for (const word of group.words) cards[`w:${word.lemmaId}:ar>tr`] = { reps: 1 }; return cards; };
+  // KAO-FIX-07 (02 §3): bilinen = iki yönde review ∧ s≥21.
+  const durable = { state: 'review', s: 21, reps: 6 };
+  const knowAll = (keys) => { const cards = {}; for (const group of groups.filter((item) => keys.includes(item.key))) for (const word of group.words) { cards[`w:${word.lemmaId}:ar>tr`] = durable; cards[`w:${word.lemmaId}:tr>ar`] = durable; } return cards; };
   const target = groups.find((group) => group.words.length >= 20) || groups.reduce((a, b) => (b.words.length > a.words.length ? b : a));
   const cards = knowAll([target.key]);
   const pickedFull = e9.kaoPickAyah({ quranLearn: { cards } }, '2026-09-25');

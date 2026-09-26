@@ -58,7 +58,7 @@ assert.ok(created.every((item) => /^assets\/kao\/audio\/[A-Za-z0-9_-]+\.m4a$/.te
   vm.runInContext(source, box, { filename: relative });
   const csvApi = box.window.SeymaQuranLearn;
   const lemmaId = box.window.QuranLexiconV1.lemmas[0].id;
-  const csvData = { quranLearn: { cards: { ['w:' + lemmaId + ':ar>tr']: { reps: 1 } } } };
+  const csvData = { quranLearn: { cards: { ['w:' + lemmaId + ':ar>tr']: { state: 'review', s: 21, reps: 6 }, ['w:' + lemmaId + ':tr>ar']: { state: 'review', s: 21, reps: 6 } } } };
   const csvUi = {};
   assert.equal(csvApi.registerQuranLearn({ data() { return csvData; }, ui() { return csvUi; }, save() { throw new Error('CSV kaydetmemeli'); }, render() {}, todayStr() { return '2026-09-25'; }, esc(value) { return String(value); }, icon() { return ''; }, getDay() { return {}; } }), true);
   assert.equal(csvApi.kaoExportCsv(), false, 'yüzey bağımlılığı yokken indirme yok');

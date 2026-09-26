@@ -23,9 +23,14 @@ let saves = 0;
 assert.equal(app.registerQuranLearn({ data() { return data; }, ui() { return {}; }, save() { saves += 1; }, render() {}, todayStr() { return '2026-09-26'; }, esc: String, icon() { return ''; }, getDay() { return {}; } }), true);
 const q = app.ensureQuranLearn(data);
 assert.equal(q.summary, null, 'yeni kök özet taşımaz');
-q.cards[`w:${lemmas[0].id}:ar>tr`] = { reps: 3, state: 'review', flagged: { at: '2026-09-25T10:00:00.000Z', kind: 'meaning' } };
-q.cards[`w:${lemmas[1].id}:tr>ar`] = { reps: 1, state: 'learning' };
-q.cards[`w:${lemmas[2].id}:ar>tr`] = { reps: 2, readerUnknown: true, flagged: { at: 'x', kind: 'audio' } };
+// KAO-FIX-07 (02 §3): bilinen = iki yönde review ∧ s≥21; tek yön ve okuyucu-bilinmeyen sayılmaz.
+q.cards[`w:${lemmas[0].id}:ar>tr`] = { reps: 3, state: 'review', s: 25, flagged: { at: '2026-09-25T10:00:00.000Z', kind: 'meaning' } };
+q.cards[`w:${lemmas[0].id}:tr>ar`] = { state: 'review', s: 21, reps: 6 };
+q.cards[`w:${lemmas[1].id}:tr>ar`] = { reps: 5, state: 'review', s: 30 };
+q.cards[`w:${lemmas[1].id}:ar>tr`] = { state: 'review', s: 21, reps: 6 };
+q.cards[`w:${lemmas[2].id}:ar>tr`] = { reps: 2, state: 'review', s: 40, readerUnknown: true, flagged: { at: 'x', kind: 'audio' } };
+q.cards[`w:${lemmas[2].id}:tr>ar`] = { state: 'review', s: 21, reps: 6 };
+q.cards[`w:${lemmas[3].id}:ar>tr`] = { reps: 6, state: 'review', s: 60 };
 q.cards[`g:g0_5:g0_5-k1`] = { reps: 1, flagged: 'serbest metin' };
 q.daily = { '2026-09-24': { answered: 5 }, '2026-09-25': { answered: 3 }, '2026-09-26': { answered: 1 }, '2026-09-22': { answered: 4 }, bad: { answered: 9 } };
 q.phonics.misheard = { tta: 3, sad: 1, tha: 2, ayn: 1 };

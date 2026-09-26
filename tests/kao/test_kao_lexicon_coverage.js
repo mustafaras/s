@@ -39,15 +39,19 @@ assert.equal(selectedFrequency, 59948, 'dondurulan frekans toplamı doğrulanmı
   for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
   const api = box.window.SeymaQuranLearn;
   const top = lemmas.slice(0, 10);
-  const cards = Object.fromEntries(top.map((lemma) => [`w:${lemma.id}:ar>tr`, { reps: 1 }]));
-  cards[`w:${lemmas[10].id}:ar>tr`] = { reps: 3, orphan: true };
-  cards[`w:${lemmas[11].id}:tr>ar`] = { reps: 1, readerUnknown: true };
+  // KAO-FIX-07 (02 §3): bilinen = iki yönde review ∧ s≥21; yetim ya da okuyucu-bilinmeyen yön lemmayı düşürür.
+  const durable = { state: 'review', s: 21, reps: 6 };
+  const bothWays = (lemma) => [[`w:${lemma.id}:ar>tr`, durable], [`w:${lemma.id}:tr>ar`, durable]];
+  const cards = Object.fromEntries(top.flatMap(bothWays));
+  Object.assign(cards, Object.fromEntries(bothWays(lemmas[10])), Object.fromEntries(bothWays(lemmas[11])));
+  cards[`w:${lemmas[10].id}:ar>tr`] = Object.assign({}, durable, { orphan: true });
+  cards[`w:${lemmas[11].id}:tr>ar`] = Object.assign({}, durable, { readerUnknown: true });
   const data = { quranLearn: { cards } };
   const whole = api.kaoCoverage(data);
   assert.equal(whole.total, TOKEN_DENOMINATOR, 'E1 paydası QAC token sayısı');
   assert.equal(whole.known, top.reduce((sum, lemma) => sum + lemma.freq, 0), 'yetim ve okuyucu-bilinmeyen sayılmaz');
   assert.equal(whole.ratio, whole.known / TOKEN_DENOMINATOR);
-  const everything = api.kaoCoverage({ quranLearn: { cards: Object.fromEntries(lemmas.map((lemma) => [`w:${lemma.id}:tr>ar`, { state: 'review' }])) } });
+  const everything = api.kaoCoverage({ quranLearn: { cards: Object.fromEntries(lemmas.flatMap(bothWays)) } });
   assert.equal(everything.known, selectedFrequency, 'tüm sözlük = %77,42 (üst sınır)');
   const words = [{ lemmaId: top[0].id }, { lemmaId: top[1].id }, { lemmaId: 'l_yok_000000' }, { lemmaId: lemmas[10].id }];
   assert.deepEqual(JSON.parse(JSON.stringify(api.kaoCoverage(data, words))), { known: 2, total: 4, ratio: 0.5 }, 'âyet kapsamı token düzeyinde');

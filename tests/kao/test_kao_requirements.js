@@ -308,21 +308,23 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   // R-C4: CSV başlığı + satır sayısı = bilinen (tekilleştirilmiş) kelime kartı.
   const lex = verifiedLemmas.slice(0, 4);
   q.cards = {};
-  q.cards['w:' + lex[0].lemmaId + ':ar>tr'] = { reps: 2 };
-  q.cards['w:' + lex[0].lemmaId + ':tr>ar'] = { reps: 1 };
-  q.cards['w:' + lex[1].lemmaId + ':ar>tr'] = { reps: 1 };
+  // KAO-FIX-07 (02 §3): CSV yalnız iki yönde kalıcı (review ∧ s≥21) lemmayı yazar.
+  q.cards['w:' + lex[0].lemmaId + ':ar>tr'] = { reps: 6, state: 'review', s: 25 };
+  q.cards['w:' + lex[0].lemmaId + ':tr>ar'] = { reps: 5, state: 'review', s: 21 };
+  q.cards['w:' + lex[1].lemmaId + ':ar>tr'] = { reps: 6, state: 'review', s: 40 };
   q.cards['w:' + lex[2].lemmaId + ':ar>tr'] = { reps: 1, readerUnknown: true };
   q.cards['w:' + lex[3].lemmaId + ':ar>tr'] = { reps: 3, orphan: true };
   q.cards['g:g0_5:1'] = { reps: 4 };
   const csv = e7.kaoCsv(e7Data).trimEnd().split('\r\n');
   assert.equal(csv[0], 'ar,tr,translit,root,tags');
-  assert.equal(csv.length - 1, 2, 'satır = bilinen kelime (yön tekil, okuyucu-bilinmeyen/yetim hariç)');
+  assert.equal(csv.length - 1, 1, 'satır = bilinen kelime (iki yönde kalıcı; tek yön, okuyucu-bilinmeyen ve yetim hariç)');
   assert.ok(csv.slice(1).every((row) => row.split(',').length >= 5));
   assert.ok(csv.some((row) => row.startsWith(lex[0].ar + ',')));
 }
 
 function sandboxLemma(api, lemmaId) {
-  const html = api.kaoCsv({ quranLearn: { cards: { ['w:' + lemmaId + ':ar>tr']: { reps: 1 } } } }).split('\r\n')[1];
+  const durable = { state: 'review', s: 21, reps: 6 };
+  const html = api.kaoCsv({ quranLearn: { cards: { ['w:' + lemmaId + ':ar>tr']: durable, ['w:' + lemmaId + ':tr>ar']: durable } } }).split('\r\n')[1];
   return { id: lemmaId, ar: html.split(',')[0] };
 }
 
@@ -341,6 +343,32 @@ function sandboxLemma(api, lemmaId) {
   assert.equal(cell({ understoodAt: 'x', delayedScore: 3, needsReread: true }, ['108:1']).status, 'gecikmeli test 3/5 · tekrar oku');
   assert.equal(cell({ understoodAt: 'x', delayedTestAt: 'z' }).status, '7 günlük test bekliyor');
   assert.deepEqual([cell({}, ['108:1']).percent, cell({}, ['108:1', '108:2', '108:3']).percent], [33, 100], 'Kevser 3 âyet');
+}
+
+// KAO-FIX-07 (Y-1, 02 §3): bilinen lemma = her iki yönde review ∧ s≥21 (yetim ve okuyucu-bilinmeyen hariç).
+{
+  const api = loadApi();
+  const lexBox = { window: {} };
+  vm.createContext(lexBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), lexBox);
+  const [a, b, c, e] = lexBox.window.QuranLexiconV1.lemmas;
+  const durable = (s) => ({ state: 'review', s, reps: 6 });
+  const cards = {
+    [`w:${a.id}:ar>tr`]: durable(30),
+    [`w:${b.id}:ar>tr`]: durable(21), [`w:${b.id}:tr>ar`]: durable(21),
+    [`w:${c.id}:ar>tr`]: durable(40), [`w:${c.id}:tr>ar`]: { state: 'learning', s: 2, reps: 2 },
+    [`w:${e.id}:ar>tr`]: { reps: 1, state: 'learning', s: 0 }
+  };
+  const known = api.kaoKnownLemmaSet({ quranLearn: { cards } });
+  assert.equal(!!known[a.id], false, 'tek yönü review ∧ s=30 → bilinmiyor');
+  assert.equal(!!known[b.id], true, 'iki yönü review ∧ s=21 → biliniyor');
+  assert.equal(!!known[c.id], false, 'bir yönü learning → bilinmiyor');
+  assert.equal(!!known[e.id], false, 'tek yanlış cevap (reps:1, learning) → bilinmiyor');
+  assert.deepEqual(Object.keys(known), [b.id], 'yalnız iki yönde kalıcı lemma bilinir');
+  const blocked = Object.assign({}, cards, { [`w:${b.id}:tr>ar`]: Object.assign(durable(21), { readerUnknown: true }) });
+  assert.deepEqual(Object.keys(api.kaoKnownLemmaSet({ quranLearn: { cards: blocked } })), [], 'okuyucu-bilinmeyen yön bilineni düşürür');
+  assert.equal(api.kaoCoverage({ quranLearn: { cards } }).known, b.freq, 'kaoCoverage = Σfreq(bilinen)');
+  assert.equal(api.kaoCoverage({ quranLearn: { cards } }).ratio, b.freq / 77430, 'kaoCoverage paydası 77.430');
 }
 
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-03/D** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-04** · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`9fa910a` (FIX-03/B, kullanıcı onayı 2026-09-26, Pages success); sonraki her push/deploy yine ayrı onay
-**Güncelleme:** 2026-09-26 · KAO-FIX-03/C done
+**Güncelleme:** 2026-09-26 · KAO-FIX-03/D done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -16,8 +16,8 @@
 | KAO-FIX-02 | K-1, Y-3 | done | `1ff09b1` | çalışma kitabı 837 satır + içe alma kapısı |
 | KAO-FIX-03/A | K-1, Y-3 | done | `bebb5de` | 95–98 (230 satır) filled, copy 0, language 0 |
 | KAO-FIX-03/B | K-1, Y-3 | done | `9fa910a` | 99–105 (210) filled, copy 0, language 0 |
-| KAO-FIX-03/C | K-1, Y-3 | done | `git log --grep=KAO-FIX-03/C` | 106–114 (178) filled, copy 0, language 0 |
-| KAO-FIX-03/D | K-1, Y-3 | todo | | Fâtiha 29 + tamamlayıcı 190 |
+| KAO-FIX-03/C | K-1, Y-3 | done | `582c5e2` | 106–114 (178) filled, copy 0, language 0 |
+| KAO-FIX-03/D | K-1, Y-3 | done | `git log --grep=KAO-FIX-03/D` | Fâtiha 29 + tamamlayıcı 190; import 837/837, copy 0, language 0 |
 | KAO-FIX-04 | K-1, Y-3 | todo | | dondurma + atıf + pin |
 | KAO-FIX-05 | Y-4, D-6 | todo | | başlık şeddesi + DİA |
 | KAO-FIX-06 | Y-2 | todo | | iki yönlü kart |

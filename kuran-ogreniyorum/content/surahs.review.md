@@ -642,222 +642,222 @@
 
 | id | ar | pronunciation | lemmaId | ref | referans-ipucu | tr | verifiedBy | verifiedAt |
 |---|---|---|---|---|---|---|---|---|
-| f-1-1-1 | بِسْمِ | bi-smi | l_som_585f33 | 1:1:1 | adıyla… |  |  |  |
-| f-1-1-2 | ٱللَّهِ | allahi | l_ll_ah_d0a09b | 1:1:2 | Allah'ın… |  |  |  |
-| f-1-1-3 | ٱلرَّحْمَـٰنِ | al-rahmâni | l_r_aHoma_n_c13ea2 | 1:1:3 | Rahman… |  |  |  |
-| f-1-1-4 | ٱلرَّحِيمِ | al-rahîmi | l_r_aHiym_ecdbe9 | 1:1:4 | Rahim… |  |  |  |
-| f-1-2-1 | ٱلْحَمْدُ | al-hamdu | l_Hamod_98138a | 1:2:1 | hamdolsun… |  |  |  |
-| f-1-2-2 | لِلَّهِ | li-lahi | l_ll_ah_d0a09b | 1:2:2 | Allah'a… |  |  |  |
-| f-1-2-3 | رَبِّ | rabbi | l_rab_fc2490 | 1:2:3 | Rabbi… |  |  |  |
-| f-1-2-4 | ٱلْعَـٰلَمِينَ | al-ʿâlamîna | l_Ea_lamiyn_c337cf | 1:2:4 | Alemlerin… |  |  |  |
-| f-1-3-1 | ٱلرَّحْمَـٰنِ | al-rahmâni | l_r_aHoma_n_c13ea2 | 1:3:1 | (O) Rahman'dır… |  |  |  |
-| f-1-3-2 | ٱلرَّحِيمِ | al-rahîmi | l_r_aHiym_ecdbe9 | 1:3:2 | Rahim'dir… |  |  |  |
-| f-1-4-1 | مَـٰلِكِ | mâliki | l_ma_lik_581500 | 1:4:1 | sahibidir… |  |  |  |
-| f-1-4-2 | يَوْمِ | yavmi | l_yawom_9b88c1 | 1:4:2 | gününün… |  |  |  |
-| f-1-4-3 | ٱلدِّينِ | al-dîni | l_diyn_6c222f | 1:4:3 | Din… |  |  |  |
-| f-1-5-1 | إِيَّاكَ | iyyâka | l_iy_aA_dbb412 | 1:5:1 | ancak sana… |  |  |  |
-| f-1-5-2 | نَعْبُدُ | naʿbudu | l_Eabada_557021 | 1:5:2 | kulluk ederiz… |  |  |  |
-| f-1-5-3 | وَإِيَّاكَ | va-iyyâka | l_iy_aA_dbb412 | 1:5:3 | ancak senden… |  |  |  |
-| f-1-5-4 | نَسْتَعِينُ | nastaʿînu | l_sotaEiynu_1fb93f | 1:5:4 | yardım isteriz… |  |  |  |
-| f-1-6-1 | ٱهْدِنَا | ahdinâ | l_hadaY_a88771 | 1:6:1 | bizi ilet… |  |  |  |
-| f-1-6-2 | ٱلصِّرَٰطَ | al-sirâta | l_Sira_T_7c7de6 | 1:6:2 | yola… |  |  |  |
-| f-1-6-3 | ٱلْمُسْتَقِيمَ | al-mustakîma | l_m_usotaqiym_930fac | 1:6:3 | doğru… |  |  |  |
-| f-1-7-1 | صِرَٰطَ | sirâta | l_Sira_T_7c7de6 | 1:7:1 | yoluna… |  |  |  |
-| f-1-7-2 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 1:7:2 | onlar ki… |  |  |  |
-| f-1-7-3 | أَنْعَمْتَ | anʿamta | l_anoEama_bec8a1 | 1:7:3 | ni'met verdin… |  |  |  |
-| f-1-7-4 | عَلَيْهِمْ | ʿalayhim | l_EalaY_f79ef3 | 1:7:4 | kimselerin… |  |  |  |
-| f-1-7-5 | غَيْرِ | gayri | l_gayor_6b16f9 | 1:7:5 | değil… |  |  |  |
-| f-1-7-6 | ٱلْمَغْضُوبِ | al-magdûbi | l_magoDuwb_278690 | 1:7:6 | gazabedilmiş olanların… |  |  |  |
-| f-1-7-7 | عَلَيْهِمْ | ʿalayhim | l_EalaY_f79ef3 | 1:7:7 | kendilerine… |  |  |  |
-| f-1-7-8 | وَلَا | va-lâ | l_laA_4e2bfd | 1:7:8 | ve değil… |  |  |  |
-| f-1-7-9 | ٱلضَّآلِّينَ | al-dâllîna | l_DaA_l_145c36 | 1:7:9 | sapmışların… |  |  |  |
-| ls_t_iyn_f520d1b9 | تِّين | — | ls_t_iyn_f520d1b9 | 95:1:1 | incire andolsun… |  |  |  |
-| ls_z_ayotuwn_ed08d607 | زَّيْتُون | — | ls_z_ayotuwn_ed08d607 | 95:1:2 | ve zeytine… |  |  |  |
-| ls_Tuwr_8829abdc | طُور | — | ls_Tuwr_8829abdc | 95:2:1 | ve dağına… |  |  |  |
-| ls_siyniyn_f013c3a1 | سِينِين | — | ls_siyniyn_f013c3a1 | 95:2:2 | sina… |  |  |  |
-| ls_balad_43a32787 | بَلَد | — | ls_balad_43a32787 | 95:3:2 | Şehre (andolsun)… |  |  |  |
-| ls_amiyn_9e1d9409 | أَمِين | — | ls_amiyn_9e1d9409 | 95:3:3 | güvenli… |  |  |  |
-| ls_taqowiym_8f634ad7 | تَقْوِيم | — | ls_taqowiym_8f634ad7 | 95:4:6 | biçimde… |  |  |  |
-| ls_asofal_4aa68568 | أَسْفَل | — | ls_asofal_4aa68568 | 95:5:3 | aşağıların… |  |  |  |
-| ls_saAfil_fa98f6a3 | سَافِل | — | ls_saAfil_fa98f6a3 | 95:5:4 | aşağısına… |  |  |  |
-| ls_falahumo_3d2a0c97 | فَلَهُمْ | — | ls_falahumo_3d2a0c97 | 95:6:6 | onlar için vardır… |  |  |  |
-| ls_mamonuwn_4902ae6a | مَمْنُون | — | ls_mamonuwn_4902ae6a | 95:6:9 | kesintisi… |  |  |  |
-| ls_aHokam_3444202a | أَحْكَم | — | ls_aHokam_3444202a | 95:8:3 | en iyi hüküm vereni… |  |  |  |
-| ls_Ha_kimiyn_e13ddef2 | حَٰكِمِين | — | ls_Ha_kimiyn_e13ddef2 | 95:8:4 | hüküm verenlerin… |  |  |  |
-| ls_qara_a_553258cd | قَرَأَ | — | ls_qara_a_553258cd | 96:1:1 | oku… |  |  |  |
-| ls_Ealaq_ef20f685 | عَلَق | — | ls_Ealaq_ef20f685 | 96:2:4 | a clinging substance… |  |  |  |
-| ls_akoram_b9ba69fb | أَكْرَم | — | ls_akoram_b9ba69fb | 96:3:3 | en büyük kerem sahibidir… |  |  |  |
-| ls_qalam_9195cdbb | قَلَم | — | ls_qalam_9195cdbb | 96:4:3 | kalemle… |  |  |  |
-| ls_TagaY_27d07634 | طَغَىٰ | — | ls_TagaY_27d07634 | 96:6:4 | azar… |  |  |  |
-| ls_sotagonaY_6677864b | ٱسْتَغْنَىٰ | — | ls_sotagonaY_6677864b | 96:7:3 | zengin (kendine yeterli)… |  |  |  |
-| ls_r_ujoEaY_d424316e | رُّجْعَىٰٓ | — | ls_r_ujoEaY_d424316e | 96:8:4 | dönüş… |  |  |  |
-| ls_Sal_aY_a2871e48 | صَلَّىٰ | — | ls_Sal_aY_a2871e48 | 96:10:3 | namaz kıldığı… |  |  |  |
-| ls_taqowaY_eeb5e12f | تَقْوَى | — | ls_taqowaY_eeb5e12f | 96:12:3 | korunmayı… |  |  |  |
-| ls_ntahaY_ea9b5956 | ٱنتَهَىٰ | — | ls_ntahaY_ea9b5956 | 96:15:4 | he desists… |  |  |  |
-| ls_nasofaEF_481e5644 | نَسْفَعًۢ | — | ls_nasofaEF_481e5644 | 96:15:5 | mutlaka yakalarız… |  |  |  |
-| ls_naASiyap_78553ccd | نَاصِيَة | — | ls_naASiyap_78553ccd | 96:15:6 | perçeminden… |  |  |  |
-| ls_xaATi_ap_9c179b08 | خَاطِئَة | — | ls_xaATi_ap_9c179b08 | 96:16:3 | günahkar… |  |  |  |
-| ls_naAdiy_80029903 | نَادِي | — | ls_naAdiy_80029903 | 96:17:2 | meclisini… |  |  |  |
-| ls_z_abaAniyap_bd0c416f | زَّبَانِيَة | — | ls_z_abaAniyap_bd0c416f | 96:18:2 | zebanileri… |  |  |  |
-| ls_qotaraba_fae897b1 | ٱقْتَرَبَ | — | ls_qotaraba_fae897b1 | 96:19:5 | ve yaklaş… |  |  |  |
-| ls_layolap_ea5c4bd5 | لَيْلَة | — | ls_layolap_ea5c4bd5 | 97:1:4 | (the) Night… |  |  |  |
-| ls_qador_b8445648 | قَدْر | — | ls_qador_b8445648 | 97:1:5 | kadir… |  |  |  |
-| ls_adoraY_5653b032 | أَدْرَىٰ | — | ls_adoraY_5653b032 | 97:2:2 | sana bildiren… |  |  |  |
-| ls_alof_14fd8ecc | أَلْف | — | ls_alof_14fd8ecc | 97:3:5 | bin… |  |  |  |
-| ls_tanaz_alato_923e8a7b | تَنَزَّلَتْ | — | ls_tanaz_alato_923e8a7b | 97:4:1 | iner de iner… |  |  |  |
-| ls_hiYa_874e9600 | هِىَ | — | ls_hiYa_874e9600 | 97:5:2 | o… |  |  |  |
-| ls_maTolaE_e55b14d4 | مَطْلَع | — | ls_maTolaE_e55b14d4 | 97:5:4 | ağarıncaya… |  |  |  |
-| ls_fajor_c93d66b8 | فَجْر | — | ls_fajor_c93d66b8 | 97:5:5 | tan yeri… |  |  |  |
-| ls_munfak_iyn_7467eb42 | مُنفَكِّين | — | ls_munfak_iyn_7467eb42 | 98:1:9 | bırakılacak… |  |  |  |
-| ls_SuHuf_2dfd6e51 | صُحُف | — | ls_SuHuf_2dfd6e51 | 98:2:5 | sahifeler… |  |  |  |
-| ls_m_uTah_arap_d2dad331 | مُّطَهَّرَة | — | ls_m_uTah_arap_d2dad331 | 98:2:6 | tertemiz… |  |  |  |
-| ls_qay_imap_95f627f6 | قَيِّمَة | — | ls_qay_imap_95f627f6 | 98:3:3 | doğru değerli'… |  |  |  |
-| ls_tafar_aqa_08bb5159 | تَفَرَّقَ | — | ls_tafar_aqa_08bb5159 | 98:4:2 | ayrılığa düşmediler… |  |  |  |
-| ls_muxoliS_e8a20e42 | مُخْلِص | — | ls_muxoliS_e8a20e42 | 98:5:6 | halis kılarak… |  |  |  |
-| ls_lahu_1244e1fe | لَهُ | — | ls_lahu_1244e1fe | 98:5:7 | O'na… |  |  |  |
-| ls_Haniyf_bdb31c21 | حَنِيف | — | ls_Haniyf_bdb31c21 | 98:5:9 | birleyerek… |  |  |  |
-| ls_humo_365429ef | هُمْ | — | ls_humo_365429ef | 98:6:14 | onlar… |  |  |  |
-| ls_bariy_ap_9dfe8878 | بَرِيَّة | — | ls_bariy_ap_9dfe8878 | 98:6:16 | yaratılmışların… |  |  |  |
-| ls_Eadon_886465ba | عَدْن | — | ls_Eadon_886465ba | 98:8:5 | Adn… |  |  |  |
-| ls_zulozilu_1b75853c | زُلْزِلُ | — | ls_zulozilu_1b75853c | 99:1:2 | sarsıldığı… |  |  |  |
-| ls_zilozaAl_27ea938f | زِلْزَال | — | ls_zilozaAl_27ea938f | 99:1:4 | yaman sarsıntı ile… |  |  |  |
-| ls_v_aqalaAn_52ce29ce | ثَّقَلَان | — | ls_v_aqalaAn_52ce29ce | 99:2:3 | ağırlıklarını… |  |  |  |
-| ls_lahaA_1f91c346 | لَهَا | — | ls_lahaA_1f91c346 | 99:3:4 | ona… |  |  |  |
-| ls_tuHad_ivu_44fcdb7a | تُحَدِّثُ | — | ls_tuHad_ivu_44fcdb7a | 99:4:2 | söyler… |  |  |  |
-| ls_axobaAr_106f46d8 | أَخْبَار | — | ls_axobaAr_106f46d8 | 99:4:3 | haberlerini… |  |  |  |
-| ls_yaSoduru_ffbf81e8 | يَصْدُرُ | — | ls_yaSoduru_ffbf81e8 | 99:6:2 | çıkarlar… |  |  |  |
-| ls_a_otaAt_d66c1b64 | أَشْتَات | — | ls_a_otaAt_d66c1b64 | 99:6:4 | ayrı ayrı gruplar halind… |  |  |  |
-| ls_mivoqaAl_840f0f7e | مِثْقَال | — | ls_mivoqaAl_840f0f7e | 99:7:3 | ağırlığınca… |  |  |  |
-| ls_ar_ap_74aa28f2 | ذَرَّة | — | ls_ar_ap_74aa28f2 | 99:7:4 | zerre… |  |  |  |
-| ls_Ea_diya_t_62abe310 | عَٰدِيَٰت | — | ls_Ea_diya_t_62abe310 | 100:1:1 | andolsun koşanlara (atla… |  |  |  |
-| ls_DaboH_a573b8f9 | ضَبْح | — | ls_DaboH_a573b8f9 | 100:1:2 | soluk soluğa… |  |  |  |
-| ls_muwriya_t_5c20aec1 | مُورِيَٰت | — | ls_muwriya_t_5c20aec1 | 100:2:1 | (tırnaklarıyla) ateş çık… |  |  |  |
-| ls_qadoH_1eb50a5e | قَدْح | — | ls_qadoH_1eb50a5e | 100:2:2 | çarparak… |  |  |  |
-| ls_mugiyra_t_9b045d3b | مُغِيرَٰت | — | ls_mugiyra_t_9b045d3b | 100:3:1 | akın edenlere… |  |  |  |
-| ls_SuboH_aea0bc33 | صُبْح | — | ls_SuboH_aea0bc33 | 100:3:2 | sabahleyin… |  |  |  |
-| ls_avaAru_9a483155 | أَثَارُ | — | ls_avaAru_9a483155 | 100:4:1 | toz koparanlara… |  |  |  |
-| ls_bihi_54e9d770 | بِهِۦ | — | ls_bihi_54e9d770 | 100:4:2 | onunla (ayaklarıyla)… |  |  |  |
-| ls_naqoE_716a210f | نَقْع | — | ls_naqoE_716a210f | 100:4:3 | toz… |  |  |  |
-| ls_wasaTo_9afe48e3 | وَسَطْ | — | ls_wasaTo_9afe48e3 | 100:5:1 | derken dalanlara… |  |  |  |
-| ls_jamoE_6ed2fe29 | جَمْع | — | ls_jamoE_6ed2fe29 | 100:5:3 | bir topluluğa… |  |  |  |
-| ls_kanuwd_a0e5a154 | كَنُود | — | ls_kanuwd_a0e5a154 | 100:6:4 | çok nankördür… |  |  |  |
-| ls_Hub_a579aad6 | حُبّ | — | ls_Hub_a579aad6 | 100:8:2 | sevgisine… |  |  |  |
-| ls_buEovira_e66097c9 | بُعْثِرَ | — | ls_buEovira_e66097c9 | 100:9:4 | dışarı atıldığı… |  |  |  |
-| ls_qabor_3be8f4d9 | قَبْر | — | ls_qabor_3be8f4d9 | 100:9:7 | the graves… |  |  |  |
-| ls_HuS_ila_ddc71bea | حُصِّلَ | — | ls_HuS_ila_ddc71bea | 100:10:1 | ve devşirildiği (zaman)… |  |  |  |
-| ls_bihimo_267fd58c | بِهِمْ | — | ls_bihimo_267fd58c | 100:11:3 | onları… |  |  |  |
-| ls_qaAriEap_1458a0eb | قَارِعَة | — | ls_qaAriEap_1458a0eb | 101:1:1 | çarpan olay… |  |  |  |
-| ls_faraA_07b7509c | فَرَاش | — | ls_faraA_07b7509c | 101:4:4 | pervaneler gibi… |  |  |  |
-| ls_mabovuwv_b5ac66cd | مَبْثُوث | — | ls_mabovuwv_b5ac66cd | 101:4:5 | yayılmış… |  |  |  |
-| ls_Eihon_e0607f8e | عِهْن | — | ls_Eihon_e0607f8e | 101:5:3 | renkli yün gibi… |  |  |  |
-| ls_manfuw_0419486b | مَنفُوش | — | ls_manfuw_0419486b | 101:5:4 | atılmış… |  |  |  |
-| ls_vaqulato_b2f24925 | ثَقُلَتْ | — | ls_vaqulato_b2f24925 | 101:6:3 | ağır gelirse… |  |  |  |
-| ls_miyzaAn_eceac4b3 | مِيزَان | — | ls_miyzaAn_eceac4b3 | 101:6:4 | tartıları… |  |  |  |
-| ls_fahuwa_a74199ab | فَهُوَ | — | ls_fahuwa_a74199ab | 101:7:1 | o… |  |  |  |
-| ls_Eiy_ap_b943e4bc | عِيشَة | — | ls_Eiy_ap_b943e4bc | 101:7:3 | bir hayat… |  |  |  |
-| ls_raADiyap_93192bd4 | رَاضِيَة | — | ls_raADiyap_93192bd4 | 101:7:4 | memmun edici… |  |  |  |
-| ls_xaf_ato_de5620c9 | خَفَّتْ | — | ls_xaf_ato_de5620c9 | 101:8:3 | hafif gelirse… |  |  |  |
-| ls_haAwiyap_251a52c0 | هَاوِيَة | — | ls_haAwiyap_251a52c0 | 101:9:2 | haviye(uçurum)dur… |  |  |  |
-| ls_hiyaho_722c1ffd | هِيَهْ | — | ls_hiyaho_722c1ffd | 101:10:4 | onun… |  |  |  |
-| ls_HaAmiyap_b8369a64 | حَامِيَة | — | ls_HaAmiyap_b8369a64 | 101:11:2 | kızgın… |  |  |  |
-| ls_alohaY_f10ed0f4 | أَلْهَىٰ | — | ls_alohaY_f10ed0f4 | 102:1:1 | sizi oyaladı… |  |  |  |
-| ls_t_akaAvur_695b6f25 | تَّكَاثُر | — | ls_t_akaAvur_695b6f25 | 102:1:2 | çokluk yarışı… |  |  |  |
-| ls_zuro_64d8a248 | زُرْ | — | ls_zuro_64d8a248 | 102:2:2 | ziyaret ettiniz… |  |  |  |
-| ls_maqaAbir_7698835f | مَقَابِر | — | ls_maqaAbir_7698835f | 102:2:3 | kabirleri… |  |  |  |
-| ls_yaqiyn_055517f0 | يَقِين | — | ls_yaqiyn_055517f0 | 102:5:5 | kesin… |  |  |  |
-| ls_naEiym_dbcff69e | نَعِيم | — | ls_naEiym_dbcff69e | 102:8:5 | the pleasures… |  |  |  |
-| ls_EaSor_05d0b972 | عَصْر | — | ls_EaSor_05d0b972 | 103:1:1 | asra andolsun ki… |  |  |  |
-| ls_xusor_a3178241 | خُسْر | — | ls_xusor_a3178241 | 103:2:4 | ziyan… |  |  |  |
-| ls_tawaASa_e93c6bb0 | تَوَاصَ | — | ls_tawaASa_e93c6bb0 | 103:3:6 | tavsiye edenler… |  |  |  |
-| ls_Sabor_b0da35f9 | صَبْر | — | ls_Sabor_b0da35f9 | 103:3:9 | sabrı… |  |  |  |
-| ls_humazap_1353ff4f | هُمَزَة | — | ls_humazap_1353ff4f | 104:1:3 | diliyle çekiştiren… |  |  |  |
-| ls_l_umazap_e05483ed | لُّمَزَة | — | ls_l_umazap_e05483ed | 104:1:4 | kaş göz işaretleriyle al… |  |  |  |
-| ls_Ead_ada_d92551cc | عَدَّدَ | — | ls_Ead_ada_d92551cc | 104:2:4 | ve onu saydı durdu… |  |  |  |
-| ls_axolada_921b851d | أَخْلَدَ | — | ls_axolada_921b851d | 104:3:4 | onu ebedi yaşatacağını… |  |  |  |
-| ls_naba_a_ec9930e7 | نَبَذَ | — | ls_naba_a_ec9930e7 | 104:4:2 | andolsun o atılacaktır… |  |  |  |
-| ls_HuTamap_4d7aa317 | حُطَمَة | — | ls_HuTamap_4d7aa317 | 104:4:4 | the Crusher… |  |  |  |
-| ls_muwqadap_5e5bb18b | مُوقَدَة | — | ls_muwqadap_5e5bb18b | 104:6:3 | tutuşturulmuş… |  |  |  |
-| ls_T_alaEa_7ecb9bb0 | طَّلَعَ | — | ls_T_alaEa_7ecb9bb0 | 104:7:2 | işler… |  |  |  |
-| ls_fu_aAd_d94bff53 | فُؤَاد | — | ls_fu_aAd_d94bff53 | 104:7:4 | the hearts… |  |  |  |
-| ls_m_u_oSadap_0e115b02 | مُّؤْصَدَة | — | ls_m_u_oSadap_0e115b02 | 104:8:3 | kapatılıp kilitlenecekti… |  |  |  |
-| ls_Eamad_03c52689 | عَمَد | — | ls_Eamad_03c52689 | 104:9:2 | direkler… |  |  |  |
-| ls_m_umad_adap_3a25bb8c | مُّمَدَّدَة | — | ls_m_umad_adap_3a25bb8c | 104:9:3 | uzatılmış… |  |  |  |
-| ls_fiyl_dfb70eaf | فِيل | — | ls_fiyl_dfb70eaf | 105:1:7 | fil… |  |  |  |
-| ls_taDoliyl_026de431 | تَضْلِيل | — | ls_taDoliyl_026de431 | 105:2:5 | astray… |  |  |  |
-| ls_Tayor_2d821f0d | طَيْر | — | ls_Tayor_2d821f0d | 105:3:3 | kuşlar… |  |  |  |
-| ls_abaAbiyl_e3bb72d1 | أَبَابِيل | — | ls_abaAbiyl_e3bb72d1 | 105:3:4 | sürü sürü… |  |  |  |
-| ls_ramaY_f06689c1 | رَمَىٰ | — | ls_ramaY_f06689c1 | 105:4:1 | onlara atıyorlardı… |  |  |  |
-| ls_HijaArap_b87e5334 | حِجَارَة | — | ls_HijaArap_b87e5334 | 105:4:2 | sertleşmiş taşlar… |  |  |  |
-| ls_sij_iyl_6bbb0652 | سِجِّيل | — | ls_sij_iyl_6bbb0652 | 105:4:4 | baked clay… |  |  |  |
-| ls_EaSof_f6148827 | عَصْف | — | ls_EaSof_f6148827 | 105:5:2 | ekin yaprağı gibi… |  |  |  |
-| ls_m_a_okuwl_aeb4fe70 | مَّأْكُول | — | ls_m_a_okuwl_aeb4fe70 | 105:5:3 | yenmiş… |  |  |  |
-| ls_ila_f_984fb933 | إِلَٰف | — | ls_ila_f_984fb933 | 106:1:1 | alıştırdığı için… |  |  |  |
-| ls_qurayo_ca5bf2e9 | قُرَيْش | — | ls_qurayo_ca5bf2e9 | 106:1:2 | Kureyşi… |  |  |  |
-| ls_riHolap_a6a06902 | رِحْلَة | — | ls_riHolap_a6a06902 | 106:2:2 | yolculuğuna… |  |  |  |
-| ls_itaA_24019358 | شِّتَآء | — | ls_itaA_24019358 | 106:2:3 | kış… |  |  |  |
-| ls_S_ayof_ac3a6ff7 | صَّيْف | — | ls_S_ayof_ac3a6ff7 | 106:2:4 | ve yaz… |  |  |  |
-| ls_aToEama_ade5d995 | أَطْعَمَ | — | ls_aToEama_ade5d995 | 106:4:2 | onları yedirip… |  |  |  |
-| ls_juwE_0d57cbb2 | جُوع | — | ls_juwE_0d57cbb2 | 106:4:4 | (against) hunger… |  |  |  |
-| ls_yaduE_u_e8040e4a | يَدُعُّ | — | ls_yaduE_u_e8040e4a | 107:2:3 | repulses… |  |  |  |
-| ls_yaHuD_u_1ff4f199 | يَحُضُّ | — | ls_yaHuD_u_1ff4f199 | 107:3:2 | teşvik etmez… |  |  |  |
-| ls_muSal_iyn_248f398b | مُصَلِّين | — | ls_muSal_iyn_248f398b | 107:4:2 | namaz kılanların… |  |  |  |
-| ls_saAhuwn_ebe2aeea | سَاهُون | — | ls_saAhuwn_ebe2aeea | 107:5:5 | gaflet ederler… |  |  |  |
-| ls_yuraA_u_a68c939f | يُرَآءُ | — | ls_yuraA_u_a68c939f | 107:6:3 | gösteriş yaparlar… |  |  |  |
-| ls_m_anaEa_eea75730 | مَّنَعَ | — | ls_m_anaEa_eea75730 | 107:7:1 | ve esirgerler… |  |  |  |
-| ls_maAEuwn_e445e1e1 | مَاعُون | — | ls_maAEuwn_e445e1e1 | 107:7:2 | en ufak bir yardımı… |  |  |  |
-| ls_aEoTaY_5531e55d | أَعْطَىٰ | — | ls_aEoTaY_5531e55d | 108:1:2 | sana verdik… |  |  |  |
-| ls_kawovar_19da63e1 | كَوْثَر | — | ls_kawovar_19da63e1 | 108:1:3 | Kevser'i… |  |  |  |
-| ls_noHaro_37895208 | ٱنْحَرْ | — | ls_noHaro_37895208 | 108:2:3 | ve kurban kes… |  |  |  |
-| ls_aAni_5533a892 | شَانِئ | — | ls_aAni_5533a892 | 108:3:2 | sana buğzeden… |  |  |  |
-| ls_huwa_fdbf01ac | هُوَ | — | ls_huwa_fdbf01ac | 108:3:3 | o… |  |  |  |
-| ls_abotar_06ccce70 | أَبْتَر | — | ls_abotar_06ccce70 | 108:3:4 | sonu kesik olandır… |  |  |  |
-| ls_antumo_a762f8ad | أَنتُمْ | — | ls_antumo_a762f8ad | 109:3:2 | siz de… |  |  |  |
-| ls_EaAbid_30f128a0 | عَابِد | — | ls_EaAbid_30f128a0 | 109:3:3 | ibadeti… |  |  |  |
-| ls_anaA_253e2ab3 | أَنَا۠ | — | ls_anaA_253e2ab3 | 109:4:2 | ben… |  |  |  |
-| ls_lakumo_ae70d3d8 | لَكُمْ | — | ls_lakumo_ae70d3d8 | 109:6:1 | sizindir… |  |  |  |
-| ls_waliYa_6595bddf | وَلِىَ | — | ls_waliYa_6595bddf | 109:6:3 | ve benimdir… |  |  |  |
-| ls_fatoH_f1fc442d | فَتْح | — | ls_fatoH_f1fc442d | 110:1:5 | ve fetih… |  |  |  |
-| ls_fawoj_ec0d3f5c | فَوْج | — | ls_fawoj_ec0d3f5c | 110:2:7 | dalga dalga… |  |  |  |
-| ls_taw_aAb_d053c098 | تَوَّاب | — | ls_taw_aAb_d053c098 | 110:3:7 | Oft-Returning… |  |  |  |
-| ls_tab_a_fef12348 | تَبَّ | — | ls_tab_a_fef12348 | 111:1:1 | kurusun… |  |  |  |
-| ls_lahab_c32cfdd1 | لَهَب | — | ls_lahab_c32cfdd1 | 111:1:4 | Leheb'in… |  |  |  |
-| ls_agonaY_f58b5210 | أَغْنَىٰ | — | ls_agonaY_f58b5210 | 111:2:2 | (will) avail… |  |  |  |
-| ls_yaSolaY_13157699 | يَصْلَى | — | ls_yaSolaY_13157699 | 111:3:1 | girecektir… |  |  |  |
-| ls_Ham_aAlap_c7043345 | حَمَّالَة | — | ls_Ham_aAlap_c7043345 | 111:4:2 | hamalı… |  |  |  |
-| ls_HaTab_f14eb503 | حَطَب | — | ls_HaTab_f14eb503 | 111:4:3 | odun… |  |  |  |
-| ls_jiyd_507b5ec7 | جِيد | — | ls_jiyd_507b5ec7 | 111:5:2 | her neck… |  |  |  |
-| ls_Habol_876dd170 | حَبْل | — | ls_Habol_876dd170 | 111:5:3 | bir ip… |  |  |  |
-| ls_m_asad_8e8dc430 | مَّسَد | — | ls_m_asad_8e8dc430 | 111:5:5 | palm-fiber… |  |  |  |
-| ls_l_ahu_7830bf10 | لَّهُۥ | — | ls_l_ahu_7830bf10 | 112:4:3 | O'nun… |  |  |  |
-| lp_5cfe478ddb | سُبْحَانَكَ | subhânaka | lp_5cfe478ddb | prayer:subhaneke | seni tenzih ederim… |  |  |  |
-| lp_f0473a3990 | اللَّهُمَّ | allahumma | lp_f0473a3990 | prayer:subhaneke | Allahım… |  |  |  |
-| lp_060fad1342 | وَبِحَمْدِكَ | va-bi-hamdika | lp_060fad1342 | prayer:subhaneke | hamdinle… |  |  |  |
-| lp_b1bf6df603 | وَتَبَارَكَ | va-tabâraka | lp_b1bf6df603 | prayer:subhaneke | bereketlidir… |  |  |  |
-| lp_10bcd8764a | اسْمُكَ | ismuka | lp_10bcd8764a | prayer:subhaneke | adın… |  |  |  |
-| lp_1673d5aec4 | وَتَعَالَى | va-taʿâlâ | lp_1673d5aec4 | prayer:subhaneke | yücedir… |  |  |  |
-| lp_f5843446b4 | جَدُّكَ | cadduka | lp_f5843446b4 | prayer:subhaneke | şanın… |  |  |  |
-| lp_999a97b04a | وَلَا | va-lâ | lp_999a97b04a | prayer:subhaneke | ve yoktur… |  |  |  |
-| lp_e3ae18f2ca | غَيْرُكَ | gayruka | lp_e3ae18f2ca | prayer:subhaneke | senden başka… |  |  |  |
-| lp_820672c615 | سُبْحَانَ | subhâna | lp_820672c615 | prayer:ruku | tenzih ederim… |  |  |  |
-| lp_7ae90ff4c5 | رَبِّيَ | rabbiya | lp_7ae90ff4c5 | prayer:ruku | Rabbimi… |  |  |  |
-| lp_e5958c3b77 | الْعَظِيمِ | al-ʿazîmi | lp_e5958c3b77 | prayer:ruku | yüce… |  |  |  |
-| lp_ccce7cf12f | الْأَعْلَى | al-aʿlâ | lp_ccce7cf12f | prayer:secde | en yüce… |  |  |  |
-| lp_436fccf6c0 | التَّحِيَّاتُ | al-tahiyyâtu | lp_436fccf6c0 | prayer:tahiyyat | hürmetler… |  |  |  |
-| lp_692bba530a | لِلَّهِ | li-lahi | lp_692bba530a | prayer:tahiyyat | Allah içindir… |  |  |  |
-| lp_6e8c2964fc | وَالصَّلَوَاتُ | va-al-salavâtu | lp_6e8c2964fc | prayer:tahiyyat | dualar… |  |  |  |
-| lp_779a7fd410 | وَالطَّيِّبَاتُ | va-al-tayyibâtu | lp_779a7fd410 | prayer:tahiyyat | güzel sözler… |  |  |  |
-| lp_7cb56720c0 | السَّلَامُ | al-salâmu | lp_7cb56720c0 | prayer:tahiyyat | selam… |  |  |  |
-| lp_25704375a0 | عَلَيْكَ | ʿalayka | lp_25704375a0 | prayer:tahiyyat | senin üzerine… |  |  |  |
-| lp_99f327d450 | النَّبِيُّ | al-nabiyyu | lp_99f327d450 | prayer:tahiyyat | peygamber… |  |  |  |
-| lp_6cc3dd4445 | وَرَحْمَةُ | va-rahmetu | lp_6cc3dd4445 | prayer:tahiyyat | rahmeti… |  |  |  |
-| lp_832ee02139 | وَبَرَكَاتُهُ | va-barakâtuhu | lp_832ee02139 | prayer:tahiyyat | bereketleri… |  |  |  |
-| lp_31fee142df | عَلَيْنَا | ʿalaynâ | lp_31fee142df | prayer:tahiyyat | bizim üzerimize… |  |  |  |
-| lp_99236de03d | وَعَلَى | va-ʿalâ | lp_99236de03d | prayer:tahiyyat | ve üzerine… |  |  |  |
-| lp_98e5be5669 | عِبَادِ | ʿibâdi | lp_98e5be5669 | prayer:tahiyyat | kullarının… |  |  |  |
-| lp_79cb46c8fc | الصَّالِحِينَ | al-sâlihîna | lp_79cb46c8fc | prayer:tahiyyat | salihlerin… |  |  |  |
-| lp_db3e429022 | أَشْهَدُ | aşhadu | lp_db3e429022 | prayer:tahiyyat | şahitlik ederim… |  |  |  |
-| lp_d9d03c781d | وَأَشْهَدُ | va-aşhadu | lp_d9d03c781d | prayer:tahiyyat | ve şahitlik ederim… |  |  |  |
-| lp_f70c1a5dcf | مُحَمَّدًا | muhammaden | lp_f70c1a5dcf | prayer:tahiyyat | Muhammed… |  |  |  |
-| lp_c7d096cadc | عَبْدُهُ | ʿabduhu | lp_c7d096cadc | prayer:tahiyyat | kuludur… |  |  |  |
-| lp_cd25a85435 | وَرَسُولُهُ | va-rasûluhu | lp_cd25a85435 | prayer:tahiyyat | elçisidir… |  |  |  |
-| lp_67dad87faf | عَلَيْكُمْ | ʿalaykum | lp_67dad87faf | prayer:selam | üzerinize… |  |  |  |
+| f-1-1-1 | بِسْمِ | bi-smi | l_som_585f33 | 1:1:1 | adıyla… | ismiyle | claude-opus-5.5 | 2026-09-26 |
+| f-1-1-2 | ٱللَّهِ | allahi | l_ll_ah_d0a09b | 1:1:2 | Allah'ın… | Allah Teâlâ'nın | claude-opus-5.5 | 2026-09-26 |
+| f-1-1-3 | ٱلرَّحْمَـٰنِ | al-rahmâni | l_r_aHoma_n_c13ea2 | 1:1:3 | Rahman… | Rahmân | claude-opus-5.5 | 2026-09-26 |
+| f-1-1-4 | ٱلرَّحِيمِ | al-rahîmi | l_r_aHiym_ecdbe9 | 1:1:4 | Rahim… | Rahîm | claude-opus-5.5 | 2026-09-26 |
+| f-1-2-1 | ٱلْحَمْدُ | al-hamdu | l_Hamod_98138a | 1:2:1 | hamdolsun… | hamd | claude-opus-5.5 | 2026-09-26 |
+| f-1-2-2 | لِلَّهِ | li-lahi | l_ll_ah_d0a09b | 1:2:2 | Allah'a… | Allah Teâlâ'ya mahsustur | claude-opus-5.5 | 2026-09-26 |
+| f-1-2-3 | رَبِّ | rabbi | l_rab_fc2490 | 1:2:3 | Rabbi… | Rabbi olan | claude-opus-5.5 | 2026-09-26 |
+| f-1-2-4 | ٱلْعَـٰلَمِينَ | al-ʿâlamîna | l_Ea_lamiyn_c337cf | 1:2:4 | Alemlerin… | âlemlerin | claude-opus-5.5 | 2026-09-26 |
+| f-1-3-1 | ٱلرَّحْمَـٰنِ | al-rahmâni | l_r_aHoma_n_c13ea2 | 1:3:1 | (O) Rahman'dır… | Rahmân | claude-opus-5.5 | 2026-09-26 |
+| f-1-3-2 | ٱلرَّحِيمِ | al-rahîmi | l_r_aHiym_ecdbe9 | 1:3:2 | Rahim'dir… | Rahîm | claude-opus-5.5 | 2026-09-26 |
+| f-1-4-1 | مَـٰلِكِ | mâliki | l_ma_lik_581500 | 1:4:1 | sahibidir… | mâliki | claude-opus-5.5 | 2026-09-26 |
+| f-1-4-2 | يَوْمِ | yavmi | l_yawom_9b88c1 | 1:4:2 | gününün… | o günün | claude-opus-5.5 | 2026-09-26 |
+| f-1-4-3 | ٱلدِّينِ | al-dîni | l_diyn_6c222f | 1:4:3 | Din… | hesap | claude-opus-5.5 | 2026-09-26 |
+| f-1-5-1 | إِيَّاكَ | iyyâka | l_iy_aA_dbb412 | 1:5:1 | ancak sana… | yalnız sana | claude-opus-5.5 | 2026-09-26 |
+| f-1-5-2 | نَعْبُدُ | naʿbudu | l_Eabada_557021 | 1:5:2 | kulluk ederiz… | ibadet ederiz | claude-opus-5.5 | 2026-09-26 |
+| f-1-5-3 | وَإِيَّاكَ | va-iyyâka | l_iy_aA_dbb412 | 1:5:3 | ancak senden… | ve yalnız senden | claude-opus-5.5 | 2026-09-26 |
+| f-1-5-4 | نَسْتَعِينُ | nastaʿînu | l_sotaEiynu_1fb93f | 1:5:4 | yardım isteriz… | yardım dileriz | claude-opus-5.5 | 2026-09-26 |
+| f-1-6-1 | ٱهْدِنَا | ahdinâ | l_hadaY_a88771 | 1:6:1 | bizi ilet… | bizi ulaştır | claude-opus-5.5 | 2026-09-26 |
+| f-1-6-2 | ٱلصِّرَٰطَ | al-sirâta | l_Sira_T_7c7de6 | 1:6:2 | yola… | o yola | claude-opus-5.5 | 2026-09-26 |
+| f-1-6-3 | ٱلْمُسْتَقِيمَ | al-mustakîma | l_m_usotaqiym_930fac | 1:6:3 | doğru… | dosdoğru | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-1 | صِرَٰطَ | sirâta | l_Sira_T_7c7de6 | 1:7:1 | yoluna… | yolu | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-2 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 1:7:2 | onlar ki… | o kimselerin ki | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-3 | أَنْعَمْتَ | anʿamta | l_anoEama_bec8a1 | 1:7:3 | ni'met verdin… | lütufta bulundun | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-4 | عَلَيْهِمْ | ʿalayhim | l_EalaY_f79ef3 | 1:7:4 | kimselerin… | onlara | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-5 | غَيْرِ | gayri | l_gayor_6b16f9 | 1:7:5 | değil… | olmayan | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-6 | ٱلْمَغْضُوبِ | al-magdûbi | l_magoDuwb_278690 | 1:7:6 | gazabedilmiş olanların… | gazaba uğramış | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-7 | عَلَيْهِمْ | ʿalayhim | l_EalaY_f79ef3 | 1:7:7 | kendilerine… | üzerlerine | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-8 | وَلَا | va-lâ | l_laA_4e2bfd | 1:7:8 | ve değil… | ve ne de | claude-opus-5.5 | 2026-09-26 |
+| f-1-7-9 | ٱلضَّآلِّينَ | al-dâllîna | l_DaA_l_145c36 | 1:7:9 | sapmışların… | yoldan sapanların | claude-opus-5.5 | 2026-09-26 |
+| ls_t_iyn_f520d1b9 | تِّين | — | ls_t_iyn_f520d1b9 | 95:1:1 | incire andolsun… | incir | claude-opus-5.5 | 2026-09-26 |
+| ls_z_ayotuwn_ed08d607 | زَّيْتُون | — | ls_z_ayotuwn_ed08d607 | 95:1:2 | ve zeytine… | zeytin | claude-opus-5.5 | 2026-09-26 |
+| ls_Tuwr_8829abdc | طُور | — | ls_Tuwr_8829abdc | 95:2:1 | ve dağına… | Tûr Dağı | claude-opus-5.5 | 2026-09-26 |
+| ls_siyniyn_f013c3a1 | سِينِين | — | ls_siyniyn_f013c3a1 | 95:2:2 | sina… | Sînâ | claude-opus-5.5 | 2026-09-26 |
+| ls_balad_43a32787 | بَلَد | — | ls_balad_43a32787 | 95:3:2 | Şehre (andolsun)… | şehir, belde | claude-opus-5.5 | 2026-09-26 |
+| ls_amiyn_9e1d9409 | أَمِين | — | ls_amiyn_9e1d9409 | 95:3:3 | güvenli… | güvenilir, emin | claude-opus-5.5 | 2026-09-26 |
+| ls_taqowiym_8f634ad7 | تَقْوِيم | — | ls_taqowiym_8f634ad7 | 95:4:6 | biçimde… | düzgün yapı, kıvam | claude-opus-5.5 | 2026-09-26 |
+| ls_asofal_4aa68568 | أَسْفَل | — | ls_asofal_4aa68568 | 95:5:3 | aşağıların… | en aşağı | claude-opus-5.5 | 2026-09-26 |
+| ls_saAfil_fa98f6a3 | سَافِل | — | ls_saAfil_fa98f6a3 | 95:5:4 | aşağısına… | aşağıda olan, alçak | claude-opus-5.5 | 2026-09-26 |
+| ls_falahumo_3d2a0c97 | فَلَهُمْ | — | ls_falahumo_3d2a0c97 | 95:6:6 | onlar için vardır… | işte onlar için | claude-opus-5.5 | 2026-09-26 |
+| ls_mamonuwn_4902ae6a | مَمْنُون | — | ls_mamonuwn_4902ae6a | 95:6:9 | kesintisi… | kesilen, başa kakılan | claude-opus-5.5 | 2026-09-26 |
+| ls_aHokam_3444202a | أَحْكَم | — | ls_aHokam_3444202a | 95:8:3 | en iyi hüküm vereni… | en hakîm | claude-opus-5.5 | 2026-09-26 |
+| ls_Ha_kimiyn_e13ddef2 | حَٰكِمِين | — | ls_Ha_kimiyn_e13ddef2 | 95:8:4 | hüküm verenlerin… | hükmedenler, hâkimler | claude-opus-5.5 | 2026-09-26 |
+| ls_qara_a_553258cd | قَرَأَ | — | ls_qara_a_553258cd | 96:1:1 | oku… | okumak | claude-opus-5.5 | 2026-09-26 |
+| ls_Ealaq_ef20f685 | عَلَق | — | ls_Ealaq_ef20f685 | 96:2:4 | a clinging substance… | alak, tutunan şey | claude-opus-5.5 | 2026-09-26 |
+| ls_akoram_b9ba69fb | أَكْرَم | — | ls_akoram_b9ba69fb | 96:3:3 | en büyük kerem sahibidir… | en cömert | claude-opus-5.5 | 2026-09-26 |
+| ls_qalam_9195cdbb | قَلَم | — | ls_qalam_9195cdbb | 96:4:3 | kalemle… | kalem | claude-opus-5.5 | 2026-09-26 |
+| ls_TagaY_27d07634 | طَغَىٰ | — | ls_TagaY_27d07634 | 96:6:4 | azar… | azmak, haddi aşmak | claude-opus-5.5 | 2026-09-26 |
+| ls_sotagonaY_6677864b | ٱسْتَغْنَىٰ | — | ls_sotagonaY_6677864b | 96:7:3 | zengin (kendine yeterli)… | kendini yeterli görmek | claude-opus-5.5 | 2026-09-26 |
+| ls_r_ujoEaY_d424316e | رُّجْعَىٰٓ | — | ls_r_ujoEaY_d424316e | 96:8:4 | dönüş… | geri dönüş, varış | claude-opus-5.5 | 2026-09-26 |
+| ls_Sal_aY_a2871e48 | صَلَّىٰ | — | ls_Sal_aY_a2871e48 | 96:10:3 | namaz kıldığı… | namaz kılmak | claude-opus-5.5 | 2026-09-26 |
+| ls_taqowaY_eeb5e12f | تَقْوَى | — | ls_taqowaY_eeb5e12f | 96:12:3 | korunmayı… | takva, sakınma | claude-opus-5.5 | 2026-09-26 |
+| ls_ntahaY_ea9b5956 | ٱنتَهَىٰ | — | ls_ntahaY_ea9b5956 | 96:15:4 | he desists… | vazgeçmek, son vermek | claude-opus-5.5 | 2026-09-26 |
+| ls_nasofaEF_481e5644 | نَسْفَعًۢ | — | ls_nasofaEF_481e5644 | 96:15:5 | mutlaka yakalarız… | yakalayıp sürüklemek | claude-opus-5.5 | 2026-09-26 |
+| ls_naASiyap_78553ccd | نَاصِيَة | — | ls_naASiyap_78553ccd | 96:15:6 | perçeminden… | alın saçı, perçem | claude-opus-5.5 | 2026-09-26 |
+| ls_xaATi_ap_9c179b08 | خَاطِئَة | — | ls_xaATi_ap_9c179b08 | 96:16:3 | günahkar… | hata işleyen, günahkâr | claude-opus-5.5 | 2026-09-26 |
+| ls_naAdiy_80029903 | نَادِي | — | ls_naAdiy_80029903 | 96:17:2 | meclisini… | meclis, topluluk | claude-opus-5.5 | 2026-09-26 |
+| ls_z_abaAniyap_bd0c416f | زَّبَانِيَة | — | ls_z_abaAniyap_bd0c416f | 96:18:2 | zebanileri… | zebânî, azap görevlisi | claude-opus-5.5 | 2026-09-26 |
+| ls_qotaraba_fae897b1 | ٱقْتَرَبَ | — | ls_qotaraba_fae897b1 | 96:19:5 | ve yaklaş… | yaklaşmak | claude-opus-5.5 | 2026-09-26 |
+| ls_layolap_ea5c4bd5 | لَيْلَة | — | ls_layolap_ea5c4bd5 | 97:1:4 | (the) Night… | gece | claude-opus-5.5 | 2026-09-26 |
+| ls_qador_b8445648 | قَدْر | — | ls_qador_b8445648 | 97:1:5 | kadir… | kadir, değer, ölçü | claude-opus-5.5 | 2026-09-26 |
+| ls_adoraY_5653b032 | أَدْرَىٰ | — | ls_adoraY_5653b032 | 97:2:2 | sana bildiren… | bildirmek | claude-opus-5.5 | 2026-09-26 |
+| ls_alof_14fd8ecc | أَلْف | — | ls_alof_14fd8ecc | 97:3:5 | bin… | bin sayısı | claude-opus-5.5 | 2026-09-26 |
+| ls_tanaz_alato_923e8a7b | تَنَزَّلَتْ | — | ls_tanaz_alato_923e8a7b | 97:4:1 | iner de iner… | inip gelmek | claude-opus-5.5 | 2026-09-26 |
+| ls_hiYa_874e9600 | هِىَ | — | ls_hiYa_874e9600 | 97:5:2 | o… | o, dişil zamir | claude-opus-5.5 | 2026-09-26 |
+| ls_maTolaE_e55b14d4 | مَطْلَع | — | ls_maTolaE_e55b14d4 | 97:5:4 | ağarıncaya… | doğuş vakti | claude-opus-5.5 | 2026-09-26 |
+| ls_fajor_c93d66b8 | فَجْر | — | ls_fajor_c93d66b8 | 97:5:5 | tan yeri… | fecir, tan vakti | claude-opus-5.5 | 2026-09-26 |
+| ls_munfak_iyn_7467eb42 | مُنفَكِّين | — | ls_munfak_iyn_7467eb42 | 98:1:9 | bırakılacak… | ayrılan, vazgeçen | claude-opus-5.5 | 2026-09-26 |
+| ls_SuHuf_2dfd6e51 | صُحُف | — | ls_SuHuf_2dfd6e51 | 98:2:5 | sahifeler… | sayfalar, sahifeler | claude-opus-5.5 | 2026-09-26 |
+| ls_m_uTah_arap_d2dad331 | مُّطَهَّرَة | — | ls_m_uTah_arap_d2dad331 | 98:2:6 | tertemiz… | arındırılmış | claude-opus-5.5 | 2026-09-26 |
+| ls_qay_imap_95f627f6 | قَيِّمَة | — | ls_qay_imap_95f627f6 | 98:3:3 | doğru değerli'… | dosdoğru, değerli | claude-opus-5.5 | 2026-09-26 |
+| ls_tafar_aqa_08bb5159 | تَفَرَّقَ | — | ls_tafar_aqa_08bb5159 | 98:4:2 | ayrılığa düşmediler… | ayrılığa düşmek | claude-opus-5.5 | 2026-09-26 |
+| ls_muxoliS_e8a20e42 | مُخْلِص | — | ls_muxoliS_e8a20e42 | 98:5:6 | halis kılarak… | ihlaslı, samimi | claude-opus-5.5 | 2026-09-26 |
+| ls_lahu_1244e1fe | لَهُ | — | ls_lahu_1244e1fe | 98:5:7 | O'na… | onun için, ona | claude-opus-5.5 | 2026-09-26 |
+| ls_Haniyf_bdb31c21 | حَنِيف | — | ls_Haniyf_bdb31c21 | 98:5:9 | birleyerek… | hanif, tevhid ehli | claude-opus-5.5 | 2026-09-26 |
+| ls_humo_365429ef | هُمْ | — | ls_humo_365429ef | 98:6:14 | onlar… | onlar, kendileri | claude-opus-5.5 | 2026-09-26 |
+| ls_bariy_ap_9dfe8878 | بَرِيَّة | — | ls_bariy_ap_9dfe8878 | 98:6:16 | yaratılmışların… | yaratılmışlar, mahlûkat | claude-opus-5.5 | 2026-09-26 |
+| ls_Eadon_886465ba | عَدْن | — | ls_Eadon_886465ba | 98:8:5 | Adn… | Adn, ebedî ikamet | claude-opus-5.5 | 2026-09-26 |
+| ls_zulozilu_1b75853c | زُلْزِلُ | — | ls_zulozilu_1b75853c | 99:1:2 | sarsıldığı… | sarsılmak | claude-opus-5.5 | 2026-09-26 |
+| ls_zilozaAl_27ea938f | زِلْزَال | — | ls_zilozaAl_27ea938f | 99:1:4 | yaman sarsıntı ile… | deprem, sarsıntı | claude-opus-5.5 | 2026-09-26 |
+| ls_v_aqalaAn_52ce29ce | ثَّقَلَان | — | ls_v_aqalaAn_52ce29ce | 99:2:3 | ağırlıklarını… | ağır yük, ağırlık | claude-opus-5.5 | 2026-09-26 |
+| ls_lahaA_1f91c346 | لَهَا | — | ls_lahaA_1f91c346 | 99:3:4 | ona… | onun için, ona (dişil) | claude-opus-5.5 | 2026-09-26 |
+| ls_tuHad_ivu_44fcdb7a | تُحَدِّثُ | — | ls_tuHad_ivu_44fcdb7a | 99:4:2 | söyler… | anlatmak | claude-opus-5.5 | 2026-09-26 |
+| ls_axobaAr_106f46d8 | أَخْبَار | — | ls_axobaAr_106f46d8 | 99:4:3 | haberlerini… | haberler | claude-opus-5.5 | 2026-09-26 |
+| ls_yaSoduru_ffbf81e8 | يَصْدُرُ | — | ls_yaSoduru_ffbf81e8 | 99:6:2 | çıkarlar… | çıkıp dönmek | claude-opus-5.5 | 2026-09-26 |
+| ls_a_otaAt_d66c1b64 | أَشْتَات | — | ls_a_otaAt_d66c1b64 | 99:6:4 | ayrı ayrı gruplar halind… | dağınık bölükler | claude-opus-5.5 | 2026-09-26 |
+| ls_mivoqaAl_840f0f7e | مِثْقَال | — | ls_mivoqaAl_840f0f7e | 99:7:3 | ağırlığınca… | ağırlık miktarı | claude-opus-5.5 | 2026-09-26 |
+| ls_ar_ap_74aa28f2 | ذَرَّة | — | ls_ar_ap_74aa28f2 | 99:7:4 | zerre… | zerre, küçük parçacık | claude-opus-5.5 | 2026-09-26 |
+| ls_Ea_diya_t_62abe310 | عَٰدِيَٰت | — | ls_Ea_diya_t_62abe310 | 100:1:1 | andolsun koşanlara (atla… | hızla koşanlar | claude-opus-5.5 | 2026-09-26 |
+| ls_DaboH_a573b8f9 | ضَبْح | — | ls_DaboH_a573b8f9 | 100:1:2 | soluk soluğa… | soluma, harıl harıl nefes | claude-opus-5.5 | 2026-09-26 |
+| ls_muwriya_t_5c20aec1 | مُورِيَٰت | — | ls_muwriya_t_5c20aec1 | 100:2:1 | (tırnaklarıyla) ateş çık… | kıvılcım çıkaranlar | claude-opus-5.5 | 2026-09-26 |
+| ls_qadoH_1eb50a5e | قَدْح | — | ls_qadoH_1eb50a5e | 100:2:2 | çarparak… | çakarak kıvılcım çıkarma | claude-opus-5.5 | 2026-09-26 |
+| ls_mugiyra_t_9b045d3b | مُغِيرَٰت | — | ls_mugiyra_t_9b045d3b | 100:3:1 | akın edenlere… | baskın yapanlar | claude-opus-5.5 | 2026-09-26 |
+| ls_SuboH_aea0bc33 | صُبْح | — | ls_SuboH_aea0bc33 | 100:3:2 | sabahleyin… | sabah | claude-opus-5.5 | 2026-09-26 |
+| ls_avaAru_9a483155 | أَثَارُ | — | ls_avaAru_9a483155 | 100:4:1 | toz koparanlara… | kaldırmak, savurmak | claude-opus-5.5 | 2026-09-26 |
+| ls_bihi_54e9d770 | بِهِۦ | — | ls_bihi_54e9d770 | 100:4:2 | onunla (ayaklarıyla)… | onunla, orada | claude-opus-5.5 | 2026-09-26 |
+| ls_naqoE_716a210f | نَقْع | — | ls_naqoE_716a210f | 100:4:3 | toz… | toz duman | claude-opus-5.5 | 2026-09-26 |
+| ls_wasaTo_9afe48e3 | وَسَطْ | — | ls_wasaTo_9afe48e3 | 100:5:1 | derken dalanlara… | ortasına dalmak | claude-opus-5.5 | 2026-09-26 |
+| ls_jamoE_6ed2fe29 | جَمْع | — | ls_jamoE_6ed2fe29 | 100:5:3 | bir topluluğa… | topluluk, kalabalık | claude-opus-5.5 | 2026-09-26 |
+| ls_kanuwd_a0e5a154 | كَنُود | — | ls_kanuwd_a0e5a154 | 100:6:4 | çok nankördür… | nankör | claude-opus-5.5 | 2026-09-26 |
+| ls_Hub_a579aad6 | حُبّ | — | ls_Hub_a579aad6 | 100:8:2 | sevgisine… | sevgi, düşkünlük | claude-opus-5.5 | 2026-09-26 |
+| ls_buEovira_e66097c9 | بُعْثِرَ | — | ls_buEovira_e66097c9 | 100:9:4 | dışarı atıldığı… | altüst edilmek | claude-opus-5.5 | 2026-09-26 |
+| ls_qabor_3be8f4d9 | قَبْر | — | ls_qabor_3be8f4d9 | 100:9:7 | the graves… | kabir, mezar | claude-opus-5.5 | 2026-09-26 |
+| ls_HuS_ila_ddc71bea | حُصِّلَ | — | ls_HuS_ila_ddc71bea | 100:10:1 | ve devşirildiği (zaman)… | ortaya çıkarılmak, derlenmek | claude-opus-5.5 | 2026-09-26 |
+| ls_bihimo_267fd58c | بِهِمْ | — | ls_bihimo_267fd58c | 100:11:3 | onları… | onlarla, onlar hakkında | claude-opus-5.5 | 2026-09-26 |
+| ls_qaAriEap_1458a0eb | قَارِعَة | — | ls_qaAriEap_1458a0eb | 101:1:1 | çarpan olay… | Kâria, çarpan felaket | claude-opus-5.5 | 2026-09-26 |
+| ls_faraA_07b7509c | فَرَاش | — | ls_faraA_07b7509c | 101:4:4 | pervaneler gibi… | kelebek, pervane | claude-opus-5.5 | 2026-09-26 |
+| ls_mabovuwv_b5ac66cd | مَبْثُوث | — | ls_mabovuwv_b5ac66cd | 101:4:5 | yayılmış… | saçılmış, dağılmış | claude-opus-5.5 | 2026-09-26 |
+| ls_Eihon_e0607f8e | عِهْن | — | ls_Eihon_e0607f8e | 101:5:3 | renkli yün gibi… | yün, boyalı yün | claude-opus-5.5 | 2026-09-26 |
+| ls_manfuw_0419486b | مَنفُوش | — | ls_manfuw_0419486b | 101:5:4 | atılmış… | didiklenmiş, atılmış | claude-opus-5.5 | 2026-09-26 |
+| ls_vaqulato_b2f24925 | ثَقُلَتْ | — | ls_vaqulato_b2f24925 | 101:6:3 | ağır gelirse… | ağır gelmek, ağır basmak | claude-opus-5.5 | 2026-09-26 |
+| ls_miyzaAn_eceac4b3 | مِيزَان | — | ls_miyzaAn_eceac4b3 | 101:6:4 | tartıları… | terazi, ölçü | claude-opus-5.5 | 2026-09-26 |
+| ls_fahuwa_a74199ab | فَهُوَ | — | ls_fahuwa_a74199ab | 101:7:1 | o… | işte o | claude-opus-5.5 | 2026-09-26 |
+| ls_Eiy_ap_b943e4bc | عِيشَة | — | ls_Eiy_ap_b943e4bc | 101:7:3 | bir hayat… | yaşayış, hayat | claude-opus-5.5 | 2026-09-26 |
+| ls_raADiyap_93192bd4 | رَاضِيَة | — | ls_raADiyap_93192bd4 | 101:7:4 | memmun edici… | hoşnut, razı olunan | claude-opus-5.5 | 2026-09-26 |
+| ls_xaf_ato_de5620c9 | خَفَّتْ | — | ls_xaf_ato_de5620c9 | 101:8:3 | hafif gelirse… | hafif gelmek | claude-opus-5.5 | 2026-09-26 |
+| ls_haAwiyap_251a52c0 | هَاوِيَة | — | ls_haAwiyap_251a52c0 | 101:9:2 | haviye(uçurum)dur… | Hâviye, uçurum | claude-opus-5.5 | 2026-09-26 |
+| ls_hiyaho_722c1ffd | هِيَهْ | — | ls_hiyaho_722c1ffd | 101:10:4 | onun… | o, dişil zamir | claude-opus-5.5 | 2026-09-26 |
+| ls_HaAmiyap_b8369a64 | حَامِيَة | — | ls_HaAmiyap_b8369a64 | 101:11:2 | kızgın… | kızgın, yakıcı | claude-opus-5.5 | 2026-09-26 |
+| ls_alohaY_f10ed0f4 | أَلْهَىٰ | — | ls_alohaY_f10ed0f4 | 102:1:1 | sizi oyaladı… | oyalamak, meşgul etmek | claude-opus-5.5 | 2026-09-26 |
+| ls_t_akaAvur_695b6f25 | تَّكَاثُر | — | ls_t_akaAvur_695b6f25 | 102:1:2 | çokluk yarışı… | çoğalma yarışı | claude-opus-5.5 | 2026-09-26 |
+| ls_zuro_64d8a248 | زُرْ | — | ls_zuro_64d8a248 | 102:2:2 | ziyaret ettiniz… | ziyaret etmek | claude-opus-5.5 | 2026-09-26 |
+| ls_maqaAbir_7698835f | مَقَابِر | — | ls_maqaAbir_7698835f | 102:2:3 | kabirleri… | mezarlar | claude-opus-5.5 | 2026-09-26 |
+| ls_yaqiyn_055517f0 | يَقِين | — | ls_yaqiyn_055517f0 | 102:5:5 | kesin… | kesin bilgi, yakîn | claude-opus-5.5 | 2026-09-26 |
+| ls_naEiym_dbcff69e | نَعِيم | — | ls_naEiym_dbcff69e | 102:8:5 | the pleasures… | nimet, bolluk | claude-opus-5.5 | 2026-09-26 |
+| ls_EaSor_05d0b972 | عَصْر | — | ls_EaSor_05d0b972 | 103:1:1 | asra andolsun ki… | asır, zaman | claude-opus-5.5 | 2026-09-26 |
+| ls_xusor_a3178241 | خُسْر | — | ls_xusor_a3178241 | 103:2:4 | ziyan… | hüsran, kayıp | claude-opus-5.5 | 2026-09-26 |
+| ls_tawaASa_e93c6bb0 | تَوَاصَ | — | ls_tawaASa_e93c6bb0 | 103:3:6 | tavsiye edenler… | birbirine öğütlemek | claude-opus-5.5 | 2026-09-26 |
+| ls_Sabor_b0da35f9 | صَبْر | — | ls_Sabor_b0da35f9 | 103:3:9 | sabrı… | sabır | claude-opus-5.5 | 2026-09-26 |
+| ls_humazap_1353ff4f | هُمَزَة | — | ls_humazap_1353ff4f | 104:1:3 | diliyle çekiştiren… | arkadan çekiştiren | claude-opus-5.5 | 2026-09-26 |
+| ls_l_umazap_e05483ed | لُّمَزَة | — | ls_l_umazap_e05483ed | 104:1:4 | kaş göz işaretleriyle al… | yüze karşı ayıplayan | claude-opus-5.5 | 2026-09-26 |
+| ls_Ead_ada_d92551cc | عَدَّدَ | — | ls_Ead_ada_d92551cc | 104:2:4 | ve onu saydı durdu… | saymak, sayıp durmak | claude-opus-5.5 | 2026-09-26 |
+| ls_axolada_921b851d | أَخْلَدَ | — | ls_axolada_921b851d | 104:3:4 | onu ebedi yaşatacağını… | ebedî kılmak | claude-opus-5.5 | 2026-09-26 |
+| ls_naba_a_ec9930e7 | نَبَذَ | — | ls_naba_a_ec9930e7 | 104:4:2 | andolsun o atılacaktır… | fırlatıp atmak | claude-opus-5.5 | 2026-09-26 |
+| ls_HuTamap_4d7aa317 | حُطَمَة | — | ls_HuTamap_4d7aa317 | 104:4:4 | the Crusher… | Hutame, paramparça eden | claude-opus-5.5 | 2026-09-26 |
+| ls_muwqadap_5e5bb18b | مُوقَدَة | — | ls_muwqadap_5e5bb18b | 104:6:3 | tutuşturulmuş… | tutuşturulmuş, alevlendirilmiş | claude-opus-5.5 | 2026-09-26 |
+| ls_T_alaEa_7ecb9bb0 | طَّلَعَ | — | ls_T_alaEa_7ecb9bb0 | 104:7:2 | işler… | ulaşmak, üstüne çıkmak | claude-opus-5.5 | 2026-09-26 |
+| ls_fu_aAd_d94bff53 | فُؤَاد | — | ls_fu_aAd_d94bff53 | 104:7:4 | the hearts… | kalp, gönül | claude-opus-5.5 | 2026-09-26 |
+| ls_m_u_oSadap_0e115b02 | مُّؤْصَدَة | — | ls_m_u_oSadap_0e115b02 | 104:8:3 | kapatılıp kilitlenecekti… | sımsıkı kapatılmış | claude-opus-5.5 | 2026-09-26 |
+| ls_Eamad_03c52689 | عَمَد | — | ls_Eamad_03c52689 | 104:9:2 | direkler… | sütunlar, direkler | claude-opus-5.5 | 2026-09-26 |
+| ls_m_umad_adap_3a25bb8c | مُّمَدَّدَة | — | ls_m_umad_adap_3a25bb8c | 104:9:3 | uzatılmış… | uzatılmış, uzun | claude-opus-5.5 | 2026-09-26 |
+| ls_fiyl_dfb70eaf | فِيل | — | ls_fiyl_dfb70eaf | 105:1:7 | fil… | fil hayvanı | claude-opus-5.5 | 2026-09-26 |
+| ls_taDoliyl_026de431 | تَضْلِيل | — | ls_taDoliyl_026de431 | 105:2:5 | astray… | boşa çıkarma, saptırma | claude-opus-5.5 | 2026-09-26 |
+| ls_Tayor_2d821f0d | طَيْر | — | ls_Tayor_2d821f0d | 105:3:3 | kuşlar… | kuş | claude-opus-5.5 | 2026-09-26 |
+| ls_abaAbiyl_e3bb72d1 | أَبَابِيل | — | ls_abaAbiyl_e3bb72d1 | 105:3:4 | sürü sürü… | bölük bölük sürüler | claude-opus-5.5 | 2026-09-26 |
+| ls_ramaY_f06689c1 | رَمَىٰ | — | ls_ramaY_f06689c1 | 105:4:1 | onlara atıyorlardı… | atmak, fırlatmak | claude-opus-5.5 | 2026-09-26 |
+| ls_HijaArap_b87e5334 | حِجَارَة | — | ls_HijaArap_b87e5334 | 105:4:2 | sertleşmiş taşlar… | taşlar | claude-opus-5.5 | 2026-09-26 |
+| ls_sij_iyl_6bbb0652 | سِجِّيل | — | ls_sij_iyl_6bbb0652 | 105:4:4 | baked clay… | pişkin çamur | claude-opus-5.5 | 2026-09-26 |
+| ls_EaSof_f6148827 | عَصْف | — | ls_EaSof_f6148827 | 105:5:2 | ekin yaprağı gibi… | ekin yaprağı, saman | claude-opus-5.5 | 2026-09-26 |
+| ls_m_a_okuwl_aeb4fe70 | مَّأْكُول | — | ls_m_a_okuwl_aeb4fe70 | 105:5:3 | yenmiş… | yenilmiş | claude-opus-5.5 | 2026-09-26 |
+| ls_ila_f_984fb933 | إِلَٰف | — | ls_ila_f_984fb933 | 106:1:1 | alıştırdığı için… | kaynaşma, alışkanlık | claude-opus-5.5 | 2026-09-26 |
+| ls_qurayo_ca5bf2e9 | قُرَيْش | — | ls_qurayo_ca5bf2e9 | 106:1:2 | Kureyşi… | Kureyş | claude-opus-5.5 | 2026-09-26 |
+| ls_riHolap_a6a06902 | رِحْلَة | — | ls_riHolap_a6a06902 | 106:2:2 | yolculuğuna… | yolculuk, sefer | claude-opus-5.5 | 2026-09-26 |
+| ls_itaA_24019358 | شِّتَآء | — | ls_itaA_24019358 | 106:2:3 | kış… | kış mevsimi | claude-opus-5.5 | 2026-09-26 |
+| ls_S_ayof_ac3a6ff7 | صَّيْف | — | ls_S_ayof_ac3a6ff7 | 106:2:4 | ve yaz… | yaz mevsimi | claude-opus-5.5 | 2026-09-26 |
+| ls_aToEama_ade5d995 | أَطْعَمَ | — | ls_aToEama_ade5d995 | 106:4:2 | onları yedirip… | yedirmek, doyurmak | claude-opus-5.5 | 2026-09-26 |
+| ls_juwE_0d57cbb2 | جُوع | — | ls_juwE_0d57cbb2 | 106:4:4 | (against) hunger… | açlık | claude-opus-5.5 | 2026-09-26 |
+| ls_yaduE_u_e8040e4a | يَدُعُّ | — | ls_yaduE_u_e8040e4a | 107:2:3 | repulses… | sertçe itmek | claude-opus-5.5 | 2026-09-26 |
+| ls_yaHuD_u_1ff4f199 | يَحُضُّ | — | ls_yaHuD_u_1ff4f199 | 107:3:2 | teşvik etmez… | teşvik etmek, özendirmek | claude-opus-5.5 | 2026-09-26 |
+| ls_muSal_iyn_248f398b | مُصَلِّين | — | ls_muSal_iyn_248f398b | 107:4:2 | namaz kılanların… | namaz kılanlar | claude-opus-5.5 | 2026-09-26 |
+| ls_saAhuwn_ebe2aeea | سَاهُون | — | ls_saAhuwn_ebe2aeea | 107:5:5 | gaflet ederler… | gafiller, unutanlar | claude-opus-5.5 | 2026-09-26 |
+| ls_yuraA_u_a68c939f | يُرَآءُ | — | ls_yuraA_u_a68c939f | 107:6:3 | gösteriş yaparlar… | gösteriş yapmak | claude-opus-5.5 | 2026-09-26 |
+| ls_m_anaEa_eea75730 | مَّنَعَ | — | ls_m_anaEa_eea75730 | 107:7:1 | ve esirgerler… | engellemek, esirgemek | claude-opus-5.5 | 2026-09-26 |
+| ls_maAEuwn_e445e1e1 | مَاعُون | — | ls_maAEuwn_e445e1e1 | 107:7:2 | en ufak bir yardımı… | yardım, gündelik eşya | claude-opus-5.5 | 2026-09-26 |
+| ls_aEoTaY_5531e55d | أَعْطَىٰ | — | ls_aEoTaY_5531e55d | 108:1:2 | sana verdik… | vermek, bahşetmek | claude-opus-5.5 | 2026-09-26 |
+| ls_kawovar_19da63e1 | كَوْثَر | — | ls_kawovar_19da63e1 | 108:1:3 | Kevser'i… | Kevser, bol hayır | claude-opus-5.5 | 2026-09-26 |
+| ls_noHaro_37895208 | ٱنْحَرْ | — | ls_noHaro_37895208 | 108:2:3 | ve kurban kes… | kurban kesmek | claude-opus-5.5 | 2026-09-26 |
+| ls_aAni_5533a892 | شَانِئ | — | ls_aAni_5533a892 | 108:3:2 | sana buğzeden… | kin besleyen | claude-opus-5.5 | 2026-09-26 |
+| ls_huwa_fdbf01ac | هُوَ | — | ls_huwa_fdbf01ac | 108:3:3 | o… | o, eril zamir | claude-opus-5.5 | 2026-09-26 |
+| ls_abotar_06ccce70 | أَبْتَر | — | ls_abotar_06ccce70 | 108:3:4 | sonu kesik olandır… | soyu kesik | claude-opus-5.5 | 2026-09-26 |
+| ls_antumo_a762f8ad | أَنتُمْ | — | ls_antumo_a762f8ad | 109:3:2 | siz de… | siz | claude-opus-5.5 | 2026-09-26 |
+| ls_EaAbid_30f128a0 | عَابِد | — | ls_EaAbid_30f128a0 | 109:3:3 | ibadeti… | ibadet eden, kul | claude-opus-5.5 | 2026-09-26 |
+| ls_anaA_253e2ab3 | أَنَا۠ | — | ls_anaA_253e2ab3 | 109:4:2 | ben… | ben, şahıs zamiri | claude-opus-5.5 | 2026-09-26 |
+| ls_lakumo_ae70d3d8 | لَكُمْ | — | ls_lakumo_ae70d3d8 | 109:6:1 | sizindir… | sizin için, size | claude-opus-5.5 | 2026-09-26 |
+| ls_waliYa_6595bddf | وَلِىَ | — | ls_waliYa_6595bddf | 109:6:3 | ve benimdir… | ve benim için | claude-opus-5.5 | 2026-09-26 |
+| ls_fatoH_f1fc442d | فَتْح | — | ls_fatoH_f1fc442d | 110:1:5 | ve fetih… | fetih, açılış | claude-opus-5.5 | 2026-09-26 |
+| ls_fawoj_ec0d3f5c | فَوْج | — | ls_fawoj_ec0d3f5c | 110:2:7 | dalga dalga… | bölük, grup | claude-opus-5.5 | 2026-09-26 |
+| ls_taw_aAb_d053c098 | تَوَّاب | — | ls_taw_aAb_d053c098 | 110:3:7 | Oft-Returning… | tövbeleri çok kabul eden | claude-opus-5.5 | 2026-09-26 |
+| ls_tab_a_fef12348 | تَبَّ | — | ls_tab_a_fef12348 | 111:1:1 | kurusun… | helak olmak, kurumak | claude-opus-5.5 | 2026-09-26 |
+| ls_lahab_c32cfdd1 | لَهَب | — | ls_lahab_c32cfdd1 | 111:1:4 | Leheb'in… | alev | claude-opus-5.5 | 2026-09-26 |
+| ls_agonaY_f58b5210 | أَغْنَىٰ | — | ls_agonaY_f58b5210 | 111:2:2 | (will) avail… | fayda vermek | claude-opus-5.5 | 2026-09-26 |
+| ls_yaSolaY_13157699 | يَصْلَى | — | ls_yaSolaY_13157699 | 111:3:1 | girecektir… | ateşe girmek, yanmak | claude-opus-5.5 | 2026-09-26 |
+| ls_Ham_aAlap_c7043345 | حَمَّالَة | — | ls_Ham_aAlap_c7043345 | 111:4:2 | hamalı… | çok taşıyan, hamal | claude-opus-5.5 | 2026-09-26 |
+| ls_HaTab_f14eb503 | حَطَب | — | ls_HaTab_f14eb503 | 111:4:3 | odun… | odun, yakacak | claude-opus-5.5 | 2026-09-26 |
+| ls_jiyd_507b5ec7 | جِيد | — | ls_jiyd_507b5ec7 | 111:5:2 | her neck… | boyun | claude-opus-5.5 | 2026-09-26 |
+| ls_Habol_876dd170 | حَبْل | — | ls_Habol_876dd170 | 111:5:3 | bir ip… | ip, urgan | claude-opus-5.5 | 2026-09-26 |
+| ls_m_asad_8e8dc430 | مَّسَد | — | ls_m_asad_8e8dc430 | 111:5:5 | palm-fiber… | hurma lifi | claude-opus-5.5 | 2026-09-26 |
+| ls_l_ahu_7830bf10 | لَّهُۥ | — | ls_l_ahu_7830bf10 | 112:4:3 | O'nun… | onun için, ona | claude-opus-5.5 | 2026-09-26 |
+| lp_5cfe478ddb | سُبْحَانَكَ | subhânaka | lp_5cfe478ddb | prayer:subhaneke | seni tenzih ederim… | seni noksanlıklardan tenzih ederim | claude-opus-5.5 | 2026-09-26 |
+| lp_f0473a3990 | اللَّهُمَّ | allahumma | lp_f0473a3990 | prayer:subhaneke | Allahım… | ey Allah'ım | claude-opus-5.5 | 2026-09-26 |
+| lp_060fad1342 | وَبِحَمْدِكَ | va-bi-hamdika | lp_060fad1342 | prayer:subhaneke | hamdinle… | ve sana hamd ile | claude-opus-5.5 | 2026-09-26 |
+| lp_b1bf6df603 | وَتَبَارَكَ | va-tabâraka | lp_b1bf6df603 | prayer:subhaneke | bereketlidir… | ve mübarektir | claude-opus-5.5 | 2026-09-26 |
+| lp_10bcd8764a | اسْمُكَ | ismuka | lp_10bcd8764a | prayer:subhaneke | adın… | senin ismin | claude-opus-5.5 | 2026-09-26 |
+| lp_1673d5aec4 | وَتَعَالَى | va-taʿâlâ | lp_1673d5aec4 | prayer:subhaneke | yücedir… | ve pek yücedir | claude-opus-5.5 | 2026-09-26 |
+| lp_f5843446b4 | جَدُّكَ | cadduka | lp_f5843446b4 | prayer:subhaneke | şanın… | şanın, azametin | claude-opus-5.5 | 2026-09-26 |
+| lp_999a97b04a | وَلَا | va-lâ | lp_999a97b04a | prayer:subhaneke | ve yoktur… | ve hiç yok | claude-opus-5.5 | 2026-09-26 |
+| lp_e3ae18f2ca | غَيْرُكَ | gayruka | lp_e3ae18f2ca | prayer:subhaneke | senden başka… | senden başkası | claude-opus-5.5 | 2026-09-26 |
+| lp_820672c615 | سُبْحَانَ | subhâna | lp_820672c615 | prayer:ruku | tenzih ederim… | tenzih, noksanlıktan uzak tutma | claude-opus-5.5 | 2026-09-26 |
+| lp_7ae90ff4c5 | رَبِّيَ | rabbiya | lp_7ae90ff4c5 | prayer:ruku | Rabbimi… | benim Rabbim | claude-opus-5.5 | 2026-09-26 |
+| lp_e5958c3b77 | الْعَظِيمِ | al-ʿazîmi | lp_e5958c3b77 | prayer:ruku | yüce… | azametli, pek büyük | claude-opus-5.5 | 2026-09-26 |
+| lp_ccce7cf12f | الْأَعْلَى | al-aʿlâ | lp_ccce7cf12f | prayer:secde | en yüce… | en yüksek, en yüce | claude-opus-5.5 | 2026-09-26 |
+| lp_436fccf6c0 | التَّحِيَّاتُ | al-tahiyyâtu | lp_436fccf6c0 | prayer:tahiyyat | hürmetler… | selamlamalar, hürmetler | claude-opus-5.5 | 2026-09-26 |
+| lp_692bba530a | لِلَّهِ | li-lahi | lp_692bba530a | prayer:tahiyyat | Allah içindir… | Allah Teâlâ'ya aittir | claude-opus-5.5 | 2026-09-26 |
+| lp_6e8c2964fc | وَالصَّلَوَاتُ | va-al-salavâtu | lp_6e8c2964fc | prayer:tahiyyat | dualar… | ve dualar, namazlar | claude-opus-5.5 | 2026-09-26 |
+| lp_779a7fd410 | وَالطَّيِّبَاتُ | va-al-tayyibâtu | lp_779a7fd410 | prayer:tahiyyat | güzel sözler… | ve temiz güzellikler | claude-opus-5.5 | 2026-09-26 |
+| lp_7cb56720c0 | السَّلَامُ | al-salâmu | lp_7cb56720c0 | prayer:tahiyyat | selam… | esenlik, selâm | claude-opus-5.5 | 2026-09-26 |
+| lp_25704375a0 | عَلَيْكَ | ʿalayka | lp_25704375a0 | prayer:tahiyyat | senin üzerine… | sana, üzerine | claude-opus-5.5 | 2026-09-26 |
+| lp_99f327d450 | النَّبِيُّ | al-nabiyyu | lp_99f327d450 | prayer:tahiyyat | peygamber… | Nebî, peygamber | claude-opus-5.5 | 2026-09-26 |
+| lp_6cc3dd4445 | وَرَحْمَةُ | va-rahmetu | lp_6cc3dd4445 | prayer:tahiyyat | rahmeti… | ve rahmet | claude-opus-5.5 | 2026-09-26 |
+| lp_832ee02139 | وَبَرَكَاتُهُ | va-barakâtuhu | lp_832ee02139 | prayer:tahiyyat | bereketleri… | ve onun bereketleri | claude-opus-5.5 | 2026-09-26 |
+| lp_31fee142df | عَلَيْنَا | ʿalaynâ | lp_31fee142df | prayer:tahiyyat | bizim üzerimize… | bize, üzerimize | claude-opus-5.5 | 2026-09-26 |
+| lp_99236de03d | وَعَلَى | va-ʿalâ | lp_99236de03d | prayer:tahiyyat | ve üzerine… | ve üzerine | claude-opus-5.5 | 2026-09-26 |
+| lp_98e5be5669 | عِبَادِ | ʿibâdi | lp_98e5be5669 | prayer:tahiyyat | kullarının… | kullar | claude-opus-5.5 | 2026-09-26 |
+| lp_79cb46c8fc | الصَّالِحِينَ | al-sâlihîna | lp_79cb46c8fc | prayer:tahiyyat | salihlerin… | salih kimseler | claude-opus-5.5 | 2026-09-26 |
+| lp_db3e429022 | أَشْهَدُ | aşhadu | lp_db3e429022 | prayer:tahiyyat | şahitlik ederim… | şahadet ederim | claude-opus-5.5 | 2026-09-26 |
+| lp_d9d03c781d | وَأَشْهَدُ | va-aşhadu | lp_d9d03c781d | prayer:tahiyyat | ve şahitlik ederim… | ve şahadet ederim | claude-opus-5.5 | 2026-09-26 |
+| lp_f70c1a5dcf | مُحَمَّدًا | muhammaden | lp_f70c1a5dcf | prayer:tahiyyat | Muhammed… | Muhammed | claude-opus-5.5 | 2026-09-26 |
+| lp_c7d096cadc | عَبْدُهُ | ʿabduhu | lp_c7d096cadc | prayer:tahiyyat | kuludur… | onun kulu | claude-opus-5.5 | 2026-09-26 |
+| lp_cd25a85435 | وَرَسُولُهُ | va-rasûluhu | lp_cd25a85435 | prayer:tahiyyat | elçisidir… | ve onun resulü | claude-opus-5.5 | 2026-09-26 |
+| lp_67dad87faf | عَلَيْكُمْ | ʿalaykum | lp_67dad87faf | prayer:selam | üzerinize… | size, üzerinize | claude-opus-5.5 | 2026-09-26 |

@@ -194,27 +194,54 @@ assert.equal(mixedGrammarQueue.filter((item) => item.type === 'grammar').length,
 }
 
 
-// R-A2 regresyonu (KAO-16b sırasında bulundu): gerçek oturum her gün iki yönü birlikte taşır — 365 günlük tarama.
+// KAO-FIX-06 (Y-2): kelime düzeyinde iki yön — gerçek kaoStart/kaoAnswer akışıyla 120 günlük birikimli tarama.
+// Her yeni lemma önce ar>tr, en erken ertesi takvim günü tr>ar kartı alır; yeni kart bütçesi iki yön için ortaktır.
 {
-  let clock = Date.UTC(2026, 0, 1);
+  const DAILY_NEW = 10;
+  let clock = new Date(2026, 0, 1, 8, 0, 0).getTime();
   const RealDate = Date;
   class FixedDate extends RealDate { constructor(...args) { super(...(args.length ? args : [clock])); } static now() { return clock; } }
   const box = { window: {}, Date: FixedDate, Math, Number, String, Object, Array, JSON };
   vm.createContext(box);
   for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
   const sweepApi = box.window.SeymaQuranLearn, sweepUi = {};
-  let sweepData = null;
-  assert.equal(sweepApi.registerQuranLearn({ data() { return sweepData; }, ui() { return sweepUi; }, save() {}, render() {}, todayStr() { return 'x'; }, esc: String, icon() { return ''; }, getDay() { return {}; } }), true);
+  const pad = (n) => String(n).padStart(2, '0');
+  const localDay = (value) => { const d = new RealDate(value); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+  const sweepData = { quranLearn: null };
+  assert.equal(sweepApi.registerQuranLearn({ data() { return sweepData; }, ui() { return sweepUi; }, save() {}, render() {}, todayStr() { return localDay(clock); }, esc: String, icon() { return ''; }, getDay() { return {}; } }), true);
   assert.equal(sweepApi.registerQuranLearnSurface({ lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose(_c, _b, body) { body(); }, mount() {}, taskElement() { return null; }, createAudio() { return { addEventListener() {}, play() { return { catch() {} }; } }; }, isQuietTime() { return false; }, setTimer() {}, clearTimer() {}, toast() {} }), true);
-  const oneWay = [];
-  for (let day = 0; day < 365; day += 1) {
-    clock = Date.UTC(2026, 0, 1) + day * 86400000;
-    sweepData = { quranLearn: null }; sweepApi.ensureQuranLearn(sweepData);
+  sweepApi.ensureQuranLearn(sweepData);
+  sweepData.quranLearn.settings.dailyNew = DAILY_NEW;
+  const oneWay = [], overBudget = [];
+  for (let day = 0; day < 120; day += 1) {
+    clock = new Date(2026, 0, 1 + day, 8, 0, 0).getTime();
     sweepApi.kaoStart();
+    const newCount = sweepUi.kaoQueue.filter((item) => item.isNew).length;
+    if (newCount > DAILY_NEW) overBudget.push(`${localDay(clock)}:${newCount}`);
     const directions = new Set(sweepUi.kaoQueue.map((item) => (String(item.cardId).match(/:(ar>tr|tr>ar)$/) || [])[1]).filter(Boolean));
-    if (directions.size < 2) oneWay.push(new RealDate(clock).toISOString().slice(0, 10));
+    if (day > 0 && directions.size < 2) oneWay.push(localDay(clock));
+    for (let guard = 0; sweepUi.kaoTaskIndex < sweepUi.kaoQueue.length && guard < 200; guard += 1) {
+      const item = sweepUi.kaoQueue[sweepUi.kaoTaskIndex];
+      sweepUi.kaoTasks[item.id] = sweepUi.kaoTasks[item.id] || sweepApi.kaoBuildTask(item, sweepData, { seed: item.id });
+      const task = sweepUi.kaoTasks[item.id];
+      clock += 4000;
+      if (task.kind === 'order') {
+        for (const choice of task.choices.slice().sort((a, b) => a.ordinal - b.ordinal)) sweepApi.kaoAnswer(task.id, choice.choiceId);
+      } else {
+        assert.notEqual(sweepApi.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId), false, `${task.id}: cevap kaydedilmeli`);
+      }
+    }
   }
-  assert.deepEqual(oneWay, [], 'R-A2: her gün iki yön');
+  const cards = sweepData.quranLearn.cards, lemmaDirs = {};
+  for (const id of Object.keys(cards)) { const m = id.match(/^w:(.+):(ar>tr|tr>ar)$/); if (m) (lemmaDirs[m[1]] = lemmaDirs[m[1]] || {})[m[2]] = cards[id]; }
+  const lemmas = Object.keys(lemmaDirs), both = lemmas.filter((id) => lemmaDirs[id]['ar>tr'] && lemmaDirs[id]['tr>ar']);
+  assert.ok(lemmas.length >= 100, `120 günde yeterli lemma görülmeli (${lemmas.length})`);
+  assert.ok(both.length / lemmas.length >= 0.95, `(a) kartı olan lemmaların ≥%95'i iki yönlü olmalı (${both.length}/${lemmas.length})`);
+  const early = both.filter((id) => localDay(lemmaDirs[id]['tr>ar'].introducedAt) <= localDay(lemmaDirs[id]['ar>tr'].introducedAt));
+  assert.deepEqual(early, [], '(b) tr>ar, ar>tr ile aynı gün ya da önce sunulmamalı');
+  assert.deepEqual(lemmas.filter((id) => !lemmaDirs[id]['ar>tr']), [], 'tr>ar yalnız ar>tr kartı olan lemmada açılır');
+  assert.deepEqual(overBudget, [], '(c) günlük yeni kart (iki yön dâhil) ≤ dailyNew');
+  assert.deepEqual(oneWay, [], 'R-A2: ilk günden sonra her oturum iki yönü taşır');
 }
 
 console.log(`KAO queue: PASS (${first.length} deterministic tasks + 4 grammar types, budgets/interleave/semantic spacing)`);

@@ -538,11 +538,11 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // KAO hub kartı dependency bag'e eklendi; app.js cache pini bu kaynak değişikliğiyle
 // aynı düzeltmede ilerletildi. Handler yüzeyi yukarıdaki ayrı kapıda sabit kalır.
 ok('index.html app.js cache-bust güncel (KAO hub köprüsü)',
-  /app\.js\?v=20260926d/.test(indexSource));
+  /app\.js\?v=20260926e/.test(indexSource));
 /* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
    gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
-  /app\/core\/appSurface\.js\?v=20260926d/.test(indexSource));
+  /app\/core\/appSurface\.js\?v=20260926e/.test(indexSource));
 /* B2: yürüyüş tikinin kullanıcıya söylediği eşik, tikin GERÇEK eşiğiyle aynı
    olmalı. Tik habitProgress → stepsGoal(date) ile dolar (varsayılan 9.000);
    STEP_TICK_MIN=4500 hiçbir yerde okunmaz. "4.500" metni geri gelmemeli. */

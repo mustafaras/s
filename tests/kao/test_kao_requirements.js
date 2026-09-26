@@ -96,10 +96,12 @@ assert.equal(sessionApi.registerQuranLearnSurface({
 sessionApi.ensureQuranLearn(sessionData);
 sessionData.quranLearn.settings.audio = false;
 sessionData.quranLearn.daily['2026-09-24'] = { seed: 'bit-bit korunmalı' };
-assert.ok(sessionApi.kaoStart() >= 2, 'R-A4: iki yönlü ilk kelime oturumu başlamalı');
+assert.ok(sessionApi.kaoStart() >= 2, 'R-A4: ilk kelime oturumu başlamalı');
 assert.equal(fullRenders, 1);
+// KAO-FIX-06 (Y-2): ilk oturumda her yeni lemma ar>tr ile açılır; tr>ar en erken ertesi gün gelir
+// (kelime düzeyi iki yön: test_kao_queue.js 120 günlük tarama).
 const directions = new Set(sessionUi.kaoQueue.map((item) => sessionApi.kaoBuildTask(item, sessionData, { seed: item.id }).direction).filter(Boolean));
-assert.deepEqual([...directions].sort(), ['ar>tr', 'tr>ar'], 'tam oturum iki görev türünü taşımalı');
+assert.deepEqual([...directions].sort(), ['ar>tr'], 'ilk oturumda ters yön (tr>ar) henüz açılmamalı');
 const firstItem = sessionUi.kaoQueue.find((item) => item.type !== 'fragment' && sessionApi.kaoBuildTask(item, sessionData, { seed: item.id }).clipId);
 assert.ok(firstItem, 'sesli kelime görevi bulunmalı');
 sessionUi.kaoTaskIndex = sessionUi.kaoQueue.indexOf(firstItem);

@@ -279,6 +279,7 @@
   }
   function seededRank(seed,id){ return xorshift(hashSeed(String(seed)+'|'+String(id))); }
   function daySeed(now){ return now.toISOString().slice(0,10); }
+  function localDayOf(value){ var d=new Date(value); if(!isFinite(d.getTime())) return ''; var pad=function(n){ return (n<10?'0':'')+n; }; return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
   function candidateRecord(raw,cards,opts){
     var id=String(raw&&raw.cardId||raw&&raw.id||'');
     if(!id) return null;
@@ -291,6 +292,8 @@
     for(var i=0;i<ids.length;i+=1){
       var other=cards[ids[i]],introduced=other&&(other.introducedAt||other.firstSeenAt);
       if(!introduced) continue;
+      // Aynı lemmanın diğer yönü yeni kelime değildir; anlamsal aralık yalnız başka lemmalar arasında uygulanır.
+      if(candidate.semantic.lemmaId&&lemmaIdForCard(ids[i])===candidate.semantic.lemmaId) continue;
       var at=new Date(introduced);
       if(!isFinite(at.getTime())||now.getTime()-at.getTime()>=3*DAY_MS) continue;
       if(semanticNeighbors(candidate.semantic,semanticInfo(ids[i],null,opts))) return true;
@@ -317,14 +320,6 @@
       if(eligible(item,selectedNew)) selectedNew.push(item);
       return false;
     });
-    // R-A2: yeni kelimeler iki yönü birlikte taşır; hepsi tek yöndeyse sonuncusu uygun karşı yönlü adayla değişir.
-    var directionOf=function(item){ var match=String(item.cardId).match(/:(ar>tr|tr>ar)$/); return match?match[1]:''; };
-    var words=selectedNew.filter(directionOf),only=words.length>=2&&words.every(function(item){ return directionOf(item)===directionOf(words[0]); })?directionOf(words[0]):'';
-    if(only){
-      var last=words[words.length-1],others=selectedNew.filter(function(item){ return item!==last; });
-      var swap=newRecords.find(function(item){ var direction=directionOf(item); return direction&&direction!==only&&selectedNew.indexOf(item)<0&&eligible(item,others); });
-      if(swap) selectedNew[selectedNew.indexOf(last)]=swap;
-    }
     var remaining=due.concat(selectedNew),out=kaoDelayedCandidates(q,now),typeCounts={grammar:0,fragment:out.length,word:0};
     while(remaining.length){
       var index=-1;
@@ -763,7 +758,15 @@
   function kaoCandidates(){
     var lex=window.QuranLexiconV1;
     if(!lex||!Array.isArray(lex.lemmas)) return [];
-    var candidates=fragmentCandidates().concat(grammarCandidates(),lex.lemmas.map(function(lemma,index){ var direction=index%2?'tr>ar':'ar>tr'; return {id:'w:'+lemma.id+':'+direction,type:direction==='tr>ar'?'arabic':'meaning'}; })),cards=objectOr(quranLearnRoot(quranLearnDeps.data()).cards,{});
+    // Y-2: her lemma önce ar>tr; tr>ar, ar>tr kartı en az bir takvim günü önce açıldıysa öncelikli aday olur.
+    // Yeni kart bütçesi (dailyNew) iki yön için ortaktır.
+    var cards=objectOr(quranLearnRoot(quranLearnDeps.data()).cards,{}),today=quranLearnDeps.todayStr();
+    var reverse=lex.lemmas.filter(function(lemma){
+      // Eski kartta tanıtım zamanı yoksa son tekrar (r) kullanılır; r tanıtımdan önce olamaz, ters yön erken açılmaz.
+      var forward=cards['w:'+lemma.id+':ar>tr'],introduced=forward&&(forward.introducedAt||forward.firstSeenAt||forward.r);
+      return introduced&&!cards['w:'+lemma.id+':tr>ar']&&localDayOf(introduced)&&localDayOf(introduced)<today;
+    }).map(function(lemma){ return {id:'w:'+lemma.id+':tr>ar',type:'arabic',priority:1}; });
+    var candidates=fragmentCandidates().concat(grammarCandidates(),reverse,lex.lemmas.map(function(lemma){ return {id:'w:'+lemma.id+':ar>tr',type:'meaning'}; }));
     Object.keys(cards).forEach(function(id){ if(candidates.every(function(item){ return item.id!==id; })) candidates.push({id:id}); });
     return candidates;
   }
@@ -900,6 +903,8 @@
     var previous=objectOr(cards[task.cardId],{}); correct=choice.correct===true;
     var grade=kaoGrade(correct,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime())),previous.reps),scheduled=kaoSchedule(previous,grade,now);
     if(correct&&scheduled.readerUnknown===true) delete scheduled.readerUnknown;
+    // Kartın ilk sunuluşu: ters yön uygunluğu ve anlamsal aralık bu zamana bakar (resultCard sonraki cevaplarda korur).
+    if(!scheduled.introducedAt&&!nonNegativeNumber(previous.reps,0)) scheduled.introducedAt=now.toISOString();
     var reviewed=nonNegativeNumber(previous.reps,0)>0,afterNight=reviewed&&typeof previous.nightAt==='string';
     if(ui.kaoNight) scheduled.nightAt=key; else delete scheduled.nightAt;
     cards[task.cardId]=scheduled;

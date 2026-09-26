@@ -41,7 +41,7 @@
 | KAO-20 | Tam regresyon + kullanıcı görevleri + kalibrasyon raporu | done | R-A1 R-A3 R-C5 R-C9 |
 | KAO-21 | Hub kartı bileşimi + köprüler (IIP koordineli) | done | — |
 | KAO-22 | Kapanış belgesi | pending | R-C9 |
-| KAO-D1 | Dalga 1 denetimi | pending | — |
+| KAO-D1 | Dalga 1 denetimi | findings | — |
 | KAO-D2 | Dalga 2 denetimi | pending | — |
 | KAO-D3 | Dalga 3 denetimi | pending | — |
 | KAO-D4 | Dalga 4 denetimi | pending | — |
@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 93 | 2026-09-26 | KAO-25 devamı: plan-check öz-testinin "kapılı kart onaysız" senaryosu gerçek STATE'i kopyaladığı için KAO-24'ün 2026-09-23 onayını taşıyordu ve beklenen hatayı üretemiyordu (15/16); senaryo artık onayı siler → 16/16. | KAO-D1 denetim yürütücüsü buldu |
+| 94 | 2026-09-26 | KAO-D1 denetimi: findings. 12/12 kart kontrolü PASS; 2 bulgu (kapsam 0,7742 < 0,78 hedefi; semNeighbors/cognate öneri kapları proposed:true) — gösterilen içeriği etkilemez, kapanışta açık karar; plan-check öz-test hatası bulundu ve 8145a2e ile düzeltildi. | `evidence/KAO-D1/AUDIT.md` |

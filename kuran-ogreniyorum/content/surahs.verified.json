@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "importedAt": "2026-09-26T13:54:07.053Z",
+  "importedAt": "2026-09-26T14:02:09.094Z",
   "rows": {
     "s-95-1-1": {
       "tr": "yemin olsun incire",
@@ -1151,14 +1151,1064 @@
       "tr": "Rabbinden",
       "verifiedBy": "claude-opus-5.5",
       "verifiedAt": "2026-09-26"
+    },
+    "s-99-1-1": {
+      "tr": "ne zaman ki",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-1-2": {
+      "tr": "sarsıldı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-1-3": {
+      "tr": "yeryüzü",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-1-4": {
+      "tr": "kendine has sarsıntısıyla",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-2-1": {
+      "tr": "ve dışarı attı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-2-2": {
+      "tr": "yeryüzü",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-2-3": {
+      "tr": "içindeki ağır yüklerini",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-3-1": {
+      "tr": "ve dedi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-3-2": {
+      "tr": "insanoğlu",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-3-3": {
+      "tr": "ne var",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-3-4": {
+      "tr": "buna",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-4-1": {
+      "tr": "o gün",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-4-2": {
+      "tr": "anlatır",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-4-3": {
+      "tr": "kendi haberlerini",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-5-1": {
+      "tr": "zira",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-5-2": {
+      "tr": "senin Rabbin",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-5-3": {
+      "tr": "vahyetti",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-5-4": {
+      "tr": "kendisine",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-6-1": {
+      "tr": "o günde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-6-2": {
+      "tr": "çıkıp gelir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-6-3": {
+      "tr": "insanoğulları",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-6-4": {
+      "tr": "bölük bölük",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-6-5": {
+      "tr": "kendilerine gösterilmek için",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-6-6": {
+      "tr": "amelleri",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-7-1": {
+      "tr": "o hâlde kim",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-7-2": {
+      "tr": "işlerse",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-7-3": {
+      "tr": "ağırlığı kadar",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-7-4": {
+      "tr": "bir zerre",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-7-5": {
+      "tr": "iyilik",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-7-6": {
+      "tr": "onu görecektir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-8-1": {
+      "tr": "ve her kim",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-8-2": {
+      "tr": "işlerse",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-8-3": {
+      "tr": "ağırlığı kadar",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-8-4": {
+      "tr": "bir zerre",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-8-5": {
+      "tr": "kötülük",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-99-8-6": {
+      "tr": "onu görecektir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-1-1": {
+      "tr": "yemin olsun hızla koşanlara",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-1-2": {
+      "tr": "harıl harıl",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-2-1": {
+      "tr": "ve kıvılcım saçanlara",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-2-2": {
+      "tr": "vurarak",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-3-1": {
+      "tr": "ve baskın yapanlara",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-3-2": {
+      "tr": "sabah vakti",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-4-1": {
+      "tr": "ve kaldırdılar",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-4-2": {
+      "tr": "orada",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-4-3": {
+      "tr": "toz duman",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-5-1": {
+      "tr": "ve ortasına daldılar",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-5-2": {
+      "tr": "orada",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-5-3": {
+      "tr": "bir kalabalığın",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-6-1": {
+      "tr": "gerçekten",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-6-2": {
+      "tr": "insanoğlu",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-6-3": {
+      "tr": "Rabbi hakkında",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-6-4": {
+      "tr": "elbette nankördür",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-7-1": {
+      "tr": "ve gerçekten o",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-7-2": {
+      "tr": "üzerine",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-7-3": {
+      "tr": "bunun",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-7-4": {
+      "tr": "elbette şahittir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-8-1": {
+      "tr": "ve gerçekten o",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-8-2": {
+      "tr": "sevgisi hususunda",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-8-3": {
+      "tr": "malın",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-8-4": {
+      "tr": "elbette pek düşkündür",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-9-1": {
+      "tr": "acaba",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-9-2": {
+      "tr": "bilmiyor mu",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-9-3": {
+      "tr": "o zaman ki",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-9-4": {
+      "tr": "altüst edilip çıkarıldı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-9-5": {
+      "tr": "şeyler",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-9-6": {
+      "tr": "içinde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-9-7": {
+      "tr": "kabirlerin",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-10-1": {
+      "tr": "ve ortaya dökülür",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-10-2": {
+      "tr": "şeyler",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-10-3": {
+      "tr": "içinde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-10-4": {
+      "tr": "gönüllerin",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-11-1": {
+      "tr": "gerçekten",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-11-2": {
+      "tr": "onların Rabbi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-11-3": {
+      "tr": "kendilerinden",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-11-4": {
+      "tr": "o günde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-100-11-5": {
+      "tr": "elbette haberdardır",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-1-1": {
+      "tr": "Kâria",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-2-1": {
+      "tr": "ne",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-2-2": {
+      "tr": "Kâria",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-3-1": {
+      "tr": "ve ne",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-3-2": {
+      "tr": "sana bildirdi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-3-3": {
+      "tr": "nedir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-3-4": {
+      "tr": "Kâria",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-4-1": {
+      "tr": "o gün ki",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-4-2": {
+      "tr": "hâle gelir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-4-3": {
+      "tr": "insanoğulları",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-4-4": {
+      "tr": "kelebekler gibi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-4-5": {
+      "tr": "etrafa saçılmış",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-5-1": {
+      "tr": "ve hâle gelir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-5-2": {
+      "tr": "dağ kütleleri",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-5-3": {
+      "tr": "boyalı yün gibi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-5-4": {
+      "tr": "didiklenmiş",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-6-1": {
+      "tr": "artık",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-6-2": {
+      "tr": "her kim ki",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-6-3": {
+      "tr": "ağır basarsa",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-6-4": {
+      "tr": "terazileri",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-7-1": {
+      "tr": "işte o",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-7-2": {
+      "tr": "içinde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-7-3": {
+      "tr": "bir yaşayış",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-7-4": {
+      "tr": "hoşnut olunacak",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-8-1": {
+      "tr": "diğer yandan",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-8-2": {
+      "tr": "her kim ki",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-8-3": {
+      "tr": "hafif kalırsa",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-8-4": {
+      "tr": "terazileri",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-9-1": {
+      "tr": "onun sığınağı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-9-2": {
+      "tr": "Hâviye'dir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-10-1": {
+      "tr": "ve ne",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-10-2": {
+      "tr": "sana bildirdi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-10-3": {
+      "tr": "nedir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-10-4": {
+      "tr": "o",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-11-1": {
+      "tr": "bir ateş",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-101-11-2": {
+      "tr": "alev alev yanan",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-1-1": {
+      "tr": "sizi meşgul etti",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-1-2": {
+      "tr": "çoğalma hırsı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-2-1": {
+      "tr": "ta ki",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-2-2": {
+      "tr": "vardınız",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-2-3": {
+      "tr": "mezarlara",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-3-1": {
+      "tr": "asla",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-3-2": {
+      "tr": "ileride",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-3-3": {
+      "tr": "öğreneceksiniz",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-4-1": {
+      "tr": "ardından",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-4-2": {
+      "tr": "asla",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-4-3": {
+      "tr": "ileride",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-4-4": {
+      "tr": "öğreneceksiniz",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-5-1": {
+      "tr": "asla",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-5-2": {
+      "tr": "eğer",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-5-3": {
+      "tr": "bilmiş olsaydınız",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-5-4": {
+      "tr": "bir bilgiyle",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-5-5": {
+      "tr": "yakîn",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-6-1": {
+      "tr": "elbette görecektiniz",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-6-2": {
+      "tr": "Cahîm'i",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-7-1": {
+      "tr": "ardından",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-7-2": {
+      "tr": "elbette onu göreceksiniz",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-7-3": {
+      "tr": "gözüyle",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-7-4": {
+      "tr": "yakîn",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-8-1": {
+      "tr": "ardından",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-8-2": {
+      "tr": "elbette sorguya çekileceksiniz",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-8-3": {
+      "tr": "o günde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-8-4": {
+      "tr": "hakkında",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-102-8-5": {
+      "tr": "nimetler",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-1-1": {
+      "tr": "yemin olsun asra",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-2-1": {
+      "tr": "gerçekten",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-2-2": {
+      "tr": "insanoğlu",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-2-3": {
+      "tr": "elbette içindedir",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-2-4": {
+      "tr": "bir hüsran",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-1": {
+      "tr": "müstesna",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-2": {
+      "tr": "o kimseler ki",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-3": {
+      "tr": "iman ettiler",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-4": {
+      "tr": "ve işlediler",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-5": {
+      "tr": "salih amelleri",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-6": {
+      "tr": "ve birbirlerine öğütlediler",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-7": {
+      "tr": "hak olanı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-8": {
+      "tr": "ve birbirlerine öğütlediler",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-103-3-9": {
+      "tr": "sabretmeyi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-1-1": {
+      "tr": "yazıklar olsun",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-1-2": {
+      "tr": "her birine",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-1-3": {
+      "tr": "arkadan çekiştiren",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-1-4": {
+      "tr": "yüze karşı ayıplayan",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-2-1": {
+      "tr": "ki o",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-2-2": {
+      "tr": "biriktirdi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-2-3": {
+      "tr": "servet",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-2-4": {
+      "tr": "ve onu tekrar tekrar saydı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-3-1": {
+      "tr": "zanneder",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-3-2": {
+      "tr": "ki",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-3-3": {
+      "tr": "servetinin",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-3-4": {
+      "tr": "kendisini ölümsüz kıldığını",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-4-1": {
+      "tr": "asla",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-4-2": {
+      "tr": "elbette fırlatılacaktır",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-4-3": {
+      "tr": "içine",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-4-4": {
+      "tr": "Hutame",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-5-1": {
+      "tr": "ve ne",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-5-2": {
+      "tr": "sana bildirdi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-5-3": {
+      "tr": "ne olduğunu",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-5-4": {
+      "tr": "o Hutame",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-6-1": {
+      "tr": "ateşi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-6-2": {
+      "tr": "Allah Teâlâ'nın",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-6-3": {
+      "tr": "alevlendirilmiş",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-7-1": {
+      "tr": "öyle ki o",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-7-2": {
+      "tr": "sızıp ulaşır",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-7-3": {
+      "tr": "-e kadar",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-7-4": {
+      "tr": "kalplere",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-8-1": {
+      "tr": "gerçekten o",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-8-2": {
+      "tr": "üstlerine",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-8-3": {
+      "tr": "kapısı sıkıca kapatılmış",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-9-1": {
+      "tr": "içinde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-9-2": {
+      "tr": "sütunlar",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-104-9-3": {
+      "tr": "boylu boyunca uzanan",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-1-1": {
+      "tr": "acaba",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-1-2": {
+      "tr": "görmedin mi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-1-3": {
+      "tr": "ne şekilde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-1-4": {
+      "tr": "davrandı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-1-5": {
+      "tr": "senin Rabbin",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-1-6": {
+      "tr": "ashabına",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-1-7": {
+      "tr": "filin",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-2-1": {
+      "tr": "acaba",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-2-2": {
+      "tr": "kılmadı mı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-2-3": {
+      "tr": "onların hilesini",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-2-4": {
+      "tr": "içinde",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-2-5": {
+      "tr": "boşa çıkma",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-3-1": {
+      "tr": "ve saldı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-3-2": {
+      "tr": "üstlerine",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-3-3": {
+      "tr": "kuşları",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-3-4": {
+      "tr": "bölük bölük",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-4-1": {
+      "tr": "onları taşlıyorlardı",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-4-2": {
+      "tr": "taşlarla",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-4-3": {
+      "tr": "-den",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-4-4": {
+      "tr": "pişkin çamur",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-5-1": {
+      "tr": "sonunda onları çevirdi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-5-2": {
+      "tr": "hasat artığı gibi",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
+    },
+    "s-105-5-3": {
+      "tr": "yenilip çiğnenmiş",
+      "verifiedBy": "claude-opus-5.5",
+      "verifiedAt": "2026-09-26"
     }
   },
   "counts": {
     "total": 837,
-    "filled": 230,
+    "filled": 440,
     "copy": 0,
     "language": 0,
-    "missing": 607,
+    "missing": 397,
     "invalid": 0
   }
 }

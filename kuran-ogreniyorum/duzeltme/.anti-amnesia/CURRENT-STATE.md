@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-03/B** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-03/C** · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı, yerel) · **Taban:** `main` @ `58e0ceb` · **Yayın:** YETKİSİZ (her push/deploy ayrı kullanıcı onayı)
-**Güncelleme:** 2026-09-26 · KAO-FIX-03/A done
+**Güncelleme:** 2026-09-26 · KAO-FIX-03/B done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -14,8 +14,8 @@
 | KAO-FIX-00 | — | done | denetim `201ff6d` · FIX-00 `5863002` | dal + kararlar (hepsi varsayılan) + taban |
 | KAO-FIX-01 | O-4 | done | `0d54321` | freeze pini + repro testi (4 modül bayt-eş) |
 | KAO-FIX-02 | K-1, Y-3 | done | `1ff09b1` | çalışma kitabı 837 satır + içe alma kapısı |
-| KAO-FIX-03/A | K-1, Y-3 | done | `git log --grep=KAO-FIX-03/A` | 95–98 (230 satır) filled, copy 0, language 0 |
-| KAO-FIX-03/B | K-1, Y-3 | todo | | 99–105 (210) |
+| KAO-FIX-03/A | K-1, Y-3 | done | `bebb5de` | 95–98 (230 satır) filled, copy 0, language 0 |
+| KAO-FIX-03/B | K-1, Y-3 | done | `git log --grep=KAO-FIX-03/B` | 99–105 (210) filled, copy 0, language 0 |
 | KAO-FIX-03/C | K-1, Y-3 | todo | | 106–114 (178) |
 | KAO-FIX-03/D | K-1, Y-3 | todo | | Fâtiha 29 + tamamlayıcı 190 |
 | KAO-FIX-04 | K-1, Y-3 | todo | | dondurma + atıf + pin |

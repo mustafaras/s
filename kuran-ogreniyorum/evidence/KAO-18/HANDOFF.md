@@ -4,7 +4,7 @@
 
 ## Ne yapıldı
 
-- : KAO yüzeyinin tüm metin renklerini açık/koyu temada WCAG ile ölçer (322 ölçüm, 0 hata).
+- `kuran-ogreniyorum/tools/kao-verify-contrast.mjs`: KAO yüzeyinin tüm metin renklerini açık/koyu temada WCAG ile ölçer (322 ölçüm, 0 hata).
 - Yayındaki sürümde bulunan 34 düşük kontrast düzeltildi; en ağırı koyu temada neredeyse görünmeyen altın etiketlerdi (1,1:1).
 - 3 hareke tonu × 2 tema, odak halkası, 44 px hedefler ve %200/320 px yeniden akış (statik) render fixture'ında sabit.
 

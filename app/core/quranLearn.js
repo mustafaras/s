@@ -338,14 +338,20 @@
     }
     return out;
   }
-  function kaoPickDistractors(d,targetId,count,options){
-    var opts=options&&typeof options==='object'?options:{},q=quranLearnRoot(d),cards=objectOr(q.cards,{});
-    var targetCard=objectOr(cards[targetId],{}),target=metaFor(targetId,null,opts);
+  // R-A2: hedefin bir önceki tekrarındaki çeldiriciler (cevapta yazılan card.lastDistractors). Aynı lemmanın
+  // öteki yön kartı da aynı çeldirici sayılır; dışlama lemma düzeyindedir.
+  function previousDistractorLemmas(d,targetId,opts){
+    var cards=objectOr(quranLearnRoot(d).cards,{}),targetCard=objectOr(cards[targetId],{});
     var previousMap=opts.previousDistractors&&typeof opts.previousDistractors==='object'?opts.previousDistractors:{};
     var previous=Array.isArray(previousMap[targetId])?previousMap[targetId]:(Array.isArray(targetCard.lastDistractors)?targetCard.lastDistractors:[]);
+    return previous.map(function(id){ return lemmaIdForCard(id)||String(id); });
+  }
+  function kaoPickDistractors(d,targetId,count,options){
+    var opts=options&&typeof options==='object'?options:{},q=quranLearnRoot(d),cards=objectOr(q.cards,{});
+    var target=metaFor(targetId,null,opts),previous=previousDistractorLemmas(d,targetId,opts);
     var limit=Math.max(0,Math.floor(nonNegativeNumber(count,3)));
     return Object.keys(cards).filter(function(id){
-      if(id===targetId||previous.indexOf(id)>=0) return false;
+      if(id===targetId||previous.indexOf(lemmaIdForCard(id)||id)>=0) return false;
       var card=cards[id],meta=metaFor(id,null,opts);
       return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=21&&!!target.pos&&meta.pos===target.pos&&!!target.root&&!!meta.root&&meta.root!==target.root;
     }).sort(function(a,b){
@@ -365,7 +371,8 @@
     var answer=direction==='tr>ar'?String(meta.ar||id):String(meanings[0]||meta.meaning||id);
     var picked=kaoPickDistractors(d,id,3,opts),lex=window.QuranLexiconV1;
     if(picked.length<3&&lex&&Array.isArray(lex.lemmas)){
-      lex.lemmas.filter(function(lemma){ return lemma.id!==lemmaIdForCard(id)&&lemma.pos===meta.pos&&lemma.root!==meta.root; }).sort(function(a,b){ return seededRank(String(opts.seed||'')+'|fallback|'+id,a.id)-seededRank(String(opts.seed||'')+'|fallback|'+id,b.id); }).some(function(lemma){
+      var previousLemmas=previousDistractorLemmas(d,id,opts),pickedLemmas=picked.map(function(item){ return lemmaIdForCard(item.cardId); });
+      lex.lemmas.filter(function(lemma){ return lemma.id!==lemmaIdForCard(id)&&lemma.pos===meta.pos&&lemma.root!==meta.root&&previousLemmas.indexOf(lemma.id)<0&&pickedLemmas.indexOf(lemma.id)<0; }).sort(function(a,b){ return seededRank(String(opts.seed||'')+'|fallback|'+id,a.id)-seededRank(String(opts.seed||'')+'|fallback|'+id,b.id); }).some(function(lemma){
         if(picked.length>=3) return true;
         picked.push({cardId:'w:'+lemma.id+':'+direction,label:direction==='tr>ar'?lemma.ar:String(lemma.meanings[0]||lemma.id)});
         return false;
@@ -903,6 +910,9 @@
     var previous=objectOr(cards[task.cardId],{}); correct=choice.correct===true;
     var grade=kaoGrade(correct,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime())),previous.reps),scheduled=kaoSchedule(previous,grade,now);
     if(correct&&scheduled.readerUnknown===true) delete scheduled.readerUnknown;
+    // R-A2: kelime görevinde bu tekrarın çeldiricileri (lemma kimliği; dışlama lemma düzeyinde, kart kimliğinden
+    // küçük) sonraki tekrarda dışlanmak üzere kartta tutulur.
+    if(/^w:/.test(task.cardId)&&Array.isArray(task.choices)) scheduled.lastDistractors=task.choices.filter(function(choice){ return !choice.correct&&choice.cardId; }).map(function(choice){ return lemmaIdForCard(choice.cardId)||String(choice.cardId); }).slice(0,3);
     // Kartın ilk sunuluşu: ters yön uygunluğu ve anlamsal aralık bu zamana bakar (resultCard sonraki cevaplarda korur).
     if(!scheduled.introducedAt&&!nonNegativeNumber(previous.reps,0)) scheduled.introducedAt=now.toISOString();
     var reviewed=nonNegativeNumber(previous.reps,0)>0,afterNight=reviewed&&typeof previous.nightAt==='string';

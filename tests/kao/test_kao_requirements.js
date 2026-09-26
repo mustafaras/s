@@ -345,6 +345,46 @@ function sandboxLemma(api, lemmaId) {
   assert.deepEqual([cell({}, ['108:1']).percent, cell({}, ['108:1', '108:2', '108:3']).percent], [33, 100], 'Kevser 3 âyet');
 }
 
+// KAO-FIX-08 (R-A2, O-1): enjeksiyonsuz — aynı hedef iki ardışık gün kaoStart → kaoAnswer ile sunulur;
+// çeldirici kümeleri kesişmez (lastDistractors üretim yolunda yazılır ve okunur).
+{
+  const lexBox = { window: {} };
+  vm.createContext(lexBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), lexBox);
+  const all = lexBox.window.QuranLexiconV1.lemmas;
+  const target = all.find((lemma) => lemma.pos && lemma.root && all.filter((other) => other.pos === lemma.pos && other.root && other.root !== lemma.root).length >= 6);
+  const pool = all.filter((other) => other.id !== target.id && other.pos === target.pos && other.root && other.root !== target.root).slice(0, 6);
+  assert.equal(pool.length, 6, 'havuzda 6 uygun kart');
+  let day = '2026-10-01';
+  const data = { quranLearn: null };
+  const ui = {};
+  const api = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return day; } });
+  api.ensureQuranLearn(data);
+  const q = data.quranLearn;
+  q.settings.dailyNew = 0; q.settings.audio = false;
+  const far = '2027-01-01T00:00:00.000Z';
+  for (const lemma of pool) q.cards[`w:${lemma.id}:ar>tr`] = { state: 'review', s: 30, d: 5, reps: 6, due: far, r: '2026-09-01T00:00:00.000Z' };
+  const targetId = `w:${target.id}:ar>tr`;
+  const seen = [];
+  for (const date of ['2026-10-01', '2026-10-02']) {
+    day = date;
+    q.cards[targetId] = Object.assign({ state: 'review', s: 30, d: 5, reps: 6, r: '2026-09-01T00:00:00.000Z' }, q.cards[targetId] || {}, { due: '2026-09-02T00:00:00.000Z' }); // gerçek saatten önce: her gün vadesi gelmiş
+    api.kaoStart();
+    const index = ui.kaoQueue.findIndex((item) => item.cardId === targetId);
+    assert.ok(index >= 0, `${date}: hedef kart kuyrukta`);
+    ui.kaoTaskIndex = index;
+    const item = ui.kaoQueue[index];
+    ui.kaoTasks = ui.kaoTasks || {};
+    const task = ui.kaoTasks[item.id] = api.kaoBuildTask(item, data, { seed: item.id });
+    const distractors = Array.from(task.choices.filter((choice) => !choice.correct), (choice) => choice.cardId); // VM dizisini ana alana taşı
+    assert.equal(distractors.length, 3, `${date}: 3 çeldirici`);
+    seen.push(distractors);
+    assert.notEqual(api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId), false, `${date}: cevap kaydedilmeli`);
+    assert.deepEqual(Array.from(q.cards[targetId].lastDistractors || []), distractors.map((id) => id.split(':')[1]), `${date}: lastDistractors (lemma kimliği) cevapta yazılmalı`);
+  }
+  assert.deepEqual(seen[1].filter((id) => seen[0].includes(id)), [], 'R-A2: ardışık iki tekrarda aynı çeldirici gelmez (üretim yolu)');
+}
+
 // KAO-FIX-07 (Y-1, 02 §3): bilinen lemma = her iki yönde review ∧ s≥21 (yetim ve okuyucu-bilinmeyen hariç).
 {
   const api = loadApi();

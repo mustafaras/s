@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-11** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`5413819` (FIX-09, Pages success; canlı pin `20260926g`); sonraki her push/deploy yine ayrı onay
-**Güncelleme:** 2026-09-26 · KAO-FIX-10 done
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-12** · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`5ccf5db` (FIX-10, Pages success; canlı pin `20260926h`); sonraki her push/deploy yine ayrı onay
+**Güncelleme:** 2026-09-26 · KAO-FIX-11 done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -24,8 +24,8 @@
 | KAO-FIX-07 | Y-1 | done | `70b7dbc` | bilinen = iki yönde review∧s≥21; sim kod=plan 505; M10 YAKALANDI |
 | KAO-FIX-08 | O-1 | done | `f021e8a` | lastDistractors cevapta yazılır (lemma kimliği), lemma düzeyinde dışlama |
 | KAO-FIX-09 | O-2 | done | `5413819` | KF-10: budama yok, 100 KB sınırı kaldırıldı; koruma testi |
-| KAO-FIX-10 | O-3 | done | `git log --grep=KAO-FIX-10` | kaoMilestoneCheck + isSettled; sim 4 taş dolu; eighty tavan %77,42 (FIX-16) |
-| KAO-FIX-11 | O-5 | todo | | test kör noktaları, mutasyon 15/15 |
+| KAO-FIX-10 | O-3 | done | `5ccf5db` | kaoMilestoneCheck + isSettled; sim 4 taş dolu; eighty tavan %77,42 (FIX-16) |
+| KAO-FIX-11 | O-5 | done | `git log --grep=KAO-FIX-11` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
 | KAO-FIX-12 | O-6 | todo | | kaynaklar/lisanslar E7 |
 | KAO-FIX-13 | O-9 | todo | | Arapça yazı tipi |
 | KAO-FIX-14 | O-7 | todo | | semNeighbors sözlükten |
@@ -82,6 +82,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 14. **`isDurable` tek kalıcılık kuralı (FIX-07);** bilinen lemma iki yönde kalıcı. Mutasyon M04/M09 hâlâ KAÇTI → FIX-11.
 15. **Veri bütçesi (FIX-09 → KF-10 kapandı):** sim 365 g `quranLearn` 241 KB (taban) → 394 (FIX-06, 2× kart) → 464 KB (FIX-08 `lastDistractors`). Kullanıcı: budama yok, sınır yok (`test_kao_state_budget.js` korur). FIX-16 kapanış ekine 05 §2 / `stateBudgetKB` istisnası yazılmalı.
 16. **`eighty` taşı kazanılamaz (FIX-10):** token kapsamı tavanı %77,42 < %80 (plan LEM havuzu %80,9). FIX-16'da karar: eşik/ölçü hizası. `isSettled(card,minS)` tek kalıcılık kuralı; M10 `isDurable`'ı hedefler.
+17. **İşlev kelimesi görevinde çeldirici yok (FIX-11 bulgusu):** kökü olmayan ~49 lemma × 2 yön tek şıklı (sözlük yedeği `root!==root` undefined'ı eler). Üretim düzeltmesi kullanıcı kararı bekliyor. `rsync --delete` hedefini daima doğrula (FIX-11 olayı).
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

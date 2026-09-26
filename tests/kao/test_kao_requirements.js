@@ -385,6 +385,50 @@ function sandboxLemma(api, lemmaId) {
   assert.deepEqual(seen[1].filter((id) => seen[0].includes(id)), [], 'R-A2: ardışık iki tekrarda aynı çeldirici gelmez (üretim yolu)');
 }
 
+// KAO-FIX-11 (O-5): undo `errors` geri sarımı (M04) ve oturum içi tek tekrar (02 §2.10).
+{
+  const data = { quranLearn: null };
+  const ui = {};
+  const api = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return '2026-10-06'; } });
+  api.ensureQuranLearn(data);
+  const q = data.quranLearn;
+  q.settings.audio = false;
+  const answerCurrent = (pickCorrect) => {
+    const item = ui.kaoQueue[ui.kaoTaskIndex];
+    const task = api.kaoBuildTask(item, data, { seed: item.id });
+    const choice = task.choices.find((option) => option.correct === pickCorrect);
+    assert.ok(choice, `${task.id}: ${pickCorrect ? 'doğru' : 'yanlış'} seçenek olmalı`);
+    return { task, result: api.kaoAnswer(task.id, choice.choiceId) };
+  };
+  // Undo errors: errorClass taşıyan gramer görevi yanlış → errors[cls] +1 → kaoUndo → errors bit-bit eski.
+  const grammarId = Array.from(api.kaoGrammarCandidates(), (candidate) => candidate.id)[0];
+  ui.kaoQueue = [{ id: `kao:2026-10-06:${grammarId}`, cardId: grammarId, type: 'grammar', isNew: true }];
+  ui.kaoTaskIndex = 0;
+  const grammarTask = api.kaoBuildTask(ui.kaoQueue[0], data, { seed: ui.kaoQueue[0].id });
+  assert.ok(grammarTask.errorClass && Object.prototype.hasOwnProperty.call(q.errors, grammarTask.errorClass), 'gramer görevi errorClass taşır');
+  const errorsBefore = JSON.stringify(q.errors);
+  answerCurrent(false);
+  assert.equal(q.errors[grammarTask.errorClass], JSON.parse(errorsBefore)[grammarTask.errorClass] + 1, 'yanlış cevap hata sınıfını artırır');
+  assert.equal(api.kaoUndo(), true);
+  assert.equal(JSON.stringify(q.errors), errorsBefore, 'R-C3: undo errors sayacını bit-bit geri sarar');
+  // Oturum içi tekrar: yanlış kelime görevi kuyruk sonuna :retry ile bir kez eklenir; retry de yanlışsa ikinci kez eklenmez.
+  const lexBox = { window: {} };
+  vm.createContext(lexBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), lexBox);
+  // İsim lemması: kökü olmayan işlev kelimelerinde çeldirici yok (ayrı bulgu, FIX-11 kanıtı); tekrar davranışı ondan bağımsız sınanır.
+  const wordId = `w:${lexBox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.pos === 'N' && lemma.root).id}:ar>tr`;
+  ui.kaoQueue = [{ id: `kao:2026-10-06:${wordId}`, cardId: wordId, type: 'meaning', isNew: true }];
+  ui.kaoTaskIndex = 0; ui.kaoUndo = null;
+  answerCurrent(false);
+  const retries = () => ui.kaoQueue.filter((item) => /:retry$/.test(item.id));
+  assert.equal(retries().length, 1, 'yanlış cevap kuyruğa bir tekrar ekler');
+  assert.equal(ui.kaoQueue[ui.kaoQueue.length - 1].id, `kao:2026-10-06:${wordId}:retry`, 'tekrar kuyruğun sonunda');
+  assert.equal(ui.kaoQueue[ui.kaoQueue.length - 1].retry, true);
+  assert.equal(ui.kaoTaskIndex, ui.kaoQueue.length - 1, 'sıradaki görev tekrar');
+  answerCurrent(false);
+  assert.equal(retries().length, 1, 'tekrar da yanlışsa ikinci tekrar eklenmez');
+}
+
 // KAO-FIX-10 (O-3, 03 §10): kilometre taşları — eşiğin bir altında yok, eşikte kazanılır; bir kez kazanılan geri alınmaz.
 {
   const lexBox = { window: {} };

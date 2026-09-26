@@ -21,7 +21,9 @@ const M = [
   { id: 'M12 R-C5 preload none', file: QL, from: "audio.preload='none';", to: "audio.preload='auto';", all: true, tests: ['tests/kao/test_kao_privacy.js', 'tests/kao/test_kao_user_tasks.js'] },
   { id: 'M13 R-C8 panel özet anahtarı ekle', file: 'panel/panelCoverageManifest.js', from: "var QURAN_LEARN_SUMMARY_KEYS=['v',", to: "var QURAN_LEARN_SUMMARY_KEYS=['v','cards',", tests: ['tests/kao/test_kao_panel_projection.js'] },
   { id: 'M14 R-C8 özet yerine ham kök', file: 'panel/panelCoverageManifest.js', from: 'var SUMMARY_ONLY_ROOTS={quranLearn:quranLearnSummary};', to: 'var SUMMARY_ONLY_ROOTS={};', tests: ['tests/kao/test_kao_panel_projection.js', 'tests/panel/test_panel_p1_projection.js'] },
-  { id: 'M15 11§2 hub kartı bileşimi', file: 'app/core/saygi.js', from: "function kaoHub(){ var f=dep('kaoHubCardHTML'); return f?f.apply(null,arguments):''; }", to: "function kaoHub(){ return ''; }", tests: ['tests/kao/test_kao_independence.js', 'tests/kao/test_kao_render.js'] }
+  { id: 'M15 11§2 hub kartı bileşimi', file: 'app/core/saygi.js', from: "function kaoHub(){ var f=dep('kaoHubCardHTML'); return f?f.apply(null,arguments):''; }", to: "function kaoHub(){ return ''; }", tests: ['tests/kao/test_kao_independence.js', 'tests/kao/test_kao_render.js'] },
+  { id: 'M16 02§2.10 oturum içi tekrar yok (FIX-11)', file: QL, from: 'if(!correct&&!task.retry) ui.kaoQueue.push(', to: 'if(false) ui.kaoQueue.push(', tests: ['tests/kao/test_kao_requirements.js'] },
+  { id: 'M17 02§2.10 tekrar sınırsız (FIX-11)', file: QL, from: 'if(!correct&&!task.retry) ui.kaoQueue.push(', to: 'if(!correct) ui.kaoQueue.push(', tests: ['tests/kao/test_kao_requirements.js'] },
 ];
 
 const results = [];

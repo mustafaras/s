@@ -48,6 +48,14 @@ assert.ok(first.filter((item) => !item.isNew).length <= 60, 'due üst sınırı 
 assert.ok(first.filter((item) => item.isNew).length <= 10, 'yeni üst sınırı dailyNew');
 assert.ok(first.filter((item) => item.type === 'grammar').length <= 4, 'KAO-12 gramer üst sınırı 4');
 assert.ok(first.filter((item) => item.type === 'fragment').length <= 2, 'parça üst sınırı 2');
+
+// KAO-FIX-11 (O-5, M09): 40 yeni aday varken kuyruktaki yeni kart sayısı tam olarak dailyNew.
+// Türler dönüşümlü (meaning/arabic): ardışık aynı tür ≤2 kuralı sınırı gizlemesin.
+for (const dailyNew of [5, 10, 15]) {
+  const fresh = Array.from({ length: 40 }, (_, i) => ({ id: `w:budget-${i}:${i % 2 ? 'tr>ar' : 'ar>tr'}`, type: i % 2 ? 'arabic' : 'meaning', isNew: true, pos: 'N', root: `br${i}`, meanings: [`b${i}`] }));
+  const queue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew }, cards: {}, daily: {} } }, now, { candidates: fresh, sessionId: `budget-${dailyNew}` });
+  assert.equal(queue.filter((item) => item.isNew).length, dailyNew, `dailyNew=${dailyNew}: yeni kart sayısı tam olarak ${dailyNew}`);
+}
 for (let i = 2; i < first.length; i += 1) {
   assert.ok(first[i].type === 'grammar' || !(first[i].type === first[i - 1].type && first[i].type === first[i - 2].type), 'gramer dışı aynı tür ardışık en çok 2');
 }

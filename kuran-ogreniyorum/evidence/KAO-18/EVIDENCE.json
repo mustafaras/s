@@ -1,0 +1,57 @@
+{
+  "card": "KAO-18",
+  "head": "e578ae0ecca1c22ae8208afb24706cee3f74ec9e",
+  "diffHash": "c8afc81da063f38f938dae37c4e815543a74a248c08cecd8d726c995e095de2c",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-26",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "scope": "KAO renk çiftleri WCAG ölçümü (açık + koyu tema), 3 hareke tonu × 2 tema, odak halkası, 44 px hedef, %200 metin / 320 px yeniden akış (statik, headless)",
+  "tool": "kuran-ogreniyorum/tools/kao-verify-contrast.mjs — styles.css tokenları + kao.css bildirimleri; var/#hex/rgba/color-mix/gradyan çözümü, katmanlı zemin bindirme; 35 elle seçilmiş çift + kao.css'teki 126 renk bildiriminin otomatik taraması × 2 tema = 322 ölçüm",
+  "before": "İlk ölçümde 19 elle seçilmiş çift + 15 otomatik bildirim eşiğin altındaydı (yayındaki sürüm). En ağırları: koyu temada --quran-gold-ink (#172B45) metinleri 1,06–1,20:1 (süre çipi, E5 okunuş etiketi, harf çipi Latin harfi); koyu temada --quran lacivert metin/dolgu 3,57–3,73:1 (eyebrow, canlı bildirim, birincil/ikincil düğme, seçili segment, ısı haritası kesinleşti, kesra); açık temada altın odak halkası 2,09:1, ilerleme çubuğu 1,86:1, namaz kapalı anlam 2,61:1, okuyucu bilinmeyen anlam 2,17:1",
+  "fixes": [
+    "metin/dolgu --quran → --quran-mid (açık temada aynı renk, koyu temada açık ton)",
+    "metin --quran-gold-ink → --quran-gold",
+    "odak halkası --quran2 → --quran-mid",
+    "ilerleme gradyanı quran-mid → mix(quran-mid 70%, quran2)",
+    "ikincil metin color-mix oranları %38–64 → %72–76",
+    "kognat kayması zemini %16 → %10, E5 okunuş zemini altın %11 → %7",
+    "sûre seçici seçili ve namaz adım numarası metni --quran-ink",
+    ".kao-fade min 44×44 px; sayı rozetleri min-width/min-height ile büyür; hub durum pastilinde nowrap kaldırıldı"
+  ],
+  "after": {
+    "pairs": 322,
+    "failed": 0
+  },
+  "lowestMargins": [
+    "KOYU · otomatik · .kao-unit-number 4.52:1 (≥4.5)",
+    "AÇIK · Okunuş etiketi (E5) 4.57:1 (≥4.5)",
+    "AÇIK · Isı haritası %75-99 4.6:1 (≥4.5)",
+    "KOYU · otomatik · .kao-hub-foot>b 4.71:1 (≥4.5)",
+    "AÇIK · otomatik · .kao-flag 4.8:1 (≥4.5)",
+    "AÇIK · otomatik · .kao-reader-meaning 4.8:1 (≥4.5)",
+    "AÇIK · otomatik · .kao-setting-hint 4.8:1 (≥4.5)",
+    "KOYU · otomatik · .kao-hub-ayah b 4.84:1 (≥4.5)"
+  ],
+  "harakatTones": [
+    "AÇIK Hareke · fetha 5.57",
+    "AÇIK Hareke · kesra 10.58",
+    "AÇIK Hareke · damma 5.51",
+    "KOYU Hareke · fetha 8.4",
+    "KOYU Hareke · kesra 5.17",
+    "KOYU Hareke · damma 9.99"
+  ],
+  "decorativeExcluded": "aria-hidden süsler (hub süsü, rozet, ۞ işareti) metin kapsamı dışı; yalnız ikon taşıyan kaplar (mühür/işaret/mahreç) 3:1 grafik eşiğiyle ölçüldü",
+  "reflow": "Statik: nowrap yok, akıştaki sabit genişlikler ≤288 px (320 − 2×16), px yazı boyutu yok (rem/token/clamp), sayı rozetleri büyüyebilir. Gerçek tarayıcıda %200 yakınlaştırma ölçümü yapılmadı.",
+  "checks": {
+    "kao-verify-contrast": "exit 0 (322/322)",
+    "docs/apple-design/verify-contrast": "exit 0",
+    "test_kao_render": "PASS (44 px, odak, kontrast, yeniden akış)",
+    "fullRegression": "tests/app+kao+quran+panel+panel-v2 147/147, reminder smoke, driver, zikr, verify-*, shell PASS"
+  },
+  "evidenceLevels": {
+    "source": "statik CSS ölçümü + headless fixture",
+    "deploy": "yok (bu commit)",
+    "device": "yok — gerçek ekranda okunabilirlik ve VoiceOver kullanıcı kabulünde"
+  }
+}

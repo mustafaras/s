@@ -384,7 +384,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
   assert.match(lesson, /<span class="kao-mahrec"><svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"[^>]*role="img" fill="currentColor"><title>/, 'R-B6: inline SVG currentColor');
   assert.doesNotMatch(lesson, /<img/);
   assert.match(lesson, /Karıştırılan çift/); assert.match(lesson, /kao-pronunciation-line/);
-  assert.match(cssSource, /\.kao-mahrec\{display:block;color:var\(--quran\)\}/, 'SVG rengi tema tokenından');
+  assert.match(cssSource, /\.kao-mahrec\{display:block;color:var\(--quran-mid\)\}/, 'SVG rengi tema tokenından');
   api.kaoPhonics('start');
   const taskHtml = api.kaoPhonicsHTML();
   assert.match(taskHtml, /id="kao-phonics-task"/); assert.match(taskHtml, /App\.kaoPhonics\('play'\)/); assert.match(taskHtml, /aria-live="polite"/);
@@ -418,7 +418,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
   assert.match(mapHtml, /110 sûrede henüz veri yok/);
   assert.match(api.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoOpenMap\(\)/, 'E1 girişi');
   assert.match(appSource, /App\.kaoOpenMap=function\(\)\{ return window\.SeymaQuranLearn\.kaoOpenMap\.apply\(null,arguments\); \};/);
-  assert.match(cssSource, /\.kao-map-cell\[data-l="5"\],\.kao-map-legend i\[data-l="5"\]\{background:var\(--quran\);color:var\(--quran-surface\)\}/);
+  assert.match(cssSource, /\.kao-map-cell\[data-l="5"\],\.kao-map-legend i\[data-l="5"\]\{background:var\(--quran-mid\);color:var\(--quran-surface\)\}/);
   appData.quranLearn = saved; ui.kaoView = 'home'; ui.kaoOpen = false;
 }
 
@@ -467,4 +467,30 @@ assert.ok(prevented >= 3 && stopped >= 3);
   appData.quranLearn = saved; ui.kaoView = 'home'; ui.kaoOpen = false;
 }
 
-console.log('KAO render: PASS (E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');
+
+// KAO-18 · 44 px dokunma hedefi, odak halkası ve WCAG kontrast denetimi (R-A9).
+{
+  const rules = [...cssSource.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((match) => ({ selectors: match[1].split(',').map((item) => item.trim()), body: match[2] }));
+  const target = (selector) => { let size = null; for (const rule of rules) if (rule.selectors.includes(selector)) { const match = rule.body.match(/(?:^|;)\s*(?:min-height|height)\s*:\s*(\d+)px/); if (match) size = Number(match[1]); } return size; };
+  const buttonClasses = [...new Set([...source.matchAll(/<button[^>]*class="([a-z0-9 -]+)/g)].flatMap((match) => match[1].split(' ')).filter((name) => name.startsWith('kao-')))];
+  const inherited = { 'kao-chip': '.kao-choices button', 'kao-level1': '.kao-link-button', 'kao-map-cell': '.kao-map-cell' };
+  const small = buttonClasses.filter((name) => !((target('.' + name) || target(inherited[name] || '')) >= 44));
+  assert.deepEqual(small, [], '44 px altı düğme sınıfı yok');
+  for (const selector of ['.kao-choices button', '.kao-seg button', '.kao-surah-picker button', '.kao-ph-letters button', '.kao-ayah-words button', '.kao-ph-attention li button', '.kao-lesson-grid button', '.kao-readability button', '.kao-flag button', '.kao-close', '.kao-waqf']) assert.ok(target(selector) >= 44, `${selector} ≥44 px`);
+  assert.match(cssSource, /\.kao-fade\{[^}]*min-width:44px;min-height:44px/, 'soldurma dokunma hedefi');
+  assert.match(cssSource, /\.kao-hub-card:focus-visible,\.kao-dialog button:focus-visible\{outline:3px solid var\(--quran-mid\);outline-offset:3px\}/, 'odak halkası görünür ve kontrastlı');
+  assert.doesNotMatch(cssSource, /var\(--quran-gold-ink\)/, 'koyu temada okunmayan gold-ink metin rengi kullanılmaz');
+  // %200 metin / 320 px yeniden akış (statik): metin satırı zorlanmaz, akıştaki sabit genişlikler 320 − 2×16 px içinde kalır,
+  // yazı boyutları rem/token tabanlıdır (metin büyütmeyle ölçeklenir), sayı taşıyan rozetler büyüyebilir.
+  assert.doesNotMatch(cssSource, /white-space:nowrap/, 'KAO metni tek satıra zorlanmaz');
+  const flowWidths = rules.filter((rule) => !rule.selectors.every((item) => /::(?:before|after)/.test(item)) && !/position:absolute/.test(rule.body)).flatMap((rule) => [...rule.body.matchAll(/(?:^|;)\s*(?:min-)?width\s*:\s*(\d+)px/g)].map((match) => Number(match[1])));
+  assert.ok(flowWidths.every((width) => width <= 288), `akış genişlikleri ≤288 px (${Math.max(...flowWidths)})`);
+  assert.doesNotMatch(cssSource, /font-size:\s*\d+(?:\.\d+)?px/, 'px yazı boyutu yok');
+  for (const selector of ['.kao-unit-number', '.kao-prayer-line h3 span']) assert.match(cssSource, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{min-width:\\d+px;min-height:\\d+px'), `${selector} metinle büyür`);
+  const { execFileSync } = require('node:child_process');
+  const report = JSON.parse(execFileSync(process.execPath, [path.join(repoRoot, 'kuran-ogreniyorum/tools/kao-verify-contrast.mjs'), '--json'], { encoding: 'utf8' }));
+  assert.equal(report.failed, 0, 'tüm KAO renk çiftleri ≥4.5:1 metin / 3:1 arayüz');
+  for (const tone of ['Hareke · fetha', 'Hareke · kesra', 'Hareke · damma']) for (const theme of ['AÇIK', 'KOYU']) assert.ok(report.results.some((row) => row.label === tone && row.theme === theme && row.pass), `${tone} × ${theme}`);
+}
+
+console.log('KAO render: PASS (KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');

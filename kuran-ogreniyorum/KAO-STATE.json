@@ -18,7 +18,7 @@
     "pagesRun": 35978035375,
     "result": "success"
   },
-  "nextCard": "KAO-18",
+  "nextCard": "KAO-19",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -1400,13 +1400,26 @@
         "kuran-ogreniyorum/tools/kao-verify-contrast.mjs",
         "app/kao.css",
         "tests/kao/test_kao_render.js",
+        "index.html",
+        "sw.js",
+        "tests/app/test_iip_22.js",
+        "tests/app/test_v3_welcome.js",
+        "tests/app/test_app_surface_boot_boundary.js",
+        "tests/app/test_app_surface_domain_boundary.js",
+        "tests/app/test_app_surface_lifecycle_boundary.js",
+        "tests/app/test_app_surface_overlay_boundary.js",
+        "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
         "kuran-ogreniyorum/evidence/KAO-18/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
         "kuran-ogreniyorum/.anti-amnesia/LEDGER.md"
       ],
       "checks": [
-        "node kuran-ogreniyorum/tools/kao-verify-contrast.mjs (tüm çiftler ≥4.5:1 metin / 3:1 UI, 3 hareke tonu × 2 tema)"
+        "node kuran-ogreniyorum/tools/kao-verify-contrast.mjs (tüm çiftler ≥4.5:1 metin / 3:1 UI, 3 hareke tonu × 2 tema)",
+        "node tests/kao/test_kao_render.js",
+        "node tests/app/test_iip_22.js",
+        "node tests/app/test_v3_welcome.js",
+        "node docs/apple-design/verify-contrast.mjs"
       ],
       "req": [
         "R-A9"
@@ -1414,7 +1427,12 @@
       "deps": [
         "KAO-16b"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-26",
+      "agent": "Claude (Opus 5.5)",
+      "scopeNote": "Kapsam: kao.css değişikliği tek yayın pinini 20260925i→20260925j taşıdı (index.html, sw.js, iip_22, v3 ve dört surface pin kardeşi). Token değerleri değiştirilmedi; yalnız kao.css başka token/color-mix seçti.",
+      "completedAt": "2026-09-26",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-18/EVIDENCE.json"
     },
     "KAO-19": {
       "title": "Panel aynası (manifest + özet projeksiyon)",
@@ -1688,7 +1706,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-16b",
+  "lastCompletedPrompt": "KAO-18",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-26 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 25/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-16b · **blockedPrompt:** — · **Sıradaki:** **KAO-18**
+**Güncelleme:** 2026-09-26 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 26/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-18 · **blockedPrompt:** — · **Sıradaki:** **KAO-19**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -36,7 +36,7 @@
 | KAO-28 | E9 Anlayabildiğin âyet | done | — |
 | KAO-28b | E10 Mushaf ısı haritası + gecikmeli sûre testi | done | R-B1 R-C6 |
 | KAO-16b | E11 Namazda ne diyorum | done | R-B2 |
-| KAO-18 | Kontrast ve erişilebilirlik ölçümü | pending | R-A9 |
+| KAO-18 | Kontrast ve erişilebilirlik ölçümü | done | R-A9 |
 | KAO-19 | Panel aynası (manifest + özet projeksiyon) | pending | R-C1 R-C8 |
 | KAO-20 | Tam regresyon + kullanıcı görevleri + kalibrasyon raporu | pending | R-A1 R-A3 R-C5 R-C9 |
 | KAO-21 | Hub kartı bileşimi + köprüler (IIP koordineli) | pending | — |
@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 87 | 2026-09-26 | KAO-16b bitti: E11 Namazda ne diyorum (rekât sırası, açık/kapalı, kuyruğa alma, köprü, E3 Seviye 1 satırı). İçerik: 94/94 namaz okunuşu; araç düzeltmeleri — digraf bozulması (7 okunuş) ve ۟ işaretli harf (21 kelime + 341 örnek); 3 modül deterministik yeniden üretildi. R-A2 yön dengesi hatası düzeltildi (365 gün fixture). Önbellek 20260925i; App pini 754/592. | `evidence/KAO-16b/EVIDENCE.json`; tam regresyon 147/147 PASS |
+| 88 | 2026-09-26 | KAO-18 bitti: kao-verify-contrast.mjs (322 ölçüm, 0 hata); yayındaki 34 düşük kontrast düzeltildi (koyu temada gold-ink 1,1:1, lacivert metin 3,7:1; açık temada odak halkası 2,1:1, ilerleme 1,9:1 vb.) — token değerleri değişmedi; 44 px / odak / yeniden akış fixture'ı; önbellek 20260925j. | ; R-A9 done; tam regresyon 147/147 |

@@ -538,7 +538,7 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // KAO hub kartı dependency bag'e eklendi; app.js cache pini bu kaynak değişikliğiyle
 // aynı düzeltmede ilerletildi. Handler yüzeyi yukarıdaki ayrı kapıda sabit kalır.
 ok('index.html app.js cache-bust güncel (KAO hub köprüsü)',
-  /app\.js\?v=20260925i/.test(indexSource));
+  /app\.js\?v=20260925j/.test(indexSource));
 /* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
    gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',

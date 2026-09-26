@@ -152,10 +152,10 @@ group('FX2-15.2 çıkış/giriş CSS token ve reduced-motion sözleşmesi var',
 }
 
 const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-group('FX2-15.7 App yüzeyi 755, onclick 393 ve render/paint gövdeleri değişmedi',
+group('FX2-15.7 App yüzeyi 756, onclick 393 ve render/paint gövdeleri değişmedi',
   // IIP-10 / DEC-07: App.saygiLens 718 → 719. IIP-11: App.saygiReader 719 → 720.
-  // KAO-14 yüzeyi 730'a çıktı; KAO-15 Seviye 0 dispatcher'ı ekledi. KAO-17 E7 ayarları 734 → 742; KAO-26 stüdyosu 744; KAO-27 gölgeleme 749; KAO-28 âyet 751; KAO-28b harita 752; KAO-16b namaz 754; KAO-21 görünürlük 755 / onclick 393.
-  handlers.size === 755 && (combinedSource.match(/onclick=/g) || []).length === 393 &&
+  // KAO-14 yüzeyi 730'a çıktı; KAO-15 Seviye 0 dispatcher'ı ekledi. KAO-17 E7 ayarları 734 → 742; KAO-26 stüdyosu 744; KAO-27 gölgeleme 749; KAO-28 âyet 751; KAO-28b harita 752; KAO-16b namaz 754; KAO-21 görünürlük 755. ÆON mail emniyeti 756 (tıklama sayısı değişmedi).
+  handlers.size === 756 && (combinedSource.match(/onclick=/g) || []).length === 393 &&
   !/function render\(\)[\s\S]{0,180}sey-leaving/.test(appSource) &&
   !/function paint\(\)[\s\S]{0,180}sey-leaving/.test(appSource));
 

@@ -45,8 +45,35 @@ var first=ctx.fetchLatest('owner/repo','main').then(function(x){
   ok('her latest isteği iptal sinyali taşır (takılı akış kilitlenemez)',!!calls[0].opts.signal&&!!calls[1].opts.signal);
 });
 
-first.then(function(){
-  console.log('[2] Taslak/input koruması ve p50/p95');
+// ── [5] 1 MB gövde sınırı: JSON zarfı gelirse Blobs API'ye düş ───────────
+// 2026-09-26 arızası: latest.json 2,5 MB oldu. Contents API 1 MB üstünde 200
+// döner ama gövdeyi BOŞ verir (encoding:"none", content:""). Bekçiler raw
+// Accept gönderiyor; bu başlık yok sayılırsa panel eline VERİ değil ZARF geçer,
+// `days` undefined olur ve panel legacy fallback'te (eski görünüm) kalır.
+var step5=first.then(function(){
+  console.log('[5] 1 MB gövde sınırı — Blobs API yedeği');
+  var calls=[];
+  var envelope={sha:'abc123',size:2614479,encoding:'none',content:''};
+  var realData={startDate:'2026-06-24',days:{'2026-09-25':{mood:'iyi'}},syncReceipt:{snapshotRevision:'b'.repeat(40),sourceUpdatedAt:'2026-09-25T10:58:54.223Z'}};
+  function resp(status,body){ return {status:status,ok:status>=200&&status<300,headers:{get:function(){return null;}},json:function(){return Promise.resolve(body);},text:function(){return Promise.resolve(typeof body==='string'?body:JSON.stringify(body));}}; }
+  var ctx={Date:Date,Math:Math,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,isFinite:isFinite,Error:Error,encodeURIComponent:encodeURIComponent,setTimeout:setTimeout,clearTimeout:clearTimeout,AbortController:AbortController,PANEL_FETCH_TIMEOUT_MS:20000,PANEL_FETCH_ATTEMPTS:1,PANEL_RETRY_DELAY_MS:5,PANEL_TIMEOUT_GROWTH:1.5,PANEL_LAST_DIAG:{status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null},parseInt:parseInt,isNaN:isNaN,panelRateInfoP:null,panelRateLimitedP:null,panelNoteDiagP:null,panelAttemptP:null,panelAttemptTimeoutP:null,panelRetryableErrorP:null,PTOKEN:'test-token',PANEL_LATEST_CACHE:{etag:null,sourceRevision:null,sourceUpdatedAt:null},PANEL_POLL_STATE:{conditionalMode:'etag'},responseHeaderP:null,pollConditionalDecisionP:null,panelFetchP:null,REPO:'owner/repo',fetch:null};
+  ctx.fetch=function(url){
+    calls.push(url);
+    if(url.indexOf('/git/blobs/')>=0) return Promise.resolve(resp(200,JSON.stringify(realData)));
+    return Promise.resolve(resp(200,envelope));
+  };
+  vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('panelRateInfoP')+'\n'+extractFunction('panelRateLimitedP')+'\n'+extractFunction('panelNoteDiagP')+'\n'+extractFunction('panelFetchP')+'\n'+extractFunction('panelRetryableErrorP')+'\n'+extractFunction('panelAttemptP')+'\n'+extractFunction('panelAttemptTimeoutP')+'\n'+extractFunction('pollConditionalDecisionP')+'\n'+extractFunction('fetchLatest'),ctx,{filename:'panel-latest-blob.js'});
+  return ctx.fetchLatest('owner/repo','main').then(function(x){
+    ok('boş gövdeli JSON zarfı veri sanılmaz', !!(x&&x.data&&x.data.days), 'days yok — legacy fallback riski');
+    ok('Blobs API yedeği çağrılır', calls.some(function(u){ return u.indexOf('/git/blobs/abc123')>=0; }), 'cagrilar='+calls.length);
+    ok('gerçek veri Blobs yanıtından gelir', x.data===realData||(x.data&&x.data.startDate==='2026-06-24'));
+    ok('blob yedeği işaretlenir', !!(x.meta&&x.meta.viaBlob===true));
+  });
+});
+
+// ── [6] Taslak/input koruması ve p50/p95 ────────────────────────────────
+step5.then(function(){
+  console.log('[6] Taslak/input koruması ve p50/p95');
   var statsCode=extractFunction('pollLatencyStatsP');
   var statsCtx={Array:Array,Number:Number,isFinite:isFinite,Math:Math};
   vm.runInNewContext(statsCode,statsCtx,{filename:'panel-p2-stats.js'});

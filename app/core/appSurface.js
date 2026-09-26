@@ -480,7 +480,7 @@
 // K4 kuralı: DOM/timer erişimi ÇIPLAK GLOBAL değil, dep-bag takma adıyla
 // (`doc`/`defer`) yapılır — böylece bu dosya tarayıcı globali adı taşımaz.
 (function(){
-  var FIELD_SURFACE_DEPENDENCIES=["App","HDR_PHASE_TR","MEALS","MOODS","activeDate","addDays","aeonAudioEls","aeonEnsureMediaLoaded","aeonLoadVisibleMedia","aeonMediaCache","aeonPaintFileCard","aeonPaintVoicePlayer","aeonPickAudioMime","aeonRec","aeonRecPaintBars","aeonRecSample","aeonRecTimeStr","aeonTextById","caffeineDrinks","caffeineLastTime","caffeineLimit","caffeineTimingOk","caffeineTotalMg","calGoal","countRec","createDefaultData","currentStreak","dayNutrition","doc","effSteps","el","esc","find","habitCountOn","habitProgress","hasAnyHubEntry","headerActionHTML","headerSaveState","headerSceneHTML","headerSkyClass","headerSkyClassNow","headerSolarProgress","headerSyncSubtitle","heroScienceLine","heroStatTile","htToday","humanFileSize","icon","isIOS","isStandalonePWA","isVacationDay","locationGateErrorText","locationGateFailure","locationGatePermanentFailure","locationGateResetNudge","lunaContext","lunaDayLine","medFreeStreak","onLocationFix","proteinGoal","psychSummaryLines","render","save","sleepGoalHours","stepsGoal","stopLocationWatch","todayStr","waterGoalCups","wxHm","wxMeta"];
+  var FIELD_SURFACE_DEPENDENCIES=["App","HDR_PHASE_TR","MEALS","MOODS","activeDate","addDays","aeonAudioEls","aeonEnsureMediaLoaded","aeonLoadVisibleMedia","aeonMediaCache","aeonPaintFileCard","aeonPaintVoicePlayer","aeonPickAudioMime","aeonRec","aeonRecPaintBars","aeonRecSample","aeonRecTimeStr","aeonTextById","caffeineDrinks","caffeineLastTime","caffeineLimit","caffeineTimingOk","caffeineTotalMg","calGoal","countRec","createDefaultData","currentStreak","dayNutrition","doc","effSteps","el","esc","find","habitCountOn","habitProgress","hasAnyHubEntry","headerActionHTML","headerSaveState","headerSceneHTML","headerSkyClass","headerSkyClassNow","headerSolarProgress","headerSyncSubtitle","heroScienceLine","heroStatTile","htToday","humanFileSize","icon","isIOS","isStandalonePWA","isVacationDay","locationGateErrorText","locationGateFailure","locationGatePermanentFailure","locationGateResetNudge","lunaContext","lunaDayLine","medFreeStreak","onLocationFix","proteinGoal","psychSummaryLines","render","save","sleepGoalHours","stepsGoal","stopLocationWatch","todayStr","waterGoalCups","wxHm","wxMeta","aeonDayDivider","aeonItemHTML","fmt","pushPing","toast","setAeonLastSeenSort","setAeonLastRenderedDateStr","getAeonLastSeenSort","getAeonLastRenderedDateStr"];
   var fieldSurfaceDeps=null;
   var FIELD_SCOPE=Object.create(null);
   function registerFieldSurface(deps){
@@ -790,6 +790,121 @@ function aeonTextById(kind,id,field){
   return field==='answer'?q.answer:q.question;
 }
 
+// ── ÆON mail tetiği emniyeti (2026-09-24 arızası sonrası) ──────────────────
+// Soru gönderilince data/aeon-outbox.json yazılır; veri reposundaki
+// aeon-mail.yml bunu görüp mustafarasit@gmail.com'a mail atar. Eskiden bu
+// çağrı sonucu BEKLENMEZ ve hata sessizce yutulurdu: senkron hata verdiğinde
+// (2,5 MB'lık latest.json GitHub'ın 1 MB gövde sınırını aştığı için) tetik
+// dosyası yazılmıyor, kullanıcı hiçbir uyarı görmüyor, balon "Gönderildi"
+// demeye devam ediyordu. Artık sonuç kayda yazılır, görünür bildirime dönüşür
+// ve başarısızsa balonda "Mail ulaşmadı · Yeniden dene" düğmesi çıkar.
+// Bu gövdeler app.js kabuk bütçesini (7800) büyütmemek için burada yaşar;
+// ağ çağrısı app.js'e ait deps.pushPing üzerinden yapılır.
+function aeonTriggerMailPing(qid,question,ts){
+  var rec=null;
+  try{ (data.aeon.qa||[]).forEach(function(x){ if(x&&x.id===qid) rec=x; }); }catch(e){}
+  if(rec) rec.mailPinged=false; // sonuç gelene kadar "yazılmadı" varsay
+  var p=null;
+  try{ if(typeof pushPing==='function') p=pushPing({id:qid,question:question,ts:ts}); }catch(e){ p=null; }
+  function settle(okErr){
+    var okay=okErr===true;
+    var target=null; try{ (data.aeon.qa||[]).forEach(function(x){ if(x&&x.id===qid) target=x; }); }catch(e){}
+    if(!target) return;
+    target.mailPinged=okay;
+    if(okay){ target.mailPingError=null; }
+    else {
+      target.mailPingError=(okErr&&okErr.message)?String(okErr.message).slice(0,80):'ulasmadi';
+      try{ toast('Mail bildirimi iletilemedi — ÆON balonundan yeniden deneyebilirsin',3200); }catch(e){}
+    }
+    try{ save(); }catch(e){}
+    if(ui.tab==='mesaj'){ try{ render(); }catch(e){} }
+  }
+  if(p&&typeof p.then==='function'){ p.then(function(ok){ settle(ok===true); },function(e){ settle(e); }); }
+  else if(p===true){ settle(true); }
+  else if(p===false){ settle(false); }
+}
+// Mail tetiğini elle yeniden dener (balondaki "Yeniden dene" düğmesi).
+function aeonRetryMail(qid){
+  var rec=null;
+  try{ (data.aeon.qa||[]).forEach(function(x){ if(x&&x.id===qid) rec=x; }); }catch(e){}
+  if(!rec){ toast('Kayıt bulunamadı'); return; }
+  if(rec.mailPinged===true){ toast('Mail zaten gönderildi ✓'); return; }
+  toast('Yeniden deneniyor…',1600);
+  aeonTriggerMailPing(rec.id,rec.question||'',rec.ts||new Date().toISOString());
+}
+// Mail tetiğinin sessizce kaybolmaması için boot/foreground emniyeti: yanıtsız
+// ve tetiği yazılmamış sorular arasından EN YENİSİNİ yeniden tetikler. Bir
+// seferde tek mail gider (aeon-mail.yml en günceli işler) — amaç kaybolan bir
+// bildirimin sonsuza kadar kaybolmaması, çift mail üretmek değil.
+function aeonMailPendingItem(){
+  try{
+    var qa=(data&&data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
+    for(var i=qa.length-1;i>=0;i--){ var x=qa[i]; if(x&&x.id&&!x.answer&&x.mailPinged!==true) return x; }
+  }catch(e){}
+  return null;
+}
+function aeonRetryPendingMail(){
+  var x=aeonMailPendingItem();
+  if(!x) return;
+  if(typeof pushPing!=='function') return;
+  var p=null;
+  try{ p=pushPing({id:x.id,question:x.question||'',ts:x.ts||new Date().toISOString()}); }catch(e){ return; }
+  if(p&&typeof p.then==='function'){
+    p.then(function(ok){
+      if(ok===true){ x.mailPinged=true; x.mailPingError=null; try{ save(); }catch(e){} }
+    },function(){ /* sessiz: bir sonraki foreground'da yeniden denenir */ });
+  }
+}
+
+// sync.js tetik dosyasını yazamazsa buraya düşer (sync.js → app.js köprüsü):
+// kayıt "yazılmadı" diye işaretlenir, kullanıcı görünür uyarı alır ve balonda
+// "Yeniden dene" düğmesi çıkar. Eskiden hata sessizce yutuluyordu ve soru
+// "Gönderildi" görünmeye devam ediyordu (mail hiç gitmemiş olmasına rağmen).
+function onMailOutboxResult(ok,kind,err){
+  if(ok===true||kind!=='aeon') return;
+  var target=null;
+  try{
+    var qa=(data&&data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
+    for(var i=qa.length-1;i>=0;i--){ var x=qa[i]; if(x&&x.id&&!x.answer){ target=x; break; } }
+  }catch(e){}
+  if(!target) return;
+  target.mailPinged=false;
+  target.mailPingError=String((err&&err.message)||'ulasmadi').slice(0,80);
+  try{ save(); }catch(e){}
+  try{ toast('Mail bildirimi iletilemedi — ÆON balonundan yeniden deneyebilirsin',3400); }catch(e){}
+  if(ui.tab==='mesaj'){ try{ render(); }catch(e){} }
+}
+
+// Mesaj gönderiminde TAM render() çağırmadan yalnızca yeni giden balonu DOM'a
+// ekler (performans). İplik DOM'da yoksa güvenli şekilde tam render'a düşer.
+function appendAeonOutgoing(item){
+  var thread=doc.getElementById('aeon-thread');
+  if(!thread || ui.tab!=='mesaj'){ render(); return; }
+  var hint=thread.querySelector('.msg-empty-hint'); if(hint) hint.remove();
+  var ds=''; try{ var dd=new Date(item.time); if(!isNaN(dd.getTime())) ds=fmt(dd); }catch(e){}
+  var frag='';
+  // aeonLastRenderedDateStr app.js'te yaşar; yazma/okuma accessor üzerinden
+  // yapılır (kayıt sınırı: kapanış değişkenine doğrudan dokunulmaz).
+  var lrds=null; try{ lrds=getAeonLastRenderedDateStr(); }catch(e){ lrds=null; }
+  if(ds && ds!==lrds){ frag+='<div class="msg-daydiv">'+esc(aeonDayDivider(item.time))+'</div>'; setAeonLastRenderedDateStr(ds); }
+  frag+=aeonItemHTML(item,' msg-enter');
+  thread.insertAdjacentHTML('beforeend',frag);
+  aeonLoadVisibleMedia();
+  var prevSort=null; try{ prevSort=getAeonLastSeenSort(); }catch(e){ prevSort=null; }
+  setAeonLastSeenSort(String(item.sort||item.time||prevSort||''));
+  // metin kutusu + karakter sayacı + gönder düğmesi durumunu tam render olmadan sıfırla
+  var ta=doc.getElementById('aeon-input'); if(ta){ ta.value=''; ta.style.height='auto'; }
+  var btn=doc.getElementById('aeon-send-btn'); if(btn){ btn.classList.add('is-disabled'); btn.style.display='none'; }
+  var mic=doc.getElementById('aeon-mic-btn'); if(mic) mic.style.display='flex';
+  var cnt=doc.getElementById('aeon-char-count'); if(cnt) cnt.style.display='none';
+  if(ui.aeonError){ ui.aeonError=null; } // hata varsa görsel temizliği bir sonraki tam render'a bırak
+  // Kendi mesajını gönderince WhatsApp tarzı anında en alta in (animasyonlu değil).
+  var sc=doc.querySelector('[data-scroll]');
+  if(sc) sc.scrollTop=sc.scrollHeight;
+  var fab=doc.getElementById('aeon-scroll-fab'); if(fab) fab.style.display='none';
+  ui.aeonScrollBottom=false; // hedefe ulaşıldı — bir sonraki tam render'da tekrar zıplamasın
+}
+
 function lunaDayLine(d,r){
   var parts=[];
   parts.push(countRec(r)+'/'+habitCountOn(d)+' tik');
@@ -906,6 +1021,12 @@ function aeonRecSample(){
   window.SeymaAppSurface.aeonPickAudioMime=aeonPickAudioMime;
   window.SeymaAppSurface.aeonRecPaintBars=aeonRecPaintBars;
   window.SeymaAppSurface.aeonRecSample=aeonRecSample;
+  window.SeymaAppSurface.aeonTriggerMailPing=aeonTriggerMailPing;
+  window.SeymaAppSurface.aeonRetryMail=aeonRetryMail;
+  window.SeymaAppSurface.aeonMailPendingItem=aeonMailPendingItem;
+  window.SeymaAppSurface.aeonRetryPendingMail=aeonRetryPendingMail;
+  window.SeymaAppSurface.appendAeonOutgoing=appendAeonOutgoing;
+  window.SeymaAppSurface.onMailOutboxResult=onMailOutboxResult;
   window.SeymaAppSurface.registerFieldSurface=registerFieldSurface;
   window.SeymaAppSurface.isFieldSurfaceReady=isFieldSurfaceReady;
   window.SeymaAppSurface.FIELD_SURFACE_DEPENDENCIES=FIELD_SURFACE_DEPENDENCIES.slice();

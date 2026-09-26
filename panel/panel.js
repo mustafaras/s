@@ -140,7 +140,20 @@ var PANEL_LOAD_INFLIGHT=null;
 var PANEL_FIRST_PAINT=false;
 var PANEL_CONSECUTIVE_ERRORS=0;
 var PANEL_POLL_TIMER=null;
-var PANEL_POLL_BASE_MS=5000, PANEL_POLL_MAX_MS=60000, PANEL_POLL_BACKOFF_STEPS=4;
+// ── 2026-09-26 ARIZASI: GİTHUB KOTASI PANELİ ÖLDÜRÜYORDU ───────────────────
+// KÖK SEBEP: taban poll aralığı 5 sn'ydi ve HER tur 9 GitHub isteği açıyordu
+// (latest 1 + inbox 1 + delivery 1 + responses 1 + receipt 1 + projeksiyon 2
+// [contents(boş)+blobs] + event-log 2 = 9). Bu, dakikada 108, saatte ~6.480
+// istek demektir; GitHub'ın KİMLİKLİ saati 5.000 istektir → panel kotayı
+// ~46 dakikada tüketiyordu. Sonrası sessiz çöküş: 403 + x-ratelimit-remaining:0
+// → panelRateLimitedP "rate_limited" → panelPollDelayP sıfırlanmaya kadar
+// bekliyor → gözlemci "panel güncellenmiyor" görüyordu (veri aslında taze).
+// DÜZELTME: aralık 60 sn'ye çıkarıldı (540 istek/saat, kotanın ~%11'i) ve
+// sekme arka plandayken poll seyrekleştirildi. Tazelik, sekmeye dönüşteki
+// anlık load() + ETag/304 ile korunur (bkz. aşağıdaki visibilitychange).
+var PANEL_POLL_BASE_MS=60000, PANEL_POLL_MAX_MS=300000, PANEL_POLL_BACKOFF_STEPS=4;
+// Arka plan sekmesi: GitHub kotasını boşuna yakmamak için seyrek tur.
+var PANEL_POLL_HIDDEN_MS=300000;
 // data/latest.json 1,6 MB, data/observer-snapshot.json 3,1 MB. Ölçülen yavaş
 // hat 18-25 KB/sn: 20 sn'lik bütçe ilerleyen bir indirmeyi haksız yere kesiyordu.
 // Denemeler kademeli uzar (30 → 45 → 67 sn) ki hızlı arıza erken yüzeye çıksın.
@@ -5383,7 +5396,34 @@ function fetchLatest(repo,branch){
       panelNoteDiagP(r.status,'ok',attempt,rate);
       // Gövde yarıda kesildiyse r.json() burada reddeder (bozuk JSON ya da
       // akış hatası); panelAttemptP bunu yeniden denenebilir sayar.
-      return r.json().then(function(data){ PANEL_LATEST_CACHE.etag=etag; PANEL_LATEST_CACHE.sourceRevision=(data&&data.syncReceipt&&data.syncReceipt.snapshotRevision)||null; PANEL_LATEST_CACHE.sourceUpdatedAt=(data&&data.syncReceipt&&data.syncReceipt.sourceUpdatedAt)||null; PANEL_POLL_STATE.conditionalMode=etag?'etag':'uncached'; return {notModified:false,data:data,meta:{etag:etag,completedAt:new Date().toISOString()}}; });
+      return r.json().then(function(data){
+        // ── 1 MB GÖVDE SINIRI (QY-22 dersi, 2026-09-26) ─────────────────────
+        // latest.json artık 2,5 MB. Contents API 1 MB üstü dosyalarda 200 döner
+        // ama `encoding:"none"` + `content:""` verir. Bekçiler Accept:
+        // application/vnd.github.raw gönderiyor; ama bir vekil/istemci bu
+        // başlığı yok sayar ve JSON zarfı döndürürse panel eline VERİ değil
+        // ZARF geçer: `latestLegacy.days` undefined olur, load() "Beklenen veri
+        // yapisi yok." diye düşer ve panel legacy fallback'te (eski/eksik
+        // görünüm) kalır. sha varsa gerçek gövdeyi Blobs API'den oku (100 MB'a
+        // kadar). Yalnız GET.
+        if(data && typeof data==='object' && data.content==='' && !data.days && data.sha){
+          var pr=REPO.split('/');
+          var blobUrl='https://api.github.com/repos/'+encodeURIComponent(pr[0])+'/'+encodeURIComponent(pr[1])+'/git/blobs/'+encodeURIComponent(data.sha);
+          var HB={}; for(var kb in H) HB[kb]=H[kb]; HB['Accept']='application/vnd.github.raw';
+          return panelFetchP(blobUrl,{headers:HB,cache:"no-store"},panelAttemptTimeoutP(PANEL_FETCH_TIMEOUT_MS,attempt)).then(function(r2){
+            if(!r2.ok) throw new Error('blob '+r2.status);
+            return r2.text();
+          }).then(function(txt){
+            var parsed=null; try{ parsed=JSON.parse(txt); }catch(e){ parsed=null; }
+            if(!parsed||typeof parsed!=='object'||!parsed.days) throw new Error('blob govde okunamadi');
+            PANEL_LATEST_CACHE.etag=etag;
+            PANEL_LATEST_CACHE.sourceRevision=(parsed.syncReceipt&&parsed.syncReceipt.snapshotRevision)||null;
+            PANEL_LATEST_CACHE.sourceUpdatedAt=(parsed.syncReceipt&&parsed.syncReceipt.sourceUpdatedAt)||null;
+            PANEL_POLL_STATE.conditionalMode=etag?'etag':'uncached';
+            return {notModified:false,data:parsed,meta:{etag:etag,completedAt:new Date().toISOString(),viaBlob:true}};
+          });
+        }
+        PANEL_LATEST_CACHE.etag=etag; PANEL_LATEST_CACHE.sourceRevision=(data&&data.syncReceipt&&data.syncReceipt.snapshotRevision)||null; PANEL_LATEST_CACHE.sourceUpdatedAt=(data&&data.syncReceipt&&data.syncReceipt.sourceUpdatedAt)||null; PANEL_POLL_STATE.conditionalMode=etag?'etag':'uncached'; return {notModified:false,data:data,meta:{etag:etag,completedAt:new Date().toISOString()}}; });
     });
   },PANEL_FETCH_ATTEMPTS,PANEL_RETRY_DELAY_MS).catch(function(err){
     if(!PANEL_LAST_DIAG||PANEL_LAST_DIAG.kind===null||PANEL_LAST_DIAG.kind==='ok'){
@@ -6025,6 +6065,9 @@ function panelBusyTyping(){ var el=document.activeElement; if(!el) return false;
 // bir sonraki turu ancak öncekinin bitişinden sonra kurar ve ardışık hatada
 // üstel olarak yavaşlar (5s → 10 → 20 → 40 → 60 tavan).
 function panelPollDelayP(){
+  // Arka planda seyrek: gözlemci bakmadığı sürece GitHub kotası harcanmaz.
+  var hidden=false; try{ hidden=typeof document!=='undefined'&&(document.hidden===true||document.visibilityState==='hidden'); }catch(e){ hidden=false; }
+  if(hidden) return Math.max(PANEL_POLL_HIDDEN_MS,PANEL_POLL_BASE_MS);
   // Sunucu sınırına takıldıysak sınır sıfırlanana kadar beklemek, üstel
   // backoff'tan daha doğrudur: erken denemeler sınırı uzatabilir. Retry-After
   // varsa ona, yoksa X-RateLimit-Reset'e uyulur; PANEL_POLL_MAX_MS ile sınırlanır

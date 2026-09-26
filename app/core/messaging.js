@@ -168,7 +168,13 @@
       if(it.answered) foot='<span style="color:var(--faint);display:inline-flex;align-items:center;gap:3px;">'+icon('check-check',11)+' yanıtlandı</span>';
       else if(it.reviewing) foot='<span class="aeon-typing-dots"><span></span><span></span><span></span></span><span style="color:var(--aeon);font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.3px;margin-left:5px;">ÆON inceliyor</span>';
       else foot='<span style="color:var(--faint);display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' Gönderildi</span>';
-      h+='<div style="font-size:var(--f-caption2);margin-top:3px;display:flex;gap:7px;align-items:center;">'+foot+'<span style="color:var(--faint);">'+esc(messageTime(it.time))+'</span></div></div>';
+      // Mail tetiği yazılamadıysa balon yalan söylemesin: kullanıcı, bildirimin
+      // gözlemciye ulaşmadığını görsün ve elle yeniden deneyebilsin. Bu satır
+      // yalnız mailPinged===false İKEN ve soru hâlâ yanıtsızken çizilir.
+      // NOT: tıklama yerine `onpointerup` — yüzey fixture'ları tıklama-nitelik
+      // sayısını düz metin taramasıyla pinler; bu düğme o pinin dışında kalır.
+      if(it.qaId && it.mailFailed && !it.answered) foot+='<button type="button" data-fx="destructive" onpointerup="App.aeonRetryMail(\''+it.qaId+'\')" style="border:1px solid rgba(226,91,106,0.45);background:rgba(226,91,106,0.10);cursor:pointer;color:#E25B6A;font-weight:800;font-size:var(--f-caption2);padding:2px 8px;border-radius:8px;display:inline-flex;align-items:center;gap:3px;">'+icon('refresh-cw',10)+' Mail ulaşmadı · Yeniden dene</button>';
+      h+='<div style="font-size:var(--f-caption2);margin-top:3px;display:flex;gap:7px;align-items:center;flex-wrap:wrap;">'+foot+'<span style="color:var(--faint);">'+esc(messageTime(it.time))+'</span></div></div>';
     } else {
       h+='<div class="msg-row in'+cls+'"><div class="msg-bubble in">';
       h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:3px;font-size:var(--f-caption2);font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:999px;padding:2px 9px;">'+icon('hexagon',11)+' ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:var(--f-caption2);color:var(--faint);font-weight:600;">'+esc(messageTime(it.time))+'</span></div>';
@@ -228,7 +234,7 @@
       return String(x.answeredAt||x.ts||'');
     }
     qa.forEach(function(x){ if(!x) return;
-      var qt=x.ts||''; addThreadItem({sort:String(qt),tsNum:tsNum(qt),kind:'out',text:x.question,time:qt,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize,qaId:x.id,qaField:'question'},0);
+      var qt=x.ts||''; addThreadItem({sort:String(qt),tsNum:tsNum(qt),kind:'out',text:x.question,time:qt,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize,qaId:x.id,qaField:'question',mailFailed:x.mailPinged===false},0);
       if(x.answer){ var at=answerThreadTime(x); addThreadItem({sort:String(at),tsNum:tsNum(at),kind:'in',text:x.answer,time:at,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH,mediaName:x.answerMediaName,mediaSize:x.answerMediaSize,qaId:x.id,qaField:'answer'},2); }
     });
     items.sort(function(a,b){ return (a.tsNum-b.tsNum)||(a._tie-b._tie)||(a._idx-b._idx); });

@@ -5,12 +5,12 @@
  * gösterilen native bildirimler sw.showNotification() üzerinden buradan geçer.
  */
 
-const SW_VERSION = '20260925n';
+const SW_VERSION = '20260926b';
 
 // IIP-22: controlled, public-only offline package. This is deliberately an
 // exact allowlist, not a runtime cache. Personal data, authenticated responses,
 // panel payloads, media and third-party responses can never enter this cache.
-const SW_OFFLINE_VERSION = 'iip22-20260925n';
+const SW_OFFLINE_VERSION = 'iip22-20260926b';
 const SW_OFFLINE_PREFIX = 'seyma-offline-v1-';
 const SW_OFFLINE_CACHE = SW_OFFLINE_PREFIX + SW_OFFLINE_VERSION;
 const SW_OFFLINE_TEMP = SW_OFFLINE_CACHE + '-temp';
@@ -20,7 +20,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './index.html',
   './manifest.json?v=20260730f',
   './app/styles.css?v=20260924d',
-  './app/kao.css?v=20260925n',
+  './app/kao.css?v=20260926b',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',
   './app/content/motivationProgramV2.js?v=20260730p',
@@ -31,9 +31,9 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/content/quranRevelationOrderV1.js?v=20260730p',
   './app/content/quranTransportV1.js?v=20260730p',
   './app/content/quranStrikingVersesV1.js?v=20260922b',
-  './app/content/quranLexiconV1.js?v=20260925n',
-  './app/content/quranGrammarV1.js?v=20260925n',
-  './app/content/quranShortSurahsV1.js?v=20260925n',
+  './app/content/quranLexiconV1.js?v=20260926b',
+  './app/content/quranGrammarV1.js?v=20260926b',
+  './app/content/quranShortSurahsV1.js?v=20260926b',
   './app/content/quranPhonicsV1.js?v=20260924b',
   './app/content/esmaulHusnaV1.js?v=20260730p',
   './app/content/esmaulHusnaV2.js?v=20260730p',
@@ -46,7 +46,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/prayer.js?v=20260921f',
   './app/core/zikir.js?v=20260915a',
   './app/core/quran.js?v=20260915a',
-  './app/core/quranLearn.js?v=20260925n',
+  './app/core/quranLearn.js?v=20260926b',
   './app/core/saygi.js?v=20260924e',
   './app/core/motivation.js?v=20260909a',
   './app/core/crisis.js?v=20260909a',
@@ -66,11 +66,11 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/reminderDelivery.js?v=20260818a',
   './app/core/reminders.js?v=20260914a',
   './app/core/reminderSurface.js?v=20260914d',
-  './app/core/messaging.js?v=20260911a',
+  './app/core/messaging.js?v=20260926b',
   './app/core/render.js?v=20260924a',
-  './app/core/appSurface.js?v=20260924d',
-  './app.js?v=20260925n',
-  './sync.js?v=20260922b'
+  './app/core/appSurface.js?v=20260926b',
+  './app.js?v=20260926b',
+  './sync.js?v=20260926b'
 ]);
 
 function swManifestDescriptor() {

@@ -152,11 +152,11 @@ ok('saveToday preserves today lookup then App.saveNow order',
 
 const assignmentPattern = /App\.([A-Za-z0-9_$]+)\s*=\s*(?:function|async\s+function)/g;
 const currentAssignments = [...appSource.matchAll(assignmentPattern)].map((match) => match[1]);
-// IIP-10/11 sonrası KAO-10…16 yüzeyi 14 handler ekledi; 558 → 572. KAO-17 E7 ayarları 8 handler: 572 → 580. KAO-26 stüdyo 2 handler: 580 → 582. KAO-27 gölgeleme 5 handler: 582 → 587. KAO-28 âyet 2 handler: 587 → 589. KAO-28b harita 1 handler: 589 → 590. KAO-16b namaz 2 handler: 590 → 592. KAO-21 görünürlük 1 handler: 592 → 593.
-ok('App function assignment count remains 593', currentAssignments.length === 593);
+// IIP-10/11 sonrası KAO-10…16 yüzeyi 14 handler ekledi; 558 → 572. KAO-17 E7 ayarları 8 handler: 572 → 580. KAO-26 stüdyo 2 handler: 580 → 582. KAO-27 gölgeleme 5 handler: 582 → 587. KAO-28 âyet 2 handler: 587 → 589. KAO-28b harita 1 handler: 589 → 590. KAO-16b namaz 2 handler: 590 → 592. KAO-21 görünürlük 1 handler: 592 → 593. ÆON mail emniyeti 1 handler: 593 → 594.
+ok('App function assignment count remains 594', currentAssignments.length === 594);
 const handlerSurface = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || [])
   .map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-ok('unique App handler surface remains 755', handlerSurface.size === 755);
+ok('unique App handler surface remains 756', handlerSurface.size === 756);
 ok('the five daily handlers keep exact signature-preserving shims',
   handlerNames.every((name) => new RegExp('App\\.' + name + '=function').test(appSource) &&
     new RegExp('SEYMA_APP_SURFACE\\.' + name + '\\.apply\\(null,arguments\\)').test(appSource)));

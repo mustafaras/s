@@ -61,6 +61,6 @@ ok('forbidden GPS, transport, fetch and notification paths are absent from MON-5
 /* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
    gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('production loads appSurface before app.js with fresh cache versions',
-  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260924d/.test(index) && /app\.js\?v=20260925n/.test(index));
+  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20260926b/.test(index) && /app\.js\?v=20260926b/.test(index));
 
 console.log('\nMON-51 domain App surface boundary: ' + passed + '/' + passed + ' passed');

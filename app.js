@@ -2644,6 +2644,9 @@ window.SeyOnSyncState=function(receipt){
   try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
   updateSaveBanner(); updateHeaderSave(); if(ui.reminderCenterOpen) render();
 };
+// ── ÆON mail tetiği sonucu (sync.js → app.js köprüsü) ────────────────────
+// Gövde appSurface alan yüzey kaydında yaşar (app.js kabuk bütçesi 7800).
+window.SeyOnMailOutboxResult=function(ok,kind,err){ return window.SeymaAppSurface.onMailOutboxResult.apply(null,arguments); };
 window.SeyOnSynced=function(receipt){
   if(!data) return;
   data.lastSyncDate=todayStr();
@@ -2884,6 +2887,16 @@ if(!window.SeymaAppSurface||typeof window.SeymaAppSurface.registerFieldSurface!=
   waterGoalCups:function(){ return waterGoalCups; },
   wxHm:function(){ return wxHm; },
   wxMeta:function(){ return wxMeta; },
+  // ÆON mail tetiği + hızlı balon ekleme (2026-09-24 arızası sonrası taşındı).
+  aeonDayDivider:function(){ return aeonDayDivider; },
+  aeonItemHTML:function(){ return aeonItemHTML; },
+  fmt:function(){ return fmt; },
+  pushPing:function(){ return function(item){ try{ return (window.SeySync&&typeof window.SeySync.pushPing==='function')?window.SeySync.pushPing(item):false; }catch(e){ return false; } }; },
+  toast:function(){ return toast; },
+  setAeonLastSeenSort:function(){ return function(v){ aeonLastSeenSort=v; }; },
+  setAeonLastRenderedDateStr:function(){ return function(v){ aeonLastRenderedDateStr=v; }; },
+  getAeonLastSeenSort:function(){ return function(){ return aeonLastSeenSort; }; },
+  getAeonLastRenderedDateStr:function(){ return function(){ return aeonLastRenderedDateStr; }; },
   doc:function(){ return document; }
 })) throw new Error('MON2-07: SeymaAppSurface alan yüzey kaydı kurulamadı');
 // MON2-01: reminder yüzey registry bag'i. MON2-03 gövde taşırken bu bag'i
@@ -7253,43 +7266,25 @@ function streamAsk(kind,question){
   }
   attempt(0).catch(function(e){ var status=e&&e._status; if(status===401){ ui.openaiKeyState='invalid'; } ui.askKind=null; var msg=(status!=null)?((e&&e.message)||'Bir hata oluştu.'):openaiErrText(null,String(e&&e.message||e)); setAskError(kind,msg); render(); });
 }
-// Mesaj gönderiminde TAM render() çağırmadan yalnızca yeni giden balonu DOM'a ekler
-// (performans: her gönderimde onlarca eski balonu yeniden string'leyip yeniden DOM'a
-// basmak yerine yalnızca 1 yeni düğüm eklenir — WhatsApp'ın yaptığı gibi).
-// İplik DOM'da yoksa (ör. sekme henüz hiç 'mesaj' olarak render edilmediyse) güvenli
-// şekilde normal tam render'a düşer.
-function appendAeonOutgoing(item){
-  var thread=document.getElementById('aeon-thread');
-  if(!thread || ui.tab!=='mesaj'){ render(); return; }
-  var hint=thread.querySelector('.msg-empty-hint'); if(hint) hint.remove();
-  var ds=''; try{ var dd=new Date(item.time); if(!isNaN(dd.getTime())) ds=fmt(dd); }catch(e){}
-  var frag='';
-  if(ds && ds!==aeonLastRenderedDateStr){ frag+='<div class="msg-daydiv">'+esc(aeonDayDivider(item.time))+'</div>'; aeonLastRenderedDateStr=ds; }
-  frag+=aeonItemHTML(item,' msg-enter');
-  thread.insertAdjacentHTML('beforeend',frag);
-  aeonLoadVisibleMedia();
-  aeonLastSeenSort=String(item.sort||item.time||aeonLastSeenSort);
-  // metin kutusu + karakter sayacı + gönder düğmesi durumunu tam render olmadan sıfırla
-  var ta=document.getElementById('aeon-input'); if(ta){ ta.value=''; ta.style.height='auto'; }
-  var btn=document.getElementById('aeon-send-btn'); if(btn){ btn.classList.add('is-disabled'); btn.style.display='none'; }
-  var mic=document.getElementById('aeon-mic-btn'); if(mic) mic.style.display='flex';
-  var cnt=document.getElementById('aeon-char-count'); if(cnt) cnt.style.display='none';
-  if(ui.aeonError){ ui.aeonError=null; } // hata varsa görsel temizliği bir sonraki tam render'a bırak
-  // Kendi mesajını gönderince WhatsApp tarzı anında en alta in (animasyonlu değil —
-  // tam render'daki orijinal davranışla birebir aynı; smooth scroll yalnızca manuel
-  // "en alta in" FAB tıklamasında kullanılır, aksi halde ara scroll olayları FAB'ı
-  // kısa süreliğine tekrar gösterip titretir).
-  var sc=document.querySelector('[data-scroll]');
-  if(sc) sc.scrollTop=sc.scrollHeight;
-  var fab=document.getElementById('aeon-scroll-fab'); if(fab) fab.style.display='none';
-  ui.aeonScrollBottom=false; // hedefe ulaşıldı — bir sonraki tam render'da tekrar zıplamasın
-}
+// Mesaj gönderiminde TAM render() çağırmadan yalnızca yeni giden balonu DOM'a ekler.
+// Gövde app/core/appSurface.js alan yüzey kaydında (MON2-07 deseni) — app.js kabuk
+// bütçesi (7800) bu ÆON arıza düzeltmesiyle büyümemeli.
+function appendAeonOutgoing(item){ return window.SeymaAppSurface.appendAeonOutgoing.apply(null,arguments); }
+// ── ÆON mail tetiği (2026-09-24 arızası sonrası) ──────────────────────────
+// Gövdeler app/core/appSurface.js alan yüzey kaydında yaşar (MON2-07 deseni;
+// app.js kabuk bütçesi 7800). Burada yalnız shim'ler kalır.
+// NOT: balon düğmesi tıklama yerine `onpointerup` kullanır, bu yüzden tıklama
+// nitelik sayısı DEĞİŞMEZ (yüzey fixture'ları onu düz metin taramasıyla pinler).
+function aeonTriggerMailPing(qid,question,ts){ return window.SeymaAppSurface.aeonTriggerMailPing.apply(null,arguments); }
+function aeonMailPendingItem(){ return window.SeymaAppSurface.aeonMailPendingItem.apply(null,arguments); }
+function aeonRetryPendingMail(){ return window.SeymaAppSurface.aeonRetryPendingMail.apply(null,arguments); }
+window.App.aeonRetryMail=function(qid){ return window.SeymaAppSurface.aeonRetryMail.apply(null,arguments); };
 function submitAeonQuestion(question){
   if(!data.aeon||typeof data.aeon!=='object') data.aeon={qa:[],lastAskDate:null};
   if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
   var ts=new Date().toISOString();
   var qid='q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);
-  data.aeon.qa.push({id:qid,question:question,ts:ts,answer:null,answeredAt:null});
+  data.aeon.qa.push({id:qid,question:question,ts:ts,answer:null,answeredAt:null,mailPinged:false});
   data.aeon.lastAskDate=todayStr();
   ui.aeonDraft=''; ui.aeonError=null; ui.aeonScrollBottom=true; // appendAeonOutgoing render()'a düşerse de en alta insin
   haptic(14);
@@ -7301,9 +7296,8 @@ function submitAeonQuestion(question){
   try{ setTimeout(function(){ var el=document.getElementById('aeon-input'); if(el) el.focus(); },30); }catch(e){}
   // Soru anında panele iletilsin diye senkronu zorla (4 sn debounce'u beklemeden)
   try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
-  // Küçük tetik dosyası (data/aeon-outbox.json) — yalnızca soru gönderilince değişir;
-  // veri reposundaki GitHub Actions bunu görüp mustafarasit@gmail.com'a anlık mail atar.
-  try{ if(window.SeySync&&typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:question,ts:ts}); }catch(e){}
+  // Küçük tetik dosyası (data/aeon-outbox.json) — bkz. aeonTriggerMailPing.
+  aeonTriggerMailPing(qid,question,ts);
   toast('Sorun ÆON’a iletildi ⬡',2200);
 }
 // Ses notu / fotoğrafı önce data/aeon-media/<id>.json'a yükler, sonra hafif bir
@@ -7321,7 +7315,7 @@ function submitAeonMedia(kind,base64,mime,extra,captionFallback){
     if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
     var ts=new Date().toISOString();
     var qid='q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);
-    var qaItem={id:qid,question:captionFallback,ts:ts,answer:null,answeredAt:null,kind:kind,mediaId:id,mediaMime:mime};
+    var qaItem={id:qid,question:captionFallback,ts:ts,answer:null,answeredAt:null,kind:kind,mediaId:id,mediaMime:mime,mailPinged:false};
     if(extra){ if(extra.durationSec!=null) qaItem.durationSec=extra.durationSec; if(extra.peaks) qaItem.peaks=extra.peaks; if(extra.w) qaItem.w=extra.w; if(extra.h) qaItem.h=extra.h; if(extra.name) qaItem.mediaName=extra.name; if(extra.size!=null) qaItem.mediaSize=extra.size; if(extra.viaUpload) qaItem.viaUpload=true; }
     data.aeon.qa.push(qaItem);
     data.aeon.lastAskDate=todayStr();
@@ -7330,7 +7324,7 @@ function submitAeonMedia(kind,base64,mime,extra,captionFallback){
     save();
     appendAeonOutgoing({sort:ts,kind:'out',text:captionFallback,time:ts,answered:false,reviewing:false,qaId:qid,qaField:'question',mediaKind:kind,mediaId:id,mediaMime:mime,durationSec:qaItem.durationSec,peaks:qaItem.peaks,w:qaItem.w,h:qaItem.h,mediaName:qaItem.mediaName,mediaSize:qaItem.mediaSize});
     try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
-    try{ if(window.SeySync&&typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:captionFallback,ts:ts}); }catch(e){}
+    aeonTriggerMailPing(qid,captionFallback,ts);
     toast((kind==='file'?'Belge':(kind==='voice'?(extra&&extra.viaUpload?'Ses dosyası':'Sesli mesaj'):'Fotoğraf'))+' ÆON’a iletildi ⬡',2200);
   }).catch(function(e){
     delete aeonMediaCache[id];
@@ -7777,6 +7771,11 @@ window.addEventListener('storage',reconcileReminderStorageEvent);
 document.addEventListener('visibilitychange',function(){ return SEYMA_APP_SURFACE.onDocumentVisibilityChange.apply(null,arguments); });
 window.addEventListener('focus',function(){ return SEYMA_APP_SURFACE.onWindowFocus.apply(null,arguments); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
 window.addEventListener('pageshow',function(){ return SEYMA_APP_SURFACE.onWindowPageshow.apply(null,arguments); }); // bfcache'ten geri dönüşte
+// Mail tetiği emniyeti — AYRI dinleyici; yukarıdaki foreground akışını
+// değiştirmez, yalnız tetiği yazılmamış bir ÆON sorusu varsa outbox'ı yeniden
+// dener (bkz. aeonRetryPendingMail). Sessiz: ağ yoksa bir sonraki fırsatta dener.
+window.addEventListener('focus',function(){ try{ aeonRetryPendingMail(); }catch(e){} });
+window.addEventListener('visibilitychange',function(){ try{ if(document.visibilityState==='visible') aeonRetryPendingMail(); }catch(e){} });
 window.addEventListener('online',function(){ return SEYMA_APP_SURFACE.onWindowOnline.apply(null,arguments); });   // bağlantı gelince bounded recovery kontrolü
 window.addEventListener('offline',function(){ return SEYMA_APP_SURFACE.onWindowOffline.apply(null,arguments); });
 window.addEventListener('popstate',function(){ if(ui.quranJourneyOpen){ App.closeQuranJourney(); return; } if(ui.qiblaOpen) App.closeQibla(); });

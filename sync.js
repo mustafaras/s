@@ -1302,11 +1302,79 @@ function pullQuranUpdates(cb){
 // ÆON soru tetiği: yalnızca Şeyma ÆON'a soru gönderince yazılır. Küçük ve ayrı bir
 // dosya olduğu için veri reposundaki mail workflow'u SADECE burada tetiklenir
 // (hareket/mod gibi sık latest.json push'larında boşuna çalışıp Actions dakikası yakmaz).
-function pushPing(item){
-  var c=cfg(); if(!c) return Promise.resolve();
-  if(devOrigin() && !syncForced()) return Promise.resolve(); // GUARD 1 — yerelden ping yazma
+//
+// ── 2026-09-24 ARIZASI (bu blok düzeltir) ─────────────────────────────────
+// KÖK SEBEP: eskiden bu yazıcı 2,5 MB'lık latest.json zinciriyle AYNI
+// varsayımlarla çalışıyordu ve `.catch(function(){})` ile hatayı SESSİZCE
+// yutuyordu. Senkron `timeout`/`typeerror` ile hata verdiğinde (veri dosyası
+// GitHub Contents API'nin 1 MB gövde sınırını aştığı için) KÜÇÜK tetik
+// dosyasının yazımı da atlanıyor, kullanıcı hiçbir uyarı görmüyordu; soru
+// "Gönderildi" diye görünmeye devam ediyordu.
+// KANIT: data/aeon-outbox.json en son 2026-09-05'te değişti; `aeon-mail.yml`
+// o tarihten sonra hiç tetiklenmedi — 24 Eylül'deki iki sorunun maili bu
+// yüzden çıkmadı.
+// ÇÖZÜM: (1) yazım ana zincirden BAĞIMSIZ, kendi taze okumasını yapar;
+// (2) hata yutulmaz, çağırana taşınır ve görünür bildirime dönüşür;
+// (3) 409/422 çakışmasında yeniden dener.
+var AEON_OUTBOX_PATH='data/aeon-outbox.json';
+// Outbox ailesi için ortak güvenli okuyucu: sha + ham gövde. Gövde boş gelirse
+// (1 MB sınırı) hiç yazmaya kalkışmayız — sha değişmeden PUT etmek veri kaybı
+// riskidir; başarısız sayıp yeniden denenmeye bırakırız. Yalnız GET.
+function outboxReadJson(c, path){
+  var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path;
+  return fetch(api+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:ghHeaders(c)})
+    .then(function(r){
+      if(r.status===404) return {sha:null,text:'',found:false};
+      if(r.status!==200) throw new Error('outbox_read_'+r.status);
+      return r.json().then(function(g){
+        var sha=(g&&g.sha)||null;
+        if(g&&typeof g.content==='string'&&g.content) return {sha:sha,text:b64decodeUtf8(g.content),found:true};
+        throw new Error('outbox_body_unreadable');
+      });
+    });
+}
+// ÆON tetik dosyasını TAZE oku-değiştir-yaz. Kardeş bir soru araya girse bile
+// onu ezmemek için her denemede içerik yeniden okunur; aeon-mail.yml her
+// tetiklemede en günceli işlediği için yarış zararsızdır.
+function pushAeonOutboxGuarded(c, item, attempt){
+  attempt=attempt||0;
+  var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+AEON_OUTBOX_PATH;
   var payload=JSON.stringify({type:'aeon-question',item:item,ts:new Date().toISOString()},null,2);
-  return ghPut(c,'data/aeon-outbox.json',payload).catch(function(){});
+  return outboxReadJson(c,AEON_OUTBOX_PATH).then(function(cur){
+    var body={message:'sync: '+AEON_OUTBOX_PATH,content:b64(payload),branch:c.branch}; if(cur&&cur.sha) body.sha=cur.sha;
+    var H={}; for(var k in ghHeaders(c)) H[k]=ghHeaders(c)[k]; H['Content-Type']='application/json';
+    return fetch(api,{method:'PUT',headers:H,body:JSON.stringify(body)});
+  }).then(function(r){
+    if(r.ok) return r.json().catch(function(){ return {}; });
+    return r.text().then(function(t){
+      if((r.status===409||r.status===422)&&attempt<3) return pushAeonOutboxGuarded(c,item,attempt+1);
+      var e=new Error(r.status+' '+t.slice(0,160));
+      e.code=(r.status===401?'unauthorized':r.status===403?'forbidden':(r.status===409||r.status===422)?'conflict':r.status===429?'rate_limited':'unknown');
+      throw e;
+    });
+  });
+}
+// Yazım sonucunu GÖRÜNÜR kılar. Sessiz yutma bu arızanın birinci sebebiydi:
+// kullanıcı maili gelmediğini ancak kendi fark ederse öğreniyordu. Yalnızca
+// BAŞARISIZLIK bildirilir — başarı her soru için ikinci bir toast üretmesin
+// (app.js zaten "Sorun ÆON'a iletildi" gösteriyor).
+function notifyMailOutboxResult(ok, kind, err){
+  if(ok) return;
+  try{
+    if(typeof window!=='undefined' && typeof window.SeyOnMailOutboxResult==='function'){ window.SeyOnMailOutboxResult(false,kind,err||null); return; }
+  }catch(e){}
+  try{ console.error('[SeySync] '+kind+' mail tetiği YAZILAMADI:',String((err&&err.message)||err)); }catch(e){}
+}
+// ÆON soru maili tetiği. Döndürülen Promise: true = yazıldı, false = yazılamadı
+// (çağıran kullanıcıya bildirir ve ileri bir turda yeniden deneyebilir).
+function pushPing(item){
+  var c=cfg(); if(!c){ notifyMailOutboxResult(false,'aeon',new Error('senkron yapılandırılmamış')); return Promise.resolve(false); }
+  if(devOrigin() && !syncForced()) return Promise.resolve(false); // GUARD 1 — yerelden ping yazma
+  var chain;
+  try{ chain=pushAeonOutboxGuarded(c,item,0); }
+  catch(syncErr){ notifyMailOutboxResult(false,'aeon',syncErr); return Promise.resolve(false); }
+  return chain.then(function(){ notifyMailOutboxResult(true,'aeon',null); return true; },
+    function(e){ notifyMailOutboxResult(false,'aeon',e); return false; });
 }
 // Profil değerlendirmesi tetiği: yalnızca 174/174 tamamlanınca (bir kez) yazılır. Ayrı ve
 // küçük bir dosya olduğu için veri reposundaki mail workflow'u SADECE burada tetiklenir —

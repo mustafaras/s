@@ -230,8 +230,8 @@ const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).
 // IIP-10 / DEC-07: App.saygiLens tek dispatcher handler'ı 718 → 719 yaptı;
 // onclick=391 pini değişmedi.
 // IIP-11: App.saygiReader tek dispatcher handler'ı 719 → 720 yaptı.
-// KAO-16 okuyucu yüzeyi üç handler ekledi; güncel pin 734 / 392. KAO-17 E7 ayarları sekiz handler ekledi: 742. KAO-26 stüdyosu iki handler: 744. KAO-27 gölgeleme beş handler: 749. KAO-28 âyet iki handler: 751. KAO-28b harita bir handler: 752. KAO-16b namaz iki handler: 754. KAO-21 görünürlük bir handler ve Ayarlar satırı: 755 / onclick 393.
-group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size === 755 && count(/onclick=/g, combinedSource) === 393);
+// KAO-16 okuyucu yüzeyi üç handler ekledi; güncel pin 734 / 392. KAO-17 E7 ayarları sekiz handler ekledi: 742. KAO-26 stüdyosu iki handler: 744. KAO-27 gölgeleme beş handler: 749. KAO-28 âyet iki handler: 751. KAO-28b harita bir handler: 752. KAO-16b namaz iki handler: 754. KAO-21 görünürlük bir handler: 755 / 393. ÆON mail emniyeti bir handler: 756 (tıklama sayısı değişmedi).
+group('FX2-10.9 App ve onclick sözleşmesi (FX2-15 + _goTimer)', handlers.size === 756 && count(/onclick=/g, combinedSource) === 393);
 
 // 10. Yüksek değerli niyetler sözlükte bulunur; none erken dönüşle sessizdir.
 const intentBody = (mediaSource.match(/var FX_INTENT\s*=\s*\{([\s\S]*?)\n\s*\};/) || [])[1] || '';

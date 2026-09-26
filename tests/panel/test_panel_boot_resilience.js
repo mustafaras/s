@@ -69,15 +69,15 @@ var step2=step1.then(function(){
 // ── [2] Backoff eğrisi ────────────────────────────────────────────────
 var step3=step2.then(function(){
   console.log('[2] Ardışık hata backoff eğrisi');
-  var ctx={Math:Math,Date:Date,PANEL_CONSECUTIVE_ERRORS:0,PANEL_POLL_BASE_MS:5000,PANEL_POLL_MAX_MS:60000,PANEL_POLL_BACKOFF_STEPS:4,
-    PANEL_LAST_DIAG:{status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null}};
+  var ctx={Math:Math,Date:Date,PANEL_CONSECUTIVE_ERRORS:0,PANEL_POLL_BASE_MS:5000,PANEL_POLL_MAX_MS:300000,PANEL_POLL_BACKOFF_STEPS:4,
+    PANEL_LAST_DIAG:{status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null},document:{hidden:false,visibilityState:'visible'}};
   vm.runInNewContext(extractFunction('panelPollDelayP'),ctx,{filename:'panel-boot-backoff.js'});
   ok('hata yokken taban aralık korunur',ctx.panelPollDelayP()===5000);
   ctx.PANEL_CONSECUTIVE_ERRORS=1; var d1=ctx.panelPollDelayP();
   ctx.PANEL_CONSECUTIVE_ERRORS=3; var d3=ctx.panelPollDelayP();
   ctx.PANEL_CONSECUTIVE_ERRORS=50; var dMax=ctx.panelPollDelayP();
-  var rlCtx={Math:Math,Date:Date,PANEL_CONSECUTIVE_ERRORS:0,PANEL_POLL_BASE_MS:5000,PANEL_POLL_MAX_MS:60000,PANEL_POLL_BACKOFF_STEPS:4,
-    PANEL_LAST_DIAG:{kind:'rate_limited',retryAfterMs:null,resetAt:Date.now()+40000}};
+  var rlCtx={Math:Math,Date:Date,PANEL_CONSECUTIVE_ERRORS:0,PANEL_POLL_BASE_MS:5000,PANEL_POLL_MAX_MS:300000,PANEL_POLL_BACKOFF_STEPS:4,
+    PANEL_LAST_DIAG:{kind:'rate_limited',retryAfterMs:null,resetAt:Date.now()+40000},document:{hidden:false,visibilityState:'visible'}};
   vm.runInNewContext(extractFunction('panelPollDelayP'),rlCtx,{filename:'panel-boot-ratedelay.js'});
   var rlDelay=rlCtx.panelPollDelayP();
   ok('sınıra takılınca sıfırlanma zamanına kadar beklenir',rlDelay>=30000&&rlDelay<=60000,'rlDelay='+rlDelay);
@@ -85,7 +85,21 @@ var step3=step2.then(function(){
   ok('Retry-After başlığı önceliklidir',rlCtx.panelPollDelayP()===12000,'='+rlCtx.panelPollDelayP());
   ok('ilk hatada aralık büyür',d1>5000&&d1<=20000,'d1='+d1);
   ok('ardışık hatada üstel yavaşlar',d3>d1,'d1='+d1+' d3='+d3);
-  ok('backoff üst sınırı aşmaz',dMax<=60000&&dMax>=d3,'dMax='+dMax);
+  ok('backoff üst sınırı aşmaz',dMax<=300000&&dMax>=d3,'dMax='+dMax);
+});
+
+// ── [2b] GitHub kotası: poll aralığı istek bütçesini boğmamalı ─────────
+// 2026-09-26 arızası: 5 sn aralık × 9 istek = ~6.480 istek/saat > 5.000
+// GitHub sınırı → panel ~46 dakikada kotayı tüketip donuyordu.
+var step3b=step3.then(function(){
+  console.log('[2b] GitHub kota bütçesi');
+  var m=source.match(/PANEL_POLL_BASE_MS=(\d+)/);
+  var base=m?parseInt(m[1],10):null;
+  var pollRequests=9; // latest+inbox+delivery+responses+receipt+projeksiyon(2)+event-log(2)
+  var perHour=Math.round(pollRequests*(3600000/base));
+  ok('poll taban aralığı en az 60 sn (kota koruması)',base>=60000,'base='+base);
+  ok('saatlik istek bütçesi GitHub 5.000 sınırının altında',perHour<5000,'perHour='+perHour);
+  ok('arka plan aralığı tanımlı ve tabandan seyrek',/PANEL_POLL_HIDDEN_MS\s*=\s*\d+/.test(source)&&source.indexOf('PANEL_POLL_HIDDEN_MS')>=0);
 });
 
 // ── [3] Event-log gün dosyaları: sınırlı eşzamanlılık + önbellek ──────

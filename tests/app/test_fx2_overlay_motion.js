@@ -130,8 +130,8 @@ group('FX2-16.2 M6 çağrı sayısı en az 10, App/onClick yüzeyi değişmez',
   // IIP-10 / DEC-07: öncü araması TEK dispatcher handler ekledi (App.saygiLens).
   // 718 → 719 artışı tam olarak bu addır; onclick=391 değişmedi.
   // IIP-11: App.saygiReader tek dispatcher handler'ı eklendi; 719 → 720.
-  // KAO-16 okuyucu yüzeyi üç handler ekledi; güncel pin 734 / 392. KAO-17 E7 ayarları sekiz handler ekledi: 742. KAO-26 stüdyosu iki handler: 744. KAO-27 gölgeleme beş handler: 749. KAO-28 âyet iki handler: 751. KAO-28b harita bir handler: 752. KAO-16b namaz iki handler: 754. KAO-21 görünürlük bir handler ve Ayarlar satırı: 755 / onclick 393.
-  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 755 &&
+  // KAO-16 okuyucu yüzeyi üç handler ekledi; güncel pin 734 / 392. KAO-17 E7 ayarları sekiz handler ekledi: 742. KAO-26 stüdyosu iki handler: 744. KAO-27 gölgeleme beş handler: 749. KAO-28 âyet iki handler: 751. KAO-28b harita bir handler: 752. KAO-16b namaz iki handler: 754. KAO-21 görünürlük bir handler: 755 / 393. ÆON mail emniyeti bir handler ekledi (tıklama nitelik sayısı değişmedi): 756.
+  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 756 &&
   (combinedSource.match(/onclick=/g) || []).length === 393
 );
 

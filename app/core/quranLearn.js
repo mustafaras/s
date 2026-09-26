@@ -417,11 +417,25 @@
     var fresh=Math.max(0,Math.floor(nonNegativeNumber(q.settings&&q.settings.dailyNew,10)));
     return {due:Math.min(due,60),fresh:fresh,minutes:Math.max(1,Math.ceil((Math.min(due,60)+fresh)*0.55)),known:Object.keys(known).length};
   }
+  var KAO_MILESTONE_LABELS={fatiha:'Fâtiha’yı anlıyorum',namaz:'Namazda ne dediğimi anlıyorum',half:'Kelimelerin yarısı tanıdık',twoThirds:'Üçte iki kapsam',eighty:'%80 kapsam',shortSurahs:'Kısa sûreler tamam'};
   function kaoMilestoneLabel(q){
-    var labels={fatiha:'Fâtiha’yı anlıyorum',namaz:'Namazda ne dediğimi anlıyorum',half:'Kelimelerin yarısı tanıdık',twoThirds:'Üçte iki kapsam',eighty:'%80 kapsam',shortSurahs:'Kısa sûreler tamam'};
     var keys=['shortSurahs','eighty','twoThirds','half','namaz','fatiha'];
-    for(var i=0;i<keys.length;i+=1) if(q.milestones&&q.milestones[keys[i]]) return labels[keys[i]];
+    for(var i=0;i<keys.length;i+=1) if(q.milestones&&q.milestones[keys[i]]) return KAO_MILESTONE_LABELS[keys[i]];
     return 'İlk kilometre taşı: Fâtiha';
+  }
+  // 03 §10 (O-3): ünite taşları ar>tr yönünde review ∧ s≥7; kapsam taşları kaoCoverage (FIX-07 bilinen tanımı).
+  // Saf: yalnız henüz kazanılmamış ve koşulu sağlanan anahtarları döndürür. shortSurahs kendi yolunda (gecikmeli test).
+  function kaoMilestoneCheck(d,nowIso){
+    var q=quranLearnRoot(d),cards=objectOr(q.cards,{}),milestones=objectOr(q.milestones,{}),units=kaoUnitSlices(),ratio=kaoCoverage(d).ratio;
+    var settledForward=function(list){ return list.length>0&&list.every(function(lemma){ return isSettled(cards['w:'+lemma.id+':ar>tr'],7); }); };
+    var reached={fatiha:settledForward(units[0]||[]),namaz:settledForward([].concat(units[0]||[],units[1]||[],units[2]||[])),half:ratio>=0.5,twoThirds:ratio>=0.68,eighty:ratio>=0.8};
+    return ['fatiha','namaz','half','twoThirds','eighty'].filter(function(key){ return reached[key]&&!milestones[key]; });
+  }
+  // Taş bir kez kazanılır: yalnız boş alana yazılır; kapsam düşse ya da undo yapılsa da geri alınmaz.
+  function recordMilestones(q,d,now){
+    var earned=kaoMilestoneCheck(d,now.toISOString());
+    earned.forEach(function(key){ q.milestones[key]=now.toISOString(); });
+    return earned;
   }
   var KAO_AR_TO_BW={"ء":"'","آ":"|","أ":">","ؤ":"&","إ":"<","ئ":"}","ا":"A","ب":"b","ة":"p","ت":"t","ث":"v","ج":"j","ح":"H","خ":"x","د":"d","ذ":"*","ر":"r","ز":"z","س":"s","ش":"$","ص":"S","ض":"D","ط":"T","ظ":"Z","ع":"E","غ":"g","ـ":"_","ف":"f","ق":"q","ك":"k","ل":"l","م":"m","ن":"n","ه":"h","و":"w","ى":"Y","ي":"y","ً":"F","ٌ":"N","ٍ":"K","َ":"a","ُ":"u","ِ":"i","ْ":"o","ّ":"~","ٰ":"`","ٱ":"{","ٓ":"^","ٔ":"#","۟":"@","۠":"\"","ۢ":"[","ۣ":";","ۥ":",","ۦ":".","ۨ":"!","۪":"-","۫":"+","۬":"%","ۭ":"]"};
   var KAO_DIA={"'":'ʾ','|':'ā','>':'ʾ','&':'ʾ','<':'ʾ','}':'ʾ',A:'ā',b:'b',p:'t',t:'t',v:'s̱',j:'c',H:'ḥ',x:'ḫ',d:'d','*':'ẕ',r:'r',z:'z',s:'s','$':'ş',S:'ṣ',D:'ḍ',T:'ṭ',Z:'ẓ',E:'ʿ',g:'ġ',f:'f',q:'ḳ',k:'k',l:'l',m:'m',n:'n',h:'h',w:'v',Y:'ī',y:'y',F:'an',N:'un',K:'in',a:'a',u:'u',i:'i','`':'ā','{':'a'};
@@ -530,11 +544,16 @@
     var surah=catalog&&typeof catalog.byMushafOrder==='function'?catalog.byMushafOrder(Number(number)):null;
     return surah&&surah.id?surah.id:'';
   }
+  // 12 ünite = sözlük sırasının eşit dilimleri; ünite ekranı ve kilometre taşları aynı kaynağı kullanır.
+  function kaoUnitSlices(){
+    var lex=window.QuranLexiconV1,lemmas=lex&&Array.isArray(lex.lemmas)?lex.lemmas:[];
+    return Array.from({length:12},function(_unused,index){ return lemmas.slice(Math.floor(index*lemmas.length/12),Math.floor((index+1)*lemmas.length/12)); });
+  }
   function kaoUnits(){
     if(!quranLearnDeps) return [];
-    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),lex=window.QuranLexiconV1,lemmas=lex&&Array.isArray(lex.lemmas)?lex.lemmas:[],known=kaoKnownLemmaSet(d);
+    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),known=kaoKnownLemmaSet(d),slices=kaoUnitSlices();
     return Array.from({length:12},function(_unused,index){
-      var start=Math.floor(index*lemmas.length/12),end=Math.floor((index+1)*lemmas.length/12),slice=lemmas.slice(start,end),done=slice.filter(function(lemma){ return known[lemma.id]; }).length,unit=q.units&&q.units[String(index+1)],representative=slice[0]||null;
+      var slice=slices[index],done=slice.filter(function(lemma){ return known[lemma.id]; }).length,unit=q.units&&q.units[String(index+1)],representative=slice[0]||null;
       return {id:String(index+1),title:String(unit&&unit.title||('Ünite '+String(index+1))),done:done,total:slice.length,percent:slice.length?Math.round(done/slice.length*100):0,lemmaId:representative&&representative.id||'',surahId:lemmaSurahId(representative)};
     });
   }
@@ -929,6 +948,8 @@
     if(!correct&&task.errorClass&&Object.prototype.hasOwnProperty.call(q.errors,task.errorClass)) q.errors[task.errorClass]+=1;
     if(!correct&&!task.retry) ui.kaoQueue.push(Object.assign({},ui.kaoQueue[ui.kaoTaskIndex],{id:task.id+':retry',retry:true,isNew:false}));
     ui.kaoFeedback=correct?'Doğru':(task.kind==='order'?'Fiil önce gelir: Arapçada çoğu kez fiil–özne–nesne sırası kullanılır.':'Doğru cevap: '+task.answer); ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoOrderDraft=[];
+    var earned=recordMilestones(q,d,now);
+    if(earned.length) ui.kaoFeedback=KAO_MILESTONE_LABELS[earned[earned.length-1]]+' ✦';
     kaoSave(); paintTask(); startTaskPresentation();
     if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.setTimer==='function'){
       if(ui.kaoUndoTimer&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoUndoTimer);
@@ -1265,10 +1286,11 @@
   // KAO-28 · E9 Anlayabildiğin âyet: kapsam token düzeyindedir (01-ARASTIRMA: QAC 77.430 token; 02 §5.1 ≥%95 eşiği).
   var KAO_QURAN_TOKENS=77430,KAO_AYAH_THRESHOLD=0.95,KAO_UNDERSTOOD_MAX=400;
   // 02 §3 (Y-1): kalıcı kart = review ∧ s≥21, yetim ya da okuyucu-bilinmeyen değil. Tek tanım; E3 sayacı da kullanır.
-  function isDurable(card){
+  function isSettled(card,minStability){
     card=card&&typeof card==='object'?card:{};
-    return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=21&&card.orphan!==true&&card.readerUnknown!==true;
+    return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=minStability&&card.orphan!==true&&card.readerUnknown!==true;
   }
+  function isDurable(card){ return isSettled(card,21); }
   // Bilinen lemma = her iki yönde (ar>tr ve tr>ar) kalıcı kart. E1, hub, E9, panel ve CSV bu kümeyi kullanır.
   function kaoKnownLemmaSet(d){
     var cards=objectOr(quranLearnRoot(d).cards,{}),durable=Object.create(null),known=Object.create(null);
@@ -1523,6 +1545,7 @@
     if(!kaoSurahs().some(function(item){ return item.id===sid; })) return false;
     var q=ensureQuranLearn(quranLearnDeps.data()),key=String(sid),record=objectOr(q.surahs[key],{}),now=new Date(); q.surahs[key]=record;
     record.understoodAt=now.toISOString(); record.delayedTestAt=addDays(now,7).toISOString(); record.delayedScore=null; record.delayedAnswered=0; record.delayedCompletedAt=null; record.confirmedAt=null; record.needsReread=false;
+    recordMilestones(q,quranLearnDeps.data(),now);
     kaoSave(); quranLearnDeps.render(); return true;
   }
   function kaoReaderHTML(){
@@ -1732,6 +1755,7 @@
     kaoStart:kaoStart,
     kaoAnswer:kaoAnswer,
     kaoUndo:kaoUndo,
+    kaoMilestoneCheck:kaoMilestoneCheck,
     kaoPlay:kaoPlay,
     kaoNightWindow:kaoNightWindow,
     kaoColorHarakat:kaoColorHarakat,

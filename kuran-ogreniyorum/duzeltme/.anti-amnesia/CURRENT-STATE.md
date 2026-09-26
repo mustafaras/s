@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-10** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`f021e8a` (FIX-08, kullanıcı onayı 2026-09-26, Pages run `36261789629` success, canlı pin `20260926g`); sonraki her push/deploy yine ayrı onay
-**Güncelleme:** 2026-09-26 · KAO-FIX-09 done
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-11** · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`5413819` (FIX-09, Pages success; canlı pin `20260926g`); sonraki her push/deploy yine ayrı onay
+**Güncelleme:** 2026-09-26 · KAO-FIX-10 done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -23,8 +23,8 @@
 | KAO-FIX-06 | Y-2 | done | `7ef9f6e` + durum `50afcc2` | iki yönlü kart; sim 365 g iki yön 524/524, plan bilinen 0→505 |
 | KAO-FIX-07 | Y-1 | done | `70b7dbc` | bilinen = iki yönde review∧s≥21; sim kod=plan 505; M10 YAKALANDI |
 | KAO-FIX-08 | O-1 | done | `f021e8a` | lastDistractors cevapta yazılır (lemma kimliği), lemma düzeyinde dışlama |
-| KAO-FIX-09 | O-2 | done | `git log --grep=KAO-FIX-09` | KF-10: budama yok, 100 KB sınırı kaldırıldı; koruma testi |
-| KAO-FIX-10 | O-3 | todo | | kilometre taşları |
+| KAO-FIX-09 | O-2 | done | `5413819` | KF-10: budama yok, 100 KB sınırı kaldırıldı; koruma testi |
+| KAO-FIX-10 | O-3 | done | `git log --grep=KAO-FIX-10` | kaoMilestoneCheck + isSettled; sim 4 taş dolu; eighty tavan %77,42 (FIX-16) |
 | KAO-FIX-11 | O-5 | todo | | test kör noktaları, mutasyon 15/15 |
 | KAO-FIX-12 | O-6 | todo | | kaynaklar/lisanslar E7 |
 | KAO-FIX-13 | O-9 | todo | | Arapça yazı tipi |
@@ -60,7 +60,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260926g`** (FIX-08) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260926h`** (FIX-10) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 
@@ -81,6 +81,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 13. **`introducedAt` artık `kaoAnswer` ilk cevabında yazılır (FIX-06);** öncesinde ana yolda yazılmadığı için R-A5 anlamsal aralık fiilen işlemiyordu. Veri 365 günde 394 KB → FIX-09.
 14. **`isDurable` tek kalıcılık kuralı (FIX-07);** bilinen lemma iki yönde kalıcı. Mutasyon M04/M09 hâlâ KAÇTI → FIX-11.
 15. **Veri bütçesi (FIX-09 → KF-10 kapandı):** sim 365 g `quranLearn` 241 KB (taban) → 394 (FIX-06, 2× kart) → 464 KB (FIX-08 `lastDistractors`). Kullanıcı: budama yok, sınır yok (`test_kao_state_budget.js` korur). FIX-16 kapanış ekine 05 §2 / `stateBudgetKB` istisnası yazılmalı.
+16. **`eighty` taşı kazanılamaz (FIX-10):** token kapsamı tavanı %77,42 < %80 (plan LEM havuzu %80,9). FIX-16'da karar: eşik/ölçü hizası. `isSettled(card,minS)` tek kalıcılık kuralı; M10 `isDurable`'ı hedefler.
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

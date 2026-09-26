@@ -385,6 +385,68 @@ function sandboxLemma(api, lemmaId) {
   assert.deepEqual(seen[1].filter((id) => seen[0].includes(id)), [], 'R-A2: ardışık iki tekrarda aynı çeldirici gelmez (üretim yolu)');
 }
 
+// KAO-FIX-10 (O-3, 03 §10): kilometre taşları — eşiğin bir altında yok, eşikte kazanılır; bir kez kazanılan geri alınmaz.
+{
+  const lexBox = { window: {} };
+  vm.createContext(lexBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), lexBox);
+  const lemmas = lexBox.window.QuranLexiconV1.lemmas;
+  const slice = (index) => lemmas.slice(Math.floor(index * lemmas.length / 12), Math.floor((index + 1) * lemmas.length / 12));
+  const settled = (s) => ({ state: 'review', s, reps: 5, due: '2027-01-01T00:00:00.000Z', r: '2026-09-01T00:00:00.000Z' });
+  const durable = { state: 'review', s: 30, reps: 8, due: '2027-01-01T00:00:00.000Z', r: '2026-09-01T00:00:00.000Z' };
+  const now = '2026-10-05T10:00:00.000Z';
+  const data = { quranLearn: null };
+  const ui = {};
+  const api = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return '2026-10-05'; } });
+  api.ensureQuranLearn(data);
+  const q = data.quranLearn;
+  const forward = (list, s) => { for (const lemma of list) q.cards[`w:${lemma.id}:ar>tr`] = settled(s); };
+  // fatiha: Ünite 1'in tüm lemmaları ar>tr review ∧ s≥7; biri 6.9 iken yok.
+  forward(slice(0), 7); q.cards[`w:${slice(0)[0].id}:ar>tr`].s = 6.9;
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), [], 'fatiha: eşiğin altında kazanılmaz');
+  q.cards[`w:${slice(0)[0].id}:ar>tr`].s = 7;
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['fatiha'], 'fatiha: eşikte kazanılır');
+  // namaz: Ünite 1–3.
+  forward(slice(1), 7); forward(slice(2), 7); q.cards[`w:${slice(2)[0].id}:ar>tr`].s = 6.9;
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['fatiha'], 'namaz: Ünite 3 eksikken yok');
+  q.cards[`w:${slice(2)[0].id}:ar>tr`].s = 7;
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['fatiha', 'namaz'], 'namaz: Ünite 1–3 tamam');
+  // Kapsam taşları: bilinen = iki yönde kalıcı (FIX-07); en yüksek frekanstan eşiğe kadar.
+  const byFreq = lemmas.slice().sort((a, b) => b.freq - a.freq);
+  const known = (count) => { for (const lemma of byFreq.slice(0, count)) { q.cards[`w:${lemma.id}:ar>tr`] = Object.assign({}, durable); q.cards[`w:${lemma.id}:tr>ar`] = Object.assign({}, durable); } };
+  const countFor = (ratio) => { let sum = 0; for (let i = 0; i < byFreq.length; i += 1) { sum += byFreq[i].freq; if (sum / 77430 >= ratio) return i + 1; } return Infinity; };
+  const halfAt = countFor(0.5), twoThirdsAt = countFor(0.68);
+  known(halfAt - 1);
+  assert.ok(!api.kaoMilestoneCheck(data, now).includes('half'), 'half: kapsam 0,50 altında yok');
+  known(halfAt);
+  assert.ok(api.kaoMilestoneCheck(data, now).includes('half') && !api.kaoMilestoneCheck(data, now).includes('twoThirds'), 'half eşikte; twoThirds henüz yok');
+  known(twoThirdsAt);
+  assert.ok(api.kaoMilestoneCheck(data, now).includes('twoThirds'), 'twoThirds kapsam 0,68');
+  known(lemmas.length);
+  assert.ok(api.kaoCoverage(data).ratio < 0.8 && !api.kaoMilestoneCheck(data, now).includes('eighty'),
+    'eighty: 524 lemmanın tamamı bilinse de token kapsamı %77,42 < %80 (plan hedefi LEM havuzuyla tanımlıydı; FIX-16 kararı)');
+  // Üretim yolu: bir cevap kazanılanları ISO tarihle yazar; kapsam düşse ve undo yapılsa da taş kalır.
+  const target = slice(11)[5];
+  q.cards[`w:${target.id}:ar>tr`] = Object.assign({}, durable, { due: '2026-09-02T00:00:00.000Z' });
+  q.settings.dailyNew = 0; q.settings.audio = false;
+  api.kaoStart();
+  const index = ui.kaoQueue.findIndex((item) => item.cardId === `w:${target.id}:ar>tr`);
+  assert.ok(index >= 0, 'cevap için kart kuyrukta');
+  ui.kaoTaskIndex = index; ui.kaoTasks = ui.kaoTasks || {};
+  const item = ui.kaoQueue[index];
+  const task = ui.kaoTasks[item.id] = api.kaoBuildTask(item, data, { seed: item.id });
+  api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId);
+  for (const key of ['fatiha', 'namaz', 'half', 'twoThirds']) assert.match(String(q.milestones[key]), /^\d{4}-\d{2}-\d{2}T/, `${key} ISO tarihle yazılır`);
+  assert.equal(q.milestones.eighty, null, 'eighty kazanılmaz');
+  assert.match(ui.kaoFeedback, /✦$/, 'yeni taş tek cümle geri bildirim');
+  const earned = JSON.stringify(q.milestones);
+  api.kaoUndo();
+  assert.equal(JSON.stringify(q.milestones), earned, 'undo taşı geri sarmaz (bilinçli karar: taş bir kez kazanılır)');
+  for (const id of Object.keys(q.cards)) if (id.endsWith(':tr>ar')) delete q.cards[id];
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), [], 'kapsam düştü: yeni taş yok');
+  assert.equal(JSON.stringify(q.milestones), earned, 'kapsam düşse de kazanılmış taş kalır');
+}
+
 // KAO-FIX-07 (Y-1, 02 §3): bilinen lemma = her iki yönde review ∧ s≥21 (yetim ve okuyucu-bilinmeyen hariç).
 {
   const api = loadApi();

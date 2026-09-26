@@ -36,7 +36,7 @@ check('gece kapsülü açık temada korumalı koyu zemin alıyor',
   css.includes('sky-time-night ~ .sey-hdr-scene .sey-hdr-phase{'));
 /* IIP-17 günlük seçki yüzeyi styles.css pinini yükseltti; appSurface pini değişmedi. */
 check('CSS ve appSurface cache sürümleri yükseltildi',
-  html.includes('app/styles.css?v=20260924d') && html.includes('app/core/appSurface.js?v=20260926g'));
+  html.includes('app/styles.css?v=20260924d') && html.includes('app/core/appSurface.js?v=20260926h'));
 
 console.log('Passed: '+passed+' / '+(passed+failed));
 if(failed) process.exit(1);

@@ -16,12 +16,12 @@ const JSON_SHA256 = Object.freeze({
   'lexicon.reference.json': '2ee7ca3d011a4fef232bffb407fac9f079ebb9b66baca5475b1a783617ed8ef6',
   'grammar.verified.json': 'd03cd3be7e14a799025c112b2deeb1a981e501a4492d1bcc55ba50afb6f6b4fd',
   'phonics.verified.json': '895d4d5a58aa5d457cf38d8ebffb5843bce07c896f8c7afaeb00ebf147b23384',
-  'lexicon.verified.json': 'cf65aa7777c709e6a95f4bbe9787f7ec56c38530d63b05745c8dac6d6480e229'
+  'lexicon.verified.json': '16a1593415b1363493eb034a421e99a7bdc65e548cb2d517d9db27311d5d6d41'
 });
 function readJson(file) {
   const buffer = fs.readFileSync(path.join(CONTENT, file));
   const actual = crypto.createHash('sha256').update(buffer).digest('hex');
-  if (actual !== JSON_SHA256[file]) throw new Error(`${file}: sha256 uyuşmuyor (${actual})`);
+  if (actual !== JSON_SHA256[file]) throw new Error(`${file}: sha256 uyuşmuyor (${actual}) (pini güncelle: shasum -a 256 kuran-ogreniyorum/content/${file})`);
   return JSON.parse(buffer.toString('utf8'));
 }
 function deepFreezeRuntime() {

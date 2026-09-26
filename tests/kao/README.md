@@ -23,6 +23,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao_requirements.js` | planlandı | Bağlayıcı R-A/R-B/R-C kabul kontrolleri |
 | `test_kao_user_tasks.js` | planlandı | Üç kullanıcı görevinin headless senaryosu |
 | `test_kao_independence.js` | planlandı | KAO-IIP bağımsızlığı ve hub fallback sözleşmesi |
+| `test_kao_freeze_repro.js` | KAO-FIX-01 | Dört içerik modülünün araçlarla `$TMPDIR` kopyasında bayt-eş yeniden üretimi; girdi yoksa SKIP |
 
 Fixture'lar ilgili uygulama kartında tek tek eklenecek; bu başlangıç promptu
 üretim kodu veya çalıştırılabilir fixture eklemez.

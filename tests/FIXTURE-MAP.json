@@ -3,13 +3,22 @@
   "generatedBy": "tools/fixture-map-build.mjs",
   "note": "Fixture -> production-file map derived from committed sources (literal + path.join + local-helper transitive). Read-only scan; regenerate after adding fixtures or helpers. Consumed by archive/ilham-ibadet-premium-plan/tools/plan-check.mjs sibling-regression gate.",
   "families": {
-    "app": 76,
+    "app": 77,
     "panel": 23,
     "panel-v2": 27,
     "quran": 9,
     "reminders": 21
   },
   "byFixture": {
+    "tests/app/test_aeon_mail_outbox.js": {
+      "family": "app",
+      "production": [
+        "app.js",
+        "app/core/appSurface.js",
+        "app/core/messaging.js",
+        "sync.js"
+      ]
+    },
     "tests/app/test_aeon_message_expand.js": {
       "family": "app",
       "production": [
@@ -30,6 +39,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderDelivery.js",
         "app/core/reminderEngine.js",
@@ -183,6 +193,7 @@
         "app/core/motivation.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
         "app/core/render.js",
@@ -211,6 +222,7 @@
         "app/core/messaging.js",
         "app/core/motivation.js",
         "app/core/profile.js",
+        "app/core/quranLearn.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
         "app/core/render.js",
@@ -233,6 +245,7 @@
         "app/core/messaging.js",
         "app/core/motivation.js",
         "app/core/profile.js",
+        "app/core/quranLearn.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
         "app/core/render.js",
@@ -416,13 +429,20 @@
       "production": [
         "app.js",
         "app/core/saygi.js",
-        "app/core/state.js"
+        "app/core/state.js",
+        "app/styles.css"
       ]
     },
     "tests/app/test_iip_22.js": {
       "family": "app",
       "production": [
+        "app.js",
+        "app/content/quranGrammarV1.js",
+        "app/content/quranLexiconV1.js",
+        "app/content/quranShortSurahsV1.js",
         "app/content/quranStrikingVersesV1.js",
+        "app/core/quranLearn.js",
+        "app/kao.css",
         "index.html",
         "sw.js"
       ]
@@ -457,6 +477,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
         "app/core/render.js",
@@ -503,6 +524,7 @@
       "production": [
         "app.js",
         "app/core/appSurface.js",
+        "app/core/render.js",
         "sw.js"
       ]
     },
@@ -731,7 +753,11 @@
         "app/content/motivationNarratives.js",
         "app/content/motivationProgramV2.js",
         "app/content/profileAssessmentV1.js",
+        "app/content/quranGrammarV1.js",
+        "app/content/quranLexiconV1.js",
+        "app/content/quranPhonicsV1.js",
         "app/content/quranRevelationOrderV1.js",
+        "app/content/quranShortSurahsV1.js",
         "app/content/quranStrikingVersesV1.js",
         "app/content/quranTransportV1.js",
         "app/content/saygiPeople.js",
@@ -751,6 +777,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderDelivery.js",
         "app/core/reminderEngine.js",
@@ -810,6 +837,7 @@
         "app/core/messaging.js",
         "app/core/motivation.js",
         "app/core/profile.js",
+        "app/core/quranLearn.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
         "app/core/render.js",
@@ -871,6 +899,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderDelivery.js",
         "app/core/reminderEngine.js",
@@ -1319,6 +1348,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderDelivery.js",
         "app/core/reminderEngine.js",
@@ -1359,6 +1389,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderDelivery.js",
         "app/core/reminderSurface.js",
@@ -1393,6 +1424,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderDelivery.js",
         "app/core/reminderSurface.js",
@@ -1426,6 +1458,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderState.js",
         "app/core/reminderSurface.js",
@@ -1461,6 +1494,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
@@ -1495,6 +1529,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
         "app/core/render.js",
@@ -1548,6 +1583,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderDelivery.js",
         "app/core/reminderSurface.js",
@@ -1586,6 +1622,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderCatalog.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
@@ -1621,6 +1658,7 @@
         "app/core/prayer.js",
         "app/core/profile.js",
         "app/core/quran.js",
+        "app/core/quranLearn.js",
         "app/core/reminderSurface.js",
         "app/core/reminders.js",
         "app/core/render.js",
@@ -1704,6 +1742,7 @@
   },
   "byProduction": {
     "app.js": [
+      "tests/app/test_aeon_mail_outbox.js",
       "tests/app/test_aeon_message_expand.js",
       "tests/app/test_app_surface_boot_boundary.js",
       "tests/app/test_app_surface_daily_boundary.js",
@@ -1726,6 +1765,7 @@
       "tests/app/test_iip_14.js",
       "tests/app/test_iip_20.js",
       "tests/app/test_iip_21.js",
+      "tests/app/test_iip_22.js",
       "tests/app/test_iip_perf_measure.js",
       "tests/app/test_journal_boundary.js",
       "tests/app/test_library_boundary.js",
@@ -1767,30 +1807,8 @@
       "tests/reminders/test_reminder_migration.js",
       "tests/reminders/test_reminder_ui_boundary.js"
     ],
-    "app/content/motivationProgramV2.js": [
-      "tests/app/test_aeon_message_expand.js",
-      "tests/app/test_iip_perf_measure.js",
-      "tests/app/test_state_rebind_boundary.js",
-      "tests/app/test_zikr_manual_entry.js"
-    ],
-    "app/content/profileAssessmentV1.js": [
-      "tests/app/test_aeon_message_expand.js",
-      "tests/app/test_deploy_surface_contract.js",
-      "tests/app/test_iip_perf_measure.js",
-      "tests/app/test_profile_boundary.js",
-      "tests/app/test_state_rebind_boundary.js",
-      "tests/app/test_zikr_manual_entry.js",
-      "tests/reminders/test_reminder_app_acceptance.js",
-      "tests/reminders/test_reminder_app_notification_boundary.js",
-      "tests/reminders/test_reminder_app_privacy.js",
-      "tests/reminders/test_reminder_boot.js",
-      "tests/reminders/test_reminder_concurrency.js",
-      "tests/reminders/test_reminder_cross_surface_schema.js",
-      "tests/reminders/test_reminder_integrated_privacy.js",
-      "tests/reminders/test_reminder_integrated_ux.js",
-      "tests/reminders/test_reminder_migration.js"
-    ],
     "app/core/appSurface.js": [
+      "tests/app/test_aeon_mail_outbox.js",
       "tests/app/test_aeon_message_expand.js",
       "tests/app/test_app_surface_boot_boundary.js",
       "tests/app/test_app_surface_daily_boundary.js",
@@ -1811,6 +1829,78 @@
       "tests/app/test_premium_voice.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/messaging.js": [
+      "tests/app/test_aeon_mail_outbox.js",
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_11.js",
+      "tests/app/test_iip_perf_measure.js",
+      "tests/app/test_messaging_boundary.js",
+      "tests/app/test_modal_focus_containment.js",
+      "tests/app/test_modularization_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "sync.js": [
+      "tests/app/test_aeon_mail_outbox.js",
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/app/test_faz10_sync.js",
+      "tests/app/test_iip_20.js",
+      "tests/app/test_local_visual_qa_guard.js",
+      "tests/app/test_sync_fetch_timeout.js",
+      "tests/app/test_sync_large_file.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
+      "tests/panel/test_panel_p0_sync.js",
+      "tests/panel/test_panel_p2_sync.js",
+      "tests/panel/test_panel_p6_qa_release.js",
+      "tests/quran/test_quran_merge.js",
+      "tests/quran/test_quran_outbox_sync.js",
+      "tests/quran/test_quran_pull_sync.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_cross_surface_status.js",
+      "tests/reminders/test_reminder_end_to_end_lineage.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_sync_privacy.js"
+    ],
+    "app/content/motivationProgramV2.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_iip_perf_measure.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_zikr_manual_entry.js"
+    ],
+    "app/content/profileAssessmentV1.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_deploy_surface_contract.js",
+      "tests/app/test_iip_perf_measure.js",
+      "tests/app/test_profile_boundary.js",
+      "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js",
       "tests/reminders/test_reminder_app_acceptance.js",
       "tests/reminders/test_reminder_app_notification_boundary.js",
@@ -1997,29 +2087,6 @@
       "tests/reminders/test_reminder_integrated_ux.js",
       "tests/reminders/test_reminder_migration.js"
     ],
-    "app/core/messaging.js": [
-      "tests/app/test_aeon_message_expand.js",
-      "tests/app/test_fx2_overlay_motion.js",
-      "tests/app/test_fx2_tab_transition.js",
-      "tests/app/test_fx2_touch_coverage.js",
-      "tests/app/test_iip_11.js",
-      "tests/app/test_iip_perf_measure.js",
-      "tests/app/test_messaging_boundary.js",
-      "tests/app/test_modal_focus_containment.js",
-      "tests/app/test_modularization_boundary.js",
-      "tests/app/test_state_rebind_boundary.js",
-      "tests/app/test_v3_welcome.js",
-      "tests/app/test_zikr_manual_entry.js",
-      "tests/reminders/test_reminder_app_acceptance.js",
-      "tests/reminders/test_reminder_app_notification_boundary.js",
-      "tests/reminders/test_reminder_app_privacy.js",
-      "tests/reminders/test_reminder_boot.js",
-      "tests/reminders/test_reminder_concurrency.js",
-      "tests/reminders/test_reminder_cross_surface_schema.js",
-      "tests/reminders/test_reminder_integrated_privacy.js",
-      "tests/reminders/test_reminder_integrated_ux.js",
-      "tests/reminders/test_reminder_migration.js"
-    ],
     "app/core/motivation.js": [
       "tests/app/test_aeon_message_expand.js",
       "tests/app/test_fx2_overlay_motion.js",
@@ -2099,6 +2166,26 @@
       "tests/app/test_state_rebind_boundary.js",
       "tests/app/test_zikr_manual_entry.js",
       "tests/quran/test_quran_merge.js",
+      "tests/reminders/test_reminder_app_acceptance.js",
+      "tests/reminders/test_reminder_app_notification_boundary.js",
+      "tests/reminders/test_reminder_app_privacy.js",
+      "tests/reminders/test_reminder_boot.js",
+      "tests/reminders/test_reminder_concurrency.js",
+      "tests/reminders/test_reminder_cross_surface_schema.js",
+      "tests/reminders/test_reminder_integrated_privacy.js",
+      "tests/reminders/test_reminder_integrated_ux.js",
+      "tests/reminders/test_reminder_migration.js"
+    ],
+    "app/core/quranLearn.js": [
+      "tests/app/test_aeon_message_expand.js",
+      "tests/app/test_fx2_overlay_motion.js",
+      "tests/app/test_fx2_tab_transition.js",
+      "tests/app/test_fx2_touch_coverage.js",
+      "tests/app/test_iip_22.js",
+      "tests/app/test_iip_perf_measure.js",
+      "tests/app/test_state_rebind_boundary.js",
+      "tests/app/test_v3_welcome.js",
+      "tests/app/test_zikr_manual_entry.js",
       "tests/reminders/test_reminder_app_acceptance.js",
       "tests/reminders/test_reminder_app_notification_boundary.js",
       "tests/reminders/test_reminder_app_privacy.js",
@@ -2195,6 +2282,7 @@
       "tests/app/test_iip_07.js",
       "tests/app/test_iip_11.js",
       "tests/app/test_iip_perf_measure.js",
+      "tests/app/test_location_gate_recovery.js",
       "tests/app/test_modal_focus_containment.js",
       "tests/app/test_modularization_boundary.js",
       "tests/app/test_premium_fx_utils.js",
@@ -2452,6 +2540,7 @@
       "tests/app/test_iip_12.js",
       "tests/app/test_iip_13.js",
       "tests/app/test_iip_17.js",
+      "tests/app/test_iip_21.js",
       "tests/app/test_premium_fx_gate_defaults.js",
       "tests/app/test_premium_reduced_motion.js",
       "tests/app/test_premium_time_theme.js",
@@ -2636,36 +2725,27 @@
       "tests/reminders/test_reminder_app_notification_boundary.js",
       "tests/reminders/test_reminder_integrated_privacy.js"
     ],
-    "sync.js": [
-      "tests/app/test_deploy_surface_contract.js",
-      "tests/app/test_faz10_sync.js",
-      "tests/app/test_iip_20.js",
-      "tests/app/test_local_visual_qa_guard.js",
-      "tests/app/test_sync_fetch_timeout.js",
-      "tests/app/test_sync_large_file.js",
-      "tests/app/test_v3_welcome.js",
-      "tests/app/test_zikr_manual_entry.js",
-      "tests/panel/test_panel_p0_sync.js",
-      "tests/panel/test_panel_p2_sync.js",
-      "tests/panel/test_panel_p6_qa_release.js",
-      "tests/quran/test_quran_merge.js",
-      "tests/quran/test_quran_outbox_sync.js",
-      "tests/quran/test_quran_pull_sync.js",
-      "tests/reminders/test_reminder_app_acceptance.js",
-      "tests/reminders/test_reminder_boot.js",
-      "tests/reminders/test_reminder_concurrency.js",
-      "tests/reminders/test_reminder_cross_surface_schema.js",
-      "tests/reminders/test_reminder_cross_surface_status.js",
-      "tests/reminders/test_reminder_end_to_end_lineage.js",
-      "tests/reminders/test_reminder_integrated_privacy.js",
-      "tests/reminders/test_reminder_sync_privacy.js"
-    ],
     "app/content/quranStrikingVersesV1.js": [
       "tests/app/test_iip_17.js",
       "tests/app/test_iip_22.js",
       "tests/app/test_iip_perf_measure.js",
       "tests/app/test_state_rebind_boundary.js",
       "tests/quran/test_quran_striking_verses.js"
+    ],
+    "app/content/quranGrammarV1.js": [
+      "tests/app/test_iip_22.js",
+      "tests/app/test_state_rebind_boundary.js"
+    ],
+    "app/content/quranLexiconV1.js": [
+      "tests/app/test_iip_22.js",
+      "tests/app/test_state_rebind_boundary.js"
+    ],
+    "app/content/quranShortSurahsV1.js": [
+      "tests/app/test_iip_22.js",
+      "tests/app/test_state_rebind_boundary.js"
+    ],
+    "app/kao.css": [
+      "tests/app/test_iip_22.js"
     ],
     "app/content/esmaulHusnaV1.js": [
       "tests/app/test_iip_perf_measure.js",
@@ -2716,6 +2796,9 @@
     "app/core/skyFx.js": [
       "tests/app/test_iip_perf_measure.js",
       "tests/app/test_sky_fx.js",
+      "tests/app/test_state_rebind_boundary.js"
+    ],
+    "app/content/quranPhonicsV1.js": [
       "tests/app/test_state_rebind_boundary.js"
     ],
     "v3-tanitim/index.html": [

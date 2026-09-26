@@ -135,12 +135,14 @@ for (const variant of [{ label: 'audio=false', quiet: false }, { label: 'sessiz 
       }
     }
   }
-  const table = bands.filter((band) => band.n).map((band) => ({ band: band.band, n: band.n, meanPred: Number((band.pred / band.n).toFixed(3)), actual: Number((band.ok / band.n).toFixed(3)), gap: Number((band.ok / band.n - band.pred / band.n).toFixed(3)) }));
+  // 10 R-bandının tamamı raporlanır; boş bant n=0 ve değer null (R-A3 kabul: 10 bant tablosu).
+  const table = bands.map((band) => ({ band: band.band, n: band.n, meanPred: band.n ? Number((band.pred / band.n).toFixed(3)) : null, actual: band.n ? Number((band.ok / band.n).toFixed(3)) : null, gap: band.n ? Number((band.ok / band.n - band.pred / band.n).toFixed(3)) : null }));
   const total = table.reduce((sum, row) => sum + row.n, 0);
-  const ece = table.reduce((sum, row) => sum + Math.abs(row.gap) * row.n, 0) / total;
+  const ece = table.filter((row) => row.n).reduce((sum, row) => sum + Math.abs(row.gap) * row.n, 0) / total;
+  assert.equal(table.length, 10, '10 R-bandı');
   assert.ok(total > 800, `simülasyon yeterli tekrar üretir (${total})`);
   assert.ok(table.filter((row) => row.n >= 200).every((row) => Math.abs(row.gap) < 0.07), 'kalibre öğrenicide bant farkı küçük (hesap zinciri doğru)');
-  assert.ok(table.length >= 5, 'gecikmeli tekrarlar birden çok R-bandını doldurur');
+  assert.ok(table.filter((row) => row.n).length >= 5, 'gecikmeli tekrarlar birden çok R-bandını doldurur');
   report.calibration = { model: "kalibre sentetik öğrenici (gerçek olasılık = FSRS öngörüsü), 300 kart (30 gün × 10), 42 gün, vadesi gelenin yüzde 60'ı o gün tekrar edilir, tohum 20260926", reviews: total, ece: Number(ece.toFixed(4)), bands: table,
     retention: weekly.map((week, index) => ({ week: index + 1, n: week.n, actual: week.n ? Number((week.ok / week.n).toFixed(3)) : null })) };
 }

@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 96 | 2026-09-26 | KAO-D3 denetimi: pass. 13 kart / 170 kontrol PASS; 12 görünüm modal sözleşmesinde, 35/35 shim, pin tuzağı yok, mikrofon gizliliği, CSS token kuralı ve gereksinim fixture eşlemesi doğrulandı. | `evidence/KAO-D3/AUDIT.md` |
+| 97 | 2026-09-26 | KAO-20 devamı: kalibrasyon tablosu yalnız dolu bantları gösteriyordu; artık 10 R-bandının tamamı (boşlar n=0, "—") hem fixture raporunda hem KAO-REGRESYON.md'de. | KAO-D4 hazırlığında bulundu; test_kao_user_tasks PASS |

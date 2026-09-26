@@ -46,13 +46,18 @@ Bu rapor ölçümle yazıldı: sayıların tamamı `node tests/kao/test_kao_user
 
 | Öngörülen R bandı | Tekrar | Ortalama öngörü | Gerçek | Fark |
 |---|---|---|---|---|
+| 0.0–0.1 | 0 | — | — | — |
+| 0.1–0.2 | 0 | — | — | — |
+| 0.2–0.3 | 0 | — | — | — |
+| 0.3–0.4 | 0 | — | — | — |
+| 0.4–0.5 | 0 | — | — | — |
 | 0.5–0.6 | 1 | 0.547 | 1 | +0.453 |
 | 0.6–0.7 | 3 | 0.632 | 1 | +0.368 |
 | 0.7–0.8 | 17 | 0.761 | 0.706 | -0.055 |
 | 0.8–0.9 | 314 | 0.879 | 0.901 | +0.022 |
 | 0.9–1.0 | 620 | 0.928 | 0.923 | -0.005 |
 
-Boş bantlar gösterilmedi: FSRS tekrarları R ≈ 0,9 hedefinde zamanladığı için alt bantlara ancak geciken tekrarlar düşer; n < 30 olan bantların farkı istatistiksel olarak anlamsızdır.
+Tabloda 10 bandın tamamı var; "—" o bantta tekrar olmadığını gösterir. FSRS tekrarları R ≈ 0,9 hedefinde zamanladığı için alt bantlara ancak geciken tekrarlar düşer; n < 30 olan bantların farkı istatistiksel olarak anlamsızdır.
 
 | Hafta | Tekrar | Gerçek doğruluk |
 |---|---|---|

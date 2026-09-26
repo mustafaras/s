@@ -99,6 +99,20 @@ for (const item of shortSurahs.supplements) {
   assert.equal(item.tr, surahVerified.rows[item.id]?.tr, `${item.id}: tamamlayıcı tr doğrulanmış satırdan gelmeli`);
 }
 
+// KAO-FIX-05 (Y-4): başlık yalıtık biçimdir; önceki kelimeden taşınan bağlam şeddesi ilk harf kümesinde olmaz.
+const firstCluster = (ar) => (String(ar || '').match(/^\p{L}\p{M}*/u) || [''])[0];
+const contextShadda = [...lexicon.lemmas, ...shortSurahs.supplements]
+  .filter((item) => firstCluster(item.ar).includes('ّ')).map((item) => item.id);
+assert.deepEqual(contextShadda, [], 'başlığın ilk harf kümesinde şedde olmamalı');
+const lexiconVerified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8'));
+const allahRecord = lexiconVerified.lemmas.find((record) => record.lemmaBw === '{ll~ah');
+assert.ok(allahRecord && allahRecord.ar.includes('ّ'), '{ll~ah başlığının iç şeddesi korunmalı (ilk harfte değil)');
+assert.equal(lexicon.byId(allahRecord.lemmaId).ar, allahRecord.ar, '{ll~ah başlığı modülde aynı kalmalı');
+const doubledReading = lexiconVerified.lemmas
+  .filter((record) => /^(\p{L})\1/u.test(record.translit.dia) || /^(\p{L})\1/u.test(record.translit.tr))
+  .map((record) => record.lemmaId);
+assert.deepEqual(doubledReading, [], 'DİA/TR okunuşu çift ünsüzle başlamamalı');
+
 // İkinci yol (girdi varsa): kısa sûre kelimelerinin hiçbiri quran.com referansıyla normalize-eşit değil.
 const referencePath = path.join(repoRoot, 'kuran-ogreniyorum/content/lexicon.reference.json');
 if (fs.existsSync(referencePath)) {

@@ -200,6 +200,36 @@ function bwToArabic(value) {
   )).join('');
 }
 
+// KAO-FIX-05 (Y-4): QAC `lemmaBw` önceki kelimenin idgamından gelen bağlam şeddesini taşır
+// (`r~aHiym`, `n~aAs`). Başlık yalıtık biçimdir: ilk ünsüzü izleyen `~` kaldırılır. İlk harfte
+// olmayan şedde (`{ll~ah`, `Hat~aY`) değişmez. lemmaId ham `lemmaBw`'den türediği için sabit kalır.
+function headwordBw(lemmaBw) {
+  const value = String(lemmaBw || '');
+  return value[1] === '~' ? value[0] + value.slice(2) : value;
+}
+
+// QAC'ın kesik verdiği ve korpusta tam sözlük biçimi bulunmayan başlıklar (V3: Arapça tamamlanmaz).
+const HEADWORD_NOTES = Object.freeze({
+  'm~a$a': 'QAC lemma biçimi kesik; sözlük biçimi korpusta yok'
+});
+
+function headwordFields(lemmaBw) {
+  const headword = headwordBw(lemmaBw);
+  return { ar: bwToArabic(headword), tr: translitTr(headword), dia: translitDia(headword), note: HEADWORD_NOTES[lemmaBw] || null };
+}
+
+// Taslaktan gelen kayda başlık biçimini uygular (bayat taslak bağlam şeddesini geri getiremez).
+function withHeadword(record) {
+  const { headwordNote, ...rest } = record;
+  const fields = headwordFields(record.lemmaBw);
+  return {
+    ...rest,
+    ar: fields.ar,
+    translit: { ...record.translit, tr: fields.tr, dia: fields.dia },
+    ...(fields.note ? { headwordNote: fields.note } : {})
+  };
+}
+
 function feature(features, name) {
   const match = String(features || '').match(new RegExp(`(?:^|\\|)${name}:([^|]+)`));
   return match ? match[1] : null;
@@ -463,6 +493,11 @@ function syntheticInputs() {
 }
 
 function selfTest() {
+  // KAO-FIX-05: başlık biçimi — yalnız ilk ünsüzü izleyen bağlam şeddesi kalkar.
+  assert(headwordBw('r~aHiym') === 'raHiym', 'r~aHiym → raHiym');
+  assert(headwordBw('{ll~ah') === '{ll~ah', '{ll~ah değişmez');
+  assert(headwordBw('n~aAs') === 'naAs', 'n~aAs → naAs');
+  assert(headwordBw('Hat~aY') === 'Hat~aY', 'Hat~aY değişmez');
   const synthetic = syntheticInputs();
   const stats = buildStats(synthetic.morphology, synthetic.uthmani, {
     morphology: sha256(Buffer.from(synthetic.morphology)),
@@ -1257,11 +1292,12 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
     const examplesException = examples.length < 3
       ? { reason: 'root_exhausted', rule: 'D-13', final: true, rootOccurrences, have: examples.length, want: 3 }
       : null;
+    const headword = headwordFields(lemma);
     candidates.push({
       lemmaId: lemmaKey(lemma),
       lemmaBw: lemma,
-      ar: bwToArabic(lemma),
-      translit: { tr: translitTr(lemma), dia: translitDia(lemma), auto: true },
+      ar: headword.ar,
+      translit: { tr: headword.tr, dia: headword.dia, auto: true },
       tr1: human ? human.tr1 : null,
       tr2: human ? human.tr2 : null,
       root: rootBw ? bwToArabic(rootBw) : null,
@@ -1697,7 +1733,38 @@ function writeDraft(inputDir) {
 
 function readDraft() {
   if (!fs.existsSync(DRAFT_PATH)) throw new CliError(`taslak yok: ${path.relative(ROOT, DRAFT_PATH)} — önce --draft koş`, 2);
-  return JSON.parse(fs.readFileSync(DRAFT_PATH, 'utf8'));
+  const draft = JSON.parse(fs.readFileSync(DRAFT_PATH, 'utf8'));
+  return { ...draft, lemmas: draft.lemmas.map(withHeadword) };
+}
+
+// --rehead: inceleme tablosunda başlık hücreleri (ar/translit_tr/translit_dia) başlık biçiminden
+// sapan satırları günceller ve D-12 yeniden doğrulama tarihini bugüne çeker. İdempotent.
+function reheadReview() {
+  if (!fs.existsSync(REVIEW_PATH)) throw new CliError(`inceleme tablosu yok: ${path.relative(ROOT, REVIEW_PATH)}`, 2);
+  const byId = new Map(readDraft().lemmas.map((record) => [record.lemmaId, record]));
+  const today = new Date().toISOString().slice(0, 10);
+  const lines = fs.readFileSync(REVIEW_PATH, 'utf8').split('\n');
+  const headerIndex = lines.findIndex((line) => line.startsWith('| lemmaId | ar |'));
+  if (headerIndex < 0) throw new CliError('inceleme tablosu başlığı bulunamadı', 2);
+  const columns = lines[headerIndex].split('|').slice(1, -1).map((cell) => cell.trim());
+  const at = (name) => { const index = columns.indexOf(name); if (index < 0) throw new CliError(`sütun yok: ${name}`, 2); return index; };
+  const [arAt, trAt, diaAt, dateAt] = ['ar', 'translit_tr', 'translit_dia', 'verifiedAt'].map(at);
+  const changed = [];
+  const output = lines.map((line) => {
+    if (!line.startsWith('| l_')) return line;
+    const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
+    if (cells.length !== columns.length) throw new CliError(`sütun sayısı uyuşmuyor: ${cells[0]}`, 2);
+    const record = byId.get(cells[0]);
+    if (!record) return line;
+    if (cells[arAt] === record.ar && cells[trAt] === record.translit.tr && cells[diaAt] === record.translit.dia) return line;
+    const next = cells.map((cell, index) => (
+      index === arAt ? record.ar : index === trAt ? record.translit.tr : index === diaAt ? record.translit.dia : index === dateAt ? today : cell
+    ));
+    changed.push(cells[0]);
+    return `| ${next.join(' | ')} |`;
+  });
+  fs.writeFileSync(REVIEW_PATH, output.join('\n'));
+  console.log(`KAO rehead: ${changed.length} satır güncellendi${changed.length ? ` (${changed.join(', ')})` : ''}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -2081,7 +2148,8 @@ function usage() {
     '  node tools/kao-lexicon-build.mjs --reference   # TEK ağ noktası: quran.com tr kelime-kelime referansı',
     '  node tools/kao-lexicon-build.mjs --workbook',
     '  node tools/kao-lexicon-build.mjs --import-md',
-    '  node tools/kao-lexicon-build.mjs --freeze'
+    '  node tools/kao-lexicon-build.mjs --freeze',
+    '  node tools/kao-lexicon-build.mjs --rehead      # inceleme tablosunda başlık biçimi (KAO-FIX-05)'
   ].join('\n');
 }
 
@@ -2119,6 +2187,11 @@ async function main(argv) {
     writeWorkbook();
     return;
   }
+  if (argv.includes('--rehead')) {
+    rejectUnknown(argv, new Set(['--rehead']));
+    reheadReview();
+    return;
+  }
   if (argv.includes('--import-md')) {
     rejectUnknown(argv, new Set(['--import-md']));
     importReview();
@@ -2138,7 +2211,7 @@ async function main(argv) {
   else compile(inputArg.resolved);
 }
 
-export { INPUTS, CliError, readPinnedInput, readUthmaniInput, parseUthmani, missingInputs, missingMessage, validatePattern, parseApproval, arabicWordRegex, translitTr, wordTranslitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand, frozenRows, packFrozenRows, renderFrozenLexicon };
+export { headwordBw, INPUTS, CliError, readPinnedInput, readUthmaniInput, parseUthmani, missingInputs, missingMessage, validatePattern, parseApproval, arabicWordRegex, translitTr, wordTranslitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand, frozenRows, packFrozenRows, renderFrozenLexicon };
 
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (IS_MAIN) {

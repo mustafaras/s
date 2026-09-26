@@ -193,8 +193,8 @@ ok('data rebinds stay out of the registry and production cache-bust is paired',
      44 satır değiştirdi; index.html sürümü bu commit'te 'c'ye çıktı. Pin 'b'de
      kalmıştı (bayat). app.js 20260921e → 20260922a (senkron durum metni
      teşhisi + dürüst hata banner'ı). */
-  /app\/core\/appSurface\.js\?v=20260926c/.test(index) &&
-  /app\.js\?v=20260926c/.test(index) &&
+  /app\/core\/appSurface\.js\?v=20260926d/.test(index) &&
+  /app\.js\?v=20260926d/.test(index) &&
   index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?'));
 ok('existing harness FILES keep appSurface immediately before app.js',
   /'app\/core\/appSurface\.js',\s*'app\.js'/.test(read('.claude/skills/run-seyma/driver.mjs')) &&

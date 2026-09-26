@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "version": "quran-lexicon-tr-v1",
   "importedBy": "kao-lexicon-build --import-md",
-  "importedAt": "2026-09-23",
+  "importedAt": "2026-09-26",
   "verifiedTotal": 524,
   "unknownTotal": 0,
   "rowsTotal": 524,
@@ -4783,10 +4783,10 @@
     {
       "lemmaId": "l_n_aAs_ba9c78",
       "lemmaBw": "n~aAs",
-      "ar": "نَّاس",
+      "ar": "نَاس",
       "translit": {
         "tr": "nâs",
-        "dia": "nnās",
+        "dia": "nās",
         "auto": true
       },
       "tr1": "insanlar",
@@ -4847,9 +4847,9 @@
       "priority": 0.341088,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -9682,10 +9682,10 @@
     {
       "lemmaId": "l_m_ubiyn_4f4924",
       "lemmaBw": "m~ubiyn",
-      "ar": "مُّبِين",
+      "ar": "مُبِين",
       "translit": {
         "tr": "mubîn",
-        "dia": "mmubīn",
+        "dia": "mubīn",
         "auto": true
       },
       "tr1": "açık, apaçık",
@@ -9833,9 +9833,9 @@
       "priority": 0.020288,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -9844,10 +9844,10 @@
     {
       "lemmaId": "l_r_aHiym_ecdbe9",
       "lemmaBw": "r~aHiym",
-      "ar": "رَّحِيم",
+      "ar": "رَحِيم",
       "translit": {
         "tr": "rahîm",
-        "dia": "rraḥīm",
+        "dia": "raḥīm",
         "auto": true
       },
       "tr1": "çok merhametli (sürekli)",
@@ -9969,9 +9969,9 @@
       "priority": 0.319777,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -9980,10 +9980,10 @@
     {
       "lemmaId": "l_d_unoyaA_4c3c1e",
       "lemmaBw": "d~unoyaA",
-      "ar": "دُّنْيَا",
+      "ar": "دُنْيَا",
       "translit": {
         "tr": "dunyâ",
-        "dia": "ddunyā",
+        "dia": "dunyā",
         "auto": true
       },
       "tr1": "en yakın (hayat), dünya",
@@ -10075,9 +10075,9 @@
       "priority": 0.019606,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -11965,10 +11965,10 @@
     {
       "lemmaId": "l_l_ayosa_5684fc",
       "lemmaBw": "l~ayosa",
-      "ar": "لَّيْسَ",
+      "ar": "لَيْسَ",
       "translit": {
         "tr": "laysa",
-        "dia": "llaysa",
+        "dia": "laysa",
         "auto": true
       },
       "tr1": "değildir",
@@ -12029,9 +12029,9 @@
       "priority": 0.015174,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -12489,10 +12489,10 @@
     {
       "lemmaId": "l_n_aZara_cdb6f4",
       "lemmaBw": "n~aZara",
-      "ar": "نَّظَرَ",
+      "ar": "نَظَرَ",
       "translit": {
         "tr": "nazara",
-        "dia": "nnaẓara",
+        "dia": "naẓara",
         "auto": true
       },
       "tr1": "baktı",
@@ -12621,9 +12621,9 @@
       "priority": 0.014833,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -15694,10 +15694,10 @@
     {
       "lemmaId": "l_n_abiY_e09f3b",
       "lemmaBw": "n~abiY~",
-      "ar": "نَّبِىّ",
+      "ar": "نَبِىّ",
       "translit": {
         "tr": "nabiyy",
-        "dia": "nnabiyy",
+        "dia": "nabiyy",
         "auto": true
       },
       "tr1": "haber getiren peygamber",
@@ -15796,9 +15796,9 @@
       "priority": 0.012787,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -20259,10 +20259,10 @@
     {
       "lemmaId": "l_S_a_liHa_t_f6a492",
       "lemmaBw": "S~a`liHa`t",
-      "ar": "صَّٰلِحَٰت",
+      "ar": "صَٰلِحَٰت",
       "translit": {
         "tr": "sâlihât",
-        "dia": "ṣṣāliḥāt",
+        "dia": "ṣāliḥāt",
         "auto": true
       },
       "tr1": "iyi işler, güzel ameller",
@@ -20375,9 +20375,9 @@
       "priority": 0.01057,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -21867,10 +21867,10 @@
     {
       "lemmaId": "l_r_aHoma_n_c13ea2",
       "lemmaBw": "r~aHoma`n",
-      "ar": "رَّحْمَٰن",
+      "ar": "رَحْمَٰن",
       "translit": {
         "tr": "rahmân",
-        "dia": "rraḥmān",
+        "dia": "raḥmān",
         "auto": true
       },
       "tr1": "rahmeti her şeyi kuşatan",
@@ -21992,9 +21992,9 @@
       "priority": 0.309718,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -33010,10 +33010,10 @@
     {
       "lemmaId": "l_m_aAta_a0f90e",
       "lemmaBw": "m~aAta",
-      "ar": "مَّاتَ",
+      "ar": "مَاتَ",
       "translit": {
         "tr": "mâta",
-        "dia": "mmāta",
+        "dia": "māta",
         "auto": true
       },
       "tr1": "öldü",
@@ -33128,9 +33128,9 @@
       "priority": 0.006649,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -33599,10 +33599,10 @@
     {
       "lemmaId": "l_m_aEoruwf_413882",
       "lemmaBw": "m~aEoruwf",
-      "ar": "مَّعْرُوف",
+      "ar": "مَعْرُوف",
       "translit": {
         "tr": "maʿrûf",
-        "dia": "mmaʿrūf",
+        "dia": "maʿrūf",
         "auto": true
       },
       "tr1": "uygun, iyi bilinen (şey)",
@@ -33715,9 +33715,9 @@
       "priority": 0.006479,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -33726,10 +33726,10 @@
     {
       "lemmaId": "l_m_ay_it_fb6ea2",
       "lemmaBw": "m~ay~it",
-      "ar": "مَّيِّت",
+      "ar": "مَيِّت",
       "translit": {
         "tr": "mayyit",
-        "dia": "mmayyit",
+        "dia": "mayyit",
         "auto": true
       },
       "tr1": "ölü",
@@ -33844,9 +33844,9 @@
       "priority": 0.006479,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -34010,10 +34010,10 @@
     {
       "lemmaId": "l_r_aDiYa_3ee772",
       "lemmaBw": "r~aDiYa",
-      "ar": "رَّضِىَ",
+      "ar": "رَضِىَ",
       "translit": {
         "tr": "radiya",
-        "dia": "rraḍiya",
+        "dia": "raḍiya",
         "auto": true
       },
       "tr1": "razı oldu, hoşnut oldu",
@@ -34147,9 +34147,9 @@
       "priority": 0.006479,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -34760,10 +34760,10 @@
     {
       "lemmaId": "l_m_usotaqiym_930fac",
       "lemmaBw": "m~usotaqiym",
-      "ar": "مُّسْتَقِيم",
+      "ar": "مُسْتَقِيم",
       "translit": {
         "tr": "mustakîm",
-        "dia": "mmustaḳīm",
+        "dia": "mustaḳīm",
         "auto": true
       },
       "tr1": "dosdoğru",
@@ -34974,9 +34974,9 @@
       "priority": 0.306308,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -36711,10 +36711,10 @@
     {
       "lemmaId": "l_m_urosal_fc2a88",
       "lemmaBw": "m~urosal",
-      "ar": "مُّرْسَل",
+      "ar": "مُرْسَل",
       "translit": {
         "tr": "mursal",
-        "dia": "mmursal",
+        "dia": "mursal",
         "auto": true
       },
       "tr1": "gönderilmiş elçi",
@@ -36827,9 +36827,9 @@
       "priority": 0.005967,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -38369,10 +38369,10 @@
     {
       "lemmaId": "l_n_aEam_57fa95",
       "lemmaBw": "n~aEam",
-      "ar": "نَّعَم",
+      "ar": "نَعَم",
       "translit": {
         "tr": "naʿam",
-        "dia": "nnaʿam",
+        "dia": "naʿam",
         "auto": true
       },
       "tr1": "sağmal hayvanlar (deve, sığır, koyun)",
@@ -38492,9 +38492,9 @@
       "priority": 0.005626,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -43132,10 +43132,10 @@
     {
       "lemmaId": "l_m_agofirap_60a926",
       "lemmaBw": "m~agofirap",
-      "ar": "مَّغْفِرَة",
+      "ar": "مَغْفِرَة",
       "translit": {
         "tr": "magfiret",
-        "dia": "mmaġfirat",
+        "dia": "maġfirat",
         "auto": true
       },
       "tr1": "bağışlanma",
@@ -43255,9 +43255,9 @@
       "priority": 0.004774,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -43450,10 +43450,10 @@
     {
       "lemmaId": "l_r_aHima_870005",
       "lemmaBw": "r~aHima",
-      "ar": "رَّحِمَ",
+      "ar": "رَحِمَ",
       "translit": {
         "tr": "rahima",
-        "dia": "rraḥima",
+        "dia": "raḥima",
         "auto": true
       },
       "tr1": "merhamet etti, acıdı",
@@ -43575,9 +43575,9 @@
       "priority": 0.004774,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -44621,10 +44621,10 @@
     {
       "lemmaId": "l_m_akaAn_b26fbd",
       "lemmaBw": "m~akaAn",
-      "ar": "مَّكَان",
+      "ar": "مَكَان",
       "translit": {
         "tr": "makân",
-        "dia": "mmakān",
+        "dia": "makān",
         "auto": true
       },
       "tr1": "yer, mekân",
@@ -44702,9 +44702,9 @@
       "priority": 0.004603,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -47153,10 +47153,10 @@
     {
       "lemmaId": "l_m_iyva_q_ac1e15",
       "lemmaBw": "m~iyva`q",
-      "ar": "مِّيثَٰق",
+      "ar": "مِيثَٰق",
       "translit": {
         "tr": "mîsâk",
-        "dia": "mmīs̱āḳ",
+        "dia": "mīs̱āḳ",
         "auto": true
       },
       "tr1": "kesin söz, antlaşma",
@@ -47255,9 +47255,9 @@
       "priority": 0.004262,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -51866,10 +51866,10 @@
     {
       "lemmaId": "l_m_u_omina_t_b9c5a2",
       "lemmaBw": "m~u&omina`t",
-      "ar": "مُّؤْمِنَٰت",
+      "ar": "مُؤْمِنَٰت",
       "translit": {
         "tr": "mu'minât",
-        "dia": "mmuʾmināt",
+        "dia": "muʾmināt",
         "auto": true
       },
       "tr1": "inanan kadınlar",
@@ -52047,9 +52047,9 @@
       "priority": 0.003751,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -54510,10 +54510,10 @@
     {
       "lemmaId": "l_m_a_a_fb0e46",
       "lemmaBw": "m~a$a",
-      "ar": "مَّشَ",
+      "ar": "مَشَ",
       "translit": {
         "tr": "maşa",
-        "dia": "mmaşa",
+        "dia": "maşa",
         "auto": true
       },
       "tr1": "yürüdü",
@@ -54591,21 +54591,22 @@
       "priority": 0.00358,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
+      "headwordNote": "QAC lemma biçimi kesik; sözlük biçimi korpusta yok",
       "copiedFromReference": false
     },
     {
       "lemmaId": "l_m_uka_ibiyn_f66cdd",
       "lemmaBw": "m~uka*~ibiyn",
-      "ar": "مُّكَذِّبِين",
+      "ar": "مُكَذِّبِين",
       "translit": {
         "tr": "mukazzibîn",
-        "dia": "mmukaẕẕibīn",
+        "dia": "mukaẕẕibīn",
         "auto": true
       },
       "tr1": "yalanlayanlar",
@@ -54725,9 +54726,9 @@
       "priority": 0.00358,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -54736,10 +54737,10 @@
     {
       "lemmaId": "l_m_usam_FY_24926e",
       "lemmaBw": "m~usam~FY",
-      "ar": "مُّسَمًّى",
+      "ar": "مُسَمًّى",
       "translit": {
         "tr": "musammen",
-        "dia": "mmusamman",
+        "dia": "musamman",
         "auto": true
       },
       "tr1": "belirlenmiş, adı konmuş",
@@ -54838,9 +54839,9 @@
       "priority": 0.00358,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -59340,10 +59341,10 @@
     {
       "lemmaId": "l_n_af_a_va_t_b7ff1f",
       "lemmaBw": "n~af~a`va`t",
-      "ar": "نَّفَّٰثَٰت",
+      "ar": "نَفَّٰثَٰت",
       "translit": {
         "tr": "naffâsât",
-        "dia": "nnaffās̱āt",
+        "dia": "naffās̱āt",
         "auto": true
       },
       "tr1": "üfleyen (kadın)lar",
@@ -59395,9 +59396,9 @@
       "priority": 0.30017,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },
@@ -59406,10 +59407,10 @@
     {
       "lemmaId": "l_S_amad_6a6bdd",
       "lemmaBw": "S~amad",
-      "ar": "صَّمَد",
+      "ar": "صَمَد",
       "translit": {
         "tr": "samad",
-        "dia": "ṣṣamad",
+        "dia": "ṣamad",
         "auto": true
       },
       "tr1": "her şeyin yöneldiği, kimseye muhtaç olmayan",
@@ -59461,9 +59462,9 @@
       "priority": 0.30017,
       "verified": true,
       "verifiedBy": "claude-opus-5-5",
-      "verifiedAt": "2026-09-23",
+      "verifiedAt": "2026-09-26",
       "approval": {
-        "date": "2026-09-23",
+        "date": "2026-09-26",
         "valid": true,
         "rule": "D-12"
       },

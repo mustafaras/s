@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { INPUTS, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic, translitTr, wordTranslitTr } from './kao-lexicon-build.mjs';
+import { INPUTS, headwordBw, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic, translitTr, wordTranslitTr } from './kao-lexicon-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = path.join(ROOT, 'kuran-ogreniyorum/content');
@@ -16,7 +16,7 @@ const JSON_SHA256 = Object.freeze({
   'lexicon.reference.json': '2ee7ca3d011a4fef232bffb407fac9f079ebb9b66baca5475b1a783617ed8ef6',
   'grammar.verified.json': 'd03cd3be7e14a799025c112b2deeb1a981e501a4492d1bcc55ba50afb6f6b4fd',
   'phonics.verified.json': '895d4d5a58aa5d457cf38d8ebffb5843bce07c896f8c7afaeb00ebf147b23384',
-  'lexicon.verified.json': '16a1593415b1363493eb034a421e99a7bdc65e548cb2d517d9db27311d5d6d41',
+  'lexicon.verified.json': '1b87b57f00216c3a4a0fd0d5cbf3e8bf14da0e7f6027be640e0e04ac918e2a22',
   'surahs.verified.json': '83194a3c90ef1fc43e61666305a22c2a7bfc87e3780045c3651d4e089127a6e3'
 });
 function readJson(file) {
@@ -165,7 +165,7 @@ function collectSurahs(verifiedRows = null) {
     const id = `s-${qac.surah}-${qac.ayah}-${qac.wordIndex}`;
     const tr = trFor(id, `${ref}:${qac.wordIndex}`);
     if (!known && !supplements.has(lemmaId)) supplements.set(lemmaId, {
-      id: lemmaId, ar: bwToArabic(qac.lemmaBw || qac.formBw), tr: trFor(lemmaId, `${ref}:${qac.wordIndex}`),
+      id: lemmaId, ar: bwToArabic(headwordBw(qac.lemmaBw || qac.formBw)), tr: trFor(lemmaId, `${ref}:${qac.wordIndex}`),
       lemmaBw: qac.lemmaBw, source: 'QAC lemma + D-12 verified KAO Turkish layer (surahs.verified.json)'
     });
     const pronunciation = qacPronunciation(qac);
@@ -194,7 +194,7 @@ function collectSurahs(verifiedRows = null) {
     const known = knownByBw.get(qac.lemmaBw); const lemmaId = known ? known.lemmaId : lemmaKey(qac.lemmaBw || qac.formBw);
     const refKey = `${ref}:${qac.wordIndex}`;
     const tr = trFor(`f-1-${qac.ayah}-${qac.wordIndex}`, refKey);
-    if (!known && !supplements.has(lemmaId)) supplements.set(lemmaId, { id: lemmaId, ar: bwToArabic(qac.lemmaBw || qac.formBw), tr: trFor(lemmaId, refKey), source: 'QAC lemma + D-12 verified KAO Turkish layer (surahs.verified.json)' });
+    if (!known && !supplements.has(lemmaId)) supplements.set(lemmaId, { id: lemmaId, ar: bwToArabic(headwordBw(qac.lemmaBw || qac.formBw)), tr: trFor(lemmaId, refKey), source: 'QAC lemma + D-12 verified KAO Turkish layer (surahs.verified.json)' });
     const pronunciation = qacPronunciation(qac);
     if (!pronunciation) throw new Error(`${ref}:${qac.wordIndex}: Fâtiha Latin okunuşu yok`);
     fatiha.push({ ar, tr, lemmaId, pronunciation });

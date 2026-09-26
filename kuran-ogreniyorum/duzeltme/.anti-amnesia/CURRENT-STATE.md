@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-05** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-06** · **Aktif:** — · **Engel:** — · **Açık karar:** `m~a$a` başlığı (FIX-05)
 **Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`9fa910a` (FIX-03/B, kullanıcı onayı 2026-09-26, Pages success); sonraki her push/deploy yine ayrı onay
-**Güncelleme:** 2026-09-26 · KAO-FIX-04 done
+**Güncelleme:** 2026-09-26 · KAO-FIX-05 done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -18,8 +18,8 @@
 | KAO-FIX-03/B | K-1, Y-3 | done | `9fa910a` | 99–105 (210) filled, copy 0, language 0 |
 | KAO-FIX-03/C | K-1, Y-3 | done | `582c5e2` | 106–114 (178) filled, copy 0, language 0 |
 | KAO-FIX-03/D | K-1, Y-3 | done | `9f9163c` | Fâtiha 29 + tamamlayıcı 190; import 837/837, copy 0, language 0 |
-| KAO-FIX-04 | K-1, Y-3 | done | `git log --grep=KAO-FIX-04` | dondurma + atıf + pin `20260926c`; kopya 618→0, İngilizce 26→0 |
-| KAO-FIX-05 | Y-4, D-6 | todo | | başlık şeddesi + DİA |
+| KAO-FIX-04 | K-1, Y-3 | done | `0ac1837` | dondurma + atıf + pin `20260926c`; kopya 618→0, İngilizce 26→0 |
+| KAO-FIX-05 | Y-4, D-6 | done | `git log --grep=KAO-FIX-05` | şeddeli başlık 26→0 (+17 tamamlayıcı), DİA çift 26→0, D-6 belgeli istisna; `m~a$a` kullanıcı kararı |
 | KAO-FIX-06 | Y-2 | todo | | iki yönlü kart |
 | KAO-FIX-07 | Y-1 | todo | | bilinen/kapsam tanımı |
 | KAO-FIX-08 | O-1 | todo | | lastDistractors |
@@ -59,7 +59,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260926c`** (FIX-04) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260926d`** (FIX-05) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 
@@ -76,6 +76,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 9. **Parti D = 29 Fâtiha + 158 `ls_` + 32 `lp_`** (lp = Diyanet dua anlamı; quran.com referansı yok → kopya denetimi yok). `counts`'ta ek `invalid` (doğrulayıcı/tarih/biçim) de exit 1 verir.
 10. **`surahs.verified.json` FIX-03'te doğar** (FIX-02'de üretilip silindi); `--surah-import` satırlar aynıysa `importedAt`'i korur (hash sabit).
 11. **Kopya kapısı tek karşılıklı kelimede eş anlamlı ister;** A'da seçilenler: `Allah Teâlâ`, `Kadr`, `melâike`, `sen oku`, `asla` (kellâ), `o Kitap`/`kitabın`. B–D'de aynı karşılıkları kullan (tutarlılık).
+12. **Başlık biçimi `headwordBw` (FIX-05):** `readDraft` bayat taslağı normalize eder; `--draft` koşma (evidence/KAO-02'ye yazar, V8). `family` (286) ve `lexicon.workbook.md` hâlâ bağlam şeddeli — modüle girmez.
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

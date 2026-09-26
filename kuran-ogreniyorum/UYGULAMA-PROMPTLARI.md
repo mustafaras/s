@@ -1581,6 +1581,9 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `tests/app/test_app_surface_lifecycle_boundary.js`
 - `tests/app/test_app_surface_overlay_boundary.js`
 - `kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md`
+- `kuran-ogreniyorum/content/lexicon.verified.json`
+- `kuran-ogreniyorum/content/lexicon.draft.json`
+- `kuran-ogreniyorum/content/lexicon.review.md`
 - `kuran-ogreniyorum/evidence/KAO-16b/**`
 - `kuran-ogreniyorum/KAO-STATE.json`
 - `kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md`

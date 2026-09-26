@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 91 | 2026-09-26 | KAO-21 bitti: kapı koşulu (IIP main'de) sağlandı; saygi.js 0 satır (bileşim a9fa40c'de vardı); bayt-eşitlik fixture'ı; settings.kaoVisible + Ayarlar'dan geri getirme; köprüler QY/Esmâ sahipliği nedeniyle prompt gereği atlandı. Pinler App 755/593, onclick 393, yayın 20260925m. | `evidence/KAO-21/EVIDENCE.json`; tam regresyon 149/149 |
+| 92 | 2026-09-26 | KAO-16b devamı: ۟ düzeltmesinin doğrulanmış sözlükte kalan tek lemması (يَرْجُوا۟ yarcûâ→yarcû) düzeltildi; DİA portuna aynı kural; sözlük yeniden donduruldu; üretilmiş taslak/inceleme eşitlendi; yayın pini 20260925n. | KAO-D1 hazırlığında denetim yürütücüsü buldu; tam regresyon PASS |

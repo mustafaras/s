@@ -1358,6 +1358,9 @@
         "tests/app/test_app_surface_lifecycle_boundary.js",
         "tests/app/test_app_surface_overlay_boundary.js",
         "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
+        "kuran-ogreniyorum/content/lexicon.verified.json",
+        "kuran-ogreniyorum/content/lexicon.draft.json",
+        "kuran-ogreniyorum/content/lexicon.review.md",
         "kuran-ogreniyorum/evidence/KAO-16b/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -1391,7 +1394,13 @@
       "agent": "Claude (Opus 5.5)",
       "scopeNote": "E11 her Arapça kelimenin doğrulanmış okunuşunu ister (KAO-15 sözleşmesi); prayerTexts okunuşsuz donmuştu. Kapsam bu yüzden içerik hattına genişledi: dondurma aracı prayerTexts okunuşunu paketler (Fâtiha/İhlâs mekanik, 6 Diyanet satırının 50 kelimesi D-12 yapay zekâ doğrulamalı), aynı araçta iki üretim hatası düzeltildi (Türkçe okunuşa ikinci kez uygulanan th/dh/sh/kh digraf dönüşümü: 5 kısa sûre + 2 gramer okunuşu; Uthmani ۟ işaretli harfin okunması: kao-lexicon-build transliterate, 21 kısa sûre kelimesi + 341 sözlük örneği) ve üç modül araçla deterministik yeniden üretildi. Tam regresyonda tarihe bağlı bir R-A2 hatası bulundu (bazı günlerde oturumun tüm yeni kelimeleri tek yönde); kaoBuildQueue yön dengeleme düzeltmesi + 365 günlük regresyon fixture'ı. İki App handler'ı pinleri 752→754 / 590→592 taşıdı; önbellek 20260925h→20260925i.",
       "completedAt": "2026-09-26",
-      "evidence": "kuran-ogreniyorum/evidence/KAO-16b/EVIDENCE.json"
+      "evidence": "kuran-ogreniyorum/evidence/KAO-16b/EVIDENCE.json",
+      "followUp": [
+        {
+          "at": "2026-09-26",
+          "note": "KAO-D1 denetim yürütücüsü, ۟ düzeltmesinin doğrulanmış sözlükteki tek lemmayı (l_yarojuwA_199bfc يَرْجُوا۟: yarcûâ→yarcû, DİA yarcūā→yarcū) kapsamadığını gösterdi: verified kayıt araç çıktısıyla düzeltildi, çalışma zamanı DİA portuna aynı ۟ kuralı eklendi, sözlük yeniden donduruldu, taslak/inceleme dosyaları bugünkü araç çıktısıyla eşitlendi; DİA 524/524 korunuyor; yayın pini 20260925n."
+        }
+      ]
     },
     "KAO-18": {
       "title": "Kontrast ve erişilebilirlik ölçümü",

@@ -430,6 +430,7 @@
     var ignored=function(c){ return KAO_DIA_IGNORE.indexOf(c)>=0; };
     for(var index=0;index<chars.length;index+=1){
       var c=chars[index],lastBase=prevBase;
+      if(chars[index+1]==='@'&&!ignored(c)) continue; // Uthmani ۟: taşıdığı harf okunmaz (araçla aynı kural)
       if(!ignored(c)&&c!=='~') prevBase=c;
       if('AY`'.indexOf(c)>=0&&lastBase==='F') continue;
       if(c==='~'){

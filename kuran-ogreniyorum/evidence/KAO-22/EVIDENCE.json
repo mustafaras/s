@@ -1,0 +1,20 @@
+{
+  "card": "KAO-22",
+  "head": "caf61fdeca0c92be32f3b2160574545012dfc72b",
+  "diffHash": "7c299bdd9d06a1de8a1e1eddce83f27724fa1b7963b91e9cc01307f9a3f12f1d",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-26",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "deliverable": "kuran-ogreniyorum/deliverables/KAO-KAPANIS.md",
+  "requirements": "24 done, 2 gerekçeli partial (R-C5, R-C9), pending 0; STATE requirements.status güncellendi",
+  "audits": "D1 findings, D2 pass, D3 pass, D4 pass, D5 findings; D6 bu karttan sonra",
+  "repoNotes": "CLAUDE.md ve AGENTS.md: Agent Routing KAO maddesi + Repo layout satırları; README.md: içerik modülleri tablosuna KAO satırı",
+  "releaseApproval": "APPROVED (kullanıcı kaydı korunur); bu kart yayın yapmaz",
+  "deviceAcceptance": "K3 bekliyor — kullanıcı",
+  "evidenceLevels": {
+    "source": "headless fixture + denetimler",
+    "deploy": "59a53d9'a kadar yayında; sonrası bekliyor",
+    "device": "bekliyor"
+  }
+}

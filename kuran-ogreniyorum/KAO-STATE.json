@@ -7,7 +7,7 @@
     "commit": "0436405",
     "branch": "main"
   },
-  "status": "in_progress",
+  "status": "completed",
   "releaseApproval": "APPROVED",
   "releaseApprovalRecord": {
     "by": "user",
@@ -18,7 +18,7 @@
     "pagesRun": 35978035375,
     "result": "success"
   },
-  "nextCard": "KAO-22",
+  "nextCard": "KAO-D1",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -1628,7 +1628,12 @@
       "deps": [
         "KAO-21"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-26",
+      "agent": "Claude (Opus 5.5)",
+      "scopeNote": "Plan releaseApproval için kapanışta NOT_APPROVED öngörüyordu; STATE'te kullanıcının açık yayın onayı (APPROVED + kayıt) bulunduğu için geri alınmadı — kapanış kendiliğinden push/merge/tag/deploy yapmaz. Kapanıştan önce D1–D5 dalga denetimleri çalıştırıldı (önceki oturumlarda atlanmıştı).",
+      "completedAt": "2026-09-26",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-22/EVIDENCE.json"
     }
   },
   "targets": {
@@ -1689,33 +1694,34 @@
       "R-C9"
     ],
     "status": {
-      "R-A1": "partial",
+      "R-A1": "done",
       "R-A2": "done",
-      "R-A3": "partial",
-      "R-A4": "partial",
+      "R-A3": "done",
+      "R-A4": "done",
       "R-A5": "done",
       "R-A6": "done",
-      "R-A7": "partial",
+      "R-A7": "done",
       "R-A8": "done",
-      "R-A9": "partial",
-      "R-B1": "pending",
-      "R-B2": "partial",
+      "R-A9": "done",
+      "R-B1": "done",
+      "R-B2": "done",
       "R-B3": "done",
-      "R-B4": "pending",
-      "R-B5": "pending",
-      "R-B6": "partial",
+      "R-B4": "done",
+      "R-B5": "done",
+      "R-B6": "done",
       "R-B7": "done",
-      "R-B8": "partial",
-      "R-C1": "pending",
-      "R-C2": "partial",
+      "R-B8": "done",
+      "R-C1": "done",
+      "R-C2": "done",
       "R-C3": "done",
-      "R-C4": "pending",
+      "R-C4": "done",
       "R-C5": "partial",
-      "R-C6": "partial",
+      "R-C6": "done",
       "R-C7": "done",
-      "R-C8": "pending",
-      "R-C9": "pending"
-    }
+      "R-C8": "done",
+      "R-C9": "partial"
+    },
+    "statusNote": "KAO-22 kapanışı (2026-09-26): 24 done, 2 gerekçeli partial (R-C5 içerik gzip bütçesi — kullanıcı kararı; R-C9 cihaz kabulü — kullanıcı). Ayrıntı: deliverables/KAO-KAPANIS.md §5–§6."
   },
   "commonChecks": [
     "node --check <değişen her .js/.mjs>",
@@ -1788,7 +1794,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-21",
+  "lastCompletedPrompt": "KAO-22",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",
@@ -1954,5 +1960,6 @@
     "attribution": "quran.com — atıf zorunlu; veri git dışında tutulur.",
     "notCopied": true,
     "fetchNote": "Tüm Kur’an: 77.429 kelime çekildi, başarısız sûre 0. Resmî sürüm toplamıyla (77.429) birebir aynı. Ardışık istekler arasında 120 ms bekleme."
-  }
+  },
+  "completedAt": "2026-09-26"
 }

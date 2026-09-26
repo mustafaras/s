@@ -483,6 +483,7 @@ source map; the four boot lists above are the executable load-order contract.
 | Core surfaces (2) | `render.js`, `appSurface.js` | Render builders, `render()`, daily/domain/overlay bodies, lifecycle callbacks and boot bridges |
 | Content/program (4) | `motivationProgramV2.js`, `motivationNarratives.js`, `saygiPeople.js`, `profileAssessmentV1.js` | Frozen motivation, narrative, inspirational-figure and profile-assessment content |
 | Content/calendar and Quran (4) | `hijriCalendar.js`, `quranRevelationOrderV1.js`, `quranStrikingVersesV1.js`, `quranTransportV1.js` | Calendar/catalog data, verse showcase and pure Quran transport contract |
+| Quranic Arabic learning (KAO, 5) | `quranLexiconV1.js`, `quranGrammarV1.js`, `quranShortSurahsV1.js`, `quranPhonicsV1.js`, `app/core/quranLearn.js` | Frozen, tool-generated vocabulary/grammar/short-surah/phonics content and the spaced-repetition learning surface; see [`kuran-ogreniyorum/deliverables/KAO-KAPANIS.md`](kuran-ogreniyorum/deliverables/KAO-KAPANIS.md) |
 | Content faith catalogs (3) | `esmaulHusnaV1.js`, `esmaulHusnaV2.js`, `zikirCoreContentV1.js` | Frozen Esmâ and core zikir content layers |
 
 The independent public surfaces are `index.html` + `app.js`/`sync.js`,

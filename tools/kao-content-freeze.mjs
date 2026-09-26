@@ -16,7 +16,8 @@ const JSON_SHA256 = Object.freeze({
   'lexicon.reference.json': '2ee7ca3d011a4fef232bffb407fac9f079ebb9b66baca5475b1a783617ed8ef6',
   'grammar.verified.json': 'd03cd3be7e14a799025c112b2deeb1a981e501a4492d1bcc55ba50afb6f6b4fd',
   'phonics.verified.json': '895d4d5a58aa5d457cf38d8ebffb5843bce07c896f8c7afaeb00ebf147b23384',
-  'lexicon.verified.json': '16a1593415b1363493eb034a421e99a7bdc65e548cb2d517d9db27311d5d6d41'
+  'lexicon.verified.json': '16a1593415b1363493eb034a421e99a7bdc65e548cb2d517d9db27311d5d6d41',
+  'surahs.verified.json': '83194a3c90ef1fc43e61666305a22c2a7bfc87e3780045c3651d4e089127a6e3'
 });
 function readJson(file) {
   const buffer = fs.readFileSync(path.join(CONTENT, file));
@@ -122,7 +123,7 @@ function prayerWord(ar, tr, pronunciation, lemmaIndex, supplements) {
   const normalized = normalizedArabic(ar.replace(/^[وفبكل]+(?=\p{L}{2})/u, ''));
   const match = lemmaIndex.find((item) => normalizedArabic(item.ar) === normalized);
   const id = match ? match.lemmaId : `lp_${crypto.createHash('sha1').update(normalized).digest('hex').slice(0, 10)}`;
-  if (!match && !supplements.has(id)) supplements.set(id, { id, ar, tr, source: 'Diyanet prayer text; D-12 verified' });
+  if (!match && !supplements.has(id)) supplements.set(id, { id, ar, tr, source: 'Diyanet prayer text + D-12 verified KAO Turkish layer (surahs.verified.json)' });
   return { ar, tr, lemmaId: id, pronunciation };
 }
 // Diyanet dua satırlarının Latin okunuşu (KAO-16b, D-12 yapay zekâ doğrulaması): Fâtiha/İhlâs'ın mekanik okunuş biçimini
@@ -133,12 +134,23 @@ function prayerLine(id, title, text, meanings, readings, lemmaIndex, supplements
   if (tokens.length !== meanings.length || tokens.length !== readings.length) throw new Error(`${id}: prayer word/meaning/reading mismatch ${tokens.length}/${meanings.length}/${readings.length}`);
   return { id, title, words: tokens.map((ar, index) => prayerWord(ar, meanings[index], readings[index], lemmaIndex, supplements)) };
 }
-function collectSurahs() {
+// `verifiedRows` verilirse (dondurma) Türkçe yalnız surahs.verified.json'dan gelir; referans
+// yalnız hizalama ve kopya kapısı için okunur. Verilmezse (çalışma kitabı) referans tr döner.
+function collectSurahs(verifiedRows = null) {
   const { qacWords, aligned, wordsByVerse, uthmaniSource } = verseData();
   const refs = [...wordsByVerse.keys()];
   const rawLines = uthmaniSource.split(/\r?\n/).map((line) => line.trim()).filter((line) => line && !line.startsWith('#'));
   const rawByRef = new Map(refs.map((ref, index) => [ref, rawLines[index]]));
   const reference = referenceMap();
+  const trFor = (id, refKey) => {
+    const referenceTr = reference.get(refKey)?.tr;
+    if (!referenceTr) throw new Error(`${refKey}: Türkçe referans yok`);
+    if (!verifiedRows) return referenceTr;
+    const tr = verifiedRows[id]?.tr;
+    if (!tr) throw new Error(`${id}: surahs.verified.json satırı yok`);
+    if (isReferenceCopy(tr, referenceTr)) throw new Error(`${id}: referans kopyası (06 §2)`);
+    return tr;
+  };
   const verified = readJson('lexicon.verified.json').lemmas;
   const knownByBw = new Map(verified.map((item) => [item.lemmaBw, item]));
   const supplements = new Map();
@@ -150,15 +162,15 @@ function collectSurahs() {
     const ar = aligned.get(ref)[qac.wordIndex - 1];
     const known = knownByBw.get(qac.lemmaBw);
     const lemmaId = known ? known.lemmaId : lemmaKey(qac.lemmaBw || qac.formBw);
-    const translated = reference.get(`${ref}:${qac.wordIndex}`);
-    if (!translated?.tr) throw new Error(`${ref}:${qac.wordIndex}: Türkçe referans yok`);
+    const id = `s-${qac.surah}-${qac.ayah}-${qac.wordIndex}`;
+    const tr = trFor(id, `${ref}:${qac.wordIndex}`);
     if (!known && !supplements.has(lemmaId)) supplements.set(lemmaId, {
-      id: lemmaId, ar: bwToArabic(qac.lemmaBw || qac.formBw), tr: translated.tr,
-      lemmaBw: qac.lemmaBw, source: 'QAC lemma + D-12 verified Quran.com Turkish word reference'
+      id: lemmaId, ar: bwToArabic(qac.lemmaBw || qac.formBw), tr: trFor(lemmaId, `${ref}:${qac.wordIndex}`),
+      lemmaBw: qac.lemmaBw, source: 'QAC lemma + D-12 verified KAO Turkish layer (surahs.verified.json)'
     });
     const pronunciation = qacPronunciation(qac);
     if (!pronunciation) throw new Error(`${ref}:${qac.wordIndex}: Latin okunuş yok`);
-    words.push({ id: `s-${qac.surah}-${qac.ayah}-${qac.wordIndex}`, surahId: qac.surah, ayah: qac.ayah, i: qac.wordIndex, ar, lemmaId, tr: translated.tr, pronunciation });
+    words.push({ id, surahId: qac.surah, ayah: qac.ayah, i: qac.wordIndex, ar, lemmaId, tr, pronunciation });
   }
   for (const ref of refs.filter((value) => Number(value.split(':')[0]) >= 95)) {
     const [surah, ayah] = ref.split(':').map(Number);
@@ -180,11 +192,12 @@ function collectSurahs() {
   for (const qac of qacWords.filter((word) => word.surah === 1)) {
     const ref = `1:${qac.ayah}`; const ar = aligned.get(ref)[qac.wordIndex - 1];
     const known = knownByBw.get(qac.lemmaBw); const lemmaId = known ? known.lemmaId : lemmaKey(qac.lemmaBw || qac.formBw);
-    const translated = reference.get(`${ref}:${qac.wordIndex}`);
-    if (!known && !supplements.has(lemmaId)) supplements.set(lemmaId, { id: lemmaId, ar: bwToArabic(qac.lemmaBw || qac.formBw), tr: translated.tr, source: 'QAC lemma + D-12 verified reference' });
+    const refKey = `${ref}:${qac.wordIndex}`;
+    const tr = trFor(`f-1-${qac.ayah}-${qac.wordIndex}`, refKey);
+    if (!known && !supplements.has(lemmaId)) supplements.set(lemmaId, { id: lemmaId, ar: bwToArabic(qac.lemmaBw || qac.formBw), tr: trFor(lemmaId, refKey), source: 'QAC lemma + D-12 verified KAO Turkish layer (surahs.verified.json)' });
     const pronunciation = qacPronunciation(qac);
     if (!pronunciation) throw new Error(`${ref}:${qac.wordIndex}: Fâtiha Latin okunuşu yok`);
-    fatiha.push({ ar, tr: translated.tr, lemmaId, pronunciation });
+    fatiha.push({ ar, tr, lemmaId, pronunciation });
   }
   const p = (id, title, text, meanings) => prayerLine(id, title, text, meanings, PRAYER_READINGS[id], verified, supplements);
   const prayerTexts = [
@@ -199,19 +212,29 @@ function collectSurahs() {
   ];
   for (const item of prayerTexts) for (const word of item.words) if (!word.pronunciation) throw new Error(`${item.id}: ${word.ar} Latin okunuşsuz dondurulamaz`);
   const fatihaRefs = qacWords.filter((word) => word.surah === 1).map((word) => `1:${word.ayah}:${word.wordIndex}`);
-  return { words, fatiha, fatihaRefs, waqfMarks, supplements, prayerTexts, reference };
+  // Dua kelimesi tamamlayıcıları (lp_) quran.com referansı taşımaz; Türkçesi yine yerel katmandan.
+  const resolved = !verifiedRows ? supplements : new Map([...supplements].map(([id, item]) => {
+    if (!id.startsWith('lp_')) return [id, item];
+    const tr = verifiedRows[id]?.tr;
+    if (!tr) throw new Error(`${id}: surahs.verified.json satırı yok`);
+    return [id, { ...item, tr }];
+  }));
+  return { words, fatiha, fatihaRefs, waqfMarks, supplements: resolved, prayerTexts, reference };
 }
 function freezeSurahs() {
-  const { words, waqfMarks, supplements, prayerTexts } = collectSurahs();
+  const surahVerified = readJson('surahs.verified.json');
+  const { total, filled, copy, language } = surahVerified.counts || {};
+  if (!total || filled !== total || copy || language) throw new Error(`surahs.verified.json eksik ya da kapı açık: ${JSON.stringify(surahVerified.counts)}`);
+  const { words, waqfMarks, supplements, prayerTexts } = collectSurahs(surahVerified.rows);
   const names = ['Nâs','Felak','İhlâs','Tebbet','Nasr','Kâfirûn','Kevser','Mâûn','Kureyş','Fîl','Hümeze','Asr','Tekâsür','Kâria','Âdiyât','Zilzâl','Beyyine','Kadir','Alak','Tîn'];
   const surahs = names.map((name, index) => ({ id: 114 - index, name }));
   const data = {
-    METHODOLOGY_TR: 'Kur’an kelimeleri pinned Tanzil Uthmani metni ile QAC 0.4 morfolojisinden hizalandı; Türkçe kelime katmanı D-12 kapsamında yerel referans üzerinden doğrulandı. Ana 524 lemma dışında kalan kayıtlar bu modülde tamamlayıcı sözlük olarak tutulur.',
-    ATTRIBUTION: { generatedAt: '2026-09-24', sources: [
+    METHODOLOGY_TR: 'Kur’an kelimeleri pinned Tanzil Uthmani metni ile QAC 0.4 morfolojisinden hizalandı; Türkçe kelime katmanı KAO’nun kendi çevirisidir (kuran-ogreniyorum/content/surahs.verified.json, D-12); quran.com kelime referansı yalnız kopya denetiminde kullanıldı, dağıtılmaz. Ana 524 lemma dışında kalan kayıtlar bu modülde tamamlayıcı sözlük olarak tutulur.',
+    ATTRIBUTION: { generatedAt: '2026-09-26', sources: [
       { name: 'Tanzil Uthmani', license: 'CC BY 3.0', url: 'https://tanzil.net/download/' },
       { name: 'Quranic Arabic Corpus 0.4', license: 'GNU GPL', url: 'https://corpus.quran.com/download/' },
       { name: 'Diyanet Namaz Duaları', url: DIANET_DUALAR }, { name: 'Diyanet Temel Dini Bilgiler', url: DIANET_NAMAZ }
-    ], verification: 'D-12' },
+    ], verification: 'D-12 · kuran-ogreniyorum/content/surahs.verified.json (yerel çeviri; quran.com yalnız kopya-denetim referansı, dağıtılmaz)' },
     S: surahs.map((item) => [item.id, item.name]),
     W: words.map((item) => [item.id, item.surahId, item.ayah, item.i, item.ar, item.lemmaId, item.tr, item.pronunciation]),
     M: waqfMarks.map((item) => [item.mark, item.afterWordId]),
@@ -311,7 +334,7 @@ function surahSourceRows() {
     const isPrayer = use.ref.startsWith('prayer:');
     rows.push({
       part: 'D', id: item.id, ar: item.ar, pronunciation: isPrayer ? use.word.pronunciation : '—', lemmaId: item.id, ref: use.ref,
-      referenceTr: isPrayer ? null : referenceTr(use.ref), hint: isPrayer ? item.tr : referenceTr(use.ref)
+      referenceTr: isPrayer ? null : referenceTr(use.ref), hint: isPrayer ? use.word.tr : referenceTr(use.ref)
     });
   }
   const ids = new Set();

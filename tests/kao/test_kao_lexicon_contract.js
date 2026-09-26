@@ -112,6 +112,13 @@ const doubledReading = lexiconVerified.lemmas
   .filter((record) => /^(\p{L})\1/u.test(record.translit.dia) || /^(\p{L})\1/u.test(record.translit.tr))
   .map((record) => record.lemmaId);
 assert.deepEqual(doubledReading, [], 'DİA/TR okunuşu çift ünsüzle başlamamalı');
+// Kök ailesi (family) girdileri de başlıktır; sözlükteki lemmanın kopyasıysa aynı biçimi taşır.
+const headwordById = new Map(lexiconVerified.lemmas.map((record) => [record.lemmaId, record.ar]));
+const familyEntries = lexiconVerified.lemmas.flatMap((record) => record.family || []);
+assert.deepEqual(familyEntries.filter((entry) => firstCluster(entry.ar).includes('ّ')).map((entry) => entry.lemmaId), [],
+  'kök ailesi başlığının ilk harf kümesinde şedde olmamalı');
+assert.deepEqual(familyEntries.filter((entry) => headwordById.has(entry.lemmaId) && headwordById.get(entry.lemmaId) !== entry.ar)
+  .map((entry) => entry.lemmaId), [], 'kök ailesindeki sözlük lemması sözlük başlığıyla aynı yazılmalı');
 
 // İkinci yol (girdi varsa): kısa sûre kelimelerinin hiçbiri quran.com referansıyla normalize-eşit değil.
 const referencePath = path.join(repoRoot, 'kuran-ogreniyorum/content/lexicon.reference.json');

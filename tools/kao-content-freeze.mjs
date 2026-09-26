@@ -16,7 +16,7 @@ const JSON_SHA256 = Object.freeze({
   'lexicon.reference.json': '2ee7ca3d011a4fef232bffb407fac9f079ebb9b66baca5475b1a783617ed8ef6',
   'grammar.verified.json': 'd03cd3be7e14a799025c112b2deeb1a981e501a4492d1bcc55ba50afb6f6b4fd',
   'phonics.verified.json': '895d4d5a58aa5d457cf38d8ebffb5843bce07c896f8c7afaeb00ebf147b23384',
-  'lexicon.verified.json': '1b87b57f00216c3a4a0fd0d5cbf3e8bf14da0e7f6027be640e0e04ac918e2a22',
+  'lexicon.verified.json': '071ea74d613c655624a06a909f4b0f368fd33f3431e55cbf9d6ecc415e6804ff',
   'surahs.verified.json': '83194a3c90ef1fc43e61666305a22c2a7bfc87e3780045c3651d4e089127a6e3'
 });
 function readJson(file) {

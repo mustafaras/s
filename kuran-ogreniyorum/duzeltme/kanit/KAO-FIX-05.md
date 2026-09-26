@@ -34,4 +34,4 @@ Hepsinde yalnız ilk harf şeddesi kalktı; iç şedde korundu (`مَيِّت`, 
 | driver · zikr 95/95 · rebind · shell · kao-plan-check · diff --check · self-test · repro | exit 0 (plan 1 warn, taban) |
 | requirements (DİA 524/524) · fixture-map `--json` ↔ dosya | PASS · aynı |
 
-**Kapsam dışı:** `family` listelerinde 286 bağlam şeddeli girdi (yalnız `verified.json`, modüle girmez); `lexicon.workbook.md` eski başlığı gösterir (izinli değil). Tuzak olarak kaydedildi.
+**Ek (kullanıcı: "her şeyi düzelt"):** `headwordAr` (524/524 `headwordBw` ile denk, self-test) → `family` 286 şeddeli girdi 0; family↔sözlük başlık tutarlılığı testte. `--workbook` yeniden üretildi: 26 başlık + KAO-03'ten bayat `yarcûâ`→`yarcû` (verified ile hizalı). Modüller bayt-eş (pin gerekmedi); `JSON_SHA256` lexicon=`071ea7…`. Contract önce kırmızı → PASS; app 77/77, kao, STD, self-test, repro exit 0.

@@ -76,7 +76,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 9. **Parti D = 29 Fâtiha + 158 `ls_` + 32 `lp_`** (lp = Diyanet dua anlamı; quran.com referansı yok → kopya denetimi yok). `counts`'ta ek `invalid` (doğrulayıcı/tarih/biçim) de exit 1 verir.
 10. **`surahs.verified.json` FIX-03'te doğar** (FIX-02'de üretilip silindi); `--surah-import` satırlar aynıysa `importedAt`'i korur (hash sabit).
 11. **Kopya kapısı tek karşılıklı kelimede eş anlamlı ister;** A'da seçilenler: `Allah Teâlâ`, `Kadr`, `melâike`, `sen oku`, `asla` (kellâ), `o Kitap`/`kitabın`. B–D'de aynı karşılıkları kullan (tutarlılık).
-12. **Başlık biçimi `headwordBw` (FIX-05):** `readDraft` bayat taslağı normalize eder; `--draft` koşma (evidence/KAO-02'ye yazar, V8). `family` (286) ve `lexicon.workbook.md` hâlâ bağlam şeddeli — modüle girmez.
+12. **Başlık biçimi `headwordBw` (FIX-05):** `readDraft` bayat taslağı normalize eder; `--draft` koşma (evidence/KAO-02'ye yazar, V8). `family` (286, `headwordAr`) ve `lexicon.workbook.md` de düzeltildi (FIX-05 ek, kullanıcı isteği).
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

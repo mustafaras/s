@@ -208,6 +208,12 @@ function headwordBw(lemmaBw) {
   return value[1] === '~' ? value[0] + value.slice(2) : value;
 }
 
+// Aynı kuralın Arapça yüzü: yalnız Arapçası saklanan kök ailesi (family) girdileri için ilk harf
+// kümesindeki tek şedde kalkar. 524 lemmada `bwToArabic(headwordBw(x)) === headwordAr(bwToArabic(x))`.
+function headwordAr(ar) {
+  return String(ar || '').replace(/^(\p{L}\p{M}*)/u, (cluster) => cluster.replace('\u0651', ''));
+}
+
 // QAC'ın kesik verdiği ve korpusta tam sözlük biçimi bulunmayan başlıklar (V3: Arapça tamamlanmaz).
 const HEADWORD_NOTES = Object.freeze({
   'm~a$a': 'QAC lemma biçimi kesik; sözlük biçimi korpusta yok'
@@ -226,6 +232,7 @@ function withHeadword(record) {
     ...rest,
     ar: fields.ar,
     translit: { ...record.translit, tr: fields.tr, dia: fields.dia },
+    ...(Array.isArray(record.family) ? { family: record.family.map((entry) => ({ ...entry, ar: headwordAr(entry.ar) })) } : {}),
     ...(fields.note ? { headwordNote: fields.note } : {})
   };
 }
@@ -498,6 +505,9 @@ function selfTest() {
   assert(headwordBw('{ll~ah') === '{ll~ah', '{ll~ah değişmez');
   assert(headwordBw('n~aAs') === 'naAs', 'n~aAs → naAs');
   assert(headwordBw('Hat~aY') === 'Hat~aY', 'Hat~aY değişmez');
+  for (const sample of ['r~aHiym', '{ll~ah', 'n~aAs', 'Hat~aY', 'm~ay~it']) {
+    assert(headwordAr(bwToArabic(sample)) === bwToArabic(headwordBw(sample)), `${sample}: Arapça ve Buckwalter başlık kuralı aynı`);
+  }
   const synthetic = syntheticInputs();
   const stats = buildStats(synthetic.morphology, synthetic.uthmani, {
     morphology: sha256(Buffer.from(synthetic.morphology)),
@@ -1317,7 +1327,7 @@ function lemmaCandidateRecords(parsed, uthmaniByVerse, sourceHashes, humanByLemm
         sameRoot: family.map((other) => lemmaKey(other)),
         sameRootAr: family.map((other) => bwToArabic(other))
       },
-      family: family.map((other) => ({ lemmaId: lemmaKey(other), ar: bwToArabic(other), tr: null })),
+      family: family.map((other) => ({ lemmaId: lemmaKey(other), ar: bwToArabic(headwordBw(other)), tr: null })),
       examples,
       examplesException, // korpustan her üretimde yeniden hesaplanır (taşınmaz)
       examplesRef: examples.map((example) => example.ref),

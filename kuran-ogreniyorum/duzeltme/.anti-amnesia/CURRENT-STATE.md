@@ -1,7 +1,7 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-06** · **Aktif:** — · **Engel:** — · **Açık karar:** `m~a$a` başlığı (FIX-05)
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`9fa910a` (FIX-03/B, kullanıcı onayı 2026-09-26, Pages success); sonraki her push/deploy yine ayrı onay
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-06** · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`b1d081c` (FIX-05, kullanıcı onayı 2026-09-26, Pages run `36259211222` success, canlı pin `20260926d`); sonraki her push/deploy yine ayrı onay
 **Güncelleme:** 2026-09-26 · KAO-FIX-05 done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
@@ -19,7 +19,7 @@
 | KAO-FIX-03/C | K-1, Y-3 | done | `582c5e2` | 106–114 (178) filled, copy 0, language 0 |
 | KAO-FIX-03/D | K-1, Y-3 | done | `9f9163c` | Fâtiha 29 + tamamlayıcı 190; import 837/837, copy 0, language 0 |
 | KAO-FIX-04 | K-1, Y-3 | done | `0ac1837` | dondurma + atıf + pin `20260926c`; kopya 618→0, İngilizce 26→0 |
-| KAO-FIX-05 | Y-4, D-6 | done | `git log --grep=KAO-FIX-05` | şeddeli başlık 26→0 (+17 tamamlayıcı), DİA çift 26→0, D-6 belgeli istisna; `m~a$a` kullanıcı kararı |
+| KAO-FIX-05 | Y-4, D-6 | done | `git log --grep=KAO-FIX-05` | şeddeli başlık 26→0 (+17 tamamlayıcı), DİA çift 26→0, D-6 belgeli istisna; `m~a$a` → not ile kalır (kullanıcı kararı) |
 | KAO-FIX-06 | Y-2 | todo | | iki yönlü kart |
 | KAO-FIX-07 | Y-1 | todo | | bilinen/kapsam tanımı |
 | KAO-FIX-08 | O-1 | todo | | lastDistractors |

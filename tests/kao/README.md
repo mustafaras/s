@@ -25,6 +25,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao_independence.js` | planlandı | KAO-IIP bağımsızlığı ve hub fallback sözleşmesi |
 | `test_kao_freeze_repro.js` | KAO-FIX-01 | Dört içerik modülünün araçlarla `$TMPDIR` kopyasında bayt-eş yeniden üretimi; girdi yoksa SKIP |
 | `test_kao_surah_import.js` | KAO-FIX-02 | Kısa sûre çalışma kitabı içe alma kapısı: boş/kopya/İngilizce/doğrulayıcı-tarih denetimi ve tablo gidiş-dönüşü (sentetik) |
+| `test_kao_state_budget.js` | KAO-FIX-09 | KF-10 koruması: `daily` budanmaz (400 gün korunur), `ensureQuranLearn` idempotent; boyut yalnız bilgi |
 
 Fixture'lar ilgili uygulama kartında tek tek eklenecek; bu başlangıç promptu
 üretim kodu veya çalıştırılabilir fixture eklemez.

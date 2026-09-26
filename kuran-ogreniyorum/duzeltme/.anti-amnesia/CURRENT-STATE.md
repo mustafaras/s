@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-09** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`70b7dbc` (FIX-07, kullanıcı onayı 2026-09-26, Pages run `36261081028` success, canlı pin `20260926f`); sonraki her push/deploy yine ayrı onay
-**Güncelleme:** 2026-09-26 · KAO-FIX-08 done
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-10** · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`f021e8a` (FIX-08, kullanıcı onayı 2026-09-26, Pages run `36261789629` success, canlı pin `20260926g`); sonraki her push/deploy yine ayrı onay
+**Güncelleme:** 2026-09-26 · KAO-FIX-09 done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -22,8 +22,8 @@
 | KAO-FIX-05 | Y-4, D-6 | done | `b1d081c` + ek `2ad2a4c` | şeddeli başlık 26→0 (+17 tamamlayıcı), DİA çift 26→0, D-6 belgeli istisna; `m~a$a` → not ile kalır (kullanıcı kararı) |
 | KAO-FIX-06 | Y-2 | done | `7ef9f6e` + durum `50afcc2` | iki yönlü kart; sim 365 g iki yön 524/524, plan bilinen 0→505 |
 | KAO-FIX-07 | Y-1 | done | `70b7dbc` | bilinen = iki yönde review∧s≥21; sim kod=plan 505; M10 YAKALANDI |
-| KAO-FIX-08 | O-1 | done | `git log --grep=KAO-FIX-08` | lastDistractors cevapta yazılır (lemma kimliği), lemma düzeyinde dışlama |
-| KAO-FIX-09 | O-2 | todo | | daily budama ≤100 KB |
+| KAO-FIX-08 | O-1 | done | `f021e8a` | lastDistractors cevapta yazılır (lemma kimliği), lemma düzeyinde dışlama |
+| KAO-FIX-09 | O-2 | done | `git log --grep=KAO-FIX-09` | KF-10: budama yok, 100 KB sınırı kaldırıldı; koruma testi |
 | KAO-FIX-10 | O-3 | todo | | kilometre taşları |
 | KAO-FIX-11 | O-5 | todo | | test kör noktaları, mutasyon 15/15 |
 | KAO-FIX-12 | O-6 | todo | | kaynaklar/lisanslar E7 |
@@ -50,6 +50,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | KF-7 | Plan tanımına geçince kullanıcının gördüğü kapsam düşer | Kabul (doğru ölçüm; veri kaybı yok) | varsayılan | varsayılan |
 | KF-8 | Yayın | Bütün FIX kartları yerel; push/merge/deploy ayrı onay | varsayılan | varsayılan |
 | KF-9 | Ardışık aynı tür ≤2 kuralı gramere de uygulansın mı | Evet | varsayılan | varsayılan |
+| KF-10 | `daily` 90 gün budaması ve 100 KB durum bütçesi (05 §2, STATE `stateBudgetKB`) | budama + 100 KB | **budama yok, sınır kaldırıldı** | kullanıcı, 2026-09-26 |
 
 ## Taban (FIX-00 doldurur)
 
@@ -79,7 +80,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 12. **Başlık biçimi `headwordBw` (FIX-05):** `readDraft` bayat taslağı normalize eder; `--draft` koşma (evidence/KAO-02'ye yazar, V8). `family` (286, `headwordAr`) ve `lexicon.workbook.md` de düzeltildi (FIX-05 ek, kullanıcı isteği).
 13. **`introducedAt` artık `kaoAnswer` ilk cevabında yazılır (FIX-06);** öncesinde ana yolda yazılmadığı için R-A5 anlamsal aralık fiilen işlemiyordu. Veri 365 günde 394 KB → FIX-09.
 14. **`isDurable` tek kalıcılık kuralı (FIX-07);** bilinen lemma iki yönde kalıcı. Mutasyon M04/M09 hâlâ KAÇTI → FIX-11.
-15. **Veri bütçesi riski (FIX-09):** sim 365 g `quranLearn` 241 KB (taban) → 394 (FIX-06, 2× kart) → 464 KB (FIX-08 `lastDistractors`). Yalnız `daily` budaması ≤100 KB'a yetmeyebilir; FIX-09 ölçüp karar sorsun.
+15. **Veri bütçesi (FIX-09 → KF-10 kapandı):** sim 365 g `quranLearn` 241 KB (taban) → 394 (FIX-06, 2× kart) → 464 KB (FIX-08 `lastDistractors`). Kullanıcı: budama yok, sınır yok (`test_kao_state_budget.js` korur). FIX-16 kapanış ekine 05 §2 / `stateBudgetKB` istisnası yazılmalı.
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

@@ -1561,6 +1561,26 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `app/kao.css`
 - `app.js`
 - `tests/kao/test_kao_render.js`
+- `index.html`
+- `sw.js`
+- `app/content/quranShortSurahsV1.js`
+- `app/content/quranLexiconV1.js`
+- `app/content/quranGrammarV1.js`
+- `tools/kao-content-freeze.mjs`
+- `tools/kao-lexicon-build.mjs`
+- `tests/kao/test_kao_phonics_contract.js`
+- `tests/kao/test_kao_queue.js`
+- `tests/app/test_fx2_tab_transition.js`
+- `tests/app/test_fx2_overlay_motion.js`
+- `tests/app/test_fx2_touch_coverage.js`
+- `tests/app/test_iip_22.js`
+- `tests/app/test_v3_welcome.js`
+- `tests/app/test_app_surface_boot_boundary.js`
+- `tests/app/test_app_surface_daily_boundary.js`
+- `tests/app/test_app_surface_domain_boundary.js`
+- `tests/app/test_app_surface_lifecycle_boundary.js`
+- `tests/app/test_app_surface_overlay_boundary.js`
+- `kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md`
 - `kuran-ogreniyorum/evidence/KAO-16b/**`
 - `kuran-ogreniyorum/KAO-STATE.json`
 - `kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md`
@@ -1575,6 +1595,16 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `node kuran-ogreniyorum/tools/kao-plan-check.mjs`
 - `git -c core.fsmonitor=false diff --check`
 - `node tests/kao/test_kao_render.js`
+- `node tests/kao/test_kao_phonics_contract.js`
+- `node tests/kao/test_kao_queue.js`
+- `node tests/kao/test_kao_requirements.js`
+- `node tools/kao-lexicon-build.mjs --self-test`
+- `node tests/app/test_fx2_tab_transition.js`
+- `node tests/app/test_fx2_overlay_motion.js`
+- `node tests/app/test_fx2_touch_coverage.js`
+- `node tests/app/test_iip_22.js`
+- `node tests/app/test_v3_welcome.js`
+- `node tests/app/test_app_surface_daily_boundary.js`
 - `node .claude/skills/run-seyma/driver.mjs`
 - `node .claude/skills/run-seyma/zikr-harness.mjs`
 - `node tests/app/test_state_rebind_boundary.js`

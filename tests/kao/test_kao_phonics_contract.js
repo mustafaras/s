@@ -181,4 +181,24 @@ assert.ok(played.every((audio) => audio.preload === 'none'));
 const migrated = studio.ensureQuranLearn({ quranLearn: { phonics: { style: 'muallim', 'p:bad': 'x', 'p:ok': { s: 1 }, misheard: { ayn: 2, qaf: -3, tha: 'x' } } } });
 assert.deepEqual(JSON.parse(JSON.stringify(migrated.phonics)), { style: 'muallim', 'p:ok': { s: 1 }, misheard: { ayn: 2 } });
 
+
+// KAO-16b · okunuş içeriği bütünlüğü (dondurma aracı düzeltmeleri kalıcı).
+{
+  for (const item of surahs.prayerTexts) for (const word of item.words) assert.ok(word.pronunciation, `${item.id}: ${word.ar} Latin okunuşu olmalı`);
+  assert.equal(surahs.prayerTexts.reduce((sum, item) => sum + item.words.length, 0), 94);
+  const lexicon = sandbox.window.QuranLexiconV1;
+  const readings = surahs.words.map((word) => [word.ar, word.pronunciation]).concat(lexicon.lemmas.flatMap((lemma) => (lemma.examples || []).filter((example) => example.pronunciation).map((example) => [example.ar, example.pronunciation])));
+  const silentViolations = readings.filter(([ar, reading]) => {
+    const tokens = ar.split(/\s+/), latin = reading.split(/\s+/);
+    return tokens.length === latin.length && tokens.some((token, index) => /[^\u0670]\u0627\u06df$/.test(token) && /â$/.test(latin[index]));
+  });
+  assert.deepEqual(Array.from(silentViolations, ([ar, reading]) => ar + ' => ' + reading), [], 'Uthmani ۟ işaretli elif okunmaz');
+  assert.equal(readings.filter(([, reading]) => /ûâ(?=\s|$)/.test(reading)).length, 0);
+  const byId = new Map(surahs.words.map((word) => [word.id, word.pronunciation]));
+  assert.deepEqual(['s-110-1-5', 's-110-2-3', 's-105-1-6', 's-98-4-10', 's-100-2-2', 's-98-5-4'].map((id) => byId.get(id)), ['va-al-fathu', 'yadhulûna', 'bi-ashâbi', "câ'athumu", 'kadhen', 'li-yaʿbudû'], 'iki harfli (th/dh/sh/kh) yeniden yazım bozulması yok');
+  assert.equal(grammar.unit11.roots.find((root) => root.root === 'دخل').pronunciation, 'd–h–l');
+  const freezeSource = fs.readFileSync(path.join(repoRoot, 'tools/kao-content-freeze.mjs'), 'utf8');
+  assert.doesNotMatch(freezeSource, /replace\(\/th\/g|replace\(\/sh\/g|replace\(\/dh\/g|replace\(\/kh\/g/, 'Türkçe okunuşa ikinci kez digraf dönüşümü uygulanmaz');
+}
+
 console.log(`KAO content contract: PASS (E8 stüdyo: 13 SVG gömülü, 6 görev türü, FSRS + dikkat, sessiz mod; grammar=${grammarBytes}, surahs=${surahBytes}, phonics=${phonicsBytes})`);

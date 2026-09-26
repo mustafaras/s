@@ -193,4 +193,28 @@ assert.equal(mixedGrammarQueue.filter((item) => item.type === 'grammar').length,
   assert.ok(shorts.words.length === 618);
 }
 
+
+// R-A2 regresyonu (KAO-16b sırasında bulundu): gerçek oturum her gün iki yönü birlikte taşır — 365 günlük tarama.
+{
+  let clock = Date.UTC(2026, 0, 1);
+  const RealDate = Date;
+  class FixedDate extends RealDate { constructor(...args) { super(...(args.length ? args : [clock])); } static now() { return clock; } }
+  const box = { window: {}, Date: FixedDate, Math, Number, String, Object, Array, JSON };
+  vm.createContext(box);
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  const sweepApi = box.window.SeymaQuranLearn, sweepUi = {};
+  let sweepData = null;
+  assert.equal(sweepApi.registerQuranLearn({ data() { return sweepData; }, ui() { return sweepUi; }, save() {}, render() {}, todayStr() { return 'x'; }, esc: String, icon() { return ''; }, getDay() { return {}; } }), true);
+  assert.equal(sweepApi.registerQuranLearnSurface({ lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose(_c, _b, body) { body(); }, mount() {}, taskElement() { return null; }, createAudio() { return { addEventListener() {}, play() { return { catch() {} }; } }; }, isQuietTime() { return false; }, setTimer() {}, clearTimer() {}, toast() {} }), true);
+  const oneWay = [];
+  for (let day = 0; day < 365; day += 1) {
+    clock = Date.UTC(2026, 0, 1) + day * 86400000;
+    sweepData = { quranLearn: null }; sweepApi.ensureQuranLearn(sweepData);
+    sweepApi.kaoStart();
+    const directions = new Set(sweepUi.kaoQueue.map((item) => (String(item.cardId).match(/:(ar>tr|tr>ar)$/) || [])[1]).filter(Boolean));
+    if (directions.size < 2) oneWay.push(new RealDate(clock).toISOString().slice(0, 10));
+  }
+  assert.deepEqual(oneWay, [], 'R-A2: her gün iki yön');
+}
+
 console.log(`KAO queue: PASS (${first.length} deterministic tasks + 4 grammar types, budgets/interleave/semantic spacing)`);

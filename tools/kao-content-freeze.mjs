@@ -38,8 +38,6 @@ function write(relative, source, budget) {
 }
 function turkishPronunciation(value) {
   return String(value || '').toLowerCase()
-    .replace(/sh/g, 'ş').replace(/kh/g, 'h').replace(/gh/g, 'g')
-    .replace(/th/g, 's').replace(/dh/g, 'z')
     .replace(/q/g, 'k').replace(/w/g, 'v').replace(/j/g, 'c')
     .replace(/ā/g, 'â').replace(/ī/g, 'î').replace(/ū/g, 'û')
     .replace(/ḥ/g, 'h').replace(/ṣ/g, 's').replace(/ḍ/g, 'd').replace(/ṭ/g, 't').replace(/ẓ/g, 'z');
@@ -120,17 +118,20 @@ function referenceMap() {
 function normalizedArabic(value) {
   return String(value || '').normalize('NFKD').replace(/\p{M}/gu, '').replace(/ـ/gu, '').replace(/[ٱأإآ]/gu, 'ا').replace(/ى/gu, 'ي');
 }
-function prayerWord(ar, tr, lemmaIndex, supplements) {
+function prayerWord(ar, tr, pronunciation, lemmaIndex, supplements) {
   const normalized = normalizedArabic(ar.replace(/^[وفبكل]+(?=\p{L}{2})/u, ''));
   const match = lemmaIndex.find((item) => normalizedArabic(item.ar) === normalized);
   const id = match ? match.lemmaId : `lp_${crypto.createHash('sha1').update(normalized).digest('hex').slice(0, 10)}`;
   if (!match && !supplements.has(id)) supplements.set(id, { id, ar, tr, source: 'Diyanet prayer text; D-12 verified' });
-  return { ar, tr, lemmaId: id };
+  return { ar, tr, lemmaId: id, pronunciation };
 }
-function prayerLine(id, title, text, meanings, lemmaIndex, supplements) {
+// Diyanet dua satırlarının Latin okunuşu (KAO-16b, D-12 yapay zekâ doğrulaması): Fâtiha/İhlâs'ın mekanik okunuş biçimini
+// izler (al- öneki, li-/va-/bi-, â î û, ʿ); Diyanet imlâsında vasıl/hançer elif olmadığı için elle, kelime kelime verilir.
+const PRAYER_READINGS = Object.freeze({"tekbir":["allahu","akbaru"],"subhaneke":["subhânaka","allahumma","va-bi-hamdika","va-tabâraka","ismuka","va-taʿâlâ","cadduka","va-lâ","ilâha","gayruka"],"ruku":["subhâna","rabbiya","al-ʿazîmi"],"secde":["subhâna","rabbiya","al-aʿlâ"],"tahiyyat":["al-tahiyyâtu","li-lahi","va-al-salavâtu","va-al-tayyibâtu","al-salâmu","ʿalayka","ayyuhâ","al-nabiyyu","va-rahmetu","allahi","va-barakâtuhu","al-salâmu","ʿalaynâ","va-ʿalâ","ʿibâdi","allahi","al-sâlihîna","aşhadu","an","lâ","ilâha","illâ","allahu","va-aşhadu","anna","muhammaden","ʿabduhu","va-rasûluhu"],"selam":["al-salâmu","ʿalaykum","va-rahmetu","allahi"]});
+function prayerLine(id, title, text, meanings, readings, lemmaIndex, supplements) {
   const tokens = text.trim().split(/\s+/);
-  if (tokens.length !== meanings.length) throw new Error(`${id}: prayer word/meaning mismatch ${tokens.length}/${meanings.length}`);
-  return { id, title, words: tokens.map((ar, index) => prayerWord(ar, meanings[index], lemmaIndex, supplements)) };
+  if (tokens.length !== meanings.length || tokens.length !== readings.length) throw new Error(`${id}: prayer word/meaning/reading mismatch ${tokens.length}/${meanings.length}/${readings.length}`);
+  return { id, title, words: tokens.map((ar, index) => prayerWord(ar, meanings[index], readings[index], lemmaIndex, supplements)) };
 }
 function freezeSurahs() {
   const { qacWords, aligned, wordsByVerse, uthmaniSource } = verseData();
@@ -185,7 +186,7 @@ function freezeSurahs() {
     if (!pronunciation) throw new Error(`${ref}:${qac.wordIndex}: Fâtiha Latin okunuşu yok`);
     fatiha.push({ ar, tr: translated.tr, lemmaId, pronunciation });
   }
-  const p = (id, title, text, meanings) => prayerLine(id, title, text, meanings, verified, supplements);
+  const p = (id, title, text, meanings) => prayerLine(id, title, text, meanings, PRAYER_READINGS[id], verified, supplements);
   const prayerTexts = [
     p('tekbir', 'İftitah tekbiri', 'اللَّهُ أَكْبَرُ', ['Allah', 'en büyüktür']),
     p('subhaneke', 'Sübhâneke', 'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلَهَ غَيْرُكَ', ['seni tenzih ederim', 'Allahım', 'hamdinle', 'bereketlidir', 'adın', 'yücedir', 'şanın', 've yoktur', 'ilah', 'senden başka']),
@@ -196,6 +197,7 @@ function freezeSurahs() {
     p('tahiyyat', 'Tahiyyat', 'التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ', ['hürmetler', 'Allah içindir', 'dualar', 'güzel sözler', 'selam', 'senin üzerine', 'ey', 'peygamber', 'rahmeti', 'Allahın', 'bereketleri', 'selam', 'bizim üzerimize', 've üzerine', 'kullarının', 'Allahın', 'salihlerin', 'şahitlik ederim', 'ki', 'yoktur', 'ilah', 'başka', 'Allah', 've şahitlik ederim', 'ki', 'Muhammed', 'kuludur', 'elçisidir']),
     p('selam', 'Selâm', 'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ', ['selam', 'üzerinize', 'rahmeti', 'Allahın'])
   ];
+  for (const item of prayerTexts) for (const word of item.words) if (!word.pronunciation) throw new Error(`${item.id}: ${word.ar} Latin okunuşsuz dondurulamaz`);
   const names = ['Nâs','Felak','İhlâs','Tebbet','Nasr','Kâfirûn','Kevser','Mâûn','Kureyş','Fîl','Hümeze','Asr','Tekâsür','Kâria','Âdiyât','Zilzâl','Beyyine','Kadir','Alak','Tîn'];
   const surahs = names.map((name, index) => ({ id: 114 - index, name }));
   const data = {
@@ -209,9 +211,9 @@ function freezeSurahs() {
     W: words.map((item) => [item.id, item.surahId, item.ayah, item.i, item.ar, item.lemmaId, item.tr, item.pronunciation]),
     M: waqfMarks.map((item) => [item.mark, item.afterWordId]),
     L: [...supplements.values()].map((item) => [item.id, item.ar, item.tr, item.lemmaBw || null, item.source, true]),
-    P: prayerTexts.map((item) => [item.id, item.title, item.words.map((word) => [word.ar, word.tr, word.lemmaId])])
+    P: prayerTexts.map((item) => [item.id, item.title, item.words.map((word) => [word.ar, word.tr, word.lemmaId, word.pronunciation || null])])
   };
-  const extras = "data.surahs=data.S.map(function(x){return{id:x[0],name:x[1]};});data.words=data.W.map(function(x){return{id:x[0],surahId:x[1],ayah:x[2],i:x[3],ar:x[4],lemmaId:x[5],tr:x[6],pronunciation:x[7]};});data.waqfMarks=data.M.map(function(x){return{mark:x[0],afterWordId:x[1]};});data.supplements=data.L.map(function(x){return{id:x[0],ar:x[1],tr:x[2],lemmaBw:x[3],source:x[4],verified:x[5]===true};});data.prayerTexts=data.P.map(function(x){return{id:x[0],title:x[1],verified:true,words:x[2].map(function(w){return{ar:w[0],tr:w[1],lemmaId:w[2]};})};});delete data.S;delete data.W;delete data.M;delete data.L;delete data.P;var supplementIndex=Object.create(null);data.supplements.forEach(function(x){supplementIndex[x.id]=x;});data.lemmaById=function(id){return (window.QuranLexiconV1&&window.QuranLexiconV1.byId(id))||supplementIndex[id]||null;};";
+  const extras = "data.surahs=data.S.map(function(x){return{id:x[0],name:x[1]};});data.words=data.W.map(function(x){return{id:x[0],surahId:x[1],ayah:x[2],i:x[3],ar:x[4],lemmaId:x[5],tr:x[6],pronunciation:x[7]};});data.waqfMarks=data.M.map(function(x){return{mark:x[0],afterWordId:x[1]};});data.supplements=data.L.map(function(x){return{id:x[0],ar:x[1],tr:x[2],lemmaBw:x[3],source:x[4],verified:x[5]===true};});data.prayerTexts=data.P.map(function(x){return{id:x[0],title:x[1],verified:true,words:x[2].map(function(w){return{ar:w[0],tr:w[1],lemmaId:w[2],pronunciation:w[3]};})};});delete data.S;delete data.W;delete data.M;delete data.L;delete data.P;var supplementIndex=Object.create(null);data.supplements.forEach(function(x){supplementIndex[x.id]=x;});data.lemmaById=function(id){return (window.QuranLexiconV1&&window.QuranLexiconV1.byId(id))||supplementIndex[id]||null;};";
   write('app/content/quranShortSurahsV1.js', wrapper('QuranShortSurahsV1', 'quran-short-surahs-tr-v1', data, extras), 90 * 1024);
 }
 

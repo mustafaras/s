@@ -18,7 +18,7 @@
     "pagesRun": 35978035375,
     "result": "success"
   },
-  "nextCard": "KAO-16b",
+  "nextCard": "KAO-18",
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -1338,6 +1338,26 @@
         "app/kao.css",
         "app.js",
         "tests/kao/test_kao_render.js",
+        "index.html",
+        "sw.js",
+        "app/content/quranShortSurahsV1.js",
+        "app/content/quranLexiconV1.js",
+        "app/content/quranGrammarV1.js",
+        "tools/kao-content-freeze.mjs",
+        "tools/kao-lexicon-build.mjs",
+        "tests/kao/test_kao_phonics_contract.js",
+        "tests/kao/test_kao_queue.js",
+        "tests/app/test_fx2_tab_transition.js",
+        "tests/app/test_fx2_overlay_motion.js",
+        "tests/app/test_fx2_touch_coverage.js",
+        "tests/app/test_iip_22.js",
+        "tests/app/test_v3_welcome.js",
+        "tests/app/test_app_surface_boot_boundary.js",
+        "tests/app/test_app_surface_daily_boundary.js",
+        "tests/app/test_app_surface_domain_boundary.js",
+        "tests/app/test_app_surface_lifecycle_boundary.js",
+        "tests/app/test_app_surface_overlay_boundary.js",
+        "kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md",
         "kuran-ogreniyorum/evidence/KAO-16b/**",
         "kuran-ogreniyorum/KAO-STATE.json",
         "kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md",
@@ -1345,6 +1365,16 @@
       ],
       "checks": [
         "node tests/kao/test_kao_render.js",
+        "node tests/kao/test_kao_phonics_contract.js",
+        "node tests/kao/test_kao_queue.js",
+        "node tests/kao/test_kao_requirements.js",
+        "node tools/kao-lexicon-build.mjs --self-test",
+        "node tests/app/test_fx2_tab_transition.js",
+        "node tests/app/test_fx2_overlay_motion.js",
+        "node tests/app/test_fx2_touch_coverage.js",
+        "node tests/app/test_iip_22.js",
+        "node tests/app/test_v3_welcome.js",
+        "node tests/app/test_app_surface_daily_boundary.js",
         "node .claude/skills/run-seyma/driver.mjs",
         "node .claude/skills/run-seyma/zikr-harness.mjs",
         "node tests/app/test_state_rebind_boundary.js",
@@ -1356,7 +1386,12 @@
       "deps": [
         "KAO-28b"
       ],
-      "status": "pending"
+      "status": "done",
+      "startedAt": "2026-09-26",
+      "agent": "Claude (Opus 5.5)",
+      "scopeNote": "E11 her Arapça kelimenin doğrulanmış okunuşunu ister (KAO-15 sözleşmesi); prayerTexts okunuşsuz donmuştu. Kapsam bu yüzden içerik hattına genişledi: dondurma aracı prayerTexts okunuşunu paketler (Fâtiha/İhlâs mekanik, 6 Diyanet satırının 50 kelimesi D-12 yapay zekâ doğrulamalı), aynı araçta iki üretim hatası düzeltildi (Türkçe okunuşa ikinci kez uygulanan th/dh/sh/kh digraf dönüşümü: 5 kısa sûre + 2 gramer okunuşu; Uthmani ۟ işaretli harfin okunması: kao-lexicon-build transliterate, 21 kısa sûre kelimesi + 341 sözlük örneği) ve üç modül araçla deterministik yeniden üretildi. Tam regresyonda tarihe bağlı bir R-A2 hatası bulundu (bazı günlerde oturumun tüm yeni kelimeleri tek yönde); kaoBuildQueue yön dengeleme düzeltmesi + 365 günlük regresyon fixture'ı. İki App handler'ı pinleri 752→754 / 590→592 taşıdı; önbellek 20260925h→20260925i.",
+      "completedAt": "2026-09-26",
+      "evidence": "kuran-ogreniyorum/evidence/KAO-16b/EVIDENCE.json"
     },
     "KAO-18": {
       "title": "Kontrast ve erişilebilirlik ölçümü",
@@ -1653,7 +1688,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-28b",
+  "lastCompletedPrompt": "KAO-16b",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",

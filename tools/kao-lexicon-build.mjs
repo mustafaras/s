@@ -741,6 +741,7 @@ function draftSelfTest() {
   assert(translitTr('hadaY') === 'hadâ' && translitTr('fiY') === 'fî', 'elif maksûre fethadan sonra â');
   assert(translitTr('mu&omin') === "mu'min" && translitTr('>aHad') === 'ahad', 'kelime içi hemze gösterilir, baştaki gösterilmez');
   assert(translitTr('EaAd2') === 'ʿâd' && bwToArabic('EaAd2') === bwToArabic('EaAd'), 'QAC ayırt edici rakamı düşer');
+  assert(translitTr('kafaruwA@') === 'kafarû' && translitTr('>uw@la`^}ika') === "ulâ'ika", 'Uthmani ۟ işaretli harf okunmaz');
   // doğrulanmış + eksik örnek çevirisi tutarsızlık olarak yakalanmalı
   const consProbe = parseReviewMarkdown(
     fill(fill(markdown, firstId, { tr1: 'anlam', verifiedBy: 'dogrulayici-1', verifiedAt: '2026-09-23' }),
@@ -901,6 +902,8 @@ function transliterate(lemmaBw, table, longTable, shortSet, options = {}) {
   let prevBase = null; // en son işlenen (yok sayılmayan) Buckwalter harfi
   for (let index = 0; index < characters.length; index += 1) {
     const character = characters[index];
+    // Uthmani ۟ (`@`) taşıdığı harfin hiç okunmadığını gösterir: كَفَرُوا۟ → kafarû, أُو۟لَـٰٓئِكَ → ulâ'ika.
+    if (characters[index + 1] === '@' && !TRANSLIT_IGNORE.has(character)) continue;
     const lastBase = prevBase;
     if (!TRANSLIT_IGNORE.has(character) && character !== '~') prevBase = character;
     if (TANWIN_SEAT.has(character) && lastBase === 'F') continue;

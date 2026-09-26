@@ -422,4 +422,49 @@ assert.ok(prevented >= 3 && stopped >= 3);
   appData.quranLearn = saved; ui.kaoView = 'home'; ui.kaoOpen = false;
 }
 
-console.log('KAO render: PASS (E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');
+
+// KAO-16b · E11 Namazda ne diyorum (R-B2).
+{
+  const prayers = sandbox.window.QuranShortSurahsV1.prayerTexts;
+  assert.deepEqual(Array.from(prayers, (item) => item.id), ['tekbir', 'subhaneke', 'fatiha', 'zamm_sure', 'ruku', 'secde', 'tahiyyat', 'selam'], 'rekât sırası');
+  const lex = sandbox.window.QuranLexiconV1;
+  const knownLemma = prayers[0].words[0].lemmaId; // Allah
+  const prayerData = { quranLearn: { cards: { [`w:${knownLemma}:ar>tr`]: { reps: 2, state: 'review' } }, ayahs: { understood: [] } } };
+  const saved = appData.quranLearn; appData.quranLearn = prayerData.quranLearn;
+  ui.kaoOpen = true; assert.equal(api.kaoOpenPrayer(), true); assert.equal(ui.kaoView, 'prayer');
+  let html = api.kaoOverlayHTML('2026-09-25T10:00:00');
+  assert.match(html, /aria-labelledby="kao-prayer-title"/);
+  const titles = [...html.matchAll(/<h3 id="kao-prayer-[a-z_]+"><span>(\d)<\/span> ([^<]+)<\/h3>/g)].map((match) => match[2]);
+  assert.deepEqual(titles, Array.from(prayers, (item) => item.title), '8 satır prayerTexts sırasında');
+  const total = prayers.reduce((sum, item) => sum + item.words.length, 0);
+  const openCount = prayers.reduce((sum, item) => sum + item.words.filter((word) => word.lemmaId === knownLemma).length, 0);
+  assert.match(html, new RegExp(`${openCount} / ${total} kelime açık`), 'açık/kapalı oranı data.quranLearn’den');
+  assert.equal((html.match(/kao-prayer-word is-known/g) || []).length, openCount);
+  assert.equal((html.match(/kao-prayer-word is-closed/g) || []).length, total - openCount, 'bilinmeyen kapalı');
+  assert.doesNotMatch(html, /kao-content-error/, 'her namaz kelimesinin doğrulanmış okunuşu var');
+  const closedIndex = prayers[1].words.findIndex((word) => word.lemmaId !== knownLemma);
+  const closed = prayers[1].words[closedIndex];
+  assert.equal(api.kaoPrayerWord(1, closedIndex), true);
+  const card = prayerData.quranLearn.cards[`w:${closed.lemmaId}:ar>tr`];
+  assert.ok(card && card.readerUnknown === true && card.tomorrowReason === 'prayer_unknown' && card.state === 'learning', 'kapalı kelime yarının kuyruğuna');
+  html = api.kaoPrayerHTML();
+  assert.match(html, /kao-prayer-word is-revealed/); assert.ok(html.includes(closed.tr)); assert.match(html, /yarınki tekrarına eklendi/);
+  assert.equal(api.kaoPrayerWord(99, 0), false);
+  assert.equal(api.kaoPrayerWord(0, 0), true, 'bilinen kelime → kelime kartı köprüsü'); assert.equal(ui.kaoView, 'word');
+  assert.match(api.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoOpenPrayer\(\)/, 'hub → E1 girişi');
+  // E3 tek satırlık Seviye 1 önerisi yalnız Ünite 1–3 review iken.
+  const unitEnd = Math.floor(3 * lex.lemmas.length / 12);
+  assert.equal(api.kaoLevel1Ready({ quranLearn: { cards: {} } }), false);
+  const level1 = { quranLearn: { cards: Object.fromEntries(lex.lemmas.slice(0, unitEnd).map((lemma) => [`w:${lemma.id}:tr>ar`, { state: 'review', reps: 3 }])) } };
+  assert.equal(api.kaoLevel1Ready(level1), true);
+  delete level1.quranLearn.cards[`w:${lex.lemmas[unitEnd - 1].id}:tr>ar`];
+  assert.equal(api.kaoLevel1Ready(level1), false, 'tek eksik kart yeter');
+  appData.quranLearn = Object.assign({}, prayerData.quranLearn, { cards: Object.fromEntries(lex.lemmas.slice(0, unitEnd).map((lemma) => [`w:${lemma.id}:tr>ar`, { state: 'review', reps: 3 }])) });
+  assert.equal((api.kaoTaskHTML(null).match(/App\.kaoOpenPrayer\(\)/g) || []).length, 1, 'E3 tek satır');
+  appData.quranLearn = { cards: {} };
+  assert.doesNotMatch(api.kaoTaskHTML(null), /kaoOpenPrayer/);
+  for (const name of ['kaoOpenPrayer', 'kaoPrayerWord']) assert.match(appSource, new RegExp(`App\\.${name}=function\\([^)]*\\)\\{ return window\\.SeymaQuranLearn\\.${name}\\.apply\\(null,arguments\\); \\};`));
+  appData.quranLearn = saved; ui.kaoView = 'home'; ui.kaoOpen = false;
+}
+
+console.log('KAO render: PASS (E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');

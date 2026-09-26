@@ -1,0 +1,49 @@
+{
+  "card": "KAO-16b",
+  "head": "4bf61c6bbeb8c5f3aae85b23b796a8aa819d2728",
+  "diffHash": "09588263d519f701b840855a93aec151b4f61b15efa2b7b131efcd28842b663d",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-26",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "scope": "E11 Namazda ne diyorum: 8 metin rekât sırasında (tekbir → Sübhâneke → Fâtiha → zamm-ı sûre → rükû → secde → Tahiyyât → selâm); bilinen kelime açık, bilinmeyen kapalı; kapalıya dokunmak anlamı açar ve kelimeyi yarının kuyruğuna alır; bilinen kelime E5 kelime kartına köprü; açık/kapalı oranı data.quranLearn'den; Ünite 1–3 review olunca E3'te tek satır Seviye 1 önerisi; E1'den erişim",
+  "content": {
+    "prayerReadings": "94/94 kelime okunuşlu (önce 0/94). Fâtiha 29 + İhlâs 15 araç mekanik; 50 Diyanet kelimesi elle, mevcut okunuş biçimiyle",
+    "prayerVerification": "50 elle okunuşun 36'sı araç mekanik çıktısıyla birebir; 14 fark açıklandı: Diyanet imlâsında vasıl/hançer elif yok (ismuka, ilâha) ve Fâtiha'daki önek biçimi (al-, li-, va-) izlendi",
+    "digraphBug": "turkishPronunciation zaten Türkçe harfli okunuşa th→s, dh→z, sh→ş, kh→h uyguluyordu: va-al-fasu→va-al-fathu, yazulûna→yadhulûna, bi-aşâbi→bi-ashâbi, câ'asumu→câ'athumu, kazen→kadhen; gramer yasurna→yathurna, دخل kökü z–l→d–h–l",
+    "silentLetterBug": "Uthmani ۟ işaretli harf okunuyordu (kafarûâ, ûlâ'ika): 21 kısa sûre kelimesi ve 341 sözlük örnek okunuşu düzeldi; yalnız ۟ içeren kayıtlar değişti (0 yan etki); lemma okunuşları ve DİA 524/524 değişmedi",
+    "determinism": "Değişiklik öncesi araçlar depodaki dosyaları byte byte üretti; değişiklik sonrası ikinci üretim de byte byte aynı",
+    "gzip": "sözlük 119.705→119.578, kısa sûre 24.048→24.409, gramer 13.070→13.068"
+  },
+  "queueFix": {
+    "bug": "kaoBuildQueue yeni kart bütçesinin çoğunu parça/gramer kartları alınca kalan kelimeler tek yönde kalabiliyordu (2026-09-26 tohumunda HEAD'de test_kao_requirements kırmızı)",
+    "fix": "seçim sonrası: kelimeler tek yöndeyse sonuncusu uygun karşı yönlü adayla değişir (anlamsal komşu ve 3 gün kuralı korunur)",
+    "proof": "365 günlük gerçek oturum taraması 0 tek-yönlü gün; fixture eski kodla kırmızı, yeniyle yeşil"
+  },
+  "results": {
+    "R-B2": "render fixture: sıra, açık/kapalı, oran, kuyruğa alma, köprü, E3 tek satır",
+    "R-A2": "365 gün iki yön"
+  },
+  "cache": {
+    "release": "20260925h → 20260925i (sözlük, gramer, kısa sûre dahil altı varlık)"
+  },
+  "surfacePins": {
+    "appHandlers": "752 → 754",
+    "appAssignments": "590 → 592"
+  },
+  "checks": {
+    "tests/kao tümü": "PASS",
+    "kao-lexicon-build --self-test": "PASS (yeni ۟ kontrolü dahil)",
+    "FX2 / iip_22 / v3 / surface-daily": "PASS",
+    "driver.mjs": "PASS",
+    "zikr-harness.mjs": "exit 0",
+    "verify-* (tümü)": "exit 0",
+    "shell-inventory --gate": "PASS",
+    "fullRegression": "tests/app+kao+quran+panel+panel-v2 147/147, reminder smoke exit 0"
+  },
+  "evidenceLevels": {
+    "source": "headless fixture + araç öz-testi",
+    "deploy": "yok (bu commit)",
+    "device": "yok"
+  }
+}

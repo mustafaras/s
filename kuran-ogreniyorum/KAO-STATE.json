@@ -1813,7 +1813,7 @@
   },
   "auditStatus": {
     "KAO-D1": "findings",
-    "KAO-D2": "pending",
+    "KAO-D2": "pass",
     "KAO-D3": "pending",
     "KAO-D4": "pending",
     "KAO-D5": "pending",

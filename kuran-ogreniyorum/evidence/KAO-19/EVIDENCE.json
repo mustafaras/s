@@ -1,0 +1,36 @@
+{
+  "card": "KAO-19",
+  "head": "4692e96f24a4ecfd6b24ec3697b6b99f5b7ce1bc",
+  "diffHash": "bcc3ea478d24fe21cda232a42dfb8134fa80729585ea61c880f8494424828c92",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-26",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "scope": "Panel aynası: manifest satırı + izinli özet anahtarları + panel bento kartı; kelime düzeyi hiçbir veri gözlemciye çıkmaz",
+  "leakFound": "Önceden quranLearn manifestte genel '*' (summary) kuralına düşüyordu: observer snapshot 'data' alanı kartları (lemma kimlikli card id'leri), hata sayaçlarını, bayrakları ve telaffuz yanlışlarını olduğu gibi taşıyordu; kapsam listesi de quranLearn.cards.w:<lemma>:… yollarını yazıyordu (R-C8 ihlali).",
+  "design": {
+    "app": "quranLearn.summary = {v, coveragePercent, knownWords, understoodAyahs, lastStudiedDate, streakDays, topSoundClass, flaggedCount, updatedAt}; kapsam E1 ile aynı kaoCoverage (token/77.430); ses sınıfı adı Seviye 0 ders başlığından (ör. 'Kalınlık', 'Peltek sesler'); bayrak yalnız {at,kind} nesnesi (R-C1)",
+    "manifest": "{path:'quranLearn',owner:'quranLearn',source:'state',privacy:'summary',mode:'summary',fallback:'latest'}; SUMMARY_ONLY_ROOTS: redact yalnız tiplenmiş/aralık denetimli 9 anahtarı bırakır, kapsam yürüyücüsü köke inmez; sections.quranLearn = özet + studiedToday (son açılış tarihine göre)",
+    "panel": "Kur’an Arapçası bento kartı (Kur’an Yolculuğu kartının ardından): kapsam %, seri, bugün çalışıldı mı, içerik bayrağı; ayrıntıda kelime/âyet sayısı, en çok karışan ses sınıfı; projeksiyon yoksa latest.json özetine düşer; özet yokken boş durum"
+  },
+  "results": {
+    "R-C1": "flaggedCount projeksiyonda; serbest metin bayrak sayılmaz",
+    "R-C8": "snapshot JSON'unda lemma/card id, misheard, errors, understood listesi yok; kapsamda quranLearn.* yolu yok; bölüm anahtarları izinli listeyle sınırlı; kurcalanmış özet (HTML, aralık dışı sayı, bozuk tarih, bilinmeyen anahtar) elenir"
+  },
+  "cache": {
+    "panel": "panelCoverageManifest.js + panel.js → 20260926a",
+    "release": "20260925j → 20260925k"
+  },
+  "checks": {
+    "test_kao_panel_projection": "PASS",
+    "tests/panel tümü": "PASS",
+    "tests/panel-v2 tümü": "PASS",
+    "tests/kao tümü": "PASS",
+    "fullRegression": "tests/app+kao+quran+panel+panel-v2 148/148, reminder smoke, driver, zikr, verify-*, shell PASS"
+  },
+  "evidenceLevels": {
+    "source": "headless fixture",
+    "deploy": "yok (bu commit)",
+    "device": "yok — gözlemci panelinde gerçek veriyle görünüm kullanıcı kabulünde"
+  }
+}

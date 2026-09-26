@@ -1048,6 +1048,23 @@ function quranJourneyDataP(){
   rows.sort(function(a,b){ return String((b.req&&b.req.updatedAt)||'').localeCompare(String((a.req&&a.req.updatedAt)||'')); });
   return {ok:true,cat:cat,total:total,stats:stats,rows:rows,deliveredRows:deliveredRows,noteTotal:noteTotal,lastActivity:lastActivity,errs:quranDeliveryErrorsP()};
 }
+// KAO-19 · Kur'an Arapçası özeti (R-C1/R-C8): yalnız manifestin izinli özet anahtarları; kelime düzeyi yok.
+function quranLearnPanelSectionP(){
+  var s=PROJECTION&&PROJECTION.sections&&PROJECTION.sections.quranLearn, P=window.PanelCoverageV1;
+  if(s&&s.status) return s;
+  return P&&typeof P.quranLearnProjection==='function'?P.quranLearnProjection(D&&D.quranLearn,D&&D.lastOpenedDate):{status:'missing'};
+}
+function quranLearnPanelCardHTML(){
+  var q=quranLearnPanelSectionP(), num=function(v){ return typeof v==='number'?String(v):'—'; };
+  if(!q||q.status!=='ok') return cardWrap({key:'quranLearn',icon:icon('book',18),title:'Kur’an Arapçası',span:12,order:24,summary:'<div class="empty"><span class="ei">'+icon('book',20)+'</span>Henüz özet yok · uygulamada ilk oturumdan sonra görünür</div>'});
+  var sum='<div class="dstats" style="grid-template-columns:repeat(4,1fr);margin-bottom:0;">';
+  sum+='<div class="dstat"><div class="dv">%'+num(q.coveragePercent)+'</div><div class="dl">kapsam</div></div>';
+  sum+='<div class="dstat"><div class="dv">'+num(q.streakDays)+'</div><div class="dl">gün seri</div></div>';
+  sum+='<div class="dstat"><div class="dv">'+(q.studiedToday?icon('check',16):'—')+'</div><div class="dl">'+(q.studiedToday?'bugün çalıştı':'bugün henüz yok')+'</div></div>';
+  sum+='<div class="dstat"><div class="dv">'+num(q.flaggedCount)+'</div><div class="dl">içerik bayrağı</div></div></div>';
+  var det='<div class="dl" style="margin-top:8px;">'+num(q.knownWords)+' kelime tanıdık · '+num(q.understoodAyahs)+' âyet anlaşıldı'+(q.topSoundClass?' · en çok karışan ses sınıfı: <b>'+esc(q.topSoundClass)+'</b>':'')+(q.lastStudiedDate?' · son çalışma '+esc(q.lastStudiedDate):'')+'</div>';
+  return cardWrap({key:'quranLearn',icon:icon('book',18),title:'Kur’an Arapçası',span:12,order:24,summary:sum,details:det});
+}
 function quranJourneyPanelCardHTML(){
   var QD=quranJourneyDataP();
   if(!QD.ok){
@@ -4356,6 +4373,7 @@ function render(){
   h+=faithAnnualPanelCardP();
   h+=hijriPanelCardP();
   h+=quranJourneyPanelCardHTML();
+  h+=quranLearnPanelCardHTML();
 
   // ROW 1.5: Luna sohbeti (salt-izleme) + ÆON sohbeti (etkileşimli) — WhatsApp thread'leri
   h+=lunaThreadCardHTML();

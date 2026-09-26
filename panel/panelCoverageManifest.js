@@ -91,6 +91,8 @@ var MANIFEST={
     {path:"eventLog",owner:"sync",source:"event_log",privacy:"metadata",mode:"summary",fallback:"event_files"},
     {path:"eventLog.events",owner:"sync",source:"event_log",privacy:"metadata",mode:"summary",fallback:"event_files"},
     {path:"quranJourney",owner:"quran",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
+    // KAO-19 (R-C1/R-C8): Kur'an Arapçası yalnız uygulamanın yazdığı sayısal özetle görünür; kart/hata/kelime düzeyi hiç çıkmaz.
+    {path:"quranLearn",owner:"quranLearn",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
     {path:"saygi",owner:"saygi",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
     // IIP-20: kişisel yer imi, ham okuyucu konumu ve tercih ayrıntıları
     // observer snapshot'a çıkmaz; yalnız uygulama cihazında tutulur.
@@ -109,7 +111,7 @@ var MANIFEST={
   ],
   expectedPaths:[
     "days","settings","profileAssessment","location","locationHistory",
-    "notifications","quranJourney","saygi","dailyPhoto","roomContentHistory",
+    "notifications","quranJourney","quranLearn","saygi","dailyPhoto","roomContentHistory",
     "locNudge","locationLastTs","labResults","aeon","eventLog"
   ],
   // REM-56 — every reminder-facing field class carries exactly ONE coverage
@@ -258,6 +260,7 @@ function recordCoverage(out,mode,parts){
   addUnique(out[mode]||out.summary,pathText(parts));
 }
 function walkCoverage(value,parts,out,opts){
+  if(parts.length&&own(SUMMARY_ONLY_ROOTS,pathText(parts))){ recordCoverage(out,'summary',parts); return; }
   var mode=parts.length?modeForPath(parts,parts[parts.length-1],value,opts):'summary';
   if(parts.length && WITHHELD_MODES[mode]){
     recordCoverage(out,mode,parts);
@@ -573,8 +576,25 @@ function isBlobPath(path,key,value){
   if(/media|attachment|upload|file|labresult/.test(low)&&(k==='data'||k==='content'||typeof value==='string')) return true;
   return k==='data'&&typeof value==='string'&&value.length>40&&/^[a-z0-9+/=_-]+$/i.test(value);
 }
+// KAO-19 · izinli özet anahtarları (R-C8): başka anahtar observer snapshot'a çıkmaz.
+var QURAN_LEARN_SUMMARY_KEYS=['v','coveragePercent','knownWords','understoodAyahs','lastStudiedDate','streakDays','topSoundClass','flaggedCount','updatedAt'];
+function quranLearnSummary(root){
+  var s=isObject(root)&&isObject(root.summary)?root.summary:null, count=function(v,max){ return typeof v==='number'&&isFinite(v)&&v>=0&&v<=max?Math.floor(v):null; };
+  if(!s) return {summary:null};
+  var date=typeof s.lastStudiedDate==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s.lastStudiedDate)?s.lastStudiedDate:null;
+  var sound=typeof s.topSoundClass==='string'&&/^[A-Za-zÇĞİÖŞÜçğıöşüâîû .'’-]{1,40}$/.test(s.topSoundClass)?s.topSoundClass:null;
+  return {summary:{v:1,coveragePercent:count(s.coveragePercent,100),knownWords:count(s.knownWords,100000),understoodAyahs:count(s.understoodAyahs,400),lastStudiedDate:date,streakDays:count(s.streakDays,100000),topSoundClass:sound,flaggedCount:count(s.flaggedCount,100000),updatedAt:safeIso(s.updatedAt)}};
+}
+var SUMMARY_ONLY_ROOTS={quranLearn:quranLearnSummary};
+/** Panel bölümü: özet + bugün çalışıldı mı (son açılış tarihine göre). */
+function quranLearnProjection(root,date){
+  var s=quranLearnSummary(root).summary;
+  if(!s) return {status:'missing'};
+  return Object.assign({status:'ok',studiedToday:!!(date&&s.lastStudiedDate===date)},s);
+}
 function redact(value,parts){
   var path=pathText(parts), key=parts.length?parts[parts.length-1]:'';
+  if(own(SUMMARY_ONLY_ROOTS,path)) return SUMMARY_ONLY_ROOTS[path](value);
   if(parts.length && WITHHELD_MODES[modeForPath(parts,key,value)]){
     if(path==='location') return locationSummary(value);
     if(path==='locationHistory') return historySummary(value);
@@ -605,6 +625,7 @@ function sectionSnapshot(safe,receipt,source){
     therapy:d.profileAssessment||null,
     notifications:Array.isArray(d.notifications)?{count:d.notifications.length}:null,
     quran:d.quranJourney||null,
+    quranLearn:quranLearnProjection(d.quranLearn,date),
     saygi:d.saygi||null,
     location:d.location||null,
     archives:{library:d.library||null,watchlist:d.watchlist||null,music:d.music||null},
@@ -802,6 +823,9 @@ root.PanelCoverageV1={
   adoptCoverage:adoptCoverage,
   normalizeReceipt:safeReceipt,
   FULL_DETAIL_ALLOW:FULL_DETAIL_ALLOW,
-  redactedPaths:redactedPaths
+  redactedPaths:redactedPaths,
+  QURAN_LEARN_SUMMARY_KEYS:QURAN_LEARN_SUMMARY_KEYS,
+  quranLearnSummary:quranLearnSummary,
+  quranLearnProjection:quranLearnProjection
 };
 })(typeof window!=='undefined'?window:this);

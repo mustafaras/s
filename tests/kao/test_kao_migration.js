@@ -35,7 +35,8 @@ assert.deepEqual(JSON.parse(JSON.stringify(fresh)), {
   phonics: { style: 'muallim', misheard: {} },
   errors: { sound: 0, root: 0, affix: 0, cognate: 0, rule: 0, order: 0 },
   ayahs: { understood: [] },
-  readability: { lineHeight: 'normal', wordSpacing: 'normal', coloredHarakat: true, fadeHarakat: false }
+  readability: { lineHeight: 'normal', wordSpacing: 'normal', coloredHarakat: true, fadeHarakat: false },
+  summary: null
 });
 
 const old = { quranLearn: {

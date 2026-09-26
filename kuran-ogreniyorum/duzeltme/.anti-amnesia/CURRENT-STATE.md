@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-02** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-03/A** · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı, yerel) · **Taban:** `main` @ `58e0ceb` · **Yayın:** YETKİSİZ (her push/deploy ayrı kullanıcı onayı)
-**Güncelleme:** 2026-09-26 · KAO-FIX-01 done
+**Güncelleme:** 2026-09-26 · KAO-FIX-02 done
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -12,8 +12,8 @@
 | Prompt | Bulgu | Durum | Commit | Not |
 |---|---|---|---|---|
 | KAO-FIX-00 | — | done | denetim `201ff6d` · FIX-00 `5863002` | dal + kararlar (hepsi varsayılan) + taban |
-| KAO-FIX-01 | O-4 | done | `git log --grep=KAO-FIX-01` | freeze pini + repro testi (4 modül bayt-eş) |
-| KAO-FIX-02 | K-1, Y-3 | todo | | çalışma kitabı + içe alma kapısı |
+| KAO-FIX-01 | O-4 | done | `0d54321` | freeze pini + repro testi (4 modül bayt-eş) |
+| KAO-FIX-02 | K-1, Y-3 | done | `git log --grep=KAO-FIX-02` | çalışma kitabı 837 satır + içe alma kapısı |
 | KAO-FIX-03/A | K-1, Y-3 | todo | | 95–98 (230 satır) |
 | KAO-FIX-03/B | K-1, Y-3 | todo | | 99–105 (210) |
 | KAO-FIX-03/C | K-1, Y-3 | todo | | 106–114 (178) |
@@ -73,6 +73,8 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 6. **Paralel oturumlar** aynı repoda çalışabilir (denetimde `58e0ceb` böyle geldi). Senin olmayan kirli dosyaya dokunma.
 7. **`--import-md` `importedAt`'i değiştirir**, bu `lexicon.verified.json` hash'ini değiştirir → tuzak 2. Değişince `node tests/kao/test_kao_freeze_repro.js` kırmızı olur (FIX-01).
 8. **`tools/fixture-map-build.mjs` `tests/kao`'yu taramaz** (FAMILIES'te yok); KAO fixture'ları FIXTURE-MAP'te görünmez.
+9. **Parti D = 29 Fâtiha + 158 `ls_` + 32 `lp_`** (lp = Diyanet dua anlamı; quran.com referansı yok → kopya denetimi yok). `counts`'ta ek `invalid` (doğrulayıcı/tarih/biçim) de exit 1 verir.
+10. **`surahs.verified.json` FIX-03'te doğar** (FIX-02'de üretilip silindi); `--surah-import` satırlar aynıysa `importedAt`'i korur (hash sabit).
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

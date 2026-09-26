@@ -2,7 +2,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { INPUTS, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic, translitTr, wordTranslitTr } from './kao-lexicon-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -133,7 +133,7 @@ function prayerLine(id, title, text, meanings, readings, lemmaIndex, supplements
   if (tokens.length !== meanings.length || tokens.length !== readings.length) throw new Error(`${id}: prayer word/meaning/reading mismatch ${tokens.length}/${meanings.length}/${readings.length}`);
   return { id, title, words: tokens.map((ar, index) => prayerWord(ar, meanings[index], readings[index], lemmaIndex, supplements)) };
 }
-function freezeSurahs() {
+function collectSurahs() {
   const { qacWords, aligned, wordsByVerse, uthmaniSource } = verseData();
   const refs = [...wordsByVerse.keys()];
   const rawLines = uthmaniSource.split(/\r?\n/).map((line) => line.trim()).filter((line) => line && !line.startsWith('#'));
@@ -198,6 +198,11 @@ function freezeSurahs() {
     p('selam', 'Selâm', 'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ', ['selam', 'üzerinize', 'rahmeti', 'Allahın'])
   ];
   for (const item of prayerTexts) for (const word of item.words) if (!word.pronunciation) throw new Error(`${item.id}: ${word.ar} Latin okunuşsuz dondurulamaz`);
+  const fatihaRefs = qacWords.filter((word) => word.surah === 1).map((word) => `1:${word.ayah}:${word.wordIndex}`);
+  return { words, fatiha, fatihaRefs, waqfMarks, supplements, prayerTexts, reference };
+}
+function freezeSurahs() {
+  const { words, waqfMarks, supplements, prayerTexts } = collectSurahs();
   const names = ['Nâs','Felak','İhlâs','Tebbet','Nasr','Kâfirûn','Kevser','Mâûn','Kureyş','Fîl','Hümeze','Asr','Tekâsür','Kâria','Âdiyât','Zilzâl','Beyyine','Kadir','Alak','Tîn'];
   const surahs = names.map((name, index) => ({ id: 114 - index, name }));
   const data = {
@@ -228,13 +233,202 @@ function freezePhonics() {
   write('app/content/quranPhonicsV1.js', wrapper('QuranPhonicsV1', 'quran-phonics-tr-v1', data), 40 * 1024);
 }
 
-const modes = new Map([
-  ['--freeze-grammar', freezeGrammar], ['--freeze-surahs', freezeSurahs], ['--freeze-phonics', freezePhonics]
+// --- KAO-FIX-02: kısa sûre çeviri çalışma kitabı ve içe alma kapısı (K-1, Y-3) ---
+// Türkçe katman quran.com referansından değil `surahs.verified.json`'dan gelecek (FIX-04).
+// Referans yalnız kopya denetimi ve kısaltılmış ipucu için okunur; çalışma kitabına tamamı yazılmaz.
+const SURAH_REVIEW = path.join(CONTENT, 'surahs.review.md');
+const SURAH_VERIFIED = path.join(CONTENT, 'surahs.verified.json');
+const SURAH_PARTS = Object.freeze([
+  ['A', 'Parti A (95–98)'], ['B', 'Parti B (99–105)'], ['C', 'Parti C (106–114)'], ['D', 'Parti D (Fâtiha + tamamlayıcı sözlük)']
 ]);
-const selected = process.argv.slice(2);
-if (selected.length !== 1 || !modes.has(selected[0])) {
-  console.error('Kullanım: node tools/kao-content-freeze.mjs --freeze-grammar|--freeze-surahs|--freeze-phonics');
-  process.exitCode = 64;
-} else {
-  modes.get(selected[0])();
+const SURAH_COLUMNS = ['id', 'ar', 'pronunciation', 'lemmaId', 'ref', 'referans-ipucu', 'tr', 'verifiedBy', 'verifiedAt'];
+const SURAH_ROW_ID = /^(?:s-\d+-\d+-\d+|f-1-\d+-\d+|ls_\S+|lp_\S+)$/;
+const HINT_CHARS = 24;
+const ENGLISH_MARKERS = new Set(['the', 'their', 'his', 'those', 'which', 'they', 'them', 'of', 'and', 'will', 'shall', 'your', 'our', 'who', 'what', 'that']);
+
+function surahPart(surahId) {
+  if (surahId >= 95 && surahId <= 98) return 'A';
+  if (surahId >= 99 && surahId <= 105) return 'B';
+  return 'C';
 }
+function copyForms(value) {
+  const normalize = (text) => text.toLocaleLowerCase('tr').replace(/[\p{P}\p{S}]+/gu, ' ').replace(/\s+/g, ' ').trim();
+  const text = String(value || '');
+  return new Set([normalize(text), normalize(text.replace(/\([^)]*\)|\[[^\]]*\]/g, ' '))].filter(Boolean));
+}
+function isReferenceCopy(tr, referenceTr) {
+  const referenceForms = copyForms(referenceTr);
+  return [...copyForms(tr)].some((form) => referenceForms.has(form));
+}
+function isIsoDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+// Tek satırın denetimi. Boş `tr` → `missing` (içe almada hata değil, kademeli doldurma).
+function validateSurahRow(row, referenceTr) {
+  const tr = String(row.tr || '').trim();
+  if (!tr) return [{ code: 'missing', message: 'tr boş' }];
+  const errors = [];
+  if (/[|\r\n]/.test(tr)) errors.push({ code: 'format', message: 'tr tablo ayırıcısı ya da satır sonu taşıyamaz' });
+  if (referenceTr && isReferenceCopy(tr, referenceTr)) errors.push({ code: 'copy', message: 'referansın kopyası (06 §2) — kendi ifadeni yaz' });
+  const english = tr.toLowerCase().split(/[^\p{L}]+/u).filter((word) => ENGLISH_MARKERS.has(word));
+  if (english.length) errors.push({ code: 'language', message: `İngilizce işaret kelimesi: ${[...new Set(english)].join(', ')}` });
+  if (!String(row.verifiedBy || '').trim()) errors.push({ code: 'verifiedBy', message: 'verifiedBy boş' });
+  if (!isIsoDate(String(row.verifiedAt || '').trim())) errors.push({ code: 'verifiedAt', message: 'verifiedAt YYYY-AA-GG olmalı' });
+  return errors;
+}
+function hintOf(text) {
+  const chars = Array.from(String(text || '').replace(/[|\r\n]+/g, ' / ').trim());
+  return chars.length ? `${chars.slice(0, HINT_CHARS).join('')}…` : '—';
+}
+function cell(value) {
+  return String(value ?? '').replace(/[|\r\n]+/g, ' / ').trim();
+}
+// Kaynak satırlar: 618 sûre kelimesi (A–C), 29 Fâtiha kelimesi ve tamamlayıcı sözlük (D).
+function surahSourceRows() {
+  const { words, fatiha, fatihaRefs, supplements, prayerTexts, reference } = collectSurahs();
+  const referenceTr = (ref) => reference.get(ref)?.tr || null;
+  const rows = words.map((word) => {
+    const ref = `${word.surahId}:${word.ayah}:${word.i}`;
+    return { part: surahPart(word.surahId), id: word.id, ar: word.ar, pronunciation: word.pronunciation, lemmaId: word.lemmaId, ref, referenceTr: referenceTr(ref), hint: referenceTr(ref) };
+  });
+  fatiha.forEach((word, index) => {
+    const ref = fatihaRefs[index];
+    const [, ayah, position] = ref.split(':');
+    rows.push({ part: 'D', id: `f-1-${ayah}-${position}`, ar: word.ar, pronunciation: word.pronunciation, lemmaId: word.lemmaId, ref, referenceTr: referenceTr(ref), hint: referenceTr(ref) });
+  });
+  // Tamamlayıcı kaydın bağlamı: onu ilk yaratan kelime (üretim sırasıyla aynı tarama).
+  const firstUse = new Map();
+  const note = (lemmaId, ref, word) => { if (!firstUse.has(lemmaId)) firstUse.set(lemmaId, { ref, word }); };
+  words.forEach((word) => note(word.lemmaId, `${word.surahId}:${word.ayah}:${word.i}`, word));
+  fatiha.forEach((word, index) => note(word.lemmaId, fatihaRefs[index], word));
+  prayerTexts.filter((item) => item.id !== 'fatiha' && item.id !== 'zamm_sure')
+    .forEach((item) => item.words.forEach((word) => note(word.lemmaId, `prayer:${item.id}`, word)));
+  for (const item of supplements.values()) {
+    const use = firstUse.get(item.id);
+    if (!use) throw new Error(`${item.id}: tamamlayıcı kaydın kaynağı bulunamadı`);
+    const isPrayer = use.ref.startsWith('prayer:');
+    rows.push({
+      part: 'D', id: item.id, ar: item.ar, pronunciation: isPrayer ? use.word.pronunciation : '—', lemmaId: item.id, ref: use.ref,
+      referenceTr: isPrayer ? null : referenceTr(use.ref), hint: isPrayer ? item.tr : referenceTr(use.ref)
+    });
+  }
+  const ids = new Set();
+  for (const row of rows) {
+    if (!SURAH_ROW_ID.test(row.id)) throw new Error(`${row.id}: beklenmeyen satır kimliği`);
+    if (ids.has(row.id)) throw new Error(`${row.id}: yinelenen kaynak satırı`);
+    ids.add(row.id);
+  }
+  return rows;
+}
+function renderSurahWorkbook(sourceRows, values = new Map()) {
+  const lines = [
+    '# KAO kısa sûre çeviri çalışma kitabı (KAO-FIX-02)',
+    '',
+    '> Üretildi: `node tools/kao-content-freeze.mjs --surah-workbook` · içe alma: `--surah-import` → `surahs.verified.json`.',
+    '> Yalnız `tr`, `verifiedBy`, `verifiedAt` sütunları doldurulur; diğer sütunlar araç çıktısıdır, elle düzenlenmez.',
+    '> `referans-ipucu` quran.com kelime referansının ilk 24 karakteridir (lp_ satırlarında Diyanet dua anlamı); bağlam içindir, **kopyalanmaz** (06 §2).',
+    '> Kapı: boş `tr` = missing · referansla aynı = copy · İngilizce işaret kelimesi = language · `verifiedAt` biçimi `YYYY-AA-GG`.',
+    ''
+  ];
+  for (const [part, title] of SURAH_PARTS) {
+    const partRows = sourceRows.filter((row) => row.part === part);
+    lines.push(`## ${title}`, '', `| ${SURAH_COLUMNS.join(' | ')} |`, `|${SURAH_COLUMNS.map(() => '---').join('|')}|`);
+    for (const row of partRows) {
+      const value = values.get(row.id) || {};
+      lines.push(`| ${[row.id, row.ar, row.pronunciation, row.lemmaId, row.ref, hintOf(row.hint), value.tr, value.verifiedBy, value.verifiedAt].map(cell).join(' | ')} |`);
+    }
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+function parseSurahWorkbook(markdown) {
+  const rows = [];
+  const seen = new Set();
+  for (const line of String(markdown).split(/\r?\n/)) {
+    if (!line.startsWith('|')) continue;
+    const cells = line.split('|').slice(1, -1).map((value) => value.trim());
+    if (cells[0] === 'id' || cells.every((value) => /^-+$/.test(value))) continue;
+    if (cells.length !== SURAH_COLUMNS.length || !SURAH_ROW_ID.test(cells[0])) throw new Error(`tanınmayan tablo satırı: ${line.slice(0, 80)}`);
+    if (seen.has(cells[0])) throw new Error(`${cells[0]}: yinelenen satır`);
+    seen.add(cells[0]);
+    rows.push({ id: cells[0], tr: cells[6], verifiedBy: cells[7], verifiedAt: cells[8] });
+  }
+  return rows;
+}
+function classifySurahRows(sourceRows, parsedRows) {
+  const byId = new Map(parsedRows.map((row) => [row.id, row]));
+  const known = new Set(sourceRows.map((row) => row.id));
+  const unknown = parsedRows.filter((row) => !known.has(row.id)).map((row) => row.id);
+  if (unknown.length) throw new Error(`bilinmeyen satır kimliği: ${unknown.slice(0, 5).join(', ')}`);
+  const counts = { total: sourceRows.length, filled: 0, copy: 0, language: 0, missing: 0, invalid: 0 };
+  const rows = {};
+  const problems = [];
+  for (const source of sourceRows) {
+    const row = byId.get(source.id) || { id: source.id };
+    const found = validateSurahRow(row, source.referenceTr).map((error) => error.code);
+    if (!found.length) {
+      counts.filled += 1;
+      rows[source.id] = { tr: row.tr.trim(), verifiedBy: row.verifiedBy.trim(), verifiedAt: row.verifiedAt.trim() };
+      continue;
+    }
+    const category = ['missing', 'copy', 'language'].find((code) => found.includes(code)) || 'invalid';
+    counts[category] += 1;
+    if (category !== 'missing') problems.push({ id: source.id, codes: found });
+  }
+  return { counts, rows, problems };
+}
+function readSurahVerified() {
+  return fs.existsSync(SURAH_VERIFIED) ? JSON.parse(fs.readFileSync(SURAH_VERIFIED, 'utf8')) : null;
+}
+function surahWorkbook(part) {
+  if (part && !SURAH_PARTS.some(([key]) => key === part)) throw new Error(`--part A|B|C|D olmalı (${part})`);
+  const sourceRows = surahSourceRows();
+  // Doldurulmuş satır silinmez: önce doğrulanmış JSON, üstüne mevcut çalışma kitabının dolu satırları.
+  const values = new Map(Object.entries(readSurahVerified()?.rows || {}));
+  if (fs.existsSync(SURAH_REVIEW)) {
+    for (const row of parseSurahWorkbook(fs.readFileSync(SURAH_REVIEW, 'utf8'))) if (row.tr) values.set(row.id, row);
+  }
+  fs.writeFileSync(SURAH_REVIEW, renderSurahWorkbook(sourceRows, values));
+  for (const [key, title] of SURAH_PARTS.filter(([key]) => !part || key === part)) {
+    const partRows = sourceRows.filter((row) => row.part === key);
+    console.log(`${title}: ${partRows.length} satır, ${partRows.filter((row) => values.get(row.id)?.tr).length} dolu`);
+  }
+  console.log(`${path.relative(ROOT, SURAH_REVIEW)}: ${sourceRows.length} satır`);
+}
+function surahImport() {
+  if (!fs.existsSync(SURAH_REVIEW)) throw new Error('surahs.review.md yok; önce --surah-workbook');
+  const sourceRows = surahSourceRows();
+  const { counts, rows, problems } = classifySurahRows(sourceRows, parseSurahWorkbook(fs.readFileSync(SURAH_REVIEW, 'utf8')));
+  const previous = readSurahVerified();
+  // Satırlar değişmediyse importedAt korunur; dosya ve hash'i gereksiz yere değişmez.
+  const unchanged = previous && JSON.stringify(previous.rows) === JSON.stringify(rows);
+  const importedAt = unchanged ? previous.importedAt : new Date().toISOString();
+  fs.writeFileSync(SURAH_VERIFIED, `${JSON.stringify({ schemaVersion: 1, importedAt, rows, counts }, null, 2)}\n`);
+  for (const problem of problems.slice(0, 20)) console.error(`${problem.id}: ${problem.codes.join(', ')}`);
+  console.log(`surah-import ${JSON.stringify(counts)}`);
+  if (counts.copy > 0 || counts.language > 0 || counts.invalid > 0) process.exitCode = 1;
+}
+
+const USAGE = 'Kullanım: node tools/kao-content-freeze.mjs --freeze-grammar|--freeze-surahs|--freeze-phonics|--surah-workbook [--part A|B|C|D]|--surah-import';
+function runCli(argv) {
+  const modes = new Map([
+    ['--freeze-grammar', freezeGrammar], ['--freeze-surahs', freezeSurahs], ['--freeze-phonics', freezePhonics], ['--surah-import', surahImport]
+  ]);
+  if (argv[0] === '--surah-workbook' && (argv.length === 1 || (argv.length === 3 && argv[1] === '--part'))) {
+    surahWorkbook(argv[2]);
+    return;
+  }
+  if (argv.length !== 1 || !modes.has(argv[0])) {
+    console.error(USAGE);
+    process.exitCode = 64;
+    return;
+  }
+  modes.get(argv[0])();
+}
+
+export { validateSurahRow, renderSurahWorkbook, parseSurahWorkbook, classifySurahRows };
+
+const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (IS_MAIN) runCli(process.argv.slice(2));

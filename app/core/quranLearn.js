@@ -371,11 +371,26 @@
     var answer=direction==='tr>ar'?String(meta.ar||id):String(meanings[0]||meta.meaning||id);
     var picked=kaoPickDistractors(d,id,3,opts),lex=window.QuranLexiconV1;
     if(picked.length<3&&lex&&Array.isArray(lex.lemmas)){
-      var previousLemmas=previousDistractorLemmas(d,id,opts),pickedLemmas=picked.map(function(item){ return lemmaIdForCard(item.cardId); });
-      lex.lemmas.filter(function(lemma){ return lemma.id!==lemmaIdForCard(id)&&lemma.pos===meta.pos&&lemma.root!==meta.root&&previousLemmas.indexOf(lemma.id)<0&&pickedLemmas.indexOf(lemma.id)<0; }).sort(function(a,b){ return seededRank(String(opts.seed||'')+'|fallback|'+id,a.id)-seededRank(String(opts.seed||'')+'|fallback|'+id,b.id); }).some(function(lemma){
-        if(picked.length>=3) return true;
-        picked.push({cardId:'w:'+lemma.id+':'+direction,label:direction==='tr>ar'?lemma.ar:String(lemma.meanings[0]||lemma.id)});
-        return false;
+      // Sözlük yedeği katmanlı: (1) aynı tür, farklı kök; (2) hedef köksüzse öteki köksüz işlev kelimeleri; (3) son çare
+      // herhangi bir kelime. Aynı kök yalnız kök varken dışlanır (köksüz edatlar birbirini elemez); etiketler tekildir.
+      var previousLemmas=previousDistractorLemmas(d,id,opts),pickedLemmas=picked.map(function(item){ return lemmaIdForCard(item.cardId); }),targetLemma=lemmaIdForCard(id);
+      var labelOf=function(lemma){ return direction==='tr>ar'?String(lemma.ar||lemma.id):String(lemma.meanings[0]||lemma.id); };
+      var usedLabels=[answer].concat(picked.map(function(item){ return direction==='tr>ar'?String(metaFor(item.cardId,null,opts).ar||item.label):String(item.label); }));
+      // Anlamca çakışan seçenek soruyu belirsiz yapar: ortak parçası (",", ";", "(", "/" ile ayrılmış) olan etiket elenir.
+      var parts=function(label){ return String(label||'').toLocaleLowerCase('tr').split(/[,;()\/]+/).map(function(part){ return part.trim(); }).filter(Boolean); };
+      var overlaps=function(label){ var own=parts(label); return usedLabels.some(function(used){ return parts(used).some(function(part){ return own.indexOf(part)>=0; }); }); };
+      var eligible=function(lemma){ return lemma.id!==targetLemma&&!(meta.root&&lemma.root===meta.root)&&previousLemmas.indexOf(lemma.id)<0&&pickedLemmas.indexOf(lemma.id)<0; };
+      var tiers=[function(lemma){ return lemma.pos===meta.pos; },function(lemma){ return !meta.root&&!lemma.root; },function(){ return true; }];
+      tiers.some(function(tier){
+        lex.lemmas.filter(function(lemma){ return eligible(lemma)&&tier(lemma); }).sort(function(a,b){ return seededRank(String(opts.seed||'')+'|fallback|'+id,a.id)-seededRank(String(opts.seed||'')+'|fallback|'+id,b.id); }).some(function(lemma){
+          if(picked.length>=3) return true;
+          var label=labelOf(lemma);
+          if(overlaps(label)) return false;
+          usedLabels.push(label); pickedLemmas.push(lemma.id);
+          picked.push({cardId:'w:'+lemma.id+':'+direction,label:label});
+          return false;
+        });
+        return picked.length>=3;
       });
     }
     var choices=[{cardId:id,label:answer,pronunciation:direction==='tr>ar'?kaoLemmaReading(lemmaIdForCard(id),meta.translit):'',correct:true}].concat(picked.map(function(item){

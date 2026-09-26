@@ -25,7 +25,7 @@
 | KAO-FIX-08 | O-1 | done | `f021e8a` | lastDistractors cevapta yazılır (lemma kimliği), lemma düzeyinde dışlama |
 | KAO-FIX-09 | O-2 | done | `5413819` | KF-10: budama yok, 100 KB sınırı kaldırıldı; koruma testi |
 | KAO-FIX-10 | O-3 | done | `5ccf5db` | kaoMilestoneCheck + isSettled; sim 4 taş dolu; eighty tavan %77,42 (FIX-16) |
-| KAO-FIX-11 | O-5 | done | `git log --grep=KAO-FIX-11` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
+| KAO-FIX-11 | O-5 | done | `6f2726b` + ek `git log --grep=KAO-FIX-11 (ek)` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
 | KAO-FIX-12 | O-6 | todo | | kaynaklar/lisanslar E7 |
 | KAO-FIX-13 | O-9 | todo | | Arapça yazı tipi |
 | KAO-FIX-14 | O-7 | todo | | semNeighbors sözlükten |
@@ -60,7 +60,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260926h`** (FIX-10) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260926i`** (FIX-11 eki) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 
@@ -82,7 +82,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 14. **`isDurable` tek kalıcılık kuralı (FIX-07);** bilinen lemma iki yönde kalıcı. Mutasyon M04/M09 hâlâ KAÇTI → FIX-11.
 15. **Veri bütçesi (FIX-09 → KF-10 kapandı):** sim 365 g `quranLearn` 241 KB (taban) → 394 (FIX-06, 2× kart) → 464 KB (FIX-08 `lastDistractors`). Kullanıcı: budama yok, sınır yok (`test_kao_state_budget.js` korur). FIX-16 kapanış ekine 05 §2 / `stateBudgetKB` istisnası yazılmalı.
 16. **`eighty` taşı kazanılamaz (FIX-10):** token kapsamı tavanı %77,42 < %80 (plan LEM havuzu %80,9). FIX-16'da karar: eşik/ölçü hizası. `isSettled(card,minS)` tek kalıcılık kuralı; M10 `isDurable`'ı hedefler.
-17. **İşlev kelimesi görevinde çeldirici yok (FIX-11 bulgusu):** kökü olmayan ~49 lemma × 2 yön tek şıklı (sözlük yedeği `root!==root` undefined'ı eler). Üretim düzeltmesi kullanıcı kararı bekliyor. `rsync --delete` hedefini daima doğrula (FIX-11 olayı).
+17. **İşlev kelimesi görevinde çeldirici yok (FIX-11 bulgusu):** kökü olmayan ~49 lemma × 2 yön tek şıklı (sözlük yedeği `root!==root` undefined'ı eler). Kullanıcı onayıyla düzeltildi (FIX-11 eki: katmanlı yedek + anlam çakışma süzgeci). `rsync --delete` hedefini daima doğrula (FIX-11 olayı).
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

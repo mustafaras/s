@@ -385,6 +385,29 @@ function sandboxLemma(api, lemmaId) {
   assert.deepEqual(seen[1].filter((id) => seen[0].includes(id)), [], 'R-A2: ardışık iki tekrarda aynı çeldirici gelmez (üretim yolu)');
 }
 
+// KAO-FIX-11 eki (kullanıcı onayı): kökü olmayan işlev kelimeleri de dâhil her kelime görevi 3 farklı çeldirici taşır.
+{
+  const api = loadApi();
+  const lexBox = { window: {} };
+  vm.createContext(lexBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), lexBox);
+  const empty = { quranLearn: { cards: {}, settings: {} } };
+  const short = [];
+  for (const lemma of lexBox.window.QuranLexiconV1.lemmas) {
+    for (const direction of ['ar>tr', 'tr>ar']) {
+      const cardId = `w:${lemma.id}:${direction}`;
+      const task = api.kaoBuildTask({ id: `kao:x:${cardId}`, cardId, type: direction === 'tr>ar' ? 'arabic' : 'meaning', isNew: true }, empty, { seed: cardId });
+      const wrong = task.choices.filter((choice) => !choice.correct);
+      const labels = new Set(wrong.map((choice) => choice.label));
+      const answer = task.choices.find((choice) => choice.correct).label;
+      const parts = (label) => String(label).toLocaleLowerCase('tr').split(/[,;()/]+/).map((part) => part.trim()).filter(Boolean);
+      const clash = wrong.some((choice) => parts(choice.label).some((part) => parts(answer).includes(part)));
+      if (wrong.length !== 3 || labels.size !== 3 || labels.has(answer) || (!lemma.root && clash)) short.push(`${cardId}(${lemma.pos}):${wrong.length}${clash ? ':çakışma' : ''}`);
+    }
+  }
+  assert.deepEqual(short, [], `her kelime görevi 3 farklı çeldirici; köksüz işlev kelimelerinde doğru cevapla anlam parçası çakışmaz (eksik: ${short.length})`);
+}
+
 // KAO-FIX-11 (O-5): undo `errors` geri sarımı (M04) ve oturum içi tek tekrar (02 §2.10).
 {
   const data = { quranLearn: null };

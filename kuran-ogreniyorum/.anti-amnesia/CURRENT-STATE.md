@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
-**Güncelleme:** 2026-09-26 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 27/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-19 · **blockedPrompt:** — · **Sıradaki:** **KAO-20**
+**Güncelleme:** 2026-09-26 · **Durum:** `in_progress` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 28/30
+**activePrompt:** — · **lastCompletedPrompt:** KAO-20 · **blockedPrompt:** — · **Sıradaki:** **KAO-21**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -38,7 +38,7 @@
 | KAO-16b | E11 Namazda ne diyorum | done | R-B2 |
 | KAO-18 | Kontrast ve erişilebilirlik ölçümü | done | R-A9 |
 | KAO-19 | Panel aynası (manifest + özet projeksiyon) | done | R-C1 R-C8 |
-| KAO-20 | Tam regresyon + kullanıcı görevleri + kalibrasyon raporu | pending | R-A1 R-A3 R-C5 R-C9 |
+| KAO-20 | Tam regresyon + kullanıcı görevleri + kalibrasyon raporu | done | R-A1 R-A3 R-C5 R-C9 |
 | KAO-21 | Hub kartı bileşimi + köprüler (IIP koordineli) | pending | — |
 | KAO-22 | Kapanış belgesi | pending | R-C9 |
 | KAO-D1 | Dalga 1 denetimi | pending | — |
@@ -52,4 +52,4 @@
 R-A1:partial · R-A2:done · R-A3:partial · R-A4:partial · R-A5:done · R-A6:done · R-A7:partial · R-A8:done · R-A9:partial · R-B1:pending · R-B2:partial · R-B3:done · R-B4:pending · R-B5:pending · R-B6:partial · R-B7:done · R-B8:partial · R-C1:pending · R-C2:partial · R-C3:done · R-C4:pending · R-C5:partial · R-C6:partial · R-C7:done · R-C8:pending · R-C9:pending
 
 ## Son ledger satırı
-| 89 | 2026-09-26 | KAO-19 bitti: panel aynası — quranLearn yalnız 9 izinli özet anahtarıyla gözlemciye çıkar (önceki '*' kuralıyla kart/hata/kelime düzeyi veri sızıyordu, kapatıldı); uygulama kaoSave ile özeti her kayıtta tazeler; panelde Kur’an Arapçası kartı; panel sürümleri 20260926a, yayın pini 20260925k. | `evidence/KAO-19/EVIDENCE.json`; R-C1/R-C8 done; tam regresyon 148/148 |
+| 90 | 2026-09-26 | KAO-20 bitti: tam regresyon (kao 14, app 76, panel 23, panel-v2 27, quran 9, premium 9, reminder smoke, driver, zikr 95, rebind 37, shell, kontrast 328 — hepsi PASS; fx-coverage exit 1 KAO öncesinden aynı), R-C9 headless üç görev, performans, 6 haftalık kalibrasyon simülasyonu (ECE 0,013) ve KAO-REGRESYON.md. Eksik tamamlandı: R-A1 gece oturumu/sayaç ve R-A3 bantlı kalibrasyon + E1 İstatistik. İçerik gzip 159,9 KB > 130 KB bütçe → kullanıcı kararı bekliyor. Yayın pini 20260925l. | `evidence/KAO-20/EVIDENCE.json`; `deliverables/KAO-REGRESYON.md` |

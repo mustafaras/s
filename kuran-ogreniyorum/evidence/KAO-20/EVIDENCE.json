@@ -1,0 +1,55 @@
+{
+  "card": "KAO-20",
+  "head": "9f604a873923319f162d60309ec1b21a82a47cd2",
+  "diffHash": "0b6989a3c3739261dd5d29d05a43eb283604edbb6c0ccc3cf512f65dc4b1f98b",
+  "diffHashMethod": "sha256(git diff HEAD -- . ':!kuran-ogreniyorum/evidence' ':!kuran-ogreniyorum/.anti-amnesia' ':!kuran-ogreniyorum/KAO-STATE.json')",
+  "date": "2026-09-26",
+  "agent": "Claude (Opus 5.5)",
+  "status": "PASS",
+  "deliverable": "kuran-ogreniyorum/deliverables/KAO-REGRESYON.md",
+  "families": {
+    "kao": "14/14",
+    "app": "76/76",
+    "panel": "23/23",
+    "panel-v2": "27/27",
+    "quran": "9/9",
+    "premium": "9/9",
+    "reminderSmoke": "exit 0 (21)",
+    "driver": "exit 0",
+    "zikr": "95/95",
+    "rebind": "37/37",
+    "shell": "PASS",
+    "verify-state": "3/3",
+    "kaoContrast": "328/328",
+    "lexiconSelfTest": "PASS",
+    "fxCoverage": "exit 1 — M2/M3/M4/M5/M7 eşik altı; 35cb697'de (KAO-17 öncesi) birebir aynı, KAO kaynaklı değil"
+  },
+  "R-C9": {
+    "a": "hub → E1 → oturum 2 dokunuş (≤3); Ayarlar'dan 2",
+    "b": "E5 → kök ağacı 1 dokunuş; ünite listesinden 2 (≤2)",
+    "c": "audio=false ve sessiz saat tam oturum: 0 ses nesnesi, oturum sonu ekranı",
+    "device": "bekliyor"
+  },
+  "R-C5": {
+    "transition": "p50 ≈0,1 ms, max <1 ms (bütçe 50 ms), tam render yok",
+    "preload": "none",
+    "contentGzip": "159.857 B / bütçe 133.120 B → AŞILDI, kullanıcı kararı bekliyor (3 seçenek raporda)"
+  },
+  "R-A3": {
+    "simulation": "kalibre sentetik öğrenici, 300 kart, 42 gün, tohum 20260926: 955 tekrar, ECE 0,0131; bant tablosu raporda",
+    "appComplete": "daily.calib.bands (10 bant) + E1 İstatistik (2/6 hafta tutunma, bant tablosu)"
+  },
+  "R-A1": {
+    "appComplete": "gece penceresinde oturum yalnız tekrar, ≤8 kart; daily.nightRev; nightFollow/dayFollow; hub + E1 önerisi; İstatistik karşılaştırması (n<30 uyarısı)",
+    "realEffect": "gerçek kullanım verisi gerektirir"
+  },
+  "checks": {
+    "test_kao_user_tasks": "PASS",
+    "fullRegression": "yukarıdaki aileler"
+  },
+  "evidenceLevels": {
+    "source": "headless fixture + sentetik simülasyon",
+    "deploy": "yok (bu commit)",
+    "device": "bekliyor"
+  }
+}

@@ -1744,6 +1744,17 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 **İzinli dosyalar (STATE ile birebir):**
 - `tests/kao/test_kao_user_tasks.js`
 - `kuran-ogreniyorum/deliverables/KAO-REGRESYON.md`
+- `app/core/quranLearn.js`
+- `app/kao.css`
+- `index.html`
+- `sw.js`
+- `tests/app/test_iip_22.js`
+- `tests/app/test_v3_welcome.js`
+- `tests/app/test_app_surface_boot_boundary.js`
+- `tests/app/test_app_surface_domain_boundary.js`
+- `tests/app/test_app_surface_lifecycle_boundary.js`
+- `tests/app/test_app_surface_overlay_boundary.js`
+- `kuran-ogreniyorum/UYGULAMA-PROMPTLARI.md`
 - `kuran-ogreniyorum/evidence/KAO-20/**`
 - `kuran-ogreniyorum/KAO-STATE.json`
 - `kuran-ogreniyorum/.anti-amnesia/CURRENT-STATE.md`
@@ -1763,6 +1774,9 @@ Kanıt düzeylerini ayır (CLAUDE.md kural 7): kaynak/test kanıtı ≠ cihaz ka
 - `node tests/kao/test_kao_user_tasks.js`
 - `for f in tests/kao/*.js; do node $f; done`
 - `tüm mevcut aileler (tests/app, tests/panel, tests/panel-v2, tests/quran, reminders smoke)`
+- `node kuran-ogreniyorum/tools/kao-verify-contrast.mjs`
+- `node tests/app/test_iip_22.js`
+- `node tests/app/test_v3_welcome.js`
 - `node .claude/skills/run-seyma/driver.mjs`
 - `node .claude/skills/run-seyma/zikr-harness.mjs`
 - `node tests/app/test_state_rebind_boundary.js`

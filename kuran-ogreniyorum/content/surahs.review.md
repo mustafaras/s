@@ -459,184 +459,184 @@
 
 | id | ar | pronunciation | lemmaId | ref | referans-ipucu | tr | verifiedBy | verifiedAt |
 |---|---|---|---|---|---|---|---|---|
-| s-106-1-1 | لِإِيلَـٰفِ | li-îlâfi | ls_ila_f_984fb933 | 106:1:1 | alıştırdığı için… |  |  |  |
-| s-106-1-2 | قُرَيْشٍ | kurayşin | ls_qurayo_ca5bf2e9 | 106:1:2 | Kureyşi… |  |  |  |
-| s-106-2-1 | إِۦلَـٰفِهِمْ | ilâfihim | ls_ila_f_984fb933 | 106:2:1 | onları alıştırdığı için… |  |  |  |
-| s-106-2-2 | رِحْلَةَ | rihleta | ls_riHolap_a6a06902 | 106:2:2 | yolculuğuna… |  |  |  |
-| s-106-2-3 | ٱلشِّتَآءِ | al-şitâ'i | ls_itaA_24019358 | 106:2:3 | kış… |  |  |  |
-| s-106-2-4 | وَٱلصَّيْفِ | va-al-sayfi | ls_S_ayof_ac3a6ff7 | 106:2:4 | ve yaz… |  |  |  |
-| s-106-3-1 | فَلْيَعْبُدُوا۟ | fa-l-yaʿbudû | l_Eabada_557021 | 106:3:1 | kulluk etsinler… |  |  |  |
-| s-106-3-2 | رَبَّ | rabba | l_rab_fc2490 | 106:3:2 | Rabbine… |  |  |  |
-| s-106-3-3 | هَـٰذَا | hâzâ | l_ha_aA_9f90d0 | 106:3:3 | bu… |  |  |  |
-| s-106-3-4 | ٱلْبَيْتِ | al-bayti | l_bayot_3393ba | 106:3:4 | evin… |  |  |  |
-| s-106-4-1 | ٱلَّذِىٓ | allazî | l_l_a_iY_1a8370 | 106:4:1 | o ki… |  |  |  |
-| s-106-4-2 | أَطْعَمَهُم | atʿamahum | ls_aToEama_ade5d995 | 106:4:2 | onları yedirip… |  |  |  |
-| s-106-4-3 | مِّن | min | l_min_1f6fa6 | 106:4:3 | açlıktan (kurtardı)… |  |  |  |
-| s-106-4-4 | جُوعٍ | cûʿin | ls_juwE_0d57cbb2 | 106:4:4 | (against) hunger… |  |  |  |
-| s-106-4-5 | وَءَامَنَهُم | va-âmanahum | l_aAmana_966a5c | 106:4:5 | ve onları güvene kavuştu… |  |  |  |
-| s-106-4-6 | مِّنْ | min | l_min_1f6fa6 | 106:4:6 | korkudan… |  |  |  |
-| s-106-4-7 | خَوْفٍۭ | havfin | l_xawof_3af862 | 106:4:7 | fear… |  |  |  |
-| s-107-1-1 | أَرَءَيْتَ | a-ra'ayta | l_ra_aA_d87b92 | 107:1:1 | gördün mü?… |  |  |  |
-| s-107-1-2 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 107:1:2 | kimseyi… |  |  |  |
-| s-107-1-3 | يُكَذِّبُ | yukazzibu | l_ka_aba_15a65b | 107:1:3 | yalanlayan… |  |  |  |
-| s-107-1-4 | بِٱلدِّينِ | bi-al-dîni | l_diyn_6c222f | 107:1:4 | dini… |  |  |  |
-| s-107-2-1 | فَذَٰلِكَ | fa-zâlika | l_a_lik_f3410a | 107:2:1 | işte o… |  |  |  |
-| s-107-2-2 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 107:2:2 | iter kakar… |  |  |  |
-| s-107-2-3 | يَدُعُّ | yaduʿʿu | ls_yaduE_u_e8040e4a | 107:2:3 | repulses… |  |  |  |
-| s-107-2-4 | ٱلْيَتِيمَ | al-yatîma | l_yatiym_4a612b | 107:2:4 | öksüzü… |  |  |  |
-| s-107-3-1 | وَلَا | va-lâ | l_laA_4e2bfd | 107:3:1 | ve… |  |  |  |
-| s-107-3-2 | يَحُضُّ | yahuddu | ls_yaHuD_u_1ff4f199 | 107:3:2 | teşvik etmez… |  |  |  |
-| s-107-3-3 | عَلَىٰ | ʿalâ | l_EalaY_f79ef3 | 107:3:3 | doyurmaya… |  |  |  |
-| s-107-3-4 | طَعَامِ | taʿâmi | l_TaEaAm_f85a5a | 107:3:4 | feed… |  |  |  |
-| s-107-3-5 | ٱلْمِسْكِينِ | al-miskîni | l_misokiyn_63a03c | 107:3:5 | yoksulu… |  |  |  |
-| s-107-4-1 | فَوَيْلٌ | fa-vaylun | l_wayol_4f2e46 | 107:4:1 | vay haline… |  |  |  |
-| s-107-4-2 | لِّلْمُصَلِّينَ | li-l-musallîna | ls_muSal_iyn_248f398b | 107:4:2 | namaz kılanların… |  |  |  |
-| s-107-5-1 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 107:5:1 | ki… |  |  |  |
-| s-107-5-2 | هُمْ | hum | ls_humo_365429ef | 107:5:2 | onlar… |  |  |  |
-| s-107-5-3 | عَن | ʿan | l_Ean_2cd3f8 | 107:5:3 | namazlarından… |  |  |  |
-| s-107-5-4 | صَلَاتِهِمْ | salâtihim | l_Salaw_p_7f701a | 107:5:4 | their prayers… |  |  |  |
-| s-107-5-5 | سَاهُونَ | sâhûna | ls_saAhuwn_ebe2aeea | 107:5:5 | gaflet ederler… |  |  |  |
-| s-107-6-1 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 107:6:1 | ki… |  |  |  |
-| s-107-6-2 | هُمْ | hum | ls_humo_365429ef | 107:6:2 | onlar… |  |  |  |
-| s-107-6-3 | يُرَآءُونَ | yurâ'ûna | ls_yuraA_u_a68c939f | 107:6:3 | gösteriş yaparlar… |  |  |  |
-| s-107-7-1 | وَيَمْنَعُونَ | va-yamnaʿûna | ls_m_anaEa_eea75730 | 107:7:1 | ve esirgerler… |  |  |  |
-| s-107-7-2 | ٱلْمَاعُونَ | al-mâʿûna | ls_maAEuwn_e445e1e1 | 107:7:2 | en ufak bir yardımı… |  |  |  |
-| s-108-1-1 | إِنَّآ | innâ | l_in_51f9c7 | 108:1:1 | elbette biz… |  |  |  |
-| s-108-1-2 | أَعْطَيْنَـٰكَ | aʿtaynâka | ls_aEoTaY_5531e55d | 108:1:2 | sana verdik… |  |  |  |
-| s-108-1-3 | ٱلْكَوْثَرَ | al-kavsara | ls_kawovar_19da63e1 | 108:1:3 | Kevser'i… |  |  |  |
-| s-108-2-1 | فَصَلِّ | fa-salli | ls_Sal_aY_a2871e48 | 108:2:1 | öyleyse namaz kıl… |  |  |  |
-| s-108-2-2 | لِرَبِّكَ | li-rabbika | l_rab_fc2490 | 108:2:2 | Rabbin için… |  |  |  |
-| s-108-2-3 | وَٱنْحَرْ | va-anhar | ls_noHaro_37895208 | 108:2:3 | ve kurban kes… |  |  |  |
-| s-108-3-1 | إِنَّ | inna | l_in_51f9c7 | 108:3:1 | şüphesiz… |  |  |  |
-| s-108-3-2 | شَانِئَكَ | şâni'aka | ls_aAni_5533a892 | 108:3:2 | sana buğzeden… |  |  |  |
-| s-108-3-3 | هُوَ | huva | ls_huwa_fdbf01ac | 108:3:3 | o… |  |  |  |
-| s-108-3-4 | ٱلْأَبْتَرُ | al-abtaru | ls_abotar_06ccce70 | 108:3:4 | sonu kesik olandır… |  |  |  |
-| s-109-1-1 | قُلْ | kul | l_qaAla_657dd3 | 109:1:1 | de ki… |  |  |  |
-| s-109-1-2 | يَـٰٓأَيُّهَا | yâ-ayyuhâ | l_ay_uhaA_a494bb | 109:1:2 | ey… |  |  |  |
-| s-109-1-3 | ٱلْكَـٰفِرُونَ | al-kâfirûna | l_ka_firuwn_165d2d | 109:1:3 | inkar edenler… |  |  |  |
-| s-109-2-1 | لَآ | lâ | l_laA_4e2bfd | 109:2:1 | ben ibadet etmem… |  |  |  |
-| s-109-2-2 | أَعْبُدُ | aʿbudu | l_Eabada_557021 | 109:2:2 | I worship… |  |  |  |
-| s-109-2-3 | مَا | mâ | l_maA_13038a | 109:2:3 | şeye… |  |  |  |
-| s-109-2-4 | تَعْبُدُونَ | taʿbudûna | l_Eabada_557021 | 109:2:4 | sizin taptığınız… |  |  |  |
-| s-109-3-1 | وَلَآ | va-lâ | l_laA_4e2bfd | 109:3:1 | ve (etmezsiniz)… |  |  |  |
-| s-109-3-2 | أَنتُمْ | antum | ls_antumo_a762f8ad | 109:3:2 | siz de… |  |  |  |
-| s-109-3-3 | عَـٰبِدُونَ | ʿâbidûna | ls_EaAbid_30f128a0 | 109:3:3 | ibadeti… |  |  |  |
-| s-109-3-4 | مَآ | mâ | l_maA_13038a | 109:3:4 | benim taptığıma… |  |  |  |
-| s-109-3-5 | أَعْبُدُ | aʿbudu | l_Eabada_557021 | 109:3:5 | I worship… |  |  |  |
-| s-109-4-1 | وَلَآ | va-lâ | l_laA_4e2bfd | 109:4:1 | ve değil(im)… |  |  |  |
-| s-109-4-2 | أَنَا۠ | anâ | ls_anaA_253e2ab3 | 109:4:2 | ben… |  |  |  |
-| s-109-4-3 | عَابِدٌ | ʿâbidun | ls_EaAbid_30f128a0 | 109:4:3 | ibadet eden… |  |  |  |
-| s-109-4-4 | مَّا | mâ | l_maA_13038a | 109:4:4 | sizin taptıklarınıza… |  |  |  |
-| s-109-4-5 | عَبَدتُّمْ | ʿabadttum | l_Eabada_557021 | 109:4:5 | you worship… |  |  |  |
-| s-109-5-1 | وَلَآ | va-lâ | l_laA_4e2bfd | 109:5:1 | ve değilsiniz… |  |  |  |
-| s-109-5-2 | أَنتُمْ | antum | ls_antumo_a762f8ad | 109:5:2 | siz de… |  |  |  |
-| s-109-5-3 | عَـٰبِدُونَ | ʿâbidûna | ls_EaAbid_30f128a0 | 109:5:3 | ibadet eden… |  |  |  |
-| s-109-5-4 | مَآ | mâ | l_maA_13038a | 109:5:4 | benim ibadet ettiğime… |  |  |  |
-| s-109-5-5 | أَعْبُدُ | aʿbudu | l_Eabada_557021 | 109:5:5 | I worship… |  |  |  |
-| s-109-6-1 | لَكُمْ | la-kum | ls_lakumo_ae70d3d8 | 109:6:1 | sizindir… |  |  |  |
-| s-109-6-2 | دِينُكُمْ | dînukum | l_diyn_6c222f | 109:6:2 | sizin dininiz… |  |  |  |
-| s-109-6-3 | وَلِىَ | va-li-ya | ls_waliYa_6595bddf | 109:6:3 | ve benimdir… |  |  |  |
-| s-109-6-4 | دِينِ | dîni | l_diyn_6c222f | 109:6:4 | benim dinim… |  |  |  |
-| s-110-1-1 | إِذَا | izâ | l_i_aA_5b7376 | 110:1:1 | zaman… |  |  |  |
-| s-110-1-2 | جَآءَ | câ'a | l_jaA_a_c0bd29 | 110:1:2 | geldiği… |  |  |  |
-| s-110-1-3 | نَصْرُ | nasru | l_naSor_e325f5 | 110:1:3 | yardımı… |  |  |  |
-| s-110-1-4 | ٱللَّهِ | allahi | l_ll_ah_d0a09b | 110:1:4 | Allah'ın… |  |  |  |
-| s-110-1-5 | وَٱلْفَتْحُ | va-al-fathu | ls_fatoH_f1fc442d | 110:1:5 | ve fetih… |  |  |  |
-| s-110-2-1 | وَرَأَيْتَ | va-ra'ayta | l_ra_aA_d87b92 | 110:2:1 | ve gördüğün (zaman)… |  |  |  |
-| s-110-2-2 | ٱلنَّاسَ | al-nâsa | l_n_aAs_ba9c78 | 110:2:2 | insanların… |  |  |  |
-| s-110-2-3 | يَدْخُلُونَ | yadhulûna | l_daxala_442502 | 110:2:3 | girdiklerini… |  |  |  |
-| s-110-2-4 | فِى | fî | l_fiY_39977c | 110:2:4 | dinine… |  |  |  |
-| s-110-2-5 | دِينِ | dîni | l_diyn_6c222f | 110:2:5 | (the) religion… |  |  |  |
-| s-110-2-6 | ٱللَّهِ | allahi | l_ll_ah_d0a09b | 110:2:6 | Allah'ın… |  |  |  |
-| s-110-2-7 | أَفْوَاجًا | afvâcen | ls_fawoj_ec0d3f5c | 110:2:7 | dalga dalga… |  |  |  |
-| s-110-3-1 | فَسَبِّحْ | fa-sabbih | l_sab_aHa_bf280a | 110:3:1 | o halde tesbih et… |  |  |  |
-| s-110-3-2 | بِحَمْدِ | bi-hamdi | l_Hamod_98138a | 110:3:2 | överek… |  |  |  |
-| s-110-3-3 | رَبِّكَ | rabbika | l_rab_fc2490 | 110:3:3 | Rabbini… |  |  |  |
-| s-110-3-4 | وَٱسْتَغْفِرْهُ | va-astagfirhu | l_sotagofara_863081 | 110:3:4 | ve O'ndan mağfiret dile… |  |  |  |
-| s-110-3-5 | إِنَّهُۥ | innahu | l_in_51f9c7 | 110:3:5 | çünkü O… |  |  |  |
-| s-110-3-6 | كَانَ | kâna | l_kaAna_febd3a | 110:3:6 | tevbeyi kabul edendir… |  |  |  |
-| s-110-3-7 | تَوَّابًۢا | tavvâben | ls_taw_aAb_d053c098 | 110:3:7 | Oft-Returning… |  |  |  |
-| s-111-1-1 | تَبَّتْ | tabbat | ls_tab_a_fef12348 | 111:1:1 | kurusun… |  |  |  |
-| s-111-1-2 | يَدَآ | yadâ | l_yad_84953d | 111:1:2 | iki eli… |  |  |  |
-| s-111-1-3 | أَبِى | abî | l_abN_71b506 | 111:1:3 | Ebu… |  |  |  |
-| s-111-1-4 | لَهَبٍ | lahabin | ls_lahab_c32cfdd1 | 111:1:4 | Leheb'in… |  |  |  |
-| s-111-1-5 | وَتَبَّ | va-tabba | ls_tab_a_fef12348 | 111:1:5 | zaten kurudu da… |  |  |  |
-| s-111-2-1 | مَآ | mâ | l_maA_13038a | 111:2:1 | kurtaramadı… |  |  |  |
-| s-111-2-2 | أَغْنَىٰ | agnâ | ls_agonaY_f58b5210 | 111:2:2 | (will) avail… |  |  |  |
-| s-111-2-3 | عَنْهُ | ʿanhu | l_Ean_2cd3f8 | 111:2:3 | onu… |  |  |  |
-| s-111-2-4 | مَالُهُۥ | mâluhu | l_maAl_d64b35 | 111:2:4 | malı… |  |  |  |
-| s-111-2-5 | وَمَا | va-mâ | l_maA_13038a | 111:2:5 | ve… |  |  |  |
-| s-111-2-6 | كَسَبَ | kasaba | l_kasaba_94ec71 | 111:2:6 | kazandığı… |  |  |  |
-| s-111-3-1 | سَيَصْلَىٰ | sa-yaslâ | ls_yaSolaY_13157699 | 111:3:1 | girecektir… |  |  |  |
-| s-111-3-2 | نَارًا | nâren | l_naAr_d577c3 | 111:3:2 | bir ateşe… |  |  |  |
-| s-111-3-3 | ذَاتَ | zâta | l_uw_7be8de | 111:3:3 | alevli… |  |  |  |
-| s-111-3-4 | لَهَبٍ | lahabin | ls_lahab_c32cfdd1 | 111:3:4 | Blazing Flames… |  |  |  |
-| s-111-4-1 | وَٱمْرَأَتُهُۥ | va-amra'atuhu | l_mora_at_d761dc | 111:4:1 | ve karısı… |  |  |  |
-| s-111-4-2 | حَمَّالَةَ | hammâleta | ls_Ham_aAlap_c7043345 | 111:4:2 | hamalı… |  |  |  |
-| s-111-4-3 | ٱلْحَطَبِ | al-hatabi | ls_HaTab_f14eb503 | 111:4:3 | odun… |  |  |  |
-| s-111-5-1 | فِى | fî | l_fiY_39977c | 111:5:1 | boynunda… |  |  |  |
-| s-111-5-2 | جِيدِهَا | cîdihâ | ls_jiyd_507b5ec7 | 111:5:2 | her neck… |  |  |  |
-| s-111-5-3 | حَبْلٌ | hablun | ls_Habol_876dd170 | 111:5:3 | bir ip… |  |  |  |
-| s-111-5-4 | مِّن | min | l_min_1f6fa6 | 111:5:4 | hurma lifinden… |  |  |  |
-| s-111-5-5 | مَّسَدٍۭ | masadin | ls_m_asad_8e8dc430 | 111:5:5 | palm-fiber… |  |  |  |
-| s-112-1-1 | قُلْ | kul | l_qaAla_657dd3 | 112:1:1 | de ki… |  |  |  |
-| s-112-1-2 | هُوَ | huva | ls_huwa_fdbf01ac | 112:1:2 | O… |  |  |  |
-| s-112-1-3 | ٱللَّهُ | allahu | l_ll_ah_d0a09b | 112:1:3 | Allah… |  |  |  |
-| s-112-1-4 | أَحَدٌ | ahadun | l_aHad_84cb2f | 112:1:4 | birdir… |  |  |  |
-| s-112-2-1 | ٱللَّهُ | allahu | l_ll_ah_d0a09b | 112:2:1 | Allah… |  |  |  |
-| s-112-2-2 | ٱلصَّمَدُ | al-samadu | l_S_amad_6a6bdd | 112:2:2 | Samed'dir… |  |  |  |
-| s-112-3-1 | لَمْ | lam | l_lam_7f1b55 | 112:3:1 | doğurmamıştır… |  |  |  |
-| s-112-3-2 | يَلِدْ | yalid | l_walada_bc1aa9 | 112:3:2 | He begets… |  |  |  |
-| s-112-3-3 | وَلَمْ | va-lam | l_lam_7f1b55 | 112:3:3 | ve… |  |  |  |
-| s-112-3-4 | يُولَدْ | yûlad | l_walada_bc1aa9 | 112:3:4 | doğurulmamıştır… |  |  |  |
-| s-112-4-1 | وَلَمْ | va-lam | l_lam_7f1b55 | 112:4:1 | ve… |  |  |  |
-| s-112-4-2 | يَكُن | yakun | l_kaAna_febd3a | 112:4:2 | olmamıştır… |  |  |  |
-| s-112-4-3 | لَّهُۥ | la-hu | ls_l_ahu_7830bf10 | 112:4:3 | O'nun… |  |  |  |
-| s-112-4-4 | كُفُوًا | kufuven | l_kufuw_3fbe35 | 112:4:4 | dengi… |  |  |  |
-| s-112-4-5 | أَحَدٌۢ | ahadun | l_aHad_84cb2f | 112:4:5 | hiçbir şey… |  |  |  |
-| s-113-1-1 | قُلْ | kul | l_qaAla_657dd3 | 113:1:1 | de ki… |  |  |  |
-| s-113-1-2 | أَعُوذُ | aʿûzu | l_Eu_o_4dcde9 | 113:1:2 | sığınırım ben… |  |  |  |
-| s-113-1-3 | بِرَبِّ | bi-rabbi | l_rab_fc2490 | 113:1:3 | Rabbe… |  |  |  |
-| s-113-1-4 | ٱلْفَلَقِ | al-falaki | l_falaq_f1e2b8 | 113:1:4 | karanlığı yarıp sabahı o… |  |  |  |
-| s-113-2-1 | مِن | min | l_min_1f6fa6 | 113:2:1 | şerrinden… |  |  |  |
-| s-113-2-2 | شَرِّ | şarri | l_ar_7b0807 | 113:2:2 | (the) evil… |  |  |  |
-| s-113-2-3 | مَا | mâ | l_maA_13038a | 113:2:3 | şeylerin… |  |  |  |
-| s-113-2-4 | خَلَقَ | halaka | l_xalaqa_2fa056 | 113:2:4 | yarattığı… |  |  |  |
-| s-113-3-1 | وَمِن | va-min | l_min_1f6fa6 | 113:3:1 | ve… |  |  |  |
-| s-113-3-2 | شَرِّ | şarri | l_ar_7b0807 | 113:3:2 | şerrinden… |  |  |  |
-| s-113-3-3 | غَاسِقٍ | gâsikin | l_gaAsiq_dc791e | 113:3:3 | gecenin… |  |  |  |
-| s-113-3-4 | إِذَا | izâ | l_i_aA_5b7376 | 113:3:4 | zaman… |  |  |  |
-| s-113-3-5 | وَقَبَ | vakaba | l_waqaba_851dd3 | 113:3:5 | karanlığı çöktüğü… |  |  |  |
-| s-113-4-1 | وَمِن | va-min | l_min_1f6fa6 | 113:4:1 | ve… |  |  |  |
-| s-113-4-2 | شَرِّ | şarri | l_ar_7b0807 | 113:4:2 | şerrinden… |  |  |  |
-| s-113-4-3 | ٱلنَّفَّـٰثَـٰتِ | al-naffâsâti | l_n_af_a_va_t_b7ff1f | 113:4:3 | üfleyenlerin… |  |  |  |
-| s-113-4-4 | فِى | fî | l_fiY_39977c | 113:4:4 | düğümlere… |  |  |  |
-| s-113-4-5 | ٱلْعُقَدِ | al-ʿukadi | l_Euqodap_88823f | 113:4:5 | the knots… |  |  |  |
-| s-113-5-1 | وَمِن | va-min | l_min_1f6fa6 | 113:5:1 | ve… |  |  |  |
-| s-113-5-2 | شَرِّ | şarri | l_ar_7b0807 | 113:5:2 | şerrinden… |  |  |  |
-| s-113-5-3 | حَاسِدٍ | hâsidin | l_HaAsid_83cf8e | 113:5:3 | hasedcinin… |  |  |  |
-| s-113-5-4 | إِذَا | izâ | l_i_aA_5b7376 | 113:5:4 | zaman… |  |  |  |
-| s-113-5-5 | حَسَدَ | hasada | l_Hasada_76834c | 113:5:5 | hased ettiği… |  |  |  |
-| s-114-1-1 | قُلْ | kul | l_qaAla_657dd3 | 114:1:1 | de ki… |  |  |  |
-| s-114-1-2 | أَعُوذُ | aʿûzu | l_Eu_o_4dcde9 | 114:1:2 | sığınırım ben… |  |  |  |
-| s-114-1-3 | بِرَبِّ | bi-rabbi | l_rab_fc2490 | 114:1:3 | Rabbine… |  |  |  |
-| s-114-1-4 | ٱلنَّاسِ | al-nâsi | l_n_aAs_ba9c78 | 114:1:4 | insanların… |  |  |  |
-| s-114-2-1 | مَلِكِ | maliki | l_malik_2063d1 | 114:2:1 | padişahına… |  |  |  |
-| s-114-2-2 | ٱلنَّاسِ | al-nâsi | l_n_aAs_ba9c78 | 114:2:2 | insanların… |  |  |  |
-| s-114-3-1 | إِلَـٰهِ | ilâhi | l_ila_h_3366e5 | 114:3:1 | tanrısına… |  |  |  |
-| s-114-3-2 | ٱلنَّاسِ | al-nâsi | l_n_aAs_ba9c78 | 114:3:2 | insanların… |  |  |  |
-| s-114-4-1 | مِن | min | l_min_1f6fa6 | 114:4:1 | şerrinden… |  |  |  |
-| s-114-4-2 | شَرِّ | şarri | l_ar_7b0807 | 114:4:2 | (the) evil… |  |  |  |
-| s-114-4-3 | ٱلْوَسْوَاسِ | al-vasvâsi | l_wasowaAs_75a11c | 114:4:3 | vesvesecinin… |  |  |  |
-| s-114-4-4 | ٱلْخَنَّاسِ | al-hannâsi | l_xan_aAs_eb9958 | 114:4:4 | sinsi… |  |  |  |
-| s-114-5-1 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 114:5:1 | o ki… |  |  |  |
-| s-114-5-2 | يُوَسْوِسُ | yuvasvisu | l_wasowasa_aeaf29 | 114:5:2 | fısıldar… |  |  |  |
-| s-114-5-3 | فِى | fî | l_fiY_39977c | 114:5:3 | göğüslerine… |  |  |  |
-| s-114-5-4 | صُدُورِ | sudûri | l_Sador_913a7b | 114:5:4 | (the) breasts… |  |  |  |
-| s-114-5-5 | ٱلنَّاسِ | al-nâsi | l_n_aAs_ba9c78 | 114:5:5 | insanların… |  |  |  |
-| s-114-6-1 | مِنَ | mina | l_min_1f6fa6 | 114:6:1 | cinlerden… |  |  |  |
-| s-114-6-2 | ٱلْجِنَّةِ | al-cinneti | l_jin_ap_589db1 | 114:6:2 | the jinn… |  |  |  |
-| s-114-6-3 | وَٱلنَّاسِ | va-al-nâsi | l_n_aAs_ba9c78 | 114:6:3 | ve insanlar(dan);… |  |  |  |
+| s-106-1-1 | لِإِيلَـٰفِ | li-îlâfi | ls_ila_f_984fb933 | 106:1:1 | alıştırdığı için… | kaynaşması sebebiyle | claude-opus-5.5 | 2026-09-26 |
+| s-106-1-2 | قُرَيْشٍ | kurayşin | ls_qurayo_ca5bf2e9 | 106:1:2 | Kureyşi… | Kureyş'in | claude-opus-5.5 | 2026-09-26 |
+| s-106-2-1 | إِۦلَـٰفِهِمْ | ilâfihim | ls_ila_f_984fb933 | 106:2:1 | onları alıştırdığı için… | onların kaynaşması | claude-opus-5.5 | 2026-09-26 |
+| s-106-2-2 | رِحْلَةَ | rihleta | ls_riHolap_a6a06902 | 106:2:2 | yolculuğuna… | seferine | claude-opus-5.5 | 2026-09-26 |
+| s-106-2-3 | ٱلشِّتَآءِ | al-şitâ'i | ls_itaA_24019358 | 106:2:3 | kış… | kışın | claude-opus-5.5 | 2026-09-26 |
+| s-106-2-4 | وَٱلصَّيْفِ | va-al-sayfi | ls_S_ayof_ac3a6ff7 | 106:2:4 | ve yaz… | ve yazın | claude-opus-5.5 | 2026-09-26 |
+| s-106-3-1 | فَلْيَعْبُدُوا۟ | fa-l-yaʿbudû | l_Eabada_557021 | 106:3:1 | kulluk etsinler… | o hâlde ibadet etsinler | claude-opus-5.5 | 2026-09-26 |
+| s-106-3-2 | رَبَّ | rabba | l_rab_fc2490 | 106:3:2 | Rabbine… | Rabbi olana | claude-opus-5.5 | 2026-09-26 |
+| s-106-3-3 | هَـٰذَا | hâzâ | l_ha_aA_9f90d0 | 106:3:3 | bu… | şu | claude-opus-5.5 | 2026-09-26 |
+| s-106-3-4 | ٱلْبَيْتِ | al-bayti | l_bayot_3393ba | 106:3:4 | evin… | Beyt'in | claude-opus-5.5 | 2026-09-26 |
+| s-106-4-1 | ٱلَّذِىٓ | allazî | l_l_a_iY_1a8370 | 106:4:1 | o ki… | ki O | claude-opus-5.5 | 2026-09-26 |
+| s-106-4-2 | أَطْعَمَهُم | atʿamahum | ls_aToEama_ade5d995 | 106:4:2 | onları yedirip… | onları doyurdu | claude-opus-5.5 | 2026-09-26 |
+| s-106-4-3 | مِّن | min | l_min_1f6fa6 | 106:4:3 | açlıktan (kurtardı)… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-106-4-4 | جُوعٍ | cûʿin | ls_juwE_0d57cbb2 | 106:4:4 | (against) hunger… | açlık | claude-opus-5.5 | 2026-09-26 |
+| s-106-4-5 | وَءَامَنَهُم | va-âmanahum | l_aAmana_966a5c | 106:4:5 | ve onları güvene kavuştu… | ve onlara emniyet verdi | claude-opus-5.5 | 2026-09-26 |
+| s-106-4-6 | مِّنْ | min | l_min_1f6fa6 | 106:4:6 | korkudan… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-106-4-7 | خَوْفٍۭ | havfin | l_xawof_3af862 | 106:4:7 | fear… | korku | claude-opus-5.5 | 2026-09-26 |
+| s-107-1-1 | أَرَءَيْتَ | a-ra'ayta | l_ra_aA_d87b92 | 107:1:1 | gördün mü?… | hiç gördün mü | claude-opus-5.5 | 2026-09-26 |
+| s-107-1-2 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 107:1:2 | kimseyi… | o kimseyi ki | claude-opus-5.5 | 2026-09-26 |
+| s-107-1-3 | يُكَذِّبُ | yukazzibu | l_ka_aba_15a65b | 107:1:3 | yalanlayan… | yalanlıyor | claude-opus-5.5 | 2026-09-26 |
+| s-107-1-4 | بِٱلدِّينِ | bi-al-dîni | l_diyn_6c222f | 107:1:4 | dini… | hesap gününü | claude-opus-5.5 | 2026-09-26 |
+| s-107-2-1 | فَذَٰلِكَ | fa-zâlika | l_a_lik_f3410a | 107:2:1 | işte o… | işte bu kişi | claude-opus-5.5 | 2026-09-26 |
+| s-107-2-2 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 107:2:2 | iter kakar… | ki o | claude-opus-5.5 | 2026-09-26 |
+| s-107-2-3 | يَدُعُّ | yaduʿʿu | ls_yaduE_u_e8040e4a | 107:2:3 | repulses… | sertçe iter | claude-opus-5.5 | 2026-09-26 |
+| s-107-2-4 | ٱلْيَتِيمَ | al-yatîma | l_yatiym_4a612b | 107:2:4 | öksüzü… | yetimi | claude-opus-5.5 | 2026-09-26 |
+| s-107-3-1 | وَلَا | va-lâ | l_laA_4e2bfd | 107:3:1 | ve… | ve hiç | claude-opus-5.5 | 2026-09-26 |
+| s-107-3-2 | يَحُضُّ | yahuddu | ls_yaHuD_u_1ff4f199 | 107:3:2 | teşvik etmez… | özendirmez | claude-opus-5.5 | 2026-09-26 |
+| s-107-3-3 | عَلَىٰ | ʿalâ | l_EalaY_f79ef3 | 107:3:3 | doyurmaya… | hususunda | claude-opus-5.5 | 2026-09-26 |
+| s-107-3-4 | طَعَامِ | taʿâmi | l_TaEaAm_f85a5a | 107:3:4 | feed… | yedirilmesi | claude-opus-5.5 | 2026-09-26 |
+| s-107-3-5 | ٱلْمِسْكِينِ | al-miskîni | l_misokiyn_63a03c | 107:3:5 | yoksulu… | düşkünün | claude-opus-5.5 | 2026-09-26 |
+| s-107-4-1 | فَوَيْلٌ | fa-vaylun | l_wayol_4f2e46 | 107:4:1 | vay haline… | yazıklar olsun | claude-opus-5.5 | 2026-09-26 |
+| s-107-4-2 | لِّلْمُصَلِّينَ | li-l-musallîna | ls_muSal_iyn_248f398b | 107:4:2 | namaz kılanların… | namaz kılanlara | claude-opus-5.5 | 2026-09-26 |
+| s-107-5-1 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 107:5:1 | ki… | o kimseler ki | claude-opus-5.5 | 2026-09-26 |
+| s-107-5-2 | هُمْ | hum | ls_humo_365429ef | 107:5:2 | onlar… | kendileri | claude-opus-5.5 | 2026-09-26 |
+| s-107-5-3 | عَن | ʿan | l_Ean_2cd3f8 | 107:5:3 | namazlarından… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-107-5-4 | صَلَاتِهِمْ | salâtihim | l_Salaw_p_7f701a | 107:5:4 | their prayers… | namazlarından | claude-opus-5.5 | 2026-09-26 |
+| s-107-5-5 | سَاهُونَ | sâhûna | ls_saAhuwn_ebe2aeea | 107:5:5 | gaflet ederler… | gafildirler | claude-opus-5.5 | 2026-09-26 |
+| s-107-6-1 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 107:6:1 | ki… | o kimseler ki | claude-opus-5.5 | 2026-09-26 |
+| s-107-6-2 | هُمْ | hum | ls_humo_365429ef | 107:6:2 | onlar… | kendileri | claude-opus-5.5 | 2026-09-26 |
+| s-107-6-3 | يُرَآءُونَ | yurâ'ûna | ls_yuraA_u_a68c939f | 107:6:3 | gösteriş yaparlar… | riyakârlık ederler | claude-opus-5.5 | 2026-09-26 |
+| s-107-7-1 | وَيَمْنَعُونَ | va-yamnaʿûna | ls_m_anaEa_eea75730 | 107:7:1 | ve esirgerler… | ve engellerler | claude-opus-5.5 | 2026-09-26 |
+| s-107-7-2 | ٱلْمَاعُونَ | al-mâʿûna | ls_maAEuwn_e445e1e1 | 107:7:2 | en ufak bir yardımı… | gündelik yardımlaşmayı | claude-opus-5.5 | 2026-09-26 |
+| s-108-1-1 | إِنَّآ | innâ | l_in_51f9c7 | 108:1:1 | elbette biz… | şüphesiz biz | claude-opus-5.5 | 2026-09-26 |
+| s-108-1-2 | أَعْطَيْنَـٰكَ | aʿtaynâka | ls_aEoTaY_5531e55d | 108:1:2 | sana verdik… | sana bahşettik | claude-opus-5.5 | 2026-09-26 |
+| s-108-1-3 | ٱلْكَوْثَرَ | al-kavsara | ls_kawovar_19da63e1 | 108:1:3 | Kevser'i… | Kevser | claude-opus-5.5 | 2026-09-26 |
+| s-108-2-1 | فَصَلِّ | fa-salli | ls_Sal_aY_a2871e48 | 108:2:1 | öyleyse namaz kıl… | o hâlde namaz kıl | claude-opus-5.5 | 2026-09-26 |
+| s-108-2-2 | لِرَبِّكَ | li-rabbika | l_rab_fc2490 | 108:2:2 | Rabbin için… | senin Rabbin için | claude-opus-5.5 | 2026-09-26 |
+| s-108-2-3 | وَٱنْحَرْ | va-anhar | ls_noHaro_37895208 | 108:2:3 | ve kurban kes… | ve kurban et | claude-opus-5.5 | 2026-09-26 |
+| s-108-3-1 | إِنَّ | inna | l_in_51f9c7 | 108:3:1 | şüphesiz… | gerçekten | claude-opus-5.5 | 2026-09-26 |
+| s-108-3-2 | شَانِئَكَ | şâni'aka | ls_aAni_5533a892 | 108:3:2 | sana buğzeden… | sana kin besleyen | claude-opus-5.5 | 2026-09-26 |
+| s-108-3-3 | هُوَ | huva | ls_huwa_fdbf01ac | 108:3:3 | o… | işte o | claude-opus-5.5 | 2026-09-26 |
+| s-108-3-4 | ٱلْأَبْتَرُ | al-abtaru | ls_abotar_06ccce70 | 108:3:4 | sonu kesik olandır… | soyu kesik olandır | claude-opus-5.5 | 2026-09-26 |
+| s-109-1-1 | قُلْ | kul | l_qaAla_657dd3 | 109:1:1 | de ki… | söyle | claude-opus-5.5 | 2026-09-26 |
+| s-109-1-2 | يَـٰٓأَيُّهَا | yâ-ayyuhâ | l_ay_uhaA_a494bb | 109:1:2 | ey… | ey siz | claude-opus-5.5 | 2026-09-26 |
+| s-109-1-3 | ٱلْكَـٰفِرُونَ | al-kâfirûna | l_ka_firuwn_165d2d | 109:1:3 | inkar edenler… | kâfirler | claude-opus-5.5 | 2026-09-26 |
+| s-109-2-1 | لَآ | lâ | l_laA_4e2bfd | 109:2:1 | ben ibadet etmem… | hiç | claude-opus-5.5 | 2026-09-26 |
+| s-109-2-2 | أَعْبُدُ | aʿbudu | l_Eabada_557021 | 109:2:2 | I worship… | tapmam | claude-opus-5.5 | 2026-09-26 |
+| s-109-2-3 | مَا | mâ | l_maA_13038a | 109:2:3 | şeye… | şeylere | claude-opus-5.5 | 2026-09-26 |
+| s-109-2-4 | تَعْبُدُونَ | taʿbudûna | l_Eabada_557021 | 109:2:4 | sizin taptığınız… | tapmakta olduğunuz | claude-opus-5.5 | 2026-09-26 |
+| s-109-3-1 | وَلَآ | va-lâ | l_laA_4e2bfd | 109:3:1 | ve (etmezsiniz)… | ve hiç | claude-opus-5.5 | 2026-09-26 |
+| s-109-3-2 | أَنتُمْ | antum | ls_antumo_a762f8ad | 109:3:2 | siz de… | siz | claude-opus-5.5 | 2026-09-26 |
+| s-109-3-3 | عَـٰبِدُونَ | ʿâbidûna | ls_EaAbid_30f128a0 | 109:3:3 | ibadeti… | tapanlar | claude-opus-5.5 | 2026-09-26 |
+| s-109-3-4 | مَآ | mâ | l_maA_13038a | 109:3:4 | benim taptığıma… | şeye | claude-opus-5.5 | 2026-09-26 |
+| s-109-3-5 | أَعْبُدُ | aʿbudu | l_Eabada_557021 | 109:3:5 | I worship… | taptığım | claude-opus-5.5 | 2026-09-26 |
+| s-109-4-1 | وَلَآ | va-lâ | l_laA_4e2bfd | 109:4:1 | ve değil(im)… | ve hiç | claude-opus-5.5 | 2026-09-26 |
+| s-109-4-2 | أَنَا۠ | anâ | ls_anaA_253e2ab3 | 109:4:2 | ben… | ben de | claude-opus-5.5 | 2026-09-26 |
+| s-109-4-3 | عَابِدٌ | ʿâbidun | ls_EaAbid_30f128a0 | 109:4:3 | ibadet eden… | tapan biri | claude-opus-5.5 | 2026-09-26 |
+| s-109-4-4 | مَّا | mâ | l_maA_13038a | 109:4:4 | sizin taptıklarınıza… | şeye | claude-opus-5.5 | 2026-09-26 |
+| s-109-4-5 | عَبَدتُّمْ | ʿabadttum | l_Eabada_557021 | 109:4:5 | you worship… | taptıklarınız | claude-opus-5.5 | 2026-09-26 |
+| s-109-5-1 | وَلَآ | va-lâ | l_laA_4e2bfd | 109:5:1 | ve değilsiniz… | ve hiç | claude-opus-5.5 | 2026-09-26 |
+| s-109-5-2 | أَنتُمْ | antum | ls_antumo_a762f8ad | 109:5:2 | siz de… | siz | claude-opus-5.5 | 2026-09-26 |
+| s-109-5-3 | عَـٰبِدُونَ | ʿâbidûna | ls_EaAbid_30f128a0 | 109:5:3 | ibadet eden… | tapanlar | claude-opus-5.5 | 2026-09-26 |
+| s-109-5-4 | مَآ | mâ | l_maA_13038a | 109:5:4 | benim ibadet ettiğime… | şeye | claude-opus-5.5 | 2026-09-26 |
+| s-109-5-5 | أَعْبُدُ | aʿbudu | l_Eabada_557021 | 109:5:5 | I worship… | taptığım | claude-opus-5.5 | 2026-09-26 |
+| s-109-6-1 | لَكُمْ | la-kum | ls_lakumo_ae70d3d8 | 109:6:1 | sizindir… | size aittir | claude-opus-5.5 | 2026-09-26 |
+| s-109-6-2 | دِينُكُمْ | dînukum | l_diyn_6c222f | 109:6:2 | sizin dininiz… | kendi dininiz | claude-opus-5.5 | 2026-09-26 |
+| s-109-6-3 | وَلِىَ | va-li-ya | ls_waliYa_6595bddf | 109:6:3 | ve benimdir… | ve bana aittir | claude-opus-5.5 | 2026-09-26 |
+| s-109-6-4 | دِينِ | dîni | l_diyn_6c222f | 109:6:4 | benim dinim… | kendi dinim | claude-opus-5.5 | 2026-09-26 |
+| s-110-1-1 | إِذَا | izâ | l_i_aA_5b7376 | 110:1:1 | zaman… | ne zaman ki | claude-opus-5.5 | 2026-09-26 |
+| s-110-1-2 | جَآءَ | câ'a | l_jaA_a_c0bd29 | 110:1:2 | geldiği… | geldi | claude-opus-5.5 | 2026-09-26 |
+| s-110-1-3 | نَصْرُ | nasru | l_naSor_e325f5 | 110:1:3 | yardımı… | yardım | claude-opus-5.5 | 2026-09-26 |
+| s-110-1-4 | ٱللَّهِ | allahi | l_ll_ah_d0a09b | 110:1:4 | Allah'ın… | Allah Teâlâ'nın | claude-opus-5.5 | 2026-09-26 |
+| s-110-1-5 | وَٱلْفَتْحُ | va-al-fathu | ls_fatoH_f1fc442d | 110:1:5 | ve fetih… | ve zafer | claude-opus-5.5 | 2026-09-26 |
+| s-110-2-1 | وَرَأَيْتَ | va-ra'ayta | l_ra_aA_d87b92 | 110:2:1 | ve gördüğün (zaman)… | ve gördün | claude-opus-5.5 | 2026-09-26 |
+| s-110-2-2 | ٱلنَّاسَ | al-nâsa | l_n_aAs_ba9c78 | 110:2:2 | insanların… | insanoğullarını | claude-opus-5.5 | 2026-09-26 |
+| s-110-2-3 | يَدْخُلُونَ | yadhulûna | l_daxala_442502 | 110:2:3 | girdiklerini… | girmekte | claude-opus-5.5 | 2026-09-26 |
+| s-110-2-4 | فِى | fî | l_fiY_39977c | 110:2:4 | dinine… | içine | claude-opus-5.5 | 2026-09-26 |
+| s-110-2-5 | دِينِ | dîni | l_diyn_6c222f | 110:2:5 | (the) religion… | dini | claude-opus-5.5 | 2026-09-26 |
+| s-110-2-6 | ٱللَّهِ | allahi | l_ll_ah_d0a09b | 110:2:6 | Allah'ın… | Allah Teâlâ'nın | claude-opus-5.5 | 2026-09-26 |
+| s-110-2-7 | أَفْوَاجًا | afvâcen | ls_fawoj_ec0d3f5c | 110:2:7 | dalga dalga… | bölük bölük | claude-opus-5.5 | 2026-09-26 |
+| s-110-3-1 | فَسَبِّحْ | fa-sabbih | l_sab_aHa_bf280a | 110:3:1 | o halde tesbih et… | artık tesbih et | claude-opus-5.5 | 2026-09-26 |
+| s-110-3-2 | بِحَمْدِ | bi-hamdi | l_Hamod_98138a | 110:3:2 | överek… | hamd ederek | claude-opus-5.5 | 2026-09-26 |
+| s-110-3-3 | رَبِّكَ | rabbika | l_rab_fc2490 | 110:3:3 | Rabbini… | senin Rabbini | claude-opus-5.5 | 2026-09-26 |
+| s-110-3-4 | وَٱسْتَغْفِرْهُ | va-astagfirhu | l_sotagofara_863081 | 110:3:4 | ve O'ndan mağfiret dile… | ve O'ndan bağışlanma iste | claude-opus-5.5 | 2026-09-26 |
+| s-110-3-5 | إِنَّهُۥ | innahu | l_in_51f9c7 | 110:3:5 | çünkü O… | gerçekten O | claude-opus-5.5 | 2026-09-26 |
+| s-110-3-6 | كَانَ | kâna | l_kaAna_febd3a | 110:3:6 | tevbeyi kabul edendir… | olmaktadır | claude-opus-5.5 | 2026-09-26 |
+| s-110-3-7 | تَوَّابًۢا | tavvâben | ls_taw_aAb_d053c098 | 110:3:7 | Oft-Returning… | tövbeleri çokça kabul eden | claude-opus-5.5 | 2026-09-26 |
+| s-111-1-1 | تَبَّتْ | tabbat | ls_tab_a_fef12348 | 111:1:1 | kurusun… | helak olsun | claude-opus-5.5 | 2026-09-26 |
+| s-111-1-2 | يَدَآ | yadâ | l_yad_84953d | 111:1:2 | iki eli… | elleri | claude-opus-5.5 | 2026-09-26 |
+| s-111-1-3 | أَبِى | abî | l_abN_71b506 | 111:1:3 | Ebu… | Ebû | claude-opus-5.5 | 2026-09-26 |
+| s-111-1-4 | لَهَبٍ | lahabin | ls_lahab_c32cfdd1 | 111:1:4 | Leheb'in… | Leheb | claude-opus-5.5 | 2026-09-26 |
+| s-111-1-5 | وَتَبَّ | va-tabba | ls_tab_a_fef12348 | 111:1:5 | zaten kurudu da… | ve helak oldu | claude-opus-5.5 | 2026-09-26 |
+| s-111-2-1 | مَآ | mâ | l_maA_13038a | 111:2:1 | kurtaramadı… | hiç | claude-opus-5.5 | 2026-09-26 |
+| s-111-2-2 | أَغْنَىٰ | agnâ | ls_agonaY_f58b5210 | 111:2:2 | (will) avail… | fayda vermedi | claude-opus-5.5 | 2026-09-26 |
+| s-111-2-3 | عَنْهُ | ʿanhu | l_Ean_2cd3f8 | 111:2:3 | onu… | kendisine | claude-opus-5.5 | 2026-09-26 |
+| s-111-2-4 | مَالُهُۥ | mâluhu | l_maAl_d64b35 | 111:2:4 | malı… | serveti | claude-opus-5.5 | 2026-09-26 |
+| s-111-2-5 | وَمَا | va-mâ | l_maA_13038a | 111:2:5 | ve… | ve ne | claude-opus-5.5 | 2026-09-26 |
+| s-111-2-6 | كَسَبَ | kasaba | l_kasaba_94ec71 | 111:2:6 | kazandığı… | elde ettiği | claude-opus-5.5 | 2026-09-26 |
+| s-111-3-1 | سَيَصْلَىٰ | sa-yaslâ | ls_yaSolaY_13157699 | 111:3:1 | girecektir… | yakında girecek | claude-opus-5.5 | 2026-09-26 |
+| s-111-3-2 | نَارًا | nâren | l_naAr_d577c3 | 111:3:2 | bir ateşe… | ateşe | claude-opus-5.5 | 2026-09-26 |
+| s-111-3-3 | ذَاتَ | zâta | l_uw_7be8de | 111:3:3 | alevli… | sahibi | claude-opus-5.5 | 2026-09-26 |
+| s-111-3-4 | لَهَبٍ | lahabin | ls_lahab_c32cfdd1 | 111:3:4 | Blazing Flames… | alev | claude-opus-5.5 | 2026-09-26 |
+| s-111-4-1 | وَٱمْرَأَتُهُۥ | va-amra'atuhu | l_mora_at_d761dc | 111:4:1 | ve karısı… | ve hanımı da | claude-opus-5.5 | 2026-09-26 |
+| s-111-4-2 | حَمَّالَةَ | hammâleta | ls_Ham_aAlap_c7043345 | 111:4:2 | hamalı… | taşıyıcısı | claude-opus-5.5 | 2026-09-26 |
+| s-111-4-3 | ٱلْحَطَبِ | al-hatabi | ls_HaTab_f14eb503 | 111:4:3 | odun… | odunun | claude-opus-5.5 | 2026-09-26 |
+| s-111-5-1 | فِى | fî | l_fiY_39977c | 111:5:1 | boynunda… | -de | claude-opus-5.5 | 2026-09-26 |
+| s-111-5-2 | جِيدِهَا | cîdihâ | ls_jiyd_507b5ec7 | 111:5:2 | her neck… | boynunda | claude-opus-5.5 | 2026-09-26 |
+| s-111-5-3 | حَبْلٌ | hablun | ls_Habol_876dd170 | 111:5:3 | bir ip… | bir urgan | claude-opus-5.5 | 2026-09-26 |
+| s-111-5-4 | مِّن | min | l_min_1f6fa6 | 111:5:4 | hurma lifinden… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-111-5-5 | مَّسَدٍۭ | masadin | ls_m_asad_8e8dc430 | 111:5:5 | palm-fiber… | hurma lifi | claude-opus-5.5 | 2026-09-26 |
+| s-112-1-1 | قُلْ | kul | l_qaAla_657dd3 | 112:1:1 | de ki… | söyle | claude-opus-5.5 | 2026-09-26 |
+| s-112-1-2 | هُوَ | huva | ls_huwa_fdbf01ac | 112:1:2 | O… | O'dur | claude-opus-5.5 | 2026-09-26 |
+| s-112-1-3 | ٱللَّهُ | allahu | l_ll_ah_d0a09b | 112:1:3 | Allah… | Allah Teâlâ | claude-opus-5.5 | 2026-09-26 |
+| s-112-1-4 | أَحَدٌ | ahadun | l_aHad_84cb2f | 112:1:4 | birdir… | tektir | claude-opus-5.5 | 2026-09-26 |
+| s-112-2-1 | ٱللَّهُ | allahu | l_ll_ah_d0a09b | 112:2:1 | Allah… | Allah Teâlâ | claude-opus-5.5 | 2026-09-26 |
+| s-112-2-2 | ٱلصَّمَدُ | al-samadu | l_S_amad_6a6bdd | 112:2:2 | Samed'dir… | Samed | claude-opus-5.5 | 2026-09-26 |
+| s-112-3-1 | لَمْ | lam | l_lam_7f1b55 | 112:3:1 | doğurmamıştır… | hiç | claude-opus-5.5 | 2026-09-26 |
+| s-112-3-2 | يَلِدْ | yalid | l_walada_bc1aa9 | 112:3:2 | He begets… | doğurmadı | claude-opus-5.5 | 2026-09-26 |
+| s-112-3-3 | وَلَمْ | va-lam | l_lam_7f1b55 | 112:3:3 | ve… | ve hiç | claude-opus-5.5 | 2026-09-26 |
+| s-112-3-4 | يُولَدْ | yûlad | l_walada_bc1aa9 | 112:3:4 | doğurulmamıştır… | doğurulmadı | claude-opus-5.5 | 2026-09-26 |
+| s-112-4-1 | وَلَمْ | va-lam | l_lam_7f1b55 | 112:4:1 | ve… | ve hiç | claude-opus-5.5 | 2026-09-26 |
+| s-112-4-2 | يَكُن | yakun | l_kaAna_febd3a | 112:4:2 | olmamıştır… | olmadı | claude-opus-5.5 | 2026-09-26 |
+| s-112-4-3 | لَّهُۥ | la-hu | ls_l_ahu_7830bf10 | 112:4:3 | O'nun… | kendisine | claude-opus-5.5 | 2026-09-26 |
+| s-112-4-4 | كُفُوًا | kufuven | l_kufuw_3fbe35 | 112:4:4 | dengi… | denk | claude-opus-5.5 | 2026-09-26 |
+| s-112-4-5 | أَحَدٌۢ | ahadun | l_aHad_84cb2f | 112:4:5 | hiçbir şey… | hiç kimse | claude-opus-5.5 | 2026-09-26 |
+| s-113-1-1 | قُلْ | kul | l_qaAla_657dd3 | 113:1:1 | de ki… | söyle | claude-opus-5.5 | 2026-09-26 |
+| s-113-1-2 | أَعُوذُ | aʿûzu | l_Eu_o_4dcde9 | 113:1:2 | sığınırım ben… | sığınırım | claude-opus-5.5 | 2026-09-26 |
+| s-113-1-3 | بِرَبِّ | bi-rabbi | l_rab_fc2490 | 113:1:3 | Rabbe… | Rabbine | claude-opus-5.5 | 2026-09-26 |
+| s-113-1-4 | ٱلْفَلَقِ | al-falaki | l_falaq_f1e2b8 | 113:1:4 | karanlığı yarıp sabahı o… | şafağın | claude-opus-5.5 | 2026-09-26 |
+| s-113-2-1 | مِن | min | l_min_1f6fa6 | 113:2:1 | şerrinden… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-113-2-2 | شَرِّ | şarri | l_ar_7b0807 | 113:2:2 | (the) evil… | kötülüğü | claude-opus-5.5 | 2026-09-26 |
+| s-113-2-3 | مَا | mâ | l_maA_13038a | 113:2:3 | şeylerin… | şeyin | claude-opus-5.5 | 2026-09-26 |
+| s-113-2-4 | خَلَقَ | halaka | l_xalaqa_2fa056 | 113:2:4 | yarattığı… | yaratmış olduğu | claude-opus-5.5 | 2026-09-26 |
+| s-113-3-1 | وَمِن | va-min | l_min_1f6fa6 | 113:3:1 | ve… | ve -den | claude-opus-5.5 | 2026-09-26 |
+| s-113-3-2 | شَرِّ | şarri | l_ar_7b0807 | 113:3:2 | şerrinden… | kötülüğü | claude-opus-5.5 | 2026-09-26 |
+| s-113-3-3 | غَاسِقٍ | gâsikin | l_gaAsiq_dc791e | 113:3:3 | gecenin… | karanlığın | claude-opus-5.5 | 2026-09-26 |
+| s-113-3-4 | إِذَا | izâ | l_i_aA_5b7376 | 113:3:4 | zaman… | ne zaman ki | claude-opus-5.5 | 2026-09-26 |
+| s-113-3-5 | وَقَبَ | vakaba | l_waqaba_851dd3 | 113:3:5 | karanlığı çöktüğü… | bastırdı | claude-opus-5.5 | 2026-09-26 |
+| s-113-4-1 | وَمِن | va-min | l_min_1f6fa6 | 113:4:1 | ve… | ve -den | claude-opus-5.5 | 2026-09-26 |
+| s-113-4-2 | شَرِّ | şarri | l_ar_7b0807 | 113:4:2 | şerrinden… | kötülüğü | claude-opus-5.5 | 2026-09-26 |
+| s-113-4-3 | ٱلنَّفَّـٰثَـٰتِ | al-naffâsâti | l_n_af_a_va_t_b7ff1f | 113:4:3 | üfleyenlerin… | üfürükçülerin | claude-opus-5.5 | 2026-09-26 |
+| s-113-4-4 | فِى | fî | l_fiY_39977c | 113:4:4 | düğümlere… | içine | claude-opus-5.5 | 2026-09-26 |
+| s-113-4-5 | ٱلْعُقَدِ | al-ʿukadi | l_Euqodap_88823f | 113:4:5 | the knots… | düğümler | claude-opus-5.5 | 2026-09-26 |
+| s-113-5-1 | وَمِن | va-min | l_min_1f6fa6 | 113:5:1 | ve… | ve -den | claude-opus-5.5 | 2026-09-26 |
+| s-113-5-2 | شَرِّ | şarri | l_ar_7b0807 | 113:5:2 | şerrinden… | kötülüğü | claude-opus-5.5 | 2026-09-26 |
+| s-113-5-3 | حَاسِدٍ | hâsidin | l_HaAsid_83cf8e | 113:5:3 | hasedcinin… | kıskancın | claude-opus-5.5 | 2026-09-26 |
+| s-113-5-4 | إِذَا | izâ | l_i_aA_5b7376 | 113:5:4 | zaman… | ne zaman ki | claude-opus-5.5 | 2026-09-26 |
+| s-113-5-5 | حَسَدَ | hasada | l_Hasada_76834c | 113:5:5 | hased ettiği… | kıskandı | claude-opus-5.5 | 2026-09-26 |
+| s-114-1-1 | قُلْ | kul | l_qaAla_657dd3 | 114:1:1 | de ki… | söyle | claude-opus-5.5 | 2026-09-26 |
+| s-114-1-2 | أَعُوذُ | aʿûzu | l_Eu_o_4dcde9 | 114:1:2 | sığınırım ben… | sığınırım | claude-opus-5.5 | 2026-09-26 |
+| s-114-1-3 | بِرَبِّ | bi-rabbi | l_rab_fc2490 | 114:1:3 | Rabbine… | Rabbi olana | claude-opus-5.5 | 2026-09-26 |
+| s-114-1-4 | ٱلنَّاسِ | al-nâsi | l_n_aAs_ba9c78 | 114:1:4 | insanların… | insanoğullarının | claude-opus-5.5 | 2026-09-26 |
+| s-114-2-1 | مَلِكِ | maliki | l_malik_2063d1 | 114:2:1 | padişahına… | hükümdarına | claude-opus-5.5 | 2026-09-26 |
+| s-114-2-2 | ٱلنَّاسِ | al-nâsi | l_n_aAs_ba9c78 | 114:2:2 | insanların… | insanoğullarının | claude-opus-5.5 | 2026-09-26 |
+| s-114-3-1 | إِلَـٰهِ | ilâhi | l_ila_h_3366e5 | 114:3:1 | tanrısına… | ilahına | claude-opus-5.5 | 2026-09-26 |
+| s-114-3-2 | ٱلنَّاسِ | al-nâsi | l_n_aAs_ba9c78 | 114:3:2 | insanların… | insanoğullarının | claude-opus-5.5 | 2026-09-26 |
+| s-114-4-1 | مِن | min | l_min_1f6fa6 | 114:4:1 | şerrinden… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-114-4-2 | شَرِّ | şarri | l_ar_7b0807 | 114:4:2 | (the) evil… | kötülüğü | claude-opus-5.5 | 2026-09-26 |
+| s-114-4-3 | ٱلْوَسْوَاسِ | al-vasvâsi | l_wasowaAs_75a11c | 114:4:3 | vesvesecinin… | vesvese verenin | claude-opus-5.5 | 2026-09-26 |
+| s-114-4-4 | ٱلْخَنَّاسِ | al-hannâsi | l_xan_aAs_eb9958 | 114:4:4 | sinsi… | sinip kaçan | claude-opus-5.5 | 2026-09-26 |
+| s-114-5-1 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 114:5:1 | o ki… | ki o | claude-opus-5.5 | 2026-09-26 |
+| s-114-5-2 | يُوَسْوِسُ | yuvasvisu | l_wasowasa_aeaf29 | 114:5:2 | fısıldar… | vesvese verir | claude-opus-5.5 | 2026-09-26 |
+| s-114-5-3 | فِى | fî | l_fiY_39977c | 114:5:3 | göğüslerine… | içine | claude-opus-5.5 | 2026-09-26 |
+| s-114-5-4 | صُدُورِ | sudûri | l_Sador_913a7b | 114:5:4 | (the) breasts… | gönüllerine | claude-opus-5.5 | 2026-09-26 |
+| s-114-5-5 | ٱلنَّاسِ | al-nâsi | l_n_aAs_ba9c78 | 114:5:5 | insanların… | insanoğullarının | claude-opus-5.5 | 2026-09-26 |
+| s-114-6-1 | مِنَ | mina | l_min_1f6fa6 | 114:6:1 | cinlerden… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-114-6-2 | ٱلْجِنَّةِ | al-cinneti | l_jin_ap_589db1 | 114:6:2 | the jinn… | cinler | claude-opus-5.5 | 2026-09-26 |
+| s-114-6-3 | وَٱلنَّاسِ | va-al-nâsi | l_n_aAs_ba9c78 | 114:6:3 | ve insanlar(dan);… | ve insanoğullarından | claude-opus-5.5 | 2026-09-26 |
 
 ## Parti D (Fâtiha + tamamlayıcı sözlük)
 

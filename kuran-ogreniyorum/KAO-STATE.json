@@ -1814,7 +1814,7 @@
   "auditStatus": {
     "KAO-D1": "findings",
     "KAO-D2": "pass",
-    "KAO-D3": "pending",
+    "KAO-D3": "pass",
     "KAO-D4": "pending",
     "KAO-D5": "pending",
     "KAO-D6": "pending"

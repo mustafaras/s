@@ -9,236 +9,236 @@
 
 | id | ar | pronunciation | lemmaId | ref | referans-ipucu | tr | verifiedBy | verifiedAt |
 |---|---|---|---|---|---|---|---|---|
-| s-95-1-1 | وَٱلتِّينِ | va-al-tîni | ls_t_iyn_f520d1b9 | 95:1:1 | incire andolsun… |  |  |  |
-| s-95-1-2 | وَٱلزَّيْتُونِ | va-al-zaytûni | ls_z_ayotuwn_ed08d607 | 95:1:2 | ve zeytine… |  |  |  |
-| s-95-2-1 | وَطُورِ | va-tûri | ls_Tuwr_8829abdc | 95:2:1 | ve dağına… |  |  |  |
-| s-95-2-2 | سِينِينَ | sînîna | ls_siyniyn_f013c3a1 | 95:2:2 | sina… |  |  |  |
-| s-95-3-1 | وَهَـٰذَا | va-hâzâ | l_ha_aA_9f90d0 | 95:3:1 | ve bu… |  |  |  |
-| s-95-3-2 | ٱلْبَلَدِ | al-baladi | ls_balad_43a32787 | 95:3:2 | Şehre (andolsun)… |  |  |  |
-| s-95-3-3 | ٱلْأَمِينِ | al-amîni | ls_amiyn_9e1d9409 | 95:3:3 | güvenli… |  |  |  |
-| s-95-4-1 | لَقَدْ | la-kad | l_qad_03fa2b | 95:4:1 | andolsun… |  |  |  |
-| s-95-4-2 | خَلَقْنَا | halaknâ | l_xalaqa_2fa056 | 95:4:2 | biz yarattık… |  |  |  |
-| s-95-4-3 | ٱلْإِنسَـٰنَ | al-insâna | l_insa_n_d60ef4 | 95:4:3 | insanı… |  |  |  |
-| s-95-4-4 | فِىٓ | fî | l_fiY_39977c | 95:4:4 | en güzel… |  |  |  |
-| s-95-4-5 | أَحْسَنِ | ahsani | l_aHosan_e3fcdb | 95:4:5 | (the) best… |  |  |  |
-| s-95-4-6 | تَقْوِيمٍ | takvîmin | ls_taqowiym_8f634ad7 | 95:4:6 | biçimde… |  |  |  |
-| s-95-5-1 | ثُمَّ | summa | l_vum_88b269 | 95:5:1 | sonra… |  |  |  |
-| s-95-5-2 | رَدَدْنَـٰهُ | radadnâhu | l_rad_a_c68b16 | 95:5:2 | onu çevirdik… |  |  |  |
-| s-95-5-3 | أَسْفَلَ | asfala | ls_asofal_4aa68568 | 95:5:3 | aşağıların… |  |  |  |
-| s-95-5-4 | سَـٰفِلِينَ | sâfilîna | ls_saAfil_fa98f6a3 | 95:5:4 | aşağısına… |  |  |  |
-| s-95-6-1 | إِلَّا | illâ | l_il_aA_e925a2 | 95:6:1 | yalnız hariç… |  |  |  |
-| s-95-6-2 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 95:6:2 | kimseler… |  |  |  |
-| s-95-6-3 | ءَامَنُوا۟ | âmanû | l_aAmana_966a5c | 95:6:3 | inanan(lar)… |  |  |  |
-| s-95-6-4 | وَعَمِلُوا۟ | va-ʿamilû | l_Eamila_50319c | 95:6:4 | ve yapanlar… |  |  |  |
-| s-95-6-5 | ٱلصَّـٰلِحَـٰتِ | al-sâlihâti | l_S_a_liHa_t_f6a492 | 95:6:5 | iyi işler… |  |  |  |
-| s-95-6-6 | فَلَهُمْ | fa-la-hum | ls_falahumo_3d2a0c97 | 95:6:6 | onlar için vardır… |  |  |  |
-| s-95-6-7 | أَجْرٌ | acrun | l_ajor_c798df | 95:6:7 | bir mükafat… |  |  |  |
-| s-95-6-8 | غَيْرُ | gayru | l_gayor_6b16f9 | 95:6:8 | olmayan… |  |  |  |
-| s-95-6-9 | مَمْنُونٍ | mamnûnin | ls_mamonuwn_4902ae6a | 95:6:9 | kesintisi… |  |  |  |
-| s-95-7-1 | فَمَا | fa-mâ | l_maA_13038a | 95:7:1 | nedir?… |  |  |  |
-| s-95-7-2 | يُكَذِّبُكَ | yukazzibuka | l_ka_aba_15a65b | 95:7:2 | sana yalanlatan… |  |  |  |
-| s-95-7-3 | بَعْدُ | baʿdu | l_baEod_22102e | 95:7:3 | bundan sonra… |  |  |  |
-| s-95-7-4 | بِٱلدِّينِ | bi-al-dîni | l_diyn_6c222f | 95:7:4 | dini… |  |  |  |
-| s-95-8-1 | أَلَيْسَ | a-laysa | l_l_ayosa_5684fc | 95:8:1 | değil midir?… |  |  |  |
-| s-95-8-2 | ٱللَّهُ | allahu | l_ll_ah_d0a09b | 95:8:2 | Allah… |  |  |  |
-| s-95-8-3 | بِأَحْكَمِ | bi-ahkami | ls_aHokam_3444202a | 95:8:3 | en iyi hüküm vereni… |  |  |  |
-| s-95-8-4 | ٱلْحَـٰكِمِينَ | al-hâkimîna | ls_Ha_kimiyn_e13ddef2 | 95:8:4 | hüküm verenlerin… |  |  |  |
-| s-96-1-1 | ٱقْرَأْ | akra' | ls_qara_a_553258cd | 96:1:1 | oku… |  |  |  |
-| s-96-1-2 | بِٱسْمِ | bi-asmi | l_som_585f33 | 96:1:2 | adıyle… |  |  |  |
-| s-96-1-3 | رَبِّكَ | rabbika | l_rab_fc2490 | 96:1:3 | Rabbinin… |  |  |  |
-| s-96-1-4 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 96:1:4 | yaratan… |  |  |  |
-| s-96-1-5 | خَلَقَ | halaka | l_xalaqa_2fa056 | 96:1:5 | created… |  |  |  |
-| s-96-2-1 | خَلَقَ | halaka | l_xalaqa_2fa056 | 96:2:1 | O yarattı… |  |  |  |
-| s-96-2-2 | ٱلْإِنسَـٰنَ | al-insâna | l_insa_n_d60ef4 | 96:2:2 | insanı… |  |  |  |
-| s-96-2-3 | مِنْ | min | l_min_1f6fa6 | 96:2:3 | alaktan… |  |  |  |
-| s-96-2-4 | عَلَقٍ | ʿalakin | ls_Ealaq_ef20f685 | 96:2:4 | a clinging substance… |  |  |  |
-| s-96-3-1 | ٱقْرَأْ | akra' | ls_qara_a_553258cd | 96:3:1 | oku… |  |  |  |
-| s-96-3-2 | وَرَبُّكَ | va-rabbuka | l_rab_fc2490 | 96:3:2 | ve Rabbin… |  |  |  |
-| s-96-3-3 | ٱلْأَكْرَمُ | al-akramu | ls_akoram_b9ba69fb | 96:3:3 | en büyük kerem sahibidir… |  |  |  |
-| s-96-4-1 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 96:4:1 | O ki… |  |  |  |
-| s-96-4-2 | عَلَّمَ | ʿallama | l_Eal_ama_5c04b6 | 96:4:2 | öğretti… |  |  |  |
-| s-96-4-3 | بِٱلْقَلَمِ | bi-al-kalami | ls_qalam_9195cdbb | 96:4:3 | kalemle… |  |  |  |
-| s-96-5-1 | عَلَّمَ | ʿallama | l_Eal_ama_5c04b6 | 96:5:1 | öğretti… |  |  |  |
-| s-96-5-2 | ٱلْإِنسَـٰنَ | al-insâna | l_insa_n_d60ef4 | 96:5:2 | insana… |  |  |  |
-| s-96-5-3 | مَا | mâ | l_maA_13038a | 96:5:3 | şeyi… |  |  |  |
-| s-96-5-4 | لَمْ | lam | l_lam_7f1b55 | 96:5:4 | bilmediği… |  |  |  |
-| s-96-5-5 | يَعْلَمْ | yaʿlam | l_Ealima_ceb6d7 | 96:5:5 | he knew… |  |  |  |
-| s-96-6-1 | كَلَّآ | kallâ | l_kal_aA_3a705b | 96:6:1 | hayır… |  |  |  |
-| s-96-6-2 | إِنَّ | inna | l_in_51f9c7 | 96:6:2 | şüphesiz… |  |  |  |
-| s-96-6-3 | ٱلْإِنسَـٰنَ | al-insâna | l_insa_n_d60ef4 | 96:6:3 | insan… |  |  |  |
-| s-96-6-4 | لَيَطْغَىٰٓ | la-yatgâ | ls_TagaY_27d07634 | 96:6:4 | azar… |  |  |  |
-| s-96-7-1 | أَن | an | l_an_d1c942 | 96:7:1 | için… |  |  |  |
-| s-96-7-2 | رَّءَاهُ | ra'âhu | l_ra_aA_d87b92 | 96:7:2 | kendini gördüğü… |  |  |  |
-| s-96-7-3 | ٱسْتَغْنَىٰٓ | astagnâ | ls_sotagonaY_6677864b | 96:7:3 | zengin (kendine yeterli)… |  |  |  |
-| s-96-8-1 | إِنَّ | inna | l_in_51f9c7 | 96:8:1 | şüphesiz… |  |  |  |
-| s-96-8-2 | إِلَىٰ | ilâ | l_ilaY_d3d2d9 | 96:8:2 | Rabbinedir… |  |  |  |
-| s-96-8-3 | رَبِّكَ | rabbika | l_rab_fc2490 | 96:8:3 | your Lord… |  |  |  |
-| s-96-8-4 | ٱلرُّجْعَىٰٓ | al-rucʿâ | ls_r_ujoEaY_d424316e | 96:8:4 | dönüş… |  |  |  |
-| s-96-9-1 | أَرَءَيْتَ | a-ra'ayta | l_ra_aA_d87b92 | 96:9:1 | gördün mü?… |  |  |  |
-| s-96-9-2 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 96:9:2 | şu… |  |  |  |
-| s-96-9-3 | يَنْهَىٰ | yanhâ | l_nahaY_8c8b5c | 96:9:3 | men'edeni… |  |  |  |
-| s-96-10-1 | عَبْدًا | ʿabden | l_Eabod_3558c0 | 96:10:1 | bir kulu?… |  |  |  |
-| s-96-10-2 | إِذَا | izâ | l_i_aA_5b7376 | 96:10:2 | zaman… |  |  |  |
-| s-96-10-3 | صَلَّىٰٓ | sallâ | ls_Sal_aY_a2871e48 | 96:10:3 | namaz kıldığı… |  |  |  |
-| s-96-11-1 | أَرَءَيْتَ | a-ra'ayta | l_ra_aA_d87b92 | 96:11:1 | gördün mü?… |  |  |  |
-| s-96-11-2 | إِن | in | l_in_f645c5 | 96:11:2 | ya… |  |  |  |
-| s-96-11-3 | كَانَ | kâna | l_kaAna_febd3a | 96:11:3 | olursa… |  |  |  |
-| s-96-11-4 | عَلَى | ʿalâ | l_EalaY_f79ef3 | 96:11:4 | üzerinde… |  |  |  |
-| s-96-11-5 | ٱلْهُدَىٰٓ | al-hudâ | l_hudFY_2e4b07 | 96:11:5 | doğru yol… |  |  |  |
-| s-96-12-1 | أَوْ | av | l_aw_43116a | 96:12:1 | yahut… |  |  |  |
-| s-96-12-2 | أَمَرَ | amara | l_amara_3fab3c | 96:12:2 | emrederse… |  |  |  |
-| s-96-12-3 | بِٱلتَّقْوَىٰٓ | bi-al-takvâ | ls_taqowaY_eeb5e12f | 96:12:3 | korunmayı… |  |  |  |
-| s-96-13-1 | أَرَءَيْتَ | a-ra'ayta | l_ra_aA_d87b92 | 96:13:1 | gördün mü?… |  |  |  |
-| s-96-13-2 | إِن | in | l_in_f645c5 | 96:13:2 | ya… |  |  |  |
-| s-96-13-3 | كَذَّبَ | kazzaba | l_ka_aba_15a65b | 96:13:3 | yalanlarsa?… |  |  |  |
-| s-96-13-4 | وَتَوَلَّىٰٓ | va-tavallâ | l_tawal_aY_fdd891 | 96:13:4 | ve yüz çevirirse?… |  |  |  |
-| s-96-14-1 | أَلَمْ | a-lam | l_lam_7f1b55 | 96:14:1 | bilmedi mi (o)?… |  |  |  |
-| s-96-14-2 | يَعْلَم | yaʿlam | l_Ealima_ceb6d7 | 96:14:2 | he know… |  |  |  |
-| s-96-14-3 | بِأَنَّ | bi-anna | l_an_e1bf35 | 96:14:3 | muhakkak… |  |  |  |
-| s-96-14-4 | ٱللَّهَ | allaha | l_ll_ah_d0a09b | 96:14:4 | Allah'ın… |  |  |  |
-| s-96-14-5 | يَرَىٰ | yarâ | l_ra_aA_d87b92 | 96:14:5 | gördüğünü… |  |  |  |
-| s-96-15-1 | كَلَّا | kallâ | l_kal_aA_3a705b | 96:15:1 | hayır… |  |  |  |
-| s-96-15-2 | لَئِن | la-in | l_in_f645c5 | 96:15:2 | eğer… |  |  |  |
-| s-96-15-3 | لَّمْ | lam | l_lam_7f1b55 | 96:15:3 | bundan vazgeçmezse… |  |  |  |
-| s-96-15-4 | يَنتَهِ | yantahi | ls_ntahaY_ea9b5956 | 96:15:4 | he desists… |  |  |  |
-| s-96-15-5 | لَنَسْفَعًۢا | la-nasfaʿen | ls_nasofaEF_481e5644 | 96:15:5 | mutlaka yakalarız… |  |  |  |
-| s-96-15-6 | بِٱلنَّاصِيَةِ | bi-al-nâsiyeti | ls_naASiyap_78553ccd | 96:15:6 | perçeminden… |  |  |  |
-| s-96-16-1 | نَاصِيَةٍ | nâsiyetin | ls_naASiyap_78553ccd | 96:16:1 | perçem(den)… |  |  |  |
-| s-96-16-2 | كَـٰذِبَةٍ | kâzibetin | l_ka_ib_807adf | 96:16:2 | yalancı… |  |  |  |
-| s-96-16-3 | خَاطِئَةٍ | hâti'etin | ls_xaATi_ap_9c179b08 | 96:16:3 | günahkar… |  |  |  |
-| s-96-17-1 | فَلْيَدْعُ | fa-l-yadʿu | l_daEaA_f5ec67 | 96:17:1 | o zaman çağırsın… |  |  |  |
-| s-96-17-2 | نَادِيَهُۥ | nâdiyahu | ls_naAdiy_80029903 | 96:17:2 | meclisini… |  |  |  |
-| s-96-18-1 | سَنَدْعُ | sa-nadʿu | l_daEaA_f5ec67 | 96:18:1 | biz de çağıracağız… |  |  |  |
-| s-96-18-2 | ٱلزَّبَانِيَةَ | al-zabâniyeta | ls_z_abaAniyap_bd0c416f | 96:18:2 | zebanileri… |  |  |  |
-| s-96-19-1 | كَلَّا | kallâ | l_kal_aA_3a705b | 96:19:1 | hayır… |  |  |  |
-| s-96-19-2 | لَا | lâ | l_laA_4e2bfd | 96:19:2 | ona boyun eğme… |  |  |  |
-| s-96-19-3 | تُطِعْهُ | tutiʿhu | l_aTaAEa_74ca26 | 96:19:3 | obey him… |  |  |  |
-| s-96-19-4 | وَٱسْجُدْ | va-ascud | l_sajada_c38135 | 96:19:4 | secde et… |  |  |  |
-| s-96-19-5 | وَٱقْتَرِب | va-aktarib | ls_qotaraba_fae897b1 | 96:19:5 | ve yaklaş… |  |  |  |
-| s-97-1-1 | إِنَّآ | innâ | l_in_51f9c7 | 97:1:1 | elbette biz… |  |  |  |
-| s-97-1-2 | أَنزَلْنَـٰهُ | anzalnâhu | l_anzala_adebf9 | 97:1:2 | onu indirdik… |  |  |  |
-| s-97-1-3 | فِى | fî | l_fiY_39977c | 97:1:3 | gecesinde… |  |  |  |
-| s-97-1-4 | لَيْلَةِ | layleti | ls_layolap_ea5c4bd5 | 97:1:4 | (the) Night… |  |  |  |
-| s-97-1-5 | ٱلْقَدْرِ | al-kadri | ls_qador_b8445648 | 97:1:5 | kadir… |  |  |  |
-| s-97-2-1 | وَمَآ | va-mâ | l_maA_13038a | 97:2:1 | nedir?… |  |  |  |
-| s-97-2-2 | أَدْرَىٰكَ | adrâka | ls_adoraY_5653b032 | 97:2:2 | sana bildiren… |  |  |  |
-| s-97-2-3 | مَا | mâ | l_maA_13038a | 97:2:3 | ne olduğunu… |  |  |  |
-| s-97-2-4 | لَيْلَةُ | layletu | ls_layolap_ea5c4bd5 | 97:2:4 | gecesi(nin)… |  |  |  |
-| s-97-2-5 | ٱلْقَدْرِ | al-kadri | ls_qador_b8445648 | 97:2:5 | kadir… |  |  |  |
-| s-97-3-1 | لَيْلَةُ | layletu | ls_layolap_ea5c4bd5 | 97:3:1 | gecesi… |  |  |  |
-| s-97-3-2 | ٱلْقَدْرِ | al-kadri | ls_qador_b8445648 | 97:3:2 | kadir… |  |  |  |
-| s-97-3-3 | خَيْرٌ | hayrun | l_xayor_65557c | 97:3:3 | hayırlıdır… |  |  |  |
-| s-97-3-4 | مِّنْ | min | l_min_1f6fa6 | 97:3:4 | bin-dan… |  |  |  |
-| s-97-3-5 | أَلْفِ | alfi | ls_alof_14fd8ecc | 97:3:5 | bin… |  |  |  |
-| s-97-3-6 | شَهْرٍ | şahrin | l_ahor_1c433f | 97:3:6 | month(s)… |  |  |  |
-| s-97-4-1 | تَنَزَّلُ | tanazzalu | ls_tanaz_alato_923e8a7b | 97:4:1 | iner de iner… |  |  |  |
-| s-97-4-2 | ٱلْمَلَـٰٓئِكَةُ | al-malâ'iketu | l_malak_b3955c | 97:4:2 | melekler… |  |  |  |
-| s-97-4-3 | وَٱلرُّوحُ | va-al-rûhu | l_ruwH_1d9882 | 97:4:3 | ve Ruh… |  |  |  |
-| s-97-4-4 | فِيهَا | fîhâ | l_fiY_39977c | 97:4:4 | onda… |  |  |  |
-| s-97-4-5 | بِإِذْنِ | bi-izni | l_i_on_21db05 | 97:4:5 | izniyle… |  |  |  |
-| s-97-4-6 | رَبِّهِم | rabbihim | l_rab_fc2490 | 97:4:6 | Rab'lerinin… |  |  |  |
-| s-97-4-7 | مِّن | min | l_min_1f6fa6 | 97:4:7 | için… |  |  |  |
-| s-97-4-8 | كُلِّ | kulli | l_kul_03497c | 97:4:8 | her… |  |  |  |
-| s-97-4-9 | أَمْرٍ | amrin | l_amor_9fbe48 | 97:4:9 | iş… |  |  |  |
-| s-97-5-1 | سَلَـٰمٌ | salâmun | l_sala_m_daff0b | 97:5:1 | esenliktir… |  |  |  |
-| s-97-5-2 | هِىَ | hiya | ls_hiYa_874e9600 | 97:5:2 | o… |  |  |  |
-| s-97-5-3 | حَتَّىٰ | hattâ | l_Hat_aY_47c8d9 | 97:5:3 | kadar… |  |  |  |
-| s-97-5-4 | مَطْلَعِ | matlaʿi | ls_maTolaE_e55b14d4 | 97:5:4 | ağarıncaya… |  |  |  |
-| s-97-5-5 | ٱلْفَجْرِ | al-facri | ls_fajor_c93d66b8 | 97:5:5 | tan yeri… |  |  |  |
-| s-98-1-1 | لَمْ | lam | l_lam_7f1b55 | 98:1:1 | değillerdi… |  |  |  |
-| s-98-1-2 | يَكُنِ | yakuni | l_kaAna_febd3a | 98:1:2 | were… |  |  |  |
-| s-98-1-3 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 98:1:3 | kimseler… |  |  |  |
-| s-98-1-4 | كَفَرُوا۟ | kafarû | l_kafara_af1746 | 98:1:4 | inkar eden(ler)… |  |  |  |
-| s-98-1-5 | مِنْ | min | l_min_1f6fa6 | 98:1:5 | ehlinden… |  |  |  |
-| s-98-1-6 | أَهْلِ | ahli | l_ahol_86b2cf | 98:1:6 | (the) People… |  |  |  |
-| s-98-1-7 | ٱلْكِتَـٰبِ | al-kitâbi | l_kita_b_291fe8 | 98:1:7 | Kitap… |  |  |  |
-| s-98-1-8 | وَٱلْمُشْرِكِينَ | va-al-muşrikîna | l_mu_orik_2ba276 | 98:1:8 | ve müşrikler(den)… |  |  |  |
-| s-98-1-9 | مُنفَكِّينَ | munfakkîna | ls_munfak_iyn_7467eb42 | 98:1:9 | bırakılacak… |  |  |  |
-| s-98-1-10 | حَتَّىٰ | hattâ | l_Hat_aY_47c8d9 | 98:1:10 | dek… |  |  |  |
-| s-98-1-11 | تَأْتِيَهُمُ | ta'tiyahumu | l_ataY_c25581 | 98:1:11 | kendilerine gelinceye… |  |  |  |
-| s-98-1-12 | ٱلْبَيِّنَةُ | al-bayyinetu | l_bay_inap_86ef67 | 98:1:12 | açık kanıt… |  |  |  |
-| s-98-2-1 | رَسُولٌ | rasûlun | l_rasuwl_9a5606 | 98:2:1 | bir elçi… |  |  |  |
-| s-98-2-2 | مِّنَ | mina | l_min_1f6fa6 | 98:2:2 | tarafından (gönderilen)… |  |  |  |
-| s-98-2-3 | ٱللَّهِ | allahi | l_ll_ah_d0a09b | 98:2:3 | Allah… |  |  |  |
-| s-98-2-4 | يَتْلُوا۟ | yatlû | l_talaY_d5d166 | 98:2:4 | okuyan… |  |  |  |
-| s-98-2-5 | صُحُفًا | suhufen | ls_SuHuf_2dfd6e51 | 98:2:5 | sahifeler… |  |  |  |
-| s-98-2-6 | مُّطَهَّرَةً | mutahhareten | ls_m_uTah_arap_d2dad331 | 98:2:6 | tertemiz… |  |  |  |
-| s-98-3-1 | فِيهَا | fîhâ | l_fiY_39977c | 98:3:1 | onda vardır (sahifelerde… |  |  |  |
-| s-98-3-2 | كُتُبٌ | kutubun | l_kita_b_291fe8 | 98:3:2 | Kitaplar… |  |  |  |
-| s-98-3-3 | قَيِّمَةٌ | kayyimetun | ls_qay_imap_95f627f6 | 98:3:3 | doğru değerli'… |  |  |  |
-| s-98-4-1 | وَمَا | va-mâ | l_maA_13038a | 98:4:1 | ve… |  |  |  |
-| s-98-4-2 | تَفَرَّقَ | tafarraka | ls_tafar_aqa_08bb5159 | 98:4:2 | ayrılığa düşmediler… |  |  |  |
-| s-98-4-3 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 98:4:3 | olanlar… |  |  |  |
-| s-98-4-4 | أُوتُوا۟ | ûtû | l_A_taY_2a778d | 98:4:4 | verilmiş… |  |  |  |
-| s-98-4-5 | ٱلْكِتَـٰبَ | al-kitâba | l_kita_b_291fe8 | 98:4:5 | Kitap… |  |  |  |
-| s-98-4-6 | إِلَّا | illâ | l_il_aA_e925a2 | 98:4:6 | ancak (düştüler)… |  |  |  |
-| s-98-4-7 | مِنۢ | min | l_min_1f6fa6 | 98:4:7 | (ondan) sonra… |  |  |  |
-| s-98-4-8 | بَعْدِ | baʿdi | l_baEod_22102e | 98:4:8 | after… |  |  |  |
-| s-98-4-9 | مَا | mâ | l_maA_13038a | 98:4:9 | ne ki… |  |  |  |
-| s-98-4-10 | جَآءَتْهُمُ | câ'athumu | l_jaA_a_c0bd29 | 98:4:10 | kendilerine geldi… |  |  |  |
-| s-98-4-11 | ٱلْبَيِّنَةُ | al-bayyinetu | l_bay_inap_86ef67 | 98:4:11 | açık kanıt… |  |  |  |
-| s-98-5-1 | وَمَآ | va-mâ | l_maA_13038a | 98:5:1 | oysa… |  |  |  |
-| s-98-5-2 | أُمِرُوٓا۟ | umirû | l_amara_3fab3c | 98:5:2 | kendilerine emredilmedi… |  |  |  |
-| s-98-5-3 | إِلَّا | illâ | l_il_aA_e925a2 | 98:5:3 | dışında (bir şey)… |  |  |  |
-| s-98-5-4 | لِيَعْبُدُوا۟ | li-yaʿbudû | l_Eabada_557021 | 98:5:4 | kulluk etmeleri… |  |  |  |
-| s-98-5-5 | ٱللَّهَ | allaha | l_ll_ah_d0a09b | 98:5:5 | Allah'a… |  |  |  |
-| s-98-5-6 | مُخْلِصِينَ | muhlisîna | ls_muxoliS_e8a20e42 | 98:5:6 | halis kılarak… |  |  |  |
-| s-98-5-7 | لَهُ | la-hu | ls_lahu_1244e1fe | 98:5:7 | O'na… |  |  |  |
-| s-98-5-8 | ٱلدِّينَ | al-dîna | l_diyn_6c222f | 98:5:8 | dini… |  |  |  |
-| s-98-5-9 | حُنَفَآءَ | hunafâ'a | ls_Haniyf_bdb31c21 | 98:5:9 | birleyerek… |  |  |  |
-| s-98-5-10 | وَيُقِيمُوا۟ | va-yukîmû | l_aqaAma_382983 | 98:5:10 | ve kılmaları… |  |  |  |
-| s-98-5-11 | ٱلصَّلَوٰةَ | al-salâta | l_Salaw_p_7f701a | 98:5:11 | namazı… |  |  |  |
-| s-98-5-12 | وَيُؤْتُوا۟ | va-yu'tû | l_A_taY_2a778d | 98:5:12 | ve vermeleri… |  |  |  |
-| s-98-5-13 | ٱلزَّكَوٰةَ | al-zakâta | l_zakaw_p_c43173 | 98:5:13 | zekatı… |  |  |  |
-| s-98-5-14 | وَذَٰلِكَ | va-zâlika | l_a_lik_f3410a | 98:5:14 | işte budur… |  |  |  |
-| s-98-5-15 | دِينُ | dînu | l_diyn_6c222f | 98:5:15 | din… |  |  |  |
-| s-98-5-16 | ٱلْقَيِّمَةِ | al-kayyimeti | ls_qay_imap_95f627f6 | 98:5:16 | doğru… |  |  |  |
-| s-98-6-1 | إِنَّ | inna | l_in_51f9c7 | 98:6:1 | şüphesiz… |  |  |  |
-| s-98-6-2 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 98:6:2 | kimseler… |  |  |  |
-| s-98-6-3 | كَفَرُوا۟ | kafarû | l_kafara_af1746 | 98:6:3 | inkarcı(lar)… |  |  |  |
-| s-98-6-4 | مِنْ | min | l_min_1f6fa6 | 98:6:4 | ehlinden… |  |  |  |
-| s-98-6-5 | أَهْلِ | ahli | l_ahol_86b2cf | 98:6:5 | (the) People… |  |  |  |
-| s-98-6-6 | ٱلْكِتَـٰبِ | al-kitâbi | l_kita_b_291fe8 | 98:6:6 | Kitap… |  |  |  |
-| s-98-6-7 | وَٱلْمُشْرِكِينَ | va-al-muşrikîna | l_mu_orik_2ba276 | 98:6:7 | ve ortak koşanlar… |  |  |  |
-| s-98-6-8 | فِى | fî | l_fiY_39977c | 98:6:8 | içindedirler… |  |  |  |
-| s-98-6-9 | نَارِ | nâri | l_naAr_d577c3 | 98:6:9 | ateşi… |  |  |  |
-| s-98-6-10 | جَهَنَّمَ | cahannama | l_jahan_am_665115 | 98:6:10 | cehennem… |  |  |  |
-| s-98-6-11 | خَـٰلِدِينَ | hâlidîna | l_xa_lid_db5cbd | 98:6:11 | sürekli olarak… |  |  |  |
-| s-98-6-12 | فِيهَآ | fîhâ | l_fiY_39977c | 98:6:12 | orada… |  |  |  |
-| s-98-6-13 | أُو۟لَـٰٓئِكَ | ulâ'ika | l_uwla_ik_8eb052 | 98:6:13 | işte… |  |  |  |
-| s-98-6-14 | هُمْ | hum | ls_humo_365429ef | 98:6:14 | onlar… |  |  |  |
-| s-98-6-15 | شَرُّ | şarru | l_ar_7b0807 | 98:6:15 | en şerlisidir… |  |  |  |
-| s-98-6-16 | ٱلْبَرِيَّةِ | al-bariyyeti | ls_bariy_ap_9dfe8878 | 98:6:16 | yaratılmışların… |  |  |  |
-| s-98-7-1 | إِنَّ | inna | l_in_51f9c7 | 98:7:1 | şüphesiz… |  |  |  |
-| s-98-7-2 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 98:7:2 | kimseler… |  |  |  |
-| s-98-7-3 | ءَامَنُوا۟ | âmanû | l_aAmana_966a5c | 98:7:3 | inanan(lar)… |  |  |  |
-| s-98-7-4 | وَعَمِلُوا۟ | va-ʿamilû | l_Eamila_50319c | 98:7:4 | ve yapanlar… |  |  |  |
-| s-98-7-5 | ٱلصَّـٰلِحَـٰتِ | al-sâlihâti | l_S_a_liHa_t_f6a492 | 98:7:5 | iyi işler… |  |  |  |
-| s-98-7-6 | أُو۟لَـٰٓئِكَ | ulâ'ika | l_uwla_ik_8eb052 | 98:7:6 | işte… |  |  |  |
-| s-98-7-7 | هُمْ | hum | ls_humo_365429ef | 98:7:7 | onlar… |  |  |  |
-| s-98-7-8 | خَيْرُ | hayru | l_xayor_65557c | 98:7:8 | en hayırlısıdır… |  |  |  |
-| s-98-7-9 | ٱلْبَرِيَّةِ | al-bariyyeti | ls_bariy_ap_9dfe8878 | 98:7:9 | yaratılmışların… |  |  |  |
-| s-98-8-1 | جَزَآؤُهُمْ | cazâ'uhum | l_jazaA_22eebd | 98:8:1 | onların mükafatı… |  |  |  |
-| s-98-8-2 | عِندَ | ʿinda | l_Eind_8fe318 | 98:8:2 | katında… |  |  |  |
-| s-98-8-3 | رَبِّهِمْ | rabbihim | l_rab_fc2490 | 98:8:3 | Rableri… |  |  |  |
-| s-98-8-4 | جَنَّـٰتُ | cannâtu | l_jan_ap_50e4b4 | 98:8:4 | cennetleridir… |  |  |  |
-| s-98-8-5 | عَدْنٍ | ʿadnin | ls_Eadon_886465ba | 98:8:5 | Adn… |  |  |  |
-| s-98-8-6 | تَجْرِى | tacrî | l_jarayo_c231f0 | 98:8:6 | akan… |  |  |  |
-| s-98-8-7 | مِن | min | l_min_1f6fa6 | 98:8:7 | altlarından… |  |  |  |
-| s-98-8-8 | تَحْتِهَا | tahtihâ | l_taHot_fb7d9c | 98:8:8 | underneath them… |  |  |  |
-| s-98-8-9 | ٱلْأَنْهَـٰرُ | al-anhâru | l_nahar_fb00c1 | 98:8:9 | ırmaklar… |  |  |  |
-| s-98-8-10 | خَـٰلِدِينَ | hâlidîna | l_xa_lid_db5cbd | 98:8:10 | sürekli kalacakları… |  |  |  |
-| s-98-8-11 | فِيهَآ | fîhâ | l_fiY_39977c | 98:8:11 | içinde… |  |  |  |
-| s-98-8-12 | أَبَدًا | abaden | l_abadFA_f54ff9 | 98:8:12 | ebedi… |  |  |  |
-| s-98-8-13 | رَّضِىَ | radiya | l_r_aDiYa_3ee772 | 98:8:13 | razı olmuştur… |  |  |  |
-| s-98-8-14 | ٱللَّهُ | allahu | l_ll_ah_d0a09b | 98:8:14 | Allah… |  |  |  |
-| s-98-8-15 | عَنْهُمْ | ʿanhum | l_Ean_2cd3f8 | 98:8:15 | onlardan… |  |  |  |
-| s-98-8-16 | وَرَضُوا۟ | va-radû | l_r_aDiYa_3ee772 | 98:8:16 | onlar da razı olmuşlardı… |  |  |  |
-| s-98-8-17 | عَنْهُ | ʿanhu | l_Ean_2cd3f8 | 98:8:17 | O'ndan… |  |  |  |
-| s-98-8-18 | ذَٰلِكَ | zâlika | l_a_lik_f3410a | 98:8:18 | bu… |  |  |  |
-| s-98-8-19 | لِمَنْ | li-man | l_man_48b676 | 98:8:19 | mahsustur… |  |  |  |
-| s-98-8-20 | خَشِىَ | haşiya | l_xa_iYa_982ede | 98:8:20 | saygı gösterene… |  |  |  |
-| s-98-8-21 | رَبَّهُۥ | rabbahu | l_rab_fc2490 | 98:8:21 | Rabbine… |  |  |  |
+| s-95-1-1 | وَٱلتِّينِ | va-al-tîni | ls_t_iyn_f520d1b9 | 95:1:1 | incire andolsun… | yemin olsun incire | claude-opus-5.5 | 2026-09-26 |
+| s-95-1-2 | وَٱلزَّيْتُونِ | va-al-zaytûni | ls_z_ayotuwn_ed08d607 | 95:1:2 | ve zeytine… | ve zeytin ağacına | claude-opus-5.5 | 2026-09-26 |
+| s-95-2-1 | وَطُورِ | va-tûri | ls_Tuwr_8829abdc | 95:2:1 | ve dağına… | ve Tûr Dağı'na | claude-opus-5.5 | 2026-09-26 |
+| s-95-2-2 | سِينِينَ | sînîna | ls_siyniyn_f013c3a1 | 95:2:2 | sina… | Sînâ'daki | claude-opus-5.5 | 2026-09-26 |
+| s-95-3-1 | وَهَـٰذَا | va-hâzâ | l_ha_aA_9f90d0 | 95:3:1 | ve bu… | ve şu | claude-opus-5.5 | 2026-09-26 |
+| s-95-3-2 | ٱلْبَلَدِ | al-baladi | ls_balad_43a32787 | 95:3:2 | Şehre (andolsun)… | beldeye | claude-opus-5.5 | 2026-09-26 |
+| s-95-3-3 | ٱلْأَمِينِ | al-amîni | ls_amiyn_9e1d9409 | 95:3:3 | güvenli… | emniyetli | claude-opus-5.5 | 2026-09-26 |
+| s-95-4-1 | لَقَدْ | la-kad | l_qad_03fa2b | 95:4:1 | andolsun… | gerçekten | claude-opus-5.5 | 2026-09-26 |
+| s-95-4-2 | خَلَقْنَا | halaknâ | l_xalaqa_2fa056 | 95:4:2 | biz yarattık… | yarattık | claude-opus-5.5 | 2026-09-26 |
+| s-95-4-3 | ٱلْإِنسَـٰنَ | al-insâna | l_insa_n_d60ef4 | 95:4:3 | insanı… | insanoğlunu | claude-opus-5.5 | 2026-09-26 |
+| s-95-4-4 | فِىٓ | fî | l_fiY_39977c | 95:4:4 | en güzel… | içinde | claude-opus-5.5 | 2026-09-26 |
+| s-95-4-5 | أَحْسَنِ | ahsani | l_aHosan_e3fcdb | 95:4:5 | (the) best… | en güzel | claude-opus-5.5 | 2026-09-26 |
+| s-95-4-6 | تَقْوِيمٍ | takvîmin | ls_taqowiym_8f634ad7 | 95:4:6 | biçimde… | bir kıvam | claude-opus-5.5 | 2026-09-26 |
+| s-95-5-1 | ثُمَّ | summa | l_vum_88b269 | 95:5:1 | sonra… | ardından | claude-opus-5.5 | 2026-09-26 |
+| s-95-5-2 | رَدَدْنَـٰهُ | radadnâhu | l_rad_a_c68b16 | 95:5:2 | onu çevirdik… | onu döndürdük | claude-opus-5.5 | 2026-09-26 |
+| s-95-5-3 | أَسْفَلَ | asfala | ls_asofal_4aa68568 | 95:5:3 | aşağıların… | en alçağına | claude-opus-5.5 | 2026-09-26 |
+| s-95-5-4 | سَـٰفِلِينَ | sâfilîna | ls_saAfil_fa98f6a3 | 95:5:4 | aşağısına… | alçakların | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-1 | إِلَّا | illâ | l_il_aA_e925a2 | 95:6:1 | yalnız hariç… | ancak | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-2 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 95:6:2 | kimseler… | o kimseler ki | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-3 | ءَامَنُوا۟ | âmanû | l_aAmana_966a5c | 95:6:3 | inanan(lar)… | iman ettiler | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-4 | وَعَمِلُوا۟ | va-ʿamilû | l_Eamila_50319c | 95:6:4 | ve yapanlar… | ve işlediler | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-5 | ٱلصَّـٰلِحَـٰتِ | al-sâlihâti | l_S_a_liHa_t_f6a492 | 95:6:5 | iyi işler… | salih amelleri | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-6 | فَلَهُمْ | fa-la-hum | ls_falahumo_3d2a0c97 | 95:6:6 | onlar için vardır… | işte onlara | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-7 | أَجْرٌ | acrun | l_ajor_c798df | 95:6:7 | bir mükafat… | ecir | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-8 | غَيْرُ | gayru | l_gayor_6b16f9 | 95:6:8 | olmayan… | değil | claude-opus-5.5 | 2026-09-26 |
+| s-95-6-9 | مَمْنُونٍ | mamnûnin | ls_mamonuwn_4902ae6a | 95:6:9 | kesintisi… | kesilip biten | claude-opus-5.5 | 2026-09-26 |
+| s-95-7-1 | فَمَا | fa-mâ | l_maA_13038a | 95:7:1 | nedir?… | o hâlde ne | claude-opus-5.5 | 2026-09-26 |
+| s-95-7-2 | يُكَذِّبُكَ | yukazzibuka | l_ka_aba_15a65b | 95:7:2 | sana yalanlatan… | seni yalanlamaya iter | claude-opus-5.5 | 2026-09-26 |
+| s-95-7-3 | بَعْدُ | baʿdu | l_baEod_22102e | 95:7:3 | bundan sonra… | bunun ardından | claude-opus-5.5 | 2026-09-26 |
+| s-95-7-4 | بِٱلدِّينِ | bi-al-dîni | l_diyn_6c222f | 95:7:4 | dini… | hesap gününü | claude-opus-5.5 | 2026-09-26 |
+| s-95-8-1 | أَلَيْسَ | a-laysa | l_l_ayosa_5684fc | 95:8:1 | değil midir?… | değil mi | claude-opus-5.5 | 2026-09-26 |
+| s-95-8-2 | ٱللَّهُ | allahu | l_ll_ah_d0a09b | 95:8:2 | Allah… | Allah Teâlâ | claude-opus-5.5 | 2026-09-26 |
+| s-95-8-3 | بِأَحْكَمِ | bi-ahkami | ls_aHokam_3444202a | 95:8:3 | en iyi hüküm vereni… | en hakîmi | claude-opus-5.5 | 2026-09-26 |
+| s-95-8-4 | ٱلْحَـٰكِمِينَ | al-hâkimîna | ls_Ha_kimiyn_e13ddef2 | 95:8:4 | hüküm verenlerin… | hükmedenlerin | claude-opus-5.5 | 2026-09-26 |
+| s-96-1-1 | ٱقْرَأْ | akra' | ls_qara_a_553258cd | 96:1:1 | oku… | sen oku | claude-opus-5.5 | 2026-09-26 |
+| s-96-1-2 | بِٱسْمِ | bi-asmi | l_som_585f33 | 96:1:2 | adıyle… | ismiyle | claude-opus-5.5 | 2026-09-26 |
+| s-96-1-3 | رَبِّكَ | rabbika | l_rab_fc2490 | 96:1:3 | Rabbinin… | senin Rabbinin | claude-opus-5.5 | 2026-09-26 |
+| s-96-1-4 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 96:1:4 | yaratan… | ki O | claude-opus-5.5 | 2026-09-26 |
+| s-96-1-5 | خَلَقَ | halaka | l_xalaqa_2fa056 | 96:1:5 | created… | yarattı | claude-opus-5.5 | 2026-09-26 |
+| s-96-2-1 | خَلَقَ | halaka | l_xalaqa_2fa056 | 96:2:1 | O yarattı… | yarattı | claude-opus-5.5 | 2026-09-26 |
+| s-96-2-2 | ٱلْإِنسَـٰنَ | al-insâna | l_insa_n_d60ef4 | 96:2:2 | insanı… | insanoğlunu | claude-opus-5.5 | 2026-09-26 |
+| s-96-2-3 | مِنْ | min | l_min_1f6fa6 | 96:2:3 | alaktan… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-96-2-4 | عَلَقٍ | ʿalakin | ls_Ealaq_ef20f685 | 96:2:4 | a clinging substance… | alak | claude-opus-5.5 | 2026-09-26 |
+| s-96-3-1 | ٱقْرَأْ | akra' | ls_qara_a_553258cd | 96:3:1 | oku… | sen oku | claude-opus-5.5 | 2026-09-26 |
+| s-96-3-2 | وَرَبُّكَ | va-rabbuka | l_rab_fc2490 | 96:3:2 | ve Rabbin… | ve senin Rabbin | claude-opus-5.5 | 2026-09-26 |
+| s-96-3-3 | ٱلْأَكْرَمُ | al-akramu | ls_akoram_b9ba69fb | 96:3:3 | en büyük kerem sahibidir… | en cömert olandır | claude-opus-5.5 | 2026-09-26 |
+| s-96-4-1 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 96:4:1 | O ki… | ki O | claude-opus-5.5 | 2026-09-26 |
+| s-96-4-2 | عَلَّمَ | ʿallama | l_Eal_ama_5c04b6 | 96:4:2 | öğretti… | öğretmiştir | claude-opus-5.5 | 2026-09-26 |
+| s-96-4-3 | بِٱلْقَلَمِ | bi-al-kalami | ls_qalam_9195cdbb | 96:4:3 | kalemle… | kalem ile | claude-opus-5.5 | 2026-09-26 |
+| s-96-5-1 | عَلَّمَ | ʿallama | l_Eal_ama_5c04b6 | 96:5:1 | öğretti… | öğretmiştir | claude-opus-5.5 | 2026-09-26 |
+| s-96-5-2 | ٱلْإِنسَـٰنَ | al-insâna | l_insa_n_d60ef4 | 96:5:2 | insana… | insanoğluna | claude-opus-5.5 | 2026-09-26 |
+| s-96-5-3 | مَا | mâ | l_maA_13038a | 96:5:3 | şeyi… | şeyleri | claude-opus-5.5 | 2026-09-26 |
+| s-96-5-4 | لَمْ | lam | l_lam_7f1b55 | 96:5:4 | bilmediği… | henüz | claude-opus-5.5 | 2026-09-26 |
+| s-96-5-5 | يَعْلَمْ | yaʿlam | l_Ealima_ceb6d7 | 96:5:5 | he knew… | bilmediği | claude-opus-5.5 | 2026-09-26 |
+| s-96-6-1 | كَلَّآ | kallâ | l_kal_aA_3a705b | 96:6:1 | hayır… | asla | claude-opus-5.5 | 2026-09-26 |
+| s-96-6-2 | إِنَّ | inna | l_in_51f9c7 | 96:6:2 | şüphesiz… | gerçekten | claude-opus-5.5 | 2026-09-26 |
+| s-96-6-3 | ٱلْإِنسَـٰنَ | al-insâna | l_insa_n_d60ef4 | 96:6:3 | insan… | insanoğlu | claude-opus-5.5 | 2026-09-26 |
+| s-96-6-4 | لَيَطْغَىٰٓ | la-yatgâ | ls_TagaY_27d07634 | 96:6:4 | azar… | elbette azgınlaşır | claude-opus-5.5 | 2026-09-26 |
+| s-96-7-1 | أَن | an | l_an_d1c942 | 96:7:1 | için… | diye | claude-opus-5.5 | 2026-09-26 |
+| s-96-7-2 | رَّءَاهُ | ra'âhu | l_ra_aA_d87b92 | 96:7:2 | kendini gördüğü… | kendini görmesi | claude-opus-5.5 | 2026-09-26 |
+| s-96-7-3 | ٱسْتَغْنَىٰٓ | astagnâ | ls_sotagonaY_6677864b | 96:7:3 | zengin (kendine yeterli)… | kendi kendine yeterli | claude-opus-5.5 | 2026-09-26 |
+| s-96-8-1 | إِنَّ | inna | l_in_51f9c7 | 96:8:1 | şüphesiz… | muhakkak | claude-opus-5.5 | 2026-09-26 |
+| s-96-8-2 | إِلَىٰ | ilâ | l_ilaY_d3d2d9 | 96:8:2 | Rabbinedir… | -e | claude-opus-5.5 | 2026-09-26 |
+| s-96-8-3 | رَبِّكَ | rabbika | l_rab_fc2490 | 96:8:3 | your Lord… | senin Rabbine | claude-opus-5.5 | 2026-09-26 |
+| s-96-8-4 | ٱلرُّجْعَىٰٓ | al-rucʿâ | ls_r_ujoEaY_d424316e | 96:8:4 | dönüş… | dönüştür | claude-opus-5.5 | 2026-09-26 |
+| s-96-9-1 | أَرَءَيْتَ | a-ra'ayta | l_ra_aA_d87b92 | 96:9:1 | gördün mü?… | hiç gördün mü | claude-opus-5.5 | 2026-09-26 |
+| s-96-9-2 | ٱلَّذِى | allazî | l_l_a_iY_1a8370 | 96:9:2 | şu… | o kimseyi ki | claude-opus-5.5 | 2026-09-26 |
+| s-96-9-3 | يَنْهَىٰ | yanhâ | l_nahaY_8c8b5c | 96:9:3 | men'edeni… | engel oluyor | claude-opus-5.5 | 2026-09-26 |
+| s-96-10-1 | عَبْدًا | ʿabden | l_Eabod_3558c0 | 96:10:1 | bir kulu?… | bir kul | claude-opus-5.5 | 2026-09-26 |
+| s-96-10-2 | إِذَا | izâ | l_i_aA_5b7376 | 96:10:2 | zaman… | ne zaman ki | claude-opus-5.5 | 2026-09-26 |
+| s-96-10-3 | صَلَّىٰٓ | sallâ | ls_Sal_aY_a2871e48 | 96:10:3 | namaz kıldığı… | namaza durdu | claude-opus-5.5 | 2026-09-26 |
+| s-96-11-1 | أَرَءَيْتَ | a-ra'ayta | l_ra_aA_d87b92 | 96:11:1 | gördün mü?… | hiç gördün mü | claude-opus-5.5 | 2026-09-26 |
+| s-96-11-2 | إِن | in | l_in_f645c5 | 96:11:2 | ya… | eğer | claude-opus-5.5 | 2026-09-26 |
+| s-96-11-3 | كَانَ | kâna | l_kaAna_febd3a | 96:11:3 | olursa… | olmuşsa | claude-opus-5.5 | 2026-09-26 |
+| s-96-11-4 | عَلَى | ʿalâ | l_EalaY_f79ef3 | 96:11:4 | üzerinde… | üzere | claude-opus-5.5 | 2026-09-26 |
+| s-96-11-5 | ٱلْهُدَىٰٓ | al-hudâ | l_hudFY_2e4b07 | 96:11:5 | doğru yol… | hidayet | claude-opus-5.5 | 2026-09-26 |
+| s-96-12-1 | أَوْ | av | l_aw_43116a | 96:12:1 | yahut… | veya | claude-opus-5.5 | 2026-09-26 |
+| s-96-12-2 | أَمَرَ | amara | l_amara_3fab3c | 96:12:2 | emrederse… | buyurduysa | claude-opus-5.5 | 2026-09-26 |
+| s-96-12-3 | بِٱلتَّقْوَىٰٓ | bi-al-takvâ | ls_taqowaY_eeb5e12f | 96:12:3 | korunmayı… | takvayı | claude-opus-5.5 | 2026-09-26 |
+| s-96-13-1 | أَرَءَيْتَ | a-ra'ayta | l_ra_aA_d87b92 | 96:13:1 | gördün mü?… | hiç gördün mü | claude-opus-5.5 | 2026-09-26 |
+| s-96-13-2 | إِن | in | l_in_f645c5 | 96:13:2 | ya… | eğer | claude-opus-5.5 | 2026-09-26 |
+| s-96-13-3 | كَذَّبَ | kazzaba | l_ka_aba_15a65b | 96:13:3 | yalanlarsa?… | yalanladıysa | claude-opus-5.5 | 2026-09-26 |
+| s-96-13-4 | وَتَوَلَّىٰٓ | va-tavallâ | l_tawal_aY_fdd891 | 96:13:4 | ve yüz çevirirse?… | ve sırt döndüyse | claude-opus-5.5 | 2026-09-26 |
+| s-96-14-1 | أَلَمْ | a-lam | l_lam_7f1b55 | 96:14:1 | bilmedi mi (o)?… | acaba | claude-opus-5.5 | 2026-09-26 |
+| s-96-14-2 | يَعْلَم | yaʿlam | l_Ealima_ceb6d7 | 96:14:2 | he know… | bilmiyor mu | claude-opus-5.5 | 2026-09-26 |
+| s-96-14-3 | بِأَنَّ | bi-anna | l_an_e1bf35 | 96:14:3 | muhakkak… | şunu ki | claude-opus-5.5 | 2026-09-26 |
+| s-96-14-4 | ٱللَّهَ | allaha | l_ll_ah_d0a09b | 96:14:4 | Allah'ın… | Allah Teâlâ | claude-opus-5.5 | 2026-09-26 |
+| s-96-14-5 | يَرَىٰ | yarâ | l_ra_aA_d87b92 | 96:14:5 | gördüğünü… | görmektedir | claude-opus-5.5 | 2026-09-26 |
+| s-96-15-1 | كَلَّا | kallâ | l_kal_aA_3a705b | 96:15:1 | hayır… | asla | claude-opus-5.5 | 2026-09-26 |
+| s-96-15-2 | لَئِن | la-in | l_in_f645c5 | 96:15:2 | eğer… | elbette eğer | claude-opus-5.5 | 2026-09-26 |
+| s-96-15-3 | لَّمْ | lam | l_lam_7f1b55 | 96:15:3 | bundan vazgeçmezse… | hâlâ | claude-opus-5.5 | 2026-09-26 |
+| s-96-15-4 | يَنتَهِ | yantahi | ls_ntahaY_ea9b5956 | 96:15:4 | he desists… | vazgeçmezse | claude-opus-5.5 | 2026-09-26 |
+| s-96-15-5 | لَنَسْفَعًۢا | la-nasfaʿen | ls_nasofaEF_481e5644 | 96:15:5 | mutlaka yakalarız… | elbette sürükleriz | claude-opus-5.5 | 2026-09-26 |
+| s-96-15-6 | بِٱلنَّاصِيَةِ | bi-al-nâsiyeti | ls_naASiyap_78553ccd | 96:15:6 | perçeminden… | alın perçeminden | claude-opus-5.5 | 2026-09-26 |
+| s-96-16-1 | نَاصِيَةٍ | nâsiyetin | ls_naASiyap_78553ccd | 96:16:1 | perçem(den)… | bir alın saçı | claude-opus-5.5 | 2026-09-26 |
+| s-96-16-2 | كَـٰذِبَةٍ | kâzibetin | l_ka_ib_807adf | 96:16:2 | yalancı… | yalan söyleyen | claude-opus-5.5 | 2026-09-26 |
+| s-96-16-3 | خَاطِئَةٍ | hâti'etin | ls_xaATi_ap_9c179b08 | 96:16:3 | günahkar… | hata işleyen | claude-opus-5.5 | 2026-09-26 |
+| s-96-17-1 | فَلْيَدْعُ | fa-l-yadʿu | l_daEaA_f5ec67 | 96:17:1 | o zaman çağırsın… | haydi çağırsın | claude-opus-5.5 | 2026-09-26 |
+| s-96-17-2 | نَادِيَهُۥ | nâdiyahu | ls_naAdiy_80029903 | 96:17:2 | meclisini… | kendi topluluğunu | claude-opus-5.5 | 2026-09-26 |
+| s-96-18-1 | سَنَدْعُ | sa-nadʿu | l_daEaA_f5ec67 | 96:18:1 | biz de çağıracağız… | yakında çağırırız | claude-opus-5.5 | 2026-09-26 |
+| s-96-18-2 | ٱلزَّبَانِيَةَ | al-zabâniyeta | ls_z_abaAniyap_bd0c416f | 96:18:2 | zebanileri… | cehennem bekçilerini | claude-opus-5.5 | 2026-09-26 |
+| s-96-19-1 | كَلَّا | kallâ | l_kal_aA_3a705b | 96:19:1 | hayır… | asla | claude-opus-5.5 | 2026-09-26 |
+| s-96-19-2 | لَا | lâ | l_laA_4e2bfd | 96:19:2 | ona boyun eğme… | sakın | claude-opus-5.5 | 2026-09-26 |
+| s-96-19-3 | تُطِعْهُ | tutiʿhu | l_aTaAEa_74ca26 | 96:19:3 | obey him… | ona uyma | claude-opus-5.5 | 2026-09-26 |
+| s-96-19-4 | وَٱسْجُدْ | va-ascud | l_sajada_c38135 | 96:19:4 | secde et… | ve secdeye kapan | claude-opus-5.5 | 2026-09-26 |
+| s-96-19-5 | وَٱقْتَرِب | va-aktarib | ls_qotaraba_fae897b1 | 96:19:5 | ve yaklaş… | ve yakınlaş | claude-opus-5.5 | 2026-09-26 |
+| s-97-1-1 | إِنَّآ | innâ | l_in_51f9c7 | 97:1:1 | elbette biz… | şüphesiz biz | claude-opus-5.5 | 2026-09-26 |
+| s-97-1-2 | أَنزَلْنَـٰهُ | anzalnâhu | l_anzala_adebf9 | 97:1:2 | onu indirdik… | onu indirmişizdir | claude-opus-5.5 | 2026-09-26 |
+| s-97-1-3 | فِى | fî | l_fiY_39977c | 97:1:3 | gecesinde… | içinde | claude-opus-5.5 | 2026-09-26 |
+| s-97-1-4 | لَيْلَةِ | layleti | ls_layolap_ea5c4bd5 | 97:1:4 | (the) Night… | gecesi | claude-opus-5.5 | 2026-09-26 |
+| s-97-1-5 | ٱلْقَدْرِ | al-kadri | ls_qador_b8445648 | 97:1:5 | kadir… | Kadr | claude-opus-5.5 | 2026-09-26 |
+| s-97-2-1 | وَمَآ | va-mâ | l_maA_13038a | 97:2:1 | nedir?… | ve ne | claude-opus-5.5 | 2026-09-26 |
+| s-97-2-2 | أَدْرَىٰكَ | adrâka | ls_adoraY_5653b032 | 97:2:2 | sana bildiren… | sana bildirdi | claude-opus-5.5 | 2026-09-26 |
+| s-97-2-3 | مَا | mâ | l_maA_13038a | 97:2:3 | ne olduğunu… | nedir | claude-opus-5.5 | 2026-09-26 |
+| s-97-2-4 | لَيْلَةُ | layletu | ls_layolap_ea5c4bd5 | 97:2:4 | gecesi(nin)… | gece | claude-opus-5.5 | 2026-09-26 |
+| s-97-2-5 | ٱلْقَدْرِ | al-kadri | ls_qador_b8445648 | 97:2:5 | kadir… | Kadr | claude-opus-5.5 | 2026-09-26 |
+| s-97-3-1 | لَيْلَةُ | layletu | ls_layolap_ea5c4bd5 | 97:3:1 | gecesi… | gece | claude-opus-5.5 | 2026-09-26 |
+| s-97-3-2 | ٱلْقَدْرِ | al-kadri | ls_qador_b8445648 | 97:3:2 | kadir… | Kadr | claude-opus-5.5 | 2026-09-26 |
+| s-97-3-3 | خَيْرٌ | hayrun | l_xayor_65557c | 97:3:3 | hayırlıdır… | daha hayırlıdır | claude-opus-5.5 | 2026-09-26 |
+| s-97-3-4 | مِّنْ | min | l_min_1f6fa6 | 97:3:4 | bin-dan… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-97-3-5 | أَلْفِ | alfi | ls_alof_14fd8ecc | 97:3:5 | bin… | bin tane | claude-opus-5.5 | 2026-09-26 |
+| s-97-3-6 | شَهْرٍ | şahrin | l_ahor_1c433f | 97:3:6 | month(s)… | aydan | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-1 | تَنَزَّلُ | tanazzalu | ls_tanaz_alato_923e8a7b | 97:4:1 | iner de iner… | iner | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-2 | ٱلْمَلَـٰٓئِكَةُ | al-malâ'iketu | l_malak_b3955c | 97:4:2 | melekler… | melâike | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-3 | وَٱلرُّوحُ | va-al-rûhu | l_ruwH_1d9882 | 97:4:3 | ve Ruh… | ve Rûh da | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-4 | فِيهَا | fîhâ | l_fiY_39977c | 97:4:4 | onda… | o gecede | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-5 | بِإِذْنِ | bi-izni | l_i_on_21db05 | 97:4:5 | izniyle… | izni ile | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-6 | رَبِّهِم | rabbihim | l_rab_fc2490 | 97:4:6 | Rab'lerinin… | Rablerinin | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-7 | مِّن | min | l_min_1f6fa6 | 97:4:7 | için… | dolayı | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-8 | كُلِّ | kulli | l_kul_03497c | 97:4:8 | her… | her bir | claude-opus-5.5 | 2026-09-26 |
+| s-97-4-9 | أَمْرٍ | amrin | l_amor_9fbe48 | 97:4:9 | iş… | emir | claude-opus-5.5 | 2026-09-26 |
+| s-97-5-1 | سَلَـٰمٌ | salâmun | l_sala_m_daff0b | 97:5:1 | esenliktir… | selâmettir | claude-opus-5.5 | 2026-09-26 |
+| s-97-5-2 | هِىَ | hiya | ls_hiYa_874e9600 | 97:5:2 | o… | o gece | claude-opus-5.5 | 2026-09-26 |
+| s-97-5-3 | حَتَّىٰ | hattâ | l_Hat_aY_47c8d9 | 97:5:3 | kadar… | -e dek | claude-opus-5.5 | 2026-09-26 |
+| s-97-5-4 | مَطْلَعِ | matlaʿi | ls_maTolaE_e55b14d4 | 97:5:4 | ağarıncaya… | doğuşuna | claude-opus-5.5 | 2026-09-26 |
+| s-97-5-5 | ٱلْفَجْرِ | al-facri | ls_fajor_c93d66b8 | 97:5:5 | tan yeri… | fecrin | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-1 | لَمْ | lam | l_lam_7f1b55 | 98:1:1 | değillerdi… | hiç | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-2 | يَكُنِ | yakuni | l_kaAna_febd3a | 98:1:2 | were… | olmayacaklardı | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-3 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 98:1:3 | kimseler… | o kimseler ki | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-4 | كَفَرُوا۟ | kafarû | l_kafara_af1746 | 98:1:4 | inkar eden(ler)… | inkâr etti | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-5 | مِنْ | min | l_min_1f6fa6 | 98:1:5 | ehlinden… | -den olan | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-6 | أَهْلِ | ahli | l_ahol_86b2cf | 98:1:6 | (the) People… | sahipleri | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-7 | ٱلْكِتَـٰبِ | al-kitâbi | l_kita_b_291fe8 | 98:1:7 | Kitap… | kitabın | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-8 | وَٱلْمُشْرِكِينَ | va-al-muşrikîna | l_mu_orik_2ba276 | 98:1:8 | ve müşrikler(den)… | ve müşriklerden | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-9 | مُنفَكِّينَ | munfakkîna | ls_munfak_iyn_7467eb42 | 98:1:9 | bırakılacak… | ayrılacak | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-10 | حَتَّىٰ | hattâ | l_Hat_aY_47c8d9 | 98:1:10 | dek… | -e kadar | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-11 | تَأْتِيَهُمُ | ta'tiyahumu | l_ataY_c25581 | 98:1:11 | kendilerine gelinceye… | onlara gelmesi | claude-opus-5.5 | 2026-09-26 |
+| s-98-1-12 | ٱلْبَيِّنَةُ | al-bayyinetu | l_bay_inap_86ef67 | 98:1:12 | açık kanıt… | apaçık delil | claude-opus-5.5 | 2026-09-26 |
+| s-98-2-1 | رَسُولٌ | rasûlun | l_rasuwl_9a5606 | 98:2:1 | bir elçi… | bir resul | claude-opus-5.5 | 2026-09-26 |
+| s-98-2-2 | مِّنَ | mina | l_min_1f6fa6 | 98:2:2 | tarafından (gönderilen)… | -den gelen | claude-opus-5.5 | 2026-09-26 |
+| s-98-2-3 | ٱللَّهِ | allahi | l_ll_ah_d0a09b | 98:2:3 | Allah… | Allah Teâlâ | claude-opus-5.5 | 2026-09-26 |
+| s-98-2-4 | يَتْلُوا۟ | yatlû | l_talaY_d5d166 | 98:2:4 | okuyan… | okur | claude-opus-5.5 | 2026-09-26 |
+| s-98-2-5 | صُحُفًا | suhufen | ls_SuHuf_2dfd6e51 | 98:2:5 | sahifeler… | sayfaları | claude-opus-5.5 | 2026-09-26 |
+| s-98-2-6 | مُّطَهَّرَةً | mutahhareten | ls_m_uTah_arap_d2dad331 | 98:2:6 | tertemiz… | arındırılmış | claude-opus-5.5 | 2026-09-26 |
+| s-98-3-1 | فِيهَا | fîhâ | l_fiY_39977c | 98:3:1 | onda vardır (sahifelerde… | onların içinde | claude-opus-5.5 | 2026-09-26 |
+| s-98-3-2 | كُتُبٌ | kutubun | l_kita_b_291fe8 | 98:3:2 | Kitaplar… | yazılı hükümler | claude-opus-5.5 | 2026-09-26 |
+| s-98-3-3 | قَيِّمَةٌ | kayyimetun | ls_qay_imap_95f627f6 | 98:3:3 | doğru değerli'… | dosdoğru | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-1 | وَمَا | va-mâ | l_maA_13038a | 98:4:1 | ve… | ve asla | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-2 | تَفَرَّقَ | tafarraka | ls_tafar_aqa_08bb5159 | 98:4:2 | ayrılığa düşmediler… | bölünmedi | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-3 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 98:4:3 | olanlar… | o kimseler ki | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-4 | أُوتُوا۟ | ûtû | l_A_taY_2a778d | 98:4:4 | verilmiş… | verildi | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-5 | ٱلْكِتَـٰبَ | al-kitâba | l_kita_b_291fe8 | 98:4:5 | Kitap… | o Kitap | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-6 | إِلَّا | illâ | l_il_aA_e925a2 | 98:4:6 | ancak (düştüler)… | yalnızca | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-7 | مِنۢ | min | l_min_1f6fa6 | 98:4:7 | (ondan) sonra… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-8 | بَعْدِ | baʿdi | l_baEod_22102e | 98:4:8 | after… | sonra | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-9 | مَا | mâ | l_maA_13038a | 98:4:9 | ne ki… | -dikten | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-10 | جَآءَتْهُمُ | câ'athumu | l_jaA_a_c0bd29 | 98:4:10 | kendilerine geldi… | onlara geldi | claude-opus-5.5 | 2026-09-26 |
+| s-98-4-11 | ٱلْبَيِّنَةُ | al-bayyinetu | l_bay_inap_86ef67 | 98:4:11 | açık kanıt… | apaçık delil | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-1 | وَمَآ | va-mâ | l_maA_13038a | 98:5:1 | oysa… | hâlbuki | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-2 | أُمِرُوٓا۟ | umirû | l_amara_3fab3c | 98:5:2 | kendilerine emredilmedi… | emrolunmadılar | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-3 | إِلَّا | illâ | l_il_aA_e925a2 | 98:5:3 | dışında (bir şey)… | yalnızca | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-4 | لِيَعْبُدُوا۟ | li-yaʿbudû | l_Eabada_557021 | 98:5:4 | kulluk etmeleri… | ibadet etmeleri için | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-5 | ٱللَّهَ | allaha | l_ll_ah_d0a09b | 98:5:5 | Allah'a… | Allah Teâlâ'ya | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-6 | مُخْلِصِينَ | muhlisîna | ls_muxoliS_e8a20e42 | 98:5:6 | halis kılarak… | ihlasla has kılarak | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-7 | لَهُ | la-hu | ls_lahu_1244e1fe | 98:5:7 | O'na… | O'na özgü | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-8 | ٱلدِّينَ | al-dîna | l_diyn_6c222f | 98:5:8 | dini… | dinlerini | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-9 | حُنَفَآءَ | hunafâ'a | ls_Haniyf_bdb31c21 | 98:5:9 | birleyerek… | hanifler olarak | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-10 | وَيُقِيمُوا۟ | va-yukîmû | l_aqaAma_382983 | 98:5:10 | ve kılmaları… | ve dosdoğru kılmaları | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-11 | ٱلصَّلَوٰةَ | al-salâta | l_Salaw_p_7f701a | 98:5:11 | namazı… | namazlarını | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-12 | وَيُؤْتُوا۟ | va-yu'tû | l_A_taY_2a778d | 98:5:12 | ve vermeleri… | ve ödemeleri | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-13 | ٱلزَّكَوٰةَ | al-zakâta | l_zakaw_p_c43173 | 98:5:13 | zekatı… | zekâtı | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-14 | وَذَٰلِكَ | va-zâlika | l_a_lik_f3410a | 98:5:14 | işte budur… | ve işte bu | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-15 | دِينُ | dînu | l_diyn_6c222f | 98:5:15 | din… | dinidir | claude-opus-5.5 | 2026-09-26 |
+| s-98-5-16 | ٱلْقَيِّمَةِ | al-kayyimeti | ls_qay_imap_95f627f6 | 98:5:16 | doğru… | dosdoğru olanın | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-1 | إِنَّ | inna | l_in_51f9c7 | 98:6:1 | şüphesiz… | muhakkak | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-2 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 98:6:2 | kimseler… | o kimseler ki | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-3 | كَفَرُوا۟ | kafarû | l_kafara_af1746 | 98:6:3 | inkarcı(lar)… | inkâr ettiler | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-4 | مِنْ | min | l_min_1f6fa6 | 98:6:4 | ehlinden… | -den olup | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-5 | أَهْلِ | ahli | l_ahol_86b2cf | 98:6:5 | (the) People… | sahipleri | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-6 | ٱلْكِتَـٰبِ | al-kitâbi | l_kita_b_291fe8 | 98:6:6 | Kitap… | kitabın | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-7 | وَٱلْمُشْرِكِينَ | va-al-muşrikîna | l_mu_orik_2ba276 | 98:6:7 | ve ortak koşanlar… | ve müşriklerden | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-8 | فِى | fî | l_fiY_39977c | 98:6:8 | içindedirler… | içinde | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-9 | نَارِ | nâri | l_naAr_d577c3 | 98:6:9 | ateşi… | ateşinde | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-10 | جَهَنَّمَ | cahannama | l_jahan_am_665115 | 98:6:10 | cehennem… | cehennemin | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-11 | خَـٰلِدِينَ | hâlidîna | l_xa_lid_db5cbd | 98:6:11 | sürekli olarak… | ebedî kalıcılar olarak | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-12 | فِيهَآ | fîhâ | l_fiY_39977c | 98:6:12 | orada… | onun içinde | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-13 | أُو۟لَـٰٓئِكَ | ulâ'ika | l_uwla_ik_8eb052 | 98:6:13 | işte… | işte onlar | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-14 | هُمْ | hum | ls_humo_365429ef | 98:6:14 | onlar… | kendileri | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-15 | شَرُّ | şarru | l_ar_7b0807 | 98:6:15 | en şerlisidir… | en kötüsüdür | claude-opus-5.5 | 2026-09-26 |
+| s-98-6-16 | ٱلْبَرِيَّةِ | al-bariyyeti | ls_bariy_ap_9dfe8878 | 98:6:16 | yaratılmışların… | mahlûkatın | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-1 | إِنَّ | inna | l_in_51f9c7 | 98:7:1 | şüphesiz… | muhakkak | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-2 | ٱلَّذِينَ | allazîna | l_l_a_iY_1a8370 | 98:7:2 | kimseler… | o kimseler ki | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-3 | ءَامَنُوا۟ | âmanû | l_aAmana_966a5c | 98:7:3 | inanan(lar)… | iman ettiler | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-4 | وَعَمِلُوا۟ | va-ʿamilû | l_Eamila_50319c | 98:7:4 | ve yapanlar… | ve işlediler | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-5 | ٱلصَّـٰلِحَـٰتِ | al-sâlihâti | l_S_a_liHa_t_f6a492 | 98:7:5 | iyi işler… | salih amelleri | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-6 | أُو۟لَـٰٓئِكَ | ulâ'ika | l_uwla_ik_8eb052 | 98:7:6 | işte… | işte onlar | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-7 | هُمْ | hum | ls_humo_365429ef | 98:7:7 | onlar… | kendileri | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-8 | خَيْرُ | hayru | l_xayor_65557c | 98:7:8 | en hayırlısıdır… | en iyisidir | claude-opus-5.5 | 2026-09-26 |
+| s-98-7-9 | ٱلْبَرِيَّةِ | al-bariyyeti | ls_bariy_ap_9dfe8878 | 98:7:9 | yaratılmışların… | mahlûkatın | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-1 | جَزَآؤُهُمْ | cazâ'uhum | l_jazaA_22eebd | 98:8:1 | onların mükafatı… | onların karşılığı | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-2 | عِندَ | ʿinda | l_Eind_8fe318 | 98:8:2 | katında… | yanında | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-3 | رَبِّهِمْ | rabbihim | l_rab_fc2490 | 98:8:3 | Rableri… | Rablerinin | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-4 | جَنَّـٰتُ | cannâtu | l_jan_ap_50e4b4 | 98:8:4 | cennetleridir… | cennetler | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-5 | عَدْنٍ | ʿadnin | ls_Eadon_886465ba | 98:8:5 | Adn… | kalıcı ikamet | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-6 | تَجْرِى | tacrî | l_jarayo_c231f0 | 98:8:6 | akan… | akar | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-7 | مِن | min | l_min_1f6fa6 | 98:8:7 | altlarından… | -den | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-8 | تَحْتِهَا | tahtihâ | l_taHot_fb7d9c | 98:8:8 | underneath them… | altları | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-9 | ٱلْأَنْهَـٰرُ | al-anhâru | l_nahar_fb00c1 | 98:8:9 | ırmaklar… | nehirler | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-10 | خَـٰلِدِينَ | hâlidîna | l_xa_lid_db5cbd | 98:8:10 | sürekli kalacakları… | ebedî kalıcılar olarak | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-11 | فِيهَآ | fîhâ | l_fiY_39977c | 98:8:11 | içinde… | orada | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-12 | أَبَدًا | abaden | l_abadFA_f54ff9 | 98:8:12 | ebedi… | sonsuza dek | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-13 | رَّضِىَ | radiya | l_r_aDiYa_3ee772 | 98:8:13 | razı olmuştur… | hoşnut olmuştur | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-14 | ٱللَّهُ | allahu | l_ll_ah_d0a09b | 98:8:14 | Allah… | Allah Teâlâ | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-15 | عَنْهُمْ | ʿanhum | l_Ean_2cd3f8 | 98:8:15 | onlardan… | kendilerinden | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-16 | وَرَضُوا۟ | va-radû | l_r_aDiYa_3ee772 | 98:8:16 | onlar da razı olmuşlardı… | ve onlar da hoşnut olmuşlardır | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-17 | عَنْهُ | ʿanhu | l_Ean_2cd3f8 | 98:8:17 | O'ndan… | Allah'tan | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-18 | ذَٰلِكَ | zâlika | l_a_lik_f3410a | 98:8:18 | bu… | işte bu | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-19 | لِمَنْ | li-man | l_man_48b676 | 98:8:19 | mahsustur… | kimse içindir | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-20 | خَشِىَ | haşiya | l_xa_iYa_982ede | 98:8:20 | saygı gösterene… | haşyet duyan | claude-opus-5.5 | 2026-09-26 |
+| s-98-8-21 | رَبَّهُۥ | rabbahu | l_rab_fc2490 | 98:8:21 | Rabbine… | Rabbinden | claude-opus-5.5 | 2026-09-26 |
 
 ## Parti B (99–105)
 

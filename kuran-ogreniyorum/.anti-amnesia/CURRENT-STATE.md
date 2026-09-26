@@ -1,7 +1,7 @@
 # KAO · Güncel durum (üretilmiş dosya — elle düzenleme; `node kuran-ogreniyorum/tools/kao-plan-check.mjs --render`)
 
 **Güncelleme:** 2026-09-26 · **Durum:** `completed` · **Sürüm:** plan-v4 · **Tamamlanan kart:** 30/30
-**activePrompt:** — · **lastCompletedPrompt:** KAO-22 · **blockedPrompt:** — · **Sıradaki:** **KAO-D1**
+**activePrompt:** — · **lastCompletedPrompt:** KAO-D6 · **blockedPrompt:** — · **Sıradaki:** **—**
 **releaseApproval:** APPROVED · **Baseline:** 0436405 (main)
 
 ## Açık kararlar
@@ -46,10 +46,10 @@
 | KAO-D3 | Dalga 3 denetimi | pass | — |
 | KAO-D4 | Dalga 4 denetimi | pass | — |
 | KAO-D5 | Dalga 5 denetimi | findings | — |
-| KAO-D6 | Dalga 6 denetimi | pending | — |
+| KAO-D6 | Dalga 6 denetimi | findings | — |
 
 ## Gereksinim durumu (12-EK-GEREKSINIMLER)
 R-A1:done · R-A2:done · R-A3:done · R-A4:done · R-A5:done · R-A6:done · R-A7:done · R-A8:done · R-A9:done · R-B1:done · R-B2:done · R-B3:done · R-B4:done · R-B5:done · R-B6:done · R-B7:done · R-B8:done · R-C1:done · R-C2:done · R-C3:done · R-C4:done · R-C5:partial · R-C6:done · R-C7:done · R-C8:done · R-C9:partial
 
 ## Son ledger satırı
-| 100 | 2026-09-26 | KAO-22 bitti: kapanış belgesi (KAO-KAPANIS.md), 26 gereksinimin 24'ü done / 2'si gerekçeli partial, D1–D5 denetimleri, CLAUDE.md/AGENTS.md/README.md notları; STATE status=completed. releaseApproval kullanıcı kaydıyla APPROVED korunur; bu kart yayın yapmaz. | `evidence/KAO-22/EVIDENCE.json`; `deliverables/KAO-KAPANIS.md` |
+| 101 | 2026-09-26 | KAO-D6 denetimi: findings. KAO-22 kontrolü PASS; gereksinimler (24 done / 2 partial), kapanış belgesi ve repo notları, K3 kaydı ve plan-check doğrulandı; 1 bulgu: releaseApproval kullanıcı yetkili APPROVED ve 59a53d9'a kadar yayın yapıldı (plan NOT_APPROVED öngörüyordu). | `evidence/KAO-D6/AUDIT.md` |

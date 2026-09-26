@@ -18,7 +18,7 @@
     "pagesRun": 35978035375,
     "result": "success"
   },
-  "nextCard": "KAO-D1",
+  "nextCard": null,
   "userApprovalRequired": false,
   "invariants": [
     "no network calls in module; all content packaged under app/content",
@@ -1794,7 +1794,7 @@
     }
   },
   "activePrompt": null,
-  "lastCompletedPrompt": "KAO-22",
+  "lastCompletedPrompt": "KAO-D6",
   "blockedPrompt": null,
   "bootstrap": {
     "id": "KAO-P00",
@@ -1823,7 +1823,7 @@
     "KAO-D3": "pass",
     "KAO-D4": "pass",
     "KAO-D5": "findings",
-    "KAO-D6": "pending"
+    "KAO-D6": "findings"
   },
   "knownPlanGaps": [
     {

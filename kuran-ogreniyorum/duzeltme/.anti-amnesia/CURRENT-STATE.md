@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-21** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`eceee66` (FIX-18 yalnız belge, Pages run 36320233598 success; canlı pin `20260926m`; index.html, sw.js, quranLearn.js canlı=repo; araç/belge Pages'te yayımlanmaz); kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-20 done (KF-11 gzip 160 KiB, KF-12 `eighty` %75; pin `20260927a`); sırada FIX-21…26 (KF-6 şimdi uygula), en son FIX-19
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-22** · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`036b67b` (FIX-20, Pages run 36321010891 success; canlı pin `20260927a`; index.html, sw.js, quranLearn.js canlı=repo); yayın kaydı sonraki kartın commit'inde ayrı LEDGER satırı; kullanıcı her karttan sonra canlıya almayı istiyor
+**Güncelleme:** 2026-09-27 · KAO-FIX-21 done (bağ kur görevi; pin `20260927b`); sırada FIX-22…26, en son FIX-19
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -33,8 +33,8 @@
 | KAO-FIX-16 | O-8, D-1, D-3 | done | `1664f57` | 05 §1/§2/§5/§6, 06 §5, 02 §2.4, README; `deliverables/KAO-KAPANIS-EK-1.md`; bağlantı 44/0 kırık; `eighty` açık karar olarak EK-1'de |
 | KAO-FIX-17 | O-11 | done | `7f74842` | KAO dosya kümesi → önek (taban `58e0ceb` sonrası FAIL, öncesi WARN: a9fa40c, ecc7ac7); `(ek)`/P00/Dn önekleri de tanınır; `--commits`; findings gerekçesiz WARN (D1/D5/D6); öz-test 19/19 |
 | KAO-FIX-18 | D-4 | done | `eceee66` | 7/7 durum satırı: 02 §5.3 uygulandı (FIX-15); §5.6, §5.8, §5.10 uygulanmadı; §5.7, 04 §4 FX, 10 §9 kısmen — kalanlar sonraki program (KF-6) |
-| KAO-FIX-20 | KF-11, KF-12 | done | (commit sonrası) | kararlar: gzip 160 KiB, `eighty` eşiği 0,75 + etiket |
-| KAO-FIX-21 | 02 §5.6 | todo | | "bağ kur" görevi: 5 yeni kelimede bir, Türkçe türev (`cognate.tr`) seçimi; yeni handler yok |
+| KAO-FIX-20 | KF-11, KF-12 | done | `036b67b` | kararlar: gzip 160 KiB, `eighty` eşiği 0,75 + etiket |
+| KAO-FIX-21 | 02 §5.6 | done | (commit sonrası) | "bağ kur" görevi: 5 yeni kelimede bir, Türkçe türev (`cognate.tr`) seçimi; yeni handler yok |
 | KAO-FIX-22 | 02 §5.7 | todo | | hata ağırlığı (zayıf sınıf kuyrukta öne) + "en çok karıştırdıkların" satırı |
 | KAO-FIX-23 | 02 §5.8 | todo | | niyet önerisi: namaz vaktine bağlı zamanlı hub metni (bildirim yok) |
 | KAO-FIX-24 | 02 §5.10 | todo | | haftalık aktarım testi: görülmemiş ≥%95 âyette çeviri seçimi, başarı ölçümü |
@@ -69,7 +69,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260927a`** (FIX-20) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260927b`** (FIX-21) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 

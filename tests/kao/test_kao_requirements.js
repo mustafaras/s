@@ -570,4 +570,86 @@ function sandboxLemma(api, lemmaId) {
   assert.equal(api.kaoCoverage({ quranLearn: { cards } }).ratio, b.freq / 77430, 'kaoCoverage paydası 77.430');
 }
 
+// KAO-FIX-21 (02 §5.6, KF-6): "bağ kur" görevi — öğrenilen her 5. yeni kelimeden (toplam sayaç: introducedAt'lı ar>tr
+// kartlar + oturumdaki sıra) sonra, son 5 yeni kelimeden Türkçe türevi (cognate.tr) olanı sorulur. FSRS kartı yazmaz;
+// sonuç daily[gün].link = {n, ok}. Gece oturumunda yok.
+{
+  const lexBox = { window: {} };
+  vm.createContext(lexBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), lexBox);
+  const lemmas = lexBox.window.QuranLexiconV1.lemmas;
+  const byId = Object.fromEntries(lemmas.map((lemma) => [lemma.id, lemma]));
+  const pad = (n) => String(n).padStart(2, '0');
+  const today = (() => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; })();
+  let bed = null;
+  const data = { quranLearn: null, settings: {} };
+  const ui = {};
+  const api = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return today; }, caffeineTargetBed() { return bed; } });
+  const fresh = (introduced) => {
+    data.quranLearn = null; api.ensureQuranLearn(data); data.quranLearn.settings.dailyNew = 20;
+    // Önceden tanıtılmış lemmalar (vadesi gelecekte, kuyruğa girmez): toplam sayacı başlatır.
+    for (const lemma of introduced) data.quranLearn.cards[`w:${lemma.id}:ar>tr`] = { state: 'learning', s: 2, reps: 1, due: '2099-01-01T00:00:00.000Z', introducedAt: '2026-09-01T10:00:00.000Z' };
+  };
+  const isNewForward = (item) => item.isNew && /^w:.+:ar>tr$/.test(item.cardId);
+  const withCognate = lemmas.filter((lemma) => lemma.cognate && lemma.cognate.tr);
+  let checked = 0;
+  for (let prior = 0; prior <= 12; prior += 1) {
+    fresh(prior ? withCognate.slice(-prior) : []);
+    api.kaoStart();
+    const queue = ui.kaoQueue;
+    let counter = prior, expected = 0;
+    queue.forEach((item, index) => {
+      if (!isNewForward(item)) return;
+      counter += 1;
+      if (counter % 5 === 0) {
+        expected += 1;
+        const next = queue[index + 1];
+        assert.ok(next && next.type === 'link' && /^k:/.test(next.cardId), `prior=${prior}: ${counter}. yeni kelimeden sonra bağ kur`);
+        const lemmaId = next.cardId.slice(2);
+        const window5 = queue.slice(0, index + 1).filter(isNewForward).map((x) => x.cardId.split(':')[1]).reverse().concat(Object.keys(data.quranLearn.cards).filter((id) => data.quranLearn.cards[id].introducedAt).map((id) => id.split(':')[1])).slice(0, 5);
+        assert.ok(window5.includes(lemmaId), 'hedef son 5 yeni kelimeden biri');
+        assert.ok(byId[lemmaId].cognate && byId[lemmaId].cognate.tr, 'hedefin Türkçe türevi var');
+        assert.equal(next.isNew, false, 'bağ kur yeni kart sayılmaz');
+        checked += 1;
+      }
+    });
+    assert.equal(queue.filter((item) => item.type === 'link').length, expected, `prior=${prior}: bağ kur sayısı toplam sayaçla tutarlı`);
+    for (let i = 2; i < queue.length; i += 1) assert.ok(!(queue[i].type === queue[i - 1].type && queue[i].type === queue[i - 2].type), 'bağ kur eklenince de aynı tür ≤2');
+  }
+  assert.ok(checked >= 5, `en az 5 bağ kur görevi sınandı (${checked})`);
+  // Görev + cevap: bağ kur içeren ilk başlangıç sayısıyla.
+  let link = null;
+  for (let prior = 0; prior <= 12 && !link; prior += 1) { fresh(prior ? withCognate.slice(-prior) : []); api.kaoStart(); link = ui.kaoQueue.find((item) => item.type === 'link'); }
+  assert.ok(link, 'bağ kur içeren oturum bulundu');
+  const task = ui.kaoTasks[link.id];
+  const target = byId[link.cardId.slice(2)];
+  assert.equal(task.type, 'link');
+  assert.equal(task.answer, target.cognate.tr);
+  assert.equal(task.ar, target.ar, 'Arapça sözlük modülünden');
+  assert.equal(task.cognate, null, 'cevap "Türkçede var" satırıyla sızmaz');
+  assert.equal(task.choices.length, 4); assert.equal(task.choices.filter((choice) => choice.correct).length, 1);
+  assert.equal(new Set(task.choices.map((choice) => choice.label)).size, 4, 'etiketler tekil');
+  const html = api.kaoTaskHTML(task);
+  assert.match(html, /Bağ kur/); assert.match(html, /class="kao-arabic-text" lang="ar"/); assert.doesNotMatch(html, /Türkçede var/);
+  ui.kaoTaskIndex = ui.kaoQueue.indexOf(link); ui.kaoUndo = null;
+  const cardsBefore = Object.keys(data.quranLearn.cards).length;
+  api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId);
+  assert.deepEqual(JSON.parse(JSON.stringify(data.quranLearn.daily[today].link)), { n: 1, ok: 1 });
+  assert.equal(Object.keys(data.quranLearn.cards).length, cardsBefore, 'bağ kur FSRS kartı yazmaz');
+  assert.ok(!Object.keys(data.quranLearn.cards).some((id) => /^k:/.test(id)));
+  assert.equal(ui.kaoTaskIndex, ui.kaoQueue.indexOf(link) + 1, 'sonraki göreve geçer');
+  ui.kaoTaskIndex = ui.kaoQueue.indexOf(link);
+  api.kaoAnswer(task.id, task.choices.find((choice) => !choice.correct).choiceId);
+  assert.deepEqual(JSON.parse(JSON.stringify(data.quranLearn.daily[today].link)), { n: 2, ok: 1 });
+  assert.ok(ui.kaoFeedback.includes(task.answer), 'yanlışta doğru türev gösterilir');
+  // Gece oturumu (hedef yatıştan 30 dk önce): yalnız tekrar kartları, bağ kur yok.
+  const soon = new Date(Date.now() + 30 * 60000);
+  bed = `${pad(soon.getHours())}:${pad(soon.getMinutes())}`;
+  fresh(withCognate.slice(0, 4)); data.settings.targetBed = bed;
+  api.kaoStart();
+  assert.equal(ui.kaoNight, true, 'fixture: gece penceresi');
+  assert.ok(!ui.kaoQueue.some((item) => item.type === 'link'), 'gece oturumunda bağ kur yok');
+  data.settings.targetBed = undefined; bed = null;
+}
+
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

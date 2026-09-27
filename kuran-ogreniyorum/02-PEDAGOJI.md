@@ -159,7 +159,7 @@ dizerek/ek çözerek *kurar*, hazır görmez.
 ### 5.6 Ayrıntılandırıcı sorgulama
 Kök ağacında "neden bu kelime bu kökten?" sorusu (ör. مَكْتَب → yazılan yer);
 her 5 yeni kelimede bir "bağ kur" görevi: Türkçedeki türevini seç.
-> **Durum (KAO-FIX-18, 2026-09-27):** Uygulanmadı — sonraki program (KF-6). Gerekçe: kök ağacı katmanı var, ancak "bağ kur" görev türü ve 5 yeni kelimede bir tetikleyici hiçbir karta bağlanmadı; yeni görev türü kuyruk ve fixture değişikliği ister.
+> **Durum (KAO-FIX-21, 2026-09-27):** Uygulandı — öğrenilen her 5. yeni kelimeden sonra (toplam sayaç) son 5 kelimeden birinin Türkçe türevi (`cognate.tr`) sorulur; FSRS kartı yazmaz, sonuç `daily[gün].link`; gece oturumunda yok (`test_kao_requirements.js`).
 
 ### 5.7 Geri bildirim zamanı ve hata taksonomisi
 Anında düzeltici geri bildirim + kısa gerekçe. Hatalar sınıflanır:

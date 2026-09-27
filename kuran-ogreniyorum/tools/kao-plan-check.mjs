@@ -6,6 +6,7 @@
 //   node kuran-ogreniyorum/tools/kao-plan-check.mjs --render   # + .anti-amnesia/CURRENT-STATE.md üret
 //   node kuran-ogreniyorum/tools/kao-plan-check.mjs --self-test
 //   node kuran-ogreniyorum/tools/kao-plan-check.mjs --card KAO-07   # yalnız o kartın kapsam/kontrol özeti
+//   node kuran-ogreniyorum/tools/kao-plan-check.mjs --commits       # + kart başına commit sayısı (yalnız bilgi)
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
@@ -23,6 +24,14 @@ const CARD_STATUSES = ['pending', 'active', 'waiting_user', 'implemented', 'done
 const LOAD_LISTS = ['index.html', '.claude/skills/run-seyma/driver.mjs', '.claude/skills/run-seyma/zikr-harness.mjs', 'tests/app/test_state_rebind_boundary.js'];
 const KAO_SOURCE_FILES = ['app/core/quranLearn.js', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranPhonicsV1.js'];
 const FORBIDDEN_ANYWHERE = ['SeyAudio.say'];
+// O-11 (KAO-FIX-17): KAO dosya kümesine dokunan her commit tanınan bir önek taşımalı. Taban (düzeltme programının
+// başladığı `58e0ceb`) sonrası ihlal FAIL, öncesi yalnız WARN (a9fa40c, ecc7ac7 kayıt amaçlı görünür).
+const FIX_BASE = '58e0ceb';
+const KAO_FILE_SCOPE = ['app/core/quranLearn.js', 'app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranPhonicsV1.js', 'tools/kao-*.mjs', 'tests/kao/**', 'assets/kao/**'];
+// KAO-P00/KAO-Dn eski programın başlangıç/denetim kartlarıdır; "(ek)" düzeltme programının ek commit biçimidir.
+const KAO_SUBJECT_RE = /^(?:(?:KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM):|chore\(kao\))/;
+const CARD_OF_SUBJECT_RE = /^(KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
+const AUDIT_STATUSES = ['pass', 'fail', 'findings'];
 const FORBIDDEN_IN_REGISTRY = ['localStorage', 'XMLHttpRequest', 'SeySync', 'ghToken', 'openaiKey', 'sessionStorage', 'indexedDB'];
 
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
@@ -127,7 +136,21 @@ export function check(state, ctx) {
     if (!scope) { fail(`commit ${cm.hash.slice(0, 7)} tanımsız karta atıf: ${id}`); continue; }
     for (const f of cm.files) if (!inScope(f, scope)) fail(`commit ${cm.hash.slice(0, 7)} (${id}) kapsam dışı dosya: ${f}; izinli kapsam: ${scope.join(', ')}`);
   }
-  // 7 · kaynak yasakları ve yükleme listeleri
+  // 7 · KAO dosya kümesi → commit öneki (O-11); konu önekinden bağımsız her commit taranır
+  if (ctx.baseMissing) warn(`taban commit ${FIX_BASE} bulunamadı: KAO dosyası commit'leri taban öncesi sayıldı (yalnız WARN)`);
+  for (const cm of ctx.commits || []) {
+    const touched = cm.files.filter(f => inScope(f, KAO_FILE_SCOPE));
+    if (!touched.length || KAO_SUBJECT_RE.test(cm.subject)) continue;
+    const msg = `commit ${cm.hash.slice(0, 7)} KAO dosyasına tanınmayan önekle dokunuyor ("${cm.subject.slice(0, 60)}"): ${touched.join(', ')}`;
+    if (cm.afterBase) fail(msg); else warn(`taban öncesi ${msg}`);
+  }
+  // 8 · dalga denetim durumları: findings gerekçesiz kalamaz (eski STATE yalnız okunur, V8)
+  const accepted = state.auditFindingsAccepted || {};
+  for (const [id, st] of Object.entries(state.auditStatus || {})) {
+    if (!AUDIT_STATUSES.includes(st)) fail(`${id}: geçersiz auditStatus ${st} (${AUDIT_STATUSES.join('|')})`);
+    else if (st === 'findings' && !String(accepted[id] || '').trim()) warn(`${id}: auditStatus findings ama auditFindingsAccepted[${id}] gerekçesi yok`);
+  }
+  // 9 · kaynak yasakları ve yükleme listeleri
   for (const f of KAO_SOURCE_FILES) {
     const src = ctx.readSource ? ctx.readSource(f) : null; if (src == null) continue;
     for (const p of FORBIDDEN_ANYWHERE) if (src.includes(p)) fail(`${f}: yasak ifade ${p}`);
@@ -142,10 +165,19 @@ export function check(state, ctx) {
   return { fails, warns };
 }
 
+// Kart başına commit sayısı (--commits; yalnız bilgi). Konu önekinden kart kimliği; tanınmayanlar sayılmaz.
+export function commitCounts(commits) {
+  const counts = {};
+  for (const cm of commits || []) { const m = cm.subject.match(CARD_OF_SUBJECT_RE); if (m) counts[m[1]] = (counts[m[1]] || 0) + 1; }
+  return counts;
+}
+
 function realCtx() {
   const readSource = (rel) => { const p = path.join(ROOT, rel); return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null; };
-  const commits = git('log --format=%H%x1f%s -n 400').split('\n').filter(Boolean).map(l => { const [hash, subject] = l.split('\x1f'); return { hash, subject, files: git(`show --pretty=format: --name-only ${hash}`).split('\n').filter(Boolean) }; });
-  return {
+  const baseMissing = !git(`rev-parse --verify --quiet ${FIX_BASE}^{commit}`);
+  const afterBase = new Set(baseMissing ? [] : git(`rev-list ${FIX_BASE}..HEAD`).split('\n').filter(Boolean));
+  const commits = git('log --format=%H%x1f%s -n 400').split('\n').filter(Boolean).map(l => { const [hash, subject] = l.split('\x1f'); return { hash, subject, afterBase: afterBase.has(hash), files: git(`show --pretty=format: --name-only ${hash}`).split('\n').filter(Boolean) }; });
+  return { baseMissing,
     prompts: fs.existsSync(PROMPTS_PATH) ? fs.readFileSync(PROMPTS_PATH, 'utf8') : null,
     ledger: fs.existsSync(LEDGER_PATH) ? fs.readFileSync(LEDGER_PATH, 'utf8') : null,
     reqDoc: fs.existsSync(REQ_DOC) ? fs.readFileSync(REQ_DOC, 'utf8') : null,
@@ -205,7 +237,9 @@ else {
     console.log(JSON.stringify(summary, null, 2));
     process.exit(0);
   }
-  const { fails, warns } = check(state, realCtx());
+  const ctx = realCtx();
+  const { fails, warns } = check(state, ctx);
+  if (args.includes('--commits')) for (const [id, n] of Object.entries(commitCounts(ctx.commits)).sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true }))) console.log(`commits ${id}: ${n}`);
   for (const w of warns) console.log('WARN ' + w);
   for (const f of fails) console.log('FAIL ' + f);
   if (args.includes('--render')) { render(state); console.log('rendered .anti-amnesia/CURRENT-STATE.md'); }

@@ -40,6 +40,10 @@ export function runSelfTests({ check, cardSummary }, base) {
       [headings[0], headings[1]] = [headings[1], headings[0]];
       return { ...ctx0, prompts: orderedPrompts({ promptOrder: headings }) };
     })(), (r) => r.fails.some(f => f.includes('prompt sırası STATE ile uyuşmuyor'))],
+    // KAO-FIX-17 (O-11): KAO dosya kümesine dokunan commit, konu önekinden bağımsız görülür.
+    ['taban sonrası tanınmayan önek KAO dosyasına dokunamaz', clone(), { ...ctx0, commits: [{ hash: 'f1xu1000aa', subject: 'fix(ui): kuyruk', files: ['app/core/quranLearn.js'], afterBase: true }] }, (r) => r.fails.some(f => f.includes('f1xu100') && f.includes('tanınmayan önek'))],
+    ['KAO-FIX commit sözlüğe dokunabilir', clone(), { ...ctx0, commits: [{ hash: 'f1x0500bbb', subject: 'KAO-FIX-05: başlıklar', files: ['app/content/quranLexiconV1.js'], afterBase: true }] }, (r) => r.fails.length === 0 && !r.warns.some(w => w.includes('f1x0500'))],
+    ['taban öncesi KAO dışı commit yalnız WARN', clone(), { ...ctx0, commits: [{ hash: 'a9fa40cccc', subject: 'fix(ui): move Quran learning into faith hub', files: ['app/core/quranLearn.js'], afterBase: false }] }, (r) => !r.fails.some(f => f.includes('a9fa40c')) && r.warns.some(w => w.includes('a9fa40c') && w.includes('taban öncesi'))],
   ];
 
   let ok = 0;

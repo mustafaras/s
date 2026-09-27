@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-17** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-18** · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`efe5906` (arayüz belgesi `ARAYUZ-DEGISIKLIKLERI.md`, Pages run 36318898141 success; önce FIX-16 `1664f57`; canlı pin `20260926m`, index.html canlı=repo; `.md` Pages'te yayımlanmaz (404, `_site`); uygulama kodu son `cbeef96`); kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-16 done (plan/belge hizası + KAPANIŞ ek-1; yalnız belge, pin `20260926m` aynı)
+**Güncelleme:** 2026-09-27 · KAO-FIX-17 done (plan-check: KAO dosyası ↔ commit öneki, `--commits`, auditStatus; yalnız araç, pin `20260926m` aynı)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -31,7 +31,7 @@
 | KAO-FIX-14 | O-7 | done | `5330698` | D-12: 79 incelendi, 70 kümede, 9 alan dışı dışlandı; `SEM_NEIGHBOR_REVIEW` + `--sem-verify`; modül `SEM_GROUPS`; `KAO_SEMANTIC_CLUSTERS` 0; sim kod=plan 506 |
 | KAO-FIX-15 | D-2, D-5 | done | `cbeef96` | KF-9 gramer dahil ≤2 (tıkanınca oturum kısalır); KF-3 kod 4; `durable30`=isSettled(s≥30) soldurma; `errorClass:'cognate'`; sim maxRun 4→2, kod=plan 510 |
 | KAO-FIX-16 | O-8, D-1, D-3 | done | `1664f57` | 05 §1/§2/§5/§6, 06 §5, 02 §2.4, README; `deliverables/KAO-KAPANIS-EK-1.md`; bağlantı 44/0 kırık; `eighty` açık karar olarak EK-1'de |
-| KAO-FIX-17 | O-11 | todo | | plan-check sertleştirme |
+| KAO-FIX-17 | O-11 | done | (commit sonrası) | KAO dosya kümesi → önek (taban `58e0ceb` sonrası FAIL, öncesi WARN: a9fa40c, ecc7ac7); `(ek)`/P00/Dn önekleri de tanınır; `--commits`; findings gerekçesiz WARN (D1/D5/D6); öz-test 19/19 |
 | KAO-FIX-18 | D-4 | todo | | sahipsiz maddeler kararı |
 | KAO-FIX-19 | hepsi | todo | | kapanış regresyonu |
 
@@ -88,6 +88,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 20. **`kao.css` global yüklenir (FIX-13):** çıplak `[lang="ar"]`/genel seçici yazma — `styles.css`’ten sonra geldiği için eşit özgüllükte diğer yüzeyleri (`.iip17-arabic` vb.) ezer; KAO seçicileri `.kao-dialog` ya da `kao-` sınıfıyla kapsanır (test korur).
 21. **R-A5 komşuları (FIX-14):** karar `tools/kao-lexicon-build.mjs` `SEM_NEIGHBOR_REVIEW`’da; `--import-md` ve `--sem-verify` uygular, incelenmemiş kök önerisi `--freeze`’i durdurur. İçerik gzip 162.177 / tavan 163.840 (`test_kao_user_tasks.js`): pay ~1,6 KB — içerik büyüten kart önce ölçsün.
 22. **Kuyruk KF-9 (FIX-15):** ardışık aynı tür ≤2 gramer dahil; salt gramer kalınca kuyruk durur (oturum kısalır, kabul). Soldurma `task.durable30` (isSettled s≥30) ister — fixture kartı açıkça review s≥30 kurmalı; `isNew:false` yetmez.
+23. **plan-check önek kuralı (FIX-17):** `app/core/quranLearn.js`, `kao.css`, 4 içerik modülü, `tools/kao-*.mjs`, `tests/kao/**`, `assets/kao/**`'e dokunan commit konusu `KAO-FIX-NN:` / `KAO-FIX-NN (ek):` olmalı; numarasız `KAO-FIX:` yalnız `duzeltme/` belgeleri için (aksi FAIL).
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

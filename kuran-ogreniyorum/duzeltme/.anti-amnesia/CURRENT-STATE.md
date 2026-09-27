@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-23** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`10fbc06` (FIX-21, Pages run 36321789601 success; canlı pin `20260927b`; index.html, sw.js, quranLearn.js canlı=repo); yayın kaydı sonraki kartın commit'inde ayrı LEDGER satırı; kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-22 done (hata ağırlığı + en çok karıştırdıkların; pin `20260927c`); sırada FIX-23…26, en son FIX-19
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-24** · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`c148329` (FIX-22, Pages run 36322381529 success; canlı pin `20260927c`; index.html, sw.js, quranLearn.js canlı=repo); yayın kaydı sonraki kartın commit'inde ayrı LEDGER satırı; kullanıcı her karttan sonra canlıya almayı istiyor
+**Güncelleme:** 2026-09-27 · KAO-FIX-23 done (niyet önerisi; pin `20260927d`); sırada FIX-24…26, en son FIX-19
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -35,8 +35,8 @@
 | KAO-FIX-18 | D-4 | done | `eceee66` | 7/7 durum satırı: 02 §5.3 uygulandı (FIX-15); §5.6, §5.8, §5.10 uygulanmadı; §5.7, 04 §4 FX, 10 §9 kısmen — kalanlar sonraki program (KF-6) |
 | KAO-FIX-20 | KF-11, KF-12 | done | `036b67b` | kararlar: gzip 160 KiB, `eighty` eşiği 0,75 + etiket |
 | KAO-FIX-21 | 02 §5.6 | done | `10fbc06` | "bağ kur" görevi: 5 yeni kelimede bir, Türkçe türev (`cognate.tr`) seçimi; yeni handler yok |
-| KAO-FIX-22 | 02 §5.7 | done | (commit sonrası) | hata ağırlığı (zayıf sınıf kuyrukta öne) + "en çok karıştırdıkların" satırı |
-| KAO-FIX-23 | 02 §5.8 | todo | | niyet önerisi: namaz vaktine bağlı zamanlı hub metni (bildirim yok) |
+| KAO-FIX-22 | 02 §5.7 | done | `c148329` | hata ağırlığı (zayıf sınıf kuyrukta öne) + "en çok karıştırdıkların" satırı |
+| KAO-FIX-23 | 02 §5.8 | done | (commit sonrası) | niyet önerisi: namaz vaktine bağlı zamanlı hub metni (bildirim yok) |
 | KAO-FIX-24 | 02 §5.10 | todo | | haftalık aktarım testi: görülmemiş ≥%95 âyette çeviri seçimi, başarı ölçümü |
 | KAO-FIX-25 | 04 §4 | todo | | FX: haptik + doğru sesi, countUp, konfeti (taş), `.sey-enter`; kendi kapıları |
 | KAO-FIX-26 | 10 §9 | todo | | kova B/C algı doğruluğu raporu + "Yakın" öz-değerlendirme oranı |
@@ -69,7 +69,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260927c`** (FIX-22) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260927d`** (FIX-23) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 

@@ -176,7 +176,7 @@ Yolculuğu'nda Raşit ile köprü). **Uygulama niyeti**: "Sabah namazından sonr
 5 dakika" — mevcut namaz vakti verisi/hatırlatıcı altyapısı *okunarak* öneri
 (REM programı dondurulmuş; yeni bildirim üretilmez, yalnız hub kartında
 zamanlı öneri metni).
-> **Durum (KAO-FIX-18, 2026-09-27):** Uygulanmadı — sonraki program (KF-6). Gerekçe: namaz vakti/hatırlatıcı verisini okuyan niyet önerisi başka programların (REM dondurulmuş, namaz vakti) yüzeyine bağımlı; hiçbir karta bağlanmadı.
+> **Durum (KAO-FIX-23, 2026-09-27):** Uygulandı — hub kartında "Niyet önerisi: öğle namazından sonra 5 dakika (13:05)"; bugünün namaz vakitleri yalnız okunur (gün kaydı oluşturulmaz), yatsıdan sonra "yarın sabah", bugün çalışıldıysa ya da gece penceresinde gösterilmez; bildirim yok.
 
 ### 5.9 Bilişsel yük yönetimi
 Tek görev tek ekran; en çok 4 çip; yeni kelimede önce ses+Arapça+Türkçe,

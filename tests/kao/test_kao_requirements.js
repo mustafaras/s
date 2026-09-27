@@ -692,4 +692,35 @@ function sandboxLemma(api, lemmaId) {
   assert.doesNotMatch(home, /En çok karıştırdıkların/);
 }
 
+// KAO-FIX-23 (02 §5.8, KF-6): uygulama niyeti — bugünün namaz vakitleri yalnız okunur (gün kaydı oluşturulmaz, yazılmaz),
+// sıradaki vakitten sonra "5 dakika" önerisi yalnız hub kartında; bildirim yok, bugün çalışıldıysa ya da gece penceresinde yok.
+{
+  const times = { fajr: { time: '05:10' }, sunrise: { time: '06:35' }, dhuhr: { time: '13:05' }, asr: { time: '16:20' }, maghrib: { time: '19:01' }, isha: { time: '20:30' } };
+  const data = { quranLearn: null, settings: {}, days: { '2026-10-05': { prayer: times } } };
+  const ui = {};
+  const pad = (n) => String(n).padStart(2, '0');
+  let today = '2026-10-05';
+  const api = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return today; }, esc(value) { return String(value); }, icon(name) { return `<i>${name}</i>`; } });
+  api.ensureQuranLearn(data);
+  const before = JSON.stringify(data.days);
+  assert.equal(api.kaoIntentSuggestion(data, '2026-10-05T10:00:00', '2026-10-05'), 'öğle namazından sonra 5 dakika (13:05)');
+  assert.equal(api.kaoIntentSuggestion(data, '2026-10-05T04:00:00', '2026-10-05'), 'sabah namazından sonra 5 dakika (05:10)');
+  assert.equal(api.kaoIntentSuggestion(data, '2026-10-05T19:30:00', '2026-10-05'), 'yatsı namazından sonra 5 dakika (20:30)');
+  assert.equal(api.kaoIntentSuggestion(data, '2026-10-05T21:00:00', '2026-10-05'), 'yarın sabah namazından sonra 5 dakika', 'yatsıdan sonra yarın sabah');
+  assert.equal(api.kaoIntentSuggestion(data, '2026-10-05T10:00:00', '2026-10-06'), '', 'vakit verisi yoksa öneri yok');
+  assert.equal(JSON.stringify(data.days), before, 'namaz verisi yalnız okunur; gün kaydı oluşturulmaz');
+  // Hub kartı: gerçek saatten bağımsız olsun diye bugünün tüm vakitleri 23:59.
+  const now = new Date();
+  today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const late = Object.fromEntries(['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'].map((key) => [key, { time: '23:59' }]));
+  data.days[today] = { prayer: late };
+  let hub = api.kaoHubCardHTML();
+  if (now.getHours() * 60 + now.getMinutes() < 23 * 60 + 59) assert.match(hub, /<b>Niyet önerisi:<\/b> sabah namazından sonra 5 dakika \(23:59\)/);
+  data.quranLearn.daily[today] = { answered: 2 };
+  hub = api.kaoHubCardHTML();
+  assert.doesNotMatch(hub, /Niyet önerisi/, 'bugün çalışıldıysa öneri yok');
+  delete data.quranLearn.daily[today];
+  assert.doesNotMatch(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8'), /Notification|showNotification|SeyReminder/, 'bildirim üretilmez');
+}
+
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

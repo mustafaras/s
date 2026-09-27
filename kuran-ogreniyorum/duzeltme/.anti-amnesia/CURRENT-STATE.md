@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-19** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-21** · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`eceee66` (FIX-18 yalnız belge, Pages run 36320233598 success; canlı pin `20260926m`; index.html, sw.js, quranLearn.js canlı=repo; araç/belge Pages'te yayımlanmaz); kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-18 done (sahipsiz 7 plan maddesine durum satırı; 6 aday sonraki programa; yalnız belge, pin `20260926m` aynı)
+**Güncelleme:** 2026-09-27 · KAO-FIX-20 done (KF-11 gzip 160 KiB, KF-12 `eighty` %75; pin `20260927a`); sırada FIX-21…26 (KF-6 şimdi uygula), en son FIX-19
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -33,7 +33,14 @@
 | KAO-FIX-16 | O-8, D-1, D-3 | done | `1664f57` | 05 §1/§2/§5/§6, 06 §5, 02 §2.4, README; `deliverables/KAO-KAPANIS-EK-1.md`; bağlantı 44/0 kırık; `eighty` açık karar olarak EK-1'de |
 | KAO-FIX-17 | O-11 | done | `7f74842` | KAO dosya kümesi → önek (taban `58e0ceb` sonrası FAIL, öncesi WARN: a9fa40c, ecc7ac7); `(ek)`/P00/Dn önekleri de tanınır; `--commits`; findings gerekçesiz WARN (D1/D5/D6); öz-test 19/19 |
 | KAO-FIX-18 | D-4 | done | `eceee66` | 7/7 durum satırı: 02 §5.3 uygulandı (FIX-15); §5.6, §5.8, §5.10 uygulanmadı; §5.7, 04 §4 FX, 10 §9 kısmen — kalanlar sonraki program (KF-6) |
-| KAO-FIX-19 | hepsi | todo | | kapanış regresyonu |
+| KAO-FIX-20 | KF-11, KF-12 | done | (commit sonrası) | kararlar: gzip 160 KiB, `eighty` eşiği 0,75 + etiket |
+| KAO-FIX-21 | 02 §5.6 | todo | | "bağ kur" görevi: 5 yeni kelimede bir, Türkçe türev (`cognate.tr`) seçimi; yeni handler yok |
+| KAO-FIX-22 | 02 §5.7 | todo | | hata ağırlığı (zayıf sınıf kuyrukta öne) + "en çok karıştırdıkların" satırı |
+| KAO-FIX-23 | 02 §5.8 | todo | | niyet önerisi: namaz vaktine bağlı zamanlı hub metni (bildirim yok) |
+| KAO-FIX-24 | 02 §5.10 | todo | | haftalık aktarım testi: görülmemiş ≥%95 âyette çeviri seçimi, başarı ölçümü |
+| KAO-FIX-25 | 04 §4 | todo | | FX: haptik + doğru sesi, countUp, konfeti (taş), `.sey-enter`; kendi kapıları |
+| KAO-FIX-26 | 10 §9 | todo | | kova B/C algı doğruluğu raporu + "Yakın" öz-değerlendirme oranı |
+| KAO-FIX-19 | hepsi | todo | | kapanış regresyonu (FIX-20…26'dan **sonra**; tüm kodu kapsar) |
 
 Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına neden) · `partial` (parti yarım).
 
@@ -46,10 +53,12 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | KF-3 | Oturum başına gramer üst sınırı | 4 (kod kalır, plan 4'e güncellenir) | varsayılan | varsayılan |
 | KF-4 | 02 §2.4 "12–16 görev" ↔ 05 §6 | 05 §6 bağlayıcı; 02 §2.4 "tipik hedef" notu | varsayılan | varsayılan |
 | KF-5 | Sözlük örneklerindeki vakıf işaretleri (377 örnek) | Sadeleştirme kabul, D-02'ye not (okuyucu işaretleri korur) | varsayılan | varsayılan |
-| KF-6 | Sahipsiz plan maddeleri (02 §5.6/5.7/5.8/5.10, 04 §4 FX, 10 §9) | Sonraki program; kod yok | varsayılan | varsayılan |
+| KF-6 | Sahipsiz plan maddeleri (02 §5.6/5.7/5.8/5.10, 04 §4 FX, 10 §9) | Sonraki program; kod yok | **şimdi uygula** (FIX-21…26) | kullanıcı, 2026-09-27 |
 | KF-7 | Plan tanımına geçince kullanıcının gördüğü kapsam düşer | Kabul (doğru ölçüm; veri kaybı yok) | varsayılan | varsayılan |
 | KF-8 | Yayın | Bütün FIX kartları yerel; push/merge/deploy ayrı onay | varsayılan | varsayılan |
 | KF-9 | Ardışık aynı tür ≤2 kuralı gramere de uygulansın mı | Evet | varsayılan | varsayılan |
+| KF-11 | R-C5 içerik gzip bütçesi (ölçülen 162.177 B > 130 KB) | karar bekliyor | **160 KiB** (içerik değişmez) | kullanıcı, 2026-09-27 |
+| KF-12 | `eighty` kilometre taşı (tavan %77,42 < %80) | karar bekliyor | **eşik %75**, etiket "%75 kapsam", anahtar aynı | kullanıcı, 2026-09-27 |
 | KF-10 | `daily` 90 gün budaması ve 100 KB durum bütçesi (05 §2, STATE `stateBudgetKB`) | budama + 100 KB | **budama yok, sınır kaldırıldı** | kullanıcı, 2026-09-26 |
 
 ## Taban (FIX-00 doldurur)
@@ -60,7 +69,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260926m`** (FIX-15) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260927a`** (FIX-20) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 

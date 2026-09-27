@@ -119,5 +119,5 @@ taşır (R-A5): anlamca yakın kelimeler aynı oturuma ve 3 gün içine gelmez.
 | Namazımı anlıyorum | Ünite 1–3 | — |
 | Kur'an'ın yarısı | kapsam ≥%50 | — |
 | 3'te 2 | ≥%68 | — |
-| Kur'an'ın %80'i | ≥%80 | Ayarlar → Hakkında'ya rozet yok; yalnız hub kartında kalıcı satır |
+| Kur'an'ın %75'i (anahtar `eighty`) | ≥%75 (KF-12, 2026-09-27: 524 lemmanın token kapsamı tavanı %77,42, %80 kazanılamıyordu) | Ayarlar → Hakkında'ya rozet yok; yalnız hub kartında kalıcı satır |
 | 20 kısa sûre | Seviye 5 tamam | Kur'an Yolculuğu köprü notu |

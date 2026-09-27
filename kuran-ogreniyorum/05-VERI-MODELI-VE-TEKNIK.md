@@ -17,7 +17,7 @@ dokunmadan önce onaylanacak **plan**dır; hiçbir dosya değişmedi.
 | `tools/kao-lexicon-build.mjs` | Derleme aracı (Node, ağsız) | — | Bkz. [06](06-ICERIK-URETIM-HATTI.md) |
 | `tests/kao/*.js` | Fixture ailesi | — | Bkz. §8 |
 
-> **KAO-FIX-16 hizası (2026-09-27):** dört içerik modülü ham toplam tavanı ≤ 480 KB (KF-2; ölçülen 472.696 B). Gzip toplamı 162.177 B (`zlib` düzey 9, dosya başına) 130 KB R-C5 bütçesini aşar; karar kullanıcıdadır ([KAPANIŞ §6.1](deliverables/KAO-KAPANIS.md)), `test_kao_user_tasks.js` 160 KiB büyüme tavanıyla sessiz büyümeyi engeller. Bölme kararı sonraki programa bırakıldı.
+> **KAO-FIX-16 hizası (2026-09-27):** dört içerik modülü ham toplam tavanı ≤ 480 KB (KF-2; ölçülen 472.696 B). Gzip toplamı 162.177 B (`zlib` düzey 9, dosya başına); R-C5 bütçesi kullanıcı kararıyla **160 KiB** (KF-11, 2026-09-27; önce 130 KB) — `test_kao_user_tasks.js` bütçe = büyüme tavanı olarak korur. Bölme kararı sonraki programa bırakıldı.
 
 Yükleme sırası: `index.html` (`quranLexiconV1.js` içerik bloğunda,
 `quranLearn.js` `quran.js`'ten sonra `saygi.js`'ten önce),

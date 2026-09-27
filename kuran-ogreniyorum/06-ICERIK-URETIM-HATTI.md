@@ -102,8 +102,8 @@ lemma'nın kartı `orphan` olur, sayılmaz, silinmez. İçerik dosyası başınd
 ## 5. Boyut bütçesi ve çevrimdışı
 
 Dört içerik modülü (sözlük, gramer, kısa sûreler, telaffuz) ham toplam ≤ 480 KB
-(KF-2 tavanı; ölçülen 472.696 B, 2026-09-27). Gzip toplamı 162.177 B; R-C5'in
-130 KB bütçesini aşar ve karar kullanıcıdadır ([KAPANIŞ §6.1](deliverables/KAO-KAPANIS.md)).
+(KF-2 tavanı; ölçülen 472.696 B, 2026-09-27). Gzip toplamı 162.177 B; R-C5 bütçesi kullanıcı kararıyla
+160 KiB (KF-11, 2026-09-27; önce 130 KB — [KAPANIŞ §6.1](deliverables/KAO-KAPANIS.md) kapandı).
 (Eski metin: "üç dosya ≤ 410 KB, gzip ~120 KB" — KAO-FIX-16 ile uzlaştırıldı.) Pages/CDN cache-bust ile
 tek indirme; PWA `sw.js` fetch cache stratejisi içermediği için "tam
 çevrimdışı" vaadi verilmez (IIP B09 ile aynı sınır). Seviye 6 (tam Kur'an

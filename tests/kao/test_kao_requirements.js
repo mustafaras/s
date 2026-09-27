@@ -509,16 +509,20 @@ function sandboxLemma(api, lemmaId) {
   const byFreq = lemmas.slice().sort((a, b) => b.freq - a.freq);
   const known = (count) => { for (const lemma of byFreq.slice(0, count)) { q.cards[`w:${lemma.id}:ar>tr`] = Object.assign({}, durable); q.cards[`w:${lemma.id}:tr>ar`] = Object.assign({}, durable); } };
   const countFor = (ratio) => { let sum = 0; for (let i = 0; i < byFreq.length; i += 1) { sum += byFreq[i].freq; if (sum / 77430 >= ratio) return i + 1; } return Infinity; };
-  const halfAt = countFor(0.5), twoThirdsAt = countFor(0.68);
+  const halfAt = countFor(0.5), twoThirdsAt = countFor(0.68), eightyAt = countFor(0.75);
   known(halfAt - 1);
   assert.ok(!api.kaoMilestoneCheck(data, now).includes('half'), 'half: kapsam 0,50 altında yok');
   known(halfAt);
   assert.ok(api.kaoMilestoneCheck(data, now).includes('half') && !api.kaoMilestoneCheck(data, now).includes('twoThirds'), 'half eşikte; twoThirds henüz yok');
   known(twoThirdsAt);
   assert.ok(api.kaoMilestoneCheck(data, now).includes('twoThirds'), 'twoThirds kapsam 0,68');
+  // KAO-FIX-20 (kullanıcı kararı KF-12): 'eighty' taşı eşiği 0,75 (tavan %77,42; %80 kazanılamıyordu). Anahtar aynı kalır.
+  known(eightyAt - 1);
+  assert.ok(!api.kaoMilestoneCheck(data, now).includes('eighty'), 'eighty: kapsam 0,75 altında yok');
+  known(eightyAt);
+  assert.ok(api.kaoCoverage(data).ratio >= 0.75 && api.kaoMilestoneCheck(data, now).includes('eighty'), 'eighty: kapsam 0,75 eşikte kazanılır');
+  assert.match(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8'), /eighty:'%75 kapsam'/, 'etiket %75 kapsam');
   known(lemmas.length);
-  assert.ok(api.kaoCoverage(data).ratio < 0.8 && !api.kaoMilestoneCheck(data, now).includes('eighty'),
-    'eighty: 524 lemmanın tamamı bilinse de token kapsamı %77,42 < %80 (plan hedefi LEM havuzuyla tanımlıydı; FIX-16 kararı)');
   // Üretim yolu: bir cevap kazanılanları ISO tarihle yazar; kapsam düşse ve undo yapılsa da taş kalır.
   const target = slice(11)[5];
   q.cards[`w:${target.id}:ar>tr`] = Object.assign({}, durable, { due: '2026-09-02T00:00:00.000Z' });
@@ -530,8 +534,7 @@ function sandboxLemma(api, lemmaId) {
   const item = ui.kaoQueue[index];
   const task = ui.kaoTasks[item.id] = api.kaoBuildTask(item, data, { seed: item.id });
   api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId);
-  for (const key of ['fatiha', 'namaz', 'half', 'twoThirds']) assert.match(String(q.milestones[key]), /^\d{4}-\d{2}-\d{2}T/, `${key} ISO tarihle yazılır`);
-  assert.equal(q.milestones.eighty, null, 'eighty kazanılmaz');
+  for (const key of ['fatiha', 'namaz', 'half', 'twoThirds', 'eighty']) assert.match(String(q.milestones[key]), /^\d{4}-\d{2}-\d{2}T/, `${key} ISO tarihle yazılır`);
   assert.match(ui.kaoFeedback, /✦$/, 'yeni taş tek cümle geri bildirim');
   const earned = JSON.stringify(q.milestones);
   api.kaoUndo();

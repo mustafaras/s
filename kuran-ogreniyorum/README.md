@@ -115,4 +115,4 @@ otomatik kanıtlayamaz — içerik doğrulaması 06 §3 (D-12, yapay zekâ doğr
   bulguların kapanış eşlemesi ve yayın kaydı: [KAO-KAPANIS-EK-1.md](deliverables/KAO-KAPANIS-EK-1.md).
 - **Sürüyor:** KAO-FIX düzeltme programı — başlangıç [duzeltme/BAGLAM-YONETIMI.md](duzeltme/BAGLAM-YONETIMI.md),
   güncel durum [duzeltme/.anti-amnesia/CURRENT-STATE.md](duzeltme/.anti-amnesia/CURRENT-STATE.md).
-- **Kullanıcıda:** cihaz kabulü (K3) ve içerik gzip bütçesi kararı (KAPANIŞ §6.1).
+- **Kullanıcıda:** cihaz kabulü (K3). Gzip bütçesi 160 KiB (KF-11) ve `eighty` eşiği %75 (KF-12) 2026-09-27'de karara bağlandı.

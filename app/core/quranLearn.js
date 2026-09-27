@@ -415,18 +415,19 @@
     var fresh=Math.max(0,Math.floor(nonNegativeNumber(q.settings&&q.settings.dailyNew,10)));
     return {due:Math.min(due,60),fresh:fresh,minutes:Math.max(1,Math.ceil((Math.min(due,60)+fresh)*0.55)),known:Object.keys(known).length};
   }
-  var KAO_MILESTONE_LABELS={fatiha:'Fâtiha’yı anlıyorum',namaz:'Namazda ne dediğimi anlıyorum',half:'Kelimelerin yarısı tanıdık',twoThirds:'Üçte iki kapsam',eighty:'%80 kapsam',shortSurahs:'Kısa sûreler tamam'};
+  var KAO_MILESTONE_LABELS={fatiha:'Fâtiha’yı anlıyorum',namaz:'Namazda ne dediğimi anlıyorum',half:'Kelimelerin yarısı tanıdık',twoThirds:'Üçte iki kapsam',eighty:'%75 kapsam',shortSurahs:'Kısa sûreler tamam'};
   function kaoMilestoneLabel(q){
     var keys=['shortSurahs','eighty','twoThirds','half','namaz','fatiha'];
     for(var i=0;i<keys.length;i+=1) if(q.milestones&&q.milestones[keys[i]]) return KAO_MILESTONE_LABELS[keys[i]];
     return 'İlk kilometre taşı: Fâtiha';
   }
   // 03 §10 (O-3): ünite taşları ar>tr yönünde review ∧ s≥7; kapsam taşları kaoCoverage (FIX-07 bilinen tanımı).
+  // 'eighty' anahtarı korunur, eşiği 0,75 (KF-12): içerik token kapsamı tavanı %77,42 olduğundan %80 kazanılamıyordu.
   // Saf: yalnız henüz kazanılmamış ve koşulu sağlanan anahtarları döndürür. shortSurahs kendi yolunda (gecikmeli test).
   function kaoMilestoneCheck(d,nowIso){
     var q=quranLearnRoot(d),cards=objectOr(q.cards,{}),milestones=objectOr(q.milestones,{}),units=kaoUnitSlices(),ratio=kaoCoverage(d).ratio;
     var settledForward=function(list){ return list.length>0&&list.every(function(lemma){ return isSettled(cards['w:'+lemma.id+':ar>tr'],7); }); };
-    var reached={fatiha:settledForward(units[0]||[]),namaz:settledForward([].concat(units[0]||[],units[1]||[],units[2]||[])),half:ratio>=0.5,twoThirds:ratio>=0.68,eighty:ratio>=0.8};
+    var reached={fatiha:settledForward(units[0]||[]),namaz:settledForward([].concat(units[0]||[],units[1]||[],units[2]||[])),half:ratio>=0.5,twoThirds:ratio>=0.68,eighty:ratio>=0.75};
     return ['fatiha','namaz','half','twoThirds','eighty'].filter(function(key){ return reached[key]&&!milestones[key]; });
   }
   // Taş bir kez kazanılır: yalnız boş alana yazılır; kapsam düşse ya da undo yapılsa da geri alınmaz.

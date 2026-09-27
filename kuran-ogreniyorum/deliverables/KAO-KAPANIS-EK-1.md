@@ -37,7 +37,7 @@ koda karşı satır satır denetledi: 1 kritik (K-1: kısa sûre/Fâtiha anlamla
 ## 3. O-8 · Bütçeler (KF-2, ölçüm 2026-09-27)
 - `app/core/quranLearn.js` 1.857 satır (tavan 1.900) · `app/kao.css` 40.209 B (tavan 42 KB).
 - Sözlük 324.328 B (tavan 340 KB, KAO-15 kararı); dört modül ham 472.696 B (tavan 480 KB).
-- Gzip dört modül 162.177 B > 130 KB (R-C5): **karar kullanıcıda** (KAPANIŞ §6.1); fixture büyüme tavanı 160 KiB.
+- Gzip dört modül 162.177 B: R-C5 bütçesi kullanıcı kararıyla **160 KiB** (KF-11, 2026-09-27) — KAPANIŞ §6.1 kapandı.
 - Bölme (quranLearn.js, içerik) sonraki programa bırakıldı. Belgeler: 05 §1, 06 §5.
 
 ## 4. D-1 · Belge tutarsızlıkları
@@ -45,9 +45,9 @@ koda karşı satır satır denetledi: 1 kritik (K-1: kısa sûre/Fâtiha anlamla
 - 05 §5 "FSRS-4.5 vektörü" → ts-fsrs v4.5.2 varsayılan parametreleri (FSRS-5, 19 sayı).
 - 02 §2.4 "12–16 görev" tipik hedef; bağlayıcı sınırlar 05 §6 (KF-4).
 - 05 §2: kısa anahtarlar uygulanmadı; `daily` budanmaz (KF-10), `calibTotals` gerekmedi.
-- Açık kararlar (eski CURRENT-STATE "yok" diyordu): gzip bütçesi (§6.1), cihaz kabulü K3 (§6.2),
-  `eighty` taşı — içerik token kapsamı tavanı %77,42 < %80, taş mevcut içerikle kazanılamaz; eşik/ölçü
-  hizası kararı kullanıcıda (kod değişmedi).
+- Açık kararlar (eski CURRENT-STATE "yok" diyordu) — 2026-09-27 kullanıcı kararlarıyla: gzip bütçesi 160 KiB
+  (KF-11, §6.1 kapandı); `eighty` taşı eşiği %75 (KF-12; token kapsamı tavanı %77,42, %80 kazanılamıyordu;
+  KAO-FIX-20). Açık kalan: cihaz kabulü K3 (§6.2).
 
 ## 5. D-3 · Vakıf işaretleri (KF-5)
 1.563 sözlük örneğinin 377'sinde vakıf/durak işaretleri sadeleştirilmiş; işaretler çıkarılınca 1.563/1.563

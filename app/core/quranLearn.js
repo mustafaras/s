@@ -645,17 +645,18 @@
     var template=concept.templates.find(function(item){ return item.id===match[2]; });
     return template?{concept:concept,template:template}:null;
   }
+  function grammarErrorClass(type){ return type==='Ek çöz'?'affix':type==='Kök bul'?'root':'rule'; }
   function grammarCandidates(){
     var grammar=window.QuranGrammarV1,out=[];
     if(!grammar||!Array.isArray(grammar.concepts)) return out;
     KAO_GRAMMAR_TYPES.forEach(function(type){
       if(type==='Kalıp eşle'){
         var patternConcept=grammar.byId&&grammar.byId('g21'),patternTemplate=patternConcept&&(patternConcept.templates||[]).find(function(item){ return item.type===type; });
-        if(patternTemplate){ out.push({id:'g:'+patternConcept.id+':'+patternTemplate.id,type:'grammar',priority:1}); return; }
+        if(patternTemplate){ out.push({id:'g:'+patternConcept.id+':'+patternTemplate.id,type:'grammar',priority:1,errorClass:grammarErrorClass(type)}); return; }
       }
       for(var i=0;i<grammar.concepts.length;i+=1){
         var concept=grammar.concepts[i],template=(concept.templates||[]).find(function(item){ return item.type===type; });
-        if(template){ out.push({id:'g:'+concept.id+':'+template.id,type:'grammar',priority:1}); break; }
+        if(template){ out.push({id:'g:'+concept.id+':'+template.id,type:'grammar',priority:1,errorClass:grammarErrorClass(type)}); break; }
       }
     });
     return out;
@@ -762,7 +763,7 @@
     if(!record) return null;
     var concept=record.concept,template=record.template,type=template.type,table=(concept.tables||[])[0],rows=table&&Array.isArray(table.rows)?table.rows:[];
     var taskId=String(queueItem&&queueItem.id||'task:'+cardId),seed=String(opts.seed||taskId),index=rows.length?seededRank(seed,template.id)%rows.length:0;
-    var row=rows[index]||{},answer='',stimulus='',stimulusPronunciation='',context=[],alternatives=[],errorClass=type==='Ek çöz'?'affix':type==='Kök bul'?'root':'rule';
+    var row=rows[index]||{},answer='',stimulus='',stimulusPronunciation='',context=[],alternatives=[],errorClass=grammarErrorClass(type);
     if(type==='Ek çöz'){
       var cells=(row.cells||[]).map(function(cell,cellIndex){ return {text:cellText(cell),pronunciation:cellPronunciation(cell),label:String((table.columns||[])[cellIndex+1]||row.label||'parça')}; }).filter(function(item){ return item.text; });
       var picked=cells[cells.length-1]||{text:String(row.label||''),label:String(row.label||'')};
@@ -798,8 +799,15 @@
     }).map(function(lemma){ return {id:'w:'+lemma.id+':tr>ar',type:'arabic',priority:1}; });
     var candidates=fragmentCandidates().concat(grammarCandidates(),reverse,lex.lemmas.map(function(lemma){ return {id:'w:'+lemma.id+':ar>tr',type:'meaning'}; }));
     Object.keys(cards).forEach(function(id){ if(candidates.every(function(item){ return item.id!==id; })) candidates.push({id:id}); });
+    // 02 §5.7: zayıf hata sınıfının adayları öne (öncelik +1): kognat → anlamı kaymış kelime, kök/ek/kural → gramer türü, sıra → dizme.
+    var weak=kaoWeakClass(quranLearnRoot(quranLearnDeps.data())),shift=Object.create(null);
+    if(weak){ lex.lemmas.forEach(function(lemma){ if(lemma.cognate&&lemma.cognate.shift) shift[lemma.id]=1; }); candidates.forEach(function(item){ var cls=/^g:/.test(item.id)?item.errorClass:(item.type==='fragment'?(item.fragmentKind==='order'?'order':''):(shift[lemmaIdForCard(item.id)]?'cognate':'')); if(cls===weak) item.priority=nonNegativeNumber(item.priority,0)+1; }); }
     return candidates;
   }
+  // Hata taksonomisi (02 §5.7): zayıf sınıf ≥3 hata ve en yüksek (eşitlikte KAO_ERROR_ORDER); ana ekranda en çok iki sınıf.
+  var KAO_ERROR_ORDER=['sound','root','affix','cognate','rule','order'],KAO_ERROR_LABELS={sound:'ses',root:'kök',affix:'ek',cognate:'Türkçe benzeri kelimeler',rule:'kural',order:'sıra'};
+  function kaoWeakClass(q){ var errors=objectOr(q&&q.errors,{}),best=null; KAO_ERROR_ORDER.forEach(function(key){ var n=nonNegativeNumber(errors[key],0); if(n>=3&&(!best||n>nonNegativeNumber(errors[best],0))) best=key; }); return best; }
+  function kaoConfusedLine(q){ var errors=objectOr(q&&q.errors,{}),count=function(key){ return Math.floor(nonNegativeNumber(errors[key],0)); },top=KAO_ERROR_ORDER.filter(function(key){ return count(key)>0; }).sort(function(a,b){ return count(b)-count(a)||KAO_ERROR_ORDER.indexOf(a)-KAO_ERROR_ORDER.indexOf(b); }).slice(0,2); return top.length?'En çok karıştırdıkların: '+top.map(function(key){ return KAO_ERROR_LABELS[key]+' ('+count(key)+')'; }).join(' · '):''; }
   function kaoAudioEnabled(){
     if(!quranLearnDeps) return false;
     var q=ensureQuranLearn(quranLearnDeps.data()),quiet=quranLearnSurfaceDeps&&quranLearnSurfaceDeps.isQuietTime;
@@ -1603,6 +1611,7 @@
     h+='<section class="kao-hero"><span class="kao-hero-rosette" aria-hidden="true">✦</span><div class="kao-hero-copy"><p class="kao-eyebrow">Kelime kapsamın</p><div class="kao-coverage"><strong>'+percent+'%</strong><span>Kur’an kelimelerinin %'+percent+' kadarını tanıyorsun</span></div></div><div class="kao-progress" role="progressbar" aria-label="Kur’an kelime kapsamı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent+'"><span style="width:'+percent+'%"></span></div><p class="kao-ayah-count"><span aria-hidden="true">۞</span> Anlaşılan âyet sayısı: <strong>'+understood+'</strong></p></section>';
     h+='<section class="kao-today"><div class="kao-section-head"><div><p class="kao-eyebrow">Bugünkü ders</p><h2>'+stats.due+' tekrar · '+stats.fresh+' yeni</h2></div><span class="kao-time-chip">~'+stats.minutes+' dk</span></div>';
     if(night) h+='<p class="kao-night">'+icon('moon',15)+' Gece tekrarı açık · '+night.durationMinutes+' dk, en fazla '+night.maxCards+' tekrar</p>';
+    var confused=kaoConfusedLine(q); if(confused) h+='<p class="kao-milestone">'+icon('triangle-alert',15)+' '+esc(confused)+'</p>';
     h+='<button type="button" class="kao-primary" onclick="App.kaoStart()">'+(night?'Gece tekrarına başla · en çok '+night.maxCards+' kart':'Bugünkü oturuma başla')+' '+icon('arrow-right',16)+'</button></section>';
     h+='<section class="kao-today-ayah"><p class="kao-eyebrow">Bugün anlayabildiğin âyet</p><h2>'+(todayAyah?esc(kaoSurahName(todayAyah.surahId))+' · '+todayAyah.ayah+'. âyet':'Kelimelerin arttıkça açılacak')+'</h2><p>'+(todayAyah?'Kelimelerinin %'+Math.floor(todayAyah.coverage.ratio*100)+'’ini tanıyorsun.':'Kelimelerinin en az %95’ini tanıdığın ilk âyet burada belirecek.')+'</p><button type="button" class="kao-link-button" onclick="App.kaoOpenAyah()">'+(todayAyah?'Âyeti aç':'Ne kadar kaldığını gör')+'</button></section>';
     h+='<section class="kao-summary"><span class="kao-summary-mark" aria-hidden="true">'+icon('compass',18)+'</span><div><p class="kao-eyebrow">Sıradaki ünite</p><h2>'+esc(kaoUnitLabel(q))+'</h2><p class="kao-milestone">'+icon('target',15)+' '+esc(kaoMilestoneLabel(q))+'</p><button type="button" class="kao-link-button" onclick="App.kaoSetView(\'units\')">Tüm üniteleri gör</button><button type="button" class="kao-link-button" onclick="App.kaoOpenSurah(114)">20 kısa sûreyi oku</button><button type="button" class="kao-link-button" onclick="App.kaoGate(\'start\')">Seviye 0 giriş kontrolü</button><button type="button" class="kao-link-button" onclick="App.kaoOpenPrayer()">Namazda ne diyorum</button><button type="button" class="kao-link-button" onclick="App.kaoOpenMap()">Mushaf ısı haritası</button><button type="button" class="kao-link-button" onclick="App.kaoOpenPhonics()">Telaffuz stüdyosu</button><button type="button" class="kao-link-button" onclick="App.kaoSetView(\'stats\')">İstatistik</button><button type="button" class="kao-link-button" onclick="App.kaoSetView(\'settings\')">Ayarlar ve dışa aktarma</button></div></section></main>';
@@ -1785,6 +1794,8 @@
     kaoAnswer:kaoAnswer,
     kaoUndo:kaoUndo,
     kaoMilestoneCheck:kaoMilestoneCheck,
+    kaoCandidates:kaoCandidates,
+    kaoWeakClass:kaoWeakClass,
     kaoPlay:kaoPlay,
     kaoNightWindow:kaoNightWindow,
     kaoColorHarakat:kaoColorHarakat,

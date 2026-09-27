@@ -652,4 +652,44 @@ function sandboxLemma(api, lemmaId) {
   data.settings.targetBed = undefined; bed = null;
 }
 
+// KAO-FIX-22 (02 §5.7, KF-6): hata taksonomisi → zayıf sınıf (≥3 hata, en yüksek) kuyrukta öne alınır; ana ekranda
+// "en çok karıştırdıkların" tek satırı. 80 lemma × 2 yön vadesi gelmiş / 60 sınır: kognat zayıfsa anlamı kaymış 20 lemmanın
+// 40 kartının hepsi girer (iki yön: KF-9 aynı tür ≤2 kuralı tek yönlü kuyruğu 2 görevde durdurur).
+{
+  const lexBox = { window: {} };
+  vm.createContext(lexBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), lexBox);
+  const lemmas = lexBox.window.QuranLexiconV1.lemmas;
+  const shifted = lemmas.filter((lemma) => lemma.cognate && lemma.cognate.shift).slice(0, 20);
+  const plain = lemmas.filter((lemma) => !(lemma.cognate && lemma.cognate.shift)).slice(0, 60);
+  const data = { quranLearn: null, settings: {} };
+  const ui = {};
+  const api = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return '2026-10-05'; }, esc(value) { return String(value); }, icon(name) { return `<i>${name}</i>`; } });
+  const setup = (errors) => {
+    data.quranLearn = null; api.ensureQuranLearn(data); data.quranLearn.settings.dailyNew = 0;
+    for (const lemma of shifted.concat(plain)) for (const dir of ['ar>tr', 'tr>ar']) data.quranLearn.cards[`w:${lemma.id}:${dir}`] = { state: 'review', s: 10, reps: 3, due: '2026-09-01T00:00:00.000Z', introducedAt: '2026-08-01T00:00:00.000Z' };
+    Object.assign(data.quranLearn.errors, errors);
+  };
+  const shiftedInQueue = () => {
+    const queue = api.kaoBuildQueue(data, '2026-10-05T10:00:00.000Z', { sessionId: '2026-10-05', candidates: api.kaoCandidates() });
+    assert.equal(queue.length, 60, 'fixture: 60 vadesi gelmiş kart sınırı dolu');
+    return queue.filter((item) => shifted.some((lemma) => item.cardId.startsWith(`w:${lemma.id}:`))).length;
+  };
+  setup({ cognate: 5, root: 1 });
+  assert.equal(api.kaoWeakClass(data.quranLearn), 'cognate', 'zayıf sınıf: en yüksek, ≥3');
+  assert.equal(shiftedInQueue(), 40, 'kognat zayıfken anlamı kaymış 20 lemmanın 40 kartının hepsi 60 sınırına girer');
+  setup({ cognate: 2 });
+  assert.equal(api.kaoWeakClass(data.quranLearn), null, '3 hatanın altında zayıf sınıf yok');
+  assert.ok(shiftedInQueue() < 40, 'ağırlık yokken rastgele sıra: bazıları dışarıda kalır');
+  setup({ root: 4, affix: 4, cognate: 3 });
+  assert.equal(api.kaoWeakClass(data.quranLearn), 'root', 'eşitlikte sabit sıra (ses, kök, ek, kognat, kural, sıra): ilk en yüksek');
+  // Ana ekran satırı: en çok iki sınıf, sayılarıyla; hata yoksa satır yok.
+  setup({ cognate: 5, root: 3, order: 1 });
+  let home = api.kaoHomeHTML('2026-10-05T10:00:00.000Z');
+  assert.match(home, /En çok karıştırdıkların: Türkçe benzeri kelimeler \(5\) · kök \(3\)/);
+  setup({});
+  home = api.kaoHomeHTML('2026-10-05T10:00:00.000Z');
+  assert.doesNotMatch(home, /En çok karıştırdıkların/);
+}
+
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

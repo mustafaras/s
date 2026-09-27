@@ -167,7 +167,7 @@ Anında düzeltici geri bildirim + kısa gerekçe. Hatalar sınıflanır:
 karışıklığı** (ـهُ/ـهُمْ), **kognat tuzağı** (anlam kayması), **kural**
 (elif-lâm/vakıf). Taksonomi telemetriye gider → zayıf alan otomatik daha sık
 gelir; kullanıcıya "en çok karıştırdıkların" tek satırı.
-> **Durum (KAO-FIX-18, 2026-09-27):** Kısmen — hata sayaçları (`errors.sound/root/affix/cognate/rule/order`) tutuluyor; kuyruk ağırlığı ve "en çok karıştırdıkların" satırı uygulanmadı — sonraki program (KF-6). Gerekçe: ağırlıklandırma FSRS kuyruğunun bütçe/serpiştirme kurallarını değiştirir, ayrı karar ve simülasyon ister.
+> **Durum (KAO-FIX-22, 2026-09-27):** Uygulandı — sayaçlar (`errors.*`) + zayıf sınıf (≥3 hata, en yüksek) adayları kuyrukta öne alınır (kognat → anlamı kaymış kelime, kök/ek/kural → gramer türü, sıra → dizme); ana ekranda "En çok karıştırdıkların" satırı. `sound` telaffuz modülünde kalır (`phonics.misheard`).
 
 ### 5.8 Motivasyon: öz-belirleme ve niyet
 Özerklik (ünite sırası öneri, kilit yok; günlük bütçe seçimi), yeterlik

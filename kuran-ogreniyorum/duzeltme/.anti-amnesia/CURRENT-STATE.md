@@ -1,7 +1,7 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
 **Durum:** `active` · **Sıradaki:** **KAO-FIX-13** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`b6754ff` (FIX-11 eki, Pages success; canlı pin `20260926i`; 8 dosya canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`7a1ee1e` (FIX-12, Pages run 36313939776 success; canlı pin `20260926j`; index.html, sw.js, quranLearn.js, kao.css canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
 **Güncelleme:** 2026-09-27 · KAO-FIX-12 done (E7 kaynaklar, pin `20260926j`)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
@@ -26,7 +26,7 @@
 | KAO-FIX-09 | O-2 | done | `5413819` | KF-10: budama yok, 100 KB sınırı kaldırıldı; koruma testi |
 | KAO-FIX-10 | O-3 | done | `5ccf5db` | kaoMilestoneCheck + isSettled; sim 4 taş dolu; eighty tavan %77,42 (FIX-16) |
 | KAO-FIX-11 | O-5 | done | `6f2726b` + ek `b6754ff` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
-| KAO-FIX-12 | O-6 | done | (yayın satırına bak) | E7 `kao-sources`: ses manifestten, metin modül ATTRIBUTION’dan, ts-fsrs MIT başlıktan; düz `<a>`; App 756/onclick 393 aynı |
+| KAO-FIX-12 | O-6 | done | `7a1ee1e` | E7 `kao-sources`: ses manifestten, metin modül ATTRIBUTION’dan, ts-fsrs MIT başlıktan; düz `<a>`; App 756/onclick 393 aynı |
 | KAO-FIX-13 | O-9 | todo | | Arapça yazı tipi |
 | KAO-FIX-14 | O-7 | todo | | semNeighbors sözlükten |
 | KAO-FIX-15 | D-2, D-5 | todo | | serpiştirme/soldurma/kognat |

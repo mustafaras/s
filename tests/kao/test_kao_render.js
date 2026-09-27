@@ -542,4 +542,24 @@ assert.ok(prevented >= 3 && stopped >= 3);
   for (const token of css.match(/var\(--[a-z0-9-]+/g) || []) assert.match(token, /var\(--(quran|f-)/, `izinsiz token: ${token}`);
 }
 
-console.log('KAO render: PASS (KAO-FIX-12 E7 kaynaklar, KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');
+// KAO-FIX-13 · Arapça yazı tipi yığını (O-9): KAO Arapçası planın yığınıyla, yalnız KAO kapsamında.
+{
+  const STACK = '"Noto Naskh Arabic","Amiri","Scheherazade New","Times New Roman",serif';
+  const rules = [...cssSource.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => ({ selectors: m[1].split(',').map((s) => s.trim()), body: m[2] }));
+  const prop = (body, name) => { const m = body.match(new RegExp(`(?:^|;)\\s*${name}\\s*:\\s*([^;]+)`)); return m ? m[1].trim() : null; };
+  const stackRule = rules.find((r) => r.selectors.includes('.kao-arabic-text') && r.selectors.includes('.kao-dialog [lang="ar"]'));
+  assert.ok(stackRule, 'tek kural: .kao-arabic-text,.kao-dialog [lang="ar"]');
+  assert.equal(prop(stackRule.body, 'font-family'), STACK);
+  assert.equal(prop(stackRule.body, 'letter-spacing'), 'normal', 'Arapça harf bitişimi: letter-spacing normal');
+  const arabic = rules.filter((r) => r.selectors.some((s) => s.includes('kao-arabic-text') || s.includes('[lang="ar"]')));
+  for (const r of arabic) {
+    const family = prop(r.body, 'font-family');
+    if (family !== null) assert.ok(family.startsWith('"Noto Naskh Arabic"'), `Arapça seçicide yığın dışı font: ${r.selectors.join(',')} → ${family}`);
+    const spacing = prop(r.body, 'letter-spacing');
+    if (spacing !== null) assert.equal(spacing, 'normal', `Arapça seçicide letter-spacing: ${r.selectors.join(',')}`);
+  }
+  for (const r of rules) for (const sel of r.selectors) assert.ok(!sel.replace(/^@[^{]*$/, '').startsWith('[lang="ar"]'), `çıplak [lang="ar"]: kao.css diğer yüzeylerin Arapçasını ezmez (${sel})`);
+  assert.doesNotMatch(cssSource, /kao-arabic-text\{font-family:serif/);
+}
+
+console.log('KAO render: PASS (KAO-FIX-13 Arapça yığın, KAO-FIX-12 E7 kaynaklar, KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');

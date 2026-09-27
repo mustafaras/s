@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-13** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-14** · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`7a1ee1e` (FIX-12, Pages run 36313939776 success; canlı pin `20260926j`; index.html, sw.js, quranLearn.js, kao.css canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-12 done (E7 kaynaklar, pin `20260926j`)
+**Güncelleme:** 2026-09-27 · KAO-FIX-13 done (Arapça yığın, pin `20260926k`)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -27,7 +27,7 @@
 | KAO-FIX-10 | O-3 | done | `5ccf5db` | kaoMilestoneCheck + isSettled; sim 4 taş dolu; eighty tavan %77,42 (FIX-16) |
 | KAO-FIX-11 | O-5 | done | `6f2726b` + ek `b6754ff` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
 | KAO-FIX-12 | O-6 | done | `7a1ee1e` | E7 `kao-sources`: ses manifestten, metin modül ATTRIBUTION’dan, ts-fsrs MIT başlıktan; düz `<a>`; App 756/onclick 393 aynı |
-| KAO-FIX-13 | O-9 | todo | | Arapça yazı tipi |
+| KAO-FIX-13 | O-9 | done | (yayın satırına bak) | `.kao-arabic-text,.kao-dialog [lang="ar"]` yığın + `letter-spacing:normal`; çıplak `[lang="ar"]` yok (tuzak 20); cihaz bekliyor |
 | KAO-FIX-14 | O-7 | todo | | semNeighbors sözlükten |
 | KAO-FIX-15 | D-2, D-5 | todo | | serpiştirme/soldurma/kognat |
 | KAO-FIX-16 | O-8, D-1, D-3 | todo | | plan/belge hizası + KAPANIŞ ek-1 |
@@ -60,7 +60,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260926j`** (FIX-12) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260926k`** (FIX-13) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 
@@ -85,10 +85,11 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 17. **İşlev kelimesi görevinde çeldirici yok (FIX-11 bulgusu):** kökü olmayan ~49 lemma × 2 yön tek şıklı (sözlük yedeği `root!==root` undefined'ı eler). Kullanıcı onayıyla düzeltildi (FIX-11 eki: katmanlı yedek + anlam çakışma süzgeci). `rsync --delete` hedefini daima doğrula (FIX-11 olayı).
 18. **Süreç dersleri:** amend kancaya takılır → ayrı küçük commit at; durum betiğini commit'ten ayrı koş ve çıktısını gör; VM dizisini `Array.from` ile karşılaştır; `kaoStart` gerçek saati kullanır (test vadeleri geçmişte olmalı). Yayın düzeni: ff `main` → Pages izle → canlı `cmp`.
 19. **E7 kaynaklar (FIX-12):** içerik atfı modül `ATTRIBUTION.sources`’tan okunur (kaynakta URL yazılmaz, test yasaklar); ses satırları `KAO_AUDIO_SOURCES` = `audio-manifest.json` (test eşler).
+20. **`kao.css` global yüklenir (FIX-13):** çıplak `[lang="ar"]`/genel seçici yazma — `styles.css`’ten sonra geldiği için eşit özgüllükte diğer yüzeyleri (`.iip17-arabic` vb.) ezer; KAO seçicileri `.kao-dialog` ya da `kao-` sınıfıyla kapsanır (test korur).
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 
-- R-C9b (≤90 sn oturuma başlama, gerçek dokunma), DOC04-§4f (%200 metin, 320 px), O-9 sonrası Arapça yazı tipi (FIX-13), VoiceOver.
+- R-C9b (≤90 sn oturuma başlama, gerçek dokunma), DOC04-§4f (%200 metin, 320 px), O-9 Arapça yazı tipi (FIX-13 kodda, **cihazda bekliyor**: iOS’ta yığındaki fontlar yüklü değil, sistem yedeği), VoiceOver.
 
 ## Sonraki program adayları (FIX-18 doldurur)
 

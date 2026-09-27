@@ -1,7 +1,7 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
 **Durum:** `active` · **Sıradaki:** **KAO-FIX-14** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`7a1ee1e` (FIX-12, Pages run 36313939776 success; canlı pin `20260926j`; index.html, sw.js, quranLearn.js, kao.css canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`a7b6ffe` (FIX-13, Pages run 36314432780 success; canlı pin `20260926k`; index.html, sw.js, kao.css, quranLearn.js canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
 **Güncelleme:** 2026-09-27 · KAO-FIX-13 done (Arapça yığın, pin `20260926k`)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
@@ -27,7 +27,7 @@
 | KAO-FIX-10 | O-3 | done | `5ccf5db` | kaoMilestoneCheck + isSettled; sim 4 taş dolu; eighty tavan %77,42 (FIX-16) |
 | KAO-FIX-11 | O-5 | done | `6f2726b` + ek `b6754ff` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
 | KAO-FIX-12 | O-6 | done | `7a1ee1e` | E7 `kao-sources`: ses manifestten, metin modül ATTRIBUTION’dan, ts-fsrs MIT başlıktan; düz `<a>`; App 756/onclick 393 aynı |
-| KAO-FIX-13 | O-9 | done | (yayın satırına bak) | `.kao-arabic-text,.kao-dialog [lang="ar"]` yığın + `letter-spacing:normal`; çıplak `[lang="ar"]` yok (tuzak 20); cihaz bekliyor |
+| KAO-FIX-13 | O-9 | done | `a7b6ffe` | `.kao-arabic-text,.kao-dialog [lang="ar"]` yığın + `letter-spacing:normal`; çıplak `[lang="ar"]` yok (tuzak 20); cihaz bekliyor |
 | KAO-FIX-14 | O-7 | todo | | semNeighbors sözlükten |
 | KAO-FIX-15 | D-2, D-5 | todo | | serpiştirme/soldurma/kognat |
 | KAO-FIX-16 | O-8, D-1, D-3 | todo | | plan/belge hizası + KAPANIŞ ek-1 |

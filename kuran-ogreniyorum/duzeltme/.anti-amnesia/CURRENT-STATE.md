@@ -1,7 +1,7 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
 **Durum:** `active` · **Sıradaki:** **KAO-FIX-17** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`cbeef96` (FIX-15, Pages run 36317350133 success; canlı pin `20260926m`; index.html, sw.js, quranLearn.js canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`1664f57` (FIX-16 yalnız belge, Pages run 36317887581 success; canlı pin `20260926m`, index.html canlı=repo; `.md` Pages'te yayımlanmaz (404, `_site`); uygulama kodu son `cbeef96`); kullanıcı her karttan sonra canlıya almayı istiyor
 **Güncelleme:** 2026-09-27 · KAO-FIX-16 done (plan/belge hizası + KAPANIŞ ek-1; yalnız belge, pin `20260926m` aynı)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
@@ -30,7 +30,7 @@
 | KAO-FIX-13 | O-9 | done | `a7b6ffe` | `.kao-arabic-text,.kao-dialog [lang="ar"]` yığın + `letter-spacing:normal`; çıplak `[lang="ar"]` yok (tuzak 20); cihaz bekliyor |
 | KAO-FIX-14 | O-7 | done | `5330698` | D-12: 79 incelendi, 70 kümede, 9 alan dışı dışlandı; `SEM_NEIGHBOR_REVIEW` + `--sem-verify`; modül `SEM_GROUPS`; `KAO_SEMANTIC_CLUSTERS` 0; sim kod=plan 506 |
 | KAO-FIX-15 | D-2, D-5 | done | `cbeef96` | KF-9 gramer dahil ≤2 (tıkanınca oturum kısalır); KF-3 kod 4; `durable30`=isSettled(s≥30) soldurma; `errorClass:'cognate'`; sim maxRun 4→2, kod=plan 510 |
-| KAO-FIX-16 | O-8, D-1, D-3 | done | (commit sonrası) | 05 §1/§2/§5/§6, 06 §5, 02 §2.4, README; `deliverables/KAO-KAPANIS-EK-1.md`; bağlantı 44/0 kırık; `eighty` açık karar olarak EK-1'de |
+| KAO-FIX-16 | O-8, D-1, D-3 | done | `1664f57` | 05 §1/§2/§5/§6, 06 §5, 02 §2.4, README; `deliverables/KAO-KAPANIS-EK-1.md`; bağlantı 44/0 kırık; `eighty` açık karar olarak EK-1'de |
 | KAO-FIX-17 | O-11 | todo | | plan-check sertleştirme |
 | KAO-FIX-18 | D-4 | todo | | sahipsiz maddeler kararı |
 | KAO-FIX-19 | hepsi | todo | | kapanış regresyonu |

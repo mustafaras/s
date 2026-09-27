@@ -1,7 +1,7 @@
 # KAO-FIX-19 · Kanıt (kapanış regresyonu ve yeniden denetim)
 
 **Tarih:** 2026-09-27 · **Dal:** `kao-duzeltme` · **Taban:** HEAD `3cc9ffb` (FIX-26) · **Kanıt düzeyi:** kaynak/test (yayın ve cihaz kabulü ayrı)
-**Kod değişmedi.** İzinli yazımlar: bu kanıt, `deliverables/KAO-UYGUNLUK-DENETIMI-20260926.md` (§8 eki), `duzeltme/.anti-amnesia/*`. Taban kasıtlı `3cc9ffb` (FIX-19 "FIX-20…26'dan sonra" koşar).
+**Kod değişmedi.** Değişen: bu kanıt, denetim raporu §8 eki, `duzeltme/.anti-amnesia/{LEDGER,CURRENT-STATE}.md`. Taban kasıtlı `3cc9ffb` (FIX-19 "FIX-20…26'dan sonra" koşar). Pin `20260927g` sabit.
 
 ## Kırmızı → yeşil
 Kod değişmediği için kırmızı test yok. Denetim "önce" tabanı: TAM 86 · TESTSİZ 4 · KISMİ 31 · EKSİK 10 · ÇELİŞKİLİ 2 · KULLANICI-KARARI 9 · ATLANDI 3 (145).
@@ -22,17 +22,8 @@ Kod değişmediği için kırmızı test yok. Denetim "önce" tabanı: TAM 86 ·
 ## Taşlar (sim) ve bütçe
 `fatiha · namaz · half · twoThirds · eighty` kazanıldı; `shortSurahs` null **beklenen** (koşul ≥20 onaylı kısa sûre, gecikmeli yol `quranLearn.js:937`; sim tetiklemez) — O-3 kapandı.
 KF-2: quranLearn 1.899/1.900 satır · kao.css 40.209/43.008 B · sözlük 324.328/348.160 B · içerik ham 472.696/491.520 B · gzip 162.177/163.840 B — hepsi tavan içinde (satır payı 1).
-
 ## Matris geçişi (145 satır)
-| Durum | Önce | Sonra |
-|---|---|---|
-| TAM | 86 | **121** |
-| KISMİ | 31 | 9 |
-| EKSİK | 10 | **0** |
-| ÇELİŞKİLİ | 2 | **0** |
-| TESTSİZ | 4 | 1 |
-| KULLANICI-KARARI | 9 | 11 |
-| ATLANDI-GEREKÇELİ | 3 | 3 |
+TAM 86→**121** · KISMİ 31→9 · EKSİK 10→**0** · ÇELİŞKİLİ 2→**0** · TESTSİZ 4→1 · KULLANICI-KARARI 9→11 · ATLANDI-GEREKÇELİ 3→3.
 
 K-1, Y-1…Y-4 kapandı. ORTA bulguların tamamı kapandı ya da gerekçeli/kullanıcı kararı (O-2/KF-10, O-8/FIX-16, O-9 cihaz bekliyor).
 
@@ -41,6 +32,3 @@ K-1, Y-1…Y-4 kapandı. ORTA bulguların tamamı kapandı ya da gerekçeli/kull
 - **TESTSİZ 1:** `DOC06-ilke` — Tanzil karşılaştırma fixture'ı yok (girdiler repoda değil).
 - **KISMİ 9:** DOC03-§9, DOC04-§4b (cihaz), DOC05-§2b, DOC06-§2b (D-3), C-02 (6 homograf), C-05 (belgeli), S7 (geçmiş), D-02, DOCS (KAPANIŞ §8 V8).
 - **Cihaz kabulü (yalnız kullanıcı):** O-9 Arapça yazı tipi, R-C9b (≤90 sn), DOC04-§4f (%200/320 px), VoiceOver.
-
-## Değişen dosyalar
-`deliverables/KAO-UYGUNLUK-DENETIMI-20260926.md` (yalnız §8 eki), `duzeltme/kanit/KAO-FIX-19.md`, `duzeltme/.anti-amnesia/{LEDGER,CURRENT-STATE}.md`. Pin `20260927g` sabit (kod değişmedi).

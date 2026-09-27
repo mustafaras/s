@@ -723,4 +723,61 @@ function sandboxLemma(api, lemmaId) {
   assert.doesNotMatch(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8'), /Notification|showNotification|SeyReminder/, 'bildirim üretilmez');
 }
 
+// KAO-FIX-24 (02 §5.10, KF-6): haftalık aktarım testi — son testten ≥7 gün sonra, hiç görülmemiş (anlaşıldı işaretli,
+// önceki test ya da parça kartıyla eğitilmiş değil) ≥%95 kapsamlı âyette kelime kelime çeviri seçimi; sonuç q.transfer.
+{
+  const box = { window: {} };
+  vm.createContext(box);
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box);
+  const lemmas = box.window.QuranLexiconV1.lemmas;
+  const words = box.window.QuranShortSurahsV1.words;
+  const pad = (n) => String(n).padStart(2, '0');
+  const now = new Date();
+  const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const data = { quranLearn: null, settings: {} };
+  const ui = {};
+  const api = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return today; }, esc(value) { return String(value); }, icon(name) { return `<i>${name}</i>`; } });
+  const fresh = api.ensureQuranLearn({});
+  assert.equal(fresh.transfer, undefined, 'taze durum şekli değişmez (alan ilk testte doğar)');
+  api.ensureQuranLearn(data);
+  data.quranLearn.settings.dailyNew = 0;
+  for (const lemma of lemmas) for (const dir of ['ar>tr', 'tr>ar']) data.quranLearn.cards[`w:${lemma.id}:${dir}`] = { state: 'review', s: 40, reps: 8, due: '2099-01-01T00:00:00.000Z', introducedAt: '2026-01-01T00:00:00.000Z' };
+  const first = api.kaoTransferCandidate(data, now);
+  assert.ok(first && /^\d+:\d+$/.test(first.key), 'görülmemiş ≥%95 âyet bulunur');
+  assert.ok(first.coverage.ratio >= 0.95);
+  const [sid, ay] = first.key.split(':').map(Number);
+  data.quranLearn.cards[`s:${sid}:${ay}:1`] = { state: 'review', s: 5, reps: 1, due: '2099-01-01T00:00:00.000Z' };
+  assert.notEqual(api.kaoTransferCandidate(data, now).key, first.key, 'parça kartıyla eğitilmiş âyet dışlanır');
+  delete data.quranLearn.cards[`s:${sid}:${ay}:1`];
+  data.quranLearn.ayahs.understood = [first.key];
+  assert.notEqual(api.kaoTransferCandidate(data, now).key, first.key, 'anlaşıldı işaretli âyet dışlanır');
+  data.quranLearn.ayahs.understood = [];
+  api.kaoStart();
+  const last = ui.kaoQueue[ui.kaoQueue.length - 1];
+  assert.equal(last.type, 'transfer', 'oturumun sonunda haftalık test');
+  const task = ui.kaoTasks[last.id];
+  const ayahWords = words.filter((word) => `${word.surahId}:${word.ayah}` === task.key).sort((a, b) => a.i - b.i);
+  assert.equal(task.answer, ayahWords.map((word) => word.tr).join(' '), 'doğru cevap: kelime kelime Türkçe (doğrulanmış katman)');
+  assert.equal(task.ar, ayahWords.map((word) => word.ar).join(' '), 'Arapça kısa sûre modülünden');
+  assert.equal(task.choices.length, 4); assert.equal(task.choices.filter((choice) => choice.correct).length, 1);
+  assert.equal(new Set(task.choices.map((choice) => choice.label)).size, 4, 'seçenekler tekil');
+  const html = api.kaoTaskHTML(task);
+  assert.match(html, /Yeni âyet/); assert.match(html, /class="kao-arabic-text" lang="ar"/);
+  ui.kaoTaskIndex = ui.kaoQueue.length - 1; ui.kaoUndo = null;
+  api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId);
+  const t = JSON.parse(JSON.stringify(data.quranLearn.transfer));
+  assert.equal(t.n, 1); assert.equal(t.ok, 1); assert.deepEqual(t.seen, [task.key]); assert.match(t.lastAt, /^\d{4}-\d{2}-\d{2}T/);
+  assert.ok(!Object.keys(data.quranLearn.cards).some((id) => /^t:/.test(id)), 'FSRS kartı yazılmaz');
+  assert.equal(api.kaoTransferCandidate(data, now), null, '7 gün dolmadan yeni test yok');
+  api.kaoStart();
+  assert.ok(!ui.kaoQueue.some((item) => item.type === 'transfer'), 'aynı hafta ikinci test yok');
+  data.quranLearn.transfer.lastAt = new Date(now.getTime() - 8 * 86400000).toISOString();
+  const next = api.kaoTransferCandidate(data, now);
+  assert.ok(next && next.key !== task.key, '8 gün sonra yeni ve görülmemiş âyet');
+  assert.match(api.kaoStatsHTML(now.toISOString()), /Yeni âyet testi[\s\S]*1 \/ 1 doğru/);
+  // ensureQuranLearn: bozuk alan normalleşir, veri silinmez.
+  const junk = { quranLearn: { transfer: { n: 'x', ok: -2, seen: 'y', lastAt: 5 } } };
+  assert.deepEqual(JSON.parse(JSON.stringify(api.ensureQuranLearn(junk).transfer)), { lastAt: null, n: 0, ok: 0, seen: [] });
+}
+
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

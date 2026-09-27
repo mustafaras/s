@@ -96,5 +96,8 @@ console.log(JSON.stringify({
   directions: st.directions, lemmasSeen: Object.keys(lemmaDirs).length, lemmasBothDirections: Object.values(lemmaDirs).filter((s) => s.size === 2).length,
   knownByPlanDefinition: knownPlan, knownByCode: Object.keys(api.kaoKnownLemmaSet(data)).length, codeCoveragePct: +(cov.ratio * 100).toFixed(2),
   overdueReviewAtEnd: { max: Math.max(...st.overdue), last: st.overdue[st.overdue.length - 1] },
-  size: st.size, saves, errorCount: st.errors.length, errors: st.errors.slice(0, 5), milestones: data.quranLearn.milestones
+  size: st.size, saves, errorCount: st.errors.length, errors: st.errors.slice(0, 5), milestones: data.quranLearn.milestones,
+  // KAO-FIX-21/22/24: bağ kur, hata sayaçları ve haftalık aktarım testi özetleri.
+  link: Object.values(data.quranLearn.daily).reduce((acc, row) => ({ n: acc.n + ((row.link && row.link.n) || 0), ok: acc.ok + ((row.link && row.link.ok) || 0) }), { n: 0, ok: 0 }),
+  errorsByClass: data.quranLearn.errors, transfer: data.quranLearn.transfer ? { n: data.quranLearn.transfer.n, ok: data.quranLearn.transfer.ok } : null
 }, null, 1));

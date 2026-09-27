@@ -187,4 +187,4 @@ başına en çok 3 yeni ses.
 Haftalık "yeni âyet" testi: hiç görülmemiş, kelime kapsamı ≥%95 bir parça
 → çeviri seçimi. Eğitilen kartlarda değil, **yeni metinde** başarı ölçülür
 (HVPT literatüründeki "untrained stimuli" mantığı).
-> **Durum (KAO-FIX-18, 2026-09-27):** Uygulanmadı — sonraki program (KF-6). Gerekçe: E9 "anlayabildiğin âyet" görülmemiş ≥%95 kapsamlı parçayı gösterir ve kullanıcı işaretler, ama haftalık çeviri-seçimi testi ve yeni metinde başarı ölçümü yok.
+> **Durum (KAO-FIX-24, 2026-09-27):** Uygulandı — son testten ≥7 gün sonra oturum sonunda "Yeni âyet" testi: hiç görülmemiş (anlaşıldı işaretli, önceden test edilmiş ya da parça kartıyla eğitilmiş olmayan) ≥%95 kapsamlı âyette kelime kelime çeviri seçimi; sonuç `quranLearn.transfer` ve İstatistik ekranında.

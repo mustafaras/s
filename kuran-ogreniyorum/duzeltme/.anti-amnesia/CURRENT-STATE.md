@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-15** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-16** · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`5330698` (FIX-14, Pages run 36316117421 success; canlı pin `20260926l`; index.html, sw.js, quranLearn.js, quranLexiconV1.js, kao.css canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-14 done (R-A5 sözlükten, pin `20260926l`)
+**Güncelleme:** 2026-09-27 · KAO-FIX-15 done (KF-9 serpiştirme, soldurma s≥30, kognat hata sınıfı; pin `20260926m`)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -29,7 +29,7 @@
 | KAO-FIX-12 | O-6 | done | `7a1ee1e` | E7 `kao-sources`: ses manifestten, metin modül ATTRIBUTION’dan, ts-fsrs MIT başlıktan; düz `<a>`; App 756/onclick 393 aynı |
 | KAO-FIX-13 | O-9 | done | `a7b6ffe` | `.kao-arabic-text,.kao-dialog [lang="ar"]` yığın + `letter-spacing:normal`; çıplak `[lang="ar"]` yok (tuzak 20); cihaz bekliyor |
 | KAO-FIX-14 | O-7 | done | `5330698` | D-12: 79 incelendi, 70 kümede, 9 alan dışı dışlandı; `SEM_NEIGHBOR_REVIEW` + `--sem-verify`; modül `SEM_GROUPS`; `KAO_SEMANTIC_CLUSTERS` 0; sim kod=plan 506 |
-| KAO-FIX-15 | D-2, D-5 | todo | | serpiştirme/soldurma/kognat |
+| KAO-FIX-15 | D-2, D-5 | done | (commit sonrası) | KF-9 gramer dahil ≤2 (tıkanınca oturum kısalır); KF-3 kod 4; `durable30`=isSettled(s≥30) soldurma; `errorClass:'cognate'`; sim maxRun 4→2, kod=plan 510 |
 | KAO-FIX-16 | O-8, D-1, D-3 | todo | | plan/belge hizası + KAPANIŞ ek-1 |
 | KAO-FIX-17 | O-11 | todo | | plan-check sertleştirme |
 | KAO-FIX-18 | D-4 | todo | | sahipsiz maddeler kararı |
@@ -60,7 +60,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260926l`** (FIX-14) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260926m`** (FIX-15) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 
@@ -87,6 +87,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 19. **E7 kaynaklar (FIX-12):** içerik atfı modül `ATTRIBUTION.sources`’tan okunur (kaynakta URL yazılmaz, test yasaklar); ses satırları `KAO_AUDIO_SOURCES` = `audio-manifest.json` (test eşler).
 20. **`kao.css` global yüklenir (FIX-13):** çıplak `[lang="ar"]`/genel seçici yazma — `styles.css`’ten sonra geldiği için eşit özgüllükte diğer yüzeyleri (`.iip17-arabic` vb.) ezer; KAO seçicileri `.kao-dialog` ya da `kao-` sınıfıyla kapsanır (test korur).
 21. **R-A5 komşuları (FIX-14):** karar `tools/kao-lexicon-build.mjs` `SEM_NEIGHBOR_REVIEW`’da; `--import-md` ve `--sem-verify` uygular, incelenmemiş kök önerisi `--freeze`’i durdurur. İçerik gzip 162.177 / tavan 163.840 (`test_kao_user_tasks.js`): pay ~1,6 KB — içerik büyüten kart önce ölçsün.
+22. **Kuyruk KF-9 (FIX-15):** ardışık aynı tür ≤2 gramer dahil; salt gramer kalınca kuyruk durur (oturum kısalır, kabul). Soldurma `task.durable30` (isSettled s≥30) ister — fixture kartı açıkça review s≥30 kurmalı; `isNew:false` yetmez.
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

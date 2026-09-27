@@ -57,7 +57,38 @@ for (const dailyNew of [5, 10, 15]) {
   assert.equal(queue.filter((item) => item.isNew).length, dailyNew, `dailyNew=${dailyNew}: yeni kart sayısı tam olarak ${dailyNew}`);
 }
 for (let i = 2; i < first.length; i += 1) {
-  assert.ok(first[i].type === 'grammar' || !(first[i].type === first[i - 1].type && first[i].type === first[i - 2].type), 'gramer dışı aynı tür ardışık en çok 2');
+  assert.ok(!(first[i].type === first[i - 1].type && first[i].type === first[i - 2].type), 'aynı tür ardışık en çok 2 (KF-9: gramer dahil)');
+}
+
+// KAO-FIX-15 (D-2, KF-9): ardışık aynı tür ≤2 kuralı gramere de uygulanır. 1.000 rastgele oturumda (gramer
+// ağırlıklı karışımlar dahil) en uzun aynı-tür dizisi ≤2; KF-3 gramer ≤4 ve parça ≤2 sınırları korunur.
+{
+  let seed = 0x15f15;
+  const rand = () => { seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; return (seed >>> 0) / 4294967296; };
+  let longest = 0;
+  let grammarSeen = 0;
+  for (let session = 0; session < 1000; session += 1) {
+    const sessionCards = {};
+    const pool = [];
+    const counts = { grammar: Math.floor(rand() * 9), word: Math.floor(rand() * 12), fragment: Math.floor(rand() * 4) };
+    for (const [type, total] of Object.entries(counts)) {
+      for (let i = 0; i < total; i += 1) {
+        const id = type === 'grammar' ? `g:s${session}-${i}:slot` : type === 'fragment' ? `s:112:1:s${session}-${i}` : `w:s${session}-${i}:ar>tr`;
+        const isNew = rand() < 0.4;
+        if (!isNew) sessionCards[id] = { state: 'review', s: 30, due: '2026-09-20T00:00:00.000Z', reps: 3 };
+        pool.push({ id, type, isNew, priority: Math.floor(rand() * 3), pos: 'N', root: `rt-${session}-${type}-${i}`, meanings: [`${type}${i}`] });
+      }
+    }
+    const queue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew: 10 }, cards: sessionCards, daily: {} } }, now, { candidates: pool, sessionId: `kf9-${session}` });
+    let run = 0;
+    queue.forEach((item, index) => { run = index && item.type === queue[index - 1].type ? run + 1 : 1; longest = Math.max(longest, run); });
+    const grammar = queue.filter((item) => item.type === 'grammar').length;
+    grammarSeen += grammar;
+    assert.ok(grammar <= 4, `oturum ${session}: gramer ≤4 (KF-3)`);
+    assert.ok(queue.filter((item) => item.type === 'fragment').length <= 2, `oturum ${session}: parça ≤2`);
+  }
+  assert.ok(grammarSeen > 1000, 'örneklem gramer içermeli');
+  assert.ok(longest <= 2, `1.000 oturumda en uzun aynı-tür dizisi ${longest} > 2`);
 }
 assert.ok(!first.some((item) => item.cardId === 'w:l_aAmana_966a5c:ar>tr') || !first.some((item) => item.cardId === 'w:l_kafara_af1746:ar>tr'), 'aynı semantik kümeden iki yeni kart aynı oturumda olmamalı');
 
@@ -130,14 +161,17 @@ for (const candidate of grammarCandidates) {
 assert.deepEqual([...grammarTypes].sort(), ['Ek çöz', 'Kalıp eşle', 'Kök bul', 'Çekim tablosu'].sort());
 assert.deepEqual([...errorClasses].sort(), ['affix', 'root', 'rule']);
 
+// KF-9 tıkanma kuralı (kabul edilen davranış): yalnız gramer kalınca üçüncü gramer yerleştirilemez, döngü durur ve
+// oturum kısalır. Dört gramer türü (KF-3 üst sınır 4) aynı oturumda ancak araya başka tür girince yer alır.
 const grammarQueue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew: 10 }, cards: {} } }, now, { candidates: grammarCandidates, sessionId: 'grammar-four' });
-assert.equal(grammarQueue.length, 4, 'dört gramer türü aynı oturuma girmeli');
-assert.deepEqual(new Set(grammarQueue.map((item) => api.kaoBuildGrammarTask(item, { quranLearn: { cards: {} } }, { seed: item.id }).grammarType)), grammarTypes);
+assert.equal(grammarQueue.length, 2, 'yalnız gramer adayı: iki gramerden sonra kuyruk durur (KF-9)');
 const mixedGrammarQueue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew: 10 }, cards: {} } }, now, {
   candidates: grammarCandidates.concat(Array.from({ length: 20 }, (_, i) => ({ id: `w:mixed-${i}:ar>tr`, type: 'word', isNew: true, pos: 'N', root: `mixed-root-${i}` }))),
   sessionId: 'grammar-mixed'
 });
 assert.equal(mixedGrammarQueue.filter((item) => item.type === 'grammar').length, 4, 'karma gerçek oturum dört gramer türünü korumalı');
+assert.deepEqual(new Set(mixedGrammarQueue.filter((item) => item.type === 'grammar').map((item) => api.kaoBuildGrammarTask(item, { quranLearn: { cards: {} } }, { seed: item.id }).grammarType)), grammarTypes, 'karma oturumda dört gramer türü');
+for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQueue[i].type === mixedGrammarQueue[i - 1].type && mixedGrammarQueue[i].type === mixedGrammarQueue[i - 2].type), 'karma oturum serpiştirilmiş');
 
 
 // KAO-28 · E9 kaoPickAyah: yalnız kısa sûreler, kapsam ≥%95, görülmemiş öncelikli, deterministik; understood ≤400.
@@ -254,4 +288,4 @@ assert.equal(mixedGrammarQueue.filter((item) => item.type === 'grammar').length,
   assert.deepEqual(oneWay, [], 'R-A2: ilk günden sonra her oturum iki yönü taşır');
 }
 
-console.log(`KAO queue: PASS (${first.length} deterministic tasks + 4 grammar types, budgets/interleave/semantic spacing)`);
+console.log(`KAO queue: PASS (${first.length} deterministic tasks + 4 grammar types, budgets/KF-9 interleave x1000/semantic spacing)`);

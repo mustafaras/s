@@ -308,7 +308,8 @@
         if(item.type==='grammar'&&typeCounts.grammar>=4) continue;
         if(item.type==='fragment'&&typeCounts.fragment>=2) continue;
         var n=out.length;
-        if(item.type!=='grammar'&&n>=2&&out[n-1].type===item.type&&out[n-2].type===item.type) continue;
+        // KF-9: ardışık aynı tür ≤2 gramere de uygulanır; yalnız aynı tür kalırsa döngü durur ve oturum kısalır.
+        if(n>=2&&out[n-1].type===item.type&&out[n-2].type===item.type) continue;
         index=i; break;
       }
       if(index<0) break;
@@ -379,7 +380,9 @@
     }));
     choices.sort(function(a,b){ return seededRank(String(opts.seed||'')+'|task|'+id,a.cardId)-seededRank(String(opts.seed||'')+'|task|'+id,b.cardId); });
     choices.forEach(function(choice,index){ choice.choiceId=String(queueItem&&queueItem.id||'task:'+id)+':choice:'+index; });
-    return {id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),direction:direction,answer:answer,ar:String(meta.ar||''),meaning:String(meanings[0]||meta.meaning||''),translit:kaoLemmaReading(lemmaIdForCard(id),meta.translit),cognate:meta.cognate||null,clipId:lemmaIdForCard(id)?'w-'+lemmaIdForCard(id):'',choices:choices};
+    // R-B5 / 02 §5.3: hareke soldurma yalnız review ∧ s≥30 kartta (durable30). Hedefte anlam kayması (cognate.shift)
+    // varsa yanlış cevap errors.cognate'e yazılır; telaffuz hataları kelime görevinde değil phonics.misheard'de sayılır.
+    return {id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),direction:direction,answer:answer,ar:String(meta.ar||''),meaning:String(meanings[0]||meta.meaning||''),translit:kaoLemmaReading(lemmaIdForCard(id),meta.translit),cognate:meta.cognate||null,durable30:isSettled(objectOr(quranLearnRoot(d).cards,{})[id],30),errorClass:meta.cognate&&meta.cognate.shift?'cognate':'',clipId:lemmaIdForCard(id)?'w-'+lemmaIdForCard(id):'',choices:choices};
   }
   function minuteOfDay(value){
     if(typeof value!=='string'||!/^\d{2}:\d{2}$/.test(value)) return null;
@@ -822,7 +825,7 @@
     var autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',prompt=isGrammar||isFragment?task.prompt:(task.direction==='tr>ar'?task.meaning:task.ar);
     var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
     h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(isFragment?(task.kind==='order'?'Kelime dizme':'Parça çevir'):(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç')))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
-    if(!isGrammar&&!isFragment&&task.direction==='ar>tr') h+='<h2 class="kao-question'+(autoplay?' kao-audio-pending':'')+'" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',!task.isNew)+'</h2>';
+    if(!isGrammar&&!isFragment&&task.direction==='ar>tr') h+='<h2 class="kao-question'+(autoplay?' kao-audio-pending':'')+'" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true)+'</h2>';
     else h+='<h2 class="kao-question">'+esc(prompt)+'</h2>';
     if(isGrammar){ h+='<div class="kao-grammar-stimulus">'+(/[\u0600-\u06ff]/.test(task.stimulus)?kaoArabicPairHTML(task.stimulus,task.stimulusPronunciation,'kao-stimulus-pair'):esc(task.stimulus))+'</div>'; if(task.context&&task.context.length) h+='<div class="kao-grammar-context">'+task.context.map(function(item){ var value=item&&typeof item==='object'?item:{label:item,pronunciation:''}; return /[\u0600-\u06ff]/.test(value.label)?'<span>'+kaoArabicPairHTML(value.label,value.pronunciation,'kao-context-pair')+'</span>':'<span>'+esc(value.label)+'</span>'; }).join('')+'</div>'; }
     if(isFragment&&task.kind==='translate') h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair')+'</div>';

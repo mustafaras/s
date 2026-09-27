@@ -174,6 +174,53 @@ for (const choice of wrongOrder) api.kaoAnswer(orderTask.id, choice.choiceId);
 assert.equal(quranLearn.errors.order, orderErrorsBefore + 1, 'SOV/dizilim hatası sıra sınıfına yazılmalı');
 assert.match(ui.kaoFeedback, /Fiil önce gelir/);
 
+// KAO-FIX-15 (D-5, R-B5 / 02 §5.3): hareke soldurma yalnız kalıcılaşmış kartta (review ∧ s≥30; task.durable30).
+{
+  const fadeLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => /[\u064b-\u0652]/.test(lemma.ar));
+  const fadeCardId = `w:${fadeLemma.id}:ar>tr`;
+  const savedCard = quranLearn.cards[fadeCardId];
+  const savedFade = quranLearn.readability.fadeHarakat;
+  quranLearn.readability.fadeHarakat = true;
+  const fadeHtml = (card) => {
+    quranLearn.cards[fadeCardId] = card;
+    const task = api.kaoBuildTask({ id: `fade:${card.state}:${card.s}`, cardId: fadeCardId, isNew: false }, { quranLearn }, { seed: 'fade' });
+    return { task, html: api.kaoTaskHTML(task) };
+  };
+  const learning = fadeHtml({ state: 'learning', s: 2, reps: 1, due: '2026-09-20T00:00:00.000Z' });
+  assert.equal(learning.task.durable30, false, 'learning kartı durable30 değil');
+  assert.doesNotMatch(learning.html, /kao-fade/, 'learning kartında (isNew=false) soldurma yok');
+  const young = fadeHtml({ state: 'review', s: 29.9, reps: 4, due: '2026-09-20T00:00:00.000Z' });
+  assert.doesNotMatch(young.html, /kao-fade/, 'review s<30 kartında soldurma yok');
+  const settled = fadeHtml({ state: 'review', s: 30, reps: 6, due: '2026-09-20T00:00:00.000Z' });
+  assert.equal(settled.task.durable30, true, 'review s≥30 kartı durable30');
+  assert.match(settled.html, /class="kao-fade/, 'review s≥30 kartında soldurma var');
+  quranLearn.readability.fadeHarakat = false;
+  assert.doesNotMatch(api.kaoTaskHTML(settled.task), /kao-fade/, 'ayar kapalıyken soldurma yok');
+  quranLearn.readability.fadeHarakat = savedFade;
+  if (savedCard) quranLearn.cards[fadeCardId] = savedCard; else delete quranLearn.cards[fadeCardId];
+}
+
+// KAO-FIX-15 (D-5): kelime görevinde yanlış cevap + hedefte cognate.shift → errors.cognate +1; shift yoksa artmaz.
+{
+  const answerWrong = (cardId, id) => {
+    const queueItem = { id, cardId, isNew: true };
+    ui.kaoQueue = [queueItem]; ui.kaoTasks = {}; ui.kaoTaskIndex = 0; ui.kaoTaskStartedAt = Date.now(); ui.kaoUndo = null;
+    const task = api.kaoBuildTask(queueItem, { quranLearn }, { seed: id });
+    const wrong = task.choices.find((choice) => !choice.correct);
+    assert.ok(wrong, `${id}: yanlış seçenek olmalı`);
+    return { task, answered: api.kaoAnswer(task.id, wrong.choiceId) };
+  };
+  const cognateBefore = quranLearn.errors.cognate;
+  const shifted = answerWrong(`w:${shiftLemma.id}:ar>tr`, 'error:cognate');
+  assert.equal(shifted.task.errorClass, 'cognate');
+  assert.equal(quranLearn.errors.cognate, cognateBefore + 1, 'kognat hata sayacı artmalı');
+  const plainLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => !(lemma.cognate && lemma.cognate.shift) && lemma.id !== shiftLemma.id);
+  const soundBefore = quranLearn.errors.sound;
+  answerWrong(`w:${plainLemma.id}:tr>ar`, 'error:plain');
+  assert.equal(quranLearn.errors.cognate, cognateBefore + 1, 'kayma yoksa kognat sayacı artmaz');
+  assert.equal(quranLearn.errors.sound, soundBefore, 'kelime görevi errors.sound artırmaz (telaffuz → phonics.misheard)');
+}
+
 const layeredLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.root && lemma.cognate && lemma.examples.length >= 3 && sandbox.window.QuranGrammarV1.unit11.roots.some((root) => root.root === lemma.root));
 assert.ok(layeredLemma, 'üç katmanlı kelime fixture lemması bulunmalı');
 const layeredCardId = `w:${layeredLemma.id}:ar>tr`;

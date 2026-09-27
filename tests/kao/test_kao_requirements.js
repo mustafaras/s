@@ -292,8 +292,14 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
 
   // Hareke kapalı / soldurma (R-B5) / hareket ayarı ve reduced-motion dalı.
   const lemma = e7Data.quranLearn && sandboxLemma(e7, sampleLemma.lemmaId);
-  const reviewTask = e7.kaoBuildTask({ id: 'w:' + lemma.id + ':ar>tr', isNew: false }, e7Data, { seed: 'e7' });
-  const newTask = e7.kaoBuildTask({ id: 'w:' + lemma.id + ':ar>tr', isNew: true }, e7Data, { seed: 'e7' });
+  // KAO-FIX-15: soldurma yalnız review ∧ s≥30 kartta (durable30); isNew=false tek başına yetmez.
+  const fadeCardId = 'w:' + lemma.id + ':ar>tr';
+  delete e7Data.quranLearn.cards[fadeCardId];
+  const newTask = e7.kaoBuildTask({ id: fadeCardId, isNew: true }, e7Data, { seed: 'e7' });
+  e7Data.quranLearn.cards[fadeCardId] = { state: 'learning', s: 3, reps: 1 };
+  assert.doesNotMatch(e7.kaoTaskHTML(e7.kaoBuildTask({ id: fadeCardId, isNew: false }, e7Data, { seed: 'e7' })), /kao-fade/, 'learning kartında soldurma yok');
+  e7Data.quranLearn.cards[fadeCardId] = { state: 'review', s: 30, reps: 6 };
+  const reviewTask = e7.kaoBuildTask({ id: fadeCardId, isNew: false }, e7Data, { seed: 'e7' });
   e7Ui.kaoQueue = [{ id: reviewTask.id }]; e7Ui.kaoTaskIndex = 0;
   let html = e7.kaoTaskHTML(reviewTask);
   assert.match(html, /class="kao-fade" aria-label="Harekeler soluyor; geri getirmek için dokun" onclick="this\.classList\.add\('is-back'\)"><span class="kao-fade-base" aria-hidden="true">([^<]+)<\/span><span class="kao-fade-full">/);
@@ -312,6 +318,7 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   assert.match(css, /\.kao-fade-full\{[^}]*animation:kaoHarakatFade var\(--dur-5\)/, 'R-B5: --dur-5 tokenı');
   assert.match(css, /@media \(prefers-reduced-motion:reduce\)\{\.kao-fade-full\{animation:none;opacity:0\}/, 'reduced-motion: anında');
   assert.match(css, /\.kao-fade\.is-back \.kao-fade-full,\.kao-fade\.is-instant\.is-back \.kao-fade-full\{animation:none;opacity:1\}/, 'dokununca geri');
+  delete e7Data.quranLearn.cards[fadeCardId]; // soldurma fixture kartı: aşağıdaki ses kontrolleri yeni kart ister
 
   // R-A4 + ses stili: otomatik ses seçilen stille ve sessiz saatte hiç çalmaz; R-B8 iki hız düğmesi korunur.
   e7.kaoSetAudioStyle('flowing');

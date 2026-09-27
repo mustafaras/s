@@ -870,12 +870,15 @@
     if(!ui.kaoTasks[item.id]) ui.kaoTasks[item.id]=kaoBuildTask(item,quranLearnDeps.data(),{seed:item.id});
     return ui.kaoTasks[item.id];
   }
+  // 04 §4 FX: premium katman (SeyHaptics/SeyAudio/SeyFx) kendi kapılarıyla (ayar, sessiz saat) çağrılır; konfeti yalnız SeyFx.shouldAnimate; modül yoksa atlanır.
+  function kaoFx(kind,node){ var w=window; try{ if(kind==='enter'){ if(w.SeyFx&&typeof w.SeyFx.enter==='function') w.SeyFx.enter(node); return; } var tone=kind==='milestone'?'success':'tap'; if(w.SeyHaptics&&typeof w.SeyHaptics[tone]==='function') w.SeyHaptics[tone](); if(w.SeyAudio&&typeof w.SeyAudio[tone]==='function') w.SeyAudio[tone](); if(kind==='milestone'&&w.SeyFx&&typeof w.SeyFx.shouldAnimate==='function'&&w.SeyFx.shouldAnimate()&&w.SeymaHelpers&&typeof w.SeymaHelpers.confetti==='function') w.SeymaHelpers.confetti(); }catch(e){} }
   function paintTask(){
     if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.taskElement!=='function') return false;
     var node=quranLearnSurfaceDeps.taskElement();
     if(!node) return false;
     var html=kaoTaskHTML(currentTask()),match=html.match(/^<section[^>]*>([\s\S]*)<\/section>$/);
     node.innerHTML=match?match[1]:html;
+    var painted=currentTask(),paintedId=painted?painted.id:'done',paintUi=quranLearnDeps.ui(); if(paintUi.kaoPaintedId!==paintedId){ paintUi.kaoPaintedId=paintedId; kaoFx('enter',node); }
     if(typeof node.setAttribute==='function'){
       var task=currentTask(); node.setAttribute('data-task-id',task?task.id:'done');
       if(task&&kaoShouldAutoplay(task,quranLearnDeps.data())) node.setAttribute('data-autoplay','1'); else if(typeof node.removeAttribute==='function') node.removeAttribute('data-autoplay');
@@ -935,11 +938,11 @@
       }
       var delayedDaily=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{}));
       delayedDaily.answered+=1; delayedDaily.reviewed+=1; if(delayedCorrect) delayedDaily.correct+=1; q.daily[key]=delayedDaily;
-      ui.kaoFeedback=delayedCorrect?'Doğru':'Doğru cevap: '+task.answer; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoUndo=null;
+      if(delayedCorrect) kaoFx('correct'); ui.kaoFeedback=delayedCorrect?'Doğru':'Doğru cevap: '+task.answer; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoUndo=null;
       kaoSave(); paintTask(); startTaskPresentation(); return {correct:delayedCorrect,delayedScore:delayed.delayedScore};
     }
-    if(task.type==='link'){ var daily0=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{})),link=Object.assign({n:0,ok:0},objectOr(daily0.link,{})),linkOk=choice.correct===true; link.n+=1; if(linkOk) link.ok+=1; daily0.link=link; q.daily[key]=daily0; ui.kaoFeedback=linkOk?'Doğru — bağ kuruldu':'Türkçedeki türevi: '+task.answer; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoUndo=null; kaoSave(); paintTask(); startTaskPresentation(); return {correct:linkOk}; }
-    if(task.type==='transfer'){ var tr0=objectOr(q.transfer,{}),trOk=choice.correct===true; q.transfer={lastAt:now.toISOString(),n:Math.floor(nonNegativeNumber(tr0.n,0))+1,ok:Math.floor(nonNegativeNumber(tr0.ok,0))+(trOk?1:0),seen:(Array.isArray(tr0.seen)?tr0.seen:[]).concat(task.key).slice(-120)}; ui.kaoFeedback=trOk?'Doğru — hiç görmediğin âyeti anladın':'Doğru çeviri: '+task.answer; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoUndo=null; kaoSave(); paintTask(); startTaskPresentation(); return {correct:trOk}; }
+    if(task.type==='link'){ var daily0=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{})),link=Object.assign({n:0,ok:0},objectOr(daily0.link,{})),linkOk=choice.correct===true; link.n+=1; if(linkOk){ link.ok+=1; kaoFx('correct'); } daily0.link=link; q.daily[key]=daily0; ui.kaoFeedback=linkOk?'Doğru — bağ kuruldu':'Türkçedeki türevi: '+task.answer; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoUndo=null; kaoSave(); paintTask(); startTaskPresentation(); return {correct:linkOk}; }
+    if(task.type==='transfer'){ var tr0=objectOr(q.transfer,{}),trOk=choice.correct===true; if(trOk) kaoFx('correct'); q.transfer={lastAt:now.toISOString(),n:Math.floor(nonNegativeNumber(tr0.n,0))+1,ok:Math.floor(nonNegativeNumber(tr0.ok,0))+(trOk?1:0),seen:(Array.isArray(tr0.seen)?tr0.seen:[]).concat(task.key).slice(-120)}; ui.kaoFeedback=trOk?'Doğru — hiç görmediğin âyeti anladın':'Doğru çeviri: '+task.answer; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoUndo=null; kaoSave(); paintTask(); startTaskPresentation(); return {correct:trOk}; }
     ui.kaoUndo={expiresAt:now.getTime()+3000,cardId:task.cardId,hadCard:hadCard,card:cloneValue(cards[task.cardId]),dailyKey:key,hadDaily:hadDaily,daily:cloneValue(q.daily[key]),errors:cloneValue(q.errors),taskIndex:ui.kaoTaskIndex,queue:cloneValue(ui.kaoQueue),durableCount:ui.kaoDurableCount,orderDraft:[]};
     var previous=objectOr(cards[task.cardId],{}); correct=choice.correct===true;
     var grade=kaoGrade(correct,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime())),previous.reps),scheduled=kaoSchedule(previous,grade,now);
@@ -963,7 +966,7 @@
     if(!correct&&task.errorClass&&Object.prototype.hasOwnProperty.call(q.errors,task.errorClass)) q.errors[task.errorClass]+=1;
     if(!correct&&!task.retry) ui.kaoQueue.push(Object.assign({},ui.kaoQueue[ui.kaoTaskIndex],{id:task.id+':retry',retry:true,isNew:false}));
     ui.kaoFeedback=correct?'Doğru':(task.kind==='order'?'Fiil önce gelir: Arapçada çoğu kez fiil–özne–nesne sırası kullanılır.':'Doğru cevap: '+task.answer); ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=now.getTime(); ui.kaoOrderDraft=[];
-    var earned=recordMilestones(q,d,now);
+    var earned=recordMilestones(q,d,now); if(correct) kaoFx('correct'); if(earned.length) kaoFx('milestone');
     if(earned.length) ui.kaoFeedback=KAO_MILESTONE_LABELS[earned[earned.length-1]]+' ✦';
     kaoSave(); paintTask(); startTaskPresentation();
     if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.setTimer==='function'){
@@ -1614,7 +1617,7 @@
     var stats=kaoTodayStats(d,now),understood=(q.ayahs&&Array.isArray(q.ayahs.understood))?q.ayahs.understood.length:0;
     var percent=Math.min(100,Math.floor(kaoCoverage(d).ratio*100)),todayAyah=kaoTodayAyah(),night=kaoNightWindow(d,now),esc=quranLearnDeps.esc,icon=quranLearnDeps.icon;
     var h='<main class="kao-home" aria-labelledby="kao-title">';
-    h+='<section class="kao-hero"><span class="kao-hero-rosette" aria-hidden="true">✦</span><div class="kao-hero-copy"><p class="kao-eyebrow">Kelime kapsamın</p><div class="kao-coverage"><strong>'+percent+'%</strong><span>Kur’an kelimelerinin %'+percent+' kadarını tanıyorsun</span></div></div><div class="kao-progress" role="progressbar" aria-label="Kur’an kelime kapsamı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent+'"><span style="width:'+percent+'%"></span></div><p class="kao-ayah-count"><span aria-hidden="true">۞</span> Anlaşılan âyet sayısı: <strong>'+understood+'</strong></p></section>';
+    h+='<section class="kao-hero"><span class="kao-hero-rosette" aria-hidden="true">✦</span><div class="kao-hero-copy"><p class="kao-eyebrow">Kelime kapsamın</p><div class="kao-coverage"><strong><span data-countup="'+percent+'" data-countup-key="kao-coverage">'+percent+'</span>%</strong><span>Kur’an kelimelerinin %'+percent+' kadarını tanıyorsun</span></div></div><div class="kao-progress" role="progressbar" aria-label="Kur’an kelime kapsamı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent+'"><span style="width:'+percent+'%"></span></div><p class="kao-ayah-count"><span aria-hidden="true">۞</span> Anlaşılan âyet sayısı: <strong>'+understood+'</strong></p></section>';
     h+='<section class="kao-today"><div class="kao-section-head"><div><p class="kao-eyebrow">Bugünkü ders</p><h2>'+stats.due+' tekrar · '+stats.fresh+' yeni</h2></div><span class="kao-time-chip">~'+stats.minutes+' dk</span></div>';
     if(night) h+='<p class="kao-night">'+icon('moon',15)+' Gece tekrarı açık · '+night.durationMinutes+' dk, en fazla '+night.maxCards+' tekrar</p>';
     var confused=kaoConfusedLine(q); if(confused) h+='<p class="kao-milestone">'+icon('triangle-alert',15)+' '+esc(confused)+'</p>';

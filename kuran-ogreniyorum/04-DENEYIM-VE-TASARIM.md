@@ -128,7 +128,7 @@ okunabilirliği içindir; üretimde korpustan gelir.
 - Doğru: `SeyHaptics.tap` + `SeyAudio.tap` (kendi kapıları; sessiz saat).
   Kilometre taşı: `SeyFx.countUp` kapsam sayacı; konfeti yalnız 6 taşta.
 - `prefers-reduced-motion` + uygulama hareket ayarı → geçiş yok, anında.
-> **Durum (KAO-FIX-18, 2026-09-27):** Kısmen — hareket ayarı/reduced-motion dalı (`kaoMotionAllowed`, soldurma) var; KAO yüzeyinde `SeyHaptics.tap`, `SeyAudio.tap`, `SeyFx.countUp`, konfeti ve `.sey-enter` çağrısı yok — sonraki program (KF-6). Gerekçe: FX çağrıları fx2 kapsam ölçümünü (`fx-coverage`) değiştirir ve ses/titreşim yalnız cihazda kabul edilebilir.
+> **Durum (KAO-FIX-25, 2026-09-27):** Uygulandı — doğru cevapta `SeyHaptics.tap` + `SeyAudio.tap`; yeni kilometre taşında `.success` + konfeti (yalnız `SeyFx.shouldAnimate`); görev geçişinde `SeyFx.enter` (`.sey-enter`, yalnız görev değişince); kapsam sayacı `data-countup` → `sweepCounters`/`SeyFx.countUp`. Kapılar (ayar, sessiz saat, reduced-motion) FX modüllerinde; modül yoksa atlanır. Ses/titreşim kabulü cihazda.
 
 ### Erişilebilirlik
 - Çipler `<button>`; ≥44×44; odak halkası 3:1; `aria-live="polite"` doğru/yanlış.

@@ -780,4 +780,57 @@ function sandboxLemma(api, lemmaId) {
   assert.deepEqual(JSON.parse(JSON.stringify(api.ensureQuranLearn(junk).transfer)), { lastAt: null, n: 0, ok: 0, seen: [] });
 }
 
+// KAO-FIX-25 (04 §4, KF-6): FX — doğru cevapta SeyHaptics.tap + SeyAudio.tap; yeni kilometre taşında .success + konfeti
+// (yalnız SeyFx.shouldAnimate); görev geçişinde SeyFx.enter(#kao-task düğümü); kapsam sayacı data-countup (render.js
+// sweepCounters → SeyFx.countUp). FX modülleri yoksa sessizce atlanır; kendi kapıları (ayar, sessiz saat) onlarda.
+{
+  const calls = [];
+  let animate = true;
+  const sandbox = { window: {
+    SeyAudio: { tap() { calls.push('audio.tap'); }, success() { calls.push('audio.success'); } },
+    SeyHaptics: { tap() { calls.push('haptic.tap'); }, success() { calls.push('haptic.success'); } },
+    SeyFx: { shouldAnimate() { return animate; }, enter(target) { calls.push(`enter:${target && target.id}`); } },
+    SeymaHelpers: { confetti() { calls.push('confetti'); } }
+  } };
+  vm.createContext(sandbox);
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
+  const api = sandbox.window.SeymaQuranLearn;
+  const data = { quranLearn: null, settings: {} };
+  const ui = {};
+  const node = { id: 'kao-task', innerHTML: '', setAttribute() {}, removeAttribute() {}, querySelector() { return null; } };
+  const deps = Object.fromEntries(['save', 'render'].map((name) => [name, function fixture() {}]));
+  assert.equal(api.registerQuranLearn(Object.assign(deps, { data() { return data; }, ui() { return ui; }, todayStr() { return '2026-10-05'; }, esc(value) { return String(value); }, icon() { return ''; }, getDay() { return {}; } })), true);
+  assert.equal(api.registerQuranLearnSurface({ lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {}, sheetClose() {}, mount() {}, taskElement() { return node; }, createAudio() { return { addEventListener() {}, play() { return Promise.resolve(); } }; }, isQuietTime() { return false; }, setTimer() { return 0; }, clearTimer() {}, toast() {} }), true);
+  api.ensureQuranLearn(data);
+  const lemma = sandbox.window.QuranLexiconV1.lemmas.find((item) => item.root && !(item.cognate && item.cognate.shift));
+  const item = { id: 'fx-1', cardId: `w:${lemma.id}:ar>tr`, isNew: true };
+  const answer = (correct) => {
+    ui.kaoQueue = [Object.assign({}, item), { id: 'fx-next', cardId: item.cardId, isNew: false }]; ui.kaoTasks = {}; ui.kaoTaskIndex = 0; ui.kaoTaskStartedAt = Date.now(); ui.kaoUndo = null;
+    const task = api.kaoBuildTask(ui.kaoQueue[0], data, { seed: 'fx-1' }); ui.kaoTasks[task.id] = task;
+    calls.length = 0;
+    api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct === correct).choiceId);
+    return calls.slice();
+  };
+  let got = answer(true);
+  assert.ok(got.includes('haptic.tap') && got.includes('audio.tap'), 'doğru cevapta dokunma sesi + titreşim');
+  assert.ok(got.includes('enter:kao-task'), 'görev geçişinde SeyFx.enter');
+  assert.ok(!got.includes('confetti') && !got.includes('audio.success'), 'taş yokken kutlama yok');
+  got = answer(false);
+  assert.ok(!got.includes('audio.tap') && !got.includes('haptic.tap'), 'yanlışta doğru sesi yok');
+  // Yeni taş: Ünite 1 lemmaları ar>tr s≥7 → fatiha; cevapla kazanılır.
+  const unit1 = sandbox.window.QuranLexiconV1.lemmas.slice(0, Math.floor(sandbox.window.QuranLexiconV1.lemmas.length / 12));
+  for (const l of unit1) data.quranLearn.cards[`w:${l.id}:ar>tr`] = { state: 'review', s: 8, reps: 4, due: '2099-01-01T00:00:00.000Z' };
+  got = answer(true);
+  assert.ok(data.quranLearn.milestones.fatiha, 'fixture: fatiha kazanıldı');
+  assert.ok(got.includes('audio.success') && got.includes('haptic.success') && got.includes('confetti'), 'yeni taşta kutlama + konfeti');
+  data.quranLearn.milestones.fatiha = null; animate = false;
+  got = answer(true);
+  assert.ok(got.includes('audio.success') && !got.includes('confetti'), 'hareket kapalıyken konfeti yok (ses kendi kapısıyla)');
+  animate = true;
+  // FX modülü yoksa atlanır.
+  const bare = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return '2026-10-05'; } });
+  assert.doesNotThrow(() => bare.kaoHomeHTML('2026-10-05T10:00:00.000Z'));
+  assert.match(api.kaoHomeHTML('2026-10-05T10:00:00.000Z'), /<span data-countup="\d+" data-countup-key="kao-coverage">\d+<\/span>%/, 'kapsam sayacı countUp için işaretli');
+}
+
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

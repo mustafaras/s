@@ -67,6 +67,10 @@ for f in tests/app/*.js; do node "$f" >/dev/null 2>&1 || echo "FAIL $f"; done; e
 3. Yalnız promptun **İzinli dosyalar** listesine yaz. Başka dosya gerekiyorsa dur, CURRENT-STATE'e `Engel:` yaz, kullanıcıya sor.
 
 ### Ö4 · Standart kontroller (promptta "STD" yazıyorsa hepsi exit 0)
+> **Hazır betikler** (`duzeltme/araclar/`, 2026-09-27): `sh …/kao-kapilar.sh` bu bölümün tamamını
+> koşar; `kao-yayin-pini.sh <yeni>` PIN-P'yi; `kao-canli-dogrula.sh [dosya…]` canlı `cmp`'yi;
+> `kao-pages-izle.sh <hash>` Pages koşusunu; `kao-sim-ozet.sh [gün]` sim + tek satır özeti.
+> Aşağıdaki komutlar yine bağlayıcıdır; betikler yalnız kolaylıktır (salt-okur, repo yazmaz).
 ```sh
 for f in tests/kao/*.js; do node "$f" >/dev/null 2>&1 || echo "FAIL $f"; done; echo kao-bitti
 node .claude/skills/run-seyma/driver.mjs > "$TMPDIR/d.log" 2>&1; echo "driver $?"

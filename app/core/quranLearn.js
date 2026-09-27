@@ -37,27 +37,6 @@
     0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621
   ];
   var KAO_GRAMMAR_TYPES=['Ek çöz','Çekim tablosu','Kök bul','Kalıp eşle'];
-  var KAO_SEMANTIC_CLUSTERS={
-    SOZ_EMIR:['l_qaAla_657dd3','l_amor_9fbe48','l_qawol_58e075','l_amara_3fab3c'],
-    IMAN_KUFUR:['l_aAmana_966a5c','l_kafara_af1746','l_mu_omin_870b47','l_ka_firuwn_165d2d','l_a_oraka_c73d6e','l_anfaqa_0b12ad','l_iyma_n_4151c0','l_mu_orik_2ba276','l_ariyk_5de5f5','l_kufor_1c9ee6','l_kaAfir_9b3cf0','l_muna_fiquwn_bdda5c','l_m_u_omina_t_b9c5a2','l_amina_0a79a6'],
-    ILIM_CEHALET:['l_Ealima_ceb6d7','l_Ealiym_c50d0d','l_Eilom_2f0f9d','l_Ea_lamiyn_c337cf','l_aEolam_db561d','l_Eaqalu_36636d','l_Eal_ama_5c04b6'],
-    AMEL_KARSILIK:['l_Ea_aAb_4b9936','l_Eamila_50319c','l_ajor_c798df','l_Eamal_8215bb','l_Hasiba_a4ca56','l_Ea_aba_be4552','l_HisaAb_b41eae'],
-    NEFIS_KALP:['l_nafos_fde475','l_qalob_e14dcc','l_riyH_14b7a7','l_ruwH_1d9882'],
-    KULLUK_DUA:['l_daEaA_f5ec67','l_Eabod_3558c0','l_Eabada_557021','l_akara_350195','l_duEaA_bcbfae'],
-    KORKU_TAKVA:['l_t_aqaY_bc8006','l_xaAfa_29d6b0','l_mut_aqiyn_afd23b','l_xa_iYa_982ede','l_xawof_3af862'],
-    HIDAYET_DALALET:['l_hadaY_a88771','l_hudFY_2e4b07','l_aDal_a_5ed954','l_Dal_a_2775a8','l_hotadaY_132fd7','l_Dala_l_fc4484','l_DaA_l_145c36'],
-    RAHMET_ZULUM:['l_ZaAlim_fae7dd','l_r_aHiym_ecdbe9','l_raHomap_490a24','l_Zalama_7a9278','l_r_aHoma_n_c13ea2','l_r_aHima_870005','l_Zuluma_t_933b08'],
-    ALGI_ISITME_GORME:['l_n_aZara_cdb6f4','l_samiEa_640570','l_baSiyr_69e5a4','l_baSar_691898','l_samiyE_d49cf3','l_aboSara_9f0224','l_samoE_5d4faf'],
-    HAYAT_OLUM:['l_Hayaw_p_e08aa3','l_aHoyaA_35079e','l_mawot_7aa65a','l_m_aAta_a0f90e','l_m_ay_it_fb6ea2','l_Hay_3dc2a8','l_amaAta_5bf411','l_taHiy_ap_de08b0'],
-    SABIR_ITAAT:['l_aTaAEa_74ca26','l_Sabara_34dfc2','l_sotaTaAEa_d34f23','l_TaEaAm_f85a5a']
-  };
-  var KAO_CLUSTER_BY_LEMMA=Object.create(null);
-  Object.keys(KAO_SEMANTIC_CLUSTERS).forEach(function(cluster){
-    KAO_SEMANTIC_CLUSTERS[cluster].forEach(function(id){
-      if(!KAO_CLUSTER_BY_LEMMA[id]) KAO_CLUSTER_BY_LEMMA[id]=[];
-      KAO_CLUSTER_BY_LEMMA[id].push(cluster);
-    });
-  });
   var REQUIRED_DEPS=['data','ui','save','render','todayStr','esc','icon','getDay'];
   var quranLearnDeps=null;
   var quranLearnSurfaceDeps=null;
@@ -248,13 +227,14 @@
       if(!meta.ar) meta.ar=lemma.ar;
       if(!meta.translit) meta.translit=lemma.translit;
       if(!meta.cognate) meta.cognate=lemma.cognate;
+      // R-A5 komşuları: sözlüğün D-12 doğrulanmış kısa listesi (kaynak: tools/kao-lexicon-build.mjs SEM_NEIGHBOR_REVIEW).
+      if(!meta.semNeighbors&&Array.isArray(lemma.semNeighbors)) meta.semNeighbors=lemma.semNeighbors;
     }
     return meta;
   }
   function semanticInfo(id,raw,opts){
     var meta=metaFor(id,raw,opts),lemmaId=lemmaIdForCard(id),keys=[],neighbors=[];
     if(meta.root) keys.push('root:'+meta.root);
-    (KAO_CLUSTER_BY_LEMMA[lemmaId]||[]).forEach(function(value){ keys.push('cluster:'+value); });
     var sem=meta.semNeighbors;
     if(Array.isArray(sem)) neighbors=neighbors.concat(sem);
     else if(sem&&typeof sem==='object'){

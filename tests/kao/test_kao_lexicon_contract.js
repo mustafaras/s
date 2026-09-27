@@ -129,6 +129,30 @@ if (fs.existsSync(referencePath)) {
   assert.equal(copied.length, 0, `referansla birebir aynı kelime olmamalı (${copied.slice(0, 3).map((word) => word.id).join(', ')})`);
 }
 
+// KAO-FIX-14 · R-A5 anlam komşuları sözlükten (O-7): D-12 doğrulanmış semNeighbors, kısa biçim.
+{
+  const verified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8'));
+  const reviewed = verified.lemmas.filter((l) => l.semNeighbors && l.semNeighbors.proposed === false);
+  assert.ok(reviewed.length >= 79, `D-12 doğrulanmış komşu satırı: ${reviewed.length}`);
+  for (const l of reviewed) assert.match(String(l.semNeighbors.verifiedAt), /^\d{4}-\d{2}-\d{2}$/, `verifiedAt: ${l.lemmaId}`);
+  const withField = lexicon.lemmas.filter((l) => Array.isArray(l.semNeighbors));
+  assert.ok(withField.length >= 79, `semNeighbors alanı olan lemma: ${withField.length}`);
+  assert.equal(withField.length, reviewed.length, 'modül yalnız doğrulanmış (proposed:false) satırları taşır');
+  for (const l of lexicon.lemmas) if (!reviewed.some((r) => r.lemmaId === l.id)) assert.equal(l.semNeighbors, null, `önerilen komşu modüle girmez: ${l.id}`);
+  const clustersOf = new Map(reviewed.map((r) => [r.lemmaId, r.semNeighbors.clusters]));
+  for (const l of withField) {
+    assert.ok(Object.isFrozen(l.semNeighbors));
+    for (const other of l.semNeighbors) {
+      assert.ok(lexicon.byId(other), `komşu kimliği sözlükte yok: ${l.id} → ${other}`);
+      assert.notEqual(other, l.id, 'kendine komşu olmaz');
+      assert.ok(lexicon.byId(other).semNeighbors.includes(l.id), `simetrik değil: ${l.id} ↔ ${other}`);
+    }
+    const expected = reviewed.filter((r) => r.lemmaId !== l.id && r.semNeighbors.clusters.some((c) => clustersOf.get(l.id).includes(c))).map((r) => r.lemmaId).sort();
+    assert.deepEqual(Array.from(l.semNeighbors), expected, `komşular doğrulanmış kümeden türemeli: ${l.id}`);
+  }
+  assert.ok(withField.filter((l) => l.semNeighbors.length).length >= 70, 'doğrulanmış kümelerde en az 70 lemma komşulu');
+}
+
 assert.ok(!/\b(?:fetch|XMLHttpRequest|localStorage|sessionStorage|indexedDB)\b/.test(source),
   'donmuş içerik modülü ağ/depo API kullanmamalı');
 console.log(`KAO lexicon contract: PASS (${lexicon.lemmas.length} lemma, ${fs.statSync(modulePath).size} bayt)`);

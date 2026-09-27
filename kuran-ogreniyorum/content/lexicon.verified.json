@@ -506,7 +506,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "SOZ_EMIR"
         ],
@@ -523,7 +523,9 @@
           "قَآئِل",
           "تَقَوَّلَ",
           "أَقَاوِيل"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -1337,7 +1339,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -1376,7 +1378,9 @@
           "ءَامِنِين",
           "ءَامِنَة",
           "مَأْمُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -2279,7 +2283,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ILIM_CEHALET"
         ],
@@ -2312,7 +2316,9 @@
           "عَلَٰمَٰت",
           "أَعْلَٰم",
           "مُعَلَّم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -2986,7 +2992,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "AMEL_KARSILIK"
         ],
@@ -3001,7 +3007,9 @@
           "مُعَذِّب",
           "عَذْب",
           "مُعَذَّبِين"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -3282,7 +3290,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "NEFIS_KALP"
         ],
@@ -3295,7 +3303,9 @@
           "تَنَفَّسَ",
           "يَتَنَافَسِ",
           "مُتَنَٰفِسُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -3383,7 +3393,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -3416,7 +3426,9 @@
           "كَوَافِر",
           "كَافُور",
           "أَكْفَرَ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -3789,7 +3801,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "AMEL_KARSILIK"
         ],
@@ -3802,7 +3814,9 @@
           "عَمَل",
           "عَٰمِل",
           "عَامِلَة"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -5117,7 +5131,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -5156,7 +5170,9 @@
           "ءَامِنِين",
           "ءَامِنَة",
           "مَأْمُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -6179,7 +6195,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KULLUK_DUA"
         ],
@@ -6198,7 +6214,9 @@
           "دَعْوَىٰ",
           "دَاعِى",
           "يَدَّعُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -6301,7 +6319,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KORKU_TAKVA"
         ],
@@ -6322,7 +6340,9 @@
           "تَقِيّ",
           "وَاق",
           "أَتْقَى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -6430,7 +6450,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "SOZ_EMIR"
         ],
@@ -6447,7 +6467,9 @@
           "أَمَّارَة",
           "إِمْر",
           "يَأْتَمِرُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -6545,7 +6567,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ILIM_CEHALET"
         ],
@@ -6578,7 +6600,9 @@
           "عَلَٰمَٰت",
           "أَعْلَٰم",
           "مُعَلَّم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -7631,7 +7655,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HIDAYET_DALALET"
         ],
@@ -7660,7 +7684,9 @@
           "مُّهْتَد",
           "هَدِيَّة",
           "هَٰدِى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -8239,7 +8265,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "NEFIS_KALP"
         ],
@@ -8262,7 +8288,9 @@
           "تَتَقَلَّبُ",
           "تُقْلَبُ",
           "مُتَقَلَّب"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -8375,7 +8403,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KULLUK_DUA"
         ],
@@ -8392,7 +8420,9 @@
           "عِبَادَت",
           "عَبَّد",
           "عَٰبِدَٰت"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -8617,7 +8647,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -8650,7 +8680,9 @@
           "كَوَافِر",
           "كَافُور",
           "أَكْفَرَ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -8788,7 +8820,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "RAHMET_ZULUM"
         ],
@@ -8817,7 +8849,9 @@
           "ظَالِمَة",
           "ظَلُوم",
           "مَظْلُوم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -9410,7 +9444,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KULLUK_DUA"
         ],
@@ -9427,7 +9461,9 @@
           "عِبَادَت",
           "عَبَّد",
           "عَٰبِدَٰت"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -9868,7 +9904,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "RAHMET_ZULUM"
         ],
@@ -9891,7 +9927,9 @@
           "رَّٰحِمِين",
           "رُحْم",
           "مَرْحَمَة"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -10110,7 +10148,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "RAHMET_ZULUM"
         ],
@@ -10133,7 +10171,9 @@
           "رَّٰحِمِين",
           "رُحْم",
           "مَرْحَمَة"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -10246,7 +10286,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "RAHMET_ZULUM"
         ],
@@ -10275,7 +10315,9 @@
           "ظَالِمَة",
           "ظَلُوم",
           "مَظْلُوم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -10601,7 +10643,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "AMEL_KARSILIK"
         ],
@@ -10612,7 +10654,9 @@
         "sameRootAr": [
           "ٱسْتَـْٔجَرْ",
           "تَأْجُرَ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -10695,7 +10739,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ILIM_CEHALET"
         ],
@@ -10728,7 +10772,9 @@
           "عَلَٰمَٰت",
           "أَعْلَٰم",
           "مُعَلَّم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -11740,7 +11786,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "SOZ_EMIR"
         ],
@@ -11757,7 +11803,9 @@
           "قَآئِل",
           "تَقَوَّلَ",
           "أَقَاوِيل"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -12513,7 +12561,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ALGI_ISITME_GORME"
         ],
@@ -12538,7 +12586,9 @@
           "نَاظِرَة",
           "نَظْرَة",
           "نَظَر"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -12886,7 +12936,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HIDAYET_DALALET"
         ],
@@ -12915,7 +12965,9 @@
           "مُّهْتَد",
           "هَدِيَّة",
           "هَٰدِى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -13697,7 +13749,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KORKU_TAKVA"
         ],
@@ -13716,7 +13768,9 @@
           "خِيفَة",
           "تَخَوُّف",
           "تَخْوِيف"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -14419,7 +14473,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ALGI_ISITME_GORME"
         ],
@@ -14444,7 +14498,9 @@
           "مُسْتَمِع",
           "مُسْمِع",
           "يَسَّمَّعُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -14717,7 +14773,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "SOZ_EMIR"
         ],
@@ -14734,7 +14790,9 @@
           "أَمَّارَة",
           "إِمْر",
           "يَأْتَمِرُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -15189,7 +15247,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HAYAT_OLUM"
         ],
@@ -15218,7 +15276,9 @@
           "ٱسْتِحْيَآء",
           "حَيَوَان",
           "مُحْى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -16104,10 +16164,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "ILIM_CEHALET"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_Ealima_ceb6d7",
           "l_Ealiym_c50d0d",
@@ -16137,7 +16195,10 @@
           "عَلَٰمَٰت",
           "أَعْلَٰم",
           "مُعَلَّم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "ILIM_CEHALET: âlemler — bilgi alanı değil"
       },
       "family": [
         {
@@ -16541,7 +16602,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "SABIR_ITAAT"
         ],
@@ -16566,7 +16627,9 @@
           "مُطَّوِّعِين",
           "طَآئِعِين",
           "مُّطَاع"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -16988,7 +17051,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -17009,7 +17072,9 @@
           "شَارِكْ",
           "شِرْك",
           "مُشْتَرِكُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -17462,7 +17527,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "AMEL_KARSILIK"
         ],
@@ -17475,7 +17540,9 @@
           "عَمِلَ",
           "عَٰمِل",
           "عَامِلَة"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -18404,10 +18471,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "IMAN_KUFUR"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_nafaqap_dbfb5c",
           "l_munfiqiyn_720257",
@@ -18429,7 +18494,10 @@
           "مُنَٰفِقَٰت",
           "نِفَاق",
           "إِنفَاق"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "IMAN_KUFUR: harcadı — iman/küfür alanı değil (münafık kök komşusu kalır)"
       },
       "family": [
         {
@@ -18999,7 +19067,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HIDAYET_DALALET"
         ],
@@ -19020,7 +19088,9 @@
           "أَضَلّ",
           "مُّضِلّ",
           "تَضْلِيل"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -21322,7 +21392,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "SABIR_ITAAT"
         ],
@@ -21343,7 +21413,9 @@
           "صَبَّار",
           "ٱصْطَبِرْ",
           "صَّٰبِرَٰت"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -21891,7 +21963,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "RAHMET_ZULUM"
         ],
@@ -21914,7 +21986,9 @@
           "رَّٰحِمِين",
           "رُحْم",
           "مَرْحَمَة"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -23196,7 +23270,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HIDAYET_DALALET"
         ],
@@ -23217,7 +23291,9 @@
           "أَضَلّ",
           "مُّضِلّ",
           "تَضْلِيل"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -24186,7 +24262,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HAYAT_OLUM"
         ],
@@ -24215,7 +24291,9 @@
           "ٱسْتِحْيَآء",
           "حَيَوَان",
           "مُحْى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -24343,7 +24421,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ALGI_ISITME_GORME"
         ],
@@ -24368,7 +24446,9 @@
           "مُسْتَبْصِرِين",
           "تَبْصِرَة",
           "يُبَصَّرُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -25019,7 +25099,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HAYAT_OLUM"
         ],
@@ -25040,7 +25120,9 @@
           "مَّيْت",
           "مَمَات",
           "مَوْتَت"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -25437,7 +25519,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ILIM_CEHALET"
         ],
@@ -25470,7 +25552,9 @@
           "عَلَٰمَٰت",
           "أَعْلَٰم",
           "مُعَلَّم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -25608,12 +25692,14 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ILIM_CEHALET"
         ],
         "sameRoot": [],
-        "sameRootAr": []
+        "sameRootAr": [],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [],
       "examples": [
@@ -25918,7 +26004,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KORKU_TAKVA"
         ],
@@ -25939,7 +26025,9 @@
           "تَقِيّ",
           "وَاق",
           "أَتْقَى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -26287,7 +26375,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ALGI_ISITME_GORME"
         ],
@@ -26312,7 +26400,9 @@
           "مُسْتَبْصِرِين",
           "تَبْصِرَة",
           "يُبَصَّرُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -26769,7 +26859,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ALGI_ISITME_GORME"
         ],
@@ -26794,7 +26884,9 @@
           "مُسْتَمِع",
           "مُسْمِع",
           "يَسَّمَّعُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -27096,7 +27188,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KULLUK_DUA"
         ],
@@ -27113,7 +27205,9 @@
           "مَّشْكُور",
           "شُكُور",
           "شُكْر"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -27324,7 +27418,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -27363,7 +27457,9 @@
           "ءَامِنِين",
           "ءَامِنَة",
           "مَأْمُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -28435,10 +28531,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "AMEL_KARSILIK"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_HisaAb_b41eae",
           "l_Hasob_661049",
@@ -28456,7 +28550,10 @@
           "حَٰسِبِين",
           "حُسْبَان",
           "يَحْتَسِبُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "AMEL_KARSILIK: sandı — karşılık/hesap alanı değil"
       },
       "family": [
         {
@@ -28705,7 +28802,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -28726,7 +28823,9 @@
           "شَارِكْ",
           "شِرْك",
           "مُشْتَرِكُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -29401,10 +29500,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "SABIR_ITAAT"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_taTaw_aEa_f4eee0",
           "l_aTaAEa_74ca26",
@@ -29426,7 +29523,10 @@
           "مُطَّوِّعِين",
           "طَآئِعِين",
           "مُّطَاع"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "SABIR_ITAAT: güç yetirdi — itaat alanı değil"
       },
       "family": [
         {
@@ -30226,7 +30326,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "AMEL_KARSILIK"
         ],
@@ -30241,7 +30341,9 @@
           "مُعَذِّب",
           "عَذْب",
           "مُعَذَّبِين"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -30334,7 +30436,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ILIM_CEHALET"
         ],
@@ -30367,7 +30469,9 @@
           "عَلَٰمَٰت",
           "أَعْلَٰم",
           "مُعَلَّم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -30858,7 +30962,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HIDAYET_DALALET"
         ],
@@ -30887,7 +30991,9 @@
           "مُّهْتَد",
           "هَدِيَّة",
           "هَٰدِى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -31473,7 +31579,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -31494,7 +31600,9 @@
           "شَارِكْ",
           "شِرْك",
           "مُشْتَرِكُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -32298,7 +32406,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KORKU_TAKVA"
         ],
@@ -32307,7 +32415,9 @@
         ],
         "sameRootAr": [
           "خَشْيَة"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -32820,7 +32930,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "AMEL_KARSILIK"
         ],
@@ -32841,7 +32951,9 @@
           "حَٰسِبِين",
           "حُسْبَان",
           "يَحْتَسِبُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -33034,7 +33146,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HAYAT_OLUM"
         ],
@@ -33055,7 +33167,9 @@
           "مَّيْت",
           "مَمَات",
           "مَوْتَت"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -33494,7 +33608,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HIDAYET_DALALET"
         ],
@@ -33515,7 +33629,9 @@
           "أَضَلّ",
           "مُّضِلّ",
           "تَضْلِيل"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -33750,7 +33866,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HAYAT_OLUM"
         ],
@@ -33771,7 +33887,9 @@
           "مَّيْت",
           "مَمَات",
           "مَوْتَت"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -34613,7 +34731,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -34646,7 +34764,9 @@
           "كَوَافِر",
           "كَافُور",
           "أَكْفَرَ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -41154,7 +41274,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ALGI_ISITME_GORME"
         ],
@@ -41179,7 +41299,9 @@
           "مُسْتَبْصِرِين",
           "تَبْصِرَة",
           "يُبَصَّرُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -41928,10 +42050,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "NEFIS_KALP"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_ruwH_1d9882",
           "l_r_awoH_90ded6",
@@ -41945,7 +42065,10 @@
           "تُرِيحُ",
           "رَوَاح",
           "رَّيْحَان"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "NEFIS_KALP: rüzgâr — nefis/kalp alanı değil"
       },
       "family": [
         {
@@ -43474,7 +43597,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "RAHMET_ZULUM"
         ],
@@ -43497,7 +43620,9 @@
           "رَّٰحِمِين",
           "رُحْم",
           "مَرْحَمَة"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -44399,7 +44524,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -44432,7 +44557,9 @@
           "كَوَافِر",
           "كَافُور",
           "أَكْفَرَ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -44737,7 +44864,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -44762,7 +44889,9 @@
           "مُنَٰفِقَٰت",
           "نِفَاق",
           "إِنفَاق"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -46201,7 +46330,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KORKU_TAKVA"
         ],
@@ -46220,7 +46349,9 @@
           "خِيفَة",
           "تَخَوُّف",
           "تَخْوِيف"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -48233,7 +48364,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HAYAT_OLUM"
         ],
@@ -48262,7 +48393,9 @@
           "ٱسْتِحْيَآء",
           "حَيَوَان",
           "مُحْى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -48761,10 +48894,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "SABIR_ITAAT"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_TaEimu_3d7f16",
           "l_iToEa_m_7e0d78",
@@ -48780,7 +48911,10 @@
           "طَاعِم",
           "ٱسْتَطْعَمَ",
           "طَعْم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "SABIR_ITAAT: yiyecek — sabır/itaat alanı değil"
       },
       "family": [
         {
@@ -50887,10 +51021,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "RAHMET_ZULUM"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_aZolama_348f9c",
           "l_ZaAlim_fae7dd",
@@ -50916,7 +51048,10 @@
           "ظَالِمَة",
           "ظَلُوم",
           "مَظْلُوم"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "RAHMET_ZULUM: karanlıklar — zulüm alanı değil"
       },
       "family": [
         {
@@ -51493,7 +51628,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "KULLUK_DUA"
         ],
@@ -51512,7 +51647,9 @@
           "دَعْوَىٰ",
           "دَاعِى",
           "يَدَّعُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -51890,7 +52027,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "IMAN_KUFUR"
         ],
@@ -51929,7 +52066,9 @@
           "ءَامِنِين",
           "ءَامِنَة",
           "مَأْمُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -52640,7 +52779,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "ALGI_ISITME_GORME"
         ],
@@ -52665,7 +52804,9 @@
           "مُسْتَمِع",
           "مُسْمِع",
           "يَسَّمَّعُ"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -53891,7 +54032,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HAYAT_OLUM"
         ],
@@ -53912,7 +54053,9 @@
           "مَّيْت",
           "مَمَات",
           "مَوْتَت"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -55086,7 +55229,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "NEFIS_KALP"
         ],
@@ -55103,7 +55246,9 @@
           "تُرِيحُ",
           "رَوَاح",
           "رَّيْحَان"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -55773,10 +55918,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "IMAN_KUFUR"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_aAmana_966a5c",
           "l_mu_omin_870b47",
@@ -55812,7 +55955,10 @@
           "ءَامِنِين",
           "ءَامِنَة",
           "مَأْمُون"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "IMAN_KUFUR: güvende oldu — güvenlik anlamı, iman alanı değil"
       },
       "family": [
         {
@@ -57519,7 +57665,7 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
+        "proposed": false,
         "clusters": [
           "HIDAYET_DALALET"
         ],
@@ -57540,7 +57686,9 @@
           "أَضَلّ",
           "مُّضِلّ",
           "تَضْلِيل"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27"
       },
       "family": [
         {
@@ -58107,10 +58255,8 @@
         "derivatives": []
       },
       "semNeighbors": {
-        "proposed": true,
-        "clusters": [
-          "HAYAT_OLUM"
-        ],
+        "proposed": false,
+        "clusters": [],
         "sameRoot": [
           "l_yasotaHoYi_6d8aaf",
           "l_aHoyaA_35079e",
@@ -58136,7 +58282,10 @@
           "ٱسْتِحْيَآء",
           "حَيَوَان",
           "مُحْى"
-        ]
+        ],
+        "verifiedBy": "claude-opus-5-5",
+        "verifiedAt": "2026-09-27",
+        "excludedReason": "HAYAT_OLUM: selamlama — hayat/ölüm alanı değil"
       },
       "family": [
         {

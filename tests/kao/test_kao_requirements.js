@@ -63,6 +63,26 @@ for (let session = 0; session < 1000; session += 1) {
   previous = picked.map((item) => item.cardId);
 }
 assert.equal(violations, 0, 'R-A2: 1.000 sentetik oturum ihlal 0');
+// KAO-FIX-14 · R-A5 komşuluğu sözlük modülünden (O-7); elle yazılmış küme yok.
+{
+  const learnSource = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8');
+  assert.doesNotMatch(learnSource, /KAO_SEMANTIC_CLUSTERS|KAO_CLUSTER_BY_LEMMA/, 'elle yazılmış küme kaldırılmalı');
+  const both = (a, b, nowIso, sessionId, opts) => {
+    const queue = noHealth.kaoBuildQueue({ quranLearn: { settings: { dailyNew: 10 }, cards: {} } }, nowIso, Object.assign({ sessionId, candidates: [{ id: `w:${a}:ar>tr`, isNew: true }, { id: `w:${b}:ar>tr`, isNew: true }] }, opts || {}));
+    return queue.some((i) => i.cardId === `w:${a}:ar>tr`) && queue.some((i) => i.cardId === `w:${b}:ar>tr`);
+  };
+  let crossRoot = 0, excluded = 0, catalogPair = 0;
+  for (let s = 0; s < 1000; s += 1) {
+    const at = `2026-09-${String(1 + s % 28).padStart(2, '0')}T12:00:00.000Z`;
+    if (both('l_hadaY_a88771', 'l_aDal_a_5ed954', at, `hd-${s}`)) crossRoot += 1;
+    if (both('l_anfaqa_0b12ad', 'l_kafara_af1746', at, `nf-${s}`)) excluded += 1;
+    if (both('x_a', 'x_b', at, `cat-${s}`, { catalog: { 'w:x_a:ar>tr': { semNeighbors: ['x_b'] } } })) catalogPair += 1;
+  }
+  assert.equal(crossRoot, 0, 'R-A5: hidâyet ↔ dalâlet (farklı kök, doğrulanmış küme) aynı oturumda yeni gelmez');
+  assert.equal(excluded, 1000, 'D-12 dışlanan anfaqa (harcadı) iman/küfür komşusu değil');
+  assert.equal(catalogPair, 0, 'katalog semNeighbors seçeneği (test) korunur');
+}
+
 
 let neighborViolations = 0;
 for (let session = 0; session < 1000; session += 1) {

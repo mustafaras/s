@@ -141,6 +141,129 @@ const SEMANTIC_CLUSTERS = Object.freeze([
   { id: 'SABIR_ITAAT', roots: ['Sbr', 'TwE', 'TEm'] }
 ]);
 
+// KAO-FIX-14 · R-A5 komşuları D-12 doğrulaması. Kural: anlamca aynı alan VE öğrenmede
+// karışma riski. Kök temelli öneriden (SEMANTIC_CLUSTERS) alan dışı düşen lemmalar
+// dışlanır; kök komşuluğu uygulamada `root` anahtarıyla ayrıca korunur.
+const SEM_NEIGHBOR_REVIEW = Object.freeze({
+  verifiedBy: 'claude-opus-5-5',
+  verifiedAt: '2026-09-27',
+  clusters: Object.freeze({
+    SOZ_EMIR: ['l_qaAla_657dd3', 'l_amor_9fbe48', 'l_qawol_58e075', 'l_amara_3fab3c'],
+    IMAN_KUFUR: ['l_aAmana_966a5c', 'l_kafara_af1746', 'l_mu_omin_870b47', 'l_ka_firuwn_165d2d', 'l_a_oraka_c73d6e',
+      'l_iyma_n_4151c0', 'l_mu_orik_2ba276', 'l_ariyk_5de5f5', 'l_kufor_1c9ee6', 'l_kaAfir_9b3cf0',
+      'l_muna_fiquwn_bdda5c', 'l_m_u_omina_t_b9c5a2'],
+    ILIM_CEHALET: ['l_Ealima_ceb6d7', 'l_Ealiym_c50d0d', 'l_Eilom_2f0f9d', 'l_aEolam_db561d', 'l_Eaqalu_36636d', 'l_Eal_ama_5c04b6'],
+    AMEL_KARSILIK: ['l_Ea_aAb_4b9936', 'l_Eamila_50319c', 'l_ajor_c798df', 'l_Eamal_8215bb', 'l_Ea_aba_be4552', 'l_HisaAb_b41eae'],
+    NEFIS_KALP: ['l_nafos_fde475', 'l_qalob_e14dcc', 'l_ruwH_1d9882'],
+    KULLUK_DUA: ['l_daEaA_f5ec67', 'l_Eabod_3558c0', 'l_Eabada_557021', 'l_akara_350195', 'l_duEaA_bcbfae'],
+    KORKU_TAKVA: ['l_t_aqaY_bc8006', 'l_xaAfa_29d6b0', 'l_mut_aqiyn_afd23b', 'l_xa_iYa_982ede', 'l_xawof_3af862'],
+    HIDAYET_DALALET: ['l_hadaY_a88771', 'l_hudFY_2e4b07', 'l_aDal_a_5ed954', 'l_Dal_a_2775a8', 'l_hotadaY_132fd7',
+      'l_Dala_l_fc4484', 'l_DaA_l_145c36'],
+    RAHMET_ZULUM: ['l_ZaAlim_fae7dd', 'l_r_aHiym_ecdbe9', 'l_raHomap_490a24', 'l_Zalama_7a9278', 'l_r_aHoma_n_c13ea2', 'l_r_aHima_870005'],
+    ALGI_ISITME_GORME: ['l_n_aZara_cdb6f4', 'l_samiEa_640570', 'l_baSiyr_69e5a4', 'l_baSar_691898', 'l_samiyE_d49cf3',
+      'l_aboSara_9f0224', 'l_samoE_5d4faf'],
+    HAYAT_OLUM: ['l_Hayaw_p_e08aa3', 'l_aHoyaA_35079e', 'l_mawot_7aa65a', 'l_m_aAta_a0f90e', 'l_m_ay_it_fb6ea2', 'l_Hay_3dc2a8',
+      'l_amaAta_5bf411'],
+    SABIR_ITAAT: ['l_aTaAEa_74ca26', 'l_Sabara_34dfc2']
+  }),
+  excluded: Object.freeze({
+    l_anfaqa_0b12ad: 'IMAN_KUFUR: harcadı — iman/küfür alanı değil (münafık kök komşusu kalır)',
+    l_amina_0a79a6: 'IMAN_KUFUR: güvende oldu — güvenlik anlamı, iman alanı değil',
+    l_Ea_lamiyn_c337cf: 'ILIM_CEHALET: âlemler — bilgi alanı değil',
+    l_Hasiba_a4ca56: 'AMEL_KARSILIK: sandı — karşılık/hesap alanı değil',
+    l_riyH_14b7a7: 'NEFIS_KALP: rüzgâr — nefis/kalp alanı değil',
+    l_Zuluma_t_933b08: 'RAHMET_ZULUM: karanlıklar — zulüm alanı değil',
+    l_taHiy_ap_de08b0: 'HAYAT_OLUM: selamlama — hayat/ölüm alanı değil',
+    l_sotaTaAEa_d34f23: 'SABIR_ITAAT: güç yetirdi — itaat alanı değil',
+    l_TaEaAm_f85a5a: 'SABIR_ITAAT: yiyecek — sabır/itaat alanı değil'
+  })
+});
+
+// Saf: yeni lemma nesneleri döndürür. Önerilen (kök temelli) küme üyeliği olan her lemma
+// kararda yer almalıdır; yeni bir öneri incelenmeden dondurulamaz.
+function applySemNeighborReview(lemmas) {
+  const review = SEM_NEIGHBOR_REVIEW;
+  const verifiedClusters = new Map();
+  for (const [cluster, members] of Object.entries(review.clusters)) {
+    for (const id of members) {
+      if (!verifiedClusters.has(id)) verifiedClusters.set(id, []);
+      verifiedClusters.get(id).push(cluster);
+    }
+  }
+  const known = new Set(lemmas.map((record) => record.lemmaId));
+  for (const id of [...verifiedClusters.keys(), ...Object.keys(review.excluded)]) {
+    assert(known.has(id), `SEM_NEIGHBOR_REVIEW: sözlükte olmayan lemma ${id}`);
+    assert(!(verifiedClusters.has(id) && review.excluded[id]), `SEM_NEIGHBOR_REVIEW: ${id} hem küme hem dışlanan`);
+  }
+  return lemmas.map((record) => {
+    const id = record.lemmaId;
+    const sem = record.semNeighbors || {};
+    const proposed = Array.isArray(sem.clusters) ? sem.clusters : [];
+    const reviewed = verifiedClusters.has(id) || Boolean(review.excluded[id]);
+    if (!reviewed) {
+      assert(sem.proposed !== false || !proposed.length, `${id}: incelenmemiş komşu doğrulanmış görünüyor`);
+      assert(!proposed.length || sem.proposed === true, `${id}: önerilen küme D-12 incelemesi bekliyor`);
+      return record;
+    }
+    const clusters = verifiedClusters.get(id) || [];
+    for (const cluster of clusters) {
+      assert(proposed.includes(cluster), `${id}: ${cluster} kök önerisinde yok (yeni küme eklenmez)`);
+    }
+    const next = {
+      ...sem,
+      proposed: false,
+      verifiedBy: review.verifiedBy,
+      verifiedAt: review.verifiedAt,
+      clusters
+    };
+    if (review.excluded[id]) next.excludedReason = review.excluded[id];
+    else delete next.excludedReason;
+    return { ...record, semNeighbors: next };
+  });
+}
+
+// Modüle giden kısa biçim: yalnız proposed:false satırlar; komşu = doğrulanmış kümeyi
+// paylaşan diğer doğrulanmış lemmalar (sıralı, simetrik). Öneri satırı null.
+function semNeighborIds(lemmas) {
+  const reviewed = lemmas.filter((record) => record.semNeighbors && record.semNeighbors.proposed === false);
+  const out = new Map();
+  for (const record of reviewed) {
+    const mine = record.semNeighbors.clusters;
+    out.set(record.lemmaId, reviewed
+      .filter((other) => other.lemmaId !== record.lemmaId && other.semNeighbors.clusters.some((c) => mine.includes(c)))
+      .map((other) => other.lemmaId)
+      .sort());
+  }
+  return out;
+}
+
+// Modülde depolama: doğrulanmış kümeler bir kez (SEM_GROUPS), satırda grup sıraları.
+// Yükleyici aynı listeyi türetir (içerik gzip bütçesi, test_kao_user_tasks).
+function semNeighborGroups(lemmas) {
+  const reviewed = lemmas.filter((record) => record.semNeighbors && record.semNeighbors.proposed === false);
+  const groups = [];
+  const index = new Map(reviewed.map((record) => [record.lemmaId, []]));
+  for (const cluster of Object.keys(SEM_NEIGHBOR_REVIEW.clusters)) {
+    const members = reviewed.filter((record) => record.semNeighbors.clusters.includes(cluster)).map((record) => record.lemmaId);
+    if (members.length < 2) continue;
+    for (const id of members) index.get(id).push(groups.length);
+    groups.push(members);
+  }
+  return { groups, index };
+}
+
+function verifySemNeighbors() {
+  const verified = JSON.parse(fs.readFileSync(VERIFIED_PATH, 'utf8'));
+  const lemmas = applySemNeighborReview(verified.lemmas);
+  const next = `${JSON.stringify({ ...verified, lemmas }, null, 2)}\n`;
+  const changed = next !== fs.readFileSync(VERIFIED_PATH, 'utf8');
+  if (changed) fs.writeFileSync(VERIFIED_PATH, next);
+  const reviewed = lemmas.filter((record) => record.semNeighbors && record.semNeighbors.proposed === false);
+  const withNeighbors = [...semNeighborIds(lemmas).values()].filter((ids) => ids.length).length;
+  console.log(`KAO sem-verify: reviewed=${reviewed.length} withNeighbors=${withNeighbors}`
+    + ` excluded=${Object.keys(SEM_NEIGHBOR_REVIEW.excluded).length} changed=${changed}`);
+}
+
 // 10-TELAFFUZ §7 — mechanical two-layer transliteration, Buckwalter driven.
 // `tr` = Turkish reading (Diyanet style, â î û), `dia` = DİA/İSAM scientific.
 // Both are PROPOSALS (`auto:true`); the human verifies or replaces them.
@@ -1956,7 +2079,7 @@ function importReview() {
     consistencyTotal: consistency.length,
     consistency,
     approvalRule: 'D-12 (06 §3): tek doğrulayıcı + tek tarih + tutarlılık denetimi',
-    lemmas: draftFile.lemmas
+    lemmas: applySemNeighborReview(draftFile.lemmas)
   };
   fs.mkdirSync(path.dirname(VERIFIED_PATH), { recursive: true });
   fs.writeFileSync(VERIFIED_PATH, `${JSON.stringify(output, null, 2)}\n`);
@@ -2021,6 +2144,7 @@ function frozenRows(verified, examplePronunciations) {
   assert(verified && verified.version === LEXICON_VERSION, 'doğrulanmış sözlük sürümü uyumsuz');
   assert(Array.isArray(verified.lemmas) && verified.lemmas.length >= 500,
     'doğrulanmış sözlükte en az 500 lemma olmalı');
+  const { index: semGroupIndex } = semNeighborGroups(verified.lemmas);
   return verified.lemmas.map((record) => {
     assert(record.verified === true, `${record.lemmaId}: yalnız verified:true kayıt dondurulabilir`);
     assert(Array.isArray(record.examples) && record.examples.length > 0,
@@ -2049,7 +2173,8 @@ function frozenRows(verified, examplePronunciations) {
         have: record.examplesException.have,
         want: record.examplesException.want
       } : null,
-      true
+      true,
+      semGroupIndex.has(record.lemmaId) ? semGroupIndex.get(record.lemmaId) : null
     ];
   });
 }
@@ -2080,6 +2205,7 @@ function packFrozenRows(rows) {
 
 function renderFrozenLexicon(verified, examplePronunciations) {
   const { dictionary, packed } = packFrozenRows(frozenRows(verified, examplePronunciations));
+  const { groups: semGroups } = semNeighborGroups(verified.lemmas);
   const packedTemplate = packed
     .replaceAll('\\', '\\\\')
     .replaceAll('`', '\\`')
@@ -2103,6 +2229,12 @@ function renderFrozenLexicon(verified, examplePronunciations) {
   var packed = \`${packedTemplate}\`;
   for (var i=0;i<DICTIONARY.length;i+=1) packed=packed.split(String.fromCodePoint(0xE000+i)).join(DICTIONARY[i]);
   var rows = JSON.parse(packed);
+  var SEM_GROUPS = ${JSON.stringify(semGroups)};
+  function semNeighborsOf(id, groups){
+    var out = [];
+    groups.forEach(function(g){ SEM_GROUPS[g].forEach(function(other){ if(other !== id && out.indexOf(other) < 0) out.push(other); }); });
+    return out.sort();
+  }
   var lemmas = rows.map(function(row){
     return Object.freeze({
       id:row[0], ar:row[1], translit:row[2], meanings:Object.freeze(row[3]),
@@ -2112,7 +2244,8 @@ function renderFrozenLexicon(verified, examplePronunciations) {
         return Object.freeze({ ar:example[0], tr:example[1], ref:example[2], pronunciation:example[3] });
       })),
       examplesException:row[11] ? Object.freeze(row[11]) : null,
-      verified:row[12] === true
+      verified:row[12] === true,
+      semNeighbors:Array.isArray(row[13]) ? Object.freeze(semNeighborsOf(row[0], row[13])) : null
     });
   });
   var index = Object.create(null);
@@ -2159,6 +2292,7 @@ function usage() {
     '  node tools/kao-lexicon-build.mjs --workbook',
     '  node tools/kao-lexicon-build.mjs --import-md',
     '  node tools/kao-lexicon-build.mjs --freeze',
+    '  node tools/kao-lexicon-build.mjs --sem-verify  # R-A5 komşu D-12 kararı (KAO-FIX-14)',
     '  node tools/kao-lexicon-build.mjs --rehead      # inceleme tablosunda başlık biçimi (KAO-FIX-05)'
   ].join('\n');
 }
@@ -2205,6 +2339,11 @@ async function main(argv) {
   if (argv.includes('--import-md')) {
     rejectUnknown(argv, new Set(['--import-md']));
     importReview();
+    return;
+  }
+  if (argv.includes('--sem-verify')) {
+    rejectUnknown(argv, new Set(['--sem-verify']));
+    verifySemNeighbors();
     return;
   }
   if (argv.includes('--freeze')) {

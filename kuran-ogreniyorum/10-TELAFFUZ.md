@@ -130,3 +130,4 @@ opsiyonel.
 - Kullanıcı öz-değerlendirme "Yakın" oranı raporlanır, puanlanmaz.
 - Telaffuz hatası → anlam kartına bağ: yanlış duyulan harfin geçtiği
   kelimeler "dikkat" rozetiyle listelenir.
+> **Durum (KAO-FIX-18, 2026-09-27):** Kısmen — üçüncü madde uygulandı (telaffuz ekranında `phonics.misheard`'den "Dikkat listesi"); kova B/C algı doğruluğu raporu ve "Yakın" oranı uygulanmadı (öz-değerlendirme kaydedilmez) — sonraki program (KF-6). Gerekçe: rapor yeni kalıcı alan ve 4 haftalık yeni-okuyucu testi ister.

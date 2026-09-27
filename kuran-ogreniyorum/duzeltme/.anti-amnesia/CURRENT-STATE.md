@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-18** · **Aktif:** — · **Engel:** —
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-19** · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`7f74842` (FIX-17 yalnız araç, Pages run 36319251351 success; canlı pin `20260926m`; index.html, sw.js, quranLearn.js canlı=repo; araç/belge Pages'te yayımlanmaz); kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-17 done (plan-check: KAO dosyası ↔ commit öneki, `--commits`, auditStatus; yalnız araç, pin `20260926m` aynı)
+**Güncelleme:** 2026-09-27 · KAO-FIX-18 done (sahipsiz 7 plan maddesine durum satırı; 6 aday sonraki programa; yalnız belge, pin `20260926m` aynı)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -32,7 +32,7 @@
 | KAO-FIX-15 | D-2, D-5 | done | `cbeef96` | KF-9 gramer dahil ≤2 (tıkanınca oturum kısalır); KF-3 kod 4; `durable30`=isSettled(s≥30) soldurma; `errorClass:'cognate'`; sim maxRun 4→2, kod=plan 510 |
 | KAO-FIX-16 | O-8, D-1, D-3 | done | `1664f57` | 05 §1/§2/§5/§6, 06 §5, 02 §2.4, README; `deliverables/KAO-KAPANIS-EK-1.md`; bağlantı 44/0 kırık; `eighty` açık karar olarak EK-1'de |
 | KAO-FIX-17 | O-11 | done | `7f74842` | KAO dosya kümesi → önek (taban `58e0ceb` sonrası FAIL, öncesi WARN: a9fa40c, ecc7ac7); `(ek)`/P00/Dn önekleri de tanınır; `--commits`; findings gerekçesiz WARN (D1/D5/D6); öz-test 19/19 |
-| KAO-FIX-18 | D-4 | todo | | sahipsiz maddeler kararı |
+| KAO-FIX-18 | D-4 | done | (commit sonrası) | 7/7 durum satırı: 02 §5.3 uygulandı (FIX-15); §5.6, §5.8, §5.10 uygulanmadı; §5.7, 04 §4 FX, 10 §9 kısmen — kalanlar sonraki program (KF-6) |
 | KAO-FIX-19 | hepsi | todo | | kapanış regresyonu |
 
 Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına neden) · `partial` (parti yarım).
@@ -96,4 +96,11 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 
 ## Sonraki program adayları (FIX-18 doldurur)
 
-- —
+KF-6 (varsayılan): kod yok, sonraki programda. Durum satırları plan belgelerinde.
+- 02 §5.6 "bağ kur" görevi (5 yeni kelimede bir, Türkçe türev seçimi) — yeni görev türü + kuyruk + fixture.
+- 02 §5.7 hata taksonomisi → kuyruk ağırlığı + "en çok karıştırdıkların" satırı (sayaçlar zaten var).
+- 02 §5.8 niyet önerisi (namaz vaktine bağlı zamanlı hub metni; REM dondurulmuş, bildirim yok).
+- 02 §5.10 haftalık aktarım testi (görülmemiş ≥%95 âyette çeviri seçimi; E9 aday seçimini yeniden kullanır).
+- 04 §4 FX: `SeyHaptics.tap`, `SeyAudio.tap`, `SeyFx.countUp`, konfeti (6 taş), `.sey-enter` — fx-coverage + cihaz kabulü.
+- 10 §9 kova B/C algı doğruluğu raporu + "Yakın" öz-değerlendirme oranı (kalıcı alan gerekir).
+- Diğer ertelenenler: `quranLearn.js`/içerik bölme (KF-2), kısa kart anahtarları (FIX-15 m.6); kullanıcı kararında: gzip bütçesi, `eighty` eşiği.

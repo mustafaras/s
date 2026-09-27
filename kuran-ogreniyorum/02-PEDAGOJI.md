@@ -145,6 +145,7 @@ Harekeli metin hem zayıf hem iyi okurda doğruluk ve anlamayı artırır;
 harekesiz okumada homograf yüzünden her 2–3 kelimeden biri risklidir.
 KAO: hareke **varsayılan açık**; "soldurma" modu yalnız kullanıcı isteğiyle,
 review kararlılığı ≥30 gün olan kelimelerde.
+> **Durum (KAO-FIX-18, 2026-09-27):** Uygulandı (KAO-FIX-15) — hareke varsayılan açık, soldurma ayarla (varsayılan kapalı) ve yalnız review ∧ s≥30 kartta (`task.durable30`); `test_kao_render.js` korur.
 
 ### 5.4 Algı-önce telaffuz (HVPT meta-analizleri)
 [10-TELAFFUZ](10-TELAFFUZ.md) §5. Çok okuyuculu dinleme; üretim aktarımı
@@ -158,6 +159,7 @@ dizerek/ek çözerek *kurar*, hazır görmez.
 ### 5.6 Ayrıntılandırıcı sorgulama
 Kök ağacında "neden bu kelime bu kökten?" sorusu (ör. مَكْتَب → yazılan yer);
 her 5 yeni kelimede bir "bağ kur" görevi: Türkçedeki türevini seç.
+> **Durum (KAO-FIX-18, 2026-09-27):** Uygulanmadı — sonraki program (KF-6). Gerekçe: kök ağacı katmanı var, ancak "bağ kur" görev türü ve 5 yeni kelimede bir tetikleyici hiçbir karta bağlanmadı; yeni görev türü kuyruk ve fixture değişikliği ister.
 
 ### 5.7 Geri bildirim zamanı ve hata taksonomisi
 Anında düzeltici geri bildirim + kısa gerekçe. Hatalar sınıflanır:
@@ -165,6 +167,7 @@ Anında düzeltici geri bildirim + kısa gerekçe. Hatalar sınıflanır:
 karışıklığı** (ـهُ/ـهُمْ), **kognat tuzağı** (anlam kayması), **kural**
 (elif-lâm/vakıf). Taksonomi telemetriye gider → zayıf alan otomatik daha sık
 gelir; kullanıcıya "en çok karıştırdıkların" tek satırı.
+> **Durum (KAO-FIX-18, 2026-09-27):** Kısmen — hata sayaçları (`errors.sound/root/affix/cognate/rule/order`) tutuluyor; kuyruk ağırlığı ve "en çok karıştırdıkların" satırı uygulanmadı — sonraki program (KF-6). Gerekçe: ağırlıklandırma FSRS kuyruğunun bütçe/serpiştirme kurallarını değiştirir, ayrı karar ve simülasyon ister.
 
 ### 5.8 Motivasyon: öz-belirleme ve niyet
 Özerklik (ünite sırası öneri, kilit yok; günlük bütçe seçimi), yeterlik
@@ -173,6 +176,7 @@ Yolculuğu'nda Raşit ile köprü). **Uygulama niyeti**: "Sabah namazından sonr
 5 dakika" — mevcut namaz vakti verisi/hatırlatıcı altyapısı *okunarak* öneri
 (REM programı dondurulmuş; yeni bildirim üretilmez, yalnız hub kartında
 zamanlı öneri metni).
+> **Durum (KAO-FIX-18, 2026-09-27):** Uygulanmadı — sonraki program (KF-6). Gerekçe: namaz vakti/hatırlatıcı verisini okuyan niyet önerisi başka programların (REM dondurulmuş, namaz vakti) yüzeyine bağımlı; hiçbir karta bağlanmadı.
 
 ### 5.9 Bilişsel yük yönetimi
 Tek görev tek ekran; en çok 4 çip; yeni kelimede önce ses+Arapça+Türkçe,
@@ -183,3 +187,4 @@ başına en çok 3 yeni ses.
 Haftalık "yeni âyet" testi: hiç görülmemiş, kelime kapsamı ≥%95 bir parça
 → çeviri seçimi. Eğitilen kartlarda değil, **yeni metinde** başarı ölçülür
 (HVPT literatüründeki "untrained stimuli" mantığı).
+> **Durum (KAO-FIX-18, 2026-09-27):** Uygulanmadı — sonraki program (KF-6). Gerekçe: E9 "anlayabildiğin âyet" görülmemiş ≥%95 kapsamlı parçayı gösterir ve kullanıcı işaretler, ama haftalık çeviri-seçimi testi ve yeni metinde başarı ölçümü yok.

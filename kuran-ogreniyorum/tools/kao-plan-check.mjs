@@ -127,7 +127,10 @@ export function check(state, ctx) {
   }
   if (state.releaseApproval !== 'NOT_APPROVED' && !(state.releaseApprovalRecord && state.releaseApprovalRecord.by)) fail('releaseApproval NOT_APPROVED değil ama kayıt yok');
   // 6 · commit kapsamı: konusu KAO-NN ile başlayan her commit yalnız o kartın izinli dosyalarına dokunur
-  const CHORE_SCOPE = ['kuran-ogreniyorum/KAO-STATE.json', 'kuran-ogreniyorum/.anti-amnesia/**', 'kuran-ogreniyorum/evidence/**'];
+  // chore(kao) kapsamı: durum/kanıt dosyaları + FIX programının belge ve yardımcı betik alanı
+  // (duzeltme/**) + KAO araçları (tools/**). 2026-09-27: `duzeltme/araclar/kao-*.sh` eklenince
+  // eski liste (yalnız kök state + .anti-amnesia + evidence) yetersiz kaldı (46a2f8f FAIL).
+  const CHORE_SCOPE = ['kuran-ogreniyorum/KAO-STATE.json', 'kuran-ogreniyorum/.anti-amnesia/**', 'kuran-ogreniyorum/evidence/**', 'kuran-ogreniyorum/duzeltme/**', 'kuran-ogreniyorum/tools/**'];
   for (const cm of ctx.commits || []) {
     if (/^chore\(kao\)/.test(cm.subject)) { for (const f of cm.files) if (!inScope(f, CHORE_SCOPE)) fail(`commit ${cm.hash.slice(0, 7)} chore(kao) kapsam dışı dosya: ${f}`); continue; }
     const m = cm.subject.match(/^(KAO-(?:P00|D\d|\d+b?))\b/); if (!m) continue;

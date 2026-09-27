@@ -1,7 +1,7 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
 **Durum:** `active` · **Sıradaki:** **KAO-FIX-17** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`1664f57` (FIX-16 yalnız belge, Pages run 36317887581 success; canlı pin `20260926m`, index.html canlı=repo; `.md` Pages'te yayımlanmaz (404, `_site`); uygulama kodu son `cbeef96`); kullanıcı her karttan sonra canlıya almayı istiyor
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`efe5906` (arayüz belgesi `ARAYUZ-DEGISIKLIKLERI.md`, Pages run 36318898141 success; önce FIX-16 `1664f57`; canlı pin `20260926m`, index.html canlı=repo; `.md` Pages'te yayımlanmaz (404, `_site`); uygulama kodu son `cbeef96`); kullanıcı her karttan sonra canlıya almayı istiyor
 **Güncelleme:** 2026-09-27 · KAO-FIX-16 done (plan/belge hizası + KAPANIŞ ek-1; yalnız belge, pin `20260926m` aynı)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).

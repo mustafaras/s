@@ -512,4 +512,34 @@ assert.ok(prevented >= 3 && stopped >= 3);
   appData.quranLearn = saved;
 }
 
-console.log('KAO render: PASS (KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');
+// KAO-FIX-12 · E7 kaynaklar ve lisanslar (O-6): statik bölüm, düz bağlantılar, metin kaynaktan okunur.
+{
+  const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum/content/audio-manifest.json'), 'utf8'));
+  const settingsHtml = api.kaoSettingsHTML();
+  const match = settingsHtml.match(/<section class="kao-sources"[\s\S]*?<\/section>/);
+  assert.ok(match, 'E7 kaynaklar bölümü yok');
+  assert.ok(settingsHtml.indexOf(match[0]) < settingsHtml.lastIndexOf('</main>'), 'bölüm E7 içinde');
+  const block = match[0];
+  for (const name of ['Tadabur', 'CC BY-NC 4.0', 'AQQD', 'CC0', 'Tanzil', 'CC BY 3.0', 'Quranic Arabic Corpus', 'Diyanet', 'ts-fsrs', 'MIT']) assert.ok(block.includes(name), `kaynak eksik: ${name}`);
+  for (const d of manifest.datasets) {
+    for (const value of [d.license, d.attribution, d.url]) assert.ok(block.includes(value), `ses kaynağı manifestle eş değil: ${value}`);
+  }
+  for (const mod of [sandbox.window.QuranLexiconV1, sandbox.window.QuranShortSurahsV1]) {
+    for (const s of mod.ATTRIBUTION.sources) if (s.url) assert.ok(block.includes(`href="${s.url}"`), `modül atfı okunmadı: ${s.url}`);
+  }
+  assert.doesNotMatch(source, /tanzil\.net|corpus\.quran\.com|dijital\.diyanet/, 'içerik atfı tekrar yazılmaz, modülden okunur');
+  const links = block.match(/<a\b[^>]*>/g) || [];
+  assert.ok(links.length >= 6, `bağlantı sayısı: ${links.length}`);
+  for (const a of links) {
+    assert.match(a, /\bhref="https:\/\/[^"]+"/);
+    assert.match(a, /\brel="noopener"/);
+    assert.match(a, /\btarget="_blank"/);
+  }
+  assert.doesNotMatch(block, /\bon[a-z]+=|App\./, 'statik bölüm: işleyici yok');
+  const css = (cssSource.match(/\.kao-sources[^{]*\{[^}]*\}/g) || []).join('');
+  assert.ok(css.length > 0, 'kao-sources stili yok');
+  assert.doesNotMatch(css, /#[0-9a-f]{3,8}\b|rgb\(|hsl\(/i, 'yalnız token');
+  for (const token of css.match(/var\(--[a-z0-9-]+/g) || []) assert.match(token, /var\(--(quran|f-)/, `izinsiz token: ${token}`);
+}
+
+console.log('KAO render: PASS (KAO-FIX-12 E7 kaynaklar, KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)');

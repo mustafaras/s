@@ -1052,6 +1052,29 @@
     var esc=quranLearnDeps.esc;
     return '<div class="kao-setting"><p class="kao-setting-label">'+esc(label)+'</p><div class="kao-seg" role="group" aria-label="'+esc(label)+'">'+options.map(function(option){ return '<button type="button" aria-pressed="'+(String(option[0])===String(current)?'true':'false')+'" onclick="App.'+handler+'('+option[2]+')">'+esc(option[1])+'</button>'; }).join('')+'</div></div>';
   }
+  // Ses kaynakları: kuran-ogreniyorum/content/audio-manifest.json → datasets[] (id, license, attribution, url); ad, id'den okunur.
+  var KAO_AUDIO_SOURCES=[
+    {name:'Tadabur (FaisaI/tadabur)',license:'CC BY-NC 4.0',attribution:'Faisal Alsaif, Faisal Almosallam, Haitham Aloqiel, Faris Alblehai',url:'https://huggingface.co/datasets/FaisaI/tadabur'},
+    {name:'AQQD-v2',license:'CC0 1.0',attribution:'Taibah University academic initiative; R000 controlled single reciter',url:'https://doi.org/10.7910/DVN/A8GM5Y'}
+  ];
+  // Zamanlayıcı kaynağı: bu dosyanın başındaki ts-fsrs lisans başlığı.
+  var KAO_FSRS_SOURCE={name:'ts-fsrs v4.5.2 (Open Spaced Repetition)',license:'MIT',url:'https://github.com/open-spaced-repetition/ts-fsrs/tree/v4.5.2'};
+  function kaoContentSources(){
+    var seen={},out=[];
+    [window.QuranLexiconV1,window.QuranShortSurahsV1].forEach(function(mod){
+      var list=mod&&mod.ATTRIBUTION&&Array.isArray(mod.ATTRIBUTION.sources)?mod.ATTRIBUTION.sources:[];
+      list.forEach(function(s){ var key=s&&(s.url||s.name); if(!key||seen[key]) return; seen[key]=true; out.push(s); });
+    });
+    return out;
+  }
+  function kaoSourceItemHTML(s,esc){
+    var name=/^https:\/\//.test(String(s.url||''))?'<a href="'+esc(s.url)+'" rel="noopener" target="_blank">'+esc(s.name)+'</a>':esc(s.name);
+    return '<li>'+name+(s.license?' · <span class="kao-source-license">'+esc(s.license)+'</span>':'')+(s.attribution?'<span class="kao-source-note">'+esc(s.attribution)+'</span>':'')+'</li>';
+  }
+  function kaoSourcesHTML(esc){
+    var item=function(s){ return kaoSourceItemHTML(s,esc); };
+    return '<section class="kao-sources" aria-labelledby="kao-sources-title"><h3 id="kao-sources-title">Kaynaklar ve lisanslar</h3><h4>Ses kayıtları</h4><ul>'+KAO_AUDIO_SOURCES.map(item).join('')+'</ul><h4>Metin, sözlük ve dualar</h4><ul>'+kaoContentSources().map(item).join('')+'</ul><h4>Tekrar zamanlaması</h4><ul>'+item(KAO_FSRS_SOURCE)+'</ul><p class="kao-setting-hint">Lisans adları her kaynağın kendi beyanıdır; bağlantılar yeni sekmede açılır.</p></section>';
+  }
   function kaoSettingsHTML(){
     if(!quranLearnDeps) return '';
     var q=ensureQuranLearn(quranLearnDeps.data()),ui=quranLearnDeps.ui(),esc=quranLearnDeps.esc,s=q.settings,r=q.readability,lines={compact:'1.9',normal:'2.2',wide:'2.5'},line=lines[r.lineHeight]||String(r.lineHeight);
@@ -1064,7 +1087,7 @@
     h+='<section><h3>Görünürlük</h3><div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(s.kaoVisible!==false?'true':'false')+'" onclick="App.kaoToggleVisible()">İlham & İbadet’te kartı göster: '+(s.kaoVisible!==false?'açık':'kapalı')+'</button></div><p class="kao-setting-hint">Kapatırsan kart gizlenir, verilerin korunur; uygulama Ayarları → Gizlenen kartlar bölümünden geri getirebilirsin.</p></section>';
     h+='<section><h3>Gölgeleme (mikrofon)</h3><div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(s.shadowing===true?'true':'false')+'" onclick="App.kaoToggleShadowing()">Gölgeleme: '+(s.shadowing===true?'açık':'kapalı')+'</button></div><p class="kao-setting-hint">Açıkken Telaffuz stüdyosunda modeli dinleyip kendi sesini en çok 10 saniye kaydedebilirsin. Mikrofon yalnız sen başlatınca açılır; kayıt yalnız bu ekranda bellekte durur, hiçbir yere kaydedilmez ya da gönderilmez ve pencereyi kapatınca silinir.</p></section>';
     h+='<section><h3>Okunabilirlik</h3><p class="kao-gate-ar kao-settings-sample" lang="ar" dir="rtl" style="'+kaoReadabilityStyle()+'">'+(r.coloredHarakat?kaoColorHarakat(sample):esc(sample))+'</p>'+kaoSegHTML('Arapça satır aralığı',KAO_LINE_HEIGHTS.map(function(v){ return [v,v==='1.9'?'Sıkı':(v==='2.2'?'Rahat':'Geniş'),"'lineHeight','"+v+"'"]; }),line,'kaoSetReadability')+kaoSegHTML('Kelime boşluğu',[['normal','Normal',"'wordSpacing','normal'"],['wide','Geniş',"'wordSpacing','wide'"]],r.wordSpacing,'kaoSetReadability')+'<div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(r.coloredHarakat?'true':'false')+'" onclick="App.kaoSetReadability(\'coloredHarakat\','+(r.coloredHarakat?'false':'true')+')">Renkli hareke (Seviye 0): '+(r.coloredHarakat?'açık':'kapalı')+'</button></div></section>';
-    h+='<section><h3>Seviye 0 ve dışa aktarma</h3><div class="kao-setting-row"><button type="button" class="kao-secondary" onclick="App.kaoReopenGate()">Seviye 0 kontrolünü yeniden aç</button><button type="button" class="kao-secondary" onclick="App.kaoExportCsv()">Kelimelerimi indir (CSV)</button></div><p class="kao-setting-hint">CSV yalnız bu cihazda oluşturulur; Anki uyumlu sütunlar: ar, tr, translit, root, tags.</p><p class="kao-live" aria-live="polite">'+esc(ui.kaoSettingsNote||'')+'</p></section></main>';
+    h+='<section><h3>Seviye 0 ve dışa aktarma</h3><div class="kao-setting-row"><button type="button" class="kao-secondary" onclick="App.kaoReopenGate()">Seviye 0 kontrolünü yeniden aç</button><button type="button" class="kao-secondary" onclick="App.kaoExportCsv()">Kelimelerimi indir (CSV)</button></div><p class="kao-setting-hint">CSV yalnız bu cihazda oluşturulur; Anki uyumlu sütunlar: ar, tr, translit, root, tags.</p><p class="kao-live" aria-live="polite">'+esc(ui.kaoSettingsNote||'')+'</p></section>'+kaoSourcesHTML(esc)+'</main>';
     return h;
   }
   // assets/kao/svg/* dosyalarının birebir kopyası (test_kao_phonics_contract.js eşitliği denetler).

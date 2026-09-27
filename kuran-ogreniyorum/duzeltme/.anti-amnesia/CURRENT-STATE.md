@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-26** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`07c897a` (FIX-24, Pages run 36323628083 success; canlı pin `20260927e`; index.html, sw.js, quranLearn.js canlı=repo); yayın kaydı sonraki kartın commit'inde ayrı LEDGER satırı; kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-25 done (FX; pin `20260927f`); sırada FIX-26, en son FIX-19
+**Durum:** `active` · **Sıradaki:** **KAO-FIX-19** · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`f534a7b` (FIX-25, Pages run 36323989074 success; canlı pin `20260927f`; index.html, sw.js, quranLearn.js canlı=repo); yayın kaydı sonraki kartın commit'inde ayrı LEDGER satırı; kullanıcı her karttan sonra canlıya almayı istiyor
+**Güncelleme:** 2026-09-27 · KAO-FIX-26 done (kova B/C raporu + Yakın oranı; pin `20260927g`); FIX-20…26 tamam, sırada kapanış FIX-19
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -38,8 +38,8 @@
 | KAO-FIX-22 | 02 §5.7 | done | `c148329` | hata ağırlığı (zayıf sınıf kuyrukta öne) + "en çok karıştırdıkların" satırı |
 | KAO-FIX-23 | 02 §5.8 | done | `8747496` | niyet önerisi: namaz vaktine bağlı zamanlı hub metni (bildirim yok) |
 | KAO-FIX-24 | 02 §5.10 | done | `07c897a` | haftalık aktarım testi: görülmemiş ≥%95 âyette çeviri seçimi, başarı ölçümü |
-| KAO-FIX-25 | 04 §4 | done | (commit sonrası) | FX: haptik + doğru sesi, countUp, konfeti (taş), `.sey-enter`; kendi kapıları |
-| KAO-FIX-26 | 10 §9 | todo | | kova B/C algı doğruluğu raporu + "Yakın" öz-değerlendirme oranı |
+| KAO-FIX-25 | 04 §4 | done | `f534a7b` | FX: haptik + doğru sesi, countUp, konfeti (taş), `.sey-enter`; kendi kapıları |
+| KAO-FIX-26 | 10 §9 | done | (commit sonrası) | kova B/C algı doğruluğu raporu + "Yakın" öz-değerlendirme oranı |
 | KAO-FIX-19 | hepsi | todo | | kapanış regresyonu (FIX-20…26'dan **sonra**; tüm kodu kapsar) |
 
 Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına neden) · `partial` (parti yarım).
@@ -69,7 +69,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 | tests/app | 77/77 |
 | tests/panel · panel-v2 · quran | 23/23 · 27/27 · 9/9 |
 | kao-sim 120 g: iki yönlü lemma / kod bilinen / plan bilinen | 0 / 524 / 0 (codeCoveragePct 77.42 · grammarMax 4 · maxSameTypeRun 4) |
-| Yayın pini | `20260926b` taban → **`20260927f`** (FIX-25) (`quranPhonicsV1` ayrı: `20260924b`) |
+| Yayın pini | `20260926b` taban → **`20260927g`** (FIX-26) (`quranPhonicsV1` ayrı: `20260924b`) |
 | app.js satır | 7.798 / 7.800 |
 | fx2 pinleri | App 756 · onclick 393 · v3 556 · surface 594 |
 
@@ -98,6 +98,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 21. **R-A5 komşuları (FIX-14):** karar `tools/kao-lexicon-build.mjs` `SEM_NEIGHBOR_REVIEW`’da; `--import-md` ve `--sem-verify` uygular, incelenmemiş kök önerisi `--freeze`’i durdurur. İçerik gzip 162.177 / tavan 163.840 (`test_kao_user_tasks.js`): pay ~1,6 KB — içerik büyüten kart önce ölçsün.
 22. **Kuyruk KF-9 (FIX-15):** ardışık aynı tür ≤2 gramer dahil; salt gramer kalınca kuyruk durur (oturum kısalır, kabul). Soldurma `task.durable30` (isSettled s≥30) ister — fixture kartı açıkça review s≥30 kurmalı; `isNew:false` yetmez.
 23. **plan-check önek kuralı (FIX-17):** `app/core/quranLearn.js`, `kao.css`, 4 içerik modülü, `tools/kao-*.mjs`, `tests/kao/**`, `assets/kao/**`'e dokunan commit konusu `KAO-FIX-NN:` / `KAO-FIX-NN (ek):` olmalı; numarasız `KAO-FIX:` yalnız `duzeltme/` belgeleri için (aksi FAIL).
+24. **Satır bütçesi doldu (FIX-26):** `quranLearn.js` 1.899 / 1.900 (KF-2). Yeni kod önce bölme (sonraki program) ya da tavan kararı ister; yeni FX/özellik blokları da gizlilik taramasının dilim sınırlarına dikkat etmeli (`test_kao_privacy` KAO-27 bloğu `kaoToggleShadowing`'e kadar).
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 
@@ -105,11 +106,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 
 ## Sonraki program adayları (FIX-18 doldurur)
 
-KF-6 (varsayılan): kod yok, sonraki programda. Durum satırları plan belgelerinde.
-- 02 §5.6 "bağ kur" görevi (5 yeni kelimede bir, Türkçe türev seçimi) — yeni görev türü + kuyruk + fixture.
-- 02 §5.7 hata taksonomisi → kuyruk ağırlığı + "en çok karıştırdıkların" satırı (sayaçlar zaten var).
-- 02 §5.8 niyet önerisi (namaz vaktine bağlı zamanlı hub metni; REM dondurulmuş, bildirim yok).
-- 02 §5.10 haftalık aktarım testi (görülmemiş ≥%95 âyette çeviri seçimi; E9 aday seçimini yeniden kullanır).
-- 04 §4 FX: `SeyHaptics.tap`, `SeyAudio.tap`, `SeyFx.countUp`, konfeti (6 taş), `.sey-enter` — fx-coverage + cihaz kabulü.
-- 10 §9 kova B/C algı doğruluğu raporu + "Yakın" öz-değerlendirme oranı (kalıcı alan gerekir).
+KF-6 kullanıcı kararıyla **şimdi uygulandı** (2026-09-27, FIX-21…26): bağ kur, hata ağırlığı + en çok karıştırdıkların, niyet önerisi, haftalık aktarım testi, FX, kova B/C raporu + Yakın oranı.
+Kalan adaylar:
+- 10 §9 "4 hafta sonra yeni okuyucu sesiyle" genelleme testi — ikinci okuyucu ses varlığı gerekir.
 - Diğer ertelenenler: `quranLearn.js`/içerik bölme (KF-2), kısa kart anahtarları (FIX-15 m.6); kullanıcı kararında: gzip bütçesi, `eighty` eşiği.

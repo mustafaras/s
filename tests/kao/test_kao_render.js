@@ -441,6 +441,40 @@ assert.ok(prevented >= 3 && stopped >= 3);
   ui.kaoPhonics = { phase: 'home' }; ui.kaoView = 'home'; ui.kaoOpen = false;
 }
 
+// KAO-FIX-26 (10 §9, KF-6): kova B/C algı doğruluğu (phonics.buckets) ve gölgeleme "Yakın" öz-değerlendirme oranı
+// (phonics.self) kaydedilir; telaffuz stüdyosu ana ekranında raporlanır (hedef ≥%85; puan değil).
+{
+  const bucketOf = (id) => (sandbox.window.QuranPhonicsV1.letters.find((letter) => letter.id === id) || {}).bucket;
+  quranLearn.phonics.buckets = undefined; quranLearn.phonics.self = undefined;
+  ui.kaoPhonics = { phase: 'home' };
+  api.kaoPhonics('start');
+  const expected = { B: { n: 0, ok: 0 }, C: { n: 0, ok: 0 } };
+  let flip = true;
+  for (let guard = 0; guard < 40 && ui.kaoPhonics.phase === 'task'; guard += 1) {
+    const st = ui.kaoPhonics, task = st.tasks[st.index];
+    if (task.kind === 'order') { for (const id of task.order) api.kaoPhonics('answer', id); continue; }
+    const choice = task.choices.find((item) => item.correct === flip);
+    const bucket = task.targetLetter ? bucketOf(task.targetLetter) : null;
+    if (bucket === 'B' || bucket === 'C') { expected[bucket].n += 1; if (flip) expected[bucket].ok += 1; }
+    api.kaoPhonics('answer', choice.id); flip = !flip;
+  }
+  const recorded = JSON.parse(JSON.stringify(quranLearn.phonics.buckets || {}));
+  assert.ok(expected.B.n + expected.C.n > 0, 'fixture: B/C algı görevi var');
+  for (const bucket of ['B', 'C']) if (expected[bucket].n) assert.deepEqual(recorded[bucket], expected[bucket], `kova ${bucket} algı doğruluğu kaydı`);
+  ui.kaoShadow = { phase: 'recorded', clipId: 'w-test' };
+  api.kaoRecordDiscard('near');
+  ui.kaoShadow = { phase: 'recorded', clipId: 'w-test' };
+  api.kaoRecordDiscard();
+  assert.deepEqual(JSON.parse(JSON.stringify(quranLearn.phonics.self)), { near: 1, n: 2 }, 'Yakın öz-değerlendirme sayacı');
+  ui.kaoPhonics = { phase: 'home' };
+  const report = api.kaoPhonicsHTML();
+  assert.match(report, /Algı doğruluğu/); assert.match(report, /hedef ≥%85/);
+  if (expected.B.n) assert.ok(report.includes(`Kova B: %${Math.round(expected.B.ok / expected.B.n * 100)} (${expected.B.n})`), 'kova B oranı');
+  assert.match(report, /Yakın: 1 \/ 2/, 'Yakın oranı raporu, puan değil');
+  assert.deepEqual(JSON.parse(JSON.stringify(api.ensureQuranLearn({ quranLearn: { phonics: { buckets: { B: { n: 'x', ok: 9 }, Z: 1 }, self: { near: 5, n: 2 } } } }).phonics)).buckets, { B: { n: 0, ok: 0 }, C: { n: 0, ok: 0 } }, 'bozuk kova kaydı normalleşir');
+  ui.kaoPhonics = { phase: 'home' }; ui.kaoShadow = null;
+}
+
 
 // KAO-28b · E10 Mushaf ısı haritası render sözleşmesi (R-B1).
 {

@@ -14,7 +14,7 @@ Kararları değiştirmek istersen (KF-1…KF-9, bkz. `.anti-amnesia/CURRENT-STAT
 İlerleme işareti (isteğe bağlı): bitirdiğin bloğun başlığındaki `[ ]` işaretini `[x]` yap.
 
 
-### [ ] 1 · KAO-FIX-00 — Başlangıç, dal, kararlar, taban ölçümü
+### [x] 1 · KAO-FIX-00 — Başlangıç, dal, kararlar, taban ölçümü
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-00 promptunu uygula.
 
@@ -32,7 +32,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, iki commit hash'i, taban ölçümleri, kontrol exit özeti (≤10 satır).
 ```
 
-### [ ] 2 · KAO-FIX-01 — Dondurma hattı onarımı + tekrar üretim testi
+### [x] 2 · KAO-FIX-01 — Dondurma hattı onarımı + tekrar üretim testi
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-01 promptunu uygula.
 
@@ -49,7 +49,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, freeze-repro sonucu, commit hash'i, kontrol exit özeti (≤10 satır).
 ```
 
-### [ ] 3 · KAO-FIX-02 — Kısa sûre çalışma kitabı ve içe alma kapısı
+### [x] 3 · KAO-FIX-02 — Kısa sûre çalışma kitabı ve içe alma kapısı
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-02 promptunu uygula.
 
@@ -66,7 +66,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, --surah-import sayıları, commit hash'i, kontrol exit özeti (≤10 satır).
 ```
 
-### [ ] 4 · KAO-FIX-03/A — Türkçe katman: Tîn, Alak, Kadr, Beyyine (230 satır)
+### [x] 4 · KAO-FIX-03/A — Türkçe katman: Tîn, Alak, Kadr, Beyyine (230 satır)
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-03 promptunu PARTİ A uygula.
 
@@ -86,7 +86,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, doldurulan satır sayısı, copy/language, commit hash'i (≤10 satır).
 ```
 
-### [ ] 5 · KAO-FIX-03/B — Türkçe katman: Zilzâl … Fil (210 satır)
+### [x] 5 · KAO-FIX-03/B — Türkçe katman: Zilzâl … Fil (210 satır)
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-03 promptunu PARTİ B uygula.
 
@@ -105,7 +105,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, doldurulan satır sayısı, copy/language, commit hash'i (≤10 satır).
 ```
 
-### [ ] 6 · KAO-FIX-03/C — Türkçe katman: Kureyş … Nâs (178 satır)
+### [x] 6 · KAO-FIX-03/C — Türkçe katman: Kureyş … Nâs (178 satır)
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-03 promptunu PARTİ C uygula.
 
@@ -124,7 +124,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, doldurulan satır sayısı, copy/language, commit hash'i (≤10 satır).
 ```
 
-### [ ] 7 · KAO-FIX-03/D — Türkçe katman: Fâtiha 29 + tamamlayıcı sözlük 190
+### [x] 7 · KAO-FIX-03/D — Türkçe katman: Fâtiha 29 + tamamlayıcı sözlük 190
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-03 promptunu PARTİ D uygula.
 
@@ -143,7 +143,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, --surah-import sayıları, commit hash'i (≤10 satır).
 ```
 
-### [ ] 8 · KAO-FIX-04 — Kısa sûre dondurma: referanstan kopuş + atıf + pin
+### [x] 8 · KAO-FIX-04 — Kısa sûre dondurma: referanstan kopuş + atıf + pin
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-04 promptunu uygula.
 
@@ -161,7 +161,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, referansla birebir aynı kelime (hedef 0), İngilizce (hedef 0), yeni pin, commit hash'i, kontrol özeti (≤10 satır).
 ```
 
-### [ ] 9 · KAO-FIX-05 — Başlık kelimesi biçimi (bağlam şeddesi) + DİA
+### [x] 9 · KAO-FIX-05 — Başlık kelimesi biçimi (bağlam şeddesi) + DİA
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-05 promptunu uygula.
 
@@ -179,7 +179,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, şeddeli başlık (hedef 0), DİA çift ünsüz (hedef 0), مَشَى kararı, commit hash'i, kontrol özeti (≤10 satır).
 ```
 
-### [ ] 10 · KAO-FIX-06 — İki yönlü kelime kartı
+### [x] 10 · KAO-FIX-06 — İki yönlü kelime kartı
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-06 promptunu uygula.
 
@@ -196,7 +196,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, lemmasBothDirections/lemmasSeen (hedef ≥0,95), newMax, commit hash'i, kontrol özeti (≤10 satır).
 ```
 
-### [ ] 11 · KAO-FIX-07 — "Bilinen kelime" ve kapsam tanımı
+### [x] 11 · KAO-FIX-07 — "Bilinen kelime" ve kapsam tanımı
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-07 promptunu uygula.
 
@@ -213,7 +213,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, knownByCode = knownByPlanDefinition, kapsam düşüşü notu, commit hash'i, kontrol özeti (≤10 satır).
 ```
 
-### [ ] 12 · KAO-FIX-08 — Çeldirici geçmişi (R-A2)
+### [x] 12 · KAO-FIX-08 — Çeldirici geçmişi (R-A2)
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-08 promptunu uygula.
 
@@ -230,7 +230,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, kırmızı→yeşil kanıtı, commit hash'i, kontrol özeti (≤10 satır).
 ```
 
-### [ ] 13 · KAO-FIX-09 — daily budama ve durum bütçesi
+### [x] 13 · KAO-FIX-09 — daily budama ve durum bütçesi
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-09 promptunu uygula.
 
@@ -247,7 +247,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, 365. gün boyutu (hedef ≤100 KB), daily satır sayısı, seri çözümü, commit hash'i, kontrol özeti (≤10 satır).
 ```
 
-### [ ] 14 · KAO-FIX-10 — Kilometre taşları
+### [x] 14 · KAO-FIX-10 — Kilometre taşları
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-10 promptunu uygula.
 
@@ -264,7 +264,7 @@ Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tar
 Son mesajında: Sıradaki prompt, simülasyonda dolan taşlar, commit hash'i, kontrol özeti (≤10 satır).
 ```
 
-### [ ] 15 · KAO-FIX-11 — Test kör noktaları
+### [x] 15 · KAO-FIX-11 — Test kör noktaları
 ```text
 /Users/m_ras/Desktop/seyma reposunda KAO düzeltme programının KAO-FIX-11 promptunu uygula.
 
@@ -292,11 +292,17 @@ Okuma sırası (başka dosya açma):
 3) awk '/^## 1\. Ortak sözleşme/,/^## 2\. /' kuran-ogreniyorum/duzeltme/FIX-PROMPTLARI.md
 4) awk '/^## KAO-FIX-12 /,/^---$/' kuran-ogreniyorum/duzeltme/FIX-PROMPTLARI.md
 
-Ön koşul: dal kao-duzeltme ve CURRENT-STATE "Sıradaki" = KAO-FIX-12. Değilse DUR ve bana söyle.
-Statik HTML, düz <a>; yeni App.* handler YOK, fx2/v3 pin sayıları değişmemeli. PIN-P.
-Yalnız bu promptu uygula; tek commit "KAO-FIX-12: …". Bitince CURRENT-STATE, LEDGER ve kanit/ güncel olsun.
-Push, merge, tag, deploy ve mustafaras/seyma-data'ya yazma YOK. Sır isteme. Tarayıcı açma. Senin olmayan kirli dosyalara dokunma.
-Son mesajında: Sıradaki prompt, listelenen kaynaklar, App/onclick sayıları, commit hash'i, kontrol özeti (≤10 satır).
+Ön koşul: dal kao-duzeltme, `git fetch` sonrası HEAD = origin/main = b6754ff (ya da sonrası), CURRENT-STATE "Sıradaki" = KAO-FIX-12. Değilse DUR ve bana söyle. CURRENT-STATE'i Tuzaklar 1–18 dâhil oku (sed -n '1,100p').
+Kurallar:
+- Önce kırmızı test: yeni testin ESKİ kodda kırmızı olduğunu gör (gerekirse $TMPDIR kopyasında HEAD dosyasıyla), sonra düzeltme.
+- Statik HTML, düz <a rel="noopener" target="_blank">; yeni App.* handler YOK; fx2/v3/surface pinleri (App 756, onclick 393, v3 556, surface 594) ve App.kao* sayısı (35) değişmemeli. Yorumlara App.kao…= ya da tıklama niteliği adı yazma.
+- Kaynak adı ve lisans tahmin edilmez: audio-manifest.json ve içerik modüllerinin ATTRIBUTION alanından okunur; ts-fsrs/MIT gibi iddiaları kaynakta grep ile doğrula, doğrulanamazsa DUR ve sor.
+- PIN-P: 20260926i → 20260926j (9 dosya, SW_VERSION + SW_OFFLINE_VERSION; eski pin 0 kalmalı).
+Kontroller: STD + tüm tests/app + tests/panel + tests/panel-v2 + tests/quran + kao-verify-contrast + kao-sim 365 + mutasyon (kao-mutate.mjs çalışma ağacı kopyasında; kopya hedefini case "$M" in "$TMPDIR"/kao-mut-*) ve [ -d "$M" ] ile doğrulamadan senkronlama yapma; beklenen 17/17).
+Kayıt: CURRENT-STATE (Sıradaki KAO-FIX-13, commit hash, pin, Yayın), LEDGER (+1 satır; yayın ayrı satır), kanit/KAO-FIX-12.md (≤40 satır). Durum betiğini commit'ten AYRI koş ve çıktısını doğrula; amend kullanma (kanca engeller), eksik kalırsa ayrı küçük commit at.
+Yayın (kullanıcı onaylı): tek commit "KAO-FIX-12: …" → git fetch + ff kontrolü + sır taraması → git push origin kao-duzeltme → git push origin kao-duzeltme:main → gh run watch ile Pages → canlı index.html pini ve değişen dosyaları curl + cmp ile doğrula → LEDGER'a yaz.
+Yasak: mustafaras/seyma-data'ya yazma, sır isteme, tarayıcı açma, senin olmayan dosyalara dokunma (tools/seyma-notes-export.mjs kullanıcıya ait).
+Son mesajında (≤10 satır): Sıradaki prompt, listelenen kaynaklar, App/onclick sayıları, commit hash'i, canlı doğrulama, kontrol özeti.
 ```
 
 ### [ ] 17 · KAO-FIX-13 — Arapça yazı tipi yığını

@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
 **Durum:** `active` · **Sıradaki:** **KAO-FIX-12** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`5ccf5db` (FIX-10, Pages success; canlı pin `20260926h`); sonraki her push/deploy yine ayrı onay
-**Güncelleme:** 2026-09-26 · KAO-FIX-11 done
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`b6754ff` (FIX-11 eki, Pages success; canlı pin `20260926i`; 8 dosya canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
+**Güncelleme:** 2026-09-27 · KAO-FIX-11 + ek done · FIX-00…11 denetimi temiz (LEDGER 30)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -25,7 +25,7 @@
 | KAO-FIX-08 | O-1 | done | `f021e8a` | lastDistractors cevapta yazılır (lemma kimliği), lemma düzeyinde dışlama |
 | KAO-FIX-09 | O-2 | done | `5413819` | KF-10: budama yok, 100 KB sınırı kaldırıldı; koruma testi |
 | KAO-FIX-10 | O-3 | done | `5ccf5db` | kaoMilestoneCheck + isSettled; sim 4 taş dolu; eighty tavan %77,42 (FIX-16) |
-| KAO-FIX-11 | O-5 | done | `6f2726b` + ek `git log --grep=KAO-FIX-11 (ek)` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
+| KAO-FIX-11 | O-5 | done | `6f2726b` + ek `b6754ff` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
 | KAO-FIX-12 | O-6 | todo | | kaynaklar/lisanslar E7 |
 | KAO-FIX-13 | O-9 | todo | | Arapça yazı tipi |
 | KAO-FIX-14 | O-7 | todo | | semNeighbors sözlükten |
@@ -83,6 +83,7 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 15. **Veri bütçesi (FIX-09 → KF-10 kapandı):** sim 365 g `quranLearn` 241 KB (taban) → 394 (FIX-06, 2× kart) → 464 KB (FIX-08 `lastDistractors`). Kullanıcı: budama yok, sınır yok (`test_kao_state_budget.js` korur). FIX-16 kapanış ekine 05 §2 / `stateBudgetKB` istisnası yazılmalı.
 16. **`eighty` taşı kazanılamaz (FIX-10):** token kapsamı tavanı %77,42 < %80 (plan LEM havuzu %80,9). FIX-16'da karar: eşik/ölçü hizası. `isSettled(card,minS)` tek kalıcılık kuralı; M10 `isDurable`'ı hedefler.
 17. **İşlev kelimesi görevinde çeldirici yok (FIX-11 bulgusu):** kökü olmayan ~49 lemma × 2 yön tek şıklı (sözlük yedeği `root!==root` undefined'ı eler). Kullanıcı onayıyla düzeltildi (FIX-11 eki: katmanlı yedek + anlam çakışma süzgeci). `rsync --delete` hedefini daima doğrula (FIX-11 olayı).
+18. **Süreç dersleri:** amend kancaya takılır → ayrı küçük commit at; durum betiğini commit'ten ayrı koş ve çıktısını gör; VM dizisini `Array.from` ile karşılaştır; `kaoStart` gerçek saati kullanır (test vadeleri geçmişte olmalı). Yayın düzeni: ff `main` → Pages izle → canlı `cmp`.
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 

@@ -1,8 +1,8 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
-**Durum:** `active` · **Sıradaki:** **KAO-FIX-19** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`f534a7b` (FIX-25, Pages run 36323989074 success; canlı pin `20260927f`; index.html, sw.js, quranLearn.js canlı=repo); yayın kaydı sonraki kartın commit'inde ayrı LEDGER satırı; kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-26 done (kova B/C raporu + Yakın oranı; pin `20260927g`); FIX-20…26 tamam, sırada kapanış FIX-19
+**Durum:** `completed` · **Sıradaki:** — · **Aktif:** — · **Engel:** —
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`3cc9ffb` (FIX-26 orada; canlı pin `20260927g`; index.html, sw.js, quranLearn.js canlı=repo); FIX-19 yalnız belge/kanıt commit'i, yayın kararı kullanıcıda
+**Güncelleme:** 2026-09-27 · KAO-FIX-19 done (kapanış regresyonu + §8 eki; **kod değişmedi**, pin `20260927g`); **tüm kartlar tamam, açık bulgu yok**
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.
@@ -30,6 +30,8 @@
 | KAO-FIX-13 | O-9 | done | `a7b6ffe` | `.kao-arabic-text,.kao-dialog [lang="ar"]` yığın + `letter-spacing:normal`; çıplak `[lang="ar"]` yok (tuzak 20); cihaz bekliyor |
 | KAO-FIX-14 | O-7 | done | `5330698` | D-12: 79 incelendi, 70 kümede, 9 alan dışı dışlandı; `SEM_NEIGHBOR_REVIEW` + `--sem-verify`; modül `SEM_GROUPS`; `KAO_SEMANTIC_CLUSTERS` 0; sim kod=plan 506 |
 | KAO-FIX-15 | D-2, D-5 | done | `cbeef96` | KF-9 gramer dahil ≤2 (tıkanınca oturum kısalır); KF-3 kod 4; `durable30`=isSettled(s≥30) soldurma; `errorClass:'cognate'`; sim maxRun 4→2, kod=plan 510 |
+
+Kapanış notu (FIX-19): matris **121 TAM / 145**; kalan 9 KISMİ + 1 TESTSİZ + 11 kullanıcı-kararı + 3 atlandı = açık bulgu YOK (ayrıntı: denetim raporu §8). `DOC03-§9` global %80 hedefi içerik genişletmesi ister; `kao-sim` taşlarından `shortSurahs` gecikmeli test yolunda (≥20 onaylı sûre), beklenen.
 | KAO-FIX-16 | O-8, D-1, D-3 | done | `1664f57` | 05 §1/§2/§5/§6, 06 §5, 02 §2.4, README; `deliverables/KAO-KAPANIS-EK-1.md`; bağlantı 44/0 kırık; `eighty` açık karar olarak EK-1'de |
 | KAO-FIX-17 | O-11 | done | `7f74842` | KAO dosya kümesi → önek (taban `58e0ceb` sonrası FAIL, öncesi WARN: a9fa40c, ecc7ac7); `(ek)`/P00/Dn önekleri de tanınır; `--commits`; findings gerekçesiz WARN (D1/D5/D6); öz-test 19/19 |
 | KAO-FIX-18 | D-4 | done | `eceee66` | 7/7 durum satırı: 02 §5.3 uygulandı (FIX-15); §5.6, §5.8, §5.10 uygulanmadı; §5.7, 04 §4 FX, 10 §9 kısmen — kalanlar sonraki program (KF-6) |
@@ -39,8 +41,8 @@
 | KAO-FIX-23 | 02 §5.8 | done | `8747496` | niyet önerisi: namaz vaktine bağlı zamanlı hub metni (bildirim yok) |
 | KAO-FIX-24 | 02 §5.10 | done | `07c897a` | haftalık aktarım testi: görülmemiş ≥%95 âyette çeviri seçimi, başarı ölçümü |
 | KAO-FIX-25 | 04 §4 | done | `f534a7b` | FX: haptik + doğru sesi, countUp, konfeti (taş), `.sey-enter`; kendi kapıları |
-| KAO-FIX-26 | 10 §9 | done | (commit sonrası) | kova B/C algı doğruluğu raporu + "Yakın" öz-değerlendirme oranı |
-| KAO-FIX-19 | hepsi | todo | | kapanış regresyonu (FIX-20…26'dan **sonra**; tüm kodu kapsar) |
+| KAO-FIX-26 | 10 §9 | done | `3cc9ffb` | kova B/C algı doğruluğu raporu + "Yakın" öz-değerlendirme oranı |
+| KAO-FIX-19 | hepsi | done | (belge commit'i) | kapanış regresyonu: tüm aileler PASS, mutasyon 17/17, sim 524/524 iki yön + kod=plan; §8 eki; **kod değişmedi** |
 
 Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına neden) · `partial` (parti yarım).
 
@@ -99,14 +101,16 @@ Durum değerleri: `todo` · `active` · `done` · `blocked` (Engel satırına ne
 22. **Kuyruk KF-9 (FIX-15):** ardışık aynı tür ≤2 gramer dahil; salt gramer kalınca kuyruk durur (oturum kısalır, kabul). Soldurma `task.durable30` (isSettled s≥30) ister — fixture kartı açıkça review s≥30 kurmalı; `isNew:false` yetmez.
 23. **plan-check önek kuralı (FIX-17):** `app/core/quranLearn.js`, `kao.css`, 4 içerik modülü, `tools/kao-*.mjs`, `tests/kao/**`, `assets/kao/**`'e dokunan commit konusu `KAO-FIX-NN:` / `KAO-FIX-NN (ek):` olmalı; numarasız `KAO-FIX:` yalnız `duzeltme/` belgeleri için (aksi FAIL).
 24. **Satır bütçesi doldu (FIX-26):** `quranLearn.js` 1.899 / 1.900 (KF-2). Yeni kod önce bölme (sonraki program) ya da tavan kararı ister; yeni FX/özellik blokları da gizlilik taramasının dilim sınırlarına dikkat etmeli (`test_kao_privacy` KAO-27 bloğu `kaoToggleShadowing`'e kadar).
+25. **Kapanış (FIX-19):** `kao-sim` `shortSurahs` taşını kazanmaz çünkü koşulu ≥20 onaylı kısa sûre (gecikmeli test yolu) — taşın null olması kusur değil. Kapanış kod değiştirmediği için pin `20260927g` sabit; `--freeze-surahs` yalnız girdiler varsa koşulur (tuzak 3).
 
 ## Cihaz kabulü (yalnız kullanıcı verir)
 
 - R-C9b (≤90 sn oturuma başlama, gerçek dokunma), DOC04-§4f (%200 metin, 320 px), O-9 Arapça yazı tipi (FIX-13 kodda, **cihazda bekliyor**: iOS’ta yığındaki fontlar yüklü değil, sistem yedeği), VoiceOver.
 
-## Sonraki program adayları (FIX-18 doldurur)
+## Sonraki program adayları (FIX-18 doldurur; FIX-19 kapatır)
 
-KF-6 kullanıcı kararıyla **şimdi uygulandı** (2026-09-27, FIX-21…26): bağ kur, hata ağırlığı + en çok karıştırdıkların, niyet önerisi, haftalık aktarım testi, FX, kova B/C raporu + Yakın oranı.
-Kalan adaylar:
+KF-6 kullanıcı kararıyla **şimdi uygulandı** (2026-09-27, FIX-21…26): bağ kur, hata ağırlığı + en çok karıştırdıkların, niyet önerisi, haftalık aktarım testi, FX, kova B/C raporu + Yakın oranı. **Kapandı — açık bulgu yok.**
+Kalan adaylar (yeni kapsam onayı ister):
+- **DOC03-§9 global %80 token kapsamı** — 524 lemmanın tavanı %77,42; yeni lemma eklemek gerekir.
 - 10 §9 "4 hafta sonra yeni okuyucu sesiyle" genelleme testi — ikinci okuyucu ses varlığı gerekir.
-- Diğer ertelenenler: `quranLearn.js`/içerik bölme (KF-2), kısa kart anahtarları (FIX-15 m.6); kullanıcı kararında: gzip bütçesi, `eighty` eşiği.
+- Diğer ertelenenler: `quranLearn.js`/içerik bölme (KF-2; satır bütçesi 1.899/1.900 dolu), kısa kart anahtarları (FIX-15 m.6), `DOC06-ilke` Tanzil karşılaştırma fixture'ı (girdiler repoda değil).

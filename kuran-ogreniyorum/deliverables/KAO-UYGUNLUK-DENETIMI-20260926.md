@@ -546,3 +546,72 @@ Sıra, riske ve bağımlılığa göre. Her madde yeni bir kart kaydı (ör. `KA
 ---
 
 *Geçici denetim betikleri (repo dışı):* `kao-sim.js`, `kao-ui-probe.js`, `kao-content-check.js`, `kao-mutate.mjs`, session scratchpad altında. Repoda yazılan tek dosya bu rapordur.
+
+---
+
+## 8. Düzeltme sonrası (KAO-FIX-19 kapanış regresyonu)
+
+**Tarih:** 2026-09-27 · **Denetlenen:** `kao-duzeltme` HEAD `3cc9ffb` (KAO-FIX-26) · **Yöntem:** aynı komutlar yeni koda karşı yeniden koşuldu; bulgular koddan doğrulandı. **Kod değişmedi** — bu yalnız "sonrası" ölçümüdür. Denetim tabanı `7693528` idi; bu turun tabanı FIX-20…26 sonrasıdır (kasıtlı).
+
+**Kanıt düzeyleri (Ö7):** aşağıdaki her sayı **kaynak/test** kanıtıdır (headless). **Yayın** ve **cihaz kabulü** ayrıdır ve bu ekte yalnız "bekliyor" olarak listelenir.
+
+### 8.1 Bulgu → durum
+
+| Bulgu | Önem | Durum | Kart | Ölçülen (sonrası) |
+|---|---|---|---|---|
+| K-1 · quran.com kopyası + atıfsız dağıtım | KRİTİK | **Kapandı** | FIX-02…04 | kopya 618→**0**, kaynak `quran.com` 158→**0**, ATTRIBUTION `surahs.verified.json`+D-12; test kapıları kilitli |
+| Y-1 · "bilinen"/kapsam tanımı sapması | YÜKSEK | **Kapandı** | FIX-07 | `knownByCode === knownByPlanDefinition` (513); panel `coveragePercent` = tanım değeri; M10 yakalandı |
+| Y-2 · ters yön kartı yok | YÜKSEK | **Kapandı** | FIX-06 | `lemmasBothDirections/lemmasSeen = 524/524 = 1,0` (önce 0) |
+| Y-3 · İngilizce anlamlar | YÜKSEK | **Kapandı** | FIX-04 | İngilizce işaret 26→**0** (`test_kao_lexicon_contract` (a)) |
+| Y-4 · bağlam şeddesi başlıklar | YÜKSEK | **Kapandı** | FIX-05 | şeddeli başlık 26+17→**0**; DİA çift ünsüz 26→**0**; `{ll~ah` iç şeddesi korunur |
+| O-1 · R-A2b etkisiz | ORTA | **Kapandı** | FIX-08 | `card.lastDistractors` cevapta yazılır (grep 1); test kaoStart/kaoAnswer ile |
+| O-2 · sınırsız büyüme | ORTA | **Karar (KF-10)** | FIX-09 | budama yok, sınır yok; 365. gün 471,9 KB; `test_kao_state_budget.js` korur |
+| O-3 · taşların 5/6'sı kazanılmıyor | ORTA | **Kapandı** | FIX-10 | sim: `fatiha · namaz · half · twoThirds · eighty` kazanıldı (5/6); `shortSurahs` ≥20 onaylı sûre (gecikmeli test yolu), beklenen |
+| O-4 · kısa sûre freeze hattı kırık | ORTA | **Kapandı** | FIX-01 | `test_kao_freeze_repro.js` PASS (4 modül bayt-eş) |
+| O-5 · mutasyon kör noktaları | ORTA | **Kapandı** | FIX-11 | **17/17 YAKALANDI** (M04, M09, M16, M17 dâhil; önce M04/M09 kaçıyordu) |
+| O-6 · ses lisansı atfı yayında yok | ORTA | **Kapandı** | FIX-12 | E7 "Kaynaklar" bloğu modül `KAO_AUDIO_SOURCES`'tan (Tadabur CC BY-NC 4.0 + AQQD CC0); düz `<a>` |
+| O-7 · R-A5 komşuları elle | ORTA | **Kapandı** | FIX-14 | sözlükte `semNeighbors` 70 küme; runtime `quranLearn.js:231,238` okur; `KAO_SEMANTIC_CLUSTERS` 0 |
+| O-8 · belgelenmemiş bütçe aşımları | ORTA | **Karar** | FIX-16 | 05 §1/§6, 06 §5, README, `KAO-KAPANIS-EK-1.md` güncellendi; ölçümler KF-2 tavanında |
+| O-9 · Arapça yığın çizilmiyor | ORTA | **Kapandı (kod) / cihaz bekliyor** | FIX-13 | `.kao-arabic-text` yığını + `letter-spacing:normal`; **cihaz kabulü bekliyor** |
+| O-10 · KAO dışı kardeş değişiklik | ORTA | **Kapandı (O-10)** | — | `58e0ceb` sonrası `tests/app` 77/77 |
+| O-11 · süreç kuralları | ORTA | **Gerekçeli karar** | FIX-17/18 | plan-check KAO dosyalarına dokunan **her** commit'i görür (`KAO-FIX-17`); `findings` gerekçe ister; kart başına commit sayısı raporlanır. `a9fa40c`/`ecc7ac7` (FIX-00 öncesi) ve S7 çok-commit'li geçmiş commit'ler **geriye dönük düzeltilemez** |
+| D-1 · belge tutarsızlıkları | DÜŞÜK | **Kısmen (V8)** | FIX-16 | plan bütçeleri + `7693528` yayın kaydı (LEDGER) hizalandı; `KAO-KAPANIS.md` kapalı program kaydı **V8 gereği dokunulmadı** |
+| D-2 · kuyruk sayıları | DÜŞÜK | **Kapandı** | FIX-15 | gramer ≤4 (KF-3); ardışık ≤2 gramer dahil (KF-9); `maxSameTypeRun` 4→**2**; 02 §2.4 "tipik hedef" (KF-4) |
+| D-3 · vakıf işaretleri | DÜŞÜK | **Belgeli istisna** | — | KF-5; D-02'ye not |
+| D-4 · sahipsiz plan maddeleri | DÜŞÜK | **Kapandı (KF-6)** | FIX-21…26 | 02 §5.3/5.6/5.7/5.8/5.10 + 04 §4 FX + 10 §9 + 02 §5.3 (FIX-15) uygulandı |
+| D-5 · şema/sayaçlar | DÜŞÜK | **Kısmen** | FIX-15/16 | `errors.cognate` 0→**185**; `durable30` tek kalıcılık/soldurma kuralı; uzun kart anahtarları **kabul** |
+| D-6 · küçük içerik uyumsuzlukları | DÜŞÜK | **Belgeli istisna** | FIX-05 | `l_bad_ala_16265e` 2:181 korpus sınırı; 6 homograf C-02 |
+
+### 8.2 Yeni matris dağılımı (145 satır)
+
+| Durum | Önce | Sonra |
+|---|---|---|
+| TAM | 86 | **121** |
+| KISMİ | 31 | **9** |
+| EKSİK | 10 | **0** |
+| ÇELİŞKİLİ | 2 | **0** |
+| TESTSİZ | 4 | **1** |
+| KULLANICI-KARARI | 9 | **11** |
+| ATLANDI-GEREKÇELİ | 3 | **3** |
+
+Kapanan 35: `DOC02-§1-L2, §5.3, §5.6, §5.7, §5.8, §5.10`; `DOC03-§10`; `DOC04-§4c`; `DOC05-§2c, §2d, §1a, §1d, §1e, §6b, §6c`; `DOC06-§2c, §5, DET`; `DOC10-§8b, §9`; `R-A2b, R-B2, R-B5, R-C8b`; `K5`; `C-03, C-04`; `D-02`; `S7*(gerekçeli)`. Kullanıcı kararına geçen 2: `DOC03-§9, DOC05-§2b`.
+
+### 8.3 Kalan cihaz kabulü (yalnız kullanıcı verir)
+
+- **O-9** Arapça yazı tipi yığını (iOS'ta Noto Naskh/Amiri/Scheherazade yüklü değil → sistem yedeği).
+- **R-C9b** ≤90 sn oturuma başlama (gerçek dokunma).
+- **DOC04-§4f** %200 metin ölçekleme, 320 px yeniden akış.
+- **VoiceOver** tam tur.
+
+### 8.4 Kalan kırmızı olmayan açıklar (yeni FIX promptu değil, sonraki program)
+
+1. **DOC03-§9 global %80 token kapsamı** — 524 lemmanın tavanı %77,42. `eighty` KF-12 ile %75'e çekildi; global hedef içerik genişletme (yeni lemma) ister.
+2. **DOC06-ilke (TESTSİZ)** — Tanzil karşılaştırma fixture'ı yok; girdiler (`inputs/*`) repoda değil (tuzak 3).
+3. **DOC05-§2b / D-5** kısa kart anahtarları (`st/n/l`) — kabul edildi, bölme/şema işi sonraki program.
+4. **DOC06-§2b / D-3, C-05, C-02** — belgeli istisnalar (vakıf, korpus sınırı, homograf).
+5. **DOCS / D-1** — `KAO-KAPANIS.md` ve kapalı `KAO-STATE.json` V8 gereği dokunulmadı.
+6. **10 §9 "yeni okuyucu sesiyle" genelleme testi** — ikinci okuyucu ses varlığı gerekir.
+
+### 8.5 Yayın
+
+Kod değişmediği için pin değişmedi; pin `20260927g`. Bu ekin commit'i yalnız belge/kanıt içerir; `main`'e yayın kararı **kullanıcıda**.

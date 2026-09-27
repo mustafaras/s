@@ -1,7 +1,7 @@
 # KAO-FIX · Güncel durum (anti-amnesia — her prompt sonunda güncellenir)
 
 **Durum:** `active` · **Sıradaki:** **KAO-FIX-15** · **Aktif:** — · **Engel:** —
-**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`a7b6ffe` (FIX-13, Pages run 36314432780 success; canlı pin `20260926k`; index.html, sw.js, kao.css, quranLearn.js canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
+**Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`5330698` (FIX-14, Pages run 36316117421 success; canlı pin `20260926l`; index.html, sw.js, quranLearn.js, quranLexiconV1.js, kao.css canlı=repo bayt-eş); kullanıcı her karttan sonra canlıya almayı istiyor
 **Güncelleme:** 2026-09-27 · KAO-FIX-14 done (R-A5 sözlükten, pin `20260926l`)
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
@@ -28,7 +28,7 @@
 | KAO-FIX-11 | O-5 | done | `6f2726b` + ek `b6754ff` | 3 test; mutasyon 17/17 (M16/M17 eklendi) |
 | KAO-FIX-12 | O-6 | done | `7a1ee1e` | E7 `kao-sources`: ses manifestten, metin modül ATTRIBUTION’dan, ts-fsrs MIT başlıktan; düz `<a>`; App 756/onclick 393 aynı |
 | KAO-FIX-13 | O-9 | done | `a7b6ffe` | `.kao-arabic-text,.kao-dialog [lang="ar"]` yığın + `letter-spacing:normal`; çıplak `[lang="ar"]` yok (tuzak 20); cihaz bekliyor |
-| KAO-FIX-14 | O-7 | done | (yayın satırına bak) | D-12: 79 incelendi, 70 kümede, 9 alan dışı dışlandı; `SEM_NEIGHBOR_REVIEW` + `--sem-verify`; modül `SEM_GROUPS`; `KAO_SEMANTIC_CLUSTERS` 0; sim kod=plan 506 |
+| KAO-FIX-14 | O-7 | done | `5330698` | D-12: 79 incelendi, 70 kümede, 9 alan dışı dışlandı; `SEM_NEIGHBOR_REVIEW` + `--sem-verify`; modül `SEM_GROUPS`; `KAO_SEMANTIC_CLUSTERS` 0; sim kod=plan 506 |
 | KAO-FIX-15 | D-2, D-5 | todo | | serpiştirme/soldurma/kognat |
 | KAO-FIX-16 | O-8, D-1, D-3 | todo | | plan/belge hizası + KAPANIŞ ek-1 |
 | KAO-FIX-17 | O-11 | todo | | plan-check sertleştirme |

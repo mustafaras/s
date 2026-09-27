@@ -46,3 +46,25 @@ Güncel Panel-v2 başlangıç noktası
 [`PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md)
 dosyasıdır; ardından `LEDGER.md` okunur. Ayrıntılı tarihsel belgeler çalışma
 ağacından temizlendi ve gerektiğinde Git geçmişinden geri alınabilir.
+
+## Kapanmış program: KAO (taşınmadı)
+
+- **Kur'an Arapçası Öğreniyorum (KAO)** — 30 üretim kartı (KAO-P00…KAO-28b) +
+  27 düzeltme kartı (KAO-FIX-00…26) **2026-09-27'de kapandı**. Kapanış kaydı:
+  [`docs/KAO-KAPANIS.md`](../docs/KAO-KAPANIS.md).
+
+  **Neden `archive/`a taşınmadı:** klasörün yolunu 17 dış nokta mutlak olarak
+  gömüyor (`tools/kao-content-freeze.mjs`, `tools/kao-lexicon-build.mjs`,
+  `tests/kao/test_kao_freeze_repro.js`, `tests/kao/test_kao_lexicon_contract.js`,
+  `.github/workflows/pages.yml` yayın guard'ı vb.). Taşıma bu 17 noktayı
+  güncellemeyi gerektirirdi ve kanıt zincirini riske atardı; **çalışma ağacında
+  kalması** tercih edildi. Klasör zaten yayın dışıdır (`pages.yml` `--exclude`
+  listesindedir), yani barındırma maliyeti yoktur.
+
+  **Dondurulmuş kayıtlar (değiştirilmez):** `KAO-STATE.json`, `evidence/**`,
+  `UYGULAMA-PROMPTLARI.md`, `deliverables/KAO-KAPANIS.md` (kao). İstisna:
+  `deliverables/KAO-UYGUNLUK-DENETIMI-20260926.md` §8 eki (kapanış regresyonu) ve
+  `KAO-KAPANIS-EK-1.md`.
+
+  **Günlük başlangıçta okunmaz:** yeni KAO işi ayrı kapsam onayı ister; kanonik
+  durum `kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md`'dir.

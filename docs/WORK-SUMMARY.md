@@ -42,6 +42,23 @@ canonical state, ledger, source ve test dosyaları yeniden doğrulanır.
 - App runtime (`REM-44..54`), current panel (`REM-55..66`) ve integration
   (`REM-67..72`) ayrı yüzeylerdir; Panel-v2 bu zincire dahil değildir.
 
+### Kur'an Arapçası Öğreniyorum (KAO)
+
+- 30 kartlık üretim programı (KAO-P00…KAO-28b) ve bağımsız denetimin
+  kapatılması için 27 kartlık düzeltme programı (KAO-FIX-00…26) **kapandı**;
+  kalan kod işi yoktur.
+- Kapanış kaydı: [`KAO-KAPANIS.md`](KAO-KAPANIS.md). Kanonik durum
+  [`../kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md`](../kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md)
+  ve [`../kuran-ogreniyorum/KAO-STATE.json`](../kuran-ogreniyorum/KAO-STATE.json);
+  olay günlüğü `LEDGER.md` (seq 1–60).
+- Test sahibi [`../tests/kao/`](../tests/kao/) (17 fixture) ve
+  [`../kuran-ogreniyorum/duzeltme/araclar/`](../kuran-ogreniyorum/duzeltme/araclar/)
+  altındaki salt-okur betikler (`kao-kapilar.sh`, `kao-yayin-pini.sh`,
+  `kao-canli-dogrula.sh`, `kao-pages-izle.sh`, `kao-sim-ozet.sh`).
+- **Açık:** cihaz kabulü (K3) yalnız kullanıcıda; global %80 token kapsamı
+  içerik genişletmesi ister (tavan %77,42). Kapalı programın kayıtları
+  (`KAO-STATE.json`, `evidence/**`, `deliverables/KAO-KAPANIS.md`) dondurulmuştur.
+
 ## Güvenli doğrulama sözleşmesi
 
 - Uygulama tarayıcıda açılmaz. `run-seyma` headless VM harness'i ve sentetik

@@ -30,6 +30,7 @@ kopyalamaz; bağlantı verir.
 | Hatırlatma / bildirim UX çalışması | [`reminders/README.md`](reminders/README.md) ve [`reminders/APP-REMINDER-WORK-SUMMARY.md`](reminders/APP-REMINDER-WORK-SUMMARY.md) | Dondurulmuş durum, yüzey özeti ve 20 fixture bakım seti |
 | Hatırlatma release / canlı eylemi | [`reminders/APP-REMINDER-APPROVAL-GATE.md`](reminders/APP-REMINDER-APPROVAL-GATE.md) | Exact kullanıcı onayı, state scope ve ayrı deploy evidence |
 | Reminder ürün ve yürütme özeti | [`reminders/APP-REMINDER-WORK-SUMMARY.md`](reminders/APP-REMINDER-WORK-SUMMARY.md) | Dondurulmuş durum, yüzey sahipliği ve bakım doğrulaması |
+| Kur'an Arapçası (KAO) kapandı | [`KAO-KAPANIS.md`](KAO-KAPANIS.md) | `kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md` + `tests/kao/` |
 
 ## Dokümantasyon sınırları
 

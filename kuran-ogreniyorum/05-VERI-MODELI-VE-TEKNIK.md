@@ -7,15 +7,17 @@ dokunmadan önce onaylanacak **plan**dır; hiçbir dosya değişmedi.
 
 | Dosya | Tür | Boyut hedefi | Sorumluluk |
 |---|---|---|---|
-| `app/content/quranLexiconV1.js` | Donmuş içerik (`window.QuranLexiconV1`) | ≤ 260 KB | ~530 lemma: Arapça (harekeli), transliterasyon, Türkçe anlam(lar), kök, kalıp, POS, sıklık, kognat notu, ≥3 âyet parçası (Arapça + Türkçe + referans; D-13: gerekirse aynı kökten `source:'root'`, kök Kur'an'da <3 geçiyorsa kökün tüm geçişleri), `verified` |
-| `app/content/quranGrammarV1.js` | Donmuş içerik (`window.QuranGrammarV1`) | ≤ 60 KB | 24 mikro-kavram: açıklama (Türkçe, terimsiz + terimli), tablolar (zamir/çekim), alıştırma şablonları |
-| `app/content/quranShortSurahsV1.js` | Donmuş içerik (`window.QuranShortSurahsV1`) | ≤ 90 KB | Seviye 5'in 20 kısa sûresi kelime kelime: `{surahId, ayah, i, ar, lemmaId, tr}` |
-| `app/content/quranPhonicsV1.js` | Donmuş içerik (`window.QuranPhonicsV1`) | ≤ 40 KB | 28 harf × kova/mahreç/Türkçe ipucu/SVG id, minimal çift listesi, 7 okuma kuralı, transliterasyon tablosu (okunuş + DİA) |
+| `app/content/quranLexiconV1.js` | Donmuş içerik (`window.QuranLexiconV1`) | ≤ 340 KB (KAO-15 kararı, 2026-09-25; ölçülen 324.328 B, 2026-09-27) | ~530 lemma: Arapça (harekeli), transliterasyon, Türkçe anlam(lar), kök, kalıp, POS, sıklık, kognat notu, ≥3 âyet parçası (Arapça + Türkçe + referans; D-13: gerekirse aynı kökten `source:'root'`, kök Kur'an'da <3 geçiyorsa kökün tüm geçişleri), `verified` |
+| `app/content/quranGrammarV1.js` | Donmuş içerik (`window.QuranGrammarV1`) | ≤ 60 KB (ölçülen 51.353 B) | 24 mikro-kavram: açıklama (Türkçe, terimsiz + terimli), tablolar (zamir/çekim), alıştırma şablonları |
+| `app/content/quranShortSurahsV1.js` | Donmuş içerik (`window.QuranShortSurahsV1`) | ≤ 90 KB (ölçülen 87.463 B) | Seviye 5'in 20 kısa sûresi kelime kelime: `{surahId, ayah, i, ar, lemmaId, tr}` |
+| `app/content/quranPhonicsV1.js` | Donmuş içerik (`window.QuranPhonicsV1`) | ≤ 40 KB (ölçülen 9.552 B) | 28 harf × kova/mahreç/Türkçe ipucu/SVG id, minimal çift listesi, 7 okuma kuralı, transliterasyon tablosu (okunuş + DİA) |
 | `assets/kao/audio/**` · `assets/kao/svg/**` | Ses (AAC .m4a) + mahreç şemaları | ≤ 16 MB (D-09) | Kelime/harf/âyet klipleri; `<audio preload="none">`, aynı-origin GET |
-| `app/core/quranLearn.js` | Domain registry (`window.SeymaQuranLearn`) | ≤ 800 satır | Şema, `ensureQuranLearn`, FSRS zamanlayıcı, kuyruk kurucu, görev üretici, çeldirici seçici, kapsam hesabı, HTML gövdeleri (`kaoHubCardHTML`, `kaoOverlayHTML`, view gövdeleri) |
-| `app/kao.css` **veya** `app/styles.css` ek bloğu | Stil | ≤ 18 KB | Karar D-03: eş zamanlı IIP çalışması sürerken ayrı dosya (çakışma yok); IIP kapanınca `styles.css`'e taşınabilir |
+| `app/core/quranLearn.js` | Domain registry (`window.SeymaQuranLearn`) | ≤ 1.900 satır (KF-2 tavanı; ölçülen 1.857, 2026-09-27; bölme sonraki program) | Şema, `ensureQuranLearn`, FSRS zamanlayıcı, kuyruk kurucu, görev üretici, çeldirici seçici, kapsam hesabı, HTML gövdeleri (`kaoHubCardHTML`, `kaoOverlayHTML`, view gövdeleri) |
+| `app/kao.css` **veya** `app/styles.css` ek bloğu | Stil | ≤ 42 KB (KF-2 tavanı; `app/kao.css` ölçülen 40.209 B) | Karar D-03: eş zamanlı IIP çalışması sürerken ayrı dosya (çakışma yok); IIP kapanınca `styles.css`'e taşınabilir |
 | `tools/kao-lexicon-build.mjs` | Derleme aracı (Node, ağsız) | — | Bkz. [06](06-ICERIK-URETIM-HATTI.md) |
 | `tests/kao/*.js` | Fixture ailesi | — | Bkz. §8 |
+
+> **KAO-FIX-16 hizası (2026-09-27):** dört içerik modülü ham toplam tavanı ≤ 480 KB (KF-2; ölçülen 472.696 B). Gzip toplamı 162.177 B (`zlib` düzey 9, dosya başına) 130 KB R-C5 bütçesini aşar; karar kullanıcıdadır ([KAPANIŞ §6.1](deliverables/KAO-KAPANIS.md)), `test_kao_user_tasks.js` 160 KiB büyüme tavanıyla sessiz büyümeyi engeller. Bölme kararı sonraki programa bırakıldı.
 
 Yükleme sırası: `index.html` (`quranLexiconV1.js` içerik bloğunda,
 `quranLearn.js` `quran.js`'ten sonra `saygi.js`'ten önce),
@@ -67,6 +69,8 @@ Kart id'leri: `w:<lemmaId>:ar>tr` · `w:<lemmaId>:tr>ar` · `r:<root>` ·
 n/l/st) sync bütçesi için. ~1.100 kart × ~80 B ≈ **90 KB** üst sınır;
 `daily` 90 satır ≈ 8 KB. Tam tekrar geçmişi **tutulmaz** (FSRS'ye gerekmez).
 
+> **KAO-FIX-16 hizası (2026-09-27):** (1) Kısa anahtarlar (`st/n/l`) **uygulanmadı**: kod uzun adları kullanır (`state`, `reps`, `lapses`); göç riski sync bütçesinden büyük (KAO-FIX-15 madde 6). Okuyucular iki biçimi de tanır (`state`∨`st`). (2) `daily` **budanmaz** ve 100 KB durum bütçesi (`stateBudgetKB`) **kaldırıldı** (KF-10, kullanıcı kararı 2026-09-26; `test_kao_state_budget.js` korur). Bu yüzden `calibTotals` gibi budama özeti gerekmedi; kalibrasyon `daily[date].calib` içinde kalır. Ölçüm (`kao-sim` 365 gün): `quranLearn` ≈ 469,5 KB, 1.054 kart, 365 `daily` satırı; `sync.js` 1 MB üstünü Blobs API ile okur. (3) Hata sayaçları rolling değil, kümülatiftir; `cognate` kelime görevinde hedefte anlam kayması varken yanlış cevapla artar, `sound` kelime görevinde artmaz (telaffuz hataları `phonics.misheard`; KAO-FIX-15).
+
 `ensureQuranLearn(d)` — additive ve idempotent: eksik alanı varsayılanla
 doldurur, bilinmeyen kart id'lerini (lexiconVersion değişince) **silmez**,
 `orphan:true` işaretler. `MIGRATE_DEPENDENCIES` listesine `'ensureQuranLearn'`
@@ -103,8 +107,8 @@ kopyası + daily farkı, 3 s; `ui.kaoWordLayer`).
 
 ## 5. Zamanlayıcı — FSRS saf JS portu
 
-`kaoSchedule(card, grade, now)` → yeni kart. Varsayılan FSRS-4.5 parametre
-vektörü (19 sayı) sabit; hedef R=0,90; `s`→aralık: `interval = s · (ln(0.9)/ln(0.9))`
+`kaoSchedule(card, grade, now)` → yeni kart. Varsayılan parametreler: ts-fsrs v4.5.2
+varsayılan parametreleri (FSRS-5, 19 sayı) sabit; hedef R=0,90; `s`→aralık: `interval = s · (ln(0.9)/ln(0.9))`
 biçiminde değil, FSRS'in `next_interval(s, r)` formülü. Grade eşlemesi:
 yanlış→Again; doğru & tepki > 8 s→Hard; doğru→Good; doğru & < 2,5 s & n≥3→Easy.
 Referans uygulama: ts-fsrs (MIT) — port edilir, bağımlılık eklenmez. Fixture
@@ -112,8 +116,9 @@ ts-fsrs'in yayımlanmış örnek vektörleriyle karşılaştırır (§8).
 
 ## 6. Görev üretimi ve çeldiriciler
 
-Kuyruk: `due` kartlar (≤60) + yeni (≤dailyNew) + gramer (≤3) + parça (≤2);
-serpiştirme kuralı ardışık aynı tür ≤2. Çeldirici seçimi: aynı POS, farklı
+Kuyruk: `due` kartlar (≤60) + yeni (≤dailyNew) + gramer (≤4, KF-3) + parça (≤2);
+serpiştirme kuralı ardışık aynı tür ≤2, gramer dahil (KF-9; yalnız aynı tür kalırsa
+kuyruk durur ve oturum kısalır — KAO-FIX-15). Çeldirici seçimi: aynı POS, farklı
 kök, benzer sıklık bandı; kök görevlerinde aynı ailenin diğer üyeleri.
 Deterministik seed (gün + kart id) → fixture'da tekrarlanabilir.
 

@@ -62,7 +62,11 @@ tüm görevler dokunma/çip seçimi.
 
 ### 2.4 Serpiştirme ve kavramsal çeşitleme
 Bir oturum 12–16 görev: %50 vadesi gelen tekrar, %25 yeni kelime tanıtımı,
-%15 gramer parçası, %10 âyet parçası. Aynı türden ardışık ≤2 görev.
+%15 gramer parçası, %10 âyet parçası. Aynı türden ardışık ≤2 görev (gramer dahil, KF-9).
+
+> **Not (KF-4, KAO-FIX-16):** 12–16 görev **tipik hedeftir**; bağlayıcı sınırlar
+> [05 §6](05-VERI-MODELI-VE-TEKNIK.md)'dadır (due ≤60, yeni ≤dailyNew, gramer ≤4 (KF-3), parça ≤2).
+> Ölçüm (`kao-sim` 365 gün): oturum uzunluğu min 2 · medyan 23 · maks 47 görev.
 
 ### 2.5 Kök-ve-kalıp (sarf) — ana dili gibi işlemleme
 Her kelime kartı `root`, `pattern`, `family[]` taşır. Kök **ilk gösterimde**

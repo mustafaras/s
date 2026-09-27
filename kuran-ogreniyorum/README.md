@@ -1,6 +1,7 @@
 # Kur'an Arapçası Öğreniyorum (KAO) — Araştırma ve plan
 
-**20 Eylül 2026 · Planlama teslimatı v2 · Üretim kodu 0/0 (henüz hiçbir kart açılmadı).**
+**Durum (2026-09-27): program kapandı (2026-09-26, 30 kart) · düzeltme programı sürüyor ([`duzeltme/`](duzeltme/BAGLAM-YONETIMI.md)).**
+Kapanış: [KAO-KAPANIS.md](deliverables/KAO-KAPANIS.md) + [KAO-KAPANIS-EK-1.md](deliverables/KAO-KAPANIS-EK-1.md) · planlama teslimatı v2: 20 Eylül 2026.
 
 **Kullanıcı kararları (v2):** KAO, yürüyen İlham & İbadet planından **farklı ve
 bağımsız**dır; hub'a yalnız bir **kart** eklenir, içerik kendi overlay'inde
@@ -102,12 +103,16 @@ otomatik kanıtlayamaz — içerik doğrulaması 06 §3 (D-12, yapay zekâ doğr
    alamaz (`quranStrikingVersesV1.js` ile aynı disiplin). Hafızadan yazılmış
    Arapça içerik üretim koduna giremez.
 6. **Onay kapıları** — push, deploy, tag, `main`'e merge ve veri deposuna yazma
-   ayrı ayrı kullanıcı onayı ister. `releaseApproval = NOT_APPROVED`.
+   ayrı ayrı kullanıcı onayı ister. Kapanışta `releaseApproval = APPROVED` (kullanıcı onayı;
+   [KAPANIŞ §8](deliverables/KAO-KAPANIS.md)); her yayın yine açık talimatla yapılır.
 
 ## Şu an ne hazır, ne bekliyor
 
-Hazır: araştırma, pedagoji (kanıt kütüphanesi), müfredat (+telaffuz hattı),
-tasarım (11 ekran), veri modeli, içerik + ses hattı, bağımsızlık sözleşmesi,
-30 kart + 26 bağlayıcı ek gereksinim ([12](12-EK-GEREKSINIMLER.md)), 37 sıralı
-prompt, anti-amnesia takibi ve çalışan denetleyici (12/12 self-test). Bekleyen: kullanıcının plan onayı → **KAO-P00** (branch + iskelet), ardından
-KAO-01 (sözlük derleme aracı). Kaynak baseline: `0436405`, `main`, 2026-09-20.
+- **Kapandı:** 30 kartlık üretim programı — kapanış
+  [KAO-KAPANIS.md](deliverables/KAO-KAPANIS.md), regresyon
+  [KAO-REGRESYON.md](deliverables/KAO-REGRESYON.md), durum `KAO-STATE.json` (`status=completed`).
+- **Denetim:** [KAO-UYGUNLUK-DENETIMI-20260926.md](deliverables/KAO-UYGUNLUK-DENETIMI-20260926.md);
+  bulguların kapanış eşlemesi ve yayın kaydı: [KAO-KAPANIS-EK-1.md](deliverables/KAO-KAPANIS-EK-1.md).
+- **Sürüyor:** KAO-FIX düzeltme programı — başlangıç [duzeltme/BAGLAM-YONETIMI.md](duzeltme/BAGLAM-YONETIMI.md),
+  güncel durum [duzeltme/.anti-amnesia/CURRENT-STATE.md](duzeltme/.anti-amnesia/CURRENT-STATE.md).
+- **Kullanıcıda:** cihaz kabulü (K3) ve içerik gzip bütçesi kararı (KAPANIŞ §6.1).

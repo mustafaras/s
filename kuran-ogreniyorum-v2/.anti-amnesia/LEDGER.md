@@ -110,3 +110,16 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: eski commit önek engeli onaylı dosya kapsamıyla çözüldü; taban/döküm baytları değişmedi
 - next: KAO2-02
+
+## seq 11 · 2026-09-28 · CARD · KAO2-02
+- status: done
+- title: Tasarım sözleşmesi fixture'ı (taban modu)
+- prev-commit: c89c3b4
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-02/KANIT.md
+- gates: kao19/app77/panel23/panel-v2 27/quran9 PASS; reminders/driver/zikr/contrast PASS; toplam P3 164/164; eski plan PASS; sync PASS; strict beklenen FAIL, baseline PASS
+- metrics: weights9 · uppercase4 · deco5 · serif3 · kaldırılacak13/13 · 24 görünüm primary≤1 · 4 ayar senaryosunda 5/5 switch semantiği eksik
+- changed-tests: yalnız yeni test_kao2_design_contract.js + envanter; eski testler değişmedi
+- evidence-levels: kaynak/test baseline ✓, hedef strict beklenen FAIL · yayın — · cihaz —
+- surprises: yok; üretim tasarımı değişmedi, mevcut ihlaller kilitlendi
+- next: KAO2-03

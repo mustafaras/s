@@ -10,6 +10,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 
 | Fixture | Durum | Amaç |
 |---|---|---|
+| `test_kao2_design_contract.js` | KAO2-02 | Canlı CSS ve boş/tohumlu 12 görünüm: baseline ihlal sayımları, strict hedef kapısı; beş ayarın açık/kapalı switch semantiği |
 | `test_kao2_perf_budget.js` | KAO2-00 | K-1 gzip tavanları; boş VM içinde 20 tekrar p95 ≤40 ms, varsa KAO2-01 tabanına göre ≤+%25 |
 | `test_kao_lexicon_contract.js` | planlandı | Sözlük şeması, doğrulama ve boyut sözleşmesi |
 | `test_kao_lexicon_coverage.js` | planlandı | 77.430 token hedefi ve kapsam bantları |

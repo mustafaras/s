@@ -1,30 +1,29 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-02
-lastSeq: 10
+nextCard: KAO2-03
+lastSeq: 11
 status: active
 -->
 
-Son güncelleme: 2026-09-28 · LEDGER seq 10
+Son güncelleme: 2026-09-28 · LEDGER seq11
 
 ## Şu an neredeyiz
-KAO2-00 ve KAO2-01 done (2/28). KAO2-01 BLOCKED önek engeli kullanıcı onaylı tek denetleyici dosyası düzeltmesiyle çözüldü. Dal kao2-yeniden-tasarim; yerel, yayın yok.
+KAO2-00…02 done (3/28); W0 kartları tamam. Tasarım sözleşmesi fixture'ı baseline modunda PASS; strict hedefler beklenen FAIL. Üretim arayüzü bu kartta değişmedi. Dal kao2-yeniden-tasarim, yerel.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-02: yeni kullanıcı isteğiyle tasarım sözleşmesi fixture'ını baseline modunda kur; bu oturumda başlanmadı.
+KAO2-03: yeni kullanıcı isteğiyle tokenlar/süs temizliğini uygula, tasarım fixture'ını strict'e geçir; bu oturumda başlanmadı.
 
 ## Canlı gerçekler
-- KAO2-01 tabanı: p95 5,087625 ms, Node v26.3.1; süre ≤40 ms ve taban ×1,25. Opt-in yazma wx korumalı.
-- Gzip: içerik 162173 B, runtime 50221 B, CSS 7051 B.
-- 24 HTML: 22 boş/tohumlu KAO dialogu + izole hub + canonical saygi sekmesi; sentetik, özel VM sabit saatli; ekran görüntüsü değil.
-- Runtime 1899 satır; CSS 93 satır/9 farklı font-weight; link CSS seçici 2/runtime metni 13; KAO handler 35.
-- P3 163/163 PASS; eski plan-check PASS (3 eski WARN), öz test 19/19; yeni prefix/artefakt testleri PASS.
-- Üretim kodu ve yayın pini 20260927g değişmedi.
-- Kanıt: evidence/KAO2-01/KANIT.md; manifest/taban/makbuzlar aynı klasörde.
+- Tasarım baseline:9 ağırlık,4 uppercase,5 boş dekoratif sözde seçici,3 serif,13/13 kaldırılacak seçici mevcut.
+- Boş/tohumlu 24 görünümde primary≤1; 4 ayar açık/kapalı senaryosunda her biri5 eksik switch semantiği.
+- P3 164/164 PASS: KAO19,app77,panel23,panel-v2 27,quran9; reminder/driver/zikr/kontrast PASS.
+- KAO2-01 perf tabanı p95 5,087625 ms; taban/üretim/pinler değişmedi.
+- Runtime1899 satır, CSS93 satır, KAO handler35; yayın pini20260927g.
+- Kanıt: evidence/KAO2-02/KANIT.md + baseline-green.log/strict-red.log/gate-receipts.json.
 
 ## Açık riskler
-VM tabanı makineye bağlıdır; cihaz kabulü değildir. HTML dökümlerinde özel VM ikonları stub; stil uygulanmış ekran kanıtı değildir. Önceki Ausubel 1968 birincil teyit uyarısı korunur.
+Baseline PASS tasarımın hedefe uyduğu anlamına gelmez. KAO2-03 strict geçişinde kartın HTML(f) todo istisnası ayrıca değerlendirilmeli; bu oturumda atlama eklenmedi. Kaynak testleri gerçek cihaz/görsel kabul değildir. Ausubel birincil teyit uyarısı korunur.
 
 ## Bekleyen kullanıcı işleri
-Bu kart için kapsam/engel kalmadı. Sonraki G2/G3 onayları, K-3 okuyucu/lisans ve L2 uzman kararı kendi kartlarında; cihaz kabulü kullanıcıda.
+Bu kart için karar/engel yok. G2/G3 müfredat/metin onayı, K-3 okuyucu/lisans ve L2 uzman işleri kendi kartlarında; cihaz kabulü kullanıcıda.

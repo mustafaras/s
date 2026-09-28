@@ -4,9 +4,9 @@
   "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
-  "releaseApproval": "not_approved",
+  "releaseApproval": "approved_through_KAO2-02",
   "nextCard": "KAO2-03",
-  "ledgerLastSeq": 11,
+  "ledgerLastSeq": 12,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -21,7 +21,7 @@
     "G3": "open",
     "G4": "open"
   },
-  "versionPolicy": "Ara kartlar ?v= pinini değiştirmez (yerel dal); yeni dosyalar mevcut pinle eklenir; pin tek seferde KAO2-27de yükseltilir (index.html + sw.js + test_iip_22.js).",
+  "versionPolicy": "2026-09-28 kullanıcı ara yayın onayı: KAO2-00…02 pini 20260928a (index.html + sw.js + test_iip_22.js). Sonraki ara kartlar bu pini korur; KAO2-27 nihai yayın pini ayrıca yükseltilir.",
   "analysis": {
     "journeyFindings": {
       "K": 9,
@@ -173,5 +173,10 @@
       "evidence": null
     }
   },
-  "backlog": []
+  "backlog": [],
+  "releaseApprovalRecord": {
+    "by": "user",
+    "at": "2026-09-28",
+    "scope": "KAO2-00…02; commit/push/main fast-forward/Pages; pin ve runtime-only paket düzeltmesi dahil; KAO2-03 ve sonraki kartlar hariç"
+  }
 }

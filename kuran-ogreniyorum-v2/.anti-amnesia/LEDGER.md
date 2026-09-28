@@ -123,3 +123,10 @@ Kurallar:
 - evidence-levels: kaynak/test baseline ✓, hedef strict beklenen FAIL · yayın — · cihaz —
 - surprises: yok; üretim tasarımı değişmedi, mevcut ihlaller kilitlendi
 - next: KAO2-03
+
+## seq 12 · 2026-09-28 · NOTE · —
+- status: done
+- summary: Kullanıcı tamamlanan KAO2-00…02'yi yeniden doğrulayıp canlıya almayı açıkça istedi. Yalnız bu teslim için commit/push/main fast-forward/Pages yetkisi kaydedildi; KAO2-03 kapsam dışı.
+- release-preparation: Ortak cache pini 20260928a index.html/sw.js/test_iip_22.js içinde eşlendi. Pages runtime-only rsync ve guard yeni kuran-ogreniyorum-v2 klasörünü dışlıyor. Gelecek KAO2 kartları yayın yetkisi almış sayılmaz.
+- evidence-levels: kaynak/test yayın öncesi yeniden koşuluyor · yayın sonucu commit sonrası Actions/canlı hash makbuzuyla raporlanacak · cihaz doğrulanmadı
+- next: KAO2-03

@@ -1,6 +1,6 @@
 # KAO2 — Kur'an Arapçası Öğreniyorum · Yeniden Tasarım Programı
 
-> **Durum:** PLANLAMA TAMAM · analiz + plan + 4 karar (G0 kapalı) · uygulama başlamadı · sıradaki kart **KAO2-00**
+> **Durum:** UYGULAMA AKTİF · G0 kapalı · KAO2-00 tamamlandı (1/28) · sıradaki kart **KAO2-01**
 > **Kapsam:** YALNIZ `Kur'an Arapçası Öğreniyorum` modülü — hub kartı, tam ekran
 > modal ve içindeki bütün ekranlar. Başka yüzeye dokunulmaz.
 > **Makine durumu:** [`KAO2-STATE.json`](KAO2-STATE.json) · **Şimdiki durum:** [`.anti-amnesia/CURRENT-STATE.md`](.anti-amnesia/CURRENT-STATE.md) · **Kayıt defteri:** [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md)

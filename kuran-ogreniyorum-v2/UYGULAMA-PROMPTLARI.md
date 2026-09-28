@@ -157,7 +157,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 - **Önkoşul:** G0 kapalı (10-KARARLAR). Dal henüz yok.
 - **Oku:** 10-KARARLAR K-1 · 04 §4 · `tests/kao/test_kao_user_tasks.js` R-C5 bloğu (~L100–112) · `tools/kao-audio-build.mjs` `BUDGET_BYTES`.
-- **Dokun:** `tests/kao/test_kao_user_tasks.js`, `tests/kao/test_kao2_perf_budget.js` (yeni), `tools/kao-audio-build.mjs`, `tests/kao/README.md`, `kuran-ogreniyorum-v2/04-BILIMSEL-TEMEL.md` (yalnız teyit işaretleri), plan klasörü.
+- **Dokun:** `tests/kao/test_kao_user_tasks.js`, `tests/kao/test_kao2_perf_budget.js` (yeni), `tools/kao-audio-build.mjs`, `tools/kao-lexicon-build.mjs` ve araç çıktısı `app/content/quranLexiconV1.js` (2026-09-28 kullanıcı onayı: içerik eşliğini koruyan yükleme optimizasyonu), `tests/kao/README.md`, `kuran-ogreniyorum-v2/04-BILIMSEL-TEMEL.md` (yalnız teyit işaretleri), plan klasörü.
 - **Adımlar:**
   1. P1'in 1. adımı yerine: `git status` temizse `git switch main && git switch -c kao2-yeniden-tasarim`. Plan klasörü `main`'de zaten commit'li olmalı (`git log main --oneline -- kuran-ogreniyorum-v2 | grep KAO2-PLAN` bir satır döndürür; LEDGER seq 4). Değilse dur ve kullanıcıya sor.
   2. (Plan commit'i 2026-09-28'de `main`'e alındı ve yayınlandı; bu adımda ayrıca commit gerekmez.)

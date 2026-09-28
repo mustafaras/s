@@ -20,7 +20,7 @@ Kaynakların tam künyesi §4'te; eski programın kaynakları
 
 | D | Karar | Kanıt | Güç |
 |---|---|---|---|
-| D-07 | **Çapa-önce müfredat**: Seviye 1 namazda her gün söylenen metinlerle (Fâtiha, tesbihat, Sübhâneke, Tahiyyat, İhlâs/Felak/Nâs) başlar; sıklık sırası Seviye 2'den itibaren. | Kişisel alaka ve özerklik (SDT, Ryan & Deci 2000); ön bilgi öğrenmenin güçlü yordayıcısıdır (Ausubel 1968; Simonsmeier ve ark. 2022). Ezberdeki metin hazır ön bilgidir. | ●● |
+| D-07 | **Çapa-önce müfredat**: Seviye 1 namazda her gün söylenen metinlerle (Fâtiha, tesbihat, Sübhâneke, Tahiyyat, İhlâs/Felak/Nâs) başlar; sıklık sırası Seviye 2'den itibaren. | Kişisel alaka ve özerklik (SDT, Ryan & Deci 2000); ön bilgi öğrenmenin güçlü yordayıcısıdır (Ausubel 1968; Simonsmeier ve ark. 2022). Ezberdeki metin hazır ön bilgidir. | ●● (⚠︎) |
 | D-08 | **Kapsam anlatısı görünür**: "İlk 50 kelime ≈ Kur'an'ın %45'i". | Sıklık temelli kelime öğretimi (Nation 2006); kapsam eşikleri %95/%98 (Hu & Nation 2000; Laufer & Ravenhorst-Kalovski 2010). | ●● |
 | D-09 | **Ünite = tek tema + net hedef + 20–40 kelime + 1–2 gramer kavramı + 1 çapa metin + ustalık kontrolü**. Kilit yok, sıra önerilir. | Ustalık öğrenmesi (Bloom 1968; Kulik, Kulik & Bangert-Drowns 1990 meta-analizi); yakın, belirli hedefler (Locke & Latham 2002). | ●●● |
 | D-10 | **Seviye 0 sistematik**: harf → konum şekli → hareke → hece → kelime; harekeli metin, ses eşliğinde. | Sistematik fonik öğretim (National Reading Panel 2000; Ehri 2005); harekeli Arapça okuma doğruluğunu artırır (Abu-Rabia 2001). | ●●● |
@@ -43,44 +43,44 @@ Kaynakların tam künyesi §4'te; eski programın kaynakları
 
 ## 4. Kaynakça (kısa künye)
 
-- Abu-Rabia, S. (2001). The role of vowels in reading Semitic scripts. *Reading and Writing*, 14.
-- Adesope, O. O., Trevisan, D. A., & Sundararajan, N. (2017). Rethinking the use of tests: A meta-analysis of practice testing. *Review of Educational Research*, 87(3).
-- Amabile, T., & Kramer, S. (2011). *The Progress Principle*. HBR Press.
-- Ausubel, D. P. (1968). *Educational Psychology: A Cognitive View*. Holt, Rinehart & Winston.
-- Bandura, A. (1977). Self-efficacy. *Psychological Review*, 84(2).
-- Bloom, B. S. (1968). Learning for mastery. *Evaluation Comment*, 1(2).
-- Brunmair, M., & Richter, T. (2019). Similarity matters: A meta-analysis of interleaved learning. *Psychological Bulletin*, 145(11).
-- Carvalho, P. F., & Goldstone, R. L. (2014). Putting category learning in order. *Memory & Cognition*, 42.
-- Cepeda, N. J., ve ark. (2006). Distributed practice in verbal recall tasks. *Psychological Bulletin*, 132(3).
-- de Groot, A. M. B., & Keijzer, R. (2000). What is hard to learn is easy to forget. *Language Learning*, 50(1).
-- Deci, E. L., Koestner, R., & Ryan, R. M. (1999). A meta-analytic review of experiments examining the effects of extrinsic rewards. *Psychological Bulletin*, 125(6).
-- Ehri, L. C. (2005). Learning to read words. *Scientific Studies of Reading*, 9(2).
-- Gollwitzer, P. M., & Sheeran, P. (2006). Implementation intentions and goal achievement: A meta-analysis. *Advances in Experimental Social Psychology*, 38.
-- Hattie, J., & Timperley, H. (2007). The power of feedback. *Review of Educational Research*, 77(1).
-- Hu, M., & Nation, I. S. P. (2000). Unknown vocabulary density and reading comprehension. *Reading in a Foreign Language*, 13(1).
-- Iyengar, S. S., & Lepper, M. R. (2000). When choice is demotivating. *JPSP*, 79(6).
-- Kalyuga, S., ve ark. (2003). The expertise reversal effect. *Educational Psychologist*, 38(1).
-- Kirschner, P. A., Sweller, J., & Clark, R. E. (2006). Why minimal guidance during instruction does not work. *Educational Psychologist*, 41(2).
-- Kornell, N., Hays, M. J., & Bjork, R. A. (2009). Unsuccessful retrieval attempts enhance subsequent learning. *JEP: LMC*, 35(4).
-- Lally, P., ve ark. (2010). How are habits formed. *European Journal of Social Psychology*, 40(6).
-- Laufer, B., & Ravenhorst-Kalovski, G. C. (2010). Lexical threshold revisited. *Reading in a Foreign Language*, 22(1).
-- Locke, E. A., & Latham, G. P. (2002). Building a practically useful theory of goal setting. *American Psychologist*, 57(9).
-- Mayer, R. E. (2009). *Multimedia Learning* (2. baskı). Cambridge UP.
-- Metcalfe, J. (2017). Learning from errors. *Annual Review of Psychology*, 68.
-- Nation, I. S. P. (2006). How large a vocabulary is needed for reading and listening? *Canadian Modern Language Review*, 63(1).
-- Nation, I. S. P. (2013). *Learning Vocabulary in Another Language* (2. baskı). Cambridge UP.
-- National Reading Panel (2000). *Teaching Children to Read*. NICHD.
-- Norris, J. M., & Ortega, L. (2000). Effectiveness of L2 instruction: A research synthesis and quantitative meta-analysis. *Language Learning*, 50(3).
-- Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning. *Psychological Science*, 17(3).
-- Rohrer, D., & Taylor, K. (2007). The shuffling of mathematics problems improves learning. *Instructional Science*, 35.
-- Ryan, R. M., & Deci, E. L. (2000). Self-determination theory. *American Psychologist*, 55(1).
-- Shute, V. J. (2008). Focus on formative feedback. *Review of Educational Research*, 78(1).
-- Spada, N., & Tomita, Y. (2010). Interactions between type of instruction and type of language feature: A meta-analysis. *Language Learning*, 60(2).
-- Sweller, J. (1988). Cognitive load during problem solving. *Cognitive Science*, 12(2).
-- Thomson, R. I. (2018). High variability [pronunciation] training (HVPT). *Journal of Second Language Pronunciation*, 4(2).
-- Webb, S., & Chang, A. C.-S. (2015). How does prior word knowledge affect vocabulary learning progress in an extensive reading program? *Studies in Second Language Acquisition*, 37(4).
-- Wilson, R. C., ve ark. (2019). The eighty five percent rule for optimal learning. *Nature Communications*, 10.
-- Ye, J., Su, J., & Cao, Y. (2022). A stochastic shortest path algorithm for optimizing spaced repetition scheduling. *KDD '22*.
+- Abu-Rabia, S. (2001). The role of vowels in reading Semitic scripts. *Reading and Writing*, 14. ✓
+- Adesope, O. O., Trevisan, D. A., & Sundararajan, N. (2017). Rethinking the use of tests: A meta-analysis of practice testing. *Review of Educational Research*, 87(3). ✓
+- Amabile, T., & Kramer, S. (2011). *The Progress Principle*. HBR Press. ✓
+- Ausubel, D. P. (1968). *Educational Psychology: A Cognitive View*. Holt, Rinehart & Winston. ⚠︎ teyit edilemedi
+- Bandura, A. (1977). Self-efficacy. *Psychological Review*, 84(2). ✓
+- Bloom, B. S. (1968). Learning for mastery. *Evaluation Comment*, 1(2). ✓
+- Brunmair, M., & Richter, T. (2019). Similarity matters: A meta-analysis of interleaved learning. *Psychological Bulletin*, 145(11). ✓
+- Carvalho, P. F., & Goldstone, R. L. (2014). Putting category learning in order. *Memory & Cognition*, 42. ✓
+- Cepeda, N. J., ve ark. (2006). Distributed practice in verbal recall tasks. *Psychological Bulletin*, 132(3). ✓
+- de Groot, A. M. B., & Keijzer, R. (2000). What is hard to learn is easy to forget. *Language Learning*, 50(1). ✓
+- Deci, E. L., Koestner, R., & Ryan, R. M. (1999). A meta-analytic review of experiments examining the effects of extrinsic rewards. *Psychological Bulletin*, 125(6). ✓
+- Ehri, L. C. (2005). Learning to read words. *Scientific Studies of Reading*, 9(2). ✓
+- Gollwitzer, P. M., & Sheeran, P. (2006). Implementation intentions and goal achievement: A meta-analysis. *Advances in Experimental Social Psychology*, 38. ✓
+- Hattie, J., & Timperley, H. (2007). The power of feedback. *Review of Educational Research*, 77(1). ✓
+- Hu, M., & Nation, I. S. P. (2000). Unknown vocabulary density and reading comprehension. *Reading in a Foreign Language*, 13(1). ✓
+- Iyengar, S. S., & Lepper, M. R. (2000). When choice is demotivating. *JPSP*, 79(6). ✓
+- Kalyuga, S., ve ark. (2003). The expertise reversal effect. *Educational Psychologist*, 38(1). ✓
+- Kirschner, P. A., Sweller, J., & Clark, R. E. (2006). Why minimal guidance during instruction does not work. *Educational Psychologist*, 41(2). ✓
+- Kornell, N., Hays, M. J., & Bjork, R. A. (2009). Unsuccessful retrieval attempts enhance subsequent learning. *JEP: LMC*, 35(4). ✓
+- Lally, P., ve ark. (2010). How are habits formed. *European Journal of Social Psychology*, 40(6). ✓
+- Laufer, B., & Ravenhorst-Kalovski, G. C. (2010). Lexical threshold revisited. *Reading in a Foreign Language*, 22(1). ✓
+- Locke, E. A., & Latham, G. P. (2002). Building a practically useful theory of goal setting. *American Psychologist*, 57(9). ✓
+- Mayer, R. E. (2009). *Multimedia Learning* (2. baskı). Cambridge UP. ✓
+- Metcalfe, J. (2017). Learning from errors. *Annual Review of Psychology*, 68. ✓
+- Nation, I. S. P. (2006). How large a vocabulary is needed for reading and listening? *Canadian Modern Language Review*, 63(1). ✓
+- Nation, I. S. P. (2013). *Learning Vocabulary in Another Language* (2. baskı). Cambridge UP. ✓
+- National Reading Panel (2000). *Teaching Children to Read*. NICHD. ✓
+- Norris, J. M., & Ortega, L. (2000). Effectiveness of L2 instruction: A research synthesis and quantitative meta-analysis. *Language Learning*, 50(3). ✓
+- Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning. *Psychological Science*, 17(3). ✓
+- Rohrer, D., & Taylor, K. (2007). The shuffling of mathematics problems improves learning. *Instructional Science*, 35. ✓
+- Ryan, R. M., & Deci, E. L. (2000). Self-determination theory. *American Psychologist*, 55(1). ✓
+- Shute, V. J. (2008). Focus on formative feedback. *Review of Educational Research*, 78(1). ✓
+- Spada, N., & Tomita, Y. (2010). Interactions between type of instruction and type of language feature: A meta-analysis. *Language Learning*, 60(2). ✓
+- Sweller, J. (1988). Cognitive load during problem solving. *Cognitive Science*, 12(2). ✓
+- Thomson, R. I. (2018). High variability [pronunciation] training (HVPT). *Journal of Second Language Pronunciation*, 4(2). ✓
+- Webb, S., & Chang, A. C.-S. (2015). How does prior word knowledge affect vocabulary learning progress in an extensive reading program? *Studies in Second Language Acquisition*, 37(4). ✓
+- Wilson, R. C., ve ark. (2019). The eighty five percent rule for optimal learning. *Nature Communications*, 10. ✓
+- Ye, J., Su, J., & Cao, Y. (2022). A stochastic shortest path algorithm for optimizing spaced repetition scheduling. *KDD '22*. ✓
 
 > **Doğrulama notu:** Künyeler uygulama öncesinde, 09-YOL-HARITASI'ndaki
 > KAO2-00 kartında birincil kaynaktan tek tek teyit edilir. Teyit edilemeyen

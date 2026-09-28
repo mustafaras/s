@@ -60,3 +60,22 @@ Kurallar:
 - evidence-levels: kaynak/test kısmi, süre FAIL · yayın yok · cihaz yok
 - surprises: mevcut sözlük yükleme süresi 40 ms bütçesini tek başına aşıyor; kaynakça teyidi tamamlanmadı
 - next: KAO2-00
+
+## seq 6 · 2026-09-28 · FIX · KAO2-00
+- status: done
+- summary: Seq 5 BLOCKED (a47a68f) sonrası kullanıcı tools/kao-lexicon-build.mjs ve araç çıktısı app/content/quranLexiconV1.js optimizasyonunu onayladı. Kart in_progress olarak sürdürüldü; Dokun listesi eşlendi. Tek geçişli decoder, içerik semantiği korunarak süre engelini çözdü.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-00/KANIT.md
+- next: KAO2-00
+
+## seq 7 · 2026-09-28 · CARD · KAO2-00
+- status: done
+- title: K-1 bütçe ve süre kapısı, ses bütçesi 24 MB, kaynakça teyidi
+- prev-commit: a47a68f
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-00/KANIT.md
+- gates: kao 18 PASS · app 77 PASS · panel 23 PASS · panel-v2 27 PASS · quran 9 PASS · reminders PASS · driver PASS · zikr 95/95 PASS · contrast 336/336 PASS · sync PASS; migration 67/67 PASS; lexicon/audio self-test PASS; semantic parity PASS; freeze 4/4 bayt-eş
+- metrics: içerik gzip 162173 B · runtime 50221 B · CSS 7051 B · VM p95 3,834 ms ≤40 · 524 lemma semantik eş · 38 kaynak işaretli (37 ✓, 1 ⚠︎)
+- changed-tests: R-C5 K-1 bütçeleri; yeni perf fixture; mevcut beklentiler zayıflatılmadı
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: yükleme maliyeti onaylı üretici düzeltmesiyle çözüldü; Ausubel 1968 birincil teyidi yok, D-07 işaretli
+- next: KAO2-01

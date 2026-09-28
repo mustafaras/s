@@ -1,31 +1,30 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-00
-lastSeq: 5
-status: blocked
+nextCard: KAO2-01
+lastSeq: 7
+status: active
 -->
 
-Son güncelleme: 2026-09-28 · LEDGER seq 5
+Son güncelleme: 2026-09-28 · LEDGER seq 7
 
 ## Şu an neredeyiz
-KAO2-00 BLOCKED. Kullanıcının taban onayıyla d4faa17 üzerinden kao2-yeniden-tasarim dalı açıldı. K-1 boyut/ses tavanları uygulandı, performans fixture'ı eklendi; 40 ms süre kapısı mevcut sözlükte kırmızı. Kart tamamlanmadı.
+KAO2-00 tamamlandı; 1/28 kart done. İlk BLOCKED commit a47a68f, kullanıcı onaylı üretici optimizasyonuyla çözüldü. K-1 boyut/süre ve ses bütçeleri uygulandı, kaynakça işaretlendi, tüm P3 kapıları PASS. Dal kao2-yeniden-tasarim; yerel çalışma, yayın yok.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-00: kapsam kararı sonrası sözlük süre engelini çöz, kaynakçayı teyit et, tüm P3 kapılarını tamamla; KAO2-01'e geçme.
+KAO2-01: yalnız yeni kullanıcı isteğiyle taban ölçümleri ve önce HTML dökümlerini üret; bu oturumda başlanmadı.
 
 ## Canlı gerçekler
-- Dal: kao2-yeniden-tasarim; başlangıç d4faa17. Push/deploy/tag/merge yok.
-- İçerik gzip 162177 B /256 KiB (mevcut dört modül /164 KiB); runtime 50221 B /80 KiB; CSS 7051 B /14 KiB.
-- Perf 20 tekrar p95: 82,948 ve 80,949 ms; tavan 40 ms. Ayrı dosya ölçümünde sözlük 84,421 ms.
-- R-C5 PASS; ses self-test PASS; yeni perf FAIL. Diğer P3 kapıları çalıştırılmadı.
-- Yayın pini 20260927g, runtime/üretim içeriği ve handler yüzeyi değiştirilmedi.
-- Kanıt: evidence/KAO2-00/KANIT.md. Kaynakça teyidi tamamlanmadı; taban dosyası henüz yok.
+- İçerik gzip 162173 B (158,372 KiB); runtime 50221 B (49,044 KiB); CSS 7051 B (6,886 KiB).
+- VM 20 tekrar p95 3,834 ms ≤40; KAO2-01 tabanı henüz yok.
+- KAO fixture 18, app 77, panel 23, panel-v2 27, quran 9 PASS; reminder smoke 21; zikr 95/95, migration 67/67; kontrast 336/336.
+- Üretilmiş sözlük yalnız decoder satırında değişti; 524 lemma + roots/attribution/byId eşliği ve dört modülün freeze bayt eşliği PASS.
+- Yayın pini 20260927g; app.js, motor, CSS, dört yükleme listesi ve handler sayısı değişmedi.
+- 04 §4 kaynakça 37 ✓, 1 ⚠︎ (Ausubel 1968); D-07 Güç işaretli.
+- Kanıt: evidence/KAO2-00/KANIT.md; komut makbuzları ve kaynak URL'leri aynı klasörde.
 
 ## Açık riskler
-Sözlük yükleme optimizasyonu kartın Dokun listesi dışındaki üretici/çıktı dosyalarını gerektiriyor. Süre tavanı yükseltilmedi, test atlanmadı. İçerik yalnız üretim aracıyla değiştirilebilir.
+Süre yalnız Node VM ölçümü; cihaz kabulü değil. Kaynakça kısa künye teyidi bilimsel kararların tam yeniden değerlendirmesi değil; §4 dışı atıflar ayrıca denetlenebilir. Ausubel için birincil teyit eksikliği görünür tutuldu. Sonraki kartlar sürüm pinini değiştirmez.
 
 ## Bekleyen kullanıcı işleri
-- KAO2-00 için tools/kao-lexicon-build.mjs ve üretilmiş app/content/quranLexiconV1.js yükleme optimizasyonuna sınırlı kapsam onayı.
-- K-3: nitelikli okuyucu ve lisans (KAO2-22 öncesi).
-- K-4: L2 alan uzmanı; G2/G3 içerik onayları kendi sıralarında.
+Bu kart için kapsam kararı kalmadı. K-3 okuyucu/lisans (KAO2-22 öncesi), G2/G3 içerik onayları ve K-4 L2 uzman ataması ilgili aşamalarda; cihaz kabulü kullanıcıda.

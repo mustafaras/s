@@ -2227,7 +2227,7 @@ function renderFrozenLexicon(verified, examplePronunciations) {
   });
   var DICTIONARY = ${JSON.stringify(dictionary)};
   var packed = \`${packedTemplate}\`;
-  for (var i=0;i<DICTIONARY.length;i+=1) packed=packed.split(String.fromCodePoint(0xE000+i)).join(DICTIONARY[i]);
+  packed=packed.replace(/[\\uE000-\\uE1FF]/g,function(token){return DICTIONARY[token.charCodeAt(0)-0xE000];});
   var rows = JSON.parse(packed);
   var SEM_GROUPS = ${JSON.stringify(semGroups)};
   function semNeighborsOf(id, groups){

@@ -1,38 +1,31 @@
-# KAO2 — CURRENT STATE (tek sayfa, her kartta yeniden yazılır)
+# KAO2 — CURRENT STATE
 
 <!-- kao2-sync
 nextCard: KAO2-00
-lastSeq: 4
-status: planning
+lastSeq: 5
+status: blocked
 -->
 
-**Son güncelleme:** 2026-09-28 · LEDGER seq 4 · plan `main`'de ve yayında; uygulama kodu değişmedi
+Son güncelleme: 2026-09-28 · LEDGER seq 5
 
 ## Şu an neredeyiz
-- Analiz ve plan tamam (01–09), 4 karar alındı (10-KARARLAR.md, G0 kapalı).
-- Uygulama **başlamadı**. Sıradaki kart: **KAO2-00** (dal açma + K-1 bütçe/süre kapısının koda yansıması + kaynakça teyidi).
-- Plan `main`'de (`KAO2-PLAN` commit'i, LEDGER seq 4). Dal henüz yok; KAO2-00 `main`'den `kao2-yeniden-tasarim` dalını açar.
+KAO2-00 BLOCKED. Kullanıcının taban onayıyla d4faa17 üzerinden kao2-yeniden-tasarim dalı açıldı. K-1 boyut/ses tavanları uygulandı, performans fixture'ı eklendi; 40 ms süre kapısı mevcut sözlükte kırmızı. Kart tamamlanmadı.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-00: `kao2-yeniden-tasarim` dalını aç; `test_kao_user_tasks.js` R-C5 bütçesini
-K-1 tavanlarına çevir, `test_kao2_perf_budget.js`'i ekle, ses bütçesini 24 MB yap,
-04 kaynakçasını teyit et.
+KAO2-00: kapsam kararı sonrası sözlük süre engelini çöz, kaynakçayı teyit et, tüm P3 kapılarını tamamla; KAO2-01'e geçme.
 
-## Canlı gerçekler (her oturumda doğru kabul et, şüphedeysen doğrula)
-| Konu | Değer |
-|---|---|
-| KAO çalışma zamanı | `app/core/quranLearn.js` (1.899 satır), `app/kao.css` (93 satır) |
-| İçerik modülleri | `app/content/quran{Lexicon,Grammar,ShortSurahs,Phonics}V1.js`, gzip 158,4 KiB |
-| Handler yüzeyi | 35 `App.kao*` (app.js L3904); KAO2 en çok +5 ekler |
-| Yayın pini | `20260927g` (index.html, sw.js `SW_VERSION`/`SW_OFFLINE_VERSION`, tests/app/test_iip_22.js); yalnız KAO2-27'de değişir |
-| KAO fixture'ları | `tests/kao/` 17 dosya + `tests/kao/README.md` |
-| Yükleme sırası listeleri | index.html · .claude/skills/run-seyma/driver.mjs · .claude/skills/run-seyma/zikr-harness.mjs · tests/app/test_state_rebind_boundary.js |
+## Canlı gerçekler
+- Dal: kao2-yeniden-tasarim; başlangıç d4faa17. Push/deploy/tag/merge yok.
+- İçerik gzip 162177 B /256 KiB (mevcut dört modül /164 KiB); runtime 50221 B /80 KiB; CSS 7051 B /14 KiB.
+- Perf 20 tekrar p95: 82,948 ve 80,949 ms; tavan 40 ms. Ayrı dosya ölçümünde sözlük 84,421 ms.
+- R-C5 PASS; ses self-test PASS; yeni perf FAIL. Diğer P3 kapıları çalıştırılmadı.
+- Yayın pini 20260927g, runtime/üretim içeriği ve handler yüzeyi değiştirilmedi.
+- Kanıt: evidence/KAO2-00/KANIT.md. Kaynakça teyidi tamamlanmadı; taban dosyası henüz yok.
 
-## Açık riskler / dikkat
-- `.claude/skills/*` Bash sandbox'ında yazmaya kapalı → yalnız Edit aracı; izin yoksa BLOCKED (K-2).
-- fx2 düz metin tarayıcıları yorumları da sayar: yorumda handler ataması ya da tıklama niteliği adı yazma.
-- Tarayıcı açma yok (CLAUDE.md DATA SAFETY); görsel QA yalnız 127.0.0.1:9000 kuralıyla ve yalnız KAO2-10 / KAO2-27'de.
+## Açık riskler
+Sözlük yükleme optimizasyonu kartın Dokun listesi dışındaki üretici/çıktı dosyalarını gerektiriyor. Süre tavanı yükseltilmedi, test atlanmadı. İçerik yalnız üretim aracıyla değiştirilebilir.
 
 ## Bekleyen kullanıcı işleri
-- (K-3) Hece kaydı için nitelikli okuyucu ve lisans izni: KAO2-22'ye kadar gerekmez.
-- (K-4) L2 alan uzmanı ataması: KAO2-17'den itibaren metinler `sourced` düzeyinde ilerleyebilir.
+- KAO2-00 için tools/kao-lexicon-build.mjs ve üretilmiş app/content/quranLexiconV1.js yükleme optimizasyonuna sınırlı kapsam onayı.
+- K-3: nitelikli okuyucu ve lisans (KAO2-22 öncesi).
+- K-4: L2 alan uzmanı; G2/G3 içerik onayları kendi sıralarında.

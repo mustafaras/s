@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 
-const BUDGET_BYTES = 16 * 1024 * 1024;
+const BUDGET_BYTES = 24 * 1024 * 1024; // KAO2 K-1
 const CONCURRENCY = 8;
 
 function fail(message, code = 1) {

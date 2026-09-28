@@ -99,12 +99,16 @@ for (const variant of [{ label: 'audio=false', quiet: false }, { label: 'sessiz 
 
 // R-C5 boyut: 4 içerik modülü gzip toplamı (ölçüm; bütçe aşımı gizlenmez, rapora yazılır).
 {
-  const sizes = Object.fromEntries(CONTENT.map((relative) => [path.basename(relative), zlib.gzipSync(fs.readFileSync(path.join(repoRoot, relative)), { level: 9 }).length]));
+  const curriculum = 'app/content/quranCurriculumV2.js';
+  const files = CONTENT.concat(fs.existsSync(path.join(repoRoot, curriculum)) ? [curriculum] : []);
+  const sizes = Object.fromEntries(files.map((relative) => [path.basename(relative), zlib.gzipSync(fs.readFileSync(path.join(repoRoot, relative)), { level: 9 }).length]));
   const total = Object.values(sizes).reduce((sum, value) => sum + value, 0);
-  // KAO-FIX-20 (kullanıcı kararı KF-11, 2026-09-27): R-C5 içerik bütçesi 130 KB → 160 KiB; bütçe = büyüme tavanı.
-  const budget = 160 * 1024;
+  // KAO2 K-1 (2026-09-28): toplam 256 KiB, mevcut modüller 164 KiB; süre kapısı test_kao2_perf_budget.js
+  const budget = 256 * 1024;
+  const legacyTotal = CONTENT.reduce((sum, file) => sum + sizes[path.basename(file)], 0);
+  assert.ok(legacyTotal <= 164 * 1024, `mevcut modüller ${legacyTotal} bayt, tavan 164 KiB`);
   const guard = budget;
-  assert.ok(total <= budget, `içerik gzip ${total} bayt, R-C5 bütçesi ${budget} (KF-11)`);
+  assert.ok(total <= budget, `içerik gzip ${total} bayt, R-C5 bütçesi ${budget} (KAO2 K-1)`);
   assert.ok(!(total > budget), 'bütçe içinde: overBudget false');
   report.contentGzip = { sizes, total, budget, overBudget: total > budget, overBy: Math.max(0, total - budget), growthGuard: guard };
   const src = read('app/core/quranLearn.js');

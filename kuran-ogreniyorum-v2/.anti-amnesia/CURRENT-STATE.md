@@ -2,11 +2,11 @@
 
 <!-- kao2-sync
 nextCard: KAO2-03
-lastSeq: 12
+lastSeq: 13
 status: active
 -->
 
-Son güncelleme: 2026-09-28 · LEDGER seq12
+Son güncelleme: 2026-09-28 · LEDGER seq13
 
 ## Şu an neredeyiz
 KAO2-00…02 done (3/28); W0 kartları tamam. Tasarım sözleşmesi fixture'ı baseline modunda PASS; strict hedefler beklenen FAIL. Üretim arayüzü bu kartta değişmedi. Dal kao2-yeniden-tasarim, KAO2-00…02 için kullanıcı yayın onayı var.
@@ -29,4 +29,4 @@ Baseline PASS tasarımın hedefe uyduğu anlamına gelmez. KAO2-03 strict geçi�
 Bu kart için karar/engel yok. G2/G3 müfredat/metin onayı, K-3 okuyucu/lisans ve L2 uzman işleri kendi kartlarında; cihaz kabulü kullanıcıda.
 
 ## Ara yayın onayı
-2026-09-28: kullanıcı KAO2-00…02 yayınına onay verdi; cache pini ve runtime-only paket istisnası uygulandı. KAO2-03 başlamadı; bu onay sonraki kartları kapsamaz. Yayın öncesi P3 164/164 PASS; release-gates.json ve YAYIN.md kaydedildi. Actions ve canlı hash doğrulaması commit sonrası raporlanır.
+2026-09-28: kullanıcı KAO2-00…02 yayınına onay verdi; cache pini ve runtime-only paket istisnası uygulandı. KAO2-03 başlamadı; bu onay sonraki kartları kapsamaz. Yayın öncesi P3 164/164 PASS; release-gates.json ve YAYIN.md kaydedildi. Yayın commit 5aff0012, Actions36412204478 success; 12 canlı dosya byte eşliği PASS, 2 plan URL404. Ayrıntılar evidence/KAO2-02/release-live.json. Cihaz kabulü doğrulanmadı.

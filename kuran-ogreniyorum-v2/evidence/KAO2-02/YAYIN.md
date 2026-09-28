@@ -13,4 +13,4 @@ Pages runtime-only rsync ve guard kuran-ogreniyorum-v2 klasörünü dışlar. İ
 Tasarım fixture'ı baseline modundadır; strict hedeflerin henüz sağlanmaması KAO2-02 sözleşmesidir. Bu yayın tüm yeniden tasarımın tamamlandığı anlamına gelmez. Cihaz/görsel kabul yok. Tarayıcı veya sunucu açılmadı; kişisel veri deposuna yazılmadı. Ausubel teyidi ve gelecekteki G2/G3/lisans/uzman kararları korunur.
 
 ## Yayın
-Actions ve canlı byte eşliği commit sonrası ayrıca kaydedilecek.
+Commit 5aff0012e4be87142273cf4e78cb15e5ca64c0bb: Actions https://github.com/mustafaras/s/actions/runs/36412204478 success; validate + deploy ve runtime-only guard PASS. Canlı 12 dosya birebir SHA-256 eş; iki KAO2 plan/HTML URL beklenen 404. Ayrıntılar release-live.json. Bu makbuzu ekleyen takip commit yalnız plan/kanıt dosyalarını değiştirir; üretim baytları aynıdır.

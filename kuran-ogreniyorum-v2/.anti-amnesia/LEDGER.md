@@ -130,3 +130,13 @@ Kurallar:
 - release-preparation: Ortak cache pini 20260928a index.html/sw.js/test_iip_22.js içinde eşlendi. Pages runtime-only rsync ve guard yeni kuran-ogreniyorum-v2 klasörünü dışlıyor. Gelecek KAO2 kartları yayın yetkisi almış sayılmaz.
 - evidence-levels: kaynak/test yayın öncesi yeniden koşuluyor · yayın sonucu commit sonrası Actions/canlı hash makbuzuyla raporlanacak · cihaz doğrulanmadı
 - next: KAO2-03
+
+## seq 13 · 2026-09-28 · NOTE · —
+- status: done
+- summary: Onaylı KAO2-00…02 ara yayını tamamlandı; main fast-forward, origin/main ve origin/kao2-yeniden-tasarim yayın commitine eşitlendi.
+- release: 5aff0012e4be87142273cf4e78cb15e5ca64c0bb; pin20260928a; Actions36412204478 validate/deploy success.
+- gates: P3 164/164 PASS; eski plan ve self-test19 PASS; sync PASS; 524 lemma semantik eşlik PASS; p95 4,210 ms.
+- evidence: evidence/KAO2-02/YAYIN.md + release-gates.json + release-live.json
+- evidence-levels: kaynak/test PASS · yayın 12 canlı varlık byte/hash eş, 2 plan URL 404 · cihaz doğrulanmadı
+- boundaries: KAO2-03 başlamadı; bu makbuz commitinde yalnız plan/kanıt güncellenir. Gelecek kartlara yayın onayı aktarılmaz.
+- next: KAO2-03

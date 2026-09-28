@@ -853,8 +853,8 @@ const combined = APP_SURFACE_FILES.map(read).join('') + quranLearnHubSrc;
 const surfaceCount = new Set(
   (combined.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((s) => s.match(/App\.[A-Za-z0-9_]+/)[0])
 ).size;
-ok('App yüzeyi pinli (758) — KAO2-04 gezinme handlerları dahil',
-  surfaceCount === 758, 'ölçülen: ' + surfaceCount);
+ok('App yüzeyi pinli (759) — KAO2-06 Devam handlerı dahil',
+  surfaceCount === 759, 'ölçülen: ' + surfaceCount);
 ok('tıklama niteliği sayısı pinli (393) — KAO-21 gizlenen kart satırı dahil',
   (combined.match(/onclick=/g) || []).length === 393,
   'ölçülen: ' + (combined.match(/onclick=/g) || []).length);

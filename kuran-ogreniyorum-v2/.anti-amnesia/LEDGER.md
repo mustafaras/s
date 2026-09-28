@@ -246,3 +246,23 @@ Kurallar:
 - evidence-levels: kaynak/test KAO PASS, tam P3 bloklu · yayın yok · cihaz doğrulanmadı
 - surprises: README eski satırında KAO2-03'ü sıradaki gösteriyor; canlı STATE/CURRENT-STATE nextCard KAO2-06 ile uyumlu, README kapsam dışı olduğu için değişmedi.
 - next: KAO2-06
+
+## seq 25 · 2026-09-28 · FIX · KAO2-06
+- status: in_progress
+- summary: Kullanıcı “blocked sorununu çöz” talebiyle seq24'te belirtilen iki sayısal App pininin düzeltilmesini onayladı.
+- resolution: `tests/app/test_app_surface_daily_boundary.js` işlev ataması/yüzey pinleri 596/758→597/759; `tests/app/test_v3_welcome.js` yüzey pini 758→759 güncellendi. İki hedefli kapı ve tam P3 yeşil.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-06/KANIT.md
+- next: KAO2-06
+
+## seq 26 · 2026-09-28 · CARD · KAO2-06
+- status: done
+- title: Geri bildirim paneli ve Devam
+- prev-commit: 2c94f1d
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-06/KANIT.md
+- gates: syntax PASS · KAO 22/22 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr 95/95 PASS · contrast 382 çift/0 ihlal PASS · sync PASS
+- metrics: handler 38 · içerik gzip 158.372 KiB · runtime gzip 54.923 KiB · CSS gzip 7.460 KiB · VM p95 4.318 ms · geçiş p50/max 0.134/0.907 ms · ECE 0.0131 · gece 8 kart
+- changed-tests: yeni test_kao2_feedback.js; etkilenen KAO testleri; FX2 yüzey pinleri; günlük App yüzeyi pinleri 596/758→597/759; v3 yüzey pini 758→759
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: paralel P3 koşusunda perf p95 gürültülüydü; izole tekrar 4.318 ms ve tam KAO ailesi PASS. README'deki eski KAO2-03 satırı değiştirilmedi, kanıta kaydedildi.
+- next: KAO2-07

@@ -6,7 +6,7 @@
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-02",
   "nextCard": "KAO2-03",
-  "ledgerLastSeq": 13,
+  "ledgerLastSeq": 14,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -21,7 +21,7 @@
     "G3": "open",
     "G4": "open"
   },
-  "versionPolicy": "2026-09-28 kullanıcı ara yayın onayı: KAO2-00…02 pini 20260928a (index.html + sw.js + test_iip_22.js). Sonraki ara kartlar bu pini korur; KAO2-27 nihai yayın pini ayrıca yükseltilir.",
+  "versionPolicy": "KAO2-00…02 yayımlanma pini 20260928a. Kullanıcı 2026-09-28 konum kapısı hatasının canlı düzeltmesini istedi; app.js/appSurface değişikliği için ortak kabuk ve KAO/SW pini 20260928b yükseltildi. KAO2-03 ve sonraki ara kartlar 20260928b pinini korur; KAO2-27 nihai yayın pini ayrıca yükseltilir.",
   "analysis": {
     "journeyFindings": {
       "K": 9,

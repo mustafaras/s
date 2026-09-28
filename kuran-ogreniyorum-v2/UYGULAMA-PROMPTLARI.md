@@ -80,7 +80,7 @@ Bir kapı kırmızıysa ve düzeltmesi kart kapsamındaysa düzelt; değilse **P
 - `app.js`'te yalnız izin verilen dokunuş: `App.kao*` shim satırı (≈L3904). `var ui=` literaline, `migrate()` gövdesine ve başka alanlara dokunma.
 - fx2/v3 düz metin tarayıcıları yorumları da sayar: **yorumda** `App.<ad>=` biçimi ya da tıklama niteliği adı yazma.
 - FSRS portu (`kaoSchedule`, ağırlıklar), `kaoBuildQueue` kuralları (R-A1…R-A8, KF-9) ve gizlilik (ses kaydı yalnız bellekte) değişmez.
-- `?v=` sürüm pini ara kartlarda değişmez (versionPolicy); yeni dosyalar mevcut `20260927g` ile eklenir.
+- `?v=` sürüm pini ara kartlarda değişmez (versionPolicy); yeni dosyalar mevcut `20260928b` ile eklenir.
 - Mevcut kullanıcı verisini silen, sıfırlayan ya da anlamını değiştiren kod yok; yalnız ekleme ve normalizasyon.
 
 ### P6 · Durma koşulları
@@ -224,7 +224,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Adımlar:**
   1. **Kırmızı:** `test_kao2_navigation.js`: (a) `kaoNav('units')` sonra `kaoNav('word','<lemma>')` → `kaoBack()` ünitelere, tekrar `kaoBack()` ana ekrana döner; (b) okuyucu ana ekrandan açılınca geri ana ekrana döner (Y-10); (c) her görünümün NavBar başlığı görünüme özgü (O-01); (d) kökte sol düğme `Kapat`, diğerlerinde `‹ <önceki başlık>`; (e) Escape modal sözleşmesi korunur.
   2. İskelet: `quranLearnFlow.js` IIFE → `window.SeymaQuranLearnFlow={version:1}` (DOM/ağ/zaman/depo yok). `quranLearnViews.js` IIFE → `window.SeymaQuranLearnViews={version:1, register:function(deps){…}}`. `quranLearn.js` açılışta views'a `{esc, icon, …}` bağımlılık torbası verir; torba yoksa fail-closed.
-  3. Dört listeye **aynı committe** ekle; sıra `quranLearnFlow.js` → `quranLearnViews.js` → `quranLearn.js`. `.claude/skills/*` iki dosyası **yalnız Edit aracıyla**; izin verilmezse P6 (BLOCKED, diff'i kullanıcıya ver). `sw.js` önbellek listesine iki dosyayı `?v=20260927g` ile ekle.
+  3. Dört listeye **aynı committe** ekle; sıra `quranLearnFlow.js` → `quranLearnViews.js` → `quranLearn.js`. `.claude/skills/*` iki dosyası **yalnız Edit aracıyla**; izin verilmezse P6 (BLOCKED, diff'i kullanıcıya ver). `sw.js` önbellek listesine iki dosyayı `?v=20260928b` ile ekle.
   4. `ui.kaoStack` (tembel başlatma); `kaoView` yığının tepesinden türetilir. `kaoSetView(v)` yığını `[home, v]` yapar (geri uyum); `kaoOpen` yığını `[home]` ile kurar; `kaoClose` temizler.
   5. Handler'lar: `App.kaoNav(view,param)`, `App.kaoBack()` → app.js shim satırına **yalnız** iki 1-satır shim; gövde `quranLearn.js`'te. fx2 App yüzeyi pinlerini +2 güncelle (yorumda handler adı geçmeden).
   6. NavBar + LargeTitle bileşenleri `quranLearnViews.js`'te; tüm mevcut görünümlerin `kao-view-head` başlığı ve sağdaki "Geri" düğmesi NavBar'a taşınır. Başlıklar: Bugün → "Kur'an Arapçası", üniteler → "Yol", kelime → kelimenin okunuşu, okuyucu → sûre adı, ayarlar → "Ayarlar", telaffuz → "Telaffuz", âyet → "Günün âyeti", harita → "Mushaf haritası", namaz → "Namazda ne diyorum", istatistik → "İlerleme", kapı → "Harf kontrolü".

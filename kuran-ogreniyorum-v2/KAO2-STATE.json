@@ -1,0 +1,177 @@
+{
+  "program": "KAO2",
+  "title": "Kur'an Arapçası Öğreniyorum · Yeniden Tasarım",
+  "status": "planning",
+  "plannedAt": "2026-09-28",
+  "branch": "kao2-yeniden-tasarim",
+  "releaseApproval": "not_approved",
+  "nextCard": "KAO2-00",
+  "ledgerLastSeq": 4,
+  "decisionsAt": "2026-09-28",
+  "decisions": {
+    "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
+    "fileSplit": "K-2: üçe böl — quranLearnFlow.js (saf) → quranLearnViews.js (saf HTML) → quranLearn.js (motor); dört liste aynı committe; .claude/skills dosyaları yalnız Edit aracıyla, izin yoksa BLOCKED",
+    "syllableAudioSource": "K-3: A) nitelikli muallim, iki ses, stüdyo protokolü, CC BY 4.0 / süresiz izin; B) geçici: harf gerçek kelime içinde (mevcut klipler); C) TTS/sentetik/lisanssız/âyetten hece kesme yasak",
+    "turkishTextReviewer": "K-4: L0 otomatik kapılar (kaynak, imlâ, yasak ifade, elle Arapça yok) + L1 proje sahibi + L2 alan uzmanı (rol); draft görünmez, sourced/expert görünür"
+  },
+  "gates": {
+    "G0": "closed",
+    "G1": "open",
+    "G2": "open",
+    "G3": "open",
+    "G4": "open"
+  },
+  "versionPolicy": "Ara kartlar ?v= pinini değiştirmez (yerel dal); yeni dosyalar mevcut pinle eklenir; pin tek seferde KAO2-27de yükseltilir (index.html + sw.js + test_iip_22.js).",
+  "analysis": {
+    "journeyFindings": {
+      "K": 9,
+      "Y": 8,
+      "O": 9
+    },
+    "designFindings": 26,
+    "pedagogyFindings": 10
+  },
+  "cards": {
+    "KAO2-00": {
+      "wave": "W0",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-01": {
+      "wave": "W0",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-02": {
+      "wave": "W0",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-03": {
+      "wave": "W1",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-04": {
+      "wave": "W1",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-05": {
+      "wave": "W1",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-06": {
+      "wave": "W1",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-07": {
+      "wave": "W2",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-08": {
+      "wave": "W2",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-09": {
+      "wave": "W2",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-10": {
+      "wave": "W2",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-11": {
+      "wave": "W2",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-12": {
+      "wave": "W3",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-13": {
+      "wave": "W3",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-14": {
+      "wave": "W3",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-15": {
+      "wave": "W3",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-16": {
+      "wave": "W3",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-17": {
+      "wave": "W4",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-18": {
+      "wave": "W4",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-19": {
+      "wave": "W4",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-20": {
+      "wave": "W4",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-21": {
+      "wave": "W4",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-22": {
+      "wave": "W4",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-23": {
+      "wave": "W5",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-24": {
+      "wave": "W5",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-25": {
+      "wave": "W5",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-26": {
+      "wave": "W5",
+      "status": "todo",
+      "evidence": null
+    },
+    "KAO2-27": {
+      "wave": "W5",
+      "status": "todo",
+      "evidence": null
+    }
+  },
+  "backlog": []
+}

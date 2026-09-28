@@ -1,0 +1,19 @@
+$ node tests/kao/test_kao2_next_step.js
+PASS  (1) ilk açılış yapılmadı → onboarding
+PASS  (2) gece penceresi → night-review (kaoNightWindow değerleri)
+PASS  (3) S0 seçildi, bitmedi → s0-lesson + doğru ders
+PASS  (4) bugün ders yok → daily (tekrar + ders parçası + dakika)
+PASS  (5) ünite dersleri bitti, ustalık yok → mastery
+PASS  (6) ünite tamam → next-unit
+PASS  (7) bugün bitti → rest
+PASS  (kenar) tekrar borcu > 60 → yeni kelime 0
+PASS  (kenar) 7+ gün ara → warmup (en zayıf 10)
+PASS  lessonOf, lessonProgress, unitProgress, türetilmiş tamamlama
+PASS  estimateMinutes: veri yoksa 0,55 dk/görev; günlük süre üst sınırı
+PASS  Flow saf: DOM/ağ/zamanlayıcı/depo/Date.now yok
+PASS  motor: kaoNextStep gerçek veriyle Flow çağırır; kaoContinue oturum sonunda sessionDone yazar
+KAO2-08 next step: PASS (13 kontrol)
+exit=0
+$ node tests/kao/test_kao_migration.js
+KAO migration: PASS (empty/old/broken/idempotent/orphan/114 surah/onboarding/path)
+exit=0

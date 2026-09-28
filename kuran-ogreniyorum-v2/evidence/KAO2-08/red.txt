@@ -1,0 +1,8 @@
+$ node tests/kao/test_kao2_next_step.js
+node:internal/assert/utils:146
+AssertionError [ERR_ASSERTION]: Flow.curriculum eksik
+exit=1 (ayrı ölçüm; boru sonrası grep çıkışı değil)
+$ node tests/kao/test_kao_migration.js
+node:internal/assert/utils:146
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+exit=1 (ayrı ölçüm; boru sonrası grep çıkışı değil)

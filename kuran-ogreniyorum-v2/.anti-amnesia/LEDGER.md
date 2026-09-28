@@ -307,3 +307,16 @@ Kurallar:
 - status: closed
 - summary: G2 closed · Kullanıcı MUFREDAT-ESLEME.md eşlemesini Ünite 6 dengelemesiyle onayladı (Ünite 2 odak eki ve kalan dağılım olduğu gibi kabul). KAO2-08 önkoşulu karşılandı.
 - next: KAO2-08
+
+## seq 32 · 2026-09-28 · CARD · KAO2-08
+- status: done
+- title: "Sıradaki adım" motoru (quranLearnFlow.js)
+- prev-commit: e87e1f0a
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-08/KANIT.md
+- gates: syntax PASS · kao 24/24 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr 95/95 PASS · contrast 382 çift/0 ihlal PASS · sync PASS
+- metrics: nextStep 7 satır + 2 kenar PASS · Flow yasaklı API 0 · migration onboarding/path PASS · runtime gzip 58,813 KiB ≤80 · VM p95 4,225 ms
+- changed-tests: yeni test_kao2_next_step.js; test_kao_migration.js yeni onboarding/path beklentileri
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: next-unit, 05 §4 tablosunda ulaşılamaz sırada olduğu için "yeni ünite başlamadı" koşuluyla daily'den önce; action tanımlayıcıları KAO2-09/11/12'de bağlanacak; daily.ms yazılmıyor, süre 0,55 dk/görev yedeğiyle
+- next: KAO2-09

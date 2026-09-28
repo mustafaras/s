@@ -36,7 +36,9 @@ assert.deepEqual(JSON.parse(JSON.stringify(fresh)), {
   errors: { sound: 0, root: 0, affix: 0, cognate: 0, rule: 0, order: 0 },
   ayahs: { understood: [] },
   readability: { lineHeight: 'normal', wordSpacing: 'normal', coloredHarakat: true, fadeHarakat: false },
-  summary: null
+  summary: null,
+  onboarding: { doneAt: null, start: null, minutes: 5, intent: null, whatsNewAt: null },
+  path: { lessons: {}, units: {} }
 });
 
 const old = { quranLearn: {
@@ -92,4 +94,33 @@ assert.equal(Object.keys(allSurahs.quranLearn.surahs).length, 114);
 assert.equal(allSurahs.quranLearn.surahs['1'].understoodAt, 't1');
 assert.equal(allSurahs.quranLearn.surahs['114'].understoodAt, 't114');
 
-console.log('KAO migration: PASS (empty/old/broken/idempotent/orphan/114 surah)');
+// KAO2-08: onboarding/path yalnız eklenir; kartı olan eski kullanıcı ilk açılışı görmez.
+assert.equal(migrated.onboarding.doneAt, 'legacy');
+assert.deepEqual(JSON.parse(JSON.stringify(migrated.path)), { lessons: {}, units: {} });
+const brokenFlow = { quranLearn: { onboarding: 'x', path: [1, 2], cards: {} } };
+const bf = api.ensureQuranLearn(brokenFlow);
+assert.deepEqual(JSON.parse(JSON.stringify(bf.onboarding)), { doneAt: null, start: null, minutes: 5, intent: null, whatsNewAt: null });
+assert.deepEqual(JSON.parse(JSON.stringify(bf.path)), { lessons: {}, units: {} });
+const keepFlow = { quranLearn: {
+  onboarding: { doneAt: '2026-10-01T18:04:11.000Z', start: 'placement', minutes: 15, intent: 'isha', whatsNewAt: 'bad-date', extra: 1 },
+  path: {
+    lessons: { 'u01.01': { startedAt: '2026-10-01T18:05:00.000Z', doneAt: 'nope', score: 2 }, 's0.03': 'bozuk', 'u01.02': { score: 0.5 } },
+    units: { '1': { masteryAt: '2026-10-02T10:00:00.000Z', masteryScore: 0.8 }, x: { masteryAt: 'a' }, '2': 7 }
+  }
+} };
+const kf = api.ensureQuranLearn(keepFlow);
+assert.equal(kf.onboarding.doneAt, '2026-10-01T18:04:11.000Z');
+assert.equal(kf.onboarding.start, 'placement');
+assert.equal(kf.onboarding.minutes, 15);
+assert.equal(kf.onboarding.intent, 'isha');
+assert.equal(kf.onboarding.whatsNewAt, null);
+assert.equal(kf.onboarding.extra, 1, 'bilinmeyen alan korunur');
+assert.deepEqual(JSON.parse(JSON.stringify(kf.path.lessons)), {
+  'u01.01': { startedAt: '2026-10-01T18:05:00.000Z', doneAt: null, score: null },
+  'u01.02': { startedAt: null, doneAt: null, score: 0.5 }
+});
+assert.deepEqual(JSON.parse(JSON.stringify(kf.path.units)), { '1': { masteryAt: '2026-10-02T10:00:00.000Z', masteryScore: 0.8 } });
+const kfAgain = JSON.stringify(api.ensureQuranLearn(keepFlow));
+assert.equal(JSON.stringify(api.ensureQuranLearn(keepFlow)), kfAgain, 'onboarding/path normalizasyonu idempotent');
+
+console.log('KAO migration: PASS (empty/old/broken/idempotent/orphan/114 surah/onboarding/path)');

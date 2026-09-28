@@ -55,5 +55,143 @@
     return {stack:result,entry:result[result.length-1],changed:true};
   }
 
-  window.SeymaQuranLearnFlow={version:1,createStack:createStack,openStack:openStack,push:push,reset:reset,replaceTop:replaceTop,current:current,previous:previous,back:back};
+  // KAO2-08: saf müfredat ilerlemesi ve "sıradaki adım" (05 §4). Girdiler salt
+  // okunur; saat yalnız parametre olarak gelir, bu dosya hiçbir durum yazmaz.
+  var DAY_MS=86400000,REVIEW_CAP=20,DEBT_LIMIT=60,WARMUP_GAP_DAYS=7,WARMUP_CARDS=10;
+  var MIN_PER_TASK=0.55,SETTLED_STABILITY=7,MASTERY_MINUTES=4,S0_MINUTES=5;
+  var curriculumCache={source:null,value:null};
+
+  function obj(value){ return value&&typeof value==='object'&&!Array.isArray(value)?value:{}; }
+  function num(value,fallback){ return typeof value==='number'&&isFinite(value)?value:fallback; }
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function dayKey(date){ return date.getFullYear()+'-'+pad2(date.getMonth()+1)+'-'+pad2(date.getDate()); }
+  function dayStart(key){ var p=key.split('-'); return new Date(Number(p[0]),Number(p[1])-1,Number(p[2])).getTime(); }
+  function checkNow(now){
+    if(!now||typeof now.getTime!=='function'||!isFinite(now.getTime())) throw new TypeError('KAO2-08: now geçerli bir tarih olmalı');
+    return now;
+  }
+  function cardFor(q,lemmaId){ var card=obj(q.cards)['w:'+lemmaId+':ar>tr']; return card&&typeof card==='object'&&card.orphan!==true?card:null; }
+  function isSettled(card){
+    return !!card&&(card.state==='review'||card.st==='review')&&num(card.s,0)>=SETTLED_STABILITY&&card.readerUnknown!==true;
+  }
+  function lessonRecord(q,lessonId){ return obj(obj(obj(q).path).lessons)[lessonId]; }
+
+  function curriculum(content){
+    var source=content&&content.curriculum;
+    if(!source||!Array.isArray(source.units)) throw new Error('KAO2-08: müfredat içeriği yok');
+    if(curriculumCache.source===source) return curriculumCache.value;
+    var lessonById={},unitOfLesson={},s0=source.s0&&Array.isArray(source.s0.lessons)?source.s0.lessons:[];
+    source.units.forEach(function(unit){ unit.lessons.forEach(function(lesson){ lessonById[lesson.id]=lesson; unitOfLesson[lesson.id]=unit.id; }); });
+    s0.forEach(function(lesson){ lessonById[lesson.id]=lesson; });
+    var value={units:source.units,s0:s0,lessonById:lessonById,unitOfLesson:unitOfLesson,lemmaToLesson:obj(source.lemmaToLesson)};
+    curriculumCache={source:source,value:value};
+    return value;
+  }
+  function lessonOf(content,lemmaId){
+    var map=curriculum(content).lemmaToLesson;
+    return Object.prototype.hasOwnProperty.call(map,lemmaId)?map[lemmaId]:null;
+  }
+  // 08 §1: ders tamamı türetilebilir — path kaydı ya da dersin tüm lemmalarının ar>tr kartı.
+  function lessonProgress(q,lessonId,content){
+    var lesson=curriculum(content).lessonById[lessonId],ids=lesson&&Array.isArray(lesson.lemmaIds)?lesson.lemmaIds:[];
+    var introduced=0,settled=0;
+    ids.forEach(function(id){ var card=cardFor(q,id); if(card){ introduced+=1; if(isSettled(card)) settled+=1; } });
+    return {total:ids.length,introduced:introduced,settled:settled,done:!!obj(lessonRecord(q,lessonId)).doneAt||(ids.length>0&&introduced===ids.length)};
+  }
+  function findUnit(content,unitId){
+    var units=curriculum(content).units;
+    for(var i=0;i<units.length;i+=1) if(String(units[i].id)===String(unitId)) return units[i];
+    return null;
+  }
+  function unitProgress(q,unitId,content){
+    var unit=findUnit(content,unitId),out={words:0,known:0,lessonsDone:0,lessons:0,mastery:false,started:false,nextLesson:null,nextIndex:-1};
+    if(!unit) return out;
+    unit.lessons.forEach(function(lesson,index){
+      var p=lessonProgress(q,lesson.id,content);
+      out.words+=p.total; out.known+=p.settled; out.lessons+=1;
+      if(p.done) out.lessonsDone+=1;
+      else if(out.nextLesson===null){ out.nextLesson=lesson; out.nextIndex=index; }
+      if(p.introduced>0||lessonRecord(q,lesson.id)) out.started=true;
+    });
+    out.mastery=!!obj(obj(obj(obj(q).path).units)[String(unit.id)]).masteryAt;
+    return out;
+  }
+  // 05 §4: son 7 günün ölçülmüş görev süresi (ms/answered); yoksa 0,55 dk/görev; üst sınır günlük süre.
+  function estimateMinutes(daily,tasks,now,capMinutes){
+    if(!(tasks>0)) return 0;
+    var days=obj(daily),today=dayStart(dayKey(checkNow(now))),ms=0,answered=0;
+    Object.keys(days).forEach(function(key){
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
+      var age=(today-dayStart(key))/DAY_MS,day=obj(days[key]);
+      if(age<0||age>=7||!(num(day.ms,0)>0)||!(num(day.answered,0)>0)) return;
+      ms+=day.ms; answered+=day.answered;
+    });
+    var perTask=answered>0?ms/answered/60000:MIN_PER_TASK,minutes=Math.max(1,Math.ceil(tasks*perTask-1e-9));
+    return capMinutes>0?Math.min(minutes,capMinutes):minutes;
+  }
+  function dueCount(q,now){
+    var cards=obj(q.cards),t=now.getTime(),n=0;
+    Object.keys(cards).forEach(function(id){
+      var card=obj(cards[id]),due=new Date(card.due||0).getTime();
+      if(card.orphan!==true&&card.state!=='new'&&card.st!=='new'&&isFinite(due)&&due<=t) n+=1;
+    });
+    return n;
+  }
+  function daysSinceActive(q,now){
+    var days=obj(q.daily),keys=Object.keys(days).filter(function(key){ return /^\d{4}-\d{2}-\d{2}$/.test(key)&&num(obj(days[key]).answered,0)>0; }).sort();
+    if(!keys.length) return null;
+    return Math.round((dayStart(dayKey(now))-dayStart(keys[keys.length-1]))/DAY_MS);
+  }
+  function step(kind,title,subtitle,minutes,action,param,counts){
+    return {kind:kind,title:title,subtitle:subtitle,minutes:minutes,action:action,param:param===undefined?null:param,counts:counts||{reviews:0,fresh:0}};
+  }
+  function currentUnit(q,content){
+    var units=curriculum(content).units;
+    for(var i=0;i<units.length;i+=1){
+      var p=unitProgress(q,units[i].id,content);
+      if(!(p.lessonsDone===p.lessons&&p.mastery)) return {unit:units[i],progress:p,previous:i>0?units[i-1]:null};
+    }
+    return null;
+  }
+  function firstOpenS0(q,content){
+    var s0=curriculum(content).s0;
+    for(var i=0;i<s0.length;i+=1) if(!obj(lessonRecord(q,s0[i].id)).doneAt) return {lesson:s0[i],index:i};
+    return null;
+  }
+  function lessonStep(q,now,content,current,due,cap){
+    var daily=obj(q.daily),lesson=current.progress.nextLesson,lp=lessonProgress(q,lesson.id,content);
+    var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
+    var minutes=estimateMinutes(daily,reviews+fresh,now,cap),counts={reviews:reviews,fresh:fresh};
+    if(current.previous&&!current.progress.started) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise,minutes,'kaoStart',lesson.id,counts);
+    var subtitle=fresh>0?reviews+' tekrar + '+fresh+' yeni · ~'+minutes+' dk':reviews+' tekrar · önce tekrarları bitirelim · ~'+minutes+' dk';
+    return step('daily',current.unit.title+' · Ders '+(current.progress.nextIndex+1),subtitle,minutes,'kaoStart',lesson.id,counts);
+  }
+  // 05 §4 öncelik sırası; ilk eşleşen kazanır. Kenar: 7+ gün ara → ısınma, tekrar borcu >60 → yeni 0.
+  function nextStep(snapshot,now,content){
+    checkNow(now);
+    var snap=obj(snapshot),q=obj(snap.quranLearn),onboarding=obj(q.onboarding),daily=obj(q.daily),night=snap.night;
+    var cap=[5,10,15].indexOf(onboarding.minutes)>=0?onboarding.minutes:0,due=dueCount(q,now);
+    if(!onboarding.doneAt) return step('onboarding','Hoş geldin','1 dakikada başlayalım',1,'kaoOnboarding',null);
+    if(night&&night.active===true&&due>0){
+      var nightCards=Math.min(due,num(night.maxCards,8)),nightMin=num(night.durationMinutes,3);
+      return step('night-review','Hafif tekrar','Uyumadan önce '+nightCards+' kart · ~'+nightMin+' dk',nightMin,'kaoStart',null,{reviews:nightCards,fresh:0});
+    }
+    var todayDone=obj(daily[dayKey(now)]).sessionDone===true,gap=daysSinceActive(q,now);
+    var cardCount=Object.keys(obj(q.cards)).filter(function(id){ return obj(q.cards[id]).orphan!==true; }).length;
+    if(!todayDone&&gap!==null&&gap>=WARMUP_GAP_DAYS&&cardCount>0){
+      var warm=Math.min(WARMUP_CARDS,cardCount),warmMin=estimateMinutes(daily,warm,now,cap);
+      return step('warmup','Yeniden ısınalım','En zayıf '+warm+' kelimeyle başla · ~'+warmMin+' dk',warmMin,'kaoStart',null,{reviews:warm,fresh:0});
+    }
+    var s0=onboarding.start==='s0'?firstOpenS0(q,content):null;
+    if(s0) return step('s0-lesson','Harfler · Ders '+(s0.index+1)+': '+s0.lesson.title,'Seviye 0 · ~'+S0_MINUTES+' dk',S0_MINUTES,'kaoOpenS0',s0.lesson.id);
+    var current=currentUnit(q,content);
+    if(current&&!current.progress.nextLesson){
+      return step('mastery','Ustalık: '+current.unit.title,'Çapa metnini dokunmadan oku + karma test · ~'+MASTERY_MINUTES+' dk',MASTERY_MINUTES,'kaoMastery',current.unit.id);
+    }
+    if(current&&!todayDone) return lessonStep(q,now,content,current,due,cap);
+    return step('rest',current?'Bugünlük tamam ✓':'Tüm üniteler tamam ✓','İstersen: Günün âyeti',0,'kaoOpenAyah',null);
+  }
+
+  window.SeymaQuranLearnFlow={version:1,createStack:createStack,openStack:openStack,push:push,reset:reset,replaceTop:replaceTop,current:current,previous:previous,back:back,
+    curriculum:curriculum,lessonOf:lessonOf,lessonProgress:lessonProgress,unitProgress:unitProgress,nextStep:nextStep,estimateMinutes:estimateMinutes};
 })(window);

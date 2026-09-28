@@ -1027,6 +1027,12 @@
     if(!ui.kaoPanel||ui.kaoPanel.open!==true) return false;
     if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
     ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=Date.now(); ui.kaoOrderDraft=[];
+    // KAO2-08: oturumun son cevabından sonra günün dersi tamam; gece tekrarı sayılmaz. Render içinde yazım yok.
+    if(!ui.kaoNight&&Array.isArray(ui.kaoQueue)&&ui.kaoQueue.length>0&&ui.kaoTaskIndex>=ui.kaoQueue.length){
+      var key=quranLearnDeps.todayStr();
+      q.daily[key]=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{}),{sessionDone:true});
+      kaoSave();
+    }
     paintTask(); startTaskPresentation(); return true;
   }
   function kaoUndo(){
@@ -1939,8 +1945,46 @@
     q.readability.fadeHarakat=boolOr(q.readability.fadeHarakat,false);
     q.summary=q.summary&&typeof q.summary==='object'&&!Array.isArray(q.summary)?q.summary:null;
 
+    normalizeOnboarding(q);
+    normalizePath(q);
+
     if(previousVersion!==LEXICON_VERSION) markOrphans(q.cards);
     return q;
+  }
+  // KAO2-08 (08 §1): yalnız ekleme; bilinmeyen alanlar korunur, bozuk tipler varsayılana döner.
+  function isoOrNull(value){ return typeof value==='string'&&value&&isFinite(new Date(value).getTime())?value:null; }
+  function scoreOrNull(value){ return typeof value==='number'&&isFinite(value)&&value>=0&&value<=1?value:null; }
+  function normalizeOnboarding(q){
+    var o=objectOr(q.onboarding,{});
+    o.doneAt=o.doneAt==='legacy'?'legacy':isoOrNull(o.doneAt);
+    if(o.doneAt===null&&Object.keys(q.cards).length>0) o.doneAt='legacy';
+    o.start=['s0','placement','level1'].indexOf(o.start)>=0?o.start:null;
+    o.minutes=[5,10,15].indexOf(o.minutes)>=0?o.minutes:5;
+    o.intent=['fajr','dhuhr','asr','maghrib','isha','custom'].indexOf(o.intent)>=0?o.intent:null;
+    o.whatsNewAt=isoOrNull(o.whatsNewAt);
+    q.onboarding=o;
+  }
+  function normalizePath(q){
+    var p=objectOr(q.path,{}),lessons=objectOr(p.lessons,{}),units=objectOr(p.units,{}),cleanLessons={},cleanUnits={};
+    Object.keys(lessons).forEach(function(id){
+      var rec=lessons[id];
+      if(!rec||typeof rec!=='object'||Array.isArray(rec)) return;
+      cleanLessons[id]=Object.assign({},rec,{startedAt:isoOrNull(rec.startedAt),doneAt:isoOrNull(rec.doneAt),score:scoreOrNull(rec.score)});
+    });
+    Object.keys(units).forEach(function(id){
+      var rec=units[id];
+      if(!/^\d+$/.test(id)||!rec||typeof rec!=='object'||Array.isArray(rec)) return;
+      cleanUnits[id]=Object.assign({},rec,{masteryAt:isoOrNull(rec.masteryAt),masteryScore:scoreOrNull(rec.masteryScore)});
+    });
+    p.lessons=cleanLessons; p.units=cleanUnits; q.path=p;
+  }
+  // KAO2-08: "sıradaki adım" tek doğruluk kaynağı; saf Flow'u gerçek veriyle çağırır.
+  function kaoNextStep(nowValue){
+    if(!quranLearnDeps) return null;
+    var flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2;
+    if(!flow||typeof flow.nextStep!=='function'||!curriculum) throw new Error('KAO2-08: akış motoru ya da müfredat yüklenmedi');
+    var d=quranLearnDeps.data(),now=validDate(nowValue===undefined?new Date():nowValue,'now'),q=ensureQuranLearn(d);
+    return flow.nextStep({quranLearn:q,night:kaoNightWindow(d,now)},now,{curriculum:curriculum});
   }
 
   window.SeymaQuranLearn={
@@ -1968,6 +2012,7 @@
     kaoStart:kaoStart,
     kaoAnswer:kaoAnswer,
     kaoContinue:kaoContinue,
+    kaoNextStep:kaoNextStep,
     kaoUndo:kaoUndo,
     kaoMilestoneCheck:kaoMilestoneCheck,
     kaoCandidates:kaoCandidates,

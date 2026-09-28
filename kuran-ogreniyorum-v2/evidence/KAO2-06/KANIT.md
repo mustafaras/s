@@ -44,7 +44,7 @@ Tarih: 2026-09-28 · Dal: kao2-yeniden-tasarim · Önceki commit: 2c94f1d404a354
 
 ## Kanıt düzeyleri
 - Kaynak/test: tam P3 PASS.
-- Yayın: yok; release yetkisi KAO2-04'e kadar.
+- Yayın: KAO2-05…06, Pages run 36446272528 success; 14/14 canlı runtime hash eşleşmesi. YAYIN.md ve release-live.json.
 - Cihaz: doğrulanmadı; tarayıcı açılmadı, sunucu başlatılmadı.
 
 ## Sürprizler / backlog

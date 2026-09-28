@@ -266,3 +266,13 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: paralel P3 koşusunda perf p95 gürültülüydü; izole tekrar 4.318 ms ve tam KAO ailesi PASS. README'deki eski KAO2-03 satırı değiştirilmedi, kanıta kaydedildi.
 - next: KAO2-07
+
+## seq 27 · 2026-09-28 · NOTE · —
+- status: verified
+- summary: Kullanıcı “push commit merge deploy, şimdiye kadar tüm yaptıklarımızı canlıya al” talebiyle önceki KAO2-04 yayın sınırını KAO2-05…06'ya genişletti; KAO2-07 kapsam dışı kaldı.
+- source: `b36db6b2e6286247f8f29d4ac6362ce6b8ae401d`; `kao2-yeniden-tasarim` ve `main` bu SHA'ya fast-forward eşitlendi.
+- actions: Pages run 36446272528 success; validate ve deploy PASS.
+- live: 14/14 runtime varlığı HTTP 200 ve yerel SHA-256 ile birebir; STATE ve KAO2-06 kanıt URL'leri runtime-only paket nedeniyle beklenen 404.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-06/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-06/release-live.json
+- evidence-levels: kaynak/test PASS · yayın/run/hash PASS · cihaz doğrulanmadı
+- next: KAO2-07

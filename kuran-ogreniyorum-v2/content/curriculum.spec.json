@@ -121,6 +121,7 @@
     { "unit": 4, "notPos": ["N", "ADJ", "PN", "V"], "why": "edat, zamir, bağlaç" },
     { "unit": 11, "rootFamily": 3, "pattern": "\\b(II|III|IV|V|VI|VII|VIII|IX|X)\\b|dörtlü", "why": "unit11 kök ailesi (≥3 üye), türemiş bâb" },
     { "unit": 10, "rootFamily": 3, "why": "unit11 kök ailesi (≥3 üye)" },
+    { "unit": 10, "pos": ["N", "ADJ", "PN"], "pattern": "ism-i (fâil|mef'ûl|mekân)|masdar", "why": "türemiş isimler: yapan, yapılan, fiilin adı (g19, g20) — G2 dengeleme" },
     { "unit": 9, "pos": ["V"], "pattern": "\\b(II|III|IV|V|VI|VII|VIII|IX|X)\\b|dörtlü", "why": "türemiş bâb fiiller" },
     { "unit": 8, "pos": ["V"], "pattern": "·|câmid fiil", "why": "illetli / câmid fiiller" },
     { "unit": 7, "pos": ["V"], "why": "sağlam I. bâb fiiller" },

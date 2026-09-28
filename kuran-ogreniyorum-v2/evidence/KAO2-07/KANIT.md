@@ -57,3 +57,7 @@ Tam çıktı: `gates.txt`.
 - İlk P3 aile döngüsü zsh'ta kelime bölünmediği için tek dosya adı gibi koştu (kabuk hatası, test hatası değil); glob'la yeniden koşuldu, `gates.txt` o koşudur.
 - README.md'deki eski "sıradaki kart KAO2-03" satırı sürüyor; talimat gereği değiştirilmedi.
 - jev-gate CLI bu oturumda `TypeSafeAPIConnectionError` verdi; oturum kancasının aynı istek için verdiği değerlendirme ("yeni özellik · yüksek muhakeme · doğrula") izlendi.
+
+## Ek — FIX (G2 dengeleme, 2026-09-28)
+- Kullanıcı G2'de "Onay + Ünite 6 dengele" seçti. Spec `poolRules`'a kök ailesi kuralından sonra yeni kural eklendi: türemiş isimler (`ism-i fâil|mef'ûl|mekân`, `masdar`; N/ADJ/PN) → Ünite 10 (g19 yapan-yapılan, g20 fiilin adı).
+- Sonuç: Ü6 196/40 → **147/30**, Ü10 49/10 → **98/20**; diğer üniteler aynı; toplam 109 ders. Müfredat testi 12/12 PASS, gzip 10,111 KiB, perf p95 4,132 ms PASS.

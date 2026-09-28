@@ -295,3 +295,15 @@ Kurallar:
 - summary: G2 open · MUFREDAT-ESLEME.md kullanıcı onayı bekleniyor. KAO2-07 done; KAO2-08 G2 kapanmadan (LEDGER'da `GATE · — · G2 closed` kaydı olmadan) başlamaz.
 - review: kuran-ogreniyorum-v2/inceleme/MUFREDAT-ESLEME.md (onay kutuları + karar bekleyen noktalar: Ünite 6 büyüklüğü, Ünite 5/12 küçüklüğü, Ünite 2 odak eki)
 - next: KAO2-08
+
+## seq 30 · 2026-09-28 · FIX · KAO2-07
+- status: done
+- summary: Kullanıcı G2 incelemesinde "Onay + Ünite 6 dengele" seçti. `curriculum.spec.json` poolRules'a türemiş isim kuralı (ism-i fâil/mef'ûl/mekân, masdar → Ünite 10) eklendi; araç yeniden çalıştırıldı.
+- resolution: Ü6 196→147 kelime (40→30 ders), Ü10 49→98 (10→20 ders); toplam 109 ders. test_kao2_curriculum 12/12, perf PASS (gzip 10,111 KiB, p95 4,132 ms).
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-07/KANIT.md
+- next: KAO2-08
+
+## seq 31 · 2026-09-28 · GATE · —
+- status: closed
+- summary: G2 closed · Kullanıcı MUFREDAT-ESLEME.md eşlemesini Ünite 6 dengelemesiyle onayladı (Ünite 2 odak eki ve kalan dağılım olduğu gibi kabul). KAO2-08 önkoşulu karşılandı.
+- next: KAO2-08

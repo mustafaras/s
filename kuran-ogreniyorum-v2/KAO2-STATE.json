@@ -6,7 +6,7 @@
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-06",
   "nextCard": "KAO2-08",
-  "ledgerLastSeq": 29,
+  "ledgerLastSeq": 31,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -17,7 +17,7 @@
   "gates": {
     "G0": "closed",
     "G1": "open",
-    "G2": "open",
+    "G2": "closed",
     "G3": "open",
     "G4": "open"
   },

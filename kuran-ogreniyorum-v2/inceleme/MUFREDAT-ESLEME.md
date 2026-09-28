@@ -12,11 +12,11 @@
 | 3 | 1 | Üç koruyucu sûre | 6 | 28 | g5, g6 | surah:112, surah:113, surah:114 |
 | 4 | 2 | Kur'an'ın tutkalı | 5 | 25 | g7, g8 | lemma-pool:edat-baglac |
 | 5 | 2 | Bu, şu, kim, ne | 2 | 10 | g9, g10 | lemma-pool:isaret-soru |
-| 6 | 2 | Gök, yer ve insan | 40 | 196 | g11, g12 | lemma-pool:isim |
+| 6 | 2 | Gök, yer ve insan | 30 | 147 | g11, g12 | lemma-pool:isim |
 | 7 | 3 | Oldu, yaptı | 9 | 42 | g13, g14 | lemma-pool:fiil-mazi |
 | 8 | 3 | Yapar, yapıyor | 9 | 46 | g15, g16 | lemma-pool:fiil-muzari |
 | 9 | 3 | Yap, ver, bağışla | 11 | 57 | g17, g18 | lemma-pool:fiil-emir |
-| 10 | 4 | Bir kök, bir aile | 10 | 49 | g19, g20 | lemma-pool:kok-ailesi |
+| 10 | 4 | Bir kök, bir aile | 20 | 98 | g19, g20 | lemma-pool:kok-ailesi |
 | 11 | 4 | Kalıplar | 6 | 21 | g21 | lemma-pool:kalip |
 | 12 | 4 | Eğer ve zaman | 3 | 11 | g22, g23, g24 | lemma-pool:sart-zaman |
 
@@ -25,9 +25,9 @@ Toplam: 12 ünite · 109 ders · 524 lemma · Seviye 0: 12 ders.
 ## Karar bekleyen noktalar
 
 - Ünite 5 (Bu, şu, kim, ne) 10 kelime: hedef aralık 20–60 dışında; dağıtım spec `poolRules` ile değiştirilebilir.
-- Ünite 6 (Gök, yer ve insan) 196 kelime: hedef aralık 20–60 dışında; dağıtım spec `poolRules` ile değiştirilebilir.
+- Ünite 6 (Gök, yer ve insan) 147 kelime: hedef aralık 20–60 dışında; dağıtım spec `poolRules` ile değiştirilebilir.
 - Ünite 2 çapası: namaz metinlerinin çoğu kelimesi sözlükte yok (`lp_*`); 11 odak kelimesi eski plan listesinden kimlikle eklendi.
-- Dağıtım kuralları (ilk eşleşen kazanır): Ü5 işaret ve soru edatları → Ü5 işaret/soru isimleri → Ü12 şart ve zaman parçacıkları → Ü12 zaman zarfları → Ü9 seslenme (g18) → Ü4 edat, zamir, bağlaç → Ü11 unit11 kök ailesi (≥3 üye), türemiş bâb → Ü10 unit11 kök ailesi (≥3 üye) → Ü9 türemiş bâb fiiller → Ü8 illetli / câmid fiiller → Ü7 sağlam I. bâb fiiller → Ü6 kalan isimler.
+- Dağıtım kuralları (ilk eşleşen kazanır): Ü5 işaret ve soru edatları → Ü5 işaret/soru isimleri → Ü12 şart ve zaman parçacıkları → Ü12 zaman zarfları → Ü9 seslenme (g18) → Ü4 edat, zamir, bağlaç → Ü11 unit11 kök ailesi (≥3 üye), türemiş bâb → Ü10 unit11 kök ailesi (≥3 üye) → Ü10 türemiş isimler: yapan, yapılan, fiilin adı (g19, g20) — G2 dengeleme → Ü9 türemiş bâb fiiller → Ü8 illetli / câmid fiiller → Ü7 sağlam I. bâb fiiller → Ü6 kalan isimler.
 
 ## Seviye 0
 
@@ -365,7 +365,7 @@ Kavram: — · Uygula: examples
 | 2 | ءَايَة | âyet | âyet; işaret, delil | `l_aAyap_9bea05` |
 | 3 | بَيْن | bayn | ara, arasında | `l_bayon_d87f11` |
 | 4 | سَبِيل | sabîl | yol | `l_sabiyl_bdac41` |
-| 5 | أَمْر | amr | iş, durum | `l_amor_9fbe48` |
+| 5 | دُون | dûn | -den başka | `l_duwn_bc1447` |
 
 ### u06.05 · Gök, yer ve insan · 5. ders
 
@@ -373,11 +373,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | آخِر | âhir | son, sonraki | `l_A_xir_5b7462` |
-| 2 | دُون | dûn | -den başka | `l_duwn_bc1447` |
-| 3 | مُوسَىٰ | mûsâ | Musa (peygamber) | `l_muwsaY_3064bc` |
-| 4 | أَهْل | ahl | ehil, halk; aile | `l_ahol_86b2cf` |
-| 5 | عَظِيم | ʿazîm | büyük, azametli | `l_EaZiym_93f908` |
+| 1 | مُوسَىٰ | mûsâ | Musa (peygamber) | `l_muwsaY_3064bc` |
+| 2 | أَهْل | ahl | ehil, halk; aile | `l_ahol_86b2cf` |
+| 3 | عَظِيم | ʿazîm | büyük, azametli | `l_EaZiym_93f908` |
+| 4 | يَد | yad | el | `l_yad_84953d` |
+| 5 | دُنْيَا | dunyâ | en yakın (hayat), dünya | `l_d_unoyaA_4c3c1e` |
 
 ### u06.06 · Gök, yer ve insan · 6. ders
 
@@ -385,11 +385,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | يَد | yad | el | `l_yad_84953d` |
-| 2 | مُبِين | mubîn | açık, apaçık | `l_m_ubiyn_4f4924` |
-| 3 | دُنْيَا | dunyâ | en yakın (hayat), dünya | `l_d_unoyaA_4c3c1e` |
-| 4 | عَزِيز | ʿazîz | güçlü, üstün | `l_Eaziyz_4804b0` |
-| 5 | ذُو | zû | sahip, -li | `l_uw_7be8de` |
+| 1 | عَزِيز | ʿazîz | güçlü, üstün | `l_Eaziyz_4804b0` |
+| 2 | ذُو | zû | sahip, -li | `l_uw_7be8de` |
+| 3 | شَيْطَٰن | şaytân | şeytan | `l_ayoTa_n_06003d` |
+| 4 | مَلَك | malak | melek | `l_malak_b3955c` |
+| 5 | مَثَل | masal | örnek, misal | `l_maval_5dedc0` |
 
 ### u06.07 · Gök, yer ve insan · 7. ders
 
@@ -397,25 +397,13 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | قَوْل | kavl | söz | `l_qawol_58e075` |
-| 2 | شَيْطَٰن | şaytân | şeytan | `l_ayoTa_n_06003d` |
-| 3 | مَلَك | malak | melek | `l_malak_b3955c` |
-| 4 | مَثَل | masal | örnek, misal | `l_maval_5dedc0` |
-| 5 | مَال | mâl | mal, servet | `l_maAl_d64b35` |
-
-### u06.08 · Gök, yer ve insan · 8. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | وَلِىّ | valiyy | dost, yakın | `l_waliY_0884c3` |
-| 2 | فَضْل | fadl | lütuf, ihsan | `l_faDol_4925b8` |
+| 1 | مَال | mâl | mal, servet | `l_maAl_d64b35` |
+| 2 | وَلِىّ | valiyy | dost, yakın | `l_waliY_0884c3` |
 | 3 | لَيْل | layl | gece vakti | `l_layol_c1152e` |
 | 4 | أَوَّل | avval | birinci, ilk | `l_aw_al_3314ee` |
 | 5 | أَكْثَر | aksar | daha çok, çoğu | `l_akovar_f7f01e` |
 
-### u06.09 · Gök, yer ve insan · 9. ders
+### u06.08 · Gök, yer ve insan · 8. ders
 
 Kavram: — · Uygula: examples
 
@@ -427,7 +415,7 @@ Kavram: — · Uygula: examples
 | 4 | زَوْج | zavc | eş | `l_zawoj_99a6c2` |
 | 5 | أَخ | ah | kardeş | `l_ax_48233a` |
 
-### u06.10 · Gök, yer ve insan · 10. ders
+### u06.09 · Gök, yer ve insan · 9. ders
 
 Kavram: — · Uygula: examples
 
@@ -436,8 +424,20 @@ Kavram: — · Uygula: examples
 | 1 | مِثْل | misl | benzer, eş | `l_mivol_d81d43` |
 | 2 | نَبِىّ | nabiyy | haber getiren peygamber | `l_n_abiY_e09f3b` |
 | 3 | فِرْعَوْن | firʿavn | Firavun | `l_firoEawon_45c9f5` |
-| 4 | خَٰلِد | hâlid | sürekli kalan | `l_xa_lid_db5cbd` |
-| 5 | أَلِيم | alîm | acı veren, elem verici | `l_aliym_a29290` |
+| 4 | أَلِيم | alîm | acı veren, elem verici | `l_aliym_a29290` |
+| 5 | وَجْه | vach | yüz | `l_wajoh_c3bb4d` |
+
+### u06.10 · Gök, yer ve insan · 10. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | بَيِّنَة | bayyinet | apaçık delil | `l_bay_inap_86ef67` |
+| 2 | إِنسَٰن | insân | insan | `l_insa_n_d60ef4` |
+| 3 | آخَر | âhar | başka, diğer | `l_A_xar_621bf1` |
+| 4 | قَلِيل | kalîl | az, azıcık | `l_qaliyl_2b769c` |
+| 5 | قُرْءَان | kur'ân | okunan (Kitap), Kur'ân | `l_quro_aAn_5027d4` |
 
 ### u06.11 · Gök, yer ve insan · 11. ders
 
@@ -445,11 +445,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | وَجْه | vach | yüz | `l_wajoh_c3bb4d` |
-| 2 | بَيِّنَة | bayyinet | apaçık delil | `l_bay_inap_86ef67` |
-| 3 | عَمَل | ʿamal | iş, amel | `l_Eamal_8215bb` |
-| 4 | إِنسَٰن | insân | insan | `l_insa_n_d60ef4` |
-| 5 | آخَر | âhar | başka, diğer | `l_A_xar_621bf1` |
+| 1 | إِبْرَاهِيم | ibrâhîm | İbrahim (peygamber) | `l_iboraAhiym_d85936` |
+| 2 | بَيْت | bayt | ev | `l_bayot_3393ba` |
+| 3 | يَمِين | yamîn | yemin | `l_yamiyn_398e7f` |
+| 4 | آبَاء | âbâ' | babalar, atalar | `l_A_baA_febd74` |
+| 5 | أُمَّة | ummet | topluluk, ümmet | `l_um_ap_e71e1a` |
 
 ### u06.12 · Gök, yer ve insan · 12. ders
 
@@ -457,11 +457,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | قَلِيل | kalîl | az, azıcık | `l_qaliyl_2b769c` |
-| 2 | قُرْءَان | kur'ân | okunan (Kitap), Kur'ân | `l_quro_aAn_5027d4` |
-| 3 | إِبْرَاهِيم | ibrâhîm | İbrahim (peygamber) | `l_iboraAhiym_d85936` |
-| 4 | بَيْت | bayt | ev | `l_bayot_3393ba` |
-| 5 | يَمِين | yamîn | yemin | `l_yamiyn_398e7f` |
+| 1 | ٱبْن | abn | oğul | `l_bon_228952` |
+| 2 | كَثِير | kasîr | çok, birçok | `l_kaviyr_d003d4` |
+| 3 | مَآء | mâ' | su, sıvı | `l_maA_e36bc7` |
+| 4 | نِسَآء | nisâ' | kadınlar | `l_nisaA_371a3e` |
+| 5 | نَذِير | nazîr | uyaran, uyarıcı | `l_na_iyr_9ec980` |
 
 ### u06.13 · Gök, yer ve insan · 13. ders
 
@@ -469,11 +469,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | آبَاء | âbâ' | babalar, atalar | `l_A_baA_febd74` |
-| 2 | أُمَّة | ummet | topluluk, ümmet | `l_um_ap_e71e1a` |
-| 3 | ٱبْن | abn | oğul | `l_bon_228952` |
-| 4 | كَثِير | kasîr | çok, birçok | `l_kaviyr_d003d4` |
-| 5 | مَآء | mâ' | su, sıvı | `l_maA_e36bc7` |
+| 1 | عَيْن | ʿayn | göz | `l_Eayon_c7bc29` |
+| 2 | نَهَار | nahâr | gündüz | `l_nahaAr_1471c5` |
+| 3 | قَرْيَة | karyet | kasaba, şehir | `l_qaroyap_3147eb` |
+| 4 | شَدِيد | şadîd | çetin, şiddetli | `l_adiyd_2db895` |
+| 5 | وَلَد | valad | çocuk, evlat | `l_walad_a334cd` |
 
 ### u06.14 · Gök, yer ve insan · 14. ders
 
@@ -481,11 +481,10 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | نِسَآء | nisâ' | kadınlar | `l_nisaA_371a3e` |
-| 2 | صَادِق | sâdik | doğru sözlü | `l_SaAdiq_43c41b` |
-| 3 | نَذِير | nazîr | uyaran, uyarıcı | `l_na_iyr_9ec980` |
-| 4 | عَيْن | ʿayn | göz | `l_Eayon_c7bc29` |
-| 5 | نَهَار | nahâr | gündüz | `l_nahaAr_1471c5` |
+| 1 | نَهَر | nahar | ırmak, nehir | `l_nahar_fb00c1` |
+| 2 | أَجَل | acal | belirli süre, vade | `l_ajal_77d132` |
+| 3 | بَصِير | basîr | her şeyi gören | `l_baSiyr_69e5a4` |
+| 4 | تَحْت | taht | alt, altında | `l_taHot_fb7d9c` |
 
 ### u06.15 · Gök, yer ve insan · 15. ders
 
@@ -493,48 +492,12 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | قَرْيَة | karyet | kasaba, şehir | `l_qaroyap_3147eb` |
-| 2 | شَدِيد | şadîd | çetin, şiddetli | `l_adiyd_2db895` |
-| 3 | وَلَد | valad | çocuk, evlat | `l_walad_a334cd` |
-| 4 | رِزْق | rizk | rızık, nasip | `l_rizoq_aec3ab` |
-| 5 | نَهَر | nahar | ırmak, nehir | `l_nahar_fb00c1` |
-
-### u06.16 · Gök, yer ve insan · 16. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | أَجَل | acal | belirli süre, vade | `l_ajal_77d132` |
-| 2 | مُجْرِم | mucrim | suçlu, günahkâr | `l_mujorim_63cb7c` |
-| 3 | خَلْق | halk | yaratma, yaratılış | `l_xaloq_875745` |
-| 4 | بَصِير | basîr | her şeyi gören | `l_baSiyr_69e5a4` |
-| 5 | تَحْت | taht | alt, altında | `l_taHot_fb7d9c` |
-
-### u06.17 · Gök, yer ve insan · 17. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
 | 1 | عَدُوّ | ʿaduvv | düşman | `l_Eaduw_4c00d2` |
-| 2 | سُوٓء | sû' | kötülük, fena şey | `l_suw_8ed869` |
-| 3 | غَيْب | gayb | görünmeyen, gizli | `l_gayob_611f35` |
-| 4 | مُتَّقِين | muttakîn | sakınanlar | `l_mut_aqiyn_afd23b` |
-| 5 | وَعْد | vaʿd | söz, vaat | `l_waEod_f8ac8c` |
-
-### u06.18 · Gök, yer ve insan · 18. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | بَصَر | basar | göz, görme | `l_baSar_691898` |
-| 2 | دَار | dâr | yurt, ev | `l_daAr_682c39` |
-| 3 | مُلْك | mulk | hükümranlık, egemenlik | `l_mulok_138b85` |
+| 2 | بَصَر | basar | göz, görme | `l_baSar_691898` |
+| 3 | دَار | dâr | yurt, ev | `l_daAr_682c39` |
 | 4 | سَاعَة | sâʿet | kıyamet saati | `l_saAEap_ac5bf9` |
 
-### u06.19 · Gök, yer ve insan · 19. ders
+### u06.16 · Gök, yer ve insan · 16. ders
 
 Kavram: — · Uygula: examples
 
@@ -546,7 +509,7 @@ Kavram: — · Uygula: examples
 | 4 | أُولِى | ûlî | sahipler, -ler (topluluk) | `l_uwliY_3328a7` |
 | 5 | خَبِير | habîr | her şeyden haberdar | `l_xabiyr_dadb64` |
 
-### u06.20 · Gök, yer ve insan · 20. ders
+### u06.17 · Gök, yer ve insan · 17. ders
 
 Kavram: — · Uygula: examples
 
@@ -555,8 +518,44 @@ Kavram: — · Uygula: examples
 | 1 | إِسْرَائِيل | isrâ'îl | İsrail (Yakub peygamber) | `l_isoraA_iyl_66e2a2` |
 | 2 | نُوح | nûh | Nuh (peygamber) | `l_nuwH_1acf34` |
 | 3 | نُور | nûr | ışık, aydınlık | `l_nuwr_2e4de0` |
-| 4 | جَزَآء | cazâ' | karşılık, ceza | `l_jazaA_22eebd` |
-| 5 | بَحْر | bahr | deniz | `l_baHor_61776d` |
+| 4 | بَحْر | bahr | deniz | `l_baHor_61776d` |
+| 5 | وَيْل | vayl | yazıklar olsun! | `l_wayol_4f2e46` |
+
+### u06.18 · Gök, yer ve insan · 18. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | جَبَل | cabal | dağ | `l_jabal_7f35ca` |
+| 2 | ذَنب | zanb | günah, suç | `l_anb_d90705` |
+| 3 | بَشَر | başar | insan, beşer | `l_ba_ar_dfc1d7` |
+| 4 | سَيِّـَٔات | sayyiât | kötülükler, günahlar | `l_say_i_aAt_cbbfce` |
+| 5 | إِثْم | ism | günah, suç | `l_ivom_eafb0c` |
+
+### u06.19 · Gök, yer ve insan · 19. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | مَتَٰع | matâʿ | yararlanma, geçimlik | `l_mata_E_087815` |
+| 2 | ءَالَآء | âlâ' | nimetler, lütuflar | `l_aAlaA_553b3f` |
+| 3 | مَرْيَم | maryam | Meryem (İsa'nın annesi) | `l_maroyam_acbcf0` |
+| 4 | أُمّ | umm | anne | `l_um_dd7260` |
+| 5 | شَمْس | şams | güneş | `l_amos_c38bdc` |
+
+### u06.20 · Gök, yer ve insan · 20. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | فَرِيق | farîk | bir grup, bölük | `l_fariyq_23fdad` |
+| 2 | حَرَام | harâm | dokunulmaz, kutsal | `l_HaraAm_07e3df` |
+| 3 | أَشَدّ | aşadd | daha çetin, daha şiddetli | `l_a_ad_4fecc8` |
+| 4 | وَٰحِدَة | vâhidet | bir, tek (dişil) | `l_wa_Hidap_1b129f` |
+| 5 | كَرِيم | karîm | değerli, cömert | `l_kariym_465d92` |
 
 ### u06.21 · Gök, yer ve insan · 21. ders
 
@@ -564,11 +563,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | وَيْل | vayl | yazıklar olsun! | `l_wayol_4f2e46` |
-| 2 | حِسَاب | hisâb | hesap, sorgu | `l_HisaAb_b41eae` |
-| 3 | إِذْن | izn | izin | `l_i_on_21db05` |
-| 4 | جَبَل | cabal | dağ | `l_jabal_7f35ca` |
-| 5 | مَعْرُوف | maʿrûf | uygun, iyi bilinen (şey) | `l_m_aEoruwf_413882` |
+| 1 | مَلَأ | mala' | ileri gelenler, önderler | `l_mala_3ccd3f` |
+| 2 | قُوَّة | kuvvet | güç, kuvvet | `l_quw_ap_4ad7a3` |
+| 3 | وَٰحِد | vâhid | bir, tek | `l_wa_Hid_e2c15d` |
+| 4 | عَرْش | ʿarş | taht, arş | `l_Earo_7dbbdb` |
+| 5 | حَيْث | hays | -dığı yer | `l_Hayov_5b7279` |
 
 ### u06.22 · Gök, yer ve insan · 22. ders
 
@@ -576,11 +575,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | ذَنب | zanb | günah, suç | `l_anb_d90705` |
-| 2 | بَشَر | başar | insan, beşer | `l_ba_ar_dfc1d7` |
-| 3 | فَاسِق | fâsik | yoldan çıkan, itaatsiz | `l_faAsiq_392fe3` |
-| 4 | سُلْطَٰن | sultân | delil, yetki | `l_suloTa_n_bfb334` |
-| 5 | سَيِّـَٔات | sayyiât | kötülükler, günahlar | `l_say_i_aAt_cbbfce` |
+| 1 | جُند | cund | asker, ordu | `l_jund_600913` |
+| 2 | نَبَأ | naba' | haber (önemli) | `l_naba_ea48de` |
+| 3 | رَجُل | racul | erkek, adam | `l_rajul_891848` |
+| 4 | رِيح | rîh | rüzgâr | `l_riyH_14b7a7` |
+| 5 | حَدِيث | hadîs | söz, haber | `l_Hadiyv_d707e2` |
 
 ### u06.23 · Gök, yer ve insan · 23. ders
 
@@ -588,11 +587,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | إِثْم | ism | günah, suç | `l_ivom_eafb0c` |
-| 2 | مَتَٰع | matâʿ | yararlanma, geçimlik | `l_mata_E_087815` |
-| 3 | ءَالَآء | âlâ' | nimetler, lütuflar | `l_aAlaA_553b3f` |
-| 4 | فِتْنَة | fitnet | deneme, imtihan | `l_fitonap_d46440` |
-| 5 | مَرْيَم | maryam | Meryem (İsa'nın annesi) | `l_maroyam_acbcf0` |
+| 1 | كَلِمَة | kalimet | söz, kelime | `l_kalimap_5d4228` |
+| 2 | رِجَال | ricâl | erkekler, adamlar | `l_rijaAl_b36b89` |
+| 3 | ذُرِّيَّة | zurriyyet | soy, nesil | `l_ur_iy_ap_2745b8` |
+| 4 | بَاب | bâb | kapı | `l_baAb_51f669` |
+| 5 | لُوط | lût | Lut (peygamber) | `l_luwT_833109` |
 
 ### u06.24 · Gök, yer ve insan · 24. ders
 
@@ -600,11 +599,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | أُمّ | umm | anne | `l_um_dd7260` |
-| 2 | شَمْس | şams | güneş | `l_amos_c38bdc` |
-| 3 | فَرِيق | farîk | bir grup, bölük | `l_fariyq_23fdad` |
-| 4 | حَرَام | harâm | dokunulmaz, kutsal | `l_HaraAm_07e3df` |
-| 5 | كَذِب | kazib | yalan, asılsız söz | `l_ka_ib_7a5632` |
+| 1 | قَمَر | kamar | ay (gökteki) | `l_qamar_a95a93` |
+| 2 | يُوسُف | yûsuf | Yusuf (peygamber) | `l_yuwsuf_bd02d7` |
+| 3 | ءَال | âl | aile, soy; taraftarlar | `l_aAl_95d364` |
+| 4 | جَحِيم | cahîm | alevli ateş | `l_jaHiym_0170fa` |
+| 5 | ٱمْرَأَت | amra'at | kadın; eş | `l_mora_at_d761dc` |
 
 ### u06.25 · Gök, yer ve insan · 25. ders
 
@@ -612,11 +611,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | عَٰقِبَة | ʿâkibet | sonuç, akıbet | `l_Ea_qibap_313f20` |
-| 2 | كَٰذِب | kâzib | yalan söyleyen, yalancı | `l_ka_ib_807adf` |
-| 3 | خَٰسِرِين | hâsirîn | kaybedenler, zarara uğrayanlar | `l_xa_siriyn_7458a8` |
-| 4 | زَكَوٰة | zakât | zekât; arınma | `l_zakaw_p_c43173` |
-| 5 | أَشَدّ | aşadd | daha çetin, daha şiddetli | `l_a_ad_4fecc8` |
+| 1 | قَرِيب | karîb | yakın | `l_qariyb_b0bf66` |
+| 2 | ثَمُود | samûd | Semûd (kavmi) | `l_vamuwd_717675` |
+| 3 | آدَم | âdam | Âdem (peygamber) | `l_A_dam_143ced` |
+| 4 | بَأْس | ba's | savaş, şiddet | `l_ba_os_3e2b64` |
+| 5 | بَعِيد | baʿîd | uzak | `l_baEiyd_8bccdd` |
 
 ### u06.26 · Gök, yer ve insan · 26. ders
 
@@ -624,11 +623,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | وَٰحِدَة | vâhidet | bir, tek (dişil) | `l_wa_Hidap_1b129f` |
-| 2 | كَرِيم | karîm | değerli, cömert | `l_kariym_465d92` |
-| 3 | مَلَأ | mala' | ileri gelenler, önderler | `l_mala_3ccd3f` |
-| 4 | قُوَّة | kuvvet | güç, kuvvet | `l_quw_ap_4ad7a3` |
-| 5 | وَٰحِد | vâhid | bir, tek | `l_wa_Hid_e2c15d` |
+| 1 | عِيسَى | ʿîsâ | İsa (peygamber) | `l_EiysaY_1af04a` |
+| 2 | جُنَاح | cunâh | günah, sakınca | `l_junaAH_86068c` |
+| 3 | لِسَان | lisân | dil | `l_lisaAn_5d42eb` |
+| 4 | مِيثَٰق | mîsâk | kesin söz, antlaşma | `l_m_iyva_q_ac1e15` |
+| 5 | عَاد | ʿâd | Âd (kavmi) | `l_EaAd2_f73727` |
 
 ### u06.27 · Gök, yer ve insan · 27. ders
 
@@ -636,11 +635,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | عَهْد | ʿahd | söz, ahit | `l_Eahod_2c711f` |
-| 2 | عَرْش | ʿarş | taht, arş | `l_Earo_7dbbdb` |
-| 3 | حَيْث | hays | -dığı yer | `l_Hayov_5b7279` |
-| 4 | جُند | cund | asker, ordu | `l_jund_600913` |
-| 5 | نَبَأ | naba' | haber (önemli) | `l_naba_ea48de` |
+| 1 | غَنِىّ | ganiyy | zengin, hiçbir şeye muhtaç olmayan | `l_ganiY_463a95` |
+| 2 | طَعَام | taʿâm | yiyecek, yemek | `l_TaEaAm_f85a5a` |
+| 3 | أُنثَىٰ | unsâ | dişi | `l_unvaY_bfb590` |
+| 4 | وَكِيل | vakîl | güvenilip işi bırakılan, vekil | `l_wakiyl_a481db` |
+| 5 | وَرَآء | varâ' | arka, geri | `l_waraA_905c82` |
 
 ### u06.28 · Gök, yer ve insan · 28. ders
 
@@ -648,11 +647,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | رَجُل | racul | erkek, adam | `l_rajul_891848` |
-| 2 | رِيح | rîh | rüzgâr | `l_riyH_14b7a7` |
-| 3 | حَدِيث | hadîs | söz, haber | `l_Hadiyv_d707e2` |
-| 4 | كَلِمَة | kalimet | söz, kelime | `l_kalimap_5d4228` |
-| 5 | مَصِير | masîr | varılacak yer, son | `l_maSiyr_274d5b` |
+| 1 | فُلْك | fulk | gemi | `l_fulok_807067` |
+| 2 | مِسْكِين | miskîn | yoksul, düşkün | `l_misokiyn_63a03c` |
+| 3 | قَرْن | karn | nesil, çağ | `l_qaron_c7a8aa` |
+| 4 | سَبْع | sabʿ | yedi (sayı) | `l_saboE_6a6f8c` |
+| 5 | يَتِيم | yatîm | yetim, öksüz | `l_yatiym_4a612b` |
 
 ### u06.29 · Gök, yer ve insan · 29. ders
 
@@ -660,143 +659,25 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | رِجَال | ricâl | erkekler, adamlar | `l_rijaAl_b36b89` |
-| 2 | سِحْر | sihr | büyü, sihir | `l_siHor_af28f3` |
-| 3 | ذُرِّيَّة | zurriyyet | soy, nesil | `l_ur_iy_ap_2745b8` |
-| 4 | بَاب | bâb | kapı | `l_baAb_51f669` |
-| 5 | غَٰفِل | gâfil | habersiz, dalgın | `l_ga_fil_8b70be` |
-
-### u06.30 · Gök, yer ve insan · 30. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | لُوط | lût | Lut (peygamber) | `l_luwT_833109` |
-| 2 | مَكَان | makân | yer, mekân | `l_m_akaAn_b26fbd` |
-| 3 | مُنَٰفِقُون | munâfikûn | ikiyüzlüler, münafıklar | `l_muna_fiquwn_bdda5c` |
-| 4 | قَمَر | kamar | ay (gökteki) | `l_qamar_a95a93` |
-| 5 | سَوَآء | savâ' | eşit, bir | `l_sawaA_91f5d4` |
-
-### u06.31 · Gök, yer ve insan · 31. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | يُوسُف | yûsuf | Yusuf (peygamber) | `l_yuwsuf_bd02d7` |
-| 2 | ءَال | âl | aile, soy; taraftarlar | `l_aAl_95d364` |
-| 3 | بَٰطِل | bâtil | boş, geçersiz; batıl | `l_ba_Til_462461` |
-| 4 | جَحِيم | cahîm | alevli ateş | `l_jaHiym_0170fa` |
-| 5 | كَيْد | kayd | tuzak, hile | `l_kayod_27a62a` |
-
-### u06.32 · Gök, yer ve insan · 32. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | ٱمْرَأَت | amra'at | kadın; eş | `l_mora_at_d761dc` |
-| 2 | قَرِيب | karîb | yakın | `l_qariyb_b0bf66` |
-| 3 | ثَمُود | samûd | Semûd (kavmi) | `l_vamuwd_717675` |
-| 4 | خَوْف | havf | korku | `l_xawof_3af862` |
-| 5 | آدَم | âdam | Âdem (peygamber) | `l_A_dam_143ced` |
-
-### u06.33 · Gök, yer ve insan · 33. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | بَأْس | ba's | savaş, şiddet | `l_ba_os_3e2b64` |
-| 2 | بَعِيد | baʿîd | uzak | `l_baEiyd_8bccdd` |
-| 3 | عِيسَى | ʿîsâ | İsa (peygamber) | `l_EiysaY_1af04a` |
-| 4 | جُنَاح | cunâh | günah, sakınca | `l_junaAH_86068c` |
-| 5 | لِسَان | lisân | dil | `l_lisaAn_5d42eb` |
-
-### u06.34 · Gök, yer ve insan · 34. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | مِيثَٰق | mîsâk | kesin söz, antlaşma | `l_m_iyva_q_ac1e15` |
-| 2 | عَاد | ʿâd | Âd (kavmi) | `l_EaAd2_f73727` |
-| 3 | غَنِىّ | ganiyy | zengin, hiçbir şeye muhtaç olmayan | `l_ganiY_463a95` |
-| 4 | لِقَآء | likâ' | kavuşma, karşılaşma | `l_liqaA_390528` |
-| 5 | طَآئِفَة | tâ'ifet | bölük, topluluk | `l_TaA_ifap_740947` |
-
-### u06.35 · Gök, yer ve insan · 35. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | طَعَام | taʿâm | yiyecek, yemek | `l_TaEaAm_f85a5a` |
-| 2 | أُنثَىٰ | unsâ | dişi | `l_unvaY_bfb590` |
-| 3 | وَكِيل | vakîl | güvenilip işi bırakılan, vekil | `l_wakiyl_a481db` |
-| 4 | وَرَآء | varâ' | arka, geri | `l_waraA_905c82` |
-| 5 | فُلْك | fulk | gemi | `l_fulok_807067` |
-
-### u06.36 · Gök, yer ve insan · 36. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | مِسْكِين | miskîn | yoksul, düşkün | `l_misokiyn_63a03c` |
-| 2 | قَرْن | karn | nesil, çağ | `l_qaron_c7a8aa` |
-| 3 | سَبْع | sabʿ | yedi (sayı) | `l_saboE_6a6f8c` |
-| 4 | يَتِيم | yatîm | yetim, öksüz | `l_yatiym_4a612b` |
-| 5 | بَرّ | barr | iyi, erdemli (çoğul ebrâr) | `l_bar_4aea03` |
-
-### u06.37 · Gök, yer ve insan · 37. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | دُعَآء | duʿâ' | çağrı, dua | `l_duEaA_bcbfae` |
+| 1 | بَرّ | barr | iyi, erdemli (çoğul ebrâr) | `l_bar_4aea03` |
 | 2 | جِنّ | cinn | cin | `l_jin_7f7c85` |
-| 3 | مَأْوَىٰ | ma'vâ | barınak, sığınılacak yer | `l_ma_owaY_b4a4a7` |
-| 4 | سَٰحِر | sâhir | büyücü | `l_sa_Hir_f05100` |
-| 5 | سَمْع | samʿ | işitme, kulak | `l_samoE_5d4faf` |
+| 3 | سَيِّئَة | sayyi'et | kötülük, günah | `l_say_i_ap_5198f7` |
+| 4 | خَلْف | half | arka, geri | `l_xalof_4a2374` |
+| 5 | أَعْمَىٰ | aʿmâ | kör | `l_aEomaY_ea9134` |
+| 6 | شَهْر | şahr | ay (takvim) | `l_ahor_1c433f` |
 
-### u06.38 · Gök, yer ve insan · 38. ders
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | سَيِّئَة | sayyi'et | kötülük, günah | `l_say_i_ap_5198f7` |
-| 2 | خَلْف | half | arka, geri | `l_xalof_4a2374` |
-| 3 | أَعْمَىٰ | aʿmâ | kör | `l_aEomaY_ea9134` |
-| 4 | شَهْر | şahr | ay (takvim) | `l_ahor_1c433f` |
-| 5 | مُكَذِّبِين | mukazzibîn | yalanlayanlar | `l_m_uka_ibiyn_f66cdd` |
-
-### u06.39 · Gök, yer ve insan · 39. ders
+### u06.30 · Gök, yer ve insan · 30. ders · ustalık
 
 Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | مُسَمًّى | musammen | belirlenmiş, adı konmuş | `l_m_usam_FY_24926e` |
-| 2 | مُفْسِد | mufsid | bozguncu, fesat çıkaran | `l_mufosid_901e3a` |
-| 3 | نَصِيب | nasîb | pay, hisse | `l_naSiyb_a556ca` |
-| 4 | رُوح | rûh | ruh; can | `l_ruwH_1d9882` |
-| 5 | ظَنّ | zann | sanı, tahmin | `l_Zan_1e2f1f` |
-
-### u06.40 · Gök, yer ve insan · 40. ders · ustalık
-
-Kavram: — · Uygula: examples
-
-| # | Arapça | Okunuş | Anlam | Kimlik |
-|---|---|---|---|---|
-| 1 | عِقَاب | ʿikâb | ceza, karşılık | `l_EiqaAb_736634` |
-| 2 | هَٰرُون | hârûn | Harun (peygamber) | `l_ha_ruwn_3d8730` |
-| 3 | حَمِيم | hamîm | kaynar su | `l_Hamiym_3e44f9` |
-| 4 | حِزْب | hizb | taraf, parti | `l_Hizob_666efe` |
-| 5 | طَيِّبَة | tayyibet | güzel, hoş, temiz | `l_Tay_ibap_bae173` |
+| 1 | نَصِيب | nasîb | pay, hisse | `l_naSiyb_a556ca` |
+| 2 | رُوح | rûh | ruh; can | `l_ruwH_1d9882` |
+| 3 | هَٰرُون | hârûn | Harun (peygamber) | `l_ha_ruwn_3d8730` |
+| 4 | حَمِيم | hamîm | kaynar su | `l_Hamiym_3e44f9` |
+| 5 | حِزْب | hizb | taraf, parti | `l_Hizob_666efe` |
+| 6 | طَيِّبَة | tayyibet | güzel, hoş, temiz | `l_Tay_ibap_bae173` |
 
 
 ## Ünite 7 · Oldu, yaptı
@@ -1185,10 +1066,10 @@ Kavram: g20 Fiilin adı: bilme, anma, inanma · Uygula: examples
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
 | 1 | عِلْم | ʿilm | bilgi, ilim | `l_Eilom_2f0f9d` |
-| 2 | غَفُور | gafûr | çok bağışlayan | `l_gafuwr_926fa2` |
-| 3 | مَغْفِرَة | magfiret | bağışlanma | `l_m_agofirap_60a926` |
-| 4 | كَٰفِرُون | kâfirûn | inkârcılar | `l_ka_firuwn_165d2d` |
-| 5 | أَمِنَ | amina | güvende oldu, emin oldu | `l_amina_0a79a6` |
+| 2 | قَوْل | kavl | söz | `l_qawol_58e075` |
+| 3 | غَفُور | gafûr | çok bağışlayan | `l_gafuwr_926fa2` |
+| 4 | مَغْفِرَة | magfiret | bağışlanma | `l_m_agofirap_60a926` |
+| 5 | كَٰفِرُون | kâfirûn | inkârcılar | `l_ka_firuwn_165d2d` |
 
 ### u10.03 · Bir kök, bir aile · 3. ders
 
@@ -1198,9 +1079,9 @@ Kavram: — · Uygula: examples
 |---|---|---|---|---|
 | 1 | أَعْلَم | aʿlam | daha iyi bilen | `l_aEolam_db561d` |
 | 2 | كُفْر | kufr | inkâr | `l_kufor_1c9ee6` |
-| 3 | ذِكْر | zikr | anma, hatırlama | `l_ikor_0e35a1` |
-| 4 | ذِكْرَىٰ | zikrâ | öğüt, hatırlatma | `l_ikoraY_20da2f` |
-| 5 | شَهِيد | şahîd | tanık, şahit | `l_ahiyd_b0cb34` |
+| 3 | أَمِنَ | amina | güvende oldu, emin oldu | `l_amina_0a79a6` |
+| 4 | ذِكْر | zikr | anma, hatırlama | `l_ikor_0e35a1` |
+| 5 | ذِكْرَىٰ | zikrâ | öğüt, hatırlatma | `l_ikoraY_20da2f` |
 
 ### u10.04 · Bir kök, bir aile · 4. ders
 
@@ -1209,10 +1090,10 @@ Kavram: — · Uygula: examples
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
 | 1 | كَافِر | kâfir | inkâr eden, nankör | `l_kaAfir_9b3cf0` |
-| 2 | شَهَٰدَة | şahâdet | tanıklık, şahitlik | `l_aha_dap_12afc0` |
-| 3 | شَاهِد | şâhid | tanıklık eden | `l_aAhid_a005f4` |
-| 4 | ظَالِم | zâlim | zulmeden, haksızlık eden | `l_ZaAlim_fae7dd` |
-| 5 | ظُلُمَٰت | zulumât | karanlıklar (çoğul) | `l_Zuluma_t_933b08` |
+| 2 | خَلْق | halk | yaratma, yaratılış | `l_xaloq_875745` |
+| 3 | صَادِق | sâdik | doğru sözlü | `l_SaAdiq_43c41b` |
+| 4 | شَهِيد | şahîd | tanık, şahit | `l_ahiyd_b0cb34` |
+| 5 | شَهَٰدَة | şahâdet | tanıklık, şahitlik | `l_aha_dap_12afc0` |
 
 ### u10.05 · Bir kök, bir aile · 5. ders
 
@@ -1220,11 +1101,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | ظَلَمَ | zalama | zulmetti, haksızlık etti | `l_Zalama_7a9278` |
-| 2 | أَحْسَن | ahsan | daha güzel | `l_aHosan_e3fcdb` |
-| 3 | حَسَنَة | hasanet | iyilik, güzellik | `l_Hasanap_efe980` |
-| 4 | حَسَن | hasan | güzel, iyi | `l_Hasan_003925` |
-| 5 | صَٰلِح | sâlih | iyi, düzgün (iş/kişi) | `l_Sa_liH_30bb88` |
+| 1 | شَاهِد | şâhid | tanıklık eden | `l_aAhid_a005f4` |
+| 2 | عَمَل | ʿamal | iş, amel | `l_Eamal_8215bb` |
+| 3 | ظَالِم | zâlim | zulmeden, haksızlık eden | `l_ZaAlim_fae7dd` |
+| 4 | ظُلُمَٰت | zulumât | karanlıklar (çoğul) | `l_Zuluma_t_933b08` |
+| 5 | أَحْسَن | ahsan | daha güzel | `l_aHosan_e3fcdb` |
 
 ### u10.06 · Bir kök, bir aile · 6. ders
 
@@ -1232,11 +1113,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | صَٰلِحَٰت | sâlihât | iyi işler, güzel ameller | `l_S_a_liHa_t_f6a492` |
-| 2 | جَمِيع | camîʿ | hepsi, topluca | `l_jamiyE_be9182` |
-| 3 | أَجْمَعِين | acmaʿîn | hepsi, tamamı | `l_ajomaEiyn_0fc80b` |
-| 4 | جَمَعَ | camaʿa | topladı, biriktirdi | `l_jamaEa_62dac9` |
-| 5 | حَيَوٰة | hayât | hayat, yaşam | `l_Hayaw_p_e08aa3` |
+| 1 | ظَلَمَ | zalama | zulmetti, haksızlık etti | `l_Zalama_7a9278` |
+| 2 | حَسَنَة | hasanet | iyilik, güzellik | `l_Hasanap_efe980` |
+| 3 | حَسَن | hasan | güzel, iyi | `l_Hasan_003925` |
+| 4 | مُفْسِد | mufsid | bozguncu, fesat çıkaran | `l_mufosid_901e3a` |
+| 5 | صَٰلِح | sâlih | iyi, düzgün (iş/kişi) | `l_Sa_liH_30bb88` |
 
 ### u10.07 · Bir kök, bir aile · 7. ders
 
@@ -1244,11 +1125,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | حَيّ | hayy | diri, canlı | `l_Hay_3dc2a8` |
-| 2 | هُدًى | huden | hidayet, doğru yol | `l_hudFY_2e4b07` |
-| 3 | قِيَٰمَة | kiyâmet | diriliş, kalkış | `l_qiya_map_2880f6` |
-| 4 | قَامَ | kâma | kalktı, ayağa kalktı | `l_qaAma_63cbf7` |
-| 5 | شَرِيك | şarîk | ortak | `l_ariyk_5de5f5` |
+| 1 | صَٰلِحَٰت | sâlihât | iyi işler, güzel ameller | `l_S_a_liHa_t_f6a492` |
+| 2 | مُنَٰفِقُون | munâfikûn | ikiyüzlüler, münafıklar | `l_muna_fiquwn_bdda5c` |
+| 3 | رِزْق | rizk | rızık, nasip | `l_rizoq_aec3ab` |
+| 4 | جَمِيع | camîʿ | hepsi, topluca | `l_jamiyE_be9182` |
+| 5 | أَجْمَعِين | acmaʿîn | hepsi, tamamı | `l_ajomaEiyn_0fc80b` |
 
 ### u10.08 · Bir kök, bir aile · 8. ders
 
@@ -1256,11 +1137,11 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | مَوْت | mavt | ölüm, ölme | `l_mawot_7aa65a` |
-| 2 | ضَلَّ | dalla | yolunu kaybetti, saptı | `l_Dal_a_2775a8` |
-| 3 | كَبِير | kabîr | büyük | `l_kabiyr_bbdade` |
-| 4 | نِعْمَة | niʿmet | nimet, iyilik | `l_niEomap_410611` |
-| 5 | نَعَم | naʿam | sağmal hayvanlar (deve, sığır, koyun) | `l_n_aEam_57fa95` |
+| 1 | جَمَعَ | camaʿa | topladı, biriktirdi | `l_jamaEa_62dac9` |
+| 2 | حَيَوٰة | hayât | hayat, yaşam | `l_Hayaw_p_e08aa3` |
+| 3 | هُدًى | huden | hidayet, doğru yol | `l_hudFY_2e4b07` |
+| 4 | فَضْل | fadl | lütuf, ihsan | `l_faDol_4925b8` |
+| 5 | قِيَٰمَة | kiyâmet | diriliş, kalkış | `l_qiya_map_2880f6` |
 
 ### u10.09 · Bir kök, bir aile · 9. ders
 
@@ -1268,22 +1149,141 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | مَاتَ | mâta | öldü | `l_m_aAta_a0f90e` |
-| 2 | ضَلَٰل | dalâl | sapkınlık, yolunu yitirme | `l_Dala_l_fc4484` |
-| 3 | سَجَدَ | sacada | secde etti, yere kapandı | `l_sajada_c38135` |
-| 4 | مَسْجِد | mascid | secde yeri, mescit | `l_masojid_ddafe8` |
-| 5 | سَاجِد | sâcid | secde eden | `l_saAjid_62ac5a` |
+| 1 | حَيّ | hayy | diri, canlı | `l_Hay_3dc2a8` |
+| 2 | ضَلَّ | dalla | yolunu kaybetti, saptı | `l_Dal_a_2775a8` |
+| 3 | قَامَ | kâma | kalktı, ayağa kalktı | `l_qaAma_63cbf7` |
+| 4 | أَمْر | amr | iş, durum | `l_amor_9fbe48` |
+| 5 | شَرِيك | şarîk | ortak | `l_ariyk_5de5f5` |
 
-### u10.10 · Bir kök, bir aile · 10. ders · ustalık
+### u10.10 · Bir kök, bir aile · 10. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | مَوْت | mavt | ölüm, ölme | `l_mawot_7aa65a` |
+| 2 | ضَلَٰل | dalâl | sapkınlık, yolunu yitirme | `l_Dala_l_fc4484` |
+| 3 | كَبِير | kabîr | büyük | `l_kabiyr_bbdade` |
+| 4 | عَهْد | ʿahd | söz, ahit | `l_Eahod_2c711f` |
+| 5 | حِسَاب | hisâb | hesap, sorgu | `l_HisaAb_b41eae` |
+
+### u10.11 · Bir kök, bir aile · 11. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | مَاتَ | mâta | öldü | `l_m_aAta_a0f90e` |
+| 2 | نِعْمَة | niʿmet | nimet, iyilik | `l_niEomap_410611` |
+| 3 | نَعَم | naʿam | sağmal hayvanlar (deve, sığır, koyun) | `l_n_aEam_57fa95` |
+| 4 | سَجَدَ | sacada | secde etti, yere kapandı | `l_sajada_c38135` |
+| 5 | مَسْجِد | mascid | secde yeri, mescit | `l_masojid_ddafe8` |
+
+### u10.12 · Bir kök, bir aile · 12. ders
 
 Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
 | 1 | مَيِّت | mayyit | ölü | `l_m_ay_it_fb6ea2` |
-| 2 | نَصَرَ | nasara | yardım etti | `l_naSara_e01de2` |
-| 3 | نَصِير | nasîr | yardımcı | `l_naSiyr_87b8a1` |
-| 4 | نَصْر | nasr | yardım, zafer | `l_naSor_e325f5` |
+| 2 | سَاجِد | sâcid | secde eden | `l_saAjid_62ac5a` |
+| 3 | مَكَان | makân | yer, mekân | `l_m_akaAn_b26fbd` |
+| 4 | مَعْرُوف | maʿrûf | uygun, iyi bilinen (şey) | `l_m_aEoruwf_413882` |
+| 5 | نَصَرَ | nasara | yardım etti | `l_naSara_e01de2` |
+
+### u10.13 · Bir kök, bir aile · 13. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | نَصِير | nasîr | yardımcı | `l_naSiyr_87b8a1` |
+| 2 | نَصْر | nasr | yardım, zafer | `l_naSor_e325f5` |
+| 3 | فَاسِق | fâsik | yoldan çıkan, itaatsiz | `l_faAsiq_392fe3` |
+| 4 | عَٰقِبَة | ʿâkibet | sonuç, akıbet | `l_Ea_qibap_313f20` |
+| 5 | عِقَاب | ʿikâb | ceza, karşılık | `l_EiqaAb_736634` |
+
+### u10.14 · Bir kök, bir aile · 14. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | آخِر | âhir | son, sonraki | `l_A_xir_5b7462` |
+| 2 | مُبِين | mubîn | açık, apaçık | `l_m_ubiyn_4f4924` |
+| 3 | خَٰلِد | hâlid | sürekli kalan | `l_xa_lid_db5cbd` |
+| 4 | مُجْرِم | mucrim | suçlu, günahkâr | `l_mujorim_63cb7c` |
+| 5 | سُوٓء | sû' | kötülük, fena şey | `l_suw_8ed869` |
+
+### u10.15 · Bir kök, bir aile · 15. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | غَيْب | gayb | görünmeyen, gizli | `l_gayob_611f35` |
+| 2 | مُتَّقِين | muttakîn | sakınanlar | `l_mut_aqiyn_afd23b` |
+| 3 | وَعْد | vaʿd | söz, vaat | `l_waEod_f8ac8c` |
+| 4 | مُلْك | mulk | hükümranlık, egemenlik | `l_mulok_138b85` |
+| 5 | جَزَآء | cazâ' | karşılık, ceza | `l_jazaA_22eebd` |
+
+### u10.16 · Bir kök, bir aile · 16. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | إِذْن | izn | izin | `l_i_on_21db05` |
+| 2 | سُلْطَٰن | sultân | delil, yetki | `l_suloTa_n_bfb334` |
+| 3 | فِتْنَة | fitnet | deneme, imtihan | `l_fitonap_d46440` |
+| 4 | كَذِب | kazib | yalan, asılsız söz | `l_ka_ib_7a5632` |
+| 5 | كَٰذِب | kâzib | yalan söyleyen, yalancı | `l_ka_ib_807adf` |
+
+### u10.17 · Bir kök, bir aile · 17. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | خَٰسِرِين | hâsirîn | kaybedenler, zarara uğrayanlar | `l_xa_siriyn_7458a8` |
+| 2 | زَكَوٰة | zakât | zekât; arınma | `l_zakaw_p_c43173` |
+| 3 | مَصِير | masîr | varılacak yer, son | `l_maSiyr_274d5b` |
+| 4 | سِحْر | sihr | büyü, sihir | `l_siHor_af28f3` |
+| 5 | غَٰفِل | gâfil | habersiz, dalgın | `l_ga_fil_8b70be` |
+
+### u10.18 · Bir kök, bir aile · 18. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | سَوَآء | savâ' | eşit, bir | `l_sawaA_91f5d4` |
+| 2 | بَٰطِل | bâtil | boş, geçersiz; batıl | `l_ba_Til_462461` |
+| 3 | كَيْد | kayd | tuzak, hile | `l_kayod_27a62a` |
+| 4 | خَوْف | havf | korku | `l_xawof_3af862` |
+| 5 | لِقَآء | likâ' | kavuşma, karşılaşma | `l_liqaA_390528` |
+
+### u10.19 · Bir kök, bir aile · 19. ders
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | طَآئِفَة | tâ'ifet | bölük, topluluk | `l_TaA_ifap_740947` |
+| 2 | دُعَآء | duʿâ' | çağrı, dua | `l_duEaA_bcbfae` |
+| 3 | مَأْوَىٰ | ma'vâ | barınak, sığınılacak yer | `l_ma_owaY_b4a4a7` |
+| 4 | سَٰحِر | sâhir | büyücü | `l_sa_Hir_f05100` |
+
+### u10.20 · Bir kök, bir aile · 20. ders · ustalık
+
+Kavram: — · Uygula: examples
+
+| # | Arapça | Okunuş | Anlam | Kimlik |
+|---|---|---|---|---|
+| 1 | سَمْع | samʿ | işitme, kulak | `l_samoE_5d4faf` |
+| 2 | مُكَذِّبِين | mukazzibîn | yalanlayanlar | `l_m_uka_ibiyn_f66cdd` |
+| 3 | مُسَمًّى | musammen | belirlenmiş, adı konmuş | `l_m_usam_FY_24926e` |
+| 4 | ظَنّ | zann | sanı, tahmin | `l_Zan_1e2f1f` |
 
 
 ## Ünite 11 · Kalıplar

@@ -6,7 +6,7 @@
  * ve app/kao.css bildirimleri parse edilir; hiçbir dosya yazılmaz, ağ yok, tarayıcı açılmaz
  * (CLAUDE.md veri güvenliği kuralı 1). Kalıp: docs/apple-design/verify-contrast.mjs.
  *
- *   node kuran-ogreniyorum/tools/kao-verify-contrast.mjs [--json]
+ *   node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs [--json]
  *
  * Renkler CSS'ten okunur, sabitlenmez: var(), #hex, rgba(), transparent,
  * color-mix(in srgb, …) ve linear-gradient (her durak ayrı ölçülür, en kötüsü raporlanır).
@@ -18,7 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const STYLES = fs.readFileSync(path.join(REPO, 'app/styles.css'), 'utf8');
 const KAO = fs.readFileSync(path.join(REPO, 'app/kao.css'), 'utf8');
 const TEXT = 4.5;

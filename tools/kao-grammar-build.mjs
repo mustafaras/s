@@ -12,7 +12,7 @@ import {
 } from './kao-lexicon-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const CONTENT = path.join(ROOT, 'kuran-ogreniyorum', 'content');
+const CONTENT = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'content');
 const DRAFT_PATH = path.join(CONTENT, 'grammar.draft.json');
 const REVIEW_PATH = path.join(CONTENT, 'grammar.review.md');
 const VERIFIED_PATH = path.join(CONTENT, 'grammar.verified.json');

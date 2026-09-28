@@ -12,8 +12,8 @@ vm.createContext(sb);
 for (const rel of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranGrammarV1.js']) vm.runInContext(fs.readFileSync(path.join(repo, rel), 'utf8'), sb);
 const L = sb.window.QuranLexiconV1, S = sb.window.QuranShortSurahsV1, G = sb.window.QuranGrammarV1;
 
-const tanzil = fs.readFileSync(path.join(repo, 'kuran-ogreniyorum/content/inputs/quran-uthmani.txt'), 'utf8').split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
-const qacRaw = fs.readFileSync(path.join(repo, 'kuran-ogreniyorum/content/inputs/quranic-corpus-morphology-0.4.txt'), 'utf8').split(/\r?\n/);
+const tanzil = fs.readFileSync(path.join(repo, 'docs/kuran-ogreniyorum/content/inputs/quran-uthmani.txt'), 'utf8').split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
+const qacRaw = fs.readFileSync(path.join(repo, 'docs/kuran-ogreniyorum/content/inputs/quranic-corpus-morphology-0.4.txt'), 'utf8').split(/\r?\n/);
 const verseRefs = [];
 const lemmaWords = new Map();
 for (const line of qacRaw) {
@@ -35,7 +35,7 @@ for (const lemma of L.lemmas) for (const e of lemma.examples || []) {
 console.log(`örnek cümle: ${exOk}/${ex} Tanzil âyetinde birebir alt dizi`);
 exBad.forEach((x) => console.log('  UYUMSUZ', x));
 
-const verified = JSON.parse(fs.readFileSync(path.join(repo, 'kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8')).lemmas;
+const verified = JSON.parse(fs.readFileSync(path.join(repo, 'docs/kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8')).lemmas;
 const bwById = new Map(verified.map((v) => [v.lemmaId, v.lemmaBw]));
 let fOk = 0; const fBad = [];
 for (const lemma of L.lemmas) {

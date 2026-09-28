@@ -280,7 +280,7 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   assert.equal(q.gate.passed, false);
 
   // DİA katmanı: çalışma zamanı dönüşümü derleme aracının doğrulanmış çıktısıyla 524/524 aynı.
-  const verified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8'));
+  const verified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8'));
   const verifiedLemmas = Array.isArray(verified.lemmas) ? verified.lemmas : Object.values(verified.lemmas || verified);
   const mismatches = verifiedLemmas.filter((record) => e7.kaoDiaReading(record.ar) !== record.translit.dia);
   assert.equal(verifiedLemmas.length, 524); assert.deepEqual(mismatches.map((record) => record.lemmaId), [], 'DİA sapması yok');

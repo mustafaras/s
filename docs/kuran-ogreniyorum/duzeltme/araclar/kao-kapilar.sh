@@ -1,9 +1,9 @@
 #!/bin/sh
 # KAO kapıları — STANDART KONTROL SETİ (FIX-PROMPTLARI §Ö4).
-# Kullanım:  sh kuran-ogreniyorum/duzeltme/araclar/kao-kapilar.sh
+# Kullanım:  sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-kapilar.sh
 # Çıkış: her satır "<kapı> <durum>"; FAIL satırı varsa exit 1.
 # Not: bu betik yalnız KOŞAR; hiçbir dosyayı değiştirmez (salt-okur kapı seti).
-ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
+ROOT=$(cd "$(dirname "$0")/../../../.." && pwd)
 cd "$ROOT" || exit 1
 TMP=${TMPDIR:-/tmp}
 fail=0
@@ -29,8 +29,8 @@ node .claude/skills/run-seyma/zikr-harness.mjs >"$TMP/kao-z.log" 2>&1
 echo "zikr $? $(tail -1 "$TMP/kao-z.log")"
 node tests/app/test_state_rebind_boundary.js >/dev/null 2>&1; echo "rebind $?"
 node tools/shell-inventory.mjs --gate 2>&1 | tail -1 | cut -c1-40
-node kuran-ogreniyorum/tools/kao-plan-check.mjs 2>&1 | tail -1
-node kuran-ogreniyorum/tools/kao-verify-contrast.mjs 2>&1 | tail -1 | cut -c1-80
+node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs 2>&1 | tail -1
+node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs 2>&1 | tail -1 | cut -c1-80
 
 # Hijyen
 git -c core.fsmonitor=false diff --check 2>/dev/null && echo diffcheck-ok

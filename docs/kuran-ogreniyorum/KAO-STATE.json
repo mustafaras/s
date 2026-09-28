@@ -1961,5 +1961,18 @@
     "notCopied": true,
     "fetchNote": "Tüm Kur’an: 77.429 kelime çekildi, başarısız sûre 0. Resmî sürüm toplamıyla (77.429) birebir aynı. Ardışık istekler arasında 120 ms bekleme."
   },
-  "completedAt": "2026-09-26"
+  "completedAt": "2026-09-26",
+  "auditFindingsAccepted": {
+    "KAO-D1": "Kabul (evidence/KAO-D1/AUDIT.md): 2 bulgu içerik kararıdır, kod kusuru değil — kapsam hedefi yaklaşık tanımlı ve belgeli (ölçülen tavan %77,42, KF-12 ile eighty eşiği %75); komşu/kalıp öneri kapları gösterilen içeriği etkilemiyor, FIX-14 ile 70 doğrulanmış küme sözlükten üretildi.",
+    "KAO-D5": "Kabul (evidence/KAO-D5/AUDIT.md): izlenebilirlik sapması — saygi.js’teki 3 satırlık KAO izi KAO-21 yerine önceki bir UI düzeltme commit’iyle geldi; içerik sınırı ihlali yok, O-10 58e0ceb ile kapandı.",
+    "KAO-D6": "Kabul (evidence/KAO-D6/AUDIT.md): plan kapanışta releaseApproval=NOT_APPROVED öngörüyordu; kullanıcı 2026-09-24’te yayını açıkça onayladı (releaseApprovalRecord). Kullanıcı yetkili bilinçli sapma."
+  },
+  "archive": {
+    "at": "2026-09-27",
+    "from": "kuran-ogreniyorum/",
+    "to": "docs/kuran-ogreniyorum/",
+    "closure": "docs/KAO-KAPANIS.md",
+    "commitPrefix": "KAO-ARSIV:",
+    "note": "Program kapandı; plan/kanıt/araçlar kök dizinden docs/ altına arşivlendi. Klasör içi belgelerdeki kuran-ogreniyorum/… yolları tarihseldir; güncel kök docs/kuran-ogreniyorum/. Yayındaki quranShortSurahsV1.js atıf metni ve quranLearn.js:1058 yorumu eski yolu taşır — bayt/pin değişmesin diye bilerek bırakıldı."
+  }
 }

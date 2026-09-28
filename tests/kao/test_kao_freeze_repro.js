@@ -12,7 +12,7 @@ const os = require('node:os');
 const path = require('node:path');
 const repoRoot = require('../repo-root');
 
-const CONTENT_REL = 'kuran-ogreniyorum/content';
+const CONTENT_REL = 'docs/kuran-ogreniyorum/content';
 const TOOLS = ['tools/kao-lexicon-build.mjs', 'tools/kao-content-freeze.mjs'];
 const REQUIRED_INPUTS = [
   `${CONTENT_REL}/inputs/quranic-corpus-morphology-0.4.txt`,

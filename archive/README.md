@@ -67,4 +67,4 @@ ağacından temizlendi ve gerektiğinde Git geçmişinden geri alınabilir.
   `KAO-KAPANIS-EK-1.md`.
 
   **Günlük başlangıçta okunmaz:** yeni KAO işi ayrı kapsam onayı ister; kanonik
-  durum `kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md`'dir.
+  durum `docs/kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md`'dir.

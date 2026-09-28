@@ -12,8 +12,8 @@ import path from 'node:path';
 import { execSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
-const PLAN = path.join(ROOT, 'kuran-ogreniyorum');
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', '..');
+const PLAN = path.join(ROOT, 'docs', 'kuran-ogreniyorum');
 const STATE_PATH = path.join(PLAN, 'KAO-STATE.json');
 const LEDGER_PATH = path.join(PLAN, '.anti-amnesia', 'LEDGER.md');
 const CURRENT_PATH = path.join(PLAN, '.anti-amnesia', 'CURRENT-STATE.md');
@@ -29,7 +29,8 @@ const FORBIDDEN_ANYWHERE = ['SeyAudio.say'];
 const FIX_BASE = '58e0ceb';
 const KAO_FILE_SCOPE = ['app/core/quranLearn.js', 'app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranPhonicsV1.js', 'tools/kao-*.mjs', 'tests/kao/**', 'assets/kao/**'];
 // KAO-P00/KAO-Dn eski programın başlangıç/denetim kartlarıdır; "(ek)" düzeltme programının ek commit biçimidir.
-const KAO_SUBJECT_RE = /^(?:(?:KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM):|chore\(kao\))/;
+// KAO-ARSIV: program kapanışında plan klasörünün kökten docs/ altına taşınması (2026-09-27); tek seferlik yol güncellemesi.
+const KAO_SUBJECT_RE = /^(?:(?:KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
 const CARD_OF_SUBJECT_RE = /^(KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
 const AUDIT_STATUSES = ['pass', 'fail', 'findings'];
 const FORBIDDEN_IN_REGISTRY = ['localStorage', 'XMLHttpRequest', 'SeySync', 'ghToken', 'openaiKey', 'sessionStorage', 'indexedDB'];
@@ -130,7 +131,8 @@ export function check(state, ctx) {
   // chore(kao) kapsamı: durum/kanıt dosyaları + FIX programının belge ve yardımcı betik alanı
   // (duzeltme/**) + KAO araçları (tools/**). 2026-09-27: `duzeltme/araclar/kao-*.sh` eklenince
   // eski liste (yalnız kök state + .anti-amnesia + evidence) yetersiz kaldı (46a2f8f FAIL).
-  const CHORE_SCOPE = ['kuran-ogreniyorum/KAO-STATE.json', 'kuran-ogreniyorum/.anti-amnesia/**', 'kuran-ogreniyorum/evidence/**', 'kuran-ogreniyorum/duzeltme/**', 'kuran-ogreniyorum/tools/**'];
+  // KAO-ARSIV: klasör docs/ altına taşındı; eski önekler geçmiş commit'ler için kalır.
+  const CHORE_SCOPE = ['', 'docs/'].flatMap(p => [`${p}kuran-ogreniyorum/KAO-STATE.json`, `${p}kuran-ogreniyorum/.anti-amnesia/**`, `${p}kuran-ogreniyorum/evidence/**`, `${p}kuran-ogreniyorum/duzeltme/**`, `${p}kuran-ogreniyorum/tools/**`]);
   for (const cm of ctx.commits || []) {
     if (/^chore\(kao\)/.test(cm.subject)) { for (const f of cm.files) if (!inScope(f, CHORE_SCOPE)) fail(`commit ${cm.hash.slice(0, 7)} chore(kao) kapsam dışı dosya: ${f}`); continue; }
     const m = cm.subject.match(/^(KAO-(?:P00|D\d|\d+b?))\b/); if (!m) continue;

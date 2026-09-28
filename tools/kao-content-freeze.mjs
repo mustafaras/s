@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { INPUTS, headwordBw, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic, translitTr, wordTranslitTr } from './kao-lexicon-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const CONTENT = path.join(ROOT, 'kuran-ogreniyorum/content');
+const CONTENT = path.join(ROOT, 'docs/kuran-ogreniyorum/content');
 const OUT = path.join(ROOT, 'app/content');
 const QAC = path.join(CONTENT, 'inputs/quranic-corpus-morphology-0.4.txt');
 const DIANET_DUALAR = 'https://dijital.diyanet.gov.tr/File/Download?id=6054&path=6054_1.pdf';
@@ -22,7 +22,7 @@ const JSON_SHA256 = Object.freeze({
 function readJson(file) {
   const buffer = fs.readFileSync(path.join(CONTENT, file));
   const actual = crypto.createHash('sha256').update(buffer).digest('hex');
-  if (actual !== JSON_SHA256[file]) throw new Error(`${file}: sha256 uyuşmuyor (${actual}) (pini güncelle: shasum -a 256 kuran-ogreniyorum/content/${file})`);
+  if (actual !== JSON_SHA256[file]) throw new Error(`${file}: sha256 uyuşmuyor (${actual}) (pini güncelle: shasum -a 256 docs/kuran-ogreniyorum/content/${file})`);
   return JSON.parse(buffer.toString('utf8'));
 }
 function deepFreezeRuntime() {
@@ -228,6 +228,9 @@ function freezeSurahs() {
   const { words, waqfMarks, supplements, prayerTexts } = collectSurahs(surahVerified.rows);
   const names = ['Nâs','Felak','İhlâs','Tebbet','Nasr','Kâfirûn','Kevser','Mâûn','Kureyş','Fîl','Hümeze','Asr','Tekâsür','Kâria','Âdiyât','Zilzâl','Beyyine','Kadir','Alak','Tîn'];
   const surahs = names.map((name, index) => ({ id: 114 - index, name }));
+  // KAO-ARSIV (2026-09-27): plan klasörü docs/kuran-ogreniyorum/ altına taşındı. Aşağıdaki iki atıf
+  // metnindeki `kuran-ogreniyorum/content/...` yolu YAYINDAKİ modülün baytlarıdır; değiştirmek
+  // quranShortSurahsV1.js'i ve yayın pinini kaydırır (test_kao_freeze_repro bayt-eşlik ister). Tarihsel kaynak adı olarak bırakıldı.
   const data = {
     METHODOLOGY_TR: 'Kur’an kelimeleri pinned Tanzil Uthmani metni ile QAC 0.4 morfolojisinden hizalandı; Türkçe kelime katmanı KAO’nun kendi çevirisidir (kuran-ogreniyorum/content/surahs.verified.json, D-12); quran.com kelime referansı yalnız kopya denetiminde kullanıldı, dağıtılmaz. Ana 524 lemma dışında kalan kayıtlar bu modülde tamamlayıcı sözlük olarak tutulur.',
     ATTRIBUTION: { generatedAt: '2026-09-26', sources: [

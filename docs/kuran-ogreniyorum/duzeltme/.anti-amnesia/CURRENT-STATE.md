@@ -2,7 +2,7 @@
 
 **Durum:** `completed` · **Sıradaki:** — · **Aktif:** — · **Engel:** —
 **Dal:** `kao-duzeltme` (FIX-00 açtı; `origin/kao-duzeltme` de var) · **Taban:** `main` @ `58e0ceb` · **Yayın:** `main`=`882c8ef` (FIX-19 ff, Pages run 36325923128 success; canlı pin `20260927g`; index.html, sw.js, quranLearn.js canlı=repo `cmp`); kullanıcı her karttan sonra canlıya almayı istiyor
-**Güncelleme:** 2026-09-27 · KAO-FIX-19 done **ve canlıda** (kapanış regresyonu + §8 eki; kod değişmedi); **tüm kartlar tamam, açık bulgu yok**
+**Güncelleme:** 2026-09-27 · **📦 arşivlendi → `docs/kuran-ogreniyorum/` (LEDGER 61, `docs/KAO-KAPANIS.md` §8)** · KAO-FIX-19 done **ve canlıda** (kapanış regresyonu + §8 eki; kod değişmedi); **tüm kartlar tamam, açık bulgu yok**
 
 > Bu dosya tek doğruluk kaynağıdır. İlk 12 satırı her oturumda oku (`sed -n '1,30p'`).
 > Güncellerken yalnız ilgili satırı değiştir. Anlatı ekleme.

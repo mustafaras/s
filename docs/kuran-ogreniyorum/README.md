@@ -1,6 +1,11 @@
 # Kur'an Arapçası Öğreniyorum (KAO) — Araştırma ve plan
 
-**Durum (2026-09-27): program kapandı (2026-09-26, 30 kart) · düzeltme programı sürüyor ([`duzeltme/`](duzeltme/BAGLAM-YONETIMI.md)).**
+> **📦 ARŞİV (2026-09-27).** Bu klasör kök dizinden `docs/kuran-ogreniyorum/` altına taşındı; KAO
+> kapandı ve kalan kod işi yok. Program düzeyindeki kapanış kaydı: [`docs/KAO-KAPANIS.md`](../KAO-KAPANIS.md).
+> Aşağıdaki ve klasör içindeki belgelerde geçen `kuran-ogreniyorum/…` yolları **tarihseldir**; güncel kök
+> `docs/kuran-ogreniyorum/`. Araçlar ve betikler yeni köke göre güncellendi. Yeni KAO işi ayrı kapsam onayı ister.
+
+**Durum (2026-09-27): program kapandı (2026-09-26, 30 kart) · düzeltme programı da kapandı (27/27, [`duzeltme/`](duzeltme/BAGLAM-YONETIMI.md)) · arşivlendi.**
 Kapanış: [KAO-KAPANIS.md](deliverables/KAO-KAPANIS.md) + [KAO-KAPANIS-EK-1.md](deliverables/KAO-KAPANIS-EK-1.md) · planlama teslimatı v2: 20 Eylül 2026.
 
 **Kullanıcı kararları (v2):** KAO, yürüyen İlham & İbadet planından **farklı ve

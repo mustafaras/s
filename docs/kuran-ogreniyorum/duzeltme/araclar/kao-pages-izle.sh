@@ -1,8 +1,8 @@
 #!/bin/sh
 # KAO yayın sonrası Pages koşusunu bekler (FIX-PROMPTLARI §Ö7 kanıt düzeyi: "yayın").
-# Kullanım:  sh kuran-ogreniyorum/duzeltme/araclar/kao-pages-izle.sh <commit-kısa-hash>
+# Kullanım:  sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-pages-izle.sh <commit-kısa-hash>
 # `gh` gerektirir; yalnız okur.
-ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
+ROOT=$(cd "$(dirname "$0")/../../../.." && pwd)
 cd "$ROOT" || exit 1
 H=$1
 [ -n "$H" ] || { echo "kullanım: $0 <commit-kısa-hash>"; exit 2; }

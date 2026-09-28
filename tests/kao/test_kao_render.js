@@ -571,7 +571,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
   assert.doesNotMatch(cssSource, /font-size:\s*\d+(?:\.\d+)?px/, 'px yazı boyutu yok');
   for (const selector of ['.kao-unit-number', '.kao-prayer-line h3 span']) assert.match(cssSource, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{min-width:\\d+px;min-height:\\d+px'), `${selector} metinle büyür`);
   const { execFileSync } = require('node:child_process');
-  const report = JSON.parse(execFileSync(process.execPath, [path.join(repoRoot, 'kuran-ogreniyorum/tools/kao-verify-contrast.mjs'), '--json'], { encoding: 'utf8' }));
+  const report = JSON.parse(execFileSync(process.execPath, [path.join(repoRoot, 'docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs'), '--json'], { encoding: 'utf8' }));
   assert.equal(report.failed, 0, 'tüm KAO renk çiftleri ≥4.5:1 metin / 3:1 arayüz');
   for (const tone of ['Hareke · fetha', 'Hareke · kesra', 'Hareke · damma']) for (const theme of ['AÇIK', 'KOYU']) assert.ok(report.results.some((row) => row.label === tone && row.theme === theme && row.pass), `${tone} × ${theme}`);
 }
@@ -595,7 +595,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
 
 // KAO-FIX-12 · E7 kaynaklar ve lisanslar (O-6): statik bölüm, düz bağlantılar, metin kaynaktan okunur.
 {
-  const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum/content/audio-manifest.json'), 'utf8'));
+  const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/content/audio-manifest.json'), 'utf8'));
   const settingsHtml = api.kaoSettingsHTML();
   const match = settingsHtml.match(/<section class="kao-sources"[\s\S]*?<\/section>/);
   assert.ok(match, 'E7 kaynaklar bölümü yok');

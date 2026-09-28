@@ -5,9 +5,9 @@
 **Kalan iş: YOK** (kod tarafında); cihaz kabulü yalnız kullanıcıda
 
 > Bu belge, `docs/` altındaki kapanış kayıtları geleniğini izler (`IIP-KAPANIS.md` gibi).
-> Ham promptbook, evidence ve ledger baytları çalışma ağacında tutulmaz — gerektiğinde Git geçmişinden okunur.
-> Kanonik durum: `kuran-ogreniyorum/KAO-STATE.json` (`status=completed`) ·
-> `kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md` (`completed`) · `LEDGER.md` (seq 1–60).
+> Ham promptbook, evidence ve ledger baytları arşivde, `docs/kuran-ogreniyorum/` altında durur (Git geçmişi de korunur).
+> **Arşiv:** plan klasörü `docs/kuran-ogreniyorum/` altındadır (§8). Kanonik durum: `docs/kuran-ogreniyorum/KAO-STATE.json` (`status=completed`) ·
+> `docs/kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md` (`completed`) · `LEDGER.md` (seq 1–60).
 
 ---
 
@@ -104,14 +104,14 @@ Canlı yüzey: `https://mustafaras.github.io/s/` · pin `20260927g`.
 
 ## 6. Yeni oturum için not
 
-- **Kanonik durum:** `kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md` (`completed`, `Sıradaki: —`).
+- **Kanonik durum:** `docs/kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md` (`completed`, `Sıradaki: —`).
 - **Doğrulama komutları** (hepsi salt-okur):
   ```sh
-  sh kuran-ogreniyorum/duzeltme/araclar/kao-kapilar.sh   # tüm aileler + STD + kontrast
-  node kuran-ogreniyorum/tools/kao-plan-check.mjs        # plan/state tutarlılığı
-  node kuran-ogreniyorum/tools/kao-verify-contrast.mjs   # 336/336 kontrast
+  sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-kapilar.sh   # tüm aileler + STD + kontrast
+  node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs        # plan/state tutarlılığı
+  node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs   # 336/336 kontrast
   node tests/kao/test_kao_user_tasks.js --report         # gzip bütçesi
-  sh kuran-ogreniyorum/duzeltme/araclar/kao-canli-dogrula.sh  # canlı ↔ repo cmp
+  sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-canli-dogrula.sh  # canlı ↔ repo cmp
   ```
 - **Yardımcı betikler** (`duzeltme/araclar/`, 2026-09-27 repoya alındı): `kao-kapilar.sh`
   (STD §Ö4), `kao-yayin-pini.sh` (PIN-P), `kao-canli-dogrula.sh`, `kao-pages-izle.sh`,
@@ -128,3 +128,77 @@ Canlı yüzey: `https://mustafaras.github.io/s/` · pin `20260927g`.
 Şu konular **bu arşive dâhil edilmedi** çünkü kapalı değiller: KAO-FIX sonrası yeni bir
 KAO programı (yok), içerik genişletme (%80 hedefi), ikinci okuyucu sesi ve cihaz kabulü.
 Bunlar yeni kapsam onayı ister.
+
+---
+
+## 8. Kapanış denetimi ve arşivleme (2026-09-27)
+
+Arşivlemeden önce "program tam ve kusursuz uygulandı mı?" sorusu, belgelere değil **ölçüme** dayanarak yeniden soruldu.
+Ölçüm iki kez alındı: taşımadan önce (taban) ve taşımadan sonra. İki ölçüm birebir aynı çıktı.
+
+| Kapı | Sonuç |
+|---|---|
+| `tests/kao/` | **17/17 PASS**. Sessiz SKIP yok; `test_kao_freeze_repro` gerçekten koştu (**4 modül bayt-eş**) |
+| app · panel · panel-v2 · quran | **77/77 · 23/23 · 27/27 · 9/9** |
+| reminder smoke | **21 PASS** |
+| `driver.mjs` · `zikr-harness.mjs` · rebind | exit 0 · **95/95** · exit 0 |
+| `shell-inventory --gate` | PASS |
+| `kao-plan-check` | PASS, 6 uyarı → **3 uyarı** (aşağıda) · self-test **19/19** |
+| `kao-verify-contrast` | **336/336** çift |
+| Kart durumu | **30/30 done** + FIX **27/27 done** · açık karar yok |
+| Yüzey pinleri | `App.kao*` 35 · `quranLearn.js` **1.899/1.900** satır |
+
+**Denetimde kapatılan kayıt açığı.** Üç dalga denetimi (D1, D5, D6) `findings` olarak kapanmıştı. Gerekçeleri
+`evidence/KAO-D*/AUDIT.md` dosyalarında yazılıydı ama `KAO-STATE.json` → `auditFindingsAccepted` alanına hiç
+işlenmemişti. Plan-check bu yüzden uyarı veriyordu. Gerekçeler STATE'e işlendi. Hiçbiri kod kusuru değildir:
+
+- D1: içerik kapsamı kararı (KF-12).
+- D5: izlenebilirlik sapması (O-10).
+- D6: kullanıcı onaylı yayın.
+
+**Kalan 3 uyarı (bilinçli):**
+
+- Taban öncesi `ecc7ac7` ve `a9fa40c` commit'leri. Tarihsel kayıttır, O-11 kuralı gereği yalnız WARN verir.
+- `MediaRecorder` ile `save` aynı dosyada geçiyor. Elle doğrulandı: mikrofon kaydı yalnız geçici
+  `ui.kaoShadow` alanında blob URL olarak durur. `data`'ya yazılmaz, eşitlenmez. `test_kao_privacy.js` bunu korur.
+
+### Arşivleme
+
+- **Taşıma:** `kuran-ogreniyorum/` → **`docs/kuran-ogreniyorum/`** (`git mv`, geçmiş korunur). Kök dizinde KAO klasörü kalmadı.
+  Yalnız yerel tutulan, git dışındaki korpus girdileri (`content/inputs/`, `lexicon.reference.json`) klasörle birlikte taşındı.
+  Klasörün kendi `content/.gitignore` dosyası onları dışlamaya devam eder.
+- **Güncellenen yollar:**
+  - `tools/kao-*.mjs` (4 dosya)
+  - `tests/kao/` (4 dosya)
+  - klasör içi `tools/kao-plan-check.mjs` ve `kao-verify-contrast.mjs` (kök derinliği +1)
+  - `duzeltme/araclar/*.sh` ve `kao-content-check.js`
+  - CLAUDE.md, AGENTS.md, `docs/README.md`, `docs/WORK-SUMMARY.md`, `archive/README.md`
+- **Plan-check:**
+  - Yeni `KAO-ARSIV:` commit öneki tanındı.
+  - `chore(kao)` kapsamı `docs/kuran-ogreniyorum/**` yollarını da kabul ediyor. Eski önekler geçmiş commit'ler için korunur.
+- **Yayın yüzeyi:** `docs/` zaten `pages.yml` tarafından dışlanıyor. `kuran-ogreniyorum` dışlaması savunma amaçlı yerinde
+  bırakıldı; `test_deploy_surface_contract.js` bu dışlamayı ister.
+- **Bilerek eski yolda bırakılanlar:**
+  - Yayındaki `app/content/quranShortSurahsV1.js` atıf metni (`METHODOLOGY_TR` ve `verification`).
+  - `app/core/quranLearn.js:1058` yorumu.
+  - Bunları değiştirmek üretim baytlarını, freeze bayt-eşliğini ve yayın pinini kaydırırdı. Taşıma **hiçbir
+    üretim dosyasına dokunmaz**; canlı yayın ve pin `20260927g` aynı kalır.
+- **Tarihsel yollar:** klasör içi belgelerde (promptlar, evidence, ledger) geçen `kuran-ogreniyorum/…` yolları olduğu gibi
+  bırakıldı. Klasörün README'si başta bunu belirtir. `KAO-STATE.json` → `archive` alanı taşıma kaydını tutar.
+
+**Doğrulama komutları (yeni kök):**
+
+```sh
+sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-kapilar.sh
+node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs
+node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs
+```
+
+**Hüküm:** Kod tarafında KAO eksiksiz uygulanmıştır. Ölçülebilen her kapı yeşildir; açık kart ve açık karar yoktur.
+"Kusursuz" iddiası yalnız bu kanıt düzeyi için geçerlidir. §5'teki dürüstçe açık konular aynen geçerlidir:
+
+- Cihaz kabulü (K3) kullanıcıdadır.
+- Global %80 kapsamı yeni lemma gerektirir.
+- Tanzil karşılaştırma fixture'ı eksiktir.
+
+Bunlar arşivle kapanmaz; yeni kapsam onayı ister.

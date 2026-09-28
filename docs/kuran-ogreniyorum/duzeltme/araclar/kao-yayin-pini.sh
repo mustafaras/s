@@ -1,10 +1,10 @@
 #!/bin/sh
 # KAO yayın pini (PIN-P, FIX-PROMPTLARI §Ö2).
-# Kullanım:  sh kuran-ogreniyorum/duzeltme/araclar/kao-yayin-pini.sh 20260927h
+# Kullanım:  sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-yayin-pini.sh 20260927h
 # 9 dosyayı (index.html, sw.js, 7 tests/app) birlikte yükseltir; eski pin kalırsa exit 9.
 # KURAL: yalnız `quranLearn.js`/`kao.css`/içerik modülü/`app.js` değişirse koşulur.
 #        `quranPhonicsV1.js`'in AYRI pini vardır (20260924b) — bu betik ona dokunmaz.
-ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
+ROOT=$(cd "$(dirname "$0")/../../../.." && pwd)
 cd "$ROOT" || exit 1
 TMP=${TMPDIR:-/tmp}
 NEW=$1

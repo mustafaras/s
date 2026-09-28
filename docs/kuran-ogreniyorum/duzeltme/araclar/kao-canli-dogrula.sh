@@ -1,10 +1,10 @@
 #!/bin/sh
 # KAO canlı doğrulama (yayın sonrası, FIX-PROMPTLARI §Ö7 kanıt düzeyi: "yayın").
-# Kullanım:  sh kuran-ogreniyorum/duzeltme/araclar/kao-canli-dogrula.sh
-#            sh kuran-ogreniyorum/duzeltme/araclar/kao-canli-dogrula.sh app.js
+# Kullanım:  sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-canli-dogrula.sh
+#            sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-canli-dogrula.sh app.js
 # Pages'in CDN'e yayması birkaç saniye sürer: her dosya için 5 deneme / 8 sn.
 # Yalnız GET + `cmp`; hiçbir şey yazmaz, token kullanmaz.
-ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
+ROOT=$(cd "$(dirname "$0")/../../../.." && pwd)
 cd "$ROOT" || exit 1
 TMP=${TMPDIR:-/tmp}
 BASE=${KAO_LIVE_BASE:-https://mustafaras.github.io/s}

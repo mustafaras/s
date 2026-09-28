@@ -152,9 +152,9 @@ group('FX2-15.2 çıkış/giriş CSS token ve reduced-motion sözleşmesi var',
 }
 
 const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-group('FX2-15.7 App yüzeyi 758, etkileşim 393 ve render/paint gövdeleri değişmedi',
-  // KAO2-04 iki gezinme handler'ı ekledi; genel yüzey 758 oldu.
-  handlers.size === 758 && (combinedSource.match(/onclick=/g) || []).length === 393 &&
+group('FX2-15.7 App yüzeyi 759, etkileşim 393 ve render/paint gövdeleri değişmedi',
+  // KAO kartlarının izinli gezinme handler'ları genel yüzeyi 759 yaptı.
+  handlers.size === 759 && (combinedSource.match(/onclick=/g) || []).length === 393 &&
   !/function render\(\)[\s\S]{0,180}sey-leaving/.test(appSource) &&
   !/function paint\(\)[\s\S]{0,180}sey-leaving/.test(appSource));
 

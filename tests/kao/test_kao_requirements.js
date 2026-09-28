@@ -167,6 +167,7 @@ while (sessionUi.kaoTaskIndex < sessionUi.kaoQueue.length) {
     assert.ok(correct);
     sessionApi.kaoAnswer(task.id, correct.choiceId);
   }
+  sessionApi.kaoContinue();
 }
 const doneHtml = sessionApi.kaoTaskHTML(null);
 assert.equal(sessionUi.kaoDurableCount, 1, 'R-B4: yalnız s<21 iken s>=21 olan kart sayılmalı');
@@ -227,6 +228,7 @@ for (let index = 0; index < delayedTasks.length; index += 1) {
   const choice = index < 4 ? task.choices.find((item) => item.correct) : task.choices.find((item) => !item.correct);
   const result = delayedApi.kaoAnswer(task.id, choice.choiceId);
   assert.equal(result.correct, index < 4);
+  delayedApi.kaoContinue();
 }
 assert.equal(delayedData.quranLearn.surahs['112'].delayedScore, 4);
 assert.match(delayedData.quranLearn.surahs['112'].confirmedAt, /^\d{4}-\d{2}-\d{2}T/, 'R-C6: 4/5 anlaşılmayı kesinleştirmeli');
@@ -408,6 +410,7 @@ function sandboxLemma(api, lemmaId) {
     seen.push(distractors);
     assert.notEqual(api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId), false, `${date}: cevap kaydedilmeli`);
     assert.deepEqual(Array.from(q.cards[targetId].lastDistractors || []), distractors.map((id) => id.split(':')[1]), `${date}: lastDistractors (lemma kimliği) cevapta yazılmalı`);
+    api.kaoContinue();
   }
   assert.deepEqual(seen[1].filter((id) => seen[0].includes(id)), [], 'R-A2: ardışık iki tekrarda aynı çeldirici gelmez (üretim yolu)');
 }
@@ -474,12 +477,15 @@ function sandboxLemma(api, lemmaId) {
   assert.equal(retries().length, 1, 'yanlış cevap kuyruğa bir tekrar ekler');
   assert.equal(ui.kaoQueue[ui.kaoQueue.length - 1].id, `kao:2026-10-06:${wordId}:retry`, 'tekrar kuyruğun sonunda');
   assert.equal(ui.kaoQueue[ui.kaoQueue.length - 1].retry, true);
-  assert.equal(ui.kaoTaskIndex, ui.kaoQueue.length - 1, 'sıradaki görev tekrar');
+  assert.equal(ui.kaoTaskIndex, 0, 'yanlış cevap paneli açıkken indeks sabit');
+  assert.equal(ui.kaoPanel.open, true);
+  api.kaoContinue();
+  assert.equal(ui.kaoTaskIndex, ui.kaoQueue.length - 1, 'Devam ile sıradaki görev tekrar');
   answerCurrent(false);
   assert.equal(retries().length, 1, 'tekrar da yanlışsa ikinci tekrar eklenmez');
 }
 
-// KAO-FIX-10 (O-3, 03 §10): kilometre taşları — eşiğin bir altında yok, eşikte kazanılır; bir kez kazanılan geri alınmaz.
+// KAO-FIX-10 (O-3, 03 §10): milestone eşiği korunur; panel undo cevap etkilerini geri alır.
 {
   const lexBox = { window: {} };
   vm.createContext(lexBox);
@@ -533,15 +539,17 @@ function sandboxLemma(api, lemmaId) {
   ui.kaoTaskIndex = index; ui.kaoTasks = ui.kaoTasks || {};
   const item = ui.kaoQueue[index];
   const task = ui.kaoTasks[item.id] = api.kaoBuildTask(item, data, { seed: item.id });
+  const beforeAnswer = JSON.stringify(q.milestones);
   api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId);
   for (const key of ['fatiha', 'namaz', 'half', 'twoThirds', 'eighty']) assert.match(String(q.milestones[key]), /^\d{4}-\d{2}-\d{2}T/, `${key} ISO tarihle yazılır`);
-  assert.match(ui.kaoFeedback, /✦$/, 'yeni taş tek cümle geri bildirim');
+  assert.match(ui.kaoPanel.note, /✦$/, 'yeni taş panel notunda görünür');
   const earned = JSON.stringify(q.milestones);
   api.kaoUndo();
-  assert.equal(JSON.stringify(q.milestones), earned, 'undo taşı geri sarmaz (bilinçli karar: taş bir kez kazanılır)');
+  assert.notEqual(earned, beforeAnswer, 'fixture cevapta yeni milestone kazandırdı');
+  assert.equal(JSON.stringify(q.milestones), beforeAnswer, 'KAO2-06 panel undo milestone etkisini de geri alır');
   for (const id of Object.keys(q.cards)) if (id.endsWith(':tr>ar')) delete q.cards[id];
-  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), [], 'kapsam düştü: yeni taş yok');
-  assert.equal(JSON.stringify(q.milestones), earned, 'kapsam düşse de kazanılmış taş kalır');
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['fatiha', 'namaz'], 'milestone kontrolü adayları kart kapsamından hesaplar; kayıt henüz kazanılmadı');
+  assert.equal(JSON.stringify(q.milestones), beforeAnswer, 'kapsam düşse de geri alınmış milestone kaydı boş kalır');
 }
 
 // KAO-FIX-07 (Y-1, 02 §3): bilinen lemma = her iki yönde review ∧ s≥21 (yetim ve okuyucu-bilinmeyen hariç).
@@ -637,11 +645,13 @@ function sandboxLemma(api, lemmaId) {
   assert.deepEqual(JSON.parse(JSON.stringify(data.quranLearn.daily[today].link)), { n: 1, ok: 1 });
   assert.equal(Object.keys(data.quranLearn.cards).length, cardsBefore, 'bağ kur FSRS kartı yazmaz');
   assert.ok(!Object.keys(data.quranLearn.cards).some((id) => /^k:/.test(id)));
-  assert.equal(ui.kaoTaskIndex, ui.kaoQueue.indexOf(link) + 1, 'sonraki göreve geçer');
-  ui.kaoTaskIndex = ui.kaoQueue.indexOf(link);
+  assert.equal(ui.kaoTaskIndex, ui.kaoQueue.indexOf(link), 'cevap panelinde indeks sabit kalır');
+  assert.equal(ui.kaoPanel.open, true, 'bağ kur geri bildirim paneli açılır');
+  api.kaoContinue();
+  ui.kaoTaskIndex = ui.kaoQueue.indexOf(link); ui.kaoPanel = { open: false };
   api.kaoAnswer(task.id, task.choices.find((choice) => !choice.correct).choiceId);
   assert.deepEqual(JSON.parse(JSON.stringify(data.quranLearn.daily[today].link)), { n: 2, ok: 1 });
-  assert.ok(ui.kaoFeedback.includes(task.answer), 'yanlışta doğru türev gösterilir');
+  assert.equal(ui.kaoPanel.answer, task.answer, 'yanlışta doğru türev panel durumuna yazılır');
   // Gece oturumu (hedef yatıştan 30 dk önce): yalnız tekrar kartları, bağ kur yok.
   const soon = new Date(Date.now() + 30 * 60000);
   bed = `${pad(soon.getHours())}:${pad(soon.getMinutes())}`;
@@ -809,6 +819,7 @@ function sandboxLemma(api, lemmaId) {
     const task = api.kaoBuildTask(ui.kaoQueue[0], data, { seed: 'fx-1' }); ui.kaoTasks[task.id] = task;
     calls.length = 0;
     api.kaoAnswer(task.id, task.choices.find((choice) => choice.correct === correct).choiceId);
+    api.kaoContinue();
     return calls.slice();
   };
   let got = answer(true);

@@ -116,7 +116,8 @@
     var actionHtml=actions.map(function(action){
       action=action&&typeof action==='object'?action:{};
       var call=actionCall(action.action);
-      return '<button type="button" class="kao-feedback-action"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(action.label)+'</button>';
+      var kind=action.kind==='primary'?'kao-feedback-continue':(action.kind==='link'?'kao-feedback-undo':'');
+      return '<button type="button" class="kao-feedback-action'+(kind?' '+kind:'')+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(action.label)+'</button>';
     }).join('');
     return '<section class="kao-feedback-sheet kao-feedback-'+tone+'"><div class="kao-feedback-message" role="status" aria-live="polite"><h3 class="kao-feedback-title">'+escapeText(options.title)+'</h3><p class="kao-feedback-body">'+escapeText(options.body)+'</p></div><div class="kao-feedback-actions">'+actionHtml+'</div></section>';
   }

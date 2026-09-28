@@ -374,7 +374,7 @@ assert.equal(restored, 'kao-hub-entry');
 assert.match(appSource, /App\.kaoOpen=function\(view\)\{ return window\.SeymaQuranLearn\.kaoOpen\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoClose=function\(\)\{ return window\.SeymaQuranLearn\.kaoClose\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoSetView=function\(v\)\{ return window\.SeymaQuranLearn\.kaoSetView\.apply\(null,arguments\); \};/);
-for (const name of ['kaoStart', 'kaoAnswer', 'kaoUndo', 'kaoPlay', 'kaoOpenWord', 'kaoWordLayer', 'kaoFlag', 'kaoGate', 'kaoOpenSurah', 'kaoRevealWord', 'kaoMarkUnderstood']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
+for (const name of ['kaoStart', 'kaoAnswer', 'kaoContinue', 'kaoUndo', 'kaoPlay', 'kaoOpenWord', 'kaoWordLayer', 'kaoFlag', 'kaoGate', 'kaoOpenSurah', 'kaoRevealWord', 'kaoMarkUnderstood']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
 assert.doesNotMatch(settingsSource, /kao-settings-entry|App\.kaoOpen\(\)/, 'geçici Ayarlar girişi kaldırılmalı');
 assert.match(appSource, /kaoHubCardHTML:function\(\)\{ return window\.SeymaQuranLearn\?window\.SeymaQuranLearn\.kaoHubCardHTML\(\):''; \}/);
 assert.match(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'Kur’an öğrenme kartı Bugün girişlerinde Kur’an Yolculuğu sonrasında olmalı');

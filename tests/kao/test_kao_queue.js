@@ -274,6 +274,7 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
       } else {
         assert.notEqual(sweepApi.kaoAnswer(task.id, task.choices.find((choice) => choice.correct).choiceId), false, `${task.id}: cevap kaydedilmeli`);
       }
+      sweepApi.kaoContinue();
     }
   }
   const cards = sweepData.quranLearn.cards, lemmaDirs = {};

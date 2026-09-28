@@ -41,6 +41,7 @@ function answerAll(api, state, correctly) {
     const started = process.hrtime.bigint();
     if (task.kind === 'order') task.choices.slice().sort((a, b) => a.ordinal - b.ordinal).forEach((choice) => api.kaoAnswer(task.id, choice.choiceId));
     else api.kaoAnswer(task.id, (correctly ? task.choices.find((choice) => choice.correct) : task.choices.find((choice) => !choice.correct) || task.choices[0]).choiceId);
+    api.kaoContinue();
     times.push(Number(process.hrtime.bigint() - started) / 1e6);
   }
   return times;

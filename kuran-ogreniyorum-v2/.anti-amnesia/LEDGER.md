@@ -233,3 +233,16 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: ilk P3 koşusundaki nowrap çatışması CSS kapsamı içinde giderildi; son koşu tamamen PASS · switch entegrasyonu için mevcut KAO2-09 TODO korunuyor
 - next: KAO2-06
+
+## seq 24 · 2026-09-28 · BLOCKED · KAO2-06
+- status: blocked
+- title: Geri bildirim paneli ve Devam — kapsam dışı App yüzey pinleri P3'ü durdurdu
+- prev-commit: fd751fc
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-06/KANIT.md
+- attempted: KAO2-06 uygulaması ve KAO testleri tamamlandı; P3'ün tamamı çalıştırıldı. 77 uygulama fixture'ının 75'i geçti; iki sabit yüzey sayısı yeni App.kaoContinue shim'iyle ölçülen 597 atama/759 yüzey değerlerini beklemiyor.
+- gates: syntax PASS · KAO 22/22 PASS · app 75/77 BLOCKED · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders 21/21 PASS · driver PASS · zikr 95/95 PASS · contrast 382 çift/0 ihlal PASS · sync PASS
+- proposed: Kullanıcı yalnız `tests/app/test_app_surface_daily_boundary.js` ve `tests/app/test_v3_welcome.js` içindeki sayısal pinlerin 596→597 ve 758→759 olarak eşlenmesine kapsam onayı verirse aynı KAO2-06'ya FIX kaydıyla dön ve tüm P3'ü yeniden çalıştır.
+- evidence-levels: kaynak/test KAO PASS, tam P3 bloklu · yayın yok · cihaz doğrulanmadı
+- surprises: README eski satırında KAO2-03'ü sıradaki gösteriyor; canlı STATE/CURRENT-STATE nextCard KAO2-06 ile uyumlu, README kapsam dışı olduğu için değişmedi.
+- next: KAO2-06

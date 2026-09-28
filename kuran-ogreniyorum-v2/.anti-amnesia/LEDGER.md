@@ -161,3 +161,11 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: legacy kao-plan-check tam taraması önceki yayımlanmış c7d5190/a488e5c teslim kayıtlarında 19 kapsam bulgusu veriyor; --self-test 19/19 PASS; P3 dışı, araç/kart kapsamı dışında
 - next: KAO2-04
+
+## seq 16 · 2026-09-28 · BLOCKED · KAO2-04
+- status: blocked
+- summary: K-2, run-seyma driver/harness FILES listelerini yalnız Edit aracıyla değiştirmeyi şart koşuyor; bu oturumda o araç yok. Ayrıca fail-closed görünüm bağımlılığı, yeni modül yüklemeyen mevcut KAO test fixture'larının güncellenmesini gerektiriyor; dört dosya KAO2-04 Dokun listesi dışında.
+- attempted: Yeni gezinme fixture'ı yazılıp çalıştırıldı; ilk hata kaoNav API'sinin bulunmamasıydı. Kapsam dışı test/skill dosyalarına dokunulmadı.
+- resolution: Kullanıcıdan dört KAO fixture'ının yalnız modül yükleme satırları için kapsam onayı ve `.claude/skills/run-seyma/*.mjs` düzenlemesi için Edit aracıyla devam edilmesi gerekiyor.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-04/KANIT.md
+- next: KAO2-04

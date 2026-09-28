@@ -147,3 +147,17 @@ Kurallar:
 - summary: Kullanıcı konum kapısı hatasının canlıya alınmasını ve ardından sıradaki KAO2 kartına geçilmesini istedi. Fe9de9c düzeltmesinin app.js/appSurface.js sürüm önbelleğini aşması için release pini 20260928a→20260928b olarak index/SW/fixture'larda eşlendi; Pages36415570405 success ve 12 canlı varlık byte/hash eş. Bir sonraki KAO kartı bu yeni taban pinini korur.
 - evidence-levels: kaynak/test önceki turda 164/164 PASS + konum regresyonu 39/39 PASS; yayın 12 asset byte eşliği ✓ · cihaz doğrulanmadı
 - next: KAO2-03
+
+
+## seq 15 · 2026-09-28 · CARD · KAO2-03
+- status: done
+- title: Tokenlar ve süs temizliği
+- prev-commit: a488e5c
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-03/KANIT.md
+- gates: P3 164/164 PASS (kao19/app77/panel23/panel-v2 27/quran9); reminders21 fixture/73 assertion PASS; driver PASS; zikr95/95 PASS; contrast328 çift/0 ihlal PASS; sync PASS
+- metrics: font-weight 2/≤4 · uppercase0 · letter-spacing0 · deco0 · serif0 · 13/13 seçici kaldırıldı · 24 görünüm primary≤1 · CSS gzip6411 B/≤14 KiB · perf p95 5,073 ms · contrast328/0
+- changed-tests: design fixture baseline sabitleri + strict; render test süs span yokluğunu ve 44 px row tokenını doğrular
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: legacy kao-plan-check tam taraması önceki yayımlanmış c7d5190/a488e5c teslim kayıtlarında 19 kapsam bulgusu veriyor; --self-test 19/19 PASS; P3 dışı, araç/kart kapsamı dışında
+- next: KAO2-04

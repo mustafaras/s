@@ -78,10 +78,8 @@ assert.match(html, /anlaş/iu);
 assert.match(html, /10 yeni/);
 assert.match(html, /Gece tekrarı/);
 assert.match(html, /App\.kaoStart\(\)/);
-assert.match(html, /class="kao-header-mark"[^>]*aria-hidden="true"/);
-assert.match(html, /class="kao-hero-rosette"[^>]*aria-hidden="true"/);
 assert.match(html, /class="kao-time-chip"/);
-assert.match(html, /class="kao-summary-mark"[^>]*aria-hidden="true"/);
+assert.doesNotMatch(html, /class="(?:kao-dialog-frame|kao-header-mark|kao-hero-rosette|kao-summary-mark|kao-done-mark)"/);
 assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 
 const firstHubHtml = api.kaoHubCardHTML();
@@ -89,8 +87,7 @@ assert.match(firstHubHtml, /id="kao-hub-entry"/);
 assert.match(firstHubHtml, /Kur’an Arapçası Öğreniyorum/);
 assert.match(firstHubHtml, /20 kısa sûre/, 'KAO-16 okuyucusu ana hub kartında keşfedilebilir olmalı');
 assert.match(firstHubHtml, /Kelime<\/b>.*Kök<\/b>.*Gramer<\/b>.*Âyet<\/b>/);
-assert.match(firstHubHtml, /class="kao-hub-spine"[^>]*aria-hidden="true"/);
-assert.match(firstHubHtml, /class="kao-hub-ornament"[^>]*aria-hidden="true"/);
+assert.doesNotMatch(firstHubHtml, /class="kao-hub-(?:spine|frame|ornament)"/);
 assert.match(firstHubHtml, /İlk oturum hazır/);
 assert.match(firstHubHtml, /onclick="App\.kaoOpen\(\)"[^>]*aria-haspopup="dialog"/);
 const firstLemma = sandbox.window.QuranLexiconV1.lemmas[0];
@@ -380,11 +377,11 @@ assert.doesNotMatch(settingsSource, /kao-settings-entry|App\.kaoOpen\(\)/, 'geç
 assert.match(appSource, /kaoHubCardHTML:function\(\)\{ return window\.SeymaQuranLearn\?window\.SeymaQuranLearn\.kaoHubCardHTML\(\):''; \}/);
 assert.match(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'Kur’an öğrenme kartı Bugün girişlerinde Kur’an Yolculuğu sonrasında olmalı');
 assert.match(indexSource, /app\/kao\.css\?v=\d{8}[a-z]/);
-for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-dialog-frame', '.kao-header-mark', '.kao-hero-rosette', '.kao-time-chip', '.kao-unit-card', '.kao-word-hero', '.kao-root-tree', '.kao-word-example', '.kao-gate', '.kao-h-fatha', '.kao-h-kesra', '.kao-h-damma', '.kao-reader', '.kao-reader-word', '.kao-waqf']) assert.ok(cssSource.includes(selector), selector);
+for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-time-chip', '.kao-unit-card', '.kao-word-hero', '.kao-root-tree', '.kao-word-example', '.kao-gate', '.kao-h-fatha', '.kao-h-kesra', '.kao-h-damma', '.kao-reader', '.kao-reader-word', '.kao-waqf']) assert.ok(cssSource.includes(selector), selector);
 assert.doesNotMatch(cssSource, /:root\s*\{/);
 assert.doesNotMatch(cssSource, /#[0-9a-f]{3,8}\b/i);
 const cssVars = [...cssSource.matchAll(/var\((--[a-z0-9-]+)/gi)].map((match) => match[1]);
-assert.ok(cssVars.length > 0 && cssVars.every((name) => /^--(?:quran|faith|f-|dur-|kao-ar-)/.test(name)), 'KAO CSS yalnız izinli token ailelerini veya kartın okunabilirlik değişkenlerini tüketmeli');
+assert.ok(cssVars.length > 0 && cssVars.every((name) => /^(?:--(?:quran|faith|f-|dur-|kao-ar-)|--kao-(?:bg|surface|label(?:-2)?|sep|tint|accent|ok(?:-bg)?|fix(?:-bg)?|r-(?:card|ctl|pill)|gutter|gap-[1-4]|row))/.test(name)), 'KAO CSS yalnız izinli token ailelerini veya kartın okunabilirlik değişkenlerini tüketmeli');
 
 const selectorStart = appSource.indexOf('var MODAL_FOCUS_SELECTOR=');
 const handlerEnd = appSource.indexOf('\nApp.onReminderKeydown=', selectorStart);
@@ -554,7 +551,8 @@ assert.ok(prevented >= 3 && stopped >= 3);
 // KAO-18 · 44 px dokunma hedefi, odak halkası ve WCAG kontrast denetimi (R-A9).
 {
   const rules = [...cssSource.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((match) => ({ selectors: match[1].split(',').map((item) => item.trim()), body: match[2] }));
-  const target = (selector) => { let size = null; for (const rule of rules) if (rule.selectors.includes(selector)) { const match = rule.body.match(/(?:^|;)\s*(?:min-height|height)\s*:\s*(\d+)px/); if (match) size = Number(match[1]); } return size; };
+  const kaoRow = Number((cssSource.match(/--kao-row:(\d+)px/) || [])[1]) || 0;
+  const target = (selector) => { let size = null; for (const rule of rules) if (rule.selectors.includes(selector)) { const match = rule.body.match(/(?:^|;)\s*(?:min-height|height)\s*:\s*(?:(\d+)px|var\(--kao-row\))/); if (match) size = match[1] ? Number(match[1]) : kaoRow; } return size; };
   const buttonClasses = [...new Set([...source.matchAll(/<button[^>]*class="([a-z0-9 -]+)/g)].flatMap((match) => match[1].split(' ')).filter((name) => name.startsWith('kao-')))];
   const inherited = { 'kao-chip': '.kao-choices button', 'kao-level1': '.kao-link-button', 'kao-map-cell': '.kao-map-cell' };
   const small = buttonClasses.filter((name) => !((target('.' + name) || target(inherited[name] || '')) >= 44));

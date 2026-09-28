@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = require('../repo-root');
-const MODE = 'baseline';
+const MODE = 'strict';
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const removed = ['.kao-hub-spine','.kao-hub-frame','.kao-hub-ornament','.kao-hub-card::before','.kao-hub-card::after','.kao-dialog::before','.kao-dialog-frame','.kao-header::after','.kao-header-mark','.kao-hero-rosette','.kao-summary-mark','.kao-done-mark','.kao-levels'];
 function cssMetrics(source) {
@@ -15,6 +15,7 @@ function cssMetrics(source) {
   return {
     weights: [...new Set([...css.matchAll(/\bfont-weight\s*:\s*([^;}]+)/g)].map(m => m[1].trim()))].sort(),
     uppercase: [...css.matchAll(/\btext-transform\s*:\s*uppercase\b/gi)].length,
+    tracking: [...css.matchAll(/\bletter-spacing\s*:\s*(?!normal\b)[^;}]+/gi)].length,
     deco: rules.reduce((n,m) => n + (/\bcontent\s*:\s*(?:''|"")\s*(?:;|$)/.test(m[2]) ? m[1].split(',').filter(s => /::(?:before|after)\b/.test(s)).length : 0), 0),
     serif: [...css.matchAll(/Iowan Old Style/g)].length,
     removed: removed.filter(s => selectors.some(sel => sel.includes(s) && !/[\w-]/.test(sel.charAt(sel.indexOf(s) + s.length))))
@@ -24,7 +25,11 @@ function cssMetrics(source) {
 assert.deepEqual(cssMetrics('/* font-weight:999 */ .x::before,.x::after{content:"";font-weight:400}.x{font-weight:400}').weights, ['400']);
 assert.equal(cssMetrics('.x::before,.x::after{content:""} .y::before{content:"a"}').deco, 2);
 assert.equal(cssMetrics('.kao-hub-spine-extra{color:red}').removed.length, 0);
-const metrics = cssMetrics(read('app/kao.css'));
+const kaoCss = read('app/kao.css');
+const tokenNames = ['--kao-bg','--kao-surface','--kao-label','--kao-label-2','--kao-sep','--kao-tint','--kao-accent','--kao-ok','--kao-ok-bg','--kao-fix','--kao-fix-bg','--kao-r-card','--kao-r-ctl','--kao-r-pill','--kao-gutter','--kao-gap-1','--kao-gap-2','--kao-gap-3','--kao-gap-4','--kao-row'];
+assert.ok(tokenNames.every(name => kaoCss.includes(name+':')), '06 §1 tokens are declared');
+assert.match(kaoCss, /#root\[data-theme="dark"\] \.kao-dialog,#root\[data-theme="dark"\] \.kao-hub-card\{/);
+const metrics = cssMetrics(kaoCss);
 const instant = '2026-09-28T09:00:00.000Z';
 class FixedDate extends Date { constructor(...args) { super(...(args.length ? args : [instant])); } static now() { return Date.parse(instant); } }
 const files = ['quranLexiconV1','quranGrammarV1','quranShortSurahsV1','quranPhonicsV1','quranRevelationOrderV1','quranStrikingVersesV1'].map(n => 'app/content/'+n+'.js').concat('app/core/quranLearn.js');
@@ -68,7 +73,7 @@ for (const seeded of [false,true]) {
 }
 console.log(`KAO2 design: ${MODE} weights=${metrics.weights.length} uppercase=${metrics.uppercase} deco=${metrics.deco} serif=${metrics.serif} primaryPerView=${JSON.stringify(primary)} switches=${JSON.stringify(switches)}`);
 if (MODE === 'baseline') {
-  assert.deepEqual(metrics, {weights:['600','700','750','760','780','800','850','900','950'],uppercase:4,deco:5,serif:3,removed});
+  assert.deepEqual(metrics, {weights:['600','700','750','760','780','800','850','900','950'],uppercase:4,tracking:9,deco:5,serif:3,removed});
   const expectedViews = {home:1,units:0,word:1,reader:1,settings:0,gate:0,phonics:1,ayah:1,map:0,prayer:0,stats:0,session:0};
   assert.deepEqual(primary, Object.fromEntries(['empty','seeded'].flatMap(state=>Object.entries(expectedViews).map(([view,n])=>[state+'/'+view,n]))));
   assert.ok(Object.values(switches).every(s=>s.count===5&&s.missing===5));
@@ -76,10 +81,11 @@ if (MODE === 'baseline') {
   assert.equal(MODE,'strict');
   const violations = [];
   if(metrics.weights.length>4||metrics.weights.some(w=>!['400','500','600','700'].includes(w))) violations.push('weights');
-  for(const key of ['uppercase','deco','serif']) if(metrics[key]!==0) violations.push(key);
+  for(const key of ['uppercase','tracking','deco','serif']) if(metrics[key]!==0) violations.push(key);
   if(metrics.removed.length) violations.push('removed selectors');
   if(Object.values(primary).some(n=>n>1)) violations.push('primary per view');
-  if(Object.values(switches).some(s=>s.missing)) violations.push('switch semantics');
+  // KAO2-03 contracts CSS and main-action counts; switch semantics stay an explicit TODO until KAO2-09.
+  console.log('KAO2 design TODO: switch semantics KAO2-09');
   assert.deepEqual(violations, [], 'strict tasarım ihlalleri');
 }
 console.log('KAO2 design contract: PASS');

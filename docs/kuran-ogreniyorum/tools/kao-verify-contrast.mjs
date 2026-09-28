@@ -47,8 +47,8 @@ function blockBody(css, selector) {
   throw new Error(`Kapanmayan blok: ${selector}`);
 }
 const tokensOf = (body) => Object.fromEntries([...body.matchAll(/--([a-z0-9-]+)\s*:\s*([^;}]+)/gi)].map((m) => [m[1], m[2].trim()]));
-const LIGHT = tokensOf(blockBody(STYLES, '  #root'));
-const DARK = { ...LIGHT, ...tokensOf(blockBody(STYLES, '  #root[data-theme="dark"]')) };
+const LIGHT = { ...tokensOf(blockBody(STYLES, '  #root')), ...tokensOf(blockBody(KAO, '.kao-dialog,.kao-hub-card')) };
+const DARK = { ...LIGHT, ...tokensOf(blockBody(STYLES, '  #root[data-theme="dark"]')), ...tokensOf(blockBody(KAO, '#root[data-theme="dark"] .kao-dialog,#root[data-theme="dark"] .kao-hub-card')) };
 
 /** Yorumsuz, medya sorgusu dışı kurallar (reduced-motion/genişlik blokları renk değiştirmez). */
 const RULES = [...KAO.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@media[^{]*\{((?:[^{}]*\{[^{}]*\})*)[^{}]*\}/g, '')

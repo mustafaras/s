@@ -1,32 +1,32 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-03
-lastSeq: 14
+nextCard: KAO2-04
+lastSeq: 15
 status: active
 -->
 
-Son güncelleme: 2026-09-28 · LEDGER seq14
+Son güncelleme: 2026-09-28 · LEDGER seq15
 
 ## Şu an neredeyiz
-KAO2-00…02 done (3/28); W0 kartları tamam. Tasarım sözleşmesi fixture'ı baseline modunda PASS; strict hedefler beklenen FAIL. Üretim arayüzü bu kartta değişmedi. Dal kao2-yeniden-tasarim, KAO2-00…02 için kullanıcı yayın onayı var.
+KAO2-00…03 done (4/28); W0 tamam, W1 sürüyor. KAO2-03 strict tasarım sözleşmesiyle kapandı: 06 §1 tokenları, sadeleştirilmiş tipografi ve süs katmanı temizliği uygulandı. Dal `kao2-yeniden-tasarim`; bu kartın değişiklikleri yerel, commit kapanışında kalacak.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-03: yeni kullanıcı isteğiyle tokenlar/süs temizliğini uygula, tasarım fixture'ını strict'e geçir; bu oturumda başlanmadı.
+KAO2-04: K-2 üç dosyalı quranLearn ayrımı, gezinme yığını ve NavBar iskeletini uygula; yalnız STATE'teki sıradaki kartı çalıştır.
 
 ## Canlı gerçekler
-- Tasarım baseline:9 ağırlık,4 uppercase,5 boş dekoratif sözde seçici,3 serif,13/13 kaldırılacak seçici mevcut.
-- Boş/tohumlu 24 görünümde primary≤1; 4 ayar açık/kapalı senaryosunda her biri5 eksik switch semantiği.
-- P3 164/164 PASS: KAO19,app77,panel23,panel-v2 27,quran9; reminder/driver/zikr/kontrast PASS.
-- KAO2-01 perf tabanı p95 5,087625 ms; taban ve üretim mantığı değişmedi; ara yayın pini güncellendi.
-- Runtime1899 satır, CSS93 satır, KAO handler35; yayın pini20260928b (konum hatası düzeltmesi için ön-kart release).
-- Kanıt: evidence/KAO2-02/KANIT.md + baseline-green.log/strict-red.log/gate-receipts.json.
+- KAO2-03 strict CSS: 2 ağırlık; uppercase 0; harf aralığı 0; dekoratif pseudo 0; serif 0; 06 §4'teki 13/13 seçici yok.
+- Boş/tohumlu 24 görünümde primary eylem ≤1. Switch semantiği KAO2-09'a kadar görünür TODO.
+- Kontrast 328 çiftte 0 eşik ihlali; `app/kao.css` gzip 6,411 B (6.26 KiB); perf p95 5.073 ms, içerik 158.372 KiB, runtime 48.923 KiB.
+- P3 turu 164/164 PASS: KAO19, app77, panel23, panel-v2 27, quran9; reminder 21 fixture/73 assertion, driver PASS, zikr95/95, contrast ve sync PASS.
+- KAO2-03 kaynak/test kanıtı `evidence/KAO2-03/KANIT.md`; strict red/green çıktıları aynı klasörde.
+- Önceki konum kapısı düzeltmesi ayrı olarak canlı: commit `c7d5190`, Pages run `36415570405` success, 12 canlı varlık byte/hash eş. Kanıt `docs/evidence/LOCATION-GATE-20260928.json`; kullanıcı cihazı doğrulanmadı.
+- Yayın pini `20260928b`; KAO2-03 yayına alınmadı. STATE `releaseApproval` yalnız KAO2-02'ye kadar onaylı.
 
 ## Açık riskler
-Baseline PASS tasarımın hedefe uyduğu anlamına gelmez. KAO2-03 strict geçişinde kartın HTML(f) todo istisnası ayrıca değerlendirilmeli; bu oturumda atlama eklenmedi. Kaynak testleri gerçek cihaz/görsel kabul değildir. Ausubel birincil teyit uyarısı korunur.
+- Eski `kao-plan-check` tam taraması 19 kapsam sorunu bildiriyor; kaynakları yayımlanmış `chore(kao)` teslim kayıtları `c7d5190` ve `a488e5c`. `--self-test` 19/19 PASS. Bu araç §1 P3 listesinde değil; düzeltme önceki commit/araç kapsamını gerektirir ve bu kartta yapılmadı.
+- 390 px hub kartı yüksekliği ve gerçek cihaz/görsel kabulü ölçülmedi; bu kartın statik CSS/kontrast kabulünü ikame etmez.
+- G1–G4, müfredat/metin onayı, K-3 ses/lisans ve L2 uzman işleri kendi kapılarında; cihaz kabulü kullanıcıda.
 
 ## Bekleyen kullanıcı işleri
-Bu kart için karar/engel yok. G2/G3 müfredat/metin onayı, K-3 okuyucu/lisans ve L2 uzman işleri kendi kartlarında; cihaz kabulü kullanıcıda.
-
-## Ara yayın onayı
-2026-09-28: kullanıcı KAO2-00…02 yayınına onay verdi; cache pini ve runtime-only paket istisnası uygulandı. KAO2-03 başlamadı; bu onay sonraki kartları kapsamaz. Yayın öncesi P3 164/164 PASS; release-gates.json ve YAYIN.md kaydedildi. Yayın commit 5aff0012, Actions36412204478 success; 12 canlı dosya byte eşliği PASS, 2 plan URL404. Ayrıntılar evidence/KAO2-02/release-live.json. Cihaz kabulü doğrulanmadı. Konum kapısı düzeltmesi canlıda: commit c7d51906, Pages36415570405 PASS, 12 dosya byte/hash eş; kanıt docs/evidence/LOCATION-GATE-20260928.json. KAO2-03 bu release doğrulamasından sonra sıradaki kart olarak başlayabilir; cihaz kabulü doğrulanmadı.
+KAO2-04 için yeni karar gerekmiyor. KAO2-03'ü canlıya alma izni yok; önceki `approved_through_KAO2-02` kapsamı korunuyor. Switch semantiği KAO2-09'da ele alınacak.

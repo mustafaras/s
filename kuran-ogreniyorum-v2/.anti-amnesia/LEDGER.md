@@ -210,3 +210,13 @@ Kurallar:
 - release-boundary: KAO2-05 ve sonrası için yayın yetkisi verilmedi; sonraki kart yerel kalır.
 - evidence-levels: kaynak/test KAO2-04 KANIT.md'de PASS · yayın makbuzu bekleniyor · cihaz doğrulanmadı
 - next: KAO2-05
+
+## seq 22 · 2026-09-28 · NOTE · —
+- status: verified
+- summary: KAO2-03…04, kaynak commit `5037b07b0279596f4f703bb50f8d4f33c1c715b5` üzerinden onaylı kapsamda main'e fast-forward edilip Pages'te yayımlandı.
+- actions: run `36423925592` success; `validate` ve `deploy` işleri PASS; runtime-only paket ve asset guard PASS.
+- live: 14 yayımlanmış runtime varlığının HTTP baytları yerel SHA-256 ile eşleşti; KAO2 state ve kanıt yolları beklenen 404.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-04/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-04/release-live.json
+- evidence-levels: kaynak/test PASS · yayın/hash PASS · cihaz doğrulanmadı
+- release-boundary: kullanıcı onayı KAO2-03…04 ile sınırlı; KAO2-05 ve sonrası yayımlanmayacak.
+- next: KAO2-05

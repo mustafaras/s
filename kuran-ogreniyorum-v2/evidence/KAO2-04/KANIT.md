@@ -42,7 +42,7 @@ Tarih: 2026-09-28 · Dal: kao2-yeniden-tasarim · Önceki commit: 30662403
 - `tests/app/test_v3_welcome.js`: yüzey 756→758; gerekçe aynı iki shim ve seq19 kullanıcı onayı.
 
 ## Kanıt düzeyleri
-- Kaynak/test: PASS · yayın: yok · cihaz: doğrulanmadı (kullanıcıda).
+- Kaynak/test: PASS · yayın: doğrulandı (`release-live.json`) · cihaz: doğrulanmadı (kullanıcıda).
 
 ## Sürprizler / backlog
 - P3'ü paralel çalıştırırken perf p95 bir kez 6.621 ms ölçülüp taban +%25 eşiğini aştı; yük kalkınca tekil perf 3.839 ms ve tam KAO ailesi PASS verdi.

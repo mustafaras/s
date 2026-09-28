@@ -2,29 +2,28 @@
 
 <!-- kao2-sync
 nextCard: KAO2-05
-lastSeq: 21
+lastSeq: 22
 status: active
 -->
 
-Son güncelleme: 2026-09-28 · LEDGER seq21
+Son güncelleme: 2026-09-28 · LEDGER seq22
 
 ## Şu an neredeyiz
-KAO2-00…04 tamamlandı (5/28). KAO2-04 tüm P3 kapılarıyla yerelde kapandı. Kullanıcı KAO2-03…04'ü canlıya alma isteğini açıkça verdi; yayın yetkisi seq21'de kaydedildi ve Pages/byte doğrulaması bekleniyor.
+KAO2-00…04 tamamlandı (5/28). KAO2-04 P3 kapıları PASS ile yerelde kapandı. Kullanıcının KAO2-03…04 yayın onayı kullanıldı: main'e fast-forward, Pages Actions ve canlı hash doğrulaması başarılı.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-04 Pages yayını ve canlı hash eşliği doğrulanınca KAO2-05 bileşen kütüphanesini uygula; bu kartı ayrıca yayımlama.
+Yalnız KAO2-05 bileşen kütüphanesini uygula; bu kartın yayını ayrıca onaylanmadı.
 
 ## Canlı gerçekler
-- Dal `kao2-yeniden-tasarim`; `HEAD=e53486f5`, `origin/main=a488e5cc`, `origin/kao2-yeniden-tasarim=40ffe74e`; yerel dal main'den dört fast-forward commit ileride.
-- Release scope: KAO2-03 ve KAO2-04. Açık kullanıcı onayı branch push + main fast-forward + Pages deployment'ı ve canlı byte/hash doğrulamasını kapsıyor; KAO2-05 ve sonrası hariç.
-- Kaynak/test: P3 PASS; KAO2-04 ölçümleri ve test makbuzu `evidence/KAO2-04/KANIT.md` içinde.
-- Önceki yayın yalnız KAO2-00…02, commit `5aff0012`; bu yeni yayının yerine geçmez.
+- Dal `kao2-yeniden-tasarim`; yayımlanan kaynak commit `5037b07b0279596f4f703bb50f8d4f33c1c715b5`, main ve özellik dalına fast-forward edildi.
+- Release scope KAO2-03…04; Actions run `36423925592` success. `evidence/KAO2-04/release-live.json` 14 runtime varlığı için 200 + birebir SHA-256, plan/kanıt yolları için beklenen 404 kaydeder.
+- Kaynak/test: KAO2-04 `KANIT.md` içindeki P3 PASS. Yayın: Pages ve byte eşliği doğrulandı. Cihaz kabulü doğrulanmadı.
 - `pages.yml` runtime-only paket kurar; `kuran-ogreniyorum-v2/`, testler ve kanıtlar Pages paketinden hariçtir.
+- Sonraki karta yayın yetkisi yok; bu makbuz dosyaları yayımlanan runtime'ı değiştirmez.
 
 ## Açık riskler
-- Canlı dağıtım henüz oluşmadı; Actions sonucu ve yayımlanan dosyaların yerel SHA-256 eşliği doğrulanmalı. Gerçek cihaz kabulü bundan ayrı kalır.
-- `releaseApproval` seq21 onayıyla KAO2-04'e kadar genişletildi; sonraki kart yerel-only.
 - G1–G4, müfredat/metin, ses/lisans, uzman ve cihaz kararları kendi kapılarına kadar açık kalır.
+- GitHub Actions yalnız doğrulama/yayın ortamı kanıtıdır; gerçek cihazda davranış kabul edilmedi.
 
 ## Bekleyen kullanıcı işleri
-- Release doğrulanınca sıradaki tek kart KAO2-05'i yürüt; kart sonunda dur ve yeni release izni varsayma.
+- KAO2-05'i tamamla ve kart sonunda dur; yeni yayın izni varsayma.

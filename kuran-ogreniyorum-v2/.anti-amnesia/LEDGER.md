@@ -220,3 +220,16 @@ Kurallar:
 - evidence-levels: kaynak/test PASS · yayın/hash PASS · cihaz doğrulanmadı
 - release-boundary: kullanıcı onayı KAO2-03…04 ile sınırlı; KAO2-05 ve sonrası yayımlanmayacak.
 - next: KAO2-05
+
+## seq 23 · 2026-09-28 · CARD · KAO2-05
+- status: done
+- title: Bileşen kütüphanesi
+- prev-commit: 3d0b2a0
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-05/KANIT.md
+- gates: kao PASS · app PASS · panel PASS · panel-v2 PASS · quran PASS · reminders PASS · driver PASS · zikr PASS · contrast PASS · sync PASS
+- metrics: içerik 158.372 KiB/256 · runtime 53.770 KiB/80 · CSS 7.329 KiB/14 · p95 4.896 ms/40 · kontrast 374/0 ihlal · 21 KAO fixture PASS
+- changed-tests: yeni test_kao2_components.js; mevcut testler değişmedi
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: ilk P3 koşusundaki nowrap çatışması CSS kapsamı içinde giderildi; son koşu tamamen PASS · switch entegrasyonu için mevcut KAO2-09 TODO korunuyor
+- next: KAO2-06

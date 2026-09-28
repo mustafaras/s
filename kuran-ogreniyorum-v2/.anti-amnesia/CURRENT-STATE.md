@@ -1,29 +1,29 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-05
-lastSeq: 22
+nextCard: KAO2-06
+lastSeq: 23
 status: active
 -->
 
-Son güncelleme: 2026-09-28 · LEDGER seq22
+Son güncelleme: 2026-09-28 · LEDGER seq23
 
 ## Şu an neredeyiz
-KAO2-00…04 tamamlandı (5/28). KAO2-04 P3 kapıları PASS ile yerelde kapandı. Kullanıcının KAO2-03…04 yayın onayı kullanıldı: main'e fast-forward, Pages Actions ve canlı hash doğrulaması başarılı.
+KAO2-00…05 tamamlandı (6/28). KAO2-05 bileşen kütüphanesi P3 kapılarıyla yerelde tamamlandı. KAO2-03…04 için daha önce onaylanan Pages yayını/hash kanıtı korunuyor; KAO2-05 canlıya alınmadı.
 
 ## Sıradaki kartın tek cümlesi
-Yalnız KAO2-05 bileşen kütüphanesini uygula; bu kartın yayını ayrıca onaylanmadı.
+Yalnız KAO2-06 geri bildirim paneli ve Devam akışını uygula; yeni yayın izni varsayma.
 
 ## Canlı gerçekler
-- Dal `kao2-yeniden-tasarim`; yayımlanan kaynak commit `5037b07b0279596f4f703bb50f8d4f33c1c715b5`, main ve özellik dalına fast-forward edildi.
-- Release scope KAO2-03…04; Actions run `36423925592` success. `evidence/KAO2-04/release-live.json` 14 runtime varlığı için 200 + birebir SHA-256, plan/kanıt yolları için beklenen 404 kaydeder.
-- Kaynak/test: KAO2-04 `KANIT.md` içindeki P3 PASS. Yayın: Pages ve byte eşliği doğrulandı. Cihaz kabulü doğrulanmadı.
-- `pages.yml` runtime-only paket kurar; `kuran-ogreniyorum-v2/`, testler ve kanıtlar Pages paketinden hariçtir.
-- Sonraki karta yayın yetkisi yok; bu makbuz dosyaları yayımlanan runtime'ı değiştirmez.
+- Dal `kao2-yeniden-tasarim`; bu kartın önceki commit'i `3d0b2a0`.
+- Kaynak/test: 21 KAO fixture'ı, uygulama/panel/panel-v2/Kur'an aileleri, reminder smoke, iki headless sürücü, tasarım sözleşmesi, kontrast ve senkron kapıları PASS.
+- Ölçümler KANIT.md'de: içerik gzip 158.372 KiB, quranLearn* runtime 53.770 KiB, CSS 7.329 KiB, VM p95 4.896 ms; kontrast 374 çiftte 0 eşik ihlali.
+- Son onaylı yayın yalnız KAO2-03…04'tür; KAO2-05 ve sonrası için yayın yetkisi yoktur. Gerçek cihaz kabulü doğrulanmadı.
+- `pages.yml` runtime-only paket kurar; KAO2 durum/kanıt belgeleri Pages paketine girmez.
 
 ## Açık riskler
 - G1–G4, müfredat/metin, ses/lisans, uzman ve cihaz kararları kendi kapılarına kadar açık kalır.
-- GitHub Actions yalnız doğrulama/yayın ortamı kanıtıdır; gerçek cihazda davranış kabul edilmedi.
+- KAO2-05 için görsel/tarayıcı veya gerçek cihaz kabulü yapılmadı; KAO2-06 sonraki iş kalemidir.
 
 ## Bekleyen kullanıcı işleri
-- KAO2-05'i tamamla ve kart sonunda dur; yeni yayın izni varsayma.
+- KAO2-06'yı tek başına yürüt ve kart sonunda dur; yayın için ayrıca onay bekle.

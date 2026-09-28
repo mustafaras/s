@@ -5,8 +5,8 @@
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-04",
-  "nextCard": "KAO2-05",
-  "ledgerLastSeq": 22,
+  "nextCard": "KAO2-06",
+  "ledgerLastSeq": 23,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -59,8 +59,8 @@
     },
     "KAO2-05": {
       "wave": "W1",
-      "status": "todo",
-      "evidence": null
+      "status": "done",
+      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-05/KANIT.md"
     },
     "KAO2-06": {
       "wave": "W1",

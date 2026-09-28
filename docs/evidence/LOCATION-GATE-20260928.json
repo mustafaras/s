@@ -1,0 +1,113 @@
+{
+  "verifiedAt": "2026-09-28T11:27:56.355096+00:00",
+  "commit": "c7d519060f7ba85c1c0023a43a419552e9527459",
+  "assets": [
+    {
+      "path": "index.html",
+      "url": "https://mustafaras.github.io/s/index.html?verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 127856,
+      "sha256": "b7df3d8da31437979eeebd364127f3eea2fedfffa3b130bf48edcd705c1ae5fe",
+      "matchesLocal": true
+    },
+    {
+      "path": "sw.js",
+      "url": "https://mustafaras.github.io/s/sw.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 17108,
+      "sha256": "9f9a30031f9f7cbb8d8ecb4a89c5110a9288c3eda776978bff3ccf1d57aa270d",
+      "matchesLocal": true
+    },
+    {
+      "path": "app.js",
+      "url": "https://mustafaras.github.io/s/app.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 605237,
+      "sha256": "b98438bfa3ab7e54586a2e5cc362711ac882f1be2b2f00ac580876c99d4bfe6a",
+      "matchesLocal": true
+    },
+    {
+      "path": "sync.js",
+      "url": "https://mustafaras.github.io/s/sync.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 91899,
+      "sha256": "c4e5d81144d93d361f5f3e4844ae1e63ae16ea9964ce916f53dc70159a50bd4b",
+      "matchesLocal": true
+    },
+    {
+      "path": "app/kao.css",
+      "url": "https://mustafaras.github.io/s/app/kao.css?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 40209,
+      "sha256": "35aeee5cefd21353c1549d88529c4ae8ecbd05a0715bc4270c3b045011c588b1",
+      "matchesLocal": true
+    },
+    {
+      "path": "app/core/quranLearn.js",
+      "url": "https://mustafaras.github.io/s/app/core/quranLearn.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 184254,
+      "sha256": "633bf0d36ae0f438ac35539a1dd4aa451296fe85098b6e6a465a2a11d6cae64b",
+      "matchesLocal": true
+    },
+    {
+      "path": "app/core/appSurface.js",
+      "url": "https://mustafaras.github.io/s/app/core/appSurface.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 69286,
+      "sha256": "142d00a1ea4963238fc47961298a008f1941972ebb8a4fc1a559c457d98d9818",
+      "matchesLocal": true
+    },
+    {
+      "path": "app/core/messaging.js",
+      "url": "https://mustafaras.github.io/s/app/core/messaging.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 31043,
+      "sha256": "4f25841fcbe8a383229135ff6e74c160375cbe9e1d5893c0f436863800880e9b",
+      "matchesLocal": true
+    },
+    {
+      "path": "app/content/quranLexiconV1.js",
+      "url": "https://mustafaras.github.io/s/app/content/quranLexiconV1.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 324323,
+      "sha256": "c1e5296a2646c6f90324b5b55957ec7ed3fba5e83b7c5dd3c5b154671706e8f6",
+      "matchesLocal": true
+    },
+    {
+      "path": "app/content/quranGrammarV1.js",
+      "url": "https://mustafaras.github.io/s/app/content/quranGrammarV1.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 51353,
+      "sha256": "e8a3c56f3b242c6302506a9ed4eac6023909c5425829aab6177fc254a130f5fc",
+      "matchesLocal": true
+    },
+    {
+      "path": "app/content/quranShortSurahsV1.js",
+      "url": "https://mustafaras.github.io/s/app/content/quranShortSurahsV1.js?v=20260928b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 87463,
+      "sha256": "18d0802e34c819c378b0ff27dae62b1c3c78dd572342d6e11b29487bb262271a",
+      "matchesLocal": true
+    },
+    {
+      "path": "app/content/quranPhonicsV1.js",
+      "url": "https://mustafaras.github.io/s/app/content/quranPhonicsV1.js?v=20260924b&verify=c7d519060f7b",
+      "status": 200,
+      "bytes": 9552,
+      "sha256": "3dfead88d140844266ecc007dc860c5eb7e720985556cd502669a478d8b3c7b9",
+      "matchesLocal": true
+    },
+    {
+      "path": "kuran-ogreniyorum-v2/KAO2-STATE.json",
+      "status": 404,
+      "expected": 404
+    },
+    {
+      "path": "kuran-ogreniyorum-v2/evidence/KAO2-01/before-empty-home.html",
+      "status": 404,
+      "expected": 404
+    }
+  ],
+  "deviceAcceptance": "not_verified"
+}

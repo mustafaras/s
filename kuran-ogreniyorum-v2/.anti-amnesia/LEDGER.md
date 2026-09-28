@@ -144,6 +144,6 @@ Kurallar:
 
 ## seq 14 · 2026-09-28 · NOTE · —
 - status: in_progress
-- summary: Kullanıcı konum kapısı hatasının canlıya alınmasını ve ardından sıradaki KAO2 kartına geçilmesini istedi. Fe9de9c düzeltmesinin app.js/appSurface.js sürüm önbelleğini aşması için release pini 20260928a→20260928b olarak index/SW/fixture'larda eşlendi; bir sonraki KAO kartı bu yeni taban pinini korur.
-- evidence-levels: kaynak/test önceki turda 164/164 PASS + konum regresyonu 39/39 PASS; yayın kapıları ve canlı byte doğrulaması bu release sırasında · cihaz doğrulanmadı
+- summary: Kullanıcı konum kapısı hatasının canlıya alınmasını ve ardından sıradaki KAO2 kartına geçilmesini istedi. Fe9de9c düzeltmesinin app.js/appSurface.js sürüm önbelleğini aşması için release pini 20260928a→20260928b olarak index/SW/fixture'larda eşlendi; Pages36415570405 success ve 12 canlı varlık byte/hash eş. Bir sonraki KAO kartı bu yeni taban pinini korur.
+- evidence-levels: kaynak/test önceki turda 164/164 PASS + konum regresyonu 39/39 PASS; yayın 12 asset byte eşliği ✓ · cihaz doğrulanmadı
 - next: KAO2-03

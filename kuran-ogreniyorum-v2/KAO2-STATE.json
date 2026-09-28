@@ -187,5 +187,14 @@
     "status": "verified",
     "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-02/release-live.json",
     "deviceAcceptance": "not_verified"
+  },
+  "infrastructureRelease": {
+    "scope": "Konum kapısı bağımlılık düzeltmesi",
+    "commit": "c7d519060f7ba85c1c0023a43a419552e9527459",
+    "pin": "20260928b",
+    "actionsRun": 36415570405,
+    "status": "verified",
+    "evidence": "docs/evidence/LOCATION-GATE-20260928.json",
+    "deviceAcceptance": "not_verified"
   }
 }

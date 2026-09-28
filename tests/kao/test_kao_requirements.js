@@ -9,7 +9,7 @@ const repoRoot = require('../repo-root');
 function loadApi(extraDeps) {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearn.js']) {
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) {
     vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
   }
   const api = sandbox.window.SeymaQuranLearn;
@@ -360,7 +360,7 @@ function sandboxLemma(api, lemmaId) {
 {
   const box = { window: {} };
   vm.createContext(box);
-  for (const relative of ['app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  for (const relative of ['app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
   const mapApi = box.window.SeymaQuranLearn;
   const cell = (record, understood) => mapApi.kaoSurahMap({ quranLearn: { surahs: { '108': record }, ayahs: { understood: understood || [] } } })[107];
   assert.equal(mapApi.kaoSurahMap({ quranLearn: {} }).length, 114);
@@ -793,7 +793,7 @@ function sandboxLemma(api, lemmaId) {
     SeymaHelpers: { confetti() { calls.push('confetti'); } }
   } };
   vm.createContext(sandbox);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
   const api = sandbox.window.SeymaQuranLearn;
   const data = { quranLearn: null, settings: {} };
   const ui = {};

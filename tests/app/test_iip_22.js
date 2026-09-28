@@ -113,7 +113,7 @@ function test(name, fn) {
   });
   await test('KAO-16 runtime ve service worker tek yayın sürümünü kullanır', () => {
     const release = '20260928b';
-    for (const asset of ['app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js', 'app.js']) {
+    for (const asset of ['app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js', 'app.js']) {
       assert.ok(indexSource.includes(`${asset}?v=${release}`), asset + ' index pini');
       assert.ok(Array.from(base.sandbox.swManifestDescriptor().entries).includes(`./${asset}?v=${release}`), asset + ' offline pini');
     }

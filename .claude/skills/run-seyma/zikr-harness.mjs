@@ -164,6 +164,8 @@ const FILES = [
   'app/core/helpers.js',
   'app/core/prayer.js',
   'app/core/zikir.js',
+  'app/core/quranLearnFlow.js',
+  'app/core/quranLearnViews.js',
   'app/core/quran.js',
   'app/core/quranLearn.js',
   'app/core/saygi.js',

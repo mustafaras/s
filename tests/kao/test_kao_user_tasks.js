@@ -20,7 +20,7 @@ function boot(options) {
   if (opts.clock) { const RealDate = Date; SandboxDate = class extends RealDate { constructor(...args) { super(...(args.length ? args : [opts.clock.now])); } static now() { return opts.clock.now; } }; }
   const box = { window: {}, Date: SandboxDate, Math, Number, String, Object, Array, JSON };
   vm.createContext(box);
-  for (const relative of CONTENT.concat(['app/content/quranRevelationOrderV1.js', 'app/core/quranLearn.js'])) vm.runInContext(read(relative), box, { filename: relative });
+  for (const relative of CONTENT.concat(['app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js'])) vm.runInContext(read(relative), box, { filename: relative });
   const api = box.window.SeymaQuranLearn;
   const state = { data: { settings: {}, quranLearn: null }, ui: { kaoOpen: false, kaoView: 'home' }, renders: 0, audios: 0 };
   const taskNode = { innerHTML: '', attrs: {}, setAttribute(name, value) { this.attrs[name] = value; }, removeAttribute(name) { delete this.attrs[name]; }, querySelectorAll() { return []; } };

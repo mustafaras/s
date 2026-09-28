@@ -6,7 +6,7 @@
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-02",
   "nextCard": "KAO2-04",
-  "ledgerLastSeq": 16,
+  "ledgerLastSeq": 18,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -173,7 +173,9 @@
       "evidence": null
     }
   },
-  "backlog": [],
+  "backlog": [
+    "KAO2-04 P3 kapsam kararı: tests/app/test_app_surface_daily_boundary.js ve tests/app/test_v3_welcome.js sabit App yüzey sayılarını iki yeni KAO gezinme shim'i için güncellemek üzere kullanıcı onayı bekliyor."
+  ],
   "releaseApprovalRecord": {
     "by": "user",
     "at": "2026-09-28",

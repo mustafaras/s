@@ -32,7 +32,7 @@ assert.match(kaoCss, /#root\[data-theme="dark"\] \.kao-dialog,#root\[data-theme=
 const metrics = cssMetrics(kaoCss);
 const instant = '2026-09-28T09:00:00.000Z';
 class FixedDate extends Date { constructor(...args) { super(...(args.length ? args : [instant])); } static now() { return Date.parse(instant); } }
-const files = ['quranLexiconV1','quranGrammarV1','quranShortSurahsV1','quranPhonicsV1','quranRevelationOrderV1','quranStrikingVersesV1'].map(n => 'app/content/'+n+'.js').concat('app/core/quranLearn.js');
+const files = ['quranLexiconV1','quranGrammarV1','quranShortSurahsV1','quranPhonicsV1','quranRevelationOrderV1','quranStrikingVersesV1'].map(n => 'app/content/'+n+'.js').concat(['app/core/quranLearnFlow.js','app/core/quranLearnViews.js','app/core/quranLearn.js']);
 const primary = {}, switches = {};
 const views = ['home','units','word','reader','settings','gate','phonics','ayah','map','prayer','stats','session'];
 const tags = html => html.match(/<[^>]+>/g) || [];

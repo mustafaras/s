@@ -169,3 +169,18 @@ Kurallar:
 - resolution: Kullanıcıdan dört KAO fixture'ının yalnız modül yükleme satırları için kapsam onayı ve `.claude/skills/run-seyma/*.mjs` düzenlemesi için Edit aracıyla devam edilmesi gerekiyor.
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-04/KANIT.md
 - next: KAO2-04
+
+## seq 17 · 2026-09-28 · FIX · KAO2-04
+- status: in_progress
+- summary: Kullanıcı KAO2-04'ü yeniden açtı; yeni görünüm modüllerini yüklemek için dört KAO test fixture'ı kapsamını ve iki run-seyma FILES listesindeki düzenleme için apply_patch kullanımını açıkça onayladı.
+- resolution: Seq 16'daki P6 engeli bu sınırlı kapsam onayıyla çözüldü. Üretim modülü görünüm bağımlılığını gerçek render yolunda fail-closed tutacak; saf motor testlerinin gereksiz modül bağımlılığı kazanmasına izin verilmeyecek.
+- next: KAO2-04
+
+## seq 18 · 2026-09-28 · BLOCKED · KAO2-04
+- status: blocked
+- summary: KAO2-04 akış/görünüm iskeleti ile NavBar uygulandı; KAO, panel, panel-v2, Kur'an, reminders, driver, zikr ve kontrast kapıları PASS. Genel app kapısı, iki yeni KAO shim'i yüzünden mevcut yüzey sayıları değişen kapsam dışı testlerde durdu.
+- attempted: KAO suite izole tam tekrar PASS; perf 3.839 ms; app ailesi `test_app_surface_daily_boundary.js` 594/756 sabitini ve `test_v3_welcome.js` 756 sabitini korumaya çalıştı, ölçülen değer 596/758.
+- resolution: Bu iki test KAO2-04 Dokun listesinde değil. Kullanıcı onayı gelene kadar dosyaları değiştirme; onay yalnız bu iki sayısal pini eşlemek için istenir.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-04/KANIT.md
+- evidence-levels: kaynak/test kısmi PASS · yayın — · cihaz —
+- next: KAO2-04

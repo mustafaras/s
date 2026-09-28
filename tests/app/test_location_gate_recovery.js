@@ -143,5 +143,39 @@ console.log('[6] Safari callback üretmezse kullanıcı kapıda kilitlenmez');
     /ui\.locationGateRequestInFlight=false;[\s\S]{0,400}ui\.locationGateLowAccuracyTried=false;/.test(surface));
 }
 
+// Execute the real registry with synthetic state; no browser, storage or network.
+{
+  const vm = require('node:vm');
+  const window = {};
+  vm.runInNewContext(surface, {window});
+  const registry = window.SeymaAppSurface;
+  const ui = {locationGateRequestInFlight:true, locationGateRequestSeq:1};
+  const data = {settings:{locationEnabled:true}};
+  let pending, grants=0;
+  const values = {
+    ui, data, navigator:{geolocation:{getCurrentPosition(success, failure){ pending={success,failure}; }}},
+    locationGateGranted(){ grants++; ui.locationGateRequestInFlight=false; ui.locationGateState='granted'; },
+    locationGateErrorText(){return 'synthetic error';}, locationGateResetNudge(){},
+    locationGatePermanentFailure:registry.locationGatePermanentFailure,
+    locationGateFailure:registry.locationGateFailure, stopLocationWatch(){}, save(){}, render(){}
+  };
+  const deps = Object.fromEntries(Array.from(registry.FIELD_SURFACE_DEPENDENCIES, name=>[name,()=>values[name] || function(){}]));
+  registry.registerFieldSurface(deps);
+  let error;
+  try { registry.locationGateFailure(2,'position-unavailable'); pending.success({coords:{latitude:0,longitude:0}}); } catch(e){error=e;}
+  ok('real retry callback opens gate without leaked closure globals', !error && grants===1 && ui.locationGateState==='granted', error&&error.message);
+  ui.locationGateRequestInFlight=true; ui.locationGateLowAccuracyTried=false;
+  try { registry.locationGateFailure(3,'timeout'); } catch(e){error=e;}
+  ok('timeout releases pending state without revoking stored permission', !error && !ui.locationGateRequestInFlight && ui.locationGateState==='unavailable' && data.settings.locationEnabled===true);
+  ui.locationGateRequestInFlight=true; ui.locationGateLowAccuracyTried=false;
+  try { registry.locationGateFailure(2,'position-unavailable'); pending.failure({code:2}); } catch(e){error=e;}
+  ok('failed low accuracy retry terminates without looping', !error && !ui.locationGateRequestInFlight && ui.locationGateState==='unavailable');
+  ui.locationGateRequestInFlight=true; ui.locationGateRequestSeq=2; ui.locationGateLowAccuracyTried=false;
+  try { registry.locationGateFailure(2,'position-unavailable'); ui.locationGateRequestSeq=3; pending.success({}); } catch(e){error=e;}
+  ok('superseded retry cannot grant permission', !error && grants===1);
+  try { registry.locationGateFailure(1,'permission-denied'); } catch(e){error=e;}
+  ok('real denial closes gate and disables location', !error && ui.locationGateState==='denied' && data.settings.locationEnabled===false, error&&error.message);
+}
+
 console.log('\nLocation gate recovery contract: ' + passed + ' PASS, ' + failed + ' FAIL');
 if (failed) process.exitCode = 1;

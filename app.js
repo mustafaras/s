@@ -2818,6 +2818,7 @@ if(!window.SeymaAppSurface||typeof window.SeymaAppSurface.registerAppSurface!=='
 // çağırıp sonucu değer olarak kullanır. Taşınan gövdeler DOM'a çıplak global
 // yerine 'doc' takma adıyla erişir (K4).
 if(!window.SeymaAppSurface||typeof window.SeymaAppSurface.registerFieldSurface!=='function'||!window.SeymaAppSurface.registerFieldSurface({
+  ui:function(){ return ui; }, data:function(){ return data; }, navigator:function(){ return navigator; }, locationGateGranted:function(){ return locationGateGranted; },
   App:function(){ return App; },
   HDR_PHASE_TR:function(){ return HDR_PHASE_TR; },
   MEALS:function(){ return MEALS; },

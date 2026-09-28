@@ -1,0 +1,20 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=process.cwd(),out=path.join(root,'kuran-ogreniyorum-v2/evidence/KAO2-01');
+const instant='2026-09-28T09:00:00.000Z';
+class FixedDate extends Date { constructor(...args){super(...(args.length?args:[instant]));} static now(){return Date.parse(instant);} }
+const files=['quranLexiconV1','quranGrammarV1','quranShortSurahsV1','quranPhonicsV1','quranRevelationOrderV1','quranStrikingVersesV1'].map(n=>'app/content/'+n+'.js').concat('app/core/quranLearn.js');
+for(const seeded of [false,true]){
+ const box={window:{},Date:FixedDate};vm.createContext(box);
+ for(const file of files) vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),box,{filename:file});
+ const api=box.window.SeymaQuranLearn,data={settings:{targetBed:'23:00'},quranJourney:{requests:{}}},ui={kaoOpen:true,kaoView:'home'};
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ api.registerQuranLearn({data:()=>data,ui:()=>ui,save(){throw Error('unexpected save');},render(){},todayStr:()=> '2026-09-28',esc,icon:()=>'',getDay:()=>({})});
+ const q=api.ensureQuranLearn(data);
+ if(seeded){q.startedAt='2026-09-21T09:00:00.000Z';for(const lemma of box.window.QuranLexiconV1.lemmas.slice(0,12)) for(const dir of ['ar>tr','tr>ar'])q.cards[`w:${lemma.id}:${dir}`]={reps:3,state:'review',s:25,d:5,due:instant};q.daily['2026-09-28']={answered:24};}
+ ui.kaoWordId=box.window.QuranLexiconV1.lemmas[0].id;
+ for(const view of ['home','units','word','reader','settings','gate','phonics','ayah','map','prayer','stats']){
+ ui.kaoView=view;const html=api.kaoOverlayHTML(instant);assert.match(html,/role="dialog"/);assert.ok(html.length>1000);fs.writeFileSync(path.join(out,`before-${seeded?'seeded':'empty'}-${view}.html`),html+'\n');
+ }
+ if(!seeded)fs.writeFileSync(path.join(out,'before-hub.html'),api.kaoHubCardHTML()+'\n');
+}
+console.log('Dumps PASS: 22 dialogs + isolated hub; fixed clock; no browser/network/storage/timers; SVG icons stubbed');

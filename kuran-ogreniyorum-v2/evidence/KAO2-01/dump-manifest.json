@@ -1,0 +1,98 @@
+{
+  "before-app-saygi.html": {
+    "bytes": 23773,
+    "sha256": "9cd07c887f9a418d867f1a03c6ab9d209f282e8dc95d9cf882799520f7ac4c6d"
+  },
+  "before-empty-ayah.html": {
+    "bytes": 1432,
+    "sha256": "0c7047bf7cef1cdc25588c916c67f72af87d71de270efbdd2251c0ba3b27b8c3"
+  },
+  "before-empty-gate.html": {
+    "bytes": 3689,
+    "sha256": "f3d1077d1098c3175ec646cd3bc598460399420046f544355539280cc9d9aedf"
+  },
+  "before-empty-home.html": {
+    "bytes": 3249,
+    "sha256": "d3b98cadb07155c462bfc3f05bf96a2c8a486882471429482a4c40cfbbba1e03"
+  },
+  "before-empty-map.html": {
+    "bytes": 22954,
+    "sha256": "5d3a19fadac2f801c0f5585d3b7aa47068bb5e113357f61281670fc781e969e1"
+  },
+  "before-empty-phonics.html": {
+    "bytes": 4164,
+    "sha256": "0a15241502e72d6d9c00c71c7da94a6e6494c414f17a9ea7f916dd8bd8413a47"
+  },
+  "before-empty-prayer.html": {
+    "bytes": 42151,
+    "sha256": "688cc52fcdf4b4ccb76829b3e953f0d1e64e09f3e33aa044077b1cbeebd56eb4"
+  },
+  "before-empty-reader.html": {
+    "bytes": 10720,
+    "sha256": "24704b1c76927129b9f1623035a5f92ed115788fdd2d173d7b2e7429b174045d"
+  },
+  "before-empty-settings.html": {
+    "bytes": 7682,
+    "sha256": "1cdb91649ec532a08e29bcaa6c73caecedf7f307684e69ef996df1c9e92d1960"
+  },
+  "before-empty-stats.html": {
+    "bytes": 2957,
+    "sha256": "f4cbfec744625e5f8254def68f092646525a853a124c820adadc78302c7d926b"
+  },
+  "before-empty-units.html": {
+    "bytes": 6795,
+    "sha256": "adebb465990fa7477fa412716932d58837b5b3757aaf7045506ad5d346b35b00"
+  },
+  "before-empty-word.html": {
+    "bytes": 1868,
+    "sha256": "bc8f446c59a5786b9df9d3ff2c7c423569ea04969fe92331a4b210530f300624"
+  },
+  "before-hub.html": {
+    "bytes": 1017,
+    "sha256": "176974e5ad2440e47d74da60c4537c6fa6c8b6a87615a166b3c2f6c373aa645b"
+  },
+  "before-seeded-ayah.html": {
+    "bytes": 1434,
+    "sha256": "6ddbbafcda8e3f4214096a5724de718f71953b64ec86d1c460ad2cca80d14ad7"
+  },
+  "before-seeded-gate.html": {
+    "bytes": 3689,
+    "sha256": "f3d1077d1098c3175ec646cd3bc598460399420046f544355539280cc9d9aedf"
+  },
+  "before-seeded-home.html": {
+    "bytes": 3256,
+    "sha256": "7ac5a1daa10a726bfd5ddb8da1cae2230eee91922cc9c24a4e56e5ee36074d21"
+  },
+  "before-seeded-map.html": {
+    "bytes": 22954,
+    "sha256": "5d3a19fadac2f801c0f5585d3b7aa47068bb5e113357f61281670fc781e969e1"
+  },
+  "before-seeded-phonics.html": {
+    "bytes": 4164,
+    "sha256": "0a15241502e72d6d9c00c71c7da94a6e6494c414f17a9ea7f916dd8bd8413a47"
+  },
+  "before-seeded-prayer.html": {
+    "bytes": 41290,
+    "sha256": "64f7743a6c0854fa5f9b71c2e0abe0bf8eea14ede4630317f1cff1b7875ad4b8"
+  },
+  "before-seeded-reader.html": {
+    "bytes": 10581,
+    "sha256": "da1cf076c493ab49f16f627dba8bda234949a6b9fbb9dcc8e0c9e604b6b834c0"
+  },
+  "before-seeded-settings.html": {
+    "bytes": 7682,
+    "sha256": "1cdb91649ec532a08e29bcaa6c73caecedf7f307684e69ef996df1c9e92d1960"
+  },
+  "before-seeded-stats.html": {
+    "bytes": 2957,
+    "sha256": "f4cbfec744625e5f8254def68f092646525a853a124c820adadc78302c7d926b"
+  },
+  "before-seeded-units.html": {
+    "bytes": 6798,
+    "sha256": "29d18111629f1cf16c6fa9df79954db7fba36dbe44d6b01be102583ccbe0ca5b"
+  },
+  "before-seeded-word.html": {
+    "bytes": 1868,
+    "sha256": "bc8f446c59a5786b9df9d3ff2c7c423569ea04969fe92331a4b210530f300624"
+  }
+}

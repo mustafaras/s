@@ -38,6 +38,13 @@ samples.sort((a, b) => a - b);
 const p95Ms = samples[Math.ceil(samples.length * 0.95) - 1];
 assert.ok(p95Ms <= 40, `p95 ${p95Ms.toFixed(3)} ms exceeds 40 ms`);
 const baselineFile = 'kuran-ogreniyorum-v2/evidence/KAO2-01/perf-baseline.json';
+if (process.env.KAO2_WRITE_BASELINE === '1') {
+  // Açık opt-in; mevcut taban sessizce yenilenemez, ölçüm kapıları önce geçer.
+  fs.writeFileSync(path.join(root, baselineFile), JSON.stringify({
+    date: new Date().toISOString(), node: process.version, p95Ms,
+    contentGzip, runtimeGzip, cssGzip
+  }, null, 2) + '\n', { flag: 'wx' });
+}
 if (exists(baselineFile)) {
   const baseline = JSON.parse(read(baselineFile));
   assert.ok(Number.isFinite(baseline.p95Ms) && baseline.p95Ms > 0, 'geçersiz p95 tabanı');

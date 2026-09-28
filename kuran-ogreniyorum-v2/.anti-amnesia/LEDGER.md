@@ -79,3 +79,16 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: yükleme maliyeti onaylı üretici düzeltmesiyle çözüldü; Ausubel 1968 birincil teyidi yok, D-07 işaretli
 - next: KAO2-01
+
+## seq 8 · 2026-09-28 · BLOCKED · KAO2-01
+- status: blocked
+- title: Taban ve dökümler hazır; eski plan kapısı KAO2 commit önekini reddediyor
+- prev-commit: f09987f5
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-01/KANIT.md
+- attempted: perf tabanı 5,087625 ms, üzerine yazma korumalı opt-in; 24 sentetik HTML; P3 163/163 PASS. 08 §7 eski kao-plan-check exit 1: a47a68f/f09987f KAO2-00 öneki tanınmıyor.
+- metrics: 1899 runtime satırı; 9 yazı ağırlığı; 35 KAO handler; 24 HTML
+- proposed: yalnız docs/kuran-ogreniyorum/tools/kao-plan-check.mjs KAO2-00…27 önek uyumu için kapsam onayı; bilinmeyen önek reddini koru
+- evidence-levels: kaynak/test P3 PASS, eski plan gate FAIL · yayın yok · cihaz yok
+- surprises: eski programın commit önek tarayıcısı yeni programı kapsamıyor
+- next: KAO2-01

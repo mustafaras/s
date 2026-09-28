@@ -1,0 +1,1571 @@
+[
+  {
+    "command": "node --check app.js",
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": []
+  },
+  {
+    "command": "node --check sync.js",
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": []
+  },
+  {
+    "command": "node --check app/core/quranLearn.js",
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": []
+  },
+  {
+    "command": "node --check app/content/quranLexiconV1.js",
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": []
+  },
+  {
+    "command": "node --check tools/kao-lexicon-build.mjs",
+    "exit": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": []
+  },
+  {
+    "command": "node tests/kao/test_kao2_perf_budget.js",
+    "exit": 0,
+    "stdoutSha256": "e452b41a20cb62a6b8c0f4d6e7399ce614546753573ff5b35d00b9cfd6fc2290",
+    "tail": [
+      "KAO2 perf: PASS (content 158.372 KiB · runtime 49.044 KiB · css 6.886 KiB · p95 4.053 ms)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "1642e96e2443a8fdffb2c02a956d98e49d163e026999713ae8752b109110cc8c",
+    "tail": [
+      "KAO boundary: PASS (load purity, fail-closed deps, four lists, shims)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_freeze_repro.js",
+    "exit": 0,
+    "stdoutSha256": "8d8ac0c779a8a8cddfe34856919f0a9c96878be2e19fbbb7ccdc98f8a668c749",
+    "tail": [
+      "KAO freeze repro: PASS (4 modül bayt-eş)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_fsrs.js",
+    "exit": 0,
+    "stdoutSha256": "f28b4912dd07e99629abee9a2f5a209a9e51d719d6b76f7f8d6802e59fc352a6",
+    "tail": [
+      "KAO FSRS: PASS (24 published vectors, ±0.000001, monotonic, grade mapping, predictedR)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_independence.js",
+    "exit": 0,
+    "stdoutSha256": "20c0e40b7acd905c9ad5462c0931e3498fb992e8e5d3b15e776225eb9a12df67",
+    "tail": [
+      "KAO independence: PASS (saygiHTML bayt-eşit + tek bileşim, IIP/state/network coupling ve load-time DOM/timer etkisi yok)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_lexicon_contract.js",
+    "exit": 0,
+    "stdoutSha256": "01daa8be3c9bd78d216fbb69e8c7f3e6da020854ac15e59c80f689f380d30270",
+    "tail": [
+      "KAO lexicon contract: PASS (524 lemma, 324323 bayt)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_lexicon_coverage.js",
+    "exit": 0,
+    "stdoutSha256": "ab413592f6d3a53bce924ea3aef41c9e0b04c6acc3a34463ef62538f02bd06b1",
+    "tail": [
+      "KAO lexicon coverage: PASS (59948/77430 = 77.42%)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_migration.js",
+    "exit": 0,
+    "stdoutSha256": "ea1209b3b5e9f7883e6ec0fddde5a3da99bef0dcc9b87672fb3c867fe963de2b",
+    "tail": [
+      "KAO migration: PASS (empty/old/broken/idempotent/orphan/114 surah)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_panel_projection.js",
+    "exit": 0,
+    "stdoutSha256": "78bad0b0307205e3255d97e2e1992df86cca82d5e1190c30110bbb4a58cd7b8e",
+    "tail": [
+      "KAO panel projection: PASS (manifest satırı, 9 izinli anahtar, snapshot/kapsamda kelime düzeyi 0, bayrak R-C1, kurcalama, kart çökme yok)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_phonics_contract.js",
+    "exit": 0,
+    "stdoutSha256": "1e763c5b51722c095e9e9f58fde9d55ac10e1195e7e1ade3f16a13ab094049d6",
+    "tail": [
+      "KAO content contract: PASS (E8 stüdyo: 13 SVG gömülü, 6 görev türü, FSRS + dikkat, sessiz mod; grammar=51353, surahs=87463, phonics=9552)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_privacy.js",
+    "exit": 0,
+    "stdoutSha256": "67e9103c6ed70eb8dd2c1a350dfc0e733caf63581f32ed629fb26fbd407a174b",
+    "tail": [
+      "KAO privacy: PASS (CSV yalnız yerel Blob + URL iptali, ağ/depo yok, assets/kao-only ses, preload none, fail-soft sessiz mod)",
+      "KAO privacy · gölgeleme: PASS (varsayılan kapalı, 0 mikrofon çağrısı, model 2×, ≤10 sn, data/save yok, revoke)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_pronunciation_contract.js",
+    "exit": 0,
+    "stdoutSha256": "15a8f5c4812a2ab40d427bf57f8a992e649aa3611d12a529e52dc1ad08914633",
+    "tail": [
+      "KAO pronunciation contract: PASS (content + task objects + visible paired rendering)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_queue.js",
+    "exit": 0,
+    "stdoutSha256": "46deb2a9846bfb1e0c74f370221a74c41d47fc5efca97fb234ae5d36ebc381d1",
+    "tail": [
+      "KAO queue: PASS (20 deterministic tasks + 4 grammar types, budgets/KF-9 interleave x1000/semantic spacing)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_render.js",
+    "exit": 0,
+    "stdoutSha256": "25e0f619f6321f0d54cd938a00a91c5f48a3853c2f96afad7c5dabac0ae88eb9",
+    "tail": [
+      "KAO render: PASS (KAO-FIX-13 Arapça yığın, KAO-FIX-12 E7 kaynaklar, KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_requirements.js",
+    "exit": 0,
+    "stdoutSha256": "731315b07807fc916d567e3f4060c745d3ede84ce443f47efbedc6423ea9aa57",
+    "tail": [
+      "KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli 0.964 ms <50 ms)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_state_budget.js",
+    "exit": 0,
+    "stdoutSha256": "eb55a5c08612ec2dff43d35e0d448456e22183deb5dc72c99f74722da58947e7",
+    "tail": [
+      "KAO state budget: PASS (KF-10 sınırsız; 400 gün korundu, idempotent, 40.1 KB bilgi amaçlı)"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_surah_import.js",
+    "exit": 0,
+    "stdoutSha256": "1eb2113f0dbc65f812b8cf3e24a193188afd9c234e3f46c86fa1435fca1b3853",
+    "tail": [
+      "KAO surah import: PASS"
+    ]
+  },
+  {
+    "command": "node tests/kao/test_kao_user_tasks.js",
+    "exit": 0,
+    "stdoutSha256": "edc39427d66e9d77116f623e327e6dddeb6092209e1baf722995e47b98f593cc",
+    "tail": [
+      "KAO user tasks: PASS (R-C9 a:2 adım, b:1 dokunuş, c: ses 0; geçiş p50 0.14 ms / max 0.806 ms; içerik gzip 162173 B; kalibrasyon ECE 0.0131; gece oturumu 8 kart)"
+    ]
+  },
+  {
+    "command": "node tests/app/test_aeon_mail_outbox.js",
+    "exit": 0,
+    "stdoutSha256": "c10c34d8ef4326243117a10fc6520d71bf20bab3d48ab42f71f0be4f66404782",
+    "tail": [
+      "",
+      "33 geçti, 0 başarısız.",
+      "SONUÇ: PASS"
+    ]
+  },
+  {
+    "command": "node tests/app/test_aeon_message_expand.js",
+    "exit": 0,
+    "stdoutSha256": "edde8387cc6a0857eb38dba7191ef38d358fbe349b90fbd2fe66a7731fd82b1d",
+    "tail": [
+      "PASS  18. hızlı ekleme yolu tam render ile aynı balon anahtarını taşıyor",
+      "",
+      "24 geçti, 0 kaldı."
+    ]
+  },
+  {
+    "command": "node tests/app/test_app_surface_boot_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "c320d240c91a2e08628b3e0e9cfb2b5714c4a662d7ac2f2fbf40acccc528b6f9",
+    "tail": [
+      "PASS  existing harness FILES keep appSurface immediately before app.js",
+      "",
+      "MON-54 boot boundary: 22/22 passed"
+    ]
+  },
+  {
+    "command": "node tests/app/test_app_surface_daily_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "498d166767fc11f9896f65cf271d4c99714523695a3e70154ffed28a9b1cc740",
+    "tail": [
+      "PASS  registry file is wired into the production harnesses",
+      "",
+      "MON-50 daily App surface boundary: 19/19 passed"
+    ]
+  },
+  {
+    "command": "node tests/app/test_app_surface_domain_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "7f5877194d0635ebd3039ba7c28fdd6bc163f23263c1acce24db33e89e4bb531",
+    "tail": [
+      "PASS  production loads appSurface before app.js with fresh cache versions",
+      "",
+      "MON-51 domain App surface boundary: 58/58 passed"
+    ]
+  },
+  {
+    "command": "node tests/app/test_app_surface_lifecycle_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "25aebb06c13271664dd969ea262bee68dfb927f119b6d0013a8b305dc3573e34",
+    "tail": [
+      "PASS  production cache busts the changed registry and app shell together",
+      "",
+      "MON-53 lifecycle boundary: 16/16 passed"
+    ]
+  },
+  {
+    "command": "node tests/app/test_app_surface_overlay_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "382f651491848765abb7069391357f9cb80b1456b92e1c0b2e250053b916e295",
+    "tail": [
+      "PASS  production loads appSurface before app.js with fresh cache versions",
+      "",
+      "MON-52 overlay App surface boundary: 49/49 passed"
+    ]
+  },
+  {
+    "command": "node tests/app/test_crisis_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "ae385630f1bb4e6b1646bc3227b1b5f9294e76dbfcfdb245a152330e57a40ad9",
+    "tail": [
+      "PASS  SeymaCrisis app boot kaydı ve load-order referansı vardır",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node tests/app/test_daily_photo_history.js",
+    "exit": 0,
+    "stdoutSha256": "d1829b535f2ed60a25ff5011a3eafbcc2daf4744b2d8d79fb2d11b9d90b38d18",
+    "tail": [
+      "PASS  fotoğraf fetchi yalnız sentetik save/render sınırını kullanır",
+      "",
+      "12/12 geçti."
+    ]
+  },
+  {
+    "command": "node tests/app/test_date_utils_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "f38439acdb5416fcff91ac7a07243ca9f81cd5554de188ec3d48b740f7a99158",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 59 / 59"
+    ]
+  },
+  {
+    "command": "node tests/app/test_deploy_surface_contract.js",
+    "exit": 0,
+    "stdoutSha256": "af175a258f06c0cda5e71554d7cee383bba0b8f8306213bb0bffbf548d4fbc83",
+    "tail": [
+      "  ✓ staged ağaçta .md kalmadı",
+      "",
+      "✓ 70 geçti, 0 başarısız"
+    ]
+  },
+  {
+    "command": "node tests/app/test_faz10_sync.js",
+    "exit": 0,
+    "stdoutSha256": "5c308b6c6b41303456d9f0f1e3d799c9c040ab9c4f5a2b20c005204d1401f4a8",
+    "tail": [
+      "  ✓ gün düzeyi: elle 10 + dokunuş 20 → 30",
+      "",
+      "=== Özet: 69 geçti, 0 kaldı ==="
+    ]
+  },
+  {
+    "command": "node tests/app/test_faz_minus11_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "cde7ed6b616c466791e0542d79fec0f78e46e0e3ea60cd0b8ae15308d1ecebc5",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 27 / 27"
+    ]
+  },
+  {
+    "command": "node tests/app/test_fx2_ambience.js",
+    "exit": 0,
+    "stdoutSha256": "97fbeabcb4eea9b002024a01b9f4cbc353bbb1d195ebc9a78d45bf5690cb2552",
+    "tail": [
+      "PASS FX2-23.13 batarya (setInterval=0, visibilitychange, amb-paused)",
+      "PASS FX2-23.14 kontrast M13 (4 zaman × 2 tema = 8 çift ≥ 4.5:1)",
+      "Passed: 14 / 14"
+    ]
+  },
+  {
+    "command": "node tests/app/test_fx2_audio_engine.js",
+    "exit": 0,
+    "stdoutSha256": "bda613fa67575245fdae1fd548ed498a193a1c5f7cf1ea6ed37de941bcd7dfe4",
+    "tail": [
+      "PASS FX2-14.11 UI ses yolunda ağ yok",
+      "PASS FX2-14.12 I2 ses API yüzeyi korundu",
+      "Passed: 12 / 12"
+    ]
+  },
+  {
+    "command": "node tests/app/test_fx2_overlay_motion.js",
+    "exit": 0,
+    "stdoutSha256": "ea566fbd20113abfc72e4c95aa53ff908aa1c7036ea28107f0f91dfcdbdb12c2",
+    "tail": [
+      "PASS FX2-16.6 premium kapalı veya reduced-motion iken anlık eski davranış",
+      "PASS FX2-16.7 çift kapatma isteği eski gövdeyi ikinci kez yürütmez",
+      "Passed: 7 / 7"
+    ]
+  },
+  {
+    "command": "node tests/app/test_fx2_palette_contrast.js",
+    "exit": 0,
+    "stdoutSha256": "23fab77922c5627c99cfcccb78b5d7c723f96afd214ce321e34b7c3df276b8ab",
+    "tail": [
+      "PASS FX2-05.11 ÆON ve zikir ham hex sızıntısı yok",
+      "PASS FX2-05.12 page gradienti üç pembe olmayan durak",
+      "Passed: 12 / 12"
+    ]
+  },
+  {
+    "command": "node tests/app/test_fx2_tab_transition.js",
+    "exit": 0,
+    "stdoutSha256": "efc45a29321953c365aef56d71134421b6532812b55e1ad662cd34b9bcbe9a5d",
+    "tail": [
+      "PASS FX2-15.6 premium kapalıyken eski senkron davranış korunur",
+      "PASS FX2-15.7 App yüzeyi 756, onclick 393 ve render/paint gövdeleri değişmedi",
+      "Passed: 7 / 7"
+    ]
+  },
+  {
+    "command": "node tests/app/test_fx2_touch_coverage.js",
+    "exit": 0,
+    "stdoutSha256": "ff56da2eb2e485e22a7480dc01de2f5c1018b0d8db08e91d7e4a648cc406daa6",
+    "tail": [
+      "PASS FX2-13.1 iOS kilit açma once + sessiz buffer",
+      "PASS FX2-13.2 visibility suspend/resume yönetimi",
+      "Passed: 14 / 14"
+    ]
+  },
+  {
+    "command": "node tests/app/test_header_celestial_timeline.js",
+    "exit": 0,
+    "stdoutSha256": "beba4a1d5f8fa689ec6dae3b20273c0dbe65540da536435f800b5d8bb9262b28",
+    "tail": [
+      "PASS gece kapsülü açık temada korumalı koyu zemin alıyor",
+      "PASS CSS ve appSurface cache sürümleri yükseltildi",
+      "Passed: 10 / 10"
+    ]
+  },
+  {
+    "command": "node tests/app/test_header_minimal_controls.js",
+    "exit": 0,
+    "stdoutSha256": "b10da6f493056ca127c0c1633115745e17e3ca303d9e4f499ff2ff2108979108",
+    "tail": [
+      "PASS erişilebilir adlar markup içinde korunuyor",
+      "PASS dar ekran artık hedefleri 40px altına düşürmüyor",
+      "Passed: 8 / 8"
+    ]
+  },
+  {
+    "command": "node tests/app/test_header_night_contrast.js",
+    "exit": 0,
+    "stdoutSha256": "ce9bc03b8e47e7eb811ab15ef5748427ee0994c72320776bb0fea64a89d377d2",
+    "tail": [
+      "PASS gündüz/şafak/akşam seçicileri gece override kapsamına alınmadı",
+      "PASS stylesheet cache sürümü yükseltildi",
+      "Passed: 23 / 23"
+    ]
+  },
+  {
+    "command": "node tests/app/test_health_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "44f9ce8d7dd8e81c3663110f088997232362d70c79cc69c24c9d1f890dcddf5a",
+    "tail": [
+      "PASS  app.js exposes health view shims",
+      "",
+      "36/36 geçti."
+    ]
+  },
+  {
+    "command": "node tests/app/test_helpers_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "9285f692bfff3a61a8f4b07e5d83115d93f5e7ad30db2ce2be5117e4d9dc1afb",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 31 / 31"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_03.js",
+    "exit": 0,
+    "stdoutSha256": "4ed5312ea670d169b43fe64a7bf4760d15d6adc51c3e928ae301e5c9425a19fa",
+    "tail": [
+      "IIP-03 synthetic source contract: PASS (17 checks; no personal data read)"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_04.js",
+    "exit": 0,
+    "stdoutSha256": "09fa96658cd1fdf9e6b1f12f5e63e42ec0fc82fcc5f2f5dab0262a5abcc5aeca",
+    "tail": [
+      "IIP-04 source/style contract: PASS (26 checks; no personal data read)"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_05.js",
+    "exit": 0,
+    "stdoutSha256": "0dae33b0a44b3bd2a1bb36bcca293c2c84125feb5f123a819984cdee01b3b8af",
+    "tail": [
+      "PASS  scope contract: no network was used while rendering all fixture states",
+      "",
+      "IIP-05 visual reader contract: 28 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_06.js",
+    "exit": 0,
+    "stdoutSha256": "fb73a406c42386ec6b0a3f32a734efc3bdb0cb233e0d0e5997433a810498006b",
+    "tail": [
+      "PASS  scope contract: no migration, App assignment or live data behavior was added",
+      "",
+      "IIP-06 visual unity contract: 21 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_07.js",
+    "exit": 0,
+    "stdoutSha256": "32808117ce46ca22dd906fb95cb4a94637882709915b226489b7fb9fdd9caa23",
+    "tail": [
+      "PASS  scope contract: IIP-07 production sources do not add migration/storage/network writes",
+      "",
+      "IIP-07 zikir/quran transition contract: 21 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_09.js",
+    "exit": 0,
+    "stdoutSha256": "ddfc968abb81ce41a07ac1e6a4fdb1dc10461661d0d33dc8e103535606c71a66",
+    "tail": [
+      "PASS  scope contract: no migration/storage/network behavior was added",
+      "",
+      "IIP-09 information architecture contract: 23 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_10.js",
+    "exit": 0,
+    "stdoutSha256": "8bc537aba457a95e0c054671d5e9ec351fd0045fe3705dba66725ade3b2dea3c",
+    "tail": [
+      "PASS  style contract: the named row keeps a single tap target for one biography",
+      "",
+      "IIP-10 search and filter contract: 61 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_11.js",
+    "exit": 0,
+    "stdoutSha256": "aa4779ca39567deb63f7817e1a1b034866475b7f446af27ef120574949c71357",
+    "tail": [
+      "PASS  REQ-021 at the default step the scale multiplier is exactly 1",
+      "",
+      "IIP-11 reader interaction contract: 55 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_12.js",
+    "exit": 0,
+    "stdoutSha256": "0cfe59fe386610a3b1aafd3acb7393bf1faf673d968ceac19632d9ee179aae26",
+    "tail": [
+      "INFO  IIP-12 Bugün hub sha256=2cfc16df6f56d580eeffbf723a3d773ef51903a2f02840efba7737739cce3ce7 bytes=2067",
+      "",
+      "IIP-12 daily focus and continue contract: 92 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_13.js",
+    "exit": 0,
+    "stdoutSha256": "e2c7349b3d4a44a0f30ff0a5630b64c2fd36d6e57756417603ffe397b120f5ee",
+    "tail": [
+      "PASS  dönüş: kapsam çıktısı deterministik",
+      "",
+      "IIP-13 prayer source and freshness contract: 80 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_14.js",
+    "exit": 0,
+    "stdoutSha256": "dcd64fc40059d321c6dff3f070cf6214890b239b582911389c4797fa39174b07",
+    "tail": [
+      "PASS  tüm inceleme sonunda kaynak veri hâlâ byte-eşdeğer",
+      "",
+      "IIP-14: 17 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_15.js",
+    "exit": 0,
+    "stdoutSha256": "75a90ea6fd2a4fe8e4b2d7aff3b23291f9cfb75abc67b8f2a271dbc9ca7f2c28",
+    "tail": [
+      "PASS  yükleniyor/hata/dönüş panel veri durumları korunur",
+      "",
+      "IIP-15 ritim doğruluğu: 13 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_17.js",
+    "exit": 0,
+    "stdoutSha256": "cd6ba4f424809e2d9265535cecf337343564e1ff7575b941406c8a6b98563f20",
+    "tail": [
+      "PASS  manevi özet emojisiz, yapılandırılmış vakit ve ay döngüsü sunar",
+      "PASS  12 pilot kaydın tamamında alan sahibi onaylı okunuş vardır",
+      "PASS: IIP-17 16/16"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_20.js",
+    "exit": 0,
+    "stdoutSha256": "4e876712502238040c2f8a287ac60406a6876186c960f4a05e5c32467a6d2df7",
+    "tail": [
+      "PASS  kaynakta visible bookmark ve persistent reader davranışı vardır",
+      "",
+      "IIP-20: 10 PASS"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_21.js",
+    "exit": 0,
+    "stdoutSha256": "6c2a7eb131a1a35953ef8980e342496ab486e5cb5acd80ae89f32daeadd2e5f8",
+    "tail": [
+      "PASS  program state migration ve tek dispatcher kaynakta korunur",
+      "",
+      "PASS: IIP-21 11/11"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_22.js",
+    "exit": 0,
+    "stdoutSha256": "e217fba8e575ee316f2a481503c0f0fa8fba3248ec86d9984b6a6ba3a1518e4a",
+    "tail": [
+      "PASS  aktif sayaç/not durumu SW güncellemesinden bağımsızdır",
+      "",
+      "PASS: IIP-22 13/13"
+    ]
+  },
+  {
+    "command": "node tests/app/test_iip_perf_measure.js",
+    "exit": 0,
+    "stdoutSha256": "a9bfe6f90f26f997257944679f406fb4f40a61c18ed1fb8ccc79945507d892b0",
+    "tail": [
+      "  min/mean/max: 0.255 / 0.523 / 1.053 ms",
+      "",
+      "  BOUNDARY: local VM, NOT device. Device p95 stays unmeasured until the user runs the protocol."
+    ]
+  },
+  {
+    "command": "node tests/app/test_journal_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "feee35563fa61aca05ec29b193072453f655f9f365dc2ae03373fe04e9cc623a",
+    "tail": [
+      "PASS  health registry app boot kaydı vardır",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node tests/app/test_library_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "6bcbc995e3095b5ec5da1731a0db86ecafc0bb870b46a7857fbfb5e9ac78c38f",
+    "tail": [
+      "PASS  Library render giriş shimleri SeymaRender üzerinden delege olur",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node tests/app/test_local_visual_qa_guard.js",
+    "exit": 0,
+    "stdoutSha256": "b35b3261e001d0909db6013dce1c9e5e711fe8acfe5cbb338e4738821327c258",
+    "tail": [
+      "PASS  run-seyma force-sync ve gerçek profil sınırını koruyor",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node tests/app/test_location_gate_recovery.js",
+    "exit": 0,
+    "stdoutSha256": "dc4cb00f7c0637e2261c7dac42bbf0627dafd4dcf21a04c826b37bc238257d4d",
+    "tail": [
+      "PASS  kod 2 yedeği yalnız bir kez çalışır; hak yalnız kapanışta yenilenir",
+      "",
+      "Location gate recovery contract: 34 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_map_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "00c3b5967bd1764591526dd54bba13ac926def478563d2b6feedd81cc5956ea2",
+    "tail": [
+      "PASS  app shim ve production cache-bust/load-order map registryye bağlıdır",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node tests/app/test_messaging_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "6e0c5d9a5e02d1f3caeeec45b34af84911c5cfcab903e4fffc1f51bb366a640e",
+    "tail": [
+      "MON-42 messaging boundary: PASS"
+    ]
+  },
+  {
+    "command": "node tests/app/test_modal_focus_containment.js",
+    "exit": 0,
+    "stdoutSha256": "38b71021ec291d504b18c71d09b0b53d941efd02224a9d1315f4a68fbfafcb30",
+    "tail": [
+      "PASS  kalıcı ekip kuralı CLAUDE.md içinde eşlenik",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node tests/app/test_modularization_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "077b834c87d2465633861852c8573bee5d31ccfa4603e5e223d7ccc5fbd84f00",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 102 / 102"
+    ]
+  },
+  {
+    "command": "node tests/app/test_motivation_room_accessibility.js",
+    "exit": 0,
+    "stdoutSha256": "bf4a9c4db5e2884d6f41fe398bb5e7eae47dd769dbd4b942c22e41df22b2eb80",
+    "tail": [
+      "PASS  Reminder Center Escape davranışı korunuyor",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node tests/app/test_prayer_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "4a8b0107feead3429e2eacc470ce84fad41f1734cc1d914200af58bde1c45ce4",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 22 / 22"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_audio_fx.js",
+    "exit": 0,
+    "stdoutSha256": "12f2badfa31a33e76fc8965aff3fde68219eaac5814d1dac9dea186787b0bfc1",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 37 / 37"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_fx_gate_defaults.js",
+    "exit": 0,
+    "stdoutSha256": "099044cb0608bbe0bc28b0bf372164daab94de91cade9ea64e56e064ada65832",
+    "tail": [
+      "  ✓ whitelist dışı anahtar reddediliyor",
+      "",
+      "PASS — 30 geçti, 0 kaldı"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_fx_utils.js",
+    "exit": 0,
+    "stdoutSha256": "85071e83ff00b264f366913a8425b7d7c70b845edab0aed1ea57e22ac96480ec",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 48 / 48"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_haptics_fx.js",
+    "exit": 0,
+    "stdoutSha256": "71a2d8ea5f3de68e31286af99ef169b9f8eb648e26df8d8961e4b3a3fbe5d443",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 25 / 25"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_launch_splash.js",
+    "exit": 0,
+    "stdoutSha256": "5f998e1121a025e96ee34aaf476b64b4a00ccd2cbaf2b76ed1103c98b2fc4fb7",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 16 / 16"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_reduced_motion.js",
+    "exit": 0,
+    "stdoutSha256": "d389aacbbd17bfd0d1ca40c262f2477ca7147bf4946a25103898494bd23be130",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 34 / 34"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_settings.js",
+    "exit": 0,
+    "stdoutSha256": "a4c59cc40dd8456c5169099d0cca58e681edab8c168b80e3ecd89d3a33415040",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 39 / 39"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_time_theme.js",
+    "exit": 0,
+    "stdoutSha256": "1a84705cd2f7d033066ccc0725a1e92e314a1b60e2533a9f17195b175140d225",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 53 / 53"
+    ]
+  },
+  {
+    "command": "node tests/app/test_premium_voice.js",
+    "exit": 0,
+    "stdoutSha256": "b9ff1ff1972c674a78c58383d21699e6dd4d04a5814a6c781b621243ef182954",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 68 / 68"
+    ]
+  },
+  {
+    "command": "node tests/app/test_profile_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "fd034c9e0d7a43b5abfbae42e36e226394202c5d196707de92e77c5e42dd2dc9",
+    "tail": [
+      "PASS  profile modülü sync/panel/network/DOM sahipliğine taşmıyor",
+      "",
+      "MON-36 profile boundary: PASS"
+    ]
+  },
+  {
+    "command": "node tests/app/test_quran_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "a106f7bbe283c5c593374dac4c5c38b5b964a0394bd11bf1680a882912add838",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 20 / 20"
+    ]
+  },
+  {
+    "command": "node tests/app/test_render_core_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "7a1a30b34e67387153cbfbb92c0dfe63993d77f040700e0e8a6a06d16449d1b7",
+    "tail": [
+      "PASS  render cache-bust remains explicit after the registry move",
+      "",
+      "MON-49 modal/render core boundary: 16/16 passed"
+    ]
+  },
+  {
+    "command": "node tests/app/test_render_shell_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "6aec465031944a302c978c841e2caa7bd2eacf17df3a164989d1418822461c3d",
+    "tail": [
+      "PASS  render cache-bust remains explicit",
+      "",
+      "MON-48 render shell boundary: 19/19 passed"
+    ]
+  },
+  {
+    "command": "node tests/app/test_report_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "dd3fb3f45597b8bce2bbeae04058897adf0b85000e9d29e97905aeca73f1aab8",
+    "tail": [
+      "PASS  app boot registry kaydı ve cache-bust/load-order vardır",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node tests/app/test_saygi_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "d7e97892f40eb8122f45da3f908074caf28a2e5ce67fc012bfc166347d9d2458",
+    "tail": [
+      "PASS  index saygi registryyi quran sonrasında cache-bust ile yükler",
+      "",
+      "MON-23 Saygı sınırı: 22 PASS, 0 FAIL"
+    ]
+  },
+  {
+    "command": "node tests/app/test_settings_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "c23ce83b39ba88cd910e952cdf762cfc002fa51a049f5d0998913fbe25aba2ff",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 13 / 13"
+    ]
+  },
+  {
+    "command": "node tests/app/test_sky_fx.js",
+    "exit": 0,
+    "stdoutSha256": "27ccc6afe7d33e42e97202890af5acaa8e9fc24fd2829329d3f5e852e9c62b4a",
+    "tail": [
+      "PASS brightness filtresi kullanılmıyor",
+      "",
+      "SKY FIXTURE PASS: 38 geçti, 0 düştü"
+    ]
+  },
+  {
+    "command": "node tests/app/test_state_rebind_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "399a8f6e36115e0e3ed3a1fb8642617aee605d609e1551c736c971c8fccc4773",
+    "tail": [
+      "PASS  state fixture uses no sync.js and cannot resolve network fetch",
+      "",
+      "MON-15 result: PASS (37 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/app/test_syncGlue_save_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "eaa07853584666f5dce19d93524be395e6958f7ccadf7a325e87c2f47979b6a1",
+    "tail": [
+      "PASS SeySync çağrı anında lazy çözülür",
+      "PASS sentetik save ağ/timer/gerçek storage yan etkisi üretmez",
+      "MON-17 save boundary PASS (19 assertions)"
+    ]
+  },
+  {
+    "command": "node tests/app/test_sync_fetch_timeout.js",
+    "exit": 0,
+    "stdoutSha256": "7eead75cc20fcea8fffc2cb55a95b57adf59fa59cd3b1832f38b8d12baa358d2",
+    "tail": [
+      "",
+      "",
+      "✓ 21 geçti, 0 başarısız"
+    ]
+  },
+  {
+    "command": "node tests/app/test_sync_large_file.js",
+    "exit": 0,
+    "stdoutSha256": "49de17a99bec3a24623d09bcaffa21d999038af6fcf3998388f75f98ded2f822",
+    "tail": [
+      "  ✓ putLatestGuarded retry parametresi aldı",
+      "",
+      "✅ Tüm kontroller PASS (15/15)"
+    ]
+  },
+  {
+    "command": "node tests/app/test_today_card_preferences.js",
+    "exit": 0,
+    "stdoutSha256": "2aa0cccf896ec9802966a2a3638319dd8b703d248a88ee9a4502c3387dde3ab4",
+    "tail": [
+      "PASS  Tatil Modunu Göster kartı geri getirir",
+      "",
+      "11/11 geçti."
+    ]
+  },
+  {
+    "command": "node tests/app/test_v3_welcome.js",
+    "exit": 0,
+    "stdoutSha256": "0cda1d1700c380b152e8646c603e0d05f9ef5a7d4f506fbb7a5ba540e06e3712",
+    "tail": [
+      "",
+      "287 kontrol geçti.",
+      "SONUÇ: PASS"
+    ]
+  },
+  {
+    "command": "node tests/app/test_zikir_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "03947eded772d328f3dddfe7dd0c5ced45757fdb81312326712ef9ea80a5e6b2",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 17 / 17"
+    ]
+  },
+  {
+    "command": "node tests/app/test_zikir_view_boundary.js",
+    "exit": 0,
+    "stdoutSha256": "d44485cb8da0e654f3801fc733033a36e5b43fbfc11bb4e39c951be20a669543",
+    "tail": [
+      "",
+      "=== Özet ===",
+      "Passed: 17 / 17"
+    ]
+  },
+  {
+    "command": "node tests/app/test_zikr_manual_entry.js",
+    "exit": 0,
+    "stdoutSha256": "3a2d24f786c069b2fa5d6bd1eebfd5964b144ef4b60925df04a95c2260826a4c",
+    "tail": [
+      "  ✓ sheet zikr-v2 overlay içinde, ayrı dialog değil",
+      "",
+      "== Özet: 21 geçti, 0 kaldı =="
+    ]
+  },
+  {
+    "command": "node tests/panel/test_faz11_panel.js",
+    "exit": 0,
+    "stdoutSha256": "d4c5fb25ab0e2b62a1c1a6e20e2fc07b20f0ec9f96f1d480c8d58c05f55e92ae",
+    "tail": [
+      "  ✓ not sayısı ve son not panel özetine taşınıyor",
+      "",
+      "=== Özet: 50 geçti, 0 kaldı ==="
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_boot_resilience.js",
+    "exit": 0,
+    "stdoutSha256": "a872c780b50290c2a6d4da73dbba33f9a350ad4bc729e79d12170f622dc3bdf5",
+    "tail": [
+      "  ✓ panelFetchP yazma yolu açmaz (localStorage)",
+      "",
+      "PANEL-BOOT fixture result: PASS (96 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_curated_change_log.js",
+    "exit": 0,
+    "stdoutSha256": "5e7284ff2e690f2ea2b343d29a77ddda6d264b36d9fc4dd2fef51d668efc24b8",
+    "tail": [
+      "  ✓ açılınca ham event log gömülü render edilir",
+      "",
+      "D1.2 curated-change-log fixture result: PASS (8 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_dev_mode_trigger.js",
+    "exit": 0,
+    "stdoutSha256": "69e0fe9d03926b951248349e679419143238830e03f85e07c37d5c927073534a",
+    "tail": [
+      "  ✓ debug parametresi yokken tetiklenmez",
+      "",
+      "D2.1 dev-mode-trigger fixture result: PASS (6 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_discomfort_trend.js",
+    "exit": 0,
+    "stdoutSha256": "5878716e74c187e09dae13a13391413f5a28336af711ee377b665f8f300cd021",
+    "tail": [
+      "  ✓ dolu senaryoda kart bölge etiketi ve gün sayısını gösterir",
+      "",
+      "PANEL discomfort trend fixture result: PASS (11 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_event_focus.js",
+    "exit": 0,
+    "stdoutSha256": "57bce59c7f18d92a79af607a4165b53c49da468798a16c8fa62c9579a687b568",
+    "tail": [
+      "  ✓ daha fazla göster beşer kayıt açar",
+      "",
+      "PANEL event focus fixture result: PASS (12 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_focus_location.js",
+    "exit": 0,
+    "stdoutSha256": "ec9da6ef9e2979175fc367bf1c57df314c9f8ee970b238d6bdf0c2b6344107fc",
+    "tail": [
+      "  ✓ Google Maps canonical search URL sözleşmesi korunur",
+      "",
+      "PANEL focus/location fixture result: PASS (13 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_milestones.js",
+    "exit": 0,
+    "stdoutSha256": "cbf094d6de04837fe286afaead39160f475567610787df0ea8bef45e4f39c358",
+    "tail": [
+      "  ✓ sosFreeStreakP sayısal ve negatif değil",
+      "",
+      "D1.5 milestones fixture result: PASS (9 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_monthly_heatmap.js",
+    "exit": 0,
+    "stdoutSha256": "a0765c1eeb49cb8f3b9049092dd58f5a162388f73f1d5252d925f1afdf18f0bb",
+    "tail": [
+      "  ✓ kart yokken render() fallback'i çağrıldı",
+      "",
+      "D1.4 monthly-heatmap fixture result: PASS (18 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_needs_attention.js",
+    "exit": 0,
+    "stdoutSha256": "0e2d9114a37da90dc24f22a3c503a27aa0cccf557b521991b5190fe6f609f9ff",
+    "tail": [
+      "  ✓ en fazla 3 madde",
+      "",
+      "D1.1 needs-attention fixture result: PASS (11 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p0_sync.js",
+    "exit": 0,
+    "stdoutSha256": "2a319c98ba4d0d45e0aa236cadd684a6f629d35310d29e0f0471e7d5f4e5a404",
+    "tail": [
+      "  ✓ section fetch başarılıysa uyarı metni içermez",
+      "",
+      "PANEL-003 / PANEL-01 P0 result: PASS (31 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p1_projection.js",
+    "exit": 0,
+    "stdoutSha256": "5d52ae660a2fc1f8a9eefc5c78c3eb41abdc0584b91a36e90567c11b07f588dc",
+    "tail": [
+      "  ✓ panel latest.json için PUT yolu taşımaz",
+      "",
+      "PANEL-004 / PANEL-02 result: PASS (43 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p2_event_log.js",
+    "exit": 0,
+    "stdoutSha256": "c2dbc7b38e4086279bf06118c010a2ee5b19aa98e483737ce489e6b04ad8088d",
+    "tail": [
+      "  ✓ son 100 filtresi 100 satırı güvenle işler",
+      "",
+      "PANEL-007 / PANEL-05 panel fixture result: PASS (11 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p2_polling.js",
+    "exit": 0,
+    "stdoutSha256": "0597cd8b75a57afd91b9eb400b4ded786484f95baf0de09c9ee02d5db2309fa8",
+    "tail": [
+      "  ✓ taslak varken yeni snapshot render kuyruğuna alınır",
+      "",
+      "PANEL-008 / PANEL-06 polling fixture result: PASS (20 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p2_sync.js",
+    "exit": 0,
+    "stdoutSha256": "494067861447716cbf90923cd2473b4dc1d376b7fc18323bb8fbd13b14e57689",
+    "tail": [
+      "  ✓ başarılı PUT yalnız event published işareti koyar",
+      "",
+      "PANEL-007 / PANEL-05 sync fixture result: PASS (8 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p3_root_modules.js",
+    "exit": 0,
+    "stdoutSha256": "a50b34ae2182fb9a1257ce7eaf62e9c2222210555fc2852b281031a46b5d9000",
+    "tail": [
+      "  ✓ kart seviyesinde de pending metni gerçekten render ediliyor (uçtan uca)",
+      "",
+      "PANEL-005 / PANEL-03 result: PASS (35 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p3_timeline_drawer.js",
+    "exit": 0,
+    "stdoutSha256": "2999d74346b1e3f779559981efd43ef2cc3165bb681e26ead8af4972eeb991f9",
+    "tail": [
+      "  ✓ cache-bust güncel panel sürümünde",
+      "",
+      "PANEL-012 / PANEL-10 fixture result: PASS (7 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p4_module_cards.js",
+    "exit": 0,
+    "stdoutSha256": "92d52fb2ef2c56411ba55d6026965b452f4f34ca5dae523b20595e3619b61544",
+    "tail": [
+      "  ✓ D4 drawer focus trap ortak handler ile çalışır",
+      "",
+      "PANEL-013 / PANEL-11 fixture result: PASS (13 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p4_provenance.js",
+    "exit": 0,
+    "stdoutSha256": "3968625442cda7a87d40642ae8225b82e15999898c246f898c9a1e2bf9280d6a",
+    "tail": [
+      "  ✓ hiç kayıt yoksa \"son kayıt\" metni hiç gösterilmez, mevcut davranış korunur",
+      "",
+      "PANEL-006 / PANEL-04 result: PASS (28 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p5_responsive_a11y.js",
+    "exit": 0,
+    "stdoutSha256": "8930bc744589484bb71ee195a8ccd3a2cd6f219f4174f5f7f82c8a72ee5a215f",
+    "tail": [
+      "  ✓ muted text WCAG AA için dark surface üzerinde yeterli kontrast taşıyor",
+      "",
+      "PANEL-014 / PANEL-12 fixture result: PASS (24 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_p6_qa_release.js",
+    "exit": 0,
+    "stdoutSha256": "c1eeb7f84f64d63363ea779fb484de74f5903c4c55fee65d07f341cae94639a2",
+    "tail": [
+      "  ✓ rollback/backup SHA dokümantasyon kapısı tanımlı",
+      "",
+      "PANEL-015 / PANEL-13 fixture result: PASS (19 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_staleness_badge.js",
+    "exit": 0,
+    "stdoutSha256": "3b7041bb37d9484806131b39fa67e38093b69230ba30276df43f3f479937c728",
+    "tail": [
+      "  ✓ rozet çıktısı mevcut status-badge HTML sözleşmesini kullanır",
+      "",
+      "PANEL staleness badge fixture result: PASS (7 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel/test_panel_weekly_digest.js",
+    "exit": 0,
+    "stdoutSha256": "1a380b6aff2e2e53e2620151c2224e4c89af40f55294d295856503a426501c28",
+    "tail": [
+      "  ✓ uyku kaydı yok metni içerir",
+      "",
+      "D1.3 weekly-digest fixture result: PASS (9 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_accessibility.js",
+    "exit": 0,
+    "stdoutSha256": "8e53845b34ed718e22220bb1092a5f9b709e6f118d1adc6b3fdcdaea47e30245",
+    "tail": [
+      "✅ PASS: pozitif tabindex kullanılmıyor",
+      "",
+      "✅ Prompt 37 accessibility fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_archives.js",
+    "exit": 0,
+    "stdoutSha256": "66ba51916d59bafa20cfd7ca80fa8f505581a2ca101dcd58d3f753d244cf9e0c",
+    "tail": [
+      "✅ PASS: Negatif sayfa 1'e sıfırlandı",
+      "",
+      "🦩 Faz 5 Arşivler fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_audit.js",
+    "exit": 0,
+    "stdoutSha256": "86aea5c91d668aae03bf13bc402f87778cfca2dc740118fcb2a151facbeec890",
+    "tail": [
+      "✅ PASS: Ham event özeti DOM'a sızmıyor",
+      "",
+      "✅ Prompt 32 sequence audit fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_compare.js",
+    "exit": 0,
+    "stdoutSha256": "16212a864c11e3ffb000fbd45c870da2d5d8b2ebfab5f6d4a9a837bd85a1a2c2",
+    "tail": [
+      "🦩 KPI karşılaştırması — panel-v2.js metrikleri elle hesaplanan beklentilerle tutarlı.",
+      "panel.js ile karşılaştırma notu: panel.js VM boot edilemiyor; fark varsa 08-VERI-KARSILASTIRMASI.md'ye yazılacak.",
+      "Hero kart sayısı: 4"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_component_contracts.js",
+    "exit": 0,
+    "stdoutSha256": "7b22f096caf285dab4e8e7ac90cc64cb19824749195bbe29c0cd203f8a3410ed",
+    "tail": [
+      "✅ PASS: Event log detay drawer'ı güvenli özeti açıyor",
+      "",
+      "🦩 Prompt 39 komponent/lifecycle contract fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_components.js",
+    "exit": 0,
+    "stdoutSha256": "dec1d592587872802b575166cc6a7080b6d0b98a834c9a7834ffb8c59da17dda",
+    "tail": [
+      "✅ PASS: DetailBlock premium giriş ve redacted sınıflarını taşıyor",
+      "",
+      "🦩 Prompt 11 komponent kontrat fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_contrast.js",
+    "exit": 0,
+    "stdoutSha256": "e627a773a5456352a549d47accb885171e14f23611e9ba138e989db57f91d319",
+    "tail": [
+      "✅ PASS: Drop butonu için metin-kontrastlı koyu zemin tokenı var",
+      "",
+      "✅ Prompt 36 WCAG AA kontrast fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_count_up.js",
+    "exit": 0,
+    "stdoutSha256": "b6209ceca49ae9ec78715d56227c7ed6109bbdd9c55aa8d8d74778821e30c58f",
+    "tail": [
+      "✅ PASS: Normal count-up animasyonu hedef değerde tamamlanıyor",
+      "",
+      "🦩 Prompt 12 count-up fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_css.js",
+    "exit": 0,
+    "stdoutSha256": "c8a2ff955286a21a8a314e407b3fc27db2739452b980b737f0a9bc63cd6e62bc",
+    "tail": [
+      "🦩 panel-v2.css contract fixture — TÜM TESTLER BAŞARILI",
+      "Spacing token kullanımı: 381",
+      "!important kullanımı: 11"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_day_detail.js",
+    "exit": 0,
+    "stdoutSha256": "bccd2a928c044985cb23a19a3f7a2f453d17d4d669d0a23494e1a5d4d7fd6d2c",
+    "tail": [
+      "✅ PASS: Her anlamlı geçmiş konumun Google Maps noktası var",
+      "",
+      "🦩 Faz 4 Gün Detayı fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_event_log.js",
+    "exit": 0,
+    "stdoutSha256": "6830f73ecc6b9b31ae9c71e0fe89ecaa1288223a2f80d2015d03320f4658af83",
+    "tail": [
+      "✅ PASS: İkinci sayfa kalan olayları gösteriyor",
+      "",
+      "✅ Prompt 29 event-log fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_history.js",
+    "exit": 0,
+    "stdoutSha256": "dac5832429498e9d51caef488da5408ffa1da2e14b75211aedfed4e075462c5f",
+    "tail": [
+      "✅ PASS: Boş seri doğrudan chart çağrısında da sıfıra çevrilmiyor",
+      "✅ PASS: Panel-v2 JS kaynak kodunda emoji yok",
+      "Panel-v2 history/steps fixture tamamlandı."
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_hit_areas.js",
+    "exit": 0,
+    "stdoutSha256": "9f54a1187172d2020d6c37bda5228f510b3e975dc4142059b6665980406af502",
+    "tail": [
+      "✅ PASS: Alt tablar gerçek button yüzeyi üretiyor",
+      "",
+      "✅ Prompt 27 hit-area contract — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_notification_lifecycle.js",
+    "exit": 0,
+    "stdoutSha256": "117517c7993a845326cc14a5b77df3d06d766c9c0003fbd9e94e1e5d131e1ff1",
+    "tail": [
+      "✅ PASS: 409 Contents çakışması bounded GET+PUT retry ile çözülüyor",
+      "",
+      "✅ Prompt 31 notification lifecycle fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_performance.js",
+    "exit": 0,
+    "stdoutSha256": "79e4da99495d9bfa408062545eee93b55033542fe9684f965d1d171c170748f7",
+    "tail": [
+      "✅ PASS: Arşiv ikinci sayfa önceki sayfa satırlarını taşımıyor",
+      "",
+      "🦩 Prompt 38 performans fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_polling_telemetry.js",
+    "exit": 0,
+    "stdoutSha256": "b4db3bffdc3d13451eb93837980505463a892c32b103cf2d3bc4a87966223af2",
+    "tail": [
+      "✅ PASS: Logout interval'ı temizliyor",
+      "",
+      "✅ Prompt 28 polling/telemetry fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_polling_tests.js",
+    "exit": 0,
+    "stdoutSha256": "b7fc34e80bbf712b63c081750cc9125aabd837dbd4af2170e887f54b26ffc408",
+    "tail": [
+      "✅ PASS: Logout polling'i durduruyor",
+      "",
+      "✅ Prompt 35 polling/telemetry test fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_pull_refresh.js",
+    "exit": 0,
+    "stdoutSha256": "d01d1420d605e9078691a77d767a671e701cd0cc569860f9e71579308ff980d3",
+    "tail": [
+      "✅ PASS: Desktop bağlanmasa da eşik sözleşmesi sabit",
+      "",
+      "🦩 Prompt 26 pull-to-refresh fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_settings.js",
+    "exit": 0,
+    "stdoutSha256": "43111222188d351538960358eb3cbfa903077a612654a0735d521a6459d1ca31",
+    "tail": [
+      "✅ PASS: Cache tanısı güvenli açıklamayla görünür kalıyor",
+      "",
+      "✅ Prompt 33 settings/diagnostics fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_skeleton.js",
+    "exit": 0,
+    "stdoutSha256": "f0a5a9a0927d7cd451cb15d5cfa32bd05c94af0fa0f943185e1abb444cfd3c09",
+    "tail": [
+      "✅ PASS: Fetch tamamlanınca gerçek panel içeriği render edildi",
+      "",
+      "🦩 Faz 0 skeleton + tooltip fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_swipe.js",
+    "exit": 0,
+    "stdoutSha256": "a6a8d328213396ed8b72416f17393ad48826df15db846acb3e5bc654eb3b969e",
+    "tail": [
+      "✅ PASS: 460px üstünde swipe listener'ı bağlanmıyor",
+      "",
+      "🦩 Prompt 25 swipe gesture fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_sync_health.js",
+    "exit": 0,
+    "stdoutSha256": "68926d254956e9f53171444ea947f6eae4b7744ce816410874fa607b02a195ad",
+    "tail": [
+      "✅ PASS: Logout sonrası istek grafiği boş durumu gösteriyor",
+      "",
+      "✅ Prompt 30 sync-health fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_system.js",
+    "exit": 0,
+    "stdoutSha256": "8a073806aec93c5802799d28a1e8d0a641d8b5eb823577b07646a82a12e42782",
+    "tail": [
+      "✅ PASS: Token ui'da saklandı",
+      "",
+      "🦩 Faz 6 Sistem & Mesajlar fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_system_subtabs.js",
+    "exit": 0,
+    "stdoutSha256": "008f7d523da618a3e00ad45e54970f585d64dc4c68cd5fbcd99d5e506e04d02d",
+    "tail": [
+      "✅ PASS: Geçersiz sistem sub-tab mevcut seçimi bozmuyor",
+      "",
+      "✅ Prompt 34 system sub-tabs fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_tabs.js",
+    "exit": 0,
+    "stdoutSha256": "165a23ad876eea4ede9ee9f9c68e81c7ce008e27077058be96cf0a9c424e7981",
+    "tail": [
+      "✅ PASS: logout sonrası status idle",
+      "",
+      "🦩 Faz 1 tabs + topbar fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_today.js",
+    "exit": 0,
+    "stdoutSha256": "9819bdb731d0de0c73dfa1cbb9c5e12c291520394ae82dde21de7436c6e453ca",
+    "tail": [
+      "✅ PASS: Geçersiz tarih reddedildi",
+      "",
+      "🦩 Faz 2 Genel Bakış fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/panel-v2/test_panel_v2_trends.js",
+    "exit": 0,
+    "stdoutSha256": "7e1503ecb164612cc8e9dfd1dd237d1fd2e2a36222418a787a6f69fe5ba8bb0b",
+    "tail": [
+      "✅ PASS: Anomali yokken uyarı yok mesajı görünür",
+      "",
+      "🦩 Faz 3 Trendler & Uyarılar fixture — TÜM TESTLER BAŞARILI"
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_a11y_contrast.js",
+    "exit": 0,
+    "stdoutSha256": "07208aba94b888ba99ee84afe8a5f36260187c23e370b3792ee40904e198561f",
+    "tail": [
+      "4. Regresyon çapası — eski başarısız değerlere dönülmediği kanıtı",
+      "",
+      "✅ Kur’an Yolculuğu WCAG AA kontrast: 66/66 geçti"
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_catalog.js",
+    "exit": 0,
+    "stdoutSha256": "9c00b1f7757753641ef0fa9854a7ba04a3552d5be9ba6195adf0d592c9c1edfb",
+    "tail": [
+      "7. Dondurulmuş içerik güvencesi",
+      "",
+      "✅ Kur’an kataloğu: 70/70 geçti"
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_flow_demo.js",
+    "exit": 0,
+    "stdoutSha256": "75a023d8957f1ccb39e04d21ec35490b9241d3796f7f8250d3c625614bd5c533",
+    "tail": [
+      "  ✓ inline JavaScript sözdizimi geçerli",
+      "",
+      "✅ 9/9 geçti"
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_merge.js",
+    "exit": 0,
+    "stdoutSha256": "d6da12bcfcda2ea2e6e6a2eb18daff7252665ef8450b2eb675300fa2b59b72df",
+    "tail": [
+      "12. Ağ izolasyonu",
+      "",
+      "✅ Kur’an Yolculuğu çoklu cihaz birleştirme: 38/38 geçti"
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_outbox_sync.js",
+    "exit": 0,
+    "stdoutSha256": "f5763e973fed67b189ee9438e76caabb0abdc955302f5e599b4a405735733fc5",
+    "tail": [
+      "  ✓ schedule/pushNow API’leri korunuyor",
+      "",
+      "=== Özet: 55 geçti, 0 kaldı ==="
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_panel_parity.js",
+    "exit": 0,
+    "stdoutSha256": "9086e3ccc24a40f76011c17ce5ddb298097aa68a7d510e835ab37ad6764dbfca",
+    "tail": [
+      "  ✓ parity fixture secret veya write kanalı içermiyor",
+      "",
+      "QY-22 parity result: PASS (9 passed, 0 failed)"
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_pull_sync.js",
+    "exit": 0,
+    "stdoutSha256": "cf3a4be635a4c7ce27a00fae0b03e54ef7397ac658f319393fafd420185aa015",
+    "tail": [
+      "  ✓ 404 sonrası eski cache gövdesi 304 ile yeniden başarı sayılmıyor",
+      "",
+      "✅ 17/17 assertion pass"
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_striking_verses.js",
+    "exit": 0,
+    "stdoutSha256": "a0b206a636d183315b6a7501b7679334172d09b9c2d7e366a562b6a36a430b82",
+    "tail": [
+      "✅ Kur’an çarpıcı âyetler (İY-A) bütünlük denetimi: 41/41 geçti",
+      "✅ Tüm kayıtlar verified:true, verifiedAt:2026-08-01 — kullanıcı doğrulaması tamamlandı olarak işaretli.",
+      "   Bu test yalnız YAPISAL bütünlüğü kanıtlar; içerik yeniden değişirse doğrulama tekrarlanmalı."
+    ]
+  },
+  {
+    "command": "node tests/quran/test_quran_transport.js",
+    "exit": 0,
+    "stdoutSha256": "9c60406b1618026a095454388d58bf309c42d9f55b795acc0321b6a4316a87f3",
+    "tail": [
+      "14. Secret sızıntı denetimi",
+      "",
+      "✅ Kur’an transport: 207/207 geçti"
+    ]
+  },
+  {
+    "command": "node tests/reminders/run-reminder-smoke.mjs",
+    "exit": 0,
+    "stdoutSha256": "b2976ca35b7086461d7d5388170f8b019af3481e2c8eaa17af26a617555369a9",
+    "tail": [
+      "PASS app user copy and panel operator copy use different voices and share no user data",
+      "REMINDER CONTRACT PASS: 73 assertions",
+      "REMINDER SMOKE PASS: 21 curated fixtures"
+    ]
+  },
+  {
+    "command": "node .claude/skills/run-seyma/driver.mjs",
+    "exit": 0,
+    "stdoutSha256": "6373b3c1d00ec590e29664c4612599f56ced9c036684e33fab96316627da1a2c",
+    "tail": [
+      "PASS  reminder in-app path stays available",
+      "",
+      "Done."
+    ]
+  },
+  {
+    "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+    "exit": 0,
+    "stdoutSha256": "5011a22e902a71a62b79ba6a352d242ed8a3a3deb5f9d438cb92c82d9c0e03e4",
+    "tail": [
+      "  ✓ Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık",
+      "",
+      "✅ 95/95 assertion pass"
+    ]
+  },
+  {
+    "command": "node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs",
+    "exit": 0,
+    "stdoutSha256": "5079d88244b1ef1a9ba49129caaa6715d811d7e519fed32b7befa946511edcee",
+    "tail": [
+      "  ✓ otomatik · .kao-stats-table     13.72:1  (≥4.5)",
+      "",
+      "336 çift denetlendi (35 elle seçilmiş + 133 otomatik renk bildirimi, × 2 tema), 0 tanesi eşiğin altında."
+    ]
+  }
+]

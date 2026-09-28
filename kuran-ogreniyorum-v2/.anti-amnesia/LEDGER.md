@@ -276,3 +276,22 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-06/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-06/release-live.json
 - evidence-levels: kaynak/test PASS · yayın/run/hash PASS · cihaz doğrulanmadı
 - next: KAO2-07
+
+## seq 28 · 2026-09-28 · CARD · KAO2-07
+- status: done
+- title: Müfredat derleme aracı ve quranCurriculumV2.js
+- prev-commit: 944dae6c
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-07/KANIT.md
+- gates: syntax PASS · kao 23/23 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr 95/95 PASS · contrast 382 çift/0 ihlal PASS · sync PASS
+- metrics: 524/524 lemma tam 1 derste · 12 ünite · 109 ders (3–7) · 25/25 kavram bağlı · S0 s0.01…s0.12 · iki çalıştırma bayt-eşit · gzip 10,104 KiB ≤48 · içerik toplamı 168,476 KiB ≤256 · VM p95 4,1–4,7 ms
+- changed-tests: yeni test_kao2_curriculum.js; test_kao2_perf_budget.js müfredat modülünü zorunlu kıldı; test_state_rebind_boundary.js boot listesine modül eklendi
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: Ünite 6 = 196 kelime (kart kuralı harfiyen; G2 kararına); Ünite 2 lp_* nedeniyle 11 odak kimliğiyle genişletildi; ders sayısı ~75 değil 109; .claude/skills iki FILES listesi K-2 gereği Edit aracıyla izinle düzenlendi
+- next: KAO2-08
+
+## seq 29 · 2026-09-28 · GATE · —
+- status: open
+- summary: G2 open · MUFREDAT-ESLEME.md kullanıcı onayı bekleniyor. KAO2-07 done; KAO2-08 G2 kapanmadan (LEDGER'da `GATE · — · G2 closed` kaydı olmadan) başlamaz.
+- review: kuran-ogreniyorum-v2/inceleme/MUFREDAT-ESLEME.md (onay kutuları + karar bekleyen noktalar: Ünite 6 büyüklüğü, Ünite 5/12 küçüklüğü, Ünite 2 odak eki)
+- next: KAO2-08

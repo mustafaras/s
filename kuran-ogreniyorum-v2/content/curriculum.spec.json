@@ -1,0 +1,129 @@
+{
+  "version": "quran-curriculum-tr-v2",
+  "note": "KAO2-07 müfredat iskeleti. Elle yazılır ama Arapça içermez: kelimeler yalnız QuranLexiconV1 lemma kimliğiyle anılır; Arapça, okunuş ve anlam araç tarafından içerik modüllerinden çekilir. Tüm Türkçe metinler review.level=draft (K-4 L0).",
+  "lessonSize": { "min": 3, "max": 7, "target": 5 },
+  "levels": [
+    { "id": 0, "title": "Harfler ve okuma" },
+    { "id": 1, "title": "Namazın dili" },
+    { "id": 2, "title": "Kur'an'ın iskeleti" },
+    { "id": 3, "title": "Fiillerin dünyası" },
+    { "id": 4, "title": "Kökten dallara" },
+    { "id": 5, "title": "Kısa sûreler" },
+    { "id": 6, "title": "Serbest okuma" }
+  ],
+  "s0": [
+    "Sağdan sola, harf ve hareke",
+    "Nokta ailesi",
+    "Esre ve ötre",
+    "Çengel ailesi",
+    "Bağlanmayan harfler",
+    "Dişli aile",
+    "Konum şekilleri",
+    "Sükûn ve kapalı hece",
+    "Uzatma (med) ve şedde",
+    "Kalan harfler",
+    "Tenvin, elif-lâm, vasıl",
+    "İlk okuma provası"
+  ],
+  "units": [
+    {
+      "id": 1, "level": 1, "title": "Fâtiha",
+      "promise": "Her namazda okuduğun Fâtiha'yı kelime kelime anlayacaksın.",
+      "conceptIds": ["g0_5", "g1", "g2"],
+      "anchor": ["prayer:fatiha"],
+      "lessonTitles": ["Besmele", "Rahîm ve Hamd", "Yalnız sana", "Doğru yol", "Gazaba uğrayanlar değil"]
+    },
+    {
+      "id": 2, "level": 1, "title": "Namazın cümleleri",
+      "promise": "Tekbirden selâma kadar namazda söylediklerini anlayacaksın.",
+      "conceptIds": ["g3", "g4"],
+      "anchor": ["prayer:tekbir", "prayer:subhaneke", "prayer:ruku", "prayer:secde", "prayer:tahiyyat", "prayer:selam"],
+      "focusNote": "Namaz metinlerinin çoğu kelimesi lp_* (namaz eki) kimliği taşır ve sözlükte yoktur; eski plan odak listesindeki sözlük karşılıkları buraya eklenir.",
+      "focus": ["l_suboHa_n_59533b", "l_Salaw_p_7f701a", "l_sala_m_daff0b", "l_Tay_iba_t_e6ca86", "l_baraka_t_188a75", "l_raHomap_490a24", "l_Eabod_3558c0", "l_rasuwl_9a5606", "l_ahida_de36bb", "l_ilaY_d3d2d9", "l_Ean_2cd3f8"]
+    },
+    {
+      "id": 3, "level": 1, "title": "Üç koruyucu sûre",
+      "promise": "İhlâs, Felak ve Nâs'ı anlayarak okuyacaksın.",
+      "conceptIds": ["g5", "g6"],
+      "anchor": ["surah:112", "surah:113", "surah:114"]
+    },
+    {
+      "id": 4, "level": 2, "title": "Kur'an'ın tutkalı",
+      "promise": "Cümleleri birbirine bağlayan kelimeleri tanıyacaksın.",
+      "conceptIds": ["g7", "g8"],
+      "anchor": ["lemma-pool:edat-baglac"],
+      "focus": ["l_man_48b676", "l_an_e1bf35", "l_an_d1c942", "l_qad_03fa2b", "l_vum_88b269", "l_aw_43116a", "l_bal_1b5a6f", "l_kul_03497c", "l_baEoD_256db1"]
+    },
+    {
+      "id": 5, "level": 2, "title": "Bu, şu, kim, ne",
+      "promise": "İşaret ve soru kelimeleriyle âyetin kime, neye döndüğünü göreceksin.",
+      "conceptIds": ["g9", "g10"],
+      "anchor": ["lemma-pool:isaret-soru"],
+      "focus": ["l_ha_aA_9f90d0", "l_a_lik_f3410a", "l_uwla_ik_8eb052", "l_kayof_79814e", "l_hal_232554"]
+    },
+    {
+      "id": 6, "level": 2, "title": "Gök, yer ve insan",
+      "promise": "Kur'an'ın en sık isimlerini tanıyacaksın.",
+      "conceptIds": ["g11", "g12"],
+      "anchor": ["lemma-pool:isim"],
+      "focus": ["l_aroD_977a0d", "l_samaA_3fe4ed", "l_qawom_d51842", "l_nafos_fde475", "l_kita_b_291fe8", "l_qalob_e14dcc", "l_Ea_aAb_4b9936", "l_ajor_c798df", "l_jan_ap_50e4b4", "l_naAr_d577c3", "l_Haq_3072cf", "l_xayor_65557c", "l_aYo_56e1b1"]
+    },
+    {
+      "id": 7, "level": 3, "title": "Oldu, yaptı",
+      "promise": "Geçmiş zaman anlatılarını çözeceksin.",
+      "conceptIds": ["g13", "g14"],
+      "anchor": ["lemma-pool:fiil-mazi"],
+      "focus": ["l_qaAla_657dd3", "l_jaEala_307581", "l_Eamila_50319c", "l_Ealima_ceb6d7", "l_jaA_a_c0bd29", "l_anzala_adebf9", "l_arosala_4ee820", "l_kafara_af1746", "l_ka_aba_15a65b", "l_aAmana_966a5c"]
+    },
+    {
+      "id": 8, "level": 3, "title": "Yapar, yapıyor",
+      "promise": "Şimdiki ve geniş zamanı tanıyacaksın.",
+      "conceptIds": ["g15", "g16"],
+      "anchor": ["lemma-pool:fiil-muzari"],
+      "focus": ["l_aA_a_25c447", "l_ra_aA_d87b92", "l_t_aqaY_bc8006", "l_anfaqa_0b12ad"]
+    },
+    {
+      "id": 9, "level": 3, "title": "Yap, ver, bağışla",
+      "promise": "Emir ve dua cümlelerini anlayacaksın.",
+      "conceptIds": ["g17", "g18"],
+      "anchor": ["lemma-pool:fiil-emir"],
+      "focus": ["l_akara_67cfbf", "l_gafara_e47aae", "l_r_aHima_870005", "l_A_taY_2a778d"]
+    },
+    {
+      "id": 10, "level": 4, "title": "Bir kök, bir aile",
+      "promise": "Bir kökten Türkçedeki onlarca kelimeye uzanacaksın.",
+      "conceptIds": ["g19", "g20"],
+      "anchor": ["lemma-pool:kok-ailesi"],
+      "order": "rootFamily"
+    },
+    {
+      "id": 11, "level": 4, "title": "Kalıplar",
+      "promise": "Kalıp değişince anlamın nasıl kaydığını göreceksin.",
+      "conceptIds": ["g21"],
+      "anchor": ["lemma-pool:kalip"],
+      "order": "rootFamily",
+      "focus": ["l_sotagofara_863081"]
+    },
+    {
+      "id": 12, "level": 4, "title": "Eğer ve zaman",
+      "promise": "Şart ve zaman cümlelerini çözeceksin.",
+      "conceptIds": ["g22", "g23", "g24"],
+      "anchor": ["lemma-pool:sart-zaman"],
+      "focus": ["l_in_f645c5", "l_law_8f1f74", "l_lawolaA_b76376", "l_Hat_aY_47c8d9", "l_lam_aA_c2bb4a"]
+    }
+  ],
+  "poolRules": [
+    { "unit": 5, "pos": ["DEM", "INTG"], "why": "işaret ve soru edatları" },
+    { "unit": 5, "pattern": "ism-i işaret|soru ismi", "why": "işaret/soru isimleri" },
+    { "unit": 12, "pos": ["COND", "T"], "why": "şart ve zaman parçacıkları" },
+    { "unit": 12, "pattern": "zarf \\((zaman|geçmiş zaman)", "why": "zaman zarfları" },
+    { "unit": 9, "pattern": "nidâ edatı", "why": "seslenme (g18)" },
+    { "unit": 4, "notPos": ["N", "ADJ", "PN", "V"], "why": "edat, zamir, bağlaç" },
+    { "unit": 11, "rootFamily": 3, "pattern": "\\b(II|III|IV|V|VI|VII|VIII|IX|X)\\b|dörtlü", "why": "unit11 kök ailesi (≥3 üye), türemiş bâb" },
+    { "unit": 10, "rootFamily": 3, "why": "unit11 kök ailesi (≥3 üye)" },
+    { "unit": 9, "pos": ["V"], "pattern": "\\b(II|III|IV|V|VI|VII|VIII|IX|X)\\b|dörtlü", "why": "türemiş bâb fiiller" },
+    { "unit": 8, "pos": ["V"], "pattern": "·|câmid fiil", "why": "illetli / câmid fiiller" },
+    { "unit": 7, "pos": ["V"], "why": "sağlam I. bâb fiiller" },
+    { "unit": 6, "why": "kalan isimler" }
+  ]
+}

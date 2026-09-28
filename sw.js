@@ -35,6 +35,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/content/quranGrammarV1.js?v=20260928b',
   './app/content/quranShortSurahsV1.js?v=20260928b',
   './app/content/quranPhonicsV1.js?v=20260924b',
+  './app/content/quranCurriculumV2.js?v=20260928b',
   './app/content/esmaulHusnaV1.js?v=20260730p',
   './app/content/esmaulHusnaV2.js?v=20260730p',
   './app/content/zikirCoreContentV1.js?v=20260730p',

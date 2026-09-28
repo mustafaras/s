@@ -1,0 +1,21 @@
+$ node tests/kao/test_kao2_curriculum.js
+node:internal/assert/utils:146
+  throw error;
+  ^
+
+AssertionError [ERR_ASSERTION]: app/content/quranCurriculumV2.js eksik
+    at Object.<anonymous> (/Users/m_ras/Desktop/seyma/tests/kao/test_kao2_curriculum.js:32:8)
+    at Module._compile (node:internal/modules/cjs/loader:1873:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:2013:10)
+exit=1
+
+$ node tests/kao/test_kao2_perf_budget.js
+node:internal/assert/utils:146
+  throw error;
+  ^
+
+AssertionError [ERR_ASSERTION]: quranCurriculumV2.js eksik
+    at Object.<anonymous> (/Users/m_ras/Desktop/seyma/tests/kao/test_kao2_perf_budget.js:16:8)
+    at Module._compile (node:internal/modules/cjs/loader:1873:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:2013:10)
+exit=1

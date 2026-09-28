@@ -1,12 +1,12 @@
 {
   "program": "KAO2",
   "title": "Kur'an Arapçası Öğreniyorum · Yeniden Tasarım",
-  "status": "blocked",
+  "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-02",
-  "nextCard": "KAO2-04",
-  "ledgerLastSeq": 18,
+  "nextCard": "KAO2-05",
+  "ledgerLastSeq": 20,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -54,7 +54,7 @@
     },
     "KAO2-04": {
       "wave": "W1",
-      "status": "blocked",
+      "status": "done",
       "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-04/KANIT.md"
     },
     "KAO2-05": {
@@ -173,9 +173,7 @@
       "evidence": null
     }
   },
-  "backlog": [
-    "KAO2-04 P3 kapsam kararı: tests/app/test_app_surface_daily_boundary.js ve tests/app/test_v3_welcome.js sabit App yüzey sayılarını iki yeni KAO gezinme shim'i için güncellemek üzere kullanıcı onayı bekliyor."
-  ],
+  "backlog": [],
   "releaseApprovalRecord": {
     "by": "user",
     "at": "2026-09-28",

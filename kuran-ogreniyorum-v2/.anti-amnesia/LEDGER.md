@@ -184,3 +184,22 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-04/KANIT.md
 - evidence-levels: kaynak/test kısmi PASS · yayın — · cihaz —
 - next: KAO2-04
+
+## seq 19 · 2026-09-28 · FIX · KAO2-04
+- status: in_progress
+- summary: Kullanıcı kapsamı yalnız `tests/app/test_app_surface_daily_boundary.js` ve `tests/app/test_v3_welcome.js` içindeki mevcut sayısal yüzey pinlerini güncellemek için genişletti.
+- resolution: Ölçülen App function assignment sayısı 596, benzersiz yüzey 758; diğer kapsam dışı dosyalar hâlâ değiştirilmeyecek. Aynı KAO2-04 sürdürülüyor.
+- next: KAO2-04
+
+## seq 20 · 2026-09-28 · CARD · KAO2-04
+- status: done
+- title: Üç dosya iskeleti, gezinme yığını ve NavBar
+- prev-commit: 30662403
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-04/KANIT.md
+- gates: kao PASS · app PASS · panel PASS · panel-v2 PASS · quran PASS · reminders PASS · driver PASS · zikr PASS · contrast PASS · sync PASS
+- metrics: App atamaları 596 · benzersiz yüzey 758 · etkileşim 393 · içerik 158.372 KiB/256 · runtime 52.172 KiB/80 · CSS 6.444 KiB/14 · p95 3.839 ms/40 · 11/11 görünüm başlığı · kontrast 340/0 ihlal
+- changed-tests: yeni gezinme testi; dört KAO modül yükleme listesi; FX2 yüzey pinleri 756→758; kullanıcı onayıyla daily-boundary assignment 594→596/yüzey 756→758 ve v3 yüzey 756→758
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: paralel P3 koşusunda p95 gürültülü çıktı; izole tekrar 3.839 ms PASS
+- next: KAO2-05

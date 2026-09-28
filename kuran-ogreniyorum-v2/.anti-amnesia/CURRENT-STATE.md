@@ -1,30 +1,30 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-01
-lastSeq: 8
-status: blocked
+nextCard: KAO2-02
+lastSeq: 10
+status: active
 -->
 
-Son güncelleme: 2026-09-28 · LEDGER seq 8
+Son güncelleme: 2026-09-28 · LEDGER seq 10
 
 ## Şu an neredeyiz
-KAO2-00 done, KAO2-01 BLOCKED. Dal kao2-yeniden-tasarim; başlangıç f09987f5. Taban, kaynak ölçümleri ve 24 HTML üretildi; P3 163 komut PASS. 08 §7 eski plan kapısı KAO2 commit öneklerini reddettiği için kart kapanmadı.
+KAO2-00 ve KAO2-01 done (2/28). KAO2-01 BLOCKED önek engeli kullanıcı onaylı tek denetleyici dosyası düzeltmesiyle çözüldü. Dal kao2-yeniden-tasarim; yerel, yayın yok.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-01: eski denetleyici için kapsam onayı sonrası önek uyumunu düzelt, kapıları doğrula ve kartı kapat; KAO2-02'ye geçme.
+KAO2-02: yeni kullanıcı isteğiyle tasarım sözleşmesi fixture'ını baseline modunda kur; bu oturumda başlanmadı.
 
 ## Canlı gerçekler
-- Taban: evidence/KAO2-01/perf-baseline.json; Node v26.3.1, p95 5,087625 ms; relatif tavan +%25.
-- İçerik 162173 B, runtime 50221 B, CSS 7051 B gzip.
-- 22 boş/tohumlu dialog + izole hub + driver saygi sekmesi =24 HTML; sabit saat ve sentetik veri; görsel cihaz kanıtı değil.
-- Runtime 1899 satır; CSS 93 satır, 9 farklı font-weight; CSS link seçici 2, runtime sınıf metni 13; KAO handler 35.
-- P3: KAO18/app77/panel23/panel-v2 27/quran9 PASS; reminder/driver/zikr/kontrast PASS.
-- Eski kao-plan-check: a47a68f ve f09987f öneklerinde 2 FAIL. Üretim/pin/diğer testlerde değişiklik yok.
+- KAO2-01 tabanı: p95 5,087625 ms, Node v26.3.1; süre ≤40 ms ve taban ×1,25. Opt-in yazma wx korumalı.
+- Gzip: içerik 162173 B, runtime 50221 B, CSS 7051 B.
+- 24 HTML: 22 boş/tohumlu KAO dialogu + izole hub + canonical saygi sekmesi; sentetik, özel VM sabit saatli; ekran görüntüsü değil.
+- Runtime 1899 satır; CSS 93 satır/9 farklı font-weight; link CSS seçici 2/runtime metni 13; KAO handler 35.
+- P3 163/163 PASS; eski plan-check PASS (3 eski WARN), öz test 19/19; yeni prefix/artefakt testleri PASS.
+- Üretim kodu ve yayın pini 20260927g değişmedi.
+- Kanıt: evidence/KAO2-01/KANIT.md; manifest/taban/makbuzlar aynı klasörde.
 
 ## Açık riskler
-KAO2-01'in izinli dosyaları eski denetleyiciyi kapsamıyor. Perf tabanı wx korumalı; sonraki kartlar tabanı sessizce değiştiremez. HTML dökümleri screenshot değildir; ikonlar özel VM'de stub.
+VM tabanı makineye bağlıdır; cihaz kabulü değildir. HTML dökümlerinde özel VM ikonları stub; stil uygulanmış ekran kanıtı değildir. Önceki Ausubel 1968 birincil teyit uyarısı korunur.
 
 ## Bekleyen kullanıcı işleri
-- docs/kuran-ogreniyorum/tools/kao-plan-check.mjs içinde KAO2 kart öneklerini tanıma için sınırlı kapsam onayı.
-- Önceki Ausubel birincil teyit uyarısı ve sonraki K-3/G2/G3/L2 kararları aynen açık.
+Bu kart için kapsam/engel kalmadı. Sonraki G2/G3 onayları, K-3 okuyucu/lisans ve L2 uzman kararı kendi kartlarında; cihaz kabulü kullanıcıda.

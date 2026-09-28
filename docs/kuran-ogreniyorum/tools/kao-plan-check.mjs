@@ -30,8 +30,8 @@ const FIX_BASE = '58e0ceb';
 const KAO_FILE_SCOPE = ['app/core/quranLearn.js', 'app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranPhonicsV1.js', 'tools/kao-*.mjs', 'tests/kao/**', 'assets/kao/**'];
 // KAO-P00/KAO-Dn eski programın başlangıç/denetim kartlarıdır; "(ek)" düzeltme programının ek commit biçimidir.
 // KAO-ARSIV: program kapanışında plan klasörünün kökten docs/ altına taşınması (2026-09-27); tek seferlik yol güncellemesi.
-const KAO_SUBJECT_RE = /^(?:(?:KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
-const CARD_OF_SUBJECT_RE = /^(KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
+const KAO_SUBJECT_RE = /^(?:(?:KAO2-(?:[01]\d|2[0-7])|KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
+const CARD_OF_SUBJECT_RE = /^(KAO2-(?:[01]\d|2[0-7])|KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
 const AUDIT_STATUSES = ['pass', 'fail', 'findings'];
 const FORBIDDEN_IN_REGISTRY = ['localStorage', 'XMLHttpRequest', 'SeySync', 'ghToken', 'openaiKey', 'sessionStorage', 'indexedDB'];
 

@@ -32,9 +32,9 @@
   {
     "command": "node tests/kao/test_kao2_perf_budget.js",
     "exit": 0,
-    "stdoutSha256": "e452b41a20cb62a6b8c0f4d6e7399ce614546753573ff5b35d00b9cfd6fc2290",
+    "stdoutSha256": "a2ecc34d2fb9905de0d65141dcad28efeee699eae9d00d5bd92d5cf10008f6ce",
     "tail": [
-      "KAO2 perf: PASS (content 158.372 KiB · runtime 49.044 KiB · css 6.886 KiB · p95 4.053 ms)"
+      "KAO2 perf: PASS (content 158.372 KiB · runtime 49.044 KiB · css 6.886 KiB · p95 4.050 ms)"
     ]
   },
   {
@@ -145,9 +145,9 @@
   {
     "command": "node tests/kao/test_kao_requirements.js",
     "exit": 0,
-    "stdoutSha256": "731315b07807fc916d567e3f4060c745d3ede84ce443f47efbedc6423ea9aa57",
+    "stdoutSha256": "71758deffe435847ffd4efe3f6398d7472d4354e48322ad545392f9ac1254e8b",
     "tail": [
-      "KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli 0.964 ms <50 ms)"
+      "KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli 0.884 ms <50 ms)"
     ]
   },
   {
@@ -169,9 +169,9 @@
   {
     "command": "node tests/kao/test_kao_user_tasks.js",
     "exit": 0,
-    "stdoutSha256": "edc39427d66e9d77116f623e327e6dddeb6092209e1baf722995e47b98f593cc",
+    "stdoutSha256": "069f797f65f931f17c932e4684759c804a76b54bf97b560b424545e02000ab70",
     "tail": [
-      "KAO user tasks: PASS (R-C9 a:2 adım, b:1 dokunuş, c: ses 0; geçiş p50 0.14 ms / max 0.806 ms; içerik gzip 162173 B; kalibrasyon ECE 0.0131; gece oturumu 8 kart)"
+      "KAO user tasks: PASS (R-C9 a:2 adım, b:1 dokunuş, c: ses 0; geçiş p50 0.188 ms / max 1.186 ms; içerik gzip 162173 B; kalibrasyon ECE 0.0131; gece oturumu 8 kart)"
     ]
   },
   {
@@ -573,9 +573,9 @@
   {
     "command": "node tests/app/test_iip_perf_measure.js",
     "exit": 0,
-    "stdoutSha256": "a9bfe6f90f26f997257944679f406fb4f40a61c18ed1fb8ccc79945507d892b0",
+    "stdoutSha256": "201ad5ab9ae779cbae012f266ccedc5ed9d3559a44c8dfedad6395b99ef3b798",
     "tail": [
-      "  min/mean/max: 0.255 / 0.523 / 1.053 ms",
+      "  min/mean/max: 0.261 / 0.549 / 1.08 ms",
       "",
       "  BOUNDARY: local VM, NOT device. Device p95 stays unmeasured until the user runs the protocol."
     ]
@@ -1531,7 +1531,7 @@
   {
     "command": "node tests/reminders/run-reminder-smoke.mjs",
     "exit": 0,
-    "stdoutSha256": "b2976ca35b7086461d7d5388170f8b019af3481e2c8eaa17af26a617555369a9",
+    "stdoutSha256": "b651b7d997e073555419ef0826b308f861f6855bf96499c52c68f3b6c205cfff",
     "tail": [
       "PASS app user copy and panel operator copy use different voices and share no user data",
       "REMINDER CONTRACT PASS: 73 assertions",

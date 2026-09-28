@@ -92,3 +92,21 @@ Kurallar:
 - evidence-levels: kaynak/test P3 PASS, eski plan gate FAIL · yayın yok · cihaz yok
 - surprises: eski programın commit önek tarayıcısı yeni programı kapsamıyor
 - next: KAO2-01
+
+## seq 9 · 2026-09-28 · FIX · KAO2-01
+- status: done
+- summary: Kullanıcının BLOCKED çözme talimatıyla docs/kuran-ogreniyorum/tools/kao-plan-check.mjs önek uyumu kapsamı onaylandı; Dokun listesi eşlendi. Seq 8 (b66a9e8) engeli yalnız iki regex değişikliğiyle çözüldü. 28 kart ve negatif önek örnekleri TDD PASS; mevcut self-test 19/19 PASS.
+- next: KAO2-01
+
+## seq 10 · 2026-09-28 · CARD · KAO2-01
+- status: done
+- title: Taban ölçüm, performans tabanı ve önce dökümleri
+- prev-commit: b66a9e8
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-01/KANIT.md
+- gates: P3 163/163 PASS (kao18/app77/panel23/panel-v2 27/quran9); reminder/driver/zikr/contrast PASS; eski plan PASS (3 WARN), self-test 19/19; prefix/artefakt/hash PASS; sync PASS
+- metrics: p95 tabanı 5,087625 ms; 24 HTML; runtime 1899 satır; CSS 9 font-weight; KAO handler 35
+- changed-tests: perf fixture yalnız opt-in taban yazma; kanıt alanında prefix ve artefakt kabul testleri
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: eski commit önek engeli onaylı dosya kapsamıyla çözüldü; taban/döküm baytları değişmedi
+- next: KAO2-02

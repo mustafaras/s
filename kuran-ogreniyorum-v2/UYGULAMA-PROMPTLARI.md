@@ -174,7 +174,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 #### KAO2-01 · Taban ölçüm ve referans dökümler
 
 - **Oku:** 08 §7 · `.claude/skills/run-seyma/SKILL.md` (`--dump` kullanımı).
-- **Dokun:** `kuran-ogreniyorum-v2/evidence/KAO2-01/*` (yalnız kanıt), `tests/kao/test_kao2_perf_budget.js` (yalnız taban yazma bayrağı gerekiyorsa).
+- **Dokun:** `kuran-ogreniyorum-v2/evidence/KAO2-01/*` (yalnız kanıt), `tests/kao/test_kao2_perf_budget.js` (yalnız taban yazma bayrağı gerekiyorsa), `docs/kuran-ogreniyorum/tools/kao-plan-check.mjs` (2026-09-28 kullanıcı onayı: yalnız KAO2-00…27 commit öneklerini tanıma; bilinmeyen önek reddi korunur).
 - **Adımlar:**
   1. P3'ün tamamını çalıştır; her aile için PASS sayısını kaydet.
   2. `perf-baseline.json` üret: `{date, node: process.version, p95Ms, contentGzip, runtimeGzip, cssGzip}` (perf testinin ölçüm fonksiyonuyla; `KAO2_WRITE_BASELINE=1` bayrağıyla yazma modu).

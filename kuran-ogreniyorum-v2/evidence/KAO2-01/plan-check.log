@@ -1,0 +1,4 @@
+WARN taban öncesi commit ecc7ac7 KAO dosyasına tanınmayan önekle dokunuyor ("feat(quran): refine learning card and modal"): app/core/quranLearn.js, app/kao.css, tests/kao/test_kao_render.js
+WARN taban öncesi commit a9fa40c KAO dosyasına tanınmayan önekle dokunuyor ("fix(ui): move Quran learning into faith hub"): app/core/quranLearn.js, app/kao.css, tests/kao/test_kao_independence.js, tests/kao/test_kao_render.js
+WARN app/core/quranLearn.js: MediaRecorder ve save birlikte — kayıt kalıcı yola çıkmıyor mu, elle incele (05 §4)
+kao-plan-check: PASS (3 warn)

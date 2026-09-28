@@ -203,3 +203,10 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: paralel P3 koşusunda p95 gürültülü çıktı; izole tekrar 3.839 ms PASS
 - next: KAO2-05
+
+## seq 21 · 2026-09-28 · NOTE · —
+- status: approved
+- summary: Kullanıcı KAO2-04 tamamlandıktan sonra "canlıya al ve sıradan devam et" dedi. Açık onay KAO2-03…04 kaynak tesliminin uzak KAO2 dalına push edilmesini, main'e fast-forward edilmesini, GitHub Pages yayını ve canlı byte/hash doğrulamasını kapsıyor.
+- release-boundary: KAO2-05 ve sonrası için yayın yetkisi verilmedi; sonraki kart yerel kalır.
+- evidence-levels: kaynak/test KAO2-04 KANIT.md'de PASS · yayın makbuzu bekleniyor · cihaz doğrulanmadı
+- next: KAO2-05

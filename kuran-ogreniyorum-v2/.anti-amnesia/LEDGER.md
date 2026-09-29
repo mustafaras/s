@@ -353,3 +353,13 @@ Kurallar:
 - resolution: gates: syntax PASS · kao 25/25 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders PASS · driver PASS · zikr 95/95 · contrast 406/0 · perf PASS (runtime 60,088 KiB · css 7,817 KiB · p95 4,37 ms) · sync PASS.
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-09/KANIT.md (Ek — FIX)
 - next: KAO2-10
+
+## seq 37 · 2026-09-29 · NOTE · —
+- status: verified
+- summary: Kullanıcı denetim raporu sonrası "onaylıyorum" → kapsam sorusuna "hepsini" yanıtıyla KAO2-07…09 + denetim FIX'lerinin yayınını onayladı; releaseApproval approved_through_KAO2-09.
+- source: `3b1b3d16bc26425e522cd42182da963ec451281e`; `kao2-yeniden-tasarim` ve `main` 944dae6c'den bu SHA'ya fast-forward eşitlendi.
+- actions: Pages run 36531279286 success; validate ve deploy PASS.
+- live: 15/15 runtime varlığı (quranCurriculumV2.js dahil) HTTP 200 ve yerel SHA-256 ile birebir; STATE ve KAO2-09 KANIT beklenen 404.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-09/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-09/release-live.json
+- evidence-levels: kaynak/test PASS · yayın/run/hash PASS · cihaz doğrulanmadı
+- next: KAO2-10

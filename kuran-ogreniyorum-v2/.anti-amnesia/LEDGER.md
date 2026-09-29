@@ -382,3 +382,14 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: eski hub CSS'i öksüz (B-KAO2-10-1 → KAO2-26); kontrast aracı dekoratif ikonu 4,5 eşiğiyle ölçüyor, ikon zemini %8'e indirildi; motor/müfredat eksikse hub sade karta düşer
 - next: KAO2-11
+
+## seq 40 · 2026-09-29 · NOTE · —
+- status: verified
+- summary: Kullanıcı "tümünü canlıya al" dedi; KAO2-10 yayınlandı, releaseApproval approved_through_KAO2-10.
+- source: `811ebc8835a789f23c48a0764b93460853092c68`; `kao2-yeniden-tasarim` ve `main` 4e836148'den fast-forward.
+- actions: Pages run 36534605512 success; validate ve deploy PASS.
+- live: 16/16 runtime varlığı HTTP 200 ve yerel SHA-256 ile birebir; STATE ve KAO2-10 KANIT beklenen 404.
+- risk: sw.js değişmedi → çevrimdışı paketli cihazlar KAO2-10'u sw.js değişene kadar görmez.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-10/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-10/release-live.json
+- evidence-levels: kaynak/test PASS · yayın/run/hash PASS · cihaz doğrulanmadı
+- next: KAO2-11

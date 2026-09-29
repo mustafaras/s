@@ -73,19 +73,23 @@ const report = {};
   report.taskA = { hubToFirstLemma: 3, settingsToSession: 2, limit: 3 };
 }
 
-// (b) Kelime kartından kök ağacına: E5 → 1 dokunuş; ünite listesinden 2 dokunuş.
+// (b) Öğrenme yolundan üniteye ve ilk derse: yol → ünite → ders (2 dokunuş).
 {
-  const { api, state } = boot();
-  state.ui.kaoOpen = true; state.ui.kaoView = 'units';
-  const openWord = clicks(api.kaoUnitsHTML()).find((item) => item.name === 'kaoOpenWord');
-  assert.ok(openWord, 'ünite listesi kelime kartına bağlanır');
-  const lemmaId = openWord.args.replace(/'/g, '');
-  assert.equal(api.kaoOpenWord(lemmaId), true); assert.equal(state.ui.kaoView, 'word');
-  const toRoot = clicks(api.kaoWordHTML()).find((item) => item.name === 'kaoWordLayer' && item.args === '2');
-  assert.ok(toRoot, 'kelime kartında “Kökünü ve akrabalarını gör”');
-  assert.equal(api.kaoWordLayer(2), true);
-  assert.match(api.kaoWordHTML(), /kao-root-tree/, 'kök ağacı görünür');
-  report.taskB = { wordCardToRootTree: 1, unitListToRootTree: 2, limit: 2 };
+  const { api, state, box } = boot();
+  const unit = box.window.QuranCurriculumV2.units[0];
+  state.ui.kaoOpen = true;
+  assert.equal(api.kaoNav('units'), true);
+  assert.match(api.kaoOverlayHTML(), new RegExp(`App\\.kaoNav\\(\\"unit\\",${unit.id}\\)`), 'Yol satırı ünite ayrıntısını açar');
+  assert.equal(api.kaoNav('unit', unit.id), true);
+  assert.equal(state.ui.kaoView, 'units', 'ünite ayrıntısı Yol geçmiş yolunda kalır');
+  const unitHTML = api.kaoOverlayHTML();
+  assert.match(unitHTML, /class="kao-unit-screen/, 'ünite ayrıntısı açılır');
+  assert.match(unitHTML, /Kelimeler · \d+/, 'ünitede gerçek kelime listesi bulunur');
+  assert.match(unitHTML, new RegExp(`App\\.kaoLesson\\(\\"start\\",\\"${unit.lessons[0].id}\\"\\)`), 'birincil ders eylemi ilk gerçek derse gider');
+  assert.equal(api.kaoLesson('start', unit.lessons[0].id), true);
+  assert.equal(state.ui.kaoView, 'session');
+  assert.equal(state.ui.kaoLesson.lessonId, unit.lessons[0].id, 'seçilen ünite dersi açılır');
+  report.taskB = { pathToFirstLesson: 2, unitWordList: true, limit: 2 };
 }
 
 // (c) Ses kapalı tam oturum: hiç ses nesnesi oluşmaz, oturum sonu ekranına ulaşılır (R-C2 ile).
@@ -208,4 +212,4 @@ for (const variant of [{ label: 'audio=false', quiet: false }, { label: 'sessiz 
 }
 
 if (process.argv.includes('--report')) console.log(JSON.stringify(report, null, 2));
-else console.log(`KAO user tasks: PASS (R-C9 a:${report.taskA.hubToFirstLemma} adım, b:${report.taskB.wordCardToRootTree} dokunuş, c: ses 0; geçiş p50 ${report.transition.p50Ms} ms / max ${report.transition.maxMs} ms; içerik gzip ${report.contentGzip.total} B${report.contentGzip.overBudget ? ' — 130 KB bütçesi AŞILDI, karar bekliyor' : ''}; kalibrasyon ECE ${report.calibration.ece}; gece oturumu ${report.night.nightSessionCards} kart)`);
+else console.log(`KAO user tasks: PASS (R-C9 a:${report.taskA.hubToFirstLemma} adım, b Yol→ders:${report.taskB.pathToFirstLesson} dokunuş, c: ses 0; geçiş p50 ${report.transition.p50Ms} ms / max ${report.transition.maxMs} ms; içerik gzip ${report.contentGzip.total} B${report.contentGzip.overBudget ? ' — 130 KB bütçesi AŞILDI, karar bekliyor' : ''}; kalibrasyon ECE ${report.calibration.ece}; gece oturumu ${report.night.nightSessionCards} kart)`);

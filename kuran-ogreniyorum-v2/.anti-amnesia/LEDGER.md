@@ -518,3 +518,23 @@ Kurallar:
 - gates: quranLearn.js/quranLearnViews.js syntax PASS · KAO2-13 yol 4/4 PASS · render PASS · kullanıcı-görev FAIL (P6) · tam KAO P3 ve diğer aile kapıları çalıştırılmadı · sync kapanışta
 - evidence-levels: kaynak/test kısmi · yayın yok · cihaz doğrulanmadı
 - next: KAO2-13
+
+## seq 55 · 2026-09-29 · FIX · KAO2-13
+- status: in_progress
+- summary: Kullanıcı seq54 P6 kapsamını onayladı. Yalnız `tests/kao/test_kao_user_tasks.js` bölüm (b), eski ünite-listesi → kelime/kök rotası yerine KAO2-13 Yol → Ünite → ilk ders ve ünite kelime listesi sözleşmesini sınayacak.
+- scope: Bu fikstürde başka senaryo/değişiklik ve üretim dosyası kapsam onayına dahil değil.
+- resolution: KAO2-13 kaldığı yerden sürüyor; tam P3 kapıları ve kanıt kapanışta.
+- next: KAO2-13
+
+## seq 56 · 2026-09-29 · CARD · KAO2-13
+- status: done
+- title: Yol (S-03) ve Ünite (S-04)
+- prev-commit: 31b63d600e1a840a7eff3734d3ab9080e492ab29
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-13/KANIT.md
+- gates: syntax PASS · KAO 29/29 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders smoke 21 curated PASS · driver PASS · zikr PASS · contrast 562/0 PASS · sync PASS
+- metrics: path 4/4 · render PASS · user_tasks PASS (A 3 adım, B Yol→ders 2 dokunuş, C ses nesnesi 0) · içerik gzip 172527/262144 B · VM geçiş p50 0.192 ms / max 1.154 ms · FSRS sentetik ECE 0.0131
+- changed-tests: seq55 onayıyla yalnız `test_kao_user_tasks.js` bölüm (b) eski API/rota → Yol → Ünite → ilk ders ve kelime listesi; bu bölümün rapor alanı güncellendi.
+- evidence-levels: kaynak/test PASS · yayın yok · cihaz doğrulanmadı
+- surprises: seq54 P6 engeli çözüldü; releaseApproval KAO2-12 ile sınırlı.
+- next: KAO2-14

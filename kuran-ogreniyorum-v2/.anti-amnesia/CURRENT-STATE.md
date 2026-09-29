@@ -1,28 +1,27 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-13
-lastSeq: 54
+nextCard: KAO2-14
+lastSeq: 56
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq54
+Son güncelleme: 2026-09-29 · LEDGER seq56
 
 ## Şu an neredeyiz
-KAO2-00…12 tamamlandı. Canlı Git/STATE doğrulaması KAO2-13'ü seçti; senkron kapısı başlangıçta PASS'tı. KAO2-13 için yedi seviyeli Yol görünümü, müfredat ünite satırları, ünite ayrıntısı, gerçek ilerleme, ders listesi ve fikstür eklendi. Odaklı yol fikstürü 4/4, `test_kao_render.js` PASS. Kart P6 ile durdu: `tests/kao/test_kao_user_tasks.js:80`, eski ve kaldırılmış `api.kaoUnitsHTML()` üzerinden ünite listesinden ilk kelime/kök rotasını zorunlu tutuyor. Bu dosya KAO2-13'ün Dokun listesinde değil; güncellenmedi. Tam P3 kümesi çalıştırılmadı.
+KAO2-00…13 tamamlandı. KAO2-13, yedi seviyeli Yol ve gerçek müfredat/ilerlemeden türetilen Ünite ekranını kapattı. Seq54 P6 eski fikstür engeli, kullanıcının yalnız test bölüm (b) kapsamını onaylamasıyla seq55 FIX kaydında çözüldü; yeni Yol → Ünite → ilk ders akışı ve kelime listesi doğrulanıyor. Tam P3 aile kapıları ve `kao2-sync-check` PASS; kanıt `evidence/KAO2-13/KANIT.md`.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-13 engelli ve sıradaki kart olarak kalıyor; yalnız `tests/kao/test_kao_user_tasks.js` bölüm (b) için P6'da belirtilen sınırlı test kapsamı onaylanırsa devam edilebilir.
+Sıradaki KAO2-14, oturum sonunda öğrenilenleri ve yarınki tekrarları özetleyen S-07 ekranıdır; bu oturumda başlanmadı.
 
 ## Canlı gerçekler
-- Dal `kao2-yeniden-tasarim`; başlangıç HEAD `b67458daa322b9d8fb54feceaba6ed2a33f8450a`; temiz başlangıç çalışma ağacı.
-- `KAO2-STATE.json.nextCard=KAO2-13`, kart `blocked`, `ledgerLastSeq=54`.
-- Release approval yalnız `approved_through_KAO2-12`; push/merge/tag/deploy yok. Cihaz kabulü doğrulanmadı.
-- G0 kapalı, G1 sunulmuş, G2 kapalı, G3/G4 açık.
-- `kaoUnitSlices()` eski taş hesabı için KAO2-16'ya kadar korunuyor. İlham & İbadet sekmesi ve `saygi.js`/`app/styles.css` değiştirilmedi.
-- Ünite gezinme eylemi `kaoNav('unit', id)` biçiminde; mevcut `quranLearnFlow.js` izin listesindeki `units` geçmiş yolunu id parametresiyle kullanıyor, o modül değiştirilmedi.
+- Dal: `kao2-yeniden-tasarim`; kapanış öncesi HEAD `31b63d600e1a840a7eff3734d3ab9080e492ab29`; bu kaydı taşıyan kapanış commit'i `HEAD+1`.
+- `KAO2-STATE.json`: program `active`; KAO2-13 `done`; `nextCard=KAO2-14`; `ledgerLastSeq=56`.
+- `releaseApproval=approved_through_KAO2-12`; push, merge, tag ve deploy yok. Cihaz kabulü doğrulanmadı.
+- G0 kapalı, G1 sunulmuş, G2 kapalı; G3/G4 açık.
+- `kaoUnitSlices()` KAO2-16 taş geçişine kadar korunuyor. IIP Arapça keşif sekmesi KAO modalından ayrı; `saygi.js`, `app/styles.css`, yayındaki sekme dosyaları ve sürüm pinleri bu kartta değişmedi.
+- KAO2-13 test kapsamı: yalnız `tests/kao/test_kao_user_tasks.js` bölüm (b) ve bu senaryonun özet metriği (seq55 onayı).
 
-## P6 kapsam engeli ve istenen karar
-- `node tests/kao/test_kao_user_tasks.js` → FAIL: satır 80 `api.kaoUnitsHTML is not a function`.
-- İstenen kapsam: yalnız testin (b) senaryosunu Yol → Ünite → yeni ders/kelime listesi sözleşmesine güncellemek. Onay verilirse diğer senaryolar veya üretim dosyaları bu kapsam genişletmesiyle değiştirilmeyecek.
-- P6 kapanışı seq54 ile kaydedildi. Kaynak/kısmi test kanıtı var; yayın ve cihaz kabulü yok. KAO2-13 kapanış kanıt dosyası üretilmedi.
+## Açık riskler ve bekleyen kullanıcı işleri
+- Yayın ve gerçek cihaz kabulü bu kartın kanıtı değildir; yeni yayın için ayrıca açık kullanıcı talimatı gerekir.
+- G3/G4 kapıları açık kalıyor ve sonraki kartlarda kendi karar/inceleme koşulları geçerli.

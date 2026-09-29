@@ -499,3 +499,11 @@ Kurallar:
 - evidence: `kuran-ogreniyorum-v2/evidence/KAO2-12/YAYIN.md` · `kuran-ogreniyorum-v2/evidence/KAO2-12/release-live.json`
 - evidence-levels: source/test PASS · Pages/run/hash PASS · device not verified
 - next: KAO2-13
+
+## seq 53 · 2026-09-29 · NOTE · —
+- status: done
+- summary: Kullanıcı isteğiyle kalan KAO2-13…27 promptları, yayımlanmış İlham & İbadet Arapça sekmesinin premium hiyerarşisi ve yeni başlayan rehberliğiyle uyumlu olacak şekilde güncellendi. §1'e P10 tasarım köprüsü; §0'a canlı durumu ve yeni referansları yeniden doğrulayan oturum başlatıcı eklendi.
+- design-boundary: IIP Arapça sekmesi ayrı keşif/giriş yüzeyi; KAO modalında 06 tasarım sistemi bağlayıcı. IIP canlı varlıkları, uygulama kodu ve KAO kart durumu değiştirilmedi.
+- scope: yalnız UYGULAMA-PROMPTLARI.md §0, §1 P10, KAO2-13…27 tasarım kabul satırları; CURRENT-STATE ve sync metaverisi.
+- evidence-levels: plan belgeleri güncellendi · kaynak/test, yayın ve cihaz kabulü bu değişiklikle iddia edilmiyor
+- next: KAO2-13

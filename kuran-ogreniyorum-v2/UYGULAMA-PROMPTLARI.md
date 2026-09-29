@@ -10,16 +10,29 @@ bağlanır. Her kart §1 Ortak protokolü **aynen** uygular.
 ## §0 · Oturum başlatıcı (her yeni oturumda bunu yapıştır)
 
 ```text
-Şeyma reposunda KAO2 programındasın (Kur'an Arapçası Öğreniyorum yeniden tasarımı).
-Sırayla oku ve başka bir şey yapmadan önce doğrula:
-1) CLAUDE.md "DATA SAFETY" bölümü (tarayıcı açma yok, seyma-data'ya yazma yok).
-2) kuran-ogreniyorum-v2/.anti-amnesia/CURRENT-STATE.md
-3) node kuran-ogreniyorum-v2/tools/kao2-sync-check.mjs  → PASS olmalı
-4) kuran-ogreniyorum-v2/KAO2-STATE.json → nextCard
-5) kuran-ogreniyorum-v2/UYGULAMA-PROMPTLARI.md → §1 Ortak protokol + nextCard'ın kartı
-Yalnız nextCard kartını uygula; §1'deki başlangıç, TDD, kapı ve kapanış adımlarını
-atlamadan izle. Kapsam dışı bir şey görürsen yapma: KAO2-STATE.json.backlog'a yaz.
-Bitince LEDGER + CURRENT-STATE + STATE aynı committe; sync-check PASS; tek commit.
+Şeyma deposunda KAO2 uygulama programına devam et. Plan güncelleme tabanı:
+dal `kao2-yeniden-tasarim`, taban commit `28efe60af79dec6fb2e7a01fb786da7dc81b3c72`;
+bu başlangıç referansıdır, canlı `git status`/STATE/LEDGER doğrulamasının yerine geçmez.
+
+Kod yazmadan önce sırayla oku ve doğrula:
+1) `CLAUDE.md` DATA SAFETY: tarayıcı/sunucu açma ve `seyma-data` yazma yok.
+2) `kuran-ogreniyorum-v2/.anti-amnesia/CURRENT-STATE.md` ve LEDGER son kaydı.
+3) `node kuran-ogreniyorum-v2/tools/kao2-sync-check.mjs` → PASS.
+4) `kuran-ogreniyorum-v2/KAO2-STATE.json` → `nextCard`, durum, kapılar, release sınırı.
+5) Bu dosyada §1 P1–P10 ve yalnız `nextCard` kartının tamamı.
+6) `05-HEDEF-DENEYIM.md`, `06-TASARIM-SISTEMI.md` ve
+   `docs/evidence/arapca-elite-20260929/README.md` + `YAYIN.md`.
+7) Kartın Oku satırındaki diğer kaynaklar ve çalışma ağacının durumu.
+
+Tasarım bağlamı: İlham & İbadet “Arapça” sekmesi yayınlanmış, ayrı bir keşif/giriş
+yüzeyidir; KAO kendi gezinme yığını olan modaldır. P10 köprüsünü uygula, iki
+yüzeyi veya tasarım sistemlerini birleştirme. Sekme içeriğini, `saygi.js` /
+`app/styles.css` değişikliklerini ve yayın pinlerini KAO2 kartı diye tekrar açma.
+
+Yalnız STATE'teki sıradaki kartı yürüt; tamamlanmış kartı yeniden açma, sonraki
+karta geçme. P1–P9 kapı/kapanış akışını uygula. Kapsam dışı gereksinimi uygulama;
+backlog'a kaydet, P6 tetikleniyorsa orada dur. Her kartta LEDGER + CURRENT-STATE +
+STATE aynı committe; sync-check PASS; tek commit. Push/merge/deploy yetkisi yok.
 ```
 
 ---
@@ -144,6 +157,34 @@ KAO2-NN: <Türkçe kısa özet>
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
+
+### P10 · Yayındaki Arapça sekmesiyle tasarım köprüsü (KAO2-13…27)
+
+Referans: [`docs/evidence/arapca-elite-20260929/README.md`](../docs/evidence/arapca-elite-20260929/README.md)
+ve `YAYIN.md`. Bu referans, İlham & İbadet içindeki keşif/giriş sekmesidir;
+KAO modalının tasarım sistemi yerine geçmez. Modal için 06'daki token, tipografi,
+etkileşim ve erişilebilirlik sözleşmesi bağlayıcı kalır.
+
+- **Deneyim sürekliliği:** kullanıcı sekmeden KAO'ya geçtiğinde sıradaki adımı,
+  eylemi ve gerçek ilerlemeyi KAO içinde de kolayca tanır. Sahte tamamlanma,
+  ilerleme veya süre üretme.
+- **Hiyerarşi:** net başlık → kısa açıklama → anlamlı içerik → tek belirgin
+  sonraki eylem; rahat boşluk, okunabilir kart/listeler ve mobilde dikey akış.
+  KAO içinde 06'nın sistem yazı ailesi ve tokenları kullanılır; yeni global
+  renk/font sistemi veya sekmenin Georgia kapağını modal içine kopyalama yok.
+- **Öğrenme yolu:** Tanış → Kavram → Pekiştir → Uygula mantığı anlaşılır kalır.
+  Bu yöntem anlatımıdır, kullanıcı ilerleme durumu değildir. S-05'teki Özet
+  aşaması ayrıca korunur.
+- **Yeni başlayan erişimi:** terimleri kısa Türkçeyle açıkla; ayrıntıyı başlık,
+  alt bölüm veya katlanabilir içerikle aşamalı sun. Etkileşimsiz öğeyi düğme gibi
+  gösterme; boş/yüklenemeyen durumda güvenli sonraki yolu belirt.
+- **Sınır:** `saygi.js`/`app/styles.css`, IIP sözleşmeleri, KAO motoru/verisi/
+  migration/App handler yüzeyi ve yeni kalıcı veri/ağ davranışı kartın Dokun
+  listesi açmıyorsa değiştirilmez. Uyumu sağlamak kapsamı genişletiyorsa
+  backlog/P6 yolunu kullan.
+- **Kontrol:** ekran üretimi değişiyorsa boş + tohumlu durum, açık + koyu tema,
+  320 px/%200 metin, gerçek ana eylem, 44 px hedefler ve yatay taşma ilgili
+  fixture/kanıtta kapsanır. İçerik/araç kartına UI işi ekleme.
 
 ---
 
@@ -362,6 +403,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Dokun:** `app/core/quranLearnViews.js`, `app/core/quranLearn.js` (eski `kaoUnitsHTML` kaldırılır; `kaoUnitSlices` taş hesabında hâlâ kullanılıyorsa KAO2-16'ya kadar korunur ve not düşülür), `app/kao.css`, `tests/kao/test_kao2_path.js` (yeni), `tests/kao/test_kao_render.js` (P2.4).
 - **Adımlar:**
   1. **Kırmızı:** (a) Yol: 7 seviye bölümü, her birinde üniteler (başlık, vaat, halka); S0 ve S5 kendi satırları; önerilen ünite `aria-current="step"`; (b) üniteye dokunmak `kaoNav('unit',id)`; (c) Ünite: LargeTitle, vaat, halka + "x / y kelime · a/b ders", tek birincil "Ders N'e devam et" / "Başla", StepList (✓/●/○), Kavramlar (KAO2-15'e kadar yalnız başlık, dokunulamaz), Kelimeler (sayı ›; liste: Arapça + okunuş + anlam + durum), Çapa metin satırı; (d) etkisiz "Seviye" kutuları yok.
+  2. **P10 tasarım kabulü:** dikey öğrenme yolu fikrini KAO tokenlarıyla sürdür. Önce konum/sıradaki adım, sonra ünite vaadi ve içerik; birincil ders eylemi görünür olsun. Dört eşit dar kart/grid kurma; yöntem adımlarını ilerleme diye işaretleme. Boş/devam/tamamlanmış durum gerçek veriden türesin.
 - **Kabul:** path testi PASS; K-08, K-09, Y-09 kapanır.
 - **Commit:** `KAO2-13: Yol ve Ünite ekranları`
 
@@ -373,6 +415,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Dokun:** `app/core/quranLearnViews.js`, `app/core/quranLearn.js`, `tests/kao/test_kao2_summary.js` (yeni), `tests/kao/test_kao_user_tasks.js` (gerekirse P2.4).
 - **Adımlar:**
   1. **Kırmızı:** (a) özet: bu oturumda tanışılan kelimeler (Arapça + anlam, en çok 10 + "ve N daha"), doğruluk %, yarın vadesi gelecek kart sayısı ve tahmini dakika (`nextStep` ile aynı hesap), sıradaki adım satırı; (b) programın ilk 7 günü "kalıcı oldu (s≥21)" sayısı gösterilmez; sonrasında yalnız ≥1 ise gösterilir; (c) iki eylem: birincil "Bugün yeter" (Bugün ekranına), ikincil "5 dakika daha"; (d) taş kazanıldıysa tek sakin satır + (hareket izinliyse) konfeti.
+  2. **P10 tasarım kabulü:** öğrenilenler → yarın → tek önerilen sonraki adım sırası. Büyük yüzde/seri iddiasıyla yargılama; sayılar gerçek ve kaynağı belli olsun. Birincil/ikincil eylem ağırlığı ayrılsın.
 - **Kabul:** summary testi PASS.
 - **Commit:** `KAO2-14: öğrenilenleri ve yarını gösteren oturum özeti`
 
@@ -384,6 +427,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Dokun:** `app/core/quranLearnViews.js`, `app/core/quranLearn.js`, `app/kao.css`, `tests/kao/test_kao2_grammar_notes.js` (yeni).
 - **Adımlar:**
   1. **Kırmızı:** (a) liste 25 kavramı ünite sırasıyla gruplar; (b) kavram sayfası: başlık, `plainTr`, tablolar (Arapça hücreler içerik modülünden, okunuşla), katlanabilir "Terimi" (`termTr`), "Bu kavramın geçtiği dersler" bağlantıları; (c) Bugün → Keşfet'te "Gramer notları" satırı görünür; Ünite ekranındaki kavram satırları dokunulabilir olur; (d) tablo `<table>` + `<th scope>`; dar ekranda sayfa yatay taşmaz (yalnız tablo sarmalayıcısı `overflow-x:auto`).
+  2. **P10 tasarım kabulü:** önce gündelik Türkçeyle açıkla; terim ve tabloyu isteğe bağlı ayrıntı olarak aç. Ünite ve Keşfet girişleri aynı içeriğe tutarlı başlık/bağlantı verir; tablo dışında 320 px'te yatay kayma olmaz.
 - **Kabul:** grammar notes testi PASS; 25/25 erişilebilir.
 - **Commit:** `KAO2-15: 25 kavramlık gramer notları kütüphanesi`
 
@@ -398,6 +442,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
   2. **Kırmızı (geçiş):** üç sentetik eski durum (boş · kısmi: 40 kart · zengin: 400 kart + günlükler + taşlar + surahs + phonics) → `ensureQuranLearn` → (a) `cards`, `daily`, `milestones`, `surahs`, `phonics`, `errors`, `gate` derin eşit; (b) `onboarding.doneAt` kartlıda `legacy`, boşta `null`; (c) `path`'ten türetilen ilerleme ünite ekranında görünür (kartı olan lemmalar "tanışıldı"); (d) iki kez çalıştırma idempotent; (e) JSON boyut artışı ≤7 KB (`test_kao_state_budget.js` ile tutarlı).
   3. `kaoUnitSlices`'ı kullanan yer kalmadıysa kaldır; kalmadığını test et.
   4. Panel projeksiyonu yeni taş anahtarlarını (`besmele`, `u1…u12`) sayısal olarak taşır (panel görünümü KAO2-25'te).
+- **P10 tasarım kabulü:** taş/ilerleme yalnız doğrulanmış durumdan türesin; eski kullanıcı geriye dönük kazanım kaybetmesin. Kutlama sakin ve ikincil olsun; yöntem yolu gerçek kazanım gibi sunulmasın.
 - **Kabul:** milestones + migration testleri PASS; panel projeksiyonu PASS.
 - **Commit:** `KAO2-16: Fâtiha taşı düzeltildi, ünite taşları, eski veri geçişi`
 
@@ -413,6 +458,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
   1. **Kırmızı:** `test_kao2_text_review.js` (L0): K-4 (a)–(f); `draft` metin render'da **görünmez** (başlık için güvenli geri dönüş: "Ünite N · Ders M"); `sourced`/`expert` görünür ve dinî bağlamlı olanda "Kaynak:" satırı var; yasak ifade listesi dosya başında sabit dizi.
   2. Metin taslakları (ajan): 12 ünite × {title, promise, why} + ~75 ders × {title, goal}. Kaynak yalnız repo içi: 03-MUFREDAT, `QuranRevelationOrderV1.themeTr/sourceRefs`, `QuranGrammarV1.plainTr`. Dinî bağlam içeren `why` cümlelerinde `sources` kimliği zorunlu; kaynağı olmayan iddia yazılmaz (`[KAYNAK?]` ile işaretlenir). Ton: sıcak, sen dili, emir yok, emoji ölçülü. Hepsi `review.level:'draft'`.
   3. İnceleme sayfasını üret; LEDGER `GATE` kaydı: `G3 · INCELEME-KAO2-17 kullanıcıda`. Kullanıcı onay verirse araç onayları taşır (`--apply-review`); onay yoksa metinler `draft` kalır ve kart yine kapanır (uygulama güvenli başlıklarla çalışır).
+  4. **P10 içerik kabulü:** başlık/vaat/amaç kısa ve yeni başlayan Türkçesiyle anlaşılır olsun; kaynak ve inceleme durumu görünür kalır. Kısalık uğruna dinî iddia veya gerekli kaynak atlanmaz.
 - **Kabul:** text review testi PASS; `draft` görünmezlik testi PASS; inceleme sayfası var.
 - **Commit:** `KAO2-17: ünite ve ders metinleri taslağı, L0 inceleme kapısı`
 
@@ -426,6 +472,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
   1. **Kırmızı:** her görev türü × doğru/yanlış için `explain` boş olmayan metin döndürür; şablonlar 07 §4; `cognate.shift` olan lemmada uyarı şablonu; gramer görevinde `errorTr` `draft` ise güvenli genel metin ("Doğru cevap: …"); Arapça yalnız görev nesnesinden.
   2. 25 × (`workedTr`, `errorTr`) taslakları (`draft`); inceleme sayfası `INCELEME-KAO2-18.md`; G3 kaydı.
   3. Panel ve kavram sayfası `explain`/`workedTr`'yi kullanır.
+  4. **P10 tasarım kabulü:** geri bildirim önce kısa açıklamayı, sonra isteğe bağlı çözümlü örneği sunar. Hata mesajı utandırmaz; nedeni ve düzeltme adımını sade dille verir. Taslak içerik onaylıymış gibi gösterilmez.
 - **Kabul:** explain testi PASS; L0 PASS.
 - **Commit:** `KAO2-18: hata sınıfına göre açıklamalar ve kavram çözümlü örnekleri`
 
@@ -438,6 +485,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Adımlar:**
   1. **Kırmızı:** (a) okuyucu başında sûre tanıtım kartı: ad, nüzul yeri, âyet sayısı, `themeTr` (mevcut `QuranRevelationOrderV1`) + `contextTr` (yalnız `sourced/expert`); (b) kelimeler WordChip: kenarlıksız, bilinmeyen altı noktalı; dokununca anlam **alt panelde**, satır akışı bozulmaz; (c) "Dinle" kelime kelime çalar (`s-<sûre>-<âyet>-<i>` klipleri) ve çalan kelimeye `aria-current` + görsel vurgu verir; ses yoksa sessiz yol; (d) seçili sûre seçicide görünür alana kaydırılır (motor tarafında, render'da değil); (e) "Anladım" öncesi 3 soruluk hızlı kontrol (sûrenin yeni kelimelerinden), sonra mevcut gecikmeli test planlanır.
   2. 20 `contextTr` taslağı: yalnız `QuranRevelationOrderV1.sourceRefs`'teki kaynak kimlikleriyle; iddia başına kaynak; `draft`; `INCELEME-KAO2-19.md`; G3.
+  3. **P10 tasarım kabulü:** kısa doğrulanmış bağlamdan sonra Arapça metin kesintisiz okunur; tanıtım kartı okuma alanını daraltmaz. Kaynaksız bağlam gizli kalır; odak metin ve dinlerken oku eylemindedir.
 - **Kabul:** reader testi PASS; L0 PASS; Y-12, T-20, T-21 kapanır.
 - **Commit:** `KAO2-19: sûre tanıtımı ve dinlerken oku okuyucusu`
 
@@ -449,6 +497,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Dokun:** `quranLearnViews.js`, `quranLearn.js`, `kao.css`, `tests/kao/test_kao2_roots.js` (yeni).
 - **Adımlar:**
   1. **Kırmızı:** (a) liste: 73 `unit11` kökü (Türkçe türev sayısıyla) + "Tüm kökler (301)" ikinci bölümü; (b) kök sayfası: kök harfleri (içerik modülünden, okunuşla), anlam, Türkçe türevler (kalıp etiketiyle), bu kökten öğrenilen/öğrenilecek lemmalar (durum rozeti) → kelime detayına bağlantı; (c) Keşfet'te satır görünür; kelime detayından kök sayfasına bağlantı.
+  2. **P10 tasarım kabulü:** önce öğrenme sırasındaki 73 aile, sonra 301 köklük isteğe bağlı keşif katmanı. Anlam/türev sayısı taranabilir; kök detayı tek odaklı ve açık geri yol içerir.
 - **Kabul:** roots testi PASS.
 - **Commit:** `KAO2-20: kök aileleri keşif ekranı`
 
@@ -460,6 +509,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Dokun:** `kuran-ogreniyorum-v2/content/curriculum.spec.json` (S0 dersleri: harf kimlikleriyle şekil aileleri), `tools/kao2-curriculum-build.mjs` (konum şekilleri + S0 kelime sesi seçimi), `tools/kao2-s0-word-audio.mjs` (yeni ya da yukarıdaki aracın alt komutu), `quranCurriculumV2.js`, `quranLearnFlow.js`, `quranLearnViews.js`, `quranLearn.js`, `kao.css`, `tests/kao/test_kao2_s0.js` (yeni).
 - **Adımlar:**
   1. **Kırmızı:** (a) 12 S0 dersi 07 §2 sırasıyla; her harf tam bir "ilk tanıtım" dersinde; (b) konum tablosu 28 × 4 hücre; biçimler araçla üretilir (tek: harf; baş: harf+ZWJ; orta: ZWJ+harf+ZWJ; son: ZWJ+harf; bağlanmayan 6 harfte baş/orta biçimi yok işareti); (c) her harf için ≥1 kelime sesi: lexicon lemması, çıplak biçimi hedef harfle başlar, ≤3 hece, `assets/kao/audio/w-<klip>-measured.m4a` diskte var; yoksa harf "sessiz" işaretlenir; (d) S0 ders akışı: açıklama → dinle-gör (kelime sesi) → 6–8 alıştırma (harf tanı, hece-hareke eşle, konum eşle) → gerçek kelime okuma; ses yoksa görsel akışla tamamlanır; (e) S0.12 Besmele + Fâtiha 1: kelime kelime dinlerken oku; (f) kapı (`kaoGate`) yalnız yerleştirme olarak kalır; eski 12 mini ders listesi kaldırılır.
+  2. **P10 tasarım kabulü:** ilk kez öğrenen önce kısa açıklamayı, sonra harfi/kelimeyi görüp dinlemeyi, ardından küçük alıştırma ve gerçek kelime okumasını izler. Ses yoksa anlaşılır alternatif sunulur; çalışmayan ses düğmesi gösterilmez.
 - **Kabul:** S0 testi PASS; sessiz harf sayısı kanıta yazılır (hedef 0; >0 ise kademe A'ya not).
 - **Commit:** `KAO2-21: Seviye 0 şekil aileleri, konum tablosu ve kelime içinde ses`
 
@@ -473,6 +523,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
   1. **Kırmızı:** (a) araç `--self-test`: ad biçimi `y-<harf>_<hareke>-<m|f>.m4a` doğrulaması, eksik/fazla klip raporu, sha256, lisans alanı zorunlu, `recordedBy` yalnız rol; (b) `safeClipId` yeni biçimi kabul eder, başka biçimi reddeder; (c) manifest `awaiting-recording` iken çalışma zamanı hiç `y-` isteği yapmaz (kademe B); (d) klipler varsa iki ses dönüşümlü çalınır (HVPT).
   2. Araç gerçek dosya işlerken ffmpeg yoksa açık hata verir; LUFS/dBTP ölçümü ffmpeg `loudnorm` analiziyle yapılır; ölçülemeyen klip reddedilir.
   3. Kayıt yoksa: kart **done** (hat hazır); LEDGER'a `NOTE`: "Kademe A kayıt bekliyor (kullanıcı)"; CURRENT-STATE "Bekleyen kullanıcı işleri"ne eklenir.
+  4. **P10 kabulü:** kayıt bekleme ve kelime içi ses yedeği sade dille açıklanır. Kayıt yokken çalışmayan hece oynatma kontrolü gösterilmez; insan kaydı/lisans koşulu korunur.
 - **Kabul:** syllable audio testi PASS; ses bütçesi 24 MB altında.
 - **Commit:** `KAO2-22: hece sesi hattı, manifest şeması ve güvenli geri dönüş`
 
@@ -486,6 +537,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Dokun:** `quranLearnViews.js`, `quranLearn.js`, `kao.css`, `tests/kao/test_kao2_settings.js` (yeni), mevcut ayar testleri (P2.4).
 - **Adımlar:**
   1. **Kırmızı:** grup sırası: Günlük hedef (süre 5/10/15 segment, niyet satırı) · Ses (otomatik ses switch, hız segment) · Okuma (okunuş katmanı segment, harekeler switch, tekrarda soldur switch, satır aralığı, kelime boşluğu, renkli hareke switch, önizleme) · Öğrenme (doğruda otomatik geç switch; "Başlangıç noktasını değiştir" → ilk açılış 2. adım) · Gölgeleme (switch + footer gizlilik notu) · Görünürlük (hub kartı switch) · Veri (CSV dışa aktar) · "Hakkında ve kaynaklar ›" alt sayfası (ses/metin/FSRS kaynakları + lisanslar + L2 inceleme durumu özeti). Tüm açık/kapalılar `role="switch"`; mevcut `App.kao*` ayar handler'ları yeniden kullanılır (yeni handler yok).
+  2. **P10 tasarım kabulü:** ayarlar amaca göre gruplanmış, taranabilir listelerde; teknik seçeneklerde kısa yardım, ayrıntılı kaynak/lisans alt sayfada. IIP sekmesinin verisi/ayarları KAO'ya kopyalanmaz; KAO tercihleri tek kaynak kalır.
 - **Kabul:** settings testi PASS; handler sayısı değişmedi (40).
 - **Commit:** `KAO2-23: iOS ayar düzeni ve kaynaklar alt sayfası`
 
@@ -497,6 +549,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Dokun:** `quranLearnViews.js`, `quranLearn.js`, `kao.css`, `tests/kao/test_kao2_progress.js` (yeni).
 - **Adımlar:**
   1. **Kırmızı:** (a) üst bölüm: kelime sayısı + kapsam % + "ilk 50 kelime ≈ %45" anlatısı (kapsam eğrisi lexicon `freq`'ten hesaplanır; 50/100/200/300/524 noktaları 03 §1 ile ±0,1 tutarlı); (b) taşlar: kazanılan/sıradaki (koşul metniyle); (c) haftalık etkinlik (7 gün, `daily`), yumuşak seri: "Bu hafta 4 gün" (D-19; kırık seri cezası yok); (d) Mushaf haritası bölümü (mevcut hücreler, yeni kabuk); (e) algı doğruluğu (telaffuz) ve kalibrasyon özeti mevcut `kaoStats`'tan; (f) eski ayrı `stats`/`map` görünümleri bu ekrana yönlenir.
+  2. **P10 tasarım kabulü:** önce ana kazanım ve sıradaki taş, sonra kapsam eğrisi/haftalık etkinlik/harita ayrı bölümlerde. Grafik ve rozetler gerçek veriye bağlı ve metinle açıklanır; seri cezalandırıcı olmaz.
 - **Kabul:** progress testi PASS.
 - **Commit:** `KAO2-24: birleşik İlerleme ekranı`
 
@@ -509,6 +562,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Adımlar:**
   1. **Kırmızı (kelime):** tek kaydırmalı sayfa: büyük Arapça + okunuş + dinle; anlam(lar); "Türkçede" (kognat, anlam kayması uyarısı); Kök (aile bağlantısı); Kur'an'dan örnekler (yalnız okunuşu doğrulanmış olanlar; doğrulanmamış örnek **hiç gösterilmez**, hata kutusu yok); öğrenme durumu (sonraki tekrar, ders bağlantısı); en altta ikincil "Hata bildir". Katman sayfalaması kaldırılır.
   2. **Kırmızı (panel):** `kaoPanelSummary` yeni alanlar: `start`, `unit`, `lesson`, `lessonsDone`, `milestones` (yeni anahtarlar dahil); Türkçe anlatı metni yok; panel render'ı yeni alanları bir satırda gösterir, alan yoksa satır gizlenir (eski veriyle kırılmaz).
+  3. **P10 tasarım kabulü:** büyük Arapça/okunuş/anlam ilk bakışta; kök ve örnekler ikincil; tekrar durumu ve derse dönüş net eylem. Panel kompakt gözlem rolünü korur, öğrenci ekranına dönüşmez.
 - **Kabul:** word + panel projeksiyon + ilgili panel testleri PASS.
 - **Commit:** `KAO2-25: tek sayfalık kelime detayı ve panel aynası`
 
@@ -520,6 +574,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - **Dokun:** KAO dosyaları (düzeltmeler), `docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs` (yeni token çiftleri), `tests/kao/test_kao2_a11y.js` (yeni).
 - **Adımlar:**
   1. **Kırmızı:** tüm KAO görünümleri × {boş, tohumlu}: (a) her `button` erişilebilir ada sahip; (b) Tab/Shift+Tab odak döngüsü modal içinde, Escape kapatır, kapanışta `kao-hub-entry`'ye döner; (c) görünüm değişince odak LargeTitle'a (odak modunda soruya) gider; (d) `aria-live` yalnız panel ve özette; (e) `aria-current="step"` StepList ve Yol'da; (f) Arapça öğelerde `lang="ar" dir="rtl"`; (g) sabit px yükseklik yok (`height:` yalnız ikon/halka boyutlarında; CSS taraması); (h) kontrast: 06 §1'deki tüm token çiftleri açık/koyu temada ≥4.5:1 (küçük metin), ≥3:1 (ikon/büyük).
+  2. **P10 tasarım kabulü:** test matrisi yol/ünite, gramer, sûre, kök, ayar, ilerleme ve kelime ekranlarının yoğun/boş hâllerini kapsar. Klavye, %200 metin ve 320 px'te kart düzeni okuma sırası veya erişimi bozmaz.
 - **Kabul:** a11y testi PASS; kontrast PASS.
 - **Commit:** `KAO2-26: erişilebilirlik ve kontrast denetimi`
 
@@ -536,6 +591,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
   4. Görsel QA yalnız kullanıcı isterse (P5): 390 px açık/koyu, sıfır kullanıcı ve dolu kullanıcı; redakte ekran görüntüleri `evidence/KAO2-27/`; sunucu durdurulur.
   5. Kapanış belgesi: kapanan bulgular (01/02/03 kimlikleriyle), kararların durumu (K-1…K-4; bekleyen kullanıcı işleri), ölçümler, bilerek değişen testler, kanıt düzeyleri, yayın için kullanıcıya önerilen adımlar (push/deploy **yapılmaz**).
   6. STATE: `status:"completed"`, `nextCard:null`, `releaseApproval:"not_approved"`; CURRENT-STATE `nextCard: none`; LEDGER son kaydı `- next: none`.
+  7. **P10 kapanış kabulü:** kapanış kanıtı KAO modalının 06 kurallarını ve IIP sekmesinin ayrı yayın yüzeyi oluşunu ayırt eder; `App.kaoOpen()` girişinin gerçek KAO eylemine ulaştığı headless kanıtla gösterilir. Bu kart IIP varlıklarını değiştirmez; yayın için yeni ve açık kullanıcı yetkisi gerekir.
 - **Kabul:** tüm aileler yeşil; pin tek committe tutarlı; kapanış belgesi var; sync-check PASS (`completed`).
 - **Commit:** `KAO2-27: regresyon, sürüm pini ve program kapanışı`
 

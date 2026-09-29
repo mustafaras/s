@@ -84,7 +84,7 @@ assert.doesNotMatch(html, /data-countup-key="kao-coverage"/);
 assert.match(html, /class="kao-hero-card"/);
 assert.match(html, /Fâtiha · Ders 1/, 'ilk açılış sonrası kahraman günlük dersi gösterir');
 assert.match(html, /class="kao-hero-foot"[\s\S]*Gece tekrarı/);
-assert.match(html, /App\.kaoStart\(\)/);
+assert.match(html, /App\.kaoLesson\("start","u01\.01"\)/);
 assert.doesNotMatch(html, /class="(?:kao-dialog-frame|kao-header-mark|kao-hero-rosette|kao-summary-mark|kao-done-mark)"/);
 assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 

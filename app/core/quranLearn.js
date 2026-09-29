@@ -298,7 +298,7 @@
       var date=new Date(item.card.due||0);
       return isFinite(date.getTime())&&date.getTime()<=now.getTime();
     }).slice(0,60);
-    var dailyNew=Math.max(0,Math.floor(nonNegativeNumber(opts.dailyNew,q.settings&&q.settings.dailyNew||10)));
+    var dailyNew=Math.max(0,Math.floor(nonNegativeNumber(opts.dailyNew,nonNegativeNumber(q.settings&&q.settings.dailyNew,10))));
     var selectedNew=[],newRecords=records.filter(function(item){ return item.isNew; });
     var eligible=function(item,chosen){ return !recentNeighbor(item,cards,now,opts)&&!chosen.some(function(other){ return semanticNeighbors(item.semantic,other.semantic); }); };
     newRecords.some(function(item){

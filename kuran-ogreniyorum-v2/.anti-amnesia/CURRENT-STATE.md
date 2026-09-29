@@ -1,27 +1,27 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-12
-lastSeq: 48
+nextCard: KAO2-13
+lastSeq: 50
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq48
+Son güncelleme: 2026-09-29 · LEDGER seq50
 
 ## Şu an neredeyiz
-KAO2-00…11 tamamlandı; son yayın KAO2-11 (`e827d24b`, Pages run 36545143962, canlı 16/16 hash eşliği). KAO2-12'nin ders planı, oynatıcısı, FSRS ortak yanıt yolu ve A-1 üç dokunuş akışı uygulanmış durumda. Kullanıcı seq47'de dört P6 fikstürünün sınırlı güncellemesini onayladı; bunlar ve fx2 pinleri güncellendi. P3'ün diğer aileleri, strict tasarım, kontrast ve izole performans kapıları PASS. KAO ailesi `tests/kao/test_kao_render.js:87` eski `App.kaoStart()` eylem assertion'ında durdu. P6 gereği kart yeniden bloke edildi; yalnız bu assertion için kapsam onayı bekleniyor.
+KAO2-00…12 tamamlandı. KAO2-12 ders oynatıcısı, A-1 üç dokunuş başlangıç yolu ve onaylı tam KAO kapısı düzeltmeleri test edildi. Seq49 onayıyla yalnız `test_kao_render.js:87` günlük eylem assertion'ı yeni `App.kaoLesson("start","u01.01")` rotasına geçirildi. Tam KAO setinde bulunan `dailyNew=0` değerinin `||10` ile kaybolması düzeltildi; 60 vadesi gelmiş görev sınırı tekrar geçti. Kart commit'i bu kapanışla oluşturulacak; releaseApproval hâlâ KAO2-11 ile sınırlı.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-12: `tests/kao/test_kao_render.js:87` içindeki eski günlük eylem assertion'ını onay sonrası yeni ders rotasına geçir; tam KAO/P3 kapılarını yeşile getir ve kartı tek committe kapat.
+KAO2-13: Yol (S-03) ve Ünite (S-04); henüz başlanmadı. Kullanıcının onayladığı İlham & İbadet Arapça sekmesi ayrı istek olarak bu kart sınırının dışında ele alınacak.
 
 ## Canlı gerçekler
 - Release approval yalnız KAO2-11'e kadar (`approved_through_KAO2-11`); KAO2-12 push/deploy/tag yok.
 - Ders oynatıcı üretimi önceki committe var: `app/core/quranLearnFlow.js`, `quranLearn.js`, `quranLearnViews.js`, `app/kao.css`, `app.js` shim.
-- Kullanıcının seq47 onayıyla `test_kao2_today.js`, `test_kao_user_tasks.js`, `test_app_surface_daily_boundary.js`, `test_v3_welcome.js` gerekli eylem/pin satırları güncellendi; `test_fx2_touch_coverage.js`, `test_fx2_tab_transition.js`, `test_fx2_overlay_motion.js` pinleri de güncellendi.
-- `test_kao2_today` 7/7, `test_kao_user_tasks` R-C9 3 dokunuş, `test_kao2_lesson_flow` 8/8, onboarding 15/15, strict tasarım PASS; kontrast 496 çift/0 ihlal; performans tek başına p95 4.382 ms.
-- P3 KAO dışında app, panel 23/23, panel-v2 27/27, Quran, reminders, driver, zikr 95/95, sync PASS. Tam KAO ailesi ilk sınır-dışı kırmızı testte P6 gereği durduruldu.
-- Yeni blocker tam olarak `tests/kao/test_kao_render.js:87`: eski `App.kaoStart()` beklentisi; gerçek eylem `App.kaoLesson("start","u01.01")`.
-- Kanıt düzeyi kaynak/test; yayın ve cihaz kabulü yok. KAO2-13'e geçme.
+- Seq47 onayıyla `test_kao2_today.js`, `test_kao_user_tasks.js`, `test_app_surface_daily_boundary.js`, `test_v3_welcome.js` gerekli eylem/pin satırları ve KAO2-12 içi fx2 pinleri güncellendi; seq49 yalnız `test_kao_render.js:87` assertion'ını açtı.
+- KAO suite 28/28, lesson-flow 8/8, today 7/7, user_tasks 3-touch, onboarding 15/15, design contract PASS; kontrast 496 çift/0 ihlal; izole perf p95 4.587 ms (≤5.088 ms baseline+%25).
+- P3: app 77/77, panel 23/23, panel-v2 27/27, Quran 9/9, reminders smoke 21 curated, driver PASS, zikr 95/95, syntax/sync PASS.
+- `KAO2-STATE.json.releaseApproval=approved_through_KAO2-11`; KAO2-12 yerel kaynak/test kanıtıdır, yayın ve cihaz kabulü yok. KAO2-13 henüz başlamadı.
 
 ## Bekleyen kullanıcı işi
-- Yalnız `tests/kao/test_kao_render.js:87` eylem assertion'ını yeni `App.kaoLesson("start","u01.01")` sözleşmesine güncelleme kapsamını onayla; başka assertion değişmeyecek.
+- Kullanıcı Arapça sekmesi tasarımını onayladı: IIP Bugün kartı yerine İbadet navigasyonunda altıncı "Arapça" sekmesi; tam genişlik premium ders özeti, salt-okunur KAO ilerlemesi, Tanış → Kavram → Pekiştir → Uygula yolu, mevcut `App.kaoOpen()` CTA; kalıcı veri veya yeni App handler yok, 44px hedefler korunacak.
+- KAO2-13 başlatma onayı yok; bu kartın dışına geçilmedi.

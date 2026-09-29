@@ -462,3 +462,22 @@ Kurallar:
 - requested-scope: Yalnız `tests/kao/test_kao_render.js` satır 87'deki eski günlük başlangıç eylemi assertion'ını `App.kaoLesson("start","u01.01")` sözleşmesine güncelle; başka assertion'a dokunma.
 - gates: targeted KAO2 tests PASS · KAO performance isolated PASS (p95 4.382 ms) · contrast 496/0 PASS · strict design PASS · app/panel/panel-v2/Quran/reminders/driver/zikr PASS · full KAO STOP (render assertion, P6) · sync PASS
 - next: KAO2-12
+
+## seq 49 · 2026-09-29 · NOTE · KAO2-12
+- status: approved
+- summary: Kullanıcı 2026-09-29'da yalnız `tests/kao/test_kao_render.js:87` eski `App.kaoStart()` günlük eylem assertion'ının `App.kaoLesson("start","u01.01")` sözleşmesine geçirilmesini onayladı. Başka assertion değişmeyecek; KAO2-12 sürüyor.
+- resolution: Kapsam yalnız belirtilen tek assertion ile açıldı; üretim kodu ve diğer KAO fikstürleri bu onayla değiştirilemez.
+- next: KAO2-12
+
+## seq 50 · 2026-09-29 · CARD · KAO2-12
+- status: done
+- title: Ders oynatıcı (S-05)
+- prev-commit: 6e77965e
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-12/KANIT.md
+- gates: syntax PASS · KAO 28/28 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders smoke 21 curated PASS · driver PASS · zikr 95/95 PASS · contrast 496/0 PASS · sync PASS
+- metrics: lesson-flow 8/8 · onboarding 15/15 · today 7/7 · user_tasks 3 dokunuş · design contract PASS · isolated p95 4.587 ms (≤5.088 ms baseline+%25) · content 168.483 KiB · runtime 72.661 KiB · CSS 9.198 KiB · due cap 60 · handler 40
+- changed-tests: seq49 user approval, only `test_kao_render.js:87` old `App.kaoStart()` → `App.kaoLesson("start","u01.01")`; existing requirements fixture stayed unchanged and exposed `dailyNew=0` fallback regression, fixed in quranLearn.js
+- evidence-levels: source/test PASS · release not authorized beyond KAO2-11 · device not verified
+- surprises: first perf attempt 8.977 ms failed noisy timing gate; isolated retry 4.587 ms PASS. Initial full KAO run exposed 64 items for a 60 due + dailyNew=0 fixture; nested fallback fix preserves explicit zero; requirements and full KAO suite pass.
+- next: KAO2-13

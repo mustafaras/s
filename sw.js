@@ -19,7 +19,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './',
   './index.html',
   './manifest.json?v=20260730f',
-  './app/styles.css?v=20260924d',
+  './app/styles.css?v=20260929a',
   './app/kao.css?v=20260928b',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',

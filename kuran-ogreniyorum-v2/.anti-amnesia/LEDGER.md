@@ -393,3 +393,9 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-10/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-10/release-live.json
 - evidence-levels: kaynak/test PASS · yayın/run/hash PASS · cihaz doğrulanmadı
 - next: KAO2-11
+
+## seq 41 · 2026-09-29 · NOTE · —
+- status: done
+- summary: KAO2 dışı İlham & İbadet ortak kart dili (kullanıcı isteği) `app/styles.css` `.saygi-page` kapsamında KAO hub kartını da ortak dile çekti: 4px altın şerit, ortak gölge, 44px rozet, başlık 800, altın halka. Bu yüzeyde 06 §5 "gölge yok / 32 px ikon" kuralından bilinçli sapma; kao.css ve KAO2 testleri değişmedi.
+- evidence: docs/evidence/ILHAM-ORTAK-DIL-20260929.md
+- next: KAO2-11 (KAO2-26 kontrast/temizlik denetimi bu sapmayı hesaba katmalı)

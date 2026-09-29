@@ -1,0 +1,94 @@
+{
+  "scope": "KAO2-14 … KAO2-15",
+  "sourceCommits": {
+    "KAO2-14": "86e646be",
+    "KAO2-15": "3b0fcb6f"
+  },
+  "releaseCommit": "0ee2a01881445e746837a24a73c564626afd93ac",
+  "remoteParity": {
+    "branch": "0ee2a01881445e746837a24a73c564626afd93ac",
+    "main": "0ee2a01881445e746837a24a73c564626afd93ac",
+    "previousSharedCommit": "c1ebe168dfc4d79cfe6dfa446528c6b60603cdf1",
+    "mergeMode": "fast-forward",
+    "equal": true
+  },
+  "actions": [
+    {
+      "runId": 36586060856,
+      "headSha": "3b0fcb6f8d161c1e4c9a7e79e9214227826916e3",
+      "status": "completed",
+      "conclusion": "success",
+      "note": "ilk yayın (pin değişmemişti)"
+    },
+    {
+      "runId": 36586684295,
+      "headSha": "0ee2a01881445e746837a24a73c564626afd93ac",
+      "status": "completed",
+      "conclusion": "success",
+      "note": "pin 20260929d sonrası yeniden yayın"
+    }
+  ],
+  "live": {
+    "verifiedAt": "2026-09-29T14:58:00Z",
+    "commit": "0ee2a01881445e746837a24a73c564626afd93ac",
+    "baseUrl": "https://mustafaras.github.io/s/",
+    "pins": {
+      "kaoRuntime": "20260929d",
+      "swVersion": "20260929d"
+    },
+    "assetCount": 4,
+    "assets": [
+      {
+        "path": "app/core/quranLearn.js",
+        "status": 200,
+        "bytes": 242956,
+        "sha256": "0622750a1d95620e2619546aa077e135faf2a97516c2c2ce8ca1eaad791ea04b",
+        "matchesLocal": true
+      },
+      {
+        "path": "app/core/quranLearnFlow.js",
+        "status": 200,
+        "bytes": 18304,
+        "sha256": "9288146bc86fdf41d1984d0a9bb5037c17990e5e3b6efbbac271a04567356dd2",
+        "matchesLocal": true
+      },
+      {
+        "path": "app/core/quranLearnViews.js",
+        "status": 200,
+        "bytes": 37052,
+        "sha256": "58c2bc802fda56d5f66ccbfa69b5366db681ecb2021489caf36e9a3d19047970",
+        "matchesLocal": true
+      },
+      {
+        "path": "app/kao.css",
+        "status": 200,
+        "bytes": 70181,
+        "sha256": "3dce7380644539033bcdb34fc81c68e0a1a2289dfa806900c3882e2e8b782fdc",
+        "matchesLocal": true
+      }
+    ],
+    "excludedPaths": [
+      {
+        "path": "kuran-ogreniyorum-v2/KAO2-STATE.json",
+        "status": 404,
+        "expected": 404
+      },
+      {
+        "path": "tests/kao/test_kao2_grammar_notes.js",
+        "status": 404,
+        "expected": 404
+      },
+      {
+        "path": "app/core/quranLearnFlow 2.js",
+        "status": 404,
+        "expected": 404
+      }
+    ],
+    "deviceAcceptance": "not_verified"
+  },
+  "releaseAuthorization": {
+    "by": "user",
+    "date": "2026-09-29",
+    "scope": "KAO2-14/15; user said 'izinleri veriyorum ve onaylıyorum tümünü canlıya da al'"
+  }
+}

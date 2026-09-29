@@ -638,3 +638,19 @@ Kurallar:
   reminders/driver/zikr/contrast/sync PASS · perf PASS (runtime 78.316 KiB)
 - evidence-levels: kaynak/test ✓ · yayın: pin sonrası yeniden yayınlanacak · cihaz —
 - next: KAO2-16
+## seq 64 · 2026-09-29 · NOTE · KAO2-15
+- status: verified
+- summary: KAO2-14/15 kullanıcı onayıyla yayımlandı. Pin düzeltmesinden sonra canlı
+  varlıklar repo ile bayt-eş doğrulandı.
+- source-commits: KAO2-14 `86e646be` · KAO2-15 `3b0fcb6f`
+- release-commit: `0ee2a018` (pin düzeltmesi dâhil)
+- remote: dal ve `main` `c1ebe168` ortak tabanından fast-forward; ikisi `0ee2a018`
+  üzerinde eşit. İlk `main` push'u GitHub 500 ile reddedildi, tekrar denemede geçti.
+- actions: run 36586060856 success (ilk) · run 36586684295 success (pin sonrası)
+- live: 5/5 dosya HTTP 200 ve SHA-256 yerel eşleşmesi (`quranLearn.js`,
+  `quranLearnFlow.js`, `quranLearnViews.js`, `kao.css`, `sw.js`); pinler
+  `20260929d`; KAO2-STATE ve KAO testi beklenen 404.
+- pins: KAO/SW ortak pin `20260928b` -> `20260929d`
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-15/YAYIN.md · release-live.json
+- evidence-levels: kaynak/test PASS · Pages/run/hash PASS · cihaz doğrulanmadı.
+- next: KAO2-16

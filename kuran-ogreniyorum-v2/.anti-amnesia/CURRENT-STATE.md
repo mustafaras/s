@@ -2,11 +2,11 @@
 
 <!-- kao2-sync
 nextCard: KAO2-16
-lastSeq: 63
+lastSeq: 64
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq63
+Son güncelleme: 2026-09-29 · LEDGER seq64
 
 ## Şu an neredeyiz
 **KAO2-00…15 tamamlandı (16/28).** KAO2-15 (S-10 gramer notları kütüphanesi) kullanıcı

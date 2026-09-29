@@ -1,0 +1,9 @@
+$ node tests/kao/test_kao2_today.js
+PASS  (e) .kao-link-button ve eski süs bölümleri yok
+PASS  erişilebilirlik korunur: harita İlerleme’den, âyet sayacı Günün âyeti ekranında
+KAO2-09 today: PASS (7 kontrol)
+exit=0
+$ node tests/kao/test_kao2_design_contract.js
+KAO2 design: strict weights=2 uppercase=0 deco=0 serif=0 primaryPerView={"empty/home":1,"empty/units":0,"empty/word":1,"empty/reader":1,"empty/settings":0,"empty/gate":0,"empty/phonics":1,"empty/ayah":1,"empty/map":0,"empty/prayer":0,"empty/stats":0,"empty/session":0,"seeded/home":1,"seeded/units":0,"seeded/word":1,"seeded/reader":1,"seeded/settings":0,"seeded/gate":0,"seeded/phonics":1,"seeded/ayah":1,"seeded/map":0,"seeded/prayer":0,"seeded/stats":0,"seeded/session":0} switches={"empty/off":{"count":5,"missing":0},"empty/on":{"count":5,"missing":0},"seeded/off":{"count":5,"missing":0},"seeded/on":{"count":5,"missing":0}}
+KAO2 design contract: PASS
+exit=0

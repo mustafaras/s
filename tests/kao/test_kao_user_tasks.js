@@ -20,7 +20,7 @@ function boot(options) {
   if (opts.clock) { const RealDate = Date; SandboxDate = class extends RealDate { constructor(...args) { super(...(args.length ? args : [opts.clock.now])); } static now() { return opts.clock.now; } }; }
   const box = { window: {}, Date: SandboxDate, Math, Number, String, Object, Array, JSON };
   vm.createContext(box);
-  for (const relative of CONTENT.concat(['app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js'])) vm.runInContext(read(relative), box, { filename: relative });
+  for (const relative of CONTENT.concat(['app/content/quranCurriculumV2.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js'])) vm.runInContext(read(relative), box, { filename: relative });
   const api = box.window.SeymaQuranLearn;
   const state = { data: { settings: {}, quranLearn: null }, ui: { kaoOpen: false, kaoView: 'home' }, renders: 0, audios: 0 };
   const taskNode = { innerHTML: '', attrs: {}, setAttribute(name, value) { this.attrs[name] = value; }, removeAttribute(name) { delete this.attrs[name]; }, querySelectorAll() { return []; } };
@@ -193,7 +193,7 @@ for (const variant of [{ label: 'audio=false', quiet: false }, { label: 'sessiz 
   assert.match(statsHtml, /aria-labelledby="kao-stats-title"/);
   assert.equal((statsHtml.match(/<th scope="row">/g) || []).length, 10, '10 R-bandı satırı');
   assert.match(statsHtml, /Son 2 hafta[\s\S]*Son 6 hafta[\s\S]*Gece tekrarı/);
-  assert.match(api.kaoHomeHTML(new Date(clock.now)), /App\.kaoSetView\('stats'\)/, 'E1 istatistik girişi');
+  assert.match(api.kaoHomeHTML(new Date(clock.now)), /App\.kaoSetView\((?:&quot;|")stats(?:&quot;|")\)/, 'S-02 Sen → İlerleme satırı (fikstür esc=String)');
   report.night = { nightSessionCards: nightCount, nightRev: q.daily[nightKey].nightRev, nightFollowN: q.daily[dayKey].nightFollow.n };
 }
 

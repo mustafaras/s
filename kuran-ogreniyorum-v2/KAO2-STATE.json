@@ -5,8 +5,8 @@
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-06",
-  "nextCard": "KAO2-09",
-  "ledgerLastSeq": 32,
+  "nextCard": "KAO2-10",
+  "ledgerLastSeq": 34,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -79,8 +79,8 @@
     },
     "KAO2-09": {
       "wave": "W2",
-      "status": "todo",
-      "evidence": null
+      "status": "done",
+      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-09/KANIT.md"
     },
     "KAO2-10": {
       "wave": "W2",
@@ -173,7 +173,20 @@
       "evidence": null
     }
   },
-  "backlog": [],
+  "backlog": [
+    {
+      "id": "B-KAO2-09-1",
+      "source": "KAO2-09",
+      "target": "KAO2-26",
+      "note": "Eski ana ekran CSS seçicileri öksüz (.kao-home/.kao-hero/.kao-time-chip/.kao-summary/.kao-today/.kao-today-ayah/.kao-night/.kao-milestone/.kao-hero-copy) + önceden öksüz .kao-undo; arşiv kontrast aracı ve render testi bağımlı, kontrast denetiminde birlikte temizlenmeli."
+    },
+    {
+      "id": "B-KAO2-08-1",
+      "source": "KAO2-08",
+      "target": "KAO2-12",
+      "note": "daily[].ms görev süresi yazılmıyor; estimateMinutes 0,55 dk/görev yedeğinde."
+    }
+  ],
   "releaseApprovalRecord": {
     "by": "user",
     "at": "2026-09-28",

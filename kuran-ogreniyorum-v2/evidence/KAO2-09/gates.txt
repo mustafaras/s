@@ -1,0 +1,32 @@
+$ node --check app/core/quranLearn.js
+exit=0
+$ node --check app/core/quranLearnFlow.js
+exit=0
+$ node --check app/core/quranLearnViews.js
+exit=0
+$ node --check app/content/quranCurriculumV2.js
+exit=0
+family kao: 25/25 PASS
+family app: 77/77 PASS
+family panel: 23/23 PASS
+family panel-v2: 27/27 PASS
+family quran: 9/9 PASS
+$ node tests/reminders/run-reminder-smoke.mjs
+REMINDER CONTRACT PASS: 73 assertions
+REMINDER SMOKE PASS: 21 curated fixtures
+exit=0
+$ node .claude/skills/run-seyma/driver.mjs
+
+Done.
+exit=0
+$ node .claude/skills/run-seyma/zikr-harness.mjs
+
+✅ 95/95 assertion pass
+exit=0
+$ node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs
+
+406 çift denetlendi (35 elle seçilmiş + 168 otomatik renk bildirimi, × 2 tema), 0 tanesi eşiğin altında.
+exit=0
+$ node kuran-ogreniyorum-v2/tools/kao2-sync-check.mjs
+KAO2 senkron: PASS · 9/28 kart done · nextCard KAO2-09 · ledger seq 32
+exit=0

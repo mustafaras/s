@@ -15,7 +15,8 @@ for (const relative of [
   'app/content/quranShortSurahsV1.js',
   'app/content/quranRevelationOrderV1.js',
   'app/content/quranStrikingVersesV1.js',
-  'app/content/quranPhonicsV1.js'
+  'app/content/quranPhonicsV1.js',
+  'app/content/quranCurriculumV2.js'
 ]) load(relative);
 for (const relative of ['app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js']) {
   if (fs.existsSync(path.join(repoRoot, relative))) load(relative);

@@ -1,0 +1,6 @@
+$ node tests/kao/test_kao2_today.js
+AssertionError [ERR_ASSERTION]: %0 metni görünmemeli
+exit=1
+$ node tests/kao/test_kao2_design_contract.js
+AssertionError [ERR_ASSERTION]: strict tasarım ihlalleri
+exit=1

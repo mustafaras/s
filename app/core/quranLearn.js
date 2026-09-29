@@ -1150,10 +1150,10 @@
     h+='<section><h3>Günlük ders</h3>'+kaoSegHTML('Günlük yeni kelime',KAO_DAILY_NEW.map(function(n){ return [n,String(n),n]; }),Math.floor(nonNegativeNumber(s.dailyNew,10)),'kaoSetDailyNew')+'</section>';
     h+='<section><h3>Ses</h3>'+kaoSegHTML('Yeni kelimede otomatik ses',[['off','Kapalı',"'off'"],['measured','Yavaş',"'measured'"],['flowing','Doğal',"'flowing'"]],audio,'kaoSetAudioStyle')+'<p class="kao-setting-hint">Ses düğmesinde dokunmak yavaş, basılı tutmak doğal hızı çalar. Sessiz saatte otomatik ses çalmaz.</p></section>';
     h+='<section><h3>Okunuş ve hareke</h3>'+kaoSegHTML('Latin okunuş katmanı',[['tr','Okunuş',"'tr'"],['dia','DİA',"'dia'"]],kaoTranslitLayer(),'kaoSetTranslit')+'<p class="kao-setting-hint">DİA katmanı kelime kartlarında harfleri birebir ayırır (ḥ, ṣ, ʿ); âyet ve parça okunuşları Okunuş katmanında kalır.</p>';
-    h+='<div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(s.harakat!==false?'true':'false')+'" onclick="App.kaoToggleHarakat()">Harekeleri göster: '+(s.harakat!==false?'açık':'kapalı')+'</button><button type="button" class="kao-toggle" aria-pressed="'+(r.fadeHarakat?'true':'false')+'" onclick="App.kaoToggleFade()">Tekrarda harekeyi soldur: '+(r.fadeHarakat?'açık':'kapalı')+'</button></div></section>';
-    h+='<section><h3>Görünürlük</h3><div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(s.kaoVisible!==false?'true':'false')+'" onclick="App.kaoToggleVisible()">İlham & İbadet’te kartı göster: '+(s.kaoVisible!==false?'açık':'kapalı')+'</button></div><p class="kao-setting-hint">Kapatırsan kart gizlenir, verilerin korunur; uygulama Ayarları → Gizlenen kartlar bölümünden geri getirebilirsin.</p></section>';
-    h+='<section><h3>Gölgeleme (mikrofon)</h3><div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(s.shadowing===true?'true':'false')+'" onclick="App.kaoToggleShadowing()">Gölgeleme: '+(s.shadowing===true?'açık':'kapalı')+'</button></div><p class="kao-setting-hint">Açıkken Telaffuz stüdyosunda modeli dinleyip kendi sesini en çok 10 saniye kaydedebilirsin. Mikrofon yalnız sen başlatınca açılır; kayıt yalnız bu ekranda bellekte durur, hiçbir yere kaydedilmez ya da gönderilmez ve pencereyi kapatınca silinir.</p></section>';
-    h+='<section><h3>Okunabilirlik</h3><p class="kao-gate-ar kao-settings-sample" lang="ar" dir="rtl" style="'+kaoReadabilityStyle()+'">'+(r.coloredHarakat?kaoColorHarakat(sample):esc(sample))+'</p>'+kaoSegHTML('Arapça satır aralığı',KAO_LINE_HEIGHTS.map(function(v){ return [v,v==='1.9'?'Sıkı':(v==='2.2'?'Rahat':'Geniş'),"'lineHeight','"+v+"'"]; }),line,'kaoSetReadability')+kaoSegHTML('Kelime boşluğu',[['normal','Normal',"'wordSpacing','normal'"],['wide','Geniş',"'wordSpacing','wide'"]],r.wordSpacing,'kaoSetReadability')+'<div class="kao-setting-row"><button type="button" class="kao-toggle" aria-pressed="'+(r.coloredHarakat?'true':'false')+'" onclick="App.kaoSetReadability(\'coloredHarakat\','+(r.coloredHarakat?'false':'true')+')">Renkli hareke (Seviye 0): '+(r.coloredHarakat?'açık':'kapalı')+'</button></div></section>';
+    h+='<div class="kao-setting-row"><button type="button" class="kao-toggle" role="switch" aria-checked="'+(s.harakat!==false?'true':'false')+'" onclick="App.kaoToggleHarakat()">Harekeleri göster: '+(s.harakat!==false?'açık':'kapalı')+'</button><button type="button" class="kao-toggle" role="switch" aria-checked="'+(r.fadeHarakat?'true':'false')+'" onclick="App.kaoToggleFade()">Tekrarda harekeyi soldur: '+(r.fadeHarakat?'açık':'kapalı')+'</button></div></section>';
+    h+='<section><h3>Görünürlük</h3><div class="kao-setting-row"><button type="button" class="kao-toggle" role="switch" aria-checked="'+(s.kaoVisible!==false?'true':'false')+'" onclick="App.kaoToggleVisible()">İlham & İbadet’te kartı göster: '+(s.kaoVisible!==false?'açık':'kapalı')+'</button></div><p class="kao-setting-hint">Kapatırsan kart gizlenir, verilerin korunur; uygulama Ayarları → Gizlenen kartlar bölümünden geri getirebilirsin.</p></section>';
+    h+='<section><h3>Gölgeleme (mikrofon)</h3><div class="kao-setting-row"><button type="button" class="kao-toggle" role="switch" aria-checked="'+(s.shadowing===true?'true':'false')+'" onclick="App.kaoToggleShadowing()">Gölgeleme: '+(s.shadowing===true?'açık':'kapalı')+'</button></div><p class="kao-setting-hint">Açıkken Telaffuz stüdyosunda modeli dinleyip kendi sesini en çok 10 saniye kaydedebilirsin. Mikrofon yalnız sen başlatınca açılır; kayıt yalnız bu ekranda bellekte durur, hiçbir yere kaydedilmez ya da gönderilmez ve pencereyi kapatınca silinir.</p></section>';
+    h+='<section><h3>Okunabilirlik</h3><p class="kao-gate-ar kao-settings-sample" lang="ar" dir="rtl" style="'+kaoReadabilityStyle()+'">'+(r.coloredHarakat?kaoColorHarakat(sample):esc(sample))+'</p>'+kaoSegHTML('Arapça satır aralığı',KAO_LINE_HEIGHTS.map(function(v){ return [v,v==='1.9'?'Sıkı':(v==='2.2'?'Rahat':'Geniş'),"'lineHeight','"+v+"'"]; }),line,'kaoSetReadability')+kaoSegHTML('Kelime boşluğu',[['normal','Normal',"'wordSpacing','normal'"],['wide','Geniş',"'wordSpacing','wide'"]],r.wordSpacing,'kaoSetReadability')+'<div class="kao-setting-row"><button type="button" class="kao-toggle" role="switch" aria-checked="'+(r.coloredHarakat?'true':'false')+'" onclick="App.kaoSetReadability(\'coloredHarakat\','+(r.coloredHarakat?'false':'true')+')">Renkli hareke (Seviye 0): '+(r.coloredHarakat?'açık':'kapalı')+'</button></div></section>';
     h+='<section><h3>Seviye 0 ve dışa aktarma</h3><div class="kao-setting-row"><button type="button" class="kao-secondary" onclick="App.kaoReopenGate()">Seviye 0 kontrolünü yeniden aç</button><button type="button" class="kao-secondary" onclick="App.kaoExportCsv()">Kelimelerimi indir (CSV)</button></div><p class="kao-setting-hint">CSV yalnız bu cihazda oluşturulur; Anki uyumlu sütunlar: ar, tr, translit, root, tags.</p><p class="kao-live" aria-live="polite">'+esc(ui.kaoSettingsNote||'')+'</p></section>'+kaoSourcesHTML(esc)+'</main>';
     return h;
   }
@@ -1478,7 +1478,7 @@
   function kaoAyahHTML(){
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),esc=quranLearnDeps.esc,icon=quranLearnDeps.icon,d=quranLearnDeps.data(),pick=kaoTodayAyah(),q=ensureQuranLearn(d);
-    var h='<main class="kao-ayah" aria-labelledby="kao-ayah-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Bugün anlayabildiğin âyet</p><h2 id="kao-ayah-title">'+(pick?esc(kaoSurahName(pick.surahId))+' · '+pick.ayah+'. âyet':'Henüz hazır âyet yok')+'</h2></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
+    var h='<main class="kao-ayah" aria-labelledby="kao-ayah-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Bugün anlayabildiğin âyet</p><h2 id="kao-ayah-title">'+(pick?esc(kaoSurahName(pick.surahId))+' · '+pick.ayah+'. âyet':'Henüz hazır âyet yok')+'</h2><p class="kao-ayah-count">Anlaşılan âyet sayısı: <strong>'+(Array.isArray(q.ayahs&&q.ayahs.understood)?q.ayahs.understood.length:0)+'</strong></p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
     if(!pick){
       var near=kaoNearestAyah(d),missing=near?near.words.length-near.coverage.known:0;
       return h+'<section class="kao-ayah-empty"><p>Kelimelerinin en az %95’ini tanıdığın bir âyet açılınca burada görünecek.</p>'+(near?'<p>En yakın âyet: '+esc(kaoSurahName(near.surahId))+' '+near.ayah+' · %'+Math.floor(near.coverage.ratio*100)+' tanıdık, '+missing+' kelime kaldı.</p>':'')+'<button type="button" class="kao-primary" onclick="App.kaoStart()">Bugünkü oturuma başla</button></section></main>';
@@ -1616,8 +1616,10 @@
     h+='<section>'+line('Son 2 hafta',stats.twoWeeks)+line('Son 6 hafta',stats.sixWeeks)+(stats.sixWeeks.n<MIN?'<p class="kao-setting-hint">Anlamlı karşılaştırma için en az '+MIN+' tekrar gerekir.</p>':'')+'</section>';
     h+='<section><h3>10 R-bandında öngörü ve gerçek (6 hafta)</h3><table class="kao-stats-table"><thead><tr><th scope="col">Öngörülen R</th><th scope="col">Tekrar</th><th scope="col">Öngörü</th><th scope="col">Gerçek</th></tr></thead><tbody>'+stats.sixWeeks.bands.map(function(band,index){ return '<tr><th scope="row">'+(index/10).toFixed(1)+'–'+((index+1)/10).toFixed(1)+'</th><td>'+band.n+'</td><td>'+pct(band.pred,band.n)+'</td><td>'+pct(band.ok,band.n)+'</td></tr>'; }).join('')+'</tbody></table></section>';
     var w=stats.sixWeeks;
-    h+='<section><h3>Gece tekrarı</h3><p>'+w.nightRev+' gece tekrarı · gece sonrası ilk tekrarda doğruluk '+pct(w.nightFollow.ok,w.nightFollow.n)+' ('+w.nightFollow.n+') · diğer tekrarlarda '+pct(w.dayFollow.ok,w.dayFollow.n)+' ('+w.dayFollow.n+')</p>'+(w.nightFollow.n<MIN?'<p class="kao-setting-hint">Karşılaştırma, gece sonrası en az '+MIN+' tekrar birikince anlamlıdır.</p>':'')+'</section></main>';
+    h+='<section><h3>Gece tekrarı</h3><p>'+w.nightRev+' gece tekrarı · gece sonrası ilk tekrarda doğruluk '+pct(w.nightFollow.ok,w.nightFollow.n)+' ('+w.nightFollow.n+') · diğer tekrarlarda '+pct(w.dayFollow.ok,w.dayFollow.n)+' ('+w.dayFollow.n+')</p>'+(w.nightFollow.n<MIN?'<p class="kao-setting-hint">Karşılaştırma, gece sonrası en az '+MIN+' tekrar birikince anlamlıdır.</p>':'')+'</section>';
     var tr=objectOr(quranLearnRoot(quranLearnDeps.data()).transfer,{}); h+='<section><h3>Yeni âyet testi (haftalık aktarım)</h3><p>'+(tr.n?tr.ok+' / '+tr.n+' doğru · '+pct(tr.ok,tr.n)+' · hiç görmediğin âyetlerde':'Henüz test yok: kelimelerinin %95’ini tanıdığın, görmediğin bir âyet çıkınca haftada bir sorulur.')+'</p></section>';
+    // KAO2-09: harita ana ekrandan kalktı; İlerleme'den erişilir (S-12 birleşimine kadar).
+    h+=kaoViewsApi().groupedList([{title:'Harita',rows:[{icon:'map',title:'Mushaf haritası',action:'kaoOpenMap'}]}])+'</main>';
     return h;
   }
   function kaoOpenPhonics(letterId){
@@ -1682,20 +1684,35 @@
     h+='</section><section class="kao-reader-understood"><p>'+(record.confirmedAt?'Gecikmeli test '+String(record.delayedScore)+'/5 · anlaşıldı':(record.needsReread?'Gecikmeli test '+String(record.delayedScore)+'/5 · tekrar oku':(record.delayedTestAt?'7 günlük test planlandı':'Okuma bitince anlayışını kaydet')))+'</p><button type="button" class="kao-primary" onclick="App.kaoMarkUnderstood()">Anladım</button></section></main>';
     return h;
   }
+  // KAO2-09 · S-02: nextStep eylem eşlemesi. Henüz handler'ı olmayan adımlar mevcut akışa bağlanır
+  // (onboarding → KAO2-11, mastery → KAO2-13); tek birincil eylem her zaman çalışır durumda kalır.
+  var KAO_HOME_ACTIONS={onboarding:{label:'Başlayalım',action:'kaoStart'},'night-review':{label:'',action:'kaoStart'},warmup:{label:'Isınmaya başla',action:'kaoStart'},'s0-lesson':{label:'Derse başla',action:{name:'kaoGate',args:['start']}},mastery:{label:'Pekiştirerek devam et',action:'kaoStart'},'next-unit':{label:'Üniteye başla',action:'kaoStart'},daily:{label:'Başla',action:'kaoStart'},rest:{label:'Günün âyetini aç',action:'kaoOpenAyah'}};
+  function kaoHomeHero(d,q,now,step){
+    var night=kaoNightWindow(d,now),confused=kaoConfusedLine(q),map=KAO_HOME_ACTIONS[step.kind]||KAO_HOME_ACTIONS.daily,foot=[];
+    if(night) foot.push({icon:'moon',text:'Gece tekrarı açık · '+night.durationMinutes+' dk, en fazla '+night.maxCards+' tekrar'});
+    if(confused) foot.push({icon:'triangle-alert',text:confused});
+    var label=step.kind==='night-review'&&night?'Gece tekrarına başla · en çok '+night.maxCards+' kart':map.label;
+    return {eyebrow:step.kind==='rest'?'Bugün':'Sıradaki',title:step.title,subtitle:step.subtitle,button:{label:label,action:map.action},foot:foot};
+  }
+  function kaoHomePath(d,q){
+    var flow=window.SeymaQuranLearnFlow,content={curriculum:window.QuranCurriculumV2},units=content.curriculum.units,current=units[units.length-1],progress=null;
+    for(var i=0;i<units.length;i+=1){ var p=flow.unitProgress(q,units[i].id,content); if(!(p.lessonsDone===p.lessons&&p.mastery)){ current=units[i]; progress=p; break; } }
+    progress=progress||flow.unitProgress(q,current.id,content);
+    var level=content.curriculum.levels.find(function(lv){ return lv.id===current.level; })||{title:'',unitIds:[current.id]};
+    var known=Object.keys(kaoKnownLemmaSet(d)).length,percent=Math.min(100,Math.floor(kaoCoverage(d).ratio*100)),first=units[0],firstWords=first.lessons.reduce(function(n,l){ return n+l.lemmaIds.length; },0);
+    return {level:'Seviye '+current.level+' · '+level.title,unit:'Ünite '+(level.unitIds.indexOf(current.id)+1)+'/'+level.unitIds.length+' · '+current.title+' · '+progress.lessonsDone+'/'+progress.lessons+' ders',percent:progress.lessons?progress.lessonsDone/progress.lessons*100:0,known:known,coverage:known>0?percent:null,goal:'İlk hedef: '+first.title+'’yı anlamak · '+firstWords+' kelime',action:{name:'kaoSetView',args:['units']}};
+  }
+  function kaoHomeLists(q){
+    var shorts=window.QuranShortSurahsV1,surahCount=shorts&&Array.isArray(shorts.surahs)?shorts.surahs.length:0,understood=q.ayahs&&Array.isArray(q.ayahs.understood)?q.ayahs.understood.length:0;
+    return [
+      {title:'Keşfet',rows:[{icon:'book-open',title:'Kısa sûreler',value:surahCount?String(surahCount):'',action:{name:'kaoOpenSurah',args:[114]}},{icon:'mosque',title:'Namazda ne diyorum',action:'kaoOpenPrayer'},{icon:'headphones',title:'Telaffuz stüdyosu',action:'kaoOpenPhonics'},{icon:'sparkles',title:'Günün âyeti',value:understood?understood+' anlaşıldı':'',action:'kaoOpenAyah'}]},
+      {title:'Sen',rows:[{icon:'trending-up',title:'İlerleme',action:{name:'kaoSetView',args:['stats']}},{icon:'settings',title:'Ayarlar',action:{name:'kaoSetView',args:['settings']}}]}
+    ];
+  }
   function kaoHomeHTML(nowValue){
     if(!quranLearnDeps) return '';
-    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),now=nowValue?validDate(nowValue,'now'):new Date();
-    var stats=kaoTodayStats(d,now),understood=(q.ayahs&&Array.isArray(q.ayahs.understood))?q.ayahs.understood.length:0;
-    var percent=Math.min(100,Math.floor(kaoCoverage(d).ratio*100)),todayAyah=kaoTodayAyah(),night=kaoNightWindow(d,now),esc=quranLearnDeps.esc,icon=quranLearnDeps.icon;
-    var h='<main class="kao-home" aria-labelledby="kao-title">';
-    h+='<section class="kao-hero"><div class="kao-hero-copy"><p class="kao-eyebrow">Kelime kapsamın</p><div class="kao-coverage"><strong><span data-countup="'+percent+'" data-countup-key="kao-coverage">'+percent+'</span>%</strong><span>Kur’an kelimelerinin %'+percent+' kadarını tanıyorsun</span></div></div><div class="kao-progress" role="progressbar" aria-label="Kur’an kelime kapsamı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent+'"><span style="width:'+percent+'%"></span></div><p class="kao-ayah-count"><span aria-hidden="true">۞</span> Anlaşılan âyet sayısı: <strong>'+understood+'</strong></p></section>';
-    h+='<section class="kao-today"><div class="kao-section-head"><div><p class="kao-eyebrow">Bugünkü ders</p><h2>'+stats.due+' tekrar · '+stats.fresh+' yeni</h2></div><span class="kao-time-chip">~'+stats.minutes+' dk</span></div>';
-    if(night) h+='<p class="kao-night">'+icon('moon',15)+' Gece tekrarı açık · '+night.durationMinutes+' dk, en fazla '+night.maxCards+' tekrar</p>';
-    var confused=kaoConfusedLine(q); if(confused) h+='<p class="kao-milestone">'+icon('triangle-alert',15)+' '+esc(confused)+'</p>';
-    h+='<button type="button" class="kao-primary" onclick="App.kaoStart()">'+(night?'Gece tekrarına başla · en çok '+night.maxCards+' kart':'Bugünkü oturuma başla')+' '+icon('arrow-right',16)+'</button></section>';
-    h+='<section class="kao-today-ayah"><p class="kao-eyebrow">Bugün anlayabildiğin âyet</p><h2>'+(todayAyah?esc(kaoSurahName(todayAyah.surahId))+' · '+todayAyah.ayah+'. âyet':'Kelimelerin arttıkça açılacak')+'</h2><p>'+(todayAyah?'Kelimelerinin %'+Math.floor(todayAyah.coverage.ratio*100)+'’ini tanıyorsun.':'Kelimelerinin en az %95’ini tanıdığın ilk âyet burada belirecek.')+'</p><button type="button" class="kao-link-button" onclick="App.kaoOpenAyah()">'+(todayAyah?'Âyeti aç':'Ne kadar kaldığını gör')+'</button></section>';
-    h+='<section class="kao-summary"><div><p class="kao-eyebrow">Sıradaki ünite</p><h2>'+esc(kaoUnitLabel(q))+'</h2><p class="kao-milestone">'+icon('target',15)+' '+esc(kaoMilestoneLabel(q))+'</p><button type="button" class="kao-link-button" onclick="App.kaoSetView(\'units\')">Tüm üniteleri gör</button><button type="button" class="kao-link-button" onclick="App.kaoOpenSurah(114)">20 kısa sûreyi oku</button><button type="button" class="kao-link-button" onclick="App.kaoGate(\'start\')">Seviye 0 giriş kontrolü</button><button type="button" class="kao-link-button" onclick="App.kaoOpenPrayer()">Namazda ne diyorum</button><button type="button" class="kao-link-button" onclick="App.kaoOpenMap()">Mushaf ısı haritası</button><button type="button" class="kao-link-button" onclick="App.kaoOpenPhonics()">Telaffuz stüdyosu</button><button type="button" class="kao-link-button" onclick="App.kaoSetView(\'stats\')">İstatistik</button><button type="button" class="kao-link-button" onclick="App.kaoSetView(\'settings\')">Ayarlar ve dışa aktarma</button></div></section></main>';
-    return h;
+    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),now=nowValue?validDate(nowValue,'now'):new Date(),step=kaoNextStepFor(d,now);
+    return kaoViewsApi().todayScreen({hero:kaoHomeHero(d,q,now,step),path:kaoHomePath(d,q),lists:kaoHomeLists(q)});
   }
   // 02 §5.8 uygulama niyeti: bugünün namaz vakitleri yalnız okunur (days[bugün].prayer; yazma/gün kaydı yok, bildirim yok).
   var KAO_INTENT_PRAYERS=[['fajr','sabah'],['dhuhr','öğle'],['asr','ikindi'],['maghrib','akşam'],['isha','yatsı']]; function kaoIntentSuggestion(d,nowValue,today){ var now=validDate(nowValue,'now'),day=objectOr(objectOr(d&&d.days,{})[today],{}),times=objectOr(day.prayer,{}),minutes=now.getHours()*60+now.getMinutes(),any=false,next=null; KAO_INTENT_PRAYERS.forEach(function(pair){ var m=/(\d{1,2}):(\d{2})/.exec(String(objectOr(times[pair[0]],{}).time||'')); if(!m) return; any=true; if(!next&&Number(m[1])*60+Number(m[2])>minutes) next=pair[1]+' namazından sonra 5 dakika ('+(m[1].length<2?'0':'')+m[1]+':'+m[2]+')'; }); return any?(next||'yarın sabah namazından sonra 5 dakika'):''; }
@@ -1979,12 +1996,14 @@
     p.lessons=cleanLessons; p.units=cleanUnits; q.path=p;
   }
   // KAO2-08: "sıradaki adım" tek doğruluk kaynağı; saf Flow'u gerçek veriyle çağırır.
-  function kaoNextStep(nowValue){
-    if(!quranLearnDeps) return null;
+  function kaoNextStepFor(d,now){
     var flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2;
     if(!flow||typeof flow.nextStep!=='function'||!curriculum) throw new Error('KAO2-08: akış motoru ya da müfredat yüklenmedi');
-    var d=quranLearnDeps.data(),now=validDate(nowValue===undefined?new Date():nowValue,'now'),q=ensureQuranLearn(d);
-    return flow.nextStep({quranLearn:q,night:kaoNightWindow(d,now)},now,{curriculum:curriculum});
+    return flow.nextStep({quranLearn:ensureQuranLearn(d),night:kaoNightWindow(d,now)},now,{curriculum:curriculum});
+  }
+  function kaoNextStep(nowValue){
+    if(!quranLearnDeps) return null;
+    return kaoNextStepFor(quranLearnDeps.data(),validDate(nowValue===undefined?new Date():nowValue,'now'));
   }
 
   window.SeymaQuranLearn={

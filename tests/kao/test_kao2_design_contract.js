@@ -32,7 +32,7 @@ assert.match(kaoCss, /#root\[data-theme="dark"\] \.kao-dialog,#root\[data-theme=
 const metrics = cssMetrics(kaoCss);
 const instant = '2026-09-28T09:00:00.000Z';
 class FixedDate extends Date { constructor(...args) { super(...(args.length ? args : [instant])); } static now() { return Date.parse(instant); } }
-const files = ['quranLexiconV1','quranGrammarV1','quranShortSurahsV1','quranPhonicsV1','quranRevelationOrderV1','quranStrikingVersesV1'].map(n => 'app/content/'+n+'.js').concat(['app/core/quranLearnFlow.js','app/core/quranLearnViews.js','app/core/quranLearn.js']);
+const files = ['quranLexiconV1','quranGrammarV1','quranShortSurahsV1','quranPhonicsV1','quranCurriculumV2','quranRevelationOrderV1','quranStrikingVersesV1'].map(n => 'app/content/'+n+'.js').concat(['app/core/quranLearnFlow.js','app/core/quranLearnViews.js','app/core/quranLearn.js']);
 const primary = {}, switches = {};
 const views = ['home','units','word','reader','settings','gate','phonics','ayah','map','prayer','stats','session'];
 const tags = html => html.match(/<[^>]+>/g) || [];
@@ -84,8 +84,8 @@ if (MODE === 'baseline') {
   for(const key of ['uppercase','tracking','deco','serif']) if(metrics[key]!==0) violations.push(key);
   if(metrics.removed.length) violations.push('removed selectors');
   if(Object.values(primary).some(n=>n>1)) violations.push('primary per view');
-  // KAO2-03 contracts CSS and main-action counts; switch semantics stay an explicit TODO until KAO2-09.
-  console.log('KAO2 design TODO: switch semantics KAO2-09');
+  // (f) KAO2-09'dan itibaren zorunlu: beş aç/kapat ayarı role="switch" + doğru aria-checked taşır.
+  if(Object.values(switches).some(s=>s.count!==5||s.missing!==0)) violations.push('switch semantics');
   assert.deepEqual(violations, [], 'strict tasarım ihlalleri');
 }
 console.log('KAO2 design contract: PASS');

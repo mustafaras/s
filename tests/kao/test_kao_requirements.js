@@ -9,7 +9,7 @@ const repoRoot = require('../repo-root');
 function loadApi(extraDeps) {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) {
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranCurriculumV2.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) {
     vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
   }
   const api = sandbox.window.SeymaQuranLearn;
@@ -275,9 +275,12 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   const settingsHtml = e7.kaoOverlayHTML('2026-09-25T10:00:00');
   assert.match(settingsHtml, /class="kao-dialog" style="--kao-ar-lh:2\.5;--kao-ar-ws:\.18em"/);
   for (const handler of ['kaoSetDailyNew(15)', "kaoSetAudioStyle('flowing')", "kaoSetTranslit('dia')", 'kaoToggleHarakat()', 'kaoToggleFade()', "kaoSetReadability('lineHeight','2.5')", "kaoSetReadability('wordSpacing','wide')", "kaoSetReadability('coloredHarakat',true)", 'kaoReopenGate()', 'kaoExportCsv()']) assert.ok(settingsHtml.includes('App.' + handler), handler);
-  assert.equal((settingsHtml.match(/aria-pressed="true"/g) || []).length, 8, 'her grupta tek seçili düğme + açık anahtarlar (görünürlük dahil)');
+  // KAO2-09 (f): aç/kapat anahtarları role="switch" + aria-checked; segment düğmeleri aria-pressed. Toplam seçili sayı aynı.
+  const pressedOn = (settingsHtml.match(/aria-pressed="true"/g) || []).length, switchOn = (settingsHtml.match(/role="switch" aria-checked="true"/g) || []).length;
+  assert.equal(pressedOn + switchOn, 8, 'her grupta tek seçili düğme + açık anahtarlar (görünürlük dahil)');
+  assert.ok(switchOn > 0 && !/class="kao-toggle" aria-pressed=/.test(settingsHtml), 'anahtarlar switch semantiğinde');
   assert.match(settingsHtml, /role="group" aria-label="Günlük yeni kelime"/);
-  assert.match(e7.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoSetView\('settings'\)/, 'E1 ana ekrandan ayarlara geçiş');
+  assert.match(e7.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoSetView\(&quot;settings&quot;\)/, 'S-02 Sen → Ayarlar satırı');
   assert.equal(e7.kaoReopenGate(), true); assert.equal(e7Ui.kaoView, 'gate', 'Seviye 0 tekrar açılır');
   assert.equal(q.gate.passed, false);
 
@@ -362,7 +365,7 @@ function sandboxLemma(api, lemmaId) {
 {
   const box = { window: {} };
   vm.createContext(box);
-  for (const relative of ['app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  for (const relative of ['app/content/quranShortSurahsV1.js', 'app/content/quranCurriculumV2.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
   const mapApi = box.window.SeymaQuranLearn;
   const cell = (record, understood) => mapApi.kaoSurahMap({ quranLearn: { surahs: { '108': record }, ayahs: { understood: understood || [] } } })[107];
   assert.equal(mapApi.kaoSurahMap({ quranLearn: {} }).length, 114);
@@ -803,7 +806,7 @@ function sandboxLemma(api, lemmaId) {
     SeymaHelpers: { confetti() { calls.push('confetti'); } }
   } };
   vm.createContext(sandbox);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranCurriculumV2.js', 'app/content/quranRevelationOrderV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
   const api = sandbox.window.SeymaQuranLearn;
   const data = { quranLearn: null, settings: {} };
   const ui = {};
@@ -841,6 +844,8 @@ function sandboxLemma(api, lemmaId) {
   // FX modülü yoksa atlanır.
   const bare = loadApi({ data() { return data; }, ui() { return ui; }, todayStr() { return '2026-10-05'; } });
   assert.doesNotThrow(() => bare.kaoHomeHTML('2026-10-05T10:00:00.000Z'));
+  // KAO2-09 (c): kapsam yalnız bilinen kelime ≥1 iken görünür; en sık lemma iki yönde kalıcı yapılır.
+  for (const dir of ['ar>tr', 'tr>ar']) data.quranLearn.cards[`w:${sandbox.window.QuranLexiconV1.lemmas[0].id}:${dir}`] = { state: 'review', s: 25, reps: 6, due: '2099-01-01T00:00:00.000Z' };
   assert.match(api.kaoHomeHTML('2026-10-05T10:00:00.000Z'), /<span data-countup="\d+" data-countup-key="kao-coverage">\d+<\/span>%/, 'kapsam sayacı countUp için işaretli');
 }
 

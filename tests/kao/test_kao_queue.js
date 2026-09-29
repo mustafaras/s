@@ -178,7 +178,7 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
 {
   const box = { window: {} };
   vm.createContext(box);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranCurriculumV2.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
   const e9 = box.window.SeymaQuranLearn, shorts = box.window.QuranShortSurahsV1;
   const groups = e9.kaoAyahGroups();
   assert.ok(groups.length > 100 && groups.every((group) => group.words.every((word) => word.surahId === group.surahId && word.ayah === group.ayah && word.pronunciation && word.tr)), 'âyet grupları yalnız kısa sûre verisinden ve eksiksiz');
@@ -222,8 +222,9 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
   assert.match(html, /aria-labelledby="kao-ayah-title"/); assert.match(html, /Anladın ✓/);
   assert.equal((html.match(/App\.kaoAyah\('play',\d+\)/g) || []).length, today.words.length, 'kelime kelime ses');
   assert.equal((html.match(/kao-ayah-tr/g) || []).length, today.words.length, 'kelime kelime Türkçe');
-  assert.match(e9.kaoHomeHTML('2026-09-25T10:00:00'), /Bugün anlayabildiğin âyet[\s\S]*App\.kaoOpenAyah\(\)/, 'E1 satırı');
-  assert.match(e9.kaoHomeHTML('2026-09-25T10:00:00'), /Anlaşılan âyet sayısı: <strong>400<\/strong>/, 'sayaç E1’de');
+  // KAO2-09 (Y-05): ana ekranda boş vaat bölümü yok; "Günün âyeti" satırı + sayaç âyet ekranında.
+  assert.match(e9.kaoHomeHTML('2026-09-25T10:00:00'), /onclick="App\.kaoOpenAyah\(\)">[\s\S]*?Günün âyeti[\s\S]*?400 anlaşıldı/, 'S-02 Günün âyeti satırı');
+  assert.match(e9.kaoAyahHTML(), /Anlaşılan âyet sayısı: <strong>400<\/strong>/, 'sayaç Günün âyeti ekranında');
   assert.match(e9.kaoHubCardHTML(), /Bugün anlayabildiğin âyet:/, 'hub kartı satırı');
   const emptyData = { quranLearn: { cards: {} }, settings: {} };
   data.quranLearn = emptyData.quranLearn; ui.kaoAyahToday = null;
@@ -247,7 +248,7 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
   class FixedDate extends RealDate { constructor(...args) { super(...(args.length ? args : [clock])); } static now() { return clock; } }
   const box = { window: {}, Date: FixedDate, Math, Number, String, Object, Array, JSON };
   vm.createContext(box);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranCurriculumV2.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
   const sweepApi = box.window.SeymaQuranLearn, sweepUi = {};
   const pad = (n) => String(n).padStart(2, '0');
   const localDay = (value) => { const d = new RealDate(value); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };

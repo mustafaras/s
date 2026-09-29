@@ -22,6 +22,7 @@ vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranShortSurah
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranRevelationOrderV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranRevelationOrderV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranStrikingVersesV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranStrikingVersesV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranPhonicsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranPhonicsV1.js' });
+vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranCurriculumV2.js'), 'utf8'), sandbox, { filename: 'app/content/quranCurriculumV2.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnFlow.js'), 'utf8'), sandbox, { filename: 'app/core/quranLearnFlow.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnViews.js'), 'utf8'), sandbox, { filename: 'app/core/quranLearnViews.js' });
 vm.runInContext(source, sandbox, { filename: relative });
@@ -75,12 +76,13 @@ assert.match(html, /id="sey-ov-back"/);
 assert.match(html, /id="sey-ov-card"[^>]*role="dialog"[^>]*aria-modal="true"[^>]*tabindex="-1"/);
 assert.match(html, /onkeydown="App\.onModalKeydown\(event,App\.kaoClose\)"/);
 assert.match(html, /onclick="App\.kaoClose\(\)"/);
-assert.match(html, /Kapsam/i);
-assert.match(html, /anlaş/iu);
-assert.match(html, /10 yeni/);
-assert.match(html, /Gece tekrarı/);
+// KAO2-09 (S-02): sıfır kullanıcıda %0 kapsam yerine ilk hedef; tek HeroCard; gece satırı altbilgide.
+assert.match(html, /İlk hedef: Fâtiha’yı anlamak · \d+ kelime/);
+assert.doesNotMatch(html, /data-countup-key="kao-coverage"/);
+assert.match(html, /class="kao-hero-card"/);
+assert.match(html, /Hoş geldin/);
+assert.match(html, /class="kao-hero-foot"[\s\S]*Gece tekrarı/);
 assert.match(html, /App\.kaoStart\(\)/);
-assert.match(html, /class="kao-time-chip"/);
 assert.doesNotMatch(html, /class="(?:kao-dialog-frame|kao-header-mark|kao-hero-rosette|kao-summary-mark|kao-done-mark)"/);
 assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 
@@ -497,7 +499,9 @@ assert.ok(prevented >= 3 && stopped >= 3);
   assert.match(mapHtml, /<li value="112">İhlâs — %100 anlaşıldı \(2 \/ 4 âyet\) · gecikmeli test 5\/5 · kesinleşti<\/li>/, 'eşdeğer metin listesi');
   assert.match(mapHtml, /<li value="114">Nâs — %\d+ anlaşıldı \(1 \/ 6 âyet\) · gecikmeli test 2\/5 · tekrar oku<\/li>/);
   assert.match(mapHtml, /110 sûrede henüz veri yok/);
-  assert.match(api.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoOpenMap\(\)/, 'E1 girişi');
+  // KAO2-09: harita ana ekrandan İlerleme'ye taşındı (S-12 birleşimine kadar).
+  assert.doesNotMatch(api.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoOpenMap\(\)/, 'S-02 ana ekranda harita satırı yok');
+  assert.match(api.kaoStatsHTML('2026-09-25T10:00:00'), /App\.kaoOpenMap\(\)/, 'İlerleme ekranından harita girişi');
   assert.match(appSource, /App\.kaoOpenMap=function\(\)\{ return window\.SeymaQuranLearn\.kaoOpenMap\.apply\(null,arguments\); \};/);
   assert.match(cssSource, /\.kao-map-cell\[data-l="5"\],\.kao-map-legend i\[data-l="5"\]\{background:var\(--quran-mid\);color:var\(--quran-surface\)\}/);
   appData.quranLearn = saved; ui.kaoView = 'home'; ui.kaoOpen = false;

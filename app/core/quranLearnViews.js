@@ -128,5 +128,34 @@
     return '<button type="button" class="kao-primary" aria-label="'+label+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+label+'</button>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton};
+  // KAO2-09 · S-02 Bugün: HeroCard (tek birincil eylem) + Yolun kartı + iki grouped list.
+  function heroCard(options){
+    if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
+    options=options&&typeof options==='object'?options:{};
+    var foot=Array.isArray(options.foot)?options.foot:[];
+    var footHtml=foot.map(function(line){
+      line=line&&typeof line==='object'?line:{};
+      return '<p class="kao-hero-note"><span class="kao-hero-note-icon" aria-hidden="true">'+deps.icon(String(line.icon||''))+'</span><span>'+escapeText(line.text)+'</span></p>';
+    }).join('');
+    return '<section class="kao-hero-card" aria-labelledby="kao-hero-title"><p class="kao-hero-eyebrow">'+escapeText(options.eyebrow)+'</p><h3 class="kao-hero-title" id="kao-hero-title">'+escapeText(options.title)+'</h3><p class="kao-hero-sub">'+escapeText(options.subtitle)+'</p>'+primaryButton(options.button)+(footHtml?'<div class="kao-hero-foot">'+footHtml+'</div>':'')+'</section>';
+  }
+  function pathCard(options){
+    if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
+    options=options&&typeof options==='object'?options:{};
+    var number=Number(options.percent),pct=Number.isFinite(number)?Math.round(Math.max(0,Math.min(100,number))):0;
+    var coverage=Number(options.coverage),hasCoverage=options.coverage!==null&&options.coverage!==undefined&&Number.isFinite(coverage);
+    var meta=hasCoverage?'<p class="kao-path-meta">'+escapeText(options.known)+' kelime tanıdık · Kur’an kelimelerinin <span data-countup="'+Math.round(coverage)+'" data-countup-key="kao-coverage">'+Math.round(coverage)+'</span>%’i</p>':'<p class="kao-path-goal">'+escapeText(options.goal)+'</p>';
+    var call=actionCall(options.action);
+    return '<section class="kao-path-card" aria-labelledby="kao-path-title"><h3 class="kao-section-title" id="kao-path-title">Yolun</h3><div class="kao-path-surface"><p class="kao-path-level">'+escapeText(options.level)+'</p>'+
+      '<div class="kao-path-bar" role="progressbar" aria-label="Ünite ilerlemesi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><span class="kao-path-fill"'+(pct>0?' style="width:'+pct+'%"':'')+'></span></div>'+
+      '<p class="kao-path-unit">'+escapeText(options.unit)+'</p>'+meta+
+      '<button type="button" class="kao-path-more"'+(call?' onclick="'+call+'"':' disabled')+'><span>Tüm yolu gör</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></div></section>';
+  }
+  function todayScreen(model){
+    if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    return '<main class="kao-today-screen" aria-label="Bugün">'+heroCard(model.hero)+pathCard(model.path)+groupedList(model.lists)+'</main>';
+  }
+
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen};
 })(window);

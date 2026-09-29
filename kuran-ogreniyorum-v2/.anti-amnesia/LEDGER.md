@@ -320,3 +320,22 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: next-unit, 05 §4 tablosunda ulaşılamaz sırada olduğu için "yeni ünite başlamadı" koşuluyla daily'den önce; action tanımlayıcıları KAO2-09/11/12'de bağlanacak; daily.ms yazılmıyor, süre 0,55 dk/görev yedeğiyle
 - next: KAO2-09
+
+## seq 33 · 2026-09-29 · FIX · KAO2-09
+- status: in_progress
+- summary: Kullanıcı KAO2-09 için kapsamı üç adımda genişletti: (1) test_kao_requirements.js + test_kao_queue.js yalnız ana ekran/switch semantiği beklentileri; (2) test_kao_user_tasks.js satır 196 ana ekran → İlerleme beklentisi; (3) KAO fikstürlerinde (navigation, queue, user_tasks, requirements, render) yalnız modül yükleme satırlarına quranCurriculumV2.js (KAO2-04 emsali).
+- resolution: P6 engeli kod yazımından önce kullanıcı onayıyla çözüldü; başka kapsam dışı dosyaya dokunulmadı.
+- next: KAO2-09
+
+## seq 34 · 2026-09-29 · CARD · KAO2-09
+- status: done
+- title: Bugün ekranı, tek birincil eylem ve Yolun kartı
+- prev-commit: 1a697a0c
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-09/KANIT.md
+- gates: syntax PASS · kao 25/25 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr 95/95 PASS · contrast 406 çift/0 ihlal PASS · sync PASS
+- metrics: today 7/7 · design strict (f) PASS: switch 5/5 · primary/görünüm ≤1 · runtime gzip 60,031 KiB · CSS 7,834 KiB · p95 4,227 ms
+- changed-tests: yeni test_kao2_today.js; design (f) zorunlu; render/requirements/queue/user_tasks bilerek değişen ana ekran beklentileri; 5 fikstürde yükleme satırı
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: harita İlerleme'ye, âyet sayacı Günün âyeti ekranına taşındı (erişim korunur); İlerleme'de </main> işaretleme hatası düzeltildi; eski ana ekran CSS'i öksüz, KAO2-26 backlog
+- next: KAO2-10

@@ -192,7 +192,11 @@
       var status=lesson.done===true?'done':(lesson.current===true?'current':'upcoming'),mark=status==='done'?'✓':(status==='current'?'●':'○');
       return '<li class="kao-unit-step kao-unit-step-'+status+'"'+(lesson.current===true?' aria-current="step"':'')+'><span class="kao-unit-step-mark" aria-hidden="true">'+mark+'</span><span class="kao-unit-step-title">'+escapeText(lesson.title)+'</span><span class="kao-sr-only">'+escapeText(status==='done'?'Tamamlandı':(status==='current'?'Sıradaki ders':'Sırada'))+'</span></li>';
     }).join('');
-    var concepts=(Array.isArray(model.concepts)?model.concepts:[]).map(function(title){ return '<li>'+escapeText(title)+'</li>'; }).join('');
+    var concepts=(Array.isArray(model.concepts)?model.concepts:[]).map(function(item){
+      if(!item||typeof item!=='object') return '<li>'+escapeText(item)+'</li>';
+      var call=actionCall({name:'kaoNav',args:['concept',item.id]});
+      return '<li><button type="button" class="kao-unit-concept"'+(call?' onclick="'+call+'"':' disabled')+'><span>'+escapeText(item.title)+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
+    }).join('');
     var wordList=Array.isArray(model.words)?model.words:[],words=wordList.map(function(word){
       word=word&&typeof word==='object'?word:{};
       return '<li class="kao-unit-word"><span class="kao-unit-word-ar" lang="ar" dir="rtl">'+escapeText(word.ar)+'</span><span class="kao-unit-word-reading" lang="tr" dir="ltr">'+escapeText(word.pronunciation)+'</span><span class="kao-unit-word-meaning">'+escapeText(word.meaning)+'</span><span class="kao-unit-word-status">'+escapeText(word.status)+'</span></li>';
@@ -319,5 +323,53 @@
       '<span class="kao-hub-cta">'+escapeText(options.action)+' <span aria-hidden="true">›</span></span>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen};
+  // KAO2-15 · S-10: 25 kavramlık kütüphane. Liste ünite sırasıyla; kavram sayfası
+  // günlük Türkçe önce, terim ve tablo isteğe bağlı ayrıntı olarak gelir.
+  function grammarTable(table){
+    table=table&&typeof table==='object'?table:{};
+    var columns=Array.isArray(table.columns)?table.columns:[],rows=Array.isArray(table.rows)?table.rows:[];
+    function cell(value){
+      if(Array.isArray(value)){ var reading=escapeText(value[2]); return '<span class="kao-grammar-ar" lang="ar" dir="rtl">'+escapeText(value[1])+'</span>'+(reading?'<span class="kao-grammar-reading" lang="tr" dir="ltr">'+reading+'</span>':''); }
+      return escapeText(value);
+    }
+    var head=columns.length?'<tr>'+columns.map(function(column){ return '<th scope="col">'+escapeText(column)+'</th>'; }).join('')+'</tr>':'';
+    var body=rows.map(function(row){
+      row=row&&typeof row==='object'?row:{};
+      var cells=Array.isArray(row.cells)?row.cells:[],out=[];
+      if(row.label!==undefined) out.push('<th scope="row">'+cell(row.label)+'</th>');
+      cells.forEach(function(value){ out.push('<td>'+cell(value)+'</td>'); });
+      return '<tr>'+out.join('')+'</tr>';
+    }).join('');
+    return '<div class="kao-grammar-table-wrap"><table class="kao-grammar-table"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>';
+  }
+  function grammarScreen(model){
+    if(!deps) throw new Error('KAO2-15: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    var groups=(Array.isArray(model.groups)?model.groups:[]).map(function(group){
+      group=group&&typeof group==='object'?group:{};
+      var rows=(Array.isArray(group.concepts)?group.concepts:[]).map(function(item){
+        item=item&&typeof item==='object'?item:{};
+        var call=actionCall(item.action);
+        return '<li><button type="button" class="kao-grammar-row"'+(call?' onclick="'+call+'"':' disabled')+'><span class="kao-grammar-row-title">'+escapeText(item.title)+'</span><span class="kao-grammar-row-plain">'+escapeText(item.plainTr)+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
+      }).join('');
+      return '<section class="kao-grammar-group" data-unit="'+escapeText(group.id)+'" aria-labelledby="kao-grammar-unit-'+escapeText(group.id)+'"><h3 id="kao-grammar-unit-'+escapeText(group.id)+'">'+escapeText(group.label)+'</h3><ul class="kao-grammar-unit">'+rows+'</ul></section>';
+    }).join('');
+    return '<main class="kao-grammar" aria-label="Gramer notları"><div class="kao-view-head"><div><p class="kao-eyebrow">Keşfet</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">Gramer notları</h2><p class="kao-grammar-intro">'+escapeText(model.intro)+'</p></div></div><div class="kao-grammar-list">'+groups+'</div></main>';
+  }
+  function grammarConceptScreen(model){
+    if(!deps) throw new Error('KAO2-15: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    var examples=(Array.isArray(model.tables)?model.tables:[]).map(function(table){
+      table=table&&typeof table==='object'?table:{};
+      return '<section class="kao-grammar-example"><h4>'+escapeText(table.title)+'</h4>'+grammarTable(table)+'</section>';
+    }).join('');
+    var lessons=(Array.isArray(model.lessons)?model.lessons:[]).map(function(item){
+      item=item&&typeof item==='object'?item:{};
+      var call=actionCall(item.action);
+      return '<li><button type="button" class="kao-grammar-lesson"'+(call?' onclick="'+call+'"':' disabled')+'><span>'+escapeText(item.title)+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
+    }).join('');
+    return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p></div></div>'+examples+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
+  }
+
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen};
 })(window);

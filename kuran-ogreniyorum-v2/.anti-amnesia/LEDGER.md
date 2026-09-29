@@ -571,3 +571,30 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: CSS değiştirilmedi; 320 px/%200 gerçek tarayıcı yerleşimi doğrulanmadı.
 - next: KAO2-15
+
+## seq 60 · 2026-09-29 · BLOCKED · KAO2-15
+- status: blocked
+- summary: S-10 gramer notları kütüphanesi (liste + kavram sayfası, Keşfet ve ünite
+  kavram girişleri, 25/25 erişilebilir) yazıldı; yeni fikstür yönlendirici dışında
+  5/5 yeşil. Kartın kabulü, kartın Dokun listesinde olmayan tek bir router
+  belirteci olmadan tamamlanamıyor.
+- attempted: `node tests/kao/test_kao2_grammar_notes.js` → `AssertionError`:
+  çıktı `kao-screen-home`; `api.kaoNav('grammar')` true ama gezinme yığını evde
+  kalıyor. Yalnız teşhis için `app/core/quranLearnFlow.js` `VIEWS` listesine
+  `grammar:true` eklendi → 5/5 PASS; yama `git checkout` ile geri alındı
+  (`grep -c 'grammar:true'` = 0). `test_kao2_perf_budget.js` PASS · runtime
+  78.0 KiB (≤80) · CSS 10.1 KiB (≤14) · içerik 168.483 KiB. `test_kao2_today.js`
+  (P2.4) ve `test_kao2_path.js`/`test_kao_render.js` PASS.
+- scope-blocker: `app/core/quranLearnFlow.js` satır 4'teki `VIEWS` beyaz listesi
+  yalnız `home,units,word,reader,settings,phonics,ayah,map,prayer,stats,gate,session`
+  tanır; `grammar` yok → `entry()` null döner, yığın evde kalır. Dosya KAO2-15
+  Dokun listesinde değil (`quranLearnViews.js`, `quranLearn.js`, `app/kao.css`,
+  yeni test).
+- requested-scope: yalnız `VIEWS` listesine `grammar` anahtarını ekleme; router
+  sözleşmesi ve motor davranışı için ek yetki istenmiyor.
+- gates: quranLearn.js/quranLearnViews.js syntax PASS · grammar fikstürü 5/5
+  (yama sonrası, kanıt) · perf bütçesi PASS · today/path/render PASS · tam P3
+  turu ve kapanış engel nedeniyle yapılmadı.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-15/KANIT.md
+- evidence-levels: kaynak/test kısmi · yayın yok · cihaz doğrulanmadı
+- next: KAO2-15

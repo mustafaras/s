@@ -140,6 +140,7 @@ check('(d) Keşfet ve Sen grouped list satırları', () => {
   assert.deepEqual(section('Keşfet'), [
     ['Kısa sûreler', 'App.kaoOpenSurah(114)'],
     ['Namazda ne diyorum', 'App.kaoOpenPrayer()'],
+    ['Gramer notları', 'App.kaoSetView(&quot;grammar&quot;)'],
     ['Telaffuz stüdyosu', 'App.kaoOpenPhonics()'],
     ['Günün âyeti', 'App.kaoOpenAyah()']
   ]);
@@ -147,7 +148,7 @@ check('(d) Keşfet ve Sen grouped list satırları', () => {
     ['İlerleme', 'App.kaoSetView(&quot;stats&quot;)'],
     ['Ayarlar', 'App.kaoSetView(&quot;settings&quot;)']
   ]);
-  assert.doesNotMatch(html, /Kök aileleri|Gramer notları/, 'ilgili kartlar gelene kadar gizli');
+  assert.doesNotMatch(html, /Kök aileleri/, 'ilgili kartlar gelene kadar gizli');
   assert.doesNotMatch(html, /data-icon=""/, 'tüm satır ikonları mevcut setten');
 });
 

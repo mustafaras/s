@@ -1,0 +1,9 @@
+PASS  (a) hiç başlamadı: 05 §8 metinleri, halka yok, %0 yok
+PASS  (b) günlük ders bekliyor: ünite başlığı, sıradaki ders, gerçek süre, gerçek halka
+PASS  (b2) niyet önerisi yalnız "bekliyor" durumunda alt satırın yerine geçer
+PASS  (c) bugün tamam: ✓ başlık, yarınki tekrar sayısı, "Aç"
+PASS  (d) gece penceresi: "Uyumadan önce N kart · M dk", "Tekrar et"
+PASS  kaoVisible=false → boş dize; hub render veriyi değiştirmez
+PASS  motor ya da müfredat yüklenmemişse kart yine çizilir (ana sekme kırılmaz)
+PASS  06 §5 CSS: yalnız --kao-* renk tokenı, 600/700, süs yok, hover kaldırma yok
+KAO2-10 hub: PASS (8 kontrol)

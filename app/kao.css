@@ -123,3 +123,12 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-path-more{appearance:none;width:100%;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding:0;border:0;border-top:1px solid var(--kao-sep);background:transparent;color:var(--kao-tint);font:inherit;font-size:var(--f-body);cursor:pointer}
 .kao-path-more:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
 @media (forced-colors:active){.kao-hero-card,.kao-path-surface{border-color:CanvasText}.kao-path-bar{background:Canvas;outline:1px solid CanvasText}.kao-path-fill{background:Highlight}.kao-hero-eyebrow,.kao-hero-sub,.kao-hero-note,.kao-section-title,.kao-path-meta,.kao-path-goal,.kao-ayah-count{color:CanvasText}.kao-path-more{color:LinkText}}
+/* KAO2-10 · 06 §5 hub kartı v2: tek bilgi + gerçek halka + eylem kapsülü; yalnız --kao-* tokenları. */
+.kao-hub-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;min-width:0}
+.kao-hub-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:var(--kao-r-ctl);background:color-mix(in srgb,var(--kao-tint) 8%,var(--kao-surface));color:var(--kao-tint)}
+.kao-hub-text{display:grid;gap:2px;min-width:0}
+.kao-hub-title{color:var(--kao-label);font-size:var(--f-headline);font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.kao-hub-sub{color:var(--kao-label-2);font-size:var(--f-subhead);line-height:1.4;overflow-wrap:anywhere}
+.kao-hub-cta{align-self:flex-end;display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:6px 14px;border-radius:var(--kao-r-pill);background:var(--kao-tint);color:var(--kao-surface);font-size:var(--f-subhead);font-weight:600}
+@media (forced-colors:active){.kao-hub-icon,.kao-hub-cta{border:1px solid CanvasText;background:Canvas;color:CanvasText}.kao-hub-sub{color:CanvasText}}
+/* KAO2-10 son */

@@ -225,7 +225,8 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
   // KAO2-09 (Y-05): ana ekranda boş vaat bölümü yok; "Günün âyeti" satırı + sayaç âyet ekranında.
   assert.match(e9.kaoHomeHTML('2026-09-25T10:00:00'), /onclick="App\.kaoOpenAyah\(\)">[\s\S]*?Günün âyeti[\s\S]*?400 anlaşıldı/, 'S-02 Günün âyeti satırı');
   assert.match(e9.kaoAyahHTML(), /Anlaşılan âyet sayısı: <strong>400<\/strong>/, 'sayaç Günün âyeti ekranında');
-  assert.match(e9.kaoHubCardHTML(), /Bugün anlayabildiğin âyet:/, 'hub kartı satırı');
+  // KAO2-10 (05 §8): hub tek bilgi taşır; âyet satırı hub'da yok, "Günün âyeti" ana ekrandan (yukarıda) açılır.
+  assert.doesNotMatch(e9.kaoHubCardHTML(), /Bugün anlayabildiğin âyet/, 'hub kartında âyet satırı yok');
   const emptyData = { quranLearn: { cards: {} }, settings: {} };
   data.quranLearn = emptyData.quranLearn; ui.kaoAyahToday = null;
   assert.match(e9.kaoAyahHTML(), /Henüz hazır âyet yok[\s\S]*En yakın âyet/, 'hazır âyet yokken yol gösterir');

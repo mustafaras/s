@@ -165,7 +165,8 @@ for (const variant of [{ label: 'audio=false', quiet: false }, { label: 'sessiz 
     const id = `w:${catalog[i]}:ar>tr`;
     q.cards[id] = { state: 'review', s: 6, d: 5, r: '2026-09-18T09:00:00.000Z', due: '2026-09-25T09:00:00.000Z', reps: 3, lapses: 0 };
   }
-  assert.match(api.kaoHubCardHTML(), /Gece tekrarı açık/, 'hub kartı gece önerisi');
+  // KAO2-10 (05 §8): gece penceresinde hub alt satırı ve eylemi.
+  assert.match(api.kaoHubCardHTML(), /Uyumadan önce 8 kart · 3 dk[\s\S]*class="kao-hub-cta">Tekrar et /, 'hub kartı gece önerisi');
   assert.match(api.kaoHomeHTML(new Date(clock.now)), /Gece tekrarına başla · en çok 8 kart/, 'E1 gece düğmesi');
   api.kaoOpen(); const nightCount = api.kaoStart();
   assert.ok(nightCount >= 1 && nightCount <= 8, `gece oturumu ≤8 kart (${nightCount})`);

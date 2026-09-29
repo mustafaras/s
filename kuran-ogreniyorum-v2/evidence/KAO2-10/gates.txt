@@ -1,0 +1,14 @@
+syntax PASS app/core/quranLearn.js
+syntax PASS app/core/quranLearnFlow.js
+syntax PASS app/core/quranLearnViews.js
+syntax PASS app/content/quranCurriculumV2.js
+kao 26/26
+app 77/77
+panel 23/23
+panel-v2 27/27
+quran 9/9
+reminders exit=0 REMINDER SMOKE PASS: 21 curated fixtures
+driver exit=0 FAIL-satırı=0
+zikr exit=0 95/95 assertion pass
+contrast exit=0 414 çift denetlendi (35 elle seçilmiş + 172 otomatik renk bildirimi, × 2 tema), 0 tanesi eşiğin altında.
+KAO2 perf: PASS (content 168.483 KiB · runtime 60.788 KiB · css 8.008 KiB · p95 4.355 ms)

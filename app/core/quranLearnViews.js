@@ -157,5 +157,15 @@
     return '<main class="kao-today-screen" aria-label="Bugün">'+heroCard(model.hero)+pathCard(model.path)+groupedList(model.lists)+'</main>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen};
+  // KAO2-10 · 06 §5 hub kartı iç yüzü: tek bilgi + gerçek ünite halkası + eylem kapsülü.
+  // Dış düğme motor tarafında kalır; burada etkileşimli öğe ya da tıklama niteliği üretilmez.
+  function hubCard(options){
+    if(!deps) throw new Error('KAO2-10: görünüm bağımlılıkları kayıtlı değil');
+    options=options&&typeof options==='object'?options:{};
+    var ring=options.ring&&typeof options.ring==='object'&&Number.isFinite(Number(options.ring.value))?progressRing(options.ring.value,28,options.ring.label):'';
+    return '<span class="kao-hub-row"><span class="kao-hub-icon" aria-hidden="true">'+deps.icon('book-open',18)+'</span><span class="kao-hub-text"><span class="kao-hub-title">'+escapeText(options.title)+'</span><span class="kao-hub-sub">'+escapeText(options.subtitle)+'</span></span>'+ring+'</span>'+
+      '<span class="kao-hub-cta">'+escapeText(options.action)+' <span aria-hidden="true">›</span></span>';
+  }
+
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,hubCard:hubCard};
 })(window);

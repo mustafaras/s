@@ -5,8 +5,8 @@
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-09",
-  "nextCard": "KAO2-10",
-  "ledgerLastSeq": 37,
+  "nextCard": "KAO2-11",
+  "ledgerLastSeq": 39,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -84,8 +84,8 @@
     },
     "KAO2-10": {
       "wave": "W2",
-      "status": "todo",
-      "evidence": null
+      "status": "done",
+      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-10/KANIT.md"
     },
     "KAO2-11": {
       "wave": "W2",
@@ -185,6 +185,12 @@
       "source": "KAO2-08",
       "target": "KAO2-12",
       "note": "daily[].ms görev süresi yazılmıyor; estimateMinutes 0,55 dk/görev yedeğinde."
+    },
+    {
+      "id": "B-KAO2-10-1",
+      "source": "KAO2-10",
+      "target": "KAO2-26",
+      "note": "Eski hub seçicileri öksüz (.kao-hub-head/.kao-hub-seal/.kao-hub-kicker/.kao-hub-status/.kao-hub-copy/.kao-hub-path/.kao-hub-foot/.kao-hub-ayah); test_kao_render.js seçici listesi ve arşiv kontrast aracı bağımlı, B-KAO2-09-1 ile birlikte temizlenmeli."
     }
   ],
   "releaseApprovalRecord": {

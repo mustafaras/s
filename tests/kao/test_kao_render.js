@@ -89,10 +89,11 @@ assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 const firstHubHtml = api.kaoHubCardHTML();
 assert.match(firstHubHtml, /id="kao-hub-entry"/);
 assert.match(firstHubHtml, /Kur’an Arapçası Öğreniyorum/);
-assert.match(firstHubHtml, /20 kısa sûre/, 'KAO-16 okuyucusu ana hub kartında keşfedilebilir olmalı');
-assert.match(firstHubHtml, /Kelime<\/b>.*Kök<\/b>.*Gramer<\/b>.*Âyet<\/b>/);
+// KAO2-10 (05 §8, Y-01/T-05): hub tek bilgi + tek eylem; sahte yol noktaları yok. KAO-16 okuyucusu Keşfet listesinde keşfedilebilir.
+assert.match(api.kaoHomeHTML('2026-09-24T12:00:00'), /App\.kaoOpenSurah\(114\)[\s\S]*?Kısa sûreler/, 'KAO-16 okuyucusu ana ekranda keşfedilebilir olmalı');
+assert.doesNotMatch(firstHubHtml, /kao-hub-path|Kelime<\/b>/);
 assert.doesNotMatch(firstHubHtml, /class="kao-hub-(?:spine|frame|ornament)"/);
-assert.match(firstHubHtml, /İlk oturum hazır/);
+assert.match(firstHubHtml, /Namazda söylediklerini anlamaya başla · 5 dk/);
 assert.match(firstHubHtml, /onclick="App\.kaoOpen\(\)"[^>]*aria-haspopup="dialog"/);
 const firstLemma = sandbox.window.QuranLexiconV1.lemmas[0];
 quranLearn.startedAt = '2026-09-24T12:00:00.000Z';
@@ -100,9 +101,11 @@ quranLearn.cards[`w:${firstLemma.id}:ar>tr`] = { reps: 2, state: 'review', s: 21
 quranLearn.cards[`w:${firstLemma.id}:tr>ar`] = { reps: 2, state: 'review', s: 21 };
 quranLearn.daily['2026-09-24'] = { answered: 3 };
 const resumeHubHtml = api.kaoHubCardHTML();
-assert.match(resumeHubHtml, /1 kelime kalıcı/);
-assert.match(resumeHubHtml, /3 cevap bugün/);
-assert.match(resumeHubHtml, /Devam et/);
+// KAO2-10: sayaçlar yerine "bekliyor" durumu — ünite, sıradaki ders ve gerçek süre; eylem "Devam".
+assert.match(resumeHubHtml, /Kur’an Arapçası · Ünite \d+/);
+assert.match(resumeHubHtml, /Sıradaki: [^<]+ · \d+ dk/);
+assert.match(resumeHubHtml, /class="kao-hub-cta">Devam /);
+assert.equal(Object.keys(api.kaoKnownLemmaSet(appData)).length, 1, 'iki yönde kalıcı kelime sayılır');
 
 const shiftLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift);
 const otherLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.id !== shiftLemma.id && lemma.pos === shiftLemma.pos && lemma.root !== shiftLemma.root);
@@ -302,13 +305,14 @@ assert.equal((nasHtml.match(/class="kao-pronunciation-line/g) || []).length, nas
 assert.doesNotMatch(nasHtml, /kao-content-error/, 'dondurulmuş 20 sûre okunuş eksiği taşımamalı');
 assert.match(nasHtml, /bilinmeyen kelime, dokunarak aç/);
 const unknown = nasWords[1];
-const knownBeforeReveal = Number((api.kaoHubCardHTML().match(/(\d+) kelime kalıcı/) || [])[1] || 0);
+// KAO2-10: kalıcı sayaç hub'dan kalktı; aynı sayı regex yedeği olmadan doğrudan kaoKnownLemmaSet'ten okunur.
+const knownBeforeReveal = Object.keys(api.kaoKnownLemmaSet(appData)).length;
 const revealStarted = Date.now();
 assert.equal(api.kaoRevealWord(1), true);
 assert.match(quranLearn.surahs['114'].words[unknown.id].revealedAt, /^\d{4}-\d{2}-\d{2}T/);
 assert.equal(quranLearn.surahs['114'].words[unknown.id].status, 'unknown');
 assert.ok(new Date(quranLearn.cards[`w:${unknown.lemmaId}:ar>tr`].due).getTime() >= revealStarted + 86400000 - 1000, 'bilinmeyen kelime yarın kuyruğuna alınmalı');
-assert.equal(Number((api.kaoHubCardHTML().match(/(\d+) kelime kalıcı/) || [])[1] || 0), knownBeforeReveal, 'yarın kuyruğundaki bilinmeyen kelime kalıcı sayacını artırmamalı');
+assert.equal(Object.keys(api.kaoKnownLemmaSet(appData)).length, knownBeforeReveal, 'yarın kuyruğundaki bilinmeyen kelime kalıcı sayacını artırmamalı');
 assert.match(api.kaoReaderHTML(), new RegExp(unknown.tr));
 assert.equal(api.kaoOpenSurah(98), true);
 const waqfHtml = api.kaoReaderHTML();

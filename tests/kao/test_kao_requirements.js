@@ -728,7 +728,11 @@ function sandboxLemma(api, lemmaId) {
   const late = Object.fromEntries(['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'].map((key) => [key, { time: '23:59' }]));
   data.days[today] = { prayer: late };
   let hub = api.kaoHubCardHTML();
-  if (now.getHours() * 60 + now.getMinutes() < 23 * 60 + 59) assert.match(hub, /<b>Niyet önerisi:<\/b> sabah namazından sonra 5 dakika \(23:59\)/);
+  // KAO2-10 (05 §8): niyet önerisi yalnız "bekliyor" durumunda alt satırın yerine geçer; hiç başlamamışta başlangıç satırı.
+  assert.match(hub, /class="kao-hub-sub">Namazda söylediklerini anlamaya başla · 5 dk</, 'hiç başlamamışta öneri yok');
+  data.quranLearn.onboarding.doneAt = '2026-10-01T00:00:00.000Z';
+  hub = api.kaoHubCardHTML();
+  if (now.getHours() * 60 + now.getMinutes() < 23 * 60 + 59) assert.match(hub, /class="kao-hub-sub">Niyet önerisi: sabah namazından sonra 5 dakika \(23:59\)</);
   data.quranLearn.daily[today] = { answered: 2 };
   hub = api.kaoHubCardHTML();
   assert.doesNotMatch(hub, /Niyet önerisi/, 'bugün çalışıldıysa öneri yok');

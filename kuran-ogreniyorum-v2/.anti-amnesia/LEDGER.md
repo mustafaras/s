@@ -363,3 +363,22 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-09/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-09/release-live.json
 - evidence-levels: kaynak/test PASS · yayın/run/hash PASS · cihaz doğrulanmadı
 - next: KAO2-10
+
+## seq 38 · 2026-09-29 · FIX · KAO2-10
+- status: done
+- summary: Kullanıcı KAO2-10 için kapsamı genişletti: Dokun dışı dört KAO testinde (test_kao_render.js, test_kao_queue.js, test_kao_user_tasks.js, test_kao_requirements.js) yalnız hub kartı beklentilerinin 05 §8'e göre güncellenmesi (KAO2-09 seq33 emsali).
+- resolution: P6 engeli kod yazımından önce kullanıcı onayıyla çözüldü; tests/app fx2/v3 pinleri dış düğme satırı korunarak değiştirilmedi.
+- next: KAO2-10
+
+## seq 39 · 2026-09-29 · CARD · KAO2-10
+- status: done
+- title: Hub kartı v2 (tek bilgi, tek eylem, gerçek ilerleme)
+- prev-commit: 4e836148
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-10/KANIT.md
+- gates: syntax PASS · kao 26/26 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr 95/95 PASS · contrast 414 çift/0 ihlal PASS · sync PASS
+- metrics: hub 8/8 · 05 §8 dört durum birebir · halka gerçek ünite ilerlemesi (Ü1 1/5 → %20), başlanmamışta yok · tek düğme/tek onclick · render veri yazmaz · runtime gzip 60,788 KiB · CSS 8,008 KiB · p95 4,36 ms
+- changed-tests: yeni test_kao2_hub.js; render/queue/user_tasks/requirements hub beklentileri (seq38 onayı)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: eski hub CSS'i öksüz (B-KAO2-10-1 → KAO2-26); kontrast aracı dekoratif ikonu 4,5 eşiğiyle ölçüyor, ikon zemini %8'e indirildi; motor/müfredat eksikse hub sade karta düşer
+- next: KAO2-11

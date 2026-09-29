@@ -434,3 +434,14 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-11/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-11/release-live.json
 - evidence-levels: kaynak/test PASS · yayın/run/hash PASS · cihaz doğrulanmadı
 - next: KAO2-12
+
+## seq 46 · 2026-09-29 · BLOCKED · KAO2-12
+- status: blocked
+- prev-commit: 828c9ef7
+- commit: HEAD+1
+- summary: Ders planı/oynatıcısı ve A-1 kapsamındaki uygulama yazıldı. Lesson-flow 8/8 ve onboarding 15/15 PASS. İki önceki regresyon fikstürü yeni eylem sözleşmesini bilerek değiştirdiği için P6 kapsam engeli oluştu.
+- attempted: `node tests/kao/test_kao2_today.js` FAIL — daily eylemi için `App.kaoStart()` bekliyor; KAO2-12 `App.kaoLesson("start", id)` istiyor. `node tests/kao/test_kao_user_tasks.js` FAIL — Bugün kartı için eski `kaoStart` eylemini bekliyor. Değişiklik bu iki testi zayıflatmıyor; yalnız rota beklentisi güncellenecek.
+- resolution: UYGULAMA-PROMPTLARI.md §1 P6 uyarınca Dokun dışı `tests/kao/test_kao2_today.js`, `tests/kao/test_kao_user_tasks.js`, `tests/app/test_app_surface_daily_boundary.js`, `tests/app/test_v3_welcome.js` dosyaları değiştirilmedi. Son iki dosya +1 App handler ve yeni ders görünümü onclick ölçümlerini pinliyor; KAO2-11 onayı tekrar kullanılamaz. KAO2-12 Dokun kapsamındaki fx2 pinleri de henüz değiştirilmedi.
+- requested-scope: Eski günlük/s0/mastery eylem beklentilerini yeni App.kaoLesson rotasına geçirmek; eklenen handler/onclick değerlerini yalnız belirtilen iki app yüzey fikstüründe güncellemek. Üretim dışı, yalnız belirlenmiş assertion/pin satırları.
+- gates: syntax PASS · lesson-flow 8/8 PASS · onboarding 15/15 PASS · today FAIL (P6) · user_tasks FAIL (P6) · full P3 not run · sync pending
+- next: KAO2-12

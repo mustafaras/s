@@ -157,6 +157,45 @@
     return '<main class="kao-today-screen" aria-label="Bugün">'+(model.notice?notice(model.notice):'')+heroCard(model.hero)+pathCard(model.path)+groupedList(model.lists)+'</main>';
   }
 
+  // KAO2-12 · Kaynakları motor seçer; bu katman yalnız güvenli metin ve App eylemi çizer.
+  function lessonScreen(model){
+    if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    var title=escapeText(model.title),label=escapeText(model.progress),call=actionCall(model.action),exit=actionCall(model.exit),body='';
+    var top='<header class="kao-lesson-head"><span class="kao-lesson-step">'+label+'</span><button type="button" class="kao-lesson-exit"'+(exit?' onclick="'+exit+'"':' disabled')+' aria-label="Dersi kapat">Kapat</button></header>';
+    if(model.stage==='intro'){
+      var anchor=(Array.isArray(model.anchor)?model.anchor:[]).map(function(word){
+        word=word&&typeof word==='object'?word:{};
+        var state=['new','known','open'].indexOf(word.state)>=0?word.state:'open';
+        return '<span class="kao-lesson-anchor-word kao-lesson-anchor-'+state+'" lang="ar" dir="rtl"><b>'+escapeText(word.ar)+'</b><small>'+escapeText(word.tr)+'</small></span>';
+      }).join('');
+      var audio=model.audio&&typeof model.audio==='object'?model.audio:null,audioCall=audio?actionCall(audio.action):'';
+      body='<section class="kao-lesson-card kao-lesson-intro" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Yeni kelime · '+escapeText(model.ordinal)+' / '+escapeText(model.total)+'</p><p class="kao-lesson-ar" lang="ar" dir="rtl">'+escapeText(model.ar)+'</p><p class="kao-lesson-reading" lang="tr">'+escapeText(model.pronunciation)+'</p>'+(audio?'<button type="button" class="kao-lesson-audio"'+(audioCall?' onclick="'+audioCall+'"':' disabled')+'>'+deps.icon('headphones',17)+' Dinle</button>':'')+'<h3 id="kao-lesson-title">'+escapeText(model.meaning)+'</h3>'+(model.cognate?'<p class="kao-lesson-cognate">Türkçedeki akrabası: '+escapeText(model.cognate)+'</p>':'')+(model.anchorTitle?'<section class="kao-lesson-anchor"><h4>'+escapeText(model.anchorTitle)+'</h4><div class="kao-lesson-anchor-words">'+anchor+'</div></section>':'')+'</section>';
+    }else if(model.stage==='concept'){
+      var table=model.table&&typeof model.table==='object'?model.table:{},columns=Array.isArray(table.columns)?table.columns:[],rows=Array.isArray(table.rows)?table.rows:[];
+      var head=columns.map(function(column){ return '<th scope="col">'+escapeText(typeof column==='object'?(column.label||column.title||''):column)+'</th>'; }).join('');
+      var rowHtml=rows.map(function(row){
+        var cells=Array.isArray(row.cells)?row.cells:[];
+        if(row.label!==undefined) cells=[row.label].concat(cells);
+        return '<tr>'+cells.map(function(cell){ return '<td>'+escapeText(Array.isArray(cell)?(cell[0]||cell[1]||''):(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell))+'</td>'; }).join('')+'</tr>';
+      }).join('');
+      body='<section class="kao-lesson-card kao-lesson-concept" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Kavram</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.plainTr)+'</p>'+(head||rowHtml?'<div class="kao-lesson-table-wrap"><table class="kao-lesson-table"><thead><tr>'+head+'</tr></thead><tbody>'+rowHtml+'</tbody></table></div>':'')+(model.termTr?'<details class="kao-lesson-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+'</section>';
+    }else if(model.stage==='apply'){
+      var words=(Array.isArray(model.words)?model.words:[]).map(function(word){
+        word=word&&typeof word==='object'?word:{};
+        var state=['new','known','open'].indexOf(word.state)>=0?word.state:'open';
+        return '<li class="kao-lesson-apply-word kao-lesson-apply-'+state+'"><span lang="ar" dir="rtl">'+escapeText(word.ar)+'</span><span>'+escapeText(word.tr)+'</span></li>';
+      }).join('');
+      body='<section class="kao-lesson-card kao-lesson-apply" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Çapa metni</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.lead)+'</p><ol class="kao-lesson-apply-list">'+words+'</ol></section>';
+    }else if(model.stage==='summary'){
+      body='<section class="kao-lesson-card kao-lesson-summary" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.score)+'</p><p>'+escapeText(model.learned)+'</p></section>';
+    }else{
+      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.promise)+'</p></section>';
+    }
+    var buttonLabel=escapeText(model.buttonLabel||'Devam');
+    return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" aria-label="Ders oynatıcı">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders adımı" aria-valuemin="1" aria-valuemax="'+escapeText(model.stepTotal||1)+'" aria-valuenow="'+escapeText(model.step||1)+'"><span style="width:'+String(Math.max(0,Math.min(100,Number(model.percent)||0)))+'%"></span></div>'+body+(model.actions?model.actions:'')+'<button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button></main>';
+  }
+
   // KAO2-11 · S-01 ilk açılış (05 §3) ve 05 §9 "Yeni düzen" notu. Eylemler yalnız actionCall ile üretilir.
   function linkButton(label,action,className){
     var call=actionCall(action);
@@ -223,5 +262,5 @@
       '<span class="kao-hub-cta">'+escapeText(options.action)+' <span aria-hidden="true">›</span></span>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen};
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen};
 })(window);

@@ -2,46 +2,28 @@
 
 <!-- kao2-sync
 nextCard: KAO2-12
-lastSeq: 45
+lastSeq: 46
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq45
+Son güncelleme: 2026-09-29 · LEDGER seq46
 
 ## Şu an neredeyiz
-KAO2-00…11 tamamlandı (12/28); **W2 kapandı** ve G1 ara özeti sunuldu (seq44, bilgi amaçlı). KAO2-11 ilk açılış + yerleştirme **yayında** (seq45): `e827d24b`, Pages run 36545143962 success, canlı 16/16 hash eşliği. Dokun dışı iki pin dosyası ve dört KAO testi kullanıcı onayıyla güncellendi (seq42). Bağımsız code-reviewer onay verdi; tek LOW bulgu (eksik içerikte sınanmadan S0 işaretleme) düzeltildi. Önceki yayınlar: KAO2-10 (`811ebc88`, run 36534605512), İlham ortak kart dili (`5aaa6168`, run 36537983076).
+KAO2-00…11 tamamlandı; son yayın KAO2-11 (`e827d24b`, Pages run 36545143962, canlı 16/16 hash eşliği). KAO2-12 için `lessonPlan`, ders oynatıcısı, FSRS ortak yanıt yolu ve A-1 üç dokunuş akışı çalışılıyor. Lesson-flow testi 8/8, onboarding testi 15/15 PASS. P3 KAO kapısında iki eski eylem beklentisi kırmızı oldu; §1 P6 gereği kart bloke edildi ve değiştirilen test dışı dosyalara onay bekleniyor.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-12: Ders oynatıcı (S-05) — `lessonPlan` (Tanış → Kavram → Pekiştir → Uygula → Özet), `App.kaoLesson` (+1 handler → 40, fx2 pinleri), A-1: sıfır kullanıcı 3 dokunuşta `intro`; `daily`/`s0-lesson`/`mastery` ve ilk açılışın son düğmesi derse bağlanır.
+KAO2-12: `daily`/`s0-lesson`/`mastery` eylemlerini ders oynatıcısına geçir; P6 kapsamında gereken belirli test/pin satırlarını kullanıcı onayından sonra güncelle, tüm P3 kapılarını yeşile getir ve kartı tek committe kapat.
 
 ## Canlı gerçekler
-- İlk açılış (KAO2-11):
-  - kartsız ve `onboarding.doneAt` boş kullanıcıda `kaoOpen()` ana ekranın yerine 3 adım gösterir. Bu ayrı bir yığın görünümü değil, ana ekran modudur (`ui.kaoOnboard`; Flow görünüm listesi değişmedi);
-  - yerleştirme kapı görevlerinin alt kümesidir (8 okuma + 4 dinleme); ≥7/8 → level1, aksi hâlde s0 ve yalnız eksik S0 dersleri (içerikten türetilir, s0.12 hep kalır, diğerleri `path.lessons[id].via='placement'`; içerik eksikse hiçbiri işaretlenmez);
-  - Atla: level1 / 5 dk / ses açık;
-  - veri yalnız Bitir/Atla'da tek kayıtla yazılır; `doneAt` doluysa hiçbir şey yazılmaz.
-- Legacy (`doneAt='legacy'`): ilk açılış yok; "Yeni düzen" notu bir kez, `whatsNewAt` `kaoOpen`'da yazılır.
-- Handler `App.kao*` = 39 (§4); App yüzeyi 760, işlev ataması 598, tıklama 393.
-- İlham & İbadet ortak kart dili (seq41, styles.css `.saygi-page`): KAO hub bu yüzeyde altın şerit + ortak gölge + 44px rozet taşır (06 §5'ten bilinçli sapma).
-- Hub kartı (İlham & İbadet): 05 §8 dört durum; halka gerçek ünite ilerlemesi; niyet önerisi yalnız "bekliyor"da ve hâlâ bir sonraki namaz vaktinden (seçilen niyet henüz bağlı değil); render veri yazmaz.
-- Ana ekran: HeroCard (nextStep; tek `.kao-primary`) + Yolun + Keşfet + Sen.
-- Eylem eşlemesi: daily/next-unit/warmup/night/mastery → kaoStart; **onboarding → kaoOnboard('start')**; s0 → kaoGate("start") (geçici, KAO2-12); rest → kaoOpenAyah.
-- Motor: tekrar borcu >60 → yeni 0 ve ünite tanıtımı yok; 7+ gün ara → ısınma; sessionDone yalnız gündüz oturumu sonunda.
-- Müfredat 12 ünite · 109 ders; S0 12 ders.
-- Boyut: runtime gzip 66,258 KiB (≤80, pay 13,7), CSS 8,629 KiB (≤14), içerik 168,483 KiB (≤256), p95 ≈4,4 ms. Pin `20260928b` (quranPhonicsV1 `20260924b`); styles.css `20260929a`.
-- P3: syntax 4/4, KAO 27/27, app 77/77, panel 23/23, panel-v2 27/27, Quran 9/9, reminders, driver, zikr 95/95, kontrast 460/0, apple 30/0, sync PASS. fx-coverage M1–M13 değişmedi.
-- `KAO2-STATE.json`: KAO2-11 done, nextCard KAO2-12, ledger seq45, G1 presented, G2 closed, G3/G4 open, backlog 4 kayıt, releaseApproval approved_through_KAO2-11, lastRelease e827d24b (run 36545143962).
+- Release approval yalnız KAO2-11'e kadar (`approved_through_KAO2-11`); KAO2-12 push/deploy/tag yok.
+- KAO2-12 uygulama dosyaları: `app/core/quranLearnFlow.js`, `quranLearn.js`, `quranLearnViews.js`, `app/kao.css`, `app.js` yalnız `App.kaoLesson` shim'i; yeni `tests/kao/test_kao2_lesson_flow.js` ve A-1 genişletilmiş `tests/kao/test_kao2_onboarding.js`.
+- Test makbuzları: syntax 4/4 PASS; lesson-flow 8/8 PASS; onboarding 15/15 PASS. `test_kao2_today.js` daily eylem için eski `App.kaoStart()` bekliyor. `test_kao_user_tasks.js` ana eylem için eski `kaoStart` bekliyor. İki fikstür de değiştirilmedi.
+- Henüz çalıştırılmadı: tam KAO/app/panel/panel-v2/Quran/reminder P3 aileleri, driver, zikr, kontrast; FX2 pinleri ve sync-check P6 commit öncesi çalıştırılacak.
+- App yüzeyi son yayın ölçüsü 760 handler / 393 onclick'ti; KAO2-12'nin `App.kaoLesson` ve görünüm markup ölçümleri KAO2-11 onayının dışındadır.
+- Kanıt düzeyi kaynak/test; yayın ve cihaz kabulü yok. Cihaz kabulü kullanıcıda.
 
-## Açık riskler
-- S0 eylemi hâlâ geçici kapıya bağlı: "Henüz değil" diyen kullanıcı "Derse başla"da eski 20 maddelik okuma kapısını görür (KAO2-12 kapatır). Mastery eylemi geçici (KAO2-13).
-- Flow görünüm beyaz listesi: yeni görünüm gerektiren kart (KAO2-12 ders oynatıcısı) `quranLearnFlow.js`'i Dokun listesine almalı ya da mod yaklaşımını kullanmalı.
-- Runtime payı 13,7 KiB; KAO2-12 boyutu yakından izlenmeli.
-- Eski ana ekran/hub CSS'i öksüz (B-KAO2-09-1, B-KAO2-10-1 → KAO2-26); daily.ms yazılmıyor (B-KAO2-08-1 → KAO2-12); niyet hub'a bağlı değil (B-KAO2-11-1 → KAO2-23).
-- Pin korunduğu ve sw.js değişmediği için çevrimdışı paketli cihazlar KAO2-10/11'i sw.js değişene kadar görmez.
-- Perf p95 kapısı soğuk başlangıçta ara sıra eşiği aşar (tekrar koşuda PASS; bilinen gürültü).
-- Kaynak/test kanıtı cihaz kabulü değildir.
+## P6 kapsam engeli
+Yalnız KAO2-12 `Dokun` listesindeki dosyalara izin var. Yeni rota davranışı şu dış fikstürleri eski beklenti nedeniyle kırıyor: `tests/kao/test_kao2_today.js`, `tests/kao/test_kao_user_tasks.js`. `App.kaoLesson` sayacı/onclick pimi için `tests/app/test_app_surface_daily_boundary.js` ve `tests/app/test_v3_welcome.js` gerekir. KAO2-11 seq42 onayı bu karta taşınmaz. Kullanıcı bu dört dosyada yalnız ilgili assertion/pin güncellemelerini onaylarsa sürdür.
 
-## Bekleyen kullanıcı işleri
-- G1 ara özeti (bilgi amaçlı; yanıt gerekmez). İstenirse yerel görsel QA (CLAUDE.md kural 1, 127.0.0.1:9000).
-- KAO2-12'ye başlamak için açık "devam".
-- Yayın sonrası gerçek cihazda ilk açılış ve ana ekran kabulü.
+## Bekleyen kullanıcı işi
+KAO2-12'nin P6 çözümü için yukarıdaki dört test dosyasına sınırlı kapsam genişletmesini onayla ya da uygulama değişikliklerinin geri alınmasını iste. Onay yokken bu dört dosyaya dokunma; nextCard KAO2-12 olarak kalır.

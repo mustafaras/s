@@ -1,6 +1,6 @@
 'use strict';
 
-// KAO2-11: ilk açılış (S-01, 05 §3), yerleştirme ve mevcut kullanıcı notu (05 §9).
+// KAO2-11/12: ilk açılış (S-01, 05 §3), yerleştirme, geçiş notu ve A-1 ders başlangıcı.
 // Sentetik VM, sahte saat; ağ, tarayıcı, ses ya da gerçek veri yok.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -132,7 +132,7 @@ check('(c) "Henüz değil" → start=s0, S0 Ders 1; "Evet, rahat okurum" → lev
   let q = b.api.ensureQuranLearn(b.state.data);
   assert.equal(q.onboarding.start, 's0');
   assert.equal(q.onboarding.doneAt, INSTANT);
-  assert.equal(b.state.ui.kaoView, 'home', 'son düğme Bugün ekranına götürür');
+  assert.equal(b.state.ui.kaoView, 'session', 'son düğme S0 ders oynatıcısını açar');
   let step = b.api.kaoNextStep(INSTANT);
   assert.equal(step.kind, 's0-lesson'); assert.equal(step.param, 's0.01');
 
@@ -141,10 +141,27 @@ check('(c) "Henüz değil" → start=s0, S0 Ders 1; "Evet, rahat okurum" → lev
   const unit1 = b.win.QuranCurriculumV2.units[0];
   assert.match(primaries(onboarding(overlay(b.api)))[0], new RegExp(`>${unit1.title} ile başla<`));
   assert.equal(b.api.kaoOnboard('finish'), true);
+  assert.equal(b.state.ui.kaoView, 'session', 'son düğme Fâtiha dersini açar');
   q = b.api.ensureQuranLearn(b.state.data);
   assert.equal(q.onboarding.start, 'level1');
   step = b.api.kaoNextStep(INSTANT);
   assert.equal(step.kind, 'daily'); assert.equal(step.param, unit1.lessons[0].id);
+});
+
+check('(A-1) üç dokunuş: Başlayalım → Evet, rahat okurum → Fâtiha ile başla → ilk tanış kartı', () => {
+  const b = openFresh(), unit1 = b.win.QuranCurriculumV2.units[0], first = unit1.lessons[0].lemmaIds[0];
+  assert.equal(b.api.kaoOnboard('next'), true);
+  assert.equal(b.api.kaoOnboard('choose', 'fluent'), true);
+  assert.match(primaries(onboarding(overlay(b.api)))[0], new RegExp(`>${unit1.title} ile başla<`));
+  assert.equal(b.api.kaoOnboard('finish'), true);
+  assert.equal(b.state.ui.kaoView, 'session');
+  const html = overlay(b.api);
+  assert.match(html, /data-lesson-stage="intro"/);
+  assert.match(html, /class="kao-lesson-ar" lang="ar" dir="rtl"/);
+  assert.match(html, /class="kao-lesson-reading" lang="tr"/);
+  assert.match(html, /class="kao-lesson-audio"/);
+  assert.equal(b.state.ui.kaoLesson.plan[b.state.ui.kaoLesson.at].lemmaId, first);
+  assert.deepEqual(Array.from(b.api.ensureQuranLearn(b.state.data).path.lessons[unit1.lessons[0].id].introducedLemmas), [first]);
 });
 
 check('(c2) "Harekeyle, yavaşça" → 8 okuma + 4 dinleme; kapı görevlerinin alt kümesi, Arapça içerikten', () => {
@@ -202,7 +219,10 @@ check('(c3) yerleştirme ≥7/8 → level1; <7/8 → s0 + yalnız eksik S0 dersl
   pair.choices.forEach((c) => assert.ok(missing.includes(b.api.kaoS0LessonOfLetter(c.id)), `yanlış çift harfi ${c.id}`));
   s0.forEach((id) => {
     const rec = q.path.lessons[id];
-    if (missing.includes(id)) assert.equal(rec, undefined, `${id} eksik → işaretlenmez`);
+    if (missing.includes(id)) {
+      if (id === missing[0]) { assert.ok(rec && rec.startedAt, `${id} ilk eksik S0 dersi açılır`); assert.equal(rec.doneAt, null); }
+      else assert.equal(rec, undefined, `${id} eksik → işaretlenmez`);
+    }
     else { assert.equal(rec.doneAt, INSTANT); assert.equal(rec.via, 'placement'); assert.equal(rec.score, null); }
   });
   const step = b.api.kaoNextStep(INSTANT);
@@ -218,7 +238,8 @@ check('(c4) içerik eksikse yerleştirme sınamadan ders işaretlemez; tam S0 yo
   const q = b.api.ensureQuranLearn(b.state.data), s0 = b.win.QuranCurriculumV2.s0.lessons.map((l) => l.id);
   assert.equal(q.onboarding.start, 's0');
   assert.deepEqual(Array.from(q.onboarding.placement.missing), Array.from(s0), 'kanıt yok → tüm S0 dersleri eksik sayılır');
-  assert.deepEqual(Object.keys(q.path.lessons), [], 'hiçbir ders yerleştirmeyle tamam işaretlenmez');
+  assert.ok(!q.path.lessons[s0[0]].doneAt, 'hiçbir ders yerleştirmeyle tamam işaretlenmez; ilk ders yalnız açılır');
+  assert.equal(Object.keys(q.path.lessons).length, 1, 'yalnız ilk S0 dersi oynatıcıda başlar');
 });
 
 check('(d) Adım 3: süre → dailyNew, niyet → intent, ses anahtarı → settings.audio (measured)', () => {
@@ -242,7 +263,7 @@ check('(d) Adım 3: süre → dailyNew, niyet → intent, ses anahtarı → sett
   assert.equal(q.onboarding.minutes, 10); assert.equal(q.settings.dailyNew, 10);
   assert.equal(q.onboarding.intent, 'isha');
   assert.equal(q.settings.audio, true); assert.equal(q.settings.audioStyle, 'measured');
-  assert.equal(b.state.saves, 1, 'tek kayıt');
+  assert.equal(b.state.saves, 2, 'onboarding ayarları ve ilk tanış ilerlemesi ayrı ayrı kaydedilir');
 
   b = openFresh();
   toStep3(b.api, 'fluent');
@@ -331,10 +352,10 @@ check('Bugün kahramanı: onboarding eylemi ilk açılışa bağlı; normalizasy
   assert.equal('placement' in old.quranLearn.onboarding, false, 'eski kayda alan eklenmez');
 });
 
-check('handler sayacı 39 (§4) ve app.js tek satır shim; yorumlarda pin tuzağı yok', () => {
+check('handler sayacı 40 (§4) ve app.js tek satır shim; yorumlarda pin tuzağı yok', () => {
   const app = read('app.js');
   const names = new Set((app.match(/App\.kao[A-Za-z0-9_]*\s*=[^=]/g) || []).map((s) => s.match(/App\.kao[A-Za-z0-9_]*/)[0]));
-  assert.equal(names.size, 39);
+  assert.equal(names.size, 40);
   assert.ok(names.has('App.kaoOnboard'));
   assert.equal((app.match(/App\.kaoOnboard=function\(action,value\)\{ return window\.SeymaQuranLearn\.kaoOnboard\.apply\(null,arguments\); \};/g) || []).length, 1);
   for (const file of ['app/core/quranLearn.js', 'app/core/quranLearnViews.js']) {
@@ -356,4 +377,4 @@ check('06 CSS: KAO2-11 bloğu yalnız --kao-*/--f-* tokenı, 600/700, süs yok',
   assert.match(block, /forced-colors/);
 });
 
-console.log(`KAO2-11 onboarding: PASS (${passed} kontrol)`);
+console.log(`KAO2-12 onboarding: PASS (${passed} kontrol)`);

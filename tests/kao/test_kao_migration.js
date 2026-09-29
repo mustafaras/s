@@ -13,6 +13,8 @@ for (const relative of [
   'app/content/quranGrammarV1.js',
   'app/content/quranShortSurahsV1.js',
   'app/content/quranPhonicsV1.js',
+  // KAO2-16: taş anahtarları müfredattan türetilir; curriculum modülü gerekir.
+  'app/content/quranCurriculumV2.js',
   'app/core/quranLearn.js'
 ]) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
 
@@ -31,7 +33,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(fresh)), {
   gate: { passed: false, skipped: false, score: null, at: null },
   settings: { dailyNew: 10, audio: false, autoAdvance: false, audioStyle: 'measured', harakat: true, translit: true, translitLayer: 'tr', shadowing: false, kaoVisible: true },
   cards: {}, units: {}, surahs: {}, daily: {},
-  milestones: { fatiha: null, namaz: null, half: null, twoThirds: null, eighty: null, shortSurahs: null },
+  milestones: { besmele: null, fatiha: null, namaz: null, half: null, twoThirds: null, eighty: null, shortSurahs: null, u1: null, u2: null, u3: null, u4: null, u5: null, u6: null, u7: null, u8: null, u9: null, u10: null, u11: null, u12: null },
   phonics: { style: 'muallim', misheard: {} },
   errors: { sound: 0, root: 0, affix: 0, cognate: 0, rule: 0, order: 0 },
   ayahs: { understood: [] },

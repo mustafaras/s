@@ -1,52 +1,46 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-16
-lastSeq: 64
+nextCard: KAO2-17
+lastSeq: 65
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq64
+Son güncelleme: 2026-09-29 · LEDGER seq65
 
 ## Şu an neredeyiz
-**KAO2-00…15 tamamlandı (16/28).** KAO2-15 (S-10 gramer notları kütüphanesi) kullanıcı
-onayıyla kapandı: 12 ünite grubunda 25 kavram, kavram sayfası (düz Türkçe önce,
-katlanır terim, içerik modülünden gelen tablo ve okunuşlar, gerçek ders bağlantıları),
-Bugün → Keşfet satırı ve Ünite ekranındaki Kavramlar satırları dokunulabilir. Engel
-(router beyaz listesi) kullanıcının kapsam onayıyla `quranLearnFlow.js` `VIEWS`
-listesine `grammar` eklenerek çözüldü (FIX · seq 61). Kullanıcı 2026-09-29'da
-KAO2-14/15'in yayınlanmasına da açık onay verdi.
+**KAO2-00…16 tamamlandı (17/28).** KAO2-16 taş katmanını düzeltti: Fâtiha taşı artık
+gerçek Fâtiha lemmalarına bağlı (eski sıklık dilimi koşulu 03 §2 gereği kaldırıldı),
+namaz taşı tüm namaz metinlerine, **besmele** ve **u1…u12** ünite taşları eklendi;
+eski kayıtlar korunur, geçiş idempotent ve kayıpsız. KAO2-15 ve öncesi 2026-09-29'da
+canlıya alınmıştı; KAO2-16 **yereldir, yayınlanmadı**.
 
 ## Sıradaki kartın tek cümlesi
-Sıradaki **KAO2-16**, Fâtiha taşının gerçek Fâtiha lemmalarına bağlanması, ünite
-taşlarının (`u1…u12`) eklenmesi ve mevcut kullanıcı verisinin kayıpsız geçişidir;
-bu oturumda başlanmadı.
+Sıradaki **KAO2-17**, 12 ünitenin ve derslerin Türkçe tanıtım/anlatı metinlerini
+K-4 protokolüyle (kaynaklı taslak → proje sahibi → alan uzmanı) yazar; bu oturumda
+başlanmadı.
 
 ## Canlı gerçekler
-- Dal: `kao2-yeniden-tasarim`. Yerel kapanış commit'i KAO2-15 ile atıldı; `origin`
-  yalnız KAO2-13 (`c1ebe168`) seviyesindeydi, yayın sonrası eşitlenecek.
-- `KAO2-STATE.json`: program `active`; KAO2-15 `done`; `nextCard=KAO2-16`;
-  `ledgerLastSeq=62`.
-- `releaseApproval=approved_through_KAO2-15` (kullanıcı beyanı 2026-09-29): yerel
-  commit, dal push, `main`'e fast-forward, GitHub Pages yayını ve canlı doğrulama.
+- Dal: `kao2-yeniden-tasarim`; bu kartın tabanı `6dae1c9c` (canlı `main` ile aynı).
+- `KAO2-STATE.json`: program `active`; KAO2-16 `done`; `nextCard=KAO2-17`;
+  `ledgerLastSeq=65`.
+- `releaseApproval=approved_through_KAO2-15`; **KAO2-16 ve sonrası yayınlanmadı**.
+  Push/merge/deploy için yeni açık kullanıcı talimatı gerekir.
 - G0 kapalı, G1 sunulmuş, G2 kapalı; G3/G4 açık.
-- KAO2-15 kaynak değişiklikleri: `app/core/quranLearn.js`,
-  `app/core/quranLearnViews.js`, `app/core/quranLearnFlow.js` (yalnız `VIEWS` +
-  onaylı FIX), `app/kao.css`, yeni `tests/kao/test_kao2_grammar_notes.js` ve P2.4
-  kaydı `tests/kao/test_kao2_today.js`. Yeni `App.kao*` handler'ı **yok**: App
-  yüzeyi ve fx2/v3/surface pinleri değişmedi.
-- Bütçe: içerik 168.483 KiB · runtime 78.316 KiB (<=80) · CSS 10.421 KiB (<=14) ·
-  yalıtılmış p95 4.743 ms — hepsi sınır içinde.
-- Kaynak/test: PASS · yayın: **canlı** (pin `20260929d`) · cihaz: doğrulanmadı.
-- **Yayın pini (seq 63):** KAO/SW ortak pini `20260928b` -> `20260929d`. İlk
-  yayında pin değişmediği için PWA önbelleği eski KAO dosyalarını sunuyordu;
-  pin yükseltmesi yayını gerçekten etkin kılar.
+- KAO2-16 kaynak değişiklikleri: `app/core/quranLearn.js` (taş koşulları, anahtar
+  uzayı, etiketler, panel projeksiyonu, `kaoUnitSlices` kaldırıldı), iki yeni fikstür
+  (`test_kao2_milestones.js`, `test_kao2_migration.js`) ve üç P2.4 güncellemesi.
+  **Yeni `App.kao*` handler'ı yok**; pinler ve fx2/v3 yüzeyleri değişmedi.
+- **Bütçe uyarısı:** runtime `quranLearn*` **79.005 / 80 KiB** · içerik 168.483/262.144 ·
+  CSS 10.421/14. KAO2-17+ için ~1 KiB yer var; kart başında ölçülmeli.
+- Kaynak/test: PASS · yayın: yok · cihaz: doğrulanmadı.
 
 ## Açık riskler ve bekleyen kullanıcı işleri
-- **Cihaz kabulü** doğrulanmadı; headless test kullanıcı cihaz doğrulamasının yerine
-  geçmez. 320 px/%200 metin koşulu kaynak fikstürüyle denetlendi, tarayıcıda açılmadı.
+- **Cihaz kabulü** hiç doğrulanmadı (KAO2-15 dâhil). Taş kutlaması ve eski veriyle
+  geçiş davranışı telefonda teyit edilmeli.
+- **Bütçe dar:** sonraki içerik kartları 80 KiB runtime sınırını aşabilir; gerekirse
+  K-1 bütçesi kullanıcı kararıyla güncellenmeli.
 - G3/G4 kapıları açık; sonraki kartlarda kendi karar/inceleme koşulları geçerli.
-- **Yayın sınırı:** izin KAO2-15'e kadardır. KAO2-16 ve sonrası için yeni açık
-  kullanıcı talimatı gerekir.
-- Router beyaz listesi (`quranLearnFlow.js` `VIEWS`) motorun `KAO_VIEW_TITLES`
-  tablosundan ayrı yaşar; yeni görünüm ekleyen kartlar üç yeri birlikte güncellemeli.
+- KAO2-16 dâhil yayınlanmamış işler var; yayın için açık talimat gerekir.
+- `perf_budget` fikstürü yük altında kırılgan (paralel CPU yükünde göreli taban
+  eşiği aşılıyor; mutlak 40 ms sınırı aşılmıyor). Kart kapsamı dışı, backlog.

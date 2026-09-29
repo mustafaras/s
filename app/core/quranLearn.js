@@ -77,6 +77,7 @@
   function nonNegativeNumber(value,fallback){
     return typeof value==='number'&&isFinite(value)&&value>=0?value:fallback;
   }
+  function keysOf(source){ return Object.keys(source&&typeof source==='object'?source:{}); }
   function round8(value){ return Number(value.toFixed(8)); }
   function clamp(value,min,max){ return Math.min(Math.max(value,min),max); }
   function validDate(value,label){
@@ -430,20 +431,60 @@
     var fresh=Math.max(0,Math.floor(nonNegativeNumber(q.settings&&q.settings.dailyNew,10)));
     return {due:Math.min(due,60),fresh:fresh,minutes:Math.max(1,Math.ceil((Math.min(due,60)+fresh)*0.55)),known:Object.keys(known).length};
   }
-  var KAO_MILESTONE_LABELS={fatiha:'Fâtiha’yı anlıyorum',namaz:'Namazda ne dediğimi anlıyorum',half:'Kelimelerin yarısı tanıdık',twoThirds:'Üçte iki kapsam',eighty:'%75 kapsam',shortSurahs:'Kısa sûreler tamam'};
+  // KAO2-16 · 07 §6: taş anahtar uzayı tek yerden türetilir; eski anahtarlar korunur.
+  var KAO_MILESTONE_CORE={besmele:true,fatiha:true,namaz:true,half:true,twoThirds:true,eighty:true,shortSurahs:true};
+  function kaoMilestoneKeys(){
+    var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
+    return keysOf(KAO_MILESTONE_CORE).concat(units.map(function(unit){ return 'u'+unit.id; }));
+  }
+  function KAO_MILESTONE_SHAPE(){
+    var shape={};
+    kaoMilestoneKeys().forEach(function(key){ shape[key]=null; });
+    return shape;
+  }
+  var KAO_MILESTONE_LABELS={besmele:'Besmele’yi okudum',fatiha:'Fâtiha’yı anlıyorum',namaz:'Namazımı anlıyorum',half:'Kelimelerin yarısı tanıdık',twoThirds:'Üçte iki kapsam',eighty:'%75 kapsam',shortSurahs:'Kısa sûreler tamam'};
+  // KAO2-16 · 07 §6: ünite taşları müfredattan türetilir; etiketler tek sözlükten okunur.
+  function kaoMilestoneLabels(){
+    var labels={};
+    keysOf(KAO_MILESTONE_LABELS).forEach(function(key){ labels[key]=KAO_MILESTONE_LABELS[key]; });
+    var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
+    units.forEach(function(unit){ labels['u'+unit.id]=String(unit.title||('Ünite '+unit.id))+' ünitesini bitirdim'; });
+    return labels;
+  }
   function kaoMilestoneLabel(q){
-    var keys=['shortSurahs','eighty','twoThirds','half','namaz','fatiha'];
-    for(var i=0;i<keys.length;i+=1) if(q.milestones&&q.milestones[keys[i]]) return KAO_MILESTONE_LABELS[keys[i]];
+    var labels=kaoMilestoneLabels(),curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
+    var keys=['shortSurahs','eighty','twoThirds','half','namaz','fatiha','besmele'].concat(units.map(function(unit){ return 'u'+unit.id; }).reverse());
+    for(var i=0;i<keys.length;i+=1) if(q.milestones&&q.milestones[keys[i]]&&labels[keys[i]]) return labels[keys[i]];
     return 'İlk kilometre taşı: Fâtiha';
   }
-  // 03 §10 (O-3): ünite taşları ar>tr yönünde review ∧ s≥7; kapsam taşları kaoCoverage (FIX-07 bilinen tanımı).
+  // KAO2-16 · 07 §6: Fâtiha/namaz taşları gerçek namaz metni lemmalarına bağlanır
+  // (eski "sıklık dilimi" koşulu 03 §2 gereği düzeltildi). Yalnız doğrulanmış kimlikler sayılır.
+  function kaoPrayerLemmaIds(kind){
+    var shorts=window.QuranShortSurahsV1,texts=shorts&&Array.isArray(shorts.prayerTexts)?shorts.prayerTexts:[],lex=window.QuranLexiconV1,ids=Object.create(null);
+    texts.filter(function(text){ return kind!=='fatiha'||text.id==='fatiha'; }).forEach(function(text){
+      (Array.isArray(text.words)?text.words:[]).forEach(function(word){
+        var id=word&&word.lemmaId,lemma=id&&lex&&typeof lex.byId==='function'?lex.byId(id):null;
+        if(lemma&&lemma.verified===true) ids[id]=true;
+      });
+    });
+    return Object.keys(ids);
+  }
+  function kaoUnitMastered(q,unitId){
+    return !!objectOr(objectOr(objectOr(q.path,{}).units,{})[String(unitId)],{}).masteryAt;
+  }
+  function kaoS0PlacementPass(q){
+    return nonNegativeNumber(objectOr(objectOr(q.onboarding,{}).placement,{}).reading,0)>=KAO_PLACEMENT_PASS;
+  }
   // 'eighty' anahtarı korunur, eşiği 0,75 (KF-12): içerik token kapsamı tavanı %77,42 olduğundan %80 kazanılamıyordu.
   // Saf: yalnız henüz kazanılmamış ve koşulu sağlanan anahtarları döndürür. shortSurahs kendi yolunda (gecikmeli test).
   function kaoMilestoneCheck(d,nowIso){
-    var q=quranLearnRoot(d),cards=objectOr(q.cards,{}),milestones=objectOr(q.milestones,{}),units=kaoUnitSlices(),ratio=kaoCoverage(d).ratio;
-    var settledForward=function(list){ return list.length>0&&list.every(function(lemma){ return isSettled(cards['w:'+lemma.id+':ar>tr'],7); }); };
-    var reached={fatiha:settledForward(units[0]||[]),namaz:settledForward([].concat(units[0]||[],units[1]||[],units[2]||[])),half:ratio>=0.5,twoThirds:ratio>=0.68,eighty:ratio>=0.75};
-    return ['fatiha','namaz','half','twoThirds','eighty'].filter(function(key){ return reached[key]&&!milestones[key]; });
+    var q=quranLearnRoot(d),cards=objectOr(q.cards,{}),milestones=objectOr(q.milestones,{}),ratio=kaoCoverage(d).ratio;
+    var settledForward=function(ids){ return ids.length>0&&ids.every(function(id){ return isSettled(cards['w:'+id+':ar>tr'],7); }); };
+    var s0Done=!!objectOr(objectOr(objectOr(q.path,{}).lessons,{})['s0.12'],{}).doneAt;
+    var reached={besmele:s0Done||kaoS0PlacementPass(q),fatiha:settledForward(kaoPrayerLemmaIds('fatiha')),namaz:settledForward(kaoPrayerLemmaIds('namaz')),half:ratio>=0.5,twoThirds:ratio>=0.68,eighty:ratio>=0.75};
+    var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
+    units.forEach(function(unit){ reached['u'+unit.id]=kaoUnitMastered(q,unit.id); });
+    return keysOf(reached).filter(function(key){ return reached[key]&&!milestones[key]; });
   }
   // Taş bir kez kazanılır: yalnız boş alana yazılır; kapsam düşse ya da undo yapılsa da geri alınmaz.
   function recordMilestones(q,d,now){
@@ -557,11 +598,6 @@
     var first=lemma&&Array.isArray(lemma.examples)&&lemma.examples[0],number=first&&String(first.ref||'').split(':')[0],catalog=window.QuranRevelationOrderV1;
     var surah=catalog&&typeof catalog.byMushafOrder==='function'?catalog.byMushafOrder(Number(number)):null;
     return surah&&surah.id?surah.id:'';
-  }
-  // KAO2-16 taş hesabı için geçiş dönemi sözlük dilimleri; yeni yol/ünite ekranı müfredat v2'yi kullanır.
-  function kaoUnitSlices(){
-    var lex=window.QuranLexiconV1,lemmas=lex&&Array.isArray(lex.lemmas)?lex.lemmas:[];
-    return Array.from({length:12},function(_unused,index){ return lemmas.slice(Math.floor(index*lemmas.length/12),Math.floor((index+1)*lemmas.length/12)); });
   }
   function kaoCurriculumUnit(unitId){
     var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
@@ -1877,7 +1913,10 @@
     var q=quranLearnRoot(d),cards=objectOr(q.cards,{}),misheard=objectOr(objectOr(q.phonics,{}).misheard,{}),classes=Object.create(null),study=kaoStudyStreak(q.daily);
     Object.keys(misheard).forEach(function(letterId){ var name=kaoSoundClass(letterId),count=Math.floor(nonNegativeNumber(misheard[letterId],0)); if(name&&count>0) classes[name]=(classes[name]||0)+count; });
     var top=Object.keys(classes).sort(function(a,b){ return classes[b]-classes[a]||a.localeCompare(b); })[0]||null;
+    // KAO2-16 · 07 §6: yeni taş anahtarları (besmele, u1…u12) yalnız sayısal olarak taşınır.
+    var milestones=objectOr(q.milestones,{}),milestoneKeys=Object.keys(milestones).filter(function(key){ return !!milestones[key]; });
     return {v:1,coveragePercent:Math.floor(kaoCoverage(d).ratio*100),knownWords:Object.keys(kaoKnownLemmaSet(d)).length,understoodAyahs:Array.isArray(objectOr(q.ayahs,{}).understood)?q.ayahs.understood.length:0,
+      milestoneCount:milestoneKeys.length,unitMilestones:milestoneKeys.filter(function(key){ return /^u\d+$/.test(key); }).length,besmele:!!milestones.besmele,
       lastStudiedDate:study.last,streakDays:study.streak,topSoundClass:top,flaggedCount:Object.keys(cards).filter(function(id){ return cards[id]&&cards[id].flagged&&typeof cards[id].flagged==='object'; }).length,updatedAt:new Date().toISOString()};
   }
   function kaoSave(){
@@ -2349,7 +2388,7 @@
       gate:{passed:false,skipped:false,score:null,at:null},
       settings:{dailyNew:10,audio:false,autoAdvance:false,audioStyle:'measured',harakat:true,translit:true,translitLayer:'tr',shadowing:false,kaoVisible:true},
       cards:{},units:{},surahs:{},daily:{},
-      milestones:{fatiha:null,namaz:null,half:null,twoThirds:null,eighty:null,shortSurahs:null},
+      milestones:KAO_MILESTONE_SHAPE(),
       phonics:{style:'muallim',misheard:{}},
       errors:{sound:0,root:0,affix:0,cognate:0,rule:0,order:0},
       ayahs:{understood:[]},
@@ -2418,8 +2457,9 @@
     q.daily=objectOr(q.daily,{});
 
     q.milestones=objectOr(q.milestones,{});
-    ['fatiha','namaz','half','twoThirds','eighty','shortSurahs'].forEach(function(key){
-      q.milestones[key]=nullableString(q.milestones[key]);
+    // KAO2-16 · 07 §6: besmele ve ünite taşları (u1…u12) tanınır; eski anahtarlar korunur.
+    kaoMilestoneKeys().forEach(function(key){
+      if(Object.prototype.hasOwnProperty.call(q.milestones,key)||KAO_MILESTONE_CORE[key]) q.milestones[key]=nullableString(q.milestones[key]);
     });
 
     q.phonics=objectOr(q.phonics,{});
@@ -2532,6 +2572,8 @@
     kaoNextStep:kaoNextStep,
     kaoUndo:kaoUndo,
     kaoMilestoneCheck:kaoMilestoneCheck,
+    kaoMilestoneLabel:kaoMilestoneLabel,
+    kaoMilestoneLabels:kaoMilestoneLabels,
     kaoCandidates:kaoCandidates,
     kaoWeakClass:kaoWeakClass,
     kaoIntentSuggestion:kaoIntentSuggestion,

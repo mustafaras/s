@@ -654,3 +654,15 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-15/YAYIN.md · release-live.json
 - evidence-levels: kaynak/test PASS · Pages/run/hash PASS · cihaz doğrulanmadı.
 - next: KAO2-16
+## seq 65 · 2026-09-29 · CARD · KAO2-16
+- status: done
+- title: Taş düzeltmesi ve mevcut kullanıcı geçişi
+- prev-commit: 6dae1c9c
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-16/KANIT.md
+- gates: syntax PASS · KAO 33/33 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr PASS · contrast PASS · perf PASS · git diff --check PASS · sync PASS
+- metrics: fatiha 23 doğrulanmış lemma · namaz 35 lemma · 12 ünite taşı · besmele S0.12 ∨ yerleştirme ≥7/8 · kapsam 0.50/0.68/0.75 · runtime 79.005 KiB · JSON artışı ≤7 KB · geçiş idempotent
+- changed-tests: `test_kao_requirements.js` (fatiha/namaz → gerçek namaz lemmaları, besmele aday), `test_kao_panel_projection.js` (izinli anahtar listesi), `test_kao_migration.js` (taş şekli + eksik curriculum modülü yüklendi)
+- evidence-levels: kaynak/test PASS · yayın yok · cihaz doğrulanmadı
+- surprises: Bütçe daraldı (79.005/80 KiB); kaoUnitSlices kaldırıldı; eski migration fikstürü curriculum modülünü yüklemiyordu.
+- next: KAO2-17

@@ -504,16 +504,31 @@ function sandboxLemma(api, lemmaId) {
   api.ensureQuranLearn(data);
   const q = data.quranLearn;
   const forward = (list, s) => { for (const lemma of list) q.cards[`w:${lemma.id}:ar>tr`] = settled(s); };
-  // fatiha: Ünite 1'in tüm lemmaları ar>tr review ∧ s≥7; biri 6.9 iken yok.
-  forward(slice(0), 7); q.cards[`w:${slice(0)[0].id}:ar>tr`].s = 6.9;
-  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), [], 'fatiha: eşiğin altında kazanılmaz');
-  q.cards[`w:${slice(0)[0].id}:ar>tr`].s = 7;
-  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['fatiha'], 'fatiha: eşikte kazanılır');
-  // namaz: Ünite 1–3.
-  forward(slice(1), 7); forward(slice(2), 7); q.cards[`w:${slice(2)[0].id}:ar>tr`].s = 6.9;
-  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['fatiha'], 'namaz: Ünite 3 eksikken yok');
-  q.cards[`w:${slice(2)[0].id}:ar>tr`].s = 7;
-  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['fatiha', 'namaz'], 'namaz: Ünite 1–3 tamam');
+  // KAO2-16 (07 §6): fatiha/namaz artık gerçek namaz metni lemmalarına bağlı; eski sıklık dilimi koşulu kaldırıldı.
+  const shortsBox = { window: {} };
+  vm.createContext(shortsBox);
+  vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranShortSurahsV1.js'), 'utf8'), shortsBox);
+  const shorts = shortsBox.window.QuranShortSurahsV1;
+  const lexById = lexBox.window.QuranLexiconV1.byId;
+  const prayerIds = (id) => {
+    const text = shorts.prayerTexts.find((item) => item.id === id);
+    return Array.from(new Set(text.words.map((w) => w.lemmaId).filter((lid) => lid && lexById(lid) && lexById(lid).verified === true)));
+  };
+  const allPrayerIds = () => Array.from(new Set(shorts.prayerTexts.flatMap((text) => text.words.map((w) => w.lemmaId).filter((lid) => lid && lexById(lid) && lexById(lid).verified === true))));
+  const asCards = (ids) => ids.map((id) => ({ id }));
+  const fatihaLemmas = asCards(prayerIds('fatiha'));
+  const allNamazLemmas = asCards(allPrayerIds());
+  // besmele: S0.12 tamam ya da yerleştirme ≥7/8.
+  q.path.lessons['s0.12'] = { doneAt: '2026-10-01T00:00:00.000Z' };
+  forward(fatihaLemmas, 7); q.cards[`w:${fatihaLemmas[0].id}:ar>tr`].s = 6.9;
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['besmele'], 'fatiha: eşiğin altında kazanılmaz (besmele ayrı koşul)');
+  q.cards[`w:${fatihaLemmas[0].id}:ar>tr`].s = 7;
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['besmele', 'fatiha'], 'fatiha: eşikte kazanılır');
+  // namaz: tüm namaz metinleri.
+  forward(allNamazLemmas, 7); q.cards[`w:${allNamazLemmas[allNamazLemmas.length - 1].id}:ar>tr`].s = 6.9;
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['besmele', 'fatiha'], 'namaz: biri eksikken yok');
+  q.cards[`w:${allNamazLemmas[allNamazLemmas.length - 1].id}:ar>tr`].s = 7;
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['besmele', 'fatiha', 'namaz'], 'namaz: tüm metinler eşikte');
   // Kapsam taşları: bilinen = iki yönde kalıcı (FIX-07); en yüksek frekanstan eşiğe kadar.
   const byFreq = lemmas.slice().sort((a, b) => b.freq - a.freq);
   const known = (count) => { for (const lemma of byFreq.slice(0, count)) { q.cards[`w:${lemma.id}:ar>tr`] = Object.assign({}, durable); q.cards[`w:${lemma.id}:tr>ar`] = Object.assign({}, durable); } };
@@ -551,7 +566,7 @@ function sandboxLemma(api, lemmaId) {
   assert.notEqual(earned, beforeAnswer, 'fixture cevapta yeni milestone kazandırdı');
   assert.equal(JSON.stringify(q.milestones), beforeAnswer, 'KAO2-06 panel undo milestone etkisini de geri alır');
   for (const id of Object.keys(q.cards)) if (id.endsWith(':tr>ar')) delete q.cards[id];
-  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['fatiha', 'namaz'], 'milestone kontrolü adayları kart kapsamından hesaplar; kayıt henüz kazanılmadı');
+  assert.deepEqual(Array.from(api.kaoMilestoneCheck(data, now)), ['besmele', 'fatiha', 'namaz'], 'milestone kontrolü adayları kart kapsamından hesaplar; kayıt henüz kazanılmadı (KAO2-16: besmele ayrı koşul)');
   assert.equal(JSON.stringify(q.milestones), beforeAnswer, 'kapsam düşse de geri alınmış milestone kaydı boş kalır');
 }
 
@@ -835,9 +850,10 @@ function sandboxLemma(api, lemmaId) {
   assert.ok(!got.includes('confetti') && !got.includes('audio.success'), 'taş yokken kutlama yok');
   got = answer(false);
   assert.ok(!got.includes('audio.tap') && !got.includes('haptic.tap'), 'yanlışta doğru sesi yok');
-  // Yeni taş: Ünite 1 lemmaları ar>tr s≥7 → fatiha; cevapla kazanılır.
-  const unit1 = sandbox.window.QuranLexiconV1.lemmas.slice(0, Math.floor(sandbox.window.QuranLexiconV1.lemmas.length / 12));
-  for (const l of unit1) data.quranLearn.cards[`w:${l.id}:ar>tr`] = { state: 'review', s: 8, reps: 4, due: '2099-01-01T00:00:00.000Z' };
+  // Yeni taş (KAO2-16 · 07 §6): Fâtiha lemmaları ar>tr s≥7 → fatiha; cevapla kazanılır.
+  const fatihaText = sandbox.window.QuranShortSurahsV1.prayerTexts.find((item) => item.id === 'fatiha');
+  const fatihaLemmaIds = Array.from(new Set(fatihaText.words.map((word) => word.lemmaId).filter((id) => id && sandbox.window.QuranLexiconV1.byId(id) && sandbox.window.QuranLexiconV1.byId(id).verified === true)));
+  for (const id of fatihaLemmaIds) data.quranLearn.cards[`w:${id}:ar>tr`] = { state: 'review', s: 8, reps: 4, due: '2099-01-01T00:00:00.000Z' };
   got = answer(true);
   assert.ok(data.quranLearn.milestones.fatiha, 'fixture: fatiha kazanıldı');
   assert.ok(got.includes('audio.success') && got.includes('haptic.success') && got.includes('confetti'), 'yeni taşta kutlama + konfeti');

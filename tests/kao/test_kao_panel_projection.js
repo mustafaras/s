@@ -38,7 +38,7 @@ q.ayahs.understood = ['112:1', '112:2'];
 q.errors.sound = 7;
 
 const summary = app.kaoPanelSummary(data);
-assert.deepEqual(Object.keys(summary).sort(), ['coveragePercent', 'flaggedCount', 'knownWords', 'lastStudiedDate', 'streakDays', 'topSoundClass', 'understoodAyahs', 'updatedAt', 'v'], 'yalnız izinli anahtarlar');
+assert.deepEqual(Object.keys(summary).sort(), ['besmele', 'coveragePercent', 'flaggedCount', 'knownWords', 'lastStudiedDate', 'milestoneCount', 'streakDays', 'topSoundClass', 'understoodAyahs', 'unitMilestones', 'updatedAt', 'v'], 'yalnız izinli anahtarlar');
 assert.equal(summary.coveragePercent, Math.floor(app.kaoCoverage(data).ratio * 100), 'E1 ile aynı kapsam hesabı');
 assert.equal(summary.coveragePercent, Math.floor((lemmas[0].freq + lemmas[1].freq) / 77430 * 100));
 assert.equal(summary.knownWords, 2, 'okuyucu-bilinmeyen sayılmaz');

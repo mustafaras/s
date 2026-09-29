@@ -73,7 +73,7 @@ check('(b) tek birincil eylem ve nextStep eşlemesi', () => {
   assert.equal(primaryAction(home()), 'App.kaoStart()', 'daily → kaoStart');
   reset({ doneAt: null, start: null });
   assert.equal(api.kaoNextStep(new FixedDate()).kind, 'onboarding');
-  assert.equal(primaryAction(home()), 'App.kaoStart()', 'onboarding → KAO2-11a kadar kaoStart');
+  assert.equal(primaryAction(home()), 'App.kaoOnboard(&quot;start&quot;)', 'onboarding → KAO2-11 ilk açılış');
   let q = reset({ doneAt: ISO, start: 's0' });
   assert.equal(api.kaoNextStep(new FixedDate()).kind, 's0-lesson');
   assert.equal(primaryAction(home()), 'App.kaoGate(&quot;start&quot;)', 's0 → mevcut kapı/ders görünümü');

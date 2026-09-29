@@ -29,7 +29,8 @@ assert.equal(typeof api.kaoBack, 'function', 'önceki ekrana dönmek için kaoBa
 assert.equal(sandbox.window.SeymaQuranLearnFlow.version, 1);
 assert.equal(sandbox.window.SeymaQuranLearnViews.version, 1);
 
-const data = { quranLearn: api.emptyQuranLearn(), settings: { targetBed: '23:00' }, quranJourney: { requests: {} } };
+// KAO2-11: ilk açılışı bitirmiş kullanıcı; kartsız ve doneAt boş kullanıcı ana ekran yerine ilk açılışı görür.
+const data = { quranLearn: Object.assign(api.emptyQuranLearn(), { onboarding: { doneAt: '2026-09-20T10:00:00.000Z' } }), settings: { targetBed: '23:00' }, quranJourney: { requests: {} } };
 const ui = { kaoOpen: false, kaoView: 'home', kaoReturnFocusId: '', kaoQueue: [], kaoTaskIndex: 0, kaoTaskStartedAt: 0, kaoUndo: null, kaoFeedback: '', kaoAudioFailed: false };
 let renderCount = 0;
 assert.equal(api.registerQuranLearn({

@@ -399,3 +399,27 @@ Kurallar:
 - summary: KAO2 dışı İlham & İbadet ortak kart dili (kullanıcı isteği) `app/styles.css` `.saygi-page` kapsamında KAO hub kartını da ortak dile çekti: 4px altın şerit, ortak gölge, 44px rozet, başlık 800, altın halka. Bu yüzeyde 06 §5 "gölge yok / 32 px ikon" kuralından bilinçli sapma; kao.css ve KAO2 testleri değişmedi.
 - evidence: docs/evidence/ILHAM-ORTAK-DIL-20260929.md
 - next: KAO2-11 (KAO2-26 kontrast/temizlik denetimi bu sapmayı hesaba katmalı)
+
+## seq 42 · 2026-09-29 · FIX · KAO2-11
+- status: done
+- summary: P6 kapsam onayları kod yazımından önce/kapı kırmızısında kullanıcıdan alındı (KAO2-04 seq18/19, KAO2-06 seq24/25, KAO2-10 seq38 emsali). (1) `App.kaoOnboard` shim'i App yüzeyini 759→760, işlev atamalarını 597→598 yapar; Dokun dışı `tests/app/test_app_surface_daily_boundary.js` ve `tests/app/test_v3_welcome.js` sayısal pinleri — kullanıcı: "tümünü en uygun premium ve bilimsel şekilde çözerek ilerlemelisin". (2) Sıfır kullanıcı artık ana ekran yerine ilk açılışı gördüğü için Dokun dışı 4 KAO testi: `test_kao2_today.js` geçici `onboarding → kaoStart` beklentisi → `kaoOnboard("start")`; `test_kao2_navigation.js`, `test_kao_render.js`, `test_kao_user_tasks.js` fikstürlerine `onboarding.doneAt` — kullanıcı: "Evet, bu 4 testte (Önerilen)".
+- resolution: Yalnız sayısal pinler ve fikstür önkoşulu değişti; zayıflatma yok. `test_kao_render.js`'te `/Hoş geldin/` beklentisi kaldırılmadı, ilk açılış ekranında ölçülmeye taşındı (KANIT "Bilerek değişen testler"). Flow (Dokun dışı) değiştirilmedi: ilk açılış ana ekran modu olarak kuruldu.
+- next: KAO2-11
+
+## seq 43 · 2026-09-29 · CARD · KAO2-11
+- status: done
+- title: İlk açılış (S-01), başlangıç noktası ve yerleştirme
+- prev-commit: c23fe78e
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-11/KANIT.md
+- gates: syntax PASS · kao 27/27 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr 95/95 PASS · contrast 460 çift/0 ihlal PASS · apple-contrast 30/0 PASS · sync PASS
+- metrics: onboarding 14/14 · (a)–(g) birebir · yerleştirme 8 okuma + 4 dinleme (kapı alt kümesi, bayt-eşit) · ≥7/8 → level1 · eksik S0 içerikten türetilir (örnek {01,02,03,05,07,09,10,12}) · Atla varsayılanları level1/5 dk/ses açık · legacy notu bir kez · handler 39 · App yüzeyi 760 · runtime gzip 66,258 KiB · CSS 8,629 KiB · içerik 168,483 KiB · p95 4,44 ms · fx-coverage M1–M13 değişmedi
+- changed-tests: yeni test_kao2_onboarding.js; fx2 pinleri ×3 (759→760); seq42 onayıyla daily-boundary (597/759→598/760), v3 (759→760), test_kao2_today, test_kao2_navigation, test_kao_render, test_kao_user_tasks
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: Flow görünüm beyaz listesi yeni görünümü reddetti → ilk açılış ana ekran modu; "524 kelime → %77" sözlükten ölçüldü (05 iddiası doğrulandı); S0 eylemi hâlâ geçici kapı (KAO2-12); niyet hub'a bağlı değil (B-KAO2-11-1 → KAO2-23); runtime payı 13,7 KiB; code-reviewer APPROVE, tek LOW (eksik içerikte sınanmadan S0 işaretleme) düzeltildi + (c4) testi
+- next: KAO2-12
+
+## seq 44 · 2026-09-29 · GATE · —
+- status: presented
+- summary: G1 · W2 ara özeti kullanıcıya sunuldu (bilgi amaçlı, yanıt beklenmez). W2 (KAO2-07…11) kapandı. Kapanan bulgular: K-01, K-02, K-03, K-08, O-02, Y-01…Y-05, Y-08, T-01…T-05, T-10, T-11; Y-13 kısmen (harf bilmeyen kullanıcı yerleştirmeye girmeden S0'a yönlenir). Kanıt düzeyleri ayrı: kaynak/test ✓ (KAO2-07…11) · yayın ✓ KAO2-10'a kadar (811ebc88, run 36534605512), KAO2-11 yayında değil · cihaz — (kullanıcıda). İsteğe bağlı yerel görsel QA yalnız kullanıcı isterse.
+- next: KAO2-12

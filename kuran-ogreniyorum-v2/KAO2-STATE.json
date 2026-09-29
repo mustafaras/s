@@ -5,8 +5,8 @@
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-10",
-  "nextCard": "KAO2-11",
-  "ledgerLastSeq": 41,
+  "nextCard": "KAO2-12",
+  "ledgerLastSeq": 44,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -16,7 +16,7 @@
   },
   "gates": {
     "G0": "closed",
-    "G1": "open",
+    "G1": "presented",
     "G2": "closed",
     "G3": "open",
     "G4": "open"
@@ -89,8 +89,8 @@
     },
     "KAO2-11": {
       "wave": "W2",
-      "status": "todo",
-      "evidence": null
+      "status": "done",
+      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-11/KANIT.md"
     },
     "KAO2-12": {
       "wave": "W3",
@@ -191,6 +191,12 @@
       "source": "KAO2-10",
       "target": "KAO2-26",
       "note": "Eski hub seçicileri öksüz (.kao-hub-head/.kao-hub-seal/.kao-hub-kicker/.kao-hub-status/.kao-hub-copy/.kao-hub-path/.kao-hub-foot/.kao-hub-ayah); test_kao_render.js seçici listesi ve arşiv kontrast aracı bağımlı, B-KAO2-09-1 ile birlikte temizlenmeli."
+    },
+    {
+      "id": "B-KAO2-11-1",
+      "source": "KAO2-11",
+      "target": "KAO2-23",
+      "note": "onboarding.intent hub niyet önerisini henüz yönlendirmiyor; öneri bugünün bir sonraki namaz vaktinden geliyor (D-18 tam bağlantısı). KAO2-23 Ayarlar niyet satırıyla birlikte bağlanmalı; hub testi (b2) kasıtlı olarak intent=null fikstürüyle kalır."
     }
   ],
   "releaseApprovalRecord": {

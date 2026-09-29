@@ -33,7 +33,7 @@
   }
   function navBar(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
-    var title=escapeText(options.title),isRoot=options.view==='home',action=isRoot?'App.kaoClose()':'App.kaoBack()',label=isRoot?'Kapat':'‹ '+escapeText(options.previousTitle||"Kur'an Arapçası");
+    var title=escapeText(options.title),isRoot=options.view==='home'||options.view==='onboard',action=isRoot?'App.kaoClose()':'App.kaoBack()',label=isRoot?'Kapat':'‹ '+escapeText(options.previousTitle||"Kur'an Arapçası");
     return '<nav class="kao-navbar" aria-label="'+title+'"><button type="button" class="kao-navbar-action" onclick="'+action+'" aria-label="'+label+'">'+label+'</button><span class="kao-navbar-title" title="'+title+'">'+title+'</span><span class="kao-navbar-spacer" aria-hidden="true"></span></nav>';
   }
   function largeTitle(title,content){
@@ -154,7 +154,63 @@
   function todayScreen(model){
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
-    return '<main class="kao-today-screen" aria-label="Bugün">'+heroCard(model.hero)+pathCard(model.path)+groupedList(model.lists)+'</main>';
+    return '<main class="kao-today-screen" aria-label="Bugün">'+(model.notice?notice(model.notice):'')+heroCard(model.hero)+pathCard(model.path)+groupedList(model.lists)+'</main>';
+  }
+
+  // KAO2-11 · S-01 ilk açılış (05 §3) ve 05 §9 "Yeni düzen" notu. Eylemler yalnız actionCall ile üretilir.
+  function linkButton(label,action,className){
+    var call=actionCall(action);
+    return '<button type="button" class="'+className+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(label)+'</button>';
+  }
+  function notice(options){
+    if(!deps) throw new Error('KAO2-11: görünüm bağımlılıkları kayıtlı değil');
+    options=options&&typeof options==='object'?options:{};
+    var items=(Array.isArray(options.items)?options.items:[]).map(function(item){ return '<li class="kao-notice-item">'+escapeText(item)+'</li>'; }).join('');
+    var close=options.close&&typeof options.close==='object'?linkButton(options.close.label,options.close.action,'kao-notice-close'):'';
+    return '<section class="kao-notice" aria-labelledby="kao-notice-title"><h3 class="kao-notice-title" id="kao-notice-title">'+escapeText(options.title)+'</h3><ul class="kao-notice-list">'+items+'</ul>'+close+'</section>';
+  }
+  function onboardPoints(items){
+    return '<ul class="kao-onboard-points">'+(Array.isArray(items)?items:[]).map(function(item){
+      item=item&&typeof item==='object'?item:{};
+      return '<li class="kao-onboard-point"><span class="kao-onboard-point-icon" aria-hidden="true">'+deps.icon(String(item.icon||''),18)+'</span><span class="kao-onboard-point-text"><strong>'+escapeText(item.title)+'</strong><span>'+escapeText(item.text)+'</span></span></li>';
+    }).join('')+'</ul>';
+  }
+  function onboardOptions(items){
+    return '<div class="kao-onboard-options">'+(Array.isArray(items)?items:[]).map(function(item){
+      item=item&&typeof item==='object'?item:{};
+      var call=actionCall(item.action);
+      return '<button type="button" class="kao-onboard-option"'+(call?' onclick="'+call+'"':' disabled')+'><span class="kao-onboard-option-title">'+escapeText(item.title)+'</span><span class="kao-onboard-option-sub">'+escapeText(item.sub)+'</span></button>';
+    }).join('')+'</div>';
+  }
+  function onboardSeg(options){
+    options=options&&typeof options==='object'?options:{};
+    var chips=(Array.isArray(options.items)?options.items:[]).map(function(item){
+      item=item&&typeof item==='object'?item:{};
+      var call=actionCall(item.action);
+      return '<button type="button" class="kao-onboard-chip" aria-pressed="'+(item.pressed===true)+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(item.label)+'</button>';
+    }).join('');
+    return '<div class="kao-onboard-field"><p class="kao-onboard-label">'+escapeText(options.label)+'</p><div class="kao-onboard-seg" role="group" aria-label="'+escapeText(options.label)+'">'+chips+'</div>'+(options.hint?'<p class="kao-onboard-hint">'+escapeText(options.hint)+'</p>':'')+'</div>';
+  }
+  function onboardTask(options){
+    options=options&&typeof options==='object'?options:{};
+    var choices=(Array.isArray(options.choices)?options.choices:[]).map(function(item){
+      item=item&&typeof item==='object'?item:{};
+      var call=actionCall(item.action),lang=item.lang==='ar'?' lang="ar" dir="rtl"':'';
+      return '<button type="button" class="kao-onboard-choice"'+lang+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(item.label)+'</button>';
+    }).join('');
+    var audio=options.audio?'<button type="button" class="kao-onboard-audio"'+(actionCall(options.audio.action)?' onclick="'+actionCall(options.audio.action)+'"':' disabled')+'>'+deps.icon('headphones',17)+' '+escapeText(options.audio.label)+'</button>':'';
+    return '<section class="kao-onboard-task" aria-labelledby="kao-onboard-prompt"><p class="kao-onboard-kicker">'+escapeText(options.kicker)+'</p>'+(options.ar?'<p class="kao-onboard-ar" lang="ar" dir="rtl">'+escapeText(options.ar)+'</p>':'')+audio+'<h3 class="kao-onboard-prompt" id="kao-onboard-prompt">'+escapeText(options.prompt)+'</h3><div class="kao-onboard-choices">'+choices+'</div>'+(options.extra?linkButton(options.extra.label,options.extra.action,'kao-onboard-link'):'')+'</section>';
+  }
+  function onboardScreen(model){
+    if(!deps) throw new Error('KAO2-11: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    var back=model.back?linkButton('‹ Geri',model.back,'kao-onboard-link'):'<span class="kao-onboard-spacer" aria-hidden="true"></span>';
+    var bar='<div class="kao-onboard-bar">'+back+'<span class="kao-onboard-progress">'+escapeText(model.progress)+'</span>'+linkButton('Atla',model.skip,'kao-onboard-link')+'</div>';
+    var body=(model.note?'<p class="kao-onboard-note" role="status">'+escapeText(model.note)+'</p>':'')+(model.points?onboardPoints(model.points):'');
+    if(model.options) body+=onboardOptions(model.options);
+    if(model.task) body+=onboardTask(model.task);
+    (Array.isArray(model.fields)?model.fields:[]).forEach(function(field){ body+=field&&field.kind==='switch'?'<div class="kao-onboard-field">'+switchRow(field)+'</div>':onboardSeg(field); });
+    return '<main class="kao-onboard" aria-labelledby="kao-onboard-title"><div class="kao-view-head">'+bar+'<h2 class="kao-largetitle-heading" id="kao-onboard-title">'+escapeText(model.title)+'</h2>'+(model.lead?'<p class="kao-onboard-lead">'+escapeText(model.lead)+'</p>':'')+'</div>'+body+(model.primary?primaryButton(model.primary):'')+'</main>';
   }
 
   // KAO2-10 · 06 §5 hub kartı iç yüzü: tek bilgi + gerçek ünite halkası + eylem kapsülü.
@@ -167,5 +223,5 @@
       '<span class="kao-hub-cta">'+escapeText(options.action)+' <span aria-hidden="true">›</span></span>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,hubCard:hubCard};
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen};
 })(window);

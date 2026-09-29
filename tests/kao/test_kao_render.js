@@ -63,6 +63,8 @@ assert.equal(api.registerQuranLearnSurface({
 }), true);
 assert.equal(api.registerCaffeineTargetBed(() => '23:00'), true);
 
+// KAO2-11: kartsız ve doneAt boş kullanıcı önce ilk açılışı görür; ana ekran beklentileri ilk açılışı bitirmiş sıfır kullanıcı içindir.
+quranLearn.onboarding = { doneAt: '2026-09-24T12:00:00.000Z' };
 api.kaoOpen();
 assert.equal(ui.kaoOpen, true);
 assert.equal(ui.kaoView, 'home');
@@ -80,12 +82,14 @@ assert.match(html, /onclick="App\.kaoClose\(\)"/);
 assert.match(html, /İlk hedef: Fâtiha’yı anlamak · \d+ kelime/);
 assert.doesNotMatch(html, /data-countup-key="kao-coverage"/);
 assert.match(html, /class="kao-hero-card"/);
-assert.match(html, /Hoş geldin/);
+assert.match(html, /Fâtiha · Ders 1/, 'ilk açılış sonrası kahraman günlük dersi gösterir');
 assert.match(html, /class="kao-hero-foot"[\s\S]*Gece tekrarı/);
 assert.match(html, /App\.kaoStart\(\)/);
 assert.doesNotMatch(html, /class="(?:kao-dialog-frame|kao-header-mark|kao-hero-rosette|kao-summary-mark|kao-done-mark)"/);
 assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 
+quranLearn.onboarding.doneAt = null;
+assert.match(api.kaoOverlayHTML(new Date('2026-09-24T22:15:00')), /Hoş geldin/, 'ilk açılış yapılmamış sıfır kullanıcı karşılanır');
 const firstHubHtml = api.kaoHubCardHTML();
 assert.match(firstHubHtml, /id="kao-hub-entry"/);
 assert.match(firstHubHtml, /Kur’an Arapçası Öğreniyorum/);

@@ -52,6 +52,8 @@ const report = {};
 // (a) Hub kartından bugünkü oturuma: hub → E1 → oturum (≤3 adım); Ayarlar'dan da ≤3 adım.
 {
   const { api, state } = boot();
+  // KAO2-11: ilk açılışı bitirmiş sıfır kullanıcı (kartsız ve doneAt boş kullanıcı önce ilk açılışı görür).
+  state.data.quranLearn = { onboarding: { doneAt: '2026-09-20T10:00:00.000Z' } };
   const hub = clicks(api.kaoHubCardHTML());
   assert.deepEqual(hub.map((item) => item.name), ['kaoOpen'], 'hub kartı tek dokunuşla açar');
   api.kaoOpen(); assert.equal(state.ui.kaoView, 'home');

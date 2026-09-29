@@ -1,0 +1,21 @@
+# KAO2-11 P3 kapıları · 2026-09-29 11:41
+## syntax
+PASS app/core/quranLearn.js
+PASS app/core/quranLearnFlow.js
+PASS app/core/quranLearnViews.js
+PASS app/content/quranCurriculumV2.js
+PASS app.js
+## tests/kao/test_*.js: 27/27
+## tests/app/test_*.js: 77/77
+## tests/panel/test_*.js: 23/23
+## tests/panel-v2/test_panel_v2_*.js: 27/27
+## tests/quran/test_*.js: 9/9
+## reminders: PASS (REMINDER SMOKE PASS: 21 curated fixtures)
+## driver: PASS (Done.)
+## zikr: PASS (✅ 95/95 assertion pass)
+## kao-contrast: PASS (460 çift denetlendi (35 elle seçilmiş + 195 otomatik renk bildirimi, × 2 tema), 0 tanesi eşiğin altında.)
+## apple-contrast: PASS (30 token denetlendi, 0 tanesi 4.5:1 eşiğinin altında.)
+## perf
+KAO2 perf: PASS (content 168.483 KiB · runtime 66.258 KiB · css 8.629 KiB · p95 4.436 ms)
+## fx-coverage (M1–M13, önce = c23fe78e dışa aktarımı)
+birebir: M1=16 M2=16 M3=25 M4=16 M5=0 M6=11 M7=0.6 M8=0 M9=2 M10=0 M11=2 M12=18 M13=8

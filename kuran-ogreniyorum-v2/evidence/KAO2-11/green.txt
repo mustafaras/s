@@ -1,0 +1,15 @@
+PASS  (a) kartsız ve doneAt boş kullanıcıda kaoOpen() → ilk açılış adım 1 (veri yazılmaz)
+PASS  (a2) açık görünüm isteği ve hub eylemi: ilk açılış yalnız ana ekran yerine geçer
+PASS  (b) legacy kullanıcı: ilk açılış yok, "Yeni düzen" notu bir kez (whatsNewAt yazılır)
+PASS  (c) "Henüz değil" → start=s0, S0 Ders 1; "Evet, rahat okurum" → level1, Ünite 1 Ders 1
+PASS  (c2) "Harekeyle, yavaşça" → 8 okuma + 4 dinleme; kapı görevlerinin alt kümesi, Arapça içerikten
+PASS  (c3) yerleştirme ≥7/8 → level1; <7/8 → s0 + yalnız eksik S0 dersleri önerilir
+PASS  (c4) içerik eksikse yerleştirme sınamadan ders işaretlemez; tam S0 yolu önerilir
+PASS  (d) Adım 3: süre → dailyNew, niyet → intent, ses anahtarı → settings.audio (measured)
+PASS  (e) "Atla" her adımda: level1, 5 dk, ses açık + doneAt; Bugün ekranı
+PASS  (f) geri ve son düğme etiketi seçime göre; adım sırası korunur
+PASS  (g) ses yüklenemezse yerleştirme yalnız okumayla karar verir (R-C2)
+PASS  Bugün kahramanı: onboarding eylemi ilk açılışa bağlı; normalizasyon yerleştirmeyi korur
+PASS  handler sayacı 39 (§4) ve app.js tek satır shim; yorumlarda pin tuzağı yok
+PASS  06 CSS: KAO2-11 bloğu yalnız --kao-*/--f-* tokenı, 600/700, süs yok
+KAO2-11 onboarding: PASS (14 kontrol)

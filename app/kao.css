@@ -132,3 +132,43 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-hub-cta{align-self:flex-end;display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:6px 14px;border-radius:var(--kao-r-pill);background:var(--kao-tint);color:var(--kao-surface);font-size:var(--f-subhead);font-weight:600}
 @media (forced-colors:active){.kao-hub-icon,.kao-hub-cta{border:1px solid CanvasText;background:Canvas;color:CanvasText}.kao-hub-sub{color:CanvasText}}
 /* KAO2-10 son */
+/* KAO2-11 · S-01 ilk açılış (05 §3) + 05 §9 "Yeni düzen" notu; yalnız --kao-*/--f-* tokenları. */
+.kao-onboard{display:grid;gap:var(--kao-gap-3);min-width:0}
+.kao-onboard-bar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:var(--kao-gap-1);margin:0 0 var(--kao-gap-2)}
+.kao-onboard-bar>:last-child{justify-self:end}
+.kao-onboard-link{appearance:none;min-height:44px;padding:0 4px;border:0;background:transparent;color:var(--kao-tint);font:inherit;font-size:var(--f-body);font-weight:600;cursor:pointer;justify-self:start}
+.kao-onboard-progress{color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600;font-variant-numeric:tabular-nums}
+.kao-onboard-lead,.kao-onboard-hint{margin:6px 0 0;color:var(--kao-label-2);font-size:var(--f-subhead);line-height:1.45;overflow-wrap:anywhere}
+.kao-onboard-hint{margin:6px 4px 0;font-size:var(--f-footnote)}
+.kao-onboard-points{display:grid;gap:0;margin:0;padding:0;list-style:none;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);overflow:hidden}
+.kao-onboard-point{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:start;gap:var(--kao-gap-2);padding:14px 16px;border-top:1px solid var(--kao-sep)}
+.kao-onboard-point:first-child{border-top:0}
+.kao-onboard-point-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:var(--kao-r-ctl);background:color-mix(in srgb,var(--kao-tint) 8%,var(--kao-surface));color:var(--kao-tint)}
+.kao-onboard-point-text{display:grid;gap:2px;min-width:0;color:var(--kao-label-2);font-size:var(--f-subhead);line-height:1.4;overflow-wrap:anywhere}
+.kao-onboard-point-text strong{color:var(--kao-label);font-size:var(--f-headline);font-weight:600}
+.kao-onboard-options,.kao-onboard-choices{display:grid;gap:var(--kao-gap-1)}
+.kao-onboard-option,.kao-onboard-choice{appearance:none;width:100%;min-height:64px;display:grid;gap:2px;align-content:center;padding:12px 16px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);color:var(--kao-label);font:inherit;text-align:left;cursor:pointer}
+.kao-onboard-option-title{color:var(--kao-label);font-size:var(--f-headline);font-weight:600;overflow-wrap:anywhere}
+.kao-onboard-option-sub{color:var(--kao-label-2);font-size:var(--f-subhead);overflow-wrap:anywhere}
+.kao-onboard-choice{min-height:52px;font-size:var(--f-callout);font-weight:600;text-align:center}
+.kao-onboard-choice[lang="ar"]{font-size:var(--f-title2);line-height:1.4}
+.kao-onboard-field{display:grid;min-width:0}
+.kao-onboard-label{margin:0 0 8px;padding:0 4px;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
+.kao-onboard-seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:var(--kao-gap-1)}
+.kao-onboard-chip{appearance:none;min-height:44px;padding:8px 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-pill);background:var(--kao-surface);color:var(--kao-label);font:inherit;font-size:var(--f-subhead);font-weight:600;cursor:pointer}
+.kao-onboard-chip[aria-pressed="true"]{border-color:var(--kao-tint);background:var(--kao-tint);color:var(--kao-surface)}
+.kao-onboard-task{display:grid;gap:var(--kao-gap-2);min-width:0;padding:16px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface)}
+.kao-onboard-kicker{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600;font-variant-numeric:tabular-nums}
+.kao-onboard-ar{margin:0;color:var(--kao-label);font-size:var(--f-title1);line-height:var(--kao-ar-lh,2.2);word-spacing:var(--kao-ar-ws,normal);text-align:center}
+.kao-onboard-prompt{margin:0;color:var(--kao-label);font-size:var(--f-headline);font-weight:600}
+.kao-onboard-audio{appearance:none;justify-self:center;min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-pill);background:var(--kao-surface);color:var(--kao-tint);font:inherit;font-weight:600;cursor:pointer}
+.kao-onboard-note{margin:0;padding:12px 14px;border-radius:var(--kao-r-ctl);background:color-mix(in srgb,var(--kao-tint) 8%,var(--kao-surface));color:var(--kao-label);font-size:var(--f-subhead);line-height:1.45;overflow-wrap:anywhere}
+.kao-onboard-spacer{min-height:44px}
+.kao-onboard .kao-primary{margin-top:0}
+.kao-notice{display:grid;gap:var(--kao-gap-1);min-width:0;padding:16px;border:1px solid var(--kao-tint);border-radius:var(--kao-r-card);background:var(--kao-surface);color:var(--kao-label)}
+.kao-notice-title{margin:0;color:var(--kao-label);font-size:var(--f-headline);font-weight:600}
+.kao-notice-list{display:grid;gap:6px;margin:0;padding:0 0 0 20px;color:var(--kao-label);font-size:var(--f-subhead);line-height:1.45}
+.kao-notice-close{appearance:none;justify-self:end;min-height:44px;padding:0 4px;border:0;background:transparent;color:var(--kao-tint);font:inherit;font-weight:600;cursor:pointer}
+.kao-onboard-link:focus-visible,.kao-onboard-option:focus-visible,.kao-onboard-choice:focus-visible,.kao-onboard-chip:focus-visible,.kao-onboard-audio:focus-visible,.kao-notice-close:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
+@media (forced-colors:active){.kao-onboard-points,.kao-onboard-option,.kao-onboard-choice,.kao-onboard-chip,.kao-onboard-task,.kao-onboard-audio,.kao-notice{border-color:CanvasText;background:Canvas;color:CanvasText}.kao-onboard-chip[aria-pressed="true"]{background:Highlight;color:HighlightText}.kao-onboard-progress,.kao-onboard-lead,.kao-onboard-hint,.kao-onboard-label,.kao-onboard-kicker,.kao-onboard-option-sub,.kao-onboard-point-text{color:CanvasText}.kao-onboard-link,.kao-notice-close{color:LinkText}}
+/* KAO2-11 son */

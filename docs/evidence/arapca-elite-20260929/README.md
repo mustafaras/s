@@ -1,6 +1,6 @@
 # Arapça sekmesi · rehberli premium görünüm
 
-2026-09-29 kullanıcı isteği: Arapça sekmesinin tamamını daha özenli, akıcı ve yeni başlayanların rahat takip edeceği biçimde tasarlamak. Taban: `0f3d107e`. Bu teslim ayrı bir sunum düzenlemesidir; KAO2-13 başlatılmadı. Yeni görünüm yereldir, yayın yapılmadı.
+2026-09-29 kullanıcı isteği: Arapça sekmesinin tamamını daha özenli, akıcı ve yeni başlayanların rahat takip edeceği biçimde tasarlamak. Kaynak commit `4dbc89db`; GitHub Pages'te yayımlandı. Yayın kanıtı [YAYIN.md](YAYIN.md). KAO2-13 başlatılmadı.
 
 ## Tasarım ve kapsam
 

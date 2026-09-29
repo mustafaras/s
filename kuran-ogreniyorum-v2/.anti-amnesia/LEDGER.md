@@ -488,3 +488,14 @@ Kurallar:
 - scope: `kao2-yeniden-tasarim` dalı push, `main` fast-forward ve GitHub Pages deploy; KAO2-13 kapsam dışı.
 - releaseApproval: `approved_through_KAO2-12`; Pages ve canlı runtime hash doğrulaması bekleniyor.
 - next: KAO2-13
+
+## seq 52 · 2026-09-29 · NOTE · KAO2-12
+- status: verified
+- summary: KAO2-12 ve onaylı İlham & İbadet Arapça sekmesi kullanıcı yetkisiyle main'e fast-forward edilip GitHub Pages'te yayımlandı.
+- source: `94f866a60bbc8b10ae17c13b6f3cbee7789cad05`; `kao2-yeniden-tasarim` ve `main` 828c9ef7'den fast-forward eşitlendi.
+- actions: Pages run `36565235609` success; validate ve deploy PASS.
+- live: 9/9 değişen runtime varlığı HTTP 200 ve yerel SHA-256 ile birebir; STATE ve KAO2-12 KANIT runtime-only paket dışında beklenen 404.
+- pins: `app/styles.css` + `app/core/saygi.js` 20260929b; KAO runtime 20260928b.
+- evidence: `kuran-ogreniyorum-v2/evidence/KAO2-12/YAYIN.md` · `kuran-ogreniyorum-v2/evidence/KAO2-12/release-live.json`
+- evidence-levels: source/test PASS · Pages/run/hash PASS · device not verified
+- next: KAO2-13

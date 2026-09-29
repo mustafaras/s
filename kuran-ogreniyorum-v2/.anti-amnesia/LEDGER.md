@@ -339,3 +339,17 @@ Kurallar:
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: harita İlerleme'ye, âyet sayacı Günün âyeti ekranına taşındı (erişim korunur); İlerleme'de </main> işaretleme hatası düzeltildi; eski ana ekran CSS'i öksüz, KAO2-26 backlog
 - next: KAO2-10
+
+## seq 35 · 2026-09-29 · FIX · KAO2-08
+- status: done
+- summary: KAO2-00…09 denetimi. Tekrar borcu >60 iken yeni ünite başlangıcında nextStep `next-unit` döndürüyordu; 05 §10 "Bugün yalnız tekrar" kuralına aykırı (masteryAt KAO2-13'e kadar yazılmadığı için üretimde gizli). `lessonStep` next-unit'i yalnız fresh>0 iken seçer.
+- resolution: test_kao2_next_step.js yeni kenar satırı kırmızı→yeşil (14 kontrol); P3 kapıları yeşil.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-08/KANIT.md (Ek — FIX)
+- next: KAO2-10
+
+## seq 36 · 2026-09-29 · FIX · KAO2-09
+- status: done
+- summary: KAO2-00…09 denetimi. `app/kao.css` `.kao-path-more:focus-visible` `--quran-mid` → `--kao-tint` (yalnız --kao-* sözleşmesi; görsel fark yok). KANIT'taki CSS gzip 7,834 KiB yanlış kaydedilmişti: f3c9905c'de 7,822, FIX sonrası 7,817 KiB.
+- resolution: gates: syntax PASS · kao 25/25 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders PASS · driver PASS · zikr 95/95 · contrast 406/0 · perf PASS (runtime 60,088 KiB · css 7,817 KiB · p95 4,37 ms) · sync PASS.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-09/KANIT.md (Ek — FIX)
+- next: KAO2-10

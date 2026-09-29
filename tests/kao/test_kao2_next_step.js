@@ -138,6 +138,17 @@ check('(kenar) tekrar borcu > 60 → yeni kelime 0', () => {
   assert.equal(r.counts.reviews, 20);
 });
 
+check('(kenar) tekrar borcu > 60 + yeni ünite → next-unit değil, yalnız tekrar (05 §10)', () => {
+  const q = baseQ({ cards: reviewCards(61, PAST) });
+  doneLessons(q, 1);
+  q.path.units['1'] = { masteryAt: ISO, masteryScore: 0.9 };
+  const r = step(q);
+  assert.equal(r.kind, 'daily');
+  assert.deepEqual(plain(r.counts), { reviews: 20, fresh: 0 });
+  assert.doesNotMatch(r.title, /Sıradaki ünite/);
+  assert.match(r.subtitle, /önce tekrarları bitirelim/);
+});
+
 check('(kenar) 7+ gün ara → warmup (en zayıf 10)', () => {
   const q = baseQ({ cards: reviewCards(14, FUTURE) });
   q.daily['2026-09-20'] = { answered: 8, correct: 6, new: 2, reviewed: 6 };

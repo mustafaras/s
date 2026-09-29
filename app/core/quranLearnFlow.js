@@ -162,7 +162,8 @@
     var daily=obj(q.daily),lesson=current.progress.nextLesson,lp=lessonProgress(q,lesson.id,content);
     var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
     var minutes=estimateMinutes(daily,reviews+fresh,now,cap),counts={reviews:reviews,fresh:fresh};
-    if(current.previous&&!current.progress.started) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise,minutes,'kaoStart',lesson.id,counts);
+    // 05 §10: tekrar borcu yeni kelimeyi sıfırladıysa ünite tanıtımı yerine "yalnız tekrar" günü.
+    if(current.previous&&!current.progress.started&&fresh>0) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise,minutes,'kaoStart',lesson.id,counts);
     var subtitle=fresh>0?reviews+' tekrar + '+fresh+' yeni · ~'+minutes+' dk':reviews+' tekrar · önce tekrarları bitirelim · ~'+minutes+' dk';
     return step('daily',current.unit.title+' · Ders '+(current.progress.nextIndex+1),subtitle,minutes,'kaoStart',lesson.id,counts);
   }

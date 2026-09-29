@@ -2,31 +2,34 @@
 
 <!-- kao2-sync
 nextCard: KAO2-10
-lastSeq: 34
+lastSeq: 36
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq34
+Son güncelleme: 2026-09-29 · LEDGER seq36
 
 ## Şu an neredeyiz
-KAO2-00…09 tamamlandı (10/28). KAO2-09 Bugün ekranı (S-02) yerel commit olarak kapandı. Kullanıcı 2026-09-29'da "canlıya al" dedi; KAO2-07…09 yayını bu kapanıştan sonra ayrı makbuz commit'iyle kaydedilir.
+KAO2-00…09 tamamlandı (10/28). 2026-09-29'da KAO2-00…09 denetimi yapıldı: iki küçük kusur Dokun listesi içinde düzeltildi (seq35 Flow next-unit/borç, seq36 kao.css token + KANIT CSS ölçüm düzeltmesi). KAO2-07…09 ve denetim FIX'leri yalnız yerel; uzak `main` ve `kao2-yeniden-tasarim` 944dae6c'de (KAO2-06 yayını).
 
 ## Sıradaki kartın tek cümlesi
-KAO2-10: Hub kartı v2 — İlham & İbadet'teki KAO kartını `kaoNextStep` ile tek eylemli, sade bir karta dönüştür.
+KAO2-10: Hub kartı v2 — İlham & İbadet'teki KAO kartını `kaoNextStep` ile tek eylemli, sade bir karta dönüştür. Kullanıcı açıkça "devam" demeden başlanmaz.
 
 ## Canlı gerçekler
 - Ana ekran: HeroCard (nextStep; tek `.kao-primary`) + Yolun (seviye/ünite ilerlemesi; kapsam yalnız bilinen ≥1, sıfır kullanıcıda "İlk hedef") + Keşfet (Kısa sûreler, Namazda ne diyorum, Telaffuz stüdyosu, Günün âyeti) + Sen (İlerleme, Ayarlar).
-- Eylem eşlemesi: daily/next-unit/warmup/night/onboarding/mastery → kaoStart; s0 → kaoGate("start"); rest → kaoOpenAyah. Mushaf haritası İlerleme'de; âyet sayacı Günün âyeti ekranında.
-- Ayarlar anahtarları `role="switch"` + `aria-checked`; design contract (f) strict.
-- Müfredat 12 ünite · 109 ders; Flow `nextStep` motoru; `onboarding`/`path` normalizasyonu (KAO2-07…08).
-- Boyut: runtime gzip 60,031 KiB (≤80), CSS 7,834 KiB (≤14), içerik 168,483 KiB (≤256), p95 ≈4,2 ms. Pin `20260928b`.
-- P3: syntax, KAO 25/25, app 77/77, panel 23/23, panel-v2 27/27, Quran 9/9, reminders, driver, zikr 95/95, kontrast 406/0, sync PASS.
-- `KAO2-STATE.json`: KAO2-09 done, nextCard KAO2-10, ledger seq34, G2 closed, backlog 2 kayıt.
+- Eylem eşlemesi: daily/next-unit/warmup/night/onboarding/mastery → kaoStart; s0 → kaoGate("start"); rest → kaoOpenAyah. Mushaf haritası İlerleme'de; âyet sayacı Günün âyeti ekranında; Seviye 0 Ayarlar'dan.
+- Motor: tekrar borcu >60 → yeni 0 ve ünite tanıtımı yok (05 §10); 7+ gün ara → ısınma; sessionDone yalnız gündüz oturumu sonunda, render yazmaz.
+- Müfredat 12 ünite · 109 ders (Ü6 147/30, Ü10 98/20); araç iki koşuda bayt-eşit ve depoyla aynı.
+- Boyut: runtime gzip 60,088 KiB (≤80), CSS 7,817 KiB (≤14), içerik 168,483 KiB (≤256), p95 ≈4,4 ms. Pin `20260928b` (quranPhonicsV1 `20260924b`).
+- P3: syntax 4/4, KAO 25/25, app 77/77, panel 23/23, panel-v2 27/27, Quran 9/9, reminders, driver, zikr 95/95, kontrast 406/0, sync PASS.
+- `KAO2-STATE.json`: KAO2-09 done, nextCard KAO2-10, ledger seq36, G2 closed, backlog 2 kayıt, releaseApproval approved_through_KAO2-06.
 
 ## Açık riskler
-- Mastery ve onboarding eylemleri geçici olarak oturuma bağlı (KAO2-11/13). Eski ana ekran CSS'i öksüz (KAO2-26 backlog).
-- Pin korunduğu için çevrimdışı paket kuran cihazlar paket yenilenene dek eski tutarlı sürümü görebilir.
+- Mastery ve onboarding eylemleri geçici olarak oturuma bağlı (KAO2-11/13); masteryAt yazılmadığı için ana ekran Ünite 1 tamamlanınca "Ustalık" adımında kalır. Eski ana ekran CSS'i öksüz (KAO2-26 backlog). daily.ms yazılmıyor (KAO2-12 backlog).
+- Pin korunduğu için çevrimdışı paket kuran cihazlar paket yenilenene dek eski sürümü görebilir; `kaoNextStepFor` motor/müfredat yoksa hata fırlatır (yalnız KAO modalı etkilenir).
+- Perf p95 kapısı soğuk başlangıçta ara sıra eşiği aşar (tekrar koşuda PASS; bilinen gürültü).
 - G1, G3, G4 açık; kaynak/test kanıtı cihaz kabulü değildir.
 
 ## Bekleyen kullanıcı işleri
+- KAO2-07…09 + denetim FIX'lerinin yayını: `git push origin kao2-yeniden-tasarim` ve `git push origin HEAD:main` (kullanıcı çalıştırır).
 - Yayın sonrası gerçek cihazda ana ekran kabulü.
+- KAO2-10'a başlamak için açık "devam".

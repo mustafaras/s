@@ -47,3 +47,9 @@ Tam çıktı: `gates.txt`.
 - `action` değerleri (`kaoOnboarding`, `kaoOpenS0`, `kaoMastery`) henüz bağlı handler değil; KAO2-09/11/12 kartlarında bağlanacak tanımlayıcılardır. `kaoStart`/`kaoOpenAyah` mevcut.
 - `daily[].ms` henüz yazılmıyor; `estimateMinutes` bu yüzden şimdilik 0,55 dk/görev yedeğini kullanır (backlog: görev süresi kaydı ders oynatıcıyla, KAO2-12).
 - İlk açılış ekranı (KAO2-11) gelene kadar kart üreten her kullanıcı `legacy` sayılır; bu, mevcut kullanıcıya ilk açılışı göstermeme kuralının doğal sonucu.
+
+## Ek — FIX (KAO2-00…09 denetimi, 2026-09-29)
+- Bulgu: tekrar borcu >60 iken önceki ünite tamam ve yeni ünite başlamamışsa `nextStep` `next-unit` döndürüyordu ("Sıradaki ünite: …" + ünite vaadi, `counts.fresh=0`). Bu durum 05 §10 "Tekrar borcu çok (>60) → 'Bugün yalnız tekrar'; yeni kelime 0" kuralına aykırıydı. Pratik etkisi şimdilik gizli: `masteryAt` KAO2-13'e kadar yazılmadığından üretimde bu dala ulaşılamıyor.
+- Düzeltme: `app/core/quranLearnFlow.js` `lessonStep`: `next-unit` yalnız `fresh>0` iken seçilir; borçta `daily` + "önce tekrarları bitirelim" döner.
+- TDD: kırmızı `node tests/kao/test_kao2_next_step.js` → `AssertionError … actual: 'next-unit'` (exit 1); yeşil → `KAO2-08 next step: PASS (14 kontrol)`.
+- Bilerek değişen test: `test_kao2_next_step.js` yeni kenar satırı (sıkılaştırma; mevcut beklenti değişmedi).

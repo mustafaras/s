@@ -121,5 +121,5 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-path-unit{margin:8px 0 2px;color:var(--kao-label);font-size:var(--f-subhead);overflow-wrap:anywhere}
 .kao-path-meta,.kao-path-goal{margin:0 0 4px;color:var(--kao-label-2);font-size:var(--f-footnote);line-height:1.4;overflow-wrap:anywhere}
 .kao-path-more{appearance:none;width:100%;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding:0;border:0;border-top:1px solid var(--kao-sep);background:transparent;color:var(--kao-tint);font:inherit;font-size:var(--f-body);cursor:pointer}
-.kao-path-more:focus-visible{outline:3px solid var(--quran-mid);outline-offset:3px}
+.kao-path-more:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
 @media (forced-colors:active){.kao-hero-card,.kao-path-surface{border-color:CanvasText}.kao-path-bar{background:Canvas;outline:1px solid CanvasText}.kao-path-fill{background:Highlight}.kao-hero-eyebrow,.kao-hero-sub,.kao-hero-note,.kao-section-title,.kao-path-meta,.kao-path-goal,.kao-ayah-count{color:CanvasText}.kao-path-more{color:LinkText}}

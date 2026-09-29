@@ -60,3 +60,9 @@ Tam çıktı: `gates.txt`.
 - Eski ana ekran seçicileri (`.kao-home`, `.kao-hero`, `.kao-time-chip`, `.kao-summary`, `.kao-today`, `.kao-today-ayah`, `.kao-night`, `.kao-milestone`, `.kao-hero-copy`) artık öksüz; arşivlenmiş kontrast aracı (`docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs`) ve render testi bunlara bağlı olduğu için silinmedi → KAO2-26 kontrast denetiminde temizlenmeli. `.kao-undo` önceden öksüzdü.
 - Mastery adımı için henüz ustalık kontrolü yok; HeroCard "Pekiştirerek devam et" ile mevcut oturumu açar. `masteryAt` yazan akış gelene kadar (KAO2-13), dersleri türetilmiş olarak bitmiş kullanıcı ana ekranda ustalık başlığını görür ama öğrenmeye devam edebilir.
 - Onboarding eylemi KAO2-11'e kadar doğrudan oturum başlatır.
+
+## Ek — FIX (KAO2-00…09 denetimi, 2026-09-29)
+- Bulgu: `app/kao.css` `.kao-path-more:focus-visible` `var(--quran-mid)` kullanıyordu; KAO2-09 bloğu "yalnız --kao-* tokenları" sözleşmesine aykırı. Görsel etki yok: `--kao-tint` iki temada da `var(--quran-mid)`.
+- Düzeltme: `var(--kao-tint)` (kardeş odak kurallarıyla aynı token).
+- Ölçüm düzeltmesi: yukarıdaki "CSS gzip 7,834 KiB" f3c9905c'de yeniden ölçüldüğünde **7,822 KiB**; FIX sonrası 7,817 KiB. Runtime 60,088 KiB (Flow FIX'i dahil), içerik 168,483 KiB, p95 4,37 ms, kontrast 406 çift / 0 ihlal.
+- Bağımsız denetim (scratchpad, depo dışı): 32 aç/kapat kombinasyonunda 5/5 `role="switch"` + metinle tutarlı `aria-checked`; 11 görünüm × boş/tohumlu veride `.kao-primary` ≤1; sıfır kullanıcıda `%0` yok; eski ana ekran hedeflerinin tamamına erişim var (Harita → İlerleme, Seviye 0 → Ayarlar `kaoReopenGate`); views'a ve kullanıcı verisine HTML enjeksiyonu → ham etiket 0, geçersiz eylem onclick üretmiyor.

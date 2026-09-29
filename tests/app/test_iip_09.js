@@ -37,6 +37,7 @@ const person = { id: 'ada', name: 'Ada Lovelace', kind: 'Bilim', era: '19. yy', 
 const state = { days: { '2026-09-20': {} }, saygi: { collection: {}, streak: 0 } };
 const ui = { tab: 'saygi', faithTab: 'oz', saygiArticle: null, saygiPersonOpen: false };
 let quranCardState = 'ready';
+let kaoAvailable = true;
 const sandbox = {
   console, URL, URLSearchParams, Date, Math, JSON, Object, Array, String,
   Number, Boolean, RegExp, Error, Promise, Set, Map, Intl, encodeURIComponent,
@@ -72,7 +73,7 @@ const deps = {
   addDays: addDaysFixture, diffDays: () => 0, dayIndexFor: () => 1,
   dateLabelTR: value => value, icon: name => '<svg data-icon="' + esc(name) + '"></svg>', esc,
   featuresLive: () => true, render: () => {}, quranJourneyHubCardHTML: () => '<article id="quran-journey-card" class="quran-v2-preview" data-state="' + quranCardState + '">Kur’an kartı</article>',
-  kaoHubCardHTML: () => '<button id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()">Kur’an Arapçası Öğreniyorum</button>',
+  kaoHubCardHTML: () => kaoAvailable ? '<button id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()">Kur’an Arapçası Öğreniyorum</button>' : '',
   zikrVisible: () => true, zikrPreviewCardHTML: () => '<article class="zikr-v2-preview">Zikir</article>',
   prayer: true
 };
@@ -105,10 +106,11 @@ check('approved Arapça relocation removes the compact KAO card from Bugün',
   !today.includes('kao-hub-entry') && today.includes('quran-journey-card'));
 
 ui.faithTab = 'arapca';
+const beforeArabic = JSON.stringify(state);
 const arabic = registry.saygiPreviewHubHTML(person, null, false);
 check('Arapça tab renders a full learning overview with the four requested stages',
   arabic.includes('data-faith-tab="arapca"') && arabic.includes('iip-arabic-course') &&
-  ['Tanış', 'Kavram', 'Pekiştir', 'Uygula'].every(label => arabic.includes('<b>' + label + '</b>')));
+  ['Tanış', 'Anla', 'Pekiştir', 'Uygula'].every(label => arabic.includes('<b>' + label + '</b>')));
 check('Arapça tab uses the KAO read-only progress summary and one existing App.kaoOpen CTA',
   arabic.includes('BUGÜNKÜ DERSİN VE İLERLEMEN') && arabic.includes('kao-hub-entry') &&
   (arabic.match(/id="kao-hub-entry"/g) || []).length === 1 &&
@@ -116,6 +118,20 @@ check('Arapça tab uses the KAO read-only progress summary and one existing App.
 check('Arapça course uses a semantic heading and ordered learning path',
   arabic.includes('aria-labelledby="iip-arabic-course-title"') &&
   arabic.includes('<ol class="iip-arabic-course-path" aria-label="Öğrenme yolu">'));
+
+check('lesson action precedes the explanatory learning path',
+  arabic.indexOf('id="kao-hub-entry"') < arabic.indexOf('<ol class="iip-arabic-course-path"'));
+check('beginner help uses native disclosures without adding App actions',
+  (arabic.match(/<details /g) || []).length === 3 &&
+  (arabic.match(/<summary>/g) || []).length === 3 &&
+  (arabic.match(/onclick=/g) || []).length === 1);
+kaoAvailable = false;
+const unavailableArabic = registry.saygiPreviewHubHTML(person, null, false);
+check('unavailable learning entry has an honest fallback and no dead CTA',
+  unavailableArabic.includes('role="status"') && !unavailableArabic.includes('App.kaoOpen()') &&
+  !unavailableArabic.includes('Ders alanını aç;'));
+kaoAvailable = true;
+check('rendering the complete Arabic overview never writes progress or settings', JSON.stringify(state) === beforeArabic);
 
 ui.faithTab = 'oncu';
 const inspiration = registry.saygiPreviewHubHTML(person, null, false);
@@ -154,13 +170,13 @@ check('Arapça overview styles every new class and becomes a full-width mobile-f
     'iip-arabic-course-lead','iip-arabic-course-path','iip-arabic-course-step','iip-arabic-course-step-index',
     'iip-arabic-course-progress','iip-arabic-course-progress-label']
     .every(name => cssSource.includes('.saygi-page .' + name)) &&
-  cssSource.includes('grid-template-columns:repeat(2,minmax(0,1fr))') &&
+  cssSource.includes('.iip-arabic-course-path{display:grid;grid-template-columns:minmax(0,1fr)') &&
   cssSource.includes('.iip-arabic-course-progress .kao-hub-card{width:100%'));
 check('Arapça surface cache pins match the app shell and offline manifest',
-  indexSource.includes('app/styles.css?v=20260929b') &&
-  indexSource.includes('app/core/saygi.js?v=20260929b') &&
-  swSource.includes("'./app/styles.css?v=20260929b'") &&
-  swSource.includes("'./app/core/saygi.js?v=20260929b'"));
+  indexSource.includes('app/styles.css?v=20260929c') &&
+  indexSource.includes('app/core/saygi.js?v=20260929c') &&
+  swSource.includes("'./app/styles.css?v=20260929c'") &&
+  swSource.includes("'./app/core/saygi.js?v=20260929c'"));
 
 quranCardState = 'loading';
 ui.faithTab = 'oz';

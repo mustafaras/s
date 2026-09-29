@@ -233,12 +233,24 @@
       }).join('');
       body='<section class="kao-lesson-card kao-lesson-apply" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Çapa metni</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.lead)+'</p><ol class="kao-lesson-apply-list">'+words+'</ol></section>';
     }else if(model.stage==='summary'){
-      body='<section class="kao-lesson-card kao-lesson-summary" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.score)+'</p><p>'+escapeText(model.learned)+'</p></section>';
+      var learned=(Array.isArray(model.learnedWords)?model.learnedWords:[]).slice(0,10).map(function(word){
+        word=word&&typeof word==='object'?word:{};
+        return '<li class="kao-lesson-summary-word kao-lesson-apply-word"><span lang="ar" dir="rtl">'+escapeText(word.ar)+'</span><span>'+escapeText(word.meaning)+'</span></li>';
+      }).join('');
+      var accuracy=model.accuracy!==null&&Number.isFinite(Number(model.accuracy))?'<p class="kao-lesson-summary-accuracy"><strong>%'+escapeText(model.accuracy)+'</strong> doğruluk · '+escapeText(model.accuracyDetail)+'</p>':'<p class="kao-lesson-summary-accuracy">'+escapeText(model.accuracyDetail||'Pekiştirme yanıtı kaydı yok')+'</p>';
+      var more=Number(model.learnedMore)>0?'<p class="kao-lesson-summary-more">ve '+escapeText(model.learnedMore)+' daha</p>':'';
+      var words=learned?'<ol class="kao-lesson-apply-list">'+learned+'</ol>'+more:'<p class="kao-lesson-summary-empty">Bu oturumda yeni kelime tanıtılmadı.</p>';
+      var durable=model.durable?'<p class="kao-lesson-summary-durable">'+escapeText(model.durable)+'</p>':'';
+      var milestone=model.milestone?'<p class="kao-lesson-cognate">Bir kilometre taşını tamamladın: '+escapeText(model.milestone)+'.</p>':'';
+      var next=model.nextStep&&typeof model.nextStep==='object'?model.nextStep:null;
+      var nextHtml=next?'<section class="kao-lesson-anchor kao-lesson-summary-next" aria-labelledby="kao-lesson-summary-next-title"><h4 id="kao-lesson-summary-next-title">Sıradaki adım</h4><p>'+escapeText(next.title)+'</p><p>'+escapeText(next.subtitle)+'</p></section>':'';
+      body='<section class="kao-lesson-card kao-lesson-summary" aria-labelledby="kao-lesson-title" aria-live="polite"><p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
     }else{
       body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.promise)+'</p></section>';
     }
     var buttonLabel=escapeText(model.buttonLabel||'Devam');
-    return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" aria-label="Ders oynatıcı">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders adımı" aria-valuemin="1" aria-valuemax="'+escapeText(model.stepTotal||1)+'" aria-valuenow="'+escapeText(model.step||1)+'"><span style="width:'+String(Math.max(0,Math.min(100,Number(model.percent)||0)))+'%"></span></div>'+body+(model.actions?model.actions:'')+'<button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button></main>';
+    var secondaryCall=actionCall(model.secondaryAction),secondary=model.secondaryAction?'<button type="button" class="kao-lesson-audio kao-lesson-more"'+(secondaryCall?' onclick="'+secondaryCall+'"':' disabled')+'>'+escapeText(model.secondaryLabel||'5 dakika daha')+'</button>':'';
+    return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" aria-label="Ders oynatıcı">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders adımı" aria-valuemin="1" aria-valuemax="'+escapeText(model.stepTotal||1)+'" aria-valuenow="'+escapeText(model.step||1)+'"><span style="width:'+String(Math.max(0,Math.min(100,Number(model.percent)||0)))+'%"></span></div>'+body+(model.actions?model.actions:'')+'<button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button>'+secondary+'</main>';
   }
 
   // KAO2-11 · S-01 ilk açılış (05 §3) ve 05 §9 "Yeni düzen" notu. Eylemler yalnız actionCall ile üretilir.

@@ -1,27 +1,29 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-14
-lastSeq: 58
+nextCard: KAO2-15
+lastSeq: 59
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq58
+Son güncelleme: 2026-09-29 · LEDGER seq59
 
 ## Şu an neredeyiz
-KAO2-00…13 tamamlandı. KAO2-13 kaynak commit'i `d93db66`, kullanıcı yetkisiyle `main` ve `kao2-yeniden-tasarim` dallarına fast-forward edilerek `32ba39c` üzerinde yayımlandı. Pages run 36576010829 validate/deploy PASS; değişen üç KAO runtime dosyasının canlı SHA-256 değerleri yerel kaynakla eşleşti. Makbuz: `evidence/KAO2-13/YAYIN.md` ve `release-live.json`.
+KAO2-00…14 tamamlandı. KAO2-14, ders sonunda öğrenilen kelimeleri, yarınki tekrar planını ve sıradaki adımı S-07 özetinde gösterir. Tam P3 kapıları PASS; kanıt `evidence/KAO2-14/KANIT.md`. Bu kartın kaynak değişiklikleri yerel tek commit ile kapanacak; push/merge/deploy kapsamı yoktur.
 
 ## Sıradaki kartın tek cümlesi
-Sıradaki KAO2-14, oturum sonunda öğrenilenleri ve yarınki tekrarları özetleyen S-07 ekranıdır; bu oturumda başlanmadı.
+Sıradaki KAO2-15, 25 gramer kavramı için aranabilir ve yeni başlayanlara uygun S-10 Gramer notları kütüphanesidir; bu oturumda başlanmadı.
 
 ## Canlı gerçekler
-- Dal: `kao2-yeniden-tasarim`; yayın anında kaynak commit `d93db66`, `origin/main` ve `origin/kao2-yeniden-tasarim` yayın commit'i `32ba39c` idi.
-- `KAO2-STATE.json`: program `active`; KAO2-13 `done`; `nextCard=KAO2-14`; `ledgerLastSeq=58`.
-- `releaseApproval=approved_through_KAO2-13`; bu kullanıcı talimatı KAO2-13 için branch push, `main` fast-forward ve Pages deploy'u kapsar; KAO2-14 kapsam dışı. Tag yok. Cihaz kabulü doğrulanmadı.
+- Dal: `kao2-yeniden-tasarim`; kart başlangıcında HEAD `c1ebe168dfc4d79cfe6dfa446528c6b60603cdf1` idi ve `origin/main` ile `origin/kao2-yeniden-tasarim` aynı commit'teydi.
+- `KAO2-STATE.json`: program `active`; KAO2-14 `done`; `nextCard=KAO2-15`; `ledgerLastSeq=59`.
+- `releaseApproval=approved_through_KAO2-13`; bu kart için push, main'e fast-forward, tag veya Pages deploy yetkisi yoktur. Cihaz kabulü doğrulanmadı.
 - G0 kapalı, G1 sunulmuş, G2 kapalı; G3/G4 açık.
-- `kaoUnitSlices()` KAO2-16 taş geçişine kadar korunuyor. IIP Arapça keşif sekmesi KAO modalından ayrı; `saygi.js`, `app/styles.css`, yayındaki sekme dosyaları ve sürüm pinleri bu kartta değişmedi.
-- KAO2-13 test kapsamı: yalnız `tests/kao/test_kao_user_tasks.js` bölüm (b) ve bu senaryonun özet metriği (seq55 onayı).
+- KAO2-14 yalnız `app/core/quranLearn.js`, `app/core/quranLearnViews.js`, yeni `tests/kao/test_kao2_summary.js` ve P4 durum/kanıt kayıtlarını değiştirdi. `app/kao.css`, İlham & İbadet dosyaları ve cache pinleri değişmedi.
+- KAO özeti 06 tokenlı mevcut modal bileşenlerini kullanır; İlham & İbadet Arapça sekmesi ayrı keşif/giriş yüzeyidir. Ekran 320 px/%200 metin koşulunda tarayıcıda açılmadı; kaynak fikstürü daralabilir grid, token kullanımı, odak ve 44 px ikincil hedef kurallarını denetledi.
+- Kaynak/test: PASS · yayın: yapılmadı · cihaz: doğrulanmadı.
 
 ## Açık riskler ve bekleyen kullanıcı işleri
-- Gerçek cihaz kabulü doğrulanmadı; sonraki kart/yayın için ayrı kapsam ve güncel açık kullanıcı talimatı gerekir.
+- Gerçek cihaz kabulü doğrulanmadı; kullanıcı cihazı doğrulamasının yerine headless test geçmez.
 - G3/G4 kapıları açık kalıyor ve sonraki kartlarda kendi karar/inceleme koşulları geçerli.
+- Yeni bir yayın için açık kullanıcı talimatı gerekir; mevcut release approval yalnız KAO2-13'e kadar.

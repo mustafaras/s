@@ -558,3 +558,16 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-13/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-13/release-live.json
 - evidence-levels: kaynak/test PASS · Pages/run/hash PASS · cihaz doğrulanmadı.
 - next: KAO2-14
+
+## seq 59 · 2026-09-29 · CARD · KAO2-14
+- status: done
+- title: Ders ve tekrar özeti (S-07)
+- prev-commit: c1ebe168dfc4d79cfe6dfa446528c6b60603cdf1
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-14/KANIT.md
+- gates: syntax PASS · KAO 30/30 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders smoke PASS · driver PASS · zikr 95/95 PASS · contrast 562/0 PASS · sync PASS
+- metrics: summary 9/9 · kelime listesi 10 + 2 daha · fixture doğruluk %75 · yarın 2 tekrar/~2 dk · ek oturum tahmini ≤5 dk · içerik 168.483 KiB · runtime 76.767 KiB · CSS 9.990 KiB · isolated p95 4.671 ms
+- changed-tests: yeni `test_kao2_summary.js`; `test_kao_user_tasks.js` değişmedi
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: CSS değiştirilmedi; 320 px/%200 gerçek tarayıcı yerleşimi doğrulanmadı.
+- next: KAO2-15

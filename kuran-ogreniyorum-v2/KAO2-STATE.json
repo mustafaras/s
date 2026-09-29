@@ -6,7 +6,7 @@
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-11",
   "nextCard": "KAO2-12",
-  "ledgerLastSeq": 46,
+  "ledgerLastSeq": 48,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -202,7 +202,7 @@
       "id": "B-KAO2-12-1",
       "source": "KAO2-12",
       "target": "KAO2-12",
-      "note": "P6: yeni kaoLesson eylemi kırmızı yaptı test_kao2_today.js ve test_kao_user_tasks.js eski kaoStart/kaoGate beklentilerini pinliyor. App.kaoLesson (+1) ayrıca test_app_surface_daily_boundary.js ve test_v3_welcome.js App/onclick pinlerine dokunmayı gerektiriyor. Dokun kapsamı dışında; kullanıcı onayı bekleniyor."
+      "note": "P6 onayı kullanıcı tarafından 2026-09-29'da verildi (LEDGER seq47) ve dört onaylı fikstür güncellendi. Tam KAO ailesi ek olarak tests/kao/test_kao_render.js:87 eski App.kaoStart rotasını beklediği için kırmızı; yalnız bu assertion için yeni kapsam onayı bekleniyor (LEDGER seq48)."
     }
   ],
   "releaseApprovalRecord": {

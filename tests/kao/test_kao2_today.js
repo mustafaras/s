@@ -52,6 +52,10 @@ function primaryAction(html) {
   assert.equal(primary.length, 1, 'ekranda tek .kao-primary');
   return onclickOf(primary[0]);
 }
+function lessonAction(step) {
+  const id = typeof step.param === 'number' ? String(step.param) : `&quot;${step.param}&quot;`;
+  return `App.kaoLesson(&quot;start&quot;,${id})`;
+}
 function settle(q, lemmaIds) {
   // kaoKnownLemmaSet: iki yönde kalıcı (s≥21) kart = bilinen kelime.
   lemmaIds.forEach((id) => { for (const dir of ['ar>tr', 'tr>ar']) q.cards[`w:${id}:${dir}`] = { reps: 3, state: 'review', s: 25, d: 5, due: '2026-10-20T09:00:00.000Z' }; });
@@ -69,14 +73,21 @@ check('(a) sıfır kullanıcı: %0 yok, ilk hedef Fâtiha', () => {
 
 check('(b) tek birincil eylem ve nextStep eşlemesi', () => {
   reset();
-  assert.equal(api.kaoNextStep(new FixedDate()).kind, 'daily');
-  assert.equal(primaryAction(home()), 'App.kaoStart()', 'daily → kaoStart');
+  let step = api.kaoNextStep(new FixedDate());
+  assert.equal(step.kind, 'daily');
+  assert.equal(primaryAction(home()), lessonAction(step), 'daily → ders oynatıcı');
   reset({ doneAt: null, start: null });
   assert.equal(api.kaoNextStep(new FixedDate()).kind, 'onboarding');
   assert.equal(primaryAction(home()), 'App.kaoOnboard(&quot;start&quot;)', 'onboarding → KAO2-11 ilk açılış');
   let q = reset({ doneAt: ISO, start: 's0' });
-  assert.equal(api.kaoNextStep(new FixedDate()).kind, 's0-lesson');
-  assert.equal(primaryAction(home()), 'App.kaoGate(&quot;start&quot;)', 's0 → mevcut kapı/ders görünümü');
+  step = api.kaoNextStep(new FixedDate());
+  assert.equal(step.kind, 's0-lesson');
+  assert.equal(primaryAction(home()), lessonAction(step), 's0 → ders oynatıcı');
+  q = reset();
+  unit1.lessons.forEach((lesson) => { q.path.lessons[lesson.id] = { doneAt: ISO, score: 1 }; });
+  step = api.kaoNextStep(new FixedDate());
+  assert.equal(step.kind, 'mastery');
+  assert.equal(primaryAction(home()), lessonAction(step), 'ustalık → ders oynatıcı');
   q = reset();
   q.daily['2026-09-28'] = { answered: 10, sessionDone: true };
   assert.equal(api.kaoNextStep(new FixedDate()).kind, 'rest');
@@ -91,7 +102,7 @@ check('(b) tek birincil eylem ve nextStep eşlemesi', () => {
   const night = api.kaoNextStep(new FixedDate());
   assert.equal(night.kind, 'night-review');
   const html = home();
-  assert.equal(primaryAction(html), 'App.kaoStart()');
+  assert.equal(primaryAction(html), 'App.kaoStart()', 'gece penceresi yalnız vadeli tekrar yolunu korur');
   assert.match(html, /Gece tekrarına başla · en çok 8 kart/);
   assert.match(html, /class="kao-hero-foot"[\s\S]*Gece tekrarı açık/, 'gece satırı HeroCard altbilgisinde');
 });

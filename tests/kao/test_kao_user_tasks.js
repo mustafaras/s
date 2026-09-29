@@ -49,7 +49,7 @@ function answerAll(api, state, correctly) {
 
 const report = {};
 
-// (a) Hub kartından bugünkü oturuma: hub → E1 → oturum (≤3 adım); Ayarlar'dan da ≤3 adım.
+// (a) Hub kartından bugünkü ders tanışına: hub → E1 → hedef → ilk kelime (≤3 adım).
 {
   const { api, state } = boot();
   // KAO2-11: ilk açılışı bitirmiş sıfır kullanıcı (kartsız ve doneAt boş kullanıcı önce ilk açılışı görür).
@@ -57,13 +57,20 @@ const report = {};
   const hub = clicks(api.kaoHubCardHTML());
   assert.deepEqual(hub.map((item) => item.name), ['kaoOpen'], 'hub kartı tek dokunuşla açar');
   api.kaoOpen(); assert.equal(state.ui.kaoView, 'home');
-  const start = clicks(api.kaoHomeHTML('2026-09-26T09:00:00')).find((item) => item.name === 'kaoStart');
-  assert.ok(start, 'E1 üzerinde oturum başlat düğmesi');
-  assert.ok(api.kaoStart() >= 1); assert.equal(state.ui.kaoView, 'session');
-  assert.match(api.kaoTaskHTML(api.kaoBuildTask(state.ui.kaoQueue[0], state.data, { seed: state.ui.kaoQueue[0].id })), /id="kao-task"/);
+  const next = api.kaoNextStep(new Date('2026-09-26T09:00:00'));
+  const homeHTML = api.kaoHomeHTML('2026-09-26T09:00:00');
+  const start = homeHTML.match(/<button[^>]*class="kao-primary"[^>]*>/);
+  assert.ok(start, 'E1 üzerinde bugünkü dersi başlat düğmesi');
+  assert.match(start[0], /onclick="App\.kaoLesson\(/, 'düğme yeni ders eylemini çağırır');
+  assert.ok(start[0].includes(next.param), 'düğme doğru ders kimliğini taşır');
+  assert.equal(api.kaoLesson('start', next.param), true); assert.equal(state.ui.kaoView, 'session');
+  assert.equal(state.ui.kaoLesson.plan[state.ui.kaoLesson.at].kind, 'goal', 'ders hedefi ilk adım olarak açılır');
+  assert.equal(api.kaoLesson('next'), true);
+  assert.equal(state.ui.kaoLesson.plan[state.ui.kaoLesson.at].kind, 'intro', 'ilk tanış kartına geçer');
+  assert.match(api.kaoOverlayHTML(), /class="kao-lesson-ar" lang="ar" dir="rtl"/, 'Arapça tanış kartı açılır');
   const fromSettings = clicks(api.kaoSettingsHTML()).find((item) => item.name === 'kaoSetView' && item.args === "'home'");
   assert.ok(fromSettings, 'Ayarlar → E1 geri dönüşü');
-  report.taskA = { hubToSession: 2, settingsToSession: 2, limit: 3 };
+  report.taskA = { hubToFirstLemma: 3, settingsToSession: 2, limit: 3 };
 }
 
 // (b) Kelime kartından kök ağacına: E5 → 1 dokunuş; ünite listesinden 2 dokunuş.
@@ -201,4 +208,4 @@ for (const variant of [{ label: 'audio=false', quiet: false }, { label: 'sessiz 
 }
 
 if (process.argv.includes('--report')) console.log(JSON.stringify(report, null, 2));
-else console.log(`KAO user tasks: PASS (R-C9 a:${report.taskA.hubToSession} adım, b:${report.taskB.wordCardToRootTree} dokunuş, c: ses 0; geçiş p50 ${report.transition.p50Ms} ms / max ${report.transition.maxMs} ms; içerik gzip ${report.contentGzip.total} B${report.contentGzip.overBudget ? ' — 130 KB bütçesi AŞILDI, karar bekliyor' : ''}; kalibrasyon ECE ${report.calibration.ece}; gece oturumu ${report.night.nightSessionCards} kart)`);
+else console.log(`KAO user tasks: PASS (R-C9 a:${report.taskA.hubToFirstLemma} adım, b:${report.taskB.wordCardToRootTree} dokunuş, c: ses 0; geçiş p50 ${report.transition.p50Ms} ms / max ${report.transition.maxMs} ms; içerik gzip ${report.contentGzip.total} B${report.contentGzip.overBudget ? ' — 130 KB bütçesi AŞILDI, karar bekliyor' : ''}; kalibrasyon ECE ${report.calibration.ece}; gece oturumu ${report.night.nightSessionCards} kart)`);

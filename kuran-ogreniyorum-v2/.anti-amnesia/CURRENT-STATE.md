@@ -2,28 +2,26 @@
 
 <!-- kao2-sync
 nextCard: KAO2-12
-lastSeq: 46
+lastSeq: 48
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq46
+Son güncelleme: 2026-09-29 · LEDGER seq48
 
 ## Şu an neredeyiz
-KAO2-00…11 tamamlandı; son yayın KAO2-11 (`e827d24b`, Pages run 36545143962, canlı 16/16 hash eşliği). KAO2-12 için `lessonPlan`, ders oynatıcısı, FSRS ortak yanıt yolu ve A-1 üç dokunuş akışı çalışılıyor. Lesson-flow testi 8/8, onboarding testi 15/15 PASS. P3 KAO kapısında iki eski eylem beklentisi kırmızı oldu; §1 P6 gereği kart bloke edildi ve değiştirilen test dışı dosyalara onay bekleniyor.
+KAO2-00…11 tamamlandı; son yayın KAO2-11 (`e827d24b`, Pages run 36545143962, canlı 16/16 hash eşliği). KAO2-12'nin ders planı, oynatıcısı, FSRS ortak yanıt yolu ve A-1 üç dokunuş akışı uygulanmış durumda. Kullanıcı seq47'de dört P6 fikstürünün sınırlı güncellemesini onayladı; bunlar ve fx2 pinleri güncellendi. P3'ün diğer aileleri, strict tasarım, kontrast ve izole performans kapıları PASS. KAO ailesi `tests/kao/test_kao_render.js:87` eski `App.kaoStart()` eylem assertion'ında durdu. P6 gereği kart yeniden bloke edildi; yalnız bu assertion için kapsam onayı bekleniyor.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-12: `daily`/`s0-lesson`/`mastery` eylemlerini ders oynatıcısına geçir; P6 kapsamında gereken belirli test/pin satırlarını kullanıcı onayından sonra güncelle, tüm P3 kapılarını yeşile getir ve kartı tek committe kapat.
+KAO2-12: `tests/kao/test_kao_render.js:87` içindeki eski günlük eylem assertion'ını onay sonrası yeni ders rotasına geçir; tam KAO/P3 kapılarını yeşile getir ve kartı tek committe kapat.
 
 ## Canlı gerçekler
 - Release approval yalnız KAO2-11'e kadar (`approved_through_KAO2-11`); KAO2-12 push/deploy/tag yok.
-- KAO2-12 uygulama dosyaları: `app/core/quranLearnFlow.js`, `quranLearn.js`, `quranLearnViews.js`, `app/kao.css`, `app.js` yalnız `App.kaoLesson` shim'i; yeni `tests/kao/test_kao2_lesson_flow.js` ve A-1 genişletilmiş `tests/kao/test_kao2_onboarding.js`.
-- Test makbuzları: syntax 4/4 PASS; lesson-flow 8/8 PASS; onboarding 15/15 PASS. `test_kao2_today.js` daily eylem için eski `App.kaoStart()` bekliyor. `test_kao_user_tasks.js` ana eylem için eski `kaoStart` bekliyor. İki fikstür de değiştirilmedi.
-- Henüz çalıştırılmadı: tam KAO/app/panel/panel-v2/Quran/reminder P3 aileleri, driver, zikr, kontrast; FX2 pinleri ve sync-check P6 commit öncesi çalıştırılacak.
-- App yüzeyi son yayın ölçüsü 760 handler / 393 onclick'ti; KAO2-12'nin `App.kaoLesson` ve görünüm markup ölçümleri KAO2-11 onayının dışındadır.
-- Kanıt düzeyi kaynak/test; yayın ve cihaz kabulü yok. Cihaz kabulü kullanıcıda.
-
-## P6 kapsam engeli
-Yalnız KAO2-12 `Dokun` listesindeki dosyalara izin var. Yeni rota davranışı şu dış fikstürleri eski beklenti nedeniyle kırıyor: `tests/kao/test_kao2_today.js`, `tests/kao/test_kao_user_tasks.js`. `App.kaoLesson` sayacı/onclick pimi için `tests/app/test_app_surface_daily_boundary.js` ve `tests/app/test_v3_welcome.js` gerekir. KAO2-11 seq42 onayı bu karta taşınmaz. Kullanıcı bu dört dosyada yalnız ilgili assertion/pin güncellemelerini onaylarsa sürdür.
+- Ders oynatıcı üretimi önceki committe var: `app/core/quranLearnFlow.js`, `quranLearn.js`, `quranLearnViews.js`, `app/kao.css`, `app.js` shim.
+- Kullanıcının seq47 onayıyla `test_kao2_today.js`, `test_kao_user_tasks.js`, `test_app_surface_daily_boundary.js`, `test_v3_welcome.js` gerekli eylem/pin satırları güncellendi; `test_fx2_touch_coverage.js`, `test_fx2_tab_transition.js`, `test_fx2_overlay_motion.js` pinleri de güncellendi.
+- `test_kao2_today` 7/7, `test_kao_user_tasks` R-C9 3 dokunuş, `test_kao2_lesson_flow` 8/8, onboarding 15/15, strict tasarım PASS; kontrast 496 çift/0 ihlal; performans tek başına p95 4.382 ms.
+- P3 KAO dışında app, panel 23/23, panel-v2 27/27, Quran, reminders, driver, zikr 95/95, sync PASS. Tam KAO ailesi ilk sınır-dışı kırmızı testte P6 gereği durduruldu.
+- Yeni blocker tam olarak `tests/kao/test_kao_render.js:87`: eski `App.kaoStart()` beklentisi; gerçek eylem `App.kaoLesson("start","u01.01")`.
+- Kanıt düzeyi kaynak/test; yayın ve cihaz kabulü yok. KAO2-13'e geçme.
 
 ## Bekleyen kullanıcı işi
-KAO2-12'nin P6 çözümü için yukarıdaki dört test dosyasına sınırlı kapsam genişletmesini onayla ya da uygulama değişikliklerinin geri alınmasını iste. Onay yokken bu dört dosyaya dokunma; nextCard KAO2-12 olarak kalır.
+- Yalnız `tests/kao/test_kao_render.js:87` eylem assertion'ını yeni `App.kaoLesson("start","u01.01")` sözleşmesine güncelleme kapsamını onayla; başka assertion değişmeyecek.

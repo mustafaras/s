@@ -527,9 +527,9 @@ console.log('\n[6] app.js yüzeyi pinli');
 
 const appSource = read('app.js');
 const handlerCount = (appSource.match(/^App\.[A-Za-z0-9_$]+\s*=\s*function/gm) || []).length;
-// IIP-10 / DEC-07: App.saygiLens eklendi; 554 → 555.
-// Satır-başı assignment sayımı, aynı satırdaki KAO shimlerini ayrı saymaz.
-ok('App.* handler yüzeyi bozulmadı (556)', handlerCount === 556, 'ölçülen: ' + handlerCount);
+// IIP-10 / DEC-07: App.saygiLens eklendi; KAO2-12 App.kaoLesson mevcut kao shim satırına eklendi.
+// Satır-başı sayımı bir satır artmaz; toplam App handler kimliği daily-boundary testinde 761 olarak pinlenir.
+ok('App.* satır-başı yüzeyi pinli (556; KAO shim satırı paylaşımlı)', handlerCount === 556, 'ölçülen: ' + handlerCount);
 ok('app.js tanıtım sayfasına referans vermiyor',
   appSource.indexOf('v3-tanitim') < 0 && appSource.indexOf(V3_KEY) < 0);
 ok('sync.js tanıtım anahtarına dokunmuyor',
@@ -853,8 +853,8 @@ const combined = APP_SURFACE_FILES.map(read).join('') + quranLearnHubSrc;
 const surfaceCount = new Set(
   (combined.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((s) => s.match(/App\.[A-Za-z0-9_]+/)[0])
 ).size;
-ok('App yüzeyi pinli (760) — KAO2-11 ilk açılış handlerı dahil',
-  surfaceCount === 760, 'ölçülen: ' + surfaceCount);
+ok('App yüzeyi pinli (761) — KAO2-12 ders oynatıcı handlerı dahil',
+  surfaceCount === 761, 'ölçülen: ' + surfaceCount);
 ok('tıklama niteliği sayısı pinli (393) — KAO-21 gizlenen kart satırı dahil',
   (combined.match(/onclick=/g) || []).length === 393,
   'ölçülen: ' + (combined.match(/onclick=/g) || []).length);

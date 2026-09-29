@@ -445,3 +445,20 @@ Kurallar:
 - requested-scope: Eski günlük/s0/mastery eylem beklentilerini yeni App.kaoLesson rotasına geçirmek; eklenen handler/onclick değerlerini yalnız belirtilen iki app yüzey fikstüründe güncellemek. Üretim dışı, yalnız belirlenmiş assertion/pin satırları.
 - gates: syntax PASS · lesson-flow 8/8 PASS · onboarding 15/15 PASS · today FAIL (P6) · user_tasks FAIL (P6) · full P3 not run · sync pending
 - next: KAO2-12
+
+## seq 47 · 2026-09-29 · NOTE · KAO2-12
+- status: approved
+- summary: Kullanıcı P6 çözümünü onayladı: KAO2-12 günlük eylem rota assertion'ları ve yüzey sayısal pinleri için yalnız `tests/kao/test_kao2_today.js`, `tests/kao/test_kao_user_tasks.js`, `tests/app/test_app_surface_daily_boundary.js`, `tests/app/test_v3_welcome.js` değişebilir. fx2 pinleri zaten kartın Dokun kapsamındadır.
+- resolution: Kapsam genişletmesi yalnız test assertion/pin satırlarıyla sınırlı; üretim davranışına ek değişiklik yetkisi vermez. Kart kaldığı yerden sürüyor.
+- next: KAO2-12
+
+## seq 48 · 2026-09-29 · BLOCKED · KAO2-12
+- status: blocked
+- prev-commit: 7c29fb60
+- commit: HEAD+1
+- summary: seq47 kullanıcı onayıyla dört P6 fikstürü ve fx2 pinleri güncellendi; KAO2 tasarım/kontrast, uygulama, panel, panel-v2, Quran, reminder, driver, zikr ve sync kapıları yeşil. Tam KAO ailesi yeni bir eski rota beklentisinde durdu.
+- attempted: `node tests/kao/test_kao_render.js` → `tests/kao/test_kao_render.js:87` `App.kaoStart()` bekliyor; gerçek Bugün eylemi KAO2-12 ders oynatıcısı `App.kaoLesson("start","u01.01")`. Diğer eski `kaoGate` fixture'ları doğrudan kapı işlevini test ettiği için bilerek değiştirilmeyecek.
+- resolution: Yeni rota assertion'ı kapsam dışı ve seq47 onayında yoktu. Assertion zayıflatılmadı; yalnız satır 87'nin yeni eylem kimliği/parametresine geçirilmesi için kullanıcı onayı bekleniyor.
+- requested-scope: Yalnız `tests/kao/test_kao_render.js` satır 87'deki eski günlük başlangıç eylemi assertion'ını `App.kaoLesson("start","u01.01")` sözleşmesine güncelle; başka assertion'a dokunma.
+- gates: targeted KAO2 tests PASS · KAO performance isolated PASS (p95 4.382 ms) · contrast 496/0 PASS · strict design PASS · app/panel/panel-v2/Quran/reminders/driver/zikr PASS · full KAO STOP (render assertion, P6) · sync PASS
+- next: KAO2-12

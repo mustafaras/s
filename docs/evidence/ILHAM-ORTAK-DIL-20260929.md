@@ -30,3 +30,10 @@ KAO 26/26 · app 77/77 · panel 23/23 · panel-v2 27/27 · Quran 9/9 · reminder
 
 ## Görsel kanıt
 Kontrollü yerel QA (CLAUDE.md kural 1): yalnız 127.0.0.1:9000, geçici Chrome profili, sentetik tohum (token boş, `seyma-sync-force` yok, Guard 1 testi PASS), sentetik konum; sunucu iş sonunda durduruldu. 390 px, açık+koyu, önce/sonra görüntüler yerel scratchpad'de tutuldu (depoya eklenmedi). Kaynak-görsel kanıttır; cihaz kabulü değildir.
+
+## Yayın (2026-09-29, kullanıcı: "canlıya al")
+- Kaynak `5aaa6168`; `kao2-yeniden-tasarim` ve `main` `3d0fd11e`'den fast-forward.
+- Pages run [36537983076](https://github.com/mustafaras/s/actions/runs/36537983076) success (validate + deploy).
+- Canlı GET: `index.html`, `sw.js`, `app/styles.css`, `app/kao.css`, `app/core/quranLearn.js`, `app/core/quranLearnViews.js`, `app/core/saygi.js`, `app.js` → 8/8 HTTP 200 ve SHA-256 yerel ile birebir; canlı `index.html` `styles.css?v=20260929a` sunuyor; bu belge runtime paketinde yok (404, beklenen).
+- `sw.js` değiştiği için yeni service worker kurulur ve çevrimdışı paketi yeniler (KAO2-10 dahil güncel dosyalar paketli cihazlara da ulaşır; yeni worker, açık sekmeler kapanınca devreye girer).
+- Kanıt düzeyleri: kaynak/test ✓ · yayın ✓ · cihaz doğrulanmadı.

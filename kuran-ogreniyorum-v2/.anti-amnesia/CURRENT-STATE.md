@@ -2,18 +2,18 @@
 
 <!-- kao2-sync
 nextCard: KAO2-17
-lastSeq: 66
+lastSeq: 67
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq66
+Son güncelleme: 2026-09-29 · LEDGER seq67
 
 ## Şu an neredeyiz
 **KAO2-00…16 tamamlandı (17/28).** KAO2-16 taş katmanını düzeltti: Fâtiha taşı artık
 gerçek Fâtiha lemmalarına bağlı (eski sıklık dilimi koşulu 03 §2 gereği kaldırıldı),
 namaz taşı tüm namaz metinlerine, **besmele** ve **u1…u12** ünite taşları eklendi;
 eski kayıtlar korunur, geçiş idempotent ve kayıpsız. KAO2-15 ve öncesi 2026-09-29'da
-canlıya alınmıştı; KAO2-16 **yereldir, yayınlanmadı**.
+canlıya alınmıştı; KAO2-16 da canlıya alındı (pin `20260929e`).
 
 ## Sıradaki kartın tek cümlesi
 Sıradaki **KAO2-17**, 12 ünitenin ve derslerin Türkçe tanıtım/anlatı metinlerini
@@ -24,8 +24,7 @@ başlanmadı.
 - Dal: `kao2-yeniden-tasarim`; bu kartın tabanı `6dae1c9c` (canlı `main` ile aynı).
 - `KAO2-STATE.json`: program `active`; KAO2-16 `done`; `nextCard=KAO2-17`;
   `ledgerLastSeq=65`.
-- `releaseApproval=approved_through_KAO2-15`; **KAO2-16 ve sonrası yayınlanmadı**.
-  Push/merge/deploy için yeni açık kullanıcı talimatı gerekir.
+- `releaseApproval=approved_through_KAO2-16`; KAO2-17 ve sonrası için yeni açık talimat gerekir.
 - G0 kapalı, G1 sunulmuş, G2 kapalı; G3/G4 açık.
 - KAO2-16 kaynak değişiklikleri: `app/core/quranLearn.js` (taş koşulları, anahtar
   uzayı, etiketler, panel projeksiyonu, `kaoUnitSlices` kaldırıldı), iki yeni fikstür

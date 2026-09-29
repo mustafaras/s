@@ -676,3 +676,15 @@ Kurallar:
 - gates: KAO 33/33 · app 77/77 · panel 23/23 PASS (pin sonrası yeniden koşuldu)
 - evidence-levels: kaynak/test ✓ · yayın: pin sonrası yayınlanacak · cihaz —
 - next: KAO2-17
+## seq 67 · 2026-09-29 · NOTE · KAO2-16
+- status: verified
+- summary: KAO2-16 kullanıcı onayıyla yayımlandı; canlı varlıklar repo ile bayt-eş.
+- release-commit: `cbd07c51` (pin düzeltmesi dâhil); önceki paylaşılan taban `6dae1c9c`.
+- remote: dal ve `main` fast-forward ile `cbd07c51` üzerinde eşit.
+- actions: run 36593068552 success.
+- live: 6/6 dosya HTTP 200 + SHA-256 eşleşmesi; pinler `20260929e`; KAO2-STATE ve
+  KAO testi beklenen 404.
+- pins: KAO/SW ortak pin `20260929d` -> `20260929e`
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-16/YAYIN.md · release-live.json
+- evidence-levels: kaynak/test PASS · Pages/run/hash PASS · cihaz doğrulanmadı.
+- next: KAO2-17

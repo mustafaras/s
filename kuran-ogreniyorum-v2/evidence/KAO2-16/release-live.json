@@ -1,0 +1,85 @@
+{
+  "scope": "KAO2-16",
+  "sourceCommit": "395a1937",
+  "releaseCommit": "cbd07c51ab7f3e6016185322398930db74274026",
+  "remoteParity": {
+    "branch": "cbd07c51ab7f3e6016185322398930db74274026",
+    "main": "cbd07c51ab7f3e6016185322398930db74274026",
+    "previousSharedCommit": "6dae1c9c",
+    "mergeMode": "fast-forward",
+    "equal": true
+  },
+  "actions": [
+    {
+      "runId": 36593068552,
+      "headSha": "cbd07c51ab7f3e6016185322398930db74274026",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "live": {
+    "verifiedAt": "2026-09-29T15:20:00Z",
+    "commit": "cbd07c51ab7f3e6016185322398930db74274026",
+    "baseUrl": "https://mustafaras.github.io/s/",
+    "pins": {
+      "kaoRuntime": "20260929e",
+      "swVersion": "20260929e"
+    },
+    "assetCount": 5,
+    "assets": [
+      {
+        "path": "app/core/quranLearn.js",
+        "status": 200,
+        "bytes": 245762,
+        "sha256": "c73a9c691cc5999b7a5329e40b084c7d7d53963b3b716ad59e69e41f76a514b2",
+        "matchesLocal": true
+      },
+      {
+        "path": "app/core/quranLearnFlow.js",
+        "status": 200,
+        "bytes": 18304,
+        "sha256": "9288146bc86fdf41d1984d0a9bb5037c17990e5e3b6efbbac271a04567356dd2",
+        "matchesLocal": true
+      },
+      {
+        "path": "app/core/quranLearnViews.js",
+        "status": 200,
+        "bytes": 37052,
+        "sha256": "58c2bc802fda56d5f66ccbfa69b5366db681ecb2021489caf36e9a3d19047970",
+        "matchesLocal": true
+      },
+      {
+        "path": "app/kao.css",
+        "status": 200,
+        "bytes": 70181,
+        "sha256": "3dce7380644539033bcdb34fc81c68e0a1a2289dfa806900c3882e2e8b782fdc",
+        "matchesLocal": true
+      },
+      {
+        "path": "sw.js",
+        "status": 200,
+        "bytes": 17253,
+        "sha256": "47bb755083c006c8f99b178afd570a76d48889a93567b28ee8948bf6004b248d",
+        "matchesLocal": true
+      }
+    ],
+    "excludedPaths": [
+      {
+        "path": "kuran-ogreniyorum-v2/KAO2-STATE.json",
+        "status": 404,
+        "expected": 404
+      },
+      {
+        "path": "tests/kao/test_kao2_milestones.js",
+        "status": 404,
+        "expected": 404
+      }
+    ],
+    "deviceAcceptance": "not_verified"
+  },
+  "releaseAuthorization": {
+    "by": "user",
+    "date": "2026-09-29",
+    "scope": "KAO2-16; user said 'tam ve kusursuz uygulandığından emin ol ve canlıya al'"
+  }
+}

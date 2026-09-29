@@ -688,3 +688,24 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-16/YAYIN.md · release-live.json
 - evidence-levels: kaynak/test PASS · Pages/run/hash PASS · cihaz doğrulanmadı.
 - next: KAO2-17
+## seq 68 · 2026-09-29 · GATE · KAO2-17
+- status: presented
+- gate: G3 · metin incelemesi (L1 proje sahibi + L2 alan uzmanı) kullanıcıda
+- summary: 133 Türkçe metin (12 ünite, 109 ders, 12 S0) taslak olarak üretildi;
+  hepsi `draft` olduğu için uygulamada GÖRÜNMEZ. Kullanıcı `INCELEME-KAO2-17.md`
+  sayfasını onaylayınca araç onayları içerik kaynağına taşır.
+- evidence: kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md
+- next: KAO2-17
+
+## seq 69 · 2026-09-29 · CARD · KAO2-17
+- status: done
+- title: Ünite ve ders metinleri (K-4 protokolü)
+- prev-commit: 6173cb4e
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-17/KANIT.md
+- gates: syntax PASS · KAO 34/34 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr PASS · contrast PASS · perf PASS · git diff --check PASS
+- metrics: 12 ünite + 109 ders + 12 S0 = 133 metin · hepsi draft · curriculum gzip 13.952 KiB · içerik 172.676 KiB · runtime 79.399 KiB · yer tutucu ders başlıkları gerçek başlıklarla değişti
+- changed-tests: `test_kao2_path.js`, `test_kao_render.js`, `test_kao2_grammar_notes.js`, `test_kao2_milestones.js` (draft gizleme)
+- evidence-levels: kaynak/test PASS · yayın yok · cihaz doğrulanmadı
+- surprises: Yer tutucu ders başlıkları ("Ünite X · N. ders") ortaya çıktı ve düzeltildi; runtime boşluğu 0.6 KiB'e indi.
+- next: KAO2-18

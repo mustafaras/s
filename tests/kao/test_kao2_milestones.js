@@ -126,7 +126,8 @@ check('etiketler: besmele ve ünite taşları okunur, u1 ünite adını taşır'
   assert.match(labels.besmele, /Besmele/, 'besmele etiketi var');
   assert.match(labels.namaz, /Namaz/, 'namaz etiketi var');
   const first = CURRICULUM.units[0];
-  assert.match(labels.u1, new RegExp(first.title), 'u1 etiketi ünite adını taşır');
+  // KAO2-17: draft başlık gizlenir; taş etiketi güvenli başlığı kullanır.
+  assert.equal(labels.u1, api.kaoUnitTitle(first) + ' ünitesini bitirdim', 'u1 etiketi güncel ünite başlığını taşır');
   assert.equal(Object.keys(labels).filter((k) => /^u\d+$/.test(k)).length, 12, '12 ünite etiketi');
   completeUnit(q, 1);
   q.milestones.u1 = NOW;

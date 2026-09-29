@@ -39,10 +39,10 @@ Toplam: 12 ünite · 109 ders · 524 lemma · Seviye 0: 12 ders.
 - s0.06 · Dişli aile
 - s0.07 · Konum şekilleri
 - s0.08 · Sükûn ve kapalı hece
-- s0.09 · Uzatma (med) ve şedde
-- s0.10 · Kalan harfler
-- s0.11 · Tenvin, elif-lâm, vasıl
-- s0.12 · İlk okuma provası
+- s0.09 · Şedde ve uzatma
+- s0.10 · Boğaz harfleri
+- s0.11 · 'el' takısı
+- s0.12 · Vakıf ve akıcı okuma
 
 ## Ünite 1 · Fâtiha
 
@@ -111,7 +111,7 @@ Kavram: — · Uygula: prayer:fatiha
 
 Vaat: Tekbirden selâma kadar namazda söylediklerini anlayacaksın.
 
-### u02.01 · Namazın cümleleri · 1. ders
+### u02.01 · Yön belirten ekler
 
 Kavram: g3 '-de, -den, -e' kelimeleri · Uygula: prayer:tekbir
 
@@ -123,7 +123,7 @@ Kavram: g3 '-de, -den, -e' kelimeleri · Uygula: prayer:tekbir
 | 4 | إِنّ | inn | şüphesiz, gerçekten | `l_in_51f9c7` |
 | 5 | إِلَّا | illâ | ancak, -den başka | `l_il_aA_e925a2` |
 
-### u02.02 · Namazın cümleleri · 2. ders
+### u02.02 · Zamirler
 
 Kavram: g4 'o, onlar, sen, siz, ben, biz' · Uygula: examples
 
@@ -135,7 +135,7 @@ Kavram: g4 'o, onlar, sen, siz, ben, biz' · Uygula: examples
 | 4 | طَيِّبَٰت | tayyibât | temiz, helal ve hoş şeyler | `l_Tay_iba_t_e6ca86` |
 | 5 | بَرَكَٰت | barakât | bereketler, bolluklar | `l_baraka_t_188a75` |
 
-### u02.03 · Namazın cümleleri · 3. ders · ustalık
+### u02.03 · Namazda ne diyorum · ustalık
 
 Kavram: — · Uygula: examples
 
@@ -153,7 +153,7 @@ Kavram: — · Uygula: examples
 
 Vaat: İhlâs, Felak ve Nâs'ı anlayarak okuyacaksın.
 
-### u03.01 · Üç koruyucu sûre · 1. ders
+### u03.01 · Kelime sonundaki ekler
 
 Kavram: g5 Yapışık ekler: -ı, -leri, -in, -iniz, -im, -imiz · Uygula: surah:112
 
@@ -165,7 +165,7 @@ Kavram: g5 Yapışık ekler: -ı, -leri, -in, -iniz, -im, -imiz · Uygula: surah
 | 4 | لَم | lam | -madı, -medi | `l_lam_7f1b55` |
 | 5 | وَلَدَ | valada | doğurdu | `l_walada_bc1aa9` |
 
-### u03.02 · Üç koruyucu sûre · 2. ders
+### u03.02 · Olumsuzluk
 
 Kavram: g6 Olumsuzluk: lâ, lem, mâ · Uygula: surah:112
 
@@ -177,7 +177,7 @@ Kavram: g6 Olumsuzluk: lâ, lem, mâ · Uygula: surah:112
 | 4 | فَلَق | falak | sabah aydınlığı, şafak | `l_falaq_f1e2b8` |
 | 5 | مِن | min | -den, -dan | `l_min_1f6fa6` |
 
-### u03.03 · Üç koruyucu sûre · 3. ders
+### u03.03 · Yaratmak ve gece
 
 Kavram: — · Uygula: surah:113
 
@@ -189,7 +189,7 @@ Kavram: — · Uygula: surah:113
 | 4 | غَاسِق | gâsik | karanlığı basan (gece) | `l_gaAsiq_dc791e` |
 | 5 | إِذَا | izâ | -dığı zaman, -ınca | `l_i_aA_5b7376` |
 
-### u03.04 · Üç koruyucu sûre · 4. ders
+### u03.04 · Düğümlere üfleyenler
 
 Kavram: — · Uygula: surah:113
 
@@ -201,7 +201,7 @@ Kavram: — · Uygula: surah:113
 | 4 | عُقْدَة | ʿukdet | düğüm | `l_Euqodap_88823f` |
 | 5 | حَاسِد | hâsid | kıskanç, haset eden | `l_HaAsid_83cf8e` |
 
-### u03.05 · Üç koruyucu sûre · 5. ders
+### u03.05 · Kıskançlık ve vesvese
 
 Kavram: — · Uygula: surah:113
 
@@ -212,7 +212,7 @@ Kavram: — · Uygula: surah:113
 | 3 | مَلِك | malik | hükümdar, kral | `l_malik_2063d1` |
 | 4 | وَسْوَاس | vasvâs | vesvese veren, fısıldayan | `l_wasowaAs_75a11c` |
 
-### u03.06 · Üç koruyucu sûre · 6. ders · ustalık
+### u03.06 · Üç sûreyi birlikte okuma · ustalık
 
 Kavram: — · Uygula: surah:114
 
@@ -228,7 +228,7 @@ Kavram: — · Uygula: surah:114
 
 Vaat: Cümleleri birbirine bağlayan kelimeleri tanıyacaksın.
 
-### u04.01 · Kur'an'ın tutkalı · 1. ders
+### u04.01 · '-an, -en' bağları
 
 Kavram: g7 '-an, -en, ki o' bağları · Uygula: examples
 
@@ -240,7 +240,7 @@ Kavram: g7 '-an, -en, ki o' bağları · Uygula: examples
 | 4 | قَد | kad | muhakkak, gerçekten (geçmişte) | `l_qad_03fa2b` |
 | 5 | ثُمّ | summ | sonra, ardından | `l_vum_88b269` |
 
-### u04.02 · Kur'an'ın tutkalı · 2. ders
+### u04.02 · 'Şüphesiz' ve 'ancak'
 
 Kavram: g8 'Şüphesiz' ve 'ancak': inne, illâ · Uygula: examples
 
@@ -252,7 +252,7 @@ Kavram: g8 'Şüphesiz' ve 'ancak': inne, illâ · Uygula: examples
 | 4 | بَعْض | baʿd | bir kısım, bazı | `l_baEoD_256db1` |
 | 5 | عِند | ʿind | yanında, katında | `l_Eind_8fe318` |
 
-### u04.03 · Kur'an'ın tutkalı · 3. ders
+### u04.03 · 'ile' ve 'veya'
 
 Kavram: — · Uygula: examples
 
@@ -264,7 +264,7 @@ Kavram: — · Uygula: examples
 | 4 | لَن | lan | asla ... -mayacak | `l_lan_094a36` |
 | 5 | لَٰكِن | lâkin | ama, lakin | `l_la_kin_4550fb` |
 
-### u04.04 · Kur'an'ın tutkalı · 4. ders
+### u04.04 · 'ama' ve 'ise'
 
 Kavram: — · Uygula: examples
 
@@ -276,7 +276,7 @@ Kavram: — · Uygula: examples
 | 4 | فَوْق | favk | üst, üstünde | `l_fawoq_451ce1` |
 | 5 | أَلَآ | alâ | dikkat edin, bilin ki | `l_alaA_121826` |
 
-### u04.05 · Kur'an'ın tutkalı · 5. ders · ustalık
+### u04.05 · 'asla' ve 'sanki' · ustalık
 
 Kavram: — · Uygula: examples
 
@@ -293,7 +293,7 @@ Kavram: — · Uygula: examples
 
 Vaat: İşaret ve soru kelimeleriyle âyetin kime, neye döndüğünü göreceksin.
 
-### u05.01 · Bu, şu, kim, ne · 1. ders
+### u05.01 · İşaret kelimeleri
 
 Kavram: g9 Bu, şu, o, bunlar, onlar · Uygula: examples
 
@@ -305,7 +305,7 @@ Kavram: g9 Bu, şu, o, bunlar, onlar · Uygula: examples
 | 4 | كَيْف | kayf | nasıl? | `l_kayof_79814e` |
 | 5 | هَل | hal | ... mı? (soru) | `l_hal_232554` |
 
-### u05.02 · Bu, şu, kim, ne · 2. ders · ustalık
+### u05.02 · Soru kelimeleri · ustalık
 
 Kavram: g10 '-dır' yazılmaz: isim cümlesi · Uygula: examples
 
@@ -322,7 +322,7 @@ Kavram: g10 '-dır' yazılmaz: isim cümlesi · Uygula: examples
 
 Vaat: Kur'an'ın en sık isimlerini tanıyacaksın.
 
-### u06.01 · Gök, yer ve insan · 1. ders
+### u06.01 · Gök ve yer
 
 Kavram: g11 Sondaki yuvarlak 'te': dişil kelime · Uygula: examples
 
@@ -333,7 +333,7 @@ Kavram: g11 Sondaki yuvarlak 'te': dişil kelime · Uygula: examples
 | 3 | قَوْم | kavm | topluluk, halk | `l_qawom_d51842` |
 | 4 | نَفْس | nafs | kendi, can | `l_nafos_fde475` |
 
-### u06.02 · Gök, yer ve insan · 2. ders
+### u06.02 · Kitap ve kalp
 
 Kavram: g12 Çoğul: sona ek ya da içten değişim · Uygula: examples
 
@@ -343,7 +343,7 @@ Kavram: g12 Çoğul: sona ek ya da içten değişim · Uygula: examples
 | 2 | قَلْب | kalb | kalp, gönül | `l_qalob_e14dcc` |
 | 3 | عَذَاب | ʿazâb | azap, ceza | `l_Ea_aAb_4b9936` |
 
-### u06.03 · Gök, yer ve insan · 3. ders
+### u06.03 · Ödül ve karşılık
 
 Kavram: — · Uygula: examples
 
@@ -355,7 +355,7 @@ Kavram: — · Uygula: examples
 | 4 | حَقّ | hakk | gerçek, doğru | `l_Haq_3072cf` |
 | 5 | خَيْر | hayr | hayır, iyilik | `l_xayor_65557c` |
 
-### u06.04 · Gök, yer ve insan · 4. ders
+### u06.04 · Âyet ve işaret
 
 Kavram: — · Uygula: examples
 
@@ -367,7 +367,7 @@ Kavram: — · Uygula: examples
 | 4 | سَبِيل | sabîl | yol | `l_sabiyl_bdac41` |
 | 5 | دُون | dûn | -den başka | `l_duwn_bc1447` |
 
-### u06.05 · Gök, yer ve insan · 5. ders
+### u06.05 · Musa ve halkı
 
 Kavram: — · Uygula: examples
 
@@ -379,7 +379,7 @@ Kavram: — · Uygula: examples
 | 4 | يَد | yad | el | `l_yad_84953d` |
 | 5 | دُنْيَا | dunyâ | en yakın (hayat), dünya | `l_d_unoyaA_4c3c1e` |
 
-### u06.06 · Gök, yer ve insan · 6. ders
+### u06.06 · Güç ve sahiplik
 
 Kavram: — · Uygula: examples
 
@@ -391,7 +391,7 @@ Kavram: — · Uygula: examples
 | 4 | مَلَك | malak | melek | `l_malak_b3955c` |
 | 5 | مَثَل | masal | örnek, misal | `l_maval_5dedc0` |
 
-### u06.07 · Gök, yer ve insan · 7. ders
+### u06.07 · Mal ve dost
 
 Kavram: — · Uygula: examples
 
@@ -403,7 +403,7 @@ Kavram: — · Uygula: examples
 | 4 | أَوَّل | avval | birinci, ilk | `l_aw_al_3314ee` |
 | 5 | أَكْثَر | aksar | daha çok, çoğu | `l_akovar_f7f01e` |
 
-### u06.08 · Gök, yer ve insan · 8. ders
+### u06.08 · Oğullar ve arkadaşlar
 
 Kavram: — · Uygula: examples
 
@@ -415,7 +415,7 @@ Kavram: — · Uygula: examples
 | 4 | زَوْج | zavc | eş | `l_zawoj_99a6c2` |
 | 5 | أَخ | ah | kardeş | `l_ax_48233a` |
 
-### u06.09 · Gök, yer ve insan · 9. ders
+### u06.09 · Peygamber ve Firavun
 
 Kavram: — · Uygula: examples
 
@@ -427,7 +427,7 @@ Kavram: — · Uygula: examples
 | 4 | أَلِيم | alîm | acı veren, elem verici | `l_aliym_a29290` |
 | 5 | وَجْه | vach | yüz | `l_wajoh_c3bb4d` |
 
-### u06.10 · Gök, yer ve insan · 10. ders
+### u06.10 · Delil ve insan
 
 Kavram: — · Uygula: examples
 
@@ -439,7 +439,7 @@ Kavram: — · Uygula: examples
 | 4 | قَلِيل | kalîl | az, azıcık | `l_qaliyl_2b769c` |
 | 5 | قُرْءَان | kur'ân | okunan (Kitap), Kur'ân | `l_quro_aAn_5027d4` |
 
-### u06.11 · Gök, yer ve insan · 11. ders
+### u06.11 · İbrahim ve ev
 
 Kavram: — · Uygula: examples
 
@@ -451,7 +451,7 @@ Kavram: — · Uygula: examples
 | 4 | آبَاء | âbâ' | babalar, atalar | `l_A_baA_febd74` |
 | 5 | أُمَّة | ummet | topluluk, ümmet | `l_um_ap_e71e1a` |
 
-### u06.12 · Gök, yer ve insan · 12. ders
+### u06.12 · Oğul ve su
 
 Kavram: — · Uygula: examples
 
@@ -463,7 +463,7 @@ Kavram: — · Uygula: examples
 | 4 | نِسَآء | nisâ' | kadınlar | `l_nisaA_371a3e` |
 | 5 | نَذِير | nazîr | uyaran, uyarıcı | `l_na_iyr_9ec980` |
 
-### u06.13 · Gök, yer ve insan · 13. ders
+### u06.13 · Göz ve gündüz
 
 Kavram: — · Uygula: examples
 
@@ -475,7 +475,7 @@ Kavram: — · Uygula: examples
 | 4 | شَدِيد | şadîd | çetin, şiddetli | `l_adiyd_2db895` |
 | 5 | وَلَد | valad | çocuk, evlat | `l_walad_a334cd` |
 
-### u06.14 · Gök, yer ve insan · 14. ders
+### u06.14 · Nehir ve vade
 
 Kavram: — · Uygula: examples
 
@@ -486,7 +486,7 @@ Kavram: — · Uygula: examples
 | 3 | بَصِير | basîr | her şeyi gören | `l_baSiyr_69e5a4` |
 | 4 | تَحْت | taht | alt, altında | `l_taHot_fb7d9c` |
 
-### u06.15 · Gök, yer ve insan · 15. ders
+### u06.15 · Düşman ve yurt
 
 Kavram: — · Uygula: examples
 
@@ -497,7 +497,7 @@ Kavram: — · Uygula: examples
 | 3 | دَار | dâr | yurt, ev | `l_daAr_682c39` |
 | 4 | سَاعَة | sâʿet | kıyamet saati | `l_saAEap_ac5bf9` |
 
-### u06.16 · Gök, yer ve insan · 16. ders
+### u06.16 · İşiten ve gücü yeten
 
 Kavram: — · Uygula: examples
 
@@ -509,7 +509,7 @@ Kavram: — · Uygula: examples
 | 4 | أُولِى | ûlî | sahipler, -ler (topluluk) | `l_uwliY_3328a7` |
 | 5 | خَبِير | habîr | her şeyden haberdar | `l_xabiyr_dadb64` |
 
-### u06.17 · Gök, yer ve insan · 17. ders
+### u06.17 · Nuh ve ışık
 
 Kavram: — · Uygula: examples
 
@@ -521,7 +521,7 @@ Kavram: — · Uygula: examples
 | 4 | بَحْر | bahr | deniz | `l_baHor_61776d` |
 | 5 | وَيْل | vayl | yazıklar olsun! | `l_wayol_4f2e46` |
 
-### u06.18 · Gök, yer ve insan · 18. ders
+### u06.18 · Dağ ve günah
 
 Kavram: — · Uygula: examples
 
@@ -533,7 +533,7 @@ Kavram: — · Uygula: examples
 | 4 | سَيِّـَٔات | sayyiât | kötülükler, günahlar | `l_say_i_aAt_cbbfce` |
 | 5 | إِثْم | ism | günah, suç | `l_ivom_eafb0c` |
 
-### u06.19 · Gök, yer ve insan · 19. ders
+### u06.19 · Nimet ve geçimlik
 
 Kavram: — · Uygula: examples
 
@@ -545,7 +545,7 @@ Kavram: — · Uygula: examples
 | 4 | أُمّ | umm | anne | `l_um_dd7260` |
 | 5 | شَمْس | şams | güneş | `l_amos_c38bdc` |
 
-### u06.20 · Gök, yer ve insan · 20. ders
+### u06.20 · Topluluk ve kutsal
 
 Kavram: — · Uygula: examples
 
@@ -557,7 +557,7 @@ Kavram: — · Uygula: examples
 | 4 | وَٰحِدَة | vâhidet | bir, tek (dişil) | `l_wa_Hidap_1b129f` |
 | 5 | كَرِيم | karîm | değerli, cömert | `l_kariym_465d92` |
 
-### u06.21 · Gök, yer ve insan · 21. ders
+### u06.21 · Önderler ve kuvvet
 
 Kavram: — · Uygula: examples
 
@@ -569,7 +569,7 @@ Kavram: — · Uygula: examples
 | 4 | عَرْش | ʿarş | taht, arş | `l_Earo_7dbbdb` |
 | 5 | حَيْث | hays | -dığı yer | `l_Hayov_5b7279` |
 
-### u06.22 · Gök, yer ve insan · 22. ders
+### u06.22 · Ordu ve haber
 
 Kavram: — · Uygula: examples
 
@@ -581,7 +581,7 @@ Kavram: — · Uygula: examples
 | 4 | رِيح | rîh | rüzgâr | `l_riyH_14b7a7` |
 | 5 | حَدِيث | hadîs | söz, haber | `l_Hadiyv_d707e2` |
 
-### u06.23 · Gök, yer ve insan · 23. ders
+### u06.23 · Söz ve nesil
 
 Kavram: — · Uygula: examples
 
@@ -593,7 +593,7 @@ Kavram: — · Uygula: examples
 | 4 | بَاب | bâb | kapı | `l_baAb_51f669` |
 | 5 | لُوط | lût | Lut (peygamber) | `l_luwT_833109` |
 
-### u06.24 · Gök, yer ve insan · 24. ders
+### u06.24 · Ay ve Yusuf
 
 Kavram: — · Uygula: examples
 
@@ -605,7 +605,7 @@ Kavram: — · Uygula: examples
 | 4 | جَحِيم | cahîm | alevli ateş | `l_jaHiym_0170fa` |
 | 5 | ٱمْرَأَت | amra'at | kadın; eş | `l_mora_at_d761dc` |
 
-### u06.25 · Gök, yer ve insan · 25. ders
+### u06.25 · Semûd ve Âdem
 
 Kavram: — · Uygula: examples
 
@@ -617,7 +617,7 @@ Kavram: — · Uygula: examples
 | 4 | بَأْس | ba's | savaş, şiddet | `l_ba_os_3e2b64` |
 | 5 | بَعِيد | baʿîd | uzak | `l_baEiyd_8bccdd` |
 
-### u06.26 · Gök, yer ve insan · 26. ders
+### u06.26 · İsa ve dil
 
 Kavram: — · Uygula: examples
 
@@ -629,7 +629,7 @@ Kavram: — · Uygula: examples
 | 4 | مِيثَٰق | mîsâk | kesin söz, antlaşma | `l_m_iyva_q_ac1e15` |
 | 5 | عَاد | ʿâd | Âd (kavmi) | `l_EaAd2_f73727` |
 
-### u06.27 · Gök, yer ve insan · 27. ders
+### u06.27 · Muhtaç olmayan
 
 Kavram: — · Uygula: examples
 
@@ -641,7 +641,7 @@ Kavram: — · Uygula: examples
 | 4 | وَكِيل | vakîl | güvenilip işi bırakılan, vekil | `l_wakiyl_a481db` |
 | 5 | وَرَآء | varâ' | arka, geri | `l_waraA_905c82` |
 
-### u06.28 · Gök, yer ve insan · 28. ders
+### u06.28 · Gemi ve yoksul
 
 Kavram: — · Uygula: examples
 
@@ -653,7 +653,7 @@ Kavram: — · Uygula: examples
 | 4 | سَبْع | sabʿ | yedi (sayı) | `l_saboE_6a6f8c` |
 | 5 | يَتِيم | yatîm | yetim, öksüz | `l_yatiym_4a612b` |
 
-### u06.29 · Gök, yer ve insan · 29. ders
+### u06.29 · İyiler ve kötülük
 
 Kavram: — · Uygula: examples
 
@@ -666,7 +666,7 @@ Kavram: — · Uygula: examples
 | 5 | أَعْمَىٰ | aʿmâ | kör | `l_aEomaY_ea9134` |
 | 6 | شَهْر | şahr | ay (takvim) | `l_ahor_1c433f` |
 
-### u06.30 · Gök, yer ve insan · 30. ders · ustalık
+### u06.30 · İsimlerin dünyası · ustalık
 
 Kavram: — · Uygula: examples
 
@@ -684,7 +684,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Geçmiş zaman anlatılarını çözeceksin.
 
-### u07.01 · Oldu, yaptı · 1. ders
+### u07.01 · Geçmiş zaman:
 
 Kavram: g13 Geçmiş zaman: yaptı, yaptılar, yaptım · Uygula: examples
 
@@ -695,7 +695,7 @@ Kavram: g13 Geçmiş zaman: yaptı, yaptılar, yaptım · Uygula: examples
 | 3 | عَلِمَ | ʿalima | bildi | `l_Ealima_ceb6d7` |
 | 4 | جَآءَ | câ'a | geldi | `l_jaA_a_c0bd29` |
 
-### u07.02 · Oldu, yaptı · 2. ders
+### u07.02 · 'idi, oldu'
 
 Kavram: g14 Kâne: 'idi, oldu' · Uygula: examples
 
@@ -706,7 +706,7 @@ Kavram: g14 Kâne: 'idi, oldu' · Uygula: examples
 | 3 | كَفَرَ | kafara | inkâr etti | `l_kafara_af1746` |
 | 4 | كَذَّبَ | kazzaba | yalanladı | `l_ka_aba_15a65b` |
 
-### u07.03 · Oldu, yaptı · 3. ders
+### u07.03 · İnanmak ve yapmak
 
 Kavram: — · Uygula: examples
 
@@ -718,7 +718,7 @@ Kavram: — · Uygula: examples
 | 4 | قَتَلَ | katala | öldürdü | `l_qatala_ae1dd2` |
 | 5 | رَجَعَ | racaʿa | döndü | `l_rajaEa_39e51f` |
 
-### u07.04 · Oldu, yaptı · 4. ders
+### u07.04 · Duymak ve girmek
 
 Kavram: — · Uygula: examples
 
@@ -730,7 +730,7 @@ Kavram: — · Uygula: examples
 | 4 | رَزَقَ | razaka | rızık verdi | `l_razaqa_19085c` |
 | 5 | صَبَرَ | sabara | sabretti, katlandı | `l_Sabara_34dfc2` |
 
-### u07.05 · Oldu, yaptı · 5. ders
+### u07.05 · Vurmak ve çıkmak
 
 Kavram: — · Uygula: examples
 
@@ -742,7 +742,7 @@ Kavram: — · Uygula: examples
 | 4 | عَقَلُ | ʿakalu | akletti, kavradı | `l_Eaqalu_36636d` |
 | 5 | كَتَبَ | kataba | yazdı | `l_kataba_f09a6a` |
 
-### u07.06 · Oldu, yaptı · 6. ders
+### u07.06 · Şükretmek
 
 Kavram: — · Uygula: examples
 
@@ -754,7 +754,7 @@ Kavram: — · Uygula: examples
 | 4 | حَمَلَ | hamala | taşıdı, yüklendi | `l_Hamala_304f43` |
 | 5 | بَلَغَ | balaga | ulaştı, erişti | `l_balaga_f89222` |
 
-### u07.07 · Oldu, yaptı · 7. ders
+### u07.07 · Bırakmak ve toplamak
 
 Kavram: — · Uygula: examples
 
@@ -766,7 +766,7 @@ Kavram: — · Uygula: examples
 | 4 | ذَهَبَ | zahaba | gitti | `l_ahaba_3f10c5` |
 | 5 | نَفَعَ | nafaʿa | fayda verdi, yararlandı | `l_nafaEa_06e253` |
 
-### u07.08 · Oldu, yaptı · 8. ders
+### u07.08 · Kalmak ve güç yetirmek
 
 Kavram: — · Uygula: examples
 
@@ -778,7 +778,7 @@ Kavram: — · Uygula: examples
 | 4 | فَتَنُ | fatanu | sınadı; saptırmaya çalıştı | `l_fatanu_2455b0` |
 | 5 | لَعَنَ | laʿana | lanetledi, rahmetinden uzaklaştırdı | `l_laEana_bf347d` |
 
-### u07.09 · Oldu, yaptı · 9. ders · ustalık
+### u07.09 · Tuzak ve yükseltmek · ustalık
 
 Kavram: — · Uygula: examples
 
@@ -794,7 +794,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Şimdiki ve geniş zamanı tanıyacaksın.
 
-### u08.01 · Yapar, yapıyor · 1. ders
+### u08.01 · Şimdiki ve geniş zaman
 
 Kavram: g15 Şimdiki ve geniş zaman: yapar, yapıyor · Uygula: examples
 
@@ -806,7 +806,7 @@ Kavram: g15 Şimdiki ve geniş zaman: yapar, yapıyor · Uygula: examples
 | 4 | أَنفَقَ | anfaka | harcadı, infak etti | `l_anfaqa_0b12ad` |
 | 5 | أَتَى | atâ | geldi | `l_ataY_c25581` |
 
-### u08.02 · Yapar, yapıyor · 2. ders
+### u08.02 · Olumsuz şimdiki zaman
 
 Kavram: g16 Yapmaz, yapmadı, asla yapmayacak · Uygula: examples
 
@@ -818,7 +818,7 @@ Kavram: g16 Yapmaz, yapmadı, asla yapmayacak · Uygula: examples
 | 4 | وَجَدَ | vacada | buldu | `l_wajada_733e47` |
 | 5 | أَكَلَ | akala | yedi | `l_akala_0ec27c` |
 
-### u08.03 · Yapar, yapıyor · 3. ders
+### u08.03 · Korkmak ve emretmek
 
 Kavram: — · Uygula: examples
 
@@ -830,7 +830,7 @@ Kavram: — · Uygula: examples
 | 4 | جَزَىٰ | cazâ | karşılık verdi | `l_jazaY_a84a54` |
 | 5 | وَعَدَ | vaʿada | söz verdi, vaat etti | `l_waEada_9ae985` |
 
-### u08.04 · Yapar, yapıyor · 4. ders
+### u08.04 · Tövbe ve okumak
 
 Kavram: — · Uygula: examples
 
@@ -842,7 +842,7 @@ Kavram: — · Uygula: examples
 | 4 | جَرَيْ | caray | aktı; yürüdü | `l_jarayo_c231f0` |
 | 5 | مَسَّ | massa | dokundu, değdi | `l_mas_a_ba2e94` |
 
-### u08.05 · Yapar, yapıyor · 5. ders
+### u08.05 · Artırmak ve sanmak
 
 Kavram: — · Uygula: examples
 
@@ -854,7 +854,7 @@ Kavram: — · Uygula: examples
 | 4 | بِئْسَ | bi'sa | ne kötü! | `l_bi_osa_d43552` |
 | 5 | خَشِىَ | haşiya | (saygıyla) korktu, çekindi | `l_xa_iYa_982ede` |
 
-### u08.06 · Yapar, yapıyor · 6. ders
+### u08.06 · Razı olmak
 
 Kavram: — · Uygula: examples
 
@@ -866,7 +866,7 @@ Kavram: — · Uygula: examples
 | 4 | رَدَّ | radda | geri çevirdi, döndürdü | `l_rad_a_c68b16` |
 | 5 | نَسِىَ | nasiya | unuttu | `l_nasiYa_a017e1` |
 
-### u08.07 · Yapar, yapıyor · 7. ders
+### u08.07 · Yeterli gelmek
 
 Kavram: — · Uygula: examples
 
@@ -878,7 +878,7 @@ Kavram: — · Uygula: examples
 | 4 | سَآءَ | sâ'a | kötü oldu; üzdü | `l_saA_a_0909f5` |
 | 5 | عَفَا | ʿafâ | affetti, bağışladı | `l_EafaA_0e7e7b` |
 
-### u08.08 · Yapar, yapıyor · 8. ders
+### u08.08 · İsyan ve aramak
 
 Kavram: — · Uygula: examples
 
@@ -890,7 +890,7 @@ Kavram: — · Uygula: examples
 | 4 | كَادَ | kâda | az kaldı, neredeyse -ecekti | `l_kaAda_69a3ae` |
 | 5 | أَذِنَ | azina | izin verdi | `l_a_ina_39e033` |
 
-### u08.09 · Yapar, yapıyor · 9. ders · ustalık
+### u08.09 · Bağışlamak ve yürümek · ustalık
 
 Kavram: — · Uygula: examples
 
@@ -908,7 +908,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Emir ve dua cümlelerini anlayacaksın.
 
-### u09.01 · Yap, ver, bağışla · 1. ders
+### u09.01 · 'yap!, deyin!'
 
 Kavram: g17 Emir: yap!, deyin! · Uygula: examples
 
@@ -920,7 +920,7 @@ Kavram: g17 Emir: yap!, deyin! · Uygula: examples
 | 4 | آتَى | âtâ | verdi | `l_A_taY_2a778d` |
 | 5 | أَرَادَ | arâda | istedi, diledi | `l_araAda_e67825` |
 
-### u09.02 · Yap, ver, bağışla · 2. ders
+### u09.02 · 'ey …'
 
 Kavram: g18 Seslenme: ey … · Uygula: examples
 
@@ -932,7 +932,7 @@ Kavram: g18 Seslenme: ey … · Uygula: examples
 | 4 | تَوَلَّىٰ | tavallâ | yüz çevirdi | `l_tawal_aY_fdd891` |
 | 5 | أَطَاعَ | atâʿa | itaat etti, boyun eğdi | `l_aTaAEa_74ca26` |
 
-### u09.03 · Yap, ver, bağışla · 3. ders
+### u09.03 · Vahyetmek ve sevmek
 
 Kavram: — · Uygula: examples
 
@@ -944,7 +944,7 @@ Kavram: — · Uygula: examples
 | 4 | أَصَابَ | asâba | isabet etti, başa geldi | `l_aSaAba_7cb0f1` |
 | 5 | نَزَّلَ | nazzala | (parça parça) indirdi | `l_naz_ala_e7cda7` |
 
-### u09.04 · Yap, ver, bağışla · 4. ders
+### u09.04 · Savaşmak ve yok etmek
 
 Kavram: — · Uygula: examples
 
@@ -956,7 +956,7 @@ Kavram: — · Uygula: examples
 | 4 | نَبَّأَ | nabba'a | haber verdi, bildirdi | `l_nab_a_a_97ecfa` |
 | 5 | أَنذَرَ | anzara | uyardı, korkuttu | `l_an_ara_72baf2` |
 
-### u09.05 · Yap, ver, bağışla · 5. ders
+### u09.05 · Seslenmek ve tenzih
 
 Kavram: — · Uygula: examples
 
@@ -968,7 +968,7 @@ Kavram: — · Uygula: examples
 | 4 | أُدْخِلَ | udhila | (içeri) sokuldu, kondu | `l_udoxila_00b5ee` |
 | 5 | عَذَّبَ | ʿazzaba | azap etti, cezalandırdı | `l_Ea_aba_be4552` |
 
-### u09.06 · Yap, ver, bağışla · 6. ders
+### u09.06 · Dayanmak
 
 Kavram: — · Uygula: examples
 
@@ -980,7 +980,7 @@ Kavram: — · Uygula: examples
 | 4 | بُشِّرَ | buşşira | müjdeledi | `l_bu_ira_749280` |
 | 5 | نَجَّىٰ | naccâ | kurtardı | `l_naj_aY_521435` |
 
-### u09.07 · Yap, ver, bağışla · 7. ders
+### u09.07 · Açıklamak
 
 Kavram: — · Uygula: examples
 
@@ -992,7 +992,7 @@ Kavram: — · Uygula: examples
 | 4 | ٱبْتَغَىٰ | abtagâ | aradı, istedi | `l_botagaY_ad5f0f` |
 | 5 | أَعْرَضَ | aʿrada | yüz çevirdi, aldırış etmedi | `l_aEoraDa_78a3e1` |
 
-### u09.08 · Yap, ver, bağışla · 8. ders
+### u09.08 · Yöneltmek ve fayda
 
 Kavram: — · Uygula: examples
 
@@ -1004,7 +1004,7 @@ Kavram: — · Uygula: examples
 | 4 | أَصْبَحَ | asbaha | sabahladı; hâline geldi | `l_aSobaHa_69bc2c` |
 | 5 | ٱسْتَجَابَ | astacâba | karşılık verdi, icabet etti | `l_sotajaAba_abdb53` |
 
-### u09.09 · Yap, ver, bağışla · 9. ders
+### u09.09 · Kurtuluş ve çaba
 
 Kavram: — · Uygula: examples
 
@@ -1016,7 +1016,7 @@ Kavram: — · Uygula: examples
 | 4 | زَيَّنَ | zayyana | süsledi, güzel gösterdi | `l_zay_ana_5368d6` |
 | 5 | جَٰدَلُ | câdalu | tartıştı, çekişti | `l_ja_dalu_728397` |
 
-### u09.10 · Yap, ver, bağışla · 10. ders
+### u09.10 · Vefat ve kurtarmak
 
 Kavram: — · Uygula: examples
 
@@ -1029,7 +1029,7 @@ Kavram: — · Uygula: examples
 | 5 | سَخَّرَ | sahhara | boyun eğdirdi, emre amade kıldı | `l_sax_ara_9612f4` |
 | 6 | ٱشْتَرَىٰ | aştarâ | satın aldı | `l_otaraY_52a098` |
 
-### u09.11 · Yap, ver, bağışla · 11. ders · ustalık
+### u09.11 · Emir ve dua kalıpları · ustalık
 
 Kavram: — · Uygula: examples
 
@@ -1047,7 +1047,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Bir kökten Türkçedeki onlarca kelimeye uzanacaksın.
 
-### u10.01 · Bir kök, bir aile · 1. ders
+### u10.01 · Yapan ve yapılan
 
 Kavram: g19 Yapan ve yapılan: kâtib, mektûb · Uygula: examples
 
@@ -1059,7 +1059,7 @@ Kavram: g19 Yapan ve yapılan: kâtib, mektûb · Uygula: examples
 | 4 | حُكْم | hukm | hüküm, yargı | `l_Hukom_5dd24a` |
 | 5 | حِكْمَة | hikmet | hikmet, bilgelik | `l_Hikomap_d90667` |
 
-### u10.02 · Bir kök, bir aile · 2. ders
+### u10.02 · Fiilin adı
 
 Kavram: g20 Fiilin adı: bilme, anma, inanma · Uygula: examples
 
@@ -1071,7 +1071,7 @@ Kavram: g20 Fiilin adı: bilme, anma, inanma · Uygula: examples
 | 4 | مَغْفِرَة | magfiret | bağışlanma | `l_m_agofirap_60a926` |
 | 5 | كَٰفِرُون | kâfirûn | inkârcılar | `l_ka_firuwn_165d2d` |
 
-### u10.03 · Bir kök, bir aile · 3. ders
+### u10.03 · Daha iyi bilen
 
 Kavram: — · Uygula: examples
 
@@ -1083,7 +1083,7 @@ Kavram: — · Uygula: examples
 | 4 | ذِكْر | zikr | anma, hatırlama | `l_ikor_0e35a1` |
 | 5 | ذِكْرَىٰ | zikrâ | öğüt, hatırlatma | `l_ikoraY_20da2f` |
 
-### u10.04 · Bir kök, bir aile · 4. ders
+### u10.04 · İnkâr eden
 
 Kavram: — · Uygula: examples
 
@@ -1095,7 +1095,7 @@ Kavram: — · Uygula: examples
 | 4 | شَهِيد | şahîd | tanık, şahit | `l_ahiyd_b0cb34` |
 | 5 | شَهَٰدَة | şahâdet | tanıklık, şahitlik | `l_aha_dap_12afc0` |
 
-### u10.05 · Bir kök, bir aile · 5. ders
+### u10.05 · Tanıklık eden
 
 Kavram: — · Uygula: examples
 
@@ -1107,7 +1107,7 @@ Kavram: — · Uygula: examples
 | 4 | ظُلُمَٰت | zulumât | karanlıklar (çoğul) | `l_Zuluma_t_933b08` |
 | 5 | أَحْسَن | ahsan | daha güzel | `l_aHosan_e3fcdb` |
 
-### u10.06 · Bir kök, bir aile · 6. ders
+### u10.06 · Zulmetmek
 
 Kavram: — · Uygula: examples
 
@@ -1119,7 +1119,7 @@ Kavram: — · Uygula: examples
 | 4 | مُفْسِد | mufsid | bozguncu, fesat çıkaran | `l_mufosid_901e3a` |
 | 5 | صَٰلِح | sâlih | iyi, düzgün (iş/kişi) | `l_Sa_liH_30bb88` |
 
-### u10.07 · Bir kök, bir aile · 7. ders
+### u10.07 · İyi işler
 
 Kavram: — · Uygula: examples
 
@@ -1131,7 +1131,7 @@ Kavram: — · Uygula: examples
 | 4 | جَمِيع | camîʿ | hepsi, topluca | `l_jamiyE_be9182` |
 | 5 | أَجْمَعِين | acmaʿîn | hepsi, tamamı | `l_ajomaEiyn_0fc80b` |
 
-### u10.08 · Bir kök, bir aile · 8. ders
+### u10.08 · Toplamak ve hayat
 
 Kavram: — · Uygula: examples
 
@@ -1143,7 +1143,7 @@ Kavram: — · Uygula: examples
 | 4 | فَضْل | fadl | lütuf, ihsan | `l_faDol_4925b8` |
 | 5 | قِيَٰمَة | kiyâmet | diriliş, kalkış | `l_qiya_map_2880f6` |
 
-### u10.09 · Bir kök, bir aile · 9. ders
+### u10.09 · Diri ve yolunu kaybetmek
 
 Kavram: — · Uygula: examples
 
@@ -1155,7 +1155,7 @@ Kavram: — · Uygula: examples
 | 4 | أَمْر | amr | iş, durum | `l_amor_9fbe48` |
 | 5 | شَرِيك | şarîk | ortak | `l_ariyk_5de5f5` |
 
-### u10.10 · Bir kök, bir aile · 10. ders
+### u10.10 · Ölüm ve sapkınlık
 
 Kavram: — · Uygula: examples
 
@@ -1167,7 +1167,7 @@ Kavram: — · Uygula: examples
 | 4 | عَهْد | ʿahd | söz, ahit | `l_Eahod_2c711f` |
 | 5 | حِسَاب | hisâb | hesap, sorgu | `l_HisaAb_b41eae` |
 
-### u10.11 · Bir kök, bir aile · 11. ders
+### u10.11 · Ölmek ve nimet
 
 Kavram: — · Uygula: examples
 
@@ -1179,7 +1179,7 @@ Kavram: — · Uygula: examples
 | 4 | سَجَدَ | sacada | secde etti, yere kapandı | `l_sajada_c38135` |
 | 5 | مَسْجِد | mascid | secde yeri, mescit | `l_masojid_ddafe8` |
 
-### u10.12 · Bir kök, bir aile · 12. ders
+### u10.12 · Ölü ve secde
 
 Kavram: — · Uygula: examples
 
@@ -1191,7 +1191,7 @@ Kavram: — · Uygula: examples
 | 4 | مَعْرُوف | maʿrûf | uygun, iyi bilinen (şey) | `l_m_aEoruwf_413882` |
 | 5 | نَصَرَ | nasara | yardım etti | `l_naSara_e01de2` |
 
-### u10.13 · Bir kök, bir aile · 13. ders
+### u10.13 · Yardımcı ve zafer
 
 Kavram: — · Uygula: examples
 
@@ -1203,7 +1203,7 @@ Kavram: — · Uygula: examples
 | 4 | عَٰقِبَة | ʿâkibet | sonuç, akıbet | `l_Ea_qibap_313f20` |
 | 5 | عِقَاب | ʿikâb | ceza, karşılık | `l_EiqaAb_736634` |
 
-### u10.14 · Bir kök, bir aile · 14. ders
+### u10.14 · Son ve sürekli kalan
 
 Kavram: — · Uygula: examples
 
@@ -1215,7 +1215,7 @@ Kavram: — · Uygula: examples
 | 4 | مُجْرِم | mucrim | suçlu, günahkâr | `l_mujorim_63cb7c` |
 | 5 | سُوٓء | sû' | kötülük, fena şey | `l_suw_8ed869` |
 
-### u10.15 · Bir kök, bir aile · 15. ders
+### u10.15 · Görünmeyen ve sakınanlar
 
 Kavram: — · Uygula: examples
 
@@ -1227,7 +1227,7 @@ Kavram: — · Uygula: examples
 | 4 | مُلْك | mulk | hükümranlık, egemenlik | `l_mulok_138b85` |
 | 5 | جَزَآء | cazâ' | karşılık, ceza | `l_jazaA_22eebd` |
 
-### u10.16 · Bir kök, bir aile · 16. ders
+### u10.16 · İzin ve delil
 
 Kavram: — · Uygula: examples
 
@@ -1239,7 +1239,7 @@ Kavram: — · Uygula: examples
 | 4 | كَذِب | kazib | yalan, asılsız söz | `l_ka_ib_7a5632` |
 | 5 | كَٰذِب | kâzib | yalan söyleyen, yalancı | `l_ka_ib_807adf` |
 
-### u10.17 · Bir kök, bir aile · 17. ders
+### u10.17 · Kaybedenler
 
 Kavram: — · Uygula: examples
 
@@ -1251,7 +1251,7 @@ Kavram: — · Uygula: examples
 | 4 | سِحْر | sihr | büyü, sihir | `l_siHor_af28f3` |
 | 5 | غَٰفِل | gâfil | habersiz, dalgın | `l_ga_fil_8b70be` |
 
-### u10.18 · Bir kök, bir aile · 18. ders
+### u10.18 · Eşit ve boş
 
 Kavram: — · Uygula: examples
 
@@ -1263,7 +1263,7 @@ Kavram: — · Uygula: examples
 | 4 | خَوْف | havf | korku | `l_xawof_3af862` |
 | 5 | لِقَآء | likâ' | kavuşma, karşılaşma | `l_liqaA_390528` |
 
-### u10.19 · Bir kök, bir aile · 19. ders
+### u10.19 · Topluluk ve sığınak
 
 Kavram: — · Uygula: examples
 
@@ -1274,7 +1274,7 @@ Kavram: — · Uygula: examples
 | 3 | مَأْوَىٰ | ma'vâ | barınak, sığınılacak yer | `l_ma_owaY_b4a4a7` |
 | 4 | سَٰحِر | sâhir | büyücü | `l_sa_Hir_f05100` |
 
-### u10.20 · Bir kök, bir aile · 20. ders · ustalık
+### u10.20 · Kök ailesi · ustalık
 
 Kavram: — · Uygula: examples
 
@@ -1290,7 +1290,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Kalıp değişince anlamın nasıl kaydığını göreceksin.
 
-### u11.01 · Kalıplar · 1. ders
+### u11.01 · 'ilim' → 'talim'
 
 Kavram: g21 Kalıp değişince anlam kayar: ilim → talim · Uygula: examples
 
@@ -1301,7 +1301,7 @@ Kavram: g21 Kalıp değişince anlam kayar: ilim → talim · Uygula: examples
 | 3 | مُسْلِم | muslim | teslim olan, Müslüman | `l_musolim_c8bd6d` |
 | 4 | أَسْلَمَ | aslama | teslim oldu, Müslüman oldu | `l_asolama_25091d` |
 
-### u11.02 · Kalıplar · 2. ders
+### u11.02 · İnanan ve düşünen
 
 Kavram: — · Uygula: examples
 
@@ -1312,7 +1312,7 @@ Kavram: — · Uygula: examples
 | 3 | مُرْسَل | mursal | gönderilmiş elçi | `l_m_urosal_fc2a88` |
 | 4 | مُحْسِن | muhsin | iyilik eden | `l_muHosin_7e031b` |
 
-### u11.03 · Kalıplar · 3. ders
+### u11.03 · İman ve iyilik
 
 Kavram: — · Uygula: examples
 
@@ -1323,7 +1323,7 @@ Kavram: — · Uygula: examples
 | 3 | أَصْلَحَ | aslaha | düzeltti, ıslah etti | `l_aSolaHa_540483` |
 | 4 | أَحْيَا | ahyâ | diriltti, hayat verdi | `l_aHoyaA_35079e` |
 
-### u11.04 · Kalıplar · 4. ders
+### u11.04 · Esenlik dileği
 
 Kavram: — · Uygula: examples
 
@@ -1333,7 +1333,7 @@ Kavram: — · Uygula: examples
 | 2 | تَحِيَّة | tahiyyet | selamlama, esenlik dileği | `l_taHiy_ap_de08b0` |
 | 3 | أَمَاتَ | amâta | öldürdü, can aldı | `l_amaAta_5bf411` |
 
-### u11.05 · Kalıplar · 5. ders
+### u11.05 · Doğru yolu bulmak
 
 Kavram: — · Uygula: examples
 
@@ -1343,7 +1343,7 @@ Kavram: — · Uygula: examples
 | 2 | أَقَامَ | akâma | ayakta tuttu, dosdoğru kıldı | `l_aqaAma_382983` |
 | 3 | أَشْرَكَ | aşraka | ortak koştu, şirk koştu | `l_a_oraka_c73d6e` |
 
-### u11.06 · Kalıplar · 6. ders · ustalık
+### u11.06 · Ortak koşmak · ustalık
 
 Kavram: — · Uygula: examples
 
@@ -1358,7 +1358,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Şart ve zaman cümlelerini çözeceksin.
 
-### u12.01 · Eğer ve zaman · 1. ders
+### u12.01 · 'eğer', '-ınca', '-seydi'
 
 Kavram: g22 'Eğer', '-ınca', '-seydi' · Uygula: examples
 
@@ -1369,7 +1369,7 @@ Kavram: g22 'Eğer', '-ınca', '-seydi' · Uygula: examples
 | 3 | لَوْلَآ | lavlâ | -mese idi | `l_lawolaA_b76376` |
 | 4 | حَتَّىٰ | hattâ | ta ki, -e kadar | `l_Hat_aY_47c8d9` |
 
-### u12.02 · Eğer ve zaman · 2. ders
+### u12.02 · Zaman rengi veren fiiller
 
 Kavram: g23 Cümleye zaman rengi veren fiiller: kâne, leyse, asbaha · Uygula: examples
 
@@ -1380,7 +1380,7 @@ Kavram: g23 Cümleye zaman rengi veren fiiller: kâne, leyse, asbaha · Uygula: 
 | 3 | إِذ | iz | hani, o vakit | `l_i_a0c726` |
 | 4 | بَعْد | baʿd | sonra | `l_baEod_22102e` |
 
-### u12.03 · Eğer ve zaman · 3. ders · ustalık
+### u12.03 · Sık kalıplar · ustalık
 
 Kavram: g24 Kur'an'ın sık kalıpları · Uygula: examples
 

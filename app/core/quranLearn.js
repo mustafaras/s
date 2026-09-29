@@ -448,7 +448,7 @@
     var labels={};
     keysOf(KAO_MILESTONE_LABELS).forEach(function(key){ labels[key]=KAO_MILESTONE_LABELS[key]; });
     var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
-    units.forEach(function(unit){ labels['u'+unit.id]=String(unit.title||('Ünite '+unit.id))+' ünitesini bitirdim'; });
+    units.forEach(function(unit){ labels['u'+unit.id]=kaoUnitTitle(unit)+' ünitesini bitirdim'; });
     return labels;
   }
   function kaoMilestoneLabel(q){
@@ -621,7 +621,8 @@
       var units=(Array.isArray(level.unitIds)?level.unitIds:[]).map(function(id){
         var unit=kaoCurriculumUnit(id); if(!unit) return null;
         var progress=flow.unitProgress(q,unit.id,content),percent=progress.lessons?progress.lessonsDone/progress.lessons*100:0;
-        return {id:unit.id,title:unit.title,promise:unit.promise,percent:percent,ringLabel:unit.title+' ders ilerlemesi',progressText:progress.lessonsDone+' / '+progress.lessons+' ders',current:recommended&&String(recommended.unit.id)===String(unit.id),action:{name:'kaoNav',args:['unit',unit.id]}};
+        var t=kaoTextPair(unit,'Ünite ');
+        return {id:unit.id,title:t.t,promise:t.p,percent:percent,ringLabel:t.t+' ders ilerlemesi',progressText:progress.lessonsDone+' / '+progress.lessons+' ders',current:recommended&&String(recommended.unit.id)===String(unit.id),action:{name:'kaoNav',args:['unit',unit.id]}};
       }).filter(Boolean);
       return {id:level.id,title:level.title,kind:'units',units:units};
     });
@@ -653,7 +654,8 @@
       return match[2]==='edat-baglac'?'Edat ve bağlaç kelimeleri':'Kelime seçkisi';
     }).filter(Boolean);
     var next=progress.nextLesson,action=next?{name:'kaoLesson',args:['start',next.id]}:null,actionLabel=next?(progress.started?'Ders '+(progress.nextIndex+1)+'’e devam et':'Başla'):'';
-    return {id:unit.id,level:unit.level,title:unit.title,levelTitle:(window.QuranCurriculumV2.levels.find(function(level){ return level.id===unit.level; })||{}).title||'',promise:unit.promise,percent:progress.lessons?progress.lessonsDone/progress.lessons*100:0,wordsKnown:progress.known,wordsTotal:progress.words,lessonsDone:progress.lessonsDone,lessonsTotal:progress.lessons,lessons:lessons,concepts:concepts,words:words,anchor:anchors.join(' · '),completed:progress.lessons>0&&progress.lessonsDone===progress.lessons,action:action,actionLabel:actionLabel};
+    var ut=kaoTextPair(unit,'Ünite ');
+    return {id:unit.id,level:unit.level,title:ut.t,levelTitle:(window.QuranCurriculumV2.levels.find(function(level){ return level.id===unit.level; })||{}).title||'',promise:ut.p,percent:progress.lessons?progress.lessonsDone/progress.lessons*100:0,wordsKnown:progress.known,wordsTotal:progress.words,lessonsDone:progress.lessonsDone,lessonsTotal:progress.lessons,lessons:lessons,concepts:concepts,words:words,anchor:anchors.join(' · '),completed:progress.lessons>0&&progress.lessonsDone===progress.lessons,action:action,actionLabel:actionLabel};
   }
   function kaoUnitHTML(unitId){
     if(!quranLearnDeps) return '';
@@ -725,6 +727,31 @@
     if(!unit||typeof unit!=='object') return 'Ünite 1 · Kur’an’a giriş';
     return String(unit.title||unit.label||('Ünite '+String(unit.order||1)));
   }
+  // KAO2-17 · K-4: 'draft' metin kullanıcıya gösterilmez; güvenli yer tutucuya düşer.
+  function kaoReviewLevel(review){
+    var level=objectOr(review,{}).level;
+    return level==='sourced'||level==='expert'?level:'draft';
+  }
+  function kaoVisibleText(review,value,fallback){
+    return kaoReviewLevel(review)==='draft'?(fallback===undefined?null:fallback):(typeof value==='string'&&value?value:null);
+  }
+  function kaoUnitTitle(unit){
+    return kaoVisibleText(unit&&unit.review,unit&&unit.title,'Ünite '+String(unit.id));
+  }
+  function kaoTextPair(o,prefix){
+    var fallback=String(prefix||'Ünite ')+String(o.id);
+    return {t:kaoVisibleText(o.review,o.title,fallback),p:kaoVisibleText(o.review,o.promise,'')};
+  }
+  function kaoLessonTitle(lesson){
+    var fallback='Ünite '+String(lesson&&lesson.unitId||'')+' · Ders '+String(lesson&&lesson.index||'');
+    return kaoVisibleText(lesson&&lesson.review,lesson&&lesson.title,fallback);
+  }
+  function kaoTextSourceLabel(review){
+    var level=kaoReviewLevel(review);
+    if(level==='draft') return '';
+    var sources=review&&Array.isArray(review.sources)?review.sources.join(', '):'içerik modülü';
+    return 'Kaynak: '+sources;
+  }
   // KAO2-15 · S-10: gramer notları. Kavramlar yalnız salt-okunur içerik modülünden gelir;
   // her kavram ait olduğu ünitede en az bir derse bağlıdır (curriculum unit.conceptIds).
   function kaoGrammarConcept(id){
@@ -743,7 +770,7 @@
     var groups=units.map(function(unit){
       var items=concepts.filter(function(concept){ return Number(concept.unit)===Number(unit.id); });
       var level=levels.find(function(item){ return item.id===unit.level; });
-      var label='Seviye '+unit.level+' · '+String(level&&level.title||'')+' · Ünite '+unit.id+' '+unit.title;
+      var label='Seviye '+unit.level+' · '+String(level&&level.title||'')+' · '+kaoUnitTitle(unit);
       return {id:unit.id,label:label,concepts:items.map(function(concept){ return {id:concept.id,title:concept.title,plainTr:concept.plainTr,action:{name:'kaoNav',args:['concept',concept.id]}}; })};
     }).filter(function(group){ return group.concepts.length>0; });
     return {intro:'Bir kez oku, sonra kavramı ders içinde uygula.',groups:groups};
@@ -2258,7 +2285,7 @@
     }
     if(view==='unit'){
       var unit=kaoCurriculumUnit(value);
-      return unit?String(unit.title):'Ünite';
+      return unit?kaoUnitTitle(unit):'Ünite';
     }
     if(view==='concept'){
       var grammar=window.QuranGrammarV1,concept=grammar&&typeof grammar.byId==='function'?grammar.byId(String(value||'')):null;
@@ -2573,6 +2600,10 @@
     kaoUndo:kaoUndo,
     kaoMilestoneCheck:kaoMilestoneCheck,
     kaoMilestoneLabel:kaoMilestoneLabel,
+    kaoUnitTitle:kaoUnitTitle,
+    kaoLessonTitle:kaoLessonTitle,
+    kaoReviewLevel:kaoReviewLevel,
+    kaoTextSourceLabel:kaoTextSourceLabel,
     kaoMilestoneLabels:kaoMilestoneLabels,
     kaoCandidates:kaoCandidates,
     kaoWeakClass:kaoWeakClass,

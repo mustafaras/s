@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "note": "KAO2-17 Türkçe metin katmanı. K-4 üç katmanlı inceleme protokolü. Arapça YOK (D-12); metinler donmuş içerikten türetilir. 'why' dinî bağlam taşıyan ünitelerde kaynak zorunludur. review.level 'draft' iken kullanıcıya gösterilmez.",
+  "sources": {
+    "grammar-plain": "QuranGrammarV1.plainTr (kavram anlatımı)",
+    "lexicon-meanings": "QuranLexiconV1 lemma anlamları",
+    "surah-theme": "QuranRevelationOrderV1.themeTr",
+    "diyanet-meal": "Diyanet Kur'an-ı Kerim Meali — sûre başlıkları",
+    "tdv-sure": "TDV İslâm Ansiklopedisi — sûre maddeleri"
+  },
+  "units": {
+    "1": {
+      "title": "Fâtiha",
+      "promise": "Her namazda okuduğun Fâtiha'yı kelime kelime anlayacaksın.",
+      "why": "Fâtiha namazın her rekâtında okunur; günde onlarca kez tekrarladığın bu yedi âyeti anlamak, öğrendiğin ilk kelimeleri hemen gerçek bir metinde kullanmanı sağlar. Yeni başlayan biri için en güçlü çapa budur.",
+      "review": { "level": "draft", "sources": ["surah-theme", "diyanet-meal"] }
+    },
+    "2": {
+      "title": "Namazın cümleleri",
+      "promise": "Tekbirden selâma kadar namazda söylediklerini anlayacaksın.",
+      "why": "Namaz, kelimeleri en sık duyduğun yerdir. İftitah tekbirinden selama kadar geçen cümleleri anlamak, öğrendiklerini günde beş kez uygulamana imkân verir.",
+      "review": { "level": "draft", "sources": ["lexicon-meanings"] }
+    },
+    "3": {
+      "title": "Üç koruyucu sûre",
+      "promise": "İhlâs, Felak ve Nâs'ı anlayarak okuyacaksın.",
+      "why": "Bu üç kısa sûre hem yeni başlayan için okunması kolay hem de anlamı berrak metinlerdir; kelime dağarcığını ilk gerçek sûre okumalarında kullanırsın.",
+      "review": { "level": "draft", "sources": ["surah-theme", "diyanet-meal"] }
+    },
+    "4": {
+      "title": "Kur'an'ın tutkalı",
+      "promise": "Cümleleri birbirine bağlayan kelimeleri tanıyacaksın.",
+      "why": "Uzun cümleleri anlamayı zorlaştıran şey çoğu zaman bağlaçlardır. Bu küçük kelimeleri tanıyınca âyetin nerede bittiğini, nerede yeni bir fikir başladığını görürsün.",
+      "review": { "level": "draft", "sources": ["grammar-plain"] }
+    },
+    "5": {
+      "title": "Bu, şu, kim, ne",
+      "promise": "İşaret ve soru kelimeleriyle âyetin kime, neye döndüğünü göreceksin.",
+      "why": "İşaret ve soru kelimeleri, cümlenin kimi ya da neyi konu edindiğini gösterir. Bunları tanıdığında âyetin içinde kaybolmazsın.",
+      "review": { "level": "draft", "sources": ["grammar-plain"] }
+    },
+    "6": {
+      "title": "Gök, yer ve insan",
+      "promise": "Kur'an'ın en sık isimlerini tanıyacaksın.",
+      "why": "Kur'an'ın büyük bölümü isimlerden oluşur ve en sık geçen isimler gök, yer, insan gibi gündelik kavramlardır. Bunları öğrenmek, kapsam eğrisinde en hızlı ilerlediğin adımdır.",
+      "review": { "level": "draft", "sources": ["lexicon-meanings"] }
+    },
+    "7": {
+      "title": "Oldu, yaptı",
+      "promise": "Geçmiş zaman anlatılarını çözeceksin.",
+      "why": "Kur'an'ın önemli bir kısmı geçmişte olanları anlatır. Geçmiş zaman kalıbını tanıdığında kıssaları takip edebilirsin.",
+      "review": { "level": "draft", "sources": ["grammar-plain"] }
+    },
+    "8": {
+      "title": "Yapar, yapıyor",
+      "promise": "Şimdiki ve geniş zamanı tanıyacaksın.",
+      "why": "Şimdiki ve geniş zaman, süregelen işleri ve genel doğruları anlatır. Bu kalıpla âyetin şu an mı yoksa geçmişte mi olduğunu ayırt edersin.",
+      "review": { "level": "draft", "sources": ["grammar-plain"] }
+    },
+    "9": {
+      "title": "Yap, ver, bağışla",
+      "promise": "Emir ve dua cümlelerini anlayacaksın.",
+      "why": "Kur'an'da emir ve dua kalıpları sık geçer. Bunları tanımak, hem yönlendirmeyi hem de yakarışı ayırt etmeni sağlar.",
+      "review": { "level": "draft", "sources": ["grammar-plain"] }
+    },
+    "10": {
+      "title": "Bir kök, bir aile",
+      "promise": "Bir kökten Türkçedeki onlarca kelimeye uzanacaksın.",
+      "why": "Arapçada kelimeler ortak bir kökten türer. Tek bir kökü öğrenmek, aynı aileden gelen pek çok kelimeyi birden tanımanı sağlar; ilim, talim, muallim aynı köktendir.",
+      "review": { "level": "draft", "sources": ["grammar-plain", "lexicon-meanings"] }
+    },
+    "11": {
+      "title": "Kalıplar",
+      "promise": "Kalıp değişince anlamın nasıl kaydığını göreceksin.",
+      "why": "Aynı kökten gelen kelimeler kalıba göre farklı işler görür: yapan, yapılan, yapma. Kalıpları tanımak, bilmediğin bir kelimenin anlamını tahmin etmeni sağlar.",
+      "review": { "level": "draft", "sources": ["grammar-plain"] }
+    },
+    "12": {
+      "title": "Eğer ve zaman",
+      "promise": "Şart ve zaman cümlelerini çözeceksin.",
+      "why": "Şart ve zaman ifadeleri, bir olayın hangi koşulda ve ne zaman gerçekleştiğini söyler. Bunları tanımak, uzun cümleleri parçalara ayırmanı kolaylaştırır.",
+      "review": { "level": "draft", "sources": ["grammar-plain"] }
+    }
+  },
+  "s0": {
+    "s0.01": { "title": "Sağdan sola, harf ve hareke", "goal": "Yazının sağdan sola aktığını ve harflerin üstündeki küçük işaretlerin sesi verdiğini göreceksin.", "review": { "level": "draft" } },
+    "s0.02": { "title": "Nokta ailesi", "goal": "Aynı gövdeyi paylaşan harfleri noktalarına bakarak ayırt edeceksin.", "review": { "level": "draft" } },
+    "s0.03": { "title": "Esre ve ötre", "goal": "İki kısa ünlü işaretini tanıyıp sesini doğru çıkaracaksın.", "review": { "level": "draft" } },
+    "s0.04": { "title": "Çengel ailesi", "goal": "Çengelli harfleri yazılış biçiminden tanıyacaksın.", "review": { "level": "draft" } },
+    "s0.05": { "title": "Bağlanmayan harfler", "goal": "Sonraki harfe bağlanmayan harfleri göreceksin.", "review": { "level": "draft" } },
+    "s0.06": { "title": "Dişli aile", "goal": "Dişli harfleri ve aralarındaki farkı ayırt edeceksin.", "review": { "level": "draft" } },
+    "s0.07": { "title": "Konum şekilleri", "goal": "Bir harfin başta, ortada ve sonda nasıl değiştiğini göreceksin.", "review": { "level": "draft" } },
+    "s0.08": { "title": "Sükûn ve kapalı hece", "goal": "Ünsüzle kapanan heceyi tanıyıp duraksız okuyacaksın.", "review": { "level": "draft" } },
+    "s0.09": { "title": "Şedde ve uzatma", "goal": "İkizlenen harfi ve uzun okunan sesi ayırt edeceksin.", "review": { "level": "draft" } },
+    "s0.10": { "title": "Boğaz harfleri", "goal": "Boğazdan çıkan harfleri çıkış yerlerine göre ayırt edeceksin.", "review": { "level": "draft" } },
+    "s0.11": { "title": "'el' takısı", "goal": "Kelime başındaki 'el' takısını tanıyıp okuyuşa katacaksın.", "review": { "level": "draft" } },
+    "s0.12": { "title": "Vakıf ve akıcı okuma", "goal": "Nerede duracağını bilerek kısa bir metni baştan sona okuyacaksın.", "review": { "level": "draft" } }
+  },
+  "lessons": {
+    "u01.01": { "title": "Besmele", "goal": "Besmelenin üç kelimesini tanıyıp 'iş önce gelir' kuralını göreceksin.", "review": { "level": "draft" } },
+    "u01.02": { "title": "Rahîm ve Hamd", "goal": "Rahmet ve övgü kelimelerini, 'el' takısıyla birlikte okuyacaksın.", "review": { "level": "draft" } },
+    "u01.03": { "title": "Yalnız sana", "goal": "Kulluğun yalnız O'na yöneldiğini anlatan cümleyi çözeceksin.", "review": { "level": "draft" } },
+    "u01.04": { "title": "Doğru yol", "goal": "Yol ve doğru kelimeleriyle kurulan isteği anlayacaksın.", "review": { "level": "draft" } },
+    "u01.05": { "title": "Gazaba uğrayanlar değil", "goal": "Fâtiha'yı baştan sona kesintisiz anlamlandıracaksın.", "review": { "level": "draft" } },
+
+    "u02.01": { "title": "Yön belirten ekler", "goal": "'-de, -den, -e' anlamı veren küçük kelimeleri tanıyacaksın.", "review": { "level": "draft" } },
+    "u02.02": { "title": "Zamirler", "goal": "'ben, biz, sen, siz, o, onlar' kelimelerini namaz cümlesinde bulacaksın.", "review": { "level": "draft" } },
+    "u02.03": { "title": "Namazda ne diyorum", "goal": "Namaz cümlelerini baştan sona anlamlandıracaksın.", "review": { "level": "draft" } },
+
+    "u03.01": { "title": "Kelime sonundaki ekler", "goal": "İyelik ve çoğul eklerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u03.02": { "title": "Olumsuzluk", "goal": "'değil, asla' anlamı veren olumsuzluk kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u03.03": { "title": "Yaratmak ve gece", "goal": "Yaratma ve karanlık kelimelerini İhlâs ve Felak'te okuyacaksın.", "review": { "level": "draft" } },
+    "u03.04": { "title": "Düğümlere üfleyenler", "goal": "Felak sûresinin kötülük saydığı davranışları anlayacaksın.", "review": { "level": "draft" } },
+    "u03.05": { "title": "Kıskançlık ve vesvese", "goal": "Haset ve fısıltı kelimelerini Nâs sûresinde tanıyacaksın.", "review": { "level": "draft" } },
+    "u03.06": { "title": "Üç sûreyi birlikte okuma", "goal": "Üç koruyucu sûreyi baştan sona anlayarak okuyacaksın.", "review": { "level": "draft" } },
+
+    "u04.01": { "title": "'-an, -en' bağları", "goal": "Bir ismi tanımlayan '-an, -en' yapısını tanıyacaksın.", "review": { "level": "draft" } },
+    "u04.02": { "title": "'Şüphesiz' ve 'ancak'", "goal": "Pekiştirme ve sınırlama kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u04.03": { "title": "'ile' ve 'veya'", "goal": "Ekleme ve seçenek bildiren bağlaçları tanıyacaksın.", "review": { "level": "draft" } },
+    "u04.04": { "title": "'ama' ve 'ise'", "goal": "Karşıtlık ve karşılaştırma bağlaçlarını tanıyacaksın.", "review": { "level": "draft" } },
+    "u04.05": { "title": "'asla' ve 'sanki'", "goal": "Vurgu ve benzetme kelimeleriyle cümlenin tonunu okuyacaksın.", "review": { "level": "draft" } },
+
+    "u05.01": { "title": "İşaret kelimeleri", "goal": "'bu, şu, onlar' kelimeleriyle cümlenin kimi gösterdiğini göreceksin.", "review": { "level": "draft" } },
+    "u05.02": { "title": "Soru kelimeleri", "goal": "'kim, ne, hangi, nasıl' sorularıyla âyetin neyi sorduğunu anlayacaksın.", "review": { "level": "draft" } },
+
+    "u06.01": { "title": "Gök ve yer", "goal": "Kur'an'ın en sık geçen iki ismini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.02": { "title": "Kitap ve kalp", "goal": "Kitap ve kalp kelimeleriyle iç dünyayı anlatan cümleleri okuyacaksın.", "review": { "level": "draft" } },
+    "u06.03": { "title": "Ödül ve karşılık", "goal": "Karşılık ve durak kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.04": { "title": "Âyet ve işaret", "goal": "'âyet' kelimesinin delil anlamını göreceksin.", "review": { "level": "draft" } },
+    "u06.05": { "title": "Musa ve halkı", "goal": "Peygamber adlarını ve topluluk kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.06": { "title": "Güç ve sahiplik", "goal": "Güç ve sahip olma kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u06.07": { "title": "Mal ve dost", "goal": "Dünya malı ve yakınlık kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.08": { "title": "Oğullar ve arkadaşlar", "goal": "Aile ve arkadaşlık kelimelerini okuyacaksın.", "review": { "level": "draft" } },
+    "u06.09": { "title": "Peygamber ve Firavun", "goal": "Haber getiren elçi ve karşıt figür kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.10": { "title": "Delil ve insan", "goal": "Apaçık delil ve insan kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u06.11": { "title": "İbrahim ve ev", "goal": "Ev ve yemin kelimelerini kıssa bağlamında okuyacaksın.", "review": { "level": "draft" } },
+    "u06.12": { "title": "Oğul ve su", "goal": "Aile ve doğa kelimelerini birlikte tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.13": { "title": "Göz ve gündüz", "goal": "Görme ve zaman kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u06.14": { "title": "Nehir ve vade", "goal": "Doğa ve süre kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.15": { "title": "Düşman ve yurt", "goal": "Karşıtlık ve mekân kelimelerini okuyacaksın.", "review": { "level": "draft" } },
+    "u06.16": { "title": "İşiten ve gücü yeten", "goal": "İki sık geçen ismi tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.17": { "title": "Nuh ve ışık", "goal": "Peygamber adını ve aydınlık kelimesini okuyacaksın.", "review": { "level": "draft" } },
+    "u06.18": { "title": "Dağ ve günah", "goal": "Doğa ve sorumluluk kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u06.19": { "title": "Nimet ve geçimlik", "goal": "İyilik ve rızık kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.20": { "title": "Topluluk ve kutsal", "goal": "Grup ve kutsallık kelimelerini okuyacaksın.", "review": { "level": "draft" } },
+    "u06.21": { "title": "Önderler ve kuvvet", "goal": "Liderlik ve güç kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.22": { "title": "Ordu ve haber", "goal": "Kalabalık ve bildiri kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u06.23": { "title": "Söz ve nesil", "goal": "Konuşma ve soy kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.24": { "title": "Ay ve Yusuf", "goal": "Göksel varlık ve peygamber adını birlikte okuyacaksın.", "review": { "level": "draft" } },
+    "u06.25": { "title": "Semûd ve Âdem", "goal": "Topluluk ve ilk insan adlarını tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.26": { "title": "İsa ve dil", "goal": "Peygamber adını ve konuşma organını okuyacaksın.", "review": { "level": "draft" } },
+    "u06.27": { "title": "Muhtaç olmayan", "goal": "'Hiçbir şeye muhtaç olmayan' anlamını pekiştireceksin.", "review": { "level": "draft" } },
+    "u06.28": { "title": "Gemi ve yoksul", "goal": "Kıssa ve toplum kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u06.29": { "title": "İyiler ve kötülük", "goal": "Ahlaki karşıtlıkları okuyacaksın.", "review": { "level": "draft" } },
+    "u06.30": { "title": "İsimlerin dünyası", "goal": "Ünitenin en sık isimlerini birlikte pekiştireceksin.", "review": { "level": "draft" } },
+
+    "u07.01": { "title": "Geçmiş zaman:", "goal": "'yaptı, yaptılar, yaptım' kalıbını tanıyacaksın.", "review": { "level": "draft" } },
+    "u07.02": { "title": "'idi, oldu'", "goal": "İndirme ve gönderme fiillerini geçmiş zamanda okuyacaksın.", "review": { "level": "draft" } },
+    "u07.03": { "title": "İnanmak ve yapmak", "goal": "Geçmiş zamanda inanma fiilini tanıyacaksın.", "review": { "level": "draft" } },
+    "u07.04": { "title": "Duymak ve girmek", "goal": "Algı ve hareket fiillerini geçmiş zamanda okuyacaksın.", "review": { "level": "draft" } },
+    "u07.05": { "title": "Vurmak ve çıkmak", "goal": "Hareket bildiren fiilleri ayırt edeceksin.", "review": { "level": "draft" } },
+    "u07.06": { "title": "Şükretmek", "goal": "Teşekkür ve sanma fiillerini geçmiş zamanda tanıyacaksın.", "review": { "level": "draft" } },
+    "u07.07": { "title": "Bırakmak ve toplamak", "goal": "Terk etme ve bir araya getirme fiillerini okuyacaksın.", "review": { "level": "draft" } },
+    "u07.08": { "title": "Kalmak ve güç yetirmek", "goal": "Süreklilik ve yeterlilik fiillerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u07.09": { "title": "Tuzak ve yükseltmek", "goal": "Geçmiş zaman fiillerini kıssa bağlamında pekiştireceksin.", "review": { "level": "draft" } },
+
+    "u08.01": { "title": "Şimdiki ve geniş zaman", "goal": "'yapar, yapıyor' kalıbını tanıyacaksın.", "review": { "level": "draft" } },
+    "u08.02": { "title": "Olumsuz şimdiki zaman", "goal": "'yapmaz, yapmadı' olumsuzluğunu okuyacaksın.", "review": { "level": "draft" } },
+    "u08.03": { "title": "Korkmak ve emretmek", "goal": "Duygu ve buyruk fiillerini şimdiki zamanda tanıyacaksın.", "review": { "level": "draft" } },
+    "u08.04": { "title": "Tövbe ve okumak", "goal": "Dönüş ve okuma fiillerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u08.05": { "title": "Artırmak ve sanmak", "goal": "Çoğaltma ve zan fiillerini okuyacaksın.", "review": { "level": "draft" } },
+    "u08.06": { "title": "Razı olmak", "goal": "Hoşnutluk ve engelleme fiillerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u08.07": { "title": "Yeterli gelmek", "goal": "Yeterlilik ve yasaklama fiillerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u08.08": { "title": "İsyan ve aramak", "goal": "Karşı gelme ve isteme fiillerini okuyacaksın.", "review": { "level": "draft" } },
+    "u08.09": { "title": "Bağışlamak ve yürümek", "goal": "Şimdiki zaman fiillerini pekiştireceksin.", "review": { "level": "draft" } },
+
+    "u09.01": { "title": "'yap!, deyin!'", "goal": "Emir kalıbının tekil ve çoğul biçimini tanıyacaksın.", "review": { "level": "draft" } },
+    "u09.02": { "title": "'ey …'", "goal": "Seslenme kalıbıyla başlayan cümleleri okuyacaksın.", "review": { "level": "draft" } },
+    "u09.03": { "title": "Vahyetmek ve sevmek", "goal": "Bildirme ve sevgi fiillerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u09.04": { "title": "Savaşmak ve yok etmek", "goal": "Şiddet ve yok etme fiillerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u09.05": { "title": "Seslenmek ve tenzih", "goal": "Çağrı ve tenzih fiillerini okuyacaksın.", "review": { "level": "draft" } },
+    "u09.06": { "title": "Dayanmak", "goal": "Gösterme ve tevekkül fiillerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u09.07": { "title": "Açıklamak", "goal": "Beyan ve yönelme fiillerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u09.08": { "title": "Yöneltmek ve fayda", "goal": "Çevirme ve yarar fiillerini okuyacaksın.", "review": { "level": "draft" } },
+    "u09.09": { "title": "Kurtuluş ve çaba", "goal": "Başarı ve gayret fiillerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u09.10": { "title": "Vefat ve kurtarmak", "goal": "Son verme ve kurtarma fiillerini okuyacaksın.", "review": { "level": "draft" } },
+    "u09.11": { "title": "Emir ve dua kalıpları", "goal": "Ünitenin fiillerini birlikte pekiştireceksin.", "review": { "level": "draft" } },
+
+    "u10.01": { "title": "Yapan ve yapılan", "goal": "Bir kökten 'yapan' ve 'yapılan' kelimelerini türeteceksin.", "review": { "level": "draft" } },
+    "u10.02": { "title": "Fiilin adı", "goal": "'bilme, anma, inanma' isimlerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u10.03": { "title": "Daha iyi bilen", "goal": "Karşılaştırma kalıbını okuyacaksın.", "review": { "level": "draft" } },
+    "u10.04": { "title": "İnkâr eden", "goal": "Yapan ismini olumsuz bağlamda tanıyacaksın.", "review": { "level": "draft" } },
+    "u10.05": { "title": "Tanıklık eden", "goal": "Tanıklık ve iş kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u10.06": { "title": "Zulmetmek", "goal": "Haksızlık ve iyilik kavramlarını okuyacaksın.", "review": { "level": "draft" } },
+    "u10.07": { "title": "İyi işler", "goal": "Güzel ameller ve rızık kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u10.08": { "title": "Toplamak ve hayat", "goal": "Yaşam ve doğru yol kelimelerini okuyacaksın.", "review": { "level": "draft" } },
+    "u10.09": { "title": "Diri ve yolunu kaybetmek", "goal": "Canlılık ve sapma karşıtlığını tanıyacaksın.", "review": { "level": "draft" } },
+    "u10.10": { "title": "Ölüm ve sapkınlık", "goal": "Son ve yitirme kelimelerini okuyacaksın.", "review": { "level": "draft" } },
+    "u10.11": { "title": "Ölmek ve nimet", "goal": "Geçiş ve iyilik kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u10.12": { "title": "Ölü ve secde", "goal": "Durum ve eylem kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u10.13": { "title": "Yardımcı ve zafer", "goal": "Destek ve başarı kelimelerini okuyacaksın.", "review": { "level": "draft" } },
+    "u10.14": { "title": "Son ve sürekli kalan", "goal": "Zaman ve kalıcılık kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u10.15": { "title": "Görünmeyen ve sakınanlar", "goal": "Gizlilik ve korunma kavramlarını okuyacaksın.", "review": { "level": "draft" } },
+    "u10.16": { "title": "İzin ve delil", "goal": "Yetki ve kanıt kelimelerini ayırt edeceksin.", "review": { "level": "draft" } },
+    "u10.17": { "title": "Kaybedenler", "goal": "Kayıp ve arınma kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u10.18": { "title": "Eşit ve boş", "goal": "Denklik ve geçersizlik kelimelerini okuyacaksın.", "review": { "level": "draft" } },
+    "u10.19": { "title": "Topluluk ve sığınak", "goal": "Grup ve barınma kelimelerini tanıyacaksın.", "review": { "level": "draft" } },
+    "u10.20": { "title": "Kök ailesi", "goal": "Bir kökten türeyen kelimeleri birlikte pekiştireceksin.", "review": { "level": "draft" } },
+
+    "u11.01": { "title": "'ilim' → 'talim'", "goal": "Aynı kökten gelen 'ilim' ve 'talim' kelimelerinin kalıp farkını göreceksin.", "review": { "level": "draft" } },
+    "u11.02": { "title": "İnanan ve düşünen", "goal": "İnanç ve düşünme kalıplarını tanıyacaksın.", "review": { "level": "draft" } },
+    "u11.03": { "title": "İman ve iyilik", "goal": "İnanç ve güzel davranış kalıplarını okuyacaksın.", "review": { "level": "draft" } },
+    "u11.04": { "title": "Esenlik dileği", "goal": "Selamlaşma kalıbını tanıyacaksın.", "review": { "level": "draft" } },
+    "u11.05": { "title": "Doğru yolu bulmak", "goal": "Hidayet kalıbını okuyacaksın.", "review": { "level": "draft" } },
+    "u11.06": { "title": "Ortak koşmak", "goal": "Kalıpları karşıtlık içinde pekiştireceksin.", "review": { "level": "draft" } },
+
+    "u12.01": { "title": "'eğer', '-ınca', '-seydi'", "goal": "Şart kalıplarını tanıyacaksın.", "review": { "level": "draft" } },
+    "u12.02": { "title": "Zaman rengi veren fiiller", "goal": "Zaman bildiren yardımcı fiilleri okuyacaksın.", "review": { "level": "draft" } },
+    "u12.03": { "title": "Sık kalıplar", "goal": "Şart ve zaman kalıplarını birlikte pekiştireceksin.", "review": { "level": "draft" } }
+  }
+}

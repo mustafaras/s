@@ -73,7 +73,8 @@ check('liste: 25 kavram ünite sırasıyla gruplanır, her grup seviye ve ünite
     const unit = CURRICULUM.units.find((item) => item.id === concept.unit);
     const level = CURRICULUM.levels.find((item) => item.id === unit.level);
     assert.ok(html.includes(`Seviye ${unit.level} ·`), `grup seviye başlığı: ${concept.unit}`);
-    assert.ok(html.includes(`Ünite ${unit.id} ${unit.title}`), `grup ünite adı: ${concept.unit}`);
+    // KAO2-17: draft başlıklar gizlenir; grup başlığı güvenli 'Ünite N' biçimine düşer.
+    assert.ok(html.includes(api.kaoUnitTitle(unit)), `grup ünite adı: ${concept.unit}`);
     assert.ok(html.includes(level.title), `seviye adı: ${concept.unit}`);
     assert.ok(html.includes(concept.title), `kavram satırı: ${concept.id}`);
   }

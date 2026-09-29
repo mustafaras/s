@@ -12,6 +12,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SPEC = 'kuran-ogreniyorum-v2/content/curriculum.spec.json';
 const OUT_MODULE = 'app/content/quranCurriculumV2.js';
 const OUT_REVIEW = 'kuran-ogreniyorum-v2/inceleme/MUFREDAT-ESLEME.md';
+const TEXTS = 'kuran-ogreniyorum-v2/content/texts.tr.json';
+const OUT_TEXT_REVIEW = 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md';
 const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
 
 function fail(message) {
@@ -171,7 +173,25 @@ function lessonsFor(ids, byId, size, minChunks) {
 const pad = (n) => String(n).padStart(2, '0');
 const draft = () => ({ level: 'draft' });
 
-function build(spec, content) {
+// KAO2-17: Türkçe metin katmanı. Arapça içeremez (D-12); review.level 'draft' iken
+// kullanıcıya gösterilmez. Eksik metin güvenli yer tutucuya düşer, build kırılmaz.
+function readTexts() {
+  const raw = fs.readFileSync(path.join(ROOT, TEXTS), 'utf8');
+  if (ARABIC.test(raw)) fail('metin kaynağı Arapça içeremez (D-12)');
+  return JSON.parse(raw);
+}
+
+function textFor(texts, id, fallbackTitle, fallbackGoal, section) {
+  const bucket = (section && texts[section]) || texts.lessons || {};
+  const entry = bucket[id] || {};
+  return {
+    title: typeof entry.title === 'string' && entry.title ? entry.title : fallbackTitle,
+    goal: typeof entry.goal === 'string' && entry.goal ? entry.goal : fallbackGoal,
+    review: entry.review && typeof entry.review === 'object' ? entry.review : { level: 'draft' }
+  };
+}
+
+function build(spec, content, texts) {
   const { perUnit, source, byId } = assignUnits(spec, content);
   const lemmaToLesson = {};
   const units = spec.units.map((unit) => {
@@ -180,20 +200,35 @@ function build(spec, content) {
     const lessons = chunks.map((lemmaIds, i) => {
       const id = `u${pad(unit.id)}.${pad(i + 1)}`;
       for (const lid of lemmaIds) lemmaToLesson[lid] = id;
+      const fallback = (unit.lessonTitles && unit.lessonTitles[i]) || `${unit.title} · ${i + 1}. ders`;
+      const text = textFor(texts, id, fallback, '');
       return {
         id,
-        title: (unit.lessonTitles && unit.lessonTitles[i]) || `${unit.title} · ${i + 1}. ders`,
+        title: text.title,
+        goal: text.goal || null,
         lemmaIds,
         conceptId: unit.conceptIds[i] || null,
         apply: source.get(lemmaIds[0]),
         mastery: i === chunks.length - 1,
-        review: draft()
+        review: text.review
       };
     });
-    return { id: unit.id, level: unit.level, title: unit.title, promise: unit.promise, conceptIds: unit.conceptIds.slice(), anchor: unit.anchor.slice(), lessons, review: draft() };
+    const unitText = (texts.units && texts.units[String(unit.id)]) || {};
+    return {
+      id: unit.id, level: unit.level,
+      title: typeof unitText.title === 'string' && unitText.title ? unitText.title : unit.title,
+      promise: typeof unitText.promise === 'string' && unitText.promise ? unitText.promise : unit.promise,
+      why: typeof unitText.why === 'string' && unitText.why ? unitText.why : null,
+      conceptIds: unit.conceptIds.slice(), anchor: unit.anchor.slice(), lessons,
+      review: unitText.review && typeof unitText.review === 'object' ? unitText.review : draft()
+    };
   });
   const levels = spec.levels.map((lv) => ({ id: lv.id, title: lv.title, unitIds: units.filter((u) => u.level === lv.id).map((u) => u.id) }));
-  const s0 = { lessons: spec.s0.map((title, i) => ({ id: `s0.${pad(i + 1)}`, title, review: draft() })) };
+  const s0 = { lessons: spec.s0.map((title, i) => {
+    const id = `s0.${pad(i + 1)}`;
+    const text = textFor(texts, id, title, '', 's0');
+    return { id, title: text.title, goal: text.goal || null, review: text.review };
+  }) };
   const missing = content.lex.lemmas.filter((l) => !lemmaToLesson[l.id]);
   if (missing.length) fail(`derse girmeyen lemma: ${missing[0].id}`);
   return { version: spec.version, levels, units, s0, lemmaToLesson };
@@ -257,14 +292,50 @@ function renderReview(data, spec, { lex, grammar }) {
   return lines.join('\n');
 }
 
+// KAO2-17 · K-4 L1/L2 inceleme sayfası (araç üretir; kullanıcı onayı bu dosyaya işlenir).
+function renderTextReview(data) {
+  const lines = ['# İnceleme · KAO2-17 — Ünite ve ders metinleri', '',
+    '> Bu sayfa `tools/kao2-curriculum-build.mjs` ile üretilir; elle düzenlenmez.',
+    '> Onay: kutu işaretlenir, sonra `--apply-review` ile metin kaynağına taşınır.',
+    '> Onaylanmamış metinler `draft` kalır ve uygulamada **gösterilmez**.', '',
+    '## Durum', ''];
+  const all = [];
+  data.units.forEach((u) => { all.push({ id: `u${u.id}`, kind: 'ünite', review: u.review }); u.lessons.forEach((l) => all.push({ id: l.id, kind: 'ders', review: l.review })); });
+  data.s0.lessons.forEach((l) => all.push({ id: l.id, kind: 'S0', review: l.review }));
+  const count = (level) => all.filter((t) => t.review.level === level).length;
+  lines.push(`- Toplam metin: **${all.length}**`,
+    `- \`draft\` (görünmez): **${count('draft')}**`,
+    `- \`sourced\` (görünür): **${count('sourced')}**`,
+    `- \`expert\` (görünür): **${count('expert')}**`, '',
+    '## Üniteler', '');
+  data.units.forEach((u) => {
+    lines.push(`### Ünite ${u.id} · ${u.title}`, '',
+      `- Vaad: ${u.promise}`,
+      u.why ? `- Neden önemli: ${u.why}` : '- Neden önemli: —',
+      `- İnceleme: \`${u.review.level}\`${Array.isArray(u.review.sources) && u.review.sources.length ? ` · kaynak: ${u.review.sources.join(', ')}` : ''}`,
+      '- [ ] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun', '');
+  });
+  lines.push('## Dersler', '');
+  data.units.forEach((u) => {
+    lines.push(`### Ünite ${u.id} dersleri`, '', '| ders | başlık | hedef | inceleme | onay |', '|---|---|---|---|---|');
+    u.lessons.forEach((l) => lines.push(`| ${l.id} | ${l.title} | ${l.goal || '—'} | \`${l.review.level}\` | - [ ] |`));
+    lines.push('');
+  });
+  lines.push('## Seviye 0', '', '| ders | başlık | hedef | inceleme | onay |', '|---|---|---|---|---|');
+  data.s0.lessons.forEach((l) => lines.push(`| ${l.id} | ${l.title} | ${l.goal || '—'} | \`${l.review.level}\` | - [ ] |`));
+  lines.push('');
+  return lines.join('\n');
+}
+
 function main() {
   const args = process.argv.slice(2);
   const at = args.indexOf('--out-dir');
   const outDir = at >= 0 ? path.resolve(args[at + 1] || fail('--out-dir değeri eksik')) : ROOT;
   const spec = readSpec();
   const content = loadContent();
-  const data = build(spec, content);
-  const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)]];
+  const texts = readTexts();
+  const data = build(spec, content, texts);
+  const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)], [OUT_TEXT_REVIEW, renderTextReview(data)]];
   for (const [file, text] of outputs) {
     const target = path.join(outDir, file);
     fs.mkdirSync(path.dirname(target), { recursive: true });

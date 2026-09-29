@@ -507,3 +507,14 @@ Kurallar:
 - scope: yalnız UYGULAMA-PROMPTLARI.md §0, §1 P10, KAO2-13…27 tasarım kabul satırları; CURRENT-STATE ve sync metaverisi.
 - evidence-levels: plan belgeleri güncellendi · kaynak/test, yayın ve cihaz kabulü bu değişiklikle iddia edilmiyor
 - next: KAO2-13
+
+## seq 54 · 2026-09-29 · BLOCKED · KAO2-13
+- status: blocked
+- prev-commit: b67458da
+- summary: KAO2-13 Yol/Ünite ekranları ve odaklı fikstür tamamlandı; tam KAO P3 kümesi başlamadan izin dışı mevcut kullanıcı-görev fikstürü engeli doğrulandı.
+- attempted: `node tests/kao/test_kao2_path.js` PASS (4 kontrol); `node tests/kao/test_kao_render.js` PASS; `node tests/kao/test_kao_user_tasks.js` FAIL — satır 80 kaldırılan `api.kaoUnitsHTML()` API'sini çağırıyor (`TypeError: api.kaoUnitsHTML is not a function`).
+- scope-blocker: `tests/kao/test_kao_user_tasks.js` kartın Dokun listesinde değil. Bu test eski “ünite listesinden ilk kelime kartı → kök” yolunu doğruluyor; KAO2-13'te ünite satırı S-04 ekranını açıyor, ders eylemi ise sonraki gerçek derse gidiyor.
+- requested-scope: yalnız `tests/kao/test_kao_user_tasks.js` içindeki (b) senaryosunu eski ilk-kelime rotası yerine yeni Yol → Ünite → ders/kelime-listesi sözleşmesine geçirmek; diğer senaryolara ve üretim koduna ek değişiklik yetkisi vermez.
+- gates: quranLearn.js/quranLearnViews.js syntax PASS · KAO2-13 yol 4/4 PASS · render PASS · kullanıcı-görev FAIL (P6) · tam KAO P3 ve diğer aile kapıları çalıştırılmadı · sync kapanışta
+- evidence-levels: kaynak/test kısmi · yayın yok · cihaz doğrulanmadı
+- next: KAO2-13

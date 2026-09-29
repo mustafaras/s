@@ -157,6 +157,51 @@
     return '<main class="kao-today-screen" aria-label="Bugün">'+(model.notice?notice(model.notice):'')+heroCard(model.hero)+pathCard(model.path)+groupedList(model.lists)+'</main>';
   }
 
+  // KAO2-13 · S-03: yedi gerçek seviye; S0/S5 ayrı girişler, S6 bilgilendirici.
+  function pathScreen(model){
+    if(!deps) throw new Error('KAO2-13: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    var levels=(Array.isArray(model.levels)?model.levels:[]).map(function(level){
+      level=level&&typeof level==='object'?level:{};
+      var body='';
+      if(level.kind==='units'){
+        body='<div class="kao-path-unit-list">'+(Array.isArray(level.units)?level.units:[]).map(function(unit){
+          unit=unit&&typeof unit==='object'?unit:{};
+          var call=actionCall(unit.action),ring=progressRing(unit.percent,44,unit.ringLabel||unit.title+' ilerlemesi');
+          return '<button type="button" class="kao-path-unit-row"'+(unit.current===true?' aria-current="step"':'')+(call?' onclick="'+call+'"':' disabled')+'><span class="kao-path-unit-index">Ünite '+escapeText(unit.id)+'</span><span class="kao-path-unit-copy"><strong>'+escapeText(unit.title)+'</strong><span class="kao-path-unit-promise">'+escapeText(unit.promise)+'</span><span class="kao-path-unit-meta">'+escapeText(unit.progressText)+'</span></span><span class="kao-path-unit-ring">'+ring+'<span aria-hidden="true">›</span></span></button>';
+        }).join('')+'</div>';
+      }else if(level.kind==='entry'){
+        var call=actionCall(level.action),ring=progressRing(level.percent,44,level.ringLabel||level.title+' ilerlemesi');
+        var entryContent='<span class="kao-path-entry-copy"><strong>'+escapeText(level.titleText||level.title)+'</strong><span>'+escapeText(level.description)+'</span><span class="kao-path-unit-meta">'+escapeText(level.progressText)+'</span></span><span class="kao-path-entry-side">'+ring+(call?'<span aria-hidden="true">›</span>':'')+'</span>';
+        body=call?'<button type="button" class="kao-path-entry-row" onclick="'+call+'">'+entryContent+'</button>':'<div class="kao-path-entry-row is-complete" role="status">'+entryContent+'</div>';
+      }else{
+        body='<p class="kao-path-note">'+escapeText(level.description)+'</p>';
+      }
+      return '<section class="kao-path-level-section" aria-labelledby="kao-path-level-'+escapeText(level.id)+'"><h3 id="kao-path-level-'+escapeText(level.id)+'">Seviye '+escapeText(level.id)+' · '+escapeText(level.title)+'</h3>'+body+'</section>';
+    }).join('');
+    return '<main class="kao-path-screen" aria-label="Öğrenme yolu"><div class="kao-view-head"><div><p class="kao-eyebrow">Yolun</p><h2 class="kao-largetitle-heading" id="kao-path-title">Öğrenme yolu</h2><p class="kao-path-intro">Önerilen üniteyi izle ya da istediğin durağı aç.</p></div></div><div class="kao-path-levels">'+levels+'</div></main>';
+  }
+
+  // KAO2-13 · S-04: ders listesi durumları salt okunur; tek belirgin eylem sıradaki derstir.
+  function unitScreen(model){
+    if(!deps) throw new Error('KAO2-13: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    var ring=progressRing(model.percent,44,model.title+' ders ilerlemesi');
+    var lessons=(Array.isArray(model.lessons)?model.lessons:[]).map(function(lesson){
+      lesson=lesson&&typeof lesson==='object'?lesson:{};
+      var status=lesson.done===true?'done':(lesson.current===true?'current':'upcoming'),mark=status==='done'?'✓':(status==='current'?'●':'○');
+      return '<li class="kao-unit-step kao-unit-step-'+status+'"'+(lesson.current===true?' aria-current="step"':'')+'><span class="kao-unit-step-mark" aria-hidden="true">'+mark+'</span><span class="kao-unit-step-title">'+escapeText(lesson.title)+'</span><span class="kao-sr-only">'+escapeText(status==='done'?'Tamamlandı':(status==='current'?'Sıradaki ders':'Sırada'))+'</span></li>';
+    }).join('');
+    var concepts=(Array.isArray(model.concepts)?model.concepts:[]).map(function(title){ return '<li>'+escapeText(title)+'</li>'; }).join('');
+    var wordList=Array.isArray(model.words)?model.words:[],words=wordList.map(function(word){
+      word=word&&typeof word==='object'?word:{};
+      return '<li class="kao-unit-word"><span class="kao-unit-word-ar" lang="ar" dir="rtl">'+escapeText(word.ar)+'</span><span class="kao-unit-word-reading" lang="tr" dir="ltr">'+escapeText(word.pronunciation)+'</span><span class="kao-unit-word-meaning">'+escapeText(word.meaning)+'</span><span class="kao-unit-word-status">'+escapeText(word.status)+'</span></li>';
+    }).join('');
+    var primary=model.action?primaryButton({label:model.actionLabel,action:model.action}):'';
+    var completion=model.completed?'<p class="kao-unit-complete" role="status">Bu ünitedeki dersler tamamlandı.</p>':'';
+    return '<main class="kao-unit-screen" aria-labelledby="kao-unit-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye '+escapeText(model.level)+' · '+escapeText(model.levelTitle)+'</p><h2 class="kao-largetitle-heading" id="kao-unit-title">'+escapeText(model.title)+'</h2><p class="kao-unit-promise"><span>Bitirince</span> '+escapeText(model.promise)+'</p></div></div><section class="kao-unit-progress" aria-label="Ünite ilerlemesi"><span>'+ring+'</span><p>'+escapeText(model.wordsKnown)+' / '+escapeText(model.wordsTotal)+' kelime · '+escapeText(model.lessonsDone)+' / '+escapeText(model.lessonsTotal)+' ders</p></section>'+primary+completion+'<section class="kao-unit-section" aria-labelledby="kao-unit-steps-title"><h3 id="kao-unit-steps-title">Dersler</h3><ol class="kao-unit-steps">'+lessons+'</ol></section><section class="kao-unit-section" aria-labelledby="kao-unit-concepts-title"><h3 id="kao-unit-concepts-title">Kavramlar</h3><ul class="kao-unit-concepts">'+concepts+'</ul></section><details class="kao-unit-words"><summary><span>Kelimeler · '+escapeText(wordList.length)+'</span><span aria-hidden="true">›</span></summary><ol class="kao-unit-word-list">'+words+'</ol></details><p class="kao-unit-anchor"><span>Çapa metin</span> · '+escapeText(model.anchor)+'</p></main>';
+  }
+
   // KAO2-12 · Kaynakları motor seçer; bu katman yalnız güvenli metin ve App eylemi çizer.
   function lessonScreen(model){
     if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
@@ -262,5 +307,5 @@
       '<span class="kao-hub-cta">'+escapeText(options.action)+' <span aria-hidden="true">›</span></span>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen};
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen};
 })(window);

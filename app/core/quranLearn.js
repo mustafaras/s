@@ -558,29 +558,72 @@
     var surah=catalog&&typeof catalog.byMushafOrder==='function'?catalog.byMushafOrder(Number(number)):null;
     return surah&&surah.id?surah.id:'';
   }
-  // 12 ünite = sözlük sırasının eşit dilimleri; ünite ekranı ve kilometre taşları aynı kaynağı kullanır.
+  // KAO2-16 taş hesabı için geçiş dönemi sözlük dilimleri; yeni yol/ünite ekranı müfredat v2'yi kullanır.
   function kaoUnitSlices(){
     var lex=window.QuranLexiconV1,lemmas=lex&&Array.isArray(lex.lemmas)?lex.lemmas:[];
     return Array.from({length:12},function(_unused,index){ return lemmas.slice(Math.floor(index*lemmas.length/12),Math.floor((index+1)*lemmas.length/12)); });
   }
-  function kaoUnits(){
-    if(!quranLearnDeps) return [];
-    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),known=kaoKnownLemmaSet(d),slices=kaoUnitSlices();
-    return Array.from({length:12},function(_unused,index){
-      var slice=slices[index],done=slice.filter(function(lemma){ return known[lemma.id]; }).length,unit=q.units&&q.units[String(index+1)],representative=slice[0]||null;
-      return {id:String(index+1),title:String(unit&&unit.title||('Ünite '+String(index+1))),done:done,total:slice.length,percent:slice.length?Math.round(done/slice.length*100):0,lemmaId:representative&&representative.id||'',surahId:lemmaSurahId(representative)};
-    });
+  function kaoCurriculumUnit(unitId){
+    var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
+    return units.find(function(unit){ return String(unit.id)===String(unitId); })||null;
   }
-  function kaoUnitsHTML(){
-    if(!quranLearnDeps) return '';
-    var d=quranLearnDeps.data(),journey=d&&d.quranJourney&&d.quranJourney.requests&&typeof d.quranJourney.requests==='object'?d.quranJourney.requests:{},units=kaoUnits(),suggested=units.find(function(unit){ return unit.percent<100; })||units[0],esc=quranLearnDeps.esc;
-    var h='<main class="kao-units" aria-labelledby="kao-units-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Öğrenme yolu</p><h2 id="kao-units-title">Üniteler</h2><p>Kilit yok; istediğin yerden açabilirsin.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
-    h+='<section class="kao-levels" aria-label="Seviye durakları"><span>Seviye 0 · Sesler</span><span>Seviye 5 · Kökler</span><span>Seviye 6 · Âyetler</span></section><div class="kao-unit-list">';
-    units.forEach(function(unit){
-      var request=unit.surahId&&journey[unit.surahId],watched=!!(request&&(request.status==='watched'||request.status==='question_opened')),isSuggested=suggested&&suggested.id===unit.id;
-      h+='<button type="button" class="kao-unit-card'+(isSuggested?' is-suggested':'')+'"'+(isSuggested?' aria-current="step"':'')+' onclick="App.kaoOpenWord(\''+esc(unit.lemmaId)+'\')"><span class="kao-unit-number">'+unit.id.padStart(2,'0')+'</span><span class="kao-unit-copy"><small>'+(isSuggested?'Sıra önerisi':'Ünite')+'</small><strong>'+esc(unit.title)+'</strong><span>'+unit.done+' / '+unit.total+' kelime</span></span><span class="kao-unit-side">'+(watched?'<b>'+quranLearnDeps.icon('check-circle',14)+' İzlendi</b>':'')+'<span class="kao-unit-progress" role="progressbar" aria-label="'+esc(unit.title)+' ilerlemesi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+unit.percent+'"><i style="width:'+unit.percent+'%"></i></span></span></button>';
+  function kaoPathModel(){
+    if(!quranLearnDeps) return {levels:[]};
+    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),curriculum=window.QuranCurriculumV2,flow=window.SeymaQuranLearnFlow,content=kaoLessonContent(),known=kaoKnownLemmaSet(d);
+    if(!curriculum||!flow||!Array.isArray(curriculum.levels)) return {levels:[]};
+    var recommended=kaoCurrentUnit(q,flow,{curriculum:curriculum}),shorts=window.QuranShortSurahsV1||{},surahs=Array.isArray(shorts.surahs)?shorts.surahs:[],shortWords=Array.isArray(shorts.words)?shorts.words:[];
+    var levels=curriculum.levels.map(function(level){
+      if(level.id===0){
+        var s0=curriculum.s0&&Array.isArray(curriculum.s0.lessons)?curriculum.s0.lessons:[],states=s0.map(function(lesson,index){ return {lesson:lesson,index:index,progress:flow.lessonProgress(q,lesson.id,content)}; }),done=states.filter(function(item){ return item.progress.done; }).length,next=states.find(function(item){ return !item.progress.done; }),record=next&&q.path&&q.path.lessons&&q.path.lessons[next.lesson.id],started=!!(next&&(done>0||next.progress.introduced>0||record&&record.startedAt));
+        return {id:level.id,title:level.title,kind:'entry',titleText:next?next.lesson.title:'12 ders tamamlandı',description:next?(started?'Ders '+(next.index+1)+'’e devam et':'Başla · '+s0.length+' kısa ders'):'12 ders tamamlandı',percent:s0.length?done/s0.length*100:100,ringLabel:'Harf ve okuma dersleri',progressText:done+' / '+s0.length+' ders',action:next?{name:'kaoLesson',args:['start',next.lesson.id]}:null};
+      }
+      if(level.id===5){
+        var knownWords=shortWords.filter(function(word){ return known[word.lemmaId]; }).length,totalWords=shortWords.length,first=surahs[0];
+        return {id:level.id,title:level.title,kind:'entry',titleText:surahs.length+' kısa sûre',description:knownWords+' / '+totalWords+' kelime tanıdık · oku ve anlamı aç',percent:totalWords?knownWords/totalWords*100:0,ringLabel:'Kısa sûrelerde tanınan kelimeler',progressText:surahs.length+' sûre',action:first?{name:'kaoOpenSurah',args:[Number(first.id)]}:null};
+      }
+      if(level.id===6) return {id:level.id,title:level.title,kind:'note',description:'Kısa sûrelerden sonra Kur’an Yolculuğu ile serbest okumaya geç.'};
+      var units=(Array.isArray(level.unitIds)?level.unitIds:[]).map(function(id){
+        var unit=kaoCurriculumUnit(id); if(!unit) return null;
+        var progress=flow.unitProgress(q,unit.id,content),percent=progress.lessons?progress.lessonsDone/progress.lessons*100:0;
+        return {id:unit.id,title:unit.title,promise:unit.promise,percent:percent,ringLabel:unit.title+' ders ilerlemesi',progressText:progress.lessonsDone+' / '+progress.lessons+' ders',current:recommended&&String(recommended.unit.id)===String(unit.id),action:{name:'kaoNav',args:['unit',unit.id]}};
+      }).filter(Boolean);
+      return {id:level.id,title:level.title,kind:'units',units:units};
     });
-    return h+'</div></main>';
+    return {levels:levels};
+  }
+  function kaoPathHTML(){
+    if(!quranLearnDeps) return '';
+    return kaoViewsApi().pathScreen(kaoPathModel());
+  }
+  function kaoUnitModel(unitId){
+    if(!quranLearnDeps) return null;
+    var unit=kaoCurriculumUnit(unitId); if(!unit) return null;
+    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),flow=window.SeymaQuranLearnFlow,content=kaoLessonContent(),progress=flow.unitProgress(q,unit.id,content),lex=window.QuranLexiconV1,known=kaoKnownLemmaSet(d),grammar=window.QuranGrammarV1,shorts=window.QuranShortSurahsV1||{},records=q.path&&q.path.lessons||{};
+    var lessons=unit.lessons.map(function(lesson,index){ var state=flow.lessonProgress(q,lesson.id,content); return {id:lesson.id,title:lesson.mastery===true?'Ustalık: '+lesson.title:lesson.title,done:state.done,current:progress.nextIndex===index&&!state.done}; });
+    var words=unit.lessons.reduce(function(all,lesson){
+      var record=records[lesson.id]&&typeof records[lesson.id]==='object'?records[lesson.id]:{},introduced=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[];
+      return all.concat(lesson.lemmaIds.map(function(id){
+        var lemma=lex&&typeof lex.byId==='function'?lex.byId(id):null;
+        if(!lemma||lemma.verified!==true||!lemma.translit||!Array.isArray(lemma.meanings)||!lemma.meanings[0]) return null;
+        var card=q.cards&&q.cards['w:'+id+':ar>tr'],seen=introduced.indexOf(id)>=0||!!(card&&(card.introducedAt||card.firstSeenAt||card.r||nonNegativeNumber(card.reps,0)>0||['learning','review','relearning'].indexOf(card.state)>=0||['learning','review','relearning'].indexOf(card.st)>=0));
+        return {id:id,ar:lemma.ar,pronunciation:kaoLemmaReading(id,lemma.translit),meaning:lemma.meanings[0],status:known[id]?'Tanıdık':(seen?'Çalışılıyor':'Sırada')};
+      }).filter(Boolean));
+    },[]);
+    var concepts=(Array.isArray(unit.conceptIds)?unit.conceptIds:[]).map(function(id){ var item=grammar&&Array.isArray(grammar.concepts)&&grammar.concepts.find(function(value){ return value.id===id; }); return item&&item.title?item.title:''; }).filter(Boolean);
+    var anchors=(Array.isArray(unit.anchor)?unit.anchor:[]).map(function(anchor){
+      var match=String(anchor||'').match(/^(prayer|surah|lemma-pool):(.+)$/); if(!match) return '';
+      if(match[1]==='prayer'){ var prayer=(shorts.prayerTexts||[]).find(function(item){ return item.id===match[2]; }); return prayer&& (prayer.title||prayer.name) || ''; }
+      if(match[1]==='surah'){ var surah=(shorts.surahs||[]).find(function(item){ return String(item.id)===match[2]; }); return surah&&(surah.name||surah.title)||''; }
+      return match[2]==='edat-baglac'?'Edat ve bağlaç kelimeleri':'Kelime seçkisi';
+    }).filter(Boolean);
+    var next=progress.nextLesson,action=next?{name:'kaoLesson',args:['start',next.id]}:null,actionLabel=next?(progress.started?'Ders '+(progress.nextIndex+1)+'’e devam et':'Başla'):'';
+    return {id:unit.id,level:unit.level,title:unit.title,levelTitle:(window.QuranCurriculumV2.levels.find(function(level){ return level.id===unit.level; })||{}).title||'',promise:unit.promise,percent:progress.lessons?progress.lessonsDone/progress.lessons*100:0,wordsKnown:progress.known,wordsTotal:progress.words,lessonsDone:progress.lessonsDone,lessonsTotal:progress.lessons,lessons:lessons,concepts:concepts,words:words,anchor:anchors.join(' · '),completed:progress.lessons>0&&progress.lessonsDone===progress.lessons,action:action,actionLabel:actionLabel};
+  }
+  function kaoUnitHTML(unitId){
+    if(!quranLearnDeps) return '';
+    var ui=quranLearnDeps.ui(),resolved=unitId===undefined||unitId===null?ui.kaoUnitId:unitId,model=kaoUnitModel(resolved);
+    if(!model) return '<main class="kao-unit-screen"><p role="status">Bu ünite şu an açılamıyor.</p></main>';
+    return kaoViewsApi().unitScreen(model);
   }
   function kaoOpenWord(lemmaId){
     if(!quranLearnDeps) return false;
@@ -624,7 +667,7 @@
   function kaoWordHTML(){
     if(!quranLearnDeps) return '';
     var d=quranLearnDeps.data(),q=ensureQuranLearn(d),ui=quranLearnDeps.ui(),lex=window.QuranLexiconV1,lemma=lex&&lex.byId&&lex.byId(ui.kaoWordId),layer=Math.max(1,Math.min(3,Math.floor(nonNegativeNumber(ui.kaoWordLayer,1)))),esc=quranLearnDeps.esc;
-    if(!lemma) return kaoUnitsHTML();
+    if(!lemma) return kaoPathHTML();
     var cardId=wordCardId(q,lemma.id),card=objectOr(q.cards[cardId],{}),root=rootDetail(lemma.root),h='<main class="kao-word" data-word-layer="'+layer+'" aria-labelledby="kao-word-title"><div class="kao-view-head"><button type="button" class="kao-back" onclick="App.kaoSetView(\'units\')">Üniteler</button><span>Katman '+layer+' / 3</span></div>';
     if(layer===1){
       h+='<section class="kao-word-hero"><p id="kao-word-title" lang="ar" dir="rtl">'+esc(lemma.ar)+'</p><div class="kao-pronunciation"><small>'+(kaoTranslitLayer()==='dia'?'DİA okunuşu':'Okunuş')+'</small><strong lang="tr" dir="ltr">'+esc(kaoLemmaReading(lemma.id,lemma.translit)||'Doğrulanmış okunuş henüz yok')+'</strong></div><button type="button" class="kao-audio" aria-label="'+esc(lemma.ar)+' Arapça telaffuzunu dinle" onclick="App.kaoPlay(\'w-'+esc(lemma.id)+'\',\''+kaoAudioStyle()+'\')">'+quranLearnDeps.icon('headphones',17)+' Telaffuzu dinle</button><h2>'+esc(lemma.meanings[0]||'')+'</h2>'+(lemma.meanings[1]?'<p>'+esc(lemma.meanings[1])+'</p>':'')+'</section><button type="button" class="kao-primary" onclick="App.kaoWordLayer(2)">Kökünü ve akrabalarını gör</button>';
@@ -2060,7 +2103,7 @@
     return '<button type="button" id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()" aria-haspopup="dialog" aria-label="'+quranLearnDeps.esc(label)+'">'+(typeof views.hubCard==='function'?views.hubCard(model):'<span class="kao-hub-title">'+quranLearnDeps.esc(model.title)+'</span>')+'</button>';
   }
   var KAO_HOME_TITLE="Kur'an Arapçası";
-  var KAO_VIEW_TITLES={home:KAO_HOME_TITLE,units:'Yol',word:'Kelime',reader:'Sûre',settings:'Ayarlar',phonics:'Telaffuz',ayah:'Günün âyeti',map:'Mushaf haritası',prayer:'Namazda ne diyorum',stats:'İlerleme',gate:'Harf kontrolü',session:'Oturum'};
+  var KAO_VIEW_TITLES={home:KAO_HOME_TITLE,units:'Yol',unit:'Ünite',word:'Kelime',reader:'Sûre',settings:'Ayarlar',phonics:'Telaffuz',ayah:'Günün âyeti',map:'Mushaf haritası',prayer:'Namazda ne diyorum',stats:'İlerleme',gate:'Harf kontrolü',session:'Oturum'};
   function kaoFlowApi(){
     var flow=window.SeymaQuranLearnFlow;
     if(!flow||flow.version!==1||typeof flow.createStack!=='function'||typeof flow.openStack!=='function'||typeof flow.push!=='function'||typeof flow.reset!=='function'||typeof flow.replaceTop!=='function'||typeof flow.current!=='function'||typeof flow.previous!=='function'||typeof flow.back!=='function') throw new Error('KAO2-04: gezinme akışı yüklenmedi');
@@ -2068,6 +2111,7 @@
   }
   function kaoRouteParam(ui,view,param){
     if(param!==undefined&&param!==null) return param;
+    if(view==='unit') return ui.kaoUnitId||null;
     if(view==='word') return ui.kaoWordId||null;
     if(view==='reader') return Number(ui.kaoSurahId)||114;
     return null;
@@ -2081,6 +2125,10 @@
     if(view==='reader'){
       var surah=kaoSurahs().find(function(item){ return item.id===Number(value); });
       return surah?String(surah.name):'Sûre';
+    }
+    if(view==='unit'){
+      var unit=kaoCurriculumUnit(value);
+      return unit?String(unit.title):'Ünite';
     }
     return KAO_VIEW_TITLES[view]||KAO_HOME_TITLE;
   }
@@ -2102,15 +2150,16 @@
   }
   function kaoApplyView(ui,view,param,mode){
     if(!KAO_VIEW_TITLES[view]) return null;
-    var flow=window.SeymaQuranLearnFlow,resolved=kaoRouteParam(ui,view,param),title=kaoViewTitle(view,resolved,ui),stack;
+    var routeView=view==='unit'?'units':view,flow=window.SeymaQuranLearnFlow,resolved=kaoRouteParam(ui,view,param),title=kaoViewTitle(view,resolved,ui),stack;
     if(view==='word'&&resolved!==null) ui.kaoWordId=String(resolved);
+    if(view==='unit'&&resolved!==null) ui.kaoUnitId=String(resolved);
     if(view==='reader'&&resolved!==null) ui.kaoSurahId=Number(resolved);
-    if(!flow){ ui.kaoView=view; return {view:view,param:resolved,title:title}; }
+    if(!flow){ ui.kaoView=routeView; return {view:routeView,param:resolved,title:title}; }
     if(flow.version!==1||typeof flow.createStack!=='function'||typeof flow.openStack!=='function'||typeof flow.push!=='function'||typeof flow.reset!=='function'||typeof flow.replaceTop!=='function'||typeof flow.current!=='function'||typeof flow.previous!=='function'||typeof flow.back!=='function') throw new Error('KAO2-04: gezinme akışı geçersiz');
-    if(mode==='open') stack=view==='home'?flow.createStack(KAO_HOME_TITLE):flow.openStack(view,resolved,title,KAO_HOME_TITLE);
-    else if(mode==='reset') stack=flow.reset(view,resolved,title,KAO_HOME_TITLE);
-    else if(mode==='replace') stack=flow.replaceTop(kaoEnsureStack(ui),view,resolved,title,KAO_HOME_TITLE);
-    else stack=flow.push(kaoEnsureStack(ui),view,resolved,title,KAO_HOME_TITLE);
+    if(mode==='open') stack=routeView==='home'?flow.createStack(KAO_HOME_TITLE):flow.openStack(routeView,resolved,title,KAO_HOME_TITLE);
+    else if(mode==='reset') stack=flow.reset(routeView,resolved,title,KAO_HOME_TITLE);
+    else if(mode==='replace') stack=flow.replaceTop(kaoEnsureStack(ui),routeView,resolved,title,KAO_HOME_TITLE);
+    else stack=flow.push(kaoEnsureStack(ui),routeView,resolved,title,KAO_HOME_TITLE);
     ui.kaoStack=stack;
     var current=flow.current(stack,KAO_HOME_TITLE);
     ui.kaoView=current.view;
@@ -2131,6 +2180,7 @@
       var lex=window.QuranLexiconV1,lemma=lex&&typeof lex.byId==='function'?lex.byId(String(resolved||'')):null;
       if(!lemma||lemma.verified!==true) return false;
     }
+    if(view==='unit'&&!kaoCurriculumUnit(resolved)) return false;
     if(view==='reader'&&!kaoSurahs().some(function(item){ return item.id===Number(resolved); })) return false;
     if(view==='home') kaoApplyView(ui,'home',null,'reset');
     else kaoApplyView(ui,view,resolved,ui.kaoView===view?'replace':'push');
@@ -2151,8 +2201,8 @@
   function kaoOverlayHTML(nowValue){
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),icon=quranLearnDeps.icon,stack=kaoEnsureStack(ui),flow=kaoFlowApi(),current=flow.current(stack,KAO_HOME_TITLE),previous=flow.previous(stack,KAO_HOME_TITLE);
-    var view=current.view,onboarding=view==='home'&&kaoOnboardActive(ui),body=onboarding?kaoOnboardHTML():view==='home'?kaoHomeHTML(nowValue):(view==='units'?kaoUnitsHTML():(view==='word'?kaoWordHTML():(view==='reader'?kaoReaderHTML():(view==='gate'?kaoGateHTML():(view==='settings'?kaoSettingsHTML():(view==='phonics'?kaoPhonicsHTML():(view==='ayah'?kaoAyahHTML():(view==='map'?kaoMapHTML():(view==='prayer'?kaoPrayerHTML():(view==='stats'?kaoStatsHTML(nowValue):'<main class="kao-session">'+kaoLessonHTML()+'</main>'))))))))));
-    body=kaoViewsApi().renderScreen({view:onboarding?'onboard':view,title:onboarding?KAO_ONBOARD_TITLE:(current.title||kaoViewTitle(view,current.param,ui)),previousTitle:previous&&previous.title||KAO_HOME_TITLE,body:body});
+    var view=current.view,unitDetail=view==='units'&&current.param!==null,onboarding=view==='home'&&kaoOnboardActive(ui),screenView=unitDetail?'unit':view,body=onboarding?kaoOnboardHTML():view==='home'?kaoHomeHTML(nowValue):(view==='units'?(unitDetail?kaoUnitHTML(current.param):kaoPathHTML()):(view==='word'?kaoWordHTML():(view==='reader'?kaoReaderHTML():(view==='gate'?kaoGateHTML():(view==='settings'?kaoSettingsHTML():(view==='phonics'?kaoPhonicsHTML():(view==='ayah'?kaoAyahHTML():(view==='map'?kaoMapHTML():(view==='prayer'?kaoPrayerHTML():(view==='stats'?kaoStatsHTML(nowValue):'<main class="kao-session">'+kaoLessonHTML()+'</main>'))))))))));
+    body=kaoViewsApi().renderScreen({view:onboarding?'onboard':screenView,title:onboarding?KAO_ONBOARD_TITLE:(current.title||kaoViewTitle(screenView,current.param,ui)),previousTitle:previous&&previous.title||KAO_HOME_TITLE,body:body});
     return '<div id="sey-ov-back" class="kao-overlay" onclick="App.kaoClose()"><div id="sey-ov-card" class="kao-dialog" style="'+kaoReadabilityStyle()+'" role="dialog" aria-modal="true" aria-labelledby="kao-title" tabindex="-1" onkeydown="App.onModalKeydown(event,App.kaoClose)" onclick="event.stopPropagation()"><header class="kao-header"><div class="kao-header-copy"><p>Kur’an Arapçası · Günlük öğrenme</p><h1 id="kao-title">Kelimelerini tanı, âyetleri anla</h1></div><button type="button" class="kao-close" onclick="App.kaoClose()" aria-label="Kur’an Arapçası penceresini kapat">'+icon('x',18)+'</button></header><div id="sey-ov-body" class="kao-body scroll" style="'+kaoReadabilityStyle()+'">'+body+'</div></div></div>';
   }
   function kaoMount(nowValue){
@@ -2189,6 +2239,7 @@
     kaoShadowCleanup(); var ui=quranLearnDeps.ui(),param=kaoRouteParam(ui,view,null);
     if(view==='word'&&param){ var lex=window.QuranLexiconV1,lemma=lex&&typeof lex.byId==='function'?lex.byId(String(param)):null; if(!lemma||lemma.verified!==true) return false; }
     if(view==='reader'&&!kaoSurahs().some(function(item){ return item.id===Number(param); })) return false;
+    if(view==='unit'&&!kaoCurriculumUnit(param)) return false;
     kaoApplyView(ui,view,param,'reset'); quranLearnDeps.render();
     return true;
   }
@@ -2397,8 +2448,8 @@
     kaoGateHTML:kaoGateHTML,
     kaoRootCatalog:kaoRootCatalog,
     kaoRootLemmaIds:kaoRootLemmaIds,
-    kaoUnits:kaoUnits,
-    kaoUnitsHTML:kaoUnitsHTML,
+    kaoPathHTML:kaoPathHTML,
+    kaoUnitHTML:kaoUnitHTML,
     kaoOpenWord:kaoOpenWord,
     kaoWordLayer:kaoWordLayer,
     kaoVerifiedAyahPronunciation:kaoVerifiedAyahPronunciation,

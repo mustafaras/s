@@ -286,16 +286,18 @@ assert.equal(quranLearn.cards[layeredCardId].flagged.kind, 'meaning');
 assert.match(quranLearn.cards[layeredCardId].flagged.at, /^\d{4}-\d{2}-\d{2}T/);
 assert.equal(toastMessage, 'Teşekkürler, sonraki içerik sürümünde bakılacak');
 
-const firstUnit = api.kaoUnits()[0];
-appData.quranJourney.requests[firstUnit.surahId] = { status: 'ready' };
-assert.doesNotMatch(api.kaoUnitsHTML(), /İzlendi/);
-appData.quranJourney.requests[firstUnit.surahId] = { status: 'watched' };
-const unitsHtml = api.kaoUnitsHTML();
-assert.equal((unitsHtml.match(/class="kao-unit-card/g) || []).length, 12);
-assert.match(unitsHtml, /Sıra önerisi/);
-assert.match(unitsHtml, /İzlendi/);
-assert.doesNotMatch(unitsHtml, /\bdisabled\b|Kilitli/i, 'ünitelerde kilit olmamalı');
-assert.match(unitsHtml, /Seviye 0.*Seviye 5.*Seviye 6/s);
+const firstUnit = sandbox.window.QuranCurriculumV2.units[0];
+assert.equal(api.kaoNav('units'), true);
+const pathHtml = api.kaoPathHTML();
+assert.equal((pathHtml.match(/class="kao-path-level-section/g) || []).length, 7, 'müfredatın yedi seviyesi görünmeli');
+assert.equal((pathHtml.match(/class="kao-path-unit-row/g) || []).length, 12, 'yol, 12 tematik müfredat ünitesini göstermeli');
+assert.match(pathHtml, /Fâtiha/);
+assert.doesNotMatch(pathHtml, /kao-levels|App\.kaoOpenWord|Kilitli/i, 'eski etkisiz kutular ve ilk-kelime rotası kalkmalı');
+assert.equal(api.kaoNav('unit', firstUnit.id), true, 'Ünite ayrıntısı gezinme yığınına eklenmeli');
+const unitsHtml = api.kaoUnitHTML(firstUnit.id);
+assert.match(unitsHtml, /Her namazda okuduğun/);
+assert.match(unitsHtml, /Dersler/);
+assert.match(unitsHtml, /Kelimeler · \d+/);
 
 const shortSurahs = api.kaoSurahs();
 assert.equal(shortSurahs.length, 20, 'E6 tam 20 kısa sûre sunmalı');

@@ -210,3 +210,53 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-lesson-exit:focus-visible,.kao-lesson-audio:focus-visible,.kao-lesson-term summary:focus-visible,.kao-lesson-next:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
 @media (forced-colors:active){.kao-lesson-card,.kao-lesson-anchor-word,.kao-lesson-table-wrap,.kao-lesson-apply-word,.kao-lesson-audio{border-color:CanvasText;background:Canvas;color:CanvasText}.kao-lesson-step,.kao-lesson-kicker,.kao-lesson-card p,.kao-lesson-anchor-word small,.kao-lesson-table th,.kao-lesson-table td{color:CanvasText}.kao-lesson-anchor-new,.kao-lesson-apply-new,.kao-lesson-anchor-known,.kao-lesson-apply-known{outline:1px solid Highlight}.kao-lesson-progress{background:Canvas;outline:1px solid CanvasText}.kao-lesson-progress>span{background:Highlight}}
 /* KAO2-12 son */
+/* KAO2-13 · S-03 Yol ve S-04 Ünite: dikey, 06 tokenlarıyla çalışan KAO modal yüzeyleri. */
+.kao-screen-units,.kao-screen-unit{min-width:0}
+.kao-path-screen,.kao-unit-screen{display:grid;gap:var(--kao-gap-3);min-width:0}
+.kao-path-intro{margin:0;color:var(--kao-label-2);font-size:var(--f-body);line-height:1.45;overflow-wrap:anywhere}
+.kao-path-levels{display:grid;gap:var(--kao-gap-3);min-width:0}
+.kao-path-level-section{display:grid;gap:var(--kao-gap-2);min-width:0;padding:16px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);color:var(--kao-label)}
+.kao-path-level-section h3{margin:0;color:var(--kao-label);font-size:var(--f-headline);font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.kao-path-unit-list{display:grid;gap:8px;min-width:0}
+.kao-path-unit-row,.kao-path-entry-row{box-sizing:border-box;width:100%;min-width:0;min-height:76px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface);color:var(--kao-label);text-align:left;font:inherit;cursor:pointer}
+.kao-path-unit-row[aria-current="step"]{border-color:var(--kao-tint)}
+.kao-path-unit-index{min-width:48px;min-height:44px;display:grid;place-items:center;padding:0 4px;border-radius:var(--kao-r-ctl);background:color-mix(in srgb,var(--kao-tint) 8%,var(--kao-surface));color:var(--kao-tint);font-size:var(--f-footnote);font-weight:600;text-align:center}
+.kao-path-unit-copy,.kao-path-entry-copy{display:grid;gap:4px;min-width:0}
+.kao-path-unit-copy strong,.kao-path-entry-copy strong{color:var(--kao-label);font-size:var(--f-body);font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.kao-path-unit-promise,.kao-path-entry-copy>span{color:var(--kao-label-2);font-size:var(--f-subhead);line-height:1.4;overflow-wrap:anywhere}
+.kao-path-unit-meta{color:var(--kao-label-2);font-size:var(--f-footnote);line-height:1.4;overflow-wrap:anywhere}
+.kao-path-unit-ring,.kao-path-entry-side{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0;color:var(--kao-tint)}
+.kao-path-entry-row{grid-template-columns:minmax(0,1fr) auto}
+.kao-path-entry-row.is-complete{cursor:default}
+.kao-path-note{margin:0;padding:12px 0 0;border-top:1px solid var(--kao-sep);color:var(--kao-label-2);font-size:var(--f-body);line-height:1.45;overflow-wrap:anywhere}
+.kao-unit-promise{margin:6px 0 0;color:var(--kao-label-2);font-size:var(--f-body);line-height:1.5;overflow-wrap:anywhere}
+.kao-unit-promise span,.kao-unit-anchor span{color:var(--kao-label);font-weight:600}
+.kao-unit-progress{display:flex;align-items:center;gap:12px;min-width:0;padding:12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface)}
+.kao-unit-progress p{margin:0;color:var(--kao-label);font-size:var(--f-body);font-variant-numeric:tabular-nums;line-height:1.45;overflow-wrap:anywhere}
+.kao-unit-screen>.kao-primary{width:100%;margin:0}
+.kao-unit-complete{margin:0;padding:12px;border:1px solid var(--kao-ok);border-radius:var(--kao-r-ctl);background:var(--kao-ok-bg);color:var(--kao-label);font-size:var(--f-body);line-height:1.45;overflow-wrap:anywhere}
+.kao-unit-section{display:grid;gap:8px;min-width:0}
+.kao-unit-section h3{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600;line-height:1.4}
+.kao-unit-steps,.kao-unit-concepts,.kao-unit-word-list{display:grid;gap:0;min-width:0;margin:0;padding:0;list-style:none}
+.kao-unit-steps{padding:0 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface)}
+.kao-unit-step{box-sizing:border-box;min-width:0;min-height:var(--kao-row);display:flex;align-items:center;gap:12px;padding:8px 0;color:var(--kao-label);overflow-wrap:anywhere}
+.kao-unit-step+.kao-unit-step{border-top:1px solid var(--kao-sep)}
+.kao-unit-step-mark{flex:0 0 24px;color:var(--kao-label-2);font-size:var(--f-body);font-weight:600;text-align:center}
+.kao-unit-step-done .kao-unit-step-mark{color:var(--kao-ok)}
+.kao-unit-step-current .kao-unit-step-mark{color:var(--kao-tint)}
+.kao-unit-step-title{min-width:0;color:var(--kao-label);font-size:var(--f-body);line-height:1.4;overflow-wrap:anywhere}
+.kao-unit-step[aria-current="step"] .kao-unit-step-title{font-weight:600}
+.kao-unit-concepts{gap:6px}
+.kao-unit-concepts li{min-width:0;padding:8px 0;color:var(--kao-label);font-size:var(--f-body);line-height:1.4;overflow-wrap:anywhere}
+.kao-unit-words{min-width:0;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);color:var(--kao-label)}
+.kao-unit-words summary{box-sizing:border-box;min-width:0;min-height:var(--kao-row);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;color:var(--kao-tint);font-size:var(--f-body);font-weight:600;cursor:pointer;overflow-wrap:anywhere}
+.kao-unit-word-list{padding:0 12px 8px}
+.kao-unit-word{min-width:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 12px;padding:10px 0;border-top:1px solid var(--kao-sep)}
+.kao-unit-word-ar{min-width:0;color:var(--kao-label);font-size:var(--f-title3);line-height:1.8;overflow-wrap:anywhere}
+.kao-unit-word-reading,.kao-unit-word-meaning,.kao-unit-word-status{min-width:0;color:var(--kao-label-2);font-size:var(--f-subhead);line-height:1.4;overflow-wrap:anywhere}
+.kao-unit-word-status{color:var(--kao-tint);font-size:var(--f-footnote)}
+.kao-unit-anchor{min-width:0;margin:0;padding:12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);color:var(--kao-label-2);font-size:var(--f-body);line-height:1.45;overflow-wrap:anywhere}
+.kao-path-unit-row:focus-visible,.kao-path-entry-row:focus-visible,.kao-unit-words summary:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
+@media(max-width:360px){.kao-path-unit-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}.kao-path-unit-index{grid-column:1/-1;justify-self:start}.kao-unit-word{grid-template-columns:minmax(0,1fr)}}
+@media(forced-colors:active){.kao-path-level-section,.kao-path-unit-row,.kao-path-entry-row,.kao-unit-progress,.kao-unit-steps,.kao-unit-words,.kao-unit-anchor{border-color:CanvasText;background:Canvas;color:CanvasText}.kao-path-unit-index{border:1px solid CanvasText;background:Canvas;color:CanvasText}.kao-path-unit-row:focus-visible,.kao-path-entry-row:focus-visible,.kao-unit-words summary:focus-visible{outline-color:Highlight}.kao-unit-step+.kao-unit-step,.kao-unit-word{border-color:CanvasText}.kao-path-unit-copy strong,.kao-path-unit-promise,.kao-path-unit-meta,.kao-path-entry-copy strong,.kao-path-entry-copy>span,.kao-path-intro,.kao-path-note,.kao-unit-promise,.kao-unit-progress p,.kao-unit-section h3,.kao-unit-step-title,.kao-unit-concepts li,.kao-unit-word-ar,.kao-unit-word-reading,.kao-unit-word-meaning,.kao-unit-word-status,.kao-unit-anchor{color:CanvasText}}
+/* KAO2-13 son */

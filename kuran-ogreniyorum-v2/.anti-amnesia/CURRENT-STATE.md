@@ -2,28 +2,27 @@
 
 <!-- kao2-sync
 nextCard: KAO2-13
-lastSeq: 53
+lastSeq: 54
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq53
+Son güncelleme: 2026-09-29 · LEDGER seq54
 
 ## Şu an neredeyiz
-KAO2-00…12 tamamlandı. KAO2-12 ders oynatıcısı, A-1 üç dokunuş başlangıç yolu ve onaylı tam KAO kapısı düzeltmeleri test edildi. Seq49 onayıyla yalnız `test_kao_render.js:87` günlük eylem assertion'ı yeni `App.kaoLesson("start","u01.01")` rotasına geçirildi. Tam KAO setinde bulunan `dailyNew=0` değerinin `||10` ile kaybolması düzeltildi; 60 vadesi gelmiş görev sınırı tekrar geçti. KAO2-12 ve ayrıca onaylanan İlham & İbadet Arapça sekmesi yayımlandı; yayın makbuzları seq52 ve `docs/evidence/arapca-elite-20260929/YAYIN.md` içindedir. Cihaz kabulü doğrulanmadı. Seq53 ile yalnız kalan KAO2-13…27 istemlerine tasarım köprüsü ve yeni oturum başlatıcısı eklendi; uygulama kartı başlatılmadı.
+KAO2-00…12 tamamlandı. Canlı Git/STATE doğrulaması KAO2-13'ü seçti; senkron kapısı başlangıçta PASS'tı. KAO2-13 için yedi seviyeli Yol görünümü, müfredat ünite satırları, ünite ayrıntısı, gerçek ilerleme, ders listesi ve fikstür eklendi. Odaklı yol fikstürü 4/4, `test_kao_render.js` PASS. Kart P6 ile durdu: `tests/kao/test_kao_user_tasks.js:80`, eski ve kaldırılmış `api.kaoUnitsHTML()` üzerinden ünite listesinden ilk kelime/kök rotasını zorunlu tutuyor. Bu dosya KAO2-13'ün Dokun listesinde değil; güncellenmedi. Tam P3 kümesi çalıştırılmadı.
 
 ## Sıradaki kartın tek cümlesi
-KAO2-13: Yol (S-03) ve Ünite (S-04); henüz başlanmadı. P10 ile yayımlanmış İlham & İbadet sekmesinin dikey öğrenme yolu ve giriş hiyerarşisini KAO modalının 06 token/etkileşim sistemi içinde sürdür; iki yüzeyi veya IIP kaynak dosyalarını birleştirme.
+KAO2-13 engelli ve sıradaki kart olarak kalıyor; yalnız `tests/kao/test_kao_user_tasks.js` bölüm (b) için P6'da belirtilen sınırlı test kapsamı onaylanırsa devam edilebilir.
 
 ## Canlı gerçekler
-- Release approval KAO2-12 ve ayrıca onaylı İlham & İbadet Arapça sekmesini kapsıyor (`approved_through_KAO2-12`); Pages run `36565235609` success, canlı runtime 9/9 SHA-256 eşleşti.
-- Ders oynatıcı üretimi önceki committe var: `app/core/quranLearnFlow.js`, `quranLearn.js`, `quranLearnViews.js`, `app/kao.css`, `app.js` shim.
-- Seq47 onayıyla `test_kao2_today.js`, `test_kao_user_tasks.js`, `test_app_surface_daily_boundary.js`, `test_v3_welcome.js` gerekli eylem/pin satırları ve KAO2-12 içi fx2 pinleri güncellendi; seq49 yalnız `test_kao_render.js:87` assertion'ını açtı.
-- KAO suite 28/28, lesson-flow 8/8, today 7/7, user_tasks 3-touch, onboarding 15/15, design contract PASS; kontrast 496 çift/0 ihlal; izole perf p95 4.587 ms (≤5.088 ms baseline+%25).
-- P3: app 77/77, panel 23/23, panel-v2 27/27, Quran 9/9, reminders smoke 21 curated, driver PASS, zikr 95/95, syntax/sync PASS.
-- `KAO2-STATE.json.releaseApproval=approved_through_KAO2-12`; KAO2-12 ve Arapça sekme yayını doğrulandı (`94f866a6`, Pages `36565235609`, 9/9 canlı hash). Cihaz kabulü ayrı ve doğrulanmadı. KAO2-13 henüz başlamadı.
-- Tasarım referansı: `docs/evidence/arapca-elite-20260929/README.md` + `YAYIN.md`. Bu, IIP keşif/giriş sekmesidir; KAO kendi modalıdır. Kalan istemlerin ortak P10 köprüsü, modal içindeki 06 sözleşmesini korur ve `saygi.js`/`app/styles.css` değişikliğine yetki vermez.
-- Uygulama promptları ve starter güncellendi (LEDGER seq53); bu plan düzenlemesi KAO2 kartını tamamlamaz, `nextCard` KAO2-13 ve release approval KAO2-12 sınırında kalır.
+- Dal `kao2-yeniden-tasarim`; başlangıç HEAD `b67458daa322b9d8fb54feceaba6ed2a33f8450a`; temiz başlangıç çalışma ağacı.
+- `KAO2-STATE.json.nextCard=KAO2-13`, kart `blocked`, `ledgerLastSeq=54`.
+- Release approval yalnız `approved_through_KAO2-12`; push/merge/tag/deploy yok. Cihaz kabulü doğrulanmadı.
+- G0 kapalı, G1 sunulmuş, G2 kapalı, G3/G4 açık.
+- `kaoUnitSlices()` eski taş hesabı için KAO2-16'ya kadar korunuyor. İlham & İbadet sekmesi ve `saygi.js`/`app/styles.css` değiştirilmedi.
+- Ünite gezinme eylemi `kaoNav('unit', id)` biçiminde; mevcut `quranLearnFlow.js` izin listesindeki `units` geçmiş yolunu id parametresiyle kullanıyor, o modül değiştirilmedi.
 
-## Teslim edilen kapsam
-- Canlı teslim: IIP Bugün’deki küçük KAO kartı altıncı "Arapça" sekmesine taşındı; tam genişlik ders özeti, salt-okunur KAO ilerlemesi, Tanış → Kavram → Pekiştir → Uygula yolu ve mevcut `App.kaoOpen()` CTA. Kalıcı veri/yeni App handler eklenmedi; 44px hedefler korundu.
-- KAO2-13 başlatma onayı yok; bu kartın dışına geçilmedi.
+## P6 kapsam engeli ve istenen karar
+- `node tests/kao/test_kao_user_tasks.js` → FAIL: satır 80 `api.kaoUnitsHTML is not a function`.
+- İstenen kapsam: yalnız testin (b) senaryosunu Yol → Ünite → yeni ders/kelime listesi sözleşmesine güncellemek. Onay verilirse diğer senaryolar veya üretim dosyaları bu kapsam genişletmesiyle değiştirilmeyecek.
+- P6 kapanışı seq54 ile kaydedildi. Kaynak/kısmi test kanıtı var; yayın ve cihaz kabulü yok. KAO2-13 kapanış kanıt dosyası üretilmedi.

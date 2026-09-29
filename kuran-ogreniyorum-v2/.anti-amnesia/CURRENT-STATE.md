@@ -2,11 +2,11 @@
 
 <!-- kao2-sync
 nextCard: KAO2-16
-lastSeq: 62
+lastSeq: 63
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq62
+Son güncelleme: 2026-09-29 · LEDGER seq63
 
 ## Şu an neredeyiz
 **KAO2-00…15 tamamlandı (16/28).** KAO2-15 (S-10 gramer notları kütüphanesi) kullanıcı
@@ -37,7 +37,10 @@ bu oturumda başlanmadı.
   yüzeyi ve fx2/v3/surface pinleri değişmedi.
 - Bütçe: içerik 168.483 KiB · runtime 78.316 KiB (<=80) · CSS 10.421 KiB (<=14) ·
   yalıtılmış p95 4.743 ms — hepsi sınır içinde.
-- Kaynak/test: PASS · yayın: onaylandı, canlı doğrulama kaydı ayrı · cihaz: doğrulanmadı.
+- Kaynak/test: PASS · yayın: **canlı** (pin `20260929d`) · cihaz: doğrulanmadı.
+- **Yayın pini (seq 63):** KAO/SW ortak pini `20260928b` -> `20260929d`. İlk
+  yayında pin değişmediği için PWA önbelleği eski KAO dosyalarını sunuyordu;
+  pin yükseltmesi yayını gerçekten etkin kılar.
 
 ## Açık riskler ve bekleyen kullanıcı işleri
 - **Cihaz kabulü** doğrulanmadı; headless test kullanıcı cihaz doğrulamasının yerine

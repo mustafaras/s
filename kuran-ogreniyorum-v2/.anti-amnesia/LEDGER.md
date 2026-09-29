@@ -622,3 +622,19 @@ Kurallar:
 - evidence-levels: kaynak/test PASS · yayın onaylandı (canlı doğrulama ayrı kayıt) · cihaz doğrulanmadı
 - surprises: Router beyaz listesi motorun KAO_VIEW_TITLES tablosundan ayrı; yeni görünüm üç yerde birlikte eklenmeli.
 - next: KAO2-16
+## seq 63 · 2026-09-29 · NOTE · KAO2-15
+- status: verified
+- summary: Yayın pini yükseltildi. KAO2-14/15 ilk yayında `20260928b` piniyle
+  çıkmıştı; pin ve servis çalışanı önbellek sürümü aynı kaldığı için PWA'lar eski
+  KAO dosyalarını sunmaya devam ederdi. Pin `20260929d`'ye alındı.
+- action: `sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-yayin-pini.sh 20260929d`
+  (9 dosya: index.html, sw.js, 7 tests/app) + `tests/kao/test_kao2_curriculum.js`
+  (betiğin kapsamadığı yer). `quranPhonicsV1.js` ayrı pini (20260924b) korundu.
+- cleanup: Düzenleyici çakışma kopyaları (`* 2.js` / `* 2.md`, 51 dosya, hiçbiri
+  git takipli değil, 51/51 birebir aynı) silindi. `app/core/quranLearnFlow 2.js`
+  K-1 runtime bütçesini şişirip `test_kao2_perf_budget.js`'i kırdığı için bu
+  temizlik gerekliydi.
+- gates: KAO 31/31 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 ·
+  reminders/driver/zikr/contrast/sync PASS · perf PASS (runtime 78.316 KiB)
+- evidence-levels: kaynak/test ✓ · yayın: pin sonrası yeniden yayınlanacak · cihaz —
+- next: KAO2-16

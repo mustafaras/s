@@ -1,35 +1,33 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-18
-lastSeq: 71
+nextCard: KAO2-19
+lastSeq: 72
 status: active
 -->
 
 Son güncelleme: 2026-09-29 · LEDGER seq71
 
 ## Şu an neredeyiz
-**KAO2-00…17 tamamlandı (18/28).** KAO2-17 Türkçe metin katmanını kurdu: 12 ünite
-(title/promise/why) + 109 ders (title/goal) + 12 S0 dersi = **133 metin**, hepsi
-`draft`. Yer tutucu ders başlıkları ("Oldu, yaptı · 3. ders") gerçek başlıklarla
-değişti. **`draft` metinler uygulamada görünmez**; yerine güvenli "Ünite N" başlığı
-gelir. KAO2-16'ya kadar olan iş canlıda (pin `20260929e`).
+**KAO2-00…18 tamamlandı (19/28).** KAO2-18 hata açıklamalarını (`kaoExplain`) ve 25
+kavramın çözümlü örneğini ekledi; ayrıca kullanıcının bildirdiği **üç yönlendirme
+kusuru** (Y-01/02/03) düzeltildi. K-1 çalışma zamanı bütçesi kullanıcı onayıyla
+80 → 88 KiB. **KAO2-17'ye kadar olan iş canlıda** (pin `20260929f`); KAO2-18 bu turda
+yayınlanacak.
 
 ## Sıradaki kartın tek cümlesi
-Sıradaki **KAO2-18**, 25 gramer kavramı için çözümlü örnek ve hata açıklaması
-(`workedTr`/`errorTr`) ekler; bu oturumda başlanmadı.
+Sıradaki **KAO2-19** — "Sûre bağlamı ve okuyucu v2": sûre ekranına bağlam (nüzul sırası,
+indiriliş yeri, kısa giriş) ve okuyucu görünümüne v2 yerleşimi ekler.
 
 ## Canlı gerçekler
-- Dal: `kao2-yeniden-tasarim`; KAO2-16 canlı (`main` = `6173cb4e`, pin `20260929e`).
-- `KAO2-STATE.json`: program `active`; KAO2-17 `done`; `nextCard=KAO2-18`;
-  `ledgerLastSeq=69`.
-- `releaseApproval=approved_through_KAO2-16`; **KAO2-17 yayınlanmadı**.
-  Push/merge/deploy için yeni açık kullanıcı talimatı gerekir.
-- G0 kapalı, G1 sunulmuş, G2 kapalı; **G3 sunuldu** (metin incelemesi kullanıcıda),
-  G4 açık.
-- **Bütçe kritik:** runtime `quranLearn*` **79.399 / 80 KiB** (~0,6 KiB kaldı) ·
-  içerik 172.676/262.144 · CSS 10.421/14. KAO2-18 kod ekleyecekse önce ölçülmeli.
-- Kaynak/test: PASS · yayın: yok · cihaz: doğrulanmadı.
+- Dal: `kao2-yeniden-tasarim` **= main = `ef480b6b`** (KAO2-18 değişiklikleri `main`
+  çalışma ağacında, commit bekliyor). Pin: `20260929f` → KAO2-18 yayınında **`20260929g`**.
+- `KAO2-STATE.json`: program `active`; KAO2-18 `done`; `nextCard=KAO2-19`;
+  `ledgerLastSeq=72`; `releaseApproval=approved_through_KAO2-18`.
+- G0 kapalı, G1 sunulmuş, G2 kapalı, G3 sunuldu (kavram metinleri L1'de), G4 açık.
+- **Bütçe rahatladı:** çalışma zamanı **81.032 / 88 KiB** · içerik 173.726/256 ·
+  curriculum 14.926/48 · CSS 10.728/14 · p95 4.651–6.104 ms.
+- Kaynak/test: PASS · yayın: KAO2-18 sonrası yapılacak · cihaz: **doğrulanmadı**.
 
 ## Açık riskler ve bekleyen kullanıcı işleri
 - **G3 metin incelemesi kullanıcıda:** `kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md`

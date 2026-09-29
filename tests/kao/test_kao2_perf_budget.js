@@ -25,7 +25,9 @@ const runtimeGzip = gzip(runtime), cssGzip = gzip(['app/kao.css']);
 assert.ok(contentGzip <= 256 * 1024, `content ${contentGzip} bytes exceeds budget`);
 assert.ok(legacyGzip <= 164 * 1024, `legacy ${legacyGzip} bytes exceeds 164 KiB`);
 assert.ok(gzip([curriculum]) <= 48 * 1024, 'curriculum exceeds 48 KiB');
-assert.ok(runtimeGzip <= 80 * 1024, 'runtime exceeds 80 KiB');
+// K-1 revizyonu (2026-09-29, kullanıcı onayı): KAO2-18+ açıklama/örnek katmanı
+// çalışma zamanı kodu gerektiriyor; bütçe 80 -> 88 KiB.
+assert.ok(runtimeGzip <= 88 * 1024, 'runtime exceeds 88 KiB');
 assert.ok(cssGzip <= 14 * 1024, 'css exceeds 14 KiB');
 const sources = content.concat(runtime).map((file) => ({ file, source: read(file).toString('utf8') }));
 const samples = [];

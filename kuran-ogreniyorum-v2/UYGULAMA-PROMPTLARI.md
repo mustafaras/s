@@ -188,6 +188,15 @@ etkileşim ve erişilebilirlik sözleşmesi bağlayıcı kalır.
 
 ---
 
+## K-1 revizyonu (2026-09-29, kullanıcı onayı)
+
+Runtime `quranLearn*` bütçesi **80 KiB → 88 KiB**. Gerekçe: KAO2-18 (hata
+sınıfına göre açıklama + kavram çözümlü örnekleri) ve sonrası çalışma zamanı
+kodu gerektiriyor; 80 KiB sınırında yalnız 615 bayt boşluk kalmıştı. Kapı:
+`tests/kao/test_kao2_perf_budget.js`.
+
+---
+
 ## §2 · Kartlar
 
 ### W0 — Hazırlık

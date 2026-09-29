@@ -1308,5 +1308,182 @@
         "at": "2026-09-29"
       }
     }
+  },
+  "concepts": {
+    "g0_5": {
+      "workedTr": "Örnek: \"yükseltiyor İbrahim temelleri\" → önce iş, sonra yapan, sonra etkilenen.",
+      "errorTr": "Sırayı Türkçedeki gibi kurma; önce işin (fiilin) geldiğini düşün.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g1": {
+      "workedTr": "Örnek: \"kitap\" belirsiz → \"bir kitap\"; başına \"el\" gelince \"o kitap\".",
+      "errorTr": "Baştaki \"el\"i kelimenin parçası sanma; \"o bilinen\" anlamı kattığını anımsa.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g2": {
+      "workedTr": "Örnek: \"hesap gününün sahibi\" → iki isim yan yana; ikincisi birincisini tamamlar.",
+      "errorTr": "Tamlamayı Türkçedeki \"-nın … -ı\" bağı olarak oku; kelimeleri ayrı ayrı çevirme.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g3": {
+      "workedTr": "Örnek: \"-de/-den/-e\" anlamı Arapçada kelimenin önündeki küçük kelimeyle verilir.",
+      "errorTr": "Bu anlamı kelime sonunda arama; cümlenin başındaki küçük kelimeye bak.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g4": {
+      "workedTr": "Örnek: \"o, onlar, sen, biz\" tek başına duran kısa kelimelerdir; fiile yapışmaz.",
+      "errorTr": "Zamiri fiilin içinde arama; cümlede ayrı duran kısa kelimeyi bul.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g5": {
+      "workedTr": "Örnek: \"-ı, -leri, -in, -im\" kelimenin sonuna yapışır ve sahibini gösterir.",
+      "errorTr": "Eki kelimenin başında arama; sondaki parçaya bak.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g6": {
+      "workedTr": "Örnek: \"yok, değil, -me\" anlamını üç ayrı olumsuzluk kelimesi taşır.",
+      "errorTr": "Olumsuzluğu fiilin içinde arama; cümledeki ayrı olumsuzluk kelimesini bul.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g7": {
+      "workedTr": "Örnek: \"-an, -en, ki o\" bağları Arapçada ayrı kelimelerle kurulur.",
+      "errorTr": "Bağı Türkçedeki gibi ekle arama; cümledeki ayrı bağ kelimesini gör.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g8": {
+      "workedTr": "Örnek: \"şüphesiz\" vurgusu bir kelimeyle, \"ancak\" sınırlaması başka bir kelimeyle yapılır.",
+      "errorTr": "Vurgu ile sınırlamayı karıştırma; hangisinin pekiştirdiğini, hangisinin daralttığını düşün.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g9": {
+      "workedTr": "Örnek: yakın için \"bu\", uzak için \"o\"; ikisi de tek başına durur.",
+      "errorTr": "İşaret kelimesini ismin eki sanma; ayrı duran kelimeyi bul.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g10": {
+      "workedTr": "Örnek: \"Allah Samed\" → \"Allah Samed'dir\". \"-dır\" yazılmaz, cümle yine tamdır.",
+      "errorTr": "Cümlede \"-dır\" arama; iki isim yan yana geldiyse cümle tamamdır.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g11": {
+      "workedTr": "Örnek: sondaki yuvarlak \"te\" kelimenin dişil olduğunu gösterir.",
+      "errorTr": "Sondaki yuvarlak işareti süs sanma; kelimenin türünü değiştirdiğini anımsa.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g12": {
+      "workedTr": "Örnek: çoğul ya sona ek gelir ya da kelimenin içi değişir.",
+      "errorTr": "Çoğulu yalnız eke bakarak arama; kelimenin içinin de değişebileceğini düşün.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g13": {
+      "workedTr": "Örnek: \"yaptı → yaptılar → yaptım\" aynı kökten son ekle kurulur.",
+      "errorTr": "Zamanı kökten ayırma; son eklerin kişiyi değiştirdiğini gör.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g14": {
+      "workedTr": "Örnek: \"idi, oldu\" anlamı veren fiil, ardından gelen fiile \"-ıyordu\" rengi katar.",
+      "errorTr": "İki fiili iki ayrı zaman sanma; yardımcı fiilin zamanı taşıdığını anımsa.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g15": {
+      "workedTr": "Örnek: \"yapar, yapıyor\" anlamı fiilin başına gelen bir harfle kurulur.",
+      "errorTr": "Şimdiki zamanı son ekte arama; fiilin başındaki harfe bak.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g16": {
+      "workedTr": "Örnek: aynı fiil üç olumsuzlukla üç ayrı zaman anlatır: yapmaz, yapmadı, asla yapmayacak.",
+      "errorTr": "Üç olumsuzluğu aynı sanma; hangi zamanı anlattığını ayırt et.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g17": {
+      "workedTr": "Örnek: \"dersin\" → \"de!\"; emir, şimdiki zaman fiilinin başı atılarak kurulur.",
+      "errorTr": "Emri ayrı bir kelime sanma; şimdiki zaman fiilinden türediğini düşün.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g18": {
+      "workedTr": "Örnek: seslenmek için \"ey\" kullanılır; \"el\"li kelimeden önce ikili biçim gelir.",
+      "errorTr": "Seslenmeyi cümlenin parçası sanma; kendinden sonraki ismi işaret ettiğini gör.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g19": {
+      "workedTr": "Örnek: aynı kökten \"yazan\" ve \"yazılan\" türer; biri yapanı, biri yapılanı gösterir.",
+      "errorTr": "Kalıbı rastgele seçme; kelimenin yapan mı yapılan mı olduğunu sor.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g20": {
+      "workedTr": "Örnek: \"bildi\" fiilinden \"bilme, bilgi\" adı türer.",
+      "errorTr": "Fiille adını aynı sanma; adın işi değil, işin kendisini gösterdiğini anımsa.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g21": {
+      "workedTr": "Örnek: \"bildi\" → \"öğretti\"; kalıp değişince anlam kayar.",
+      "errorTr": "Kökü tanıyıp anlamı aynı sanma; kalıbın anlamı kaydırdığını düşün.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g22": {
+      "workedTr": "Örnek: \"eğer … -se\", \"-dığı zaman\", \"-seydi (ama olmadı)\" ayrı kelimelerle kurulur.",
+      "errorTr": "Şartı tek kalıp sanma; gerçekleşmiş, gerçekleşmemiş ve zaman anlamlarını ayır.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g23": {
+      "workedTr": "Örnek: \"idi, değildir\" gibi fiiller cümleye zaman ve durum rengi verir.",
+      "errorTr": "Bu fiilleri asıl iş sanma; cümlenin rengini belirlediklerini gör.",
+      "review": {
+        "level": "draft"
+      }
+    },
+    "g24": {
+      "workedTr": "Örnek: bazı söz kalıpları sık tekrarlanır; kalıbı tanıyınca cümle bütün olarak açılır.",
+      "errorTr": "Kelime kelime çevirip kalıbı kaçırma; tekrarlanan bütünü tanımaya çalış.",
+      "review": {
+        "level": "draft"
+      }
+    }
   }
 }

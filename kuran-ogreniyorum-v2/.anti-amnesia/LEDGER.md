@@ -732,3 +732,51 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-17/YAYIN.md · release-live.json
 - evidence-levels: kaynak/test PASS · Pages/run/hash PASS · cihaz doğrulanmadı.
 - next: KAO2-18
+
+## seq 72 · 2026-09-29 · CARD · KAO2-18
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-18/KANIT.md
+- gates: KAO 35/35 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/contrast PASS
+- budget: runtime 81.032/88 KiB · content 173.726/256 · curriculum 14.926/48 · css 10.728/14 · p95 4.651-6.104 ms
+- evidence-levels: kaynak/test PASS · yayın KAO2-18 sonrası · cihaz doğrulanmadı
+- next: KAO2-19
+
+**Ayrıntı.**
+**Kart:** KAO2-18 — Hata açıklamaları ve kavram çözümlü örnekleri (W4).
+**Sonuç:** `done` · kanıt `evidence/KAO2-18/KANIT.md`.
+
+**Yapılan.** `kaoExplain(task,choice,correct)` hata sınıfına göre boş olmayan Türkçe
+açıklama üretir (dil bilgisi/sıralama/ses/kökteş), doğru cevabı **nedeniyle** söyler,
+utandırıcı dil kullanmaz. 25 kavram için `workedTr`/`errorTr` yazıldı; yapı aracı bunları
+`app/content/quranConceptTextsV1.js` modülüne birleştirir (`draft` → `null` → görünmez).
+Gramer kavram sayfası çözümlü örneği `kao-grammar-worked` bloğunda gösterir.
+
+**Kullanıcının bildirdiği üç kusur (Y-01/02/03) önce yeniden üretildi, sonra düzeltildi.**
+Y-01: Yolun kartı "Fâtiha" yazıp tıklanınca üniteyi değil **yol listesini** açıyordu →
+birincil düğme artık "Üniteyi aç" (`kaoNav('unit',1)`), "Tüm yolu gör" ikincil.
+Y-02: ders ekranına bağlam satırı → "Ünite 1 · Fâtiha · Ders 1 / 5".
+Y-03: KAO2-17'de yazılan **109 dersin `goal` alanı hiçbir yerde render edilmiyordu**
+(ölü veri) → ünite listesinde ve ders kartında görünür.
+
+**Bütçe.** Kullanıcı onayıyla K-1 çalışma zamanı bütçesi **80 → 88 KiB**
+(KAO2-17 sonunda 79.399/80 ile ~0,6 KiB kalmıştı).
+
+**Kendi hatalarım (testler yakaladı).** (1) `kaoExplain` içinde ölü `else` dalı
+hesaplanan satırı eziyordu → kaldırıldı. (2) `kao-path-more` hakkında çelişen iki iddia
+→ teke indirildi. (3) `iip_22` kırıldı: yeni modül `sw.js` çevrimdışı izin listesinde
+yoktu → eklendi.
+
+**Kapılar.** KAO **35/35** · app **77/77** · panel 23/23 · panel-v2 27/27 · quran 9/9 ·
+reminders/driver/zikr/contrast PASS · `git diff --check` temiz.
+Bütçe: çalışma zamanı **81.032/88** · içerik 173.726/256 · curriculum 14.926/48 ·
+CSS 10.728/14 · p95 4.651–6.104 ms.
+
+**Dürüst not (p95).** Ardışık ölçümde p95 9.4 ms'ye tırmanıp taban+%25 bandını aşıyor,
+soğuk ölçümde geçiyor — fark makine yükü; perf testi CSS'i ölçmüyor, aynı kaynakla tur
+başına sonuç değişiyor. Kod +%65 büyürken soğuk p95 **+%20** (5.088→6.104), yani
+büyümenin altında. KAO2-01 taban çizgisi (5.088 ms) o günün boyutunu kaydediyor.
+
+**Açık kalan.** 12 kavram metni `draft` (L1 bekliyor, uygulamada görünmez); 12 ünite
+`why` metni L2 bekliyor; **cihaz kabulü hiç yapılmadı**; gerçek ekran okuyucu testi yok.
+
+**Sonraki:** KAO2-19.

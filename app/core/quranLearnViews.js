@@ -145,11 +145,13 @@
     var number=Number(options.percent),pct=Number.isFinite(number)?Math.round(Math.max(0,Math.min(100,number))):0;
     var coverage=Number(options.coverage),hasCoverage=options.coverage!==null&&options.coverage!==undefined&&Number.isFinite(coverage);
     var meta=hasCoverage?'<p class="kao-path-meta">'+escapeText(options.known)+' kelime tanıdık · Kur’an kelimelerinin <span data-countup="'+Math.round(coverage)+'" data-countup-key="kao-coverage">'+Math.round(coverage)+'</span>%’i</p>':'<p class="kao-path-goal">'+escapeText(options.goal)+'</p>';
-    var call=actionCall(options.action);
+    var call=actionCall(options.action),moreCall=actionCall(options.moreAction);
     return '<section class="kao-path-card" aria-labelledby="kao-path-title"><h3 class="kao-section-title" id="kao-path-title">Yolun</h3><div class="kao-path-surface"><p class="kao-path-level">'+escapeText(options.level)+'</p>'+
       '<div class="kao-path-bar" role="progressbar" aria-label="Ünite ilerlemesi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><span class="kao-path-fill"'+(pct>0?' style="width:'+pct+'%"':'')+'></span></div>'+
       '<p class="kao-path-unit">'+escapeText(options.unit)+'</p>'+meta+
-      '<button type="button" class="kao-path-more"'+(call?' onclick="'+call+'"':' disabled')+'><span>Tüm yolu gör</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></div></section>';
+      // KAO2-18 (Y-01): birincil eylem içinde bulunulan ÜNİTEyi açar; Yol listesi ikincil kalır.
+      (call?'<button type="button" class="kao-path-unit-open" onclick="'+call+'"><span>'+escapeText(options.openLabel||'Üniteyi aç')+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button>':'')+
+      (moreCall?'<button type="button" class="kao-path-more" onclick="'+moreCall+'"><span>Tüm yolu gör</span><span class="kao-group-chevron" aria-hidden="true">›</span></button>':'')+'</div></section>';
   }
   function todayScreen(model){
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
@@ -190,7 +192,9 @@
     var lessons=(Array.isArray(model.lessons)?model.lessons:[]).map(function(lesson){
       lesson=lesson&&typeof lesson==='object'?lesson:{};
       var status=lesson.done===true?'done':(lesson.current===true?'current':'upcoming'),mark=status==='done'?'✓':(status==='current'?'●':'○');
-      return '<li class="kao-unit-step kao-unit-step-'+status+'"'+(lesson.current===true?' aria-current="step"':'')+'><span class="kao-unit-step-mark" aria-hidden="true">'+mark+'</span><span class="kao-unit-step-title">'+escapeText(lesson.title)+'</span><span class="kao-sr-only">'+escapeText(status==='done'?'Tamamlandı':(status==='current'?'Sıradaki ders':'Sırada'))+'</span></li>';
+      // KAO2-18 (Y-03): dersin hedef cümlesi listede görünür (onaylıysa).
+      var goal=lesson.goal?'<span class="kao-unit-step-goal">'+escapeText(lesson.goal)+'</span>':'';
+      return '<li class="kao-unit-step kao-unit-step-'+status+'"'+(lesson.current===true?' aria-current="step"':'')+'><span class="kao-unit-step-mark" aria-hidden="true">'+mark+'</span><span class="kao-unit-step-body"><span class="kao-unit-step-title">'+escapeText(lesson.title)+'</span>'+goal+'</span><span class="kao-sr-only">'+escapeText(status==='done'?'Tamamlandı':(status==='current'?'Sıradaki ders':'Sırada'))+'</span></li>';
     }).join('');
     var concepts=(Array.isArray(model.concepts)?model.concepts:[]).map(function(item){
       if(!item||typeof item!=='object') return '<li>'+escapeText(item)+'</li>';
@@ -211,7 +215,9 @@
     if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
     var title=escapeText(model.title),label=escapeText(model.progress),call=actionCall(model.action),exit=actionCall(model.exit),body='';
-    var top='<header class="kao-lesson-head"><span class="kao-lesson-step">'+label+'</span><button type="button" class="kao-lesson-exit"'+(exit?' onclick="'+exit+'"':' disabled')+' aria-label="Dersi kapat">Kapat</button></header>';
+    // KAO2-18 (Y-02): kullanıcı hangi ünitenin kaçıncı dersinde olduğunu görmeli.
+    var ctx=model.context?'<p class="kao-lesson-context">'+escapeText(model.context)+'</p>':'';
+    var top='<header class="kao-lesson-head"><span class="kao-lesson-step">'+label+'</span><button type="button" class="kao-lesson-exit"'+(exit?' onclick="'+exit+'"':' disabled')+' aria-label="Dersi kapat">Kapat</button></header>'+ctx;
     if(model.stage==='intro'){
       var anchor=(Array.isArray(model.anchor)?model.anchor:[]).map(function(word){
         word=word&&typeof word==='object'?word:{};
@@ -250,7 +256,8 @@
       var nextHtml=next?'<section class="kao-lesson-anchor kao-lesson-summary-next" aria-labelledby="kao-lesson-summary-next-title"><h4 id="kao-lesson-summary-next-title">Sıradaki adım</h4><p>'+escapeText(next.title)+'</p><p>'+escapeText(next.subtitle)+'</p></section>':'';
       body='<section class="kao-lesson-card kao-lesson-summary" aria-labelledby="kao-lesson-title" aria-live="polite"><p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
     }else{
-      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.promise)+'</p></section>';
+      var goalLine=model.goal?'<p class="kao-lesson-goal-line">'+escapeText(model.goal)+'</p>':'';
+      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3>'+goalLine+'<p>'+escapeText(model.promise)+'</p></section>';
     }
     var buttonLabel=escapeText(model.buttonLabel||'Devam');
     var secondaryCall=actionCall(model.secondaryAction),secondary=model.secondaryAction?'<button type="button" class="kao-lesson-audio kao-lesson-more"'+(secondaryCall?' onclick="'+secondaryCall+'"':' disabled')+'>'+escapeText(model.secondaryLabel||'5 dakika daha')+'</button>':'';
@@ -363,12 +370,13 @@
       table=table&&typeof table==='object'?table:{};
       return '<section class="kao-grammar-example"><h4>'+escapeText(table.title)+'</h4>'+grammarTable(table)+'</section>';
     }).join('');
+    var worked=model.workedTr?'<p class="kao-grammar-worked"><span>Çözümlü örnek</span> '+escapeText(model.workedTr)+'</p>':'';
     var lessons=(Array.isArray(model.lessons)?model.lessons:[]).map(function(item){
       item=item&&typeof item==='object'?item:{};
       var call=actionCall(item.action);
       return '<li><button type="button" class="kao-grammar-lesson"'+(call?' onclick="'+call+'"':' disabled')+'><span>'+escapeText(item.title)+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
     }).join('');
-    return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p></div></div>'+examples+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
+    return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p>'+worked+'</div></div>'+examples+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
   }
 
   window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen};

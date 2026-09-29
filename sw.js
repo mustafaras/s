@@ -5,12 +5,12 @@
  * gösterilen native bildirimler sw.showNotification() üzerinden buradan geçer.
  */
 
-const SW_VERSION = '20260929f';
+const SW_VERSION = '20260929g';
 
 // IIP-22: controlled, public-only offline package. This is deliberately an
 // exact allowlist, not a runtime cache. Personal data, authenticated responses,
 // panel payloads, media and third-party responses can never enter this cache.
-const SW_OFFLINE_VERSION = 'iip22-20260929f';
+const SW_OFFLINE_VERSION = 'iip22-20260929g';
 const SW_OFFLINE_PREFIX = 'seyma-offline-v1-';
 const SW_OFFLINE_CACHE = SW_OFFLINE_PREFIX + SW_OFFLINE_VERSION;
 const SW_OFFLINE_TEMP = SW_OFFLINE_CACHE + '-temp';
@@ -20,7 +20,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './index.html',
   './manifest.json?v=20260730f',
   './app/styles.css?v=20260929c',
-  './app/kao.css?v=20260929f',
+  './app/kao.css?v=20260929g',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',
   './app/content/motivationProgramV2.js?v=20260730p',
@@ -31,11 +31,12 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/content/quranRevelationOrderV1.js?v=20260730p',
   './app/content/quranTransportV1.js?v=20260730p',
   './app/content/quranStrikingVersesV1.js?v=20260922b',
-  './app/content/quranLexiconV1.js?v=20260929f',
-  './app/content/quranGrammarV1.js?v=20260929f',
-  './app/content/quranShortSurahsV1.js?v=20260929f',
+  './app/content/quranLexiconV1.js?v=20260929g',
+  './app/content/quranGrammarV1.js?v=20260929g',
+  './app/content/quranShortSurahsV1.js?v=20260929g',
   './app/content/quranPhonicsV1.js?v=20260924b',
-  './app/content/quranCurriculumV2.js?v=20260929f',
+  './app/content/quranCurriculumV2.js?v=20260929g',
+  './app/content/quranConceptTextsV1.js?v=20260929g',
   './app/content/esmaulHusnaV1.js?v=20260730p',
   './app/content/esmaulHusnaV2.js?v=20260730p',
   './app/content/zikirCoreContentV1.js?v=20260730p',
@@ -46,10 +47,10 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/helpers.js?v=20260903b',
   './app/core/prayer.js?v=20260921f',
   './app/core/zikir.js?v=20260915a',
-  './app/core/quranLearnFlow.js?v=20260929f',
-  './app/core/quranLearnViews.js?v=20260929f',
+  './app/core/quranLearnFlow.js?v=20260929g',
+  './app/core/quranLearnViews.js?v=20260929g',
   './app/core/quran.js?v=20260915a',
-  './app/core/quranLearn.js?v=20260929f',
+  './app/core/quranLearn.js?v=20260929g',
   './app/core/saygi.js?v=20260929c',
   './app/core/motivation.js?v=20260909a',
   './app/core/crisis.js?v=20260909a',
@@ -69,11 +70,11 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/reminderDelivery.js?v=20260818a',
   './app/core/reminders.js?v=20260914a',
   './app/core/reminderSurface.js?v=20260914d',
-  './app/core/messaging.js?v=20260929f',
+  './app/core/messaging.js?v=20260929g',
   './app/core/render.js?v=20260924a',
-  './app/core/appSurface.js?v=20260929f',
-  './app.js?v=20260929f',
-  './sync.js?v=20260929f'
+  './app/core/appSurface.js?v=20260929g',
+  './app.js?v=20260929g',
+  './sync.js?v=20260929g'
 ]);
 
 function swManifestDescriptor() {

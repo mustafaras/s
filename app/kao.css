@@ -296,3 +296,17 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-grammar-row:focus-visible,.kao-grammar-lesson:focus-visible,.kao-unit-concept:focus-visible,.kao-grammar-term summary:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
 @media(forced-colors:active){.kao-grammar-unit,.kao-grammar-table-wrap,.kao-grammar-lessons ul{border-color:CanvasText;background:Canvas}.kao-grammar-row,.kao-grammar-lesson,.kao-unit-concept{background:Canvas;color:CanvasText}.kao-grammar-row-title,.kao-grammar-row-plain,.kao-grammar-group h3,.kao-grammar-intro,.kao-grammar-plain,.kao-grammar-example h4,.kao-grammar-table th,.kao-grammar-table td,.kao-grammar-ar,.kao-grammar-reading,.kao-grammar-term p,.kao-grammar-lessons h3{color:CanvasText}.kao-grammar-row:focus-visible,.kao-grammar-lesson:focus-visible,.kao-unit-concept:focus-visible{outline-color:Highlight}}
 /* KAO2-15 son */
+
+/* KAO2-18 · yönlendirme ve ders bağlamı: Yolun kartının birincil eylemi içinde bulunulan üniteyi açar (Y-01),
+   ders hedefi ünite listesinde ve ders kartında görünür (Y-02/Y-03), kavram çözümlü örneği okunur. Yalnız --kao-* tokenları. */
+.kao-path-unit-open{appearance:none;box-sizing:border-box;width:100%;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:9px 12px;border:1px solid var(--kao-tint);border-radius:var(--kao-r-ctl);background:color-mix(in srgb,var(--kao-tint) 10%,var(--kao-surface));color:var(--kao-tint);font:inherit;font-size:var(--f-body);font-weight:600;cursor:pointer}
+.kao-path-unit-open:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
+.kao-unit-step-body{display:grid;gap:2px;min-width:0}
+.kao-unit-step-goal{min-width:0;color:var(--kao-label-2);font-size:var(--f-footnote);line-height:1.4;overflow-wrap:anywhere}
+.kao-unit-step[aria-current="step"] .kao-unit-step-goal{color:var(--kao-label)}
+.kao-lesson-context{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600;overflow-wrap:anywhere}
+.kao-lesson-goal-line,.kao-grammar-worked{margin:0;padding:10px 12px;border-left:3px solid var(--kao-tint);border-radius:var(--kao-r-ctl);background:color-mix(in srgb,var(--kao-tint) 7%,var(--kao-surface));color:var(--kao-label);font-size:var(--f-subhead);line-height:1.45;overflow-wrap:anywhere}
+.kao-grammar-worked{color:var(--kao-label-2)}
+.kao-grammar-worked>span{display:block;margin-bottom:4px;color:var(--kao-tint);font-size:var(--f-footnote);font-weight:600}
+@media(forced-colors:active){.kao-path-unit-open{border-color:CanvasText;background:Canvas;color:LinkText}.kao-unit-step-goal,.kao-lesson-context,.kao-grammar-worked{color:CanvasText}.kao-lesson-goal-line,.kao-grammar-worked{border-left-color:CanvasText;background:Canvas}.kao-grammar-worked>span{color:CanvasText}}
+/* KAO2-18 son */

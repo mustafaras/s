@@ -245,6 +245,7 @@ const FILES = [
   'app/content/quranShortSurahsV1.js',
   'app/content/quranPhonicsV1.js',
   'app/content/quranCurriculumV2.js',
+  'app/content/quranConceptTextsV1.js',
   'app/content/esmaulHusnaV1.js',
   'app/content/esmaulHusnaV2.js',
   'app/content/zikirCoreContentV1.js',

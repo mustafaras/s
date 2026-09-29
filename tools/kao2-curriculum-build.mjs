@@ -14,6 +14,8 @@ const OUT_MODULE = 'app/content/quranCurriculumV2.js';
 const OUT_REVIEW = 'kuran-ogreniyorum-v2/inceleme/MUFREDAT-ESLEME.md';
 const TEXTS = 'kuran-ogreniyorum-v2/content/texts.tr.json';
 const OUT_TEXT_REVIEW = 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md';
+const OUT_CONCEPT_REVIEW = 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-18.md';
+const OUT_CONCEPT_MODULE = 'app/content/quranConceptTextsV1.js';
 const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
 
 function fail(message) {
@@ -327,6 +329,57 @@ function renderTextReview(data) {
   return lines.join('\n');
 }
 
+// KAO2-18: 25 kavram için workedTr (çözümlü örnek) + errorTr (hata açıklaması).
+// draft metinler modüle yazılmaz; uygulama güvenli genel metne düşer.
+function buildConceptTexts(texts) {
+  const concepts = texts.concepts || {};
+  const out = {};
+  Object.keys(concepts).sort().forEach((id) => {
+    const entry = concepts[id] || {};
+    const level = entry.review && ['sourced', 'expert'].includes(entry.review.level) ? entry.review.level : 'draft';
+    out[id] = {
+      workedTr: level === 'draft' ? null : String(entry.workedTr || '') || null,
+      errorTr: level === 'draft' ? null : String(entry.errorTr || '') || null,
+      level
+    };
+  });
+  return out;
+}
+
+function renderConceptReview(texts, grammar) {
+  const concepts = texts.concepts || {};
+  const lines = ['# İnceleme · KAO2-18 — Kavram çözümlü örnekleri ve hata açıklamaları', '',
+    '> Bu sayfa `tools/kao2-curriculum-build.mjs` ile üretilir; elle düzenlenmez.',
+    '> Onaylanmamış (`draft`) metinler uygulamada **gösterilmez**; yerine güvenli genel metin gelir.', ''];
+  const ids = Object.keys(concepts).sort();
+  const draftCount = ids.filter((id) => !(concepts[id].review && concepts[id].review.level !== 'draft')).length;
+  lines.push('## Durum', '', `- Toplam kavram: **${ids.length}**`, `- \`draft\` (görünmez): **${draftCount}**`, '');
+  lines.push('## Kavramlar', '');
+  ids.forEach((id) => {
+    const entry = concepts[id] || {};
+    const concept = grammar && typeof grammar.byId === 'function' ? grammar.byId(id) : null;
+    lines.push(`### ${id} · ${concept ? concept.title : '—'}`, '',
+      `- Çözümlü örnek (workedTr): ${entry.workedTr || '—'}`,
+      `- Hata açıklaması (errorTr): ${entry.errorTr || '—'}`,
+      `- İnceleme: \`${(entry.review && entry.review.level) || 'draft'}\``,
+      '- [ ] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun', '');
+  });
+  return lines.join('\n');
+}
+
+function renderConceptModule(map) {
+  return [
+    '// KAO2-18 donmuş çıktı: kavram çözümlü örnekleri ve hata açıklamaları.',
+    '// `tools/kao2-curriculum-build.mjs` üretir; elle düzenlenmez. draft -> null.',
+    '(function(window){',
+    "  'use strict';",
+    `  var DATA=${JSON.stringify(map)};`,
+    '  window.QuranConceptTextsV1=Object.freeze({version:1,byId:function(id){ return Object.prototype.hasOwnProperty.call(DATA,String(id))?DATA[String(id)]:null; },all:DATA});',
+    '})(window);',
+    ''
+  ].join('\n');
+}
+
 function main() {
   const args = process.argv.slice(2);
   const at = args.indexOf('--out-dir');
@@ -335,7 +388,9 @@ function main() {
   const content = loadContent();
   const texts = readTexts();
   const data = build(spec, content, texts);
-  const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)], [OUT_TEXT_REVIEW, renderTextReview(data)]];
+  const conceptTexts = buildConceptTexts(texts);
+  const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)], [OUT_TEXT_REVIEW, renderTextReview(data)],
+    [OUT_CONCEPT_REVIEW, renderConceptReview(texts, content.grammar)], [OUT_CONCEPT_MODULE, renderConceptModule(conceptTexts)]];
   for (const [file, text] of outputs) {
     const target = path.join(outDir, file);
     fs.mkdirSync(path.dirname(target), { recursive: true });

@@ -4,9 +4,9 @@
   "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
-  "releaseApproval": "approved_through_KAO2-12",
+  "releaseApproval": "approved_through_KAO2-13",
   "nextCard": "KAO2-14",
-  "ledgerLastSeq": 56,
+  "ledgerLastSeq": 57,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -208,7 +208,7 @@
   "releaseApprovalRecord": {
     "by": "user",
     "at": "2026-09-29",
-    "scope": "KAO2-12 ve onaylı İlham & İbadet Arapça sekmesi; kullanıcı “tam ve kusursuz uyguladıysan canlıya al” talebiyle branch push, main fast-forward ve Pages yayınına açıkça onay verdi"
+    "scope": "KAO2-13; kullanıcı 2026-09-29'da 'push deploy' diyerek KAO2-13 için branch push, main fast-forward ve GitHub Pages yayınına açıkça onay verdi"
   },
   "lastRelease": {
     "scope": "KAO2-12 + İlham & İbadet Arapça sekmesi",

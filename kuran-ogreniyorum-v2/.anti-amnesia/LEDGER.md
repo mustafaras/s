@@ -538,3 +538,10 @@ Kurallar:
 - evidence-levels: kaynak/test PASS · yayın yok · cihaz doğrulanmadı
 - surprises: seq54 P6 engeli çözüldü; releaseApproval KAO2-12 ile sınırlı.
 - next: KAO2-14
+
+## seq 57 · 2026-09-29 · NOTE · KAO2-13
+- status: approved
+- summary: Kullanıcı “push deploy” talimatıyla KAO2-13'ün tamamlanmış kapsamını yayımlamaya açıkça yetki verdi.
+- scope: `kao2-yeniden-tasarim` dalını push et; ortak `28efe60` tabanından `main`'e fast-forward et; GitHub Pages validate/deploy ve canlı runtime hash doğrulamasını tamamla. KAO2-14 dahil değildir.
+- releaseApproval: `approved_through_KAO2-13`; `mustafaras/seyma-data` yazımı yok.
+- next: KAO2-14

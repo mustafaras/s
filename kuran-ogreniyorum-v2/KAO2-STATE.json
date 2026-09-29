@@ -4,9 +4,9 @@
   "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
-  "releaseApproval": "approved_through_KAO2-15",
+  "releaseApproval": "approved_through_KAO2-16",
   "nextCard": "KAO2-17",
-  "ledgerLastSeq": 65,
+  "ledgerLastSeq": 66,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -208,7 +208,7 @@
   "releaseApprovalRecord": {
     "by": "user",
     "at": "2026-09-29",
-    "scope": "KAO2-14/15 yerel commit + dal push + main'e fast-forward + GitHub Pages yayını + canlı doğrulama; kullanıcı 2026-09-29'da 'izinleri veriyorum ve onaylıyorum tümünü canlıya da al' dedi"
+    "scope": "KAO2-16; kullanıcı 2026-09-29'da 'tam ve kusursuz uygulandığından emin ol ve canlıya al' diyerek dal push, main fast-forward, Pages yayını ve canlı doğrulamaya onay verdi"
   },
   "lastRelease": {
     "scope": "KAO2-13",

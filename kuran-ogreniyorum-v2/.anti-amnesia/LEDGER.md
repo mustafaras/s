@@ -666,3 +666,13 @@ Kurallar:
 - evidence-levels: kaynak/test PASS · yayın yok · cihaz doğrulanmadı
 - surprises: Bütçe daraldı (79.005/80 KiB); kaoUnitSlices kaldırıldı; eski migration fikstürü curriculum modülünü yüklemiyordu.
 - next: KAO2-17
+## seq 66 · 2026-09-29 · NOTE · KAO2-16
+- status: verified
+- summary: Yayın pini yükseltildi. KAO2-16 çalışma zamanı dosyasını (quranLearn.js)
+  değiştirdiği için pin sabit kalsaydı PWA önbelleği eski taş mantığını sunacaktı.
+- action: `sh docs/kuran-ogreniyorum/duzeltme/araclar/kao-yayin-pini.sh 20260929e`
+  (9 dosya: index.html, sw.js, 7 tests/app) + `tests/kao/test_kao2_curriculum.js`
+  (betiğin kapsamadığı yer). `quranPhonicsV1.js` ayrı pini korundu.
+- gates: KAO 33/33 · app 77/77 · panel 23/23 PASS (pin sonrası yeniden koşuldu)
+- evidence-levels: kaynak/test ✓ · yayın: pin sonrası yayınlanacak · cihaz —
+- next: KAO2-17

@@ -2,11 +2,11 @@
 
 <!-- kao2-sync
 nextCard: KAO2-17
-lastSeq: 65
+lastSeq: 66
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq65
+Son güncelleme: 2026-09-29 · LEDGER seq66
 
 ## Şu an neredeyiz
 **KAO2-00…16 tamamlandı (17/28).** KAO2-16 taş katmanını düzeltti: Fâtiha taşı artık

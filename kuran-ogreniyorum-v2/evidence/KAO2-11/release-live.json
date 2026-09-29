@@ -1,0 +1,68 @@
+{
+  "scope": "KAO2-11",
+  "sourceCommit": "e827d24b358db020bf34f5f1064df13e0476e48d",
+  "remoteParity": {
+    "branch": "e827d24b358db020bf34f5f1064df13e0476e48d",
+    "main": "e827d24b358db020bf34f5f1064df13e0476e48d",
+    "previousSharedCommit": "c23fe78e",
+    "mergeMode": "fast-forward",
+    "equal": true
+  },
+  "actions": {
+    "runId": 36545143962,
+    "url": "https://github.com/mustafaras/s/actions/runs/36545143962",
+    "headSha": "e827d24b358db020bf34f5f1064df13e0476e48d",
+    "createdAt": "2026-09-29T08:49:14Z",
+    "completedAt": "2026-09-29T08:50:21Z",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": {
+      "validate": "success",
+      "deploy": "success"
+    }
+  },
+  "live": {
+    "verifiedAt": "2026-09-29T08:51:17Z",
+    "commit": "e827d24b358db020bf34f5f1064df13e0476e48d",
+    "baseUrl": "https://mustafaras.github.io/s/",
+    "pin": "20260928b",
+    "assetCount": 16,
+    "assets": [
+      {"path":"index.html","status":200,"bytes":128052,"sha256":"c4fcbb5bfe58f431788b477cc8f03629f2b030e9cbdcd957471045b6cf09cca7","matchesLocal":true},
+      {"path":"sw.js","status":200,"bytes":17253,"sha256":"2d04eab7ebec617414a67479d0a4c71a67d5cfe25c52ebd2bce48e58df289a96","matchesLocal":true},
+      {"path":"app.js","status":200,"bytes":605623,"sha256":"906c89c599e66e733900b0f87c226c91d8842c0cf35906c7bd1a69646093be7d","matchesLocal":true},
+      {"path":"sync.js","status":200,"bytes":91899,"sha256":"c4e5d81144d93d361f5f3e4844ae1e63ae16ea9964ce916f53dc70159a50bd4b","matchesLocal":true},
+      {"path":"app/kao.css","status":200,"bytes":53272,"sha256":"7dd0188825f38ac9d0888e68d9a1c5f3c6593de24435a14823e0ca116e015c60","matchesLocal":true},
+      {"path":"app/core/quranLearn.js","status":200,"bytes":214740,"sha256":"727897d500a8958e752ec1c6409c8c7023132e39f45687fd507cb56932a619cb","matchesLocal":true},
+      {"path":"app/core/quranLearnFlow.js","status":200,"bytes":11700,"sha256":"ec833042e7b8df8fc8e47b5ff046df061280341d55087b8a5ab573e56c343c19","matchesLocal":true},
+      {"path":"app/core/quranLearnViews.js","status":200,"bytes":18593,"sha256":"c312c229c2da85e3c37c68c314ea1c5a51d4adcc8e6467d5883ad9937037cf88","matchesLocal":true},
+      {"path":"app/core/appSurface.js","status":200,"bytes":69286,"sha256":"142d00a1ea4963238fc47961298a008f1941972ebb8a4fc1a559c457d98d9818","matchesLocal":true},
+      {"path":"app/core/messaging.js","status":200,"bytes":31043,"sha256":"4f25841fcbe8a383229135ff6e74c160375cbe9e1d5893c0f436863800880e9b","matchesLocal":true},
+      {"path":"app/core/saygi.js","status":200,"bytes":118266,"sha256":"a8b00dec456b355adf23cc65ded825c072bbb05285883cbd35bd4a1c76d2caba","matchesLocal":true},
+      {"path":"app/content/quranLexiconV1.js","status":200,"bytes":324323,"sha256":"c1e5296a2646c6f90324b5b55957ec7ed3fba5e83b7c5dd3c5b154671706e8f6","matchesLocal":true},
+      {"path":"app/content/quranGrammarV1.js","status":200,"bytes":51353,"sha256":"e8a3c56f3b242c6302506a9ed4eac6023909c5425829aab6177fc254a130f5fc","matchesLocal":true},
+      {"path":"app/content/quranShortSurahsV1.js","status":200,"bytes":87463,"sha256":"18d0802e34c819c378b0ff27dae62b1c3c78dd572342d6e11b29487bb262271a","matchesLocal":true},
+      {"path":"app/content/quranPhonicsV1.js","status":200,"bytes":9552,"sha256":"3dfead88d140844266ecc007dc860c5eb7e720985556cd502669a478d8b3c7b9","matchesLocal":true},
+      {"path":"app/content/quranCurriculumV2.js","status":200,"bytes":45935,"sha256":"8e566182d44344ec845dbeb59b2931446438f59b0ad2c9323e83320badf7d53d","matchesLocal":true}
+    ],
+    "excludedPaths": [
+      {
+        "path": "kuran-ogreniyorum-v2/KAO2-STATE.json",
+        "status": 404,
+        "expected": 404
+      },
+      {
+        "path": "kuran-ogreniyorum-v2/evidence/KAO2-11/KANIT.md",
+        "status": 404,
+        "expected": 404
+      }
+    ],
+    "deviceAcceptance": "not_verified",
+    "offlinePackageNote": "sw.js önceki yayınla bayt-eşit; çevrimdışı paketi kurulu cihazlar aynı ?v=20260928b URL’lerini önbellekten verir ve KAO2-11’i sw.js değişene kadar görmez"
+  },
+  "releaseAuthorization": {
+    "by": "user",
+    "date": "2026-09-29",
+    "scope": "KAO2-11; kullanıcı “canlıya al”"
+  }
+}

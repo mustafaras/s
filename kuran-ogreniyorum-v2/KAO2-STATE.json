@@ -4,9 +4,9 @@
   "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
-  "releaseApproval": "approved_through_KAO2-10",
+  "releaseApproval": "approved_through_KAO2-11",
   "nextCard": "KAO2-12",
-  "ledgerLastSeq": 44,
+  "ledgerLastSeq": 45,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -202,15 +202,15 @@
   "releaseApprovalRecord": {
     "by": "user",
     "at": "2026-09-29",
-    "scope": "KAO2-10; kullanıcı “tümünü canlıya al” talebiyle branch push, main fast-forward ve Pages yayınına açıkça onay verdi (önceki onay KAO2-07…09 + denetim FIX)"
+    "scope": "KAO2-11; kullanıcı “canlıya al” talebiyle branch push, main fast-forward ve Pages yayınına açıkça onay verdi (önceki onay KAO2-10)"
   },
   "lastRelease": {
-    "scope": "KAO2-10",
-    "commit": "811ebc8835a789f23c48a0764b93460853092c68",
+    "scope": "KAO2-11",
+    "commit": "e827d24b358db020bf34f5f1064df13e0476e48d",
     "pin": "20260928b",
-    "actionsRun": 36534605512,
+    "actionsRun": 36545143962,
     "status": "verified",
-    "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-10/release-live.json",
+    "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-11/release-live.json",
     "deviceAcceptance": "not_verified"
   },
   "infrastructureRelease": {

@@ -423,3 +423,14 @@ Kurallar:
 - status: presented
 - summary: G1 · W2 ara özeti kullanıcıya sunuldu (bilgi amaçlı, yanıt beklenmez). W2 (KAO2-07…11) kapandı. Kapanan bulgular: K-01, K-02, K-03, K-08, O-02, Y-01…Y-05, Y-08, T-01…T-05, T-10, T-11; Y-13 kısmen (harf bilmeyen kullanıcı yerleştirmeye girmeden S0'a yönlenir). Kanıt düzeyleri ayrı: kaynak/test ✓ (KAO2-07…11) · yayın ✓ KAO2-10'a kadar (811ebc88, run 36534605512), KAO2-11 yayında değil · cihaz — (kullanıcıda). İsteğe bağlı yerel görsel QA yalnız kullanıcı isterse.
 - next: KAO2-12
+
+## seq 45 · 2026-09-29 · NOTE · —
+- status: verified
+- summary: Kullanıcı "canlıya al" dedi; KAO2-11 yayınlandı, releaseApproval approved_through_KAO2-11.
+- source: `e827d24b358db020bf34f5f1064df13e0476e48d`; `kao2-yeniden-tasarim` ve `main` c23fe78e'den fast-forward.
+- actions: Pages run 36545143962 success; validate ve deploy PASS.
+- live: 16/16 runtime varlığı HTTP 200 ve yerel SHA-256 ile birebir; STATE ve KAO2-11 KANIT beklenen 404.
+- risk: sw.js/index.html değişmedi → çevrimdışı paketli cihazlar KAO2-11'i sw.js değişene kadar görmez.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-11/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-11/release-live.json
+- evidence-levels: kaynak/test PASS · yayın/run/hash PASS · cihaz doğrulanmadı
+- next: KAO2-12

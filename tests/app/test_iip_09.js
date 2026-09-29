@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// IIP-09 — beş bölüm hedef bilgi mimarisi.
+// IIP-09 — İlham & İbadet gezinmesi + kullanıcı onaylı Arapça altıncı sekme.
 // No-network/node:vm fixture; mevcut App handler kimlikleri ve kart davranışı
 // korunurken görünür sekme adları ile yüzey sahipliği doğrulanır.
 
@@ -13,6 +13,8 @@ const root = path.resolve(__dirname, '../..');
 const saygiSource = fs.readFileSync(path.join(root, 'app/core/saygi.js'), 'utf8');
 const cssSource = fs.readFileSync(path.join(root, 'app/styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+const indexSource = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const swSource = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 let passed = 0;
 let failed = 0;
 function check(name, condition, detail) {
@@ -78,13 +80,19 @@ check('IIP-09 registry boots with a dependency bag', registry && registry.regist
 check('second registration remains fail-closed', registry.registerSaygi(deps) === false);
 
 const nav = registry.faithNavHTML();
-check('REQ-017 visible names are Bugün/İlham/İbadet/Zikir/Ritim',
-  ['Bugün', 'İlham', 'İbadet', 'Zikir', 'Ritim'].every(label => nav.includes('<b>' + label + '</b>')));
+check('REQ-017 visible names include the six approved sections',
+  ['Bugün', 'İlham', 'İbadet', 'Zikir', 'Ritim', 'Arapça'].every(label => nav.includes('<b>' + label + '</b>')));
 check('REQ-017 existing faith handler ids remain stable',
   ['oz', 'oncu', 'iman', 'zikir', 'rapor'].every(id => nav.includes("App.setFaithTab('" + id + "')")));
+check('approved Arapça tab reuses the existing faith-tab handler and has a clear accessible name',
+  nav.includes("App.setFaithTab('arapca')") && nav.includes('aria-label="Kur’an Arapçası öğrenme sekmesi"'));
 check('REQ-017 navigation keeps selected-page semantics',
   nav.includes('aria-current="page"') && nav.includes('aria-pressed="true"') &&
   nav.includes('data-legacy-label="Öz"'));
+ui.faithTab = 'arapca';
+const arabicNav = registry.faithNavHTML();
+check('Arapça selected state is exposed to assistive technology',
+  /aria-label="Kur’an Arapçası öğrenme sekmesi"[^>]*aria-current="page"[^>]*aria-pressed="true"/.test(arabicNav));
 
 ui.faithTab = 'oz';
 const today = registry.saygiPreviewHubHTML(person, null, false);
@@ -93,8 +101,21 @@ check('REQ-017 Bugün keeps a continuation surface',
   today.includes('zikr-v2-preview'));
 check('REQ-017 full Quran card belongs to Bugün and qibla does not',
   today.includes('quran-journey-card') && !today.includes('qibla-card'));
-check('KAO UI remediation: learning card follows Quran Journey in Bugün',
-  today.includes('kao-hub-entry') && today.indexOf('quran-journey-card') < today.indexOf('kao-hub-entry'));
+check('approved Arapça relocation removes the compact KAO card from Bugün',
+  !today.includes('kao-hub-entry') && today.includes('quran-journey-card'));
+
+ui.faithTab = 'arapca';
+const arabic = registry.saygiPreviewHubHTML(person, null, false);
+check('Arapça tab renders a full learning overview with the four requested stages',
+  arabic.includes('data-faith-tab="arapca"') && arabic.includes('iip-arabic-course') &&
+  ['Tanış', 'Kavram', 'Pekiştir', 'Uygula'].every(label => arabic.includes('<b>' + label + '</b>')));
+check('Arapça tab uses the KAO read-only progress summary and one existing App.kaoOpen CTA',
+  arabic.includes('BUGÜNKÜ DERSİN VE İLERLEMEN') && arabic.includes('kao-hub-entry') &&
+  (arabic.match(/id="kao-hub-entry"/g) || []).length === 1 &&
+  (arabic.match(/App\.kaoOpen\(\)/g) || []).length === 1);
+check('Arapça course uses a semantic heading and ordered learning path',
+  arabic.includes('aria-labelledby="iip-arabic-course-title"') &&
+  arabic.includes('<ol class="iip-arabic-course-path" aria-label="Öğrenme yolu">'));
 
 ui.faithTab = 'oncu';
 const inspiration = registry.saygiPreviewHubHTML(person, null, false);
@@ -124,19 +145,32 @@ check('REQ-017 route ownership is tab-scoped instead of a shared rail',
   /tab==='iman'.*qiblaHubCardHTML\(\)/.test(saygiSource) &&
   /else body=.*quranHub\(\)/.test(saygiSource) &&
   !/routeRail=.*qiblaHubCardHTML\(\)\+quranHub\(\)/.test(saygiSource));
-check('REQ-018 tab anchor is explicit and narrow',
+check('REQ-018 tab anchor is explicit, responsive, and preserves 44px+ targets',
   cssSource.includes('.iip-09-section') && cssSource.includes('.iip-09-route-rail') &&
-  cssSource.includes('@media(max-width:389px)'));
+  cssSource.includes('@media(max-width:389px)') && cssSource.includes('min-height:50px') &&
+  cssSource.includes('min-height:47px'));
+check('Arapça overview styles every new class and becomes a full-width mobile-friendly layout',
+  ['iip-arabic-course','iip-arabic-course-head','iip-arabic-course-eyebrow','iip-arabic-course-title',
+    'iip-arabic-course-lead','iip-arabic-course-path','iip-arabic-course-step','iip-arabic-course-step-index',
+    'iip-arabic-course-progress','iip-arabic-course-progress-label']
+    .every(name => cssSource.includes('.saygi-page .' + name)) &&
+  cssSource.includes('grid-template-columns:repeat(2,minmax(0,1fr))') &&
+  cssSource.includes('.iip-arabic-course-progress .kao-hub-card{width:100%'));
+check('Arapça surface cache pins match the app shell and offline manifest',
+  indexSource.includes('app/styles.css?v=20260929b') &&
+  indexSource.includes('app/core/saygi.js?v=20260929b') &&
+  swSource.includes("'./app/styles.css?v=20260929b'") &&
+  swSource.includes("'./app/core/saygi.js?v=20260929b'"));
 
 quranCardState = 'loading';
 ui.faithTab = 'oz';
-check('TC-017 loading state stays inside the Bugün Quran entry',
+check('TC-017 loading state stays inside the Bugün Quran entry after KAO relocation',
   registry.saygiPreviewHubHTML(person, null, false).includes('data-state="loading"'));
 quranCardState = 'error';
-check('TC-017 error state stays inside the Bugün Quran entry',
+check('TC-017 error state stays inside the Bugün Quran entry after KAO relocation',
   registry.saygiPreviewHubHTML(person, null, false).includes('data-state="error"'));
 quranCardState = 'empty';
-check('TC-017 empty state stays inside the Bugün Quran entry',
+check('TC-017 empty state stays inside the Bugün Quran entry after KAO relocation',
   registry.saygiPreviewHubHTML(person, null, false).includes('data-state="empty"'));
 
 function sourceBetween(start, end) {

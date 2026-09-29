@@ -481,3 +481,10 @@ Kurallar:
 - evidence-levels: source/test PASS · release not authorized beyond KAO2-11 · device not verified
 - surprises: first perf attempt 8.977 ms failed noisy timing gate; isolated retry 4.587 ms PASS. Initial full KAO run exposed 64 items for a 60 due + dailyNew=0 fixture; nested fallback fix preserves explicit zero; requirements and full KAO suite pass.
 - next: KAO2-13
+
+## seq 51 · 2026-09-29 · NOTE · KAO2-12
+- status: approved
+- summary: Kullanıcı “tam ve kusursuz uyguladıysan canlıya al” diyerek KAO2-12 kapanışının ve daha önce onayladığı İlham & İbadet Arapça sekmesinin release kapsamını onayladı.
+- scope: `kao2-yeniden-tasarim` dalı push, `main` fast-forward ve GitHub Pages deploy; KAO2-13 kapsam dışı.
+- releaseApproval: `approved_through_KAO2-12`; Pages ve canlı runtime hash doğrulaması bekleniyor.
+- next: KAO2-13

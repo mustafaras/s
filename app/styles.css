@@ -2834,3 +2834,19 @@
 .saygi-page .kao-hub-title{font-weight:800}
 .saygi-page .kao-hub-card .kao-progress-ring{color:var(--ib-gold)}
 @media (forced-colors:active){.saygi-page .iip17-reader,.saygi-page .iip21-program,.saygi-page .quran-v2-preview,.saygi-page .kao-hub-card,.saygi-page .hub-v2-preview,.saygi-page .zikr-v2-preview{border-color:CanvasText!important;background:Canvas!important}}
+
+/* İlham & İbadet · Kur’an Arapçası öğrenme sekmesi */
+.saygi-page .iip-arabic-course{width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;padding:clamp(18px,4vw,28px);border:1px solid var(--ib-line);border-left:4px solid var(--ib-gold);border-radius:var(--ib-r);background:linear-gradient(160deg,color-mix(in srgb,var(--ib-quran-tone) 9%,var(--ib-surface)) 0%,var(--ib-surface) 62%);box-shadow:var(--ib-shadow);color:var(--text)}
+.saygi-page .iip-arabic-course-head{display:flex;flex-direction:column;gap:8px;min-width:0}
+.saygi-page .iip-arabic-course-eyebrow,.saygi-page .iip-arabic-course-progress-label{margin:0;color:var(--ib-eyebrow);font-size:var(--f-caption2);font-weight:900;letter-spacing:.1em}
+.saygi-page .iip-arabic-course-title{margin:0;color:var(--text);font-size:var(--f-title2);font-weight:900;line-height:1.18;letter-spacing:-.02em}
+.saygi-page .iip-arabic-course-lead{max-width:60ch;margin:0;color:var(--text2);font-size:var(--f-body);line-height:1.55}
+.saygi-page .iip-arabic-course-path{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0;padding:0;list-style:none}
+.saygi-page .iip-arabic-course-step{min-width:0;min-height:118px;box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:13px;border:1px solid var(--ib-line);border-radius:16px;background:color-mix(in srgb,var(--ib-gold) 5%,var(--ib-surface))}
+.saygi-page .iip-arabic-course-step-index{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:var(--ib-navy);color:var(--ib-on-navy);font-size:var(--f-caption2);font-weight:900;font-variant-numeric:tabular-nums}
+.saygi-page .iip-arabic-course-step b{color:var(--text);font-size:var(--f-callout);font-weight:850;line-height:1.2}
+.saygi-page .iip-arabic-course-step small{color:var(--text2);font-size:var(--f-footnote);font-weight:600;line-height:1.4}
+.saygi-page .iip-arabic-course-progress{display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid var(--ib-line)}
+.saygi-page .iip-arabic-course-progress .kao-hub-card{width:100%;max-width:none;min-height:56px;box-sizing:border-box}
+@media(max-width:560px){.saygi-page .iip-arabic-course{gap:16px;padding:17px}.saygi-page .iip-arabic-course-path{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.saygi-page .iip-arabic-course-step{min-height:112px;padding:11px}}
+@media(forced-colors:active){.saygi-page .iip-arabic-course,.saygi-page .iip-arabic-course-step,.saygi-page .iip-arabic-course-progress{border-color:CanvasText;background:Canvas;color:CanvasText}.saygi-page .iip-arabic-course-title,.saygi-page .iip-arabic-course-lead,.saygi-page .iip-arabic-course-step b,.saygi-page .iip-arabic-course-step small,.saygi-page .iip-arabic-course-eyebrow,.saygi-page .iip-arabic-course-progress-label{color:CanvasText}.saygi-page .iip-arabic-course-step-index{border:1px solid CanvasText;background:Canvas;color:CanvasText}}

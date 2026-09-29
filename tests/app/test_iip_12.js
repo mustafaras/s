@@ -295,7 +295,8 @@ console.log('[6] Hub — odak ve Devam Bugün sekmesinde; IIP-09 sözleşmesi ko
   ok('odak kartı tek baskın eylemdir (tek CTA)', (hub.match(/GÜNÜN ODAĞI/g) || []).length === 1);
   ok('Devam satırları Bugün sekmesinde', hub.indexOf('Kaldığın yer') > -1 && hub.indexOf('Yâ Latîf') > -1);
   ok('IIP-09: rota/Devam yüzeyleri korunur', hub.indexOf('iip-09-route-rail') > -1 && hub.indexOf('iip-09-today-continue') > -1);
-  ok('IIP-09: Bugün hâlâ Kur’an + zikir kartı taşır', hub.indexOf('quran-journey-card') > -1 && hub.indexOf('zikr-v2-preview') > -1);
+  ok('IIP-09: Bugün Kur’an + zikir kartını korur, taşınan KAO kartını göstermez',
+    hub.indexOf('quran-journey-card') > -1 && hub.indexOf('zikr-v2-preview') > -1 && hub.indexOf('kao-hub-entry') === -1);
   ok('IIP-09: İbadet araçları (kıble) Bugün’de değil', hub.indexOf('qibla-card') === -1);
   ok('yeni App handlerı eklenmedi (App.openZikr/openQuranJourney mevcut)',
     hub.indexOf('App.openZikr()') > -1 && hub.indexOf('App.openQuranJourney()') > -1);
@@ -307,8 +308,8 @@ console.log('[6] Hub — odak ve Devam Bugün sekmesinde; IIP-09 sözleşmesi ko
   ok('Öncü sekmesinde Devam satırı görünmez', oncu.indexOf('Kaldığın yer') === -1);
 }
 
-// ── [7] Yeni App.* eklenmediği ve CSS eklenmediği bekçisi ──────────────────
-console.log('[7] Bekçi — yeni App.* handler ve yeni CSS sınıfı yok');
+// ── [7] Yeni App.* eklenmediği; onaylı Arapça sınıfları stilli ──────────────
+console.log('[7] Bekçi — yeni App.* handler yok; Arapça sekme sınıfları stilli');
 {
   const appSource = fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8');
   const cssSource = fs.readFileSync(path.join(ROOT, 'app/styles.css'), 'utf8');
@@ -322,10 +323,14 @@ console.log('[7] Bekçi — yeni App.* handler ve yeni CSS sınıfı yok');
   const missing = calls.filter(n => appSource.indexOf('App.' + n + '=function') === -1);
   ok('çağrılan her App handler app.js\'te tanımlı', missing.length === 0, missing.join(','));
 
-  // Yeni sınıf uydurulmadı: hub katmanı yalnız stilli mevcut sınıfları kullanır.
+  // Bugün ek sınıf üretmez; onaylı Arapça sekmenin yeni sınıfları stillenmelidir.
   const invented = ['sg-daily-focus', 'sg-continue-row', 'sg-continue-icon', 'sg-continue-copy', 'sg-continue-go', 'saygi-continue'];
   const leaked = invented.filter(c => src.indexOf(c) > -1);
   ok('CSS\'siz yeni sınıf bırakılmadı', leaked.length === 0, leaked.join(','));
+  ['iip-arabic-course','iip-arabic-course-head','iip-arabic-course-eyebrow','iip-arabic-course-title',
+    'iip-arabic-course-lead','iip-arabic-course-path','iip-arabic-course-step','iip-arabic-course-step-index',
+    'iip-arabic-course-progress','iip-arabic-course-progress-label']
+    .forEach(function (c) { ok('Arapça sekme sınıfı stilli: .' + c, src.indexOf(c) > -1 && cssSource.indexOf('.saygi-page .' + c) > -1); });
   ['saygi-source-card', 'saygi-link-thumb', 'saygi-link-copy', 'saygi-link-label', 'saygi-link-sub', 'saygi-link-arrow']
     .forEach(function (c) { ok('kullanılan sınıf stilli: .' + c, cssSource.indexOf('.' + c) > -1); });
 

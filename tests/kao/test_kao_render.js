@@ -387,7 +387,9 @@ assert.match(appSource, /App\.kaoSetView=function\(v\)\{ return window\.SeymaQur
 for (const name of ['kaoStart', 'kaoAnswer', 'kaoContinue', 'kaoUndo', 'kaoPlay', 'kaoOpenWord', 'kaoWordLayer', 'kaoFlag', 'kaoGate', 'kaoOpenSurah', 'kaoRevealWord', 'kaoMarkUnderstood']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
 assert.doesNotMatch(settingsSource, /kao-settings-entry|App\.kaoOpen\(\)/, 'geçici Ayarlar girişi kaldırılmalı');
 assert.match(appSource, /kaoHubCardHTML:function\(\)\{ return window\.SeymaQuranLearn\?window\.SeymaQuranLearn\.kaoHubCardHTML\(\):''; \}/);
-assert.match(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'Kur’an öğrenme kartı Bugün girişlerinde Kur’an Yolculuğu sonrasında olmalı');
+assert.match(saygiSource, /function arabicLearningHTML\(\)[\s\S]*?kaoHub\(\)[\s\S]*?function saygiPreviewHubHTML/, 'KAO hub kartı yeni Arapça öğrenme sayfasında mevcut ilerlemeyi sunmalı');
+assert.match(saygiSource, /tab==='arapca'\)body=arabicLearningHTML\(\)/, 'Arapça navigasyonu kurs sayfasını açmalı');
+assert.doesNotMatch(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'küçük KAO kartı Bugün Kur’an girişine karışmamalı');
 assert.match(indexSource, /app\/kao\.css\?v=\d{8}[a-z]/);
 for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-time-chip', '.kao-unit-card', '.kao-word-hero', '.kao-root-tree', '.kao-word-example', '.kao-gate', '.kao-h-fatha', '.kao-h-kesra', '.kao-h-damma', '.kao-reader', '.kao-reader-word', '.kao-waqf']) assert.ok(cssSource.includes(selector), selector);
 assert.doesNotMatch(cssSource, /:root\s*\{/);

@@ -468,7 +468,7 @@ ok('Premium nav erişilebilir bölüm adı ve seçili sayfa semantiği taşır',
   sb.App.setFaithTab('oz');
   return /<nav class="faith-v2-nav" aria-label="İlham ve İbadet bölümleri">/.test(appHTML)&&
     /class="on"[^>]*aria-current="page"/.test(appHTML)&&
-    (appHTML.match(/aria-current="false"/g)||[]).length===4;
+    (appHTML.match(/aria-current="false"/g)||[]).length===5&&appHTML.includes("App.setFaithTab('arapca')");
 })());
 
 ok('Premium nav ve yeni kartlar en az 44px dokunma hedefi taşır',

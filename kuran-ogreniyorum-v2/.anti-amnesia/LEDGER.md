@@ -709,3 +709,15 @@ Kurallar:
 - evidence-levels: kaynak/test PASS · yayın yok · cihaz doğrulanmadı
 - surprises: Yer tutucu ders başlıkları ("Ünite X · N. ders") ortaya çıktı ve düzeltildi; runtime boşluğu 0.6 KiB'e indi.
 - next: KAO2-18
+## seq 70 · 2026-09-29 · NOTE · KAO2-17
+- status: approved
+- summary: Kullanıcı yayın talimatıyla metinlerin L1 (proje sahibi) onayını verdi.
+  K-4 gereği dinî bağlam içermeyen metinlerde L0+L1 yeterlidir; 133 metin
+  `sourced` yapıldı ve görünür hâle geldi.
+- scope: `why` (neden önemli) alanı dinî bağlamlı olduğu için L2 bekleyen katman
+  olarak `draft` işaretlendi ve render edilmiyor. Ek yetki yok.
+- kalite: 4 kusurlu ders başlığı düzeltildi (kesik "Geçmiş zaman:", "'idi, oldu'",
+  "yap!, deyin!", "ey …").
+- gates: KAO 34/34 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 ·
+  reminders/driver/zikr/contrast/perf PASS
+- next: KAO2-18

@@ -291,13 +291,13 @@ assert.equal(api.kaoNav('units'), true);
 const pathHtml = api.kaoPathHTML();
 assert.equal((pathHtml.match(/class="kao-path-level-section/g) || []).length, 7, 'müfredatın yedi seviyesi görünmeli');
 assert.equal((pathHtml.match(/class="kao-path-unit-row/g) || []).length, 12, 'yol, 12 tematik müfredat ünitesini göstermeli');
-// KAO2-17: draft ünite başlığı gizlenir.
-assert.match(pathHtml, /Ünite 1/);
+// KAO2-17: L1 onayı sonrası ünite başlığı görünür.
+assert.match(pathHtml, /Fâtiha/);
 assert.doesNotMatch(pathHtml, /kao-levels|App\.kaoOpenWord|Kilitli/i, 'eski etkisiz kutular ve ilk-kelime rotası kalkmalı');
 assert.equal(api.kaoNav('unit', firstUnit.id), true, 'Ünite ayrıntısı gezinme yığınına eklenmeli');
 const unitsHtml = api.kaoUnitHTML(firstUnit.id);
-// KAO2-17: draft vaat gizlenir.
-assert.doesNotMatch(unitsHtml, /Her namazda okuduğun/);
+// KAO2-17: L1 onayı sonrası ünite vaadi görünür.
+assert.match(unitsHtml, /Her namazda okuduğun/);
 assert.match(unitsHtml, /Dersler/);
 assert.match(unitsHtml, /Kelimeler · \d+/);
 

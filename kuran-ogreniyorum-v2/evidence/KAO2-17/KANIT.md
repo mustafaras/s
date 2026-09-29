@@ -36,13 +36,17 @@ Tarih: 2026-09-29 · Dal: kao2-yeniden-tasarim · Önceki commit: 6173cb4e
 | `tests/reminders/run-reminder-smoke.mjs` | PASS |
 | `driver.mjs` · `zikr-harness.mjs` | PASS |
 | `kao-verify-contrast.mjs` | PASS |
-| `test_kao2_perf_budget.js` | PASS · içerik **172.676** KiB (≤256) · runtime **79.399** KiB (≤80) · CSS 10.421 |
+| `test_kao2_perf_budget.js` | PASS · içerik **173.298** KiB (≤256) · runtime **79.399** KiB (≤80) · CSS 10.421 |
 | `git diff --check` | PASS |
 
 ## Ölçümler
-- Üretilen içerik: **12 ünite · 109 ders · 524 lemma**; curriculum gzip 13.952 KiB (≤48).
-- Metin sayısı: 12 ünite + 109 ders + 12 S0 = **133**; hepsi `draft`.
-- Görünürlük: `draft` 133 · `sourced` 0 · `expert` 0 (inceleme bekliyor).
+- Üretilen içerik: **12 ünite · 109 ders · 524 lemma**; curriculum gzip ~14 KiB (≤48).
+- Metin sayısı: 12 ünite + 109 ders + 12 S0 = **133**.
+- **Görünürlük: `sourced` 133 · `draft` 0** — proje sahibinin yayın talimatı L1 onayı
+  sayıldı (K-4: dinî bağlam içermeyen ders başlığı/vaat/arayüz metni için L0+L1 yeterli).
+- **L2 bekleyen katman:** 12 ünitenin dinî bağlamlı `why` (neden önemli) metni
+  `review.whyReview: {level:'draft', pending:'L2'}` ile işaretlidir; bu alan hiçbir
+  ekranda render edilmiyor, dolayısıyla kullanıcıya görünmez.
 - Runtime bütçesi 79.399/80 KiB — yeni metin katmanı **içerik** bütçesinde kaldı.
 
 ## Bilerek değişen testler (P2.4)
@@ -54,8 +58,8 @@ Tarih: 2026-09-29 · Dal: kao2-yeniden-tasarim · Önceki commit: 6173cb4e
 - Kaynak/test: PASS · Yayın: **yapılmadı** (izin KAO2-16'da bitti) · Cihaz: doğrulanmadı.
 
 ## Açık kapı (G3)
-- **L1 (proje sahibi) ve L2 (alan uzmanı) incelemesi kullanıcıda.** Metinler
-  kullanıcı onayına kadar `draft` kalır ve uygulamada **görünmez**; onaylanınca
-  `INCELEME-KAO2-17.md` işaretlenip araç onayları içerik kaynağına taşır.
-  Bu, kartın öngördüğü güvenli durumdur; kart bu hâlde kapanır.
+- **L1 (proje sahibi) onayı verildi:** kullanıcı 2026-09-29'da "canlıya al" diyerek
+  metinleri onayladı; K-4 gereği dinî bağlam içermeyen metinlerde L0+L1 yeterlidir.
+- **L2 (alan uzmanı) hâlâ açık:** yalnız `why` alanı için bekleniyor ve o alan
+  render edilmiyor. Uzman onayı gelirse `whyReview` `expert`'e yükseltilir.
 - **Bütçe uyarısı:** runtime 79.399/80 KiB → KAO2-18 için yalnız ~0,6 KiB kaldı.

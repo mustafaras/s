@@ -83,7 +83,8 @@ check('(b) 12 ünite, derste 3–7 yeni kelime, son ders ustalık', () => {
     const n = lesson.lemmaIds.length;
     assert.ok(n >= 3 && n <= 7, `${lesson.id}: ${n} yeni kelime (3–7)`);
     assert.ok(lesson.title && typeof lesson.title === 'string', `${lesson.id}: başlık boş`);
-    assert.equal(lesson.review && lesson.review.level, 'draft', `${lesson.id}: review.level draft olmalı`);
+    // KAO2-17: L1 (proje sahibi) onayıyla metinler yayına açılır; 'draft' da geçerli bir durumdur.
+    assert.ok(['draft', 'sourced', 'expert'].includes(lesson.review && lesson.review.level), `${lesson.id}: geçerli review.level`);
     const last = unit.lessons[unit.lessons.length - 1] === lesson;
     assert.equal(lesson.mastery, last, `${lesson.id}: mastery yalnız son derste`);
   }
@@ -136,7 +137,8 @@ check('(d) kavram kimlikleri geçerli; 25 kavramın her biri bir derse bağlı',
 check('(e) Seviye 0: s0.01…s0.12', () => {
   const ids = [...cur.s0.lessons.map((l) => l.id)];
   assert.deepEqual(ids, Array.from({ length: 12 }, (_, i) => `s0.${String(i + 1).padStart(2, '0')}`));
-  for (const l of cur.s0.lessons) assert.ok(l.title && l.review.level === 'draft', `${l.id}: başlık/review`);
+  // KAO2-17: L1 onayıyla S0 metinleri de yayına açılabilir.
+  for (const l of cur.s0.lessons) assert.ok(l.title && ['draft','sourced','expert'].includes(l.review.level), `${l.id}: başlık/review`);
 });
 
 check('(f) lemmaToLesson ve byLesson tutarlı', () => {
@@ -179,9 +181,9 @@ check('(h) gzip ≤ 48 KiB', () => {
 check('yükleme listeleri: index.html, sw.js ve üç FILES listesi', () => {
   const html = read('index.html').toString('utf8');
   const a = html.indexOf('app/content/quranPhonicsV1.js');
-  const b = html.indexOf('app/content/quranCurriculumV2.js?v=20260929e');
-  assert.ok(a > 0 && b > a, 'index.html: quranPhonicsV1.js sonrası 20260929e pinli satır yok');
-  assert.ok(read('sw.js').toString('utf8').includes("'./app/content/quranCurriculumV2.js?v=20260929e'"), 'sw.js önbellek listesi');
+  const b = html.indexOf('app/content/quranCurriculumV2.js?v=20260929f');
+  assert.ok(a > 0 && b > a, 'index.html: quranPhonicsV1.js sonrası 20260929f pinli satır yok');
+  assert.ok(read('sw.js').toString('utf8').includes("'./app/content/quranCurriculumV2.js?v=20260929f'"), 'sw.js önbellek listesi');
   for (const file of ['.claude/skills/run-seyma/driver.mjs', '.claude/skills/run-seyma/zikr-harness.mjs', 'tests/app/test_state_rebind_boundary.js']) {
     const src = read(file).toString('utf8');
     const p = src.indexOf("'app/content/quranPhonicsV1.js'");

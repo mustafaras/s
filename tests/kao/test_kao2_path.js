@@ -61,12 +61,12 @@ check('yol: yedi seviye, tematik üniteler ve tek önerilen gerçek sıradaki ad
   const html = decode(api.kaoOverlayHTML());
   assert.equal(count(html, 'kao-path-level-section'), 7, 'S0–S6 için yedi bölüm');
   assert.equal(count(html, 'kao-path-unit-row'), 12, '12 tematik ünite müfredat sırasıyla görünür');
-  // KAO2-17: draft metinler gizli; güvenli 'Ünite 1' başlığı görünür.
-  assert.match(html, /Ünite 1/);
-  assert.doesNotMatch(html, /Her namazda okuduğun Fâtiha/);
+  // KAO2-17: L1 onayı sonrası ünite metinleri görünür.
+  assert.match(html, /Fâtiha/);
+  assert.match(html, /Her namazda okuduğun Fâtiha/);
   assert.match(html, /onclick="App\.kaoNav\("unit",1\)"/);
   assert.equal((html.match(/aria-current="step"/g) || []).length, 1, 'tek sıradaki ünite step olarak işaretlenir');
-  assert.match(html, /class="kao-progress-ring" role="img" aria-label="Ünite 1 ders ilerlemesi: 20%"/);
+  assert.match(html, /class="kao-progress-ring" role="img" aria-label="Fâtiha ders ilerlemesi: 20%"/);
   assert.match(html, /onclick="App\.kaoLesson\("start","s0\.02"\)"/, 'S0 satırı gerçek ilk tamamlanmamış derse gider');
   assert.match(html, /onclick="App\.kaoOpenSurah\(114\)"/, 'S5 satırı var olan kısa sûre okuyucusunu açar');
   assert.match(html, /Seviye 6/);
@@ -87,9 +87,9 @@ check('ünite: vaat, gerçek ilerleme, sıradaki ders ve statik kavram listesi',
   const html = decode(api.kaoOverlayHTML());
   const total = unit.lessons.reduce((sum, lesson) => sum + lesson.lemmaIds.length, 0);
   assert.match(html, /class="kao-screen[^\"]*kao-screen-unit/);
-  // KAO2-17: draft metinler gizli; güvenli 'Ünite 1' başlığı görünür.
-  assert.match(html, /Ünite 1/);
-  assert.doesNotMatch(html, /Her namazda okuduğun Fâtiha/);
+  // KAO2-17: L1 onayı sonrası ünite metinleri görünür.
+  assert.match(html, /Fâtiha/);
+  assert.match(html, /Her namazda okuduğun Fâtiha/);
   assert.match(html, new RegExp(`3 / ${total} kelime · 1 / ${unit.lessons.length} ders`));
   assert.match(html, /Ders 2’e devam et/);
   assert.match(html, /onclick="App\.kaoLesson\("start","u01\.02"\)"/);

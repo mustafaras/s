@@ -114,19 +114,23 @@ check('(f) [KAYNAK?] işareti kalmamış', () => {
   assert.doesNotMatch(src, /\[KAYNAK\?\]/, 'metin kaynağında [KAYNAK?] kaldı');
 });
 
-check('draft metin render\'da görünmez; güvenli geri dönüş başlığı kullanılır', () => {
-  // Ünite listesi (Yol) ve ünite detayı draft başlık/vaat göstermemeli.
-  const nav = api.kaoNav('units');
-  assert.equal(nav, true);
+check('onaylı metinler render\'da görünür; draft metin gizlenir', () => {
+  assert.equal(api.kaoNav('units'), true);
   const listHtml = html();
   for (const u of units) {
-    assert.ok(listHtml.includes(`Ünite ${u.id}`), `Yol: Ünite ${u.id} satırı var`);
-    assert.equal(listHtml.includes(u.promise), false, `Yol: draft vaat görünmez (u${u.id})`);
+    if (api.kaoReviewLevel(u.review) === 'sourced') {
+      assert.ok(listHtml.includes(esc(u.promise)), `Yol: onaylı vaat görünür (u${u.id})`);
+    } else {
+      assert.equal(listHtml.includes(esc(u.promise)), false, `Yol: draft vaat gizli (u${u.id})`);
+    }
   }
-  api.kaoNav('unit', units[0].id);
-  const unitHtml = html();
-  assert.match(unitHtml, /Güvenli başlık|Ünite 1/);
-  assert.equal(unitHtml.includes(units[0].promise), false, 'Ünite: draft vaat görünmez');
+  // draft metin güvenli başlığa düşer.
+  const draftUnit = { id: 9, review: { level: 'draft' }, title: 'Gizli', promise: 'Gizli vaat' };
+  assert.equal(api.kaoUnitTitle(draftUnit), 'Ünite 9', 'draft ünite güvenli başlığa düşer');
+  assert.equal(api.kaoReviewLevel({ level: 'sourced' }), 'sourced');
+  assert.equal(api.kaoReviewLevel({}), 'draft');
+  assert.equal(api.kaoTextSourceLabel({ level: 'draft' }), '', 'draft kaynak satırı üretmez');
+  assert.match(api.kaoTextSourceLabel(units[0].review), /^Kaynak: /, 'onaylı metin kaynak satırı taşır');
 });
 
 check('sourced/expert görünür; dinî bağlamlı olanda "Kaynak:" satırı var', () => {

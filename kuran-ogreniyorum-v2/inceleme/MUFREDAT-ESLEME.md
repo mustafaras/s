@@ -684,7 +684,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Geçmiş zaman anlatılarını çözeceksin.
 
-### u07.01 · Geçmiş zaman:
+### u07.01 · Geçmiş zamanı tanıyalım
 
 Kavram: g13 Geçmiş zaman: yaptı, yaptılar, yaptım · Uygula: examples
 
@@ -695,7 +695,7 @@ Kavram: g13 Geçmiş zaman: yaptı, yaptılar, yaptım · Uygula: examples
 | 3 | عَلِمَ | ʿalima | bildi | `l_Ealima_ceb6d7` |
 | 4 | جَآءَ | câ'a | geldi | `l_jaA_a_c0bd29` |
 
-### u07.02 · 'idi, oldu'
+### u07.02 · Yardımcı fiil: oldu, idi
 
 Kavram: g14 Kâne: 'idi, oldu' · Uygula: examples
 
@@ -908,7 +908,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Emir ve dua cümlelerini anlayacaksın.
 
-### u09.01 · 'yap!, deyin!'
+### u09.01 · Emir kipi: yap!
 
 Kavram: g17 Emir: yap!, deyin! · Uygula: examples
 
@@ -920,7 +920,7 @@ Kavram: g17 Emir: yap!, deyin! · Uygula: examples
 | 4 | آتَى | âtâ | verdi | `l_A_taY_2a778d` |
 | 5 | أَرَادَ | arâda | istedi, diledi | `l_araAda_e67825` |
 
-### u09.02 · 'ey …'
+### u09.02 · Seslenme: ey …
 
 Kavram: g18 Seslenme: ey … · Uygula: examples
 

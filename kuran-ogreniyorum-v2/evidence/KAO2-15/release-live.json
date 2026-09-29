@@ -4,10 +4,10 @@
     "KAO2-14": "86e646be",
     "KAO2-15": "3b0fcb6f"
   },
-  "releaseCommit": "0ee2a01881445e746837a24a73c564626afd93ac",
+  "releaseCommit": "59dfd659ad3cbb0ee9872d17ebd3992b68ad8223",
   "remoteParity": {
-    "branch": "0ee2a01881445e746837a24a73c564626afd93ac",
-    "main": "0ee2a01881445e746837a24a73c564626afd93ac",
+    "branch": "59dfd659ad3cbb0ee9872d17ebd3992b68ad8223",
+    "main": "59dfd659ad3cbb0ee9872d17ebd3992b68ad8223",
     "previousSharedCommit": "c1ebe168dfc4d79cfe6dfa446528c6b60603cdf1",
     "mergeMode": "fast-forward",
     "equal": true
@@ -26,17 +26,24 @@
       "status": "completed",
       "conclusion": "success",
       "note": "pin 20260929d sonrası yeniden yayın"
+    },
+    {
+      "runId": 36587033176,
+      "headSha": "59dfd659ad3cbb0ee9872d17ebd3992b68ad8223",
+      "status": "completed",
+      "conclusion": "success",
+      "note": "pin testlerini hizalayan son commit"
     }
   ],
   "live": {
     "verifiedAt": "2026-09-29T14:58:00Z",
-    "commit": "0ee2a01881445e746837a24a73c564626afd93ac",
+    "commit": "59dfd659ad3cbb0ee9872d17ebd3992b68ad8223",
     "baseUrl": "https://mustafaras.github.io/s/",
     "pins": {
       "kaoRuntime": "20260929d",
       "swVersion": "20260929d"
     },
-    "assetCount": 4,
+    "assetCount": 5,
     "assets": [
       {
         "path": "app/core/quranLearn.js",
@@ -64,6 +71,13 @@
         "status": 200,
         "bytes": 70181,
         "sha256": "3dce7380644539033bcdb34fc81c68e0a1a2289dfa806900c3882e2e8b782fdc",
+        "matchesLocal": true
+      },
+      {
+        "path": "sw.js",
+        "status": 200,
+        "bytes": 17253,
+        "sha256": "df0c00c80d95f9b4d4680895846e479480efb58a039dfce712f6c315a4dd788a",
         "matchesLocal": true
       }
     ],

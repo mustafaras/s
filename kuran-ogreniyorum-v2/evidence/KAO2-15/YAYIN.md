@@ -17,11 +17,12 @@ yazımı yoktur.
 | 4 | **Pin denetimi** | pin ve `SW_VERSION` `20260928b` kaldığı için PWA önbelleği eski KAO dosyalarını sunuyordu → pin **`20260929d`**'ye yükseltildi |
 | 5 | Pin commit `0ee2a018` + push | `3b0fcb6f..0ee2a018` |
 | 6 | Pages run **36586684295** | validate + deploy **success** |
-| 7 | Canlı doğrulama | 5/5 dosya **bayt-eş**, pinler `20260929d`, özel malzeme 404 |
+| 7 | Canlı doğrulama | dosyalar **bayt-eş**, pinler `20260929d`, özel malzeme 404 |
+| 8 | Eksik `tests/app` pin hizalaması (`59dfd659`) + push | run 36587033176 **success**; son doğrulama 6/6 **MATCH** |
 
 ## Canlı (doğrulandı)
 - Taban: `https://mustafaras.github.io/s/`
-- Commit: `0ee2a01881445e746837a24a73c564626afd93ac` (dal ve `main` eşit)
+- Commit: `59dfd659` (dal ve `main` eşit) — pin `0ee2a018`, yayın kanıtı `eebeffb4`, test hizalaması `59dfd659`
 - Pinler: `kaoRuntime=20260929d` · `swVersion=20260929d`
 - Bayt-eş dosyalar: `app/core/quranLearn.js`, `app/core/quranLearnFlow.js`,
   `app/core/quranLearnViews.js`, `app/kao.css`, `sw.js`

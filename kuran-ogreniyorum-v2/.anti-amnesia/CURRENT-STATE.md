@@ -2,11 +2,11 @@
 
 <!-- kao2-sync
 nextCard: KAO2-18
-lastSeq: 70
+lastSeq: 71
 status: active
 -->
 
-Son güncelleme: 2026-09-29 · LEDGER seq70
+Son güncelleme: 2026-09-29 · LEDGER seq71
 
 ## Şu an neredeyiz
 **KAO2-00…17 tamamlandı (18/28).** KAO2-17 Türkçe metin katmanını kurdu: 12 ünite

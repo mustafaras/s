@@ -721,3 +721,14 @@ Kurallar:
 - gates: KAO 34/34 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 ·
   reminders/driver/zikr/contrast/perf PASS
 - next: KAO2-18
+## seq 71 · 2026-09-29 · NOTE · KAO2-17
+- status: verified
+- summary: KAO2-17 kullanıcı onayıyla yayımlandı; 133 metin L1 ile sourced oldu ve görünür hâle geldi.
+- release-commit: `c1e11d5e` (pin düzeltmesi dâhil); önceki paylaşılan taban `6173cb4e`.
+- remote: dal ve `main` fast-forward ile `c1e11d5e` üzerinde eşit.
+- actions: run 36597032647 success.
+- live: 7/7 dosya HTTP 200 + SHA-256 eşleşmesi; pinler `20260929f`; KAO2-STATE, texts.tr.json ve KAO testi beklenen 404.
+- pins: KAO/SW ortak pin `20260929e` -> `20260929f`
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-17/YAYIN.md · release-live.json
+- evidence-levels: kaynak/test PASS · Pages/run/hash PASS · cihaz doğrulanmadı.
+- next: KAO2-18

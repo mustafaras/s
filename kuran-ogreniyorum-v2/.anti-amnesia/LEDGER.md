@@ -545,3 +545,16 @@ Kurallar:
 - scope: `kao2-yeniden-tasarim` dalını push et; ortak `28efe60` tabanından `main`'e fast-forward et; GitHub Pages validate/deploy ve canlı runtime hash doğrulamasını tamamla. KAO2-14 dahil değildir.
 - releaseApproval: `approved_through_KAO2-13`; `mustafaras/seyma-data` yazımı yok.
 - next: KAO2-14
+
+## seq 58 · 2026-09-29 · NOTE · KAO2-13
+- status: verified
+- summary: KAO2-13 kullanıcı onayıyla yayımlandı; kaynak/test ve Pages kanıtı ayrı kaydedildi.
+- source-commit: d93db66fc072bf2eee95d1d974fa3295fe6fe2cd
+- release-commit: 32ba39c7bdb83f97b63613ae377b0ed39340a28d
+- remote: branch ve main ortak `28efe60` tabanından fast-forward; ikisi `32ba39c` üzerinde eşit.
+- actions: run 36576010829 success; validate PASS · runtime guard PASS · deploy PASS.
+- live: 3/3 değişen KAO runtime dosyası HTTP 200 ve yerel SHA-256 eşleşmesi; KAO2-STATE ve KANIT URL'leri beklenen 404.
+- pins: KAO runtime `20260928b` korundu.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-13/YAYIN.md · kuran-ogreniyorum-v2/evidence/KAO2-13/release-live.json
+- evidence-levels: kaynak/test PASS · Pages/run/hash PASS · cihaz doğrulanmadı.
+- next: KAO2-14

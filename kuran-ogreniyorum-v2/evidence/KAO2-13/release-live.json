@@ -1,0 +1,49 @@
+{
+  "scope": "KAO2-13",
+  "sourceCommit": "d93db66fc072bf2eee95d1d974fa3295fe6fe2cd",
+  "releaseCommit": "32ba39c7bdb83f97b63613ae377b0ed39340a28d",
+  "remoteParity": {
+    "branch": "32ba39c7bdb83f97b63613ae377b0ed39340a28d",
+    "main": "32ba39c7bdb83f97b63613ae377b0ed39340a28d",
+    "previousSharedCommit": "28efe60af79dec6fb2e7a01fb786da7dc81b3c72",
+    "mergeMode": "fast-forward",
+    "equal": true
+  },
+  "actions": {
+    "runId": 36576010829,
+    "url": "https://github.com/mustafaras/s/actions/runs/36576010829",
+    "headSha": "32ba39c7bdb83f97b63613ae377b0ed39340a28d",
+    "createdAt": "2026-09-29T13:33:50Z",
+    "completedAt": "2026-09-29T13:34:28Z",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": {
+      "validate": "success",
+      "deploy": "success"
+    }
+  },
+  "live": {
+    "verifiedAt": "2026-09-29T13:35:52Z",
+    "commit": "32ba39c7bdb83f97b63613ae377b0ed39340a28d",
+    "baseUrl": "https://mustafaras.github.io/s/",
+    "pins": {
+      "kaoRuntime": "20260928b"
+    },
+    "assetCount": 3,
+    "assets": [
+      {"path":"app/core/quranLearn.js","status":200,"bytes":234459,"sha256":"e1ce1df7bcfcf22d91cae55c7ccab666813706df9964553a1f4df6752607809a","matchesLocal":true},
+      {"path":"app/core/quranLearnViews.js","status":200,"bytes":29963,"sha256":"def81b2bf8c0f0cf79b066392997854862136e4a41578379445db309b1a123c6","matchesLocal":true},
+      {"path":"app/kao.css","status":200,"bytes":65472,"sha256":"9c314fd84ab298eef38b569cffa35727b3ca17d124700d49baf799a35c2afe1a","matchesLocal":true}
+    ],
+    "excludedPaths": [
+      {"path":"kuran-ogreniyorum-v2/KAO2-STATE.json","status":404,"expected":404},
+      {"path":"kuran-ogreniyorum-v2/evidence/KAO2-13/KANIT.md","status":404,"expected":404}
+    ],
+    "deviceAcceptance": "not_verified"
+  },
+  "releaseAuthorization": {
+    "by": "user",
+    "date": "2026-09-29",
+    "scope": "KAO2-13 only; user said 'push deploy', authorizing branch push, main fast-forward and GitHub Pages"
+  }
+}

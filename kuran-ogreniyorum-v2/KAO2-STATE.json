@@ -6,7 +6,7 @@
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-13",
   "nextCard": "KAO2-14",
-  "ledgerLastSeq": 57,
+  "ledgerLastSeq": 58,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -211,12 +211,13 @@
     "scope": "KAO2-13; kullanıcı 2026-09-29'da 'push deploy' diyerek KAO2-13 için branch push, main fast-forward ve GitHub Pages yayınına açıkça onay verdi"
   },
   "lastRelease": {
-    "scope": "KAO2-12 + İlham & İbadet Arapça sekmesi",
-    "commit": "94f866a60bbc8b10ae17c13b6f3cbee7789cad05",
-    "pin": "app/styles.css + app/core/saygi.js 20260929b; KAO 20260928b",
-    "actionsRun": 36565235609,
+    "scope": "KAO2-13",
+    "sourceCommit": "d93db66fc072bf2eee95d1d974fa3295fe6fe2cd",
+    "commit": "32ba39c7bdb83f97b63613ae377b0ed39340a28d",
+    "pin": "KAO runtime 20260928b",
+    "actionsRun": 36576010829,
     "status": "verified",
-    "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-12/release-live.json",
+    "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-13/release-live.json",
     "deviceAcceptance": "not_verified"
   },
   "infrastructureRelease": {

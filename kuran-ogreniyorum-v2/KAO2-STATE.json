@@ -4,9 +4,9 @@
   "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
-  "releaseApproval": "approved_through_KAO2-13",
-  "nextCard": "KAO2-15",
-  "ledgerLastSeq": 60,
+  "releaseApproval": "approved_through_KAO2-15",
+  "nextCard": "KAO2-16",
+  "ledgerLastSeq": 62,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤80 KiB; kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -109,7 +109,7 @@
     },
     "KAO2-15": {
       "wave": "W3",
-      "status": "blocked",
+      "status": "done",
       "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-15/KANIT.md"
     },
     "KAO2-16": {
@@ -208,7 +208,7 @@
   "releaseApprovalRecord": {
     "by": "user",
     "at": "2026-09-29",
-    "scope": "KAO2-13; kullanıcı 2026-09-29'da 'push deploy' diyerek KAO2-13 için branch push, main fast-forward ve GitHub Pages yayınına açıkça onay verdi"
+    "scope": "KAO2-14/15 yerel commit + dal push + main'e fast-forward + GitHub Pages yayını + canlı doğrulama; kullanıcı 2026-09-29'da 'izinleri veriyorum ve onaylıyorum tümünü canlıya da al' dedi"
   },
   "lastRelease": {
     "scope": "KAO2-13",

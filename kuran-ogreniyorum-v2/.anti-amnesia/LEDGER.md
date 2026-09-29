@@ -598,3 +598,27 @@ Kurallar:
 - evidence: kuran-ogreniyorum-v2/evidence/KAO2-15/KANIT.md
 - evidence-levels: kaynak/test kısmi · yayın yok · cihaz doğrulanmadı
 - next: KAO2-15
+## seq 61 · 2026-09-29 · FIX · KAO2-15
+- status: approved
+- summary: Kullanıcı "izinleri veriyorum ve onaylıyorum tümünü canlıya da al"
+  diyerek iki şeye açık onay verdi: (a) `app/core/quranLearnFlow.js` `VIEWS`
+  beyaz listesine `grammar` anahtarını ekleme kapsamı, (b) KAO2-14/15'in
+  yayınlanması.
+- scope: Yalnız `VIEWS` listesine `grammar` anahtarı; router sözleşmesi, yığın
+  davranışı ve diğer görünümlere ek yetki verilmedi.
+- resolution: `VIEWS`'e `grammar:true` eklendi; `test_kao2_grammar_notes.js` 5/5
+  PASS, KAO ailesi 31/31 PASS. KAO2-15 blocked'tan çıkarılıp kapatıldı.
+- next: KAO2-15
+
+## seq 62 · 2026-09-29 · CARD · KAO2-15
+- status: done
+- title: Gramer notları kütüphanesi (S-10)
+- prev-commit: 86e646be
+- commit: HEAD+1
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-15/KANIT.md
+- gates: syntax PASS · KAO 31/31 PASS · app 77/77 PASS · panel 23/23 PASS · panel-v2 27/27 PASS · quran 9/9 PASS · reminders PASS · driver PASS · zikr 95/95 PASS · contrast 594/0 PASS · perf PASS · git diff --check PASS · sync PASS
+- metrics: liste 12 ünite grubu/25 kavram · kavram sayfası plainTr+tablo+katlanır terim+ders bağlantıları · 25/25 erişilebilir · içerik 168.483 KiB · runtime 78.316 KiB · CSS 10.421 KiB · p95 4.743 ms
+- changed-tests: `test_kao2_today.js` Keşfet dizisi + gizli-liste iddiası; `quranLearnFlow.js` VIEWS kapsamı kullanıcı onayıyla genişledi (seq 61)
+- evidence-levels: kaynak/test PASS · yayın onaylandı (canlı doğrulama ayrı kayıt) · cihaz doğrulanmadı
+- surprises: Router beyaz listesi motorun KAO_VIEW_TITLES tablosundan ayrı; yeni görünüm üç yerde birlikte eklenmeli.
+- next: KAO2-16

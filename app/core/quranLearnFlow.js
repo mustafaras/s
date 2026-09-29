@@ -1,7 +1,7 @@
 (function(window){
   'use strict';
 
-  var VIEWS={home:true,units:true,word:true,reader:true,settings:true,phonics:true,ayah:true,map:true,prayer:true,stats:true,gate:true,session:true};
+  var VIEWS={home:true,units:true,word:true,reader:true,settings:true,phonics:true,ayah:true,map:true,prayer:true,stats:true,gate:true,session:true,grammar:true};
 
   function entry(view,param,title){
     if(typeof view!=='string'||!VIEWS[view]) return null;

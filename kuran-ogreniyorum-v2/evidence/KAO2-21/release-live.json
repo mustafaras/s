@@ -1,0 +1,19 @@
+{
+  "card": "KAO2-21",
+  "date": "2026-09-30",
+  "branch": "kao2-yeniden-tasarim",
+  "commit": "98e8f2df",
+  "previousCommit": "b744fec3",
+  "pin": { "from": "20260930d", "to": "20260930e" },
+  "actions": { "workflow": "pages.yml", "runId": 36697504567, "conclusion": "success" },
+  "live": { "base": "https://mustafaras.github.io/s", "filesMatched": 6, "filesMismatched": 0, "privateMaterial": "404" },
+  "decisions": { "s0Surface": "B2", "elifLetter": "A3" },
+  "metrics": { "silentLetters": 0, "letters": 28, "fatihaWords": 29, "drills": 8, "positionRows": 28 },
+  "evidenceLevels": { "sourceTests": "PASS", "liveDeploy": "PASS", "deviceAcceptance": "NOT_PERFORMED" },
+  "openItems": [
+    "runtime bütçesi 87.423/88 KiB (%99.3)",
+    "elif (ا) içerikte yok (A3)",
+    "cihaz kabulü ve gerçek ses dinlemesi yapılmadı",
+    "alıştırma soru metinleri iskelet düzeyinde"
+  ]
+}

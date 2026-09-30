@@ -912,3 +912,14 @@ JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için 
 - pins: DEĞİŞMEDİ (App.kao* 42 · atama 601 · yüzey 763 · onclick 393)
 - fixed: line-height→line-min-height bozulması (10 yer + min-min-height) · aria-live için keyfi sayı sınırı → anlamlı kural · ^/$ çapalı regex yüzünden sessiz geçen yükseklik testi · kao-chip miras kalıntısı
 - next: KAO2-27
+
+## seq 83 · 2026-09-30 · CARD · KAO2-27
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-27/KANIT.md · kuran-ogreniyorum-v2/deliverables/KAO2-KAPANIS.md
+- scope: Program kapanışı. A-1…A-10 kabul ölçütleri GERÇEK koşullardan ölçüldü (tests/kao/test_kao2_kabul.js → evidence/KAO2-27/A-KABUL.md, 10/10 PASS); P10 kapanış kabulü (App.kaoOpen shim → motor, KAO kendi yayın yüzeyi, IIP bağımsız); sürüm pini 20260930k→20260930l tek committe (index.html · sw.js SW_VERSION/SW_OFFLINE_VERSION/önbellek · test_iip_22 release · tüm tests/kao pinleri); kapanış belgesi; CLAUDE.md + AGENTS.md Agent Routing'e tek KAO2 satırı; KAO2-STATE status=completed/nextCard=null.
+- gates: KAO 45/45 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/iip_22 PASS · kao2-sync-check PASS (completed)
+- budget: runtime 92,4/128 KiB · content 177,7/256 · css 12,8/14 · p95 ≤40 ms
+- pins: App.kao* 42 · atama 601 · yüzey 763 · onclick 393 (KAO2-25'ten beri sabit)
+- fixed: A-2'yi `isNew` bayrağıyla ölçüp üretimi bozdum (isNew günlük `new` sayacını besler) → `test_kao2_lesson_flow` gerçek gerileme yakaladı, değişiklik GERİ ALINDI; A-2 artık sipariş kuralıyla (tanış, alıştırmalardan önce) ölçülüyor. Ölçüm hatalarım da düzeltildi: lessonPlan dizi döndürür · sûre bağlamları `cur.surahs` · şekil≠veri · panel taskId eşleşmesi.
+- evidence-levels: kaynak/test PASS · yayın doğrulandı · **cihaz/ekran okuyucu/L1/L2/K-3 kayıtları kullanıcıda**
+- next: none

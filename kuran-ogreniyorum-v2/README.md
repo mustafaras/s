@@ -1,6 +1,8 @@
 # KAO2 — Kur'an Arapçası Öğreniyorum · Yeniden Tasarım Programı
 
-> **Durum:** UYGULAMA AKTİF · G0 kapalı · KAO2-00…02 tamamlandı (3/28) · sıradaki kart **KAO2-03**
+> **Durum:** 🏁 **KAPANDI (2026-09-30)** · KAO2-00…27 tamamlandı (**28/28**) · sıradaki kart **YOK** (`nextCard: null`)
+> **Kapanış belgesi:** [`deliverables/KAO2-KAPANIS.md`](deliverables/KAO2-KAPANIS.md) · **Kabul ölçütleri:** [`evidence/KAO2-27/A-KABUL.md`](evidence/KAO2-27/A-KABUL.md)
+> **Açık kalanlar (kullanıcıda):** L1 metin onayı · K-3 muallim kayıtları · cihaz kabulü (A-11/A-12) · ekran okuyucu turu. Yeni bir KAO2 işi ayrı kapsam onayı ister.
 > **Kapsam:** YALNIZ `Kur'an Arapçası Öğreniyorum` modülü — hub kartı, tam ekran
 > modal ve içindeki bütün ekranlar. Başka yüzeye dokunulmaz.
 > **Makine durumu:** [`KAO2-STATE.json`](KAO2-STATE.json) · **Şimdiki durum:** [`.anti-amnesia/CURRENT-STATE.md`](.anti-amnesia/CURRENT-STATE.md) · **Kayıt defteri:** [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md)

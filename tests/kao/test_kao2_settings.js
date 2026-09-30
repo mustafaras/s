@@ -115,7 +115,7 @@ check('alt sayfa kaynak/lisans + sürüm + gizlilik bilgisini taşır', () => {
 check('handler sayısı değişmedi: App.kao* 43 kalır (yeni handler yok)', () => {
   const app = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
   const kao = new Set((app.match(/App\.kao[A-Za-z0-9_]*\s*=[^=]/g) || []).map((s) => s.match(/App\.kao[A-Za-z0-9_]*/)[0]));
-  assert.equal(kao.size, 43, `App.kao* sayısı 43 olmalı (ölçülen ${kao.size})`);
+  assert.equal(kao.size, 42, `App.kao* sayısı 42 olmalı — KAO2-25 katman sayfalamasını kaldırdı (ölçülen ${kao.size})`);
 });
 
 check('ayarlar hâlâ TEK veri kaynağı: IIP sekmesine kopyalanmaz', () => {

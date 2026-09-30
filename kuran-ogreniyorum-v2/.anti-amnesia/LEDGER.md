@@ -891,3 +891,14 @@ JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için 
 - fixtures: test_kao2_navigation (map satırı çıktı) · test_kao_render E10 (gömülü harita) · test_kao2_today (gömülü hücre) — kartın gereği.
 - evidence-levels: kaynak/test PASS · yayın KAO2-24 sonrası · cihaz doğrulanmadı
 - next: KAO2-25
+
+## seq 81 · 2026-09-30 · CARD · KAO2-25
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-25/KANIT.md
+- scope: Kelime kartı "Katman 1/3" sayfalaması kaldırıldı → TEK kaydırmalı detay (kahraman → Anlamı → Türkçede → Kök → Kur'an'da → Öğrenme durumu → Hata bildir). Y-11 kapandı: doğrulanmamış örnek HİÇ gösterilmez, hata kutusu sızmaz. Panel aynası (KAO-19) genişledi: start/unit/lesson/lessonsDone/milestones — anlatı metni YOK, katı süzme, eski veriyle kırılmaz.
+- gates: KAO 43/43 (yeni test_kao2_word.js 11 kontrol) · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/iip_22 PASS · contrast PASS · design-contract --strict PASS
+- budget: runtime 92.431/128 KiB · content 177.657/256 · css 12.824/14
+- pins: **KASITLI** App.kao* 43→42 (kaoWordLayer kaldırıldı) · App.*=function 602→601 · App yüzeyi 764→763 · onclick 393 DEĞİŞMEDİ. 8 pin dosyası güncellendi.
+- fixed: test lemması kapsamı · assert.match argüman tipi · kök ikilisinde hata kutusu (Y-11) · nullable start · izinli olmayan --kao-r-2 → --kao-r-ctl · panel iki anahtar listesi · fx2 iki sayaç yeri.
+- evidence-levels: kaynak/test PASS · yayın KAO2-25 sonrası · cihaz doğrulanmadı
+- next: KAO2-26

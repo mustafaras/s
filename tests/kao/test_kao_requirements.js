@@ -334,7 +334,7 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   e7.kaoSetAudioStyle('off'); assert.equal(e7.kaoShouldAutoplay(withClip, e7Data), false, 'ses kapalıyken otomatik ses yok');
   const audioButton = e7.kaoTaskHTML(withClip);
   assert.match(audioButton, /App\.kaoPlay\('w-[^']+','flowing'\)/); assert.match(audioButton, /App\.kaoPlay\('w-[^']+','measured'\)/); assert.match(audioButton, /event\.shiftKey/);
-  e7.kaoSetAudioStyle('flowing'); e7Ui.kaoWordId = lemma.id; e7Ui.kaoWordLayer = 1;
+  e7.kaoSetAudioStyle('flowing'); e7Ui.kaoWordId = lemma.id;
   assert.match(e7.kaoWordHTML(), /App\.kaoPlay\('w-[^']+','flowing'\)/, 'kelime kartı tek düğmesi seçilen stili çalar');
 
   // R-C4: CSV başlığı + satır sayısı = bilinen (tekilleştirilmiş) kelime kartı.

@@ -577,13 +577,18 @@ function isBlobPath(path,key,value){
   return k==='data'&&typeof value==='string'&&value.length>40&&/^[a-z0-9+/=_-]+$/i.test(value);
 }
 // KAO-19 · izinli özet anahtarları (R-C8): başka anahtar observer snapshot'a çıkmaz.
-var QURAN_LEARN_SUMMARY_KEYS=['v','coveragePercent','knownWords','understoodAyahs','lastStudiedDate','streakDays','topSoundClass','flaggedCount','updatedAt'];
+var QURAN_LEARN_SUMMARY_KEYS=['v','coveragePercent','knownWords','understoodAyahs','lastStudiedDate','streakDays','topSoundClass','flaggedCount','updatedAt','start','unit','lesson','lessonsDone','milestones'];
 function quranLearnSummary(root){
   var s=isObject(root)&&isObject(root.summary)?root.summary:null, count=function(v,max){ return typeof v==='number'&&isFinite(v)&&v>=0&&v<=max?Math.floor(v):null; };
   if(!s) return {summary:null};
   var date=typeof s.lastStudiedDate==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s.lastStudiedDate)?s.lastStudiedDate:null;
   var sound=typeof s.topSoundClass==='string'&&/^[A-Za-zÇĞİÖŞÜçğıöşüâîû .'’-]{1,40}$/.test(s.topSoundClass)?s.topSoundClass:null;
-  return {summary:{v:1,coveragePercent:count(s.coveragePercent,100),knownWords:count(s.knownWords,100000),understoodAyahs:count(s.understoodAyahs,400),lastStudiedDate:date,streakDays:count(s.streakDays,100000),topSoundClass:sound,flaggedCount:count(s.flaggedCount,100000),updatedAt:safeIso(s.updatedAt)}};
+  // KAO2-25 · S-08: nerede kaldığı (kimlik/sayı) + taş anahtarları. Anlatı metni REDDEDİLİR.
+  var unit=count(s.unit,10000);
+  var lesson=typeof s.lesson==='string'&&/^[a-z0-9._-]{1,32}$/.test(s.lesson)?s.lesson:null;
+  var lessonsDone=count(s.lessonsDone,100000);
+  var milestones=typeof s.milestones==='string'&&s.milestones.length<=400&&/^([a-zA-Z0-9]+,)*[a-zA-Z0-9]*$/.test(s.milestones)?s.milestones:null;
+  return {summary:{v:1,start:safeIso(s.start),unit:unit,lesson:lesson,lessonsDone:lessonsDone,milestones:milestones,coveragePercent:count(s.coveragePercent,100),knownWords:count(s.knownWords,100000),understoodAyahs:count(s.understoodAyahs,400),lastStudiedDate:date,streakDays:count(s.streakDays,100000),topSoundClass:sound,flaggedCount:count(s.flaggedCount,100000),updatedAt:safeIso(s.updatedAt)}};
 }
 var SUMMARY_ONLY_ROOTS={quranLearn:quranLearnSummary};
 /** Panel bölümü: özet + bugün çalışıldı mı (son açılış tarihine göre). */

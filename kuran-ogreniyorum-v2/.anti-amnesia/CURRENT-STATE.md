@@ -1,32 +1,32 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-25
-lastSeq: 80
+nextCard: KAO2-26
+lastSeq: 81
 status: active
 -->
 
 Son güncelleme: 2026-09-29 · LEDGER seq71
 
 ## Şu an neredeyiz
-**KAO2-00…24 tamamlandı (25/28).** KAO2-24 iki ayrı ekranı (harita + istatistik) tek
-**İlerleme** ekranında birleştirdi ve modülün en güçlü motivasyon anlatısını görünür
-kıldı: **kapsam eğrisi** ("ilk 50 kelime ≈ %45") çalışma zamanında lexicon `freq`'ten
-hesaplanır, 03 §1 tablosuyla ±0,1 tutarlı. Taşlar koşul metniyle, haftalık etkinlik
-yumuşak seri diliyle (D-19), Mushaf haritası ekranın bölümü olarak.
+**KAO2-00…25 tamamlandı (26/28).** KAO2-25 kelime kartını **tek kaydırmalı detaya**
+çevirdi (katman sayfalaması yok) ve **Y-11'i kapattı**: doğrulanmamış örnek artık hiç
+gösterilmiyor, iç kalite kuralı kullanıcıya sızmıyor. Panel aynası nerede kalındığını
+(ünite/ders/taşlar) gösteriyor — anlatı metni olmadan, katı süzülmüş.
 
 ## Sıradaki kartın tek cümlesi
-Sıradaki **KAO2-25** — Kelime detayı v2 (S-08) ve **panel aynası**: kelime katmanları,
-gerçek bağlam örnekleri ve panel projeksiyonunun eşlenmesi.
+Sıradaki **KAO2-26** — Erişilebilirlik ve kontrast denetimi: tüm KAO görünümleri ×
+{boş, tohumlu} için klavye döngüsü, odak yönetimi, `lang/dir`, sabit px yükseklik ve
+token kontrastı (06 §6, §7 · T-24…T-26).
 
 ## Canlı gerçekler
-- Dal: `kao2-yeniden-tasarim` = `main`; canlı pin **`20260930h`** (KAO2-24 bu turda yayınlanacak).
-- `KAO2-STATE.json`: KAO2-24 `done`; `nextCard=KAO2-25`; `ledgerLastSeq=80`;
-  `releaseApproval=approved_through_KAO2-24`.
-- **Bütçe (revizyon 2, kullanıcı yetkisi):** çalışma zamanı tavanı **128 KiB**.
-  Ölçüm **91.567 / 128 KiB** · içerik 177.657/256 · css 12.631/14 · p95 4,6 ms.
-- Kimlik pinleri: App yüzeyi 764 · `App.kao*` **43** · atama 602 · `onclick` 393.
-- Kaynak/test: PASS · yayın: KAO2-24 sonrası · cihaz: **doğrulanmadı**.
+- Dal: `kao2-yeniden-tasarim` = `main`; canlı pin **`20260930i`** (KAO2-25 bu turda yayınlanacak).
+- `KAO2-STATE.json`: KAO2-25 `done`; `nextCard=KAO2-26`; `ledgerLastSeq=81`;
+  `releaseApproval=approved_through_KAO2-25`.
+- **Bütçe:** çalışma zamanı **92.431 / 128 KiB** · içerik 177.657/256 · css 12.824/14.
+- Kimlik pinleri: App yüzeyi **763** · `App.kao*` **42** · atama **601** · `onclick` **393**.
+  (KAO2-25 bir handler'ı kaldırdı: `kaoWordLayer`.)
+- Kaynak/test: PASS · yayın: KAO2-25 sonrası · cihaz: **doğrulanmadı**.
 
 ## Açık riskler ve bekleyen kullanıcı işleri
 - **G3 metin incelemesi kullanıcıda:** `kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md`

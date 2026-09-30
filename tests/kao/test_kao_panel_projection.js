@@ -38,7 +38,7 @@ q.ayahs.understood = ['112:1', '112:2'];
 q.errors.sound = 7;
 
 const summary = app.kaoPanelSummary(data);
-assert.deepEqual(Object.keys(summary).sort(), ['besmele', 'coveragePercent', 'flaggedCount', 'knownWords', 'lastStudiedDate', 'milestoneCount', 'streakDays', 'topSoundClass', 'understoodAyahs', 'unitMilestones', 'updatedAt', 'v'], 'yalnız izinli anahtarlar');
+assert.deepEqual(Object.keys(summary).sort(), ['besmele', 'coveragePercent', 'flaggedCount', 'knownWords', 'lastStudiedDate', 'lesson', 'lessonsDone', 'milestoneCount', 'milestones', 'start', 'streakDays', 'topSoundClass', 'understoodAyahs', 'unit', 'unitMilestones', 'updatedAt', 'v'], 'yalnız izinli anahtarlar');
 assert.equal(summary.coveragePercent, Math.floor(app.kaoCoverage(data).ratio * 100), 'E1 ile aynı kapsam hesabı');
 assert.equal(summary.coveragePercent, Math.floor((lemmas[0].freq + lemmas[1].freq) / 77430 * 100));
 assert.equal(summary.knownWords, 2, 'okuyucu-bilinmeyen sayılmaz');
@@ -60,7 +60,7 @@ vm.runInContext(read('panel/panelCoverageManifest.js'), panelBox, { filename: 'p
 const P = panelBox.window.PanelCoverageV1;
 const row = P.MANIFEST.paths.find((item) => item.path === 'quranLearn');
 assert.deepEqual(JSON.parse(JSON.stringify(row)), { path: 'quranLearn', owner: 'quranLearn', source: 'state', privacy: 'summary', mode: 'summary', fallback: 'latest' });
-assert.deepEqual(Array.from(P.QURAN_LEARN_SUMMARY_KEYS), ['v', 'coveragePercent', 'knownWords', 'understoodAyahs', 'lastStudiedDate', 'streakDays', 'topSoundClass', 'flaggedCount', 'updatedAt']);
+assert.deepEqual(Array.from(P.QURAN_LEARN_SUMMARY_KEYS), ['v', 'coveragePercent', 'knownWords', 'understoodAyahs', 'lastStudiedDate', 'streakDays', 'topSoundClass', 'flaggedCount', 'updatedAt', 'start', 'unit', 'lesson', 'lessonsDone', 'milestones']);
 
 const snapshot = P.buildObserverSnapshot(JSON.parse(JSON.stringify(data)), { status: 'accepted' }, '2026-09-26T12:00:00.000Z');
 const text = JSON.stringify(snapshot);
@@ -77,7 +77,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(P.quranLearnProjection({ cards: {} },
 
 // Kurcalanmış özet: bilinmeyen anahtar, HTML, aralık dışı sayı ve bozuk tarih düşer.
 const tampered = P.quranLearnSummary({ summary: { v: 9, coveragePercent: 180, knownWords: -1, understoodAyahs: 12.9, lastStudiedDate: '26/09/2026', streakDays: 'x', topSoundClass: '<img src=x onerror=1>', flaggedCount: 2, updatedAt: 'dün', words: ['l_min'], extra: 1 } }).summary;
-assert.deepEqual(JSON.parse(JSON.stringify(tampered)), { v: 1, coveragePercent: null, knownWords: null, understoodAyahs: 12, lastStudiedDate: null, streakDays: null, topSoundClass: null, flaggedCount: 2, updatedAt: null });
+assert.deepEqual(JSON.parse(JSON.stringify(tampered)), { v: 1, coveragePercent: null, knownWords: null, understoodAyahs: 12, lastStudiedDate: null, streakDays: null, topSoundClass: null, flaggedCount: 2, updatedAt: null, start: null, unit: null, lesson: null, lessonsDone: null, milestones: null });
 
 // --- Panel kartı: panel.js'teki gerçek fonksiyonlar, çökme yok ------------------------------------
 const panelSource = read('panel/panel.js');

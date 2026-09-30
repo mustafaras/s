@@ -119,7 +119,6 @@ check('(c) kelime detayından kök sayfasına bağlantı verilir', () => {
   const lemmaId = t.api.kaoRootModel(root.root).lemmas[0].lemmaId;
   t.api.kaoOpenWord(lemmaId);
   // Kök ağacı 2. katmanda; kelime detayı oradan kök sayfasına bağlanır.
-  if (!/App\.kaoRoots/.test(decode(t.api.kaoWordHTML()))) t.api.kaoWordLayer(2);
   const html = decode(t.api.kaoWordHTML());
   assert.match(html, /App\.kaoRoots\((['’]|&#39;)open(['’]|&#39;)/, 'kelime detayında kök bağlantısı var');
   assert.match(html, /Kök ailesini aç/, 'bağlantı okunur etiket taşır');

@@ -230,42 +230,34 @@ assert.match(ui.kaoFeedback, /Fiil önce gelir/);
   assert.equal(quranLearn.errors.sound, soundBefore, 'kelime görevi errors.sound artırmaz (telaffuz → phonics.misheard)');
 }
 
-const layeredLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.root && lemma.cognate && lemma.examples.length >= 3 && sandbox.window.QuranGrammarV1.unit11.roots.some((root) => root.root === lemma.root));
-assert.ok(layeredLemma, 'üç katmanlı kelime fixture lemması bulunmalı');
+const layeredLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.root && lemma.cognate && lemma.examples.length >= 3 && sandbox.window.QuranGrammarV1.unit11.roots.some((item) => item.root === lemma.root));
+assert.ok(layeredLemma, 'zengin kelime fixture lemması bulunmalı');
 const layeredCardId = `w:${layeredLemma.id}:ar>tr`;
 quranLearn.cards[layeredCardId] = { state: 'review', s: 24, reps: 4, due: '2026-09-28T12:00:00.000Z' };
 assert.equal(api.kaoOpenWord(layeredLemma.id), true);
 assert.equal(ui.kaoView, 'word');
-assert.equal(ui.kaoWordLayer, 1);
-const wordLayer1 = api.kaoWordHTML();
-assert.match(wordLayer1, /data-word-layer="1"/);
-assert.match(wordLayer1, new RegExp(layeredLemma.ar));
-assert.match(wordLayer1, new RegExp(layeredLemma.meanings[0]));
-assert.match(wordLayer1, /class="kao-pronunciation"/);
-assert.match(wordLayer1, new RegExp(layeredLemma.translit));
-assert.match(wordLayer1, /Okunuş/);
-assert.match(wordLayer1, /aria-label="[^"]*Arapça telaffuzunu dinle"/);
-assert.match(wordLayer1, /Telaffuzu dinle/);
-assert.doesNotMatch(wordLayer1, /kao-root-tree|kao-word-examples/, 'ilk dokunuşta yalnız katman 1 DOM’da olmalı');
-assert.equal(api.kaoWordLayer(3), false, 'katman 1’den doğrudan 3’e atlanmamalı');
-
-assert.equal(api.kaoWordLayer(2), true);
-const wordLayer2 = api.kaoWordHTML();
-assert.match(wordLayer2, /data-word-layer="2"/);
-assert.match(wordLayer2, /class="kao-root-tree"/);
-assert.match(wordLayer2, /Türkçedeki akrabaları/);
-assert.match(wordLayer2, /class="kao-pattern"/);
-assert.doesNotMatch(wordLayer2, /kao-word-examples/, 'ikinci dokunuşta örnekler DOM’da olmamalı');
-
-assert.equal(api.kaoWordLayer(3), true);
-const wordLayer3 = api.kaoWordHTML();
-assert.match(wordLayer3, /data-word-layer="3"/);
-assert.equal((wordLayer3.match(/class="kao-word-example"/g) || []).length, 3);
-assert.equal((wordLayer3.match(/class="kao-example-pronunciation/g) || []).length, 3);
-assert.equal((wordLayer3.match(/Cümlenin okunuşu/g) || []).length, 3);
-assert.doesNotMatch(wordLayer3, /tam okunuşu henüz doğrulanmadı/);
-assert.match(wordLayer3, /Sonraki tekrar/);
-assert.doesNotMatch(wordLayer3, /kao-root-tree/, 'üçüncü dokunuşta kök katmanı DOM’da kalmamalı');
+// KAO2-25 (02 T-19): katman sayfalaması YOK; tek kaydırmalı detay sayfası.
+assert.equal(ui.kaoWordLayer, undefined, 'katman durumu kaldırılmalı');
+const wordPage = api.kaoWordHTML();
+assert.match(wordPage, new RegExp(layeredLemma.ar));
+assert.match(wordPage, new RegExp(layeredLemma.meanings[0]));
+assert.match(wordPage, /class="kao-pronunciation"/);
+assert.match(wordPage, new RegExp(layeredLemma.translit));
+assert.match(wordPage, /Okunuş|DİA okunuşu/);
+assert.match(wordPage, /aria-label="[^"]*Arapça telaffuzunu dinle"/);
+assert.match(wordPage, /Telaffuzu dinle/);
+// Bütün bölümler AYNI sayfada (P10 sırası testi test_kao2_word.js'te).
+assert.match(wordPage, /class="kao-word-meanings"/);
+assert.match(wordPage, /class="kao-word-root"/);
+assert.match(wordPage, /Türkçedeki akrabaları/);
+assert.match(wordPage, /class="kao-pattern"/);
+assert.equal((wordPage.match(/class="kao-word-example"/g) || []).length, 3);
+assert.equal((wordPage.match(/class="kao-example-pronunciation/g) || []).length, 3);
+assert.equal((wordPage.match(/Cümlenin okunuşu/g) || []).length, 3);
+assert.doesNotMatch(wordPage, /tam okunuşu henüz doğrulanmadı/);
+assert.match(wordPage, /Sonraki tekrar/);
+assert.doesNotMatch(wordPage, /Katman\s*\d\s*\/\s*3/, 'katman sayacı kalmamalı');
+assert.doesNotMatch(wordPage, /kaoWordLayer/, 'katman düğmesi kalmamalı');
 
 const verifiedAyahExample = { ref: '1:5', ar: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ' };
 assert.equal(api.kaoVerifiedAyahPronunciation(verifiedAyahExample), 'İyyâke na‘büdü ve iyyâke nesteîn.');
@@ -274,7 +266,6 @@ assert.equal(api.kaoVerifiedAyahPronunciation({ ref: '2:3', ar: 'وَيُقِي�
 const shiftedWord = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift && sandbox.window.QuranGrammarV1.unit11.roots.some((root) => root.root === lemma.root));
 assert.ok(shiftedWord);
 api.kaoOpenWord(shiftedWord.id);
-api.kaoWordLayer(2);
 const shiftedWordHtml = api.kaoWordHTML();
 assert.match(shiftedWordHtml, /kao-cognate is-shift/);
 assert.match(shiftedWordHtml, /triangle-alert/);
@@ -391,7 +382,7 @@ assert.equal(restored, 'kao-hub-entry');
 assert.match(appSource, /App\.kaoOpen=function\(view\)\{ return window\.SeymaQuranLearn\.kaoOpen\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoClose=function\(\)\{ return window\.SeymaQuranLearn\.kaoClose\.apply\(null,arguments\); \};/);
 assert.match(appSource, /App\.kaoSetView=function\(v\)\{ return window\.SeymaQuranLearn\.kaoSetView\.apply\(null,arguments\); \};/);
-for (const name of ['kaoStart', 'kaoAnswer', 'kaoContinue', 'kaoUndo', 'kaoPlay', 'kaoOpenWord', 'kaoWordLayer', 'kaoFlag', 'kaoGate', 'kaoOpenSurah', 'kaoRevealWord', 'kaoMarkUnderstood']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
+for (const name of ['kaoStart', 'kaoAnswer', 'kaoContinue', 'kaoUndo', 'kaoPlay', 'kaoOpenWord', 'kaoFlag', 'kaoGate', 'kaoOpenSurah', 'kaoRevealWord', 'kaoMarkUnderstood']) assert.match(appSource, new RegExp(`App\\.${name}=function`));
 assert.doesNotMatch(settingsSource, /kao-settings-entry|App\.kaoOpen\(\)/, 'geçici Ayarlar girişi kaldırılmalı');
 assert.match(appSource, /kaoHubCardHTML:function\(\)\{ return window\.SeymaQuranLearn\?window\.SeymaQuranLearn\.kaoHubCardHTML\(\):''; \}/);
 assert.match(saygiSource, /function arabicLearningHTML\(\)[\s\S]*?kaoHub\(\)[\s\S]*?function saygiPreviewHubHTML/, 'KAO hub kartı yeni Arapça öğrenme sayfasında mevcut ilerlemeyi sunmalı');

@@ -1075,7 +1075,10 @@ function quranLearnPanelCardHTML(){
   sum+='<div class="dstat"><div class="dv">'+num(q.streakDays)+'</div><div class="dl">gün seri</div></div>';
   sum+='<div class="dstat"><div class="dv">'+(q.studiedToday?icon('check',16):'—')+'</div><div class="dl">'+(q.studiedToday?'bugün çalıştı':'bugün henüz yok')+'</div></div>';
   sum+='<div class="dstat"><div class="dv">'+num(q.flaggedCount)+'</div><div class="dl">içerik bayrağı</div></div></div>';
-  var det='<div class="dl" style="margin-top:8px;">'+num(q.knownWords)+' kelime tanıdık · '+num(q.understoodAyahs)+' âyet anlaşıldı'+(q.topSoundClass?' · en çok karışan ses sınıfı: <b>'+esc(q.topSoundClass)+'</b>':'')+(q.lastStudiedDate?' · son çalışma '+esc(q.lastStudiedDate):'')+'</div>';
+  var where=(q.unit!==null&&q.unit!==undefined&&q.lessonsDone!==null)?'Ünite '+num(q.unit)+(q.lessonsDone!==null?' · '+num(q.lessonsDone)+' ders':''):'';
+  var stones=(q.milestones!==null&&q.milestones!==undefined&&q.milestones)?String(q.milestones).split(',').filter(Boolean).length:null;
+  var progressLine=(where||stones!==null)?'<div class="dl" style="margin-top:6px;">'+(where?where:'')+(where&&stones!==null?' · ':'')+(stones!==null?num(stones)+' taş kazanıldı':'')+'</div>':'';
+  var det=progressLine+'<div class="dl" style="margin-top:8px;">'+num(q.knownWords)+' kelime tanıdık · '+num(q.understoodAyahs)+' âyet anlaşıldı'+(q.topSoundClass?' · en çok karışan ses sınıfı: <b>'+esc(q.topSoundClass)+'</b>':'')+(q.lastStudiedDate?' · son çalışma '+esc(q.lastStudiedDate):'')+'</div>';
   return cardWrap({key:'quranLearn',icon:icon('book',18),title:'Kur’an Arapçası',span:12,order:24,summary:sum,details:det});
 }
 function quranJourneyPanelCardHTML(){

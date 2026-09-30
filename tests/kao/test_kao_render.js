@@ -617,10 +617,15 @@ assert.ok(prevented >= 3 && stopped >= 3);
 // KAO-FIX-12 · E7 kaynaklar ve lisanslar (O-6): statik bölüm, düz bağlantılar, metin kaynaktan okunur.
 {
   const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/content/audio-manifest.json'), 'utf8'));
+  // KAO2-23 (T-23): kaynak/lisans listesi Ayarlar gövdesinden ÇIKARILDI;
+  // "Hakkında ve kaynaklar" alt sayfasında yaşar. Ayarlar yalnız bağlantı verir.
   const settingsHtml = api.kaoSettingsHTML();
-  const match = settingsHtml.match(/<section class="kao-sources"[\s\S]*?<\/section>/);
-  assert.ok(match, 'E7 kaynaklar bölümü yok');
-  assert.ok(settingsHtml.indexOf(match[0]) < settingsHtml.lastIndexOf('</main>'), 'bölüm E7 içinde');
+  assert.doesNotMatch(settingsHtml, /<section class="kao-sources"/, 'uzun liste Ayarlar gövdesinde değil');
+  assert.match(settingsHtml, /App\.kaoSetView\('sources'\)/, 'Ayarlar alt sayfaya bağlanır');
+  const page = api.kaoSourcesPageHTML();
+  const match = page.match(/<section class="kao-sources"[\s\S]*?<\/section>/);
+  assert.ok(match, 'E7 kaynaklar bölümü alt sayfada yok');
+  assert.ok(page.indexOf(match[0]) < page.lastIndexOf('</main>'), 'bölüm E7 içinde');
   const block = match[0];
   for (const name of ['Tadabur', 'CC BY-NC 4.0', 'AQQD', 'CC0', 'Tanzil', 'CC BY 3.0', 'Quranic Arabic Corpus', 'Diyanet', 'ts-fsrs', 'MIT']) assert.ok(block.includes(name), `kaynak eksik: ${name}`);
   for (const d of manifest.datasets) {

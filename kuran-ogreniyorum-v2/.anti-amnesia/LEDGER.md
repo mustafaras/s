@@ -868,3 +868,14 @@ JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için 
 - user-task: kademe A kaydı (230 klip, iki ses, muallim, lisans+atıf) + L2 mahreç dinlemesi + lisans beyanı.
 - evidence-levels: kaynak/test PASS · yayın KAO2-22 sonrası · cihaz doğrulanmadı
 - next: KAO2-23
+
+## seq 79 · 2026-09-30 · CARD · KAO2-23
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-23/KANIT.md
+- scope: Ayarlar 7 dağınık bölümden amaca göre 3 ana gruba indi (Günlük hedef · Ses · Okuma) + alt başlıklar; Niyet satırı gerçek veriden (s.intent); kaynak/lisans listesi Ayarlar gövdesinden ÇIKARILIP "Hakkında ve kaynaklar" ALT SAYFASINA taşındı (T-23) — sürüm, çalışma biçimi, gizlilik, gelişmiş eylemler, tam kaynak listesi; geri yolu var.
+- gates: KAO 41/41 (yeni test_kao2_settings.js 8 kontrol) · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/contrast/iip_22 PASS
+- budget: runtime 88.529/128 KiB (revizyon 2) · content 177.657/256 · css 12.142/14
+- pins: App.kao* 43 DEĞİŞMEDİ — bu kartta 0 yeni handler.
+- fixed: kaoSourcesHTML esc aktarımı (TypeError) · alt sayfa sınıf ayrımı · E7 fixture alt sayfaya yönlendirildi (aynı kontroller korunur).
+- evidence-levels: kaynak/test PASS · yayın KAO2-23 sonrası · cihaz doğrulanmadı
+- next: KAO2-24

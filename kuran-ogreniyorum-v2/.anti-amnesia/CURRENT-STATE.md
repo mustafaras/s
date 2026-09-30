@@ -1,42 +1,33 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-23
-lastSeq: 78
+nextCard: KAO2-24
+lastSeq: 79
 status: active
 -->
 
 Son güncelleme: 2026-09-29 · LEDGER seq71
 
 ## Şu an neredeyiz
-**KAO2-00…22 tamamlandı (23/28).** KAO2-22 K-3 kademe A hece sesi **hattını** kurdu
-(ses değil): `tools/kao2-syllable-audio.mjs` envanteri (115 klip × 2 ses = **230**),
-ad biçimini (`y-<harf>_<mark>-<m|f>`), sha256/lisans kurallarını ve ffmpeg `loudnorm`
-ölçüm kapısını (`−18 LUFS ±1`, `−1 dBTP`, `≥48 kHz`) zorlar. Kayıt yoksa
-`awaiting-recording` der; **uygulama K-3 kademe B** ile (harf gerçek kelime içinde,
-KAO2-21'in 28/28 kelime sesi) çalışmaya devam eder.
+**KAO2-00…23 tamamlandı (24/28).** KAO2-23 Ayarlar'ı iOS kalıbına çekti: 7 dağınık
+bölüm → **3 ana grup** (Günlük hedef · Ses · Okuma) + alt başlıklar; kaynak/lisans
+listesi Ayarlar gövdesinden **ayrı "Hakkında ve kaynaklar" alt sayfasına** taşındı.
+Ayrıca **bütçe 128 KiB'e** yükseltildi (kullanıcı yetkisi) ve **metin katmanı açıkları**
+kapatıldı: 20 `contextTr` taslağı (donmuş veriden türetilmiş, atıflı), 25 kavrama
+gerçek kaynak atıfı, `elif` için 07 §2 uzlaştırması.
 
 ## Sıradaki kartın tek cümlesi
-Sıradaki **KAO2-23** — Ayarlar (S-13) ve "Hakkında ve kaynaklar" (inset grouped
-list, switch, alt sayfa; T-22/T-23, O-04).
+Sıradaki **KAO2-24** — İlerleme (S-12): taşlar, kapsam eğrisi, harita ve istatistik
+tek ekranda birleşir (05 §2, 03 §1).
 
 ## Canlı gerçekler
-- Dal: `kao2-yeniden-tasarim` = `main`; canlı pin **`20260930e`** (KAO2-22 bu turda yayınlanacak).
-- `KAO2-STATE.json`: KAO2-22 `done`; `nextCard=KAO2-23`; `ledgerLastSeq=78`;
-  `releaseApproval=approved_through_KAO2-22`.
-- **⛔ BÜTÇE KRİTİK:** çalışma zamanı **87.900 / 88 KiB** (pay **0.1 KiB**) ·
-  içerik 175.459/256 · ses 10.9/24 MB · css 11.911/14. **Sonraki kart yeni çalışma
-  zamanı kodu getirmemeli**; gerekirse önce veri taşıma ya da kullanıcı kararı.
-- Ortam: **ffmpeg 8.1.2 kurulu** → kayıt günü doğrulama koşabilir.
-- Kimlik pinleri: App yüzeyi 764 · `App.kao*` 43 · atama 602 · `onclick` 393.
-- Kaynak/test: PASS · yayın: KAO2-22 sonrası · cihaz: **doğrulanmadı**.
-
-## Bekleyen kullanıcı işleri
-- **K-3 kademe A kaydı:** 230 hece klibi (28 harf × 3 hareke + 28 sükûn + 3 med,
-  iki ses), nitelikli muallim, stüdyo protokolü, **CC BY 4.0 / süresiz kullanım**
-  lisansı + atıf metni. Sonra: `node tools/kao2-syllable-audio.mjs --check
-  --source <dizin>` → temizse `assets/kao/audio/`, `planned[]` → `datasets[]`.
-  L2 mahreç dinlemesi gereklidir.
+- Dal: `kao2-yeniden-tasarim` = `main`; canlı pin **`20260930g`** (KAO2-23 bu turda yayınlanacak).
+- `KAO2-STATE.json`: KAO2-23 `done`; `nextCard=KAO2-24`; `ledgerLastSeq=79`;
+  `releaseApproval=approved_through_KAO2-23`.
+- **Bütçe (revizyon 2, kullanıcı yetkisi):** çalışma zamanı tavanı **128 KiB**.
+  Ölçüm **88.529 / 128 KiB** · içerik 177.657/256 · css 12.142/14 · p95 4.7 ms.
+- Kimlik pinleri: App yüzeyi 764 · `App.kao*` **43** · atama 602 · `onclick` 393.
+- Kaynak/test: PASS · yayın: KAO2-23 sonrası · cihaz: **doğrulanmadı**.
 
 ## Açık riskler ve bekleyen kullanıcı işleri
 - **G3 metin incelemesi kullanıcıda:** `kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md`

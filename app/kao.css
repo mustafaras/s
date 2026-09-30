@@ -367,3 +367,19 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-s0-note{margin:8px 0;color:var(--kao-label-2);font-size:var(--f-footnote);line-height:1.4}
 .kao-s0 .kao-primary{margin-top:8px}
 @media(forced-colors:active){.kao-s0-letters li,.kao-s0-listen,.kao-s0-pos-row li,.kao-s0-word{border-color:CanvasText;background:Canvas}.kao-s0-word-ar,.kao-s0-pos-row li b,.kao-s0-word span{color:CanvasText}.kao-s0-note,.kao-s0-word small{color:CanvasText}}
+
+/* KAO2-23 · Ayarlar iOS düzeni (T-22) + "Hakkında ve kaynaklar" alt sayfası (T-23).
+   Amaca göre gruplar, alt başlıklar gruplu, alt sayfa ayrı. Yalnız --kao-* tokenları. */
+.kao-settings-group{display:grid;gap:8px;min-width:0}
+.kao-settings-group>h3{margin:0;padding:0 4px;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
+.kao-link-button{appearance:none;min-height:44px;display:inline-flex;align-items:center;gap:6px;padding:0 4px;border:0;background:transparent;color:var(--kao-tint);font:inherit;font-size:var(--f-subhead);font-weight:600;cursor:pointer;text-align:start}
+.kao-link-button:focus-visible{outline:3px solid var(--kao-tint);outline-offset:2px}
+.kao-sources-page{max-width:460px;margin:0 auto;display:grid;gap:16px}
+.kao-about{display:grid;gap:8px}
+.kao-about h3{margin:0;color:var(--kao-label);font-size:var(--f-title3);font-weight:700}
+.kao-about-list{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;margin:0;padding:12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface)}
+.kao-about-list dt{color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
+.kao-about-list dd{margin:0;color:var(--kao-label);font-size:var(--f-subhead);overflow-wrap:anywhere}
+.kao-about-group{display:grid;gap:8px;min-width:0}
+.kao-about-group>h3{margin:0;padding:0 4px;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
+@media(forced-colors:active){.kao-about-list{border-color:CanvasText;background:Canvas}.kao-about-list dd,.kao-about h3{color:CanvasText}.kao-link-button{color:LinkText}}

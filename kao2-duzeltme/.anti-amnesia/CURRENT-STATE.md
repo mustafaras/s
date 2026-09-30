@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-06
-lastSeq: 15
+lastSeq: 16
 status: active
 -->
 
-Son güncelleme: 2026-09-30 · LEDGER seq 15 · K2F-00…05 tamam (6/44), sıradaki K2F-06. R-09, R-10 PASS (2/10).
+Son güncelleme: 2026-09-30 · LEDGER seq 16 · K2F-00…05 tamam (6/44), sıradaki K2F-06. R-09, R-10 PASS (2/10).
 
 ## Şu an neredeyiz
 K2F-05 bitti (Dalga 1, acil): `quranLearnFlow.js`'e saf `masteryPlan(snapshot, unitId, now, content)` ve
@@ -29,6 +29,7 @@ handler) + `test_kao2_migration.js`; R-01 ve R-02 fail→pass.
 - Bütçe (perf): içerik 177,657 KiB · runtime 93,633 KiB (tavan 128) · css 12,815 KiB · p95 4,34 ms.
 
 ## Açık riskler
+- Kayıt düzeltmesi (LEDGER seq 16): `releaseApproval=approved_through_K2F-04`; K2F-02 ek düzeltmeleri ve `5e0665bd` geçmiş kirliliği geriye dönük bildirildi.
 - Canlı kullanıcı Ünite 1 ustalığında kilitli (K4-01) ve gramer görevleri yanlış öğretiyor (K4-02) → Dalga 1 önceliklidir.
 - iCloud Drive `… 2.*` kopyaları üretebilir (seq 12): `git add` yalnız açık dosya yollarıyla; klasörü iCloud dışına taşımak kullanıcı kararı.
 - Yeni handler'lar (K2F-12, K2F-16, K2F-30) fx2/v3/surface pinlerini kaydırır — PROMPTLAR.md P8 listesine göre aynı committe.

@@ -152,3 +152,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: read öğesi çapa dizisindeki (Ünite 2: 6 namaz metni, Ünite 3: 3 sûre) tüm prayer:/surah: girdilerini birleştirir; lemma-pool çapalı ünitelerde read yoktur. Practice kimlikleri `mastery:<ünite>:<lemma>:<yön>[:r<tur>]`; <10 lemmada yönler turlanır. runtime 92,439 → 93,633 KiB.
 - next: K2F-06
+
+## seq 16 · 2026-09-30 · NOTE · K2F-05
+- summary: Geriye dönük düzeltme ve bildirim (kullanıcı isteği: "düzelt o zaman"). Kod değişmedi; yalnız kayıtlar.
+- fix-1: `releaseApproval` `approved_through_K2F-03` → `approved_through_K2F-04`. İkinci erken yayın (`430539ec`, seq 14) K2F-04 kapsamını da yayınladı; `lastRelease.prompt` zaten K2F-04 idi, değer tutarsızdı. Yayınlanan varlık (index.html, sw.js, app/**) değişmediği için pin ve davranış etkilenmedi.
+- disclosure-1: K2F-02 seq 7 kararı yalnız `quranLearnFlow.js` için kullanıcı onayı aldı. `quranLearn.js`'teki iki ek düzeltme (`kaoNav` roots liste yolu: `resolved!==null` koşulu; `kaoS0HTML`: `objectOr(ui.kaoS0,{})`) K2F-02 Dokun kısıtı ("yalnız yığın türetme ve KAO_VIEW_TITLES") dışındaydı ve AYRI kullanıcı onayı alınmadan yapıldı; gerekçe (aynı kusurun doğrudan sonucu, s0 ulaşılabilir olunca çökme) seq 7'de kayıtlı. Geriye dönük bildirildi; geri alınmadı (geri almak s0 görünümünü yine çökertir).
+- disclosure-2: K2F-03 kanıt commit'i `5e0665bd` `git add kao2-duzeltme` (dizin) ile 15 iCloud kopyasını (`… 2.*`) içeri aldı; `945e37bd` kaldırdı. `5e0665bd` ikinci yayınla public `origin/main` geçmişine girdi (yalnız kao2-duzeltme belge kopyaları; Pages'e dahil değil; geçmiş yeniden yazılmadı — P5). Bundan sonra `git add` yalnız açık dosya yollarıyla.
+- disclosure-3: K2F-00…05 tek oturumda yürütüldü (BAGLAM-YONETIMI §2 önerisi dışı); her prompt ayrı commit + tam kapılarla kapandı.
+- next: K2F-06

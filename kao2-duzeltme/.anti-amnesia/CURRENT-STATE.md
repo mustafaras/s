@@ -1,30 +1,28 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-03
-lastSeq: 8
+nextPrompt: K2F-04
+lastSeq: 9
 status: active
 -->
 
-Son güncelleme: 2026-09-30 · LEDGER seq 8 · K2F-00…02 tamam (3/44), sıradaki K2F-03. R-09 PASS (1/10).
+Son güncelleme: 2026-09-30 · LEDGER seq 9 · K2F-00…03 tamam (4/44), sıradaki K2F-04. R-09 PASS (1/10).
 
 ## Şu an neredeyiz
-K2F-02 bitti: `tests/kao/helpers/kao-harness.js` (bootKao/freshUser/openView/walkLesson/text) ve
-`tests/kao/test_kao2_view_resolution.js` (11 kontrol) eklendi. Kök neden `quranLearnFlow.js` VIEWS beyaz listesinde
-`roots`/`s0`/`sources` yokluğuydu: yığın onları düşürüp ana ekrana iniyordu, gerçek `kaoNav('s0'|'sources')` da işe
-yaramıyordu. Beyaz liste genişletildi (kullanıcı onayıyla Dokun'a eklendi, LEDGER seq 7); `kaoNav` roots liste yolu ve
-`kaoS0HTML` null durumu aynı committe düzeltildi.
+K2F-03 bitti: `tests/kao/test_kao2_handler_surface.js` (6 kontrol) `App.kao*` başvuruları ↔ `app.js` shim'leri ↔
+`window.SeymaQuranLearn` yüzeyini kalıcı sınar; `KNOWN_MISSING=['kaoS0']` (K2F-12 boşaltır). Kullanıcı isteğiyle
+K2F-03 sonrası **canlıya alma** (main'e fast-forward + yayın pini + push) yapılacak; bu plan dışı bir yayındır
+(planlı YAYIN-1 K2F-18). Durum LEDGER'da `DECISION` ile kaydedilir.
 
 ## Sıradaki promptun tek cümlesi
-**K2F-03:** `tests/kao/test_kao2_handler_surface.js` yaz — `quranLearn*.js` içindeki tüm `App.kao*` başvuruları
-(`App.x`, `name:'kao…'`, `action:'kao…'`, birleştirilmiş adlar) ↔ `app.js` shim tanımları ↔ `window.SeymaQuranLearn`
-yüzeyi; `KNOWN_MISSING=['kaoS0']` gerçekten eksik olmalı (R-05 K2F-12'ye kadar FAIL kalır); yeni test README'ye eklenir.
-Harness'i kullan (`tests/kao/helpers/kao-harness.js`).
+**K2F-04:** `tests/kao/test_kao2_kabul.js` (≈270–285) kanıt raporunu yalnız `KAO2_EVIDENCE_OUT` tanımlıysa o yola
+yazsın, aksi hâlde stdout'a basın; `kapilar.sh`'taki A-KABUL yedek/geri koyma bloğunu kaldır; R-10 fail→pass,
+test sonrası `git status --porcelain` boş.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
 - Dal: `kao2-duzeltme` (tabanı `main` = `07802fa6`); push yok.
 - Yayın pini: `20260930l` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
-- Kapılar: KAO 46/46 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
+- Kapılar: KAO 47/47 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **1/10 PASS** (R-09); kalan R-01…R-08, R-10 FAIL (beklenen).
 - Bütçe (perf): içerik 177,657 KiB · runtime 92,439 KiB (+0,008) · css 12,815 KiB · p95 4,34 ms.
 

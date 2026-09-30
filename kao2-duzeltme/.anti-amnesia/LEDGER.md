@@ -83,3 +83,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: Flow VIEWS kusuru gerçek yönlendirmeyi de bozuyordu (seq 7); düzeltme s0'ın gizli çökmesini açığa çıkardı (`kaoS0HTML` null durum) ve aynı committe kapatıldı. R-06 (s0 derslerinin çökmesi) ayrı, K2F-13'te.
 - next: K2F-03
+
+## seq 9 · 2026-09-30 · PROMPT · K2F-03
+- status: done
+- title: Handler yüzeyi fixture'ı
+- prev-commit: a97c63ed
+- evidence: kao2-duzeltme/evidence/K2F-03/KANIT.md
+- closes: (K5-02 tespitinin kalıcı testi)
+- repro: değişmedi · toplam 1/10 (R-05 K2F-12'de)
+- gates: kapilar.sh YEŞİL (kao 47 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20260930l
+- changed-tests: yok
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: işleyici adları yalnız `App.x`/`name:`/`action:` ile değil `kaoSegHTML` dize argümanıyla da geçiyor (kaoSetDailyNew/kaoSetAudioStyle/kaoSetTranslit); test bunu kapsar. Tanımlı ama çağrılmayan 3 işleyici: kaoRevealWord, kaoMarkUnderstood, kaoOpenMap (bilgi, üst sınır 5).
+- next: K2F-04

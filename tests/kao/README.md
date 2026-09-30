@@ -29,6 +29,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao_surah_import.js` | KAO-FIX-02 | Kısa sûre çalışma kitabı içe alma kapısı: boş/kopya/İngilizce/doğrulayıcı-tarih denetimi ve tablo gidiş-dönüşü (sentetik) |
 | `test_kao_state_budget.js` | KAO-FIX-09 | KF-10 koruması: `daily` budanmaz (400 gün korunur), `ensureQuranLearn` idempotent; boyut yalnız bilgi |
 | `test_kao2_view_resolution.js` | K2F-02 | Yığınsız `ui.kaoView` çözümü ve gerçek `kaoNav`/`kaoSetView` ile 12 parametresiz + 4 parametreli görünüm; `helpers/kao-harness.js` (bootKao/freshUser/openView/walkLesson) öz-testi |
+| `test_kao2_handler_surface.js` | K2F-03 | İşaretlemede çağrılan her `App.kao*` ↔ `app.js` tek satırlık shim ↔ `window.SeymaQuranLearn`; `KNOWN_MISSING=['kaoS0']` yalnız küçülür (K2F-12 boşaltır) |
 
 Fixture'lar ilgili uygulama kartında tek tek eklenecek; bu başlangıç promptu
 üretim kodu veya çalıştırılabilir fixture eklemez.

@@ -383,3 +383,31 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-about-group{display:grid;gap:8px;min-width:0}
 .kao-about-group>h3{margin:0;padding:0 4px;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
 @media(forced-colors:active){.kao-about-list{border-color:CanvasText;background:Canvas}.kao-about-list dd,.kao-about h3{color:CanvasText}.kao-link-button{color:LinkText}}
+
+/* KAO2-24 · S-12 birleşik İlerleme ekranı: kapsam eğrisi, taşlar, hafta, harita, algı. */
+.kao-progress-hero h3,.kao-progress-stones h3,.kao-progress-week h3,.kao-progress-map h3,.kao-progress-perception h3,.kao-progress-calibration h3{margin:0 0 var(--f-1);font-size:var(--f-15)}
+.kao-progress-count{margin:0 0 var(--f-2);font-size:var(--f-15);line-height:1.45}
+.kao-progress-count strong{font-size:var(--f-17);font-variant-numeric:tabular-nums}
+.kao-progress-curve{margin:0 0 var(--f-2);padding:0;list-style:none;display:grid;gap:var(--kao-gap-1)}
+.kao-progress-curve li{display:flex;align-items:center;gap:var(--f-1);color:var(--kao-label);font-size:var(--f-13);font-variant-numeric:tabular-nums}
+.kao-progress-curve li .kao-curve-mark{width:14px;flex:none;color:var(--kao-label-2)}
+.kao-progress-curve li.is-earned .kao-curve-mark{color:var(--kao-ok)}
+.kao-progress-stones,.kao-progress-week,.kao-progress-map,.kao-progress-perception,.kao-progress-calibration{margin-top:var(--f-3);padding-top:var(--f-3);border-top:1px solid var(--kao-sep)}
+.kao-stone-earned{margin:0 0 var(--f-2);padding:0;list-style:none;display:grid;gap:var(--kao-gap-1)}
+.kao-stone-earned li{display:flex;align-items:center;gap:var(--f-1);font-size:var(--f-14);color:var(--kao-label)}
+/* Dekoratif sözde-öğe yok (02 K-2): durum işareti gerçek metinle taşınır. */
+.kao-stone-mark{color:var(--kao-ok);flex:none}
+.kao-stone-next{margin:0;display:grid;gap:var(--kao-gap-1);font-size:var(--f-14);color:var(--kao-label)}
+.kao-stone-condition{color:var(--kao-label-2);font-size:var(--f-13);line-height:1.4}
+.kao-week-line{margin:0 0 var(--f-2);font-size:var(--f-14);color:var(--kao-label)}
+.kao-week-days{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(7,1fr);gap:var(--kao-gap-1)}
+.kao-week-days li{display:grid;justify-items:center;gap:6px;font-size:var(--f-11);color:var(--kao-label-2)}
+.kao-week-dot{width:100%;height:8px;border-radius:4px;background:var(--kao-sep)}
+.kao-week-days li.is-studied .kao-week-dot{background:var(--kao-accent)}
+.kao-week-days li.is-studied{color:var(--kao-label)}
+.kao-map-note{margin:0 0 var(--f-2);font-size:var(--f-12);color:var(--kao-label-2);line-height:1.45}
+.kao-progress-perception p,.kao-progress-calibration p{margin:0 0 var(--f-1);font-size:var(--f-14);line-height:1.5;color:var(--kao-label)}
+.kao-progress-perception strong,.kao-progress-calibration strong{font-variant-numeric:tabular-nums}
+@media (forced-colors:active){
+  .kao-progress-curve li.is-earned .kao-curve-mark,.kao-week-days li.is-studied .kao-week-dot{forced-color-adjust:none}
+}

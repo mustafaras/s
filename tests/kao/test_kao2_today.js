@@ -163,7 +163,8 @@ check('erişilebilirlik korunur: harita İlerleme’den, âyet sayacı Günün �
   const q = reset();
   q.ayahs.understood = ['1:1', '1:2'];
   ui.kaoView = 'stats';
-  assert.match(api.kaoOverlayHTML(INSTANT), /onclick="App\.kaoOpenMap\(\)"/);
+  // KAO2-24: harita ayrı görünüm değil; İlerleme ekranının bölümü (giriş yerine gömülü hücreler).
+  assert.equal([...api.kaoOverlayHTML(INSTANT).matchAll(/class="kao-map-cell"/g)].length, 114, 'İlerleme içinde 114 sûre hücresi');
   ui.kaoView = 'ayah';
   assert.match(api.kaoOverlayHTML(INSTANT), /Anlaşılan âyet sayısı: <strong>2<\/strong>/);
   ui.kaoView = 'home';

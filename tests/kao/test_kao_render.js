@@ -501,8 +501,9 @@ assert.ok(prevented >= 3 && stopped >= 3);
     '114': { understoodAt: '2026-09-10T10:00:00.000Z', delayedTestAt: '2026-09-17T10:00:00.000Z', delayedScore: 2, needsReread: true },
     '113': { understoodAt: '2026-09-24T10:00:00.000Z', delayedTestAt: '2026-10-01T10:00:00.000Z', delayedScore: null } } } };
   const saved = appData.quranLearn; appData.quranLearn = mapData.quranLearn;
-  ui.kaoOpen = true; assert.equal(api.kaoOpenMap(), true); assert.equal(ui.kaoView, 'map');
-  const mapHtml = api.kaoOverlayHTML('2026-09-25T10:00:00');
+  // KAO2-24 (S-12): ayrı harita görünümü kaldırıldı; harita artık İlerleme ekranının bölümü.
+  ui.kaoOpen = true; assert.equal(api.kaoOpenMap(), true); assert.equal(ui.kaoView, 'stats', 'harita İlerleme bölümüdür');
+  const mapHtml = api.kaoStatsHTML('2026-09-25T10:00:00');
   const cells = [...mapHtml.matchAll(/class="kao-map-cell" data-l="(\d)" aria-label="([^"]+)"/g)];
   assert.equal(cells.length, 114, '114 hücre');
   assert.ok(cells.every((match) => /^.+: %\d{1,3} anlaşıldı$/.test(match[2])), 'aria-label "Sûre adı: %n anlaşıldı"');
@@ -516,9 +517,10 @@ assert.ok(prevented >= 3 && stopped >= 3);
   assert.match(mapHtml, /<li value="112">İhlâs — %100 anlaşıldı \(2 \/ 4 âyet\) · gecikmeli test 5\/5 · kesinleşti<\/li>/, 'eşdeğer metin listesi');
   assert.match(mapHtml, /<li value="114">Nâs — %\d+ anlaşıldı \(1 \/ 6 âyet\) · gecikmeli test 2\/5 · tekrar oku<\/li>/);
   assert.match(mapHtml, /110 sûrede henüz veri yok/);
-  // KAO2-09: harita ana ekrandan İlerleme'ye taşındı (S-12 birleşimine kadar).
+  // KAO2-24: harita ana ekrandan kalktı ve İlerleme ekranının İÇİNE girdi (ayrı görünüm yok).
   assert.doesNotMatch(api.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoOpenMap\(\)/, 'S-02 ana ekranda harita satırı yok');
-  assert.match(api.kaoStatsHTML('2026-09-25T10:00:00'), /App\.kaoOpenMap\(\)/, 'İlerleme ekranından harita girişi');
+  assert.doesNotMatch(api.kaoStatsHTML('2026-09-25T10:00:00'), /App\.kaoOpenMap\(\)/, 'harita girişi yerine harita gömülü');
+  assert.equal([...api.kaoStatsHTML('2026-09-25T10:00:00').matchAll(/class="kao-map-cell"/g)].length, 114, 'İlerleme içinde 114 hücre');
   assert.match(appSource, /App\.kaoOpenMap=function\(\)\{ return window\.SeymaQuranLearn\.kaoOpenMap\.apply\(null,arguments\); \};/);
   assert.match(cssSource, /\.kao-map-cell\[data-l="5"\],\.kao-map-legend i\[data-l="5"\]\{background:var\(--quran-mid\);color:var\(--quran-surface\)\}/);
   appData.quranLearn = saved; ui.kaoView = 'home'; ui.kaoOpen = false;

@@ -71,7 +71,6 @@ const screens = [
   ['settings', undefined, 'Ayarlar'],
   ['phonics', undefined, 'Telaffuz'],
   ['ayah', undefined, 'Günün âyeti'],
-  ['map', undefined, 'Mushaf haritası'],
   ['prayer', undefined, 'Namazda ne diyorum'],
   ['stats', undefined, 'İlerleme'],
   ['gate', undefined, 'Harf kontrolü']

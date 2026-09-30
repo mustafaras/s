@@ -160,3 +160,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - disclosure-2: K2F-03 kanıt commit'i `5e0665bd` `git add kao2-duzeltme` (dizin) ile 15 iCloud kopyasını (`… 2.*`) içeri aldı; `945e37bd` kaldırdı. `5e0665bd` ikinci yayınla public `origin/main` geçmişine girdi (yalnız kao2-duzeltme belge kopyaları; Pages'e dahil değil; geçmiş yeniden yazılmadı — P5). Bundan sonra `git add` yalnız açık dosya yollarıyla.
 - disclosure-3: K2F-00…05 tek oturumda yürütüldü (BAGLAM-YONETIMI §2 önerisi dışı); her prompt ayrı commit + tam kapılarla kapandı.
 - next: K2F-06
+
+## seq 17 · 2026-09-30 · DECISION · K2F-05
+- decision: `main` geçmişi yeniden yazıldı ve `--force-with-lease` ile push edildi — kullanıcının AÇIK onayıyla ("Yeniden yaz + force-push"). PROMPTLAR P5 ("git push --force, geçmiş yeniden yazma yok") bu işlem için kullanıcı kararıyla istisna edildi; başka bir yerde geçerli değildir.
+- why: seq 12/16'daki `5e0665bd` 15 iCloud kopyasını (`… 2.*`) public geçmişe taşımıştı.
+- how: yedek etiket `backup-pre-rewrite-20260930` (yerel, `1d74bd9c`) → `f0e8b1c1`'den yeni zincir: `5e0665bd`'yi kopyasız yeniden oluştur (`68ac71b2`), `945e37bd` (kaldırma) düştü, K2F-04 cherry-pick (`86a56267`), sonra K2F-05 (`d08c03c1`) ve kayıt düzeltmesi (`a2fb9873`). Lease: yalnız uzak `main` hâlâ `430539ec` ise.
+- map: `5e0665bd`→`68ac71b2` · `430539ec`→`86a56267` · `bb3f539f`→`d08c03c1` · `1d74bd9c`→`a2fb9873` · `945e37bd` silindi. Önceki LEDGER/KANIT metinlerindeki eski hash'ler tarihseldir.
+- verified: yeni `main` ağaç hash'i eskisiyle AYNI (`f083063f…`), yani site içeriği değişmedi; Pages run 36753100758 success; canlı 5/5 bayt-eşit; `origin/main` ağacında `… 2.*` yok.
+- residual: GitHub eski nesneleri (örn. `5e0665bd`) bir süre önbellekte/erişilebilir tutabilir; tam silme GitHub tarafında (Support) yapılır. Yerel yedek etiket istenirse silinebilir (`git tag -d backup-pre-rewrite-20260930`).
+- next: K2F-06

@@ -49,3 +49,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: yok (sandbox'ta `mktemp -d` ve `diff -` reddedildi; $TMPDIR altında geçici dosya kullanıldı)
 - next: K2F-01
+
+## seq 6 · 2026-09-30 · PROMPT · K2F-01
+- status: done
+- title: kao-plan-check: K2F öneki ve taban commit
+- prev-commit: d19b4576
+- evidence: kao2-duzeltme/evidence/K2F-01/KANIT.md
+- closes: M-10
+- repro: değişmedi · toplam 0/10
+- gates: kapilar.sh YEŞİL (kao 45 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check PASS · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20260930l
+- changed-tests: yok (kao-plan-check.test.mjs self-test 19 → 30 durum; hiçbiri zayıflatılmadı)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: yok (plan-check taban commit K2F-00 d19b457; 22 tarihsel FAIL + 1 K2F-00 FAIL → 0; --since çözülemezse FAIL verir, sessiz atlamaz)
+- next: K2F-02

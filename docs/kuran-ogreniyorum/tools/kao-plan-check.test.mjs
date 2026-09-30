@@ -7,7 +7,7 @@ const PLAN = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
 const STATE_PATH = path.join(PLAN, 'KAO-STATE.json');
 const LOAD_LISTS = ['index.html', '.claude/skills/run-seyma/driver.mjs', '.claude/skills/run-seyma/zikr-harness.mjs', 'tests/app/test_state_rebind_boundary.js'];
 
-export function runSelfTests({ check, cardSummary }, base) {
+export function runSelfTests({ check, cardSummary, commitCounts, resolvePlanBase }, base) {
   const clone = () => JSON.parse(JSON.stringify(base));
   const ctx0 = { prompts: null, ledger: '| 1 | d | e | k |', reqDoc: null, evidenceExists: () => true, readSource: () => null, commits: [] };
   const orderedPrompts = (state) => state.promptOrder.map(id => `## ${id}`).join('\n');
@@ -44,6 +44,18 @@ export function runSelfTests({ check, cardSummary }, base) {
     ['taban sonrası tanınmayan önek KAO dosyasına dokunamaz', clone(), { ...ctx0, commits: [{ hash: 'f1xu1000aa', subject: 'fix(ui): kuyruk', files: ['app/core/quranLearn.js'], afterBase: true }] }, (r) => r.fails.some(f => f.includes('f1xu100') && f.includes('tanınmayan önek'))],
     ['KAO-FIX commit sözlüğe dokunabilir', clone(), { ...ctx0, commits: [{ hash: 'f1x0500bbb', subject: 'KAO-FIX-05: başlıklar', files: ['app/content/quranLexiconV1.js'], afterBase: true }] }, (r) => r.fails.length === 0 && !r.warns.some(w => w.includes('f1x0500'))],
     ['taban öncesi KAO dışı commit yalnız WARN', clone(), { ...ctx0, commits: [{ hash: 'a9fa40cccc', subject: 'fix(ui): move Quran learning into faith hub', files: ['app/core/quranLearn.js'], afterBase: false }] }, (r) => !r.fails.some(f => f.includes('a9fa40c')) && r.warns.some(w => w.includes('a9fa40c') && w.includes('taban öncesi'))],
+    // K2F-01 (M-10): KAO2-FIX programı önekleri ve plan-check tabanı.
+    ['K2F-07 commit KAO dosyasına dokunabilir', clone(), { ...ctx0, commits: [{ hash: 'k2f0700aaa', subject: 'K2F-07: masteryAt kaydı', files: ['app/core/quranLearn.js', 'tests/kao/test_kao2_x.js'], afterBase: true }] }, (r) => r.fails.length === 0 && !r.warns.some(w => w.includes('k2f0700'))],
+    ['K2F-43 (üst sınır) tanınır', clone(), { ...ctx0, commits: [{ hash: 'k2f4300aaa', subject: 'K2F-43: yayın', files: ['app/kao.css'], afterBase: true }] }, (r) => r.fails.length === 0],
+    ['K2F-7 (tek hane) reddedilir', clone(), { ...ctx0, commits: [{ hash: 'k2f7000aaa', subject: 'K2F-7: kısa', files: ['app/core/quranLearn.js'], afterBase: true }] }, (r) => r.fails.some(f => f.includes('k2f7000') && f.includes('tanınmayan önek'))],
+    ['K2FX-07 reddedilir', clone(), { ...ctx0, commits: [{ hash: 'k2fx700aaa', subject: 'K2FX-07: yanlış önek', files: ['app/core/quranLearn.js'], afterBase: true }] }, (r) => r.fails.some(f => f.includes('k2fx700') && f.includes('tanınmayan önek'))],
+    ['K2F-44 (aralık dışı) reddedilir', clone(), { ...ctx0, commits: [{ hash: 'k2f4400aaa', subject: 'K2F-44: yok', files: ['app/core/quranLearn.js'], afterBase: true }] }, (r) => r.fails.some(f => f.includes('k2f4400') && f.includes('tanınmayan önek'))],
+    ['plan taban öncesi tanınmayan önek taranmaz', clone(), { ...ctx0, commits: [{ hash: 'old0000aaa', subject: 'KAO2-A: bütçe', files: ['tests/kao/test_kao2_perf_budget.js'], afterBase: true, beforePlanBase: true }] }, (r) => r.fails.length === 0 && !r.warns.some(w => w.includes('old0000'))],
+    ['plan taban öncesi chore(kao) kapsamı taranmaz', clone(), { ...ctx0, commits: [{ hash: 'old1111bbb', subject: 'chore(kao): eski', files: ['index.html'], beforePlanBase: true }] }, (r) => r.fails.length === 0],
+    ['plan taban sonrası tanınmayan önek FAIL', clone(), { ...ctx0, commits: [{ hash: 'new2222ccc', subject: 'wip: kuyruk', files: ['app/core/quranLearn.js'], afterBase: true, beforePlanBase: false }] }, (r) => r.fails.some(f => f.includes('new2222') && f.includes('tanınmayan önek'))],
+    ['çözülemeyen plan tabanı FAIL (sessiz atlama yok)', clone(), { ...ctx0, planBase: 'deadbee', planBaseMissing: true }, (r) => r.fails.some(f => f.includes('deadbee') && f.includes('bulunamadı'))],
+    ['commitCounts K2F kartını sayar', clone(), ctx0, () => { const c = commitCounts([{ subject: 'K2F-07: a' }, { subject: 'K2F-07: b' }, { subject: 'K2F-7: c' }]); return c['K2F-07'] === 2 && Object.keys(c).length === 1; }],
+    ['planBase çözümü: --since önce, sonra STATE, yoksa null', clone(), ctx0, () => resolvePlanBase(['--since', 'abc1234'], { planCheckBase: 'def5678' }) === 'abc1234' && resolvePlanBase([], { planCheckBase: 'def5678' }) === 'def5678' && resolvePlanBase([], { planCheckBase: null }) === null && resolvePlanBase([], null) === null && resolvePlanBase(['--since'], { planCheckBase: 'def5678' }) === 'def5678'],
   ];
 
   let ok = 0;

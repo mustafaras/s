@@ -1,29 +1,29 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-01
-lastSeq: 5
+nextPrompt: K2F-02
+lastSeq: 6
 status: active
 -->
 
-Son güncelleme: 2026-09-30 · LEDGER seq 5 · K2F-00 tamam (1/44), sıradaki K2F-01.
+Son güncelleme: 2026-09-30 · LEDGER seq 6 · K2F-00, K2F-01 tamam (2/44), sıradaki K2F-02.
 
 ## Şu an neredeyiz
-K2F-00 bitti: taşıma (`archive/kuran-ogreniyorum-v2/`, `docs/kuran-ogreniyorum/kao2/…`) ve program dosyaları
-`kao2-duzeltme` dalında tek commit'le kaydedildi. Taban ölçüm alındı; hiçbir R değişmedi (0/10).
+K2F-01 bitti: `kao-plan-check` artık `K2F-00…43` önekini tanır (tek hane / `K2FX` / aralık dışı reddedilir) ve
+`FIX-STATE.json.planCheckBase` (= K2F-00 commit'i `d19b4576`) öncesindeki commitleri taramaz; `--since <hash>` ile
+geçersiz kılınır. Çözülemeyen taban sessizce atlanmaz, FAIL verir. Hiçbir R değişmedi (0/10).
 
 ## Sıradaki promptun tek cümlesi
-**K2F-01:** `docs/kuran-ogreniyorum/tools/kao-plan-check.mjs`'i geçmiş commitleri değil `planCheckBase`'den
-sonrakileri denetleyecek ve `K2F` önekini tanıyacak şekilde düzelt (KR-6); `FIX-STATE.json.planCheckBase`'i
-K2F-00 commit'ine sabitle; şu an 22 olan tarihsel FAIL sıfırlanmalı.
+**K2F-02:** `tests/kao/helpers/kao-harness.js` ortak düzeneğini (`bootKao`/`freshUser`/`openView` — gerçek
+`kaoNav`/`kaoSetView`) yaz ve `app/core/quranLearn.js`'te yığın boşken `ui.kaoView`'un sessizce ana ekrana düşmesini
+düzelt; `tests/kao/test_kao2_view_resolution.js` ile R-09 fail→pass.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
 - Dal: `kao2-duzeltme` (tabanı `main` = `07802fa6`); push yok.
 - Yayın pini: `20260930l` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
-- Kapılar: KAO 45/45 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/kontrast PASS · sync PASS.
-- `kao-plan-check`: 22 FAIL (tarihsel; K2F-01 çözer). `tekrar-uret.cjs`: **0/10 PASS** (beklenen taban).
-- Bütçe (perf): içerik 177,657 KiB · runtime 92,431 KiB · css 12,815 KiB · p95 4,419 ms.
-- Müfredat derleyicisi çıktısı repodakiyle 5/5 bayt-eşit; `pages.yml` `kao2-duzeltme`'yi yayından hariç tutuyor.
+- `kao-plan-check`: **PASS** (1 WARN: MediaRecorder+save, kayıt amaçlı) · self-test 30/30 (19 → 30) · taban `d19b457`.
+- `tekrar-uret.cjs`: **0/10 PASS** (beklenen; ilk dönüş K2F-02'de R-09).
+- Bütçe (perf): içerik 177,657 KiB · runtime 92,431 KiB · css 12,815 KiB (uygulama koduna dokunulmadı).
 
 ## Açık riskler
 - Canlı kullanıcı Ünite 1 ustalığında kilitli (K4-01) ve gramer görevleri yanlış öğretiyor (K4-02) → Dalga 1 önceliklidir.

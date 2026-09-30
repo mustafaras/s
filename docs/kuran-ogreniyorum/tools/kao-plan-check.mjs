@@ -7,6 +7,8 @@
 //   node kuran-ogreniyorum/tools/kao-plan-check.mjs --self-test
 //   node kuran-ogreniyorum/tools/kao-plan-check.mjs --card KAO-07   # yalnız o kartın kapsam/kontrol özeti
 //   node kuran-ogreniyorum/tools/kao-plan-check.mjs --commits       # + kart başına commit sayısı (yalnız bilgi)
+//   node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs --since <hash>  # yalnız <hash>'ten sonraki commitleri denetle
+//                                                                       # (verilmezse kao2-duzeltme/FIX-STATE.json.planCheckBase)
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
@@ -30,8 +32,11 @@ const FIX_BASE = '58e0ceb';
 const KAO_FILE_SCOPE = ['app/core/quranLearn.js', 'app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranPhonicsV1.js', 'tools/kao-*.mjs', 'tests/kao/**', 'assets/kao/**'];
 // KAO-P00/KAO-Dn eski programın başlangıç/denetim kartlarıdır; "(ek)" düzeltme programının ek commit biçimidir.
 // KAO-ARSIV: program kapanışında plan klasörünün kökten docs/ altına taşınması (2026-09-27); tek seferlik yol güncellemesi.
-const KAO_SUBJECT_RE = /^(?:(?:KAO2-(?:[01]\d|2[0-7])|KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
-const CARD_OF_SUBJECT_RE = /^(KAO2-(?:[01]\d|2[0-7])|KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
+// K2F-NN: KAO2-FIX programı (kao2-duzeltme/, 44 prompt: K2F-00…K2F-43); tek hane ya da aralık dışı numara tanınmaz.
+const KAO_SUBJECT_RE = /^(?:(?:KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
+const CARD_OF_SUBJECT_RE = /^(KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
+// K2F-01 (M-10): plan-check tabanı — bu commit'ten SONRAKİ commitler denetlenir, öncesi tarihsel sayılır.
+const FIX_STATE_PATH = path.join(ROOT, 'kao2-duzeltme', 'FIX-STATE.json');
 const AUDIT_STATUSES = ['pass', 'fail', 'findings'];
 const FORBIDDEN_IN_REGISTRY = ['localStorage', 'XMLHttpRequest', 'SeySync', 'ghToken', 'openaiKey', 'sessionStorage', 'indexedDB'];
 
@@ -134,6 +139,7 @@ export function check(state, ctx) {
   // KAO-ARSIV: klasör docs/ altına taşındı; eski önekler geçmiş commit'ler için kalır.
   const CHORE_SCOPE = ['', 'docs/'].flatMap(p => [`${p}kuran-ogreniyorum/KAO-STATE.json`, `${p}kuran-ogreniyorum/.anti-amnesia/**`, `${p}kuran-ogreniyorum/evidence/**`, `${p}kuran-ogreniyorum/duzeltme/**`, `${p}kuran-ogreniyorum/tools/**`]);
   for (const cm of ctx.commits || []) {
+    if (cm.beforePlanBase) continue; // tarihsel: plan-check tabanından önce (K2F-01)
     if (/^chore\(kao\)/.test(cm.subject)) { for (const f of cm.files) if (!inScope(f, CHORE_SCOPE)) fail(`commit ${cm.hash.slice(0, 7)} chore(kao) kapsam dışı dosya: ${f}`); continue; }
     const m = cm.subject.match(/^(KAO-(?:P00|D\d|\d+b?))\b/); if (!m) continue;
     const id = m[1];
@@ -142,8 +148,10 @@ export function check(state, ctx) {
     for (const f of cm.files) if (!inScope(f, scope)) fail(`commit ${cm.hash.slice(0, 7)} (${id}) kapsam dışı dosya: ${f}; izinli kapsam: ${scope.join(', ')}`);
   }
   // 7 · KAO dosya kümesi → commit öneki (O-11); konu önekinden bağımsız her commit taranır
+  if (ctx.planBaseMissing) fail(`plan-check tabanı ${ctx.planBase} bulunamadı (FIX-STATE.json.planCheckBase ya da --since): tarihsel commitler ayrılamıyor`);
   if (ctx.baseMissing) warn(`taban commit ${FIX_BASE} bulunamadı: KAO dosyası commit'leri taban öncesi sayıldı (yalnız WARN)`);
   for (const cm of ctx.commits || []) {
+    if (cm.beforePlanBase) continue;
     const touched = cm.files.filter(f => inScope(f, KAO_FILE_SCOPE));
     if (!touched.length || KAO_SUBJECT_RE.test(cm.subject)) continue;
     const msg = `commit ${cm.hash.slice(0, 7)} KAO dosyasına tanınmayan önekle dokunuyor ("${cm.subject.slice(0, 60)}"): ${touched.join(', ')}`;
@@ -177,12 +185,23 @@ export function commitCounts(commits) {
   return counts;
 }
 
-function realCtx() {
+// Plan-check tabanı: `--since <hash>` önce, yoksa FIX-STATE.json.planCheckBase; ikisi de yoksa null (eski davranış).
+export function resolvePlanBase(args, fixState) {
+  const i = (args || []).indexOf('--since');
+  const cli = i >= 0 ? args[i + 1] : null;
+  if (cli && !cli.startsWith('--')) return cli;
+  return (fixState && typeof fixState.planCheckBase === 'string' && fixState.planCheckBase) || null;
+}
+
+function realCtx(planBase) {
   const readSource = (rel) => { const p = path.join(ROOT, rel); return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null; };
   const baseMissing = !git(`rev-parse --verify --quiet ${FIX_BASE}^{commit}`);
   const afterBase = new Set(baseMissing ? [] : git(`rev-list ${FIX_BASE}..HEAD`).split('\n').filter(Boolean));
-  const commits = git('log --format=%H%x1f%s -n 400').split('\n').filter(Boolean).map(l => { const [hash, subject] = l.split('\x1f'); return { hash, subject, afterBase: afterBase.has(hash), files: git(`show --pretty=format: --name-only ${hash}`).split('\n').filter(Boolean) }; });
-  return { baseMissing,
+  // Taban verilmişse ama çözülemiyorsa sessizce tümünü denetleme/atlama: hata olarak yüzeye çıkar.
+  const planBaseMissing = Boolean(planBase) && !git(`rev-parse --verify --quiet ${planBase}^{commit}`);
+  const afterPlanBase = planBase && !planBaseMissing ? new Set(git(`rev-list ${planBase}..HEAD`).split('\n').filter(Boolean)) : null;
+  const commits = git('log --format=%H%x1f%s -n 400').split('\n').filter(Boolean).map(l => { const [hash, subject] = l.split('\x1f'); return { hash, subject, afterBase: afterBase.has(hash), beforePlanBase: afterPlanBase ? !afterPlanBase.has(hash) : false, files: git(`show --pretty=format: --name-only ${hash}`).split('\n').filter(Boolean) }; });
+  return { baseMissing, planBase: planBase || null, planBaseMissing,
     prompts: fs.existsSync(PROMPTS_PATH) ? fs.readFileSync(PROMPTS_PATH, 'utf8') : null,
     ledger: fs.existsSync(LEDGER_PATH) ? fs.readFileSync(LEDGER_PATH, 'utf8') : null,
     reqDoc: fs.existsSync(REQ_DOC) ? fs.readFileSync(REQ_DOC, 'utf8') : null,
@@ -232,7 +251,7 @@ const args = process.argv.slice(2);
 if (!IS_MAIN) { /* import edildi (test/simülasyon): CLI çalışmaz */ }
 else if (args.includes('--self-test')) {
   const { runSelfTests } = await import('./kao-plan-check.test.mjs');
-  process.exitCode = runSelfTests({ check, cardSummary }, readJson(STATE_PATH)) ? 0 : 1;
+  process.exitCode = runSelfTests({ check, cardSummary, commitCounts, resolvePlanBase }, readJson(STATE_PATH)) ? 0 : 1;
 }
 else {
   const state = readJson(STATE_PATH);
@@ -242,8 +261,10 @@ else {
     console.log(JSON.stringify(summary, null, 2));
     process.exit(0);
   }
-  const ctx = realCtx();
+  const fixState = fs.existsSync(FIX_STATE_PATH) ? readJson(FIX_STATE_PATH) : null;
+  const ctx = realCtx(resolvePlanBase(args, fixState));
   const { fails, warns } = check(state, ctx);
+  if (ctx.planBase && !ctx.planBaseMissing) console.log(`INFO plan-check tabanı ${ctx.planBase.slice(0, 7)}: ${ctx.commits.filter(c => c.beforePlanBase).length} tarihsel commit taranmadı, ${ctx.commits.filter(c => !c.beforePlanBase).length} commit denetlendi`);
   if (args.includes('--commits')) for (const [id, n] of Object.entries(commitCounts(ctx.commits)).sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true }))) console.log(`commits ${id}: ${n}`);
   for (const w of warns) console.log('WARN ' + w);
   for (const f of fails) console.log('FAIL ' + f);

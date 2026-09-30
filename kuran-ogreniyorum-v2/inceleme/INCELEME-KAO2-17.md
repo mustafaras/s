@@ -280,7 +280,7 @@
 | s0.06 | Dişli aile | Dişli harfleri ve aralarındaki farkı ayırt edeceksin. | `sourced` | - [ ] |
 | s0.07 | Konum şekilleri | Bir harfin başta, ortada ve sonda nasıl değiştiğini göreceksin. | `sourced` | - [ ] |
 | s0.08 | Sükûn ve kapalı hece | Ünsüzle kapanan heceyi tanıyıp duraksız okuyacaksın. | `sourced` | - [ ] |
-| s0.09 | Şedde ve uzatma | İkizlenen harfi ve uzun okunan sesi ayırt edeceksin. | `sourced` | - [ ] |
-| s0.10 | Boğaz harfleri | Boğazdan çıkan harfleri çıkış yerlerine göre ayırt edeceksin. | `sourced` | - [ ] |
-| s0.11 | 'el' takısı | Kelime başındaki 'el' takısını tanıyıp okuyuşa katacaksın. | `sourced` | - [ ] |
-| s0.12 | Vakıf ve akıcı okuma | Nerede duracağını bilerek kısa bir metni baştan sona okuyacaksın. | `sourced` | - [ ] |
+| s0.09 | Uzatma (med) ve şedde | İkizlenen harfi ve uzun okunan sesi ayırt edeceksin. | `sourced` | - [ ] |
+| s0.10 | Kalan harfler | Boğazdan çıkan harfleri çıkış yerlerine göre ayırt edeceksin. | `sourced` | - [ ] |
+| s0.11 | Tenvin, elif-lâm, vasıl | Kelime başındaki 'el' takısını tanıyıp okuyuşa katacaksın. | `sourced` | - [ ] |
+| s0.12 | İlk okuma provası | Nerede duracağını bilerek kısa bir metni baştan sona okuyacaksın. | `sourced` | - [ ] |

@@ -290,39 +290,43 @@
       }
     },
     "s0.09": {
-      "title": "Şedde ve uzatma",
+      "title": "Uzatma (med) ve şedde",
       "goal": "İkizlenen harfi ve uzun okunan sesi ayırt edeceksin.",
       "review": {
         "level": "sourced",
         "by": "owner",
-        "at": "2026-09-29"
+        "at": "2026-09-30",
+        "note": "07 §2 başlığına hizalandı (spec esastır)"
       }
     },
     "s0.10": {
-      "title": "Boğaz harfleri",
+      "title": "Kalan harfler",
       "goal": "Boğazdan çıkan harfleri çıkış yerlerine göre ayırt edeceksin.",
       "review": {
         "level": "sourced",
         "by": "owner",
-        "at": "2026-09-29"
+        "at": "2026-09-30",
+        "note": "07 §2 başlığına hizalandı (spec esastır)"
       }
     },
     "s0.11": {
-      "title": "'el' takısı",
+      "title": "Tenvin, elif-lâm, vasıl",
       "goal": "Kelime başındaki 'el' takısını tanıyıp okuyuşa katacaksın.",
       "review": {
         "level": "sourced",
         "by": "owner",
-        "at": "2026-09-29"
+        "at": "2026-09-30",
+        "note": "07 §2 başlığına hizalandı (spec esastır)"
       }
     },
     "s0.12": {
-      "title": "Vakıf ve akıcı okuma",
+      "title": "İlk okuma provası",
       "goal": "Nerede duracağını bilerek kısa bir metni baştan sona okuyacaksın.",
       "review": {
         "level": "sourced",
         "by": "owner",
-        "at": "2026-09-29"
+        "at": "2026-09-30",
+        "note": "07 §2 başlığına hizalandı (spec esastır)"
       }
     }
   },

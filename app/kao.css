@@ -345,3 +345,25 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-root-lemma:focus-visible{outline:3px solid var(--kao-tint);outline-offset:-3px}
 .kao-roots-empty{margin:0;padding:12px;color:var(--kao-label-2);font-size:var(--f-subhead);text-align:center}
 @media(forced-colors:active){.kao-root-family-list ul,.kao-root-lemmas,.kao-root-derivs li{border-color:CanvasText;background:Canvas}.kao-root-row,.kao-root-lemma{background:Canvas;color:CanvasText}.kao-root-meta,.kao-root-body small,.kao-root-lemma small,.kao-root-meaning,.kao-root-mastered,.kao-roots-empty{color:CanvasText}.kao-root-row:focus-visible,.kao-root-lemma:focus-visible,.kao-roots-search input:focus-visible{outline-color:Highlight}}
+
+/* KAO2-21 · Seviye 0 (şekil aileleri). Kapı yüzeyi DOKUNULMAZ; bu ekran ayrıdır.
+   Yalnız --kao-* / --quran* tokenları; 44px hedefler, :focus-visible, forced-colors. */
+.kao-s0-stage h3,.kao-s0-listen h3,.kao-s0-positions h3{margin:0 0 8px;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
+.kao-s0-letters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:0;list-style:none}
+.kao-s0-letters li{min-width:52px;min-height:52px;display:grid;place-items:center;padding:6px 10px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface);color:var(--kao-label);font-size:var(--f-title3);font-weight:700}
+.kao-s0-listen{display:grid;gap:6px;justify-items:center;margin-bottom:16px;padding:14px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface)}
+.kao-s0-word-ar{margin:0;color:var(--kao-label);font-size:clamp(2rem,9vw,3rem);font-weight:700;line-height:var(--kao-ar-lh,2.2);text-align:center}
+.kao-s0-word-tr{margin:0;color:var(--kao-tint);font-size:var(--f-callout);font-weight:600}
+.kao-s0-positions{margin-bottom:16px}
+.kao-s0-pos-row{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.kao-s0-pos-row li{flex:1 1 calc(50% - 8px);display:grid;gap:4px;justify-items:center;min-width:0;padding:10px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
+.kao-s0-pos-row li span{color:var(--kao-label-2);font-size:var(--f-caption1);font-weight:600}
+.kao-s0-pos-row li b{color:var(--kao-label);font-size:var(--f-title2);font-weight:700;line-height:var(--kao-ar-lh,2.2)}
+.kao-s0-pos-none{color:var(--kao-label-2);font-size:var(--f-caption1)}
+.kao-s0-words{display:grid;gap:8px;margin:0 0 14px;padding:0;list-style:none}
+.kao-s0-word{display:grid;gap:2px;justify-items:center;width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
+.kao-s0-word span{color:var(--kao-label);font-size:var(--f-title3);font-weight:700}
+.kao-s0-word small{color:var(--kao-label-2);font-size:var(--f-caption1)}
+.kao-s0-note{margin:8px 0;color:var(--kao-label-2);font-size:var(--f-footnote);line-height:1.4}
+.kao-s0 .kao-primary{margin-top:8px}
+@media(forced-colors:active){.kao-s0-letters li,.kao-s0-listen,.kao-s0-pos-row li,.kao-s0-word{border-color:CanvasText;background:Canvas}.kao-s0-word-ar,.kao-s0-pos-row li b,.kao-s0-word span{color:CanvasText}.kao-s0-note,.kao-s0-word small{color:CanvasText}}

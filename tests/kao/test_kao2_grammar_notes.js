@@ -140,7 +140,7 @@ check('girişler: Keşfet satırı görünür, ünite kavramları dokunulabilir'
   const discover = home.match(/<h3 class="kao-group-title">Keşfet<\/h3><div class="kao-group-surface">([\s\S]*?)<\/div><\/section>/);
   assert.ok(discover, 'Keşfet bölümü var');
   const labels = [...discover[1].matchAll(/<span class="kao-group-label">([^<]*)<\/span>/g)].map((match) => match[1]);
-  assert.deepEqual(labels, ['Kısa sûreler', 'Namazda ne diyorum', 'Gramer notları', 'Kök aileleri', 'Telaffuz stüdyosu', 'Günün âyeti']);
+  assert.deepEqual(labels, ['Kısa sûreler', 'Namazda ne diyorum', 'Gramer notları', 'Kök aileleri', 'Seviye 0 · şekil aileleri', 'Telaffuz stüdyosu', 'Günün âyeti']);
   assert.match(discover[1], /App\.kaoOpenRoots\(\)/);
   assert.match(discover[1], /onclick="App\.kaoSetView\("grammar"\)"/);
   assert.equal(api.kaoNav('unit', unit.id), true);

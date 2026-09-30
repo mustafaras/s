@@ -4,9 +4,9 @@
   "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
-  "releaseApproval": "approved_through_KAO2-20",
-  "nextCard": "KAO2-21",
-  "ledgerLastSeq": 76,
+  "releaseApproval": "approved_through_KAO2-21",
+  "nextCard": "KAO2-22",
+  "ledgerLastSeq": 77,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤88 KiB (2026-09-29 revizyonu: KAO2-18+ açıklama katmanı için 80→88); kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -16,7 +16,10 @@
     "readerQuietTime": "KAO2-19: okuma sesi uygulamanın genel sessiz saat kuralına (23:00-07:00) uyar; sessiz saatte çalma başlamaz, neden kullanıcıya söylenir.",
     "rootScopeGate": "KAO2-20: \"Kök aileleri\" keşif satırı yalnız kullanıcı en az bir kelime kartı edinince görünür (test_kao2_today \"ilgili kartlar gelene kadar gizli\" sözleşmesi).",
     "contentBudgetNote": "KAO2-20 sonrası runtime 86.032/88 KiB (%98). Sonraki çalışma zamanı artışı kullanıcı onayı ister.",
-    "budgetRelief": "KAO2-21 hazırlık: runtime 86.032->84.745 KiB. Ölü kod (kaoTodasyStats/kaoUnitLabel/lemmaSurahId) + KAO_MAHREC_SVG içerik modülüne taşındı. İkinci bütçe artışı GEREKMEDİ."
+    "budgetRelief": "KAO2-21 hazırlık: runtime 86.032->84.745 KiB. Ölü kod (kaoTodasyStats/kaoUnitLabel/lemmaSurahId) + KAO_MAHREC_SVG içerik modülüne taşındı. İkinci bütçe artışı GEREKMEDİ.",
+    "elifLetter": "A3 (kullanıcı onayı, 2026-09-30): elif (ا) donmuş içerikte yok; bağlanmayan küme veriyle sınırlı (dal,dhal,ra,zay,waw,hamza). elif eklemek ayrı içerik işi.",
+    "s0Surface": "B2 (kullanıcı onayı): yeni Seviye 0 akışı AYRI yüzey (kao-s0); kapı (kaoGate) yalnız yerleştirme kalır, 12 mini ders dokunulmaz.",
+    "perfGateNoise": "KAO2-21: perf p95 kapısı gürültüye dayanıklı yapıldı — göreli bant en iyi 3 turun ortancasıyla (steady) sınanır; mutlak 40 ms kapısı korunur. Gerekçe: git stash karşılaştırması, sapmanın makine yükü olduğunu kanıtladı."
   },
   "gates": {
     "G0": "closed",
@@ -144,9 +147,8 @@
     },
     "KAO2-21": {
       "wave": "W4",
-      "status": "blocked",
-      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-21/BLOKAJ.md",
-      "note": "Bütçe engeli çözüldü (84.745/88). İki kullanıcı kararı bekliyor: (A) elif (ا) içerikte yok — 07 §2 ders 0.5 \"ا د ذ ر ز و\" der ama quranPhonicsV1.letters elif taşımaz; eklemek yeni içerik işi. (B) (f) kapıdaki 12 mini dersi kaldırmayı ister; test_kao_render:342 bunu sabitliyor."
+      "status": "done",
+      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-21/KANIT.md"
     },
     "KAO2-22": {
       "wave": "W4",

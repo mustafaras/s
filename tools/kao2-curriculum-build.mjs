@@ -24,13 +24,13 @@ function fail(message) {
 
 function loadContent() {
   const box = vm.createContext({ window: {} });
-  for (const name of ['Lexicon', 'Grammar', 'ShortSurahs']) {
+  for (const name of ['Lexicon', 'Grammar', 'ShortSurahs', 'Phonics']) {
     const file = `app/content/quran${name}V1.js`;
     vm.runInContext(fs.readFileSync(path.join(ROOT, file), 'utf8'), box, { filename: file });
   }
-  const { QuranLexiconV1: lex, QuranGrammarV1: grammar, QuranShortSurahsV1: surahs } = box.window;
-  if (!lex || !grammar || !surahs) fail('içerik modülleri yüklenemedi');
-  return { lex, grammar, surahs };
+  const { QuranLexiconV1: lex, QuranGrammarV1: grammar, QuranShortSurahsV1: surahs, QuranPhonicsV1: phonics } = box.window;
+  if (!lex || !grammar || !surahs || !phonics) fail('içerik modülleri yüklenemedi');
+  return { lex, grammar, surahs, phonics };
 }
 
 function readSpec() {
@@ -226,11 +226,45 @@ function build(spec, content, texts) {
     };
   });
   const levels = spec.levels.map((lv) => ({ id: lv.id, title: lv.title, unitIds: units.filter((u) => u.level === lv.id).map((u) => u.id) }));
+  // (b) Konum tablosu biçimleri ZWJ ile MEKANİK üretilir (elle Arapça yazılmaz).
+  // Bağlanmayan harfte baş/orta biçimi YOKTUR — uydurulmaz, "yok" işaretlenir.
+  const ZWJ = '\u200d';
+  const NON_JOINING_DEFAULT = ['dal', 'dhal', 'ra', 'zay', 'waw', 'hamza'];
+  const nonJoining = Array.isArray(content.lex.nonJoining) && content.lex.nonJoining.length
+    ? content.lex.nonJoining.slice() : NON_JOINING_DEFAULT.slice();
+  // (c) Harf başına gerçek kelime: çıplak biçim hedef harfle başlar, ≤3 hece,
+  // klip DİSKTE vardır. Diski yalnız araç görür; seçim modüle yazılır.
+  const audioDir = path.join(ROOT, 'assets/kao/audio');
+  const audioFiles = fs.existsSync(audioDir) ? new Set(fs.readdirSync(audioDir)) : new Set();
+  const syllableCount = (ar) => (String(ar).match(/[\u064e\u064f\u0650\u064b-\u064d]/g) || []).length;
+  const s0Letters = {};
+  for (const letter of content.phonics.letters) {
+    const joins = nonJoining.indexOf(letter.id) < 0;
+    const pick = content.lex.lemmas
+      .filter((l) => String(l.ar || '').indexOf(String(letter.ar)) === 0 && l.ar !== letter.ar
+        && syllableCount(l.ar) <= 3 && audioFiles.has(`w-${l.id}-measured.m4a`))
+      .sort((a, b) => syllableCount(a.ar) - syllableCount(b.ar) || String(a.id).localeCompare(String(b.id)))[0];
+    s0Letters[letter.id] = {
+      letter: String(letter.ar || ''),
+      joins,
+      cells: joins
+        ? [`${letter.ar}`, `${letter.ar}${ZWJ}`, `${ZWJ}${letter.ar}${ZWJ}`, `${ZWJ}${letter.ar}`]
+        : [String(letter.ar), null, null, `${ZWJ}${letter.ar}`],
+      word: pick ? {
+        wordId: pick.id,
+        ar: String(pick.ar),
+        tr: String((pick.meanings && pick.meanings[0]) || ''),
+        syllables: syllableCount(pick.ar),
+        startsWithLetter: true,
+        file: `w-${pick.id}-measured.m4a`
+      } : null
+    };
+  }
   const s0 = { lessons: spec.s0.map((title, i) => {
     const id = `s0.${pad(i + 1)}`;
     const text = textFor(texts, id, title, '', 's0');
     return { id, title: text.title, goal: text.goal || null, review: text.review };
-  }) };
+  }), letters: s0Letters };
   const missing = content.lex.lemmas.filter((l) => !lemmaToLesson[l.id]);
   if (missing.length) fail(`derse girmeyen lemma: ${missing[0].id}`);
   return { version: spec.version, levels, units, s0, lemmaToLesson };

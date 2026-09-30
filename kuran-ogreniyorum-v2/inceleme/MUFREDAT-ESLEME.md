@@ -39,10 +39,10 @@ Toplam: 12 ünite · 109 ders · 524 lemma · Seviye 0: 12 ders.
 - s0.06 · Dişli aile
 - s0.07 · Konum şekilleri
 - s0.08 · Sükûn ve kapalı hece
-- s0.09 · Şedde ve uzatma
-- s0.10 · Boğaz harfleri
-- s0.11 · 'el' takısı
-- s0.12 · Vakıf ve akıcı okuma
+- s0.09 · Uzatma (med) ve şedde
+- s0.10 · Kalan harfler
+- s0.11 · Tenvin, elif-lâm, vasıl
+- s0.12 · İlk okuma provası
 
 ## Ünite 1 · Fâtiha
 

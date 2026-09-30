@@ -1,30 +1,31 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-21
-lastSeq: 76
+nextCard: KAO2-22
+lastSeq: 77
 status: active
 -->
 
 Son güncelleme: 2026-09-29 · LEDGER seq71
 
 ## Şu an neredeyiz
-**KAO2-00…20 tamamlandı (21/28). KAO2-21 `blocked`.** Bütçe engeli **çözüldü**:
-çalışma zamanı 86.032 → **84.745 / 88 KiB** (pay 3.34). İki **kullanıcı kararı** bekliyor:
-(A) 07 §2 ders 0.5'in istediği **elif (ا)** içerikte yok; (B) kartın (f) maddesi kapıdaki
-12 mini dersi kaldırmayı ister ama `test_kao_render.js:342` bunu sabitliyor.
+**KAO2-00…21 tamamlandı (22/28).** KAO2-21 Seviye 0'ı şekil aileleri sırasıyla yeniden
+kurdu ve **ayrı yüzey** olarak ekledi (onaylanan B2): konum tablosu 28×4 (ZWJ ile mekanik,
+bağlanmayanda "biçim yok"), 28/28 harfe **gerçek kelime sesi** (sessiz harf 0), ders akışı
+açıklama→dinle-gör→6-8 alıştırma→gerçek kelime, S0.12 Besmele+Fâtiha kelime kelime.
+**Kapı dokunulmadı** (12 mini ders · 20 okunuş · 12 minimal çift).
 
 ## Sıradaki kartın tek cümlesi
-**KAO2-21** — Seviye 0'ı şekil aileleri sırasıyla yeniden kurmak; ama yukarıdaki iki karar
-verilmeden başlanamaz. Kabul ölçütleri çalıştırılabilir spec olarak hazır:
-`evidence/KAO2-21/HEDEF-SPEC-TESTI.js`.
+Sıradaki **KAO2-22** — K-3 kademe A (muallim kaydı hattı; kayıt gelirse).
 
 ## Canlı gerçekler
-- Dal: `kao2-yeniden-tasarim` = `main`; canlı pin **`20260930c`** (run 36690840781).
-- `KAO2-STATE.json`: KAO2-20 `done`; **KAO2-21 `blocked`**; `ledgerLastSeq=76`;
-  `releaseApproval=approved_through_KAO2-20`.
-- **Bütçe rahatladı:** çalışma zamanı **84.745 / 88 KiB** · içerik 173.298/256 ·
-  css 11.574/14 · p95 ~5.0 ms.
+- Dal: `kao2-yeniden-tasarim` = `main`; canlı pin **`20260930d`** (KAO2-20/21 bu turda yayınlanacak).
+- `KAO2-STATE.json`: KAO2-21 `done`; `nextCard=KAO2-22`; `ledgerLastSeq=77`;
+  `releaseApproval=approved_through_KAO2-21`.
+- **⚠️ BÜTÇE %99.3 DOLU:** çalışma zamanı **87.423 / 88 KiB** (pay **0.6 KiB**) ·
+  içerik 175.459/256 · css 11.911/14. Sonraki kart yeni çalışma zamanı kodu
+  getirmemeli; gerekirse veri taşıma/karar gerekir.
+- Kimlik pinleri: App yüzeyi **764** · `App.kao*` **43** · atama **602** · `onclick` 393.
 - Kaynak/test: PASS · yayın: KAO2-21 sonrası · cihaz: **doğrulanmadı**.
 
 ## Açık riskler ve bekleyen kullanıcı işleri

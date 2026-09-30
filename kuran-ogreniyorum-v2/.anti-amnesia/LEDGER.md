@@ -841,3 +841,17 @@ JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için 
 - recommendation: B2 + A2/A3 (en düşük risk: çelişki doğurmadan öğretim değeri hayata geçer)
 - gates: KAO 38/38 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/contrast PASS
 - next: KAO2-21
+
+## seq 77 · 2026-09-30 · CARD · KAO2-21
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-21/KANIT.md
+- decision: B2 (yeni S0 akışı AYRI yüzey; kapı dokunulmaz, 12 mini ders korunur) + A3 (elif veride yok; bağlanmayan küme veriyle sınırlı: dal,dhal,ra,zay,waw,hamza).
+- scope: 12 ders 07 §2 sırası (4 başlık spec'e hizalandı) · konum tablosu 28×4 ZWJ ile mekanik, bağlanmayanda "biçim yok" · 28/28 harfe gerçek kelime sesi (sessiz harf 0) · ders akışı intro→listen→drill 6-8→read · sessiz saat/ses-yok yolu · S0.12 Besmele+Fâtiha 29 kelime kelime · Keşfet satırı.
+- architecture: kelime seçimi YAPIDA (araç diski görür) → içerik modülü; çalışma zamanı yalnız okur (tarayıcı dosya sorgulayamaz).
+- gates: KAO 39/39 (yeni test_kao2_s0.js 10 kontrol) · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/contrast/iip_22 PASS
+- budget: runtime 87.423/88 KiB (%99.3 — pay 0.6) · content 175.459/256 · css 11.911/14
+- pins: DEĞİŞMEDİ — App yüzeyi 764 · App.kao* 43 · atama 602 · onclick 393 (S0 tek eylem handler'ı üzerinden çalışır)
+- fixed-alongside: perf p95 kapısı gürültüye dayanıklı (steady = en iyi 3 tur ortancası); sapmanın makine yükü olduğu git stash karşılaştırmasıyla kanıtlandı.
+- evidence-levels: kaynak/test PASS · yayın KAO2-21 sonrası · cihaz doğrulanmadı
+- open: elif (ا) hâlâ yok · bütçe %99.3 (sonraki kart yeni çalışma zamanı kodu getirmemeli) · cihaz kabulü yok · alıştırma soru metinleri iskelet düzeyinde.
+- next: KAO2-22

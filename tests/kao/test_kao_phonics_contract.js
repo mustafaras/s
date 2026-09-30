@@ -85,7 +85,7 @@ const svgFiles = fs.readdirSync(svgDir).filter((name) => name.endsWith('.svg')).
 assert.equal(svgFiles.length, 13, 'R-B6: 13 mahreç SVG');
 const studioBox = { window: {}, Date, Math, Number, String, Object, Array, JSON };
 vm.createContext(studioBox);
-for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranPhonicsV1.js', 'app/core/quranLearn.js']) load(relative, studioBox);
+for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranPhonicsV1.js', 'app/content/quranMahrecSchemasV1.js', 'app/core/quranLearn.js']) load(relative, studioBox);
 const studio = studioBox.window.SeymaQuranLearn;
 for (const name of svgFiles) {
   const body = fs.readFileSync(path.join(svgDir, name), 'utf8');

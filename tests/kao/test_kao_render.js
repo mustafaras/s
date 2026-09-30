@@ -22,6 +22,7 @@ vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranShortSurah
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranRevelationOrderV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranRevelationOrderV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranStrikingVersesV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranStrikingVersesV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranPhonicsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranPhonicsV1.js' });
+vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranMahrecSchemasV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranMahrecSchemasV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranCurriculumV2.js'), 'utf8'), sandbox, { filename: 'app/content/quranCurriculumV2.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnFlow.js'), 'utf8'), sandbox, { filename: 'app/core/quranLearnFlow.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnViews.js'), 'utf8'), sandbox, { filename: 'app/core/quranLearnViews.js' });

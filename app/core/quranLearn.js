@@ -421,16 +421,6 @@
     if(until>90) return false;
     return {active:true,targetBed:target,startsAt:minuteLabel(bed-90),durationMinutes:3,maxCards:8,reviewOnly:true};
   }
-  function kaoTodayStats(d,nowValue){
-    var now=validDate(nowValue,'now'),q=ensureQuranLearn(d),cards=objectOr(q&&q.cards,{}),ids=Object.keys(cards);
-    var due=0,known=kaoKnownLemmaSet(d);
-    ids.forEach(function(id){
-      var card=cards[id]||{},date=new Date(card.due||0),lemma=lemmaIdForCard(id);
-      if(card.orphan!==true&&!(/^new$/.test(card.state||card.st))&&isFinite(date.getTime())&&date.getTime()<=now.getTime()) due+=1;
-    });
-    var fresh=Math.max(0,Math.floor(nonNegativeNumber(q.settings&&q.settings.dailyNew,10)));
-    return {due:Math.min(due,60),fresh:fresh,minutes:Math.max(1,Math.ceil((Math.min(due,60)+fresh)*0.55)),known:Object.keys(known).length};
-  }
   // KAO2-16 · 07 §6: taş anahtar uzayı tek yerden türetilir; eski anahtarlar korunur.
   var KAO_MILESTONE_CORE={besmele:true,fatiha:true,namaz:true,half:true,twoThirds:true,eighty:true,shortSurahs:true};
   function kaoMilestoneKeys(){
@@ -678,11 +668,6 @@
     var cards=objectOr(q&&q.cards,{}),prefix='w:'+lemmaId+':',ids=Object.keys(cards).filter(function(id){ return id.indexOf(prefix)===0; });
     return ids[0]||prefix+'ar>tr';
   }
-  function lemmaSurahId(lemma){
-    var first=lemma&&Array.isArray(lemma.examples)&&lemma.examples[0],number=first&&String(first.ref||'').split(':')[0],catalog=window.QuranRevelationOrderV1;
-    var surah=catalog&&typeof catalog.byMushafOrder==='function'?catalog.byMushafOrder(Number(number)):null;
-    return surah&&surah.id?surah.id:'';
-  }
   // Ders kimliğinden ünite ve sıra bilgisi (KAO2-18 Y-02).
   function kaoCurriculumLesson(lessonId){
     var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[],id=String(lessonId||'');
@@ -811,11 +796,6 @@
     if(!quranLearnDeps||['meaning','example','audio','root'].indexOf(kind)<0||!currentCardId(cardId)) return false;
     var q=ensureQuranLearn(quranLearnDeps.data()),card=objectOr(q.cards[cardId],{}); q.cards[cardId]=card; card.flagged={at:new Date().toISOString(),kind:kind};
     kaoSave(); if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Teşekkürler, sonraki içerik sürümünde bakılacak'); quranLearnDeps.render(); return true;
-  }
-  function kaoUnitLabel(q){
-    var ids=Object.keys(objectOr(q.units,{})).sort(),id=ids[0],unit=id&&q.units[id];
-    if(!unit||typeof unit!=='object') return 'Ünite 1 · Kur’an’a giriş';
-    return String(unit.title||unit.label||('Ünite '+String(unit.order||1)));
   }
   // KAO2-17 · K-4: 'draft' metin kullanıcıya gösterilmez; güvenli yer tutucuya düşer.
   function kaoReviewLevel(review){
@@ -1647,7 +1627,8 @@
     return h;
   }
   // assets/kao/svg/* dosyalarının birebir kopyası (test_kao_phonics_contract.js eşitliği denetler).
-  var KAO_MAHREC_SVG={"mahrec-ayn":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Ayn mahreci: boğaz ortası</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M36 55c6-4 12-4 17 0l-2 7c-4-2-8-2-13 1Z\"/></svg>","mahrec-dad":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Kalın d mahreci: dil yanı ve üst azı dişler</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M62 45c7-3 15-2 21 2l-2 7c-7-3-13-3-19 0Z\"/></svg>","mahrec-dhal":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Peltek z mahreci: dil ucu dişlerin arasında</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M78 48h14v5H79l-9 5-2-5Z\"/></svg>","mahrec-ghayn":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Gayn mahreci: boğaz üstü ve küçük dil yakını</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M42 42c6-4 12-3 17 1l-3 6c-4-2-8-2-12 1Z\"/></svg>","mahrec-hah":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Boğaz h'si mahreci: boğaz ortası</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M38 57c5-3 10-3 14 0l-1 8c-4-2-8-2-12 0Z\"/></svg>","mahrec-hamza":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Hemze mahreci: gırtlakta kısa kapanış</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M39 72h13v7H39Z\"/></svg>","mahrec-khah":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Hırıltılı h mahreci: boğaz üstü</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M44 44c6-3 12-2 16 2l-3 6c-4-3-8-3-12-1Z\"/></svg>","mahrec-qaf-b":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Kaf ve qaf karşılaştırması: qaf dil kökünde daha geride</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M47 37c9-3 17 0 22 6l-5 5c-5-4-10-5-16-3Z\"/></svg>","mahrec-qaf-c":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Qaf mahreci: dil kökü ve yumuşak damak</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M45 38c8-4 15-2 21 3l-4 6c-5-3-10-4-15-1Z\"/></svg>","mahrec-sad":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Kalın s mahreci: dil ucu ve yükselen dil gövdesi</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M51 58c11-8 23-10 35-5l-2 6c-11-3-20-1-29 5Z\"/></svg>","mahrec-tha":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Peltek s mahreci: dil ucu dişlerin arasında</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M79 46h13v5H80l-8 4-2-5Z\"/></svg>","mahrec-tta":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Kalın t mahreci: dil ucu ve yükselen dil gövdesi</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M55 55c9-7 20-8 29-3l-3 6c-8-3-15-2-22 3Z\"/></svg>","mahrec-zah":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 96\" role=\"img\" fill=\"currentColor\"><title>Kalın peltek z mahreci: dil ucu ve yükselen dil gövdesi</title><path opacity=\".14\" d=\"M17 16c19-9 49-7 65 5 13 10 18 25 17 42l-13 3c-4 1-7 5-8 9l-3 12H42l-2-15c-1-7-7-11-15-12l-10-1c7-7 11-14 11-22 0-7-3-14-9-21Z\"/><path opacity=\".28\" d=\"M31 48c13-7 29-7 43 0l-3 8c-12-4-24-3-35 3Z\"/><path d=\"M68 48c8-5 16-6 24-3v6c-8-2-15 0-21 4Z\"/></svg>"};
+  // KAO2-20: mahreç şemaları içerik katmanındadır (app/content/quranMahrecSchemasV1.js);
+  // veri çalışma zamanı bütçesine yazılmaz. Erişim yalnız yukarıdaki yardımcıdan.
   // KAO-26 · E8 Telaffuz stüdyosu: algı görevleri yalnız paketli kliplerden; kartlar quranLearn.phonics['p:…'] (FSRS).
   var KAO_PHONICS_BUCKETS=[['B','Kova B · Yakın ama farklı'],['C','Kova C · Türkçede yok']],KAO_PHONICS_AUDIO='assets/kao/audio/';
   function phonicsSource(){ var p=window.QuranPhonicsV1; return p&&Array.isArray(p.letters)&&Array.isArray(p.pairs)?p:null; }
@@ -1655,7 +1636,14 @@
   function phonicsLemma(id){ var lex=window.QuranLexiconV1; return lex&&typeof lex.byId==='function'?lex.byId(id):null; }
   function phonicsLetterLatin(letter){ var p=phonicsSource(),dia=p&&p.translit&&p.translit.bwToDia||{}; return String(dia[letter&&letter.bw]||''); }
   function phonicsLetterHTML(letter){ var esc=quranLearnDeps.esc; return '<span class="kao-ph-letter"><span lang="ar" dir="rtl">'+esc(letter.ar)+'</span><small>'+esc(phonicsLetterLatin(letter))+'</small></span>'; }
-  function phonicsSvgHTML(letter){ var name=String(letter&&letter.svg||'').replace(/^.*\//,'').replace(/\.svg$/,''); return Object.prototype.hasOwnProperty.call(KAO_MAHREC_SVG,name)?'<span class="kao-mahrec">'+KAO_MAHREC_SVG[name]+'</span>':''; }
+  function kaoMahrecSchemas(){
+    var mod=window.QuranMahrecSchemasV1;
+    return mod&&mod.schemas&&typeof mod.schemas==='object'?mod.schemas:{};
+  }
+  function phonicsSvgHTML(letter){
+    var name=String(letter&&letter.svg||'').replace(/^.*\//,'').replace(/\.svg$/,''),schemas=kaoMahrecSchemas();
+    return Object.prototype.hasOwnProperty.call(schemas,name)?'<span class="kao-mahrec">'+schemas[name]+'</span>':'';
+  }
   function phonicsRoot(q){ q.phonics=objectOr(q.phonics,{}); q.phonics.misheard=objectOr(q.phonics.misheard,{}); return q.phonics; }
   function phonicsOrdered(list,seed,dueOf){ return list.slice().sort(function(a,b){ return dueOf(a)-dueOf(b)||seededRank(seed,a.id)-seededRank(seed,b.id); }); }
   function phonicsShuffle(list,seed){ return list.slice().sort(function(a,b){ return seededRank(seed,a.id)-seededRank(seed,b.id); }); }
@@ -2992,7 +2980,7 @@
     kaoCsv:kaoCsv,
     kaoExportCsv:kaoExportCsv,
     kaoSettingsHTML:kaoSettingsHTML,
-    kaoMahrecSvg:KAO_MAHREC_SVG,
+    kaoMahrecSvg:kaoMahrecSchemas(),
     kaoPhonicsTasks:kaoPhonicsTasks,
     kaoPhonics:kaoPhonics,
     kaoPhonicsAttention:kaoPhonicsAttention,

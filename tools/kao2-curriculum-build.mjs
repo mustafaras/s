@@ -380,7 +380,177 @@ function renderConceptModule(map) {
   ].join('\n');
 }
 
+// KAO2-18 · K-4 onay taşıma. İnceleme sayfası ve KAO2-17 §3 bu yolu vaat ediyordu
+// ama araçta yoktu: bilinmeyen bayrak sessizce yok sayılıyordu (exit 0), yani
+// kullanıcı onay verse bile metinler `draft` kalıyordu. Burada yalnız İNSAN
+// onayı taşınır: kod hiçbir kutuyu kendi işaretlemez ve hiçbir metni yazmaz.
+function parseFlags(argv) {
+  // `--apply-review` değer almaz; diğerleri alır.
+  const BOOLEAN = new Set(['--apply-review']);
+  const known = new Set(['--apply-review', '--out-dir', '--texts', '--sheet', '--at']);
+  const value = (name) => {
+    const i = argv.indexOf(name);
+    if (i < 0) return null;
+    return argv[i + 1] || fail(`${name} değeri eksik`);
+  };
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (!arg.startsWith('--')) fail(`beklenmeyen argüman: ${arg}`);
+    if (!known.has(arg)) fail(`bilinmeyen seçenek: ${arg}`);
+    if (!BOOLEAN.has(arg)) i += 1; // değerini atla
+  }
+  return {
+    applyReview: argv.includes('--apply-review'),
+    outDir: value('--out-dir'),
+    texts: value('--texts'),
+    sheet: value('--sheet'),
+    at: value('--at')
+  };
+}
+
+// İnceleme sayfasından ONAYLANMIŞ metin kimliklerini çıkarır. Yalnız işaretli
+// (`[x]`) kutular onay sayılır; işaretsiz satır hiçbir şeyi onaylamaz.
+// Onay satırı iki kutu taşıyabilir ("L1 metin uygun" · "L2 (dinî bağlam) uygun");
+// herhangi birinin işaretlenmesi metnin onaylandığı anlamına gelir — L1/L2
+// ayrımı K-4 gereği inceleyicinin sorumluluğundadır, araç rol atamaz.
+function readApproved(sheetPath) {
+  const lines = fs.readFileSync(sheetPath, 'utf8').split('\n');
+  const approved = new Set();
+  let heading = null;
+  const headingId = (text) => {
+    const unit = /^### Ünite (\d+) ·/.exec(text);
+    if (unit) return `u${unit[1]}`;                        // ünitenin kendi onay kutusu
+    if (/^### Ünite \d+ dersleri/.test(text)) return null;  // dersler tabloda işaretlenir
+    if (/^### Seviye 0/.test(text)) return null;            // S0 dersleri tabloda işaretlenir
+    const plain = /^### (\S+)/.exec(text);
+    return plain ? plain[1] : null;                        // kavram kimliği
+  };
+  for (const line of lines) {
+    if (/^### /.test(line)) { heading = headingId(line); continue; }
+    // Ders/S0 tablo satırı: | <kimlik> | ... | `draft` | - [x] |
+    const row = /^\|\s*(\S+)\s*\|/.exec(line);
+    if (row && /\[x\]/i.test(line)) { approved.add(row[1]); continue; }
+    // Başlık altı onay kutusu (ünite ya da kavram).
+    if (heading && /^\s*-\s*\[/.test(line) && /\[x\]/i.test(line)) approved.add(heading);
+  }
+  return approved;
+}
+
+// Metin kaynağı: units { "<no>": {review} }, lessons/s0 { "<kimlik>": {review} },
+// concepts { "<kimlik>": {review} } — dördü de aynı onay işlemini alır.
+function collectHolders(texts) {
+  const holders = [];
+  for (const key of Object.keys(texts.units || {})) holders.push({ id: `u${key}`, entry: texts.units[key] });
+  for (const bucket of ['lessons', 's0', 'concepts']) {
+    const map = texts[bucket] || {};
+    for (const key of Object.keys(map)) holders.push({ id: key, entry: map[key] });
+  }
+  return holders;
+}
+
+// --- KAO2-18 · onay öncesi L0 kuru denetimi --------------------------------
+// Araç, L0 kapısını (`tests/kao/test_kao2_text_review.js`) bozan bir durumu
+// ASLA yazmamalı: aksi halde "onayla" komutu kullanıcıyı kırmızı bir repoya
+// sokar. Aşağıdaki liste L0 ile aynı kuralları taşır.
+const RELIGIOUS = /Kur|Fâtiha|Fatiha|namaz|Namaz|âyet|sûre|Peygamber|Allah|Rab|Besmele|salât|dua|âhiret|cennet|cehennem|melek|vahiy|Kâbe|kıble/i;
+const FORBIDDEN = [
+  'haramdır', 'helâldır', 'helaldır', 'caizdir', 'caiz değildir', 'farzdır', 'vaciptir',
+  'sünnettir', 'mekruhtur', 'müstehaptır', 'günahtır', 'sevaptır', 'bidattir',
+  'fetva', 'hüküm budur', 'kesinlikle doğrudur', 'mezhebe göre', 'hanefî', 'şâfiî', 'malikî', 'hanbelî'
+];
+const ORTHOGRAPHY = [
+  ['Kur\'an', ['Kuran', 'Kur`an', "Kur’an'ı"]],
+  ['Fâtiha', ['Fatiha', 'Fatihâ']],
+  ['Besmele', ['Bismillah', 'Besemle\'yi']],
+  ['Rahmân', ['Rahman']],
+  ['Rahîm', ['Rahim']],
+  ['Müslüman', ['Musluman']],
+  ['âyet', ['ayet']],
+  ['sûre', ['sure']]
+];
+const LEVELS = ['draft', 'sourced', 'expert'];
+
+function lintTexts(texts) {
+  const problems = [];
+  const textsOf = (entry) => Object.values(entry).filter((v) => typeof v === 'string');
+  const units = Object.keys(texts.units || {}).map((k) => ({ id: `u${k}`, entry: texts.units[k] }));
+  const flat = ['lessons', 's0', 'concepts'].flatMap((bucket) =>
+    Object.keys(texts[bucket] || {}).map((k) => ({ id: k, entry: texts[bucket][k] })));
+  for (const { id, entry } of [...units, ...flat]) {
+    const review = entry.review;
+    if (!review || !LEVELS.includes(review.level)) { problems.push(`${id}: review.level geçersiz`); continue; }
+    if (review.by !== undefined && !['owner', 'expert'].includes(review.by)) problems.push(`${id}: rol kodu geçersiz`);
+    // (d) elle Arapça yok
+    for (const value of textsOf(entry)) {
+      if (/[\u0600-\u06ff]/.test(value)) problems.push(`${id}: elle Arapça`);
+    }
+    // (a) dinî bağlamlı 'why' kaynak taşır
+    if (entry.why && RELIGIOUS.test(entry.why) && !(Array.isArray(review.sources) && review.sources.length)) {
+      problems.push(`${id}: dinî bağlamlı 'why' kaynak taşımıyor`);
+    }
+    // (c) yasak ifade
+    const joined = textsOf(entry).join(' ').toLocaleLowerCase('tr');
+    for (const banned of FORBIDDEN) if (joined.includes(banned)) problems.push(`${id}: yasak ifade "${banned}"`);
+    // (b) Diyanet imlâsı
+    for (const [, wrongs] of ORTHOGRAPHY) {
+      for (const wrong of wrongs) {
+        const pattern = new RegExp(`(^|[^\\p{L}])${wrong.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^\\p{L}]|$)`, 'u');
+        if (textsOf(entry).some((v) => pattern.test(v))) problems.push(`${id}: yanlış imlâ "${wrong}"`);
+      }
+    }
+  }
+  return problems;
+}
+
+function applyReview({ textsPath, sheetPath, outDir, at }) {
+  if (!textsPath) fail('--apply-review için --texts gerekli');
+  if (!sheetPath) fail('--apply-review için --sheet gerekli');
+  const date = at || new Date().toISOString().slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) fail('--at biçimi YYYY-AA-GG olmalı');
+  const approved = readApproved(sheetPath);
+  if (!approved.size) fail('inceleme sayfasında işaretli kutu yok (onay taşınmadı)');
+  const texts = JSON.parse(fs.readFileSync(textsPath, 'utf8'));
+  const holders = collectHolders(texts);
+  const known = new Set(holders.map((h) => h.id));
+  const missing = [...approved].filter((id) => !known.has(id));
+  if (missing.length) fail(`işaretli kutu metin kaynağında yok: ${missing.join(', ')}`);
+  const matched = holders.filter((h) => approved.has(h.id));
+  if (!matched.length) fail('işaretli kutular mevcut metinlerle eşleşmedi (kimlik yazımını kontrol et)');
+  let count = 0;
+  for (const { entry } of matched) {
+    if (!entry.review || entry.review.level !== 'draft') continue; // zaten onaylıysa dokunma
+    entry.review.level = 'sourced';
+    entry.review.by = 'owner';
+    entry.review.at = date;
+    count += 1;
+  }
+  // Onay yazılmadan ÖNCE L0 kuru denetimi: kırmızı bir repo bırakma.
+  const problems = lintTexts(texts);
+  if (problems.length) fail(`onay L0 kapısını bozar, yazılmadı:\n  - ${problems.join('\n  - ')}`);
+  fs.writeFileSync(textsPath, `${JSON.stringify(texts, null, 2)}\n`);
+  // Türetilen modüller onayla birlikte güncellenir.
+  const spec = readSpec();
+  const content = loadContent();
+  const data = build(spec, content, texts);
+  for (const [file, text] of [[OUT_MODULE, renderModule(data)],
+    [OUT_CONCEPT_MODULE, renderConceptModule(buildConceptTexts(texts))]]) {
+    const target = path.join(outDir, file);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, text);
+  }
+  return count;
+}
+
 function main() {
+  const flags = parseFlags(process.argv.slice(2));
+  if (flags.applyReview) {
+    const outDir = flags.outDir ? path.resolve(flags.outDir) : ROOT;
+    const count = applyReview({
+      textsPath: path.resolve(flags.texts), sheetPath: path.resolve(flags.sheet), outDir, at: flags.at
+    });
+    console.log(`kao2-curriculum-build: onay taşındı · ${count} metin sourced`);
+    return;
+  }
   const args = process.argv.slice(2);
   const at = args.indexOf('--out-dir');
   const outDir = at >= 0 ? path.resolve(args[at + 1] || fail('--out-dir değeri eksik')) : ROOT;

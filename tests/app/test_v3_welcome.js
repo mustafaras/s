@@ -528,7 +528,7 @@ console.log('\n[6] app.js yüzeyi pinli');
 const appSource = read('app.js');
 const handlerCount = (appSource.match(/^App\.[A-Za-z0-9_$]+\s*=\s*function/gm) || []).length;
 // IIP-10 / DEC-07: App.saygiLens eklendi; KAO2-12 App.kaoLesson mevcut kao shim satırına eklendi.
-// Satır-başı sayımı bir satır artmaz; toplam App handler kimliği daily-boundary testinde 761 olarak pinlenir.
+// Satır-başı sayımı bir satır artmaz; toplam App handler kimliği (KAO2-19 okuyucu dahil) daily-boundary testinde 762 olarak pinlenir.
 ok('App.* satır-başı yüzeyi pinli (556; KAO shim satırı paylaşımlı)', handlerCount === 556, 'ölçülen: ' + handlerCount);
 ok('app.js tanıtım sayfasına referans vermiyor',
   appSource.indexOf('v3-tanitim') < 0 && appSource.indexOf(V3_KEY) < 0);
@@ -538,11 +538,11 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // KAO hub kartı dependency bag'e eklendi; app.js cache pini bu kaynak değişikliğiyle
 // aynı düzeltmede ilerletildi. Handler yüzeyi yukarıdaki ayrı kapıda sabit kalır.
 ok('index.html app.js cache-bust güncel (KAO hub köprüsü)',
-  /app\.js\?v=20260929g/.test(indexSource));
+  /app\.js\?v=20260930a/.test(indexSource));
 /* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
    gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
-  /app\/core\/appSurface\.js\?v=20260929g/.test(indexSource));
+  /app\/core\/appSurface\.js\?v=20260930a/.test(indexSource));
 /* B2: yürüyüş tikinin kullanıcıya söylediği eşik, tikin GERÇEK eşiğiyle aynı
    olmalı. Tik habitProgress → stepsGoal(date) ile dolar (varsayılan 9.000);
    STEP_TICK_MIN=4500 hiçbir yerde okunmaz. "4.500" metni geri gelmemeli. */
@@ -853,8 +853,8 @@ const combined = APP_SURFACE_FILES.map(read).join('') + quranLearnHubSrc;
 const surfaceCount = new Set(
   (combined.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((s) => s.match(/App\.[A-Za-z0-9_]+/)[0])
 ).size;
-ok('App yüzeyi pinli (761) — KAO2-12 ders oynatıcı handlerı dahil',
-  surfaceCount === 761, 'ölçülen: ' + surfaceCount);
+ok('App yüzeyi pinli (762) — KAO2-12 ders oynatıcı ve KAO2-19 okuyucu handlerı dahil',
+  surfaceCount === 762, 'ölçülen: ' + surfaceCount);
 ok('tıklama niteliği sayısı pinli (393) — KAO-21 gizlenen kart satırı dahil',
   (combined.match(/onclick=/g) || []).length === 393,
   'ölçülen: ' + (combined.match(/onclick=/g) || []).length);

@@ -780,3 +780,34 @@ büyümenin altında. KAO2-01 taban çizgisi (5.088 ms) o günün boyutunu kayde
 `why` metni L2 bekliyor; **cihaz kabulü hiç yapılmadı**; gerçek ekran okuyucu testi yok.
 
 **Sonraki:** KAO2-19.
+
+## seq 73 · 2026-09-30 · NOTE · KAO2-18
+- status: verified
+- summary: İnceleme sayfasının vaat ettiği `--apply-review` yolu araçta YOKTU; bilinmeyen bayrak sessizce yok sayılıyordu (exit 0), yani onay verilse bile metinler draft kalıyordu.
+- fix: `--apply-review --texts <yol> --sheet <yol>` eklendi; işaretli kutuları draft→sourced taşır, türetilen modülleri yeniden üretir; bilinmeyen seçenek artık hata verir.
+- guard: onay yazılmadan ÖNCE L0 kuru denetimi (yasak ifade, Diyanet imlâsı, elle Arapça, dinî bağlamlı why kaynağı) — kırmızı repo bırakılmaz.
+- invariant: yalnız insan onayı taşınır; araç hiçbir kutuyu kendi işaretlemez, idempotenttir.
+- fixture: tests/kao/test_kao2_review_apply.js (7 kontrol)
+- gates: KAO 36/36 · app 77/77 · normal mod belirlenimci
+- commit: `795461f6`
+- evidence-levels: kaynak/test PASS · yayın gerektirmez (araç) · cihaz yok
+- next: KAO2-19
+
+## seq 74 · 2026-09-30 · CARD · KAO2-19
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-19/KANIT.md
+- fixes: 01 Y-12 (öz-beyan öncesi 3 soruluk kontrol) · 02 T-20 (kenarlıksız WordChip + alt panel) · 02 T-21 (seçili sûre kaydırma hedefi motor tarafında)
+- gates: KAO 37/37 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/contrast PASS
+- budget: runtime 83.962/88 KiB · content 173.298/256 · css 11.074/14 · p95 4.443 ms
+- pins: App yüzeyi 761→762 (tek yeni handler App.kaoReader) · App.kao* 40→41 · app.js ataması 599→600 · onclick 393 değişmedi
+- evidence-levels: kaynak/test PASS · yayın KAO2-19 sonrası · cihaz doğrulanmadı
+- open: 20 sûre contextTr yazılmadı (kaynaksız bağlam K-4 ihlali olurdu; kaynak seçimi kullanıcı kararı)
+- next: KAO2-20
+
+**Ayrıntı.** Okuyucu başına katlanabilir sûre tanıtım kartı (nüzul yeri, âyet sayısı, kelime
+sayısı, donmuş `themeTr`; `contextTr` yalnız sourced/expert). Kelime çipleri kenarlıksız,
+bilinmeyen altı noktalı; anlam kelime İÇİNDE değil ALT PANELDE (satır akışı bozulmaz).
+"Dinle" sûreyi kelime kelime çalar (`s-<sûre>-<âyet>-<i>.m4a`; 618/618 klip mevcut), çalan
+kelime `aria-current` alır. Ses yoksa sessiz yol. Öz-beyan öncesi 3 soruluk hızlı kontrol.
+Ek olarak: okuma sesi uygulamanın genel sessiz saat kuralına (23:00–07:00) uyduruldu —
+önce atlıyordu. 5 kendi hatam testlerle yakalandı ve düzeltildi.

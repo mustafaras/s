@@ -152,9 +152,9 @@ group('FX2-15.2 çıkış/giriş CSS token ve reduced-motion sözleşmesi var',
 }
 
 const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-group('FX2-15.7 App yüzeyi 761, etkileşim 393 ve render/paint gövdeleri değişmedi',
-  // KAO kartlarının izinli handler'ları (KAO2-12 ders oynatıcı dahil) genel yüzeyi 761 yaptı.
-  handlers.size === 761 && (combinedSource.match(/onclick=/g) || []).length === 393 &&
+group('FX2-15.7 App yüzeyi 762 (KAO2-19 okuyucu dahil), etkileşim 393 ve render/paint gövdeleri değişmedi',
+  // KAO kartlarının izinli handler'ları (KAO2-12 ders oynatıcı + KAO2-19 okuyucu) genel yüzeyi 762 yaptı.
+  handlers.size === 762 && (combinedSource.match(/onclick=/g) || []).length === 393 &&
   !/function render\(\)[\s\S]{0,180}sey-leaving/.test(appSource) &&
   !/function paint\(\)[\s\S]{0,180}sey-leaving/.test(appSource));
 

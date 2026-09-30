@@ -316,7 +316,9 @@ const unknown = nasWords[1];
 // KAO2-10: kalıcı sayaç hub'dan kalktı; aynı sayı regex yedeği olmadan doğrudan kaoKnownLemmaSet'ten okunur.
 const knownBeforeReveal = Object.keys(api.kaoKnownLemmaSet(appData)).length;
 const revealStarted = Date.now();
-assert.equal(api.kaoRevealWord(1), true);
+// T-20/KAO2-19: anlam artık kelime İÇİNDE değil ALT PANELDE açılır; panel okuyucu
+// eylemiyle açılır (çıplak kaoRevealWord paneli açmaz).
+assert.equal(api.kaoReader('word', 1), true);
 assert.match(quranLearn.surahs['114'].words[unknown.id].revealedAt, /^\d{4}-\d{2}-\d{2}T/);
 assert.equal(quranLearn.surahs['114'].words[unknown.id].status, 'unknown');
 assert.ok(new Date(quranLearn.cards[`w:${unknown.lemmaId}:ar>tr`].due).getTime() >= revealStarted + 86400000 - 1000, 'bilinmeyen kelime yarın kuyruğuna alınmalı');

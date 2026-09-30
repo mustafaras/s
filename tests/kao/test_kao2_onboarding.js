@@ -352,10 +352,11 @@ check('Bugün kahramanı: onboarding eylemi ilk açılışa bağlı; normalizasy
   assert.equal('placement' in old.quranLearn.onboarding, false, 'eski kayda alan eklenmez');
 });
 
-check('handler sayacı 40 (§4) ve app.js tek satır shim; yorumlarda pin tuzağı yok', () => {
+check('handler sayacı 41 (§4 + KAO2-19 okuyucu) ve app.js tek satır shim; yorumlarda pin tuzağı yok', () => {
   const app = read('app.js');
   const names = new Set((app.match(/App\.kao[A-Za-z0-9_]*\s*=[^=]/g) || []).map((s) => s.match(/App\.kao[A-Za-z0-9_]*/)[0]));
-  assert.equal(names.size, 40);
+  // KAO2-19 okuyucu eylemiyle 40 -> 41.
+  assert.equal(names.size, 41);
   assert.ok(names.has('App.kaoOnboard'));
   assert.equal((app.match(/App\.kaoOnboard=function\(action,value\)\{ return window\.SeymaQuranLearn\.kaoOnboard\.apply\(null,arguments\); \};/g) || []).length, 1);
   for (const file of ['app/core/quranLearn.js', 'app/core/quranLearnViews.js']) {

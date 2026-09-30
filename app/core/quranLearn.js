@@ -2054,6 +2054,134 @@
     if(learned) return true;
     return !(explicit&&explicit.status==='unknown')&&learned;
   }
+  // KAO2-19 · S-09 okuyucu v2. Bağlam yalnız K-4'e göre sourced/expert ise görünür;
+  // kaynaksız bağlam gizli kalır ve hiç yazılmaz (draft metin uygulamaya sızmaz).
+  function kaoReaderContext(surahId){
+    var curriculum=window.QuranCurriculumV2,surahs=curriculum&&curriculum.texts&&curriculum.texts.surahs;
+    if(!surahs) return null;
+    var entry=surahs[String(surahId)];
+    if(!entry||typeof entry.contextTr!=='string'||!entry.contextTr) return null;
+    var review=entry.review||{},level=review.level;
+    if(level!=='sourced'&&level!=='expert') return null;
+    return {text:entry.contextTr,level:level,sources:Array.isArray(review.sources)?review.sources.slice():[]};
+  }
+  // T-21: seçili sûrenin kaydırma hedefi MOTORDA belirlenir; render yalnız işareti taşır.
+  function kaoReaderScrollTarget(){
+    if(!quranLearnDeps) return null;
+    var sid=Number(quranLearnDeps.ui().kaoSurahId);
+    return kaoSurahs().some(function(item){ return item.id===sid; })?sid:null;
+  }
+  // Y-12: "Anladım" öncesi 3 soruluk hızlı kontrol. Sorular sûrenin KENDİ kelimelerinden
+  // seçilir; sıra ve şıklar sûre kimliğine göre belirlenimcidir (rastgelelik yok).
+  function kaoSurahCheckQuestions(surahId,words){
+    var pool=[],seen=Object.create(null);
+    words.forEach(function(word){ var tr=String(word.tr||''); if(tr&&!seen[tr]){ seen[tr]=true; pool.push(tr); } });
+    if(words.length<3||pool.length<3) return [];
+    return words.slice(0,3).map(function(word,index){
+      var others=pool.filter(function(tr){ return tr!==word.tr; });
+      if(others.length<2) return null;
+      var distractors=[others[index%others.length],others[(index+1)%others.length]].filter(function(v,i,arr){ return v&&arr.indexOf(v)===i; });
+      for(var i=0;distractors.length<2&&i<others.length;i+=1){ if(distractors.indexOf(others[i])<0) distractors.push(others[i]); }
+      if(distractors.length<2) return null;
+      var choices=[{id:'c',text:word.tr}].concat(distractors.slice(0,2).map(function(tr,i){ return {id:'x'+(i+1),text:tr}; }));
+      // Belirlenimci karıştırma: sıralama metne, yön sûre kimliğine bağlı.
+      choices=choices.slice().sort(function(a,b){ return a.text<b.text?-1:(a.text>b.text?1:0); });
+      if(surahId%2===1) choices.reverse();
+      return {id:'sc:'+String(surahId)+':'+String(word.id),lemmaId:word.lemmaId,
+        prompt:'“'+word.ar+'” hangi anlama gelir?',correctId:'c',choices:choices};
+    }).filter(Boolean);
+  }
+  function kaoSurahCheck(){
+    if(!quranLearnDeps) return null;
+    var ui=quranLearnDeps.ui(),sid=Number(ui.kaoSurahId),words=surahWords(sid);
+    var state=objectOr(ui.kaoReaderCheckState,{});
+    var questions=Array.isArray(state.questions)?state.questions:[];
+    var answers=objectOr(state.answers,{});
+    var answered=questions.filter(function(q){ return answers[q.id]!==undefined; }).length;
+    // available: sûre kontrol SORABİLİR mi (kelime havuzu yeterli mi) — soruların
+    // yüklenmiş olması değil. Aksi halde kontrol başlamadan "yetersiz" mesajı çıkardı.
+    var canAsk=kaoSurahCheckQuestions(sid,words).length===3;
+    return {surahId:sid,available:canAsk,questions:questions,answers:answers,
+      answered:answered,correct:questions.filter(function(q){ return answers[q.id]===q.correctId; }).length,
+      done:questions.length===3&&answered===questions.length};
+  }
+  // S-09(c): kelime kelime çalma. Her klibin öncesinde çalan kelime işaretlenir; ses
+  // yoksa sessiz yola düşülür (okuyucu okunuş ve anlamla sürdürülebilir).
+  function kaoReaderPlayWords(words,onFail){
+    if(!quranLearnDeps||!words.length) return false;
+    if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.createAudio!=='function') return false;
+    var ui=quranLearnDeps.ui(),failed=false;
+    var fail=function(){ if(failed) return; failed=true; ui.kaoReaderPlaying=null; if(typeof onFail==='function') onFail(); };
+    var playAt=function(index){
+      if(index>=words.length||failed) return;
+      var word=words[index];
+      ui.kaoReaderPlaying=index;
+      var audio=quranLearnSurfaceDeps.createAudio(KAO_PHONICS_AUDIO+'s-'+String(word.surahId)+'-'+String(word.ayah)+'-'+String(word.i)+'.m4a');
+      if(!audio){ fail(); return; }
+      audio.preload='none';
+      if(typeof audio.addEventListener==='function'){
+        audio.addEventListener('error',fail,{once:true});
+        audio.addEventListener('ended',function(){ playAt(index+1); },{once:true});
+      }
+      try{ var result=audio.play(); if(result&&typeof result.catch==='function') result.catch(fail); }catch(_error){ fail(); }
+    };
+    playAt(0);
+    return true;
+  }
+  // Y-12/T-20: okuyucunun tek eylem yüzeyi. Anlam kelime içinde değil ALT PANELDE
+  // açılır (satır akışı bozulmaz) ve "Anladım" ancak hızlı kontrolden sonra yazılır.
+  function kaoReader(action,value){
+    if(!quranLearnDeps) return false;
+    var ui=quranLearnDeps.ui(),words=surahWords(Number(ui.kaoSurahId));
+    if(action==='word'){
+      ui.kaoReaderWord=Math.floor(Number(value));
+      return kaoRevealWord(value);
+    }
+    if(action==='close'){
+      ui.kaoReaderWord=null;
+      quranLearnDeps.render();
+      return true;
+    }
+    if(action==='play'){
+      // Uygulamanın genel ses kuralı: 23:00–07:00 sessiz saatte ses çalmaz
+      // (SeyAudio de aynı kurala uyar). Okuma yolu sessizce sürer.
+      if(quranLearnSurfaceDeps&&quranLearnSurfaceDeps.isQuietTime===true){
+        ui.kaoReaderPlaying=null;
+        ui.kaoReaderNote='Sessiz saat (23:00–07:00); okunuş ve Türkçe anlam açık.';
+        quranLearnDeps.render();
+        return false;
+      }
+      var list=value==='one'?[words[ui.kaoReaderWord]].filter(Boolean):words;
+      ui.kaoReaderNote='';
+      var started=kaoReaderPlayWords(list,function(){
+        ui.kaoReaderPlaying=null;
+        ui.kaoReaderNote='Ses yüklenemedi; sûreyi okunuş ve Türkçe anlamla sürdürebilirsin.';
+        quranLearnDeps.render();
+      });
+      if(!started) ui.kaoReaderNote='Bu cihazda ses kapalı; okunuş ve anlam yine açık.';
+      quranLearnDeps.render();
+      return started;
+    }
+    if(action==='checkstart'){
+      ui.kaoReaderCheckState={questions:kaoSurahCheckQuestions(Number(ui.kaoSurahId),words),answers:{},done:false};
+      quranLearnDeps.render();
+      return true;
+    }
+    if(action==='answer'){
+      var picked=value&&typeof value==='object'?value:{},qs=objectOr(ui.kaoReaderCheckState,{});
+      var q=String(picked.id||''),choice=String(picked.choice||'');
+      if(!Array.isArray(qs.questions)||!qs.questions.some(function(item){ return item.id===q; })) return false;
+      qs.answers=objectOr(qs.answers,{});
+      qs.answers[q]=choice;
+      var done=qs.questions.every(function(item){ return qs.answers[item.id]!==undefined; });
+      qs.done=done;
+      ui.kaoReaderCheckState=qs;
+      quranLearnDeps.render();
+      return true;
+    }
+    if(action==='understood') return kaoMarkUnderstood();
+    return false;
+  }
   function kaoRevealWord(index){
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),sid=Number(ui.kaoSurahId),words=surahWords(sid),word=words[Math.floor(Number(index))];
@@ -2079,17 +2207,71 @@
     if(!quranLearnDeps) return '';
     var q=ensureQuranLearn(quranLearnDeps.data()),ui=quranLearnDeps.ui(),surahs=kaoSurahs(),sid=Number(ui.kaoSurahId||surahs[0]&&surahs[0].id),surah=surahs.find(function(item){ return item.id===sid; });
     if(!surah) return '<main class="kao-reader"><span class="kao-content-error" role="alert">Kısa sûre içeriği bulunamadı.</span></main>';
-    var esc=quranLearnDeps.esc,words=surahWords(sid),record=objectOr(q.surahs[String(sid)],{}),wordState=objectOr(record.words,{}),marks=Object.create(null);
+    var esc=quranLearnDeps.esc,words=surahWords(sid),record=objectOr(q.surahs[String(sid)],{}),marks=Object.create(null);
+    var playing=typeof ui.kaoReaderPlaying==='number'?ui.kaoReaderPlaying:-1,openIndex=typeof ui.kaoReaderWord==='number'?ui.kaoReaderWord:-1;
     (window.QuranShortSurahsV1.waqfMarks||[]).forEach(function(mark){ marks[mark.afterWordId]=mark.mark; });
-    var h='<main class="kao-reader" aria-labelledby="kao-reader-title"><div class="kao-view-head"><div><p class="kao-eyebrow">20 kısa sûre</p><h2 id="kao-reader-title">'+esc(surah.name)+'</h2><p>Her kelimenin okunuşu yanında; anlamı açmak için kelimeye dokun.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'units\')">Üniteler</button></div><div class="kao-surah-picker" aria-label="Kısa sûre seç">';
-    surahs.forEach(function(item){ h+='<button type="button"'+(item.id===sid?' aria-current="true"':'')+' onclick="App.kaoOpenSurah('+item.id+')">'+esc(item.name)+'</button>'; }); h+='</div><section class="kao-reader-lines">';
+    // (a) Sûre tanıtımı: K-4 kaynaklı bağlam + donmuş nüzul/âyet/tema verisi.
+    var order=window.QuranRevelationOrderV1,meta=order&&typeof order.byMushafOrder==='function'?order.byMushafOrder(sid):null;
+    var context=kaoReaderContext(sid),theme=meta&&typeof meta.themeTr==='string'?meta.themeTr:'';
+    var intro='';
+    if(meta||context||theme){
+      var facts=[];
+      if(meta&&meta.revelationPlace) facts.push(esc(meta.revelationPlace===String('Mekke')?'Mekke’de indi':'Medine’de indi'));
+      if(meta&&meta.ayahCount) facts.push(String(meta.ayahCount)+' âyet');
+      facts.push(String(words.length)+' kelime');
+      intro='<details class="kao-reader-surah"><summary><span class="kao-reader-surah-name">'+esc(surah.name)+'</span><span class="kao-reader-surah-facts">'+facts.join(' · ')+'</span></summary>'
+        +(theme?'<p class="kao-reader-theme">'+esc(theme)+'</p>':'')
+        +(context?'<p class="kao-reader-context">'+esc(context.text)+'</p><p class="kao-reader-context-source">Kaynak: '+esc(context.sources.join(', '))+'</p>':'')
+        +'</details>';
+    }
+    var target=kaoReaderScrollTarget(),check=kaoSurahCheck();
+    var h='<main class="kao-reader" aria-labelledby="kao-reader-title"><div class="kao-view-head"><div><p class="kao-eyebrow">20 kısa sûre</p><h2 id="kao-reader-title">'+esc(surah.name)+'</h2><p>Kelimeler mushaf akışında; anlamı görmek için kelimeye dokun.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'units\')">Üniteler</button></div>'+intro
+      +'<div class="kao-surah-picker" aria-label="Kısa sûre seç">';
+    surahs.forEach(function(item){ h+='<button type="button"'+(item.id===target?' data-kao-scroll="'+item.id+'" aria-current="true"':'')+' onclick="App.kaoOpenSurah('+item.id+')">'+esc(item.name)+'</button>'; });
+    h+='</div><div class="kao-reader-actions"><button type="button" class="kao-secondary" onclick="App.kaoReader(\'play\',\'all\')">Dinle</button>'
+      +(ui.kaoReaderNote?'<p class="kao-reader-note" role="status">'+esc(ui.kaoReaderNote)+'</p>':'')
+      +'</div><section class="kao-reader-lines">';
     words.forEach(function(word,index){
-      var known=wordKnown(q,word),revealed=known||!!(wordState[word.id]&&wordState[word.id].revealedAt),label=known?'bilinen kelime':'bilinmeyen kelime, dokunarak aç';
-      h+='<span class="kao-reader-word '+(known?'is-known':(revealed?'is-revealed':'is-unknown'))+'"><button type="button" aria-label="'+label+'" onclick="App.kaoRevealWord('+index+')">'+kaoArabicPairHTML(word.ar,word.pronunciation,'kao-reader-pair')+'<span class="kao-reader-meaning">'+(revealed?esc(word.tr):'•••')+'</span></button>';
+      var known=wordKnown(q,word),revealed=known||!!(record.words&&record.words[word.id]&&record.words[word.id].revealedAt);
+      var label=known?'bilinen kelime':'bilinmeyen kelime, dokunarak aç';
+      // T-20: kelime kenarlıksız çip; anlam kelime İÇİNDE basılmaz (satır akışı sabit).
+      h+='<span class="kao-reader-word '+(known?'is-known':(revealed?'is-revealed':'is-unknown'))+'"'+(index===playing?' aria-current="true"':'')+'><button type="button" aria-label="'+label+'"'+(index===openIndex?' aria-expanded="true"':'')+' onclick="App.kaoReader(\'word\','+index+')">'+kaoArabicPairHTML(word.ar,word.pronunciation,'kao-reader-pair')+'</button>';
       if(marks[word.id]){ var popId='kao-waqf-'+String(sid)+'-'+String(index); h+='<button type="button" class="kao-waqf" popovertarget="'+popId+'" aria-label="Vakıf işareti '+esc(marks[word.id])+' açıklaması">'+esc(marks[word.id])+'</button><span id="'+popId+'" class="kao-waqf-note" popover>burada dur: cümle/anlam sınırı</span>'; }
       h+='</span>';
     });
-    h+='</section><section class="kao-reader-understood"><p>'+(record.confirmedAt?'Gecikmeli test '+String(record.delayedScore)+'/5 · anlaşıldı':(record.needsReread?'Gecikmeli test '+String(record.delayedScore)+'/5 · tekrar oku':(record.delayedTestAt?'7 günlük test planlandı':'Okuma bitince anlayışını kaydet')))+'</p><button type="button" class="kao-primary" onclick="App.kaoMarkUnderstood()">Anladım</button></section></main>';
+    h+='</section>';
+    // (b) Anlam ALT PANELİ: dokunulan kelimenin anlamı akışı bozmadan altta açılır.
+    if(openIndex>=0&&words[openIndex]){
+      var openWord=words[openIndex];
+      h+='<section class="kao-reader-panel" role="dialog" aria-label="Kelime anlamı"><p class="kao-reader-panel-ar" lang="ar" dir="rtl">'+esc(openWord.ar)+'</p><p class="kao-reader-panel-tr">'+esc(openWord.tr)+'</p>'
+        +'<div class="kao-reader-panel-actions"><button type="button" class="kao-secondary" onclick="App.kaoReader(\'play\',\'one\')">Kelimeyi dinle</button><button type="button" class="kao-secondary" onclick="App.kaoReader(\'close\')">Kapat</button></div></section>';
+    }
+    // (e) Y-12: "Anladım" öncesi 3 soruluk hızlı kontrol.
+    h+='<section class="kao-reader-understood">';
+    if(!check.available){
+      h+='<p class="kao-reader-check-hint">Sûre kısa; hızlı kontrol için yeterli kelime yok. Okuduğunu kaydedebilirsin.</p>';
+    }else if(!check.questions.length){
+      h+='<p>Okumayı bitirdiysen üç soruyla anlayışını yoklayalım.</p><button type="button" class="kao-primary" onclick="App.kaoReader(\'checkstart\')">Anladım · 3 soru</button>';
+    }else{
+      h+='<div class="kao-reader-check" role="group" aria-label="Hızlı kontrol">';
+      h+='<p class="kao-reader-check-kicker">Hızlı kontrol · '+String(check.answered)+' / 3</p>';
+      check.questions.forEach(function(item){
+        var answered=check.answers[item.id]!==undefined;
+        h+='<fieldset class="kao-reader-question"'+(answered?' data-answered="true"':'')+'><legend>'+esc(item.prompt)+'</legend>';
+        item.choices.forEach(function(choice){
+          var isPicked=check.answers[item.id]===choice.id,isCorrect=answered&&choice.id===item.correctId;
+          h+='<button type="button" class="kao-reader-option'+(isCorrect?' is-correct':'')+(isPicked&&!isCorrect?' is-wrong':'')+'"'+(answered?' disabled':'')+' onclick="App.kaoReader(\'answer\',{id:\''+item.id+'\',choice:\''+choice.id+'\'})">'+esc(choice.text)+'</button>';
+        });
+        h+='</fieldset>';
+      });
+      h+='</div>';
+      if(check.done){
+        h+='<p class="kao-reader-check-result">'+String(check.correct)+' / 3 doğru. '+(check.correct===3?'Hazırsın.':'Yanlışlar yarınki tekrara eklendi.')+'</p><button type="button" class="kao-primary" onclick="App.kaoReader(\'understood\')">Anladım · kaydet</button>';
+      }else{
+        h+='<button type="button" class="kao-primary" disabled>Önce üç soruyu yanıtla</button>';
+      }
+    }
+    h+='<p class="kao-reader-status">'+(record.confirmedAt?'Gecikmeli test '+String(record.delayedScore)+'/5 · anlaşıldı':(record.needsReread?'Gecikmeli test '+String(record.delayedScore)+'/5 · tekrar oku':(record.delayedTestAt?'7 günlük test planlandı':'Okuma bitince anlayışını kaydet')))+'</p></section></main>';
     return h;
   }
   // KAO2-09 · S-02: nextStep eylem eşlemesi. Henüz handler'ı olmayan adımlar mevcut akışa bağlanır
@@ -2686,6 +2868,10 @@
     kaoRevealWord:kaoRevealWord,
     kaoMarkUnderstood:kaoMarkUnderstood,
     kaoReaderHTML:kaoReaderHTML,
+    kaoReader:kaoReader,
+    kaoReaderContext:kaoReaderContext,
+    kaoReaderScrollTarget:kaoReaderScrollTarget,
+    kaoSurahCheck:kaoSurahCheck,
     kaoHubCardHTML:kaoHubCardHTML,
     kaoHomeHTML:kaoHomeHTML,
     kaoOnboard:kaoOnboard,

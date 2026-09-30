@@ -4,15 +4,16 @@
   "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
-  "releaseApproval": "approved_through_KAO2-18",
-  "nextCard": "KAO2-19",
-  "ledgerLastSeq": 72,
+  "releaseApproval": "approved_through_KAO2-19",
+  "nextCard": "KAO2-20",
+  "ledgerLastSeq": 74,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤88 KiB (2026-09-29 revizyonu: KAO2-18+ açıklama katmanı için 80→88); kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
     "fileSplit": "K-2: üçe böl — quranLearnFlow.js (saf) → quranLearnViews.js (saf HTML) → quranLearn.js (motor); dört liste aynı committe; .claude/skills dosyaları yalnız Edit aracıyla, izin yoksa BLOCKED",
     "syllableAudioSource": "K-3: A) nitelikli muallim, iki ses, stüdyo protokolü, CC BY 4.0 / süresiz izin; B) geçici: harf gerçek kelime içinde (mevcut klipler); C) TTS/sentetik/lisanssız/âyetten hece kesme yasak",
-    "turkishTextReviewer": "K-4: L0 otomatik kapılar (kaynak, imlâ, yasak ifade, elle Arapça yok) + L1 proje sahibi + L2 alan uzmanı (rol); draft görünmez, sourced/expert görünür"
+    "turkishTextReviewer": "K-4: L0 otomatik kapılar (kaynak, imlâ, yasak ifade, elle Arapça yok) + L1 proje sahibi + L2 alan uzmanı (rol); draft görünmez, sourced/expert görünür",
+    "readerQuietTime": "KAO2-19: okuma sesi uygulamanın genel sessiz saat kuralına (23:00-07:00) uyar; sessiz saatte çalma başlamaz, neden kullanıcıya söylenir."
   },
   "gates": {
     "G0": "closed",
@@ -129,8 +130,9 @@
     },
     "KAO2-19": {
       "wave": "W4",
-      "status": "todo",
-      "evidence": null
+      "status": "done",
+      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-19/KANIT.md",
+      "note": "contextTr (20 sûre girişi) yazılmadı: kart \"iddia başına kaynak\" şart koşuyor, kaynak seçimi kullanıcı kararı. (a) maddesi draft'ta doğru çalışır (bağlam gizlenir)."
     },
     "KAO2-20": {
       "wave": "W4",
@@ -211,11 +213,11 @@
     "scope": "KAO2-17; kullanıcı 'tam ve kusursuz uygulandığından emin ol canlıya al sıradakine geç' diyerek metin L1 onayını verdi ve yayına izin verdi"
   },
   "lastRelease": {
-    "card": "KAO2-18",
+    "card": "KAO2-19",
     "branch": "kao2-yeniden-tasarim",
-    "previousCommit": "ef480b6b",
-    "approval": "approved_through_KAO2-18",
-    "note": "kullanıcı: \"ikiside evet ... canlıya al ve sıradan devam et\""
+    "previousCommit": "795461f6",
+    "approval": "approved_through_KAO2-19",
+    "note": "kullanıcı: \"açık kalanları kesinlikle düzelt ve sonrakine devam et\""
   },
   "infrastructureRelease": {
     "scope": "Konum kapısı bağımlılık düzeltmesi",

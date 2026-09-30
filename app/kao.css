@@ -309,3 +309,39 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-grammar-worked>span{display:block;margin-bottom:4px;color:var(--kao-tint);font-size:var(--f-footnote);font-weight:600}
 @media(forced-colors:active){.kao-path-unit-open{border-color:CanvasText;background:Canvas;color:LinkText}.kao-unit-step-goal,.kao-lesson-context,.kao-grammar-worked{color:CanvasText}.kao-lesson-goal-line,.kao-grammar-worked{border-left-color:CanvasText;background:Canvas}.kao-grammar-worked>span{color:CanvasText}}
 /* KAO2-18 son */
+
+/* KAO2-20 · S-11 kök aileleri: önce öğrenme sırasındaki 73 aile, sonra 301 köklük keşif katmanı.
+   Yalnız --kao-* tokenları; 44px hedefler, :focus-visible, forced-colors. */
+.kao-roots-tools{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.kao-roots-search{flex:1 1 auto;min-width:0}
+.kao-roots-search input{box-sizing:border-box;width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface);color:var(--kao-label);font:inherit;font-size:var(--f-subhead)}
+.kao-roots-search input:focus-visible{outline:3px solid var(--kao-tint);outline-offset:2px}
+.kao-root-family-list h3{margin:0 0 8px;padding:0 4px;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
+.kao-root-family-list ul{display:grid;gap:0;min-width:0;margin:0;padding:0;list-style:none;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);overflow:hidden}
+.kao-root-family-list li+li .kao-root-row{border-top:1px solid var(--kao-sep)}
+.kao-root-row{appearance:none;box-sizing:border-box;width:100%;min-height:var(--kao-row);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 12px;border:0;background:transparent;color:var(--kao-label);font:inherit;text-align:start;cursor:pointer}
+.kao-root-row:focus-visible{outline:3px solid var(--kao-tint);outline-offset:-3px}
+.kao-root-ar{color:var(--kao-label);font-size:var(--f-title3);font-weight:700}
+.kao-root-body{display:grid;gap:2px;min-width:0}
+.kao-root-meta{color:var(--kao-label);font-size:var(--f-body);overflow-wrap:anywhere}
+.kao-root-body small{color:var(--kao-label-2);font-size:var(--f-caption1)}
+.kao-root-detail{display:grid;gap:8px}
+.kao-root-detail h2{margin:0;color:var(--kao-label);font-size:clamp(2.2rem,10vw,3.4rem);font-weight:700;line-height:var(--kao-ar-lh,2.2);text-align:center}
+.kao-root-pron{margin:-4px 0 0;color:var(--kao-tint);font-size:var(--f-callout);font-weight:600;text-align:center;direction:ltr}
+.kao-root-meaning,.kao-root-mastered{margin:0;color:var(--kao-label);font-size:var(--f-body);line-height:1.5}
+.kao-root-mastered{color:var(--kao-label-2);font-size:var(--f-subhead)}
+.kao-root-detail h3{margin:8px 0 0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
+.kao-root-derivs{display:flex;flex-wrap:wrap;gap:7px;margin:0;padding:0;list-style:none}
+.kao-root-derivs li{display:grid;gap:2px;padding:7px 10px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
+.kao-root-derivs li span{color:var(--kao-label);font-size:var(--f-subhead);font-weight:600}
+.kao-root-derivs li small{color:var(--kao-label-2);font-size:var(--f-caption2)}
+.kao-root-lemmas{display:grid;gap:0;margin:0;padding:0;list-style:none;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);overflow:hidden}
+.kao-root-lemma{appearance:none;box-sizing:border-box;width:100%;min-height:var(--kao-row);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 12px;border:0;background:transparent;color:var(--kao-label);font:inherit;text-align:start;cursor:pointer}
+.kao-root-lemmas li+li .kao-root-lemma{border-top:1px solid var(--kao-sep)}
+.kao-root-lemma>span:first-child{font-size:var(--f-title3);font-weight:700}
+.kao-root-lemma small{color:var(--kao-label-2);font-size:var(--f-caption1)}
+.kao-root-lemma[data-kao-root-state="known"] small{color:var(--kao-ok)}
+.kao-root-lemma[data-kao-root-state="learning"] small{color:var(--kao-tint)}
+.kao-root-lemma:focus-visible{outline:3px solid var(--kao-tint);outline-offset:-3px}
+.kao-roots-empty{margin:0;padding:12px;color:var(--kao-label-2);font-size:var(--f-subhead);text-align:center}
+@media(forced-colors:active){.kao-root-family-list ul,.kao-root-lemmas,.kao-root-derivs li{border-color:CanvasText;background:Canvas}.kao-root-row,.kao-root-lemma{background:Canvas;color:CanvasText}.kao-root-meta,.kao-root-body small,.kao-root-lemma small,.kao-root-meaning,.kao-root-mastered,.kao-roots-empty{color:CanvasText}.kao-root-row:focus-visible,.kao-root-lemma:focus-visible,.kao-roots-search input:focus-visible{outline-color:Highlight}}

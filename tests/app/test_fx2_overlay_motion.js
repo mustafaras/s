@@ -127,9 +127,9 @@ group('FX2-16.1 12 hedef closeX sarmalayıcısı doğru yüzey kimliğine bağl�
 
 group('FX2-16.2 M6 çağrı sayısı en az 10, App/onClick yüzeyi değişmez',
   (combinedSource.match(/\bsheetClose\s*\(/g) || []).length >= 10 &&
-  // KAO2-12 ders oynatıcı ve KAO2-19 okuyucu eylemleriyle birleşik App yüzeyi 762'e çıkar.
+  // KAO2-12 ders oynatıcı, KAO2-19 okuyucu ve KAO2-20 kök eylemleriyle birleşik App yüzeyi 764'e çıkar.
   // Etkileşim sayacı 393 olarak kalır.
-  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 762 &&
+  new Set((combinedSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((item) => item.match(/App\.[A-Za-z0-9_]+/)[0])).size === 764 &&
   (combinedSource.match(/onclick=/g) || []).length === 393
 );
 

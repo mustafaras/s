@@ -1,33 +1,33 @@
 # KAO2 — CURRENT STATE
 
 <!-- kao2-sync
-nextCard: KAO2-20
-lastSeq: 74
+nextCard: KAO2-21
+lastSeq: 75
 status: active
 -->
 
 Son güncelleme: 2026-09-29 · LEDGER seq71
 
 ## Şu an neredeyiz
-**KAO2-00…19 tamamlandı (20/28).** KAO2-19 okuyucuyu yeniledi ve üç açık bulguyu kapattı:
-Y-12 (öz-beyan öncesi 3 soruluk kontrol), T-20 (kenarlıksız WordChip + anlam alt panelde),
-T-21 (seçili sûre kaydırma hedefi motorda). Ek olarak okuma sesi uygulamanın genel sessiz
-saat kuralına (23:00–07:00) uyduruldu. Ayrıca KAO2-18'in açık kusuru kapatıldı:
-inceleme sayfasının vaat ettiği `--apply-review` yolu araçta **yoktu**, yazıldı (seq 73).
+**KAO2-00…20 tamamlandı (21/28).** KAO2-20 kök aileleri ekranını (S-11) getirdi:
+73 `unit11` ailesi öğrenme sırasında, 301 köklük sözlük isteğe bağlı keşif katmanında;
+kök sayfası harfler/okunuş/anlam, kalıp etiketli Türkçe türevler ve durum rozetli
+kelime satırları gösterir. Keşif satırı yalnız kartı olan kullanıcıda görünür.
 
 ## Sıradaki kartın tek cümlesi
-Sıradaki **KAO2-20** — "Kök aileleri (S-11)": `QuranGrammarV1.unit11.roots` (73) +
-`QuranLexiconV1.roots` (301) verisinden kök ailesi ekranı.
+Sıradaki **KAO2-21** — kademe B (ses): K-3 kararına bağlı muallim kaydı hattı.
 
 ## Canlı gerçekler
-- Dal: `kao2-yeniden-tasarim` = `main`; KAO2-18 canlı (`2ad13a5f`, pin `20260929g`),
-  KAO2-19 bu turda yayınlanacak.
-- `KAO2-STATE.json`: KAO2-19 `done`; `nextCard=KAO2-20`; `ledgerLastSeq=74`;
-  `releaseApproval=approved_through_KAO2-19`.
-- **Bütçe:** çalışma zamanı **83.962 / 88 KiB** · içerik 173.298/256 · css 11.074/14 ·
-  p95 4.443 ms. (Kalan pay ~4 KiB — KAO2-20 önce ölçülmeli.)
-- Kimlik pinleri: App yüzeyi **762** · `App.kao*` **41** · `app.js` ataması **600** · `onclick` 393.
-- Kaynak/test: PASS · yayın: KAO2-19 sonrası · cihaz: **doğrulanmadı**.
+- Dal: `kao2-yeniden-tasarim` = `main`; KAO2-19 canlı (`f801540d`, pin `20260930a`),
+  KAO2-20 bu turda yayınlanacak.
+- `KAO2-STATE.json`: KAO2-20 `done`; `nextCard=KAO2-21`; `ledgerLastSeq=75`;
+  `releaseApproval=approved_through_KAO2-20`.
+- **⛔ BÜTÇE %98 DOLU:** çalışma zamanı **86.032 / 88 KiB** (pay ~2 KiB) · içerik
+  173.298/256 · css 11.574/14 · p95 4.479 ms. Sonraki çalışma zamanı artışı
+  **kullanıcı onayı ister** (80→88 bir kez onaylandı).
+- Kimlik pinleri: App yüzeyi **764** · `App.kao*` **43** · `app.js` ataması **602** ·
+  `onclick` 393.
+- Kaynak/test: PASS · yayın: KAO2-20 sonrası · cihaz: **doğrulanmadı**.
 
 ## Açık riskler ve bekleyen kullanıcı işleri
 - **G3 metin incelemesi kullanıcıda:** `kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md`

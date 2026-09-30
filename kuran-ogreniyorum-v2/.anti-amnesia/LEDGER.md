@@ -811,3 +811,20 @@ bilinmeyen altı noktalı; anlam kelime İÇİNDE değil ALT PANELDE (satır ak�
 kelime `aria-current` alır. Ses yoksa sessiz yol. Öz-beyan öncesi 3 soruluk hızlı kontrol.
 Ek olarak: okuma sesi uygulamanın genel sessiz saat kuralına (23:00–07:00) uyduruldu —
 önce atlıyordu. 5 kendi hatam testlerle yakalandı ve düzeltildi.
+
+## seq 75 · 2026-09-30 · CARD · KAO2-20
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-20/KANIT.md
+- scope: S-11 kök aileleri — 73 unit11 ailesi (öğrenme sırası) + 301 köklük isteğe bağlı keşif katmanı; kök sayfasında harfler/okunuş/anlam, türevler kalıp etiketiyle, bu kökten kelimeler durum rozetiyle, kelime detayına bağlantı, açık geri yolu; Keşfet satırı ve kelime detayından erişim.
+- gate: keşif satırı yalnız kullanıcı bir kelime kartı edinince görünür (test_kao2_today gizlilik sözleşmesi korunur).
+- gates: KAO 38/38 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/contrast PASS
+- budget: runtime 86.032/88 KiB (%98) · content 173.298/256 · css 11.574/14 · p95 4.479 ms
+- pins: App yüzeyi 762→764 · app.js ataması 600→602 · App.kao* 41→43 · onclick 393 sabit
+- evidence-levels: kaynak/test PASS · yayın KAO2-20 sonrası · cihaz doğrulanmadı
+- incidents: `app/core/quranLearn.js` bir düzenleme betiğinde 'w' ile açılıp write hatasından önce KESİLDİ (2937→0 satır); `git checkout HEAD --` ile kurtarıldı, sonraki düzenlemeler yazmadan önce doğrulandı.
+- next: KAO2-21
+
+**Ayrıntı.** İki katmanlı liste (73 öğrenme + 301 keşif), tek odaklı kök sayfası, taranabilir
+anlam/kök, durum rozetli kelime satırları, açık geri yolu. 7 kendi hata testlerle yakalandı
+(dosya kesilmesi, parantez dengesi, yanlış API, yanlış katman, CSS sınıfı birleştirmesi,
+JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için plan gerekir.**

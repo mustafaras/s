@@ -97,3 +97,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: işleyici adları yalnız `App.x`/`name:`/`action:` ile değil `kaoSegHTML` dize argümanıyla da geçiyor (kaoSetDailyNew/kaoSetAudioStyle/kaoSetTranslit); test bunu kapsar. Tanımlı ama çağrılmayan 3 işleyici: kaoRevealWord, kaoMarkUnderstood, kaoOpenMap (bilgi, üst sınır 5).
 - next: K2F-04
+
+## seq 10 · 2026-09-30 · DECISION · K2F-03
+- decision: Plan dışı erken yayın — kullanıcı açık isteği ("3 e gec ve önce canlıya al", kapsam yanıtı: "Önce K2F-03 sonra canlıya al"). Kapsam: K2F-00…03 (4 commit) + yayın pini `20260930l` → `20260930m`.
+- scope-effect: planlı YAYIN-1 (K2F-18) yine yapılır; bu yayın onu değiştirmez. `releaseApproval` = `approved_through_K2F-03`.
+- known-exposure: `s0`/`sources`/`roots` görünümleri artık ulaşılabilir; R-06 (6 s0 dersinde `kaoS0HTML` çökmesi) ve tanımsız `App.kaoS0` (R-05) canlıda K2F-12/13'e kadar açık. Kullanıcı bu riski bilgilendirilerek kabul etti.
+- steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `YAYIN.md`/`release-live.json`.
+- next: K2F-04

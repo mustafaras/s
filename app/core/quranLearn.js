@@ -1600,7 +1600,19 @@
     ui.kaoAdvanceTimer=null; ui.kaoQueue=cloneValue(undo.queue); ui.kaoTaskIndex=undo.taskIndex; ui.kaoTaskStartedAt=Date.now(); ui.kaoDurableCount=Math.floor(nonNegativeNumber(undo.durableCount,0)); ui.kaoOrderDraft=cloneValue(undo.orderDraft)||[]; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoFeedback='Geri alındı';
     kaoSave(); paintTask(); return true;
   }
-  function safeClipId(value){ return /^w-l_[A-Za-z0-9_]+_[0-9a-f]{6}$/.test(String(value||'')); }
+  // KAO2-22 (K-3): ses kimlikleri iki biçimlidir — kelime klibi (`w-l_<id>_<hex6>`)
+  // ve hece klibi (`y-<harf>_<hareke|sükûn|med>-<m|f>`). Başka biçim reddedilir.
+  var KAO_CLIP_WORD=/^w-l_[A-Za-z0-9_]+_[0-9a-f]{6}$/,KAO_CLIP_SYL=/^y-[a-z]+_[a-z_]+-[mf]$/;
+  function safeClipId(value){ var id=String(value||'').replace(/\.m4a$/,''); return KAO_CLIP_WORD.test(id)||KAO_CLIP_SYL.test(id); }
+  // K-3 hece kimliği üretimi. Kayıt gelmeden klibe erişilmez; bu yalnız AD üretir.
+  function kaoS0SyllableClipId(letterId,mark,voice){ return 'y-'+String(letterId||'')+'_'+String(mark||'')+'-'+String(voice||''); }
+  // Kademe seçimi: hece klibi VARSA A, yoksa B (harf gerçek kelime içinde). Uydurma yok.
+  function kaoS0ClipPlan(letterId){
+    var word=kaoS0Word(letterId),ui=quranLearnDeps?quranLearnDeps.ui():{},have=objectOr(ui.kaoS0Syllables,{});
+    var ids=[];
+    ['fatha','kasra','damma','sukun'].forEach(function(mk){ ['m','f'].forEach(function(v){ var id=kaoS0SyllableClipId(letterId,mk,v); if(have[id]) ids.push(id); }); });
+    return ids.length?{tier:'A',syllable:ids,word:word}:{tier:'B',syllable:null,word:word};
+  }
   function kaoPlay(clipId,style){
     if(!quranLearnDeps||!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.createAudio!=='function'||!safeClipId(clipId)) return false;
     var resolved=style==='flowing'?'flowing':'measured',ui=quranLearnDeps.ui(),audio=quranLearnSurfaceDeps.createAudio('assets/kao/audio/'+clipId+'-'+resolved+'.m4a');
@@ -3076,6 +3088,9 @@
     kaoS0Lesson:kaoS0Lesson,
     kaoS0Start:kaoS0Start,
     kaoS0Play:kaoS0Play,
+    safeClipId:safeClipId,
+    kaoS0SyllableClipId:kaoS0SyllableClipId,
+    kaoS0ClipPlan:kaoS0ClipPlan,
     kaoS0PositionTable:kaoS0PositionTable,
     kaoS0Model:kaoS0Model,
     kaoS0:kaoS0,

@@ -36,6 +36,75 @@
       "use": "Surah 1:7 fallback only; local Whisper alignment, manually bounded from transcript timestamps"
     }
   ],
+  "planned": [
+    {
+      "id": "kao2-syllable-k3A",
+      "kind": "syllable",
+      "title": "İzole hece sesleri (K-3 kademe A)",
+      "status": "awaiting-recording",
+      "sourceRefs": [
+        "kuran-ogreniyorum-v2/10-KARARLAR.md#K-3"
+      ],
+      "reason": "İzole hece (بَ بِ بُ) Kur'an'da kelime olarak geçmez; âyet kaydından kesmek ses geçişlerini bozar. TTS yasak (K-3 kademe C). Yalnız nitelikli insan kaydı.",
+      "voices": [
+        {
+          "role": "reciter-male",
+          "id": "m"
+        },
+        {
+          "role": "reciter-female",
+          "id": "f"
+        }
+      ],
+      "voicesRationale": "Yüksek değişkenlikli fonetik eğitim, çok-konuşmacıyla algının yeni seslere genellenmesini artırır (Logan, Lively & Pisoni 1991; Thomson 2018).",
+      "license": {
+        "required": [
+          "CC BY 4.0",
+          "süresiz kullanım hakkı"
+        ],
+        "status": "pending",
+        "attribution": "okuyucunun tercih ettiği ad/unvan"
+      },
+      "protocol": {
+        "sampleRateHz": 48000,
+        "bitDepth": 24,
+        "channels": 1,
+        "integratedLufs": -18,
+        "truePeakDbtp": -1,
+        "headTailSilenceMs": 150,
+        "maxRoomNoiseDba": 35,
+        "takesPerSyllable": 3,
+        "codec": "AAC-LC",
+        "bitrateKbps": 48
+      },
+      "clipName": "y-<harf>_<hareke|sükûn|med>-<m|f>.m4a",
+      "expectedClips": 230,
+      "perVoice": 115,
+      "marks": [
+        "fatha",
+        "kasra",
+        "damma",
+        "sukun",
+        "madd_alef",
+        "madd_waw",
+        "madd_ya"
+      ],
+      "qa": {
+        "reviewer": "L2",
+        "scope": "mahreç dinlemesi; hatalı klip yeniden kaydedilir",
+        "deviceAcceptance": "kullanıcı beyanı"
+      },
+      "tool": "tools/kao2-syllable-audio.mjs",
+      "clipNameExample": "y-ba_fatha-m.m4a · y-alef_madd_alef-m.m4a",
+      "medCarriers": [
+        "alef",
+        "waw",
+        "ya"
+      ],
+      "medNote": "Med klipleri kendi taşıyıcı harfine bağlıdır; elif (ا) 28 harfte olmadığı için `alef` taşıyıcı kimliği yalnız med için kullanılır.",
+      "whySeparate": "Henüz kayıt/lisans/atıf yok; datasets[] yayınlanmış kaynaklı listeyi besler ve ayarlar \"kaynaklar\" bölümüne yansır."
+    }
+  ],
   "selection": {
     "policy": "lemma measured=valid 75th-percentile duration; flowing=valid 25th-percentile duration from a different reader (0.20-4.00 s quality window); short-surah=one aligned clip per QAC word; labels are operational and not canonical qiraat classes",
     "tadaburShards": [
@@ -96,8 +165,9 @@
     "minimal-pair": 12
   },
   "totalBytes": 10950329,
-  "budgetBytes": 16777216,
+  "budgetBytes": 25165824,
   "budgetMet": true,
+  "budgetNote": "KAO2-22: budgetBytes bayattı (16 MiB); K-1 ve tools/kao-audio-build.mjs BUDGET_BYTES 24 MB der. K-1 esastır.",
   "clips": {
     "w-l_min_1f6fa6-measured": {
       "file": "assets/kao/audio/w-l_min_1f6fa6-measured.m4a",

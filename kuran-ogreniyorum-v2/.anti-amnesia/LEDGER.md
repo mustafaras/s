@@ -855,3 +855,16 @@ JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için 
 - evidence-levels: kaynak/test PASS · yayın KAO2-21 sonrası · cihaz doğrulanmadı
 - open: elif (ا) hâlâ yok · bütçe %99.3 (sonraki kart yeni çalışma zamanı kodu getirmemeli) · cihaz kabulü yok · alıştırma soru metinleri iskelet düzeyinde.
 - next: KAO2-22
+
+## seq 78 · 2026-09-30 · CARD · KAO2-22
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-22/KANIT.md
+- scope: K-3 kademe A HATTI (ses değil) — tools/kao2-syllable-audio.mjs: envanter 115×2=230, ad biçimi y-<harf>_<mark>-<m|f>, sha256, lisans zorunlu, --validate, --check (ffmpeg loudnorm: -18 LUFS ±1, -1 dBTP, >=48 kHz), kayıt yoksa awaiting-recording (uydurma yok). safeClipId iki biçim kabul eder. kaoS0ClipPlan: klib varsa A, yoksa B.
+- honesty: kaydedilmemiş malzeme datasets[]e KONMADI (o liste kaynaklı/yayınlanmış, ayarlara yansır) -> yeni planned[] altında status:'awaiting-recording'.
+- fixed: manifest budgetBytes bayattı (16 MiB -> 24 MB, K-1 esas) · ffmpeg kapısı kaynak kontrolünden ÖNCE sorulur (boş dizinde kapı anlamsızdı).
+- gates: KAO 40/40 (yeni test_kao2_syllable_audio.js 11 kontrol) · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/contrast/iip_22 PASS
+- budget: runtime 87.900/88 KiB (%99.9 — pay 0.1!) · content 175.459/256 · ses 10.9/24 MB · css 11.911/14
+- env: ffmpeg 8.1.2 kurulu -> kayıt günü --check koşabilir.
+- user-task: kademe A kaydı (230 klip, iki ses, muallim, lisans+atıf) + L2 mahreç dinlemesi + lisans beyanı.
+- evidence-levels: kaynak/test PASS · yayın KAO2-22 sonrası · cihaz doğrulanmadı
+- next: KAO2-23

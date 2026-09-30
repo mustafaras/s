@@ -4,9 +4,9 @@
   "status": "active",
   "plannedAt": "2026-09-28",
   "branch": "kao2-yeniden-tasarim",
-  "releaseApproval": "approved_through_KAO2-21",
-  "nextCard": "KAO2-22",
-  "ledgerLastSeq": 77,
+  "releaseApproval": "approved_through_KAO2-22",
+  "nextCard": "KAO2-23",
+  "ledgerLastSeq": 78,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤88 KiB (2026-09-29 revizyonu: KAO2-18+ açıklama katmanı için 80→88); kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -19,7 +19,8 @@
     "budgetRelief": "KAO2-21 hazırlık: runtime 86.032->84.745 KiB. Ölü kod (kaoTodasyStats/kaoUnitLabel/lemmaSurahId) + KAO_MAHREC_SVG içerik modülüne taşındı. İkinci bütçe artışı GEREKMEDİ.",
     "elifLetter": "A3 (kullanıcı onayı, 2026-09-30): elif (ا) donmuş içerikte yok; bağlanmayan küme veriyle sınırlı (dal,dhal,ra,zay,waw,hamza). elif eklemek ayrı içerik işi.",
     "s0Surface": "B2 (kullanıcı onayı): yeni Seviye 0 akışı AYRI yüzey (kao-s0); kapı (kaoGate) yalnız yerleştirme kalır, 12 mini ders dokunulmaz.",
-    "perfGateNoise": "KAO2-21: perf p95 kapısı gürültüye dayanıklı yapıldı — göreli bant en iyi 3 turun ortancasıyla (steady) sınanır; mutlak 40 ms kapısı korunur. Gerekçe: git stash karşılaştırması, sapmanın makine yükü olduğunu kanıtladı."
+    "perfGateNoise": "KAO2-21: perf p95 kapısı gürültüye dayanıklı yapıldı — göreli bant en iyi 3 turun ortancasıyla (steady) sınanır; mutlak 40 ms kapısı korunur. Gerekçe: git stash karşılaştırması, sapmanın makine yükü olduğunu kanıtladı.",
+    "syllableAudioHat": "KAO2-22: hece sesi hattı kuruldu (tools/kao2-syllable-audio.mjs). Kayıt yoksa awaiting-recording; uygulama K-3 kademe B (harf kelime içinde) ile çalışır. Ad: y-<harf>_<mark>-<m|f>. Med taşıyıcıya bağlı; elif için `alef` beyan edildi."
   },
   "gates": {
     "G0": "closed",
@@ -152,8 +153,9 @@
     },
     "KAO2-22": {
       "wave": "W4",
-      "status": "todo",
-      "evidence": null
+      "status": "done",
+      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-22/KANIT.md",
+      "note": "Hat teslim edildi; kademe A kaydı kullanıcı işi (230 klip, iki ses, muallim, lisans+atıf)."
     },
     "KAO2-23": {
       "wave": "W5",

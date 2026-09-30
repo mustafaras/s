@@ -279,6 +279,16 @@ md.push('| A-11 | İlk hafta dönüş günleri ve ilk tekrar doğruluğu | ≥4/
 md.push('| A-12 | "Şimdi ne yapmalıyım?" anı | 0 | ölçülmedi | ⏳ | **Cihaz/kullanıcı** |');
 const p10 = rows.filter((r) => r.id === 'P10');
 if (p10.length) md.push('', '## P10 kapanış kabulü', '', '| Kontrol | Ölçülen | Durum |', '|---|---|---|', `| ${p10[0].label} | ${p10[0].value} | ${p10[0].pass ? '✅ PASS' : '❌ FAIL'} |`);
-fs.writeFileSync(path.join(repoRoot, 'archive/kuran-ogreniyorum-v2/evidence/KAO2-27/A-KABUL.md'), md.join('\n') + '\n');
+// K2F-04 (M-11): rapor izlenen kanıt dosyasını her koşuda yeniden yazmaz. Yazım yalnız açık istekle:
+//   KAO2_EVIDENCE_OUT=<yol> node tests/kao/test_kao2_kabul.js
+// Tanımsızsa yazım yok; rapor stdout'a basılır.
+const report = md.join('\n') + '\n';
+const evidenceOut = process.env.KAO2_EVIDENCE_OUT;
+if (evidenceOut) {
+  fs.writeFileSync(path.resolve(evidenceOut), report);
+  console.log(`KAO2-27 kabul raporu yazıldı: ${path.resolve(evidenceOut)}`);
+} else {
+  console.log(report);
+}
 const fixtureRows = rows.filter((r) => r.id.startsWith('A-'));
 console.log(`KAO2-27 kabul: ${fixtureRows.filter((r) => r.pass).length}/${fixtureRows.length} ölçüt PASS · P10 kapanış kabulü PASS (A-11/A-12 cihazda)`);

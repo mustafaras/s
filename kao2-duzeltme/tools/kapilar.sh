@@ -21,13 +21,6 @@ family() { # family <ad> <glob>
   if [ -z "$fails" ]; then row "$name ($n)" "PASS"; else row "$name ($n)" "FAIL:$fails"; FAILED=1; fi
 }
 
-# K2F-04 öncesi kabul testi arşivdeki kanıt dosyasını yeniden yazar; içerik korunur (M-11).
-KABUL_FILE="archive/kuran-ogreniyorum-v2/evidence/KAO2-27/A-KABUL.md"
-KABUL_SAVED=0
-KABUL_CONTENT=""
-# Geçici dosya yok (sandbox'ta mktemp yazamayabilir): içerik bellekte tutulur, sonda aynen geri yazılır.
-if [ -f "$KABUL_FILE" ]; then KABUL_CONTENT="$(cat "$KABUL_FILE"; printf x)"; KABUL_SAVED=1; fi
-
 echo "== KAO2-FIX kapıları =="
 for f in app/core/quranLearn.js app/core/quranLearnFlow.js app/core/quranLearnViews.js app/content/quranCurriculumV2.js app/content/quranGrammarV1.js; do
   gate "node --check $(basename "$f")" node --check "$f"
@@ -48,8 +41,6 @@ if [ "$PLAN_READY" = "1" ]; then gate "kao-plan-check" node docs/kuran-ogreniyor
 else row "kao-plan-check" "ATLANDI (K2F-01 öncesi)"; fi
 
 gate "fix-sync-check --repro" node kao2-duzeltme/tools/fix-sync-check.mjs --repro
-
-if [ "$KABUL_SAVED" -eq 1 ]; then printf '%s' "${KABUL_CONTENT%x}" > "$KABUL_FILE"; fi
 
 echo "== tekrar-uret özeti =="
 node kao2-duzeltme/denetim/tekrar-uret.cjs 2>/dev/null | tail -1

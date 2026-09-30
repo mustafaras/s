@@ -111,3 +111,23 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
 - note: push için sandbox `github.com`'u engelledi; yalnız `git push` ve `gh`/`curl` (salt-okur) komutları kullanıcı onaylı şekilde sandbox dışında çalıştı.
 - next: K2F-04
+
+## seq 12 · 2026-09-30 · NOTE · K2F-04
+- summary: iCloud Drive (Desktop senkronu) `… 2.*` çakışma kopyaları üretiyor. 85 izlenmeyen kopya (bayt-eşit doğrulanıp, kullanıcı onayıyla) silindi; sonradan 15 kopya `kao2-duzeltme/` altında yeniden çıktı ve yerel `5e0665bd` commit'ine girdi (origin/main'de YOK; yayın ve Pages etkilenmedi).
+- fix: `945e37bd` — 15 kopya `git rm` ile kaldırıldı, geçmiş yeniden yazılmadı; orijinaller değişmedi (4 kopya eski anlık görüntüydü).
+- risk: kalıcı çözüm klasörü iCloud dışına taşımak (kullanıcı kararı). Tekrarlarsa `git add` dizin yerine açık dosya yollarıyla yapılmalı.
+- next: K2F-04
+
+## seq 13 · 2026-09-30 · PROMPT · K2F-04
+- status: done
+- title: Kabul testi kanıt yazımı opt-in
+- prev-commit: 945e37bd
+- evidence: kao2-duzeltme/evidence/K2F-04/KANIT.md
+- closes: M-11
+- repro: R-10 fail→pass · toplam 2/10
+- gates: kapilar.sh YEŞİL (kao 47 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20260930m
+- changed-tests: yok (test_kao2_kabul.js yalnız rapor yazımı; 10/10 ölçüt aynen PASS)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: iCloud kopyaları (seq 12). `A-KABUL.md` artık hiçbir test koşusunda değişmiyor; `kapilar.sh` yedek/geri koyma bloğu kaldırıldı.
+- next: K2F-05

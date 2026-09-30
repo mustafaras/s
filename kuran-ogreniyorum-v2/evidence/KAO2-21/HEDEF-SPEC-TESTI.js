@@ -8,7 +8,16 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const repoRoot = require('../repo-root');
+// Depo kökü konumdan bağımsız bulunur: bu dosya tests/kao DIŞINDA yaşar (kırmızı
+// kalacağı için test glob'unu kirletmez), bu yüzden '../repo-root' çözülmez.
+const repoRoot = (() => {
+  let dir = __dirname;
+  for (let i = 0; i < 6; i += 1) {
+    if (fs.existsSync(path.join(dir, 'index.html')) && fs.existsSync(path.join(dir, 'app.js'))) return dir;
+    dir = path.dirname(dir);
+  }
+  throw new Error('HEDEF-SPEC: depo kökü bulunamadı');
+})();
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const decode = (h) => h.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');

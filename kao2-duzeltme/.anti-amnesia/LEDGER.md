@@ -104,3 +104,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - known-exposure: `s0`/`sources`/`roots` görünümleri artık ulaşılabilir; R-06 (6 s0 dersinde `kaoS0HTML` çökmesi) ve tanımsız `App.kaoS0` (R-05) canlıda K2F-12/13'e kadar açık. Kullanıcı bu riski bilgilendirilerek kabul etti.
 - steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `YAYIN.md`/`release-live.json`.
 - next: K2F-04
+
+## seq 11 · 2026-09-30 · NOTE · K2F-03
+- summary: Erken yayın tamamlandı ve doğrulandı (seq 10 kararı). `main` ff-only `07802fa6..f0e8b1c1`, Pages run 36740401945 success, pin `20260930m`.
+- evidence: kao2-duzeltme/evidence/K2F-03/YAYIN.md · release-live.json — canlı 5/5 bayt-eşit, gizlilik yolları 404.
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
+- note: push için sandbox `github.com`'u engelledi; yalnız `git push` ve `gh`/`curl` (salt-okur) komutları kullanıcı onaylı şekilde sandbox dışında çalıştı.
+- next: K2F-04

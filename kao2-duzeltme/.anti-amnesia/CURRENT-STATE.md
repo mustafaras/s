@@ -2,17 +2,17 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-04
-lastSeq: 10
+lastSeq: 11
 status: active
 -->
 
-Son güncelleme: 2026-09-30 · LEDGER seq 10 · K2F-00…03 tamam (4/44), sıradaki K2F-04. R-09 PASS (1/10).
+Son güncelleme: 2026-09-30 · LEDGER seq 11 · K2F-00…03 tamam (4/44), sıradaki K2F-04. R-09 PASS (1/10).
 
 ## Şu an neredeyiz
 K2F-03 bitti: `tests/kao/test_kao2_handler_surface.js` (6 kontrol) `App.kao*` başvuruları ↔ `app.js` shim'leri ↔
 `window.SeymaQuranLearn` yüzeyini kalıcı sınar; `KNOWN_MISSING=['kaoS0']` (K2F-12 boşaltır). Kullanıcı isteğiyle
-K2F-03 sonrası **canlıya alma** (main'e fast-forward + yayın pini + push) yapılacak; bu plan dışı bir yayındır
-(planlı YAYIN-1 K2F-18). LEDGER seq 10 `DECISION`; pin `20260930m` committe, yayın adımları sürüyor.
+K2F-03 sonrası **canlıya alındı** (plan dışı erken yayın; planlı YAYIN-1 K2F-18 ayrıca sürer): `main` = `f0e8b1c1`,
+Pages run 36740401945 success, canlı 5/5 bayt-eşit, gizlilik 404 (`evidence/K2F-03/YAYIN.md`, LEDGER seq 10–11).
 
 ## Sıradaki promptun tek cümlesi
 **K2F-04:** `tests/kao/test_kao2_kabul.js` (≈270–285) kanıt raporunu yalnız `KAO2_EVIDENCE_OUT` tanımlıysa o yola
@@ -20,8 +20,8 @@ yazsın, aksi hâlde stdout'a basın; `kapilar.sh`'taki A-KABUL yedek/geri koyma
 test sonrası `git status --porcelain` boş.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
-- Dal: `kao2-duzeltme` (tabanı `main` = `07802fa6`); push yok.
-- Yayın pini (yerel, yayına hazır): `20260930m` (öncesi `20260930l`) · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
+- Dal: `kao2-duzeltme`; canlı `main` = `f0e8b1c1`. Sonraki push yalnız K2F-18/43 onay kapılarında.
+- Yayın pini (canlı): `20260930m` (öncesi `20260930l`) · `main` = `f0e8b1c1` (kao2-duzeltme dalı yalnız kanıt belgeleriyle ileride) · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
 - Kapılar: KAO 47/47 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **1/10 PASS** (R-09); kalan R-01…R-08, R-10 FAIL (beklenen).
 - Bütçe (perf): içerik 177,657 KiB · runtime 92,439 KiB (+0,008) · css 12,815 KiB · p95 4,34 ms.

@@ -685,7 +685,7 @@
   }
   function kaoS0HTML(){
     if(!quranLearnDeps) return '';
-    var esc=quranLearnDeps.esc,ui=quranLearnDeps.ui(),state=objectOr(ui.kaoS0,null),flow=state.lessonId?kaoS0Lesson(state.lessonId):null;
+    var esc=quranLearnDeps.esc,ui=quranLearnDeps.ui(),state=objectOr(ui.kaoS0,{}),flow=state.lessonId?kaoS0Lesson(state.lessonId):null;
     if(!flow) return '<main class="kao-s0"><span class="kao-content-error" role="alert">Seviye 0 dersi bulunamadı.</span></main>';
     var table=kaoS0PositionTable(),word=flow.word,canAudio=kaoS0CanAudio();
     var h='<main class="kao-s0" aria-labelledby="kao-s0-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye 0 · şekil aileleri</p><h2 id="kao-s0-title">'+esc(flow.title)+'</h2>'+(flow.goal?'<p>'+esc(flow.goal)+'</p>':'')+'</div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
@@ -2978,7 +2978,7 @@
     if(view==='unit'&&!kaoCurriculumUnit(resolved)) return false;
     if(view==='concept'&&!kaoGrammarConcept(resolved)) return false;
     if(view==='reader'&&!kaoSurahs().some(function(item){ return item.id===Number(resolved); })) return false;
-    if(view==='roots'){ var lexr=window.QuranLexiconV1,mapr=lexr&&lexr.roots||{}; if(!rootDetail(String(resolved))&&!mapr[String(resolved)]) return false; }
+    if(view==='roots'&&resolved!==null){ var lexr=window.QuranLexiconV1,mapr=lexr&&lexr.roots||{}; if(!rootDetail(String(resolved))&&!mapr[String(resolved)]) return false; }
     if(view==='home') kaoApplyView(ui,'home',null,'reset');
     else kaoApplyView(ui,view,resolved,ui.kaoView===view?'replace':'push');
     quranLearnDeps.render();

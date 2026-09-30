@@ -7,8 +7,8 @@
   "branch": "kao2-duzeltme",
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
-  "nextPrompt": "K2F-02",
-  "ledgerLastSeq": 6,
+  "nextPrompt": "K2F-03",
+  "ledgerLastSeq": 8,
   "releaseApproval": "not_approved",
   "lastRelease": null,
   "sources": {
@@ -52,7 +52,7 @@
     "R-06": "fail",
     "R-07": "fail",
     "R-08": "fail",
-    "R-09": "fail",
+    "R-09": "pass",
     "R-10": "fail"
   },
   "reproFlipPlan": {
@@ -76,7 +76,7 @@
   "prompts": {
     "K2F-00": { "wave": "W0", "title": "Başlangıç: dal, taşıma commit'i, taban ölçüm", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-00/KANIT.md" },
     "K2F-01": { "wave": "W0", "title": "kao-plan-check: K2F öneki ve taban commit", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-01/KANIT.md" },
-    "K2F-02": { "wave": "W0", "title": "Test düzeneği ve yığınsız görünüm çözümü", "status": "pending", "evidence": null },
+    "K2F-02": { "wave": "W0", "title": "Test düzeneği ve yığınsız görünüm çözümü", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-02/KANIT.md" },
     "K2F-03": { "wave": "W0", "title": "Handler yüzeyi fixture'ı", "status": "pending", "evidence": null },
     "K2F-04": { "wave": "W0", "title": "Kabul testi kanıt yazımı opt-in", "status": "pending", "evidence": null },
     "K2F-05": { "wave": "W1", "title": "Ustalık 1/4 — saf masteryPlan", "status": "pending", "evidence": null },

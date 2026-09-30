@@ -63,3 +63,23 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: yok (plan-check taban commit K2F-00 d19b457; 22 tarihsel FAIL + 1 K2F-00 FAIL → 0; --since çözülemezse FAIL verir, sessiz atlamaz)
 - next: K2F-02
+
+## seq 7 · 2026-09-30 · DECISION · K2F-02
+- decision: K2F-02 Dokun listesi `app/core/quranLearnFlow.js` ile genişletildi (kullanıcı onayı: "Flow'u Dokun'a ekle").
+- why: `SeymaQuranLearnFlow` VIEWS beyaz listesi `roots`, `s0`, `sources` görünümlerini eleyip yığını ana ekrana indiriyordu; gerçek `kaoNav('s0')`/`kaoNav('sources')` true dönüp ana ekranda kalıyordu (yalnız test kurulumu sorunu değildi). `quranLearn.js` tek başına düzeltemez: `flow.current/normalize` bilinmeyen görünümü zaten düşürür.
+- also-touched: `quranLearn.js` `kaoNav` (roots için parametresiz liste yolu `false` dönüyordu → `resolved!==null` koşulu) ve `kaoS0HTML` (`objectOr(ui.kaoS0,null)` → `{}`; s0 artık ulaşılabilir olunca `ui.kaoS0` yokken çöküyordu). İkisi de aynı kusurun doğrudan sonucu.
+- next: K2F-02
+
+## seq 8 · 2026-09-30 · PROMPT · K2F-02
+- status: done
+- title: Test düzeneği ve yığınsız görünüm çözümü
+- prev-commit: 3491c785
+- evidence: kao2-duzeltme/evidence/K2F-02/KANIT.md
+- closes: K6-02 (altyapı)
+- repro: R-09 fail→pass · toplam 1/10
+- gates: kapilar.sh YEŞİL (kao 46 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20260930l
+- changed-tests: yok
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: Flow VIEWS kusuru gerçek yönlendirmeyi de bozuyordu (seq 7); düzeltme s0'ın gizli çökmesini açığa çıkardı (`kaoS0HTML` null durum) ve aynı committe kapatıldı. R-06 (s0 derslerinin çökmesi) ayrı, K2F-13'te.
+- next: K2F-03

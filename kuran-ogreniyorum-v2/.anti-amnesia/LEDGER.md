@@ -879,3 +879,15 @@ JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için 
 - fixed: kaoSourcesHTML esc aktarımı (TypeError) · alt sayfa sınıf ayrımı · E7 fixture alt sayfaya yönlendirildi (aynı kontroller korunur).
 - evidence-levels: kaynak/test PASS · yayın KAO2-23 sonrası · cihaz doğrulanmadı
 - next: KAO2-24
+
+## seq 80 · 2026-09-30 · CARD · KAO2-24
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-24/KANIT.md
+- scope: map + stats TEK İlerleme ekranında birleşti (S-12): tanıdık kelime + kapsam eğrisi (03 §1 noktaları çalışma zamanında lexicon freq'ten, ±0,1), taşlar (kazanılan + SIRADAKİ koşul metniyle), haftalık etkinlik (7 gün, yumuşak seri D-19 — kırık seri cezası yok), Mushaf haritası bölümü (114 hücre gömülü), algı doğruluğu + kalibrasyon. Ayrı 'map' görünümü kaldırıldı; kaoSetView/kaoNav tek noktadan kaoViewAlias() ile stats'a akar.
+- gates: KAO 42/42 (yeni test_kao2_progress.js 14 kontrol) · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/iip_22 PASS · contrast 726 çift 0 ihlal · design-contract --strict PASS (deco 0, tracking 0, serif 0)
+- budget: runtime 91.567/128 KiB · content 177.657/256 · css 12.631/14 · p95 4,6 ms
+- pins: App.kao* 43 DEĞİŞMEDİ · app.js App.*=function 602 · bu kartta 0 yeni handler (App.kaoOpenMap uyumluluk için korundu, İlerleme'ye akar).
+- fixed: kaoStatsHTML'de tanımsız q · <main> içinde <main> + iki h2 · başlık değişiminde metin kalıntısı · dengesiz </main> · model saflığı (taş kazandırma ekrana taşındı) · strict sözleşmede tracking/dekoratif sözde-öğe ihlali · kazanılmış işaret kontrastı 2,20:1 → --kao-ok 10,02:1 · kaoNav yolunda eksik takma ad.
+- fixtures: test_kao2_navigation (map satırı çıktı) · test_kao_render E10 (gömülü harita) · test_kao2_today (gömülü hücre) — kartın gereği.
+- evidence-levels: kaynak/test PASS · yayın KAO2-24 sonrası · cihaz doğrulanmadı
+- next: KAO2-25

@@ -21,7 +21,7 @@ Sıradaki **KAO2-24** — İlerleme (S-12): taşlar, kapsam eğrisi, harita ve i
 tek ekranda birleşir (05 §2, 03 §1).
 
 ## Canlı gerçekler
-- Dal: `kao2-yeniden-tasarim` = `main`; canlı pin **`20260930g`** (KAO2-23 bu turda yayınlanacak).
+- Dal: `kao2-yeniden-tasarim` = `main`; canlı pin **`20260930h`** (KAO2-23 yayınlandı).
 - `KAO2-STATE.json`: KAO2-23 `done`; `nextCard=KAO2-24`; `ledgerLastSeq=79`;
   `releaseApproval=approved_through_KAO2-23`.
 - **Bütçe (revizyon 2, kullanıcı yetkisi):** çalışma zamanı tavanı **128 KiB**.

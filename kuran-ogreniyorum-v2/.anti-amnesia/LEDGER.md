@@ -828,3 +828,16 @@ Ek olarak: okuma sesi uygulamanın genel sessiz saat kuralına (23:00–07:00) u
 anlam/kök, durum rozetli kelime satırları, açık geri yolu. 7 kendi hata testlerle yakalandı
 (dosya kesilmesi, parantez dengesi, yanlış API, yanlış katman, CSS sınıfı birleştirmesi,
 JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için plan gerekir.**
+
+## seq 76 · 2026-09-30 · BLOCKED · KAO2-21
+- status: blocked
+- reason: iki kullanıcı kararı gerekiyor (P6); bütçe engeli ayrıca ÇÖZÜLDÜ.
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-21/BLOKAJ.md
+- blocker-A: 07 §2 ders 0.5 "bağlanmayan 6 harf: ا د ذ ر ز و" der; ölçüm: `QuranPhonicsV1.letters` (28 harf, بتثجحخدذرزسشصضطظعغفقكلمنهويء) elif (ا) İÇERMİYOR. elif eklemek yeni donmuş içerik + L1 + ses klibi işi; ajan Arapça içerik yazamaz.
+- blocker-B: kartın (f) maddesi kapıdaki eski 12 mini ders listesini kaldırmayı ister; `tests/kao/test_kao_render.js:342` bu listeyi (length 12, sounds ≤3) sabitliyor; test_kao_requirements + test_kao2_onboarding de kapı ders yapısını kullanıyor. Kaldırma başka alanın davranışını değiştirir.
+- budget-solved: runtime 86.032 -> 84.745 KiB (pay 2.0 -> 3.34). Ölü kod −0.703 + KAO_MAHREC_SVG içerik modülüne −0.946. Davranış HEAD ile birebir (ders ekranı SVG aynı).
+- prepared: evidence/KAO2-21/HEDEF-SPEC-TESTI.js — kartın (a)–(f) kabul ölçütlerini çalıştırılabilir spec olarak kilitler (tests/kao altında DEĞİL; kırmızı kalacağı için glob'u kirletmez).
+- options: A1 elif'i içeriğe al / A2 07 §2'yi veriye uydur / A3 elif'i sonraki karta bırak · B1 (f)'yi uygula + 3 fixture pini güncelle / B2 yeni S0 akışını ayrı yüzey yap (kapı dokunulmaz)
+- recommendation: B2 + A2/A3 (en düşük risk: çelişki doğurmadan öğretim değeri hayata geçer)
+- gates: KAO 38/38 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/contrast PASS
+- next: KAO2-21

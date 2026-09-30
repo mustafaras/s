@@ -6,7 +6,7 @@
   "branch": "kao2-yeniden-tasarim",
   "releaseApproval": "approved_through_KAO2-20",
   "nextCard": "KAO2-21",
-  "ledgerLastSeq": 75,
+  "ledgerLastSeq": 76,
   "decisionsAt": "2026-09-28",
   "decisions": {
     "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤88 KiB (2026-09-29 revizyonu: KAO2-18+ açıklama katmanı için 80→88); kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
@@ -15,7 +15,8 @@
     "turkishTextReviewer": "K-4: L0 otomatik kapılar (kaynak, imlâ, yasak ifade, elle Arapça yok) + L1 proje sahibi + L2 alan uzmanı (rol); draft görünmez, sourced/expert görünür",
     "readerQuietTime": "KAO2-19: okuma sesi uygulamanın genel sessiz saat kuralına (23:00-07:00) uyar; sessiz saatte çalma başlamaz, neden kullanıcıya söylenir.",
     "rootScopeGate": "KAO2-20: \"Kök aileleri\" keşif satırı yalnız kullanıcı en az bir kelime kartı edinince görünür (test_kao2_today \"ilgili kartlar gelene kadar gizli\" sözleşmesi).",
-    "contentBudgetNote": "KAO2-20 sonrası runtime 86.032/88 KiB (%98). Sonraki çalışma zamanı artışı kullanıcı onayı ister."
+    "contentBudgetNote": "KAO2-20 sonrası runtime 86.032/88 KiB (%98). Sonraki çalışma zamanı artışı kullanıcı onayı ister.",
+    "budgetRelief": "KAO2-21 hazırlık: runtime 86.032->84.745 KiB. Ölü kod (kaoTodasyStats/kaoUnitLabel/lemmaSurahId) + KAO_MAHREC_SVG içerik modülüne taşındı. İkinci bütçe artışı GEREKMEDİ."
   },
   "gates": {
     "G0": "closed",
@@ -143,8 +144,9 @@
     },
     "KAO2-21": {
       "wave": "W4",
-      "status": "todo",
-      "evidence": null
+      "status": "blocked",
+      "evidence": "kuran-ogreniyorum-v2/evidence/KAO2-21/BLOKAJ.md",
+      "note": "Bütçe engeli çözüldü (84.745/88). İki kullanıcı kararı bekliyor: (A) elif (ا) içerikte yok — 07 §2 ders 0.5 \"ا د ذ ر ز و\" der ama quranPhonicsV1.letters elif taşımaz; eklemek yeni içerik işi. (B) (f) kapıdaki 12 mini dersi kaldırmayı ister; test_kao_render:342 bunu sabitliyor."
     },
     "KAO2-22": {
       "wave": "W4",

@@ -1,6 +1,6 @@
 # KAO2 · A-1…A-12 kabul ölçütleri (ölçüm)
 
-Ölçüm: 2026-09-30T12:05:57Z · node tests/kao/test_kao2_kabul.js
+Ölçüm: 2026-09-30T13:10:17Z · node tests/kao/test_kao2_kabul.js
 
 | # | Ölçüt | Hedef | Ölçülen | Durum | Kanıt düzeyi |
 |---|---|---|---|---|---|
@@ -13,7 +13,7 @@
 | A-7 | Tasarım sözleşmesi (06 §7 tamamı) | weights≤4 · deco/uppercase/serif 0 · kontrast 0 ihlal | weights=2 uppercase=0 deco=0 serif=0 · kontrast 0 ihlal | ✅ PASS | Fixture |
 | A-8 | Cevap sonrası geri bildirim "Devam"a kadar görünür | %100 | cevap sonrası görünür=true · Devam sonrası gizli=true | ✅ PASS | Fixture |
 | A-9 | Mevcut test aileleri | hepsi yeşil | KAO 45 dosya · APP 77 dosya (+panel, panel-v2, quran, reminders) | ✅ PASS | Fixture |
-| A-10 | Bütçe ve süre (K-1) | runtime ≤128 · css ≤14 · content ≤256 · p95 ≤40 ms | runtime 92.431 · css 12.815 · content 177.657 · p95 6.424 ms | ✅ PASS | Fixture |
+| A-10 | Bütçe ve süre (K-1) | runtime ≤128 · css ≤14 · content ≤256 · p95 ≤40 ms | runtime 92.431 · css 12.815 · content 177.657 · p95 4.857 ms | ✅ PASS | Fixture |
 | P10 | `App.kaoOpen()` gerçek KAO eylemine ulaşır; IIP ayrı yüzey | shim → motor + ayrı yüzey | kaoOpen true · role=dialog · IIP bağımsız | ✅ PASS | Fixture |
 | A-11 | İlk hafta dönüş günleri ve ilk tekrar doğruluğu | ≥4/7 gün · ≥%80 | ölçülmedi | ⏳ | **Cihaz/kullanıcı** |
 | A-12 | "Şimdi ne yapmalıyım?" anı | 0 | ölçülmedi | ⏳ | **Cihaz/kullanıcı** |

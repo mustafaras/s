@@ -902,3 +902,13 @@ JS string kırılması, koşulsuz satır). **Bütçe %98 — sonraki kart için 
 - fixed: test lemması kapsamı · assert.match argüman tipi · kök ikilisinde hata kutusu (Y-11) · nullable start · izinli olmayan --kao-r-2 → --kao-r-ctl · panel iki anahtar listesi · fx2 iki sayaç yeri.
 - evidence-levels: kaynak/test PASS · yayın KAO2-25 sonrası · cihaz doğrulanmadı
 - next: KAO2-26
+
+## seq 82 · 2026-09-30 · CARD · KAO2-26
+- status: done
+- evidence: kuran-ogreniyorum-v2/evidence/KAO2-26/KANIT.md
+- scope: tests/kao/test_kao2_a11y.js (11 kontrol, 15 görünüm × boş/tohumlu): düğme erişilebilir adları · modal odak/kilit/dönüş sözleşmesi (backdrop odaklanamaz) · diyalog role/aria-modal · odak hedefi · aria-live (yalnız polite, panelde) · aria-current="step" · Arapça lang/dir · sabit px yükseklik yok (metin denetimleri min-height) · kontrast aracı JSON 726 çift 0 ihlal · odak halkası + ≥44px · dar genişlik/%200 metin koruması. Üretimde 20 denetim height→min-height.
+- gates: KAO 44/44 · app 77/77 · panel 23/23 · panel-v2 27/27 · quran 9/9 · reminders/driver/zikr/iip_22 PASS · contrast PASS
+- budget: runtime 92.431/128 · content 177.657/256 · css 12.815/14
+- pins: DEĞİŞMEDİ (App.kao* 42 · atama 601 · yüzey 763 · onclick 393)
+- fixed: line-height→line-min-height bozulması (10 yer + min-min-height) · aria-live için keyfi sayı sınırı → anlamlı kural · ^/$ çapalı regex yüzünden sessiz geçen yükseklik testi · kao-chip miras kalıntısı
+- next: KAO2-27

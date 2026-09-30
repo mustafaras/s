@@ -167,6 +167,79 @@
     items.push({id:'summary:'+lesson.id,kind:'summary',lessonId:lesson.id,lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),practiceCount:practice.length});
     return items;
   }
+  // K2F-05 (KR-1): ünite ustalık kontrolü — çapa metnini oku + 10 soruluk karma test. Saf; hiçbir durum yazmaz.
+  // Tohum unitId + gün: kararlılığı eşit kartların sırası günlük karışır ama aynı gün bayt-eşit kalır.
+  var MASTERY_ITEMS=10,MASTERY_CHOICES=4,MASTERY_DIRECTIONS=['ar>tr','tr>ar','audio>meaning'];
+  function hash32(text){
+    var h=2166136261;
+    for(var i=0;i<text.length;i+=1){ h^=text.charCodeAt(i); h=Math.imul(h,16777619)>>>0; }
+    return h>>>0;
+  }
+  function unitIntroducedLemmas(q,unit){
+    var seen=Object.create(null),out=[];
+    unit.lessons.forEach(function(lesson){
+      (Array.isArray(lesson.lemmaIds)?lesson.lemmaIds:[]).forEach(function(id){
+        if(typeof id!=='string'||!id||seen[id]) return;
+        if(introduced(q,id,lesson.id)){ seen[id]=true; out.push(id); }
+      });
+    });
+    return out;
+  }
+  function masteryRead(unit,content,q){
+    var anchors=Array.isArray(unit.anchor)?unit.anchor:[],used=[],words=[];
+    anchors.forEach(function(anchor){
+      var match=/^(prayer|surah):(.+)$/.exec(String(anchor));
+      if(!match) return;
+      var part=applyWords({id:'mastery:'+unit.id,apply:{kind:match[1],ref:match[1]==='surah'?Number(match[2]):match[2]}},content,q,[]);
+      if(!part.length) return;
+      used.push(String(anchor)); words=words.concat(part);
+    });
+    return used.length?{words:words,anchors:used}:null;
+  }
+  function masteryItem(q,unit,lemmaId,direction,round){
+    var audio=direction==='audio>meaning',reverse=direction==='tr>ar',card=obj(obj(q.cards)['w:'+lemmaId+':ar>tr']);
+    return {id:'mastery:'+unit.id+':'+lemmaId+':'+(audio?'audio':direction)+(round>0?':r'+round:''),kind:'practice',group:'lemma',mastery:true,unitId:unit.id,lemmaId:lemmaId,cardId:'w:'+lemmaId+':'+(reverse?'tr>ar':'ar>tr'),type:reverse?'arabic':'meaning',direction:direction,choiceCount:MASTERY_CHOICES,audioOnly:audio,isNew:!num(card.reps,0)};
+  }
+  function masteryPlan(snapshot,unitId,now,content){
+    checkNow(now);
+    var q=obj(obj(snapshot).quranLearn),c=content||{},unit=findUnit(c,unitId);
+    if(!unit) return null;
+    var ids=unitIntroducedLemmas(q,unit);
+    if(!ids.length) return null;
+    var seed=String(unit.id)+':'+dayKey(now);
+    var ranked=ids.map(function(id){ var card=cardFor(q,id); return {id:id,s:card?num(card.s,0):0,tie:hash32(seed+':'+id)}; })
+      .sort(function(a,b){ return a.s-b.s||a.tie-b.tie||(a.id<b.id?-1:(a.id>b.id?1:0)); })
+      .map(function(entry){ return entry.id; });
+    var practice=[];
+    for(var round=0;practice.length<MASTERY_ITEMS;round+=1){
+      var before=practice.length;
+      for(var d=0;d<MASTERY_DIRECTIONS.length;d+=1){
+        for(var i=0;i<ranked.length&&practice.length<MASTERY_ITEMS;i+=1){
+          if(MASTERY_DIRECTIONS[d]==='audio>meaning'&&!audioAvailable(c,ranked[i])) continue;
+          practice.push(masteryItem(q,unit,ranked[i],MASTERY_DIRECTIONS[d],round));
+        }
+      }
+      if(practice.length===before) break;
+    }
+    var items=[{id:'goal:mastery:'+unit.id,kind:'goal',mastery:true,unitId:unit.id,title:String(unit.title||''),lemmaIds:ids.slice(),newLemmaIds:[],apply:null}];
+    var anchor=masteryRead(unit,c,q);
+    if(anchor) items.push({id:'read:mastery:'+unit.id,kind:'read',mastery:true,unitId:unit.id,words:anchor.words,anchors:anchor.anchors});
+    items=items.concat(practice);
+    items.push({id:'summary:mastery:'+unit.id,kind:'summary',mastery:true,unitId:unit.id,lemmaIds:ids.slice(),newLemmaIds:[],practiceCount:practice.length});
+    return items;
+  }
+  // Ustalık kaydının tek yorumu: passed > skipped > repair > failed > none. Bozuk alanlar güvenli varsayılana düşer.
+  function unitMastery(q,unitId){
+    var record=obj(obj(obj(obj(q).path).units)[String(unitId)]);
+    var attempts=Math.max(0,Math.floor(num(record.attempts,0)));
+    var score=typeof record.masteryScore==='number'&&isFinite(record.masteryScore)?Math.max(0,Math.min(1,record.masteryScore)):null;
+    var repair=obj(record.repair),hasRepair=Array.isArray(repair.lemmaIds)&&repair.lemmaIds.length>0,state='none';
+    if(typeof record.masteryAt==='string'&&record.masteryAt) state='passed';
+    else if(typeof record.skippedAt==='string'&&record.skippedAt) state='skipped';
+    else if(hasRepair) state='repair';
+    else if(attempts>0) state='failed';
+    return {state:state,score:score,attempts:attempts};
+  }
   // 08 §1: ders tamamı türetilebilir — path kaydı ya da dersin tüm lemmalarının ar>tr kartı.
   function lessonProgress(q,lessonId,content){
     var lesson=curriculum(content).lessonById[lessonId],ids=lesson&&Array.isArray(lesson.lemmaIds)?lesson.lemmaIds:[],record=obj(lessonRecord(q,lessonId)),presented=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[];
@@ -271,5 +344,5 @@
   }
 
   window.SeymaQuranLearnFlow={version:1,createStack:createStack,openStack:openStack,push:push,reset:reset,replaceTop:replaceTop,current:current,previous:previous,back:back,
-    curriculum:curriculum,lessonOf:lessonOf,lessonProgress:lessonProgress,unitProgress:unitProgress,nextStep:nextStep,lessonPlan:lessonPlan,estimateMinutes:estimateMinutes};
+    curriculum:curriculum,lessonOf:lessonOf,lessonProgress:lessonProgress,unitProgress:unitProgress,nextStep:nextStep,lessonPlan:lessonPlan,masteryPlan:masteryPlan,unitMastery:unitMastery,estimateMinutes:estimateMinutes};
 })(window);

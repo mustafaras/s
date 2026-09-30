@@ -131,3 +131,24 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: iCloud kopyaları (seq 12). `A-KABUL.md` artık hiçbir test koşusunda değişmiyor; `kapilar.sh` yedek/geri koyma bloğu kaldırıldı.
 - next: K2F-05
+
+## seq 14 · 2026-09-30 · NOTE · K2F-05
+- summary: Kullanıcı isteğiyle ikinci erken yayın (K2F-04 sonrası): `main` ff-only `f0e8b1c1..430539ec`, Pages run 36747169978 success. Yayınlanan varlık değişmedi (yalnız belge/test/araç commit'leri) → pin `20260930m` korundu.
+- verified: canlı 5/5 bayt-eşit (quranLearn.js, quranLearnFlow.js, kao.css, sw.js, index.html), `kao2-duzeltme/FIX-STATE.json` ve `tests/kao/test_kao2_kabul.js` 404; `SW_VERSION='20260930m'`.
+- note: geçmişte 15 iCloud kopyası içeren `5e0665bd` artık `origin/main` geçmişinde (sonraki `945e37bd` kaldırdı); yalnız `kao2-duzeltme/` belge kopyaları, yayın dışı. `releaseApproval` `approved_through_K2F-03` kalır (yayın kapsamı değişmedi).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
+- next: K2F-06
+
+## seq 15 · 2026-09-30 · PROMPT · K2F-05
+- status: done
+- title: Ustalık 1/4 — saf masteryPlan
+- prev-commit: 430539ec
+- evidence: kao2-duzeltme/evidence/K2F-05/KANIT.md
+- closes: K4-01 (1/4)
+- repro: değişmedi · toplam 2/10 (R-01/R-02 K2F-06'da)
+- gates: kapilar.sh YEŞİL (kao 48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20260930m
+- changed-tests: yok
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: read öğesi çapa dizisindeki (Ünite 2: 6 namaz metni, Ünite 3: 3 sûre) tüm prayer:/surah: girdilerini birleştirir; lemma-pool çapalı ünitelerde read yoktur. Practice kimlikleri `mastery:<ünite>:<lemma>:<yön>[:r<tur>]`; <10 lemmada yönler turlanır. runtime 92,439 → 93,633 KiB.
+- next: K2F-06

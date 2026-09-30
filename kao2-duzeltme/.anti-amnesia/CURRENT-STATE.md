@@ -1,30 +1,32 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-05
-lastSeq: 13
+nextPrompt: K2F-06
+lastSeq: 15
 status: active
 -->
 
-Son güncelleme: 2026-09-30 · LEDGER seq 13 · K2F-00…04 tamam (5/44), sıradaki K2F-05. R-09, R-10 PASS (2/10).
+Son güncelleme: 2026-09-30 · LEDGER seq 15 · K2F-00…05 tamam (6/44), sıradaki K2F-06. R-09, R-10 PASS (2/10).
 
 ## Şu an neredeyiz
-K2F-04 bitti: `test_kao2_kabul.js` raporu yalnız `KAO2_EVIDENCE_OUT=<yol>` ile yazar, aksi hâlde stdout'a basar;
-`kapilar.sh` A-KABUL yedek bloğu kaldırıldı; test koşusu ağacı kirletmiyor. W0 (hazırlık) tamam. Plan dışı erken yayın
-K2F-03 sonrası yapıldı (main `f0e8b1c1`, pin `20260930m`; LEDGER seq 10–11). iCloud çakışma kopyaları temizlendi (seq 12).
+K2F-05 bitti (Dalga 1, acil): `quranLearnFlow.js`'e saf `masteryPlan(snapshot, unitId, now, content)` ve
+`unitMastery(q, unitId)` eklendi; `tests/kao/test_kao2_mastery.js` bölüm A 17 kontrol PASS. Canlı `main` = `430539ec`
+(ikinci erken yayın, LEDGER seq 14; pin `20260930m`, yayınlanan varlık değişmedi). Canlıda Ünite 1 ustalığı hâlâ
+kilitli: plan kurulu ama `kaoLessonStart` henüz onu kullanmıyor (K2F-06).
 
 ## Sıradaki promptun tek cümlesi
-**K2F-05 (Dalga 1, acil):** `app/core/quranLearnFlow.js`'e saf `masteryPlan(snapshot, unitId, now, content)` ve
-`unitMastery(q, unitId)` ekle (sıra goal → [read] → 10 × practice → summary; practice `mastery:true`, `choiceCount:4`,
-yalnız tanışılmış lemmalar, en zayıftan; belirlenimci; tanışılmış lemma 0 ise `null`); önce `tests/kao/test_kao2_mastery.js`
-bölüm A kırmızı; Flow saflığı korunur, runtime bütçesi tavan 128 KiB.
+**K2F-06:** `app/core/quranLearn.js`'te `kaoLessonStart` ünite kimliğini `masteryPlan` ile ustalık oturumu olarak
+açsın (`ui.kaoLesson.kind==='mastery'`, "son içerik dersine düş" geri dönüşü kalksın), bitişte
+`path.units[id]={masteryAt,masteryScore,attempts,lastAttemptAt,repair,skippedAt}` yazsın (eşik 0,8; ders kaydı yazılmaz),
+`ensureQuranLearn` bu alanları yalnız-ekleme ile normalize etsin; `test_kao2_mastery.js` bölüm B (harness ile gerçek
+handler) + `test_kao2_migration.js`; R-01 ve R-02 fail→pass.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
-- Dal: `kao2-duzeltme`; canlı `main` = `f0e8b1c1`. Sonraki push yalnız K2F-18/43 onay kapılarında.
-- Yayın pini (canlı): `20260930m` (öncesi `20260930l`) · `main` = `f0e8b1c1` (kao2-duzeltme dalı yalnız kanıt belgeleriyle ileride) · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
-- Kapılar: KAO 47/47 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
+- Dal: `kao2-duzeltme` = `main` (canlı `430539ec`) + K2F-05. Sonraki push yalnız K2F-18/43 onay kapılarında.
+- Yayın pini (canlı): `20260930m` (öncesi `20260930l`) · canlı `main` = `430539ec` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
+- Kapılar: KAO 48/48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **2/10 PASS** (R-09, R-10); kalan R-01…R-08 FAIL (beklenen).
-- Bütçe (perf): içerik 177,657 KiB · runtime 92,439 KiB (+0,008) · css 12,815 KiB · p95 4,34 ms.
+- Bütçe (perf): içerik 177,657 KiB · runtime 93,633 KiB (tavan 128) · css 12,815 KiB · p95 4,34 ms.
 
 ## Açık riskler
 - Canlı kullanıcı Ünite 1 ustalığında kilitli (K4-01) ve gramer görevleri yanlış öğretiyor (K4-02) → Dalga 1 önceliklidir.

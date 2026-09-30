@@ -32,11 +32,11 @@ korunur.
 | 0.2 | Nokta ailesi: ب ت ث ن ي | Tek gövde, noktalar ayırır | Hece okuma |
 | 0.3 | Esre ve ötre | Kesra, damme; hece üçlüsü | بَ بِ بُ |
 | 0.4 | Çengel ailesi: ج ح خ | Boğaz sesleri (T0 ile bağ) | Hece + dinle-seç |
-| 0.5 | Bağlanmayan harfler: ا د ذ ر ز و | Sonraki harfe bağlanmayan 6 harf | Kelime birleştirme |
+| 0.5 | Bağlanmayan harfler: د ذ ر ز و | Sonraki harfe bağlanmayan harfler (hemze dâhil) | Kelime birleştirme |
 | 0.6 | Dişli aile: س ش ص ض | İnce/kalın ayrımı | Minimal çift dinleme |
 | 0.7 | Konum şekilleri | Başta / ortada / sonda / tek (tablo, 28 harf) | Aynı harfi dört yerde bul |
 | 0.8 | Sükûn ve kapalı hece | Cezm; iki harfli heceler | مِنْ, لَمْ |
-| 0.9 | Uzatma (med) ve şedde | ا و ي ile uzun ünlü; şedde = çift harf | رَبِّ, ٱللَّه |
+| 0.9 | Uzatma (med) ve şedde | elif ا, vav و, ye ي taşıyıcılarıyla uzun ünlü; şedde = çift harf | رَبِّ, ٱللَّه |
 | 0.10 | Kalan harfler: ط ظ ع غ ف ق ك ل م ه ة ء | İki grup, ses odaklı | Kelime okuma |
 | 0.11 | Tenvin, elif-lâm, vasıl | -an/-in/-un; şemsî/kamerî | ٱلرَّحْمَٰن, ٱلْحَمْدُ |
 | 0.12 | İlk okuma provası | Besmele ve Fâtiha'nın ilk âyeti, dinlerken oku | **Besmele'yi kendin oku** |
@@ -149,3 +149,9 @@ Seçenekler (W0'da kullanıcı kararı):
 1. Bütçeyi 180 KB'a çıkar (önerilen; tek modül, çevrimdışı tam).
 2. Müfredat modülünü ilk açılışta tembel yükle (karmaşıklık + çevrimdışı risk).
 3. Mevcut içerikten budama (önerilmez).
+
+> **Uzlaştırma (2026-09-30, KAO2-21/22 geri bildirimi):** `elif (ا)` donmuş
+> `QuranPhonicsV1.letters` kümesinde (28 harf) **yer almaz**; med taşıyıcısı olarak
+> ders **0.9**'da tanıtılır ve hece sesi adında ayrı taşıyıcı kimliği (`alef`) alır
+> (`y-alef_madd_alef-m`). 0.5'teki bağlanmayan küme **veriyle birebir** hâle
+> getirildi (dal, zel, re, ze, vav + hemze); uydurma harf eklenmedi.

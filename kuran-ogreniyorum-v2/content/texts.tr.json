@@ -23,7 +23,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -40,7 +41,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -58,7 +60,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -75,7 +78,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -92,7 +96,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -109,7 +114,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -126,7 +132,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -143,7 +150,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -160,7 +168,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -177,7 +186,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -194,7 +204,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     },
@@ -211,7 +222,8 @@
         ],
         "whyReview": {
           "level": "draft",
-          "pending": "L2"
+          "l0": "pass",
+          "at": "2026-09-30"
         }
       }
     }
@@ -1318,175 +1330,732 @@
       "workedTr": "Örnek: \"yükseltiyor İbrahim temelleri\" → önce iş, sonra yapan, sonra etkilenen.",
       "errorTr": "Sırayı Türkçedeki gibi kurma; önce işin (fiilin) geldiğini düşün.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g1": {
       "workedTr": "Örnek: \"kitap\" belirsiz → \"bir kitap\"; başına \"el\" gelince \"o kitap\".",
       "errorTr": "Baştaki \"el\"i kelimenin parçası sanma; \"o bilinen\" anlamı kattığını anımsa.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g2": {
       "workedTr": "Örnek: \"hesap gününün sahibi\" → iki isim yan yana; ikincisi birincisini tamamlar.",
       "errorTr": "Tamlamayı Türkçedeki \"-nın … -ı\" bağı olarak oku; kelimeleri ayrı ayrı çevirme.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g3": {
       "workedTr": "Örnek: \"-de/-den/-e\" anlamı Arapçada kelimenin önündeki küçük kelimeyle verilir.",
       "errorTr": "Bu anlamı kelime sonunda arama; cümlenin başındaki küçük kelimeye bak.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g4": {
       "workedTr": "Örnek: \"o, onlar, sen, biz\" tek başına duran kısa kelimelerdir; fiile yapışmaz.",
       "errorTr": "Zamiri fiilin içinde arama; cümlede ayrı duran kısa kelimeyi bul.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g5": {
       "workedTr": "Örnek: \"-ı, -leri, -in, -im\" kelimenin sonuna yapışır ve sahibini gösterir.",
       "errorTr": "Eki kelimenin başında arama; sondaki parçaya bak.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g6": {
       "workedTr": "Örnek: \"yok, değil, -me\" anlamını üç ayrı olumsuzluk kelimesi taşır.",
       "errorTr": "Olumsuzluğu fiilin içinde arama; cümledeki ayrı olumsuzluk kelimesini bul.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g7": {
       "workedTr": "Örnek: \"-an, -en, ki o\" bağları Arapçada ayrı kelimelerle kurulur.",
       "errorTr": "Bağı Türkçedeki gibi ekle arama; cümledeki ayrı bağ kelimesini gör.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g8": {
       "workedTr": "Örnek: \"şüphesiz\" vurgusu bir kelimeyle, \"ancak\" sınırlaması başka bir kelimeyle yapılır.",
       "errorTr": "Vurgu ile sınırlamayı karıştırma; hangisinin pekiştirdiğini, hangisinin daralttığını düşün.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g9": {
       "workedTr": "Örnek: yakın için \"bu\", uzak için \"o\"; ikisi de tek başına durur.",
       "errorTr": "İşaret kelimesini ismin eki sanma; ayrı duran kelimeyi bul.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g10": {
       "workedTr": "Örnek: \"Allah Samed\" → \"Allah Samed'dir\". \"-dır\" yazılmaz, cümle yine tamdır.",
       "errorTr": "Cümlede \"-dır\" arama; iki isim yan yana geldiyse cümle tamamdır.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g11": {
       "workedTr": "Örnek: sondaki yuvarlak \"te\" kelimenin dişil olduğunu gösterir.",
       "errorTr": "Sondaki yuvarlak işareti süs sanma; kelimenin türünü değiştirdiğini anımsa.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g12": {
       "workedTr": "Örnek: çoğul ya sona ek gelir ya da kelimenin içi değişir.",
       "errorTr": "Çoğulu yalnız eke bakarak arama; kelimenin içinin de değişebileceğini düşün.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g13": {
       "workedTr": "Örnek: \"yaptı → yaptılar → yaptım\" aynı kökten son ekle kurulur.",
       "errorTr": "Zamanı kökten ayırma; son eklerin kişiyi değiştirdiğini gör.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g14": {
       "workedTr": "Örnek: \"idi, oldu\" anlamı veren fiil, ardından gelen fiile \"-ıyordu\" rengi katar.",
       "errorTr": "İki fiili iki ayrı zaman sanma; yardımcı fiilin zamanı taşıdığını anımsa.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g15": {
       "workedTr": "Örnek: \"yapar, yapıyor\" anlamı fiilin başına gelen bir harfle kurulur.",
       "errorTr": "Şimdiki zamanı son ekte arama; fiilin başındaki harfe bak.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g16": {
       "workedTr": "Örnek: aynı fiil üç olumsuzlukla üç ayrı zaman anlatır: yapmaz, yapmadı, asla yapmayacak.",
       "errorTr": "Üç olumsuzluğu aynı sanma; hangi zamanı anlattığını ayırt et.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g17": {
       "workedTr": "Örnek: \"dersin\" → \"de!\"; emir, şimdiki zaman fiilinin başı atılarak kurulur.",
       "errorTr": "Emri ayrı bir kelime sanma; şimdiki zaman fiilinden türediğini düşün.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g18": {
       "workedTr": "Örnek: seslenmek için \"ey\" kullanılır; \"el\"li kelimeden önce ikili biçim gelir.",
       "errorTr": "Seslenmeyi cümlenin parçası sanma; kendinden sonraki ismi işaret ettiğini gör.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g19": {
       "workedTr": "Örnek: aynı kökten \"yazan\" ve \"yazılan\" türer; biri yapanı, biri yapılanı gösterir.",
       "errorTr": "Kalıbı rastgele seçme; kelimenin yapan mı yapılan mı olduğunu sor.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g20": {
       "workedTr": "Örnek: \"bildi\" fiilinden \"bilme, bilgi\" adı türer.",
       "errorTr": "Fiille adını aynı sanma; adın işi değil, işin kendisini gösterdiğini anımsa.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g21": {
       "workedTr": "Örnek: \"bildi\" → \"öğretti\"; kalıp değişince anlam kayar.",
       "errorTr": "Kökü tanıyıp anlamı aynı sanma; kalıbın anlamı kaydırdığını düşün.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g22": {
       "workedTr": "Örnek: \"eğer … -se\", \"-dığı zaman\", \"-seydi (ama olmadı)\" ayrı kelimelerle kurulur.",
       "errorTr": "Şartı tek kalıp sanma; gerçekleşmiş, gerçekleşmemiş ve zaman anlamlarını ayır.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g23": {
       "workedTr": "Örnek: \"idi, değildir\" gibi fiiller cümleye zaman ve durum rengi verir.",
       "errorTr": "Bu fiilleri asıl iş sanma; cümlenin rengini belirlediklerini gör.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
       }
     },
     "g24": {
       "workedTr": "Örnek: bazı söz kalıpları sık tekrarlanır; kalıbı tanıyınca cümle bütün olarak açılır.",
       "errorTr": "Kelime kelime çevirip kalıbı kaçırma; tekrarlanan bütünü tanımaya çalış.",
       "review": {
-        "level": "draft"
+        "level": "draft",
+        "sources": [
+          "grammar-plain"
+        ],
+        "derivedFrom": [
+          "QuranGrammarV1.plainTr"
+        ],
+        "at": "2026-09-30"
+      }
+    }
+  },
+  "surahs": {
+    "114": {
+      "contextTr": "Nâs, Mekke'de indi ve 6 âyetten oluşur. Ana tema: İnsanların Rabbine sığınma: içe fısıldayan vesveseye karşı.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "113": {
+      "contextTr": "Felak, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Şafağın Rabbine sığınma: karanlık, haset ve gizli kötülüğe karşı.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "112": {
+      "contextTr": "İhlâs, Mekke'de indi ve 4 âyetten oluşur. Ana tema: Tevhidin özü: eşsiz olan; doğmamış ve doğurmamış olan.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "111": {
+      "contextTr": "Tebbet (Mesed), Mekke'de indi ve 5 âyetten oluşur. Ana tema: Davete düşmanlıkta direnen bir tutumun akıbetini anlatan kısa sûre.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "110": {
+      "contextTr": "Nasr, Medine'de indi ve 3 âyetten oluşur. Ana tema: Yardım ve fetih geldiğinde tesbih, hamd ve istiğfar.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "109": {
+      "contextTr": "Kâfirûn, Mekke'de indi ve 6 âyetten oluşur. Ana tema: İnançta net sınır: “sizin dininiz size, benim dinim bana”.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "108": {
+      "contextTr": "Kevser, Mekke'de indi ve 3 âyetten oluşur. Ana tema: Verilen bol hayır; namaz, kurban ve kesintiye uğramayan hat.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "107": {
+      "contextTr": "Mâûn, Mekke'de indi ve 7 âyetten oluşur. Ana tema: Dini yalanlamanın işaretleri: yetimi itmek, namazdan gafil olmak, yardımı esirgemek.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "106": {
+      "contextTr": "Kureyş, Mekke'de indi ve 4 âyetten oluşur. Ana tema: Güvenli yolculuklar ve açlıktan doyuran Ev sahibine kulluk.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "105": {
+      "contextTr": "Fîl, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Fil sahiplerinin planının boşa çıkarılışı.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "104": {
+      "contextTr": "Hümeze, Mekke'de indi ve 9 âyetten oluşur. Ana tema: Arkadan çekiştiren, mal yığıp ölümsüzlük sanan tutumun sonu.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "103": {
+      "contextTr": "Asr, Mekke'de indi ve 3 âyetten oluşur. Ana tema: Zamana yeminle hüsranın istisnası: iman, sâlih amel, hak ve sabır.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "102": {
+      "contextTr": "Tekâsür, Mekke'de indi ve 8 âyetten oluşur. Ana tema: Çoklukla övünmenin oyalayıcılığı ve nimetten hesaba çekiliş.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "101": {
+      "contextTr": "Kâria, Mekke'de indi ve 11 âyetten oluşur. Ana tema: Kapı çalan gün; tartısı ağır ve hafif gelenler.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "100": {
+      "contextTr": "Âdiyât, Mekke'de indi ve 11 âyetten oluşur. Ana tema: Koşan atlar sahnesiyle insanın nankörlüğü ve gizlinin açığa çıkışı.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "99": {
+      "contextTr": "Zilzâl, Medine'de indi ve 8 âyetten oluşur. Ana tema: Yerin sarsılışı ve zerre ağırlığınca amelin görülmesi.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "98": {
+      "contextTr": "Beyyine, Medine'de indi ve 8 âyetten oluşur. Ana tema: Apaçık delil, ayrışma ve hâlis kulluk.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "97": {
+      "contextTr": "Kadir, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Bin aydan hayırlı gece ve inişin bereketi.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "96": {
+      "contextTr": "Alak, Mekke'de indi ve 19 âyetten oluşur. Ana tema: Yaratılış ve “oku” çağrısıyla açılan ilk vahiy bölümü; kalem, bilgi ve azgınlığın sınırı.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "95": {
+      "contextTr": "Tîn, Mekke'de indi ve 8 âyetten oluşur. Ana tema: İncir ve zeytin yemini; en güzel biçimde yaratılan insanın iki ucu.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
       }
     }
   }

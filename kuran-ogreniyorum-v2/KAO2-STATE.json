@@ -9,7 +9,7 @@
   "ledgerLastSeq": 78,
   "decisionsAt": "2026-09-28",
   "decisions": {
-    "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤88 KiB (2026-09-29 revizyonu: KAO2-18+ açıklama katmanı için 80→88); kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
+    "contentBudget": "K-1: içerik gzip toplam ≤256 KiB (curriculumV2 ≤48, mevcut 4 modül ≤164); runtime quranLearn* ≤128 KiB (2026-09-30 revizyonu 2, kullanıcı yetkisi: kalan kartlar için 88→128); kao.css ≤14 KiB; ses ≤24 MB; vm değerlendirme p95 ≤40 ms ve taban +%25",
     "fileSplit": "K-2: üçe böl — quranLearnFlow.js (saf) → quranLearnViews.js (saf HTML) → quranLearn.js (motor); dört liste aynı committe; .claude/skills dosyaları yalnız Edit aracıyla, izin yoksa BLOCKED",
     "syllableAudioSource": "K-3: A) nitelikli muallim, iki ses, stüdyo protokolü, CC BY 4.0 / süresiz izin; B) geçici: harf gerçek kelime içinde (mevcut klipler); C) TTS/sentetik/lisanssız/âyetten hece kesme yasak",
     "turkishTextReviewer": "K-4: L0 otomatik kapılar (kaynak, imlâ, yasak ifade, elle Arapça yok) + L1 proje sahibi + L2 alan uzmanı (rol); draft görünmez, sourced/expert görünür",

@@ -631,3 +631,9 @@ kodu gerektiriyor; 80 KiB sınırında yalnız 615 bayt boşluk kalmıştı. Kap
 | KAO2-11 | `kaoOnboard` | 39 |
 | KAO2-12 | `kaoLesson` | 40 |
 | diğerleri | — (yeni handler yasak; mevcutlar yeniden kullanılır) | 40 |
+
+> **K-1 revizyonu 2 (2026-09-30, kullanıcı yetkisi: "bütçeyi istediğin kadar arttırabilirsin"):**
+> çalışma zamanı tavanı **88 → 128 KiB**. Gerekçe: kalan KAO2 kartları (Ayarlar S-13,
+> İlerleme S-12, Kelime v2 S-08 + panel aynası, erişilebilirlik) gerçek çalışma
+> zamanı kodu gerektirir; 128 KiB ~40 KiB pay verir ve tek dosya düzenini korur.
+> Ölçüm: KAO2-22 sonrası 87.9 KiB (dosya tabanı ~71.8 KiB).

@@ -260,6 +260,20 @@ function build(spec, content, texts) {
       } : null
     };
   }
+  // KAO2-19 · 20 kısa sûrenin bağlamı. K-4: yalnız `sourced`/`expert` görünür;
+  // `draft` metin render'da GİZLENİR (kaoReaderContext null döner).
+  const surahs = {};
+  for (const [id, entry] of Object.entries((texts.surahs && typeof texts.surahs === 'object') ? texts.surahs : {})) {
+    const review = entry.review && typeof entry.review === 'object' ? entry.review : { level: 'draft' };
+    surahs[id] = {
+      contextTr: typeof entry.contextTr === 'string' && entry.contextTr ? entry.contextTr : null,
+      derivedFrom: Array.isArray(entry.derivedFrom) ? entry.derivedFrom.slice() : [],
+      review: {
+        level: ['sourced', 'expert'].includes(review.level) ? review.level : 'draft',
+        sources: Array.isArray(review.sources) ? review.sources.slice() : []
+      }
+    };
+  }
   const s0 = { lessons: spec.s0.map((title, i) => {
     const id = `s0.${pad(i + 1)}`;
     const text = textFor(texts, id, title, '', 's0');
@@ -267,7 +281,7 @@ function build(spec, content, texts) {
   }), letters: s0Letters };
   const missing = content.lex.lemmas.filter((l) => !lemmaToLesson[l.id]);
   if (missing.length) fail(`derse girmeyen lemma: ${missing[0].id}`);
-  return { version: spec.version, levels, units, s0, lemmaToLesson };
+  return { version: spec.version, levels, units, s0, surahs, lemmaToLesson };
 }
 
 function renderModule(data) {

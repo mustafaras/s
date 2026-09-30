@@ -27,7 +27,10 @@ assert.ok(legacyGzip <= 164 * 1024, `legacy ${legacyGzip} bytes exceeds 164 KiB`
 assert.ok(gzip([curriculum]) <= 48 * 1024, 'curriculum exceeds 48 KiB');
 // K-1 revizyonu (2026-09-29, kullanıcı onayı): KAO2-18+ açıklama/örnek katmanı
 // çalışma zamanı kodu gerektiriyor; bütçe 80 -> 88 KiB.
-assert.ok(runtimeGzip <= 88 * 1024, 'runtime exceeds 88 KiB');
+// K-1 revizyonu 2 (2026-09-30, kullanıcı yetkisi "istediğin kadar arttır"): 88 -> 128 KiB.
+// Gerekçe: KAO2 kalan kartları (Ayarlar, İlerleme, Kelime v2+panel, a11y) gerçek
+// çalışma zamanı kodu gerektirir; 128 KiB pay ~40 KiB verir ve tek dosyada kalır.
+assert.ok(runtimeGzip <= 128 * 1024, 'runtime exceeds 128 KiB');
 assert.ok(cssGzip <= 14 * 1024, 'css exceeds 14 KiB');
 const sources = content.concat(runtime).map((file) => ({ file, source: read(file).toString('utf8') }));
 const samples = [];

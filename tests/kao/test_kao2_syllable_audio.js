@@ -147,14 +147,14 @@ check('(2) ffmpeg yoksa açık hata; sessizce geçmez', () => {
 });
 
 check('(2) klip yoksa awaiting-recording; kayıt UYDURULMAZ', () => {
-  const r = runTool(['--check', '--source', path.join(repoRoot, 'kuran-ogreniyorum-v2/evidence')]);
+  const r = runTool(['--check', '--source', path.join(repoRoot, 'archive/kuran-ogreniyorum-v2/evidence')]);
   assert.equal(r.code, 0, 'boş dizin hata değil, durum bildirir');
   assert.match(r.out, /awaiting-recording/, 'kayıt beklediğini söyler');
   assert.match(r.out, /kayıt bekliyor/i, 'Türkçe açıklama');
 });
 
 check('(2) var olmayan kaynak dizini net hata verir', () => {
-  const r = runTool(['--check', '--source', path.join(repoRoot, 'kuran-ogreniyorum-v2/__yok__')]);
+  const r = runTool(['--check', '--source', path.join(repoRoot, 'archive/kuran-ogreniyorum-v2/__yok__')]);
   assert.notEqual(r.code, 0, 'var olmayan dizinde başarısız');
   assert.match(r.out, /kaynak bulunamadı/i, 'nedeni söyler');
 });

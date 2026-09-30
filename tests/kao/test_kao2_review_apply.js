@@ -18,9 +18,9 @@ const { execFileSync } = require('node:child_process');
 const repoRoot = require('../repo-root');
 
 const TOOL = path.join(repoRoot, 'tools/kao2-curriculum-build.mjs');
-const SHEET_17 = 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md';
-const SHEET_18 = 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-18.md';
-const TEXTS = 'kuran-ogreniyorum-v2/content/texts.tr.json';
+const SHEET_17 = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md';
+const SHEET_18 = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md';
+const TEXTS = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
 
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };

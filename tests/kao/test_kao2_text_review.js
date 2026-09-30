@@ -1,7 +1,7 @@
 'use strict';
 
 // KAO2-17 · K-4 L0 otomatik kapılar. Sentetik VM; tarayıcı, ağ, gerçek veri yok.
-// Kapsam: docs/kuran-ogreniyorum-v2/UYGULAMA-PROMPTLARI.md KAO2-17 (a)–(f).
+// Kapsam: archive/kuran-ogreniyorum-v2/UYGULAMA-PROMPTLARI.md KAO2-17 (a)–(f).
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -91,7 +91,7 @@ check('(d) elle Arapça yok: metinler Arapça karakter taşımaz', () => {
   for (const text of all) {
     assert.doesNotMatch(String(text), /[\u0600-\u06ff]/, `metinde elle Arapça var: ${text}`);
   }
-  const src = fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum-v2/content/texts.tr.json'), 'utf8');
+  const src = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8');
   assert.doesNotMatch(src, /[\u0600-\u06ff]/, 'metin kaynağı Arapça karakter taşımaz');
 });
 
@@ -110,7 +110,7 @@ check('(e) her metinde review kaydı; by yalnız rol kodu', () => {
 check('(f) [KAYNAK?] işareti kalmamış', () => {
   const all = [...units.flatMap(unitText), ...lessons.flatMap(lessonText)];
   for (const text of all) assert.doesNotMatch(String(text), /\[KAYNAK\?\]/, `metinde [KAYNAK?] kaldı: ${text}`);
-  const src = fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum-v2/content/texts.tr.json'), 'utf8');
+  const src = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8');
   assert.doesNotMatch(src, /\[KAYNAK\?\]/, 'metin kaynağında [KAYNAK?] kaldı');
 });
 
@@ -147,9 +147,9 @@ check('sourced/expert görünür; dinî bağlamlı olanda "Kaynak:" satırı var
 });
 
 check('inceleme sayfası ve metin kaynağı mevcut', () => {
-  assert.ok(fs.existsSync(path.join(repoRoot, 'kuran-ogreniyorum-v2/content/texts.tr.json')), 'texts.tr.json var');
-  assert.ok(fs.existsSync(path.join(repoRoot, 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md')), 'INCELEME-KAO2-17.md var');
-  const sheet = fs.readFileSync(path.join(repoRoot, 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md'), 'utf8');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json')), 'texts.tr.json var');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md')), 'INCELEME-KAO2-17.md var');
+  const sheet = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md'), 'utf8');
   for (const u of units) assert.ok(sheet.includes(`Ünite ${u.id}`), `inceleme sayfası: Ünite ${u.id}`);
   assert.ok(sheet.includes('- [ ]'), 'onay kutuları var');
 });

@@ -84,6 +84,7 @@ jobs:
             --exclude 'ilham-ibadet-premium-plan' \
             --exclude 'kuran-ogreniyorum' \
             --exclude 'kuran-ogreniyorum-v2' \
+            --exclude 'kao2-duzeltme' \
             --exclude 'jev-gate' \
             --exclude '_site' \
             --exclude '*.md' \
@@ -112,7 +113,7 @@ jobs:
           done
           [ -z "$(find _site -name '*.md' -print -quit)" ] || { echo "_site icinde .md kaldi"; exit 1; }
           for d in docs tests archive .claude tools files \
-                   ilham-ibadet-premium-plan kuran-ogreniyorum kuran-ogreniyorum-v2 jev-gate; do
+                   ilham-ibadet-premium-plan kuran-ogreniyorum kuran-ogreniyorum-v2 kao2-duzeltme jev-gate; do
             [ ! -e "_site/$d" ] || { echo "_site icinde $d kaldi"; exit 1; }
           done
           echo "runtime guard OK"

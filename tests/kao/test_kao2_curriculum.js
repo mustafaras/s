@@ -12,8 +12,8 @@ const { execFileSync } = require('node:child_process');
 const root = require('../repo-root');
 
 const MODULE = 'app/content/quranCurriculumV2.js';
-const REVIEW = 'kuran-ogreniyorum-v2/inceleme/MUFREDAT-ESLEME.md';
-const SPEC = 'kuran-ogreniyorum-v2/content/curriculum.spec.json';
+const REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md';
+const SPEC = 'docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json';
 const TOOL = 'tools/kao2-curriculum-build.mjs';
 const read = (file) => fs.readFileSync(path.join(root, file));
 

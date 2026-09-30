@@ -43,7 +43,7 @@
       "title": "İzole hece sesleri (K-3 kademe A)",
       "status": "awaiting-recording",
       "sourceRefs": [
-        "kuran-ogreniyorum-v2/10-KARARLAR.md#K-3"
+        "archive/kuran-ogreniyorum-v2/10-KARARLAR.md#K-3"
       ],
       "reason": "İzole hece (بَ بِ بُ) Kur'an'da kelime olarak geçmez; âyet kaydından kesmek ses geçişlerini bozar. TTS yasak (K-3 kademe C). Yalnız nitelikli insan kaydı.",
       "voices": [

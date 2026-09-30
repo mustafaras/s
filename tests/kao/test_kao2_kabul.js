@@ -279,6 +279,6 @@ md.push('| A-11 | İlk hafta dönüş günleri ve ilk tekrar doğruluğu | ≥4/
 md.push('| A-12 | "Şimdi ne yapmalıyım?" anı | 0 | ölçülmedi | ⏳ | **Cihaz/kullanıcı** |');
 const p10 = rows.filter((r) => r.id === 'P10');
 if (p10.length) md.push('', '## P10 kapanış kabulü', '', '| Kontrol | Ölçülen | Durum |', '|---|---|---|', `| ${p10[0].label} | ${p10[0].value} | ${p10[0].pass ? '✅ PASS' : '❌ FAIL'} |`);
-fs.writeFileSync(path.join(repoRoot, 'kuran-ogreniyorum-v2/evidence/KAO2-27/A-KABUL.md'), md.join('\n') + '\n');
+fs.writeFileSync(path.join(repoRoot, 'archive/kuran-ogreniyorum-v2/evidence/KAO2-27/A-KABUL.md'), md.join('\n') + '\n');
 const fixtureRows = rows.filter((r) => r.id.startsWith('A-'));
 console.log(`KAO2-27 kabul: ${fixtureRows.filter((r) => r.pass).length}/${fixtureRows.length} ölçüt PASS · P10 kapanış kabulü PASS (A-11/A-12 cihazda)`);

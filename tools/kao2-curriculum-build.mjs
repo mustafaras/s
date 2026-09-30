@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // KAO2-07 müfredat derleyici. Girdi: curriculum.spec.json (Arapça yok) + donmuş
 // KAO içerik modülleri. Çıktı: app/content/quranCurriculumV2.js ve
-// kuran-ogreniyorum-v2/inceleme/MUFREDAT-ESLEME.md. Belirlenimci: zaman damgası
+// docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md. Belirlenimci: zaman damgası
 // yok, sıralama yalnız veriye bağlı; ağ, tarayıcı ve kullanıcı verisi yok.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -9,12 +9,12 @@ import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SPEC = 'kuran-ogreniyorum-v2/content/curriculum.spec.json';
+const SPEC = 'docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json';
 const OUT_MODULE = 'app/content/quranCurriculumV2.js';
-const OUT_REVIEW = 'kuran-ogreniyorum-v2/inceleme/MUFREDAT-ESLEME.md';
-const TEXTS = 'kuran-ogreniyorum-v2/content/texts.tr.json';
-const OUT_TEXT_REVIEW = 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-17.md';
-const OUT_CONCEPT_REVIEW = 'kuran-ogreniyorum-v2/inceleme/INCELEME-KAO2-18.md';
+const OUT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md';
+const TEXTS = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
+const OUT_TEXT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md';
+const OUT_CONCEPT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md';
 const OUT_CONCEPT_MODULE = 'app/content/quranConceptTextsV1.js';
 const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
 

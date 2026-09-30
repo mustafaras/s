@@ -1,0 +1,15 @@
+{
+  "card": "KAO2-20",
+  "date": "2026-09-30",
+  "branch": "kao2-yeniden-tasarim",
+  "commit": "326c01ed",
+  "previousCommit": "f801540d",
+  "pin": { "from": "20260930a", "to": "20260930b" },
+  "actions": { "workflow": "pages.yml", "runId": 36678178666, "conclusion": "success" },
+  "live": { "base": "https://mustafaras.github.io/s", "filesMatched": 5, "filesMismatched": 0, "privateMaterial": "404" },
+  "evidenceLevels": { "sourceTests": "PASS", "liveDeploy": "PASS", "deviceAcceptance": "NOT_PERFORMED" },
+  "openItems": [
+    "runtime bütçesi 86.032/88 KiB (%98) — KAO2-21+ için kullanıcı onayı gerekir",
+    "cihaz kabulü hiç yapılmadı; gerçek ekran okuyucu testi yapılmadı"
+  ]
+}

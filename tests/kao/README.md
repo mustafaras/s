@@ -32,6 +32,9 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao2_handler_surface.js` | K2F-03 | İşaretlemede çağrılan her `App.kao*` ↔ `app.js` tek satırlık shim ↔ `window.SeymaQuranLearn`; `KNOWN_MISSING=['kaoS0']` yalnız küçülür (K2F-12 boşaltır) |
 | `test_kao2_mastery.js` | K2F-05…08 | Ünite ustalığı: A saf Flow (`masteryPlan`, `unitMastery`); B gerçek handler'larla oturum + kayıt; C `repairPlan`, onarım oturumu, `skip-mastery`, 12 ünite simülasyonu; D görünümler (ayrı Ustalık satırı, Bugün birincil + "Şimdilik atla", özet, Yol `aria-current`, `u<n>` taşı) ve dokunarak uçtan uca (sıfır kullanıcı → Ünite 2, v1 → Ünite 4); ~28 sn |
 | `test_kao2_grammar_tasks.js` | K2F-09…11 | Gramer 1–3/3: A) modül 93 doğrulanmış âyet örneğini taşır (kaynakla birebir, bütçe); B) fail-closed (geçersiz görev gösterilmez, ders planında ikame, kuyruk/tekrar süzgeci); C) görevler örnekten ve kavram tablosundan kurulur (83/86 şablon, L2 listesi, rehberlik soldurma, kavram sayfasında örnek+not, 109 ders yürüyüşü, ardışık tür yok) |
+| `test_kao2_s0.js` | K2F-12…15 | Seviye 0: `kaoS0` yüzeyi (12 dersin 12'si çökmeden çizilir, R-04/R-06), harfsiz ders içeriği, 5 aşama + puanlı alıştırma (6–8 soru, aşama başına ≤1 birincil düğme), Bugün/ilk açılıştan 3 dokunuşla S0, 12 ders uçtan uca → Fâtiha, Besmele taşı yalnız `s0.12` sonrası |
+| `test_kao2_settings.js` | K2F-16 | Ayarlar: niyet satırı `onboarding.intent`'ten okunur, `kaoSetIntent` 5 vakit + kendim kabul eder, geçersiz değer reddedilir (R-07); handler pini |
+| `test_kao2_hub.js` | K2F-16 | Hub kartı: niyet varsa öneri o vaktin saatiyle (geçtiyse "yarın"), yoksa sıradaki-vakit davranışı |
 
 Fixture'lar ilgili uygulama kartında tek tek eklenecek; bu başlangıç promptu
 üretim kodu veya çalıştırılabilir fixture eklemez.

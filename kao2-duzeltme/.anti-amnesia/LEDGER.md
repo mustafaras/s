@@ -481,3 +481,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: kök neden Ayarlar'ın `settings.intent` okuması; onboarding niyeti `onboarding.intent` altına yazıyordu (iki ayrı alan) → Ayarlar artık `onboarding.intent` okur.
 - next: K2F-17
+
+## seq 50 · 2026-10-01 · PROMPT · K2F-17
+- status: done
+- title: Dalga 1 regresyonu ve ara rapor
+- prev-commit: 77f63542
+- evidence: kao2-duzeltme/evidence/K2F-17/KANIT.md
+- closes: —
+- repro: değişmedi · toplam 9/10
+- gates: kapilar.sh YEŞİL (kao 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001f
+- changed-tests: yok
+- evidence-levels: kaynak/test ✓ · yayın — (K2F-12…15 canlıda) · cihaz —
+- surprises: gösterilen gramer görevi 75 (K2F-11 kaydında 64); ihlal 0.
+- next: K2F-18

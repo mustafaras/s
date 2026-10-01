@@ -1,21 +1,20 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-17
-lastSeq: 49
+nextPrompt: K2F-18
+lastSeq: 50
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 49 · K2F-00…16 tamam (17/44), sıradaki K2F-17. R-01…R-07, R-09, R-10 PASS (9/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 50 · K2F-00…17 tamam (18/44), sıradaki K2F-18. R-01…R-07, R-09, R-10 PASS (9/10).
 
 ## Şu an neredeyiz
-K2F-16 bitti (K3-06, K3-05, P-10, D-18; R-07 fail→pass): kök neden Ayarlar'ın `settings.intent` okuması, onboarding'in ise niyeti `onboarding.intent` altına yazmasıydı. Ayarlar artık `onboarding.intent`'ten okur ("Niyet: Her yatsı namazından sonra 5 dakika" / "Kendim seçerim" / "Henüz seçilmedi"),
-6 seçenekli niyet segmenti `App.kaoSetIntent(v)` ile değiştirir (geçersiz değer `false`, mevcut niyet bozulmaz), hub "bekliyor" önerisi niyet varsa o vaktin saatiyle ("Niyet önerisi: yatsı namazından sonra 5 dakika (20:30)"; vakit geçtiyse "yarın …"; niyet yok/özel ya da vakit verisi yoksa eski sıradaki-vakit davranışı).
-`kaoIntentSuggestion` dördüncü isteğe bağlı argüman (niyet) alır. Yeni handler: 43→44 · 764→765 · 602→603 (9 pin dosyası + FIX-STATE). Yayın yok: K2F-16 yalnız kaynak/test düzeyinde; canlı `main` hâlâ `4fd00131` (pin `20261001f`).
+K2F-17 bitti: Dalga 1 regresyonu temiz (kapilar YEŞİL, tekrar-uret 9/10, yalnız R-08 beklenen FAIL). Ek ölçümler: 12 ünite simülasyonu geçti · 109 derste gösterilen gramer görevi 75, ihlal 0 · S0 12 ders uçtan uca · perf runtime 110,8 KiB. Kullanıcı için `evidence/K2F-17/ARA-RAPOR.md` yazıldı; `tests/kao/README.md` envanteri s0/settings/hub satırlarıyla güncellendi. Kod değişmedi.
+Canlıda K2F-12…15 var (`main` = `4fd00131`, pin `20261001f`); K2F-05…11 ve K2F-16 yalnız dalda.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-17 (Dalga 1 regresyonu ve ara rapor):** `kapilar.sh` YEŞİL ve `tekrar-uret` 9/10 doğrulanır; 12 ünite simülasyonu · 109 ders gramer görevi (0 ihlal) · S0 12 ders uçtan uca · perf/bütçe ölçülür; `evidence/K2F-17/{KANIT.md,ARA-RAPOR.md}` (sade Türkçe, kanıt düzeyleri ayrı, cihazda denenecek 3 akış) ve `tests/kao/README.md` envanteri güncellenir. Kod değişmez.
+**K2F-18 (YAYIN-1, kullanıcı kapısı):** `ARA-RAPOR.md` özeti kullanıcıya sunulur ve açık yanıt istenir ("YAYIN-1 onaylı" ya da "YAYIN-1 ertele"); yanıt yoksa `waiting_user` ile durulur, onaysız push/pin yok. Onaylıysa pin `20261001g`, ff-only merge + push, Pages izleme, canlı bayt-eşitliği.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-01)
 - Dal: `kao2-duzeltme` = canlı `main` (`4fd00131`) + belge-only kanıt commit'i. Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.

@@ -124,6 +124,55 @@ check('(6) ünite tamam → next-unit', () => {
   assert.ok(r.title.includes(unit(2).title));
 });
 
+// K2F-07: onarım, atlama ve öncelik (repair > mastery). Ünite tamam = dersler bitti ∧ (masteryAt ∨ skippedAt).
+check('(5a) dersler bitti + onarım var → repair (başlık "Onarım: <ünite>", eylem repair:<id>)', () => {
+  const q = baseQ();
+  doneLessons(q, 1);
+  const lemmaIds = unit(1).lessons[0].lemmaIds.slice(0, 2);
+  q.path.units['1'] = { masteryAt: null, masteryScore: 0.5, attempts: 1, lastAttemptAt: ISO, repair: { lemmaIds, at: ISO }, skippedAt: null };
+  const r = step(q);
+  assert.equal(r.kind, 'repair');
+  assert.equal(r.param, 'repair:1');
+  assert.equal(r.title, `Onarım: ${unit(1).title}`);
+  assert.ok(r.minutes >= 1);
+});
+
+check('(5b) onarım bitti (repair:null, deneme>0) → yeniden mastery', () => {
+  const q = baseQ();
+  doneLessons(q, 1);
+  q.path.units['1'] = { masteryAt: null, masteryScore: 0.5, attempts: 1, lastAttemptAt: ISO, repair: null, skippedAt: null };
+  const r = step(q);
+  assert.equal(r.kind, 'mastery');
+  assert.equal(r.param, 1);
+});
+
+check('(5c) skippedAt dolu → sonraki ünitenin adımı (taş yok)', () => {
+  const q = baseQ();
+  doneLessons(q, 1);
+  q.path.units['1'] = { masteryAt: null, skippedAt: ISO };
+  const r = step(q);
+  assert.equal(r.kind, 'next-unit');
+  assert.equal(r.param, unit(2).lessons[0].id);
+});
+
+check('(5d) öncelik: masteryAt dolu ve onarım kalıntısı olsa da sonraki ünite; repair > mastery', () => {
+  const q = baseQ();
+  doneLessons(q, 1);
+  q.path.units['1'] = { masteryAt: ISO, masteryScore: 0.9, repair: { lemmaIds: unit(1).lessons[0].lemmaIds.slice(0, 1), at: ISO } };
+  assert.equal(step(q).kind, 'next-unit');
+  q.path.units['1'] = { masteryAt: null, attempts: 2, repair: { lemmaIds: unit(1).lessons[0].lemmaIds.slice(0, 1), at: ISO } };
+  assert.equal(step(q).kind, 'repair');
+});
+
+check('(5e) dersler bitmeden ustalık/onarım sunulmaz: sıradaki ders önce gelir', () => {
+  const q = baseQ();
+  unit(1).lessons.slice(0, 2).forEach((l) => { q.path.lessons[l.id] = { startedAt: ISO, doneAt: ISO, score: 1 }; });
+  q.path.units['1'] = { masteryAt: null, attempts: 1, repair: { lemmaIds: unit(1).lessons[0].lemmaIds.slice(0, 1), at: ISO } };
+  const r = step(q);
+  assert.notEqual(r.kind, 'repair');
+  assert.notEqual(r.kind, 'mastery');
+});
+
 check('(7) bugün bitti → rest', () => {
   const q = baseQ();
   q.daily[TODAY] = { answered: 12, correct: 10, new: 5, reviewed: 7, sessionDone: true };

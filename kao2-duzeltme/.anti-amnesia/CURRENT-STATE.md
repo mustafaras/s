@@ -1,32 +1,32 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-07
-lastSeq: 19
+nextPrompt: K2F-08
+lastSeq: 20
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 19 · K2F-00…06 tamam (7/44), sıradaki K2F-07. R-01, R-02, R-09, R-10 PASS (4/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 20 · K2F-00…07 tamam (8/44), sıradaki K2F-08. R-01, R-02, R-09, R-10 PASS (4/10).
 
 ## Şu an neredeyiz
-K2F-06 bitti: `kaoLesson('start', <ünite>)` artık `masteryPlan` ile gerçek ustalık oturumu açar (`kind:'mastery'`,
-ders kaydı yazmaz), özet ekranında `path.units[id]={masteryAt,masteryScore,attempts,lastAttemptAt,repair,skippedAt}`
-bir kez kaydedilir (eşik 0,8; yanlışta anında yeniden deneme yok; yanlış lemmalar `repair.lemmaIds`);
-`ensureQuranLearn` bu alanları yalnız-ekleme ile normalize eder. K4-01 2/4. Canlıda Ünite 1 kilidi, K2F-18 yayınına
-kadar sürer (K2F-06 henüz yayınlanmadı).
+K2F-07 bitti: ünite tamam = dersler bitti ∧ (masteryAt ∨ skippedAt) (`unitProgress.complete`); Bugün adımı repair >
+mastery; saf `repairPlan` (yalnız karıştırılan kelimeler, iki yön, ≤10); `kaoLesson('start','repair:<id>')` onarım
+oturumu (bitince `repair:null`); `kaoLesson('skip-mastery', unitId)` yalnız `skippedAt` yazar. 12 ünite simülasyonu
+(Ünite 3 kaldı → onarım → geçti) `test_kao2_mastery.js` bölüm C'de yeşil. K4-01 3/4. K2F-06/07 henüz yayında değil.
 
 ## Sıradaki promptun tek cümlesi
-**K2F-07:** Flow'da "ünite tamam = dersler bitti ∧ (masteryAt ∨ skippedAt)" ve öncelik repair > mastery; başarısız
-ustalıkta `kind:'repair'` adımı (`kaoLesson('start','repair:<id>')` → onarım lemmalarıyla iki yönlü alıştırma, bitince
-`repair:null`), `kaoLesson('skip-mastery', unitId)` ile `skippedAt` (yeni handler yok), `KAO_HOME_ACTIONS`'a repair; 12
-ünite simülasyonu (`test_kao2_mastery.js` bölüm C) ve `test_kao2_next_step.js` yeni satırları.
+**K2F-08 (ustalığın son parçası):** Ünite ekranında ders listesinden ayrı "Ustalık" satırı (○/●/✓ %puan/"Atlandı"),
+Bugün kahramanında mastery adımı için tek birincil "Ustalığa başla" + ikincil "Şimdilik atla" (`skip-mastery`),
+ustalık özetinde "10 sorudan N doğru" ve geçti/kaldı cümlesi + tek taş satırı, Yol'da `aria-current` Flow `currentUnit`'e,
+`u<n>` taşı yalnız geçince (`kaoPanelSummary.unitMilestones`), ve sıfır kullanıcıdan Ünite 2'ye / v1 kullanıcıdan
+Ünite 4'e uçtan uca dokunma testi (`test_kao2_mastery.js` bölüm D); `lesson.mastery` görünümde yok sayılır.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
-- Dal: `kao2-duzeltme` = `main` (canlı `86a56267`) + K2F-05, K2F-06. Sonraki push yalnız K2F-18/43 onay kapılarında.
+- Dal: `kao2-duzeltme` = `main` (canlı `86a56267`) + K2F-05, K2F-06, K2F-07. Sonraki push yalnız K2F-18/43 onay kapılarında.
 - Yayın pini (canlı): `20260930m` (öncesi `20260930l`) · canlı `main` = `86a56267` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
 - Kapılar: KAO 48/48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **4/10 PASS** (R-01, R-02, R-09, R-10); kalan R-03…R-08 FAIL (beklenen).
-- Bütçe (perf): içerik 177,657 KiB · runtime 95,416 KiB (tavan 128) · css 12,815 KiB · p95 4,34 ms.
+- Bütçe (perf): içerik 177,657 KiB · runtime 96,683 KiB (tavan 128) · css 12,815 KiB · p95 4,34 ms.
 
 ## Açık riskler
 - Tarih-bağımlı test: `test_kao_requirements.js` bağ kur bölümü günün tohumuna bağlı (aralık 30'a genişletildi, seq 18); kalıcı çözüm sabit saat.

@@ -190,3 +190,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: aralığın dışında tarih-bağımlı test (baseline kırmızı); `read` öğesi için Views'a dokunulmadı (apply aşaması yeniden kullanıldı); ustalık özeti Views'ın "Ders tamamlandı" başlığını kullanıyor (K2F-08 inceltir).
 - next: K2F-07
+
+## seq 20 · 2026-10-01 · PROMPT · K2F-07
+- status: done
+- title: Ustalık 3/4 — onarım, atla, sıradaki adım
+- prev-commit: b44741a6
+- evidence: kao2-duzeltme/evidence/K2F-07/KANIT.md
+- closes: K4-01 (3/4)
+- repro: değişmedi · toplam 4/10 (R-01/R-02 PASS kalır)
+- gates: kapilar.sh YEŞİL (kao 48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20260930m
+- changed-tests: yok (yalnız ekleme: next_step (5a)–(5e), mastery bölüm C)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: `unitProgress` `complete`/`skipped` bayrakları eklendi; kaoCurrentUnit (Yol/hub kartı) da `complete` kullanıyor. 12 ünite simülasyonu ~25 sn sürüyor. "Şimdilik atla" için UI düğmesi K2F-08'de (handler hazır). Simülasyonda sahte saat sabit + her oturum sonrası sessionDone sıfırlanır (gerçek takvim bağımlılığı yok).
+- next: K2F-08

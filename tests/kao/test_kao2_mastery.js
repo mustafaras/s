@@ -368,4 +368,135 @@ check('B(d) bozuk tipler varsayılana düşer; geçerli onarım/deneme alanları
   assert.deepEqual({ lemmaIds: Array.from(second.repair.lemmaIds), at: second.repair.at }, { lemmaIds: ['l_abc_a1b2c3', 'l_xyz_0f0f0f'], at });
 });
 
-console.log(`test_kao2_mastery: bölüm A ${partA} + bölüm B ${passed - partA} = ${passed} kontrol PASS`);
+const partB = passed;
+
+// ---- Bölüm C — onarım, atlama ve 12 ünite simülasyonu (K2F-07) ----------------------------------------
+const AT = '2026-09-30T10:00:00.000Z';
+const U1 = () => unitLemmas(1);
+// Ünite 1 bitmiş + başarısız ustalık (onarım listesiyle) kullanıcısı.
+function bootRepairUser(repairIds) {
+  const u = bootUnit1Done();
+  u.data.quranLearn.path.units['1'] = { masteryAt: null, masteryScore: 0.5, attempts: 1, lastAttemptAt: AT, repair: { lemmaIds: repairIds, at: AT }, skippedAt: null };
+  return u;
+}
+
+check('C repairPlan (saf): goal → onarım lemmaları × iki yön → summary; yalnız onarım listesi, tanış yok', () => {
+  const ids = U1().slice(0, 3);
+  const q = bootRepairUser(ids).data.quranLearn;
+  assert.equal(typeof flow.repairPlan, 'function');
+  const plan = flow.repairPlan(snapshotOf(q), 1, NOW, content);
+  assert.deepEqual(kindsOf(plan), ['goal', ...Array(6).fill('practice'), 'summary']);
+  const practice = practiceOf(plan);
+  assert.deepEqual([...new Set(practice.map((p) => p.lemmaId))].sort(), ids.slice().sort());
+  assert.deepEqual([...new Set(practice.map((p) => p.direction))].sort(), ['ar>tr', 'tr>ar']);
+  assert.ok(practice.every((p) => p.repair === true && p.mastery !== true && p.choiceCount === 4));
+  assert.equal(new Set(practice.map((p) => p.id)).size, practice.length);
+  assert.ok(!plan.some((i) => i.kind === 'intro'), 'onarımda tanış adımı atlanır');
+});
+
+check('C repairPlan: 10 öğeyle sınırlı (çok lemma), belirlenimci; onarım yok/geçersiz → null', () => {
+  const many = U1().slice(0, 8);
+  const q = bootRepairUser(many).data.quranLearn;
+  const a = flow.repairPlan(snapshotOf(q), 1, NOW, content);
+  assert.equal(practiceOf(a).length, 10);
+  assert.equal(JSON.stringify(a), JSON.stringify(flow.repairPlan(snapshotOf(q), 1, NOW, content)));
+  assert.equal(flow.repairPlan(snapshotOf(userWithUnit(1)), 1, NOW, content), null, 'repair kaydı yok');
+  const empty = bootRepairUser([]).data.quranLearn;
+  assert.equal(flow.repairPlan(snapshotOf(empty), 1, NOW, content), null, 'boş onarım listesi');
+  const foreign = bootRepairUser([unitLemmas(4)[0]]).data.quranLearn;
+  assert.equal(flow.repairPlan(snapshotOf(foreign), 1, NOW, content), null, 'başka ünitenin lemması sayılmaz');
+  assert.equal(flow.repairPlan(snapshotOf(q), 999, NOW, content), null);
+});
+
+check('C kaoLesson(start, "repair:<ünite>") onarım oturumu açar; bitince repair:null, ustalık/ders kaydı yazılmaz', () => {
+  const ids = U1().slice(0, 3);
+  const u = bootRepairUser(ids);
+  const lessonKeys = Object.keys(u.data.quranLearn.path.lessons).sort().join(',');
+  assert.equal(u.api.kaoLesson('start', 'repair:1'), true);
+  assert.equal(u.ui.kaoLesson.kind, 'repair');
+  assert.equal(u.ui.kaoLesson.lessonId, 'repair:1');
+  const seenLemmas = new Set();
+  const done = walkLesson(u, 'repair:1', { answer: 'correct', visit: (task) => seenLemmas.add(lemmaOf(task)) });
+  assert.equal(done, true);
+  const rec = unitRecord(u);
+  assert.equal(rec.repair, null, 'onarım bitince repair:null');
+  assert.equal(rec.masteryAt, null, 'onarım ustalığı vermez');
+  assert.equal(rec.attempts, 1, 'onarım deneme saymaz');
+  assert.equal(Object.keys(u.data.quranLearn.path.lessons).sort().join(','), lessonKeys, 'ders kaydı yok');
+  assert.ok([...seenLemmas].every((id) => ids.includes(id)), 'yalnız onarım lemmaları soruldu');
+  assert.equal(u.api.kaoNextStep(NOW.toISOString()).kind, 'mastery', 'onarım bitti → yeniden ustalık');
+});
+
+check('C onarım yarıda bırakılırsa repair korunur; onarım yokken başlatma false', () => {
+  const u = bootRepairUser(U1().slice(0, 2));
+  u.api.kaoLesson('start', 'repair:1');
+  u.api.kaoLesson('exit');
+  assert.equal(unitRecord(u).repair.lemmaIds.length, 2);
+  const none = bootUnit1Done();
+  assert.equal(none.api.kaoLesson('start', 'repair:1'), false);
+  assert.ok(!none.ui.kaoLesson || none.ui.kaoLesson.kind !== 'repair');
+});
+
+check('C kaoLesson(skip-mastery, ünite): skippedAt yazar, masteryAt/taş yazmaz; sıradaki adım sonraki ünite', () => {
+  const u = bootUnit1Done();
+  const milestonesBefore = JSON.stringify(u.data.quranLearn.milestones);
+  assert.equal(u.api.kaoLesson('skip-mastery', 1), true);
+  const rec = unitRecord(u);
+  assert.match(rec.skippedAt, ISO);
+  assert.equal(rec.masteryAt, null);
+  assert.equal(JSON.stringify(u.data.quranLearn.milestones), milestonesBefore, 'atlamak taş kazandırmaz');
+  const next = u.api.kaoNextStep(NOW.toISOString());
+  assert.equal(next.kind, 'next-unit');
+  assert.equal(u.api.kaoLesson('skip-mastery', 999), false, 'bilinmeyen ünite');
+});
+
+check('C atlama geçilmiş ustalığı bozmaz', () => {
+  const u = bootUnit1Done();
+  runMastery(u, 0); u.api.kaoLesson('finish');
+  const before = JSON.stringify(unitRecord(u));
+  assert.equal(u.api.kaoLesson('skip-mastery', 1), true);
+  assert.equal(JSON.stringify(unitRecord(u)), before, 'geçilmiş ünitede kayıt aynı');
+});
+
+check('C 12 ünite simülasyonu: Bugün adımı her ünitede ilerler, Ünite 3 kaldı → onarım → geçti, sonunda "Tüm üniteler tamam"', () => {
+  const u = bootKao();
+  freshUser(u);
+  const masterySteps = [], kinds = [];
+  let failedOnce = false, finalTitle = '', guard = 0;
+  // Saat sabit (harness todayStr de sabit): her oturumdan sonra günün sessionDone'ı sıfırlanır → "yeni gün" benzetimi
+  // (ısınma/boşluk adımı ve gerçek takvim bağımlılığı olmadan).
+  const nextDay = () => { const day = u.data.quranLearn.daily[u.NOW.slice(0, 10)]; if (day) day.sessionDone = false; };
+  for (; guard < 400; guard += 1) {
+    const step = u.api.kaoNextStep(u.NOW);
+    kinds.push(step.kind);
+    if (step.kind === 'rest') { finalTitle = step.title; break; }
+    assert.ok(['daily', 'next-unit', 'mastery', 'repair'].includes(step.kind), `beklenmeyen adım: ${step.kind} (${step.title})`);
+    if (step.kind === 'mastery') {
+      masterySteps.push(step.param);
+      const failNow = step.param === 3 && !failedOnce;
+      if (failNow) failedOnce = true;
+      assert.equal(u.api.kaoLesson('start', step.param), true, `ustalık ${step.param} açılmalı`);
+      let seen = 0;
+      const answer = (task) => { const wrongNow = failNow && seen < 5; seen += 1; return (wrongNow ? task.choices.find((c) => !c.correct) : task.choices.find((c) => c.correct)).choiceId; };
+      assert.equal(walkLesson(u, step.param, { answer }), true);
+      u.api.kaoLesson('finish'); nextDay();
+      continue;
+    }
+    const lessonId = step.param;
+    assert.equal(walkLesson(u, lessonId, { answer: 'correct' }), true, `${step.kind} ${lessonId} oynatılmalı`);
+    u.api.kaoLesson('finish'); nextDay();
+  }
+  assert.ok(guard < 400, 'sıradaki adım döngüye girdi');
+  assert.equal(finalTitle, 'Tüm üniteler tamam ✓');
+  const unique = [...new Set(masterySteps)];
+  assert.deepEqual(unique, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 'ustalık adımları ünite sırasıyla ilerledi');
+  assert.equal(masterySteps.filter((id) => id === 3).length, 2, 'Ünite 3 iki kez (kaldı + geçti)');
+  assert.ok(kinds.includes('repair'), 'onarım adımı görüldü');
+  assert.equal(kinds.indexOf('repair') > kinds.indexOf('mastery'), true);
+  const units = u.data.quranLearn.path.units;
+  for (let id = 1; id <= 12; id += 1) assert.match(units[String(id)].masteryAt, ISO, `Ünite ${id} ustalık kaydı`);
+  assert.equal(units['3'].attempts, 2);
+  assert.equal(units['3'].repair, null);
+});
+
+console.log(`test_kao2_mastery: bölüm A ${partA} + B ${partB - partA} + C ${passed - partB} = ${passed} kontrol PASS`);

@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-16
-lastSeq: 46
+lastSeq: 47
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 46 · K2F-00…15 tamam (16/44), sıradaki K2F-16. R-01…R-06, R-09, R-10 PASS (8/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 47 · K2F-00…15 tamam (16/44), sıradaki K2F-16. R-01…R-06, R-09, R-10 PASS (8/10).
 
 ## Şu an neredeyiz
 K2F-15 bitti (K5-01, K5-02 iii): Seviye 0 zinciri tamamlandı (K2F-12…15, kaynak/test düzeyinde). Okuyamayan kullanıcı ("Henüz değil") ilk açılıştan 3 dokunuşla (next · choose · finish) S0 içeriğine ulaşır; Bugün birincil düğmesi

@@ -452,3 +452,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - changed-tests: test_kao2_grammar_tasks.js C6 (geri bildirim satırları) · test_kao2_design_contract.js (NavBar/feedback CSS sözleşmesi).
 - evidence-levels: kaynak/test ✓ · kaynak-görsel ✓ (cihaz kabulü DEĞİL) · yayın — · cihaz —
 - next: K2F-16
+
+## seq 47 · 2026-10-01 · DECISION · K2F-15
+- decision: Sekizinci erken yayın — kullanıcı açık isteği ("canlıya al"). Kapsam: K2F-12…15 Seviye 0 zinciri (`App.kaoS0` shim'i, harfsiz dersler + örnek kelimeler, aşamalı puanlı alıştırma, Bugün/ilk açılıştan S0, tamamlama kaydı) + görsel QA düzeltmeleri + geri bildirim satırları + NavBar. Yayınlanan varlıklar: `app.js` (tek shim), `app/core/quranLearn.js`, `quranLearnFlow.js`, `quranLearnViews.js`, `app/kao.css`, `app/content/quranCurriculumV2.js`. Pin `20261001e` → `20261001f` (index.html, sw.js, 8 pin taşıyan test).
+- scope-effect: planlı YAYIN-1 (K2F-18) ayrıca sürer. `releaseApproval` = `approved_through_K2F-15`. Canlıda `App.kao*` 43 / yüzey 764 / atama 602.
+- known-exposure (canlıda sürer, K2F-16+): R-07 niyet (Ayarlar'da görünmez/değişmez), R-08 "Uygula" adımı 97/109 derste içeriksiz; 3 gramer şablonu içerik bekliyor (L2).
+- steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `lastRelease` kaydı.
+- next: K2F-16

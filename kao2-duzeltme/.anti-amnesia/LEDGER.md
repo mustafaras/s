@@ -261,3 +261,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - scope-effect: planlı YAYIN-1 (K2F-18) ayrıca sürer. `releaseApproval` = `approved_through_K2F-09`.
 - known-exposure (canlıda sürer, K2F-10…17): K4-02 yanlış gramer görevleri, R-05 `App.kaoS0`, R-06 Seviye 0 çökmeleri, R-03/R-04/R-07/R-08.
 - next: K2F-10
+
+## seq 27 · 2026-10-01 · NOTE · K2F-09
+- summary: Dördüncü erken yayın tamamlandı ve doğrulandı (seq 26 kararı). `main` ff-only `8d757abd..1b3b47d1`, Pages run 36845760600 success, pin `20261001b`.
+- verified: canlı 7/7 bayt-eşit (quranGrammarV1.js, quranLearn.js, quranLearnFlow.js, quranLearnViews.js, kao.css, sw.js, index.html); `kao2-duzeltme/`, `tools/`, `tests/`, `archive/`, `docs/…/grammar.verified.json` 404; `SW_VERSION='20261001b'`.
+- evidence: kao2-duzeltme/evidence/K2F-09/YAYIN.md · release-live.json
+- note: push için sandbox `github.com`'u engelledi; yalnız `git push`, `gh` ve salt-okur `curl` komutları sandbox dışında çalıştı. `main` bu not commit'inin gerisindedir (belge-only).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
+- next: K2F-10

@@ -1,0 +1,27 @@
+{
+  "prompt": "K2F-09",
+  "verifiedAt": "2026-10-01",
+  "commit": "1b3b47d1c18eafe0d20007446022b23de859a71c",
+  "pin": "20261001b",
+  "previousPin": "20261001a",
+  "pagesRun": 36845760600,
+  "conclusion": "success",
+  "baseUrl": "https://mustafaras.github.io/s/",
+  "files": [
+    { "path": "app/content/quranGrammarV1.js", "match": true },
+    { "path": "app/core/quranLearn.js", "match": true },
+    { "path": "app/core/quranLearnFlow.js", "match": true },
+    { "path": "app/core/quranLearnViews.js", "match": true },
+    { "path": "app/kao.css", "match": true },
+    { "path": "sw.js", "match": true },
+    { "path": "index.html", "match": true }
+  ],
+  "privacy404": [
+    "kao2-duzeltme/FIX-STATE.json",
+    "tools/kao-content-freeze.mjs",
+    "tests/kao/test_kao2_grammar_tasks.js",
+    "archive/kuran-ogreniyorum-v2/KAO2-STATE.json",
+    "docs/kuran-ogreniyorum/content/grammar.verified.json"
+  ],
+  "evidenceLevels": { "sourceTest": true, "deploy": true, "device": false }
+}

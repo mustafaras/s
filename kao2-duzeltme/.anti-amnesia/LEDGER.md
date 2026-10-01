@@ -169,3 +169,24 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - verified: yeni `main` ağaç hash'i eskisiyle AYNI (`f083063f…`), yani site içeriği değişmedi; Pages run 36753100758 success; canlı 5/5 bayt-eşit; `origin/main` ağacında `… 2.*` yok.
 - residual: GitHub eski nesneleri (örn. `5e0665bd`) bir süre önbellekte/erişilebilir tutabilir; tam silme GitHub tarafında (Support) yapılır. Yerel yedek etiket istenirse silinebilir (`git tag -d backup-pre-rewrite-20260930`).
 - next: K2F-06
+
+## seq 18 · 2026-10-01 · DECISION · K2F-06
+- decision: K2F-06 Dokun listesi dışındaki iki mevcut test, bu promptun kendi sonucu ya da takvim değişimiyle kırıldığı için asgari değişiklikle düzeltildi. Ayrı kullanıcı onayı alınmadı; kullanıcının genel talimatı "düzelt hepsini / K2F-06'dan Dalga 1 sonuna". Geriye dönük bildirim.
+- test_kao_migration.js: `path.units['1']` beklentisi eski `{masteryAt, masteryScore}` → `{… , attempts:0, lastAttemptAt:null, repair:null, skippedAt:null}` (promptun (d) maddesi: yeni alanlar varsayılanla eklenir). Bilerek değişen test.
+- test_kao_requirements.js: bağ kur testi günün tohumuna (`daySeed`) bağlı; tarih 2026-09-30 → 2026-10-01 olunca "en az 5 bağ kur görevi sınandı (4)" ile kırıldı (BASELINE'da, benim değişikliğimden ÖNCE de kırmızı — stash ile doğrulandı). Başlangıç sayısı aralığı 12 → 30 (iddia aynı, kapsam geniş). Gizli tarih-bağımlılığı: test hâlâ gerçek saate bağlı; kalıcı çözüm (sabit saat) ayrı iş.
+- note: kapı koşusunda bir an `test_kao2_kabul.js` de FAIL göründü (migration beklentisi kırıkken); migration düzelince yeşil, tek başına 4 koşuda exit 0.
+- next: K2F-06
+
+## seq 19 · 2026-10-01 · PROMPT · K2F-06
+- status: done
+- title: Ustalık 2/4 — ustalık oturumu ve kayıt
+- prev-commit: b1e53acb
+- evidence: kao2-duzeltme/evidence/K2F-06/KANIT.md
+- closes: K4-01 (2/4)
+- repro: R-01, R-02 fail→pass · toplam 4/10
+- gates: kapilar.sh YEŞİL (kao 48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20260930m
+- changed-tests: test_kao_migration.js (path.units beklentisi: eski → yeni alanlar, bulgu K4-01) · test_kao_requirements.js (tarih bağımlılığı: aralık 12→30; seq 18)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: aralığın dışında tarih-bağımlı test (baseline kırmızı); `read` öğesi için Views'a dokunulmadı (apply aşaması yeniden kullanıldı); ustalık özeti Views'ın "Ders tamamlandı" başlığını kullanıyor (K2F-08 inceltir).
+- next: K2F-07

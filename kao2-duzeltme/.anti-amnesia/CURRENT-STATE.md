@@ -1,34 +1,35 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-06
-lastSeq: 17
+nextPrompt: K2F-07
+lastSeq: 19
 status: active
 -->
 
-Son güncelleme: 2026-09-30 · LEDGER seq 17 · K2F-00…05 tamam (6/44), sıradaki K2F-06. R-09, R-10 PASS (2/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 19 · K2F-00…06 tamam (7/44), sıradaki K2F-07. R-01, R-02, R-09, R-10 PASS (4/10).
 
 ## Şu an neredeyiz
-K2F-05 bitti (Dalga 1, acil): `quranLearnFlow.js`'e saf `masteryPlan(snapshot, unitId, now, content)` ve
-`unitMastery(q, unitId)` eklendi; `tests/kao/test_kao2_mastery.js` bölüm A 17 kontrol PASS. Canlı `main` = `86a56267`
-(ikinci erken yayın, LEDGER seq 14; pin `20260930m`, yayınlanan varlık değişmedi). Canlıda Ünite 1 ustalığı hâlâ
-kilitli: plan kurulu ama `kaoLessonStart` henüz onu kullanmıyor (K2F-06).
+K2F-06 bitti: `kaoLesson('start', <ünite>)` artık `masteryPlan` ile gerçek ustalık oturumu açar (`kind:'mastery'`,
+ders kaydı yazmaz), özet ekranında `path.units[id]={masteryAt,masteryScore,attempts,lastAttemptAt,repair,skippedAt}`
+bir kez kaydedilir (eşik 0,8; yanlışta anında yeniden deneme yok; yanlış lemmalar `repair.lemmaIds`);
+`ensureQuranLearn` bu alanları yalnız-ekleme ile normalize eder. K4-01 2/4. Canlıda Ünite 1 kilidi, K2F-18 yayınına
+kadar sürer (K2F-06 henüz yayınlanmadı).
 
 ## Sıradaki promptun tek cümlesi
-**K2F-06:** `app/core/quranLearn.js`'te `kaoLessonStart` ünite kimliğini `masteryPlan` ile ustalık oturumu olarak
-açsın (`ui.kaoLesson.kind==='mastery'`, "son içerik dersine düş" geri dönüşü kalksın), bitişte
-`path.units[id]={masteryAt,masteryScore,attempts,lastAttemptAt,repair,skippedAt}` yazsın (eşik 0,8; ders kaydı yazılmaz),
-`ensureQuranLearn` bu alanları yalnız-ekleme ile normalize etsin; `test_kao2_mastery.js` bölüm B (harness ile gerçek
-handler) + `test_kao2_migration.js`; R-01 ve R-02 fail→pass.
+**K2F-07:** Flow'da "ünite tamam = dersler bitti ∧ (masteryAt ∨ skippedAt)" ve öncelik repair > mastery; başarısız
+ustalıkta `kind:'repair'` adımı (`kaoLesson('start','repair:<id>')` → onarım lemmalarıyla iki yönlü alıştırma, bitince
+`repair:null`), `kaoLesson('skip-mastery', unitId)` ile `skippedAt` (yeni handler yok), `KAO_HOME_ACTIONS`'a repair; 12
+ünite simülasyonu (`test_kao2_mastery.js` bölüm C) ve `test_kao2_next_step.js` yeni satırları.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
-- Dal: `kao2-duzeltme` = `main` (canlı `86a56267`) + K2F-05. Sonraki push yalnız K2F-18/43 onay kapılarında.
+- Dal: `kao2-duzeltme` = `main` (canlı `86a56267`) + K2F-05, K2F-06. Sonraki push yalnız K2F-18/43 onay kapılarında.
 - Yayın pini (canlı): `20260930m` (öncesi `20260930l`) · canlı `main` = `86a56267` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
 - Kapılar: KAO 48/48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
-- `tekrar-uret.cjs`: **2/10 PASS** (R-09, R-10); kalan R-01…R-08 FAIL (beklenen).
-- Bütçe (perf): içerik 177,657 KiB · runtime 93,633 KiB (tavan 128) · css 12,815 KiB · p95 4,34 ms.
+- `tekrar-uret.cjs`: **4/10 PASS** (R-01, R-02, R-09, R-10); kalan R-03…R-08 FAIL (beklenen).
+- Bütçe (perf): içerik 177,657 KiB · runtime 95,416 KiB (tavan 128) · css 12,815 KiB · p95 4,34 ms.
 
 ## Açık riskler
+- Tarih-bağımlı test: `test_kao_requirements.js` bağ kur bölümü günün tohumuna bağlı (aralık 30'a genişletildi, seq 18); kalıcı çözüm sabit saat.
 - LEDGER seq 16–17: `releaseApproval=approved_through_K2F-04`; K2F-02 ek düzeltmeleri bildirildi; `main` geçmişi kullanıcı onayıyla yeniden yazıldı (iCloud kopyaları gitti; ağaç aynı, yedek etiket `backup-pre-rewrite-20260930`). Eski hash'ler tarihsel: `430539ec`→`86a56267`.
 - Canlı kullanıcı Ünite 1 ustalığında kilitli (K4-01) ve gramer görevleri yanlış öğretiyor (K4-02) → Dalga 1 önceliklidir.
 - iCloud Drive `… 2.*` kopyaları üretebilir (seq 12): `git add` yalnız açık dosya yollarıyla; klasörü iCloud dışına taşımak kullanıcı kararı.

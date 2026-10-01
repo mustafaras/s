@@ -204,4 +204,168 @@ check('runtime bütçesi tavanı (128 KiB gzip) içinde kalır', () => {
   assert.ok(kib <= 128, `runtime gzip ${kib.toFixed(3)} KiB > 128`);
 });
 
-console.log(`test_kao2_mastery (bölüm A): ${passed} kontrol PASS`);
+const partA = passed;
+
+// ---- Bölüm B — gerçek handler'larla ustalık oturumu ve kayıt (K2F-06) ---------------------------------
+const { walkLesson } = require('./helpers/kao-harness');
+const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+const lemmaOf = (task) => String(task.cardId).split(':')[1];
+
+// Ünite 1'in dersleri bitmiş (gerçek bir öğrenci gibi: ders kaydı + kartlar) kullanıcıyla yeni VM.
+function bootUnit1Done() {
+  const u = bootKao();
+  const q = freshUser(u);
+  for (const lesson of u.win.QuranCurriculumV2.units[0].lessons) {
+    q.path.lessons[lesson.id] = { startedAt: NOW.toISOString(), doneAt: NOW.toISOString(), score: 0.9, introducedLemmas: lesson.lemmaIds.slice() };
+    for (const id of lesson.lemmaIds) q.cards[`w:${id}:ar>tr`] = { state: 'review', s: 12, reps: 4, due: '2026-12-01T00:00:00.000Z' };
+  }
+  return u;
+}
+// İlk `wrongCount` görevi yanlış, kalanı doğru cevaplayan oynatma; yanlış cevaplanan lemmaları döndürür.
+function runMastery(u, wrongCount) {
+  const wrong = [];
+  let seen = 0;
+  const answer = (task) => {
+    const wantWrong = seen < wrongCount; seen += 1;
+    const pick = wantWrong ? task.choices.find((c) => !c.correct) : task.choices.find((c) => c.correct);
+    if (wantWrong) wrong.push(lemmaOf(task));
+    return pick.choiceId;
+  };
+  const done = walkLesson(u, 1, { answer });
+  return { done, wrong, seen };
+}
+const unitRecord = (u) => u.data.quranLearn.path.units['1'];
+
+check('B(a) kaoLesson(start, ünite) ustalık oturumu açar — içerik dersi değil, masteryPlan çıktısı', () => {
+  const u = bootUnit1Done();
+  assert.equal(u.api.kaoLesson('start', 1), true);
+  const st = u.ui.kaoLesson;
+  assert.equal(st.kind, 'mastery');
+  assert.equal(st.unitId, 1);
+  assert.ok(!/^u\d{2}\.\d{2}$/.test(String(st.lessonId)), `ders kimliği içerik dersi olmamalı: ${st.lessonId}`);
+  assert.deepEqual(kindsOf(st.plan), ['goal', 'read', ...Array(10).fill('practice'), 'summary']);
+  assert.ok(st.plan.every((i) => i.mastery === true));
+  assert.equal(u.ui.kaoView, 'session');
+});
+
+check('B(a) v1 kullanıcı (yalnız kartlar, ders kaydı yok) ustalık adımını başlatınca gerçek ustalık açılır (R-02)', () => {
+  const u = bootKao();
+  const cards = {};
+  for (const unit of u.win.QuranCurriculumV2.units.slice(0, 3)) for (const l of unit.lessons) for (const id of l.lemmaIds) cards[`w:${id}:ar>tr`] = { state: 'review', s: 30, reps: 6, due: '2026-12-01T00:00:00.000Z' };
+  u.data.quranLearn = { schemaVersion: 1, cards, daily: { '2026-09-29': { answered: 10, correct: 9 } } };
+  const step = u.api.kaoNextStep(NOW);
+  assert.equal(step.kind, 'mastery');
+  assert.equal(u.api.kaoLesson('start', step.param), true);
+  assert.equal(u.ui.kaoLesson.kind, 'mastery');
+  assert.ok(!/^u\d{2}\.\d{2}$/.test(String(u.ui.kaoLesson.lessonId)));
+});
+
+check('B(a) tanışılmış lemma yoksa başlatılamaz (false) ve ustalık oturumu açılmaz', () => {
+  const u = bootKao();
+  freshUser(u);
+  assert.equal(u.api.kaoLesson('start', 1), false);
+  assert.ok(!u.ui.kaoLesson || u.ui.kaoLesson.kind !== 'mastery');
+});
+
+check('B(b) 10 doğru → path.units[1] tam kayıtla yazılır ve sıradaki adım sonraki üniteye geçer', () => {
+  const u = bootUnit1Done();
+  const lessonKeysBefore = Object.keys(u.data.quranLearn.path.lessons).sort().join(',');
+  const { done, seen } = runMastery(u, 0);
+  assert.equal(done, true);
+  assert.equal(seen, 10, 'tam 10 soru (yeniden deneme yok)');
+  const rec = unitRecord(u);
+  assert.match(rec.masteryAt, ISO);
+  assert.equal(rec.masteryScore, 1);
+  assert.equal(rec.attempts, 1);
+  assert.match(rec.lastAttemptAt, ISO);
+  assert.equal(rec.repair, null);
+  assert.equal(rec.skippedAt, null);
+  assert.equal(Object.keys(u.data.quranLearn.path.lessons).sort().join(','), lessonKeysBefore, 'ustalık ders kaydı (path.lessons) yazmaz');
+  const next = u.api.kaoNextStep('2026-10-01T12:00:00.000Z');
+  assert.notEqual(next.kind, 'mastery', `ustalık geçildi ama adım hâlâ ${next.title}`);
+  assert.ok(!/Fâtiha/.test(next.title), `Ünite 1 tekrar önerilmemeli: ${next.title}`);
+});
+
+check('B(c) 5 yanlış → masteryAt:null, masteryScore 0.5, repair.lemmaIds = yanlış lemmalar (tekilleştirilmiş)', () => {
+  const u = bootUnit1Done();
+  const { done, wrong, seen } = runMastery(u, 5);
+  assert.equal(done, true);
+  assert.equal(seen, 10, 'yanlışta yeniden deneme eklenmez');
+  const rec = unitRecord(u);
+  assert.equal(rec.masteryAt, null);
+  assert.equal(rec.masteryScore, 0.5);
+  assert.equal(rec.attempts, 1);
+  assert.match(rec.lastAttemptAt, ISO);
+  assert.equal(rec.skippedAt, null);
+  assert.deepEqual(Array.from(rec.repair.lemmaIds).sort(), [...new Set(wrong)].sort());
+  assert.ok(rec.repair.lemmaIds.length > 0);
+});
+
+check('B(c) eşik 0,8: 8/10 geçer, 7/10 geçmez', () => {
+  const pass = bootUnit1Done(); runMastery(pass, 2);
+  assert.match(unitRecord(pass).masteryAt, ISO);
+  assert.equal(unitRecord(pass).masteryScore, 0.8);
+  const fail = bootUnit1Done(); runMastery(fail, 3);
+  assert.equal(unitRecord(fail).masteryAt, null);
+  assert.equal(unitRecord(fail).masteryScore, 0.7);
+});
+
+check('B kayıt tekrarsız: özet + finish aynı denemeyi bir kez sayar; finish günü tamamlar', () => {
+  const u = bootUnit1Done();
+  runMastery(u, 0);
+  assert.equal(unitRecord(u).attempts, 1);
+  assert.equal(u.api.kaoLesson('finish'), true);
+  assert.equal(unitRecord(u).attempts, 1, 'finish ikinci deneme yazmaz');
+  assert.equal(u.data.quranLearn.daily[u.NOW.slice(0, 10)].sessionDone, true);
+  assert.equal(u.ui.kaoView, 'home');
+});
+
+check('B ikinci deneme geçilmiş ustalığı bozmaz: masteryAt korunur, deneme sayısı artar', () => {
+  const u = bootUnit1Done();
+  runMastery(u, 0);
+  const first = unitRecord(u).masteryAt;
+  u.api.kaoLesson('finish');
+  runMastery(u, 6);
+  const rec = unitRecord(u);
+  assert.equal(rec.masteryAt, first, 'geçilmiş ustalık kaybolmaz');
+  assert.equal(rec.attempts, 2);
+  assert.equal(rec.repair, null, 'geçilmiş ünitede onarım açılmaz');
+});
+
+check('B oturum sürerken aynı ünite yeniden başlatılırsa sıfırlanmaz', () => {
+  const u = bootUnit1Done();
+  u.api.kaoLesson('start', 1);
+  const st = u.ui.kaoLesson;
+  st.at = 2; st.phase = 'practice';
+  assert.equal(u.api.kaoLesson('start', 1), true);
+  assert.equal(u.ui.kaoLesson, st, 'aynı durum nesnesi');
+  assert.equal(u.ui.kaoLesson.at, 2);
+});
+
+check('B(d) eski biçim path.units[1]={masteryAt} korunur, yeni alanlar varsayılanla eklenir', () => {
+  const u = bootKao();
+  const at = '2026-09-20T00:00:00.000Z';
+  u.data.quranLearn = { schemaVersion: 1, path: { units: { 1: { masteryAt: at } } } };
+  const q = u.api.ensureQuranLearn(u.data);
+  assert.deepEqual({ ...q.path.units['1'] }, { masteryAt: at, masteryScore: null, attempts: 0, lastAttemptAt: null, repair: null, skippedAt: null });
+  const again = u.api.ensureQuranLearn(u.data);
+  assert.deepEqual(JSON.parse(JSON.stringify(again.path.units)), JSON.parse(JSON.stringify(q.path.units)), 'idempotent');
+});
+
+check('B(d) bozuk tipler varsayılana düşer; geçerli onarım/deneme alanları korunur', () => {
+  const u = bootKao();
+  const at = '2026-09-21T10:00:00.000Z';
+  u.data.quranLearn = { schemaVersion: 1, path: { units: {
+    1: { masteryAt: 5, masteryScore: 'x', attempts: 'üç', lastAttemptAt: 7, repair: 'bozuk', skippedAt: 9 },
+    2: { masteryAt: null, masteryScore: 0.5, attempts: 2.9, lastAttemptAt: at, repair: { lemmaIds: ['l_abc_a1b2c3', 3, 'l_abc_a1b2c3', 'l_xyz_0f0f0f'], at }, skippedAt: at }
+  } } };
+  const q = u.api.ensureQuranLearn(u.data);
+  assert.deepEqual({ ...q.path.units['1'] }, { masteryAt: null, masteryScore: null, attempts: 0, lastAttemptAt: null, repair: null, skippedAt: null });
+  const second = q.path.units['2'];
+  assert.equal(second.attempts, 2);
+  assert.equal(second.lastAttemptAt, at);
+  assert.equal(second.skippedAt, at);
+  assert.deepEqual({ lemmaIds: Array.from(second.repair.lemmaIds), at: second.repair.at }, { lemmaIds: ['l_abc_a1b2c3', 'l_xyz_0f0f0f'], at });
+});
+
+console.log(`test_kao2_mastery: bölüm A ${partA} + bölüm B ${passed - partA} = ${passed} kontrol PASS`);

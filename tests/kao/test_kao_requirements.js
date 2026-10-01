@@ -619,7 +619,9 @@ function sandboxLemma(api, lemmaId) {
   const isNewForward = (item) => item.isNew && /^w:.+:ar>tr$/.test(item.cardId);
   const withCognate = lemmas.filter((lemma) => lemma.cognate && lemma.cognate.tr);
   let checked = 0;
-  for (let prior = 0; prior <= 12; prior += 1) {
+  // K2F-06: kuyruk günün tohumuna (daySeed) bağlıdır; 12 başlangıç sayısı bazı günlerde <5 bağ kur görevi verdi
+  // (2026-10-01'de 4). Aralık 30'a genişletildi ki "en az 5" iddiası günden bağımsız kalsın.
+  for (let prior = 0; prior <= 30; prior += 1) {
     fresh(prior ? withCognate.slice(-prior) : []);
     api.kaoStart();
     const queue = ui.kaoQueue;

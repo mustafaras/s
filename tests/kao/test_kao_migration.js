@@ -121,7 +121,8 @@ assert.deepEqual(JSON.parse(JSON.stringify(kf.path.lessons)), {
   'u01.01': { startedAt: '2026-10-01T18:05:00.000Z', doneAt: null, score: null },
   'u01.02': { startedAt: null, doneAt: null, score: 0.5 }
 });
-assert.deepEqual(JSON.parse(JSON.stringify(kf.path.units)), { '1': { masteryAt: '2026-10-02T10:00:00.000Z', masteryScore: 0.8 } });
+// K2F-06: ustalık kaydına yalnız-ekleme alanları (attempts, lastAttemptAt, repair, skippedAt) varsayılanla eklenir; eski değerler korunur.
+assert.deepEqual(JSON.parse(JSON.stringify(kf.path.units)), { '1': { masteryAt: '2026-10-02T10:00:00.000Z', masteryScore: 0.8, attempts: 0, lastAttemptAt: null, repair: null, skippedAt: null } });
 const kfAgain = JSON.stringify(api.ensureQuranLearn(keepFlow));
 assert.equal(JSON.stringify(api.ensureQuranLearn(keepFlow)), kfAgain, 'onboarding/path normalizasyonu idempotent');
 

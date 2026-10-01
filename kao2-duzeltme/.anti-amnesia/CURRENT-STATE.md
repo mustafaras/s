@@ -2,17 +2,17 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-16
-lastSeq: 47
+lastSeq: 48
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 47 · K2F-00…15 tamam (16/44), sıradaki K2F-16. R-01…R-06, R-09, R-10 PASS (8/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 48 · K2F-00…15 tamam (16/44), sıradaki K2F-16. R-01…R-06, R-09, R-10 PASS (8/10).
 
 ## Şu an neredeyiz
 K2F-15 bitti (K5-01, K5-02 iii): Seviye 0 zinciri tamamlandı (K2F-12…15, kaynak/test düzeyinde). Okuyamayan kullanıcı ("Henüz değil") ilk açılıştan 3 dokunuşla (next · choose · finish) S0 içeriğine ulaşır; Bugün birincil düğmesi
 `kaoS0('start','s0.01')`; `kaoLessonStart('s0.xx')` S0 yüzeyine devreder (boş plan yok, R-04 PASS); S0 dersi yalnız `read` aşaması bitince `path.lessons[id]={startedAt,doneAt,score}` yazar (score = alıştırma doğru/toplam);
 12 ders uçtan uca → sonra Fâtiha (`u01.01`); Besmele taşı yalnız `s0.12` tamamlanınca (ya da yerleştirmeyle); Keşfet "Seviye 0" satırı `start==='s0'` / başlanmış S0 dersi / kart varsa görünür.
-Yayın YOK: canlıda (`main` = `3d97c338`, pin `20261001e`) S0 düğmesi hâlâ ölü, S0 dersleri alıştırmasız. **Yayın önerisi:** K2F-12…15 birlikte yayınlanmalı (yalnız bir kısmı çökme/boş ekran riski taşır); öncesinde cihazda gözle doğrulama
+CANLIDA (erken yayın, `main` = `4fd00131`, Pages run 36890470595, pin `20261001f`, canlı 9/9 bayt-eşit; LEDGER seq 47–48): K2F-12…15 + görsel QA düzeltmeleri birlikte yayında; cihazda gözle doğrulama kullanıcıda
 (kaynak-görsel QA terminalden yapıldı, seq 45; cihaz kabulü değil).
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
@@ -21,14 +21,14 @@ Yayın YOK: canlıda (`main` = `3d97c338`, pin `20261001e`) S0 düğmesi hâlâ 
 (niyet varsa o vaktin saatiyle öneri, yoksa mevcut sıradaki-vakit davranışı); önce `test_kao2_settings.js`/`test_kao2_hub.js`'te kırmızı, `App.kaoSetIntent` P8 (43→44 · 764→765 · 602→603, 9 pin dosyası + FIX-STATE `pins`, ölçerek), R-07 fail→pass.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-01)
-- Dal: `kao2-duzeltme` = canlı `main` (`3d97c338`) + belge-only commit'ler + K2F-12. Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.
-- Yayın pini (canlı): `20261001e` · `App.kao*` 43 · App yüzeyi 764 · atama 602 · `onclick` 393 (kaynak; canlıda 42/763/601).
+- Dal: `kao2-duzeltme` = canlı `main` (`4fd00131`) + belge-only kanıt commit'i. Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.
+- Yayın pini (canlı): `20261001f` (öncesi `20261001e`) · `App.kao*` 43 · App yüzeyi 764 · atama 602 · `onclick` 393 (canlıda da aynı).
 - Kapılar: KAO 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **8/10 PASS** (R-01…R-06, R-09, R-10); kalan R-07, R-08 FAIL (beklenen).
 - Bütçe (perf): içerik 184,231 KiB (tavan 256; müfredat modülü gzip 20,2 KiB ≤48) · runtime ≈110,3 KiB (tavan 128) · css ≈13,25 KiB (tavan 14).
 
 ## Açık riskler
-- Seviye 0 zinciri kaynak/test düzeyinde tamam; cihazda gözle doğrulanmadı (görsel QA yok) ve canlıda henüz yok.
+- Seviye 0 zinciri canlıda; cihazda gözle doğrulama kullanıcıda (kaynak-görsel QA terminalden yapıldı).
 - 3 gramer şablonu (g10-k3, g14-k2, g19-k3) yeni Türkçe içerik bekliyor (L1/L2, GRAMER-SABLON-L2.md öneriler).
 - Canlıda R-04…R-08 sürer (R-04, R-05, R-06 kaynakta kapandı; R-07, R-08 açık).
 - Yeni handler'lar (K2F-16, K2F-30) fx2/v3/surface pinlerini kaydırır — PROMPTLAR.md P8 listesine göre aynı committe (K2F-16: 44/765/603).

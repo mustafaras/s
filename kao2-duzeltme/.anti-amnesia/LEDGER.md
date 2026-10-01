@@ -459,3 +459,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - known-exposure (canlıda sürer, K2F-16+): R-07 niyet (Ayarlar'da görünmez/değişmez), R-08 "Uygula" adımı 97/109 derste içeriksiz; 3 gramer şablonu içerik bekliyor (L2).
 - steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `lastRelease` kaydı.
 - next: K2F-16
+
+## seq 48 · 2026-10-01 · NOTE · K2F-15
+- summary: Sekizinci erken yayın tamamlandı ve doğrulandı (seq 47 kararı). `main` ff-only `3d97c338..4fd00131`, Pages run 36890470595 success, pin `20261001f`.
+- verified: canlı 9/9 bayt-eşit (app.js, quranCurriculumV2.js, quranGrammarV1.js, quranLearn.js, quranLearnFlow.js, quranLearnViews.js, kao.css, sw.js, index.html); `App.kaoS0=function` canlıda; özel dosyalar 404; `SW_VERSION='20261001f'`.
+- evidence: kao2-duzeltme/evidence/K2F-15/YAYIN.md · release-live.json
+- note: push/`gh` sandbox dışında çalıştı; `main` bu not commit'inin gerisindedir (belge-only).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
+- next: K2F-16

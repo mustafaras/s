@@ -2,17 +2,17 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-12
-lastSeq: 38
+lastSeq: 39
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 38 · K2F-00…11 tamam (12/44), sıradaki K2F-12. R-01, R-02, R-03, R-09, R-10 PASS (5/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 39 · K2F-00…11 tamam (12/44), sıradaki K2F-12. R-01, R-02, R-03, R-09, R-10 PASS (5/10).
 
 ## Şu an neredeyiz
 K2F-11 bitti (K4-02 3/3 + K4-04): gramer görevleri artık doğrulanmış âyet örneğinden ve kavram tablosundan KURULUYOR (`quranLearn.js`
 tarifler: Kelime dizme, Parça çevir, Çekim tablosu, Ek çöz (g1 "el" + g5 yapışık ek), Anlam seç, Arapça seç, Kök bul, Kalıp eşle (g21)).
 83/86 şablon destekli (örnekli 43'ün 43'ü); 3 şablon (g10-k3, g14-k2, g19-k3) yeni Türkçe içerik istediği için gerekçe+öneriyle
-`docs/kuran-ogreniyorum/kao2/inceleme/GRAMER-SABLON-L2.md`'de (test üretir). EK TUR (seq 37, canlıda DEĞİL): kavram sayfasında doğrulanmış âyet örnekleri + notlar, dizme ipucu soldurma, tekrar-uret order-aware. Kullanıcı kararıyla görev "yönlendirir ve öğretir": Kelime dizme'de
+`docs/kuran-ogreniyorum/kao2/inceleme/GRAMER-SABLON-L2.md`'de (test üretir). EK TUR (seq 37, canlıda: `main` = `3d97c338`, run 36870144118, pin `20261001e`): kavram sayfasında doğrulanmış âyet örnekleri + notlar, dizme ipucu soldurma, tekrar-uret order-aware. Kullanıcı kararıyla görev "yönlendirir ve öğretir": Kelime dizme'de
 ilk kelime ipucu + anlam, cevap sonrası "Âyet ref: çeviri · Kural: plainTr". Dizme arayüzü fragman `order` etkileşimini paylaşır (genelleştirildi;
 fragman metni/notu yalnız fragmanlarda). Flow'da aynı gramer türü ardışık gelmez (araya kelime alıştırması). 109 ders yürüyüşünde gösterilen
 gramer görevi 37 → 64, 0 kusur, en az alıştırma 9. Bölüm B (B1–B6) + C (C1–C9) = 23 kontrol. Ek tur sonrası kapılar: bkz. KANIT. CANLIDA (erken yayın, `main` = `247c7392`, Pages run 36858234640, pin `20261001d`, canlı 7/7 bayt-eşit; LEDGER seq 35–36).
@@ -24,8 +24,8 @@ gramer görevi 37 → 64, 0 kusur, en az alıştırma 9. Bölüm B (B1–B6) + C
 `test_kao2_handler_surface.js` `KNOWN_MISSING` boşken PASS; pinler App.kao* 42→43 · yüzey 763→764 · atama 601→602 (P8 listesindeki 7 dosya + FIX-STATE `pins`, ölçerek); R-05 fail→pass.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-01)
-- Dal: `kao2-duzeltme` = `main` (canlı `247c7392`) + K2F-11 kanıt commit'i (belge-only). Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.
-- Yayın pini (canlı): `20261001d` (öncesi `20261001c`) · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi; `kaoGrammarSupport`/`kaoGrammarTaskValid` handler değil).
+- Dal: `kao2-duzeltme` = `main` (canlı `3d97c338`) + belge-only kanıt commit'i. Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.
+- Yayın pini (canlı): `20261001e` (öncesi `20261001d`) · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi; `kaoGrammarSupport`/`kaoGrammarTaskValid` handler değil).
 - Kapılar: KAO 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **5/10 PASS** (R-01, R-02, R-03, R-09, R-10); kalan R-04…R-08 FAIL (beklenen).
 - Bütçe (perf): içerik 183,287 KiB (tavan 256) · runtime ≈102,5 KiB (tavan 128) · css 12,938 KiB (tavan 14) · p95 ≈4,3 ms.

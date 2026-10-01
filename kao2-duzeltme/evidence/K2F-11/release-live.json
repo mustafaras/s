@@ -1,10 +1,10 @@
 {
   "prompt": "K2F-11",
   "verifiedAt": "2026-10-01",
-  "commit": "247c7392baf894560dbbf4cde3d8833cf4d495db",
-  "pin": "20261001d",
-  "previousPin": "20261001c",
-  "pagesRun": 36858234640,
+  "commit": "3d97c338db7b9598cfa81d9fa57f53b6b741b4fb",
+  "pin": "20261001e",
+  "previousPin": "20261001d",
+  "pagesRun": 36870144118,
   "conclusion": "success",
   "baseUrl": "https://mustafaras.github.io/s/",
   "files": [
@@ -39,8 +39,9 @@
   ],
   "privacy404": [
     "kao2-duzeltme/FIX-STATE.json",
-    "tools/kao-content-freeze.mjs",
+    "kao2-duzeltme/denetim/tekrar-uret.cjs",
     "tests/kao/test_kao2_grammar_tasks.js",
+    "tools/kao-content-freeze.mjs",
     "archive/kuran-ogreniyorum-v2/KAO2-STATE.json",
     "docs/kuran-ogreniyorum/content/grammar.verified.json",
     "docs/kuran-ogreniyorum/kao2/inceleme/GRAMER-SABLON-L2.md"

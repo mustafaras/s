@@ -361,3 +361,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - known-exposure (canlıda sürer, K2F-12…17): R-05 `App.kaoS0` tanımsız, R-06 Seviye 0 çökmeleri, R-04/R-07/R-08; 3 gramer şablonu içerik bekliyor (L2).
 - steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `lastRelease` kaydı.
 - next: K2F-12
+
+## seq 39 · 2026-10-01 · NOTE · K2F-11
+- summary: Yedinci erken yayın tamamlandı ve doğrulandı (seq 38 kararı). `main` ff-only `247c7392..3d97c338`, Pages run 36870144118 success, pin `20261001e`.
+- verified: canlı 7/7 bayt-eşit; `FIX-STATE.json`, `tekrar-uret.cjs`, gramer testi, `kao-content-freeze.mjs`, `KAO2-STATE.json`, `grammar.verified.json`, `GRAMER-SABLON-L2.md` 404; `SW_VERSION='20261001e'`.
+- evidence: kao2-duzeltme/evidence/K2F-11/YAYIN.md · release-live.json
+- note: push/`gh` sandbox dışında çalıştı; `main` bu not commit'inin gerisindedir (belge-only).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
+- next: K2F-12

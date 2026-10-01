@@ -10,8 +10,16 @@ Kapatılan bulgular: K5-03 (1/3) · R değişimi: yok
 
 ## Yapılan
 - `tests/kao/test_kao2_lesson_coherence.js`: 20 kategorili sözlük (başlık/hedef anahtar sözcüğü → lemma yüklemi, gerekçeli), eşik %60, 14 denetlenebilir kavram kategorisi (g3 g4 g6 g7 g9 g13–17 g19 g20 g22 g23). Başlık/hedef bir kategori anıyorsa ve kavramın kategorisi varsa her ikisi de eşiği geçmeli.
-- Üretim kodu değişmedi.
+- Üretim kodu değişmedi (ek tur 2'de de: araç + fixture + testler).
 - Ek tur (bağımsız 3 denetçi + çürütme, 6 bulgu doğrulandı, 7 aday reddedildi): `fiil` regex'i çekimli biçimleri (fiillerini/fiilini) kaçırıyordu → düzeltildi (+ geçmiş/şimdiki/geniş zaman → V); `ancak` yüklemi RET (idrâb harfi 'bal') saymıyor, yalnız EXP; yeni `bağlaç` (CONJ/AMD/EXL) ve `yardımcı fiil` (anlamı oldu/idi/değil/sabahladı olan V) kategorileri; g14 ve g23 kavramları yardımcı-fiil yüklemine bağlandı (g23 yanlışlıkla zarf-T'ydi); `zaman` kategorisi yalnız 'zaman kalıpları'; liste çıtası eklendi.
+
+## Ek tur 2 — bilimsel kip/anlam ölçümü (kullanıcı isteği: "emir etiketi yok" ve "kapı anlamı ölçmüyor" sınırları)
+- **Kaynak:** Quranic Arabic Corpus 0.4 (Dukes & Habash 2010; GPL) — yerel girdi `docs/kuran-ogreniyorum/content/inputs/` (gitignore). Etiket tanımları resmî belgeden doğrulandı: PERF/IMPF/IMPV fiil kökü aspect özellikleri (corpus.quran.com/documentation/morphologicalfeatures.jsp), `l:IMPV+` emir lâmı önek özelliği AYRIDIR (sayılmaz), VOC seslenme edatı (…/tagset.jsp).
+- **Araç:** `tools/kao2-lemma-morph-build.mjs --write|--check` → `tests/kao/fixtures/qac-lemma-morph.json` (123 KB, 524 lemma × {perf, impf, impv, voc, total, ilk 3 örnek âyette aynı sayımlar}; sha256 girdi kaydı; bayt-eşit üretim doğrulandı; lemma anahtarı sözlük yapım kuralıyla aynı: ilk LEM, yoksa parça biçimleri). Uygulama, içerik modülleri, bütçe ve yayın pini DEĞİŞMEDİ.
+- **ETİKET:** emir/geçmiş/şimdiki/seslenme artık veriden: ders lemmalarının ≥%60'ı hedef kipi Kur'an'da kullanıyor mu. Sonuç: u09.01 (emir) etiket düzeyinde GEÇER (4/5 lemma emirle kullanılır) ve ETİKET listesinden çıktı; u09.02 (seslenme %0) ve u09.11 (emir %33) kalır.
+- **ÖRNEK (yeni ölçüm):** öğrencinin gördüğü örnek âyetlerin ≥%60'ında hedef kip geçmeli. 11 ders tutmuyor: u07.01 %58 · u07.03 %13 · u07.04 %53 · u07.06 %53 · u07.09 %42 · u08.01 %47 · u08.02 %40 · u08.09 %44 · u09.01 %40 · u09.02 %0 · u09.11 %0 — yani "Emir kipi" dersinin örneklerinin yalnız %40'ı gerçekten emir.
+- **ANLAM (yeni ölçüm):** 82 tematik dersin başlık sözcükleri lemma anlamlarında (Türkçe mastar/çoğul atılmış 3–4 harf kök-önek) aranır; özet dersler (hedefte pekiştireceksin/baştan sona/birlikte) kapsam dışı. 1 ders tutmuyor: u06.20 (topluluk≈grup eşanlamlısı; yöntem sınırı, listede notlu).
+- **Sınır (dürüst):** ANLAM ölçümü kök-önek örtüşmesidir; eşanlamlı ve mecaz ölçmez. ÖRNEK ölçümü örnek seçiminin kipe uyumunu ölçer, çeviri doğruluğunu değil. Her iki liste yalnız küçülür.
 
 ## TDD
 - Kırmızı: `node tests/kao/test_kao2_lesson_coherence.js` (KNOWN_MISMATCH=[]) → AssertionError: bulunan: ["u02.01","u02.02","u03.02","u04.01","u04.02","u09.01","u09.02","u09.11","u10.01","u10.03","u11.04","u11.05","u12.02","u12.03"]

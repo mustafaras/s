@@ -537,3 +537,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - rejected-by-verifier (7): emir yüklemi sabit false (veri sınırı), liste mekanik küçülme (prompt kapsamı), zaman=T/N zarf, olumlu örnek eksikliği, K2F-20 boşaltma imkânı, %60 eşik n=5, regex kırılganlığı (kapsam sınırı) — belgelendi, kod değişmedi.
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - next: K2F-20
+
+## seq 55 · 2026-10-01 · FIX · K2F-19
+- request: kullanıcı: emir etiketi yok ve kapı yalnız etikete bakıyor → "en bilimsel şekilde düzelt, web search yaparak kaynaklara eşle". Kararlar (AskUserQuestion): veri yeri = test yanı tablo; kapsam = K2F-19 ek turu.
+- done: QAC 0.4 etiket tanımları resmî belgeden doğrulandı (morphologicalfeatures.jsp, tagset.jsp); `tools/kao2-lemma-morph-build.mjs` + `tests/kao/fixtures/qac-lemma-morph.json` (SAYILMIŞ PERF/IMPF/IMPV/VOC, ilk 3 örnek âyette aynı sayımlar, bayt-eşit üretim, lemma anahtarı sözlük kuralıyla aynı, CRLF); kapı üç ölçümlü: ETİKET (kip veriden) · ÖRNEK (gösterilen âyetlerde hedef kip ≥%60) · ANLAM (tematik derste başlık↔lemma anlamı); yeni `test_kao2_lemma_morph.js`.
+- result: ETİKET 17→16 (u09.01 etiket düzeyinde geçer), ÖRNEK 11 ders, ANLAM 1 ders (u06.20, eşanlamlı sınırı); toplam çıtalı üç liste.
+- scope: Dokun listesi genişledi (kullanıcı onaylı): tools/kao2-lemma-morph-build.mjs, tests/kao/fixtures/qac-lemma-morph.json, tests/kao/test_kao2_lemma_morph.js. Uygulama/içerik modülü/bütçe/pin değişmedi.
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- next: K2F-20

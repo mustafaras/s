@@ -331,3 +331,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: `tekrar-uret` yürüyüşçüsü çok adımlı "Kelime dizme" görevinde takılıp aynı görevi tekrar tekrar sayıyor (R-03 "4035 görev"); R-03 yine PASS ama koruma gücü azaldı — gerçek koruma bölüm C8. Oracle yürüyüşçüsü bir sonraki uygun promptta order-aware yapılabilir. 71/86 şablon destekli; 15'i `GRAMER-SABLON-L2.md`'de gerekçeyle.
 - next: K2F-12
+
+## seq 35 · 2026-10-01 · DECISION · K2F-11
+- decision: Altıncı erken yayın — kullanıcı açık isteği ("canlıya al"). Kapsam: K2F-11 (gramer görevleri doğrulanmış örnek ve kavram tablosundan kurulur; ardışık aynı tür engeli: `app/core/quranLearn.js`, `app/core/quranLearnFlow.js`). Pin `20261001c` → `20261001d` (index.html, sw.js, 8 pin taşıyan test).
+- scope-effect: planlı YAYIN-1 (K2F-18) ayrıca sürer. `releaseApproval` = `approved_through_K2F-11`. Canlıda gramer görevleri örnekten kurulur, Çekim tablosu geri gelir.
+- known-exposure (canlıda sürer, K2F-12…17): R-05 `App.kaoS0` tanımsız, R-06 Seviye 0 çökmeleri, R-04/R-07/R-08.
+- steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `lastRelease` kaydı.
+- next: K2F-12

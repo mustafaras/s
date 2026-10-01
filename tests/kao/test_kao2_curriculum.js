@@ -181,9 +181,9 @@ check('(h) gzip ≤ 48 KiB', () => {
 check('yükleme listeleri: index.html, sw.js ve üç FILES listesi', () => {
   const html = read('index.html').toString('utf8');
   const a = html.indexOf('app/content/quranPhonicsV1.js');
-  const b = html.indexOf('app/content/quranCurriculumV2.js?v=20261001c');
-  assert.ok(a > 0 && b > a, 'index.html: quranPhonicsV1.js sonrası 20261001c pinli satır yok');
-  assert.ok(read('sw.js').toString('utf8').includes("'./app/content/quranCurriculumV2.js?v=20261001c'"), 'sw.js önbellek listesi');
+  const b = html.indexOf('app/content/quranCurriculumV2.js?v=20261001d');
+  assert.ok(a > 0 && b > a, 'index.html: quranPhonicsV1.js sonrası 20261001d pinli satır yok');
+  assert.ok(read('sw.js').toString('utf8').includes("'./app/content/quranCurriculumV2.js?v=20261001d'"), 'sw.js önbellek listesi');
   for (const file of ['.claude/skills/run-seyma/driver.mjs', '.claude/skills/run-seyma/zikr-harness.mjs', 'tests/app/test_state_rebind_boundary.js']) {
     const src = read(file).toString('utf8');
     const p = src.indexOf("'app/content/quranPhonicsV1.js'");

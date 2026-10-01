@@ -212,4 +212,34 @@ check('(f/B2) kapı DOKUNULMAZ; yeni S0 akışı AYRI yüzey', () => {
   assert.doesNotMatch(html, /kao-gate/, 'kapı yüzeyi S0 ekranına karışmaz');
 });
 
+// ---- (g) K2F-12 · App.kaoS0 tanımlı ve S0 görünümü gerçekten açılır ---------------
+const kao = require('./helpers/kao-harness');
+check('(g/K2F-12) kaoS0("start") yığına s0 görünümünü iter: NavBar "Harfler", ders ekranı çizilir, geri ana ekrana döner', () => {
+  const t = kao.bootKao();
+  kao.freshUser(t);
+  assert.equal(t.api.kaoOpen('home'), true);
+  assert.equal(t.api.kaoS0('start', 's0.02'), true, 'S0 dersi başlar');
+  assert.equal(t.ui.kaoView, 's0', 'görünüm s0');
+  const views = Array.from(t.ui.kaoStack, (e) => e.view);
+  assert.deepEqual(views.slice(-2), ['home', 's0'], 'yığın: ana ekran → s0 (gerçek yönlendirme)');
+  const html = t.api.kaoOverlayHTML(t.NOW);
+  assert.equal(kao.navTitle(html), 'Harfler', 'NavBar başlığı');
+  assert.match(html, /kao-s0/, 'S0 ekranı çizilir');
+  assert.match(kao.text(html), /Nokta ailesi/, 'seçilen dersin başlığı');
+  assert.equal(t.api.kaoS0('next'), true, 'sıradaki adım çalışır');
+  assert.equal(t.ui.kaoView, 's0', 'sıradaki adım görünümü değiştirmez');
+  assert.equal(t.api.kaoS0('start', 's0.03'), true, 'ikinci ders başlar');
+  assert.equal(Array.from(t.ui.kaoStack, (e) => e.view).filter((v) => v === 's0').length, 1, 'ders değişince s0 yığında ikilenmez (replace)');
+  assert.equal(t.api.kaoS0('start', 'yok-boyle-ders'), false, 'bilinmeyen ders reddedilir, görünüm değişmez');
+  assert.equal(t.ui.kaoView, 's0');
+  t.api.kaoBack();
+  assert.equal(t.ui.kaoView, 'home', 'geri ana ekrana döner');
+});
+
+check('(g/K2F-12) app.js tek satırlık App.kaoS0 shim\'ini taşır ve motor yüzeyinde kaoS0 var', () => {
+  const appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  assert.match(appSrc, /App\.kaoS0 *= *function\(\)\{ *return window\.SeymaQuranLearn\.kaoS0\.apply\(null, *arguments\); *\};/);
+  assert.equal(typeof kao.bootKao().api.kaoS0, 'function');
+});
+
 console.log(`KAO2 s0: PASS (${passed} kontrol)`);

@@ -227,8 +227,8 @@ group(
 
 // 9. FX2 dokunuşları eski App yüzeyini değiştirmez.
 const handlers = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-// KAO2-12 ders oynatıcı eylemiyle toplam yüzey 764'e yükseldi; KAO2-25 kaoWordLayer'ı kaldırdı → 763. Etkileşim sayacı 393 kaldı.
-group('FX2-10.9 App ve etkileşim sözleşmesi (FX2-15 + _goTimer)', handlers.size === 763 && count(/onclick=/g, combinedSource) === 393);
+// KAO2-12 ders oynatıcı eylemiyle toplam yüzey 764'e yükseldi; KAO2-25 kaoWordLayer'ı kaldırdı → 763; K2F-12 kaoS0 tanımını ekledi → 764. Etkileşim sayacı 393 kaldı.
+group('FX2-10.9 App ve etkileşim sözleşmesi (FX2-15 + _goTimer)', handlers.size === 764 && count(/onclick=/g, combinedSource) === 393);
 
 // 10. Yüksek değerli niyetler sözlükte bulunur; none erken dönüşle sessizdir.
 const intentBody = (mediaSource.match(/var FX_INTENT\s*=\s*\{([\s\S]*?)\n\s*\};/) || [])[1] || '';

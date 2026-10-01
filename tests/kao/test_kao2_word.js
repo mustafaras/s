@@ -124,7 +124,7 @@ check('kelime ekranı yeni App.kao* handler eklemez', () => {
   assert.equal(new Set(exported).size, exported.length, 'yinelenen export');
   const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
   const handlers = new Set([...appSource.matchAll(/App\.(kao[A-Za-z0-9_]*)\s*=\s*function/g)].map((m) => m[1]));
-  assert.equal(handlers.size, 42, `App.kao* pin kaydı: ${handlers.size}`);
+  assert.equal(handlers.size, 43, `App.kao* pin kaydı: ${handlers.size}`);
 });
 
 // ---- (7) Panel aynası: yeni alanlar, anlatı metni yok ------------------

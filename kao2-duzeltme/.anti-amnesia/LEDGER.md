@@ -369,3 +369,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - note: push/`gh` sandbox dışında çalıştı; `main` bu not commit'inin gerisindedir (belge-only).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
 - next: K2F-12
+
+## seq 40 · 2026-10-01 · PROMPT · K2F-12
+- status: done
+- title: Seviye 0 1/4 — App.kaoS0 ve s0 görünümü
+- prev-commit: a42fe59f
+- evidence: kao2-duzeltme/evidence/K2F-12/KANIT.md
+- closes: K5-02 (i, ii)
+- repro: R-05 fail→pass · toplam 6/10
+- gates: kapilar.sh YEŞİL (kao 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 43 · yüzey 764 · atama 602 · yayın 20261001e
+- changed-tests: test_kao2_handler_surface.js (KNOWN_MISSING boş) · 8 pin testi (42/763/601 → 43/764/602; test_kao2_settings ve test_kao2_word P8 arama kalıbında yoktu)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: S0 görünümü artık açıldığından R-06 (6 ders çöküyor) kullanıcıya görünür; yayından önce K2F-13 tamamlanmalı. NavBar başlığı "Seviye 0" → "Harfler" (plan metni).
+- next: K2F-13

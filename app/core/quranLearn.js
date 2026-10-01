@@ -662,7 +662,8 @@
   function kaoS0(action,value){
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),state=objectOr(ui.kaoS0,{});
-    if(action==='start'){ if(!kaoS0Start(value)) return false; quranLearnDeps.render(); return true; }
+    // K2F-12 (K5-02 i, ii): başlatma S0 görünümünü gerçekten açar (ana ekran → s0); s0'dayken ders değişimi üst öğeyi değiştirir.
+    if(action==='start'){ if(!kaoS0Start(value)) return false; kaoApplyView(ui,'s0',value,ui.kaoView==='s0'?'replace':'push'); quranLearnDeps.render(); return true; }
     if(action==='next'){
       var flow=kaoS0Lesson(state.lessonId); if(!flow) return false;
       state.stage=Math.min(flow.stages.length-1,Math.floor(nonNegativeNumber(state.stage,0))+1);
@@ -3289,7 +3290,7 @@
     return '<button type="button" id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()" aria-haspopup="dialog" aria-label="'+quranLearnDeps.esc(label)+'">'+(typeof views.hubCard==='function'?views.hubCard(model):'<span class="kao-hub-title">'+quranLearnDeps.esc(model.title)+'</span>')+'</button>';
   }
   var KAO_HOME_TITLE="Kur'an Arapçası";
-  var KAO_VIEW_TITLES={home:KAO_HOME_TITLE,units:'Yol',unit:'Ünite',word:'Kelime',reader:'Sûre',settings:'Ayarlar',phonics:'Telaffuz',ayah:'Günün âyeti',prayer:'Namazda ne diyorum',stats:'İlerleme',gate:'Harf kontrolü',session:'Oturum',grammar:'Gramer notları',concept:'Kavram',roots:'Kök aileleri',s0:'Seviye 0',sources:'Hakkında ve kaynaklar'};
+  var KAO_VIEW_TITLES={home:KAO_HOME_TITLE,units:'Yol',unit:'Ünite',word:'Kelime',reader:'Sûre',settings:'Ayarlar',phonics:'Telaffuz',ayah:'Günün âyeti',prayer:'Namazda ne diyorum',stats:'İlerleme',gate:'Harf kontrolü',session:'Oturum',grammar:'Gramer notları',concept:'Kavram',roots:'Kök aileleri',s0:'Harfler',sources:'Hakkında ve kaynaklar'};
   function kaoFlowApi(){
     var flow=window.SeymaQuranLearnFlow;
     if(!flow||flow.version!==1||typeof flow.createStack!=='function'||typeof flow.openStack!=='function'||typeof flow.push!=='function'||typeof flow.reset!=='function'||typeof flow.replaceTop!=='function'||typeof flow.current!=='function'||typeof flow.previous!=='function'||typeof flow.back!=='function') throw new Error('KAO2-04: gezinme akışı yüklenmedi');

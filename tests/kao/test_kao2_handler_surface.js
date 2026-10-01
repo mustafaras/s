@@ -8,7 +8,7 @@ const { bootKao, read } = require('./helpers/kao-harness');
 
 // K2F-12 boşaltır: işaretlemede çağrılıp app.js'te henüz tanımlanmamış adlar. Liste yalnız küçülebilir;
 // her ad gerçekten eksik olmalıdır (aşağıdaki kontrol), yoksa test listeyi bayat sayar.
-const KNOWN_MISSING = ['kaoS0'];
+const KNOWN_MISSING = []; // K2F-12 boşalttı: App.kaoS0 tanımlandı
 
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };

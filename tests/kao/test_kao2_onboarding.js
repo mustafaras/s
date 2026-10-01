@@ -356,7 +356,7 @@ check('handler sayacı 43 (§4 + KAO2-19 okuyucu + KAO2-20 kök) ve app.js tek s
   const app = read('app.js');
   const names = new Set((app.match(/App\.kao[A-Za-z0-9_]*\s*=[^=]/g) || []).map((s) => s.match(/App\.kao[A-Za-z0-9_]*/)[0]));
   // KAO2-19 okuyucu (41) ve KAO2-20 kök eylemleriyle (43) arttı.
-  assert.equal(names.size, 42, 'KAO2-25 kaoWordLayer\'ı kaldırdı');
+  assert.equal(names.size, 43, 'KAO2-25 kaoWordLayer\'ı kaldırdı; K2F-12 kaoS0 ekledi');
   assert.ok(names.has('App.kaoOnboard'));
   assert.equal((app.match(/App\.kaoOnboard=function\(action,value\)\{ return window\.SeymaQuranLearn\.kaoOnboard\.apply\(null,arguments\); \};/g) || []).length, 1);
   for (const file of ['app/core/quranLearn.js', 'app/core/quranLearnViews.js']) {

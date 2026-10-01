@@ -7,8 +7,8 @@
   "branch": "kao2-duzeltme",
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
-  "nextPrompt": "K2F-16",
-  "ledgerLastSeq": 48,
+  "nextPrompt": "K2F-17",
+  "ledgerLastSeq": 49,
   "releaseApproval": "approved_through_K2F-15",
   "lastRelease": {"prompt": "K2F-15", "commit": "4fd00131", "pin": "20261001f", "run": 36890470595, "evidence": "kao2-duzeltme/evidence/K2F-15/YAYIN.md"},
   "sources": {
@@ -33,9 +33,9 @@
   },
   "pins": {
     "release": "20261001f",
-    "kaoHandlers": 43,
-    "appSurface": 764,
-    "appAssignments": 602,
+    "kaoHandlers": 44,
+    "appSurface": 765,
+    "appAssignments": 603,
     "onclick": 393,
     "plannedHandlerChanges": {
       "K2F-16": "+App.kaoSetIntent → 44 / yüzey 765 / atama 603",
@@ -49,7 +49,7 @@
     "R-04": "pass",
     "R-05": "pass",
     "R-06": "pass",
-    "R-07": "fail",
+    "R-07": "pass",
     "R-08": "fail",
     "R-09": "pass",
     "R-10": "pass"
@@ -89,7 +89,7 @@
     "K2F-13": { "wave": "W1", "title": "Seviye 0 2/4 — harfsiz dersler", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-13/KANIT.md" },
     "K2F-14": { "wave": "W1", "title": "Seviye 0 3/4 — aşamalar ve alıştırmalar", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-14/KANIT.md" },
     "K2F-15": { "wave": "W1", "title": "Seviye 0 4/4 — ana yol ve tamamlama", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-15/KANIT.md" },
-    "K2F-16": { "wave": "W1", "title": "Niyet — okuma, değiştirme, öneri", "status": "pending", "evidence": null },
+    "K2F-16": { "wave": "W1", "title": "Niyet — okuma, değiştirme, öneri", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-16/KANIT.md" },
     "K2F-17": { "wave": "W1", "title": "Dalga 1 regresyonu ve ara rapor", "status": "pending", "evidence": null },
     "K2F-18": { "wave": "W1", "title": "YAYIN-1 (kullanıcı onay kapısı)", "status": "pending", "evidence": null },
     "K2F-19": { "wave": "W2", "title": "Ders tutarlılık kapısı (test)", "status": "pending", "evidence": null },

@@ -91,6 +91,27 @@ check('(b2) niyet önerisi yalnız "bekliyor" durumunda alt satırın yerine ge�
   assert.doesNotMatch(card(api.kaoHubCardHTML()).sub, /Niyet/, 'bugün tamamken öneri yok');
 });
 
+check('(b3) K2F-16 · niyet varsa öneri o vaktin saatiyle; niyet yoksa/özelse sıradaki-vakit davranışı', () => {
+  const { api, state, cur } = boot();
+  const q = api.ensureQuranLearn(state.data); q.onboarding.doneAt = ISO;
+  settle(q, cur.units[0].lessons[0].lemmaIds);
+  const times = { fajr: '05:10', dhuhr: '13:05', asr: '16:30', maghrib: '19:00', isha: '20:30' };
+  state.data.days[TODAY] = { prayer: Object.fromEntries(Object.entries(times).map(([k, v]) => [k, { time: v }])) };
+  q.onboarding.intent = 'isha';
+  assert.equal(card(api.kaoHubCardHTML()).sub, 'Niyet önerisi: yatsı namazından sonra 5 dakika (20:30)', 'sıradaki vakit sabah/öğle olsa bile niyet vakti');
+  q.onboarding.intent = 'asr';
+  assert.equal(card(api.kaoHubCardHTML()).sub, 'Niyet önerisi: ikindi namazından sonra 5 dakika (16:30)');
+  q.onboarding.intent = 'custom';
+  assert.match(card(api.kaoHubCardHTML()).sub, /^Niyet önerisi: (sabah|öğle|ikindi|akşam|yatsı) namazından sonra|^Niyet önerisi: yarın sabah/, 'özel niyet: sıradaki vakit');
+  q.onboarding.intent = 'isha';
+  q.daily[TODAY] = { answered: 1, correct: 1, new: 0, reviewed: 1 };
+  assert.match(card(api.kaoHubCardHTML()).sub, /^Sıradaki: /, 'bugün çalışıldıysa niyet önerisi yok');
+  // Saf yardımcı: dördüncü argüman niyet; vakit verisi yoksa niyet olsa da öneri yok.
+  assert.equal(api.kaoIntentSuggestion(state.data, '2026-09-30T10:00:00', TODAY, 'maghrib'), 'akşam namazından sonra 5 dakika (19:00)');
+  assert.equal(api.kaoIntentSuggestion(state.data, '2026-09-30T21:00:00', TODAY, 'maghrib'), 'yarın akşam namazından sonra 5 dakika (19:00)', 'vakit geçtiyse yarın');
+  assert.equal(api.kaoIntentSuggestion(state.data, '2026-09-30T10:00:00', '2026-10-06', 'maghrib'), '', 'vakit verisi yoksa öneri yok');
+});
+
 check('(c) bugün tamam: ✓ başlık, yarınki tekrar sayısı, "Aç"', () => {
   const { api, state, cur } = boot();
   const q = api.ensureQuranLearn(state.data); q.onboarding.doneAt = ISO;

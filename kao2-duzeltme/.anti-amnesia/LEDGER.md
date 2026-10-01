@@ -467,3 +467,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - note: push/`gh` sandbox dışında çalıştı; `main` bu not commit'inin gerisindedir (belge-only).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
 - next: K2F-16
+
+## seq 49 · 2026-10-01 · PROMPT · K2F-16
+- status: done
+- title: Niyet — okuma, değiştirme, öneri
+- prev-commit: 825d56e2
+- evidence: kao2-duzeltme/evidence/K2F-16/KANIT.md
+- closes: K3-06, K3-05, P-10, D-18
+- repro: R-07 fail→pass · toplam 9/10
+- gates: kapilar.sh YEŞİL (bkz. KANIT)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001f
+- changed-tests: test_kao2_settings.js (handler pini 43→44) · test_kao2_word.js, test_kao2_onboarding.js (43→44) · test_app_surface_daily_boundary.js (602→603 · 764→765) · test_fx2_{tab_transition,touch_coverage,overlay_motion}.js, test_v3_welcome.js (764→765) · gerekçe: yeni App.kao* handler (P8)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: kök neden Ayarlar'ın `settings.intent` okuması; onboarding niyeti `onboarding.intent` altına yazıyordu (iki ayrı alan) → Ayarlar artık `onboarding.intent` okur.
+- next: K2F-17

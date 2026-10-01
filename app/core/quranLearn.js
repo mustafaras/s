@@ -2191,6 +2191,7 @@
     quranLearnDeps.ui().kaoTasks={}; kaoSave(); quranLearnDeps.render(); return true;
   }
   function kaoSetDailyNew(n){ var value=Number(n); return KAO_DAILY_NEW.indexOf(value)>=0&&kaoCommitSetting(function(q){ q.settings.dailyNew=value; }); }
+  function kaoSetIntent(value){ return typeof value==='string'&&KAO_ONBOARD_INTENTS.some(function(pair){ return pair[0]===value; })&&kaoCommitSetting(function(q){ q.onboarding.intent=value; }); }
   function kaoSetAudioStyle(style){
     if(['off','measured','flowing'].indexOf(style)<0) return false;
     return kaoCommitSetting(function(q){ q.settings.audio=style!=='off'; if(style!=='off') q.settings.audioStyle=style; });
@@ -2286,7 +2287,8 @@
     var sample=KAO_READABILITY_SAMPLE,audio=s.audio?kaoAudioStyle():'off';
     var h='<main class="kao-settings" aria-labelledby="kao-settings-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Ayarlar</p><h2 id="kao-settings-title">Öğrenme ayarların</h2><p>Seçimlerin bu cihazda saklanır ve senkronla taşınır.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
     h+='<section><h3>Günlük hedef</h3>'
-      +'<p class="kao-setting-hint">Niyet: '+esc((function(){ var v=String(s.intent||''); var hit=KAO_INTENT_PRAYERS.filter(function(pair){ return pair[0]===v; })[0]; return hit?('Her '+hit[1]+' namazından sonra 5 dakika'):'Henüz seçilmedi'; })())+'</p>'
+      +'<p class="kao-setting-hint">Niyet: '+esc((function(){ var v=String(q.onboarding.intent||''); var hit=KAO_INTENT_PRAYERS.filter(function(pair){ return pair[0]===v; })[0]; return hit?('Her '+hit[1]+' namazından sonra 5 dakika'):(v==='custom'?'Kendim seçerim':'Henüz seçilmedi'); })())+'</p>'
+      +kaoSegHTML('Niyet',KAO_ONBOARD_INTENTS.map(function(pair){ return [pair[0],pair[1],"'"+pair[0]+"'"]; }),q.onboarding.intent,'kaoSetIntent')
       +kaoSegHTML('Günlük yeni kelime',KAO_DAILY_NEW.map(function(n){ return [n,String(n),n]; }),Math.floor(nonNegativeNumber(s.dailyNew,10)),'kaoSetDailyNew')+'</section>';
     h+='<section><h3>Ses</h3>'+kaoSegHTML('Yeni kelimede otomatik ses',[['off','Kapalı',"'off'"],['measured','Yavaş',"'measured'"],['flowing','Doğal',"'flowing'"]],audio,'kaoSetAudioStyle')+'<p class="kao-setting-hint">Ses düğmesinde dokunmak yavaş, basılı tutmak doğal hızı çalar. Sessiz saatte otomatik ses çalmaz.</p></section>';
     h+='<section><h3>Okuma</h3>'+kaoSegHTML('Latin okunuş katmanı',[['tr','Okunuş',"'tr'"],['dia','DİA',"'dia'"]],kaoTranslitLayer(),'kaoSetTranslit')+'<p class="kao-setting-hint">DİA katmanı kelime kartlarında harfleri birebir ayırır (ḥ, ṣ, ʿ); âyet ve parça okunuşları Okunuş katmanında kalır.</p>';
@@ -3414,7 +3416,7 @@
     return kaoViewsApi().onboardScreen(Object.assign({skip:kaoOnboardAction('skip')},kaoOnboardBody(ui,st)));
   }
   // 02 §5.8 uygulama niyeti: bugünün namaz vakitleri yalnız okunur (days[bugün].prayer; yazma/gün kaydı yok, bildirim yok).
-  var KAO_INTENT_PRAYERS=[['fajr','sabah'],['dhuhr','öğle'],['asr','ikindi'],['maghrib','akşam'],['isha','yatsı']]; function kaoIntentSuggestion(d,nowValue,today){ var now=validDate(nowValue,'now'),day=objectOr(objectOr(d&&d.days,{})[today],{}),times=objectOr(day.prayer,{}),minutes=now.getHours()*60+now.getMinutes(),any=false,next=null; KAO_INTENT_PRAYERS.forEach(function(pair){ var m=/(\d{1,2}):(\d{2})/.exec(String(objectOr(times[pair[0]],{}).time||'')); if(!m) return; any=true; if(!next&&Number(m[1])*60+Number(m[2])>minutes) next=pair[1]+' namazından sonra 5 dakika ('+(m[1].length<2?'0':'')+m[1]+':'+m[2]+')'; }); return any?(next||'yarın sabah namazından sonra 5 dakika'):''; }
+  var KAO_INTENT_PRAYERS=[['fajr','sabah'],['dhuhr','öğle'],['asr','ikindi'],['maghrib','akşam'],['isha','yatsı']]; function kaoIntentSuggestion(d,nowValue,today,intent){ var now=validDate(nowValue,'now'),day=objectOr(objectOr(d&&d.days,{})[today],{}),times=objectOr(day.prayer,{}),minutes=now.getHours()*60+now.getMinutes(),any=false,next=null,chosen=null; function clock(m,pair){ return pair[1]+' namazından sonra 5 dakika ('+(m[1].length<2?'0':'')+m[1]+':'+m[2]+')'; } KAO_INTENT_PRAYERS.forEach(function(pair){ var m=/(\d{1,2}):(\d{2})/.exec(String(objectOr(times[pair[0]],{}).time||'')); if(!m) return; any=true; if(pair[0]===intent) chosen=(Number(m[1])*60+Number(m[2])>minutes?'':'yarın ')+clock(m,pair); if(!next&&Number(m[1])*60+Number(m[2])>minutes) next=clock(m,pair); }); return chosen||(any?(next||'yarın sabah namazından sonra 5 dakika'):''); }
   // KAO2-10 · 05 §8 hub kartı: nextStep'ten tek bilgi + tek eylem; halka gerçek ünite ilerlemesi.
   // Ana sekme render'ında çalışır: veri yazmaz (normalizasyon kopyada) ve motor/müfredat eksikse sade karta düşer.
   var KAO_HUB_TITLE='Kur’an Arapçası';
@@ -3437,7 +3439,7 @@
       return {title:KAO_HUB_TITLE+' ✓',subtitle:'Bugünlük tamam'+(tomorrow>0?' · yarın '+tomorrow+' tekrar':''),action:'Aç',ring:ring};
     }
     var lesson=(step.kind==='daily'||step.kind==='next-unit')&&typeof curriculum.byLesson==='function'?curriculum.byLesson(step.param):null;
-    var today=quranLearnDeps.todayStr(),answered=Math.floor(nonNegativeNumber(objectOr(q.daily[today],{}).answered,0)),intent=answered?'':kaoIntentSuggestion(d,now,today);
+    var today=quranLearnDeps.todayStr(),answered=Math.floor(nonNegativeNumber(objectOr(q.daily[today],{}).answered,0)),intent=answered?'':kaoIntentSuggestion(d,now,today,q.onboarding&&q.onboarding.intent);
     return {title:KAO_HUB_TITLE+' · '+(step.kind==='s0-lesson'?'Harfler':'Ünite '+at.unit.id),subtitle:intent?'Niyet önerisi: '+intent:'Sıradaki: '+(lesson?lesson.title:step.title)+' · '+step.minutes+' dk',action:'Devam',ring:ring};
   }
   function kaoHubCardHTML(){
@@ -3883,6 +3885,7 @@
     kaoLemmaReading:kaoLemmaReading,
     kaoStripHarakat:kaoStripHarakat,
     kaoSetDailyNew:kaoSetDailyNew,
+    kaoSetIntent:kaoSetIntent,
     kaoSetAudioStyle:kaoSetAudioStyle,
     kaoToggleHarakat:kaoToggleHarakat,
     kaoToggleFade:kaoToggleFade,

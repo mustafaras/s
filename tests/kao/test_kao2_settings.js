@@ -64,6 +64,29 @@ check('Günlük hedef: süre segmenti (5/10/15) + niyet satırı', () => {
   assert.match(html, /niyet|Niyet/, 'niyet satırı görünür (D-18 uygulama niyeti)');
 });
 
+check('K2F-16 · Niyet: onboarding.intent Ayarlar\'da görünür, kaoSetIntent ile değişir, geçersiz değer reddedilir', () => {
+  const t = boot();
+  assert.match(decode(t.api.kaoSettingsHTML()), /Niyet: Henüz seçilmedi/, 'niyet yokken');
+  t.q.onboarding.intent = 'isha';
+  const html = decode(t.api.kaoSettingsHTML());
+  assert.match(html, /Niyet: Her yatsı namazından sonra 5 dakika/, 'onboarding.intent okunur (K3-06)');
+  // Seçim segmenti: 5 vakit + kendim; mevcut seçim basılı.
+  const seg = html.match(/<div class="kao-seg" role="group" aria-label="Niyet">[\s\S]*?<\/div>/);
+  assert.ok(seg, 'niyet segmenti var');
+  assert.equal((seg[0].match(/App\.kaoSetIntent\(/g) || []).length, 6, 'sabah/öğle/ikindi/akşam/yatsı/kendim');
+  assert.match(seg[0], /aria-pressed="true" onclick="App\.kaoSetIntent\('isha'\)"/, 'mevcut niyet basılı');
+  for (const v of ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'custom']) {
+    assert.equal(t.api.kaoSetIntent(v), true, `${v} kabul`);
+    assert.equal(t.q.onboarding.intent, v);
+  }
+  assert.match(decode(t.api.kaoSettingsHTML()), /Niyet: Kendim seçerim/, 'custom satırı');
+  t.api.kaoSetIntent('dhuhr');
+  for (const bad of ['', 'noon', null, undefined, 5, '__proto__', 'FAJR']) {
+    assert.equal(t.api.kaoSetIntent(bad), false, `${String(bad)} reddedilir`);
+    assert.equal(t.q.onboarding.intent, 'dhuhr', 'geçersiz değer mevcut niyeti bozmaz');
+  }
+});
+
 check('Ses grubu: otomatik ses + hız/üslup segmenti + gölgeleme; sessiz saat notu', () => {
   const t = boot();
   const html = decode(t.api.kaoSettingsHTML());
@@ -112,10 +135,10 @@ check('alt sayfa kaynak/lisans + sürüm + gizlilik bilgisini taşır', () => {
 });
 
 // ---- (3) Handler sayısı DEĞİŞMEDİ (kartın kabul ölçütü) --------------------
-check('handler sayısı değişmedi: App.kao* 43 kalır (yeni handler yok)', () => {
+check('handler sayısı: App.kao* 44 (K2F-16 kaoSetIntent ekledi)', () => {
   const app = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
   const kao = new Set((app.match(/App\.kao[A-Za-z0-9_]*\s*=[^=]/g) || []).map((s) => s.match(/App\.kao[A-Za-z0-9_]*/)[0]));
-  assert.equal(kao.size, 43, `App.kao* sayısı 43 olmalı — KAO2-25 katman sayfalamasını kaldırdı, K2F-12 kaoS0 ekledi (ölçülen ${kao.size})`);
+  assert.equal(kao.size, 44, `App.kao* sayısı 44 olmalı — KAO2-25 katman sayfalamasını kaldırdı, K2F-12 kaoS0, K2F-16 kaoSetIntent ekledi (ölçülen ${kao.size})`);
 });
 
 check('ayarlar hâlâ TEK veri kaynağı: IIP sekmesine kopyalanmaz', () => {

@@ -101,6 +101,13 @@ function playLesson(t, { answer = 'correct', visit } = {}) {
       const task = item && t.ui.kaoTasks[item.id];
       if (!task) return false;
       if (visit) visit(task);
+      if (task.kind === 'order') {
+        // K2F-11: "Kelime dizme" (kind:'order') birden çok seçim ister: ordinal sırayla (answer:'wrong' → ters sıra) tek tek seçilir.
+        const byOrdinal = (task.choices || []).slice().sort((a, b) => a.ordinal - b.ordinal);
+        for (const c of (answer === 'wrong' ? byOrdinal.slice().reverse() : byOrdinal)) t.api.kaoAnswer(task.id, c.choiceId);
+        t.api.kaoContinue();
+        continue;
+      }
       const pick = choose(task);
       if (pick === undefined) return false;
       t.api.kaoAnswer(task.id, pick);

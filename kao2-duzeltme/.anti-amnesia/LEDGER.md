@@ -311,3 +311,23 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - note: push/`gh` sandbox dışında çalıştı; `main` bu not commit'inin gerisindedir (belge-only).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
 - next: K2F-11
+
+## seq 33 · 2026-10-01 · DECISION · K2F-11
+- decision: İki kullanıcı kararı. (1) Kelime dizme (18 örnekli şablon) doğası gereği Arapça uyaran taşımaz ama `tekrar-uret` R-03 kural 5 örnekli şablonda uyaranın örnek Arapçası içinde olmasını ister; soru: oracle muafiyeti mi, ilk-kelime ipucu mu? Kullanıcı yanıtı: "yönlendirecek ve öğretecek şekilde olmalı" → oracle'a dokunulmadı; uyaran = örneğin ilk kelimesi (yönlendirme/ipucu) + cevap sonrası kural cümlesi ve âyet künyesi (öğretme). (2) P6 kapsam onayı ("İkisini de güncelle (Önerilen)"): `tests/kao/helpers/kao-harness.js` `playLesson` order-aware yapıldı; `tests/kao/test_kao_queue.js` K2F-10'da 3 türe çekilen beklenti 4 türe geri döndü (Çekim tablosu görev kurucusu düzeldi).
+- scope-effect: harness yalnız `kind:'order'` görevinde ordinal sırayla (answer:'wrong' → ters) cevap verir, diğer davranış aynı.
+- changed-tests: test_kao_queue.js (3 tür → 4 tür geri; K2F-10 seq 28'in ters yönü) · kao-harness.js (order-aware playLesson).
+- next: K2F-11
+
+## seq 34 · 2026-10-01 · PROMPT · K2F-11
+- status: done
+- title: Gramer 3/3 — görev kurucu örnekten ve kavramdan
+- prev-commit: fb4f4dab
+- evidence: kao2-duzeltme/evidence/K2F-11/KANIT.md
+- closes: K4-02 (3/3) · K4-04 (ardışık aynı gramer türü)
+- repro: R-03 PASS kalır · toplam 5/10
+- gates: kapilar.sh YEŞİL (kao 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20261001c (`app/core/quranLearn.js` + `quranLearnFlow.js` değişti: sonraki yayında pin yükselmeli)
+- changed-tests: test_kao_queue.js (seq 33) · kao-harness.js (seq 33)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: `tekrar-uret` yürüyüşçüsü çok adımlı "Kelime dizme" görevinde takılıp aynı görevi tekrar tekrar sayıyor (R-03 "4035 görev"); R-03 yine PASS ama koruma gücü azaldı — gerçek koruma bölüm C8. Oracle yürüyüşçüsü bir sonraki uygun promptta order-aware yapılabilir. 71/86 şablon destekli; 15'i `GRAMER-SABLON-L2.md`'de gerekçeyle.
+- next: K2F-12

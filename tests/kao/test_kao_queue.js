@@ -170,13 +170,13 @@ const mixedGrammarQueue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew
   sessionId: 'grammar-mixed'
 });
 const visibleGrammarTasks = mixedGrammarQueue.filter((item) => item.type === 'grammar');
-assert.equal(visibleGrammarTasks.length, 3, 'karma oturum yalnız geçerli gramer görevlerini korumalı; geçersiz Çekim tablosu K2F-10 ile elenir');
+assert.equal(visibleGrammarTasks.length, 4, 'karma gerçek oturum dört gramer türünü korumalı (K2F-11: Çekim tablosu görev kurucusu düzeldi; K2F-10 arayı 3 türe çekmişti)');
 const visibleGrammarTypes = new Set(visibleGrammarTasks.map((item) => {
   const task = api.kaoBuildGrammarTask(item, { quranLearn: { cards: {} } }, { seed: item.id });
   assert.equal(api.kaoGrammarTaskValid(task), true, `${item.cardId}: geçersiz görev kuyruğa girdi`);
   return task.grammarType;
 }));
-assert.deepEqual([...visibleGrammarTypes].sort(), ['Ek çöz', 'Kalıp eşle', 'Kök bul'].sort(), 'yalnız güvenli gramer türleri sunulmalı');
+assert.deepEqual([...visibleGrammarTypes].sort(), [...grammarTypes].sort(), 'karma oturumda dört gramer türü, hepsi geçerli görevle');
 for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQueue[i].type === mixedGrammarQueue[i - 1].type && mixedGrammarQueue[i].type === mixedGrammarQueue[i - 2].type), 'karma oturum serpiştirilmiş');
 
 

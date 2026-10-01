@@ -153,7 +153,21 @@
     if(hasAudio.length&&budgetLeft-audioCount<1&&budgetLeft>1) audioCount=Math.max(1,audioCount-1),reverseCount=Math.min(eligible.length,budgetLeft-audioCount);
     hasAudio.slice(0,audioCount).forEach(function(id){ practice.push(makeWord(id,'ar>tr',true)); });
     eligible.slice(0,reverseCount).forEach(function(id){ practice.push(makeWord(id,'tr>ar',false)); });
-    practice=practice.concat(grammarItems);
+    // K2F-11 (K4-04): aynı gramer türü ardışık gelmez. Önce türler açgözlüyle yayılır (özgün sıra eşitlikte korunur); yine de
+    // bitişik kalan çiftler için kelime alıştırmasının bir kısmı araya konur (en fazla bitişik çift sayısı kadar, ilk öğe sabit).
+    var typeOfGrammar=function(item){ var found=templates.find(function(entry){ return entry.id===item.templateId; }); return found?String(found.type):''; };
+    var spread=[],pool=grammarItems.slice(),adjacent=0;
+    while(pool.length){
+      var at=pool.findIndex(function(item){ return !spread.length||typeOfGrammar(item)!==typeOfGrammar(spread[spread.length-1]); });
+      if(at<0){ at=0; adjacent+=1; }
+      spread.push(pool.splice(at,1)[0]);
+    }
+    var separators=practice.length>adjacent+1?practice.splice(practice.length-adjacent,adjacent):[];
+    spread.forEach(function(item,index){
+      if(index>0&&typeOfGrammar(item)===typeOfGrammar(spread[index-1])&&separators.length) practice.push(separators.shift());
+      practice.push(item);
+    });
+    practice=practice.concat(separators);
     if(practice.length<6){
       var repeatIndex=0;
       while(practice.length<6&&eligible.length){ practice.push(makeWord(eligible[repeatIndex%eligible.length],'tr>ar',false)); repeatIndex+=1; }

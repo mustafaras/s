@@ -354,3 +354,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - sources: Kalyuga vd. (expertise reversal) · Sweller (guidance fading) · Fyfe vd. (concreteness fading) · Bjork & Bjork 2011 (desirable difficulties) — bağlantılar KANIT "Ek tur".
 - changed-tests: test_kao2_grammar_tasks.js (C1/C2/C4/C5/C6 koşullu ipucu + C10–C12 yeni; 26 kontrol).
 - next: K2F-12
+
+## seq 38 · 2026-10-01 · DECISION · K2F-11
+- decision: Yedinci erken yayın — kullanıcı açık isteği ("canlıya al"). Kapsam: K2F-11 ek turu (seq 37): `app/core/quranLearn.js`, `app/core/quranLearnViews.js`, `app/kao.css` (kavram sayfasında âyet örnekleri + notlar, 83/86 gramer şablonu, ipucu soldurma). Pin `20261001d` → `20261001e` (index.html, sw.js, 8 pin taşıyan test).
+- scope-effect: planlı YAYIN-1 (K2F-18) ayrıca sürer. `releaseApproval` = `approved_through_K2F-11` (değişmez; ek tur aynı prompt).
+- known-exposure (canlıda sürer, K2F-12…17): R-05 `App.kaoS0` tanımsız, R-06 Seviye 0 çökmeleri, R-04/R-07/R-08; 3 gramer şablonu içerik bekliyor (L2).
+- steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `lastRelease` kaydı.
+- next: K2F-12

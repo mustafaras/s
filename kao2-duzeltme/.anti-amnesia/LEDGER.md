@@ -515,3 +515,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın ✓ (main 19f0bfd6, Pages run 36893692611, canlı 9/9 bayt-eşit) · cihaz —
 - surprises: yok
 - next: K2F-19
+
+## seq 53 · 2026-10-01 · PROMPT · K2F-19
+- status: done
+- title: Ders tutarlılık kapısı (test)
+- prev-commit: 27d8d6df
+- evidence: kao2-duzeltme/evidence/K2F-19/KANIT.md
+- closes: K5-03 (1/3)
+- repro: değişmedi · toplam 9/10
+- gates: kapilar.sh YEŞİL (kao 50 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001g
+- changed-tests: yok (yeni test_kao2_lesson_coherence.js)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: kapı K5-03'ün 10 dersine ek 4 tutarsız ders buldu (u03.02, u09.11, u10.03, u12.03); toplam 14/109.
+- next: K2F-20

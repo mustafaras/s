@@ -1,20 +1,19 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-18
-lastSeq: 50
+nextPrompt: K2F-19
+lastSeq: 52
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 50 · K2F-00…17 tamam (18/44), sıradaki K2F-18. R-01…R-07, R-09, R-10 PASS (9/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 52 · K2F-00…18 tamam (19/44), sıradaki K2F-19. R-01…R-07, R-09, R-10 PASS (9/10).
 
 ## Şu an neredeyiz
-K2F-17 bitti: Dalga 1 regresyonu temiz (kapilar YEŞİL, tekrar-uret 9/10, yalnız R-08 beklenen FAIL). Ek ölçümler: 12 ünite simülasyonu geçti · 109 derste gösterilen gramer görevi 75, ihlal 0 · S0 12 ders uçtan uca · perf runtime 110,8 KiB. Kullanıcı için `evidence/K2F-17/ARA-RAPOR.md` yazıldı; `tests/kao/README.md` envanteri s0/settings/hub satırlarıyla güncellendi. Kod değişmedi.
-Canlıda K2F-12…15 var (`main` = `4fd00131`, pin `20261001f`); K2F-05…11 ve K2F-16 yalnız dalda.
+K2F-18 bitti: YAYIN-1 kullanıcı onayıyla (“onaylıyorum”) canlıda. `main` = `19f0bfd6` (ff-only `4fd00131..19f0bfd6`), Pages run 36893692611 success, pin `20261001g`, canlı 9/9 bayt-eşit, `App.kaoSetIntent` canlı `app.js`'te, gizlilik 404'leri doğru. Dalga 1 (K2F-00…17) canlıda; cihazda gözle doğrulama kullanıcıda.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-18 (YAYIN-1, kullanıcı kapısı):** `ARA-RAPOR.md` özeti kullanıcıya sunulur ve açık yanıt istenir ("YAYIN-1 onaylı" ya da "YAYIN-1 ertele"); yanıt yoksa `waiting_user` ile durulur, onaysız push/pin yok. Onaylıysa pin `20261001g`, ff-only merge + push, Pages izleme, canlı bayt-eşitliği.
+**K2F-19 (Ders tutarlılık kapısı):** ders başlığı/hedefi ile lemmalar arasındaki uyumu ölçen yeni `tests/kao/test_kao2_lesson_coherence.js` (K5-03 1/3); kod değişmez.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-01)
 - Dal: `kao2-duzeltme` = canlı `main` (`4fd00131`) + belge-only kanıt commit'i. Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.

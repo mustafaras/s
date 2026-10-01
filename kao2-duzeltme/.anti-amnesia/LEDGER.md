@@ -495,3 +495,23 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (K2F-12…15 canlıda) · cihaz —
 - surprises: gösterilen gramer görevi 75 (K2F-11 kaydında 64); ihlal 0.
 - next: K2F-18
+
+## seq 51 · 2026-10-01 · GATE · K2F-18
+- status: closed
+- gate: YAYIN-1 — kullanıcı yanıtı: "onaylıyorum" (ARA-RAPOR sunulduktan sonra) → YAYIN-1 onaylı.
+- scope-effect: Dalga 1 canlıya alındı; `releaseApproval` = approved_through_K2F-17.
+- next: K2F-18
+
+## seq 52 · 2026-10-01 · PROMPT · K2F-18
+- status: done
+- title: YAYIN-1 (kullanıcı onay kapısı)
+- prev-commit: 9b4cbe55
+- evidence: kao2-duzeltme/evidence/K2F-18/KANIT.md
+- closes: —
+- repro: değişmedi · toplam 9/10
+- gates: kapilar.sh YEŞİL (pin commit öncesi)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001g
+- changed-tests: 8 pin taşıyan test (20261001f→g) · gerekçe: yayın pini
+- evidence-levels: kaynak/test ✓ · yayın ✓ (main 19f0bfd6, Pages run 36893692611, canlı 9/9 bayt-eşit) · cihaz —
+- surprises: yok
+- next: K2F-19

@@ -545,3 +545,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - scope: Dokun listesi genişledi (kullanıcı onaylı): tools/kao2-lemma-morph-build.mjs, tests/kao/fixtures/qac-lemma-morph.json, tests/kao/test_kao2_lemma_morph.js. Uygulama/içerik modülü/bütçe/pin değişmedi.
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - next: K2F-20
+
+## seq 56 · 2026-10-01 · FIX · K2F-19
+- request: seq 55 ölçüm hattının bağımsız doğrulaması (2 denetçi: ham QAC'a karşı veri · kapı mantığı; her bulguya çürütme).
+- verified-ok: kip/seslenme/örnek sayımları ham QAC ile uyuşuyor (fark yok); `total` sözlük freq'ine 524/524 eşit.
+- fixed: (1) `total` tanımı belgelendi + test kilidi (fixture yeniden üretildi); (2) KÖK ölçümü (u10.20, u11.01 → ETİKET 16→18); (3) özet-ders muafiyeti regex'ten gerekçeli kimlik tablosuna; (4) çıta = liste uzunluğu, FIXED_SINCE_AUDIT kaydı.
+- rejected (5): ayet düzeyi örnek sayımı (ölçüm ince ayarı, kanıtsız), attests>0 zayıflığı (ÖRNEK katmanı kapatıyor), fiil derslerinin ANLAM kapsamı, u08.02 olumsuzluk regex'i (zaten yakalanıyor), %60 eşik tercihi.
+- result: ETİKET 18 · ÖRNEK 11 · ANLAM 1 (/109).
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- next: K2F-20

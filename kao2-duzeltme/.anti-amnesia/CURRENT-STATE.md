@@ -2,18 +2,18 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-20
-lastSeq: 55
+lastSeq: 56
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 55 · K2F-00…19 tamam (20/44), sıradaki K2F-20. R-01…R-07, R-09, R-10 PASS (9/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 56 · K2F-00…19 tamam (20/44), sıradaki K2F-20. R-01…R-07, R-09, R-10 PASS (9/10).
 
 ## Şu an neredeyiz
-K2F-19 bitti (K5-03 1/3): `tests/kao/test_kao2_lesson_coherence.js` ders başlığı/hedefi ↔ lemma kategorisi uyumunu ölçer (eşik %60, kavram kategorisi de). Kapı üç ölçümlü (ek turlar, seq 54–55): ETİKET 16 ders (kip/zaman/seslenme artık QAC 0.4'ten sayılmış tablodan) · ÖRNEK 11 ders (gösterilen âyetlerde hedef kip <%60) · ANLAM 1 ders (u06.20, eşanlamlı sınırı); listeler `KNOWN_MISMATCH` / `KNOWN_EXAMPLE_MISMATCH` / `KNOWN_SEMANTIC_GAP`, yalnız küçülür.02, u04.03, u04.04, u07.02, u09.11, u10.03, u12.03); `KNOWN_MISMATCH` tam liste, yalnız küçülür. Kod değişmedi, yayın yok. Canlı: `main` = `19f0bfd6`, pin `20261001g` (Dalga 1).
+K2F-19 bitti (K5-03 1/3): `tests/kao/test_kao2_lesson_coherence.js` ders başlığı/hedefi ↔ lemma kategorisi uyumunu ölçer (eşik %60, kavram kategorisi de). Kapı üç ölçümlü (ek turlar, seq 54–56): ETİKET 18 ders (kök tutarlılığı dâhil) (kip/zaman/seslenme artık QAC 0.4'ten sayılmış tablodan) · ÖRNEK 11 ders (gösterilen âyetlerde hedef kip <%60) · ANLAM 1 ders (u06.20, eşanlamlı sınırı); listeler `KNOWN_MISMATCH` / `KNOWN_EXAMPLE_MISMATCH` / `KNOWN_SEMANTIC_GAP`, yalnız küçülür.02, u04.03, u04.04, u07.02, u09.11, u10.03, u12.03); `KNOWN_MISMATCH` tam liste, yalnız küçülür. Kod değişmedi, yayın yok. Canlı: `main` = `19f0bfd6`, pin `20261001g` (Dalga 1).
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-20 (Müfredat yeniden dağıtımı, G2 kullanıcı kapısı):** kelimeleri başlık/kavrama göre yeniden dağıtan yeni eşleme `MUFREDAT-ESLEME.md` olarak üretilir ve kullanıcıdan açık onay (G2) istenir; onay gelmeden müfredat modülü değişmez. Hedef: üç liste (16 + 11 + 1) boşalır; ÖRNEK listesi için örnek seçimi kipe göre yapılabilir ya da ders kipin tipik olduğu fiillerle yeniden dağıtılır.
+**K2F-20 (Müfredat yeniden dağıtımı, G2 kullanıcı kapısı):** kelimeleri başlık/kavrama göre yeniden dağıtan yeni eşleme `MUFREDAT-ESLEME.md` olarak üretilir ve kullanıcıdan açık onay (G2) istenir; onay gelmeden müfredat modülü değişmez. Hedef: üç liste (18 + 11 + 1) boşalır; ÖRNEK listesi için örnek seçimi kipe göre yapılabilir ya da ders kipin tipik olduğu fiillerle yeniden dağıtılır.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-01)
 - Dal: `kao2-duzeltme` = canlı `main` (`19f0bfd6`) + belge/test-only commit'ler (K2F-18 kanıtı, K2F-19). Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.

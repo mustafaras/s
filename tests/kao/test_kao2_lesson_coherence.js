@@ -105,7 +105,10 @@ function exampleIncoherence(lesson) {
 
 // ANLAM ölçümü: tematik derslerde başlık sözcüklerinin lemma anlamlarında geçme oranı.
 const STOP_WORDS = new Set(['ve', 'ile', 'veya', 'ama', 'ise', 'için', 'bir', 'bu', 'şu', 'gibi', 'kadar', 'daha', 'en', 'de', 'da', 'ki', 'mi']);
-const REVIEW_GOAL = /pekiştireceksin|baştan sona|birlikte/;
+// Başlığı sözcük değil metin/özet adı taşıyan ders kimlikleri (ANLAM ölçümünün kapsamı dışı; her biri gerekçeli).
+const TITLED_BY_PASSAGE = {
+  'u01.05': 'Fâtiha bütünü', 'u02.03': 'namaz cümleleri bütünü', 'u03.06': 'üç sûre bütünü', 'u06.30': 'ünite pekiştirmesi'
+};
 // Türkçe kök-önek: mastar (-mak/-mek) ve çoğul (-lar/-ler) atılır, 3–4 harf önek karşılaştırılır.
 function titleStem(word) {
   const base = word.toLocaleLowerCase('tr').replace(/[^a-zçğıöşüâîû]/g, '').replace(/(mak|mek)$/, '').replace(/(lar|ler)$/, '');
@@ -113,7 +116,7 @@ function titleStem(word) {
 }
 function isThematic(lesson) {
   const text = `${lesson.title} ${lesson.goal}`.toLocaleLowerCase('tr');
-  return !lesson.conceptId && !REVIEW_GOAL.test(lesson.goal.toLocaleLowerCase('tr')) && !CATEGORIES.some((c) => c.re.test(text));
+  return !lesson.conceptId && !TITLED_BY_PASSAGE[lesson.id] && !ROOT_RE.test(text) && !CATEGORIES.some((c) => c.re.test(text));
 }
 function semanticIncoherence(lesson) {
   if (!isThematic(lesson)) return [];
@@ -128,6 +131,14 @@ function semanticIncoherence(lesson) {
   return ratio < THRESHOLD ? [`başlık sözcüklerinin %${Math.round(ratio * 100)}'i lemma anlamlarında var`] : [];
 }
 
+// KÖK ölçümü: "bir kökten / aynı kökten / kök ailesi" diyen derste lemmaların ≥%60'ı aynı kökü paylaşır (Arapça kök temelli).
+const ROOT_RE = /bir kökten|aynı kökten|kök ailesi/;
+function rootShare(lemmaIds) {
+  const counts = new Map();
+  for (const id of lemmaIds) { const root = lexicon.byId(id).root; if (root) counts.set(root, (counts.get(root) || 0) + 1); }
+  return counts.size ? Math.max(...counts.values()) / lemmaIds.length : 0;
+}
+
 function incoherence(lesson) {
   const text = `${lesson.title} ${lesson.goal}`.toLocaleLowerCase('tr');
   const reasons = [];
@@ -135,6 +146,10 @@ function incoherence(lesson) {
     if (!category.re.test(text)) continue;
     const ratio = share(lesson.lemmaIds, category.test);
     if (ratio < THRESHOLD) reasons.push(`başlık/hedef "${category.id}" anıyor, lemmaların %${Math.round(ratio * 100)}'i uyuyor`);
+  }
+  if (ROOT_RE.test(text)) {
+    const ratio = rootShare(lesson.lemmaIds);
+    if (ratio < THRESHOLD) reasons.push(`başlık/hedef "kök" anıyor, lemmaların en çok %${Math.round(ratio * 100)}'i aynı kökte`);
   }
   const concept = CONCEPT_CATEGORY[lesson.conceptId];
   if (concept) {
@@ -147,7 +162,7 @@ function incoherence(lesson) {
 // Bugün tutmayan derslerin TAM listeleri (K5-03). Yalnız küçülür; K2F-20 boşaltır.
 const KNOWN_MISMATCH = [
   'u02.01', 'u02.02', 'u03.02', 'u04.01', 'u04.02', 'u04.03', 'u04.04', 'u07.02',
-  'u09.02', 'u09.11', 'u10.01', 'u10.03', 'u11.04', 'u11.05', 'u12.02', 'u12.03'
+  'u09.02', 'u09.11', 'u10.01', 'u10.03', 'u10.20', 'u11.01', 'u11.04', 'u11.05', 'u12.02', 'u12.03'
 ];
 // Kip/zaman derslerinde örnek âyetlerin <%60'ında hedef kip geçer (ör. 'Emir kipi' dersi: %40). K2F-20 örnek seçimini
 // kipe göre yapabilir ya da dersi kipin tipik olduğu fiillerle yeniden dağıtabilir.
@@ -156,8 +171,13 @@ const KNOWN_EXAMPLE_MISMATCH = [
 ];
 // u06.20: "topluluk" başlığı "grup, bölük" anlamıyla eşanlamlı örtüşür; kök-önek yöntemi eşanlamlıyı ölçemez (bilinen sınır).
 const KNOWN_SEMANTIC_GAP = ['u06.20'];
-// Çıta: listeler büyüyemez (bir kimliği listeye eklemek çıtayı da bilerek yükseltmeyi gerektirir).
-const CEILING = { label: 16, example: 11, semantic: 1 };
+// Çıta: her listenin uzunluğuyla BİREBİR eşit olmalıdır; liste küçülünce çıta da aynı commit'te düşer, büyümek ise
+// listeyi ve çıtayı birlikte, bilerek değiştirmeyi gerektirir (sessiz artış yok).
+const CEILING = { label: 18, example: 11, semantic: 1 };
+// K5-03 denetimindeki 10 ders. Düzeltilen ders buraya taşınır (kapı artık yakalamaz); biri hem düzeltilmeden
+// hem de hiçbir ölçümde görünmeden kaybolamaz.
+const AUDITED_K5_03 = ['u02.01', 'u02.02', 'u04.01', 'u04.02', 'u09.01', 'u09.02', 'u10.01', 'u11.04', 'u11.05', 'u12.02'];
+const FIXED_SINCE_AUDIT = [];
 
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
@@ -197,9 +217,9 @@ check('ANLAM: tematik derslerde başlık sözcükleri lemma anlamlarında geçer
   assert.deepEqual(Array.from(foundSemantic, (x) => x.id), KNOWN_SEMANTIC_GAP, `bulunan: ${JSON.stringify(Array.from(foundSemantic, (x) => x.id))}`);
 });
 
-check('listeler çıtayı aşmaz ve yinelenen kimlik yok (yalnız küçülür)', () => {
+check('listeler çıtayla eşit ve yinelenen kimlik yok (yalnız küçülür)', () => {
   for (const [name, list, ceiling] of [['label', KNOWN_MISMATCH, CEILING.label], ['example', KNOWN_EXAMPLE_MISMATCH, CEILING.example], ['semantic', KNOWN_SEMANTIC_GAP, CEILING.semantic]]) {
-    assert.ok(list.length <= ceiling, `${name}: ${list.length} > çıta ${ceiling}`);
+    assert.equal(list.length, ceiling, `${name}: liste ${list.length} ≠ çıta ${ceiling} (küçülünce çıtayı da düşür)`);
     assert.equal(new Set(list).size, list.length, `${name}: yinelenen kimlik`);
   }
 });
@@ -225,9 +245,9 @@ check('kapı boş değil: sentetik tutarsız ders yakalanır, uyumlu ders geçer
   assert.ok(cat('yardımcı fiil').re.test('yardımcı fiil: oldu, idi') && cat('bağlaç').re.test('bağlaçlar'));
   assert.ok(!cat('ancak').test({ pos: 'RET' }), 'RET (bal) sınırlama sayılmaz');
   assert.equal(titleStem('Duymak'), 'duy'); assert.equal(titleStem('isimlerin'), 'isim');
-  const audited = ['u02.01', 'u02.02', 'u04.01', 'u04.02', 'u09.01', 'u09.02', 'u10.01', 'u11.04', 'u11.05', 'u12.02'];
-  const everKnown = new Set([...KNOWN_MISMATCH, ...KNOWN_EXAMPLE_MISMATCH, ...KNOWN_SEMANTIC_GAP]);
-  for (const id of audited) assert.ok(everKnown.has(id) || !everKnown.size, `${id} bilinen listelerde olmalı (K5-03)`);
+  const flagged = new Set([...KNOWN_MISMATCH, ...KNOWN_EXAMPLE_MISMATCH, ...KNOWN_SEMANTIC_GAP]);
+  for (const id of AUDITED_K5_03) assert.ok(flagged.has(id) || FIXED_SINCE_AUDIT.includes(id), `${id}: ne bilinen listelerde ne de düzeltilenlerde (K5-03)`);
+  assert.ok(rootShare(curriculum.byLesson('u10.20').lemmaIds) < THRESHOLD, 'kök ailesi dersi (4 ayrı kök) kök ölçümünde yakalanmalı');
 });
 
 console.log(`KAO2 ders tutarlılığı: PASS (${passed} kontrol · etiket ${KNOWN_MISMATCH.length} · örnek ${KNOWN_EXAMPLE_MISMATCH.length} · anlam ${KNOWN_SEMANTIC_GAP.length} / ${lessons.length} ders)`);

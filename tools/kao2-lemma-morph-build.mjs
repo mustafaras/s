@@ -94,7 +94,7 @@ export function buildTable(qacText, lexiconJson) {
     note: 'QAC 0.4 (GPL; telif bloğu girdi dosyasında korunur) morfolojisinden SAYILMIŞ değerler. Elle yazılmaz: node tools/kao2-lemma-morph-build.mjs --write',
     sources: SOURCES,
     input: { qacSha256: sha256(Buffer.from(qacText)), lexiconSha256: sha256(Buffer.from(lexiconJson)) },
-    fields: { perf: 'PERF kök sayısı', impf: 'IMPF kök sayısı', impv: 'IMPV (emir) kök sayısı', voc: 'VOC önekli kelime sayısı', total: 'lemmanın tüm kelimeleri', examples: 'lemmanın ilk 3 örnek âyetinde aynı sayımlar' },
+    fields: { perf: 'PERF kök sayısı', impf: 'IMPF kök sayısı', impv: 'IMPV (emir) kök sayısı', voc: 'VOC önekli kelime sayısı', total: 'lemmayı İLK LEM olarak taşıyan kelime sayısı (sözlükteki freq ile birebir eşit; çok parçalı kelimede ikinci kök sayılmaz)', examples: 'lemmanın ilk 3 örnek âyetinde aynı sayımlar' },
     lemmas: table
   };
 }

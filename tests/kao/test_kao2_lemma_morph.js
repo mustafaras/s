@@ -31,6 +31,10 @@ check('şema, kaynaklar ve sha256 girdi kaydı var; tablo 524 lemmanın tamamın
   assert.deepEqual(Object.keys(table.lemmas).sort(), Array.from(lexicon.lemmas, (l) => l.id).sort());
 });
 
+check('total sözlükteki freq ile birebir eşit (ilk-LEM kuralı; QAC ile sözlük aynı sayım tanımını paylaşır)', () => {
+  for (const lemma of lexicon.lemmas) assert.equal(table.lemmas[lemma.id].total, lemma.freq, `${lemma.id}: total ≠ freq`);
+});
+
 check('her satır tutarlı: sayımlar tamsayı, kip toplamı ≤ toplam, örnekler ≤3 ve kendi sayımları ≤ toplam', () => {
   for (const [id, r] of Object.entries(table.lemmas)) {
     for (const key of ['perf', 'impf', 'impv', 'voc', 'total']) assert.ok(Number.isInteger(r[key]) && r[key] >= 0, `${id}.${key}`);

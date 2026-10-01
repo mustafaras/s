@@ -226,3 +226,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - known-exposure (canlıda sürer, K2F-09…17): K4-02 yanlış gramer görevleri, R-05 `App.kaoS0` tanımsız, R-06 6 Seviye 0 dersinde çökme, R-03/R-04/R-07/R-08.
 - steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `lastRelease` kaydı.
 - next: K2F-09
+
+## seq 23 · 2026-10-01 · NOTE · K2F-08
+- summary: Üçüncü erken yayın tamamlandı ve doğrulandı (seq 22 kararı). `main` ff-only `86a56267..8d757abd`, Pages run 36840879605 success, pin `20261001a`.
+- verified: canlı 6/6 bayt-eşit (quranLearn.js, quranLearnFlow.js, quranLearnViews.js, kao.css, sw.js, index.html); `kao2-duzeltme/FIX-STATE.json`, `tests/kao/test_kao2_mastery.js`, `archive/…/KAO2-STATE.json`, `docs/…/KAO-STATE.json` 404; `SW_VERSION='20261001a'`.
+- evidence: kao2-duzeltme/evidence/K2F-08/YAYIN.md · release-live.json
+- note: push için sandbox `github.com`'u engelledi; yalnız `git push`, `gh` ve salt-okur `curl` komutları sandbox dışında çalıştı. `main` bu not commit'inin gerisindedir (belge-only).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
+- next: K2F-09

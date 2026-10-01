@@ -2,18 +2,18 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-09
-lastSeq: 22
+lastSeq: 23
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 22 · K2F-00…08 tamam (9/44), sıradaki K2F-09. R-01, R-02, R-09, R-10 PASS (4/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 23 · K2F-00…08 tamam (9/44), sıradaki K2F-09. R-01, R-02, R-09, R-10 PASS (4/10).
 
 ## Şu an neredeyiz
 K2F-08 bitti ve K4-01 (Ünite 1 ustalık kilidi) kaynak/test düzeyinde kapandı: Ünite ekranında dersten AYRI "Ustalık"
 satırı (○ kilitli · ● sırada/onarım · ✓ %puan · Atlandı), dersler bitince tek birincil "Ustalığa başla"/"Onarım turuna
 başla", Bugün kahramanında ikincil "Şimdilik atla", ustalık özetinde "10 sorudan N doğru" + tek taş satırı, `u<n>` taşı
 yalnız geçince, Yol `aria-current` ünite-tamam kuralıyla; sıfır kullanıcı → Ünite 2 ve v1 kullanıcı → Ünite 4 dokunarak
-uçtan uca test yeşil. K2F-05…08 erken yayınla canlıya alınıyor (pin `20261001a`, LEDGER seq 22).
+uçtan uca test yeşil. K2F-05…08 CANLIDA (erken yayın, `main` = `8d757abd`, Pages run 36840879605, pin `20261001a`, canlı 6/6 bayt-eşit; LEDGER seq 22–23). Ünite 1 ustalık kilidi canlıda kaynak düzeyinde açıldı.
 **Kullanıcı yönergesi (2026-10-01): sırayla, her seferinde tek prompt; K2F-08 sonrası durulur.**
 
 ## Sıradaki promptun tek cümlesi
@@ -24,8 +24,8 @@ uçtan uca test yeşil. K2F-05…08 erken yayınla canlıya alınıyor (pin `202
 bütçeleri yeşil kalmalı (aşılırsa P6).
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
-- Dal: `kao2-duzeltme` = `main` (canlı: yayın sonrası `main`) + K2F-05…K2F-08. Sonraki push yalnız K2F-18/43 onay kapılarında.
-- Yayın pini (canlı): `20260930m` (öncesi `20260930l`) · canlı `main` = `86a56267` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
+- Dal: `kao2-duzeltme` = `main` (canlı `8d757abd`) + K2F-05…K2F-08. Sonraki push yalnız K2F-18/43 onay kapılarında.
+- Yayın pini (canlı): `20261001a` (öncesi `20260930m`) · canlı `main` = `8d757abd` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
 - Kapılar: KAO 48/48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **4/10 PASS** (R-01, R-02, R-09, R-10); kalan R-03…R-08 FAIL (beklenen).
 - Bütçe (perf): içerik 177,657 KiB · runtime 97,532 KiB (tavan 128) · css 12,938 KiB (tavan 14) · p95 4,34 ms.

@@ -1,0 +1,25 @@
+{
+  "prompt": "K2F-08",
+  "verifiedAt": "2026-10-01",
+  "commit": "8d757abd96d7ee322d94751b79f3d9c1ed07f43f",
+  "pin": "20261001a",
+  "previousPin": "20260930m",
+  "pagesRun": 36840879605,
+  "conclusion": "success",
+  "baseUrl": "https://mustafaras.github.io/s/",
+  "files": [
+    { "path": "app/core/quranLearn.js", "match": true },
+    { "path": "app/core/quranLearnFlow.js", "match": true },
+    { "path": "app/core/quranLearnViews.js", "match": true },
+    { "path": "app/kao.css", "match": true },
+    { "path": "sw.js", "match": true },
+    { "path": "index.html", "match": true }
+  ],
+  "privacy404": [
+    "kao2-duzeltme/FIX-STATE.json",
+    "tests/kao/test_kao2_mastery.js",
+    "archive/kuran-ogreniyorum-v2/KAO2-STATE.json",
+    "docs/kuran-ogreniyorum/KAO-STATE.json"
+  ],
+  "evidenceLevels": { "sourceTest": true, "deploy": true, "device": false }
+}

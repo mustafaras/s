@@ -1,0 +1,12 @@
+# K2F-08 — Erken yayın kanıtı (kullanıcı isteği)
+- Kapsam: K2F-05…08 (ustalık planı, oturum + kayıt, onarım/atla, görünümler/taşlar) + yayın pini `20261001a` · Kullanıcı isteği: "tüm sorunları çözmeden ilerleyemeyiz çözelim ve canlıya alalım sonra devam ederiz"
+- Commit: `8d757abd` · Dal: `main` (ff-only, `86a56267..8d757abd`) · force yok
+- Pages run: **36840879605** · conclusion **success** (`.github/workflows/pages.yml`)
+- Pin: `20260930m` → **`20261001a`** (index.html ×15, sw.js ×16, SW_VERSION, SW_OFFLINE_VERSION `iip22-20261001a`)
+- Bayt eşitliği (canlı SHA-256 = yerel): `app/core/quranLearn.js` · `app/core/quranLearnFlow.js` · `app/core/quranLearnViews.js` · `app/kao.css` · `sw.js` · `index.html` → **6/6 MATCH**
+- Canlı işaretler: `index.html` → `quranLearn.js?v=20261001a` · `sw.js` → `SW_VERSION = '20261001a'`
+- Gizlilik (404): `kao2-duzeltme/FIX-STATE.json` · `tests/kao/test_kao2_mastery.js` · `archive/kuran-ogreniyorum-v2/KAO2-STATE.json` · `docs/kuran-ogreniyorum/KAO-STATE.json`
+- Etki: canlıda Ünite 1 ustalık kilidi (K4-01) kaynak düzeyinde kapalı; kullanıcı eski sürümü önbellekte tutuyorsa yeni pin servis çalışanını yeniler.
+- Bilinen açık (canlıda sürer, K2F-09…17): K4-02 yanlış gramer görevleri · R-05 tanımsız `App.kaoS0` · R-06 6 Seviye 0 dersinde çökme · R-03/R-04/R-07/R-08.
+- Kanıt düzeyi: kaynak/test **PASS** · yayın **doğrulandı** · cihaz **doğrulanmadı** (kullanıcıda)
+- Not: `main` bu kanıt commit'inin gerisinde kalır (yalnız `kao2-duzeltme/` belgeleri; Pages'e dahil değil).

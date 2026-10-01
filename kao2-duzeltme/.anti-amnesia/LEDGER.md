@@ -218,3 +218,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: kontrast aracı `background:none` çözemiyor (→ `transparent`); onboarding'de seçim ekranları birincil düğmesiz (testte ilk seçeneğe dokunuş); taş alanları başlangıçta `null` (tanımsız değil). Kullanıcı yönergesi: "sırayla gideceğiz" — her prompt ayrı, sıradaki isteğe kadar durulur.
 - next: K2F-09
+
+## seq 22 · 2026-10-01 · DECISION · K2F-08
+- decision: Üçüncü erken yayın — kullanıcı açık isteği ("tüm sorunları çözmeden ilerleyemeyiz çözelim ve canlıya alalım sonra devam ederiz"). Kapsam: K2F-05…08 (ustalık planı, oturum+kayıt, onarım/atla, görünümler/taşlar). Pin `20260930m` → `20261001a` (index.html, sw.js, 8 pin taşıyan test).
+- scope-effect: planlı YAYIN-1 (K2F-18) ayrıca sürer. `releaseApproval` = `approved_through_K2F-08`. Canlıda Ünite 1 ustalık kilidi bu yayınla açılır (K4-01).
+- fix: `test_kao_requirements.js` tarih bağımlılığı (seq 18) ÖLÇÜLEREK doğrulandı: aynı test 45 ardışık simüle gün için çalıştırıldı (sandbox `Date` kaydırılarak), 0/45 başarısız → genişletilmiş tarama aralığı (30) günden bağımsız güvenilir. Test dosyasında ek değişiklik gerekmedi.
+- known-exposure (canlıda sürer, K2F-09…17): K4-02 yanlış gramer görevleri, R-05 `App.kaoS0` tanımsız, R-06 6 Seviye 0 dersinde çökme, R-03/R-04/R-07/R-08.
+- steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `lastRelease` kaydı.
+- next: K2F-09

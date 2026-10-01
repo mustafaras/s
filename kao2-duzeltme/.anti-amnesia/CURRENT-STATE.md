@@ -2,18 +2,18 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-09
-lastSeq: 21
+lastSeq: 22
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 21 · K2F-00…08 tamam (9/44), sıradaki K2F-09. R-01, R-02, R-09, R-10 PASS (4/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 22 · K2F-00…08 tamam (9/44), sıradaki K2F-09. R-01, R-02, R-09, R-10 PASS (4/10).
 
 ## Şu an neredeyiz
 K2F-08 bitti ve K4-01 (Ünite 1 ustalık kilidi) kaynak/test düzeyinde kapandı: Ünite ekranında dersten AYRI "Ustalık"
 satırı (○ kilitli · ● sırada/onarım · ✓ %puan · Atlandı), dersler bitince tek birincil "Ustalığa başla"/"Onarım turuna
 başla", Bugün kahramanında ikincil "Şimdilik atla", ustalık özetinde "10 sorudan N doğru" + tek taş satırı, `u<n>` taşı
 yalnız geçince, Yol `aria-current` ünite-tamam kuralıyla; sıfır kullanıcı → Ünite 2 ve v1 kullanıcı → Ünite 4 dokunarak
-uçtan uca test yeşil. K2F-06…08 henüz yayında DEĞİL (canlıda kilit K2F-18 yayınına kadar sürer).
+uçtan uca test yeşil. K2F-05…08 erken yayınla canlıya alınıyor (pin `20261001a`, LEDGER seq 22).
 **Kullanıcı yönergesi (2026-10-01): sırayla, her seferinde tek prompt; K2F-08 sonrası durulur.**
 
 ## Sıradaki promptun tek cümlesi
@@ -24,14 +24,14 @@ uçtan uca test yeşil. K2F-06…08 henüz yayında DEĞİL (canlıda kilit K2F-
 bütçeleri yeşil kalmalı (aşılırsa P6).
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
-- Dal: `kao2-duzeltme` = `main` (canlı `86a56267`) + K2F-05…K2F-08. Sonraki push yalnız K2F-18/43 onay kapılarında.
+- Dal: `kao2-duzeltme` = `main` (canlı: yayın sonrası `main`) + K2F-05…K2F-08. Sonraki push yalnız K2F-18/43 onay kapılarında.
 - Yayın pini (canlı): `20260930m` (öncesi `20260930l`) · canlı `main` = `86a56267` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
 - Kapılar: KAO 48/48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **4/10 PASS** (R-01, R-02, R-09, R-10); kalan R-03…R-08 FAIL (beklenen).
 - Bütçe (perf): içerik 177,657 KiB · runtime 97,532 KiB (tavan 128) · css 12,938 KiB (tavan 14) · p95 4,34 ms.
 
 ## Açık riskler
-- Tarih-bağımlı test: `test_kao_requirements.js` bağ kur bölümü günün tohumuna bağlı (aralık 30'a genişletildi, seq 18); kalıcı çözüm sabit saat.
+- Tarih-bağımlı test: `test_kao_requirements.js` bağ kur bölümü günün tohumuna bağlı; aralık 30'a genişletildi (seq 18) ve 45 simüle günde 0 hata ölçüldü (seq 22) — kalıcı çözüm (sabit saat) isteğe bağlı iyileştirme.
 - LEDGER seq 16–17: `releaseApproval=approved_through_K2F-04`; K2F-02 ek düzeltmeleri bildirildi; `main` geçmişi kullanıcı onayıyla yeniden yazıldı (iCloud kopyaları gitti; ağaç aynı, yedek etiket `backup-pre-rewrite-20260930`). Eski hash'ler tarihsel: `430539ec`→`86a56267`.
 - Canlı kullanıcı Ünite 1 ustalığında kilitli (K4-01) ve gramer görevleri yanlış öğretiyor (K4-02) → Dalga 1 önceliklidir.
 - iCloud Drive `… 2.*` kopyaları üretebilir (seq 12): `git add` yalnız açık dosya yollarıyla; klasörü iCloud dışına taşımak kullanıcı kararı.

@@ -792,7 +792,7 @@
     if(!quranLearnDeps) return null;
     var unit=kaoCurriculumUnit(unitId); if(!unit) return null;
     var d=quranLearnDeps.data(),q=ensureQuranLearn(d),flow=window.SeymaQuranLearnFlow,content=kaoLessonContent(),progress=flow.unitProgress(q,unit.id,content),lex=window.QuranLexiconV1,known=kaoKnownLemmaSet(d),grammar=window.QuranGrammarV1,shorts=window.QuranShortSurahsV1||{},records=q.path&&q.path.lessons||{};
-    var lessons=unit.lessons.map(function(lesson,index){ var state=flow.lessonProgress(q,lesson.id,content),title=lesson.mastery===true?'Ustalık: '+lesson.title:lesson.title; return {id:lesson.id,title:kaoVisibleText(lesson.review,title,title),goal:kaoVisibleText(lesson.review,lesson.goal,''),done:state.done,current:progress.nextIndex===index&&!state.done}; });
+    var lessons=unit.lessons.map(function(lesson,index){ var state=flow.lessonProgress(q,lesson.id,content),title=lesson.title; return {id:lesson.id,title:kaoVisibleText(lesson.review,title,title),goal:kaoVisibleText(lesson.review,lesson.goal,''),done:state.done,current:progress.nextIndex===index&&!state.done}; });
     var words=unit.lessons.reduce(function(all,lesson){
       var record=records[lesson.id]&&typeof records[lesson.id]==='object'?records[lesson.id]:{},introduced=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[];
       return all.concat(lesson.lemmaIds.map(function(id){
@@ -810,8 +810,17 @@
       return match[2]==='edat-baglac'?'Edat ve bağlaç kelimeleri':'Kelime seçkisi';
     }).filter(Boolean);
     var next=progress.nextLesson,action=next?{name:'kaoLesson',args:['start',next.id]}:null,actionLabel=next?(progress.started?'Ders '+(progress.nextIndex+1)+'’e devam et':'Başla'):'';
+    // K2F-08: ustalık ders listesinden AYRI satırdır (○ kilitli · ● sırada/onarım · ✓ geçti · Atlandı); dersler bitince birincil eylem ustalık/onarım.
+    var masteryInfo=flow.unitMastery(q,unit.id),mastery;
+    if(masteryInfo.state==='passed') mastery={state:'passed',mark:'✓',label:'Ustalık geçildi',detail:masteryInfo.score!==null?'%'+Math.round(masteryInfo.score*100):''};
+    else if(masteryInfo.state==='skipped') mastery={state:'skipped',mark:'–',label:'Ustalık',detail:'Atlandı'};
+    else if(progress.lessonsDone<progress.lessons) mastery={state:'locked',mark:'○',label:'Ustalık kontrolü',detail:'Dersler bitince açılır'};
+    else if(masteryInfo.state==='repair') mastery={state:'repair',mark:'●',label:'Onarım gerekiyor',detail:'Karıştırdığın kelimeleri pekiştir'};
+    else mastery={state:'current',mark:'●',label:'Ustalık kontrolü',detail:'10 soru · en az 8 doğru'};
+    if(!next&&mastery.state==='repair'){ action={name:'kaoLesson',args:['start','repair:'+unit.id]}; actionLabel='Onarım turuna başla'; }
+    else if(!next&&mastery.state==='current'){ action={name:'kaoLesson',args:['start',unit.id]}; actionLabel='Ustalığa başla'; }
     var ut=kaoTextPair(unit,'Ünite ');
-    return {id:unit.id,level:unit.level,title:ut.t,levelTitle:(window.QuranCurriculumV2.levels.find(function(level){ return level.id===unit.level; })||{}).title||'',promise:ut.p,percent:progress.lessons?progress.lessonsDone/progress.lessons*100:0,wordsKnown:progress.known,wordsTotal:progress.words,lessonsDone:progress.lessonsDone,lessonsTotal:progress.lessons,lessons:lessons,concepts:concepts,words:words,anchor:anchors.join(' · '),completed:progress.lessons>0&&progress.lessonsDone===progress.lessons,action:action,actionLabel:actionLabel};
+    return {id:unit.id,level:unit.level,title:ut.t,levelTitle:(window.QuranCurriculumV2.levels.find(function(level){ return level.id===unit.level; })||{}).title||'',promise:ut.p,percent:progress.lessons?progress.lessonsDone/progress.lessons*100:0,wordsKnown:progress.known,wordsTotal:progress.words,lessonsDone:progress.lessonsDone,lessonsTotal:progress.lessons,lessons:lessons,concepts:concepts,words:words,anchor:anchors.join(' · '),completed:progress.lessons>0&&progress.lessonsDone===progress.lessons,action:action,actionLabel:actionLabel,mastery:mastery};
   }
   function kaoUnitHTML(unitId){
     if(!quranLearnDeps) return '';
@@ -1461,6 +1470,10 @@
     if(passed&&!passedBefore){ next.masteryAt=stamp; next.masteryScore=score; next.repair=null; }
     else if(!passed&&!passedBefore){ next.masteryScore=score; next.repair={lemmaIds:validLemmaIds(state.wrongLemmas),at:stamp}; }
     q.path.units[key]=next; state.recorded=true; state.result={score:score,passed:passed||passedBefore,answered:answered,correct:correct};
+    // K2F-08: u<n> taşı yalnız ustalık geçilince (kaoUnitMastered masteryAt'a bakar); özet için kazanılanlar oturumda tutulur.
+    var earnedNow=recordMilestones(q,quranLearnDeps.data(),new Date());
+    state.earnedMilestones=Array.isArray(state.earnedMilestones)?state.earnedMilestones:[];
+    earnedNow.forEach(function(milestone){ if(state.earnedMilestones.indexOf(milestone)<0) state.earnedMilestones.push(milestone); });
     return true;
   }
   // K2F-07: onarım oturumu — yalnız karıştırılan kelimeler, iki yön; bitince repair:null (ustalık/deneme/ders kaydı yazılmaz).
@@ -1550,12 +1563,14 @@
       model.title=readTitles.length?readTitles.join(' · '):'Çapa metni'; model.lead='Dokunmadan oku: kelimelerin anlamını içinden hatırlamaya çalış, hazır olunca devam et.'; model.words=item.words||[];
     }
     if(item.kind==='summary'&&kaoUnitSession(state)){
-      var result=objectOr(state.result,{score:0,passed:false,answered:0,correct:0}),masteryNext=kaoNextStepFor(quranLearnDeps.data(),new Date()),repairing=state.kind==='repair';
+      var q0=ensureQuranLearn(quranLearnDeps.data()),result=objectOr(state.result,{score:0,passed:false,answered:0,correct:0}),masteryNext=kaoNextStepFor(quranLearnDeps.data(),new Date()),repairing=state.kind==='repair';
       model.title=repairing?'Onarım tamam ✓':(result.passed?'Ustalık geçildi ✓':'Biraz daha pekiştirelim');
       model.learnedWords=[]; model.learnedMore=0;
-      model.accuracy=result.answered?Math.round(result.correct/result.answered*100):null; model.accuracyDetail=result.answered?result.correct+' / '+result.answered+(repairing?' soru':' soru · geçmek için en az 8/10'):'Cevap kaydı yok';
-      model.tomorrowText=repairing?'Şimdi ustalık kontrolünü yeniden deneyebilirsin.':(result.passed?'Bir sonraki üniteye geçebilirsin.':'Karıştırdığın kelimeler için onarım turu hazırlanacak.');
-      model.nextStep=masteryNext?{title:masteryNext.title,subtitle:masteryNext.subtitle}:null; model.milestone=''; model.durable='';
+      model.accuracy=result.answered?Math.round(result.correct/result.answered*100):null; model.accuracyDetail=result.answered?(repairing?result.correct+' / '+result.answered+' soru':result.answered+' sorudan '+result.correct+' doğru · geçmek için en az 8'):'Cevap kaydı yok';
+      model.tomorrowText=repairing?'Şimdi ustalık kontrolünü yeniden deneyebilirsin.':(result.passed?'Bir sonraki üniteye geçebilirsin.':'Bu sefer olmadı; karıştırdığın kelimeler için kısa bir onarım turu yapacağız.');
+      model.nextStep=masteryNext?{title:masteryNext.title,subtitle:masteryNext.subtitle}:null; model.durable='';
+      var masteryEarned=Array.isArray(state.earnedMilestones)?state.earnedMilestones.slice().reverse().find(function(key){ return !!(q0.milestones&&q0.milestones[key]&&kaoMilestoneLabels()[key]); }):'';
+      model.milestone=!repairing&&masteryEarned?kaoMilestoneLabels()[masteryEarned]:'';
       model.secondaryAction={name:'kaoLesson',args:['more']};
     }else if(item.kind==='summary'){
       var q=ensureQuranLearn(quranLearnDeps.data()),record=kaoLessonRecord(q,state.lessonId),lexicon=window.QuranLexiconV1,knownIds=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[],sessionIds=Array.isArray(item.newLemmaIds)?item.newLemmaIds:knownIds,seen=Object.create(null),words=[];
@@ -2727,14 +2742,17 @@
   }
   // KAO2-09 · S-02: nextStep eylem eşlemesi. Henüz handler'ı olmayan adımlar mevcut akışa bağlanır
   // (mastery → KAO2-13); tek birincil eylem her zaman çalışır durumda kalır. KAO2-11: onboarding → ilk açılış.
-  var KAO_HOME_ACTIONS={onboarding:{label:'Başlayalım',action:{name:'kaoOnboard',args:['start']}},'night-review':{label:'',action:'kaoStart'},warmup:{label:'Isınmaya başla',action:'kaoStart'},'s0-lesson':{label:'Derse başla',action:'kaoLesson'},mastery:{label:'Pekiştirerek devam et',action:'kaoLesson'},repair:{label:'Onarım turuna başla',action:'kaoLesson'},'next-unit':{label:'Üniteye başla',action:'kaoLesson'},daily:{label:'Başla',action:'kaoLesson'},rest:{label:'Günün âyetini aç',action:'kaoOpenAyah'}};
+  var KAO_HOME_ACTIONS={onboarding:{label:'Başlayalım',action:{name:'kaoOnboard',args:['start']}},'night-review':{label:'',action:'kaoStart'},warmup:{label:'Isınmaya başla',action:'kaoStart'},'s0-lesson':{label:'Derse başla',action:'kaoLesson'},mastery:{label:'Ustalığa başla',action:'kaoLesson'},repair:{label:'Onarım turuna başla',action:'kaoLesson'},'next-unit':{label:'Üniteye başla',action:'kaoLesson'},daily:{label:'Başla',action:'kaoLesson'},rest:{label:'Günün âyetini aç',action:'kaoOpenAyah'}};
   function kaoHomeHero(d,q,now,step){
     var night=kaoNightWindow(d,now),confused=kaoConfusedLine(q),map=KAO_HOME_ACTIONS[step.kind]||KAO_HOME_ACTIONS.daily,foot=[];
     if(night) foot.push({icon:'moon',text:'Gece tekrarı açık · '+night.durationMinutes+' dk, en fazla '+night.maxCards+' tekrar'});
     if(confused) foot.push({icon:'triangle-alert',text:confused});
     var label=step.kind==='night-review'&&night?'Gece tekrarına başla · en çok '+night.maxCards+' kart':map.label,action=map.action;
     if(['s0-lesson','mastery','repair','next-unit','daily'].indexOf(step.kind)>=0) action={name:'kaoLesson',args:['start',step.param]};
-    return {eyebrow:step.kind==='rest'?'Bugün':'Sıradaki',title:step.title,subtitle:step.subtitle,button:{label:label,action:action},foot:foot};
+    var hero={eyebrow:step.kind==='rest'?'Bugün':'Sıradaki',title:step.title,subtitle:step.subtitle,button:{label:label,action:action},foot:foot};
+    // K2F-08 (KR-2): ustalık adımında ikincil metin düğmesi; atlamak taş/ustalık yazmaz.
+    if(step.kind==='mastery') hero.secondary={label:'Şimdilik atla',action:{name:'kaoLesson',args:['skip-mastery',step.param]}};
+    return hero;
   }
   // Yolun kartı ve hub kartı için ortak: dersleri ya da ustalığı bitmemiş ilk ünite (hepsi bittiyse son ünite).
   function kaoCurrentUnit(q,flow,content){

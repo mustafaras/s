@@ -84,11 +84,11 @@ function openView(t, view, param, { mode = 'nav' } = {}) {
   return { ok, view: t.ui.kaoView, stack: Array.from(t.ui.kaoStack || [], (e) => e.view), title: navTitle(html), html };
 }
 
-// Ders oynatıcısını gerçek handler'larla sürer. answer: 'correct' | 'wrong' | (task) => choiceId.
-// visit(task) her görevde çağrılır. Bitişte true (özet ekranı), takılırsa false.
-function walkLesson(t, lessonId, { answer = 'correct', visit } = {}) {
-  if (!t.api.kaoLesson('start', lessonId)) return false;
+// Başlamış bir ders/ustalık/onarım oturumunu gerçek handler'larla özet ekranına kadar oynatır.
+// answer: 'correct' | 'wrong' | (task) => choiceId. visit(task) her görevde çağrılır. Özette true, takılırsa false.
+function playLesson(t, { answer = 'correct', visit } = {}) {
   const st = t.ui.kaoLesson;
+  if (!st) return false;
   const choose = (task) => {
     const choices = task.choices || [];
     if (typeof answer === 'function') return answer(task);
@@ -114,4 +114,23 @@ function walkLesson(t, lessonId, { answer = 'correct', visit } = {}) {
   return false;
 }
 
-module.exports = { bootKao, freshUser, seed, openView, walkLesson, text, navTitle, esc, read, repoRoot, DEFAULT_NOW };
+// Dersi başlatır ve özet ekranına kadar oynatır (bkz. playLesson).
+function walkLesson(t, lessonId, options = {}) {
+  if (!t.api.kaoLesson('start', lessonId)) return false;
+  return playLesson(t, options);
+}
+
+// "Dokunma": ekrandaki bir düğmenin onclick'ini gerçek `App.kao*` adıyla motora yönlendirir (işaretlemeden okunur).
+// cls: düğme sınıfı (kao-primary | kao-hero-secondary). Dönüş: {name, args, ok}; düğme yoksa null.
+function tap(t, cls) {
+  const html = t.api.kaoOverlayHTML(t.NOW);
+  const m = new RegExp(`class="(?:[^"]* )?${cls}(?: [^"]*)?"[^>]*onclick="App\\.(kao\\w+)\\(([^"]*)\\)"`).exec(html);
+  if (!m) return null;
+  const args = JSON.parse('[' + m[2].replace(/&quot;/g, '"').replace(/&#39;/g, "'") + ']');
+  return { name: m[1], args, ok: t.api[m[1]](...args) };
+}
+const tapPrimary = (t) => tap(t, 'kao-primary');
+const tapSecondary = (t) => tap(t, 'kao-hero-secondary');
+const countClass = (html, cls) => (String(html).match(new RegExp(`class="${cls}[" ]`, 'g')) || []).length;
+
+module.exports = { bootKao, freshUser, seed, openView, walkLesson, playLesson, tap, tapPrimary, tapSecondary, countClass, text, navTitle, esc, read, repoRoot, DEFAULT_NOW };

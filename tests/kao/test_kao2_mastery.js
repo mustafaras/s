@@ -499,4 +499,180 @@ check('C 12 ünite simülasyonu: Bugün adımı her ünitede ilerler, Ünite 3 k
   assert.equal(units['3'].repair, null);
 });
 
-console.log(`test_kao2_mastery: bölüm A ${partA} + B ${partB - partA} + C ${passed - partB} = ${passed} kontrol PASS`);
+const partC = passed;
+
+// ---- Bölüm D — görünümler, taşlar ve dokunarak uçtan uca geçiş (K2F-08) ------------------------------
+const { openView, tap, tapPrimary, tapSecondary, playLesson, countClass, text } = require('./helpers/kao-harness');
+const unit1Title = () => curriculum.units[0].title;
+const masteryState = (html) => (/data-mastery-state="(\w+)"/.exec(html) || [])[1];
+const unitHtml = (u, id = 1) => openView(u, 'unit', id).html;
+const homeHtml = (u) => { u.ui.kaoOpen = false; u.ui.kaoStack = []; u.ui.kaoView = 'home'; u.api.kaoOpen('home'); return u.api.kaoOverlayHTML(u.NOW); };
+const nextDay = (u) => { const day = u.data.quranLearn.daily[u.NOW.slice(0, 10)]; if (day) day.sessionDone = false; };
+
+check('D(a) Ünite ekranı: dersler listesinden AYRI "Ustalık" satırı; dersler bitmeden kilitli ○, içerik başlığında "Ustalık:" öneki yok', () => {
+  const u = bootKao();
+  const q = freshUser(u);
+  unitOf(1).lessons.slice(0, 2).forEach((l) => { q.path.lessons[l.id] = { startedAt: AT, doneAt: AT, score: 1, introducedLemmas: l.lemmaIds.slice() }; });
+  const html = unitHtml(u);
+  assert.equal(masteryState(html), 'locked');
+  assert.match(text(html), /Ustalık/);
+  assert.doesNotMatch(text(html), /Ustalık: /, 'ders başlıklarında "Ustalık:" öneki olmamalı (lesson.mastery yok sayılır)');
+  assert.equal(countClass(html, 'kao-primary'), 1, 'ekran başına ≤1 birincil');
+  assert.ok(html.indexOf('kao-unit-mastery') > html.indexOf('kao-unit-steps'), 'ustalık satırı ders listesinden sonra, ayrı bölümde');
+});
+
+check('D(a) Ustalık satırı durumları: sırada ●, geçti ✓ (%puan), atlandı, onarım', () => {
+  const cur = bootUnit1Done();
+  assert.equal(masteryState(unitHtml(cur)), 'current');
+  const passed1 = bootUnit1Done();
+  passed1.data.quranLearn.path.units['1'] = { masteryAt: AT, masteryScore: 0.9, attempts: 1, lastAttemptAt: AT, repair: null, skippedAt: null };
+  const ph = unitHtml(passed1);
+  assert.equal(masteryState(ph), 'passed');
+  assert.match(text(ph), /Ustalık geçildi/);
+  assert.match(text(ph), /%90/);
+  const skipped = bootUnit1Done();
+  skipped.api.kaoLesson('skip-mastery', 1);
+  const sh = unitHtml(skipped);
+  assert.equal(masteryState(sh), 'skipped');
+  assert.match(text(sh), /Atlandı/);
+  const repair = bootRepairUser(U1().slice(0, 2));
+  const rh = unitHtml(repair);
+  assert.equal(masteryState(rh), 'repair');
+  assert.match(text(rh), /Onarım/);
+});
+
+check('D(a) Ünite ekranının tek birincil düğmesi: dersler bitince "Ustalığa başla" (ünite), onarımda "Onarım turuna başla"', () => {
+  const cur = bootUnit1Done();
+  const h = unitHtml(cur);
+  assert.equal(countClass(h, 'kao-primary'), 1);
+  assert.match(text(h), /Ustalığa başla/);
+  const tapped = tapPrimary(cur);
+  assert.deepEqual([tapped.name, tapped.args], ['kaoLesson', ['start', 1]], 'birincil düğme ünite ustalığını başlatır');
+  assert.equal(cur.ui.kaoLesson.kind, 'mastery');
+  const rep = bootRepairUser(U1().slice(0, 2));
+  const rh = unitHtml(rep);
+  assert.equal(countClass(rh, 'kao-primary'), 1);
+  assert.match(text(rh), /Onarım turuna başla/);
+  assert.ok(/repair:1/.test(rh), 'onarım eylemi repair:<id>');
+});
+
+check('D(b) Bugün kahramanı (mastery): tek birincil "Ustalığa başla" + ikincil "Şimdilik atla" (skip-mastery); ≤1 .kao-primary', () => {
+  const u = bootUnit1Done();
+  const h = homeHtml(u);
+  assert.equal(countClass(h, 'kao-primary'), 1);
+  assert.equal(countClass(h, 'kao-hero-secondary'), 1);
+  assert.match(text(h), /Ustalığa başla/);
+  assert.match(text(h), /Şimdilik atla/);
+  const primary = tapPrimary(u);
+  assert.deepEqual([primary.name, primary.args], ['kaoLesson', ['start', 1]]);
+  assert.equal(u.ui.kaoLesson.kind, 'mastery');
+  const v = bootUnit1Done();
+  homeHtml(v);
+  const secondary = tapSecondary(v);
+  assert.deepEqual([secondary.name, secondary.args], ['kaoLesson', ['skip-mastery', 1]]);
+  assert.equal(secondary.ok, true);
+  assert.match(v.data.quranLearn.path.units['1'].skippedAt, ISO);
+});
+
+check('D(b) Bugün kahramanı (repair) onarım düğmesi gösterir, atla düğmesi yok', () => {
+  const u = bootRepairUser(U1().slice(0, 2));
+  const h = homeHtml(u);
+  assert.match(text(h), /Onarım turuna başla/);
+  assert.equal(countClass(h, 'kao-hero-secondary'), 0);
+  assert.equal(countClass(h, 'kao-primary'), 1);
+});
+
+check('D(c) ustalık özeti: "10 sorudan N doğru", geçti → tek taş satırı + sıradaki adım; kaldı → onarım cümlesi', () => {
+  const pass = bootUnit1Done();
+  runMastery(pass, 1);
+  const ph = pass.api.kaoOverlayHTML(pass.NOW);
+  assert.match(text(ph), /10 sorudan 9 doğru/);
+  assert.match(text(ph), /Ustalık geçildi/);
+  assert.equal((text(ph).match(/Bir kilometre taşını tamamladın/g) || []).length, 1, 'tek sakin taş satırı');
+  assert.match(text(ph), new RegExp(`${unit1Title()} ünitesini bitirdim`));
+  assert.match(text(ph), /Sıradaki adım/);
+  assert.equal(countClass(ph, 'kao-primary'), 1);
+  const fail = bootUnit1Done();
+  runMastery(fail, 4);
+  const fh = fail.api.kaoOverlayHTML(fail.NOW);
+  assert.match(text(fh), /10 sorudan 6 doğru/);
+  assert.match(text(fh), /onarım/i);
+  assert.doesNotMatch(text(fh), /Bir kilometre taşını/);
+});
+
+check('D(d) Yol: aria-current="step" Flow\'un ünite tamam kuralıyla aynı üniteye (atlanan ünite sayılır)', () => {
+  const u = bootUnit1Done();
+  const current = (u2) => (/aria-current="step"[^>]*>(?:<[^>]+>)*Ünite (\d+)/.exec(openView(u2, 'units').html) || [])[1];
+  assert.equal(current(u), '1', 'ders bitti ama ustalık yok → hâlâ Ünite 1');
+  u.api.kaoLesson('skip-mastery', 1);
+  assert.equal(current(u), '2', 'atlanınca Ünite 2');
+  const p = bootUnit1Done();
+  runMastery(p, 0); p.api.kaoLesson('finish');
+  assert.equal(current(p), '2', 'geçince Ünite 2');
+});
+
+check('D(e) u<n> taşı yalnız ustalık geçilince; atlamak taş vermez; kaoPanelSummary.unitMilestones artar', () => {
+  const skip = bootUnit1Done();
+  skip.api.kaoLesson('skip-mastery', 1);
+  assert.ok(!skip.data.quranLearn.milestones.u1, 'atlamak taş vermez');
+  assert.equal(skip.api.kaoPanelSummary(skip.data).unitMilestones, 0);
+  const failed = bootUnit1Done(); runMastery(failed, 5);
+  assert.ok(!failed.data.quranLearn.milestones.u1, 'kalınca taş yok');
+  const pass = bootUnit1Done();
+  assert.equal(pass.api.kaoPanelSummary(pass.data).unitMilestones, 0);
+  runMastery(pass, 0);
+  assert.match(pass.data.quranLearn.milestones.u1, ISO, 'geçince u1 taşı');
+  assert.equal(pass.api.kaoPanelSummary(pass.data).unitMilestones, 1);
+  assert.ok(pass.ui.kaoLesson.earnedMilestones.includes('u1'), 'özet için kazanılan taş kaydı');
+});
+
+check('D(f) uçtan uca (sıfır kullanıcı): ilk açılıştan yalnız birincil düğmelerle Ünite 1 → ustalık → Ünite 2', () => {
+  const u = bootKao();
+  u.api.kaoOpen('home');
+  let guard = 0;
+  // Onboarding: birincil düğme ya da (seçim ekranlarında) ilk seçenek — kullanıcı yalnız dokunur.
+  while (u.ui.kaoOnboard && guard++ < 40) { const t = tapPrimary(u) || tap(u, 'kao-onboard-option'); assert.ok(t && t.ok !== false, `onboarding dokunuşu çalışmalı (${guard})`); }
+  assert.ok(!u.ui.kaoOnboard, 'onboarding bitti');
+  const seen = [];
+  for (guard = 0; guard < 120; guard += 1) {
+    const step = u.api.kaoNextStep(u.NOW);
+    seen.push(step.kind + ':' + step.param);
+    if (step.kind === 'next-unit' && unitOf(2).lessons.some((l) => l.id === step.param)) break;
+    homeHtml(u);
+    const tapped = tapPrimary(u);
+    assert.ok(tapped && tapped.ok, `Bugün birincil düğmesi çalışmalı: ${step.kind}`);
+    assert.ok(u.ui.kaoLesson, `düğme oturum açmalı: ${step.kind}`);
+    assert.equal(playLesson(u, { answer: 'correct' }), true);
+    const done = tapPrimary(u); // özetin birincil düğmesi ("Bugün yeter")
+    assert.ok(done && done.ok, 'özet düğmesi günü kapatmalı');
+    nextDay(u);
+  }
+  assert.ok(guard < 120, 'Ünite 2\'ye ulaşılamadı');
+  assert.ok(seen.includes('mastery:1'), `ustalık adımı görüldü: ${seen.join(' ')}`);
+  assert.match(u.data.quranLearn.path.units['1'].masteryAt, ISO, 'Ünite 1 ustalığı dokunuşlarla geçildi');
+  assert.match(u.data.quranLearn.milestones.u1, ISO);
+});
+
+check('D(f) uçtan uca (v1 kullanıcı Ü1–3 kartlı): ustalık teklif edilir, "Şimdilik atla" ile Ünite 4\'e ulaşır', () => {
+  const u = bootKao();
+  const cards = {};
+  for (const unit of curriculum.units.slice(0, 3)) for (const l of unit.lessons) for (const id of l.lemmaIds) cards[`w:${id}:ar>tr`] = { state: 'review', s: 30, reps: 6, due: '2026-12-01T00:00:00.000Z' };
+  u.data.quranLearn = { schemaVersion: 1, cards, daily: { '2026-09-29': { answered: 10, correct: 9 } } };
+  const skipped = [];
+  for (let i = 0; i < 6; i += 1) {
+    const step = u.api.kaoNextStep(u.NOW);
+    if (step.kind !== 'mastery') break;
+    const h = homeHtml(u);
+    assert.match(text(h), /Ustalığa başla/);
+    assert.match(text(h), /Şimdilik atla/);
+    skipped.push(step.param);
+    assert.equal(tapSecondary(u).ok, true);
+  }
+  assert.deepEqual(skipped, [1, 2, 3], 'Ü1–3 ustalıkları sırayla atlandı');
+  const after = u.api.kaoNextStep(u.NOW);
+  const inUnit4 = unitOf(4).lessons.some((l) => l.id === after.param);
+  assert.ok(inUnit4, `Ünite 4'e ulaşıldı: ${after.kind} ${after.param}`);
+  for (const id of ['u1', 'u2', 'u3']) assert.ok(!u.data.quranLearn.milestones[id], `${id} taşı atlamakla verilmez`);
+});
+
+console.log(`test_kao2_mastery: bölüm A ${partA} + B ${partB - partA} + C ${partC - partB} + D ${passed - partC} = ${passed} kontrol PASS`);

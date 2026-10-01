@@ -204,3 +204,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: `unitProgress` `complete`/`skipped` bayrakları eklendi; kaoCurrentUnit (Yol/hub kartı) da `complete` kullanıyor. 12 ünite simülasyonu ~25 sn sürüyor. "Şimdilik atla" için UI düğmesi K2F-08'de (handler hazır). Simülasyonda sahte saat sabit + her oturum sonrası sessionDone sıfırlanır (gerçek takvim bağımlılığı yok).
 - next: K2F-08
+
+## seq 21 · 2026-10-01 · PROMPT · K2F-08
+- status: done
+- title: Ustalık 4/4 — görünümler, taşlar, uçtan uca
+- prev-commit: 7906b071
+- evidence: kao2-duzeltme/evidence/K2F-08/KANIT.md
+- closes: K4-01 (4/4 — Ünite 1 ustalık kilidi kaynak/test düzeyinde kapandı; yayın K2F-18'de)
+- repro: değişmedi · toplam 4/10 (R-01/R-02 PASS kalır)
+- gates: kapilar.sh YEŞİL (kao 48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20260930m
+- changed-tests: test_kao2_path.js (tamamlanmış ünite: "düğme yok" → "tek çalışan Ustalığa başla"; ustalık geçilmişse yine düğme yok · K4-01)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: kontrast aracı `background:none` çözemiyor (→ `transparent`); onboarding'de seçim ekranları birincil düğmesiz (testte ilk seçeneğe dokunuş); taş alanları başlangıçta `null` (tanımsız değil). Kullanıcı yönergesi: "sırayla gideceğiz" — her prompt ayrı, sıradaki isteğe kadar durulur.
+- next: K2F-09

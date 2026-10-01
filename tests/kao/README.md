@@ -30,7 +30,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao_state_budget.js` | KAO-FIX-09 | KF-10 koruması: `daily` budanmaz (400 gün korunur), `ensureQuranLearn` idempotent; boyut yalnız bilgi |
 | `test_kao2_view_resolution.js` | K2F-02 | Yığınsız `ui.kaoView` çözümü ve gerçek `kaoNav`/`kaoSetView` ile 12 parametresiz + 4 parametreli görünüm; `helpers/kao-harness.js` (bootKao/freshUser/openView/walkLesson) öz-testi |
 | `test_kao2_handler_surface.js` | K2F-03 | İşaretlemede çağrılan her `App.kao*` ↔ `app.js` tek satırlık shim ↔ `window.SeymaQuranLearn`; `KNOWN_MISSING=['kaoS0']` yalnız küçülür (K2F-12 boşaltır) |
-| `test_kao2_mastery.js` | K2F-05/06/07 | Ünite ustalığı: A saf Flow (`masteryPlan`, `unitMastery`); B gerçek handler'larla oturum + kayıt (eşik 0,8, onarım listesi, normalizasyon); C `repairPlan`, `repair:<id>` oturumu, `skip-mastery` ve 12 ünite simülasyonu (Ünite 3 kaldı → onarım → geçti; ~25 sn) |
+| `test_kao2_mastery.js` | K2F-05…08 | Ünite ustalığı: A saf Flow (`masteryPlan`, `unitMastery`); B gerçek handler'larla oturum + kayıt; C `repairPlan`, onarım oturumu, `skip-mastery`, 12 ünite simülasyonu; D görünümler (ayrı Ustalık satırı, Bugün birincil + "Şimdilik atla", özet, Yol `aria-current`, `u<n>` taşı) ve dokunarak uçtan uca (sıfır kullanıcı → Ünite 2, v1 → Ünite 4); ~28 sn |
 
 Fixture'lar ilgili uygulama kartında tek tek eklenecek; bu başlangıç promptu
 üretim kodu veya çalıştırılabilir fixture eklemez.

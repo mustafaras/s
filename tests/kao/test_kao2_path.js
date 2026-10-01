@@ -119,7 +119,13 @@ check('tamamlanmış ünite CTA ve halka durumunu yalnız ders kayıtlarından t
   const html = decode(api.kaoOverlayHTML());
   assert.match(html, /100%/);
   assert.match(html, /Bu ünitedeki dersler tamamlandı/);
-  assert.doesNotMatch(html, /class="kao-primary"/, 'tamamlanmış ünite için çalışmayan devam düğmesi gösterilmez');
+  // K2F-08: dersler bitince birincil düğme ÇALIŞAN ustalık eylemidir (eski beklenti: düğme yok → artık "Ustalığa başla");
+  // ustalık geçilmişse yine hiçbir devam düğmesi yoktur.
+  assert.equal((html.match(/class="kao-primary"/g) || []).length, 1, 'dersler bitince tek ve çalışan ustalık düğmesi');
+  assert.match(html, /Ustalığa başla/);
+  q.path.units['1'] = { masteryAt: '2026-09-20T10:00:00.000Z', masteryScore: 0.9, attempts: 1, lastAttemptAt: '2026-09-20T10:00:00.000Z', repair: null, skippedAt: null };
+  assert.equal(api.kaoNav('unit', unit.id), true);
+  assert.doesNotMatch(decode(api.kaoOverlayHTML()), /class="kao-primary"/, 'ustalığı geçilmiş ünite için devam düğmesi gösterilmez');
 });
 
 check('06: KAO tokenları, 44px hedefler ve dar/geniş metinde sarmalanan dikey düzen', () => {

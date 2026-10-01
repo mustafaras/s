@@ -274,10 +274,59 @@ function build(spec, content, texts) {
       }
     };
   }
+  // K2F-13 · harfsiz S0 dersleri: spec `s0Focus` işaret kimlikleriyle odak verir; örnek kelimeler lexicon'dan BELİRLENİMCİ seçilir
+  // (≤3 hece, klip diskte, Latin okunuşlu; en sık geçen önce, fetha/damme/kesre için yalnız o ünlüyü taşıyanlar önce). Arapça elle yazılmaz:
+  // işaret yüzeyleri Unicode kod noktasından, işaret simgesi (glyph) noktalı daire + kod noktasından üretilir.
+  const MARKS = {
+    fatha: { test: (a) => a.includes('\u064e'), glyph: '\u25cc\u064e', vowel: '\u064e' },
+    damma: { test: (a) => a.includes('\u064f'), glyph: '\u25cc\u064f', vowel: '\u064f' },
+    kasra: { test: (a) => a.includes('\u0650'), glyph: '\u25cc\u0650', vowel: '\u0650' },
+    sukun: { test: (a) => a.includes('\u0652'), glyph: '\u25cc\u0652' },
+    shadda: { test: (a) => a.includes('\u0651'), glyph: '\u25cc\u0651' },
+    'dagger-alif': { test: (a) => a.includes('\u0670'), glyph: '\u25cc\u0670' },
+    tanwin: { test: (a) => /[\u064b-\u064d]/.test(a), glyph: '\u25cc\u064b' },
+    al: { test: (a) => /^[\u0671\u0627]\u0644/.test(a), glyph: '\u0671\u0644' }
+  };
+  const FOCUS_KINDS = ['marks', 'positions', 'sukun', 'madd-shadda', 'tanwin-al'];
+  const examplePool = content.lex.lemmas
+    .filter((l) => syllableCount(l.ar) <= 3 && audioFiles.has(`w-${l.id}-measured.m4a`) && l.translit && l.meanings && l.meanings[0])
+    .sort((a, b) => (b.freq || 0) - (a.freq || 0) || String(a.id).localeCompare(String(b.id)));
+  const pureVowel = (ar, vowel) => !vowel || ['\u064e', '\u064f', '\u0650'].filter((v) => ar.includes(v)).every((v) => v === vowel);
+  const focusFor = (id) => {
+    const entry = spec.s0Focus && spec.s0Focus[id];
+    if (!entry) return null;
+    if (!FOCUS_KINDS.includes(entry.kind)) fail(`${id}: bilinmeyen focus türü ${entry.kind}`);
+    const taken = new Set();
+    const marks = (entry.marks || []).map((m) => {
+      if (!MARKS[m.id]) fail(`${id}: bilinmeyen işaret ${m.id}`);
+      if (!m.tr) fail(`${id}/${m.id}: Türkçe ad eksik`);
+      return { id: m.id, tr: String(m.tr), glyph: MARKS[m.id].glyph };
+    });
+    const examples = [];
+    for (const m of marks) {
+      const def = MARKS[m.id];
+      const per = Math.max(1, Math.ceil(3 / Math.max(1, marks.length)));
+      const candidates = examplePool.filter((l) => !taken.has(l.id) && def.test(String(l.ar)));
+      // Ünlü derslerinde (fetha/damme/kesre) önce yalnız o ünlüyü taşıyan ve henüz öğretilmemiş başka işareti (şedde, sükûn, tenvin, hançer elif, med) olmayan kelimeler.
+      const bare = candidates.filter((l) => def.vowel && pureVowel(String(l.ar), def.vowel) && !/[\u0651\u0652\u0670\u064b-\u064d\u0653]/.test(String(l.ar)));
+      const pure = candidates.filter((l) => pureVowel(String(l.ar), def.vowel));
+      const pool = bare.length >= per ? bare : (pure.length >= per ? pure : candidates);
+      for (const l of pool.slice(0, per)) {
+        taken.add(l.id);
+        examples.push({ wordId: l.id, ar: String(l.ar), tr: String(l.meanings[0]), translit: String(l.translit), syllables: syllableCount(l.ar),
+          marks: marks.filter((x) => MARKS[x.id].test(String(l.ar))).map((x) => x.id), file: `w-${l.id}-measured.m4a` });
+      }
+      if (candidates.length < per) fail(`${id}/${m.id}: yeterli örnek kelime yok (${candidates.length})`);
+    }
+    if (entry.kind !== 'positions' && examples.length < 3) fail(`${id}: ≥3 örnek kelime gerekir (${examples.length})`);
+    return { kind: entry.kind, marks, examples };
+  };
   const s0 = { lessons: spec.s0.map((title, i) => {
     const id = `s0.${pad(i + 1)}`;
     const text = textFor(texts, id, title, '', 's0');
-    return { id, title: text.title, goal: text.goal || null, review: text.review };
+    const focus = focusFor(id);
+    return Object.assign({ id, title: text.title, goal: text.goal || null, review: text.review },
+      focus ? { focus: { kind: focus.kind, marks: focus.marks }, examples: focus.examples } : {});
   }), letters: s0Letters };
   const missing = content.lex.lemmas.filter((l) => !lemmaToLesson[l.id]);
   if (missing.length) fail(`derse girmeyen lemma: ${missing[0].id}`);

@@ -25,6 +25,20 @@
     "Tenvin, elif-lâm, vasıl",
     "İlk okuma provası"
   ],
+  "s0Focus": {
+    "_note": "Harf listesi olmayan S0 dersleri: işaret kimlikleriyle odak (Arapça yazılmaz). Araç her işaret için lexicon'dan belirlenimci örnek kelime seçer: ≤3 hece, klip diskte, en sık geçen önce; fetha/damme/kesre için yalnız o ünlüyü taşıyan kelimeler önce.",
+    "s0.01": { "kind": "marks", "marks": [
+      { "id": "fatha", "tr": "fetha — kısa a" }, { "id": "damma", "tr": "damme (ötre) — kısa u" }, { "id": "kasra", "tr": "kesre (esre) — kısa i" } ] },
+    "s0.03": { "kind": "marks", "marks": [
+      { "id": "kasra", "tr": "kesre (esre) — kısa i" }, { "id": "damma", "tr": "damme (ötre) — kısa u" } ] },
+    "s0.07": { "kind": "positions", "marks": [] },
+    "s0.08": { "kind": "sukun", "marks": [
+      { "id": "sukun", "tr": "sükûn — ünlüsüz, hece ünsüzle kapanır" } ] },
+    "s0.09": { "kind": "madd-shadda", "marks": [
+      { "id": "shadda", "tr": "şedde — harf ikilenir" }, { "id": "dagger-alif", "tr": "hançer elif — uzun a" } ] },
+    "s0.11": { "kind": "tanwin-al", "marks": [
+      { "id": "tanwin", "tr": "tenvin — sonda -un, -in, -an" }, { "id": "al", "tr": "elif-lâm — başta 'el' takısı" } ] }
+  },
   "units": [
     {
       "id": 1, "level": 1, "title": "Fâtiha",

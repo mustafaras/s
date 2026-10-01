@@ -172,6 +172,24 @@ check('(g) araç iki çalıştırmada bayt-eşit ve depodaki çıktıyla aynı',
   assert.ok(!/generatedAt|\d{4}-\d{2}-\d{2}T\d{2}:/.test(runs[0][0].toString('utf8')), 'zaman damgası var');
 });
 
+check('(K2F-13) S0 focus: spec `s0Focus` ↔ modül tutarlı; örnek kelimeler sözlükte var ve yüzey/anlam/okunuş sözlükle aynı; spec Arapça içermez', () => {
+  const spec = JSON.parse(read(SPEC).toString('utf8'));
+  assert.ok(!/[\u0600-\u06ff]/.test(JSON.stringify(spec)), 'spec Arapça içeremez (D-12)');
+  const focusIds = Object.keys(spec.s0Focus).filter((k) => !k.startsWith('_')).sort();
+  assert.deepEqual(focusIds, ['s0.01', 's0.03', 's0.07', 's0.08', 's0.09', 's0.11'], 'harfsiz 6 ders');
+  for (const lesson of cur.s0.lessons) {
+    const entry = spec.s0Focus[lesson.id];
+    if (!entry) { assert.ok(!lesson.focus, `${lesson.id}: spec'te yok, modülde var`); continue; }
+    assert.equal(lesson.focus.kind, entry.kind, `${lesson.id}: tür`);
+    assert.deepEqual([...lesson.focus.marks.map((m) => m.id)], entry.marks.map((m) => m.id), `${lesson.id}: işaretler`);
+    for (const e of lesson.examples) {
+      const lemma = byId.get(e.wordId);
+      assert.ok(lemma, `${lesson.id}: ${e.wordId} sözlükte yok`);
+      assert.equal(e.ar, lemma.ar); assert.equal(e.translit, lemma.translit); assert.equal(e.tr, lemma.meanings[0]);
+    }
+  }
+});
+
 check('(h) gzip ≤ 48 KiB', () => {
   const size = zlib.gzipSync(read(MODULE), { level: 9 }).length;
   console.log(`      gzip ${(size / 1024).toFixed(3)} KiB`);

@@ -262,4 +262,88 @@ check('(g/K2F-12) S0 görünümü a11y sözleşmesi: başlık etiketi, Arapça l
   assert.ok(!/tabindex="[1-9]/.test(html), 'pozitif tabindex yok');
 });
 
+// ---- (h) K2F-13 · harfsiz 6 S0 dersi içerik kazanır, hiçbir S0 dersi çizimde çökmez ---------------
+const FOCUS = {
+  's0.01': { kind: 'marks', marks: ['fatha', 'damma', 'kasra'] },
+  's0.03': { kind: 'marks', marks: ['kasra', 'damma'] },
+  's0.07': { kind: 'positions', marks: [] },
+  's0.08': { kind: 'sukun', marks: ['sukun'] },
+  's0.09': { kind: 'madd-shadda', marks: ['shadda', 'dagger-alif'] },
+  's0.11': { kind: 'tanwin-al', marks: ['tanwin', 'al'] }
+};
+const MARK_PATTERN = { fatha: /َ/, damma: /ُ/, kasra: /ِ/, sukun: /ْ/, shadda: /ّ/, 'dagger-alif': /ٰ/, tanwin: /[ً-ٍ]/, al: /^[ٱا]ل/ };
+const syllablesOf = (ar) => (String(ar).match(/[ًَُِ-ٍ]/g) || []).length;
+const hasHtmlError = (html) => /content-error|Seviye 0 dersi bulunamadı/.test(html);
+
+check('(h/K2F-13) 12 S0 dersinin 12\'si kaoS0HTML ile çökmeden çizilir (R-06); her çizim dersin başlığını taşır', () => {
+  const t = boot();
+  for (const lesson of t.curriculum.s0.lessons) {
+    assert.equal(t.api.kaoS0Start(lesson.id), true, `${lesson.id}: başlamalı`);
+    let html;
+    assert.doesNotThrow(() => { html = decode(t.api.kaoS0HTML()); }, `${lesson.id}: çizim çökmemeli`);
+    assert.ok(!hasHtmlError(html), `${lesson.id}: içerik hatası`);
+    assert.ok(html.includes(esc(lesson.title)) || html.includes(lesson.title), `${lesson.id}: başlık`);
+  }
+});
+
+check('(h/K2F-13) harfsiz 6 ders `focus` taşır; ≥3 örnek kelime: ≤3 hece, hedef işareti içerir, klip diskte, Latin okunuşlu, tekrarsız', () => {
+  const t = boot();
+  const phonicsLetters = new Set(Array.from(t.phonics.letters, (l) => String(l.ar)));
+  for (const [id, expected] of Object.entries(FOCUS)) {
+    const lesson = t.curriculum.s0.lessons.find((l) => l.id === id);
+    assert.ok(lesson.focus, `${id}: focus yok`);
+    assert.equal(lesson.focus.kind, expected.kind, `${id}: focus türü`);
+    assert.deepEqual(Array.from(lesson.focus.marks, (m) => m.id), expected.marks, `${id}: işaret kimlikleri`);
+    for (const m of lesson.focus.marks) assert.ok(m.tr && m.glyph, `${id}/${m.id}: Türkçe ad ve işaret`);
+    if (expected.kind === 'positions') continue;
+    assert.ok(lesson.examples.length >= 3, `${id}: ${lesson.examples.length} örnek < 3`);
+    assert.equal(new Set(Array.from(lesson.examples, (e) => e.wordId)).size, lesson.examples.length, `${id}: yinelenen örnek`);
+    for (const e of lesson.examples) {
+      assert.ok(syllablesOf(e.ar) <= 3, `${id}/${e.wordId}: ${syllablesOf(e.ar)} hece`);
+      assert.ok(e.marks.some((m) => MARK_PATTERN[m].test(e.ar)), `${id}/${e.wordId}: hedef işaret yok`);
+      assert.ok(fs.existsSync(path.join(repoRoot, 'assets/kao/audio', e.file)), `${id}/${e.wordId}: klip diskte yok (${e.file})`);
+      assert.ok(e.translit && !/[؀-ۿ]/.test(e.translit), `${id}/${e.wordId}: Latin okunuş`);
+      assert.ok(e.tr, `${id}/${e.wordId}: Türkçe anlam`);
+    }
+    for (const m of expected.marks) assert.ok(lesson.examples.some((e) => MARK_PATTERN[m].test(e.ar)), `${id}: ${m} için örnek yok`);
+  }
+  void phonicsLetters;
+});
+
+check('(h/K2F-13) harfsiz derslerin çizimi örnekleri okunuşuyla gösterir; konum dersi 28 harflik tabloyu taşır; ses düğmesi örnek indeksiyle çalışır', () => {
+  const t = boot();
+  for (const id of ['s0.01', 's0.03', 's0.08', 's0.09', 's0.11']) {
+    t.api.kaoS0Start(id);
+    const html = decode(t.api.kaoS0HTML());
+    const lesson = t.curriculum.s0.lessons.find((l) => l.id === id);
+    for (const e of lesson.examples) assert.ok(html.includes(e.ar) && html.includes(e.translit), `${id}: ${e.wordId} Arapça + okunuş görünmeli`);
+    for (const m of lesson.focus.marks) assert.ok(html.includes(m.tr), `${id}: ${m.id} Türkçe adı görünmeli`);
+  }
+  t.api.kaoS0Start('s0.07');
+  const positions = decode(t.api.kaoS0HTML());
+  assert.equal((positions.match(/class="kao-s0-pos-row"/g) || []).length, 28, '28 harflik konum tablosu');
+  t.api.kaoS0Start('s0.01');
+  assert.equal(t.api.kaoS0('audio', 0), true, 'ilk örnek çalınır');
+  assert.match(t.played[t.played.length - 1], /\.m4a$/, 'klip dosyası çalındı');
+  assert.equal(t.api.kaoS0('audio', 99), false, 'olmayan örnek reddedilir');
+});
+
+check('(h/K2F-13) gerçek giriş satırı: Keşfet\'teki "Seviye 0" satırı (s0.01) açılır ve çizilir; 12 dersin hepsi görünüm üzerinden çökmeden açılır', () => {
+  const t = kao.bootKao({ seeded: true });
+  const home = t.api.kaoOverlayHTML(t.NOW);
+  const m = /onclick="App\.kaoS0\(([^"]*)\)"/.exec(home);
+  assert.ok(m, 'ana ekranda S0 satırı');
+  const args = JSON.parse('[' + decode(m[1]) + ']');
+  assert.deepEqual(args, ['start', 's0.01']);
+  assert.equal(t.api.kaoS0(...args), true);
+  assert.equal(t.ui.kaoView, 's0');
+  let out;
+  assert.doesNotThrow(() => { out = t.api.kaoOverlayHTML(t.NOW); }, 'giriş dersi görünüm üzerinden çizilmeli');
+  assert.equal(kao.navTitle(out), 'Harfler');
+  for (const lesson of t.win.QuranCurriculumV2.s0.lessons) {
+    assert.equal(t.api.kaoS0('start', lesson.id), true, lesson.id);
+    assert.doesNotThrow(() => t.api.kaoOverlayHTML(t.NOW), `${lesson.id}: görünüm çökmemeli`);
+  }
+});
+
 console.log(`KAO2 s0: PASS (${passed} kontrol)`);

@@ -670,8 +670,8 @@
       ui.kaoS0=state; quranLearnDeps.render(); return true;
     }
     if(action==='audio'){
-      var f=kaoS0Lesson(state.lessonId),w=f&&f.word;
-      if(!w) return false;
+      var f=kaoS0Lesson(state.lessonId),w=f&&(f.kind==='focus'?(f.examples||[])[Math.floor(Number(value))]:f.word);
+      if(!w||!w.file) return false;
       if(!kaoS0CanAudio()){ ui.kaoS0Note='Bu cihazda ya da sessiz saatte ses kapalı; kelimeyi görerek öğren.'; quranLearnDeps.render(); return false; }
       var started=kaoS0Play([w.file],function(){ ui.kaoS0Note='Ses yüklenemedi; görsel akışla sürdür.'; quranLearnDeps.render(); });
       if(!started) ui.kaoS0Note='Ses başlatılamadı; görsel akışla sürdür.';
@@ -701,6 +701,27 @@
       h+='<button type="button" class="kao-secondary" onclick="App.kaoS0(\'read\')">Okudum</button>';
       return h+'</section></main>';
     }
+    if(flow.kind==='focus'){
+      var marks=Array.isArray(flow.focus.marks)?flow.focus.marks:[],examples=Array.isArray(flow.examples)?flow.examples:[];
+      if(marks.length) h+='<section class="kao-s0-stage"><h3>Bu derste</h3><ul class="kao-s0-marks">'+marks.map(function(m){ return '<li><span class="kao-s0-glyph" lang="ar" dir="rtl">'+esc(m.glyph)+'</span><span>'+esc(m.tr)+'</span></li>'; }).join('')+'</ul></section>';
+      if(examples.length){
+        h+='<section class="kao-s0-listen"><h3>Örnek kelimeler</h3><ol class="kao-s0-words">'+examples.map(function(e,i){
+          return '<li><span class="kao-s0-word"><span lang="ar" dir="rtl">'+esc(e.ar)+'</span><small>'+esc(e.translit)+' · '+esc(e.tr)+'</small></span>'+(canAudio?'<button type="button" class="kao-secondary" onclick="App.kaoS0(\'audio\','+i+')" aria-label="'+esc(e.translit)+' kelimesini dinle">Dinle</button>':'')+'</li>'; }).join('')+'</ol>';
+        if(!canAudio) h+='<p class="kao-s0-note">Bu cihazda ses kapalı; okunuşları okuyarak ilerle.</p>';
+        if(ui.kaoS0Note) h+='<p class="kao-s0-note" role="status">'+esc(ui.kaoS0Note)+'</p>';
+        h+='</section>';
+      }
+      if(flow.focus.kind==='positions'){
+        h+='<section class="kao-s0-positions"><h3>28 harf, dört konum</h3>';
+        table.rows.forEach(function(r){
+          h+='<ul class="kao-s0-pos-row">';
+          r.cells.forEach(function(cell,i){ h+='<li><span>'+esc(table.columns[i].label)+'</span>'+(cell.unavailable?'<small class="kao-s0-pos-none">biçim yok</small>':'<b lang="ar" dir="rtl">'+esc(cell.ar)+'</b>')+'</li>'; });
+          h+='</ul>';
+        });
+        h+='</section>';
+      }
+      return h+'<button type="button" class="kao-primary" onclick="App.kaoS0(\'next\')">Sıradaki adım</button></main>';
+    }
     h+='<section class="kao-s0-stage"><h3>Bu derste</h3><ul class="kao-s0-letters">'+flow.letters.map(function(l){ return '<li lang="ar" dir="rtl">'+esc(l.ar)+'</li>'; }).join('')+'</ul></section>';
     if(flow.stages[1]&&flow.stages[1].kind==='listen'&&word){
       h+='<section class="kao-s0-listen"><h3>Dinle ve gör</h3><p class="kao-s0-word-ar" lang="ar" dir="rtl">'+esc(word.ar)+'</p><p class="kao-s0-word-tr">'+esc(word.tr)+'</p>';
@@ -708,7 +729,7 @@
       if(ui.kaoS0Note) h+='<p class="kao-s0-note" role="status">'+esc(ui.kaoS0Note)+'</p>';
       h+='</section>';
     }
-    var row=table.rows.filter(function(r){ return r.letterId===flow.letters[0].id; })[0];
+    var row=flow.letters[0]?table.rows.filter(function(r){ return r.letterId===flow.letters[0].id; })[0]:null;
     if(row){
       h+='<section class="kao-s0-positions"><h3>Aynı harf dört yerde</h3><ul class="kao-s0-pos-row">';
       row.cells.forEach(function(cell,i){
@@ -3102,6 +3123,12 @@
     if(!lesson) return null;
     if(id==='s0.12') return {id:id,kind:'reading',title:lesson.title,goal:lesson.goal,stages:[{kind:'read'}],
       words:kaoFatihaWords()};
+    // K2F-13: harf listesi olmayan dersler (hareke, esre/ötre, konum, sükûn, med/şedde, tenvin/elif-lâm) `focus` + örnek kelimelerle gelir.
+    if(lesson.focus&&typeof lesson.focus==='object'){
+      var examples=Array.isArray(lesson.examples)?lesson.examples:[];
+      return {id:id,kind:'focus',title:lesson.title,goal:lesson.goal,focus:lesson.focus,letters:[],word:null,examples:examples,
+        stages:[{kind:'intro'},{kind:'listen',audio:examples.length>0},{kind:'read'}]};
+    }
     var letters=(c.s0.letters&&typeof c.s0.letters==='object')?c.s0.letters:{};
     var mine=Object.keys(letters).filter(function(k){ return (lesson.family||[]).indexOf(k)>=0; });
     // Aile bilgisi KAO_S0_LETTERS'tan gelir (derste hangi harfler tanıtılır).

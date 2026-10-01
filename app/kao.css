@@ -370,6 +370,10 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-s0-word span{color:var(--kao-label);font-size:var(--f-title3);font-weight:700}
 .kao-s0-word small{color:var(--kao-label-2);font-size:var(--f-caption1)}
 .kao-s0-note{margin:8px 0;color:var(--kao-label-2);font-size:var(--f-footnote);line-height:1.4}
+.kao-s0-marks{display:grid;gap:8px;margin:0 0 14px;padding:0;list-style:none}.kao-s0-marks li{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface);color:var(--kao-label);font-size:var(--f-subhead);line-height:1.4}
+.kao-s0-glyph{min-width:44px;display:grid;place-items:center;color:var(--kao-tint);font-size:var(--f-title2);font-weight:700}
+.kao-s0-words li{display:flex;align-items:center;justify-content:space-between;gap:10px}.kao-s0-words li .kao-s0-word{flex:1 1 auto;min-width:0}.kao-s0-words li .kao-secondary{flex:0 0 auto}
+.kao-s0-positions .kao-s0-pos-row+.kao-s0-pos-row{margin-top:8px}
 .kao-s0 .kao-primary{margin-top:8px}
 @media(forced-colors:active){.kao-s0-letters li,.kao-s0-listen,.kao-s0-pos-row li,.kao-s0-word{border-color:CanvasText;background:Canvas}.kao-s0-word-ar,.kao-s0-pos-row li b,.kao-s0-word span{color:CanvasText}.kao-s0-note,.kao-s0-word small{color:CanvasText}}
 

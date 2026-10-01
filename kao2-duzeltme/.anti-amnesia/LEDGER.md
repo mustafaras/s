@@ -391,3 +391,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - note: bu oturumda bilgisayar kullanımı (computer use) aracı yok; CLAUDE.md'deki kontrollü görsel QA istisnası (127.0.0.1:9000, tek kullanımlık profil) uygulanamadı → görsel doğrulama headless/HTML düzeyinde kalır, cihaz doğrulaması kullanıcıda.
 - changed-tests: test_kao2_s0.js (+1 a11y kontrolü).
 - next: K2F-13
+
+## seq 42 · 2026-10-01 · PROMPT · K2F-13
+- status: done
+- title: Seviye 0 2/4 — harfsiz dersler
+- prev-commit: 3260f1cb
+- evidence: kao2-duzeltme/evidence/K2F-13/KANIT.md
+- closes: K5-02 (iv)
+- repro: R-06 fail→pass · toplam 7/10
+- gates: kapilar.sh YEŞİL (kao 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 43 · yüzey 764 · atama 602 · yayın 20261001e (yayınlanan `quranCurriculumV2.js`, `quranLearn.js`, `kao.css` değişti: sonraki yayında pin yükselmeli)
+- changed-tests: yok (yalnız genişletme)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: giriş satırı (s0.01) artık çökmüyor; harfsiz derslerde puanlı alıştırma K2F-14'te; sıfır kartlı S0 öğrencisinin yolu K2F-15.
+- next: K2F-14

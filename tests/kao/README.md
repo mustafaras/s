@@ -35,7 +35,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao2_s0.js` | K2F-12…15 | Seviye 0: `kaoS0` yüzeyi (12 dersin 12'si çökmeden çizilir, R-04/R-06), harfsiz ders içeriği, 5 aşama + puanlı alıştırma (6–8 soru, aşama başına ≤1 birincil düğme), Bugün/ilk açılıştan 3 dokunuşla S0, 12 ders uçtan uca → Fâtiha, Besmele taşı yalnız `s0.12` sonrası |
 | `test_kao2_settings.js` | K2F-16 | Ayarlar: niyet satırı `onboarding.intent`'ten okunur, `kaoSetIntent` 5 vakit + kendim kabul eder, geçersiz değer reddedilir (R-07); handler pini |
 | `test_kao2_hub.js` | K2F-16 | Hub kartı: niyet varsa öneri o vaktin saatiyle (geçtiyse "yarın"), yoksa sıradaki-vakit davranışı |
-| `test_kao2_lesson_coherence.js` | K2F-19 | Ders tutarlılık kapısı (K5-03): başlık/hedef bir dil kategorisi anıyorsa lemmaların ≥%60'ı yüklemi sağlar, kavram kategorisi de; `KNOWN_MISMATCH` (14/109 ders) tam listelenir, yalnız küçülür (K2F-20 boşaltır) |
+| `test_kao2_lesson_coherence.js` | K2F-19 | Ders tutarlılık kapısı (K5-03): başlık/hedef bir dil kategorisi anıyorsa lemmaların ≥%60'ı yüklemi sağlar, kavram kategorisi de; `KNOWN_MISMATCH` (17/109 ders) tam listelenir, yalnız küçülür (K2F-20 boşaltır) |
 
 Fixture'lar ilgili uygulama kartında tek tek eklenecek; bu başlangıç promptu
 üretim kodu veya çalıştırılabilir fixture eklemez.

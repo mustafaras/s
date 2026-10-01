@@ -529,3 +529,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: kapı K5-03'ün 10 dersine ek 4 tutarsız ders buldu (u03.02, u09.11, u10.03, u12.03); toplam 14/109.
 - next: K2F-20
+
+## seq 54 · 2026-10-01 · FIX · K2F-19
+- request: kullanıcı: "tam ve kusursuz olduğundan emin ol" → 3 bağımsız denetçi (test mantığı · protokol · veri yeniden hesaplama) + her bulguya çürütme ajanı.
+- fixed: 6 doğrulanmış bulgu — (1) `fiil` regex'i fiillerini/fiilini biçimlerini kaçırıyordu (22 ders denetlenmiyordu) → /fiil(?!in adı)|geçmiş zaman|şimdiki zaman|geniş zaman/; (2) `ancak` RET'i (idrâb harfi bal) sayıyordu → yalnız EXP; (3) `bağlaç` kategorisi yoktu (u04.03, u04.04) → CONJ/AMD/EXL; (4) u07.02 yardımcı fiil yokken geçiyordu ve g23 yanlışlıkla zarf-T'ye bağlıydı → `yardımcı fiil` yüklemi (g14, g23); (5) KANIT.md kategori sayısı (19→20 son durum); (6) CURRENT-STATE "Canlı gerçekler" bayattı (main 19f0bfd6, pin 20261001g). Ek: liste çıtası (≤17) ve yinelenen kimlik denetimi.
+- result: KNOWN_MISMATCH 14 → 17/109 (+u04.03, u04.04, u07.02); K5-03'ün 10 dersi hâlâ yakalanıyor.
+- rejected-by-verifier (7): emir yüklemi sabit false (veri sınırı), liste mekanik küçülme (prompt kapsamı), zaman=T/N zarf, olumlu örnek eksikliği, K2F-20 boşaltma imkânı, %60 eşik n=5, regex kırılganlığı (kapsam sınırı) — belgelendi, kod değişmedi.
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- next: K2F-20

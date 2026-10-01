@@ -23,6 +23,7 @@ const grammar = box.window.QuranGrammarV1;
 const meaning = (lemma) => (lemma.meanings || []).join(' ').toLocaleLowerCase('tr');
 const posIn = (...tags) => (lemma) => tags.includes(lemma.pos);
 const patternIs = (re) => (lemma) => re.test(String(lemma.pattern || ''));
+const isHelperVerb = (lemma) => lemma.pos === 'V' && /(^|[\s,])(oldu|idi|değil|sabahladı|hâline geldi)([\s,]|$)/.test(meaning(lemma));
 
 // Kategori sözlüğü: anahtar sözcük (başlık/hedef) → lemma yüklemi. Gerekçe her satırda.
 const CATEGORIES = [
@@ -34,11 +35,15 @@ const CATEGORIES = [
   { id: 'soru', re: /soru kelimeleri/, test: posIn('INTG') },
   { id: 'olumsuzluk', re: /olumsuzluk/, test: posIn('NEG') },
   { id: 'şart', re: /şart|eğer/, test: posIn('COND') },
-  { id: 'zaman', re: /zaman bildiren|zaman kalıpları/, test: posIn('T') },
+  // 'Zaman bildiren yardımcı fiilleri' (u12.02) bir fiil dersidir; zarf-zaman yalnız 'zaman kalıpları' için aranır.
+  { id: 'zaman', re: /zaman kalıpları/, test: posIn('T') },
   // 'allazî/mâ' REL: "-an, -en" ilgi bağları.
   { id: 'ilgi bağı', re: /'-an, -en' bağları/, test: posIn('REL') },
   { id: 'şüphesiz', re: /şüphesiz|pekiştirme/, test: posIn('CERT', 'ACC') },
-  { id: 'ancak', re: /ancak|sınırlama/, test: posIn('RET', 'EXP') },
+  // RET 'bal' (hayır, aksine) idrâb harfidir, sınırlama değil: yalnız EXP (illâ).
+  { id: 'ancak', re: /ancak|sınırlama/, test: posIn('EXP') },
+  // Sözlükte bağlaç CONJ, istidrâk/karşıtlık AMD ve EXL ile işaretlenir (ile=LOC ayrı edat gibi etiketli).
+  { id: 'bağlaç', re: /bağlaç/, test: posIn('CONJ', 'AMD', 'EXL') },
   // Sözlükte ayrı seslenme etiketi yok; anlamı "ey" ile başlayan lemmalar sayılır.
   { id: 'seslenme', re: /seslenme(?!k)/, test: (l) => /(^|\s)ey(\s|$)/.test(meaning(l)) },
   // Sözlükte emir kipi etiketi yok: lemmalar fiilin 3. tekil geçmiş biçimidir, hiçbiri emir sayılamaz.
@@ -47,7 +52,10 @@ const CATEGORIES = [
   { id: 'fiilin adı', re: /fiilin adı/, test: patternIs(/masdar/) },
   { id: 'karşılaştırma', re: /karşılaştırma kalıbı/, test: patternIs(/tafdîl/) },
   // Fiil dersleri: sözlükteki fiil lemması kalıp başlığına uyar (geçmiş/şimdiki ayrımı veri modelinde yok).
-  { id: 'fiil', re: /\bfiil(ler|leri|i)?\b/, test: posIn('V') },
+  // 'fiilin adı' (masdar) ayrı kategoridir; 'fiilini/fiillerini' gibi çekimli biçimler de eşleşir.
+  { id: 'fiil', re: /fiil(?!in adı)|geçmiş zaman|şimdiki zaman|geniş zaman/, test: posIn('V') },
+  // Yardımcı fiil (kâne, leyse, asbaha): yalnız pos=V yetmez; anlamı oldu/idi/değil/sabahladı olan fiil aranır.
+  { id: 'yardımcı fiil', re: /yardımcı fiil/, test: isHelperVerb },
   { id: 'esenlik', re: /esenlik/, test: (l) => /esen|selam|selâm|barış/.test(meaning(l)) },
   { id: 'hidayet', re: /hidayet|doğru yolu bulmak/, test: (l) => /hidayet|doğru yol|yol göster|doğruya/.test(meaning(l)) }
 ];
@@ -55,9 +63,9 @@ const CATEGORIES = [
 // Denetlenebilir kavram kategorileri (öteki kavramlar anlam/sözdizimi; lemma yüklemiyle ölçülemez).
 const CONCEPT_CATEGORY = {
   g3: ['edat', posIn('P')], g4: ['zamir', posIn('PRON')], g6: ['olumsuzluk', posIn('NEG')], g7: ['ilgi bağı', posIn('REL')],
-  g9: ['işaret', posIn('DEM')], g13: ['fiil', posIn('V')], g14: ['fiil', posIn('V')], g15: ['fiil', posIn('V')],
+  g9: ['işaret', posIn('DEM')], g13: ['fiil', posIn('V')], g14: ['yardımcı fiil', isHelperVerb], g15: ['fiil', posIn('V')],
   g16: ['fiil', posIn('V')], g17: ['emir', () => false], g19: ['yapan/yapılan', patternIs(/ism-i (fâil|mef)/)],
-  g20: ['fiilin adı', patternIs(/masdar/)], g22: ['şart', posIn('COND')], g23: ['zaman', posIn('T')]
+  g20: ['fiilin adı', patternIs(/masdar/)], g22: ['şart', posIn('COND')], g23: ['yardımcı fiil', isHelperVerb]
 };
 
 function share(lemmaIds, test) {
@@ -84,9 +92,11 @@ function incoherence(lesson) {
 
 // Bugün tutmayan derslerin TAM listesi (K5-03). Yalnız küçülür; K2F-20 boşaltır.
 const KNOWN_MISMATCH = [
-  'u02.01', 'u02.02', 'u03.02', 'u04.01', 'u04.02', 'u09.01', 'u09.02',
-  'u09.11', 'u10.01', 'u10.03', 'u11.04', 'u11.05', 'u12.02', 'u12.03'
+  'u02.01', 'u02.02', 'u03.02', 'u04.01', 'u04.02', 'u04.03', 'u04.04', 'u07.02', 'u09.01',
+  'u09.02', 'u09.11', 'u10.01', 'u10.03', 'u11.04', 'u11.05', 'u12.02', 'u12.03'
 ];
+// Çıta: liste büyüyemez (yeni bir kimliği listeye eklemek bu sayıyı da bilerek yükseltmeyi gerektirir).
+const KNOWN_MISMATCH_CEILING = 17;
 
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
@@ -111,10 +121,21 @@ check('tutarsız ders listesi KNOWN_MISMATCH ile TAM eşit (liste yalnız küç�
   assert.deepEqual(ids, KNOWN_MISMATCH, `bulunan: ${JSON.stringify(ids)}`);
 });
 
+check('liste çıtayı aşmaz (yalnız küçülür)', () => {
+  assert.ok(KNOWN_MISMATCH.length <= KNOWN_MISMATCH_CEILING, `KNOWN_MISMATCH ${KNOWN_MISMATCH.length} > çıta ${KNOWN_MISMATCH_CEILING}`);
+  assert.equal(new Set(KNOWN_MISMATCH).size, KNOWN_MISMATCH.length, 'listede yinelenen kimlik');
+});
+
 check('kapı boş değil: sentetik tutarsız ders yakalanır, uyumlu ders geçer; bilinen liste K5-03\'ün 10 dersini kapsar', () => {
   const pick = (pos) => lexicon.lemmas.filter((l) => l.pos === pos).slice(0, 5).map((l) => l.id);
   assert.ok(incoherence({ title: 'Zamirler', goal: 'x', lemmaIds: pick('N') }).length > 0, 'zamir başlığı + isim lemmaları yakalanmalı');
   assert.equal(incoherence({ title: 'İşaret kelimeleri', goal: 'x', lemmaIds: pick('DEM') }).length, 0, 'işaret başlığı + DEM lemmaları geçmeli');
+  // Denetim düzeltmeleri: çekimli 'fiillerini', yardımcı fiil (kâne) ve bağlaç dersleri artık kategori görür.
+  const cat = (id) => CATEGORIES.find((c) => c.id === id);
+  for (const word of ['fiillerini', 'fiilini', 'geçmiş zamanı', 'şimdiki ve geniş zaman']) assert.ok(cat('fiil').re.test(word), `${word} fiil kategorisine girmeli`);
+  assert.ok(!cat('fiil').re.test('fiilin adı'), '"fiilin adı" masdar kategorisinde kalır');
+  assert.ok(cat('yardımcı fiil').re.test('yardımcı fiil: oldu, idi') && cat('bağlaç').re.test('bağlaçlar'));
+  assert.ok(!cat('ancak').test({ pos: 'RET' }), 'RET (bal) sınırlama sayılmaz');
   const audited = ['u02.01', 'u02.02', 'u04.01', 'u04.02', 'u09.01', 'u09.02', 'u10.01', 'u11.04', 'u11.05', 'u12.02'];
   for (const id of audited) assert.ok(KNOWN_MISMATCH.includes(id), `${id} bilinen listede olmalı (K5-03)`);
 });

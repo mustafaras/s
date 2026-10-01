@@ -43,3 +43,8 @@ tekrar-uret: 6/10 PASS (önceki 5/10)
 ## Sürprizler / sonraki promptlara not
 - S0 görünümü artık açıldığı için R-06 çökmeleri (6 ders) kullanıcıya görünür olur → K2F-13 önceliği yüksek; yayından önce K2F-13 tamamlanmalı (aksi hâlde Keşfet'ten S0'a girmek 6 derste çöker).
 - `kaoS0Start` doğrudan çağrıldığında (testler) görünüm değişmez; yalnız `kaoS0('start')` yönlendirir.
+
+## Ek tur (kullanıcı isteği: "hepsini yap") — LEDGER seq 41
+- Denetim bulguları: giriş satırı `kaoS0("start","s0.01")` çağırıyor ve s0.01 çizimde çöküyor (R-06, K2F-13); satır yalnız `Object.keys(q.cards).length>0` iken görünür, sıfır kartlı S0 öğrencisi ana ekrandan ders oynatıcıya gidiyor (K2F-14/15).
+- Yapılan: `test_kao2_s0.js` (g) a11y sözleşme kontrolü (13 kontrol PASS). Odak: görünüm değişimi odağı kendiliğinden taşımaz — units/grammar/stats ile aynı sözleşme (ölçüldü, `calls.focus` değişmez).
+- Görsel doğrulama: computer-use aracı yok; headless HTML düzeyinde kaldı.

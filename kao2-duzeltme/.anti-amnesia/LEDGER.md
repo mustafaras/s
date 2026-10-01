@@ -383,3 +383,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: S0 görünümü artık açıldığından R-06 (6 ders çöküyor) kullanıcıya görünür; yayından önce K2F-13 tamamlanmalı. NavBar başlığı "Seviye 0" → "Harfler" (plan metni).
 - next: K2F-13
+
+## seq 41 · 2026-10-01 · FIX · K2F-12
+- request: kullanıcı: K2F-12 denetim bulgularının hepsi ("hepsini yap"): (1) giriş düğmesi s0.01'de çöküyor, (2) S0 yalnız kartı olan kullanıcıya görünür, (3) küçük sapmalar, (4) a11y/odak/görsel doğrulama.
+- done: (4) S0 görünümü a11y sözleşme testi (başlık etiketi, Arapça lang/dir, düğme adları, pozitif tabindex yok, odak diğer görünümlerle aynı); (3) bilgi amaçlı, değişiklik yok.
+- plan: (1) çökme K2F-13 kapsamı (R-06: s0.01, .03, .07, .08, .09, .11 — `letters[0]` korumasız); (2) görünürlük K2F-14/15; kullanıcı talimatıyla bu üç prompt sırayla, her biri ayrı commit ve kapı koşusuyla yürütülür.
+- note: bu oturumda bilgisayar kullanımı (computer use) aracı yok; CLAUDE.md'deki kontrollü görsel QA istisnası (127.0.0.1:9000, tek kullanımlık profil) uygulanamadı → görsel doğrulama headless/HTML düzeyinde kalır, cihaz doğrulaması kullanıcıda.
+- changed-tests: test_kao2_s0.js (+1 a11y kontrolü).
+- next: K2F-13

@@ -242,4 +242,24 @@ check('(g/K2F-12) app.js tek satırlık App.kaoS0 shim\'ini taşır ve motor yü
   assert.equal(typeof kao.bootKao().api.kaoS0, 'function');
 });
 
+check('(g/K2F-12) S0 görünümü a11y sözleşmesi: başlık etiketi, Arapça lang/dir, düğme adları ve odak diğer görünümlerle aynı', () => {
+  const t = kao.bootKao();
+  kao.freshUser(t);
+  t.api.kaoOpen('home');
+  const focusBefore = t.calls.focus.length;
+  assert.equal(t.api.kaoS0('start', 's0.02'), true);
+  assert.equal(t.calls.focus.length, focusBefore, 'görünüm değişimi odağı kendiliğinden taşımaz (units/grammar/stats ile aynı sözleşme)');
+  const html = t.api.kaoOverlayHTML(t.NOW);
+  const label = /<main class="kao-s0" aria-labelledby="([^"]+)"/.exec(html);
+  assert.ok(label, 'S0 ana bölgesi aria-labelledby taşır');
+  assert.equal((html.match(new RegExp(`id="${label[1]}"`, 'g')) || []).length, 1, 'etiketlenen başlık tek ve var');
+  assert.match(html, /role="dialog" aria-modal="true" aria-labelledby="kao-title"/, 'çerçeve diyaloğu korunur');
+  for (const m of html.matchAll(/<[a-z0-9]+[^>]*dir="rtl"[^>]*>/g)) assert.match(m[0], /lang="ar"/, 'dir=rtl olan her öğe lang="ar" taşır: ' + m[0].slice(0, 60));
+  const buttons = [...html.matchAll(/<button\b[^>]*>([\s\S]*?)<\/button>/g)].map((m) => ({ tag: m[0], text: kao.text(m[1]) }));
+  assert.ok(buttons.length >= 3, 'Kapat, NavBar geri ve Sıradaki adım düğmeleri');
+  for (const b of buttons) assert.ok(b.text || /aria-label="[^"]+"/.test(b.tag), 'her düğmenin erişilebilir adı var: ' + b.tag.slice(0, 80));
+  assert.ok(buttons.some((b) => /kaoBack\(\)/.test(b.tag)), 'NavBar geri düğmesi (App.kaoBack) var'); assert.ok(buttons.some((b) => b.text === 'Sıradaki adım'), 'birincil eylem');
+  assert.ok(!/tabindex="[1-9]/.test(html), 'pozitif tabindex yok');
+});
+
 console.log(`KAO2 s0: PASS (${passed} kontrol)`);

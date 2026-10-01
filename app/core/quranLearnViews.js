@@ -119,7 +119,13 @@
       var kind=action.kind==='primary'?'kao-feedback-continue':(action.kind==='link'?'kao-feedback-undo':'');
       return '<button type="button" class="kao-feedback-action'+(kind?' '+kind:'')+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(action.label)+'</button>';
     }).join('');
-    return '<section class="kao-feedback-sheet kao-feedback-'+tone+'"><div class="kao-feedback-message" role="status" aria-live="polite"><h3 class="kao-feedback-title">'+escapeText(options.title)+'</h3><p class="kao-feedback-body">'+escapeText(options.body)+'</p></div><div class="kao-feedback-actions">'+actionHtml+'</div></section>';
+    // body: dize (tek paragraf) ya da satır dizisi; satır = dize ya da {text, lang:'ar'} (Arapça satır RTL ve ayrı paragraf).
+    var bodyItems=Array.isArray(options.body)?options.body:[options.body];
+    var bodyHtml=bodyItems.map(function(item){
+      if(item&&typeof item==='object') return '<p class="kao-feedback-body'+(item.lang==='ar'?' kao-feedback-ar':'')+'"'+(item.lang==='ar'?' lang="ar" dir="rtl"':'')+'>'+escapeText(item.text)+'</p>';
+      return '<p class="kao-feedback-body">'+escapeText(item)+'</p>';
+    }).join('');
+    return '<section class="kao-feedback-sheet kao-feedback-'+tone+'"><div class="kao-feedback-message" role="status" aria-live="polite"><h3 class="kao-feedback-title">'+escapeText(options.title)+'</h3>'+bodyHtml+'</div><div class="kao-feedback-actions">'+actionHtml+'</div></section>';
   }
   function primaryButton(options){
     if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');

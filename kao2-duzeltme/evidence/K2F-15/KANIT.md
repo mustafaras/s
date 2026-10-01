@@ -56,4 +56,4 @@ tekrar-uret: 8/10 PASS (önceki 7/10)
 - Bakılan ekranlar: S0 açıklama / dinle-gör / alıştırma (cevapsız, yanlış, karanlık tema) / okuma / bitti, s0.01 işaretler+örnekler, s0.07 konum tablosu; kavram sayfası (g1: âyet örnekleri okunuşlu + notlar); Kelime dizme görevi (ipucu, yanlış sıra, öğretici geri bildirim).
 - Bulgular ve düzeltmeler: pasif düğme etkin görünüyordu → soluk; cevaplanan şıklar `opacity:.42` → tam opaklık; okuma aşaması boşluk/başlık; konum tablosu 4 sütun; uzun yönergeler `--f-title3`.
 - İyi çıkanlar: kavram sayfası (Arapça sağdan sola, okunuş altında, künye/çeviri), karanlık tema, Arapça harf/hareke glifleri, S0 aşama ayrımı.
-- Açık (not): geri bildirim gövdesi tek paragraf; NavBar geri etiketi iki satıra kırılıyor.
+- Açık notlar → seq 46'da kapandı: geri bildirim gövdesi satır satır (Arapça cevap RTL satırı, âyet, kural ayrı paragraf); NavBar geri etiketi tek satır (sütun oranı; `nowrap` sözleşmeyle yasak). Gerçek tarayıcıda yeniden doğrulandı.

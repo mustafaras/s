@@ -1476,12 +1476,13 @@
     return record?(grammarRecipe(record,'support-probe',{reps:0}).unsupported||''):'şablon bulunamadı';
   }
   // "Yönlendirir + öğretir": cevaptan sonra kavramın kural cümlesi (plainTr) ve örnekli şablonda âyet künyesi + çevirisi gösterilir.
-  function gramTeach(record,example){
+  function gramTeachLines(record,example){
     var out=[];
     if(example) out.push('Âyet '+example.ref+': “'+example.tr+'”');
     if(record.concept.plainTr) out.push('Kural: '+record.concept.plainTr);
-    return out.join(' · ');
+    return out;
   }
+  function gramTeach(record,example){ return gramTeachLines(record,example).join(' · '); }
   function kaoBuildGrammarTask(queueItem,d,options){
     var opts=options&&typeof options==='object'?options:{},cardId=String(queueItem&&queueItem.cardId||queueItem&&queueItem.id||''),record=grammarRecord(cardId);
     if(!record) return null;
@@ -1491,7 +1492,7 @@
     var type=recipe.type||record.template.type,answerValue=choiceValue(recipe.answer),choices;
     if(recipe.choices){ choices=recipe.choices; choices.forEach(function(choice,index){ choice.choiceId=taskId+':choice:'+index; }); }
     else choices=choiceList(recipe.alternatives,answerValue,seed,taskId);
-    var task={id:taskId,cardId:cardId,type:'grammar',grammarType:type,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:String(recipe.prompt||record.template.prompt||type),stimulus:recipe.stimulus||'',stimulusPronunciation:recipe.stimulusPronunciation||'',context:recipe.context||[],errorClass:grammarErrorClass(type),answer:answerValue.label,teach:gramTeach(record,gramExample(record)),clipId:'',choices:choices};
+    var task={id:taskId,cardId:cardId,type:'grammar',grammarType:type,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:String(recipe.prompt||record.template.prompt||type),stimulus:recipe.stimulus||'',stimulusPronunciation:recipe.stimulusPronunciation||'',context:recipe.context||[],errorClass:grammarErrorClass(type),answer:answerValue.label,teach:gramTeach(record,gramExample(record)),teachLines:gramTeachLines(record,gramExample(record)),clipId:'',choices:choices};
     if(recipe.kind) task.kind=recipe.kind;
     return task;
   }
@@ -1647,11 +1648,14 @@
     h+='</div><p class="kao-live" aria-live="polite">'+esc(panel?'':(ui.kaoFeedback||''))+'</p>';
     if(panel){
       var answer=String(panel.answer||task.answer||task.choices.filter(function(item){ return item.correct===true; }).map(function(item){ return item.label; }).join(' · '));
-      var body=panel.correct?'Doğru'+(answer?' — '+answer:''):'Doğru cevap: '+answer;
-      if(task.teach) body+=' · '+task.teach;
-      if(task.cognate&&task.cognate.tr) body+=' · Türkçedeki akrabası: '+task.cognate.tr+(task.cognate.shift?' — '+task.cognate.shift:'');
-      if(panel.note) body+=' · '+panel.note;
-      h+=kaoViewsApi().feedbackSheet({tone:panel.correct?'success':'warning',title:panel.correct?'Doğru':'Bir daha bakalım',body:body,actions:[{label:'Aslında biliyordum',action:'kaoUndo',kind:'link'},{label:'Devam',action:'kaoContinue',kind:'primary'}]});
+      // Geri bildirim gövdesi satır satır: Arapça cevap kendi RTL satırında (sıra görevinde kelimeler boşlukla), sonra âyet künyesi ve kural ayrı satırlar.
+      var lines=[],answerIsArabic=/[\u0600-\u06ff]/.test(answer);
+      if(answerIsArabic){ lines.push(panel.correct?'Doğru':'Doğru cevap:'); lines.push({text:task.kind==='order'?answer.split(' · ').join(' '):answer,lang:'ar'}); }
+      else lines.push(panel.correct?'Doğru'+(answer?' — '+answer:''):'Doğru cevap: '+answer);
+      (Array.isArray(task.teachLines)?task.teachLines:(task.teach?[task.teach]:[])).forEach(function(line){ lines.push(line); });
+      if(task.cognate&&task.cognate.tr) lines.push('Türkçedeki akrabası: '+task.cognate.tr+(task.cognate.shift?' — '+task.cognate.shift:''));
+      if(panel.note) lines.push(panel.note);
+      h+=kaoViewsApi().feedbackSheet({tone:panel.correct?'success':'warning',title:panel.correct?'Doğru':'Bir daha bakalım',body:lines,actions:[{label:'Aslında biliyordum',action:'kaoUndo',kind:'link'},{label:'Devam',action:'kaoContinue',kind:'primary'}]});
     }
     h+='</section>';
     return h;

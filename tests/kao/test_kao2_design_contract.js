@@ -88,4 +88,14 @@ if (MODE === 'baseline') {
   if(Object.values(switches).some(s=>s.count!==5||s.missing!==0)) violations.push('switch semantics');
   assert.deepEqual(violations, [], 'strict tasarım ihlalleri');
 }
+// NavBar sözleşmesi (görsel QA): yan sütunlar eşit, başlık doğal genişlikte ortada → "‹ Kur'an Arapçası" 390px'te tek satırda kalır;
+// metin tek satıra ZORLANMAZ (white-space:nowrap yok), taşan uzun başlık/etiket sarar.
+{
+  const bar = /\.kao-navbar\{[^}]*\}/.exec(kaoCss)[0];
+  assert.match(bar, /grid-template-columns:minmax\(0,1fr\) minmax\(0,auto\) minmax\(0,1fr\)/, 'NavBar: eşit yan sütunlar + doğal başlık');
+  const action = /\.kao-navbar-action\{[^}]*\}/.exec(kaoCss)[0];
+  assert.doesNotMatch(action, /white-space:nowrap/, 'NavBar geri etiketi tek satıra zorlanmaz');
+  assert.match(action, /overflow-wrap:anywhere/, 'çok uzun etiket sarar');
+  assert.match(kaoCss, /\.kao-feedback-body\+\.kao-feedback-body\{margin-top:8px\}/, 'geri bildirim satırları arası boşluk');
+}
 console.log('KAO2 design contract: PASS');

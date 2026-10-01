@@ -486,6 +486,12 @@ check('C6 · arayüz: dizme görevi sıra düğmeleriyle işlenir; cevaptan sonr
   const after = t.api.kaoTaskHTML(task);
   assert.ok(after.includes('Kural:') && after.includes('Âyet '), 'öğretici açıklama');
   assert.ok(!/Fiil önce gelir/.test(after), 'gramer sıra hatasında fragman notu çıkmamalı');
+  // Geri bildirim gövdesi satır satır: Arapça cevap kendi RTL satırında; âyet künyesi ve kural ayrı paragraflar (tek paragraf değil).
+  const feedback = after.slice(after.indexOf('kao-feedback-sheet'));
+  assert.ok((feedback.match(/<p class="kao-feedback-body/g) || []).length >= 4, 'cevap etiketi + Arapça cevap + âyet + kural ayrı paragraflar');
+  assert.match(feedback, /<p class="kao-feedback-body kao-feedback-ar" lang="ar" dir="rtl">/, 'Arapça cevap RTL satırı');
+  assert.doesNotMatch(feedback, / · Âyet | · Kural:/, 'bölümler " · " ile tek paragrafa yapıştırılmaz');
+  assert.ok(feedback.includes('<p class="kao-feedback-body">Kural: '), 'kural kendi paragrafında');
   assert.ok(q.cards[task.cardId], 'kart zamanlandı');
 });
 

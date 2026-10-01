@@ -443,3 +443,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - not-fixed (not): geri bildirim paneli gövdesi tek paragraf (Arapça cevap · âyet · kural) yoğun; satır kırma için `feedbackSheet` biçimi gerekir (sonraki UI turu). NavBar geri etiketi "‹ Kur'an Arapçası" 390px'te iki satıra kırılıyor (mevcut bileşen).
 - evidence-levels: kaynak/test ✓ · kaynak-görsel ✓ (cihaz kabulü DEĞİL) · yayın — · cihaz —
 - next: K2F-16
+
+## seq 46 · 2026-10-01 · FIX · K2F-15
+- request: kullanıcı: seq 45'te açık bırakılan iki not için "bunları da düzelt".
+- fixed: (1) geri bildirim paneli gövdesi tek paragraf değil: `feedbackSheet({body})` dize (eski, tek paragraf) ya da satır dizisi (`{text, lang:'ar'}` Arapça satır RTL); görev geri bildirimi artık satır satır — etiket ("Doğru cevap:"), Arapça cevap (sıra görevinde kelimeler boşlukla, RTL), âyet künyesi, kural, akraba/not ayrı paragraflar; gramer görevi `teachLines` taşır (`teach` dizesi korunur). (2) NavBar: yan sütunlar eşit + başlık doğal genişlikte (`minmax(0,1fr) minmax(0,auto) minmax(0,1fr)`) → "‹ Kur'an Arapçası" 390px'te tek satır; metin tek satıra ZORLANMAZ (`test_kao_render` sözleşmesi: `white-space:nowrap` yok), çok uzun etiket sarar.
+- verified: gerçek tarayıcıda (aynı kontrollü yerel görsel QA yöntemi, seq 45) geri etiketi 44 px tek satır, uzun başlık ("Namazda ne diyorum") bozulmadı; geri bildirim açık/karanlık tema satırlar ayrı. Sunucu ve Chrome durduruldu (9000/9333 kapalı).
+- first-attempt: `nowrap` denemesi `test_kao_render` "KAO metni tek satıra zorlanmaz" sözleşmesine takıldı → sütun oranı çözümüne dönüldü.
+- changed-tests: test_kao2_grammar_tasks.js C6 (geri bildirim satırları) · test_kao2_design_contract.js (NavBar/feedback CSS sözleşmesi).
+- evidence-levels: kaynak/test ✓ · kaynak-görsel ✓ (cihaz kabulü DEĞİL) · yayın — · cihaz —
+- next: K2F-16

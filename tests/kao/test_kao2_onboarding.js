@@ -132,7 +132,8 @@ check('(c) "Henüz değil" → start=s0, S0 Ders 1; "Evet, rahat okurum" → lev
   let q = b.api.ensureQuranLearn(b.state.data);
   assert.equal(q.onboarding.start, 's0');
   assert.equal(q.onboarding.doneAt, INSTANT);
-  assert.equal(b.state.ui.kaoView, 'session', 'son düğme S0 ders oynatıcısını açar');
+  assert.equal(b.state.ui.kaoView, 's0', 'son düğme Seviye 0 yüzeyini açar (K2F-15: boş ders planı yok)');
+  assert.equal(b.state.ui.kaoS0.lessonId, 's0.01');
   let step = b.api.kaoNextStep(INSTANT);
   assert.equal(step.kind, 's0-lesson'); assert.equal(step.param, 's0.01');
 

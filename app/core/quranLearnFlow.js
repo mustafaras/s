@@ -379,7 +379,7 @@
       return step('warmup','Yeniden ısınalım','En zayıf '+warm+' kelimeyle başla · ~'+warmMin+' dk',warmMin,'kaoStart',null,{reviews:warm,fresh:0});
     }
     var s0=onboarding.start==='s0'?firstOpenS0(q,content):null;
-    if(s0) return step('s0-lesson','Harfler · Ders '+(s0.index+1)+': '+s0.lesson.title,'Seviye 0 · ~'+S0_MINUTES+' dk',S0_MINUTES,'kaoLesson',s0.lesson.id);
+    if(s0) return step('s0-lesson','Harfler · Ders '+(s0.index+1)+': '+s0.lesson.title,'Seviye 0 · ~'+S0_MINUTES+' dk',S0_MINUTES,'kaoS0',s0.lesson.id);
     var current=currentUnit(q,content);
     if(current&&!current.progress.nextLesson){
       // K2F-07: öncelik repair > mastery. Onarım biter bitmez (repair:null) yeniden mastery önerilir.

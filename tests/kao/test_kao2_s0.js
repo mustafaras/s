@@ -482,4 +482,97 @@ check('(i/K2F-14) ses yoksa alıştırma ve okuma yine tamamlanır; "ses kapalı
   }
 });
 
+// ---- (j) K2F-15 · okuyamayan kullanıcı Bugün'den S0'a ulaşır; S0 gerçekten tamamlanır ----------------
+const S0_IDS = Array.from({ length: 12 }, (_, i) => `s0.${String(i + 1).padStart(2, '0')}`);
+const hasHubRow = (t) => /App\.kaoS0\(&quot;start&quot;,&quot;s0\.01&quot;\)/.test(t.api.kaoOverlayHTML(t.NOW));
+// Gerçek handler'larla bir S0 dersini sonuna kadar oynar (tüm cevaplar doğru ya da `wrong` kadarı yanlış), "Okudum"a basar.
+function finishS0(t, id, { wrong = 0 } = {}) {
+  assert.equal(t.api.kaoS0('start', id), true, `${id}: başlamalı`);
+  assert.equal(t.api.kaoS0('next'), true); assert.equal(t.api.kaoS0('next'), true);
+  const total = t.ui.kaoS0.drill.items.length;
+  for (let i = 0; i < total; i += 1) {
+    const q = t.ui.kaoS0.drill.items[t.ui.kaoS0.drill.index];
+    const pick = q.choices.find((c) => c.correct === (i >= wrong));
+    assert.equal(t.api.kaoS0('answer', pick.id), true); assert.equal(t.api.kaoS0('next'), true);
+  }
+  return { total, correct: total - wrong, finish: () => t.api.kaoS0('read') };
+}
+
+check('(j/K2F-15 a,g) "Henüz değil" seçen sıfır kullanıcı: ilk açılıştan S0 içeriğine ≤3 dokunuş; sonra Bugün birincil düğmesi kaoS0("start","s0.01")', () => {
+  const t = kao.bootKao();
+  assert.equal(t.api.kaoOpen('home'), true);
+  assert.equal(t.api.kaoOnboard('start'), true, 'ilk açılış başlar (dokunuş sayılmaz: açılış ekranı)');
+  let taps = 0;
+  assert.equal(t.api.kaoOnboard('next'), true); taps += 1;
+  assert.equal(t.api.kaoOnboard('choose', 'none'), true); taps += 1;
+  assert.equal(t.api.kaoOnboard('finish'), true); taps += 1;
+  assert.ok(taps <= 3, `${taps} dokunuş`);
+  assert.equal(t.ui.kaoView, 's0', 'ilk S0 içeriği açıldı');
+  assert.equal(t.ui.kaoS0.lessonId, 's0.01');
+  t.api.kaoBack();
+  const tapped = kao.tapPrimary(t);
+  assert.ok(tapped, 'Bugün birincil düğmesi var');
+  assert.equal(tapped.name, 'kaoS0', 'birincil düğme S0 yüzeyine gider');
+  assert.deepEqual(tapped.args, ['start', 's0.01']);
+  assert.equal(t.ui.kaoView, 's0');
+});
+
+check('(j/K2F-15 b) kaoLessonStart("s0.xx") ve kaoLesson("start","s0.xx") S0 yüzeyine devreder; boş ders planı (goal,apply,summary) kurulmaz', () => {
+  for (const call of [(t) => t.api.kaoLesson('start', 's0.03'), (t) => t.api.kaoLessonStart('s0.03')]) {
+    const t = kao.bootKao();
+    kao.freshUser(t, { start: 's0' });
+    t.api.kaoOpen('home');
+    assert.equal(call(t), true);
+    assert.equal(t.ui.kaoView, 's0');
+    assert.equal(t.ui.kaoS0.lessonId, 's0.03');
+    assert.ok(!t.ui.kaoLesson, 'ders oynatıcı planı kurulmadı');
+  }
+});
+
+check('(j/K2F-15 c) S0 dersi YALNIZ read aşaması bitince path.lessons kaydı yazar: {startedAt, doneAt, score = doğru/toplam}', () => {
+  const t = kao.bootKao();
+  const q = kao.freshUser(t, { start: 's0' });
+  t.api.kaoOpen('home');
+  const played = finishS0(t, 's0.02', { wrong: 2 });
+  const mid = q.path.lessons['s0.02'] || {};
+  assert.ok(!mid.doneAt, 'alıştırma bitti ama read bitmedi: doneAt yok');
+  assert.equal(t.api.kaoS0('read', 'toggle'), true);
+  assert.ok(!(q.path.lessons['s0.02'] || {}).doneAt, 'okunuşu göstermek tamamlama değildir');
+  assert.equal(played.finish(), true);
+  const rec = q.path.lessons['s0.02'];
+  assert.ok(rec.startedAt && rec.doneAt, 'startedAt ve doneAt');
+  assert.equal(rec.score, (played.total - 2) / played.total, 'score = doğru/toplam');
+});
+
+check('(j/K2F-15 d,e) 12 S0 dersi uçtan uca → sonra Fâtiha; Besmele taşı YALNIZ s0.12 tamamlanınca verilir', () => {
+  const t = kao.bootKao();
+  const q = kao.freshUser(t, { start: 's0' });
+  t.api.kaoOpen('home');
+  for (let i = 0; i < 12; i += 1) {
+    const step = t.api.kaoNextStep(t.NOW);
+    assert.equal(step.kind, 's0-lesson', `${i + 1}. adım S0 dersi (${step.kind})`);
+    assert.equal(step.param, S0_IDS[i], 'müfredat sırasında');
+    assert.ok(!q.milestones.besmele, `${S0_IDS[i]} öncesi Besmele taşı yok`);
+    const played = finishS0(t, step.param);
+    played.finish();
+    assert.ok(q.path.lessons[step.param].doneAt, `${step.param}: kayıt`);
+    if (i < 11) assert.ok(!q.milestones.besmele, `${step.param} sonrası Besmele taşı hâlâ yok (yalnız s0.12)`);
+  }
+  assert.ok(q.milestones.besmele, 's0.12 tamamlanınca Besmele taşı kazanıldı');
+  const after = t.api.kaoNextStep(t.NOW);
+  assert.notEqual(after.kind, 's0-lesson', '12 ders sonrası S0 bitti');
+  assert.equal(after.param, 'u01.01', 'sonra Fâtiha (Ünite 1, Ders 1)');
+});
+
+check('(j/K2F-15 f) Keşfet\'teki S0 satırı: onboarding.start==="s0" ya da başlanmış S0 dersi ya da kart varsa görünür; aksi hâlde gizli', () => {
+  const none = kao.bootKao(); kao.freshUser(none, { start: 'level1' }); none.api.kaoOpen('home');
+  assert.equal(hasHubRow(none), false, 'level1 + kart yok + S0 başlamamış: gizli');
+  const s0 = kao.bootKao(); kao.freshUser(s0, { start: 's0' }); s0.api.kaoOpen('home');
+  assert.equal(hasHubRow(s0), true, 'start==="s0": görünür');
+  const started = kao.bootKao(); const sq = kao.freshUser(started, { start: 'level1' }); sq.path.lessons['s0.04'] = { startedAt: '2026-09-29T10:00:00.000Z', doneAt: null, score: null }; started.api.kaoOpen('home');
+  assert.equal(hasHubRow(started), true, 'başlanmış S0 dersi: görünür');
+  const cards = kao.bootKao({ seeded: true }); cards.api.kaoOpen('home');
+  assert.equal(hasHubRow(cards), true, 'kart var: görünür');
+});
+
 console.log(`KAO2 s0: PASS (${passed} kontrol)`);

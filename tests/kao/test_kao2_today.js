@@ -82,7 +82,7 @@ check('(b) tek birincil eylem ve nextStep eşlemesi', () => {
   let q = reset({ doneAt: ISO, start: 's0' });
   step = api.kaoNextStep(new FixedDate());
   assert.equal(step.kind, 's0-lesson');
-  assert.equal(primaryAction(home()), lessonAction(step), 's0 → ders oynatıcı');
+  assert.equal(primaryAction(home()), 'App.kaoS0(&quot;start&quot;,&quot;s0.01&quot;)', 's0 → Seviye 0 yüzeyi (K2F-15)');
   q = reset();
   unit1.lessons.forEach((lesson) => { q.path.lessons[lesson.id] = { doneAt: ISO, score: 1 }; });
   step = api.kaoNextStep(new FixedDate());

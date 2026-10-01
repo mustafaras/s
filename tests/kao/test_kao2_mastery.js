@@ -641,6 +641,16 @@ check('D(f) uçtan uca (sıfır kullanıcı): ilk açılıştan yalnız birincil
     homeHtml(u);
     const tapped = tapPrimary(u);
     assert.ok(tapped && tapped.ok, `Bugün birincil düğmesi çalışmalı: ${step.kind}`);
+    if (step.kind === 's0-lesson') {
+      // K2F-15: Seviye 0 adımı ders oynatıcıya değil S0 yüzeyine açılır; ders S0 eylemleriyle (aşamalar → alıştırma → Okudum) bitirilir.
+      assert.equal(u.ui.kaoView, 's0', 'S0 adımı Seviye 0 yüzeyine açılır');
+      u.api.kaoS0('next'); u.api.kaoS0('next');
+      for (let n = u.ui.kaoS0.drill.items.length; n > 0; n -= 1) { const q = u.ui.kaoS0.drill.items[u.ui.kaoS0.drill.index]; u.api.kaoS0('answer', q.choices.find((c) => c.correct).id); u.api.kaoS0('next'); }
+      assert.equal(u.api.kaoS0('read'), true, 'S0 dersi Okudum ile biter');
+      u.api.kaoBack();
+      nextDay(u);
+      continue;
+    }
     assert.ok(u.ui.kaoLesson, `düğme oturum açmalı: ${step.kind}`);
     assert.equal(playLesson(u, { answer: 'correct' }), true);
     const done = tapPrimary(u); // özetin birincil düğmesi ("Bugün yeter")

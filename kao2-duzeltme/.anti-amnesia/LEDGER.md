@@ -419,3 +419,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: test-önce sırası ters (önce uygulama, sonra test; önceki sürüme karşı kırmızı doğrulandı); S0 tamamlanması `path.lessons`'a henüz yazılmıyor (K2F-15).
 - next: K2F-15
+
+## seq 44 · 2026-10-01 · PROMPT · K2F-15
+- status: done
+- title: Seviye 0 4/4 — ana yol ve tamamlama
+- prev-commit: eeb239cf
+- evidence: kao2-duzeltme/evidence/K2F-15/KANIT.md
+- closes: K5-01 · K5-02 (iii) · P-05
+- repro: R-04 fail→pass · toplam 8/10
+- gates: kapilar.sh YEŞİL (kao 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 43 · yüzey 764 · atama 602 · yayın 20261001e (yayınlanan `quranLearn.js`, `quranLearnFlow.js` değişti: sonraki yayında pin yükselmeli)
+- changed-tests: test_kao2_onboarding.js (ilk açılış sonu s0 yüzeyi) · test_kao2_today.js (s0 birincil düğmesi kaoS0) · test_kao2_mastery.js (Dokun dışı, kullanıcı onayı: uçtan uca yürüyüşte S0 adımı S0 eylemleriyle)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: Seviye 0 zinciri (K2F-12…15) kaynak/test düzeyinde tamam; yayından önce cihazda gözle doğrulama önerilir (görsel QA yapılamadı).
+- next: K2F-16

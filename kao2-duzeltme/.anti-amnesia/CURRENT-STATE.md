@@ -2,18 +2,18 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-16
-lastSeq: 44
+lastSeq: 45
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 44 · K2F-00…15 tamam (16/44), sıradaki K2F-16. R-01…R-06, R-09, R-10 PASS (8/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 45 · K2F-00…15 tamam (16/44), sıradaki K2F-16. R-01…R-06, R-09, R-10 PASS (8/10).
 
 ## Şu an neredeyiz
 K2F-15 bitti (K5-01, K5-02 iii): Seviye 0 zinciri tamamlandı (K2F-12…15, kaynak/test düzeyinde). Okuyamayan kullanıcı ("Henüz değil") ilk açılıştan 3 dokunuşla (next · choose · finish) S0 içeriğine ulaşır; Bugün birincil düğmesi
 `kaoS0('start','s0.01')`; `kaoLessonStart('s0.xx')` S0 yüzeyine devreder (boş plan yok, R-04 PASS); S0 dersi yalnız `read` aşaması bitince `path.lessons[id]={startedAt,doneAt,score}` yazar (score = alıştırma doğru/toplam);
 12 ders uçtan uca → sonra Fâtiha (`u01.01`); Besmele taşı yalnız `s0.12` tamamlanınca (ya da yerleştirmeyle); Keşfet "Seviye 0" satırı `start==='s0'` / başlanmış S0 dersi / kart varsa görünür.
 Yayın YOK: canlıda (`main` = `3d97c338`, pin `20261001e`) S0 düğmesi hâlâ ölü, S0 dersleri alıştırmasız. **Yayın önerisi:** K2F-12…15 birlikte yayınlanmalı (yalnız bir kısmı çökme/boş ekran riski taşır); öncesinde cihazda gözle doğrulama
-(görsel QA bu oturumda yapılamadı: computer-use aracı yok).
+(kaynak-görsel QA terminalden yapıldı, seq 45; cihaz kabulü değil).
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi

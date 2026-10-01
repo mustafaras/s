@@ -50,3 +50,10 @@ tekrar-uret: 8/10 PASS (önceki 7/10)
 - Seviye 0 zinciri (K2F-12…15) kaynak/test düzeyinde tamam: düğme → görünüm → içerik → aşamalar/alıştırma → kayıt/taş → Fâtiha. Yayından önce cihazda telefonda gözle doğrulama önerilir (görsel QA yapılmadı; computer-use aracı yok).
 - `kaoS0Complete` `recordMilestones` çağırır; taş bildirimi `kaoFx('milestone')` ile verilir, ayrı bir kutlama ekranı yok (S0 görünümünde "Ders tamam" metni).
 - S0 yeniden yapılabilir (done sonrası `start` yeniden açar, `doneAt` korunur, `score` son denemeyle güncellenir).
+
+## Ek tur — kaynak-görsel QA (kullanıcı isteği; LEDGER seq 45)
+- Yöntem: kontrollü yerel görsel QA (127.0.0.1:9000 statik sunucu + geçici boş profilli headless Chrome/CDP, 390×844@2x). Parola kapısına dokunulmadı; gerçek KAO modülleri + stil dosyaları sync/login'siz bir QA sayfasında çizildi. Sunucu/Chrome durduruldu. Kanıt düzeyi: **kaynak-görsel** (cihaz kabulü değil); ekran görüntüleri depoya girmez (geçici scratchpad).
+- Bakılan ekranlar: S0 açıklama / dinle-gör / alıştırma (cevapsız, yanlış, karanlık tema) / okuma / bitti, s0.01 işaretler+örnekler, s0.07 konum tablosu; kavram sayfası (g1: âyet örnekleri okunuşlu + notlar); Kelime dizme görevi (ipucu, yanlış sıra, öğretici geri bildirim).
+- Bulgular ve düzeltmeler: pasif düğme etkin görünüyordu → soluk; cevaplanan şıklar `opacity:.42` → tam opaklık; okuma aşaması boşluk/başlık; konum tablosu 4 sütun; uzun yönergeler `--f-title3`.
+- İyi çıkanlar: kavram sayfası (Arapça sağdan sola, okunuş altında, künye/çeviri), karanlık tema, Arapça harf/hareke glifleri, S0 aşama ayrımı.
+- Açık (not): geri bildirim gövdesi tek paragraf; NavBar geri etiketi iki satıra kırılıyor.

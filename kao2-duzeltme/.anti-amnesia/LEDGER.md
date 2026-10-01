@@ -433,3 +433,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: Seviye 0 zinciri (K2F-12…15) kaynak/test düzeyinde tamam; yayından önce cihazda gözle doğrulama önerilir (görsel QA yapılamadı).
 - next: K2F-16
+
+## seq 45 · 2026-10-01 · FIX · K2F-15
+- request: kullanıcı: "computer use yükle o zaman" → "bunu terminal kullanarak yapabilirsin" (computer-use aracı yok; kontrollü yerel görsel QA terminalden yapıldı).
+- procedure: CLAUDE.md DATA SAFETY kontrollü istisnası: `test_local_visual_qa_guard.js` PASS + `sync.js` Guard 1 doğrulandı; yalnız `127.0.0.1:9000` statik sunucu (yalnız GET, özel dizinler 404, POST 405) + geçici boş profilli headless Chrome (CDP `127.0.0.1:9333`); `forceSync` yok, `seyma-sync-force` yazılmadı. Gerçek uygulama kabuğu parola kapısı arkasında olduğundan parola alanlarına DOKUNULMADI; bunun yerine gerçek KAO modülleri + `app/styles.css`/`app/kao.css` ayrı bir QA sayfasında (sync.js/app.js/login yok, sentetik bellek-içi veri) gerçek tarayıcıda çizildi. Sandbox yerel port bağlamayı engellediği için sunucu/Chrome izin kapısıyla sandbox dışında çalıştı. Tur sonunda sunucu ve Chrome durduruldu (9000/9333 kapalı).
+- findings (kaynak-görsel kanıt, 390×844 @2x, açık+karanlık tema): (1) pasif "Sonraki soru" etkin görünüyordu; (2) cevaplanan doğru/yanlış şıklar `opacity:.42` ile soluyordu (S0 alıştırması ve mevcut görev arayüzü); (3) "okunuşu gizli" metni düğmeye yapışık ve başlık gibi büyüktü; (4) 28 harflik konum tablosu 2×2 hücrelerle çok uzundu; (5) gramer/parça yönergesi (uzun Türkçe cümle) kelime başlığı boyutunda çiziliyordu.
+- fixed: `.kao-primary[disabled]` soluk; doğru/yanlış şık `[disabled]` iken tam opaklık (S0 + genel görev arayüzü); okuma aşaması boşlukları + `kao-s0-hidden`; konum tablosu 4 sütun (`kao-s0-pos-table`); `kao-question-text` (yönergeler `--f-title3`).
+- scope-effect: Dokun dışı: `app/kao.css`, `app/core/quranLearnViews.js`, `app/core/quranLearn.js` (yalnız sınıf adı + CSS). Davranış/pin değişmedi.
+- not-fixed (not): geri bildirim paneli gövdesi tek paragraf (Arapça cevap · âyet · kural) yoğun; satır kırma için `feedbackSheet` biçimi gerekir (sonraki UI turu). NavBar geri etiketi "‹ Kur'an Arapçası" 390px'te iki satıra kırılıyor (mevcut bileşen).
+- evidence-levels: kaynak/test ✓ · kaynak-görsel ✓ (cihaz kabulü DEĞİL) · yayın — · cihaz —
+- next: K2F-16

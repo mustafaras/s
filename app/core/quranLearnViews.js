@@ -407,9 +407,9 @@
     }).join('')+'</ol>';
   }
   function s0PositionRows(table){
-    return table.rows.map(function(r){
+    return '<div class="kao-s0-pos-table">'+table.rows.map(function(r){
       return '<ul class="kao-s0-pos-row">'+r.cells.map(function(cell,i){ return '<li><span>'+escapeText(table.columns[i].label)+'</span>'+(cell.unavailable?'<small class="kao-s0-pos-none">biçim yok</small>':'<b lang="ar" dir="rtl">'+escapeText(cell.ar)+'</b>')+'</li>'; }).join('')+'</ul>';
-    }).join('');
+    }).join('')+'</div>';
   }
   function s0Note(model){ return model.note?'<p class="kao-s0-note" role="status">'+escapeText(model.note)+'</p>':''; }
   function s0Intro(model){
@@ -459,7 +459,7 @@
     if(r.words&&r.words.length){
       h+='<ol class="kao-s0-words">'+r.words.map(function(w){ return '<li><span class="kao-s0-word">'+s0Arabic(w.ar)+'<small>'+(r.showReading?escapeText(w.pronunciation?w.pronunciation+' · '+w.tr:w.tr):'okunuşu gizli')+'</small></span></li>'; }).join('')+'</ol>';
     }else if(r.word){
-      h+='<p class="kao-s0-word-ar" lang="ar" dir="rtl">'+escapeText(r.word.ar)+'</p><p class="kao-s0-word-tr">'+(r.showReading?escapeText(r.word.translit?r.word.translit+' · '+r.word.tr:r.word.tr):'okunuşu gizli')+'</p>';
+      h+='<p class="kao-s0-word-ar" lang="ar" dir="rtl">'+escapeText(r.word.ar)+'</p><p class="kao-s0-word-tr'+(r.showReading?'':' kao-s0-hidden')+'">'+(r.showReading?escapeText(r.word.translit?r.word.translit+' · '+r.word.tr:r.word.tr):'okunuşu gizli')+'</p>';
     }
     h+='<button type="button" class="kao-secondary" aria-pressed="'+(r.showReading?'true':'false')+'" onclick="App.kaoS0(\'read\',\'toggle\')">'+(r.showReading?'Okunuşu gizle':'Okunuşu göster')+'</button>';
     return h+s0Note(model)+'</section>';

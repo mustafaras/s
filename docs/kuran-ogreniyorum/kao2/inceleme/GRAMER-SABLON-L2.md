@@ -5,22 +5,10 @@ kullanır; aşağıdaki şablonlar için tablo tek anlamlı bir görev türetmey
 alıştırması ikame edilir, tekrar kuyruğunda sunulmaz). Arapça metin içermez; yalnız kimlik ve gerekçe vardır. Alan uzmanı (L2)
 ya tabloya eksik sütunu ekler ya da şablonu onaylı biçimde yeniden yazar.
 
-Desteklenen: 71/86 · Desteklenmeyen: 15/86
+Desteklenen: 83/86 · Desteklenmeyen: 3/86
 
 | Şablon | Tür | Örnek (âyet) | Neden |
 |---|---|---|---|
-| g2-k4 | Anlam seç | — | tabloda tek anlamlı kelime–anlam satırı yok (satırda birden çok Arapça hücre ya da anlam hücresi eksik) |
-| g3-k1 | Ek çöz | — | tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok |
-| g3-k2 | Ek çöz | — | tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok |
-| g8-k3 | Ek çöz | — | tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok |
-| g10-k3 | Anlam seç | — | yönerge tablo dışı bir ifadeye ya da gizli öğeye bağlı; tablo yetmiyor |
-| g11-k2 | Ek çöz | — | tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok |
-| g13-k3 | Ek çöz | — | tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok |
-| g14-k2 | Anlam seç | — | yönerge tablo dışı bir ifadeye ya da gizli öğeye bağlı; tablo yetmiyor |
-| g15-k2 | Ek çöz | — | tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok |
-| g17-k2 | Ek çöz | — | tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok |
-| g18-k1 | Ek çöz | — | tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok |
-| g19-k2 | Kalıp eşle | — | fâil/mef'ûl için tabloda Türkçe karşılık sütunu yok |
-| g19-k3 | Anlam seç | — | tabloda tek anlamlı kelime–anlam satırı yok (satırda birden çok Arapça hücre ya da anlam hücresi eksik) |
-| g20-k1 | Kalıp eşle | — | yönerge üçlü eşleştirme ister; tablo iki sütunlu |
-| g20-k2 | Anlam seç | — | tabloda tek anlamlı kelime–anlam satırı yok (satırda birden çok Arapça hücre ya da anlam hücresi eksik) |
+| g10-k3 | Anlam seç | — | doğrulanmış metin "-dır eki yazılmaz" der, hangi kelimede saklı olduğunu söylemez. Öneri (içerik, L1 onayı): soruyu "hangisi haberdir (söylenen)?" olarak yeniden yaz |
+| g14-k2 | Anlam seç | — | yönerge doğrulanmış örnekler arasında olmayan bir ifadeye bağlı. Öneri (içerik, L1 onayı): doğrulanmış kâne örneği (g14-e1) üzerinden yeni örnekli şablon yaz |
+| g19-k3 | Anlam seç | — | fâil/mef'ûl hücrelerinin Türkçe karşılığı tabloda yok. Öneri (içerik, L2 onayı): tabloya "yazan / yazılan" gibi Türkçe karşılık sütunu ekle (sözlükle doğrulanarak) |

@@ -164,7 +164,7 @@ function defectsOf(task, lessonId) {
   const template = concept && concept.templates.find((x) => x.id === templateId);
   const example = template && template.exampleId && concept.examples.find((e) => e.id === template.exampleId);
   const exampleAr = example && example.resolved && example.resolved.ar;
-  if (exampleAr && !(stimulus && exampleAr.includes(stimulus))) out.push(`${lessonId} ${templateId} uyaran örnek ${template.exampleId} içinde değil`);
+  if (exampleAr && (task.kind === 'order' ? stimulus && !exampleAr.includes(stimulus) : !(stimulus && exampleAr.includes(stimulus)))) out.push(`${lessonId} ${templateId} uyaran örnek ${template.exampleId} içinde değil`);
   const correct = (task.choices || []).filter((c) => c.correct);
   const labels = (task.choices || []).map((c) => c.label);
   if (task.kind === 'order') {
@@ -321,6 +321,7 @@ check('B6 · yanlış cevap sonrası "yeniden dene" farklı tohumla kurulur ve o
 // ---------------------------------------------------------------------------------------------------------------
 // Bölüm C (K2F-11) — görevler doğrulanmış örnekten ve kavram tablosundan kurulur
 // ---------------------------------------------------------------------------------------------------------------
+const htmlEsc = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const stripParens = (text) => String(text || '').replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
 const cellKinds = (row) => row.cells.map((cell) => (Array.isArray(cell) ? (ARABIC.test(String(cell[1] || '')) ? { ar: String(cell[1]) } : { empty: true }) : { text: String(cell) }));
 const SEEDS = ['2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02'];
@@ -352,11 +353,11 @@ check('C1 · 86 şablonun her biri ya desteklenir (her tohumda geçerli görev) 
   const withExample = allTemplates.filter((x) => x.template.exampleId);
   assert.equal(withExample.length, 43);
   assert.equal(withExample.filter((x) => supported.includes(x)).length, 43, 'örnekli şablonların tümü desteklenmeli');
-  assert.ok(supported.length >= 60, `desteklenen şablon ${supported.length} < 60`);
+  assert.ok(supported.length >= 78, `desteklenen şablon ${supported.length} < 78`);
   console.log(`      desteklenen ${supported.length}/86 · desteklenmeyen ${unsupported.length}`);
 });
 
-check('C2 · Kelime dizme: doğru sıra = örnek sırası, karışık sıra çözülmüş değil, uyaran = ilk kelime (ipucu); Parça çevir: uyaran = örnek Arapçası, doğru = örnek çevirisi', () => {
+check('C2 · Kelime dizme: doğru sıra = örnek sırası, karışık sıra çözülmüş değil, uyaran = ilk kelime (ipucu, yalnız üç+ kelimede); Parça çevir: uyaran = örnek Arapçası, doğru = örnek çevirisi', () => {
   const t = bootKao();
   freshUser(t);
   let order = 0, translate = 0;
@@ -370,7 +371,7 @@ check('C2 · Kelime dizme: doğru sıra = örnek sırası, karışık sıra çö
         const byOrdinal = Array.from(task.choices).sort((a, b) => a.ordinal - b.ordinal);
         assert.deepEqual(byOrdinal.map((c) => c.label), Array.from(example.words, (w) => w.ar), `${x.cardId}: doğru sıra`);
         assert.ok(!task.choices.every((c, i) => c.ordinal === i), `${x.cardId} ${day}: karışık sıra zaten çözülmüş`);
-        assert.equal(task.stimulus, example.words[0].ar, `${x.cardId}: ipucu = ilk kelime`);
+        assert.equal(task.stimulus, example.words.length >= 3 ? example.words[0].ar : '', `${x.cardId}: ipucu yalnız üç+ kelimede ve taze kartta`);
         assert.equal(task.answer, example.ar);
         assert.ok(task.choices.every((c) => c.choiceId && c.pronunciation && !ARABIC.test(c.pronunciation)));
       } else {
@@ -419,11 +420,12 @@ check('C4 · Ek çöz (g1 "el" ve g5 yapışık ek), Anlam seç ve Arapça seç:
     for (const day of SEEDS) {
       const task = buildFor(t, x.cardId, day);
       const correct = task.choices.find((c) => c.correct).label;
-      const arabicKey = x.template.type === 'Arapça seç' ? correct : task.stimulus;
+      if (x.template.type === 'Anlam seç' && !task.stimulus) continue; // Arapça şıklı tamlama görevi: C11
+      const arabicKey = task.grammarType === 'Arapça seç' ? correct : task.stimulus;
       const owner = rows.filter((row) => cellKinds(row).some((c) => c.ar === arabicKey));
       assert.ok(owner.length >= 1, `${x.cardId} ${day}: Arapça hücre tabloda yok`);
       const texts = (row) => [row.label, ...cellKinds(row).filter((c) => c.text).map((c) => c.text.replace(/^[IVX]+:\s*/, ''))];
-      if (x.template.type === 'Arapça seç') { const asked = /'([^']+)'/.exec(task.prompt)[1]; assert.ok(owner.some((row) => stripParens(row.label) === stripParens(asked)), `${x.cardId} ${day}: doğru Arapça '${asked}' satırından değil`); checked += 1; continue; }
+      if (task.grammarType === 'Arapça seç') { const asked = task.prompt.slice(1, task.prompt.lastIndexOf("' hangisi?")); assert.ok(owner.some((row) => texts(row).some((text) => stripParens(text) === stripParens(asked))), `${x.cardId} ${day}: doğru Arapça '${asked}' satırından değil`); checked += 1; continue; }
       const okAnswer = owner.some((row) => texts(row).includes(correct) || (x.concept.id === 'g1' && correct === `el + ${row.label}`) || ['Tekil', 'Çoğul'].includes(correct) || (x.concept.id === 'g0_5' && texts(row).length));
       assert.ok(okAnswer || x.concept.id === 'g0_5' || x.concept.id === 'g12', `${x.cardId} ${day}: cevap "${correct}" aynı satırdan gelmiyor`);
       checked += 1;
@@ -446,7 +448,7 @@ check('C5 · her görev yönlendirir ve öğretir: kural cümlesi (plainTr) + ö
       const example = exampleOf(x.concept, x.template);
       assert.ok(task.teach.includes(example.ref) && task.teach.includes(example.tr), `${x.cardId}: âyet künyesi ve çeviri`);
     }
-    if (task.kind === 'order') assert.ok(task.context.some((c) => /İpucu/.test(c.label)) && task.context.some((c) => /^Anlamı: /.test(c.label)), `${x.cardId}: ipucu + anlam`);
+    if (task.kind === 'order') assert.ok(task.context.some((c) => /^Anlamı: /.test(c.label)) && task.context.some((c) => /İpucu/.test(c.label)) === (exampleOf(x.concept, x.template).words.length >= 3), `${x.cardId}: anlam + (üç+ kelimede) ipucu`);
   }
 });
 
@@ -478,7 +480,7 @@ check('C6 · arayüz: dizme görevi sıra düğmeleriyle işlenir; cevaptan sonr
   const before = t.api.kaoTaskHTML(task);
   assert.ok(/aria-pressed="false"/.test(before) && /kao-order-target/.test(before), 'sıra düğmeleri ve hedef şeridi');
   assert.ok(!/Önce fiili seç/.test(before) && /Kelimeleri sırayla seç/.test(before), 'fragman metni gramerde görünmemeli');
-  assert.ok(/İpucu: parça yukarıdaki kelimeyle başlar/.test(before) && /Anlamı: /.test(before), 'yönlendirme: anlam + ipucu');
+  assert.ok(/Anlamı: /.test(before) && (task.choices.length >= 3) === /İpucu: parça yukarıdaki kelimeyle başlar/.test(before), 'yönlendirme: anlam (+ üç+ kelimede ipucu)');
   const q = t.data.quranLearn;
   for (const c of Array.from(task.choices).sort((a, b) => b.ordinal - a.ordinal)) t.api.kaoAnswer(task.id, c.choiceId);
   const after = t.api.kaoTaskHTML(task);
@@ -533,6 +535,81 @@ check('C8 · 109 dersin yürüyüşü: gösterilen gramer görevi ≥60 ve 0 ihl
   assert.ok(shown >= 60, `gösterilen gramer görevi ${shown} < 60`);
   assert.ok(minPractice >= 6);
   console.log(`      gösterilen gramer görevi: ${shown} (K2F-10 sonrası 37, önce 78) · en az alıştırma ${minPractice}`);
+});
+
+check('C10 · kavram sayfası: doğrulanmış âyet örnekleri (kelime kelime okunuşlu) ve "Dikkat edilecekler" notları görünür; 25 kavramın tümü', () => {
+  const t = bootKao();
+  freshUser(t);
+  assert.equal(grammar.concepts.length, 25);
+  for (const concept of grammar.concepts) {
+    const html = t.api.kaoConceptHTML(concept.id);
+    assert.ok(html.includes('Kur\'an\'dan örnekler'), `${concept.id}: örnek bölümü`);
+    assert.equal((html.match(/class="kao-grammar-ayah"/g) || []).length, concept.examples.length, `${concept.id}: örnek sayısı`);
+    for (const example of concept.examples) {
+      assert.ok(html.includes('Âyet ' + example.ref) && html.includes(htmlEsc(example.tr)), `${concept.id}/${example.id}: künye ve çeviri`);
+      for (const word of example.words) assert.ok(html.includes(htmlEsc(word.ar)) && html.includes(htmlEsc(word.pronunciation)), `${example.id}: kelime ve okunuşu`);
+    }
+    if (concept.explanation && concept.explanation.length) {
+      assert.ok(html.includes('Dikkat edilecekler'), `${concept.id}: not bölümü`);
+      assert.equal((html.match(/<li>/g) || []).length >= concept.explanation.length, true);
+      for (const note of concept.explanation) assert.ok(html.includes(htmlEsc(note)), `${concept.id}: not metni`);
+    }
+    assert.ok(html.indexOf('kao-grammar-ayahs') < html.indexOf('kao-grammar-table'), `${concept.id}: önce somut örnek, sonra tablo (somutlaştır→soyutla)`);
+  }
+});
+
+check('C11 · yeni tarifler: kişi tanıma (g13/g15/g17), tamlama (g2), masdar (g20), fâil→mef\'ûl ve fiil→masdar eşleştirme tablodaki AYNI satırdan doğrulanır', () => {
+  const t = bootKao();
+  freshUser(t);
+  const rowsOf = (id) => grammar.byId(id).tables[0].rows;
+  const arCells = (row) => row.cells.filter((c) => Array.isArray(c) && ARABIC.test(String(c[1] || ''))).map((c) => c[1]);
+  for (const day of SEEDS) {
+    for (const [card, concept] of [['g:g13:g13-k3', 'g13'], ['g:g15:g15-k2', 'g15'], ['g:g17:g17-k2', 'g17']]) {
+      const task = buildFor(t, card, day);
+      assert.equal(t.api.kaoGrammarTaskValid(task), true, card);
+      const owner = rowsOf(concept).filter((row) => arCells(row)[0] === task.stimulus);
+      assert.equal(owner.length, 1, `${card} ${day}: biçim tabloda tek satıra ait olmalı`);
+      assert.equal(task.choices.find((c) => c.correct).label, owner[0].label, `${card}: doğru şahıs/kişi`);
+      const allLabels = new Set(rowsOf(concept).map((row) => row.label));
+      assert.ok(task.choices.every((c) => allLabels.has(c.label)), `${card}: çeldirici tablo dışı`);
+      const forms = rowsOf(concept).map((row) => arCells(row)[0]);
+      for (const c of task.choices) { const row = rowsOf(concept).find((r) => r.label === c.label); assert.equal(forms.filter((f) => f === arCells(row)[0]).length, 1, `${card}: yinelenen biçimli satır çeldirici/soru olamaz`); }
+    }
+    const phrase = buildFor(t, 'g:g2:g2-k4', day);
+    const asked = phrase.prompt.slice(1, phrase.prompt.lastIndexOf("' tamlaması"));
+    const row = rowsOf('g2').find((r) => r.label === asked);
+    assert.ok(row, 'tamlama satırı');
+    assert.equal(phrase.stimulus, '');
+    assert.equal(phrase.choices.find((c) => c.correct).label, arCells(row).join(' '), 'doğru tamlama = satırdaki iki kelime');
+    assert.ok(phrase.choices.every((c) => ARABIC.test(c.label)) && t.api.kaoGrammarTaskValid(phrase));
+    const masdar = buildFor(t, 'g:g20:g20-k2', day);
+    const mrow = rowsOf('g20').find((r) => arCells(r)[1] === masdar.stimulus);
+    assert.ok(mrow && masdar.choices.find((c) => c.correct).label === mrow.label, 'masdarın anlamı = satır başlığı');
+    for (const [card, concept, fromIdx, toIdx] of [['g:g19:g19-k2', 'g19', 0, 1], ['g:g20:g20-k1', 'g20', 0, 1]]) {
+      const task = buildFor(t, card, day);
+      const r = rowsOf(concept).find((x) => arCells(x)[fromIdx] === task.stimulus);
+      assert.ok(r, `${card}: kaynak satır`);
+      assert.equal(task.choices.find((c) => c.correct).label, arCells(r)[toIdx], `${card}: eşleşen biçim aynı satırdan`);
+      assert.equal(t.api.kaoGrammarTaskValid(task), true);
+    }
+  }
+});
+
+check('C12 · rehberlik soldurma: dizmede ipucu yalnız taze kartta (<2 tekrar) verilir (tüm 18 örnek 3+ kelimedir; 2 kelimede ipucu zaten verilmezdi); ipucusuz görev de geçerli', () => {
+  const t = bootKao();
+  const q = freshUser(t);
+  const threeWord = allTemplates.find((x) => x.template.type === 'Kelime dizme' && exampleOf(x.concept, x.template).words.length >= 3);
+  assert.ok(threeWord, 'test verisi');
+  const words = exampleOf(threeWord.concept, threeWord.template).words;
+  assert.equal(buildFor(t, threeWord.cardId, '2026-09-30').stimulus, words[0].ar, 'taze kart: ipucu var');
+  q.cards[threeWord.cardId] = { state: 'learning', reps: 1, s: 1 };
+  assert.equal(buildFor(t, threeWord.cardId, '2026-09-30').stimulus, words[0].ar, '1 tekrar: hâlâ ipucu');
+  q.cards[threeWord.cardId] = { state: 'review', reps: 2, s: 5 };
+  const faded = buildFor(t, threeWord.cardId, '2026-09-30');
+  assert.equal(faded.stimulus, '', '2+ tekrar: ipucu soldu');
+  assert.ok(!faded.context.some((c) => /İpucu/.test(c.label)) && faded.context.some((c) => /^Anlamı: /.test(c.label)));
+  assert.equal(t.api.kaoGrammarTaskValid(faded), true, 'ipucusuz dizme geçerli');
+  for (const x of allTemplates.filter((y) => y.template.type === 'Kelime dizme')) assert.ok(exampleOf(x.concept, x.template).words.length >= 3, `${x.cardId}: tüm dizme örnekleri 3+ kelime`);
 });
 
 check('C9 · GRAMER-SABLON-L2.md: desteklenmeyen şablonlar kimlikle ve gerekçeyle listelenir (Arapça metin yok); testin ürettiği liste dosyayla aynı', () => {

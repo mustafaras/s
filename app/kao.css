@@ -283,6 +283,11 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-grammar-table tr:last-child th,.kao-grammar-table tr:last-child td{border-bottom:0}
 .kao-grammar-ar{display:block;color:var(--kao-label);font-size:var(--f-body);line-height:var(--kao-ar-lh,2.2)}
 .kao-grammar-reading{display:block;color:var(--kao-label-2);font-size:var(--f-caption1);line-height:1.35;overflow-wrap:anywhere}
+.kao-grammar-ayahs,.kao-grammar-notes{display:grid;gap:8px;min-width:0}.kao-grammar-ayahs h3,.kao-grammar-notes h3{margin:0;color:var(--kao-label);font-size:var(--f-headline);font-weight:600}.kao-grammar-hint{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote);line-height:1.45}
+.kao-grammar-ayahs ul,.kao-grammar-notes ul{display:grid;gap:10px;margin:0;padding:0;list-style:none}.kao-grammar-ayah{display:grid;gap:6px;min-width:0;padding:12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
+.kao-grammar-ayah-words{display:flex;flex-wrap:wrap;gap:8px 16px;margin:0;font-size:var(--f-title3);line-height:1.6}.kao-grammar-word{display:grid;justify-items:center;gap:2px;min-width:0}
+.kao-grammar-ayah-tr{margin:0;color:var(--kao-label);font-size:var(--f-subhead);line-height:1.45;overflow-wrap:anywhere}.kao-grammar-ayah-ref{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote)}
+.kao-grammar-notes li{padding:10px 12px;border-left:3px solid var(--kao-tint);border-radius:var(--kao-r-ctl);background:color-mix(in srgb,var(--kao-tint) 7%,var(--kao-surface));color:var(--kao-label);font-size:var(--f-subhead);line-height:1.5;overflow-wrap:anywhere}
 .kao-grammar-term{padding-top:10px;border-top:1px solid var(--kao-sep)}
 .kao-grammar-term summary{min-height:44px;display:flex;align-items:center;color:var(--kao-tint);font-size:var(--f-subhead);font-weight:600;cursor:pointer}
 .kao-grammar-term p{padding:0 4px 8px;margin:0;color:var(--kao-label-2);line-height:1.5;overflow-wrap:anywhere}

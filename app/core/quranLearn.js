@@ -1014,7 +1014,7 @@
     if(!concept) return null;
     var levels=window.QuranCurriculumV2&&Array.isArray(window.QuranCurriculumV2.levels)?window.QuranCurriculumV2.levels:[],unit=kaoCurriculumUnit(concept.unit),level=unit?levels.find(function(item){ return item.id===unit.level; }):null;
     var ct=kaoConceptText(concept.id),lv=ct&&(ct.level==='sourced'||ct.level==='expert')?{level:ct.level}:null;
-    return {title:concept.title,plainTr:concept.plainTr,termTr:concept.termTr,workedTr:kaoVisibleText(lv,ct&&ct.workedTr,''),tables:Array.isArray(concept.tables)?concept.tables:[],verified:concept.verified===true,levelTitle:level?String(level.title):'',lessons:kaoGrammarLessonsOf(concept.id).map(function(lesson){ return {id:lesson.id,title:lesson.title,action:{name:'kaoLesson',args:['start',lesson.id]}}; })};
+    return {title:concept.title,plainTr:concept.plainTr,termTr:concept.termTr,workedTr:kaoVisibleText(lv,ct&&ct.workedTr,''),tables:Array.isArray(concept.tables)?concept.tables:[],examples:(Array.isArray(concept.examples)?concept.examples:[]).map(function(item){ return {ref:String(item.ref||''),tr:String(item.tr||''),words:(Array.isArray(item.words)?item.words:[]).map(function(word){ return {ar:String(word.ar||''),pronunciation:String(word.pronunciation||'')}; })}; }),notes:Array.isArray(concept.explanation)?concept.explanation.map(String):[],verified:concept.verified===true,levelTitle:level?String(level.title):'',lessons:kaoGrammarLessonsOf(concept.id).map(function(lesson){ return {id:lesson.id,title:lesson.title,action:{name:'kaoLesson',args:['start',lesson.id]}}; })};
   }
   function kaoConceptHTML(conceptId){
     if(!quranLearnDeps) return '';
@@ -1182,13 +1182,16 @@
     });
     return items;
   }
-  function gramOrderRecipe(record,seed){
-    var example=gramExample(record),words=gramWords(example);
+  // Rehberlik soldurma (Kalyuga vd. uzmanlık-tersine-çevrilme; Bjork "istenen zorluk"): ilk-kelime ipucu yalnız üç+ kelimelik parçada ve
+  // kart henüz GRAMMAR_HINT_UNTIL_REPS kereden az tekrarlandıysa verilir; iki kelimelik parçada ipucu soruyu çözdüğü için hiç verilmez.
+  var GRAMMAR_HINT_UNTIL_REPS=2;
+  function gramOrderRecipe(record,seed,ctx){
+    var example=gramExample(record),words=gramWords(example),hint=words.length>=3&&nonNegativeNumber(ctx&&ctx.reps,0)<GRAMMAR_HINT_UNTIL_REPS;
     if(!example||words.length<2) return gramUnsupported('örnek ya da en az iki kelime yok');
     var choices=words.map(function(word,index){ return {label:String(word.ar),pronunciation:String(word.pronunciation||''),ordinal:index,tokenId:'w'+index}; });
     choices.sort(function(a,b){ return seededRank(seed+'|grammar-order',a.tokenId)-seededRank(seed+'|grammar-order',b.tokenId)||a.ordinal-b.ordinal; });
     if(choices.every(function(item,index){ return item.ordinal===index; })) choices.push(choices.shift());
-    return {kind:'order',choices:choices,answer:words.map(function(word){ return word.ar; }).join(' '),stimulus:String(words[0].ar),stimulusPronunciation:String(words[0].pronunciation||''),context:[{label:'Anlamı: '+example.tr,pronunciation:''},{label:'İpucu: parça yukarıdaki kelimeyle başlar',pronunciation:''}]};
+    return {kind:'order',choices:choices,answer:words.map(function(word){ return word.ar; }).join(' '),stimulus:hint?String(words[0].ar):'',stimulusPronunciation:hint?String(words[0].pronunciation||''):'',context:[{label:'Anlamı: '+example.tr,pronunciation:''}].concat(hint?[{label:'İpucu: parça yukarıdaki kelimeyle başlar',pronunciation:''}]:[])};
   }
   function gramTranslateRecipe(record,seed){
     var example=gramExample(record),grammar=window.QuranGrammarV1,same=[],other=[];
@@ -1224,11 +1227,67 @@
       var picked=gramPick(suffixes,seed+'|'+tid);
       return {stimulus:picked.word.label,stimulusPronunciation:picked.word.pronunciation,prompt:'Kelimeye yapışan ek hangisi?',answer:String(picked.row.label),alternatives:gramShuffle(suffixes.filter(function(item){ return item!==picked; }).map(function(item){ return String(item.row.label); }),seed+'|suffix'),context:[]};
     }
-    return gramUnsupported('tablo gövde ile eki ayrı vermiyor; ayrıştırma kaynağı yok');
+    if(id==='g13'||id==='g15'||id==='g17') return gramPersonRecipe(record,seed);
+    return gramReverseRecipe(record,seed);
+  }
+  // Ek çöz şablonu kelime listesi tablosuna bağlıysa (parçalanacak gövde+ek verisi yok) görev tablodan "Arapça seç"e (Türkçe→Arapça) çevrilir:
+  // üretme/geri çağırma yönü (Bjork "istenen zorluk") ve arayüzde dürüst tür etiketi; cevap tablodaki aynı satırdan gelir.
+  function gramReverseRecipe(record,seed){
+    var items=gramMeaningItems(gramRows(record)),counts=Object.create(null);
+    items.forEach(function(item){ counts[item.answer]=(counts[item.answer]||0)+1; });
+    items=items.filter(function(item){ return counts[item.answer]===1; });
+    if(items.length<3) return gramUnsupported('tabloda tek anlamlı en az üç kelime–anlam satırı yok');
+    var chosen=gramPick(items,seed+'|'+record.template.id);
+    return {type:'Arapça seç',stimulus:'',prompt:"'"+chosen.answer+"' hangisi?",answer:{label:chosen.stimulus.label,pronunciation:chosen.stimulus.pronunciation},alternatives:gramShuffle(items.filter(function(item){ return item!==chosen; }).map(function(item){ return {label:item.stimulus.label,pronunciation:item.stimulus.pronunciation}; }),seed+'|reverse'),context:[]};
+  }
+  // Çekim/emir tablolarında "kelimeyi parçalarına ayır" yerine ek tanıma: Arapça biçim verilir, hangi şahıs/kime ait olduğu sorulur
+  // (şahıs ekini tanımak). Aynı biçim iki satırda geçiyorsa (belirsiz) o satırlar ne soru ne çeldirici olur.
+  var GRAMMAR_PERSON_PROMPTS={g13:'Bu geçmiş zaman biçimi kimin için? (şahıs ekini tanı)',g15:'Bu şimdiki zaman biçimi kimin için? (şahıs ekini tanı)',g17:'Bu emir kime söylenmiş?'};
+  function gramPersonRecipe(record,seed){
+    var forms=Object.create(null),items=gramRows(record).map(function(row){ var ar=gramCells(row).find(gramIsAr); return ar?{row:row,ar:ar}:null; }).filter(Boolean);
+    items.forEach(function(item){ forms[item.ar.label]=(forms[item.ar.label]||0)+1; });
+    var unique=items.filter(function(item){ return forms[item.ar.label]===1; });
+    if(unique.length<4) return gramUnsupported('tabloda tek anlamlı (yinelenmeyen) en az dört biçim yok');
+    var chosen=gramPick(unique,seed+'|'+record.template.id);
+    return {stimulus:chosen.ar.label,stimulusPronunciation:chosen.ar.pronunciation,prompt:GRAMMAR_PERSON_PROMPTS[record.concept.id],answer:String(chosen.row.label),alternatives:gramShuffle(unique.filter(function(item){ return item!==chosen; }).map(function(item){ return String(item.row.label); }),seed+'|persons'),context:[{label:String((record.concept.tables[0]||{}).title||record.concept.title),pronunciation:''}]};
+  }
+  function gramColumnIndex(record,pattern){
+    var columns=(record.concept.tables[0]||{}).columns||[];
+    for(var i=1;i<columns.length;i+=1) if(pattern.test(String(columns[i]))) return i-1;
+    return -1;
+  }
+  function gramArabicAt(row,index){
+    var cell=index>=0&&row&&Array.isArray(row.cells)?row.cells[index]:null;
+    return Array.isArray(cell)&&GRAMMAR_ARABIC.test(String(cell[1]||''))?{label:String(cell[1]),pronunciation:String(cell[2]||'')}:null;
+  }
+  // Aynı satırdaki iki sütun arasında eşleştirme (fiil→masdar, fâil→mef'ûl): sütunlar başlıktan bulunur, cevap aynı satırdan gelir.
+  function gramColumnPairRecipe(record,seed,fromPattern,toPattern,prompt,hint){
+    var from=gramColumnIndex(record,fromPattern),to=gramColumnIndex(record,toPattern);
+    if(from<0||to<0) return gramUnsupported('tabloda gerekli sütun başlıkları yok');
+    var items=gramRows(record).map(function(row){ var a=gramArabicAt(row,from),b=gramArabicAt(row,to); return a&&b?{row:row,from:a,to:b}:null; }).filter(Boolean);
+    if(items.length<3) return gramUnsupported('tabloda en az üç dolu satır yok');
+    var chosen=gramPick(items,seed+'|'+record.template.id);
+    return {stimulus:chosen.from.label,stimulusPronunciation:chosen.from.pronunciation,prompt:prompt,answer:{label:chosen.to.label,pronunciation:chosen.to.pronunciation},alternatives:gramShuffle(items.filter(function(item){ return item!==chosen; }).map(function(item){ return {label:item.to.label,pronunciation:item.to.pronunciation}; }),seed+'|pairs'),context:[{label:hint+String(chosen.row.label),pronunciation:''}]};
+  }
+  // "'âlemlerin Rabbi' tamlaması hangisi?": Türkçe karşılık yönergede, şıklar tablodaki iki kelimelik tamlamalar (tamlanan + tamlayan).
+  function gramPhraseRecipe(record,seed){
+    var items=gramRows(record).map(function(row){ var ar=gramCells(row).filter(gramIsAr); return ar.length===2?{row:row,pair:{label:ar[0].label+' '+ar[1].label,pronunciation:ar[0].pronunciation+' '+ar[1].pronunciation}}:null; }).filter(Boolean);
+    if(items.length<3) return gramUnsupported('tabloda en az üç iki kelimelik tamlama yok');
+    var chosen=gramPick(items,seed+'|'+record.template.id);
+    return {stimulus:'',prompt:"'"+chosen.row.label+"' tamlaması hangisi?",answer:chosen.pair,alternatives:gramShuffle(items.filter(function(item){ return item!==chosen; }).map(function(item){ return item.pair; }),seed+'|phrases'),context:[]};
   }
   function gramMeaningRecipe(record,seed){
     var id=record.template.id,rows=gramRows(record);
-    if(id==='g10-k3'||id==='g14-k2') return gramUnsupported('yönerge tablo dışı bir ifadeye ya da gizli öğeye bağlı; tablo yetmiyor');
+    if(id==='g10-k3') return gramUnsupported('doğrulanmış metin "-dır eki yazılmaz" der, hangi kelimede saklı olduğunu söylemez. Öneri (içerik, L1 onayı): soruyu "hangisi haberdir (söylenen)?" olarak yeniden yaz');
+    if(id==='g14-k2') return gramUnsupported('yönerge doğrulanmış örnekler arasında olmayan bir ifadeye bağlı. Öneri (içerik, L1 onayı): doğrulanmış kâne örneği (g14-e1) üzerinden yeni örnekli şablon yaz');
+    if(id==='g19-k3') return gramUnsupported('fâil/mef\'ûl hücrelerinin Türkçe karşılığı tabloda yok. Öneri (içerik, L2 onayı): tabloya "yazan / yazılan" gibi Türkçe karşılık sütunu ekle (sözlükle doğrulanarak)');
+    if(record.concept.id==='g2') return gramPhraseRecipe(record,seed);
+    if(record.concept.id==='g20'){
+      var masdar=gramColumnIndex(record,/masdar/i),named=gramRows(record).map(function(row){ var ar=gramArabicAt(row,masdar); return ar?{row:row,ar:ar}:null; }).filter(Boolean);
+      if(named.length<3) return gramUnsupported('masdar sütunu yok ya da üç satırdan az');
+      var pickedName=gramPick(named,seed+'|'+id);
+      return {stimulus:pickedName.ar.label,stimulusPronunciation:pickedName.ar.pronunciation,answer:String(pickedName.row.label),alternatives:gramShuffle(named.filter(function(item){ return item!==pickedName; }).map(function(item){ return String(item.row.label); }),seed+'|names'),context:[]};
+    }
     if(record.concept.id==='g12'){
       var pairs=rows.map(function(row){ var ar=gramCells(row).filter(gramIsAr); return ar.length===2?ar:null; }).filter(Boolean);
       if(pairs.length<2) return gramUnsupported('tekil/çoğul çifti yok');
@@ -1263,15 +1322,17 @@
     return {stimulus:chosen.ar.label,stimulusPronunciation:chosen.ar.pronunciation,answer:{label:Array.from(chosen.root.root).join('–'),pronunciation:String(chosen.root.pronunciation||'')},alternatives:roots.slice(0,12).map(function(item){ return {label:Array.from(item.root).join('–'),pronunciation:String(item.pronunciation||'')}; }),context:[{label:String(chosen.row.label),pronunciation:''}]};
   }
   function gramPatternRecipe(record,seed){
-    if(record.concept.id!=='g21') return gramUnsupported(record.concept.id==='g19'?'fâil/mef\'ûl için tabloda Türkçe karşılık sütunu yok':'yönerge üçlü eşleştirme ister; tablo iki sütunlu');
+    if(record.concept.id==='g19') return gramColumnPairRecipe(record,seed,/fâil/i,/mef/i,"Bu 'yapan' (fâil) kelimenin aynı kökten 'yapılan' (mef'ûl) biçimi hangisi?",'Kök anlamı: ');
+    if(record.concept.id==='g20') return gramColumnPairRecipe(record,seed,/^Fiil/i,/masdar/i,'Bu fiilin adı (masdarı) hangisi?','Anlamı: ');
+    if(record.concept.id!=='g21') return gramUnsupported('bu kavramda eşleştirme tarifi yok');
     var items=gramMeaningItems(gramRows(record)).slice(0,3);
     if(items.length<3) return gramUnsupported('tabloda üç eşleşebilir satır yok');
     var chosen=items[seededRank(seed,record.template.id)%items.length];
     return {stimulus:chosen.stimulus.label,stimulusPronunciation:chosen.stimulus.pronunciation,answer:chosen.answer,alternatives:items.map(function(item){ return item.answer; }),context:items.map(function(item){ return {label:item.stimulus.label,pronunciation:item.stimulus.pronunciation}; })};
   }
-  function grammarRecipe(record,seed){
+  function grammarRecipe(record,seed,ctx){
     var type=record.template.type;
-    if(type==='Kelime dizme') return gramOrderRecipe(record,seed);
+    if(type==='Kelime dizme') return gramOrderRecipe(record,seed,ctx);
     if(type==='Parça çevir') return gramTranslateRecipe(record,seed);
     if(type==='Çekim tablosu') return gramInflectionRecipe(record,seed);
     if(type==='Ek çöz') return gramAffixRecipe(record,seed);
@@ -1284,7 +1345,7 @@
   // Boş dize = destekleniyor; aksi hâlde görev kurulamamasının gerekçesi (GRAMER-SABLON-L2.md bunu listeler).
   function kaoGrammarSupport(cardId){
     var record=grammarRecord(cardId);
-    return record?(grammarRecipe(record,'support-probe').unsupported||''):'şablon bulunamadı';
+    return record?(grammarRecipe(record,'support-probe',{reps:0}).unsupported||''):'şablon bulunamadı';
   }
   // "Yönlendirir + öğretir": cevaptan sonra kavramın kural cümlesi (plainTr) ve örnekli şablonda âyet künyesi + çevirisi gösterilir.
   function gramTeach(record,example){
@@ -1296,9 +1357,10 @@
   function kaoBuildGrammarTask(queueItem,d,options){
     var opts=options&&typeof options==='object'?options:{},cardId=String(queueItem&&queueItem.cardId||queueItem&&queueItem.id||''),record=grammarRecord(cardId);
     if(!record) return null;
-    var taskId=String(queueItem&&queueItem.id||'task:'+cardId),seed=String(opts.seed||taskId),recipe=grammarRecipe(record,seed);
+    var taskId=String(queueItem&&queueItem.id||'task:'+cardId),seed=String(opts.seed||taskId),card=objectOr(quranLearnRoot(d).cards,{})[cardId];
+    var recipe=grammarRecipe(record,seed,{reps:nonNegativeNumber(card&&card.reps,0)});
     if(recipe.unsupported) return null;
-    var type=record.template.type,answerValue=choiceValue(recipe.answer),choices;
+    var type=recipe.type||record.template.type,answerValue=choiceValue(recipe.answer),choices;
     if(recipe.choices){ choices=recipe.choices; choices.forEach(function(choice,index){ choice.choiceId=taskId+':choice:'+index; }); }
     else choices=choiceList(recipe.alternatives,answerValue,seed,taskId);
     var task={id:taskId,cardId:cardId,type:'grammar',grammarType:type,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:String(recipe.prompt||record.template.prompt||type),stimulus:recipe.stimulus||'',stimulusPronunciation:recipe.stimulusPronunciation||'',context:recipe.context||[],errorClass:grammarErrorClass(type),answer:answerValue.label,teach:gramTeach(record,gramExample(record)),clipId:'',choices:choices};
@@ -1315,7 +1377,9 @@
     var record=grammarRecord(task.cardId),choices=Array.isArray(task.choices)?task.choices:[];
     if(!record||choices.length<2) return false;
     var type=record.template.type,example=gramExample(record),stimulus=String(task.stimulus||''),answer='';
-    if(task.grammarType!==type) return false;
+    // İzinli tek yeniden türlendirme: kelime listesi tablosuna bağlı "Ek çöz" şablonu "Arapça seç" olarak gösterilir (gramReverseRecipe).
+    if(task.grammarType!==type&&!(type==='Ek çöz'&&task.grammarType==='Arapça seç')) return false;
+    type=task.grammarType;
     var labels=choices.map(function(item){ return String(item&&item.label||''); });
     if(labels.some(function(label){ return !label; })) return false;
     if(type==='Kelime dizme'){
@@ -1332,8 +1396,9 @@
     if(type==='Çekim tablosu'){
       var quoted=/'([^']+)'/.exec(String(task.prompt||''));
       if(!stimulus||(quoted&&quoted[1]!==stimulus)) return false;
-    }else if(stimulus?!GRAMMAR_ARABIC.test(stimulus):type!=='Arapça seç') return false;
-    if(example&&(!example.ar||!stimulus||example.ar.indexOf(stimulus)<0)) return false;
+    }else if(stimulus){ if(!GRAMMAR_ARABIC.test(stimulus)) return false; }
+    else if(type!=='Arapça seç'&&type!=='Kelime dizme'&&!choices.every(function(item){ return GRAMMAR_ARABIC.test(String(item.label||'')); })) return false;
+    if(example&&(!example.ar||(stimulus?example.ar.indexOf(stimulus)<0:type!=='Kelime dizme'))) return false;
     return true;
   }
   // Bir kuyruk/plan öğesinin gramer görevi, GERÇEKTE kurulacağı tohumla (öğe kimliği) kurulup doğrulanır;

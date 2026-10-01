@@ -50,6 +50,12 @@ function walkLesson(t, lessonId, visit) {
       const task = item && t.ui.kaoTasks[item.id];
       if (!task) return false;
       if (visit) visit(task);
+      if (task.kind === 'order') {
+        // K2F-11 ek turu: "Kelime dizme" birden çok seçim ister; ordinal sırayla seçilmezse yürüyüşçü aynı görevde takılır.
+        for (const c of (task.choices || []).slice().sort((a, b) => a.ordinal - b.ordinal)) t.api.kaoAnswer(task.id, c.choiceId);
+        t.api.kaoContinue();
+        continue;
+      }
       const pick = (task.choices || []).find((c) => c.correct) || (task.choices || [])[0];
       if (!pick) return false;
       t.api.kaoAnswer(task.id, pick.choiceId);
@@ -119,7 +125,14 @@ function grammarDefects(task, lessonId, verified) {
   const template = concept && (concept.templates || []).find((x) => x.id === templateId);
   const example = template && template.exampleId && (concept.examples || []).find((e) => e.id === template.exampleId);
   const exampleAr = example && example.resolved && example.resolved.ar;
-  if (exampleAr && !(stimulus && exampleAr.includes(stimulus))) out.push(`${lessonId} ${templateId} uyaran "${stimulus}" örnek ${template.exampleId} içinde değil`);
+  // Kelime dizme (kind:'order') ipucu soldurduğunda uyaran boş olabilir (rehberlik soldurma); doluysa örnek içinde olmalı.
+  // Dizmenin doğruluğu ayrıca kaynak örnekle karşılaştırılır: ordinal sırası = örneğin kelime sırası.
+  if (task.kind === 'order') {
+    if (stimulus && exampleAr && !exampleAr.includes(stimulus)) out.push(`${lessonId} ${templateId} uyaran "${stimulus}" örnek ${template.exampleId} içinde değil`);
+    const expected = example && example.resolved && example.resolved.words ? example.resolved.words.map((w) => w.ar) : null;
+    const actual = (task.choices || []).slice().sort((a, b) => a.ordinal - b.ordinal).map((c) => c.label);
+    if (expected && expected.join(' ') !== actual.join(' ')) out.push(`${lessonId} ${templateId} dizme sırası örnekle uyuşmuyor`);
+  } else if (exampleAr && !(stimulus && exampleAr.includes(stimulus))) out.push(`${lessonId} ${templateId} uyaran "${stimulus}" örnek ${template.exampleId} içinde değil`);
   return out;
 }
 

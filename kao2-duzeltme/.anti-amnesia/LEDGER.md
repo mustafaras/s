@@ -346,3 +346,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - note: push/`gh` sandbox dışında çalıştı; `main` bu not commit'inin gerisindedir (belge-only).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
 - next: K2F-12
+
+## seq 37 · 2026-10-01 · FIX · K2F-11
+- request: kullanıcı: "bunların hepsini düzeltmeden devam etmeyelim gerekirse web search ile bilimsel ve premium şekilde önerelim sadece sonraki aşamalarda düzeltilecek olanları bırakabilirsin" (K2F-00…11 denetim raporunun 7 maddesi).
+- done: (1) kavram sayfasına doğrulanmış âyet örnekleri + notlar; (2) şablon desteği 71→83/86, kalan 3 içerik kararı gerekçe+öneriyle L2 listesinde; (3) dizme ipucu soldurma (3+ kelime, taze kart); (4) `tekrar-uret.cjs` order-aware + dizme kuralı; (5) ölü-yüzey bulgusu düzeltildi: 3'ü yanlış pozitif (ayar arayüzü `kaoSegHTML` dizeleriyle çağırır), 3'ü testlerle bilerek sabit → kod değişikliği yok; (6) README'de yalnız grammar_tasks satırı (tam envanter K2F-41).
+- scope-effect: Dokun dışı dosyalar kullanıcı talimatıyla: `app/core/quranLearnViews.js`, `app/kao.css` (kavram sayfası), `kao2-duzeltme/denetim/tekrar-uret.cjs`, `tests/kao/README.md`. R-03 oracle'ı güçlendi (zayıflamadı): dizme sırası kaynakla karşılaştırılır; ipucusuz dizmede uyaran boş olabilir.
+- sources: Kalyuga vd. (expertise reversal) · Sweller (guidance fading) · Fyfe vd. (concreteness fading) · Bjork & Bjork 2011 (desirable difficulties) — bağlantılar KANIT "Ek tur".
+- changed-tests: test_kao2_grammar_tasks.js (C1/C2/C4/C5/C6 koşullu ipucu + C10–C12 yeni; 26 kontrol).
+- next: K2F-12

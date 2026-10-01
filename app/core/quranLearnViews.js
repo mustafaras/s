@@ -380,7 +380,19 @@
       var call=actionCall(item.action);
       return '<li><button type="button" class="kao-grammar-lesson"'+(call?' onclick="'+call+'"':' disabled')+'><span>'+escapeText(item.title)+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
     }).join('');
-    return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p>'+worked+'</div></div>'+examples+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
+    // Somutlaştır → soyutla (Fyfe vd. "concreteness fading"): önce doğrulanmış âyet örnekleri (kelime kelime okunuşuyla), sonra tablo ve notlar.
+    var ayahs=(Array.isArray(model.examples)?model.examples:[]).map(function(item){
+      item=item&&typeof item==='object'?item:{};
+      var words=(Array.isArray(item.words)?item.words:[]).map(function(word){
+        word=word&&typeof word==='object'?word:{};
+        return '<span class="kao-grammar-word"><span class="kao-grammar-ar" lang="ar" dir="rtl">'+escapeText(word.ar)+'</span><span class="kao-grammar-reading" lang="tr" dir="ltr">'+escapeText(word.pronunciation)+'</span></span>';
+      }).join('');
+      return '<li class="kao-grammar-ayah"><p class="kao-grammar-ayah-words" dir="rtl">'+words+'</p><p class="kao-grammar-ayah-tr">“'+escapeText(item.tr)+'”</p><p class="kao-grammar-ayah-ref">Âyet '+escapeText(item.ref)+'</p></li>';
+    }).join('');
+    var ayahSection=ayahs?'<section class="kao-grammar-ayahs" aria-labelledby="kao-grammar-ayahs-title"><h3 id="kao-grammar-ayahs-title">Kur\'an\'dan örnekler</h3><p class="kao-grammar-hint">Her örnek doğrulanmış âyetten alındı; kelime kelime okunuşuyla.</p><ul>'+ayahs+'</ul></section>':'';
+    var notes=(Array.isArray(model.notes)?model.notes:[]).map(function(note){ return '<li>'+escapeText(note)+'</li>'; }).join('');
+    var notesSection=notes?'<section class="kao-grammar-notes" aria-labelledby="kao-grammar-notes-title"><h3 id="kao-grammar-notes-title">Dikkat edilecekler</h3><ul>'+notes+'</ul></section>':'';
+    return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p>'+worked+'</div></div>'+ayahSection+examples+notesSection+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
   }
 
   window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen};

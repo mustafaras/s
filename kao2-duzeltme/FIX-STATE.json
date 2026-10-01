@@ -8,8 +8,8 @@
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
   "nextPrompt": "K2F-10",
-  "ledgerLastSeq": 25,
-  "releaseApproval": "approved_through_K2F-08",
+  "ledgerLastSeq": 26,
+  "releaseApproval": "approved_through_K2F-09",
   "lastRelease": {"prompt": "K2F-08", "commit": "8d757abd", "pin": "20261001a", "run": 36840879605, "evidence": "kao2-duzeltme/evidence/K2F-08/YAYIN.md"},
   "sources": {
     "audit": "kao2-duzeltme/denetim/KUSUR-RAPORU.md",
@@ -32,7 +32,7 @@
     "acceptedAt": "2026-09-30"
   },
   "pins": {
-    "release": "20261001a",
+    "release": "20261001b",
     "kaoHandlers": 42,
     "appSurface": 763,
     "appAssignments": 601,

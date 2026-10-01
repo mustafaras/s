@@ -2,18 +2,18 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-10
-lastSeq: 25
+lastSeq: 26
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 25 · K2F-00…09 tamam (10/44), sıradaki K2F-10. R-01, R-02, R-09, R-10 PASS (4/10).
+Son güncelleme: 2026-10-01 · LEDGER seq 26 · K2F-00…09 tamam (10/44), sıradaki K2F-10. R-01, R-02, R-09, R-10 PASS (4/10).
 
 ## Şu an neredeyiz
 K2F-09 bitti (K4-02 1/3, kök neden): `tools/kao-content-freeze.mjs` artık doğrulanmış 93 âyet örneğini (329 kelime; Arapça
 Tanzil `resolved`'dan, okunuş QAC D-12 projeksiyonundan, ünsüz iskeleti hizası 329/329) ve kavram açıklamalarını
 `quranGrammarV1.js`'e taşıyor; `QuranGrammarV1.exampleById` ile 43/43 `exampleId` çözülüyor; iki üretim bayt-eşit;
 `tests/kao/test_kao2_grammar_tasks.js` bölüm A 8 kontrol. Bütçe tavanları kullanıcı kararıyla yükseltildi (LEDGER seq 24:
-ham 60→128 KiB, eski 4 modül gzip 164→176 KiB; toplam 256 KiB aynı). Değişen dosya henüz yayında DEĞİL (sonraki yayında pin).
+ham 60→128 KiB, eski 4 modül gzip 164→176 KiB; toplam 256 KiB aynı). Yayın: pin `20261001b` ile canlıya alınıyor (LEDGER seq 26).
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
@@ -25,7 +25,7 @@ R-03 fail→pass; KANIT'a gösterilen görev sayısı (önce 78, şimdi N) ve at
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-09-30)
 - Dal: `kao2-duzeltme` = `main` (canlı `8d757abd`) + K2F-05…K2F-08. Sonraki push yalnız K2F-18/43 onay kapılarında.
-- Yayın pini (canlı): `20261001a` (öncesi `20260930m`) · canlı `main` = `8d757abd` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
+- Yayın pini (yerel/yayın hazır): `20261001b` (canlıda `20261001a`) · canlı `main` = `8d757abd` · `App.kao*` 42 · App yüzeyi 763 · atama 601 · `onclick` 393 (değişmedi).
 - Kapılar: KAO 48/48 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **4/10 PASS** (R-01, R-02, R-09, R-10); kalan R-03…R-08 FAIL (beklenen).
 - Bütçe (perf): içerik 183,287 KiB (tavan 256; eski 4 modül gzip 167.938 B, tavan 176 KiB) · runtime 97,532 KiB (tavan 128) · css 12,938 KiB (tavan 14) · p95 4,34 ms.

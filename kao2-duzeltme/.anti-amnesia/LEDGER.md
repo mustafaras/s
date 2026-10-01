@@ -255,3 +255,9 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: Uthmani ↔ QAC yazım farkı (hançer elif, küçük yâ) yüzünden tam yüzey eşitliği yerine ünsüz iskeleti karşılaştırması kullanıldı (329/329 hizalı); `w` ardışık (93/93) ve `from..to` ile örtüşüyor → türetilebilir. `app/content/quranGrammarV1.js` değiştiği için yayında pin yükseltilmeli (index.html/sw.js).
 - next: K2F-10
+
+## seq 26 · 2026-10-01 · DECISION · K2F-09
+- decision: Dördüncü erken yayın — kullanıcı açık isteği ("push commit merge deploy"). Kapsam: K2F-09 (gramer modülü doğrulanmış âyet örnekleri) + bütçe/araç/test güncellemeleri. Pin `20261001a` → `20261001b` (index.html, sw.js, 8 pin taşıyan test). Yayınlanan varlık değişikliği: yalnız `app/content/quranGrammarV1.js` (+5,8 KiB gzip; davranış değişmez, görev kurucu hâlâ eski).
+- scope-effect: planlı YAYIN-1 (K2F-18) ayrıca sürer. `releaseApproval` = `approved_through_K2F-09`.
+- known-exposure (canlıda sürer, K2F-10…17): K4-02 yanlış gramer görevleri, R-05 `App.kaoS0`, R-06 Seviye 0 çökmeleri, R-03/R-04/R-07/R-08.
+- next: K2F-10

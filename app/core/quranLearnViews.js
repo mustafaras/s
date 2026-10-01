@@ -395,5 +395,90 @@
     return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p>'+worked+'</div></div>'+ayahSection+examples+notesSection+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen};
+  // K2F-14 · Seviye 0 ekranı: aşamaya göre (intro → listen → drill → read → done) birbirinden FARKLI HTML. Motor yalnız model üretir (K-2);
+  // aşama başına en fazla bir `.kao-primary`; alıştırma bitmeden birincil düğme pasif; geri bildirim aria-live.
+  function s0Arabic(text,className){ return '<span'+(className?' class="'+className+'"':'')+' lang="ar" dir="rtl">'+escapeText(text)+'</span>'; }
+  function s0MarkList(marks){
+    return marks.length?'<ul class="kao-s0-marks">'+marks.map(function(m){ return '<li>'+s0Arabic(m.glyph,'kao-s0-glyph')+'<span>'+escapeText(m.tr)+'</span></li>'; }).join('')+'</ul>':'';
+  }
+  function s0ExampleList(examples,canAudio){
+    return '<ol class="kao-s0-words">'+examples.map(function(e,i){
+      return '<li><span class="kao-s0-word">'+s0Arabic(e.ar)+'<small>'+escapeText(e.translit)+' · '+escapeText(e.tr)+'</small></span>'+(canAudio?'<button type="button" class="kao-secondary" onclick="App.kaoS0(\'audio\','+i+')" aria-label="'+escapeText(e.translit)+' kelimesini dinle">Dinle</button>':'')+'</li>';
+    }).join('')+'</ol>';
+  }
+  function s0PositionRows(table){
+    return table.rows.map(function(r){
+      return '<ul class="kao-s0-pos-row">'+r.cells.map(function(cell,i){ return '<li><span>'+escapeText(table.columns[i].label)+'</span>'+(cell.unavailable?'<small class="kao-s0-pos-none">biçim yok</small>':'<b lang="ar" dir="rtl">'+escapeText(cell.ar)+'</b>')+'</li>'; }).join('')+'</ul>';
+    }).join('');
+  }
+  function s0Note(model){ return model.note?'<p class="kao-s0-note" role="status">'+escapeText(model.note)+'</p>':''; }
+  function s0Intro(model){
+    var intro=model.intro,h='<section class="kao-s0-intro" aria-label="Açıklama">'+(model.goal?'<p class="kao-s0-goal">'+escapeText(model.goal)+'</p>':'')+'<p class="kao-s0-sentence">'+escapeText(intro.sentence)+'</p>';
+    if(intro.letters.length) h+='<section class="kao-s0-stage"><h3>Bu derste</h3><ul class="kao-s0-letters">'+intro.letters.map(function(l){ return '<li lang="ar" dir="rtl">'+escapeText(l.ar)+'</li>'; }).join('')+'</ul></section>';
+    h+=s0MarkList(intro.marks);
+    return h+'</section>';
+  }
+  function s0Listen(model){
+    var l=model.listen,h='';
+    if(l.kind==='reading'){
+      h+='<section class="kao-s0-read"><h3>Dinlerken oku</h3><ol class="kao-s0-words">'+l.words.map(function(w){ return '<li><span class="kao-s0-word">'+s0Arabic(w.ar)+'<small>'+escapeText(w.pronunciation?w.pronunciation+' · '+w.tr:w.tr)+'</small></span></li>'; }).join('')+'</ol>';
+      h+=l.canAudio?'<button type="button" class="kao-secondary" onclick="App.kaoS0(\'playall\')">Kelime kelime dinle</button>':'<p class="kao-s0-note">Bu cihazda ses kapalı; okunuşları okuyarak ilerle.</p>';
+      return h+s0Note(model)+'</section>';
+    }
+    if(l.marks.length) h+='<section class="kao-s0-stage"><h3>Bu derste</h3>'+s0MarkList(l.marks)+'</section>';
+    if(l.examples.length){
+      h+='<section class="kao-s0-listen"><h3>Örnek kelimeler</h3>'+s0ExampleList(l.examples,l.canAudio);
+      if(!l.canAudio) h+='<p class="kao-s0-note">Bu cihazda ses kapalı; okunuşları okuyarak ilerle.</p>';
+      h+=s0Note(model)+'</section>';
+    }
+    if(l.word){
+      h+='<section class="kao-s0-listen"><h3>Dinle ve gör</h3><p class="kao-s0-word-ar" lang="ar" dir="rtl">'+escapeText(l.word.ar)+'</p><p class="kao-s0-word-tr">'+escapeText(l.word.tr)+'</p>';
+      h+=l.canAudio?'<button type="button" class="kao-secondary" onclick="App.kaoS0(\'audio\')">Kelimeyi dinle</button>':'<p class="kao-s0-note">Bu cihazda ses kapalı; kelimeyi görerek öğren.</p>';
+      h+=s0Note(model)+'</section>';
+    }
+    if(l.positionRow){
+      h+='<section class="kao-s0-positions"><h3>Aynı harf dört yerde</h3><ul class="kao-s0-pos-row">'+l.positionRow.cells.map(function(cell,i){ return '<li><span>'+escapeText(l.columns[i].label)+'</span>'+(cell.unavailable?'<small class="kao-s0-pos-none">biçim yok</small>':'<b lang="ar" dir="rtl">'+escapeText(cell.ar)+'</b>')+'</li>'; }).join('')+'</ul></section>';
+    }
+    if(l.table) h+='<section class="kao-s0-positions"><h3>28 harf, dört konum</h3>'+s0PositionRows(l.table)+'</section>';
+    return h;
+  }
+  function s0Drill(model){
+    var d=model.drill,q=d.question,answered=q.picked!==null;
+    var stimulus=q.stimulus.ar?'<p class="kao-s0-stimulus" lang="ar" dir="rtl">'+escapeText(q.stimulus.ar)+'</p>':(q.stimulus.glyph?'<p class="kao-s0-stimulus kao-s0-glyph" lang="ar" dir="rtl">'+escapeText(q.stimulus.glyph)+'</p>':(q.stimulus.text?'<p class="kao-s0-stimulus">'+escapeText(q.stimulus.text)+'</p>':''));
+    var choices=q.choices.map(function(c){
+      var state=!answered?'':(c.correct?' kao-choice-correct':(c.id===q.picked?' kao-choice-wrong':' kao-choice-dim'));
+      var mark=!answered?'':(c.correct?'<span class="kao-choice-mark" aria-hidden="true">✓</span><span class="kao-sr-only">Doğru cevap</span>':(c.id===q.picked?'<span class="kao-choice-mark" aria-hidden="true">✕</span><span class="kao-sr-only">Senin seçimin</span>':''));
+      return '<button type="button" class="kao-chip kao-s0-choice'+state+'"'+(answered?' disabled':'')+' onclick="App.kaoS0(\'answer\',\''+escapeText(c.id)+'\')">'+mark+(c.ar?s0Arabic(c.label):escapeText(c.label))+'</button>';
+    }).join('');
+    var feedback=answered?(q.correct?'Doğru':'Doğrusu: '+q.answerLabel):'';
+    var last=d.index>=d.total-1;
+    return '<section class="kao-s0-drill" aria-labelledby="kao-s0-q"><p class="kao-s0-count">Soru '+String(d.index+1)+' / '+String(d.total)+' · Doğru: '+String(d.correct)+'</p><h3 id="kao-s0-q">'+escapeText(q.prompt)+'</h3>'+stimulus+'<div class="kao-choices" role="group" aria-labelledby="kao-s0-q">'+choices+'</div><p class="kao-live" aria-live="polite">'+escapeText(feedback)+'</p></section>';
+  }
+  function s0Read(model){
+    var r=model.read,h='<section class="kao-s0-read"><h3>Gerçek kelime</h3>';
+    if(r.words&&r.words.length){
+      h+='<ol class="kao-s0-words">'+r.words.map(function(w){ return '<li><span class="kao-s0-word">'+s0Arabic(w.ar)+'<small>'+(r.showReading?escapeText(w.pronunciation?w.pronunciation+' · '+w.tr:w.tr):'okunuşu gizli')+'</small></span></li>'; }).join('')+'</ol>';
+    }else if(r.word){
+      h+='<p class="kao-s0-word-ar" lang="ar" dir="rtl">'+escapeText(r.word.ar)+'</p><p class="kao-s0-word-tr">'+(r.showReading?escapeText(r.word.translit?r.word.translit+' · '+r.word.tr:r.word.tr):'okunuşu gizli')+'</p>';
+    }
+    h+='<button type="button" class="kao-secondary" aria-pressed="'+(r.showReading?'true':'false')+'" onclick="App.kaoS0(\'read\',\'toggle\')">'+(r.showReading?'Okunuşu gizle':'Okunuşu göster')+'</button>';
+    return h+s0Note(model)+'</section>';
+  }
+  function s0Done(model){
+    return '<section class="kao-s0-done" role="status"><h3>Ders tamam</h3><p>Alıştırma: '+String(model.done.correct)+' / '+String(model.done.total)+' doğru.</p>'+(model.note?'<p class="kao-s0-note">'+escapeText(model.note)+'</p>':'')+'</section>';
+  }
+  function s0Screen(model){
+    if(!deps) throw new Error('KAO2-14: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    var stage=model.stage||{index:0,count:1,kind:'intro'},body,action;
+    if(stage.kind==='intro'){ body=s0Intro(model); action={label:'Sıradaki adım',call:"App.kaoS0('next')"}; }
+    else if(stage.kind==='listen'){ body=s0Listen(model); action={label:'Sıradaki adım',call:"App.kaoS0('next')"}; }
+    else if(stage.kind==='drill'){ var q=model.drill.question,last=model.drill.index>=model.drill.total-1; body=s0Drill(model); action={label:last?'Alıştırmayı bitir':'Sonraki soru',call:"App.kaoS0('next')",disabled:q.picked===null}; }
+    else if(stage.kind==='read'){ body=s0Read(model); action={label:'Okudum',call:"App.kaoS0('read')"}; }
+    else { body=s0Done(model); action={label:'Derslere dön',call:'App.kaoBack()'}; }
+    var button='<button type="button" class="kao-primary"'+(action.disabled?' disabled aria-disabled="true"':'')+' onclick="'+action.call+'">'+escapeText(action.label)+'</button>';
+    return '<main class="kao-s0" data-stage="'+escapeText(stage.kind)+'" aria-labelledby="kao-s0-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye 0 · şekil aileleri</p><h2 id="kao-s0-title">'+escapeText(model.title)+'</h2><p class="kao-s0-progress" aria-label="Aşama '+String(stage.index+1)+' / '+String(stage.count)+'">Aşama '+String(stage.index+1)+' / '+String(stage.count)+' · '+escapeText(stage.label)+'</p></div></div>'+body+button+'</main>';
+  }
+
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
 })(window);

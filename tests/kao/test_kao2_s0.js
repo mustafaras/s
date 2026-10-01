@@ -171,6 +171,7 @@ check('(d) ses yoksa görsel akışla tamamlanır; çalışmayan ses düğmesi g
   api.registerQuranLearnSurface({ toast() {}, isQuietTime: false, mount() {}, lockBody() {}, unlockBody() {}, focusDialog() {}, restoreFocus() {}, activeElementId: () => '', sheetClose(e, bk, done) { done && done(); }, taskElement: () => null });
   api.ensureQuranLearn(data).onboarding.doneAt = '2026-09-20T00:00:00.000Z';
   api.kaoS0Start('s0.02');
+  assert.equal(api.kaoS0('next'), true, 'dinle-gör aşamasına geç');
   const html = decode(api.kaoS0HTML());
   assert.match(html, /kao-s0/, 'S0 akışı çizilir');
   assert.doesNotMatch(html, /App\.kaoS0\(&#39;audio&#39;\)|App\.kaoS0\('audio'\)/, 'ses yoksa ses düğmesi gösterilmez');
@@ -250,7 +251,7 @@ check('(g/K2F-12) S0 görünümü a11y sözleşmesi: başlık etiketi, Arapça l
   assert.equal(t.api.kaoS0('start', 's0.02'), true);
   assert.equal(t.calls.focus.length, focusBefore, 'görünüm değişimi odağı kendiliğinden taşımaz (units/grammar/stats ile aynı sözleşme)');
   const html = t.api.kaoOverlayHTML(t.NOW);
-  const label = /<main class="kao-s0" aria-labelledby="([^"]+)"/.exec(html);
+  const label = /<main class="kao-s0"[^>]*aria-labelledby="([^"]+)"/.exec(html);
   assert.ok(label, 'S0 ana bölgesi aria-labelledby taşır');
   assert.equal((html.match(new RegExp(`id="${label[1]}"`, 'g')) || []).length, 1, 'etiketlenen başlık tek ve var');
   assert.match(html, /role="dialog" aria-modal="true" aria-labelledby="kao-title"/, 'çerçeve diyaloğu korunur');
@@ -314,16 +315,18 @@ check('(h/K2F-13) harfsiz derslerin çizimi örnekleri okunuşuyla gösterir; ko
   const t = boot();
   for (const id of ['s0.01', 's0.03', 's0.08', 's0.09', 's0.11']) {
     t.api.kaoS0Start(id);
+    assert.equal(t.api.kaoS0('next'), true, `${id}: dinle aşamasına geç`);
     const html = decode(t.api.kaoS0HTML());
     const lesson = t.curriculum.s0.lessons.find((l) => l.id === id);
     for (const e of lesson.examples) assert.ok(html.includes(e.ar) && html.includes(e.translit), `${id}: ${e.wordId} Arapça + okunuş görünmeli`);
     for (const m of lesson.focus.marks) assert.ok(html.includes(m.tr), `${id}: ${m.id} Türkçe adı görünmeli`);
   }
   t.api.kaoS0Start('s0.07');
+  assert.equal(t.api.kaoS0('next'), true);
   const positions = decode(t.api.kaoS0HTML());
   assert.equal((positions.match(/class="kao-s0-pos-row"/g) || []).length, 28, '28 harflik konum tablosu');
   t.api.kaoS0Start('s0.01');
-  assert.equal(t.api.kaoS0('audio', 0), true, 'ilk örnek çalınır');
+  assert.equal(t.api.kaoS0('audio', 0), true, 'ilk örnek çalınır (aşamadan bağımsız eylem)');
   assert.match(t.played[t.played.length - 1], /\.m4a$/, 'klip dosyası çalındı');
   assert.equal(t.api.kaoS0('audio', 99), false, 'olmayan örnek reddedilir');
 });
@@ -343,6 +346,139 @@ check('(h/K2F-13) gerçek giriş satırı: Keşfet\'teki "Seviye 0" satırı (s0
   for (const lesson of t.win.QuranCurriculumV2.s0.lessons) {
     assert.equal(t.api.kaoS0('start', lesson.id), true, lesson.id);
     assert.doesNotThrow(() => t.api.kaoOverlayHTML(t.NOW), `${lesson.id}: görünüm çökmemeli`);
+  }
+});
+
+// ---- (i) K2F-14 · 4 aşama gerçekten farklı; 6–8 puanlı alıştırma ---------------------------------
+const primaries = (html) => (html.match(/<button[^>]*class="kao-primary"[^>]*>/g) || []);
+const stageOf = (html) => (/data-stage="([a-z]+)"/.exec(html) || [])[1];
+const nextQuestion = (t) => { const d = t.ui.kaoS0.drill; return d.items[d.index]; };
+const answerWith = (t, wanted) => { const q = nextQuestion(t); const c = q.choices.find((x) => x.correct === wanted); return t.api.kaoS0('answer', c.id); };
+
+function playAll(t, id, { wrongFirst = false } = {}) {
+  const sig = {};
+  assert.equal(t.api.kaoS0Start(id), true, id);
+  sig.intro = decode(t.api.kaoS0HTML());
+  assert.equal(stageOf(sig.intro), 'intro', `${id}: ilk aşama intro`);
+  assert.equal(t.api.kaoS0('next'), true);
+  sig.listen = decode(t.api.kaoS0HTML());
+  assert.equal(stageOf(sig.listen), 'listen', `${id}: ikinci aşama listen`);
+  assert.equal(t.api.kaoS0('next'), true);
+  sig.drill = decode(t.api.kaoS0HTML());
+  assert.equal(stageOf(sig.drill), 'drill', `${id}: üçüncü aşama drill`);
+  const total = t.ui.kaoS0.drill.items.length;
+  for (let i = 0; i < total; i += 1) {
+    assert.equal(t.api.kaoS0('next'), false, `${id}: cevaplanmadan next pasif (soru ${i + 1})`);
+    assert.equal(answerWith(t, !(wrongFirst && i === 0)), true);
+    assert.equal(t.api.kaoS0('answer', 'c0'), false, `${id}: aynı soru ikinci kez cevaplanamaz`);
+    if (i === 0) sig.feedback = decode(t.api.kaoS0HTML());
+    assert.equal(t.api.kaoS0('next'), true);
+  }
+  sig.read = decode(t.api.kaoS0HTML());
+  assert.equal(stageOf(sig.read), 'read', `${id}: dördüncü aşama read`);
+  assert.equal(t.api.kaoS0('read', 'toggle'), true);
+  sig.readShown = decode(t.api.kaoS0HTML());
+  assert.equal(t.api.kaoS0('read'), true, 'Okudum');
+  sig.done = decode(t.api.kaoS0HTML());
+  assert.equal(stageOf(sig.done), 'done');
+  return { sig, total, correct: t.ui.kaoS0.drill.correct };
+}
+
+check('(i/K2F-14) 12 ders × 4 aşama: aşama HTML\'leri birbirinden farklı, aşama başına ≤1 .kao-primary, her derste 6–8 soru, cevaplamadan next pasif', () => {
+  for (const lesson of boot().curriculum.s0.lessons) {
+    const t = boot();
+    const { sig, total } = playAll(t, lesson.id);
+    assert.ok(total >= 6 && total <= 8, `${lesson.id}: ${total} soru (6–8 olmalı)`);
+    const stages = ['intro', 'listen', 'drill', 'read', 'done'];
+    assert.equal(new Set(stages.map((k) => sig[k].replace(/\s+/g, ' '))).size, 5, `${lesson.id}: 5 aşama HTML'i birbirinden farklı`);
+    for (const k of stages) assert.ok(primaries(sig[k]).length <= 1, `${lesson.id}/${k}: birden çok .kao-primary`);
+    assert.match(sig.drill, /<button[^>]*class="kao-primary"[^>]*disabled/, `${lesson.id}: cevaplanmamış soruda birincil düğme pasif`);
+    assert.match(sig.drill, /aria-live="polite"/, `${lesson.id}: geri bildirim aria-live`);
+    assert.match(sig.read, /okunuşu gizli/, `${lesson.id}: okunuş başta gizli`);
+    assert.doesNotMatch(sig.readShown, /okunuşu gizli/, `${lesson.id}: okunuş gösterilince açılır`);
+    assert.match(sig.readShown, /Okunuşu gizle/);
+  }
+});
+
+check('(i/K2F-14) puanlama: yanlış cevap doğrusunu gösterir ve doğru sayısını artırmaz; bitişte "n−1 / n doğru"', () => {
+  const t = boot();
+  const { sig, total, correct } = playAll(t, 's0.02', { wrongFirst: true });
+  assert.equal(correct, total - 1, 'ilk soru yanlış → n−1 doğru');
+  assert.match(sig.feedback, /Doğrusu: /, 'yanlışta doğru cevap gösterilir');
+  assert.match(sig.feedback, /kao-choice-wrong/);
+  assert.match(sig.feedback, /kao-choice-correct/);
+  assert.match(sig.done, new RegExp(`${total - 1} / ${total} doğru`));
+  const t2 = boot();
+  const all = playAll(t2, 's0.02');
+  assert.equal(all.correct, all.total);
+  assert.match(all.sig.done, new RegExp(`${all.total} / ${all.total} doğru`));
+});
+
+check('(i/K2F-14) soru türleri dersin focus\'una göre; çeldiriciler benzersiz (2–4 şık, tek doğru); aynı ders tohumuyla bayt-eşit', () => {
+  const kindsOf = (t, id) => { t.api.kaoS0Start(id); t.api.kaoS0('next'); t.api.kaoS0('next'); return new Set(t.ui.kaoS0.drill.items.map((x) => x.type)); };
+  const t = boot();
+  const expectKinds = {
+    's0.02': ['letter-id', 'position', 'shape'], 's0.01': ['mark-name', 'word-sound', 'word-meaning'], 's0.03': ['mark-name', 'word-sound', 'word-meaning'],
+    's0.07': ['position', 'form-letter'], 's0.08': ['mark-name', 'word-sound', 'word-meaning'], 's0.09': ['mark-name', 'word-sound', 'word-meaning'],
+    's0.11': ['mark-name', 'word-sound', 'word-meaning'], 's0.12': ['word-meaning']
+  };
+  for (const [id, kinds] of Object.entries(expectKinds)) {
+    const got = kindsOf(t, id);
+    for (const k of kinds) assert.ok(got.has(k), `${id}: ${k} sorusu yok (${[...got].join(',')})`);
+  }
+  for (const lesson of t.curriculum.s0.lessons) {
+    t.api.kaoS0Start(lesson.id); t.api.kaoS0('next'); t.api.kaoS0('next');
+    for (const item of t.ui.kaoS0.drill.items) {
+      assert.ok(item.choices.length >= 2 && item.choices.length <= 4, `${item.id}: şık sayısı`);
+      assert.equal(item.choices.filter((c) => c.correct).length, 1, `${item.id}: tek doğru`);
+      assert.equal(new Set(Array.from(item.choices, (c) => c.label)).size, item.choices.length, `${item.id}: şıklar benzersiz`);
+    }
+  }
+  const run = () => { const b = boot(); b.api.kaoS0Start('s0.05'); b.api.kaoS0('next'); b.api.kaoS0('next'); return JSON.stringify(b.ui.kaoS0.drill.items); };
+  assert.equal(run(), run(), 'aynı ders aynı sorular (belirlenimci)');
+});
+
+check('(i/K2F-14) tüm Arapça içerik modüllerden: soru uyaranı ve Arapça şıklar harf/konum/örnek/Fâtiha verisinde var; harf dersi çeldiricileri önce aynı aileden', () => {
+  const t = boot();
+  const allowed = new Set();
+  for (const l of t.phonics.letters) allowed.add(String(l.ar));
+  for (const r of t.api.kaoS0PositionTable().rows) for (const c of r.cells) if (c.ar) allowed.add(c.ar);
+  for (const l of t.curriculum.s0.lessons) for (const e of (l.examples || [])) allowed.add(e.ar);
+  for (const w of t.api.kaoS0Lesson('s0.12').words) allowed.add(w.ar);
+  const marks = new Set(); for (const l of t.curriculum.s0.lessons) for (const m of ((l.focus && l.focus.marks) || [])) marks.add(m.glyph);
+  for (const lesson of t.curriculum.s0.lessons) {
+    t.api.kaoS0Start(lesson.id); t.api.kaoS0('next'); t.api.kaoS0('next');
+    for (const item of t.ui.kaoS0.drill.items) {
+      if (item.stimulus.ar) assert.ok(allowed.has(item.stimulus.ar), `${item.id}: uyaran Arapçası modülde yok`);
+      if (item.stimulus.glyph) assert.ok(marks.has(item.stimulus.glyph), `${item.id}: işaret simgesi modülde yok`);
+      for (const c of item.choices) if (c.ar) assert.ok(allowed.has(c.label), `${item.id}: Arapça şık modülde yok`);
+    }
+  }
+  t.api.kaoS0Start('s0.05'); t.api.kaoS0('next'); t.api.kaoS0('next');
+  const family = new Set(['dal', 'dhal', 'ra', 'zay', 'waw'].map((id) => t.phonics.letters.find((l) => l.id === id).ar));
+  const shape = t.ui.kaoS0.drill.items.find((x) => x.type === 'shape');
+  assert.ok(shape.choices.filter((c) => !c.correct && family.has(c.label)).length >= 2, 'şekil sorusunda çeldiriciler önce aynı aileden');
+});
+
+check('(i/K2F-14) ses yoksa alıştırma ve okuma yine tamamlanır; "ses kapalı" notu dinle aşamasında görünür, çalışmayan ses düğmesi yok', () => {
+  const box = { window: {}, Date };
+  vm.createContext(box);
+  for (const n of CONTENT) vm.runInContext(fs.readFileSync(path.join(repoRoot, `app/content/${n}.js`), 'utf8'), box, { filename: n });
+  for (const f of ['app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, f), 'utf8'), box, { filename: f });
+  const data = { settings: {}, days: {}, quranLearn: null }; const ui = { kaoOpen: true, kaoView: 'home', kaoStack: [] };
+  const api = box.window.SeymaQuranLearn;
+  api.registerQuranLearn({ data: () => data, ui: () => ui, save() {}, render() {}, todayStr: () => '2026-09-30', esc, icon: () => '', getDay: () => ({}) });
+  api.registerQuranLearnSurface({ toast() {}, isQuietTime: false, mount() {}, lockBody() {}, unlockBody() {}, focusDialog() {}, restoreFocus() {}, activeElementId: () => '', sheetClose(e, bk, done) { done && done(); }, taskElement: () => null });
+  api.ensureQuranLearn(data).onboarding.doneAt = '2026-09-20T00:00:00.000Z';
+  for (const id of ['s0.02', 's0.01', 's0.12']) {
+    api.kaoS0Start(id); api.kaoS0('next');
+    const listen = decode(api.kaoS0HTML());
+    assert.match(listen, /ses kapalı/, `${id}: sessiz yol anlatılır`);
+    assert.doesNotMatch(listen, /App\.kaoS0\('(audio|playall)'/, `${id}: çalışmayan ses düğmesi yok`);
+    api.kaoS0('next');
+    for (let i = 0; i < ui.kaoS0.drill.items.length; i += 1) { const q = ui.kaoS0.drill.items[ui.kaoS0.drill.index]; api.kaoS0('answer', q.choices.find((c) => c.correct).id); api.kaoS0('next'); }
+    assert.equal(api.kaoS0('read'), true, `${id}: sessiz cihazda okuma tamamlanır`);
+    assert.match(decode(api.kaoS0HTML()), /Ders tamam/);
   }
 });
 

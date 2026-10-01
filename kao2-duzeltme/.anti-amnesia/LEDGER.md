@@ -405,3 +405,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: giriş satırı (s0.01) artık çökmüyor; harfsiz derslerde puanlı alıştırma K2F-14'te; sıfır kartlı S0 öğrencisinin yolu K2F-15.
 - next: K2F-14
+
+## seq 43 · 2026-10-01 · PROMPT · K2F-14
+- status: done
+- title: Seviye 0 3/4 — aşamalar ve alıştırmalar
+- prev-commit: 52b2a9ea
+- evidence: kao2-duzeltme/evidence/K2F-14/KANIT.md
+- closes: K5-02 (v) · D-10
+- repro: değişmedi · toplam 7/10
+- gates: kapilar.sh YEŞİL (kao 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 43 · yüzey 764 · atama 602 · yayın 20261001e (yayınlanan `quranLearn.js`, `quranLearnViews.js`, `kao.css` değişti: sonraki yayında pin yükselmeli)
+- changed-tests: test_kao2_syllable_audio.js (Dokun dışı, kullanıcı onayı: ses düğmesi dinle aşamasında) · test_kao2_s0.js (d)/(h) dinle aşamasına uyarlandı
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: test-önce sırası ters (önce uygulama, sonra test; önceki sürüme karşı kırmızı doğrulandı); S0 tamamlanması `path.lessons`'a henüz yazılmıyor (K2F-15).
+- next: K2F-15

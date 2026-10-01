@@ -202,6 +202,7 @@ check('(3) kayıt yokken çalışmayan hece oynatma kontrolü gösterilmez', () 
   });
   api.ensureQuranLearn(data).onboarding.doneAt = '2026-09-20T00:00:00.000Z';
   api.kaoS0Start('s0.02');
+  api.kaoS0('next'); // K2F-14: ses düğmesi dinle-gör aşamasında (aşama 0 yalnız açıklama)
   const html = String(api.kaoS0HTML()).replace(/&quot;/g, '"').replace(/&#39;/g, "'");
   assert.doesNotMatch(html, /y-[a-z]+_[a-z_]+-[mf]/, 'kayıt yokken hece klibi çağrılmaz');
   assert.match(html, /App\.kaoS0\('audio'\)/, 'kelime içi ses (kademe B) sunulur');

@@ -169,8 +169,14 @@ const mixedGrammarQueue = api.kaoBuildQueue({ quranLearn: { settings: { dailyNew
   candidates: grammarCandidates.concat(Array.from({ length: 20 }, (_, i) => ({ id: `w:mixed-${i}:ar>tr`, type: 'word', isNew: true, pos: 'N', root: `mixed-root-${i}` }))),
   sessionId: 'grammar-mixed'
 });
-assert.equal(mixedGrammarQueue.filter((item) => item.type === 'grammar').length, 4, 'karma gerçek oturum dört gramer türünü korumalı');
-assert.deepEqual(new Set(mixedGrammarQueue.filter((item) => item.type === 'grammar').map((item) => api.kaoBuildGrammarTask(item, { quranLearn: { cards: {} } }, { seed: item.id }).grammarType)), grammarTypes, 'karma oturumda dört gramer türü');
+const visibleGrammarTasks = mixedGrammarQueue.filter((item) => item.type === 'grammar');
+assert.equal(visibleGrammarTasks.length, 3, 'karma oturum yalnız geçerli gramer görevlerini korumalı; geçersiz Çekim tablosu K2F-10 ile elenir');
+const visibleGrammarTypes = new Set(visibleGrammarTasks.map((item) => {
+  const task = api.kaoBuildGrammarTask(item, { quranLearn: { cards: {} } }, { seed: item.id });
+  assert.equal(api.kaoGrammarTaskValid(task), true, `${item.cardId}: geçersiz görev kuyruğa girdi`);
+  return task.grammarType;
+}));
+assert.deepEqual([...visibleGrammarTypes].sort(), ['Ek çöz', 'Kalıp eşle', 'Kök bul'].sort(), 'yalnız güvenli gramer türleri sunulmalı');
 for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQueue[i].type === mixedGrammarQueue[i - 1].type && mixedGrammarQueue[i].type === mixedGrammarQueue[i - 2].type), 'karma oturum serpiştirilmiş');
 
 
@@ -291,4 +297,4 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
   assert.deepEqual(oneWay, [], 'R-A2: ilk günden sonra her oturum iki yönü taşır');
 }
 
-console.log(`KAO queue: PASS (${first.length} deterministic tasks + 4 grammar types, budgets/KF-9 interleave x1000/semantic spacing)`);
+console.log(`KAO queue: PASS (${first.length} deterministic tasks + 4 candidate types / 3 safe queue types, budgets/KF-9 interleave x1000/semantic spacing)`);

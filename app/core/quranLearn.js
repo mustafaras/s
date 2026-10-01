@@ -291,7 +291,10 @@
     var opts=options&&typeof options==='object'?options:{};
     var now=validDate(nowValue,'now'),q=quranLearnRoot(d),cards=objectOr(q.cards,{});
     var source=Array.isArray(opts.candidates)?opts.candidates:Object.keys(cards).map(function(id){ return {id:id}; });
-    var records=source.map(function(raw){ return candidateRecord(raw,cards,opts); }).filter(Boolean);
+    // K2F-10: sunulamayan gramer kartı kuyruğa girmez (kart silinmez; yalnız sunumu kesilir, kapasite harcamaz).
+    var records=source.map(function(raw){ return candidateRecord(raw,cards,opts); }).filter(Boolean).filter(function(item){
+      return item.type!=='grammar'||kaoGrammarItemPresentable({id:'kao:'+daySeed(now)+':'+item.cardId,cardId:item.cardId},d);
+    });
     var seed=daySeed(now)+'|'+String(opts.sessionId||'');
     records.sort(function(a,b){ return b.priority-a.priority||seededRank(seed,a.cardId)-seededRank(seed,b.cardId)||a.cardId.localeCompare(b.cardId); });
     var due=records.filter(function(item){
@@ -1169,6 +1172,62 @@
     var answerValue=choiceValue(answer);
     return {id:taskId,cardId:cardId,type:'grammar',grammarType:type,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:String(template.prompt||type),stimulus:stimulus,stimulusPronunciation:stimulusPronunciation,context:context,errorClass:errorClass,answer:answerValue.label,clipId:'',choices:choiceList(alternatives,answerValue,seed,taskId)};
   }
+  // K2F-10 (K4-02, fail-closed): yanlış öğretebilecek gramer görevi HİÇ gösterilmez. Kurallar denetimin beş kuralıdır
+  // (tek şık · "el +" yalnız g1 · Çekim tablosu dışında Arapça uyaran · Çekim tablosu yönergesindeki hücre = uyaran ·
+  // örnekli şablonda uyaran o âyet örneğinin içinde) + tam bir doğru şık + boş/yinelenen şık etiketi yok.
+  // Örnek verisi doğrulanmış QuranGrammarV1.exampleById'den gelir; çözülemeyen exampleId de geçersiz sayılır.
+  function kaoGrammarTaskValid(task){
+    if(!task||task.type!=='grammar') return false;
+    var record=grammarRecord(task.cardId),choices=Array.isArray(task.choices)?task.choices:[];
+    if(!record||choices.length<2) return false;
+    var labels=choices.map(function(item){ return String(item&&item.label||''); }),correct=choices.filter(function(item){ return item&&item.correct===true; });
+    if(correct.length!==1||labels.some(function(label){ return !label; })||labels.some(function(label,index){ return labels.indexOf(label)!==index; })) return false;
+    if(task.grammarType!==record.template.type) return false;
+    var answer=String(correct[0].label||''),stimulus=String(task.stimulus||''),conceptId=record.concept.id,type=record.template.type;
+    if(type==='Ek çöz'&&/^el \+/.test(answer)&&conceptId!=='g1') return false;
+    if(type!=='Çekim tablosu'&&!/[\u0600-\u06ff]/.test(stimulus)) return false;
+    if(type==='Çekim tablosu'){
+      var quoted=/'([^']+)'/.exec(String(task.prompt||''));
+      if(quoted&&quoted[1]!==stimulus) return false;
+    }
+    if(record.template.exampleId){
+      var examples=Array.isArray(record.concept.examples)?record.concept.examples:[];
+      var example=examples.find(function(item){ return item.id===record.template.exampleId; });
+      if(!example||!example.ar||!stimulus||example.ar.indexOf(stimulus)<0) return false;
+    }
+    return true;
+  }
+  // Bir kuyruk/plan öğesinin gramer görevi, GERÇEKTE kurulacağı tohumla (öğe kimliği) kurulup doğrulanır;
+  // gramer dışı öğeler her zaman sunulabilir. Görev kuruluş kuralı değişmez, yalnız sunum kapısı eklenir.
+  // Şablonu çözülemeyen `g:` kartı için görev hiç kurulmaz (yanlış öğretemez); kapı yalnız "kurulan ama yanlış" görevi keser,
+  // çözülemeyen kartın eski davranışı (kuyruk zamanlaması) değişmez.
+  function kaoGrammarItemPresentable(item,d){
+    var id=String(item&&item.cardId||item&&item.id||'');
+    if(!/^g:/.test(id)||!grammarRecord(id)) return true;
+    return kaoGrammarTaskValid(kaoBuildGrammarTask(item,d,{seed:String(item&&item.id||id)}));
+  }
+  // Ders planında sunulamayan gramer alıştırmasını AYNI dersin bir kelime alıştırmasıyla değiştirir: öğe kimliği (devam
+  // noktası) ve sırası korunur, alıştırma sayısı düşmez. Önce dersin henüz kullanılmamış kart yönleri, yoksa tekrar.
+  function kaoLessonSafePlan(plan,d){
+    var goal=plan.find(function(item){ return item.kind==='goal'; }),eligible=goal&&Array.isArray(goal.lemmaIds)?goal.lemmaIds:[];
+    var used=Object.create(null),cards=objectOr(quranLearnRoot(d).cards,{}),spare=0;
+    plan.forEach(function(item){ if(item.kind==='practice') used[item.cardId]=true; });
+    function pickWord(){
+      for(var i=0;i<eligible.length;i+=1) for(var k=0;k<2;k+=1){
+        var direction=k===0?'tr>ar':'ar>tr',cardId='w:'+eligible[i]+':'+direction;
+        if(!used[cardId]) return {lemmaId:eligible[i],direction:direction};
+      }
+      spare+=1; return {lemmaId:eligible[(spare-1)%eligible.length],direction:'tr>ar'};
+    }
+    return plan.reduce(function(out,item){
+      if(item.kind!=='practice'||item.group!=='concept'||kaoGrammarItemPresentable({id:item.id,cardId:item.cardId,type:'grammar'},d)){ out.push(item); return out; }
+      if(!eligible.length) return out;
+      var word=pickWord(),cardId='w:'+word.lemmaId+':'+word.direction;
+      used[cardId]=true;
+      out.push({id:item.id,kind:'practice',group:'lemma',lessonId:item.lessonId,lemmaId:word.lemmaId,cardId:cardId,type:word.direction==='tr>ar'?'arabic':'meaning',direction:word.direction,choiceCount:item.choiceCount,audioOnly:false,isNew:!nonNegativeNumber(objectOr(cards[cardId],{}).reps,0),substitutedFor:item.cardId});
+      return out;
+    },[]);
+  }
   function kaoCandidates(){
     var lex=window.QuranLexiconV1;
     if(!lex||!Array.isArray(lex.lemmas)) return [];
@@ -1424,6 +1483,7 @@
     }
     var now=new Date(),plan=flow.lessonPlan({quranLearn:q},lesson.id,now,content);
     if(!Array.isArray(plan)||!plan.length) return false;
+    plan=kaoLessonSafePlan(plan,d);
     var reviews=startMode==='intro'?[]:kaoBuildQueue(d,now,{sessionId:quranLearnDeps.todayStr(),candidates:kaoCandidates(),dailyNew:0}).filter(function(item){ return !item.isNew; }).slice(0,20);
     var record=kaoLessonRecord(q,lesson.id),resume=objectOr(record.resume,{}),state={lessonId:lesson.id,title:String(lesson.title||''),plan:plan,at:0,phase:reviews.length?'review':'lesson',reviews:reviews,correct:0,answered:0,done:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:record.startedAt||now.toISOString(),resumeAt:0};
     if(startMode==='intro'){ state.at=Math.max(0,plan.findIndex(function(item){ return item.kind==='intro'; })); state.resumeAt=state.at; }
@@ -1710,7 +1770,11 @@
     if(!isDurable(previous)&&isDurable(scheduled)) ui.kaoDurableCount=Math.floor(nonNegativeNumber(ui.kaoDurableCount,0))+1;
     if(!correct&&task.errorClass&&Object.prototype.hasOwnProperty.call(q.errors,task.errorClass)) q.errors[task.errorClass]+=1;
     // Ustalık karma testinde yanlışa anında yeniden deneme eklenmez: puan yalnız ilk 10 cevaptan gelir (K2F-06).
-    if(!correct&&!task.retry&&!(ui.kaoLesson&&ui.kaoLesson.kind==='mastery')) ui.kaoQueue.push(Object.assign({},ui.kaoQueue[ui.kaoTaskIndex],{id:task.id+':retry',retry:true,isNew:false}));
+    if(!correct&&!task.retry&&!(ui.kaoLesson&&ui.kaoLesson.kind==='mastery')){
+      // Yeniden deneme farklı tohumla (kimlik+':retry') kurulur; K2F-10: sunulamayan gramer görevi tekrarlanmaz.
+      var retryItem=Object.assign({},ui.kaoQueue[ui.kaoTaskIndex],{id:task.id+':retry',retry:true,isNew:false});
+      if(kaoGrammarItemPresentable(retryItem,d)) ui.kaoQueue.push(retryItem);
+    }
     ui.kaoOrderDraft=task.kind==='order'?cloneValue(ui.kaoOrderDraft):[];
     var earned=recordMilestones(q,d,now),lessonMilestone=kaoRememberLessonMilestones(ui,earned); if(correct) kaoFx('correct'); if(earned.length&&!lessonMilestone) kaoFx('milestone');
     var notes=[]; if(task.kind==='order'&&!correct) notes.push('Fiil önce gelir: Arapçada çoğu kez fiil–özne–nesne sırası kullanılır.'); if(earned.length&&!lessonMilestone) notes.push(KAO_MILESTONE_LABELS[earned[earned.length-1]]+' ✦');
@@ -3364,6 +3428,7 @@
     kaoBuildTask:kaoBuildTask,
     kaoGrammarCandidates:grammarCandidates,
     kaoBuildGrammarTask:kaoBuildGrammarTask,
+    kaoGrammarTaskValid:kaoGrammarTaskValid,
     kaoFragmentCandidates:fragmentCandidates,
     kaoBuildFragmentTask:kaoBuildFragmentTask,
     kaoShouldAutoplay:kaoShouldAutoplay,

@@ -296,3 +296,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - scope-effect: `tests/kao/test_kao_queue.js` 4-tür beklentisi, yalnız geçerli gramer görevlerinin sunulduğunu doğrular; geçersiz Çekim tablosu şablonları K2F-11'e kadar atlanır.
 - prompt-state: K2F-10 done · nextPrompt K2F-11 · releaseApproval approved_through_K2F-09.
 - next: K2F-11
+
+## seq 31 · 2026-10-01 · DECISION · K2F-10
+- decision: Beşinci erken yayın — kullanıcı açık isteği ("push commit merge deploy"). Kapsam: K2F-10 (gramer fail-closed güvenlik ağı: `app/core/quranLearn.js`). Pin `20261001b` → `20261001c` (index.html, sw.js, 8 pin taşıyan test). Yayınlanan varlık değişikliği yalnız `app/core/quranLearn.js`.
+- scope-effect: planlı YAYIN-1 (K2F-18) ayrıca sürer. `releaseApproval` = `approved_through_K2F-10`. Canlıda yanlış gramer görevleri (K4-02) bu yayınla kesilir; Çekim tablosu türü K2F-11'e kadar sunulmaz.
+- known-exposure (canlıda sürer, K2F-11…17): R-05 `App.kaoS0` tanımsız, R-06 Seviye 0 çökmeleri, R-04/R-07/R-08.
+- steps: pin commit → `main` ff-only → push → Pages izleme → canlı bayt-eşitliği + gizlilik 404 → `lastRelease` kaydı.
+- next: K2F-11

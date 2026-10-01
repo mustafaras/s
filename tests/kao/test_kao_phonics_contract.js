@@ -19,7 +19,8 @@ load('app/content/quranLexiconV1.js', sandbox);
 const grammarBytes = load('app/content/quranGrammarV1.js', sandbox);
 const surahBytes = load('app/content/quranShortSurahsV1.js', sandbox);
 const phonicsBytes = load('app/content/quranPhonicsV1.js', sandbox);
-assert.ok(grammarBytes <= 60 * 1024, 'gramer modülü 60 KB bütçesini aşmamalı');
+// K2F-09 (kullanıcı kararı): gramer modülü ham tavanı 60 → 128 KiB (doğrulanmış âyet örnekleri taşındı); gzip bütçeleri ayrıca bağlayıcı.
+assert.ok(grammarBytes <= 128 * 1024, 'gramer modülü 128 KiB ham bütçesini aşmamalı');
 assert.ok(surahBytes <= 90 * 1024, 'kısa sûre modülü 90 KB bütçesini aşmamalı');
 assert.ok(phonicsBytes <= 40 * 1024, 'fonetik modülü 40 KB bütçesini aşmamalı');
 

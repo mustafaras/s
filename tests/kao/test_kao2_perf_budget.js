@@ -23,7 +23,8 @@ const gzip = (files) => files.reduce((sum, file) => sum + zlib.gzipSync(read(fil
 const contentGzip = gzip(content), legacyGzip = gzip(legacy);
 const runtimeGzip = gzip(runtime), cssGzip = gzip(['app/kao.css']);
 assert.ok(contentGzip <= 256 * 1024, `content ${contentGzip} bytes exceeds budget`);
-assert.ok(legacyGzip <= 164 * 1024, `legacy ${legacyGzip} bytes exceeds 164 KiB`);
+// K2F-09 (kullanıcı kararı): eski 4 modül alt tavanı 164 → 176 KiB (gramer örnekleri taşındı); toplam 256 KiB tavanı değişmedi.
+assert.ok(legacyGzip <= 176 * 1024, `legacy ${legacyGzip} bytes exceeds 176 KiB`);
 assert.ok(gzip([curriculum]) <= 48 * 1024, 'curriculum exceeds 48 KiB');
 // K-1 revizyonu (2026-09-29, kullanıcı onayı): KAO2-18+ açıklama/örnek katmanı
 // çalışma zamanı kodu gerektiriyor; bütçe 80 -> 88 KiB.

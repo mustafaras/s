@@ -61,6 +61,35 @@ function compactCell(cell, pronunciationSources) {
   if (resolved.ar && !pronunciation) throw new Error(`${resolved.ref || resolved.lemmaId || 'hücre'}: Arapça hücre okunuşsuz dondurulamaz`);
   return [resolved.ref || null, resolved.ar || null, pronunciation || null];
 }
+// K2F-09 (K4-02 kök neden): doğrulanmış âyet örnekleri çalışma zamanına taşınır. Arapça `grammar.verified.json`
+// `resolved` alanından (Tanzil) aynen gelir; okunuş yalnız QAC 0.4 Buckwalter yüzeyinin D-12 Türkçe projeksiyonudur
+// (hücrelerle aynı yol). Elle metin yok: kelime QAC'ta bulunmuyor, Arapçası QAC yüzeyiyle (normalize) örtüşmüyor,
+// okunuşu boş ya da `ar` kelimelerin birleşimi değilse dondurma hata verir.
+// Ünsüz iskeleti: işaretler, Kur'ân'a özgü küçük harf/işaretler (U+06D6–06ED), tatvil ve zayıf harfler (ا و ي ى) atılır.
+// Tanzil (Uthmani) ile QAC yüzeyi arasındaki yazım farkını (hançer elif, küçük yâ…) aşar; farklı kelimeyi yakalar.
+function skeletonArabic(value) {
+  return String(value || '').normalize('NFKD').replace(/\p{M}/gu, '').replace(/[\u06D6-\u06ED\u0640]/gu, '')
+    .replace(/[ٱأإآءؤئ]/gu, 'ا').replace(/ى/gu, 'ي').replace(/[اويى]/gu, '').replace(/ة/gu, 'ه');
+}
+function compactExample(example, pronunciationSources) {
+  const resolved = example.resolved || {};
+  const words = Array.isArray(resolved.words) ? resolved.words : [];
+  if (!example.id || !/^\d+:\d+$/.test(example.ref || '') || !example.tr || !resolved.ar || !words.length) throw new Error(`${example.id || 'örnek'}: eksik alan (id/ref/tr/ar/words)`);
+  if (words.map((word) => word.ar).join(' ') !== resolved.ar) throw new Error(`${example.id}: ar kelimelerin birleşimi değil (türetme güvencesi)`);
+  // Kelime indeksleri ardışık ve from..to ile örtüşür → yalnız başlangıç saklanır, `w` yüklemede türetilir (boyut).
+  if (!words.every((word, index) => word.w === words[0].w + index) || example.from !== words[0].w || example.to !== words[words.length - 1].w) throw new Error(`${example.id}: kelime indeksleri ardışık değil (türetme güvencesi)`);
+  const frozenWords = words.map((word) => {
+    const key = `${example.ref}:${word.w}`;
+    const qac = pronunciationSources.qac.get(key);
+    if (!qac) throw new Error(`${example.id}: ${key} QAC'ta yok`);
+    const all = qac.segments.map((segment) => segment.form).join('');
+    if (skeletonArabic(bwToArabic(all)) !== skeletonArabic(word.ar)) throw new Error(`${example.id}: ${key} Arapçası QAC yüzeyiyle (ünsüz iskeleti) örtüşmüyor`);
+    const pronunciation = turkishPronunciation(qacPronunciation(qac, true));
+    if (!pronunciation) throw new Error(`${example.id}: ${key} okunuşsuz dondurulamaz`);
+    return [word.ar, pronunciation];
+  });
+  return [example.id, example.ref, words[0].w, example.tr, frozenWords];
+}
 function freezeGrammar() {
   const input = readJson('grammar.verified.json');
   if (input.consistencyTotal !== 0 || input.verifiedTotal !== 26) throw new Error('grammar.verified doğrulama kapısı geçmedi');
@@ -76,8 +105,14 @@ function freezeGrammar() {
     templates: item.templates.map((template) => ({
       id: template.id, type: template.type, exampleId: template.exampleId,
       errorClass: template.errorClass, prompt: template.prompt
-    })), verified: true
+    })),
+    explanation: Array.isArray(item.explanation) ? item.explanation.slice() : [],
+    examples: (item.examples || []).map((example) => compactExample(example, pronunciationSources)),
+    verified: true
   }));
+  const exampleIds = new Set(concepts.flatMap((concept) => concept.examples.map((example) => example[0])));
+  const dangling = concepts.flatMap((concept) => concept.templates).filter((template) => template.exampleId && !exampleIds.has(template.exampleId));
+  if (dangling.length) throw new Error(`sarkık exampleId: ${dangling.map((template) => template.exampleId).join(', ')}`);
   const unit11 = {
     id: input.unit11.id, title: input.unit11.title, note: input.unit11.note,
     roots: input.unit11.roots.map((root) => ({
@@ -90,8 +125,11 @@ function freezeGrammar() {
     ATTRIBUTION: { source: 'grammar.verified.json', pronunciation: 'Pinned QAC 0.4 Buckwalter surface forms; deterministic D-12 Turkish-Latin projection', verification: 'D-12', generatedAt: '2026-09-25' },
     concepts, unit11
   };
-  const extras = "var byId=Object.create(null);data.concepts.forEach(function(x){byId[x.id]=x;});data.byId=function(id){return byId[id]||null;};";
-  write('app/content/quranGrammarV1.js', wrapper('QuranGrammarV1', 'quran-grammar-tr-v1', data, extras), 60 * 1024);
+  // Örnekler dizi biçiminde saklanır [id, ref, ilkKelimeIndeksi, tr, [[ar, okunuş]…]] (boyut); yükleme anında nesneye açılır:
+  // {id,ref,tr,ar(kelimelerin birleşimi),words:[{w(ardışık),ar,pronunciation}]}.
+  const extras = "var byId=Object.create(null),exById=Object.create(null);data.concepts.forEach(function(x){byId[x.id]=x;x.examples=x.examples.map(function(r){var words=r[4].map(function(v,i){return {w:r[2]+i,ar:v[0],pronunciation:v[1]};});var e={id:r[0],ref:r[1],tr:r[3],ar:words.map(function(v){return v.ar;}).join(' '),words:words};exById[e.id]=e;return e;});});data.byId=function(id){return byId[id]||null;};data.exampleById=function(id){return exById[id]||null;};";
+  // Ham tavan 60 → 128 KiB (K2F-09, kullanıcı kararı); bağlayıcı bütçeler gzip'tir (içerik ≤256, eski 4 modül ≤176 KiB — K2F-09'da 164'ten çıkarıldı).
+  write('app/content/quranGrammarV1.js', wrapper('QuranGrammarV1', 'quran-grammar-tr-v1', data, extras), 128 * 1024);
 }
 
 function lemmaKey(value) {

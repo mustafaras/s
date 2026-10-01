@@ -234,3 +234,24 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - note: push için sandbox `github.com`'u engelledi; yalnız `git push`, `gh` ve salt-okur `curl` komutları sandbox dışında çalıştı. `main` bu not commit'inin gerisindedir (belge-only).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
 - next: K2F-09
+
+## seq 24 · 2026-10-01 · DECISION · K2F-09
+- decision: İçerik bütçe tavanları kullanıcı kararıyla yükseltildi (P6 tetiklendi; kullanıcı: "çok daha yükseğe çıkarabilirsin neden çekiniyorsun"). (1) `quranGrammarV1.js` ham tavanı 60 → 128 KiB (araç `kao-content-freeze.mjs` + `test_kao_phonics_contract.js`). (2) Eski 4 modül gzip alt tavanı 164 → 176 KiB (`test_kao2_perf_budget.js`, `test_kao_user_tasks.js`). Toplam içerik tavanı 256 KiB, müfredat 48 KiB, runtime 128 KiB, css 14 KiB DEĞİŞMEDİ.
+- why: doğrulanmış 93 âyet örneği + 25 kavram açıklaması taşımak ham 51,4 → 71,7 KiB, eski 4 modül gzip(9) 162.173 → 167.938 B (164 KiB = 167.936 B tavanını 2 bayt aştı). Bilgi kaybı olmadan sıkıştırma (kelime indeksi `w` ilk indeksten türetilir, `ar` kelimelerin birleşimi) yapıldı; geri kalan ihtiyaç için tavan yükseltildi.
+- measured: içerik gzip 177,657 → 183,287 KiB (tavan 256); eski 4 modül 167.938 B (tavan 176 KiB = 180.224 B, pay ~12,3 KiB).
+- changed-tests: test_kao2_perf_budget.js, test_kao_user_tasks.js, test_kao_phonics_contract.js (yalnız bütçe sabiti; Dokun dışı, bu karar kapsamında).
+- next: K2F-09
+
+## seq 25 · 2026-10-01 · PROMPT · K2F-09
+- status: done
+- title: Gramer 1/3 — dondurma hattı örnekleri taşır
+- prev-commit: 4e6b4b6f
+- evidence: kao2-duzeltme/evidence/K2F-09/KANIT.md
+- closes: K4-02 (1/3 — kök neden: dondurma hattı `examples`/`explanation` atıyordu)
+- repro: değişmedi · toplam 4/10 (R-03 K2F-10'da)
+- gates: kapilar.sh YEŞİL (kao 49 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 42 · yüzey 763 · atama 601 · yayın 20261001a (içerik dosyası değişti: sonraki yayında pin yükselmeli)
+- changed-tests: test_kao2_perf_budget.js · test_kao_user_tasks.js · test_kao_phonics_contract.js (bütçe sabitleri; seq 24)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: Uthmani ↔ QAC yazım farkı (hançer elif, küçük yâ) yüzünden tam yüzey eşitliği yerine ünsüz iskeleti karşılaştırması kullanıldı (329/329 hizalı); `w` ardışık (93/93) ve `from..to` ile örtüşüyor → türetilebilir. `app/content/quranGrammarV1.js` değiştiği için yayında pin yükseltilmeli (index.html/sw.js).
+- next: K2F-10

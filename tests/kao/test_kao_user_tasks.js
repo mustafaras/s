@@ -120,7 +120,8 @@ for (const variant of [{ label: 'audio=false', quiet: false }, { label: 'sessiz 
   // KAO2 K-1 (2026-09-28): toplam 256 KiB, mevcut modüller 164 KiB; süre kapısı test_kao2_perf_budget.js
   const budget = 256 * 1024;
   const legacyTotal = CONTENT.reduce((sum, file) => sum + sizes[path.basename(file)], 0);
-  assert.ok(legacyTotal <= 164 * 1024, `mevcut modüller ${legacyTotal} bayt, tavan 164 KiB`);
+  // K2F-09 (kullanıcı kararı): alt tavan 164 → 176 KiB (gramer örnekleri); toplam 256 KiB tavanı aynı.
+  assert.ok(legacyTotal <= 176 * 1024, `mevcut modüller ${legacyTotal} bayt, tavan 176 KiB`);
   const guard = budget;
   assert.ok(total <= budget, `içerik gzip ${total} bayt, R-C5 bütçesi ${budget} (KAO2 K-1)`);
   assert.ok(!(total > budget), 'bütçe içinde: overBudget false');

@@ -13,12 +13,13 @@ const vm = require('node:vm');
 const repoRoot = require('../repo-root');
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const { legacyDraftState } = require('./helpers/kao-harness');
 const CONTENT = ['quranLexiconV1', 'quranGrammarV1', 'quranShortSurahsV1', 'quranPhonicsV1', 'quranCurriculumV2', 'quranRevelationOrderV1', 'quranStrikingVersesV1'];
 
 function boot(seed) {
   const box = { window: {}, Date };
   vm.createContext(box);
-  for (const n of CONTENT) vm.runInContext(fs.readFileSync(path.join(repoRoot, `app/content/${n}.js`), 'utf8'), box, { filename: n });
+  for (const n of CONTENT) vm.runInContext(legacyDraftState(n, fs.readFileSync(path.join(repoRoot, `app/content/${n}.js`), 'utf8')), box, { filename: n });
   for (const f of ['app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) {
     vm.runInContext(fs.readFileSync(path.join(repoRoot, f), 'utf8'), box, { filename: f });
   }

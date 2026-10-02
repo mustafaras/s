@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const zlib = require('node:zlib');
-const { bootKao, freshUser, read, repoRoot } = require('./helpers/kao-harness');
+const { bootKao, freshUser, read, repoRoot, legacyDraftState } = require('./helpers/kao-harness');
 
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
@@ -213,7 +213,7 @@ const lemmaOf = (task) => String(task.cardId).split(':')[1];
 
 // Ünite 1'in dersleri bitmiş (gerçek bir öğrenci gibi: ders kaydı + kartlar) kullanıcıyla yeni VM.
 function bootUnit1Done() {
-  const u = bootKao();
+  const u = bootKao({ transformSource: legacyDraftState });
   const q = freshUser(u);
   for (const lesson of u.win.QuranCurriculumV2.units[0].lessons) {
     q.path.lessons[lesson.id] = { startedAt: NOW.toISOString(), doneAt: NOW.toISOString(), score: 0.9, introducedLemmas: lesson.lemmaIds.slice() };
@@ -590,7 +590,7 @@ check('D(c) ustalık özeti: "10 sorudan N doğru", geçti → tek taş satırı
   assert.match(text(ph), /Ustalık geçildi/);
   assert.equal((text(ph).match(/Bir kilometre taşını tamamladın/g) || []).length, 1, 'tek sakin taş satırı');
   // K2F-22: Ünite 1 başlığı draft; taş satırı ham başlık yerine güvenli "Ünite 1" ile kurulur.
-  assert.equal(pass.api.kaoReviewLevel(curriculum.units[0].review), 'draft', 'Ünite 1 onaysız');
+  assert.equal(pass.api.kaoReviewLevel(pass.win.QuranCurriculumV2.units[0].review), 'draft', 'Ünite 1 onaysız');
   assert.match(text(ph), /Ünite 1 ünitesini bitirdim/);
   assert.doesNotMatch(text(ph), new RegExp(`${unit1Title()} ünitesini bitirdim`), 'draft ünite adı sızmaz');
   assert.match(text(ph), /Sıradaki adım/);

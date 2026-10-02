@@ -9,7 +9,7 @@
 |---|---|---|---|---|---|---|
 | 1 | 1 | Fâtiha | 5 | 23 | g0_5, g1, g2 | prayer:fatiha |
 | 2 | 1 | Namazın cümleleri | 3 | 16 | g3, g4 | prayer:tekbir, prayer:subhaneke, prayer:ruku, prayer:secde, prayer:tahiyyat, prayer:selam |
-| 3 | 1 | Üç koruyucu sûre | 6 | 28 | g5, g6 | surah:112, surah:113, surah:114 |
+| 3 | 1 | Üç kısa sûre | 6 | 28 | g5, g6 | surah:112, surah:113, surah:114 |
 | 4 | 2 | Kur'an'ın tutkalı | 5 | 25 | g7, g8 | lemma-pool:edat-baglac |
 | 5 | 2 | Bu, şu, kim, ne | 2 | 10 | g9, g10 | lemma-pool:isaret-soru |
 | 6 | 2 | Gök, yer ve insan | 30 | 147 | g11, g12 | lemma-pool:isim |
@@ -207,7 +207,7 @@ Kavram: — · Uygula: examples
 | 6 | عَن | ʿan | -den (uzaklaşma) | `l_Ean_2cd3f8` |
 
 
-## Ünite 3 · Üç koruyucu sûre
+## Ünite 3 · Üç kısa sûre
 
 Vaat: İhlâs, Felak ve Nâs'ı anlayarak okuyacaksın.
 
@@ -1103,7 +1103,7 @@ Kavram: — · Uygula: examples
 
 ## Ünite 10 · Bir kök, bir aile
 
-Vaat: Bir kökten Türkçedeki onlarca kelimeye uzanacaksın.
+Vaat: Bir kökten türeyen kelime ailesini göreceksin.
 
 ### u10.01 · Yapan ve yapılan
 

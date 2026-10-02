@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-23
-lastSeq: 64
+lastSeq: 65
 status: active
 -->
 
-Son güncelleme: 2026-10-02 · LEDGER seq 64 · K2F-00…22 tamam (23/44), sıradaki K2F-23. R-01…R-07, R-09, R-10 PASS (9/10).
+Son güncelleme: 2026-10-02 · LEDGER seq 65 · K2F-00…22 tamam (23/44), sıradaki K2F-23. R-01…R-07, R-09, R-10 PASS (9/10).
 
 ## Şu an neredeyiz
 K2F-22 bitti: L1 onayı yalnız işaretli metinlere taşındı (`sourced` ⇔ işaretli kutu). Ölçülen sayılar (sourced/draft): üniteler 1/11 · dersler 27/82 · S0 8/4 · toplam **36/97**; 36 işaretli kutu, hepsi `by:"owner"`. Onaylı ünite yalnız Ünite 12; Ünite 1'de yalnız u01.04 onaylı, kalan Ünite 1 metinleri `draft` → ekranda "Ünite N · Ders M".

@@ -633,3 +633,21 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlığı: quranCurriculumV2.js) · cihaz —
 - surprises: ders oynatıcı bağlam satırı draft ünite için "Ünite 1 · Ünite 1 · Ders 1 / 5" gösteriyor (çift ön ek); bu committe değiştirilmedi, ayrı karar.
 - next: K2F-23 (kullanıcı "geç" diyene kadar geçilmez)
+
+## seq 65 · 2026-10-02 · PROMPT · K2F-22
+- status: done
+- title: ek iş (K2F-23 öncesi) — açık işlerin kapatılması: çift ön ek, 122 metin onayı, 3 gramer şablonu
+- prev-commit: f7194cb8
+- evidence: kao2-duzeltme/evidence/K2F-22/KANIT.md (ek bölüm)
+- closes: K2F-22 açık riskleri (çift ön ek · 97 draft · 3 gramer şablonu)
+- repro: değişmedi · toplam 9/10 (R-08 açık, K2F-23)
+- gates: kapilar.sh YEŞİL
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001g (pin yükseltme YOK; yayın adımında yükseltilecek)
+- counts: sourced/draft — üniteler 12/0 · dersler 109/0 · S0 12/0 · kavram 25/0 · sûre tanıtımı 0/20 (contextTr, KR-5'te kaldırılacak; bu inceleme kapsamında değil)
+- approval-source: KULLANICI DEVRİ — kullanıcı sahip (L1) onayını ve "uzman" rolünü Claude'a açıkça devretti ("uzman sen olabilirsin ve benim yerime bunları da yapabilirsin ben onay veriyorum"). 122 metin tek tek okundu; 20 metinde içerik düzeltildi (aşağıda). `by:"owner"` kaydı bu devre dayanır; DİKKAT: bu bir yapay zekâ incelemesidir, gerçek alan uzmanı (L2) onayı DEĞİLDİR ve L2 kutularına dokunulmadı. Dinî içerik için gerçek uzman kontrolü hâlâ tavsiye edilir.
+- text-fixes: u1 why ("her rekât" mezhebe göre değişir → "namazlarda tekrar tekrar") · u3 başlık ("koruyucu" → "kısa") · u4/u5/u6/u7/u8/u11 why (kanıtsız/abartılı iddia yumuşatıldı) · u10 vaat ("onlarca" kaldırıldı) · u03.06, u09.04 hedef · s0.01 (üst+alt işaret), s0.10 (hedef derse uymuyordu: "boğaz harfleri" → "geri kalan harfler"), s0.11 (tenvin eklendi) · kavram g4 (ayrı zamir/yapışık zamir ayrımı), g11 ("çoğunlukla"), g17 ("çoğunlukla"), g18 (ara kelime).
+- grammar: g10-k3 (haber hangisi), g14-k2 (kânû ne katar), g19-k3 (yapan/yapılan) artık doğrulanmış tablo ve g14-e1 örneğinden kurulur; elle Arapça YOK. Desteklenen 86/86; GRAMER-SABLON-L2.md boş liste. g14-k2 çeldiricileri ("gelecek zaman/olumsuzluk/emir anlamı") genel yanlış seçeneklerdir, doğrulanmış veri değildir.
+- code-fix: ders oynatıcı bağlam satırında "Ünite N · Ünite N" çift ön eki giderildi (commit f7194cb8).
+- scope-extension: testler gerçek veride artık draft kalmadığı için güncellendi — harness `transformSource` + `legacyDraftState` (K2F-22 sonu durumunu sentetik VM'de üretir): explain · hub · mastery · path · render · text_review (ikinci VM) · grammar_tasks (B3/B4 bozulmuş modülle) · yeni test_kao2_context_label.
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearn.js · quranCurriculumV2.js · quranConceptTextsV1.js) · cihaz —
+- next: K2F-23

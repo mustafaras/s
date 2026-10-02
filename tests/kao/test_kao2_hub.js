@@ -10,6 +10,7 @@ const repoRoot = require('../repo-root');
 
 const INSTANT = '2026-09-28T09:00:00';
 const TODAY = '2026-09-28';
+const { legacyDraftState } = require('./helpers/kao-harness');
 const CONTENT = ['quranLexiconV1', 'quranGrammarV1', 'quranShortSurahsV1', 'quranPhonicsV1', 'quranCurriculumV2', 'quranRevelationOrderV1', 'quranStrikingVersesV1'];
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -21,7 +22,7 @@ function boot(options = {}) {
   const box = { window: {}, Date: FixedDate };
   vm.createContext(box);
   const content = options.withoutCurriculum ? CONTENT.filter((n) => n !== 'quranCurriculumV2') : CONTENT;
-  for (const name of content) vm.runInContext(fs.readFileSync(path.join(repoRoot, `app/content/${name}.js`), 'utf8'), box, { filename: name });
+  for (const name of content) vm.runInContext(legacyDraftState(name, fs.readFileSync(path.join(repoRoot, `app/content/${name}.js`), 'utf8')), box, { filename: name });
   const core = options.withoutFlow ? ['app/core/quranLearnViews.js', 'app/core/quranLearn.js'] : ['app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js'];
   for (const file of core) vm.runInContext(fs.readFileSync(path.join(repoRoot, file), 'utf8'), box, { filename: file });
   const state = { data: { settings: {}, days: {}, quranLearn: null }, bed: null };

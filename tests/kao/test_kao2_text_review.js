@@ -175,7 +175,37 @@ check('kelime kümesi değişen her ders draft ya da değişiklik sonrası açı
 
 // K2F-21 (KR-4): draft metin HİÇBİR ekranda görünmez; yerine güvenli başlık ("Ünite N · Ders M") yazar.
 // Bağımsız denetimde 35 draft dersin hepsinde ünite ekranında ve ders oynatıcıda ham başlığın sızdığı bulundu.
+// Tüm metinler onaylanınca gerçek draft kalmaz; gizleme davranışı bu testte ikinci bir sentetik VM'de, müfredat
+// kaynağındaki her `sourced` işareti `draft` yapılarak sınanır (repodaki veriye dokunulmaz).
+function bootDraftEnv() {
+  const sandbox = { window: {}, Date };
+  vm.createContext(sandbox);
+  for (const n of ['quranLexiconV1', 'quranGrammarV1', 'quranShortSurahsV1', 'quranPhonicsV1', 'quranCurriculumV2', 'quranRevelationOrderV1', 'quranStrikingVersesV1']) {
+    let source = fs.readFileSync(path.join(repoRoot, `app/content/${n}.js`), 'utf8');
+    if (n === 'quranCurriculumV2') source = source.split('"level":"sourced"').join('"level":"draft"');
+    vm.runInContext(source, sandbox, { filename: n });
+  }
+  for (const f of ['app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js']) {
+    vm.runInContext(fs.readFileSync(path.join(repoRoot, f), 'utf8'), sandbox, { filename: f });
+  }
+  const envApi = sandbox.window.SeymaQuranLearn;
+  const envData = { settings: {}, days: {}, quranLearn: null };
+  const envUi = {};
+  assert.equal(envApi.registerQuranLearn({
+    data: () => envData, ui: () => envUi, save() {}, render() {}, todayStr: () => '2026-09-29',
+    esc, icon: () => '', getDay: () => ({})
+  }), true);
+  envApi.ensureQuranLearn(envData);
+  const envUnits = sandbox.window.QuranCurriculumV2.units;
+  return { api: envApi, data: envData, ui: envUi, units: envUnits, lessons: envUnits.flatMap((u) => u.lessons), html: () => envApi.kaoOverlayHTML() };
+}
+
 check('draft ders başlığı/hedefi ünite ekranında, ders oynatıcıda ve hub kartında SIZMAZ (tüm draft dersler)', () => {
+  runDraftLeakCheck(bootDraftEnv());
+});
+
+function runDraftLeakCheck(env) {
+  const { api, data, ui, units, lessons, html } = env;
   const draftLessons = lessons.filter((l) => api.kaoReviewLevel(l.review) === 'draft');
   assert.ok(draftLessons.length >= 35, `draft ders sayısı ${draftLessons.length}`);
   const escText = (v) => esc(String(v));
@@ -209,6 +239,6 @@ check('draft ders başlığı/hedefi ünite ekranında, ders oynatıcıda ve hub
     assert.equal(hubHtml.includes(escText(lesson.title)), false, `${lesson.id}: hub kartında ham başlık sızdı`);
     if (hubHtml.includes('Sıradaki:')) assert.ok(hubHtml.includes(safe), `${lesson.id}: hub kartında güvenli başlık yok`);
   }
-});
+}
 
 console.log(`KAO2-17 text review: PASS (${passed} kontrol)`);

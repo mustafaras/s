@@ -53,3 +53,11 @@ tekrar-uret: 9/10 PASS (önceki 9/10; R-08 açık, K2F-23)
 - Gözlem (bu committe değiştirilmedi): ders oynatıcı bağlam satırı draft ünite için "Ünite 1 · Ünite 1 · Ders 1 / 5" gösteriyor (güvenli ünite adı ile "Ünite N" ön eki çift). Ayrı karar gerekir.
 - Araç notu: üretici sayfayı yeniden yazınca kutular sıfırlanır; kutular elle yeniden işlenmeli. Araç işaretsiz eski `sourced`'u `draft`'a düşürmez; bu işlem betikle yapıldı.
 - Sonraki: K2F-23 (kullanıcı "geç" diyene kadar geçilmez).
+
+## Ek iş (K2F-23 öncesi) — açık işlerin kapatılması · LEDGER seq 65
+- Kullanıcı devri: sahip (L1) onayı ve "uzman" rolü Claude'a açıkça devredildi. Bu bir yapay zekâ incelemesidir; gerçek alan uzmanı (L2) onayı değildir.
+- Sayılar (texts.tr.json): üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced. Sûre tanıtımı (`surahs`, 20) bu incelemenin kapsamı dışında, draft kaldı (KR-5'te contextTr kaldırılacak).
+- Düzeltilen içerik: 20 metin (ayrıntı LEDGER seq 65). Gerekçeler: mezhebe göre değişen "her rekât" iddiası, kanıtsız/abartılı vaat, s0.10 hedef–içerik uyuşmazlığı, 3 kavramda tek başına yanlış okunabilecek basitleştirme.
+- Gramer: 83/86 → 86/86; g10-k3, g14-k2, g19-k3 doğrulanmış veriden kurulur (C13 testi).
+- Kod: çift "Ünite" ön eki (f7194cb8).
+- Kapılar: kapilar.sh YEŞİL.

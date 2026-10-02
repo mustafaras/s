@@ -1414,11 +1414,43 @@
     var chosen=gramPick(items,seed+'|'+record.template.id);
     return {stimulus:'',prompt:"'"+chosen.row.label+"' tamlaması hangisi?",answer:chosen.pair,alternatives:gramShuffle(items.filter(function(item){ return item!==chosen; }).map(function(item){ return item.pair; }),seed+'|phrases'),context:[]};
   }
+  // g10-k3: "söylenen (haber) hangisi?" — şıklar tablodaki Arapça hücreler; doğru = satırın haber hücresi, aynı satırın mübtedası çeldirici.
+  function gramPredicateRecipe(record,seed){
+    var subject=gramColumnIndex(record,/mübteda/i),predicate=gramColumnIndex(record,/haber/i);
+    if(subject<0||predicate<0) return gramUnsupported('tabloda mübteda/haber sütunları yok');
+    var items=gramRows(record).map(function(row){ var a=gramArabicAt(row,subject),b=gramArabicAt(row,predicate); return a&&b&&a.label!==b.label?{row:row,subject:a,predicate:b}:null; }).filter(Boolean);
+    if(items.length<3) return gramUnsupported('tabloda en az üç mübteda–haber satırı yok');
+    var chosen=gramPick(items,seed+'|'+record.template.id);
+    var others=items.filter(function(item){ return item!==chosen&&item.predicate.label!==chosen.subject.label; }).map(function(item){ return {label:item.predicate.label,pronunciation:item.predicate.pronunciation}; });
+    return {stimulus:'',prompt:"'"+chosen.row.label+"' cümlesinde söylenen (haber) hangisi?",answer:{label:chosen.predicate.label,pronunciation:chosen.predicate.pronunciation},alternatives:[{label:chosen.subject.label,pronunciation:chosen.subject.pronunciation}].concat(gramShuffle(others,seed+'|haber')),context:[]};
+  }
+  // g14-k2: uyaran doğrulanmış g14-e1 örneğindeki "kânû + fiil" kelimeleri; doğru anlam kavramın kural cümlesindeki ('-ıyordu, -ırdı') anlamdır.
+  var GRAMMAR_KANE_ANSWER="Geçmişte süren iş: '-ıyordu, -ırdı'";
+  function gramKaneRecipe(record,seed){
+    var example=(record.concept.examples||[]).find(function(item){ return item.id==='g14-e1'; }),words=gramWords(example);
+    if(!example||words.length<3||words[1].pronunciation!=='kânû') return gramUnsupported('doğrulanmış kâne örneği (g14-e1) bulunamadı');
+    return {stimulus:String(words[1].ar)+' '+String(words[2].ar),stimulusPronunciation:String(words[1].pronunciation)+' '+String(words[2].pronunciation||''),prompt:"Bu ifadede 'kânû' fiile ne katar?",answer:GRAMMAR_KANE_ANSWER,alternatives:['Gelecek zaman anlamı','Olumsuzluk anlamı','Emir anlamı'],context:[]};
+  }
+  // g19-k3: uyaran fâil ya da mef'ûl sütunundan bir kelime; kök anlamı satır başlığından gelir, doğru şık o sütunun adıdır.
+  function gramVoiceRecipe(record,seed){
+    var fail=gramColumnIndex(record,/fâil/i),passive=gramColumnIndex(record,/mef/i);
+    if(fail<0||passive<0) return gramUnsupported('tabloda fâil/mef\'ûl sütunları yok');
+    var items=[],seen=Object.create(null);
+    gramRows(record).forEach(function(row){
+      [[fail,'fail'],[passive,'passive']].forEach(function(pair){
+        var ar=gramArabicAt(row,pair[0]);
+        if(ar&&!seen[ar.label]){ seen[ar.label]=1; items.push({row:row,side:pair[1],ar:ar}); }
+      });
+    });
+    if(items.length<4) return gramUnsupported('tabloda en az dört fâil/mef\'ûl kelimesi yok');
+    var chosen=gramPick(items,seed+'|'+record.template.id),isFail=chosen.side==='fail';
+    return {stimulus:chosen.ar.label,stimulusPronunciation:chosen.ar.pronunciation,prompt:"Kökü '"+gramBase(chosen.row.label)+"' olan bu kelime yapan mı, yapılan mı?",answer:isFail?'Yapan (fâil)':'Yapılan (mef\'ûl)',alternatives:[isFail?'Yapılan (mef\'ûl)':'Yapan (fâil)'],context:[]};
+  }
   function gramMeaningRecipe(record,seed){
     var id=record.template.id,rows=gramRows(record);
-    if(id==='g10-k3') return gramUnsupported('doğrulanmış metin "-dır eki yazılmaz" der, hangi kelimede saklı olduğunu söylemez. Öneri (içerik, L1 onayı): soruyu "hangisi haberdir (söylenen)?" olarak yeniden yaz');
-    if(id==='g14-k2') return gramUnsupported('yönerge doğrulanmış örnekler arasında olmayan bir ifadeye bağlı. Öneri (içerik, L1 onayı): doğrulanmış kâne örneği (g14-e1) üzerinden yeni örnekli şablon yaz');
-    if(id==='g19-k3') return gramUnsupported('fâil/mef\'ûl hücrelerinin Türkçe karşılığı tabloda yok. Öneri (içerik, L2 onayı): tabloya "yazan / yazılan" gibi Türkçe karşılık sütunu ekle (sözlükle doğrulanarak)');
+    if(id==='g10-k3') return gramPredicateRecipe(record,seed);
+    if(id==='g14-k2') return gramKaneRecipe(record,seed);
+    if(id==='g19-k3') return gramVoiceRecipe(record,seed);
     if(record.concept.id==='g2') return gramPhraseRecipe(record,seed);
     if(record.concept.id==='g20'){
       var masdar=gramColumnIndex(record,/masdar/i),named=gramRows(record).map(function(row){ var ar=gramArabicAt(row,masdar); return ar?{row:row,ar:ar}:null; }).filter(Boolean);

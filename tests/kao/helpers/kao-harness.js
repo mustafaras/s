@@ -28,11 +28,31 @@ function navTitle(html) {
   return m ? text(m[1]) : '';
 }
 
+// Taslak (draft) gizleme davranışını gerçek veriden bağımsız sınamak için: tüm metinler onaylandığında hiç draft kalmaz.
+// Bu dönüştürücü yalnız `quranCurriculumV2` kaynağını okur ve K2F-22 sonundaki duruma döndürür: yalnız aşağıdaki metinler onaylı
+// (Ünite 12, 27 ders, 8 S0 dersi), geri kalanı `draft`. Repodaki veriye dokunmaz; `transformSource` seçeneğiyle kullanılır.
+const LEGACY_SOURCED = new Set(['u12', 's0.02', 's0.03', 's0.04', 's0.05', 's0.07', 's0.08', 's0.09', 's0.12',
+  'u01.04', 'u02.01', 'u02.02', 'u03.04', 'u04.01', 'u04.02', 'u04.04', 'u04.05', 'u06.01', 'u06.04', 'u06.07', 'u07.01', 'u07.02',
+  'u07.03', 'u07.04', 'u07.06', 'u07.09', 'u08.07', 'u08.09', 'u09.06', 'u09.07', 'u09.11', 'u10.01', 'u10.03', 'u10.20', 'u11.03', 'u11.04']);
+function legacyDraftState(name, source) {
+  if (name !== 'quranCurriculumV2') return source;
+  const start = source.indexOf('var data=') + 'var data='.length;
+  const end = source.indexOf(';var index={}');
+  const data = JSON.parse(source.slice(start, end));
+  const demote = (entry, id) => {
+    if (entry.review && entry.review.level === 'sourced' && !LEGACY_SOURCED.has(id)) entry.review = { ...entry.review, level: 'draft', by: null };
+  };
+  data.units.forEach((unit) => { demote(unit, `u${unit.id}`); unit.lessons.forEach((lesson) => demote(lesson, lesson.id)); });
+  ((data.s0 && data.s0.lessons) || []).forEach((lesson) => demote(lesson, lesson.id));
+  return source.slice(0, start) + JSON.stringify(data) + source.slice(end);
+}
+
 // Boş VM: içerik + Flow/Views/motor, `register*` sahteleriyle. `seeded` kartlı bir öğrenci kurar.
-function bootKao({ now = DEFAULT_NOW, seeded = false } = {}) {
+function bootKao({ now = DEFAULT_NOW, seeded = false, transformSource = null } = {}) {
   const box = { window: {}, Date };
   vm.createContext(box);
-  for (const n of CONTENT) vm.runInContext(read(`app/content/${n}.js`), box, { filename: n });
+  // transformSource(ad, kaynak) → kaynak: yalnız testte, içerik modülünü sentetik biçimde bozmak için (ör. bir şablonu desteksiz yapmak).
+  for (const n of CONTENT) { const src = read(`app/content/${n}.js`); vm.runInContext(transformSource ? transformSource(n, src) : src, box, { filename: n }); }
   for (const f of RUNTIME) vm.runInContext(read(f), box, { filename: f });
   const data = { settings: {}, days: {}, quranLearn: null, lastOpenedDate: now.slice(0, 10) };
   const ui = { kaoOpen: true, kaoView: 'home', kaoStack: [] };
@@ -140,4 +160,4 @@ const tapPrimary = (t) => tap(t, 'kao-primary');
 const tapSecondary = (t) => tap(t, 'kao-hero-secondary');
 const countClass = (html, cls) => (String(html).match(new RegExp(`class="${cls}[" ]`, 'g')) || []).length;
 
-module.exports = { bootKao, freshUser, seed, openView, walkLesson, playLesson, tap, tapPrimary, tapSecondary, countClass, text, navTitle, esc, read, repoRoot, DEFAULT_NOW };
+module.exports = { legacyDraftState, bootKao, freshUser, seed, openView, walkLesson, playLesson, tap, tapPrimary, tapSecondary, countClass, text, navTitle, esc, read, repoRoot, DEFAULT_NOW };

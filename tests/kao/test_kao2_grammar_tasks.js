@@ -177,6 +177,12 @@ function defectsOf(task, lessonId) {
   return out;
 }
 
+
+// K2F ek iş: gerçek modülde 86/86 şablon desteklendiği için fail-closed yedek yolu (ikame, kuyruktan eleme) sentetik bir VM'de
+// sınanır: "fâil"/"haber" sütun adları kaldırılır, böylece g10-k3, g19-k1/k2/k3 gibi tablo-bağımlı şablonlar kurulamaz.
+const BREAK_COLUMNS = (name, source) => (name === 'quranGrammarV1' ? source.split('(fâil)').join('').split('(haber)').join('') : source);
+const bootBroken = () => bootKao({ transformSource: BREAK_COLUMNS });
+
 const curriculum = bootKao().win.QuranCurriculumV2;
 const allLessons = curriculum.units.flatMap((unit) => unit.lessons);
 const gradedTask = (t, queueItem) => t.api.kaoBuildTask(queueItem, t.data, { seed: queueItem.id });
@@ -245,7 +251,7 @@ check('B2 · kaoGrammarTaskValid beş kuralı + tek doğru şık + tekil etiketi
 });
 
 check('B3 · sunulamayan gramer görevi içeren ders: plan öğesi kelime alıştırmasıyla ikame edilir (kimlik korunur, sayı düşmez, kalan gramer görevleri geçerli)', () => {
-  const t = bootKao();
+  const t = bootBroken();
   let hit = null;
   for (const lesson of allLessons) {
     freshUser(t);
@@ -269,7 +275,7 @@ check('B3 · sunulamayan gramer görevi içeren ders: plan öğesi kelime alış
 });
 
 check('B4 · tekrar kuyruğu: sunulan her gramer kartının görevi geçerli; geçersizi sunulmaz ve süzgeç 86 şablonun bir kısmını eler', () => {
-  const t = bootKao();
+  const t = bootBroken();
   freshUser(t);
   const now = new Date(DEFAULT_NOW);
   let presented = 0, dropped = 0;
@@ -353,7 +359,7 @@ check('C1 · 86 şablonun her biri ya desteklenir (her tohumda geçerli görev) 
   const withExample = allTemplates.filter((x) => x.template.exampleId);
   assert.equal(withExample.length, 43);
   assert.equal(withExample.filter((x) => supported.includes(x)).length, 43, 'örnekli şablonların tümü desteklenmeli');
-  assert.ok(supported.length >= 78, `desteklenen şablon ${supported.length} < 78`);
+  assert.equal(supported.length, 86, `desteklenen şablon ${supported.length} ≠ 86 (desteklenmeyen: ${unsupported.map((x) => x.template.id).join(', ')})`);
   console.log(`      desteklenen ${supported.length}/86 · desteklenmeyen ${unsupported.length}`);
 });
 
@@ -416,6 +422,7 @@ check('C4 · Ek çöz (g1 "el" ve g5 yapışık ek), Anlam seç ve Arapça seç:
   let checked = 0;
   for (const x of allTemplates.filter((y) => ['Ek çöz', 'Anlam seç', 'Arapça seç'].includes(y.template.type))) {
     if (t.api.kaoGrammarSupport(x.cardId)) continue;
+    if (['g10-k3', 'g14-k2', 'g19-k3'].includes(x.template.id)) continue; // K2F ek iş: kendi kuralları C10'da
     const rows = x.concept.tables[0].rows;
     for (const day of SEEDS) {
       const task = buildFor(t, x.cardId, day);
@@ -621,7 +628,7 @@ check('C12 · rehberlik soldurma: dizmede ipucu yalnız taze kartta (<2 tekrar) 
 check('C9 · GRAMER-SABLON-L2.md: desteklenmeyen şablonlar kimlikle ve gerekçeyle listelenir (Arapça metin yok); testin ürettiği liste dosyayla aynı', () => {
   const rows = supportedRows();
   const unsupported = rows.filter((x) => x.reason);
-  assert.ok(unsupported.length > 0 && unsupported.length < 30, `desteklenmeyen sayısı ${unsupported.length}`);
+  assert.ok(unsupported.length < 30, `desteklenmeyen sayısı ${unsupported.length}`);
   const lines = [
     '# Gramer şablonları — desteklenmeyenler (L2 inceleme listesi)',
     '',
@@ -632,8 +639,9 @@ check('C9 · GRAMER-SABLON-L2.md: desteklenmeyen şablonlar kimlikle ve gerekçe
     '',
     `Desteklenen: ${rows.length - unsupported.length}/${rows.length} · Desteklenmeyen: ${unsupported.length}/${rows.length}`,
     '',
-    '| Şablon | Tür | Örnek (âyet) | Neden |',
-    '|---|---|---|---|',
+    ...(unsupported.length
+      ? ['| Şablon | Tür | Örnek (âyet) | Neden |', '|---|---|---|---|']
+      : ['Tüm şablonlar için doğrulanmış tablo/örnek verisinden görev kurulur; L2 bekleyen şablon yoktur.']),
     ...unsupported.map((x) => { const ex = x.template.exampleId ? exampleOf(x.concept, x.template) : null; return `| ${x.template.id} | ${x.template.type} | ${ex ? ex.ref : '—'} | ${x.reason} |`; }),
     ''
   ];
@@ -642,6 +650,53 @@ check('C9 · GRAMER-SABLON-L2.md: desteklenmeyen şablonlar kimlikle ve gerekçe
   const file = path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/GRAMER-SABLON-L2.md');
   if (!fs.existsSync(file) || fs.readFileSync(file, 'utf8') !== text) fs.writeFileSync(file, text);
   assert.equal(fs.readFileSync(file, 'utf8'), text);
+});
+
+check('C13 · g10-k3 / g14-k2 / g19-k3: görev yalnız doğrulanmış tablo ve örnekten kurulur; doğru şık kaynak veriyle eşleşir', () => {
+  const t = bootKao();
+  freshUser(t);
+  const byId = (id) => allTemplates.find((x) => x.template.id === id);
+  const table = (x) => x.concept.tables[0];
+  const arAt = (row, i) => { const cell = row.cells[i]; return Array.isArray(cell) && ARABIC.test(String(cell[1] || '')) ? String(cell[1]) : null; };
+  // g10-k3: doğru şık = satırın haber hücresi (2. sütun); aynı satırın mübtedası şık olarak bulunur ama doğru değildir.
+  const g10 = byId('g10-k3');
+  for (const day of SEEDS) {
+    const task = buildFor(t, g10.cardId, day);
+    const correct = task.choices.filter((c) => c.correct);
+    assert.equal(correct.length, 1, `g10-k3 ${day}: tek doğru şık`);
+    const label = /^'(.*)' cümlesinde/.exec(task.prompt)[1];
+    const row = table(g10).rows.find((r) => r.label === label);
+    assert.ok(row, `g10-k3 ${day}: yönergedeki cümle tabloda yok (${label})`);
+    assert.equal(correct[0].label, arAt(row, 1), `g10-k3 ${day}: doğru şık haber hücresi değil`);
+    assert.ok(task.choices.some((c) => c.label === arAt(row, 0)), `g10-k3 ${day}: aynı satırın mübtedası çeldirici olmalı`);
+  }
+  // g14-k2: uyaran = doğrulanmış g14-e1 örneğinin "kânû + fiil" kelimeleri; doğru şık kavramın kural cümlesindeki anlamdır.
+  const g14 = byId('g14-k2');
+  const e1 = g14.concept.examples.find((e) => e.id === 'g14-e1');
+  const expectStimulus = `${e1.words[1].ar} ${e1.words[2].ar}`;
+  for (const day of SEEDS) {
+    const task = buildFor(t, g14.cardId, day);
+    assert.equal(task.stimulus, expectStimulus, `g14-k2 ${day}: uyaran örnekle aynı olmalı`);
+    const correct = task.choices.filter((c) => c.correct);
+    assert.equal(correct.length, 1);
+    assert.match(correct[0].label, /-ıyordu|-ırdı/, 'doğru şık kural cümlesindeki anlamı taşımalı');
+  }
+  // g19-k3: uyaran fâil ya da mef'ûl sütunundan gelir; doğru şık o sütunun adıdır.
+  const g19 = byId('g19-k3');
+  const headers = table(g19).columns;
+  const failIdx = headers.findIndex((h) => /fâil/i.test(h)) - 1, mefIdx = headers.findIndex((h) => /mef/i.test(h)) - 1;
+  const seenSides = new Set();
+  for (const day of SEEDS) {
+    const task = buildFor(t, g19.cardId, day);
+    const correct = task.choices.find((c) => c.correct);
+    const rowIdx = table(g19).rows.findIndex((r) => arAt(r, failIdx) === task.stimulus || arAt(r, mefIdx) === task.stimulus);
+    assert.ok(rowIdx >= 0, `g19-k3 ${day}: uyaran tabloda yok`);
+    const row = table(g19).rows[rowIdx];
+    const isFail = arAt(row, failIdx) === task.stimulus;
+    assert.match(correct.label, isFail ? /Yapan/ : /Yapılan/, `g19-k3 ${day}: doğru şık sütunla uyuşmuyor`);
+    seenSides.add(isFail);
+  }
+  assert.ok(seenSides.size >= 1);
 });
 
 console.log(`test_kao2_grammar_tasks (bölüm A+B+C): ${passed} kontrol PASS`);

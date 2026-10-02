@@ -11,6 +11,7 @@ const source = fs.readFileSync(path.join(repoRoot, relative), 'utf8');
 const appSource = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
 const saygiSource = fs.readFileSync(path.join(repoRoot, 'app/core/saygi.js'), 'utf8');
 const settingsSource = fs.readFileSync(path.join(repoRoot, 'app/core/settings.js'), 'utf8');
+const { legacyDraftState } = require('./helpers/kao-harness');
 const cssSource = fs.readFileSync(path.join(repoRoot, 'app/kao.css'), 'utf8');
 const indexSource = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
 
@@ -23,7 +24,7 @@ vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranRevelation
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranStrikingVersesV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranStrikingVersesV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranPhonicsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranPhonicsV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranMahrecSchemasV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranMahrecSchemasV1.js' });
-vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranCurriculumV2.js'), 'utf8'), sandbox, { filename: 'app/content/quranCurriculumV2.js' });
+vm.runInContext(legacyDraftState('quranCurriculumV2', fs.readFileSync(path.join(repoRoot, 'app/content/quranCurriculumV2.js'), 'utf8')), sandbox, { filename: 'app/content/quranCurriculumV2.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnFlow.js'), 'utf8'), sandbox, { filename: 'app/core/quranLearnFlow.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnViews.js'), 'utf8'), sandbox, { filename: 'app/core/quranLearnViews.js' });
 vm.runInContext(source, sandbox, { filename: relative });

@@ -1,6 +1,13 @@
 {
  "schema": "kao2-lemma-morph/1",
- "note": "QAC 0.4 (GPL; telif bloğu girdi dosyasında korunur) morfolojisinden SAYILMIŞ değerler. Elle yazılmaz: node tools/kao2-lemma-morph-build.mjs --write",
+ "note": "QAC 0.4 (GPL; telif/lisans `license` alanında) morfolojisinden SAYILMIŞ değerler. Elle yazılmaz: node tools/kao2-lemma-morph-build.mjs --write",
+ "license": {
+  "holder": "Kais Dukes",
+  "year": 2011,
+  "name": "GNU General Public License",
+  "notice": "The Quranic Arabic Corpus (morphology, version 0.4), Copyright (C) 2011 Kais Dukes. License: GNU General Public License. Bu tablo o korpustan türetilmiş sayımlardır.",
+  "source": "https://corpus.quran.com/download/"
+ },
  "sources": [
   "https://corpus.quran.com/documentation/morphologicalfeatures.jsp",
   "https://corpus.quran.com/documentation/tagset.jsp",

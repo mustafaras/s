@@ -154,6 +154,23 @@ check('inceleme sayfası ve metin kaynağı mevcut', () => {
   assert.ok(sheet.includes('- [ ]'), 'onay kutuları var');
 });
 
+// K2F-20/21 (KR-4): kelime kümesi değişen bir dersin eski (onaylı) metni geçersizdir. Ders ya `draft` olmalı ya da
+// değişiklikten SONRA bir sahibin açık onayıyla (by + at ≥ 2026-10-02) `sourced` yapılmış olmalı.
+check('kelime kümesi değişen her ders draft ya da değişiklik sonrası açık onaylı', () => {
+  const before = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/curriculum.before-k2f20.json'), 'utf8')).lessons;
+  let changed = 0;
+  for (const lesson of lessons) {
+    const was = before[lesson.id] || [];
+    const now = Array.from(lesson.lemmaIds);
+    const differs = was.length !== now.length || now.some((id) => !was.includes(id));
+    if (!differs) continue;
+    changed += 1;
+    const ok = api.kaoReviewLevel(lesson.review) === 'draft' || (lesson.review.by && String(lesson.review.at || '') >= '2026-10-02');
+    assert.ok(ok, `${lesson.id}: kelime kümesi değişti ama eski onaylı metin duruyor`);
+  }
+  assert.ok(changed >= 26, `değişen ders sayısı ${changed}`);
+});
+
 // K2F-21 (KR-4): draft metin HİÇBİR ekranda görünmez; yerine güvenli başlık ("Ünite N · Ders M") yazar.
 // Bağımsız denetimde 35 draft dersin hepsinde ünite ekranında ve ders oynatıcıda ham başlığın sızdığı bulundu.
 check('draft ders başlığı/hedefi ünite ekranında, ders oynatıcıda ve hub kartında SIZMAZ (tüm draft dersler)', () => {

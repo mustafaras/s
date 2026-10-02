@@ -149,3 +149,7 @@ bu 10 çifti karşılaştırır, kalan 15 değeri uydurmaz.
 Bu taslaklar kullanıcı/lisans kabulü değildir. `verified:true` üretim içeriği
 ve `app/content/quranLexiconV1.js` bu kartta üretilmez (KAO-03 onayı sonrası
 KAO-05).
+
+## Türetilmiş sayım tablosu (K2F-19)
+
+`tests/kao/fixtures/qac-lemma-morph.json`, yukarıdaki **QAC v0.4 morfolojisinden** (Copyright (C) 2011 Kais Dukes, GNU GPL) `tools/kao2-lemma-morph-build.mjs` ile SAYILMIŞ türetilmiş eserdir (lemma başına PERF/IMPF/IMPV/VOC sayıları). Telif/lisans bildirimi dosyanın `license` alanında yeniden üretilir; girdi SHA-256 pini yukarıdaki tabloyla aynıdır ve `tests/kao/test_kao2_lemma_morph.js` ile doğrulanır. Fixture yalnız test/araç içindir; uygulamaya, içerik modüllerine ya da yayına girmez.

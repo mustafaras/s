@@ -310,6 +310,12 @@ function runChecks() {
     assert.equal(titleStem('Duymak'), 'duy'); assert.equal(titleStem('isimlerin'), 'isim');
     const flagged = new Set([...KNOWN_MISMATCH, ...KNOWN_EXAMPLE_MISMATCH, ...KNOWN_SEMANTIC_GAP]);
     for (const id of AUDITED_K5_03) assert.ok(flagged.has(id) || FIXED_SINCE_AUDIT.includes(id), `${id}: ne bilinen listelerde ne de düzeltilenlerde (K5-03)`);
+    // 'Düzeltildi' iddiası gerçek olmalı: FIXED_SINCE_AUDIT'teki her ders şu an tüm ölçümlerden geçer.
+    for (const id of FIXED_SINCE_AUDIT) {
+      const lesson = curriculum.byLesson(id);
+      const reasons = failing({ id: lesson.id, title: lesson.title, goal: lesson.goal, conceptId: lesson.conceptId, lemmaIds: Array.from(lesson.lemmaIds) }, ['etiket', 'örnek', 'anlam']);
+      assert.deepEqual(reasons, [], `${id}: FIXED_SINCE_AUDIT'te ama hâlâ tutarsız`);
+    }
     // Kök ölçümü: 4 ayrı kökten lemma yakalanır; K2F-20 sonrası 'Kök ailesi' dersi (u10.20) aynı kökten ≥%60 taşır.
   const distinctRoots = [];
   for (const lemma of lexicon.lemmas) if (lemma.root && !distinctRoots.some((l) => l.root === lemma.root) && distinctRoots.length < 4) distinctRoots.push(lemma);

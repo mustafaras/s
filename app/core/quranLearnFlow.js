@@ -127,7 +127,9 @@
     if(level==='sourced'||level==='expert'||!m) return String(lesson&&lesson.title||'');
     return 'Ünite '+m[1]+' · Ders '+m[2];
   }
-  function carryOver(q,cur,lesson){
+  function carryOver(q,cur,lesson,content){
+    var current=currentUnit(q,content),next=current&&current.progress&&current.progress.nextLesson;
+    if(!next||next.id!==lesson.id||obj(lessonRecord(q,lesson.id)).doneAt) return [];
     var out=[],found=false;
     cur.units.forEach(function(unit){
       unit.lessons.forEach(function(prior){
@@ -145,7 +147,7 @@
     checkNow(now);
     var snap=obj(snapshot),q=obj(snap.quranLearn),c=content||{},cur=curriculum(c),lesson=cur.lessonById[String(lessonId)];
     if(!lesson) return null;
-    var own=Array.isArray(lesson.lemmaIds)?lesson.lemmaIds.filter(function(id){ return typeof id==='string'&&id; }):[],ids=own.concat(carryOver(q,cur,lesson).filter(function(id){ return own.indexOf(id)<0; })),settings=obj(q.settings),budget=Math.max(0,Math.floor(num(settings.dailyNew,10))),fresh=[],record=obj(lessonRecord(q,lesson.id)),resume=obj(record.resume),resumeIntro=String(resume.itemId||'');
+    var own=Array.isArray(lesson.lemmaIds)?lesson.lemmaIds.filter(function(id){ return typeof id==='string'&&id; }):[],ids=own.concat(carryOver(q,cur,lesson,c).filter(function(id){ return own.indexOf(id)<0; })),settings=obj(q.settings),budget=Math.max(0,Math.floor(num(settings.dailyNew,10))),fresh=[],record=obj(lessonRecord(q,lesson.id)),resume=obj(record.resume),resumeIntro=String(resume.itemId||'');
     ids.forEach(function(id){ if(resumeIntro==='intro:'+id){ fresh.push(id); return; } if(!introduced(q,id,lesson.id)&&fresh.length<budget) fresh.push(id); });
     var eligible=ids.filter(function(id){ return introduced(q,id,lesson.id)||fresh.indexOf(id)>=0; });
     var lex=c.lexicon,grammar=c.grammar,lemmas=eligible.map(function(id){ return lex&&typeof lex.byId==='function'?lex.byId(id):null; }).filter(Boolean);

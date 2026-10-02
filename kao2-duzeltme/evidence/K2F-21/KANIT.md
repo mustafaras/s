@@ -17,6 +17,9 @@ Kapatılan bulgular: K5-03 (3/3) · K5-04 (1/2) · M-01 (veri tarafı) · R değ
 - **Bağımsız denetimin bulduğu yüksek önemli kusur düzeltildi:** draft ders başlığı/hedefi ünite ekranında, ders oynatıcıda ve hub kartında ham olarak GÖRÜNÜYORDU (35/35 ders). `quranLearn.js` (`kaoSafeLessonTitle`, 3 nokta) ve `quranLearnFlow.js` (`safeLessonTitle`) artık güvenli başlığı ("Ünite N · Ders M") kullanır. [Dokun listesi dışı: K2F-21 adım 3 "draft metin görünmez" kabulü için zorunluydu — LEDGER seq 61.]
 - Kapı: `CONCEPT_EXEMPT` (6 gerekçeli kavram muafiyeti, dürüstlük testiyle), `şart` regex'i kelime sınırlı ('değerli' içindeki 'eğer' sayılmazdı), ANLAM Türkçe düzeltme işaretlerini katlar, yardımcı fiil kümesi kâna+leyse+asbaha (önceki "leyse yok" iddiası YANLIŞTI, düzeltildi).
 
+## Ek tur — K2F-16…21 bağımsız tarama (LEDGER seq 63)
+- 4 denetçi (kod · test · kayıt · veri güvenliği), 20 ajan: 10 bulgu doğrulandı, 6 aday reddedildi; hepsi işlendi (carryOver sıradaki dersle sınırlandı, araç yol kırılganlığı, fixture lisansı ve pinleri, SKIP≠PASS, tautoloji, KR-4 testi, kayıt hizası).
+
 ## TDD
 - Kırmızı: `node tests/kao/test_kao2_text_review.js` (sızıntı testi) → AssertionError: u08.01 ünite ekranında ham başlık sızdı / hub mutasyonu: "u02.01: hub kartında ham başlık sızdı"
 - Yeşil: aynı komut → PASS (10 kontrol); hub düzeltmesi geri alınınca test kırılır (mutasyonla doğrulandı)

@@ -572,7 +572,7 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 ## seq 59 · 2026-10-02 · PROMPT · K2F-20
 - status: done
 - title: Müfredat yeniden dağıtımı (G2 kapısı)
-- prev-commit: d4a48056
+- prev-commit: c21d76d3
 - evidence: kao2-duzeltme/evidence/K2F-20/KANIT.md
 - closes: K5-03 (2/3) · K3-07 (belge)
 - repro: değişmedi · toplam 9/10
@@ -604,4 +604,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - changed-tests: test_kao2_text_review.js (by:null yalnız draft; sızıntı testi) · test_kao2_lesson_coherence.js (listeler 0/1/0, CONCEPT_EXEMPT, regex/katlama)
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranCurriculumV2.js, quranLearn.js, quranLearnFlow.js) · cihaz —
 - surprises: draft başlık sızıntısı (yüksek) bağımsız denetimde bulundu ve düzeltildi; K2F-20 sunumundaki "leyse yok" hatası düzeltildi.
+- next: K2F-22
+
+## seq 63 · 2026-10-02 · FIX · K2F-21
+- request: kullanıcı: "düzeltmen gereken başka kusurlar var mı kontrol et" → K2F-16…21 dal farkı için 4 bağımsız denetçi (kod · test · kayıt · veri güvenliği; her bulguya çürütme; 20 ajan, 10 bulgu doğrulandı / 6 aday reddedildi).
+- fixed-code: `carryOver` yalnız SIRADAKİ (currentUnit.nextLesson) ve tamamlanmamış derse öksüz ekler (önceden her sonraki/tamamlanmış derse ekliyordu; A-6 testi bunu mutasyonla doğrular); `tools/kao2-lemma-morph-build.mjs` ana-modül denetimi sembolik bağ/özel karakterli yollarda sessizce çıkış 0 veriyordu → `pathToFileURL(realpathSync())`, modsuz çağrı çıkış 2.
+- fixed-test: fixture QAC telif/lisans bildirimi (`license` alanı + docs README notu); lexicon/QAC sha256 pinleri artık girdi gerektirmeden doğrulanır; SKIP artık PASS sayılmaz; FIXED_SINCE_AUDIT totolojisi gerçek iddiaya çevrildi; "kelime kümesi değişen ders draft/sonradan onaylı" testi (KR-4); curriculum test adı güncellendi.
+- fixed-records: seq 59 prev-commit c21d76d3'e geri alındı (KANIT ile tutarlı; önceki "düzeltme" yanlış yöndeydi; K2F-20 iki commit: G2 kapısı d4a48056, kapanış 6b42c9f6); CURRENT-STATE bütçe satırı ve README eksik sayısı (24) ölçülen değerlere çekildi.
+- rejected (6): lessonSizes/minChunks doğrulaması, conceptId'li derslerin ANLAM dışı kalması (CONCEPT_EXEMPT/ETİKET kapsıyor), çıta dışarıdan bağlayıcı değil (tasarım), P6 kaydı (seq 61 var), u07.01 kalıntısı (KANIT'ta var), GPL (yukarıda giderildi).
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - next: K2F-22

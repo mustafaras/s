@@ -277,6 +277,12 @@ check('A-6 · tamamlanmış dersin yeni taşınan kelimeleri kaybolmaz: ders tam
   for (const id of next.lemmaIds) assert.ok(intro.includes(id), `sıradaki dersin kendi kelimesi ${id} yerinde`);
   for (const id of known) assert.ok(!intro.includes(id), 'zaten tanışılmış kelime yeniden tanıştırılmaz');
   assert.equal(JSON.stringify(input.quranLearn), before, 'lessonPlan veriyi değiştirmez (kart/ilerleme eşit)');
+  // Öksüzler yalnız SIRADAKİ derse eklenir: sonraki dersin ve tamamlanmış dersin planı kendi kelimelerinden ibaret kalır.
+  const later = unit.lessons[4];
+  const laterIntro = flow.lessonPlan(input, later.id, now, content).filter((i) => i.kind === 'intro').map((i) => i.lemmaId);
+  assert.deepEqual(Array.from(laterIntro), Array.from(later.lemmaIds), 'sıradaki olmayan derse öksüz eklenmez');
+  const redoneIntro = flow.lessonPlan(input, done.id, now, content).filter((i) => i.kind === 'intro').map((i) => i.lemmaId);
+  assert.deepEqual(Array.from(redoneIntro), Array.from(orphans), 'tamamlanmış dersin yeniden planında yalnız kendi tanışılmamış kelimeleri vardır (başkasının öksüzü eklenmez)');
   const step = flow.nextStep(input, now, content);
   assert.equal(step.param, next.id, 'sıradaki adım bozulmadı: ilk tamamlanmamış ders');
 });

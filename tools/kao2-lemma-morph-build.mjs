@@ -14,9 +14,9 @@
 //   node tools/kao2-lemma-morph-build.mjs --write   fixture'ı üretir
 //   node tools/kao2-lemma-morph-build.mjs --check   fixture'ın girdiden bayt-eşit üretildiğini doğrular
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const QAC = join(ROOT, 'docs/kuran-ogreniyorum/content/inputs/quranic-corpus-morphology-0.4.txt');
@@ -28,6 +28,15 @@ const SOURCES = [
   'https://corpus.quran.com/documentation/tagset.jsp',
   'Dukes & Habash 2010, Morphological Annotation of Quranic Arabic, LREC'
 ];
+
+// QAC 0.4 morfolojisi GNU GPL altındadır; sayımlar türetilmiş eserdir ve telif/lisans bildirimi burada yeniden üretilir.
+const LICENSE = {
+  holder: 'Kais Dukes',
+  year: 2011,
+  name: 'GNU General Public License',
+  notice: 'The Quranic Arabic Corpus (morphology, version 0.4), Copyright (C) 2011 Kais Dukes. License: GNU General Public License. Bu tablo o korpustan türetilmiş sayımlardır.',
+  source: 'https://corpus.quran.com/download/'
+};
 
 const sha256 = (buffer) => createHash('sha256').update(buffer).digest('hex');
 
@@ -91,7 +100,8 @@ export function buildTable(qacText, lexiconJson) {
   }
   return {
     schema: 'kao2-lemma-morph/1',
-    note: 'QAC 0.4 (GPL; telif bloğu girdi dosyasında korunur) morfolojisinden SAYILMIŞ değerler. Elle yazılmaz: node tools/kao2-lemma-morph-build.mjs --write',
+    note: 'QAC 0.4 (GPL; telif/lisans `license` alanında) morfolojisinden SAYILMIŞ değerler. Elle yazılmaz: node tools/kao2-lemma-morph-build.mjs --write',
+    license: LICENSE,
     sources: SOURCES,
     input: { qacSha256: sha256(Buffer.from(qacText)), lexiconSha256: sha256(Buffer.from(lexiconJson)) },
     fields: { perf: 'PERF kök sayısı', impf: 'IMPF kök sayısı', impv: 'IMPV (emir) kök sayısı', voc: 'VOC önekli kelime sayısı', total: 'lemmayı İLK LEM olarak taşıyan kelime sayısı (sözlükteki freq ile birebir eşit; çok parçalı kelimede ikinci kök sayılmaz)', examples: 'lemmanın ilk 3 örnek âyetinde aynı sayımlar' },
@@ -108,10 +118,14 @@ function render() {
   return `${head},\n "lemmas": {\n${lemmaLines.join(',\n')}\n }\n}\n`;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Sembolik bağ (/tmp → /private/tmp) ve özel karakterli yollar için gerçek yol karşılaştırılır.
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   const mode = process.argv[2];
-  const rendered = render();
-  if (rendered === null) {
+  const rendered = ['--write', '--check'].includes(mode) ? render() : undefined;
+  if (rendered === undefined) {
+    console.error('Kullanım: --write | --check');
+    process.exit(2);
+  } else if (rendered === null) {
     console.log("kao2-lemma-morph-build: SKIP (QAC girdisi yok; gitignore'daki inputs/)");
   } else if (mode === '--write') {
     writeFileSync(OUT, rendered);

@@ -75,7 +75,7 @@ check('(a) 524 l_* lemmanın her biri tam bir derste', () => {
   assert.deepEqual(foreign, [], `sözlük dışı (ls_/lp_) lemma derste: ${foreign.slice(0, 5)}`);
 });
 
-check('(b) 12 ünite, derste 3–7 yeni kelime, son ders ustalık', () => {
+check('(b) 12 ünite, derste 3–7 yeni kelime, başlık dolu, içerik dersi mastery:false (ustalık ünite düzeyinde)', () => {
   assert.deepEqual(unitIds, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   const report = cur.units.map((u) => `Ü${u.id}=${unitLemmas(u).length}/${u.lessons.length}d`).join(' ');
   console.log(`      dağılım: ${report} · toplam ${lessons.length} ders`);

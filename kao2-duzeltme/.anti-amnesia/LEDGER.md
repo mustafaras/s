@@ -572,7 +572,7 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 ## seq 59 · 2026-10-02 · PROMPT · K2F-20
 - status: done
 - title: Müfredat yeniden dağıtımı (G2 kapısı)
-- prev-commit: c21d76d3
+- prev-commit: d4a48056
 - evidence: kao2-duzeltme/evidence/K2F-20/KANIT.md
 - closes: K5-03 (2/3) · K3-07 (belge)
 - repro: değişmedi · toplam 9/10

@@ -1,20 +1,20 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-21
-lastSeq: 59
+nextPrompt: K2F-22
+lastSeq: 62
 status: active
 -->
 
-Son güncelleme: 2026-10-02 · LEDGER seq 59 · K2F-00…20 tamam (21/44), sıradaki K2F-21. R-01…R-07, R-09, R-10 PASS (9/10).
+Son güncelleme: 2026-10-02 · LEDGER seq 62 · K2F-00…21 tamam (22/44), sıradaki K2F-22. R-01…R-07, R-09, R-10 PASS (9/10).
 
 ## Şu an neredeyiz
-K2F-20 bitti (G2 onaylı: "tüm önerilerini gerçekleştir"): kelimeler başlık/kavrama göre yeniden dağıtıldı (26 ders / 41 lemma; Ü1–3, ders kimlikleri/sıraları/boyutları sabit), A-6 ilerleme koruması (`carryOver`) ve testleri, araç `lessonSizes`/`mastery:false`, `MUFREDAT-ESLEME.md` yenilendi. Kapı: ETİKET 11 · ÖRNEK 2 · ANLAM 1 (`KNOWN_*` listeleri). Kullanıcı kararı: kalan dersler sözlük/donuk ünite sınırında; başlık/hedef metinleri K2F-21'de gerçek kelimelere göre yeniden yazılır. Yayın yok (değişen yayın varlıkları `quranCurriculumV2.js`, `quranLearnFlow.js` sonraki YAYIN'da).
-Canlı: `main` = `19f0bfd6`, pin `20261001g` (Dalga 1).
+K2F-21 bitti: 35 ders metni (K2F-20'de taşınan 26 ∪ kapıya takılan 13) dersin gerçek kelimelerinden yeniden yazıldı (`draft`, `by:null`; uygulamada "Ünite N · Ders M" görünür). Kapı: ETİKET 0 · ÖRNEK 1 (u07.01 %58) · ANLAM 0. `INCELEME-KAO2-17.md` yeniden üretildi: 133 metin, 35 `draft`, 98 `sourced` (açık kutu onayı yok → "Yeniden onay gerekli"), sayfa başında kullanıcı talimatı. Bağımsız denetim yüksek önemli bir kusuru buldu ve düzeltildi: draft başlık/hedef ünite ekranında, ders oynatıcıda ve hub kartında ham görünüyordu (düzeltme `quranLearn.js`/`quranLearnFlow.js`, mutasyonla doğrulandı). K2F-20 sunumundaki "leyse sözlükte yok" iddiası yanlıştı (leyse u08.03'te); karar değişmedi.
+Yayın yok (değişen yayın varlıkları `quranCurriculumV2.js`, `quranLearn.js`, `quranLearnFlow.js`). Canlı: `main` = `19f0bfd6`, pin `20261001g`.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-21 (Ders metinleri ve inceleme sayfası):** değişen/kapıya takılan her dersin `title/goal` metni yeni kelimelere göre yeniden yazılır (`texts.tr.json`, draft, `by:null`), `KNOWN_MISMATCH` (11) · `KNOWN_EXAMPLE_MISMATCH` (2) · `KNOWN_SEMANTIC_GAP` (1) listeleri boşalmalı ya da gerekçeyle küçülmeli, `INCELEME-KAO2-17.md` açık L1 kutularıyla yeniden üretilir.
+**K2F-22 (L1 onay taşıma, KULLANICI KAPISI):** `docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md` içindeki kutuları sen `[x]` yaparsın ve "L1 işaretlendi" yazarsın; ben yalnız işaretlenen metinleri `sourced` yaparım (`sourced` ⇔ işaretli kutu). Kutu işaretlenmeden ya da yanıt gelmeden `waiting_user` ile dururum.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-01)
 - Dal: `kao2-duzeltme` = canlı `main` (`19f0bfd6`) + belge/test-only commit'ler (K2F-18 kanıtı, K2F-19). Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.

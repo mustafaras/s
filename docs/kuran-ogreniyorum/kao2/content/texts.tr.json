@@ -389,21 +389,23 @@
       }
     },
     "u02.01": {
-      "title": "Yön belirten ekler",
-      "goal": "'-de, -den, -e' anlamı veren küçük kelimeleri tanıyacaksın.",
+      "title": "Büyüklük ve tek ilah",
+      "goal": "Namazda sık duyduğun 'daha büyük', 'tapılan' ve 'ey' kelimelerini küçük yardımcılarıyla birlikte göreceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u02.02": {
-      "title": "Zamirler",
-      "goal": "'ben, biz, sen, siz, o, onlar' kelimelerini namaz cümlesinde bulacaksın.",
+      "title": "Tenzih, selâm ve bereket",
+      "goal": "Namazda sık geçen tenzih (her eksiklikten uzak tutma), namaz, selâm, temiz şeyler ve bereket kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u02.03": {
@@ -425,12 +427,13 @@
       }
     },
     "u03.02": {
-      "title": "Olumsuzluk",
-      "goal": "'değil, asla' anlamı veren olumsuzluk kelimelerini tanıyacaksın.",
+      "title": "Sığınma ve sabah aydınlığı",
+      "goal": "Felak ve İhlâs'taki sığınma, şafak, denk ve 'oldu' gibi kelimeleri tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u03.03": {
@@ -470,48 +473,53 @@
       }
     },
     "u04.01": {
-      "title": "'-an, -en' bağları",
-      "goal": "Bir ismi tanımlayan '-an, -en' yapısını tanıyacaksın.",
+      "title": "Dikkat ve vurgu",
+      "goal": "Cümleye dikkat çeken, onu vurgulayan ve başka kelimelere bağlayan küçük kelimelerle birlikte 'üstünde' kelimesini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u04.02": {
-      "title": "'Şüphesiz' ve 'ancak'",
-      "goal": "Pekiştirme ve sınırlama kelimelerini ayırt edeceksin.",
+      "title": "O gün, her ve bazı",
+      "goal": "'O gün', 'hayır, aksine', 'her', 'bazı' ve 'yanında' gibi küçük kelimeleri tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u04.03": {
-      "title": "'ile' ve 'veya'",
-      "goal": "Ekleme ve seçenek bildiren bağlaçları tanıyacaksın.",
+      "title": "'sonra', 'ile' ve 'veya'",
+      "goal": "Sıra, birliktelik, seçenek ve karşıtlık bildiren küçük kelimelerle birlikte gelecekte 'hayır' diyen 'asla' kelimesini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u04.04": {
-      "title": "'ama' ve 'ise'",
-      "goal": "Karşıtlık ve karşılaştırma bağlaçlarını tanıyacaksın.",
+      "title": "'ya da', 'ama' ve 'ise'",
+      "goal": "Seçenek, karşıtlık ve gelecek bildiren 'ya … ya da', 'veya', 'ama', 'ileride' ve 'ise' kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u04.05": {
-      "title": "'asla' ve 'sanki'",
-      "goal": "Vurgu ve benzetme kelimeleriyle cümlenin tonunu okuyacaksın.",
+      "title": "'asla', 'sanki' ve 'umulur ki'",
+      "goal": "Reddetme, benzetme ve umut bildiren 'asla', 'öyleyse', 'sanki', 'umulur ki' ve 'hayır öyle değil' kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u05.01": {
@@ -533,12 +541,13 @@
       }
     },
     "u06.01": {
-      "title": "Gök ve yer",
-      "goal": "Kur'an'ın en sık geçen iki ismini tanıyacaksın.",
+      "title": "Gök, yer ve işitme",
+      "goal": "Yer, gök, işitme ve 'kendi' kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u06.02": {
@@ -587,12 +596,13 @@
       }
     },
     "u06.07": {
-      "title": "Mal ve dost",
-      "goal": "Dünya malı ve yakınlık kelimelerini tanıyacaksın.",
+      "title": "Mal, dost ve gece",
+      "goal": "Mal, dost, gece, ilk ve inkâr kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u06.08": {
@@ -705,11 +715,12 @@
     },
     "u06.20": {
       "title": "Topluluk ve kutsal",
-      "goal": "Grup ve kutsallık kelimelerini okuyacaksın.",
+      "goal": "Grup, topluluk, kutsal, değerli ve 'bir' kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u06.21": {
@@ -803,39 +814,43 @@
       }
     },
     "u07.01": {
-      "title": "Geçmiş zamanı tanıyalım",
-      "goal": "Fiilin geçmişte olduğunu gösteren kalıbı tanıyacaksın.",
+      "title": "Geçmişte olanlar",
+      "goal": "Helal kıldı, yaptı, bildi ve geldi gibi geçmişte olan işleri anlatan fiilleri tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u07.02": {
-      "title": "Yardımcı fiil: oldu, idi",
-      "goal": "Geçmişte süren durumları anlatan yardımcı fiili okuyacaksın.",
+      "title": "Gönderme ve yalanlama",
+      "goal": "Gönderdi, yalanladı, inkâr etti ve indirdi fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u07.03": {
       "title": "İnanmak ve yapmak",
-      "goal": "Geçmiş zamanda inanma fiilini tanıyacaksın.",
+      "goal": "İnandı, döndü, ortaya çıkardı, hazırladı ve yaptı fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u07.04": {
       "title": "Duymak ve girmek",
-      "goal": "Algı ve hareket fiillerini geçmiş zamanda okuyacaksın.",
+      "goal": "Duydu, girdi, kazandı, ulaştı ve rızık verdi fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u07.05": {
@@ -848,12 +863,13 @@
       }
     },
     "u07.06": {
-      "title": "Şükretmek",
-      "goal": "Teşekkür ve sanma fiillerini geçmiş zamanda tanıyacaksın.",
+      "title": "Şükretmek ve sahip olmak",
+      "goal": "Şükretti, sahip oldu, sandı, diledi ve taşıdı fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u07.07": {
@@ -876,29 +892,32 @@
     },
     "u07.09": {
       "title": "Tuzak ve yükseltmek",
-      "goal": "Geçmiş zaman fiillerini kıssa bağlamında pekiştireceksin.",
+      "goal": "Tuzak kurdu, yükseltti, gerçekleşti ve tanıdı fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u08.01": {
       "title": "Şimdiki ve geniş zaman",
-      "goal": "'yapar, yapıyor' kalıbını tanıyacaksın.",
+      "goal": "Gelir, görür, harcar, öldürür ve sabreder gibi 'yapar, yapıyor' kalıbını tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u08.02": {
-      "title": "Olumsuz şimdiki zaman",
-      "goal": "'yapmaz, yapmadı' olumsuzluğunu okuyacaksın.",
+      "title": "Bulmak, bakmak ve sormak",
+      "goal": "Buldu, baktı, yaptı, aldı ve sordu fiillerini, 'yapmaz, yapmadı' olumsuzlarıyla birlikte göreceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u08.03": {
@@ -938,12 +957,13 @@
       }
     },
     "u08.07": {
-      "title": "Yeterli gelmek",
-      "goal": "Yeterlilik ve yasaklama fiillerini ayırt edeceksin.",
+      "title": "Umut, yetmek ve affetmek",
+      "goal": "Umulur ki, kötü oldu, affetti, yasakladı ve yetti fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u08.08": {
@@ -957,29 +977,32 @@
     },
     "u08.09": {
       "title": "Bağışlamak ve yürümek",
-      "goal": "Şimdiki zaman fiillerini pekiştireceksin.",
+      "goal": "Bağışladı, gizledi, yürüdü, sınadı, koydu ve umar fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u09.01": {
-      "title": "Emir kipi: yap!",
-      "goal": "Bir işi isteme kalıbını tekil ve çoğul biçimde tanıyacaksın.",
+      "title": "Emir kipi: an, ye, ver, bağışla",
+      "goal": "Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerinin emir biçimini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u09.02": {
-      "title": "Seslenme: ey …",
-      "goal": "Birine seslenerek başlayan cümleleri okuyacaksın.",
+      "title": "Uymak ve yüz çevirmek",
+      "goal": "Uydu, edindi, çıkardı, yüz çevirdi ve itaat etti fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u09.03": {
@@ -1010,21 +1033,23 @@
       }
     },
     "u09.06": {
-      "title": "Dayanmak",
-      "goal": "Gösterme ve tevekkül fiillerini tanıyacaksın.",
+      "title": "Göstermek ve dayanmak",
+      "goal": "Gösterdi, dayandı, haram kıldı, istedi ve kurtardı fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u09.07": {
       "title": "Açıklamak",
-      "goal": "Beyan ve yönelme fiillerini ayırt edeceksin.",
+      "goal": "Açıkladı, yöneldi, ayrılığa düştü, aradı ve yemin etti fiillerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u09.08": {
@@ -1055,21 +1080,23 @@
       }
     },
     "u09.11": {
-      "title": "Emir ve dua kalıpları",
-      "goal": "Ünitenin fiillerini birlikte pekiştireceksin.",
+      "title": "Çağırmak, sakınmak ve müjdelemek",
+      "goal": "Çağırdı, sakındı, alay etti, müjdeledi, yüz çevirdi ve konuştu fiillerini birlikte pekiştireceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u10.01": {
       "title": "Yapan ve yapılan",
-      "goal": "Bir kökten 'yapan' ve 'yapılan' kelimelerini türeteceksin.",
+      "goal": "'İnanan', 'yalanlayan', 'her şeyi bilen' ve 'adı konmuş' gibi, işi yapanı ya da yapılanı anlatan kelimelerle 'güvende oldu' kelimesini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u10.02": {
@@ -1082,12 +1109,13 @@
       }
     },
     "u10.03": {
-      "title": "Daha iyi bilen",
-      "goal": "Karşılaştırma kalıbını okuyacaksın.",
+      "title": "Daha iyi bilen ve daha çok",
+      "goal": "Daha iyi bilen, daha çok, daha çetin, anma ve öğüt kelimelerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u10.04": {
@@ -1235,21 +1263,23 @@
       }
     },
     "u10.20": {
-      "title": "Kök ailesi",
-      "goal": "Bir kökten türeyen kelimeleri birlikte pekiştireceksin.",
+      "title": "Kök ailesi: hüküm ve hikmet",
+      "goal": "Hükmetmek, hüküm ve hikmet kelimelerinin aynı kökten geldiğini göreceksin; yanında 'sanı' da var.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u11.01": {
-      "title": "'ilim' → 'talim'",
-      "goal": "Aynı kökten gelen 'ilim' ve 'talim' kelimelerinin kalıp farkını göreceksin.",
+      "title": "Kalıp değişince anlam değişir",
+      "goal": "Öğretti, bağışlanma diledi, Müslüman ve teslim oldu kelimelerinde kalıbın anlamı nasıl değiştirdiğini göreceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u11.02": {
@@ -1262,30 +1292,33 @@
       }
     },
     "u11.03": {
-      "title": "İman ve iyilik",
-      "goal": "İnanç ve güzel davranış kalıplarını okuyacaksın.",
+      "title": "İman, iyilik ve diriltmek",
+      "goal": "İman, iyilik etmek, hikmet sahibi ve diriltmek kelimelerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u11.04": {
-      "title": "Esenlik dileği",
-      "goal": "Selamlaşma kalıbını tanıyacaksın.",
+      "title": "Selâmlama ve ıslah",
+      "goal": "Selâmlama, düzeltmek ve can almak kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u11.05": {
-      "title": "Doğru yolu bulmak",
-      "goal": "Hidayet kalıbını okuyacaksın.",
+      "title": "Doğru yol ve ortak koşmak",
+      "goal": "Doğru yola ulaşmak, ortak koşmak ve dosdoğru kılmak fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u11.06": {
@@ -1307,21 +1340,23 @@
       }
     },
     "u12.02": {
-      "title": "Zaman rengi veren fiiller",
-      "goal": "Zaman bildiren yardımcı fiilleri okuyacaksın.",
+      "title": "Önce, sonra ve o vakit",
+      "goal": "'-ınca', 'önce', 'hani, o vakit' ve 'sonra' gibi zamanı belirten kelimeleri tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     },
     "u12.03": {
       "title": "Sık kalıplar",
-      "goal": "Şart ve zaman kalıplarını birlikte pekiştireceksin.",
+      "goal": "'Hiçbir zaman', 'vakit' ve 'kim' kelimeleriyle sık kullanılan kalıpları pekiştireceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "l0": "pass",
+        "at": "2026-10-02"
       }
     }
   },

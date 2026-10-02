@@ -121,6 +121,12 @@
   // KAO2-12: tek dersin kaynak-bağlı sırası. İçerik ve veri salt okunur; bütün Arapça lexicon/anchor kaynaklarından gelir.
   // K2F-20 (A-6): ders içerikleri yeniden dağıtılabilir; tamamlanmış (doneAt) bir derse sonradan taşınan ve hiç tanışılmamış
   // kelimeler kaybolmasın diye SIRADAKİ dersin planına eklenir. Tamamlanmış ders tamamlanmış kalır, kart verisine dokunulmaz.
+  // K2F-21: onaylanmamış (draft) ders başlığı plana sızmaz; kimlikten türetilen güvenli başlık kullanılır.
+  function safeLessonTitle(lesson){
+    var level=obj(lesson&&lesson.review).level,m=/^u0*(\d+)\.0*(\d+)$/.exec(String(lesson&&lesson.id||''));
+    if(level==='sourced'||level==='expert'||!m) return String(lesson&&lesson.title||'');
+    return 'Ünite '+m[1]+' · Ders '+m[2];
+  }
   function carryOver(q,cur,lesson){
     var out=[],found=false;
     cur.units.forEach(function(unit){
@@ -145,7 +151,7 @@
     var lex=c.lexicon,grammar=c.grammar,lemmas=eligible.map(function(id){ return lex&&typeof lex.byId==='function'?lex.byId(id):null; }).filter(Boolean);
     var concept=lesson.conceptId&&grammar&&typeof grammar.byId==='function'?grammar.byId(lesson.conceptId):null;
     var templates=concept&&Array.isArray(concept.templates)?concept.templates:[];
-    var items=[{id:'goal:'+lesson.id,kind:'goal',lessonId:lesson.id,title:String(lesson.title||''),lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),apply:lesson.apply||null}];
+    var items=[{id:'goal:'+lesson.id,kind:'goal',lessonId:lesson.id,title:safeLessonTitle(lesson),lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),apply:lesson.apply||null}];
     fresh.forEach(function(id,index){
       var lemma=lex&&typeof lex.byId==='function'?lex.byId(id):null;
       if(!lemma) return;

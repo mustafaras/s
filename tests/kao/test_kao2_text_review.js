@@ -98,11 +98,11 @@ check('(d) elle Arapça yok: metinler Arapça karakter taşımaz', () => {
 check('(e) her metinde review kaydı; by yalnız rol kodu', () => {
   for (const u of units) {
     assert.ok(u.review && LEVELS.includes(u.review.level), `u${u.id}: review.level`);
-    if (u.review.by !== undefined) assert.ok(['owner', 'expert'].includes(u.review.by), `u${u.id}: rol kodu`);
+    if (u.review.by !== undefined && !(u.review.by === null && u.review.level === 'draft')) assert.ok(['owner', 'expert'].includes(u.review.by), `u${u.id}: rol kodu (null yalnız draft)`);
   }
   for (const l of lessons) {
     assert.ok(l.review && LEVELS.includes(l.review.level), `${l.id}: review.level`);
-    if (l.review.by !== undefined) assert.ok(['owner', 'expert'].includes(l.review.by), `${l.id}: rol kodu`);
+    if (l.review.by !== undefined && !(l.review.by === null && l.review.level === 'draft')) assert.ok(['owner', 'expert'].includes(l.review.by), `${l.id}: rol kodu (null yalnız draft)`);
   }
   for (const lesson of CURRICULUM.s0.lessons) assert.ok(lesson.review && LEVELS.includes(lesson.review.level), `${lesson.id}: review.level`);
 });
@@ -152,6 +152,44 @@ check('inceleme sayfası ve metin kaynağı mevcut', () => {
   const sheet = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md'), 'utf8');
   for (const u of units) assert.ok(sheet.includes(`Ünite ${u.id}`), `inceleme sayfası: Ünite ${u.id}`);
   assert.ok(sheet.includes('- [ ]'), 'onay kutuları var');
+});
+
+// K2F-21 (KR-4): draft metin HİÇBİR ekranda görünmez; yerine güvenli başlık ("Ünite N · Ders M") yazar.
+// Bağımsız denetimde 35 draft dersin hepsinde ünite ekranında ve ders oynatıcıda ham başlığın sızdığı bulundu.
+check('draft ders başlığı/hedefi ünite ekranında, ders oynatıcıda ve hub kartında SIZMAZ (tüm draft dersler)', () => {
+  const draftLessons = lessons.filter((l) => api.kaoReviewLevel(l.review) === 'draft');
+  assert.ok(draftLessons.length >= 35, `draft ders sayısı ${draftLessons.length}`);
+  const escText = (v) => esc(String(v));
+  for (const lesson of draftLessons) {
+    const m = /^u0*(\d+)\.0*(\d+)$/.exec(lesson.id);
+    const safe = `Ünite ${m[1]} · Ders ${m[2]}`;
+    const unit = units.find((u) => u.lessons.includes(lesson));
+    // 1) ünite ekranı
+    assert.equal(api.kaoNav('unit', unit.id), true);
+    const unitHtml = html();
+    // Ders adımı <li> bloğu: kavram başlığı gibi başka bölümler ders başlığıyla aynı sözcükleri taşıyabilir.
+    const step = unitHtml.split('<li class="kao-unit-step').find((part) => part.includes(safe));
+    assert.ok(step, `${lesson.id}: ünite ekranında güvenli başlık "${safe}" yok`);
+    assert.equal(step.includes(escText(lesson.title)), false, `${lesson.id}: ünite ekranında ham başlık sızdı`);
+    if (lesson.goal) assert.equal(step.includes(escText(lesson.goal)), false, `${lesson.id}: ünite ekranında ham hedef sızdı`);
+    // 2) ders oynatıcı (tüm önceki dersler tamamlanmış sayılır; ders gerçek handler ile başlatılır)
+    const q = api.ensureQuranLearn(data);
+    q.onboarding.doneAt = '2026-09-20T00:00:00.000Z'; q.onboarding.start = 'level1';
+    q.path = { lessons: {}, units: {} };
+    for (const prior of lessons) { if (prior.id === lesson.id) break; q.path.lessons[prior.id] = { startedAt: '2026-09-20T10:00:00.000Z', doneAt: '2026-09-20T10:10:00.000Z', introducedLemmas: prior.lemmaIds.slice() }; }
+    for (const u of units) if (u.id < unit.id) q.path.units[String(u.id)] = { masteryAt: '2026-09-21T10:00:00.000Z', masteryScore: 1, attempts: 1, lastAttemptAt: '2026-09-21T10:00:00.000Z', repair: null, skippedAt: null };
+    ui.kaoStack = []; ui.kaoView = 'home'; ui.kaoOpen = true; ui.kaoLesson = null;
+    assert.equal(api.kaoLesson('start', lesson.id), true, `${lesson.id}: başlamadı`);
+    const playerHtml = html();
+    assert.equal(playerHtml.includes(escText(lesson.title)), false, `${lesson.id}: ders oynatıcıda ham başlık sızdı`);
+    if (lesson.goal) assert.equal(playerHtml.includes(escText(lesson.goal)), false, `${lesson.id}: ders oynatıcıda ham hedef sızdı`);
+    assert.ok(playerHtml.includes(safe), `${lesson.id}: ders oynatıcıda güvenli başlık yok`);
+    ui.kaoLesson = null;
+    // 3) hub kartı ("Sıradaki: …"): sıradaki ders bu draft ders olduğunda ham başlık görünmez
+    const hubHtml = api.kaoHubCardHTML();
+    assert.equal(hubHtml.includes(escText(lesson.title)), false, `${lesson.id}: hub kartında ham başlık sızdı`);
+    if (hubHtml.includes('Sıradaki:')) assert.ok(hubHtml.includes(safe), `${lesson.id}: hub kartında güvenli başlık yok`);
+  }
 });
 
 console.log(`KAO2-17 text review: PASS (${passed} kontrol)`);

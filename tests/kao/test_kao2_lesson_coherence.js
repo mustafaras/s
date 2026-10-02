@@ -33,8 +33,8 @@ const posIn = (...tags) => (lemma) => tags.includes(lemma.pos);
 const patternIs = (re) => (lemma) => re.test(String(lemma.pattern || ''));
 // Yardımcı fiil (kâne ve kardeşleri: kâne, leyse, asbaha, sâre, bâte, zalle, mâ dâme…, klasik Arapça dilbilgisi) KAPALI bir
 // kümedir; anlam sözcüğü ('oldu') eşleştirmesi 'sahip oldu', 'razı oldu' gibi sıradan fiilleri de yakalayacağından kullanılmaz.
-// Sözlükte bugün yalnız ikisi vardır: kâna ve asbaha.
-const HELPER_VERB_IDS = new Set(['l_kaAna_febd3a', 'l_aSobaHa_69bc2c']);
+// Sözlükte bugün yalnız üçü vardır: kâna (Ünite 3, donuk), leyse (u08.03) ve asbaha (u09.08).
+const HELPER_VERB_IDS = new Set(['l_kaAna_febd3a', 'l_l_ayosa_5684fc', 'l_aSobaHa_69bc2c']);
 const isHelperVerb = (lemma) => HELPER_VERB_IDS.has(lemma.id);
 
 // Kategori sözlüğü: anahtar sözcük (başlık/hedef) → lemma yüklemi. Gerekçe her satırda.
@@ -46,7 +46,8 @@ const CATEGORIES = [
   { id: 'işaret', re: /işaret kelimeleri/, test: posIn('DEM') },
   { id: 'soru', re: /soru kelimeleri/, test: posIn('INTG') },
   { id: 'olumsuzluk', re: /olumsuzluk/, test: posIn('NEG') },
-  { id: 'şart', re: /şart|eğer/, test: posIn('COND') },
+  // Kelime sınırı: 'değerli' içindeki 'eğer' şart anlamına gelmez.
+  { id: 'şart', re: /(^|[^\p{L}])(şart|eğer)([^\p{L}]|$)/u, test: posIn('COND') },
   // 'Zaman bildiren yardımcı fiilleri' (u12.02) bir fiil dersidir; zarf-zaman yalnız 'zaman kalıpları' için aranır.
   { id: 'zaman', re: /zaman kalıpları/, test: posIn('T') },
   // 'allazî/mâ' REL: "-an, -en" ilgi bağları.
@@ -82,6 +83,19 @@ const CONCEPT_CATEGORY = {
   g20: ['fiilin adı', patternIs(/masdar/)], g22: ['şart', posIn('COND')], g23: ['yardımcı fiil', isHelperVerb]
 };
 
+// Kavram bağı konumsaldır (Ünite.conceptIds[i]); kavram sayfası ve şablonları KENDİ doğrulanmış örnekleriyle öğretir. Dersin
+// kelimeleri kavramın kategorisinden olamıyorsa (sözlükte yeterli lemma yok ya da lemmalar donuk ünitelerde) kavram eşiği
+// aranmaz. Her muafiyet gerekçelidir; test, muafiyetin hâlâ gerçek olduğunu doğrular (kavram eşiğinin altında kalmalı).
+const CONCEPT_EXEMPT = {
+  'u02.01': ['g3', "sözlükte 5 edat lemması var; üçü donuk Ünite 1/3'te, ikisi (ilâ, ʿan) u02.03'te"],
+  'u02.02': ['g4', 'sözlükte tek zamir lemması var (iyyâ, Ünite 1)'],
+  'u03.02': ['g6', 'Ünite 3 donuk; olumsuzluk lemmaları (lâ, lam, lan) başka ünitelerde'],
+  'u04.01': ['g7', 'sözlükte 2 ilgi bağı lemması var (allazî Ünite 1, mâ Ünite 3)'],
+  'u07.02': ['g14', 'sözlükte yalnız üç yardımcı fiil var (kâna Ünite 3 donuk, leyse u08.03, asbaha u09.08); 4 lemmalı derste %60 için üçü gerekir'],
+  'u12.02': ['g23', 'aynı üç yardımcı fiil iki derse yetmez (kâna donuk Ünite 3\'te); sâre, bâte… sözlükte yok']
+};
+const conceptExempt = (lesson) => !!(CONCEPT_EXEMPT[lesson.id] && CONCEPT_EXEMPT[lesson.id][0] === lesson.conceptId);
+
 function share(lemmaIds, test) {
   const lemmas = lemmaIds.map((id) => lexicon.byId(id));
   assert.ok(lemmas.every(Boolean), 'çözülemeyen lemma kimliği');
@@ -107,9 +121,11 @@ const STOP_WORDS = new Set(['ve', 'ile', 'veya', 'ama', 'ise', 'için', 'bir', '
 const TITLED_BY_PASSAGE = {
   'u01.05': 'Fâtiha bütünü', 'u02.03': 'namaz cümleleri bütünü', 'u03.06': 'üç sûre bütünü', 'u06.30': 'ünite pekiştirmesi'
 };
+// Düzeltme işaretli ünlüler (â, î, û) yazım farkı olarak sayılmaz ('selâm' ≡ 'selam').
+const fold = (v) => String(v).toLocaleLowerCase('tr').replace(/â/g, 'a').replace(/î/g, 'i').replace(/û/g, 'u');
 // Türkçe kök-önek: mastar (-mak/-mek) ve çoğul (-lar/-ler) atılır, 3–4 harf önek karşılaştırılır.
 function titleStem(word) {
-  const base = word.toLocaleLowerCase('tr').replace(/[^a-zçğıöşüâîû]/g, '').replace(/(mak|mek)$/, '').replace(/(lar|ler)$/, '');
+  const base = fold(word).replace(/[^a-zçğıöşü]/g, '').replace(/(mak|mek)$/, '').replace(/(lar|ler)$/, '');
   return base.slice(0, Math.max(3, Math.min(4, base.length - 1)));
 }
 // KÖK ölçümü: "bir kökten / aynı kökten / kök ailesi" diyen derste lemmaların ≥%60'ı aynı kökü paylaşır (Arapça kök temelli).
@@ -128,11 +144,11 @@ function isThematic(lesson) {
   return !lesson.conceptId && !TITLED_BY_PASSAGE[lesson.id] && !ROOT_RE.test(text) && !CATEGORIES.some((c) => c.re.test(title));
 }
 function titleCoverage(lesson) {
-  const words = lesson.title.toLocaleLowerCase('tr').split(/[\s,:'’‘.\-–…!?]+/).filter((w) => w.length > 2 && !STOP_WORDS.has(w));
+  const words = fold(lesson.title).split(/[\s,:'’‘.\-–…!?]+/).filter((w) => w.length > 2 && !STOP_WORDS.has(w));
   if (!words.length) return null;
   const glosses = lesson.lemmaIds.map((id) => {
     const lemma = lexicon.byId(id);
-    return `${(lemma.meanings || []).join(' ')} ${(lemma.cognate && lemma.cognate.tr) || ''}`.toLocaleLowerCase('tr');
+    return fold(`${(lemma.meanings || []).join(' ')} ${(lemma.cognate && lemma.cognate.tr) || ''}`);
   });
   return words.filter((w) => glosses.some((g) => g.includes(titleStem(w)))).length / words.length;
 }
@@ -167,7 +183,7 @@ function measures(lesson) {
     out.push({ kind: 'etiket', key: 'kök', ratio, reason: `başlık/hedef "kök" anıyor, lemmaların en çok %${pct(ratio)}'i aynı kökte` });
   }
   const concept = CONCEPT_CATEGORY[lesson.conceptId];
-  if (concept) {
+  if (concept && !conceptExempt(lesson)) {
     const ratio = share(lesson.lemmaIds, concept[1]);
     out.push({ kind: 'etiket', key: `kavram:${lesson.conceptId}`, ratio, reason: `kavram ${lesson.conceptId} "${concept[0]}" bekliyor, lemmaların %${pct(ratio)}'i uyuyor` });
   }
@@ -189,28 +205,18 @@ const semanticIncoherence = (lesson) => failing(lesson, ['anlam']);
 const shortfall = (lesson) => measures(lesson).reduce((sum, m) => sum + Math.max(0, THRESHOLD - m.ratio), 0);
 
 // Bugün tutmayan derslerin TAM listeleri (K5-03). Yalnız küçülür; K2F-20 boşaltır.
-const KNOWN_MISMATCH = [
-  // Donmuş üniteler (Ünite 1–3): başlık/kavram metni K2F-21'de ya da sözlük genişletmesiyle çözülür.
-  'u02.01', 'u02.02', 'u03.02',
-  // Sözlükte yeterli lemma yok: ilgi bağı (2), "ancak" (1), yardımcı fiil (yalnız kâna ve asbaha; leyse sözlükte yok).
-  'u04.01', 'u04.02', 'u07.02', 'u12.02',
-  // Seslenme dersi isim lemmaları ister; isimleri fiil ünitesine taşımak sınıf kuralını bozar (G2 kararı).
-  'u09.02',
-  // Kök/anlam: aynı kökten ≥%60 lemma ya da yalnız 3 lemmalı küçük küme (G2 kararı).
-  'u10.01', 'u11.01', 'u11.05'
-];
-// u07.01: örneklerin %58'i geçmiş (eşik %60; tek örnek eksik). u09.02 yukarıdaki seslenme sınırı.
-const KNOWN_EXAMPLE_MISMATCH = ['u07.01', 'u09.02'];
-// u08.07: "Yeterli gelmek" başlığının yarısı lemma anlamlarında; metin K2F-21'de yeniden yazılır.
-const KNOWN_SEMANTIC_GAP = ['u08.07'];
+const KNOWN_MISMATCH = [];
+// u07.01: örneklerin %58'i geçmiş kipte (eşik %60; tek örnek eksik). Kavram (g13) kip aradığı için metin yeniden yazımıyla
+// düzelmez; dağılım G2'de onaylandı, örnek seçimi kipe göre yapılırsa kapanır.
+const KNOWN_EXAMPLE_MISMATCH = ['u07.01'];
+const KNOWN_SEMANTIC_GAP = [];
 // Çıta: her listenin uzunluğuyla BİREBİR eşit olmalıdır; liste küçülünce çıta da aynı commit'te düşer, büyümek ise
 // listeyi ve çıtayı birlikte, bilerek değiştirmeyi gerektirir (sessiz artış yok).
-const CEILING = { label: 11, example: 2, semantic: 1 };
-// K5-03 denetimindeki 10 ders. Düzeltilen ders FIXED_SINCE_AUDIT'e taşınır (kapı artık yakalamaz); biri hem
-// düzeltilmeden hem de hiçbir ölçümde görünmeden kaybolamaz.
+const CEILING = { label: 0, example: 1, semantic: 0 };
 const AUDITED_K5_03 = ['u02.01', 'u02.02', 'u04.01', 'u04.02', 'u09.01', 'u09.02', 'u10.01', 'u11.04', 'u11.05', 'u12.02'];
 // K2F-20 yeniden dağıtımı: u09.01 (emir; lemma + örnek), u11.04 (esenlik; salâm hariç iki lemma + dolgu).
-const FIXED_SINCE_AUDIT = ['u09.01', 'u11.04'];
+// K2F-20/21: dağılım + yeniden yazılan metinler. u02.01, u02.02, u04.01, u12.02 kavram muafiyetiyle (CONCEPT_EXEMPT) açıkça belgelidir.
+const FIXED_SINCE_AUDIT = ['u02.01', 'u02.02', 'u04.01', 'u04.02', 'u09.01', 'u09.02', 'u10.01', 'u11.04', 'u11.05', 'u12.02'];
 
 function runChecks() {
   let passed = 0;
@@ -236,7 +242,20 @@ function runChecks() {
   check('kategori sözlüğü ve kavram kategorileri gerçek kimliklere bağlı', () => {
     const conceptIds = new Set(grammar.concepts.map((c) => c.id));
     for (const id of Object.keys(CONCEPT_CATEGORY)) assert.ok(conceptIds.has(id), `kavram ${id} gramer modülünde yok`);
-    for (const category of CATEGORIES) assert.ok(lessons.some((l) => category.re.test(`${l.title} ${l.goal}`.toLocaleLowerCase('tr'))), `kategori "${category.id}" hiçbir derste anılmıyor`);
+      // Metinler artık dersin gerçek kelimelerinden yazıldığı için kategori adı hiçbir derste geçmeyebilir; regex'in ölü
+    // olmadığı örnek ifadelerle sınanır (ve 'değerli' içindeki 'eğer' gibi yanlış eşleşmeler yoktur).
+    const SAMPLES = {
+      edat: 'edat kelimeleri', zamir: 'Zamirler', işaret: 'İşaret kelimeleri', soru: 'Soru kelimeleri', olumsuzluk: 'Olumsuzluk',
+      şart: "'eğer' ve şart", zaman: 'Zaman kalıpları', 'ilgi bağı': "'-an, -en' bağları", şüphesiz: "'Şüphesiz'", ancak: "'ancak'",
+      bağlaç: 'bağlaçlar', seslenme: 'Seslenme: ey', emir: 'Emir kipi', 'geçmiş zaman': 'geçmiş zaman', 'şimdiki zaman': 'şimdiki zaman',
+      'yapan/yapılan': 'Yapan ve yapılan', 'fiilin adı': 'Fiilin adı', karşılaştırma: 'karşılaştırma kalıbı', fiil: 'fiilleri',
+      'yardımcı fiil': 'yardımcı fiil', esenlik: 'Esenlik dileği', hidayet: 'hidayet'
+    };
+    for (const category of CATEGORIES) {
+      assert.ok(SAMPLES[category.id], `kategori "${category.id}" için örnek ifade yok`);
+      assert.ok(category.re.test(SAMPLES[category.id].toLocaleLowerCase('tr')), `kategori "${category.id}" kendi örnek ifadesini yakalamıyor`);
+    }
+    assert.equal(CATEGORIES.find((c) => c.id === 'şart').re.test('değerli kelimeler'), false, "'değerli' içindeki 'eğer' şart sayılmaz");
   });
 
   check('ETİKET: tutarsız ders listesi KNOWN_MISMATCH ile TAM eşit', () => {
@@ -249,6 +268,16 @@ function runChecks() {
 
   check('ANLAM: tematik derslerde başlık sözcükleri lemma anlamlarında geçer (KNOWN_SEMANTIC_GAP tam eşit)', () => {
     assert.deepEqual(Array.from(foundSemantic, (x) => x.id).sort(), Array.from(KNOWN_SEMANTIC_GAP).sort(), `bulunan: ${JSON.stringify(Array.from(foundSemantic, (x) => x.id))}`);
+  });
+
+  check('kavram muafiyetleri dürüst: her muaf çift hâlâ kavram eşiğinin altında, kavram gerçekten bağlı, gerekçe dolu', () => {
+    for (const [lessonId, [conceptId, reason]] of Object.entries(CONCEPT_EXEMPT)) {
+      const lesson = curriculum.byLesson(lessonId);
+      assert.equal(lesson.conceptId, conceptId, `${lessonId}: kavram ${conceptId} değil`);
+      assert.ok(reason.length > 20, `${lessonId}: gerekçe boş`);
+      const ratio = share(Array.from(lesson.lemmaIds), CONCEPT_CATEGORY[conceptId][1]);
+      assert.ok(ratio < THRESHOLD, `${lessonId}: kavram eşiği artık sağlanıyor (%${pct(ratio)}) — muafiyeti kaldır`);
+    }
   });
 
   check('listeler çıtayla eşit ve yinelenen kimlik yok (yalnız küçülür)', () => {

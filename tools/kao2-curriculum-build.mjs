@@ -448,16 +448,33 @@ function renderTextReview(data) {
   const lines = ['# İnceleme · KAO2-17 — Ünite ve ders metinleri', '',
     '> Bu sayfa `tools/kao2-curriculum-build.mjs` ile üretilir; elle düzenlenmez.',
     '> Onay: kutu işaretlenir, sonra `--apply-review` ile metin kaynağına taşınır.',
-    '> Onaylanmamış metinler `draft` kalır ve uygulamada **gösterilmez**.', '',
+    '> Onaylanmamış metinler `draft` kalır ve uygulamada **gösterilmez** (yerine "Ünite N · Ders M" yazar).', '',
+    '## Sana düşen', '',
+    '1. Aşağıdaki tabloları oku. Bir metni uygun buluyorsan **o satırın kutusunu `[x]` yap**.',
+    '2. Dinî bağlam taşıyan ünite metinlerinde L2 kutusu da vardır (alan uzmanı onayı).',
+    '3. İşin bitince bana **"L1 işaretlendi"** yaz. Kutusu işaretli olmayan hiçbir metin onaylanmış sayılmaz.', '',
     '## Durum', ''];
   const all = [];
-  data.units.forEach((u) => { all.push({ id: `u${u.id}`, kind: 'ünite', review: u.review }); u.lessons.forEach((l) => all.push({ id: l.id, kind: 'ders', review: l.review })); });
-  data.s0.lessons.forEach((l) => all.push({ id: l.id, kind: 'S0', review: l.review }));
+  data.units.forEach((u) => { all.push({ id: `u${u.id}`, kind: 'ünite', title: u.title, goal: u.promise, review: u.review }); u.lessons.forEach((l) => all.push({ id: l.id, kind: 'ders', title: l.title, goal: l.goal, review: l.review })); });
+  data.s0.lessons.forEach((l) => all.push({ id: l.id, kind: 'S0', title: l.title, goal: l.goal, review: l.review }));
   const count = (level) => all.filter((t) => t.review.level === level).length;
+  const drafts = all.filter((t) => t.review.level === 'draft');
+  const reapprove = all.filter((t) => t.review.level !== 'draft');
   lines.push(`- Toplam metin: **${all.length}**`,
     `- \`draft\` (görünmez): **${count('draft')}**`,
     `- \`sourced\` (görünür): **${count('sourced')}**`,
-    `- \`expert\` (görünür): **${count('expert')}**`, '',
+    `- \`expert\` (görünür): **${count('expert')}**`, '');
+  // KR-4: yeniden yazılanlar ve kutu onayı olmadan görünür kalanlar ayrı listelenir.
+  const cell = (v) => String(v ?? '—').replace(/\|/g, '\\|');
+  lines.push('## Yeniden yazılan metinler (`draft`, K2F-21)', '',
+    'Bu dersler yeni kelime dağılımına göre yeniden yazıldı; sen onaylayana kadar uygulamada görünmez.', '');
+  if (drafts.length) {
+    lines.push('| id | başlık | hedef |', '|---|---|---|');
+    drafts.forEach((t) => lines.push(`| ${t.id} | ${cell(t.title)} | ${cell(t.goal)} |`));
+  } else lines.push('Yok.');
+  lines.push('', '## Yeniden onay gerekli', '',
+    `Bugün \`sourced\` (görünür) olup **açık kutu onayı olmayan** ${reapprove.length} metin vardır: ${reapprove.map((t) => t.id).join(', ') || '—'}.`,
+    'Bunların hiçbiri senin kutu işaretinle onaylanmadı; aşağıdaki tablolarda `[x]` yapmadığın metin onaylı sayılmaz.', '',
     '## Üniteler', '');
   data.units.forEach((u) => {
     lines.push(`### Ünite ${u.id} · ${u.title}`, '',
@@ -628,7 +645,8 @@ function lintTexts(texts) {
   for (const { id, entry } of [...units, ...flat]) {
     const review = entry.review;
     if (!review || !LEVELS.includes(review.level)) { problems.push(`${id}: review.level geçersiz`); continue; }
-    if (review.by !== undefined && !['owner', 'expert'].includes(review.by)) problems.push(`${id}: rol kodu geçersiz`);
+    // by: yalnız rol kodu; yeniden yazılan (henüz kimse onaylamamış) metinde null.
+    if (review.by !== undefined && !(review.by === null && review.level === 'draft') && !['owner', 'expert'].includes(review.by)) problems.push(`${id}: rol kodu geçersiz`);
     // (d) elle Arapça yok
     for (const value of textsOf(entry)) {
       if (/[\u0600-\u06ff]/.test(value)) problems.push(`${id}: elle Arapça`);

@@ -923,7 +923,7 @@
     if(!quranLearnDeps) return null;
     var unit=kaoCurriculumUnit(unitId); if(!unit) return null;
     var d=quranLearnDeps.data(),q=ensureQuranLearn(d),flow=window.SeymaQuranLearnFlow,content=kaoLessonContent(),progress=flow.unitProgress(q,unit.id,content),lex=window.QuranLexiconV1,known=kaoKnownLemmaSet(d),grammar=window.QuranGrammarV1,shorts=window.QuranShortSurahsV1||{},records=q.path&&q.path.lessons||{};
-    var lessons=unit.lessons.map(function(lesson,index){ var state=flow.lessonProgress(q,lesson.id,content),title=lesson.title; return {id:lesson.id,title:kaoVisibleText(lesson.review,title,title),goal:kaoVisibleText(lesson.review,lesson.goal,''),done:state.done,current:progress.nextIndex===index&&!state.done}; });
+    var lessons=unit.lessons.map(function(lesson,index){ var state=flow.lessonProgress(q,lesson.id,content),title=kaoSafeLessonTitle(lesson); return {id:lesson.id,title:title,goal:kaoVisibleText(lesson.review,lesson.goal,''),done:state.done,current:progress.nextIndex===index&&!state.done}; });
     var words=unit.lessons.reduce(function(all,lesson){
       var record=records[lesson.id]&&typeof records[lesson.id]==='object'?records[lesson.id]:{},introduced=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[];
       return all.concat(lesson.lemmaIds.map(function(id){
@@ -1066,6 +1066,11 @@
   function kaoLessonTitle(lesson){
     var fallback='Ünite '+String(lesson&&lesson.unitId||'')+' · Ders '+String(lesson&&lesson.index||'');
     return kaoVisibleText(lesson&&lesson.review,lesson&&lesson.title,fallback);
+  }
+  // K2F-21 (KR-4): draft ders metni hiçbir ekranda görünmez; kimlikten türetilen güvenli başlık ("Ünite N · Ders M") kullanılır.
+  function kaoSafeLessonTitle(lesson){
+    var m=/^u0*(\d+)\.0*(\d+)$/.exec(String(lesson&&lesson.id||''));
+    return kaoVisibleText(lesson&&lesson.review,lesson&&lesson.title,m?('Ünite '+m[1]+' · Ders '+m[2]):String(lesson&&lesson.title||''));
   }
   // KAO2-18 · 07 §4: hata sınıfına göre sade açıklama. Utandırmaz, nedeni ve
   // düzeltme adımını verir. Arapça yalnız görev nesnesinden gelir; sözlüğe bakılmaz.
@@ -1823,7 +1828,7 @@
     if(!Array.isArray(plan)||!plan.length) return false;
     plan=kaoLessonSafePlan(plan,d);
     var reviews=startMode==='intro'?[]:kaoBuildQueue(d,now,{sessionId:quranLearnDeps.todayStr(),candidates:kaoCandidates(),dailyNew:0}).filter(function(item){ return !item.isNew; }).slice(0,20);
-    var record=kaoLessonRecord(q,lesson.id),resume=objectOr(record.resume,{}),state={lessonId:lesson.id,title:String(lesson.title||''),plan:plan,at:0,phase:reviews.length?'review':'lesson',reviews:reviews,correct:0,answered:0,done:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:record.startedAt||now.toISOString(),resumeAt:0};
+    var record=kaoLessonRecord(q,lesson.id),resume=objectOr(record.resume,{}),state={lessonId:lesson.id,title:kaoSafeLessonTitle(lesson),plan:plan,at:0,phase:reviews.length?'review':'lesson',reviews:reviews,correct:0,answered:0,done:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:record.startedAt||now.toISOString(),resumeAt:0};
     if(startMode==='intro'){ state.at=Math.max(0,plan.findIndex(function(item){ return item.kind==='intro'; })); state.resumeAt=state.at; }
     var planResumeId=resume.lessonItemId||((resume.phase!=='review'&&resume.itemId)?resume.itemId:'');
     if(planResumeId){ var planAt=plan.findIndex(function(item){ return item.id===planResumeId; }); if(planAt>=0) state.resumeAt=planAt; }
@@ -3440,7 +3445,7 @@
     }
     var lesson=(step.kind==='daily'||step.kind==='next-unit')&&typeof curriculum.byLesson==='function'?curriculum.byLesson(step.param):null;
     var today=quranLearnDeps.todayStr(),answered=Math.floor(nonNegativeNumber(objectOr(q.daily[today],{}).answered,0)),intent=answered?'':kaoIntentSuggestion(d,now,today,q.onboarding&&q.onboarding.intent);
-    return {title:KAO_HUB_TITLE+' · '+(step.kind==='s0-lesson'?'Harfler':'Ünite '+at.unit.id),subtitle:intent?'Niyet önerisi: '+intent:'Sıradaki: '+(lesson?lesson.title:step.title)+' · '+step.minutes+' dk',action:'Devam',ring:ring};
+    return {title:KAO_HUB_TITLE+' · '+(step.kind==='s0-lesson'?'Harfler':'Ünite '+at.unit.id),subtitle:intent?'Niyet önerisi: '+intent:'Sıradaki: '+(lesson?kaoSafeLessonTitle(lesson):step.title)+' · '+step.minutes+' dk',action:'Devam',ring:ring};
   }
   function kaoHubCardHTML(){
     if(!quranLearnDeps) return '';

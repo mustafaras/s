@@ -284,10 +284,10 @@
         "u07.02",
         "u12.02"
       ],
-      "sorun": "Yardımcı fiil (kâne ve kardeşleri) sözlükte yalnız kâna ve asbaha; leyse, sâre, bâte… yok. İki ders için en az 3'er yardımcı fiil gerekir.",
+      "sorun": "Yardımcı fiil (kâne ve kardeşleri) sözlükte yalnız üç tane: kâna (Ünite 3'te, donuk), leyse (u08.03), asbaha (u09.08); sâre, bâte… yok. İki ders için en az 3'er yardımcı fiil gerekir, üç fiil ikisine yetmez. (K2F-21'de düzeltildi: önceki sunumda 'leyse yok' yazılmıştı.)",
       "secenekler": [
         "K2F-21: dersler kâna/asbaha'yı tek derste toplar, diğeri yeniden adlandırılır (önerilen)",
-        "Sözlük genişletilir (leyse, sâre, bâte, zalle)"
+        "Sözlük genişletilir (sâre, bâte, zalle)"
       ]
     },
     {

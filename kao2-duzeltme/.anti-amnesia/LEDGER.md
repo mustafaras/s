@@ -582,3 +582,26 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranCurriculumV2.js, quranLearnFlow.js) · cihaz —
 - surprises: prompt kabulü "KNOWN_MISMATCH boş" kullanıcı kararıyla K2F-21'e devredildi (metinler yeniden yazılınca). Uzun arka plan koşuları tur boşta dondu; kapılar ön planda koşturuldu.
 - next: K2F-21
+
+## seq 60 · 2026-10-02 · FIX · K2F-21
+- request: K2F-21 bağımsız denetimi (3 bakış: içerik doğruluğu · dil/L0 · entegrasyon; her bulguya çürütme; 27 ajan, 8 doğrulandı / 16 reddedildi).
+- fixed: u04.01 (favk), u04.03 (lan), u10.03 (zikrâ), u10.01 (belirsiz cümle), u09.01 (başlıktaki 'yap'/ünlem), selâm yazımı ve 'tenzih' açıklaması (u02.02/u11.04); lint `by:null` yalnız draft; CONCEPT_EXEMPT gerekçesindeki yanlış iddia ("leyse sözlükte yok" — leyse u08.03'te; yardımcı fiil kümesi kâna+leyse+asbaha) düzeltildi, K2F-20 G2 sunumundaki aynı hata spec g2Decisions'ta işaretlendi; karar değişmedi (üç fiil iki derse yetmez, kâna donuk Ü3'te).
+- verified-ok: lemma anlamları metinlerle uyumlu; L0 kuralları, imlâ, Arapça yok.
+
+## seq 61 · 2026-10-02 · NOTE · K2F-21
+- scope-extension: Dokun listesi dışı `app/core/quranLearn.js` (3 nokta) ve `app/core/quranLearnFlow.js` (1 nokta) + `tests/kao/test_kao2_lesson_coherence.js`. Gerekçe: bağımsız denetim, draft ders başlığı/hedefinin ünite ekranı, ders oynatıcı ve hub kartında ham görünmesini (35/35 ders) buldu; K2F-21 adım 3 "draft metin görünmez" kabulü bunu gerektirir. Düzeltme yalnız başlık/hedef kaynağını güvenli başlığa bağlar (`kaoSafeLessonTitle`, `safeLessonTitle`); davranış/handler/pin değişmedi (App.kao* 44 · yüzey 765 · atama 603).
+- proof: test_kao2_text_review.js sızıntı testi 35 draft dersin hepsinde ünite ekranı/ders oynatıcı/hub kartını sınar; hub düzeltmesi geri alınınca test kırılır (mutasyon).
+
+## seq 62 · 2026-10-02 · PROMPT · K2F-21
+- status: done
+- title: Ders metinleri ve inceleme sayfası
+- prev-commit: 6b42c9f6
+- evidence: kao2-duzeltme/evidence/K2F-21/KANIT.md
+- closes: K5-03 (3/3) · K5-04 (1/2) · M-01 (veri)
+- repro: değişmedi · toplam 9/10
+- gates: kapilar.sh YEŞİL (kao 51 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001g
+- changed-tests: test_kao2_text_review.js (by:null yalnız draft; sızıntı testi) · test_kao2_lesson_coherence.js (listeler 0/1/0, CONCEPT_EXEMPT, regex/katlama)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranCurriculumV2.js, quranLearn.js, quranLearnFlow.js) · cihaz —
+- surprises: draft başlık sızıntısı (yüksek) bağımsız denetimde bulundu ve düzeltildi; K2F-20 sunumundaki "leyse yok" hatası düzeltildi.
+- next: K2F-22

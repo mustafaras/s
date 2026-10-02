@@ -2,14 +2,67 @@
 
 > Bu sayfa `tools/kao2-curriculum-build.mjs` ile üretilir; elle düzenlenmez.
 > Onay: kutu işaretlenir, sonra `--apply-review` ile metin kaynağına taşınır.
-> Onaylanmamış metinler `draft` kalır ve uygulamada **gösterilmez**.
+> Onaylanmamış metinler `draft` kalır ve uygulamada **gösterilmez** (yerine "Ünite N · Ders M" yazar).
+
+## Sana düşen
+
+1. Aşağıdaki tabloları oku. Bir metni uygun buluyorsan **o satırın kutusunu `[x]` yap**.
+2. Dinî bağlam taşıyan ünite metinlerinde L2 kutusu da vardır (alan uzmanı onayı).
+3. İşin bitince bana **"L1 işaretlendi"** yaz. Kutusu işaretli olmayan hiçbir metin onaylanmış sayılmaz.
 
 ## Durum
 
 - Toplam metin: **133**
-- `draft` (görünmez): **0**
-- `sourced` (görünür): **133**
+- `draft` (görünmez): **35**
+- `sourced` (görünür): **98**
 - `expert` (görünür): **0**
+
+## Yeniden yazılan metinler (`draft`, K2F-21)
+
+Bu dersler yeni kelime dağılımına göre yeniden yazıldı; sen onaylayana kadar uygulamada görünmez.
+
+| id | başlık | hedef |
+|---|---|---|
+| u02.01 | Büyüklük ve tek ilah | Namazda sık duyduğun 'daha büyük', 'tapılan' ve 'ey' kelimelerini küçük yardımcılarıyla birlikte göreceksin. |
+| u02.02 | Tenzih, selâm ve bereket | Namazda sık geçen tenzih (her eksiklikten uzak tutma), namaz, selâm, temiz şeyler ve bereket kelimelerini tanıyacaksın. |
+| u03.02 | Sığınma ve sabah aydınlığı | Felak ve İhlâs'taki sığınma, şafak, denk ve 'oldu' gibi kelimeleri tanıyacaksın. |
+| u04.01 | Dikkat ve vurgu | Cümleye dikkat çeken, onu vurgulayan ve başka kelimelere bağlayan küçük kelimelerle birlikte 'üstünde' kelimesini tanıyacaksın. |
+| u04.02 | O gün, her ve bazı | 'O gün', 'hayır, aksine', 'her', 'bazı' ve 'yanında' gibi küçük kelimeleri tanıyacaksın. |
+| u04.03 | 'sonra', 'ile' ve 'veya' | Sıra, birliktelik, seçenek ve karşıtlık bildiren küçük kelimelerle birlikte gelecekte 'hayır' diyen 'asla' kelimesini tanıyacaksın. |
+| u04.04 | 'ya da', 'ama' ve 'ise' | Seçenek, karşıtlık ve gelecek bildiren 'ya … ya da', 'veya', 'ama', 'ileride' ve 'ise' kelimelerini tanıyacaksın. |
+| u04.05 | 'asla', 'sanki' ve 'umulur ki' | Reddetme, benzetme ve umut bildiren 'asla', 'öyleyse', 'sanki', 'umulur ki' ve 'hayır öyle değil' kelimelerini tanıyacaksın. |
+| u06.01 | Gök, yer ve işitme | Yer, gök, işitme ve 'kendi' kelimelerini tanıyacaksın. |
+| u06.07 | Mal, dost ve gece | Mal, dost, gece, ilk ve inkâr kelimelerini tanıyacaksın. |
+| u06.20 | Topluluk ve kutsal | Grup, topluluk, kutsal, değerli ve 'bir' kelimelerini tanıyacaksın. |
+| u07.01 | Geçmişte olanlar | Helal kıldı, yaptı, bildi ve geldi gibi geçmişte olan işleri anlatan fiilleri tanıyacaksın. |
+| u07.02 | Gönderme ve yalanlama | Gönderdi, yalanladı, inkâr etti ve indirdi fiillerini tanıyacaksın. |
+| u07.03 | İnanmak ve yapmak | İnandı, döndü, ortaya çıkardı, hazırladı ve yaptı fiillerini tanıyacaksın. |
+| u07.04 | Duymak ve girmek | Duydu, girdi, kazandı, ulaştı ve rızık verdi fiillerini tanıyacaksın. |
+| u07.06 | Şükretmek ve sahip olmak | Şükretti, sahip oldu, sandı, diledi ve taşıdı fiillerini tanıyacaksın. |
+| u07.09 | Tuzak ve yükseltmek | Tuzak kurdu, yükseltti, gerçekleşti ve tanıdı fiillerini okuyacaksın. |
+| u08.01 | Şimdiki ve geniş zaman | Gelir, görür, harcar, öldürür ve sabreder gibi 'yapar, yapıyor' kalıbını tanıyacaksın. |
+| u08.02 | Bulmak, bakmak ve sormak | Buldu, baktı, yaptı, aldı ve sordu fiillerini, 'yapmaz, yapmadı' olumsuzlarıyla birlikte göreceksin. |
+| u08.07 | Umut, yetmek ve affetmek | Umulur ki, kötü oldu, affetti, yasakladı ve yetti fiillerini tanıyacaksın. |
+| u08.09 | Bağışlamak ve yürümek | Bağışladı, gizledi, yürüdü, sınadı, koydu ve umar fiillerini okuyacaksın. |
+| u09.01 | Emir kipi: an, ye, ver, bağışla | Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerinin emir biçimini tanıyacaksın. |
+| u09.02 | Uymak ve yüz çevirmek | Uydu, edindi, çıkardı, yüz çevirdi ve itaat etti fiillerini okuyacaksın. |
+| u09.06 | Göstermek ve dayanmak | Gösterdi, dayandı, haram kıldı, istedi ve kurtardı fiillerini tanıyacaksın. |
+| u09.07 | Açıklamak | Açıkladı, yöneldi, ayrılığa düştü, aradı ve yemin etti fiillerini ayırt edeceksin. |
+| u09.11 | Çağırmak, sakınmak ve müjdelemek | Çağırdı, sakındı, alay etti, müjdeledi, yüz çevirdi ve konuştu fiillerini birlikte pekiştireceksin. |
+| u10.01 | Yapan ve yapılan | 'İnanan', 'yalanlayan', 'her şeyi bilen' ve 'adı konmuş' gibi, işi yapanı ya da yapılanı anlatan kelimelerle 'güvende oldu' kelimesini tanıyacaksın. |
+| u10.03 | Daha iyi bilen ve daha çok | Daha iyi bilen, daha çok, daha çetin, anma ve öğüt kelimelerini okuyacaksın. |
+| u10.20 | Kök ailesi: hüküm ve hikmet | Hükmetmek, hüküm ve hikmet kelimelerinin aynı kökten geldiğini göreceksin; yanında 'sanı' da var. |
+| u11.01 | Kalıp değişince anlam değişir | Öğretti, bağışlanma diledi, Müslüman ve teslim oldu kelimelerinde kalıbın anlamı nasıl değiştirdiğini göreceksin. |
+| u11.03 | İman, iyilik ve diriltmek | İman, iyilik etmek, hikmet sahibi ve diriltmek kelimelerini okuyacaksın. |
+| u11.04 | Selâmlama ve ıslah | Selâmlama, düzeltmek ve can almak kelimelerini tanıyacaksın. |
+| u11.05 | Doğru yol ve ortak koşmak | Doğru yola ulaşmak, ortak koşmak ve dosdoğru kılmak fiillerini okuyacaksın. |
+| u12.02 | Önce, sonra ve o vakit | '-ınca', 'önce', 'hani, o vakit' ve 'sonra' gibi zamanı belirten kelimeleri tanıyacaksın. |
+| u12.03 | Sık kalıplar | 'Hiçbir zaman', 'vakit' ve 'kim' kelimeleriyle sık kullanılan kalıpları pekiştireceksin. |
+
+## Yeniden onay gerekli
+
+Bugün `sourced` (görünür) olup **açık kutu onayı olmayan** 98 metin vardır: u1, u01.01, u01.02, u01.03, u01.04, u01.05, u2, u02.03, u3, u03.01, u03.03, u03.04, u03.05, u03.06, u4, u5, u05.01, u05.02, u6, u06.02, u06.03, u06.04, u06.05, u06.06, u06.08, u06.09, u06.10, u06.11, u06.12, u06.13, u06.14, u06.15, u06.16, u06.17, u06.18, u06.19, u06.21, u06.22, u06.23, u06.24, u06.25, u06.26, u06.27, u06.28, u06.29, u06.30, u7, u07.05, u07.07, u07.08, u8, u08.03, u08.04, u08.05, u08.06, u08.08, u9, u09.03, u09.04, u09.05, u09.08, u09.09, u09.10, u10, u10.02, u10.04, u10.05, u10.06, u10.07, u10.08, u10.09, u10.10, u10.11, u10.12, u10.13, u10.14, u10.15, u10.16, u10.17, u10.18, u10.19, u11, u11.02, u11.06, u12, u12.01, s0.01, s0.02, s0.03, s0.04, s0.05, s0.06, s0.07, s0.08, s0.09, s0.10, s0.11, s0.12.
+Bunların hiçbiri senin kutu işaretinle onaylanmadı; aşağıdaki tablolarda `[x]` yapmadığın metin onaylı sayılmaz.
 
 ## Üniteler
 
@@ -113,8 +166,8 @@
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u02.01 | Yön belirten ekler | '-de, -den, -e' anlamı veren küçük kelimeleri tanıyacaksın. | `sourced` | - [ ] |
-| u02.02 | Zamirler | 'ben, biz, sen, siz, o, onlar' kelimelerini namaz cümlesinde bulacaksın. | `sourced` | - [ ] |
+| u02.01 | Büyüklük ve tek ilah | Namazda sık duyduğun 'daha büyük', 'tapılan' ve 'ey' kelimelerini küçük yardımcılarıyla birlikte göreceksin. | `draft` | - [ ] |
+| u02.02 | Tenzih, selâm ve bereket | Namazda sık geçen tenzih (her eksiklikten uzak tutma), namaz, selâm, temiz şeyler ve bereket kelimelerini tanıyacaksın. | `draft` | - [ ] |
 | u02.03 | Namazda ne diyorum | Namaz cümlelerini baştan sona anlamlandıracaksın. | `sourced` | - [ ] |
 
 ### Ünite 3 dersleri
@@ -122,7 +175,7 @@
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
 | u03.01 | Kelime sonundaki ekler | İyelik ve çoğul eklerini ayırt edeceksin. | `sourced` | - [ ] |
-| u03.02 | Olumsuzluk | 'değil, asla' anlamı veren olumsuzluk kelimelerini tanıyacaksın. | `sourced` | - [ ] |
+| u03.02 | Sığınma ve sabah aydınlığı | Felak ve İhlâs'taki sığınma, şafak, denk ve 'oldu' gibi kelimeleri tanıyacaksın. | `draft` | - [ ] |
 | u03.03 | Yaratmak ve gece | Yaratma ve karanlık kelimelerini İhlâs ve Felak'te okuyacaksın. | `sourced` | - [ ] |
 | u03.04 | Düğümlere üfleyenler | Felak sûresinin kötülük saydığı davranışları anlayacaksın. | `sourced` | - [ ] |
 | u03.05 | Kıskançlık ve vesvese | Haset ve fısıltı kelimelerini Nâs sûresinde tanıyacaksın. | `sourced` | - [ ] |
@@ -132,11 +185,11 @@
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u04.01 | '-an, -en' bağları | Bir ismi tanımlayan '-an, -en' yapısını tanıyacaksın. | `sourced` | - [ ] |
-| u04.02 | 'Şüphesiz' ve 'ancak' | Pekiştirme ve sınırlama kelimelerini ayırt edeceksin. | `sourced` | - [ ] |
-| u04.03 | 'ile' ve 'veya' | Ekleme ve seçenek bildiren bağlaçları tanıyacaksın. | `sourced` | - [ ] |
-| u04.04 | 'ama' ve 'ise' | Karşıtlık ve karşılaştırma bağlaçlarını tanıyacaksın. | `sourced` | - [ ] |
-| u04.05 | 'asla' ve 'sanki' | Vurgu ve benzetme kelimeleriyle cümlenin tonunu okuyacaksın. | `sourced` | - [ ] |
+| u04.01 | Dikkat ve vurgu | Cümleye dikkat çeken, onu vurgulayan ve başka kelimelere bağlayan küçük kelimelerle birlikte 'üstünde' kelimesini tanıyacaksın. | `draft` | - [ ] |
+| u04.02 | O gün, her ve bazı | 'O gün', 'hayır, aksine', 'her', 'bazı' ve 'yanında' gibi küçük kelimeleri tanıyacaksın. | `draft` | - [ ] |
+| u04.03 | 'sonra', 'ile' ve 'veya' | Sıra, birliktelik, seçenek ve karşıtlık bildiren küçük kelimelerle birlikte gelecekte 'hayır' diyen 'asla' kelimesini tanıyacaksın. | `draft` | - [ ] |
+| u04.04 | 'ya da', 'ama' ve 'ise' | Seçenek, karşıtlık ve gelecek bildiren 'ya … ya da', 'veya', 'ama', 'ileride' ve 'ise' kelimelerini tanıyacaksın. | `draft` | - [ ] |
+| u04.05 | 'asla', 'sanki' ve 'umulur ki' | Reddetme, benzetme ve umut bildiren 'asla', 'öyleyse', 'sanki', 'umulur ki' ve 'hayır öyle değil' kelimelerini tanıyacaksın. | `draft` | - [ ] |
 
 ### Ünite 5 dersleri
 
@@ -149,13 +202,13 @@
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u06.01 | Gök ve yer | Kur'an'ın en sık geçen iki ismini tanıyacaksın. | `sourced` | - [ ] |
+| u06.01 | Gök, yer ve işitme | Yer, gök, işitme ve 'kendi' kelimelerini tanıyacaksın. | `draft` | - [ ] |
 | u06.02 | Kitap ve kalp | Kitap ve kalp kelimeleriyle iç dünyayı anlatan cümleleri okuyacaksın. | `sourced` | - [ ] |
 | u06.03 | Ödül ve karşılık | Karşılık ve durak kelimelerini tanıyacaksın. | `sourced` | - [ ] |
 | u06.04 | Âyet ve işaret | 'âyet' kelimesinin delil anlamını göreceksin. | `sourced` | - [ ] |
 | u06.05 | Musa ve halkı | Peygamber adlarını ve topluluk kelimelerini tanıyacaksın. | `sourced` | - [ ] |
 | u06.06 | Güç ve sahiplik | Güç ve sahip olma kelimelerini ayırt edeceksin. | `sourced` | - [ ] |
-| u06.07 | Mal ve dost | Dünya malı ve yakınlık kelimelerini tanıyacaksın. | `sourced` | - [ ] |
+| u06.07 | Mal, dost ve gece | Mal, dost, gece, ilk ve inkâr kelimelerini tanıyacaksın. | `draft` | - [ ] |
 | u06.08 | Oğullar ve arkadaşlar | Aile ve arkadaşlık kelimelerini okuyacaksın. | `sourced` | - [ ] |
 | u06.09 | Peygamber ve Firavun | Haber getiren elçi ve karşıt figür kelimelerini tanıyacaksın. | `sourced` | - [ ] |
 | u06.10 | Delil ve insan | Apaçık delil ve insan kelimelerini ayırt edeceksin. | `sourced` | - [ ] |
@@ -168,7 +221,7 @@
 | u06.17 | Nuh ve ışık | Peygamber adını ve aydınlık kelimesini okuyacaksın. | `sourced` | - [ ] |
 | u06.18 | Dağ ve günah | Doğa ve sorumluluk kelimelerini ayırt edeceksin. | `sourced` | - [ ] |
 | u06.19 | Nimet ve geçimlik | İyilik ve rızık kelimelerini tanıyacaksın. | `sourced` | - [ ] |
-| u06.20 | Topluluk ve kutsal | Grup ve kutsallık kelimelerini okuyacaksın. | `sourced` | - [ ] |
+| u06.20 | Topluluk ve kutsal | Grup, topluluk, kutsal, değerli ve 'bir' kelimelerini tanıyacaksın. | `draft` | - [ ] |
 | u06.21 | Önderler ve kuvvet | Liderlik ve güç kelimelerini tanıyacaksın. | `sourced` | - [ ] |
 | u06.22 | Ordu ve haber | Kalabalık ve bildiri kelimelerini ayırt edeceksin. | `sourced` | - [ ] |
 | u06.23 | Söz ve nesil | Konuşma ve soy kelimelerini tanıyacaksın. | `sourced` | - [ ] |
@@ -184,53 +237,53 @@
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u07.01 | Geçmiş zamanı tanıyalım | Fiilin geçmişte olduğunu gösteren kalıbı tanıyacaksın. | `sourced` | - [ ] |
-| u07.02 | Yardımcı fiil: oldu, idi | Geçmişte süren durumları anlatan yardımcı fiili okuyacaksın. | `sourced` | - [ ] |
-| u07.03 | İnanmak ve yapmak | Geçmiş zamanda inanma fiilini tanıyacaksın. | `sourced` | - [ ] |
-| u07.04 | Duymak ve girmek | Algı ve hareket fiillerini geçmiş zamanda okuyacaksın. | `sourced` | - [ ] |
+| u07.01 | Geçmişte olanlar | Helal kıldı, yaptı, bildi ve geldi gibi geçmişte olan işleri anlatan fiilleri tanıyacaksın. | `draft` | - [ ] |
+| u07.02 | Gönderme ve yalanlama | Gönderdi, yalanladı, inkâr etti ve indirdi fiillerini tanıyacaksın. | `draft` | - [ ] |
+| u07.03 | İnanmak ve yapmak | İnandı, döndü, ortaya çıkardı, hazırladı ve yaptı fiillerini tanıyacaksın. | `draft` | - [ ] |
+| u07.04 | Duymak ve girmek | Duydu, girdi, kazandı, ulaştı ve rızık verdi fiillerini tanıyacaksın. | `draft` | - [ ] |
 | u07.05 | Vurmak ve çıkmak | Hareket bildiren fiilleri ayırt edeceksin. | `sourced` | - [ ] |
-| u07.06 | Şükretmek | Teşekkür ve sanma fiillerini geçmiş zamanda tanıyacaksın. | `sourced` | - [ ] |
+| u07.06 | Şükretmek ve sahip olmak | Şükretti, sahip oldu, sandı, diledi ve taşıdı fiillerini tanıyacaksın. | `draft` | - [ ] |
 | u07.07 | Bırakmak ve toplamak | Terk etme ve bir araya getirme fiillerini okuyacaksın. | `sourced` | - [ ] |
 | u07.08 | Kalmak ve güç yetirmek | Süreklilik ve yeterlilik fiillerini tanıyacaksın. | `sourced` | - [ ] |
-| u07.09 | Tuzak ve yükseltmek | Geçmiş zaman fiillerini kıssa bağlamında pekiştireceksin. | `sourced` | - [ ] |
+| u07.09 | Tuzak ve yükseltmek | Tuzak kurdu, yükseltti, gerçekleşti ve tanıdı fiillerini okuyacaksın. | `draft` | - [ ] |
 
 ### Ünite 8 dersleri
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u08.01 | Şimdiki ve geniş zaman | 'yapar, yapıyor' kalıbını tanıyacaksın. | `sourced` | - [ ] |
-| u08.02 | Olumsuz şimdiki zaman | 'yapmaz, yapmadı' olumsuzluğunu okuyacaksın. | `sourced` | - [ ] |
+| u08.01 | Şimdiki ve geniş zaman | Gelir, görür, harcar, öldürür ve sabreder gibi 'yapar, yapıyor' kalıbını tanıyacaksın. | `draft` | - [ ] |
+| u08.02 | Bulmak, bakmak ve sormak | Buldu, baktı, yaptı, aldı ve sordu fiillerini, 'yapmaz, yapmadı' olumsuzlarıyla birlikte göreceksin. | `draft` | - [ ] |
 | u08.03 | Korkmak ve emretmek | Duygu ve buyruk fiillerini şimdiki zamanda tanıyacaksın. | `sourced` | - [ ] |
 | u08.04 | Tövbe ve okumak | Dönüş ve okuma fiillerini ayırt edeceksin. | `sourced` | - [ ] |
 | u08.05 | Artırmak ve sanmak | Çoğaltma ve zan fiillerini okuyacaksın. | `sourced` | - [ ] |
 | u08.06 | Razı olmak | Hoşnutluk ve engelleme fiillerini tanıyacaksın. | `sourced` | - [ ] |
-| u08.07 | Yeterli gelmek | Yeterlilik ve yasaklama fiillerini ayırt edeceksin. | `sourced` | - [ ] |
+| u08.07 | Umut, yetmek ve affetmek | Umulur ki, kötü oldu, affetti, yasakladı ve yetti fiillerini tanıyacaksın. | `draft` | - [ ] |
 | u08.08 | İsyan ve aramak | Karşı gelme ve isteme fiillerini okuyacaksın. | `sourced` | - [ ] |
-| u08.09 | Bağışlamak ve yürümek | Şimdiki zaman fiillerini pekiştireceksin. | `sourced` | - [ ] |
+| u08.09 | Bağışlamak ve yürümek | Bağışladı, gizledi, yürüdü, sınadı, koydu ve umar fiillerini okuyacaksın. | `draft` | - [ ] |
 
 ### Ünite 9 dersleri
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u09.01 | Emir kipi: yap! | Bir işi isteme kalıbını tekil ve çoğul biçimde tanıyacaksın. | `sourced` | - [ ] |
-| u09.02 | Seslenme: ey … | Birine seslenerek başlayan cümleleri okuyacaksın. | `sourced` | - [ ] |
+| u09.01 | Emir kipi: an, ye, ver, bağışla | Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerinin emir biçimini tanıyacaksın. | `draft` | - [ ] |
+| u09.02 | Uymak ve yüz çevirmek | Uydu, edindi, çıkardı, yüz çevirdi ve itaat etti fiillerini okuyacaksın. | `draft` | - [ ] |
 | u09.03 | Vahyetmek ve sevmek | Bildirme ve sevgi fiillerini tanıyacaksın. | `sourced` | - [ ] |
 | u09.04 | Savaşmak ve yok etmek | Şiddet ve yok etme fiillerini ayırt edeceksin. | `sourced` | - [ ] |
 | u09.05 | Seslenmek ve tenzih | Çağrı ve tenzih fiillerini okuyacaksın. | `sourced` | - [ ] |
-| u09.06 | Dayanmak | Gösterme ve tevekkül fiillerini tanıyacaksın. | `sourced` | - [ ] |
-| u09.07 | Açıklamak | Beyan ve yönelme fiillerini ayırt edeceksin. | `sourced` | - [ ] |
+| u09.06 | Göstermek ve dayanmak | Gösterdi, dayandı, haram kıldı, istedi ve kurtardı fiillerini tanıyacaksın. | `draft` | - [ ] |
+| u09.07 | Açıklamak | Açıkladı, yöneldi, ayrılığa düştü, aradı ve yemin etti fiillerini ayırt edeceksin. | `draft` | - [ ] |
 | u09.08 | Yöneltmek ve fayda | Çevirme ve yarar fiillerini okuyacaksın. | `sourced` | - [ ] |
 | u09.09 | Kurtuluş ve çaba | Başarı ve gayret fiillerini tanıyacaksın. | `sourced` | - [ ] |
 | u09.10 | Vefat ve kurtarmak | Son verme ve kurtarma fiillerini okuyacaksın. | `sourced` | - [ ] |
-| u09.11 | Emir ve dua kalıpları | Ünitenin fiillerini birlikte pekiştireceksin. | `sourced` | - [ ] |
+| u09.11 | Çağırmak, sakınmak ve müjdelemek | Çağırdı, sakındı, alay etti, müjdeledi, yüz çevirdi ve konuştu fiillerini birlikte pekiştireceksin. | `draft` | - [ ] |
 
 ### Ünite 10 dersleri
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u10.01 | Yapan ve yapılan | Bir kökten 'yapan' ve 'yapılan' kelimelerini türeteceksin. | `sourced` | - [ ] |
+| u10.01 | Yapan ve yapılan | 'İnanan', 'yalanlayan', 'her şeyi bilen' ve 'adı konmuş' gibi, işi yapanı ya da yapılanı anlatan kelimelerle 'güvende oldu' kelimesini tanıyacaksın. | `draft` | - [ ] |
 | u10.02 | Fiilin adı | 'bilme, anma, inanma' isimlerini tanıyacaksın. | `sourced` | - [ ] |
-| u10.03 | Daha iyi bilen | Karşılaştırma kalıbını okuyacaksın. | `sourced` | - [ ] |
+| u10.03 | Daha iyi bilen ve daha çok | Daha iyi bilen, daha çok, daha çetin, anma ve öğüt kelimelerini okuyacaksın. | `draft` | - [ ] |
 | u10.04 | İnkâr eden | Yapan ismini olumsuz bağlamda tanıyacaksın. | `sourced` | - [ ] |
 | u10.05 | Tanıklık eden | Tanıklık ve iş kelimelerini ayırt edeceksin. | `sourced` | - [ ] |
 | u10.06 | Zulmetmek | Haksızlık ve iyilik kavramlarını okuyacaksın. | `sourced` | - [ ] |
@@ -247,17 +300,17 @@
 | u10.17 | Kaybedenler | Kayıp ve arınma kelimelerini tanıyacaksın. | `sourced` | - [ ] |
 | u10.18 | Eşit ve boş | Denklik ve geçersizlik kelimelerini okuyacaksın. | `sourced` | - [ ] |
 | u10.19 | Topluluk ve sığınak | Grup ve barınma kelimelerini tanıyacaksın. | `sourced` | - [ ] |
-| u10.20 | Kök ailesi | Bir kökten türeyen kelimeleri birlikte pekiştireceksin. | `sourced` | - [ ] |
+| u10.20 | Kök ailesi: hüküm ve hikmet | Hükmetmek, hüküm ve hikmet kelimelerinin aynı kökten geldiğini göreceksin; yanında 'sanı' da var. | `draft` | - [ ] |
 
 ### Ünite 11 dersleri
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u11.01 | 'ilim' → 'talim' | Aynı kökten gelen 'ilim' ve 'talim' kelimelerinin kalıp farkını göreceksin. | `sourced` | - [ ] |
+| u11.01 | Kalıp değişince anlam değişir | Öğretti, bağışlanma diledi, Müslüman ve teslim oldu kelimelerinde kalıbın anlamı nasıl değiştirdiğini göreceksin. | `draft` | - [ ] |
 | u11.02 | İnanan ve düşünen | İnanç ve düşünme kalıplarını tanıyacaksın. | `sourced` | - [ ] |
-| u11.03 | İman ve iyilik | İnanç ve güzel davranış kalıplarını okuyacaksın. | `sourced` | - [ ] |
-| u11.04 | Esenlik dileği | Selamlaşma kalıbını tanıyacaksın. | `sourced` | - [ ] |
-| u11.05 | Doğru yolu bulmak | Hidayet kalıbını okuyacaksın. | `sourced` | - [ ] |
+| u11.03 | İman, iyilik ve diriltmek | İman, iyilik etmek, hikmet sahibi ve diriltmek kelimelerini okuyacaksın. | `draft` | - [ ] |
+| u11.04 | Selâmlama ve ıslah | Selâmlama, düzeltmek ve can almak kelimelerini tanıyacaksın. | `draft` | - [ ] |
+| u11.05 | Doğru yol ve ortak koşmak | Doğru yola ulaşmak, ortak koşmak ve dosdoğru kılmak fiillerini okuyacaksın. | `draft` | - [ ] |
 | u11.06 | Ortak koşmak | Kalıpları karşıtlık içinde pekiştireceksin. | `sourced` | - [ ] |
 
 ### Ünite 12 dersleri
@@ -265,8 +318,8 @@
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
 | u12.01 | 'eğer', '-ınca', '-seydi' | Şart kalıplarını tanıyacaksın. | `sourced` | - [ ] |
-| u12.02 | Zaman rengi veren fiiller | Zaman bildiren yardımcı fiilleri okuyacaksın. | `sourced` | - [ ] |
-| u12.03 | Sık kalıplar | Şart ve zaman kalıplarını birlikte pekiştireceksin. | `sourced` | - [ ] |
+| u12.02 | Önce, sonra ve o vakit | '-ınca', 'önce', 'hani, o vakit' ve 'sonra' gibi zamanı belirten kelimeleri tanıyacaksın. | `draft` | - [ ] |
+| u12.03 | Sık kalıplar | 'Hiçbir zaman', 'vakit' ve 'kim' kelimeleriyle sık kullanılan kalıpları pekiştireceksin. | `draft` | - [ ] |
 
 ## Seviye 0
 

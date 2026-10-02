@@ -1059,6 +1059,11 @@
   function kaoUnitTitle(unit){
     return kaoVisibleText(unit&&unit.review,unit&&unit.title,'Ünite '+String(unit.id));
   }
+  // Bağlam satırı etiketi: draft ünitede başlık "Ünite N" güvenli başlığına düşer; ön ek ikinci kez eklenmez.
+  function kaoUnitContextLabel(unit){
+    var prefix='Ünite '+String(unit.id),title=kaoUnitTitle(unit);
+    return title===prefix?prefix:prefix+' · '+title;
+  }
   function kaoTextPair(o,prefix){
     var fallback=String(prefix||'Ünite ')+String(o.id);
     return {t:kaoVisibleText(o.review,o.title,fallback),p:kaoVisibleText(o.review,o.promise,'')};
@@ -1927,8 +1932,8 @@
     if(!item) return '<main class="kao-lesson"><p role="status">Ders durumu yüklenemedi.</p></main>';
     // KAO2-18 (Y-02): ders bağlamı — hangi ünitenin kaçıncı dersi, hedefi ne.
     var lessonRef=kaoCurriculumLesson(state.lessonId),lessonUnit=lessonRef?kaoCurriculumUnit(lessonRef.unitId):null;
-    var contextLine=lessonUnit?('Ünite '+lessonUnit.id+' · '+kaoUnitTitle(lessonUnit)+' · Ders '+String(lessonRef.index+1)+' / '+String(lessonUnit.lessons.length)):'';
-    if(kaoUnitSession(state)){ var sessionUnit=kaoCurriculumUnit(state.unitId),sessionLabel=state.kind==='repair'?'Onarım':'Ustalık kontrolü'; contextLine=sessionUnit?('Ünite '+sessionUnit.id+' · '+kaoUnitTitle(sessionUnit)+' · '+sessionLabel):sessionLabel; }
+    var contextLine=lessonUnit?(kaoUnitContextLabel(lessonUnit)+' · Ders '+String(lessonRef.index+1)+' / '+String(lessonUnit.lessons.length)):'';
+    if(kaoUnitSession(state)){ var sessionUnit=kaoCurriculumUnit(state.unitId),sessionLabel=state.kind==='repair'?'Onarım':'Ustalık kontrolü'; contextLine=sessionUnit?(kaoUnitContextLabel(sessionUnit)+' · '+sessionLabel):sessionLabel; }
     var model={stage:item.kind==='read'?'apply':item.kind,title:state.title,context:contextLine,progress:String((state.at||0)+1)+' / '+state.plan.length,step:(state.at||0)+1,stepTotal:state.plan.length,percent:((state.at||0)+1)/state.plan.length*100,action:item.kind==='summary'?{name:'kaoLesson',args:['finish']}:{name:'kaoLesson',args:['next']},exit:{name:'kaoLesson',args:['exit']},buttonLabel:item.kind==='summary'?'Bugün yeter':'Devam'};
     if(item.kind==='goal'&&state.kind==='repair'){
       model.promise='Karıştırdığın '+(item.lemmaIds||[]).length+' kelimeyi iki yönde tekrar edeceğiz. Bitince ustalık kontrolünü yeniden deneyebilirsin.';

@@ -22,7 +22,9 @@ function boot() {
   return { api, box, curriculum: box.window.QuranCurriculumV2, lexicon: box.window.QuranLexiconV1 };
 }
 
-const { api, lexicon, curriculum } = boot();
+const { api, lexicon, curriculum, box: BOX } = boot();
+const GRAMMAR = BOX.window.QuranGrammarV1;
+const require_flow = () => BOX.window.SeymaQuranLearnFlow;
 const cardsFor = (count, offset = 0) => {
   const out = {};
   lexicon.lemmas.slice(offset, offset + count).forEach((lemma, index) => {
@@ -234,6 +236,61 @@ check('panel projeksiyonu yeni taş anahtarlarını sayısal taşır', () => {
     assert.equal(Object.prototype.hasOwnProperty.call(summary, forbidden), false, `panel özeti ${forbidden} taşımaz`);
   }
   assert.equal(typeof summary.knownWords, 'number', 'kelime bilgisi yalnız sayı olarak taşınır');
+});
+
+// K2F-20 (A-6): ders içerikleri yeniden dağıtıldı; ders kimlikleri sabit. Eski dağılımla tamamlanmış kullanıcı için
+// tamamlanmış ders tamamlanmış kalır, kart verisi değişmez, sıradaki adım bozulmaz ve derse sonradan taşınan
+// (tanışılmamış) kelimeler sıradaki dersin planında tanıştırılır.
+check('A-6 · tamamlanmış dersin yeni taşınan kelimeleri kaybolmaz: ders tamamlı kalır, veri eşit, sıradaki ders onları tanıştırır', () => {
+  const flow = require_flow();
+  const content = { curriculum, lexicon, grammar: GRAMMAR };
+  const now = new Date('2026-09-30T12:00:00.000Z');
+  const unit = curriculum.units.find((u) => u.id === 10);
+  const done = unit.lessons[2];           // u10.03: tamamlanmış sayılır
+  const next = unit.lessons[3];           // u10.04: sıradaki ders
+  const orphans = done.lemmaIds.slice(-2); // sonradan derse taşınmış, tanışılmamış kelimeler
+  const known = done.lemmaIds.slice(0, -2);
+  const lessons = {};
+  for (const u of curriculum.units) {
+    for (const lesson of u.lessons) {
+      if (u.id < 10 || (u.id === 10 && lesson.id <= done.id)) {
+        lessons[lesson.id] = { startedAt: '2026-08-01T10:00:00.000Z', doneAt: '2026-08-01T10:12:00.000Z', score: 0.9, introducedLemmas: lesson.lemmaIds.filter((id) => !(lesson.id === done.id && orphans.includes(id))) };
+      }
+    }
+  }
+  const cards = {};
+  for (const u of curriculum.units) for (const lesson of u.lessons) {
+    if (u.id < 10 || (u.id === 10 && lesson.id <= done.id)) lesson.lemmaIds.filter((id) => !orphans.includes(id)).forEach((id) => {
+      cards[`w:${id}:ar>tr`] = { state: 'review', s: 12, reps: 4, due: '2027-01-01T00:00:00.000Z', r: '2026-09-01T00:00:00.000Z', introducedAt: '2026-09-01T00:00:00.000Z' };
+    });
+  }
+  const units = {};
+  for (const u of curriculum.units) if (u.id < 10) units[String(u.id)] = { masteryAt: '2026-08-02T10:00:00.000Z', masteryScore: 0.9, attempts: 1, lastAttemptAt: '2026-08-02T10:00:00.000Z', repair: null, skippedAt: null };
+  const input = { quranLearn: { cards, path: { lessons, units }, onboarding: { doneAt: '2026-08-01T00:00:00.000Z', start: 'level1', minutes: 5, intent: null, placement: null }, settings: { dailyNew: 10, translitLayer: 'tr', audioStyle: 'measured', shadowing: false, kaoVisible: true, harakat: true } } };
+  api.ensureQuranLearn(input);
+  const before = JSON.stringify(input.quranLearn);
+  assert.equal(flow.lessonProgress(input.quranLearn, done.id, content).done, true, 'tamamlanmış ders tamamlanmış kalır');
+  assert.ok(orphans.every((id) => !input.quranLearn.cards[`w:${id}:ar>tr`]), 'öksüz kelimelerin kartı yok');
+  const plan = flow.lessonPlan(input, next.id, now, content);
+  const intro = plan.filter((i) => i.kind === 'intro').map((i) => i.lemmaId);
+  for (const id of orphans) assert.ok(intro.includes(id), `taşınan kelime ${id} sıradaki derste tanıştırılır`);
+  for (const id of next.lemmaIds) assert.ok(intro.includes(id), `sıradaki dersin kendi kelimesi ${id} yerinde`);
+  for (const id of known) assert.ok(!intro.includes(id), 'zaten tanışılmış kelime yeniden tanıştırılmaz');
+  assert.equal(JSON.stringify(input.quranLearn), before, 'lessonPlan veriyi değiştirmez (kart/ilerleme eşit)');
+  const step = flow.nextStep(input, now, content);
+  assert.equal(step.param, next.id, 'sıradaki adım bozulmadı: ilk tamamlanmamış ders');
+});
+
+check('A-6 · öksüz kelime yoksa plan değişmez (geri uyum)', () => {
+  const flow = require_flow();
+  const content = { curriculum, lexicon, grammar: GRAMMAR };
+  const now = new Date('2026-09-30T12:00:00.000Z');
+  const unit = curriculum.units.find((u) => u.id === 10);
+  const next = unit.lessons[3];
+  const input = { quranLearn: { path: { lessons: {}, units: {} }, onboarding: { doneAt: '2026-08-01T00:00:00.000Z', start: 'level1', minutes: 5, intent: null, placement: null } } };
+  api.ensureQuranLearn(input);
+  const intro = flow.lessonPlan(input, next.id, now, content).filter((i) => i.kind === 'intro').map((i) => i.lemmaId);
+  assert.deepEqual(Array.from(intro), Array.from(next.lemmaIds).slice(0, Math.min(10, next.lemmaIds.length)), 'yalnız dersin kendi kelimeleri');
 });
 
 console.log(`KAO2-16 migration: PASS (${passed} kontrol)`);

@@ -1,6 +1,6 @@
 {
   "version": "quran-curriculum-tr-v2",
-  "note": "KAO2-07 müfredat iskeleti. Elle yazılır ama Arapça içermez: kelimeler yalnız QuranLexiconV1 lemma kimliğiyle anılır; Arapça, okunuş ve anlam araç tarafından içerik modüllerinden çekilir. Tüm Türkçe metinler review.level=draft (K-4 L0).",
+  "note": "KAO2-07 müfredat iskeleti. Elle yazılır ama Arapça içermez: kelimeler yalnız QuranLexiconV1 lemma kimliğiyle anılır; Arapça, okunuş ve anlam araç tarafından içerik modüllerinden çekilir. Tüm Türkçe metinler review.level=draft (K-4 L0). K2F-20: Ünite 4–12 lemma sırası (focus) başlık/kavram tutarlılığına göre kimlikle sabitlenmiştir; her satır bir dersin lemmalarıdır ve sıra dersleri belirler (hedef ve eksikler MUFREDAT-ESLEME.md).",
   "lessonSize": { "min": 3, "max": 7, "target": 5 },
   "levels": [
     { "id": 0, "title": "Harfler ve okuma" },
@@ -66,48 +66,149 @@
       "promise": "Cümleleri birbirine bağlayan kelimeleri tanıyacaksın.",
       "conceptIds": ["g7", "g8"],
       "anchor": ["lemma-pool:edat-baglac"],
-      "focus": ["l_man_48b676", "l_an_e1bf35", "l_an_d1c942", "l_qad_03fa2b", "l_vum_88b269", "l_aw_43116a", "l_bal_1b5a6f", "l_kul_03497c", "l_baEoD_256db1"]
+      "focus": [
+        "l_alaA_121826", "l_an_e1bf35", "l_an_d1c942", "l_qad_03fa2b", "l_fawoq_451ce1",
+        "l_yawoma_i_367815", "l_bal_1b5a6f", "l_kul_03497c", "l_baEoD_256db1", "l_Eind_8fe318",
+        "l_lan_094a36", "l_vum_88b269", "l_maE_d833a0", "l_am_1e8491", "l_la_kin_4550fb",
+        "l_im_aA_986f60", "l_aw_43116a", "l_la_kin_d0bdf4", "l_sawof_892db8", "l_am_aA_c993e0",
+        "l_kal_aA_3a705b", "l_i_FA_60c2bd", "l_ka_an_965a6d", "l_laEal_7b9569", "l_balaY_04cddb"
+      ],
+      "lessonSizes": [5, 5, 5, 5, 5]
     },
     {
       "id": 5, "level": 2, "title": "Bu, şu, kim, ne",
       "promise": "İşaret ve soru kelimeleriyle âyetin kime, neye döndüğünü göreceksin.",
       "conceptIds": ["g9", "g10"],
       "anchor": ["lemma-pool:isaret-soru"],
-      "focus": ["l_ha_aA_9f90d0", "l_a_lik_f3410a", "l_uwla_ik_8eb052", "l_kayof_79814e", "l_hal_232554"]
+      "focus": [
+        "l_ha_aA_9f90d0", "l_a_lik_f3410a", "l_uwla_ik_8eb052", "l_kayof_79814e", "l_hal_232554",
+        "l_aY_907a32", "l_an_aY_15158e", "l_maA_aA_ff073e", "l_aA_baa50b", "l_kam_0f9dfb"
+      ],
+      "lessonSizes": [5, 5]
     },
     {
       "id": 6, "level": 2, "title": "Gök, yer ve insan",
       "promise": "Kur'an'ın en sık isimlerini tanıyacaksın.",
       "conceptIds": ["g11", "g12"],
       "anchor": ["lemma-pool:isim"],
-      "focus": ["l_aroD_977a0d", "l_samaA_3fe4ed", "l_qawom_d51842", "l_nafos_fde475", "l_kita_b_291fe8", "l_qalob_e14dcc", "l_Ea_aAb_4b9936", "l_ajor_c798df", "l_jan_ap_50e4b4", "l_naAr_d577c3", "l_Haq_3072cf", "l_xayor_65557c", "l_aYo_56e1b1"]
+      "focus": [
+        "l_aroD_977a0d", "l_samaA_3fe4ed", "l_samoE_5d4faf", "l_nafos_fde475",
+        "l_kita_b_291fe8", "l_qalob_e14dcc", "l_Ea_aAb_4b9936",
+        "l_ajor_c798df", "l_jan_ap_50e4b4", "l_naAr_d577c3", "l_Haq_3072cf", "l_xayor_65557c",
+        "l_aYo_56e1b1", "l_aAyap_9bea05", "l_bayon_d87f11", "l_sabiyl_bdac41", "l_duwn_bc1447",
+        "l_muwsaY_3064bc", "l_ahol_86b2cf", "l_EaZiym_93f908", "l_yad_84953d", "l_d_unoyaA_4c3c1e",
+        "l_Eaziyz_4804b0", "l_uw_7be8de", "l_ayoTa_n_06003d", "l_malak_b3955c", "l_maval_5dedc0",
+        "l_maAl_d64b35", "l_waliY_0884c3", "l_layol_c1152e", "l_aw_al_3314ee", "l_kufor_1c9ee6",
+        "l_bunaY_8dc929", "l_aSoHa_b_b49ea8", "l_jahan_am_665115", "l_zawoj_99a6c2", "l_ax_48233a",
+        "l_mivol_d81d43", "l_n_abiY_e09f3b", "l_firoEawon_45c9f5", "l_aliym_a29290", "l_wajoh_c3bb4d",
+        "l_bay_inap_86ef67", "l_insa_n_d60ef4", "l_A_xar_621bf1", "l_qaliyl_2b769c", "l_quro_aAn_5027d4",
+        "l_iboraAhiym_d85936", "l_bayot_3393ba", "l_yamiyn_398e7f", "l_A_baA_febd74", "l_um_ap_e71e1a",
+        "l_bon_228952", "l_kaviyr_d003d4", "l_maA_e36bc7", "l_nisaA_371a3e", "l_na_iyr_9ec980",
+        "l_Eayon_c7bc29", "l_nahaAr_1471c5", "l_qaroyap_3147eb", "l_adiyd_2db895", "l_walad_a334cd",
+        "l_nahar_fb00c1", "l_ajal_77d132", "l_baSiyr_69e5a4", "l_taHot_fb7d9c",
+        "l_Eaduw_4c00d2", "l_baSar_691898", "l_daAr_682c39", "l_saAEap_ac5bf9",
+        "l_samiyE_d49cf3", "l_abN_71b506", "l_qadiyr_cd0ac2", "l_uwliY_3328a7", "l_xabiyr_dadb64",
+        "l_isoraA_iyl_66e2a2", "l_nuwH_1acf34", "l_nuwr_2e4de0", "l_baHor_61776d", "l_wayol_4f2e46",
+        "l_jabal_7f35ca", "l_anb_d90705", "l_ba_ar_dfc1d7", "l_say_i_aAt_cbbfce", "l_ivom_eafb0c",
+        "l_mata_E_087815", "l_aAlaA_553b3f", "l_maroyam_acbcf0", "l_um_dd7260", "l_amos_c38bdc",
+        "l_fariyq_23fdad", "l_HaraAm_07e3df", "l_kariym_465d92", "l_qawom_d51842", "l_wa_Hidap_1b129f",
+        "l_mala_3ccd3f", "l_quw_ap_4ad7a3", "l_wa_Hid_e2c15d", "l_Earo_7dbbdb", "l_Hayov_5b7279",
+        "l_jund_600913", "l_naba_ea48de", "l_rajul_891848", "l_riyH_14b7a7", "l_Hadiyv_d707e2",
+        "l_kalimap_5d4228", "l_rijaAl_b36b89", "l_ur_iy_ap_2745b8", "l_baAb_51f669", "l_luwT_833109",
+        "l_qamar_a95a93", "l_yuwsuf_bd02d7", "l_aAl_95d364", "l_jaHiym_0170fa", "l_mora_at_d761dc",
+        "l_qariyb_b0bf66", "l_vamuwd_717675", "l_A_dam_143ced", "l_ba_os_3e2b64", "l_baEiyd_8bccdd",
+        "l_EiysaY_1af04a", "l_junaAH_86068c", "l_lisaAn_5d42eb", "l_m_iyva_q_ac1e15", "l_EaAd2_f73727",
+        "l_ganiY_463a95", "l_TaEaAm_f85a5a", "l_unvaY_bfb590", "l_wakiyl_a481db", "l_waraA_905c82",
+        "l_fulok_807067", "l_misokiyn_63a03c", "l_qaron_c7a8aa", "l_saboE_6a6f8c", "l_yatiym_4a612b",
+        "l_bar_4aea03", "l_jin_7f7c85", "l_say_i_ap_5198f7", "l_xalof_4a2374", "l_aEomaY_ea9134", "l_ahor_1c433f",
+        "l_naSiyb_a556ca", "l_ruwH_1d9882", "l_ha_ruwn_3d8730", "l_Hamiym_3e44f9", "l_Hizob_666efe", "l_Tay_ibap_bae173"
+      ],
+      "lessonSizes": [4, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6]
     },
     {
       "id": 7, "level": 3, "title": "Oldu, yaptı",
       "promise": "Geçmiş zaman anlatılarını çözeceksin.",
       "conceptIds": ["g13", "g14"],
       "anchor": ["lemma-pool:fiil-mazi"],
-      "focus": ["l_qaAla_657dd3", "l_jaEala_307581", "l_Eamila_50319c", "l_Ealima_ceb6d7", "l_jaA_a_c0bd29", "l_anzala_adebf9", "l_arosala_4ee820", "l_kafara_af1746", "l_ka_aba_15a65b", "l_aAmana_966a5c"]
+      "focus": [
+        "l_aHal_a_bf74a4", "l_jaEala_307581", "l_Ealima_ceb6d7", "l_jaA_a_c0bd29",
+        "l_arosala_4ee820", "l_ka_aba_15a65b", "l_kafara_af1746", "l_anzala_adebf9",
+        "l_aAmana_966a5c", "l_rajaEa_39e51f", "l_an_a_a_a1dde3", "l_aEad_a_17540a", "l_Eamila_50319c",
+        "l_samiEa_640570", "l_daxala_442502", "l_kasaba_94ec71", "l_balaga_f89222", "l_razaqa_19085c",
+        "l_Daraba_fbd307", "l_xaraja_d1d0bb", "l_baEava_a09270", "l_Eaqalu_36636d", "l_kataba_f09a6a",
+        "l_akara_350195", "l_malakato_07e799", "l_Hasiba_a4ca56", "l_aA_a_25c447", "l_Hamala_304f43",
+        "l_taraka_738029", "l_Ha_ara_ed6489", "l_yaHozun_b30b11", "l_ahaba_3f10c5", "l_nafaEa_06e253",
+        "l_labiva_2b778d", "l_qadara_a5b3da", "l_ya_oEuru_05ae7b", "l_fatanu_2455b0", "l_laEana_bf347d",
+        "l_makara_540389", "l_rafaEa_7f376e", "l_Haq_a_a024e5", "l_Earafa_a51610"
+      ],
+      "lessonSizes": [4, 4, 5, 5, 5, 5, 5, 5, 4]
     },
     {
       "id": 8, "level": 3, "title": "Yapar, yapıyor",
       "promise": "Şimdiki ve geniş zamanı tanıyacaksın.",
       "conceptIds": ["g15", "g16"],
       "anchor": ["lemma-pool:fiil-muzari"],
-      "focus": ["l_aA_a_25c447", "l_ra_aA_d87b92", "l_t_aqaY_bc8006", "l_anfaqa_0b12ad"]
+      "focus": [
+        "l_ataY_c25581", "l_ra_aA_d87b92", "l_anfaqa_0b12ad", "l_qatala_ae1dd2", "l_Sabara_34dfc2",
+        "l_wajada_733e47", "l_n_aZara_cdb6f4", "l_faEala_b34da5", "l_axa_a_2954c6", "l_sa_ala_a822cc",
+        "l_l_ayosa_5684fc", "l_xaAfa_29d6b0", "l_amara_3fab3c", "l_jazaY_a84a54", "l_waEada_9ae985",
+        "l_taAba_0ab18c", "l_jarayo_c231f0", "l_qaDaY_2a99a6", "l_mas_a_ba2e94", "l_talaY_d5d166",
+        "l_zaAda_884c7a", "l_Zan_a_9b29e5", "l_ya_ara_ef2203", "l_bi_osa_d43552", "l_xa_iYa_982ede",
+        "l_r_aDiYa_3ee772", "l_nasiYa_a017e1", "l_aAqu_e43a4a", "l_Sad_a_552787", "l_rad_a_c68b16",
+        "l_EasaY_2fc848", "l_saA_a_0909f5", "l_EafaA_0e7e7b", "l_nahaY_8c8b5c", "l_kafaY_089040",
+        "l_EaSaA_9aa159", "l_bagaY_4c4004", "l_xalaA_13082a", "l_kaAda_69a3ae", "l_a_ina_39e033",
+        "l_wahaba_f39bde", "l_katama_166c72", "l_m_a_a_fb0e46", "l_balawo_60a2d6", "l_waDaEa_057a2f", "l_yarojuwA_199bfc"
+      ],
+      "lessonSizes": [5, 5, 5, 5, 5, 5, 5, 5, 6]
     },
     {
       "id": 9, "level": 3, "title": "Yap, ver, bağışla",
       "promise": "Emir ve dua cümlelerini anlayacaksın.",
       "conceptIds": ["g17", "g18"],
       "anchor": ["lemma-pool:fiil-emir"],
-      "focus": ["l_akara_67cfbf", "l_gafara_e47aae", "l_r_aHima_870005", "l_A_taY_2a778d"]
+      "focus": [
+        "l_akara_67cfbf", "l_akala_0ec27c", "l_r_aHima_870005", "l_gafara_e47aae", "l_A_taY_2a778d",
+        "l_t_abaEa_e11446", "l_t_axa_a_6d8c4b", "l_axoraja_186bcc", "l_tawal_aY_fdd891", "l_aTaAEa_74ca26",
+        "l_awoHaY_5691fd", "l_aloqaY_525495", "l_aHobabo_02c0a1", "l_aSaAba_7cb0f1", "l_naz_ala_e7cda7",
+        "l_qa_tala_f7c6c3", "l_aholaka_36d8f7", "l_fotaraY_22f50e", "l_nab_a_a_97ecfa", "l_an_ara_72baf2",
+        "l_naAdaY_6f54dd", "l_sab_aHa_bf280a", "l_sotaTaAEa_d34f23", "l_udoxila_00b5ee", "l_Ea_aba_be4552",
+        "l_arayo_d53b57", "l_tawak_alo_21b95a", "l_Har_ama_8f6d04", "l_araAda_e67825", "l_naj_aY_521435",
+        "l_bay_anu_305824", "l_sotawaY_89d53f", "l_xotalafa_cd0ab4", "l_botagaY_ad5f0f", "l_aqosamu_a01a25",
+        "l_wal_aY_e4e16c", "l_aboSara_9f0224", "l_agonato_9fcd5e", "l_aSobaHa_69bc2c", "l_sotajaAba_abdb53",
+        "l_afolaHa_e69ae1", "l_ja_hada_33407c", "l_zay_ana_5368d6", "l_ja_dalu_728397", "l_qad_ama_29cf56",
+        "l_tawaf_aY_1ebd4b", "l_anjaY_cbb481", "l_bad_ala_16265e", "l_a_aAqa_3f3c06", "l_sax_ara_9612f4", "l_otaraY_52a098",
+        "l_daEaA_f5ec67", "l_t_aqaY_bc8006", "l_sotuhozi_a_a56746", "l_bu_ira_749280", "l_aEoraDa_78a3e1", "l_kal_ama_04b12e"
+      ],
+      "lessonSizes": [5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6]
     },
     {
       "id": 10, "level": 4, "title": "Bir kök, bir aile",
       "promise": "Bir kökten Türkçedeki onlarca kelimeye uzanacaksın.",
       "conceptIds": ["g19", "g20"],
       "anchor": ["lemma-pool:kok-ailesi"],
+      "focus": [
+        "l_m_usam_FY_24926e", "l_amina_0a79a6", "l_Ealiym_c50d0d", "l_m_u_omina_t_b9c5a2", "l_m_uka_ibiyn_f66cdd",
+        "l_Eilom_2f0f9d", "l_qawol_58e075", "l_gafuwr_926fa2", "l_m_agofirap_60a926", "l_ka_firuwn_165d2d",
+        "l_aEolam_db561d", "l_akovar_f7f01e", "l_ikoraY_20da2f", "l_a_ad_4fecc8", "l_ikor_0e35a1",
+        "l_kaAfir_9b3cf0", "l_xaloq_875745", "l_SaAdiq_43c41b", "l_ahiyd_b0cb34", "l_aha_dap_12afc0",
+        "l_aAhid_a005f4", "l_Eamal_8215bb", "l_ZaAlim_fae7dd", "l_Zuluma_t_933b08", "l_aHosan_e3fcdb",
+        "l_Zalama_7a9278", "l_Hasanap_efe980", "l_Hasan_003925", "l_mufosid_901e3a", "l_Sa_liH_30bb88",
+        "l_S_a_liHa_t_f6a492", "l_muna_fiquwn_bdda5c", "l_rizoq_aec3ab", "l_jamiyE_be9182", "l_ajomaEiyn_0fc80b",
+        "l_jamaEa_62dac9", "l_Hayaw_p_e08aa3", "l_hudFY_2e4b07", "l_faDol_4925b8", "l_qiya_map_2880f6",
+        "l_Hay_3dc2a8", "l_Dal_a_2775a8", "l_qaAma_63cbf7", "l_amor_9fbe48", "l_ariyk_5de5f5",
+        "l_mawot_7aa65a", "l_Dala_l_fc4484", "l_kabiyr_bbdade", "l_Eahod_2c711f", "l_HisaAb_b41eae",
+        "l_m_aAta_a0f90e", "l_niEomap_410611", "l_n_aEam_57fa95", "l_sajada_c38135", "l_masojid_ddafe8",
+        "l_m_ay_it_fb6ea2", "l_saAjid_62ac5a", "l_m_akaAn_b26fbd", "l_m_aEoruwf_413882", "l_naSara_e01de2",
+        "l_naSiyr_87b8a1", "l_naSor_e325f5", "l_faAsiq_392fe3", "l_Ea_qibap_313f20", "l_EiqaAb_736634",
+        "l_A_xir_5b7462", "l_m_ubiyn_4f4924", "l_xa_lid_db5cbd", "l_mujorim_63cb7c", "l_suw_8ed869",
+        "l_gayob_611f35", "l_mut_aqiyn_afd23b", "l_waEod_f8ac8c", "l_mulok_138b85", "l_jazaA_22eebd",
+        "l_i_on_21db05", "l_suloTa_n_bfb334", "l_fitonap_d46440", "l_ka_ib_7a5632", "l_ka_ib_807adf",
+        "l_xa_siriyn_7458a8", "l_zakaw_p_c43173", "l_maSiyr_274d5b", "l_siHor_af28f3", "l_ga_fil_8b70be",
+        "l_sawaA_91f5d4", "l_ba_Til_462461", "l_kayod_27a62a", "l_xawof_3af862", "l_liqaA_390528",
+        "l_TaA_ifap_740947", "l_duEaA_bcbfae", "l_ma_owaY_b4a4a7", "l_sa_Hir_f05100",
+        "l_Hukom_5dd24a", "l_Hikomap_d90667", "l_Zan_1e2f1f", "l_Hakama_763b9a"
+      ],
+      "lessonSizes": [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4],
       "order": "rootFamily"
     },
     {
@@ -116,14 +217,27 @@
       "conceptIds": ["g21"],
       "anchor": ["lemma-pool:kalip"],
       "order": "rootFamily",
-      "focus": ["l_sotagofara_863081"]
+      "focus": [
+        "l_Eal_ama_5c04b6", "l_sotagofara_863081", "l_musolim_c8bd6d", "l_asolama_25091d",
+        "l_mu_omin_870b47", "l_ta_ak_ara_901fef", "l_m_urosal_fc2a88", "l_muHosin_7e031b",
+        "l_iyma_n_4151c0", "l_aHosana_1ac221", "l_Hakiym_e62e6c", "l_aHoyaA_35079e",
+        "l_aSolaHa_540483", "l_taHiy_ap_de08b0", "l_amaAta_5bf411",
+        "l_hotadaY_132fd7", "l_a_oraka_c73d6e", "l_aqaAma_382983",
+        "l_aDal_a_5ed954", "l_mu_orik_2ba276", "l_sotakobara_4181b5"
+      ],
+      "lessonSizes": [4, 4, 4, 3, 3, 3]
     },
     {
       "id": 12, "level": 4, "title": "Eğer ve zaman",
       "promise": "Şart ve zaman cümlelerini çözeceksin.",
       "conceptIds": ["g22", "g23", "g24"],
       "anchor": ["lemma-pool:sart-zaman"],
-      "focus": ["l_in_f645c5", "l_law_8f1f74", "l_lawolaA_b76376", "l_Hat_aY_47c8d9", "l_lam_aA_c2bb4a"]
+      "focus": [
+        "l_in_f645c5", "l_law_8f1f74", "l_lawolaA_b76376", "l_Hat_aY_47c8d9",
+        "l_lam_aA_c2bb4a", "l_qabol_0769c8", "l_i_a0c726", "l_baEod_22102e",
+        "l_abadFA_f54ff9", "l_Hiyn_b9a2cc", "l_man_48b676"
+      ],
+      "lessonSizes": [4, 4, 3]
     }
   ],
   "poolRules": [
@@ -140,5 +254,90 @@
     { "unit": 8, "pos": ["V"], "pattern": "·|câmid fiil", "why": "illetli / câmid fiiller" },
     { "unit": 7, "pos": ["V"], "why": "sağlam I. bâb fiiller" },
     { "unit": 6, "why": "kalan isimler" }
+  ],
+  "g2Decisions": [
+    {
+      "lessons": [
+        "u02.01",
+        "u02.02",
+        "u03.02"
+      ],
+      "sorun": "Ünite 1–3 donmuş (K2F-20 kapsamı dışı). u02.01 (edat), u02.02 (zamir), u03.02 (olumsuzluk) başlıklarını taşıyacak lemma yok ya da başka ünitede.",
+      "secenekler": [
+        "K2F-21: başlık/hedef dersin gerçek kelimelerine göre yeniden yazılır (önerilen)",
+        "Ünite 1–3 de yeniden dağıtıma açılır (namaz çapası bozulur)"
+      ]
+    },
+    {
+      "lessons": [
+        "u04.01",
+        "u04.02"
+      ],
+      "sorun": "Sözlükte 'ilgi bağı' (REL) yalnız 2 lemma (biri Ünite 1, biri Ünite 3), 'ancak' (EXP) yalnız 1 lemma (Ünite 2).",
+      "secenekler": [
+        "K2F-21: başlıklar mevcut kelimelere göre yeniden yazılır (önerilen)",
+        "Sözlük genişletilir (yeni lemma = yeni doğrulama, dondurulmuş modül + bütçe + yayın pini)"
+      ]
+    },
+    {
+      "lessons": [
+        "u07.02",
+        "u12.02"
+      ],
+      "sorun": "Yardımcı fiil (kâne ve kardeşleri) sözlükte yalnız kâna ve asbaha; leyse, sâre, bâte… yok. İki ders için en az 3'er yardımcı fiil gerekir.",
+      "secenekler": [
+        "K2F-21: dersler kâna/asbaha'yı tek derste toplar, diğeri yeniden adlandırılır (önerilen)",
+        "Sözlük genişletilir (leyse, sâre, bâte, zalle)"
+      ]
+    },
+    {
+      "lessons": [
+        "u09.02"
+      ],
+      "sorun": "'Seslenme: ey …' dersi seslenme alan isimleri ister (kavm, rabb, mûsâ…); bunlar isim ünitesindedir. Fiil ünitesine isim taşımak sınıf kuralını bozar.",
+      "secenekler": [
+        "Dersi kavramsal bırak, başlığı fiil kelimeleriyle uyumlu yaz (K2F-21, önerilen)",
+        "İsim lemmalarını Ünite 9'a taşı (fiil/isim karışımı kabul edilir)"
+      ]
+    },
+    {
+      "lessons": [
+        "u10.01",
+        "u11.01"
+      ],
+      "sorun": "'Bir kökten' dersleri aynı kökten ≥%60 lemma ister; en iyi dağıtımda %40–50'ye çıkıyor (aynı kök ailesi başka derslere bölünmüş ve anlam komşusu kuralı tek derste toplanmayı engelliyor).",
+      "secenekler": [
+        "Başlık 'bir kökten' iddiasını kaldırır (K2F-21, önerilen)",
+        "Anlam komşusu kuralı (R-A5) bu iki derste gevşetilir"
+      ]
+    },
+    {
+      "lessons": [
+        "u11.05"
+      ],
+      "sorun": "'Hidayet' için sözlükte yalnız 3 lemma var, biri Ünite 1'de donmuş.",
+      "secenekler": [
+        "Başlık genellenir (K2F-21, önerilen)",
+        "Ünite 1'den lemma çekilir"
+      ]
+    },
+    {
+      "lessons": [
+        "u07.01"
+      ],
+      "sorun": "Örnek âyetlerin %58'i geçmiş kipte (eşik %60); tek örnek eksik.",
+      "secenekler": [
+        "Eşik %55'e indirilir ya da K2F-21'de örnek seçimi kipe göre yapılır"
+      ]
+    },
+    {
+      "lessons": [
+        "u08.07"
+      ],
+      "sorun": "'Yeterli gelmek' başlığının yarısı lemma anlamlarında.",
+      "secenekler": [
+        "K2F-21: başlık yeniden yazılır"
+      ]
+    }
   ]
 }

@@ -554,3 +554,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - result: ETİKET 18 · ÖRNEK 11 · ANLAM 1 (/109).
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - next: K2F-20
+
+## seq 57 · 2026-10-01 · GATE · K2F-20
+- status: waiting
+- gate: G2 · yeni müfredat eşlemesi onayı. Kullanıcı sunumu: `docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md` ("K2F-20 ile değişenler" + "G2 karar noktaları").
+- work-done: spec Ünite 4–12 `focus` + `lessonSizes` (26 ders / 41 lemma taşındı; Ünite 1–3, ders kimlikleri/sıraları/boyutları sabit); araç `lessonSizes`, `mastery:false`, "değişenler" bölümü; A-6 `carryOver` + migration testleri; kapı ETİKET 18→11, ÖRNEK 11→2, ANLAM 1→1.
+- not-met: prompt kabulü "KNOWN_MISMATCH boş" sağlanamadı — 11 ders yapısal sınırda (donmuş ünite, sözlükte yeterli lemma yok, sınıf kuralı) ve G2 kararı bekliyor (MUFREDAT-ESLEME.md G2 karar noktaları).
+- waiting-for: kullanıcı yanıtı — `G2 onaylı` ya da değişiklik istekleri (ders ya da lemma kimliğiyle) ve karar noktaları için seçenek.
+- next: K2F-20 (aynı prompt sürer; onaysız `done` yok)

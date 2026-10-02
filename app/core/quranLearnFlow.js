@@ -119,11 +119,27 @@
     });
   }
   // KAO2-12: tek dersin kaynak-bağlı sırası. İçerik ve veri salt okunur; bütün Arapça lexicon/anchor kaynaklarından gelir.
+  // K2F-20 (A-6): ders içerikleri yeniden dağıtılabilir; tamamlanmış (doneAt) bir derse sonradan taşınan ve hiç tanışılmamış
+  // kelimeler kaybolmasın diye SIRADAKİ dersin planına eklenir. Tamamlanmış ders tamamlanmış kalır, kart verisine dokunulmaz.
+  function carryOver(q,cur,lesson){
+    var out=[],found=false;
+    cur.units.forEach(function(unit){
+      unit.lessons.forEach(function(prior){
+        if(found) return;
+        if(prior.id===lesson.id){ found=true; return; }
+        if(!obj(lessonRecord(q,prior.id)).doneAt) return;
+        (Array.isArray(prior.lemmaIds)?prior.lemmaIds:[]).forEach(function(id){
+          if(typeof id==='string'&&id&&out.indexOf(id)<0&&!introduced(q,id,prior.id)) out.push(id);
+        });
+      });
+    });
+    return found?out:[];
+  }
   function lessonPlan(snapshot,lessonId,now,content){
     checkNow(now);
     var snap=obj(snapshot),q=obj(snap.quranLearn),c=content||{},cur=curriculum(c),lesson=cur.lessonById[String(lessonId)];
     if(!lesson) return null;
-    var ids=Array.isArray(lesson.lemmaIds)?lesson.lemmaIds.filter(function(id){ return typeof id==='string'&&id; }):[],settings=obj(q.settings),budget=Math.max(0,Math.floor(num(settings.dailyNew,10))),fresh=[],record=obj(lessonRecord(q,lesson.id)),resume=obj(record.resume),resumeIntro=String(resume.itemId||'');
+    var own=Array.isArray(lesson.lemmaIds)?lesson.lemmaIds.filter(function(id){ return typeof id==='string'&&id; }):[],ids=own.concat(carryOver(q,cur,lesson).filter(function(id){ return own.indexOf(id)<0; })),settings=obj(q.settings),budget=Math.max(0,Math.floor(num(settings.dailyNew,10))),fresh=[],record=obj(lessonRecord(q,lesson.id)),resume=obj(record.resume),resumeIntro=String(resume.itemId||'');
     ids.forEach(function(id){ if(resumeIntro==='intro:'+id){ fresh.push(id); return; } if(!introduced(q,id,lesson.id)&&fresh.length<budget) fresh.push(id); });
     var eligible=ids.filter(function(id){ return introduced(q,id,lesson.id)||fresh.indexOf(id)>=0; });
     var lex=c.lexicon,grammar=c.grammar,lemmas=eligible.map(function(id){ return lex&&typeof lex.byId==='function'?lex.byId(id):null; }).filter(Boolean);

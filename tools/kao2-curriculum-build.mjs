@@ -13,6 +13,7 @@ const SPEC = 'docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json';
 const OUT_MODULE = 'app/content/quranCurriculumV2.js';
 const OUT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md';
 const TEXTS = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
+const BEFORE_K2F20 = 'docs/kuran-ogreniyorum/kao2/content/curriculum.before-k2f20.json';
 const OUT_TEXT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md';
 const OUT_CONCEPT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md';
 const OUT_CONCEPT_MODULE = 'app/content/quranConceptTextsV1.js';
@@ -166,6 +167,21 @@ function spreadNeighbors(ids, byId, size, minChunks) {
   return null;
 }
 
+// K2F-20: spec `lessonSizes` verildiğinde ders sınırları AÇIKTIR (bölümleme aranmaz). Toplam, boyut aralığı ve
+// anlam komşusu çakışmasızlığı doğrulanır; böylece ders içerikleri yalnız spec'teki sıradan ve boyutlardan çıkar.
+function sliceBySizes(ids, sizes, byId, size, unitId) {
+  if (sizes.reduce((a, b) => a + b, 0) !== ids.length) fail(`Ü${unitId}: lessonSizes toplamı ${sizes.reduce((a, b) => a + b, 0)} ≠ ${ids.length} kelime`);
+  let at = 0;
+  return sizes.map((len, i) => {
+    if (len < size.min || len > size.max) fail(`Ü${unitId}: ders ${i + 1} boyutu ${len} aralık dışı`);
+    const chunk = ids.slice(at, (at += len));
+    for (let x = 0; x < chunk.length; x += 1) for (let y = x + 1; y < chunk.length; y += 1) {
+      if (clashes(byId, chunk[x], chunk[y])) fail(`Ü${unitId}: ders ${i + 1} anlam komşuları çakışıyor (${chunk[x]} ~ ${chunk[y]})`);
+    }
+    return chunk;
+  });
+}
+
 function lessonsFor(ids, byId, size, minChunks) {
   return partition(ids, byId, size, minChunks)
     || spreadNeighbors(ids, byId, size, minChunks)
@@ -198,7 +214,9 @@ function build(spec, content, texts) {
   const lemmaToLesson = {};
   const units = spec.units.map((unit) => {
     for (const cid of unit.conceptIds) if (!content.grammar.byId(cid)) fail(`Ü${unit.id}: geçersiz kavram ${cid}`);
-    const chunks = lessonsFor(perUnit.get(unit.id), byId, spec.lessonSize, unit.conceptIds.length);
+    const chunks = unit.lessonSizes
+      ? sliceBySizes(perUnit.get(unit.id), unit.lessonSizes, byId, spec.lessonSize, unit.id)
+      : lessonsFor(perUnit.get(unit.id), byId, spec.lessonSize, unit.conceptIds.length);
     const lessons = chunks.map((lemmaIds, i) => {
       const id = `u${pad(unit.id)}.${pad(i + 1)}`;
       for (const lid of lemmaIds) lemmaToLesson[lid] = id;
@@ -211,7 +229,8 @@ function build(spec, content, texts) {
         lemmaIds,
         conceptId: unit.conceptIds[i] || null,
         apply: source.get(lemmaIds[0]),
-        mastery: i === chunks.length - 1,
+        // KAO2 ustalığı ÜNİTE düzeyindedir (path.units[].masteryAt); içerik dersi hiçbir zaman ustalık dersi değildir.
+        mastery: false,
         review: text.review
       };
     });
@@ -337,18 +356,50 @@ function renderModule(data) {
   const freeze = "function freeze(v){if(v&&typeof v==='object'&&!Object.isFrozen(v)){Object.keys(v).forEach(function(k){freeze(v[k]);});Object.freeze(v);}return v;}";
   const index = "var index={};data.units.forEach(function(u){u.lessons.forEach(function(l){index[l.id]=l;});});";
   const byLesson = "data.byLesson=function(id){return Object.prototype.hasOwnProperty.call(index,id)?index[id]:null;};";
-  return '/* KAO2-07 araç çıktısı: tools/kao2-curriculum-build.mjs + kuran-ogreniyorum-v2/content/curriculum.spec.json. Elle düzenlemeyin. */\n'
+  return '/* KAO2-07 araç çıktısı: tools/kao2-curriculum-build.mjs + docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json. Elle düzenlemeyin. */\n'
     + `(function(){'use strict';${freeze}var data=${JSON.stringify(data)};${index}${byLesson}window.QuranCurriculumV2=freeze(data);})();\n`;
 }
 
 const unitSize = (u) => u.lessons.reduce((s, l) => s + l.lemmaIds.length, 0);
+
+// K2F-20: önceki dağılımla (curriculum.before-k2f20.json) karşılaştırılan "değişenler" bölümü ve G2 karar noktaları.
+function renderChanges(data, byId, cell) {
+  const file = path.join(ROOT, BEFORE_K2F20);
+  if (!fs.existsSync(file)) return [];
+  const before = JSON.parse(fs.readFileSync(file, 'utf8')).lessons;
+  const spec = readSpec();
+  const label = (id) => { const l = byId.get(id); return `${cell(l.translit || id)} (\`${id}\`)`; };
+  const rows = [];
+  let moved = 0;
+  for (const u of data.units) for (const l of u.lessons) {
+    const was = before[l.id] || [];
+    const out = was.filter((id) => !l.lemmaIds.includes(id));
+    const inn = l.lemmaIds.filter((id) => !was.includes(id));
+    if (!out.length && !inn.length) continue;
+    moved += inn.length;
+    rows.push(`| ${l.id} | ${cell(l.title)} | ${out.map(label).join(', ') || '—'} | ${inn.map(label).join(', ') || '—'} |`);
+  }
+  const lines = ['## K2F-20 ile değişenler (G2 onayı bekliyor)', '',
+    `${rows.length} ders değişti, ${moved} lemma başka derse taşındı. Ders kimlikleri, sıraları ve boyutları sabittir; Ünite 1–3 değişmedi. Tamamlanmış ders tamamlanmış kalır; derse sonradan taşınan ve tanışılmamış kelimeler sıradaki dersin planında tanıştırılır (A-6). Değişen derslerin başlık/hedef metinleri K2F-21'de yeniden yazılır.`, '',
+    '| Ders | Başlık (eski metin) | Çıkan | Giren |', '|---|---|---|---|', ...rows, ''];
+  const decisions = Array.isArray(spec.g2Decisions) ? spec.g2Decisions : [];
+  if (decisions.length) {
+    lines.push('## G2 karar noktaları (kapıyla ölçülen kalan tutarsızlıklar)', '');
+    for (const d of decisions) {
+      lines.push(`- **${d.lessons.join(', ')}** — ${d.sorun}`);
+      for (const option of d.secenekler) lines.push(`  - ${option}`);
+    }
+    lines.push('');
+  }
+  return lines;
+}
 
 function renderReview(data, spec, { lex, grammar }) {
   const byId = new Map(lex.lemmas.map((l) => [l.id, l]));
   const cell = (s) => String(s).replace(/\|/g, '\\|');
   const lines = [
     '# KAO2 — Müfredat eşlemesi (G2 incelemesi)', '',
-    '> Araç çıktısı: `node tools/kao2-curriculum-build.mjs` — elle düzenlemeyin; değişiklik `kuran-ogreniyorum-v2/content/curriculum.spec.json` üzerinden yapılır.',
+    '> Araç çıktısı: `node tools/kao2-curriculum-build.mjs` — elle düzenlemeyin; değişiklik `docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json` üzerinden yapılır.',
     '> Arapça, okunuş ve anlam `QuranLexiconV1` içerik modülünden kopyalanır. Tüm başlık ve vaatler taslaktır (`review.level: draft`).', '',
     '## Özet', '',
     '| Ünite | Seviye | Başlık | Ders | Kelime | Kavramlar | Çapa |', '|---|---|---|---|---|---|---|'
@@ -359,6 +410,7 @@ function renderReview(data, spec, { lex, grammar }) {
   const lessonCount = data.units.reduce((s, u) => s + u.lessons.length, 0);
   const total = data.units.reduce((s, u) => s + unitSize(u), 0);
   lines.push('', `Toplam: ${data.units.length} ünite · ${lessonCount} ders · ${total} lemma · Seviye 0: ${data.s0.lessons.length} ders.`, '');
+  lines.push(...renderChanges(data, byId, cell));
   lines.push('## Karar bekleyen noktalar', '');
   for (const u of data.units) {
     if (u.id > 3 && u.id < 10 && (unitSize(u) < 20 || unitSize(u) > 60)) {

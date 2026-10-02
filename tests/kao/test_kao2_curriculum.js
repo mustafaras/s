@@ -85,8 +85,8 @@ check('(b) 12 ünite, derste 3–7 yeni kelime, son ders ustalık', () => {
     assert.ok(lesson.title && typeof lesson.title === 'string', `${lesson.id}: başlık boş`);
     // KAO2-17: L1 (proje sahibi) onayıyla metinler yayına açılır; 'draft' da geçerli bir durumdur.
     assert.ok(['draft', 'sourced', 'expert'].includes(lesson.review && lesson.review.level), `${lesson.id}: geçerli review.level`);
-    const last = unit.lessons[unit.lessons.length - 1] === lesson;
-    assert.equal(lesson.mastery, last, `${lesson.id}: mastery yalnız son derste`);
+    // K2F-20: ustalık ÜNİTE düzeyindedir (path.units[].masteryAt); hiçbir içerik dersi ustalık dersi değildir.
+    assert.equal(lesson.mastery, false, `${lesson.id}: içerik dersi mastery:true taşımaz`);
   }
   for (const u of cur.units) {
     assert.ok(u.title && u.promise, `Ü${u.id}: başlık/vaat boş`);

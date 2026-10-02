@@ -73,7 +73,10 @@ check('(b) günlük ders bekliyor: ünite başlığı, sıradaki ders, gerçek s
   settle(q, u1.lessons[0].lemmaIds);
   const c = card(api.kaoHubCardHTML());
   assert.equal(c.title, 'Kur’an Arapçası · Ünite 1');
-  assert.match(c.sub, new RegExp(`^Sıradaki: ${u1.lessons[1].title} · \\d+ dk$`));
+  // K2F-22: Ünite 1 ders metinleri draft; kart güvenli kimlik-türevli başlığı gösterir, ham başlığı değil.
+  assert.equal(api.kaoReviewLevel(u1.lessons[1].review), 'draft', 'u01.02 onaysız');
+  assert.match(c.sub, /^Sıradaki: Ünite 1 · Ders 2 · \d+ dk$/);
+  assert.doesNotMatch(c.sub, new RegExp(u1.lessons[1].title), 'draft ders başlığı sızmaz');
   assert.equal(c.cta, 'Devam');
   assert.equal(c.ring, Math.round(100 / u1.lessons.length), 'halka = biten ders / ünite dersi');
   assert.match(c.label, new RegExp(`Ünite 1 ilerlemesi %${c.ring}`));

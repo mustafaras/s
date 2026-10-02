@@ -61,25 +61,39 @@ check('Y-01 Yolun kartı birincil olarak içinde bulunulan üniteyi açar', () =
 check('Y-02 ders oynatıcı hangi ünitenin kaçıncı dersi olduğunu söyler', () => {
   const { api, curriculum } = boot();
   const unit = curriculum.units[0];
+  assert.equal(api.kaoReviewLevel(unit.review), 'draft', 'Ünite 1 metni onaysız (draft)');
   assert.equal(api.kaoLesson('start', unit.lessons[0].id), true);
   const html = decode(api.kaoOverlayHTML());
   assert.equal(screenOf(html), '', 'ders odak modunda tam ekran değil');
   assert.match(html, /kao-lesson-context/, 'bağlam satırı var');
-  assert.match(html, new RegExp(unit.title), 'ünite adı görünür');
+  assert.match(html, /Ünite 1/, 'draft ünite adı yerine güvenli "Ünite 1" görünür');
+  assert.doesNotMatch(html, new RegExp(unit.title), 'draft ünite adı sızmaz');
   assert.match(html, /Ders\s*1\s*\/\s*\d+/, 'kaçıncı ders olduğu görünür');
-  assert.equal(html.includes(unit.lessons[0].goal), true, 'dersin hedefi görünür');
+  assert.equal(html.includes(unit.lessons[0].goal), false, 'draft dersin hedefi gösterilmez');
+});
+
+check('Y-02b onaylı ders (u01.04) oynatıcıda gerçek hedefiyle görünür', () => {
+  const { api, curriculum } = boot();
+  const lesson = curriculum.units[0].lessons.find((l) => l.id === 'u01.04');
+  assert.equal(api.kaoReviewLevel(lesson.review), 'sourced', 'u01.04 onaylı');
+  assert.equal(api.kaoLesson('start', lesson.id), true);
+  const html = decode(api.kaoOverlayHTML());
+  assert.equal(html.includes(lesson.goal), true, 'onaylı dersin hedefi görünür');
 });
 
 // ---- Y-03: ders listesinde hedef cümlesi ----------------------------------
-check('Y-03 ünite ekranı her dersin hedef cümlesini gösterir', () => {
+check('Y-03 ünite ekranı yalnız onaylı derslerin hedef cümlesini gösterir', () => {
   const { api, curriculum } = boot();
   const unit = curriculum.units[0];
   assert.equal(api.kaoNav('unit', unit.id), true);
   const html = decode(api.kaoOverlayHTML());
   assert.match(html, /kao-unit-step-goal/, 'hedef satırı sınıfı var');
-  let shown = 0;
-  for (const lesson of unit.lessons) if (lesson.goal && html.includes(lesson.goal)) shown += 1;
-  assert.equal(shown, unit.lessons.filter((l) => l.goal).length, 'her dersin hedefi listelenir');
+  const approved = unit.lessons.filter((l) => l.goal && api.kaoReviewLevel(l.review) !== 'draft');
+  assert.ok(approved.length > 0, 'Ünite 1 içinde en az bir onaylı ders var');
+  for (const lesson of unit.lessons.filter((l) => l.goal)) {
+    const isApproved = approved.includes(lesson);
+    assert.equal(html.includes(lesson.goal), isApproved, `${lesson.id}: hedef ${isApproved ? 'görünür' : 'gizli'}`);
+  }
 });
 
 // ---- KAO2-18: explain() sözleşmesi ----------------------------------------

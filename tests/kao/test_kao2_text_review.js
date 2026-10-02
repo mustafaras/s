@@ -130,7 +130,9 @@ check('onaylı metinler render\'da görünür; draft metin gizlenir', () => {
   assert.equal(api.kaoReviewLevel({ level: 'sourced' }), 'sourced');
   assert.equal(api.kaoReviewLevel({}), 'draft');
   assert.equal(api.kaoTextSourceLabel({ level: 'draft' }), '', 'draft kaynak satırı üretmez');
-  assert.match(api.kaoTextSourceLabel(units[0].review), /^Kaynak: /, 'onaylı metin kaynak satırı taşır');
+  const approvedUnit = units.find((u) => api.kaoReviewLevel(u.review) === 'sourced' && Array.isArray(u.review.sources) && u.review.sources.length);
+  assert.ok(approvedUnit, 'kaynaklı onaylı en az bir ünite metni var');
+  assert.match(api.kaoTextSourceLabel(approvedUnit.review), /^Kaynak: /, 'onaylı metin kaynak satırı taşır');
 });
 
 check('sourced/expert görünür; dinî bağlamlı olanda "Kaynak:" satırı var', () => {

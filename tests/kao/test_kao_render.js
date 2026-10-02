@@ -283,13 +283,17 @@ assert.equal(api.kaoNav('units'), true);
 const pathHtml = api.kaoPathHTML();
 assert.equal((pathHtml.match(/class="kao-path-level-section/g) || []).length, 7, 'müfredatın yedi seviyesi görünmeli');
 assert.equal((pathHtml.match(/class="kao-path-unit-row/g) || []).length, 12, 'yol, 12 tematik müfredat ünitesini göstermeli');
-// KAO2-17: L1 onayı sonrası ünite başlığı görünür.
-assert.match(pathHtml, /Fâtiha/);
+// K2F-22: Ünite 1 metni draft → yolda ham başlık yok; onaylı (sourced) ünitenin gerçek başlığı görünür.
+const approvedPathUnit = sandbox.window.QuranCurriculumV2.units.find((u) => api.kaoReviewLevel(u.review) === 'sourced');
+assert.equal(api.kaoReviewLevel(firstUnit.review), 'draft', 'Ünite 1 onaysız');
+assert.ok(approvedPathUnit, 'en az bir onaylı ünite metni var');
+assert.doesNotMatch(pathHtml, new RegExp(firstUnit.title), 'draft ünite adı yolda sızmaz');
+assert.ok(pathHtml.includes(approvedPathUnit.title), 'onaylı ünite adı yolda görünür');
 assert.doesNotMatch(pathHtml, /kao-levels|App\.kaoOpenWord|Kilitli/i, 'eski etkisiz kutular ve ilk-kelime rotası kalkmalı');
 assert.equal(api.kaoNav('unit', firstUnit.id), true, 'Ünite ayrıntısı gezinme yığınına eklenmeli');
 const unitsHtml = api.kaoUnitHTML(firstUnit.id);
-// KAO2-17: L1 onayı sonrası ünite vaadi görünür.
-assert.match(unitsHtml, /Her namazda okuduğun/);
+// K2F-22: draft ünite vaadi ünite ekranında görünmez.
+assert.equal(unitsHtml.includes(firstUnit.promise), false, 'draft ünite vaadi sızmaz');
 assert.match(unitsHtml, /Dersler/);
 assert.match(unitsHtml, /Kelimeler · \d+/);
 

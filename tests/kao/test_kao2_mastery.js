@@ -589,7 +589,10 @@ check('D(c) ustalık özeti: "10 sorudan N doğru", geçti → tek taş satırı
   assert.match(text(ph), /10 sorudan 9 doğru/);
   assert.match(text(ph), /Ustalık geçildi/);
   assert.equal((text(ph).match(/Bir kilometre taşını tamamladın/g) || []).length, 1, 'tek sakin taş satırı');
-  assert.match(text(ph), new RegExp(`${unit1Title()} ünitesini bitirdim`));
+  // K2F-22: Ünite 1 başlığı draft; taş satırı ham başlık yerine güvenli "Ünite 1" ile kurulur.
+  assert.equal(pass.api.kaoReviewLevel(curriculum.units[0].review), 'draft', 'Ünite 1 onaysız');
+  assert.match(text(ph), /Ünite 1 ünitesini bitirdim/);
+  assert.doesNotMatch(text(ph), new RegExp(`${unit1Title()} ünitesini bitirdim`), 'draft ünite adı sızmaz');
   assert.match(text(ph), /Sıradaki adım/);
   assert.equal(countClass(ph, 'kao-primary'), 1);
   const fail = bootUnit1Done();

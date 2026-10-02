@@ -614,3 +614,22 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - rejected (6): lessonSizes/minChunks doğrulaması, conceptId'li derslerin ANLAM dışı kalması (CONCEPT_EXEMPT/ETİKET kapsıyor), çıta dışarıdan bağlayıcı değil (tasarım), P6 kaydı (seq 61 var), u07.01 kalıntısı (KANIT'ta var), GPL (yukarıda giderildi).
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - next: K2F-22
+
+## seq 64 · 2026-10-02 · PROMPT · K2F-22
+- status: done
+- title: L1 onay taşıma (kullanıcı kapısı)
+- prev-commit: 6896562e
+- evidence: kao2-duzeltme/evidence/K2F-22/KANIT.md
+- closes: K5-04 (2/2) · M-01 (veri)
+- repro: değişmedi · toplam 9/10 (R-08 açık, K2F-23)
+- gates: kapilar.sh YEŞİL (kao 51 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001g (pin yükseltme YOK; yayın sonrası 20261001h)
+- counts: sourced/draft — üniteler 1/11 · dersler 27/82 · S0 8/4 · toplam 36/97 (sourced ⇔ işaretli kutu; 36 işaretli kutu, hepsi `by:"owner"`)
+- approval-source: onay yapay zekâ incelemesinden (kullanıcı L1 incelemesini devretti; 26 bağımsız inceleme, iki bakışın da onayladığı 36 metin işaretlendi); `by:"owner"` kaydı kullanıcının devrine dayanır. L2 uzman onayı AÇIK, L2 kutularına dokunulmadı (0 işaretli).
+- open: 97 draft metin düzeltme bekliyor — ret gerekçeleri: abartılı vaat, başlık-içerik uyuşmazlığı, yanlış sûre ataması, u1–u3 `why` alanında kaynaksız iddialar.
+- scope-extension: kullanıcı onaylı 5 test güncellemesi (Dokun listesi dışı): test_kao2_explain.js · test_kao2_hub.js · test_kao2_mastery.js · test_kao2_path.js · test_kao_render.js. Ünite 1 metinleri draft olduğundan beklentiler güvenli yedeğe ("Ünite 1", "Ünite 1 · Ders 2 · N dk", "Ünite 1 ünitesini bitirdim") çekildi; gerçek metnin görünürlüğü onaylı u01.04 ve onaylı Ünite 12 ile sınanır. Kırmızı önce görüldü (5/5); uygulama kodu DEĞİŞMEDİ.
+- changed-tests: test_kao2_review_apply.js (sourced ⇔ işaretli kutu) · test_kao2_text_review.js (onaylı ünite örneği) · yukarıdaki 5 test
+- tool-note: üretici sayfayı yeniden yazınca kutular sıfırlanır, elle yeniden işlenmeli; araç işaretsiz eski `sourced`'u `draft`'a düşürmez (bu işlem betikle yapıldı).
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlığı: quranCurriculumV2.js) · cihaz —
+- surprises: ders oynatıcı bağlam satırı draft ünite için "Ünite 1 · Ünite 1 · Ders 1 / 5" gösteriyor (çift ön ek); bu committe değiştirilmedi, ayrı karar.
+- next: K2F-23 (kullanıcı "geç" diyene kadar geçilmez)

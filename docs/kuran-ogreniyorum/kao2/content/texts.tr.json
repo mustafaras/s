@@ -14,9 +14,9 @@
       "promise": "Her namazda okuduğun Fâtiha'yı kelime kelime anlayacaksın.",
       "why": "Fâtiha namazın her rekâtında okunur; günde onlarca kez tekrarladığın bu yedi âyeti anlamak, öğrendiğin ilk kelimeleri hemen gerçek bir metinde kullanmanı sağlar. Yeni başlayan biri için en güçlü çapa budur.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "surah-theme",
           "lexicon-meanings"
@@ -25,7 +25,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "2": {
@@ -33,9 +34,9 @@
       "promise": "Tekbirden selâma kadar namazda söylediklerini anlayacaksın.",
       "why": "Namaz, kelimeleri en sık duyduğun yerdir. İftitah tekbirinden selama kadar geçen cümleleri anlamak, öğrendiklerini günde beş kez uygulamana imkân verir.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "lexicon-meanings"
         ],
@@ -43,7 +44,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "3": {
@@ -51,9 +53,9 @@
       "promise": "İhlâs, Felak ve Nâs'ı anlayarak okuyacaksın.",
       "why": "Bu üç kısa sûre hem yeni başlayan için okunması kolay hem de anlamı berrak metinlerdir; kelime dağarcığını ilk gerçek sûre okumalarında kullanırsın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "surah-theme",
           "lexicon-meanings"
@@ -62,7 +64,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "4": {
@@ -70,9 +73,9 @@
       "promise": "Cümleleri birbirine bağlayan kelimeleri tanıyacaksın.",
       "why": "Uzun cümleleri anlamayı zorlaştıran şey çoğu zaman bağlaçlardır. Bu küçük kelimeleri tanıyınca âyetin nerede bittiğini, nerede yeni bir fikir başladığını görürsün.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "grammar-plain"
         ],
@@ -80,7 +83,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "5": {
@@ -88,9 +92,9 @@
       "promise": "İşaret ve soru kelimeleriyle âyetin kime, neye döndüğünü göreceksin.",
       "why": "İşaret ve soru kelimeleri, cümlenin kimi ya da neyi konu edindiğini gösterir. Bunları tanıdığında âyetin içinde kaybolmazsın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "grammar-plain"
         ],
@@ -98,7 +102,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "6": {
@@ -106,9 +111,9 @@
       "promise": "Kur'an'ın en sık isimlerini tanıyacaksın.",
       "why": "Kur'an'ın büyük bölümü isimlerden oluşur ve en sık geçen isimler gök, yer, insan gibi gündelik kavramlardır. Bunları öğrenmek, kapsam eğrisinde en hızlı ilerlediğin adımdır.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "lexicon-meanings"
         ],
@@ -116,7 +121,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "7": {
@@ -124,9 +130,9 @@
       "promise": "Geçmiş zaman anlatılarını çözeceksin.",
       "why": "Kur'an'ın önemli bir kısmı geçmişte olanları anlatır. Geçmiş zaman kalıbını tanıdığında kıssaları takip edebilirsin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "grammar-plain"
         ],
@@ -134,7 +140,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "8": {
@@ -142,9 +149,9 @@
       "promise": "Şimdiki ve geniş zamanı tanıyacaksın.",
       "why": "Şimdiki ve geniş zaman, süregelen işleri ve genel doğruları anlatır. Bu kalıpla âyetin şu an mı yoksa geçmişte mi olduğunu ayırt edersin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "grammar-plain"
         ],
@@ -152,7 +159,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "9": {
@@ -160,9 +168,9 @@
       "promise": "Emir ve dua cümlelerini anlayacaksın.",
       "why": "Kur'an'da emir ve dua kalıpları sık geçer. Bunları tanımak, hem yönlendirmeyi hem de yakarışı ayırt etmeni sağlar.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "grammar-plain"
         ],
@@ -170,7 +178,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "10": {
@@ -178,9 +187,9 @@
       "promise": "Bir kökten Türkçedeki onlarca kelimeye uzanacaksın.",
       "why": "Arapçada kelimeler ortak bir kökten türer. Tek bir kökü öğrenmek, aynı aileden gelen pek çok kelimeyi birden tanımanı sağlar; ilim, talim, muallim aynı köktendir.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "lexicon-meanings"
         ],
@@ -188,7 +197,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "11": {
@@ -196,9 +206,9 @@
       "promise": "Kalıp değişince anlamın nasıl kaydığını göreceksin.",
       "why": "Aynı kökten gelen kelimeler kalıba göre farklı işler görür: yapan, yapılan, yapma. Kalıpları tanımak, bilmediğin bir kelimenin anlamını tahmin etmeni sağlar.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29",
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
         "sources": [
           "lexicon-meanings"
         ],
@@ -206,7 +216,8 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "l0": "pass"
       }
     },
     "12": {
@@ -233,9 +244,10 @@
       "title": "Sağdan sola, harf ve hareke",
       "goal": "Yazının sağdan sola aktığını ve harflerin üstündeki küçük işaretlerin sesi verdiğini göreceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "s0.02": {
@@ -278,9 +290,10 @@
       "title": "Dişli aile",
       "goal": "Dişli harfleri ve aralarındaki farkı ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "s0.07": {
@@ -315,20 +328,22 @@
       "title": "Kalan harfler",
       "goal": "Boğazdan çıkan harfleri çıkış yerlerine göre ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-30",
-        "note": "07 §2 başlığına hizalandı (spec esastır)"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "note": "07 §2 başlığına hizalandı (spec esastır)",
+        "l0": "pass"
       }
     },
     "s0.11": {
       "title": "Tenvin, elif-lâm, vasıl",
       "goal": "Kelime başındaki 'el' takısını tanıyıp okuyuşa katacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-30",
-        "note": "07 §2 başlığına hizalandı (spec esastır)"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "note": "07 §2 başlığına hizalandı (spec esastır)",
+        "l0": "pass"
       }
     },
     "s0.12": {
@@ -347,27 +362,30 @@
       "title": "Besmele",
       "goal": "Besmelenin üç kelimesini tanıyıp 'iş önce gelir' kuralını göreceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u01.02": {
       "title": "Rahîm ve Hamd",
       "goal": "Rahmet ve övgü kelimelerini, 'el' takısıyla birlikte okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u01.03": {
       "title": "Yalnız sana",
       "goal": "Kulluğun yalnız O'na yöneldiğini anlatan cümleyi çözeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u01.04": {
@@ -383,17 +401,18 @@
       "title": "Gazaba uğrayanlar değil",
       "goal": "Fâtiha'yı baştan sona kesintisiz anlamlandıracaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u02.01": {
       "title": "Büyüklük ve tek ilah",
       "goal": "Namazda sık duyduğun 'daha büyük', 'tapılan' ve 'ey' kelimelerini küçük yardımcılarıyla birlikte göreceksin.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -402,8 +421,8 @@
       "title": "Tenzih, selâm ve bereket",
       "goal": "Namazda sık geçen tenzih (her eksiklikten uzak tutma), namaz, selâm, temiz şeyler ve bereket kelimelerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -412,18 +431,20 @@
       "title": "Namazda ne diyorum",
       "goal": "Namaz cümlelerini baştan sona anlamlandıracaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u03.01": {
       "title": "Kelime sonundaki ekler",
       "goal": "İyelik ve çoğul eklerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u03.02": {
@@ -440,9 +461,10 @@
       "title": "Yaratmak ve gece",
       "goal": "Yaratma ve karanlık kelimelerini İhlâs ve Felak'te okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u03.04": {
@@ -458,26 +480,28 @@
       "title": "Kıskançlık ve vesvese",
       "goal": "Haset ve fısıltı kelimelerini Nâs sûresinde tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u03.06": {
       "title": "Üç sûreyi birlikte okuma",
       "goal": "Üç koruyucu sûreyi baştan sona anlayarak okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u04.01": {
       "title": "Dikkat ve vurgu",
       "goal": "Cümleye dikkat çeken, onu vurgulayan ve başka kelimelere bağlayan küçük kelimelerle birlikte 'üstünde' kelimesini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -486,8 +510,8 @@
       "title": "O gün, her ve bazı",
       "goal": "'O gün', 'hayır, aksine', 'her', 'bazı' ve 'yanında' gibi küçük kelimeleri tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -506,8 +530,8 @@
       "title": "'ya da', 'ama' ve 'ise'",
       "goal": "Seçenek, karşıtlık ve gelecek bildiren 'ya … ya da', 'veya', 'ama', 'ileride' ve 'ise' kelimelerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -516,8 +540,8 @@
       "title": "'asla', 'sanki' ve 'umulur ki'",
       "goal": "Reddetme, benzetme ve umut bildiren 'asla', 'öyleyse', 'sanki', 'umulur ki' ve 'hayır öyle değil' kelimelerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -526,26 +550,28 @@
       "title": "İşaret kelimeleri",
       "goal": "'bu, şu, onlar' kelimeleriyle cümlenin kimi gösterdiğini göreceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u05.02": {
       "title": "Soru kelimeleri",
       "goal": "'kim, ne, hangi, nasıl' sorularıyla âyetin neyi sorduğunu anlayacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.01": {
       "title": "Gök, yer ve işitme",
       "goal": "Yer, gök, işitme ve 'kendi' kelimelerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -554,18 +580,20 @@
       "title": "Kitap ve kalp",
       "goal": "Kitap ve kalp kelimeleriyle iç dünyayı anlatan cümleleri okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.03": {
       "title": "Ödül ve karşılık",
       "goal": "Karşılık ve durak kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.04": {
@@ -581,26 +609,28 @@
       "title": "Musa ve halkı",
       "goal": "Peygamber adlarını ve topluluk kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.06": {
       "title": "Güç ve sahiplik",
       "goal": "Güç ve sahip olma kelimelerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.07": {
       "title": "Mal, dost ve gece",
       "goal": "Mal, dost, gece, ilk ve inkâr kelimelerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -609,108 +639,120 @@
       "title": "Oğullar ve arkadaşlar",
       "goal": "Aile ve arkadaşlık kelimelerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.09": {
       "title": "Peygamber ve Firavun",
       "goal": "Haber getiren elçi ve karşıt figür kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.10": {
       "title": "Delil ve insan",
       "goal": "Apaçık delil ve insan kelimelerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.11": {
       "title": "İbrahim ve ev",
       "goal": "Ev ve yemin kelimelerini kıssa bağlamında okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.12": {
       "title": "Oğul ve su",
       "goal": "Aile ve doğa kelimelerini birlikte tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.13": {
       "title": "Göz ve gündüz",
       "goal": "Görme ve zaman kelimelerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.14": {
       "title": "Nehir ve vade",
       "goal": "Doğa ve süre kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.15": {
       "title": "Düşman ve yurt",
       "goal": "Karşıtlık ve mekân kelimelerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.16": {
       "title": "İşiten ve gücü yeten",
       "goal": "İki sık geçen ismi tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.17": {
       "title": "Nuh ve ışık",
       "goal": "Peygamber adını ve aydınlık kelimesini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.18": {
       "title": "Dağ ve günah",
       "goal": "Doğa ve sorumluluk kelimelerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.19": {
       "title": "Nimet ve geçimlik",
       "goal": "İyilik ve rızık kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.20": {
@@ -727,98 +769,108 @@
       "title": "Önderler ve kuvvet",
       "goal": "Liderlik ve güç kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.22": {
       "title": "Ordu ve haber",
       "goal": "Kalabalık ve bildiri kelimelerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.23": {
       "title": "Söz ve nesil",
       "goal": "Konuşma ve soy kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.24": {
       "title": "Ay ve Yusuf",
       "goal": "Göksel varlık ve peygamber adını birlikte okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.25": {
       "title": "Semûd ve Âdem",
       "goal": "Topluluk ve ilk insan adlarını tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.26": {
       "title": "İsa ve dil",
       "goal": "Peygamber adını ve konuşma organını okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.27": {
       "title": "Muhtaç olmayan",
       "goal": "'Hiçbir şeye muhtaç olmayan' anlamını pekiştireceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.28": {
       "title": "Gemi ve yoksul",
       "goal": "Kıssa ve toplum kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.29": {
       "title": "İyiler ve kötülük",
       "goal": "Ahlaki karşıtlıkları okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u06.30": {
       "title": "İsimlerin dünyası",
       "goal": "Ünitenin en sık isimlerini birlikte pekiştireceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u07.01": {
       "title": "Geçmişte olanlar",
       "goal": "Helal kıldı, yaptı, bildi ve geldi gibi geçmişte olan işleri anlatan fiilleri tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -827,8 +879,8 @@
       "title": "Gönderme ve yalanlama",
       "goal": "Gönderdi, yalanladı, inkâr etti ve indirdi fiillerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -837,8 +889,8 @@
       "title": "İnanmak ve yapmak",
       "goal": "İnandı, döndü, ortaya çıkardı, hazırladı ve yaptı fiillerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -847,8 +899,8 @@
       "title": "Duymak ve girmek",
       "goal": "Duydu, girdi, kazandı, ulaştı ve rızık verdi fiillerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -857,17 +909,18 @@
       "title": "Vurmak ve çıkmak",
       "goal": "Hareket bildiren fiilleri ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u07.06": {
       "title": "Şükretmek ve sahip olmak",
       "goal": "Şükretti, sahip oldu, sandı, diledi ve taşıdı fiillerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -876,26 +929,28 @@
       "title": "Bırakmak ve toplamak",
       "goal": "Terk etme ve bir araya getirme fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u07.08": {
       "title": "Kalmak ve güç yetirmek",
       "goal": "Süreklilik ve yeterlilik fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u07.09": {
       "title": "Tuzak ve yükseltmek",
       "goal": "Tuzak kurdu, yükseltti, gerçekleşti ve tanıdı fiillerini okuyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -924,44 +979,48 @@
       "title": "Korkmak ve emretmek",
       "goal": "Duygu ve buyruk fiillerini şimdiki zamanda tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u08.04": {
       "title": "Tövbe ve okumak",
       "goal": "Dönüş ve okuma fiillerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u08.05": {
       "title": "Artırmak ve sanmak",
       "goal": "Çoğaltma ve zan fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u08.06": {
       "title": "Razı olmak",
       "goal": "Hoşnutluk ve engelleme fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u08.07": {
       "title": "Umut, yetmek ve affetmek",
       "goal": "Umulur ki, kötü oldu, affetti, yasakladı ve yetti fiillerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -970,17 +1029,18 @@
       "title": "İsyan ve aramak",
       "goal": "Karşı gelme ve isteme fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u08.09": {
       "title": "Bağışlamak ve yürümek",
       "goal": "Bağışladı, gizledi, yürüdü, sınadı, koydu ve umar fiillerini okuyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1009,35 +1069,38 @@
       "title": "Vahyetmek ve sevmek",
       "goal": "Bildirme ve sevgi fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u09.04": {
       "title": "Savaşmak ve yok etmek",
       "goal": "Şiddet ve yok etme fiillerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u09.05": {
       "title": "Seslenmek ve tenzih",
       "goal": "Çağrı ve tenzih fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u09.06": {
       "title": "Göstermek ve dayanmak",
       "goal": "Gösterdi, dayandı, haram kıldı, istedi ve kurtardı fiillerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1046,8 +1109,8 @@
       "title": "Açıklamak",
       "goal": "Açıkladı, yöneldi, ayrılığa düştü, aradı ve yemin etti fiillerini ayırt edeceksin.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1056,35 +1119,38 @@
       "title": "Yöneltmek ve fayda",
       "goal": "Çevirme ve yarar fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u09.09": {
       "title": "Kurtuluş ve çaba",
       "goal": "Başarı ve gayret fiillerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u09.10": {
       "title": "Vefat ve kurtarmak",
       "goal": "Son verme ve kurtarma fiillerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u09.11": {
       "title": "Çağırmak, sakınmak ve müjdelemek",
       "goal": "Çağırdı, sakındı, alay etti, müjdeledi, yüz çevirdi ve konuştu fiillerini birlikte pekiştireceksin.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1093,8 +1159,8 @@
       "title": "Yapan ve yapılan",
       "goal": "'İnanan', 'yalanlayan', 'her şeyi bilen' ve 'adı konmuş' gibi, işi yapanı ya da yapılanı anlatan kelimelerle 'güvende oldu' kelimesini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1103,17 +1169,18 @@
       "title": "Fiilin adı",
       "goal": "'bilme, anma, inanma' isimlerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.03": {
       "title": "Daha iyi bilen ve daha çok",
       "goal": "Daha iyi bilen, daha çok, daha çetin, anma ve öğüt kelimelerini okuyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1122,152 +1189,168 @@
       "title": "İnkâr eden",
       "goal": "Yapan ismini olumsuz bağlamda tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.05": {
       "title": "Tanıklık eden",
       "goal": "Tanıklık ve iş kelimelerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.06": {
       "title": "Zulmetmek",
       "goal": "Haksızlık ve iyilik kavramlarını okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.07": {
       "title": "İyi işler",
       "goal": "Güzel ameller ve rızık kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.08": {
       "title": "Toplamak ve hayat",
       "goal": "Yaşam ve doğru yol kelimelerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.09": {
       "title": "Diri ve yolunu kaybetmek",
       "goal": "Canlılık ve sapma karşıtlığını tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.10": {
       "title": "Ölüm ve sapkınlık",
       "goal": "Son ve yitirme kelimelerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.11": {
       "title": "Ölmek ve nimet",
       "goal": "Geçiş ve iyilik kelimelerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.12": {
       "title": "Ölü ve secde",
       "goal": "Durum ve eylem kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.13": {
       "title": "Yardımcı ve zafer",
       "goal": "Destek ve başarı kelimelerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.14": {
       "title": "Son ve sürekli kalan",
       "goal": "Zaman ve kalıcılık kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.15": {
       "title": "Görünmeyen ve sakınanlar",
       "goal": "Gizlilik ve korunma kavramlarını okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.16": {
       "title": "İzin ve delil",
       "goal": "Yetki ve kanıt kelimelerini ayırt edeceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.17": {
       "title": "Kaybedenler",
       "goal": "Kayıp ve arınma kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.18": {
       "title": "Eşit ve boş",
       "goal": "Denklik ve geçersizlik kelimelerini okuyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.19": {
       "title": "Topluluk ve sığınak",
       "goal": "Grup ve barınma kelimelerini tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u10.20": {
       "title": "Kök ailesi: hüküm ve hikmet",
       "goal": "Hükmetmek, hüküm ve hikmet kelimelerinin aynı kökten geldiğini göreceksin; yanında 'sanı' da var.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1286,17 +1369,18 @@
       "title": "İnanan ve düşünen",
       "goal": "İnanç ve düşünme kalıplarını tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u11.03": {
       "title": "İman, iyilik ve diriltmek",
       "goal": "İman, iyilik etmek, hikmet sahibi ve diriltmek kelimelerini okuyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1305,8 +1389,8 @@
       "title": "Selâmlama ve ıslah",
       "goal": "Selâmlama, düzeltmek ve can almak kelimelerini tanıyacaksın.",
       "review": {
-        "level": "draft",
-        "by": null,
+        "level": "sourced",
+        "by": "owner",
         "l0": "pass",
         "at": "2026-10-02"
       }
@@ -1325,18 +1409,20 @@
       "title": "Ortak koşmak",
       "goal": "Kalıpları karşıtlık içinde pekiştireceksin.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u12.01": {
       "title": "'eğer', '-ınca', '-seydi'",
       "goal": "Şart kalıplarını tanıyacaksın.",
       "review": {
-        "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "level": "draft",
+        "by": null,
+        "at": "2026-10-02",
+        "l0": "pass"
       }
     },
     "u12.02": {
@@ -1713,331 +1799,8 @@
     }
   },
   "surahs": {
-    "114": {
-      "contextTr": "Nâs, Mekke'de indi ve 6 âyetten oluşur. Ana tema: İnsanların Rabbine sığınma: içe fısıldayan vesveseye karşı.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "113": {
-      "contextTr": "Felak, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Şafağın Rabbine sığınma: karanlık, haset ve gizli kötülüğe karşı.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "112": {
-      "contextTr": "İhlâs, Mekke'de indi ve 4 âyetten oluşur. Ana tema: Tevhidin özü: eşsiz olan; doğmamış ve doğurmamış olan.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "111": {
-      "contextTr": "Tebbet (Mesed), Mekke'de indi ve 5 âyetten oluşur. Ana tema: Davete düşmanlıkta direnen bir tutumun akıbetini anlatan kısa sûre.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "110": {
-      "contextTr": "Nasr, Medine'de indi ve 3 âyetten oluşur. Ana tema: Yardım ve fetih geldiğinde tesbih, hamd ve istiğfar.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "109": {
-      "contextTr": "Kâfirûn, Mekke'de indi ve 6 âyetten oluşur. Ana tema: İnançta net sınır: “sizin dininiz size, benim dinim bana”.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "108": {
-      "contextTr": "Kevser, Mekke'de indi ve 3 âyetten oluşur. Ana tema: Verilen bol hayır; namaz, kurban ve kesintiye uğramayan hat.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "107": {
-      "contextTr": "Mâûn, Mekke'de indi ve 7 âyetten oluşur. Ana tema: Dini yalanlamanın işaretleri: yetimi itmek, namazdan gafil olmak, yardımı esirgemek.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "106": {
-      "contextTr": "Kureyş, Mekke'de indi ve 4 âyetten oluşur. Ana tema: Güvenli yolculuklar ve açlıktan doyuran Ev sahibine kulluk.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "105": {
-      "contextTr": "Fîl, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Fil sahiplerinin planının boşa çıkarılışı.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "104": {
-      "contextTr": "Hümeze, Mekke'de indi ve 9 âyetten oluşur. Ana tema: Arkadan çekiştiren, mal yığıp ölümsüzlük sanan tutumun sonu.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "103": {
-      "contextTr": "Asr, Mekke'de indi ve 3 âyetten oluşur. Ana tema: Zamana yeminle hüsranın istisnası: iman, sâlih amel, hak ve sabır.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "102": {
-      "contextTr": "Tekâsür, Mekke'de indi ve 8 âyetten oluşur. Ana tema: Çoklukla övünmenin oyalayıcılığı ve nimetten hesaba çekiliş.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "101": {
-      "contextTr": "Kâria, Mekke'de indi ve 11 âyetten oluşur. Ana tema: Kapı çalan gün; tartısı ağır ve hafif gelenler.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "100": {
-      "contextTr": "Âdiyât, Mekke'de indi ve 11 âyetten oluşur. Ana tema: Koşan atlar sahnesiyle insanın nankörlüğü ve gizlinin açığa çıkışı.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "99": {
-      "contextTr": "Zilzâl, Medine'de indi ve 8 âyetten oluşur. Ana tema: Yerin sarsılışı ve zerre ağırlığınca amelin görülmesi.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "98": {
-      "contextTr": "Beyyine, Medine'de indi ve 8 âyetten oluşur. Ana tema: Apaçık delil, ayrışma ve hâlis kulluk.",
-      "derivedFrom": [
-        "QuranRevelationOrderV1.nameTr",
-        "revelationPlace",
-        "ayahCount",
-        "themeTr"
-      ],
-      "review": {
-        "level": "draft",
-        "sources": [
-          "diyanet-kuran-i-kerim-meali-sure-basliklari",
-          "tdv-islam-ansiklopedisi-sure-maddeleri",
-          "misir-kahire-mushafi-nuzul-tertibi"
-        ],
-        "by": null,
-        "at": "2026-09-30"
-      }
-    },
-    "97": {
-      "contextTr": "Kadir, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Bin aydan hayırlı gece ve inişin bereketi.",
+    "95": {
+      "contextTr": "Tîn, Mekke'de indi ve 8 âyetten oluşur. Ana tema: İncir ve zeytin yemini; en güzel biçimde yaratılan insanın iki ucu.",
       "derivedFrom": [
         "QuranRevelationOrderV1.nameTr",
         "revelationPlace",
@@ -2074,8 +1837,331 @@
         "at": "2026-09-30"
       }
     },
-    "95": {
-      "contextTr": "Tîn, Mekke'de indi ve 8 âyetten oluşur. Ana tema: İncir ve zeytin yemini; en güzel biçimde yaratılan insanın iki ucu.",
+    "97": {
+      "contextTr": "Kadir, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Bin aydan hayırlı gece ve inişin bereketi.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "98": {
+      "contextTr": "Beyyine, Medine'de indi ve 8 âyetten oluşur. Ana tema: Apaçık delil, ayrışma ve hâlis kulluk.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "99": {
+      "contextTr": "Zilzâl, Medine'de indi ve 8 âyetten oluşur. Ana tema: Yerin sarsılışı ve zerre ağırlığınca amelin görülmesi.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "100": {
+      "contextTr": "Âdiyât, Mekke'de indi ve 11 âyetten oluşur. Ana tema: Koşan atlar sahnesiyle insanın nankörlüğü ve gizlinin açığa çıkışı.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "101": {
+      "contextTr": "Kâria, Mekke'de indi ve 11 âyetten oluşur. Ana tema: Kapı çalan gün; tartısı ağır ve hafif gelenler.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "102": {
+      "contextTr": "Tekâsür, Mekke'de indi ve 8 âyetten oluşur. Ana tema: Çoklukla övünmenin oyalayıcılığı ve nimetten hesaba çekiliş.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "103": {
+      "contextTr": "Asr, Mekke'de indi ve 3 âyetten oluşur. Ana tema: Zamana yeminle hüsranın istisnası: iman, sâlih amel, hak ve sabır.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "104": {
+      "contextTr": "Hümeze, Mekke'de indi ve 9 âyetten oluşur. Ana tema: Arkadan çekiştiren, mal yığıp ölümsüzlük sanan tutumun sonu.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "105": {
+      "contextTr": "Fîl, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Fil sahiplerinin planının boşa çıkarılışı.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "106": {
+      "contextTr": "Kureyş, Mekke'de indi ve 4 âyetten oluşur. Ana tema: Güvenli yolculuklar ve açlıktan doyuran Ev sahibine kulluk.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "107": {
+      "contextTr": "Mâûn, Mekke'de indi ve 7 âyetten oluşur. Ana tema: Dini yalanlamanın işaretleri: yetimi itmek, namazdan gafil olmak, yardımı esirgemek.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "108": {
+      "contextTr": "Kevser, Mekke'de indi ve 3 âyetten oluşur. Ana tema: Verilen bol hayır; namaz, kurban ve kesintiye uğramayan hat.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "109": {
+      "contextTr": "Kâfirûn, Mekke'de indi ve 6 âyetten oluşur. Ana tema: İnançta net sınır: “sizin dininiz size, benim dinim bana”.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "110": {
+      "contextTr": "Nasr, Medine'de indi ve 3 âyetten oluşur. Ana tema: Yardım ve fetih geldiğinde tesbih, hamd ve istiğfar.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "111": {
+      "contextTr": "Tebbet (Mesed), Mekke'de indi ve 5 âyetten oluşur. Ana tema: Davete düşmanlıkta direnen bir tutumun akıbetini anlatan kısa sûre.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "112": {
+      "contextTr": "İhlâs, Mekke'de indi ve 4 âyetten oluşur. Ana tema: Tevhidin özü: eşsiz olan; doğmamış ve doğurmamış olan.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "113": {
+      "contextTr": "Felak, Mekke'de indi ve 5 âyetten oluşur. Ana tema: Şafağın Rabbine sığınma: karanlık, haset ve gizli kötülüğe karşı.",
+      "derivedFrom": [
+        "QuranRevelationOrderV1.nameTr",
+        "revelationPlace",
+        "ayahCount",
+        "themeTr"
+      ],
+      "review": {
+        "level": "draft",
+        "sources": [
+          "diyanet-kuran-i-kerim-meali-sure-basliklari",
+          "tdv-islam-ansiklopedisi-sure-maddeleri",
+          "misir-kahire-mushafi-nuzul-tertibi"
+        ],
+        "by": null,
+        "at": "2026-09-30"
+      }
+    },
+    "114": {
+      "contextTr": "Nâs, Mekke'de indi ve 6 âyetten oluşur. Ana tema: İnsanların Rabbine sığınma: içe fısıldayan vesveseye karşı.",
       "derivedFrom": [
         "QuranRevelationOrderV1.nameTr",
         "revelationPlace",

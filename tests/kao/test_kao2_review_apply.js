@@ -136,5 +136,39 @@ check('bilinmeyen seçenek sessizce yok sayılmaz', () => {
   assert.equal(threw, true, 'bilinmeyen bayrak hata verir');
 });
 
+// --- K2F-22 · sourced ⇔ işaretli kutu (gerçek inceleme sayfası, gerçek metin) ---
+// Kural (KR-4): ünite/ders/S0 metni yalnız inceleme sayfasında kutusu `[x]` ise
+// `sourced`/`expert` olabilir; kutusu işaretsiz olan metin `draft`'tır.
+const ticked17 = () => {
+  const ids = new Set();
+  let unit = null;
+  for (const line of read(SHEET_17).split('\n')) {
+    const h = /^### Ünite (\d+) ·/.exec(line);
+    if (h) { unit = `u${h[1]}`; continue; }
+    if (/^##? /.test(line)) { unit = null; continue; }
+    if (unit && /^- \[x\] L1/i.test(line)) ids.add(unit);
+    const row = /^\|\s*((?:u\d\d|s0)\.\d\d)\s*\|.*\|\s*- \[x\]\s*\|$/i.exec(line);
+    if (row) ids.add(row[1]);
+  }
+  return ids;
+};
+
+check('K2F-22: sourced ⇔ işaretli kutu (üniteler, dersler, S0)', () => {
+  const texts = JSON.parse(read(TEXTS));
+  const ticked = ticked17();
+  assert.ok(ticked.size > 0, 'inceleme sayfasında en az bir işaretli kutu var');
+  const entries = [
+    ...Object.keys(texts.units).map((k) => [`u${k}`, texts.units[k]]),
+    ...Object.entries(texts.lessons),
+    ...Object.entries(texts.s0)
+  ];
+  const visible = (e) => ['sourced', 'expert'].includes(e.review.level);
+  const unticked = entries.filter(([id, e]) => visible(e) && !ticked.has(id)).map(([id]) => id);
+  const missing = entries.filter(([id, e]) => !visible(e) && ticked.has(id)).map(([id]) => id);
+  assert.deepEqual(unticked, [], `kutusuz ama sourced: ${unticked.join(', ')}`);
+  assert.deepEqual(missing, [], `kutulu ama draft: ${missing.join(', ')}`);
+  for (const [id] of entries.filter(([, e]) => visible(e))) assert.ok(ticked.has(id), id);
+});
+
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(`KAO2 review-apply: PASS (${passed} kontrol)`);

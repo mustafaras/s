@@ -61,12 +61,18 @@ check('yol: yedi seviye, tematik üniteler ve tek önerilen gerçek sıradaki ad
   const html = decode(api.kaoOverlayHTML());
   assert.equal(count(html, 'kao-path-level-section'), 7, 'S0–S6 için yedi bölüm');
   assert.equal(count(html, 'kao-path-unit-row'), 12, '12 tematik ünite müfredat sırasıyla görünür');
-  // KAO2-17: L1 onayı sonrası ünite metinleri görünür.
-  assert.match(html, /Fâtiha/);
-  assert.match(html, /Her namazda okuduğun Fâtiha/);
+  // K2F-22: Ünite 1 metni draft → güvenli "Ünite 1"; onaylı (sourced) Ünite 12 metni gerçek haliyle görünür.
+  const draftUnit = curriculum.units[0];
+  const approvedUnit = curriculum.units.find((u) => api.kaoReviewLevel(u.review) === 'sourced');
+  assert.equal(api.kaoReviewLevel(draftUnit.review), 'draft', 'Ünite 1 onaysız');
+  assert.ok(approvedUnit, 'en az bir onaylı ünite metni var');
+  assert.doesNotMatch(html, new RegExp(draftUnit.title), 'draft ünite adı sızmaz');
+  assert.equal(html.includes(draftUnit.promise), false, 'draft ünite vaadi sızmaz');
+  assert.ok(html.includes(esc(approvedUnit.title)), 'onaylı ünite adı görünür');
+  assert.ok(html.includes(esc(approvedUnit.promise)), 'onaylı ünite vaadi görünür');
   assert.match(html, /onclick="App\.kaoNav\("unit",1\)"/);
   assert.equal((html.match(/aria-current="step"/g) || []).length, 1, 'tek sıradaki ünite step olarak işaretlenir');
-  assert.match(html, /class="kao-progress-ring" role="img" aria-label="Fâtiha ders ilerlemesi: 20%"/);
+  assert.match(html, /class="kao-progress-ring" role="img" aria-label="Ünite 1 ders ilerlemesi: 20%"/);
   assert.match(html, /onclick="App\.kaoLesson\("start","s0\.02"\)"/, 'S0 satırı gerçek ilk tamamlanmamış derse gider');
   assert.match(html, /onclick="App\.kaoOpenSurah\(114\)"/, 'S5 satırı var olan kısa sûre okuyucusunu açar');
   assert.match(html, /Seviye 6/);
@@ -87,9 +93,15 @@ check('ünite: vaat, gerçek ilerleme, sıradaki ders ve statik kavram listesi',
   const html = decode(api.kaoOverlayHTML());
   const total = unit.lessons.reduce((sum, lesson) => sum + lesson.lemmaIds.length, 0);
   assert.match(html, /class="kao-screen[^\"]*kao-screen-unit/);
-  // KAO2-17: L1 onayı sonrası ünite metinleri görünür.
-  assert.match(html, /Fâtiha/);
-  assert.match(html, /Her namazda okuduğun Fâtiha/);
+  // K2F-22: Ünite 1 metni draft → ünite ekranında ham başlık/vaat görünmez; güvenli "Ünite 1" görünür.
+  assert.equal(api.kaoReviewLevel(unit.review), 'draft', 'Ünite 1 onaysız');
+  assert.match(html, /Ünite 1/);
+  // "Çapa metin · Fâtiha" sûre adıdır (yapısal müfredat verisi, onaylı metin kapısına bağlı değil); onu çıkarıp başlık sızıntısını ara.
+  const withoutAnchor = html.replace(/<p class="kao-unit-anchor">[\s\S]*?<\/p>/, '');
+  assert.notEqual(withoutAnchor, html, 'çapa satırı bulundu');
+  assert.match(html, /<p class="kao-unit-anchor"><span>Çapa metin<\/span> · Fâtiha<\/p>/, 'çapa satırı sûre adını taşır');
+  assert.doesNotMatch(withoutAnchor, new RegExp(unit.title), 'draft ünite adı sızmaz');
+  assert.equal(html.includes(unit.promise), false, 'draft ünite vaadi sızmaz');
   assert.match(html, new RegExp(`3 / ${total} kelime · 1 / ${unit.lessons.length} ders`));
   assert.match(html, /Ders 2’e devam et/);
   assert.match(html, /onclick="App\.kaoLesson\("start","u01\.02"\)"/);

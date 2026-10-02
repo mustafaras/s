@@ -1,21 +1,20 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-20
-lastSeq: 57
+nextPrompt: K2F-21
+lastSeq: 59
 status: active
 -->
 
-Son güncelleme: 2026-10-01 · LEDGER seq 57 · K2F-00…19 tamam (20/44), sıradaki K2F-20. R-01…R-07, R-09, R-10 PASS (9/10).
+Son güncelleme: 2026-10-02 · LEDGER seq 59 · K2F-00…20 tamam (21/44), sıradaki K2F-21. R-01…R-07, R-09, R-10 PASS (9/10).
 
 ## Şu an neredeyiz
-**K2F-20 `waiting_user` (G2).** Kelimeler başlık/kavrama göre yeniden dağıtıldı (kaynak/test düzeyinde, yayın yok): 26 ders değişti, 41 lemma taşındı; ders kimlikleri/sıraları/boyutları ve Ünite 1–3 sabit; spec Ünite 4–12 `focus` + `lessonSizes`; iki üretim bayt-eşit. Kapı: ETİKET 18→11, ÖRNEK 11→2, ANLAM 1→1. A-6: tamamlanmış ders tamamlanmış kalır, taşınan tanışılmamış kelimeler sıradaki dersin planında tanıştırılır (`carryOver`). Kalan 11 ders yapısal sınırda (donmuş Ü1–3, sözlükte yeterli lemma yok, sınıf kuralı) — karar noktaları `MUFREDAT-ESLEME.md` sonunda.
-Kullanıcıdan bekleniyor: `G2 onaylı` ya da değişiklik istekleri (ders/lemma kimliğiyle) + karar noktaları için seçenek. Onaysız K2F-20 `done` olmaz.
-Canlı: `main` = `19f0bfd6`, pin `20261001g` (Dalga 1); K2F-19/20 değişiklikleri yalnız dalda.
+K2F-20 bitti (G2 onaylı: "tüm önerilerini gerçekleştir"): kelimeler başlık/kavrama göre yeniden dağıtıldı (26 ders / 41 lemma; Ü1–3, ders kimlikleri/sıraları/boyutları sabit), A-6 ilerleme koruması (`carryOver`) ve testleri, araç `lessonSizes`/`mastery:false`, `MUFREDAT-ESLEME.md` yenilendi. Kapı: ETİKET 11 · ÖRNEK 2 · ANLAM 1 (`KNOWN_*` listeleri). Kullanıcı kararı: kalan dersler sözlük/donuk ünite sınırında; başlık/hedef metinleri K2F-21'de gerçek kelimelere göre yeniden yazılır. Yayın yok (değişen yayın varlıkları `quranCurriculumV2.js`, `quranLearnFlow.js` sonraki YAYIN'da).
+Canlı: `main` = `19f0bfd6`, pin `20261001g` (Dalga 1).
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-20 (aynı prompt, G2 yanıtı sonrası):** kullanıcı yanıtına göre spec düzeltilir (gerekirse yeniden üretim, iki kez bayt-eşit), LEDGER GATE `closed`, K2F-20 `done`; ardından K2F-21 (değişen derslerin başlık/hedef metinleri + L1 inceleme sayfası).
+**K2F-21 (Ders metinleri ve inceleme sayfası):** değişen/kapıya takılan her dersin `title/goal` metni yeni kelimelere göre yeniden yazılır (`texts.tr.json`, draft, `by:null`), `KNOWN_MISMATCH` (11) · `KNOWN_EXAMPLE_MISMATCH` (2) · `KNOWN_SEMANTIC_GAP` (1) listeleri boşalmalı ya da gerekçeyle küçülmeli, `INCELEME-KAO2-17.md` açık L1 kutularıyla yeniden üretilir.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-01)
 - Dal: `kao2-duzeltme` = canlı `main` (`19f0bfd6`) + belge/test-only commit'ler (K2F-18 kanıtı, K2F-19). Sonraki push yalnız kullanıcı isteğiyle / K2F-18/43 kapılarında.

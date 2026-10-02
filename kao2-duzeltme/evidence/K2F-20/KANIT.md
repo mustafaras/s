@@ -1,6 +1,6 @@
 # K2F-20 — Müfredat yeniden dağıtımı (G2 kapısı)
 Tarih: 2026-10-01 · Dal: kao2-duzeltme · Önceki commit: c21d76d3 · Uygulayıcı: Claude Sonnet 5.5
-Kapatılan bulgular: K5-03 (2/3, kısmen) · K3-07 (belge) · R değişimi: yok · **Durum: waiting_user (G2)**
+Kapatılan bulgular: K5-03 (2/3, kısmen) · K3-07 (belge) · R değişimi: yok · **Durum: done (G2 onaylı, 2026-10-02)**
 
 ## İlerleme günlüğü
 - [x] P1: sync PASS, nextPrompt K2F-20, dal kao2-duzeltme
@@ -12,7 +12,7 @@ Kapatılan bulgular: K5-03 (2/3, kısmen) · K3-07 (belge) · R değişimi: yok 
 - [x] A-6 ilerleme koruması: `carryOver` (Flow) + migration testleri
 - [x] MUFREDAT-ESLEME.md yeniden üretildi ("değişenler" + G2 karar noktaları)
 - [x] kapilar.sh YEŞİL
-- [ ] G2 kullanıcı onayı (bekleniyor)
+- [x] G2 kullanıcı onayı: "tüm önerilerini gerçekleştir" (önerilen seçenekler kabul; LEDGER seq 58)
 
 ## Yapılan
 - Kelimeler başlık/kavrama göre yeniden dağıtıldı: 26 ders değişti, 41 lemma taşındı (ayrıntı `docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md` "K2F-20 ile değişenler").

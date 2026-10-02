@@ -562,3 +562,23 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - not-met: prompt kabulü "KNOWN_MISMATCH boş" sağlanamadı — 11 ders yapısal sınırda (donmuş ünite, sözlükte yeterli lemma yok, sınıf kuralı) ve G2 kararı bekliyor (MUFREDAT-ESLEME.md G2 karar noktaları).
 - waiting-for: kullanıcı yanıtı — `G2 onaylı` ya da değişiklik istekleri (ders ya da lemma kimliğiyle) ve karar noktaları için seçenek.
 - next: K2F-20 (aynı prompt sürer; onaysız `done` yok)
+
+## seq 58 · 2026-10-02 · GATE · K2F-20
+- status: closed
+- gate: G2 · yeni müfredat eşlemesi onayı — kullanıcı yanıtı: "tüm önerilerini gerçekleştir" (G2 sunumundaki önerilen seçeneklerin hepsi kabul).
+- decision: eşleme olduğu gibi onaylandı (26 ders / 41 lemma). Karar noktaları: Ünite 1–3 donuk kalır; sözlük genişletilmez; seslenme dersine isim taşınmaz; "bir kökten/hidayet/yardımcı fiil/ilgi bağı/ancak" başlıkları ve u07.01, u08.07 metinleri K2F-21'de dersin gerçek kelimelerine göre yeniden yazılır. Listeler (KNOWN_MISMATCH 11 · KNOWN_EXAMPLE_MISMATCH 2 · KNOWN_SEMANTIC_GAP 1) K2F-21'in kabul ölçütüdür: metinler yazılınca boşalmalı.
+- next: K2F-20
+
+## seq 59 · 2026-10-02 · PROMPT · K2F-20
+- status: done
+- title: Müfredat yeniden dağıtımı (G2 kapısı)
+- prev-commit: c21d76d3
+- evidence: kao2-duzeltme/evidence/K2F-20/KANIT.md
+- closes: K5-03 (2/3) · K3-07 (belge)
+- repro: değişmedi · toplam 9/10
+- gates: kapilar.sh YEŞİL (kao 51 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001g
+- changed-tests: test_kao2_curriculum.js (mastery) · test_kao2_lesson_coherence.js (listeler 11/2/1) · test_kao2_migration.js (+2 A-6)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranCurriculumV2.js, quranLearnFlow.js) · cihaz —
+- surprises: prompt kabulü "KNOWN_MISMATCH boş" kullanıcı kararıyla K2F-21'e devredildi (metinler yeniden yazılınca). Uzun arka plan koşuları tur boşta dondu; kapılar ön planda koşturuldu.
+- next: K2F-21

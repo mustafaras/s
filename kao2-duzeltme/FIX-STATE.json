@@ -7,8 +7,8 @@
   "branch": "kao2-duzeltme",
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
-  "nextPrompt": "K2F-20",
-  "ledgerLastSeq": 57,
+  "nextPrompt": "K2F-21",
+  "ledgerLastSeq": 59,
   "releaseApproval": "approved_through_K2F-17",
   "lastRelease": {"prompt": "K2F-18", "commit": "19f0bfd6", "pin": "20261001g", "run": 36893692611, "evidence": "kao2-duzeltme/evidence/K2F-18/YAYIN.md"},
   "sources": {
@@ -23,6 +23,7 @@
   "decisions": {
     "KR-1": "Ustalık = 07 §3: çapa metnini dokunmadan oku + 10 soruluk karma test; ≥0,8 geçer; altında onarım dersi. Çapası olmayan ünitede yalnız test.",
     "KR-2": "v1 ilerlemesi olan kullanıcıya ustalık teklif edilir; 'Şimdilik atla' ile sonraki üniteye geçilir (skippedAt); kazanım/taş yazılmaz.",
+    "G2": "2026-10-02 · kullanıcı: 'tüm önerilerini gerçekleştir' → G2 onaylı, karar noktalarında önerilen seçenekler kabul: Ünite 1–3 donuk kalır, sözlük genişletilmez, ilgili derslerin başlık/hedef metinleri K2F-21'de dersin gerçek kelimelerine göre yeniden yazılır (u02.01/.02, u03.02, u04.01/.02, u07.02, u09.02, u10.01, u11.01/.05, u12.02, u07.01, u08.07).",
     "KR-3": "Başlık–kelime uyuşmazlığı: kelimeler başlık/kavrama göre yeniden dağıtılır (spec focus + poolRules), G2 kullanıcı onayı tekrar alınır.",
     "KR-4": "Açık L1 incelemesi bitene kadar içeriği değişen ya da tutarlılık kapısından geçmeyen metinler draft; sonunda sourced kümesi = işaretli inceleme kutuları.",
     "KR-5": "contextTr kaldırılır (yeni bilgi yok, atıf yanlış); A-5 hedefi '20/20 sûre tanıtımı (tema/yer/âyet sayısı)' olur.",
@@ -93,7 +94,7 @@
     "K2F-17": { "wave": "W1", "title": "Dalga 1 regresyonu ve ara rapor", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-17/KANIT.md" },
     "K2F-18": { "wave": "W1", "title": "YAYIN-1 (kullanıcı onay kapısı)", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-18/KANIT.md" },
     "K2F-19": { "wave": "W2", "title": "Ders tutarlılık kapısı (test)", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-19/KANIT.md" },
-    "K2F-20": { "wave": "W2", "title": "Müfredat yeniden dağıtımı (G2 kapısı)", "status": "waiting_user", "evidence": "kao2-duzeltme/evidence/K2F-20/KANIT.md" },
+    "K2F-20": { "wave": "W2", "title": "Müfredat yeniden dağıtımı (G2 kapısı)", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-20/KANIT.md" },
     "K2F-21": { "wave": "W2", "title": "Ders metinleri ve inceleme sayfası", "status": "pending", "evidence": null },
     "K2F-22": { "wave": "W2", "title": "L1 onay taşıma (kullanıcı kapısı)", "status": "pending", "evidence": null },
     "K2F-23": { "wave": "W2", "title": "Uygula 1/2 — örnek cümleler", "status": "pending", "evidence": null },

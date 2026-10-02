@@ -245,6 +245,12 @@
         return '<tr>'+cells.map(function(cell){ return '<td>'+escapeText(Array.isArray(cell)?(cell[0]||cell[1]||''):(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell))+'</td>'; }).join('')+'</tr>';
       }).join('');
       body='<section class="kao-lesson-card kao-lesson-concept" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Kavram</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.plainTr)+'</p>'+(head||rowHtml?'<div class="kao-lesson-table-wrap"><table class="kao-lesson-table"><thead><tr>'+head+'</tr></thead><tbody>'+rowHtml+'</tbody></table></div>':'')+(model.termTr?'<details class="kao-lesson-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+'</section>';
+    }else if(model.stage==='apply'&&Array.isArray(model.sentences)){
+      var sentences=model.sentences.map(function(sentence){
+        sentence=sentence&&typeof sentence==='object'?sentence:{};
+        return '<li class="kao-lesson-sentence"><p class="kao-lesson-sentence-ar" lang="ar" dir="rtl">'+escapeText(sentence.ar)+'</p><p class="kao-lesson-sentence-pron">'+escapeText(sentence.pronunciation)+'</p><p class="kao-lesson-sentence-tr">'+escapeText(sentence.tr)+'</p><p class="kao-lesson-sentence-meta">Âyet '+escapeText(sentence.ref)+' · Bu dersin kelimesi: '+escapeText(sentence.lemmaPronunciation)+'</p></li>';
+      }).join('');
+      body='<section class="kao-lesson-card kao-lesson-apply kao-lesson-sentences" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Örnek cümleler</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.lead)+'</p>'+(sentences?'<ol class="kao-lesson-apply-list">'+sentences+'</ol>':'')+'</section>';
     }else if(model.stage==='apply'){
       var words=(Array.isArray(model.words)?model.words:[]).map(function(word){
         word=word&&typeof word==='object'?word:{};

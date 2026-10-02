@@ -118,6 +118,18 @@
       return {ar:String(word.ar||''),tr:String(word.tr||''),lemmaId:lemmaId,pronunciation:String(word.pronunciation||''),state:isNew?'new':(lemmaId&&introduced(qRoot,lemmaId,lesson.id)?'known':'open')};
     });
   }
+  // K2F-23 (K3-01): çapa metni olmayan derste "Uygula" adımı dersin lemmalarının doğrulanmış ilk örnek cümlesiyle dolar
+  // (önce yeni lemmalar, en çok 3). Arapça, okunuş ve çeviri yalnız lexicon `examples[0]`'dan gelir; doğrulanmamış örnek kullanılmaz.
+  var APPLY_SENTENCE_MAX=3;
+  function applySentences(content,fresh,eligible){
+    var lex=content&&content.lexicon,order=fresh.concat(eligible.filter(function(id){ return fresh.indexOf(id)<0; })),out=[];
+    for(var i=0;i<order.length&&out.length<APPLY_SENTENCE_MAX;i+=1){
+      var lemma=lex&&typeof lex.byId==='function'?lex.byId(order[i]):null,source=lemma&&lemma.verified===true&&Array.isArray(lemma.examples)?lemma.examples[0]:null;
+      if(!source||!source.ar||!source.tr||!source.ref||!source.pronunciation) continue;
+      out.push({lemmaId:lemma.id,ar:String(source.ar),pronunciation:String(source.pronunciation),tr:String(source.tr),ref:String(source.ref),lemmaPronunciation:String(lemma.translit||'')});
+    }
+    return out;
+  }
   // KAO2-12: tek dersin kaynak-bağlı sırası. İçerik ve veri salt okunur; bütün Arapça lexicon/anchor kaynaklarından gelir.
   // K2F-20 (A-6): ders içerikleri yeniden dağıtılabilir; tamamlanmış (doneAt) bir derse sonradan taşınan ve hiç tanışılmamış
   // kelimeler kaybolmasın diye SIRADAKİ dersin planına eklenir. Tamamlanmış ders tamamlanmış kalır, kart verisine dokunulmaz.
@@ -201,6 +213,7 @@
     items=items.concat(practice);
 
     var apply={id:'apply:'+lesson.id,kind:'apply',lessonId:lesson.id,ref:lesson.apply||null,words:applyWords(lesson,c,q,fresh)};
+    if(obj(lesson.apply).kind==='examples'){ apply.mode='examples'; apply.sentences=applySentences(c,fresh,eligible); }
     items.push(apply);
     items.push({id:'summary:'+lesson.id,kind:'summary',lessonId:lesson.id,lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),practiceCount:practice.length});
     return items;

@@ -651,3 +651,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - scope-extension: testler gerçek veride artık draft kalmadığı için güncellendi — harness `transformSource` + `legacyDraftState` (K2F-22 sonu durumunu sentetik VM'de üretir): explain · hub · mastery · path · render · text_review (ikinci VM) · grammar_tasks (B3/B4 bozulmuş modülle) · yeni test_kao2_context_label.
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearn.js · quranCurriculumV2.js · quranConceptTextsV1.js) · cihaz —
 - next: K2F-23
+
+## seq 66 · 2026-10-02 · PROMPT · K2F-23
+- status: done
+- title: Uygula 1/2 — örnek cümleler
+- prev-commit: b1e87886
+- evidence: kao2-duzeltme/evidence/K2F-23/KANIT.md
+- closes: K3-01
+- repro: R-08 fail→pass · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261001g (pin yükseltme YOK)
+- changed-tests: yok (test_kao2_lesson_flow.js +3 kontrol; harness playLesson stopAt)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearnFlow.js · quranLearn.js · quranLearnViews.js · kao.css) · cihaz —
+- surprises: yok
+- next: K2F-24

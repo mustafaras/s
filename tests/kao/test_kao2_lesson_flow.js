@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const repoRoot = require('../repo-root');
+const { bootKao, freshUser, playLesson, text } = require('./helpers/kao-harness');
 
 const NOW_MS = Date.parse('2026-09-29T09:00:00.000Z');
 class ClockDate extends Date {
@@ -164,6 +165,71 @@ check('oynatıcı: vadeli tekrar önce; intro → FSRS pekiştirme; çıkışta 
   assert.match(html, /Dinlediğin kelimenin anlamını seç/); assert.match(html, /class="kao-audio"/);
   assert.doesNotMatch(html, /lang="ar"|data-kao-ar/, 'ses sorusu cevaptan önce Arapça metni açığa çıkarmaz');
   assert.ok(state.saves >= 4, 'ilerleme ve FSRS kaydı kalıcılaştırıldı');
+});
+
+// K2F-23 (K3-01, R-08): çapa metni olmayan 97 derste "Uygula" adımı doğrulanmış örnek cümlelerle dolar.
+const allLessons = curriculum.units.flatMap((unit) => unit.lessons);
+const SENTENCE_KEYS = ['lemmaId', 'ar', 'pronunciation', 'tr', 'ref'];
+
+check('K2F-23 uygula: 109 dersin 109\'unda adım içerikli (kelime ya da cümle); boş liste yok', () => {
+  const q = freshQ();
+  let examples = 0;
+  for (const item of allLessons) {
+    const apply = flow.lessonPlan({ quranLearn: q }, item.id, now, content).find((entry) => entry.kind === 'apply');
+    assert.ok(apply, `${item.id}: uygula adımı yok`);
+    const count = (apply.words || []).length + (apply.sentences || []).length;
+    assert.ok(count > 0, `${item.id}: uygula adımı içeriksiz`);
+    if (item.apply && item.apply.kind === 'examples') {
+      examples += 1;
+      assert.equal(apply.mode, 'examples', `${item.id}: mode`);
+      assert.equal((apply.words || []).length, 0, `${item.id}: örnek modunda çapa kelimesi olmaz`);
+    }
+  }
+  assert.equal(examples, 97, 'çapa metni olmayan ders sayısı');
+});
+
+check('K2F-23 uygula: örnek cümleler dersin lemmalarından (önce yeni), en çok 3, doğrulanmış examples[0]; tahmin yok', () => {
+  const q = freshQ();
+  for (const item of allLessons.filter((entry) => entry.apply && entry.apply.kind === 'examples')) {
+    const plan = flow.lessonPlan({ quranLearn: q }, item.id, now, content);
+    const apply = plan.find((entry) => entry.kind === 'apply');
+    const sentences = plain(apply.sentences);
+    assert.ok(sentences.length >= 1 && sentences.length <= 3, `${item.id}: cümle sayısı ${sentences.length}`);
+    const fresh = plain(plan[0].newLemmaIds);
+    const eligible = plain(plan[0].lemmaIds);
+    const order = fresh.concat(eligible.filter((id) => !fresh.includes(id)));
+    assert.deepEqual(sentences.map((entry) => entry.lemmaId), order.slice(0, sentences.length), `${item.id}: sıra (önce yeni lemma)`);
+    for (const sentence of sentences) {
+      assert.deepEqual(Object.keys(sentence).sort(), SENTENCE_KEYS.concat('lemmaPronunciation').sort(), `${item.id}: biçim`);
+      const lemma = content.lexicon.byId(sentence.lemmaId);
+      assert.equal(lemma.verified, true, `${sentence.lemmaId}: doğrulanmamış lemma`);
+      const source = lemma.examples[0];
+      assert.deepEqual({ ar: sentence.ar, pronunciation: sentence.pronunciation, tr: sentence.tr, ref: sentence.ref },
+        { ar: source.ar, pronunciation: source.pronunciation, tr: source.tr, ref: source.ref }, `${sentence.lemmaId}: örnek veriyle aynı değil`);
+    }
+  }
+});
+
+check('K2F-23 uygula: görünüm cümleyi Arapça + okunuş + Türkçe + âyet künyesi + "Bu dersin kelimesi" ile çizer; gerçek akışta ulaşılır', () => {
+  const t = bootKao();
+  freshUser(t);
+  const target = t.win.QuranCurriculumV2.units[3].lessons[0];
+  assert.equal(target.apply.kind, 'examples');
+  assert.equal(t.api.kaoLesson('start', target.id), true);
+  assert.equal(playLesson(t, { stopAt: 'apply' }), true, 'uygula adımına ulaşılamadı');
+  const item = t.ui.kaoLesson.plan[t.ui.kaoLesson.at];
+  assert.equal(item.kind, 'apply');
+  const html = t.api.kaoOverlayHTML(t.NOW);
+  const flat = text(html);
+  assert.ok(item.sentences.length >= 1);
+  for (const sentence of item.sentences) {
+    assert.ok(html.includes(sentence.ar), `${sentence.lemmaId}: Arapça yok`);
+    assert.ok(flat.includes(sentence.pronunciation), `${sentence.lemmaId}: okunuş yok`);
+    assert.ok(flat.includes(sentence.tr), `${sentence.lemmaId}: Türkçe yok`);
+    assert.ok(flat.includes(sentence.ref), `${sentence.lemmaId}: künye yok`);
+    assert.ok(flat.includes(`Bu dersin kelimesi: ${sentence.lemmaPronunciation}`), `${sentence.lemmaId}: ders kelimesi satırı yok`);
+  }
+  assert.equal((html.match(/kao-primary/g) || []).length >= 1, true);
 });
 
 console.log(`KAO2-12 lesson flow: PASS (${passed} kontrol)`);

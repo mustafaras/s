@@ -1990,6 +1990,7 @@
       if(ref.kind==='prayer'&&shorts&&Array.isArray(shorts.prayerTexts)){ var text=shorts.prayerTexts.find(function(value){ return value.id===ref.ref; }); if(text) title=text.title||text.name||text.id; }
       if(ref.kind==='surah'&&shorts&&Array.isArray(shorts.surahs)){ var surah=shorts.surahs.find(function(value){ return Number(value.id)===Number(ref.ref); }); if(surah) title=surah.name||surah.title||title; }
       model.title=title; model.lead='Yeni kelimeler vurgulu; diğer kelimeler çapa metninde yerinde.'; model.words=item.words||[];
+      if(item.mode==='examples'){ model.title='Örnek cümleler'; model.lead='Bu dersin kelimelerini gerçek âyetlerde gör.'; model.sentences=item.sentences||[]; }
     }
     if(item.kind==='read'){
       // K2F-06: ustalık çapa metni — kelimeler Flow'dan (içerik modülü kaynaklı) gelir.

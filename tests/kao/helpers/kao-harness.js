@@ -105,8 +105,8 @@ function openView(t, view, param, { mode = 'nav' } = {}) {
 }
 
 // Başlamış bir ders/ustalık/onarım oturumunu gerçek handler'larla özet ekranına kadar oynatır.
-// answer: 'correct' | 'wrong' | (task) => choiceId. visit(task) her görevde çağrılır. Özette true, takılırsa false.
-function playLesson(t, { answer = 'correct', visit } = {}) {
+// answer: 'correct' | 'wrong' | (task) => choiceId. visit(task) her görevde çağrılır. Özette (ya da stopAt aşamasında) true, takılırsa false.
+function playLesson(t, { answer = 'correct', visit, stopAt } = {}) {
   const st = t.ui.kaoLesson;
   if (!st) return false;
   const choose = (task) => {
@@ -135,7 +135,7 @@ function playLesson(t, { answer = 'correct', visit } = {}) {
       continue;
     }
     const current = st.plan[st.at];
-    if (!current || current.kind === 'summary') return true;
+    if (!current || current.kind === 'summary' || (stopAt && current.kind === stopAt)) return true;
     t.api.kaoLesson('next');
   }
   return false;

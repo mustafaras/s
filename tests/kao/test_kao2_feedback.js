@@ -133,6 +133,21 @@ assert.equal(ui.kaoTaskIndex, 1);
 assert.equal(ui.kaoPanel.open, false);
 assert.ok(audioCalls.some((src) => src.includes('w-l_audio_abcdef-measured.m4a')), 'Devam mevcut otomatik ses davranışını korumalı');
 
+// K2F-31 (a): cevapta ölçülen süre günlük kayda eklenir (0–120 s ile sınırlı); geri alma günlüğü eski hâline döndürür.
+for (const [elapsed, expected] of [[800, 800], [500000, 120000], [-5000, 0]]) {
+  freshData();
+  const timed = wordTask('answer-ms', 'w:l_ms:ar>tr');
+  show(timed); ui.kaoTaskStartedAt = now - elapsed;
+  api.kaoAnswer(timed.id, 'right');
+  assert.equal(data.quranLearn.daily['2026-09-28'].ms, expected, `${elapsed} ms → ${expected}`);
+}
+freshData();
+const timedTwo = [wordTask('ms-a', 'w:l_msa:ar>tr'), wordTask('ms-b', 'w:l_msb:ar>tr')];
+show(timedTwo[0]); ui.kaoTaskStartedAt = now - 1000; api.kaoAnswer('ms-a', 'right');
+assert.equal(data.quranLearn.daily['2026-09-28'].ms, 1000);
+api.kaoUndo();
+assert.equal(data.quranLearn.daily['2026-09-28'], undefined, 'geri alma günlük süreyi de geri alır');
+
 // K2F-30: ayar gerçek handler ile açılır (ayar değişimi görev önbelleğini temizler → önce çevir, sonra göster).
 const autoItem = wordTask('answer-toggle', 'w:l_toggle:ar>tr');
 freshData();

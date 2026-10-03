@@ -96,7 +96,8 @@ check('S-07: doğruluk, yarının tekrar tahmini ve sıradaki adım gerçek duru
   const output = html();
   assert.match(output, /%75/);
   assert.match(output, /Yarın/);
-  assert.match(output, /2 tekrar kartı · günlük plan ~2 dk/);
+  // K2F-31: yarının dakikası tekrar + dersin gerçek görev sayısından gelir (eski beklenti ~2 dk, yalnız tekrar + yeni kelime sayısıydı).
+  assert.match(output, /2 tekrar kartı · günlük plan ~4 dk/);
   assert.match(output, /Sıradaki adım/);
   assert.ok(output.indexOf('Bu derste tanıştıkların') < output.indexOf('Yarın'));
   assert.ok(output.indexOf('Yarın') < output.indexOf('Sıradaki adım'));

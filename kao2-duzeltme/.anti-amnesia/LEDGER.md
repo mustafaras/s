@@ -869,3 +869,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js · quranLearnViews.js · app.js) · cihaz — (Öğrenme grubu yerleşimi ve başlangıç değişim akışı gözlenmedi)
 - surprises: varsayılan dailyNew 10→5 iki eski testin beklentisini değiştirdi (P1 c: 08 §1); kaoCommitSetting görev önbelleğini temizler; 5 yeni kart bütçesinde kaoStart kelime kartı çıkarmayabilir (kapsam dışı, risk olarak not)
 - next: K2F-31
+
+## seq 85 · 2026-10-03 · PROMPT · K2F-31
+- status: done
+- title: Süre ölçümü ve tahmini
+- prev-commit: 4ce74803
+- evidence: kao2-duzeltme/evidence/K2F-31/KANIT.md
+- closes: K3-03 · K3-09
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261003d (pin yükseltme YOK)
+- changed-tests: test_kao2_next_step.js (+5, üretim yolu dahil) · test_kao2_feedback.js (+ms/geri alma) · test_kao2_summary.js (yarın ~2→~4 dk, K3-03)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js · quranLearnFlow.js) · cihaz — (gerçek ders süresi/dakika metni gözlenmedi)
+- surprises: bağımsız inceleme HIGH: üretimde nextStep eksik içerikle çağrılıyordu (dakika ~yarı) → kaoLessonContent() ve üretim yolu testi; tahmin onboarding süresiyle (5/10/15) sınırlı → uzun ders 5 dk seçen kullanıcıda "~5 dk" gösterir; plan-yok yedek yolu pratikte ulaşılmaz
+- next: K2F-32

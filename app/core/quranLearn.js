@@ -1770,6 +1770,8 @@
     var cardId=String(task.cardId),surahId=String(task.delayedSurahId),hasSurah=task.fragmentKind==='delayed'&&Object.prototype.hasOwnProperty.call(q.surahs,surahId);
     return {cardId:cardId,hadCard:Object.prototype.hasOwnProperty.call(q.cards,cardId),card:cloneValue(q.cards[cardId]),dailyKey:key,hadDaily:Object.prototype.hasOwnProperty.call(q.daily,key),daily:cloneValue(q.daily[key]),errors:cloneValue(q.errors),milestones:cloneValue(q.milestones),kind:task.fragmentKind==='delayed'?'delayed':(task.type||'card'),surahId:surahId,hadSurah:hasSurah,surah:cloneValue(q.surahs[surahId]),hadTransfer:Object.prototype.hasOwnProperty.call(q,'transfer'),transfer:cloneValue(q.transfer),taskIndex:ui.kaoTaskIndex,queue:cloneValue(ui.kaoQueue),durableCount:ui.kaoDurableCount,orderDraft:cloneValue(orderDraft)||[],lesson:cloneValue(ui.kaoLesson)};
   }
+  // K2F-31: görev süresi ölçümü üst sınırı (05 §4: uzun duraklama ortalamayı bozmaz).
+  var KAO_TASK_MS_CAP=120000;
   function kaoAnswerText(task){
     if(task&&task.kind==='order') return Array.isArray(task.choices)?task.choices.slice().sort(function(a,b){ return nonNegativeNumber(a.ordinal,0)-nonNegativeNumber(b.ordinal,0); }).map(function(item){ return item.label; }).join(' · '):'';
     if(task&&task.answer) return String(task.answer);
@@ -1787,9 +1789,17 @@
     },900);
     return true;
   }
+  // K2F-31: sıradaki-adım tahmini de bu içerikle çalışır (plan eksik içerikle yarı sayıda adım üretir); ses haritası sözlük başına bir kez kurulur.
+  var kaoAudioLemmaCache={lexicon:null,map:null};
+  function kaoAudioLemmaMap(lexicon){
+    if(kaoAudioLemmaCache.lexicon===lexicon&&kaoAudioLemmaCache.map) return kaoAudioLemmaCache.map;
+    var lemmas=lexicon&&Array.isArray(lexicon.lemmas)?lexicon.lemmas:[],map=Object.create(null);
+    lemmas.forEach(function(lemma){ if(lemma&&safeClipId('w-'+lemma.id)) map[lemma.id]=true; });
+    kaoAudioLemmaCache={lexicon:lexicon,map:map};
+    return map;
+  }
   function kaoLessonContent(){
-    var lexicon=window.QuranLexiconV1,lemmas=lexicon&&Array.isArray(lexicon.lemmas)?lexicon.lemmas:[],audioLemmas=Object.create(null);
-    lemmas.forEach(function(lemma){ if(lemma&&safeClipId('w-'+lemma.id)) audioLemmas[lemma.id]=true; });
+    var lexicon=window.QuranLexiconV1,audioLemmas=kaoAudioLemmaMap(lexicon);
     return {curriculum:window.QuranCurriculumV2,lexicon:lexicon,grammar:window.QuranGrammarV1,shorts:window.QuranShortSurahsV1,phonics:window.QuranPhonicsV1,audioLemmas:audioLemmas};
   }
   function kaoLessonRecord(q,id){
@@ -2158,7 +2168,7 @@
       // K2F-06: ustalıkta yanlış cevaplanan kelimeler (tekilleştirilmiş) onarım listesine gider.
       if(!correct&&ui.kaoLesson.kind==='mastery'){ var missed=lemmaIdForCard(task.cardId); ui.kaoLesson.wrongLemmas=Array.isArray(ui.kaoLesson.wrongLemmas)?ui.kaoLesson.wrongLemmas:[]; if(missed&&ui.kaoLesson.wrongLemmas.indexOf(missed)<0) ui.kaoLesson.wrongLemmas.push(missed); }
     }
-    var grade=kaoGrade(correct,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime())),previous.reps),scheduled=kaoSchedule(previous,grade,now);
+    var elapsed=Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime())),grade=kaoGrade(correct,elapsed,previous.reps),scheduled=kaoSchedule(previous,grade,now);
     if(correct&&scheduled.readerUnknown===true) delete scheduled.readerUnknown;
     // R-A2: kelime görevinde bu tekrarın çeldiricileri (lemma kimliği; dışlama lemma düzeyinde, kart kimliğinden
     // küçük) sonraki tekrarda dışlanmak üzere kartta tutulur.
@@ -2169,6 +2179,7 @@
     if(ui.kaoNight) scheduled.nightAt=key; else delete scheduled.nightAt;
     cards[task.cardId]=scheduled;
     var daily=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{}));
+    daily.ms=nonNegativeNumber(daily.ms,0)+Math.min(KAO_TASK_MS_CAP,elapsed);
     daily.answered+=1; if(correct) daily.correct+=1; if(task.isNew) daily.new+=1; else daily.reviewed+=1; q.daily[key]=daily;
     var calib=Object.assign({pred:0,ok:0,n:0},objectOr(daily.calib,{}));
     calib.pred=round8(nonNegativeNumber(calib.pred,0)+nonNegativeNumber(scheduled.predictedR,0)); calib.ok=nonNegativeNumber(calib.ok,0)+(correct?1:0); calib.n=nonNegativeNumber(calib.n,0)+1; daily.calib=calib;
@@ -2828,7 +2839,7 @@
     var unitId=null,lessonId=null,lessonsDone=0,flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2,nowValue=new Date();
     try{
       if(flow&&typeof flow.unitProgress==='function'&&curriculum){
-        var content={curriculum:curriculum},at=kaoCurrentUnit(q,flow,content);
+        var content=kaoLessonContent(),at=kaoCurrentUnit(q,flow,content);
         if(at&&at.unit){ unitId=Number(at.unit.id)||null; lessonsDone=Math.floor(nonNegativeNumber(at.progress&&at.progress.lessonsDone,0)); }
         if(typeof flow.nextStep==='function'){
           var step=flow.nextStep({quranLearn:q,night:kaoNightWindow(d,nowValue)},nowValue,content);
@@ -3528,7 +3539,7 @@
   function kaoHubModel(d,now){
     var flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2;
     if(!flow||typeof flow.nextStep!=='function'||typeof flow.unitProgress!=='function'||!curriculum||!Array.isArray(curriculum.units)||!curriculum.units.length) return {title:KAO_HUB_TITLE,subtitle:'Kaldığın yerden devam et',action:'Aç',ring:null};
-    var q=ensureQuranLearn({quranLearn:cloneValue(objectOr(d.quranLearn,null))}),content={curriculum:curriculum};
+    var q=ensureQuranLearn({quranLearn:cloneValue(objectOr(d.quranLearn,null))}),content=kaoLessonContent();
     var step=flow.nextStep({quranLearn:q,night:kaoNightWindow(d,now)},now,content);
     if(step.kind==='onboarding') return {title:KAO_HUB_TITLE,subtitle:'Namazda söylediklerini anlamaya başla · 5 dk',action:'Başla',ring:null};
     var at=kaoCurrentUnit(q,flow,content),pct=at.progress.lessons?Math.round(at.progress.lessonsDone/at.progress.lessons*100):0;
@@ -3880,7 +3891,7 @@
   function kaoNextStepFor(d,now){
     var flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2;
     if(!flow||typeof flow.nextStep!=='function'||!curriculum) throw new Error('KAO2-08: akış motoru ya da müfredat yüklenmedi');
-    return flow.nextStep({quranLearn:ensureQuranLearn(d),night:kaoNightWindow(d,now)},now,{curriculum:curriculum});
+    return flow.nextStep({quranLearn:ensureQuranLearn(d),night:kaoNightWindow(d,now)},now,kaoLessonContent());
   }
   function kaoNextStep(nowValue){
     if(!quranLearnDeps) return null;

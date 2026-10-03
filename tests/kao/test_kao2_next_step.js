@@ -234,8 +234,10 @@ check('Flow saf: DOM/ağ/zamanlayıcı/depo/Date.now yok', () => {
   }
 });
 
+let motorData = null;
 check('motor: kaoNextStep gerçek veriyle Flow çağırır; kaoContinue oturum sonunda sessionDone yazar', () => {
   const data = { quranLearn: api.emptyQuranLearn() };
+  motorData = data;
   const ui = { kaoQueue: [], kaoTasks: {}, kaoTaskIndex: 0, kaoPanel: { open: false } };
   assert.equal(api.registerQuranLearn({
     data() { return data; }, ui() { return ui; }, save() {}, render() {}, todayStr() { return TODAY; },
@@ -259,6 +261,57 @@ check('motor: kaoNextStep gerçek veriyle Flow çağırır; kaoContinue oturum s
   delete data.quranLearn.daily[TODAY].sessionDone;
   api.kaoContinue();
   assert.equal(data.quranLearn.daily[TODAY].sessionDone, undefined, 'gece tekrarı günlük dersi tamamlamaz');
+});
+
+// ---- K2F-31 · görev sayısına dayalı süre tahmini ----------------------------------
+const W = sandbox.window;
+const fullContent = { curriculum: cur, lexicon: W.QuranLexiconV1, grammar: W.QuranGrammarV1, shorts: W.QuranShortSurahsV1, phonics: W.QuranPhonicsV1 };
+const planTasks = (q, lessonId) => flow.lessonPlan({ quranLearn: q }, lessonId, now, fullContent).filter((i) => ['intro', 'practice', 'apply'].includes(i.kind)).length;
+const fullStep = (q) => flow.nextStep({ quranLearn: q }, now, fullContent);
+const withCap = (q, minutes) => { q.onboarding.minutes = minutes; return q; };
+
+check('K2F-31 (b): ders dakikası görev sayısından gelir (tekrar + tanış + alıştırma + uygula); uzun ders "~2 dk" değildir', () => {
+  const q = withCap(baseQ(), 15);
+  const r = fullStep(q), tasks = planTasks(q, 'u01.01');
+  assert.ok(tasks >= 12, `gerçek ders plan adımı: ${tasks}`);
+  assert.equal(r.minutes, flow.estimateMinutes({}, tasks, now, 15));
+  assert.ok(r.minutes >= 6, `dakika: ${r.minutes}`);
+  assert.match(r.subtitle, new RegExp(`~${r.minutes} dk$`));
+});
+
+check('K2F-31 (b): tekrar sayısı göreve eklenir', () => {
+  const lean = withCap(baseQ(), 15), busy = withCap(baseQ({ cards: reviewCards(12, PAST) }), 15);
+  const a = fullStep(lean), b = fullStep(busy);
+  assert.equal(b.counts.reviews, 12);
+  assert.equal(b.minutes, flow.estimateMinutes({}, 12 + planTasks(busy, 'u01.01'), now, 15));
+  assert.ok(b.minutes > a.minutes);
+});
+
+check('K2F-31 (c): son 7 günün ölçülmüş süresi varsa ortalama kullanılır', () => {
+  const q = withCap(baseQ(), 15);
+  q.daily['2026-09-27'] = { answered: 10, ms: 300000 };
+  const r = fullStep(q), tasks = planTasks(q, 'u01.01');
+  assert.equal(r.minutes, flow.estimateMinutes(q.daily, tasks, now, 15));
+  assert.ok(r.minutes < flow.estimateMinutes({}, tasks, now, 15), 'ölçülmüş 0,5 dk/görev, varsayılan 0,55 dk/görevden kısa');
+});
+
+check('K2F-31 (d): tekrar 0 iken alt satır "N yeni kelime · ~M dk" — "0 tekrar" yazılmaz', () => {
+  const q = withCap(baseQ(), 15);
+  const r = fullStep(q);
+  assert.equal(r.counts.reviews, 0);
+  assert.ok(r.counts.fresh > 0);
+  assert.equal(r.subtitle, `${r.counts.fresh} yeni kelime · ~${r.minutes} dk`);
+  assert.doesNotMatch(r.subtitle, /0 tekrar/);
+});
+
+check('K2F-31: üretim yolu (kaoNextStep) tam içerikle çalışır — dakika/alt satır fullContent ile aynıdır', () => {
+  const q = motorData.quranLearn; // 'motor' kontrolünün kaydettiği veri (api tek kez kayıtlıdır)
+  Object.assign(q.onboarding, { doneAt: ISO, start: 'level1', minutes: 15 });
+  const prod = api.kaoNextStep(now), full = flow.nextStep({ quranLearn: q }, now, fullContent);
+  assert.equal(prod.kind, 'daily');
+  assert.equal(prod.minutes, full.minutes);
+  assert.equal(prod.subtitle, full.subtitle);
+  assert.ok(prod.minutes > flow.nextStep({ quranLearn: q }, now, { curriculum: cur }).minutes, 'eksik içerik daha az adım sayardı');
 });
 
 console.log(`KAO2-08 next step: PASS (${passed} kontrol)`);

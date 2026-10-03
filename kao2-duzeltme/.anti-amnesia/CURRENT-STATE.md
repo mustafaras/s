@@ -1,15 +1,16 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-31
-lastSeq: 84
+nextPrompt: K2F-32
+lastSeq: 85
 status: active
 -->
 
-Son güncelleme: 2026-10-03 · LEDGER seq 84 · K2F-00…30 tamam (31/44), sıradaki K2F-31. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-03 · LEDGER seq 85 · K2F-00…31 tamam (32/44), sıradaki K2F-32. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-30 bitti (**yerel, yayınlanmadı**): Ayarlar'a "Öğrenme" grubu (Okuma ile Gölgeleme arası): "Doğruda otomatik geç" switch'i (`App.kaoToggleAutoAdvance`, pinler 45/766/604) ve "Başlangıç noktasını değiştir" (`kaoOnboard('change-start')`: ilk açılışın 2. adımı, Vazgeç/Geri yazmaz, yalnız `onboarding.start` yazılır, Ayarlar'a dönülür). Varsayılan `settings.dailyNew` 10→5 (onboarding.minutes ile hizalı; kayıtlı ayar korunur). Ayrıntı: [KANIT.md](../evidence/K2F-30/KANIT.md).
+K2F-31 bitti (**yerel, yayınlanmadı**): cevapta `daily[today].ms` (0–120 s sınırlı) kaydedilir, geri alma süreyi de geri alır; ders dakikası tekrar + dersin gerçek görev sayısından (`lessonTaskCount`: tanış+alıştırma+uygula) hesaplanır, ölçülmüş ms varsa ortalama kullanılır; tekrar 0 iken alt satır "N yeni kelime · ~M dk". Ayrıntı: [KANIT.md](../evidence/K2F-31/KANIT.md).
+Önceki: K2F-30 bitti (**yerel, yayınlanmadı**): Ayarlar'a "Öğrenme" grubu (Okuma ile Gölgeleme arası): "Doğruda otomatik geç" switch'i (`App.kaoToggleAutoAdvance`, pinler 45/766/604) ve "Başlangıç noktasını değiştir" (`kaoOnboard('change-start')`: ilk açılışın 2. adımı, Vazgeç/Geri yazmaz, yalnız `onboarding.start` yazılır, Ayarlar'a dönülür). Varsayılan `settings.dailyNew` 10→5 (onboarding.minutes ile hizalı; kayıtlı ayar korunur). Ayrıntı: [KANIT.md](../evidence/K2F-30/KANIT.md).
 Önceki: K2F-29 bitti (**yerel, yayınlanmadı**): Ayarlar gruplu listeye geçti — Günlük hedef · Ses · Okuma · Gölgeleme · Görünürlük · Veri · Hakkında; beş aç/kapat ayarı gerçek `switchRow` (etiket değer içermez), yeni handler yok. "Öğrenme" grubu K2F-30'da gelecek. Ayrıntı: [KANIT.md](../evidence/K2F-29/KANIT.md).
 Önceki: K2F-28 bitti (**yerel, yayınlanmadı**): ders ve tekrar oturumunda NavBar/LargeTitle yok; üstte yalnız ✕ (`aria-label="Dersten çık"`, ≥44 px) ve içeriğin kendi ince ilerleme çubuğu. ✕ derste `kaoLesson('exit')`, tekrarda `kaoSetView('home')`; yeni görev çizilince odak soruya gider. Ayrıntı: [KANIT.md](../evidence/K2F-28/KANIT.md).
 Önceki: K2F-27 bitti (**yerel, yayınlanmadı**): eski modal başlığı (`kao-header`, sabit h1, X) kalktı. NavBar tek üst çubuk; kökte "Kapat", diğer görünümlerde "‹ önceki"; dialog `aria-labelledby` görünümün LargeTitle h2'sine işaret eder (ders oynatıcıda `aria-label`). Ders oynatıcının görev/özet aşamasında NavBar'a tek "Kapat" eklenir (ders ekranı kendi "Kapat"ını taşır). Escape/Tab sözleşmesi aynı. Bağımsız code-reviewer APPROVE (CRITICAL/HIGH 0). Ayrıntı: [KANIT.md](../evidence/K2F-27/KANIT.md).
@@ -17,19 +18,21 @@ K2F-30 bitti (**yerel, yayınlanmadı**): Ayarlar'a "Öğrenme" grubu (Okuma ile
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-31 (Süre ölçümü):** `PROMPTLAR.md` §K2F-31 (≈satır 932); `kaoAnswer`'da `daily[today].ms += clamp(şimdi − kaoTaskStartedAt, 0, 120000)`, `quranLearnFlow.js` `lessonStep`/`estimateMinutes` görev sayısına dayalı süre, tekrar 0 iken "N yeni kelime · ~M dk" (R değişmez; yeni handler YOK, pinler 45/766/604 sabit).
+**K2F-32 (İlerleme başlığı):** `PROMPTLAR.md` §K2F-32 (≈satır 951); `kaoStatsHTML` LargeTitle "İlerleme" (eski "İstatistik / Tutunma ve kalibrasyon" yok), R-bandı kalibrasyon tablosu kapalı `<details>` içinde tek cümlelik özetle; `tests/kao/test_kao2_progress.js` (R değişmez; yeni handler YOK, pinler 45/766/604 sabit).
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
 - Yayın pini (canlı): `20261003d`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main 44/765/603).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
-- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,015 KiB (tavan 128) · **css 13,442 KiB (tavan 14 — kalan ≈0,56 KiB)** · p95 4,6 ms.
+- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,442 KiB (tavan 14 — kalan ≈0,56 KiB)** · p95 4,6 ms.
 - Testler: `test_kao2_lesson_flow.js` 23 · `test_kao2_review_apply.js` 15 · `test_kao2_reader.js` 14 · `test_kao2_hub.js` 10 · `test_kao2_arabic_tab.js` 4 (yeni) · `test_kao2_kabul.js` 10/10 ölçüt.
 - Namaz eşlemesi: 19/32 `lp_*` eşli. Veri kapsamı (524 lemma): 162 unit11 köküne, 113 kognat kaymasına sahip.
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
+- **K2F-31 ölçüm sapmaları (bilerek açık):** `daily.ms` yalnız kart cevabında artar (gecikmeli sûre/bağlantı/transfer `answered`'ı ms'siz artırır → ortalama hafif düşük); sekme arka planda bekleyince cevap başına 120 sn eklenir (spec sınırı) → ortalama şişebilir; `lessonPlan` her `nextStep` çağrısında kurulur (perf kapısı p95 ≈4,8 ms; render başına çağrı sayısı ölçülmedi).
+- **K2F-31 cihazda gözlenmedi:** Bugün/hub/özet dakika metinleri; tahmin onboarding süresiyle (5/10/15 dk) sınırlı olduğundan uzun ders 5 dk seçen kullanıcıda "~5 dk" gösterir (spec 05 §4 üst sınırı).
 - **K2F-30 cihazda gözlenmedi:** Öğrenme grubu yerleşimi (switch + satır aynı yüzeyde), "Başlangıç noktasını değiştir" akışı (Ayarlar → ana ekranın yerine 2. adım → seçim → Ayarlar'a dönüş), "Vazgeç" etiketi, odak.
 - **dailyNew varsayılanı 5:** yalnız yeni/boş kayıtları etkiler (kayıtlı ayar korunur); onboarding sonunda `dailyNew=minutes` zaten yazılır. 5 yeni kart bütçesinde `kaoStart` kuyruğu kelime kartı içermeyebilir (aday öncelik/tür sınırı; `test_kao_requirements.js` bu yüzden 10 kurar) — 5 dk seçen kullanıcıda gerçek akışta (ders oynatıcı) etkisi doğrulanmadı.
 - **K2F-29 cihazda gözlenmedi:** gruplu yerleşim, anahtar/seg iç boşlukları, switch odak halkası (`outline-offset:-3px`). Kontrast aracı artık `.kao-group-surface` zeminini kullanır.

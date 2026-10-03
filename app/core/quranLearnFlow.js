@@ -395,13 +395,19 @@
     for(var i=0;i<s0.length;i+=1) if(!obj(lessonRecord(q,s0[i].id)).doneAt) return {lesson:s0[i],index:i};
     return null;
   }
+  // K2F-31: dersin gerçek görev sayısı = tanış + alıştırma + uygula (plan kurulabiliyorsa); kurulamazsa yalnız yeni kelime sayısı.
+  function lessonTaskCount(q,lessonId,now,content,fresh){
+    var plan=lessonPlan({quranLearn:q},lessonId,now,content),count=0;
+    if(Array.isArray(plan)) plan.forEach(function(item){ if(item.kind==='intro'||item.kind==='practice'||item.kind==='apply') count+=1; });
+    return count>0?count:fresh;
+  }
   function lessonStep(q,now,content,current,due,cap){
     var daily=obj(q.daily),lesson=current.progress.nextLesson,lp=lessonProgress(q,lesson.id,content);
     var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
-    var minutes=estimateMinutes(daily,reviews+fresh,now,cap),counts={reviews:reviews,fresh:fresh};
+    var minutes=estimateMinutes(daily,reviews+lessonTaskCount(q,lesson.id,now,content,fresh),now,cap),counts={reviews:reviews,fresh:fresh};
     // 05 §10: tekrar borcu yeni kelimeyi sıfırladıysa ünite tanıtımı yerine "yalnız tekrar" günü.
     if(current.previous&&!current.progress.started&&fresh>0) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise,minutes,'kaoLesson',lesson.id,counts);
-    var subtitle=fresh>0?reviews+' tekrar + '+fresh+' yeni · ~'+minutes+' dk':reviews+' tekrar · önce tekrarları bitirelim · ~'+minutes+' dk';
+    var subtitle=fresh>0?(reviews>0?reviews+' tekrar + '+fresh+' yeni':fresh+' yeni kelime')+' · ~'+minutes+' dk':reviews+' tekrar · önce tekrarları bitirelim · ~'+minutes+' dk';
     return step('daily',current.unit.title+' · Ders '+(current.progress.nextIndex+1),subtitle,minutes,'kaoLesson',lesson.id,counts);
   }
   // 05 §4 öncelik sırası; ilk eşleşen kazanır. Kenar: 7+ gün ara → ısınma, tekrar borcu >60 → yeni 0.

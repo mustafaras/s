@@ -1739,13 +1739,20 @@
     earned.forEach(function(key){ if(state.earnedMilestones.indexOf(key)<0) state.earnedMilestones.push(key); });
     return true;
   }
+  // K2F-28: yeni görev çizilince odak soruya gider (✕ ya da eski şıkta kalmaz).
+  function kaoFocusQuestion(node){
+    var question=node&&typeof node.querySelector==='function'?node.querySelector('.kao-question'):null;
+    if(!question||typeof question.focus!=='function') return false;
+    if(typeof question.setAttribute==='function') question.setAttribute('tabindex','-1');
+    question.focus(); return true;
+  }
   function paintTask(){
     if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.taskElement!=='function') return false;
     var node=quranLearnSurfaceDeps.taskElement();
     if(!node) return false;
     var html=kaoTaskHTML(currentTask()),match=html.match(/^<section[^>]*>([\s\S]*)<\/section>$/);
     node.innerHTML=match?match[1]:html;
-    var painted=currentTask(),paintedId=painted?painted.id:'done',paintUi=quranLearnDeps.ui(); if(paintUi.kaoPaintedId!==paintedId){ paintUi.kaoPaintedId=paintedId; kaoFx('enter',node); }
+    var painted=currentTask(),paintedId=painted?painted.id:'done',paintUi=quranLearnDeps.ui(); if(paintUi.kaoPaintedId!==paintedId){ paintUi.kaoPaintedId=paintedId; kaoFx('enter',node); kaoFocusQuestion(node); }
     if(typeof node.setAttribute==='function'){
       var task=currentTask(); node.setAttribute('data-task-id',task?task.id:'done');
       if(task&&kaoShouldAutoplay(task,quranLearnDeps.data())) node.setAttribute('data-autoplay','1'); else if(typeof node.removeAttribute==='function') node.removeAttribute('data-autoplay');
@@ -3616,7 +3623,7 @@
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),stack=kaoEnsureStack(ui),flow=kaoFlowApi(),current=flow.current(stack,KAO_HOME_TITLE),previous=flow.previous(stack,KAO_HOME_TITLE);
     var view=current.view,unitDetail=view==='units'&&current.param!==null,onboarding=view==='home'&&kaoOnboardActive(ui),screenView=unitDetail?'unit':(view==='grammar'&&current.param!==null?'concept':view),body=(view==='sources'?kaoSourcesPageHTML():view==='s0'?kaoS0HTML():view==='roots'?kaoRootsHTML():onboarding?kaoOnboardHTML():view==='home'?kaoHomeHTML(nowValue):(view==='units'?(unitDetail?kaoUnitHTML(current.param):kaoPathHTML()):(view==='grammar'?(current.param!==null?kaoConceptHTML(current.param):kaoGrammarHTML()):(view==='word'?kaoWordHTML():(view==='reader'?kaoReaderHTML():(view==='gate'?kaoGateHTML():(view==='settings'?kaoSettingsHTML():(view==='phonics'?kaoPhonicsHTML():(view==='ayah'?kaoAyahHTML():(view==='map'?kaoMapHTML():(view==='prayer'?kaoPrayerHTML():(view==='stats'?kaoStatsHTML(nowValue):'<main class="kao-session">'+kaoLessonHTML()+'</main>'))))))))))));
-    body=kaoViewsApi().renderScreen({view:onboarding?'onboard':screenView,title:onboarding?KAO_ONBOARD_TITLE:(current.title||kaoViewTitle(screenView,current.param,ui)),previousTitle:previous&&previous.title||KAO_HOME_TITLE,body:body});
+    body=kaoViewsApi().renderScreen({exit:ui.kaoLesson?{name:'kaoLesson',args:['exit']}:{name:'kaoSetView',args:['home']},view:onboarding?'onboard':screenView,title:onboarding?KAO_ONBOARD_TITLE:(current.title||kaoViewTitle(screenView,current.param,ui)),previousTitle:previous&&previous.title||KAO_HOME_TITLE,body:body});
     var titleId=/class="kao-largetitle">[\s\S]*?<h2\b[^>]*\sid="([^"]+)"/.exec(body),dialogName=titleId?'aria-labelledby="'+titleId[1]+'"':'aria-label="Kur’an Arapçası · günlük oturum"';
     return '<div id="sey-ov-back" class="kao-overlay" onclick="App.kaoClose()"><div id="sey-ov-card" class="kao-dialog" style="'+kaoReadabilityStyle()+'" role="dialog" aria-modal="true" '+dialogName+' tabindex="-1" onkeydown="App.onModalKeydown(event,App.kaoClose)" onclick="event.stopPropagation()"><div id="sey-ov-body" class="kao-body scroll" style="'+kaoReadabilityStyle()+'">'+body+'</div></div></div>';
   }

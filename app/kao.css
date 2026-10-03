@@ -172,9 +172,9 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 /* KAO2-11 son */
 /* KAO2-12 · Ders oynatıcı; yalnız --kao-* / --f-* tokenları. */
 .kao-lesson{display:grid;gap:var(--kao-gap-2);max-width:460px;margin:0 auto;min-width:0}
-.kao-lesson-head{display:flex;align-items:center;justify-content:space-between;gap:var(--kao-gap-2)}
-.kao-lesson-step,.kao-lesson-kicker{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600;font-variant-numeric:tabular-nums}
-.kao-lesson-exit{appearance:none;min-height:44px;padding:0 8px;border:0;background:transparent;color:var(--kao-tint);font:inherit;font-size:var(--f-subhead);font-weight:600;cursor:pointer}
+.kao-focusbar{display:flex;align-items:center;min-height:44px}
+.kao-lesson-kicker{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600;font-variant-numeric:tabular-nums}
+.kao-focus-exit{appearance:none;min-width:44px;min-height:44px;padding:0;border:0;background:transparent;color:var(--kao-tint);font:inherit;font-size:var(--f-title3,20px);font-weight:600;cursor:pointer}
 .kao-lesson-progress{height:4px;overflow:hidden;border-radius:var(--kao-r-pill);background:color-mix(in srgb,var(--kao-tint) 15%,var(--kao-surface))}
 .kao-lesson-progress>span{display:block;height:100%;border-radius:inherit;background:var(--kao-tint);transition:width var(--dur-2)}
 .kao-lesson-card{display:grid;gap:var(--kao-gap-2);min-width:0;padding:18px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);color:var(--kao-label);box-shadow:0 8px 24px color-mix(in srgb,var(--kao-label) 6%,transparent)}
@@ -211,9 +211,9 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-lesson-sentence-tr{color:var(--kao-label);font-size:var(--f-callout)}
 .kao-lesson-sentence-meta{color:var(--kao-label-2);font-size:var(--f-footnote)}
 .kao-lesson-next{width:100%;margin-top:0}
-.kao-lesson-exit:focus-visible,.kao-lesson-audio:focus-visible,.kao-lesson-why summary:focus-visible,.kao-lesson-term summary:focus-visible,.kao-lesson-next:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
+.kao-focus-exit:focus-visible,.kao-lesson-audio:focus-visible,.kao-lesson-why summary:focus-visible,.kao-lesson-term summary:focus-visible,.kao-lesson-next:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
 .kao-lesson-why{padding-top:10px;border-top:1px solid var(--kao-sep);color:var(--kao-label)}.kao-lesson-why summary{min-height:44px;display:flex;align-items:center;color:var(--kao-tint);font-weight:600;cursor:pointer}.kao-lesson-why p{margin:6px 0 0;font-size:var(--f-subhead)}
-@media (forced-colors:active){.kao-lesson-card,.kao-lesson-anchor-word,.kao-lesson-table-wrap,.kao-lesson-apply-word,.kao-lesson-audio{border-color:CanvasText;background:Canvas;color:CanvasText}.kao-lesson-step,.kao-lesson-kicker,.kao-lesson-card p,.kao-lesson-anchor-word small,.kao-lesson-table th,.kao-lesson-table td{color:CanvasText}.kao-lesson-anchor-new,.kao-lesson-apply-new,.kao-lesson-anchor-known,.kao-lesson-apply-known{outline:1px solid Highlight}.kao-lesson-progress{background:Canvas;outline:1px solid CanvasText}.kao-lesson-progress>span{background:Highlight}}
+@media (forced-colors:active){.kao-lesson-card,.kao-lesson-anchor-word,.kao-lesson-table-wrap,.kao-lesson-apply-word,.kao-lesson-audio{border-color:CanvasText;background:Canvas;color:CanvasText}.kao-lesson-kicker,.kao-lesson-card p,.kao-lesson-anchor-word small,.kao-lesson-table th,.kao-lesson-table td{color:CanvasText}.kao-lesson-anchor-new,.kao-lesson-apply-new,.kao-lesson-anchor-known,.kao-lesson-apply-known{outline:1px solid Highlight}.kao-lesson-progress{background:Canvas;outline:1px solid CanvasText}.kao-lesson-progress>span{background:Highlight}}
 /* KAO2-12 son */
 /* KAO2-13 · S-03 Yol ve S-04 Ünite: dikey, 06 tokenlarıyla çalışan KAO modal yüzeyleri. */
 .kao-screen-units,.kao-screen-unit{min-width:0}

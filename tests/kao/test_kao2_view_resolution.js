@@ -28,6 +28,7 @@ check('KAO_VIEW_TITLES parametresiz görünüm kümesi sabit ve s0/roots/sources
 check(`yığınsız ui.kaoView=v → NavBar başlığı KAO_VIEW_TITLES[v] (${PARAM_FREE.length} görünüm)`, () => {
   const wrong = [];
   for (const view of PARAM_FREE) {
+    if (view === 'session') continue; // K2F-28: odak modunda NavBar yok
     t.ui.kaoOpen = true; t.ui.kaoStack = []; t.ui.kaoView = view;
     const title = navTitle(t.api.kaoOverlayHTML(t.NOW));
     if (!titleOk(view, title)) wrong.push(`${view}: "${title}" ≠ "${TITLES[view]}"`);
@@ -37,6 +38,7 @@ check(`yığınsız ui.kaoView=v → NavBar başlığı KAO_VIEW_TITLES[v] (${PA
 
 check('yığınsız türetilen yığın [home, görünüm] biçimindedir', () => {
   for (const view of PARAM_FREE) {
+    if (view === 'session') continue; // K2F-28: odak modunda NavBar yok
     t.ui.kaoOpen = true; t.ui.kaoStack = []; t.ui.kaoView = view;
     t.api.kaoOverlayHTML(t.NOW);
     assert.deepEqual(Array.from(t.ui.kaoStack, (e) => e.view), ['home', routeOf(view)], view);
@@ -53,6 +55,7 @@ check('bilinmeyen ui.kaoView ana ekrana düşer (geri uyum)', () => {
 check('gerçek kaoNav her parametresiz görünümü doğru başlık ve [home, görünüm] yığınıyla açar', () => {
   const wrong = [];
   for (const view of PARAM_FREE) {
+    if (view === 'session') continue; // K2F-28: odak modunda NavBar yok
     const r = openView(t, view, null);
     const okStack = r.stack.length === 2 && r.stack[0] === 'home' && r.stack[1] === routeOf(view);
     if (!r.ok || !okStack || !titleOk(view, r.title)) wrong.push(`${view}: ok=${r.ok} yığın=${r.stack} başlık="${r.title}"`);
@@ -63,6 +66,7 @@ check('gerçek kaoNav her parametresiz görünümü doğru başlık ve [home, g�
 check('gerçek kaoSetView her parametresiz görünümü doğru başlıkla açar', () => {
   const wrong = [];
   for (const view of PARAM_FREE) {
+    if (view === 'session') continue; // K2F-28: odak modunda NavBar yok
     const r = openView(t, view, null, { mode: 'set' });
     if (!r.ok || !titleOk(view, r.title)) wrong.push(`${view}: ok=${r.ok} başlık="${r.title}"`);
   }

@@ -109,7 +109,7 @@ assert.ok(renderCount >= 5);
   const t = kao.bootKao({ seeded: true });
   const lemmaId = t.win.QuranLexiconV1.lemmas[0].id;
   const views = [['home'], ['units'], ['word', lemmaId], ['reader', 112], ['settings'], ['gate'], ['phonics'], ['ayah'], ['prayer'], ['stats'], ['grammar'], ['roots'], ['s0'], ['sources'], ['map']];
-  const closeControls = (html) => (html.match(/class="kao-navbar-action"[^>]*>Kapat</g) || []).length + (html.match(/class="kao-lesson-exit"/g) || []).length + (html.match(/class="kao-close"/g) || []).length;
+  const closeControls = (html) => (html.match(/class="kao-navbar-action"[^>]*>Kapat</g) || []).length + (html.match(/class="kao-focus-exit"/g) || []).length + (html.match(/class="kao-close"/g) || []).length;
   const checkChrome = (name, html) => {
     assert.doesNotMatch(html, /kao-header|kao-close/, `${name}: eski modal başlığı/X kalmamalı`);
     assert.equal((html.match(/<nav class="kao-navbar/g) || []).length, 1, `${name}: tek üst çubuk`);
@@ -126,15 +126,41 @@ assert.ok(renderCount >= 5);
     const isRoot = view === 'home';
     assert.equal(closeControls(opened.html), isRoot ? 1 : 0, `${view}: kapatma yalnız kökte (NavBar Kapat); diğerlerinde NavBar geri`);
   }
-  // Ders oynatıcı (session): NavBar yok sayılabilir ama tek kapatma kontrolü şart; diyalog adı boş kalmaz.
+  // K2F-28 (K4-03): odak modu — oturumda NavBar/LargeTitle yok; yalnız ✕ ("Dersten çık", ≥44 px) + tek ince ilerleme çubuğu.
+  const focusChecks = (name, html) => {
+    assert.doesNotMatch(html, /kao-header|kao-close|<nav class="kao-navbar|kao-largetitle/, `${name}: NavBar/LargeTitle/eski başlık yok`);
+    assert.equal((html.match(/class="kao-focus-exit"[^>]*aria-label="Dersten çık"/g) || []).length, 1, `${name}: tek ✕ (Dersten çık)`);
+    assert.equal(closeControls(html), 1, `${name}: tek kapatma kontrolü`);
+    assert.equal((html.match(/role="progressbar"/g) || []).length, 1, `${name}: tek ince ilerleme çubuğu`);
+    assert.match(html, /id="sey-ov-card"[^>]*aria-label(?:ledby)?="[^"]+"/, `${name}: diyalog adı var`);
+  };
   kao.openView(t, 'units');
   t.api.kaoLesson('start', 'u01.01');
-  for (let step = 0; step < 3 && t.ui.kaoView === 'session'; step += 1) {
-    const html = t.api.kaoOverlayHTML(t.NOW);
-    assert.doesNotMatch(html, /kao-header|kao-close/, `session/${step}: eski başlık/X yok`);
-    assert.equal(closeControls(html), 1, `session/${step}: tek kapatma kontrolü`);
-    assert.match(html, /id="sey-ov-card"[^>]*aria-label(?:ledby)?="[^"]+"/, `session/${step}: diyalog adı var`);
+  let stages = 0;
+  for (let step = 0; step < 8 && t.ui.kaoView === 'session'; step += 1) {
+    focusChecks(`ders/${step}`, t.api.kaoOverlayHTML(t.NOW));
+    stages += 1;
     t.api.kaoLesson('next');
+  }
+  assert.ok(stages >= 2, 'ders birden çok aşamada odak çubuğuyla çizilmeli');
+  // Ders ✕'i Bugün'e (home) döner.
+  {
+    const t2 = kao.bootKao({ seeded: true });
+    t2.api.kaoLesson('start', 'u01.01');
+    assert.match(t2.api.kaoOverlayHTML(t2.NOW), /class="kao-focus-exit" onclick="App\.kaoLesson\(&quot;exit&quot;\)"/);
+    assert.equal(t2.api.kaoLesson('exit'), true);
+    assert.equal(t2.ui.kaoView, 'home', 'ders ✕ sonrası Bugün');
+  }
+  // Tekrar oturumu (ders dışı): aynı odak çubuğu; ✕ kaoSetView('home') ile Bugün'e döner.
+  {
+    const t3 = kao.bootKao({ seeded: true });
+    t3.api.kaoStart(5);
+    assert.equal(t3.ui.kaoView, 'session');
+    const html = t3.api.kaoOverlayHTML(t3.NOW);
+    focusChecks('tekrar', html);
+    assert.match(html, /class="kao-focus-exit" onclick="App\.kaoSetView\(&quot;home&quot;\)"/);
+    assert.equal(t3.api.kaoSetView('home'), true);
+    assert.equal(t3.ui.kaoView, 'home', 'tekrar ✕ sonrası Bugün');
   }
 }
 

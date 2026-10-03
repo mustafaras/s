@@ -36,6 +36,12 @@
     var title=escapeText(options.title),isRoot=options.view==='home'||options.view==='onboard'||options.view==='session',action=isRoot?'App.kaoClose()':'App.kaoBack()',label=isRoot?'Kapat':'‹ '+escapeText(options.previousTitle||"Kur'an Arapçası");
     return '<nav class="kao-navbar" aria-label="'+title+'"><button type="button" class="kao-navbar-action" onclick="'+action+'" aria-label="'+label+'">'+label+'</button><span class="kao-navbar-title" title="'+title+'">'+title+'</span><span class="kao-navbar-spacer" aria-hidden="true"></span></nav>';
   }
+  // K2F-28 (K4-03): odak çubuğu — ≥44 px ✕ tek kontroldür; ilerleme çubuğu içeriğin (ders/görev) kendi parçasıdır.
+  function focusBar(options){
+    if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
+    var exit=actionCall(options&&options.exit);
+    return '<header class="kao-focusbar"><button type="button" class="kao-focus-exit"'+(exit?' onclick="'+exit+'"':' disabled')+' aria-label="Dersten çık"><span aria-hidden="true">✕</span></button></header>';
+  }
   function largeTitle(title,content){
     var heading=content||'';
     if(!/<h2\b/i.test(heading)) heading='<h2 class="kao-largetitle-heading">'+escapeText(title)+'</h2>'+heading;
@@ -45,8 +51,8 @@
   }
   function renderScreen(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
-    // K2F-27: ders oynatıcının kendi "Kapat" düğmesi yoksa (görev/özet aşaması) tek kapatma kontrolü NavBar'dır.
-    if(options.view==='session') return /class="kao-lesson-exit"/.test(String(options.body||''))?options.body:'<section class="kao-screen kao-screen-session">'+navBar({view:'session',title:'Oturum'})+options.body+'</section>';
+    // K2F-28: odak modu — oturumda NavBar/LargeTitle yok; üstte yalnız ✕ (+ ders ekranında ince ilerleme çubuğu).
+    if(options.view==='session') return /class="kao-focusbar"/.test(String(options.body||''))?options.body:'<section class="kao-screen kao-screen-session">'+focusBar({exit:options.exit})+options.body+'</section>';
     var extracted=extractLargeTitle(String(options.body||''));
     return '<section class="kao-screen kao-screen-'+escapeText(options.view)+'">'+navBar(options)+largeTitle(options.title,extracted.content)+extracted.html+'</section>';
   }
@@ -242,10 +248,10 @@
   function lessonScreen(model){
     if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
-    var title=escapeText(model.title),label=escapeText(model.progress),call=actionCall(model.action),exit=actionCall(model.exit),body='';
+    var title=escapeText(model.title),call=actionCall(model.action),body='';
     // KAO2-18 (Y-02): kullanıcı hangi ünitenin kaçıncı dersinde olduğunu görmeli.
     var ctx=model.context?'<p class="kao-lesson-context">'+escapeText(model.context)+'</p>':'';
-    var top='<header class="kao-lesson-head"><span class="kao-lesson-step">'+label+'</span><button type="button" class="kao-lesson-exit"'+(exit?' onclick="'+exit+'"':' disabled')+' aria-label="Dersi kapat">Kapat</button></header>'+ctx;
+    var top=focusBar({exit:model.exit})+ctx;
     if(model.stage==='intro'){
       var anchor=(Array.isArray(model.anchor)?model.anchor:[]).map(function(word){
         word=word&&typeof word==='object'?word:{};
@@ -510,5 +516,5 @@
     return '<main class="kao-s0" data-stage="'+escapeText(stage.kind)+'" aria-labelledby="kao-s0-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye 0 · şekil aileleri</p><h2 id="kao-s0-title">'+escapeText(model.title)+'</h2><p class="kao-s0-progress" aria-label="Aşama '+String(stage.index+1)+' / '+String(stage.count)+'">Aşama '+String(stage.index+1)+' / '+String(stage.count)+' · '+escapeText(stage.label)+'</p></div></div>'+body+button+'</main>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
 })(window);

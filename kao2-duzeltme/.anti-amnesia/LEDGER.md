@@ -827,3 +827,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearn.js · quranLearnViews.js · kao.css) · cihaz — (NavBar üst boşluğu/safe-area gözlenmedi)
 - surprises: görev aşamasında NavBar "Kapat" overlay'i kapatır (ders ekranının "Kapat"ı kaydedip ana ekrana döner) — eski X ile aynı, regresyon değil; code-reviewer MEDIUM not olarak bırakıldı
 - next: K2F-28
+
+## seq 82 · 2026-10-03 · PROMPT · K2F-28
+- status: done
+- title: Odak modu
+- prev-commit: 2afd6830
+- evidence: kao2-duzeltme/evidence/K2F-28/KANIT.md
+- closes: K4-03
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261003d (pin yükseltme YOK)
+- changed-tests: test_kao2_navigation.js · test_kao2_view_resolution.js · test_kao_render.js
+- evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js · quranLearnViews.js · kao.css) · cihaz — (odak aktarımı, ✕ yerleşimi gözlenmedi)
+- surprises: kırmızı-önce sırası gevşek tutuldu (kod ve test aynı turda); görev ilerleme çubuğu ✕ satırının altında
+- next: K2F-29

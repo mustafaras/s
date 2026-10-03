@@ -674,3 +674,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - finding: bağımsız doğrulamada dailyNew=0 iken 97 dersin Uygula adımı boştu (arayüz 5/10/15 sunar; eski/içe aktarılmış veri 0 olabilir). Düzeltildi + test (lesson_flow 12 kontrol).
 - gates: kapilar.sh YEŞİL · tekrar-uret 10/10
 - next: K2F-24
+
+## seq 68 · 2026-10-03 · NOTE · K2F-23
+- status: done
+- title: Erken yayın (kullanıcı isteği) — K2F-19…23 canlıda, pin 20261003a
+- prev-commit: b25ee012
+- evidence: kao2-duzeltme/evidence/K2F-23/YAYIN.md
+- decision: kullanıcı "yayına alalım" dedi; `main` ff-only `19f0bfd6..b25ee012`, force yok; Pages run 37113366008 success; canlı 10/10 bayt-eşit; gizlilik 404 ✓.
+- disclosure: yayına giren 122 metin onayı yapay zekâ incelemesidir (kullanıcı devri); gerçek L2 uzman onayı yoktur.
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
+- next: K2F-24

@@ -601,7 +601,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
   appData.quranLearn = { settings: { kaoVisible: true }, cards: {}, ayahs: { understood: [] } };
   api.ensureQuranLearn(appData);
   assert.match(api.kaoHubCardHTML(), /id="kao-hub-entry"/);
-  assert.match(api.kaoSettingsHTML(), /App\.kaoToggleVisible\(\)[^>]*>İlham & İbadet’te kartı göster: açık/);
+  assert.match(api.kaoSettingsHTML(), /role="switch" aria-checked="true" aria-label="İlham (?:&amp;|&) İbadet’te kartı göster" onclick="App\.kaoToggleVisible\(\)"/);
   assert.equal(api.kaoToggleVisible(), true); assert.equal(appData.quranLearn.settings.kaoVisible, false);
   assert.equal(api.kaoHubCardHTML(), '', 'gizliyken hub kartı yok');
   assert.equal(api.kaoToggleVisible(), true); assert.equal(appData.quranLearn.settings.kaoVisible, true);
@@ -619,7 +619,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
   // "Hakkında ve kaynaklar" alt sayfasında yaşar. Ayarlar yalnız bağlantı verir.
   const settingsHtml = api.kaoSettingsHTML();
   assert.doesNotMatch(settingsHtml, /<section class="kao-sources"/, 'uzun liste Ayarlar gövdesinde değil');
-  assert.match(settingsHtml, /App\.kaoSetView\('sources'\)/, 'Ayarlar alt sayfaya bağlanır');
+  assert.match(settingsHtml, /App\.kaoSetView\((?:'|"|&quot;)sources(?:'|"|&quot;)\)/, 'Ayarlar alt sayfaya bağlanır');
   const page = api.kaoSourcesPageHTML();
   const match = page.match(/<section class="kao-sources"[\s\S]*?<\/section>/);
   assert.ok(match, 'E7 kaynaklar bölümü alt sayfada yok');

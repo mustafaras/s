@@ -65,10 +65,12 @@ for (const seeded of [false,true]) {
     q.readability.fadeHarakat = q.readability.coloredHarakat = on;
     ui.kaoView = 'settings';
     const html = api.kaoOverlayHTML(instant);
-    const toggles = [...html.matchAll(/<button\b[^>]*>[\s\S]*?<\/button>/g)].map(m=>m[0]).filter(t=>/:\s*(?:açık|kapalı)\s*<\/button>/.test(t));
+    // K2F-29: aç/kapat ayarları gerçek anahtar bileşenidir (role="switch" + aria-checked + track/thumb); etiket değer içermez.
+    const toggles = [...html.matchAll(/<button\b[^>]*\brole="switch"[^>]*>[\s\S]*?<\/button>/g)].map(m=>m[0]);
     assert.equal(toggles.length,5,'beş aç/kapat ayarı ölçülmeli');
-    assert.ok(toggles.every(t=>t.includes(on?': açık':': kapalı')), 'ayar durumları gerçekten değişmeli');
-    switches[label+'/'+(on?'on':'off')] = {count:toggles.length,missing:toggles.filter(t=>!/<button\b[^>]*\brole="switch"/.test(t)||!new RegExp('aria-checked="'+on+'"').test(t)).length};
+    assert.ok(toggles.every(t=>new RegExp('aria-checked="'+on+'"').test(t)), 'ayar durumları gerçekten değişmeli');
+    assert.doesNotMatch(html, /:\s*(?:açık|kapalı)\s*<\/button>/, 'etiketlerde değer metni yok');
+    switches[label+'/'+(on?'on':'off')] = {count:toggles.length,missing:toggles.filter(t=>!/class="kao-switch-track"/.test(t)||!new RegExp('aria-checked="'+on+'"').test(t)).length};
   }
 }
 console.log(`KAO2 design: ${MODE} weights=${metrics.weights.length} uppercase=${metrics.uppercase} deco=${metrics.deco} serif=${metrics.serif} primaryPerView=${JSON.stringify(primary)} switches=${JSON.stringify(switches)}`);
@@ -76,7 +78,7 @@ if (MODE === 'baseline') {
   assert.deepEqual(metrics, {weights:['600','700','750','760','780','800','850','900','950'],uppercase:4,tracking:9,deco:5,serif:3,removed});
   const expectedViews = {home:1,units:0,word:1,reader:1,settings:0,gate:0,phonics:1,ayah:1,map:0,prayer:0,stats:0,session:0};
   assert.deepEqual(primary, Object.fromEntries(['empty','seeded'].flatMap(state=>Object.entries(expectedViews).map(([view,n])=>[state+'/'+view,n]))));
-  assert.ok(Object.values(switches).every(s=>s.count===5&&s.missing===5));
+  // K2F-29: baseline tarihseldir; anahtarlar artık gerçek bileşendir (strict dalı sınar).
 } else {
   assert.equal(MODE,'strict');
   const violations = [];

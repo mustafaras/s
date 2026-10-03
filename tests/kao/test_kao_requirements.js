@@ -274,7 +274,11 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   e7Ui.kaoOpen = true; e7Ui.kaoView = 'settings';
   const settingsHtml = e7.kaoOverlayHTML('2026-09-25T10:00:00');
   assert.match(settingsHtml, /class="kao-dialog" style="--kao-ar-lh:2\.5;--kao-ar-ws:\.18em"/);
-  for (const handler of ['kaoSetDailyNew(15)', "kaoSetAudioStyle('flowing')", "kaoSetTranslit('dia')", 'kaoToggleHarakat()', 'kaoToggleFade()', "kaoSetReadability('lineHeight','2.5')", "kaoSetReadability('wordSpacing','wide')", "kaoSetReadability('coloredHarakat',true)", 'kaoReopenGate()', 'kaoExportCsv()']) assert.ok(settingsHtml.includes('App.' + handler), handler);
+  for (const handler of ['kaoSetDailyNew(15)', "kaoSetAudioStyle('flowing')", "kaoSetTranslit('dia')", 'kaoToggleHarakat()', 'kaoToggleFade()', "kaoSetReadability('lineHeight','2.5')", "kaoSetReadability('wordSpacing','wide')", "kaoSetReadability('coloredHarakat',true)", 'kaoReopenGate()', 'kaoExportCsv()']) {
+    // K2F-29: anahtar satırları eylemi actionCall ile (çift tırnak, &quot;) yazar; segmentler tek tırnaklı kalır.
+    const decoded = settingsHtml.replace(/&quot;/g, '"');
+    assert.ok(settingsHtml.includes('App.' + handler) || decoded.includes('App.' + handler.replace(/'/g, '"')), handler);
+  }
   // KAO2-09 (f): aç/kapat anahtarları role="switch" + aria-checked; segment düğmeleri aria-pressed. Toplam seçili sayı aynı.
   const pressedOn = (settingsHtml.match(/aria-pressed="true"/g) || []).length, switchOn = (settingsHtml.match(/role="switch" aria-checked="true"/g) || []).length;
   assert.equal(pressedOn + switchOn, 8, 'her grupta tek seçili düğme + açık anahtarlar (görünürlük dahil)');

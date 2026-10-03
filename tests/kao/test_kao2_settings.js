@@ -38,22 +38,54 @@ let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
 
 // ---- (1) Grup sırası ve içerikleri ----------------------------------------
-check('ayarlar amaca göre ÜÇ gruba indi: Günlük hedef · Ses · Okuma', () => {
+check('K2F-29: ayarlar amaca göre gruplanır — Günlük hedef · Ses · Okuma · Gölgeleme · Görünürlük · Veri · Hakkında', () => {
   const t = boot();
   const html = decode(t.api.kaoSettingsHTML());
   const titles = [...html.matchAll(/<h3[^>]*>([^<]+)<\/h3>/g)].map((m) => m[1]);
-  // Amaca göre gruplama (T-22): üç ana grup sırayla başta; alt başlıklar onlara bağlı.
-  const idx = (re) => titles.findIndex((x) => re.test(x));
-  const g1 = idx(/^Günlük hedef/), g2 = idx(/^Ses/), g3 = idx(/^Okuma/);
-  assert.ok(g1 >= 0 && g2 >= 0 && g3 >= 0, `üç grup var (${titles.join(' | ')})`);
-  assert.ok(g1 < g2 && g2 < g3, 'sıra: Günlük hedef → Ses → Okuma');
-  // Eski dağınık bölüm başlıkları gruplara katlandı (T-22: 8 bölüm → gruplar).
-  for (const old of ['Okunuş ve hareke', 'Gölgeleme (mikrofon)', 'Seviye 0 ve dışa aktarma']) {
+  assert.deepEqual(titles, ['Günlük hedef', 'Ses', 'Okuma', 'Gölgeleme', 'Görünürlük', 'Veri', 'Hakkında'], 'grup sırası 06/KAO2-23');
+  for (const old of ['Okunuş ve hareke', 'Gölgeleme (mikrofon)', 'Seviye 0 ve dışa aktarma', 'Ses · gölgeleme', 'Okuma · görünürlük', 'Okuma · görünüm', 'Diğer']) {
     assert.ok(!titles.includes(old), `eski bölüm başlığı kaldı: ${old}`);
   }
-  // Alt başlıklar ana gruba bağlı (iOS alt satır kalıbı).
-  assert.ok(titles.some((x) => /^Okuma · /.test(x)), 'Okuma alt başlığı gruplu');
-  assert.ok(titles.some((x) => /^Ses · /.test(x)), 'Ses alt başlığı gruplu');
+});
+
+check('K2F-29: tüm aç/kapat ayarları gerçek anahtardır; etiket değer içermez, "X: açık" metin düğmesi yok', () => {
+  const t = boot();
+  for (const on of [false, true]) {
+    t.q.settings.harakat = t.q.settings.kaoVisible = t.q.settings.shadowing = on;
+    t.q.readability.fadeHarakat = t.q.readability.coloredHarakat = on;
+    const html = decode(t.api.kaoSettingsHTML());
+    const switches = [...html.matchAll(/<button\b[^>]*role="switch"[^>]*>[\s\S]*?<\/button>/g)].map((m) => m[0]);
+    assert.equal(switches.length, 5, 'beş anahtar');
+    for (const sw of switches) {
+      assert.match(sw, new RegExp(`aria-checked="${on}"`), 'durum aria-checked ile');
+      assert.match(sw, /class="kao-switch-row"/);
+      assert.match(sw, /<span class="kao-switch-track" aria-hidden="true"><span class="kao-switch-thumb">/, 'gerçek anahtar bileşeni');
+    }
+    assert.doesNotMatch(html, /:\s*(?:açık|kapalı)\s*<\/button>/, 'etiket değer içermez');
+    assert.doesNotMatch(html, /kao-toggle/, 'eski metin düğmesi yok');
+  }
+  const html = decode(t.api.kaoSettingsHTML());
+  for (const label of ['Harekeleri göster', 'Tekrarda harekeyi soldur', 'Renkli hareke (Seviye 0)', 'Gölgeleme', 'İlham & İbadet’te kartı göster']) {
+    assert.ok(html.includes(`aria-label="${label}"`), `anahtar etiketi: ${label}`);
+  }
+});
+
+check('K2F-29: yüzey overflow:hidden olduğundan satır odak halkası içeri çizilir (kırpılmaz)', () => {
+  const css = require('fs').readFileSync(require('path').join(require('../repo-root'), 'app/kao.css'), 'utf8');
+  assert.match(css, /\.kao-group-surface\{[^}]*overflow:hidden/, 'yüzey taşmayı keser');
+  assert.match(css, /\.kao-group-surface :is\(\.kao-switch-row,\.kao-group-row\):focus-visible\{outline-offset:-3px\}/, 'yüzey içi satırlarda negatif outline-offset');
+});
+
+check('K2F-29: Okuma grubu sırası — okunuş, hareke, soldur, satır aralığı, kelime boşluğu, renkli hareke, önizleme; Veri ve Hakkında satırları', () => {
+  const t = boot();
+  const html = decode(t.api.kaoSettingsHTML());
+  const okuma = html.match(/<h3[^>]*>Okuma<\/h3>[\s\S]*?(?=<h3[^>]*>Gölgeleme)/)[0];
+  const order = ['Latin okunuş katmanı', 'Harekeleri göster', 'Tekrarda harekeyi soldur', 'Arapça satır aralığı', 'Kelime boşluğu', 'Renkli hareke', 'kao-settings-sample'].map((x) => okuma.indexOf(x));
+  assert.ok(order.every((x) => x >= 0), `hepsi var ${order}`);
+  assert.deepEqual([...order].sort((a, b) => a - b), order, 'sıra korunur');
+  assert.match(html, /<h3[^>]*>Gölgeleme<\/h3>[\s\S]*?kaoToggleShadowing[\s\S]*?kao-group-footer[^>]*>[^<]*Mikrofon yalnız sen başlatınca/, 'gizlilik açıklaması footer');
+  assert.match(html, /<h3[^>]*>Veri<\/h3>[\s\S]*?kaoExportCsv[\s\S]*?kaoReopenGate/, 'Veri grubu');
+  assert.match(html, /<h3[^>]*>Hakkında<\/h3>[\s\S]*?Hakkında ve kaynaklar/, 'Hakkında satırı');
 });
 
 check('Günlük hedef: süre segmenti (5/10/15) + niyet satırı', () => {
@@ -94,8 +126,8 @@ check('Ses grubu: otomatik ses + hız/üslup segmenti + gölgeleme; sessiz saat 
   assert.ok(ses, 'Ses grubu var');
   assert.match(ses[0], /kaoSetAudioStyle/, 'üslup segmenti');
   assert.match(ses[0], /Sessiz saat/, 'sessiz saat notu (23–07) korunur');
-  // Gölgeleme de Ses grubuna katlandı (alt başlık).
-  assert.match(html, /<h3[^>]*>Ses · gölgeleme<\/h3>[\s\S]*?kaoToggleShadowing/, 'gölgeleme Ses grubunda');
+  // K2F-29: gölgeleme kendi grubunda.
+  assert.match(html, /<h3[^>]*>Gölgeleme<\/h3>[\s\S]*?kaoToggleShadowing/, 'gölgeleme kendi grubunda');
 });
 
 check('Okuma grubu: okunuş katmanı, hareke anahtarları, satır aralığı, kelime boşluğu', () => {

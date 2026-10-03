@@ -95,6 +95,11 @@
     }).join('');
     return '<div class="kao-group-list">'+html+'</div>';
   }
+  // K2F-29: ayar grubu — başlık + yüzey (satırlar) + isteğe bağlı alt açıklama; satırlar önceden üretilmiş HTML'dir.
+  function settingsGroup(title,rowsHtml,footer){
+    if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');
+    return '<div class="kao-group-section"><h3 class="kao-group-title">'+escapeText(title)+'</h3><div class="kao-group-surface">'+(Array.isArray(rowsHtml)?rowsHtml.join(''):String(rowsHtml||''))+'</div>'+(footer?'<p class="kao-group-footer">'+escapeText(footer)+'</p>':'')+'</div>';
+  }
   function switchRow(options){
     if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
@@ -516,5 +521,5 @@
     return '<main class="kao-s0" data-stage="'+escapeText(stage.kind)+'" aria-labelledby="kao-s0-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye 0 · şekil aileleri</p><h2 id="kao-s0-title">'+escapeText(model.title)+'</h2><p class="kao-s0-progress" aria-label="Aşama '+String(stage.index+1)+' / '+String(stage.count)+'">Aşama '+String(stage.index+1)+' / '+String(stage.count)+' · '+escapeText(stage.label)+'</p></div></div>'+body+button+'</main>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,switchRow:switchRow,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,switchRow:switchRow,settingsGroup:settingsGroup,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
 })(window);

@@ -841,3 +841,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js · quranLearnViews.js · kao.css) · cihaz — (odak aktarımı, ✕ yerleşimi gözlenmedi)
 - surprises: kırmızı-önce sırası gevşek tutuldu (kod ve test aynı turda); görev ilerleme çubuğu ✕ satırının altında
 - next: K2F-29
+
+## seq 83 · 2026-10-03 · PROMPT · K2F-29
+- status: done
+- title: Ayarlar 1/2 — gruplar ve Switch
+- prev-commit: 19f4d6ff
+- evidence: kao2-duzeltme/evidence/K2F-29/KANIT.md
+- closes: K2-02 · O-04 · T-22 · K6-03 (düzen)
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast 776 çift · l2-paket · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261003d (pin yükseltme YOK)
+- changed-tests: test_kao2_settings.js · test_kao2_design_contract.js · test_kao_requirements.js · test_kao_render.js · docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs (aracın seçicileri yeni yüzeye taşındı)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js · quranLearnViews.js · kao.css) · cihaz — (gruplu yerleşim, anahtar görünümü, odak halkası gözlenmedi)
+- surprises: handler-surface testi adı dinamik kuran kodu "çağrılmayan tanım" saymasına yansıttı → eylemler `{name:'kaoX'}` literal; K2F-28 ek tur 3 ayrı commit (19f4d6ff); bağımsız inceleme MEDIUM (odak halkası kırpılması) kapandı
+- next: K2F-30

@@ -803,3 +803,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - limit: odak davranışı gerçek tarayıcıda gözlenmedi; düzeltme yayınlanmadı; kullanıcının cihaz verisi okunmadı.
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - next: K2F-27
+
+## seq 80 · 2026-10-03 · RELEASE · K2F-26
+- status: done
+- title: K2F-26 + Arapça sekmesi geri getirme düzeltmesi canlıya alındı (kullanıcı isteği), pin 20261003d
+- prev-commit: c951d38d
+- evidence: kao2-duzeltme/evidence/K2F-26/YAYIN.md
+- decision: kullanıcı "açıkları kapat ve canlıya al" dedi; kalıcı uçtan uca test eklendi (mutasyonla doğrulandı); `main` ff-only `8cde3903..dc3f3f06`, force yok; Pages run 37128484796 success; canlı 11/11 bayt-eşit; gizlilik 404 ✓.
+- disclosure: tarayıcıda odak davranışı gözlenmedi ve kullanıcının cihaz verisi okunmadı → cihaz doğrulaması kullanıcıda; dinî bağlamlı metin onayları yapay zekâ incelemesidir (GATE seq 71 açık).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
+- next: K2F-27

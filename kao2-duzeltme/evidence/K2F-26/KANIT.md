@@ -57,3 +57,8 @@ tekrar-uret: 10/10 PASS (önceki 10/10)
 - (L) Gizli dalda `typeof views.hubCard==='function'` koruması geri eklendi (yedek metin).
 - Gerçek önyükleme provası: varsayılan entry ✓ → gizle: restore ✓ (aria-haspopup yok) → geri getir: entry ✓; "Ders alanı şu an görünmüyor" hiçbir durumda yok.
 - Dürüst sınırlar: odak davranışı gerçek tarayıcıda gözlenmedi (kural: tarayıcı yok; sahte yüzeyle sınandı); saygi.js uçtan uca metin testi yalnız headless prova olarak yapıldı, kalıcı fixture değil.
+
+### Ek tur 3 — açıkların kapatılması ve yayın (LEDGER seq 80)
+- Kalıcı uçtan uca fixture: `tests/kao/test_kao2_arabic_tab.js` (saygi.js + gerçek KAO hub kartı; 4 kontrol: görünürken tek giriş · gizliyken geri getirme kartı ve yedek mesaj yok · gizliyken diğer sekmelerde kart yok · dokununca giriş döner). Mutasyon kanıtı: `faithTab` şartı kaldırılınca `geri getirme kartı yok` ile kırmızı. `tests/kao/README.md` envanterine satır eklendi.
+- Kapatılamayan açıklar (dürüstçe): gerçek tarayıcıda odak davranışı (tarayıcı kuralı) ve kullanıcının cihaz verisi teşhisi (veri okunamaz) — cihaz doğrulaması kullanıcıda.
+- Yayın: `YAYIN.md` (pin `20261003d`, `main` `dc3f3f06`, run 37128484796).

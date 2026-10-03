@@ -1,0 +1,11 @@
+# K2F-26 — Yayın kanıtı (kullanıcı isteği, 2026-10-03)
+- Onay: kullanıcı "açıkları kapat ve canlıya al" (2026-10-03).
+- Kapsam: K2F-26 (sûre bağlamı kaldırma) + ek tur 1–2 (Arapça sekmesi "Ders kartı gizli · Göster" geri getirme kartı, erişilebilirlik düzeltmeleri) + Arapça sekmesi uçtan uca testi. Yayınlanan varlık değişimleri: `app/core/quranLearn.js` · `app/content/quranCurriculumV2.js` · `app/kao.css` (+ `index.html`, `sw.js` pin). Pin `20261003c` → **`20261003d`** (index.html ×15, sw.js ×16, 8 pin taşıyan app testi + test_kao2_curriculum).
+- Commit: `dc3f3f06` · `main` ff-only `8cde3903..dc3f3f06` · force yok · Pages run **37128484796** success
+- Bayt eşitliği: 11/11 MATCH (index.html · sw.js · kao.css · quranLearn.js · quranLearnFlow.js · quranLearnViews.js · quranCurriculumV2.js · quranConceptTextsV1.js · quranGrammarV1.js · app.js · saygi.js) · `SW_VERSION='20261003d'` · canlı quranLearn.js'te `kao-hub-restore` var
+- Gizlilik 404: `kao2-duzeltme/FIX-STATE.json`, `docs/kuran-ogreniyorum/kao2/content/texts.tr.json`, `docs/GELISTIRME-PLANI.md`, `tests/kao/test_kao2_arabic_tab.js`
+- Kapılar: pin commit öncesi `kapilar.sh` YEŞİL (tests/kao 53) · tekrar-uret 10/10
+- Test kanıtı: yeni `test_kao2_arabic_tab.js` (4 kontrol) mutasyonla doğrulandı — düzeltme geçici bozulunca `geri getirme kartı yok` ile kırmızı, geri alınınca yeşil.
+- İçerik notu: dinî bağlamlı metin onayları yapay zekâ incelemesidir; gerçek L2 uzman onayı yoktur (GATE seq 71 waiting).
+- Kanıt düzeyi: kaynak/test ✓ · yayın **doğrulandı** · cihaz **doğrulanmadı** (kullanıcıda: Arapça sekmesinde düğme / "Ders kartı gizli · Göster" kartı, odak davranışı) · uzman L2 —
+- Not: push/`gh`/`curl` sandbox dışında çalıştı; `main` bu kanıt commit'inin gerisinde kalır (yalnız `kao2-duzeltme/` belgeleri; Pages'e dahil değil).

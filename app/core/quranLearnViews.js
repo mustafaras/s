@@ -39,8 +39,8 @@
   // K2F-28 (K4-03): odak çubuğu — ≥44 px ✕ tek kontroldür; ilerleme çubuğu içeriğin (ders/görev) kendi parçasıdır.
   function focusBar(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
-    var exit=actionCall(options&&options.exit);
-    return '<header class="kao-focusbar"><button type="button" class="kao-focus-exit"'+(exit?' onclick="'+exit+'"':' disabled')+' aria-label="Dersten çık"><span aria-hidden="true">✕</span></button></header>';
+    var exit=actionCall(options&&options.exit),label=escapeText(options&&options.label||'Oturumdan çık');
+    return '<header class="kao-focusbar"><button type="button" class="kao-focus-exit"'+(exit?' onclick="'+exit+'"':' disabled')+' aria-label="'+label+'"><span aria-hidden="true">✕</span></button></header>';
   }
   function largeTitle(title,content){
     var heading=content||'';
@@ -52,7 +52,7 @@
   function renderScreen(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     // K2F-28: odak modu — oturumda NavBar/LargeTitle yok; üstte yalnız ✕ (+ ders ekranında ince ilerleme çubuğu).
-    if(options.view==='session') return /class="kao-focusbar"/.test(String(options.body||''))?options.body:'<section class="kao-screen kao-screen-session">'+focusBar({exit:options.exit})+options.body+'</section>';
+    if(options.view==='session') return /class="kao-focusbar"/.test(String(options.body||''))?options.body:'<section class="kao-screen kao-screen-session">'+focusBar({exit:options.exit,label:options.exitLabel})+options.body+'</section>';
     var extracted=extractLargeTitle(String(options.body||''));
     return '<section class="kao-screen kao-screen-'+escapeText(options.view)+'">'+navBar(options)+largeTitle(options.title,extracted.content)+extracted.html+'</section>';
   }
@@ -251,7 +251,7 @@
     var title=escapeText(model.title),call=actionCall(model.action),body='';
     // KAO2-18 (Y-02): kullanıcı hangi ünitenin kaçıncı dersinde olduğunu görmeli.
     var ctx=model.context?'<p class="kao-lesson-context">'+escapeText(model.context)+'</p>':'';
-    var top=focusBar({exit:model.exit})+ctx;
+    var top=focusBar({exit:model.exit,label:'Dersten çık'})+ctx;
     if(model.stage==='intro'){
       var anchor=(Array.isArray(model.anchor)?model.anchor:[]).map(function(word){
         word=word&&typeof word==='object'?word:{};

@@ -37,3 +37,10 @@ kaynak/test ✓ · yayın — · cihaz — (odak aktarımı ve ✕ boyutu gözle
 - **MEDIUM-3 kapandı:** view_resolution'da yığın türetme testi session'ı yeniden kapsar; yeni test ✕ sonrası zamanlayıcı/panel temizliğini doğrular; tekrar oturumu ✕ onclick'i `kaoLesson("exit")`.
 - **Bilerek açık (LOW):** `model.progress` ölü alan; ✕ adı bağlama göre sabit "Dersten çık"; geniş ekranda ✕ hizası; `kaoFocusQuestion` için birim testi yok (yalnız kod yolu).
 - Ölçüm: runtime 114,184 KiB · css 13,447 KiB · kapılar YEŞİL · tekrar-üret 10/10.
+
+## Ek tur 2 — LOW bulguları kapandı
+- `model.progress` ölü alanı kaldırıldı.
+- ✕ adı bağlama göre: derste "Dersten çık", tekrar/oturum tamam ekranında "Oturumdan çık" (`exitLabel`).
+- `.kao-focusbar` içerikle aynı `max-width:460px; margin:0 auto` (geniş ekran hizası; cihazda gözlenmedi).
+- `kaoFocusQuestion` testi `test_kao2_feedback.js`'te: yeni görevde odak + `tabindex=-1`, yeniden çizimde odak yok; mutasyonla (çağrı silinince) kırıldığı doğrulandı.
+- Ölçüm: runtime 114,220 KiB · css 13,452 KiB · kapılar YEŞİL · tekrar-üret 10/10.

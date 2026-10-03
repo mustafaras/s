@@ -32,12 +32,15 @@ const audioCalls = [];
 let data = { quranLearn: { settings: { dailyNew: 10, audio: true, autoAdvance: false } } };
 const ui = { kaoQueue: [], kaoTasks: {}, kaoTaskIndex: 0, kaoTaskStartedAt: 0, kaoUndo: null, kaoFeedback: '', kaoAudioFailed: false };
 let focusedContinue = 0;
+let focusedQuestion = 0;
+let questionNode = null;
 const taskNode = {
   innerHTML: '', attrs: {},
   setAttribute(name, value) { this.attrs[name] = value; },
   removeAttribute(name) { delete this.attrs[name]; },
   querySelector(selector) {
     if (selector === '.kao-feedback-continue') return { focus() { focusedContinue += 1; } };
+    if (selector === '.kao-question' && questionNode) return questionNode;
     return null;
   }
 };
@@ -164,5 +167,20 @@ for (const type of ['delayed', 'link', 'transfer']) {
 freshData();
 const normalized = api.ensureQuranLearn({ quranLearn: { settings: { autoAdvance: 'yes' } } });
 assert.equal(normalized.settings.autoAdvance, false, 'autoAdvance bozuk/eski veride kapalıya normalize olmalı');
+
+// K2F-28: yeni görev çizilince odak soruya gider; aynı görevin yeniden çizimi odağı çalmaz.
+{
+  freshData();
+  const attrs = {};
+  questionNode = { setAttribute(n, v) { attrs[n] = v; }, focus() { focusedQuestion += 1; } };
+  const first = wordTask('focus-1', 'w:focus:1');
+  show(first); ui.kaoPaintedId = undefined;
+  api.kaoAnswer(first.id, 'wrong');
+  assert.equal(focusedQuestion, 1, 'yeni görev çizilince odak soruya gitmeli');
+  assert.equal(attrs.tabindex, '-1', 'soru programatik odaklanabilir olmalı');
+  api.kaoUndo();
+  assert.equal(focusedQuestion, 1, 'aynı görevin yeniden çizimi odağı almamalı');
+  questionNode = null;
+}
 
 console.log('KAO2-06 feedback PASS');

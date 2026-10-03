@@ -172,7 +172,7 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 /* KAO2-11 son */
 /* KAO2-12 · Ders oynatıcı; yalnız --kao-* / --f-* tokenları. */
 .kao-lesson{display:grid;gap:var(--kao-gap-2);max-width:460px;margin:0 auto;min-width:0}
-.kao-focusbar{display:flex;align-items:center;min-height:44px}
+.kao-focusbar{display:flex;align-items:center;min-height:44px;max-width:460px;margin:0 auto}
 .kao-lesson-kicker{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600;font-variant-numeric:tabular-nums}
 .kao-focus-exit{appearance:none;min-width:44px;min-height:44px;padding:0;border:0;background:transparent;color:var(--kao-tint);font:inherit;font-size:var(--f-title3,20px);font-weight:600;cursor:pointer}
 .kao-lesson-progress{height:4px;overflow:hidden;border-radius:var(--kao-r-pill);background:color-mix(in srgb,var(--kao-tint) 15%,var(--kao-surface))}

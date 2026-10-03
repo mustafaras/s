@@ -127,9 +127,9 @@ assert.ok(renderCount >= 5);
     assert.equal(closeControls(opened.html), isRoot ? 1 : 0, `${view}: kapatma yalnız kökte (NavBar Kapat); diğerlerinde NavBar geri`);
   }
   // K2F-28 (K4-03): odak modu — oturumda NavBar/LargeTitle yok; yalnız ✕ ("Dersten çık", ≥44 px) + tek ince ilerleme çubuğu.
-  const focusChecks = (name, html) => {
+  const focusChecks = (name, html, label = 'Dersten çık') => {
     assert.doesNotMatch(html, /kao-header|kao-close|<nav class="kao-navbar|kao-largetitle/, `${name}: NavBar/LargeTitle/eski başlık yok`);
-    assert.equal((html.match(/class="kao-focus-exit"[^>]*aria-label="Dersten çık"/g) || []).length, 1, `${name}: tek ✕ (Dersten çık)`);
+    assert.equal((html.match(new RegExp(`class="kao-focus-exit"[^>]*aria-label="${label}"`, 'g')) || []).length, 1, `${name}: tek ✕ (${label})`);
     assert.equal(closeControls(html), 1, `${name}: tek kapatma kontrolü`);
     assert.equal((html.match(/role="progressbar"/g) || []).length, 1, `${name}: tek ince ilerleme çubuğu`);
     assert.match(html, /id="sey-ov-card"[^>]*aria-label(?:ledby)?="[^"]+"/, `${name}: diyalog adı var`);
@@ -157,7 +157,7 @@ assert.ok(renderCount >= 5);
     t3.api.kaoStart(5);
     assert.equal(t3.ui.kaoView, 'session');
     const html = t3.api.kaoOverlayHTML(t3.NOW);
-    focusChecks('tekrar', html);
+    focusChecks('tekrar', html, 'Oturumdan çık');
     assert.match(html, /class="kao-focus-exit" onclick="App\.kaoLesson\(&quot;exit&quot;\)"/);
     assert.equal(t3.api.kaoLesson('exit'), true);
     assert.equal(t3.ui.kaoView, 'home', 'tekrar ✕ sonrası Bugün');

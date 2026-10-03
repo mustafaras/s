@@ -115,6 +115,7 @@ assert.equal(sessionApi.registerQuranLearnSurface({
 }), true);
 sessionApi.ensureQuranLearn(sessionData);
 sessionData.quranLearn.settings.audio = false;
+sessionData.quranLearn.settings.dailyNew = 10; // K2F-30: varsayılan artık 5 (onboarding.minutes ile hizalı); bu test yön mantığını 10 kartlık bütçeyle sınar
 sessionData.quranLearn.daily['2026-09-24'] = { seed: 'bit-bit korunmalı' };
 assert.ok(sessionApi.kaoStart() >= 2, 'R-A4: ilk kelime oturumu başlamalı');
 assert.equal(fullRenders, 1);

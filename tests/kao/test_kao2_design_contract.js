@@ -61,13 +61,13 @@ for (const seeded of [false,true]) {
     primary[label+'/'+view] = tags(html).filter(t=>hasClass(t,'kao-primary')).length;
   }
   for (const on of [false,true]) {
-    q.settings.harakat = q.settings.kaoVisible = q.settings.shadowing = on;
+    q.settings.harakat = q.settings.kaoVisible = q.settings.shadowing = q.settings.autoAdvance = on;
     q.readability.fadeHarakat = q.readability.coloredHarakat = on;
     ui.kaoView = 'settings';
     const html = api.kaoOverlayHTML(instant);
     // K2F-29: aç/kapat ayarları gerçek anahtar bileşenidir (role="switch" + aria-checked + track/thumb); etiket değer içermez.
     const toggles = [...html.matchAll(/<button\b[^>]*\brole="switch"[^>]*>[\s\S]*?<\/button>/g)].map(m=>m[0]);
-    assert.equal(toggles.length,5,'beş aç/kapat ayarı ölçülmeli');
+    assert.equal(toggles.length,6,'altı aç/kapat ayarı ölçülmeli');
     assert.ok(toggles.every(t=>new RegExp('aria-checked="'+on+'"').test(t)), 'ayar durumları gerçekten değişmeli');
     assert.doesNotMatch(html, /:\s*(?:açık|kapalı)\s*<\/button>/, 'etiketlerde değer metni yok');
     switches[label+'/'+(on?'on':'off')] = {count:toggles.length,missing:toggles.filter(t=>!/class="kao-switch-track"/.test(t)||!new RegExp('aria-checked="'+on+'"').test(t)).length};
@@ -86,8 +86,8 @@ if (MODE === 'baseline') {
   for(const key of ['uppercase','tracking','deco','serif']) if(metrics[key]!==0) violations.push(key);
   if(metrics.removed.length) violations.push('removed selectors');
   if(Object.values(primary).some(n=>n>1)) violations.push('primary per view');
-  // (f) KAO2-09'dan itibaren zorunlu: beş aç/kapat ayarı role="switch" + doğru aria-checked taşır.
-  if(Object.values(switches).some(s=>s.count!==5||s.missing!==0)) violations.push('switch semantics');
+  // (f) KAO2-09'dan itibaren zorunlu: altı aç/kapat ayarı role="switch" + doğru aria-checked taşır.
+  if(Object.values(switches).some(s=>s.count!==6||s.missing!==0)) violations.push('switch semantics');
   assert.deepEqual(violations, [], 'strict tasarım ihlalleri');
 }
 // NavBar sözleşmesi (görsel QA): yan sütunlar eşit, başlık doğal genişlikte ortada → "‹ Kur'an Arapçası" 390px'te tek satırda kalır;

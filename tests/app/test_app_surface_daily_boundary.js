@@ -152,11 +152,11 @@ ok('saveToday preserves today lookup then App.saveNow order',
 
 const assignmentPattern = /App\.([A-Za-z0-9_$]+)\s*=\s*(?:function|async\s+function)/g;
 const currentAssignments = [...appSource.matchAll(assignmentPattern)].map((match) => match[1]);
-// KAO2-06 596→597 · KAO2-11 597→598 · KAO2-12 598→599 · KAO2-19 okuyucu 599→600 · KAO2-20 kök 600→602 · KAO2-25 katman sayfalaması kaldırıldı 602→601 · K2F-12 kaoS0 tanımı 601→602 · K2F-16 kaoSetIntent 602→603.
-ok('App function assignment count includes KAO2-19 okuyucu + KAO2-20 kök - KAO2-25 kaoWordLayer + K2F-12 kaoS0 + K2F-16 kaoSetIntent (603)', currentAssignments.length === 603);
+// KAO2-06 596→597 · KAO2-11 597→598 · KAO2-12 598→599 · KAO2-19 okuyucu 599→600 · KAO2-20 kök 600→602 · KAO2-25 katman sayfalaması kaldırıldı 602→601 · K2F-12 kaoS0 tanımı 601→602 · K2F-16 kaoSetIntent 602→603 · K2F-30 kaoToggleAutoAdvance 603→604.
+ok('App function assignment count includes KAO2-19 okuyucu + KAO2-20 kök - KAO2-25 kaoWordLayer + K2F-12 kaoS0 + K2F-16 kaoSetIntent + K2F-30 kaoToggleAutoAdvance (604)', currentAssignments.length === 604);
 const handlerSurface = new Set((appSource.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || [])
   .map((value) => value.match(/App\.[A-Za-z0-9_]+/)[0]));
-ok('unique App handler surface includes KAO2-12 ders oynatıcı + KAO2-19/20 - KAO2-25 kaoWordLayer + K2F-12 kaoS0 + K2F-16 kaoSetIntent (765)', handlerSurface.size === 765);
+ok('unique App handler surface includes KAO2-12 ders oynatıcı + KAO2-19/20 - KAO2-25 kaoWordLayer + K2F-12 kaoS0 + K2F-16 kaoSetIntent + K2F-30 kaoToggleAutoAdvance (766)', handlerSurface.size === 766);
 ok('the five daily handlers keep exact signature-preserving shims',
   handlerNames.every((name) => new RegExp('App\\.' + name + '=function').test(appSource) &&
     new RegExp('SEYMA_APP_SURFACE\\.' + name + '\\.apply\\(null,arguments\\)').test(appSource)));

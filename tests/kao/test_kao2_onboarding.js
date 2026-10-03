@@ -353,17 +353,116 @@ check('Bugün kahramanı: onboarding eylemi ilk açılışa bağlı; normalizasy
   assert.equal('placement' in old.quranLearn.onboarding, false, 'eski kayda alan eklenmez');
 });
 
-check('handler sayacı 44 (§4 + KAO2-19 okuyucu + KAO2-20 kök) ve app.js tek satır shim; yorumlarda pin tuzağı yok', () => {
+check('handler sayacı 45 (§4 + KAO2-19 okuyucu + KAO2-20 kök) ve app.js tek satır shim; yorumlarda pin tuzağı yok', () => {
   const app = read('app.js');
   const names = new Set((app.match(/App\.kao[A-Za-z0-9_]*\s*=[^=]/g) || []).map((s) => s.match(/App\.kao[A-Za-z0-9_]*/)[0]));
   // KAO2-19 okuyucu (41) ve KAO2-20 kök eylemleriyle (43) arttı.
-  assert.equal(names.size, 44, 'KAO2-25 kaoWordLayer\'ı kaldırdı; K2F-12 kaoS0, K2F-16 kaoSetIntent ekledi');
+  assert.equal(names.size, 45, 'KAO2-25 kaoWordLayer\'ı kaldırdı; K2F-12 kaoS0, K2F-16 kaoSetIntent, K2F-30 kaoToggleAutoAdvance ekledi');
   assert.ok(names.has('App.kaoOnboard'));
   assert.equal((app.match(/App\.kaoOnboard=function\(action,value\)\{ return window\.SeymaQuranLearn\.kaoOnboard\.apply\(null,arguments\); \};/g) || []).length, 1);
   for (const file of ['app/core/quranLearn.js', 'app/core/quranLearnViews.js']) {
     const comments = (read(file).match(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g) || []).join('\n');
     assert.doesNotMatch(comments, /App\.[A-Za-z0-9_]+\s*=|onclick/, `${file} yorumları`);
   }
+});
+
+// ---- K2F-30 · Başlangıç noktasını değiştir ---------------------------------------
+function doneUser() {
+  const b = boot();
+  const q = b.api.ensureQuranLearn(b.state.data);
+  const lessonId = b.win.QuranCurriculumV2.units[0].lessons[0].id;
+  Object.assign(q.onboarding, { doneAt: ISO, start: 'level1', minutes: 10, intent: 'fajr' });
+  q.settings.dailyNew = 10; q.settings.audio = false;
+  q.path.lessons[lessonId] = { startedAt: ISO, doneAt: ISO, score: 0.9 };
+  q.daily['2026-09-20'] = { answered: 4 };
+  assert.equal(b.api.kaoOpen('settings'), true);
+  b.state.saves = 0;
+  return b;
+}
+const snap = (q) => JSON.stringify({ cards: q.cards, path: q.path, daily: q.daily, settings: q.settings, doneAt: q.onboarding.doneAt, minutes: q.onboarding.minutes, intent: q.onboarding.intent, placement: q.onboarding.placement });
+
+check('K2F-30 (b): "Başlangıç noktasını değiştir" ilk açılışın 2. adımını açar; Atla yerine Vazgeç, ilerleme verisi değişmez', () => {
+  const b = doneUser();
+  const q = b.api.ensureQuranLearn(b.state.data), before = snap(q);
+  assert.equal(b.api.kaoOnboard('change-start'), true);
+  assert.equal(b.state.ui.kaoView, 'home');
+  assert.equal(b.state.ui.kaoOnboard.step, 2);
+  const html = onboarding(overlay(b.api));
+  assert.match(text(html), /Arapça harfleri okuyabiliyor musun/);
+  for (const choice of ['none', 'slow', 'fluent']) assert.ok(html.includes(call('kaoOnboard', 'choose', choice)), choice);
+  assert.ok(html.includes(call('kaoOnboard', 'back')), 'Geri = vazgeç');
+  assert.match(html, />Vazgeç</); assert.doesNotMatch(html, />Atla</);
+  assert.equal(b.state.saves, 0, 'açmak veri yazmaz');
+  assert.equal(snap(q), before);
+});
+
+check('K2F-30 (b): "Evet, rahat okurum" → yalnız onboarding.start=level1; "Henüz değil" → s0; ders/kart/günlük/ayar/doneAt aynı', () => {
+  for (const [choice, start] of [['none', 's0'], ['fluent', 'level1']]) {
+    const b = doneUser(), q = b.api.ensureQuranLearn(b.state.data);
+    q.onboarding.start = choice === 'none' ? 'level1' : 's0';
+    const before = snap(q);
+    assert.equal(b.api.kaoOnboard('change-start'), true);
+    assert.equal(b.api.kaoOnboard('choose', choice), true);
+    assert.equal(q.onboarding.start, start);
+    assert.equal(snap(q), before, 'başka hiçbir alan değişmez (S0 dersleri de eklenmez)');
+    assert.equal(b.state.ui.kaoOnboard, null, 'mod kapanır');
+    assert.equal(b.state.ui.kaoView, 'settings', 'Ayarlar\'a dönülür');
+    assert.equal(b.state.saves, 1);
+    assert.doesNotMatch(overlay(b.api), /kao-screen-onboard/);
+    assert.equal(b.api.kaoOnboard('start'), false, 'tamamlanmış kullanıcı ilk açılışa zorlanamaz');
+  }
+});
+
+check('K2F-30 (b): aynı başlangıç noktası seçilirse veri yazılmaz ama Ayarlar\'a dönülür', () => {
+  const b = doneUser(), q = b.api.ensureQuranLearn(b.state.data);
+  assert.equal(q.onboarding.start, 'level1');
+  b.api.kaoOnboard('change-start'); b.api.kaoOnboard('choose', 'fluent');
+  assert.equal(b.state.saves, 0); assert.equal(b.state.ui.kaoView, 'settings'); assert.equal(b.state.ui.kaoOnboard, null);
+});
+
+check('K2F-30 (b): "Harekeyle, yavaşça" → yerleştirme sınavı → start yazılır; yerleştirme kaydı ve S0 dersleri değişmez', () => {
+  for (const [wrong, start] of [[[], 'level1'], [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 's0']]) {
+    const b = doneUser(), q = b.api.ensureQuranLearn(b.state.data);
+    q.onboarding.start = start === 'level1' ? 's0' : 'level1';
+    const before = snap(q);
+    assert.equal(b.api.kaoOnboard('change-start'), true);
+    assert.equal(b.api.kaoOnboard('choose', 'slow'), true);
+    assert.equal(b.state.ui.kaoOnboard.step, 'placement');
+    runPlacement(b.api, b.state, wrong);
+    assert.equal(q.onboarding.start, start);
+    assert.equal(snap(q), before);
+    assert.equal(b.state.ui.kaoOnboard, null);
+    assert.equal(b.state.ui.kaoView, 'settings');
+  }
+});
+
+check('K2F-30 (b): Geri (2. adım) ve Vazgeç hiçbir şey yazmadan Ayarlar\'a döner; yerleştirmeden Geri 2. adıma döner', () => {
+  for (const action of ['back', 'skip']) {
+    const b = doneUser(), q = b.api.ensureQuranLearn(b.state.data), before = snap(q), start = q.onboarding.start;
+    b.api.kaoOnboard('change-start');
+    assert.equal(b.api.kaoOnboard(action), true, action);
+    assert.equal(q.onboarding.start, start); assert.equal(snap(q), before);
+    assert.equal(b.state.ui.kaoOnboard, null); assert.equal(b.state.ui.kaoView, 'settings');
+    assert.equal(b.state.saves, 0);
+  }
+  const b = doneUser();
+  b.api.kaoOnboard('change-start'); b.api.kaoOnboard('choose', 'slow');
+  assert.equal(b.api.kaoOnboard('back'), true);
+  assert.equal(b.state.ui.kaoOnboard.step, 2); assert.equal(b.state.ui.kaoOnboard.change, true);
+});
+
+check('K2F-30 (b): ilk açılışı bitirmemiş kullanıcıda change-start çalışmaz; ayarlar dışı yola sapınca mod temizlenir', () => {
+  const fresh = openFresh();
+  assert.equal(fresh.api.kaoOnboard('change-start'), false);
+  assert.equal(fresh.state.ui.kaoOnboard.step, 1, 'normal ilk açılış bozulmaz');
+  const b = doneUser();
+  b.api.kaoOnboard('change-start');
+  b.api.kaoNav('units');
+  assert.equal(b.state.ui.kaoOnboard, null, 'başka görünüme geçince bayat mod kalmaz');
+  b.api.kaoSetView('home');
+  assert.doesNotMatch(overlay(b.api), /kao-screen-onboard/, 'ana ekrana dönünce ilk açılış çizilmez');
+  b.api.kaoClose(); assert.equal(b.api.kaoOpen(), true);
+  assert.doesNotMatch(overlay(b.api), /kao-screen-onboard/);
 });
 
 check('06 CSS: KAO2-11 bloğu yalnız --kao-*/--f-* tokenı, 600/700, süs yok', () => {

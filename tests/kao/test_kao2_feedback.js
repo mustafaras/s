@@ -133,6 +133,24 @@ assert.equal(ui.kaoTaskIndex, 1);
 assert.equal(ui.kaoPanel.open, false);
 assert.ok(audioCalls.some((src) => src.includes('w-l_audio_abcdef-measured.m4a')), 'Devam mevcut otomatik ses davranışını korumalı');
 
+// K2F-30: ayar gerçek handler ile açılır (ayar değişimi görev önbelleğini temizler → önce çevir, sonra göster).
+const autoItem = wordTask('answer-toggle', 'w:l_toggle:ar>tr');
+freshData();
+assert.equal(data.quranLearn.settings.autoAdvance, false);
+assert.equal(api.kaoToggleAutoAdvance(), true);
+assert.equal(data.quranLearn.settings.autoAdvance, true);
+show(autoItem);
+assert.equal(api.kaoAnswer(autoItem.id, 'wrong').correct, false);
+assert.equal(timers.some((timer) => timer.ms === 900), false, 'yanlış cevapta otomatik devam zamanlayıcısı yok');
+freshData();
+api.kaoToggleAutoAdvance(); show(autoItem);
+assert.equal(api.kaoAnswer(autoItem.id, 'right').correct, true);
+assert.ok(timers.some((timer) => timer.ms === 900), 'anahtarla açılan ayar doğru cevapta 900 ms zamanlayıcı kurar');
+freshData();
+api.kaoToggleAutoAdvance(); api.kaoToggleAutoAdvance(); show(autoItem);
+api.kaoAnswer(autoItem.id, 'right');
+assert.equal(timers.some((timer) => timer.ms === 900), false, 'kapatılan ayar zamanlayıcı kurmaz');
+
 freshData();
 const order = {
   id: 'order-task', cardId: 'fragment:order', type: 'fragment', fragmentKind: 'order', kind: 'order', isNew: true,

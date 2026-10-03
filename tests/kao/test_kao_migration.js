@@ -31,7 +31,8 @@ assert.deepEqual(JSON.parse(JSON.stringify(fresh)), {
   lexiconVersion: 'quran-lexicon-tr-v1',
   startedAt: null,
   gate: { passed: false, skipped: false, score: null, at: null },
-  settings: { dailyNew: 10, audio: false, autoAdvance: false, audioStyle: 'measured', harakat: true, translit: true, translitLayer: 'tr', shadowing: false, kaoVisible: true },
+  // K2F-30: boş kayıtta günlük hedef onboarding.minutes ile hizalı (5; eski beklenti 10) — 08 §1: dailyNew süreden türetilir.
+  settings: { dailyNew: 5, audio: false, autoAdvance: false, audioStyle: 'measured', harakat: true, translit: true, translitLayer: 'tr', shadowing: false, kaoVisible: true },
   cards: {}, units: {}, surahs: {}, daily: {},
   milestones: { besmele: null, fatiha: null, namaz: null, half: null, twoThirds: null, eighty: null, shortSurahs: null, u1: null, u2: null, u3: null, u4: null, u5: null, u6: null, u7: null, u8: null, u9: null, u10: null, u11: null, u12: null },
   phonics: { style: 'muallim', misheard: {} },

@@ -38,11 +38,11 @@ let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
 
 // ---- (1) Grup sırası ve içerikleri ----------------------------------------
-check('K2F-29: ayarlar amaca göre gruplanır — Günlük hedef · Ses · Okuma · Gölgeleme · Görünürlük · Veri · Hakkında', () => {
+check('K2F-29: ayarlar amaca göre gruplanır — Günlük hedef · Ses · Okuma · Öğrenme · Gölgeleme · Görünürlük · Veri · Hakkında', () => {
   const t = boot();
   const html = decode(t.api.kaoSettingsHTML());
   const titles = [...html.matchAll(/<h3[^>]*>([^<]+)<\/h3>/g)].map((m) => m[1]);
-  assert.deepEqual(titles, ['Günlük hedef', 'Ses', 'Okuma', 'Gölgeleme', 'Görünürlük', 'Veri', 'Hakkında'], 'grup sırası 06/KAO2-23');
+  assert.deepEqual(titles, ['Günlük hedef', 'Ses', 'Okuma', 'Öğrenme', 'Gölgeleme', 'Görünürlük', 'Veri', 'Hakkında'], 'grup sırası 06/KAO2-23');
   for (const old of ['Okunuş ve hareke', 'Gölgeleme (mikrofon)', 'Seviye 0 ve dışa aktarma', 'Ses · gölgeleme', 'Okuma · görünürlük', 'Okuma · görünüm', 'Diğer']) {
     assert.ok(!titles.includes(old), `eski bölüm başlığı kaldı: ${old}`);
   }
@@ -51,11 +51,11 @@ check('K2F-29: ayarlar amaca göre gruplanır — Günlük hedef · Ses · Okuma
 check('K2F-29: tüm aç/kapat ayarları gerçek anahtardır; etiket değer içermez, "X: açık" metin düğmesi yok', () => {
   const t = boot();
   for (const on of [false, true]) {
-    t.q.settings.harakat = t.q.settings.kaoVisible = t.q.settings.shadowing = on;
+    t.q.settings.harakat = t.q.settings.kaoVisible = t.q.settings.shadowing = t.q.settings.autoAdvance = on;
     t.q.readability.fadeHarakat = t.q.readability.coloredHarakat = on;
     const html = decode(t.api.kaoSettingsHTML());
     const switches = [...html.matchAll(/<button\b[^>]*role="switch"[^>]*>[\s\S]*?<\/button>/g)].map((m) => m[0]);
-    assert.equal(switches.length, 5, 'beş anahtar');
+    assert.equal(switches.length, 6, 'altı anahtar');
     for (const sw of switches) {
       assert.match(sw, new RegExp(`aria-checked="${on}"`), 'durum aria-checked ile');
       assert.match(sw, /class="kao-switch-row"/);
@@ -65,7 +65,7 @@ check('K2F-29: tüm aç/kapat ayarları gerçek anahtardır; etiket değer içer
     assert.doesNotMatch(html, /kao-toggle/, 'eski metin düğmesi yok');
   }
   const html = decode(t.api.kaoSettingsHTML());
-  for (const label of ['Harekeleri göster', 'Tekrarda harekeyi soldur', 'Renkli hareke (Seviye 0)', 'Gölgeleme', 'İlham & İbadet’te kartı göster']) {
+  for (const label of ['Harekeleri göster', 'Tekrarda harekeyi soldur', 'Renkli hareke (Seviye 0)', 'Doğruda otomatik geç', 'Gölgeleme', 'İlham & İbadet’te kartı göster']) {
     assert.ok(html.includes(`aria-label="${label}"`), `anahtar etiketi: ${label}`);
   }
 });
@@ -166,11 +166,48 @@ check('alt sayfa kaynak/lisans + sürüm + gizlilik bilgisini taşır', () => {
   assert.match(page, /gizli|cihazda|yalnız bu cihazda/i, 'gizlilik notu');
 });
 
+// ---- (K2F-30) Öğrenme grubu --------------------------------------------------
+check('K2F-30: Öğrenme grubu — "Doğruda otomatik geç" anahtarı + "Başlangıç noktasını değiştir" satırı', () => {
+  const t = boot();
+  for (const on of [false, true]) {
+    t.q.settings.autoAdvance = on;
+    const html = decode(t.api.kaoSettingsHTML());
+    const group = html.match(/<h3 class="kao-group-title">Öğrenme<\/h3>[\s\S]*?<p class="kao-group-footer">/);
+    assert.ok(group, 'Öğrenme grubu var');
+    const sw = group[0].match(/<button\b[^>]*role="switch"[^>]*>/);
+    assert.ok(sw, 'otomatik geç gerçek anahtar');
+    assert.match(sw[0], new RegExp(`aria-checked="${on}"`));
+    assert.match(sw[0], /aria-label="Doğruda otomatik geç"/);
+    assert.match(sw[0], /onclick="App\.kaoToggleAutoAdvance\(\)"/);
+    assert.match(group[0], /<button type="button" class="kao-group-row" onclick="App\.kaoOnboard\(\"change-start\"\)">[\s\S]*Başlangıç noktasını değiştir/);
+  }
+});
+
+check('K2F-30: kaoToggleAutoAdvance ayarı çevirir ve yazar; ikinci çağrı geri alır', () => {
+  const t = boot();
+  assert.equal(t.q.settings.autoAdvance, false);
+  assert.equal(t.api.kaoToggleAutoAdvance(), true);
+  assert.equal(t.api.ensureQuranLearn(t.data).settings.autoAdvance, true);
+  assert.equal(t.api.kaoToggleAutoAdvance(), true);
+  assert.equal(t.api.ensureQuranLearn(t.data).settings.autoAdvance, false);
+});
+
+check('K2F-30: ilk açılış varsayılanları hizalı — dailyNew, onboarding.minutes ile aynı (5)', () => {
+  const t = boot();
+  const fresh = t.api.ensureQuranLearn({ quranLearn: null });
+  assert.equal(fresh.settings.dailyNew, 5);
+  assert.equal(fresh.onboarding.minutes, 5);
+  const bare = t.api.ensureQuranLearn({ quranLearn: { settings: {} } });
+  assert.equal(bare.settings.dailyNew, bare.onboarding.minutes, 'ayar yokken günlük hedef süreyle tutarlı');
+  const kept = t.api.ensureQuranLearn({ quranLearn: { settings: { dailyNew: 10 } } });
+  assert.equal(kept.settings.dailyNew, 10, 'kayıtlı ayar korunur');
+});
+
 // ---- (3) Handler sayısı DEĞİŞMEDİ (kartın kabul ölçütü) --------------------
-check('handler sayısı: App.kao* 44 (K2F-16 kaoSetIntent ekledi)', () => {
+check('handler sayısı: App.kao* 45 (K2F-30 kaoToggleAutoAdvance ekledi)', () => {
   const app = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
   const kao = new Set((app.match(/App\.kao[A-Za-z0-9_]*\s*=[^=]/g) || []).map((s) => s.match(/App\.kao[A-Za-z0-9_]*/)[0]));
-  assert.equal(kao.size, 44, `App.kao* sayısı 44 olmalı — KAO2-25 katman sayfalamasını kaldırdı, K2F-12 kaoS0, K2F-16 kaoSetIntent ekledi (ölçülen ${kao.size})`);
+  assert.equal(kao.size, 45, `App.kao* sayısı 45 olmalı — KAO2-25 katman sayfalamasını kaldırdı, K2F-12 kaoS0, K2F-16 kaoSetIntent, K2F-30 kaoToggleAutoAdvance ekledi (ölçülen ${kao.size})`);
 });
 
 check('ayarlar hâlâ TEK veri kaynağı: IIP sekmesine kopyalanmaz', () => {

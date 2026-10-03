@@ -77,20 +77,22 @@
     var href=String(value||'');
     return /^#[A-Za-z][A-Za-z0-9_-]*$/.test(href)?href:'';
   }
+  function groupRow(row,hasSeparator){
+    if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');
+    row=row&&typeof row==='object'?row:{};
+    var title=escapeText(row.title),value=escapeText(row.value),icon=deps.icon(String(row.icon||''));
+    var content='<span class="kao-group-icon" aria-hidden="true">'+icon+'</span><span class="kao-group-label">'+title+'</span><span class="kao-group-value">'+value+'</span><span class="kao-group-chevron" aria-hidden="true">›</span>'+(hasSeparator===true?'<span class="kao-group-separator" aria-hidden="true"></span>':'');
+    var href=safeHref(row.href),call=actionCall(row.action);
+    if(href) return '<a class="kao-group-row" href="'+escapeText(href)+'">'+content+'</a>';
+    return '<button type="button" class="kao-group-row"'+(call?' onclick="'+call+'"':' disabled')+'>'+content+'</button>';
+  }
   function groupedList(sections){
     if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');
     if(!Array.isArray(sections)) return '<div class="kao-group-list"></div>';
     var html=sections.map(function(section){
       section=section&&typeof section==='object'?section:{};
       var rows=Array.isArray(section.rows)?section.rows:[];
-      var rowHtml=rows.map(function(row,rowIndex){
-        row=row&&typeof row==='object'?row:{};
-        var title=escapeText(row.title),value=escapeText(row.value),icon=deps.icon(String(row.icon||''));
-        var content='<span class="kao-group-icon" aria-hidden="true">'+icon+'</span><span class="kao-group-label">'+title+'</span><span class="kao-group-value">'+value+'</span><span class="kao-group-chevron" aria-hidden="true">›</span>'+(rowIndex<rows.length-1?'<span class="kao-group-separator" aria-hidden="true"></span>':'');
-        var href=safeHref(row.href),call=actionCall(row.action);
-        if(href) return '<a class="kao-group-row" href="'+escapeText(href)+'">'+content+'</a>';
-        return '<button type="button" class="kao-group-row"'+(call?' onclick="'+call+'"':' disabled')+'>'+content+'</button>';
-      }).join('');
+      var rowHtml=rows.map(function(row,rowIndex){ return groupRow(row,rowIndex<rows.length-1); }).join('');
       return '<section class="kao-group-section"><h3 class="kao-group-title">'+escapeText(section.title)+'</h3><div class="kao-group-surface">'+rowHtml+'</div>'+(section.footer?'<p class="kao-group-footer">'+escapeText(section.footer)+'</p>':'')+'</section>';
     }).join('');
     return '<div class="kao-group-list">'+html+'</div>';
@@ -357,7 +359,7 @@
     if(!deps) throw new Error('KAO2-11: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
     var back=model.back?linkButton('‹ Geri',model.back,'kao-onboard-link'):'<span class="kao-onboard-spacer" aria-hidden="true"></span>';
-    var bar='<div class="kao-onboard-bar">'+back+'<span class="kao-onboard-progress">'+escapeText(model.progress)+'</span>'+linkButton('Atla',model.skip,'kao-onboard-link')+'</div>';
+    var bar='<div class="kao-onboard-bar">'+back+'<span class="kao-onboard-progress">'+escapeText(model.progress)+'</span>'+linkButton(model.skipLabel||'Atla',model.skip,'kao-onboard-link')+'</div>';
     var body=(model.note?'<p class="kao-onboard-note" role="status">'+escapeText(model.note)+'</p>':'')+(model.points?onboardPoints(model.points):'');
     if(model.options) body+=onboardOptions(model.options);
     if(model.task) body+=onboardTask(model.task);
@@ -521,5 +523,5 @@
     return '<main class="kao-s0" data-stage="'+escapeText(stage.kind)+'" aria-labelledby="kao-s0-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye 0 · şekil aileleri</p><h2 id="kao-s0-title">'+escapeText(model.title)+'</h2><p class="kao-s0-progress" aria-label="Aşama '+String(stage.index+1)+' / '+String(stage.count)+'">Aşama '+String(stage.index+1)+' / '+String(stage.count)+' · '+escapeText(stage.label)+'</p></div></div>'+body+button+'</main>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,switchRow:switchRow,settingsGroup:settingsGroup,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,groupRow:groupRow,switchRow:switchRow,settingsGroup:settingsGroup,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
 })(window);

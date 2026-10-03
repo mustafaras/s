@@ -855,3 +855,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js · quranLearnViews.js · kao.css) · cihaz — (gruplu yerleşim, anahtar görünümü, odak halkası gözlenmedi)
 - surprises: handler-surface testi adı dinamik kuran kodu "çağrılmayan tanım" saymasına yansıttı → eylemler `{name:'kaoX'}` literal; K2F-28 ek tur 3 ayrı commit (19f4d6ff); bağımsız inceleme MEDIUM (odak halkası kırpılması) kapandı
 - next: K2F-30
+
+## seq 84 · 2026-10-03 · PROMPT · K2F-30
+- status: done
+- title: Ayarlar 2/2 — otomatik geç, başlangıç noktası
+- prev-commit: 980f8466
+- evidence: kao2-duzeltme/evidence/K2F-30/KANIT.md
+- closes: K2-06 · K6-03 · K7-03
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261003d (pin yükseltme YOK)
+- changed-tests: test_kao2_settings.js · test_kao2_onboarding.js · test_kao2_feedback.js · test_kao2_design_contract.js · test_kao2_word.js · test_kao_migration.js (dailyNew 10→5) · test_kao_requirements.js (dailyNew=10 açık kurulum) · tests/app fx2/v3/surface pinleri
+- evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js · quranLearnViews.js · app.js) · cihaz — (Öğrenme grubu yerleşimi ve başlangıç değişim akışı gözlenmedi)
+- surprises: varsayılan dailyNew 10→5 iki eski testin beklentisini değiştirdi (P1 c: 08 §1); kaoCommitSetting görev önbelleğini temizler; 5 yeni kart bütçesinde kaoStart kelime kartı çıkarmayabilir (kapsam dışı, risk olarak not)
+- next: K2F-31

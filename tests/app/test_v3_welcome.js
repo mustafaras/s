@@ -853,8 +853,8 @@ const combined = APP_SURFACE_FILES.map(read).join('') + quranLearnHubSrc;
 const surfaceCount = new Set(
   (combined.match(/App\.[A-Za-z0-9_]+\s*=[^=]/g) || []).map((s) => s.match(/App\.[A-Za-z0-9_]+/)[0])
 ).size;
-ok('App yüzeyi pinli (765) — KAO2-12, KAO2-19, KAO2-20, K2F-12 kaoS0 ve K2F-16 kaoSetIntent handlerlari dahil, KAO2-25 kaoWordLayer hariç',
-  surfaceCount === 765, 'ölçülen: ' + surfaceCount);
+ok('App yüzeyi pinli (766) — KAO2-12, KAO2-19, KAO2-20, K2F-12 kaoS0, K2F-16 kaoSetIntent ve K2F-30 kaoToggleAutoAdvance handlerlari dahil, KAO2-25 kaoWordLayer hariç',
+  surfaceCount === 766, 'ölçülen: ' + surfaceCount);
 ok('tıklama niteliği sayısı pinli (393) — KAO-21 gizlenen kart satırı dahil',
   (combined.match(/onclick=/g) || []).length === 393,
   'ölçülen: ' + (combined.match(/onclick=/g) || []).length);

@@ -2266,6 +2266,7 @@
     if(['off','measured','flowing'].indexOf(style)<0) return false;
     return kaoCommitSetting(function(q){ q.settings.audio=style!=='off'; if(style!=='off') q.settings.audioStyle=style; });
   }
+  function kaoToggleAutoAdvance(){ return kaoCommitSetting(function(q){ q.settings.autoAdvance=q.settings.autoAdvance!==true; }); }
   function kaoToggleHarakat(){ return kaoCommitSetting(function(q){ q.settings.harakat=q.settings.harakat===false; }); }
   function kaoToggleFade(){ return kaoCommitSetting(function(q){ q.readability.fadeHarakat=!q.readability.fadeHarakat; }); }
   function kaoSetTranslit(layer){ return (layer==='tr'||layer==='dia')&&kaoCommitSetting(function(q){ q.settings.translitLayer=layer; }); }
@@ -2351,6 +2352,7 @@
       +kaoSourcesHTML(esc)+'</main>';
     return h;
   }
+  function kaoStartLabel(start){ return start==='s0'?'Harflerle':(start==='level1'||start==='placement'?'Seviye 1':''); }
   function kaoSettingsHTML(){
     if(!quranLearnDeps) return '';
     var q=ensureQuranLearn(quranLearnDeps.data()),ui=quranLearnDeps.ui(),esc=quranLearnDeps.esc,s=q.settings,r=q.readability,lines={compact:'1.9',normal:'2.2',wide:'2.5'},line=lines[r.lineHeight]||String(r.lineHeight);
@@ -2371,6 +2373,7 @@
       sw('Renkli hareke (Seviye 0)',r.coloredHarakat===true,{name:'kaoSetReadability',args:['coloredHarakat',r.coloredHarakat!==true]}),
       '<p class="kao-gate-ar kao-settings-sample" lang="ar" dir="rtl" style="'+kaoReadabilityStyle()+'">'+(r.coloredHarakat?kaoColorHarakat(sample):esc(sample))+'</p>'
     ],'DİA katmanı kelime kartlarında harfleri birebir ayırır (ḥ, ṣ, ʿ); âyet ve parça okunuşları Okunuş katmanında kalır.');
+    h+=group('Öğrenme',[sw('Doğruda otomatik geç',s.autoAdvance===true,{name:'kaoToggleAutoAdvance'}),views.groupRow({title:'Başlangıç noktasını değiştir',value:kaoStartLabel(q.onboarding.start),action:{name:'kaoOnboard',args:['change-start']}})],'Açıkken doğru cevaptan kısa süre sonra kendiliğinden sonraki göreve geçilir. Başlangıç noktası yalnız önerilen ilk dersi değiştirir; ilerlemen ve kartların korunur.');
     h+=group('Gölgeleme',[sw('Gölgeleme',s.shadowing===true,{name:'kaoToggleShadowing'})],'Açıkken Telaffuz stüdyosunda modeli dinleyip kendi sesini en çok 10 saniye kaydedebilirsin. Mikrofon yalnız sen başlatınca açılır; kayıt yalnız bu ekranda bellekte durur, hiçbir yere kaydedilmez ya da gönderilmez ve pencereyi kapatınca silinir.');
     h+=group('Görünürlük',[sw('İlham & İbadet’te kartı göster',s.kaoVisible!==false,{name:'kaoToggleVisible'})],'Kapatırsan kart gizlenir, verilerin korunur; uygulama Ayarları → Gizlenen kartlar bölümünden geri getirebilirsin.');
     h+=views.groupedList([{title:'Veri',rows:[{title:'Kelimelerimi indir (CSV)',action:{name:'kaoExportCsv'}},{title:'Seviye 0 kontrolünü yeniden aç',action:{name:'kaoReopenGate'}}],footer:'CSV yalnız bu cihazda oluşturulur; Anki uyumlu sütunlar: ar, tr, translit, root, tags.'},{title:'Hakkında',rows:[{title:'Hakkında ve kaynaklar',action:{name:'kaoSetView',args:['sources']}}]}]);
@@ -3446,11 +3449,37 @@
     }
     return true;
   }
+  // K2F-30: tamamlanmış kullanıcı için başlangıç noktasını değiştirme (ilk açılışın 2. adımı); yalnız onboarding.start yazılır.
+  function kaoOnboardChangeLeave(ui,q,start){
+    ui.kaoOnboard=null; ui.kaoAudioFailed=false;
+    if(start&&start!==q.onboarding.start){ q.onboarding.start=start; kaoSave(); }
+    kaoApplyView(ui,'settings',null,'open');
+    if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.focusDialog==='function') quranLearnSurfaceDeps.focusDialog('sey-ov-card');
+    return true;
+  }
+  function kaoOnboardChangeStart(ui,q){
+    if(!q.onboarding.doneAt) return false;
+    kaoApplyView(ui,'home',null,'open');
+    ui.kaoOnboard=Object.assign(kaoOnboardState(),{step:2,change:true});
+    quranLearnDeps.render();
+    if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.focusDialog==='function') quranLearnSurfaceDeps.focusDialog('sey-ov-card');
+    return true;
+  }
+  function kaoOnboardChangeStep(ui,q,st,action,value){
+    var done;
+    if(action==='skip'||(action==='back'&&st.step===2)) done=kaoOnboardChangeLeave(ui,q,null);
+    else done=kaoOnboardMove(ui,st,action,value)||kaoOnboardPlacement(ui,st,action,value);
+    if(done&&st.step===3) kaoOnboardChangeLeave(ui,q,kaoOnboardStart(st));
+    return done;
+  }
   function kaoOnboard(action,value){
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),q=ensureQuranLearn(quranLearnDeps.data()),st=ui.kaoOnboard,changed=false;
     if(action==='whats-new-close'){ if(ui.kaoWhatsNew!==true) return false; ui.kaoWhatsNew=false; quranLearnDeps.render(); return true; }
-    if(!q||q.onboarding.doneAt) return false;
+    if(!q) return false;
+    if(action==='change-start') return kaoOnboardChangeStart(ui,q);
+    if(kaoOnboardActive(ui)&&st.change===true){ changed=kaoOnboardChangeStep(ui,q,st,action,value); if(changed) quranLearnDeps.render(); return changed; }
+    if(q.onboarding.doneAt) return false;
     if(action==='start'){ ui.kaoOnboard=kaoOnboardState(); kaoApplyView(ui,'home',null,'open'); quranLearnDeps.render(); return true; }
     if(!kaoOnboardActive(ui)) return false;
     if(action==='skip') changed=kaoOnboardCommit(ui,q,st,true);
@@ -3463,7 +3492,7 @@
   function kaoOnboardBody(ui,st){
     var unit1=window.QuranCurriculumV2&&Array.isArray(window.QuranCurriculumV2.units)&&window.QuranCurriculumV2.units[0],unitTitle=unit1&&unit1.title?String(unit1.title):'Fâtiha';
     if(st.step===1){ var facts=kaoOnboardFacts(); return {progress:'1/3',title:'Namazda söylediklerini anlamaya başla',points:[{icon:'book-open',title:facts.words+' kelime',text:'Bu kelimeler Kur’an metninin %'+facts.percent+' kadarını oluşturur.'},{icon:'repeat',title:'Önce öğren, sonra akıllı tekrar',text:'Her kelime, unutmaya yaklaştığın anda yeniden karşına çıkar.'},{icon:'mosque',title:unitTitle+'’dan başla',text:'Her gün namazda söylediğin metinleri anlayarak ilerlersin.'}],primary:{label:'Başlayalım',action:kaoOnboardAction('next')}}; }
-    if(st.step===2) return {progress:'2/3',back:kaoOnboardAction('back'),title:'Arapça harfleri okuyabiliyor musun?',lead:'Doğru ya da yanlış yok; yalnız başlangıç yerini buluyoruz.',options:[{title:'Henüz değil',sub:'Harflerle başlayalım · 12 kısa ders',action:kaoOnboardAction('choose','none')},{title:'Harekeyle, yavaşça',sub:'2 dakikalık kısa kontrol',action:kaoOnboardAction('choose','slow')},{title:'Evet, rahat okurum',sub:'Seviye 1 · '+unitTitle,action:kaoOnboardAction('choose','fluent')}]};
+    if(st.step===2) return {progress:st.change?'':'2/3',back:kaoOnboardAction('back'),title:'Arapça harfleri okuyabiliyor musun?',lead:'Doğru ya da yanlış yok; yalnız başlangıç yerini buluyoruz.',options:[{title:'Henüz değil',sub:'Harflerle başlayalım · 12 kısa ders',action:kaoOnboardAction('choose','none')},{title:'Harekeyle, yavaşça',sub:'2 dakikalık kısa kontrol',action:kaoOnboardAction('choose','slow')},{title:'Evet, rahat okurum',sub:'Seviye 1 · '+unitTitle,action:kaoOnboardAction('choose','fluent')}]};
     if(st.step==='placement') return kaoPlacementBody(ui,st);
     var start=kaoOnboardStart(st),r=st.result&&st.result.record;
     var note=r?'Okuma '+r.reading+'/'+r.readingTotal+(start==='level1'?' · '+unitTitle+'’dan başlıyoruz.':' · önce '+r.missing.length+' kısa harf dersi.')+(r.audioDeferred?' Ses çalmadığı için karar okumaya göre verildi.':''):'';
@@ -3474,7 +3503,7 @@
       primary:{label:start==='s0'?'Harflerle başla':unitTitle+' ile başla',action:kaoOnboardAction('finish')}};
   }
   function kaoPlacementBody(ui,st){
-    var tasks=kaoPlacementTasks(),p=st.placement,listening=p.phase==='listening',task=(listening?tasks.listening:tasks.reading)[p.index]||null,model={progress:'2/3',back:kaoOnboardAction('back'),title:listening?'Kısa dinleme kontrolü':'Kısa okuma kontrolü',lead:listening?'Sesi dinle, duyduğun harfi seç.':'Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz.'};
+    var tasks=kaoPlacementTasks(),p=st.placement,listening=p.phase==='listening',task=(listening?tasks.listening:tasks.reading)[p.index]||null,model={progress:st.change?'':'2/3',back:kaoOnboardAction('back'),title:listening?'Kısa dinleme kontrolü':'Kısa okuma kontrolü',lead:listening?'Sesi dinle, duyduğun harfi seç.':'Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz.'};
     if(!task) return model;
     if(!listening){ model.task={kicker:'Okuma '+(p.index+1)+'/'+tasks.reading.length,ar:task.ar,prompt:'Doğru okunuşu seç',choices:task.choices.map(function(choice){ return {label:choice,action:kaoOnboardAction('answer',choice)}; })}; return model; }
     model.task={kicker:'Dinleme '+(p.index+1)+'/'+tasks.listening.length,prompt:'Hangi harf?',audio:{label:'Sesi dinle',action:kaoOnboardAction('play',task.pairId)},choices:task.choices.map(function(choice){ return {label:choice.ar,lang:'ar',action:kaoOnboardAction('answer',choice.id)}; }),extra:ui.kaoAudioFailed===true?{label:'Ses çalmıyor · dinlemeyi atla',action:kaoOnboardAction('audio-skip')}:null};
@@ -3484,7 +3513,7 @@
   function kaoOnboardHTML(){
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),st=kaoOnboardActive(ui)?ui.kaoOnboard:kaoOnboardState();
-    return kaoViewsApi().onboardScreen(Object.assign({skip:kaoOnboardAction('skip')},kaoOnboardBody(ui,st)));
+    return kaoViewsApi().onboardScreen(Object.assign({skip:kaoOnboardAction('skip'),skipLabel:st.change?'Vazgeç':'Atla'},kaoOnboardBody(ui,st)));
   }
   // 02 §5.8 uygulama niyeti: bugünün namaz vakitleri yalnız okunur (days[bugün].prayer; yazma/gün kaydı yok, bildirim yok).
   var KAO_INTENT_PRAYERS=[['fajr','sabah'],['dhuhr','öğle'],['asr','ikindi'],['maghrib','akşam'],['isha','yatsı']]; function kaoIntentSuggestion(d,nowValue,today,intent){ var now=validDate(nowValue,'now'),day=objectOr(objectOr(d&&d.days,{})[today],{}),times=objectOr(day.prayer,{}),minutes=now.getHours()*60+now.getMinutes(),any=false,next=null,chosen=null; function clock(m,pair){ return pair[1]+' namazından sonra 5 dakika ('+(m[1].length<2?'0':'')+m[1]+':'+m[2]+')'; } KAO_INTENT_PRAYERS.forEach(function(pair){ var m=/(\d{1,2}):(\d{2})/.exec(String(objectOr(times[pair[0]],{}).time||'')); if(!m) return; any=true; if(pair[0]===intent) chosen=(Number(m[1])*60+Number(m[2])>minutes?'':'yarın ')+clock(m,pair); if(!next&&Number(m[1])*60+Number(m[2])>minutes) next=clock(m,pair); }); return chosen||(any?(next||'yarın sabah namazından sonra 5 dakika'):''); }
@@ -3582,6 +3611,7 @@
   }
   function kaoApplyView(ui,view,param,mode){
     if(!KAO_VIEW_TITLES[view]) return null;
+    if(ui.kaoOnboard&&ui.kaoOnboard.change===true) ui.kaoOnboard=null;
     var routeView=view==='unit'?'units':(view==='concept'?'grammar':view),flow=window.SeymaQuranLearnFlow,resolved=kaoRouteParam(ui,view,param),title=kaoViewTitle(view,resolved,ui),stack;
     if(view==='word'&&resolved!==null) ui.kaoWordId=String(resolved);
     if(view==='unit'&&resolved!==null) ui.kaoUnitId=String(resolved);
@@ -3691,7 +3721,7 @@
       lexiconVersion:LEXICON_VERSION,
       startedAt:null,
       gate:{passed:false,skipped:false,score:null,at:null},
-      settings:{dailyNew:10,audio:false,autoAdvance:false,audioStyle:'measured',harakat:true,translit:true,translitLayer:'tr',shadowing:false,kaoVisible:true},
+      settings:{dailyNew:KAO_ONBOARD_MINUTES[0],audio:false,autoAdvance:false,audioStyle:'measured',harakat:true,translit:true,translitLayer:'tr',shadowing:false,kaoVisible:true},
       cards:{},units:{},surahs:{},daily:{},
       milestones:KAO_MILESTONE_SHAPE(),
       phonics:{style:'muallim',misheard:{}},
@@ -3746,7 +3776,7 @@
     q.gate.at=nullableString(q.gate.at);
 
     q.settings=objectOr(q.settings,{});
-    q.settings.dailyNew=nonNegativeNumber(q.settings.dailyNew,10);
+    q.settings.dailyNew=nonNegativeNumber(q.settings.dailyNew,KAO_ONBOARD_MINUTES[0]);
     q.settings.audio=boolOr(q.settings.audio,false);
     q.settings.autoAdvance=boolOr(q.settings.autoAdvance,false);
     q.settings.harakat=boolOr(q.settings.harakat,true);
@@ -4010,6 +4040,7 @@
     kaoRecordStop:kaoRecordStop,
     kaoRecordPlay:kaoRecordPlay,
     kaoRecordDiscard:kaoRecordDiscard,
+    kaoToggleAutoAdvance:kaoToggleAutoAdvance,
     kaoToggleShadowing:kaoToggleShadowing,
     kaoToggleVisible:kaoToggleVisible,
     kaoShadowHTML:kaoShadowHTML,

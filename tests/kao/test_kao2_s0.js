@@ -254,10 +254,10 @@ check('(g/K2F-12) S0 görünümü a11y sözleşmesi: başlık etiketi, Arapça l
   const label = /<main class="kao-s0"[^>]*aria-labelledby="([^"]+)"/.exec(html);
   assert.ok(label, 'S0 ana bölgesi aria-labelledby taşır');
   assert.equal((html.match(new RegExp(`id="${label[1]}"`, 'g')) || []).length, 1, 'etiketlenen başlık tek ve var');
-  assert.match(html, /role="dialog" aria-modal="true" aria-labelledby="kao-title"/, 'çerçeve diyaloğu korunur');
+  assert.match(html, new RegExp(`role="dialog" aria-modal="true" aria-labelledby="${label[1]}"`), 'çerçeve diyaloğu S0 başlığıyla adlanır (K2F-27: eski sabit başlık kalktı)');
   for (const m of html.matchAll(/<[a-z0-9]+[^>]*dir="rtl"[^>]*>/g)) assert.match(m[0], /lang="ar"/, 'dir=rtl olan her öğe lang="ar" taşır: ' + m[0].slice(0, 60));
   const buttons = [...html.matchAll(/<button\b[^>]*>([\s\S]*?)<\/button>/g)].map((m) => ({ tag: m[0], text: kao.text(m[1]) }));
-  assert.ok(buttons.length >= 3, 'Kapat, NavBar geri ve Sıradaki adım düğmeleri');
+  assert.ok(buttons.length >= 2, 'NavBar geri ve Sıradaki adım düğmeleri (K2F-27: modal X kalktı)');
   for (const b of buttons) assert.ok(b.text || /aria-label="[^"]+"/.test(b.tag), 'her düğmenin erişilebilir adı var: ' + b.tag.slice(0, 80));
   assert.ok(buttons.some((b) => /kaoBack\(\)/.test(b.tag)), 'NavBar geri düğmesi (App.kaoBack) var'); assert.ok(buttons.some((b) => b.text === 'Sıradaki adım'), 'birincil eylem');
   assert.ok(!/tabindex="[1-9]/.test(html), 'pozitif tabindex yok');

@@ -813,3 +813,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - disclosure: tarayıcıda odak davranışı gözlenmedi ve kullanıcının cihaz verisi okunmadı → cihaz doğrulaması kullanıcıda; dinî bağlamlı metin onayları yapay zekâ incelemesidir (GATE seq 71 açık).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
 - next: K2F-27
+
+## seq 81 · 2026-10-03 · PROMPT · K2F-27
+- status: done
+- title: Tek başlık çubuğu
+- prev-commit: dd8a8594
+- evidence: kao2-duzeltme/evidence/K2F-27/KANIT.md
+- closes: K2-01 · O-01 · T-06 · T-07 · K2-07 (başlık kalıntıları)
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261003d (pin yükseltme YOK)
+- changed-tests: test_kao2_s0.js · test_kao2_view_resolution.js · test_kao_render.js (44 px listesi genişledi) · test_kao2_design_contract.js (+3 kaldırılmış seçici) · test_kao2_navigation.js (+tüm görünümler/oturum kontrolü)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearn.js · quranLearnViews.js · kao.css) · cihaz — (NavBar üst boşluğu/safe-area gözlenmedi)
+- surprises: görev aşamasında NavBar "Kapat" overlay'i kapatır (ders ekranının "Kapat"ı kaydedip ana ekrana döner) — eski X ile aynı, regresyon değil; code-reviewer MEDIUM not olarak bırakıldı
+- next: K2F-28

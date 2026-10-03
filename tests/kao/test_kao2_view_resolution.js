@@ -16,9 +16,8 @@ const HOME_TITLE = TITLES.home;
 // Parametresiz görünümler: başlık doğrudan KAO_VIEW_TITLES'tan gelir.
 const PARAM_FREE = Object.keys(TITLES).filter((v) => !['home', 'unit', 'word', 'reader', 'concept'].includes(v));
 const routeOf = (v) => ({ unit: 'units', concept: 'grammar' }[v] || v);
-// Ders oturumu tasarım gereği NavBar'sızdır (tam ekran oynatıcı): başlık yerine görünüm/yığın sınanır.
-const NO_NAVBAR = new Set(['session']);
-const titleOk = (view, title) => NO_NAVBAR.has(view) ? title === '' : title === TITLES[view];
+// K2F-27: eski modal başlığı (X) kalktı; görev/özet oturumunun tek kapatma kontrolü NavBar "Kapat"tır, başlığı KAO_VIEW_TITLES.session.
+const titleOk = (view, title) => title === TITLES[view];
 
 check('KAO_VIEW_TITLES parametresiz görünüm kümesi sabit ve s0/roots/sources dahil', () => {
   assert.deepEqual(PARAM_FREE.slice().sort(),

@@ -578,7 +578,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
   const inherited = { 'kao-chip': '.kao-choices button', 'kao-level1': '.kao-link-button', 'kao-map-cell': '.kao-map-cell' };
   const small = buttonClasses.filter((name) => !((target('.' + name) || target(inherited[name] || '')) >= 44));
   assert.deepEqual(small, [], '44 px altı düğme sınıfı yok');
-  for (const selector of ['.kao-choices button', '.kao-seg button', '.kao-surah-picker button', '.kao-ph-letters button', '.kao-ayah-words button', '.kao-ph-attention li button', '.kao-lesson-grid button', '.kao-readability button', '.kao-flag button', '.kao-close', '.kao-waqf']) assert.ok(target(selector) >= 44, `${selector} ≥44 px`);
+  for (const selector of ['.kao-choices button', '.kao-seg button', '.kao-surah-picker button', '.kao-ph-letters button', '.kao-ayah-words button', '.kao-ph-attention li button', '.kao-lesson-grid button', '.kao-readability button', '.kao-flag button', '.kao-navbar-action', '.kao-lesson-exit', '.kao-waqf']) assert.ok(target(selector) >= 44, `${selector} ≥44 px`);
   assert.match(cssSource, /\.kao-fade\{[^}]*min-width:44px;min-height:44px/, 'soldurma dokunma hedefi');
   assert.match(cssSource, /\.kao-hub-card:focus-visible,\.kao-dialog button:focus-visible\{outline:3px solid var\(--quran-mid\);outline-offset:3px\}/, 'odak halkası görünür ve kontrastlı');
   assert.doesNotMatch(cssSource, /var\(--quran-gold-ink\)/, 'koyu temada okunmayan gold-ink metin rengi kullanılmaz');

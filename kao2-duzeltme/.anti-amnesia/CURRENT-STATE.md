@@ -1,34 +1,33 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-27
-lastSeq: 80
+nextPrompt: K2F-28
+lastSeq: 81
 status: active
 -->
 
-Son güncelleme: 2026-10-03 · LEDGER seq 78 · K2F-00…26 tamam (27/44) + K2F-26 ek turları (seq 78, 79 FIX) + yayın (seq 80 RELEASE), sıradaki K2F-27. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-03 · LEDGER seq 81 · K2F-00…27 tamam (28/44), sıradaki K2F-28. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-26 bitti ve **canlıda** (2026-10-03, kullanıcı isteği; pin `20261003d`, `main` `dc3f3f06`, Pages run 37128484796, canlı 11/11 bayt-eş — [YAYIN.md](../evidence/K2F-26/YAYIN.md)): kaynaksız ve atfı yanlış 20 `surahs.*.contextTr` kaldırıldı (`texts.tr.json` `surahs` + yalnız onlara bağlı `sources["diyanet-meal"]`/`["tdv-sure"]`; araç `surahs` bloğu; modülde `surahs` yok; `kaoReaderContext` ve ölü `.kao-reader-context*` CSS gitti). Okuyucu tanıtım kartı yalnız `QuranRevelationOrderV1`'den (nüzul yeri · âyet sayısı · tema) çizilir; A-5 artık 20/20 sûre tanıtımını gerçek render ile ölçer. `code-reviewer` ek olarak "Hakkında ve kaynaklar" sayfasındaki gizli tüketiciyi yakaladı (`QuranCurriculumV2.surahs` sayısı → "0 sûre bağlamı" yazacaktı); düzeltildi. Kullanıcıya görünür davranış değişmedi (bağlam zaten ölü koddu).
-**Ek tur (seq 78, cihaz bildirimi):** canlıda Arapça sekmesinde "Ders alanı şu an görünmüyor" görüldü; kök neden `settings.kaoVisible===false` (K2F-25/26 değil, headless ölçüldü). Arapça sekmesi KAO'ya tek giriş olduğundan gizliyken artık "Ders kartı gizli · Göster" geri getirme kartı çıkar (`kaoHubCardHTML`, mevcut `kaoToggleVisible`; başka sekmelerde kart gizli kalır). Bağımsız kod incelemesi (seq 79) sonrası geri getirme düğmesinde yanlış `aria-haspopup` kaldırıldı ve geri getirince odak ders girişine verilir. Canlıda (pin `20261003d`). Cihazda hâlâ düğme yoksa çare: uygulama Ayarları → Gizlenen kartlar → "Kur’an Arapçası kartını geri getir".
-
-**Canlıda (2026-10-03, kullanıcı isteğiyle):** K2F-19…26 + ek turlar — `main` `dc3f3f06`, pin `20261003d`, Pages run 37128484796, canlı 11/11 bayt-eş ([YAYIN.md](../evidence/K2F-26/YAYIN.md)). Cihaz doğrulaması kullanıcıda.
+K2F-27 bitti (**yerel, yayınlanmadı**): eski modal başlığı (`kao-header`, sabit h1, X) kalktı. NavBar tek üst çubuk; kökte "Kapat", diğer görünümlerde "‹ önceki"; dialog `aria-labelledby` görünümün LargeTitle h2'sine işaret eder (ders oynatıcıda `aria-label`). Ders oynatıcının görev/özet aşamasında NavBar'a tek "Kapat" eklenir (ders ekranı kendi "Kapat"ını taşır). Escape/Tab sözleşmesi aynı. Bağımsız code-reviewer APPROVE (CRITICAL/HIGH 0). Ayrıntı: [KANIT.md](../evidence/K2F-27/KANIT.md).
+**Canlıda (2026-10-03, kullanıcı isteğiyle):** K2F-19…26 + ek turlar — `main` `dc3f3f06`, pin `20261003d`. K2F-27 canlıda DEĞİL (yayın yalnız kullanıcı "canlıya al" derse). Cihaz doğrulaması kullanıcıda.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-27 (Tek başlık çubuğu):** eski modal başlığını (`kao-header`, kapat X) kaldırıp NavBar'ı tek üst çubuk yap; tüm görünümlerde tek kapatma kontrolü, dialog `aria-labelledby` LargeTitle'a işaret eder, Escape sözleşmesi korunur (`quranLearn.js` `kaoOverlayHTML`, `quranLearnViews.js` `navBar`/`renderScreen`, `app/kao.css`, `test_kao2_navigation/design_contract/a11y.js`; CLAUDE.md "Modal keyboard contract").
+**K2F-28 (Odak modu):** `PROMPTLAR.md` §K2F-28 bölümünü oku (≈satır 873); ders oynatıcı odak modu — Dokun listesi ve testleri orada.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
-- Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + yalnız `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
+- Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
 - Yayın pini (canlı): `20261003d` · `App.kao*` 44 · App yüzeyi 765 · atama 603 · `onclick` 393.
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
-- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 113,209 KiB (tavan 128) · **css 13,613 KiB (tavan 14 — kalan ≈0,39 KiB)** · p95 4,6 ms.
+- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 113,806 KiB (tavan 128) · **css 13,451 KiB (tavan 14 — kalan ≈0,55 KiB)** · p95 4,6 ms.
 - Testler: `test_kao2_lesson_flow.js` 23 · `test_kao2_review_apply.js` 15 · `test_kao2_reader.js` 14 · `test_kao2_hub.js` 10 · `test_kao2_arabic_tab.js` 4 (yeni) · `test_kao2_kabul.js` 10/10 ölçüt.
 - Namaz eşlemesi: 19/32 `lp_*` eşli. Veri kapsamı (524 lemma): 162 unit11 köküne, 113 kognat kaymasına sahip.
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
+- **K2F-27 cihazda gözlenmedi:** `.kao-body` `padding-top:22px` NavBar üstüne ek boşluk bırakabilir, NavBar (`--kao-bg`) ve dialog yüzeyi farklıysa bant görünebilir; görev aşamasında NavBar "Kapat" overlay'i kapatır (`ui.kaoLesson` bellekte kalır; ders ekranının "Kapat"ı kaydedip ana ekrana döner) — eski X ile aynı, ilerlemenin kaydı ayrıca doğrulanmadı.
 - **CSS payı dar (≈0,39 KiB):** K2F-27…29 CSS ekler/çıkarırsa 14 KiB tavanına dayanabilir; K2F-27 eski başlık CSS'ini kaldıracağı için pay büyüyebilir. Bütçeyi aşmak P6 durma koşuludur.
 - **Silinen veri için tarama dersi:** bir alanı kaldırırken yalnız alan adlarını değil, nesnenin genel okumalarını da (`QuranCurriculumV2&&…surahs`, `Object.keys(...)`) tara; K2F-26'da böyle bir gizli tüketici yalnız kod incelemesiyle yakalandı.
 - **"Neden böyle?" kapsamı sınırlı:** kök anlamı yalnız unit11 köklerinde (162/524 lemma); 12 ünitenin ilk dersi gerçek akışla ölçüldü.

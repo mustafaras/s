@@ -33,17 +33,20 @@
   }
   function navBar(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
-    var title=escapeText(options.title),isRoot=options.view==='home'||options.view==='onboard',action=isRoot?'App.kaoClose()':'App.kaoBack()',label=isRoot?'Kapat':'‹ '+escapeText(options.previousTitle||"Kur'an Arapçası");
+    var title=escapeText(options.title),isRoot=options.view==='home'||options.view==='onboard'||options.view==='session',action=isRoot?'App.kaoClose()':'App.kaoBack()',label=isRoot?'Kapat':'‹ '+escapeText(options.previousTitle||"Kur'an Arapçası");
     return '<nav class="kao-navbar" aria-label="'+title+'"><button type="button" class="kao-navbar-action" onclick="'+action+'" aria-label="'+label+'">'+label+'</button><span class="kao-navbar-title" title="'+title+'">'+title+'</span><span class="kao-navbar-spacer" aria-hidden="true"></span></nav>';
   }
   function largeTitle(title,content){
     var heading=content||'';
     if(!/<h2\b/i.test(heading)) heading='<h2 class="kao-largetitle-heading">'+escapeText(title)+'</h2>'+heading;
+    // K2F-27: diyalog adı bu başlıktan gelir; kimliği olmayan başlığa tek kimlik verilir.
+    heading=heading.replace(/<h2\b(?![^>]*\sid=)/,'<h2 id="kao-title"');
     return '<div class="kao-largetitle">'+heading+'</div>';
   }
   function renderScreen(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
-    if(options.view==='session') return options.body;
+    // K2F-27: ders oynatıcının kendi "Kapat" düğmesi yoksa (görev/özet aşaması) tek kapatma kontrolü NavBar'dır.
+    if(options.view==='session') return /class="kao-lesson-exit"/.test(String(options.body||''))?options.body:'<section class="kao-screen kao-screen-session">'+navBar({view:'session',title:'Oturum'})+options.body+'</section>';
     var extracted=extractLargeTitle(String(options.body||''));
     return '<section class="kao-screen kao-screen-'+escapeText(options.view)+'">'+navBar(options)+largeTitle(options.title,extracted.content)+extracted.html+'</section>';
   }

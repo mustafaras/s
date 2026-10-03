@@ -103,4 +103,39 @@ assert.match(html, /id="sey-ov-card"[^>]*role="dialog"[^>]*aria-modal="true"[^>]
 assert.match(html, /onkeydown="App\.onModalKeydown\(event,App\.kaoClose\)"/);
 assert.ok(renderCount >= 5);
 
+// K2F-27 (K2-01): eski modal başlığı yok; NavBar tek üst çubuk, tek kapatma kontrolü, diyalog adı LargeTitle'dan gelir.
+{
+  const kao = require('./helpers/kao-harness');
+  const t = kao.bootKao({ seeded: true });
+  const lemmaId = t.win.QuranLexiconV1.lemmas[0].id;
+  const views = [['home'], ['units'], ['word', lemmaId], ['reader', 112], ['settings'], ['gate'], ['phonics'], ['ayah'], ['prayer'], ['stats'], ['grammar'], ['roots'], ['s0'], ['sources'], ['map']];
+  const closeControls = (html) => (html.match(/class="kao-navbar-action"[^>]*>Kapat</g) || []).length + (html.match(/class="kao-lesson-exit"/g) || []).length + (html.match(/class="kao-close"/g) || []).length;
+  const checkChrome = (name, html) => {
+    assert.doesNotMatch(html, /kao-header|kao-close/, `${name}: eski modal başlığı/X kalmamalı`);
+    assert.equal((html.match(/<nav class="kao-navbar/g) || []).length, 1, `${name}: tek üst çubuk`);
+    const label = /id="sey-ov-card"[^>]*aria-labelledby="([^"]+)"/.exec(html);
+    assert.ok(label, `${name}: diyalog aria-labelledby taşır`);
+    assert.equal((html.match(new RegExp(`id="${label[1]}"`, 'g')) || []).length, 1, `${name}: etiket hedefi tek ve var`);
+    assert.match(html, new RegExp(`<div class="kao-largetitle">[\\s\\S]*?<h2\\b[^>]*id="${label[1]}"`), `${name}: diyalog adı LargeTitle başlığıdır`);
+    assert.doesNotMatch(html, /Günlük öğrenme|Kelimelerini tanı, âyetleri anla/, `${name}: sabit modal başlığı metni yok`);
+  };
+  for (const [view, param] of views) {
+    const opened = kao.openView(t, view, param);
+    assert.equal(opened.ok, true, `${view} açılmalı`);
+    checkChrome(view, opened.html);
+    const isRoot = view === 'home';
+    assert.equal(closeControls(opened.html), isRoot ? 1 : 0, `${view}: kapatma yalnız kökte (NavBar Kapat); diğerlerinde NavBar geri`);
+  }
+  // Ders oynatıcı (session): NavBar yok sayılabilir ama tek kapatma kontrolü şart; diyalog adı boş kalmaz.
+  kao.openView(t, 'units');
+  t.api.kaoLesson('start', 'u01.01');
+  for (let step = 0; step < 3 && t.ui.kaoView === 'session'; step += 1) {
+    const html = t.api.kaoOverlayHTML(t.NOW);
+    assert.doesNotMatch(html, /kao-header|kao-close/, `session/${step}: eski başlık/X yok`);
+    assert.equal(closeControls(html), 1, `session/${step}: tek kapatma kontrolü`);
+    assert.match(html, /id="sey-ov-card"[^>]*aria-label(?:ledby)?="[^"]+"/, `session/${step}: diyalog adı var`);
+    t.api.kaoLesson('next');
+  }
+}
+
 console.log('KAO2 navigation: PASS (yığın geri dönüşü, görünüm başlıkları, kök kapat, Escape sözleşmesi)');

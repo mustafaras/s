@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const root = require('../repo-root');
 const MODE = 'strict';
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
-const removed = ['.kao-hub-spine','.kao-hub-frame','.kao-hub-ornament','.kao-hub-card::before','.kao-hub-card::after','.kao-dialog::before','.kao-dialog-frame','.kao-header::after','.kao-header-mark','.kao-hero-rosette','.kao-summary-mark','.kao-done-mark','.kao-levels'];
+const removed = ['.kao-hub-spine','.kao-hub-frame','.kao-hub-ornament','.kao-hub-card::before','.kao-hub-card::after','.kao-dialog::before','.kao-dialog-frame','.kao-header','.kao-header-copy','.kao-close','.kao-header::after','.kao-header-mark','.kao-hero-rosette','.kao-summary-mark','.kao-done-mark','.kao-levels'];
 function cssMetrics(source) {
   const css = source.replace(/\/\*[\s\S]*?\*\//g, '');
   const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];

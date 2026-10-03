@@ -29,3 +29,11 @@ kaynak/test ✓ · yayın — · cihaz — (odak aktarımı ve ✕ boyutu gözle
 ## Sürprizler / sonraki promptlara not
 - Görev ekranında ilerleme çubuğu ✕ satırının altındadır (aynı satırda değil); spec "ince çubuk" şartını karşılar, yerleşim cihazda gözlenmedi.
 - Odak aktarımı yalnız `paintTask` yolunda (yeni görev); ders aşamaları arası odak değişmedi.
+
+## Ek tur (bağımsız code-reviewer: CRITICAL/HIGH 0, MEDIUM 3, LOW 3)
+- **Kırmızı-önce kanıtlandı:** `2afd6830` kaynağıyla `test_kao2_navigation.js` "ders/0: NavBar/LargeTitle/eski başlık yok" ile kırıldı; mevcut kaynakla PASS (ağaç geri alındı, temiz).
+- **MEDIUM-1 kapandı:** ✕ artık tek eylem `kaoLesson('exit')`; ders dışı oturumda da çalışır, bekleyen `kaoAdvanceTimer`'ı temizler, `kaoPanel`/`kaoUndo`/`kaoFeedback`'i sıfırlar, shadow'u temizler. Yeni handler yok (pinler aynı: 44/765/603).
+- **MEDIUM-2 kapandı (kaynakta):** ✕ sonrası `focusDialog('sey-ov-card')`; "oturum tamam" ekranında `kaoFocusQuestion` h2'ye düşer. Odak davranışı gerçek tarayıcıda gözlenmedi.
+- **MEDIUM-3 kapandı:** view_resolution'da yığın türetme testi session'ı yeniden kapsar; yeni test ✕ sonrası zamanlayıcı/panel temizliğini doğrular; tekrar oturumu ✕ onclick'i `kaoLesson("exit")`.
+- **Bilerek açık (LOW):** `model.progress` ölü alan; ✕ adı bağlama göre sabit "Dersten çık"; geniş ekranda ✕ hizası; `kaoFocusQuestion` için birim testi yok (yalnız kod yolu).
+- Ölçüm: runtime 114,184 KiB · css 13,447 KiB · kapılar YEŞİL · tekrar-üret 10/10.

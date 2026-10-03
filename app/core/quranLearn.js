@@ -1741,7 +1741,7 @@
   }
   // K2F-28: yeni görev çizilince odak soruya gider (✕ ya da eski şıkta kalmaz).
   function kaoFocusQuestion(node){
-    var question=node&&typeof node.querySelector==='function'?node.querySelector('.kao-question'):null;
+    var question=node&&typeof node.querySelector==='function'?(node.querySelector('.kao-question')||node.querySelector('h2')):null;
     if(!question||typeof question.focus!=='function') return false;
     if(typeof question.setAttribute==='function') question.setAttribute('tabindex','-1');
     question.focus(); return true;
@@ -2059,10 +2059,16 @@
     var ui=quranLearnDeps.ui(),q=ensureQuranLearn(quranLearnDeps.data()),state=ui.kaoLesson;
     if(action==='start') return kaoLessonStart(lessonId,startMode);
     if(action==='skip-mastery') return kaoMasterySkip(lessonId);
-    if(!state) return false;
+    // K2F-28: ✕ tek çıkış eylemi — ders de tekrar oturumu da buradan Bugün'e döner; bekleyen geçiş/panel temizlenir.
     if(action==='exit'){
-      kaoLessonResume(ui); kaoSave(); kaoApplyView(ui,'home',null,'reset'); quranLearnDeps.render(); return true;
+      if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
+      ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback='';
+      if(state){ kaoLessonResume(ui); kaoSave(); }
+      kaoShadowCleanup(); kaoApplyView(ui,'home',null,'reset'); quranLearnDeps.render();
+      if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.focusDialog==='function') quranLearnSurfaceDeps.focusDialog('sey-ov-card');
+      return true;
     }
+    if(!state) return false;
     if(action==='next'){
       if(state.phase!=='lesson') return false;
       var current=(state.plan||[])[state.at||0]; if(!current||current.kind==='summary') return false;
@@ -3623,7 +3629,7 @@
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),stack=kaoEnsureStack(ui),flow=kaoFlowApi(),current=flow.current(stack,KAO_HOME_TITLE),previous=flow.previous(stack,KAO_HOME_TITLE);
     var view=current.view,unitDetail=view==='units'&&current.param!==null,onboarding=view==='home'&&kaoOnboardActive(ui),screenView=unitDetail?'unit':(view==='grammar'&&current.param!==null?'concept':view),body=(view==='sources'?kaoSourcesPageHTML():view==='s0'?kaoS0HTML():view==='roots'?kaoRootsHTML():onboarding?kaoOnboardHTML():view==='home'?kaoHomeHTML(nowValue):(view==='units'?(unitDetail?kaoUnitHTML(current.param):kaoPathHTML()):(view==='grammar'?(current.param!==null?kaoConceptHTML(current.param):kaoGrammarHTML()):(view==='word'?kaoWordHTML():(view==='reader'?kaoReaderHTML():(view==='gate'?kaoGateHTML():(view==='settings'?kaoSettingsHTML():(view==='phonics'?kaoPhonicsHTML():(view==='ayah'?kaoAyahHTML():(view==='map'?kaoMapHTML():(view==='prayer'?kaoPrayerHTML():(view==='stats'?kaoStatsHTML(nowValue):'<main class="kao-session">'+kaoLessonHTML()+'</main>'))))))))))));
-    body=kaoViewsApi().renderScreen({exit:ui.kaoLesson?{name:'kaoLesson',args:['exit']}:{name:'kaoSetView',args:['home']},view:onboarding?'onboard':screenView,title:onboarding?KAO_ONBOARD_TITLE:(current.title||kaoViewTitle(screenView,current.param,ui)),previousTitle:previous&&previous.title||KAO_HOME_TITLE,body:body});
+    body=kaoViewsApi().renderScreen({exit:{name:'kaoLesson',args:['exit']},view:onboarding?'onboard':screenView,title:onboarding?KAO_ONBOARD_TITLE:(current.title||kaoViewTitle(screenView,current.param,ui)),previousTitle:previous&&previous.title||KAO_HOME_TITLE,body:body});
     var titleId=/class="kao-largetitle">[\s\S]*?<h2\b[^>]*\sid="([^"]+)"/.exec(body),dialogName=titleId?'aria-labelledby="'+titleId[1]+'"':'aria-label="Kur’an Arapçası · günlük oturum"';
     return '<div id="sey-ov-back" class="kao-overlay" onclick="App.kaoClose()"><div id="sey-ov-card" class="kao-dialog" style="'+kaoReadabilityStyle()+'" role="dialog" aria-modal="true" '+dialogName+' tabindex="-1" onkeydown="App.onModalKeydown(event,App.kaoClose)" onclick="event.stopPropagation()"><div id="sey-ov-body" class="kao-body scroll" style="'+kaoReadabilityStyle()+'">'+body+'</div></div></div>';
   }

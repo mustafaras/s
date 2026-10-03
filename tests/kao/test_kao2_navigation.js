@@ -151,15 +151,15 @@ assert.ok(renderCount >= 5);
     assert.equal(t2.api.kaoLesson('exit'), true);
     assert.equal(t2.ui.kaoView, 'home', 'ders ✕ sonrası Bugün');
   }
-  // Tekrar oturumu (ders dışı): aynı odak çubuğu; ✕ kaoSetView('home') ile Bugün'e döner.
+  // Tekrar oturumu (ders dışı): aynı odak çubuğu; ✕ kaoLesson('exit') ile Bugün'e döner.
   {
     const t3 = kao.bootKao({ seeded: true });
     t3.api.kaoStart(5);
     assert.equal(t3.ui.kaoView, 'session');
     const html = t3.api.kaoOverlayHTML(t3.NOW);
     focusChecks('tekrar', html);
-    assert.match(html, /class="kao-focus-exit" onclick="App\.kaoSetView\(&quot;home&quot;\)"/);
-    assert.equal(t3.api.kaoSetView('home'), true);
+    assert.match(html, /class="kao-focus-exit" onclick="App\.kaoLesson\(&quot;exit&quot;\)"/);
+    assert.equal(t3.api.kaoLesson('exit'), true);
     assert.equal(t3.ui.kaoView, 'home', 'tekrar ✕ sonrası Bugün');
   }
 }

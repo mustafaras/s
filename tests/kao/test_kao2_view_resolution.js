@@ -38,12 +38,25 @@ check(`yığınsız ui.kaoView=v → NavBar başlığı KAO_VIEW_TITLES[v] (${PA
 
 check('yığınsız türetilen yığın [home, görünüm] biçimindedir', () => {
   for (const view of PARAM_FREE) {
-    if (view === 'session') continue; // K2F-28: odak modunda NavBar yok
     t.ui.kaoOpen = true; t.ui.kaoStack = []; t.ui.kaoView = view;
     t.api.kaoOverlayHTML(t.NOW);
     assert.deepEqual(Array.from(t.ui.kaoStack, (e) => e.view), ['home', routeOf(view)], view);
     assert.equal(t.ui.kaoView, routeOf(view), view);
   }
+});
+
+check('K2F-28: session görünümü NavBar yerine odak çubuğuyla çizilir; ✕ zamanlayıcı/paneli temizleyip Bugün\'e döner', () => {
+  t.ui.kaoOpen = true; t.ui.kaoStack = []; t.ui.kaoView = 'session';
+  const html = t.api.kaoOverlayHTML(t.NOW);
+  assert.equal((html.match(/class="kao-focus-exit"/g) || []).length, 1);
+  assert.doesNotMatch(html, /<nav class="kao-navbar/);
+  t.ui.kaoAdvanceTimer = 7; t.ui.kaoPanel = { open: true, taskId: 'x' }; t.ui.kaoUndo = { a: 1 };
+  t.ui.kaoLesson = null;
+  assert.equal(t.api.kaoLesson('exit'), true);
+  assert.equal(t.ui.kaoView, 'home');
+  assert.equal(t.ui.kaoAdvanceTimer, null, 'bekleyen otomatik geçiş temizlenir');
+  assert.equal(t.ui.kaoPanel.open, false, 'geri bildirim paneli kapanır');
+  assert.equal(t.ui.kaoUndo, null);
 });
 
 check('bilinmeyen ui.kaoView ana ekrana düşer (geri uyum)', () => {

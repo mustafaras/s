@@ -344,4 +344,84 @@ check('K2F-24 eşleme dosyası ve L2 listesi: araç çıktısı modülle aynı; 
   assert.ok(!/[\u0600-\u06FF]/.test(JSON.stringify(file)) && !/[\u0600-\u06FF]/.test(review), 'eşleme çıktıları Arapça harf içermez (P9)');
 });
 
+// K2F-25 (K5-05 · D-01): tanış kartı katmanları — doğrulanmış örnek âyet + katlanabilir "Neden böyle?" (kök anlamı, unit11 türevleri, kognat kayması).
+const unit11Roots = new Map(win.QuranGrammarV1.unit11.roots.map((row) => [row.root, row]));
+const expectedWhy = (lemma) => ({ root: unit11Roots.get(lemma.root) || null, shift: lemma.cognate && lemma.cognate.shift ? String(lemma.cognate.shift) : '' });
+function introCards(t, lessonId) {
+  assert.equal(t.api.kaoLesson('start', lessonId), true);
+  const cards = [];
+  for (let guard = 0; guard < 40; guard += 1) {
+    const item = t.ui.kaoLesson.plan[t.ui.kaoLesson.at];
+    if (!item) break;
+    if (item.kind === 'intro') cards.push({ lemmaId: item.lemmaId, html: t.api.kaoOverlayHTML(t.NOW) });
+    if (item.kind === 'concept' || item.kind === 'practice' || item.kind === 'apply' || item.kind === 'summary') break;
+    t.api.kaoLesson('next');
+  }
+  return cards;
+}
+
+check('K2F-25 tanış kartı: her yeni kelimede doğrulanmış ilk örnek âyet (Arapça + okunuş + Türkçe + künye) gösterilir; 12 ünitenin ilk dersi, gerçek akış', () => {
+  let seen = 0;
+  for (const unit of curriculum.units) {
+    const t = bootKao();
+    freshUser(t);
+    for (const card of introCards(t, unit.lessons[0].id)) {
+      const lemma = win.QuranLexiconV1.byId(card.lemmaId);
+      const example = lemma.examples[0];
+      const flat = text(card.html);
+      assert.ok(card.html.includes(example.ar), `${card.lemmaId}: örnek Arapça yok`);
+      assert.ok(flat.includes(example.pronunciation), `${card.lemmaId}: okunuş yok`);
+      assert.ok(flat.includes(example.tr), `${card.lemmaId}: Türkçe yok`);
+      assert.ok(flat.includes(example.ref), `${card.lemmaId}: künye yok`);
+      seen += 1;
+    }
+  }
+  assert.ok(seen >= 24, `az tanış kartı sınandı: ${seen}`);
+});
+
+check('K2F-25 "Neden böyle?": kök anlamı + unit11 türevleri + kognat kayması; katman yalnız içerik varsa ve en çok bir <details>; ≤1 kao-primary', () => {
+  let withLayer = 0, withoutLayer = 0, sawRoot = 0, sawShift = 0;
+  for (const unit of curriculum.units) {
+    const t = bootKao();
+    freshUser(t);
+    for (const card of introCards(t, unit.lessons[0].id)) {
+      const why = expectedWhy(win.QuranLexiconV1.byId(card.lemmaId));
+      const flat = text(card.html);
+      const details = (card.html.match(/<details/g) || []).length;
+      assert.ok(details <= 1, `${card.lemmaId}: ${details} details`);
+      assert.ok((card.html.match(/kao-primary/g) || []).length <= 1, `${card.lemmaId}: birden çok kao-primary`);
+      if (!why.root && !why.shift) { assert.equal(details, 0, `${card.lemmaId}: içeriksiz "Neden böyle?"`); withoutLayer += 1; continue; }
+      assert.equal(details, 1, `${card.lemmaId}: "Neden böyle?" yok`);
+      assert.ok(flat.includes('Neden böyle?'), `${card.lemmaId}: başlık yok`);
+      withLayer += 1;
+      if (why.root) { sawRoot += 1; assert.ok(flat.includes(why.root.meaning), `${card.lemmaId}: kök anlamı yok`); why.root.derivatives.forEach((d) => assert.ok(flat.includes(d.tr), `${card.lemmaId}: türev ${d.tr} yok`)); }
+      if (why.shift) { sawShift += 1; assert.ok(flat.includes(why.shift), `${card.lemmaId}: kayma uyarısı yok`); }
+    }
+  }
+  assert.ok(withLayer > 0 && withoutLayer > 0 && sawRoot > 0 && sawShift > 0, `kapsam: katmanlı ${withLayer} katmansız ${withoutLayer} kök ${sawRoot} kayma ${sawShift}`);
+});
+
+check('K2F-25 doğrulanmamış örnek hiç gösterilmez (verified:false ya da okunuşsuz): kartta örnek bloğu ve künye yok', () => {
+  const firstLesson = curriculum.units[0].lessons[0];
+  const firstId = firstLesson.lemmaIds[0];
+  const reference = win.QuranLexiconV1.byId(firstId).examples[0];
+  // Her varyant taze VM'de: ikinci başlatmada kelime zaten tanışılmış sayılır.
+  const cardWith = (patch) => {
+    const t = bootKao();
+    freshUser(t);
+    const original = t.win.QuranLexiconV1;
+    t.win.QuranLexiconV1 = Object.assign({}, original, { byId: (id) => { const lemma = original.byId(id); return id === firstId ? Object.assign({}, lemma, patch(lemma)) : lemma; } });
+    return introCards(t, firstLesson.id).find((c) => c.lemmaId === firstId);
+  };
+  // Pozitif kontrol: doğrulanmış ve okunuşlu örnek sözlükten karta ulaşır (aşağıdaki "gizli" sonuçları boş yere geçmesin).
+  const control = cardWith((lemma) => ({ examples: [Object.assign({}, lemma.examples[0], { tr: 'KONTROL-CEVIRI' })] }));
+  assert.ok(control && text(control.html).includes('KONTROL-CEVIRI'), 'doğrulanmış örnek sözlükten karta ulaşmadı (kontrol)');
+  for (const patch of [() => ({ verified: false }), (lemma) => ({ examples: [Object.assign({}, lemma.examples[0], { pronunciation: '' })] })]) {
+    const card = cardWith(patch);
+    assert.ok(card, 'tanış kartı üretilmedi');
+    assert.ok(!card.html.includes(reference.ar), 'doğrulanmamış örneğin Arapçası göründü');
+    assert.ok(!text(card.html).includes(reference.tr), 'doğrulanmamış örneğin çevirisi göründü');
+  }
+});
+
 console.log(`KAO2-12 lesson flow: PASS (${passed} kontrol)`);

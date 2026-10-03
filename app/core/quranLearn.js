@@ -518,6 +518,19 @@
   function kaoSettingsOf(){ return quranLearnDeps?objectOr(quranLearnRoot(quranLearnDeps.data()).settings,{}):{}; }
   function kaoTranslitLayer(){ return kaoSettingsOf().translitLayer==='dia'?'dia':'tr'; }
   function kaoAudioStyle(){ return kaoSettingsOf().audioStyle==='flowing'?'flowing':'measured'; }
+  // K2F-25: tanış kartı katmanları. Yalnız içerik modüllerinden gelen doğrulanmış bilgi gösterilir; eksikse katman hiç çizilmez (tahmin yok).
+  function kaoIntroExample(lemma){
+    var source=lemma&&lemma.verified===true&&Array.isArray(lemma.examples)?lemma.examples[0]:null;
+    if(!source||!source.ar||!source.tr||!source.ref||!source.pronunciation) return null;
+    return {ar:String(source.ar),pronunciation:String(source.pronunciation),tr:String(source.tr),ref:String(source.ref)};
+  }
+  function kaoIntroWhy(lemma){
+    var grammar=window.QuranGrammarV1,unit=grammar&&grammar.unit11,roots=unit&&Array.isArray(unit.roots)?unit.roots:[],row=null,why={};
+    for(var i=0;i<roots.length&&lemma&&lemma.root;i+=1){ if(roots[i]&&roots[i].root===lemma.root){ row=roots[i]; break; } }
+    if(row) why.root={ar:String(row.root),reading:String(row.pronunciation||''),meaning:String(row.meaning||''),derivatives:(Array.isArray(row.derivatives)?row.derivatives:[]).map(function(item){ return String(item&&item.tr||''); }).filter(Boolean)};
+    if(lemma&&lemma.cognate&&lemma.cognate.shift) why.shift=String(lemma.cognate.shift);
+    return why.root||why.shift?why:null;
+  }
   function kaoLemmaReading(lemmaId,fallback){
     var lex=window.QuranLexiconV1,lemma=lemmaId&&lex&&typeof lex.byId==='function'?lex.byId(lemmaId):null;
     if(!lemma||!lemma.translit) return String(fallback||'');
@@ -1977,7 +1990,7 @@
     }
     if(item.kind==='intro'){
       var lemma=item.lemma||{}; model.ar=lemma.ar; model.pronunciation=kaoLemmaReading(item.lemmaId,lemma.translit); model.meaning=Array.isArray(lemma.meanings)?lemma.meanings.join(' · '):''; model.ordinal=item.ordinal; model.total=item.total;
-      model.cognate=lemma.cognate&&lemma.cognate.tr?String(lemma.cognate.tr)+(lemma.cognate.shift?' · '+lemma.cognate.shift:''):'';
+      model.cognate=lemma.cognate&&lemma.cognate.tr?String(lemma.cognate.tr):''; model.example=kaoIntroExample(lemma); model.why=kaoIntroWhy(lemma);
       if(safeClipId('w-'+item.lemmaId)) model.audio={action:{name:'kaoPlay',args:['w-'+item.lemmaId,kaoAudioStyle()]}};
       model.anchorTitle=item.applyRef&&item.applyRef.ref?String(item.applyRef.ref==='fatiha'?'Fâtiha içindeki yeri':'Çapa metnindeki yeri'):'';
       model.anchor=item.anchor?[item.anchor]:[];

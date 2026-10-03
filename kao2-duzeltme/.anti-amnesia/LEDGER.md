@@ -737,3 +737,24 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - disclosure: dinî bağlamlı metin onayları yapay zekâ incelemesidir; gerçek L2 uzman onayı yoktur (GATE seq 71 açık).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
 - next: K2F-25
+
+## seq 74 · 2026-10-03 · DECISION · K2F-25
+- decision: D-12 "zaten biliyorsun" kognat turu bu programda ERTELENDİ (kapsam dışı).
+- rationale: ayrı bir öğrenme akışı ve yeni ekran gerektirir; mevcut tanış kartı artık kognatı (`Türkçedeki akrabası`) ve kayma uyarısını "Neden böyle?" katmanında gösterir. K7-01 karar kaydı budur.
+- follow-up: K2F-41'de 04 kararı durumuna "ertelendi (K2F-25, seq 74)" notu eklenir.
+- evidence: kao2-duzeltme/evidence/K2F-25/KANIT.md
+- next: K2F-25
+
+## seq 75 · 2026-10-03 · PROMPT · K2F-25
+- status: done
+- title: Tanış kartı katmanları
+- prev-commit: 4e9b5f7a
+- evidence: kao2-duzeltme/evidence/K2F-25/KANIT.md
+- closes: K5-05 · K7-01
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261003b (pin yükseltme YOK)
+- changed-tests: yok (test_kao2_lesson_flow.js +3 kontrol → 22)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearn.js · quranLearnViews.js · kao.css) · cihaz —
+- surprises: yok (kognat kayması artık "Türkçedeki akrabası" satırından kalktı, "Neden böyle?" içinde)
+- next: K2F-26

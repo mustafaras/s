@@ -221,6 +221,21 @@
   }
 
   // KAO2-12 · Kaynakları motor seçer; bu katman yalnız güvenli metin ve App eylemi çizer.
+  // K2F-25: tanış kartı katmanları — doğrulanmış örnek âyet (uygula adımıyla aynı kart biçimi) ve katlanabilir "Neden böyle?".
+  function introExample(example){
+    if(!example||typeof example!=='object') return '';
+    return '<section class="kao-lesson-anchor kao-lesson-example" aria-label="Örnek âyet"><h4>Örnek âyet</h4><div class="kao-lesson-sentence"><p class="kao-lesson-sentence-ar" lang="ar" dir="rtl">'+escapeText(example.ar)+'</p><p class="kao-lesson-sentence-pron">'+escapeText(example.pronunciation)+'</p><p class="kao-lesson-sentence-tr">'+escapeText(example.tr)+'</p><p class="kao-lesson-sentence-meta">Âyet '+escapeText(example.ref)+'</p></div></section>';
+  }
+  function introWhy(why){
+    if(!why||typeof why!=='object') return '';
+    var root=why.root&&typeof why.root==='object'?why.root:null,body='';
+    if(root){
+      var derivatives=Array.isArray(root.derivatives)?root.derivatives:[];
+      body+='<p>Kök <span lang="ar" dir="rtl">'+escapeText(root.ar)+'</span> ('+escapeText(root.reading)+'): “'+escapeText(root.meaning)+'”</p>'+(derivatives.length?'<p>Aynı kökten Türkçeye geçenler: '+derivatives.map(function(item){ return escapeText(item); }).join(', ')+'</p>':'');
+    }
+    if(why.shift) body+='<p>Dikkat: '+escapeText(why.shift)+'</p>';
+    return body?'<details class="kao-lesson-why"><summary>Neden böyle?</summary>'+body+'</details>':'';
+  }
   function lessonScreen(model){
     if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
@@ -235,7 +250,7 @@
         return '<span class="kao-lesson-anchor-word kao-lesson-anchor-'+state+'" lang="ar" dir="rtl"><b>'+escapeText(word.ar)+'</b><small>'+escapeText(word.tr)+'</small></span>';
       }).join('');
       var audio=model.audio&&typeof model.audio==='object'?model.audio:null,audioCall=audio?actionCall(audio.action):'';
-      body='<section class="kao-lesson-card kao-lesson-intro" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Yeni kelime · '+escapeText(model.ordinal)+' / '+escapeText(model.total)+'</p><p class="kao-lesson-ar" lang="ar" dir="rtl">'+escapeText(model.ar)+'</p><p class="kao-lesson-reading" lang="tr">'+escapeText(model.pronunciation)+'</p>'+(audio?'<button type="button" class="kao-lesson-audio"'+(audioCall?' onclick="'+audioCall+'"':' disabled')+'>'+deps.icon('headphones',17)+' Dinle</button>':'')+'<h3 id="kao-lesson-title">'+escapeText(model.meaning)+'</h3>'+(model.cognate?'<p class="kao-lesson-cognate">Türkçedeki akrabası: '+escapeText(model.cognate)+'</p>':'')+(model.anchorTitle?'<section class="kao-lesson-anchor"><h4>'+escapeText(model.anchorTitle)+'</h4><div class="kao-lesson-anchor-words">'+anchor+'</div></section>':'')+'</section>';
+      body='<section class="kao-lesson-card kao-lesson-intro" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Yeni kelime · '+escapeText(model.ordinal)+' / '+escapeText(model.total)+'</p><p class="kao-lesson-ar" lang="ar" dir="rtl">'+escapeText(model.ar)+'</p><p class="kao-lesson-reading" lang="tr">'+escapeText(model.pronunciation)+'</p>'+(audio?'<button type="button" class="kao-lesson-audio"'+(audioCall?' onclick="'+audioCall+'"':' disabled')+'>'+deps.icon('headphones',17)+' Dinle</button>':'')+'<h3 id="kao-lesson-title">'+escapeText(model.meaning)+'</h3>'+(model.cognate?'<p class="kao-lesson-cognate">Türkçedeki akrabası: '+escapeText(model.cognate)+'</p>':'')+(model.anchorTitle?'<section class="kao-lesson-anchor"><h4>'+escapeText(model.anchorTitle)+'</h4><div class="kao-lesson-anchor-words">'+anchor+'</div></section>':'')+introExample(model.example)+introWhy(model.why)+'</section>';
     }else if(model.stage==='concept'){
       var table=model.table&&typeof model.table==='object'?model.table:{},columns=Array.isArray(table.columns)?table.columns:[],rows=Array.isArray(table.rows)?table.rows:[];
       var head=columns.map(function(column){ return '<th scope="col">'+escapeText(typeof column==='object'?(column.label||column.title||''):column)+'</th>'; }).join('');

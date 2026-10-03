@@ -2062,7 +2062,7 @@
     // K2F-28: ✕ tek çıkış eylemi — ders de tekrar oturumu da buradan Bugün'e döner; bekleyen geçiş/panel temizlenir.
     if(action==='exit'){
       if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
-      ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback='';
+      ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoOrderDraft=[];
       if(state){ kaoLessonResume(ui); kaoSave(); }
       kaoShadowCleanup(); kaoApplyView(ui,'home',null,'reset'); quranLearnDeps.render();
       if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.focusDialog==='function') quranLearnSurfaceDeps.focusDialog('sey-ov-card');
@@ -2089,6 +2089,7 @@
   function kaoStart(extraMinutes){
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),d=quranLearnDeps.data(),now=new Date(),q=ensureQuranLearn(d);
+    ui.kaoLesson=null; // K2F-28: tekrar oturumu ders değildir; eski ders durumu etiketi/✕ çıkışını bozmasın (ders devamı kayıtlı resume'dan gelir)
     var night=kaoNightWindow(d,now);
     ui.kaoQueue=kaoBuildQueue(d,now,{sessionId:quranLearnDeps.todayStr(),candidates:kaoCandidates()});
     // R-A1: hedef yatıştan önceki 90 dk'da oturum yalnız tekrar kartlarından, en çok 8 kart.

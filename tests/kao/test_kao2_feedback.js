@@ -34,6 +34,7 @@ const ui = { kaoQueue: [], kaoTasks: {}, kaoTaskIndex: 0, kaoTaskStartedAt: 0, k
 let focusedContinue = 0;
 let focusedQuestion = 0;
 let questionNode = null;
+let headingNode = null;
 const taskNode = {
   innerHTML: '', attrs: {},
   setAttribute(name, value) { this.attrs[name] = value; },
@@ -41,6 +42,7 @@ const taskNode = {
   querySelector(selector) {
     if (selector === '.kao-feedback-continue') return { focus() { focusedContinue += 1; } };
     if (selector === '.kao-question' && questionNode) return questionNode;
+    if (selector === 'h2' && headingNode) return headingNode;
     return null;
   }
 };
@@ -181,6 +183,15 @@ assert.equal(normalized.settings.autoAdvance, false, 'autoAdvance bozuk/eski ver
   api.kaoUndo();
   assert.equal(focusedQuestion, 1, 'aynı görevin yeniden çizimi odağı almamalı');
   questionNode = null;
+  // "Oturum tamam" ekranında soru yoktur; odak başlığa (h2) düşer.
+  const headingAttrs = {};
+  headingNode = { setAttribute(n, v) { headingAttrs[n] = v; }, focus() { focusedQuestion += 1; } };
+  const second = wordTask('focus-2', 'w:focus:2');
+  show(second); ui.kaoPaintedId = undefined;
+  api.kaoAnswer(second.id, 'wrong');
+  assert.equal(focusedQuestion, 2, 'soru yoksa odak başlığa düşmeli');
+  assert.equal(headingAttrs.tabindex, '-1');
+  headingNode = null;
 }
 
 console.log('KAO2-06 feedback PASS');

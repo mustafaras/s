@@ -151,6 +151,22 @@ assert.ok(renderCount >= 5);
     assert.equal(t2.api.kaoLesson('exit'), true);
     assert.equal(t2.ui.kaoView, 'home', 'ders ✕ sonrası Bugün');
   }
+  // Ders ✕'inden sonra açılan tekrar oturumu eski ders durumunu taşımaz: etiket "Oturumdan çık", ✕ ders kaydına dokunmaz.
+  {
+    const t4 = kao.bootKao({ seeded: true });
+    t4.api.kaoLesson('start', 'u01.01');
+    t4.api.kaoLesson('next');
+    t4.api.kaoLesson('exit');
+    assert.ok(t4.ui.kaoLesson, 'ders ✕ sonrası bellekteki ders durumu devam için korunur');
+    t4.api.kaoStart(5);
+    assert.equal(t4.ui.kaoLesson, null, 'tekrar oturumu başlayınca eski ders durumu temizlenir');
+    const html = t4.api.kaoOverlayHTML(t4.NOW);
+    focusChecks('ders→tekrar', html, 'Oturumdan çık');
+    const before = JSON.stringify((t4.data.quranLearn && t4.data.quranLearn.lessons) || {});
+    t4.api.kaoLesson('exit');
+    assert.equal(JSON.stringify((t4.data.quranLearn && t4.data.quranLearn.lessons) || {}), before, 'tekrar ✕ ders kaydını değiştirmez');
+    assert.equal(t4.ui.kaoView, 'home');
+  }
   // Tekrar oturumu (ders dışı): aynı odak çubuğu; ✕ kaoLesson('exit') ile Bugün'e döner.
   {
     const t3 = kao.bootKao({ seeded: true });

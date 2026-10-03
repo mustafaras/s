@@ -44,3 +44,8 @@ kaynak/test ✓ · yayın — · cihaz — (odak aktarımı ve ✕ boyutu gözle
 - `.kao-focusbar` içerikle aynı `max-width:460px; margin:0 auto` (geniş ekran hizası; cihazda gözlenmedi).
 - `kaoFocusQuestion` testi `test_kao2_feedback.js`'te: yeni görevde odak + `tabindex=-1`, yeniden çizimde odak yok; mutasyonla (çağrı silinince) kırıldığı doğrulandı.
 - Ölçüm: runtime 114,220 KiB · css 13,452 KiB · kapılar YEŞİL · tekrar-üret 10/10.
+
+## Ek tur 3 — ikinci bağımsız inceleme (CRITICAL/HIGH 0, MEDIUM 1, LOW 2) kapandı
+- **MEDIUM (gerileme):** ders ✕'inden sonra `kaoStart` eski `ui.kaoLesson`'u taşıyordu → tekrar oturumu "Dersten çık" adı alıyor ve ✕ eski dersin resume kaydını yeniden yazabiliyordu. `kaoStart` artık `ui.kaoLesson=null` yapar (devam bilgisi kayıtlı resume'dan gelir; `more` yolu zaten böyleydi). Test: ders→✕→tekrar senaryosu (etiket "Oturumdan çık", ders kaydı değişmez); mutasyonla (satır silinince) kırıldığı doğrulandı.
+- **LOW:** ✕ çıkışı `kaoOrderDraft`'ı da sıfırlar. `kaoFocusQuestion` h2 yedeği test edildi.
+- Ölçüm: runtime 114,274 KiB · css 13,452 KiB · kapılar YEŞİL · tekrar-üret 10/10.

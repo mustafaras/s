@@ -758,3 +758,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearn.js · quranLearnViews.js · kao.css) · cihaz —
 - surprises: yok (kognat kayması artık "Türkçedeki akrabası" satırından kalktı, "Neden böyle?" içinde)
 - next: K2F-26
+
+## seq 76 · 2026-10-03 · RELEASE · K2F-25
+- status: done
+- title: K2F-25 canlıya alındı (kullanıcı isteği), pin 20261003c
+- prev-commit: 6d1b5919
+- evidence: kao2-duzeltme/evidence/K2F-25/YAYIN.md
+- decision: kullanıcı "canlıya al ve sıradakine geç" dedi; `main` ff-only `9adac908..8cde3903`, force yok; Pages run 37117992353 success; canlı 10/10 bayt-eşit; gizlilik 404 ✓.
+- disclosure: dinî bağlamlı metin onayları yapay zekâ incelemesidir; gerçek L2 uzman onayı yoktur (GATE seq 71 açık).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
+- next: K2F-26

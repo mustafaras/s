@@ -2,25 +2,25 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-26
-lastSeq: 75
+lastSeq: 76
 status: active
 -->
 
-Son güncelleme: 2026-10-03 · LEDGER seq 75 · K2F-00…25 tamam (26/44), sıradaki K2F-26. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-03 · LEDGER seq 76 · K2F-00…25 tamam (26/44) + yayın (seq 76 RELEASE), sıradaki K2F-26. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-25 bitti (yalnız kaynak/test; **yayında DEĞİL**, pin yükseltilmedi): tanış kartı artık (1) doğrulanmış ilk örnek âyeti (Arapça + okunuş + Türkçe + âyet künyesi; uygula adımındaki kart biçimiyle) ve (2) katlanabilir "Neden böyle?" katmanını (kök okunuşu + anlamı + Türkçe türevler `QuranGrammarV1.unit11`'den; `cognate.shift` uyarısı) gösterir. Doğrulanmamış (`verified!==true` ya da okunuşsuz) örnek hiç gösterilmez; katman içeriği yoksa hiç çizilmez; ≤1 `<details>`, ≤1 `.kao-primary`. Kognat kayması "Türkçedeki akrabası" satırından kalkıp katmana taşındı. D-12 "zaten biliyorsun" kognat turu bu programda **ertelendi** (LEDGER seq 74 DECISION; K2F-41'de 04 kararı durumuna not eklenecek).
+K2F-25 bitti ve **canlıda** (2026-10-03, kullanıcı isteği; pin `20261003c`, `main` `8cde3903`, Pages run 37117992353, canlı 10/10 bayt-eş — [YAYIN.md](../evidence/K2F-25/YAYIN.md)): tanış kartı artık (1) doğrulanmış ilk örnek âyeti (Arapça + okunuş + Türkçe + âyet künyesi; uygula adımındaki kart biçimiyle) ve (2) katlanabilir "Neden böyle?" katmanını (kök okunuşu + anlamı + Türkçe türevler `QuranGrammarV1.unit11`'den; `cognate.shift` uyarısı) gösterir. Doğrulanmamış (`verified!==true` ya da okunuşsuz) örnek hiç gösterilmez; katman içeriği yoksa hiç çizilmez; ≤1 `<details>`, ≤1 `.kao-primary`. Kognat kayması "Türkçedeki akrabası" satırından kalkıp katmana taşındı. D-12 "zaten biliyorsun" kognat turu bu programda **ertelendi** (LEDGER seq 74 DECISION; K2F-41'de 04 kararı durumuna not eklenecek).
 
-Önceki durum: K2F-24 (namaz eşlemesi 19/32, Ünite 2 çapası) ve ek turları (araç inceleme-kutusu koruması, L2 paketi aracı, kod incelemesi bulguları) **canlıda** (2026-10-03, kullanıcı isteği; `main` `9adac908`, pin `20261003b`, Pages run 37116493085, canlı 10/10 bayt-eş — [YAYIN.md](../evidence/K2F-24/YAYIN.md)). Cihaz doğrulaması kullanıcıda.
+Önceki yayın: K2F-24 (namaz eşlemesi 19/32, Ünite 2 çapası) ve ek turları (araç inceleme-kutusu koruması, L2 paketi aracı, kod incelemesi bulguları) **canlıda** (2026-10-03, kullanıcı isteği; `main` `9adac908`, pin `20261003b`, Pages run 37116493085, canlı 10/10 bayt-eş — [YAYIN.md](../evidence/K2F-24/YAYIN.md)). Cihaz doğrulaması kullanıcıda.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
 **K2F-26 (Sûre bağlamı kaldırma):** `texts.tr.json` `surahs.*.contextTr` (20 kaynaksız/yanlış atıflı metin) ve yanlış `review.sources` kaldırılır; okuyucu tanıtım kartı yalnız `QuranRevelationOrderV1`'den çizer (tools/kao2-curriculum-build.mjs surahs işleyişi, `quranCurriculumV2.js`, `quranLearn.js` bağlam okuma, `test_kao2_reader.js`, `test_kao2_kabul.js` A-5: 20/20 sûre tanıtımı tema+yer+âyet sayısı).
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
-- Dal: `kao2-duzeltme` = canlı `main` (`9adac908`) + belge commit'leri + K2F-25 (yayınlanmamış: `quranLearn.js`, `quranLearnViews.js`, `kao.css`). Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
-- Yayın pini (canlı): `20261003b` · `App.kao*` 44 · App yüzeyi 765 · atama 603 · `onclick` 393.
-- Kapılar (K2F-25 sonu): KAO 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
+- Dal: `kao2-duzeltme` = canlı `main` (`8cde3903`) + yalnız `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
+- Yayın pini (canlı): `20261003c` · `App.kao*` 44 · App yüzeyi 765 · atama 603 · `onclick` 393.
+- Kapılar (K2F-25 yayını sonrası): KAO 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
 - Bütçe (perf): içerik 185,235 KiB (tavan 256) · runtime 113,511 KiB (tavan 128) · **css 13,639 KiB (tavan 14 — kalan ≈0,37 KiB)** · müfredat modülü gzip 21,9 KB (tavan 48 KiB) · p95 4,3 ms.
 - Testler: `test_kao2_lesson_flow.js` 22 kontrol · `test_kao2_review_apply.js` 15 kontrol.
@@ -48,4 +48,3 @@ K2F-25 bitti (yalnız kaynak/test; **yayında DEĞİL**, pin yükseltilmedi): ta
 ## Bekleyen kullanıcı işleri
 - Cihaz doğrulaması (telefonda canlı site) kullanıcıdadır ve ayrıca bildirilecektir. Kalan kapı: K2F-43 YAYIN-2.
 - **L2 (GATE seq 71, waiting):** gerçek alan uzmanı onayı yoktur ve Claude veremez. `L2-PAKET.md` tek oturumda işaretlenecek madde listesidir. Uygunsa ilgili sayfada L2 kutusu `[x]` yapılıp **"L2 işaretlendi"** yazılır; kapı sonraki promptları engellemez.
-- K2F-25 yayında değil: istersen "canlıya alalım" de (pin `20261003b` → yeni pin).

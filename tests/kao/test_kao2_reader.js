@@ -55,13 +55,39 @@ check('(a) okuyucu başında sûre tanıtım kartı: ad, nüzul yeri, âyet say�
   assert.ok(meta === undefined || true);
 });
 
-check('(a) contextTr yalnız sourced/expert iken görünür', () => {
+// K2F-26 (M-02 · M-03): kaynaksız/yanlış atıflı 20 `contextTr` kaldırıldı; tanıtım kartı yalnız QuranRevelationOrderV1'den çizilir.
+check('(a) K2F-26: sûre bağlamı kaldırıldı — motorda okuyucu, müfredat modülünde `surahs`, metin kaynağında `surahs` ve yanlış atıflar yok', () => {
   const t = boot();
-  assert.equal(typeof t.api.kaoReaderContext, 'function', 'motorda bağlam okuyucusu var');
-  const draft = t.api.kaoReaderContext(95);
-  if (draft) assert.notEqual(draft.level, 'draft', 'draft bağlam döndürülmez');
-  const html = readerHtml(t);
-  if (!draft) assert.doesNotMatch(html, /kao-reader-context/, 'kaynaksız bağlam gizli');
+  assert.equal(t.api.kaoReaderContext, undefined, 'bağlam okuyucusu motordan kalkmalı');
+  assert.equal(t.box.window.QuranCurriculumV2.surahs, undefined, 'müfredat modülünde surahs kalmamalı');
+  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8'));
+  assert.equal(texts.surahs, undefined, 'texts.tr.json surahs kalmamalı');
+  assert.deepEqual(Object.keys(texts.sources).filter((key) => key === 'diyanet-meal' || key === 'tdv-sure'), [], 'yanlış atıf kalmamalı');
+  const css = fs.readFileSync(path.join(repoRoot, 'app/kao.css'), 'utf8');
+  assert.doesNotMatch(css, /kao-reader-context/, 'ölü bağlam stili kalmamalı');
+});
+
+check('(a) K2F-26: "Hakkında ve kaynaklar" sayfası silinen sûre bağlamını saymaz (eskiden "0 sûre bağlamı" yazardı)', () => {
+  const t = boot();
+  const html = decode(t.api.kaoSourcesPageHTML());
+  assert.match(html, /KAO2 · metin katmanı/, 'sürüm satırı korunur');
+  assert.doesNotMatch(html, /sûre bağlamı/, 'silinen özelliğe atıf kalmamalı');
+  assert.doesNotMatch(html, /\b0 sûre/, 'anlamsız sıfır sayacı kalmamalı');
+});
+
+check('(a) K2F-26: 20 kısa sûrenin 20\'sinde tanıtım kartı nüzul yeri + âyet sayısı + tema gösterir; bağlam satırı yoktur', () => {
+  const t = boot();
+  assert.equal(t.surahs.surahs.length, 20);
+  for (const surah of t.surahs.surahs) {
+    t.api.kaoOpenSurah(surah.id);
+    const html = decode(t.api.kaoReaderHTML());
+    const meta = t.rev.byMushafOrder(surah.id);
+    assert.ok(meta && meta.themeTr && meta.ayahCount && meta.revelationPlace, `${surah.id}: nüzul verisi eksik`);
+    assert.ok(html.includes(meta.revelationPlace === 'Mekke' ? 'Mekke’de indi' : 'Medine’de indi'), `${surah.id}: nüzul yeri yok`);
+    assert.ok(html.includes(`${meta.ayahCount} âyet`), `${surah.id}: âyet sayısı yok`);
+    assert.ok(html.includes(meta.themeTr), `${surah.id}: tema yok`);
+    assert.doesNotMatch(html, /kao-reader-context/, `${surah.id}: bağlam satırı çizildi`);
+  }
 });
 
 // ---- (b) WordChip: kenarlıksız, altı noktalı, anlam alt panelde --------------

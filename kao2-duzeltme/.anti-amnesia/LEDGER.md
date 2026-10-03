@@ -768,3 +768,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - disclosure: dinî bağlamlı metin onayları yapay zekâ incelemesidir; gerçek L2 uzman onayı yoktur (GATE seq 71 açık).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
 - next: K2F-26
+
+## seq 77 · 2026-10-03 · PROMPT · K2F-26
+- status: done
+- title: Sûre bağlamı kaldırma
+- prev-commit: d471fc53
+- evidence: kao2-duzeltme/evidence/K2F-26/KANIT.md
+- closes: M-02 (veri) · M-03
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261003c (pin yükseltme YOK)
+- changed-tests: test_kao2_reader.js ((a) bağlam kontrolü gerekçeli değişti, +2 yeni) · test_kao2_kabul.js (A-5 hedefi: render ile 20/20 sûre tanıtımı)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranCurriculumV2.js · quranLearn.js · kao.css) · cihaz —
+- surprises: bağlam özelliği zaten ölü koddu (`curriculum.texts` yok); "Hakkında" sayfasındaki gizli tüketici code-reviewer ile yakalandı ve kapatıldı; bütçe küçüldü (içerik 183,5 · runtime 113,2 · css 13,61 KiB)
+- next: K2F-27

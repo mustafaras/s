@@ -142,17 +142,18 @@ const measure = (id, label, target, value, pass) => {
   const grammar = t.box.window.QuranGrammarV1;
   const conceptIds = (Array.isArray(grammar.concepts) ? grammar.concepts : Object.keys(grammar.concepts || {})).map((c) => (typeof c === 'string' ? c : c.id));
   const bound = conceptIds.filter((id) => cur.units.some((u) => (u.conceptIds || []).includes(id)));
-  // 20 kısa sûrenin bağlam metni (sourced düzeyi yayınlanabilir).
-  const surahTexts = cur.surahs || {};
-  const surahIds = Object.keys(surahTexts);
-  const published = surahIds.filter((id) => {
-    const entry = surahTexts[id];
-    const level = entry && entry.review && entry.review.level;
-    return typeof entry.contextTr === 'string' && entry.contextTr && (level === 'sourced' || level === 'expert');
+  // K2F-26 (M-02): 20 kısa sûrenin tanıtımı GERÇEK render ile ölçülür — nüzul yeri + âyet sayısı + tema (QuranRevelationOrderV1).
+  const order = t.box.window.QuranRevelationOrderV1;
+  const shorts = t.box.window.QuranShortSurahsV1.surahs;
+  const withIntro = shorts.filter((surah) => {
+    const meta = order.byMushafOrder(surah.id);
+    t.api.kaoOpenSurah(surah.id);
+    const html = t.api.kaoReaderHTML().replace(/&#39;/g, "'");
+    return meta && html.includes(meta.revelationPlace === 'Mekke' ? 'Mekke’de indi' : 'Medine’de indi') && html.includes(`${meta.ayahCount} âyet`) && html.includes(meta.themeTr) && !html.includes('kao-reader-context');
   });
-  measure('A-5', 'Müfredat bütünlüğü (lemma/kavram/sûre bağlamı)', '524/25/20',
-    `${lemmas}/524 lemma · ${bound.length}/${conceptIds.length} kavram bağlı · ${surahIds.length}/20 sûre bağlamı hazır (${published.length} yayında — L1 onayı bekliyor)`,
-    lemmas === 524 && conceptIds.length === 25 && bound.length === 25 && surahIds.length === 20);
+  measure('A-5', 'Müfredat bütünlüğü (lemma/kavram/sûre tanıtımı)', '524/25/20',
+    `${lemmas}/524 lemma · ${bound.length}/${conceptIds.length} kavram bağlı · ${withIntro.length}/20 sûre tanıtımı (tema + yer + âyet sayısı, render ile)`,
+    lemmas === 524 && conceptIds.length === 25 && bound.length === 25 && shorts.length === 20 && withIntro.length === 20);
 }
 
 // ---- A-6: eski veri güvenliği -----------------------------------------

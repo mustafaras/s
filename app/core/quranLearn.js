@@ -2329,7 +2329,7 @@
     var h='<main class="kao-sources-page" aria-labelledby="kao-sources-page-title"><div class="kao-view-head"><button type="button" class="kao-back" onclick="App.kaoSetView(\'settings\')">‹ Ayarlar</button><span>Hakkında</span></div>'
       +'<section class="kao-about"><h3 id="kao-sources-page-title">Hakkında ve kaynaklar</h3>'
       +'<p class="kao-setting-hint">Kur’an Arapçası öğrenme modülü. Öğrenme verilerin <strong>yalnız bu cihazda</strong> ve kendi veri deposunda tutulur; kaynak listesi ağa bağlanmaz.</p>'
-      +'<dl class="kao-about-list"><dt>Sürüm</dt><dd>KAO2 · metin katmanı '+String(Object.keys(window.QuranCurriculumV2&&window.QuranCurriculumV2.surahs||{}).length)+' sûre bağlamı</dd>'
+      +'<dl class="kao-about-list"><dt>Sürüm</dt><dd>KAO2 · metin katmanı</dd>'
       +'<dt>Çalışma biçimi</dt><dd>Çevrimdışı çalışır; ses klipleri cihazda önbelleğe alınır.</dd>'
       +'<dt>Gizlilik</dt><dd>Mikrofon yalnız gölgeleme açıkken ve en çok 10 sn; kayıt cihazdan çıkmaz.</dd></dl></section>'
       +'<section class="kao-about-group"><h3>Gelişmiş</h3><div class="kao-setting-row"><button type="button" class="kao-secondary" onclick="App.kaoReopenGate()">Seviye 0 kontrolünü yeniden aç</button><button type="button" class="kao-secondary" onclick="App.kaoExportCsv()">Kelimelerimi indir (CSV)</button></div>'
@@ -2980,17 +2980,6 @@
     if(learned) return true;
     return !(explicit&&explicit.status==='unknown')&&learned;
   }
-  // KAO2-19 · S-09 okuyucu v2. Bağlam yalnız K-4'e göre sourced/expert ise görünür;
-  // kaynaksız bağlam gizli kalır ve hiç yazılmaz (draft metin uygulamaya sızmaz).
-  function kaoReaderContext(surahId){
-    var curriculum=window.QuranCurriculumV2,surahs=curriculum&&curriculum.texts&&curriculum.texts.surahs;
-    if(!surahs) return null;
-    var entry=surahs[String(surahId)];
-    if(!entry||typeof entry.contextTr!=='string'||!entry.contextTr) return null;
-    var review=entry.review||{},level=review.level;
-    if(level!=='sourced'&&level!=='expert') return null;
-    return {text:entry.contextTr,level:level,sources:Array.isArray(review.sources)?review.sources.slice():[]};
-  }
   // T-21: seçili sûrenin kaydırma hedefi MOTORDA belirlenir; render yalnız işareti taşır.
   function kaoReaderScrollTarget(){
     if(!quranLearnDeps) return null;
@@ -3136,18 +3125,17 @@
     var esc=quranLearnDeps.esc,words=surahWords(sid),record=objectOr(q.surahs[String(sid)],{}),marks=Object.create(null);
     var playing=typeof ui.kaoReaderPlaying==='number'?ui.kaoReaderPlaying:-1,openIndex=typeof ui.kaoReaderWord==='number'?ui.kaoReaderWord:-1;
     (window.QuranShortSurahsV1.waqfMarks||[]).forEach(function(mark){ marks[mark.afterWordId]=mark.mark; });
-    // (a) Sûre tanıtımı: K-4 kaynaklı bağlam + donmuş nüzul/âyet/tema verisi.
+    // (a) Sûre tanıtımı: yalnız donmuş nüzul/âyet/tema verisi (QuranRevelationOrderV1); K2F-26: kaynaksız bağlam metni yok.
     var order=window.QuranRevelationOrderV1,meta=order&&typeof order.byMushafOrder==='function'?order.byMushafOrder(sid):null;
-    var context=kaoReaderContext(sid),theme=meta&&typeof meta.themeTr==='string'?meta.themeTr:'';
+    var theme=meta&&typeof meta.themeTr==='string'?meta.themeTr:'';
     var intro='';
-    if(meta||context||theme){
+    if(meta||theme){
       var facts=[];
       if(meta&&meta.revelationPlace) facts.push(esc(meta.revelationPlace===String('Mekke')?'Mekke’de indi':'Medine’de indi'));
       if(meta&&meta.ayahCount) facts.push(String(meta.ayahCount)+' âyet');
       facts.push(String(words.length)+' kelime');
       intro='<details class="kao-reader-surah"><summary><span class="kao-reader-surah-name">'+esc(surah.name)+'</span><span class="kao-reader-surah-facts">'+facts.join(' · ')+'</span></summary>'
         +(theme?'<p class="kao-reader-theme">'+esc(theme)+'</p>':'')
-        +(context?'<p class="kao-reader-context">'+esc(context.text)+'</p><p class="kao-reader-context-source">Kaynak: '+esc(context.sources.join(', '))+'</p>':'')
         +'</details>';
     }
     var target=kaoReaderScrollTarget(),check=kaoSurahCheck();
@@ -3920,7 +3908,6 @@
     kaoMarkUnderstood:kaoMarkUnderstood,
     kaoReaderHTML:kaoReaderHTML,
     kaoReader:kaoReader,
-    kaoReaderContext:kaoReaderContext,
     kaoReaderScrollTarget:kaoReaderScrollTarget,
     kaoSurahCheck:kaoSurahCheck,
     kaoHubCardHTML:kaoHubCardHTML,

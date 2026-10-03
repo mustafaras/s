@@ -424,4 +424,21 @@ check('K2F-25 doğrulanmamış örnek hiç gösterilmez (verified:false ya da ok
   }
 });
 
+// K2F-26 ek tur: geri getirme kartı kalkıp yerini ders girişi alırken klavye/ekran okuyucu odağı kaybolmaz.
+check('K2F-26 ek tur: Arapça sekmesinde kartı geri getirince odak yeni ders girişine (kao-hub-entry) verilir; başka sekmede odak çağrısı yok', () => {
+  const t = bootKao();
+  freshUser(t);
+  t.data.quranLearn.settings.kaoVisible = false;
+  t.ui.faithTab = 'arapca';
+  assert.match(t.api.kaoHubCardHTML(), /id="kao-hub-restore"/);
+  assert.equal(t.api.kaoToggleVisible(), true);
+  assert.deepEqual(t.calls.restore, ['kao-hub-entry'], 'odak ders girişine dönmedi');
+  assert.match(t.api.kaoHubCardHTML(), /id="kao-hub-entry"/);
+  const other = bootKao();
+  freshUser(other);
+  other.ui.faithTab = 'oz';
+  other.api.kaoToggleVisible();
+  assert.deepEqual(other.calls.restore, [], 'Arapça dışında odak çağrısı olmamalı');
+});
+
 console.log(`KAO2-12 lesson flow: PASS (${passed} kontrol)`);

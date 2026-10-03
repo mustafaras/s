@@ -167,11 +167,13 @@ check('kaoVisible=false iken yalnız Arapça sekmesinde geri getirme kartı çı
   assert.deepEqual(onclicks(html), ['onclick="App.kaoToggleVisible()"'], 'tek ve mevcut handler');
   assert.ok(!html.includes('kao-hub-entry'), 'gizliyken ders girişi çizilmez');
   assert.ok(text(html).includes('gizli') && text(html).includes('Göster'), 'metin durumu ve eylemi söylemeli');
+  assert.ok(!html.includes('aria-haspopup'), 'geri getirme düğmesi dialog açmaz; aria-haspopup yanlış duyurur');
   assert.equal(api.kaoToggleVisible(), true);
   assert.equal(state.data.quranLearn.settings.kaoVisible, true);
   const back = api.kaoHubCardHTML();
   assert.match(back, /id="kao-hub-entry"/, 'geri getirince ders girişi dönmeli');
   assert.ok(!back.includes('kao-hub-restore'));
+  assert.match(back, /aria-haspopup="dialog"/, 'ders girişi dialog açar');
 });
 
 check('motor ya da müfredat yüklenmemişse kart yine çizilir (ana sekme kırılmaz)', () => {

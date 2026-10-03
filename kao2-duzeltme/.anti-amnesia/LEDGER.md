@@ -793,3 +793,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - limit: kullanıcının tarayıcı verisi okunmadı; `kaoVisible=false` çıkarımı kodla ulaşılabilen tek boş-dönüş yolu olduğu için güçlü ama kullanıcı doğrulaması bekliyor. Yayınlanana dek canlıda etkisiz. Hemen çare: uygulama Ayarları → Gizlenen kartlar → "Kur'an Arapçası kartını geri getir".
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - next: K2F-27
+
+## seq 79 · 2026-10-03 · FIX · K2F-26
+- request: kullanıcı "tam ve kusursuz uygulandığından emin ol" (hub geri getirme düzeltmesi için).
+- prev-commit: 56d511ef
+- evidence: kao2-duzeltme/evidence/K2F-26/KANIT.md (Ek tur 2)
+- done: bağımsız `code-reviewer` incelemesi yapıldı (CRITICAL/HIGH 0). MEDIUM a11y ×2 kapatıldı: geri getirme düğmesinde yanlış `aria-haspopup` kaldırıldı; geri getirince odak `kao-hub-entry`'ye verilir (kırmızı → yeşil: hub 10 kontrol, lesson_flow 23). LOW: gizli dalda `hubCard` koruması geri eklendi. Gerçek önyükleme provası temiz.
+- scope: yalnız app/core/quranLearn.js, tests/kao/test_kao2_hub.js, tests/kao/test_kao2_lesson_flow.js (+ kayıtlar). Yeni handler/pin yok.
+- limit: odak davranışı gerçek tarayıcıda gözlenmedi; düzeltme yayınlanmadı; kullanıcının cihaz verisi okunmadı.
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- next: K2F-27

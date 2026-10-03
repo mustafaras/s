@@ -2586,7 +2586,12 @@
     quranLearnDeps.render(); return true;
   }
   // KAO-21: İlham & İbadet hub kartının görünürlüğü; gizliyken uygulama Ayarları'ndaki "Gizlenen kartlar" geri getirir.
-  function kaoToggleVisible(){ return kaoCommitSetting(function(q){ q.settings.kaoVisible=q.settings.kaoVisible===false; }); }
+  function kaoToggleVisible(){
+    var wasHidden=false,done=kaoCommitSetting(function(q){ wasHidden=q.settings.kaoVisible===false; q.settings.kaoVisible=wasHidden; });
+    // Arapça sekmesinde geri getirme kartı ders girişiyle yer değiştirir: klavye/ekran okuyucu odağı kaybolmasın.
+    if(done&&wasHidden&&quranLearnSurfaceDeps&&quranLearnDeps.ui().faithTab==='arapca') quranLearnSurfaceDeps.restoreFocus('kao-hub-entry');
+    return done;
+  }
   function kaoToggleShadowing(){ var result=kaoCommitSetting(function(q){ q.settings.shadowing=q.settings.shadowing!==true; }); if(!kaoShadowEnabled()) kaoShadowCleanup(); return result; }
   // 10 §9: gölgeleme öz-değerlendirmesi yalnız sayı olarak tutulur ("Yakın" oranı raporlanır, puanlanmaz); kayıt asla kalıcı değil.
   function kaoShadowVerdict(verdict){ var ph=phonicsRoot(ensureQuranLearn(quranLearnDeps.data())),self=Object.assign({near:0,n:0},objectOr(ph.self,{})); self.n+=1; if(verdict==='near') self.near+=1; ph.self=self; kaoSave(); }
@@ -3494,13 +3499,13 @@
     var views=kaoViewsApi(),model,label,inner,id,call;
     if(hidden){
       id='kao-hub-restore'; call='App.kaoToggleVisible()'; label='Kur’an Arapçası ders kartı gizli; yeniden göstermek için dokun';
-      inner=views.hubCard({title:'Ders kartı gizli',subtitle:'Gizlemiştin; dokunursan ders alanı yeniden görünür.',action:'Göster'});
+      inner=typeof views.hubCard==='function'?views.hubCard({title:'Ders kartı gizli',subtitle:'Gizlemiştin; dokunursan ders alanı yeniden görünür.',action:'Göster'}):'<span class="kao-hub-title">Ders kartı gizli · Göster</span>';
     }else{
       model=kaoHubModel(d,new Date()); id='kao-hub-entry'; call='App.kaoOpen()';
       label='Kur’an Arapçası Öğreniyorum; '+model.subtitle+(model.ring?'; '+model.ring.label+' %'+model.ring.value:'')+'; '+model.action;
       inner=typeof views.hubCard==='function'?views.hubCard(model):'<span class="kao-hub-title">'+quranLearnDeps.esc(model.title)+'</span>';
     }
-    return '<button type="button" id="'+id+'" class="kao-hub-card" onclick="'+call+'" aria-haspopup="dialog" aria-label="'+quranLearnDeps.esc(label)+'">'+inner+'</button>';
+    return '<button type="button" id="'+id+'" class="kao-hub-card" onclick="'+call+'"'+(hidden?'':' aria-haspopup="dialog"')+' aria-label="'+quranLearnDeps.esc(label)+'">'+inner+'</button>';
   }
   var KAO_HOME_TITLE="Kur'an Arapçası";
   var KAO_VIEW_TITLES={home:KAO_HOME_TITLE,units:'Yol',unit:'Ünite',word:'Kelime',reader:'Sûre',settings:'Ayarlar',phonics:'Telaffuz',ayah:'Günün âyeti',prayer:'Namazda ne diyorum',stats:'İlerleme',gate:'Harf kontrolü',session:'Oturum',grammar:'Gramer notları',concept:'Kavram',roots:'Kök aileleri',s0:'Harfler',sources:'Hakkında ve kaynaklar'};

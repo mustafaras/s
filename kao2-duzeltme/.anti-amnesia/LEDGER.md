@@ -698,3 +698,23 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearnFlow.js · quranCurriculumV2.js) · cihaz —
 - surprises: üretici araç INCELEME-KAO2-17/18 onay kutularını sıfırladı → git checkout ile geri alındı; 30 lp_* kelimeden 18'i eşlendi, 12'si L2 listesinde (11 aday yok, 1 birden çok aday)
 - next: K2F-25
+
+## seq 70 · 2026-10-03 · FIX · K2F-24
+- request: kullanıcı devri — K2F-24'ten kalan 3 açık iş, K2F-25'ten ÖNCE tek ek tur olarak (yeni prompt numarası yok).
+- prev-commit: 3bdef17d
+- evidence: kao2-duzeltme/evidence/K2F-24/KANIT.md (Ek tur) · kao2-duzeltme/evidence/K2F-24/L2-PAKET.md
+- done-1 (eşleşmeyen namaz kelimeleri): 13 kelime tek tek sınıflandırıldı (eşleşmeyen sayısı beyanlardaki 12 değil, araç çıktısında 14'tü; 32 benzersiz `lp_*`, 18 eşli). Yalnız düzenli -în/-ûn çoğulu güvenli bulundu: yalnız çoğul olmayan fâil/mef'ûl/sıfat-ı müşebbehe lemmalarına, ≥3 harf çekirdekle uygulanır → `lp_79cb46c8fc` (es-sâlihîn) → `l_Sa_liH_30bb88`. Sonuç 19 eşli / 13 eşlenmez. Kırmızı → yeşil: lesson_flow 19 kontrol (+2).
+- rejected (gerekçe): fiil 1. tekil e- öneki (e-şhadu) ile elatif ef'al harekeli metinde bile aynı kalıp → yanlış-pozitif sınıfı var, eklenmedi; lillâh/allâhumme tek kelimelik (kelime tablosu sayılır); kırık/müennes çoğul (ʿibâd, salavât, tahiyyât) ek ayıklamayla üretilemez; ʿabduhu iki aday (kul/kulluk etti) → eşleme YOK; kalanı sözlükte lemma yok. Lemma eklenmedi, lexicon değişmedi, elle eşleme yok.
+- done-2 (araç inceleme kutuları): `tools/kao2-curriculum-build.mjs` INCELEME-KAO2-17/18'i yazmadan önce önceki sayfadaki işaretli kutuları (id → kutu durumları; L1/L2 ayrı) yeniden üretilen metne taşır; hedefte sayfa yoksa depodakini okur; taşınamayan işaret uyarı verir (sessiz düşmez). `readApproved` aynı anahtarlayıcıyı kullanır (tek kaynak). Araç içe aktarılabilir oldu (`buildPrayerMap` export; doğrudan çalıştırılınca üretir). review_apply +3 kontrol (11): önce kırmızı → yeşil. Araç iki kez çalışınca git diff --stat aynı; INCELEME dosyaları değişmedi.
+- scope: Dokun dışı dosya: tests/kao/test_kao2_review_apply.js (yalnız yeni kontroller; kullanıcı yetkisi: test/araç düzeltmesi). Uygulama/yayın varlığı: yalnız quranCurriculumV2.js (1 satır: eşleme).
+- decision: araç düzeltmesi ve kural genişletmesi kullanıcının teknik devri kapsamındadır; pin/yayın/seyma-data/L2 dokunulmadı.
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- next: K2F-25
+
+## seq 71 · 2026-10-03 · GATE · K2F-24
+- status: waiting
+- gate: L2 · dinî bağlamlı metin ve namaz eşlemesi için GERÇEK alan uzmanı onayı. Claude uzman onayı veremez; hiçbir L2 kutusu işaretlenmedi, `expert` düzeyi yazılmadı, yapay zekâ incelemesi uzman onayı gibi sunulmadı.
+- work-done: tek oturumluk inceleme paketi hazırlandı — `kao2-duzeltme/evidence/K2F-24/L2-PAKET.md` (A: 13 eşlenmeyen + 19 eşlenen namaz kelimesi, her biri için soru · B: 8 ünite + 20 ders + 7 kavram dinî-bağlam metni, dosya/kutu konumuyla · C: kapsam dışı/açık).
+- waiting-for: kullanıcının (ya da getireceği uzmanın) kararı — paketteki maddeler için evet/hayır/düzeltme; uygunsa ilgili sayfada L2 kutusunu `[x]` yapıp **"L2 işaretlendi"** yazması. Yanıt yoksa kapı açık kalır.
+- blocks: hiçbir sonraki promptu engellemez (K2F-25 sürer); yayın bildirimlerinde "onaylı" kelimesi yapay zekâ incelemesini anlatmaya devam eder.
+- next: K2F-25

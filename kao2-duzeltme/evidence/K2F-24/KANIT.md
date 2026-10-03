@@ -40,3 +40,46 @@ tekrar-uret: 10/10 PASS (önceki 10/10)
 - Üretici araç tüm çıktıları yeniden yazar; `INCELEME-KAO2-17.md`/`-18.md` onay kutuları sıfırlandığı için bu iki dosya `git checkout` ile geri alındı (Dokun listesinde yoktu).
 - Eşleme yalnızca eşit iskelette çalışır; çekim/çoğul/fiil (ör. aşhadu, salavât, tahiyyât, ʿibâd) bilerek eşlenmedi → L2 listesinde. Ünite 2 odak lemmalarından yalnız suboHa_n, sala_m, Tay_iba_t, baraka_t, raHomap, rasuwl namaz metinlerine bağlanır; Salaw_p, Eabod (iki aday), ahida, ilaY, Ean bağlanmaz.
 - Eşlenen bazı kelimeler Ünite 1 lemmalarına gider (ör. EalaY, rab, Hamod); ilgili ders tamamlanmışsa "known" görünür.
+
+## Ek tur (K2F-24'ten kalan 3 açık iş, 2026-10-03 · LEDGER seq 70 FIX + seq 71 GATE)
+Önceki commit: 3bdef17d · Yeni prompt numarası yok; K2F-25'ten önce. Kapsam: araç + test + belge; yayın varlıklarından yalnız `quranCurriculumV2.js` (1 satır).
+
+### İlerleme günlüğü
+- [x] P1: sync PASS (25/44, seq 69, pin 20261003a), dal kao2-duzeltme, ağaç temiz
+- [x] İş 2 kırmızı → yeşil (inceleme kutuları korunur)
+- [x] İş 1 sınıflandırma + kırmızı → yeşil (düzenli çoğul)
+- [x] İş 3 L2 paketi + GATE
+- [x] Kapılar, tekrar-uret, kapanış
+
+### İş 1 — Eşleşmeyen namaz kelimeleri (sınıflandırma)
+Sayı düzeltmesi: KANIT/CURRENT-STATE "30 benzersiz, 18 eşli, 12 eşlenmez" diyordu; araç çıktısı **32 benzersiz `lp_*`, 18 eşli, 14 eşlenmez** idi (yanlış sayı belgelerde kaldı; ek tur sonrası 32 = 19 + 13).
+
+| Sınıf | Kelimeler | Karar |
+|---|---|---|
+| (a) kural güvenle genişler | es-sâlihîn (`lp_79cb46c8fc`) | **Eklendi:** düzenli -în/-ûn çoğulu |
+| (b) sözlükte lemma yok | va-taʿâlâ, va-tabâraka, al-tahiyyât, al-aʿlâ, cadduka, muhammaden | Dokunulmadı (lemma uydurulmaz) |
+| (b') lemma var ama kural güvenli değil | aşhadu / va-aşhadu (fiil 1. tekil ≡ elatif kalıbı), li-lahi, allahumma (tek kelimelik kural = tablo), ʿibâdi, va-al-salavât (kırık/müennes çoğul) | Eklenmedi → L2 |
+| (c) belirsiz | ʿabduhu (kul / kulluk etti) | Eşleme YOK |
+
+- Kural: `PRAYER_PLURAL_SUFFIXES` (-în/-ûn) × yalnız `N/ADJ` ve deseni `ism-i fâil | ism-i mef… | sıfat-ı müşebbehe` olup "çoğul" içermeyen lemma, çekirdek ≥3 harf, tüm ek/önek kombinasyonlarında **tek aday**. Gerekçe: câmid isim + -în (müsk+ín türü) ve zaten çoğul lemma yanlış-pozitifleri desenle elenir; Arapça yalnız `\uXXXX`.
+- KIRMIZI: `node tests/kao/test_kao2_lesson_flow.js` → `AssertionError: es-sâlihîn → sâlih (ism-i fâil)` (actual undefined). YEŞİL: 19 kontrol (+2: gerçek metin ve sentetik yanlış-pozitif sınaması: câmid isim, çoğul lemma, fiil → eşleşmez).
+- Etki: eşleme 18 → 19; çıktı yalnız `prayer-lemma-map.json` (+1 giriş/ayrıntı), `NAMAZ-ESLEME-L2.md` (13/19, kural notu), `quranCurriculumV2.js` (1 satır). Ünite 2 çapaları değişmedi (lesson_flow yeşil).
+
+### İş 2 — Üretici araç inceleme kutularını sıfırlıyordu
+- Düzeltme: `carryReviewMarks`/`reviewBoxKeys` (`tools/kao2-curriculum-build.mjs`): önceki sayfadaki kutu durumları (id → ['x',' '] biçiminde, L1/L2 ayrı) yeniden üretilen metne taşınır; hedefte sayfa yoksa depodaki okunur; taşınamayan işaret `console.warn` ile bildirilir. `readApproved` aynı anahtarlayıcıyı kullanır.
+- KIRMIZI: `node tests/kao/test_kao2_review_apply.js` → `AssertionError: INCELEME-17: işaretler korunmadı`. YEŞİL: 11 kontrol (+3: işaret taşıma [ders satırı kaldırma + yalnız-L2 kutusu], ikinci çalıştırma bayt-eş, boş --out-dir depodan taşır).
+- Kabul: aracı gerçek depoda iki kez çalıştırınca `git diff --stat` değişmedi (STABLE) ve INCELEME-KAO2-17/18 hiç değişmedi; INCELEME-17 (135 işaretli satır) ve -18 (25) korunur.
+- Araç artık içe aktarılabilir (`export { buildPrayerMap }`; `main()` yalnız doğrudan çalıştırmada). Testlerde `require()` ile kullanılır.
+
+### İş 3 — L2 (yetki dışı, hazırlık)
+- Gerçek alan uzmanı onayı yoktur; **L2 kutularına dokunulmadı**, `expert` yazılmadı, yapay zekâ incelemesi uzman onayı gibi sunulmadı.
+- `kao2-duzeltme/evidence/K2F-24/L2-PAKET.md`: A) 13 eşlenmeyen + 19 eşlenen namaz kelimesi (kimlik · okunuş · anlam · neden · uzmana soru) B) 8 ünite + 20 ders + 7 kavram metni (dosya/kutu konumu) C) kapsam dışı. Arapça harf yok (üretimde doğrulandı).
+- LEDGER seq 71 `GATE` (waiting) + CURRENT-STATE "Bekleyen kullanıcı işleri".
+
+### Ölçümler
+- Bayt-eşitlik (`--out-dir`): quranCurriculumV2.js · quranConceptTextsV1.js · prayer-lemma-map.json · NAMAZ-ESLEME-L2.md · MUFREDAT-ESLEME.md · INCELEME-KAO2-17.md · INCELEME-KAO2-18.md hepsi `cmp` eş.
+- Pinler değişmedi (App.kao* 44 · yüzey 765 · atama 603 · yayın 20261003a).
+- Kapılar: kapilar.sh tests/kao 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync PASS — SONUÇ: TÜM KAPILAR YEŞİL. tekrar-uret 10/10 (önceki 10/10). Perf: içerik 185,235 KiB (tavan 256) · runtime 112,810 (128) · css 13,605 (14).
+
+### Kanıt düzeyleri
+- Kaynak/test ✓ · Yayın — (değişen yayın varlığı: quranCurriculumV2.js; K2F-24 hâlâ canlıda değil) · Cihaz — (kullanıcıda) · Uzman (L2) — (kullanıcı kapısı).

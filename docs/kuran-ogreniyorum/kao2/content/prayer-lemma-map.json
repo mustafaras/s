@@ -1,6 +1,6 @@
 {
   "note": "Araç çıktısı (tools/kao2-curriculum-build.mjs, K2F-24). Elle düzenlemeyin; Arapça içermez.",
-  "rule": "harekesiz iskelet + yaygın önek/zamir eki ayıklanmış tam eşitlik; tek aday → eşleme, aksi hâlde yok",
+  "rule": "harekesiz iskelet + yaygın önek/zamir eki (ve düzenli -în/-ûn çoğulu, yalnız çoğul olmayan fâil/mef'ûl/sıfat lemmaları) ayıklanmış tam eşitlik; tek aday → eşleme, aksi hâlde yok",
   "map": {
     "lp_060fad1342": "l_Hamod_98138a",
     "lp_10bcd8764a": "l_som_585f33",
@@ -10,6 +10,7 @@
     "lp_67dad87faf": "l_EalaY_f79ef3",
     "lp_6cc3dd4445": "l_raHomap_490a24",
     "lp_779a7fd410": "l_Tay_iba_t_e6ca86",
+    "lp_79cb46c8fc": "l_Sa_liH_30bb88",
     "lp_7ae90ff4c5": "l_rab_fc2490",
     "lp_7cb56720c0": "l_sala_m_daff0b",
     "lp_820672c615": "l_suboHa_n_59533b",
@@ -91,6 +92,15 @@
       "lemma": "l_Tay_iba_t_e6ca86",
       "pronunciation": "va-al-tayyibâtu",
       "tr": "güzel sözler",
+      "prayers": [
+        "tahiyyat"
+      ]
+    },
+    {
+      "lemmaId": "lp_79cb46c8fc",
+      "lemma": "l_Sa_liH_30bb88",
+      "pronunciation": "al-sâlihîna",
+      "tr": "salihlerin",
       "prayers": [
         "tahiyyat"
       ]

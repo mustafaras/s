@@ -1,10 +1,11 @@
 # Namaz metni ↔ lemma eşlemesi (L2 inceleme)
 
 > Araç çıktısıdır (`tools/kao2-curriculum-build.mjs`, K2F-24); elle düzenlemeyin. Arapça içermez; kelimeler kimlik + okunuşla anılır.
-> Kural: harekesiz iskelet + yaygın önek/zamir eki ayıklanmış TAM eşitlik; tek aday → eşleme, birden çok aday ya da aday yok → eşleme YOK (tahmin yok).
+> Kural: harekesiz iskelet + yaygın önek/zamir eki (ve düzenli -în/-ûn çoğulu: yalnız çoğul olmayan fâil/mef'ûl/sıfat lemmaları, ≥3 harf çekirdek) ayıklanmış TAM eşitlik; tek aday → eşleme, birden çok aday ya da aday yok → eşleme YOK (tahmin yok).
+> Bilerek kapsam dışı: fiil 1. tekil (e-) ile elatif (ef'al) aynı kalıptır; kırık/müennes çoğul ek ayıklamayla üretilemez; birleşik ifadeler (lillâh, allâhumme) tek kelimelik kuraldır.
 > Bu liste yapay zekâ değil, gerçek alan uzmanının (L2) bakması içindir: eşlenmeyen kelimeler uygulamada "açık" görünür, hiçbir lemmaya bağlanmaz.
 
-## Eşleşmeyen kelimeler (14)
+## Eşleşmeyen kelimeler (13)
 
 | Namaz kelimesi | Okunuş | Anlam | Metinler | Neden | Adaylar |
 |---|---|---|---|---|---|
@@ -12,7 +13,6 @@
 | lp_436fccf6c0 | al-tahiyyâtu | hürmetler | tahiyyat | aday yok | — |
 | lp_692bba530a | li-lahi | Allah içindir | tahiyyat | aday yok | — |
 | lp_6e8c2964fc | va-al-salavâtu | dualar | tahiyyat | aday yok | — |
-| lp_79cb46c8fc | al-sâlihîna | salihlerin | tahiyyat | aday yok | — |
 | lp_98e5be5669 | ʿibâdi | kullarının | tahiyyat | aday yok | — |
 | lp_b1bf6df603 | va-tabâraka | bereketlidir | subhaneke | aday yok | — |
 | lp_c7d096cadc | ʿabduhu | kuludur | tahiyyat | birden çok aday | l_Eabada_557021, l_Eabod_3558c0 |
@@ -23,7 +23,7 @@
 | lp_f5843446b4 | cadduka | şanın | subhaneke | aday yok | — |
 | lp_f70c1a5dcf | muhammaden | Muhammed | tahiyyat | aday yok | — |
 
-## Eşlenen kelimeler (18)
+## Eşlenen kelimeler (19)
 
 - lp_060fad1342 (va-bi-hamdika · hamdinle) → l_Hamod_98138a · subhaneke
 - lp_10bcd8764a (ismuka · adın) → l_som_585f33 · subhaneke
@@ -33,6 +33,7 @@
 - lp_67dad87faf (ʿalaykum · üzerinize) → l_EalaY_f79ef3 · selam
 - lp_6cc3dd4445 (va-rahmetu · rahmeti) → l_raHomap_490a24 · tahiyyat, selam
 - lp_779a7fd410 (va-al-tayyibâtu · güzel sözler) → l_Tay_iba_t_e6ca86 · tahiyyat
+- lp_79cb46c8fc (al-sâlihîna · salihlerin) → l_Sa_liH_30bb88 · tahiyyat
 - lp_7ae90ff4c5 (rabbiya · Rabbimi) → l_rab_fc2490 · ruku, secde
 - lp_7cb56720c0 (al-salâmu · selam) → l_sala_m_daff0b · tahiyyat, selam
 - lp_820672c615 (subhâna · tenzih ederim) → l_suboHa_n_59533b · ruku, secde

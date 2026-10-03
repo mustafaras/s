@@ -170,5 +170,45 @@ check('K2F-22: sourced ⇔ işaretli kutu (üniteler, dersler, S0)', () => {
   for (const [id] of entries.filter(([, e]) => visible(e))) assert.ok(ticked.has(id), id);
 });
 
+// --- K2F-24 ek tur · üretici araç işaretli inceleme kutularını SİLMEZ ---------------------------------
+// Eskiden araç her çalışmada iki inceleme sayfasını sıfırdan yazıp [x] kutularını siliyordu (elle `git checkout` gerekiyordu).
+const regenerate = (outDir) => execFileSync(process.execPath, [TOOL, '--out-dir', outDir], { encoding: 'utf8' });
+const flipFirst = (text, pattern, replacement) => {
+  assert.match(text, pattern, 'çevrilecek kutu satırı bulunamadı');
+  return text.replace(pattern, replacement);
+};
+
+check('K2F-24 ek tur: önceki sayfadaki işaretler (ders satırı, yalnız-L2 ünite/kavram kutusu) yeniden üretimde korunur', () => {
+  const out = path.join(tmp, 'carry');
+  const sheets = [SHEET_17, SHEET_18].map((rel) => path.join(out, rel));
+  sheets.forEach((target) => fs.mkdirSync(path.dirname(target), { recursive: true }));
+  // Depodaki sayfalarda tüm L1 kutuları işaretli, L2 kutuları boş: bir ders işaretini kaldır, bir L2 kutusunu işaretle.
+  const edited17 = flipFirst(flipFirst(read(SHEET_17), /(\| (?:u\d\d|s0)\.\d\d \|[^\n]*?\| )- \[x\] \|/, '$1- [ ] |'),
+    /- \[x\] L1 metin uygun {3}- \[ \] L2/, '- [x] L1 metin uygun   - [x] L2');
+  const edited18 = flipFirst(read(SHEET_18), /- \[x\] L1 metin uygun {3}- \[ \] L2/, '- [x] L1 metin uygun   - [x] L2');
+  fs.writeFileSync(sheets[0], edited17);
+  fs.writeFileSync(sheets[1], edited18);
+  regenerate(out);
+  assert.equal(fs.readFileSync(sheets[0], 'utf8'), edited17, 'INCELEME-17: işaretler korunmadı');
+  assert.equal(fs.readFileSync(sheets[1], 'utf8'), edited18, 'INCELEME-18: işaretler korunmadı');
+});
+
+check('K2F-24 ek tur: araç ikinci kez çalışınca iki sayfa bayt-eş kalır', () => {
+  const out = path.join(tmp, 'twice');
+  regenerate(out);
+  const first = [SHEET_17, SHEET_18].map((rel) => fs.readFileSync(path.join(out, rel), 'utf8'));
+  regenerate(out);
+  const second = [SHEET_17, SHEET_18].map((rel) => fs.readFileSync(path.join(out, rel), 'utf8'));
+  assert.deepEqual(second, first);
+});
+
+check('K2F-24 ek tur: boş --out-dir önceki sayfayı depodan taşır (depodaki onaylı kutular kaybolmaz)', () => {
+  const out = path.join(tmp, 'fromrepo');
+  regenerate(out);
+  for (const rel of [SHEET_17, SHEET_18]) {
+    assert.equal(fs.readFileSync(path.join(out, rel), 'utf8'), read(rel), `${rel}: depo ile bayt-eş değil`);
+  }
+});
+
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(`KAO2 review-apply: PASS (${passed} kontrol)`);

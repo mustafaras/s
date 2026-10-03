@@ -50,6 +50,18 @@ const DIACRITICS = /[\u0640\u064B-\u065F\u06D6-\u06ED]/g;
 const PRAYER_PREFIXES = ['', '\u0648', '\u0627\u0644', '\u0648\u0627\u0644', '\u0628', '\u0648\u0628', '\u0644', '\u0648\u0644', '\u0641'];
 const PRAYER_SUFFIXES = ['', '\u0643', '\u0647', '\u064A', '\u0646\u0627', '\u0643\u0645', '\u0647\u0645', '\u0647\u0627'];
 const PRAYER_CORE_MIN = 2;
+// K2F-24 ek tur: düzenli çoğul (-în/-ûn) YALNIZ çoğullanabilir özne/sıfat lemmalarına (fâil, mef'ûl, sıfat-ı müşebbehe; çoğul
+// olmayan) ve ≥3 harflik çekirdeğe uygulanır. Elatif (ef'al) ile fiil 1. tekil (e-) kalıpları harekeli metinde bile ayırt
+// edilemediği, kırık çoğul/müennes çoğul ise ek ayıklamayla üretilemediği için bilerek kapsam dışıdır (eşleme yok).
+const PRAYER_PLURAL_SUFFIXES = ['\u064A\u0646', '\u0648\u0646'];
+const PRAYER_PLURAL_CORE_MIN = 3;
+const PRAYER_PLURAL_PATTERNS = ['ism-i fâil', 'ism-i mef', 'sıfat-ı müşebbehe'];
+
+function isPluralizable(lemma) {
+  const pattern = String((lemma && lemma.pattern) || '');
+  return Boolean(lemma) && ['N', 'ADJ'].includes(lemma.pos) && !pattern.includes('çoğul')
+    && PRAYER_PLURAL_PATTERNS.some((head) => pattern.startsWith(head));
+}
 
 // Hançer elif (U+0670) mushafta yazılır ama düz metinde elif olarak ya da hiç yazılmaz: iki iskelet biçimi de anahtar sayılır.
 function skeletons(text) {
@@ -58,10 +70,17 @@ function skeletons(text) {
     .map((form) => form.replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627').replace(/\u0649/g, '\u064A'));
 }
 
-function prayerCandidates(word, bySkeleton) {
+function prayerCandidates(word, bySkeleton, lemmaById) {
   const full = skeletons(word.ar)[0];
   const found = new Map();
   for (const prefix of PRAYER_PREFIXES) {
+    for (const suffix of PRAYER_PLURAL_SUFFIXES) {
+      if (!full.startsWith(prefix) || !full.endsWith(suffix)) continue;
+      if (full.length - prefix.length - suffix.length < PRAYER_PLURAL_CORE_MIN) continue;
+      for (const id of bySkeleton.get(full.slice(prefix.length, full.length - suffix.length)) || []) {
+        if (isPluralizable(lemmaById.get(id))) found.set(id, true);
+      }
+    }
     for (const suffix of PRAYER_SUFFIXES) {
       if (!full.startsWith(prefix) || !full.endsWith(suffix)) continue;
       if (full.length - prefix.length - suffix.length < PRAYER_CORE_MIN) continue;
@@ -73,6 +92,7 @@ function prayerCandidates(word, bySkeleton) {
 
 function buildPrayerMap({ lex, surahs }) {
   const bySkeleton = new Map();
+  const lemmaById = new Map(lex.lemmas.map((lemma) => [lemma.id, lemma]));
   for (const lemma of lex.lemmas) {
     for (const key of skeletons(lemma.ar)) {
       if (!bySkeleton.has(key)) bySkeleton.set(key, []);
@@ -83,7 +103,7 @@ function buildPrayerMap({ lex, surahs }) {
   for (const text of surahs.prayerTexts) {
     for (const word of text.words) {
       if (!word.lemmaId.startsWith('lp_')) continue;
-      if (!rows.has(word.lemmaId)) rows.set(word.lemmaId, { lemmaId: word.lemmaId, pronunciation: word.pronunciation, tr: word.tr, prayers: [], candidates: prayerCandidates(word, bySkeleton) });
+      if (!rows.has(word.lemmaId)) rows.set(word.lemmaId, { lemmaId: word.lemmaId, pronunciation: word.pronunciation, tr: word.tr, prayers: [], candidates: prayerCandidates(word, bySkeleton, lemmaById) });
       const row = rows.get(word.lemmaId);
       if (!row.prayers.includes(text.id)) row.prayers.push(text.id);
     }
@@ -106,7 +126,7 @@ function renderPrayerMapJson({ map, matched }) {
   const details = matched.map((row) => ({ lemmaId: row.lemmaId, lemma: map[row.lemmaId], pronunciation: row.pronunciation, tr: row.tr, prayers: row.prayers }));
   return `${JSON.stringify({
     note: 'Araç çıktısı (tools/kao2-curriculum-build.mjs, K2F-24). Elle düzenlemeyin; Arapça içermez.',
-    rule: 'harekesiz iskelet + yaygın önek/zamir eki ayıklanmış tam eşitlik; tek aday → eşleme, aksi hâlde yok',
+    rule: 'harekesiz iskelet + yaygın önek/zamir eki (ve düzenli -în/-ûn çoğulu, yalnız çoğul olmayan fâil/mef\'ûl/sıfat lemmaları) ayıklanmış tam eşitlik; tek aday → eşleme, aksi hâlde yok',
     map, details
   }, null, 2)}\n`;
 }
@@ -114,7 +134,8 @@ function renderPrayerMapJson({ map, matched }) {
 function renderPrayerReview({ map, matched, unmatched }) {
   const lines = ['# Namaz metni ↔ lemma eşlemesi (L2 inceleme)', '',
     '> Araç çıktısıdır (`tools/kao2-curriculum-build.mjs`, K2F-24); elle düzenlemeyin. Arapça içermez; kelimeler kimlik + okunuşla anılır.',
-    '> Kural: harekesiz iskelet + yaygın önek/zamir eki ayıklanmış TAM eşitlik; tek aday → eşleme, birden çok aday ya da aday yok → eşleme YOK (tahmin yok).',
+    '> Kural: harekesiz iskelet + yaygın önek/zamir eki (ve düzenli -în/-ûn çoğulu: yalnız çoğul olmayan fâil/mef\'ûl/sıfat lemmaları, ≥3 harf çekirdek) ayıklanmış TAM eşitlik; tek aday → eşleme, birden çok aday ya da aday yok → eşleme YOK (tahmin yok).',
+    '> Bilerek kapsam dışı: fiil 1. tekil (e-) ile elatif (ef\'al) aynı kalıptır; kırık/müennes çoğul ek ayıklamayla üretilemez; birleşik ifadeler (lillâh, allâhumme) tek kelimelik kuraldır.',
     '> Bu liste yapay zekâ değil, gerçek alan uzmanının (L2) bakması içindir: eşlenmeyen kelimeler uygulamada "açık" görünür, hiçbir lemmaya bağlanmaz.', '',
     `## Eşleşmeyen kelimeler (${unmatched.length})`, '',
     '| Namaz kelimesi | Okunuş | Anlam | Metinler | Neden | Adaylar |', '|---|---|---|---|---|---|'];
@@ -683,7 +704,15 @@ function parseFlags(argv) {
 // ayrımı K-4 gereği inceleyicinin sorumluluğundadır, araç rol atamaz.
 function readApproved(sheetPath) {
   const lines = fs.readFileSync(sheetPath, 'utf8').split('\n');
+  const keys = reviewBoxKeys(lines);
   const approved = new Set();
+  lines.forEach((line, i) => { if (keys[i] && /\[x\]/i.test(line)) approved.add(keys[i]); });
+  return approved;
+}
+
+// Onay kutusu taşıyan her satırın anahtarı (ders/S0 satırında kimlik, ünite/kavram kutusunda başlık kimliği); kutusuz satır null.
+const REVIEW_BOX = /\[( |x|X)\]/g;
+function reviewBoxKeys(lines) {
   let heading = null;
   const headingId = (text) => {
     const unit = /^### Ünite (\d+) ·/.exec(text);
@@ -693,15 +722,47 @@ function readApproved(sheetPath) {
     const plain = /^### (\S+)/.exec(text);
     return plain ? plain[1] : null;                        // kavram kimliği
   };
-  for (const line of lines) {
-    if (/^### /.test(line)) { heading = headingId(line); continue; }
+  return lines.map((line) => {
+    if (/^### /.test(line)) { heading = headingId(line); return null; }
+    if (!/\[( |x|X)\]/.test(line)) return null;
     // Ders/S0 tablo satırı: | <kimlik> | ... | `draft` | - [x] |
     const row = /^\|\s*(\S+)\s*\|/.exec(line);
-    if (row && /\[x\]/i.test(line)) { approved.add(row[1]); continue; }
+    if (row) return row[1];
     // Başlık altı onay kutusu (ünite ya da kavram).
-    if (heading && /^\s*-\s*\[/.test(line) && /\[x\]/i.test(line)) approved.add(heading);
-  }
-  return approved;
+    return heading && /^\s*-\s*\[/.test(line) ? heading : null;
+  });
+}
+
+// K2F-24 ek tur: üretici sayfayı sıfırdan yazar; insanın işaretlediği kutular (id → kutu durumları) yeniden üretilen
+// metne taşınır. Metin değişmediyse çıktı bayt-eştir. Taşınamayan işaret (kimlik/kutu sayısı değişti) sessizce düşmez: uyarılır.
+function carryReviewMarks(previousText, nextText, label) {
+  const previousLines = previousText.split('\n');
+  const previousKeys = reviewBoxKeys(previousLines);
+  const marks = new Map();
+  previousLines.forEach((line, i) => {
+    const states = [...line.matchAll(REVIEW_BOX)].map((m) => m[1]);
+    if (previousKeys[i] && states.some((state) => state !== ' ')) marks.set(previousKeys[i], states);
+  });
+  const nextLines = nextText.split('\n');
+  const nextKeys = reviewBoxKeys(nextLines);
+  const carried = new Set();
+  const out = nextLines.map((line, i) => {
+    const states = nextKeys[i] && marks.get(nextKeys[i]);
+    if (!states || [...line.matchAll(REVIEW_BOX)].length !== states.length) return line;
+    carried.add(nextKeys[i]);
+    let n = 0;
+    return line.replace(REVIEW_BOX, () => `[${states[n++]}]`);
+  });
+  const dropped = [...marks.keys()].filter((id) => !carried.has(id));
+  if (dropped.length) console.warn(`kao2-curriculum-build: UYARI ${label}: taşınamayan işaret ${dropped.length}: ${dropped.join(', ')}`);
+  return out.join('\n');
+}
+
+// Hedefte önceki sayfa varsa onu, yoksa depodakini okur (boş --out-dir ile bayt-eşitlik kontrolü depoyla aynı çıkar).
+function withCarriedMarks(rel, outDir, text) {
+  const candidates = [path.join(outDir, rel), path.join(ROOT, rel)];
+  const previous = candidates.find((file) => fs.existsSync(file));
+  return previous ? carryReviewMarks(fs.readFileSync(previous, 'utf8'), text, rel) : text;
 }
 
 // Metin kaynağı: units { "<no>": {review} }, lessons/s0 { "<kimlik>": {review} },
@@ -828,8 +889,9 @@ function main() {
   const texts = readTexts();
   const data = build(spec, content, texts);
   const conceptTexts = buildConceptTexts(texts);
-  const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)], [OUT_TEXT_REVIEW, renderTextReview(data)],
-    [OUT_CONCEPT_REVIEW, renderConceptReview(texts, content.grammar)], [OUT_CONCEPT_MODULE, renderConceptModule(conceptTexts)],
+  const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)],
+    [OUT_TEXT_REVIEW, withCarriedMarks(OUT_TEXT_REVIEW, outDir, renderTextReview(data))],
+    [OUT_CONCEPT_REVIEW, withCarriedMarks(OUT_CONCEPT_REVIEW, outDir, renderConceptReview(texts, content.grammar))], [OUT_CONCEPT_MODULE, renderConceptModule(conceptTexts)],
     [OUT_PRAYER_MAP, renderPrayerMapJson(data.prayerMap)], [OUT_PRAYER_REVIEW, renderPrayerReview(data.prayerMap)]];
   for (const [file, text] of outputs) {
     const target = path.join(outDir, file);
@@ -840,4 +902,7 @@ function main() {
   console.log(`kao2-curriculum-build: ${data.units.length} ünite · ${lessons} ders · ${Object.keys(data.lemmaToLesson).length} lemma`);
 }
 
-main();
+// Araç doğrudan çalıştırılınca üretir; testler `buildPrayerMap`ı içe aktarınca hiçbir dosya yazılmaz.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+
+export { buildPrayerMap };

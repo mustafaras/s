@@ -264,6 +264,35 @@ check('K2F-24 eşleme: yalnız namaz-eki (lp_) → sözlük (l_) ve doğrulanmı
 
 function prayerWordsAll() { return content.shorts.prayerTexts.flatMap((item) => item.words); }
 
+// K2F-24 ek tur: düzenli çoğul (-în/-ûn) kuralı yalnız çoğullanabilir özne/sıfat lemmalarına (fâil/mef'ûl/sıfat-ı müşebbehe,
+// çoğul olmayan) uygulanır; elatif (ef'al) ile fiil 1. tekil (e-) kalıpları harekeli metinde bile ayırt edilemediği için eşlenmez.
+check('K2F-24 ek tur: düzenli çoğul kuralı gerçek metinde yalnız es-sâlihîn → sâlih lemmasını ekler; fiil/elatif/kırık çoğul eşlenmez', () => {
+  assert.equal(MAP.lp_79cb46c8fc, 'l_Sa_liH_30bb88', 'es-sâlihîn → sâlih (ism-i fâil)');
+  for (const id of ['lp_d9d03c781d', 'lp_db3e429022', 'lp_f0473a3990', 'lp_692bba530a', 'lp_98e5be5669', 'lp_c7d096cadc', 'lp_ccce7cf12f', 'lp_436fccf6c0', 'lp_6e8c2964fc']) {
+    assert.equal(MAP[id], undefined, `${id}: eşlenmemeli (tahmin yok)`);
+  }
+  assert.equal(Object.keys(MAP).length, 19, 'eşleme sayısı 18 + 1');
+});
+
+check('K2F-24 ek tur: çoğul kuralı sentetik yanlış-pozitif sınaması (isim değil, fâil/sıfat; çoğul lemma değil; çekirdek ≥3)', () => {
+  const tool = require('../../tools/kao2-curriculum-build.mjs');
+  const salih = 'صالح';
+  const misk = 'مسك';
+  const lemma = (id, ar, pattern) => ({ id, ar, pos: 'N', pattern });
+  const lex = { lemmas: [lemma('l_salih', salih, "ism-i fâil (fâ'il)"), lemma('l_misk', misk, "câmid isim (fa'l)"), lemma('l_cog', `${salih}ات`, "ism-i fâil (fâ'il, çoğul)")] };
+  const word = (id, ar) => ({ ar, lemmaId: id, pronunciation: id, tr: id });
+  const surahs = { prayerTexts: [{ id: 't', words: [
+    word('lp_in', `ال${salih}ين`), word('lp_un', `ال${salih}ون`),
+    word('lp_misk', `ال${misk}ين`), word('lp_cog', `${salih}اتين`),
+    word('lp_fiil', 'أشهد')] }] };
+  const { map } = tool.buildPrayerMap({ lex, surahs });
+  assert.equal(map.lp_in, 'l_salih', '-în çoğulu fâil lemmasına bağlanır');
+  assert.equal(map.lp_un, 'l_salih', '-ûn çoğulu fâil lemmasına bağlanır');
+  assert.equal(map.lp_misk, undefined, 'câmid isim + -în (müsk+ín gibi) eşlenmez');
+  assert.equal(map.lp_cog, undefined, 'zaten çoğul olan lemma tekrar çoğullanmaz');
+  assert.equal(map.lp_fiil, undefined, 'e- önekli fiil eşlenmez');
+});
+
 check('K2F-24 Ünite 2: her dersin uygula adımı kendi namaz çapasına bağlı (örnek cümleye düşmez)', () => {
   const anchors = unit2.anchor.map((a) => a.replace(/^prayer:/, ''));
   for (const item of unit2.lessons) {

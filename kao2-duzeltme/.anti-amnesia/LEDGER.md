@@ -718,3 +718,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - waiting-for: kullanıcının (ya da getireceği uzmanın) kararı — paketteki maddeler için evet/hayır/düzeltme; uygunsa ilgili sayfada L2 kutusunu `[x]` yapıp **"L2 işaretlendi"** yazması. Yanıt yoksa kapı açık kalır.
 - blocks: hiçbir sonraki promptu engellemez (K2F-25 sürer); yayın bildirimlerinde "onaylı" kelimesi yapay zekâ incelemesini anlatmaya devam eder.
 - next: K2F-25
+
+## seq 72 · 2026-10-03 · FIX · K2F-24
+- request: kullanıcı: ek tur sonrası dürüst değerlendirmede sayılan 6 eksiğin hepsini çöz.
+- prev-commit: 38f7bdbb
+- evidence: kao2-duzeltme/evidence/K2F-24/KANIT.md (Ek tur 2)
+- done: (1) CURRENT-STATE baştan yazıldı. (2) `code-reviewer` ajanı çalıştırıldı: CRITICAL/HIGH yok, 2 MEDIUM + 2 LOW → hepsi kapatıldı: sembolik bağ üzerinden çağrılan araç sessizce üretmiyordu (`realpath` karşılaştırması + test); işaret yalnız kimlikle taşınıyordu, metin değişse yeni metne yapışırdı (artık kutunun metin bağlamı aynıysa taşınır; düzey sütunu/"- İnceleme:" satırı bağlam dışı); aynı kimlikli çok kutulu satır belirsiz sayılır (taşınmaz, uyarı); `l2-paket-build.mjs` `process.chdir` yerine `path.join(ROOT)` ve Arapça aralığı `\uXXXX`. (3) Eşleme kuralı riski: sayı yerine eşlenen kelime KÜMESİ testte sabitlendi (gevşeme/yeni eşleme görünür); homograf artık riski CURRENT-STATE'te açıkça yazıldı — matematiksel olarak sıfırlanmadı. (4) uyarı yolu, metin-değişimi, belirsiz kimlik ve sembolik bağ testleri eklendi (review_apply 15 kontrol). (5) L2 paketi `kao2-duzeltme/tools/l2-paket-build.mjs` ile yeniden üretilebilir, `--check` kapısı `kapilar.sh`'a bağlandı; seçim Ünite 1–3 derslerini her zaman kapsar. (6) Kapsam dışı dosyalar bu kayıtta belgelendi; yalnız kendi geçici dosyalarım silindi.
+- scope: Dokun dışı (kullanıcı yetkisi): tests/kao/test_kao2_review_apply.js, kao2-duzeltme/tools/l2-paket-build.mjs (yeni), kao2-duzeltme/tools/kapilar.sh (+1 kapı). Ortak $TMPDIR'de `a.txt` adlı bir dosyayı yanlışlıkla ezdim (benim değilse içeriği kayıp; depoyla ilgisi yok).
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz — · uzman (L2) —
+- next: K2F-25

@@ -733,27 +733,49 @@ function reviewBoxKeys(lines) {
   });
 }
 
+// Kutunun "ne için" işaretlendiğini gösteren metin bağlamı: tablo satırında kutu ve düzey sütunu hariç satır; başlık kutusunda
+// başlıktan kutuya kadarki blok (kutular ve "- İnceleme:" düzey satırı hariç). Onaydan sonra düzey değişir ama metin değişmez.
+function reviewBoxContexts(lines, keys) {
+  let start = 0;
+  return lines.map((line, i) => {
+    if (/^### /.test(line)) start = i;
+    if (!keys[i]) return null;
+    const strip = (text) => text.replace(REVIEW_BOX, '[]').replace(/`[^`]*`/g, '');
+    if (/^\|/.test(line)) return strip(line);
+    return lines.slice(start, i + 1).filter((l) => !/^- İnceleme:/.test(l)).map(strip).join('\n');
+  });
+}
+
 // K2F-24 ek tur: üretici sayfayı sıfırdan yazar; insanın işaretlediği kutular (id → kutu durumları) yeniden üretilen
-// metne taşınır. Metin değişmediyse çıktı bayt-eştir. Taşınamayan işaret (kimlik/kutu sayısı değişti) sessizce düşmez: uyarılır.
+// metne taşınır. Metin değişmediyse çıktı bayt-eştir. Yeni metin görülmeden onay yapışmasın diye işaret YALNIZ kutunun
+// metin bağlamı aynıysa taşınır. Taşınamayan işaret (kimlik kayboldu, kutu sayısı ya da metin değişti, kimlik belirsiz)
+// sessizce düşmez: uyarılır.
 function carryReviewMarks(previousText, nextText, label) {
   const previousLines = previousText.split('\n');
   const previousKeys = reviewBoxKeys(previousLines);
+  const previousContexts = reviewBoxContexts(previousLines, previousKeys);
+  const occurrences = new Map();
+  previousKeys.forEach((key) => { if (key) occurrences.set(key, (occurrences.get(key) || 0) + 1); });
   const marks = new Map();
+  const ambiguous = new Set();
   previousLines.forEach((line, i) => {
     const states = [...line.matchAll(REVIEW_BOX)].map((m) => m[1]);
-    if (previousKeys[i] && states.some((state) => state !== ' ')) marks.set(previousKeys[i], states);
+    if (!previousKeys[i] || !states.some((state) => state !== ' ')) return;
+    if (occurrences.get(previousKeys[i]) > 1) ambiguous.add(previousKeys[i]);
+    else marks.set(previousKeys[i], { states, context: previousContexts[i] });
   });
   const nextLines = nextText.split('\n');
   const nextKeys = reviewBoxKeys(nextLines);
+  const nextContexts = reviewBoxContexts(nextLines, nextKeys);
   const carried = new Set();
   const out = nextLines.map((line, i) => {
-    const states = nextKeys[i] && marks.get(nextKeys[i]);
-    if (!states || [...line.matchAll(REVIEW_BOX)].length !== states.length) return line;
+    const mark = nextKeys[i] && marks.get(nextKeys[i]);
+    if (!mark || mark.context !== nextContexts[i] || [...line.matchAll(REVIEW_BOX)].length !== mark.states.length) return line;
     carried.add(nextKeys[i]);
     let n = 0;
-    return line.replace(REVIEW_BOX, () => `[${states[n++]}]`);
+    return line.replace(REVIEW_BOX, () => `[${mark.states[n++]}]`);
   });
-  const dropped = [...marks.keys()].filter((id) => !carried.has(id));
+  const dropped = [...marks.keys()].filter((id) => !carried.has(id)).concat([...ambiguous]);
   if (dropped.length) console.warn(`kao2-curriculum-build: UYARI ${label}: taşınamayan işaret ${dropped.length}: ${dropped.join(', ')}`);
   return out.join('\n');
 }
@@ -903,6 +925,8 @@ function main() {
 }
 
 // Araç doğrudan çalıştırılınca üretir; testler `buildPrayerMap`ı içe aktarınca hiçbir dosya yazılmaz.
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+// Sembolik bağ üzerinden çağrılsa da çalışsın: iki yol da gerçek yola çözülür.
+const isDirectRun = () => Boolean(process.argv[1]) && fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));
+if (isDirectRun()) main();
 
-export { buildPrayerMap };
+export { buildPrayerMap, carryReviewMarks };

@@ -83,3 +83,16 @@ Sayı düzeltmesi: KANIT/CURRENT-STATE "30 benzersiz, 18 eşli, 12 eşlenmez" di
 
 ### Kanıt düzeyleri
 - Kaynak/test ✓ · Yayın — (değişen yayın varlığı: quranCurriculumV2.js; K2F-24 hâlâ canlıda değil) · Cihaz — (kullanıcıda) · Uzman (L2) — (kullanıcı kapısı).
+
+## Ek tur 2 (dürüst değerlendirmede sayılan 6 eksik · LEDGER seq 72)
+| # | Eksik | Çözüm | Kanıt |
+|---|---|---|---|
+| 1 | CURRENT-STATE yerinde düzenlenmişti | Baştan yazıldı (P4.4) | dosya |
+| 2 | `code-reviewer` çalıştırılmamıştı | Çalıştırıldı: CRITICAL/HIGH 0 · MEDIUM 2 · LOW 2 → hepsi kapatıldı | aşağıda |
+| 3 | Çoğul kuralı riski | Küme testte sabit (19 id); homograf artık riski belgelendi (sıfırlanmadı) | lesson_flow 19 |
+| 4 | Test boşlukları | Uyarı yolu · metin değişimi · düzey sütunu değişimi · belirsiz kimlik · sembolik bağ | review_apply 15 |
+| 5 | L2-PAKET yeniden üretilemezdi | `kao2-duzeltme/tools/l2-paket-build.mjs` (+ `--check` kapısı); seçim Ünite 1–3 + desen | `--check` PASS |
+| 6 | Kapsam/temizlik | Kendi geçici dosyalarım silindi; Dokun dışı dosyalar LEDGER'da | seq 72 |
+
+Reviewer bulguları → düzeltme: (M1) `main()` koruması symlink'te sessizce çıkıyordu → `fs.realpathSync` iki tarafta + test (KIRMIZI gözlenen: önce "ders başlığı değişti: işaret taşınmaz" kontrolü düştü; symlink senaryosu reviewer tarafından yeniden üretildi) · (M2) işaret yalnız kimlikle taşınıyordu → `reviewBoxContexts`: kutunun metin bağlamı aynıysa taşınır; düzey sütunu ve "- İnceleme:" satırı bağlam dışı (apply-review sonrası düzey değişimi onayı düşürmesin) · (L3) aynı kimlikli çok kutulu satır belirsiz → taşınmaz + uyarı · (L4) `chdir` kaldırıldı, Arapça aralığı `\uXXXX`.
+Dürüst sınır: symlink testi için ayrı "önce kırmızı" çalıştırması yapılmadı; bulgu reviewer'ın kendi denemesine dayanır, test sonradan eklendi ve yeşil.

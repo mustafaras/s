@@ -34,6 +34,7 @@ gate "reminders smoke"   node tests/reminders/run-reminder-smoke.mjs
 gate "run-seyma driver"  node .claude/skills/run-seyma/driver.mjs
 gate "run-seyma zikr"    node .claude/skills/run-seyma/zikr-harness.mjs
 gate "kontrast"          node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs
+gate "l2-paket --check"  node kao2-duzeltme/tools/l2-paket-build.mjs --check
 
 # kao-plan-check yalnız K2F-01 tamamlandıktan sonra kapıdır (öncesinde tarihsel 22 FAIL beklenir).
 PLAN_READY="$(node -e "const s=require('./kao2-duzeltme/FIX-STATE.json');process.stdout.write(s.prompts&&s.prompts['K2F-01']&&s.prompts['K2F-01'].status==='done'?'1':'0')" 2>/dev/null)"

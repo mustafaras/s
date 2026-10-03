@@ -271,7 +271,10 @@ check('K2F-24 ek tur: düzenli çoğul kuralı gerçek metinde yalnız es-sâlih
   for (const id of ['lp_d9d03c781d', 'lp_db3e429022', 'lp_f0473a3990', 'lp_692bba530a', 'lp_98e5be5669', 'lp_c7d096cadc', 'lp_ccce7cf12f', 'lp_436fccf6c0', 'lp_6e8c2964fc']) {
     assert.equal(MAP[id], undefined, `${id}: eşlenmemeli (tahmin yok)`);
   }
-  assert.equal(Object.keys(MAP).length, 19, 'eşleme sayısı 18 + 1');
+  // Sayı değil KÜME sabitlenir: kural gevşer ya da metin değişirse yeni (belki yanlış-pozitif) eşleme bilinçli onay ister.
+  assert.deepEqual(Object.keys(MAP).sort(), ['lp_060fad1342', 'lp_10bcd8764a', 'lp_25704375a0', 'lp_31fee142df', 'lp_5cfe478ddb', 'lp_67dad87faf',
+    'lp_6cc3dd4445', 'lp_779a7fd410', 'lp_79cb46c8fc', 'lp_7ae90ff4c5', 'lp_7cb56720c0', 'lp_820672c615', 'lp_832ee02139', 'lp_99236de03d',
+    'lp_999a97b04a', 'lp_99f327d450', 'lp_cd25a85435', 'lp_e3ae18f2ca', 'lp_e5958c3b77'], 'eşlenen kelime kümesi değişti (19 beklenir)');
 });
 
 check('K2F-24 ek tur: çoğul kuralı sentetik yanlış-pozitif sınaması (isim değil, fâil/sıfat; çoğul lemma değil; çekirdek ≥3)', () => {

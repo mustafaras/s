@@ -210,5 +210,64 @@ check('K2F-24 ek tur: boş --out-dir önceki sayfayı depodan taşır (depodaki 
   }
 });
 
+check('K2F-24 ek tur: taşınamayan işaret (kimlik kayboldu ya da kutu sayısı değişti) sessizce düşmez, uyarı verir', () => {
+  const { carryReviewMarks } = require('../../tools/kao2-curriculum-build.mjs');
+  const previous = ['### Ünite 1 · A', '', '- [x] L1 metin uygun   - [x] L2 (dinî bağlam) uygun', '',
+    '### Ünite 2 dersleri', '', '| ders | başlık | onay |', '|---|---|---|', '| u02.01 | x | - [x] |', '| u99.01 | silindi | - [x] |'].join('\n');
+  const next = ['### Ünite 1 · A', '', '- [ ] L1 metin uygun', '',
+    '### Ünite 2 dersleri', '', '| ders | başlık | onay |', '|---|---|---|', '| u02.01 | x | - [ ] |'].join('\n');
+  const warnings = [];
+  const original = console.warn;
+  console.warn = (message) => warnings.push(String(message));
+  let out;
+  try { out = carryReviewMarks(previous, next, 'sayfa'); } finally { console.warn = original; }
+  assert.match(out, /\| u02\.01 \| x \| - \[x\] \|/, 'kimliği duran satırın işareti taşınır');
+  assert.match(out, /- \[ \] L1 metin uygun$/m, 'kutu sayısı değişen satır taşınmaz (yanlış kutuya işaret yazılmaz)');
+  assert.equal(warnings.length, 1, 'tek uyarı');
+  assert.match(warnings[0], /u1.*u99\.01|u99\.01.*u1/, 'uyarı taşınamayan her iki kimliği de sayar');
+});
+
+check('K2F-24 ek tur: metni değişen satırın işareti TAŞINMAZ (yeni metin görülmeden onaylı görünmez); yalnız düzey sütunu/İnceleme satırı değişirse taşınır', () => {
+  const { carryReviewMarks } = require('../../tools/kao2-curriculum-build.mjs');
+  const sheet = (title, level, vaad, m = ' ') => ['### Ünite 1 · A', '', `- Vaad: ${vaad}`, `- İnceleme: \`${level}\``, `- [${m}] L1 metin uygun   - [${m}] L2 (dinî bağlam) uygun`, '',
+    '### Ünite 1 dersleri', '', '| ders | başlık | hedef | inceleme | onay |', '|---|---|---|---|---|', `| u01.01 | ${title} | h | \`${level}\` | - [${m}] |`].join('\n');
+  const run = (previous, next) => {
+    const warnings = [];
+    const original = console.warn;
+    console.warn = (message) => warnings.push(String(message));
+    try { return { out: carryReviewMarks(previous, next, 'sayfa'), warnings }; } finally { console.warn = original; }
+  };
+  const same = run(sheet('Eski', 'draft', 'v', 'x'), sheet('Eski', 'sourced', 'v'));
+  assert.equal(same.out, sheet('Eski', 'sourced', 'v', 'x'), 'yalnız düzey değişti: iki işaret de taşınır');
+  assert.equal(same.warnings.length, 0);
+  const title = run(sheet('Eski', 'draft', 'v', 'x'), sheet('Yeni', 'draft', 'v'));
+  assert.match(title.out, /\| u01\.01 \| Yeni \| h \| `draft` \| - \[ \] \|/, 'ders başlığı değişti: işaret taşınmaz');
+  assert.match(title.out, /- \[x\] L1 metin uygun {3}- \[x\] L2/, 'ünite metni aynı: ünite işareti taşınır');
+  assert.equal(title.warnings.length, 1);
+  const vaad = run(sheet('Eski', 'draft', 'v', 'x'), sheet('Eski', 'draft', 'yeni vaat'));
+  assert.match(vaad.out, /- \[ \] L1 metin uygun {3}- \[ \] L2/, 'ünite vaadi değişti: işaret taşınmaz');
+  assert.match(vaad.out, /\| u01\.01 \| Eski \| h \| `draft` \| - \[x\] \|/, 'ders satırı aynı: işareti kalır');
+});
+
+check('K2F-24 ek tur: aynı kimlikli birden çok kutu satırı belirsizdir → taşınmaz ve uyarılır', () => {
+  const { carryReviewMarks } = require('../../tools/kao2-curriculum-build.mjs');
+  const dup = ['### g1 · X', '', '- [x] L1 metin uygun', '- [ ] L1 metin uygun'].join('\n');
+  const warnings = [];
+  const original = console.warn;
+  console.warn = (message) => warnings.push(String(message));
+  let out;
+  try { out = carryReviewMarks(dup, dup.replace(/\[x\]/, '[ ]'), 'sayfa'); } finally { console.warn = original; }
+  assert.doesNotMatch(out, /\[x\]/, 'belirsiz işaret hiçbir satıra yazılmaz');
+  assert.equal(warnings.length, 1);
+});
+
+check('K2F-24 ek tur: araç sembolik bağ üzerinden çalıştırılınca da üretir (sessizce hiçbir şey yapmaz)', () => {
+  const link = path.join(tmp, 'tool-link.mjs');
+  fs.symlinkSync(TOOL, link);
+  const out = path.join(tmp, 'viaSymlink');
+  execFileSync(process.execPath, [link, '--out-dir', out], { encoding: 'utf8' });
+  assert.ok(fs.existsSync(path.join(out, 'app/content/quranCurriculumV2.js')), 'sembolik bağ üzerinden çıktı üretilmedi');
+});
+
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(`KAO2 review-apply: PASS (${passed} kontrol)`);

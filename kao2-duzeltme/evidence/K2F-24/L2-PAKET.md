@@ -61,7 +61,7 @@ Kural: harekesiz iskelet + yaygın önek/zamir eki (+ düzenli çoğul) ayıklan
 
 ## B. Dinî bağlamlı ünite ve ders metinleri
 
-Seçim ölçütü: aracın kendi dinî-bağlam deseni (`RELIGIOUS`, `tools/kao2-curriculum-build.mjs`) metinde geçiyor. Uzman listeye madde ekleyebilir/çıkarabilir.
+Seçim ölçütü: Ünite 1–3 dersleri her zaman; diğerleri için aracın dinî-bağlam deseni (`RELIGIOUS`, `tools/kao2-curriculum-build.mjs`) metinde geçiyor. Uzman listeye madde ekleyebilir/çıkarabilir.
 
 ### B1. Ünite metinleri (vaat + “neden önemli”)
 
@@ -85,11 +85,16 @@ Dosya: `docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md  → “Dersler
 | Kimlik | Başlık | Mevcut düzey |
 |---|---|---|
 | u01.01 | Besmele | sourced |
+| u01.02 | Rahîm ve Hamd | sourced |
+| u01.03 | Yalnız sana | sourced |
 | u01.04 | Doğru yol | sourced |
 | u01.05 | Gazaba uğrayanlar değil | sourced |
 | u02.01 | Büyüklük ve tek ilah | sourced |
 | u02.02 | Tenzih, selâm ve bereket | sourced |
 | u02.03 | Namazda ne diyorum | sourced |
+| u03.01 | Kelime sonundaki ekler | sourced |
+| u03.02 | Sığınma ve sabah aydınlığı | sourced |
+| u03.03 | Yaratmak ve gece | sourced |
 | u03.04 | Düğümlere üfleyenler | sourced |
 | u03.05 | Kıskançlık ve vesvese | sourced |
 | u03.06 | Üç sûreyi birlikte okuma | sourced |
@@ -121,6 +126,6 @@ Dosya: `docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md  → ilgili kav
 
 ## C. Bu paketin kapsamadığı / dürüstçe açık olanlar
 
-- Yukarıdaki seçim bir **regex taramasıdır**; dinî bağlam taşıyıp desene takılmayan metin olabilir.
+- Seçim: Ünite 1–3 dersleri (baştan dinî metin) + aracın dinî-bağlam deseni (`RELIGIOUS`) metinde geçen diğer ünite/ders/kavramlar. Desene takılmayan ama dinî bağlam taşıyan metin olabilir; uzman madde ekleyebilir.
 - Mevcut `sourced` onayları kullanıcı devriyle yapay zekâ incelemesidir; bu paket onları **uzman onayına yükseltmez**.
 - Telaffuz sesi (katman A kayıt), 20 `draft` sûre tanıtımı (KR-5) ve cihaz doğrulaması ayrı kapılardır.

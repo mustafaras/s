@@ -727,3 +727,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - scope: Dokun dışı (kullanıcı yetkisi): tests/kao/test_kao2_review_apply.js, kao2-duzeltme/tools/l2-paket-build.mjs (yeni), kao2-duzeltme/tools/kapilar.sh (+1 kapı). Ortak $TMPDIR'de `a.txt` adlı bir dosyayı yanlışlıkla ezdim (benim değilse içeriği kayıp; depoyla ilgisi yok).
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz — · uzman (L2) —
 - next: K2F-25
+
+## seq 73 · 2026-10-03 · RELEASE · K2F-24
+- status: done
+- title: K2F-24 + ek turlar canlıya alındı (kullanıcı isteği), pin 20261003b
+- prev-commit: 867aca6f
+- evidence: kao2-duzeltme/evidence/K2F-24/YAYIN.md
+- decision: kullanıcı "canlıya alalım" dedi; `main` ff-only `b25ee012..9adac908`, force yok; Pages run 37116493085 success; canlı 10/10 bayt-eşit; gizlilik 404 ✓.
+- disclosure: dinî bağlamlı metin onayları yapay zekâ incelemesidir; gerçek L2 uzman onayı yoktur (GATE seq 71 açık).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
+- next: K2F-25

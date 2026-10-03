@@ -8,9 +8,9 @@
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
   "nextPrompt": "K2F-25",
-  "ledgerLastSeq": 72,
+  "ledgerLastSeq": 73,
   "releaseApproval": "approved_through_K2F-17",
-  "lastRelease": {"prompt": "K2F-23", "commit": "b25ee012", "pin": "20261003a", "run": 37113366008, "evidence": "kao2-duzeltme/evidence/K2F-23/YAYIN.md"},
+  "lastRelease": {"prompt": "K2F-24", "commit": "9adac908", "pin": "20261003b", "run": 37116493085, "evidence": "kao2-duzeltme/evidence/K2F-24/YAYIN.md"},
   "sources": {
     "audit": "kao2-duzeltme/denetim/KUSUR-RAPORU.md",
     "plan": "kao2-duzeltme/denetim/DUZELTME-PLANI.md",

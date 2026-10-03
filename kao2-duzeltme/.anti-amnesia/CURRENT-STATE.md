@@ -2,30 +2,30 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-25
-lastSeq: 72
+lastSeq: 73
 status: active
 -->
 
-Son güncelleme: 2026-10-03 · LEDGER seq 72 · K2F-00…24 tamam (25/44) + K2F-24 ek turları (seq 70 FIX, seq 71 GATE, seq 72 FIX), sıradaki K2F-25. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-03 · LEDGER seq 73 · K2F-00…24 tamam (25/44) + K2F-24 ek turları (seq 70 FIX, 71 GATE, 72 FIX) + yayın (seq 73 RELEASE), sıradaki K2F-25. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-24 bitti (yalnız kaynak/test; **yayında DEĞİL**, pin yükseltilmedi): namaz metinlerindeki `lp_*` kelimeleri araçla öğretilen `l_*` lemmalarına muhafazakâr belirlenimci eşlemeyle bağlandı. `applyWords` durumu eşlenen lemmadan türetir (`mappedLemmaId`), tanış kartı çapası eşlenen kelimeyi bulur, Ünite 2'nin u02.02 ve u02.03 dersleri `examples` yerine `prayer:tahiyyat` çapasına bağlandı (u02.01 `tekbir` kaldı). K2F-23 sabiti 97 → 95 ders.
+K2F-24 bitti ve **canlıda** (2026-10-03, kullanıcı isteği; pin `20261003b`): namaz metinlerindeki `lp_*` kelimeleri araçla öğretilen `l_*` lemmalarına muhafazakâr belirlenimci eşlemeyle bağlandı. `applyWords` durumu eşlenen lemmadan türetir (`mappedLemmaId`), tanış kartı çapası eşlenen kelimeyi bulur, Ünite 2'nin u02.02 ve u02.03 dersleri `examples` yerine `prayer:tahiyyat` çapasına bağlandı (u02.01 `tekbir` kaldı). K2F-23 sabiti 97 → 95 ders.
 
-**Ek turlar (yalnız kaynak/test, yayında DEĞİL):**
+**Ek turlar (canlıda):**
 - **Eşleme:** 32 benzersiz `lp_*` kelimeden **19 eşli, 13 eşlenmez** (eski belgelerdeki "30/18/12" yanlıştı; araç 32/18/14 üretiyordu). Eklenen tek kural: düzenli -în/-ûn çoğulu (yalnız çoğul olmayan fâil/mef'ûl/sıfat lemmaları, ≥3 harf çekirdek) → es-sâlihîn → sâlih. Eşlenen kelime KÜMESİ testte sabit; yeni eşleme bilinçli onay ister.
 - **Araç inceleme kutuları (seq 70, seq 72):** `tools/kao2-curriculum-build.mjs` `INCELEME-KAO2-17/18` onay kutularını korur (L1/L2 ayrı; boş `--out-dir` depodan okur). Seq 72 sıkılaştırması: işaret YALNIZ kutunun metin bağlamı (satır/başlık bloğu; düzey sütunu ve "- İnceleme:" satırı hariç) aynıysa taşınır; metin/kimlik/kutu sayısı değişir ya da kimlik belirsizse taşınmaz ve stderr'e UYARI yazılır. Araç sembolik bağ üzerinden de çalışır (`realpath`).
 - **L2 paketi:** `kao2-duzeltme/evidence/K2F-24/L2-PAKET.md` artık `node kao2-duzeltme/tools/l2-paket-build.mjs` ile üretilir; `--check` kapısı `kapilar.sh` içindedir (L2 listesi eşlemeyle senkron kalır). Seçim: Ünite 1–3 dersleri + dinî-bağlam deseni.
 - **Kod incelemesi (code-reviewer):** CRITICAL/HIGH yok; 2 MEDIUM + 2 LOW bulgu seq 72'de kapatıldı.
 
-**YAYINDA (2026-10-03, K2F-23 sonrası):** K2F-19…23 + ek turlar canlı — `main` `b25ee012`, pin `20261003a`; K2F-24 ve ek turları canlıda yok. Cihaz doğrulaması kullanıcıda.
+**YAYINDA (2026-10-03):** K2F-19…24 + ek turlar canlı — `main` `9adac908`, pin `20261003b`, Pages run 37116493085 success, canlı 10/10 bayt-eş ([YAYIN.md](../evidence/K2F-24/YAYIN.md)). Cihaz doğrulaması kullanıcıda.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
 **K2F-25 (Tanış kartı katmanları):** tanış kartına doğrulanmış örnek âyet ve katlanabilir "Neden böyle?" ekle (`quranLearnViews.js` intro aşaması, `quranLearn.js` intro modeli, `app/kao.css`, `test_kao2_lesson_flow.js`).
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
-- Dal: `kao2-duzeltme` = canlı `main` (`b25ee012`) + belge commit'leri + K2F-24 ve ek turları (yayınlanmamış: `quranLearnFlow.js`, `quranCurriculumV2.js`). Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
-- Yayın pini (canlı): `20261003a` · `App.kao*` 44 · App yüzeyi 765 · atama 603 · `onclick` 393.
+- Dal: `kao2-duzeltme` = canlı `main` (`9adac908`) + yalnız `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
+- Yayın pini (canlı): `20261003b` · `App.kao*` 44 · App yüzeyi 765 · atama 603 · `onclick` 393.
 - Kapılar: KAO 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS (ayrıntı KANIT "Ek tur 2").
 - `tekrar-uret.cjs`: **10/10 PASS**.
 - Bütçe (perf): içerik 185,235 KiB (tavan 256) · runtime 112,810 KiB (tavan 128) · css 13,605 KiB (tavan 14) · müfredat modülü gzip 21,9 KB (tavan 48 KiB).

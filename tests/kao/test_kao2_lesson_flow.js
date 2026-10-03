@@ -167,7 +167,7 @@ check('oynatıcı: vadeli tekrar önce; intro → FSRS pekiştirme; çıkışta 
   assert.ok(state.saves >= 4, 'ilerleme ve FSRS kaydı kalıcılaştırıldı');
 });
 
-// K2F-23 (K3-01, R-08): çapa metni olmayan 97 derste "Uygula" adımı doğrulanmış örnek cümlelerle dolar.
+// K2F-23 (K3-01, R-08): çapa metni olmayan 95 derste (K2F-24: Ünite 2'nin 2 dersi namaz çapasına bağlandı, 97 → 95) "Uygula" adımı doğrulanmış örnek cümlelerle dolar.
 const allLessons = curriculum.units.flatMap((unit) => unit.lessons);
 const SENTENCE_KEYS = ['lemmaId', 'ar', 'pronunciation', 'tr', 'ref'];
 
@@ -185,7 +185,7 @@ check('K2F-23 uygula: 109 dersin 109\'unda adım içerikli (kelime ya da cümle)
       assert.equal((apply.words || []).length, 0, `${item.id}: örnek modunda çapa kelimesi olmaz`);
     }
   }
-  assert.equal(examples, 97, 'çapa metni olmayan ders sayısı');
+  assert.equal(examples, 95, 'çapa metni olmayan ders sayısı');
 });
 
 check('K2F-23 uygula: örnek cümleler dersin lemmalarından (önce yeni), en çok 3, doğrulanmış examples[0]; tahmin yok', () => {
@@ -240,6 +240,76 @@ check('K2F-23 uygula: görünüm cümleyi Arapça + okunuş + Türkçe + âyet k
     assert.ok(flat.includes(`Bu dersin kelimesi: ${sentence.lemmaPronunciation}`), `${sentence.lemmaId}: ders kelimesi satırı yok`);
   }
   assert.equal((html.match(/kao-primary/g) || []).length >= 1, true);
+});
+
+// K2F-24 (K3-02 · D-07): namaz metinlerindeki lp_* kelimeleri öğretilen l_* lemmalarına muhafazakâr belirlenimci eşlemeyle bağlanır.
+const MAP = curriculum.prayerLemmaMap || {};
+const unit2 = curriculum.units.find((unit) => unit.id === 2);
+const prayerWords = (id) => content.shorts.prayerTexts.find((item) => item.id === id).words;
+const introduceAll = (q, ids) => ids.forEach((id) => { q.cards[`w:${id}:ar>tr`] = { state: 'review', s: 4, reps: 1, introducedAt: '2026-09-20T10:00:00.000Z' }; });
+
+check('K2F-24 eşleme: yalnız namaz-eki (lp_) → sözlük (l_) ve doğrulanmış lemma; birden çok adaylı kelime eşlenmez', () => {
+  const keys = Object.keys(MAP);
+  assert.ok(keys.length >= 10, `eşleme sayısı ${keys.length}`);
+  for (const key of keys) {
+    assert.ok(key.startsWith('lp_'), `${key}: anahtar lp_ değil`);
+    assert.ok(content.lexicon.byId(MAP[key]), `${key}: hedef sözlükte yok (${MAP[key]})`);
+    assert.ok(prayerWordsAll().some((w) => w.lemmaId === key), `${key}: namaz metninde geçmiyor`);
+  }
+  assert.equal(MAP.lp_7cb56720c0, 'l_sala_m_daff0b', 'es-selâm → selâm lemması');
+  assert.equal(MAP.lp_5cfe478ddb, 'l_suboHa_n_59533b', 'subhânaka → subhân lemması');
+  assert.equal(MAP.lp_c7d096cadc, undefined, "'abduhu iki adaylı (kul / kulluk etti): eşleme yok");
+  assert.equal(MAP.lp_f0473a3990, undefined, 'adayı olmayan kelime eşlenmez (tahmin yok)');
+});
+
+function prayerWordsAll() { return content.shorts.prayerTexts.flatMap((item) => item.words); }
+
+check('K2F-24 Ünite 2: her dersin uygula adımı kendi namaz çapasına bağlı (örnek cümleye düşmez)', () => {
+  const anchors = unit2.anchor.map((a) => a.replace(/^prayer:/, ''));
+  for (const item of unit2.lessons) {
+    assert.equal(item.apply.kind, 'prayer', `${item.id}: apply ${item.apply.kind}`);
+    assert.ok(anchors.includes(item.apply.ref), `${item.id}: çapa dışı metin ${item.apply.ref}`);
+    const ids = new Set(item.lemmaIds);
+    const reach = prayerWords(item.apply.ref).some((w) => ids.has(w.lemmaId) || ids.has(MAP[w.lemmaId]));
+    assert.ok(reach, `${item.id}: ${item.apply.ref} metni dersin hiçbir lemmasına bağlanmıyor`);
+  }
+  const lessonOfSalam = unit2.lessons.find((item) => item.lemmaIds.includes('l_sala_m_daff0b'));
+  assert.equal(lessonOfSalam.apply.ref, 'tahiyyat', 'selâm/tayyibât/berekât dersi tahiyyat metnine bağlı');
+});
+
+check('K2F-24 uygula durumu: eşlenen lp_ kelimesi öğretilmişse known, ders yeniyse new, eşlenmeyen open; doğrudan l_ kelimeleri değişmez', () => {
+  const target = unit2.lessons.find((item) => item.lemmaIds.includes('l_sala_m_daff0b'));
+  const fresh = flow.lessonPlan({ quranLearn: freshQ() }, target.id, now, content).find((item) => item.kind === 'apply');
+  const salam = fresh.words.find((w) => w.lemmaId === 'lp_7cb56720c0');
+  assert.equal(salam.state, 'new', 'bu dersin yeni kelimesi namaz metninde "new"');
+  assert.equal(salam.mappedLemmaId, 'l_sala_m_daff0b');
+  const q = freshQ();
+  introduceAll(q, unit2.lessons.flatMap((item) => item.lemmaIds));
+  const done = flow.lessonPlan({ quranLearn: q }, target.id, now, content).find((item) => item.kind === 'apply');
+  assert.equal(done.words.find((w) => w.lemmaId === 'lp_7cb56720c0').state, 'known');
+  assert.equal(done.words.find((w) => w.lemmaId === 'lp_c7d096cadc').state, 'open', 'eşlenmeyen kelime open kalır');
+  assert.equal(done.words.find((w) => w.lemmaId === 'l_ll_ah_d0a09b').state, 'open', 'Ünite 1 lemması bu ünitede öğretilmedi');
+  assert.deepEqual(plain(done.words.map(({ ar, tr, lemmaId }) => ({ ar, tr, lemmaId }))), plain(prayerWords(target.apply.ref).map(({ ar, tr, lemmaId }) => ({ ar, tr, lemmaId }))));
+});
+
+check('K2F-24 tanış kartı: eşlenen namaz kelimesi çapa olarak kartta görünür', () => {
+  const target = unit2.lessons.find((item) => item.lemmaIds.includes('l_sala_m_daff0b'));
+  const intro = flow.lessonPlan({ quranLearn: freshQ() }, target.id, now, content).find((item) => item.kind === 'intro' && item.lemmaId === 'l_sala_m_daff0b');
+  assert.ok(intro && intro.anchor && intro.anchor.lemmaId === 'lp_7cb56720c0', 'intro çapası eşlenen namaz kelimesi değil');
+});
+
+check('K2F-24 eşleme dosyası ve L2 listesi: araç çıktısı modülle aynı; eşleşmeyenler kimlik + neden ile listelenir', () => {
+  const file = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/prayer-lemma-map.json'), 'utf8'));
+  assert.deepEqual(plain(file.map), plain(MAP));
+  const review = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md'), 'utf8');
+  const uniqueLp = new Set(prayerWordsAll().map((w) => w.lemmaId).filter((id) => id.startsWith('lp_')));
+  const unmatched = [...uniqueLp].filter((id) => !MAP[id]);
+  assert.ok(unmatched.length > 0);
+  for (const id of unmatched) assert.ok(review.includes(id), `${id} L2 listesinde yok`);
+  for (const id of Object.keys(MAP)) assert.ok(!review.includes(`| ${id} |`), `${id} eşlenmiş ama listede`);
+  assert.ok(review.includes('lp_c7d096cadc') && /birden çok aday/.test(review), 'belirsiz aday nedeni yazılmamış');
+  assert.equal(Object.keys(MAP).length + unmatched.length, uniqueLp.size);
+  assert.ok(!/[\u0600-\u06FF]/.test(JSON.stringify(file)) && !/[\u0600-\u06FF]/.test(review), 'eşleme çıktıları Arapça harf içermez (P9)');
 });
 
 console.log(`KAO2-12 lesson flow: PASS (${passed} kontrol)`);

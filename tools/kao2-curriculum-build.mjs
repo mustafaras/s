@@ -17,6 +17,8 @@ const BEFORE_K2F20 = 'docs/kuran-ogreniyorum/kao2/content/curriculum.before-k2f2
 const OUT_TEXT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md';
 const OUT_CONCEPT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md';
 const OUT_CONCEPT_MODULE = 'app/content/quranConceptTextsV1.js';
+const OUT_PRAYER_MAP = 'docs/kuran-ogreniyorum/kao2/content/prayer-lemma-map.json';
+const OUT_PRAYER_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md';
 const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
 
 function fail(message) {
@@ -38,6 +40,104 @@ function readSpec() {
   const raw = fs.readFileSync(path.join(ROOT, SPEC), 'utf8');
   if (ARABIC.test(raw)) fail('spec Arapça içeremez (D-12); yalnız lemma kimliği kullan');
   return JSON.parse(raw);
+}
+
+// K2F-24 (K3-02 · D-07): namaz metinlerindeki `lp_*` (namaz eki) kelimelerini öğretilen `l_*` lemmalarına BAĞLAR.
+// Muhafazakâr + belirlenimci: harekesiz iskelet (hançer elif elife çevrilir, elif/ya biçimleri birleştirilir); yalnız yaygın
+// önek (ve, bi, li, fe, el, vel) ve zamir eki (ke, he, ye, nâ, küm, hüm, hâ) ayıklanmış TAM eşitlik; çok-aday → eşleme yok.
+// Çekim/çoğul/fiil kökü tahmini yapılmaz; eşleşmeyenler L2 listesine yazılır. Arapça yalnız kod noktasıyla anılır.
+const DIACRITICS = /[\u0640\u064B-\u065F\u06D6-\u06ED]/g;
+const PRAYER_PREFIXES = ['', '\u0648', '\u0627\u0644', '\u0648\u0627\u0644', '\u0628', '\u0648\u0628', '\u0644', '\u0648\u0644', '\u0641'];
+const PRAYER_SUFFIXES = ['', '\u0643', '\u0647', '\u064A', '\u0646\u0627', '\u0643\u0645', '\u0647\u0645', '\u0647\u0627'];
+const PRAYER_CORE_MIN = 2;
+
+// Hançer elif (U+0670) mushafta yazılır ama düz metinde elif olarak ya da hiç yazılmaz: iki iskelet biçimi de anahtar sayılır.
+function skeletons(text) {
+  const base = String(text).replace(DIACRITICS, '');
+  return [...new Set([base.replace(/\u0670/g, ''), base.replace(/\u0670/g, '\u0627')])]
+    .map((form) => form.replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627').replace(/\u0649/g, '\u064A'));
+}
+
+function prayerCandidates(word, bySkeleton) {
+  const full = skeletons(word.ar)[0];
+  const found = new Map();
+  for (const prefix of PRAYER_PREFIXES) {
+    for (const suffix of PRAYER_SUFFIXES) {
+      if (!full.startsWith(prefix) || !full.endsWith(suffix)) continue;
+      if (full.length - prefix.length - suffix.length < PRAYER_CORE_MIN) continue;
+      for (const id of bySkeleton.get(full.slice(prefix.length, full.length - suffix.length)) || []) found.set(id, true);
+    }
+  }
+  return [...found.keys()].sort();
+}
+
+function buildPrayerMap({ lex, surahs }) {
+  const bySkeleton = new Map();
+  for (const lemma of lex.lemmas) {
+    for (const key of skeletons(lemma.ar)) {
+      if (!bySkeleton.has(key)) bySkeleton.set(key, []);
+      if (!bySkeleton.get(key).includes(lemma.id)) bySkeleton.get(key).push(lemma.id);
+    }
+  }
+  const rows = new Map();
+  for (const text of surahs.prayerTexts) {
+    for (const word of text.words) {
+      if (!word.lemmaId.startsWith('lp_')) continue;
+      if (!rows.has(word.lemmaId)) rows.set(word.lemmaId, { lemmaId: word.lemmaId, pronunciation: word.pronunciation, tr: word.tr, prayers: [], candidates: prayerCandidates(word, bySkeleton) });
+      const row = rows.get(word.lemmaId);
+      if (!row.prayers.includes(text.id)) row.prayers.push(text.id);
+    }
+  }
+  const map = {};
+  const matched = [];
+  const unmatched = [];
+  for (const row of [...rows.values()].sort((a, b) => a.lemmaId.localeCompare(b.lemmaId))) {
+    if (row.candidates.length === 1) {
+      map[row.lemmaId] = row.candidates[0];
+      matched.push(row);
+    } else {
+      unmatched.push(Object.assign({ reason: row.candidates.length ? 'birden çok aday' : 'aday yok' }, row));
+    }
+  }
+  return { map, matched, unmatched };
+}
+
+function renderPrayerMapJson({ map, matched }) {
+  const details = matched.map((row) => ({ lemmaId: row.lemmaId, lemma: map[row.lemmaId], pronunciation: row.pronunciation, tr: row.tr, prayers: row.prayers }));
+  return `${JSON.stringify({
+    note: 'Araç çıktısı (tools/kao2-curriculum-build.mjs, K2F-24). Elle düzenlemeyin; Arapça içermez.',
+    rule: 'harekesiz iskelet + yaygın önek/zamir eki ayıklanmış tam eşitlik; tek aday → eşleme, aksi hâlde yok',
+    map, details
+  }, null, 2)}\n`;
+}
+
+function renderPrayerReview({ map, matched, unmatched }) {
+  const lines = ['# Namaz metni ↔ lemma eşlemesi (L2 inceleme)', '',
+    '> Araç çıktısıdır (`tools/kao2-curriculum-build.mjs`, K2F-24); elle düzenlemeyin. Arapça içermez; kelimeler kimlik + okunuşla anılır.',
+    '> Kural: harekesiz iskelet + yaygın önek/zamir eki ayıklanmış TAM eşitlik; tek aday → eşleme, birden çok aday ya da aday yok → eşleme YOK (tahmin yok).',
+    '> Bu liste yapay zekâ değil, gerçek alan uzmanının (L2) bakması içindir: eşlenmeyen kelimeler uygulamada "açık" görünür, hiçbir lemmaya bağlanmaz.', '',
+    `## Eşleşmeyen kelimeler (${unmatched.length})`, '',
+    '| Namaz kelimesi | Okunuş | Anlam | Metinler | Neden | Adaylar |', '|---|---|---|---|---|---|'];
+  for (const row of unmatched) lines.push(`| ${row.lemmaId} | ${row.pronunciation} | ${row.tr} | ${row.prayers.join(', ')} | ${row.reason} | ${row.candidates.join(', ') || '—'} |`);
+  lines.push('', `## Eşlenen kelimeler (${matched.length})`, '');
+  for (const row of matched) lines.push(`- ${row.lemmaId} (${row.pronunciation} · ${row.tr}) → ${map[row.lemmaId]} · ${row.prayers.join(', ')}`);
+  return `${lines.join('\n')}\n`;
+}
+
+// Ünite çapaları namaz metniyse ve dersin ilk lemması örnek cümleye düşüyorsa: dersin lemmalarını (doğrudan ya da eşlemeyle)
+// en çok içeren çapa metni uygulama olur (eşitlikte çapa sırası). Hiçbirine bağlanmıyorsa varsayılan korunur.
+function prayerApplyFor(unit, lemmaIds, fallback, surahs, map) {
+  if (fallback.kind !== 'examples') return fallback;
+  const wanted = new Set(lemmaIds);
+  let best = null;
+  for (const ref of unit.anchor || []) {
+    const [kind, id] = ref.split(':');
+    if (kind !== 'prayer') continue;
+    const text = surahs.prayerTexts.find((p) => p.id === id);
+    const hits = new Set(text.words.map((w) => (wanted.has(w.lemmaId) ? w.lemmaId : map[w.lemmaId])).filter((l) => l && wanted.has(l))).size;
+    if (hits > 0 && (!best || hits > best.hits)) best = { hits, apply: { kind: 'prayer', ref: id } };
+  }
+  return best ? best.apply : fallback;
 }
 
 // Çapa metninin kelimelerini ilk geçiş sırasıyla verir (sözlük dışı olanlar sonra elenir).
@@ -211,6 +311,7 @@ function textFor(texts, id, fallbackTitle, fallbackGoal, section) {
 
 function build(spec, content, texts) {
   const { perUnit, source, byId } = assignUnits(spec, content);
+  const prayerMap = buildPrayerMap(content);
   const lemmaToLesson = {};
   const units = spec.units.map((unit) => {
     for (const cid of unit.conceptIds) if (!content.grammar.byId(cid)) fail(`Ü${unit.id}: geçersiz kavram ${cid}`);
@@ -228,7 +329,7 @@ function build(spec, content, texts) {
         goal: text.goal || null,
         lemmaIds,
         conceptId: unit.conceptIds[i] || null,
-        apply: source.get(lemmaIds[0]),
+        apply: prayerApplyFor(unit, lemmaIds, source.get(lemmaIds[0]), content.surahs, prayerMap.map),
         // KAO2 ustalığı ÜNİTE düzeyindedir (path.units[].masteryAt); içerik dersi hiçbir zaman ustalık dersi değildir.
         mastery: false,
         review: text.review
@@ -349,10 +450,11 @@ function build(spec, content, texts) {
   }), letters: s0Letters };
   const missing = content.lex.lemmas.filter((l) => !lemmaToLesson[l.id]);
   if (missing.length) fail(`derse girmeyen lemma: ${missing[0].id}`);
-  return { version: spec.version, levels, units, s0, surahs, lemmaToLesson };
+  return { version: spec.version, levels, units, s0, surahs, lemmaToLesson, prayerLemmaMap: prayerMap.map, prayerMap };
 }
 
-function renderModule(data) {
+function renderModule(fullData) {
+  const { prayerMap, ...data } = fullData; // araç içi ayrıntı (eşleşmeyen liste) modüle girmez
   const freeze = "function freeze(v){if(v&&typeof v==='object'&&!Object.isFrozen(v)){Object.keys(v).forEach(function(k){freeze(v[k]);});Object.freeze(v);}return v;}";
   const index = "var index={};data.units.forEach(function(u){u.lessons.forEach(function(l){index[l.id]=l;});});";
   const byLesson = "data.byLesson=function(id){return Object.prototype.hasOwnProperty.call(index,id)?index[id]:null;};";
@@ -727,7 +829,8 @@ function main() {
   const data = build(spec, content, texts);
   const conceptTexts = buildConceptTexts(texts);
   const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)], [OUT_TEXT_REVIEW, renderTextReview(data)],
-    [OUT_CONCEPT_REVIEW, renderConceptReview(texts, content.grammar)], [OUT_CONCEPT_MODULE, renderConceptModule(conceptTexts)]];
+    [OUT_CONCEPT_REVIEW, renderConceptReview(texts, content.grammar)], [OUT_CONCEPT_MODULE, renderConceptModule(conceptTexts)],
+    [OUT_PRAYER_MAP, renderPrayerMapJson(data.prayerMap)], [OUT_PRAYER_REVIEW, renderPrayerReview(data.prayerMap)]];
   for (const [file, text] of outputs) {
     const target = path.join(outDir, file);
     fs.mkdirSync(path.dirname(target), { recursive: true });

@@ -183,7 +183,7 @@ Kavram: g3 '-de, -den, -e' kelimeleri · Uygula: prayer:tekbir
 
 ### u02.02 · Tenzih, selâm ve bereket
 
-Kavram: g4 'o, onlar, sen, siz, ben, biz' · Uygula: examples
+Kavram: g4 'o, onlar, sen, siz, ben, biz' · Uygula: prayer:tahiyyat
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
@@ -195,7 +195,7 @@ Kavram: g4 'o, onlar, sen, siz, ben, biz' · Uygula: examples
 
 ### u02.03 · Namazda ne diyorum
 
-Kavram: — · Uygula: examples
+Kavram: — · Uygula: prayer:tahiyyat
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|

@@ -1,0 +1,192 @@
+{
+  "note": "Araç çıktısı (tools/kao2-curriculum-build.mjs, K2F-24). Elle düzenlemeyin; Arapça içermez.",
+  "rule": "harekesiz iskelet + yaygın önek/zamir eki ayıklanmış tam eşitlik; tek aday → eşleme, aksi hâlde yok",
+  "map": {
+    "lp_060fad1342": "l_Hamod_98138a",
+    "lp_10bcd8764a": "l_som_585f33",
+    "lp_25704375a0": "l_EalaY_f79ef3",
+    "lp_31fee142df": "l_EalaY_f79ef3",
+    "lp_5cfe478ddb": "l_suboHa_n_59533b",
+    "lp_67dad87faf": "l_EalaY_f79ef3",
+    "lp_6cc3dd4445": "l_raHomap_490a24",
+    "lp_779a7fd410": "l_Tay_iba_t_e6ca86",
+    "lp_7ae90ff4c5": "l_rab_fc2490",
+    "lp_7cb56720c0": "l_sala_m_daff0b",
+    "lp_820672c615": "l_suboHa_n_59533b",
+    "lp_832ee02139": "l_baraka_t_188a75",
+    "lp_99236de03d": "l_EalaY_f79ef3",
+    "lp_999a97b04a": "l_laA_4e2bfd",
+    "lp_99f327d450": "l_n_abiY_e09f3b",
+    "lp_cd25a85435": "l_rasuwl_9a5606",
+    "lp_e3ae18f2ca": "l_gayor_6b16f9",
+    "lp_e5958c3b77": "l_EaZiym_93f908"
+  },
+  "details": [
+    {
+      "lemmaId": "lp_060fad1342",
+      "lemma": "l_Hamod_98138a",
+      "pronunciation": "va-bi-hamdika",
+      "tr": "hamdinle",
+      "prayers": [
+        "subhaneke"
+      ]
+    },
+    {
+      "lemmaId": "lp_10bcd8764a",
+      "lemma": "l_som_585f33",
+      "pronunciation": "ismuka",
+      "tr": "adın",
+      "prayers": [
+        "subhaneke"
+      ]
+    },
+    {
+      "lemmaId": "lp_25704375a0",
+      "lemma": "l_EalaY_f79ef3",
+      "pronunciation": "ʿalayka",
+      "tr": "senin üzerine",
+      "prayers": [
+        "tahiyyat"
+      ]
+    },
+    {
+      "lemmaId": "lp_31fee142df",
+      "lemma": "l_EalaY_f79ef3",
+      "pronunciation": "ʿalaynâ",
+      "tr": "bizim üzerimize",
+      "prayers": [
+        "tahiyyat"
+      ]
+    },
+    {
+      "lemmaId": "lp_5cfe478ddb",
+      "lemma": "l_suboHa_n_59533b",
+      "pronunciation": "subhânaka",
+      "tr": "seni tenzih ederim",
+      "prayers": [
+        "subhaneke"
+      ]
+    },
+    {
+      "lemmaId": "lp_67dad87faf",
+      "lemma": "l_EalaY_f79ef3",
+      "pronunciation": "ʿalaykum",
+      "tr": "üzerinize",
+      "prayers": [
+        "selam"
+      ]
+    },
+    {
+      "lemmaId": "lp_6cc3dd4445",
+      "lemma": "l_raHomap_490a24",
+      "pronunciation": "va-rahmetu",
+      "tr": "rahmeti",
+      "prayers": [
+        "tahiyyat",
+        "selam"
+      ]
+    },
+    {
+      "lemmaId": "lp_779a7fd410",
+      "lemma": "l_Tay_iba_t_e6ca86",
+      "pronunciation": "va-al-tayyibâtu",
+      "tr": "güzel sözler",
+      "prayers": [
+        "tahiyyat"
+      ]
+    },
+    {
+      "lemmaId": "lp_7ae90ff4c5",
+      "lemma": "l_rab_fc2490",
+      "pronunciation": "rabbiya",
+      "tr": "Rabbimi",
+      "prayers": [
+        "ruku",
+        "secde"
+      ]
+    },
+    {
+      "lemmaId": "lp_7cb56720c0",
+      "lemma": "l_sala_m_daff0b",
+      "pronunciation": "al-salâmu",
+      "tr": "selam",
+      "prayers": [
+        "tahiyyat",
+        "selam"
+      ]
+    },
+    {
+      "lemmaId": "lp_820672c615",
+      "lemma": "l_suboHa_n_59533b",
+      "pronunciation": "subhâna",
+      "tr": "tenzih ederim",
+      "prayers": [
+        "ruku",
+        "secde"
+      ]
+    },
+    {
+      "lemmaId": "lp_832ee02139",
+      "lemma": "l_baraka_t_188a75",
+      "pronunciation": "va-barakâtuhu",
+      "tr": "bereketleri",
+      "prayers": [
+        "tahiyyat"
+      ]
+    },
+    {
+      "lemmaId": "lp_99236de03d",
+      "lemma": "l_EalaY_f79ef3",
+      "pronunciation": "va-ʿalâ",
+      "tr": "ve üzerine",
+      "prayers": [
+        "tahiyyat"
+      ]
+    },
+    {
+      "lemmaId": "lp_999a97b04a",
+      "lemma": "l_laA_4e2bfd",
+      "pronunciation": "va-lâ",
+      "tr": "ve yoktur",
+      "prayers": [
+        "subhaneke"
+      ]
+    },
+    {
+      "lemmaId": "lp_99f327d450",
+      "lemma": "l_n_abiY_e09f3b",
+      "pronunciation": "al-nabiyyu",
+      "tr": "peygamber",
+      "prayers": [
+        "tahiyyat"
+      ]
+    },
+    {
+      "lemmaId": "lp_cd25a85435",
+      "lemma": "l_rasuwl_9a5606",
+      "pronunciation": "va-rasûluhu",
+      "tr": "elçisidir",
+      "prayers": [
+        "tahiyyat"
+      ]
+    },
+    {
+      "lemmaId": "lp_e3ae18f2ca",
+      "lemma": "l_gayor_6b16f9",
+      "pronunciation": "gayruka",
+      "tr": "senden başka",
+      "prayers": [
+        "subhaneke"
+      ]
+    },
+    {
+      "lemmaId": "lp_e5958c3b77",
+      "lemma": "l_EaZiym_93f908",
+      "pronunciation": "al-ʿazîmi",
+      "tr": "yüce",
+      "prayers": [
+        "ruku"
+      ]
+    }
+  ]
+}

@@ -684,3 +684,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - disclosure: yayına giren 122 metin onayı yapay zekâ incelemesidir (kullanıcı devri); gerçek L2 uzman onayı yoktur.
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda)
 - next: K2F-24
+
+## seq 69 · 2026-10-03 · PROMPT · K2F-24
+- status: done
+- title: Uygula 2/2 — Ünite 2 namaz çapası
+- prev-commit: ab19144e
+- evidence: kao2-duzeltme/evidence/K2F-24/KANIT.md
+- closes: K3-02 · D-07
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · plan-check · sync)
+- pins: App.kao* 44 · yüzey 765 · atama 603 · yayın 20261003a (pin yükseltme YOK)
+- changed-tests: test_kao2_lesson_flow.js (K2F-23 kontrolü: çapa metni olmayan ders 97 → 95; +5 K2F-24 kontrolü)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearnFlow.js · quranCurriculumV2.js) · cihaz —
+- surprises: üretici araç INCELEME-KAO2-17/18 onay kutularını sıfırladı → git checkout ile geri alındı; 30 lp_* kelimeden 18'i eşlendi, 12'si L2 listesinde (11 aday yok, 1 birden çok aday)
+- next: K2F-25

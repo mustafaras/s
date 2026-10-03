@@ -1,30 +1,32 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-24
-lastSeq: 68
+nextPrompt: K2F-25
+lastSeq: 69
 status: active
 -->
 
-Son güncelleme: 2026-10-02 · LEDGER seq 68 · K2F-00…23 tamam (24/44), sıradaki K2F-24. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-03 · LEDGER seq 69 · K2F-00…24 tamam (25/44), sıradaki K2F-25. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-23 bitti: 109 dersin 109'unda "Uygula" adımı içerikli (97 ders doğrulanmış örnek cümle, 12 ders çapa metni); R-08 PASS, tekrar-uret 10/10. Ek iş (seq 65, K2F-22 sonrası): 122 metin kullanıcı devriyle onaylandı (yapay zekâ incelemesi, gerçek L2 uzman onayı DEĞİL), 3 gramer şablonu eklendi (86/86), çift "Ünite" ön eki giderildi.
-**YAYINDA (2026-10-03, kullanıcı isteği):** K2F-19…23 + ek turlar canlı — `main` ff-only `19f0bfd6..b25ee012`, Pages run 37113366008 success, pin `20261003a`, canlı 10/10 bayt-eşit, gizlilik 404 ✓ (kanıt: evidence/K2F-23/YAYIN.md). Cihaz doğrulaması kullanıcıda.
+K2F-24 bitti (yalnız kaynak/test; **yayında DEĞİL**, pin yükseltilmedi): namaz metinlerindeki `lp_*` kelimeleri araçla öğretilen `l_*` lemmalarına muhafazakâr belirlenimci eşlemeyle bağlandı — 30 benzersiz kelimeden 18 eşlendi, 12'si eşlenmedi (11 aday yok, 1 birden çok aday: `lp_c7d096cadc`). `applyWords` durumu eşlenen lemmadan türetir (`mappedLemmaId`), tanış kartı çapası eşlenen kelimeyi bulur, Ünite 2'nin u02.02 ve u02.03 dersleri `examples` yerine `prayer:tahiyyat` çapasına bağlandı (u02.01 `tekbir` kaldı). Eşleşmeyenler `docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md`'de. K2F-23 sabiti 97 → 95 ders. tekrar-uret 10/10, tüm kapılar yeşil.
+**YAYINDA (2026-10-03, K2F-23 sonrası):** K2F-19…23 + ek turlar canlı — `main` `b25ee012`, pin `20261003a`; K2F-24 canlıda yok. Cihaz doğrulaması kullanıcıda.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-24 (Uygula 2/2 — Ünite 2 namaz çapası):** namaz metinlerindeki `lp_*` kelimelerini öğretilen `l_*` lemmalarına muhafazakâr belirlenimci eşlemeyle bağla (`tools/kao2-curriculum-build.mjs`, `prayer-lemma-map.json`, `applyWords`), Ünite 2'yi çapasına döndür; eşleşmeyenleri `NAMAZ-ESLEME-L2.md`'ye yaz.
+**K2F-25 (Tanış kartı katmanları):** tanış kartına doğrulanmış örnek âyet ve katlanabilir "Neden böyle?" ekle (`quranLearnViews.js` intro aşaması, `quranLearn.js` intro modeli, `app/kao.css`, `test_kao2_lesson_flow.js`).
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-02)
-- Dal: `kao2-duzeltme` = canlı `main` (`b25ee012`) + yalnız belge commit'leri (kao2-duzeltme/, Pages'e dahil değil). Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
+- Dal: `kao2-duzeltme` = canlı `main` (`b25ee012`) + belge commit'leri + K2F-24 (yayınlanmamış: `quranLearnFlow.js`, `quranCurriculumV2.js`). Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
 - Yayın pini (canlı): `20261003a` · `App.kao*` 44 · App yüzeyi 765 · atama 603 · `onclick` 393.
-- Kapılar: KAO 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
+- Kapılar (K2F-24 sonu): KAO 52 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
-- Bütçe (perf): içerik 184,986 KiB (tavan 256) · runtime 112,597 KiB (tavan 128) · css 13,605 KiB (tavan 14).
+- Bütçe (perf): içerik 185,223 KiB (tavan 256) · runtime 112,810 KiB (tavan 128) · css 13,605 KiB (tavan 14) · müfredat modülü gzip 21,9 KB (tavan 48 KiB).
+- Namaz eşlemesi: 18/30 `lp_*` eşlendi; Ünite 2 odak lemmalarından namaza bağlananlar suboHa_n, sala_m, Tay_iba_t, baraka_t, raHomap, rasuwl.
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı (`surahs`) 20 draft (KR-5'te kaldırılacak).
 
 ## Açık riskler
+- **Namaz eşlemesi yalnız eşit iskelette çalışır:** çekim/çoğul/fiil (aşhadu, salavât, tahiyyât, ʿibâd…) bilerek eşlenmedi → `NAMAZ-ESLEME-L2.md`; gerçek uzman bakışı tavsiye edilir. Üretici araç `INCELEME-KAO2-17/18` onay kutularını sıfırlar: araç çalıştırınca bu iki dosyayı `git checkout` ile geri al.
 - **Gerçek L2 uzman onayı yok:** dinî bağlamlı metinlerin onayı kullanıcı devriyle yapay zekâ incelemesidir; L2 kutularına dokunulmadı. Gerçek uzman kontrolü tavsiye edilir.
 - g14-k2 çeldiricileri ("gelecek zaman/olumsuzluk/emir anlamı") genel yanlış seçeneklerdir, doğrulanmış veri değildir.
 - Üretici sayfayı yeniden yazınca inceleme kutuları sıfırlanır (elle yeniden işlenmeli); araç işaretsiz eski `sourced`'u `draft`'a düşürmez.

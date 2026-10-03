@@ -113,9 +113,14 @@
     }
     var qRoot=obj(q),freshSet=Object.create(null);
     fresh.forEach(function(id){ freshSet[id]=true; });
+    // K2F-24 (K3-02): namaz metnindeki lp_* kelimesi, araçla üretilmiş muhafazakâr eşlemede (curriculum.prayerLemmaMap) bir l_* lemmasına
+    // bağlıysa durumu o lemmadan türer; eşlenmeyen kelime open kalır. lemmaId aynen korunur, eşlenen kimlik mappedLemmaId'de taşınır.
+    var prayerMap=obj(obj(content&&content.curriculum).prayerLemmaMap);
     return words.map(function(word){
-      var lemmaId=typeof word.lemmaId==='string'?word.lemmaId:'',isNew=!!(lemmaId&&freshSet[lemmaId]);
-      return {ar:String(word.ar||''),tr:String(word.tr||''),lemmaId:lemmaId,pronunciation:String(word.pronunciation||''),state:isNew?'new':(lemmaId&&introduced(qRoot,lemmaId,lesson.id)?'known':'open')};
+      var lemmaId=typeof word.lemmaId==='string'?word.lemmaId:'',mapped=typeof prayerMap[lemmaId]==='string'?prayerMap[lemmaId]:'',stateId=mapped||lemmaId,isNew=!!(stateId&&freshSet[stateId]);
+      var out={ar:String(word.ar||''),tr:String(word.tr||''),lemmaId:lemmaId,pronunciation:String(word.pronunciation||''),state:isNew?'new':(stateId&&introduced(qRoot,stateId,lesson.id)?'known':'open')};
+      if(mapped) out.mappedLemmaId=mapped;
+      return out;
     });
   }
   // K2F-23 (K3-01): çapa metni olmayan derste "Uygula" adımı dersin lemmalarının doğrulanmış ilk örnek cümlesiyle dolar
@@ -169,7 +174,7 @@
     fresh.forEach(function(id,index){
       var lemma=lex&&typeof lex.byId==='function'?lex.byId(id):null;
       if(!lemma) return;
-      var anchorWords=applyWords(lesson,c,q,fresh),anchor=anchorWords.find(function(word){ return word.lemmaId===id; })||null;
+      var anchorWords=applyWords(lesson,c,q,fresh),anchor=anchorWords.find(function(word){ return word.lemmaId===id||word.mappedLemmaId===id; })||null;
       items.push({id:'intro:'+id,kind:'intro',lessonId:lesson.id,lemmaId:id,lemma:lemma,ordinal:index+1,total:fresh.length,anchor:anchor,applyRef:lesson.apply||null});
     });
     if(concept) items.push({id:'concept:'+concept.id,kind:'concept',lessonId:lesson.id,concept:concept});

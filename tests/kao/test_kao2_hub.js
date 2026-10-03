@@ -25,10 +25,10 @@ function boot(options = {}) {
   for (const name of content) vm.runInContext(legacyDraftState(name, fs.readFileSync(path.join(repoRoot, `app/content/${name}.js`), 'utf8')), box, { filename: name });
   const core = options.withoutFlow ? ['app/core/quranLearnViews.js', 'app/core/quranLearn.js'] : ['app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js'];
   for (const file of core) vm.runInContext(fs.readFileSync(path.join(repoRoot, file), 'utf8'), box, { filename: file });
-  const state = { data: { settings: {}, days: {}, quranLearn: null }, bed: null };
+  const state = { data: { settings: {}, days: {}, quranLearn: null }, bed: null, ui: {} };
   const api = box.window.SeymaQuranLearn;
   assert.equal(api.registerQuranLearn({
-    data: () => state.data, ui: () => ({}), save() {}, render() {}, todayStr: () => TODAY, esc,
+    data: () => state.data, ui: () => state.ui, save() {}, render() {}, todayStr: () => TODAY, esc,
     icon: (name) => `<i data-icon="${name}"></i>`, getDay: () => ({})
   }), true);
   api.registerCaffeineTargetBed(() => state.bed);
@@ -154,6 +154,24 @@ check('kaoVisible=false → boş dize; hub render veriyi değiştirmez', () => {
   const before = JSON.stringify(state.data);
   card(api.kaoHubCardHTML());
   assert.equal(JSON.stringify(state.data), before, 'hub render sırasında veri yazmaz/normalize etmez');
+});
+
+// K2F-26 ek tur: Arapça sekmesi KAO'ya TEK giriştir; kart gizliyken boş "Ders alanı şu an görünmüyor" yerine geri getirme kartı çıkar.
+check('kaoVisible=false iken yalnız Arapça sekmesinde geri getirme kartı çıkar; başka yerde kart gizli kalır; geri getirince ders kartı döner', () => {
+  const { api, state } = boot();
+  state.data.quranLearn = { cards: {}, settings: { kaoVisible: false } };
+  for (const tab of [undefined, 'oz', 'oncu', 'iman']) { state.ui = { faithTab: tab }; assert.equal(api.kaoHubCardHTML(), '', `${tab}: gizliyken kart görünmemeli`); }
+  state.ui = { faithTab: 'arapca' };
+  const html = api.kaoHubCardHTML();
+  assert.match(html, /id="kao-hub-restore"/, 'geri getirme kartı yok');
+  assert.deepEqual(onclicks(html), ['onclick="App.kaoToggleVisible()"'], 'tek ve mevcut handler');
+  assert.ok(!html.includes('kao-hub-entry'), 'gizliyken ders girişi çizilmez');
+  assert.ok(text(html).includes('gizli') && text(html).includes('Göster'), 'metin durumu ve eylemi söylemeli');
+  assert.equal(api.kaoToggleVisible(), true);
+  assert.equal(state.data.quranLearn.settings.kaoVisible, true);
+  const back = api.kaoHubCardHTML();
+  assert.match(back, /id="kao-hub-entry"/, 'geri getirince ders girişi dönmeli');
+  assert.ok(!back.includes('kao-hub-restore'));
 });
 
 check('motor ya da müfredat yüklenmemişse kart yine çizilir (ana sekme kırılmaz)', () => {

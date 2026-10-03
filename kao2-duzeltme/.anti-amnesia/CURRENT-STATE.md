@@ -2,14 +2,15 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-27
-lastSeq: 77
+lastSeq: 78
 status: active
 -->
 
-Son güncelleme: 2026-10-03 · LEDGER seq 77 · K2F-00…26 tamam (27/44), sıradaki K2F-27. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-03 · LEDGER seq 78 · K2F-00…26 tamam (27/44) + K2F-26 ek turu (seq 78 FIX), sıradaki K2F-27. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 K2F-26 bitti (yalnız kaynak/test; **yayında DEĞİL**, pin yükseltilmedi): kaynaksız ve atfı yanlış 20 `surahs.*.contextTr` kaldırıldı (`texts.tr.json` `surahs` + yalnız onlara bağlı `sources["diyanet-meal"]`/`["tdv-sure"]`; araç `surahs` bloğu; modülde `surahs` yok; `kaoReaderContext` ve ölü `.kao-reader-context*` CSS gitti). Okuyucu tanıtım kartı yalnız `QuranRevelationOrderV1`'den (nüzul yeri · âyet sayısı · tema) çizilir; A-5 artık 20/20 sûre tanıtımını gerçek render ile ölçer. `code-reviewer` ek olarak "Hakkında ve kaynaklar" sayfasındaki gizli tüketiciyi yakaladı (`QuranCurriculumV2.surahs` sayısı → "0 sûre bağlamı" yazacaktı); düzeltildi. Kullanıcıya görünür davranış değişmedi (bağlam zaten ölü koddu).
+**Ek tur (seq 78, cihaz bildirimi):** canlıda Arapça sekmesinde "Ders alanı şu an görünmüyor" görüldü; kök neden `settings.kaoVisible===false` (K2F-25/26 değil, headless ölçüldü). Arapça sekmesi KAO'ya tek giriş olduğundan gizliyken artık "Ders kartı gizli · Göster" geri getirme kartı çıkar (`kaoHubCardHTML`, mevcut `kaoToggleVisible`; başka sekmelerde kart gizli kalır). Yayında değil. Hemen çare: uygulama Ayarları → Gizlenen kartlar → "Kur’an Arapçası kartını geri getir".
 
 **Canlıda (2026-10-03, kullanıcı isteğiyle):** K2F-19…25 + ek turlar — `main` `8cde3903`, pin `20261003c`, Pages run 37117992353, canlı 10/10 bayt-eş ([YAYIN.md](../evidence/K2F-25/YAYIN.md)). K2F-26 canlıda yok. Cihaz doğrulaması kullanıcıda.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
@@ -48,4 +49,5 @@ K2F-26 bitti (yalnız kaynak/test; **yayında DEĞİL**, pin yükseltilmedi): ka
 ## Bekleyen kullanıcı işleri
 - Cihaz doğrulaması (telefonda canlı site) kullanıcıdadır ve ayrıca bildirilecektir. Kalan kapı: K2F-43 YAYIN-2.
 - **L2 (GATE seq 71, waiting):** gerçek alan uzmanı onayı yoktur ve Claude veremez. `L2-PAKET.md` tek oturumda işaretlenecek madde listesidir. Uygunsa ilgili sayfada L2 kutusu `[x]` yapılıp **"L2 işaretlendi"** yazılır; kapı sonraki promptları engellemez.
-- K2F-26 yayında değil: istersen "canlıya alalım" de (pin `20261003c` → yeni pin).
+- K2F-26 + hub geri getirme düzeltmesi yayında değil: "canlıya alalım" de (pin `20261003c` → yeni pin). Düzeltme yayınlanmadan canlıdaki Arapça sekmesi eskisi gibi davranır; kullanıcı kartı Ayarlar → Gizlenen kartlar'dan geri getirebilir.
+- Cihaz doğrulaması: Arapça sekmesinde düğmenin geri geldiğini (ya da "Ders kartı gizli · Göster" kartını) teyit et; gelmezse cihazdaki veri farklı bir durumda demektir.

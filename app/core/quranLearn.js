@@ -3488,10 +3488,19 @@
   }
   function kaoHubCardHTML(){
     if(!quranLearnDeps) return '';
-    var d=quranLearnDeps.data()||{},raw=objectOr(d.quranLearn,{});
-    if(raw.settings&&raw.settings.kaoVisible===false) return '';
-    var model=kaoHubModel(d,new Date()),views=kaoViewsApi(),label='Kur’an Arapçası Öğreniyorum; '+model.subtitle+(model.ring?'; '+model.ring.label+' %'+model.ring.value:'')+'; '+model.action;
-    return '<button type="button" id="kao-hub-entry" class="kao-hub-card" onclick="App.kaoOpen()" aria-haspopup="dialog" aria-label="'+quranLearnDeps.esc(label)+'">'+(typeof views.hubCard==='function'?views.hubCard(model):'<span class="kao-hub-title">'+quranLearnDeps.esc(model.title)+'</span>')+'</button>';
+    var d=quranLearnDeps.data()||{},raw=objectOr(d.quranLearn,{}),hidden=!!(raw.settings&&raw.settings.kaoVisible===false);
+    // Arapça sekmesi KAO'ya tek giriş: gizliyken boş bırakmak kullanıcıyı çıkmaza sokar → aynı düğme geri getirme kartı olur (mevcut kaoToggleVisible). Başka yerde kart gizli kalır.
+    if(hidden&&quranLearnDeps.ui().faithTab!=='arapca') return '';
+    var views=kaoViewsApi(),model,label,inner,id,call;
+    if(hidden){
+      id='kao-hub-restore'; call='App.kaoToggleVisible()'; label='Kur’an Arapçası ders kartı gizli; yeniden göstermek için dokun';
+      inner=views.hubCard({title:'Ders kartı gizli',subtitle:'Gizlemiştin; dokunursan ders alanı yeniden görünür.',action:'Göster'});
+    }else{
+      model=kaoHubModel(d,new Date()); id='kao-hub-entry'; call='App.kaoOpen()';
+      label='Kur’an Arapçası Öğreniyorum; '+model.subtitle+(model.ring?'; '+model.ring.label+' %'+model.ring.value:'')+'; '+model.action;
+      inner=typeof views.hubCard==='function'?views.hubCard(model):'<span class="kao-hub-title">'+quranLearnDeps.esc(model.title)+'</span>';
+    }
+    return '<button type="button" id="'+id+'" class="kao-hub-card" onclick="'+call+'" aria-haspopup="dialog" aria-label="'+quranLearnDeps.esc(label)+'">'+inner+'</button>';
   }
   var KAO_HOME_TITLE="Kur'an Arapçası";
   var KAO_VIEW_TITLES={home:KAO_HOME_TITLE,units:'Yol',unit:'Ünite',word:'Kelime',reader:'Sûre',settings:'Ayarlar',phonics:'Telaffuz',ayah:'Günün âyeti',prayer:'Namazda ne diyorum',stats:'İlerleme',gate:'Harf kontrolü',session:'Oturum',grammar:'Gramer notları',concept:'Kavram',roots:'Kök aileleri',s0:'Harfler',sources:'Hakkında ve kaynaklar'};

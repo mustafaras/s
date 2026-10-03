@@ -782,3 +782,14 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranCurriculumV2.js · quranLearn.js · kao.css) · cihaz —
 - surprises: bağlam özelliği zaten ölü koddu (`curriculum.texts` yok); "Hakkında" sayfasındaki gizli tüketici code-reviewer ile yakalandı ve kapatıldı; bütçe küçüldü (içerik 183,5 · runtime 113,2 · css 13,61 KiB)
 - next: K2F-27
+
+## seq 78 · 2026-10-03 · FIX · K2F-26
+- request: kullanıcı iki ekran görüntüsüyle bildirdi: canlı sitede Arapça sekmesinde başlama düğmesi yok, "Ders alanı şu an görünmüyor" yazıyor; "nasıl gireceğiz".
+- prev-commit: f026aebd
+- evidence: kao2-duzeltme/evidence/K2F-26/KANIT.md (Ek tur)
+- root-cause: `kaoHubCardHTML()` yalnız `settings.kaoVisible===false` iken boş döner (kodla ve gerçek önyükleme harness'iyle ölçüldü; taze/tohumlu/9 ders sonrası düğme çıkıyor). K2F-25/26 neden değil. Tasarım kusuru: Arapça taşımasından sonra sekme KAO'ya tek giriş, gizliyken çıkış yolu ve doğru mesaj yok.
+- done: gizliyken ve `ui.faithTab==='arapca'` ise aynı düğme "Ders kartı gizli · Göster" geri getirme kartı olur (`App.kaoToggleVisible()`, yeni handler yok, tek onclick şablonu → fx2 pin 393 korunur); başka sekmelerde kart gizli kalır. test_kao2_hub +1 (10). Gerçek önyükleme: varsayılan entry → gizle: restore → geri getir: entry.
+- scope: Dokun dışı (kullanıcı bildirimi, hata düzeltmesi): yalnız `app/core/quranLearn.js` ve `tests/kao/test_kao2_hub.js`; IIP yüzeyi (`saygi.js`) değişmedi.
+- limit: kullanıcının tarayıcı verisi okunmadı; `kaoVisible=false` çıkarımı kodla ulaşılabilen tek boş-dönüş yolu olduğu için güçlü ama kullanıcı doğrulaması bekliyor. Yayınlanana dek canlıda etkisiz. Hemen çare: uygulama Ayarları → Gizlenen kartlar → "Kur'an Arapçası kartını geri getir".
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- next: K2F-27

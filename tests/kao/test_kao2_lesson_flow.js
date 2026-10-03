@@ -210,6 +210,16 @@ check('K2F-23 uygula: örnek cümleler dersin lemmalarından (önce yeni), en ç
   }
 });
 
+check('K2F-23 uygula: günlük yeni kelime 0 (eski/içe aktarılmış veri) olsa da hiçbir derste adım boş kalmaz', () => {
+  for (const dailyNew of [0, 1]) {
+    const q = freshQ(); q.settings.dailyNew = dailyNew;
+    for (const item of allLessons) {
+      const apply = flow.lessonPlan({ quranLearn: q }, item.id, now, content).find((entry) => entry.kind === 'apply');
+      assert.ok((apply.words || []).length + (apply.sentences || []).length > 0, `${item.id} (dailyNew=${dailyNew}): uygula adımı boş`);
+    }
+  }
+});
+
 check('K2F-23 uygula: görünüm cümleyi Arapça + okunuş + Türkçe + âyet künyesi + "Bu dersin kelimesi" ile çizer; gerçek akışta ulaşılır', () => {
   const t = bootKao();
   freshUser(t);

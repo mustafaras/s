@@ -665,3 +665,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen yayın varlıkları: quranLearnFlow.js · quranLearn.js · quranLearnViews.js · kao.css) · cihaz —
 - surprises: yok
 - next: K2F-24
+
+## seq 67 · 2026-10-03 · FIX · K2F-23
+- status: done
+- title: K2F-23 ek tur — Uygula adımı dailyNew=0 verisinde de dolu
+- prev-commit: eefb1b8b
+- evidence: kao2-duzeltme/evidence/K2F-23/KANIT.md (Ek tur)
+- finding: bağımsız doğrulamada dailyNew=0 iken 97 dersin Uygula adımı boştu (arayüz 5/10/15 sunar; eski/içe aktarılmış veri 0 olabilir). Düzeltildi + test (lesson_flow 12 kontrol).
+- gates: kapilar.sh YEŞİL · tekrar-uret 10/10
+- next: K2F-24

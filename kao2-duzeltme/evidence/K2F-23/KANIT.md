@@ -38,3 +38,9 @@ tekrar-uret: 10/10 PASS (önceki 9/10)
 ## Sürprizler / sonraki promptlara not
 - Ders oynatıcıda "Uygula" adımı artık 97 derste cümle gösterir; telefonda gözle bakılmalı (Arapça cümle sağa yaslı, 3 satır alt metin).
 - K2F-24 Ünite 2'nin 6 `prayer` çapasını `lp_*`→`l_*` eşlemesiyle bağlayacak.
+
+## Ek tur (yayın öncesi bağımsız doğrulama, 2026-10-03)
+- Bağımsız ölçüm (109 ders × 3 ayar): varsayılan 0 içeriksiz · dailyNew=1 0 içeriksiz · **dailyNew=0 → 97 ders içeriksiz** (arayüz yalnız 5/10/15 sunar ama eski/içe aktarılmış veride 0 olabilir; prompt: "hiçbir koşulda boş liste çizilmez").
+- KIRMIZI: yeni kontrol "günlük yeni kelime 0 … hiçbir derste adım boş kalmaz" → `u02.02 (dailyNew=0): uygula adımı boş`.
+- Düzeltme: `applySentences` sırası = yeni → tanışılmış → dersin kalan lemmaları (`quranLearnFlow.js`, tek satır). YEŞİL: lesson_flow 12 kontrol.
+- Veri kalitesi (97 ders): cümle ≤67 Arapça karakter · boş çeviri 0 · çok kısa cümle 0 · aynı künyeli iki cümle 1 ders (u06.02: 2:7'nin iki farklı parçası — kabul).

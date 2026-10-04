@@ -942,3 +942,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - gates: kapilar.sh YEŞİL · css 13,605 KiB
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
 - next: K2F-33
+
+## seq 92 · 2026-10-04 · PROMPT · K2F-33
+- status: done
+- title: Kelime detayı kendi dersine bağlanır
+- prev-commit: 19ed250f
+- evidence: kao2-duzeltme/evidence/K2F-33/KANIT.md
+- closes: K6-05
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261004a (canlı; bu prompt canlıda DEĞİL)
+- changed-tests: yok (test_kao2_word +2, design_contract +spacing)
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
+- surprises: ekran görüntüsü iki benzer düğme + yapışık bölümü gösterdi → düzeltildi
+- next: K2F-34

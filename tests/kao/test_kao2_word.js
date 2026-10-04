@@ -209,4 +209,31 @@ check('panel kartı kelime düzeyi bilgi sızdırmaz', () => {
   assert.doesNotMatch(text, /(anlam|örnek|çeviri)/i, 'içerik metni sızdı');
 });
 
+// ---- (11) K2F-33: kelime kendi dersine bağlanır -------------------------
+check('K2F-33: "Bu kelimenin dersi: Ünite N · başlık" ve "Derse git" kaoNav(unit) çağırır', () => {
+  const t = boot();
+  const cur = t.box.window.QuranCurriculumV2;
+  const [lemmaId, lessonId] = Object.entries(cur.lemmaToLesson)[0];
+  const lesson = cur.byLesson(lessonId);
+  const unitNo = Number(/^u0*(\d+)\./.exec(lessonId)[1]);
+  const html = decode(t.openWord(lemmaId));
+  assert.match(html, new RegExp(`Bu kelimenin dersi: <strong>Ünite ${unitNo} · ${lesson.title}</strong>`), 'ders satırı yok: ' + lesson.title);
+  assert.match(html, new RegExp(`onclick="App\\.kaoNav\\('unit',${unitNo}\\)"[^>]*>Derse git<`), '"Derse git" kaoNav(unit) çağırmıyor');
+  assert.ok(html.indexOf('Bu kelimenin dersi') < html.indexOf('Bulunduğun yer'), 'ders satırı "Bulunduğun yer"den önce');
+  assert.doesNotMatch(html, />Derse dön</, 'iki benzer düğme: ders bağlantısı varken genel "Derse dön" gösterilmez');
+  assert.notEqual(t.api.kaoNav('unit', unitNo), false, 'kaoNav(unit) dersin ünitesini açamadı');
+  assert.equal(t.ui.kaoView, 'units', 'ünite detayı açılmadı');
+});
+
+check('K2F-33: lemmaToLesson\'da olmayan lemma için ders satırı gizli', () => {
+  const t = boot();
+  const cur = t.box.window.QuranCurriculumV2;
+  const lemmaId = Object.keys(cur.lemmaToLesson)[0];
+  t.box.window.QuranCurriculumV2 = Object.assign({}, cur, { lemmaToLesson: {} });
+  const html = decode(t.openWord(lemmaId));
+  assert.doesNotMatch(html, /Bu kelimenin dersi/, 'eşlemesiz lemma için satır görünüyor');
+  assert.doesNotMatch(html, />Derse git</, 'eşlemesiz lemma için düğme görünüyor');
+  assert.match(html, />Derse dön</, 'eşlemesiz lemmada genel "Derse dön" yedeği kalır');
+});
+
 console.log(`\nKAO2-25 kelime + panel aynası: ${passed} kontrol PASS`);

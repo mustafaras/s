@@ -1008,15 +1008,25 @@
   // KAO2-25 · S-08/02 T-19: katman sayfalaması KALDIRILDI; tek kaydırmalı detay sayfası.
   // Y-11: doğrulanmamış örnek HİÇ gösterilmez (iç kalite kuralı kullanıcıya sızmaz).
   function kaoWordLearningHTML(q,lemma,card,cardId){
-    var esc=quranLearnDeps.esc,at=kaoCurrentUnitLabel(q),text=nextReviewText(card);
+    var esc=quranLearnDeps.esc,at=kaoCurrentUnitLabel(q),text=nextReviewText(card),lessonRow=kaoWordLessonRowHTML(lemma,esc);
     return '<section class="kao-word-learning" aria-labelledby="kao-word-learning-title"><h3 id="kao-word-learning-title">Öğrenme durumu</h3>'
+      +lessonRow
       +'<p>Sonraki tekrar: <strong>'+esc(text)+'</strong></p>'
       +(at?'<p>Bulunduğun yer: <strong>'+esc(at)+'</strong></p>':'')
-      +'<button type="button" class="kao-secondary" onclick="App.kaoSetView(\'units\')">Derse dön</button></section>'
+      +(lessonRow?'':'<button type="button" class="kao-secondary" onclick="App.kaoSetView(\'units\')">Derse dön</button>')+'</section>'
       +'<details class="kao-flag"><summary>Hata bildir</summary><div>'
       +'<button type="button" onclick="App.kaoFlag(\''+esc(cardId)+'\',\'meaning\')">Anlamı bildir</button>'
       +'<button type="button" onclick="App.kaoFlag(\''+esc(cardId)+'\',\'example\')">Örneği bildir</button>'
       +'</div></details>';
+  }
+  // K2F-33 (K6-05): kelimenin kendi dersi (lemmaToLesson) ve ünitesine geçiş; eşlemesi olmayan lemmada satır hiç çizilmez.
+  function kaoWordLessonRowHTML(lemma,esc){
+    var curriculum=window.QuranCurriculumV2,map=curriculum&&curriculum.lemmaToLesson,lessonId=map&&lemma?map[lemma.id]:null,
+      lesson=lessonId&&typeof curriculum.byLesson==='function'?curriculum.byLesson(lessonId):null,match=/^u0*(\d+)\./.exec(String(lessonId||''));
+    if(!lesson||!match) return '';
+    var unitNo=Number(match[1]);
+    return '<p>Bu kelimenin dersi: <strong>'+esc('Ünite '+unitNo+' · '+kaoSafeLessonTitle(lesson))+'</strong></p>'
+      +'<button type="button" class="kao-secondary" onclick="App.kaoNav(\'unit\','+unitNo+')">Derse git</button>';
   }
   // Geçerli ünite/özet etiketi: panel aynasının okuduğu durumla aynı kaynaktan.
   function kaoCurrentUnitLabel(q){

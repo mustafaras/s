@@ -1,15 +1,16 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-33
-lastSeq: 91
+nextPrompt: K2F-34
+lastSeq: 92
 status: active
 -->
 
-Son güncelleme: 2026-10-04 · LEDGER seq 91 · K2F-00…32 tamam (33/44), sıradaki K2F-33. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-04 · LEDGER seq 92 · K2F-00…33 tamam (34/44), sıradaki K2F-34. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-32 bitti (**yerel, yayınlanmadı**): İlerleme ekranı kendi başlığını taşır (h2 "İlerleme"; "İstatistik / Tutunma ve kalibrasyon" kalktı); 10 R-bandı tablosu "Tekrar doğruluğu" bölümünde kapalı `<details class="kao-flag">` içinde, tek cümle özetle. Yeni CSS/handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-32/KANIT.md).
+K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi: Ünite N · başlık" + "Derse git" (kaoNav unit); eşlemesiz lemmada satır gizli, "Derse dön" yedeği; ders varken tek düğme. Yeni handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-33/KANIT.md).
+Önceki: K2F-32 bitti (**yerel, yayınlanmadı**): İlerleme ekranı kendi başlığını taşır (h2 "İlerleme"; "İstatistik / Tutunma ve kalibrasyon" kalktı); 10 R-bandı tablosu "Tekrar doğruluğu" bölümünde kapalı `<details class="kao-flag">` içinde, tek cümle özetle. Yeni CSS/handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-32/KANIT.md).
 Önceki: K2F-31 bitti (**yerel, yayınlanmadı**): cevapta `daily[today].ms` (0–120 s sınırlı) kaydedilir, geri alma süreyi de geri alır; ders dakikası tekrar + dersin gerçek görev sayısından (`lessonTaskCount`: tanış+alıştırma+uygula) hesaplanır, ölçülmüş ms varsa ortalama kullanılır; tekrar 0 iken alt satır "N yeni kelime · ~M dk". Ayrıntı: [KANIT.md](../evidence/K2F-31/KANIT.md).
 Önceki: K2F-30 bitti (**yerel, yayınlanmadı**): Ayarlar'a "Öğrenme" grubu (Okuma ile Gölgeleme arası): "Doğruda otomatik geç" switch'i (`App.kaoToggleAutoAdvance`, pinler 45/766/604) ve "Başlangıç noktasını değiştir" (`kaoOnboard('change-start')`: ilk açılışın 2. adımı, Vazgeç/Geri yazmaz, yalnız `onboarding.start` yazılır, Ayarlar'a dönülür). Varsayılan `settings.dailyNew` 10→5 (onboarding.minutes ile hizalı; kayıtlı ayar korunur). Ayrıntı: [KANIT.md](../evidence/K2F-30/KANIT.md).
 Önceki: K2F-29 bitti (**yerel, yayınlanmadı**): Ayarlar gruplu listeye geçti — Günlük hedef · Ses · Okuma · Gölgeleme · Görünürlük · Veri · Hakkında; beş aç/kapat ayarı gerçek `switchRow` (etiket değer içermez), yeni handler yok. "Öğrenme" grubu K2F-30'da gelecek. Ayrıntı: [KANIT.md](../evidence/K2F-29/KANIT.md).
@@ -19,7 +20,7 @@ K2F-32 bitti (**yerel, yayınlanmadı**): İlerleme ekranı kendi başlığını
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-33 (Kelime detayı ders bağlantısı):** `PROMPTLAR.md` §K2F-33 (≈satır 964) — Dokun/Kabul listesini oradan oku; yeni handler yok (pinler 45/766/604 sabit), CSS payı ≈0,56 KiB.
+**K2F-34 (Yerleştirme şıkları):** `PROMPTLAR.md` §K2F-34 (≈satır 977); `kaoPlacementTasks`/`kaoGateTasks` çeldiricilerini aynı havuzdan uzunluk-dengeli seç (doğru şık en kısa/uzun olmasın, okunuş uzunlukları ±2 karakter, belirlenimci); test `tests/kao/test_kao2_onboarding.js`; yerleştirme kararı (≥7/8) aynı kalır; yeni handler YOK.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.

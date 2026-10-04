@@ -444,7 +444,7 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-word h3{margin:0 0 var(--f-1);font-size:var(--f-15)}
 .kao-word h4{margin:0;font-size:var(--f-13);color:var(--kao-label-2)}
 .kao-word-meanings p{margin:0 0 var(--f-1);font-size:var(--f-17);line-height:1.45;color:var(--kao-label)}
-.kao-word-cognate,.kao-word-root,.kao-word-examples,.kao-word-learning{padding-top:var(--f-3);border-top:1px solid var(--kao-sep)}
+.kao-word-cognate,.kao-word-root,.kao-word-examples,.kao-word-learning{margin-top:var(--f-3);padding-top:var(--f-3);border-top:1px solid var(--kao-sep)}
 .kao-word-root .kao-derivatives{display:flex;flex-wrap:wrap;gap:var(--kao-gap-1);margin:var(--f-1) 0 var(--f-2)}
 .kao-word-root .kao-derivatives>span{display:grid;gap:2px;padding:6px 10px;border-radius:var(--kao-r-ctl);background:var(--kao-tint)}
 .kao-word-root .kao-derivatives small{color:var(--kao-label-2);font-size:var(--f-11)}

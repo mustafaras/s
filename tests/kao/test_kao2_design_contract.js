@@ -129,4 +129,5 @@ if (MODE === 'baseline') {
   const mark = /\.kao-progress-curve li \.kao-curve-mark\{[^}]*\}/.exec(kaoCss)[0];
   assert.match(mark, /width:(1[8-9]|2\d)px/, 'işaret (●/○) metne yapışmaması için en az 18px');
 }
+assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğrenme durumu bölümü üstteki karta yapışmaz');
 console.log('KAO2 design contract: PASS');

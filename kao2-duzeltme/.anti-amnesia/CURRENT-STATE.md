@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-34
-lastSeq: 93
+lastSeq: 94
 status: active
 -->
 
-Son güncelleme: 2026-10-04 · LEDGER seq 93 · K2F-00…33 tamam (34/44), sıradaki K2F-34. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-04 · LEDGER seq 94 · K2F-00…33 tamam (34/44), sıradaki K2F-34. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi: Ünite N · başlık" + "Derse git" (kaoNav unit); eşlemesiz lemmada satır gizli, "Derse dön" yedeği; ders varken tek düğme. Yeni handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-33/KANIT.md).
@@ -16,7 +16,7 @@ K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi:
 Önceki: K2F-29 bitti (**yerel, yayınlanmadı**): Ayarlar gruplu listeye geçti — Günlük hedef · Ses · Okuma · Gölgeleme · Görünürlük · Veri · Hakkında; beş aç/kapat ayarı gerçek `switchRow` (etiket değer içermez), yeni handler yok. "Öğrenme" grubu K2F-30'da gelecek. Ayrıntı: [KANIT.md](../evidence/K2F-29/KANIT.md).
 Önceki: K2F-28 bitti (**yerel, yayınlanmadı**): ders ve tekrar oturumunda NavBar/LargeTitle yok; üstte yalnız ✕ (`aria-label="Dersten çık"`, ≥44 px) ve içeriğin kendi ince ilerleme çubuğu. ✕ derste `kaoLesson('exit')`, tekrarda `kaoSetView('home')`; yeni görev çizilince odak soruya gider. Ayrıntı: [KANIT.md](../evidence/K2F-28/KANIT.md).
 Önceki: K2F-27 bitti (**yerel, yayınlanmadı**): eski modal başlığı (`kao-header`, sabit h1, X) kalktı. NavBar tek üst çubuk; kökte "Kapat", diğer görünümlerde "‹ önceki"; dialog `aria-labelledby` görünümün LargeTitle h2'sine işaret eder (ders oynatıcıda `aria-label`). Ders oynatıcının görev/özet aşamasında NavBar'a tek "Kapat" eklenir (ders ekranı kendi "Kapat"ını taşır). Escape/Tab sözleşmesi aynı. Bağımsız code-reviewer APPROVE (CRITICAL/HIGH 0). Ayrıntı: [KANIT.md](../evidence/K2F-27/KANIT.md).
-**Canlıda (2026-10-04, kullanıcı isteğiyle):** K2F-19…32 — `main` `ab41e056`, pin `20261004a`, Pages run 37197809774, 8/8 bayt-eşit. Cihaz doğrulaması kullanıcıda.
+**Canlıda (2026-10-04, kullanıcı isteğiyle):** K2F-19…33 + görsel QA düzeltmeleri — `main` `2715ad50`, pin `20261004b`, Pages run 37202523139, 9/9 bayt-eşit. Cihaz doğrulaması kullanıcıda.
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
@@ -24,7 +24,7 @@ K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi:
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
-- Yayın pini (canlı): `20261004a`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
+- Yayın pini (canlı): `20261004b`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
 - Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 115,784 KiB** · p95 4,6 ms.
@@ -33,7 +33,7 @@ K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi:
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
-- **Ekran görüntüsünde bulunan 3 kusur yerelde DÜZELTİLDİ, canlıda DEĞİL** ([EKRAN.md](../evidence/K2F-32/EKRAN.md), LEDGER seq 91): › işareti, opak/yapışık başlık çubuğu, sarılan Niyet segmenti. Canlıya almak yeni pin + kullanıcı onayı ister. Cihazda gözlenmedi.
+- **Görsel QA düzeltmeleri canlıda** (LEDGER seq 90–94); yalnız cihazda gözlenmedi: ›/yapışık çubuk/sarılan Niyet/ikon hizası/--f-N aralıkları telefonda teyit edilmeli.
 - **K2F-32 cihazda gözlenmedi:** İlerleme ekranında katlanan öngörü bölümünün (summary ≥44 px) görünümü ve dokunma davranışı.
 - **K2F-31 ölçüm sınırları (kapatılanlar sonrası kalan):** `daily.ms` artık gecikmeli sûre cevabında da yazılır (ms/answered paydası tutarlı; seq 86). Kalan, spec'e bağlı: 120 sn üst sınırı (K2F-31 spec'i clamp ister) sekme arka planda beklenirse cevap başına 120 sn ekler → ortalama şişebilir; tahmin onboarding süresiyle (5/10/15 dk) sınırlıdır (05 §4) → 5 dk seçen kullanıcıda uzun ders "~5 dk" gösterir. `lessonPlan` maliyeti ölçüldü: `kaoNextStep` ≈0,09 ms/çağrı (200 çağrı ortalaması) → risk kapandı.
 - **K2F-31 cihazda gözlenmedi:** Bugün/hub/özet dakika metinleri; tahmin onboarding süresiyle (5/10/15 dk) sınırlı olduğundan uzun ders 5 dk seçen kullanıcıda "~5 dk" gösterir (spec 05 §4 üst sınırı).
@@ -60,7 +60,6 @@ K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi:
 - Sözlüğü sahtelemek için `t.win.QuranLexiconV1` değiştirilebilir (K2F-25 testi); her varyant taze `bootKao()` ister.
 
 ## Bekleyen kullanıcı işleri
-- **Canlıya alma kararı:** canlıda (ab41e056, pin 20261004a) K2F-27…32 var; görsel QA düzeltmeleri (LEDGER seq 90, 91, 93) ve K2F-33 yalnız yerelde. Yayın için kullanıcıdan "canlıya al" gerekir. Karşılaştırma sayfası: https://claude.ai/artifact/FFKc4mBzeoNxyqjQGApBdb
 - **Oturum başlatıcı:** [OTURUM-BASLATICI-K2F-34.md](../OTURUM-BASLATICI-K2F-34.md) (yeni oturumda yapıştır).
 - Cihaz doğrulaması (telefonda canlı site) kullanıcıdadır ve ayrıca bildirilecektir. Kalan kapı: K2F-43 YAYIN-2.
 - **L2 (GATE seq 71, waiting):** gerçek alan uzmanı onayı yoktur ve Claude veremez. `L2-PAKET.md` tek oturumda işaretlenecek madde listesidir. Uygunsa ilgili sayfada L2 kutusu `[x]` yapılıp **"L2 işaretlendi"** yazılır; kapı sonraki promptları engellemez.

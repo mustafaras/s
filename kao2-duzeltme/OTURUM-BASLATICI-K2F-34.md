@@ -21,8 +21,8 @@ Kullanıcı kapısında P7. Her promptta LEDGER + CURRENT-STATE + FIX-STATE ayn�
 fix-sync-check PASS; tek commit. Push/merge/deploy yalnız YAYIN promptlarında ve açık kullanıcı onayıyla.
 
 Durum (önceki oturumdan): K2F-00…33 tamam (34/44), nextPrompt K2F-34 (yerleştirme şıkları: çeldiricileri
-uzunluk-dengeli seç). Dal kao2-duzeltme, hepsi yerel; canlı main ab41e056, pin 20261004a. Canlıda K2F-27…32
-var AMA görsel QA düzeltmeleri ve K2F-33 canlıda DEĞİL (yayın yalnız kullanıcı "canlıya al" derse).
+uzunluk-dengeli seç). Dal kao2-duzeltme (K2F-33 dahil main'e ff-only yayınlandı; sonrası yerel); canlı main 2715ad50, pin 20261004b. K2F-27…33 ve görsel QA
+düzeltmeleri canlıda (kullanıcı isteğiyle yayınlandı); K2F-34 ve sonrası canlıda DEĞİL (yayın yalnız kullanıcı "canlıya al" derse).
 
 K2F-34'e özel notlar (önceki oturumlardan öğrenilenler):
 - Yeni handler yok: pinler App.kao* 45 · yüzey 766 · atama 604 sabit. Eylemleri literal yaz; yorumlarda
@@ -45,4 +45,4 @@ K2F-34'e özel notlar (önceki oturumlardan öğrenilenler):
 
 ## Sıradan sonra
 - K2F-35 yeni bölümü yalnız K2F-34 kapanınca okunur.
-- Canlıya alma yalnız kullanıcı isterse: pin `20261004a` → yeni pin (index.html ×15, sw.js ×16, 8 pin taşıyan test), `kapilar.sh`, ff-only push, Pages run, bayt eşitliği, gizlilik 404. Önceki örnek: `evidence/K2F-32/YAYIN.md`.
+- Canlıya alma yalnız kullanıcı isterse: pin `20261004b` → yeni pin (index.html ×15, sw.js ×16, 8 pin taşıyan test), `kapilar.sh`, ff-only push, Pages run, bayt eşitliği, gizlilik 404. Önceki örnek: `evidence/K2F-33/YAYIN.md`.

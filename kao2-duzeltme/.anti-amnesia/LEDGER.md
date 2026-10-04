@@ -965,3 +965,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - gates: kapilar.sh YEŞİL · css 13,661 KiB · runtime 115,784 KiB · tekrar-uret 10/10
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ (19 ekran) · yayın — · cihaz —
 - next: K2F-34
+
+## seq 94 · 2026-10-04 · RELEASE · K2F-33
+- status: done
+- title: K2F-33 + görsel QA düzeltmeleri canlıya alındı (kullanıcı isteği), pin 20261004b
+- prev-commit: 2715ad50
+- evidence: kao2-duzeltme/evidence/K2F-33/YAYIN.md
+- decision: kullanıcı "canlıya al" dedi; main ff-only ab41e056..2715ad50, force yok; Pages run 37202523139 success; canlı 9/9 bayt-eşit; gizlilik 404 ✓.
+- disclosure: cihaz doğrulaması yapılmadı (kullanıcıda); dinî bağlamlı metin onayları yapay zekâ incelemesidir (GATE seq 71 açık).
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
+- next: K2F-34

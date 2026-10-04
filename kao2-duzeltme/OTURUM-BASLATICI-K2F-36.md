@@ -30,7 +30,7 @@ K2F-36'ya özel notlar (önceki oturumlardan öğrenilenler):
 - Dokun yalnız test_kao2_kabul.js + evidence/K2F-36/A-KABUL.md (KAO2_EVIDENCE_OUT ile). Üretim kodu gerekirse P6.
 - Mutasyon kanıtı commit edilmez: $TMPDIR kopyasında yap, KANIT'a sonucu yaz. Testte totoloji/dosya sayımı/regex sayımı yok.
 - A-9 aileleri alt süreçle çalıştırır (çıkış kodu); eşzamanlı koşumlar perf_budget'ı kırmızı gösterebilir — tek başına koş.
-- VM'den dönen dizilerde deepEqual öncesi Array.from. Modal görsel QA turu (LEDGER seq 101) NOT 96/99'u kapattı; CSS payı 13,692 / 14 KiB. Yeni `tests/kao/test_kao2_modal_layout.js` ~23 sn sürer (109 ders yürür). Tarayıcı taraması: `kao2-duzeltme/tools/gorsel-qa/audit-modal.mjs` (yalnız kullanıcı "ekran görüntüsü" isterse).
+- VM'den dönen dizilerde deepEqual öncesi Array.from. Modal görsel QA turu (LEDGER seq 101) NOT 96/99'u kapattı; CSS payı 13,778 / 14 KiB (≈0,22 KiB kaldı). Yeni `tests/kao/test_kao2_modal_layout.js` ~23 sn sürer (109 ders yürür). Tarayıcı taraması: `kao2-duzeltme/tools/gorsel-qa/audit-modal.mjs` (yalnız kullanıcı "ekran görüntüsü" isterse).
 - CSS payı çok dar: 13,661 / 14 KiB (kalan ≈0,34 KiB); aşmak P6 durma koşuludur. Bu prompt CSS gerektirmez; runtime 116,270 / 128 KiB.
 - CSS jetonları: kao.css'te fallback'siz kullanılan her --jeton tanımlı olmalı (test_kao2_design_contract.js
   zorlar; tanımsız jeton bildirimi sessizce düşürür). KAO satırlarındaki her icon:'ad' constants.js'te tanımlı olmalı.

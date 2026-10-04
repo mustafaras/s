@@ -1,4 +1,5 @@
-origin: http://127.0.0.1:9000 token:false force:null width=390
+origin: http://127.0.0.1:9000 force:null width=390
+tema=dark yazı-ölçeği=1 gerçek-tema=dark
 ## v-home: Kapat Kur'an Arapçası Kur'an Arapçası Sıradaki Fâtiha · Ders 2 4 yeni kelime · ~3 dk Başla
 ## v-home-alt: Kapat Kur'an Arapçası Kur'an Arapçası Sıradaki Fâtiha · Ders 2 4 yeni kelime · ~3 dk Başla
 ## v-units: ‹ Kur'an Arapçası Yol Yolun Öğrenme yolu Önerilen üniteyi izle ya da istediğin durağı aç. 

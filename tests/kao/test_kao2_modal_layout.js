@@ -86,4 +86,47 @@ check('(h) 114 sûre ısı haritası: 320 px\'te de hücre ≥44 px (sabit 6 sü
   assert.doesNotMatch(grid, /repeat\(6,/);
 });
 
+check('(i) halka boyutu yazı boyutuyla ölçeklenir (rem): %200 yazıda "%20" halkadan taşmaz', () => {
+  for (const [size, rem] of [[28, '1.75rem'], [44, '2.75rem'], [64, '4rem']]) {
+    const body = bodyOf(`.kao-progress-ring-${size}`);
+    assert.match(body, new RegExp(`width:${rem};height:${rem}`), `halka ${size}`);
+  }
+  assert.doesNotMatch(css, /\.kao-progress-ring-svg\{[^}]*(?:width|height):\d+px/);
+});
+
+check('(j) dar ekran / büyük yazıda NavBar geri etiketi sarmaz: ≤23rem\'de yan sütunlar içeriğe göre (taban simetri sözleşmesi korunur)', () => {
+  assert.match(bodyOf('.kao-navbar'), /grid-template-columns:minmax\(0,1fr\) minmax\(0,auto\) minmax\(0,1fr\)/, 'taban sözleşme değişmedi');
+  const m = /@media\(max-width:23rem\)\{\.kao-navbar\{grid-template-columns:minmax\(0,auto\) minmax\(0,1fr\) minmax\(0,auto\)\}\}/.exec(css);
+  assert.ok(m, 'dar ekran NavBar kuralı');
+  assert.doesNotMatch(bodyOf('.kao-navbar') + bodyOf('.kao-navbar-action') + bodyOf('.kao-navbar-title'), /white-space:nowrap/, 'NavBar metni tek satıra zorlanmaz (genel yasak test_kao_render\'da)');
+});
+
+check('(k) Seviye 0 alıştırmada Arapça şık harfleri okunur boyutta (öğrenilen içerik düğme metninden küçük kalmaz)', () => {
+  const body = bodyOf('.kao-s0-choice [lang="ar"]');
+  assert.match(body, /font-size:var\(--f-title1\)/);
+  assert.match(body, /line-height:1\.4/);
+});
+
+check('(l) Seviye 0 örnek/okuma kelimeleri ve harf konum biçimleri okunur boyutta', () => {
+  assert.match(bodyOf('.kao-s0-word span'), /font-size:var\(--f-title1\)/);
+  assert.match(bodyOf('.kao-s0-word span'), /line-height:1\.6/);
+  assert.ok(rulesFor('.kao-s0-pos-row li b').some((rule) => /font-size:var\(--f-title1\)/.test(rule.body)), '2×2 "aynı harf dört yerde" biçimleri');
+  assert.match(css, /\.kao-s0-pos-row li b\{font-size:var\(--f-title2\)\}/, '28 harf tablosu (4 sütun) biçimleri');
+  assert.doesNotMatch(css, /\.kao-s0-pos-row li b\{font-size:var\(--f-title3\)\}/, 'eski küçük boyut kalmadı');
+});
+
+check('(m) Kavram tablolarında Arapça hücre lang="ar" dir="rtl" taşır ve okunur boyutta (düz <td> değil)', () => {
+  const t = h.bootKao();
+  assert.equal(t.api.kaoLesson('start', 'u02.01'), true);
+  assert.equal(h.playLesson(t, { stopAt: 'concept' }), true);
+  const html = t.api.kaoOverlayHTML(new Date('2026-09-28T09:00:00')), tables = html.match(/<table class="kao-lesson-table">[\s\S]*?<\/table>/g) || [];
+  assert.equal(tables.length, 1, 'kavram tablosu çizildi');
+  const arabic = /[\u0600-\u06FF]/, cells = tables[0].match(/<td[^>]*>[^<]*<\/td>/g) || [];
+  const arCells = cells.filter((cell) => arabic.test(cell));
+  assert.ok(arCells.length >= 3, `Arapça hücre sayısı ${arCells.length}`);
+  assert.ok(arCells.every((cell) => /^<td lang="ar" dir="rtl" class="kao-lesson-ar-cell">/.test(cell)), 'her Arapça hücre lang/dir/sınıf taşır');
+  assert.equal(cells.filter((cell) => !arabic.test(cell) && /lang="ar"/.test(cell)).length, 0, 'Arapça olmayan hücre ar etiketi almaz');
+  assert.match(bodyOf('.kao-lesson-ar-cell'), /font-size:var\(--f-title3\)/);
+});
+
 console.log(`KAO modal yerleşim: PASS (${passed} kontrol)`);

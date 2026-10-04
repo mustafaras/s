@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-36
-lastSeq: 102
+lastSeq: 103
 status: active
 -->
 
-Son güncelleme: 2026-10-04 · LEDGER seq 102 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-04 · LEDGER seq 103 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 **Modal görsel QA (seq 101, yerel, yayınlanmadı):** kullanıcı ekran görüntüsü üzerine tüm modal 390/320 px'te tarandı; 8 yerleşim kusuru + NOTE 96 (dinleme şık sırası) düzeltildi, NOTE 99 (gramer tekrarı) yeniden üretilemedi ve test koruması eklendi. Kanıt: [modal-qa/](../evidence/K2F-35/modal-qa/). Araç: `kao2-duzeltme/tools/gorsel-qa/audit-modal.mjs`.
@@ -30,14 +30,14 @@ K2F-35 bitti (**yerel, yayınlanmadı**): halka metni ve aria-label "%20"; ünit
 - Yayın pini (canlı): `20261004c`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
-- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,692 KiB (tavan 14 — kalan ≈0,31 KiB) · runtime 116,393 KiB (K2F-35 sonrası)** · p95 4,2 ms.
+- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,778 KiB (tavan 14 — kalan ≈0,22 KiB) · runtime 116,393 KiB (K2F-35 sonrası)** · p95 4,2 ms.
 - Testler: `test_kao2_lesson_flow.js` 23 · `test_kao2_review_apply.js` 15 · `test_kao2_reader.js` 14 · `test_kao2_hub.js` 10 · `test_kao2_arabic_tab.js` 4 (yeni) · `test_kao2_kabul.js` 10/10 ölçüt.
 - Namaz eşlemesi: 19/32 `lp_*` eşli. Veri kapsamı (524 lemma): 162 unit11 köküne, 113 kognat kaymasına sahip.
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
 - **K2F-35 cihazda gözlenmedi:** halka içi "%20" metninin 28/44 px halkalara sığması, ünite satırının "kalıcı kelime" ile sarması.
-- **Modal QA açık sınırlar (NOTE seq 102):** %200 yazıda halka içi "%20" halkadan geniş; 320 px'te geri etiketi 2 satır; 227 karenin yalnız ~60'ı gözle incelendi (hepsi otomatik ölçüldü); açık tema ve %200 yazı taraması temiz.
+- **Modal QA son durum (seq 103):** tüm kareler (koyu 390/320, açık 390) tarandı ve gözle incelendi; açık kalan yalnız cihaz doğrulaması, 28 px halkada "%100" sığması ve yayın pini. CSS payı ≈0,22 KiB.
 - **Modal QA cihazda gözlenmedi (seq 101):** S0 örnek kelime satırları, Arapça hero, ünite kutusu, kısa NavBar başlıkları, 7 sütunlu ısı haritası telefonda teyit edilmeli. Tarama sentetik veriyle masaüstü Chrome'dadır; CSS değişti → yayında yeni pin gerekir.
 - **K2F-34 cihazda gözlenmedi:** yerleştirme/kapı okuma şıklarının yeni dağılımı (doğru şık 1./2./3. düğmede).
 - **Görsel QA düzeltmeleri canlıda** (LEDGER seq 90–94); yalnız cihazda gözlenmedi: ›/yapışık çubuk/sarılan Niyet/ikon hizası/--f-N aralıkları telefonda teyit edilmeli.

@@ -1057,3 +1057,14 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ (sentetik, masaüstü Chrome) · yayın — · cihaz —
 - next: K2F-36
 
+## seq 103 · 2026-10-04 · FIX · K2F-35
+- status: done
+- title: Modal QA açıkları kapatıldı (NOTE seq 102) + tüm kareler gözle incelendi, 4 ek kusur sınıfı düzeltildi
+- prev-commit: f7ec1ed4
+- evidence: kao2-duzeltme/evidence/K2F-35/modal-qa/ (tarama-sonra-390/-320/açık-tema: 3×227 kare, 0 bulgu; 06/07 görüntüleri)
+- decision: Kullanıcı açık sınırların kapatılmasını istedi. (a) %200 yazıda halka içi "%20" taşması: halka boyutu rem tabanlı (`.kao-progress-ring-28/44/64`), yazıyla birlikte büyür. (b) 320 px geri etiketi: `@media(max-width:23rem)` yan sütunlar içeriğe göre (taban eşit-sütun sözleşmesi ve nowrap yasağı korundu; ≤368 px'te başlık geri düğmesi kadar sola kayar — bilinçli takas). (c) Kalan kareler: S0 12 dersin tüm aşamaları, 4 ders akışı, ünite ekranları, görünümler koyu 390 + açık 390 + 320'de gözle incelendi (~170 kare, kontak sayfaları); bulunan 4 kusur: Seviye 0 alıştırmada Arapça şık harfleri küçük, "Dinlerken oku"/örnek kelime Arapçası küçük, harf konum biçimleri küçük, Kavram tablolarında Arapça hücreler düz `<td>` (lang/dir yok + küçük). Hepsi önce kırmızı test, sonra düzeltme. Reviewer APPROVE; test kırılganlığı notları (nowrap taraması, bildirim sırası) daraltıldı.
+- gates: kapilar.sh YEŞİL (kao 54) · css 13,778 KiB (tavan 14, pay ≈0,22 KiB) · runtime 116,517 KiB · tekrar-uret 10/10
+- open: cihaz doğrulaması (kullanıcıda); 28 px halkada "%100" tam sığmaz (öncekinden kalan, cihazda bakılacak); yayın yok (CSS/JS değişti, yeni pin gerekir); Arapça sunum-biçimi blokları (U+FB50+) hücre algısında yok (mevcut veride karşılığı yok).
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ (sentetik, masaüstü Chrome 390/320, koyu+açık) · yayın — · cihaz —
+- next: K2F-36
+

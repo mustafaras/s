@@ -1007,3 +1007,24 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
 - next: K2F-35
 
+## seq 98 · 2026-10-04 · PROMPT · K2F-35
+- status: done
+- title: Küçük metin ve etiket düzeltmeleri
+- prev-commit: 33c878c7
+- evidence: kao2-duzeltme/evidence/K2F-35/KANIT.md
+- closes: K4-04 (etiketler) · K3-09
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261004c (canlı; bu prompt canlıda DEĞİL)
+- changed-tests: components/hub/path (yüzde biçimi, kalıcı kelime) · onboarding (özet başlığı) — KANIT'ta gerekçeli
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: path testinde ikinci bir `/100%/` iddiası vardı (güncellendi)
+- next: K2F-36
+
+## seq 99 · 2026-10-04 · NOTE · K2F-35
+- status: open
+- title: K4-04'ün "ardışık tekrar eden gramer görevi" maddesi (u01.02 aynı "Ek çöz" ×2) yapılmadı
+- decision: K2F-35 Adımlar (a)–(d) bu maddeyi içermez; kapsam dışı. Sonraki uygun prompt (gramer görev dizisi) ya da kullanıcı kararı gerekir.
+- evidence-levels: kaynak ✓
+- next: K2F-36
+

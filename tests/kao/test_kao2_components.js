@@ -58,12 +58,15 @@ assert.doesNotMatch(switchOff, /onclick=/);
 
 const ringLow = api.progressRing(-20, 28, '<Tamamlanma>');
 const ringHigh = api.progressRing(120, 64, 'İlerleme');
-assert.match(ringLow, /role="img" aria-label="&lt;Tamamlanma&gt;: 0%"/);
+assert.match(ringLow, /role="img" aria-label="&lt;Tamamlanma&gt;: %0"/);
 assert.match(ringLow, /class="kao-progress-ring-svg kao-progress-ring-28"/);
 assert.match(ringLow, /width="28" height="28"/);
 assert.match(ringLow, /aria-hidden="true"/);
-assert.match(ringHigh, /aria-label="İlerleme: 100%"/);
+assert.match(ringHigh, /aria-label="İlerleme: %100"/);
 assert.match(ringHigh, /class="kao-progress-ring-svg kao-progress-ring-64"/);
+assert.match(ringHigh, /<span class="kao-progress-ring-text" aria-hidden="true">%100<\/span>/, 'K2F-35: görünen halka metni Türkçe yüzde');
+assert.match(ringLow, /<span class="kao-progress-ring-text" aria-hidden="true">%0<\/span>/);
+assert.doesNotMatch(ringLow + ringHigh, /\d%/, 'K2F-35: "20%" biçimi yok');
 assert.match(ringHigh, /width="64" height="64"/);
 assert.equal((api.progressRing(47, 999, 'İlerleme').match(/kao-progress-ring-44/g) || []).length, 1);
 

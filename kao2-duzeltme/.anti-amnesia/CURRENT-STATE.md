@@ -1,15 +1,16 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-35
-lastSeq: 97
+nextPrompt: K2F-36
+lastSeq: 99
 status: active
 -->
 
-Son güncelleme: 2026-10-04 · LEDGER seq 97 · K2F-00…34 tamam (35/44), sıradaki K2F-35. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-04 · LEDGER seq 99 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-34 bitti (**canlıda**, main `dc9743f4`, pin `20261004c`, Pages run 37204779072, 9/9 bayt-eşit; ayrıntı [YAYIN.md](../evidence/K2F-34/YAYIN.md)): okuma çeldiricileri en sık 60 kelimeden, doğru okunuşa uzunlukça yakın (biri ≥, biri ≤; ±2 bandı) ve belirlenimci seçilir; doğru şık 3 konuma dönüşümlü yerleşir (eskiden 20/20 görevde 1. sıradaydı); aynı Arapçanın hiçbir okunuşu çeldirici olmaz. İlk/son/kısa/uzun/orta sezgisi yerleştirmeyi (≥7/8) ve kapıyı (≥18/20) geçemez. Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-34/KANIT.md).
+K2F-35 bitti (**yerel, yayınlanmadı**): halka metni ve aria-label "%20"; ünite ekranı "x / y kalıcı kelime · a / b ders"; `namaz` taşı "Namazda geçen N kelimeyi tanıyorum" (N gerçek koşul kümesi, N=0 ise eski etiket); onboarding test özeti "KAO2-11". Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-35/KANIT.md).
+Önceki: K2F-34 bitti (**canlıda**, main `dc9743f4`, pin `20261004c`, Pages run 37204779072, 9/9 bayt-eşit; ayrıntı [YAYIN.md](../evidence/K2F-34/YAYIN.md)): okuma çeldiricileri en sık 60 kelimeden, doğru okunuşa uzunlukça yakın (biri ≥, biri ≤; ±2 bandı) ve belirlenimci seçilir; doğru şık 3 konuma dönüşümlü yerleşir (eskiden 20/20 görevde 1. sıradaydı); aynı Arapçanın hiçbir okunuşu çeldirici olmaz. İlk/son/kısa/uzun/orta sezgisi yerleştirmeyi (≥7/8) ve kapıyı (≥18/20) geçemez. Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-34/KANIT.md).
 Önceki: K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi: Ünite N · başlık" + "Derse git" (kaoNav unit); eşlemesiz lemmada satır gizli, "Derse dön" yedeği; ders varken tek düğme. Yeni handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-33/KANIT.md).
 Önceki: K2F-32 bitti (**yerel, yayınlanmadı**): İlerleme ekranı kendi başlığını taşır (h2 "İlerleme"; "İstatistik / Tutunma ve kalibrasyon" kalktı); 10 R-bandı tablosu "Tekrar doğruluğu" bölümünde kapalı `<details class="kao-flag">` içinde, tek cümle özetle. Yeni CSS/handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-32/KANIT.md).
 Önceki: K2F-31 bitti (**yerel, yayınlanmadı**): cevapta `daily[today].ms` (0–120 s sınırlı) kaydedilir, geri alma süreyi de geri alır; ders dakikası tekrar + dersin gerçek görev sayısından (`lessonTaskCount`: tanış+alıştırma+uygula) hesaplanır, ölçülmüş ms varsa ortalama kullanılır; tekrar 0 iken alt satır "N yeni kelime · ~M dk". Ayrıntı: [KANIT.md](../evidence/K2F-31/KANIT.md).
@@ -21,19 +22,21 @@ K2F-34 bitti (**canlıda**, main `dc9743f4`, pin `20261004c`, Pages run 37204779
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-35 (Küçük metin ve etiket düzeltmeleri):** `PROMPTLAR.md` §K2F-35 (≈satır 991): hub halkası metni "%20" (`kaoHubCardHTML`/Views `progressRing`), ünite ekranı "x / y kalıcı kelime · a / b ders", `namaz` taşı etiketi gerçek kapsamı söyler (`kaoMilestoneLabel`), test başlıkları gerçek sayı/kart numarası; testler `test_kao2_hub/path/milestones/onboarding`; yeni handler YOK.
+**K2F-36 (Kabul testi gerçek ölçüm):** `PROMPTLAR.md` §K2F-36; `tests/kao/test_kao2_kabul.js` A-1…A-10'u gerçekten ölçsün (handler'larla dokunuş sayımı, 109 ders, tüm görünümler × durumlar, 12 ünite simülasyonu, alt süreçle aile koşusu, bütçe koşulu); kanıt `kao2-duzeltme/evidence/K2F-36/A-KABUL.md` (`KAO2_EVIDENCE_OUT`); mutasyon kanıtı commit edilmez; yeni handler YOK.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
 - Yayın pini (canlı): `20261004c`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
-- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 116,270 KiB (K2F-34 sonrası)** · p95 4,2 ms.
+- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 116,365 KiB (K2F-35 sonrası)** · p95 4,2 ms.
 - Testler: `test_kao2_lesson_flow.js` 23 · `test_kao2_review_apply.js` 15 · `test_kao2_reader.js` 14 · `test_kao2_hub.js` 10 · `test_kao2_arabic_tab.js` 4 (yeni) · `test_kao2_kabul.js` 10/10 ölçüt.
 - Namaz eşlemesi: 19/32 `lp_*` eşli. Veri kapsamı (524 lemma): 162 unit11 köküne, 113 kognat kaymasına sahip.
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
+- **K4-04 gramer tekrarı açık (NOTE seq 99):** u01.02'de aynı "Ek çöz" görevi ardışık iki kez çıkabilir; K2F-35 kapsamı dışı, yapılmadı.
+- **K2F-35 cihazda gözlenmedi:** halka içi "%20" metninin 28/44 px halkalara sığması, ünite satırının "kalıcı kelime" ile sarması.
 - **Dinleme şıkları hep ilk sırada (NOTE seq 96, açık):** `kaoGateTasks.listening` doğru harfi 1. düğmede çizer; hep ilk düğme dinleme kapısını (≥10/12) geçer. K5-06 kapsamı dışı olduğundan yapılmadı; sonraki uygun prompt/kullanıcı kararı.
 - **K2F-34 cihazda gözlenmedi:** yerleştirme/kapı okuma şıklarının yeni dağılımı (doğru şık 1./2./3. düğmede).
 - **Görsel QA düzeltmeleri canlıda** (LEDGER seq 90–94); yalnız cihazda gözlenmedi: ›/yapışık çubuk/sarılan Niyet/ikon hizası/--f-N aralıkları telefonda teyit edilmeli.
@@ -63,7 +66,7 @@ K2F-34 bitti (**canlıda**, main `dc9743f4`, pin `20261004c`, Pages run 37204779
 - Sözlüğü sahtelemek için `t.win.QuranLexiconV1` değiştirilebilir (K2F-25 testi); her varyant taze `bootKao()` ister.
 
 ## Bekleyen kullanıcı işleri
-- **Oturum başlatıcı:** [OTURUM-BASLATICI-K2F-35.md](../OTURUM-BASLATICI-K2F-35.md) (yeni oturumda yapıştır).
+- **Oturum başlatıcı:** [OTURUM-BASLATICI-K2F-36.md](../OTURUM-BASLATICI-K2F-36.md) (yeni oturumda yapıştır).
 - Cihaz doğrulaması (telefonda canlı site) kullanıcıdadır ve ayrıca bildirilecektir. Kalan kapı: K2F-43 YAYIN-2.
 - **L2 (GATE seq 71, waiting):** gerçek alan uzmanı onayı yoktur ve Claude veremez. `L2-PAKET.md` tek oturumda işaretlenecek madde listesidir. Uygunsa ilgili sayfada L2 kutusu `[x]` yapılıp **"L2 işaretlendi"** yazılır; kapı sonraki promptları engellemez.
 - Cihaz teyidi (K2F-26 yayını): Arapça sekmesinde "Başla/Aç" düğmesi ya da "Ders kartı gizli · Göster" kartı görünmeli; "Göster"e basınca düğme gelmeli ve odak ona geçmeli (odak gerçek tarayıcıda gözlenmedi). Düğme hiç yoksa/hata varsa bana bildir.

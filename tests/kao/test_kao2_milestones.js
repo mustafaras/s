@@ -160,4 +160,24 @@ check('P10: taş yalnız doğrulanmış durumdan türesin, uydurma kazanım yok'
   assert.equal(has(list, 'half'), false, 'kapsam yetmezken kapsam taşı verilmez');
 });
 
+check('K2F-35: namaz taşı etiketi gerçek kapsamı söyler — namazda geçen doğrulanmış kelime sayısı, "tüm metinler" iddiası yok', () => {
+  const { api } = boot();
+  const n = allPrayerLemmaIds().length;
+  assert.ok(n > 0 && n < 100, `kapsam sayısı gerçek ve küçük (${n})`);
+  const label = api.kaoMilestoneLabels().namaz;
+  assert.equal(label, `Namazda geçen ${n} kelimeyi tanıyorum`);
+  assert.doesNotMatch(label, /Namazımı anlıyorum|tüm/i);
+  const { q } = boot();
+  q.milestones.namaz = NOW;
+  assert.equal(api.kaoMilestoneLabel(q), api.kaoMilestoneLabels().namaz, 'kazanılan taş aynı etiketi okur');
+});
+
+check('K2F-35: namaz metni/sözlük yoksa etiket "0 kelime" demez, eski güvenli etikete döner', () => {
+  const { api, box } = boot();
+  box.window.QuranShortSurahsV1 = { prayerTexts: [] };
+  const label = api.kaoMilestoneLabels().namaz;
+  assert.doesNotMatch(label, /Namazda geçen 0/);
+  assert.match(label, /Namaz/);
+});
+
 console.log(`KAO2-16 milestones: PASS (${passed} kontrol)`);

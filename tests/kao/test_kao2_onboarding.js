@@ -1,6 +1,6 @@
 'use strict';
 
-// KAO2-11/12: ilk açılış (S-01, 05 §3), yerleştirme, geçiş notu ve A-1 ders başlangıcı.
+// KAO2-11 (ilk açılış kartı) + KAO2-12: ilk açılış (S-01, 05 §3), yerleştirme, geçiş notu ve A-1 ders başlangıcı.
 // Sentetik VM, sahte saat; ağ, tarayıcı, ses ya da gerçek veri yok.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -567,4 +567,4 @@ check('K2F-34 (g): seyrek havuzda da iki taraf (≥ ve ≤) aranır; gerçek hav
   assert.ok(Math.max(...uses.values()) <= 3, 'bir çeldirici en çok 3 görevde görünür');
 });
 
-console.log(`KAO2-12 onboarding: PASS (${passed} kontrol)`);
+console.log(`KAO2-11 onboarding: PASS (${passed} kontrol)`);

@@ -442,6 +442,9 @@
     keysOf(KAO_MILESTONE_LABELS).forEach(function(key){ labels[key]=KAO_MILESTONE_LABELS[key]; });
     var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
     units.forEach(function(unit){ labels['u'+unit.id]=kaoUnitTitle(unit)+' ünitesini bitirdim'; });
+    // K2F-35: taşın koşulu namazda geçen doğrulanmış kelimelerdir (yalnız lp_* değil), etiket gerçek sayıyı söyler.
+    var prayerCount=kaoPrayerLemmaIds('namaz').length;
+    if(prayerCount>0) labels.namaz='Namazda geçen '+prayerCount+' kelimeyi tanıyorum';
     return labels;
   }
   function kaoMilestoneLabel(q){

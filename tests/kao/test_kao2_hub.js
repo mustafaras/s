@@ -45,7 +45,7 @@ function card(html) {
   const title = (html.match(/class="kao-hub-title">([^<]*)</) || [])[1];
   const sub = (html.match(/class="kao-hub-sub">([^<]*)</) || [])[1];
   const cta = (html.match(/class="kao-hub-cta">([^<]*)</) || [])[1];
-  const ring = (html.match(/class="kao-progress-ring" role="img" aria-label="[^"]*: (\d+)%"/) || [])[1];
+  const ring = (html.match(/class="kao-progress-ring" role="img" aria-label="[^"]*: %(\d+)"/) || [])[1];
   const label = (html.match(/aria-label="([^"]*)"/) || [])[1];
   return { title, sub, cta: cta && cta.trim(), ring: ring === undefined ? null : Number(ring), label };
 }

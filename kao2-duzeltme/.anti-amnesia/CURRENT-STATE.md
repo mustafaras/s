@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-33
-lastSeq: 89
+lastSeq: 90
 status: active
 -->
 
-Son güncelleme: 2026-10-04 · LEDGER seq 89 · K2F-00…32 tamam (33/44), sıradaki K2F-33. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-04 · LEDGER seq 90 · K2F-00…32 tamam (33/44), sıradaki K2F-33. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 K2F-32 bitti (**yerel, yayınlanmadı**): İlerleme ekranı kendi başlığını taşır (h2 "İlerleme"; "İstatistik / Tutunma ve kalibrasyon" kalktı); 10 R-bandı tablosu "Tekrar doğruluğu" bölümünde kapalı `<details class="kao-flag">` içinde, tek cümle özetle. Yeni CSS/handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-32/KANIT.md).
@@ -32,7 +32,7 @@ K2F-32 bitti (**yerel, yayınlanmadı**): İlerleme ekranı kendi başlığını
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
-- **Ekran görüntüsünde görülen, CANLIDA olan 3 kusur** ([EKRAN.md](../evidence/K2F-32/EKRAN.md)): (1) İlerleme'deki katlanan kalibrasyon satırı işaretçisiz ve soluk → açılır olduğu anlaşılmıyor; (2) başlık çubuğu saydam, kaydırılan içerik başlıkla çakışıyor; (3) Ayarlar → Niyet segmenti sağa taşıyor ("Kendim seçerim" kesik). Düzeltme ayrı commit + yeni yayın onayı ister; CSS payı ≈0,56 KiB.
+- **Ekran görüntüsünde bulunan 3 kusur yerelde DÜZELTİLDİ, canlıda DEĞİL** ([EKRAN.md](../evidence/K2F-32/EKRAN.md), LEDGER seq 90): › işareti, opak/yapışık başlık çubuğu, sarılan Niyet segmenti. Canlıya almak yeni pin + kullanıcı onayı ister. Cihazda gözlenmedi.
 - **K2F-32 cihazda gözlenmedi:** İlerleme ekranında katlanan öngörü bölümünün (summary ≥44 px) görünümü ve dokunma davranışı.
 - **K2F-31 ölçüm sınırları (kapatılanlar sonrası kalan):** `daily.ms` artık gecikmeli sûre cevabında da yazılır (ms/answered paydası tutarlı; seq 86). Kalan, spec'e bağlı: 120 sn üst sınırı (K2F-31 spec'i clamp ister) sekme arka planda beklenirse cevap başına 120 sn ekler → ortalama şişebilir; tahmin onboarding süresiyle (5/10/15 dk) sınırlıdır (05 §4) → 5 dk seçen kullanıcıda uzun ders "~5 dk" gösterir. `lessonPlan` maliyeti ölçüldü: `kaoNextStep` ≈0,09 ms/çağrı (200 çağrı ortalaması) → risk kapandı.
 - **K2F-31 cihazda gözlenmedi:** Bugün/hub/özet dakika metinleri; tahmin onboarding süresiyle (5/10/15 dk) sınırlı olduğundan uzun ders 5 dk seçen kullanıcıda "~5 dk" gösterir (spec 05 §4 üst sınırı).

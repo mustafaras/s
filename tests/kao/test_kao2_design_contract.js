@@ -100,4 +100,19 @@ if (MODE === 'baseline') {
   assert.match(action, /overflow-wrap:anywhere/, 'çok uzun etiket sarar');
   assert.match(kaoCss, /\.kao-feedback-body\+\.kao-feedback-body\{margin-top:8px\}/, 'geri bildirim satırları arası boşluk');
 }
+// Görsel QA bulguları (ekran görüntüsü, 2026-10-04): çubuk opak, katlanan satır açılır görünür, uzun segment sarar.
+{
+  const bar = /\.kao-navbar\{[^}]*\}/.exec(kaoCss)[0];
+  assert.match(bar, /background:linear-gradient\(var\(--kao-bg\),var\(--kao-bg\)\),var\(--quran-surface\)/,
+    'NavBar arka planı opak olmalı: saydam --kao-bg opak yüzeyin üstüne katmanlanır (içerik çubuğun altından görünmez)');
+  assert.match(bar, /top:calc\(var\(--quran-pt,22px\)\*-1\)/, 'çubuk, kaydırıcının üst dolgusu kadar yukarı yapışır: üstündeki şeritten içerik görünmez');
+  assert.match(kaoCss, /\.kao-body\{[^}]*--quran-pt:22px/, 'dolgu özel değişkeni (22px)');
+  assert.match(kaoCss, /\.kao-body\{padding:24px 22px 30px;--quran-pt:24px\}/, 'geniş dolgu özel değişkeni (24px)');
+  assert.match(kaoCss, /\.kao-flag summary::after\{[^}]*content:/, 'katlanan satırda açılır işaretçisi (›) olmalı');
+  assert.match(kaoCss, /\.kao-stats \.kao-flag summary\{[^}]*color:var\(--quran-ink\)/, 'İlerleme katlanan satırı soluk değil: özet tam mürekkep rengi');
+  assert.match(kaoCss, /\.kao-flag\[open\] summary::after\{[^}]*rotate/, 'açıkken işaretçi döner');
+  const seg = /\.kao-seg\{[^}]*\}/.exec(kaoCss)[0];
+  assert.match(seg, /flex-wrap:wrap/, '6 niyet düğmesi tek satıra sığmaz: segment sarar');
+  assert.match(/\.kao-seg button\{[^}]*\}/.exec(kaoCss)[0], /flex:1 1 80px/, 'düğme tabanı 80px: 3 düğme tek satırda eşit, 6 düğme 3+3');
+}
 console.log('KAO2 design contract: PASS');

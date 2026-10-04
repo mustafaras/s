@@ -924,3 +924,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - decision: kontrollü yerel görsel QA yapıldı (soketsiz CDP, boş profil, dış ağ kesik); 12 görüntü kao2-duzeltme/evidence/K2F-32/ekran/, rapor EKRAN.md. Görüntüler 3 kusur gösterdi: kalibrasyon summary işaretçisiz/soluk, başlık çubuğu saydam, Niyet segmenti taşıyor. Düzeltme canlıya gitmedi; yeni commit + yayın kullanıcı onayı ister.
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
 - next: K2F-33
+
+## seq 90 · 2026-10-04 · FIX · K2F-32
+- status: done
+- title: Ekran görüntüsünde görülen 3 görsel kusurun düzeltilmesi (kullanıcı isteği)
+- prev-commit: 44e4d04b
+- decision: (1) katlanan satıra › işareti + tam renk; (2) başlık çubuğu opak ve dolgu kadar yukarı yapışık (22→0 px ölçüldü); (3) .kao-seg sarar (80px taban). Test önce kırmızı. Özel değişken izin listesi için --quran-pt adını aldı. Yalnız yerel; yayın ayrı onay ister (pin hâlâ 20261004a canlıda, düzeltme canlıda DEĞİL).
+- gates: kapilar.sh YEŞİL · css 13,548 KiB
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
+- next: K2F-33

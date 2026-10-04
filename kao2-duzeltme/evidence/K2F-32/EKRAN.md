@@ -21,3 +21,11 @@ Tarih: 2026-10-04 · Kanıt düzeyi: **yerel kaynak-görsel** (cihaz kabulü DE�
 1. **Katlanan kalibrasyon satırı tıklanabilir görünmüyor** (K2F-32): `.kao-flag summary{display:flex}` işaretçiyi (▸) kaldırıyor, metin soluk gri; kapalı satır düz not gibi okunuyor (sonra-06).
 2. **Başlık çubuğu saydam**: kaydırılan içerik çubuğun altından görünüp başlıkla çakışıyor (sonra-03, sonra-07) — K2F-27 sonrası.
 3. **Ayarlar → Niyet segmenti sağa taşıyor**: "Kendim seçerim" kesik (sonra-02). Önceki sürümde taşma daha kötüydü (once-02), yani iyileşti ama bitmedi.
+
+## Düzeltme (aynı gün, yerel; yayınlanmadı)
+`app/kao.css` + `tests/kao/test_kao2_design_contract.js` (önce kırmızı, sonra yeşil):
+1. Katlanan satır: `.kao-flag summary::after` › işareti (açıkken döner), İlerleme'de özet tam mürekkep rengi → `duzeltilmis-06`, `duzeltilmis-07`.
+2. Başlık çubuğu: arka plan opak (`linear-gradient(--kao-bg)` + `--quran-surface`) ve `top:calc(var(--quran-pt,22px)*-1)` ile kaydırıcının üst dolgusu kadar yukarı yapışır. Ölçüm: kaydırınca çubuk üstü 22px → 0px.
+3. Niyet segmenti: `.kao-seg{flex-wrap:wrap}` + düğme tabanı 80px → 3+3 sarar, "Kendim seçerim" kesilmez → `duzeltilmis-02`.
+Kapılar: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · kontrast · plan-check · sync), css 13,548 KiB (tavan 14).
+Karşılaştırma sayfası (önceki · canlı · düzeltilmiş): https://claude.ai/artifact/FFKc4mBzeoNxyqjQGApBdb

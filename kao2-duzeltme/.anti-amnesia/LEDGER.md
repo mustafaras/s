@@ -916,3 +916,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - disclosure: cihaz doğrulaması yapılmadı (kullanıcıda); dinî bağlamlı metin onayları yapay zekâ incelemesidir (GATE seq 71 açık).
 - evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
 - next: K2F-33
+
+## seq 89 · 2026-10-04 · NOTE · K2F-32
+- status: done
+- title: Ekran görüntüsü kanıtı (kullanıcı isteği) ve görsel kusurlar
+- prev-commit: e7f05ca6
+- decision: kontrollü yerel görsel QA yapıldı (soketsiz CDP, boş profil, dış ağ kesik); 12 görüntü kao2-duzeltme/evidence/K2F-32/ekran/, rapor EKRAN.md. Görüntüler 3 kusur gösterdi: kalibrasyon summary işaretçisiz/soluk, başlık çubuğu saydam, Niyet segmenti taşıyor. Düzeltme canlıya gitmedi; yeni commit + yayın kullanıcı onayı ister.
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
+- next: K2F-33

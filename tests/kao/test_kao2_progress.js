@@ -212,6 +212,29 @@ check('İlerleme başlığı tek ve tutarlı', () => {
   assert.equal(headings.length, 1, `tek h2 beklenir: ${headings.join(' | ')}`);
 });
 
+// ---- (7b) K2F-32: kendi başlığı + katlanan kalibrasyon ayrıntısı --------
+check('K2F-32: LargeTitle "İlerleme"; eski "İstatistik / Tutunma ve kalibrasyon" başlığı yok', () => {
+  const t = boot();
+  const html = decode(t.api.kaoStatsHTML(t.NOW));
+  const h2 = html.match(/<h2 id="kao-stats-title">([^<]+)<\/h2>/);
+  assert.ok(h2, 'başlık h2 bulunamadı');
+  assert.equal(h2[1], 'İlerleme');
+  assert.doesNotMatch(html, /Tutunma ve kalibrasyon/, 'eski başlık duruyor');
+  assert.doesNotMatch(html, /<p class="kao-eyebrow">İstatistik<\/p>/, 'eski "İstatistik" üst etiketi duruyor');
+});
+
+check('K2F-32: R-bandı tablosu kapalı başlayan <details> içinde, özeti tek cümle', () => {
+  const t = boot();
+  const html = decode(t.api.kaoStatsHTML(t.NOW));
+  const m = html.match(/<details(?![^>]*\bopen\b)[^>]*>\s*<summary>([^<]+)<\/summary>([\s\S]*?)<\/details>/);
+  assert.ok(m, 'kapalı <details> yok');
+  assert.match(m[2], /<table class="kao-stats-table"/, 'tablo <details> dışında');
+  assert.equal(m[1].trim().split(/[.!?]/).filter(Boolean).length, 1, `özet tek cümle olmalı: ${m[1]}`);
+  assert.doesNotMatch(html.replace(m[0], ''), /kao-stats-table/, 'tablo <details> dışında da var');
+  // Aynı bölümdeki doğruluk satırları (Son 2/6 hafta) katlanmadan görünür kalır.
+  assert.ok(html.indexOf('Son 2 hafta') < html.indexOf('<details'), 'doğruluk satırları katlanmış');
+});
+
 // ---- (8) Model saflığı: determinizm ve sıra ----------------------------
 check('kaoProgressModel saf ve deterministiktir', () => {
   const t = boot();

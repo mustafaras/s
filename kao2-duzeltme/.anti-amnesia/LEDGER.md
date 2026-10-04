@@ -892,3 +892,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - still-open: 120 sn clamp (spec) ve tahminin onboarding süresiyle sınırlı olması (05 §4) tasarım gereğidir; cihaz gözlemleri kullanıcıda.
 - gates: kapilar.sh YEŞİL · tekrar-üret 10/10
 - next: K2F-32
+
+## seq 87 · 2026-10-04 · PROMPT · K2F-32
+- status: done
+- title: İlerleme ekranı başlığı ve kalibrasyon
+- prev-commit: 51d8f505
+- evidence: kao2-duzeltme/evidence/K2F-32/KANIT.md
+- closes: K6-04
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync)
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261003d (pin yükseltme YOK)
+- changed-tests: yok (test_kao2_progress.js +2 kontrol)
+- evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js) · cihaz — (katlanan bölüm görünümü gözlenmedi)
+- surprises: yok (bağımsız inceleme APPROVE; mutasyon `open` testi kırdı)
+- next: K2F-33

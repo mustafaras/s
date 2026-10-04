@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-36
-lastSeq: 101
+lastSeq: 102
 status: active
 -->
 
-Son güncelleme: 2026-10-04 · LEDGER seq 101 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-04 · LEDGER seq 102 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 **Modal görsel QA (seq 101, yerel, yayınlanmadı):** kullanıcı ekran görüntüsü üzerine tüm modal 390/320 px'te tarandı; 8 yerleşim kusuru + NOTE 96 (dinleme şık sırası) düzeltildi, NOTE 99 (gramer tekrarı) yeniden üretilemedi ve test koruması eklendi. Kanıt: [modal-qa/](../evidence/K2F-35/modal-qa/). Araç: `kao2-duzeltme/tools/gorsel-qa/audit-modal.mjs`.
@@ -37,6 +37,7 @@ K2F-35 bitti (**yerel, yayınlanmadı**): halka metni ve aria-label "%20"; ünit
 
 ## Açık riskler
 - **K2F-35 cihazda gözlenmedi:** halka içi "%20" metninin 28/44 px halkalara sığması, ünite satırının "kalıcı kelime" ile sarması.
+- **Modal QA açık sınırlar (NOTE seq 102):** %200 yazıda halka içi "%20" halkadan geniş; 320 px'te geri etiketi 2 satır; 227 karenin yalnız ~60'ı gözle incelendi (hepsi otomatik ölçüldü); açık tema ve %200 yazı taraması temiz.
 - **Modal QA cihazda gözlenmedi (seq 101):** S0 örnek kelime satırları, Arapça hero, ünite kutusu, kısa NavBar başlıkları, 7 sütunlu ısı haritası telefonda teyit edilmeli. Tarama sentetik veriyle masaüstü Chrome'dadır; CSS değişti → yayında yeni pin gerekir.
 - **K2F-34 cihazda gözlenmedi:** yerleştirme/kapı okuma şıklarının yeni dağılımı (doğru şık 1./2./3. düğmede).
 - **Görsel QA düzeltmeleri canlıda** (LEDGER seq 90–94); yalnız cihazda gözlenmedi: ›/yapışık çubuk/sarılan Niyet/ikon hizası/--f-N aralıkları telefonda teyit edilmeli.

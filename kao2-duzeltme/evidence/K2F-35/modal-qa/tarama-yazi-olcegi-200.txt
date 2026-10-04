@@ -1,0 +1,273 @@
+origin: http://127.0.0.1:9000 force:null width=390
+tema=dark yazı-ölçeği=2 gerçek-tema=dark
+## v-home: Kapat Kur'an Arapçası Kur'an Arapçası Sıradaki Fâtiha · Ders 2 4 yeni kelime · ~3 dk Başla
+## v-home-alt: Kapat Kur'an Arapçası Kur'an Arapçası Sıradaki Fâtiha · Ders 2 4 yeni kelime · ~3 dk Başla
+## v-units: ‹ Kur'an Arapçası Yol Yolun Öğrenme yolu Önerilen üniteyi izle ya da istediğin durağı aç. 
+   ! DAR SÜTUN span.kao-path-unit-promise w=116 satır=10 "Her namazda okuduğun F"
+   ! DAR SÜTUN strong w=112 satır=4 "Namazın cümleleri"
+   ! DAR SÜTUN span.kao-path-unit-promise w=112 satır=10 "Tekbirden selâma kadar"
+   ! DAR SÜTUN strong w=112 satır=3 "Üç kısa sûre"
+   ! DAR SÜTUN span.kao-path-unit-promise w=112 satır=7 "İhlâs, Felak ve Nâs'ı "
+   ! DAR SÜTUN strong w=111 satır=3 "Kur'an'ın tutkalı"
+   ! DAR SÜTUN span.kao-path-unit-promise w=111 satır=9 "Cümleleri birbirine ba"
+   ! DAR SÜTUN span.kao-path-unit-promise w=112 satır=11 "İşaret ve soru kelimel"
+   ! DAR SÜTUN strong w=111 satır=3 "Gök, yer ve insan"
+   ! DAR SÜTUN span.kao-path-unit-promise w=111 satır=6 "Kur'an'ın en sık isiml"
+   ! DAR SÜTUN span.kao-path-unit-promise w=113 satır=6 "Geçmiş zaman anlatılar"
+   ! DAR SÜTUN strong w=111 satır=3 "Yapar, yapıyor"
+   ! DAR SÜTUN strong w=111 satır=3 "Yap, ver, bağışla"
+   ! DAR SÜTUN span.kao-path-unit-promise w=111 satır=6 "Emir ve dua cümlelerin"
+## v-units-alt: ‹ Kur'an Arapçası Yol Yolun Öğrenme yolu Önerilen üniteyi izle ya da istediğin durağı aç. 
+   ! DAR SÜTUN span.kao-path-unit-promise w=116 satır=10 "Her namazda okuduğun F"
+   ! DAR SÜTUN strong w=112 satır=4 "Namazın cümleleri"
+   ! DAR SÜTUN span.kao-path-unit-promise w=112 satır=10 "Tekbirden selâma kadar"
+   ! DAR SÜTUN strong w=112 satır=3 "Üç kısa sûre"
+   ! DAR SÜTUN span.kao-path-unit-promise w=112 satır=7 "İhlâs, Felak ve Nâs'ı "
+   ! DAR SÜTUN strong w=111 satır=3 "Kur'an'ın tutkalı"
+   ! DAR SÜTUN span.kao-path-unit-promise w=111 satır=9 "Cümleleri birbirine ba"
+   ! DAR SÜTUN span.kao-path-unit-promise w=112 satır=11 "İşaret ve soru kelimel"
+   ! DAR SÜTUN strong w=111 satır=3 "Gök, yer ve insan"
+   ! DAR SÜTUN span.kao-path-unit-promise w=111 satır=6 "Kur'an'ın en sık isiml"
+   ! DAR SÜTUN span.kao-path-unit-promise w=113 satır=6 "Geçmiş zaman anlatılar"
+   ! DAR SÜTUN strong w=111 satır=3 "Yapar, yapıyor"
+   ! DAR SÜTUN strong w=111 satır=3 "Yap, ver, bağışla"
+   ! DAR SÜTUN span.kao-path-unit-promise w=111 satır=6 "Emir ve dua cümlelerin"
+## v-grammar: ‹ Kur'an Arapçası Gramer notları Keşfet Gramer notları Bir kez oku, sonra kavramı ders içi
+   ! DAR SÜTUN button.kao-navbar-action w=87 satır=5 "‹ Kur'an Arapçası"
+## v-grammar-alt: ‹ Kur'an Arapçası Gramer notları Keşfet Gramer notları Bir kez oku, sonra kavramı ders içi
+   ! DAR SÜTUN button.kao-navbar-action w=87 satır=5 "‹ Kur'an Arapçası"
+## v-reader: ‹ Kur'an Arapçası Nâs 20 kısa sûre Nâs Kelimeler mushaf akışında; anlamı görmek için kelim
+## v-reader-alt: ‹ Kur'an Arapçası Nâs 20 kısa sûre Nâs Kelimeler mushaf akışında; anlamı görmek için kelim
+## v-phonics: ‹ Kur'an Arapçası Telaffuz Telaffuz stüdyosu Önce duy, sonra ayırt et Minimal çiftler, uzu
+## v-phonics-alt: ‹ Kur'an Arapçası Telaffuz Telaffuz stüdyosu Önce duy, sonra ayırt et Minimal çiftler, uzu
+## v-ayah: ‹ Kur'an Arapçası Günün âyeti Bugün anlayabildiğin âyet Alak · 14. âyet Anlaşılan âyet say
+   ! DAR SÜTUN button.kao-navbar-action w=100 satır=4 "‹ Kur'an Arapçası"
+## v-ayah-alt: ‹ Kur'an Arapçası Günün âyeti Bugün anlayabildiğin âyet Alak · 14. âyet Anlaşılan âyet say
+   ! DAR SÜTUN button.kao-navbar-action w=100 satır=4 "‹ Kur'an Arapçası"
+## v-prayer: ‹ Kur'an Arapçası Namaz Seviye 1 · Namazda ne diyorum Bir rekâtta söylediklerin Tanıdığın 
+## v-prayer-alt: ‹ Kur'an Arapçası Namaz Seviye 1 · Namazda ne diyorum Bir rekâtta söylediklerin Tanıdığın 
+## v-sources: ‹ Kur'an Arapçası Hakkında Hakkında Hakkında ve kaynaklar Kur’an Arapçası öğrenme modülü. 
+   ! DAR SÜTUN button.kao-navbar-action w=115 satır=3 "‹ Kur'an Arapçası"
+## v-sources-alt: ‹ Kur'an Arapçası Hakkında Hakkında Hakkında ve kaynaklar Kur’an Arapçası öğrenme modülü. 
+   ! DAR SÜTUN button.kao-navbar-action w=115 satır=3 "‹ Kur'an Arapçası"
+## v-roots: ‹ Kur'an Arapçası Kök aileleri Kök aileleri Bir kök, bir aile Öğrenme sırasındaki 73 aile;
+   ! DAR SÜTUN button.kao-navbar-action w=107 satır=3 "‹ Kur'an Arapçası"
+## v-roots-alt: ‹ Kur'an Arapçası Kök aileleri Kök aileleri Bir kök, bir aile Öğrenme sırasındaki 73 aile;
+   ! DAR SÜTUN button.kao-navbar-action w=107 satır=3 "‹ Kur'an Arapçası"
+## v-gate: ‹ Kur'an Arapçası Harf kontrolü Seviye 0 Harf · ses · hareke 20 kısa seçim · utanma yok, y
+   ! DAR SÜTUN button.kao-navbar-action w=94 satır=4 "‹ Kur'an Arapçası"
+## v-gate-alt: ‹ Kur'an Arapçası Harf kontrolü Seviye 0 Harf · ses · hareke 20 kısa seçim · utanma yok, y
+   ! DAR SÜTUN button.kao-navbar-action w=94 satır=4 "‹ Kur'an Arapçası"
+## v-stats: ‹ Kur'an Arapçası İlerleme İlerleme Kaç kelime tanıdığını, bu haftanı ve tekrar doğruluğun
+## v-stats-alt: ‹ Kur'an Arapçası İlerleme İlerleme Kaç kelime tanıdığını, bu haftanı ve tekrar doğruluğun
+## v-settings: ‹ Kur'an Arapçası Ayarlar Ayarlar Öğrenme ayarların Seçimlerin bu cihazda saklanır ve senk
+## v-settings-alt: ‹ Kur'an Arapçası Ayarlar Ayarlar Öğrenme ayarların Seçimlerin bu cihazda saklanır ve senk
+## unit-1: ‹ Kur'an Arapçası Fâtiha Seviye 1 · Namazın dili Fâtiha Bitirince Her namazda okuduğun Fât
+## unit-2: ‹ Kur'an Arapçası Namazın cümleleri Seviye 1 · Namazın dili Namazın cümleleri Bitirince Te
+   ! DAR SÜTUN button.kao-navbar-action w=62 satır=6 "‹ Kur'an Arapçası"
+## unit-3: ‹ Kur'an Arapçası Üç kısa sûre Seviye 1 · Namazın dili Üç kısa sûre Bitirince İhlâs, Felak
+   ! DAR SÜTUN button.kao-navbar-action w=100 satır=4 "‹ Kur'an Arapçası"
+## unit-6: ‹ Kur'an Arapçası Gök, yer ve insan Seviye 2 · Kur'an'ın iskeleti Gök, yer ve insan Bitiri
+   ! DAR SÜTUN button.kao-navbar-action w=72 satır=5 "‹ Kur'an Arapçası"
+## unit-12: ‹ Kur'an Arapçası Eğer ve zaman Seviye 4 · Kökten dallara Eğer ve zaman Bitirince Şart ve 
+   ! DAR SÜTUN button.kao-navbar-action w=85 satır=5 "‹ Kur'an Arapçası"
+## word: ‹ Kur'an Arapçası asm asm ٱسْم Okunuş asm Telaffuzu dinle Anlamı ad, isim Türkçede Türkçed
+## s0-01-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 1 / 
+## s0-01-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 2 / 
+## s0-01-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-01-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sağdan sola, harf ve hareke Aşama 3 / 
+## s0-02-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 1 / 4 · Açıklama Ay
+## s0-02-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 2 / 4 · Dinle ve gö
+## s0-02-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-02-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma S
+## s0-03-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 1 / 4 · Açıklama İk
+## s0-03-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 2 / 4 · Dinle ve gö
+## s0-03-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-03-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Esre ve ötre Aşama 3 / 4 · Alıştırma S
+## s0-04-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 1 / 4 · Açıklama Ç
+## s0-04-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 2 / 4 · Dinle ve g
+## s0-04-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-04-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Çengel ailesi Aşama 3 / 4 · Alıştırma 
+## s0-05-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 1 / 4 · Açık
+## s0-05-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 2 / 4 · Dinl
+## s0-05-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-05-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Bağlanmayan harfler Aşama 3 / 4 · Alış
+## s0-06-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 1 / 4 · Açıklama Dişl
+## s0-06-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 2 / 4 · Dinle ve gör 
+## s0-06-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-06-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Dişli aile Aşama 3 / 4 · Alıştırma Sor
+## s0-07-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 1 / 4 · Açıklama
+## s0-07-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 2 / 4 · Dinle ve
+## s0-07-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-07-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Konum şekilleri Aşama 3 / 4 · Alıştırm
+## s0-08-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 1 / 4 · Açı
+## s0-08-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 2 / 4 · Din
+## s0-08-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-08-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Sükûn ve kapalı hece Aşama 3 / 4 · Alı
+## s0-09-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 1 / 4 · Aç
+## s0-09-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 2 / 4 · Di
+## s0-09-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-09-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Uzatma (med) ve şedde Aşama 3 / 4 · Al
+## s0-10-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 1 / 4 · Açıklama G
+## s0-10-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 2 / 4 · Dinle ve g
+## s0-10-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-10-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Kalan harfler Aşama 3 / 4 · Alıştırma 
+## s0-11-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 1 / 4 · 
+## s0-11-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 2 / 4 · 
+## s0-11-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-11-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Tenvin, elif-lâm, vasıl Aşama 3 / 4 · 
+## s0-12-00: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 1 / 4 · Açıkla
+## s0-12-01: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 2 / 4 · Dinle 
+## s0-12-02: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-03: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-04: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-05: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-06: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-07: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-08: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-09: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-10: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-11: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-12: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## s0-12-13: ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri İlk okuma provası Aşama 3 / 4 · Alıştı
+## ders-u01_02-00: ✕ Ünite 1 · Fâtiha · Ders 2 / 5 Bugünün dersi Rahîm ve Hamd Rahmet ve övgü kelimelerini, '
+## ders-u01_02-01: ✕ Ünite 1 · Fâtiha · Ders 2 / 5 Yeni kelime · 1 / 5 رَحِيم rahîm Dinle çok merhametli (sür
+## ders-u01_02-02: ✕ Ünite 1 · Fâtiha · Ders 2 / 5 Yeni kelime · 2 / 5 حَمْد hamd Dinle övgü ve şükür Türkçed
+## ders-u01_02-03: ✕ Ünite 1 · Fâtiha · Ders 2 / 5 Yeni kelime · 3 / 5 عَٰلَمِين ʿâlamîn Dinle bütün varlıkla
+## ders-u01_02-04: ✕ Ünite 1 · Fâtiha · Ders 2 / 5 Yeni kelime · 4 / 5 مَٰلِك mâlik Dinle sahip, malik Türkçe
+## ders-u01_02-05: ✕ Ünite 1 · Fâtiha · Ders 2 / 5 Yeni kelime · 5 / 5 ٱسْم asm Dinle ad, isim Türkçedeki akr
+## ders-u01_02-06: ✕ Ünite 1 · Fâtiha · Ders 2 / 5 Kavram Başındaki 'el': o bilinen Kelimenin başındaki 'el' 
+## ders-u01_02-07: ✕ Anlamı seç 1 / 10 رَحِيم rahîm Dinle Doğal hız Türkçede var: merhamet; rahmet çok merham
+## ders-u01_02-08: ✕ Anlamı seç 1 / 10 رَحِيم rahîm Dinle Doğal hız Türkçede var: merhamet; rahmet ✓ Doğru ce
+## ders-u02_01-00: ✕ Ünite 2 · Namazın cümleleri · Ders 1 / 3 Bugünün dersi Büyüklük ve tek ilah Namazda sık 
+## ders-u02_01-01: ✕ Ünite 2 · Namazın cümleleri · Ders 1 / 3 Yeni kelime · 1 / 3 أَكْبَر akbar Dinle daha bü
+## ders-u02_01-02: ✕ Ünite 2 · Namazın cümleleri · Ders 1 / 3 Yeni kelime · 2 / 3 إِلَٰه ilâh Dinle tapılan, 
+## ders-u02_01-03: ✕ Ünite 2 · Namazın cümleleri · Ders 1 / 3 Yeni kelime · 3 / 3 أَيُّهَا ayyuhâ Dinle ey (s
+## ders-u02_01-04: ✕ Ünite 2 · Namazın cümleleri · Ders 1 / 3 Kavram '-de, -den, -e' kelimeleri Türkçede sona
+## ders-u02_01-05: ✕ Anlamı seç 1 / 10 أَكْبَر akbar Dinle Doğal hız Türkçede var: ekber daha büyük güçlü, üs
+## ders-u02_01-06: ✕ Anlamı seç 1 / 10 أَكْبَر akbar Dinle Doğal hız Türkçede var: ekber ✓ Doğru cevap daha b
+## ders-u05_01-00: ✕ Ünite 5 · Bu, şu, kim, ne · Ders 1 / 2 Bugünün dersi İşaret kelimeleri 'bu, şu, onlar' k
+## ders-u05_01-01: ✕ Ünite 5 · Bu, şu, kim, ne · Ders 1 / 2 Yeni kelime · 1 / 2 كَيْف kayf Dinle nasıl? Türkç
+## ders-u05_01-02: ✕ Ünite 5 · Bu, şu, kim, ne · Ders 1 / 2 Yeni kelime · 2 / 2 هَل hal Dinle ... mı? (soru) 
+## ders-u05_01-03: ✕ Ünite 5 · Bu, şu, kim, ne · Ders 1 / 2 Kavram Bu, şu, o, bunlar, onlar Yakını göstermek 
+## ders-u05_01-04: ✕ Anlamı seç 1 / 10 هَٰذَا hâzâ Dinle Doğal hız onlar (uzak işaret) bu (yakın işaret)@0
+## ders-u05_01-05: ✕ Anlamı seç 1 / 11 هَٰذَا hâzâ Dinle Doğal hız ✕ Senin seçimin onlar (uzak işaret) ✓ Doğr
+## ders-u09_01-00: ✕ Ünite 9 · Yap, ver, bağışla · Ders 1 / 11 Bugünün dersi Emir kipi: an, ye, ver, bağışla 
+## ders-u09_01-01: ✕ Ünite 9 · Yap, ver, bağışla · Ders 1 / 11 Yeni kelime · 1 / 4 ذَكَرَ zakara Dinle andı, 
+## ders-u09_01-02: ✕ Ünite 9 · Yap, ver, bağışla · Ders 1 / 11 Yeni kelime · 2 / 4 أَكَلَ akala Dinle yedi Ör
+## ders-u09_01-03: ✕ Ünite 9 · Yap, ver, bağışla · Ders 1 / 11 Yeni kelime · 3 / 4 رَحِمَ rahima Dinle merham
+## ders-u09_01-04: ✕ Ünite 9 · Yap, ver, bağışla · Ders 1 / 11 Yeni kelime · 4 / 4 غَفَرَ gafara Dinle bağışl
+## ders-u09_01-05: ✕ Ünite 9 · Yap, ver, bağışla · Ders 1 / 11 Kavram Emir: yap!, deyin! Emir, şimdiki zamand
+## ders-u09_01-06: ✕ Anlamı seç 1 / 10 ذَكَرَ zakara Dinle Doğal hız Türkçede var: zikir yaptı, işledi andı, 
+## ders-u09_01-07: ✕ Anlamı seç 1 / 11 ذَكَرَ zakara Dinle Doğal hız Türkçede var: zikir ✕ Senin seçimin yapt
+blocked-external: 241

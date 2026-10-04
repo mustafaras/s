@@ -1050,3 +1050,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - surprises: tek `git checkout app/kao.css` yanlışlıkla CSS düzeltmelerini geri aldı; yedekten ve düzeltme listesinden betikle yeniden uygulandı, mutasyon testleri sonradan yeniden koşuldu.
 - next: K2F-36
 
+## seq 102 · 2026-10-04 · NOTE · K2F-35
+- status: open
+- title: Modal QA ek taramaları (açık tema, %200 yazı) — açık risk ve sınırlar
+- decision: Kullanıcı "tam ve kusursuz uygulandığından emin ol" dedi; bağımsız doğrulama turu: audit-modal.mjs'e tema/yazı-ölçeği seçeneği eklendi. Açık tema 390 px: 227 kare, 0 bulgu, 12 kare gözle incelendi (modal-qa/06-acik-tema.png). %200 yazı 390 px: kırpılan/taşan/ekran dışı/küçük hedef bulgusu 0; yalnız "dar sütun" 42 uyarısı (içerik doğal olarak çok satıra akıyor, kırpılma yok; modal-qa/tarama-yazi-olcegi-200.txt). Açık gözlemler: (a) %200 yazıda halka içi "%20" halkadan geniş kalır (rem tabanlı); (b) 320 px'te "‹ Kur'an Arapçası" geri etiketi iki satıra sarar (nowrap yasak, kabul); (c) 227 karenin tamamı gözle okunmadı — otomatik denetim hepsini ölçtü, gözle ~60 kare incelendi; (d) cihaz doğrulaması yok.
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ (sentetik, masaüstü Chrome) · yayın — · cihaz —
+- next: K2F-36
+

@@ -1,12 +1,12 @@
-// usage: node audit-modal.mjs <root> <outDir> <profileName> [width]
+// usage: node audit-modal.mjs <root> <outDir> <profileName> [width] [dark|light] [yazı ölçeği, ör. 2 = %200]
 // Tüm KAO modal görünümlerini ve ders akışlarını gezer: ekran görüntüsü + otomatik DOM denetimi
 // (sıkışık metin, kırpılan taşma, 44 px altı dokunma hedefi, ekran dışı eleman, yatay kaydırma). Sentetik veri.
 import { launch } from './cdp.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
-const [root, out, prof, widthArg] = process.argv.slice(2);
-const width = Number(widthArg) || 390;
+const [root, out, prof, widthArg, themeArg, scaleArg] = process.argv.slice(2);
+const width = Number(widthArg) || 390, theme = themeArg === 'light' ? 'light' : 'dark', scale = Number(scaleArg) || 1;
 fs.mkdirSync(out, { recursive: true });
 const b = await launch(root, path.join(os.tmpdir(), prof), { width, height: 844 });
 const log = [], seen = new Set();
@@ -59,6 +59,9 @@ const seed = (withCards) => `(function(){
   for(var i=1;i<=4;i++){var d=new Date(Date.now()-i*86400000).toISOString().slice(0,10);q.daily[d]={answered:20,correct:16,new:2,reviewed:18,ms:20*9000}}}
   return true})()`;
 await b.eval(seed(true));
+if (theme === 'light') await b.eval('App.setTheme(false)');
+if (scale !== 1) await b.eval(`document.documentElement.style.fontSize='${16 * scale}px'`);
+log.push(`tema=${theme} yazı-ölçeği=${scale} gerçek-tema=` + await b.eval(`document.getElementById('root').getAttribute('data-theme')`));
 for (const v of ['home', 'units', 'grammar', 'reader', 'phonics', 'ayah', 'prayer', 'sources', 'roots', 'gate', 'stats', 'settings']) {
   await b.eval(`SeymaQuranLearn.kaoOpen('home'); SeymaQuranLearn.kaoSetView('${v}')`); await b.wait(500);
   await frame('v-' + v);

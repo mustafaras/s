@@ -8,14 +8,14 @@
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
   "nextPrompt": "K2F-35",
-  "ledgerLastSeq": 96,
+  "ledgerLastSeq": 97,
   "releaseApproval": "approved_through_K2F-17",
   "lastRelease": {
-    "prompt": "K2F-33",
-    "commit": "2715ad50",
-    "pin": "20261004b",
-    "run": 37202523139,
-    "evidence": "kao2-duzeltme/evidence/K2F-33/YAYIN.md"
+    "prompt": "K2F-34",
+    "commit": "dc9743f4",
+    "pin": "20261004c",
+    "run": 37204779072,
+    "evidence": "kao2-duzeltme/evidence/K2F-34/YAYIN.md"
   },
   "sources": {
     "audit": "kao2-duzeltme/denetim/KUSUR-RAPORU.md",

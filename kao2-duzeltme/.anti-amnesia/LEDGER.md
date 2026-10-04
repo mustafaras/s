@@ -997,3 +997,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak ✓
 - next: K2F-35
 
+## seq 97 · 2026-10-04 · RELEASE · K2F-34
+- status: done
+- title: K2F-34 canlıya alındı (kullanıcı isteği), pin 20261004c
+- prev-commit: dc9743f4
+- evidence: kao2-duzeltme/evidence/K2F-34/YAYIN.md
+- decision: kullanıcı "canlıya al" dedi; main ff-only 2715ad50..dc9743f4, force yok; Pages run 37204779072 success; canlı 9/9 bayt-eşit; gizlilik 404 ✓.
+- disclosure: cihaz doğrulaması yapılmadı (kullanıcıda); dinleme şık sırası NOTE seq 96 açık; dinî bağlamlı metin onayları yapay zekâ incelemesidir (GATE seq 71 açık).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
+- next: K2F-35
+

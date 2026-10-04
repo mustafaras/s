@@ -22,7 +22,7 @@ fix-sync-check PASS; tek commit. Push/merge/deploy yalnız YAYIN promptlarında 
 
 Durum (önceki oturumdan): K2F-00…34 tamam (35/44), nextPrompt K2F-35 (küçük metin ve etiket düzeltmeleri:
 halka "%20", ünite "x / y kalıcı kelime · a / b ders", namaz taşı etiketi, test başlıkları). Dal kao2-duzeltme
-(K2F-33 dahil main'e ff-only yayınlandı; sonrası yerel); canlı main 2715ad50, pin 20261004b. K2F-34 ve sonrası canlıda
+(K2F-34 dahil main'e ff-only yayınlandı; sonrası yerel); canlı main dc9743f4, pin 20261004c. K2F-34 canlıda; K2F-35 ve sonrası canlıda
 DEĞİL (yayın yalnız kullanıcı "canlıya al" derse).
 
 K2F-35'e özel notlar (önceki oturumlardan öğrenilenler):
@@ -46,4 +46,4 @@ K2F-35'e özel notlar (önceki oturumlardan öğrenilenler):
 
 ## Sıradan sonra
 - K2F-36 yeni bölümü yalnız K2F-35 kapanınca okunur.
-- Canlıya alma yalnız kullanıcı isterse: pin `20261004b` → yeni pin (index.html ×15, sw.js ×16, 8 pin taşıyan test), `kapilar.sh`, ff-only push, Pages run, bayt eşitliği, gizlilik 404. Önceki örnek: `evidence/K2F-33/YAYIN.md`.
+- Canlıya alma yalnız kullanıcı isterse: pin `20261004c` → yeni pin (index.html ×15, sw.js ×16, 8 pin taşıyan test), `kapilar.sh`, ff-only push, Pages run, bayt eşitliği, gizlilik 404. Önceki örnek: `evidence/K2F-33/YAYIN.md`.

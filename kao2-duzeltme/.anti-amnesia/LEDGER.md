@@ -1028,3 +1028,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak ✓
 - next: K2F-36
 
+## seq 100 · 2026-10-04 · FIX · K2F-35
+- status: done
+- title: Ekran görüntüsü kanıtı (K2F-34/35) — namaz taşı koşul satırındaki "tüm kelimeler" iddiası düzeltildi
+- prev-commit: eddee9e0
+- evidence: kao2-duzeltme/evidence/K2F-35/ekran/ (önce a352fa77 · sonra güncel; sentetik veri, 127.0.0.1:9000, boş profil, token yok, Guard 1 testi yeşil, dış istek 13 engellendi)
+- decision: kullanıcı "tam ve kusursuz uygulandığından emin ol, arayüz değişikliklerini ekran görüntüleriyle ispatla" dedi. Görüntüler: halka "20%"→"%20", ünite "kelime"→"kalıcı kelime", yerleştirme doğru şık hep 1.→dönüşümlü + eşit uzunluk. Namaz taşı görüntüsünde etiket düzelmişti ama koşul satırı hâlâ "Namaz metinlerindeki tüm kelimeler…" diyordu (namaz metinlerinde 69 ayrı kelime, taş 35 doğrulanmışı sayar) — K4-04'ün asıl şikâyeti; (c) eksik kapatılmıştı. Önce kırmızı test, sonra "Bu N kelimenin hepsi 7 gün oturmuş olsun".
+- gates: kapilar.sh YEŞİL · runtime 116,393 KiB · css 13,661 KiB · tekrar-uret 10/10
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ (sentetik) · yayın — · cihaz —
+- next: K2F-36
+

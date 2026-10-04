@@ -180,4 +180,14 @@ check('K2F-35: namaz metni/sözlük yoksa etiket "0 kelime" demez, eski güvenli
   assert.match(label, /Namaz/);
 });
 
+check('K2F-35: sıradaki namaz taşının koşul satırı "tüm namaz metinleri" demez; taşın saydığı N kelimeyi söyler', () => {
+  const { api, data, q } = boot();
+  q.milestones = { besmele: NOW, fatiha: NOW };
+  const next = api.kaoProgressModel(data, NOW).stones.next;
+  assert.ok(next, 'sıradaki taş var');
+  assert.equal(next.label, `Namazda geçen ${allPrayerLemmaIds().length} kelimeyi tanıyorum`);
+  assert.equal(next.condition, `Bu ${allPrayerLemmaIds().length} kelimenin hepsi 7 gün oturmuş olsun`);
+  assert.doesNotMatch(next.condition, /tüm/i);
+});
+
 console.log(`KAO2-16 milestones: PASS (${passed} kontrol)`);

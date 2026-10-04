@@ -2,14 +2,14 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-36
-lastSeq: 99
+lastSeq: 100
 status: active
 -->
 
-Son güncelleme: 2026-10-04 · LEDGER seq 99 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-04 · LEDGER seq 100 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-35 bitti (**yerel, yayınlanmadı**): halka metni ve aria-label "%20"; ünite ekranı "x / y kalıcı kelime · a / b ders"; `namaz` taşı "Namazda geçen N kelimeyi tanıyorum" (N gerçek koşul kümesi, N=0 ise eski etiket); onboarding test özeti "KAO2-11". Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-35/KANIT.md).
+K2F-35 bitti (**yerel, yayınlanmadı**): halka metni ve aria-label "%20"; ünite ekranı "x / y kalıcı kelime · a / b ders"; `namaz` taşı "Namazda geçen N kelimeyi tanıyorum" (N gerçek koşul kümesi, N=0 ise eski etiket); onboarding test özeti "KAO2-11". Yeni handler/CSS yok. **Ekran görüntüsüyle kanıtlandı** (önce/sonra, [ekran/](../evidence/K2F-35/ekran/)); görüntü, taşın koşul satırındaki "tüm kelimeler" iddiasını da ortaya çıkardı ve düzeltildi (seq 100). Ayrıntı: [KANIT.md](../evidence/K2F-35/KANIT.md).
 Önceki: K2F-34 bitti (**canlıda**, main `dc9743f4`, pin `20261004c`, Pages run 37204779072, 9/9 bayt-eşit; ayrıntı [YAYIN.md](../evidence/K2F-34/YAYIN.md)): okuma çeldiricileri en sık 60 kelimeden, doğru okunuşa uzunlukça yakın (biri ≥, biri ≤; ±2 bandı) ve belirlenimci seçilir; doğru şık 3 konuma dönüşümlü yerleşir (eskiden 20/20 görevde 1. sıradaydı); aynı Arapçanın hiçbir okunuşu çeldirici olmaz. İlk/son/kısa/uzun/orta sezgisi yerleştirmeyi (≥7/8) ve kapıyı (≥18/20) geçemez. Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-34/KANIT.md).
 Önceki: K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi: Ünite N · başlık" + "Derse git" (kaoNav unit); eşlemesiz lemmada satır gizli, "Derse dön" yedeği; ders varken tek düğme. Yeni handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-33/KANIT.md).
 Önceki: K2F-32 bitti (**yerel, yayınlanmadı**): İlerleme ekranı kendi başlığını taşır (h2 "İlerleme"; "İstatistik / Tutunma ve kalibrasyon" kalktı); 10 R-bandı tablosu "Tekrar doğruluğu" bölümünde kapalı `<details class="kao-flag">` içinde, tek cümle özetle. Yeni CSS/handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-32/KANIT.md).
@@ -29,7 +29,7 @@ K2F-35 bitti (**yerel, yayınlanmadı**): halka metni ve aria-label "%20"; ünit
 - Yayın pini (canlı): `20261004c`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
-- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 116,365 KiB (K2F-35 sonrası)** · p95 4,2 ms.
+- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 116,393 KiB (K2F-35 sonrası)** · p95 4,2 ms.
 - Testler: `test_kao2_lesson_flow.js` 23 · `test_kao2_review_apply.js` 15 · `test_kao2_reader.js` 14 · `test_kao2_hub.js` 10 · `test_kao2_arabic_tab.js` 4 (yeni) · `test_kao2_kabul.js` 10/10 ölçüt.
 - Namaz eşlemesi: 19/32 `lp_*` eşli. Veri kapsamı (524 lemma): 162 unit11 köküne, 113 kognat kaymasına sahip.
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).

@@ -1,0 +1,21 @@
+origin: http://127.0.0.1:9000 token:false force:null
+K35-1-uniteler-halka: ‹ Kur'an Arapçası Yol Yolun Öğrenme yolu Önerilen üniteyi izle ya da istediğin durağı aç. Seviye 0 · Harfler ve okuma Sağdan sola, harf ve hareke Başla · 12 kısa ders 0 / 12 ders 0% › Seviye 1 · Namazın dili Ünite 1 Fâtiha Her namazda okuduğun Fâtiha'yı kelime kelime anlayacaksın. 1 / 5 ders 20% › Ünite 2 Namazın cümleleri Tekbirden selâma kadar namazda söylediklerini anlayacaksın. 0 / 3 ders 0% › Ünite 3 Üç kısa sûre İhlâs, Felak ve Nâs'ı anlayarak okuyacaksın. 0 / 6 ders 0% › Seviye 2 · Kur'an'ın iskeleti Ünite 4 Kur'an'ın tutkalı Cümleleri birbirine bağlayan kelimeleri tanıyacaksın. 0 / 5 ders 0% › Ünite 5 Bu, şu, kim, ne İşaret ve soru kelimeleriyle âyetin kime, neye döndüğünü göreceksin
+K35-2-unite-detayi: ‹ Yol Fâtiha Seviye 1 · Namazın dili Fâtiha Bitirince Her namazda okuduğun Fâtiha'yı kelime kelime anlayacaksın. 20% 6 / 23 kelime · 1 / 5 ders Ders 2’e devam et Dersler ✓ Besmele Besmelenin üç kelimesini tanıyıp 'iş önce gelir' kuralını göreceksin. Tamamlandı ● Rahîm ve Hamd Rahmet ve övgü kelimelerini, 'el' takısıyla birlikte okuyacaksın. Sıradaki ders ○ Yalnız sana Kulluğun yalnız O'na yöneldiğini anlatan cümleyi çözeceksin. Sırada ○ Doğru yol Yol ve doğru kelimeleriyle kurulan isteği anlayac
+K35-3-ilerleme-tas-etiketi: ‹ Kur'an Arapçası İlerleme İlerleme Kaç kelime tanıdığını, bu haftanı ve tekrar doğruluğunu burada görürsün. Tanıdık kelime 60 / 524 lemma · Kur’an metninin %47’ini okuyabilirsin ● İlk 50 kelime ≈ %45,2 · kazanıldı ○ İlk 100 kelime ≈ %54,8 ○ İlk 200 kelime ≈ %64,5 Sıradaki hedef: 100 kelime · %54,8 kapsam (40 kelime kaldı) Taşlar ✓ Besmele’yi okudum ✓ Fâtiha’yı anlıyorum Sıradaki: Namazımı anlıyorum Namaz metinlerindeki tüm kelimeler 7 gün oturmuş olsun Bu hafta Bu hafta 0 gün çalıştın · 0 tekrar Pzt Sal Çar Per Cum Cmt Paz 114 sûrede anladıkların Renk ve yüzde, o sûrede “anladım” dediğin âyetlerin oranıdır; kilit yok. Koyu hücre: 7 gün sonraki testte 4/5 ve üstü. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
+K34-okuma-1: Kapat Hoş geldin ‹ Geri Vazgeç Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 1/8 مِن Doğru okunuşu seç min fî allazî
+K34-okuma-1 şıklar (*doğru, parantez harf sayısı): *min(3) | fî(2) | allazî(6)
+K34-okuma-2: Kapat Hoş geldin ‹ Geri Vazgeç Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 2/8 مَا Doğru okunuşu seç mâ inn kâna
+K34-okuma-2 şıklar (*doğru, parantez harf sayısı): *mâ(2) | inn(3) | kâna(4)
+K34-okuma-3: Kapat Hoş geldin ‹ Geri Vazgeç Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 3/8 إِنّ Doğru okunuşu seç inn ʿalâ ilâ
+K34-okuma-3 şıklar (*doğru, parantez harf sayısı): *inn(3) | ʿalâ(4) | ilâ(3)
+K34-okuma-4: Kapat Hoş geldin ‹ Geri Vazgeç Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 4/8 ٱلَّذِى Doğru okunuşu seç allazî rabb illâ
+K34-okuma-4 şıklar (*doğru, parantez harf sayısı): *allazî(6) | rabb(4) | illâ(4)
+K34-okuma-5: Kapat Hoş geldin ‹ Geri Vazgeç Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 5/8 رَبّ Doğru okunuşu seç rabb in zâlik
+K34-okuma-5 şıklar (*doğru, parantez harf sayısı): *rabb(4) | in(2) | zâlik(5)
+K34-okuma-6: Kapat Hoş geldin ‹ Geri Vazgeç Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 6/8 إِلَىٰ Doğru okunuşu seç ilâ an ard
+K34-okuma-6 şıklar (*doğru, parantez harf sayısı): *ilâ(3) | an(2) | ard(3)
+K34-okuma-7: Kapat Hoş geldin ‹ Geri Vazgeç Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 7/8 أَن Doğru okunuşu seç an ʿan mâ
+K34-okuma-7 şıklar (*doğru, parantez harf sayısı): *an(2) | ʿan(3) | mâ(2)
+K34-okuma-8: Kapat Hoş geldin ‹ Geri Vazgeç Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 8/8 ذَٰلِك Doğru okunuşu seç zâlik min lâ
+K34-okuma-8 şıklar (*doğru, parantez harf sayısı): *zâlik(5) | min(3) | lâ(2)
+blocked-external: 13

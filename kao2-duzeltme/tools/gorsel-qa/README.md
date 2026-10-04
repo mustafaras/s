@@ -16,3 +16,5 @@ Kullanım (Bash `dangerouslyDisableSandbox` ister: Chrome macOS sandbox içinde 
   dokunmadan oturum bayraklarıyla (`ui.authUnlocked`, `ui.locationGateState`, `settings.locationEnabled`) geçilir.
 - 19 görünümün PNG'sini ve `log.txt` yazar. Çok görüntü için PIL ile kontak sayfası çıkarıp bakmak ucuzdur.
 - Chrome yolu `cdp.mjs` başında (ms-playwright önbelleği); farklı makinede güncelle.
+
+K2F-34/35 önce/sonra senaryosu: `node kao2-duzeltme/tools/gorsel-qa/shoot-k2f34-35.mjs <kök> <çıktı> <profil>` (yol/ünite/ilerleme ekranları + 8 yerleştirme sorusu).

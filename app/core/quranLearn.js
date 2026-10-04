@@ -2947,7 +2947,7 @@
     var conditionOf=function(key){
       if(key==='besmele') return 'Seviye 0\u2019ı bitir (ya da yerleştirme sınavını geç)';
       if(key==='fatiha') return 'Fâtiha kelimelerinin tümü 7 gün oturmuş olsun';
-      if(key==='namaz') return 'Namaz metinlerindeki tüm kelimeler 7 gün oturmuş olsun';
+      if(key==='namaz'){ var prayerCount=kaoPrayerLemmaIds('namaz').length; return prayerCount>0?'Bu '+prayerCount+' kelimenin hepsi 7 gün oturmuş olsun':'Namaz kelimelerinin hepsi 7 gün oturmuş olsun'; }
       if(key==='half') return 'Kur\u2019an kelimelerinin yarısı tanıdık olsun';
       if(key==='twoThirds') return 'Üçte iki kapsama ulaş';
       if(key==='eighty') return 'Kapsam %75\u2019e ulaş';

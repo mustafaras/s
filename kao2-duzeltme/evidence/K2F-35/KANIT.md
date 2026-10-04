@@ -11,7 +11,7 @@ Kapatılan bulgular: K4-04 · K3-09 · R değişimi: yok (10/10 korunur)
 - [x] kapilar.sh YEŞİL, tekrar-uret 10/10
 
 ## Yapılan
-- (a) `progressRing`: görünen metin ve aria-label Türkçe yüzde ("%20"); (b) ünite ekranı "x / y kalıcı kelime · a / b ders" (sayı yalnız kalıcı kelime); (c) `namaz` taşı etiketi "Namazda geçen N kelimeyi tanıyorum" (N = taşın gerçek koşulundaki doğrulanmış namaz kelimeleri; N=0 ise eski güvenli etiket); (d) onboarding test özeti "KAO2-11 onboarding" (handler başlığı zaten 45'e güncel). Yeni handler/CSS yok.
+- (a) `progressRing`: görünen metin ve aria-label Türkçe yüzde ("%20"); (b) ünite ekranı "x / y kalıcı kelime · a / b ders" (sayı yalnız kalıcı kelime); (c) `namaz` taşı etiketi "Namazda geçen N kelimeyi tanıyorum" (N = taşın gerçek koşulundaki doğrulanmış namaz kelimeleri; N=0 ise eski güvenli etiket); (c2) taşın koşul satırı "Bu N kelimenin hepsi 7 gün oturmuş olsun" (görüntüde yakalandı, FIX seq 100); (d) onboarding test özeti "KAO2-11 onboarding" (handler başlığı zaten 45'e güncel). Yeni handler/CSS yok.
 
 ## TDD
 - Kırmızı: `node tests/kao/test_kao2_components.js` → `AssertionError: ... did not match /role="img" aria-label="&lt;Tamamlanma&gt;: %0"/`; hub `halka = biten ders / ünite dersi`; path `... ilerlemesi: %20`; milestones `strictly equal` (namaz etiketi)
@@ -37,3 +37,12 @@ tekrar-uret: 10/10 PASS (önceki 10/10)
 ## Sürprizler / sonraki promptlara not
 - K4-04'ün üçüncü maddesi (ardışık tekrar eden gramer görevi u01.02) K2F-35 Adımlar'ında yok; kapsam dışı olduğundan yapılmadı → LEDGER NOTE seq 99.
 - K3-09'un "Bugün alt satırı 0 tekrar + 3 yeni" kısmı K2F-31'de kapanmıştı.
+
+## Ekran görüntüsü kanıtı (kullanıcı isteği, FIX seq 100)
+Araç: `kao2-duzeltme/tools/gorsel-qa/shoot-k2f34-35.mjs` (soketsiz CDP, boş geçici profil, `127.0.0.1:9000`, token/parola yok, dış istekler kesildi; önce `tests/app/test_local_visual_qa_guard.js` yeşil). Önce = `git archive a352fa77`, sonra = çalışma ağacı; aynı sentetik veri (60 kelimelik kart + Ünite 1 / 1. ders bitmiş). Görüntü 390×844 @2×; yan yana sayfalar sol=ÖNCE, sağ=SONRA.
+- [K35-1-halka-yuzde.png](ekran/K35-1-halka-yuzde.png): yol ekranında halka içi "0% / 20%" → "%0 / %20"
+- [K35-2-kalici-kelime.png](ekran/K35-2-kalici-kelime.png): ünite satırı "6 / 23 kelime · 1 / 5 ders" → "6 / 23 kalıcı kelime · 1 / 5 ders", halka "%20"
+- [K35-3-namaz-tasi.png](ekran/K35-3-namaz-tasi.png): Besmele + Fâtiha kazanılmışken sıradaki taş "Namazımı anlıyorum / Namaz metinlerindeki tüm kelimeler…" → "Namazda geçen 35 kelimeyi tanıyorum / Bu 35 kelimenin hepsi 7 gün oturmuş olsun"
+- [K34-yerlestirme-okuma-8-soru.png](ekran/K34-yerlestirme-okuma-8-soru.png): 8 okuma sorusu önce/sonra. Önce: doğru şık 8/8 soruda en üstte; sonra: konumlar 1,3,3,2,2,1,1,3 ve her soruda üç şık aynı uzunlukta (log-sonra.txt: harf sayıları)
+- Ham metin dökümü: [log-once.txt](ekran/log-once.txt), [log-sonra.txt](ekran/log-sonra.txt) (`blocked-external: 13` = tarayıcının istediği ama kesilen dış istekler)
+- Sınır: sentetik veri + masaüstü Chrome (390 px görünüm); gerçek cihaz/telefon değil.

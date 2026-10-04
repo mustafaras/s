@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-34
-lastSeq: 92
+lastSeq: 93
 status: active
 -->
 
-Son güncelleme: 2026-10-04 · LEDGER seq 92 · K2F-00…33 tamam (34/44), sıradaki K2F-34. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-04 · LEDGER seq 93 · K2F-00…33 tamam (34/44), sıradaki K2F-34. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi: Ünite N · başlık" + "Derse git" (kaoNav unit); eşlemesiz lemmada satır gizli, "Derse dön" yedeği; ders varken tek düğme. Yeni handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-33/KANIT.md).
@@ -27,7 +27,7 @@ K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi:
 - Yayın pini (canlı): `20261004a`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
-- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,442 KiB (tavan 14 — kalan ≈0,56 KiB) · runtime 115,549 KiB** · p95 4,6 ms.
+- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 115,784 KiB** · p95 4,6 ms.
 - Testler: `test_kao2_lesson_flow.js` 23 · `test_kao2_review_apply.js` 15 · `test_kao2_reader.js` 14 · `test_kao2_hub.js` 10 · `test_kao2_arabic_tab.js` 4 (yeni) · `test_kao2_kabul.js` 10/10 ölçüt.
 - Namaz eşlemesi: 19/32 `lp_*` eşli. Veri kapsamı (524 lemma): 162 unit11 köküne, 113 kognat kaymasına sahip.
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
@@ -60,6 +60,8 @@ K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi:
 - Sözlüğü sahtelemek için `t.win.QuranLexiconV1` değiştirilebilir (K2F-25 testi); her varyant taze `bootKao()` ister.
 
 ## Bekleyen kullanıcı işleri
+- **Canlıya alma kararı:** canlıda (ab41e056, pin 20261004a) K2F-27…32 var; görsel QA düzeltmeleri (LEDGER seq 90, 91, 93) ve K2F-33 yalnız yerelde. Yayın için kullanıcıdan "canlıya al" gerekir. Karşılaştırma sayfası: https://claude.ai/artifact/FFKc4mBzeoNxyqjQGApBdb
+- **Oturum başlatıcı:** [OTURUM-BASLATICI-K2F-34.md](../OTURUM-BASLATICI-K2F-34.md) (yeni oturumda yapıştır).
 - Cihaz doğrulaması (telefonda canlı site) kullanıcıdadır ve ayrıca bildirilecektir. Kalan kapı: K2F-43 YAYIN-2.
 - **L2 (GATE seq 71, waiting):** gerçek alan uzmanı onayı yoktur ve Claude veremez. `L2-PAKET.md` tek oturumda işaretlenecek madde listesidir. Uygunsa ilgili sayfada L2 kutusu `[x]` yapılıp **"L2 işaretlendi"** yazılır; kapı sonraki promptları engellemez.
 - Cihaz teyidi (K2F-26 yayını): Arapça sekmesinde "Başla/Aç" düğmesi ya da "Ders kartı gizli · Göster" kartı görünmeli; "Göster"e basınca düğme gelmeli ve odak ona geçmeli (odak gerçek tarayıcıda gözlenmedi). Düğme hiç yoksa/hata varsa bana bildir.

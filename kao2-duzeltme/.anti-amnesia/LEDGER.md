@@ -956,3 +956,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
 - surprises: ekran görüntüsü iki benzer düğme + yapışık bölümü gösterdi → düzeltildi
 - next: K2F-34
+
+## seq 93 · 2026-10-04 · FIX · K2F-33
+- status: done
+- title: Görsel QA 3. tur — tüm KAO görünümleri tarandı, kök neden (tanımsız --f-N jetonları) kapatıldı
+- prev-commit: 32feeee0
+- decision: 19 görünüm ekran görüntüsüyle tarandı. Kök neden: kao.css tanımsız --f-1…--f-17 jetonları kullanıyordu (≈33 bildirim sessizce düşüyordu); 9 jeton tanımlandı, test fallback'siz her jetonun tanımlı olmasını zorlar. Ek: Hakkında sayfasında üç kez tekrarlanan başlık, Kök aileleri yer tutucusu, K2F-33 iki benzer düğme + yapışık bölüm. Hepsi önce kırmızı test. Yalnız yerel; canlıda DEĞİL. Görsel QA aracı kalıcılaştırıldı: tools/gorsel-qa/.
+- gates: kapilar.sh YEŞİL · css 13,661 KiB · runtime 115,784 KiB · tekrar-uret 10/10
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ (19 ekran) · yayın — · cihaz —
+- next: K2F-34

@@ -878,7 +878,7 @@
     }
     var rows=model.visible,query=model.query;
     var h='<main class="kao-roots" aria-labelledby="kao-roots-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Kök aileleri</p><h2 id="kao-roots-title">Bir kök, bir aile</h2><p>Öğrenme sırasındaki 73 aile; altında tüm sözlüğü keşfedebilirsin.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
-    h+='<div class="kao-roots-tools"><label class="kao-roots-search"><span class="kao-sr-only">Kök ara</span><input type="search" value="'+esc(query)+'" placeholder="Anlam ya da kök ara" oninput="App.kaoRoots(\'query\',this.value)"></label>'
+    h+='<div class="kao-roots-tools"><label class="kao-roots-search"><span class="kao-sr-only">Kök ara</span><input type="search" value="'+esc(query)+'" placeholder="Kök ara" oninput="App.kaoRoots(\'query\',this.value)"></label>'
       +'<button type="button" class="kao-secondary" aria-pressed="'+(model.allVisible?'true':'false')+'" onclick="App.kaoRoots(\'all\')">'+(model.allVisible?'Öğrenme sırasına dön':'Tüm kökler ('+String(model.allCount)+')')+'</button></div>';
     if(!rows.length){ h+='<p class="kao-roots-empty">Bu aramaya uyan kök yok.</p>'; return h+'</main>'; }
     var listTitle=model.allVisible?'Sözlükteki tüm kökler':'Öğrenme sırasındaki kök aileleri';
@@ -2364,8 +2364,8 @@
   function kaoSourcesPageHTML(){
     if(!quranLearnDeps) return '';
     var esc=quranLearnDeps.esc,ui=quranLearnDeps.ui(),q=ensureQuranLearn(quranLearnDeps.data());
-    var h='<main class="kao-sources-page" aria-labelledby="kao-sources-page-title"><div class="kao-view-head"><button type="button" class="kao-back" onclick="App.kaoSetView(\'settings\')">‹ Ayarlar</button><span>Hakkında</span></div>'
-      +'<section class="kao-about"><h3 id="kao-sources-page-title">Hakkında ve kaynaklar</h3>'
+    var h='<main class="kao-sources-page" aria-labelledby="kao-sources-page-title"><div class="kao-view-head"><button type="button" class="kao-back" onclick="App.kaoSetView(\'settings\')">‹ Ayarlar</button></div>'
+      +'<section class="kao-about"><h3 id="kao-sources-page-title" class="kao-sr-only">Hakkında ve kaynaklar</h3>'
       +'<p class="kao-setting-hint">Kur’an Arapçası öğrenme modülü. Öğrenme verilerin <strong>yalnız bu cihazda</strong> ve kendi veri deposunda tutulur; kaynak listesi ağa bağlanmaz.</p>'
       +'<dl class="kao-about-list"><dt>Sürüm</dt><dd>KAO2 · metin katmanı</dd>'
       +'<dt>Çalışma biçimi</dt><dd>Çevrimdışı çalışır; ses klipleri cihazda önbelleğe alınır.</dd>'

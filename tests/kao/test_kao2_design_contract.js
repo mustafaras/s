@@ -129,5 +129,14 @@ if (MODE === 'baseline') {
   const mark = /\.kao-progress-curve li \.kao-curve-mark\{[^}]*\}/.exec(kaoCss)[0];
   assert.match(mark, /width:(1[8-9]|2\d)px/, 'işaret (●/○) metne yapışmaması için en az 18px');
 }
+// Tanımsız özel özellik, o bildirimi sessizce geçersiz kılar (boşluk/yazı boyutu kaybolur): kao.css'in fallback'siz kullandığı her jeton tanımlı olmalı.
+{
+  const defs = new Set([...(kaoCss + read('app/styles.css') + read('app/core/quranLearn.js') + read('app/core/quranLearnViews.js')).matchAll(/(--[a-zA-Z0-9-]+)\s*[:=]/g)].map(m => m[1]));
+  const runtime = new Set(['--kao-ar-lh', '--kao-ar-ws']); // okunabilirlik değişkenleri: çalışma zamanında inline yazılır
+  const undefinedTokens = [...new Set([...kaoCss.matchAll(/var\((--[a-zA-Z0-9-]+)\s*\)/g)].map(m => m[1]))].filter(n => !defs.has(n) && !runtime.has(n));
+  assert.deepEqual(undefinedTokens, [], 'kao.css tanımsız jeton kullanıyor (bildirim sessizce düşer): ' + undefinedTokens.join(', '));
+}
+// Kök arama kutusu yan düğmeyle paylaşılan dar alanda kesilmeyecek kısa yer tutucu taşır.
+assert.match(read('app/core/quranLearn.js'), /type="search" value="'\+esc\(query\)\+'" placeholder="Kök ara"/, 'kök arama yer tutucusu kısa ("Kök ara"), kesilmez');
 assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğrenme durumu bölümü üstteki karta yapışmaz');
 console.log('KAO2 design contract: PASS');

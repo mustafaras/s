@@ -29,3 +29,14 @@ Tarih: 2026-10-04 · Kanıt düzeyi: **yerel kaynak-görsel** (cihaz kabulü DE�
 3. Niyet segmenti: `.kao-seg{flex-wrap:wrap}` + düğme tabanı 80px → 3+3 sarar, "Kendim seçerim" kesilmez → `duzeltilmis-02`.
 Kapılar: kapilar.sh YEŞİL (kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · kontrast · plan-check · sync), css 13,548 KiB (tavan 14).
 Karşılaştırma sayfası (önceki · canlı · düzeltilmiş): https://claude.ai/artifact/FFKc4mBzeoNxyqjQGApBdb
+
+## 2. ve 3. tur (aynı gün, yerel; yayınlanmadı) — tüm KAO görünümleri tarandı
+19 görünüm tek tek incelendi (araç: `kao2-duzeltme/tools/gorsel-qa/`). Bulunan ve düzeltilen ek kusurlar (hepsi önce kırmızı test):
+- Hub'da tanımsız ikon adları (`layers`, `shapes`) → `sprout`, `hexagon`; test KAO'da kullanılan her ikon adının tanımlı olmasını zorlar.
+- İkonsuz liste satırında boş ikon alanı, ayırıcı kayması ve iri/kalın bağlantı yazısı.
+- ●/○ işareti metne yapışıyordu (14→20 px).
+- **Kök neden:** `kao.css` sayısal `--f-1…--f-17` jetonlarını kullanıyordu ama hiçbir yerde tanımlı değildi; tanımsız jeton bildirimi sessizce geçersiz kılar (≈33 boşluk/yazı boyutu kuralı hiç çalışmıyordu). Dokuz jeton `.kao-dialog,.kao-hub-card` kapsamında tanımlandı; test fallback'siz kullanılan her jetonun tanımlı olmasını zorlar.
+- "Hakkında ve kaynaklar" sayfasında başlık üç kez tekrarlanıyordu → tek LargeTitle, h3 yalnız erişilebilir ad (`kao-sr-only`).
+- Kök aileleri arama yer tutucusu kesiliyordu → "Kök ara".
+- K2F-33: ders bağlantısı varken iki benzer düğme ("Derse git"/"Derse dön") → tek düğme; "Öğrenme durumu" bölümü karta yapışıyordu.
+Karşılaştırma sayfası (önceki · canlı · düzeltilmiş, 19 ekran): https://claude.ai/artifact/FFKc4mBzeoNxyqjQGApBdb

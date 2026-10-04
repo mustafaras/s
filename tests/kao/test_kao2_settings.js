@@ -153,6 +153,8 @@ check('kaynaklar artık Ayarlar’ın altında uzun liste DEĞİL, ayrı alt say
   const page = decode(t.api.kaoSourcesPageHTML());
   assert.match(page, /Hakkında ve kaynaklar/, 'alt sayfa başlığı');
   assert.match(page, /kao-back/, 'geri yolu var');
+  assert.doesNotMatch(page, /<span>Hakkında<\/span>/, 'görsel QA: LargeTitle ile tekrar eden "Hakkında" etiketi yok');
+  assert.match(page, /<h3 id="kao-sources-page-title" class="kao-sr-only">Hakkında ve kaynaklar<\/h3>/, 'görsel QA: sayfa başlığı LargeTitle\'dır; h3 yalnız erişilebilir ad (görünür tekrar yok)');
   assert.doesNotMatch(page, /kao-settings/, 'alt sayfada ayar gövdesi yok');
 });
 

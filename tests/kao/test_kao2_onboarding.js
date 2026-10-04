@@ -567,4 +567,21 @@ check('K2F-34 (g): seyrek havuzda da iki taraf (≥ ve ≤) aranır; gerçek hav
   assert.ok(Math.max(...uses.values()) <= 3, 'bir çeldirici en çok 3 görevde görünür');
 });
 
+check('K2F-34 (h): dinleme şıklarında doğru harf hep ilk düğme değil — konum dönüşümlü; hep ilk/son seçen dinleme eşiğini geçemez', () => {
+  const b = boot(), gate = b.api.kaoGateTasks().listening, place = b.api.kaoPlacementTasks().listening;
+  assert.equal(gate.length, 12); assert.equal(place.length, 4);
+  for (const task of [...gate, ...place]) {
+    assert.equal(task.choices.length, 2, task.id);
+    assert.equal(new Set(task.choices.map((c) => c.id)).size, 2, `${task.id}: iki ayrı harf`);
+    assert.ok(task.choices.some((c) => c.id === task.answer), `${task.id}: doğru harf şıklarda`);
+  }
+  const spots = (list) => list.map((t) => t.choices.findIndex((c) => c.id === t.answer));
+  const count = (list, spot) => spots(list).filter((s) => s === spot).length;
+  assert.equal(count(gate, 0), 6, `kapıda doğru harf 1. düğmede ${count(gate, 0)}/12`);
+  assert.equal(count(place, 0), 2, `yerleştirmede doğru harf 1. düğmede ${count(place, 0)}/4`);
+  const first = gate.filter((t) => t.choices[0].id === t.answer).length, last = gate.filter((t) => t.choices[1].id === t.answer).length;
+  assert.ok(first < 10 && last < 10, `hep ilk ${first}/12 · hep son ${last}/12 (eşik 10)`);
+  assert.equal(JSON.stringify(boot().api.kaoGateTasks().listening), JSON.stringify(gate), 'belirlenimci');
+});
+
 console.log(`KAO2-11 onboarding: PASS (${passed} kontrol)`);

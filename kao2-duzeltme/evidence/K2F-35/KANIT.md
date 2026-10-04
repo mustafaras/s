@@ -46,3 +46,7 @@ Araç: `kao2-duzeltme/tools/gorsel-qa/shoot-k2f34-35.mjs` (soketsiz CDP, boş ge
 - [K34-yerlestirme-okuma-8-soru.png](ekran/K34-yerlestirme-okuma-8-soru.png): 8 okuma sorusu önce/sonra. Önce: doğru şık 8/8 soruda en üstte; sonra: konumlar 1,3,3,2,2,1,1,3 ve her soruda üç şık aynı uzunlukta (log-sonra.txt: harf sayıları)
 - Ham metin dökümü: [log-once.txt](ekran/log-once.txt), [log-sonra.txt](ekran/log-sonra.txt) (`blocked-external: 13` = tarayıcının istediği ama kesilen dış istekler)
 - Sınır: sentetik veri + masaüstü Chrome (390 px görünüm); gerçek cihaz/telefon değil.
+
+## Modal görsel QA (kullanıcı isteği, FIX seq 101)
+Kanıt klasörü [modal-qa/](modal-qa/): `01-seviye0-ornek-kelimeler.png` (kullanıcının gönderdiği ekran ve 2 benzeri, önce/sonra), `02-arapca-hero-ve-kok.png`, `03-harf-kutulari-ve-unite-kutusu.png`, `04-gezinme-cubugu.png`, `05-kok-harfleri.png`; `tarama-once.txt` (21 bulgu) → `tarama-sonra-390.txt`, `tarama-sonra-320.txt` (0 bulgu, 227 kare). Hesaplanmış yazı boyutu ölçümü: kök harfleri 16 px → 28 px, yeni kelime Arapçası 17 px → ~47 px (12vw). Mutasyon: 7 CSS/JS değişikliğinin her biri geri alınınca test_kao2_modal_layout / onboarding / navigation kırıldı.
+Sınır: sentetik veri + masaüstü Chrome (390 ve 320 px); gerçek cihaz değil. `blocked-external` sayacı (241) tarayıcının istediği ama kesilen dış istekleri sayar (ses/CDN); ağa çıkılmadı.

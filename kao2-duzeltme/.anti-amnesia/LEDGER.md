@@ -1038,3 +1038,15 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ (sentetik) · yayın — · cihaz —
 - next: K2F-36
 
+## seq 101 · 2026-10-04 · FIX · K2F-35
+- status: done
+- title: Modal görsel QA (kullanıcı ekran görüntüsü) — 8 yerleşim kusuru + NOTE 96 + NOTE 99 kapandı
+- prev-commit: d76d7182
+- evidence: kao2-duzeltme/evidence/K2F-35/modal-qa/ (önce/sonra görüntüleri, tarama-once.txt 21 bulgu → tarama-sonra-390.txt / -320.txt 0 bulgu, 227 kare)
+- decision: Kullanıcı Seviye 0 "Dinle ve gör" ekranında sıkışmış "Örnek kelimeler" görüntüsü gönderdi ve tüm modalın taranmasını + önceki yanıttaki sınırların düzeltilmesini istedi. Yeni araç `kao2-duzeltme/tools/gorsel-qa/audit-modal.mjs` 36 görünüm/ders akışını 390 ve 320 px'te gezer (ekran görüntüsü + DOM denetimi: dar sütun, kırpılan taşma, 44 px altı hedef, ekran dışı eleman, ebeveynden taşan çocuk). Kusurlar ve kök nedenler: (1) S0 örnek kelime kartı ~25 px'e büzülüyordu — `.kao-s0-listen` justify-items:center + `.kao-secondary{width:100%}`; (2) yeni kelime kartında hedef Arapça 17 px — `.kao-lesson-card p` (0,1,1) `.kao-lesson-ar` (0,1,0) kuralını eziyordu; (3) ünite ilerleme kutusu 26 px'e ezilip halka taşıyordu — eski v1 `.kao-unit-progress{height:5px;overflow:hidden}` kuralı aynı sınıf adıyla duruyordu (silindi, CSS −bayt); (4) S0 işaret simgeleri ve harf kutuları çok küçük; (5) kelime detayında kök harfleri 16 px (`.kao-arabic-text` kuralı o öğeye uymuyordu); (6) Namaz/Kaynaklar'da geri etiketi iki satıra bölünüyordu — NavBar başlıkları kısaltıldı (Namaz, Hakkında; tam başlık LargeTitle'da; eşit yan sütun sözleşmesi ve nowrap yasağı korundu); (7) namaz kelime düğmesi 38 px genişlik; (8) ısı haritası 320 px'te 40 px hücre (auto-fill 44 px). NOTE 96 kapandı: dinleme şıklarında doğru harf konumu (index>>1)&1 ile dönüşümlü (kapı 6/12, yerleştirme 2/4). NOTE 99 yeniden üretilemedi: 109 ders × (doğru cevap hepsi + yanlış cevap ünite başları) ve ayrıca fresh/seeded/yanlış modlarında ardışık aynı kart/soru/gramer türü yok → regresyon koruması test_kao2_modal_layout (g). Tarama aracı yalnız 127.0.0.1:9000 + boş profil; token varlığı okuması araçlardan çıkarıldı (kural 6).
+- gates: kapilar.sh YEŞİL (kao 54) · css 13,692 KiB (tavan 14) · runtime 116,469 KiB · tekrar-uret 10/10
+- changed-tests: test_kao2_navigation (prayer 'Namaz', sources 'Hakkında')
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ (sentetik veri, masaüstü Chrome 390/320 px) · yayın — · cihaz —
+- surprises: tek `git checkout app/kao.css` yanlışlıkla CSS düzeltmelerini geri aldı; yedekten ve düzeltme listesinden betikle yeniden uygulandı, mutasyon testleri sonradan yeniden koşuldu.
+- next: K2F-36
+

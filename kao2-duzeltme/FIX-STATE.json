@@ -8,7 +8,7 @@
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
   "nextPrompt": "K2F-36",
-  "ledgerLastSeq": 100,
+  "ledgerLastSeq": 101,
   "releaseApproval": "approved_through_K2F-17",
   "lastRelease": {
     "prompt": "K2F-34",

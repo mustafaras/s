@@ -71,7 +71,9 @@ const screens = [
   ['settings', undefined, 'Ayarlar'],
   ['phonics', undefined, 'Telaffuz'],
   ['ayah', undefined, 'Günün âyeti'],
-  ['prayer', undefined, 'Namazda ne diyorum'],
+  // Görsel QA (uzun başlık geri etiketini iki satıra bölüyordu): NavBar başlığı kısa, tam başlık LargeTitle'da.
+  ['prayer', undefined, 'Namaz'],
+  ['sources', undefined, 'Hakkında'],
   ['stats', undefined, 'İlerleme'],
   ['gate', undefined, 'Harf kontrolü']
 ];

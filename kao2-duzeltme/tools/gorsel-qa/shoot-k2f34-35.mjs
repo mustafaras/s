@@ -20,7 +20,7 @@ const shot = async (name, js, dump = 500) => {
 await b.goto('http://127.0.0.1:9000/index.html?v3done=1');
 await b.eval(`localStorage.setItem('seyma-reset-v1', JSON.stringify((function(){var d=window.createDefaultData();d.settings.locationEnabled=true;return d})()))`);
 await b.goto('http://127.0.0.1:9000/index.html?v3done=1');
-log.push('origin: ' + await b.eval('location.origin + " token:" + !!(data.settings&&data.settings.ghToken) + " force:" + localStorage.getItem("seyma-sync-force")'));
+log.push('origin: ' + await b.eval('location.origin + " force:" + localStorage.getItem("seyma-sync-force")'));
 await b.eval(`(function(){
   ui.authUnlocked=true; ui.locationGateState='granted';
   var q=SeymaQuranLearn.ensureQuranLearn(data);

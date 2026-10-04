@@ -883,3 +883,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js · quranLearnFlow.js) · cihaz — (gerçek ders süresi/dakika metni gözlenmedi)
 - surprises: bağımsız inceleme HIGH: üretimde nextStep eksik içerikle çağrılıyordu (dakika ~yarı) → kaoLessonContent() ve üretim yolu testi; tahmin onboarding süresiyle (5/10/15) sınırlı → uzun ders 5 dk seçen kullanıcıda "~5 dk" gösterir; plan-yok yedek yolu pratikte ulaşılmaz
 - next: K2F-32
+
+## seq 86 · 2026-10-04 · NOTE · K2F-31
+- status: done
+- title: K2F-31 açık risklerinin kapatılması (ek tur)
+- prev-commit: a3b74823
+- decision: (1) gecikmeli sûre cevabı `ms` yazar (`kaoTaskMs`; ms/answered paydası tutarlı, test eklendi); (2) `lessonPlan` maliyeti ölçüldü ≈0,09 ms/`kaoNextStep` → performans riski kapandı; (3) dailyNew=5 kuyruk notu ölçülerek netleştirildi (kartsız `kaoStart` eski aday yolu kelime üretmez, dailyNew'den bağımsız; ana yol `kaoLesson` etkilenmez) — `kaoBuildQueue` kuralları P5 gereği değişmez, kod yok.
+- still-open: 120 sn clamp (spec) ve tahminin onboarding süresiyle sınırlı olması (05 §4) tasarım gereğidir; cihaz gözlemleri kullanıcıda.
+- gates: kapilar.sh YEŞİL · tekrar-üret 10/10
+- next: K2F-32

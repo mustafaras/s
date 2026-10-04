@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-32
-lastSeq: 85
+lastSeq: 86
 status: active
 -->
 
-Son güncelleme: 2026-10-03 · LEDGER seq 85 · K2F-00…31 tamam (32/44), sıradaki K2F-32. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-03 · LEDGER seq 86 · K2F-00…31 tamam (32/44), sıradaki K2F-32. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 K2F-31 bitti (**yerel, yayınlanmadı**): cevapta `daily[today].ms` (0–120 s sınırlı) kaydedilir, geri alma süreyi de geri alır; ders dakikası tekrar + dersin gerçek görev sayısından (`lessonTaskCount`: tanış+alıştırma+uygula) hesaplanır, ölçülmüş ms varsa ortalama kullanılır; tekrar 0 iken alt satır "N yeni kelime · ~M dk". Ayrıntı: [KANIT.md](../evidence/K2F-31/KANIT.md).
@@ -31,10 +31,10 @@ K2F-31 bitti (**yerel, yayınlanmadı**): cevapta `daily[today].ms` (0–120 s s
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
-- **K2F-31 ölçüm sapmaları (bilerek açık):** `daily.ms` yalnız kart cevabında artar (gecikmeli sûre/bağlantı/transfer `answered`'ı ms'siz artırır → ortalama hafif düşük); sekme arka planda bekleyince cevap başına 120 sn eklenir (spec sınırı) → ortalama şişebilir; `lessonPlan` her `nextStep` çağrısında kurulur (perf kapısı p95 ≈4,8 ms; render başına çağrı sayısı ölçülmedi).
+- **K2F-31 ölçüm sınırları (kapatılanlar sonrası kalan):** `daily.ms` artık gecikmeli sûre cevabında da yazılır (ms/answered paydası tutarlı; seq 86). Kalan, spec'e bağlı: 120 sn üst sınırı (K2F-31 spec'i clamp ister) sekme arka planda beklenirse cevap başına 120 sn ekler → ortalama şişebilir; tahmin onboarding süresiyle (5/10/15 dk) sınırlıdır (05 §4) → 5 dk seçen kullanıcıda uzun ders "~5 dk" gösterir. `lessonPlan` maliyeti ölçüldü: `kaoNextStep` ≈0,09 ms/çağrı (200 çağrı ortalaması) → risk kapandı.
 - **K2F-31 cihazda gözlenmedi:** Bugün/hub/özet dakika metinleri; tahmin onboarding süresiyle (5/10/15 dk) sınırlı olduğundan uzun ders 5 dk seçen kullanıcıda "~5 dk" gösterir (spec 05 §4 üst sınırı).
 - **K2F-30 cihazda gözlenmedi:** Öğrenme grubu yerleşimi (switch + satır aynı yüzeyde), "Başlangıç noktasını değiştir" akışı (Ayarlar → ana ekranın yerine 2. adım → seçim → Ayarlar'a dönüş), "Vazgeç" etiketi, odak.
-- **dailyNew varsayılanı 5:** yalnız yeni/boş kayıtları etkiler (kayıtlı ayar korunur); onboarding sonunda `dailyNew=minutes` zaten yazılır. 5 yeni kart bütçesinde `kaoStart` kuyruğu kelime kartı içermeyebilir (aday öncelik/tür sınırı; `test_kao_requirements.js` bu yüzden 10 kurar) — 5 dk seçen kullanıcıda gerçek akışta (ders oynatıcı) etkisi doğrulanmadı.
+- **dailyNew varsayılanı 5 / eski kuyruk:** yalnız yeni/boş kayıtları etkiler (kayıtlı ayar korunur); onboarding sonunda `dailyNew=minutes` zaten yazılır. Ölçüm (seq 86): kartsız kullanıcıda `kaoStart` (eski aday yolu) 5'te 4 öğe (2 gramer + 2 parça, kelime 0), 10'da 9 öğe (3 kelime) üretir — kelime önceliği düşüktür, `dailyNew`'den bağımsızdır. Ana yol ders oynatıcıdır (`kaoLesson`, `lessonPlan` bütçesi) ve etkilenmez; `kaoStart` yalnız gece/ısınma/ek oturumda (kart varken) kullanılır. `kaoBuildQueue` kuralları P5 gereği değişmez → bilerek açık, kod değişikliği yok.
 - **K2F-29 cihazda gözlenmedi:** gruplu yerleşim, anahtar/seg iç boşlukları, switch odak halkası (`outline-offset:-3px`). Kontrast aracı artık `.kao-group-surface` zeminini kullanır.
 - **K2F-28 cihazda gözlenmedi:** ✕ ve ilerleme çubuğu yerleşimi, odağın soruya geçişi (yalnız `paintTask` yolunda; ders aşamaları arasında odak değişmez).
 - **K2F-27 cihazda gözlenmedi:** `.kao-body` `padding-top:22px` NavBar üstüne ek boşluk bırakabilir, NavBar (`--kao-bg`) ve dialog yüzeyi farklıysa bant görünebilir; görev aşamasında NavBar "Kapat" overlay'i kapatır (`ui.kaoLesson` bellekte kalır; ders ekranının "Kapat"ı kaydedip ana ekrana döner) — eski X ile aynı, ilerlemenin kaydı ayrıca doğrulanmadı.

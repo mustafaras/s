@@ -1772,6 +1772,7 @@
   }
   // K2F-31: görev süresi ölçümü üst sınırı (05 §4: uzun duraklama ortalamayı bozmaz).
   var KAO_TASK_MS_CAP=120000;
+  function kaoTaskMs(ui,now){ return Math.min(KAO_TASK_MS_CAP,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime()))); }
   function kaoAnswerText(task){
     if(task&&task.kind==='order') return Array.isArray(task.choices)?task.choices.slice().sort(function(a,b){ return nonNegativeNumber(a.ordinal,0)-nonNegativeNumber(b.ordinal,0); }).map(function(item){ return item.label; }).join(' · '):'';
     if(task&&task.answer) return String(task.answer);
@@ -2156,6 +2157,7 @@
         if(confirmed>=20&&!q.milestones.shortSurahs) q.milestones.shortSurahs=now.toISOString();
       }
       var delayedDaily=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{}));
+      delayedDaily.ms=nonNegativeNumber(delayedDaily.ms,0)+kaoTaskMs(ui,now);
       delayedDaily.answered+=1; delayedDaily.reviewed+=1; if(delayedCorrect) delayedDaily.correct+=1; q.daily[key]=delayedDaily;
       if(delayedCorrect) kaoFx('correct'); kaoOpenFeedback(ui,task,delayedCorrect,choiceId);
       kaoSave(); paintTask(); kaoAutoAdvance(ui,q); return {correct:delayedCorrect,delayedScore:delayed.delayedScore};
@@ -2179,7 +2181,7 @@
     if(ui.kaoNight) scheduled.nightAt=key; else delete scheduled.nightAt;
     cards[task.cardId]=scheduled;
     var daily=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{}));
-    daily.ms=nonNegativeNumber(daily.ms,0)+Math.min(KAO_TASK_MS_CAP,elapsed);
+    daily.ms=nonNegativeNumber(daily.ms,0)+kaoTaskMs(ui,now);
     daily.answered+=1; if(correct) daily.correct+=1; if(task.isNew) daily.new+=1; else daily.reviewed+=1; q.daily[key]=daily;
     var calib=Object.assign({pred:0,ok:0,n:0},objectOr(daily.calib,{}));
     calib.pred=round8(nonNegativeNumber(calib.pred,0)+nonNegativeNumber(scheduled.predictedR,0)); calib.ok=nonNegativeNumber(calib.ok,0)+(correct?1:0); calib.n=nonNegativeNumber(calib.n,0)+1; daily.calib=calib;

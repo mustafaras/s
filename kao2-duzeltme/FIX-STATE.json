@@ -8,7 +8,7 @@
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
   "nextPrompt": "K2F-32",
-  "ledgerLastSeq": 85,
+  "ledgerLastSeq": 86,
   "releaseApproval": "approved_through_K2F-17",
   "lastRelease": {"prompt": "K2F-26", "commit": "dc3f3f06", "pin": "20261003d", "run": 37128484796, "evidence": "kao2-duzeltme/evidence/K2F-26/YAYIN.md"},
   "sources": {

@@ -148,6 +148,14 @@ assert.equal(data.quranLearn.daily['2026-09-28'].ms, 1000);
 api.kaoUndo();
 assert.equal(data.quranLearn.daily['2026-09-28'], undefined, 'geri alma günlük süreyi de geri alır');
 
+// K2F-31 (risk kapatma): gecikmeli sûre cevabı da `answered` ile birlikte `ms` yazar (ms/answered paydası tutarlı).
+freshData();
+const delayedTimed = wordTask('delayed-ms', 'surah:112:delayed', { type: 'fragment', fragmentKind: 'delayed', delayedSurahId: 112, answer: 'Doğru çeviri' });
+show(delayedTimed); ui.kaoTaskStartedAt = now - 1500;
+api.kaoAnswer(delayedTimed.id, 'right');
+assert.equal(data.quranLearn.daily['2026-09-28'].answered, 1);
+assert.equal(data.quranLearn.daily['2026-09-28'].ms, 1500, 'gecikmeli yol ms yazmalı');
+
 // K2F-30: ayar gerçek handler ile açılır (ayar değişimi görev önbelleğini temizler → önce çevir, sonra göster).
 const autoItem = wordTask('answer-toggle', 'w:l_toggle:ar>tr');
 freshData();

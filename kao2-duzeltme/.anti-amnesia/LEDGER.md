@@ -906,3 +906,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — (değişen: quranLearn.js) · cihaz — (katlanan bölüm görünümü gözlenmedi)
 - surprises: yok (bağımsız inceleme APPROVE; mutasyon `open` testi kırdı)
 - next: K2F-33
+
+## seq 88 · 2026-10-04 · RELEASE · K2F-32
+- status: done
+- title: K2F-27…32 canlıya alındı (kullanıcı isteği), pin 20261004a
+- prev-commit: 364de831
+- evidence: kao2-duzeltme/evidence/K2F-32/YAYIN.md
+- decision: kullanıcı "canlıya al" dedi; `main` ff-only `dc3f3f06..ab41e056`, force yok; Pages run 37197809774 success; canlı 8/8 bayt-eşit; gizlilik 404 ✓.
+- disclosure: cihaz doğrulaması yapılmadı (kullanıcıda); dinî bağlamlı metin onayları yapay zekâ incelemesidir (GATE seq 71 açık).
+- evidence-levels: kaynak/test ✓ · yayın ✓ · cihaz — (kullanıcıda) · uzman (L2) —
+- next: K2F-33

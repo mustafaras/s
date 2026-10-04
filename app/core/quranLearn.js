@@ -553,10 +553,30 @@
     var specs=[['A-kova harfler 1',['ba','ta','jim']],['A-kova harfler 2',['dal','ra','zay']],['A-kova harfler 3',['sin','shin','fa']],['Konum şekilleri ve birleştirme',['kaf','lam','mim']],['Harf sesleri ve dudaklar',['nun','ha','waw']],['Hareke, med ve şedde',['ya']],['Kalınlık: ط ض ص',['tta','dad','sad']],['Dil kökü ve boğaz: ق ح',['qaf','hah']],['Peltek sesler: ث ذ ظ',['tha','dhal','zah']],['Boğaz sesleri: ع غ خ',['ayn','ghayn','khah']],['Elif-lâm ve vasıl hemzesi',['hamza']],['Vakıf ve okuma provası',[]]];
     return specs.map(function(spec,index){ return {id:'t0-'+(index+1),title:spec[0],sounds:spec[1].map(function(id){ return byId[id]; }).filter(Boolean),rules:index===5?rules.slice(0,2):(index===10?rules.slice(2,4):(index===11?rules.slice(4):[]))}; });
   }
+  // K2F-34: okuma çeldiricileri en sık KAO_GATE_POOL kelimeden, doğru okunuşa uzunlukça en yakın (biri ≥, biri ≤) seçilir; doğru şık 3 konuma
+  // dönüşümlü yerleşir; aynı Arapçanın hiçbir okunuşu çeldirici olmaz. Belirlenimci. Havuz yetmezse (örn. cevap havuzun en uzunu) en yakın olanlar alınır.
+  var KAO_GATE_POOL=60;
+  function kaoReadingLength(text){ return String(text||'').normalize('NFC').length; }
+  function kaoGateChoices(pool,index,all){
+    var lemma=pool[index],size=kaoReadingLength(lemma.translit),seen=Object.create(null),near=[];
+    all.forEach(function(item){ if(item.ar===lemma.ar) seen[item.translit]=true; });
+    seen[lemma.translit]=true;
+    pool.forEach(function(item,at){
+      if(seen[item.translit]) return;
+      seen[item.translit]=true; near.push({text:item.translit,gap:kaoReadingLength(item.translit)-size,turn:(at-index+pool.length)%pool.length});
+    });
+    function closer(a,b){ return Math.abs(a.gap)-Math.abs(b.gap)||a.turn-b.turn; }
+    function nearest(side,skip){ return near.filter(function(item){ return item!==skip&&(side>0?item.gap>=0:item.gap<=0); }).sort(closer)[0]; }
+    var up=nearest(1),down=nearest(-1,up),wrong=[up,down].filter(Boolean);
+    near.filter(function(item){ return wrong.indexOf(item)<0; }).sort(closer).slice(0,2-wrong.length).forEach(function(item){ wrong.push(item); });
+    var choices=wrong.map(function(item){ return item.text; });
+    choices.splice(index%3,0,lemma.translit);
+    return choices;
+  }
   function kaoGateTasks(){
-    var lex=window.QuranLexiconV1,p=window.QuranPhonicsV1,lemmas=lex&&Array.isArray(lex.lemmas)?lex.lemmas.filter(function(lemma){ return lemma.verified===true&&lemma.translit; }).slice(0,20):[],pairs=p&&Array.isArray(p.pairs)?p.pairs.slice(0,12):[],letters=p&&Array.isArray(p.letters)?p.letters:[];
+    var lex=window.QuranLexiconV1,p=window.QuranPhonicsV1,verified=lex&&Array.isArray(lex.lemmas)?lex.lemmas.filter(function(lemma){ return lemma.verified===true&&lemma.translit; }):[],lemmas=verified.slice(0,20),pool=verified.slice(0,KAO_GATE_POOL),pairs=p&&Array.isArray(p.pairs)?p.pairs.slice(0,12):[],letters=p&&Array.isArray(p.letters)?p.letters:[];
     function letter(id){ return letters.find(function(item){ return item.id===id; })||{id:id,ar:id}; }
-    return {reading:lemmas.map(function(lemma,index){ return {id:'read-'+lemma.id,ar:lemma.ar,answer:lemma.translit,choices:[lemma.translit,lemmas[(index+3)%lemmas.length].translit,lemmas[(index+7)%lemmas.length].translit].filter(function(value,pos,list){ return list.indexOf(value)===pos; })}; }),listening:pairs.map(function(pair,index){ var target=letter(index%2?pair.b:pair.a),other=letter(index%2?pair.a:pair.b); return {id:'listen-'+pair.id,pairId:pair.id,answer:target.id,choices:[target,other]}; }),lessons:kaoGateLessons()};
+    return {reading:lemmas.map(function(lemma,index){ return {id:'read-'+lemma.id,ar:lemma.ar,answer:lemma.translit,choices:kaoGateChoices(pool,index,verified)}; }),listening:pairs.map(function(pair,index){ var target=letter(index%2?pair.b:pair.a),other=letter(index%2?pair.a:pair.b); return {id:'listen-'+pair.id,pairId:pair.id,answer:target.id,choices:[target,other]}; }),lessons:kaoGateLessons()};
   }
   function finishGate(reading,listening,deferred){
     var q=ensureQuranLearn(quranLearnDeps.data()),ui=quranLearnDeps.ui(); q.gate.passed=reading>=18&&(deferred||listening>=10); q.gate.skipped=reading>=18&&!deferred&&listening>=10; q.gate.score=reading+(deferred?0:listening); q.gate.at=new Date().toISOString(); ui.kaoGatePhase=q.gate.skipped?'result':'lessons'; ui.kaoGateAudioDeferred=!!deferred; kaoSave(); quranLearnDeps.render(); return true;

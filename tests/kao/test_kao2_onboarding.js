@@ -478,4 +478,93 @@ check('06 CSS: KAO2-11 bloğu yalnız --kao-*/--f-* tokenı, 600/700, süs yok',
   assert.match(block, /forced-colors/);
 });
 
+// K2F-34 (K5-06): okuma şıkları uzunluk ve sıra ile tahmin edilemez; belirlenimci.
+const readingLen = (text) => String(text).normalize('NFC').length;
+const gateReading = () => { const b = boot(), tasks = b.api.kaoGateTasks().reading; return { b, tasks }; };
+const placementReading = (b) => b.api.kaoPlacementTasks().reading;
+
+check('K2F-34 (a): her okuma görevinde 3 ayrı şık; çeldirici aynı Arapçayı paylaşmaz, doğru şık kapı sözlüğünden', () => {
+  const { b, tasks } = gateReading(), lex = b.win.QuranLexiconV1;
+  assert.equal(tasks.length, 20);
+  tasks.forEach((task) => {
+    assert.equal(task.choices.length, 3, task.id);
+    assert.equal(new Set(task.choices).size, 3, `${task.id}: şıklar ayrı`);
+    assert.ok(task.choices.includes(task.answer), `${task.id}: doğru şık içinde`);
+    assert.equal(task.answer, lex.byId(task.id.slice(5)).translit);
+    task.choices.filter((c) => c !== task.answer).forEach((wrong) => {
+      const same = lex.lemmas.filter((l) => l.translit === wrong && l.ar === task.ar);
+      assert.equal(same.length, 0, `${task.id}: "${wrong}" bu Arapçanın da okunuşu olamaz`);
+    });
+  });
+});
+
+check('K2F-34 (b): doğru şık uzunlukta tek başına en kısa/en uzun değil; çeldiriciler ±2 karakter bandında (kapı 20 + yerleştirme 8)', () => {
+  const { b, tasks } = gateReading();
+  const placement = placementReading(b);
+  assert.equal(placement.length, 8);
+  for (const task of [...tasks, ...placement]) {
+    const n = readingLen(task.answer), gaps = task.choices.filter((c) => c !== task.answer).map((c) => readingLen(c) - n);
+    assert.ok(gaps.some((g) => g >= 0) && gaps.some((g) => g <= 0), `${task.id}: doğru şık (${n}) tek başına en ${gaps.every((g) => g > 0) ? 'kısa' : 'uzun'} — farklar ${gaps}`);
+    assert.ok(gaps.every((g) => Math.abs(g) <= 2), `${task.id}: çeldirici bandı aşıyor — farklar ${gaps}`);
+  }
+});
+
+check('K2F-34 (c): sıra ve uzunluk sezgileriyle geçilemez — hep ilk/son/kısa/uzun/orta seçen yerleştirmeyi (≥7/8) ve kapıyı (≥18/20) geçemez', () => {
+  const { b, tasks } = gateReading();
+  const pick = {
+    first: (t) => t.choices[0], last: (t) => t.choices[t.choices.length - 1],
+    shortest: (t) => [...t.choices].sort((x, y) => readingLen(x) - readingLen(y))[0],
+    longest: (t) => [...t.choices].sort((x, y) => readingLen(y) - readingLen(x))[0],
+    median: (t) => [...t.choices].sort((x, y) => readingLen(x) - readingLen(y))[1]
+  };
+  for (const [name, fn] of Object.entries(pick)) {
+    const place = placementReading(b).filter((t) => fn(t) === t.answer).length, gate = tasks.filter((t) => fn(t) === t.answer).length;
+    assert.ok(place < 7, `${name}: yerleştirme ${place}/8`);
+    assert.ok(gate < 18, `${name}: kapı ${gate}/20`);
+  }
+});
+
+check('K2F-34 (d): doğru şık yeri üç konuma dağılır (yerleştirmede her konum ≤4/8) ve her çağrıda/başlatmada aynıdır', () => {
+  const { b, tasks } = gateReading();
+  const spots = placementReading(b).map((t) => t.choices.indexOf(t.answer));
+  [0, 1, 2].forEach((spot) => { const n = spots.filter((s) => s === spot).length; assert.ok(n >= 1 && n <= 4, `konum ${spot}: ${n}/8 (${spots})`); });
+  const gateSpots = tasks.map((t) => t.choices.indexOf(t.answer));
+  [0, 1, 2].forEach((spot) => assert.ok(gateSpots.filter((s) => s === spot).length >= 5, `kapı konum ${spot}: ${gateSpots}`));
+  assert.equal(JSON.stringify(b.api.kaoGateTasks().reading), JSON.stringify(tasks), 'aynı örnekte tekrar çağrı aynı');
+  assert.equal(JSON.stringify(boot().api.kaoGateTasks().reading), JSON.stringify(tasks), 'taze başlatma aynı (rastgelelik yok)');
+});
+
+check('K2F-34 (e): kapı havuzu yetmediğinde de çeldirici bulunur (havuz 2 kelimeye inse bile 2 şık, çökme yok)', () => {
+  const b = boot();
+  const lex = b.win.QuranLexiconV1, keep = lex.lemmas.filter((l) => l.verified === true && l.translit).slice(0, 2);
+  b.win.QuranLexiconV1 = Object.assign({}, lex, { lemmas: keep });
+  const tasks = b.api.kaoGateTasks().reading;
+  assert.equal(tasks.length, 2);
+  tasks.forEach((t) => { assert.ok(t.choices.includes(t.answer)); assert.equal(new Set(t.choices).size, t.choices.length); assert.ok(t.choices.length >= 2, t.id); });
+});
+
+check('K2F-34 (f): aynı Arapçanın başka okunuşu çeldirici olmaz; aynı okunuşlu kelimeler tek şık sayılır (sentetik sözlük)', () => {
+  const b = boot(), lex = b.win.QuranLexiconV1;
+  const mk = (id, ar, translit) => ({ id, ar, translit, verified: true });
+  const lemmas = [mk('a', 'AR1', 'katab'), mk('b', 'AR1', 'katib'), mk('c', 'AR2', 'katub'), mk('d', 'AR3', 'katab'), mk('e', 'AR4', 'kutub'), mk('f', 'AR5', 'kitab')];
+  b.win.QuranLexiconV1 = Object.assign({}, lex, { lemmas });
+  const [a, bb] = b.api.kaoGateTasks().reading;
+  assert.equal(a.choices.includes('katib'), false, 'AR1 için "katib" aynı Arapçanın okunuşu');
+  assert.equal(bb.choices.includes('katab'), false, 'AR1 için "katab" aynı Arapçanın okunuşu');
+  assert.equal(a.choices.filter((c) => c === 'katab').length, 1, 'aynı okunuş iki kez şık olmaz');
+  b.api.kaoGateTasks().reading.forEach((t) => assert.equal(new Set(t.choices).size, t.choices.length, t.id));
+});
+
+check('K2F-34 (g): seyrek havuzda da iki taraf (≥ ve ≤) aranır; gerçek havuzda çeldiriciler görevler arasında çeşitlenir', () => {
+  const b = boot(), lex = b.win.QuranLexiconV1;
+  const mk = (id, ar, translit) => ({ id, ar, translit, verified: true });
+  b.win.QuranLexiconV1 = Object.assign({}, lex, { lemmas: [mk('a', 'A0', 'abcd'), mk('b', 'A1', 'abcde'), mk('c', 'A2', 'abcdf'), mk('d', 'A3', 'ab')] });
+  const task = b.api.kaoGateTasks().reading[0], gaps = task.choices.filter((c) => c !== task.answer).map((c) => readingLen(c) - 4);
+  assert.deepEqual(Array.from(gaps).sort((x, y) => x - y), [-2, 1], 'daha yakın iki "uzun" yerine bir uzun + bir kısa');
+  const real = gateReading(), uses = new Map();
+  real.tasks.forEach((t) => t.choices.filter((c) => c !== t.answer).forEach((c) => uses.set(c, (uses.get(c) || 0) + 1)));
+  assert.ok(uses.size >= 20, `20 görevde yalnız ${uses.size} ayrı çeldirici`);
+  assert.ok(Math.max(...uses.values()) <= 3, 'bir çeldirici en çok 3 görevde görünür');
+});
+
 console.log(`KAO2-12 onboarding: PASS (${passed} kontrol)`);

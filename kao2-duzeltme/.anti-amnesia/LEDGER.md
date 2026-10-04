@@ -933,3 +933,12 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - gates: kapilar.sh YEŞİL · css 13,548 KiB
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
 - next: K2F-33
+
+## seq 91 · 2026-10-04 · FIX · K2F-32
+- status: done
+- title: Görsel QA 2. tur — kalan tasarım kusurları (kullanıcı: "tüm tasarım kusurlarını düzelttiğinden emin ol")
+- prev-commit: 9a126cf0
+- decision: kalan ekranlar tek tek incelendi; 3 ek kusur düzeltildi: (1) hub'da tanımsız ikon adları (layers, shapes → sprout, hexagon; test artık KAO'da kullanılan her ikon adının constants.js'te tanımlı olmasını zorlar), (2) ikonu olmayan satırlarda boş ikon alanı gizlendi, ayırıcı ve 16px yan boşluk hizalandı, bağlantı satırı yazı ölçüsü anahtar satırıyla aynı, (3) İlerleme'de ●/○ işareti 14→20px (metne yapışıyordu). Test önce kırmızı. Yalnız yerel; canlıda DEĞİL.
+- gates: kapilar.sh YEŞİL · css 13,605 KiB
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
+- next: K2F-33

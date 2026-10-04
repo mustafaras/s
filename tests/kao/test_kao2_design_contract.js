@@ -115,4 +115,18 @@ if (MODE === 'baseline') {
   assert.match(seg, /flex-wrap:wrap/, '6 niyet düğmesi tek satıra sığmaz: segment sarar');
   assert.match(/\.kao-seg button\{[^}]*\}/.exec(kaoCss)[0], /flex:1 1 80px/, 'düğme tabanı 80px: 3 düğme tek satırda eşit, 6 düğme 3+3');
 }
+// Görsel QA (2. tur): ikonu olmayan satırda boş alan kalmaz; kullanılan her ikon adı gerçekten tanımlıdır; işaret metne yapışmaz.
+{
+  const constantsSrc = read('app/core/constants.js');
+  const quranSrc = read('app/core/quranLearn.js');
+  const used = [...new Set([...quranSrc.matchAll(/\bicon:'([a-z0-9-]+)'/g)].map(m => m[1]))];
+  const missing = used.filter(name => !new RegExp("['\"]" + name + "['\"]\\s*:").test(constantsSrc) && !constantsSrc.includes("'" + name + "'"));
+  assert.deepEqual(missing, [], 'KAO satırlarında tanımsız ikon adı (boş ikon alanı bırakır): ' + missing.join(', '));
+  assert.match(kaoCss, /\.kao-group-icon:empty\{display:none\}/, 'boş ikon alanı gizlenir');
+  assert.match(kaoCss, /\.kao-group-row:has\(\.kao-group-icon:empty\)\{grid-template-columns:minmax\(0,1fr\) auto 12px;padding-inline:16px\}/, 'ikonsuz satır sütunları ve 16px yan boşluk');
+  assert.match(kaoCss, /\.kao-group-row:has\(\.kao-group-icon:empty\) \.kao-group-separator\{left:16px\}/, 'ikonsuz satırda ayırıcı içeriğe (16px) hizalanır');
+  assert.match(kaoCss, /\.kao-group-row:has\(\.kao-group-icon:empty\) \.kao-group-label\{font-size:var\(--f-body\);font-weight:400\}/, 'ikonsuz bağlantı satırı anahtar satırıyla aynı yazı ölçüsü');
+  const mark = /\.kao-progress-curve li \.kao-curve-mark\{[^}]*\}/.exec(kaoCss)[0];
+  assert.match(mark, /width:(1[8-9]|2\d)px/, 'işaret (●/○) metne yapışmaması için en az 18px');
+}
 console.log('KAO2 design contract: PASS');

@@ -2,14 +2,14 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-36
-lastSeq: 97
+lastSeq: 98
 status: active
 -->
 
-Son güncelleme: 2026-10-05 · LEDGER seq 97 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-05 · LEDGER seq 98 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-35 bitti (**yerel, yayınlanmadı**): ilerleme halkası Türkçe yüzde yazar (`%20`, görünür metin + aria-label); ünite satırı "x / y kalıcı kelime · a / b ders"; `namaz` taşı etiketi/koşulu gerçek kapsamı söyler ("Namazda geçen N kelime tanıdık", N = doğrulanmış namaz lemması); onboarding testi özet satırı "KAO2-11". Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-35/KANIT.md).
+K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu dengelendi, seq 98): ilerleme halkası Türkçe yüzde yazar (`%20`, görünür metin + aria-label); ünite satırı "x / y kalıcı kelime · a / b ders"; `namaz` taşı etiketi/koşulu gerçek kapsamı söyler ("Namazda geçen N kelime tanıdık", N = doğrulanmış namaz lemması); onboarding testi özet satırı "KAO2-11". Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-35/KANIT.md).
 Önceki: K2F-34 bitti (**yerel, yayınlanmadı**): okuma çeldiricileri en sık 60 kelimeden ve uzunlukça dengeli; doğru şık dönüşümlü konumda. Ayrıntı: [KANIT.md](../evidence/K2F-34/KANIT.md).
 Önceki: K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi: Ünite N · başlık" + "Derse git" (kaoNav unit); eşlemesiz lemmada satır gizli, "Derse dön" yedeği; ders varken tek düğme. Yeni handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-33/KANIT.md).
 Önceki: K2F-32 bitti (**yerel, yayınlanmadı**): İlerleme ekranı kendi başlığını taşır (h2 "İlerleme"; "İstatistik / Tutunma ve kalibrasyon" kalktı); 10 R-bandı tablosu "Tekrar doğruluğu" bölümünde kapalı `<details class="kao-flag">` içinde, tek cümle özetle. Yeni CSS/handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-32/KANIT.md).
@@ -35,9 +35,8 @@ K2F-35 bitti (**yerel, yayınlanmadı**): ilerleme halkası Türkçe yüzde yaza
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
-- **Ortam kısıtı (K2F-35'te görüldü):** bu oturumun deposu sığ klon (50 commit) ve konteyner yavaş → `test_kao2_perf_budget`/`test_kao2_kabul` (p95 8,8 ms > 5,09), `kao-plan-check` (planCheckBase yok), `test_profile_boundary`/`test_settings_boundary` (MON commitleri yok), `test_deploy_surface_contract` (rsync yok) baseline'da da kırmızı. K2F-36 A-9/A-10 ölçümü bu ortamda tam yeşile çekilemez; tam geçmişli/hızlı ortamda doğrulanmalı.
+- **Ortam (K2F-35 sonrası):** sığ klon `git fetch --unshallow` ile, rsync kurulumla giderildi (profile/settings boundary, plan-check, deploy_surface artık PASS). Kalan: bu konteyner baseline makineden ~2× yavaş → `test_kao2_perf_budget` göreli +25% bandı (p95 ≈9 ms vs 5,09) ve ona bağlı `test_kao2_kabul` A-10 kırmızı; mutlak 40 ms tavanı geçiyor. Test zayıflatılmadı; baseline hızlı makinede yenilenmeli ya da orada koşulmalı.
 - **K2F-35 cihazda gözlenmedi:** halka `%N` metninin 44/28 px halkada sığması, ünite satırı "kalıcı kelime" uzunluğu, namaz taşı etiketi.
-- **Dinleme şıkları hep ilk sırada (NOTE seq 96, açık):** `kaoGateTasks.listening` doğru harfi 1. düğmede çizer; hep ilk düğme dinleme kapısını (≥10/12) geçer. K5-06 kapsamı dışı olduğundan yapılmadı; sonraki uygun prompt/kullanıcı kararı.
 - **K2F-34 cihazda gözlenmedi:** yerleştirme/kapı okuma şıklarının yeni dağılımı (doğru şık 1./2./3. düğmede).
 - **Görsel QA düzeltmeleri canlıda** (LEDGER seq 90–94); yalnız cihazda gözlenmedi: ›/yapışık çubuk/sarılan Niyet/ikon hizası/--f-N aralıkları telefonda teyit edilmeli.
 - **K2F-32 cihazda gözlenmedi:** İlerleme ekranında katlanan öngörü bölümünün (summary ≥44 px) görünümü ve dokunma davranışı.

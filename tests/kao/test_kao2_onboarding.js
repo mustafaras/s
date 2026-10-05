@@ -567,4 +567,21 @@ check('K2F-34 (g): seyrek havuzda da iki taraf (≥ ve ≤) aranır; gerçek hav
   assert.ok(Math.max(...uses.values()) <= 3, 'bir çeldirici en çok 3 görevde görünür');
 });
 
+check('K2F-35 ek (NOTE seq 96): dinleme şıklarında doğru harf konumu dengeli — hep ilk düğme kapıyı geçemez', () => {
+  const { api } = openFresh();
+  const gate = api.kaoGateTasks(), placement = api.kaoPlacementTasks();
+  const position = (t) => t.choices.findIndex((c) => c.id === t.answer);
+  const gatePositions = gate.listening.map(position);
+  assert.equal(gate.listening.length, 12);
+  assert.ok(gatePositions.every((p) => p === 0 || p === 1), 'doğru şık iki düğmeden birinde');
+  assert.equal(gatePositions.filter((p) => p === 0).length, 6, 'kapı: doğru şık 6 görevde 1., 6 görevde 2. düğme');
+  // "Hep ilk düğme" ya da "hep ikinci düğme" stratejisi ≥10/12 eşiğine ulaşamaz.
+  assert.ok(gatePositions.filter((p) => p === 0).length < 10 && gatePositions.filter((p) => p === 1).length < 10);
+  const placementPositions = placement.listening.map(position);
+  assert.ok(placementPositions.includes(0) && placementPositions.includes(1), 'yerleştirme dinlemesinde iki konum da var');
+  // Konum değişse de hedef/diğer harf kümesi aynı kalır (içerik değişmedi).
+  gate.listening.forEach((t) => assert.equal(t.choices.length, 2));
+  assert.ok(gate.listening.every((t) => new Set(t.choices.map((c) => c.id)).size === 2), 'iki farklı harf');
+});
+
 console.log(`KAO2-11 onboarding: PASS (${passed} kontrol)`);

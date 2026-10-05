@@ -1011,3 +1011,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: progressRing'i doğrudan sınayan test_kao2_components Dokun listesinde yoktu; zorunlu sonuç olarak güncellendi. Ortam sığ klon/yavaş olduğundan tam kapı listesi yeşile çekilemedi (baseline ile aynı kırmızılar).
 - next: K2F-36
+
+## seq 98 · 2026-10-05 · FIX · K2F-35
+- status: closed (NOTE seq 96)
+- title: Dinleme şıklarında doğru harf konumu dengelendi
+- decision: kullanıcı "tüm açıkları kapat" dedi → `kaoGateTasks.listening` şıkları `[hedef, diğer]` yerine `floor(index/2)%2` ile dönüşümlü sıralanır (kapı 12 görevde 6/6; yerleştirme 4 görevde 2/2). "Hep ilk (ya da ikinci) düğme" stratejisi ≥10/12 eşiğine ulaşamaz. Test: test_kao2_onboarding "K2F-35 ek" (28→29 kontrol; kırmızı → yeşil). Yeni handler/CSS yok.
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- next: K2F-36

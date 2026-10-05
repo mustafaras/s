@@ -43,3 +43,7 @@ tekrar-uret: 10/10 PASS (önceki 10/10)
 ## Sürprizler / sonraki promptlara not
 - `test_kao2_components.js` Dokun listesinde değildi ama `progressRing`i doğrudan sınıyor; zorunlu güncelleme yapıldı (P1.6 sapması, gerekçeli).
 - Bu ortam sığ klon + yavaş: K2F-36'nın A-9/A-10 ölçümleri (perf p95, plan-check tabanı) burada kırmızı çıkar; tam geçmişli/hızlı ortamda doğrulanmalı.
+
+## Ek (kullanıcı: "tüm açıkları kapat", 2026-10-05)
+- NOTE seq 96 kapatıldı: dinleme şıkları dönüşümlü (seq 98); test_kao2_onboarding 28→29.
+- Ortam: `git fetch --unshallow` + rsync kurulumu → test_profile_boundary, test_settings_boundary, test_deploy_surface_contract, kao-plan-check artık PASS. Kalan tek kırmızı: perf göreli bandı (konteyner ~2× yavaş; test zayıflatılmadı).

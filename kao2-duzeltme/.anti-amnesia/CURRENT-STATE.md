@@ -1,14 +1,16 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-36
-lastSeq: 99
+nextPrompt: K2F-37
+lastSeq: 100
 status: active
 -->
 
-Son güncelleme: 2026-10-05 · LEDGER seq 99 · K2F-00…35 tamam (36/44), sıradaki K2F-36. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-05 · LEDGER seq 100 · K2F-00…36 tamam (37/44), sıradaki K2F-37. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
+K2F-36 bitti (**yalnız test/kanıt; canlıya etkisi yok**): `test_kao2_kabul.js` baştan yazıldı — A-1…A-10 gerçek handler/render/alt süreç ölçümü (A-1 iki yol 3 dokunuş · A-2 109 ders/1097 görev/524 lemma ihlal 0 · A-3 66 yüzey · A-4 9 durum + 12 ünite simülasyonu · A-5 · A-6 v1 ilerler · A-7 · A-8 gerçek kaoContinue · A-9 188/188 dosya çıkış 0 · A-10 bütçe). Mutasyon kanıtı kayıtlı. `KAO2_ACCEPT_SLOW_HOST=1` yalnız A-10'un makineye bağlı göreli p95 bandını atlar. Ayrıntı: [KANIT.md](../evidence/K2F-36/KANIT.md), [A-KABUL.md](../evidence/K2F-36/A-KABUL.md).
+Önceki: K2F-35 bitti ve canlıya alındı (bkz. aşağı).
 K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu dengelendi, seq 98): ilerleme halkası Türkçe yüzde yazar (`%20`, görünür metin + aria-label); ünite satırı "x / y kalıcı kelime · a / b ders"; `namaz` taşı etiketi/koşulu gerçek kapsamı söyler ("Namazda geçen N kelime tanıdık", N = doğrulanmış namaz lemması); onboarding testi özet satırı "KAO2-11". Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-35/KANIT.md).
 Önceki: K2F-34 bitti (**yerel, yayınlanmadı**): okuma çeldiricileri en sık 60 kelimeden ve uzunlukça dengeli; doğru şık dönüşümlü konumda. Ayrıntı: [KANIT.md](../evidence/K2F-34/KANIT.md).
 Önceki: K2F-33 bitti (**yerel, yayınlanmadı**): kelime detayında "Bu kelimenin dersi: Ünite N · başlık" + "Derse git" (kaoNav unit); eşlemesiz lemmada satır gizli, "Derse dön" yedeği; ders varken tek düğme. Yeni handler yok. Ayrıntı: [KANIT.md](../evidence/K2F-33/KANIT.md).
@@ -23,7 +25,7 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-36 (Kabul testi gerçek ölçüm):** `PROMPTLAR.md` §K2F-36 (`grep -n "^#### K2F-36"`): `tests/kao/test_kao2_kabul.js` A-1…A-10'u gerçekten ölçsün (totoloji/dosya sayımı yok), mutasyon kanıtı `$TMPDIR` kopyasında, `KAO2_EVIDENCE_OUT=kao2-duzeltme/evidence/K2F-36/A-KABUL.md`; Dokun yalnız o test + evidence; yeni handler yok.
+**K2F-37 (a11y ve tasarım sözleşmesi matrisi):** `PROMPTLAR.md` §K2F-37 (`grep -n "^#### K2F-37"`); yalnız promptun Dokun listesindeki dosyalar; yeni handler yok.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
@@ -36,6 +38,8 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
+- **Kabul testi süresi:** A-9 aileleri çalıştırdığı için `test_kao2_kabul.js` ≈3–4 dk; `kapilar.sh` içinde aileler iki kez koşar. Gerekirse sonraki promptta (K2F-38/39) paylaşılan sonuç önbelleği düşünülebilir.
+- **Kök dizindeki geçici dosyalar:** K2F-36 oturumunda `$TMPDIR` boştu; `/mut`, `/kabul.log`, `/A-KABUL.md` vb. kök dizine yazıldı (depoyu etkilemez, ephemeral konteyner). Silme güvenlik denetimince engellendi; yeni oturumda gerek yok.
 - **Perf (K2F-35 sonrası):** konteyner ≈1,8× yavaş olduğundan `test_kao2_perf_budget`/`test_kao2_kabul` göreli bandı (5,09 ms×1,25) burada düşer; makineden bağımsız A/B (`tools/perf-ab.cjs`, cari vs `07802fa6`, aynı süreç) en iyi-3 oranı 1,10–1,13 → +%25 bandının içinde. Referans makinede bir kez koşulup teyit edilmeli.
 - **K2F-35 cihazda gözlenmedi:** halka `%N` metninin 44/28 px halkada sığması, ünite satırı "kalıcı kelime" uzunluğu, namaz taşı etiketi.
 - **K2F-34 cihazda gözlenmedi:** yerleştirme/kapı okuma şıklarının yeni dağılımı (doğru şık 1./2./3. düğmede).
@@ -66,7 +70,7 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 - Sözlüğü sahtelemek için `t.win.QuranLexiconV1` değiştirilebilir (K2F-25 testi); her varyant taze `bootKao()` ister.
 
 ## Bekleyen kullanıcı işleri
-- **Oturum başlatıcı:** [OTURUM-BASLATICI-K2F-36.md](../OTURUM-BASLATICI-K2F-36.md) (yeni oturumda yapıştır).
+- **Oturum başlatıcı:** [OTURUM-BASLATICI-K2F-37.md](../OTURUM-BASLATICI-K2F-37.md) (yeni oturumda yapıştır).
 - Cihaz doğrulaması (telefonda canlı site) kullanıcıdadır ve ayrıca bildirilecektir. Kalan kapı: K2F-43 YAYIN-2.
 - **L2 (GATE seq 71, waiting):** gerçek alan uzmanı onayı yoktur ve Claude veremez. `L2-PAKET.md` tek oturumda işaretlenecek madde listesidir. Uygunsa ilgili sayfada L2 kutusu `[x]` yapılıp **"L2 işaretlendi"** yazılır; kapı sonraki promptları engellemez.
 - Cihaz teyidi (K2F-26 yayını): Arapça sekmesinde "Başla/Aç" düğmesi ya da "Ders kartı gizli · Göster" kartı görünmeli; "Göster"e basınca düğme gelmeli ve odak ona geçmeli (odak gerçek tarayıcıda gözlenmedi). Düğme hiç yoksa/hata varsa bana bildir.

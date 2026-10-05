@@ -1026,3 +1026,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence: kao2-duzeltme/evidence/K2F-35/YAYIN.md
 - evidence-levels: kaynak/test ✓ · yayın: run success ✓, canlı bayt eşitliği 9/9 ✓ + gizlilik 404 ✓ (kullanıcı terminali; seq 99 sonrası doğrulama) · cihaz —
 - next: K2F-36
+
+## seq 100 · 2026-10-05 · PROMPT · K2F-36
+- status: done
+- title: Kabul ölçütleri A-1…A-10 gerçekten ölçülüyor
+- prev-commit: a88d7066
+- evidence: kao2-duzeltme/evidence/K2F-36/KANIT.md
+- closes: K6-01 · K2-04 · K2-05 · M-02 (ölçüm)
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh: kao 51/53 (yalnız test_kao2_perf_budget + kabul'ün katı A-10 göreli p95 bandı; konteyner ≈1,8× yavaş, bkz. K2F-35 YAYIN.md A/B) · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync PASS; KAO2_ACCEPT_SLOW_HOST=1 ile kabul 10/10 PASS (A-9: 188/188 dosya çıkış 0)
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261005a (canlı; bu prompt yalnız test/kanıt, canlıya etkisi yok)
+- changed-tests: test_kao2_kabul.js (baştan yazıldı)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz — (A-11/A-12 kullanıcıda)
+- surprises: $TMPDIR boş olduğundan geçici dosyalar kök dizine yazıldı (/mut vb.; silme güvenlik denetimince engellendi); kaoStart true değil sayı döndürür; kabul testi artık aileleri çalıştırdığı için kapı süresi uzadı
+- next: K2F-37

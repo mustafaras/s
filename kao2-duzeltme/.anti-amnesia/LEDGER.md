@@ -1018,3 +1018,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - decision: kullanıcı "tüm açıkları kapat" dedi → `kaoGateTasks.listening` şıkları `[hedef, diğer]` yerine `floor(index/2)%2` ile dönüşümlü sıralanır (kapı 12 görevde 6/6; yerleştirme 4 görevde 2/2). "Hep ilk (ya da ikinci) düğme" stratejisi ≥10/12 eşiğine ulaşamaz. Test: test_kao2_onboarding "K2F-35 ek" (28→29 kontrol; kırmızı → yeşil). Yeni handler/CSS yok.
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - next: K2F-36
+
+## seq 99 · 2026-10-05 · RELEASE · K2F-35
+- status: done
+- title: K2F-34 + K2F-35 canlıya (pin 20261005a)
+- decision: kullanıcı "canlıya al" dedi; main ff-only dc9743f4..5a1aea85, Pages run 37330041514 success.
+- evidence: kao2-duzeltme/evidence/K2F-35/YAYIN.md
+- evidence-levels: kaynak/test ✓ · yayın: run success ✓, canlı bayt eşitliği — (egress engeli) · cihaz —
+- next: K2F-36

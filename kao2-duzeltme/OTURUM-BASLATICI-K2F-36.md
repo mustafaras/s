@@ -21,7 +21,7 @@ Kullanıcı kapısında P7. Her promptta LEDGER + CURRENT-STATE + FIX-STATE ayn�
 fix-sync-check PASS; tek commit. Push/merge/deploy yalnız YAYIN promptlarında ve açık kullanıcı onayıyla.
 
 Durum (önceki oturumdan): K2F-00…35 tamam (36/44), nextPrompt K2F-36 (kabul testi gerçek ölçüm: A-1…A-10,
-mutasyon kanıtı). Dal yerel; canlı pin 20261004c (K2F-34 içeriği, main dc9743f); K2F-35 ve sonrası canlıda DEĞİL
+mutasyon kanıtı). Dal yerel; canlı pin 20261005a (K2F-35 dahil, main 5a1aea85, run 37330041514); K2F-36 ve sonrası canlıda DEĞİL
 (yayın yalnız kullanıcı "canlıya al" derse). K2F-35 oturumunun ortamı sığ klon + yavaştı: perf/plan-check/boundary kırmızıları baseline'da da vardı.
 
 K2F-36'e özel notlar (önceki oturumlardan öğrenilenler):
@@ -45,4 +45,4 @@ K2F-36'e özel notlar (önceki oturumlardan öğrenilenler):
 
 ## Sıradan sonra
 - K2F-36 yeni bölümü yalnız K2F-36 kapanınca okunur.
-- Canlıya alma yalnız kullanıcı isterse: pin `20261004c` → yeni pin (index.html ×15, sw.js ×16, 8 pin taşıyan test), `kapilar.sh`, ff-only push, Pages run, bayt eşitliği, gizlilik 404. Önceki örnek: `evidence/K2F-33/YAYIN.md`.
+- Canlıya alma yalnız kullanıcı isterse: pin `20261005a` → yeni pin (index.html ×15, sw.js ×16, 8 pin taşıyan test), `kapilar.sh`, ff-only push, Pages run, bayt eşitliği, gizlilik 404. Önceki örnek: `evidence/K2F-33/YAYIN.md`.

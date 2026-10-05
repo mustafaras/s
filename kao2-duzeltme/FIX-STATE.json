@@ -11,11 +11,11 @@
   "ledgerLastSeq": 98,
   "releaseApproval": "approved_through_K2F-17",
   "lastRelease": {
-    "prompt": "K2F-33",
-    "commit": "2715ad50",
-    "pin": "20261004b",
-    "run": 37202523139,
-    "evidence": "kao2-duzeltme/evidence/K2F-33/YAYIN.md"
+    "prompt": "K2F-35",
+    "commit": "5a1aea85",
+    "pin": "20261005a",
+    "run": 37330041514,
+    "evidence": "kao2-duzeltme/evidence/K2F-35/YAYIN.md"
   },
   "sources": {
     "audit": "kao2-duzeltme/denetim/KUSUR-RAPORU.md",

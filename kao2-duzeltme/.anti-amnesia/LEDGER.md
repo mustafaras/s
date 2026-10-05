@@ -1024,5 +1024,5 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - title: K2F-34 + K2F-35 canlıya (pin 20261005a)
 - decision: kullanıcı "canlıya al" dedi; main ff-only dc9743f4..5a1aea85, Pages run 37330041514 success.
 - evidence: kao2-duzeltme/evidence/K2F-35/YAYIN.md
-- evidence-levels: kaynak/test ✓ · yayın: run success ✓, canlı bayt eşitliği — (egress engeli) · cihaz —
+- evidence-levels: kaynak/test ✓ · yayın: run success ✓, canlı bayt eşitliği 9/9 ✓ + gizlilik 404 ✓ (kullanıcı terminali; seq 99 sonrası doğrulama) · cihaz —
 - next: K2F-36

@@ -1040,3 +1040,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz — (A-11/A-12 kullanıcıda)
 - surprises: $TMPDIR boş olduğundan geçici dosyalar kök dizine yazıldı (/mut vb.; silme güvenlik denetimince engellendi); kaoStart true değil sayı döndürür; kabul testi artık aileleri çalıştırdığı için kapı süresi uzadı
 - next: K2F-37
+
+## seq 101 · 2026-10-05 · RELEASE · K2F-36
+- status: done
+- title: K2F-36 (yalnız test/kanıt) main'e alındı; Pages run success
+- decision: kullanıcı "canlıya al push commit merge deploy" dedi; main ff-only a88d7066..7cecaaad, run 37343918991 success; yayın varlıkları 5a1aea85 ile bayt aynı → pin değişmedi (20261005a).
+- evidence: kao2-duzeltme/evidence/K2F-36/YAYIN.md
+- evidence-levels: kaynak/test ✓ · yayın run success ✓ · cihaz —
+- next: K2F-37

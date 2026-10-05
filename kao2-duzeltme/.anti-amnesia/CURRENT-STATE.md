@@ -2,14 +2,14 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-37
-lastSeq: 100
+lastSeq: 101
 status: active
 -->
 
-Son güncelleme: 2026-10-05 · LEDGER seq 100 · K2F-00…36 tamam (37/44), sıradaki K2F-37. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-05 · LEDGER seq 101 · K2F-00…36 tamam (37/44), sıradaki K2F-37. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-K2F-36 bitti (**yalnız test/kanıt; canlıya etkisi yok**): `test_kao2_kabul.js` baştan yazıldı — A-1…A-10 gerçek handler/render/alt süreç ölçümü (A-1 iki yol 3 dokunuş · A-2 109 ders/1097 görev/524 lemma ihlal 0 · A-3 66 yüzey · A-4 9 durum + 12 ünite simülasyonu · A-5 · A-6 v1 ilerler · A-7 · A-8 gerçek kaoContinue · A-9 188/188 dosya çıkış 0 · A-10 bütçe). Mutasyon kanıtı kayıtlı. `KAO2_ACCEPT_SLOW_HOST=1` yalnız A-10'un makineye bağlı göreli p95 bandını atlar. Ayrıntı: [KANIT.md](../evidence/K2F-36/KANIT.md), [A-KABUL.md](../evidence/K2F-36/A-KABUL.md).
+K2F-36 bitti (**yalnız test/kanıt; main'e alındı, run 37343918991 success, varlıklar bayt aynı, pin 20261005a**): `test_kao2_kabul.js` baştan yazıldı — A-1…A-10 gerçek handler/render/alt süreç ölçümü (A-1 iki yol 3 dokunuş · A-2 109 ders/1097 görev/524 lemma ihlal 0 · A-3 66 yüzey · A-4 9 durum + 12 ünite simülasyonu · A-5 · A-6 v1 ilerler · A-7 · A-8 gerçek kaoContinue · A-9 188/188 dosya çıkış 0 · A-10 bütçe). Mutasyon kanıtı kayıtlı. `KAO2_ACCEPT_SLOW_HOST=1` yalnız A-10'un makineye bağlı göreli p95 bandını atlar. Ayrıntı: [KANIT.md](../evidence/K2F-36/KANIT.md), [A-KABUL.md](../evidence/K2F-36/A-KABUL.md).
 Önceki: K2F-35 bitti ve canlıya alındı (bkz. aşağı).
 K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu dengelendi, seq 98): ilerleme halkası Türkçe yüzde yazar (`%20`, görünür metin + aria-label); ünite satırı "x / y kalıcı kelime · a / b ders"; `namaz` taşı etiketi/koşulu gerçek kapsamı söyler ("Namazda geçen N kelime tanıdık", N = doğrulanmış namaz lemması); onboarding testi özet satırı "KAO2-11". Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-35/KANIT.md).
 Önceki: K2F-34 bitti (**yerel, yayınlanmadı**): okuma çeldiricileri en sık 60 kelimeden ve uzunlukça dengeli; doğru şık dönüşümlü konumda. Ayrıntı: [KANIT.md](../evidence/K2F-34/KANIT.md).

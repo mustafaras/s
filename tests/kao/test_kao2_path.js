@@ -73,7 +73,7 @@ check('yol: yedi seviye, tematik üniteler ve tek önerilen gerçek sıradaki ad
   assert.ok(html.includes(esc(approvedUnit.promise)), 'onaylı ünite vaadi görünür');
   assert.match(html, /onclick="App\.kaoNav\("unit",1\)"/);
   assert.equal((html.match(/aria-current="step"/g) || []).length, 1, 'tek sıradaki ünite step olarak işaretlenir');
-  assert.match(html, /class="kao-progress-ring" role="img" aria-label="Ünite 1 ders ilerlemesi: 20%"/);
+  assert.match(html, /class="kao-progress-ring" role="img" aria-label="Ünite 1 ders ilerlemesi: %20"/);
   assert.match(html, /onclick="App\.kaoLesson\("start","s0\.02"\)"/, 'S0 satırı gerçek ilk tamamlanmamış derse gider');
   assert.match(html, /onclick="App\.kaoOpenSurah\(114\)"/, 'S5 satırı var olan kısa sûre okuyucusunu açar');
   assert.match(html, /Seviye 6/);
@@ -103,7 +103,7 @@ check('ünite: vaat, gerçek ilerleme, sıradaki ders ve statik kavram listesi',
   assert.match(html, /<p class="kao-unit-anchor"><span>Çapa metin<\/span> · Fâtiha<\/p>/, 'çapa satırı sûre adını taşır');
   assert.doesNotMatch(withoutAnchor, new RegExp(unit.title), 'draft ünite adı sızmaz');
   assert.equal(html.includes(unit.promise), false, 'draft ünite vaadi sızmaz');
-  assert.match(html, new RegExp(`3 / ${total} kelime · 1 / ${unit.lessons.length} ders`));
+  assert.match(html, new RegExp(`3 / ${total} kalıcı kelime · 1 / ${unit.lessons.length} ders`));
   assert.match(html, /Ders 2’e devam et/);
   assert.match(html, /onclick="App\.kaoLesson\("start","u01\.02"\)"/);
   assert.equal(count(html, 'kao-primary'), 1, 'ünite ekranında tek birincil eylem');
@@ -130,7 +130,8 @@ check('tamamlanmış ünite CTA ve halka durumunu yalnız ders kayıtlarından t
   unit.lessons.forEach((lesson) => lessonDone(q, lesson));
   assert.equal(api.kaoNav('unit', unit.id), true);
   const html = decode(api.kaoOverlayHTML());
-  assert.match(html, /100%/);
+  assert.match(html, /%100/, 'tamamlanan ünite halkası Türkçe yüzde yazar');
+  assert.doesNotMatch(html, /\d+%(?!\d)/, 'sayıdan sonra gelen % kalmadı (Türkçe: %N)');
   assert.match(html, /Bu ünitedeki dersler tamamlandı/);
   // K2F-08: dersler bitince birincil düğme ÇALIŞAN ustalık eylemidir (eski beklenti: düğme yok → artık "Ustalığa başla");
   // ustalık geçilmişse yine hiçbir devam düğmesi yoktur.

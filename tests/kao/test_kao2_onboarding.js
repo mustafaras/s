@@ -567,4 +567,4 @@ check('K2F-34 (g): seyrek havuzda da iki taraf (≥ ve ≤) aranır; gerçek hav
   assert.ok(Math.max(...uses.values()) <= 3, 'bir çeldirici en çok 3 görevde görünür');
 });
 
-console.log(`KAO2-12 onboarding: PASS (${passed} kontrol)`);
+console.log(`KAO2-11 onboarding: PASS (${passed} kontrol)`);

@@ -120,6 +120,24 @@ check('kapsam taşları korunur; etiketler taş sözlüğünde', () => {
   assert.equal(has(earned(api, data), 'eighty'), true, 'eighty kapsam 0,75');
 });
 
+check('K2F-35 (K4-04): namaz taşı etiketi gerçek kapsamı söyler (sabit "tüm namaz" vaadi yok)', () => {
+  const { api, q } = boot();
+  const n = allPrayerLemmaIds().length;
+  assert.ok(n >= 30 && n < 60, `namaz kapsamı ölçüldü: ${n}`);
+  const labels = api.kaoMilestoneLabels();
+  assert.equal(labels.namaz, `Namazda geçen ${n} kelime tanıdık`, 'etiket gerçek lemma sayısını söyler');
+  assert.doesNotMatch(labels.namaz, /anlıyorum/, 'eski geniş vaat kalktı');
+  q.milestones.namaz = NOW;
+  assert.equal(api.kaoMilestoneLabel(q), labels.namaz, 'kazanılan namaz taşı aynı etiketi okur');
+  // Koşul metni de aynı kapsamı söyler: ilerleme ekranındaki "sıradaki taş" kartı.
+  const fresh = boot();
+  fresh.q.milestones.besmele = NOW; fresh.q.milestones.fatiha = NOW;
+  const next = fresh.api.kaoProgressModel(fresh.data, new Date(NOW)).stones.next;
+  assert.equal(next.key, 'namaz', 'sıradaki taş namaz');
+  assert.equal(next.label, labels.namaz);
+  assert.equal(next.condition, `Namazda geçen ${n} kelimenin tümü 7 gün oturmuş olsun`);
+});
+
 check('etiketler: besmele ve ünite taşları okunur, u1 ünite adını taşır', () => {
   const { api, q } = boot();
   const labels = api.kaoMilestoneLabels();

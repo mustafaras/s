@@ -997,3 +997,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak ✓
 - next: K2F-35
 
+
+## seq 97 · 2026-10-05 · PROMPT · K2F-35
+- status: done
+- title: Yüzde, ünite kelime ve namaz taşı etiketleri düzeltildi
+- prev-commit: dc9743f
+- evidence: kao2-duzeltme/evidence/K2F-35/KANIT.md
+- closes: K4-04 · K3-09
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh bu ortamda KIRMIZI yalnız ortam nedenleriyle (perf p95 8,8 ms baseline'da da; kabul perf'e bağlı; sığ klon → profile/settings boundary + plan-check tabanı; rsync yok → deploy_surface); diğer tüm kapılar PASS (panel · panel-v2 · quran · reminders · driver · zikr · kontrast · l2-paket · sync)
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261004c (bu prompt canlıda DEĞİL)
+- changed-tests: test_kao2_path · test_kao2_hub · test_kao2_components (Dokun dışı, zorunlu) · test_kao2_onboarding · test_kao2_milestones (+1 kontrol)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: progressRing'i doğrudan sınayan test_kao2_components Dokun listesinde yoktu; zorunlu sonuç olarak güncellendi. Ortam sığ klon/yavaş olduğundan tam kapı listesi yeşile çekilemedi (baseline ile aynı kırmızılar).
+- next: K2F-36

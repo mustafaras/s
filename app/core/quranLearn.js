@@ -442,6 +442,9 @@
     keysOf(KAO_MILESTONE_LABELS).forEach(function(key){ labels[key]=KAO_MILESTONE_LABELS[key]; });
     var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
     units.forEach(function(unit){ labels['u'+unit.id]=kaoUnitTitle(unit)+' ünitesini bitirdim'; });
+    // K2F-35 (K4-04): namaz taşı gerçek kapsamı söyler (doğrulanmış namaz lemmaları); sayı yoksa eski etiket kalır.
+    var prayerCount=kaoPrayerLemmaIds('namaz').length;
+    if(prayerCount>0) labels.namaz='Namazda geçen '+prayerCount+' kelime tanıdık';
     return labels;
   }
   function kaoMilestoneLabel(q){
@@ -2944,7 +2947,7 @@
     var conditionOf=function(key){
       if(key==='besmele') return 'Seviye 0\u2019ı bitir (ya da yerleştirme sınavını geç)';
       if(key==='fatiha') return 'Fâtiha kelimelerinin tümü 7 gün oturmuş olsun';
-      if(key==='namaz') return 'Namaz metinlerindeki tüm kelimeler 7 gün oturmuş olsun';
+      if(key==='namaz'){ var prayerCount=kaoPrayerLemmaIds('namaz').length; return prayerCount>0?'Namazda geçen '+prayerCount+' kelimenin tümü 7 gün oturmuş olsun':'Namaz metinlerindeki tüm kelimeler 7 gün oturmuş olsun'; }
       if(key==='half') return 'Kur\u2019an kelimelerinin yarısı tanıdık olsun';
       if(key==='twoThirds') return 'Üçte iki kapsama ulaş';
       if(key==='eighty') return 'Kapsam %75\u2019e ulaş';

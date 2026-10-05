@@ -5,3 +5,7 @@
 - Kapılar (pin öncesi): tests/app 77 PASS · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · kao-plan-check · sync PASS; tekrar-uret 10/10; tests/kao 51/53 (yalnız test_kao2_perf_budget + ona bağlı test_kao2_kabul A-10 kırmızı: konteyner baseline makineden ~2× yavaş, p95 ≈8,7–9,7 ms vs göreli bant 5,09 ms; mutlak 40 ms tavanı geçiyor; test zayıflatılmadı, baseline'da da aynı).
 - **Canlı bayt eşitliği DOĞRULANAMADI:** bu oturumun ağ çıkış vekili `mustafaras.github.io`yu engelliyor (curl 403, WebFetch EGRESS_BLOCKED). Önceki yayınlardaki 9/9 bayt kontrolü ve gizlilik 404 kontrolü bu oturumda yapılamadı; kullanıcı ya da ağı açık bir oturum yapmalı.
 - Kanıt düzeyi: kaynak/test ✓ · yayın: Pages run success ✓, bayt eşitliği — · cihaz — (kullanıcıda)
+
+## Ek ölçümler (2026-10-05, kullanıcı: "çok fazla kapatamadığın açık var")
+- **Perf kırmızısı yalnız makine hızı:** taban commit `07802fa6`in KENDİ kodu, aynı testle bu konteynerde 3 koşuda steady p95 = 9,54 / 8,63 / 8,62 ms çıktı (göreli bant 5,09 ms'yi o da aşıyor); güncel kod 8,7–9,7 ms. Yani gerileme yok; bant referans makineye bağlı. Test dokunulmadan bırakıldı.
+- **Yayın adımları (Actions API):** validate (sözdizimi, panel etiket dengesi, headless render) success; deploy işinde "Stage runtime-only site", "Guard runtime assets present", "Upload artifact", "Deploy to GitHub Pages" adımlarının hepsi success. Canlı bayt eşitliği egress engeli yüzünden hâlâ doğrudan ölçülemedi.

@@ -36,7 +36,7 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
-- **Ortam (K2F-35 sonrası):** sığ klon `git fetch --unshallow` ile, rsync kurulumla giderildi (profile/settings boundary, plan-check, deploy_surface artık PASS). Kalan: bu konteyner baseline makineden ~2× yavaş → `test_kao2_perf_budget` göreli +25% bandı (p95 ≈9 ms vs 5,09) ve ona bağlı `test_kao2_kabul` A-10 kırmızı; mutlak 40 ms tavanı geçiyor. Test zayıflatılmadı; baseline hızlı makinede yenilenmeli ya da orada koşulmalı.
+- **Perf (K2F-35 sonrası):** konteyner ≈1,8× yavaş olduğundan `test_kao2_perf_budget`/`test_kao2_kabul` göreli bandı (5,09 ms×1,25) burada düşer; makineden bağımsız A/B (`tools/perf-ab.cjs`, cari vs `07802fa6`, aynı süreç) en iyi-3 oranı 1,10–1,13 → +%25 bandının içinde. Referans makinede bir kez koşulup teyit edilmeli.
 - **K2F-35 cihazda gözlenmedi:** halka `%N` metninin 44/28 px halkada sığması, ünite satırı "kalıcı kelime" uzunluğu, namaz taşı etiketi.
 - **K2F-34 cihazda gözlenmedi:** yerleştirme/kapı okuma şıklarının yeni dağılımı (doğru şık 1./2./3. düğmede).
 - **Görsel QA düzeltmeleri canlıda** (LEDGER seq 90–94); yalnız cihazda gözlenmedi: ›/yapışık çubuk/sarılan Niyet/ikon hizası/--f-N aralıkları telefonda teyit edilmeli.

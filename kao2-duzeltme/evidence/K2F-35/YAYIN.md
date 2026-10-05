@@ -17,3 +17,8 @@
 - Gizlilik: `kao2-duzeltme/FIX-STATE.json` → 404 · `docs/GELISTIRME-PLANI.md` → 404.
 - Not: kullanıcının ilk denemesindeki "0/9 DIFF" yanlış alarmdı (`cd ~/yol/s` örnek yoldu, yerel dosya bulunamadı); özet yöntemiyle çözüldü.
 - Kanıt düzeyi: kaynak/test ✓ · yayın **doğrulandı** (run success + bayt eşitliği + gizlilik) · cihaz — (kullanıcıda).
+
+## Performans testi (kullanıcı: "performans testlerini sen yapmalısın", 2026-10-05)
+- `test_kao2_perf_budget.js` bu konteynerde mutlak kapılarını geçiyor (içerik/runtime/css gzip bütçeleri, p95 ≤ 40 ms) ve yalnız KAO2-01 makinesinden alınmış göreli bantta (5,09 ms × 1,25) düşüyor; bant makineye bağlı olduğundan test dokunulmadan bırakıldı.
+- Makineden bağımsız kanıt: `kao2-duzeltme/tools/perf-ab.cjs` — cari ağaç ile taban commit `07802fa6` (K2F başlangıcı) AYNI süreçte, serpiştirilmiş 60'ar yükleme. 4 koşuda en iyi-3 ortancası oranı (testin kullandığı metrik): **1,096 · 1,128 · 1,115 · 1,096** (cari/taban) → K2F-01…35 yüklemeyi ≈ %10–13 yavaşlattı (runtime ve içerik büyüdü), testin +%25 bandının **altında**. p50 oranı 1,18–1,29, p95 oranı gürültülü (0,79–1,50; 20 örnekte p95 tek aykırı değerdir).
+- Sonuç: performans gerilemesi bandın içinde; referans makinede (kullanıcının kapıları K2F-34'te yeşildi) bantı geçmesi beklenir. Kesin teyit için testin referans makinede bir kez koşulması gerekir (bu konteyner ≈1,8× yavaş).

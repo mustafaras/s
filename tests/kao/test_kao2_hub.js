@@ -205,4 +205,29 @@ check('06 §5 CSS: yalnız --kao-* renk tokenı, 600/700, süs yok, hover kaldı
   assert.match(block, /\.kao-hub-icon\{[^}]*width:32px;height:32px/);
 });
 
+check('K2F-35 ek: hiçbir KAO görünümünde görünür metinde "N%" yok (Türkçe yüzde %N); kapsam satırı %N', () => {
+  const { bootKao, seed, openView, text: viewText } = require('./helpers/kao-harness');
+  const t = bootKao();
+  const q = seed(t);
+  // Tekrar doğruluğu tablosu ve aktarım satırı için gerçek günlük kaydı (yüzde üreten yollar).
+  for (let i = 1; i <= 6; i += 1) {
+    const day = new Date(Date.parse(t.NOW) - i * 86400000).toISOString().slice(0, 10);
+    q.daily[day] = { answered: 20, correct: 15, new: 2, reviewed: 18, ms: 180000, dayFollow: { n: 10, ok: 8 }, nightFollow: { n: 5, ok: 4 }, calib: { bands: Array.from({ length: 10 }, () => ({ n: 3, ok: 2, pred: 2 })) } };
+  }
+  q.transfer = { n: 4, ok: 3 };
+  const lex = t.win.QuranLexiconV1, grammar = t.win.QuranGrammarV1;
+  const params = { unit: 1, word: lex.lemmas[0].id, reader: 112, concept: grammar.concepts[0].id };
+  const bad = [];
+  let sawPercent = 0;
+  for (const view of ['home', 'units', 'unit', 'word', 'reader', 'settings', 'phonics', 'ayah', 'prayer', 'stats', 'gate', 'grammar', 'concept', 'roots', 's0', 'sources']) {
+    const visible = viewText(openView(t, view, params[view]).html);
+    if (/\d%/.test(visible)) bad.push(`${view}: ${(visible.match(/.{0,25}\d%.{0,10}/) || [''])[0]}`);
+    sawPercent += (visible.match(/%\d/g) || []).length;
+  }
+  assert.deepEqual(bad, [], 'görünür metinde "N%" biçimi var');
+  assert.ok(sawPercent >= 3, `Türkçe %N biçimi görünümlerde gerçekten üretiliyor (${sawPercent})`);
+  const home = viewText(openView(t, 'home').html);
+  assert.match(home, /Kur’an kapsamı %\s?\d+/, "ana ekran kapsam satırı %N");
+});
+
 console.log(`KAO2-10 hub: PASS (${passed} kontrol)`);

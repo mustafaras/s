@@ -5,13 +5,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
-const CHROME = `${os.homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
+// KAO_QA_CHROME: başka makinede/konteynerde Chrome yolu; KAO_QA_NO_SANDBOX=1: root konteynerinde (yalnız boş geçici profil).
+const CHROME = process.env.KAO_QA_CHROME || `${os.homedir()}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
 const ORIGIN = 'http://127.0.0.1:9000';
 const MIME = { html: 'text/html; charset=utf-8', js: 'text/javascript; charset=utf-8', css: 'text/css; charset=utf-8', json: 'application/json', png: 'image/png', svg: 'image/svg+xml', webmanifest: 'application/manifest+json' };
 
 export async function launch(root, profileDir, { width = 390, height = 844 } = {}) {
   fs.mkdirSync(profileDir, { recursive: true });
-  const child = spawn(CHROME, ['--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-gpu', '--remote-debugging-pipe',
+  const child = spawn(CHROME, [...(process.env.KAO_QA_NO_SANDBOX === '1' ? ['--no-sandbox'] : []), '--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-gpu', '--remote-debugging-pipe',
     `--user-data-dir=${profileDir}`, 'about:blank'], { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'] });
   const wIn = child.stdio[3], rOut = child.stdio[4];
   let id = 0, buf = '';

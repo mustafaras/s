@@ -3009,7 +3009,7 @@
   }
   function kaoStatsHTML(nowValue){
     if(!quranLearnDeps) return '';
-    var esc=quranLearnDeps.esc,stats=kaoStats(quranLearnDeps.data(),nowValue),pct=function(ok,n){ return n?Math.round(ok/n*100)+'%':'—'; },MIN=30;
+    var esc=quranLearnDeps.esc,stats=kaoStats(quranLearnDeps.data(),nowValue),pct=function(ok,n){ return n?'%'+Math.round(ok/n*100):'—'; },MIN=30;
     var line=function(label,w){ return '<p><strong>'+esc(label)+':</strong> tekrar doğruluğu '+pct(w.ok,w.n)+' · FSRS öngörüsü '+pct(w.pred,w.n)+' · '+w.n+' tekrar</p>'; };
     var h='<main class="kao-stats" aria-labelledby="kao-stats-title"><div class="kao-view-head"><div><h2 id="kao-stats-title">İlerleme</h2><p>Kaç kelime tanıdığını, bu haftanı ve tekrar doğruluğunu burada görürsün.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
     // S-12: İlerleme ekranı taşları UZLAŞTIRIR (mevcut kayıt yoluna ek; taş bir kez kazanılır).

@@ -47,3 +47,6 @@ tekrar-uret: 10/10 PASS (önceki 10/10)
 ## Ek (kullanıcı: "tüm açıkları kapat", 2026-10-05)
 - NOTE seq 96 kapatıldı: dinleme şıkları dönüşümlü (seq 98); test_kao2_onboarding 28→29.
 - Ortam: `git fetch --unshallow` + rsync kurulumu → test_profile_boundary, test_settings_boundary, test_deploy_surface_contract, kao-plan-check artık PASS. Kalan tek kırmızı: perf göreli bandı (konteyner ~2× yavaş; test zayıflatılmadı).
+
+## Ek 2 (ekran kanıtı, 2026-10-05)
+- Ekran görüntüleri ve ÖNCE/SONRA tablosu: [EKRAN.md](EKRAN.md). Görüntüde Bugün ekranı kapsam satırında kalan "47%’i" bulundu ve kaynakta düzeltildi (LEDGER seq 102).

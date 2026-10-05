@@ -122,7 +122,7 @@ check('(c) Yolun kartı: seviye + gerçek ünite ilerlemesi; kapsam yalnız keli
   assert.match(html, /Seviye 1 · Namazın dili/);
   assert.match(html, /Ünite 1\/3 · Fâtiha/);
   assert.match(html, new RegExp(`role="progressbar"[^>]*aria-valuenow="${pct}"`));
-  assert.match(html, /<span data-countup="\d+" data-countup-key="kao-coverage">\d+<\/span>%/);
+  assert.match(html, /Kur’an kapsamı %<span data-countup="\d+" data-countup-key="kao-coverage">\d+<\/span>/);
   assert.match(html, /Tüm yolu gör/);
   assert.match(html, /onclick="App\.kaoSetView\(&quot;units&quot;\)"/);
   reset();

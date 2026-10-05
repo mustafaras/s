@@ -1048,3 +1048,14 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence: kao2-duzeltme/evidence/K2F-36/YAYIN.md
 - evidence-levels: kaynak/test ✓ · yayın run success ✓ · cihaz —
 - next: K2F-37
+
+## seq 102 · 2026-10-05 · FIX · K2F-35
+- status: closed (yerel; canlıda DEĞİL)
+- title: Ekran görüntüsü kanıtı + görüntüde bulunan kalan "N%" biçimi düzeltildi
+- decision: kullanıcı "tüm değişiklikleri ekran görüntüleriyle ispatla" dedi → kontrollü yerel QA (ÖNCE a352fa77 / SONRA çalışma ağacı) 7 değişikliği gösterdi (EKRAN.md). Görüntüde Bugün ekranında `Kur’an kelimelerinin 47%’i` kaldığı görüldü (K3-09 halka düzeltmesi bunu kaçırmıştı): `quranLearnViews.js` kapsam satırı "Kur’an kapsamı %47", `quranLearn.js` `pct` `%N`. Test: test_kao2_hub +1 kontrol (11; geri alınınca kırmızı), test_kao2_today ve test_kao_requirements regex'leri güncellendi. Araç: shoot-k2f35.mjs, cdp.mjs env geçersiz kılma.
+- evidence: kao2-duzeltme/evidence/K2F-35/EKRAN.md (kiyas-1…4 + once/sonra)
+- changed-tests: test_kao2_hub · test_kao2_today · test_kao_requirements
+- gates: kapilar.sh yalnız test_kao2_perf_budget + kabul'ün katı A-10 bandı kırmızı (makine hızı); KAO2_ACCEPT_SLOW_HOST=1 ile kabul 10/10; diğer tüm kapılar PASS
+- pins: yayın pini DEĞİŞMEDİ (20261005a); canlıdaki `47%’i` bir sonraki yayında (yeni pin) düzelecek
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
+- next: K2F-37

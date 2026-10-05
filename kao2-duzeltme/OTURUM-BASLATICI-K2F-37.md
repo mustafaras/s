@@ -46,3 +46,11 @@ K2F-37'e özel notlar (önceki oturumlardan öğrenilenler):
 ## Sıradan sonra
 - K2F-37 yeni bölümü yalnız K2F-37 kapanınca okunur.
 - Canlıya alma yalnız kullanıcı isterse: pin `20261005a` → yeni pin (index.html ×15, sw.js ×16, 8 pin taşıyan test), `kapilar.sh`, ff-only push, Pages run, bayt eşitliği, gizlilik 404. Önceki örnek: `evidence/K2F-33/YAYIN.md`.
+
+Bu oturum devrinden ek notlar (2026-10-05, K2F-35/36 ve ekran kanıtı turu):
+- Yerel kaynakta yayında OLMAYAN fark var: Bugün kapsam satırı "Kur’an kapsamı %47" ve tekrar doğruluğu `%N` (LEDGER seq 102); canlı pin 20261005a eski "47%’i"yi taşır. Yeni yayında pin yükseltilir (index.html ×15, sw.js ×16, 8 pin taşıyan test + test_kao2_curriculum).
+- Kabul testi: `KAO2_ACCEPT_SLOW_HOST=1 node tests/kao/test_kao2_kabul.js` yavaş makinede yalnız A-10 göreli p95 bandını atlar (≈3–4 dk; aileleri gerçekten çalıştırır). Hızlı makinede bayraksız çalıştır. `tools/perf-ab.cjs` makineden bağımsız A/B ölçer.
+- Bash'te `$TMPDIR` BOŞ olabilir (ilk K2F-36 turunda geçici dosyalar kök dizine düştü). Geçici işler için mutlak scratchpad yolu kullan; `rm` kök yola engellenir.
+- Ekran görüntüsü (yalnız kullanıcı isterse): `KAO_QA_CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome KAO_QA_NO_SANDBOX=1 node kao2-duzeltme/tools/gorsel-qa/shoot-k2f35.mjs <kök> <çıktı> <profil>`; ÖNCE için `git archive <commit> | tar -x -C <dizin>`; kontak sayfası için `pip install pillow`. Görüntüler sentetiktir, cihaz değildir; PNG'leri küçült (quantize) ki depo şişmesin.
+- Ağ: `mustafaras.github.io` bu oturumlarda egress ile engelliydi; canlı bayt doğrulaması kullanıcı terminalinde `curl | shasum -a 256` ile yapıldı (K2F-35 YAYIN.md).
+- Pin değişen yayında yalnız kullanıcı "canlıya al" derse push/deploy; K2F-36 gibi yalnız test/kanıt commit'leri pini değiştirmez.

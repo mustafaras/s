@@ -873,7 +873,7 @@ function sandboxLemma(api, lemmaId) {
   assert.doesNotThrow(() => bare.kaoHomeHTML('2026-10-05T10:00:00.000Z'));
   // KAO2-09 (c): kapsam yalnız bilinen kelime ≥1 iken görünür; en sık lemma iki yönde kalıcı yapılır.
   for (const dir of ['ar>tr', 'tr>ar']) data.quranLearn.cards[`w:${sandbox.window.QuranLexiconV1.lemmas[0].id}:${dir}`] = { state: 'review', s: 25, reps: 6, due: '2099-01-01T00:00:00.000Z' };
-  assert.match(api.kaoHomeHTML('2026-10-05T10:00:00.000Z'), /<span data-countup="\d+" data-countup-key="kao-coverage">\d+<\/span>%/, 'kapsam sayacı countUp için işaretli');
+  assert.match(api.kaoHomeHTML('2026-10-05T10:00:00.000Z'), /%<span data-countup="\d+" data-countup-key="kao-coverage">\d+<\/span>/, 'kapsam sayacı countUp için işaretli');
 }
 
 console.log(`KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli ${transitionMs.toFixed(3)} ms <50 ms)`);

@@ -1059,3 +1059,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - pins: yayın pini DEĞİŞMEDİ (20261005a); canlıdaki `47%’i` bir sonraki yayında (yeni pin) düzelecek
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
 - next: K2F-37
+
+## seq 103 · 2026-10-05 · RELEASE · K2F-35
+- status: done (bayt eşitliği kullanıcıda bekliyor)
+- title: Yüzde düzeltmesi + ekran kanıtı canlıya (pin 20261005b)
+- decision: kullanıcı "tüm herşeyi canlıya al" dedi; main ff-only 36db70cd..59160810, run 37349172650 success.
+- evidence: kao2-duzeltme/evidence/K2F-35/YAYIN-2.md
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor · cihaz —
+- next: K2F-37

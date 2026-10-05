@@ -1,0 +1,7 @@
+# K2F-35 — Yayın 2 (kullanıcı isteği "tüm her şeyi canlıya al", 2026-10-05)
+- Kapsam: yüzde biçimi düzeltmesi (Bugün kapsam satırı "Kur’an kapsamı %47", tekrar doğruluğu `%N`) + ekran kanıtı/araç/kayıtlar. Pin `20261005a` → **`20261005b`** (index.html ×15, sw.js ×16, 8 pin taşıyan test + test_kao2_curriculum).
+- Commit: `59160810` · `main` ff-only `36db70cd..59160810` · force yok · Pages run **37349172650**: validate (sözdizimi, panel etiket dengesi, headless render) success, deploy success.
+- Kapılar (pin öncesi): tests/app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync PASS; tekrar-uret 10/10; kabul `KAO2_ACCEPT_SLOW_HOST=1` ile 10/10 (A-9: 188/188). Yalnız perf göreli bandı bu konteynerde kırmızı (makine hızı; K2F-35 YAYIN.md A/B).
+- Beklenen canlı özetleri (`git show 59160810:<dosya> | sha256sum`, ilk 16 hane): index.html `dd18e6a0fe0028cb` · sw.js `aab6b9db6a7a9822` · app/kao.css `321998ba7d9b7311` · quranLearn.js `6481a3bb73cd9c12` · quranLearnFlow.js `1bde07c50138d8c8` · quranLearnViews.js `74baa9f7e3f6ff77` · quranCurriculumV2.js `ae7b20609031ac33` · app.js `157f88ebb81dce3f` · constants.js `b241181406d303ae`; `SW_VERSION = '20261005b'`.
+- Canlı bayt eşitliği: bu oturumun egress'i github.io'yu engelliyor → **kullanıcı terminalinde doğrulanmalı** (komut sohbette verildi). Henüz DOĞRULANMADI.
+- Kanıt düzeyi: kaynak/test ✓ · yerel görsel ✓ (EKRAN.md) · yayın: run success ✓, bayt eşitliği bekliyor · cihaz — (kullanıcıda)

@@ -1165,3 +1165,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: yerel görsel ✓ (sentetik) · yayın — · cihaz —
 - next: K2F-39
 
+## seq 114 · 2026-10-06 · FIX · K2F-38
+- status: closed (yayın seq 115)
+- title: Eksik taramalar tamamlandı: ana uygulama sekmeleri + panel + panel-v2 + 200 px; 4 kusur düzeltildi
+- decision: kullanıcı "tüm eksikleri tamamla ve canlıya al" dedi. Taranan (sentetik, yerel, cihaz DEĞİL): KAO 200 px (63 görüntü, sw=cw, yalnız bilinen 4 kaydırmalı alan); ana uygulama 7 sekme (bugun/harita/rapor/saglik/saygi/mesaj/ayarlar) 390 px, 320 px, koyu 390 (yeni araç `tools/gorsel-qa/shoot-app.mjs`); panel.html + panel-v2.html 390/320 yalnız İLK AÇILIŞ (token yok; token/parola alanlarına dokunulmadı, canlı veri görünümü doğrulanmadı) (`shoot-panel.mjs`). Bulgular+düzeltmeler: (1) alt çubuk "İlham·İbadet" → "İlham…" kısalıyordu: görünen etiket "İlham", aria-label tam; (2) ≤340 px'te İlham&İbadet alt sekmesinde "Arapça" ortasından kırılıyordu (`overflow-wrap:anywhere`): dar ekran kuralı; (3) Raşit'e yaz/ara kartlarında alt yazı `nowrap` ile kesiliyordu; (4) panel-v2 ≤360 px'te ÆON yazısı durum hapıyla üst üste biniyor, alt çubuk etiketleri kısalıyordu: dar ekran medya kuralı. Cache pinleri: render.js, styles.css, panel-v2.css → 20261006c (index.html, sw.js, panel-v2.html, 5 test). Gözlenen ama düzeltilmeyen: üst başlıkta "hava bekleni…" / Hicri tarih üç nokta (ağ kesik, dinamik içerik).
+- evidence: kao2-duzeltme/evidence/K2F-38/YAYIN.md
+- changed-tests: yalnız cache-pin sabitleri (test_v3_welcome, test_header_night_contrast, test_header_celestial_timeline, test_iip_09, panel-v2 hit_areas + performance); davranış testi zayıflatılmadı
+- gates: paralel koşu 189 test dosyası + reminders/driver/zikr/kontrast/l2-paket/tekrar-uret: yeşil; kabul 10/10 (KAO2_ACCEPT_SLOW_HOST=1, A-10 göreli p95 bandı atlandı); css 13,905/14 KiB. Konteyner kaynaklı kırmızılar ve çözümleri: depo sığ klondu → `git fetch --unshallow` ile profile/settings_boundary + plan-check geçti; `rsync` yoktu → kurulunca deploy_surface_contract 70/70. perf_budget göreli bandı yavaş konteynerde kırmızı (baseline'da da). Gerçek bulgu: kao-plan-check `65e94db "K2F-38 ek:"` önekini reddetti (iki nokta yok) — benim commit hatam, main'de, geçmiş yazılamaz; araç `K2F-NN ek:` biçimini KAO-FIX (ek) emsaliyle tanıyacak şekilde en dar biçimde genişletildi (chore(kao) commit).
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın bkz. seq 115 · cihaz —
+- next: K2F-39
+

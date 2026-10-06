@@ -1260,3 +1260,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın bkz. RELEASE kaydı · cihaz —
 - surprises: yok
 - next: none
+
+## seq 122 · 2026-10-06 · RELEASE · K2F-43
+- status: done (canlı bayt eşitliği ve cihaz kullanıcıda bekliyor)
+- title: YAYIN-2 canlıda (pin 20261006e)
+- decision: kullanıcı "canlıya al" dedi; main ff-only f1cb4a01..6796d87a, Pages run 37510458831 success.
+- evidence: kao2-duzeltme/evidence/K2F-43/YAYIN.md
+- evidence-levels: kaynak/test ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor (github.io bu konteynerden engelli) · cihaz —
+- next: none

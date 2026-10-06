@@ -2,11 +2,11 @@
 
 <!-- k2f-sync
 nextPrompt: none
-lastSeq: 121
+lastSeq: 122
 status: completed
 -->
 
-Son güncelleme: 2026-10-06 · LEDGER seq 121 · K2F-00…43 tamam (44/44), program kapandı. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-06 · LEDGER seq 122 · K2F-00…43 tamam (44/44), program kapandı. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 **K2F-43 bitti (seq 121): program KAPANDI; pin 20261006e main'e alındı (kullanıcı "canlıya al" dedi). Canlı bayt eşitliği ve cihaz doğrulaması kullanıcıda.** Kapanış: [KAO2-FIX-KAPANIS.md](../deliverables/KAO2-FIX-KAPANIS.md).

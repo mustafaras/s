@@ -1,14 +1,15 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-43
-lastSeq: 120
-status: active
+nextPrompt: none
+lastSeq: 121
+status: completed
 -->
 
-Son güncelleme: 2026-10-06 · LEDGER seq 120 · K2F-00…42 tamam (43/44), sıradaki K2F-43. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-06 · LEDGER seq 121 · K2F-00…43 tamam (44/44), program kapandı. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
+**K2F-43 bitti (seq 121): program KAPANDI; pin 20261006e main'e alındı (kullanıcı "canlıya al" dedi). Canlı bayt eşitliği ve cihaz doğrulaması kullanıcıda.** Kapanış: [KAO2-FIX-KAPANIS.md](../deliverables/KAO2-FIX-KAPANIS.md).
 **K2F-42 bitti (seq 120, yerel):** tam regresyon yeşil, tekrar-uret 10/10, kabul 10/10; kapanış belgesi [KAO2-FIX-KAPANIS.md](../deliverables/KAO2-FIX-KAPANIS.md). Kullanıcı "canlıya al" dedi → K2F-43 yürütülür.
 **K2F-41 bitti (seq 119, yerel):** arşiv `DUZELTME-NOTU.md`, `tests/kao/README.md` envanteri (37/37), CLAUDE/AGENTS KAO2 satırları. Yalnız belge. Ayrıntı: [KANIT.md](../evidence/K2F-41/KANIT.md).
 **K2F-40 bitti (seq 118, yerel, yayınlanmadı):** görev şıkları `Views.choice` düğme kipinden kurulur (motorda işaret/aria HTML'i kopyası kalmadı); 6 tür × {cevapsız, doğru, yanlış} 18 döküm bayt-eşit; runtime gzip 115,991 / 128 KiB. Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-40/KANIT.md).
@@ -34,11 +35,11 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-43 (YAYIN-2):** kullanıcı onayı verildi ("canlıya al"); yeni pin, tek commit, ff-only `HEAD:main`, Pages izleme, bayt-eşitlik, program `completed`.
+Yok — program tamamlandı. Yeni KAO2 işi ayrı kapsam onayı ister.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
-- Yayın pini: `20261006c`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
+- Yayın pini: `20261006e`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
 - Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,027 KiB (tavan 14 — kalan ≈0,97 KiB; K2F-39 sonrası) · runtime 116,270 KiB (K2F-34 sonrası)** · p95 4,2 ms.

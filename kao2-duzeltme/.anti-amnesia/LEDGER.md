@@ -1246,3 +1246,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: yok
 - next: K2F-43
+
+## seq 121 · 2026-10-06 · PROMPT · K2F-43
+- status: done
+- title: YAYIN-2 — KAO2-FIX canlıya (pin 20261006e), program kapandı
+- prev-commit: ce67250e
+- evidence: kao2-duzeltme/evidence/K2F-43/YAYIN.md
+- closes: —
+- repro: değişmedi · toplam 10/10
+- gates: K2F-42 regresyonu; pin sonrası 15+ pin/yüzey testi + driver PASS
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261006e
+- changed-tests: yalnız pin sabitleri (12 test dosyası)
+- evidence-levels: kaynak/test ✓ · yayın bkz. RELEASE kaydı · cihaz —
+- surprises: yok
+- next: none

@@ -1,21 +1,21 @@
 {
   "program": "KAO2-FIX",
   "title": "KAO2 denetim düzeltmeleri — 49 bulgu, 44 sıralı prompt",
-  "status": "active",
+  "status": "completed",
   "plannedAt": "2026-09-30",
   "implementer": "Claude Sonnet 5.5 (claude-sonnet-5-5) — her prompt ayrı oturum",
   "branch": "kao2-duzeltme",
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
-  "nextPrompt": "K2F-43",
-  "ledgerLastSeq": 120,
-  "releaseApproval": "approved_through_K2F-17",
+  "nextPrompt": null,
+  "ledgerLastSeq": 121,
+  "releaseApproval": "approved_through_K2F-43",
   "lastRelease": {
-    "prompt": "K2F-35",
-    "commit": "59160810",
-    "pin": "20261006a",
-    "run": 37349172650,
-    "evidence": "kao2-duzeltme/evidence/K2F-35/YAYIN-2.md"
+    "prompt": "K2F-43",
+    "commit": "PINCOMMIT",
+    "pin": "20261006e",
+    "run": null,
+    "evidence": "kao2-duzeltme/evidence/K2F-43/YAYIN.md"
   },
   "sources": {
     "audit": "kao2-duzeltme/denetim/KUSUR-RAPORU.md",
@@ -39,7 +39,7 @@
     "acceptedAt": "2026-09-30"
   },
   "pins": {
-    "release": "20261006d",
+    "release": "20261006e",
     "kaoHandlers": 45,
     "appSurface": 766,
     "appAssignments": 604,
@@ -123,6 +123,6 @@
     "K2F-40": { "wave": "W5", "title": "K-2 katman tamamlama", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-40/KANIT.md" },
     "K2F-41": { "wave": "W5", "title": "Kayıtlar ve yönlendirme belgeleri", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-41/KANIT.md" },
     "K2F-42": { "wave": "W5", "title": "Kapanış regresyonu ve kapanış belgesi", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-42/KANIT.md" },
-    "K2F-43": { "wave": "W5", "title": "YAYIN-2 (kullanıcı onay kapısı)", "status": "pending", "evidence": null }
+    "K2F-43": { "wave": "W5", "title": "YAYIN-2 (kullanıcı onay kapısı)", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-43/YAYIN.md" }
   }
 }

@@ -100,7 +100,8 @@ if (MODE === 'baseline') {
 // metin tek satıra ZORLANMAZ (white-space:nowrap yok), taşan uzun başlık/etiket sarar.
 {
   const bar = /\.kao-navbar\{[^}]*\}/.exec(kaoCss)[0];
-  assert.match(bar, /grid-template-columns:minmax\(0,1fr\) minmax\(0,auto\) minmax\(0,1fr\)/, 'NavBar: eşit yan sütunlar + doğal başlık');
+  // K2F-38 ek (tarama): uzun başlıkta ("Namazda ne diyorum", "Hakkında ve kaynaklar") eşit yan sütun etiketi iki satıra kırıyordu; ilk sütun etiketin tek satır genişliğinden küçülmez (nowrap yine yok).
+  assert.match(bar, /grid-template-columns:minmax\(max-content,1fr\) minmax\(0,auto\) minmax\(0,1fr\)/, 'NavBar: geri etiketi tek satır genişliğinde, başlık doğal');
   const action = /\.kao-navbar-action\{[^}]*\}/.exec(kaoCss)[0];
   assert.doesNotMatch(action, /white-space:nowrap/, 'NavBar geri etiketi tek satıra zorlanmaz');
   assert.match(action, /overflow-wrap:anywhere/, 'çok uzun etiket sarar');

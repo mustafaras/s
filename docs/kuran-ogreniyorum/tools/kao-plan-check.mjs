@@ -32,8 +32,9 @@ const FIX_BASE = '58e0ceb';
 const KAO_FILE_SCOPE = ['app/core/quranLearn.js', 'app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranPhonicsV1.js', 'tools/kao-*.mjs', 'tests/kao/**', 'assets/kao/**'];
 // KAO-P00/KAO-Dn eski programın başlangıç/denetim kartlarıdır; "(ek)" düzeltme programının ek commit biçimidir.
 // KAO-ARSIV: program kapanışında plan klasörünün kökten docs/ altına taşınması (2026-09-27); tek seferlik yol güncellemesi.
+// K2F-NN ek: (2026-10-06) kullanıcı isteğiyle yapılan ek iş commit'i; 65e94db `K2F-38 ek:` önekiyle main'e girdi, geçmiş yazılamaz (KAO-FIX (ek) emsali).
 // K2F-NN: KAO2-FIX programı (kao2-duzeltme/, 44 prompt: K2F-00…K2F-43); tek hane ya da aralık dışı numara tanınmaz.
-const KAO_SUBJECT_RE = /^(?:(?:KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
+const KAO_SUBJECT_RE = /^(?:(?:KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])(?: ek)?|KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
 const CARD_OF_SUBJECT_RE = /^(KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
 // K2F-01 (M-10): plan-check tabanı — bu commit'ten SONRAKİ commitler denetlenir, öncesi tarihsel sayılır.
 const FIX_STATE_PATH = path.join(ROOT, 'kao2-duzeltme', 'FIX-STATE.json');

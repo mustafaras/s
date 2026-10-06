@@ -277,7 +277,9 @@
       var rowHtml=rows.map(function(row){
         var cells=Array.isArray(row.cells)?row.cells:[];
         if(row.label!==undefined) cells=[row.label].concat(cells);
-        return '<tr>'+cells.map(function(cell){ return '<td>'+escapeMixed(Array.isArray(cell)?(cell[0]||cell[1]||''):(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell))+'</td>'; }).join('')+'</tr>';
+        return '<tr>'+cells.map(function(cell){ // K2F-37 (ekran görüntüsü): Arapça hücre [âyet-referansı, Arapça, okunuş] üçlüsüdür; gösterilen Arapça + okunuş olmalı (referans değil).
+        if(Array.isArray(cell)){ var reading=escapeText(cell[2]); return '<td><span class="kao-grammar-ar" lang="ar" dir="rtl">'+escapeText(cell[1]||cell[0]||'')+'</span>'+(reading?'<span class="kao-grammar-reading" lang="tr" dir="ltr">'+reading+'</span>':'')+'</td>'; }
+        return '<td>'+escapeMixed(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell)+'</td>'; }).join('')+'</tr>';
       }).join('');
       body='<section class="kao-lesson-card kao-lesson-concept" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Kavram</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.plainTr)+'</p>'+(head||rowHtml?'<div class="kao-lesson-table-wrap"><table class="kao-lesson-table"><thead><tr>'+head+'</tr></thead><tbody>'+rowHtml+'</tbody></table></div>':'')+(model.termTr?'<details class="kao-lesson-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+'</section>';
     }else if(model.stage==='apply'&&Array.isArray(model.sentences)){

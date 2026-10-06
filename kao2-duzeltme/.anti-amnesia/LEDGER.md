@@ -991,7 +991,7 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - next: K2F-35
 
 ## seq 96 · 2026-10-04 · NOTE · K2F-34
-- status: open
+- status: closed (FIX seq 98)
 - title: Dinleme görevlerinde doğru şık hep ilk sırada (kapsam dışı, yapılmadı)
 - decision: kaoGateTasks.listening şıkları `[hedef, diğer]` sırasıyla üretilir ve olduğu gibi çizilir → hep ilk düğmeyi seçen dinlemeyi 4/4 (kapı 12/12) geçer. K5-06 yalnız okuma sorularını kapsar; yerleştirme kararı okumaya göre verilir (etkisiz), ama kapı (S0 atlama) dinleme ≥10/12 ister. Sonraki uygun prompt ya da kullanıcı kararı gerekir.
 - evidence-levels: kaynak ✓
@@ -1083,8 +1083,19 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - next: K2F-38
 
 ## seq 105 · 2026-10-06 · NOTE · K2F-37
-- status: open
+- status: closed (FIX seq 106: kusur kavram tablosu hücre biçimiydi, içerik değil)
 - title: Kavram tablosunda "Arapça" sütunu bazı satırlarda referans gösteriyor
 - decision: u04.01 kavram aşaması tablosunda ilk üç satırın "Arapça" hücresi `2:17:3` gibi sûre:âyet:kelime referansı (içerik verisi), son iki satır Arapça. İçerik/tasarım kararı gerektirir (Arapça yoksa sütun başlığı ya da hücre biçimi); K2F-37 kapsamı dışı, dokunulmadı.
 - evidence-levels: kaynak ✓
+- next: K2F-38
+
+## seq 106 · 2026-10-06 · FIX · K2F-37
+- status: closed (yerel; canlıda DEĞİL)
+- title: Modal ekran görüntüsü taramasında bulunan 2 görsel/içerik kusuru düzeltildi
+- decision: kullanıcı "tüm modal tasarımı ekran görüntüleriyle kontrol et" dedi → 390 px, 320 px ve karanlık temada 15 görünüm + ders aşamaları/panel + S0 + ustalık çekildi (EKRAN.md). Bulgular: (1) Ünite ekranı ilerleme kutusunda halka kırpılıyordu: eski ilerleme çubuğundan kalan ölü `.kao-unit-progress{height:5px;overflow:hidden}` kuralı yeni kutuyu eziyordu → ölü kurallar silindi (CSS küçüldü), design_contract'a koruma; (2) ders oynatıcı kavram tablosunda Arapça hücreler `[âyet-referansı, Arapça, okunuş]` üçlüsünden YANLIŞ eleman (referans "2:17:3") gösteriyordu → Arapça + okunuş çizilir (NOTE seq 105 bu kusurdu; 109 ders taranan test_kao2_lesson_flow +1 kontrol, kırmızı → yeşil).
+- evidence: kao2-duzeltme/evidence/K2F-37/EKRAN.md
+- changed-tests: test_kao2_design_contract (+koruma) · test_kao2_lesson_flow (+1 kontrol)
+- gates: kapilar.sh yalnız perf bütçesi + kabul'ün katı A-10 bandı kırmızı (makine hızı); diğer tüm kapılar PASS; tekrar-uret 10/10
+- pins: yayın pini DEĞİŞMEDİ (20261005b); quranLearnViews.js + kao.css canlıda eski haliyle (bir sonraki yayında yeni pin)
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ (390/320/karanlık) · yayın — · cihaz —
 - next: K2F-38

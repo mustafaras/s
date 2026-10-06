@@ -145,4 +145,13 @@ if (MODE === 'baseline') {
 // Kök arama kutusu yan düğmeyle paylaşılan dar alanda kesilmeyecek kısa yer tutucu taşır.
 assert.match(read('app/core/quranLearn.js'), /type="search" value="'\+esc\(query\)\+'" placeholder="Kök ara"/, 'kök arama yer tutucusu kısa ("Kök ara"), kesilmez');
 assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğrenme durumu bölümü üstteki karta yapışmaz');
+// Görsel QA (K2F-37 sonrası): "Ünite ilerlemesi" kutusu (halka + metin) eski 5 px'lik ilerleme çubuğu kuralından
+// yükseklik/kırpma MİRAS ALMAZ — aynı sınıf adıyla kalan ölü kural halkayı kırpıyordu (ekran görüntüsünde ")" yayı).
+{
+  const declared = [...kaoCss.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}@]+)\{([^{}]*)\}/g)]
+    .filter(m => m[1].split(',').some(sel => sel.trim() === '.kao-unit-progress')).map(m => m[2]).join(';');
+  assert.doesNotMatch(declared, /(?:^|;)\s*(?:max-)?height\s*:/, '.kao-unit-progress sabit yükseklik taşımaz (halka 44 px, kutu içeriğe göre büyür)');
+  assert.doesNotMatch(declared, /overflow\s*:\s*hidden/, '.kao-unit-progress halkayı kırpmaz');
+  assert.doesNotMatch(kaoCss, /\.kao-unit-progress\s+i\s*\{/, 'eski ilerleme çubuğu dolgusu (.kao-unit-progress i) ölü kural, kalmamalı');
+}
 console.log('KAO2 design contract: PASS');

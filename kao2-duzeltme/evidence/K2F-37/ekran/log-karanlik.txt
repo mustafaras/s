@@ -1,0 +1,60 @@
+origin: http://127.0.0.1:9000 token:false force:null
+tema: dark
+v01-home: sw=390 cw=390 dialogW=390 overflowX=false | Kapat Kur'an Arapçası Kur'an Arapçası Sıradaki Fâtiha · Ders 3 4 yeni kelime · ~3 dk Başla Yolun Seviye 1 · Namazın dili
+v02-units: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Yol Yolun Öğrenme yolu Önerilen üniteyi izle ya da istediğin durağı aç. Seviye 0 · Harfler ve okuma Sa
+v03-unit: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Yol Fâtiha Seviye 1 · Namazın dili Fâtiha Bitirince Her namazda okuduğun Fâtiha'yı kelime kelime anlayacaksın. %40 6 /
+v04-word: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Fâtiha asm asm ٱسْم Okunuş asm Telaffuzu dinle Anlamı ad, isim Türkçede Türkçede var: isim Kök س–م–و câmid isim (fi'l)
+v05-reader: sw=390 cw=390 dialogW=390 overflowX=false | ‹ asm İhlâs 20 kısa sûre İhlâs Kelimeler mushaf akışında; anlamı görmek için kelimeye dokun. İhlâs Mekke’de indi · 4 âye
+v06-settings: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Ayarlar Ayarlar Öğrenme ayarların Seçimlerin bu cihazda saklanır ve senkronla taşınır. Günlük hedef Gü
+v07-phonics: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Telaffuz Telaffuz stüdyosu Önce duy, sonra ayırt et Minimal çiftler, uzun ünlü, şedde, dinle-diz ve va
+v08-ayah: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Günün âyeti Bugün anlayabildiğin âyet Alak · 14. âyet Anlaşılan âyet sayısı: 0 Kelimelerin %100’ini ta
+v09-prayer: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Namazda ne diyorum Seviye 1 · Namazda ne diyorum Bir rekâtta söylediklerin Tanıdığın kelimelerin anlam
+v10-stats: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası İlerleme İlerleme Kaç kelime tanıdığını, bu haftanı ve tekrar doğruluğunu burada görürsün. Tanıdık kel
+v11-gate: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Harf kontrolü Seviye 0 Harf · ses · hareke 20 kısa seçim · utanma yok, yalnız başlangıç yerini buluyor
+v12-grammar: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Gramer notları Keşfet Gramer notları Bir kez oku, sonra kavramı ders içinde uygula. Seviye 1 · Namazın
+v13-concept: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Gramer notları Fiil önce gelir Gramer Fiil önce gelir Türkçede iş cümlenin sonunda söylenir: 'İbrahim temelleri yüksel
+v14-roots: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Kök aileleri Kök aileleri Bir kök, bir aile Öğrenme sırasındaki 73 aile; altında tüm sözlüğü keşfedebi
+v15-sources: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Hakkında ve kaynaklar Hakkında ve kaynaklar Hakkında ve kaynaklar Kur’an Arapçası öğrenme modülü. Öğre
+l01-goal: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Bugünün dersi Yalnız sana Kulluğun yalnız O'na yöneldiğini anlatan cümleyi çözeceksin. Bu derste 5 kelimeyle
+l02-intro: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 1 / 4 دِين dîn Dinle hesap, karşılık · din; itaat, yol Türkçedeki akrabası: din Fâtiha içindek
+l03-intro: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 2 / 4 إِيَّا iyyâ Dinle yalnız (sana, beni) Fâtiha içindeki yeri إِيَّاكَ yalnız sana Örnek ây
+l04-intro: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 3 / 4 عَبَدَ ʿabada Dinle kulluk etti, ibadet etti Türkçedeki akrabası: ibadet Fâtiha içindeki
+l05-intro: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 4 / 4 ٱسْتَعِينُ astaʿînu Dinle yardım dileriz Türkçedeki akrabası: iane Fâtiha içindeki yeri 
+l06-concept: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Kavram İki isim yan yana: …nın …ı İki ismi yan yana koyunca Türkçedeki '-nın … -ı' bağı kurulur; sıra Türkçe
+l07-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 1 / 10 يَوْم yavm Dinle Doğal hız dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış hiçbir zaman, ebed
+l07-panel-dogru: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 1 / 10 يَوْم yavm Dinle Doğal hız dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış hiçbir zaman, ebediyen ✓ Doğru cevap g
+l08-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 2 / 10 دِين dîn Dinle Doğal hız dikkat · Türkçede var: din · 1:4'te 'hesap / ceza' anlamında; Türkçede yalnız 'inanç sistemi' h
+l08-panel-yanlis: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 2 / 11 دِين dîn Dinle Doğal hız dikkat · Türkçede var: din · 1:4'te 'hesap / ceza' anlamında; Türkçede yalnız 'inanç sistemi' ✓ Doğru cevap hesap, 
+l09-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 3 / 11 إِيَّا iyyâ Dinle Doğal hız ancak, -den başka -den, -dan Firavun yalnız (sana, beni)
+l09-panel-dogru: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 3 / 11 إِيَّا iyyâ Dinle Doğal hız ancak, -den başka -den, -dan Firavun ✓ Doğru cevap yalnız (sana, beni) Doğru Doğru — yalnız (sana, beni) Aslında
+l10-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 4 / 11 عَبَدَ ʿabada Dinle Doğal hız Türkçede var: ibadet yarattı kıldı, yaptı kulluk etti, ibadet etti yaptı, işledi
+l10-panel-yanlis: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 4 / 12 عَبَدَ ʿabada Dinle Doğal hız Türkçede var: ibadet ✕ Senin seçimin yarattı kıldı, yaptı ✓ Doğru cevap kulluk etti, ibadet etti yaptı, işledi
+l11-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 5 / 12 ٱسْتَعِينُ astaʿînu Dinle Doğal hız Türkçede var: iane yardım dileriz dedi, söyledi yaptı, işledi geldi
+l11-panel-dogru: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 5 / 12 ٱسْتَعِينُ astaʿînu Dinle Doğal hız Türkçede var: iane ✓ Doğru cevap yardım dileriz dedi, söyledi yaptı, işledi geldi Doğru Doğru — yardım d
+l12-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 6 / 12 Dinlediğin kelimenin anlamını seç Dinle Doğal hız dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına ka
+l12-panel-yanlis: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 6 / 13 Dinlediğin kelimenin anlamını seç Dinle Doğal hız dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış ✕ Senin seçimin
+l13-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Arapçayı seç 7 / 13 gün Dinle Doğal hız dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış يَوْم yavm لَمَّا lammâ
+l13-panel-dogru: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Arapçayı seç 7 / 13 gün Dinle Doğal hız dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış ✓ Doğru cevap يَوْم yavm لَمَّا lammâ إِذ i
+l14-gorev-order: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Kelime dizme 8 / 13 'hesap gününün sahibi' tamlamasını Arapça sırayla diz. مَـٰلِكِ mâliki Anlamı: hesap gününün sahibi İpucu: parça yukar
+l14-panel-yanlis: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Kelime dizme 8 / 13 'hesap gününün sahibi' tamlamasını Arapça sırayla diz. مَـٰلِكِ mâliki Anlamı: hesap gününün sahibi İpucu: parça yukarıdaki kelimeyle başl
+l15-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Parça çevir 9 / 13 Doğru çeviri hangisi? مَـٰلِكِ يَوْمِ ٱلدِّينِ mâliki yavmi al-dîni Âyet 1:4 âlemlerin Rabbi Allah'ın size olan nimetin
+l15-panel-dogru: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Parça çevir 9 / 13 Doğru çeviri hangisi? مَـٰلِكِ يَوْمِ ٱلدِّينِ mâliki yavmi al-dîni Âyet 1:4 âlemlerin Rabbi Allah'ın size olan nimetini hatırlayın Allah'ı
+l16-gorev-order: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Kelime dizme 10 / 13 Parçayı diz. وَٱذْكُرُوا۟ va-azkurû Anlamı: Allah'ın size olan nimetini hatırlayın İpucu: parça yukarıdaki kelimeyle 
+l16-panel-yanlis: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Kelime dizme 10 / 13 Parçayı diz. وَٱذْكُرُوا۟ va-azkurû Anlamı: Allah'ın size olan nimetini hatırlayın İpucu: parça yukarıdaki kelimeyle başlar وَٱذْكُرُوا۟ 
+l17-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 11 / 13 دِين dîn Dinle Doğal hız dikkat · Türkçede var: din · 1:4'te 'hesap / ceza' anlamında; Türkçede yalnız 'inanç sistemi' 
+l17-panel-dogru: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 11 / 13 دِين dîn Dinle Doğal hız dikkat · Türkçede var: din · 1:4'te 'hesap / ceza' anlamında; Türkçede yalnız 'inanç sistemi' insanlar yer, yeryüz
+l18-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 12 / 13 عَبَدَ ʿabada Dinle Doğal hız Türkçede var: ibadet yalanladı diledi, istedi oldu, idi kulluk etti, ibadet etti
+l18-panel-yanlis: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 12 / 13 عَبَدَ ʿabada Dinle Doğal hız Türkçede var: ibadet ✕ Senin seçimin yalanladı diledi, istedi oldu, idi ✓ Doğru cevap kulluk etti, ibadet ett
+l19-gorev-undefined: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 13 / 13 Dinlediğin kelimenin anlamını seç Dinle Doğal hız dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına k
+l19-panel-dogru: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Anlamı seç 13 / 13 Dinlediğin kelimenin anlamını seç Dinle Doğal hız dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış yazılı kitap -
+l20-apply: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Çapa metni Fâtiha Yeni kelimeler vurgulu; diğer kelimeler çapa metninde yerinde. بِسْمِ ismiyle ٱللَّهِ Alla
+l21-summary: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Ders tamamlandı Yalnız sana tamamlandı Bu derste tanıştıkların دِين hesap, karşılık إِيَّا yalnız (sana, ben
+s0-aşama-1: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 1 / 4 · Açıklama Aynı gövdeyi paylaşan harfleri n
+s0-aşama-2: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 2 / 4 · Dinle ve gör Dinle ve gör بَأْس savaş, şi
+s0-aşama-3: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma Soru 1 / 8 · Doğru: 0 Bu harf h
+s0-aşama-3-cevap: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma Soru 1 / 8 · Doğru: 1 Bu harf h
+s0-aşama-4: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma Soru 2 / 8 · Doğru: 1 Bu harf h
+s0-aşama-4-cevap: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma Soru 2 / 8 · Doğru: 2 Bu harf h
+z1-ayarlar-alt: sw=390 cw=390 dialogW=390 overflowX=false | ‹ Kur'an Arapçası Ayarlar Ayarlar Öğrenme ayarların Seçimlerin bu cihazda saklanır ve senkronla taşınır. Günlük hedef Gü
+z2-ustalik-baslangic: sw=390 cw=390 dialogW=390 overflowX=false | ✕ Ünite 1 · Fâtiha · Ustalık kontrolü Bugünün dersi Ustalık: Fâtiha Önce çapa metnini dokunmadan oku, sonra 10 soruluk karma testi geç. Geçm
+z3-tekrar-sonrasi-ana: sw=390 cw=390 dialogW=390 overflowX=false | Kapat Kur'an Arapçası Kur'an Arapçası Sıradaki Ustalık: Fâtiha Çapa metnini dokunmadan oku + karma test · ~4 dk Ustalığa başla Şimdilik atla

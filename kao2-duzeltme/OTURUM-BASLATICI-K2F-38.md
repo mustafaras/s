@@ -55,4 +55,4 @@ Bu oturum devrinden ek notlar (2026-10-05, K2F-35/36 ve ekran kanıtı turu):
 - Ağ: `mustafaras.github.io` bu oturumlarda egress ile engelliydi; canlı bayt doğrulaması kullanıcı terminalinde `curl | shasum -a 256` ile yapıldı (K2F-35 YAYIN.md).
 - Pin değişen yayında yalnız kullanıcı "canlıya al" derse push/deploy; K2F-36 gibi yalnız test/kanıt commit'leri pini değiştirmez.
 - K2F-37 devri: kaynakta yayında OLMAYAN fark var (quranLearn.js + quranLearnViews.js: Arapça lang/dir sarmalayıcıları, kök arama aria-label); canlı pin 20261005b bunları taşımaz. Yeni yayında pin yükselt. a11y matrisi 445 yüzey/≈20 sn; yeni kapsam gerekirse yalnız `buildMatrix()`e ekle (görünümler kaynaktan türetilir).
-- LEDGER NOTE seq 105 açık (kavram tablosunda "Arapça" sütununda referans); K2F-38 kapsamı değil.
+- Ek (LEDGER seq 106, yerel): ünite halka CSS düzeltmesi + ders kavram tablosu Arapça/okunuş düzeltmesi de yayında değil; yayında quranLearnViews.js + kao.css + quranLearn.js için yeni pin. Ekran taraması: `tools/gorsel-qa/shoot-modal.mjs`.

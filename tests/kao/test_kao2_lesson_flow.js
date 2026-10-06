@@ -441,4 +441,35 @@ check('K2F-26 ek tur: Arapça sekmesinde kartı geri getirince odak yeni ders gi
   assert.deepEqual(other.calls.restore, [], 'Arapça dışında odak çağrısı olmamalı');
 });
 
+check('K2F-37 ek (ekran görüntüsü): ders oynatıcıdaki kavram tablosu hücrelerinde Arapça + okunuş gösterilir, çıplak âyet referansı (2:17:3) gösterilmez', () => {
+  const t = bootKao();
+  freshUser(t);
+  const grammar = t.win.QuranGrammarV1, cur = t.win.QuranCurriculumV2;
+  const conceptLessons = [];
+  cur.units.forEach((u) => u.lessons.forEach((l) => conceptLessons.push(l.id)));
+  assert.equal(conceptLessons.length, 109, 'tüm dersler taranır; kavram aşaması olmayan atlanır');
+  let tables = 0, arabicCells = 0;
+  const bad = [];
+  for (const lessonId of conceptLessons) {
+    assert.equal(t.api.kaoLesson('start', lessonId), true);
+    const plan = t.ui.kaoLesson.plan;
+    const at = plan.findIndex((item) => item.kind === 'concept');
+    if (at < 0) continue;
+    t.ui.kaoLesson.at = at; t.ui.kaoLesson.phase = 'lesson';
+    const html = t.api.kaoOverlayHTML(t.NOW).replace(/&#39;/g, "'");
+    for (const table of html.match(/<table class="kao-lesson-table">[\s\S]*?<\/table>/g) || []) {
+      tables += 1;
+      for (const cell of table.match(/<td>[\s\S]*?<\/td>/g) || []) {
+        const inner = text(cell);
+        if (/^\d+:\d+(?::\d+)?$/.test(inner)) bad.push(`${lessonId}: ${inner}`);
+        if (/lang="ar"/.test(cell)) arabicCells += 1;
+      }
+    }
+    t.api.kaoLesson('exit');
+  }
+  assert.ok(grammar.concepts.some((c) => (c.tables || []).some((tb) => (tb.rows || []).some((r) => (r.cells || []).some(Array.isArray)))), 'veri: Arapça hücreli tablo yok');
+  assert.deepEqual(bad, [], `tablo hücresinde çıplak referans: ${bad.slice(0, 4).join(' | ')}`);
+  assert.ok(tables >= 10 && arabicCells >= 30, `Arapça hücreler çizilmiyor (tablo ${tables}, Arapça hücre ${arabicCells})`);
+});
+
 console.log(`KAO2-12 lesson flow: PASS (${passed} kontrol)`);

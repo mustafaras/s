@@ -1109,3 +1109,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - gates: kapilar.sh yalnız perf bütçesi + kabul'ün katı A-10 bandı kırmızı (makine hızı); KAO2_ACCEPT_SLOW_HOST=1 ile kabul 10/10; diğer kapılar PASS; css 13,872/14 KiB
 - evidence-levels: kaynak/test ✓ · yerel görsel+tarama ✓ · yayın — · cihaz —
 - next: K2F-38
+
+## seq 108 · 2026-10-06 · RELEASE · K2F-37
+- status: done (bayt eşitliği kullanıcıda bekliyor)
+- title: K2F-37 kaynakları canlıya (pin 20261006a)
+- decision: kullanıcı "canlıya al" dedi; main ff-only b345a6c1..8558b2cc, run 37457305595 success.
+- evidence: kao2-duzeltme/evidence/K2F-37/YAYIN.md
+- evidence-levels: kaynak/test ✓ · yerel görsel+tarama ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor · cihaz —
+- next: K2F-38

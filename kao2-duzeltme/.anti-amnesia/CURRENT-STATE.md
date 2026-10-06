@@ -2,16 +2,16 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-38
-lastSeq: 107
+lastSeq: 108
 status: active
 -->
 
-Son güncelleme: 2026-10-05 · LEDGER seq 107 · K2F-00…37 tamam (38/44), sıradaki K2F-38. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-05 · LEDGER seq 108 · K2F-00…37 tamam (38/44), sıradaki K2F-38. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
 **Metin taşma taraması (seq 107):** gerçek tarayıcıda her yüzey 390/320/200 px'te tarandı; 390/320'de metin taşması/kırpılması 0, 200 px'te 322 → 4 (yalnız kaydırmalı alanlar). Düzeltmeler `app/kao.css`; ayrıntı [EKRAN-TASMA.md](../evidence/K2F-37/EKRAN-TASMA.md).
-**Ek (seq 106, yerel, canlıda değil):** modal ekran görüntüsü taraması (390/320/karanlık, [EKRAN.md](../evidence/K2F-37/EKRAN.md)) iki kusur buldu ve düzeltti: ünite ilerleme kutusunda kırpılan halka (ölü CSS kuralı) ve ders kavram tablosunda Arapça yerine âyet referansı gösteren hücreler. Yayın bekliyor: `quranLearn.js`, `quranLearnViews.js`, `kao.css` canlı pin 20261005b'den farklıdır.
-K2F-37 bitti (**kaynakta değişti, canlıda DEĞİL**): a11y/tasarım matrisi 445 yüzey (18 görünüm kaynaktan türetilir × boş/tohumlu + ilk açılış + ders aşamaları/panel + ustalık/onarım + S0 + odak modu) ve 42 dokunma-hedefi imzası ≥44 px; matris 3 gerçek kusur buldu ve düzeltildi (gate başlıklarında/kavram tablosunda lang/dir'siz Arapça, kök arama kutusunda etiket yok). Ayrıntı: [KANIT.md](../evidence/K2F-37/KANIT.md). Yayın pini değişmedi (20261005b); bir sonraki yayında quranLearn.js + quranLearnViews.js için yeni pin gerekir.
+**Ek (seq 106, canlıya alındı seq 108):** modal ekran görüntüsü taraması (390/320/karanlık, [EKRAN.md](../evidence/K2F-37/EKRAN.md)) iki kusur buldu ve düzeltti: ünite ilerleme kutusunda kırpılan halka (ölü CSS kuralı) ve ders kavram tablosunda Arapça yerine âyet referansı gösteren hücreler. Canlı pin 20261006a.
+K2F-37 bitti ve **CANLIYA ALINDI** (main 8558b2cc, pin 20261006a, run 37457305595 success; bayt eşitliği kullanıcı terminalinde bekliyor — YAYIN.md): a11y/tasarım matrisi 445 yüzey (18 görünüm kaynaktan türetilir × boş/tohumlu + ilk açılış + ders aşamaları/panel + ustalık/onarım + S0 + odak modu) ve 42 dokunma-hedefi imzası ≥44 px; matris 3 gerçek kusur buldu ve düzeltildi (gate başlıklarında/kavram tablosunda lang/dir'siz Arapça, kök arama kutusunda etiket yok). Ayrıntı: [KANIT.md](../evidence/K2F-37/KANIT.md). 
 **Ek (seq 102–103): CANLIYA ALINDI (main 59160810, pin 20261005b, run 37349172650 success; bayt eşitliği kullanıcı terminalinde bekliyor — YAYIN-2.md):** ekran görüntüsü kanıtı üretildi ([EKRAN.md](../evidence/K2F-35/EKRAN.md)); görüntüde bulunan kalan "N%" biçimi (Bugün kapsam satırı + tekrar doğruluğu `pct`) kaynakta `%N` yapıldı. Eski `47%’i` metni artık canlıda düzeltildi.
 K2F-36 bitti (**yalnız test/kanıt; main'e alındı, run 37343918991 success, varlıklar bayt aynı, pin 20261005a**): `test_kao2_kabul.js` baştan yazıldı — A-1…A-10 gerçek handler/render/alt süreç ölçümü (A-1 iki yol 3 dokunuş · A-2 109 ders/1097 görev/524 lemma ihlal 0 · A-3 66 yüzey · A-4 9 durum + 12 ünite simülasyonu · A-5 · A-6 v1 ilerler · A-7 · A-8 gerçek kaoContinue · A-9 188/188 dosya çıkış 0 · A-10 bütçe). Mutasyon kanıtı kayıtlı. `KAO2_ACCEPT_SLOW_HOST=1` yalnız A-10'un makineye bağlı göreli p95 bandını atlar. Ayrıntı: [KANIT.md](../evidence/K2F-36/KANIT.md), [A-KABUL.md](../evidence/K2F-36/A-KABUL.md).
 Önceki: K2F-35 bitti ve canlıya alındı (bkz. aşağı).
@@ -33,7 +33,7 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
-- Yayın pini (canlı): `20261005b`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
+- Yayın pini (canlı): `20261006a`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
 - Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 116,270 KiB (K2F-34 sonrası)** · p95 4,2 ms.

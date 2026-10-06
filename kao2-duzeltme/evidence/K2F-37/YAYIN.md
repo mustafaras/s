@@ -1,0 +1,8 @@
+# K2F-37 — Yayın kaydı (kullanıcı isteği "canlıya al", 2026-10-06)
+- Onay: kullanıcı "tüm metin taşma durumlarını kontrol et ve canlıya al ve sonraki adım için starter yaz" (2026-10-06).
+- Kapsam: K2F-37 kaynakları — a11y matrisinin bulduğu düzeltmeler (Arapça lang/dir sarmalayıcıları, kök arama etiketi), modal taramasının düzeltmeleri (ünite halka CSS ölü kuralı, ders kavram tablosu Arapça+okunuş) ve metin taşma düzeltmeleri (`kao.css`). Pin `20261005b` → **`20261006a`** (index.html ×15, sw.js ×16, 8 pin taşıyan test + test_kao2_curriculum).
+- Commit: `8558b2cc` · `main` ff-only `b345a6c1..8558b2cc` · force yok · Pages run **37457305595**: validate + deploy success.
+- Kapılar (pin öncesi): tests/app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync PASS; tekrar-uret 10/10; kabul `KAO2_ACCEPT_SLOW_HOST=1` ile 10/10; yalnız perf göreli bandı bu konteynerde kırmızı (makine hızı); css 13,872/14 KiB.
+- Beklenen canlı özetleri (`git show 8558b2cc:<dosya> | sha256sum`, ilk 16 hane): index.html `6709025852429195` · sw.js `2c3ff238547a3c69` · app/kao.css `e51d510bca61cfe8` · quranLearn.js `0fd88f611da4466f` · quranLearnFlow.js `1bde07c50138d8c8` · quranLearnViews.js `300a062e4968d3ca` · quranCurriculumV2.js `ae7b20609031ac33` · app.js `157f88ebb81dce3f` · constants.js `b241181406d303ae`; `SW_VERSION = '20261006a'`.
+- Canlı bayt eşitliği: bu oturumun egress'i github.io'yu engelliyor → **kullanıcı terminalinde doğrulanmalı** (komut sohbette verildi). Henüz DOĞRULANMADI.
+- Kanıt düzeyi: kaynak/test ✓ · yerel görsel+tarama ✓ · yayın: run success ✓, bayt eşitliği bekliyor · cihaz — (kullanıcıda)

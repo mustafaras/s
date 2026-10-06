@@ -10,6 +10,31 @@ const width = Number(widthArg) || 390;
 fs.mkdirSync(out, { recursive: true });
 const b = await launch(root, path.join(os.tmpdir(), prof), { width, height: 844 });
 const log = [];
+
+const issues = [];
+const SCAN = `(function(){
+  var d=document.querySelector('[role=dialog]'); if(!d) return ['DİYALOG YOK'];
+  var dr=d.getBoundingClientRect(), out=[], all=d.querySelectorAll('*');
+  function path(el){ var n=el.tagName.toLowerCase(), c=(el.getAttribute('class')||'').trim().split(/\\s+/).slice(0,2).join('.'); return n+(c?'.'+c:''); }
+  function hasText(el){ return (el.textContent||'').replace(/\\s+/g,'').length>0 && !el.querySelector('svg') || (el.childNodes.length&&[].some.call(el.childNodes,function(n){return n.nodeType===3&&n.textContent.trim()})); }
+  function scrollAnc(el){ for(var p=el.parentElement;p&&p!==d&&!(p.classList&&(p.classList.contains('kao-body')||/kao-dialog/.test(p.className)));p=p.parentElement){ var cs=getComputedStyle(p); if(/(auto|scroll)/.test(cs.overflowX)) return true; } return false; }
+  function add(kind,el,extra){ out.push(kind+' | '+path(el)+' | "'+(el.textContent||'').replace(/\\s+/g,' ').trim().slice(0,40)+'" '+(extra||'')); }
+  for(var i=0;i<all.length;i++){ var el=all[i], cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') continue;
+    var r=el.getBoundingClientRect(); if(r.width===0&&r.height===0) continue;
+    if(el.closest('.kao-sr-only')) continue; // ekran okuyucuya özel (bilerek 1 px)
+    if(el.closest('svg')&&el.tagName.toLowerCase()!=='svg') continue;
+    if(!scrollAnc(el)&&(r.right>dr.right+1||r.left<dr.left-1)&&hasText(el)) add('DIŞARI-TAŞAR',el,'right='+Math.round(r.right)+' dialog='+Math.round(dr.right));
+    if(/(auto|scroll)/.test(cs.overflowX)&&el.scrollWidth>el.clientWidth+1&&el!==d&&!el.classList.contains('kao-body')&&!/kao-dialog/.test(el.className)) add('KAYDIRMALI-ALAN(bilgi)',el,'sw='+el.scrollWidth+' cw='+el.clientWidth);
+    if(cs.overflowX==='visible'&&cs.display!=='inline'&&el.scrollWidth>el.clientWidth+1&&hasText(el)&&!scrollAnc(el)&&el.children.length===0) add('METİN-KUTUDAN-TAŞAR',el,'sw='+el.scrollWidth+' cw='+el.clientWidth);
+    var clipX=/(hidden|clip)/.test(cs.overflowX), clipY=/(hidden|clip)/.test(cs.overflowY);
+    if(clipX&&el.scrollWidth>el.clientWidth+1&&hasText(el)&&el.getAttribute('role')!=='progressbar') add('YATAY-KIRPILIR',el,'sw='+el.scrollWidth+' cw='+el.clientWidth);
+    if(clipY&&el.scrollHeight>el.clientHeight+1&&hasText(el)&&el.getAttribute('role')!=='progressbar') add('DİKEY-KIRPILIR',el,'sh='+el.scrollHeight+' ch='+el.clientHeight);
+    if(cs.textOverflow==='ellipsis'&&el.scrollWidth>el.clientWidth+1) add('ÜÇ-NOKTA',el,'sw='+el.scrollWidth+' cw='+el.clientWidth);
+    if(cs.webkitLineClamp&&cs.webkitLineClamp!=='none'&&el.scrollHeight>el.clientHeight+1) add('SATIR-SINIRI',el);
+    if(cs.whiteSpace==='nowrap'&&hasText(el)&&el.scrollWidth>el.clientWidth+1&&!scrollAnc(el)) add('NOWRAP-TAŞAR',el,'sw='+el.scrollWidth+' cw='+el.clientWidth);
+  }
+  var b=d.querySelector('.kao-body'); if(b&&b.scrollWidth>b.clientWidth+1){ var wide=[].slice.call(b.querySelectorAll('*')).filter(function(x){ if(x.closest('.kao-sr-only')||x.closest('svg')) return false; var q=x.getBoundingClientRect(); return q.width>0&&q.right>dr.right+1&&!scrollAnc(x); }).sort(function(x,y){return y.getBoundingClientRect().right-x.getBoundingClientRect().right}).slice(0,3).map(function(x){return path(x)+'@'+Math.round(x.getBoundingClientRect().right)+'["'+(x.textContent||'').replace(/\\s+/g,' ').trim().slice(0,24)+'"]'}); out.push('GÖVDE-YATAY-KAYDIRMA | .kao-body sw='+b.scrollWidth+' cw='+b.clientWidth+' | en geniş: '+wide.join(' ; ')); }
+  return out; })()`;
 const snap = async (name, js, dump = 160) => {
   try {
     if (js) await b.eval(js);
@@ -17,6 +42,7 @@ const snap = async (name, js, dump = 160) => {
     await b.shot(path.join(out, name + '.png'));
     const m = await b.eval(`(function(){var d=document.querySelector('[role=dialog]');if(!d)return 'DİYALOG YOK';var s=d.querySelector('.kao-body')||d;return 'sw='+document.documentElement.scrollWidth+' cw='+document.documentElement.clientWidth+' dialogW='+Math.round(d.getBoundingClientRect().width)+' overflowX='+(s.scrollWidth>s.clientWidth+1)+' | '+d.innerText.replace(/\\s+/g,' ').slice(0,${dump})})()`);
     log.push(`${name}: ${m}`);
+    if (process.env.KAO_QA_SCAN === '1') { const found = await b.eval(SCAN); for (const f of found) issues.push(`${name} @${width}px: ${f}`); }
   } catch (e) { log.push(`${name}: SKIP ${String(e.message).slice(0, 140)}`); }
 };
 await b.goto('http://127.0.0.1:9000/index.html?v3done=1');
@@ -86,6 +112,27 @@ await b.eval(`App.kaoLesson('exit')`);
 await snap('z3-tekrar-sonrasi-ana', null, 140);
 // İlk açılış (taze profil)
 await b.eval(`ui.kaoOpen&&App.kaoClose&&App.kaoClose()`);
+// İlk açılış (taze profil): adım 1, 2, yerleştirme okuma/dinleme, 3
+if (process.env.KAO_QA_SCAN === '1') {
+  await b.close();
+  const e = await launch(root, path.join(os.tmpdir(), prof + '-e'), { width, height: 844 });
+  await e.goto('http://127.0.0.1:9000/index.html?v3done=1');
+  await e.eval(`localStorage.setItem('seyma-reset-v1', JSON.stringify((function(){var d=window.createDefaultData();d.settings.locationEnabled=true;return d})()))`);
+  await e.goto('http://127.0.0.1:9000/index.html?v3done=1');
+  await e.eval(`ui.authUnlocked=true; ui.locationGateState='granted'; true`);
+  await e.eval(`SeymaQuranLearn.kaoOpen('home')`);
+  const scanE = async (name) => { await e.wait(500); await e.shot(path.join(out, name + '.png')); for (const f of await e.eval(SCAN)) issues.push(`${name} @${width}px: ${f}`); };
+  await scanE('o1-ilk-acilis-1');
+  await e.eval(`App.kaoOnboard('next')`); await scanE('o2-ilk-acilis-2');
+  await e.eval(`App.kaoOnboard('choose','slow')`); await scanE('o3-yerlestirme-okuma');
+  const tasks = JSON.parse(await e.eval(`JSON.stringify(SeymaQuranLearn.kaoPlacementTasks())`));
+  for (const t of tasks.reading) await e.eval(`App.kaoOnboard('answer', ${JSON.stringify(t.answer)})`);
+  await scanE('o4-yerlestirme-dinleme');
+  for (const t of tasks.listening) await e.eval(`App.kaoOnboard('answer', ${JSON.stringify(t.answer)})`);
+  await scanE('o5-ilk-acilis-3');
+  await e.close();
+} else { await b.close(); }
+fs.writeFileSync(path.join(out, 'issues.txt'), issues.join('\n') + '\n');
+console.log('TARAMA: ' + issues.length + ' bulgu'); console.log(issues.slice(0, 60).join('\n'));
 fs.writeFileSync(path.join(out, 'log.txt'), log.join('\n') + '\nblocked-external: ' + b.blocked.length + '\n');
 console.log(log.join('\n'));
-await b.close();

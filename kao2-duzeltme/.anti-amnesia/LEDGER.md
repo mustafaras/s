@@ -1099,3 +1099,13 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - pins: yayın pini DEĞİŞMEDİ (20261005b); quranLearnViews.js + kao.css canlıda eski haliyle (bir sonraki yayında yeni pin)
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ (390/320/karanlık) · yayın — · cihaz —
 - next: K2F-38
+
+## seq 107 · 2026-10-06 · FIX · K2F-37
+- status: closed (yerel; yayın seq 108)
+- title: Metin taşma taraması: 200 px'te 322 bulgu → 4 (kaydırmalı alanlar); 390/320 px temiz
+- decision: kullanıcı "tüm metin taşma durumlarını kontrol et" dedi → gerçek tarayıcı taraması (EKRAN-TASMA.md). 390/320 px: metin taşması/kırpılması 0 (yalnız 3 bilerek kaydırmalı alan). 200 px (≈%200 yakınlaştırma) kök nedenleri CSS'te düzeltildi (ızgara minmax(0,1fr), kaydırmalı tablo, başlık overflow-wrap, ≤260 px uygula/NavBar düzeni). Araç: shoot-modal.mjs KAO_QA_SCAN=1. Koruma: design_contract +6 CSS sözleşmesi.
+- evidence: kao2-duzeltme/evidence/K2F-37/EKRAN-TASMA.md
+- changed-tests: test_kao2_design_contract (+taşma sözleşmeleri)
+- gates: kapilar.sh yalnız perf bütçesi + kabul'ün katı A-10 bandı kırmızı (makine hızı); KAO2_ACCEPT_SLOW_HOST=1 ile kabul 10/10; diğer kapılar PASS; css 13,872/14 KiB
+- evidence-levels: kaynak/test ✓ · yerel görsel+tarama ✓ · yayın — · cihaz —
+- next: K2F-38

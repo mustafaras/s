@@ -458,3 +458,10 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-unit-mastery-detail{margin-inline-start:auto;color:var(--kao-label-2);font-size:var(--f-footnote)}
 .kao-unit-mastery[data-mastery-state="passed"] .kao-unit-step-mark{color:var(--kao-ok)}
 .kao-unit-mastery[data-mastery-state="current"] .kao-unit-step-mark,.kao-unit-mastery[data-mastery-state="repair"] .kao-unit-step-mark{color:var(--kao-tint)}
+/* K2F-37 ek (metin taşma taraması, %200 yakınlaştırma ≈200 px): ızgara parçaları içeriğe göre değil kabuğa göre daralır; geniş tablo kaydırılır. */
+.kao-stats,.kao-prayer,.kao-map{grid-template-columns:minmax(0,1fr)}
+.kao-stats-table{display:block;max-width:100%;overflow-x:auto}
+.kao-prayer-word,.kao-section-head>*{min-width:0;max-width:100%}
+.kao-lesson-apply-word span,.kao-body h2,.kao-body h3,.kao-readability button,.kao-lesson-grid button{overflow-wrap:anywhere}
+.kao-week-days{grid-template-columns:repeat(7,minmax(0,1fr))}
+@media(max-width:260px){.kao-navbar{grid-template-columns:minmax(0,1fr) auto}.kao-navbar-title{grid-column:1/-1;grid-row:2}.kao-lesson-apply-word{grid-template-columns:minmax(0,1fr)}.kao-lesson-apply-word span:first-child{text-align:center}}

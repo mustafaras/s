@@ -154,4 +154,14 @@ assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğr
   assert.doesNotMatch(declared, /overflow\s*:\s*hidden/, '.kao-unit-progress halkayı kırpmaz');
   assert.doesNotMatch(kaoCss, /\.kao-unit-progress\s+i\s*\{/, 'eski ilerleme çubuğu dolgusu (.kao-unit-progress i) ölü kural, kalmamalı');
 }
+// Metin taşma taraması (K2F-37 ek, %200 yakınlaştırma ≈200 px): ızgara parçaları kabuğa göre daralır, uzun sözcük kırılır, geniş tablo kaydırılır.
+// Gerçek tarayıcı taraması: tools/gorsel-qa/shoot-modal.mjs (KAO_QA_SCAN=1) — 390/320/200 px'te yalnız kaydırmalı alanlar kalır.
+{
+  assert.match(kaoCss, /\.kao-stats,\.kao-prayer,\.kao-map\{grid-template-columns:minmax\(0,1fr\)\}/, 'ızgara kapları tek sütun minmax(0,1fr): içeriğin min-content genişliği kabuğu aşmaz');
+  assert.match(kaoCss, /\.kao-stats-table\{display:block;max-width:100%;overflow-x:auto\}/, 'geniş İlerleme tablosu kaydırılır');
+  assert.match(kaoCss, /\.kao-body h2,\.kao-body h3[^{]*\{overflow-wrap:anywhere\}/, 'başlıklarda uzun sözcük kırılır');
+  assert.match(kaoCss, /\.kao-week-days\{grid-template-columns:repeat\(7,minmax\(0,1fr\)\)\}/, 'hafta şeridi 7 eşit daralabilir sütun');
+  assert.match(kaoCss, /@media\(max-width:260px\)\{[^}]*\.kao-navbar\{grid-template-columns:minmax\(0,1fr\) auto\}[^}]*\.kao-navbar-title\{grid-column:1\/-1;grid-row:2\}/, 'çok dar ekranda NavBar başlığı ikinci satıra iner');
+  assert.match(kaoCss, /\.kao-lesson-grid button[^{]*\{overflow-wrap:anywhere\}/, 'harf kontrolü mini ders düğmeleri sarar');
+}
 console.log('KAO2 design contract: PASS');

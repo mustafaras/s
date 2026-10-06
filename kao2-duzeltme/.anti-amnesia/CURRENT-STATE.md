@@ -2,13 +2,14 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-38
-lastSeq: 106
+lastSeq: 107
 status: active
 -->
 
-Son güncelleme: 2026-10-05 · LEDGER seq 106 · K2F-00…37 tamam (38/44), sıradaki K2F-38. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-05 · LEDGER seq 107 · K2F-00…37 tamam (38/44), sıradaki K2F-38. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
+**Metin taşma taraması (seq 107):** gerçek tarayıcıda her yüzey 390/320/200 px'te tarandı; 390/320'de metin taşması/kırpılması 0, 200 px'te 322 → 4 (yalnız kaydırmalı alanlar). Düzeltmeler `app/kao.css`; ayrıntı [EKRAN-TASMA.md](../evidence/K2F-37/EKRAN-TASMA.md).
 **Ek (seq 106, yerel, canlıda değil):** modal ekran görüntüsü taraması (390/320/karanlık, [EKRAN.md](../evidence/K2F-37/EKRAN.md)) iki kusur buldu ve düzeltti: ünite ilerleme kutusunda kırpılan halka (ölü CSS kuralı) ve ders kavram tablosunda Arapça yerine âyet referansı gösteren hücreler. Yayın bekliyor: `quranLearn.js`, `quranLearnViews.js`, `kao.css` canlı pin 20261005b'den farklıdır.
 K2F-37 bitti (**kaynakta değişti, canlıda DEĞİL**): a11y/tasarım matrisi 445 yüzey (18 görünüm kaynaktan türetilir × boş/tohumlu + ilk açılış + ders aşamaları/panel + ustalık/onarım + S0 + odak modu) ve 42 dokunma-hedefi imzası ≥44 px; matris 3 gerçek kusur buldu ve düzeltildi (gate başlıklarında/kavram tablosunda lang/dir'siz Arapça, kök arama kutusunda etiket yok). Ayrıntı: [KANIT.md](../evidence/K2F-37/KANIT.md). Yayın pini değişmedi (20261005b); bir sonraki yayında quranLearn.js + quranLearnViews.js için yeni pin gerekir.
 **Ek (seq 102–103): CANLIYA ALINDI (main 59160810, pin 20261005b, run 37349172650 success; bayt eşitliği kullanıcı terminalinde bekliyor — YAYIN-2.md):** ekran görüntüsü kanıtı üretildi ([EKRAN.md](../evidence/K2F-35/EKRAN.md)); görüntüde bulunan kalan "N%" biçimi (Bugün kapsam satırı + tekrar doğruluğu `pct`) kaynakta `%N` yapıldı. Eski `47%’i` metni artık canlıda düzeltildi.
@@ -41,6 +42,7 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
+- **CSS payı çok dar:** 13,872 / 14 KiB (≈0,13 KiB kaldı); K2F-39 CSS temizliği payı açmalı, aksi hâlde yeni kural P6.
 - **Ders kavram tablosu dar ekranda yatay kaydırır:** 390 px'te 3. sütun kısmen taşar (tablo sarmalayıcısı kaydırılabilir, sayfa taşmaz — sw=cw her yüzeyde ölçüldü); tasarım kararı gerekirse sütun/yazı küçültme ayrı iş.
 - **K2F-37 cihazda/ekran okuyucuda gözlenmedi:** lang/dir sarmalayıcıları ve etiketler VoiceOver ile dinlenmedi (yalnız kaynak/test).
 - **Kabul testi süresi:** A-9 aileleri çalıştırdığı için `test_kao2_kabul.js` ≈3–4 dk; `kapilar.sh` içinde aileler iki kez koşar. Gerekirse sonraki promptta (K2F-38/39) paylaşılan sonuç önbelleği düşünülebilir.

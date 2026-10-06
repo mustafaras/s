@@ -1067,3 +1067,24 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence: kao2-duzeltme/evidence/K2F-35/YAYIN-2.md
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor · cihaz —
 - next: K2F-37
+
+## seq 104 · 2026-10-06 · PROMPT · K2F-37
+- status: done
+- title: a11y ve tasarım sözleşmesi tüm ekranları kapsar
+- prev-commit: b345a6c1
+- evidence: kao2-duzeltme/evidence/K2F-37/KANIT.md
+- closes: K6-02 · K2-05
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh: kao 51/53 (yalnız perf bütçesi + kabul'ün katı A-10 bandı; makine hızı) · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · l2-paket · plan-check · sync PASS
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261005b (canlı; bu prompt kaynakta değişti, canlıda DEĞİL)
+- changed-tests: test_kao2_a11y (445 yüzeylik matris) · test_kao2_design_contract (18 görünüm)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: matris ilk koşuda 19 ihlal buldu: gate başlıklarında ve kavram tablosunda lang/dir'siz Arapça, kök arama kutusunda etiket yok (hepsi düzeltildi)
+- next: K2F-38
+
+## seq 105 · 2026-10-06 · NOTE · K2F-37
+- status: open
+- title: Kavram tablosunda "Arapça" sütunu bazı satırlarda referans gösteriyor
+- decision: u04.01 kavram aşaması tablosunda ilk üç satırın "Arapça" hücresi `2:17:3` gibi sûre:âyet:kelime referansı (içerik verisi), son iki satır Arapça. İçerik/tasarım kararı gerektirir (Arapça yoksa sütun başlığı ya da hücre biçimi); K2F-37 kapsamı dışı, dokunulmadı.
+- evidence-levels: kaynak ✓
+- next: K2F-38

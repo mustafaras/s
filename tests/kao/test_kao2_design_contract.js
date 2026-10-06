@@ -34,7 +34,11 @@ const instant = '2026-09-28T09:00:00.000Z';
 class FixedDate extends Date { constructor(...args) { super(...(args.length ? args : [instant])); } static now() { return Date.parse(instant); } }
 const files = ['quranLexiconV1','quranGrammarV1','quranShortSurahsV1','quranPhonicsV1','quranCurriculumV2','quranRevelationOrderV1','quranStrikingVersesV1'].map(n => 'app/content/'+n+'.js').concat(['app/core/quranLearnFlow.js','app/core/quranLearnViews.js','app/core/quranLearn.js']);
 const primary = {}, switches = {};
-const views = ['home','units','word','reader','settings','gate','phonics','ayah','map','prayer','stats','session'];
+// K2F-37: görünüm listesi kaynaktan türetilir (Flow VIEWS ∪ KAO_VIEW_TITLES); yeni görünüm kendiliğinden kapsanır.
+const flowViews = [...read('app/core/quranLearnFlow.js').match(/var VIEWS=\{([^}]*)\}/)[1].matchAll(/([a-z0-9]+):true/g)].map(m => m[1]);
+const routeViews = [...read('app/core/quranLearn.js').match(/var KAO_VIEW_TITLES=\{([^}]*)\}/)[1].matchAll(/(?:^|,)\s*([a-z0-9]+):/g)].map(m => m[1]);
+const views = [...new Set(flowViews.concat(routeViews))];
+assert.ok(views.length >= 17 && ['home','units','unit','word','reader','settings','stats','gate','session','grammar','concept','roots','s0','sources','map'].every(v => views.includes(v)), 'görünüm listesi kaynaktan okunamadı: ' + views.join(','));
 const tags = html => html.match(/<[^>]+>/g) || [];
 const hasClass = (tag,name) => (tag.match(/\bclass="([^"]*)"/) || [,''])[1].split(/\s+/).includes(name);
 for (const seeded of [false,true]) {
@@ -42,20 +46,22 @@ for (const seeded of [false,true]) {
   vm.createContext(box);
   for (const file of files) vm.runInContext(read(file),box,{filename:file});
   const api = box.window.SeymaQuranLearn;
+  let allowSave = false; // yalnız S0 dersini başlatırken kayıt serbest (render salt okunur kalır)
   const data = { settings:{targetBed:'23:00'}, quranJourney:{requests:{}} }, ui = {kaoOpen:true};
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  assert.equal(api.registerQuranLearn({data:()=>data,ui:()=>ui,save(){throw Error('unexpected save');},render(){},todayStr:()=> '2026-09-28',esc,icon:()=>'',getDay:()=>({})}),true);
+  assert.equal(api.registerQuranLearn({data:()=>data,ui:()=>ui,save(){ if (!allowSave) throw Error('unexpected save'); },render(){},todayStr:()=> '2026-09-28',esc,icon:()=>'',getDay:()=>({})}),true);
   const q = api.ensureQuranLearn(data), lemma = box.window.QuranLexiconV1.lemmas[0];
   if (seeded) {
     q.startedAt = instant;
     for (const word of box.window.QuranLexiconV1.lemmas.slice(0,12)) for (const dir of ['ar>tr','tr>ar']) q.cards[`w:${word.id}:${dir}`] = {reps:3,state:'review',s:25,d:5,due:instant};
     q.daily['2026-09-28'] = {answered:24};
   }
-  ui.kaoWordId = lemma.id;
+  ui.kaoWordId = lemma.id; ui.kaoUnitId = '1'; ui.kaoSurahId = 112; ui.kaoConceptId = box.window.QuranGrammarV1.concepts[0].id;
   ui.kaoQueue = [{id:'design-task',cardId:`w:${lemma.id}:ar>tr`,isNew:!seeded}];
   ui.kaoTaskIndex = 0;
   for (const view of views) {
     ui.kaoView = view;
+    if (view === 's0') { allowSave = true; assert.equal(api.kaoS0('start', 's0.01'), true, 'S0 dersi başlamadı'); allowSave = false; } // S0 ekranı başlamış bir derse bağlıdır
     const html = api.kaoOverlayHTML(instant);
     assert.match(html,/role="dialog"/); assert.ok(html.length > 1000, label+'/'+view+' rendered');
     primary[label+'/'+view] = tags(html).filter(t=>hasClass(t,'kao-primary')).length;

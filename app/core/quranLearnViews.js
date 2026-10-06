@@ -13,6 +13,10 @@
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     return deps.esc(value==null?'':String(value));
   }
+  // K2F-37 (a11y): karışık Türkçe+Arapça metinde Arapça parçalar kendi dilini/yönünü taşır (ekran okuyucu telaffuzu, bidi).
+  function escapeMixed(value){
+    return escapeText(value).replace(/[\u0600-\u06FF]+(?:[ \u00a0]+[\u0600-\u06FF]+)*/g,'<span lang="ar" dir="rtl">$&</span>');
+  }
   function matchingDivEnd(html,start){
     var tags=/<\/?div\b[^>]*>/gi,depth=0,match;
     tags.lastIndex=start;
@@ -273,7 +277,7 @@
       var rowHtml=rows.map(function(row){
         var cells=Array.isArray(row.cells)?row.cells:[];
         if(row.label!==undefined) cells=[row.label].concat(cells);
-        return '<tr>'+cells.map(function(cell){ return '<td>'+escapeText(Array.isArray(cell)?(cell[0]||cell[1]||''):(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell))+'</td>'; }).join('')+'</tr>';
+        return '<tr>'+cells.map(function(cell){ return '<td>'+escapeMixed(Array.isArray(cell)?(cell[0]||cell[1]||''):(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell))+'</td>'; }).join('')+'</tr>';
       }).join('');
       body='<section class="kao-lesson-card kao-lesson-concept" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Kavram</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.plainTr)+'</p>'+(head||rowHtml?'<div class="kao-lesson-table-wrap"><table class="kao-lesson-table"><thead><tr>'+head+'</tr></thead><tbody>'+rowHtml+'</tbody></table></div>':'')+(model.termTr?'<details class="kao-lesson-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+'</section>';
     }else if(model.stage==='apply'&&Array.isArray(model.sentences)){

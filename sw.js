@@ -19,7 +19,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './',
   './index.html',
   './manifest.json?v=20260730f',
-  './app/styles.css?v=20260929c',
+  './app/styles.css?v=20261006c',
   './app/kao.css?v=20261006c',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',
@@ -72,7 +72,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/reminders.js?v=20260914a',
   './app/core/reminderSurface.js?v=20260914d',
   './app/core/messaging.js?v=20261006c',
-  './app/core/render.js?v=20260924a',
+  './app/core/render.js?v=20261006c',
   './app/core/appSurface.js?v=20261006c',
   './app.js?v=20261006c',
   './sync.js?v=20261006c'

@@ -173,9 +173,9 @@ check('Arapça overview styles every new class and becomes a full-width mobile-f
   cssSource.includes('.iip-arabic-course-path{display:grid;grid-template-columns:minmax(0,1fr)') &&
   cssSource.includes('.iip-arabic-course-progress .kao-hub-card{width:100%'));
 check('Arapça surface cache pins match the app shell and offline manifest',
-  indexSource.includes('app/styles.css?v=20260929c') &&
+  indexSource.includes('app/styles.css?v=20261006c') &&
   indexSource.includes('app/core/saygi.js?v=20260929c') &&
-  swSource.includes("'./app/styles.css?v=20260929c'") &&
+  swSource.includes("'./app/styles.css?v=20261006c'") &&
   swSource.includes("'./app/core/saygi.js?v=20260929c'"));
 
 quranCardState = 'loading';

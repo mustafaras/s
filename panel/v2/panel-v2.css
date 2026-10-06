@@ -5381,3 +5381,11 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
     transform: none !important;
   }
 }
+
+/* Dar ekran (≤360px): üst çubukta ÆON yazısı durum hapıyla üst üste binmesin. */
+@media (max-width: 360px) {
+  .ae-topbar { margin-left: var(--ae-space-xs); margin-right: var(--ae-space-xs); padding-left: var(--ae-space-sm); padding-right: var(--ae-space-sm); gap: var(--ae-space-xs); }
+  .ae-topbar__tools { gap: var(--ae-space-xs); }
+  .ae-topbar__title { letter-spacing: 0.5px; }
+  .ae-tab { flex: 1 1 auto; min-width: 0; padding-left: 2px; padding-right: 2px; }
+}

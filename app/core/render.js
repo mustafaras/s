@@ -552,7 +552,7 @@ function render(){
       var clickFn=n[0]==='mesaj'?'App.openMesaj()':'App.go(\''+n[0]+'\')';
       h+='<button data-fx="nav" class="sey-bottomnav-item'+(active?' is-active':'')+(n[5]?' is-saygi':'')+'" style="--nav-item-accent:'+n[3]+';--nav-item-accent2:'+n[4]+';" onclick="'+clickFn+'" aria-label="'+n[2]+'"'+(active?' aria-current="page"':'')+'>';
       h+='<span class="sey-bottomnav-icon"><span class="sey-bottomnav-indicator"></span><span class="sey-bottomnav-glyph">'+icon(n[1],20)+'</span>'+badge+'</span>';
-      h+='<span class="sey-bottomnav-label">'+n[2]+'</span>';
+      h+='<span class="sey-bottomnav-label">'+(n[0]==='saygi'?'İlham':n[2])+'</span>';
       h+='</button>';
     });
     h+='</div></nav>';
@@ -1394,7 +1394,7 @@ function rasitContactHTML(){
   var btn=function(href,attr,ic,label,sub){
     return '<a href="'+href+'"'+attr+' style="text-decoration:none;flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--room) 14%, var(--card)),color-mix(in srgb,var(--room) 6%, var(--card)));border:1px solid color-mix(in srgb,var(--room) 34%, var(--card-bd));box-shadow:0 8px 20px color-mix(in srgb,var(--room) 16%, transparent);color:var(--room);">'
       +'<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 4px 12px var(--room-glow);">'+icon(ic,17)+'</span>'
-      +'<span style="min-width:0;display:flex;flex-direction:column;line-height:1.15;"><span style="font-size:var(--f-subhead);font-weight:800;color:var(--text);white-space:nowrap;">'+label+'</span><span style="font-size:var(--f-caption2);font-weight:600;color:var(--faint);white-space:nowrap;">'+sub+'</span></span></a>';
+      +'<span style="min-width:0;display:flex;flex-direction:column;line-height:1.15;"><span style="font-size:var(--f-subhead);font-weight:800;color:var(--text);white-space:nowrap;">'+label+'</span><span style="font-size:var(--f-caption2);font-weight:600;color:var(--faint);">'+sub+'</span></span></a>';
   };
   var h='<div style="display:flex;gap:9px;margin-top:-4px;">';
   h+=btn(WA,' target="_blank" rel="noopener"','send-horizontal','Raşit\'e yaz','WhatsApp\'tan mesaj');

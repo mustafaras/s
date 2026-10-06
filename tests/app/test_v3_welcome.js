@@ -863,7 +863,7 @@ ok('sürüm yorumları pin taramasını kaydırmıyor (yorumda nitelik adı geç
 
 // Cache-bust: değişen modüller yeni sürüm taşımalı
 ok('settings.js cache-bust güncel', /app\/core\/settings\.js\?v=20260926a/.test(indexSource));
-ok('render.js cache-bust güncel', /app\/core\/render\.js\?v=20260924a/.test(indexSource));
+ok('render.js cache-bust güncel', /app\/core\/render\.js\?v=20261006c/.test(indexSource));
 
 // ───────────────────────────────────────────────────────────────────────────
 // [10] Kişisel 85 gün özeti (v3-data.js + v3-charts.js)

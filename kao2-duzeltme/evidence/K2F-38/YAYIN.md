@@ -4,3 +4,4 @@
 - Canlı bayt eşitliği: bu konteynerin egress'i github.io'yu engelliyor → kullanıcı terminalinde doğrulanmalı. DOĞRULANMADI.
 - Kanıt düzeyi: kaynak/test ✓ · yerel görsel (390/320/koyu) ✓ · yayın run success ✓ · cihaz — (kullanıcıda)
 - Yayın 3 (kullanıcı: "tüm eksikleri tamamla ve canlıya al", 2026-10-06): ana uygulama alt çubuk "İlham" etiketi, İlham&İbadet alt sekmesi "Arapça" kırılması (≤340 px), Raşit kartları alt yazısı, panel-v2 ≤360 px üst çubuk + alt çubuk. Pin 20261006c (render.js, styles.css, panel-v2.css). Tarama/kapı ayrıntısı LEDGER seq 114. Run numarası LEDGER seq 115.
+- Yayın 3 sonucu: `main` ff-only 95978a3..378e44f, Pages run **37495127453** success. Canlı bayt eşitliği DOĞRULANMADI (kullanıcı terminali).

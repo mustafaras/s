@@ -1175,3 +1175,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın bkz. seq 115 · cihaz —
 - next: K2F-39
 
+## seq 115 · 2026-10-06 · RELEASE · K2F-38
+- status: done (canlı bayt eşitliği ve cihaz kullanıcıda bekliyor)
+- title: Tüm yüzey taraması düzeltmeleri canlıya (pin 20261006c)
+- decision: kullanıcı "tüm eksikleri tamamla ve canlıya al" dedi; main ff-only 95978a3..378e44f, Pages run 37495127453 success.
+- evidence: kao2-duzeltme/evidence/K2F-38/YAYIN.md
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor (github.io bu konteynerden engelli) · cihaz —
+- next: K2F-39
+

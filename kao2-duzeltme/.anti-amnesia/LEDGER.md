@@ -1158,3 +1158,10 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın bkz. YAYIN.md · cihaz —
 - next: K2F-39
 
+## seq 113 · 2026-10-06 · NOTE · K2F-38
+- status: closed
+- title: Tarama tamamlayıcısı: S0 dersleri 03/07/09/12 (390 px) temiz
+- decision: seq 112'de çekimi düşen dört S0 dersi sırayla yeniden çekildi (aşama 1–3 incelendi): sıkışma/binme/taşma yok. Hâlâ taranmayanlar: 200 px yakınlaştırma; KAO dışı yüzeyler (ana uygulama sekmeleri, panel, panel-v2); gerçek cihaz. Kullanıcıya "tüm yüzeyler" kapsamının KAO dışını içerip içermediği soruldu.
+- evidence-levels: yerel görsel ✓ (sentetik) · yayın — · cihaz —
+- next: K2F-39
+

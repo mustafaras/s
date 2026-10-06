@@ -1205,3 +1205,16 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor (github.io bu konteynerden engelli) · cihaz —
 - next: K2F-40
 
+## seq 118 · 2026-10-06 · PROMPT · K2F-40
+- status: done
+- title: K-2 katman tamamlama — görev şıkları Views.choice'tan
+- prev-commit: f1cb4a0
+- evidence: kao2-duzeltme/evidence/K2F-40/KANIT.md
+- closes: K2-03
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh değil, eşdeğer paralel koşu (kao/app/panel/panel-v2/quran test dosyaları + reminders · driver · zikr · kontrast · l2-paket · plan-check · tekrar-uret) kırmızı yok; kabul 10/10 (KAO2_ACCEPT_SLOW_HOST=1). Dürüst not: perf_budget göreli p95 bandı yavaş konteynerde kırmızı (cari 10,7 ms, değişiklik öncesi 9,7 ms; runtime/css bütçe iddiaları önce geçer), önceki oturumlardaki bilinen konteyner durumu. Döküm: 6 tür × 3 durum = 18 HTML bayt-eşit.
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261006d (DEĞİŞMEDİ)
+- changed-tests: test_kao2_components (genişledi) · test_kao_pronunciation_contract (yükleme listesine quranLearnViews.js; Dokun listesi dışı tek satır, davranış zayıflamadı)
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: Views.choice üretimde hiç kullanılmıyordu; düğme kipi eklendi (div çıktısı değişmedi). Runtime gzip 115,874 → 115,991 KiB.
+- next: K2F-41

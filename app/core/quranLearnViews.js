@@ -126,6 +126,12 @@
     var state=['correct','wrong','dim'].indexOf(options.state)>=0?options.state:'idle';
     var mark=state==='correct'?'✓':state==='wrong'?'✕':'';
     var screenText=state==='correct'?'Doğru cevap':state==='wrong'?'Senin seçimin':'';
+    if(options.button===true){
+      // Görev şıkkı: gerçek düğme; sınıf sırası durum + ek sınıflar, etiket `labelHtml` (önceden kaçırılmış) ya da kaçırılmış `label`.
+      var classes=(state==='idle'?[]:['kao-choice-'+state]).concat(Array.isArray(options.extraClasses)?options.extraClasses:[]);
+      var aria=options.arabic===true?' data-kao-ar aria-label="'+escapeText(options.label+', okunuşu '+options.pronunciation+(screenText?', '+screenText:''))+'"':'';
+      return '<button type="button"'+(classes.length?' class="'+classes.join(' ')+'"':'')+(options.pressed===true||options.pressed===false?' aria-pressed="'+String(options.pressed)+'"':'')+(options.disabled===true?' disabled':'')+aria+(options.onclick?' onclick="'+options.onclick+'"':'')+'>'+(mark?'<span class="kao-choice-mark" aria-hidden="true">'+mark+'</span><span class="kao-sr-only">'+screenText+'</span>':'')+(options.labelHtml!=null?options.labelHtml:escapeText(options.label))+'</button>';
+    }
     return '<div class="kao-choice kao-choice-'+state+'">'+(mark?'<span class="kao-choice-mark" aria-hidden="true">'+mark+'</span>':'')+(screenText?'<span class="kao-sr-only">'+screenText+'</span>':'')+'<span class="kao-choice-label">'+escapeText(options.label)+'</span></div>';
   }
   function feedbackSheet(options){

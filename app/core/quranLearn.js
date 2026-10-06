@@ -1719,7 +1719,7 @@
     h+=kaoCognateHTML(task)+'<div class="kao-choices">';
     task.choices.forEach(function(choice){
       var selected=task.kind==='order'&&Array.isArray(ui.kaoOrderDraft)&&ui.kaoOrderDraft.indexOf(choice.choiceId)>=0;
-      var arabic=/[\u0600-\u06ff]/.test(choice.label),classes=[],state='',disabled=selected;
+      var arabic=/[\u0600-\u06ff]/.test(choice.label),state='',disabled=selected;
       if(panel){
         if(task.kind==='order'){
           var orderPosition=(ui.kaoOrderDraft||[]).indexOf(choice.choiceId);
@@ -1727,12 +1727,9 @@
         }else if(choice.correct===true) state='correct';
         else if(choice.choiceId===panel.choiceId) state='wrong';
         else state='dim';
-        if(state) classes.push('kao-choice-'+state);
         disabled=true;
       }
-      if(isGrammar||isFragment||isTransfer) classes.push('kao-chip');
-      var mark=state==='correct'?'✓':(state==='wrong'?'✕':''),screenText=state==='correct'?'Doğru cevap':(state==='wrong'?'Senin seçimin':'');
-      h+='<button type="button"'+(classes.length?' class="'+classes.join(' ')+'"':'')+(task.kind==='order'?' aria-pressed="'+(selected?'true':'false')+'"':'')+(disabled?' disabled':'')+(arabic?' data-kao-ar aria-label="'+esc(choice.label+', okunuşu '+choice.pronunciation+(screenText?', '+screenText:''))+'"':'')+' onclick="App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')">'+(mark?'<span class="kao-choice-mark" aria-hidden="true">'+mark+'</span><span class="kao-sr-only">'+screenText+'</span>':'')+(arabic?kaoArabicPairHTML(choice.label,choice.pronunciation,'kao-choice-pair'):esc(choice.label))+'</button>';
+      h+=kaoViewsApi().choice({button:true,state:state||'idle',label:choice.label,labelHtml:arabic?kaoArabicPairHTML(choice.label,choice.pronunciation,'kao-choice-pair'):esc(choice.label),arabic:arabic,pronunciation:choice.pronunciation,extraClasses:(isGrammar||isFragment||isTransfer)?['kao-chip']:[],pressed:task.kind==='order'?selected:undefined,disabled:disabled,onclick:'App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')'});
     });
     h+='</div><p class="kao-live" aria-live="polite">'+esc(panel?'':(ui.kaoFeedback||''))+'</p>';
     if(panel){

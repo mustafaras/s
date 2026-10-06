@@ -1,14 +1,15 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-40
-lastSeq: 117
+nextPrompt: K2F-41
+lastSeq: 118
 status: active
 -->
 
-Son güncelleme: 2026-10-06 · LEDGER seq 117 · K2F-00…39 tamam (40/44), sıradaki K2F-40. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-06 · LEDGER seq 118 · K2F-00…40 tamam (41/44), sıradaki K2F-41. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
+**K2F-40 bitti (seq 118, yerel, yayınlanmadı):** görev şıkları `Views.choice` düğme kipinden kurulur (motorda işaret/aria HTML'i kopyası kalmadı); 6 tür × {cevapsız, doğru, yanlış} 18 döküm bayt-eşit; runtime gzip 115,991 / 128 KiB. Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-40/KANIT.md).
 **K2F-39 bitti (seq 116) ve CANLIYA ALINDI (seq 117; main 3122b5a, pin 20261006d, run 37498517193 success; bayt eşitliği kullanıcıda bekliyor):** `kao.css`ten 25 öksüz sınıf (53 kural) ve degrade silindi, `kao-audio-pending`/`reveal` kalktı, design_contract'a öksüz-sınıf/degrade/ölü-ad kontrolü, kontrast HOME gerçek Bugün kartına. css gzip 14239 → 13340 B (13,027 KiB; pay ≈0,97 KiB). Görsel regresyon: 58 görüntüde yalnız ilerleme çubuğu dolgusu düzleşti. NavBar'daki tek renkli katman bilerek korundu (opaklık). Ayrıntı: [KANIT.md](../evidence/K2F-39/KANIT.md).
 **K2F-38 bitti (seq 109–110):** `tests/kao/test_kao2_denetim.js` R-01…R-10 kalıcı (10/10; R-04 güçlendirildi). Ek FIX: Seviye 0 "Örnek kelimeler" satırı (daralan kutu + binen Dinle) `app/kao.css`te düzeltildi, pin `20261006c`; yayın kaydı seq 111. Tam kapilar.sh bu konteynerde tamamlanmadı (LEDGER seq 115). Tüm yüzey taraması yapıldı (seq 112): NavBar etiketi kırılması düzeltildi; küçük notlar ve taranmayanlar LEDGER seq 115'de. Sıradaki: K2F-39.
 **Metin taşma taraması (seq 107):** gerçek tarayıcıda her yüzey 390/320/200 px'te tarandı; 390/320'de metin taşması/kırpılması 0, 200 px'te 322 → 4 (yalnız kaydırmalı alanlar). Düzeltmeler `app/kao.css`; ayrıntı [EKRAN-TASMA.md](../evidence/K2F-37/EKRAN-TASMA.md).
@@ -31,7 +32,7 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-40 (K-2 katman tamamlama):** `PROMPTLAR.md` §K2F-40 (`grep -n "^#### K2F-40"`): `quranLearn.js` `kaoTaskHTML` şık döngüsünü `quranLearnViews.js` `choice` bileşenine taşı; önce 6 görev türü × {cevapsız, doğru, yanlış} HTML dökümünü `$TMPDIR`'e al, sonra bayt-eşit (ya da yalnız sınıf sırası farkı) kanıtla; `tests/kao/test_kao2_components.js` genişler; runtime 117,3 / 128 KiB içinde kalmalı.
+**K2F-41 (Kayıtlar ve yönlendirme belgeleri):** `PROMPTLAR.md` §K2F-41 (`grep -n "^#### K2F-41"`) — `tests/kao/README.md` envanteri (eksik test dosyaları), D-12 kognat turu "ertelendi (K2F-25, seq 74)" notu ve arşivdeki tek düzeltme notu; yalnız belge işi.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.

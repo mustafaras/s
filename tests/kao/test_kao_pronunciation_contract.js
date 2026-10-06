@@ -14,6 +14,7 @@ for (const relative of [
   'app/content/quranShortSurahsV1.js',
   'app/content/quranStrikingVersesV1.js',
   'app/content/quranPhonicsV1.js',
+  'app/core/quranLearnViews.js',
   'app/core/quranLearn.js'
 ]) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
 

@@ -81,6 +81,23 @@ assert.match(wrong, /class="kao-sr-only">Senin seçimin</);
 assert.match(dim, /class="kao-choice kao-choice-dim"/);
 assert.match(api.choice({ label: 'Boş', state: 'unexpected' }), /class="kao-choice kao-choice-idle"/);
 
+// K2F-40: görev şıkkı (düğme kipi) Views.choice'tan gelir; motorda kopya kalmaz.
+const btnIdle = api.choice({ button: true, label: 'A<b>', onclick: "App.kaoAnswer('t','a')" });
+assert.equal(btnIdle, `<button type="button" onclick="App.kaoAnswer('t','a')">A&lt;b&gt;</button>`, 'düğme kipi: idle şıkkta sınıf yok');
+const btnWrong = api.choice({ button: true, state: 'wrong', label: 'x', extraClasses: ['kao-chip'], pressed: true, disabled: true, onclick: 'f()' });
+assert.equal(btnWrong, '<button type="button" class="kao-choice-wrong kao-chip" aria-pressed="true" disabled onclick="f()"><span class="kao-choice-mark" aria-hidden="true">✕</span><span class="kao-sr-only">Senin seçimin</span>x</button>');
+const btnAr = api.choice({ button: true, state: 'correct', label: 'ب', pronunciation: 'be', arabic: true, labelHtml: '<b>H</b>', pressed: false });
+assert.match(btnAr, /aria-pressed="false"/);
+assert.match(btnAr, / data-kao-ar aria-label="ب, okunuşu be, Doğru cevap"/);
+assert.match(btnAr, /<\/span><b>H<\/b><\/button>$/, 'labelHtml olduğu gibi gelir');
+assert.match(api.choice({ label: 'Boş' }), /^<div class="kao-choice kao-choice-idle">/, 'düğme kipi kapalıyken div çıktısı değişmez');
+const engine = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8');
+const taskStart = engine.indexOf('function kaoTaskHTML(');
+const taskBody = engine.slice(taskStart, engine.indexOf('function currentTask(', taskStart));
+assert.ok(taskStart > 0 && taskBody.length > 500, 'kaoTaskHTML gövdesi bulunmalı');
+assert.match(taskBody, /kaoViewsApi\(\)\.choice\(\{button:true/, 'görev şıkları Views.choice ile kurulmalı');
+assert.doesNotMatch(taskBody, /kao-choice-mark|kao-sr-only/, 'şık işaret/ekran okuyucu HTML\'i motorda kopyalanmamalı');
+
 const feedback = api.feedbackSheet({
   tone: 'success', title: '<Başlık>', body: 'Açıklama & not',
   actions: [{ label: 'Devam', action: 'kaoContinue' }, { label: 'Geçersiz', action: 'save' }]

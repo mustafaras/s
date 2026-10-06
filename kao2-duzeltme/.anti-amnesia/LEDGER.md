@@ -1183,3 +1183,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor (github.io bu konteynerden engelli) · cihaz —
 - next: K2F-39
 
+## seq 116 · 2026-10-06 · PROMPT · K2F-39
+- status: done
+- title: CSS ve ölü kod temizliği
+- prev-commit: 4a0666cd
+- evidence: kao2-duzeltme/evidence/K2F-39/KANIT.md
+- closes: K3-04 · K6-07 · M-13 · K2-07
+- repro: değişmedi · toplam 10/10
+- gates: paralel koşu (189 test dosyası + reminders · driver · zikr · kontrast 722 çift · l2-paket · plan-check · tekrar-uret) kırmızı yok; kabul 10/10 (KAO2_ACCEPT_SLOW_HOST=1; A-10 göreli p95 bandı atlandı); tam kapilar.sh betiği değil, eşdeğer paralel koşu. Görsel: 390 px 58 görüntü önce/sonra, yalnız ilerleme çubuğu dolgusu değişti.
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261006c (DEĞİŞMEDİ; kao.css/quranLearn.js bir sonraki yayında)
+- changed-tests: test_kao_render (öksüz seçici varlık zorunluluğu kaldırıldı, P2.4) · test_kao2_design_contract (yeni kontrol) · kontrast aracı HOME + 2 çift
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın — · cihaz —
+- surprises: öksüz seçici 18 değil 25 idi; alt-dize taraması dinamik sınıflarda yanlış pozitif verir (10); NavBar tek renkli katmanı degrade değil (--kao-bg ≈%89 opak), kontrol bunu bilerek hariç tutar.
+- next: K2F-40
+

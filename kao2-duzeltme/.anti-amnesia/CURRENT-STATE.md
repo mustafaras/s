@@ -1,14 +1,15 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-39
-lastSeq: 115
+nextPrompt: K2F-40
+lastSeq: 116
 status: active
 -->
 
-Son güncelleme: 2026-10-06 · LEDGER seq 115 · K2F-00…38 tamam (39/44), sıradaki K2F-39. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-06 · LEDGER seq 116 · K2F-00…39 tamam (40/44), sıradaki K2F-40. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
+**K2F-39 bitti (seq 116, yerel; canlıda DEĞİL):** `kao.css`ten 25 öksüz sınıf (53 kural) ve degrade silindi, `kao-audio-pending`/`reveal` kalktı, design_contract'a öksüz-sınıf/degrade/ölü-ad kontrolü, kontrast HOME gerçek Bugün kartına. css gzip 14239 → 13340 B (13,027 KiB; pay ≈0,97 KiB). Görsel regresyon: 58 görüntüde yalnız ilerleme çubuğu dolgusu düzleşti. NavBar'daki tek renkli katman bilerek korundu (opaklık). Ayrıntı: [KANIT.md](../evidence/K2F-39/KANIT.md).
 **K2F-38 bitti (seq 109–110):** `tests/kao/test_kao2_denetim.js` R-01…R-10 kalıcı (10/10; R-04 güçlendirildi). Ek FIX: Seviye 0 "Örnek kelimeler" satırı (daralan kutu + binen Dinle) `app/kao.css`te düzeltildi, pin `20261006c`; yayın kaydı seq 111. Tam kapilar.sh bu konteynerde tamamlanmadı (LEDGER seq 115). Tüm yüzey taraması yapıldı (seq 112): NavBar etiketi kırılması düzeltildi; küçük notlar ve taranmayanlar LEDGER seq 115'de. Sıradaki: K2F-39.
 **Metin taşma taraması (seq 107):** gerçek tarayıcıda her yüzey 390/320/200 px'te tarandı; 390/320'de metin taşması/kırpılması 0, 200 px'te 322 → 4 (yalnız kaydırmalı alanlar). Düzeltmeler `app/kao.css`; ayrıntı [EKRAN-TASMA.md](../evidence/K2F-37/EKRAN-TASMA.md).
 **Ek (seq 106, canlıya alındı seq 108):** modal ekran görüntüsü taraması (390/320/karanlık, [EKRAN.md](../evidence/K2F-37/EKRAN.md)) iki kusur buldu ve düzeltti: ünite ilerleme kutusunda kırpılan halka (ölü CSS kuralı) ve ders kavram tablosunda Arapça yerine âyet referansı gösteren hücreler. Canlı pin 20261006a.
@@ -30,20 +31,20 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-39 (CSS ve ölü kod temizliği):** `PROMPTLAR.md` §K2F-39 (`grep -n "^#### K2F-39"`); CSS payı 13,896 / 14 KiB; genel `.kao-secondary{width:100%}` gibi flex içinde tuzak olan kuralları tara.
+**K2F-40 (K-2 katman tamamlama):** `PROMPTLAR.md` §K2F-40 (`grep -n "^#### K2F-40"`): `quranLearn.js` `kaoTaskHTML` şık döngüsünü `quranLearnViews.js` `choice` bileşenine taşı; önce 6 görev türü × {cevapsız, doğru, yanlış} HTML dökümünü `$TMPDIR`'e al, sonra bayt-eşit (ya da yalnız sınıf sırası farkı) kanıtla; `tests/kao/test_kao2_components.js` genişler; runtime 117,3 / 128 KiB içinde kalmalı.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
 - Yayın pini: `20261006c`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
-- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 116,270 KiB (K2F-34 sonrası)** · p95 4,2 ms.
+- Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,027 KiB (tavan 14 — kalan ≈0,97 KiB; K2F-39 sonrası) · runtime 116,270 KiB (K2F-34 sonrası)** · p95 4,2 ms.
 - Testler: `test_kao2_lesson_flow.js` 23 · `test_kao2_review_apply.js` 15 · `test_kao2_reader.js` 14 · `test_kao2_hub.js` 10 · `test_kao2_arabic_tab.js` 4 (yeni) · `test_kao2_kabul.js` 10/10 ölçüt.
 - Namaz eşlemesi: 19/32 `lp_*` eşli. Veri kapsamı (524 lemma): 162 unit11 köküne, 113 kognat kaymasına sahip.
 - Metin durumu: üniteler 12/12 · dersler 109/109 · S0 12/12 · kavramlar 25/25 sourced; sûre tanıtımı metni yok (kaldırıldı).
 
 ## Açık riskler
-- **CSS payı çok dar:** 13,872 / 14 KiB (≈0,13 KiB kaldı); K2F-39 CSS temizliği payı açmalı, aksi hâlde yeni kural P6.
+- **CSS payı:** 13,027 / 14 KiB (≈0,97 KiB kaldı; K2F-39 temizliği açtı). Yeni kural eklerken ölç.
 - **Ders kavram tablosu dar ekranda yatay kaydırır:** 390 px'te 3. sütun kısmen taşar (tablo sarmalayıcısı kaydırılabilir, sayfa taşmaz — sw=cw her yüzeyde ölçüldü); tasarım kararı gerekirse sütun/yazı küçültme ayrı iş.
 - **K2F-37 cihazda/ekran okuyucuda gözlenmedi:** lang/dir sarmalayıcıları ve etiketler VoiceOver ile dinlenmedi (yalnız kaynak/test).
 - **Kabul testi süresi:** A-9 aileleri çalıştırdığı için `test_kao2_kabul.js` ≈3–4 dk; `kapilar.sh` içinde aileler iki kez koşar. Gerekirse sonraki promptta (K2F-38/39) paylaşılan sonuç önbelleği düşünülebilir.

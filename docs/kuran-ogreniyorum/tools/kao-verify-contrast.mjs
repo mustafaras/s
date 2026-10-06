@@ -122,7 +122,7 @@ function backgrounds(chain, map) {
   return layers;
 }
 const DIALOG = ['.kao-dialog', 'background'];
-const HOME = [DIALOG, ['.kao-home section', 'background']];
+const HOME = [DIALOG, ['.kao-hero-card', 'background']]; // K2F-39: Bugün yüzeyinin gerçek kartı (eski .kao-home bölümü kalktı)
 const PAIRS = [
   // [etiket, tür, önplan seçici, önplan özelliği, zemin zinciri]
   ['Diyalog gövde metni', 'text', '.kao-dialog', 'color', [DIALOG]],
@@ -133,8 +133,6 @@ const PAIRS = [
   ['Seçenek düğmesi', 'text', '.kao-choices button', 'color', [DIALOG, ['.kao-choices button', 'background']]],
   ['Birincil düğme', 'text', '.kao-primary', 'color', [DIALOG, ['.kao-primary', 'background']]],
   ['İkincil düğme', 'text', '.kao-secondary', 'color', [DIALOG, ['.kao-secondary', 'background']]],
-  ['Geri al düğmesi', 'text', '.kao-undo', 'color', [DIALOG, ['.kao-undo', 'background']]],
-  ['Süre çipi', 'text', '.kao-time-chip', 'color', [...HOME, ['.kao-time-chip', 'background']]],
   ['Kognat rozeti', 'text', '.kao-cognate', 'color', [DIALOG, ['.kao-cognate', 'background']]],
   ['Kognat anlam kayması', 'text', '.kao-cognate.is-shift', 'color', [DIALOG, ['.kao-cognate.is-shift', 'background']]],
   ['İçerik hatası', 'text', '.kao-content-error', 'color', [DIALOG, ['.kao-content-error', 'background']]],
@@ -181,7 +179,7 @@ for (const [theme, map] of THEMES) {
 const DECORATIVE = new Set(['.kao-hub-ornament', '.kao-hero-rosette', '.kao-ayah-count>span', '.kao-fade', '.kao-map-cell[data-l="5"] small', '.kao-map-legend i[data-l="5"]']);
 const HUB = [['.kao-hub-card', 'background']];
 /** Yalnız ikon taşıyan kaplar: metin değil grafik (WCAG 1.4.11) → 3:1. */
-const ICON_MARKS = new Set(['.kao-hub-seal', '.kao-header-mark', '.kao-summary-mark', '.kao-done-mark', '.kao-mahrec']);
+const ICON_MARKS = new Set(['.kao-header-mark', '.kao-summary-mark', '.kao-done-mark', '.kao-mahrec']);
 /** Kendi zemini olan seçiciler kendi zemininde, diğerleri bağlamının en kötü zemininde ölçülür. */
 function autoChain(selector) {
   const own = RULES.some((rule) => rule.selectors.includes(selector) && /(?:^|;)\s*background(?:-color)?\s*:/.test(rule.body));

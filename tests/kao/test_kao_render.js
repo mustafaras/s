@@ -394,7 +394,7 @@ assert.match(saygiSource, /function arabicLearningHTML\(\)[\s\S]*?kaoHub\(\)[\s\
 assert.match(saygiSource, /tab==='arapca'\)body=arabicLearningHTML\(\)/, 'Arapça navigasyonu kurs sayfasını açmalı');
 assert.doesNotMatch(saygiSource, /quranHub\(\)\+kaoHub\(\)/, 'küçük KAO kartı Bugün Kur’an girişine karışmamalı');
 assert.match(indexSource, /app\/kao\.css\?v=\d{8}[a-z]/);
-for (const selector of ['.kao-hub-card', '.kao-hub-seal', '.kao-hub-path', '.kao-hub-foot', '.kao-time-chip', '.kao-unit-card', '.kao-word-hero', '.kao-root-tree', '.kao-word-example', '.kao-gate', '.kao-h-fatha', '.kao-h-kesra', '.kao-h-damma', '.kao-reader', '.kao-reader-word', '.kao-waqf']) assert.ok(cssSource.includes(selector), selector);
+for (const selector of ['.kao-hub-card', '.kao-word-hero', '.kao-word-example', '.kao-gate', '.kao-h-fatha', '.kao-h-kesra', '.kao-h-damma', '.kao-reader', '.kao-reader-word', '.kao-waqf']) assert.ok(cssSource.includes(selector), selector);
 assert.doesNotMatch(cssSource, /:root\s*\{/);
 assert.doesNotMatch(cssSource, /#[0-9a-f]{3,8}\b/i);
 const cssVars = [...cssSource.matchAll(/var\((--[a-z0-9-]+)/gi)].map((match) => match[1]);
@@ -588,7 +588,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
   const flowWidths = rules.filter((rule) => !rule.selectors.every((item) => /::(?:before|after)/.test(item)) && !/position:absolute/.test(rule.body)).flatMap((rule) => [...rule.body.matchAll(/(?:^|;)\s*(?:min-)?width\s*:\s*(\d+)px/g)].map((match) => Number(match[1])));
   assert.ok(flowWidths.every((width) => width <= 288), `akış genişlikleri ≤288 px (${Math.max(...flowWidths)})`);
   assert.doesNotMatch(cssSource, /font-size:\s*\d+(?:\.\d+)?px/, 'px yazı boyutu yok');
-  for (const selector of ['.kao-unit-number', '.kao-prayer-line h3 span']) assert.match(cssSource, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{min-width:\\d+px;min-height:\\d+px'), `${selector} metinle büyür`);
+  for (const selector of ['.kao-prayer-line h3 span']) assert.match(cssSource, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{min-width:\\d+px;min-height:\\d+px'), `${selector} metinle büyür`);
   const { execFileSync } = require('node:child_process');
   const report = JSON.parse(execFileSync(process.execPath, [path.join(repoRoot, 'docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs'), '--json'], { encoding: 'utf8' }));
   assert.equal(report.failed, 0, 'tüm KAO renk çiftleri ≥4.5:1 metin / 3:1 arayüz');

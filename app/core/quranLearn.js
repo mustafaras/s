@@ -1706,7 +1706,7 @@
     var taskCount=Math.max(1,(ui.kaoQueue||[]).length),taskPosition=Math.min(taskCount,Math.max(1,(ui.kaoTaskIndex||0)+1));
     h+='<div class="kao-task-progress" role="progressbar" aria-label="Görev ilerlemesi" aria-valuemin="1" aria-valuemax="'+String(taskCount)+'" aria-valuenow="'+String(taskPosition)+'"><span style="width:'+String(Math.round(taskPosition/taskCount*100))+'%"></span></div>';
     h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(isFragment?(task.kind==='order'?'Kelime dizme':'Parça çevir'):(isLink?'Bağ kur · Türkçedeki türevi':(isTransfer?'Yeni âyet · haftalık test':(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç')))))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
-    if(!task.audioOnly&&!isGrammar&&!isFragment&&(task.direction==='ar>tr'||isLink)) h+='<h2 class="kao-question'+(autoplay?' kao-audio-pending':'')+'" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true)+'</h2>';
+    if(!task.audioOnly&&!isGrammar&&!isFragment&&(task.direction==='ar>tr'||isLink)) h+='<h2 class="kao-question" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true)+'</h2>';
     else h+='<h2 class="kao-question'+(isGrammar||isFragment||isTransfer?' kao-question-text':'')+'">'+esc(prompt)+'</h2>';
     if(isLink) h+='<p class="kao-eyebrow">Anlamı: '+esc(task.meaning)+'</p>';
     if(isGrammar){ h+='<div class="kao-grammar-stimulus">'+(/[\u0600-\u06ff]/.test(task.stimulus)?kaoArabicPairHTML(task.stimulus,task.stimulusPronunciation,'kao-stimulus-pair'):esc(task.stimulus))+'</div>'; if(task.context&&task.context.length) h+='<div class="kao-grammar-context">'+task.context.map(function(item){ var value=item&&typeof item==='object'?item:{label:item,pronunciation:''}; return /[\u0600-\u06ff]/.test(value.label)?'<span>'+kaoArabicPairHTML(value.label,value.pronunciation,'kao-context-pair')+'</span>':'<span>'+esc(value.label)+'</span>'; }).join('')+'</div>'; }
@@ -1731,7 +1731,6 @@
         disabled=true;
       }
       if(isGrammar||isFragment||isTransfer) classes.push('kao-chip');
-      if(autoplay&&task.direction==='tr>ar') classes.push('kao-audio-pending');
       var mark=state==='correct'?'✓':(state==='wrong'?'✕':''),screenText=state==='correct'?'Doğru cevap':(state==='wrong'?'Senin seçimin':'');
       h+='<button type="button"'+(classes.length?' class="'+classes.join(' ')+'"':'')+(task.kind==='order'?' aria-pressed="'+(selected?'true':'false')+'"':'')+(disabled?' disabled':'')+(arabic?' data-kao-ar aria-label="'+esc(choice.label+', okunuşu '+choice.pronunciation+(screenText?', '+screenText:''))+'"':'')+' onclick="App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')">'+(mark?'<span class="kao-choice-mark" aria-hidden="true">'+mark+'</span><span class="kao-sr-only">'+screenText+'</span>':'')+(arabic?kaoArabicPairHTML(choice.label,choice.pronunciation,'kao-choice-pair'):esc(choice.label))+'</button>';
     });
@@ -2294,10 +2293,8 @@
     var resolved=style==='flowing'?'flowing':'measured',ui=quranLearnDeps.ui(),audio=quranLearnSurfaceDeps.createAudio('assets/kao/audio/'+clipId+'-'+resolved+'.m4a');
     if(!audio) return false;
     audio.preload='none';
-    var reveal=function(){ var node=typeof quranLearnSurfaceDeps.taskElement==='function'&&quranLearnSurfaceDeps.taskElement(),items=node&&typeof node.querySelectorAll==='function'?node.querySelectorAll('[data-kao-ar]'):[]; Array.prototype.forEach.call(items||[],function(ar){ if(ar&&ar.classList) ar.classList.remove('kao-audio-pending'); }); };
-    if(typeof audio.addEventListener==='function'){ audio.addEventListener('playing',reveal,{once:true}); audio.addEventListener('error',function(){ ui.kaoAudioFailed=true; reveal(); },{once:true}); }
-    if(typeof quranLearnSurfaceDeps.setTimer==='function') quranLearnSurfaceDeps.setTimer(reveal,150);
-    try{ var result=audio.play(); if(result&&typeof result.catch==='function') result.catch(function(){ ui.kaoAudioFailed=true; reveal(); }); }catch(_error){ ui.kaoAudioFailed=true; reveal(); }
+    if(typeof audio.addEventListener==='function') audio.addEventListener('error',function(){ ui.kaoAudioFailed=true; },{once:true});
+    try{ var result=audio.play(); if(result&&typeof result.catch==='function') result.catch(function(){ ui.kaoAudioFailed=true; }); }catch(_error){ ui.kaoAudioFailed=true; }
     return audio;
   }
   // KAO-17 · E7: ayarlar kalıcıdır (data.quranLearn.settings / readability); ağ yok.

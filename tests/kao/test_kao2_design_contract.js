@@ -171,4 +171,30 @@ assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğr
   assert.match(kaoCss, /\.kao-s0-words li \.kao-s0-word\{flex:1 1 0;width:auto;min-width:0\}/, 'kelime kutusu satırın kalanını alır');
   assert.match(kaoCss, /\.kao-s0-words li \.kao-secondary\{flex:0 0 auto;width:auto;/, 'Dinle düğmesi içeriği kadar (genel width:100% geçersiz)');
 }
+// K2F-39 (K3-04, K6-07, M-13, K2-07): kao.css'teki her sınıf seçicisi KAO işaretlemesinde (Views + motor + Flow) kullanılır;
+// degrade ve ölü sınıf adı kalmaz. Dinamik üretilen sınıflar (`'kao-screen-'+görünüm`) önek+birleştirme biçimiyle tanınır.
+// İzinli istisnalar gerekçeli liste: şu an boş (öksüz seçici yok).
+{
+  const ORPHAN_ALLOWED = {};
+  const markup = ['app/core/quranLearnViews.js', 'app/core/quranLearn.js', 'app/core/quranLearnFlow.js'].map(read).join('\n');
+  const cssNoComments = kaoCss.replace(/\/\*[\s\S]*?\*\//g, '');
+  const classes = new Set([...cssNoComments.matchAll(/\.([a-zA-Z][\w-]*)/g)].map(m => m[1]));
+  const usedInMarkup = (name) => {
+    if (markup.includes(name)) return true;
+    const parts = name.split('-');
+    for (let i = 1; i < parts.length; i += 1) {
+      const prefix = parts.slice(0, i).join('-') + '-';
+      if (new RegExp('["\' ]' + prefix.replace(/-/g, '\\-') + '["\']\\s*\\+').test(markup)) return true;
+    }
+    return false;
+  };
+  const orphans = [...classes].filter(name => !usedInMarkup(name) && !ORPHAN_ALLOWED[name]);
+  assert.deepEqual(orphans, [], 'kao.css öksüz sınıf seçicileri: ' + orphans.join(' '));
+  // Tek izinli biçim: aynı rengi iki kez veren katman (NavBar saydam --kao-bg'yi opak yüzeyin üstüne bindirir); gerçek degrade yok.
+  const gradients = [...cssNoComments.matchAll(/linear-gradient\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g)].map(m => m[1]);
+  const real = gradients.filter(arg => { const parts = arg.split(/,(?![^()]*\))/).map(x => x.trim()); return new Set(parts).size > 1; });
+  assert.deepEqual(real, [], 'degrade yok (öksüz ilerleme çubuğu kalıntısı dahil); tek renkli katman hariç');
+  assert.ok(!markup.includes('kao-audio-pending'), 'ölü sınıf adı kao-audio-pending kalmadı');
+  assert.doesNotMatch(cssNoComments, /\.kao-header\b/, 'eski .kao-header kuralları kalmadı');
+}
 console.log('KAO2 design contract: PASS');

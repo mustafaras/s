@@ -13,7 +13,7 @@
   "lastRelease": {
     "prompt": "K2F-35",
     "commit": "59160810",
-    "pin": "20261005b",
+    "pin": "20261006a",
     "run": 37349172650,
     "evidence": "kao2-duzeltme/evidence/K2F-35/YAYIN-2.md"
   },
@@ -39,7 +39,7 @@
     "acceptedAt": "2026-09-30"
   },
   "pins": {
-    "release": "20261005b",
+    "release": "20261006a",
     "kaoHandlers": 45,
     "appSurface": 766,
     "appAssignments": 604,

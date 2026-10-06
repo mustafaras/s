@@ -1117,3 +1117,27 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence: kao2-duzeltme/evidence/K2F-37/YAYIN.md
 - evidence-levels: kaynak/test ✓ · yerel görsel+tarama ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor · cihaz —
 - next: K2F-38
+
+## seq 109 · 2026-10-06 · FIX · K2F-38
+- status: closed (yayın seq 111)
+- title: Seviye 0 "Örnek kelimeler" satırı: daralan kelime kutusu ve üstüne binen Dinle düğmesi
+- decision: kullanıcı ekran görüntüsüyle gösterdi (s0.01 "Dinle ve gör"). Kök neden: `.kao-s0-listen{justify-items:center}` listeyi içeriğe daraltıyor + genel `.kao-secondary{width:100%}` satır içinde kelime kutusunu eziyor. `app/kao.css`'te iki mevcut kural düzeltildi (yeni kural yok); ilk denemem yarım kaldı (düğme taştı), ikinci neden görüntüyle bulundu. Koruma: design_contract +3.
+- evidence: kao2-duzeltme/evidence/K2F-38/KANIT.md
+- changed-tests: test_kao2_design_contract (+3 sözleşme, mutasyonla kırmızı)
+- evidence-levels: kaynak/test ✓ · yerel görsel (390/320, s0.01/.05/.10/.11) ✓ · yayın seq 111 · cihaz —
+- next: K2F-39
+
+## seq 110 · 2026-10-06 · PROMPT · K2F-38
+- status: done
+- title: Denetim kontrolleri kalıcı fixture
+- prev-commit: 1998f25
+- evidence: kao2-duzeltme/evidence/K2F-38/KANIT.md
+- closes: (denetim kalıcılığı)
+- repro: değişmedi · toplam 10/10
+- gates: TAM kapilar.sh TAMAMLANMADI (yavaş konteyner; kullanıcı yayını bekletmemek için durdurdu). Koşulan: test_kao2_denetim 10/10 · design_contract · handler_surface · a11y 12 · curriculum · 7 pin/yüzey testi · v3_welcome · iip_22 · local_visual_qa_guard · driver · zikr 95/95 · node --check · sync PASS. Koşulmayan: tam tests/app, panel, panel-v2, quran, reminders aileleri (yalnız kao.css/pin değişti).
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261006b
+- changed-tests: yok (yalnız ekleme: test_kao2_denetim yeni; design_contract +3)
+- evidence-levels: kaynak/test ✓ · yayın seq 111 · cihaz —
+- surprises: tekrar-uret R-04 özgün biçimde zayıftı (plan boş); kalıcı testte düzeltildi. Genel `.kao-secondary{width:100%}` başka flex satırlarında tuzak olabilir (K2F-39).
+- next: K2F-39
+

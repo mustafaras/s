@@ -1,14 +1,15 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-38
-lastSeq: 108
+nextPrompt: K2F-39
+lastSeq: 110
 status: active
 -->
 
-Son güncelleme: 2026-10-05 · LEDGER seq 108 · K2F-00…37 tamam (38/44), sıradaki K2F-38. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-06 · LEDGER seq 110 · K2F-00…38 tamam (39/44), sıradaki K2F-39. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
+**K2F-38 bitti (seq 109–110):** `tests/kao/test_kao2_denetim.js` R-01…R-10 kalıcı (10/10; R-04 güçlendirildi). Ek FIX: Seviye 0 "Örnek kelimeler" satırı (daralan kutu + binen Dinle) `app/kao.css`te düzeltildi, pin `20261006b`; yayın kaydı seq 111. Tam kapilar.sh bu konteynerde tamamlanmadı (LEDGER seq 110). Sıradaki iş: kullanıcı isteğiyle TÜM yüzeylerin ekran görüntüsü taraması (sıkışma/binme türü kusurlar), sonra K2F-39.
 **Metin taşma taraması (seq 107):** gerçek tarayıcıda her yüzey 390/320/200 px'te tarandı; 390/320'de metin taşması/kırpılması 0, 200 px'te 322 → 4 (yalnız kaydırmalı alanlar). Düzeltmeler `app/kao.css`; ayrıntı [EKRAN-TASMA.md](../evidence/K2F-37/EKRAN-TASMA.md).
 **Ek (seq 106, canlıya alındı seq 108):** modal ekran görüntüsü taraması (390/320/karanlık, [EKRAN.md](../evidence/K2F-37/EKRAN.md)) iki kusur buldu ve düzeltti: ünite ilerleme kutusunda kırpılan halka (ölü CSS kuralı) ve ders kavram tablosunda Arapça yerine âyet referansı gösteren hücreler. Canlı pin 20261006a.
 K2F-37 bitti ve **CANLIYA ALINDI** (main 8558b2cc, pin 20261006a, run 37457305595 success; bayt eşitliği kullanıcı terminalinde bekliyor — YAYIN.md): a11y/tasarım matrisi 445 yüzey (18 görünüm kaynaktan türetilir × boş/tohumlu + ilk açılış + ders aşamaları/panel + ustalık/onarım + S0 + odak modu) ve 42 dokunma-hedefi imzası ≥44 px; matris 3 gerçek kusur buldu ve düzeltildi (gate başlıklarında/kavram tablosunda lang/dir'siz Arapça, kök arama kutusunda etiket yok). Ayrıntı: [KANIT.md](../evidence/K2F-37/KANIT.md). 
@@ -29,11 +30,11 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-38 (Denetim kontrolleri kalıcı fixture):** `PROMPTLAR.md` §K2F-38 (`grep -n "^#### K2F-38"`): `kao2-duzeltme/denetim/tekrar-uret.cjs`'in 10 kontrolünü `tests/kao/test_kao2_denetim.js` (yeni) olarak `kao-harness` ile kalıcı yap (R-01…R-10 PASS), `tests/kao/README.md`e satır ekle; tekrar-uret.cjs tarihsel kalır; yeni handler yok.
+**K2F-39 (CSS ve ölü kod temizliği):** `PROMPTLAR.md` §K2F-39 (`grep -n "^#### K2F-39"`); CSS payı 13,896 / 14 KiB; genel `.kao-secondary{width:100%}` gibi flex içinde tuzak olan kuralları tara.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
-- Yayın pini (canlı): `20261006a`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
+- Yayın pini: `20261006b`; yerel dal: `App.kao*` 45 · App yüzeyi 766 · atama 604 · `onclick` 393 (canlı main artık yerel dalla aynı: 45/766/604).
 - Kapılar (K2F-26 yayını sonrası): KAO 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders/driver/zikr/kontrast/l2-paket/plan-check/sync PASS.
 - `tekrar-uret.cjs`: **10/10 PASS**.
 - Bütçe (perf): içerik 183,544 KiB (tavan 256) · runtime 115,478 KiB (tavan 128) · **css 13,661 KiB (tavan 14 — kalan ≈0,34 KiB) · runtime 116,270 KiB (K2F-34 sonrası)** · p95 4,2 ms.

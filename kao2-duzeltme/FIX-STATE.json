@@ -7,8 +7,8 @@
   "branch": "kao2-duzeltme",
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
-  "nextPrompt": "K2F-38",
-  "ledgerLastSeq": 108,
+  "nextPrompt": "K2F-39",
+  "ledgerLastSeq": 110,
   "releaseApproval": "approved_through_K2F-17",
   "lastRelease": {
     "prompt": "K2F-35",
@@ -39,7 +39,7 @@
     "acceptedAt": "2026-09-30"
   },
   "pins": {
-    "release": "20261006a",
+    "release": "20261006b",
     "kaoHandlers": 45,
     "appSurface": 766,
     "appAssignments": 604,
@@ -118,7 +118,7 @@
     "K2F-35": { "wave": "W3", "title": "Küçük metin ve etiket düzeltmeleri", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-35/KANIT.md" },
     "K2F-36": { "wave": "W4", "title": "Kabul testi gerçek ölçüm", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-36/KANIT.md" },
     "K2F-37": { "wave": "W4", "title": "a11y ve tasarım sözleşmesi matrisi", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-37/KANIT.md" },
-    "K2F-38": { "wave": "W4", "title": "Denetim kontrolleri kalıcı fixture", "status": "in_progress", "evidence": null },
+    "K2F-38": { "wave": "W4", "title": "Denetim kontrolleri kalıcı fixture", "status": "done", "evidence": "kao2-duzeltme/evidence/K2F-38/KANIT.md" },
     "K2F-39": { "wave": "W5", "title": "CSS ve ölü kod temizliği", "status": "pending", "evidence": null },
     "K2F-40": { "wave": "W5", "title": "K-2 katman tamamlama", "status": "pending", "evidence": null },
     "K2F-41": { "wave": "W5", "title": "Kayıtlar ve yönlendirme belgeleri", "status": "pending", "evidence": null },

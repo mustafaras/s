@@ -2,14 +2,14 @@
 
 <!-- k2f-sync
 nextPrompt: K2F-40
-lastSeq: 116
+lastSeq: 117
 status: active
 -->
 
-Son güncelleme: 2026-10-06 · LEDGER seq 116 · K2F-00…39 tamam (40/44), sıradaki K2F-40. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-06 · LEDGER seq 117 · K2F-00…39 tamam (40/44), sıradaki K2F-40. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
-**K2F-39 bitti (seq 116, yerel; canlıda DEĞİL):** `kao.css`ten 25 öksüz sınıf (53 kural) ve degrade silindi, `kao-audio-pending`/`reveal` kalktı, design_contract'a öksüz-sınıf/degrade/ölü-ad kontrolü, kontrast HOME gerçek Bugün kartına. css gzip 14239 → 13340 B (13,027 KiB; pay ≈0,97 KiB). Görsel regresyon: 58 görüntüde yalnız ilerleme çubuğu dolgusu düzleşti. NavBar'daki tek renkli katman bilerek korundu (opaklık). Ayrıntı: [KANIT.md](../evidence/K2F-39/KANIT.md).
+**K2F-39 bitti (seq 116) ve CANLIYA ALINDI (seq 117; main 3122b5a, pin 20261006d, run 37498517193 success; bayt eşitliği kullanıcıda bekliyor):** `kao.css`ten 25 öksüz sınıf (53 kural) ve degrade silindi, `kao-audio-pending`/`reveal` kalktı, design_contract'a öksüz-sınıf/degrade/ölü-ad kontrolü, kontrast HOME gerçek Bugün kartına. css gzip 14239 → 13340 B (13,027 KiB; pay ≈0,97 KiB). Görsel regresyon: 58 görüntüde yalnız ilerleme çubuğu dolgusu düzleşti. NavBar'daki tek renkli katman bilerek korundu (opaklık). Ayrıntı: [KANIT.md](../evidence/K2F-39/KANIT.md).
 **K2F-38 bitti (seq 109–110):** `tests/kao/test_kao2_denetim.js` R-01…R-10 kalıcı (10/10; R-04 güçlendirildi). Ek FIX: Seviye 0 "Örnek kelimeler" satırı (daralan kutu + binen Dinle) `app/kao.css`te düzeltildi, pin `20261006c`; yayın kaydı seq 111. Tam kapilar.sh bu konteynerde tamamlanmadı (LEDGER seq 115). Tüm yüzey taraması yapıldı (seq 112): NavBar etiketi kırılması düzeltildi; küçük notlar ve taranmayanlar LEDGER seq 115'de. Sıradaki: K2F-39.
 **Metin taşma taraması (seq 107):** gerçek tarayıcıda her yüzey 390/320/200 px'te tarandı; 390/320'de metin taşması/kırpılması 0, 200 px'te 322 → 4 (yalnız kaydırmalı alanlar). Düzeltmeler `app/kao.css`; ayrıntı [EKRAN-TASMA.md](../evidence/K2F-37/EKRAN-TASMA.md).
 **Ek (seq 106, canlıya alındı seq 108):** modal ekran görüntüsü taraması (390/320/karanlık, [EKRAN.md](../evidence/K2F-37/EKRAN.md)) iki kusur buldu ve düzeltti: ünite ilerleme kutusunda kırpılan halka (ölü CSS kuralı) ve ders kavram tablosunda Arapça yerine âyet referansı gösteren hücreler. Canlı pin 20261006a.

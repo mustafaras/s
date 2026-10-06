@@ -1197,3 +1197,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - surprises: öksüz seçici 18 değil 25 idi; alt-dize taraması dinamik sınıflarda yanlış pozitif verir (10); NavBar tek renkli katmanı degrade değil (--kao-bg ≈%89 opak), kontrol bunu bilerek hariç tutar.
 - next: K2F-40
 
+## seq 117 · 2026-10-06 · RELEASE · K2F-39
+- status: done (canlı bayt eşitliği ve cihaz kullanıcıda bekliyor)
+- title: K2F-39 kaynakları canlıya (pin 20261006d)
+- decision: kullanıcı "canlıya al" dedi; main ff-only 9a86307c..3122b5ae, Pages run 37498517193 success. Pin 20261006c → d (index.html ×17, sw.js ×18, panel-v2.html, 8 test). Yayına giren: kao.css (25 öksüz sınıf/53 kural, degrade), quranLearn.js (kao-audio-pending/reveal), kontrast aracı ve testler.
+- evidence: kao2-duzeltme/evidence/K2F-39/YAYIN.md
+- evidence-levels: kaynak/test ✓ · yerel görsel ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor (github.io bu konteynerden engelli) · cihaz —
+- next: K2F-40
+

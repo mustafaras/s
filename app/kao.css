@@ -370,14 +370,14 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-s0-pos-row li span{color:var(--kao-label-2);font-size:var(--f-caption1);font-weight:600}
 .kao-s0-pos-row li b{color:var(--kao-label);font-size:var(--f-title2);font-weight:700;line-height:var(--kao-ar-lh,2.2)}
 .kao-s0-pos-none{color:var(--kao-label-2);font-size:var(--f-caption1)}
-.kao-s0-words{display:grid;gap:8px;margin:0 0 14px;padding:0;list-style:none}
+.kao-s0-words{display:grid;gap:8px;justify-self:stretch;width:100%;margin:0 0 14px;padding:0;list-style:none}
 .kao-s0-word{display:grid;gap:2px;justify-items:center;width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
 .kao-s0-word span{color:var(--kao-label);font-size:var(--f-title3);font-weight:700}
 .kao-s0-word small{color:var(--kao-label-2);font-size:var(--f-caption1)}
 .kao-s0-note{margin:8px 0;color:var(--kao-label-2);font-size:var(--f-footnote);line-height:1.4}
 .kao-s0-marks{display:grid;gap:8px;margin:0 0 14px;padding:0;list-style:none}.kao-s0-marks li{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface);color:var(--kao-label);font-size:var(--f-subhead);line-height:1.4}
 .kao-s0-glyph{min-width:44px;display:grid;place-items:center;color:var(--kao-tint);font-size:var(--f-title2);font-weight:700}
-.kao-s0-words li{display:flex;align-items:center;justify-content:space-between;gap:10px}.kao-s0-words li .kao-s0-word{flex:1 1 auto;min-width:0}.kao-s0-words li .kao-secondary{flex:0 0 auto}
+.kao-s0-words li{display:flex;align-items:center;justify-content:space-between;gap:10px}.kao-s0-words li .kao-s0-word{flex:1 1 0;width:auto;min-width:0}.kao-s0-words li .kao-secondary{flex:0 0 auto;width:auto;padding:0 20px}
 .kao-s0-positions .kao-s0-pos-row+.kao-s0-pos-row{margin-top:8px}
 .kao-s0-intro{display:grid;gap:12px;margin-bottom:14px}.kao-s0-goal,.kao-s0-sentence{margin:0;padding:10px 12px;border-left:3px solid var(--kao-tint);border-radius:var(--kao-r-ctl);background:color-mix(in srgb,var(--kao-tint) 7%,var(--kao-surface));color:var(--kao-label);font-size:var(--f-subhead);line-height:1.5}
 .kao-s0-progress{margin:2px 0 0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}

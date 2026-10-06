@@ -164,4 +164,10 @@ assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğr
   assert.match(kaoCss, /@media\(max-width:260px\)\{[^}]*\.kao-navbar\{grid-template-columns:minmax\(0,1fr\) auto\}[^}]*\.kao-navbar-title\{grid-column:1\/-1;grid-row:2\}/, 'çok dar ekranda NavBar başlığı ikinci satıra iner');
   assert.match(kaoCss, /\.kao-lesson-grid button[^{]*\{overflow-wrap:anywhere\}/, 'harf kontrolü mini ders düğmeleri sarar');
 }
+// Seviye 0 örnek kelime satırı (kullanıcı ekran görüntüsü): düğme tam genişliğe yayılıp kelime kutusunu daraltmasın.
+{
+  assert.match(kaoCss, /\.kao-s0-words\{[^}]*justify-self:stretch;width:100%/, 'örnek kelime listesi ortalı ızgarada içeriğe daralmaz');
+  assert.match(kaoCss, /\.kao-s0-words li \.kao-s0-word\{flex:1 1 0;width:auto;min-width:0\}/, 'kelime kutusu satırın kalanını alır');
+  assert.match(kaoCss, /\.kao-s0-words li \.kao-secondary\{flex:0 0 auto;width:auto;/, 'Dinle düğmesi içeriği kadar (genel width:100% geçersiz)');
+}
 console.log('KAO2 design contract: PASS');

@@ -95,7 +95,7 @@ for (let guard = 0; guard < 40; guard++) {
 }
 await b.eval(`App.kaoLesson('finish')`);
 // S0
-await b.eval(`SeymaQuranLearn.kaoSetView('home'); App.kaoS0('start','s0.02')`);
+await b.eval(`SeymaQuranLearn.kaoSetView('home'); App.kaoS0('start','${process.env.KAO_QA_S0 || 's0.02'}')`);
 for (let i = 1; i <= 4; i++) {
   await snap(`s0-aşama-${i}`, null, 120);
   const picked = await b.eval(`(function(){var d=ui.kaoS0&&ui.kaoS0.drill;if(d&&d.picked===null){var q=d.items[d.index];App.kaoS0('answer',q.choices.filter(function(c){return c.correct})[0].id);return 'answer'}return 'next'})()`);

@@ -1150,7 +1150,7 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - next: K2F-39
 
 ## seq 112 · 2026-10-06 · FIX · K2F-38
-- status: closed (pin 20261006c ile yayında; run YAYIN.md)
+- status: closed (pin 20261006c ile yayında; main 1e93f59, run 37480226060 success)
 - title: Tüm yüzey taraması (390/320/koyu, ~58 görünüm): tek bulgu NavBar geri etiketi iki satıra kırılıyor
 - decision: kullanıcı "tüm yüzeyleri kontrol et" dedi. Tarama: 390 px 58 görünüm, 320 px 58, koyu 390 58 (sentetik, yerel). Bulgu: "Namazda ne diyorum" ve "Hakkında ve kaynaklar" ekranlarında "‹ Kur'an / Arapçası" 2 satır (eşit yan sütunlar). Düzeltme: `.kao-navbar` ilk sütun `minmax(max-content,1fr)`; eski design_contract satırı bilerek güncellendi (eşit yan sütun → tek satır etiket). Gözlenen ama düzeltilmeyen küçük notlar: kelime ekranında Kök satırında Arapça kök ortalı/Latin satır solda; geri bildirim kartında "Doğru / Doğru —" tekrarı; sw=cw dışı yalnız bilinen kaydırmalı alanlar. 200 px ve dikey taşma bu turda taranmadı; tüm S0 dersleri tek tek çekilmedi (03/07/09/12 düştü).
 - evidence: kao2-duzeltme/evidence/K2F-38/YAYIN.md

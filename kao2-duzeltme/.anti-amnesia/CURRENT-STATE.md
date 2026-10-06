@@ -1,14 +1,15 @@
 # KAO2-FIX — CURRENT STATE
 
 <!-- k2f-sync
-nextPrompt: K2F-41
-lastSeq: 118
+nextPrompt: K2F-42
+lastSeq: 119
 status: active
 -->
 
-Son güncelleme: 2026-10-06 · LEDGER seq 118 · K2F-00…40 tamam (41/44), sıradaki K2F-41. R-01…R-10 PASS (10/10).
+Son güncelleme: 2026-10-06 · LEDGER seq 119 · K2F-00…41 tamam (42/44), sıradaki K2F-42. R-01…R-10 PASS (10/10).
 
 ## Şu an neredeyiz
+**K2F-41 bitti (seq 119, yerel):** arşiv `DUZELTME-NOTU.md`, `tests/kao/README.md` envanteri (37/37), CLAUDE/AGENTS KAO2 satırları. Yalnız belge. Ayrıntı: [KANIT.md](../evidence/K2F-41/KANIT.md).
 **K2F-40 bitti (seq 118, yerel, yayınlanmadı):** görev şıkları `Views.choice` düğme kipinden kurulur (motorda işaret/aria HTML'i kopyası kalmadı); 6 tür × {cevapsız, doğru, yanlış} 18 döküm bayt-eşit; runtime gzip 115,991 / 128 KiB. Yeni handler/CSS yok. Ayrıntı: [KANIT.md](../evidence/K2F-40/KANIT.md).
 **K2F-39 bitti (seq 116) ve CANLIYA ALINDI (seq 117; main 3122b5a, pin 20261006d, run 37498517193 success; bayt eşitliği kullanıcıda bekliyor):** `kao.css`ten 25 öksüz sınıf (53 kural) ve degrade silindi, `kao-audio-pending`/`reveal` kalktı, design_contract'a öksüz-sınıf/degrade/ölü-ad kontrolü, kontrast HOME gerçek Bugün kartına. css gzip 14239 → 13340 B (13,027 KiB; pay ≈0,97 KiB). Görsel regresyon: 58 görüntüde yalnız ilerleme çubuğu dolgusu düzleşti. NavBar'daki tek renkli katman bilerek korundu (opaklık). Ayrıntı: [KANIT.md](../evidence/K2F-39/KANIT.md).
 **K2F-38 bitti (seq 109–110):** `tests/kao/test_kao2_denetim.js` R-01…R-10 kalıcı (10/10; R-04 güçlendirildi). Ek FIX: Seviye 0 "Örnek kelimeler" satırı (daralan kutu + binen Dinle) `app/kao.css`te düzeltildi, pin `20261006c`; yayın kaydı seq 111. Tam kapilar.sh bu konteynerde tamamlanmadı (LEDGER seq 115). Tüm yüzey taraması yapıldı (seq 112): NavBar etiketi kırılması düzeltildi; küçük notlar ve taranmayanlar LEDGER seq 115'de. Sıradaki: K2F-39.
@@ -32,7 +33,7 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 **Kullanıcı yönergesi: sırayla, her seferinde tek madde; cihaz doğrulamasını kullanıcı yapıp bildirecek.**
 
 ## Sıradaki promptun tek cümlesi
-**K2F-41 (Kayıtlar ve yönlendirme belgeleri):** `PROMPTLAR.md` §K2F-41 (`grep -n "^#### K2F-41"`) — `tests/kao/README.md` envanteri (eksik test dosyaları), D-12 kognat turu "ertelendi (K2F-25, seq 74)" notu ve arşivdeki tek düzeltme notu; yalnız belge işi.
+**K2F-42 (Kapanış regresyonu ve belgesi):** `PROMPTLAR.md` §K2F-42 — tam kapılar + tekrar-uret 10/10 + kabul; `deliverables/KAO2-FIX-KAPANIS.md` (49 bulgu → prompt → kanıt; kanıt düzeyleri ayrı) ve `README.md` durum satırı.
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-03)
 - Dal: `kao2-duzeltme` = canlı `main` (`dc3f3f06`) + K2F-27 kod commit'i + `kao2-duzeltme/` belge commit'leri. Sonraki push yalnız kullanıcı isteğiyle / K2F-43 kapısında.
@@ -72,7 +73,6 @@ K2F-35 bitti (**canlıya alındı, bkz. YAYIN.md**; ek: dinleme şık konumu den
 - Seviye 0 zinciri, Uygula cümleleri, yeni tanış kartı katmanları ve K2F-26 tanıtım kartı canlıda/cihazda gözle doğrulanmadı (kullanıcıda).
 - P8: yeni handler hakkı bitti (K2F-12, 16, 30 kullanıldı); sonraki promptlarda yeni `App.kao*` gerekirse P6.
 - Tarih-bağımlı test: `test_kao_requirements.js` bağ kur bölümü günün tohumuna bağlı (aralık 30; 45 simüle günde 0 hata).
-- `tests/kao/README.md` envanterinde 24 test dosyası yok (K2F-41); K2F-41'de ayrıca D-12 kognat turu "ertelendi (K2F-25, seq 74)" notu eklenecek.
 - iCloud Drive `… 2.*` kopyaları üretebilir (seq 12): `git add` yalnız açık dosya yollarıyla.
 - Sandbox'ta `mktemp -d` ve `diff -` (stdin) reddediliyor; geçici işler için `$TMPDIR` altında elle dizin/dosya kullan. `$TMPDIR` ortak bir dizin: yalnız kendi oluşturduğun dosyaları sil.
 - VM içinden dönen diziler başka realm'den: testlerde `assert.deepEqual` öncesi `Array.from(…)`/`plain()` kullan.

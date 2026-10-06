@@ -1218,3 +1218,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/test ✓ · yayın — · cihaz —
 - surprises: Views.choice üretimde hiç kullanılmıyordu; düğme kipi eklendi (div çıktısı değişmedi). Runtime gzip 115,874 → 115,991 KiB.
 - next: K2F-41
+
+## seq 119 · 2026-10-06 · PROMPT · K2F-41
+- status: done
+- title: Kayıtlar ve yönlendirme belgeleri
+- prev-commit: f4c256c7
+- evidence: kao2-duzeltme/evidence/K2F-41/KANIT.md
+- closes: M-01 (belge) · M-04 · M-05 · M-06 · M-07 · M-08 · M-09 · M-12 · K3-07 (belge) · K3-08 · K6-06 · K7-01/K7-02 (karar kaydı)
+- repro: değişmedi · toplam 10/10
+- gates: yalnız belge işi; kao-plan-check + fix-sync-check + README envanter kontrolü (37/37); kod değişmedi
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261006d (DEĞİŞMEDİ)
+- changed-tests: yok
+- evidence-levels: kaynak/belge ✓ · yayın — · cihaz —
+- surprises: texts.tr.json'da draft kalmamış (158 sourced); CLAUDE/AGENTS satırı buna göre düzeltildi.
+- next: K2F-42

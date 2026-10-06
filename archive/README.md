@@ -68,3 +68,5 @@ ağacından temizlendi ve gerektiğinde Git geçmişinden geri alınabilir.
 
   **Günlük başlangıçta okunmaz:** yeni KAO işi ayrı kapsam onayı ister; kanonik
   durum `docs/kuran-ogreniyorum/duzeltme/.anti-amnesia/CURRENT-STATE.md`'dir.
+
+- **kuran-ogreniyorum-v2/** — KAO2 (28 kart) arşivi; bayat ifadelerin doğrusu `DUZELTME-NOTU.md` (K2F-41), güncel durum `kao2-duzeltme/`.

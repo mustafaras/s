@@ -1232,3 +1232,17 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence-levels: kaynak/belge ✓ · yayın — · cihaz —
 - surprises: texts.tr.json'da draft kalmamış (158 sourced); CLAUDE/AGENTS satırı buna göre düzeltildi.
 - next: K2F-42
+
+## seq 120 · 2026-10-06 · PROMPT · K2F-42
+- status: done
+- title: Kapanış regresyonu ve kapanış belgesi
+- prev-commit: 06a47e63
+- evidence: kao2-duzeltme/evidence/K2F-42/KANIT.md
+- closes: kapanış doğrulaması (49/49)
+- repro: değişmedi · toplam 10/10
+- gates: kapilar.sh değil, eşdeğer paralel koşu (kao/app/panel/panel-v2/quran + reminders · driver · zikr · kontrast · l2-paket · plan-check) kırmızı yok; kabul 10/10 (KAO2_ACCEPT_SLOW_HOST=1); perf_budget göreli bandı yavaş konteynerde kırmızı (bilinen)
+- pins: App.kao* 45 · yüzey 766 · atama 604 · yayın 20261006d (DEĞİŞMEDİ)
+- changed-tests: yok
+- evidence-levels: kaynak/test ✓ · yayın — · cihaz —
+- surprises: yok
+- next: K2F-43

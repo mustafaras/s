@@ -1,6 +1,6 @@
 # KAO2-FIX — Kur'an Arapçası modülü denetim düzeltmeleri
 
-> **Durum:** PLANLANDI (2026-09-30) · sıradaki prompt **K2F-00** · 0/44 tamam · tekrar-uret 0/10
+> **Durum:** K2F-00…42 tamam (43/44), sıradaki K2F-43 (YAYIN-2) · tekrar-uret 10/10 · kapanış belgesi [`deliverables/KAO2-FIX-KAPANIS.md`](deliverables/KAO2-FIX-KAPANIS.md)
 > **Uygulayıcı:** Claude Sonnet 5.5 — her prompt ayrı oturum, tek commit.
 > **Başlamak için:** [`PROMPTLAR.md`](PROMPTLAR.md) §0'daki oturum başlatıcıyı yeni bir oturuma yapıştır.
 > **Makine durumu:** [`FIX-STATE.json`](FIX-STATE.json) · **Şu an:** [`.anti-amnesia/CURRENT-STATE.md`](.anti-amnesia/CURRENT-STATE.md) ·

@@ -60,13 +60,21 @@ check('N-02', 'D2-02', () => {
   return [!(r01Passes && !rec.masteryAt), `R-01 koşulu (kayıt var mı) masteryAt=${rec.masteryAt} skor=${rec.masteryScore} iken ${r01Passes ? 'PASS veriyor' : 'FAIL veriyor'}`];
 });
 
-// D2-03 · R-10 kalıbı yalnız satır başındaki yazımı yakalar; girintili koşulsuz yazım geçer.
+// D2-03 (D2F-05'te güçlendirildi) · R-10 kalıbı artık girintiden bağımsız yakalar ve yazımın KAO2_EVIDENCE_OUT
+// koşulu altında olduğunu doğrular. Bu kontrol, güçlendirilmiş denetimi girintili koşulsuz yazıma uygular.
 check('N-03', 'D2-03', () => {
   const src = read('tests/kao/test_kao2_kabul.js');
   const mutated = src.replace("  const report = md.join('\\n') + '\\n';", "  const report = md.join('\\n') + '\\n';\n  fs.writeFileSync(path.join(repoRoot, 'kao2-duzeltme/evidence/K2F-36/A-KABUL.md'), report);");
-  const r10 = /\nfs\.writeFileSync\(path\.join\(repoRoot, '[^']*A-KABUL\.md'\)/;
-  const caught = r10.test(mutated);
-  return [mutated !== src && caught, `girintili koşulsuz yazım R-10 kalıbınca ${caught ? 'yakalanıyor' : 'YAKALANMIYOR'}`];
+  const lines = mutated.split('\n');
+  const indentOf = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
+  const writes = [];
+  lines.forEach((line, i) => { if (!/^\s*\/\//.test(line) && /fs\.writeFileSync\(/.test(line) && /A-KABUL\.md|evidenceOut/.test(line)) writes.push(i); });
+  const unguarded = writes.filter((i) => {
+    for (let j = i - 1; j >= 0; j -= 1) { if (!/\bif\s*\(/.test(lines[j])) continue; if (indentOf(lines[j]) < indentOf(lines[i])) return !/KAO2_EVIDENCE_OUT|evidenceOut/.test(lines[j]); }
+    return true;
+  });
+  const caught = unguarded.length > 0;
+  return [mutated !== src && caught, `girintili koşulsuz yazım ${caught ? 'yakalanıyor' : 'YAKALANMIYOR'} (${writes.length} kanıt yazımı, koşulsuz ${unguarded.length})`];
 });
 
 // D2-04 · CLAUDE.md/AGENTS.md KAO2 satırı L1'i "kullanıcıda" diyor; veride tüm metinler sourced (by: owner).

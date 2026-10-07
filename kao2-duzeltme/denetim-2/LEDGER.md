@@ -86,3 +86,26 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - DOĞRU DURUM: program **kapanmadı** — D2F-05…16 `pending`, N-02…N-08 açık; yayında olanlar: D2F-01…04 (dizme çip yazısı, ders içi aynı
   gramer sorusu, çözülmüş açılmayan dizme, kapı araçları). Canlı bayt eşitliği ve cihaz doğrulaması kullanıcıda.
 - next: D2F-05
+
+## seq 8 · 2026-10-07 · PROMPT · D2F-05
+- başlık: Denetim kontrollerini güçlendir — R-01 gerçek ustalık geçişini, R-10 girintili koşulsuz yazımı yakalar (D2-02, D2-03).
+- oturum: https://claude.ai/code/session_d0d6d6d9-c277-497f-98ea-e3c237d4db72
+- dal: `d2f-05` (D2F-04 commit'i `59abe97b` üzerinde; baseCommit `cbe0d604`).
+- değişen: `tests/kao/test_kao2_denetim.js` (import +`playLesson`; R-01 gerçek `walkLesson`+`kaoLesson('finish')`+`playLesson`,
+  elle `st.at/st.phase` yok, doğru→`masteryAt` dolu/skor≥0,8/`next-unit`, yanlış→`masteryAt` boş/`repair`; R-10 girintiden
+  bağımsız yazım + `KAO2_EVIDENCE_OUT` koşul denetimi) · `tekrar-uret-2.cjs` (N-03 aynı kalıp) · `denetim/tekrar-uret.cjs`
+  (yalnız başa yorum). Dokunulmadı: `app.js`, `app/core/*`, pinler/sw, `test_kao2_kabul.js`.
+- test: `test_kao2_denetim.js` **10/10 PASS** (çıkış 0) · `tekrar-uret-2.cjs` **5/9 PASS** (N-01, N-02, N-03, N-08, N-09;
+  D2F-04'te 2/9 idi — azalmadı) · `tekrar-uret.cjs` 10/10.
+- mutasyon (scratchpad, commit edilmedi): (a) `quranLearn.js` `masteryAt` yazımı kapatıldı → R-01 FAIL
+  (`doğru: masteryAt=false skor=1 adım=mastery`); (b) `test_kao2_kabul.js`'e girintili koşulsuz A-KABUL.md yazımı → R-10 FAIL
+  (`2 kanıt yazımı · koşulsuz=1`).
+- kapılar (bayraklı kapilar.sh): **çıkış 1, "SONUÇ: KIRMIZI KAPI VAR"** — iki kırmızı da ortam kaynaklı ve prompt kapsamı dışı:
+  `test_kao2_kabul.js` A-4 (`night-review`; `kaoNightWindow` yerel saat, bu makine +03 → `TZ=UTC` ile geçiyor) ·
+  `test_settings_boundary.js` (ajan ana makinesi kök kontrol-noktası ref'i `625eba07` `git log --all`'ı kirletiyor; `main` atası değil).
+  Diğer satırlar yeşil (panel/panel-v2/quran/reminders/driver/zikr/kontrast/l2/plan-check/fix-sync + perf PASS).
+- kayıt: `D2F-STATE.json` D2F-05 done · `nextPrompt` D2F-06 · `ledgerLastSeq` 8 · N-02/N-03 `pass` · **N-08 `fail`→`pass`**
+  (seq 7 erken yayını panel-v2.html pinini `20261007a` yapıp pin tazeliğini kapattı; `d2f-sync-check --repro` "gerçek pass ama STATE fail" verdi).
+  `d2f-sync-check.mjs` (düz + `--repro`) **PASS** (N 5/9 pass).
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-05/KANIT.md
+- next: D2F-06

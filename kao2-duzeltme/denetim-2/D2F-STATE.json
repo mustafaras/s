@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-05",
-  "ledgerLastSeq": 7,
+  "nextPrompt": "D2F-06",
+  "ledgerLastSeq": 8,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -35,9 +35,9 @@
     },
     "D2F-05": {
       "title": "Denetim kontrollerini güçlendir (R-01, R-10)",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-05/KANIT.md",
+      "session": "https://claude.ai/code/session_d0d6d6d9-c277-497f-98ea-e3c237d4db72"
     },
     "D2F-06": {
       "title": "Ses görevinin ekranı teste bağlansın",
@@ -108,13 +108,13 @@
   },
   "n": {
     "N-01": "pass",
-    "N-02": "fail",
-    "N-03": "fail",
+    "N-02": "pass",
+    "N-03": "pass",
     "N-04": "fail",
     "N-05": "fail",
     "N-06": "fail",
     "N-07": "fail",
-    "N-08": "fail",
+    "N-08": "pass",
     "N-09": "pass"
   },
   "pins": {

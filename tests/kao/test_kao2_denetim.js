@@ -4,7 +4,7 @@
 // Kaynak: kao2-duzeltme/denetim/tekrar-uret.cjs (tarihsel kayıt olarak kalır). Her kontrol DOĞRU davranışı bekler.
 // Sentetik node:vm; ağ, tarayıcı, zamanlayıcı ve dosya yazımı yok. Durum GERÇEK handler'larla sürülür.
 const assert = require('node:assert/strict');
-const { bootKao, freshUser, walkLesson, openView, navTitle, read, DEFAULT_NOW: NOW } = require('./helpers/kao-harness');
+const { bootKao, freshUser, walkLesson, playLesson, openView, navTitle, read, DEFAULT_NOW: NOW } = require('./helpers/kao-harness');
 
 let passed = 0;
 function check(id, finding, run) {
@@ -14,19 +14,32 @@ function check(id, finding, run) {
   console.log(`PASS  ${id} (${finding}) · ${detail}`);
 }
 
+// R-01 (D2F-05): ustalık GERÇEKTEN geçildiğinde path.units kaydı yazılır — masteryAt dolu, masteryScore ≥ 0,8, sonraki adım "next-unit".
+// Başarısız deneme (yanlış cevaplar) kaydolmaz: masteryAt boş, sonraki adım "repair". Ünite 1 dersleri GERÇEK handler'larla
+// oynanır (start → özet → finish); elle st.at/st.phase ataması yok. Kaydı yazmayan mutasyon bu testi FAIL ettirir.
 check('R-01', 'K4-01', () => {
-  const t = bootKao();
-  const q = freshUser(t);
-  for (const l of t.win.QuranCurriculumV2.units[0].lessons) q.path.lessons[l.id] = { startedAt: NOW, doneAt: NOW, score: 0.9, introducedLemmas: l.lemmaIds };
-  const step = t.api.kaoNextStep(NOW);
-  t.api.kaoLesson('start', step.param);
-  const st = t.ui.kaoLesson;
-  st.at = st.plan.length - 1; st.phase = 'lesson';
-  t.api.kaoLesson('finish');
-  t.data.quranLearn.daily = {};
-  const after = t.api.kaoNextStep('2026-10-01T12:00:00.000Z');
-  const recorded = Object.keys(t.data.quranLearn.path.units || {}).length > 0;
-  return [recorded || after.title !== step.title, `ustalık öncesi "${step.title}" · sonrası "${after.title}" · path.units kaydı=${recorded}`];
+  const playUnit1 = (answer) => {
+    const t = bootKao();
+    freshUser(t);
+    const unit = t.win.QuranCurriculumV2.units[0];
+    const lessonsOk = unit.lessons.every((l) => walkLesson(t, l.id, { answer: 'correct' }) && t.api.kaoLesson('finish'));
+    const step = t.api.kaoNextStep(NOW);
+    const started = t.api.kaoLesson('start', step.param) && step.kind === 'mastery';
+    const played = playLesson(t, { answer });
+    const units = (t.data.quranLearn.path && t.data.quranLearn.path.units) || {};
+    const record = units[String(unit.id)] || {};
+    const after = t.api.kaoNextStep('2026-10-01T12:00:00.000Z');
+    return { lessonsOk, step, started, played, record, after };
+  };
+  const passed = playUnit1('correct');
+  const failed = playUnit1('wrong');
+  const passOk = passed.lessonsOk && passed.started && passed.played
+    && typeof passed.record.masteryAt === 'string' && !!passed.record.masteryAt
+    && passed.record.masteryScore >= 0.8 && passed.after.kind === 'next-unit';
+  const failOk = failed.lessonsOk && failed.started && failed.played
+    && !failed.record.masteryAt && failed.after.kind === 'repair';
+  return [passOk && failOk,
+    `doğru: masteryAt=${!!passed.record.masteryAt} skor=${passed.record.masteryScore} adım=${passed.after.kind} · yanlış: masteryAt=${!!failed.record.masteryAt} adım=${failed.after.kind}`];
 });
 
 check('R-02', 'K4-01 (v1 kullanıcı)', () => {
@@ -168,10 +181,28 @@ check('R-09', 'K6-02', () => {
   return [wrong.length === 0, `yığınsız atama ve kaoNav ana ekrana düşmüyor: ${wrong.join(', ') || 'yok'}`];
 });
 
+// R-10 (D2F-05): kabul testi izlenen kanıt dosyasını (A-KABUL.md) koşulsuz yeniden yazmamalı. Yazım GİRİNTİDEN BAĞIMSIZ
+// yakalanır ve yazan satırın KAO2_EVIDENCE_OUT koşulu (`if (evidenceOut) …`) altında olduğu doğrulanır. Koşulsuz bir yazım → FAIL.
 check('R-10', 'M-11', () => {
   const src = read('tests/kao/test_kao2_kabul.js');
-  const writesUnconditionally = /\nfs\.writeFileSync\(path\.join\(repoRoot, '[^']*A-KABUL\.md'\)/.test(src);
-  return [!writesUnconditionally, 'kabul testi izlenen kanıt dosyasını her koşuda koşulsuz yeniden yazıyor ise FAIL'];
+  const lines = src.split('\n');
+  const indentOf = (line) => (line.match(/^[ \t]*/) || [''])[0].length;
+  // Kanıt dosyasına yazan her satır (literal A-KABUL.md yolu ya da kanıt-yolu değişkeni evidenceOut); girinti serbest, yorum hariç.
+  const writes = [];
+  lines.forEach((line, i) => {
+    if (/^\s*\/\//.test(line) || !/fs\.writeFileSync\(/.test(line)) return;
+    if (/A-KABUL\.md|evidenceOut/.test(line)) writes.push(i);
+  });
+  // Yazımdan yukarı, daha az girintili en yakın `if (...)` bloğu yazımı sarmalı ve koşulu KAO2_EVIDENCE_OUT'a bakmalı.
+  const unguarded = writes.filter((i) => {
+    for (let j = i - 1; j >= 0; j -= 1) {
+      if (!/\bif\s*\(/.test(lines[j])) continue;
+      if (indentOf(lines[j]) < indentOf(lines[i])) return !/KAO2_EVIDENCE_OUT|evidenceOut/.test(lines[j]);
+    }
+    return true;
+  });
+  return [writes.length > 0 && unguarded.length === 0,
+    `${writes.length} kanıt yazımı (girintiden bağımsız) · KAO2_EVIDENCE_OUT koşulsuz=${unguarded.length}`];
 });
 
 assert.equal(passed, 10, 'R-01…R-10 hepsi koşmalı');

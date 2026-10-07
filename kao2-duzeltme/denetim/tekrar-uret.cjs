@@ -1,6 +1,7 @@
 'use strict';
 
 // KAO2 denetimi (2026-09-30) · kritik ve yüksek bulguları yeniden üretir.
+// tarihsel kayıt; güncel kontroller tests/kao/test_kao2_denetim.js — R-01/R-10 D2F-05'te güçlendi
 // Her kontrol DOĞRU davranışı bekler: bugün FAIL, düzeltmeden sonra PASS olmalıdır.
 // Salt okur: node:vm içinde sentetik veri; ağ, tarayıcı, zamanlayıcı ve dosya yazımı yok.
 // Çalıştır: node kao2-duzeltme/denetim/tekrar-uret.cjs  (çıkış kodu = FAIL sayısı)

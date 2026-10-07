@@ -285,3 +285,13 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-13/KANIT.md
 - next: D2F-14
+
+## seq 21 · 2026-10-07 · NOTE · D2F-13
+- başlık: Kullanıcı isteğiyle iki açık madde düzeltildi: `MediaRecorder` plan-check uyarısı ve D2-12 `8bf8f658` kararı.
+- oturum: claude-code:a2d84e3d-c707-467c-81b6-d166368fce15
+- kullanıcı isteği (birebir): "bunlsrı duzelt" (D2-12 `8bf8f658` ve plan-check `MediaRecorder` + `save` uyarısı için).
+- **MediaRecorder:** `app/core/quranLearn.js` okundu: kayıt yalnız `ui.kaoShadow.url` (kalıcı olmayan `ui`) içinde; `save` yalnız `kaoShadowVerdict` içinde iki sayı (`near`, `n`) yazar. Uyarı sahte alarmdı. `kao-plan-check.mjs`: elle-incele uyarısı kaldırıldı, yerine deterministik kapı: `kaoShadowCleanup…kaoShadowVerdict` bloğunda `save(`/`kaoSave(`/`.data()`/depo/senkron/`fetch(` varsa FAIL; blok sınırı bulunamazsa FAIL. Self-test 38→41 (temiz blok · kayıt bloğunda `kaoSave` FAIL · sınır yok FAIL). Gerçek kod: `PASS (0 warn)`. `tests/kao/test_kao_privacy.js` aynı sözleşmeyi zaten koşuyordu; kapı artık aracın kendisinde.
+- **D2-12 / `8bf8f658` kararı: GERİ ALINMADI, kayıtla kapatıldı.** Gerekçe (ölçüm): commit düzeltme içeriyor (alt çubuk İlham etiketi, Arapça sekmesi, Raşit kartları, panel-v2 dar ekran) ve yayında (`20261007a` pininin parçası); geri almak bu düzeltmeleri siler ve pinleri geriye alır. Değiştirdiği 8 fixture bayraklı ve bayraksız tam kapıda yeşil. Denetimin itirazı süreçtir (öneksiz/kapsam dışı), kod hatası değil; süreç kaydı KAO2-FIX seq 124'te ve bu NOT'ta. Reddedilen: `git revert` (yayını bozar, izin yok), geçmişi yeniden yazma (yasak). **Geri alma yolu:** kullanıcı isterse ayrı onayla `git revert 8bf8f658` + pin güncellemesi.
+- değişen: `docs/kuran-ogreniyorum/tools/kao-plan-check.mjs` + `.test.mjs`, `DUZELTME-SONUCU.md`, LEDGER, CURRENT-STATE, D2F-STATE (`strictExceptions`). Uygulama kodu/pin yok.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- next: D2F-14

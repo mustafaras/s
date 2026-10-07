@@ -52,6 +52,7 @@ const CARD_OF_SUBJECT_RE = /^(KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|D2F-
 // K2F-01 (M-10): plan-check tabanı — bu commit'ten SONRAKİ commitler denetlenir, öncesi tarihsel sayılır.
 const FIX_STATE_PATH = path.join(ROOT, 'kao2-duzeltme', 'FIX-STATE.json');
 const AUDIT_STATUSES = ['pass', 'fail', 'findings'];
+const SHADOW_BLOCK_FORBIDDEN = /\bsave\(|SeymaSave|kaoSave\(|\.data\(\)|localStorage|sessionStorage|indexedDB|SeySync|\bfetch\(|sendBeacon/;
 const FORBIDDEN_IN_REGISTRY = ['localStorage', 'XMLHttpRequest', 'SeySync', 'ghToken', 'openaiKey', 'sessionStorage', 'indexedDB'];
 
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
@@ -184,7 +185,15 @@ export function check(state, ctx) {
     if (f.endsWith('quranLearn.js')) {
       for (const p of FORBIDDEN_IN_REGISTRY) if (src.includes(p)) fail(`${f}: registry'de yasak ${p}`);
       for (const mm of src.matchAll(/fetch\(\s*([^)]*)\)/g)) if (!/assets\/kao\//.test(mm[1])) fail(`${f}: fetch yalnız assets/kao/ olabilir → ${mm[1].slice(0, 60)}`);
-      if (/MediaRecorder/.test(src) && /(save\(|SeymaSave)/.test(src)) warn(`${f}: MediaRecorder ve save birlikte — kayıt kalıcı yola çıkmıyor mu, elle incele (05 §4)`);
+      if (/MediaRecorder/.test(src)) {
+        // 05 §4 / 10 §9: gölgeleme kaydı yalnız bellekte; kayıt bloğu (kaoShadowCleanup…kaoShadowVerdict öncesi) depo/senkron/ağa dokunamaz.
+        const from = src.indexOf('function kaoShadowCleanup'), to = src.indexOf('function kaoShadowVerdict');
+        if (from < 0 || to <= from) fail(`${f}: MediaRecorder var ama kayıt bloğu sınırları (kaoShadowCleanup…kaoShadowVerdict) bulunamadı`);
+        else {
+          const hit = src.slice(from, to).match(SHADOW_BLOCK_FORBIDDEN);
+          if (hit) fail(`${f}: gölgeleme kayıt bloğunda kalıcı/ağ yolu ${hit[0]} (05 §4)`);
+        }
+      }
     } else if (/verified\s*:\s*false|"verified"\s*:\s*false/.test(src)) fail(`${f}: verified:false kayıt üretim paketinde`);
     const base = path.basename(f);
     for (const L of LOAD_LISTS) { const t = ctx.readSource(L); if (t != null && !t.includes(base)) fail(`${base} ${L} yükleme listesinde yok (MON-25 dört liste kuralı)`); }

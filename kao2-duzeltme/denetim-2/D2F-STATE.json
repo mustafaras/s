@@ -7,7 +7,7 @@
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
   "nextPrompt": "D2F-14",
-  "ledgerLastSeq": 20,
+  "ledgerLastSeq": 21,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -196,6 +196,11 @@
       "rule": "a",
       "ref": "D2F-12",
       "reason": "2 commit: yayımlanmış hazırlık/merge-istisnası kaydı 3f3b28cd + gerçek D2F-12 uygulaması; ilk commit yanlış D2F-12 önekiyle yayımlandı, kullanıcı geçmişi yeniden yazmadan dar istisna yolunu seçti (2026-10-07)"
+    },
+    {
+      "rule": "a",
+      "ref": "D2F-13",
+      "reason": "2 commit: doğrulama commit'i c7154f8b + kullanıcı isteğiyle (\"bunlsrı duzelt\") plan-check MediaRecorder kapısı ve 8bf8f658 kararı NOT commit'i (LEDGER seq 21); geçmiş yeniden yazılmadı (2026-10-07)"
     }
   ]
 }

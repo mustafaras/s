@@ -13,8 +13,8 @@ Kanıt düzeyleri ayrıdır: **K** = kaynak/test (bu oturumda koşturuldu) · **
 | `tekrar-uret-2.cjs` | **9/9 PASS** (beklenen 8/9'dan **fazla**: N-08 de geçiyor, bkz. D2-08) |
 | `tekrar-uret.cjs` | 10/10 PASS |
 | `tests/kao/test_kao2_denetim.js` | 10/10 PASS (R-01 gerçek ustalık geçişi, R-10 girintiden bağımsız) |
-| `kao-plan-check.mjs` | PASS (1 warn: `quranLearn.js` MediaRecorder+save, önceden beri bilinen, elle inceleme notu) |
-| `d2f-sync-check.mjs --strict` | PASS · 24 commit · 13/13 kayıtlı istisna |
+| `kao-plan-check.mjs` | **PASS (0 warn)**; self-test 41/41. Eski `MediaRecorder`+`save` uyarısı sahte alarm çıktı; kayıt bloğunu denetleyen deterministik kapıya çevrildi (seq 21) |
+| `d2f-sync-check.mjs --strict` | PASS · 14/14 kayıtlı istisna (seq 21 NOT commit'i dahil) |
 | `perf-ab.cjs` (cari ↔ `git archive 07802fa6`) | best3 **1,098** · p50 1,072 · p95 0,939 (cari p50 3,19 ms / taban 2,97 ms) — denetimdeki 1,111–1,139'dan iyi, bandın içinde |
 | `test_kao2_kabul.js` | **A-1…A-10 PASS · P10 PASS**; A-11/A-12 cihazda (ölçülmedi) → [evidence/D2F-13/A-KABUL.md](evidence/D2F-13/A-KABUL.md) |
 | Bütçeler | runtime 117,350 KiB ≤ 128 · css 13,035 ≤ 14 · içerik 183,837 ≤ 256 |
@@ -35,7 +35,7 @@ Kanıt düzeyleri ayrıdır: **K** = kaynak/test (bu oturumda koşturuldu) · **
 | D2-09 | Aynı derste aynı gramer sorusu | D2F-04 | `16d87a77` | N-09 PASS (tekrar yok) | **Kapandı (K)** |
 | D2-10 | u09.01 başlığı içerikle uyuşmuyor | D2F-11→12 | `2fe3abf6` | Başlık "Anmak, yemek, vermek: fiil kökleri"; hedef geçmiş-zaman fiil kartlarıyla uyumlu; `test_kao2_lesson_coherence` yeşil | **Kapandı (K)** — metin devirle yazıldı; review kaydı `ai-delegated`, L2 yok |
 | D2-11 | Müfredat eşleme sayfası bayat | D2F-07 | `7ad82a93` | `MUFREDAT-ESLEME.md`: "taslaktır" 0, "Karar bekleyen" 0; durum satırı "133 metin · draft 0 · sourced 133"; `test_kao2_curriculum` yeşil | **Kapandı (K)** |
-| D2-12 | Kapsam dışı commit + gevşek plan-check | D2F-02, D2F-10 | `2edc9810`, `618791e9` | Plan-check istisnası tek-hash'e daralmış (`65e94db2`, `8e583a93`), genel "K2F-NN ek:" izni yok; plan-check PASS. `8bf8f658` kapsam dışı commit'in kendisi **geri alınmadı** (yayında) | **Kısmen: kapı daraltıldı (K); kapsam dışı CSS/uygulama değişikliği ayrı kayıt/program konusu olarak duruyor** |
+| D2-12 | Kapsam dışı commit + gevşek plan-check | D2F-02, D2F-10, D2F-13 NOT | `2edc9810`, `618791e9` | Plan-check istisnası tek-hash'e daralmış, genel "K2F-NN ek:" izni yok; `8bf8f658` içeriği (8 fixture) tam kapıda yeşil. **Karar (seq 21): geri alınmadı** — düzeltme içeriyor, yayında; geri alma yayını bozar | **Kapandı (K) kayıtla; kod geri alınmadı.** İstenirse `git revert 8bf8f658` ayrı onayla |
 | — | Ses görevi şık ekranı doğrulanamadı | D2F-06 | `79eca899` | `test_kao2_components` yeşil (ses görevi üretilebilir, şık bloğu bayt-eş) | **Kapandı (K)** |
 | — | Süreç hataları M-05/M-07/M-12 | D2F-09 | `e36e96ad` | `d2f-sync-check --strict` PASS; `--audit-k2f` geçmişi yalnız raporlar | **Önleme araçla var (K)**; geçmiş ihlaller (28 çok commit'li prompt, 21 plan dışı pin) silinmedi |
 | — | Perf göreli bant | D2F-02 | `2edc9810` | Bayraklı ve bayraksız perf yeşil; A/B 1,098 | **Kapandı (K)** |
@@ -56,4 +56,5 @@ Programın kendi süreç sapmaları (dürüstlük): D2F-03/04/05/06/08/11/12 bir
 3. **Hece sesi kayıtları (K-3)** — kayıt bekliyor.
 4. **Cihaz kabulü (A-11/A-12, K3)** ve **ekran okuyucu turu.**
 5. **Canlı bayt eşitliği (D2-06 geri kalanı, D2F-16)** — komutu kullanıcı çalıştırır.
-6. D2F-14/15 (yayın özeti, yayın): D2F-15 yayın adımı yalnız kullanıcı kararıyla; erken yayın zaten çıktı.
+6. D2-12 `8bf8f658` kalıcı geri alınmak istenirse: ayrı ve açık onay (canlı arayüzü değiştirir).
+7. D2F-14/15 (yayın özeti, yayın): D2F-15 yayın adımı yalnız kullanıcı kararıyla; erken yayın zaten çıktı.

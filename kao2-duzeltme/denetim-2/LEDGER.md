@@ -34,3 +34,18 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - mutasyon: (a) `selected.ordinal===index` geri → D1 FAIL ("geri bildirim: Doğru cevap: …"), D4 FAIL; (b) çip durumu ordinal'e geri → D1 FAIL ("çiplerden hiçbiri yanlış işaretlenmez").
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-03/KANIT.md
 - next: D2F-04
+
+## seq 4 · 2026-10-07 · NOTE · D2F-03
+- başlık: D2F-03 commit'inden (`cd614eb6`) sonra bulunan kardeş kusur — "Kelime dizme" görevi bazen çözülmüş sırayla açılır.
+- oturum: https://claude.ai/code/session_018WK6EKGxUJbKAaNFboTVpv
+- bulgu: `gramOrderRecipe` (`app/core/quranLearn.js:1379`) karıştırmadan sonra "zaten sıralı mı" kontrolünü çip kimliğiyle
+  (`item.ordinal===index`) yapar. Aynı yazılı çipler yer değişmiş gelirse kimlikler sıralı görünmez, kaydırma yapılmaz; ama
+  ekrandaki yazı dizisi tam cevaptır → kullanıcı soldan sağa dokunarak "Doğru" alır.
+- ölçüm (bu oturum, scratchpad betiği, kaynak/test): 18 dizme şablonu × 2000 tohum = 36000 görev; çözülmüş görünen 22,
+  hepsi `g:g16:g16-k2` (≈%1,1 bu kartta, diğer 17 şablonda 0). D2F-03 testleri (D1–D4) bunu kapsamıyor.
+- önerilen düzeltme: 1379'daki kontrolü yazı dizisine çevir (`kaoOrderLabels` ile karşılaştır); test: 18 şablonun tüm
+  tohumlarında gösterilen yazı dizisi hiçbir zaman doğru diziye eşit değil. Dosyalar: `app/core/quranLearn.js`,
+  `tests/kao/test_kao2_grammar_tasks.js`. FSRS/`kaoBuildQueue` değişmez.
+- durum: kod bu oturumda değiştirilmedi (ORTAK-KURALLAR §3); yeni prompt gerekir (ayrı ek prompt ya da D2F-04'e ekleme —
+  kullanıcı kararı bekleniyor).
+- next: D2F-04

@@ -2,7 +2,7 @@
 
 <!-- d2f-sync
 nextPrompt: D2F-04
-lastSeq: 3
+lastSeq: 4
 status: active
 -->
 
@@ -31,6 +31,7 @@ status: active
 ## Açık bulgular (N durumları)
 N-01 `pass` (D2F-03: dizme doğruluğu çip yazısına dayanır). N-02…N-09 `fail`. Eşleme: N-01↔D2-01 (D2F-03, kapandı — kaynak/test; canlıda yayına kadar eski davranış) · N-09↔D2-09 (D2F-04) · N-02/N-03↔D2-02/03 (D2F-05) ·
 N-05↔D2-05 (D2F-08) · N-06/N-07↔D2-06/07 (D2F-10) · N-04↔D2-04 (D2F-11/12) · N-08↔D2-08 (yayın, D2F-15).
+**Açık NOT (LEDGER seq 4):** D2F-03 sonrası kardeş kusur — `gramOrderRecipe` "zaten sıralı" kontrolü kimliğe bakıyor, g16-k2 ≈%1 tohumda çözülmüş sırayla açılıyor; yeni prompt gerekir (kod değişmedi).
 D2-12'nin araç kısmı D2F-02'de kapandı; kayıt kısmı (LEDGER notu) D2F-10'da.
 
 ## Ortam notu

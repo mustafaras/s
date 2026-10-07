@@ -127,4 +127,71 @@ assert.match(css, /:focus-visible[^{}]*\{[^}]*outline\s*:\s*3px/);
 assert.match(css, /\.kao-group-separator\{[^}]*left:\s*51px/);
 assert.match(css, /@media \(forced-colors:active\)/);
 
-console.log('KAO2 components: PASS (escape, erişilebilirlik, güvenli eylem, ölçü ve durum bileşenleri)');
+// D2F-06 (denetim raporu §8 "doğrulanamayanlar"): K2F-40 "ses" (audioOnly) görevinin şık ekranını Views.choice düğme
+// kipine taşıdı; denetim bu türü sentetik ortamda ürettiği için ekran doğrulanamamıştı. Görev burada GERÇEK kurucuyla
+// (dersin gerçek oynatımı) üretilir; cevapsız/doğru/yanlış üç durumda şık ekranı sınanır. Görev nesnesi elle kurulmaz.
+const kaoHarness = require('./helpers/kao-harness');
+const AUDIO_LESSON = 'u01.01';
+const AUDIO_BTN = '<button type="button" class="kao-audio" aria-label="Yavaş dinlemek için dokun; doğal hız için 350 milisaniye basılı tut"';
+
+// Görevlerde şık bloklarını (Views.choice düğme kipinin ürettiği) görev bölümünden çeker.
+function kaoChoicesBlock(html) {
+  const match = /<div class="kao-choices">([\s\S]*?)<\/div><p class="kao-live"/.exec(html);
+  return match ? match[1] : null;
+}
+// Views.choice düğme kipinin SÖZLEŞMESİ (ses görevi: etiketler Türkçe, sıra değil): motor çıktısını bu bağımsız
+// orakula karşılaştırmak, gösterimin gerçekten düğme kipinden geldiğini ve sınıf/kapalılık sırasını doğrular.
+function kaoExpectedChoices(task, panel, choiceId) {
+  return task.choices.map((choice) => {
+    const state = panel ? (choice.correct === true ? 'correct' : (choice.choiceId === choiceId ? 'wrong' : 'dim')) : 'idle';
+    const mark = state === 'correct' ? '✓' : (state === 'wrong' ? '✕' : '');
+    const screenText = state === 'correct' ? 'Doğru cevap' : (state === 'wrong' ? 'Senin seçimin' : '');
+    const classes = state === 'idle' ? '' : ` class="kao-choice-${state}"`;
+    const markHtml = mark ? `<span class="kao-choice-mark" aria-hidden="true">${mark}</span><span class="kao-sr-only">${screenText}</span>` : '';
+    return `<button type="button"${classes}${panel ? ' disabled' : ''} onclick="App.kaoAnswer('${task.id}','${choice.choiceId}')">${markHtml}${esc(choice.label)}</button>`;
+  }).join('');
+}
+// Ses görevini gerçek oynatımla yakalar: `answer` doğru ya da yanlış şıkkı seçtirir; görev nesnesi elle kurulmaz.
+function kaoAudioShot(answer) {
+  const t = kaoHarness.bootKao({ seeded: true });
+  let shot = null;
+  const walked = kaoHarness.walkLesson(t, AUDIO_LESSON, { answer, visit(task) {
+    if (!task.audioOnly || shot) return;
+    const idle = t.api.kaoOverlayHTML(t.NOW);
+    const pick = answer === 'wrong' ? task.choices.find((c) => !c.correct) : task.choices.find((c) => c.correct);
+    const result = t.api.kaoAnswer(task.id, pick.choiceId);
+    shot = { task, idle, after: t.api.kaoOverlayHTML(t.NOW), result };
+  }});
+  assert.equal(walked, true, `${answer}: ses görevli ders baştan sona oynatılmalı`);
+  assert.ok(shot, `${answer}: "ses" türü görev gerçek kurucuyla üretilebilmeli (rapor §8)`);
+  assert.equal(!!(shot.result && shot.result.correct), answer !== 'wrong', `${answer}: cevap doğruluk durumu`);
+  return shot;
+}
+
+const audioShots = { correct: kaoAudioShot('correct'), wrong: kaoAudioShot('wrong') };
+for (const [ad, answer] of [['doğru', 'correct'], ['yanlış', 'wrong']]) {
+  const { task, idle, after } = audioShots[answer];
+  assert.ok(task.audioOnly === true && task.choices.length >= 2, `${ad}: ses görevi (audioOnly) en az iki şıklı`);
+  assert.ok(task.choices.every((choice) => !/[\u0600-\u06ff]/.test(choice.label)), `${ad}: ses görevi şıkları Türkçe anlam (dinlenen kelime açığa çıkmaz)`);
+  assert.match(idle, /Dinlediğin kelimenin anlamını seç/, `${ad}: ses görevi yönergesi`);
+  const idleBlock = kaoChoicesBlock(idle), afterBlock = kaoChoicesBlock(after);
+  assert.ok(idleBlock && afterBlock, `${ad}: görev şık bloğu render edilmeli`);
+  // Cevapsız: şıklar Views.choice düğme kipinden, sınıfsız ve etkin; durum sınıfı/kapalılık/aria-pressed yok.
+  assert.equal(idleBlock, kaoExpectedChoices(task, false, ''), `${ad}: cevapsız şıklar Views.choice düğme kipi çıktısı`);
+  assert.equal(idleBlock, task.choices.map((choice) => api.choice({ button: true, label: choice.label, onclick: `App.kaoAnswer('${task.id}','${choice.choiceId}')` })).join(''), `${ad}: şıklar doğrudan Views.choice düğme kipinden gelir`);
+  assert.doesNotMatch(idleBlock, /kao-choice-(?:correct|wrong|dim)| disabled| aria-pressed/);
+  // Yanıt sonrası: tüm şıklar kapalı; doğru/yanlış/dim durum sınıfları yine Views.choice'dan gelir.
+  const chosen = task.choices.find((choice) => (answer === 'wrong' ? !choice.correct : choice.correct));
+  assert.equal(afterBlock, kaoExpectedChoices(task, true, chosen.choiceId), `${ad}: yanıt sonrası şıklar Views.choice düğme kipi çıktısı`);
+  assert.equal((afterBlock.match(/ disabled\b/g) || []).length, task.choices.length, `${ad}: yanıt sonrası tüm şıklar kapalı`);
+  assert.equal((afterBlock.match(/class="kao-choice-correct"/g) || []).length, 1, `${ad}: tek doğru şık işaretli`);
+  assert.doesNotMatch(afterBlock, /aria-pressed/, `${ad}: ses görevi sıra görevi değil; aria-pressed yok`);
+  if (answer === 'wrong') assert.equal((afterBlock.match(/class="kao-choice-wrong"/g) || []).length, 1, `${ad}: seçilen yanlış şık işaretli`);
+  // Ses düğmesinin erişilebilir adı üç durumda da aynı ve doğru.
+  assert.ok(idle.includes(AUDIO_BTN), `${ad}: cevapsız ses düğmesi erişilebilir adı`);
+  assert.ok(after.includes(AUDIO_BTN), `${ad}: yanıt sonrası ses düğmesi erişilebilir adı`);
+}
+assert.match(audioShots.correct.after, /kao-feedback-success/, 'doğru: başarı geri bildirimi');
+assert.match(audioShots.wrong.after, /kao-feedback-warning/, 'yanlış: uyarı geri bildirimi');
+
+console.log('KAO2 components: PASS (escape, erişilebilirlik, güvenli eylem, ölçü, durum ve ses görevi şıkları)');

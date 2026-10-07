@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-06",
-  "ledgerLastSeq": 8,
+  "nextPrompt": "D2F-07",
+  "ledgerLastSeq": 9,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -41,9 +41,9 @@
     },
     "D2F-06": {
       "title": "Ses görevinin ekranı teste bağlansın",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-06/KANIT.md",
+      "session": "https://claude.ai/code/session_d0d6d6d9-c277-497f-98ea-e3c237d4db72"
     },
     "D2F-07": {
       "title": "Müfredat eşleme sayfası gerçeği yazsın",

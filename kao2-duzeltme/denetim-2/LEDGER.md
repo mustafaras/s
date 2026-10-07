@@ -109,3 +109,25 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
   `d2f-sync-check.mjs` (düz + `--repro`) **PASS** (N 5/9 pass).
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-05/KANIT.md
 - next: D2F-06
+
+## seq 9 · 2026-10-07 · PROMPT · D2F-06
+- başlık: Ses görevinin ekranı teste bağlansın — denetim raporu §8 "doğrulanamayanlar" kapandı: "ses" (audioOnly) görevinin şık
+  ekranı **gerçek kurucuyla** üretilip cevapsız/doğru/yanlış durumlarda kalıcı teste bağlandı.
+- oturum: https://claude.ai/code/session_d0d6d6d9-c277-497f-98ea-e3c237d4db72
+- dal: `d2f-05` (HEAD `80ed4450` = D2F-05 NOT; baseCommit `cbe0d604`).
+- değişen: `tests/kao/test_kao2_components.js` (yeni ses görevi bölümü: `kao-harness` `bootKao`+`walkLesson('u01.01')` ile gerçek
+  oynatım, görev nesnesi elle kurulmaz; `kaoChoicesBlock` görev şık bloğunu render'dan çeker; `kaoExpectedChoices` düğme kipi
+  sözleşmesinin **bağımsız literal orakulu**; cevapsız→sınıf/`disabled`/`aria-pressed` yok, yanıt sonrası→tüm şıklar kapalı +
+  tek `kao-choice-correct` + yanlışta tek `kao-choice-wrong`; şıklar Türkçe; ses düğmesi erişilebilir adı). Dokunulmadı:
+  `app.js`, `app/core/*`, `sync.js`, pinler/sw, `test_kao2_kabul.js`.
+- test: `test_kao2_components.js` **çıkış 0 PASS** · `tekrar-uret-2.cjs` **5/9 PASS** (D2F-05'te de 5/9 — azalmadı) · `tekrar-uret.cjs` 10/10.
+- kanıt (tek seferlik, commit edilmedi): `f4c256c7^` (K2F-40 öncesi) vs HEAD ses görevi şık HTML'i üç durumda **bayt-eşit**
+  (idle 617 · correct 853 · wrong 973 B; sha256 önekleri aynı; `diff -q` EQUAL; toplam 2.443 B).
+- mutasyon (scratchpad, commit edilmedi): (a) Views düğme kipi geri alındı (`quranLearnViews.js`=f4c256c7^) → satır 86 FAIL;
+  (b) motor `disabled:disabled`→`disabled:false` (`quranLearn.js:1746`) → satır 185 **yeni bölüm** FAIL (bölümü izole eder).
+- kapılar (bayraklı kapilar.sh): **çıkış 1, "SONUÇ: KIRMIZI KAPI VAR"** — iki kırmızı da ortam kaynaklı ve prompt kapsamı dışı:
+  `test_kao2_kabul.js` A-4 (`night-review`; yerel saat +03) · `test_settings_boundary.js` (ajan ana makinesi kök kontrol-noktası
+  ref'i `625eba07` `git log --all`'ı kirletiyor). Diğer tüm satırlar + perf (p95 4.570 · steady 3.179) PASS.
+- kayıt: `D2F-STATE.json` D2F-06 done · `nextPrompt` **D2F-07** · `ledgerLastSeq` **9** · N durumları değişmedi (5/9 pass).
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-06/KANIT.md
+- next: D2F-07

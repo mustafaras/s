@@ -86,3 +86,67 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - DOĞRU DURUM: program **kapanmadı** — D2F-05…16 `pending`, N-02…N-08 açık; yayında olanlar: D2F-01…04 (dizme çip yazısı, ders içi aynı
   gramer sorusu, çözülmüş açılmayan dizme, kapı araçları). Canlı bayt eşitliği ve cihaz doğrulaması kullanıcıda.
 - next: D2F-05
+
+## seq 8 · 2026-10-07 · PROMPT · D2F-05
+- başlık: Denetim kontrollerini güçlendir — R-01 gerçek ustalık geçişini, R-10 girintili koşulsuz yazımı yakalar (D2-02, D2-03).
+- oturum: https://claude.ai/code/session_d0d6d6d9-c277-497f-98ea-e3c237d4db72
+- dal: `d2f-05` (D2F-04 commit'i `59abe97b` üzerinde; baseCommit `cbe0d604`).
+- değişen: `tests/kao/test_kao2_denetim.js` (import +`playLesson`; R-01 gerçek `walkLesson`+`kaoLesson('finish')`+`playLesson`,
+  elle `st.at/st.phase` yok, doğru→`masteryAt` dolu/skor≥0,8/`next-unit`, yanlış→`masteryAt` boş/`repair`; R-10 girintiden
+  bağımsız yazım + `KAO2_EVIDENCE_OUT` koşul denetimi) · `tekrar-uret-2.cjs` (N-03 aynı kalıp) · `denetim/tekrar-uret.cjs`
+  (yalnız başa yorum). Dokunulmadı: `app.js`, `app/core/*`, pinler/sw, `test_kao2_kabul.js`.
+- test: `test_kao2_denetim.js` **10/10 PASS** (çıkış 0) · `tekrar-uret-2.cjs` **5/9 PASS** (N-01, N-02, N-03, N-08, N-09;
+  D2F-04'te 2/9 idi — azalmadı) · `tekrar-uret.cjs` 10/10.
+- mutasyon (scratchpad, commit edilmedi): (a) `quranLearn.js` `masteryAt` yazımı kapatıldı → R-01 FAIL
+  (`doğru: masteryAt=false skor=1 adım=mastery`); (b) `test_kao2_kabul.js`'e girintili koşulsuz A-KABUL.md yazımı → R-10 FAIL
+  (`2 kanıt yazımı · koşulsuz=1`).
+- kapılar (bayraklı kapilar.sh): **çıkış 1, "SONUÇ: KIRMIZI KAPI VAR"** — iki kırmızı da ortam kaynaklı ve prompt kapsamı dışı:
+  `test_kao2_kabul.js` A-4 (`night-review`; `kaoNightWindow` yerel saat, bu makine +03 → `TZ=UTC` ile geçiyor) ·
+  `test_settings_boundary.js` (ajan ana makinesi kök kontrol-noktası ref'i `625eba07` `git log --all`'ı kirletiyor; `main` atası değil).
+  Diğer satırlar yeşil (panel/panel-v2/quran/reminders/driver/zikr/kontrast/l2/plan-check/fix-sync + perf PASS).
+- kayıt: `D2F-STATE.json` D2F-05 done · `nextPrompt` D2F-06 · `ledgerLastSeq` 8 · N-02/N-03 `pass` · **N-08 `fail`→`pass`**
+  (seq 7 erken yayını panel-v2.html pinini `20261007a` yapıp pin tazeliğini kapattı; `d2f-sync-check --repro` "gerçek pass ama STATE fail" verdi).
+  `d2f-sync-check.mjs` (düz + `--repro`) **PASS** (N 5/9 pass).
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-05/KANIT.md
+- next: D2F-06
+
+## seq 9 · 2026-10-07 · PROMPT · D2F-06
+- başlık: Ses görevinin ekranı teste bağlansın — denetim raporu §8 "doğrulanamayanlar" kapandı: "ses" (audioOnly) görevinin şık
+  ekranı **gerçek kurucuyla** üretilip cevapsız/doğru/yanlış durumlarda kalıcı teste bağlandı.
+- oturum: https://claude.ai/code/session_d0d6d6d9-c277-497f-98ea-e3c237d4db72
+- dal: `d2f-05` (HEAD `80ed4450` = D2F-05 NOT; baseCommit `cbe0d604`).
+- değişen: `tests/kao/test_kao2_components.js` (yeni ses görevi bölümü: `kao-harness` `bootKao`+`walkLesson('u01.01')` ile gerçek
+  oynatım, görev nesnesi elle kurulmaz; `kaoChoicesBlock` görev şık bloğunu render'dan çeker; `kaoExpectedChoices` düğme kipi
+  sözleşmesinin **bağımsız literal orakulu**; cevapsız→sınıf/`disabled`/`aria-pressed` yok, yanıt sonrası→tüm şıklar kapalı +
+  tek `kao-choice-correct` + yanlışta tek `kao-choice-wrong`; şıklar Türkçe; ses düğmesi erişilebilir adı). Dokunulmadı:
+  `app.js`, `app/core/*`, `sync.js`, pinler/sw, `test_kao2_kabul.js`.
+- test: `test_kao2_components.js` **çıkış 0 PASS** · `tekrar-uret-2.cjs` **5/9 PASS** (D2F-05'te de 5/9 — azalmadı) · `tekrar-uret.cjs` 10/10.
+- kanıt (tek seferlik, commit edilmedi): `f4c256c7^` (K2F-40 öncesi) vs HEAD ses görevi şık HTML'i üç durumda **bayt-eşit**
+  (idle 617 · correct 853 · wrong 973 B; sha256 önekleri aynı; `diff -q` EQUAL; toplam 2.443 B).
+- mutasyon (scratchpad, commit edilmedi): (a) Views düğme kipi geri alındı (`quranLearnViews.js`=f4c256c7^) → satır 86 FAIL;
+  (b) motor `disabled:disabled`→`disabled:false` (`quranLearn.js:1746`) → satır 185 **yeni bölüm** FAIL (bölümü izole eder).
+- kapılar (bayraklı kapilar.sh): **çıkış 1, "SONUÇ: KIRMIZI KAPI VAR"** — iki kırmızı da ortam kaynaklı ve prompt kapsamı dışı:
+  `test_kao2_kabul.js` A-4 (`night-review`; yerel saat +03) · `test_settings_boundary.js` (ajan ana makinesi kök kontrol-noktası
+  ref'i `625eba07` `git log --all`'ı kirletiyor). Diğer tüm satırlar + perf (p95 4.570 · steady 3.179) PASS.
+- kayıt: `D2F-STATE.json` D2F-06 done · `nextPrompt` **D2F-07** · `ledgerLastSeq` **9** · N durumları değişmedi (5/9 pass).
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-06/KANIT.md
+- next: D2F-07
+
+## seq 10 · 2026-10-07 · NOTE · D2F-06
+- başlık: Ortam kırmızıları giderildi (kullanıcı yönergesi) — D2F-05/D2F-06'da "kapsam dışı (§3)" denen iki kırmızı, prompt
+  listesi dışında ve kullanıcı emriyle kapatıldı. İkisi de **test kusuru**; üretim davranışı doğruydu.
+- oturum: https://claude.ai/code/session_d0d6d6d9-c277-497f-98ea-e3c237d4db72
+- dal: `d2f-05` (HEAD `79eca899` = D2F-06; baseCommit `cbe0d604`).
+- kullanıcı yönergesi (birebir): "failleri çözmen gerekiyor tam ve kusursu şekilde çözülmeli"
+- değişen: `tests/kao/test_kao2_kabul.js` (A-4 `night-review` artık yerel duvar saati 23:30 kurar; `kaoNightWindow` YEREL saati
+  okur, `23:30Z` yalnız UTC'de 23:30'a denk geliyordu) · `tests/app/test_settings_boundary.js` (`git log` artık `--all` yok —
+  yürüyüş yalnız HEAD ataları; ajan ana makinesi kök kontrol-noktası ref'i `625eba07` `main` atası değil ve ebeveynsiz →
+  `git show <sha>^` geçersizdi). Üretim dosyası, pinler, `sw.js` değişmedi.
+- ölçüm (bu oturum, kaynak/test): 6 saat dilimi sondası — eski fikstür `night-review`'ı yalnız UTC'de verir, yeni fikstür
+  altısında da · `test_settings_boundary.js` **13/13 PASS** (öncesi çökme) · `test_kao2_kabul.js` **10/10 PASS çıkış 0**
+  (A-9: 189/189 dosya çıkış 0) · `tekrar-uret-2.cjs` **5/9 PASS** (azalmadı) · tam kapı **çıkış 0 "SONUÇ: TÜM KAPILAR YEŞİL"**.
+- mutasyon (scratchpad, geri alma, commit edilmedi): A-4 `now` eski değere dönerse bu makinede FAIL (`night-review`→`daily`);
+  `--all` geri eklenirse settings sınırı çöker. İkisi de fikstürün nedeni izole ettiğini gösterir.
+- kayıt: `nextPrompt` **ilerlemedi** (D2F-07'de kalır; bu bir NOTE'dır, prompt değil) · `ledgerLastSeq` **10**.
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-06/EK-KANIT.md
+- next: D2F-07

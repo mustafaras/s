@@ -20,8 +20,11 @@ function gitParentApp() {
   // This boundary belongs to MON-37, so HEAD^ is not a stable baseline once
   // later MON cards land. Resolve the commit that first added the settings
   // registry and compare against its actual parent instead.
+  // Ancestry only (no `--all`): agent-host checkpoint refs (refs/agents/**) are
+  // not ancestors of HEAD and can carry a parentless root commit that lists
+  // this path as added, which would make `<sha>^` invalid. Walk HEAD's history.
   const settingsCommit = childProcess.execFileSync('git', [
-    'log', '--format=%H', '--all', '--diff-filter=A', '--', 'app/core/settings.js'
+    'log', '--format=%H', '--diff-filter=A', '--', 'app/core/settings.js'
   ], {
     cwd: repoRoot,
     encoding: 'utf8',

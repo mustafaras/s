@@ -228,7 +228,8 @@ const sim = {};
   run('s0-lesson', 's0-lesson', (t, q) => { q.onboarding.start = 's0'; });
   run('daily', 'daily', () => {});
   // Gece penceresi: hedef yatış saatinin 90 dk öncesi (gerçek kaoNightWindow); çözücü kayıt API'siyle verilir.
-  run('night-review', 'night-review', (t, q) => { t.data.settings.targetBed = '00:30'; assert.equal(t.api.registerCaffeineTargetBed(() => '00:30'), true); dueCards(t, q, 12, '2026-09-30T08:00:00.000Z'); }, { now: '2026-09-30T23:30:00.000Z' });
+  // Saat diliminden bağımsız: kaoNightWindow YEREL saati okur; bu yüzden 23:30Z yerine yerel duvar saati 23:30 kurulur.
+  run('night-review', 'night-review', (t, q) => { t.data.settings.targetBed = '00:30'; assert.equal(t.api.registerCaffeineTargetBed(() => '00:30'), true); dueCards(t, q, 12, '2026-09-30T08:00:00.000Z'); }, { now: new Date(2026, 8, 30, 23, 30, 0).toISOString() });
   run('rest', 'rest', (t, q) => { q.daily['2026-09-30'] = { answered: 12, correct: 10, new: 5, reviewed: 7, sessionDone: true }; });
   run('mastery', 'mastery', (t, q) => doneUnit(t, q, 1));
   run('next-unit', 'next-unit', (t, q) => { doneUnit(t, q, 1); q.path.units['1'] = { masteryAt: ISO, masteryScore: 0.9 }; });

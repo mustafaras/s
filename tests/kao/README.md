@@ -23,6 +23,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao_phonics_contract.js` | planlandı | Harf, minimal çift, ses kimliği ve transliterasyon sözleşmesi |
 | `test_kao_privacy.js` | planlandı | Bellek-içi mikrofon ve aynı-origin ses sınırı |
 | `test_kao_requirements.js` | planlandı | Bağlayıcı R-A/R-B/R-C kabul kontrolleri |
+| `test_kao_pronunciation_contract.js` | KAO-FIX | Latin okunuş sözleşmesi: kısa sûre kelimesi, sözlük lemması/örneği, gramer hücresi, görev seçenekleri ve çizilen satırlarda okunuş zorunlu; bilinen okunuşlar sabit |
 | `test_kao_user_tasks.js` | planlandı | Üç kullanıcı görevinin headless senaryosu |
 | `test_kao_independence.js` | planlandı | KAO-IIP bağımsızlığı ve hub fallback sözleşmesi |
 | `test_kao_freeze_repro.js` | KAO-FIX-01 | Dört içerik modülünün araçlarla `$TMPDIR` kopyasında bayt-eş yeniden üretimi; girdi yoksa SKIP |
@@ -46,6 +47,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao2_explain.js` | KAO2-18 | Hata sınıfına göre açıklamalar ve kavram çözümlü örnekler |
 | `test_kao2_feedback.js` | KAO2-10 · K2F-31 | Cevap geri bildirimi paneli; ölçülen süre günlüğe (0–120 s), geri alma, gecikmeli sûre cevabı |
 | `test_kao2_grammar_notes.js` | KAO2-15 | S-10 gramer notları kütüphanesi |
+| `test_kao2_inventory.js` | D2F-08 | Bu envanterin koruması: her `tests/kao/test_*.js` burada tam adıyla bir satırda geçer, burada adı geçen her test diskte vardır, `helpers/` ve `fixtures/` içerikleri listelidir |
 | `test_kao2_kabul.js` | KAO2-27 · K2F-36 | Kabul ölçütleri A-1…A-10, gerçek handler/render/alt süreç ölçümü (`KAO2_ACCEPT_SLOW_HOST=1` yalnız A-10 göreli bandını atlar) |
 | `test_kao2_lesson_flow.js` | KAO2-12 · K2F-23 | Ders planı ve oynatıcı; Uygula adımı doğrulanmış örnek cümle |
 | `test_kao2_migration.js` | KAO2-16 | Mevcut kullanıcı geçişi (05 §9), sentetik eski durumlar |
@@ -64,4 +66,13 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao2_today.js` | KAO2-09 | Bugün ekranı (S-02) |
 | `test_kao2_word.js` | KAO2-25 · K2F-33 | Kelime detayı v2 (S-08) + panel aynası |
 
-K2F-41: `test_kao2_*.js` envanteri gerçek dosya listesine eşittir (37 dosya; kontrol: her `tests/kao/test_kao2_*.js` adı bu tabloda geçer). Yeni KAO2 testi aynı committe buraya eklenir.
+K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (55 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
+
+## Yardımcılar ve sabit veri
+
+| Dosya | Amaç |
+|---|---|
+| `helpers/kao-harness.js` | Ortak harness: `bootKao`/`freshUser`/`openView`/`walkLesson`; gerçek handler'larla akışı sürer (öz-testi `test_kao2_view_resolution.js`) |
+| `fixtures/fsrs-vectors.json` | FSRS referans vektörleri (`test_kao_fsrs.js`) |
+| `fixtures/qac-lemma-morph.json` | QAC'tan sayılmış lemma biçim tablosu (`test_kao2_lemma_morph.js`) |
+

@@ -179,3 +179,22 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-07/KANIT.md
 - next: D2F-08
+
+## seq 12 · 2026-10-07 · PROMPT · D2F-08
+- durum: done
+- başlık: tests/kao envanteri tam ve testle korunuyor
+- oturum: https://claude.ai/code/session_1f48752b-ccea-476d-8043-aecb83e71957
+- dal: `d2f-07` (önceki commit `7ad82a93` = D2F-07).
+- sorun: `tests/kao/README.md` 54 test dosyasından 53'ünü listeliyordu (`test_kao_pronunciation_contract.js` yok); `fixtures/fsrs-vectors.json` da listelenmemişti. D2-05 + K6-06 kalıntısı.
+- değişen: `tests/kao/README.md` (eksik satır + yeni test satırı + "Yardımcılar ve sabit veri" tablosu; sayım 55) · `tests/kao/test_kao2_inventory.js` (yeni).
+  Dokunulmadı: `app.js`, `app/core/*`, pinler/`sw.js`, `migrate()`.
+- test: önce kırmızı: `AssertionError: README envanterinde olmayan test dosyaları: test_kao2_inventory.js, test_kao_pronunciation_contract.js`
+  (çıkış 1); sonra `PASS test_kao2_inventory: 55 test + 3 yardımcı/fixture envanterde` (çıkış 0). Mutasyon kanıtı = README'siz kırmızı koşu (eksik satırlar
+  testi izole kırdı).
+- kapılar: `KAO2_ACCEPT_SLOW_HOST=1 bash kao2-duzeltme/tools/kapilar.sh` → tests/kao (55) PASS · tests/app (77) · panel (23) · panel-v2 (27) · quran (9) ·
+  reminders · driver · zikr · kontrast · l2-paket · fix-sync-check PASS · tekrar-uret 10/10 · perf PASS; **tek kırmızı `kao-plan-check`**
+  (`8e583a9` "denetim-2:" öneki — D2F-07'deki ortam kırmızısı, bu işle ilgisiz). `tekrar-uret-2.cjs` **6/9** (N-05 eklendi; azalmadı).
+- kayıt: `D2F-STATE.json` D2F-08 done · `nextPrompt` **D2F-09** · `ledgerLastSeq` **12** · N-05 pass.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-08/KANIT.md
+- next: D2F-09

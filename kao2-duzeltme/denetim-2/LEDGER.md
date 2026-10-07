@@ -13,3 +13,13 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - sürpriz: konteyner sığ klonla gelmişti (53 commit) ve `rsync` yoktu → ilk koşuda 4 ek kırmızı; `git fetch --unshallow` + `rsync` kurulumu sonrası koşu yinelendi (ayrıntı KANIT §Sürprizler).
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-01/KANIT.md
 - next: D2F-02
+
+## seq 2 · 2026-10-07 · PROMPT · D2F-02
+- başlık: Kapı araçları — plan-check istisnası tek commit'e daraldı, kapılar yavaş makinede dürüstçe yeşil.
+- oturum: https://claude.ai/code/session_018iQKmY6Zw9KwXkn632WQoN
+- dal: `claude/jolly-ride-9ltui4` (`36015f08` → `10537d18` ff-only, sonra bu commit).
+- değişen: kao-plan-check.mjs (genel `K2F-NN ek:` izni kaldırıldı; tek hash istisnası 65e94db2; D2F-01…16 tanınır) · kao-plan-check.test.mjs (+8 vaka, 38/38) · kapilar.sh (`KAO2_ACCEPT_SLOW_HOST=1` açıkça geçirilir, perf satırı denetlenir) · test_kao2_perf_budget.js (bayrakla yalnız göreli bant atlanır, stdout'a yazılır).
+- kapılar: bayraksız çıkış 1 (yalnız göreli p95: kabul + perf) · bayraklı çıkış 0 "SONUÇ: TÜM KAPILAR YEŞİL". tekrar-uret-2 0/9 · tekrar-uret 10/10.
+- mutasyon: sahte runtime (>128 KiB) bayraklı perf FAIL · istisna listesi boş → self-test FAIL · D2F aralığı genişletilince FAIL.
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-02/KANIT.md
+- next: D2F-03

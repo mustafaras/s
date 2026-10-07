@@ -59,11 +59,20 @@ if (process.env.KAO2_WRITE_BASELINE === '1') {
     contentGzip, runtimeGzip, cssGzip
   }, null, 2) + '\n', { flag: 'wx' });
 }
+// D2F-02: göreli bant KAO2-01 makinesine bağlıdır. KAO2_ACCEPT_SLOW_HOST=1 yalnız bu bandı atlar (ölçüm yine yazılır);
+// yukarıdaki mutlak tavanlar (içerik ≤256 · runtime ≤128 · css ≤14 KiB · p95 ≤40 ms) bayraktan bağımsız zorunludur.
+const slowHost = process.env.KAO2_ACCEPT_SLOW_HOST === '1';
+let relativeNote = '';
 if (baseline) {
   assert.ok(Number.isFinite(baseline.p95Ms) && baseline.p95Ms > 0, 'geçersiz p95 tabanı');
-  // Göreli bant, tur dalgalanması yerine EN İYİ 3 tur okumasıyla sınanır.
-  assert.ok(steadyP95Ms <= baseline.p95Ms * 1.25,
-    `steady p95 ${steadyP95Ms.toFixed(3)} ms exceeds baseline +25% (${baseline.p95Ms} ms)`);
+  const band = baseline.p95Ms * 1.25;
+  if (slowHost) {
+    relativeNote = ` · GÖRELİ BANT ATLANDI (yavaş makine): steady ${steadyP95Ms.toFixed(3)} ms ${steadyP95Ms <= band ? '≤' : '>'} bant ${band.toFixed(3)} ms`;
+  } else {
+    // Göreli bant, tur dalgalanması yerine EN İYİ 3 tur okumasıyla sınanır.
+    assert.ok(steadyP95Ms <= band,
+      `steady p95 ${steadyP95Ms.toFixed(3)} ms exceeds baseline +25% (${baseline.p95Ms} ms)`);
+  }
 }
 const kib = (n) => (n / 1024).toFixed(3);
-console.log(`KAO2 perf: PASS (content ${kib(contentGzip)} KiB · runtime ${kib(runtimeGzip)} KiB · css ${kib(cssGzip)} KiB · p95 ${p95Ms.toFixed(3)} ms · steady ${steadyP95Ms.toFixed(3)} ms)`);
+console.log(`KAO2 perf: PASS (content ${kib(contentGzip)} KiB · runtime ${kib(runtimeGzip)} KiB · css ${kib(cssGzip)} KiB · p95 ${p95Ms.toFixed(3)} ms · steady ${steadyP95Ms.toFixed(3)} ms${relativeNote})`);

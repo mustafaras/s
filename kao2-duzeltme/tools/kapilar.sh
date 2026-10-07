@@ -2,8 +2,14 @@
 # KAO2-FIX · tüm kapı komutları tek yerde (PROMPTLAR.md P3). Salt okur: ağ yok, tarayıcı yok, push yok.
 # Kullanım (repo kökünden):  bash kao2-duzeltme/tools/kapilar.sh
 # Çıkış kodu: 0 = hepsi yeşil · 1 = en az bir kapı kırmızı. Her kapı ayrı değerlendirilir (boru yok).
+# Yavaş makine (D2F-02):  KAO2_ACCEPT_SLOW_HOST=1 bash kao2-duzeltme/tools/kapilar.sh
+#   Bayrak kabul testine (A-10) ve bütçe testine açıkça geçirilir; YALNIZ göreli p95 bandı (KAO2-01 makinesine bağlı) atlanır
+#   ve perf satırı bunu yazar. Mutlak tavanlar (içerik ≤256 · runtime ≤128 · css ≤14 KiB · p95 ≤40 ms) aynen zorunludur.
+#   Bayraksız koşu değişmez: göreli bant da kapıdır.
 set -u
 cd "$(dirname "$0")/../.." || exit 1
+
+if [ "${KAO2_ACCEPT_SLOW_HOST:-}" = "1" ]; then export KAO2_ACCEPT_SLOW_HOST=1; SLOW=1; else unset KAO2_ACCEPT_SLOW_HOST; SLOW=0; fi
 
 FAILED=0
 row() { printf '%-34s %s\n' "$1" "$2"; }
@@ -22,6 +28,7 @@ family() { # family <ad> <glob>
 }
 
 echo "== KAO2-FIX kapıları =="
+if [ "$SLOW" = "1" ]; then echo "mod: YAVAŞ MAKİNE (KAO2_ACCEPT_SLOW_HOST=1) — yalnız göreli p95 bandı atlanır, mutlak tavanlar zorunlu"; fi
 for f in app/core/quranLearn.js app/core/quranLearnFlow.js app/core/quranLearnViews.js app/content/quranCurriculumV2.js app/content/quranGrammarV1.js; do
   gate "node --check $(basename "$f")" node --check "$f"
 done
@@ -46,7 +53,11 @@ gate "fix-sync-check --repro" node kao2-duzeltme/tools/fix-sync-check.mjs --repr
 echo "== tekrar-uret özeti =="
 node kao2-duzeltme/denetim/tekrar-uret.cjs 2>/dev/null | tail -1
 echo "== perf =="
-node tests/kao/test_kao2_perf_budget.js 2>/dev/null | grep 'KAO2 perf:' || echo "perf satırı okunamadı"
+PERF_LINE="$(node tests/kao/test_kao2_perf_budget.js 2>/dev/null | grep 'KAO2 perf:')"
+if [ -z "$PERF_LINE" ]; then echo "perf satırı okunamadı"
+elif [ "$SLOW" = "1" ] && ! printf '%s' "$PERF_LINE" | grep -q 'GÖRELİ BANT ATLANDI (yavaş makine)'; then
+  echo "$PERF_LINE"; echo "perf: bayrak verildi ama satırda 'GÖRELİ BANT ATLANDI (yavaş makine)' yok"; FAILED=1
+else echo "$PERF_LINE"; fi
 
 if [ "$FAILED" -eq 0 ]; then echo "SONUÇ: TÜM KAPILAR YEŞİL"; else echo "SONUÇ: KIRMIZI KAPI VAR"; fi
 exit "$FAILED"

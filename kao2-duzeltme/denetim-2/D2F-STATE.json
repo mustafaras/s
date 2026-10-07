@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-02",
-  "ledgerLastSeq": 1,
+  "nextPrompt": "D2F-03",
+  "ledgerLastSeq": 2,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -17,9 +17,9 @@
     },
     "D2F-02": {
       "title": "Kapı araçları",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-02/KANIT.md",
+      "session": "https://claude.ai/code/session_018iQKmY6Zw9KwXkn632WQoN"
     },
     "D2F-03": {
       "title": "\"Kelime dizme\" aynı görünen çipler",

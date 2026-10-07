@@ -1376,7 +1376,10 @@
     if(!example||words.length<2) return gramUnsupported('örnek ya da en az iki kelime yok');
     var choices=words.map(function(word,index){ return {label:String(word.ar),pronunciation:String(word.pronunciation||''),ordinal:index,tokenId:'w'+index}; });
     choices.sort(function(a,b){ return seededRank(seed+'|grammar-order',a.tokenId)-seededRank(seed+'|grammar-order',b.tokenId)||a.ordinal-b.ordinal; });
-    if(choices.every(function(item,index){ return item.ordinal===index; })) choices.push(choices.shift());
+    // D2F-04: "zaten çözülmüş mü" ekrandaki YAZI dizisiyle bakılır (aynı yazılı çipler yer değişince kimlik sırası karışık görünse de
+    // soru çözülmüş açılırdı); yazı dizisi doğru diziden ayrılana kadar kaydırılır (yalnız tüm yazılar aynıysa ayrılamaz).
+    var solved=kaoOrderLabels({choices:choices}).join('\u0001'),shownText=function(){ return choices.map(function(item){ return item.label; }).join('\u0001'); };
+    for(var turn=1;turn<choices.length&&shownText()===solved;turn+=1) choices.push(choices.shift());
     return {kind:'order',choices:choices,answer:words.map(function(word){ return word.ar; }).join(' '),stimulus:hint?String(words[0].ar):'',stimulusPronunciation:hint?String(words[0].pronunciation||''):'',context:[{label:'Anlamı: '+example.tr,pronunciation:''}].concat(hint?[{label:'İpucu: parça yukarıdaki kelimeyle başlar',pronunciation:''}]:[])};
   }
   function gramTranslateRecipe(record,seed){
@@ -1629,8 +1632,16 @@
     if(!/^g:/.test(id)||!grammarRecord(id)) return true;
     return kaoGrammarTaskValid(kaoBuildGrammarTask(item,d,{seed:String(item&&item.id||id)}));
   }
+  // D2F-04 (D2-09): kullanıcının gördüğü gramer sorusu = tür + yönerge + uyaran + şık yazıları (sırasız). Dizmede uyaran yalnız
+  // tekrar sayısına bağlı ilk-kelime ipucudur; imzaya girmez (aynı parçayı dizdiren iki şablon ipucu farkıyla ayrı soru sayılmaz).
+  function kaoGrammarTaskSignature(task){
+    if(!task||task.type!=='grammar') return '';
+    var labels=(Array.isArray(task.choices)?task.choices:[]).map(function(item){ return String(item&&item.label||''); }).sort();
+    return [String(task.grammarType||''),String(task.prompt||''),task.kind==='order'?'':String(task.stimulus||''),labels.join('\u0001')].join('\u0002');
+  }
   // Ders planında sunulamayan gramer alıştırmasını AYNI dersin bir kelime alıştırmasıyla değiştirir: öğe kimliği (devam
   // noktası) ve sırası korunur, alıştırma sayısı düşmez. Önce dersin henüz kullanılmamış kart yönleri, yoksa tekrar.
+  // D2F-04: aynı ders içinde daha önce kurulmuş bir gramer sorusunun birebir tekrarı da (farklı şablon, aynı soru) aynı yolla ikame edilir.
   function kaoLessonSafePlan(plan,d){
     var goal=plan.find(function(item){ return item.kind==='goal'; }),eligible=goal&&Array.isArray(goal.lemmaIds)?goal.lemmaIds:[];
     var used=Object.create(null),cards=objectOr(quranLearnRoot(d).cards,{}),spare=0;
@@ -1642,8 +1653,11 @@
       }
       spare+=1; return {lemmaId:eligible[(spare-1)%eligible.length],direction:'tr>ar'};
     }
+    var seen=Object.create(null);
     return plan.reduce(function(out,item){
-      if(item.kind!=='practice'||item.group!=='concept'||kaoGrammarItemPresentable({id:item.id,cardId:item.cardId,type:'grammar'},d)){ out.push(item); return out; }
+      if(item.kind!=='practice'||item.group!=='concept'){ out.push(item); return out; }
+      var probe={id:item.id,cardId:item.cardId,type:'grammar'},keep=kaoGrammarItemPresentable(probe,d),signature=keep?kaoGrammarTaskSignature(kaoBuildGrammarTask(probe,d,{seed:String(item.id)})):'';
+      if(keep&&!(signature&&seen[signature])){ if(signature) seen[signature]=true; out.push(item); return out; }
       if(!eligible.length) return out;
       var word=pickWord(),cardId='w:'+word.lemmaId+':'+word.direction;
       used[cardId]=true;

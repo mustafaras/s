@@ -191,6 +191,8 @@ const allLessons = curriculum.units.flatMap((unit) => unit.lessons);
 const gradedTask = (t, queueItem) => t.api.kaoBuildTask(queueItem, t.data, { seed: queueItem.id });
 // Kurulamayan (null) görev de "sunulamaz" demektir: kusur listesi boş değildir.
 const defectsOrUnbuilt = (task, label) => (task ? defectsOf(task, label) : [`${label} görev kurulamadı`]);
+// D2F-04: kullanıcının gördüğü gramer sorusu — tür + yönerge + uyaran + şık yazıları (sırasız); bölüm B3 ve E kullanır.
+const shownSignature = (task) => [task.grammarType, task.prompt, task.stimulus, (task.choices || []).map((c) => c.label).sort().join('/')].join('|');
 
 check('B1 · 109 dersin yürüyüşünde gösterilen HİÇBİR gramer görevi kuralları ihlal etmez; her derste alıştırma sayısı planla aynı ve ≥6', () => {
   assert.equal(allLessons.length, 109);
@@ -255,12 +257,14 @@ check('B2 · kaoGrammarTaskValid beş kuralı + tek doğru şık + tekil etiketi
 
 check('B3 · sunulamayan gramer görevi içeren ders: plan öğesi kelime alıştırmasıyla ikame edilir (kimlik korunur, sayı düşmez, kalan gramer görevleri geçerli)', () => {
   const t = bootBroken();
+  // D2F-04: ikame yolu ders içi birebir tekrar soruyu da (sunulabilir ama aynı) ikame eder; bu kontrol sunulamayan görevin ikamesini arar.
+  const unpresentable = (item) => (t.api.kaoGrammarSupport(item.substitutedFor) || (gradedTask(t, { id: item.id, cardId: item.substitutedFor, type: 'grammar' }) ? '' : 'kurulamadı')) !== '';
   let hit = null;
   for (const lesson of allLessons) {
     freshUser(t);
     assert.ok(t.api.kaoLesson('start', lesson.id));
     const subs = t.ui.kaoLesson.plan.filter((item) => item.substitutedFor);
-    if (subs.length) { hit = { lesson, plan: t.ui.kaoLesson.plan, subs }; break; }
+    if (subs.some(unpresentable)) { hit = { lesson, plan: t.ui.kaoLesson.plan, subs }; break; }
   }
   assert.ok(hit, 'ikame edilen alıştırması olan ders bulunamadı (test verisi)');
   const lemmaIds = new Set(hit.plan.find((x) => x.kind === 'goal').lemmaIds);
@@ -270,7 +274,11 @@ check('B3 · sunulamayan gramer görevi içeren ders: plan öğesi kelime alış
     assert.equal(item.group, 'lemma', 'kelime alıştırması');
     assert.notEqual(item.type, 'grammar');
     assert.ok(lemmaIds.has(item.lemmaId), 'ikame kelimesi aynı dersin kelimesi');
-    assert.notEqual(t.api.kaoGrammarSupport(item.substitutedFor) || (gradedTask(t, { id: item.id, cardId: item.substitutedFor, type: 'grammar' }) ? '' : 'kurulamadı'), '', 'yalnız sunulamayan görev ikame edilir');
+    if (unpresentable(item)) continue;
+    // Sunulabilir ikame yalnız D2F-04 tekrarıdır: aynı plandaki daha önceki bir gramer öğesinin gösterilen sorusuyla birebir aynı.
+    const shown = (x) => shownSignature(gradedTask(t, { id: x.id, cardId: x.substitutedFor || x.cardId, type: 'grammar' }));
+    const at = hit.plan.indexOf(item);
+    assert.ok(hit.plan.slice(0, at).some((x) => x.kind === 'practice' && x.group === 'concept' && shown(x) === shown(item)), 'yalnız sunulamayan ya da ders içinde tekrar eden görev ikame edilir');
   }
   const practice = hit.plan.filter((x) => x.kind === 'practice');
   assert.ok(practice.length >= 6 && practice.length <= 10, `alıştırma sayısı ${practice.length}`);
@@ -859,4 +867,85 @@ check('D4 · parça (fragment) dizme: aynı yazılı çipler yer değişse de g�
   assert.equal(wrong.after.queueLen, wrong.before.queueLen + 1);
 });
 
-console.log(`test_kao2_grammar_tasks (bölüm A+B+C+D): ${passed} kontrol PASS`);
+// ---------------------------------------------------------------------------------------------------------------
+// Bölüm E (D2F-04 · D2-09 + LEDGER seq 4 NOT) — ders içinde aynı gramer sorusu bir kez; dizme çözülmüş açılmaz
+// ---------------------------------------------------------------------------------------------------------------
+// Kullanıcının gördüğü soru: tür + yönerge + uyaran + şık yazıları (sırasız). Farklı şablonlar (ör. u01.02 g1-k1 ve g1-k2) aynı
+// tohum ailesinden birebir aynı soruyu kurabiliyordu; "ardışık aynı tür yok" kuralı bir görev arayla gelen tekrarı yakalamaz.
+// D2F-04 öncesi ölçülen değerler (109 ders, taze kullanıcı, doğru cevaplı gerçek yürüyüş): alıştırma sayısı her derste 10, yalnız
+// u11.04/u11.05/u11.06'da 9; gösterilen gramer görevi 78, ders içi aynı soru çifti 1 (u01.02 g1-k1 ≡ g1-k2).
+const PRACTICE_BEFORE = (lessonId) => (['u11.04', 'u11.05', 'u11.06'].includes(lessonId) ? 9 : 10);
+const GRAMMAR_SHOWN_BEFORE = 78, DUP_PAIRS_BEFORE = 1;
+
+check('E1 · D2-09 109 dersin yürüyüşünde hiçbir derste aynı gramer sorusu (tür + yönerge + uyaran + şıklar) iki kez gösterilmez; alıştırma sayısı her derste değişmez; gösterilen gramer yalnız çift sayısı kadar azalır', () => {
+  assert.equal(allLessons.length, 109);
+  const t = bootKao();
+  const dup = [], countDiff = [];
+  let shown = 0, substituted = 0;
+  for (const lesson of allLessons) {
+    freshUser(t);
+    const seen = new Map();
+    let practice = 0;
+    const done = walkAware(t, lesson.id, { visit: (task) => {
+      if (t.ui.kaoLesson.phase !== 'practice') return;
+      practice += 1;
+      if (task.type !== 'grammar' || task.retry) return;
+      shown += 1;
+      const sig = shownSignature(task);
+      if (seen.has(sig)) dup.push(`${lesson.id}: ${seen.get(sig)} ≡ ${task.cardId}`); else seen.set(sig, task.cardId);
+    } });
+    assert.ok(done, `${lesson.id}: özete ulaşılamadı`);
+    substituted += t.ui.kaoLesson.plan.filter((item) => item.kind === 'practice' && item.substitutedFor).length;
+    if (practice !== PRACTICE_BEFORE(lesson.id)) countDiff.push(`${lesson.id}: ${practice} ≠ ${PRACTICE_BEFORE(lesson.id)}`);
+  }
+  assert.deepEqual(dup, [], `ders içi aynı gramer sorusu: ${dup.join(', ')}`);
+  assert.deepEqual(countDiff, [], 'alıştırma sayısı değişti');
+  assert.equal(substituted, DUP_PAIRS_BEFORE, `ikame edilen gramer öğesi ${substituted} ≠ çift sayısı ${DUP_PAIRS_BEFORE}`);
+  assert.equal(shown, GRAMMAR_SHOWN_BEFORE - DUP_PAIRS_BEFORE, `gösterilen gramer ${shown} ≠ ${GRAMMAR_SHOWN_BEFORE} − ${DUP_PAIRS_BEFORE}`);
+  console.log(`      gösterilen gramer görevi: ${GRAMMAR_SHOWN_BEFORE} → ${shown} · ikame ${substituted} · ders içi tekrar 0`);
+});
+
+check('E2 · u01.02: ikinci kopya (g1-k2) aynı dersin kullanılmamış bir kelime alıştırmasıyla ikame edilir — öğe kimliği/sırası korunur, lemma tanış kartından sonra gelir, ilk kopya (g1-k1) kalır', () => {
+  const t = bootKao();
+  freshUser(t);
+  assert.ok(t.api.kaoLesson('start', 'u01.02'));
+  const plan = t.ui.kaoLesson.plan, goal = plan.find((item) => item.kind === 'goal');
+  const index = plan.findIndex((item) => item.id === 'practice:u01.02:g1:g1-k2');
+  assert.ok(index >= 0, 'öğe kimliği (devam noktası) korunur');
+  const item = plan[index];
+  assert.equal(item.group, 'lemma');
+  assert.equal(item.substitutedFor, 'g:g1:g1-k2');
+  assert.ok(goal.lemmaIds.includes(item.lemmaId), 'ikame aynı dersin lemmasıdır');
+  assert.equal(plan.filter((x) => x.kind === 'practice' && x.cardId === item.cardId).length, 1, 'ikame kartı planda başka yerde yok');
+  const introAt = plan.findIndex((x) => x.kind === 'intro' && x.lemmaId === item.lemmaId);
+  assert.ok(introAt < 0 ? !goal.newLemmaIds.includes(item.lemmaId) : introAt < index, 'yeni lemmanın tanış kartı ikameden önce');
+  assert.ok(plan.some((x) => x.kind === 'practice' && x.cardId === 'g:g1:g1-k1'), 'ilk kopya kalır');
+});
+
+// 18 dizme şablonu × 2000 tohum (gerçek kuyruk kimliği biçimi `kao:<gün>:<kart>`, 2026-01-01'den ardışık 2000 gün).
+// Kullanıcı yalnız çip yazısını görür: ekrandaki yazı dizisi doğru yazı dizisine eşitse soru çözülmüş açılmıştır (aynı yazılı çipler
+// yer değiştirdiğinde kimlik sırası "karışık" görünse bile).
+const ORDER_DAYS = Array.from({ length: 2000 }, (_, i) => new Date(Date.UTC(2026, 0, 1) + i * 864e5).toISOString().slice(0, 10));
+check('E3 · Kelime dizme: 18 şablonun her biri 2000 tohumla kurulunca ekrandaki yazı dizisi HİÇBİR zaman doğru yazı dizisine eşit değil (0/36000); doğru sıra yine örnek sırası', () => {
+  const t = bootKao();
+  freshUser(t);
+  let templates = 0, tasks = 0;
+  const solved = {};
+  for (const x of allTemplates) {
+    if (x.template.type !== 'Kelime dizme') continue;
+    const example = exampleOf(x.concept, x.template);
+    templates += 1;
+    const correct = Array.from(example.words, (w) => w.ar).join('\u0001');
+    for (const day of ORDER_DAYS) {
+      const task = buildFor(t, x.cardId, day);
+      tasks += 1;
+      assert.equal(byOrdinalOf(task).map((c) => c.label).join('\u0001'), correct, `${x.cardId} ${day}: doğru sıra örnek sırası`);
+      if (task.choices.map((c) => c.label).join('\u0001') === correct) solved[x.cardId] = (solved[x.cardId] || 0) + 1;
+    }
+  }
+  assert.equal(templates, 18);
+  assert.equal(tasks, 36000);
+  assert.deepEqual(solved, {}, `çözülmüş açılan dizme: ${JSON.stringify(solved)}`);
+});
+
+console.log(`test_kao2_grammar_tasks (bölüm A+B+C+D+E): ${passed} kontrol PASS`);

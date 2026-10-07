@@ -58,3 +58,19 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
   commit konusu ve BİTTİ ölçütü genişletildi. Dokunulacak dosyalar aynı (`app/core/quranLearn.js`, `tests/kao/test_kao2_grammar_tasks.js`).
 - kod değişmedi.
 - next: D2F-04
+
+## seq 6 · 2026-10-07 · PROMPT · D2F-04
+- başlık: Aynı derste aynı gramer sorusu bir kez (D2-09) + "Kelime dizme" çözülmüş açılmaz (seq 4 NOT, seq 5 kararıyla eklendi).
+- oturum: https://claude.ai/code/session_01FSbk3dCn8vUh1pAKQR11qA
+- dal: `claude/cool-bardeen-6k6fgo` (`36015f08` → `6b6cf333` ff-only, sonra bu commit).
+- değişen: `app/core/quranLearn.js` (yeni `kaoGrammarTaskSignature`; `kaoLessonSafePlan` ders içi tekrar soruyu K2F-10 ikame yoluyla
+  kelime alıştırmasına çevirir; `gramOrderRecipe` "zaten çözülmüş" kontrolü `kaoOrderLabels` yazı dizisiyle) ·
+  `tests/kao/test_kao2_grammar_tasks.js` (bölüm E: E1–E3, 31 → 34; B3 bilerek uyarlandı — gerekçe KANIT).
+- dokunulmadı: `quranLearnFlow.js`, FSRS, `kaoBuildQueue`, `kaoGrammarTaskValid`, `app.js`, pinler/sw.
+- ölçüm: gösterilen gramer 78 → 77 (ikame 1 = çift sayısı) · ders içi tekrar 1 → 0 · alıştırma sayıları aynı · dizme çözülmüş açılış
+  21/36000 → 0/36000 (yalnız g16-k2'nin 21 görevi değişti).
+- kapılar: bayraklı kapilar.sh çıkış 0 "SONUÇ: TÜM KAPILAR YEŞİL" (21 dk 57 sn) · tekrar-uret-2 1/9 → 2/9 (N-09 PASS) · tekrar-uret 10/10 · kabul A-2 PASS.
+- mutasyon: (a) tekrar kontrolü kapalı → E1 FAIL; (b) dizme kontrolü kimliğe geri → E3 FAIL `{"g:g16:g16-k2":21}`.
+- kapsam dışı (önerildi, dokunulmadı): parça dizmesi (`kaoBuildFragmentTask`) çözülmüş açılış kontrolü yok — `s:95:4:1` 5/500.
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-04/KANIT.md
+- next: D2F-05

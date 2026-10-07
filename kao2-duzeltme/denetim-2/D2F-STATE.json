@@ -201,6 +201,11 @@
       "rule": "a",
       "ref": "D2F-13",
       "reason": "2 commit: doğrulama commit'i c7154f8b + kullanıcı isteğiyle (\"bunlsrı duzelt\") plan-check MediaRecorder kapısı ve 8bf8f658 kararı NOT commit'i (LEDGER seq 21); geçmiş yeniden yazılmadı (2026-10-07)"
+    },
+    {
+      "rule": "a",
+      "ref": "D2F-16",
+      "reason": "2 commit: kapanış kaydı + devir listesi NOT'u (kullanıcı isteği 'yapabildiklerinin hepsini yap', 2026-10-07); geçmiş yeniden yazılmadı"
     }
   ],
   "rulesRetired": {

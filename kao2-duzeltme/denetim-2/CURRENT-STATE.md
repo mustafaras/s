@@ -2,7 +2,7 @@
 
 <!-- d2f-sync
 nextPrompt: D2F-09
-lastSeq: 12
+lastSeq: 13
 status: active
 -->
 
@@ -41,10 +41,7 @@ N-01 `pass` (D2F-03) · N-02 `pass` (D2F-05) · N-03 `pass` (D2F-05) · N-05 `pa
 **N-04, N-06, N-07 açık.** Eşleme: N-06/N-07↔D2-06/07 (D2F-10) · N-04↔D2-04 (D2F-11/12).
 
 ## Ortam notu
-- **`kao-plan-check` kırmızısı (bu makinede, kapsam dışı):** seq 10 NOTE commit'i `8e583a9` öneki `"denetim-2:"` ile
-  `tests/kao/test_kao2_kabul.js`'e dokunuyor; plan aracı bu öneki tanımıyor →
-  `FAIL commit 8e583a9 KAO dosyasına tanınmayan önekle dokunuyor`. **Bu kırmızı HEAD'de, D2F-07 değişiklikleri olmadan da aynı** (temiz ağaçta
-  doğrulandı). D2F-07 ile ilgisiz; düzeltmesi commit mesajı kuralını ilgilendirir → kapsam dışı. Kaynak: D2F-08 veya ayrı iş.
+- **`kao-plan-check` (seq 13 NOTE ile giderildi):** `8e583a9` ("denetim-2:" öneki) için aracın tek-hash istisna listesine daraltılmış kayıt eklendi; araç PASS.
 - Konteyner sığ klonla ve `rsync`'siz gelebilir. İlk kapı koşusundan önce `git rev-parse --is-shallow-repository` ve
   `which rsync` (gerekirse `git fetch --unshallow origin`, `apt-get update && apt-get install -y rsync` — `update` olmadan kurulum başarısız).
 - `test_kao2_kabul.js` ve `test_kao2_grammar_tasks.js` tek başına yavaş koşar; kapılar ~15–22 dk.

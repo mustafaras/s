@@ -198,3 +198,9 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-08/KANIT.md
 - next: D2F-09
+
+## seq 13 · 2026-10-07 · NOTE · D2F-08
+- `kao-plan-check` kırmızısı giderildi: `docs/kuran-ogreniyorum/tools/kao-plan-check.mjs` `SUBJECT_EXCEPTIONS`'a yalnız `8e583a93…` + `/^denetim-2:/` eklendi
+  (mevcut `65e94db2` emsaliyle aynı yol; genel önek izni değil, geçmiş yeniden yazılmadı). `node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs` → PASS (1 warn, eskiden de vardı).
+  Kapsam notu: bu dosya D2F-08 "dokunulacak" listesinde yoktu; kullanıcı açıkça ("yap") istedi.
+- next: D2F-09

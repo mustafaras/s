@@ -1,4 +1,4 @@
-# VS Code devir notu · denetim-2 (2026-10-07, D2F-04 sonrası)
+# VS Code devir notu · denetim-2 (2026-10-07, D2F-04 + erken yayın sonrası)
 
 ## 1. Yerel klasörü uzakla eşitle (önce oku)
 Uzak depo çok ilerde. Yerelde commit'lenmemiş işin varsa **önce yedekle**; `reset --hard` kullanma.
@@ -10,7 +10,7 @@ git switch -c claude/cool-bardeen-6k6fgo --track origin/claude/cool-bardeen-6k6f
 git log --oneline -5             # en üstte: 16d87a77 D2F-04 ...
 node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs --clean   # PASS, "4/16 prompt done · nextPrompt D2F-05"
 ```
-- `main` = canlı (`36015f08`'in ardından K2F-43 yayını, pin `20261006e`). Programın dalı `claude/cool-bardeen-6k6fgo`, D2F-01…04'ü taşır; `main`'e **birleştirilmedi**.
+- `main` = canlı = `claude/cool-bardeen-6k6fgo` (ff-only, pin `20261007a`). Yerelde `git switch main && git pull --ff-only` yeterli.
 - `git pull` çakışırsa dur ve bana göster; `push --force` yok.
 
 ## 2. Güvenlik (CLAUDE.md DATA SAFETY)
@@ -30,12 +30,13 @@ node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs --clean   # PASS, "4/16 pr
 |---|---|
 | Biten | D2F-01…04 (N-01, N-09 PASS; `tekrar-uret-2` 2/9) |
 | Açık | N-02/03 (D2F-05) · N-05 (08) · N-06/07 (10) · N-04 (11/12) · N-08 (15) |
-| Yayın | **Yok.** Pin `20261006e`, `releaseApproval: not_approved` |
+| Yayın | Pin `20261007a` (seq 7 erken yayın, `main` ff-only) |
 | Kullanıcı kapıları | D2F-12 (iki karar: L1 onayı + u09.01), D2F-15 (yayın onayı), D2F-16 (canlı doğrulama) |
 | Ayrı öneri | Kısa sûre "parça dizme" çözülmüş açılış (`kaoBuildFragmentTask`, `s:95:4:1` 5/500) — programda prompt yok, ayrı kapsam onayı ister |
 
-## 5. Yayın ne zaman?
-Yalnız D2F-15'te, senin onay cümlen LEDGER'a yazıldıktan sonra. Önce D2F-13 (baştan sona doğrulama) ve D2F-14 (yayın özeti) gelir.
+## 5. Yayın
+D2F-01…04 **canlıda** (pin `20261007a`, seq 7, kullanıcı kararıyla tek seferlik erken yayın; ORTAK-KURALLAR §9). Kalan promptlar (05…16) yeni
+kodla gelirse yeniden yayın gerekir; D2F-15 bunu yeniden onay cümlesiyle kararlaştırır. Canlı bayt eşitliği ve cihaz doğrulaması sende.
 
 ## 6. Claude Code'u VS Code'da başlatma cümlesi
 > Şeyma deposunda denetim-2 düzeltmelerinin PROMPT 5'ini yap (commit öneki D2F-05). Önce kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md'yi oku ve uy; nextPrompt "D2F-05" olmalı.

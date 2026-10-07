@@ -74,3 +74,15 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kapsam dışı (önerildi, dokunulmadı): parça dizmesi (`kaoBuildFragmentTask`) çözülmüş açılış kontrolü yok — `s:95:4:1` 5/500.
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-04/KANIT.md
 - next: D2F-05
+
+## seq 7 · 2026-10-07 · GATE · D2F-04
+- başlık: Tek seferlik erken yayın — kullanıcı, ortam değişikliği nedeniyle yayın kuralını bir kereliğine değiştirdi.
+- oturum: https://claude.ai/code/session_01FSbk3dCn8vUh1pAKQR11qA
+- status: closed (yalnız bu yayın için)
+- kullanıcı cevabı (birebir): "programı tek seferlik değiştirelim ortam değiştireceğiz buyuzden tumu push commit ve merge ve deploy yapılmalı"
+- önceki istek (reddedilmişti, §6/§7): "tümünü canlıya al ve vs code içinde devam edeceğim şekilde …" — bu cevapla birlikte açık yönerge oldu.
+- uygulanan: pin `20261006e` → `20261007a` (index.html, sw.js, panel-v2.html — `app/styles.css` dahil, N-08 kapsamı —, pin taşıyan 12 test);
+  FIX-STATE/D2F-STATE `pins.release`; ORTAK-KURALLAR §9 (istisna kaydı). Kod değişmedi.
+- DOĞRU DURUM: program **kapanmadı** — D2F-05…16 `pending`, N-02…N-08 açık; yayında olanlar: D2F-01…04 (dizme çip yazısı, ders içi aynı
+  gramer sorusu, çözülmüş açılmayan dizme, kapı araçları). Canlı bayt eşitliği ve cihaz doğrulaması kullanıcıda.
+- next: D2F-05

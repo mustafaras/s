@@ -2,18 +2,20 @@
 
 <!-- d2f-sync
 nextPrompt: D2F-05
-lastSeq: 6
+lastSeq: 7
 status: active
 -->
 
-**Son güncelleme:** 2026-10-07 · D2F-04 sonu. Bu dosya her prompt sonunda **baştan** yazılır.
+**Son güncelleme:** 2026-10-07 · D2F-04 sonu + tek seferlik erken yayın (seq 7). Bu dosya her prompt sonunda **baştan** yazılır.
 
 ## Nerede kaldık
+- **YAYIN (seq 7, kullanıcı kararı):** ortam değişikliği için D2F-04 sonrası erken yayın — pin `20261007a`, `main` ff-only. Program kapanmadı:
+  D2F-05…16 pending, N-02…N-08 açık. Ayrıntı: ORTAK-KURALLAR §9, evidence/D2F-04/YAYIN.md.
 - Program: düzeltme programı (16 prompt, [`DUZELTME-PROMPTLARI.md`](DUZELTME-PROMPTLARI.md)); kurallar [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md); kaynak rapor [`DENETIM-RAPORU.md`](DENETIM-RAPORU.md).
 - Tamamlanan: **4/16** (D2F-01…D2F-04). Sıradaki: **D2F-05 — Denetim kontrollerini güçlendir (R-01, R-10)** (yeni oturumda).
 - Başlangıç commit'i (`baseCommit`): `cbe0d604`. Dallar: D2F-02 `claude/jolly-ride-9ltui4` · D2F-03 `claude/sharp-volta-l6ifgz` · D2F-04 `claude/cool-bardeen-6k6fgo`
   (her dal bir öncekinin commit'ini `--ff-only` ile taşır).
-- Kullanıcı kapıları: D2F-12, D2F-15, D2F-16. Yayın onayı: yok (`releaseApproval: not_approved`).
+- Kullanıcı kapıları: D2F-12, D2F-15, D2F-16. Yayın: seq 7 ile tek seferlik erken yayın (`releaseApproval: user_override_2026-10-07_early_release`).
 
 ## Canlı gerçekler (araçla ölçüldü, 2026-10-07, D2F-04)
 | Ölçüm | Değer | Araç |
@@ -21,7 +23,7 @@ status: active
 | `App.kao*` handler | 45 (değişmedi) | `d2f-sync-check.mjs` |
 | App yüzeyi / atama | 766 / 604 | aynı |
 | `onclick` | 393 | aynı |
-| Yayın pini | `20261006e` | aynı |
+| Yayın pini | `20261007a` (önce `20261006e`) | aynı |
 | `kapilar.sh` bayraklı (`KAO2_ACCEPT_SLOW_HOST=1`) | **çıkış 0, "SONUÇ: TÜM KAPILAR YEŞİL"**; perf: göreli bant atlandı (steady 11,66 ms > bant 6,36 ms), mutlak tavanlar geçti (runtime 117,9 · css 13,0 · içerik 184,2 KiB · p95 30,2 ms) | tam koşu, 21 dk 57 sn |
 | `kapilar.sh` bayraksız | D2F-04'te koşulmadı; son ölçüm D2F-02: çıkış 1, yalnız göreli p95 bandı | — |
 | `test_kao2_grammar_tasks` | 34 kontrol PASS (bölüm E: ders içi tekrar soru yok, dizme çözülmüş açılmaz) | koşuldu |

@@ -7,7 +7,7 @@
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
   "nextPrompt": "D2F-05",
-  "ledgerLastSeq": 6,
+  "ledgerLastSeq": 7,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -123,12 +123,12 @@
     "appSurface": 766,
     "appAssignments": 604,
     "onclick": 393,
-    "release": "20261006e"
+    "release": "20261007a"
   },
   "userGates": [
     "D2F-12",
     "D2F-15",
     "D2F-16"
   ],
-  "releaseApproval": "not_approved"
+  "releaseApproval": "user_override_2026-10-07_early_release"
 }

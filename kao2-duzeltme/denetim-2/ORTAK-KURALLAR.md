@@ -64,3 +64,11 @@ node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs          # PASS (Prompt 1'
 ## 8. Kanıt düzeyleri
 KANIT ve kullanıcıya rapor: **kaynak/test** (bu oturumda koşturdun) · **yayın** (git/Actions kaydı) · **cihaz** (yalnız kullanıcı
 beyanı) ayrı yazılır. "Cihazda çalışıyor" ya da "canlıda doğru" yalnız ilgili kanıt varsa yazılır.
+
+## 9. Tek seferlik istisna (2026-10-07, kullanıcı kararı)
+Kullanıcı ortam değiştireceği için programın yayın kuralını bir kereliğine değiştirdi (birebir: "programı tek seferlik değiştirelim
+ortam değiştireceğiz buyuzden tumu push commit ve merge ve deploy yapılmalı"). Bu istisna D2F-04 sonrasında **erken yayın** (pin
+`20261007a`, `main` ff-only) için geçerlidir; §6 ("pin yalnız Prompt 15") ve §7 (onay çıkarılmaz) bu yayın için uygulanmadı.
+**Program kapanmadı:** D2F-05…16 `pending` kalır, N-02…N-08 açık; kullanıcı kapıları (D2F-12 iki karar, D2F-16 canlı doğrulama)
+geçerlidir. D2F-15 artık "yeni pin yok" olarak yapılır (yayın zaten çıktı) ya da yeni kod olursa tekrar pin; kararı o prompt verir.
+İstisna başka yayın için geçerli değildir.

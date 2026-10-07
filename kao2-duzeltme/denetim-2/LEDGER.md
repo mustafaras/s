@@ -321,3 +321,14 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ · yayın YAYIN.md'de · cihaz —
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-15/KANIT.md
 - next: D2F-16
+
+## seq 24 · 2026-10-07 · GATE · D2F-16
+- başlık: Canlı doğrulama — pin `20261007b` canlıda bayt-eşit; denetim-2 programı kapandı.
+- oturum: claude-code:ce2f6bb4-fb96-4b22-99e4-f9da04d481ee
+- status: closed
+- kapı: D2F-16 (komutu kullanıcı yerine Claude çalıştırdı; kullanıcı "uygula ve canlıya al" + seq 23 devri).
+- sonuç: **20 EŞİT / 0 FARKLI**; gizlilik yolları 4/4 404; Pages run 37664767297 success (head `b468d9a3`); perf PASS (183,8 / 117,4 / 13,0 KiB · p95 4,2 ms).
+- kanıt düzeyleri: kaynak/test ✓ · yayın ✓ · canlı bayt eşitliği ✓ · cihaz —
+- açık (Claude kapatamaz): L2 0/37, 13 namaz kelimesi, K-3 hece sesi, cihaz kabulü A-11/A-12, ekran okuyucu, D2-12 `8bf8f658` geri alma tercihi.
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-16/KANIT.md · CANLI.md
+- next: none

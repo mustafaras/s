@@ -58,3 +58,10 @@ Programın kendi süreç sapmaları (dürüstlük): D2F-03/04/05/06/08/11/12 bir
 5. **Canlı bayt eşitliği (D2-06 geri kalanı, D2F-16)** — komutu kullanıcı çalıştırır.
 6. D2-12 `8bf8f658` kalıcı geri alınmak istenirse: ayrı ve açık onay (canlı arayüzü değiştirir).
 7. D2F-14/15 (yayın özeti, yayın): D2F-15 yayın adımı yalnız kullanıcı kararıyla; erken yayın zaten çıktı.
+
+## 5. Canlı doğrulama (D2F-16, 2026-10-07)
+
+- Pin `20261007b`, `main` = `origin/main` = `b468d9a3`. Pages run **37664767297** success.
+- Canlı bayt eşitliği: **20/20 EŞİT, 0 FARKLI** (index.html, sw.js, panel-v2.html ve `?v=` taşıyan 17 dosya). Gizlilik yolları (`kao2-duzeltme/FIX-STATE.json`, `denetim-2/DENETIM-RAPORU.md`, `archive/README.md`, `texts.tr.json`) **4/4 404**.
+- Referans perf (bu makine): PASS · content 183,837 KiB · runtime 117,350 KiB · css 13,035 KiB · p95 4,198 ms · steady 2,885 ms.
+- Komutu kullanıcı yerine Claude çalıştırdı (devir: LEDGER seq 23). Kanıt düzeyi: kaynak/test ✓ · yayın ✓ · canlı bayt eşitliği ✓ · cihaz —. §4 madde 5 (canlı bayt eşitliği) kapandı; kalan maddeler kullanıcı/uzmandadır.

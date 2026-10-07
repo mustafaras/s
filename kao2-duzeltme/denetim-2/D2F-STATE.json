@@ -1,13 +1,13 @@
 {
   "program": "KAO2-FIX denetim-2",
-  "status": "active",
+  "status": "completed",
   "source": "kao2-duzeltme/denetim-2/DENETIM-RAPORU.md",
   "promptList": "kao2-duzeltme/denetim-2/DUZELTME-PROMPTLARI.md",
   "rules": null,
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-16",
-  "ledgerLastSeq": 23,
+  "nextPrompt": null,
+  "ledgerLastSeq": 24,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -101,9 +101,9 @@
     },
     "D2F-16": {
       "title": "Canlı doğrulama ve kapanış (komutu sen çalıştırırsın)",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-16/KANIT.md",
+      "session": "claude-code:ce2f6bb4-fb96-4b22-99e4-f9da04d481ee"
     }
   },
   "n": {

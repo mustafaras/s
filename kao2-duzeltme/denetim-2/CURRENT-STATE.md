@@ -1,22 +1,22 @@
 # KAO2-FIX denetim-2 · CURRENT-STATE
 
 <!-- d2f-sync
-nextPrompt: D2F-16
-lastSeq: 23
-status: active
+nextPrompt: none
+lastSeq: 24
+status: completed
 -->
 
-**Son güncelleme:** 2026-10-07 · D2F-15 sonu. Bu dosya her prompt sonunda **baştan** yazılır.
+**Son güncelleme:** 2026-10-07 · D2F-16 sonu (program kapandı). Bu dosya her prompt sonunda **baştan** yazılır.
 
 ## Nerede kaldık
 - **YAYIN (seq 7, kullanıcı kararı):** ortam değişikliği için D2F-04 sonrası erken yayın — pin `20261007a`, `main` ff-only. Program kapanmadı:
   D2F-14…16 pending. Ayrıntı: ORTAK-KURALLAR §9, evidence/D2F-04/YAYIN.md.
 - Program: düzeltme programı (16 prompt, [`DUZELTME-PROMPTLARI.md`](DUZELTME-PROMPTLARI.md)); kurallar `ORTAK-KURALLAR.md` 2026-10-07'de kullanıcı kararıyla kaldırıldı (LEDGER seq 23); kaynak rapor [`DENETIM-RAPORU.md`](DENETIM-RAPORU.md).
-- Tamamlanan: **15/16** (D2F-01…D2F-15). Sıradaki: **D2F-16** (canlı doğrulama komutunu kullanıcı çalıştırır).
+- Tamamlanan: **16/16** — **PROGRAM KAPANDI** (`status=completed`, `nextPrompt=null`). Canlı bayt eşitliği ✓ (20/20 EŞİT, 4/4 gizlilik 404, Pages run 37664767297).
 - Başlangıç commit'i (`baseCommit`): `cbe0d604`. D2F-05 PROMPT `467ab6fa`, D2F-05 NOT `80ed4450`; D2F-06 `79eca899` (dal `d2f-05`); D2F-06 NOT `e7b2c170`; D2F-07 dal `d2f-07`; D2F-08 aynı dal.
 - Kullanıcı kapıları: D2F-11→12 (GATE waiting, seq 16), D2F-12, D2F-15, D2F-16. Yayın: seq 7 ile tek seferlik erken yayın (`releaseApproval: user_override_2026-10-07_early_release`).
 
-## Canlı gerçekler (araçla ölçüldü, 2026-10-07, D2F-15)
+## Canlı gerçekler (araçla ölçüldü, 2026-10-07, D2F-16)
 | Ölçüm | Değer | Araç |
 |---|---|---|
 | `App.kao*` handler | 45 (değişmedi) | `d2f-sync-check.mjs` |
@@ -33,6 +33,7 @@ status: active
 | `tekrar-uret.cjs` | 10/10 PASS | koşuldu |
 
 ## Bu oturumun işi
+- **D2F-16 — Canlı doğrulama (seq 24, GATE closed).** Komutu Claude çalıştırdı: 20 EŞİT / 0 FARKLI, 4×404, perf PASS. [evidence/D2F-16/CANLI.md](evidence/D2F-16/CANLI.md), [KANIT.md](evidence/D2F-16/KANIT.md). Kanıt: kaynak ✓ · yayın ✓ · canlı ✓ · cihaz —.
 - **D2F-15 — YAYIN-3 (seq 23, GATE closed).** Pin `20261007b`; yetki devriyle Claude kararı (birebir alıntılar LEDGER'da). `ORTAK-KURALLAR.md` kullanıcı kararıyla silindi. Ayrıntı: [evidence/D2F-15/KANIT.md](evidence/D2F-15/KANIT.md), [YAYIN.md](evidence/D2F-15/YAYIN.md).
 - **D2F-14 — YAYIN-3 onayı bekleniyor (seq 22, GATE waiting).** Yayın hazırlandı, yapılmadı. Öneri: pin `20261007b`; `main`'e 3 yerel commit (ff-only); çalışma zamanı farkı yalnız `quranCurriculumV2.js` (aynı `20261007a` pininde değişmiş). Canlı pin artık `20261007a` (erken yayın), panel-v2 styles pini zaten yükseltilmiş. Ayrıntı: [evidence/D2F-14/KANIT.md](evidence/D2F-14/KANIT.md).
 - **D2F-13 NOT (seq 21).** Kullanıcı isteğiyle: `MediaRecorder` plan-check uyarısı deterministik kapıya çevrildi (self-test 41/41, `PASS (0 warn)`); D2-12 `8bf8f658` **geri alınmadı**, gerekçeli kararla kayda geçti (geri alma yolu LEDGER seq 21).

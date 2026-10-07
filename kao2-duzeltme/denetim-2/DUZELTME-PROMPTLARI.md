@@ -122,8 +122,13 @@ ADIMLAR:
 2) Soru kurulduktan sonra ders içi "görülen sorular" kümesine bak; tekrar ise mevcut ikame yolunu kullan (kelime alıştırması).
    Flow dosyasına dokunma.
 3) Gösterilen gramer sorusu sayısı önce/sonra KANIT'a (bugün 78; azalma yalnız çift sayısı kadar olabilir).
-Commit: "D2F-04: ders içinde aynı gramer sorusu tekrar gösterilmez"
-BİTTİ SAYILIR: N-09 PASS · kabul testi A-2 PASS · kapılar yeşil.
+4) EK (LEDGER seq 4 NOTE, kullanıcı kararıyla bu prompta eklendi): "Kelime dizme" görevi bazen çözülmüş sırayla açılıyor.
+   gramOrderRecipe (~1379) karıştırma sonrası "zaten sıralı mı" kontrolünü çip kimliğiyle (item.ordinal===index) yapıyor; aynı
+   yazılı çipler yer değişmiş gelince kaydırma yapılmıyor (g16-k2, 2000 tohumda 22). Önce test (kırmızı gör): 18 dizme
+   şablonunun her biri ≥2000 tohumla kurulunca gösterilen yazı dizisi hiçbir zaman doğru yazı dizisine eşit değil. Sonra kontrolü
+   yazı dizisine çevir (kaoOrderLabels ile). Sayıları önce/sonra KANIT'a yaz.
+Commit: "D2F-04: ders içinde aynı gramer sorusu tekrar gösterilmez, dizme çözülmüş açılmaz"
+BİTTİ SAYILIR: N-09 PASS · kabul testi A-2 PASS · dizme çözülmüş açılma 0/36000 · kapılar yeşil.
 ```
 
 ## Prompt 5 — Denetim kontrollerini güçlendir (R-01, R-10)

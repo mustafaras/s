@@ -49,3 +49,12 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - durum: kod bu oturumda değiştirilmedi (ORTAK-KURALLAR §3); yeni prompt gerekir (ayrı ek prompt ya da D2F-04'e ekleme —
   kullanıcı kararı bekleniyor).
 - next: D2F-04
+
+## seq 5 · 2026-10-07 · NOTE · D2F-03
+- başlık: seq 4 NOT'unun yeri — kullanıcı kararı: D2F-04'e eklenir.
+- oturum: https://claude.ai/code/session_018WK6EKGxUJbKAaNFboTVpv
+- kullanıcı cevabı (birebir): "04 e eklensin"
+- değişen: DUZELTME-PROMPTLARI.md Prompt 4'e adım 4 (dizme "zaten sıralı" kontrolü yazıya dayansın; test 18 şablon × ≥2000 tohum),
+  commit konusu ve BİTTİ ölçütü genişletildi. Dokunulacak dosyalar aynı (`app/core/quranLearn.js`, `tests/kao/test_kao2_grammar_tasks.js`).
+- kod değişmedi.
+- next: D2F-04

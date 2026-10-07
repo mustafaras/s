@@ -2,7 +2,7 @@
 
 <!-- d2f-sync
 nextPrompt: D2F-04
-lastSeq: 4
+lastSeq: 5
 status: active
 -->
 
@@ -10,7 +10,7 @@ status: active
 
 ## Nerede kaldık
 - Program: düzeltme programı (16 prompt, [`DUZELTME-PROMPTLARI.md`](DUZELTME-PROMPTLARI.md)); kurallar [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md); kaynak rapor [`DENETIM-RAPORU.md`](DENETIM-RAPORU.md).
-- Tamamlanan: **3/16** (D2F-01, D2F-02, D2F-03). Sıradaki: **D2F-04 — Aynı derste aynı gramer sorusu** (yeni oturumda).
+- Tamamlanan: **3/16** (D2F-01, D2F-02, D2F-03). Sıradaki: **D2F-04 — Aynı derste aynı gramer sorusu + dizme çözülmüş açılmasın** (yeni oturumda).
 - Başlangıç commit'i (`baseCommit`): `cbe0d604`. D2F-02 dalı: `claude/jolly-ride-9ltui4`; D2F-03 dalı: `claude/sharp-volta-l6ifgz`.
 - Kullanıcı kapıları: D2F-12, D2F-15, D2F-16. Yayın onayı: yok (`releaseApproval: not_approved`).
 
@@ -31,7 +31,7 @@ status: active
 ## Açık bulgular (N durumları)
 N-01 `pass` (D2F-03: dizme doğruluğu çip yazısına dayanır). N-02…N-09 `fail`. Eşleme: N-01↔D2-01 (D2F-03, kapandı — kaynak/test; canlıda yayına kadar eski davranış) · N-09↔D2-09 (D2F-04) · N-02/N-03↔D2-02/03 (D2F-05) ·
 N-05↔D2-05 (D2F-08) · N-06/N-07↔D2-06/07 (D2F-10) · N-04↔D2-04 (D2F-11/12) · N-08↔D2-08 (yayın, D2F-15).
-**Açık NOT (LEDGER seq 4):** D2F-03 sonrası kardeş kusur — `gramOrderRecipe` "zaten sıralı" kontrolü kimliğe bakıyor, g16-k2 ≈%1 tohumda çözülmüş sırayla açılıyor; yeni prompt gerekir (kod değişmedi).
+**Açık NOT (LEDGER seq 4):** D2F-03 sonrası kardeş kusur — `gramOrderRecipe` "zaten sıralı" kontrolü kimliğe bakıyor, g16-k2 ≈%1 tohumda çözülmüş sırayla açılıyor; kullanıcı kararıyla **D2F-04'e eklendi** (Prompt 4 adım 4, LEDGER seq 5; kod değişmedi).
 D2-12'nin araç kısmı D2F-02'de kapandı; kayıt kısmı (LEDGER notu) D2F-10'da.
 
 ## Ortam notu

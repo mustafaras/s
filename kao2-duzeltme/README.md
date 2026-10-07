@@ -1,7 +1,7 @@
 # KAO2-FIX — Kur'an Arapçası modülü denetim düzeltmeleri
 
 > **Durum:** K2F-00…43 tamam (44/44), program kapandı · tekrar-uret 10/10 · kapanış belgesi [`deliverables/KAO2-FIX-KAPANIS.md`](deliverables/KAO2-FIX-KAPANIS.md)
-> **Uygulayıcı:** Claude Sonnet 5.5 — her prompt ayrı oturum, tek commit.
+> **Uygulayıcı:** Claude Sonnet 5.5. **Plan:** her prompt ayrı oturum, tek commit. **Gerçekleşen:** 44 prompt için 126 önekli + 2 öneksiz = 128 commit (yalnız 16 prompt tek commit'le kapandı), 21 plan dışı yayın pini, birkaç oturumda birden çok prompt; ayrıntı [`denetim-2/DENETIM-RAPORU.md`](denetim-2/DENETIM-RAPORU.md) §4. Düzeltmeler: [`denetim-2/`](denetim-2/).
 > **Başlamak için:** [`PROMPTLAR.md`](PROMPTLAR.md) §0'daki oturum başlatıcıyı yeni bir oturuma yapıştır.
 > **Makine durumu:** [`FIX-STATE.json`](FIX-STATE.json) · **Şu an:** [`.anti-amnesia/CURRENT-STATE.md`](.anti-amnesia/CURRENT-STATE.md) ·
 > **Geçmiş:** [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md) · **Bağlam kuralları:** [`BAGLAM-YONETIMI.md`](BAGLAM-YONETIMI.md)
@@ -47,7 +47,7 @@ handler ve çökmeler yüzünden çalışmıyor. Ayrıntı ve kanıt: [`denetim/
 ## Değişmez kurallar (özet — tam hali PROMPTLAR.md §1)
 
 1. Tarayıcı/sunucu yok, `seyma-data`'ya yazım yok (CLAUDE.md DATA SAFETY).
-2. Tek prompt = tek oturum = tek commit; sıradaki promptu yalnız `FIX-STATE.json` söyler.
+2. Tek prompt = tek oturum = tek commit; sıradaki promptu yalnız `FIX-STATE.json` söyler. *(Plan kuralıdır; uygulamada tutmadı — bkz. üstteki Gerçekleşen notu. Denetim-2 programında bu kural `d2f-sync-check --strict` ile araçla denetlenir.)*
 3. Test önce ve davranışla; durumu elle kurup davranışı atlayan test yasak.
 4. Motor (FSRS, kuyruk kuralları), `migrate()` ve kullanıcı verisi korunur; yalnız ekleme ve normalizasyon.
 5. Arapça içerik elle yazılmaz; yalnız içerik modülleri ve araç çıktısı.

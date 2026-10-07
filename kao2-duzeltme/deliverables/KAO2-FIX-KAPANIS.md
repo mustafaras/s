@@ -82,3 +82,11 @@ Bu belge **kanıt düzeylerini ayırır**: kaynak/test · yayın · cihaz. "Ciha
 - D-12 ertelenen karar; D-21.
 - perf bandı: `test_kao2_perf_budget` göreli p95 bandı yavaş konteynerde kırmızıdır; referans makinede bir kez koşulmalı.
 - Canlı bayt eşitliği (pin 20261006d ve K2F-43 pini) kullanıcı terminalinde.
+
+## 8. Bağımsız denetim (denetim-2) — geriye dönük ek (D2F-10, 2026-10-07)
+Bu bölüm kapanıştan sonra eklendi; §1–§7 değiştirilmedi.
+
+- **Hüküm:** KAO2-FIX 2026-10-06'da bağımsız bir oturumca denetlendi: program **"tam ve kusursuz değildir."** Dört kritik kod kusuru gerçekten kapanmıştır; protokol uyumunda ve kayıtlarda boşluk vardır. Rapor: [`../denetim-2/DENETIM-RAPORU.md`](../denetim-2/DENETIM-RAPORU.md).
+- **Sayılar (rapordan):** 49 eski bulgu → KAPANDI 32 · KISMEN 7 · YALNIZ BELGE 7 · KAPANMADI 3 · DOĞRULANAMADI 0. 44 prompt → geçti 17 · kısmen 21 · kaldı 6. Yeni bulgu 12 (yüksek 2 · orta 4 · düşük 6). Süreç: 128 commit / 44 prompt (yalnız 16 tek commit'li), 21 plan dışı yayın pini.
+- **Bu belgedeki düzeltmeler:** §5 "Kullanıcıda kalanlar"a ek olarak K2F-43 YAYIN-2 onayı açık cümleyle verilmemişti, çıkarımla verildi (LEDGER seq 123); K2F-43 KANIT.md ve K2F-34 YAYIN.md geriye dönük eklendi (D2F-10).
+- **Düzeltme programı:** [`../denetim-2/`](../denetim-2/) (16 prompt; durum [`D2F-STATE.json`](../denetim-2/D2F-STATE.json)). §1'deki "49 bulgunun 49'u … kapatıldı" ifadesi denetim-2 sonuçlarıyla birlikte okunmalıdır: kod bulgularının 32'si KAPANDI, 7'si KISMEN, 7'si YALNIZ BELGE, 3'ü KAPANMADI (tekrarladı).

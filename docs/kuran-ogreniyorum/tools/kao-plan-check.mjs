@@ -38,7 +38,11 @@ const KAO_SUBJECT_RE = /^(?:(?:KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|D2F
 // Tek hash istisnaları (D2F-02, denetim-2 D2-12): tanınmayan önekle main'e girmiş, geçmişi yazılamayan commit'ler.
 // Genel bir önek izni değil; yalnız tam hash + birebir konu öneki eşleşirse kabul edilir.
 // 65e94db2 `K2F-38 ek:` (2026-10-06): kullanıcı isteğiyle ek iş; 5b267dde bunu genel "K2F-NN ek:" iznine çevirmişti, burada tek commit'e daraltıldı.
-const SUBJECT_EXCEPTIONS = { '65e94db29eda6d81753dd70a7c5785e10052ebed': /^K2F-38 ek:/ };
+// 8e583a9 `denetim-2:` (2026-10-07, seq 10 NOTE): D2F-05/06 ortam kırmızılarını gideren NOTE commit'i; öneki tanınmıyordu, tek commit'e daraltıldı.
+const SUBJECT_EXCEPTIONS = {
+  '65e94db29eda6d81753dd70a7c5785e10052ebed': /^K2F-38 ek:/,
+  '8e583a93e7b49211f21d93021dbd8fb67dd4c7df': /^denetim-2:/,
+};
 export function subjectRecognized(cm) {
   if (KAO_SUBJECT_RE.test(cm.subject)) return true;
   const re = SUBJECT_EXCEPTIONS[cm.hash];

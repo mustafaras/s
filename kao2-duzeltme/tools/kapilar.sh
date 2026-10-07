@@ -49,6 +49,7 @@ if [ "$PLAN_READY" = "1" ]; then gate "kao-plan-check" node docs/kuran-ogreniyor
 else row "kao-plan-check" "ATLANDI (K2F-01 öncesi)"; fi
 
 gate "fix-sync-check --repro" node kao2-duzeltme/tools/fix-sync-check.mjs --repro
+gate "d2f-sync-check --strict" node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs --strict
 
 echo "== tekrar-uret özeti =="
 node kao2-duzeltme/denetim/tekrar-uret.cjs 2>/dev/null | tail -1

@@ -150,3 +150,107 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kayıt: `nextPrompt` **ilerlemedi** (D2F-07'de kalır; bu bir NOTE'dır, prompt değil) · `ledgerLastSeq` **10**.
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-06/EK-KANIT.md
 - next: D2F-07
+
+## seq 11 · 2026-10-07 · PROMPT · D2F-07
+- durum: done
+- başlık: Müfredat eşleme sayfası gerçeği yazsın — sayfa artık onay durumunu VERİDEN yazar (metin sayıları + G2 kararı)
+- oturum: https://claude.ai/code/session_1f48752b-ccea-476d-8043-aecb83e71957
+- dal: `d2f-07` (baseCommit `cbe0d604`; önceki commit `e7b2c170` = D2F-06 NOT).
+- sorun: `docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md` (araç üretir) hâlâ "Tüm başlık ve vaatler taslaktır" yazıyor ve boş kutulu
+  "## Karar bekleyen noktalar" taşıyordu; oysa taslak metin sayısı **0** (hepsi `sourced`) ve G2 kararı **2026-10-02**'de verilmişti.
+  D2-11 + K3-07 kalıntısı: sayfa gerçeği değil, donmuş bir varsayımı yazıyordu.
+- değişen (yalnız araç + çıktısı + fikstür): `tools/kao2-curriculum-build.mjs` (yeni `reviewStatus`/`readG2Decision`; `renderReview` durum satırı
+  sayılardan, karar/G2 bölümü `kao2-duzeltme/FIX-STATE.json` `decisions.G2`'den) · `docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md`
+  (yalnız `node tools/kao2-curriculum-build.mjs` çıktısı; elle düzenlenmedi) · `tests/kao/test_kao2_curriculum.js`
+  (iki yeni kontrol: D2-11 sayı/G2; mevcut kutu kontrolü `[ xX]` olacak şekilde genişletildi).
+  Dokunulmadı: `app.js`, `app/core/*`, `sync.js`, pinler/`sw.js`, `migrate()`, diğer araç çıktıları.
+- test: `node tests/kao/test_kao2_curriculum.js` → **çıkış 0 PASS (15 kontrol)**. Araç `--out-dir` ile iki kez koşuldu →
+  `MUFREDAT-ESLEME.md` ve `quranCurriculumV2.js` **bayt-eşit** ve depodaki çıktıyla **aynı**. `git diff --stat`: yalnız üç dosya
+  (araç + çıktı + fikstür); `quranCurriculumV2.js` ve diğer araç çıktıları değişmedi. Bağımsız sayım: `draft 0`, tüm seviyeler `sourced`.
+- mutasyon (scratchpad kopya, commit edilmedi): (a) durum satırı sabit "taslaktır"a dönerse → `AssertionError: sayfa toplam metin 133 yazmalı`
+  (çıkış 1); (b) G2 okuması `null`'a zorlanırsa → `AssertionError: sayfa "## G2 kararı (2026-10-02)" yazmalı` (çıkış 1). Her mutasyon
+  ilgili yeni kontrolü izole eder.
+- kapılar (bu oturum): `KAO2_ACCEPT_SLOW_HOST=1 bash kao2-duzeltme/tools/kapilar.sh` → 16 satır yeşil, **tek kırmızı `kao-plan-check`**:
+  `FAIL commit 8e583a9 ... tests/kao/test_kao2_kabul.js` — seq 10 NOTE commit'inin öneki ("denetim-2:") plan aracının tanıdığı KAO önekleri
+  dışında. **Bu kırmızı HEAD'de, benim değişikliklerim olmadan da aynı** (temiz ağaçta doğrulandı) → D2F-07 ile ilgisiz, kapsam dışı (§3).
+  Diğerleri: `tests/kao` 54 PASS · `tests/app` 77 PASS · panel/panel-v2/quran/reminders/driver/zikr/kontrast/l2-paket PASS ·
+  `tekrar-uret-2.cjs` **5/9** (N-01,02,03,08,09 — azalmadı) · `tekrar-uret.cjs` **10/10** · perf PASS (p95 4.239 · steady 2.855).
+- kayıt: `D2F-STATE.json` D2F-07 done · `nextPrompt` **D2F-08** · `ledgerLastSeq` **11** · N durumları değişmedi (5/9 pass) · pin `20261007a` sabit.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-07/KANIT.md
+- next: D2F-08
+
+## seq 12 · 2026-10-07 · PROMPT · D2F-08
+- durum: done
+- başlık: tests/kao envanteri tam ve testle korunuyor
+- oturum: https://claude.ai/code/session_1f48752b-ccea-476d-8043-aecb83e71957
+- dal: `d2f-07` (önceki commit `7ad82a93` = D2F-07).
+- sorun: `tests/kao/README.md` 54 test dosyasından 53'ünü listeliyordu (`test_kao_pronunciation_contract.js` yok); `fixtures/fsrs-vectors.json` da listelenmemişti. D2-05 + K6-06 kalıntısı.
+- değişen: `tests/kao/README.md` (eksik satır + yeni test satırı + "Yardımcılar ve sabit veri" tablosu; sayım 55) · `tests/kao/test_kao2_inventory.js` (yeni).
+  Dokunulmadı: `app.js`, `app/core/*`, pinler/`sw.js`, `migrate()`.
+- test: önce kırmızı: `AssertionError: README envanterinde olmayan test dosyaları: test_kao2_inventory.js, test_kao_pronunciation_contract.js`
+  (çıkış 1); sonra `PASS test_kao2_inventory: 55 test + 3 yardımcı/fixture envanterde` (çıkış 0). Mutasyon kanıtı = README'siz kırmızı koşu (eksik satırlar
+  testi izole kırdı).
+- kapılar: `KAO2_ACCEPT_SLOW_HOST=1 bash kao2-duzeltme/tools/kapilar.sh` → tests/kao (55) PASS · tests/app (77) · panel (23) · panel-v2 (27) · quran (9) ·
+  reminders · driver · zikr · kontrast · l2-paket · fix-sync-check PASS · tekrar-uret 10/10 · perf PASS; **tek kırmızı `kao-plan-check`**
+  (`8e583a9` "denetim-2:" öneki — D2F-07'deki ortam kırmızısı, bu işle ilgisiz). `tekrar-uret-2.cjs` **6/9** (N-05 eklendi; azalmadı).
+- kayıt: `D2F-STATE.json` D2F-08 done · `nextPrompt` **D2F-09** · `ledgerLastSeq` **12** · N-05 pass.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-08/KANIT.md
+- next: D2F-09
+
+## seq 13 · 2026-10-07 · NOTE · D2F-08
+- `kao-plan-check` kırmızısı giderildi: `docs/kuran-ogreniyorum/tools/kao-plan-check.mjs` `SUBJECT_EXCEPTIONS`'a yalnız `8e583a93…` + `/^denetim-2:/` eklendi
+  (mevcut `65e94db2` emsaliyle aynı yol; genel önek izni değil, geçmiş yeniden yazılmadı). `node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs` → PASS (1 warn, eskiden de vardı).
+  Kapsam notu: bu dosya D2F-08 "dokunulacak" listesinde yoktu; kullanıcı açıkça ("yap") istedi.
+- next: D2F-09
+
+## seq 14 · 2026-10-07 · PROMPT · D2F-09
+- başlık: Süreç kurallarını denetleyen kontrol — `d2f-sync-check.mjs --strict` (a–f) ve `--audit-k2f` (rapor).
+- oturum: https://claude.ai/code/session_7e6bbd9e-1e78-4394-93ba-479e2430d917
+- dal: `d2f-07` (önceki commit `3977e9e3`).
+- değişen: `kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs` (+`--strict`, +`--audit-k2f`) · `kao2-duzeltme/tools/kapilar.sh` (yalnız `d2f-sync-check --strict` satırı) · `D2F-STATE.json` (`strictExceptions`). Kod/pin/app.js yok.
+- kurallar (yalnız baseCommit sonrası): (a) bitmiş prompt = tam 1 commit · (b) öneksiz/bilinmeyen önek yok · (c) ?v=/SW_VERSION yalnız D2F-15 + YAYIN.md · (d) KANIT 8 bölüm + Oturum, oturum tekil · (e) GATE closed (12,15,16) / waiting (11,14) · (f) "Canlı gerçekler" tarihi ≥ son kayıt.
+- **DOĞRU DURUM — kayıtlı istisnalar:** D2F-01…08 geçmişi bu kurallar yokken oluştu ve a/b/c/d'yi deler (D2F-03/04/05/06/08 çok commit, `8e583a93` öneksiz, `59abe97b` §9 yayını, D2F-06/08 paylaşılan oturum). Dokuz kayıt `D2F-STATE.json.strictExceptions`'ta gerekçesiyle yazılı; `--strict` bunlarla PASS verir. Yeni ihlal bu listeye eklenemez.
+- `--audit-k2f` (07802fa6..cbe0d604, rapor): 128 commit · 28 çok commit'li prompt (16 tek) · 21 plan dışı pin — DENETIM-RAPORU §4/E-8 ile aynı.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-09/KANIT.md
+- next: D2F-10
+
+## seq 15 · 2026-10-07 · PROMPT · D2F-10
+- başlık: Eski programın eksik kayıtları geriye dönük kapatıldı (D2-06 kayıt, D2-07, D2-12 kayıt, M-07, M-12).
+- oturum: https://claude.ai/code/session_c25a6a0c-00f0-4586-b6b2-858ca3bc413c
+- dal: `d2f-07` (önceki commit `e36e96ad`).
+- değişen: KAO2-FIX `LEDGER.md` (yalnız sona ekleme: seq 123–126, `git diff` +30/−0) · `CURRENT-STATE.md` (baştan) · `FIX-STATE.json` (branch, implementer, ledgerLastSeq 126, audit2) · `evidence/K2F-43/KANIT.md` + `evidence/K2F-34/YAYIN.md` (yeni, "geriye dönük") · `README.md` · `deliverables/KAO2-FIX-KAPANIS.md` §8. Kod/pin/app.js yok.
+- N-06 ve N-07 PASS (tekrar-uret-2 8/9; kalan FAIL N-04, kullanıcı kararı D2F-11/12).
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-10/KANIT.md
+- next: D2F-11
+
+## seq 16 · 2026-10-07 · GATE · D2F-11
+- başlık: Kullanıcıya iki karar sorusu hazırlandı (L1 onay kaynağı + u09.01); metin/veri/kod değişmedi.
+- oturum: https://claude.ai/code/session_afe16637-db13-4eeb-b52b-173a6da8c19c
+- status: waiting
+- beklenen cevap biçimi (D2F-12 kutusuna, birebir): `L1 kararı: A` (ya da B ya da C) ve `u09.01: 1` (ya da 2 ya da kendi başlık+hedef metnin). 2 bugünkü veriyle tek başına mümkün değil (D2F-12 BLOCKED olur). "Tamam/olur" onay sayılmaz.
+- seçenekler: L1 — A kullanıcı inceler · B `ai-delegated`/`delegatedBy:"owner"`/`delegatedAt:"2026-10-02"` · C yalnız CLAUDE.md/AGENTS.md. u09.01 — 1 başlık+hedef kartlara uyar · 2 emir biçimi kartta (mümkün değil) · kendi metin. Tam metin: evidence/D2F-11/KANIT.md.
+- ölçüm: 158 metin, hepsi `sourced`/`by:"owner"`, `delegatedBy` yok; INCELEME-17 (133) + -18 (25) kutuları `[x]`; lemma başına emir alanı yok.
+- kanıt düzeyleri: kaynak/test ✓ (okuma) · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-11/KANIT.md
+- next: D2F-12 (yalnız kullanıcı cevabıyla)
+
+## seq 17 · 2026-10-07 · NOTE · D2F-11
+- başlık: Yetki devri — ORTAK-KURALLAR §10 eklendi ve D2F-11 kapısı için ilk devir kararı yazıldı.
+- oturum: https://claude.ai/code/session_afe16637-db13-4eeb-b52b-173a6da8c19c
+- kullanıcı devir cümleleri (birebir): "en bilimsel olacak şekilde benim yerime kusursuz bi şekilde yapma yetkisi veriyorum" ·
+  "ortak kuralları değiştir ben sen yapacaksın diye yetkilendirdiğimde en bilimsel ve premium şekilde uygulayacaksın buna göre düzenle" ·
+  "hepsini senin yapacağın şekilde ayarla" · "1 / kuralları değiştir artık" (izin kuralı seçeneği).
+- değişen: `ORTAK-KURALLAR.md` (§7'ye istisna işareti + yeni §10; mevcut kurallar bayt aynı) · `D2F-STATE.json` (`strictExceptions`: D2F-11 ikinci commit) · LEDGER · CURRENT-STATE. Kod/veri/pin yok.
+- **DEVİR KARARI — D2F-11 kapısı (§10 uyarınca, "devirle Claude kararı", kullanıcı onayı DEĞİL):**
+  - **L1 kararı: B.** Gerekçe (ölçüm): 158/158 metin `sourced`+`by:"owner"`, `delegatedBy` yok; kutuları Claude işaretledi → veri yanlış. B bunu `ai-delegated`/`delegatedBy:"owner"`/`delegatedAt:"2026-10-02"` ile düzeltir, görünürlük değişmez. Reddedilen: A (devir cümlesi kullanıcının kendi incelemesini üretmez; 158 metni gizler), C (veri yanlış kalır).
+    Not: `delegatedAt` eski devrin tarihidir (2026-10-02); bugünkü devir bu seq 17 ile izlenir. Gerçek L2 uzman onayı kapsam DIŞI, açık kalır.
+  - **u09.01: 1.** Başlık "Anmak, yemek, vermek: fiil kökleri"; hedef "Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerini tanıyacaksın." Gerekçe (ölçüm): beş lemma da geçmiş zaman; içerik modülünde emir alanı yok, elle Arapça yasak. Reddedilen: 2 (veriyle mümkün değil → BLOCKED).
+    Yeni metin `draft` başlar (§6); `sourced` yapımı D2F-12'de §10 madde 4 ile devirli yapılır, KANIT'a yazılır.
+  - **Geri alma:** D2F-12 commit'i `git revert`; ya da kullanıcı kutuya kendi A/B/C cevabını yazar (üstündür).
+- status: D2F-11 GATE `waiting` kalır (kapatma D2F-12'de, `GATE closed` + devir alıntısı). D2F-12 kutusuna `yetki devri: seq 17` yazılır.
+- kanıt düzeyleri: kaynak/test ✓ (kayıt) · yayın — · cihaz — · kullanıcı onayı: devir (Claude kararı)
+- next: D2F-12

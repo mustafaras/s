@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // KAO2-07 müfredat derleyici. Girdi: curriculum.spec.json (Arapça yok) + donmuş
-// KAO içerik modülleri. Çıktı: app/content/quranCurriculumV2.js ve
+// KAO içerik modülleri + texts.tr.json (metin/review katmanı) + G2 karar kaydı
+// (kao2-duzeltme/FIX-STATE.json, salt okunur). Çıktı: app/content/quranCurriculumV2.js ve
 // docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md. Belirlenimci: zaman damgası
 // yok, sıralama yalnız veriye bağlı; ağ, tarayıcı ve kullanıcı verisi yok.
 import fs from 'node:fs';
@@ -19,6 +20,9 @@ const OUT_CONCEPT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-1
 const OUT_CONCEPT_MODULE = 'app/content/quranConceptTextsV1.js';
 const OUT_PRAYER_MAP = 'docs/kuran-ogreniyorum/kao2/content/prayer-lemma-map.json';
 const OUT_PRAYER_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md';
+// D2-11 · K3-07: G2 onay kararının kaydı KAO2-FIX programında tutulur; müfredat sayfası onay durumunu
+// buradan yazar (salt okunur). Kayıt yoksa sayfa kırılmaz, bölüm "bekliyor" biçiminde kalır.
+const FIX_STATE = 'kao2-duzeltme/FIX-STATE.json';
 const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
 
 function fail(message) {
@@ -472,6 +476,43 @@ function renderModule(fullData) {
 
 const unitSize = (u) => u.lessons.reduce((s, l) => s + l.lemmaIds.length, 0);
 
+// D2-11: müfredat sayfasındaki metin durumu VERİDEN türetilir (`texts.tr.json` → review.level);
+// elle "taslaktır/draft" yazılmaz. Sayılar metin kaynağıyla aynı olmalı (test bunu doğrular).
+const reviewLevel = (entry) => (entry && entry.review && LEVELS.includes(entry.review.level) ? entry.review.level : 'draft');
+function reviewStatus(data) {
+  const levels = [];
+  for (const u of data.units) {
+    levels.push(reviewLevel(u));
+    for (const l of u.lessons) levels.push(reviewLevel(l));
+  }
+  for (const l of data.s0.lessons) levels.push(reviewLevel(l));
+  const count = (level) => levels.filter((lv) => lv === level).length;
+  return { total: levels.length, draft: count('draft'), sourced: count('sourced'), expert: count('expert') };
+}
+
+// D2-11 · K3-07: G2 karar kaydını (`decisions.G2` = "<YYYY-MM-DD> · <metin>") okur. Salt okunur,
+// belirlenimci; kayıt yok/bozuksa null döner ve sayfa "bekliyor" biçimini korur.
+function readG2Decision() {
+  const file = path.join(ROOT, FIX_STATE);
+  if (!fs.existsSync(file)) return null;
+  let decisions;
+  try { decisions = JSON.parse(fs.readFileSync(file, 'utf8')).decisions; } catch { return null; }
+  const raw = decisions && decisions.G2;
+  if (typeof raw !== 'string' || !raw.trim()) return null;
+  const text = raw.trim();
+  const sep = text.indexOf('·');                       // '·' ayıracı
+  const date = sep > 0 ? text.slice(0, sep).trim() : '';
+  const valid = /^\d{4}-\d{2}-\d{2}$/.test(date);
+  return { date: valid ? date : '', summary: valid ? text.slice(sep + 1).trim() : text };
+}
+
+// Sayfa başlıklarında kullanılan kısa G2 durum etiketi.
+const g2Heading = () => {
+  const g2 = readG2Decision();
+  if (!g2) return 'G2 onayı bekliyor';
+  return g2.date ? `G2 onaylı ${g2.date}` : 'G2 onaylı';
+};
+
 // K2F-20: önceki dağılımla (curriculum.before-k2f20.json) karşılaştırılan "değişenler" bölümü ve G2 karar noktaları.
 function renderChanges(data, byId, cell) {
   const file = path.join(ROOT, BEFORE_K2F20);
@@ -489,7 +530,7 @@ function renderChanges(data, byId, cell) {
     moved += inn.length;
     rows.push(`| ${l.id} | ${cell(l.title)} | ${out.map(label).join(', ') || '—'} | ${inn.map(label).join(', ') || '—'} |`);
   }
-  const lines = ['## K2F-20 ile değişenler (G2 onayı bekliyor)', '',
+  const lines = [`## K2F-20 ile değişenler (${g2Heading()})`, '',
     `${rows.length} ders değişti, ${moved} lemma başka derse taşındı. Ders kimlikleri, sıraları ve boyutları sabittir; Ünite 1–3 değişmedi. Tamamlanmış ders tamamlanmış kalır; derse sonradan taşınan ve tanışılmamış kelimeler sıradaki dersin planında tanıştırılır (A-6). Değişen derslerin başlık/hedef metinleri K2F-21'de yeniden yazılır.`, '',
     '| Ders | Başlık (eski metin) | Çıkan | Giren |', '|---|---|---|---|', ...rows, ''];
   const decisions = Array.isArray(spec.g2Decisions) ? spec.g2Decisions : [];
@@ -507,10 +548,16 @@ function renderChanges(data, byId, cell) {
 function renderReview(data, spec, { lex, grammar }) {
   const byId = new Map(lex.lemmas.map((l) => [l.id, l]));
   const cell = (s) => String(s).replace(/\|/g, '\\|');
+  const status = reviewStatus(data);
+  const g2 = readG2Decision();
+  const levels = [status.sourced ? '`sourced`' : null, status.expert ? '`expert`' : null].filter(Boolean).join(' / ') || '`sourced`';
+  const statusLine = status.draft === 0
+    ? `Metin durumu: ${status.total} metin · draft 0 · sourced ${status.sourced} · expert ${status.expert}. Tüm başlık ve vaatler onaylıdır (${levels}), uygulamada görünür.`
+    : `Metin durumu: ${status.total} metin · draft ${status.draft} · sourced ${status.sourced} · expert ${status.expert}. ${status.draft} metin hâlâ taslaktır (\`review.level: draft\`); uygulamada görünmez.`;
   const lines = [
     '# KAO2 — Müfredat eşlemesi (G2 incelemesi)', '',
     '> Araç çıktısı: `node tools/kao2-curriculum-build.mjs` — elle düzenlemeyin; değişiklik `docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json` üzerinden yapılır.',
-    '> Arapça, okunuş ve anlam `QuranLexiconV1` içerik modülünden kopyalanır. Tüm başlık ve vaatler taslaktır (`review.level: draft`).', '',
+    `> Arapça, okunuş ve anlam \`QuranLexiconV1\` içerik modülünden kopyalanır. ${statusLine}`, '',
     '## Özet', '',
     '| Ünite | Seviye | Başlık | Ders | Kelime | Kavramlar | Çapa |', '|---|---|---|---|---|---|---|'
   ];
@@ -521,15 +568,24 @@ function renderReview(data, spec, { lex, grammar }) {
   const total = data.units.reduce((s, u) => s + unitSize(u), 0);
   lines.push('', `Toplam: ${data.units.length} ünite · ${lessonCount} ders · ${total} lemma · Seviye 0: ${data.s0.lessons.length} ders.`, '');
   lines.push(...renderChanges(data, byId, cell));
-  lines.push('## Karar bekleyen noktalar', '');
+  // D2-11: karar/gerekçe maddeleri veriden üretilir; sayfa bunları iki başlıktan yalnız birinde gösterir.
+  const notes = [];
   for (const u of data.units) {
     if (u.id > 3 && u.id < 10 && (unitSize(u) < 20 || unitSize(u) > 60)) {
-      lines.push(`- Ünite ${u.id} (${u.title}) ${unitSize(u)} kelime: hedef aralık 20–60 dışında; dağıtım spec \`poolRules\` ile değiştirilebilir.`);
+      notes.push(`- Ünite ${u.id} (${u.title}) ${unitSize(u)} kelime: hedef aralık 20–60 dışında; dağıtım spec \`poolRules\` ile değiştirilebilir.`);
     }
   }
   const focus2 = (spec.units.find((u) => u.id === 2).focus || []).length;
-  lines.push(`- Ünite 2 çapası: namaz metinlerinin çoğu kelimesi sözlükte yok (\`lp_*\`); ${focus2} odak kelimesi eski plan listesinden kimlikle eklendi.`);
-  lines.push(`- Dağıtım kuralları (ilk eşleşen kazanır): ${spec.poolRules.map((r) => `Ü${r.unit} ${r.why}`).join(' → ')}.`, '');
+  notes.push(`- Ünite 2 çapası: namaz metinlerinin çoğu kelimesi sözlükte yok (\`lp_*\`); ${focus2} odak kelimesi eski plan listesinden kimlikle eklendi.`);
+  notes.push(`- Dağıtım kuralları (ilk eşleşen kazanır): ${spec.poolRules.map((r) => `Ü${r.unit} ${r.why}`).join(' → ')}.`);
+  if (g2) {
+    lines.push(`## G2 kararı (${g2.date})`, '', `> ${g2.summary}`, '', ...notes, '',
+      '- [x] Ünite sırası, çapalar ve ders bölümü uygun.',
+      '- [x] Kelime–ünite eşlemesi uygun.',
+      '- [x] Karar noktalarında önerilen seçenekler kabul edildi.', '');
+  } else {
+    lines.push('## Karar bekleyen noktalar', '', ...notes, '');
+  }
   lines.push('## Seviye 0', '');
   for (const l of data.s0.lessons) lines.push(`- ${l.id} · ${l.title}`);
   for (const u of data.units) {
@@ -546,10 +602,13 @@ function renderReview(data, spec, { lex, grammar }) {
       lines.push('');
     }
   }
-  lines.push('## Onay (G2)', '',
-    '- [ ] Ünite sırası, çapalar ve ders bölümü uygun.',
-    '- [ ] Kelime–ünite eşlemesi uygun (değişiklik isteniyorsa kimlikle yazın).',
-    '- [ ] Karar bekleyen noktalar için tercih belirtildi.', '');
+  // G2 onaylıysa onay satırları yukarıda işaretli yazıldı; boş kutu bloğu tekrar basılmaz.
+  if (!g2) {
+    lines.push('## Onay (G2)', '',
+      '- [ ] Ünite sırası, çapalar ve ders bölümü uygun.',
+      '- [ ] Kelime–ünite eşlemesi uygun (değişiklik isteniyorsa kimlikle yazın).',
+      '- [ ] Karar bekleyen noktalar için tercih belirtildi.', '');
+  }
   return lines.join('\n');
 }
 

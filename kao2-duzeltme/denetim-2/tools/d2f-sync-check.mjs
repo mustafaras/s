@@ -4,6 +4,8 @@
 //   node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs            → temel denetim
 //   node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs --clean    → + git çalışma ağacı temiz mi (prompt başı)
 //   node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs --repro    → + tekrar-uret-2.cjs: STATE'te "pass" olan her N gerçekten PASS
+//   node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs --strict   → + süreç kapıları (a–f): tek commit, önek, yayın, KANIT, onay, bayat durum
+//   node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs --audit-k2f → KAO2-FIX dönemine aynı kuralları yalnız RAPOR olarak uygular (çıkış kodu etkilenmez)
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -143,6 +145,117 @@ if (args.has('--clean')) {
     const status = execFileSync('git', ['status', '--porcelain'], { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
     if (status) fail(`çalışma ağacı temiz değil:\n${status}`);
   } catch (error) { fail(`git status çalışmadı: ${error.message}`); }
+}
+
+// 8 · İsteğe bağlı: süreç kapıları (--strict) — yalnız baseCommit'ten sonraki D2F commit'leri
+const KANIT_SECTIONS = ['İlerleme günlüğü', 'Yapılan', 'TDD', 'Kapılar', 'Ölçümler', 'Bilerek değişen testler', 'Kanıt düzeyleri', 'Sürprizler'];
+const GATES_CLOSED = ['D2F-12', 'D2F-15', 'D2F-16'];
+const GATES_WAITING = ['D2F-11', 'D2F-14'];
+const RELEASE_PROMPT = 'D2F-15';
+const K2F_BASE = '07802fa6';
+const K2F_PLANNED_RELEASES = new Set(['K2F-18', 'K2F-43']);
+const PIN_PICKAXE = '\\?v=|SW_VERSION';
+// belge ve kayıt dosyaları pin sayılmaz: yalnız kod/test/kabuk dosyalarındaki ?v= ve SW_VERSION değişimi
+const PIN_PATHSPEC = [':(exclude)kao2-duzeltme', ':(exclude)docs', ':(exclude)*.md'];
+const git = (argv) => execFileSync('git', argv, { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+const commitsIn = (range) => git(['log', '--format=%H%x09%s', range]).split('\n').filter(Boolean)
+  .map((line) => ({ hash: line.slice(0, line.indexOf('\t')), subject: line.slice(line.indexOf('\t') + 1) }));
+const pinHashesIn = (range) => new Set(git(['log', `-G${PIN_PICKAXE}`, '--format=%H', range, '--', '.', ...PIN_PATHSPEC]).split('\n').filter(Boolean));
+const isDirty = () => git(['status', '--porcelain']).trim() !== '';
+
+if (args.has('--strict')) {
+  const exceptions = Array.isArray(state.strictExceptions) ? state.strictExceptions : [];
+  const exempt = new Set();
+  for (const ex of exceptions) {
+    if (!ex || !/^[a-f]$/.test(ex.rule) || !ex.ref || !ex.reason) fail(`strictExceptions kaydı geçersiz (rule/ref/reason zorunlu): ${JSON.stringify(ex)}`);
+    else exempt.add(`${ex.rule}:${ex.ref}`);
+  }
+  const used = new Set();
+  const violate = (rule, ref, message) => {
+    const hit = [...exempt].find((key) => { const [r, f] = [key.slice(0, 1), key.slice(2)]; return r === rule && (ref === f || (f.length >= 7 && ref.startsWith(f))); });
+    if (hit) { used.add(hit); return; }
+    fail(`[strict-${rule}] ${ref}: ${message}`);
+  };
+  const range = `${state.baseCommit}..HEAD`;
+  const commits = commitsIn(range);
+  const pending = isDirty();
+  const lastDone = [...ids].reverse().find((id) => state.prompts[id].status === 'done') || null;
+  const byPrompt = {};
+  // (b) önek
+  for (const c of commits) {
+    const m = /^(D2F-\d{2}):/.exec(c.subject);
+    if (!m) violate('b', c.hash.slice(0, 8), `öneksiz commit: "${c.subject.slice(0, 60)}"`);
+    else if (!EXPECTED_IDS.includes(m[1])) violate('b', c.hash.slice(0, 8), `bilinmeyen önek ${m[1]}`);
+    else (byPrompt[m[1]] ||= []).push(c);
+  }
+  // (a) bitmiş her prompt için tam bir commit (en son bitmiş prompt, çalışma ağacı kirliyken henüz commit'lenmemiş olabilir)
+  for (const id of ids.filter((x) => state.prompts[x].status === 'done')) {
+    const count = (byPrompt[id] || []).length;
+    if (count === 1) continue;
+    if (count === 0 && id === lastDone && pending) continue;
+    violate('a', id, `${count} commit (tam 1 olmalı)`);
+  }
+  // (c) yayın: ?v= / SW_VERSION yalnız D2F-15'te ve YAYIN.md ile
+  const pinHashes = pinHashesIn(range);
+  const hasReleaseNote = existsSync(join(PLAN_DIR, 'evidence', RELEASE_PROMPT, 'YAYIN.md'));
+  for (const c of commits.filter((x) => pinHashes.has(x.hash))) {
+    if (!c.subject.startsWith(`${RELEASE_PROMPT}:`)) violate('c', c.hash.slice(0, 8), `pin değiştiren commit ${RELEASE_PROMPT} değil: "${c.subject.slice(0, 60)}"`);
+    else if (!hasReleaseNote) violate('c', c.hash.slice(0, 8), `evidence/${RELEASE_PROMPT}/YAYIN.md yok`);
+  }
+  if (pending && git(['diff', 'HEAD', `-G${PIN_PICKAXE}`, '--name-only', '--', '.', ...PIN_PATHSPEC]).trim() && lastDone !== RELEASE_PROMPT && state.nextPrompt !== RELEASE_PROMPT) {
+    violate('c', 'çalışma-ağacı', `commit'lenmemiş ?v=/SW_VERSION değişimi var, yayın promptu ${RELEASE_PROMPT} değil`);
+  }
+  // (d) KANIT: 8 bölüm + Oturum satırı, oturum adresi tekil
+  const sessionOwner = new Map();
+  for (const id of ids.filter((x) => state.prompts[x].status === 'done')) {
+    const rel = state.prompts[id].evidence;
+    if (!rel || !existsSync(join(REPO, rel))) continue; // eksik dosya bölüm 2'de zaten FAIL
+    const text = readFileSync(join(REPO, rel), 'utf8');
+    const missing = KANIT_SECTIONS.filter((name) => !new RegExp(`^## ${name}(?=\\s|$)`, 'm').test(text));
+    if (missing.length) violate('d', id, `KANIT bölümü eksik: ${missing.join(', ')}`);
+    const session = (/^Oturum:\s*(\S+)/m.exec(text) || [])[1];
+    if (!session) { violate('d', id, 'KANIT\'ta "Oturum:" satırı yok'); continue; }
+    if (state.prompts[id].session && state.prompts[id].session !== session) violate('d', id, `STATE.session ≠ KANIT Oturum (${session})`);
+    if (sessionOwner.has(session)) violate('d', id, `oturum adresi ${sessionOwner.get(session)} ile paylaşılıyor`);
+    else sessionOwner.set(session, id);
+  }
+  // (e) onay kapıları: LEDGER'da GATE kaydı
+  const gateEntries = [...ledger.matchAll(/^## seq \d+ · \d{4}-\d{2}-\d{2} · GATE · (D2F-\d{2})\s*$([\s\S]*?)(?=^## seq |(?![\s\S]))/gm)];
+  const gateStatus = (id, wanted) => gateEntries.some((g) => g[1] === id && new RegExp(`^- status:\\s*${wanted}\\b`, 'm').test(g[2]));
+  for (const id of GATES_CLOSED) if (state.prompts[id]?.status === 'done' && !gateStatus(id, 'closed')) violate('e', id, 'LEDGER\'da GATE status: closed kaydı yok');
+  for (const id of GATES_WAITING) if (state.prompts[id]?.status === 'done' && !gateStatus(id, 'waiting')) violate('e', id, 'LEDGER\'da GATE status: waiting kaydı yok');
+  // (f) CURRENT-STATE "Canlı gerçekler" tarihi son LEDGER kaydından eski olamaz
+  const liveDate = (/^## Canlı gerçekler[^\n]*?(\d{4}-\d{2}-\d{2})/m.exec(current) || [])[1];
+  const lastDate = entries.length ? entries[entries.length - 1][2] : null;
+  if (!liveDate) violate('f', 'CURRENT-STATE', '"Canlı gerçekler" başlığında tarih yok');
+  else if (lastDate && liveDate < lastDate) violate('f', 'CURRENT-STATE', `"Canlı gerçekler" ${liveDate}, son prompt kaydı ${lastDate}`);
+  for (const key of exempt) if (!used.has(key)) console.log(`  not: strictExceptions "${key}" artık kullanılmıyor`);
+  console.log(`D2F strict: ${commits.length} commit incelendi (${range.slice(0, 8)}…HEAD) · ${used.size}/${exempt.size} kayıtlı istisna kullanıldı`);
+}
+
+// 9 · İsteğe bağlı: KAO2-FIX dönemi denetimi — yalnız rapor
+if (args.has('--audit-k2f')) {
+  const era = commitsIn(`${K2F_BASE}..${state.baseCommit}`).filter((c) => !c.subject.startsWith('KAO2-FIX denetim-2'));
+  const per = {};
+  let unprefixed = 0;
+  for (const c of era) {
+    const m = /^(K2F-\d{2})\b/.exec(c.subject);
+    if (m) (per[m[1]] ||= []).push(c); else unprefixed += 1;
+  }
+  const pinSet = pinHashesIn(`${K2F_BASE}..${state.baseCommit}`);
+  const eraPins = era.filter((c) => pinSet.has(c.hash));
+  const offPlan = eraPins.filter((c) => { const m = /^(K2F-\d{2})\b/.exec(c.subject); return m && !K2F_PLANNED_RELEASES.has(m[1]); });
+  const kanits = Object.keys(per).map((id) => join(REPO, 'kao2-duzeltme', 'evidence', id, 'KANIT.md')).filter(existsSync).map((f) => readFileSync(f, 'utf8'));
+  const noSession = kanits.filter((t) => !/^Oturum:\s*\S+/m.test(t)).length;
+  const sectionGaps = kanits.filter((t) => KANIT_SECTIONS.some((name) => !new RegExp(`^## ${name}(?=\\s|$)`, 'm').test(t))).length;
+  const promptCount = Object.keys(per).length;
+  const multi = Object.values(per).filter((list) => list.length > 1).length;
+  console.log(`K2F denetimi (yalnız rapor, çıkış kodunu etkilemez) ${K2F_BASE}..${state.baseCommit.slice(0, 8)}`);
+  console.log(`  (a) ${era.length} commit · ${promptCount} prompt · ${promptCount - multi} tek commit'li · ${multi} çok commit'li prompt`);
+  console.log(`  (b) ${unprefixed} öneksiz commit`);
+  console.log(`  (c) ${eraPins.length} pin değiştiren commit · ${offPlan.length} plan dışı pin (planlı: ${[...K2F_PLANNED_RELEASES].join(', ')}; öneksiz pin commit'leri b'de)`);
+  console.log(`  (d) ${kanits.length} KANIT · ${noSession} tanesinde "Oturum:" satırı yok · ${sectionGaps} tanesinde 8 bölümden eksik var`);
+  console.log('  (e)(f) K2F LEDGER/CURRENT-STATE biçimi farklı: bu araçta uygulanmaz');
 }
 
 const done = ids.filter((id) => state.prompts[id].status === 'done').length;

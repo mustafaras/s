@@ -1268,3 +1268,33 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence: kao2-duzeltme/evidence/K2F-43/YAYIN.md
 - evidence-levels: kaynak/test ✓ · yayın run success ✓, canlı bayt eşitliği bekliyor (github.io bu konteynerden engelli) · cihaz —
 - next: none
+
+## seq 123 · 2026-10-07 · GATE · K2F-43
+- status: closed-inferred (geriye dönük, D2F-10)
+- title: YAYIN-2 onayı — K2F-43 sırasında GATE kaydı yazılmamıştı; bu satır eksik kaydı geriye dönük ekler
+- decision: K2F-43 prompt'u kapanış özeti sunulduktan sonra açık "YAYIN-2 onaylı" cümlesi ister. O cümle alınmadı; onay, oturum başındaki genel talimattan çıkarıldı. Kullanıcının gerçek talimatı (evidence/K2F-43/YAYIN.md başlığından, 2026-10-06): "tüm açıkları kontrol et ve düzelt sonra da canlıya al". YAYIN.md'deki "YAYIN-2 onaylı sayıldı" ifadesi bu çıkarımdır.
+- onay: onay çıkarımla verildi; açık teyit denetim-2 Prompt 15'te (D2F-15) alınır. Bu kayıt onayı sonradan geçerli kılmaz.
+- evidence: kao2-duzeltme/evidence/K2F-43/KANIT.md (geriye dönük) · kao2-duzeltme/evidence/K2F-43/YAYIN.md · kao2-duzeltme/denetim-2/DENETIM-RAPORU.md (D2-06, E-4)
+- evidence-levels: kaynak/test — · yayın: run kaydı var (37510458831), canlı bayt eşitliği yok · cihaz —
+- next: none
+
+## seq 124 · 2026-10-07 · NOTE · K2F-34
+- title: K2F-34 yayınının kanıt dosyası eksikti (geriye dönük, D2F-10)
+- note: K2F-34 yayın pini `dc9743f4` ("K2F-34: yayın pini 20261004c") `evidence/K2F-34/` altında YAYIN.md bırakmadı; LEDGER'da RELEASE kaydı da yok (yalnız seq 97 `prev-commit: dc9743f` ve seq 99'daki `dc9743f4..5a1aea85` aralığı onu dolaylı gösterir). Eksik kayıt git'ten kuruldu: kao2-duzeltme/evidence/K2F-34/YAYIN.md. Pages run numarası ve canlı bayt eşitliği kayıtta yok; tahmin edilmedi.
+- evidence: kao2-duzeltme/evidence/K2F-34/YAYIN.md · kao2-duzeltme/denetim-2/DENETIM-RAPORU.md (E-7)
+- evidence-levels: kaynak/test — · yayın: git push kaydı ✓, run no yok · cihaz —
+- next: none
+
+## seq 125 · 2026-10-07 · NOTE · K2F-38
+- title: K2F-38 döneminin iki süreç dışı commit'i (geriye dönük, D2F-10)
+- note: (1) `8bf8f658` — öneksiz commit ("Tüm yüzey taraması bulguları … (ara durum)"): KAO2-FIX kapsamı dışında ana uygulama alt çubuğu etiketi, Arapça alt sekmesi, Raşit kartları (`app/core/render.js`, `app/styles.css`) ve panel-v2 dar ekran CSS'i (`panel/v2/panel-v2.css`) ile pin 20261006c ve pin testlerini değiştirdi. Bu iş KAO2-FIX prompt'larından biri değildi. (2) `5b267dde` — `chore(kao)`: `docs/kuran-ogreniyorum/tools/kao-plan-check.mjs`'e kalıcı "K2F-NN ek:" önek izni eklendi; programın kendi hatalı önekini (`65e94db2`) geçirmek için kapı genişletildi. Daraltma: denetim-2 Prompt 2'de yapıldı (bkz. D2F-02 KANIT); tek-hash istisnası için D2F-08 seq 13.
+- evidence: git show --stat 8bf8f658 5b267dde · kao2-duzeltme/denetim-2/DENETIM-RAPORU.md (D2-12, E-8)
+- evidence-levels: kaynak/test — · yayın — · cihaz —
+- next: none
+
+## seq 126 · 2026-10-07 · NOTE · denetim-2
+- title: Bağımsız kapanış denetimi (denetim-2) ve düzeltme programı bağlantısı
+- note: KAO2-FIX kapanışı 2026-10-06'da bağımsız bir oturumca denetlendi; hüküm "tam ve kusursuz değil": kod tarafında dört kritik kusur kapanmış, protokol uyumunda ve kayıtlarda boşluk var. Sayılar: 49 eski bulgu → KAPANDI 32 · KISMEN 7 · YALNIZ BELGE 7 · KAPANMADI 3; 44 prompt → geçti 17 · kısmen 21 · kaldı 6; yeni bulgu 12 (yüksek 2 · orta 4 · düşük 6). Rapor: kao2-duzeltme/denetim-2/DENETIM-RAPORU.md. Düzeltme programı: kao2-duzeltme/denetim-2/ (16 prompt, D2F-01…16; durum D2F-STATE.json). Bu dosyanın seq 123–126 satırları D2F-10 ile geriye dönük eklendi; seq 1–122 değiştirilmedi.
+- evidence: kao2-duzeltme/denetim-2/DENETIM-RAPORU.md · kao2-duzeltme/denetim-2/D2F-STATE.json
+- evidence-levels: kaynak/test — · yayın — · cihaz —
+- next: none

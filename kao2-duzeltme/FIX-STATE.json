@@ -3,12 +3,18 @@
   "title": "KAO2 denetim düzeltmeleri — 49 bulgu, 44 sıralı prompt",
   "status": "completed",
   "plannedAt": "2026-09-30",
-  "implementer": "Claude Sonnet 5.5 (claude-sonnet-5-5) — her prompt ayrı oturum",
-  "branch": "kao2-duzeltme",
+  "implementer": "Claude Sonnet 5.5 (claude-sonnet-5-5) — plan: her prompt ayrı oturum; gerçekleşen: birkaç oturumda birden çok prompt, 128 commit (bkz. audit2)",
+  "branch": "oturum dalları → main; bkz. denetim-2",
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
   "nextPrompt": null,
-  "ledgerLastSeq": 122,
+  "ledgerLastSeq": 126,
+  "audit2": {
+    "report": "kao2-duzeltme/denetim-2/DENETIM-RAPORU.md",
+    "program": "kao2-duzeltme/denetim-2/D2F-STATE.json",
+    "verdict": "tam ve kusursuz değil: kod tarafında 4 kritik kusur kapanmış; protokol ve kayıt uyumunda boşluk",
+    "retroactiveRecords": "D2F-10 (2026-10-07): LEDGER seq 123–126, evidence/K2F-43/KANIT.md, evidence/K2F-34/YAYIN.md"
+  },
   "releaseApproval": "approved_through_K2F-43",
   "lastRelease": {
     "prompt": "K2F-43",

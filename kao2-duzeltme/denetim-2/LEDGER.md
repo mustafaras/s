@@ -237,3 +237,20 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ (okuma) · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-11/KANIT.md
 - next: D2F-12 (yalnız kullanıcı cevabıyla)
+
+## seq 17 · 2026-10-07 · NOTE · D2F-11
+- başlık: Yetki devri — ORTAK-KURALLAR §10 eklendi ve D2F-11 kapısı için ilk devir kararı yazıldı.
+- oturum: https://claude.ai/code/session_afe16637-db13-4eeb-b52b-173a6da8c19c
+- kullanıcı devir cümleleri (birebir): "en bilimsel olacak şekilde benim yerime kusursuz bi şekilde yapma yetkisi veriyorum" ·
+  "ortak kuralları değiştir ben sen yapacaksın diye yetkilendirdiğimde en bilimsel ve premium şekilde uygulayacaksın buna göre düzenle" ·
+  "hepsini senin yapacağın şekilde ayarla" · "1 / kuralları değiştir artık" (izin kuralı seçeneği).
+- değişen: `ORTAK-KURALLAR.md` (§7'ye istisna işareti + yeni §10; mevcut kurallar bayt aynı) · `D2F-STATE.json` (`strictExceptions`: D2F-11 ikinci commit) · LEDGER · CURRENT-STATE. Kod/veri/pin yok.
+- **DEVİR KARARI — D2F-11 kapısı (§10 uyarınca, "devirle Claude kararı", kullanıcı onayı DEĞİL):**
+  - **L1 kararı: B.** Gerekçe (ölçüm): 158/158 metin `sourced`+`by:"owner"`, `delegatedBy` yok; kutuları Claude işaretledi → veri yanlış. B bunu `ai-delegated`/`delegatedBy:"owner"`/`delegatedAt:"2026-10-02"` ile düzeltir, görünürlük değişmez. Reddedilen: A (devir cümlesi kullanıcının kendi incelemesini üretmez; 158 metni gizler), C (veri yanlış kalır).
+    Not: `delegatedAt` eski devrin tarihidir (2026-10-02); bugünkü devir bu seq 17 ile izlenir. Gerçek L2 uzman onayı kapsam DIŞI, açık kalır.
+  - **u09.01: 1.** Başlık "Anmak, yemek, vermek: fiil kökleri"; hedef "Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerini tanıyacaksın." Gerekçe (ölçüm): beş lemma da geçmiş zaman; içerik modülünde emir alanı yok, elle Arapça yasak. Reddedilen: 2 (veriyle mümkün değil → BLOCKED).
+    Yeni metin `draft` başlar (§6); `sourced` yapımı D2F-12'de §10 madde 4 ile devirli yapılır, KANIT'a yazılır.
+  - **Geri alma:** D2F-12 commit'i `git revert`; ya da kullanıcı kutuya kendi A/B/C cevabını yazar (üstündür).
+- status: D2F-11 GATE `waiting` kalır (kapatma D2F-12'de, `GATE closed` + devir alıntısı). D2F-12 kutusuna `yetki devri: seq 17` yazılır.
+- kanıt düzeyleri: kaynak/test ✓ (kayıt) · yayın — · cihaz — · kullanıcı onayı: devir (Claude kararı)
+- next: D2F-12

@@ -56,6 +56,8 @@ node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs          # PASS (Prompt 1'
 - Yorumlarda `App.<ad>=` biçimi ya da `onclick` kelimesi yazılmaz (pin tarayıcıları yorumları da sayar).
 
 ## 7. Kullanıcı onayı
+> §10 (yetki devri) bu bölümün istisnasıdır; devir yoksa §7 aynen geçerlidir.
+
 - Onay **asla çıkarılmaz**. Kullanıcı kararı gereken promptlarda (11→12, 14→15, 16) yalnız promptta yazan cevaplar geçerlidir.
   "Tamam", "olur", "canlıya al", oturum başındaki genel talimat onay sayılmaz — kullanıcıya beklenen cümleyi tekrar sor.
 - Karar soran promptta: işi commit et, LEDGER `GATE status: waiting` (beklenen cümle yazılı) ekle, kullanıcıya tek mesajla
@@ -72,3 +74,35 @@ ortam değiştireceğiz buyuzden tumu push commit ve merge ve deploy yapılmalı
 **Program kapanmadı:** D2F-05…16 `pending` kalır, N-02…N-08 açık; kullanıcı kapıları (D2F-12 iki karar, D2F-16 canlı doğrulama)
 geçerlidir. D2F-15 artık "yeni pin yok" olarak yapılır (yayın zaten çıktı) ya da yeni kod olursa tekrar pin; kararı o prompt verir.
 İstisna başka yayın için geçerli değildir.
+
+## 10. Yetki devri (2026-10-07, kullanıcı kararı)
+Kullanıcı, kapıdaki kararları kendi adına vermem için açık yetki verdi (birebir: "ortak kuralları değiştir ben sen yapacaksın diye
+yetkilendirdiğimde en bilimsel ve premium şekilde uygulayacaksın buna göre düzenle"; ardından "hepsini senin yapacağın şekilde ayarla",
+izin kuralı seçeneğine "1" ve "kuralları değiştir artık"). Bu bölüm §7'nin tek istisnasıdır.
+
+**Ne zaman geçerli:** kullanıcı yazılı olarak "yetkilendiriyorum / benim yerime sen karar ver / sen yap" anlamında açık bir cümle
+yazmışsa ve cümle ilgili kapıyı (ya da "tüm kullanıcı kararları"nı) kapsıyorsa. "Tamam", "olur", "devam" hâlâ devir **değildir**.
+
+**Devir varsa Claude şöyle karar verir (en bilimsel ve premium standart):**
+1. Karar, depodaki ölçüme dayanır (hangi dosya/alan/sayı) — tahmine değil; ölçüm KANIT'a yazılır.
+2. Tüm seçenekler tek tek değerlendirilir; seçilen ve **reddedilen** seçenekler gerekçesiyle kaydedilir. Geri alınabilir ve veriyi
+   gerçeğe en çok uyduran seçenek tercih edilir; görünürlüğü/kullanıcı verisini sessizce bozan seçenek tercih edilmez.
+3. Karar LEDGER'a `GATE` (ya da `NOTE`) olarak **kullanıcının devir cümlesi birebir alıntıyla**, kararlar ve gerekçeleriyle yazılır.
+4. Veri dürüstlüğü: devirle verilen onay **asla** `by:"owner"` olarak yazılmaz; `by:"ai-delegated"`, `delegatedBy:"owner"`,
+   `delegatedAt:<devir tarihi>` yazılır. Kullanıcı onayı/incelemesi yapılmış gibi gösterilmez; raporda "devirle, Claude kararı" denir.
+5. Bir oturum = bir prompt = bir commit (§3) değişmez: karar yazılır, uygulaması sıradaki promptun oturumunda yapılır. Promptun
+   "kutu doldurulmamışsa dur" şartı, kutuya `yetki devri: seq N` yazıldığında ya da LEDGER'da o kapı için geçerli devir kararı
+   bulunduğunda sağlanmış sayılır; D2F-12 kararı oradan okur ve `GATE closed` kaydına devir alıntısını yazar.
+6. Her devir kararı tek bir geri alma yolu içerir (hangi commit/araç çıktısı geri çevrilir) ve KANIT "Kanıt düzeyleri"nde
+   "kullanıcı onayı değil, devirle Claude kararı" diye ayrı yazılır.
+
+**Devredilemez (devir cümlesi olsa da):**
+- **L2 alan uzmanı onayı ve cihaz kabulü (K3):** gerçek bir uzman/cihaz olayıdır; Claude üretemez, "geçti" diye yazamaz.
+- **`mustafaras/seyma-data` yazımı, token/parola/2FA, tarayıcıda gerçek hesap** (CLAUDE.md DATA SAFETY) — ayrı ve açık onay ister.
+- **Yayın (D2F-15 push/merge/deploy ve pin):** yalnız devir cümlesi yayını **adıyla** kapsıyorsa (örn. "yayını da sen yap");
+  genel "kararları sen ver" yayını kapsamaz. Kapsıyorsa §6/§9 kuralları ve D2F-15'in kendi adımları aynen uygulanır.
+- Geçmişi yeniden yazmak, `push --force`, onay kutusu işaretini kullanıcı adına "owner" göstermek.
+- **D2F-16 canlı doğrulama komutu** kullanıcı tarafından çalıştırılır (ortam gerçeği).
+
+**Kapsam notu:** bu devir ilk kez D2F-11 kapısında kullanılır (LEDGER seq 17). Devir kararı kullanıcıya her zaman geri
+çevrilebilir: kullanıcı aynı kapıya kendi A/B/C cevabını yazarsa o cevap devir kararının üzerindedir.

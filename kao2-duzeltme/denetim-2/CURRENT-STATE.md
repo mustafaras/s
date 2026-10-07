@@ -2,7 +2,7 @@
 
 <!-- d2f-sync
 nextPrompt: D2F-12
-lastSeq: 16
+lastSeq: 17
 status: active
 -->
 
@@ -33,6 +33,7 @@ status: active
 | `tekrar-uret.cjs` | 10/10 PASS | koşuldu |
 
 ## Bu oturumun işi
+- **Yetki devri (seq 17, NOTE).** Kullanıcı kapı kararlarını Claude'a devretti; ORTAK-KURALLAR §10 eklendi (devredilemez: L2, cihaz kabulü, seyma-data, adıyla belirtilmemiş yayın). D2F-11 devir kararı: **L1 = B, u09.01 = 1** (kullanıcı onayı değil, devirle Claude kararı). GATE `waiting` kalır; D2F-12 kutusuna `yetki devri: seq 17` yazılır.
 - **D2F-11 — Kullanıcı kararı bekleniyor (seq 16, GATE waiting).** İki soru: (1) 158 metnin L1 onay kaynağı — A sen incelersin / B `ai-delegated` yazılır / C yalnız belge; (2) u09.01 başlık↔kart — 1 başlık+hedef kartlara uyar / 2 emir biçimi kartta (bugünkü veriyle mümkün değil) / kendi metin. Beklenen cevap: D2F-12 kutusunda `L1 kararı: X` + `u09.01: Y`. Metin/veri/kod değişmedi. Ayrıntı: [evidence/D2F-11/KANIT.md](evidence/D2F-11/KANIT.md).
 - **D2F-10 — Eski program kayıtları (seq 15).** KAO2-FIX LEDGER seq 123–126 (K2F-43 GATE closed-inferred, K2F-34/K2F-38/denetim-2 NOT), K2F-43 KANIT + K2F-34 YAYIN geriye dönük, CURRENT-STATE baştan, FIX-STATE/README/KAPANIŞ §8. N-06, N-07 PASS. Ayrıntı: [evidence/D2F-10/KANIT.md](evidence/D2F-10/KANIT.md).
 - **D2F-09 — Süreç kuralları araçla (seq 14).** `d2f-sync-check.mjs --strict`: baseCommit'ten sonraki D2F commit'lerine (a) tam bir commit, (b) önek, (c) yayın yalnız D2F-15 + YAYIN.md,

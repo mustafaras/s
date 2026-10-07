@@ -14,6 +14,8 @@ const root = require('../repo-root');
 const MODULE = 'app/content/quranCurriculumV2.js';
 const REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md';
 const SPEC = 'docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json';
+const TEXT_SOURCE = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
+const FIX_STATE = 'kao2-duzeltme/FIX-STATE.json';
 const TOOL = 'tools/kao2-curriculum-build.mjs';
 const read = (file) => fs.readFileSync(path.join(root, file));
 
@@ -154,8 +156,52 @@ check('(f) lemmaToLesson ve byLesson tutarlı', () => {
 check('spec elle yazılmış Arapça içermez; inceleme listesi tam', () => {
   assert.ok(!/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/.test(read(SPEC).toString('utf8')), 'spec Arapça içeriyor');
   const md = read(REVIEW).toString('utf8');
-  assert.match(md, /- \[ \] /, 'inceleme listesinde onay kutusu yok');
+  // Onay kutusu taşıyan en az bir satır kalır; kutu G2 durumuna göre işaretli ya da boş olabilir
+  // (D2-11: G2 onaylıyken işaretlenir, aşağıdaki kontrol işareti zorunlu kılar).
+  assert.match(md, /- \[[ xX]\] /, 'inceleme listesinde onay kutusu yok');
   for (const id of lemmaIds) assert.ok(md.includes(byId.get(id).ar), `inceleme listesinde yok: ${id}`);
+});
+
+// D2-11: sayfa onay durumunu VERİDEN yazar. Taslak metin sayısı 0 iken "taslaktır" DENMEZ; sayılar
+// `texts.tr.json` (review.level) ile birebir aynı olmalı. Sayılar metin kaynağından bağımsız hesaplanır.
+check('(D2-11) metin durumu sayfaya veriden yazılır; sayılar texts.tr.json ile aynı, taslak 0 iken "taslaktır" yok', () => {
+  const texts = JSON.parse(read(TEXT_SOURCE).toString('utf8'));
+  const levelAt = (bucket, id) => {
+    const entry = (bucket && bucket[id]) || {};
+    const review = entry.review;
+    return review && typeof review === 'object' && typeof review.level === 'string' ? review.level : 'draft';
+  };
+  const levels = [];
+  for (const u of cur.units) {
+    levels.push(levelAt(texts.units, String(u.id)));
+    for (const l of u.lessons) levels.push(levelAt(texts.lessons, l.id));
+  }
+  for (const l of cur.s0.lessons) levels.push(levelAt(texts.s0, l.id));
+  const count = (level) => levels.filter((lv) => lv === level).length;
+  const stat = { total: levels.length, draft: count('draft'), sourced: count('sourced'), expert: count('expert') };
+  const md = read(REVIEW).toString('utf8');
+  assert.ok(md.includes(`${stat.total} metin`), `sayfa toplam metin ${stat.total} yazmalı`);
+  assert.ok(md.includes(`draft ${stat.draft}`), `sayfa draft ${stat.draft} yazmalı`);
+  assert.ok(md.includes(`sourced ${stat.sourced}`), `sayfa sourced ${stat.sourced} yazmalı`);
+  assert.ok(md.includes(`expert ${stat.expert}`), `sayfa expert ${stat.expert} yazmalı`);
+  if (stat.draft === 0) assert.ok(!md.includes('taslaktır'), 'taslak metin yokken sayfa "taslaktır" yazmamalı');
+  else assert.ok(md.includes('taslaktır'), 'taslak metin varken sayfa uyarmalı');
+});
+
+// D2-11 · K3-07 kalıntısı: G2 kararı kayıtlıysa "Karar bekleyen noktalar" yerine "G2 kararı (<tarih>)"
+// özeti ve işaretli onay satırı yazılır; eski boş kutu başlığı kalmaz.
+check('(D2-11 · K3-07) G2 kararı kayıtlıysa sayfa "G2 kararı (tarih)" + işaretli onay satırı yazar', () => {
+  const fix = JSON.parse(read(FIX_STATE).toString('utf8'));
+  const g2 = fix.decisions && fix.decisions.G2;
+  const md = read(REVIEW).toString('utf8');
+  if (typeof g2 !== 'string' || !g2.trim()) {
+    assert.ok(!md.includes('## Karar bekleyen noktalar'), 'G2 yokken "Karar bekleyen noktalar" başlığı beklenmez');
+    return;
+  }
+  const date = g2.split('·')[0].trim();
+  assert.ok(md.includes(`## G2 kararı (${date})`), `sayfa "## G2 kararı (${date})" yazmalı`);
+  assert.ok(!md.includes('## Karar bekleyen noktalar'), 'eski "Karar bekleyen noktalar" başlığı kaldırılmalı');
+  assert.match(md, /- \[x\] /, 'işaretli onay satırı yok');
 });
 
 check('(g) araç iki çalıştırmada bayt-eşit ve depodaki çıktıyla aynı', () => {

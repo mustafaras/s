@@ -1,7 +1,7 @@
 # KAO2 — Müfredat eşlemesi (G2 incelemesi)
 
 > Araç çıktısı: `node tools/kao2-curriculum-build.mjs` — elle düzenlemeyin; değişiklik `docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json` üzerinden yapılır.
-> Arapça, okunuş ve anlam `QuranLexiconV1` içerik modülünden kopyalanır. Tüm başlık ve vaatler taslaktır (`review.level: draft`).
+> Arapça, okunuş ve anlam `QuranLexiconV1` içerik modülünden kopyalanır. Metin durumu: 133 metin · draft 0 · sourced 133 · expert 0. Tüm başlık ve vaatler onaylıdır (`sourced`), uygulamada görünür.
 
 ## Özet
 
@@ -22,7 +22,7 @@
 
 Toplam: 12 ünite · 109 ders · 524 lemma · Seviye 0: 12 ders.
 
-## K2F-20 ile değişenler (G2 onayı bekliyor)
+## K2F-20 ile değişenler (G2 onaylı 2026-10-02)
 
 26 ders değişti, 41 lemma başka derse taşındı. Ders kimlikleri, sıraları ve boyutları sabittir; Ünite 1–3 değişmedi. Tamamlanmış ders tamamlanmış kalır; derse sonradan taşınan ve tanışılmamış kelimeler sıradaki dersin planında tanıştırılır (A-6). Değişen derslerin başlık/hedef metinleri K2F-21'de yeniden yazılır.
 
@@ -80,12 +80,18 @@ Toplam: 12 ünite · 109 ders · 524 lemma · Seviye 0: 12 ders.
 - **u08.07** — 'Yeterli gelmek' başlığının yarısı lemma anlamlarında.
   - K2F-21: başlık yeniden yazılır
 
-## Karar bekleyen noktalar
+## G2 kararı (2026-10-02)
+
+> kullanıcı: 'tüm önerilerini gerçekleştir' → G2 onaylı, karar noktalarında önerilen seçenekler kabul: Ünite 1–3 donuk kalır, sözlük genişletilmez, ilgili derslerin başlık/hedef metinleri K2F-21'de dersin gerçek kelimelerine göre yeniden yazılır (u02.01/.02, u03.02, u04.01/.02, u07.02, u09.02, u10.01, u11.01/.05, u12.02, u07.01, u08.07).
 
 - Ünite 5 (Bu, şu, kim, ne) 10 kelime: hedef aralık 20–60 dışında; dağıtım spec `poolRules` ile değiştirilebilir.
 - Ünite 6 (Gök, yer ve insan) 147 kelime: hedef aralık 20–60 dışında; dağıtım spec `poolRules` ile değiştirilebilir.
 - Ünite 2 çapası: namaz metinlerinin çoğu kelimesi sözlükte yok (`lp_*`); 11 odak kelimesi eski plan listesinden kimlikle eklendi.
 - Dağıtım kuralları (ilk eşleşen kazanır): Ü5 işaret ve soru edatları → Ü5 işaret/soru isimleri → Ü12 şart ve zaman parçacıkları → Ü12 zaman zarfları → Ü9 seslenme (g18) → Ü4 edat, zamir, bağlaç → Ü11 unit11 kök ailesi (≥3 üye), türemiş bâb → Ü10 unit11 kök ailesi (≥3 üye) → Ü10 türemiş isimler: yapan, yapılan, fiilin adı (g19, g20) — G2 dengeleme → Ü9 türemiş bâb fiiller → Ü8 illetli / câmid fiiller → Ü7 sağlam I. bâb fiiller → Ü6 kalan isimler.
+
+- [x] Ünite sırası, çapalar ve ders bölümü uygun.
+- [x] Kelime–ünite eşlemesi uygun.
+- [x] Karar noktalarında önerilen seçenekler kabul edildi.
 
 ## Seviye 0
 
@@ -1447,9 +1453,3 @@ Kavram: g24 Kur'an'ın sık kalıpları · Uygula: examples
 | 1 | أَبَدًا | abaden | hiçbir zaman, ebediyen | `l_abadFA_f54ff9` |
 | 2 | حِين | hîn | zaman, vakit | `l_Hiyn_b9a2cc` |
 | 3 | مَن | man | kim; o kimse ki | `l_man_48b676` |
-
-## Onay (G2)
-
-- [ ] Ünite sırası, çapalar ve ders bölümü uygun.
-- [ ] Kelime–ünite eşlemesi uygun (değişiklik isteniyorsa kimlikle yazın).
-- [ ] Karar bekleyen noktalar için tercih belirtildi.

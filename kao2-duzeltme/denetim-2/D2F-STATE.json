@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-07",
-  "ledgerLastSeq": 10,
+  "nextPrompt": "D2F-08",
+  "ledgerLastSeq": 11,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -47,9 +47,9 @@
     },
     "D2F-07": {
       "title": "Müfredat eşleme sayfası gerçeği yazsın",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-07/KANIT.md",
+      "session": "https://claude.ai/code/session_1f48752b-ccea-476d-8043-aecb83e71957"
     },
     "D2F-08": {
       "title": "Test listesi tam olsun",

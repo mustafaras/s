@@ -150,3 +150,32 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kayıt: `nextPrompt` **ilerlemedi** (D2F-07'de kalır; bu bir NOTE'dır, prompt değil) · `ledgerLastSeq` **10**.
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-06/EK-KANIT.md
 - next: D2F-07
+
+## seq 11 · 2026-10-07 · PROMPT · D2F-07
+- durum: done
+- başlık: Müfredat eşleme sayfası gerçeği yazsın — sayfa artık onay durumunu VERİDEN yazar (metin sayıları + G2 kararı)
+- oturum: https://claude.ai/code/session_1f48752b-ccea-476d-8043-aecb83e71957
+- dal: `d2f-07` (baseCommit `cbe0d604`; önceki commit `e7b2c170` = D2F-06 NOT).
+- sorun: `docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md` (araç üretir) hâlâ "Tüm başlık ve vaatler taslaktır" yazıyor ve boş kutulu
+  "## Karar bekleyen noktalar" taşıyordu; oysa taslak metin sayısı **0** (hepsi `sourced`) ve G2 kararı **2026-10-02**'de verilmişti.
+  D2-11 + K3-07 kalıntısı: sayfa gerçeği değil, donmuş bir varsayımı yazıyordu.
+- değişen (yalnız araç + çıktısı + fikstür): `tools/kao2-curriculum-build.mjs` (yeni `reviewStatus`/`readG2Decision`; `renderReview` durum satırı
+  sayılardan, karar/G2 bölümü `kao2-duzeltme/FIX-STATE.json` `decisions.G2`'den) · `docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md`
+  (yalnız `node tools/kao2-curriculum-build.mjs` çıktısı; elle düzenlenmedi) · `tests/kao/test_kao2_curriculum.js`
+  (iki yeni kontrol: D2-11 sayı/G2; mevcut kutu kontrolü `[ xX]` olacak şekilde genişletildi).
+  Dokunulmadı: `app.js`, `app/core/*`, `sync.js`, pinler/`sw.js`, `migrate()`, diğer araç çıktıları.
+- test: `node tests/kao/test_kao2_curriculum.js` → **çıkış 0 PASS (15 kontrol)**. Araç `--out-dir` ile iki kez koşuldu →
+  `MUFREDAT-ESLEME.md` ve `quranCurriculumV2.js` **bayt-eşit** ve depodaki çıktıyla **aynı**. `git diff --stat`: yalnız üç dosya
+  (araç + çıktı + fikstür); `quranCurriculumV2.js` ve diğer araç çıktıları değişmedi. Bağımsız sayım: `draft 0`, tüm seviyeler `sourced`.
+- mutasyon (scratchpad kopya, commit edilmedi): (a) durum satırı sabit "taslaktır"a dönerse → `AssertionError: sayfa toplam metin 133 yazmalı`
+  (çıkış 1); (b) G2 okuması `null`'a zorlanırsa → `AssertionError: sayfa "## G2 kararı (2026-10-02)" yazmalı` (çıkış 1). Her mutasyon
+  ilgili yeni kontrolü izole eder.
+- kapılar (bu oturum): `KAO2_ACCEPT_SLOW_HOST=1 bash kao2-duzeltme/tools/kapilar.sh` → 16 satır yeşil, **tek kırmızı `kao-plan-check`**:
+  `FAIL commit 8e583a9 ... tests/kao/test_kao2_kabul.js` — seq 10 NOTE commit'inin öneki ("denetim-2:") plan aracının tanıdığı KAO önekleri
+  dışında. **Bu kırmızı HEAD'de, benim değişikliklerim olmadan da aynı** (temiz ağaçta doğrulandı) → D2F-07 ile ilgisiz, kapsam dışı (§3).
+  Diğerleri: `tests/kao` 54 PASS · `tests/app` 77 PASS · panel/panel-v2/quran/reminders/driver/zikr/kontrast/l2-paket PASS ·
+  `tekrar-uret-2.cjs` **5/9** (N-01,02,03,08,09 — azalmadı) · `tekrar-uret.cjs` **10/10** · perf PASS (p95 4.239 · steady 2.855).
+- kayıt: `D2F-STATE.json` D2F-07 done · `nextPrompt` **D2F-08** · `ledgerLastSeq` **11** · N durumları değişmedi (5/9 pass) · pin `20261007a` sabit.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-07/KANIT.md
+- next: D2F-08

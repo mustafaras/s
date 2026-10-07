@@ -181,6 +181,16 @@
       "rule": "a",
       "ref": "D2F-11",
       "reason": "2 commit: ana + yetki devri kuralı (ORTAK-KURALLAR §10, LEDGER seq 17); kullanıcının açık talimatıyla eklendi (2026-10-07)"
+    },
+    {
+      "rule": "b",
+      "ref": "d0acd9b4",
+      "reason": "main'e d2f-07 birleştirmesi için oluşturulan yerel merge commit'i; kullanıcı, geçmişi yeniden yazmadan istisna ekleme yolunu seçti (2026-10-07)"
+    },
+    {
+      "rule": "b",
+      "ref": "347884fb",
+      "reason": "main'e d2f-05 birleştirmesi için oluşturulan yerel merge commit'i; kullanıcı, geçmişi yeniden yazmadan istisna ekleme yolunu seçti (2026-10-07)"
     }
   ]
 }

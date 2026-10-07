@@ -1723,7 +1723,7 @@
       if(panel){
         if(task.kind==='order'){
           var orderPosition=(ui.kaoOrderDraft||[]).indexOf(choice.choiceId);
-          state=orderPosition<0?'dim':(choice.ordinal===orderPosition?'correct':'wrong');
+          state=orderPosition<0?'dim':(choice.label===kaoOrderLabels(task)[orderPosition]?'correct':'wrong');
         }else if(choice.correct===true) state='correct';
         else if(choice.choiceId===panel.choiceId) state='wrong';
         else state='dim';
@@ -1804,8 +1804,12 @@
   // K2F-31: görev süresi ölçümü üst sınırı (05 §4: uzun duraklama ortalamayı bozmaz).
   var KAO_TASK_MS_CAP=120000;
   function kaoTaskMs(ui,now){ return Math.min(KAO_TASK_MS_CAP,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime()))); }
+  // D2F-03: dizme görevinin doğru sırası çip YAZILARI dizisidir; aynı yazılı çipler (ör. bir kelime âyette iki kez) birbirinin yerine geçer.
+  function kaoOrderLabels(task){
+    return task&&Array.isArray(task.choices)?task.choices.slice().sort(function(a,b){ return nonNegativeNumber(a.ordinal,0)-nonNegativeNumber(b.ordinal,0); }).map(function(item){ return item.label; }):[];
+  }
   function kaoAnswerText(task){
-    if(task&&task.kind==='order') return Array.isArray(task.choices)?task.choices.slice().sort(function(a,b){ return nonNegativeNumber(a.ordinal,0)-nonNegativeNumber(b.ordinal,0); }).map(function(item){ return item.label; }).join(' · '):'';
+    if(task&&task.kind==='order') return kaoOrderLabels(task).join(' · ');
     if(task&&task.answer) return String(task.answer);
     return task&&Array.isArray(task.choices)?task.choices.filter(function(item){ return item.correct===true; }).map(function(item){ return item.label; }).join(' · '):'';
   }
@@ -2168,9 +2172,10 @@
       if(ui.kaoOrderDraft.length<task.choices.length){
         ui.kaoFeedback=String(ui.kaoOrderDraft.length)+' / '+String(task.choices.length)+' kelime seçildi'; paintTask(); return {pending:true};
       }
+      var expectedLabels=kaoOrderLabels(task);
       correct=ui.kaoOrderDraft.every(function(selectedId,index){
         var selected=task.choices.find(function(item){ return item.choiceId===selectedId; });
-        return selected&&selected.ordinal===index;
+        return !!selected&&selected.label===expectedLabels[index];
       });
       choice={correct:correct};
     }

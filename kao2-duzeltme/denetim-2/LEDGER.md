@@ -23,3 +23,14 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - mutasyon: sahte runtime (>128 KiB) bayraklı perf FAIL · istisna listesi boş → self-test FAIL · D2F aralığı genişletilince FAIL.
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-02/KANIT.md
 - next: D2F-03
+
+## seq 3 · 2026-10-07 · PROMPT · D2F-03
+- başlık: "Kelime dizme" aynı görünen çipler — sıra kontrolü çip kimliği yerine çip yazısına dayanır (D2-01).
+- oturum: https://claude.ai/code/session_018WK6EKGxUJbKAaNFboTVpv
+- dal: `claude/sharp-volta-l6ifgz` (`36015f08` → `2edc9810` ff-only, sonra bu commit).
+- değişen: `app/core/quranLearn.js` (yeni yardımcı `kaoOrderLabels`; `applyAnswer` dizme doğruluğu ve `kaoTaskHTML` geri bildirim çip durumu yazıya dayanır; `kaoAnswerText` aynı yardımcıyı kullanır) · `tests/kao/test_kao2_grammar_tasks.js` (bölüm D, 4 kontrol: D1–D4; 27 → 31).
+- dokunulmadı: FSRS (`kaoSchedule`), `kaoBuildQueue`, `kaoGrammarTaskValid`, `app.js`, pinler/sw.
+- kapılar: bayraklı kapilar.sh çıkış 0 "SONUÇ: TÜM KAPILAR YEŞİL" (1437 sn) · tekrar-uret-2 0/9 → 1/9 (N-01 PASS) · tekrar-uret 10/10.
+- mutasyon: (a) `selected.ordinal===index` geri → D1 FAIL ("geri bildirim: Doğru cevap: …"), D4 FAIL; (b) çip durumu ordinal'e geri → D1 FAIL ("çiplerden hiçbiri yanlış işaretlenmez").
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-03/KANIT.md
+- next: D2F-04

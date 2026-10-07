@@ -29,7 +29,8 @@ const ARABIC = /[؀-ۿ]/;
 
 // Ders oynatıcıyı gerçek handler'larla özete kadar yürütür. Harness'in `walkLesson`ı görev başına tek cevap verir; "Kelime dizme"
 // (kind:'order') birden çok seçim ister, bu yüzden burada order-aware yürüyüşçü var. wrongFor(task) true ise yanlış cevap verilir.
-function walkAware(t, lessonId, { wrongFor = () => false, visit } = {}) {
+// D2F-03: orderFor(task) dizme görevinde seçim sırasını (çip listesi) verir; after(task) cevaptan sonra, Devam'dan önce çağrılır.
+function walkAware(t, lessonId, { wrongFor = () => false, visit, orderFor, after } = {}) {
   if (!t.api.kaoLesson('start', lessonId)) return false;
   const st = t.ui.kaoLesson;
   for (let guard = 0; guard < 400; guard += 1) {
@@ -42,11 +43,13 @@ function walkAware(t, lessonId, { wrongFor = () => false, visit } = {}) {
       const choices = task.choices || [];
       if (task.kind === 'order') {
         const byOrdinal = choices.slice().sort((a, b) => a.ordinal - b.ordinal);
-        for (const c of (wrong ? byOrdinal.slice().reverse() : byOrdinal)) t.api.kaoAnswer(task.id, c.choiceId);
+        const picks = orderFor ? orderFor(task) : (wrong ? byOrdinal.slice().reverse() : byOrdinal);
+        for (const c of picks) t.api.kaoAnswer(task.id, c.choiceId);
       } else {
         const pick = wrong ? choices.find((c) => !c.correct) : choices.find((c) => c.correct);
         t.api.kaoAnswer(task.id, (pick || choices[0]).choiceId);
       }
+      if (after) after(task);
       t.api.kaoContinue();
       continue;
     }
@@ -699,4 +702,161 @@ check('C13 · g10-k3 / g14-k2 / g19-k3: görev yalnız doğrulanmış tablo ve �
   assert.ok(seenSides.size >= 1);
 });
 
-console.log(`test_kao2_grammar_tasks (bölüm A+B+C): ${passed} kontrol PASS`);
+// ---------------------------------------------------------------------------------------------------------------
+// Bölüm D (D2F-03 · D2-01) — aynı yazılı dizme çipleri birbirinin yerine geçer
+// ---------------------------------------------------------------------------------------------------------------
+// Kullanıcı yalnız çip yazısını görür: aynı yazılı iki çipten hangisini önce seçtiği görünür sırayı değiştirmez. Sıra kontrolü
+// çip kimliğine (ordinal) değil yazıya dayanmalı. Akış gerçek handler'larla sürülür (kaoLesson/kaoStart/kaoAnswer/kaoContinue).
+const byOrdinalOf = (task) => (task.choices || []).slice().sort((a, b) => a.ordinal - b.ordinal);
+const labelsOf = (picks) => picks.map((c) => c.label);
+const hasDupLabel = (task) => { const l = labelsOf(task.choices || []); return l.some((x, i) => l.indexOf(x) !== i); };
+// Aynı yazılı çiplerin konumlarını kendi aralarında ters çevirir: yazı dizisi aynı kalır, çip kimlikleri yer değiştirir.
+function swapSameLabel(picks) {
+  const out = picks.slice();
+  for (const label of new Set(labelsOf(picks))) {
+    const at = picks.map((c, i) => (c.label === label ? i : -1)).filter((i) => i >= 0);
+    at.forEach((pos, k) => { out[pos] = picks[at[at.length - 1 - k]]; });
+  }
+  return out;
+}
+// Görünür yazı dizisi doğru sıradan farklı olan bir sıra (bir kaydırma).
+const rotated = (picks) => picks.slice(1).concat(picks.slice(0, 1));
+const todayKeyOf = (t) => t.NOW.slice(0, 10);
+const answerState = (t, task) => {
+  const q = t.data.quranLearn, daily = q.daily[todayKeyOf(t)] || {};
+  return { feedback: t.ui.kaoFeedback, panelCorrect: !!(t.ui.kaoPanel && t.ui.kaoPanel.correct), correct: daily.correct || 0, answered: daily.answered || 0,
+    errors: { ...q.errors }, queueLen: t.ui.kaoQueue.length, lessonCorrect: (t.ui.kaoLesson && t.ui.kaoLesson.correct) || 0, html: task ? t.api.kaoTaskHTML(task) : '' };
+};
+
+// u08.02'yi oynatır; g16-k2 dizme görevinde seçim sırasını pickFor(canonical) belirler. Cevaptan önce/sonra durum döner.
+function playU0802(pickFor) {
+  const t = bootKao();
+  freshUser(t);
+  let hit = null;
+  const finished = walkAware(t, 'u08.02', {
+    orderFor: (task) => {
+      const canonical = byOrdinalOf(task);
+      if (hit || task.retry || !/g16-k2$/.test(task.cardId)) return canonical;
+      const picks = pickFor(canonical);
+      hit = { task, canonical, picks, before: answerState(t, null) };
+      return picks;
+    },
+    after: (task) => { if (hit && hit.task === task && !hit.after) hit.after = answerState(t, task); }
+  });
+  assert.ok(finished, 'u08.02 özete kadar yürümedi');
+  assert.ok(hit && hit.after, 'u08.02 g16-k2 "Kelime dizme" görevi gösterilmedi');
+  assert.equal(hit.task.grammarType, 'Kelime dizme');
+  assert.ok(hasDupLabel(hit.task), 'ön koşul: g16-k2 görevinde aynı yazılı iki çip var');
+  return hit;
+}
+
+check('D1 · D2-01 u08.02 g16-k2: aynı yazılı iki çip yer değiştirerek görünürde doğru sırayla seçilince "Doğru"; günlük doğru +1, hata sayacı değişmez, yeniden deneme eklenmez', () => {
+  const hit = playU0802(swapSameLabel);
+  assert.deepEqual(labelsOf(hit.picks), labelsOf(hit.canonical), 'görünür sıra doğru sıra');
+  assert.notDeepEqual(hit.picks.map((c) => c.choiceId), hit.canonical.map((c) => c.choiceId), 'çip kimlikleri yer değiştirdi');
+  const { before, after } = hit;
+  assert.equal(after.feedback, 'Doğru', `geri bildirim: ${after.feedback}`);
+  assert.equal(after.panelCorrect, true);
+  assert.equal(after.answered, before.answered + 1);
+  assert.equal(after.correct, before.correct + 1, 'günlük doğru sayısı artar');
+  assert.equal(after.lessonCorrect, before.lessonCorrect + 1, 'ders doğru sayısı artar');
+  assert.deepEqual(after.errors, before.errors, 'hata sayacına yazılmaz');
+  assert.equal(after.queueLen, before.queueLen, 'yanlış sayılıp yeniden deneme eklenmez');
+  assert.ok(!/kao-choice-wrong/.test(after.html), 'çiplerden hiçbiri yanlış işaretlenmez');
+  assert.ok(/kao-choice-correct/.test(after.html), 'seçilen çipler doğru işaretlenir');
+});
+
+check('D2 · D2-01 u08.02 g16-k2: gerçekten yanlış sıra (aynı yazılı çipler de yer değiştirse) yine yanlış; hata sayacı +1, yeniden deneme eklenir', () => {
+  for (const pickFor of [rotated, (c) => swapSameLabel(rotated(c))]) {
+    const hit = playU0802(pickFor);
+    assert.notDeepEqual(labelsOf(hit.picks), labelsOf(hit.canonical), 'görünür sıra yanlış');
+    const { before, after } = hit;
+    assert.match(after.feedback, /^Doğru cevap: /);
+    assert.equal(after.panelCorrect, false);
+    assert.equal(after.correct, before.correct, 'günlük doğru sayısı artmaz');
+    assert.equal(after.errors[hit.task.errorClass], before.errors[hit.task.errorClass] + 1, `errors.${hit.task.errorClass} +1`);
+    assert.equal(after.queueLen, before.queueLen + 1, 'yeniden deneme eklenir');
+    assert.ok(/kao-choice-wrong/.test(after.html), 'yanlış konumdaki çip işaretlenir');
+  }
+});
+
+check('D3 · 109 dersin bütün dizme görevlerinde aynı yazılı çiplerin yer değiştirmesi sonucu değiştirmez (doğru sıra doğru, yanlış sıra yanlış)', () => {
+  const t = bootKao();
+  let orderTasks = 0, dupTasks = 0;
+  const dupCards = new Set(), bad = [];
+  for (const wrongPass of [false, true]) {
+    for (const lesson of allLessons) {
+      freshUser(t);
+      let pending = null;
+      const finished = walkAware(t, lesson.id, {
+        orderFor: (task) => {
+          const canonical = byOrdinalOf(task);
+          if (task.retry) { pending = null; return canonical; }
+          const base = wrongPass ? rotated(canonical) : canonical;
+          pending = { task, expectCorrect: !wrongPass };
+          if (!wrongPass) { orderTasks += 1; if (hasDupLabel(task)) { dupTasks += 1; dupCards.add(task.cardId); } }
+          return swapSameLabel(base);
+        },
+        after: (task) => {
+          if (!pending || pending.task !== task) return;
+          const ok = !!(t.ui.kaoPanel && t.ui.kaoPanel.correct);
+          if (ok !== pending.expectCorrect) bad.push(`${lesson.id} ${task.cardId}: ${wrongPass ? 'yanlış sıra' : 'doğru sıra'} → "${t.ui.kaoFeedback}"`);
+          pending = null;
+        }
+      });
+      assert.ok(finished, `${lesson.id}: özete kadar yürümedi`);
+    }
+  }
+  assert.equal(bad.length, 0, bad.slice(0, 5).join(' | '));
+  assert.ok(orderTasks >= 10, `dizme görevi sayısı ${orderTasks}`);
+  assert.ok(dupTasks >= 1 && [...dupCards].some((id) => /g16-k2$/.test(id)), `aynı yazılı çipli dizme görevi: ${[...dupCards].join(', ') || 'yok'}`);
+});
+
+// Parça (fragment) dizme aynı cevap yolunu kullanır. Gerçek kısa sûre gruplarında tekrar eden kelime yok; sentetik VM'de 95:4
+// grubunun bir kelimesine aynı grubun başka bir kelimesinin yazı+okunuşu kopyalanır (modülden türetilir, elle Arapça yazılmaz).
+const DUP_FRAGMENT = (name, src) => {
+  if (name !== 'quranShortSurahsV1') return src;
+  // Sıkıştırılmış kelime kaydı: [id, sûre, âyet, sıra, ar, lemmaId, tr, okunuş].
+  const re = /\["s-95-4-(\d+)",[^[\]]*\]/g;
+  const recs = {};
+  for (const m of src.matchAll(re)) recs[m[1]] = m[0];
+  assert.ok(recs['3'] && recs['5'], 'sentetik kurulum: 95:4 kayıtları bulunamadı');
+  const from = JSON.parse(recs['3']), to = JSON.parse(recs['5']);
+  assert.equal(from.length, 8, 'sentetik kurulum: kayıt biçimi');
+  to[4] = from[4]; to[7] = from[7];
+  return src.split(recs['5']).join(JSON.stringify(to));
+};
+function playFragment(transformSource, pickFor) {
+  const t = transformSource ? bootKao({ transformSource }) : bootKao();
+  freshUser(t);
+  t.api.kaoStart();
+  const item = t.ui.kaoQueue[t.ui.kaoTaskIndex];
+  const task = item && t.ui.kaoTasks[item.id];
+  assert.ok(task && task.type === 'fragment' && task.kind === 'order', 'ilk görev parça dizme olmalı');
+  const canonical = byOrdinalOf(task), picks = pickFor(canonical), before = answerState(t, null);
+  for (const c of picks) t.api.kaoAnswer(task.id, c.choiceId);
+  return { t, task, canonical, picks, before, after: answerState(t, task) };
+}
+
+check('D4 · parça (fragment) dizme: aynı yazılı çipler yer değişse de görünür doğru sıra "Doğru"; gerçekten yanlış sıra yanlış (errors.order +1)', () => {
+  const real = playFragment(null, (c) => c);
+  assert.equal(real.after.feedback, 'Doğru', 'gerçek veride doğru sıra doğru');
+  assert.ok(!hasDupLabel(real.task), 'gerçek parça grubunda tekrar eden kelime yok (sentetik kurulumun gerekçesi)');
+  const swap = playFragment(DUP_FRAGMENT, swapSameLabel);
+  assert.ok(hasDupLabel(swap.task), 'ön koşul: sentetik parçada aynı yazılı iki çip');
+  assert.deepEqual(labelsOf(swap.picks), labelsOf(swap.canonical));
+  assert.notDeepEqual(swap.picks.map((c) => c.choiceId), swap.canonical.map((c) => c.choiceId));
+  assert.equal(swap.after.feedback, 'Doğru', `geri bildirim: ${swap.after.feedback}`);
+  assert.equal(swap.after.correct, swap.before.correct + 1);
+  assert.deepEqual(swap.after.errors, swap.before.errors);
+  assert.equal(swap.after.queueLen, swap.before.queueLen);
+  assert.ok(!/kao-choice-wrong/.test(swap.after.html));
+  const wrong = playFragment(DUP_FRAGMENT, (c) => swapSameLabel(rotated(c)));
+  assert.notDeepEqual(labelsOf(wrong.picks), labelsOf(wrong.canonical));
+  assert.equal(wrong.after.panelCorrect, false);
+  assert.equal(wrong.after.correct, wrong.before.correct);
+  assert.equal(wrong.after.errors.order, wrong.before.errors.order + 1);
+  assert.equal(wrong.after.queueLen, wrong.before.queueLen + 1);
+});
+
+console.log(`test_kao2_grammar_tasks (bölüm A+B+C+D): ${passed} kontrol PASS`);

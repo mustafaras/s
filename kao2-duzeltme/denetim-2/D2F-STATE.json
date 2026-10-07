@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-03",
-  "ledgerLastSeq": 2,
+  "nextPrompt": "D2F-04",
+  "ledgerLastSeq": 3,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -23,9 +23,9 @@
     },
     "D2F-03": {
       "title": "\"Kelime dizme\" aynı görünen çipler",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-03/KANIT.md",
+      "session": "https://claude.ai/code/session_018WK6EKGxUJbKAaNFboTVpv"
     },
     "D2F-04": {
       "title": "Aynı derste aynı gramer sorusu",
@@ -107,7 +107,7 @@
     }
   },
   "n": {
-    "N-01": "fail",
+    "N-01": "pass",
     "N-02": "fail",
     "N-03": "fail",
     "N-04": "fail",

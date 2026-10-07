@@ -274,3 +274,14 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - karar: gerçek L2 alan uzmanı onayı üretilmedi; L2 kutuları boş kaldı.
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-12/KANIT.md
 - next: D2F-13
+
+## seq 20 · 2026-10-07 · PROMPT · D2F-13
+- başlık: Tüm düzeltmeler birlikte baştan sona yeniden ölçüldü; DUZELTME-SONUCU.md ve A-KABUL.md yazıldı.
+- oturum: claude-code:a2d84e3d-c707-467c-81b6-d166368fce15
+- dal: `main` (önceki commit `2fe3abf6`).
+- ölçüm: kapilar.sh bayraklı ve bayraksız ikisi de TÜM KAPILAR YEŞİL (çıkış 0) · tekrar-uret-2 9/9 (prompt 8/9 bekliyordu; N-08 erken yayınla zaten kapanmıştı) · tekrar-uret 10/10 · test_kao2_denetim 10/10 · plan-check PASS · d2f strict PASS (13/13 istisna) · perf-ab best3 1,098 · kabul A-1…A-10 + P10 PASS.
+- açık (Claude kapatamaz): L2 uzman onayı (0/37), 13 namaz kelimesi, ses kayıtları (K-3), cihaz kabulü, ekran okuyucu turu; D2-06 canlı bayt eşitliği (D2F-16); D2-12 kapsam dışı `8bf8f658` geri alınmadı.
+- değişen: `DUZELTME-SONUCU.md`, `evidence/D2F-13/{KANIT,A-KABUL}.md`, LEDGER, CURRENT-STATE, D2F-STATE. Kod/pin/app.js yok.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-13/KANIT.md
+- next: D2F-14

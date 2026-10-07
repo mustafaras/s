@@ -204,3 +204,15 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
   (mevcut `65e94db2` emsaliyle aynı yol; genel önek izni değil, geçmiş yeniden yazılmadı). `node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs` → PASS (1 warn, eskiden de vardı).
   Kapsam notu: bu dosya D2F-08 "dokunulacak" listesinde yoktu; kullanıcı açıkça ("yap") istedi.
 - next: D2F-09
+
+## seq 14 · 2026-10-07 · PROMPT · D2F-09
+- başlık: Süreç kurallarını denetleyen kontrol — `d2f-sync-check.mjs --strict` (a–f) ve `--audit-k2f` (rapor).
+- oturum: https://claude.ai/code/session_7e6bbd9e-1e78-4394-93ba-479e2430d917
+- dal: `d2f-07` (önceki commit `3977e9e3`).
+- değişen: `kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs` (+`--strict`, +`--audit-k2f`) · `kao2-duzeltme/tools/kapilar.sh` (yalnız `d2f-sync-check --strict` satırı) · `D2F-STATE.json` (`strictExceptions`). Kod/pin/app.js yok.
+- kurallar (yalnız baseCommit sonrası): (a) bitmiş prompt = tam 1 commit · (b) öneksiz/bilinmeyen önek yok · (c) ?v=/SW_VERSION yalnız D2F-15 + YAYIN.md · (d) KANIT 8 bölüm + Oturum, oturum tekil · (e) GATE closed (12,15,16) / waiting (11,14) · (f) "Canlı gerçekler" tarihi ≥ son kayıt.
+- **DOĞRU DURUM — kayıtlı istisnalar:** D2F-01…08 geçmişi bu kurallar yokken oluştu ve a/b/c/d'yi deler (D2F-03/04/05/06/08 çok commit, `8e583a93` öneksiz, `59abe97b` §9 yayını, D2F-06/08 paylaşılan oturum). Dokuz kayıt `D2F-STATE.json.strictExceptions`'ta gerekçesiyle yazılı; `--strict` bunlarla PASS verir. Yeni ihlal bu listeye eklenemez.
+- `--audit-k2f` (07802fa6..cbe0d604, rapor): 128 commit · 28 çok commit'li prompt (16 tek) · 21 plan dışı pin — DENETIM-RAPORU §4/E-8 ile aynı.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-09/KANIT.md
+- next: D2F-10

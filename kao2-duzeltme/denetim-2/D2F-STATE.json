@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-09",
-  "ledgerLastSeq": 13,
+  "nextPrompt": "D2F-10",
+  "ledgerLastSeq": 14,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -59,9 +59,9 @@
     },
     "D2F-09": {
       "title": "Süreç kurallarını denetleyen kontrol",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-09/KANIT.md",
+      "session": "https://claude.ai/code/session_7e6bbd9e-1e78-4394-93ba-479e2430d917"
     },
     "D2F-10": {
       "title": "Eski programın eksik kayıtları",
@@ -130,5 +130,52 @@
     "D2F-15",
     "D2F-16"
   ],
-  "releaseApproval": "user_override_2026-10-07_early_release"
+  "releaseApproval": "user_override_2026-10-07_early_release",
+  "strictExceptions": [
+    {
+      "rule": "b",
+      "ref": "8e583a93",
+      "reason": "ortam kırmızılarını gideren öneksiz commit (D2F-06/07 arası); D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
+    },
+    {
+      "rule": "a",
+      "ref": "D2F-03",
+      "reason": "3 commit: ana + 2 NOT (LEDGER seq 4-5); D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
+    },
+    {
+      "rule": "a",
+      "ref": "D2F-04",
+      "reason": "3 commit: ana + NOT + YAYIN (LEDGER seq 7); D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
+    },
+    {
+      "rule": "a",
+      "ref": "D2F-05",
+      "reason": "2 commit: ana + NOT starter; D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
+    },
+    {
+      "rule": "a",
+      "ref": "D2F-06",
+      "reason": "2 commit: ana + NOT starter; D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
+    },
+    {
+      "rule": "a",
+      "ref": "D2F-08",
+      "reason": "2 commit: ana + plan-check tek-hash NOT'u; D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
+    },
+    {
+      "rule": "c",
+      "ref": "59abe97b",
+      "reason": "ORTAK-KURALLAR §9 tek seferlik erken yayın (LEDGER seq 7, kullanıcı kararı)"
+    },
+    {
+      "rule": "d",
+      "ref": "D2F-06",
+      "reason": "D2F-05 ile aynı oturum adresi; D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
+    },
+    {
+      "rule": "d",
+      "ref": "D2F-08",
+      "reason": "D2F-07 ile aynı oturum adresi; D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
+    }
+  ]
 }

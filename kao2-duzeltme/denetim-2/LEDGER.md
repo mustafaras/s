@@ -131,3 +131,22 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kayıt: `D2F-STATE.json` D2F-06 done · `nextPrompt` **D2F-07** · `ledgerLastSeq` **9** · N durumları değişmedi (5/9 pass).
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-06/KANIT.md
 - next: D2F-07
+
+## seq 10 · 2026-10-07 · NOTE · D2F-06
+- başlık: Ortam kırmızıları giderildi (kullanıcı yönergesi) — D2F-05/D2F-06'da "kapsam dışı (§3)" denen iki kırmızı, prompt
+  listesi dışında ve kullanıcı emriyle kapatıldı. İkisi de **test kusuru**; üretim davranışı doğruydu.
+- oturum: https://claude.ai/code/session_d0d6d6d9-c277-497f-98ea-e3c237d4db72
+- dal: `d2f-05` (HEAD `79eca899` = D2F-06; baseCommit `cbe0d604`).
+- kullanıcı yönergesi (birebir): "failleri çözmen gerekiyor tam ve kusursu şekilde çözülmeli"
+- değişen: `tests/kao/test_kao2_kabul.js` (A-4 `night-review` artık yerel duvar saati 23:30 kurar; `kaoNightWindow` YEREL saati
+  okur, `23:30Z` yalnız UTC'de 23:30'a denk geliyordu) · `tests/app/test_settings_boundary.js` (`git log` artık `--all` yok —
+  yürüyüş yalnız HEAD ataları; ajan ana makinesi kök kontrol-noktası ref'i `625eba07` `main` atası değil ve ebeveynsiz →
+  `git show <sha>^` geçersizdi). Üretim dosyası, pinler, `sw.js` değişmedi.
+- ölçüm (bu oturum, kaynak/test): 6 saat dilimi sondası — eski fikstür `night-review`'ı yalnız UTC'de verir, yeni fikstür
+  altısında da · `test_settings_boundary.js` **13/13 PASS** (öncesi çökme) · `test_kao2_kabul.js` **10/10 PASS çıkış 0**
+  (A-9: 189/189 dosya çıkış 0) · `tekrar-uret-2.cjs` **5/9 PASS** (azalmadı) · tam kapı **çıkış 0 "SONUÇ: TÜM KAPILAR YEŞİL"**.
+- mutasyon (scratchpad, geri alma, commit edilmedi): A-4 `now` eski değere dönerse bu makinede FAIL (`night-review`→`daily`);
+  `--all` geri eklenirse settings sınırı çöker. İkisi de fikstürün nedeni izole ettiğini gösterir.
+- kayıt: `nextPrompt` **ilerlemedi** (D2F-07'de kalır; bu bir NOTE'dır, prompt değil) · `ledgerLastSeq` **10**.
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-06/EK-KANIT.md
+- next: D2F-07

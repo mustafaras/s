@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-12",
-  "ledgerLastSeq": 17,
+  "nextPrompt": "D2F-13",
+  "ledgerLastSeq": 19,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -77,9 +77,9 @@
     },
     "D2F-12": {
       "title": "Kararını uygula (kutuyu doldur)",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-12/KANIT.md",
+      "session": "copilot-cli:4ec68470-d2f12"
     },
     "D2F-13": {
       "title": "Baştan sona doğrulama",
@@ -110,7 +110,7 @@
     "N-01": "pass",
     "N-02": "pass",
     "N-03": "pass",
-    "N-04": "fail",
+    "N-04": "pass",
     "N-05": "pass",
     "N-06": "pass",
     "N-07": "pass",
@@ -191,6 +191,11 @@
       "rule": "b",
       "ref": "347884fb",
       "reason": "main'e d2f-05 birleştirmesi için oluşturulan yerel merge commit'i; kullanıcı, geçmişi yeniden yazmadan istisna ekleme yolunu seçti (2026-10-07)"
+    },
+    {
+      "rule": "a",
+      "ref": "D2F-12",
+      "reason": "2 commit: yayımlanmış hazırlık/merge-istisnası kaydı 3f3b28cd + gerçek D2F-12 uygulaması; ilk commit yanlış D2F-12 önekiyle yayımlandı, kullanıcı geçmişi yeniden yazmadan dar istisna yolunu seçti (2026-10-07)"
     }
   ]
 }

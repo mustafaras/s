@@ -13,7 +13,7 @@
       "why": "Fâtiha namazlarda tekrar tekrar okunur; bu yedi âyeti anlamak, öğrendiğin ilk kelimeleri hemen gerçek bir metinde kullanmanı sağlar. Yeni başlayan biri için en güçlü çapa budur.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "surah-theme",
@@ -24,7 +24,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "2": {
@@ -33,7 +35,7 @@
       "why": "Namaz, kelimeleri en sık duyduğun yerdir. İftitah tekbirinden selama kadar geçen cümleleri anlamak, öğrendiklerini günde beş kez uygulamana imkân verir.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "lexicon-meanings"
@@ -43,7 +45,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "3": {
@@ -52,7 +56,7 @@
       "why": "Bu üç kısa sûre hem yeni başlayan için okunması kolay hem de anlamı berrak metinlerdir; kelime dağarcığını ilk gerçek sûre okumalarında kullanırsın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "surah-theme",
@@ -63,7 +67,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "4": {
@@ -72,7 +78,7 @@
       "why": "Uzun cümleleri anlamayı zorlaştıran şey çoğu zaman bağlaçlardır. Bu küçük kelimeleri tanıyınca cümlenin parçalarını ve bir fikrin nerede başka bir fikre bağlandığını görmen kolaylaşır.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "grammar-plain"
@@ -82,7 +88,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "5": {
@@ -91,7 +99,7 @@
       "why": "İşaret ve soru kelimeleri, cümlenin kimi ya da neyi konu edindiğini gösterir. Bunları tanıdığında âyetin yönünü bulman kolaylaşır.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "grammar-plain"
@@ -101,7 +109,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "6": {
@@ -110,7 +120,7 @@
       "why": "Kur'an'da isimler çok geçer ve sık geçen isimlerin birçoğu gök, yer, insan gibi gündelik kavramlardır. Bunları öğrenmek, okuduğun âyetlerde tanıdığın kelime sayısını hızla artırır.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "lexicon-meanings"
@@ -120,7 +130,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "7": {
@@ -129,7 +141,7 @@
       "why": "Kur'an'da geçmişte olanlar sık anlatılır. Geçmiş zaman kalıbını tanıdığında kıssa anlatımlarını daha rahat takip edersin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "grammar-plain"
@@ -139,7 +151,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "8": {
@@ -148,7 +162,7 @@
       "why": "Şimdiki ve geniş zaman kalıbı, süregelen işleri ve genel doğruları anlatır. Bu kalıbı tanıyınca fiilin süren ya da genel bir işi anlattığını fark edersin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "grammar-plain"
@@ -158,7 +172,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "9": {
@@ -167,7 +183,7 @@
       "why": "Kur'an'da emir ve dua kalıpları sık geçer. Bunları tanımak, hem yönlendirmeyi hem de yakarışı ayırt etmeni sağlar.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "grammar-plain"
@@ -177,7 +193,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "10": {
@@ -186,7 +204,7 @@
       "why": "Arapçada kelimeler ortak bir kökten türer. Tek bir kökü öğrenmek, aynı aileden gelen pek çok kelimeyi birden tanımanı sağlar; ilim, talim, muallim aynı köktendir.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "lexicon-meanings"
@@ -196,7 +214,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "11": {
@@ -205,7 +225,7 @@
       "why": "Aynı kökten gelen kelimeler kalıba göre farklı işler görür: yapan, yapılan, yapma. Kalıpları tanımak, bilmediğin bir kelimenin anlamı için sana ipucu verir.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "sources": [
           "lexicon-meanings"
@@ -215,7 +235,9 @@
           "l0": "pass",
           "at": "2026-09-30"
         },
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "12": {
@@ -224,7 +246,7 @@
       "why": "Şart ve zaman ifadeleri, bir olayın hangi koşulda ve ne zaman gerçekleştiğini söyler. Bunları tanımak, uzun cümleleri parçalara ayırmanı kolaylaştırır.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-09-29",
         "sources": [
           "grammar-plain"
@@ -233,7 +255,9 @@
           "level": "draft",
           "l0": "pass",
           "at": "2026-09-30"
-        }
+        },
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     }
   },
@@ -243,9 +267,11 @@
       "goal": "Yazının sağdan sola aktığını ve harflerin üstündeki ve altındaki küçük işaretlerin ünlü sesi verdiğini göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.02": {
@@ -253,8 +279,10 @@
       "goal": "Aynı gövdeyi paylaşan harfleri noktalarına bakarak ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.03": {
@@ -262,8 +290,10 @@
       "goal": "İki kısa ünlü işaretini tanıyıp sesini doğru çıkaracaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.04": {
@@ -271,8 +301,10 @@
       "goal": "Çengelli harfleri yazılış biçiminden tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.05": {
@@ -280,8 +312,10 @@
       "goal": "Sonraki harfe bağlanmayan harfleri göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.06": {
@@ -289,9 +323,11 @@
       "goal": "Dişli harfleri ve aralarındaki farkı ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.07": {
@@ -299,8 +335,10 @@
       "goal": "Bir harfin başta, ortada ve sonda nasıl değiştiğini göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.08": {
@@ -308,8 +346,10 @@
       "goal": "Ünsüzle kapanan heceyi tanıyıp duraksız okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.09": {
@@ -317,9 +357,11 @@
       "goal": "İkizlenen harfi ve uzun okunan sesi ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-09-30",
-        "note": "07 §2 başlığına hizalandı (spec esastır)"
+        "note": "07 §2 başlığına hizalandı (spec esastır)",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.10": {
@@ -327,10 +369,12 @@
       "goal": "Geri kalan harflerin seslerini ve çıkış yerlerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "note": "07 §2 başlığına hizalandı (spec esastır)",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.11": {
@@ -338,10 +382,12 @@
       "goal": "Tenvini ve kelime başındaki 'el' takısını tanıyıp okuyuşa katacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
         "note": "07 §2 başlığına hizalandı (spec esastır)",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "s0.12": {
@@ -349,9 +395,11 @@
       "goal": "Nerede duracağını bilerek kısa bir metni baştan sona okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-09-30",
-        "note": "07 §2 başlığına hizalandı (spec esastır)"
+        "note": "07 §2 başlığına hizalandı (spec esastır)",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     }
   },
@@ -361,9 +409,11 @@
       "goal": "Besmelenin üç kelimesini tanıyıp 'iş önce gelir' kuralını göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u01.02": {
@@ -371,9 +421,11 @@
       "goal": "Rahmet ve övgü kelimelerini, 'el' takısıyla birlikte okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u01.03": {
@@ -381,9 +433,11 @@
       "goal": "Kulluğun yalnız O'na yöneldiğini anlatan cümleyi çözeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u01.04": {
@@ -391,8 +445,10 @@
       "goal": "Yol ve doğru kelimeleriyle kurulan isteği anlayacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u01.05": {
@@ -400,9 +456,11 @@
       "goal": "Fâtiha'yı baştan sona kesintisiz anlamlandıracaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u02.01": {
@@ -410,9 +468,11 @@
       "goal": "Namazda sık duyduğun 'daha büyük', 'tapılan' ve 'ey' kelimelerini küçük yardımcılarıyla birlikte göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u02.02": {
@@ -420,9 +480,11 @@
       "goal": "Namazda sık geçen tenzih (her eksiklikten uzak tutma), namaz, selâm, temiz şeyler ve bereket kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u02.03": {
@@ -430,9 +492,11 @@
       "goal": "Namaz cümlelerini baştan sona anlamlandıracaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u03.01": {
@@ -440,9 +504,11 @@
       "goal": "İyelik ve çoğul eklerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u03.02": {
@@ -450,9 +516,11 @@
       "goal": "Felak ve İhlâs'taki sığınma, şafak, denk ve 'oldu' gibi kelimeleri tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u03.03": {
@@ -460,9 +528,11 @@
       "goal": "Yaratma ve karanlık kelimelerini İhlâs ve Felak'te okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u03.04": {
@@ -470,8 +540,10 @@
       "goal": "Felak sûresinin kötülük saydığı davranışları anlayacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u03.05": {
@@ -479,9 +551,11 @@
       "goal": "Haset ve fısıltı kelimelerini Nâs sûresinde tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u03.06": {
@@ -489,9 +563,11 @@
       "goal": "İhlâs, Felak ve Nâs sûrelerini baştan sona anlayarak okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u04.01": {
@@ -499,9 +575,11 @@
       "goal": "Cümleye dikkat çeken, onu vurgulayan ve başka kelimelere bağlayan küçük kelimelerle birlikte 'üstünde' kelimesini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u04.02": {
@@ -509,9 +587,11 @@
       "goal": "'O gün', 'hayır, aksine', 'her', 'bazı' ve 'yanında' gibi küçük kelimeleri tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u04.03": {
@@ -519,9 +599,11 @@
       "goal": "Sıra, birliktelik, seçenek ve karşıtlık bildiren küçük kelimelerle birlikte gelecekte 'hayır' diyen 'asla' kelimesini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u04.04": {
@@ -529,9 +611,11 @@
       "goal": "Seçenek, karşıtlık ve gelecek bildiren 'ya … ya da', 'veya', 'ama', 'ileride' ve 'ise' kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u04.05": {
@@ -539,9 +623,11 @@
       "goal": "Reddetme, benzetme ve umut bildiren 'asla', 'öyleyse', 'sanki', 'umulur ki' ve 'hayır öyle değil' kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u05.01": {
@@ -549,9 +635,11 @@
       "goal": "'bu, şu, onlar' kelimeleriyle cümlenin kimi gösterdiğini göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u05.02": {
@@ -559,9 +647,11 @@
       "goal": "'kim, ne, hangi, nasıl' sorularıyla âyetin neyi sorduğunu anlayacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.01": {
@@ -569,9 +659,11 @@
       "goal": "Yer, gök, işitme ve 'kendi' kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.02": {
@@ -579,9 +671,11 @@
       "goal": "Kitap ve kalp kelimeleriyle iç dünyayı anlatan cümleleri okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.03": {
@@ -589,9 +683,11 @@
       "goal": "Karşılık ve durak kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.04": {
@@ -599,8 +695,10 @@
       "goal": "'âyet' kelimesinin delil anlamını göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
-        "at": "2026-09-29"
+        "by": "ai-delegated",
+        "at": "2026-09-29",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.05": {
@@ -608,9 +706,11 @@
       "goal": "Peygamber adlarını ve topluluk kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.06": {
@@ -618,9 +718,11 @@
       "goal": "Güç ve sahip olma kelimelerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.07": {
@@ -628,9 +730,11 @@
       "goal": "Mal, dost, gece, ilk ve inkâr kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.08": {
@@ -638,9 +742,11 @@
       "goal": "Aile ve arkadaşlık kelimelerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.09": {
@@ -648,9 +754,11 @@
       "goal": "Haber getiren elçi ve karşıt figür kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.10": {
@@ -658,9 +766,11 @@
       "goal": "Apaçık delil ve insan kelimelerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.11": {
@@ -668,9 +778,11 @@
       "goal": "Ev ve yemin kelimelerini kıssa bağlamında okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.12": {
@@ -678,9 +790,11 @@
       "goal": "Aile ve doğa kelimelerini birlikte tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.13": {
@@ -688,9 +802,11 @@
       "goal": "Görme ve zaman kelimelerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.14": {
@@ -698,9 +814,11 @@
       "goal": "Doğa ve süre kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.15": {
@@ -708,9 +826,11 @@
       "goal": "Karşıtlık ve mekân kelimelerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.16": {
@@ -718,9 +838,11 @@
       "goal": "İki sık geçen ismi tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.17": {
@@ -728,9 +850,11 @@
       "goal": "Peygamber adını ve aydınlık kelimesini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.18": {
@@ -738,9 +862,11 @@
       "goal": "Doğa ve sorumluluk kelimelerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.19": {
@@ -748,9 +874,11 @@
       "goal": "İyilik ve rızık kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.20": {
@@ -758,9 +886,11 @@
       "goal": "Grup, topluluk, kutsal, değerli ve 'bir' kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.21": {
@@ -768,9 +898,11 @@
       "goal": "Liderlik ve güç kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.22": {
@@ -778,9 +910,11 @@
       "goal": "Kalabalık ve bildiri kelimelerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.23": {
@@ -788,9 +922,11 @@
       "goal": "Konuşma ve soy kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.24": {
@@ -798,9 +934,11 @@
       "goal": "Göksel varlık ve peygamber adını birlikte okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.25": {
@@ -808,9 +946,11 @@
       "goal": "Topluluk ve ilk insan adlarını tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.26": {
@@ -818,9 +958,11 @@
       "goal": "Peygamber adını ve konuşma organını okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.27": {
@@ -828,9 +970,11 @@
       "goal": "'Hiçbir şeye muhtaç olmayan' anlamını pekiştireceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.28": {
@@ -838,9 +982,11 @@
       "goal": "Kıssa ve toplum kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.29": {
@@ -848,9 +994,11 @@
       "goal": "Ahlaki karşıtlıkları okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u06.30": {
@@ -858,9 +1006,11 @@
       "goal": "Ünitenin en sık isimlerini birlikte pekiştireceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.01": {
@@ -868,9 +1018,11 @@
       "goal": "Helal kıldı, yaptı, bildi ve geldi gibi geçmişte olan işleri anlatan fiilleri tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.02": {
@@ -878,9 +1030,11 @@
       "goal": "Gönderdi, yalanladı, inkâr etti ve indirdi fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.03": {
@@ -888,9 +1042,11 @@
       "goal": "İnandı, döndü, ortaya çıkardı, hazırladı ve yaptı fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.04": {
@@ -898,9 +1054,11 @@
       "goal": "Duydu, girdi, kazandı, ulaştı ve rızık verdi fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.05": {
@@ -908,9 +1066,11 @@
       "goal": "Hareket bildiren fiilleri ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.06": {
@@ -918,9 +1078,11 @@
       "goal": "Şükretti, sahip oldu, sandı, diledi ve taşıdı fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.07": {
@@ -928,9 +1090,11 @@
       "goal": "Terk etme ve bir araya getirme fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.08": {
@@ -938,9 +1102,11 @@
       "goal": "Süreklilik ve yeterlilik fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u07.09": {
@@ -948,9 +1114,11 @@
       "goal": "Tuzak kurdu, yükseltti, gerçekleşti ve tanıdı fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.01": {
@@ -958,9 +1126,11 @@
       "goal": "Gelir, görür, harcar, öldürür ve sabreder gibi 'yapar, yapıyor' kalıbını tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.02": {
@@ -968,9 +1138,11 @@
       "goal": "Buldu, baktı, yaptı, aldı ve sordu fiillerini, 'yapmaz, yapmadı' olumsuzlarıyla birlikte göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.03": {
@@ -978,9 +1150,11 @@
       "goal": "Duygu ve buyruk fiillerini şimdiki zamanda tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.04": {
@@ -988,9 +1162,11 @@
       "goal": "Dönüş ve okuma fiillerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.05": {
@@ -998,9 +1174,11 @@
       "goal": "Çoğaltma ve zan fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.06": {
@@ -1008,9 +1186,11 @@
       "goal": "Hoşnutluk ve engelleme fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.07": {
@@ -1018,9 +1198,11 @@
       "goal": "Umulur ki, kötü oldu, affetti, yasakladı ve yetti fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.08": {
@@ -1028,9 +1210,11 @@
       "goal": "Karşı gelme ve isteme fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u08.09": {
@@ -1038,19 +1222,23 @@
       "goal": "Bağışladı, gizledi, yürüdü, sınadı, koydu ve umar fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.01": {
-      "title": "Emir kipi: an, ye, ver, bağışla",
-      "goal": "Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerinin emir biçimini tanıyacaksın.",
+      "title": "Anmak, yemek, vermek: fiil kökleri",
+      "goal": "Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.02": {
@@ -1058,9 +1246,11 @@
       "goal": "Uydu, edindi, çıkardı, yüz çevirdi ve itaat etti fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.03": {
@@ -1068,9 +1258,11 @@
       "goal": "Bildirme ve sevgi fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.04": {
@@ -1078,9 +1270,11 @@
       "goal": "Savaşma ve yok etme fiillerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.05": {
@@ -1088,9 +1282,11 @@
       "goal": "Çağrı ve tenzih fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.06": {
@@ -1098,9 +1294,11 @@
       "goal": "Gösterdi, dayandı, haram kıldı, istedi ve kurtardı fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.07": {
@@ -1108,9 +1306,11 @@
       "goal": "Açıkladı, yöneldi, ayrılığa düştü, aradı ve yemin etti fiillerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.08": {
@@ -1118,9 +1318,11 @@
       "goal": "Çevirme ve yarar fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.09": {
@@ -1128,9 +1330,11 @@
       "goal": "Başarı ve gayret fiillerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.10": {
@@ -1138,9 +1342,11 @@
       "goal": "Son verme ve kurtarma fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u09.11": {
@@ -1148,9 +1354,11 @@
       "goal": "Çağırdı, sakındı, alay etti, müjdeledi, yüz çevirdi ve konuştu fiillerini birlikte pekiştireceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.01": {
@@ -1158,9 +1366,11 @@
       "goal": "'İnanan', 'yalanlayan', 'her şeyi bilen' ve 'adı konmuş' gibi, işi yapanı ya da yapılanı anlatan kelimelerle 'güvende oldu' kelimesini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.02": {
@@ -1168,9 +1378,11 @@
       "goal": "'bilme, anma, inanma' isimlerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.03": {
@@ -1178,9 +1390,11 @@
       "goal": "Daha iyi bilen, daha çok, daha çetin, anma ve öğüt kelimelerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.04": {
@@ -1188,9 +1402,11 @@
       "goal": "Yapan ismini olumsuz bağlamda tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.05": {
@@ -1198,9 +1414,11 @@
       "goal": "Tanıklık ve iş kelimelerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.06": {
@@ -1208,9 +1426,11 @@
       "goal": "Haksızlık ve iyilik kavramlarını okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.07": {
@@ -1218,9 +1438,11 @@
       "goal": "Güzel ameller ve rızık kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.08": {
@@ -1228,9 +1450,11 @@
       "goal": "Yaşam ve doğru yol kelimelerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.09": {
@@ -1238,9 +1462,11 @@
       "goal": "Canlılık ve sapma karşıtlığını tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.10": {
@@ -1248,9 +1474,11 @@
       "goal": "Son ve yitirme kelimelerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.11": {
@@ -1258,9 +1486,11 @@
       "goal": "Geçiş ve iyilik kelimelerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.12": {
@@ -1268,9 +1498,11 @@
       "goal": "Durum ve eylem kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.13": {
@@ -1278,9 +1510,11 @@
       "goal": "Destek ve başarı kelimelerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.14": {
@@ -1288,9 +1522,11 @@
       "goal": "Zaman ve kalıcılık kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.15": {
@@ -1298,9 +1534,11 @@
       "goal": "Gizlilik ve korunma kavramlarını okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.16": {
@@ -1308,9 +1546,11 @@
       "goal": "Yetki ve kanıt kelimelerini ayırt edeceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.17": {
@@ -1318,9 +1558,11 @@
       "goal": "Kayıp ve arınma kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.18": {
@@ -1328,9 +1570,11 @@
       "goal": "Denklik ve geçersizlik kelimelerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.19": {
@@ -1338,9 +1582,11 @@
       "goal": "Grup ve barınma kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u10.20": {
@@ -1348,9 +1594,11 @@
       "goal": "Hükmetmek, hüküm ve hikmet kelimelerinin aynı kökten geldiğini göreceksin; yanında 'sanı' da var.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u11.01": {
@@ -1358,9 +1606,11 @@
       "goal": "Öğretti, bağışlanma diledi, Müslüman ve teslim oldu kelimelerinde kalıbın anlamı nasıl değiştirdiğini göreceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u11.02": {
@@ -1368,9 +1618,11 @@
       "goal": "İnanç ve düşünme kalıplarını tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u11.03": {
@@ -1378,9 +1630,11 @@
       "goal": "İman, iyilik etmek, hikmet sahibi ve diriltmek kelimelerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u11.04": {
@@ -1388,9 +1642,11 @@
       "goal": "Selâmlama, düzeltmek ve can almak kelimelerini tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u11.05": {
@@ -1398,9 +1654,11 @@
       "goal": "Doğru yola ulaşmak, ortak koşmak ve dosdoğru kılmak fiillerini okuyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u11.06": {
@@ -1408,9 +1666,11 @@
       "goal": "Kalıpları karşıtlık içinde pekiştireceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u12.01": {
@@ -1418,9 +1678,11 @@
       "goal": "Şart kalıplarını tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "at": "2026-10-02",
-        "l0": "pass"
+        "l0": "pass",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u12.02": {
@@ -1428,9 +1690,11 @@
       "goal": "'-ınca', 'önce', 'hani, o vakit' ve 'sonra' gibi zamanı belirten kelimeleri tanıyacaksın.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "u12.03": {
@@ -1438,9 +1702,11 @@
       "goal": "'Hiçbir zaman', 'vakit' ve 'kim' kelimeleriyle sık kullanılan kalıpları pekiştireceksin.",
       "review": {
         "level": "sourced",
-        "by": "owner",
+        "by": "ai-delegated",
         "l0": "pass",
-        "at": "2026-10-02"
+        "at": "2026-10-02",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     }
   },
@@ -1457,7 +1723,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g1": {
@@ -1472,7 +1740,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g2": {
@@ -1487,7 +1757,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g3": {
@@ -1502,7 +1774,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g4": {
@@ -1517,7 +1791,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g5": {
@@ -1532,7 +1808,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g6": {
@@ -1547,7 +1825,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g7": {
@@ -1562,7 +1842,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g8": {
@@ -1577,7 +1859,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g9": {
@@ -1592,7 +1876,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g10": {
@@ -1607,7 +1893,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g11": {
@@ -1622,7 +1910,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g12": {
@@ -1637,7 +1927,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g13": {
@@ -1652,7 +1944,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g14": {
@@ -1667,7 +1961,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g15": {
@@ -1682,7 +1978,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g16": {
@@ -1697,7 +1995,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g17": {
@@ -1712,7 +2012,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g18": {
@@ -1727,7 +2029,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g19": {
@@ -1742,7 +2046,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g20": {
@@ -1757,7 +2063,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g21": {
@@ -1772,7 +2080,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g22": {
@@ -1787,7 +2097,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g23": {
@@ -1802,7 +2114,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     },
     "g24": {
@@ -1817,7 +2131,9 @@
           "QuranGrammarV1.plainTr"
         ],
         "at": "2026-10-02",
-        "by": "owner"
+        "by": "ai-delegated",
+        "delegatedBy": "owner",
+        "delegatedAt": "2026-10-02"
       }
     }
   }

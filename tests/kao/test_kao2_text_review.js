@@ -96,15 +96,43 @@ check('(d) elle Arapça yok: metinler Arapça karakter taşımaz', () => {
 });
 
 check('(e) her metinde review kaydı; by yalnız rol kodu', () => {
+  const validBy = (review, id) => {
+    if (review.by === undefined || (review.by === null && review.level === 'draft')) return;
+    assert.ok(['owner', 'expert', 'ai-delegated'].includes(review.by), `${id}: rol kodu`);
+    if (review.by === 'ai-delegated') {
+      assert.equal(review.delegatedBy, 'owner', `${id}: delegatedBy`);
+      assert.match(String(review.delegatedAt || ''), /^\d{4}-\d{2}-\d{2}$/, `${id}: delegatedAt`);
+    }
+  };
   for (const u of units) {
     assert.ok(u.review && LEVELS.includes(u.review.level), `u${u.id}: review.level`);
-    if (u.review.by !== undefined && !(u.review.by === null && u.review.level === 'draft')) assert.ok(['owner', 'expert'].includes(u.review.by), `u${u.id}: rol kodu (null yalnız draft)`);
+    validBy(u.review, `u${u.id}`);
   }
   for (const l of lessons) {
     assert.ok(l.review && LEVELS.includes(l.review.level), `${l.id}: review.level`);
-    if (l.review.by !== undefined && !(l.review.by === null && l.review.level === 'draft')) assert.ok(['owner', 'expert'].includes(l.review.by), `${l.id}: rol kodu (null yalnız draft)`);
+    validBy(l.review, l.id);
   }
-  for (const lesson of CURRICULUM.s0.lessons) assert.ok(lesson.review && LEVELS.includes(lesson.review.level), `${lesson.id}: review.level`);
+  for (const lesson of CURRICULUM.s0.lessons) {
+    assert.ok(lesson.review && LEVELS.includes(lesson.review.level), `${lesson.id}: review.level`);
+    validBy(lesson.review, lesson.id);
+  }
+});
+
+check('devirle onaylanan 158 metin kaynağını dürüstçe söyler', () => {
+  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8'));
+  const entries = [
+    ...Object.values(texts.units),
+    ...Object.values(texts.lessons),
+    ...Object.values(texts.s0),
+    ...Object.values(texts.concepts)
+  ];
+  assert.equal(entries.length, 158);
+  for (const entry of entries) {
+    assert.equal(entry.review.level, 'sourced');
+    assert.equal(entry.review.by, 'ai-delegated');
+    assert.equal(entry.review.delegatedBy, 'owner');
+    assert.equal(entry.review.delegatedAt, '2026-10-02');
+  }
 });
 
 check('(f) [KAYNAK?] işareti kalmamış', () => {

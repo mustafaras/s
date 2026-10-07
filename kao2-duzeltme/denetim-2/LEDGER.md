@@ -254,3 +254,23 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - status: D2F-11 GATE `waiting` kalır (kapatma D2F-12'de, `GATE closed` + devir alıntısı). D2F-12 kutusuna `yetki devri: seq 17` yazılır.
 - kanıt düzeyleri: kaynak/test ✓ (kayıt) · yayın — · cihaz — · kullanıcı onayı: devir (Claude kararı)
 - next: D2F-12
+
+## seq 18 · 2026-10-07 · GATE · D2F-11
+- başlık: D2F-11 karar kapısı yetki devriyle kapatıldı.
+- oturum: copilot-cli:4ec68470-d2f12
+- status: closed
+- karar (kullanıcının devir cümlesi birebir): "benim yerime yap gerekenleri" ve "13 e kadar hepsini tamamla"; seq 17'deki açık devir kararı uygulandı.
+- uygulanan: `L1 kararı: B` · `u09.01: 1`; kullanıcı incelemesi/onayı olarak gösterilmedi.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz — · kullanıcı onayı: devir (Claude kararı)
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-12/KANIT.md
+- next: D2F-13
+
+## seq 19 · 2026-10-07 · GATE · D2F-12
+- başlık: L1 kaynak dürüstlüğü ve u09.01 tutarlılığı uygulandı; N-04 kapandı.
+- oturum: copilot-cli:4ec68470-d2f12
+- status: closed
+- ölçüm: 158/158 `sourced` + `ai-delegated`; `delegatedBy:"owner"` 158; `delegatedAt:"2026-10-02"` 158; `owner` 0.
+- test: review-apply 16/16 · text-review 12/12 · lesson-coherence 9/9 · tekrar-uret-2 9/9 · tekrar-uret 10/10.
+- karar: gerçek L2 alan uzmanı onayı üretilmedi; L2 kutuları boş kaldı.
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-12/KANIT.md
+- next: D2F-13

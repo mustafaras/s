@@ -715,14 +715,12 @@ function renderConceptModule(map) {
   ].join('\n');
 }
 
-// KAO2-18 · K-4 onay taşıma. İnceleme sayfası ve KAO2-17 §3 bu yolu vaat ediyordu
-// ama araçta yoktu: bilinmeyen bayrak sessizce yok sayılıyordu (exit 0), yani
-// kullanıcı onay verse bile metinler `draft` kalıyordu. Burada yalnız İNSAN
-// onayı taşınır: kod hiçbir kutuyu kendi işaretlemez ve hiçbir metni yazmaz.
+// KAO2-18 · K-4 onay taşıma. Varsayılan insan onayıdır; açık yetki devrinde
+// `--by ai-delegated` yalnız kaynak ve devir metadata'sını dürüstçe kaydeder.
 function parseFlags(argv) {
   // `--apply-review` değer almaz; diğerleri alır.
   const BOOLEAN = new Set(['--apply-review']);
-  const known = new Set(['--apply-review', '--out-dir', '--texts', '--sheet', '--at']);
+  const known = new Set(['--apply-review', '--out-dir', '--texts', '--sheet', '--at', '--by', '--delegated-by', '--delegated-at']);
   const value = (name) => {
     const i = argv.indexOf(name);
     if (i < 0) return null;
@@ -739,7 +737,10 @@ function parseFlags(argv) {
     outDir: value('--out-dir'),
     texts: value('--texts'),
     sheet: value('--sheet'),
-    at: value('--at')
+    at: value('--at'),
+    by: value('--by'),
+    delegatedBy: value('--delegated-by'),
+    delegatedAt: value('--delegated-at')
   };
 }
 
@@ -845,6 +846,20 @@ function collectHolders(texts) {
   return holders;
 }
 
+function markApprovedBoxes(text, approved) {
+  const lines = text.split('\n');
+  const keys = reviewBoxKeys(lines);
+  return lines.map((line, i) => {
+    if (!keys[i] || !approved.has(keys[i])) return line;
+    let marked = false;
+    return line.replace(REVIEW_BOX, (box) => {
+      if (marked) return box;
+      marked = true;
+      return '[x]';
+    });
+  }).join('\n');
+}
+
 // --- KAO2-18 · onay öncesi L0 kuru denetimi --------------------------------
 // Araç, L0 kapısını (`tests/kao/test_kao2_text_review.js`) bozan bir durumu
 // ASLA yazmamalı: aksi halde "onayla" komutu kullanıcıyı kırmızı bir repoya
@@ -877,7 +892,11 @@ function lintTexts(texts) {
     const review = entry.review;
     if (!review || !LEVELS.includes(review.level)) { problems.push(`${id}: review.level geçersiz`); continue; }
     // by: yalnız rol kodu; yeniden yazılan (henüz kimse onaylamamış) metinde null.
-    if (review.by !== undefined && !(review.by === null && review.level === 'draft') && !['owner', 'expert'].includes(review.by)) problems.push(`${id}: rol kodu geçersiz`);
+    if (review.by !== undefined && !(review.by === null && review.level === 'draft') && !['owner', 'expert', 'ai-delegated'].includes(review.by)) problems.push(`${id}: rol kodu geçersiz`);
+    if (review.by === 'ai-delegated') {
+      if (review.delegatedBy !== 'owner') problems.push(`${id}: delegatedBy owner olmalı`);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(review.delegatedAt || ''))) problems.push(`${id}: delegatedAt geçersiz`);
+    }
     // (d) elle Arapça yok
     for (const value of textsOf(entry)) {
       if (/[\u0600-\u06ff]/.test(value)) problems.push(`${id}: elle Arapça`);
@@ -900,11 +919,19 @@ function lintTexts(texts) {
   return problems;
 }
 
-function applyReview({ textsPath, sheetPath, outDir, at }) {
+function applyReview({ textsPath, sheetPath, outDir, at, by, delegatedBy, delegatedAt }) {
   if (!textsPath) fail('--apply-review için --texts gerekli');
   if (!sheetPath) fail('--apply-review için --sheet gerekli');
   const date = at || new Date().toISOString().slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) fail('--at biçimi YYYY-AA-GG olmalı');
+  const reviewer = by || 'owner';
+  if (!['owner', 'ai-delegated'].includes(reviewer)) fail('--by yalnız owner ya da ai-delegated olabilir');
+  if (reviewer === 'ai-delegated') {
+    if (delegatedBy !== 'owner') fail('--by ai-delegated için --delegated-by owner gerekli');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(delegatedAt || ''))) fail('--by ai-delegated için --delegated-at YYYY-AA-GG gerekli');
+  } else if (delegatedBy || delegatedAt) {
+    fail('--delegated-by/--delegated-at yalnız --by ai-delegated ile kullanılabilir');
+  }
   const approved = readApproved(sheetPath);
   if (!approved.size) fail('inceleme sayfasında işaretli kutu yok (onay taşınmadı)');
   const texts = JSON.parse(fs.readFileSync(textsPath, 'utf8'));
@@ -916,22 +943,38 @@ function applyReview({ textsPath, sheetPath, outDir, at }) {
   if (!matched.length) fail('işaretli kutular mevcut metinlerle eşleşmedi (kimlik yazımını kontrol et)');
   let count = 0;
   for (const { entry } of matched) {
-    if (!entry.review || entry.review.level !== 'draft') continue; // zaten onaylıysa dokunma
-    entry.review.level = 'sourced';
-    entry.review.by = 'owner';
-    entry.review.at = date;
-    count += 1;
+    if (!entry.review) entry.review = { level: 'draft' };
+    const before = JSON.stringify(entry.review);
+    if (entry.review.level === 'draft') {
+      entry.review.level = 'sourced';
+      entry.review.at = date;
+    }
+    entry.review.by = reviewer;
+    if (reviewer === 'ai-delegated') {
+      entry.review.delegatedBy = delegatedBy;
+      entry.review.delegatedAt = delegatedAt;
+    } else {
+      delete entry.review.delegatedBy;
+      delete entry.review.delegatedAt;
+    }
+    if (JSON.stringify(entry.review) !== before) count += 1;
   }
   // Onay yazılmadan ÖNCE L0 kuru denetimi: kırmızı bir repo bırakma.
   const problems = lintTexts(texts);
   if (problems.length) fail(`onay L0 kapısını bozar, yazılmadı:\n  - ${problems.join('\n  - ')}`);
   fs.writeFileSync(textsPath, `${JSON.stringify(texts, null, 2)}\n`);
-  // Türetilen modüller onayla birlikte güncellenir.
+  // Türetilen dosyalar onayla birlikte güncellenir; işaretler kimlik üzerinden
+  // araçça taşınır, böylece metni değişen ama açıkça onaylanan kayıt kaybolmaz.
   const spec = readSpec();
   const content = loadContent();
   const data = build(spec, content, texts);
-  for (const [file, text] of [[OUT_MODULE, renderModule(data)],
-    [OUT_CONCEPT_MODULE, renderConceptModule(buildConceptTexts(texts))]]) {
+  const conceptTexts = buildConceptTexts(texts);
+  const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)],
+    [OUT_TEXT_REVIEW, markApprovedBoxes(renderTextReview(data), approved)],
+    [OUT_CONCEPT_REVIEW, markApprovedBoxes(renderConceptReview(texts, content.grammar), approved)],
+    [OUT_CONCEPT_MODULE, renderConceptModule(conceptTexts)],
+    [OUT_PRAYER_MAP, renderPrayerMapJson(data.prayerMap)], [OUT_PRAYER_REVIEW, renderPrayerReview(data.prayerMap)]];
+  for (const [file, text] of outputs) {
     const target = path.join(outDir, file);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, text);
@@ -944,7 +987,8 @@ function main() {
   if (flags.applyReview) {
     const outDir = flags.outDir ? path.resolve(flags.outDir) : ROOT;
     const count = applyReview({
-      textsPath: path.resolve(flags.texts), sheetPath: path.resolve(flags.sheet), outDir, at: flags.at
+      textsPath: path.resolve(flags.texts), sheetPath: path.resolve(flags.sheet), outDir, at: flags.at,
+      by: flags.by, delegatedBy: flags.delegatedBy, delegatedAt: flags.delegatedAt
     });
     console.log(`kao2-curriculum-build: onay taşındı · ${count} metin sourced`);
     return;

@@ -44,7 +44,7 @@ Toplam: 12 ünite · 109 ders · 524 lemma · Seviye 0: 12 ders.
 | u08.01 | Şimdiki ve geniş zaman | şâ'a (`l_aA_a_25c447`), attakâ (`l_t_aqaY_bc8006`) | katala (`l_qatala_ae1dd2`), sabara (`l_Sabara_34dfc2`) |
 | u08.02 | Bulmak, bakmak ve sormak | daʿâ (`l_daEaA_f5ec67`), akala (`l_akala_0ec27c`) | nazara (`l_n_aZara_cdb6f4`), faʿala (`l_faEala_b34da5`) |
 | u08.09 | Bağışlamak ve yürümek | hakka (`l_Haq_a_a024e5`) | katama (`l_katama_166c72`) |
-| u09.01 | Emir kipi: an, ye, ver, bağışla | arâda (`l_araAda_e67825`) | akala (`l_akala_0ec27c`) |
+| u09.01 | Anmak, yemek, vermek: fiil kökleri | arâda (`l_araAda_e67825`) | akala (`l_akala_0ec27c`) |
 | u09.06 | Göstermek ve dayanmak | buşşira (`l_bu_ira_749280`) | arâda (`l_araAda_e67825`) |
 | u09.07 | Açıklamak | aʿrada (`l_aEoraDa_78a3e1`) | aksamu (`l_aqosamu_a01a25`) |
 | u09.11 | Çağırmak, sakınmak ve müjdelemek | aʿadda (`l_aEad_a_17540a`), ahalla (`l_aHal_a_bf74a4`), anşa'a (`l_an_a_a_a1dde3`), aksamu (`l_aqosamu_a01a25`) | daʿâ (`l_daEaA_f5ec67`), attakâ (`l_t_aqaY_bc8006`), buşşira (`l_bu_ira_749280`), aʿrada (`l_aEoraDa_78a3e1`) |
@@ -972,7 +972,7 @@ Kavram: — · Uygula: examples
 
 Vaat: Emir ve dua cümlelerini anlayacaksın.
 
-### u09.01 · Emir kipi: an, ye, ver, bağışla
+### u09.01 · Anmak, yemek, vermek: fiil kökleri
 
 Kavram: g17 Emir: yap!, deyin! · Uygula: examples
 

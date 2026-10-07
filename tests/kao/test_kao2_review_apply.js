@@ -53,6 +53,10 @@ const copyIn = (rel) => {
 const applyReview = (textsPath, sheetPath) => execFileSync(process.execPath, [
   TOOL, '--apply-review', '--texts', textsPath, '--sheet', sheetPath, '--out-dir', tmp
 ], { encoding: 'utf8' });
+const applyDelegatedReview = (textsPath, sheetPath) => execFileSync(process.execPath, [
+  TOOL, '--apply-review', '--texts', textsPath, '--sheet', sheetPath, '--out-dir', tmp,
+  '--by', 'ai-delegated', '--delegated-by', 'owner', '--delegated-at', '2026-10-02'
+], { encoding: 'utf8' });
 
 const runApply = () => {
   const textsPath = copyIn(TEXTS);
@@ -89,10 +93,32 @@ check('onay metni ve içeriği bozmaz', () => {
   assert.equal(applied.version, before.version, 'sürüm korunur');
 });
 
+check('yetki devri mevcut sourced kayıtları dürüst metadata ile dönüştürür', () => {
+  const textsPath = copyIn(TEXTS);
+  const sheetPath = path.join(tmp, 'SHEET-DELEGATED.md');
+  fs.writeFileSync(sheetPath, `${read(SHEET_17)}\n${read(SHEET_18)}`);
+  applyDelegatedReview(textsPath, sheetPath);
+  const after = JSON.parse(fs.readFileSync(textsPath, 'utf8'));
+  const entries = [
+    ...Object.values(after.units),
+    ...Object.values(after.lessons),
+    ...Object.values(after.s0),
+    ...Object.values(after.concepts)
+  ];
+  assert.equal(entries.length, 158, '158 inceleme kaydı');
+  for (const entry of entries) {
+    assert.equal(entry.review.level, 'sourced');
+    assert.equal(entry.review.by, 'ai-delegated');
+    assert.equal(entry.review.delegatedBy, 'owner');
+    assert.equal(entry.review.delegatedAt, '2026-10-02');
+  }
+});
+
 check('onaylanmamış kutu draft bırakır', () => {
   const textsPath = copyIn(TEXTS);
   const sheetPath = path.join(tmp, 'SHEET-18-PARTIAL.md');
-  const sheet = read(SHEET_18).split('\n');
+  const blankSheet = read(SHEET_18).replace(/\[x\]/gi, '[ ]');
+  const sheet = blankSheet.split('\n');
   let seen = 0;
   fs.writeFileSync(sheetPath, sheet.map((line) => {
     if (!/- \[ \]/.test(line) || !/^### /.test(line)) return line;
@@ -101,7 +127,7 @@ check('onaylanmamış kutu draft bırakır', () => {
   }).join('\n'));
   // İlk başlıktan sonra gelen kutuları işaretle: yalnız o kavram sourced olmalı.
   const partial = (() => {
-    const out = read(SHEET_18).split('\n');
+    const out = blankSheet.split('\n');
     const mark = new Set();
     let current = null;
     for (let i = 0; i < out.length; i += 1) {

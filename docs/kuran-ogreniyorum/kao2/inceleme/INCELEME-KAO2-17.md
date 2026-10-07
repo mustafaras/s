@@ -229,7 +229,7 @@ Bunların hiçbiri senin kutu işaretinle onaylanmadı; aşağıdaki tablolarda 
 
 | ders | başlık | hedef | inceleme | onay |
 |---|---|---|---|---|
-| u09.01 | Emir kipi: an, ye, ver, bağışla | Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerinin emir biçimini tanıyacaksın. | `sourced` | - [x] |
+| u09.01 | Anmak, yemek, vermek: fiil kökleri | Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerini tanıyacaksın. | `sourced` | - [x] |
 | u09.02 | Uymak ve yüz çevirmek | Uydu, edindi, çıkardı, yüz çevirdi ve itaat etti fiillerini okuyacaksın. | `sourced` | - [x] |
 | u09.03 | Vahyetmek ve sevmek | Bildirme ve sevgi fiillerini tanıyacaksın. | `sourced` | - [x] |
 | u09.04 | Savaşmak ve yok etmek | Savaşma ve yok etme fiillerini ayırt edeceksin. | `sourced` | - [x] |

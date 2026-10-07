@@ -287,6 +287,13 @@ function runChecks() {
     }
   });
 
+  check('u09.01 başlık ve hedefi gerçek fiil kartlarıyla uyumlu', () => {
+    const lesson = curriculum.byLesson('u09.01');
+    assert.equal(lesson.title, 'Anmak, yemek, vermek: fiil kökleri');
+    assert.equal(lesson.goal, 'Anmak, yemek, merhamet etmek, bağışlamak ve vermek fiillerini tanıyacaksın.');
+    assert.doesNotMatch(`${lesson.title} ${lesson.goal}`.toLocaleLowerCase('tr'), /emir kipi|emir biçimi/);
+  });
+
   check('kapı boş değil: sentetik tutarsız ders yakalanır, uyumlu ders geçer; denetimdeki 10 ders hâlâ görülür', () => {
     const pick = (pos) => lexicon.lemmas.filter((l) => l.pos === pos).slice(0, 5).map((l) => l.id);
     assert.ok(incoherence({ title: 'Zamirler', goal: 'x', lemmaIds: pick('N') }).length > 0, 'zamir başlığı + isim lemmaları yakalanmalı');

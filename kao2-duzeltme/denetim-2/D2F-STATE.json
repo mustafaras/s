@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-14",
-  "ledgerLastSeq": 21,
+  "nextPrompt": "D2F-15",
+  "ledgerLastSeq": 22,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -89,9 +89,9 @@
     },
     "D2F-14": {
       "title": "Yayın özeti ve onay sorusu",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-14/KANIT.md",
+      "session": "claude-code:b9936220-be4d-4f19-8846-806b9a508105"
     },
     "D2F-15": {
       "title": "Canlıya al (kutuya cevabını yaz)",

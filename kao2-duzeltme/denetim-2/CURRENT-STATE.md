@@ -1,18 +1,18 @@
 # KAO2-FIX denetim-2 · CURRENT-STATE
 
 <!-- d2f-sync
-nextPrompt: D2F-14
-lastSeq: 21
+nextPrompt: D2F-15
+lastSeq: 22
 status: active
 -->
 
-**Son güncelleme:** 2026-10-07 · D2F-13 sonu. Bu dosya her prompt sonunda **baştan** yazılır.
+**Son güncelleme:** 2026-10-07 · D2F-14 sonu. Bu dosya her prompt sonunda **baştan** yazılır.
 
 ## Nerede kaldık
 - **YAYIN (seq 7, kullanıcı kararı):** ortam değişikliği için D2F-04 sonrası erken yayın — pin `20261007a`, `main` ff-only. Program kapanmadı:
   D2F-14…16 pending. Ayrıntı: ORTAK-KURALLAR §9, evidence/D2F-04/YAYIN.md.
 - Program: düzeltme programı (16 prompt, [`DUZELTME-PROMPTLARI.md`](DUZELTME-PROMPTLARI.md)); kurallar [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md); kaynak rapor [`DENETIM-RAPORU.md`](DENETIM-RAPORU.md).
-- Tamamlanan: **13/16** (D2F-01…D2F-13). Sıradaki: **D2F-14** (yayın özeti ve onay sorusu).
+- Tamamlanan: **14/16** (D2F-01…D2F-14). Sıradaki: **D2F-15** (yalnız kullanıcı cevabı `YAYIN-3 onaylı` / `YAYIN-3 ertele` ile).
 - Başlangıç commit'i (`baseCommit`): `cbe0d604`. D2F-05 PROMPT `467ab6fa`, D2F-05 NOT `80ed4450`; D2F-06 `79eca899` (dal `d2f-05`); D2F-06 NOT `e7b2c170`; D2F-07 dal `d2f-07`; D2F-08 aynı dal.
 - Kullanıcı kapıları: D2F-11→12 (GATE waiting, seq 16), D2F-12, D2F-15, D2F-16. Yayın: seq 7 ile tek seferlik erken yayın (`releaseApproval: user_override_2026-10-07_early_release`).
 
@@ -33,6 +33,7 @@ status: active
 | `tekrar-uret.cjs` | 10/10 PASS | koşuldu |
 
 ## Bu oturumun işi
+- **D2F-14 — YAYIN-3 onayı bekleniyor (seq 22, GATE waiting).** Yayın hazırlandı, yapılmadı. Öneri: pin `20261007b`; `main`'e 3 yerel commit (ff-only); çalışma zamanı farkı yalnız `quranCurriculumV2.js` (aynı `20261007a` pininde değişmiş). Canlı pin artık `20261007a` (erken yayın), panel-v2 styles pini zaten yükseltilmiş. Ayrıntı: [evidence/D2F-14/KANIT.md](evidence/D2F-14/KANIT.md).
 - **D2F-13 NOT (seq 21).** Kullanıcı isteğiyle: `MediaRecorder` plan-check uyarısı deterministik kapıya çevrildi (self-test 41/41, `PASS (0 warn)`); D2-12 `8bf8f658` **geri alınmadı**, gerekçeli kararla kayda geçti (geri alma yolu LEDGER seq 21).
 - **D2F-13 — Baştan sona doğrulama (seq 20).** `kapilar.sh` bayraklı ve bayraksız TÜM KAPILAR YEŞİL; tekrar-uret-2 **9/9** (N-08 erken yayınla kapanmıştı), tekrar-uret 10/10, test_kao2_denetim 10/10, plan-check PASS, d2f strict PASS, perf-ab best3 1,098, kabul A-1…A-10 PASS. Sonuç belgesi: [DUZELTME-SONUCU.md](DUZELTME-SONUCU.md); kanıt: [evidence/D2F-13/KANIT.md](evidence/D2F-13/KANIT.md). Açık: L2 (0/37), 13 namaz kelimesi, K-3 ses, cihaz kabulü, ekran okuyucu, D2-06 canlı bayt eşitliği, D2-12 `8bf8f658`.
 - **D2F-12 — Kararlar uygulandı (seq 18–19).** L1=B devir kararı: 158 kayıt `ai-delegated` + `delegatedBy:"owner"` + `delegatedAt:"2026-10-02"`; kullanıcı incelemesi gibi gösterilmedi. u09.01 başlık/hedef gerçek fiil kartlarına uyarlandı. N-04 PASS. Gerçek L2 onayı hâlâ yok. Ayrıntı: [evidence/D2F-12/KANIT.md](evidence/D2F-12/KANIT.md).

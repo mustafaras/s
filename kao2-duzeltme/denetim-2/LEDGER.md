@@ -295,3 +295,15 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - değişen: `docs/kuran-ogreniyorum/tools/kao-plan-check.mjs` + `.test.mjs`, `DUZELTME-SONUCU.md`, LEDGER, CURRENT-STATE, D2F-STATE (`strictExceptions`). Uygulama kodu/pin yok.
 - kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
 - next: D2F-14
+
+## seq 22 · 2026-10-07 · GATE · D2F-14
+- başlık: Yayın (YAYIN-3) hazırlandı, onay bekleniyor; pin, `?v=`, `sw.js`, push ve `main` değişmedi.
+- oturum: claude-code:b9936220-be4d-4f19-8846-806b9a508105
+- status: waiting
+- beklenen cevap (D2F-15 kutusuna, birebir): `YAYIN-3 onaylı` ya da `YAYIN-3 ertele`. "Tamam/olur/canlıya al" onay sayılmaz.
+- öneri: yeni pin `20261007b`; `main`'e 3 yerel commit (ff-only); çalışma zamanı farkı yalnız `app/content/quranCurriculumV2.js` (aynı `20261007a` pininde değişmiş, bu yüzden pin gerekli).
+- düzeltme: canlı pin artık `20261007a` (erken yayın, §9); `panel-v2.html` `styles.css` pini zaten yükseltilmiş (D2-08 kapalı).
+- not: bu yayın K2F-43'te (`20261006e`) açık onay alınmadan yapılan yayını da açıkça onaylamış olur.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — (fetch yapılamadı) · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-14/KANIT.md
+- next: D2F-15 (yalnız kullanıcı cevabıyla)

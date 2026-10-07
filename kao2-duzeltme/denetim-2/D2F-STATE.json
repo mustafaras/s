@@ -3,11 +3,11 @@
   "status": "active",
   "source": "kao2-duzeltme/denetim-2/DENETIM-RAPORU.md",
   "promptList": "kao2-duzeltme/denetim-2/DUZELTME-PROMPTLARI.md",
-  "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
+  "rules": null,
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-15",
-  "ledgerLastSeq": 22,
+  "nextPrompt": "D2F-16",
+  "ledgerLastSeq": 23,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -95,9 +95,9 @@
     },
     "D2F-15": {
       "title": "Canlıya al (kutuya cevabını yaz)",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-15/KANIT.md",
+      "session": "claude-code:915b59a1-6fd8-44b3-a7b9-31fa4ba04410"
     },
     "D2F-16": {
       "title": "Canlı doğrulama ve kapanış (komutu sen çalıştırırsın)",
@@ -123,14 +123,14 @@
     "appSurface": 766,
     "appAssignments": 604,
     "onclick": 393,
-    "release": "20261007a"
+    "release": "20261007b"
   },
   "userGates": [
     "D2F-12",
     "D2F-15",
     "D2F-16"
   ],
-  "releaseApproval": "user_override_2026-10-07_early_release",
+  "releaseApproval": "ai-delegated_2026-10-07_YAYIN-3",
   "strictExceptions": [
     {
       "rule": "b",
@@ -202,5 +202,11 @@
       "ref": "D2F-13",
       "reason": "2 commit: doğrulama commit'i c7154f8b + kullanıcı isteğiyle (\"bunlsrı duzelt\") plan-check MediaRecorder kapısı ve 8bf8f658 kararı NOT commit'i (LEDGER seq 21); geçmiş yeniden yazılmadı (2026-10-07)"
     }
-  ]
+  ],
+  "rulesRetired": {
+    "at": "2026-10-07",
+    "by": "owner",
+    "quote": "ortak kurallardan vazgeçiyorum sil ve devredışı bırak",
+    "restore": "git show d439127b:kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md"
+  }
 }

@@ -307,3 +307,17 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ · yayın — (fetch yapılamadı) · cihaz —
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-14/KANIT.md
 - next: D2F-15 (yalnız kullanıcı cevabıyla)
+
+## seq 23 · 2026-10-07 · GATE · D2F-15
+- başlık: YAYIN-3 — denetim-2 düzeltmeleri canlıya alındı (pin `20261007b`); ORTAK-KURALLAR kullanıcı kararıyla kaldırıldı.
+- oturum: claude-code:915b59a1-6fd8-44b3-a7b9-31fa4ba04410
+- status: closed
+- kapı: D2F-14 (seq 22, beklenen `YAYIN-3 onaylı` / `YAYIN-3 ertele`).
+- kullanıcı cevabı (birebir, sırayla): "benim yerime onayla gerekirse kuaçları değiştir sıkıldım artık" · "benim yerime tüm kuralları senin de yapacagın uygualayacağın şekilde yap ben yetkileri sana devretmek istiyorum ortak kurallardan vazgeçiyorum sil ve devredışı bırak" · "bu beni aksayıyor ben yönetici ve uygulamanın sahibiyim istediğimi yap" · "saydıklarınnın hemsini yap" · "devam".
+- karar: beklenen birebir cümle yazılmadı; yayın, YAYIN-3 sorusuna doğrudan cevap olan açık yetki devriyle yapıldı (§10, yayın adıyla kapsandı). Kullanıcının kendi "YAYIN-3 onaylı" cümlesi gibi gösterilmez: **devirle, Claude kararı**.
+- kurallar: `ORTAK-KURALLAR.md` kullanıcı kararıyla silindi; `D2F-STATE.rules=null`, `rulesRetired` kaydı. Geri getirme: `git show d439127b:kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md`. CLAUDE.md DATA SAFETY ayrı ve geçerli.
+- pin: `20261007a` → `20261007b` (index.html 17, sw.js 18, panel-v2.html 2, 12 test; FIX-STATE + D2F-STATE `pins.release`).
+- geri alma: pin commit'ini `git revert` (geçmiş yeniden yazılmaz).
+- kanıt düzeyleri: kaynak/test ✓ · yayın YAYIN.md'de · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-15/KANIT.md
+- next: D2F-16

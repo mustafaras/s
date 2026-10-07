@@ -216,3 +216,13 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-09/KANIT.md
 - next: D2F-10
+
+## seq 15 · 2026-10-07 · PROMPT · D2F-10
+- başlık: Eski programın eksik kayıtları geriye dönük kapatıldı (D2-06 kayıt, D2-07, D2-12 kayıt, M-07, M-12).
+- oturum: https://claude.ai/code/session_c25a6a0c-00f0-4586-b6b2-858ca3bc413c
+- dal: `d2f-07` (önceki commit `e36e96ad`).
+- değişen: KAO2-FIX `LEDGER.md` (yalnız sona ekleme: seq 123–126, `git diff` +30/−0) · `CURRENT-STATE.md` (baştan) · `FIX-STATE.json` (branch, implementer, ledgerLastSeq 126, audit2) · `evidence/K2F-43/KANIT.md` + `evidence/K2F-34/YAYIN.md` (yeni, "geriye dönük") · `README.md` · `deliverables/KAO2-FIX-KAPANIS.md` §8. Kod/pin/app.js yok.
+- N-06 ve N-07 PASS (tekrar-uret-2 8/9; kalan FAIL N-04, kullanıcı kararı D2F-11/12).
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-10/KANIT.md
+- next: D2F-11

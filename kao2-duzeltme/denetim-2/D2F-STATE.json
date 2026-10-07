@@ -6,8 +6,8 @@
   "rules": "kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md",
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
-  "nextPrompt": "D2F-11",
-  "ledgerLastSeq": 15,
+  "nextPrompt": "D2F-12",
+  "ledgerLastSeq": 16,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",
@@ -71,9 +71,9 @@
     },
     "D2F-11": {
       "title": "Sana iki karar sorulur (L1 onayı + u09.01)",
-      "status": "pending",
-      "evidence": null,
-      "session": null
+      "status": "done",
+      "evidence": "kao2-duzeltme/denetim-2/evidence/D2F-11/KANIT.md",
+      "session": "https://claude.ai/code/session_afe16637-db13-4eeb-b52b-173a6da8c19c"
     },
     "D2F-12": {
       "title": "Kararını uygula (kutuyu doldur)",

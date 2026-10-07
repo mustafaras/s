@@ -226,3 +226,14 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-10/KANIT.md
 - next: D2F-11
+
+## seq 16 · 2026-10-07 · GATE · D2F-11
+- başlık: Kullanıcıya iki karar sorusu hazırlandı (L1 onay kaynağı + u09.01); metin/veri/kod değişmedi.
+- oturum: https://claude.ai/code/session_afe16637-db13-4eeb-b52b-173a6da8c19c
+- status: waiting
+- beklenen cevap biçimi (D2F-12 kutusuna, birebir): `L1 kararı: A` (ya da B ya da C) ve `u09.01: 1` (ya da 2 ya da kendi başlık+hedef metnin). 2 bugünkü veriyle tek başına mümkün değil (D2F-12 BLOCKED olur). "Tamam/olur" onay sayılmaz.
+- seçenekler: L1 — A kullanıcı inceler · B `ai-delegated`/`delegatedBy:"owner"`/`delegatedAt:"2026-10-02"` · C yalnız CLAUDE.md/AGENTS.md. u09.01 — 1 başlık+hedef kartlara uyar · 2 emir biçimi kartta (mümkün değil) · kendi metin. Tam metin: evidence/D2F-11/KANIT.md.
+- ölçüm: 158 metin, hepsi `sourced`/`by:"owner"`, `delegatedBy` yok; INCELEME-17 (133) + -18 (25) kutuları `[x]`; lemma başına emir alanı yok.
+- kanıt düzeyleri: kaynak/test ✓ (okuma) · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-2/evidence/D2F-11/KANIT.md
+- next: D2F-12 (yalnız kullanıcı cevabıyla)

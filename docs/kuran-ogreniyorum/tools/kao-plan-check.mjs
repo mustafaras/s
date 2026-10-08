@@ -34,7 +34,8 @@ const KAO_FILE_SCOPE = ['app/core/quranLearn.js', 'app/kao.css', 'app/content/qu
 // KAO-ARSIV: program kapanışında plan klasörünün kökten docs/ altına taşınması (2026-09-27); tek seferlik yol güncellemesi.
 // K2F-NN: KAO2-FIX programı (kao2-duzeltme/, 44 prompt: K2F-00…K2F-43); tek hane ya da aralık dışı numara tanınmaz.
 // D2F-NN: denetim-2 düzeltme programı (kao2-duzeltme/denetim-2/, 16 prompt: D2F-01…D2F-16); tek hane ya da aralık dışı numara tanınmaz.
-const KAO_SUBJECT_RE = /^(?:(?:KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|D2F-(?:0[1-9]|1[0-6])|KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
+// D3F-NN: denetim-3 düzeltme programı (kao2-duzeltme/denetim-3/, D3F-00 altyapı + bulgu başına bir kart, D3F-00…D3F-20); tek hane ya da aralık dışı numara tanınmaz.
+const KAO_SUBJECT_RE = /^(?:(?:KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|D2F-(?:0[1-9]|1[0-6])|D3F-(?:[01]\d|20)|KAO-(?:P00|D\d|\d+b?)|KAO-FIX-\d+(?:\/[A-D])?(?: \(ek\))?|KAO-DENETIM|KAO-ARSIV):|chore\(kao\))/;
 // Tek hash istisnaları (D2F-02, denetim-2 D2-12): tanınmayan önekle main'e girmiş, geçmişi yazılamayan commit'ler.
 // Genel bir önek izni değil; yalnız tam hash + birebir konu öneki eşleşirse kabul edilir.
 // 65e94db2 `K2F-38 ek:` (2026-10-06): kullanıcı isteğiyle ek iş; 5b267dde bunu genel "K2F-NN ek:" iznine çevirmişti, burada tek commit'e daraltıldı.
@@ -48,7 +49,7 @@ export function subjectRecognized(cm) {
   const re = SUBJECT_EXCEPTIONS[cm.hash];
   return Boolean(re && re.test(cm.subject));
 }
-const CARD_OF_SUBJECT_RE = /^(KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|D2F-(?:0[1-9]|1[0-6])|KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
+const CARD_OF_SUBJECT_RE = /^(KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|D2F-(?:0[1-9]|1[0-6])|D3F-(?:[01]\d|20)|KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
 // K2F-01 (M-10): plan-check tabanı — bu commit'ten SONRAKİ commitler denetlenir, öncesi tarihsel sayılır.
 const FIX_STATE_PATH = path.join(ROOT, 'kao2-duzeltme', 'FIX-STATE.json');
 const AUDIT_STATUSES = ['pass', 'fail', 'findings'];

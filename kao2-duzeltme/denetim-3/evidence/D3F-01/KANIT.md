@@ -38,3 +38,5 @@ kaynak/test ✓ · yayın — (push yok) · canlı — · cihaz —
 
 ## Sürprizler
 `test_kao2_grammar_tasks.js` F2'de VM dizisiyle ana süreç dizisi deepEqual'da realm farkı verdi; `Array.from` ile çözüldü.
+Commit sonrası (`fd588903`) `kao-plan-check` FAIL verdi: D3F öneki tanınmıyordu (`kapilar.txt` commit öncesi koşuydu).
+D3F-00 ek commit'iyle giderildi; commit sonrası tam koşu `evidence/D3F-00/kapilar-commit-sonrasi.txt`.

@@ -50,6 +50,8 @@ else row "kao-plan-check" "ATLANDI (K2F-01 öncesi)"; fi
 
 gate "fix-sync-check --repro" node kao2-duzeltme/tools/fix-sync-check.mjs --repro
 gate "d2f-sync-check --strict" node kao2-duzeltme/denetim-2/tools/d2f-sync-check.mjs --strict
+# D3F-00: kapanmış programlar 128ab06d'de dondu; canlı yayın pini D3F-STATE.pins.release = index.html quranLearn.js ?v= = sw.js SW_VERSION
+gate "d3f pin senkronu" node -e "const fs=require('fs');const s=JSON.parse(fs.readFileSync('kao2-duzeltme/denetim-3/D3F-STATE.json','utf8'));const i=(/app\/core\/quranLearn\.js\?v=(\w+)/.exec(fs.readFileSync('index.html','utf8'))||[])[1];const w=(/SW_VERSION\s*=\s*'(\w+)'/.exec(fs.readFileSync('sw.js','utf8'))||[])[1];if(!(s.pins&&s.pins.release&&s.pins.release===i&&i===w)){console.error('D3F pin: STATE '+(s.pins&&s.pins.release)+' · index '+i+' · sw '+w);process.exit(1);}"
 
 echo "== tekrar-uret özeti =="
 node kao2-duzeltme/denetim/tekrar-uret.cjs 2>/dev/null | tail -1

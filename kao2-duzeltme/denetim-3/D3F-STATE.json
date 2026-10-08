@@ -33,5 +33,8 @@
     "F-18": { "severity": "DÜŞÜK", "title": "8bf8f658 süreç dışı (tutma kararı doğru)", "status": "open" },
     "F-19": { "severity": "DÜŞÜK", "title": "depo public: gizlilik yolları GitHub'da okunur", "status": "open" }
   },
-  "commits": {}
+  "commits": {
+    "D3F-00": ["0105cbe7", "(ek: plan-check D3F öneki · pin kapısı · CLAUDE/AGENTS göstergesi)"],
+    "D3F-01": ["fd588903"]
+  }
 }

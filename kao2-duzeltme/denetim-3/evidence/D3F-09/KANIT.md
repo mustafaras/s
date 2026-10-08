@@ -52,3 +52,9 @@ değişim saymama ile düzeltildi. Ayrıca `--follow` ile `--reverse` birlikte �
 
 ## Kanıt düzeyleri
 kaynak/test ✓ · yayın → YAYIN-7 · canlı → YAYIN-7 · cihaz — (kullanıcıda; görünen metin değişmedi, yalnız modüldeki inceleme tarihi)
+
+## Ek (commit sonrası kapı)
+Commit sonrası hızlı sette `D3F-06/inceleme-mutasyon.sh` M6 kırmızı verdi. Sayfa doğruydu (veriyi izledi: 131 + 1 devir, owner 1);
+kırmızının nedeni M6'nın beklentiyi sabit "132" olarak yazmasıydı. D3F-09 verideki devir gruplarını değiştirince bu sabit bayatladı (F-14 dersi).
+M6 artık beklentiyi klondaki veriden hesaplıyor; ters tırnak bash komut ikamesine düştüğü için JS'te `String.fromCharCode(96)` kullanıldı.
+Sonuç: d3f06 mutasyon 7/7 PASS (`owner 1 · devir veri 132 / sayfa 132`).

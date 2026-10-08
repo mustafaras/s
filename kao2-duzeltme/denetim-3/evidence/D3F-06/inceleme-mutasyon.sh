@@ -53,14 +53,20 @@ expect "M4 yapay zekâ ifadesi yok" FAIL "$d" "işareti yapay zekânın koyduğu
 d=$(fresh M5); mutate "$d" "$TOOL" "**senin kendi onayını taşımayan**" "**açık kutu onayı olmayan**" || BAD=1
 expect "M5 çelişen dil" FAIL "$d" "kutu onayı yok"
 
-# M6 · veri türetimi: u1 kullanıcının kendi onayına çevrilir → sayfa veriyi izler (owner 1, devir 132, u1 yeniden onay listesinde yok)
+# M6 · veri türetimi: u1 kullanıcının kendi onayına çevrilir → sayfa veriyi izler. Beklenen sayılar SABİT değil, klondaki
+# veriden hesaplanır (D3F-09 ek: veriye ikinci bir devir tarihi eklenince sabit "132" bayatlamıştı — F-14 dersi).
 d=$(fresh M6)
 (cd "$d" && node -e "const fs=require('fs');const p='$TEXTS';const t=JSON.parse(fs.readFileSync(p,'utf8'));const r=t.units['1'].review;
-  r.by='owner';delete r.delegatedBy;delete r.delegatedAt;fs.writeFileSync(p,JSON.stringify(t,null,2)+'\n')" && node "$TOOL" >/dev/null 2>&1)
-if grep -q -- '- `owner` (kullanıcının kendi kutu onayı): \*\*1\*\*' "$d/$S17" && grep -q -- '- `ai-delegated`: \*\*132\*\*' "$d/$S17" \
-  && grep -q -- '- İnceleme: `sourced · owner`' "$d/$S17" && ! grep -q 'onayını taşımayan\*\* 133' "$d/$S17" \
-  && grep 'onayını taşımayan\*\* 132 metin vardır: u01.01,' "$d/$S17" >/dev/null; then echo "PASS  M6 sayfa veriden türer (owner 1 / devir 132)"
-else echo "FAIL  M6 sayfa veriyi izlemedi"; grep -n 'owner\|ai-delegated`:\|taşımayan' "$d/$S17" | head -5 | sed 's/^/      /'; BAD=1; fi
+  r.by='owner';delete r.delegatedBy;delete r.delegatedAt;fs.writeFileSync(p,JSON.stringify(t,null,2)+'\\n')" && node "$TOOL" >/dev/null 2>&1)
+if (cd "$d" && node -e "
+  const fs=require('fs');const B=String.fromCharCode(96);const t=JSON.parse(fs.readFileSync('$TEXTS','utf8'));const page=fs.readFileSync('$S17','utf8');
+  const all=[...Object.entries(t.units).map(([k,v])=>['u'+k,v]),...Object.entries(t.lessons),...Object.entries(t.s0)].filter(([,e])=>e.review.level!=='draft');
+  const dlg=all.filter(([,e])=>e.review.by==='ai-delegated').length, own=all.filter(([,e])=>e.review.by==='owner').length;
+  const shown=page.split('\\n').filter(l=>l.startsWith('- '+B+'ai-delegated'+B+': **')).reduce((a,l)=>a+Number(l.split('**')[1]),0);
+  const ok=own===1&&shown===dlg&&page.includes('- '+B+'owner'+B+' (kullanıcının kendi kutu onayı): **'+own+'**')
+    &&page.includes('- İnceleme: '+B+'sourced · owner'+B)&&page.includes('onayını taşımayan** '+dlg+' metin vardır: u01.01,');
+  console.log('      owner '+own+' · devir veri '+dlg+' / sayfa '+shown);process.exit(ok?0:1)"); then echo "PASS  M6 sayfa veriden türer (owner 1, devir sayısı veriyle eşit)"
+else echo "FAIL  M6 sayfa veriyi izlemedi"; grep -n 'owner\|ai-delegated`:\|taşımayan' "$d/$S17" | head -5 | cut -c1-160 | sed 's/^/      /'; BAD=1; fi
 
 rm -rf "$H"
 [ "$BAD" = 0 ] && echo "d3f06 mutasyon: 7/7 PASS" || { echo "d3f06 mutasyon: FAIL"; exit 1; }

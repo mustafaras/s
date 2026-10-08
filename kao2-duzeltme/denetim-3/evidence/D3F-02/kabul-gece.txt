@@ -1,0 +1,9 @@
+# kabul (test_kao2_kabul.js), render süreci 22:00 — 6a20c702 izole klon
+## tek başına
+| A-9 | Mevcut test aileleri gerçekten çalıştırıldı | hepsi yeşil (çıkış kodu 0) | 190/190 dosya çıkış 0 [kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders 1] | ✅ PASS | Fixture |
+| A-10 | Bütçe ve süre (K-1) | runtime ≤128 · css ≤14 · content ≤256 KiB · p95 ≤40 ms | runtime 117.711 · css 13.035 · content 183.943 · p95 6.127 ms | ✅ PASS | Fixture |
+KAO2-27 kabul: 10/10 ölçüt PASS · P10 kapanış kabulü PASS (A-11/A-12 cihazda)
+## tests/kao ailesi sırasıyla (kapilar ile aynı sıra)
+| A-9 | Mevcut test aileleri gerçekten çalıştırıldı | hepsi yeşil (çıkış kodu 0) | 190/190 dosya çıkış 0 [kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders 1] | ✅ PASS | Fixture |
+| A-10 | Bütçe ve süre (K-1) | runtime ≤128 · css ≤14 · content ≤256 KiB · p95 ≤40 ms | runtime 117.711 · css 13.035 · content 183.943 · p95 7.777 ms | ✅ PASS | Fixture |
+KAO2-27 kabul: 10/10 ölçüt PASS · P10 kapanış kabulü PASS (A-11/A-12 cihazda)

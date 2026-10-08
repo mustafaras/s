@@ -15,7 +15,7 @@
   "findings": {
     "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-01/KANIT.md" },
     "F-02": { "severity": "YÜKSEK", "title": "test_kao_render.js saate bağlı (21:30–23:29 kırmızı)", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-02/KANIT.md" },
-    "F-03": { "severity": "ORTA", "title": "kapilar.sh perf bloğu okunamayan satırı geçiriyor", "status": "open" },
+    "F-03": { "severity": "ORTA", "title": "kapilar.sh perf bloğu okunamayan satırı geçiriyor", "status": "open", "note": "D3F-02 gece koşusunda kabulde yeniden üretilemeyen bir kırmızı; kapı çıktıyı yuttuğu için nedeni görülemedi — F-03 kapsamında" },
     "F-04": { "severity": "ORTA", "title": "strictExceptions (kural a) sınırsız muafiyet", "status": "open" },
     "F-05": { "severity": "ORTA", "title": "D2F-12 uygulayıcısı Copilot, 'Claude kararı' diye kayıtlı", "status": "open" },
     "F-06": { "severity": "ORTA", "title": "INCELEME-KAO2-17 [x] işaretlerinin yapay zekâ devri olduğunu söylemiyor", "status": "open" },
@@ -36,6 +36,6 @@
   "commits": {
     "D3F-00": ["0105cbe7", "b3d70a16"],
     "D3F-01": ["fd588903"],
-    "D3F-02": ["(bu commit)"]
+    "D3F-02": ["6a20c702", "(ek: commit sonrası kapı kanıtı)"]
   }
 }

@@ -141,26 +141,31 @@
     {
       "rule": "a",
       "ref": "D2F-03",
+      "commits": ["cd614eb6","19de94f2","6b6cf333"],
       "reason": "3 commit: ana + 2 NOT (LEDGER seq 4-5); D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
     },
     {
       "rule": "a",
       "ref": "D2F-04",
+      "commits": ["16d87a77","1b441146","59abe97b"],
       "reason": "3 commit: ana + NOT + YAYIN (LEDGER seq 7); D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
     },
     {
       "rule": "a",
       "ref": "D2F-05",
+      "commits": ["467ab6fa","80ed4450"],
       "reason": "2 commit: ana + NOT starter; D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
     },
     {
       "rule": "a",
       "ref": "D2F-06",
+      "commits": ["79eca899","e7b2c170"],
       "reason": "2 commit: ana + NOT starter; D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
     },
     {
       "rule": "a",
       "ref": "D2F-08",
+      "commits": ["e20ee8c3","3977e9e3"],
       "reason": "2 commit: ana + plan-check tek-hash NOT'u; D2F-01…08 döneminde strict kuralı yokken oluştu (D2F-09 öncesi geçmiş); yeni ihlal bu listeye eklenemez, yalnız kullanıcı kararıyla"
     },
     {
@@ -181,6 +186,7 @@
     {
       "rule": "a",
       "ref": "D2F-11",
+      "commits": ["dde51ce4","27f72852"],
       "reason": "2 commit: ana + yetki devri kuralı (ORTAK-KURALLAR §10, LEDGER seq 17); kullanıcının açık talimatıyla eklendi (2026-10-07)"
     },
     {
@@ -196,16 +202,19 @@
     {
       "rule": "a",
       "ref": "D2F-12",
+      "commits": ["3f3b28cd","2fe3abf6"],
       "reason": "2 commit: yayımlanmış hazırlık/merge-istisnası kaydı 3f3b28cd + gerçek D2F-12 uygulaması; ilk commit yanlış D2F-12 önekiyle yayımlandı, kullanıcı geçmişi yeniden yazmadan dar istisna yolunu seçti (2026-10-07)"
     },
     {
       "rule": "a",
       "ref": "D2F-13",
+      "commits": ["c7154f8b","5f72ba5f"],
       "reason": "2 commit: doğrulama commit'i c7154f8b + kullanıcı isteğiyle (\"bunlsrı duzelt\") plan-check MediaRecorder kapısı ve 8bf8f658 kararı NOT commit'i (LEDGER seq 21); geçmiş yeniden yazılmadı (2026-10-07)"
     },
     {
       "rule": "a",
       "ref": "D2F-16",
+      "commits": ["55da6965","128ab06d"],
       "reason": "2 commit: kapanış kaydı + devir listesi NOT'u (kullanıcı isteği 'yapabildiklerinin hepsini yap', 2026-10-07); geçmiş yeniden yazılmadı"
     }
   ],

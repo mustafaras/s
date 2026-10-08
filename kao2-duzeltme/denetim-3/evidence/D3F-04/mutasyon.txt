@@ -1,0 +1,9 @@
+PASS  T0 gerçek durum → PASS
+PASS  T1 D2F-16 3. commit → FAIL
+PASS  T2 D2F-11 3. commit → FAIL
+PASS  T3 D2F-14 2. commit → FAIL
+PASS  T4 kapanış sonrası D2F öneki → FAIL
+PASS  T5 kapanış sonrası K2F öneki → FAIL
+PASS  T6 kapanış sonrası D3F → PASS
+PASS  T7 commits'siz a istisnası → FAIL
+d2f mutasyon: 8/8 PASS

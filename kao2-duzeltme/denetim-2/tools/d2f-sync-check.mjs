@@ -174,6 +174,8 @@ if (args.has('--strict')) {
   const exempt = new Set();
   for (const ex of exceptions) {
     if (!ex || !/^[a-f]$/.test(ex.rule) || !ex.ref || !ex.reason) fail(`strictExceptions kaydı geçersiz (rule/ref/reason zorunlu): ${JSON.stringify(ex)}`);
+    // D3F-04 (denetim-3 F-04): kural (a) istisnası sınırsız olamaz — muaf tutulan commit'lerin hash listesi zorunlu
+    else if (ex.rule === 'a' && !(Array.isArray(ex.commits) && ex.commits.length >= 2 && ex.commits.every((h) => /^[0-9a-f]{7,40}$/.test(h)))) fail(`strictExceptions a:${ex.ref} geçersiz: commits (en az 2 hash) zorunlu`);
     else exempt.add(`${ex.rule}:${ex.ref}`);
   }
   const used = new Set();
@@ -200,7 +202,17 @@ if (args.has('--strict')) {
     const count = (byPrompt[id] || []).length;
     if (count === 1) continue;
     if (count === 0 && id === lastDone && pending) continue;
-    violate('a', id, `${count} commit (tam 1 olmalı)`);
+    // D3F-04: istisna yalnız kayıtlı hash kümesiyle BİREBİR aynı commit kümesini muaf tutar; fazlası ya da farklısı FAIL
+    const ex = exceptions.find((e) => e && e.rule === 'a' && e.ref === id && Array.isArray(e.commits));
+    const actual = (byPrompt[id] || []).map((c) => c.hash);
+    if (ex && ex.commits.length === actual.length && ex.commits.every((h) => actual.filter((full) => full.startsWith(h)).length === 1)) { used.add(`a:${id}`); continue; }
+    fail(`[strict-a] ${id}: ${count} commit (tam 1 olmalı)${ex ? ` — istisna yalnız ${ex.commits.join(', ')} için kayıtlı, gerçek: ${actual.map((h) => h.slice(0, 8)).join(', ')}` : ''}`);
+  }
+  // D3F-04: kapanmış programların önekleri (D2F-NN, K2F-NN) kapanıştan SONRA kullanılamaz (aralık dondurulduğu için başka kapı görmez)
+  if (state.closeCommit) {
+    for (const c of commitsIn(`${state.closeCommit}..HEAD`)) {
+      if (/^(?:D2F|K2F)-\d{2}\b/.test(c.subject)) fail(`[strict-kapanış] ${c.hash.slice(0, 8)}: kapanmış programın öneki kapanıştan sonra kullanıldı: "${c.subject.slice(0, 60)}"`);
+    }
   }
   // (c) yayın: ?v= / SW_VERSION yalnız D2F-15'te ve YAYIN.md ile
   const pinHashes = pinHashesIn(range);

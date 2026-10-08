@@ -1,0 +1,3 @@
+namaz kelime düğmesi: 94
+dokununca HİÇBİR ŞEY yapmayan düğme: 0
+# not: 94 düğmenin tamamı dokununca true döndü (sessiz no-op yok); eşlenmeyen 13 kelime lp_ kimliğiyle namaz metninde görünür ve kapalı başlar

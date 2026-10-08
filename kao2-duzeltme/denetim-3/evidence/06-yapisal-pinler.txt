@@ -1,0 +1,14 @@
+app.js ham { kao: 45, surface: 766, assign: 604 } yorumsuz { kao: 45, surface: 766, assign: 604 }
+onclick ham 393 yorumsuz 102
+KAO yüzeyinde başvurulan App.kao* 26 tanımsız: [] kullanılmayan tanım: [
+  'kaoContinue',          'kaoOnboard',
+  'kaoUndo',              'kaoRevealWord',
+  'kaoMarkUnderstood',    'kaoOpenRoots',
+  'kaoSetDailyNew',       'kaoSetIntent',
+  'kaoSetAudioStyle',     'kaoToggleHarakat',
+  'kaoToggleFade',        'kaoSetTranslit',
+  'kaoSetReadability',    'kaoOpenPhonics',
+  'kaoToggleAutoAdvance', 'kaoToggleShadowing',
+  'kaoOpenAyah',          'kaoOpenMap',
+  'kaoLesson'
+]

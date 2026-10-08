@@ -1,6 +1,7 @@
 {
   "program": "KAO2-FIX denetim-2",
   "status": "completed",
+  "closeCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
   "source": "kao2-duzeltme/denetim-2/DENETIM-RAPORU.md",
   "promptList": "kao2-duzeltme/denetim-2/DUZELTME-PROMPTLARI.md",
   "rules": null,

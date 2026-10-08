@@ -100,7 +100,13 @@ if (!nextLine) fail('LEDGER son kaydında "- next:" satırı yok');
 else if ((nextLine[1] === 'none' ? null : nextLine[1]) !== state.nextPrompt) fail(`LEDGER son next ${nextLine[1]} ≠ STATE ${state.nextPrompt}`);
 
 // 5 · Kod pinleri gerçekle aynı mı (sayım kalıpları pin testleriyle aynı)
-const appJs = read('app.js', REPO);
+// Kapanmış program: kod kapanış commit'inden okunur; sonraki programların (D3F…) pin yükseltmesi bu kaydı bozmaz.
+const readCode = (rel) => {
+  if (!state.closeCommit) return read(rel, REPO);
+  try { return execFileSync('git', ['show', `${state.closeCommit}:${rel}`], { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 }); }
+  catch (error) { fail(`${state.closeCommit}:${rel} okunamadı`); return ''; }
+};
+const appJs = readCode('app.js');
 const measured = {
   // fix-sync-check.mjs ile aynı kalıp
   kaoHandlers: new Set([...appJs.matchAll(/App\.(kao[A-Za-z0-9]+) *= *function/g)].map((m) => m[1])).size,
@@ -110,16 +116,16 @@ const measured = {
 };
 // tests/app/test_fx2_touch_coverage.js combinedSource'u ile aynı dosya kümesi
 {
-  const src = (rel) => read(rel, REPO);
+  const src = (rel) => readCode(rel);
   const ql = src('app/core/quranLearn.js');
   const qlHub = ql.slice(ql.indexOf('function kaoHubCardHTML'), ql.indexOf('function kaoOverlayHTML'));
   const combined = appJs + ['motivation', 'crisis', 'journal', 'health', 'library', 'report', 'map', 'profile', 'settings'].map((n) => src(`app/core/${n}.js`)).join('')
     + qlHub + src('app/core/messaging.js') + src('app/core/render.js') + src('app/core/reminders.js') + src('app/core/reminderSurface.js') + src('app/core/appSurface.js');
   measured.onclick = (combined.match(/onclick=/g) || []).length;
 }
-const indexHtml = read('index.html', REPO);
+const indexHtml = readCode('index.html');
 measured.release = (/app\/core\/quranLearn\.js\?v=(\w+)/.exec(indexHtml) || [])[1] || null;
-const swVersion = (/SW_VERSION\s*=\s*'(\w+)'/.exec(read('sw.js', REPO)) || [])[1] || null;
+const swVersion = (/SW_VERSION\s*=\s*'(\w+)'/.exec(readCode('sw.js')) || [])[1] || null;
 if (swVersion !== measured.release) fail(`sw.js SW_VERSION ${swVersion} ≠ index.html quranLearn.js pini ${measured.release}`);
 for (const [key, value] of Object.entries(measured)) {
   if (!state.pins || !(key in state.pins)) fail(`pins.${key} STATE'te yok (ölçülen ${value})`);
@@ -176,9 +182,10 @@ if (args.has('--strict')) {
     if (hit) { used.add(hit); return; }
     fail(`[strict-${rule}] ${ref}: ${message}`);
   };
-  const range = `${state.baseCommit}..HEAD`;
+  // kapanmış programın aralığı kapanış commit'inde biter; sonraki programların commit'leri ve çalışma ağacı bu kapıya girmez
+  const range = `${state.baseCommit}..${state.closeCommit || 'HEAD'}`;
   const commits = commitsIn(range);
-  const pending = isDirty();
+  const pending = state.closeCommit ? false : isDirty();
   const lastDone = [...ids].reverse().find((id) => state.prompts[id].status === 'done') || null;
   const byPrompt = {};
   // (b) önek
@@ -230,7 +237,7 @@ if (args.has('--strict')) {
   if (!liveDate) violate('f', 'CURRENT-STATE', '"Canlı gerçekler" başlığında tarih yok');
   else if (lastDate && liveDate < lastDate) violate('f', 'CURRENT-STATE', `"Canlı gerçekler" ${liveDate}, son prompt kaydı ${lastDate}`);
   for (const key of exempt) if (!used.has(key)) console.log(`  not: strictExceptions "${key}" artık kullanılmıyor`);
-  console.log(`D2F strict: ${commits.length} commit incelendi (${range.slice(0, 8)}…HEAD) · ${used.size}/${exempt.size} kayıtlı istisna kullanıldı`);
+  console.log(`D2F strict: ${commits.length} commit incelendi (${range.slice(0, 8)}…${(state.closeCommit || 'HEAD').slice(0, 8)}) · ${used.size}/${exempt.size} kayıtlı istisna kullanıldı`);
 }
 
 // 9 · İsteğe bağlı: KAO2-FIX dönemi denetimi — yalnız rapor

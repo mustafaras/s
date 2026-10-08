@@ -2,6 +2,7 @@
   "program": "KAO2-FIX",
   "title": "KAO2 denetim düzeltmeleri — 49 bulgu, 44 sıralı prompt",
   "status": "completed",
+  "closeCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
   "plannedAt": "2026-09-30",
   "implementer": "Claude Sonnet 5.5 (claude-sonnet-5-5) — plan: her prompt ayrı oturum; gerçekleşen: birkaç oturumda birden çok prompt, 128 commit (bkz. audit2)",
   "branch": "oturum dalları → main; bkz. denetim-2",

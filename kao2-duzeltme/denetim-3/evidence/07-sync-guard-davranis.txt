@@ -1,0 +1,19 @@
+# Denetim-3 · sync.js Guard 1 davranış sınaması (harness: guard1.cjs, $TMPDIR; gerçek ağ yok). Son 4 satır: devOrigin() bozulmuş KOPYA (mutasyon) — FAIL beklenir.
+[SeySync] Yerel ortam (localhost/file:) algılandı — push ENGELLENDİ (veri güvenliği). Bilinçli test için: localStorage.setItem("seyma-sync-force","1") veya ?forceSync=1
+{"senaryo":"localhost","ağÇağrısı":0,"PUT":0,"putYolları":[],"gizliSızanYollar":[]}
+[SeySync] Yerel ortam (localhost/file:) algılandı — push ENGELLENDİ (veri güvenliği). Bilinçli test için: localStorage.setItem("seyma-sync-force","1") veya ?forceSync=1
+{"senaryo":"127.0.0.1","ağÇağrısı":0,"PUT":0,"putYolları":[],"gizliSızanYollar":[]}
+[SeySync] Yerel ortam (localhost/file:) algılandı — push ENGELLENDİ (veri güvenliği). Bilinçli test için: localStorage.setItem("seyma-sync-force","1") veya ?forceSync=1
+{"senaryo":"::1","ağÇağrısı":0,"PUT":0,"putYolları":[],"gizliSızanYollar":[]}
+[SeySync] Yerel ortam (localhost/file:) algılandı — push ENGELLENDİ (veri güvenliği). Bilinçli test için: localStorage.setItem("seyma-sync-force","1") veya ?forceSync=1
+{"senaryo":"file:","ağÇağrısı":0,"PUT":0,"putYolları":[],"gizliSızanYollar":[]}
+[SeySync] Yerel ortam (localhost/file:) algılandı — push ENGELLENDİ (veri güvenliği). Bilinçli test için: localStorage.setItem("seyma-sync-force","1") veya ?forceSync=1
+{"senaryo":"mac.local","ağÇağrısı":0,"PUT":0,"putYolları":[],"gizliSızanYollar":[]}
+{"senaryo":"KONTROL üretim","ağÇağrısı":4,"PUT":2,"putYolları":["data/backups/2026-10-07.json","data/latest.json"],"gizliSızanYollar":[]}
+Guard 1 (5 yerel köken → 0 ağ çağrısı): PASS
+Pozitif kontrol (üretim kökeni ağa çıkar): PASS
+Gizli alan (ghToken/openaiKey/syncUrl) hiçbir PUT gövdesinde yok: PASS
+{"senaryo":"KONTROL üretim","ağÇağrısı":4,"PUT":2,"putYolları":["data/backups/2026-10-07.json","data/latest.json"],"gizliSızanYollar":[]}
+Guard 1 (5 yerel köken → 0 ağ çağrısı): FAIL
+Pozitif kontrol (üretim kökeni ağa çıkar): PASS
+Gizli alan (ghToken/openaiKey/syncUrl) hiçbir PUT gövdesinde yok: PASS

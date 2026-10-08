@@ -1,0 +1,37 @@
+{
+  "program": "KAO2-FIX denetim-3 düzeltmeleri",
+  "status": "active",
+  "source": "kao2-duzeltme/denetim-3/DENETIM-3-RAPORU.md",
+  "baseCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
+  "startedAt": "2026-10-08",
+  "process": {
+    "commitPrefix": "D3F-NN:",
+    "rule": "her bulgu ayrı düzeltme ve tek yerel commit; her düzeltmeden sonra kullanıcı onayı alınır, sonra sıradakine geçilir",
+    "pins": "çalışma zamanı dosyası değiştiren her düzeltme kendi pinini yükseltir (kullanıcı kararı, 2026-10-08)",
+    "push": "yok — push/deploy ayrıca açık kullanıcı onayı ister",
+    "closedPrograms": "FIX-STATE ve D2F-STATE closeCommit=128ab06d ile donduruldu; sync araçları kodu o commit'ten ölçer"
+  },
+  "pins": { "release": "20261007b" },
+  "findings": {
+    "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "open" },
+    "F-02": { "severity": "YÜKSEK", "title": "test_kao_render.js saate bağlı (21:30–23:29 kırmızı)", "status": "open" },
+    "F-03": { "severity": "ORTA", "title": "kapilar.sh perf bloğu okunamayan satırı geçiriyor", "status": "open" },
+    "F-04": { "severity": "ORTA", "title": "strictExceptions (kural a) sınırsız muafiyet", "status": "open" },
+    "F-05": { "severity": "ORTA", "title": "D2F-12 uygulayıcısı Copilot, 'Claude kararı' diye kayıtlı", "status": "open" },
+    "F-06": { "severity": "ORTA", "title": "INCELEME-KAO2-17 [x] işaretlerinin yapay zekâ devri olduğunu söylemiyor", "status": "open" },
+    "F-07": { "severity": "ORTA", "title": "FIX-STATE.releaseApproval abartılı", "status": "open" },
+    "F-08": { "severity": "ORTA", "title": "3f3b28cd push/deploy kayıtsız", "status": "open" },
+    "F-09": { "severity": "ORTA", "title": "u09.01 inceleme damgası metinden eski", "status": "open" },
+    "F-10": { "severity": "ORTA", "title": "state.js · zikir.js · skyFx.js · panelCoverageManifest.js pinleri yükseltilmemiş", "status": "open" },
+    "F-11": { "severity": "DÜŞÜK", "title": "g17-k2 şıkları muğlak", "status": "open" },
+    "F-12": { "severity": "DÜŞÜK", "title": "12 ünitenin whyReview'u draft", "status": "open" },
+    "F-13": { "severity": "DÜŞÜK", "title": "bayat ve çelişkili belgeler", "status": "open" },
+    "F-14": { "severity": "DÜŞÜK", "title": "D2F-05/09 mutasyon betikleri depoda değil", "status": "open" },
+    "F-15": { "severity": "DÜŞÜK", "title": "K2F KANIT eksikleri (Oturum satırı, bölümler)", "status": "open" },
+    "F-16": { "severity": "DÜŞÜK", "title": "okuyucu alt paneli role=dialog ama dialog değil", "status": "open" },
+    "F-17": { "severity": "DÜŞÜK", "title": "D2F-16 ölçütü birebir sağlanmadı", "status": "open" },
+    "F-18": { "severity": "DÜŞÜK", "title": "8bf8f658 süreç dışı (tutma kararı doğru)", "status": "open" },
+    "F-19": { "severity": "DÜŞÜK", "title": "depo public: gizlilik yolları GitHub'da okunur", "status": "open" }
+  },
+  "commits": {}
+}

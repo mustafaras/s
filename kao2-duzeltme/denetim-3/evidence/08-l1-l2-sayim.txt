@@ -1,0 +1,17 @@
+review taşıyan kayıt: 158
+  anahtar:at: 158
+  anahtar:by: 158
+  anahtar:delegatedAt: 158
+  anahtar:delegatedBy: 158
+  anahtar:derivedFrom: 25
+  anahtar:l0: 121
+  anahtar:level: 158
+  anahtar:note: 4
+  anahtar:sources: 37
+  anahtar:whyReview: 12
+  by=ai-delegated: 158
+  delegatedAt=2026-10-02: 158
+  delegatedBy=owner: 158
+  level=sourced: 158
+  status=None: 158
+örnek: ('/units/1', {'level': 'sourced', 'by': 'ai-delegated', 'at': '2026-10-02', 'sources': ['surah-theme', 'lexicon-meanings'], 'whyReview': {'level': 'draft', 'l0': 'pass', 'at': '2026-09-30'}, 'l0': 'pass', 'delegatedBy': 'owner', 'delegatedAt': '2026-10-02'})

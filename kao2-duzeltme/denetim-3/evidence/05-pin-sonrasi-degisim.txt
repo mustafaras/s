@@ -1,0 +1,19 @@
+PİNDEN SONRA DEĞİŞTİ: app/core/skyFx.js pin 20260909a pin-commit 856400a6 
+    8d1d272b sky: SKY-09 uc hizda sis bandi + yonlu simsek patlamasi
+    366053b8 sky: SKY-08 degisken boyutlu, sinus savrulmali kar
+    1febe7ef sky: SKY-07 derinlik tabanli yagmur + ruzgar acisi + sicrama
+    d4b4255f sky: SKY-06 iki parallax duzlemde hacimli bulut
+    58767796 sky: SKY-05 gece yildiz alani (deterministik seed)
+    5881af78 sky: SKY-04 gunes/ay diski + atmosferik halo
+    2c7cfe5f sky: SKY-03 rAF cizim dongusu + duraklatma
+PİNDEN SONRA DEĞİŞTİ: app/core/state.js pin 20260910b pin-commit 47a9575a 
+    4d71eb19 KAO-07: öğrenme şemasını ve migration kancasını kur
+    de59f03f feat(iip-21): add seven-day content journey pilot
+    8449cc24 feat(iip-20): persist reader preferences and bookmarks
+PİNDEN SONRA DEĞİŞTİ: app/core/zikir.js pin 20260915a pin-commit 98e51a8a 
+    45d9ce40 feat(iip): close worship package acceptance
+PİNDEN SONRA DEĞİŞTİ: manifest.json pin 20260730f pin-commit e09c5e6b 
+    c1f9daca chore: organize repository runtime and docs
+PİNDEN SONRA DEĞİŞTİ: panel/panelCoverageManifest.js pin 20260926a pin-commit 9f604a87 
+    4e8a778d KAO2-25: tek sayfalık kelime detayı ve panel aynası
+toplam pin 57 pin sonrası değişen dosya 5

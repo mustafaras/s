@@ -1,0 +1,26 @@
+== KAO2-FIX kapıları ==
+node --check quranLearn.js         PASS
+node --check quranLearnFlow.js     PASS
+node --check quranLearnViews.js    PASS
+node --check quranCurriculumV2.js  PASS
+node --check quranGrammarV1.js     PASS
+tests/kao (55)                     FAIL: test_kao2_kabul.js test_kao_render.js
+tests/app (77)                     PASS
+tests/panel (23)                   PASS
+tests/panel-v2 (27)                PASS
+tests/quran (9)                    PASS
+reminders smoke                    PASS
+run-seyma driver                   PASS
+run-seyma zikr                     PASS
+kontrast                           PASS
+l2-paket --check                   PASS
+kao-plan-check                     PASS
+fix-sync-check --repro             PASS
+d2f-sync-check --strict            PASS
+== tekrar-uret özeti ==
+KAO2 denetim tekrar üretimi: 10/10 PASS · 0 FAIL
+== perf ==
+perf satırı okunamadı
+SONUÇ: KIRMIZI KAPI VAR
+bash kao2-duzeltme/tools/kapilar.sh  1608.79s user 33.82s system 130% cpu 21:03.28 total
+exit=1

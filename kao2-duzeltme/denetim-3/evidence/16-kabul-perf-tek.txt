@@ -1,0 +1,14 @@
+## test_kao2_kabul.js bayraksız, tek başına
+AssertionError [ERR_ASSERTION]: A-9 FAIL — Mevcut test aileleri gerçekten çalıştırıldı: 189/190 dosya çıkış 0 [kao 53 · app 77 · panel 23 · panel-v2 27 · quran 9 · reminders 1] · KIRMIZI: tests/kao/test_kao_render.js (hedef hepsi yeşil (çıkış kodu 0))
+    at measure (/Users/m_ras/Desktop/seyma/tests/kao/test_kao2_kabul.js:24:10)
+    at main (/Users/m_ras/Desktop/seyma/tests/kao/test_kao2_kabul.js:404:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+node tests/kao/test_kao2_kabul.js  787.72s user 14.73s system 201% cpu 6:38.26 total
+exit=1
+## test_kao2_perf_budget.js bayraksız
+KAO2 perf: PASS (content 183.837 KiB · runtime 117.350 KiB · css 13.035 KiB · p95 8.485 ms · steady 5.878 ms)
+exit=0
+## test_kao2_perf_budget.js KAO2_ACCEPT_SLOW_HOST=1
+KAO2 perf: PASS (content 183.837 KiB · runtime 117.350 KiB · css 13.035 KiB · p95 8.342 ms · steady 5.486 ms · GÖRELİ BANT ATLANDI (yavaş makine): steady 5.486 ms ≤ bant 6.360 ms)
+exit=0
+## test_kao2_kabul.js D3_HOUR=12:00 (saat sabit)

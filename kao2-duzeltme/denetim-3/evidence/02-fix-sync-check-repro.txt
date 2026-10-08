@@ -1,0 +1,2 @@
+KAO2-FIX senkron: PASS · 44/44 prompt done · nextPrompt none · ledger seq 126 · App.kao* 45 · pin 20261007b
+exit=0

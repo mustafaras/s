@@ -1,0 +1,2708 @@
+[
+ {
+  "lesson": "u01.01",
+  "cardId": "g:g0_5:g0_5-k1",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "Arapça sırayla diz: önce iş, sonra yapan, sonra etkilenen.",
+  "stimulus": "يَرْفَعُ",
+  "pron": "yarfaʿu",
+  "answer": "يَرْفَعُ إِبْرَٰهِـۧمُ ٱلْقَوَاعِدَ",
+  "teach": "Âyet 2:127: “İbrahim temelleri yükseltiyor” · Kural: Türkçede iş cümlenin sonunda söylenir: 'İbrahim temelleri yükseltiyor.' Arapçada çoğu zaman önce iş söylenir, sonra işi yapan, sonra işten etkilenen: 'yükseltiyor İbrahim temelleri.'",
+  "context": [
+   "Anlamı: İbrahim temelleri yükseltiyor",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "إِبْرَٰهِـۧمُ",
+    "p": "ibrâhimu",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "ٱلْقَوَاعِدَ",
+    "p": "al-kavâʿida",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "يَرْفَعُ",
+    "p": "yarfaʿu",
+    "correct": false,
+    "ord": 0
+   }
+  ]
+ },
+ {
+  "lesson": "u01.01",
+  "cardId": "g:g0_5:g0_5-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Bu parçanın doğru çevirisi hangisi?",
+  "stimulus": "خَتَمَ ٱللَّهُ عَلَىٰ قُلُوبِهِمْ",
+  "pron": "hatama allahu ʿalâ kulûbihim",
+  "answer": "Allah onların kalplerini mühürledi",
+  "teach": "Âyet 2:7: “Allah onların kalplerini mühürledi” · Kural: Türkçede iş cümlenin sonunda söylenir: 'İbrahim temelleri yükseltiyor.' Arapçada çoğu zaman önce iş söylenir, sonra işi yapan, sonra işten etkilenen: 'yükseltiyor İbrahim temelleri.'",
+  "context": [
+   "Âyet 2:7"
+  ],
+  "choices": [
+   {
+    "l": "İbrahim temelleri yükseltiyor",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Allah onların kalplerini mühürledi",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "Allah onlardan razı oldu",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ve Dâvud Câlût'u öldürdü",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u01.01",
+  "cardId": "g:g0_5:g0_5-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'ve Dâvud Câlût'u öldürdü' cümlesini Arapça sırayla kur.",
+  "stimulus": "وَقَتَلَ",
+  "pron": "va-katala",
+  "answer": "وَقَتَلَ دَاوُۥدُ جَالُوتَ",
+  "teach": "Âyet 2:251: “ve Dâvud Câlût'u öldürdü” · Kural: Türkçede iş cümlenin sonunda söylenir: 'İbrahim temelleri yükseltiyor.' Arapçada çoğu zaman önce iş söylenir, sonra işi yapan, sonra işten etkilenen: 'yükseltiyor İbrahim temelleri.'",
+  "context": [
+   "Anlamı: ve Dâvud Câlût'u öldürdü",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "دَاوُۥدُ",
+    "p": "dâvudu",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "وَقَتَلَ",
+    "p": "va-katala",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "جَالُوتَ",
+    "p": "câlûta",
+    "correct": false,
+    "ord": 2
+   }
+  ]
+ },
+ {
+  "lesson": "u01.01",
+  "cardId": "g:g0_5:g0_5-k4",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Cümlenin ilk kelimesi neyi söylüyor?",
+  "stimulus": "يَرْفَعُ",
+  "pron": "yarfaʿu",
+  "answer": "iş (fiil)",
+  "teach": "Kural: Türkçede iş cümlenin sonunda söylenir: 'İbrahim temelleri yükseltiyor.' Arapçada çoğu zaman önce iş söylenir, sonra işi yapan, sonra işten etkilenen: 'yükseltiyor İbrahim temelleri.'",
+  "context": [],
+  "choices": [
+   {
+    "l": "etkilenen (nesne)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "yapan (özne)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "iş (fiil)",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u01.02",
+  "cardId": "g:g1:g1-k1",
+  "kind": "choice",
+  "gtype": "Ek çöz",
+  "prompt": "Kelimeyi parçalarına ayır.",
+  "stimulus": "ٱلْكِتَـٰبُ",
+  "pron": "al-kitâbu",
+  "answer": "el + kitap",
+  "teach": "Kural: Kelimenin başındaki 'el' parçası 'o bilinen' demektir: kitâb (bir kitap) → el-kitâb (o kitap).",
+  "context": [
+   "el = o bilinen",
+   "kitap"
+  ],
+  "choices": [
+   {
+    "l": "el + kitap",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "el + yol",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "el + gün",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "bir kitap",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u01.02",
+  "cardId": "g:g1:g1-k3",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'bizi dosdoğru yola ilet' parçasını diz.",
+  "stimulus": "ٱهْدِنَا",
+  "pron": "ahdinâ",
+  "answer": "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ",
+  "teach": "Âyet 1:6: “bizi dosdoğru yola ilet” · Kural: Kelimenin başındaki 'el' parçası 'o bilinen' demektir: kitâb (bir kitap) → el-kitâb (o kitap).",
+  "context": [
+   "Anlamı: bizi dosdoğru yola ilet",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "ٱلصِّرَٰطَ",
+    "p": "al-sirâta",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "ٱلْمُسْتَقِيمَ",
+    "p": "al-mustakîma",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "ٱهْدِنَا",
+    "p": "ahdinâ",
+    "correct": false,
+    "ord": 0
+   }
+  ]
+ },
+ {
+  "lesson": "u01.03",
+  "cardId": "g:g2:g2-k1",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'hesap gününün sahibi' tamlamasını Arapça sırayla diz.",
+  "stimulus": "مَـٰلِكِ",
+  "pron": "mâliki",
+  "answer": "مَـٰلِكِ يَوْمِ ٱلدِّينِ",
+  "teach": "Âyet 1:4: “hesap gününün sahibi” · Kural: İki ismi yan yana koyunca Türkçedeki '-nın … -ı' bağı kurulur; sıra Türkçenin tersidir: 'Rab âlemler' = 'âlemlerin Rabbi'.",
+  "context": [
+   "Anlamı: hesap gününün sahibi",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "يَوْمِ",
+    "p": "yavmi",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "مَـٰلِكِ",
+    "p": "mâliki",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "ٱلدِّينِ",
+    "p": "al-dîni",
+    "correct": false,
+    "ord": 2
+   }
+  ]
+ },
+ {
+  "lesson": "u01.03",
+  "cardId": "g:g2:g2-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "مَـٰلِكِ يَوْمِ ٱلدِّينِ",
+  "pron": "mâliki yavmi al-dîni",
+  "answer": "hesap gününün sahibi",
+  "teach": "Âyet 1:4: “hesap gününün sahibi” · Kural: İki ismi yan yana koyunca Türkçedeki '-nın … -ı' bağı kurulur; sıra Türkçenin tersidir: 'Rab âlemler' = 'âlemlerin Rabbi'.",
+  "context": [
+   "Âyet 1:4"
+  ],
+  "choices": [
+   {
+    "l": "âlemlerin Rabbi",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Allah'ın size olan nimetini hatırlayın",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Allah'ın adıyla",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "hesap gününün sahibi",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u01.03",
+  "cardId": "g:g2:g2-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "Parçayı diz.",
+  "stimulus": "وَٱذْكُرُوا۟",
+  "pron": "va-azkurû",
+  "answer": "وَٱذْكُرُوا۟ نِعْمَتَ ٱللَّهِ عَلَيْكُمْ",
+  "teach": "Âyet 3:103: “Allah'ın size olan nimetini hatırlayın” · Kural: İki ismi yan yana koyunca Türkçedeki '-nın … -ı' bağı kurulur; sıra Türkçenin tersidir: 'Rab âlemler' = 'âlemlerin Rabbi'.",
+  "context": [
+   "Anlamı: Allah'ın size olan nimetini hatırlayın",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "نِعْمَتَ",
+    "p": "niʿmata",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "ٱللَّهِ",
+    "p": "allahi",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "وَٱذْكُرُوا۟",
+    "p": "va-azkurû",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "عَلَيْكُمْ",
+    "p": "ʿalaykum",
+    "correct": false,
+    "ord": 3
+   }
+  ]
+ },
+ {
+  "lesson": "u02.01",
+  "cardId": "g:g3:g3-k1",
+  "kind": "choice",
+  "gtype": "Arapça seç",
+  "prompt": "'-den (uzaklaşma)' hangisi?",
+  "stimulus": null,
+  "pron": "",
+  "answer": "عَن",
+  "teach": "Kural: Türkçede sona eklenen '-de, -den, -e' Arapçada kelimenin önüne gelen küçük kelimelerdir: fî = içinde, min = -den, ilâ = -e doğru.",
+  "context": [],
+  "choices": [
+   {
+    "l": "إِلَىٰ",
+    "p": "ilâ",
+    "correct": false
+   },
+   {
+    "l": "عَن",
+    "p": "ʿan",
+    "correct": true
+   },
+   {
+    "l": "فِى",
+    "p": "fî",
+    "correct": false
+   },
+   {
+    "l": "عَلَىٰ",
+    "p": "ʿalâ",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u02.01",
+  "cardId": "g:g3:g3-k3",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu küçük kelime ne demek?",
+  "stimulus": "إِلَىٰ",
+  "pron": "ilâ",
+  "answer": "-e doğru",
+  "teach": "Kural: Türkçede sona eklenen '-de, -den, -e' Arapçada kelimenin önüne gelen küçük kelimelerdir: fî = içinde, min = -den, ilâ = -e doğru.",
+  "context": [],
+  "choices": [
+   {
+    "l": "içinde, -de",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "için (li-, yapışık)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ile (bi-, yapışık)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-e doğru",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u02.01",
+  "cardId": "g:g3:g3-k2",
+  "kind": "choice",
+  "gtype": "Arapça seç",
+  "prompt": "'içinde, -de' hangisi?",
+  "stimulus": null,
+  "pron": "",
+  "answer": "فِى",
+  "teach": "Kural: Türkçede sona eklenen '-de, -den, -e' Arapçada kelimenin önüne gelen küçük kelimelerdir: fî = içinde, min = -den, ilâ = -e doğru.",
+  "context": [],
+  "choices": [
+   {
+    "l": "فِى",
+    "p": "fî",
+    "correct": true
+   },
+   {
+    "l": "عَلَىٰ",
+    "p": "ʿalâ",
+    "correct": false
+   },
+   {
+    "l": "مِن",
+    "p": "min",
+    "correct": false
+   },
+   {
+    "l": "بِسْمِ",
+    "p": "bi-smi",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u02.02",
+  "cardId": "g:g4:g4-k1",
+  "kind": "choice",
+  "gtype": "Arapça seç",
+  "prompt": "'biz' hangisi?",
+  "stimulus": null,
+  "pron": "",
+  "answer": "نَحْنُ",
+  "teach": "Kural: 'o, onlar, sen, siz, ben, biz' Arapçada tek başına duran kısa kelimelerdir: hüve (o), hüm (onlar), ente (sen), nahnü (biz).",
+  "context": [],
+  "choices": [
+   {
+    "l": "أَنَا۠",
+    "p": "anâ",
+    "correct": false
+   },
+   {
+    "l": "نَحْنُ",
+    "p": "nahnu",
+    "correct": true
+   },
+   {
+    "l": "هِىَ",
+    "p": "hiya",
+    "correct": false
+   },
+   {
+    "l": "هُمْ",
+    "p": "hum",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u02.02",
+  "cardId": "g:g4:g4-k2",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne demek?",
+  "stimulus": "أَنتَ",
+  "pron": "anta",
+  "answer": "sen (erkek)",
+  "teach": "Kural: 'o, onlar, sen, siz, ben, biz' Arapçada tek başına duran kısa kelimelerdir: hüve (o), hüm (onlar), ente (sen), nahnü (biz).",
+  "context": [],
+  "choices": [
+   {
+    "l": "o (kadın)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "siz",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "o (erkek)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "sen (erkek)",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u02.02",
+  "cardId": "g:g4:g4-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+  "pron": "kul huva allahu ahadun",
+  "answer": "de ki: O Allah'tır, tektir",
+  "teach": "Âyet 112:1: “de ki: O Allah'tır, tektir” · Kural: 'o, onlar, sen, siz, ben, biz' Arapçada tek başına duran kısa kelimelerdir: hüve (o), hüm (onlar), ente (sen), nahnü (biz).",
+  "context": [
+   "Âyet 112:1"
+  ],
+  "choices": [
+   {
+    "l": "de ki: O Allah'tır, tektir",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "kurtuluşa erenler de onlardır",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "biz ise tesbih ediyoruz",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "şüphesiz sen bilensin, hikmet sahibisin",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u03.01",
+  "cardId": "g:g5:g5-k1",
+  "kind": "choice",
+  "gtype": "Ek çöz",
+  "prompt": "Kelimeye yapışan ek hangisi?",
+  "stimulus": "عَبْدِنَا",
+  "pron": "ʿabdinâ",
+  "answer": "-imiz (bizim)",
+  "teach": "Kural: Türkçedeki iyelik ekleri Arapçada da kelimenin sonuna yapışır: rabbi-hum (Rableri), rabbi-kum (Rabbiniz), abdi-nâ (kulumuz).",
+  "context": [],
+  "choices": [
+   {
+    "l": "-iniz (sizin)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-leri (onların)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-imiz (bizim)",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "-im (benim)",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u03.01",
+  "cardId": "g:g5:g5-k2",
+  "kind": "choice",
+  "gtype": "Ek çöz",
+  "prompt": "Kelimeye yapışan ek hangisi?",
+  "stimulus": "مِّثْلِهِۦ",
+  "pron": "mislihi",
+  "answer": "-ı / -i (onun)",
+  "teach": "Kural: Türkçedeki iyelik ekleri Arapçada da kelimenin sonuna yapışır: rabbi-hum (Rableri), rabbi-kum (Rabbiniz), abdi-nâ (kulumuz).",
+  "context": [],
+  "choices": [
+   {
+    "l": "-im (benim)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-iniz (sizin)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-in (senin)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-ı / -i (onun)",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u03.01",
+  "cardId": "g:g5:g5-k3",
+  "kind": "choice",
+  "gtype": "Ek çöz",
+  "prompt": "Kelimeye yapışan ek hangisi?",
+  "stimulus": "رَّبِّهِمْ",
+  "pron": "rabbihim",
+  "answer": "-leri (onların)",
+  "teach": "Kural: Türkçedeki iyelik ekleri Arapçada da kelimenin sonuna yapışır: rabbi-hum (Rableri), rabbi-kum (Rabbiniz), abdi-nâ (kulumuz).",
+  "context": [],
+  "choices": [
+   {
+    "l": "-leri (onların)",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "-ı / -i (onun)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-imiz (bizim)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-im (benim)",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u03.02",
+  "cardId": "g:g6:g6-k1",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'doğurmadı ve doğurulmadı' parçasını diz.",
+  "stimulus": "لَمْ",
+  "pron": "lam",
+  "answer": "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+  "teach": "Âyet 112:3: “doğurmadı ve doğurulmadı” · Kural: 'yok, değil, -me' anlamını üç kısa kelime taşır: lâ (yok, -mez), lem (-medi), mâ (değil).",
+  "context": [
+   "Anlamı: doğurmadı ve doğurulmadı",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "وَلَمْ",
+    "p": "va-lam",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "يَلِدْ",
+    "p": "yalid",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "يُولَدْ",
+    "p": "yûlad",
+    "correct": false,
+    "ord": 3
+   },
+   {
+    "l": "لَمْ",
+    "p": "lam",
+    "correct": false,
+    "ord": 0
+   }
+  ]
+ },
+ {
+  "lesson": "u03.02",
+  "cardId": "g:g6:g6-k2",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime fiile hangi anlamı verir?",
+  "stimulus": "لَا",
+  "pron": "lâ",
+  "answer": "yok; -mez; yasakta -me",
+  "teach": "Kural: 'yok, değil, -me' anlamını üç kısa kelime taşır: lâ (yok, -mez), lem (-medi), mâ (değil).",
+  "context": [],
+  "choices": [
+   {
+    "l": "yok; -mez; yasakta -me",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "geçmiş: -medi",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "değil; -medi",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u03.02",
+  "cardId": "g:g6:g6-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَمَا هُم بِمُؤْمِنِينَ",
+  "pron": "va-mâ hum bi-mu'minîna",
+  "answer": "oysa onlar inanmış değiller",
+  "teach": "Âyet 2:8: “oysa onlar inanmış değiller” · Kural: 'yok, değil, -me' anlamını üç kısa kelime taşır: lâ (yok, -mez), lem (-medi), mâ (değil).",
+  "context": [
+   "Âyet 2:8"
+  ],
+  "choices": [
+   {
+    "l": "onda hiç şüphe yok",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "oysa onlar inanmış değiller",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "doğurmadı ve doğurulmadı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "onları uyarmasan da inanmazlar",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u04.01",
+  "cardId": "g:g7:g7-k1",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne demek?",
+  "stimulus": "مَا",
+  "pron": "mâ",
+  "answer": "şey ki (şey)",
+  "teach": "Kural: Türkçedeki '-an, -en' ve 'ki o' bağlarını Arapçada ayrı kelimeler kurar: ellezî (o ki), ellezîne (onlar ki), men (kim), mâ (şey ki).",
+  "context": [],
+  "choices": [
+   {
+    "l": "onlar ki (çoğul)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "o ki (erkek, tekil)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "kim (kişi)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "şey ki (şey)",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u04.01",
+  "cardId": "g:g7:g7-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'görünmeyene inananlar' parçasını diz.",
+  "stimulus": "ٱلَّذِينَ",
+  "pron": "allazîna",
+  "answer": "ٱلَّذِينَ يُؤْمِنُونَ بِٱلْغَيْبِ",
+  "teach": "Âyet 2:3: “görünmeyene inananlar” · Kural: Türkçedeki '-an, -en' ve 'ki o' bağlarını Arapçada ayrı kelimeler kurar: ellezî (o ki), ellezîne (onlar ki), men (kim), mâ (şey ki).",
+  "context": [
+   "Anlamı: görünmeyene inananlar",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "بِٱلْغَيْبِ",
+    "p": "bi-al-gaybi",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "ٱلَّذِينَ",
+    "p": "allazîna",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "يُؤْمِنُونَ",
+    "p": "yu'minûna",
+    "correct": false,
+    "ord": 1
+   }
+  ]
+ },
+ {
+  "lesson": "u04.01",
+  "cardId": "g:g7:g7-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "رَبَّكُمُ ٱلَّذِى خَلَقَكُمْ",
+  "pron": "rabbakumu allazî halakakum",
+  "answer": "sizi yaratan Rabbiniz",
+  "teach": "Âyet 2:21: “sizi yaratan Rabbiniz” · Kural: Türkçedeki '-an, -en' ve 'ki o' bağlarını Arapçada ayrı kelimeler kurar: ellezî (o ki), ellezîne (onlar ki), men (kim), mâ (şey ki).",
+  "context": [
+   "Âyet 2:21"
+  ],
+  "choices": [
+   {
+    "l": "kendilerine nimet verdiğin kimselerin yolu",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "görünmeyene inananlar",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "sizi yaratan Rabbiniz",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "'inandık' diyen kimse",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u04.02",
+  "cardId": "g:g8:g8-k1",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَمَا يَخْدَعُونَ إِلَّآ أَنفُسَهُمْ",
+  "pron": "va-mâ yahdaʿûna illâ anfusahum",
+  "answer": "ancak kendilerini aldatırlar",
+  "teach": "Âyet 2:9: “ancak kendilerini aldatırlar” · Kural: Vurgu 'inne' (şüphesiz) ile yapılır; 'illâ' ancak, -den başka demektir. 'Mâ … illâ' birlikte 'sadece' anlamı verir.",
+  "context": [
+   "Âyet 2:9"
+  ],
+  "choices": [
+   {
+    "l": "şüphesiz Allah her şeye gücü yetendir",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "şüphesiz inkâr edenler",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "onunla yalnız yoldan çıkanları saptırır",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ancak kendilerini aldatırlar",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u04.02",
+  "cardId": "g:g8:g8-k2",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne demek?",
+  "stimulus": "أَنّ",
+  "pron": "ann",
+  "answer": "-dığı, ki",
+  "teach": "Kural: Vurgu 'inne' (şüphesiz) ile yapılır; 'illâ' ancak, -den başka demektir. 'Mâ … illâ' birlikte 'sadece' anlamı verir.",
+  "context": [],
+  "choices": [
+   {
+    "l": "-dığı, ki",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "sadece, ancak",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ancak, -den başka",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "şüphesiz",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u04.02",
+  "cardId": "g:g8:g8-k3",
+  "kind": "choice",
+  "gtype": "Arapça seç",
+  "prompt": "'sadece, ancak' hangisi?",
+  "stimulus": null,
+  "pron": "",
+  "answer": "إِنَّمَا",
+  "teach": "Kural: Vurgu 'inne' (şüphesiz) ile yapılır; 'illâ' ancak, -den başka demektir. 'Mâ … illâ' birlikte 'sadece' anlamı verir.",
+  "context": [],
+  "choices": [
+   {
+    "l": "إِنَّمَا",
+    "p": "innamâ",
+    "correct": true
+   },
+   {
+    "l": "إِنّ",
+    "p": "inn",
+    "correct": false
+   },
+   {
+    "l": "أَنّ",
+    "p": "ann",
+    "correct": false
+   },
+   {
+    "l": "إِلَّا",
+    "p": "illâ",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u05.01",
+  "cardId": "g:g9:g9-k1",
+  "kind": "choice",
+  "gtype": "Arapça seç",
+  "prompt": "'bu (erkek)' hangisi?",
+  "stimulus": null,
+  "pron": "",
+  "answer": "هَٰذَا",
+  "teach": "Kural: Yakını göstermek için hâzâ (bu), uzağı göstermek için zâlike (o) kullanılır; kadınlar ve çoğul için ayrı kelimeler vardır.",
+  "context": [],
+  "choices": [
+   {
+    "l": "تِلْكَ",
+    "p": "tilka",
+    "correct": false
+   },
+   {
+    "l": "هَـٰذِهِ",
+    "p": "hâzihi",
+    "correct": false
+   },
+   {
+    "l": "أُولَٰٓئِك",
+    "p": "ûlâ'ik",
+    "correct": false
+   },
+   {
+    "l": "هَٰذَا",
+    "p": "hâzâ",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u05.01",
+  "cardId": "g:g9:g9-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "Parçayı diz.",
+  "stimulus": "تِلْكَ",
+  "pron": "tilka",
+  "answer": "تِلْكَ أُمَّةٌ قَدْ خَلَتْ",
+  "teach": "Âyet 2:134: “o, gelip geçmiş bir ümmetti” · Kural: Yakını göstermek için hâzâ (bu), uzağı göstermek için zâlike (o) kullanılır; kadınlar ve çoğul için ayrı kelimeler vardır.",
+  "context": [
+   "Anlamı: o, gelip geçmiş bir ümmetti",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "تِلْكَ",
+    "p": "tilka",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "خَلَتْ",
+    "p": "halat",
+    "correct": false,
+    "ord": 3
+   },
+   {
+    "l": "أُمَّةٌ",
+    "p": "ummetun",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "قَدْ",
+    "p": "kad",
+    "correct": false,
+    "ord": 2
+   }
+  ]
+ },
+ {
+  "lesson": "u05.01",
+  "cardId": "g:g9:g9-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "قَالُوا۟ هَـٰذَا ٱلَّذِى رُزِقْنَا",
+  "pron": "kâlû hâzâ allazî ruziknâ",
+  "answer": "dediler: bu bize verilendir",
+  "teach": "Âyet 2:25: “dediler: bu bize verilendir” · Kural: Yakını göstermek için hâzâ (bu), uzağı göstermek için zâlike (o) kullanılır; kadınlar ve çoğul için ayrı kelimeler vardır.",
+  "context": [
+   "Âyet 2:25"
+  ],
+  "choices": [
+   {
+    "l": "o, gelip geçmiş bir ümmetti",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "işte onlar bir hidayet üzeredir",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "işte o kitap; hiç şüphe yok",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "dediler: bu bize verilendir",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u05.02",
+  "cardId": "g:g10:g10-k1",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'ilahınız tek bir ilahtır' cümlesini diz.",
+  "stimulus": "وَإِلَـٰهُكُمْ",
+  "pron": "va-ilâhukum",
+  "answer": "وَإِلَـٰهُكُمْ إِلَـٰهٌ وَٰحِدٌ",
+  "teach": "Âyet 2:163: “ilahınız tek bir ilahtır” · Kural: Türkçedeki '-dır' eki Arapçada yazılmaz: 'Allah Samed' = 'Allah Samed'dir'. Cümle bir isimle başlar ve onun hakkında bir şey söyler.",
+  "context": [
+   "Anlamı: ilahınız tek bir ilahtır",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "إِلَـٰهٌ",
+    "p": "ilâhun",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "وَٰحِدٌ",
+    "p": "vâhidun",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "وَإِلَـٰهُكُمْ",
+    "p": "va-ilâhukum",
+    "correct": false,
+    "ord": 0
+   }
+  ]
+ },
+ {
+  "lesson": "u05.02",
+  "cardId": "g:g10:g10-k2",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَإِلَـٰهُكُمْ إِلَـٰهٌ وَٰحِدٌ",
+  "pron": "va-ilâhukum ilâhun vâhidun",
+  "answer": "ilahınız tek bir ilahtır",
+  "teach": "Âyet 2:163: “ilahınız tek bir ilahtır” · Kural: Türkçedeki '-dır' eki Arapçada yazılmaz: 'Allah Samed' = 'Allah Samed'dir'. Cümle bir isimle başlar ve onun hakkında bir şey söyler.",
+  "context": [
+   "Âyet 2:163"
+  ],
+  "choices": [
+   {
+    "l": "Allah Samed olandır",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Allah; O'ndan başka ilah yoktur, diri olan O'dur",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "kurtuluşa erenler de onlardır",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ilahınız tek bir ilahtır",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u05.02",
+  "cardId": "g:g10:g10-k3",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "'onlar kurtuluşa erenlerdir' cümlesinde söylenen (haber) hangisi?",
+  "stimulus": null,
+  "pron": "",
+  "answer": "ٱلْمُفْلِحُونَ",
+  "teach": "Kural: Türkçedeki '-dır' eki Arapçada yazılmaz: 'Allah Samed' = 'Allah Samed'dir'. Cümle bir isimle başlar ve onun hakkında bir şey söyler.",
+  "context": [],
+  "choices": [
+   {
+    "l": "هُمُ",
+    "p": "humu",
+    "correct": false
+   },
+   {
+    "l": "ٱلْمُفْلِحُونَ",
+    "p": "al-muflihûna",
+    "correct": true
+   },
+   {
+    "l": "إِلَـٰهٌ",
+    "p": "ilâhun",
+    "correct": false
+   },
+   {
+    "l": "ٱلصَّمَدُ",
+    "p": "al-samadu",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u06.01",
+  "cardId": "g:g11:g11-k1",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne demek?",
+  "stimulus": "ءَايَة",
+  "pron": "âyet",
+  "answer": "âyet, işaret",
+  "teach": "Kural: Kelime sonundaki yuvarlak 'te' çoğunlukla dişil (kadınsı) kelimeyi gösterir; durakta 'e' ya da 'h' okunur: rahmet, cennet, âyet.",
+  "context": [],
+  "choices": [
+   {
+    "l": "cennet, bahçe",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "nimet",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "kelime, söz",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "âyet, işaret",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u06.01",
+  "cardId": "g:g11:g11-k2",
+  "kind": "choice",
+  "gtype": "Arapça seç",
+  "prompt": "'ümmet' hangisi?",
+  "stimulus": null,
+  "pron": "",
+  "answer": "أُمَّة",
+  "teach": "Kural: Kelime sonundaki yuvarlak 'te' çoğunlukla dişil (kadınsı) kelimeyi gösterir; durakta 'e' ya da 'h' okunur: rahmet, cennet, âyet.",
+  "context": [],
+  "choices": [
+   {
+    "l": "جَنَّة",
+    "p": "cannet",
+    "correct": false
+   },
+   {
+    "l": "نِعْمَة",
+    "p": "niʿmet",
+    "correct": false
+   },
+   {
+    "l": "ءَايَة",
+    "p": "âyet",
+    "correct": false
+   },
+   {
+    "l": "أُمَّة",
+    "p": "ummet",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u06.01",
+  "cardId": "g:g11:g11-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَٱذْكُرُوا۟ نِعْمَتَ ٱللَّهِ",
+  "pron": "va-azkurû niʿmata allahi",
+  "answer": "Allah'ın nimetini hatırlayın",
+  "teach": "Âyet 3:103: “Allah'ın nimetini hatırlayın” · Kural: Kelime sonundaki yuvarlak 'te' çoğunlukla dişil (kadınsı) kelimeyi gösterir; durakta 'e' ya da 'h' okunur: rahmet, cennet, âyet.",
+  "context": [
+   "Âyet 3:103"
+  ],
+  "choices": [
+   {
+    "l": "Allah'ın nimetini hatırlayın",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "sen ve eşin cennete yerleşin",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "işte onlar; Rablerinden onlara lütuflar ve rahmet vardır",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ey iman edenler",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u06.02",
+  "cardId": "g:g12:g12-k1",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime tekil mi çoğul mu?",
+  "stimulus": "جَنَّة",
+  "pron": "cannet",
+  "answer": "Tekil",
+  "teach": "Kural: Çoğul iki yolla yapılır: sona '-ûn / -în' (erkek) ya da '-ât' (dişil) eklenir; ya da kelimenin içi değişir: kalb → kulûb.",
+  "context": [],
+  "choices": [
+   {
+    "l": "Çoğul",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Tekil",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u06.02",
+  "cardId": "g:g12:g12-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'kalplerinde bir hastalık var' parçasını diz.",
+  "stimulus": "فِى",
+  "pron": "fî",
+  "answer": "فِى قُلُوبِهِم مَّرَضٌ",
+  "teach": "Âyet 2:10: “kalplerinde bir hastalık var” · Kural: Çoğul iki yolla yapılır: sona '-ûn / -în' (erkek) ya da '-ât' (dişil) eklenir; ya da kelimenin içi değişir: kalb → kulûb.",
+  "context": [
+   "Anlamı: kalplerinde bir hastalık var",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "مَّرَضٌ",
+    "p": "maradun",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "قُلُوبِهِم",
+    "p": "kulûbihim",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "فِى",
+    "p": "fî",
+    "correct": false,
+    "ord": 0
+   }
+  ]
+ },
+ {
+  "lesson": "u06.02",
+  "cardId": "g:g12:g12-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَبَشِّرِ ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ",
+  "pron": "va-başşiri allazîna âmanû va-ʿamilû al-sâlihâti",
+  "answer": "iman edip iyi işler yapanları müjdele",
+  "teach": "Âyet 2:25: “iman edip iyi işler yapanları müjdele” · Kural: Çoğul iki yolla yapılır: sona '-ûn / -în' (erkek) ya da '-ât' (dişil) eklenir; ya da kelimenin içi değişir: kalb → kulûb.",
+  "context": [
+   "Âyet 2:25"
+  ],
+  "choices": [
+   {
+    "l": "oysa onlar inananlardan değiller",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "onlar için cennetler olduğunu",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "kalplerinde bir hastalık var",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "iman edip iyi işler yapanları müjdele",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u07.01",
+  "cardId": "g:g13:g13-k1",
+  "kind": "choice",
+  "gtype": "Çekim tablosu",
+  "prompt": "'o (erkek) yaptı' hücresini doldur.",
+  "stimulus": "o (erkek) yaptı",
+  "pron": "",
+  "answer": "فَعَلَ",
+  "teach": "Kural: Geçmiş zaman fiilin sonuna şahıs eki getirilerek kurulur: fe'ale (yaptı), fe'alû (yaptılar), fe'altü (yaptım), fe'alnâ (yaptık).",
+  "context": [
+   "Mâzi çekimi"
+  ],
+  "choices": [
+   {
+    "l": "فَعَلْتُم",
+    "p": "faʿaltum",
+    "correct": false
+   },
+   {
+    "l": "فَعَلَ",
+    "p": "faʿala",
+    "correct": true
+   },
+   {
+    "l": "كَسَبَا",
+    "p": "kasabâ",
+    "correct": false
+   },
+   {
+    "l": "فَسَدَتَا",
+    "p": "fasadatâ",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u07.01",
+  "cardId": "g:g13:g13-k3",
+  "kind": "choice",
+  "gtype": "Ek çöz",
+  "prompt": "Bu geçmiş zaman biçimi kimin için? (şahıs ekini tanı)",
+  "stimulus": "كَسَبَا",
+  "pron": "kasabâ",
+  "answer": "o ikisi (erkek)",
+  "teach": "Kural: Geçmiş zaman fiilin sonuna şahıs eki getirilerek kurulur: fe'ale (yaptı), fe'alû (yaptılar), fe'altü (yaptım), fe'alnâ (yaptık).",
+  "context": [
+   "Mâzi çekimi"
+  ],
+  "choices": [
+   {
+    "l": "o ikisi (erkek)",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "ben",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "onlar (erkek)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "o (kadın)",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u07.01",
+  "cardId": "g:g13:g13-k2",
+  "kind": "choice",
+  "gtype": "Çekim tablosu",
+  "prompt": "'siz yaptınız' hücresini doldur.",
+  "stimulus": "siz yaptınız",
+  "pron": "",
+  "answer": "فَعَلْتُم",
+  "teach": "Kural: Geçmiş zaman fiilin sonuna şahıs eki getirilerek kurulur: fe'ale (yaptı), fe'alû (yaptılar), fe'altü (yaptım), fe'alnâ (yaptık).",
+  "context": [
+   "Mâzi çekimi"
+  ],
+  "choices": [
+   {
+    "l": "فَعَلُوا۟",
+    "p": "faʿalû",
+    "correct": false
+   },
+   {
+    "l": "فَعَلْتُم",
+    "p": "faʿaltum",
+    "correct": true
+   },
+   {
+    "l": "رَبِحَت",
+    "p": "rabihat",
+    "correct": false
+   },
+   {
+    "l": "فَعَلْتَ",
+    "p": "faʿalta",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u07.01",
+  "cardId": "g:g13:g13-k4",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ",
+  "pron": "allazîna âmanû va-ʿamilû al-sâlihâti",
+  "answer": "iman edip iyi işler yapanlar",
+  "teach": "Âyet 2:25: “iman edip iyi işler yapanlar” · Kural: Geçmiş zaman fiilin sonuna şahıs eki getirilerek kurulur: fe'ale (yaptı), fe'alû (yaptılar), fe'altü (yaptım), fe'alnâ (yaptık).",
+  "context": [
+   "Âyet 2:25"
+  ],
+  "choices": [
+   {
+    "l": "iman edip iyi işler yapanlar",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "ve onlar ki bir çirkinlik yaptıklarında",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "şüphesiz inkâr edenler",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ve Âdem'e isimleri öğretti",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u07.02",
+  "cardId": "g:g14:g14-k1",
+  "kind": "choice",
+  "gtype": "Çekim tablosu",
+  "prompt": "'onlar idiler' hücresini doldur.",
+  "stimulus": "onlar idiler",
+  "pron": "",
+  "answer": "كَانُوا۟",
+  "teach": "Kural: Kâne 'oldu, idi' demektir; ardından şimdiki zamanlı bir fiil gelirse '-ıyordu, -ırdı' anlamı verir: kânû yekzibûn = yalan söylüyorlardı.",
+  "context": [
+   "Kâne çekimi"
+  ],
+  "choices": [
+   {
+    "l": "كُنتُمْ",
+    "p": "kuntum",
+    "correct": false
+   },
+   {
+    "l": "كَانَتْ",
+    "p": "kânat",
+    "correct": false
+   },
+   {
+    "l": "كَانُوا۟",
+    "p": "kânû",
+    "correct": true
+   },
+   {
+    "l": "كَانَ",
+    "p": "kâna",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u07.02",
+  "cardId": "g:g14:g14-k2",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu ifadede 'kânû' fiile ne katar?",
+  "stimulus": "كَانُوا۟ يَكْذِبُونَ",
+  "pron": "kânû yakzibûna",
+  "answer": "Geçmişte süren iş: '-ıyordu, -ırdı'",
+  "teach": "Kural: Kâne 'oldu, idi' demektir; ardından şimdiki zamanlı bir fiil gelirse '-ıyordu, -ırdı' anlamı verir: kânû yekzibûn = yalan söylüyorlardı.",
+  "context": [],
+  "choices": [
+   {
+    "l": "Gelecek zaman anlamı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Emir anlamı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Geçmişte süren iş: '-ıyordu, -ırdı'",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "Olumsuzluk anlamı",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u07.02",
+  "cardId": "g:g14:g14-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَكَانَ ٱللَّهُ عَلِيمًا حَكِيمًا",
+  "pron": "va-kâna allahu ʿalîmen hakîmen",
+  "answer": "Allah her şeyi bilen, hikmet sahibidir",
+  "teach": "Âyet 4:17: “Allah her şeyi bilen, hikmet sahibidir” · Kural: Kâne 'oldu, idi' demektir; ardından şimdiki zamanlı bir fiil gelirse '-ıyordu, -ırdı' anlamı verir: kânû yekzibûn = yalan söylüyorlardı.",
+  "context": [
+   "Âyet 4:17"
+  ],
+  "choices": [
+   {
+    "l": "yalan söyleyip durduklarından dolayı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "eğer bir şüphe içindeyseniz",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "doğurmadı ve doğurulmadı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Allah her şeyi bilen, hikmet sahibidir",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u08.01",
+  "cardId": "g:g15:g15-k1",
+  "kind": "choice",
+  "gtype": "Çekim tablosu",
+  "prompt": "'o (erkek) yapar' hücresini doldur.",
+  "stimulus": "o (erkek) yapar",
+  "pron": "",
+  "answer": "يَفْعَلُ",
+  "teach": "Kural: Şimdiki/geniş zaman fiilin önüne ye-, te-, e-, ne- getirilerek kurulur: yef'alü (yapar), tef'alûne (yaparsınız), nef'alü (yaparız).",
+  "context": [
+   "Muzâri çekimi"
+  ],
+  "choices": [
+   {
+    "l": "يَطْهُرْنَ",
+    "p": "yathurna",
+    "correct": false
+   },
+   {
+    "l": "يَفْعَلُ",
+    "p": "yafʿalu",
+    "correct": true
+   },
+   {
+    "l": "يَفْعَلُونَ",
+    "p": "yafʿalûna",
+    "correct": false
+   },
+   {
+    "l": "أَعْلَمُ",
+    "p": "aʿlamu",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u08.01",
+  "cardId": "g:g15:g15-k2",
+  "kind": "choice",
+  "gtype": "Ek çöz",
+  "prompt": "Bu şimdiki zaman biçimi kimin için? (şahıs ekini tanı)",
+  "stimulus": "تَفْعَلُونَ",
+  "pron": "tafʿalûna",
+  "answer": "siz (erkek)",
+  "teach": "Kural: Şimdiki/geniş zaman fiilin önüne ye-, te-, e-, ne- getirilerek kurulur: yef'alü (yapar), tef'alûne (yaparsınız), nef'alü (yaparız).",
+  "context": [
+   "Muzâri çekimi"
+  ],
+  "choices": [
+   {
+    "l": "ben",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "o (kadın)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "siz (erkek)",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "o ikisi (erkek)",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u08.01",
+  "cardId": "g:g15:g15-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَلَـٰكِن لَّا يَعْلَمُونَ",
+  "pron": "va-lâkin lâ yaʿlamûna",
+  "answer": "fakat bilmezler",
+  "teach": "Âyet 2:13: “fakat bilmezler” · Kural: Şimdiki/geniş zaman fiilin önüne ye-, te-, e-, ne- getirilerek kurulur: yef'alü (yapar), tef'alûne (yaparsınız), nef'alü (yaparız).",
+  "context": [
+   "Âyet 2:13"
+  ],
+  "choices": [
+   {
+    "l": "görünmeyene inananlar",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "yalnız sana kulluk ederiz",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "fakat bilmezler",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "ben sizin bilmediğinizi bilirim",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u08.02",
+  "cardId": "g:g16:g16-k1",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne anlatır?",
+  "stimulus": "لَم",
+  "pron": "lam",
+  "answer": "geçmiş: -medi",
+  "teach": "Kural: Aynı fiil üç olumsuzlukla üç zaman anlatır: lâ yef'alü (yapmaz), lem yef'al (yapmadı), len yef'ale (asla yapmayacak).",
+  "context": [],
+  "choices": [
+   {
+    "l": "gelecek: asla -meyecek",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "geçmiş: -medi",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "şimdi / genel: -mez",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u08.02",
+  "cardId": "g:g16:g16-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "Parçayı diz.",
+  "stimulus": "فَإِن",
+  "pron": "fa-in",
+  "answer": "فَإِن لَّمْ تَفْعَلُوا۟ وَلَن تَفْعَلُوا۟",
+  "teach": "Âyet 2:24: “eğer yapamazsanız, ki asla yapamayacaksınız” · Kural: Aynı fiil üç olumsuzlukla üç zaman anlatır: lâ yef'alü (yapmaz), lem yef'al (yapmadı), len yef'ale (asla yapmayacak).",
+  "context": [
+   "Anlamı: eğer yapamazsanız, ki asla yapamayacaksınız",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "تَفْعَلُوا۟",
+    "p": "tafʿalû",
+    "correct": false,
+    "ord": 4
+   },
+   {
+    "l": "لَّمْ",
+    "p": "lam",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "فَإِن",
+    "p": "fa-in",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "وَلَن",
+    "p": "va-lan",
+    "correct": false,
+    "ord": 3
+   },
+   {
+    "l": "تَفْعَلُوا۟",
+    "p": "tafʿalû",
+    "correct": false,
+    "ord": 2
+   }
+  ]
+ },
+ {
+  "lesson": "u08.02",
+  "cardId": "g:g16:g16-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "لَمْ تُنذِرْهُمْ لَا يُؤْمِنُونَ",
+  "pron": "lam tunzirhum lâ yu'minûna",
+  "answer": "onları uyarmasan da inanmazlar",
+  "teach": "Âyet 2:6: “onları uyarmasan da inanmazlar” · Kural: Aynı fiil üç olumsuzlukla üç zaman anlatır: lâ yef'alü (yapmaz), lem yef'al (yapmadı), len yef'ale (asla yapmayacak).",
+  "context": [
+   "Âyet 2:6"
+  ],
+  "choices": [
+   {
+    "l": "eğer yapamazsanız, ki asla yapamayacaksınız",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "bizim hiçbir bilgimiz yok",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "doğurmadı ve doğurulmadı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "onları uyarmasan da inanmazlar",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u09.01",
+  "cardId": "g:g17:g17-k1",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne demek?",
+  "stimulus": "ٱعْبُدُوا۟",
+  "pron": "aʿbudû",
+  "answer": "kulluk edin!",
+  "teach": "Kural: Emir, şimdiki zamandaki fiilin baş harfi atılarak yapılır: te-kûlü (dersin) → kul (de!); çoğulda -û eklenir: kûlû (deyin!).",
+  "context": [],
+  "choices": [
+   {
+    "l": "deyin!",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "kulluk edin!",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "bağışla!",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "de!",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u09.01",
+  "cardId": "g:g17:g17-k2",
+  "kind": "choice",
+  "gtype": "Ek çöz",
+  "prompt": "Bu emir kime söylenmiş?",
+  "stimulus": "ٱعْبُدُوا۟",
+  "pron": "aʿbudû",
+  "answer": "siz (kulluk)",
+  "teach": "Kural: Emir, şimdiki zamandaki fiilin baş harfi atılarak yapılır: te-kûlü (dersin) → kul (de!); çoğulda -û eklenir: kûlû (deyin!).",
+  "context": [
+   "Kur'an'dan emirler"
+  ],
+  "choices": [
+   {
+    "l": "siz (söz)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "sen",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "sen (dua)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "siz (kulluk)",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u09.01",
+  "cardId": "g:g17:g17-k3",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'namazı kılın, zekâtı verin' parçasını diz.",
+  "stimulus": "وَأَقِيمُوا۟",
+  "pron": "va-akîmû",
+  "answer": "وَأَقِيمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ",
+  "teach": "Âyet 2:43: “namazı kılın, zekâtı verin” · Kural: Emir, şimdiki zamandaki fiilin baş harfi atılarak yapılır: te-kûlü (dersin) → kul (de!); çoğulda -û eklenir: kûlû (deyin!).",
+  "context": [
+   "Anlamı: namazı kılın, zekâtı verin",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "ٱلزَّكَوٰةَ",
+    "p": "al-zakâta",
+    "correct": false,
+    "ord": 3
+   },
+   {
+    "l": "وَءَاتُوا۟",
+    "p": "va-âtû",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "ٱلصَّلَوٰةَ",
+    "p": "al-salâta",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "وَأَقِيمُوا۟",
+    "p": "va-akîmû",
+    "correct": false,
+    "ord": 0
+   }
+  ]
+ },
+ {
+  "lesson": "u09.02",
+  "cardId": "g:g18:g18-k1",
+  "kind": "choice",
+  "gtype": "Arapça seç",
+  "prompt": "'ey oğulları' hangisi?",
+  "stimulus": null,
+  "pron": "",
+  "answer": "يَـٰبَنِىٓ",
+  "teach": "Kural: Seslenmek için 'yâ' (ey) kullanılır; 'el'li kelimeden önce 'yâ eyyühâ' gelir. Duada 'Rabbenâ' tek başına 'ey Rabbimiz' demektir.",
+  "context": [],
+  "choices": [
+   {
+    "l": "أَيُّهَا",
+    "p": "ayyuhâ",
+    "correct": false
+   },
+   {
+    "l": "يَـٰبَنِىٓ",
+    "p": "yâ-banî",
+    "correct": true
+   },
+   {
+    "l": "يَـٰٓـَٔادَمُ",
+    "p": "yâ-âdamu",
+    "correct": false
+   },
+   {
+    "l": "رَبَّنَآ",
+    "p": "rabbanâ",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u09.02",
+  "cardId": "g:g18:g18-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'ey iman edenler' parçasını diz.",
+  "stimulus": "يَـٰٓأَيُّهَا",
+  "pron": "yâ-ayyuhâ",
+  "answer": "يَـٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟",
+  "teach": "Âyet 2:104: “ey iman edenler” · Kural: Seslenmek için 'yâ' (ey) kullanılır; 'el'li kelimeden önce 'yâ eyyühâ' gelir. Duada 'Rabbenâ' tek başına 'ey Rabbimiz' demektir.",
+  "context": [
+   "Anlamı: ey iman edenler",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "ءَامَنُوا۟",
+    "p": "âmanû",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "يَـٰٓأَيُّهَا",
+    "p": "yâ-ayyuhâ",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "ٱلَّذِينَ",
+    "p": "allazîna",
+    "correct": false,
+    "ord": 1
+   }
+  ]
+ },
+ {
+  "lesson": "u09.02",
+  "cardId": "g:g18:g18-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "يَـٰبَنِىٓ إِسْرَٰٓءِيلَ ٱذْكُرُوا۟",
+  "pron": "yâ-banî isrâ'îla azkurû",
+  "answer": "ey İsrailoğulları, hatırlayın",
+  "teach": "Âyet 2:40: “ey İsrailoğulları, hatırlayın” · Kural: Seslenmek için 'yâ' (ey) kullanılır; 'el'li kelimeden önce 'yâ eyyühâ' gelir. Duada 'Rabbenâ' tek başına 'ey Rabbimiz' demektir.",
+  "context": [
+   "Âyet 2:40"
+  ],
+  "choices": [
+   {
+    "l": "Rabbimiz, bize ver",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ey İsrailoğulları, hatırlayın",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "ey iman edenler",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ey insanlar, kulluk edin",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u10.01",
+  "cardId": "g:g19:g19-k1",
+  "kind": "choice",
+  "gtype": "Kök bul",
+  "prompt": "Bu kelimenin kökü hangisi?",
+  "stimulus": "مُرْسِلِينَ",
+  "pron": "mursilîna",
+  "answer": "ر–س–ل",
+  "teach": "Kural: Fiilden 'yapan' ve 'yapılan' kelimeleri türer: kâtib (yazan), mektûb (yazılan). Türkçedeki 'kâtip, mektup, âlim, malûm, zalim, mazlum' buradan gelir.",
+  "context": [
+   "göndermek (IV)"
+  ],
+  "choices": [
+   {
+    "l": "ع–ل–م",
+    "p": "ʿ–l–m",
+    "correct": false
+   },
+   {
+    "l": "ر–س–ل",
+    "p": "r–s–l",
+    "correct": true
+   },
+   {
+    "l": "ك–ت–ب",
+    "p": "k–t–b",
+    "correct": false
+   },
+   {
+    "l": "ر–ح–م",
+    "p": "r–h–m",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u10.01",
+  "cardId": "g:g19:g19-k2",
+  "kind": "choice",
+  "gtype": "Kalıp eşle",
+  "prompt": "Bu 'yapan' (fâil) kelimenin aynı kökten 'yapılan' (mef'ûl) biçimi hangisi?",
+  "stimulus": "ظَالِم",
+  "pron": "zâlim",
+  "answer": "مَظْلُومًا",
+  "teach": "Kural: Fiilden 'yapan' ve 'yapılan' kelimeleri türer: kâtib (yazan), mektûb (yazılan). Türkçedeki 'kâtip, mektup, âlim, malûm, zalim, mazlum' buradan gelir.",
+  "context": [
+   "Kök anlamı: zulmetmek"
+  ],
+  "choices": [
+   {
+    "l": "مُّرْسَل",
+    "p": "mursal",
+    "correct": false
+   },
+   {
+    "l": "مَّعْلُومٌ",
+    "p": "maʿlûmun",
+    "correct": false
+   },
+   {
+    "l": "مَكْتُوبًا",
+    "p": "maktûben",
+    "correct": false
+   },
+   {
+    "l": "مَظْلُومًا",
+    "p": "mazlûmen",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u10.01",
+  "cardId": "g:g19:g19-k3",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Kökü 'bilmek' olan bu kelime yapan mı, yapılan mı?",
+  "stimulus": "مَّعْلُومٌ",
+  "pron": "maʿlûmun",
+  "answer": "Yapılan (mef'ûl)",
+  "teach": "Kural: Fiilden 'yapan' ve 'yapılan' kelimeleri türer: kâtib (yazan), mektûb (yazılan). Türkçedeki 'kâtip, mektup, âlim, malûm, zalim, mazlum' buradan gelir.",
+  "context": [],
+  "choices": [
+   {
+    "l": "Yapan (fâil)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Yapılan (mef'ûl)",
+    "p": "",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u10.02",
+  "cardId": "g:g20:g20-k1",
+  "kind": "choice",
+  "gtype": "Kalıp eşle",
+  "prompt": "Bu fiilin adı (masdarı) hangisi?",
+  "stimulus": "كَفَرَ",
+  "pron": "kafara",
+  "answer": "كُفْر",
+  "teach": "Kural: Fiilin adı (yapma, bilme) da kökten türer: alime (bildi) → ilm (bilme, bilgi); zekera (andı) → zikr (anma).",
+  "context": [
+   "Anlamı: küfür"
+  ],
+  "choices": [
+   {
+    "l": "عِلْم",
+    "p": "ʿilm",
+    "correct": false
+   },
+   {
+    "l": "رَحْمَة",
+    "p": "rahmet",
+    "correct": false
+   },
+   {
+    "l": "إِيمَٰن",
+    "p": "îmân",
+    "correct": false
+   },
+   {
+    "l": "كُفْر",
+    "p": "kufr",
+    "correct": true
+   }
+  ]
+ },
+ {
+  "lesson": "u10.02",
+  "cardId": "g:g20:g20-k2",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne demek?",
+  "stimulus": "كُفْر",
+  "pron": "kufr",
+  "answer": "küfür",
+  "teach": "Kural: Fiilin adı (yapma, bilme) da kökten türer: alime (bildi) → ilm (bilme, bilgi); zekera (andı) → zikr (anma).",
+  "context": [],
+  "choices": [
+   {
+    "l": "küfür",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "iman",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "ilim",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "zikir",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u10.02",
+  "cardId": "g:g20:g20-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَمَن يَتَبَدَّلِ ٱلْكُفْرَ بِٱلْإِيمَـٰنِ",
+  "pron": "va-man yatabaddali al-kufra bi-al-îmâni",
+  "answer": "kim inkârı imanla değiştirirse",
+  "teach": "Âyet 2:108: “kim inkârı imanla değiştirirse” · Kural: Fiilin adı (yapma, bilme) da kökten türer: alime (bildi) → ilm (bilme, bilgi); zekera (andı) → zikr (anma).",
+  "context": [
+   "Âyet 2:108"
+  ],
+  "choices": [
+   {
+    "l": "kim inkârı imanla değiştirirse",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "yalan söyleyip durduklarından dolayı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "bizim hiçbir bilgimiz yok",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "övgü Allah'a aittir",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u11.01",
+  "cardId": "g:g21:g21-k1",
+  "kind": "choice",
+  "gtype": "Kalıp eşle",
+  "prompt": "Aynı kökten üç kelimeyi anlamlarıyla eşleştir.",
+  "stimulus": "أَنزَلَ",
+  "pron": "anzala",
+  "answer": "indirdi",
+  "teach": "Kural: Aynı kök kalıbı değişince anlamını kaydırır: alime (bildi) → allema (öğretti); nezele (indi) → enzele (indirdi); gafere (bağışladı) → istagfere (bağışlanma diledi). Türkçedeki 'ilim → talim → muallim' zinciri bunu gösterir.",
+  "context": [
+   "عَلَّمَ [ʿallama]",
+   "أَنزَلَ [anzala]",
+   "ٱسْتَغْفَرَ [astagfara]"
+  ],
+  "choices": [
+   {
+    "l": "indirdi",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "öğretti",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "bağışlanma diledi",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u11.01",
+  "cardId": "g:g21:g21-k2",
+  "kind": "choice",
+  "gtype": "Kök bul",
+  "prompt": "Bu fiilin kökü hangisi?",
+  "stimulus": "ذَكَرَ",
+  "pron": "zakara",
+  "answer": "ذ–ك–ر",
+  "teach": "Kural: Aynı kök kalıbı değişince anlamını kaydırır: alime (bildi) → allema (öğretti); nezele (indi) → enzele (indirdi); gafere (bağışladı) → istagfere (bağışlanma diledi). Türkçedeki 'ilim → talim → muallim' zinciri bunu gösterir.",
+  "context": [
+   "anmak"
+  ],
+  "choices": [
+   {
+    "l": "ذ–ك–ر",
+    "p": "z–k–r",
+    "correct": true
+   },
+   {
+    "l": "ر–ح–م",
+    "p": "r–h–m",
+    "correct": false
+   },
+   {
+    "l": "ك–ت–ب",
+    "p": "k–t–b",
+    "correct": false
+   },
+   {
+    "l": "ع–ل–م",
+    "p": "ʿ–l–m",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u11.01",
+  "cardId": "g:g21:g21-k3",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu fiil ne demek?",
+  "stimulus": "ٱسْتَغْفَرَ",
+  "pron": "astagfara",
+  "answer": "bağışlanma diledi",
+  "teach": "Kural: Aynı kök kalıbı değişince anlamını kaydırır: alime (bildi) → allema (öğretti); nezele (indi) → enzele (indirdi); gafere (bağışladı) → istagfere (bağışlanma diledi). Türkçedeki 'ilim → talim → muallim' zinciri bunu gösterir.",
+  "context": [],
+  "choices": [
+   {
+    "l": "yalanladı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "bağışlanma diledi",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "öğüt aldı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "öğretti",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u11.01",
+  "cardId": "g:g21:g21-k4",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "فَٱسْتَغْفَرُوا۟ لِذُنُوبِهِمْ",
+  "pron": "fa-astagfarû li-zunûbihim",
+  "answer": "günahları için bağışlanma dilediler",
+  "teach": "Âyet 3:135: “günahları için bağışlanma dilediler” · Kural: Aynı kök kalıbı değişince anlamını kaydırır: alime (bildi) → allema (öğretti); nezele (indi) → enzele (indirdi); gafere (bağışladı) → istagfere (bağışlanma diledi). Türkçedeki 'ilim → talim → muallim' zinciri bunu gösterir.",
+  "context": [
+   "Âyet 3:135"
+  ],
+  "choices": [
+   {
+    "l": "sana indirilene",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "işte onlar bir hidayet üzeredir",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "günahları için bağışlanma dilediler",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "ve Âdem'e isimleri öğretti",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u12.01",
+  "cardId": "g:g22:g22-k1",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne demek?",
+  "stimulus": "لَمَّا",
+  "pron": "lammâ",
+  "answer": "-ınca (geçmiş)",
+  "teach": "Kural: 'Eğer … -se' için in, '-dığı zaman' için izâ, '-seydi (ama olmadı)' için lev kullanılır; cevap çoğunlukla 'fe' ile başlar.",
+  "context": [],
+  "choices": [
+   {
+    "l": "… olmasaydı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "-ınca (geçmiş)",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "-seydi (olmadı)",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "eğer",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u12.01",
+  "cardId": "g:g22:g22-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "Parçayı diz.",
+  "stimulus": "وَلَوْ",
+  "pron": "va-lav",
+  "answer": "وَلَوْ شَآءَ ٱللَّهُ لَذَهَبَ",
+  "teach": "Âyet 2:20: “Allah dileseydi giderirdi” · Kural: 'Eğer … -se' için in, '-dığı zaman' için izâ, '-seydi (ama olmadı)' için lev kullanılır; cevap çoğunlukla 'fe' ile başlar.",
+  "context": [
+   "Anlamı: Allah dileseydi giderirdi",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "شَآءَ",
+    "p": "şâ'a",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "وَلَوْ",
+    "p": "va-lav",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "لَذَهَبَ",
+    "p": "la-zahaba",
+    "correct": false,
+    "ord": 3
+   },
+   {
+    "l": "ٱللَّهُ",
+    "p": "allahu",
+    "correct": false,
+    "ord": 2
+   }
+  ]
+ },
+ {
+  "lesson": "u12.01",
+  "cardId": "g:g22:g22-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "فَمَن تَبِعَ هُدَاىَ",
+  "pron": "fa-man tabiʿa hudâya",
+  "answer": "kim hidayetime uyarsa",
+  "teach": "Âyet 2:38: “kim hidayetime uyarsa” · Kural: 'Eğer … -se' için in, '-dığı zaman' için izâ, '-seydi (ama olmadı)' için lev kullanılır; cevap çoğunlukla 'fe' ile başlar.",
+  "context": [
+   "Âyet 2:38"
+  ],
+  "choices": [
+   {
+    "l": "kim hidayetime uyarsa",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "Allah dileseydi giderirdi",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "eğer bir şüphe içindeyseniz",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "onlara denildiği zaman",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u12.02",
+  "cardId": "g:g23:g23-k1",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Bu kelime ne demek?",
+  "stimulus": "كَانَ",
+  "pron": "kâna",
+  "answer": "idi, oldu",
+  "teach": "Kural: Bazı fiiller cümleye zaman ve durum rengi verir: kâne (idi), leyse (değildir), asbaha (… hâline geldi).",
+  "context": [],
+  "choices": [
+   {
+    "l": "idi, oldu",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "değildir",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "… hâline geldi",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u12.02",
+  "cardId": "g:g23:g23-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "'nimetiyle kardeşler oldunuz' parçasını diz.",
+  "stimulus": "فَأَصْبَحْتُم",
+  "pron": "fa-asbahtum",
+  "answer": "فَأَصْبَحْتُم بِنِعْمَتِهِۦٓ إِخْوَٰنًا",
+  "teach": "Âyet 3:103: “nimetiyle kardeşler oldunuz” · Kural: Bazı fiiller cümleye zaman ve durum rengi verir: kâne (idi), leyse (değildir), asbaha (… hâline geldi).",
+  "context": [
+   "Anlamı: nimetiyle kardeşler oldunuz",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "فَأَصْبَحْتُم",
+    "p": "fa-asbahtum",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "إِخْوَٰنًا",
+    "p": "ihvânen",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "بِنِعْمَتِهِۦٓ",
+    "p": "bi-niʿmatihi",
+    "correct": false,
+    "ord": 1
+   }
+  ]
+ },
+ {
+  "lesson": "u12.02",
+  "cardId": "g:g23:g23-k3",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَقَالَتِ ٱلْيَهُودُ لَيْسَتِ ٱلنَّصَـٰرَىٰ عَلَىٰ شَىْءٍ",
+  "pron": "va-kâlati al-yahûdu laysati al-nasârâ ʿalâ şay'in",
+  "answer": "Yahudiler dedi: Hristiyanlar bir şey üzerinde değil",
+  "teach": "Âyet 2:113: “Yahudiler dedi: Hristiyanlar bir şey üzerinde değil” · Kural: Bazı fiiller cümleye zaman ve durum rengi verir: kâne (idi), leyse (değildir), asbaha (… hâline geldi).",
+  "context": [
+   "Âyet 2:113"
+  ],
+  "choices": [
+   {
+    "l": "yalan söyleyip durduklarından dolayı",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Yahudiler dedi: Hristiyanlar bir şey üzerinde değil",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "Rabbimiz, bize ver",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "nimetiyle kardeşler oldunuz",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u12.03",
+  "cardId": "g:g24:g24-k1",
+  "kind": "choice",
+  "gtype": "Parça çevir",
+  "prompt": "Doğru çeviri hangisi?",
+  "stimulus": "وَمَا مُحَمَّدٌ إِلَّا رَسُولٌ",
+  "pron": "va-mâ muhammadun illâ rasûlun",
+  "answer": "Muhammed ancak bir elçidir",
+  "teach": "Âyet 3:144: “Muhammed ancak bir elçidir” · Kural: Bazı söz kalıpları Kur'an'da defalarca tekrarlanır; kalıbı tanıyınca cümleyi hemen anlarsın.",
+  "context": [
+   "Âyet 3:144"
+  ],
+  "choices": [
+   {
+    "l": "şüphesiz Allah her şeye gücü yetendir",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Muhammed ancak bir elçidir",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "şüphesiz Allah çok bağışlayan, çok merhametlidir",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "Allah yaptıklarınızdan habersiz değildir",
+    "p": "",
+    "correct": false
+   }
+  ]
+ },
+ {
+  "lesson": "u12.03",
+  "cardId": "g:g24:g24-k2",
+  "kind": "order",
+  "gtype": "Kelime dizme",
+  "prompt": "Kalıbı diz.",
+  "stimulus": "إِنَّ",
+  "pron": "inna",
+  "answer": "إِنَّ ٱللَّهَ غَفُورٌ رَّحِيمٌ",
+  "teach": "Âyet 2:173: “şüphesiz Allah çok bağışlayan, çok merhametlidir” · Kural: Bazı söz kalıpları Kur'an'da defalarca tekrarlanır; kalıbı tanıyınca cümleyi hemen anlarsın.",
+  "context": [
+   "Anlamı: şüphesiz Allah çok bağışlayan, çok merhametlidir",
+   "İpucu: parça yukarıdaki kelimeyle başlar"
+  ],
+  "choices": [
+   {
+    "l": "غَفُورٌ",
+    "p": "gafûrun",
+    "correct": false,
+    "ord": 2
+   },
+   {
+    "l": "ٱللَّهَ",
+    "p": "allaha",
+    "correct": false,
+    "ord": 1
+   },
+   {
+    "l": "إِنَّ",
+    "p": "inna",
+    "correct": false,
+    "ord": 0
+   },
+   {
+    "l": "رَّحِيمٌ",
+    "p": "rahîmun",
+    "correct": false,
+    "ord": 3
+   }
+  ]
+ },
+ {
+  "lesson": "u12.03",
+  "cardId": "g:g24:g24-k3",
+  "kind": "choice",
+  "gtype": "Anlam seç",
+  "prompt": "Kalıbın bu anahtar kelimesi ne demek?",
+  "stimulus": "إِلَّا",
+  "pron": "illâ",
+  "answer": "ancak",
+  "teach": "Kural: Bazı söz kalıpları Kur'an'da defalarca tekrarlanır; kalıbı tanıyınca cümleyi hemen anlarsın.",
+  "context": [],
+  "choices": [
+   {
+    "l": "ancak",
+    "p": "",
+    "correct": true
+   },
+   {
+    "l": "gücü yeten",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "habersiz",
+    "p": "",
+    "correct": false
+   },
+   {
+    "l": "çok bağışlayan",
+    "p": "",
+    "correct": false
+   }
+  ]
+ }
+]

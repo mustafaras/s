@@ -1,0 +1,32 @@
+# KAO2_ACCEPT_SLOW_HOST=1 + NODE_OPTIONS=-r fixdate.cjs (D3_HOUR=12:00; argümansız Date öğlene sabit, alt süreçler dahil)
+== KAO2-FIX kapıları ==
+mod: YAVAŞ MAKİNE (KAO2_ACCEPT_SLOW_HOST=1) — yalnız göreli p95 bandı atlanır, mutlak tavanlar zorunlu
+node --check quranLearn.js         PASS
+node --check quranLearnFlow.js     PASS
+node --check quranLearnViews.js    PASS
+node --check quranCurriculumV2.js  PASS
+node --check quranGrammarV1.js     PASS
+tests/kao (55)                     FAIL: test_kao2_kabul.js test_kao_requirements.js
+tests/app (77)                     FAIL: test_map_boundary.js
+tests/panel (23)                   PASS
+tests/panel-v2 (27)                FAIL: test_panel_v2_polling_telemetry.js test_panel_v2_sync_health.js
+tests/quran (9)                    PASS
+reminders smoke                    PASS
+run-seyma driver                   PASS
+run-seyma zikr                     PASS
+kontrast                           PASS
+l2-paket --check                   PASS
+kao-plan-check                     PASS
+fix-sync-check --repro             PASS
+d2f-sync-check --strict            PASS
+== tekrar-uret özeti ==
+KAO2 denetim tekrar üretimi: 10/10 PASS · 0 FAIL
+== perf ==
+KAO2 perf: PASS (content 183.837 KiB · runtime 117.350 KiB · css 13.035 KiB · p95 12.737 ms · steady 7.148 ms · GÖRELİ BANT ATLANDI (yavaş makine): steady 7.148 ms > bant 6.360 ms)
+SONUÇ: KIRMIZI KAPI VAR
+env D3_HOUR=12:00 NODE_OPTIONS="-r $TMPDIR/d3/fixdate.cjs"  bash   1459.33s user 29.73s system 134% cpu 18:23.17 total
+exit=1
+tests/kao/test_kao_requirements.js                      gerçek saat: PASS · öğlen-dondurulmuş: FAIL
+tests/app/test_map_boundary.js                          gerçek saat: PASS · öğlen-dondurulmuş: FAIL
+tests/panel-v2/test_panel_v2_polling_telemetry.js       gerçek saat: PASS · öğlen-dondurulmuş: FAIL
+tests/panel-v2/test_panel_v2_sync_health.js             gerçek saat: PASS · öğlen-dondurulmuş: FAIL

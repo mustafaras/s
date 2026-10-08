@@ -1,0 +1,3 @@
+ders içi birebir aynı gramer sorusu: 0 []
+dizme görevi: 16 çözülmüş açılan (görünen yazı dizisi = doğru dizi): 0
+aynı derste aynı uyaranla birden çok gramer görevi: [ 'u01.01|يَرْفَعُ ×2', 'u09.01|ٱعْبُدُوا۟ ×2' ]

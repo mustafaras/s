@@ -31,6 +31,12 @@ for (const key of ['program', 'status', 'nextPrompt', 'ledgerLastSeq', 'prompts'
 }
 if (state.status && !PROGRAM_STATUSES.has(state.status)) fail(`geçersiz program durumu: ${state.status}`);
 const ids = Object.keys(state.prompts || {});
+// Kapanmış program: kod pinleri kapanış commit'inde dondurulur; sonraki programların (D3F…) pin yükseltmesi bu kaydı bozmaz.
+const readCode = (rel) => {
+  if (!state.closeCommit) return read(rel, REPO);
+  try { return execFileSync('git', ['show', `${state.closeCommit}:${rel}`], { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 }); }
+  catch (error) { fail(`${state.closeCommit}:${rel} okunamadı`); return ''; }
+};
 
 // 2 · PROMPTLAR.md başlık sırası = STATE sırası
 const promptsMd = read('PROMPTLAR.md');
@@ -85,9 +91,9 @@ if (!nextLine) fail('LEDGER son kaydında "- next:" satırı yok');
 else if ((nextLine[1] === 'none' ? null : nextLine[1]) !== state.nextPrompt) fail(`LEDGER son next ${nextLine[1]} ≠ STATE ${state.nextPrompt}`);
 
 // 6 · Kod pinleri gerçekle aynı mı (sayaç karmaşası olmasın)
-const appJs = read('app.js', REPO);
+const appJs = readCode('app.js');
 const kaoHandlers = new Set([...appJs.matchAll(/App\.(kao[A-Za-z0-9]+) *= *function/g)].map((m) => m[1])).size;
-const index = read('index.html', REPO);
+const index = readCode('index.html');
 const pin = (/app\/core\/quranLearn\.js\?v=(\w+)/.exec(index) || [])[1] || null;
 if (state.pins && state.pins.kaoHandlers !== kaoHandlers) fail(`pins.kaoHandlers ${state.pins.kaoHandlers} ≠ app.js'teki ${kaoHandlers}`);
 if (state.pins && state.pins.release !== pin) fail(`pins.release ${state.pins.release} ≠ index.html quranLearn.js pini ${pin}`);
@@ -118,4 +124,4 @@ if (errors.length) {
   errors.forEach((e) => console.error('  - ' + e));
   process.exit(1);
 }
-console.log(`KAO2-FIX senkron: PASS · ${done}/${ids.length} prompt done · nextPrompt ${state.nextPrompt ?? 'none'} · ledger seq ${state.ledgerLastSeq} · App.kao* ${kaoHandlers} · pin ${pin}`);
+console.log(`KAO2-FIX senkron: PASS · ${done}/${ids.length} prompt done · nextPrompt ${state.nextPrompt ?? 'none'} · ledger seq ${state.ledgerLastSeq} · App.kao* ${kaoHandlers} · pin ${pin}${state.closeCommit ? ` (dondurulmuş: ${state.closeCommit.slice(0, 8)})` : ''}`);

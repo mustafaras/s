@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: A-10 FAIL — bütçe testi kırmızı:
+node:internal/assert/utils:146
+  throw error;
+  ^
+
+AssertionError [ERR_ASSERTION]: steady p95 8.613 ms exceeds baseline +25% (5.087625000000003 ms)
+    at Object.<anonymous> (/private/tmp/claude-501/d3f03full.KBMF/r/tests/kao/test_kao2_perf_budget.js:73:12)
+    at main (/private/tmp/claude-501/d3f03full.KBMF/r/tests/kao/test_kao2_kabul.js:420:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

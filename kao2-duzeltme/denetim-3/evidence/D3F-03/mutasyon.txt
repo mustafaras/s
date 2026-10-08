@@ -1,0 +1,6 @@
+PASS  M0  FAILED=0  günlük: yok
+PASS  M1  FAILED=1  günlük: perf.log 
+PASS  M2  FAILED=1  günlük: perf.log 
+PASS  M3  FAILED=1  günlük: fam_test_b.js.log 
+PASS  M4  FAILED=1  günlük: kotu_kapi.log 
+kapilar mutasyon: 5/5 PASS

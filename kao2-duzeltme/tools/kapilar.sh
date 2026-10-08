@@ -2,6 +2,9 @@
 # KAO2-FIX · tüm kapı komutları tek yerde (PROMPTLAR.md P3). Salt okur: ağ yok, tarayıcı yok, push yok.
 # Kullanım (repo kökünden):  bash kao2-duzeltme/tools/kapilar.sh
 # Çıkış kodu: 0 = hepsi yeşil · 1 = en az bir kapı kırmızı. Her kapı ayrı değerlendirilir (boru yok).
+# D3F-03 (denetim-3 F-03): kırmızı kapının/dosyanın tam çıktısı depo DIŞINA yazılır ve yolu satırda gösterilir
+#   (varsayılan $TMPDIR/kapilar-<zaman>-<pid>/, değiştirmek için KAPILAR_LOG_DIR). Perf satırı okunamazsa ya da perf testi
+#   sıfırdan farklı çıkarsa kapı KIRMIZIDIR (önceden "okunamadı" yazıp geçiyordu).
 # Yavaş makine (D2F-02):  KAO2_ACCEPT_SLOW_HOST=1 bash kao2-duzeltme/tools/kapilar.sh
 #   Bayrak kabul testine (A-10) ve bütçe testine açıkça geçirilir; YALNIZ göreli p95 bandı (KAO2-01 makinesine bağlı) atlanır
 #   ve perf satırı bunu yazar. Mutlak tavanlar (içerik ≤256 · runtime ≤128 · css ≤14 KiB · p95 ≤40 ms) aynen zorunludur.
@@ -12,19 +15,30 @@ cd "$(dirname "$0")/../.." || exit 1
 if [ "${KAO2_ACCEPT_SLOW_HOST:-}" = "1" ]; then export KAO2_ACCEPT_SLOW_HOST=1; SLOW=1; else unset KAO2_ACCEPT_SLOW_HOST; SLOW=0; fi
 
 FAILED=0
+LOG_DIR="${KAPILAR_LOG_DIR:-${TMPDIR:-/tmp}/kapilar-$(date +%Y%m%d-%H%M%S)-$$}"
 row() { printf '%-34s %s\n' "$1" "$2"; }
+slug() { printf '%s' "$1" | tr -c 'A-Za-z0-9._-' '_'; }
+keep_log() { # keep_log <ad> <geçici çıktı dosyası> → kalıcı günlük yolunu yazar
+  mkdir -p "$LOG_DIR"
+  local dest="$LOG_DIR/$(slug "$1").log"
+  mv "$2" "$dest" && printf '%s' "$dest"
+}
 gate() { # gate <ad> <komut...>
   local name="$1"; shift
-  if "$@" >/dev/null 2>&1; then row "$name" "PASS"; else row "$name" "FAIL"; FAILED=1; fi
+  local out; out="$(mktemp "${TMPDIR:-/tmp}/kapi.XXXXXX")"
+  if "$@" >"$out" 2>&1; then row "$name" "PASS"; rm -f "$out"
+  else row "$name" "FAIL → $(keep_log "$name" "$out")"; FAILED=1; fi
 }
 family() { # family <ad> <glob>
-  local name="$1" pattern="$2" n=0 fails=""
+  local name="$1" pattern="$2" n=0 fails="" out
   for f in $pattern; do
     [ -f "$f" ] || continue
     n=$((n + 1))
-    node "$f" >/dev/null 2>&1 || fails="$fails $(basename "$f")"
+    out="$(mktemp "${TMPDIR:-/tmp}/kapi.XXXXXX")"
+    if node "$f" >"$out" 2>&1; then rm -f "$out"
+    else fails="$fails $(basename "$f")"; keep_log "$f" "$out" >/dev/null; fi
   done
-  if [ -z "$fails" ]; then row "$name ($n)" "PASS"; else row "$name ($n)" "FAIL:$fails"; FAILED=1; fi
+  if [ -z "$fails" ]; then row "$name ($n)" "PASS"; else row "$name ($n)" "FAIL:$fails → $LOG_DIR"; FAILED=1; fi
 }
 
 echo "== KAO2-FIX kapıları =="
@@ -56,11 +70,17 @@ gate "d3f pin senkronu" node -e "const fs=require('fs');const s=JSON.parse(fs.re
 echo "== tekrar-uret özeti =="
 node kao2-duzeltme/denetim/tekrar-uret.cjs 2>/dev/null | tail -1
 echo "== perf =="
-PERF_LINE="$(node tests/kao/test_kao2_perf_budget.js 2>/dev/null | grep 'KAO2 perf:')"
-if [ -z "$PERF_LINE" ]; then echo "perf satırı okunamadı"
+PERF_OUT="$(mktemp "${TMPDIR:-/tmp}/kapi.XXXXXX")"
+node tests/kao/test_kao2_perf_budget.js >"$PERF_OUT" 2>&1; PERF_RC=$?
+PERF_LINE="$(grep 'KAO2 perf:' "$PERF_OUT")"
+if [ -z "$PERF_LINE" ] || [ "$PERF_RC" -ne 0 ]; then
+  [ -n "$PERF_LINE" ] && echo "$PERF_LINE"
+  echo "perf: KIRMIZI (çıkış $PERF_RC$([ -z "$PERF_LINE" ] && printf ', satır okunamadı')) → $(keep_log perf "$PERF_OUT")"; FAILED=1; PERF_OUT=""
 elif [ "$SLOW" = "1" ] && ! printf '%s' "$PERF_LINE" | grep -q 'GÖRELİ BANT ATLANDI (yavaş makine)'; then
   echo "$PERF_LINE"; echo "perf: bayrak verildi ama satırda 'GÖRELİ BANT ATLANDI (yavaş makine)' yok"; FAILED=1
 else echo "$PERF_LINE"; fi
+[ -n "$PERF_OUT" ] && rm -f "$PERF_OUT"
+[ -d "$LOG_DIR" ] && [ -n "$(ls -A "$LOG_DIR" 2>/dev/null)" ] && echo "kırmızı çıktılar: $LOG_DIR"
 
 if [ "$FAILED" -eq 0 ]; then echo "SONUÇ: TÜM KAPILAR YEŞİL"; else echo "SONUÇ: KIRMIZI KAPI VAR"; fi
 exit "$FAILED"

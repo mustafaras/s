@@ -4,7 +4,7 @@
   "source": "kao2-duzeltme/denetim-3/DENETIM-3-RAPORU.md",
   "baseCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
   "startedAt": "2026-10-08",
-  "nextFinding": "F-13",
+  "nextFinding": "F-14",
   "starter": "kao2-duzeltme/denetim-3/STARTER.md",
   "process": {
     "commitPrefix": "D3F-NN:",
@@ -33,7 +33,7 @@
     "F-10": { "severity": "ORTA", "title": "state.js · zikir.js · skyFx.js · panelCoverageManifest.js pinleri yükseltilmemiş", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-10/KANIT.md", "pin": "20261008c", "note": "genel denetim 2 bayat pin daha buldu: manifest.json, panel/v2/panel-v2.js" },
     "F-11": { "severity": "DÜŞÜK", "title": "g17-k2 şıkları muğlak", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-11/KANIT.md", "pin": "20261008d" },
     "F-12": { "severity": "DÜŞÜK", "title": "12 ünitenin whyReview'u draft", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-12/KANIT.md", "note": "kayıt/sayım dürüstlüğü; why metinleri onaysız (draft) kalır — onay kullanıcı/devir kararıdır" },
-    "F-13": { "severity": "DÜŞÜK", "title": "bayat ve çelişkili belgeler", "status": "open", "note": "CURRENT-STATE kısmı D3F-05te kapandı; DUZELTME-SONUCU, CLAUDE.md 130 KB, DEVIR-LISTESI açık" },
+    "F-13": { "severity": "DÜŞÜK", "title": "bayat ve çelişkili belgeler", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-13/KANIT.md", "note": "CURRENT-STATE kısmı D3F-05te; DUZELTME-SONUCU, CLAUDE.md/AGENTS.md 130 KB, DEVIR-LISTESI D3F-13te" },
     "F-14": { "severity": "DÜŞÜK", "title": "D2F-05/09 mutasyon betikleri depoda değil", "status": "open" },
     "F-15": { "severity": "DÜŞÜK", "title": "K2F KANIT eksikleri (Oturum satırı, bölümler)", "status": "open" },
     "F-16": { "severity": "DÜŞÜK", "title": "okuyucu alt paneli role=dialog ama dialog değil", "status": "open" },
@@ -61,6 +61,7 @@
     "D3F-10": ["b828aaea", "b6915f19"],
     "YAYIN-7": ["bcd92988", "8f0a3d10"],
     "D3F-11": ["7b9a908b"],
-    "D3F-12": ["(bu commit)"]
+    "D3F-12": ["f07db9ab"],
+    "D3F-13": ["(bu commit)"]
   }
 }

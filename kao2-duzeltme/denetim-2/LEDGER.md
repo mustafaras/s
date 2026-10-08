@@ -375,3 +375,16 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kayıt/test ✓ · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-3/evidence/D3F-12/KANIT.md
 - next: none
+
+## seq 28 · 2026-10-08 · NOTE · D2F-13
+- başlık: Düzeltme notu (denetim-3 F-13) — DUZELTME-SONUCU ve DEVIR-LISTESI'ndeki bayat/yanlış iddialar.
+- oturum: claude-code (denetim-3 düzeltmeleri, D3F-13; kao2-duzeltme/denetim-3/)
+- DUZELTME-SONUCU: §1 "14/14 istisna" ve `SW_VERSION 20261007a`, §2 "13 kayıt" D2F-13 anının değerleriydi (kendi içinde de 14 ↔ 13 çelişiyordu).
+  Kapanış gerçeği (D2F-STATE, ölçüldü): `strictExceptions` 15, pin `20261007b`. Değerler silinmedi; "D2F-13 anı / kapanışta" diye ayrıldı, başa not eklendi.
+  §4 madde 5 (canlı bayt eşitliği) ve 7 (D2F-15 yayını) kapanmıştı; üstü çizildi, kapanış yazıldı (YAYIN-3 yetki devriyle; açık "onaylı" cümlesi yok).
+- DEVIR-LISTESI §3: "eşlenmeyen kelimeler uygulamada 'açık' görünür" yanlıştı. Kod (`kaoPrayerHTML`): tanınmayan kelime `is-closed` başlar, dokununca `is-revealed`
+  (denetim-3 evidence/12: 94/94 düğme çalışıyor). Düzeltildi.
+- değişen: yalnız belgeler (DUZELTME-SONUCU · DEVIR-LISTESI · bu not · D2F-STATE `ledgerLastSeq` · CURRENT-STATE). Geçmiş LEDGER satırları değişmedi; kod/veri/pin yok.
+- kanıt düzeyleri: kayıt ✓ (belge-denetimi.mjs 9/9) · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-13/KANIT.md
+- next: none

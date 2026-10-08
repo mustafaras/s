@@ -9,7 +9,7 @@ Commit canlıdaki düzeltmeleri taşıyor (alt çubuk İlham etiketi, Arapça se
 Paket hazır: `docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md` ve `INCELEME-KAO2-18.md` (37 satır, L2 kutuları). Uzman kutuları işaretler; sonra `node kao2-duzeltme/denetim-2/../tools/l2-paket-build.mjs` ile paket yenilenir. Claude işaretlemez.
 
 ## 3. Eşlenmeyen 13 namaz kelimesi — uzman
-Liste: `docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md` ("Eşleşmeyen kelimeler"). 12'sinde aday yok, 1'inde (ʿabduhu) iki aday var. Uzman karar verirse eşleme araç girdisine eklenir; tahmin yok. Bu arada uygulamada "açık" görünürler.
+Liste: `docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md` ("Eşleşmeyen kelimeler"). 12'sinde aday yok, 1'inde (ʿabduhu) iki aday var. Uzman karar verirse eşleme araç girdisine eklenir; tahmin yok. Bu arada uygulamada **kapalı** başlarlar (`is-closed`; ekran okuyucuya "anlamı kapalı; dokununca açılır"); dokununca anlamları açılır (`is-revealed`). Ölçüm: denetim-3 `evidence/12-namaz-eslenmeyen.txt` (94/94 düğme çalışıyor). Düzeltme notu: denetim-3 F-13 (2026-10-08); eski metin "açık görünürler" diyordu.
 
 ## 4. Hece sesi kayıtları (K-3) — kayıt
 Araç: `node tools/kao2-syllable-audio.mjs --inventory` (ne kaydedilecek), kayıtlar gelince `--check --source <dizin>`. Protokol: 48 kHz · 24 bit · mono · −18 LUFS · −1 dBTP · baş/son 150 ms sessizlik · hece başına 3 kayıt · ses sahibi lisansı. Kayıt gelmeden uygulama kademe B ile çalışır.

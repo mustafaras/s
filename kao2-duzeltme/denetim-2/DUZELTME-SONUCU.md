@@ -1,6 +1,7 @@
 # KAO2-FIX denetim-2 · Düzeltme sonucu (D2F-13)
 
 Ölçüm tarihi: 2026-10-07 · dal `main` · başlangıç `cbe0d604` · yayın pini `20261007a`.
+> **Düzeltme notu (denetim-3 F-13, 2026-10-08):** §1–§4 D2F-13 anının ölçümüdür. Kapanış (D2F-16, `128ab06d`) gerçekleri: `strictExceptions` 15, kapanış pini `20261007b`, canlı bayt eşitliği doğrulandı (§5). Aşağıda o anın değerleri silinmedi; kapanış değeri yanına yazıldı.
 Bu belgedeki her satır bu oturumda **yeniden ölçüldü**; önceki KANIT'lardan kopyalanmış "kapandı" damgası yoktur.
 Kanıt düzeyleri ayrıdır: **K** = kaynak/test (bu oturumda koşturuldu) · **Y** = yayın (git kaydı) · **C** = cihaz (yalnız kullanıcı beyanı).
 
@@ -14,11 +15,11 @@ Kanıt düzeyleri ayrıdır: **K** = kaynak/test (bu oturumda koşturuldu) · **
 | `tekrar-uret.cjs` | 10/10 PASS |
 | `tests/kao/test_kao2_denetim.js` | 10/10 PASS (R-01 gerçek ustalık geçişi, R-10 girintiden bağımsız) |
 | `kao-plan-check.mjs` | **PASS (0 warn)**; self-test 41/41. Eski `MediaRecorder`+`save` uyarısı sahte alarm çıktı; kayıt bloğunu denetleyen deterministik kapıya çevrildi (seq 21) |
-| `d2f-sync-check.mjs --strict` | PASS · 14/14 kayıtlı istisna (seq 21 NOT commit'i dahil) |
+| `d2f-sync-check.mjs --strict` | PASS · 14/14 kayıtlı istisna (seq 21 NOT commit'i dahil; D2F-13 anı — kapanışta 15/15) |
 | `perf-ab.cjs` (cari ↔ `git archive 07802fa6`) | best3 **1,098** · p50 1,072 · p95 0,939 (cari p50 3,19 ms / taban 2,97 ms) — denetimdeki 1,111–1,139'dan iyi, bandın içinde |
 | `test_kao2_kabul.js` | **A-1…A-10 PASS · P10 PASS**; A-11/A-12 cihazda (ölçülmedi) → [evidence/D2F-13/A-KABUL.md](evidence/D2F-13/A-KABUL.md) |
 | Bütçeler | runtime 117,350 KiB ≤ 128 · css 13,035 ≤ 14 · içerik 183,837 ≤ 256 |
-| Pinler | `App.kao*` 45 · yüzey 766 · atama 604 · onclick 393 · `SW_VERSION` `20261007a` (`app.js` bu programda dokunulmadı) |
+| Pinler | `App.kao*` 45 · yüzey 766 · atama 604 · onclick 393 · `SW_VERSION` `20261007a` (D2F-13 anı; kapanış pini `20261007b`, D2F-15) (`app.js` bu programda dokunulmadı) |
 
 ## 2. D2-01…D2-12
 
@@ -40,12 +41,12 @@ Kanıt düzeyleri ayrıdır: **K** = kaynak/test (bu oturumda koşturuldu) · **
 | — | Süreç hataları M-05/M-07/M-12 | D2F-09 | `e36e96ad` | `d2f-sync-check --strict` PASS; `--audit-k2f` geçmişi yalnız raporlar | **Önleme araçla var (K)**; geçmiş ihlaller (28 çok commit'li prompt, 21 plan dışı pin) silinmedi |
 | — | Perf göreli bant | D2F-02 | `2edc9810` | Bayraklı ve bayraksız perf yeşil; A/B 1,098 | **Kapandı (K)** |
 
-Programın kendi süreç sapmaları (dürüstlük): D2F-03/04/05/06/08/11/12 birden çok commit'tir, D2F-04 erken yayın kuralı istisnasıyla (ORTAK-KURALLAR §9) yapıldı, D2F-11 kapısı yetki devriyle (§10) kapatıldı. Bunlar `strictExceptions`'ta (13 kayıt) gerekçeleriyle durur.
+Programın kendi süreç sapmaları (dürüstlük): D2F-03/04/05/06/08/11/12 birden çok commit'tir, D2F-04 erken yayın kuralı istisnasıyla (ORTAK-KURALLAR §9) yapıldı, D2F-11 kapısı yetki devriyle (§10) kapatıldı. Bunlar `strictExceptions`'ta (D2F-13 anında 13 kayıt; kapanışta 15) gerekçeleriyle durur.
 
 ## 3. Kanıt düzeyleri
 
 - **Kaynak/test (K):** bu belgedeki tüm "kapandı" satırları; yukarıdaki kapılar bu oturumda koşuldu.
-- **Yayın (Y):** pin `20261007a`, `main` — yalnız git kaydından (`59abe97b`); **canlıda bayt eşitliği bu oturumda doğrulanmadı.**
+- **Yayın (Y):** pin `20261007a`, `main` — yalnız git kaydından (`59abe97b`); **canlıda bayt eşitliği bu oturumda doğrulanmadı.** Sonra: kapanış pini `20261007b` canlıda bayt-eşit doğrulandı (§5).
 - **Cihaz (C):** hiçbiri. A-11/A-12 ölçülmedi.
 - **Kullanıcı onayı:** D2-04/D2-10 kararları kullanıcı onayı değil; yazılı devirle Claude kararıdır (seq 17); uygulayıcı Claude değil Copilot CLI oturumudur (seq 18–19, düzeltme notu LEDGER seq 25) (geri alma: `2fe3abf6` revert ya da kullanıcının kendi cevabı).
 
@@ -55,9 +56,9 @@ Programın kendi süreç sapmaları (dürüstlük): D2F-03/04/05/06/08/11/12 bir
 2. **13 eşlenmeyen namaz kelimesi** — uzman kararı; tahminle eşleme Arapça kuralına aykırı.
 3. **Hece sesi kayıtları (K-3)** — kayıt bekliyor.
 4. **Cihaz kabulü (A-11/A-12, K3)** ve **ekran okuyucu turu.**
-5. **Canlı bayt eşitliği (D2-06 geri kalanı, D2F-16)** — komutu kullanıcı çalıştırır.
+5. ~~**Canlı bayt eşitliği (D2-06 geri kalanı, D2F-16)** — komutu kullanıcı çalıştırır.~~ **Kapandı** (§5: 20/20 EŞİT, devirle Claude çalıştırdı).
 6. D2-12 `8bf8f658` kalıcı geri alınmak istenirse: ayrı ve açık onay (canlı arayüzü değiştirir).
-7. D2F-14/15 (yayın özeti, yayın): D2F-15 yayın adımı yalnız kullanıcı kararıyla; erken yayın zaten çıktı.
+7. ~~D2F-14/15 (yayın özeti, yayın): D2F-15 yayın adımı yalnız kullanıcı kararıyla; erken yayın zaten çıktı.~~ **Kapandı**: YAYIN-3 (pin `20261007b`) yetki devriyle yapıldı (LEDGER seq 23); açık "YAYIN-3 onaylı" cümlesi yoktur.
 
 ## 5. Canlı doğrulama (D2F-16, 2026-10-07)
 

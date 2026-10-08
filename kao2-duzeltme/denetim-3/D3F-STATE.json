@@ -12,6 +12,9 @@
     "closedPrograms": "FIX-STATE ve D2F-STATE closeCommit=128ab06d ile donduruldu; sync araçları kodu o commit'ten ölçer"
   },
   "pins": { "release": "20261008a" },
+  "releases": {
+    "YAYIN-4": { "approval": "user_explicit_2026-10-08", "quote": "önce buraya kadar olan kısımları canlıya al son ra yeni adım için starter yaz", "scope": "D3F-00…D3F-05", "pin": "20261008a", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-4/YAYIN.md" }
+  },
   "findings": {
     "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-01/KANIT.md" },
     "F-02": { "severity": "YÜKSEK", "title": "test_kao_render.js saate bağlı (21:30–23:29 kırmızı)", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-02/KANIT.md" },
@@ -42,6 +45,7 @@
     "D3F-02": ["6a20c702", "bb587965"],
     "D3F-03": ["dd875348"],
     "D3F-04": ["0d812c5c"],
-    "D3F-05": ["(bu commit)"]
+    "D3F-05": ["9181a4a8"],
+    "YAYIN-4": ["(bu commit)"]
   }
 }

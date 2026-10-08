@@ -948,4 +948,52 @@ check('E3 · Kelime dizme: 18 şablonun her biri 2000 tohumla kurulunca ekrandak
   assert.deepEqual(solved, {}, `çözülmüş açılan dizme: ${JSON.stringify(solved)}`);
 });
 
-console.log(`test_kao2_grammar_tasks (bölüm A+B+C+D+E): ${passed} kontrol PASS`);
+// D3F-01 (denetim-3 F-01): g21-k1 "Aynı kökten üç kelime" diyordu ama tablonun ilk üç satırını (ʿ-l-m, n-z-l, ġ-f-r) gösteriyordu.
+// Kalıp eşle şablonunun lemmaları dondurma hattından gelir (elle Arapça yok); görev o lemmalardan kurulur ve "aynı kök" diyen
+// bir görevin Arapça bağlamı tek kökten değilse doğrulayıcı reddeder (fail-closed).
+check('F1 · Kalıp eşle şablonlarının lemmaları kaynakla aynı (Arapça, okunuş, anlam, kök) — elle yazılmadı', () => {
+  let n = 0;
+  for (const x of allTemplates.filter((item) => item.template.type === 'Kalıp eşle')) {
+    const src = srcConcept(x.concept.id).templates.find((tpl) => tpl.id === x.template.id);
+    assert.ok(Array.isArray(x.template.lemmas) && x.template.lemmas.length === src.lemmas.length, `${x.template.id}: lemma listesi dondurulmalı`);
+    x.template.lemmas.forEach((row, i) => {
+      assert.equal(row[0], src.lemmas[i].ar, `${x.template.id}#${i} Arapça`);
+      assert.ok(row[1], `${x.template.id}#${i} okunuş boş`);
+      assert.equal(row[2], src.lemmas[i].tr1, `${x.template.id}#${i} anlam`);
+      assert.equal(row[3], src.lemmas[i].root, `${x.template.id}#${i} kök`);
+    });
+    n += 1;
+  }
+  assert.equal(n, 3, 'g19-k2 · g20-k1 · g21-k1');
+});
+
+check('F2 · g21-k1 her tohumda aynı kökten üç kelime gösterir; uyaran ve doğru anlam aynı lemmadan; doğrulayıcı kabul eder', () => {
+  const t = bootKao();
+  freshUser(t);
+  const lemmas = grammar.byId('g21').templates.find((tpl) => tpl.id === 'g21-k1').lemmas;
+  assert.equal(new Set(lemmas.map((row) => row[3])).size, 1, 'kaynak lemmalar tek kökten');
+  for (const day of ORDER_DAYS.slice(0, 200)) {
+    const task = buildFor(t, 'g:g21:g21-k1', day);
+    assert.ok(task, `${day}: görev kurulmalı`);
+    assert.deepEqual(Array.from(task.context, (c) => c.label), Array.from(lemmas, (row) => row[0]), `${day}: bağlam şablon lemmaları`);
+    const hit = lemmas.find((row) => row[0] === task.stimulus);
+    assert.ok(hit, `${day}: uyaran lemmalardan biri`);
+    assert.equal(task.answer, hit[2], `${day}: doğru şık uyaranın anlamı`);
+    assert.doesNotMatch(task.prompt, /eşleştir/, 'tek şıklı arayüzde "eşleştir" denmez');
+    assert.match(task.prompt, /[Aa]ynı kök/);
+    assert.equal(t.api.kaoGrammarTaskValid(task), true, `${day}: doğrulayıcı`);
+  }
+});
+
+check('F3 · mutasyon: "aynı kök" diyen görevin bağlamına başka kökten kelime girerse doğrulayıcı reddeder', () => {
+  const t = bootKao();
+  freshUser(t);
+  const task = buildFor(t, 'g:g21:g21-k1', '2026-10-08');
+  const foreign = grammar.byId('g21').tables[0].rows[0].cells.find((cell) => Array.isArray(cell) && cell[1]);
+  assert.ok(foreign && !task.context.some((c) => c.label === foreign[1]), 'başka kökten tablo hücresi');
+  const mixed = { ...task, context: [task.context[0], task.context[1], { label: foreign[1], pronunciation: foreign[2] }] };
+  assert.equal(t.api.kaoGrammarTaskValid(mixed), false, 'karışık kök bağlamı');
+  assert.equal(t.api.kaoGrammarTaskValid({ ...task, stimulus: foreign[1] }), false, 'uyaran lemmalardan değil');
+});
+
+console.log(`test_kao2_grammar_tasks (bölüm A+B+C+D+E+F): ${passed} kontrol PASS`);

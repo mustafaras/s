@@ -90,6 +90,16 @@ function compactExample(example, pronunciationSources) {
   });
   return [example.id, example.ref, words[0].w, example.tr, frozenWords];
 }
+// D3F-01 (denetim-3 F-01): "Kalıp eşle" şablonunun lemmaları [ar, okunuş, anlam, kök] olarak taşınır; g21-k1 "aynı kökten üç
+// kelime" görevini tablonun ilk üç (farklı kökten) satırı yerine bu listeden kurar. Arapça/anlam/kök sözlükten (resolved) aynen gelir.
+function compactTemplateLemmas(template) {
+  if (template.type !== 'Kalıp eşle' || !Array.isArray(template.lemmas)) return undefined;
+  return template.lemmas.map((lemma) => {
+    const pronunciation = turkishPronunciation(lemma.translit);
+    if (!lemma.ar || !pronunciation || !lemma.tr1 || !lemma.root) throw new Error(`${template.id}: ${lemma.lemmaId || 'lemma'} eksik alan (ar/translit/tr1/root)`);
+    return [lemma.ar, pronunciation, lemma.tr1, lemma.root];
+  });
+}
 function freezeGrammar() {
   const input = readJson('grammar.verified.json');
   if (input.consistencyTotal !== 0 || input.verifiedTotal !== 26) throw new Error('grammar.verified doğrulama kapısı geçmedi');
@@ -104,7 +114,8 @@ function freezeGrammar() {
     })),
     templates: item.templates.map((template) => ({
       id: template.id, type: template.type, exampleId: template.exampleId,
-      errorClass: template.errorClass, prompt: template.prompt
+      errorClass: template.errorClass, prompt: template.prompt,
+      lemmas: compactTemplateLemmas(template)
     })),
     explanation: Array.isArray(item.explanation) ? item.explanation.slice() : [],
     examples: (item.examples || []).map((example) => compactExample(example, pronunciationSources)),

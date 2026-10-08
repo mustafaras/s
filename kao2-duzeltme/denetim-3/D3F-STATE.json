@@ -11,9 +11,9 @@
     "push": "yok — push/deploy ayrıca açık kullanıcı onayı ister",
     "closedPrograms": "FIX-STATE ve D2F-STATE closeCommit=128ab06d ile donduruldu; sync araçları kodu o commit'ten ölçer"
   },
-  "pins": { "release": "20261007b" },
+  "pins": { "release": "20261008a" },
   "findings": {
-    "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "open" },
+    "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-01/KANIT.md" },
     "F-02": { "severity": "YÜKSEK", "title": "test_kao_render.js saate bağlı (21:30–23:29 kırmızı)", "status": "open" },
     "F-03": { "severity": "ORTA", "title": "kapilar.sh perf bloğu okunamayan satırı geçiriyor", "status": "open" },
     "F-04": { "severity": "ORTA", "title": "strictExceptions (kural a) sınırsız muafiyet", "status": "open" },

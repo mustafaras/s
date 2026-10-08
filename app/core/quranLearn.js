@@ -1546,11 +1546,17 @@
     if(record.concept.id==='g19') return gramColumnPairRecipe(record,seed,/fâil/i,/mef/i,"Bu 'yapan' (fâil) kelimenin aynı kökten 'yapılan' (mef'ûl) biçimi hangisi?",'Kök anlamı: ');
     if(record.concept.id==='g20') return gramColumnPairRecipe(record,seed,/^Fiil/i,/masdar/i,'Bu fiilin adı (masdarı) hangisi?','Anlamı: ');
     if(record.concept.id!=='g21') return gramUnsupported('bu kavramda eşleştirme tarifi yok');
-    var items=gramMeaningItems(gramRows(record)).slice(0,3);
-    if(items.length<3) return gramUnsupported('tabloda üç eşleşebilir satır yok');
+    // D3F-01: "aynı kökten üç kelime" şablonun dondurulmuş lemmalarından kurulur (tablonun ilk üç satırı üç ayrı kökten).
+    var items=gramTemplateLemmas(record);
+    if(items.length<3) return gramUnsupported('şablonda üç lemma yok');
+    if(!gramSameRoot(items)) return gramUnsupported('şablon lemmaları aynı kökten değil');
     var chosen=items[seededRank(seed,record.template.id)%items.length];
-    return {stimulus:chosen.stimulus.label,stimulusPronunciation:chosen.stimulus.pronunciation,answer:chosen.answer,alternatives:items.map(function(item){ return item.answer; }),context:items.map(function(item){ return {label:item.stimulus.label,pronunciation:item.stimulus.pronunciation}; })};
+    return {stimulus:chosen.label,stimulusPronunciation:chosen.pronunciation,prompt:'Aynı kökten üç kelime: bu kelimenin anlamı hangisi?',answer:chosen.meaning,alternatives:items.map(function(item){ return item.meaning; }),context:items.map(function(item){ return {label:item.label,pronunciation:item.pronunciation}; })};
   }
+  function gramTemplateLemmas(record){
+    return (Array.isArray(record.template.lemmas)?record.template.lemmas:[]).map(function(row){ return {label:String(row[0]||''),pronunciation:String(row[1]||''),meaning:String(row[2]||''),root:String(row[3]||'')}; });
+  }
+  function gramSameRoot(items){ return items.length>0&&items.every(function(item){ return item.root&&item.root===items[0].root; }); }
   function grammarRecipe(record,seed,ctx){
     var type=record.template.type;
     if(type==='Kelime dizme') return gramOrderRecipe(record,seed,ctx);
@@ -1621,6 +1627,14 @@
     }else if(stimulus){ if(!GRAMMAR_ARABIC.test(stimulus)) return false; }
     else if(type!=='Arapça seç'&&type!=='Kelime dizme'&&!choices.every(function(item){ return GRAMMAR_ARABIC.test(String(item.label||'')); })) return false;
     if(example&&(!example.ar||(stimulus?example.ar.indexOf(stimulus)<0:type!=='Kelime dizme'))) return false;
+    // D3F-01: "aynı kök" diyen görevde Arapça bağlam + uyaran şablonun tek kökten lemmalarıdır; değilse yanlış öğretir.
+    var arContext=(Array.isArray(task.context)?task.context:[]).filter(function(item){ return GRAMMAR_ARABIC.test(String(item&&item.label||'')); });
+    if(arContext.length>=2&&/aynı kök/i.test(String(task.prompt||''))){
+      var lemmas=gramTemplateLemmas(record),byLabel=Object.create(null);
+      lemmas.forEach(function(item){ byLabel[item.label]=item; });
+      var shown=arContext.map(function(item){ return byLabel[String(item.label)]; }).concat(stimulus?[byLabel[stimulus]]:[]);
+      if(!gramSameRoot(lemmas)||shown.some(function(item){ return !item; })) return false;
+    }
     return true;
   }
   // Bir kuyruk/plan öğesinin gramer görevi, GERÇEKTE kurulacağı tohumla (öğe kimliği) kurulup doğrulanır;

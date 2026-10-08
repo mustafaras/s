@@ -2,11 +2,11 @@
 
 <!-- d2f-sync
 nextPrompt: none
-lastSeq: 28
+lastSeq: 29
 status: completed
 -->
 
-**Son güncelleme:** 2026-10-08 · kapanış sonrası düzeltme notları (LEDGER seq 25, denetim-3 D3F-05; seq 26, D3F-08; seq 27, D3F-12; seq 28, D3F-13). Program 2026-10-07'de D2F-16 ile kapandı (`closeCommit` `128ab06d`); sonraki düzeltmeler `kao2-duzeltme/denetim-3/` (D3F-NN) altında.
+**Son güncelleme:** 2026-10-08 · kapanış sonrası düzeltme notları (LEDGER seq 25, denetim-3 D3F-05; seq 26, D3F-08; seq 27, D3F-12; seq 28, D3F-13; seq 29, D3F-14). Program 2026-10-07'de D2F-16 ile kapandı (`closeCommit` `128ab06d`); sonraki düzeltmeler `kao2-duzeltme/denetim-3/` (D3F-NN) altında.
 
 ## Nerede kaldık
 - **YAYIN (seq 7, kullanıcı kararı):** ortam değişikliği için D2F-04 sonrası erken yayın — pin `20261007a`, `main` ff-only (tarihsel; sonraki yayın D2F-15, pin `20261007b`). Ayrıntı: evidence/D2F-04/YAYIN.md (ORTAK-KURALLAR silindi; geri getirme: `git show d439127b:kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md`).

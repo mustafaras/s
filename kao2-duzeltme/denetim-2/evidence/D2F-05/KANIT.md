@@ -167,3 +167,8 @@ AssertionError [ERR_ASSERTION]: R-10 (M-11) · 2 kanıt yazımı (girintiden ba�
 4. **N-08 kaydı seq 7'de geride kalmış.** Erken yayın (seq 7) panel-v2.html pinini `20261007a` yapınca N-08 (D2-08) gerçekten kapandı,
    ama seq 7 bir GATE kaydı olduğu için D2F-STATE'in N durumu güncellenmedi; `d2f-sync-check --repro` bunu yakaladı ve D2F-05'te düzeltildi.
    N-08 ↔ D2F-15 eşlemesi artık geçersiz; D2F-15 yeni pin yazarsa N-08 yeniden değerlendirilir.
+
+## Düzeltme notu (denetim-3 F-14, 2026-10-08)
+Yukarıdaki mutasyonlar scratchpad'de koşulmuş, betik depoya alınmamıştı; iddia yeniden üretilemiyordu. Yeniden üretilebilir hâli depoda:
+`bash kao2-duzeltme/denetim-3/evidence/D3F-14/d2f-0509-mutasyon.sh` (13/13: D2F-09 kontrol · b×2 · c · d×3 · e×2 · f; D2F-05 kontrol · (a) · (b)).
+D2F-09'un (a) kuralı ve kapanış sonrası önek kuralı: `denetim-3/evidence/D3F-04/d2f-mutasyon.sh`. Ayrıntı: denetim-2 LEDGER seq 29.

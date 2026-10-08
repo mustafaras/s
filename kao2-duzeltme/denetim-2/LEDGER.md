@@ -388,3 +388,16 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kayıt ✓ (belge-denetimi.mjs 9/9) · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-3/evidence/D3F-13/KANIT.md
 - next: none
+
+## seq 29 · 2026-10-08 · NOTE · D2F-09
+- başlık: Düzeltme notu (denetim-3 F-14) — D2F-05 ve D2F-09 mutasyon kanıtları depoya alındı ve yeniden üretildi.
+- oturum: claude-code (denetim-3 düzeltmeleri, D3F-14; kao2-duzeltme/denetim-3/)
+- gerçek: D2F-05 KANIT'ı iki mutasyonu komutlarıyla yazmış ama "scratchpad; commit edilmedi" demişti; D2F-09 harness'i de scratchpad'de kalmıştı.
+- düzeltme: `denetim-3/evidence/D3F-14/d2f-0509-mutasyon.sh` (taze klon başına bir vaka, ağsız) bugünkü kodda **13/13 PASS**:
+  D2F-09 kontrol yeşil · b öneksiz / bilinmeyen önek · c pin · d Oturum yok / bölüm eksik / paylaşılan oturum · e closed / waiting · f bayat Canlı gerçekler →
+  her biri beklenen `[strict-x]` gerekçesiyle kırmızı; D2F-05 kontrol yeşil · (a) masteryAt yazılmaz → R-01 · (b) koşulsuz kanıt yazımı → R-10.
+  Kural (a) ve kapanış sonrası önekler D3F-04 betiğinde (8/8). Yeniden üretilemeyen vaka kalmadı.
+- değişen: yalnız kayıtlar (D2F-05 ve D2F-09 KANIT sonuna düzeltme notu · bu not · D2F-STATE `ledgerLastSeq` · CURRENT-STATE). Geçmiş satırlar değişmedi; kod/veri/pin yok.
+- kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-14/KANIT.md
+- next: none

@@ -71,3 +71,8 @@ kaynak/test ✓ · yayın — · cihaz —
 - Gerçek geçmişte `--strict` ilk koşuda 10 ihlal verdi: D2F-03/04/05/06/08 çok commit (NOT/YAYIN ek commit'leri), `8e583a93` öneksiz, `59abe97b` §9 yayını, D2F-06/08 paylaşılan oturum ve D2F-07 KANIT'ta "Yapılan (…)" başlığı (bölüm eşleşmesi önek-tolerant yapıldı: `## Yapılan …` geçer).
   Bunlar silinmedi, `strictExceptions`'ta gerekçeli; "PASS" bu 9 kayda dayanır.
 - Her prompttan sonra gelen "NOT — VS Code devir notu" commit'i (D2F-05/06 emsali) artık (a)'yı deler; D2F-09 böyle bir commit atmadı. Gerekirse not aynı commit'e girmeli.
+
+## Düzeltme notu (denetim-3 F-14, 2026-10-08)
+Yukarıdaki mutasyonlar scratchpad'de koşulmuş, betik depoya alınmamıştı; iddia yeniden üretilemiyordu. Yeniden üretilebilir hâli depoda:
+`bash kao2-duzeltme/denetim-3/evidence/D3F-14/d2f-0509-mutasyon.sh` (13/13: D2F-09 kontrol · b×2 · c · d×3 · e×2 · f; D2F-05 kontrol · (a) · (b)).
+D2F-09'un (a) kuralı ve kapanış sonrası önek kuralı: `denetim-3/evidence/D3F-04/d2f-mutasyon.sh`. Ayrıntı: denetim-2 LEDGER seq 29.

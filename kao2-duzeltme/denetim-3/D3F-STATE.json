@@ -4,7 +4,7 @@
   "source": "kao2-duzeltme/denetim-3/DENETIM-3-RAPORU.md",
   "baseCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
   "startedAt": "2026-10-08",
-  "nextFinding": "F-14",
+  "nextFinding": "F-15",
   "starter": "kao2-duzeltme/denetim-3/STARTER.md",
   "process": {
     "commitPrefix": "D3F-NN:",
@@ -35,7 +35,7 @@
     "F-11": { "severity": "DÜŞÜK", "title": "g17-k2 şıkları muğlak", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-11/KANIT.md", "pin": "20261008d" },
     "F-12": { "severity": "DÜŞÜK", "title": "12 ünitenin whyReview'u draft", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-12/KANIT.md", "note": "kayıt/sayım dürüstlüğü; why metinleri onaysız (draft) kalır — onay kullanıcı/devir kararıdır" },
     "F-13": { "severity": "DÜŞÜK", "title": "bayat ve çelişkili belgeler", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-13/KANIT.md", "note": "CURRENT-STATE kısmı D3F-05te; DUZELTME-SONUCU, CLAUDE.md/AGENTS.md 130 KB, DEVIR-LISTESI D3F-13te" },
-    "F-14": { "severity": "DÜŞÜK", "title": "D2F-05/09 mutasyon betikleri depoda değil", "status": "open" },
+    "F-14": { "severity": "DÜŞÜK", "title": "D2F-05/09 mutasyon betikleri depoda değil", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-14/KANIT.md", "note": "D2F-05 (a,b) ve D2F-09 (kontrol,b,c,d,e,f) depoda yeniden üretildi 13/13; a kuralı D3F-04te; yeniden üretilemeyen kalmadı" },
     "F-15": { "severity": "DÜŞÜK", "title": "K2F KANIT eksikleri (Oturum satırı, bölümler)", "status": "open" },
     "F-16": { "severity": "DÜŞÜK", "title": "okuyucu alt paneli role=dialog ama dialog değil", "status": "open" },
     "F-17": { "severity": "DÜŞÜK", "title": "D2F-16 ölçütü birebir sağlanmadı", "status": "open" },
@@ -64,6 +64,7 @@
     "D3F-11": ["7b9a908b"],
     "D3F-12": ["f07db9ab"],
     "D3F-13": ["070418a7"],
-    "YAYIN-8": ["(bu commit)"]
+    "YAYIN-8": ["e28049b2", "02c99355"],
+    "D3F-14": ["(bu commit)"]
   }
 }

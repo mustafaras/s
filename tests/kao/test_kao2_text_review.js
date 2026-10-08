@@ -121,17 +121,19 @@ check('(e) her metinde review kaydı; by yalnız rol kodu', () => {
 check('devirle onaylanan 158 metin kaynağını dürüstçe söyler', () => {
   const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8'));
   const entries = [
-    ...Object.values(texts.units),
-    ...Object.values(texts.lessons),
-    ...Object.values(texts.s0),
-    ...Object.values(texts.concepts)
+    ...Object.entries(texts.units).map(([k, v]) => [`u${k}`, v]),
+    ...Object.entries(texts.lessons),
+    ...Object.entries(texts.s0),
+    ...Object.entries(texts.concepts)
   ];
+  // D3F-09: u09.01'in metni 2026-10-07'de yeniden yazıldı ve o gün devirle (denetim-2 LEDGER seq 17) yeniden onaylandı.
+  const REAPPROVED = { 'u09.01': '2026-10-07' };
   assert.equal(entries.length, 158);
-  for (const entry of entries) {
-    assert.equal(entry.review.level, 'sourced');
-    assert.equal(entry.review.by, 'ai-delegated');
-    assert.equal(entry.review.delegatedBy, 'owner');
-    assert.equal(entry.review.delegatedAt, '2026-10-02');
+  for (const [id, entry] of entries) {
+    assert.equal(entry.review.level, 'sourced', id);
+    assert.equal(entry.review.by, 'ai-delegated', id);
+    assert.equal(entry.review.delegatedBy, 'owner', id);
+    assert.equal(entry.review.delegatedAt, REAPPROVED[id] || '2026-10-02', id);
   }
 });
 
@@ -244,6 +246,53 @@ check('D3F-06: inceleme sayfaları [x] işaretini kimin koyduğunu veriden söyl
   const notOwn = SHEETS[0][1].filter(([, e]) => visible(e) && !['owner', 'expert'].includes(e.review.by)).map(([id]) => id);
   const listed = (/: ([^\n]*)\.\n/.exec(reSection[1]) || [, ''])[1].split(', ').filter(Boolean);
   assert.deepEqual([...listed].sort(), [...notOwn].sort(), 'INCELEME-17: yeniden onay listesi kullanıcının kendi onayı olmayan görünür metinlerle aynı değil');
+});
+
+// D3F-09 (F-09): bir kaydın inceleme damgası (review.at ve varsa delegatedAt), metninin son değiştiği tarihten eski olamaz;
+// yoksa eski metnin onayı yeni metne taşınmış olur. Değişim tarihi git geçmişinden (taşıma dahil, --follow) türetilir;
+// commit'lenmemiş metin değişikliği bugünün tarihini alır. İlk görünüş değişim sayılmaz (geçmiş sığsa yanlış kırmızı vermez).
+check('D3F-09: inceleme damgası metnin son değişiminden eski değil (git geçmişi)', () => {
+  const { execFileSync } = require('node:child_process');
+  const rel = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
+  const git = (args) => execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 });
+  let log;
+  try { log = git(['log', '--follow', '--name-only', '--format=@%H %cs', '--', rel]); } catch { console.log('SKIP  git yok: damga/metin tarihi denetlenmedi'); return; }
+  const commits = [];
+  for (const line of log.split('\n').filter(Boolean)) {
+    if (line.startsWith('@')) { const [hash, date] = line.slice(1).split(' '); commits.push({ hash, date }); } else commits[commits.length - 1].path = line;
+  }
+  commits.reverse(); // --follow ile --reverse birlikte çalışmaz
+  const flat = (t) => {
+    const out = {};
+    for (const [k, v] of Object.entries(t.units || {})) out[`u${k}`] = v;
+    for (const bucket of ['lessons', 's0', 'concepts']) for (const [k, v] of Object.entries(t[bucket] || {})) out[k] = v;
+    return out;
+  };
+  const textOf = (entry) => { const copy = Object.assign({}, entry); delete copy.review; return JSON.stringify(copy); };
+  const changed = {};
+  let previous = {};
+  const step = (snapshot, date) => {
+    const now = {};
+    for (const [id, entry] of Object.entries(flat(snapshot))) {
+      now[id] = textOf(entry);
+      if (id in previous && previous[id] !== now[id]) changed[id] = date;
+    }
+    previous = now;
+  };
+  for (const c of commits) step(JSON.parse(git(['show', `${c.hash}:${c.path}`])), c.date);
+  const local = new Date();
+  const today = `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-${String(local.getDate()).padStart(2, '0')}`;
+  const current = JSON.parse(fs.readFileSync(path.join(repoRoot, rel), 'utf8'));
+  step(current, today);
+  const stale = [];
+  for (const [id, entry] of Object.entries(flat(current))) {
+    const review = entry.review || {};
+    if (review.level === 'draft' || !changed[id]) continue;
+    for (const key of ['at', 'delegatedAt']) {
+      if (review[key] !== undefined && String(review[key]) < changed[id]) stale.push(`${id}.${key}=${review[key]} < metin ${changed[id]}`);
+    }
+  }
+  assert.deepEqual(stale, [], `onay damgası metinden eski: ${stale.join(' · ')}`);
 });
 
 // K2F-20/21 (KR-4): kelime kümesi değişen bir dersin eski (onaylı) metni geçersizdir. Ders ya `draft` olmalı ya da

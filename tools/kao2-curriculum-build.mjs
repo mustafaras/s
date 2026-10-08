@@ -983,6 +983,10 @@ function applyReview({ textsPath, sheetPath, outDir, at, by, delegatedBy, delega
     if (entry.review.level === 'draft') {
       entry.review.level = 'sourced';
       entry.review.at = date;
+    } else if (at) {
+      // D3F-09 (F-09): görünür bir kaydın açık --at ile yeniden onayı yeni inceleme tarihini yazar; metni değişen kaydın
+      // eski damgası yeni metne taşınmasın. --at verilmezse ilk onay tarihi korunur (yetki devri metadata'sı gibi).
+      entry.review.at = at;
     }
     entry.review.by = reviewer;
     if (reviewer === 'ai-delegated') {
@@ -1004,9 +1008,10 @@ function applyReview({ textsPath, sheetPath, outDir, at, by, delegatedBy, delega
   const content = loadContent();
   const data = build(spec, content, texts);
   const conceptTexts = buildConceptTexts(texts);
+  // D3F-09: önceki sayfanın işaretleri taşınır, sonra onaylananlar işaretlenir; kısmi sayfa öteki kayıtların kutusunu düşürmez.
   const outputs = [[OUT_MODULE, renderModule(data)], [OUT_REVIEW, renderReview(data, spec, content)],
-    [OUT_TEXT_REVIEW, markApprovedBoxes(renderTextReview(data), approved)],
-    [OUT_CONCEPT_REVIEW, markApprovedBoxes(renderConceptReview(texts, content.grammar), approved)],
+    [OUT_TEXT_REVIEW, markApprovedBoxes(withCarriedMarks(OUT_TEXT_REVIEW, outDir, renderTextReview(data)), approved)],
+    [OUT_CONCEPT_REVIEW, markApprovedBoxes(withCarriedMarks(OUT_CONCEPT_REVIEW, outDir, renderConceptReview(texts, content.grammar)), approved)],
     [OUT_CONCEPT_MODULE, renderConceptModule(conceptTexts)],
     [OUT_PRAYER_MAP, renderPrayerMapJson(data.prayerMap)], [OUT_PRAYER_REVIEW, renderPrayerReview(data.prayerMap)]];
   for (const [file, text] of outputs) {

@@ -21,7 +21,8 @@
 
 Kutudaki `[x]` tek başına kimin onayladığını söylemez; aşağıdaki sayılar metin kaynağındaki (`texts.tr.json`) `review.by` kaydından üretilir.
 
-- `ai-delegated`: **133** — bu metinlerdeki `[x]` L1 işaretlerini kullanıcı değil, yetki devriyle yapay zekâ koydu (yetkiyi devreden: `owner`, devir tarihi 2026-10-02).
+- `ai-delegated`: **132** — bu metinlerdeki `[x]` L1 işaretlerini kullanıcı değil, yetki devriyle yapay zekâ koydu (yetkiyi devreden: `owner`, devir tarihi 2026-10-02).
+- `ai-delegated`: **1** — bu metinlerdeki `[x]` L1 işaretlerini kullanıcı değil, yetki devriyle yapay zekâ koydu (yetkiyi devreden: `owner`, devir tarihi 2026-10-07).
 - `owner` (kullanıcının kendi kutu onayı): **0**
 - `expert` (L2 alan uzmanı onayı): **0**
 

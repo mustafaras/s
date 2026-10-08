@@ -114,6 +114,42 @@ check('yetki devri mevcut sourced kayıtları dürüst metadata ile dönüştür
   }
 });
 
+// D3F-09 (F-09): metni değişmiş, zaten görünür bir kaydı yeniden onaylamak için tek kutulu sayfa + açık --at kullanılır.
+// (1) açık --at yeni inceleme tarihini yazar (eskiden yalnız draft → sourced geçişinde yazılıyordu);
+// (2) kısmi sayfa, çıktı inceleme sayfasındaki öteki kayıtların işaretlerini düşürmez (sourced ⇔ işaretli bozulmaz).
+// Tarih verideki değerden FARKLI seçilir; aynı olsaydı araç tarihi yazmasa da test geçerdi (D3F-09 mutasyonu M3 gösterdi).
+const REAPPLY_AT = '2026-10-08';
+const reapplyOne = (id, outName) => {
+  const textsPath = copyIn(TEXTS);
+  const before = JSON.parse(fs.readFileSync(textsPath, 'utf8'));
+  const sheetPath = path.join(tmp, `SHEET-17-ONE-${outName}.md`);
+  fs.writeFileSync(sheetPath, read(SHEET_17).replace(/\[x\]/gi, '[ ]').split('\n')
+    .map((line) => (line.startsWith(`| ${id} |`) ? line.replace('- [ ]', '- [x]') : line)).join('\n'));
+  const out = path.join(tmp, outName);
+  execFileSync(process.execPath, [TOOL, '--apply-review', '--texts', textsPath, '--sheet', sheetPath, '--out-dir', out,
+    '--at', REAPPLY_AT, '--by', 'ai-delegated', '--delegated-by', 'owner', '--delegated-at', REAPPLY_AT], { encoding: 'utf8' });
+  return { before, after: JSON.parse(fs.readFileSync(textsPath, 'utf8')), out };
+};
+
+check('D3F-09: açık --at, görünür bir kaydı yeniden onaylarken inceleme tarihini yazar; ötekilere dokunmaz', () => {
+  const { before, after } = reapplyOne('u09.01', 'reapply-at');
+  assert.notEqual(before.lessons['u09.01'].review.at, REAPPLY_AT, 'sınama tarihi verideki tarihten farklı olmalı');
+  assert.equal(after.lessons['u09.01'].review.at, REAPPLY_AT, 'açık --at yazılmadı');
+  assert.equal(after.lessons['u09.01'].review.delegatedAt, REAPPLY_AT);
+  assert.equal(after.lessons['u09.01'].review.level, 'sourced');
+  const others = (t) => { const c = JSON.parse(JSON.stringify(t)); delete c.lessons['u09.01']; return c; };
+  assert.deepEqual(others(after), others(before), 'öteki kayıtlar değişmemeli');
+});
+
+check('D3F-09: kısmi sayfayla onay, çıktı inceleme sayfasındaki öteki işaretleri düşürmez', () => {
+  const { out } = reapplyOne('u09.01', 'reapply-marks');
+  const sheet = fs.readFileSync(path.join(out, SHEET_17), 'utf8');
+  const boxes = (text) => (text.match(/- \[x\]/g) || []).length;
+  assert.equal(boxes(sheet), boxes(read(SHEET_17)), 'çıktı sayfasında işaret sayısı düştü');
+  assert.match(sheet, /^\| u09\.01 \|.*\| - \[x\] \|$/m, 'u09.01 kutusu işaretli değil');
+  assert.equal(fs.readFileSync(path.join(out, SHEET_18), 'utf8'), read(SHEET_18), 'INCELEME-18 işaretleri korunmadı');
+});
+
 check('onaylanmamış kutu draft bırakır', () => {
   const textsPath = copyIn(TEXTS);
   const sheetPath = path.join(tmp, 'SHEET-18-PARTIAL.md');

@@ -1431,14 +1431,19 @@
   }
   // Çekim/emir tablolarında "kelimeyi parçalarına ayır" yerine ek tanıma: Arapça biçim verilir, hangi şahıs/kime ait olduğu sorulur
   // (şahıs ekini tanımak). Aynı biçim iki satırda geçiyorsa (belirsiz) o satırlar ne soru ne çeldirici olur.
-  var GRAMMAR_PERSON_PROMPTS={g13:'Bu geçmiş zaman biçimi kimin için? (şahıs ekini tanı)',g15:'Bu şimdiki zaman biçimi kimin için? (şahıs ekini tanı)',g17:'Bu emir kime söylenmiş?'};
+  var GRAMMAR_PERSON_PROMPTS={g13:'Bu geçmiş zaman biçimi kimin için? (şahıs ekini tanı)',g15:'Bu şimdiki zaman biçimi kimin için? (şahıs ekini tanı)',g17:'Bu emir kime söylenmiş? (tek kişiye mi, topluluğa mı?)'};
+  // D3F-11: şık yalnız kişidir. Etiketteki parantez notu cinsiyetse ("o (erkek)") kişiye aittir; değilse ("siz (kulluk)") anlam
+  // notudur ve atılır. Aynı kişiyi gösteren şıkları choiceList tekilleştirir (doğru cevap önce girer); tarif yalnız ayrı bir kişi var mı bakar.
+  function gramPersonKey(label){ return String(label||'').replace(/\s*\((?!(?:erkek|kadın)\))[^)]*\)/g,'').replace(/\s+/g,' ').trim(); }
   function gramPersonRecipe(record,seed){
     var forms=Object.create(null),items=gramRows(record).map(function(row){ var ar=gramCells(row).find(gramIsAr); return ar?{row:row,ar:ar}:null; }).filter(Boolean);
     items.forEach(function(item){ forms[item.ar.label]=(forms[item.ar.label]||0)+1; });
     var unique=items.filter(function(item){ return forms[item.ar.label]===1; });
     if(unique.length<4) return gramUnsupported('tabloda tek anlamlı (yinelenmeyen) en az dört biçim yok');
-    var chosen=gramPick(unique,seed+'|'+record.template.id);
-    return {stimulus:chosen.ar.label,stimulusPronunciation:chosen.ar.pronunciation,prompt:GRAMMAR_PERSON_PROMPTS[record.concept.id],answer:String(chosen.row.label),alternatives:gramShuffle(unique.filter(function(item){ return item!==chosen; }).map(function(item){ return String(item.row.label); }),seed+'|persons'),context:[{label:String((record.concept.tables[0]||{}).title||record.concept.title),pronunciation:''}]};
+    var chosen=gramPick(unique,seed+'|'+record.template.id),answer=gramPersonKey(chosen.row.label);
+    var others=unique.map(function(item){ return gramPersonKey(item.row.label); }).filter(function(key){ return key!==answer; });
+    if(!others.length) return gramUnsupported('tabloda en az iki ayrı kişi yok');
+    return {stimulus:chosen.ar.label,stimulusPronunciation:chosen.ar.pronunciation,prompt:GRAMMAR_PERSON_PROMPTS[record.concept.id],answer:answer,alternatives:gramShuffle(others,seed+'|persons'),context:[{label:String((record.concept.tables[0]||{}).title||record.concept.title),pronunciation:''}]};
   }
   function gramColumnIndex(record,pattern){
     var columns=(record.concept.tables[0]||{}).columns||[];

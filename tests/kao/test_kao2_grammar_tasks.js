@@ -341,6 +341,8 @@ check('B6 · yanlış cevap sonrası "yeniden dene" farklı tohumla kurulur ve o
 const htmlEsc = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const stripParens = (text) => String(text || '').replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
 const cellKinds = (row) => row.cells.map((cell) => (Array.isArray(cell) ? (ARABIC.test(String(cell[1] || '')) ? { ar: String(cell[1]) } : { empty: true }) : { text: String(cell) }));
+// D3F-11: tablo etiketinden kişi; parantez notu cinsiyetse ("o (erkek)") kişiye aittir, değilse ("siz (kulluk)") anlam notudur.
+const personKey = (label) => String(label).replace(/\s*\((?!(?:erkek|kadın)\))[^)]*\)/g, '').replace(/\s+/g, ' ').trim();
 const SEEDS = ['2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02'];
 const allTemplates = grammar.concepts.flatMap((concept) => concept.templates.map((template) => ({ concept, template, cardId: `g:${concept.id}:${template.id}` })));
 const buildFor = (t, cardId, day) => { const id = `kao:${day}:${cardId}`; return t.api.kaoBuildGrammarTask({ id, cardId, type: 'grammar' }, t.data, { seed: id }); };
@@ -444,7 +446,7 @@ check('C4 · Ek çöz (g1 "el" ve g5 yapışık ek), Anlam seç ve Arapça seç:
       assert.ok(owner.length >= 1, `${x.cardId} ${day}: Arapça hücre tabloda yok`);
       const texts = (row) => [row.label, ...cellKinds(row).filter((c) => c.text).map((c) => c.text.replace(/^[IVX]+:\s*/, ''))];
       if (task.grammarType === 'Arapça seç') { const asked = task.prompt.slice(1, task.prompt.lastIndexOf("' hangisi?")); assert.ok(owner.some((row) => texts(row).some((text) => stripParens(text) === stripParens(asked))), `${x.cardId} ${day}: doğru Arapça '${asked}' satırından değil`); checked += 1; continue; }
-      const okAnswer = owner.some((row) => texts(row).includes(correct) || (x.concept.id === 'g1' && correct === `el + ${row.label}`) || ['Tekil', 'Çoğul'].includes(correct) || (x.concept.id === 'g0_5' && texts(row).length));
+      const okAnswer = owner.some((row) => texts(row).includes(correct) || (x.concept.id === 'g1' && correct === `el + ${row.label}`) || ['Tekil', 'Çoğul'].includes(correct) || (x.concept.id === 'g0_5' && texts(row).length) || (['g13', 'g15', 'g17'].includes(x.concept.id) && personKey(row.label) === correct));
       assert.ok(okAnswer || x.concept.id === 'g0_5' || x.concept.id === 'g12', `${x.cardId} ${day}: cevap "${correct}" aynı satırdan gelmiyor`);
       checked += 1;
     }
@@ -582,6 +584,29 @@ check('C10 · kavram sayfası: doğrulanmış âyet örnekleri (kelime kelime ok
   }
 });
 
+// D3F-11 (denetim-3 F-11): kişi tanıma sorusu kişiyi sınar, anlamı değil (personKey: dosya başında).
+check('D3F-11 · kişi sorusunda şıklar yalnız kişidir ve hiçbir ikisi aynı kişiyi göstermez (g13/g15/g17)', () => {
+  const t = bootKao();
+  freshUser(t);
+  const rowsOf = (id) => grammar.byId(id).tables[0].rows;
+  const arCells = (row) => row.cells.filter((c) => Array.isArray(c) && ARABIC.test(String(c[1] || ''))).map((c) => c[1]);
+  for (const day of SEEDS) {
+    for (const [card, concept] of [['g:g13:g13-k3', 'g13'], ['g:g15:g15-k2', 'g15'], ['g:g17:g17-k2', 'g17']]) {
+      const task = buildFor(t, card, day);
+      assert.equal(t.api.kaoGrammarTaskValid(task), true, `${card} ${day}: geçerli görev`);
+      const labels = task.choices.map((c) => c.label);
+      for (const label of labels) assert.equal(label, personKey(label), `${card} ${day}: şık anlam notu taşıyor: "${label}"`);
+      assert.equal(new Set(labels.map(personKey)).size, labels.length, `${card} ${day}: iki şık aynı kişiyi gösteriyor: ${labels.join(' / ')}`);
+      const owner = rowsOf(concept).find((row) => arCells(row)[0] === task.stimulus);
+      assert.ok(owner, `${card} ${day}: uyaran tabloda yok`);
+      assert.equal(task.choices.find((c) => c.correct).label, personKey(owner.label), `${card} ${day}: doğru cevap uyaranın kişisi`);
+      const keys = new Set(rowsOf(concept).map((row) => personKey(row.label)));
+      assert.ok(labels.every((label) => keys.has(label)), `${card} ${day}: tabloda olmayan kişi şıkkı`);
+      if (concept === 'g17') assert.match(task.prompt, /tek kişiye mi, topluluğa mı\?/, `${card}: yönerge kişiyi (tek/topluluk) sorduğunu söylemiyor`);
+    }
+  }
+});
+
 check('C11 · yeni tarifler: kişi tanıma (g13/g15/g17), tamlama (g2), masdar (g20), fâil→mef\'ûl ve fiil→masdar eşleştirme tablodaki AYNI satırdan doğrulanır', () => {
   const t = bootKao();
   freshUser(t);
@@ -593,11 +618,12 @@ check('C11 · yeni tarifler: kişi tanıma (g13/g15/g17), tamlama (g2), masdar (
       assert.equal(t.api.kaoGrammarTaskValid(task), true, card);
       const owner = rowsOf(concept).filter((row) => arCells(row)[0] === task.stimulus);
       assert.equal(owner.length, 1, `${card} ${day}: biçim tabloda tek satıra ait olmalı`);
-      assert.equal(task.choices.find((c) => c.correct).label, owner[0].label, `${card}: doğru şahıs/kişi`);
-      const allLabels = new Set(rowsOf(concept).map((row) => row.label));
+      // D3F-11: şık satır etiketinin kişi kısmıdır (personKey); anlam notu atılır, cinsiyet notu kalır.
+      assert.equal(task.choices.find((c) => c.correct).label, personKey(owner[0].label), `${card}: doğru şahıs/kişi`);
+      const allLabels = new Set(rowsOf(concept).map((row) => personKey(row.label)));
       assert.ok(task.choices.every((c) => allLabels.has(c.label)), `${card}: çeldirici tablo dışı`);
       const forms = rowsOf(concept).map((row) => arCells(row)[0]);
-      for (const c of task.choices) { const row = rowsOf(concept).find((r) => r.label === c.label); assert.equal(forms.filter((f) => f === arCells(row)[0]).length, 1, `${card}: yinelenen biçimli satır çeldirici/soru olamaz`); }
+      for (const c of task.choices) { const rows = rowsOf(concept).filter((r) => personKey(r.label) === c.label); assert.ok(rows.some((row) => forms.filter((f) => f === arCells(row)[0]).length === 1), `${card}: yinelenen biçimli satır çeldirici/soru olamaz`); }
     }
     const phrase = buildFor(t, 'g:g2:g2-k4', day);
     const asked = phrase.prompt.slice(1, phrase.prompt.lastIndexOf("' tamlaması"));

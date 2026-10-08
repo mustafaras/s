@@ -16,7 +16,8 @@
   "pins": { "release": "20261008a" },
   "releases": {
     "YAYIN-4": { "approval": "user_explicit_2026-10-08", "quote": "önce buraya kadar olan kısımları canlıya al son ra yeni adım için starter yaz", "scope": "D3F-00…D3F-05", "pin": "20261008a", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-4/YAYIN.md", "pushed": "128ab06d..700cae25", "pagesRun": "37781196494 success", "live": "63/63 bayt-eşit · gizlilik 8/8 404 (CANLI.md)" },
-    "YAYIN-5": { "approval": "user_explicit_2026-10-08", "quote": "önce düzelt sonra tüm değişiklikleri canlıya al", "scope": "c4116a53 + D3F-06", "pin": "20261008a (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapilar.sh 5/20 kapıda kullanıcı kararıyla durduruldu (\"atlayalım\"); hızlı set 6/6 PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-5/YAYIN.md" }
+    "YAYIN-5": { "approval": "user_explicit_2026-10-08", "quote": "önce düzelt sonra tüm değişiklikleri canlıya al", "scope": "c4116a53 + D3F-06", "pin": "20261008a (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapilar.sh 5/20 kapıda kullanıcı kararıyla durduruldu (\"atlayalım\"); hızlı set 6/6 PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-5/YAYIN.md" },
+    "YAYIN-6": { "approval": "user_explicit_2026-10-08", "quote": "başla ve tam bir push commit merge deploy istiyorum", "scope": "4a0ada6f + D3F-07 + D3F-08", "pin": "20261008a (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapilar.sh 5/20 kapıda kullanıcı kararıyla durduruldu (\"atla ve canlıya al\"); hızlı set 9/9 PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-6/YAYIN.md" }
   },
   "findings": {
     "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-01/KANIT.md" },
@@ -53,6 +54,7 @@
     "D3F-06": ["b9db08b9"],
     "YAYIN-5": ["2f0f6f02", "4a0ada6f"],
     "D3F-07": ["13a6d345"],
-    "D3F-08": ["(bu commit)"]
+    "D3F-08": ["9e5e5df6"],
+    "YAYIN-6": ["(bu commit)"]
   }
 }

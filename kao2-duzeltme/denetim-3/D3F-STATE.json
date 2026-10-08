@@ -4,6 +4,8 @@
   "source": "kao2-duzeltme/denetim-3/DENETIM-3-RAPORU.md",
   "baseCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
   "startedAt": "2026-10-08",
+  "nextFinding": "F-06",
+  "starter": "kao2-duzeltme/denetim-3/STARTER.md",
   "process": {
     "commitPrefix": "D3F-NN:",
     "rule": "her bulgu ayrı düzeltme ve tek yerel commit; her düzeltmeden sonra kullanıcı onayı alınır, sonra sıradakine geçilir",
@@ -13,7 +15,7 @@
   },
   "pins": { "release": "20261008a" },
   "releases": {
-    "YAYIN-4": { "approval": "user_explicit_2026-10-08", "quote": "önce buraya kadar olan kısımları canlıya al son ra yeni adım için starter yaz", "scope": "D3F-00…D3F-05", "pin": "20261008a", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-4/YAYIN.md" }
+    "YAYIN-4": { "approval": "user_explicit_2026-10-08", "quote": "önce buraya kadar olan kısımları canlıya al son ra yeni adım için starter yaz", "scope": "D3F-00…D3F-05", "pin": "20261008a", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-4/YAYIN.md", "pushed": "128ab06d..700cae25", "pagesRun": "37781196494 success", "live": "63/63 bayt-eşit · gizlilik 8/8 404 (CANLI.md)" }
   },
   "findings": {
     "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-01/KANIT.md" },
@@ -46,6 +48,6 @@
     "D3F-03": ["dd875348"],
     "D3F-04": ["0d812c5c"],
     "D3F-05": ["9181a4a8"],
-    "YAYIN-4": ["(bu commit)"]
+    "YAYIN-4": ["700cae25", "(canlı kaydı + starter)"]
   }
 }

@@ -184,6 +184,68 @@ check('inceleme sayfası ve metin kaynağı mevcut', () => {
   assert.ok(sheet.includes('- [ ]'), 'onay kutuları var');
 });
 
+// D3F-06 (F-06): `[x]` tek başına kimin onayladığını söylemez. İki inceleme sayfası da işareti kimin koyduğunu
+// metin kaynağındaki review.by / delegatedBy / delegatedAt kaydından türeterek yazmalı (sayfa düzeyi + kayıt başı).
+check('D3F-06: inceleme sayfaları [x] işaretini kimin koyduğunu veriden söyler', () => {
+  const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
+  const texts = JSON.parse(read('docs/kuran-ogreniyorum/kao2/content/texts.tr.json'));
+  const SHEETS = [
+    ['docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md', [
+      ...Object.keys(texts.units).map((k) => [`u${k}`, texts.units[k]]),
+      ...Object.entries(texts.lessons),
+      ...Object.entries(texts.s0)
+    ]],
+    ['docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md', Object.entries(texts.concepts)]
+  ];
+  const visible = (e) => e.review && ['sourced', 'expert'].includes(e.review.level);
+  // Kaydın kutusunu taşıyan satır: ünite/kavram başlık bloğundaki "- İnceleme:" satırı, ders/S0 tablo satırı.
+  const reviewLineFor = (lines, id) => {
+    const unit = /^u(\d+)$/.exec(id);
+    const heading = unit ? new RegExp(`^### Ünite ${unit[1]} ·`) : new RegExp(`^### ${id.replace(/\./g, '\\.')} ·`);
+    const start = lines.findIndex((l) => heading.test(l));
+    if (start >= 0) return lines.slice(start + 1).find((l) => /^- İnceleme:/.test(l) || /^### /.test(l));
+    return lines.find((l) => l.startsWith(`| ${id} |`));
+  };
+  for (const [rel, entries] of SHEETS) {
+    const name = path.basename(rel);
+    const sheet = read(rel);
+    const lines = sheet.split('\n');
+    const section = /\n## Onayı kim verdi\n([\s\S]*?)\n## /.exec(sheet);
+    assert.ok(section, `${name}: "Onayı kim verdi" bölümü yok`);
+    const body = section[1].split('\n');
+    const shown = entries.filter(([, e]) => visible(e));
+    const groups = new Map();
+    for (const [, e] of shown.filter(([, x]) => x.review.by === 'ai-delegated')) {
+      const key = `${e.review.delegatedBy}|${e.review.delegatedAt}`;
+      groups.set(key, (groups.get(key) || 0) + 1);
+    }
+    for (const [key, n] of groups) {
+      const [by, at] = key.split('|');
+      const line = body.find((l) => l.includes('`ai-delegated`') && l.includes(`**${n}**`) && l.includes(`\`${by}\``) && l.includes(at));
+      assert.ok(line, `${name}: ${n} devirli kayıt (${by}, ${at}) için açıklama satırı yok`);
+      assert.match(line, /yetki devriyle yapay zekâ/, `${name}: devir satırı işareti yapay zekânın koyduğunu söylemiyor`);
+    }
+    const owner = shown.filter(([, e]) => e.review.by === 'owner').length;
+    const expert = entries.filter(([, e]) => e.review && e.review.level === 'expert').length;
+    assert.ok(body.some((l) => l.includes('`owner`') && l.includes(`**${owner}**`)), `${name}: kullanıcının kendi onayı sayısı (${owner}) yazmıyor`);
+    assert.ok(body.some((l) => l.includes('`expert`') && l.includes(`**${expert}**`)), `${name}: L2 uzman onayı sayısı (${expert}) yazmıyor`);
+    for (const [id, e] of shown) {
+      const line = reviewLineFor(lines, id);
+      assert.ok(line, `${name}: ${id} inceleme satırı bulunamadı`);
+      const by = e.review.by || 'onaylayan kayıtsız';
+      assert.ok(line.includes(by), `${name}: ${id} satırı onaylayanı (${by}) söylemiyor: ${line}`);
+    }
+  }
+  // "Yeniden onay gerekli" kutunun kendisini değil kullanıcının kendi onayını sorar; işaretli kutuyla çelişen dil kalmaz.
+  const s17 = read(SHEETS[0][0]);
+  assert.doesNotMatch(s17, /açık kutu onayı olmayan|hiçbiri senin kutu işaretinle onaylanmadı/, 'INCELEME-17: işaretli kutularla çelişen "kutu onayı yok" dili duruyor');
+  const reSection = /\n## Yeniden onay gerekli\n([\s\S]*?)\n## /.exec(s17);
+  assert.ok(reSection, 'INCELEME-17: "Yeniden onay gerekli" bölümü yok');
+  const notOwn = SHEETS[0][1].filter(([, e]) => visible(e) && !['owner', 'expert'].includes(e.review.by)).map(([id]) => id);
+  const listed = (/: ([^\n]*)\.\n/.exec(reSection[1]) || [, ''])[1].split(', ').filter(Boolean);
+  assert.deepEqual([...listed].sort(), [...notOwn].sort(), 'INCELEME-17: yeniden onay listesi kullanıcının kendi onayı olmayan görünür metinlerle aynı değil');
+});
+
 // K2F-20/21 (KR-4): kelime kümesi değişen bir dersin eski (onaylı) metni geçersizdir. Ders ya `draft` olmalı ya da
 // değişiklikten SONRA bir sahibin açık onayıyla (by + at ≥ 2026-10-02) `sourced` yapılmış olmalı.
 check('kelime kümesi değişen her ders draft ya da değişiklik sonrası açık onaylı', () => {

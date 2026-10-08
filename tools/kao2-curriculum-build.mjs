@@ -612,6 +612,37 @@ function renderReview(data, spec, { lex, grammar }) {
   return lines.join('\n');
 }
 
+// D3F-06 (F-06): `[x]` tek başına kimin onayladığını söylemez. Onaylayan, metin kaynağındaki review.by kaydından
+// sayfaya yazılır. Etiket ünite/kavram bloğunda "- İnceleme:" satırına, tabloda düzey hücresinin backtick'i içine
+// konur: ikisi de işaret taşımanın bağlam karşılaştırmasına girmez, böylece mevcut işaretler korunur.
+function reviewerLabel(review) {
+  if (!review || review.level === 'draft') return '';
+  return review.by ? ` · ${review.by}` : ' · onaylayan kayıtsız';
+}
+
+function renderReviewAttribution(reviews) {
+  const visible = reviews.filter((r) => r && r.level !== 'draft');
+  const delegated = new Map();
+  visible.filter((r) => r.by === 'ai-delegated').forEach((r) => {
+    const key = `${r.delegatedBy}|${r.delegatedAt}`;
+    delegated.set(key, (delegated.get(key) || 0) + 1);
+  });
+  const owner = visible.filter((r) => r.by === 'owner').length;
+  const expert = reviews.filter((r) => r && r.level === 'expert').length;
+  const unknown = visible.filter((r) => !['owner', 'expert', 'ai-delegated'].includes(r.by)).length;
+  const lines = ['## Onayı kim verdi', '',
+    'Kutudaki `[x]` tek başına kimin onayladığını söylemez; aşağıdaki sayılar metin kaynağındaki (`texts.tr.json`) `review.by` kaydından üretilir.', ''];
+  [...delegated.keys()].sort().forEach((key) => {
+    const [by, at] = key.split('|');
+    lines.push(`- \`ai-delegated\`: **${delegated.get(key)}** — bu metinlerdeki \`[x]\` L1 işaretlerini kullanıcı değil, yetki devriyle yapay zekâ koydu (yetkiyi devreden: \`${by}\`, devir tarihi ${at}).`);
+  });
+  lines.push(`- \`owner\` (kullanıcının kendi kutu onayı): **${owner}**`,
+    `- \`expert\` (L2 alan uzmanı onayı): **${expert}**`);
+  if (unknown) lines.push(`- onaylayan kayıtsız: **${unknown}**`);
+  lines.push('');
+  return lines;
+}
+
 // KAO2-17 · K-4 L1/L2 inceleme sayfası (araç üretir; kullanıcı onayı bu dosyaya işlenir).
 function renderTextReview(data) {
   const lines = ['# İnceleme · KAO2-17 — Ünite ve ders metinleri', '',
@@ -628,11 +659,12 @@ function renderTextReview(data) {
   data.s0.lessons.forEach((l) => all.push({ id: l.id, kind: 'S0', title: l.title, goal: l.goal, review: l.review }));
   const count = (level) => all.filter((t) => t.review.level === level).length;
   const drafts = all.filter((t) => t.review.level === 'draft');
-  const reapprove = all.filter((t) => t.review.level !== 'draft');
+  const reapprove = all.filter((t) => t.review.level !== 'draft' && !['owner', 'expert'].includes(t.review.by));
   lines.push(`- Toplam metin: **${all.length}**`,
     `- \`draft\` (görünmez): **${count('draft')}**`,
     `- \`sourced\` (görünür): **${count('sourced')}**`,
     `- \`expert\` (görünür): **${count('expert')}**`, '');
+  lines.push(...renderReviewAttribution(all.map((t) => t.review)));
   // KR-4: yeniden yazılanlar ve kutu onayı olmadan görünür kalanlar ayrı listelenir.
   const cell = (v) => String(v ?? '—').replace(/\|/g, '\\|');
   lines.push('## Yeniden yazılan metinler (`draft`, K2F-21)', '',
@@ -641,25 +673,27 @@ function renderTextReview(data) {
     lines.push('| id | başlık | hedef |', '|---|---|---|');
     drafts.forEach((t) => lines.push(`| ${t.id} | ${cell(t.title)} | ${cell(t.goal)} |`));
   } else lines.push('Yok.');
-  lines.push('', '## Yeniden onay gerekli', '',
-    `Bugün \`sourced\` (görünür) olup **açık kutu onayı olmayan** ${reapprove.length} metin vardır: ${reapprove.map((t) => t.id).join(', ') || '—'}.`,
-    'Bunların hiçbiri senin kutu işaretinle onaylanmadı; aşağıdaki tablolarda `[x]` yapmadığın metin onaylı sayılmaz.', '',
-    '## Üniteler', '');
+  lines.push('', '## Yeniden onay gerekli', '');
+  if (reapprove.length) {
+    lines.push(`Bugün görünür olup **senin kendi onayını taşımayan** ${reapprove.length} metin vardır: ${reapprove.map((t) => t.id).join(', ')}.`,
+      'Bunlardaki `[x]` senin kendi onayın değildir; işareti kimin koyduğu "Onayı kim verdi" bölümünde yazar.');
+  } else lines.push('Yok.');
+  lines.push('', '## Üniteler', '');
   data.units.forEach((u) => {
     lines.push(`### Ünite ${u.id} · ${u.title}`, '',
       `- Vaad: ${u.promise}`,
       u.why ? `- Neden önemli: ${u.why}` : '- Neden önemli: —',
-      `- İnceleme: \`${u.review.level}\`${Array.isArray(u.review.sources) && u.review.sources.length ? ` · kaynak: ${u.review.sources.join(', ')}` : ''}`,
+      `- İnceleme: \`${u.review.level}${reviewerLabel(u.review)}\`${Array.isArray(u.review.sources) && u.review.sources.length ? ` · kaynak: ${u.review.sources.join(', ')}` : ''}`,
       '- [ ] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun', '');
   });
   lines.push('## Dersler', '');
   data.units.forEach((u) => {
     lines.push(`### Ünite ${u.id} dersleri`, '', '| ders | başlık | hedef | inceleme | onay |', '|---|---|---|---|---|');
-    u.lessons.forEach((l) => lines.push(`| ${l.id} | ${l.title} | ${l.goal || '—'} | \`${l.review.level}\` | - [ ] |`));
+    u.lessons.forEach((l) => lines.push(`| ${l.id} | ${l.title} | ${l.goal || '—'} | \`${l.review.level}${reviewerLabel(l.review)}\` | - [ ] |`));
     lines.push('');
   });
   lines.push('## Seviye 0', '', '| ders | başlık | hedef | inceleme | onay |', '|---|---|---|---|---|');
-  data.s0.lessons.forEach((l) => lines.push(`| ${l.id} | ${l.title} | ${l.goal || '—'} | \`${l.review.level}\` | - [ ] |`));
+  data.s0.lessons.forEach((l) => lines.push(`| ${l.id} | ${l.title} | ${l.goal || '—'} | \`${l.review.level}${reviewerLabel(l.review)}\` | - [ ] |`));
   lines.push('');
   return lines.join('\n');
 }
@@ -689,6 +723,7 @@ function renderConceptReview(texts, grammar) {
   const ids = Object.keys(concepts).sort();
   const draftCount = ids.filter((id) => !(concepts[id].review && concepts[id].review.level !== 'draft')).length;
   lines.push('## Durum', '', `- Toplam kavram: **${ids.length}**`, `- \`draft\` (görünmez): **${draftCount}**`, '');
+  lines.push(...renderReviewAttribution(ids.map((id) => (concepts[id] && concepts[id].review) || { level: 'draft' })));
   lines.push('## Kavramlar', '');
   ids.forEach((id) => {
     const entry = concepts[id] || {};
@@ -696,7 +731,7 @@ function renderConceptReview(texts, grammar) {
     lines.push(`### ${id} · ${concept ? concept.title : '—'}`, '',
       `- Çözümlü örnek (workedTr): ${entry.workedTr || '—'}`,
       `- Hata açıklaması (errorTr): ${entry.errorTr || '—'}`,
-      `- İnceleme: \`${(entry.review && entry.review.level) || 'draft'}\``,
+      `- İnceleme: \`${(entry.review && entry.review.level) || 'draft'}${reviewerLabel(entry.review)}\``,
       '- [ ] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun', '');
   });
   return lines.join('\n');

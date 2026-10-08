@@ -1306,3 +1306,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence: kao2-duzeltme/denetim-3/evidence/D3F-07/KANIT.md
 - evidence-levels: kayıt/test ✓ · yayın — · cihaz —
 - next: none
+
+## seq 128 · 2026-10-08 · NOTE · K2F-KANIT
+- title: Düzeltme notu (denetim-3 F-15) — K2F KANIT'larında "Oturum:" satırı ve bölüm eksikleri
+- note: `d2f-sync-check --audit-k2f` yalnız sayı veriyordu; dosya dosya envanter çıkarıldı. 44 KANIT var. "Oturum:" satırı 43/44 dosyada yok; yalnız K2F-43'te var. 8 bölümden en az biri 7/44 dosyada eksik: K2F-18 (TDD, Ölçümler, Bilerek değişen testler) · K2F-22 (Yapılan, Ölçümler, Sürprizler) · K2F-30 (Ölçümler) · K2F-31 (Ölçümler) · K2F-33 (Ölçümler, Bilerek değişen testler) · K2F-41 (Yapılan, TDD, Kapılar, Bilerek değişen testler) · K2F-42 (Yapılan, TDD, Kapılar, Bilerek değişen testler, Sürprizler). Araç başlığı birebir arar; K2F-22'de içerik kısmen başka adla duruyor ("Ölçüm (texts.tr.json, araçla)", "Açık kalanlar / sonraki promptlara not"), K2F-18/30/31/33'te "Sürprizler / sonraki promptlara not" başlığı kabul edildi. Tarihsel KANIT dosyaları değiştirilmedi: oturum kimliği sonradan uydurulamaz, eksik bölüm geriye dönük yazılmaz. Bu eksikler yalnız rapor olarak kalır; kapı değildir (D2F `--strict` yalnız D2F commit'lerini sınar).
+- değişen: yalnız kayıtlar (bu LEDGER kaydı · FIX-STATE `ledgerLastSeq` · CURRENT-STATE senkron bloğu ve "Canlı gerçekler") ve kanıt (`kao2-duzeltme/denetim-3/evidence/D3F-15/K2F-KANIT-ENVANTERI.md`, `k2f-kanit-envanteri.mjs`). Geçmiş satırlar ve K2F KANIT'ları değişmedi; kod/veri/pin yok.
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-15/K2F-KANIT-ENVANTERI.md · kao2-duzeltme/denetim-3/evidence/D3F-15/KANIT.md
+- evidence-levels: kayıt/test ✓ · yayın — · cihaz —
+- next: none

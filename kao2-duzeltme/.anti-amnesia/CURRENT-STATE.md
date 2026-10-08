@@ -2,7 +2,7 @@
 
 <!-- k2f-sync
 nextPrompt: none
-lastSeq: 127
+lastSeq: 128
 status: completed
 -->
 
@@ -13,7 +13,7 @@ Bu dosya yalnız kapanış gerçeklerini ve açık işleri taşır; prompt baş�
 KAO2-FIX 2026-10-06'da kapandı; 2026-10-06'daki bağımsız denetim (denetim-2) "tam ve kusursuz değil" dedi: kod tarafında dört kritik kusur kapanmış, kayıt ve süreç uyumunda boşluk var.
 Rapor: [denetim-2/DENETIM-RAPORU.md](../denetim-2/DENETIM-RAPORU.md). Düzeltmeler ayrı program: [denetim-2/](../denetim-2/) (durum `D2F-STATE.json`; sıradaki prompt yalnız orada). Kapanış belgesi: [KAO2-FIX-KAPANIS.md](../deliverables/KAO2-FIX-KAPANIS.md) (§8 denetim-2).
 
-## Canlı gerçekler (araçla yeniden ölçüldü, 2026-10-08; kapanış commit'i `128ab06d`, D3F-07)
+## Canlı gerçekler (araçla yeniden ölçüldü, 2026-10-08; kapanış commit'i `128ab06d`, D3F-15)
 | Ölçüm | Değer | Yöntem |
 |---|---|---|
 | `App.kao*` handler | 45 · App yüzeyi 766 · atama 604 · `onclick` 393 | `fix-sync-check.mjs` + `d2f-sync-check.mjs` |
@@ -21,8 +21,8 @@ Rapor: [denetim-2/DENETIM-RAPORU.md](../denetim-2/DENETIM-RAPORU.md). Düzeltmel
 | Runtime (`app/core/quranLearn*.js`) gzip(9), dosya başına toplam | **117,350 KiB** ≤ 128 | `zlib` düzey 9, `test_kao2_perf_budget.js` ile aynı toplama, `128ab06d`'de |
 | `app/kao.css` gzip(9) | **13,035 KiB** ≤ 14 | aynı |
 | İçerik (5 modül) gzip(9) | **183,837 KiB** ≤ 256 · eski 4 modül 164,002 ≤ 176 | aynı (önceki 183,544 D2F-12 müfredat değişikliğinden önceydi) |
-| `fix-sync-check --repro` | PASS (44/44 · seq 127) | koşuldu |
-| `d2f-sync-check --strict` | PASS (16/16 · seq 25) | koşuldu |
+| `fix-sync-check --repro` | PASS (44/44 · seq 128) | koşuldu |
+| `d2f-sync-check --strict` | PASS (16/16 · seq 29 · 15/15 istisna) | koşuldu |
 
 Başka sayı bu dosyada **yoktur**; test/fixture sayıları için `tests/README.md` ve `tests/kao/README.md`.
 
@@ -39,6 +39,7 @@ Başka sayı bu dosyada **yoktur**; test/fixture sayıları için `tests/README.
 - **Cihaz:** K2F-26…40 görsel/odak/dakika metinleri, NavBar/alt çubuk/panel-v2 dar ekran ve ekran okuyucu turu kullanıcıda.
 - **Canlı doğrulama:** eski pinler (`20261006a…e`, `20261007a`) yayından kalktığı için geriye dönük doğrulanamaz; güncel yayınlar denetim-3 kayıtlarında (`denetim-3/evidence/YAYIN-*/CANLI.md`).
 - **Perf:** `test_kao2_perf_budget.js` göreli p95 bandı yavaş makinede kırmızı olabilir; referans makinede bir kez koşulmalı.
+- **K2F KANIT eksikleri (denetim-3 F-15):** 43/44 KANIT'ta "Oturum:" satırı, 7/44'ünde bölüm eksik; tarihsel, yalnız raporlanır (LEDGER seq 128, envanter `denetim-3/evidence/D3F-15/K2F-KANIT-ENVANTERI.md`). Oturum kimliği sonradan yazılmaz.
 - K-3 hece sesi kayıtları; D-12 (ertelendi) ve D-21 (bağlanmadı) kararları.
 
 ## Çalışma kuralları (kalıcı)

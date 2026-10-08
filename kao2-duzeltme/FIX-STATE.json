@@ -9,7 +9,7 @@
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
   "nextPrompt": null,
-  "ledgerLastSeq": 127,
+  "ledgerLastSeq": 128,
   "audit2": {
     "report": "kao2-duzeltme/denetim-2/DENETIM-RAPORU.md",
     "program": "kao2-duzeltme/denetim-2/D2F-STATE.json",

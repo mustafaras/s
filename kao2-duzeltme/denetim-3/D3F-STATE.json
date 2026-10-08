@@ -4,7 +4,7 @@
   "source": "kao2-duzeltme/denetim-3/DENETIM-3-RAPORU.md",
   "baseCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
   "startedAt": "2026-10-08",
-  "nextFinding": "F-07",
+  "nextFinding": "F-08",
   "starter": "kao2-duzeltme/denetim-3/STARTER.md",
   "process": {
     "commitPrefix": "D3F-NN:",
@@ -25,7 +25,7 @@
     "F-04": { "severity": "ORTA", "title": "strictExceptions (kural a) sınırsız muafiyet", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-04/KANIT.md" },
     "F-05": { "severity": "ORTA", "title": "D2F-12 uygulayıcısı Copilot, 'Claude kararı' diye kayıtlı", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-05/KANIT.md" },
     "F-06": { "severity": "ORTA", "title": "INCELEME-KAO2-17 [x] işaretlerinin yapay zekâ devri olduğunu söylemiyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-06/KANIT.md", "note": "aynı kök INCELEME-KAO2-18 (25 kavram) de düzeltildi" },
-    "F-07": { "severity": "ORTA", "title": "FIX-STATE.releaseApproval abartılı", "status": "open" },
+    "F-07": { "severity": "ORTA", "title": "FIX-STATE.releaseApproval abartılı", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-07/KANIT.md" },
     "F-08": { "severity": "ORTA", "title": "3f3b28cd push/deploy kayıtsız", "status": "open" },
     "F-09": { "severity": "ORTA", "title": "u09.01 inceleme damgası metinden eski", "status": "open" },
     "F-10": { "severity": "ORTA", "title": "state.js · zikir.js · skyFx.js · panelCoverageManifest.js pinleri yükseltilmemiş", "status": "open" },
@@ -51,6 +51,7 @@
     "D3F-05": ["9181a4a8"],
     "YAYIN-4": ["700cae25", "c4116a53"],
     "D3F-06": ["b9db08b9"],
-    "YAYIN-5": ["(bu commit)"]
+    "YAYIN-5": ["2f0f6f02", "4a0ada6f"],
+    "D3F-07": ["(bu commit)"]
   }
 }

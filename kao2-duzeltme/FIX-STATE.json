@@ -9,14 +9,37 @@
   "baseCommit": "07802fa6",
   "planCheckBase": "d19b4576aad643fb12e61c86fef112c24163924c",
   "nextPrompt": null,
-  "ledgerLastSeq": 126,
+  "ledgerLastSeq": 127,
   "audit2": {
     "report": "kao2-duzeltme/denetim-2/DENETIM-RAPORU.md",
     "program": "kao2-duzeltme/denetim-2/D2F-STATE.json",
     "verdict": "tam ve kusursuz değil: kod tarafında 4 kritik kusur kapanmış; protokol ve kayıt uyumunda boşluk",
     "retroactiveRecords": "D2F-10 (2026-10-07): LEDGER seq 123–126, evidence/K2F-43/KANIT.md, evidence/K2F-34/YAYIN.md"
   },
-  "releaseApproval": "approved_through_K2F-43",
+  "releaseApproval": "inferred_2026-10-06_K2F-43+ai-delegated_2026-10-07_YAYIN-3",
+  "releaseApprovalRecord": {
+    "K2F-43": {
+      "kind": "inferred",
+      "at": "2026-10-06",
+      "pin": "20261006e",
+      "ledger": {
+        "file": "kao2-duzeltme/.anti-amnesia/LEDGER.md",
+        "seq": 123
+      },
+      "note": "YAYIN-2: K2F-43 prompt'unun istediği açık \"YAYIN-2 onaylı\" cümlesi alınmadı; onay oturum başındaki genel talimattan çıkarıldı. D2F-14'te (denetim-2 LEDGER seq 22) beklenen açık teyit de gelmedi."
+    },
+    "YAYIN-3": {
+      "kind": "ai-delegated",
+      "at": "2026-10-07",
+      "pin": "20261007b",
+      "ledger": {
+        "file": "kao2-duzeltme/denetim-2/LEDGER.md",
+        "seq": 23
+      },
+      "note": "Beklenen \"YAYIN-3 onaylı\" cümlesi yazılmadı; yayın kullanıcının açık yetki devriyle, Claude kararıyla yapıldı. K2F-43 yayınını geriye dönük açıkça onaylamaz."
+    },
+    "note": "D3F-07 (denetim-3 F-07, 2026-10-08): eski değer \"approved_through_K2F-43\" türü gizliyordu. Bu alandaki iki yayının (K2F-43, YAYIN-3) hiçbiri açık kullanıcı onay cümlesiyle alınmadı; önceki yayınlar (ör. K2F-34) bu düzeltmede yeniden denetlenmedi. Doğrulama: fix-sync-check 5b."
+  },
   "lastRelease": {
     "prompt": "K2F-43",
     "commit": "6796d87a",

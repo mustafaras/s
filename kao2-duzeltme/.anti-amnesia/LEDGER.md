@@ -1298,3 +1298,11 @@ Denetim: `node kao2-duzeltme/tools/fix-sync-check.mjs --repro`
 - evidence: kao2-duzeltme/denetim-2/DENETIM-RAPORU.md · kao2-duzeltme/denetim-2/D2F-STATE.json
 - evidence-levels: kaynak/test — · yayın — · cihaz —
 - next: none
+
+## seq 127 · 2026-10-08 · NOTE · K2F-43
+- title: Düzeltme notu (denetim-3 F-07) — `FIX-STATE.releaseApproval` onay türünü gizliyordu
+- note: Kapanışta yazılan `"approved_through_K2F-43"` iki yayını "onaylandı" diye genelliyordu. Gerçek: K2F-43 yayını (YAYIN-2, pin `20261006e`) **çıkarımla** onaylandı (seq 123, closed-inferred). denetim-2 seq 22'nin "bu yayın K2F-43'teki yayını da açıkça onaylamış olur" koşulu gerçekleşmedi, çünkü YAYIN-3 (pin `20261007b`) de açık cümleyle değil **yetki devriyle** yapıldı (denetim-2 LEDGER seq 23). Yeni değer `inferred_2026-10-06_K2F-43+ai-delegated_2026-10-07_YAYIN-3`; ayrıntı `releaseApprovalRecord`. `fix-sync-check` artık değeri LEDGER'la sınar (5b): tür explicit|inferred|ai-delegated, her öge bir LEDGER kaydına bağlı, closed-inferred GATE başka türle yazılamaz.
+- değişen: yalnız kayıtlar ve araç (FIX-STATE `releaseApproval` + `releaseApprovalRecord` + `ledgerLastSeq` · CURRENT-STATE · `tools/fix-sync-check.mjs` · `evidence/K2F-43/YAYIN.md` sonuna düzeltme notu). Geçmiş satırlar değişmedi; kod/veri/pin yok.
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-07/KANIT.md
+- evidence-levels: kayıt/test ✓ · yayın — · cihaz —
+- next: none

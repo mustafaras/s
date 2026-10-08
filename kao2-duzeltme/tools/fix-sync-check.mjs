@@ -90,6 +90,48 @@ const nextLine = /^- next:\s*(\S+)/m.exec(tail);
 if (!nextLine) fail('LEDGER son kaydında "- next:" satırı yok');
 else if ((nextLine[1] === 'none' ? null : nextLine[1]) !== state.nextPrompt) fail(`LEDGER son next ${nextLine[1]} ≠ STATE ${state.nextPrompt}`);
 
+// 5b · D3F-07 (F-07): releaseApproval onayın gerçek türünü söyler, "onaylandı" diye genellemez.
+// Biçim: "<tür>_<YYYY-AA-GG>_<yayın>" ögeleri "+" ile; tür ∈ explicit | inferred | ai-delegated.
+// Her öge releaseApprovalRecord[<yayın>]'da aynı tür ve tarihle, bir LEDGER kaydına bağlı durur; LEDGER kaydı türü doğrular:
+// inferred → "closed-inferred" · ai-delegated → "devir" · explicit → kayıttaki birebir kullanıcı cümlesi LEDGER'da geçer.
+// Bu LEDGER'da closed-inferred GATE'i olan yayın başka türle yazılamaz. Türü gizleyen eski "approved_through_*" reddedilir.
+const APPROVAL_KINDS = new Set(['explicit', 'inferred', 'ai-delegated']);
+const ledgerEntry = (rel, seq) => {
+  const text = read(rel, REPO);
+  const start = text.search(new RegExp(`^## seq ${seq} · `, 'm'));
+  if (start < 0) return null;
+  const rest = text.slice(start + 1);
+  const end = rest.search(/^## seq \d+ · /m);
+  return end < 0 ? text.slice(start) : text.slice(start, start + 1 + end);
+};
+const approvalText = typeof state.releaseApproval === 'string' ? state.releaseApproval : '';
+const approvalRecord = state.releaseApprovalRecord || {};
+const approvalKinds = {};
+if (approvalText !== 'NOT_APPROVED') {
+  for (const token of approvalText.split('+')) {
+    const m = /^([a-z-]+)_(\d{4}-\d{2}-\d{2})_([A-Z0-9-]+)$/.exec(token);
+    if (!m || !APPROVAL_KINDS.has(m[1])) { fail(`releaseApproval ögesi "${token}" <tür>_<tarih>_<yayın> biçiminde değil (tür: explicit|inferred|ai-delegated)`); continue; }
+    const [, kind, at, release] = m;
+    approvalKinds[release] = kind;
+    const rec = approvalRecord[release];
+    if (!rec) { fail(`releaseApprovalRecord.${release} yok`); continue; }
+    if (rec.kind !== kind || rec.at !== at) fail(`releaseApprovalRecord.${release} (${rec.kind}, ${rec.at}) ≠ releaseApproval (${kind}, ${at})`);
+    const entry = rec.ledger && rec.ledger.file && Number.isInteger(rec.ledger.seq) ? ledgerEntry(rec.ledger.file, rec.ledger.seq) : null;
+    if (!entry) { fail(`releaseApprovalRecord.${release}: LEDGER kaydı bulunamadı (${JSON.stringify(rec.ledger)})`); continue; }
+    if (!entry.includes(release)) fail(`releaseApprovalRecord.${release}: LEDGER seq ${rec.ledger.seq} bu yayını anmıyor`);
+    if (kind === 'inferred' && !/closed-inferred/.test(entry)) fail(`releaseApprovalRecord.${release}: inferred ama LEDGER seq ${rec.ledger.seq} closed-inferred demiyor`);
+    if (kind === 'ai-delegated' && !/devir/i.test(entry)) fail(`releaseApprovalRecord.${release}: ai-delegated ama LEDGER seq ${rec.ledger.seq} devirden söz etmiyor`);
+    if (kind === 'explicit' && !(rec.quote && entry.includes(rec.quote))) fail(`releaseApprovalRecord.${release}: explicit ama birebir kullanıcı cümlesi LEDGER seq ${rec.ledger.seq}'te yok`);
+  }
+}
+for (const m of entries) {
+  if (m[3] !== 'GATE') continue;
+  const entry = ledgerEntry('kao2-duzeltme/.anti-amnesia/LEDGER.md', Number(m[1])) || '';
+  if (/status:\s*closed-inferred/.test(entry) && approvalKinds[m[4]] !== 'inferred') {
+    fail(`LEDGER seq ${m[1]}: ${m[4]} yayın onayı closed-inferred, ama releaseApproval onu inferred diye yazmıyor`);
+  }
+}
+
 // 6 · Kod pinleri gerçekle aynı mı (sayaç karmaşası olmasın)
 const appJs = readCode('app.js');
 const kaoHandlers = new Set([...appJs.matchAll(/App\.(kao[A-Za-z0-9]+) *= *function/g)].map((m) => m[1])).size;

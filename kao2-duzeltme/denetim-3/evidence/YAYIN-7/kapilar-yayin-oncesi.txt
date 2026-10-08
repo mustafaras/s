@@ -1,0 +1,28 @@
+=== 17:45:42 YAYIN-7 · tam kapilar.sh (ZORUNLU — pin 20261008c, D3F-09+D3F-10) · HEAD b6915f19 D3F-10: ek — commit sonrası kap · KAO2_ACCEPT_SLOW_HOST=1 ===
+== KAO2-FIX kapıları ==
+mod: YAVAŞ MAKİNE (KAO2_ACCEPT_SLOW_HOST=1) — yalnız göreli p95 bandı atlanır, mutlak tavanlar zorunlu
+node --check quranLearn.js         PASS
+node --check quranLearnFlow.js     PASS
+node --check quranLearnViews.js    PASS
+node --check quranCurriculumV2.js  PASS
+node --check quranGrammarV1.js     PASS
+tests/kao (55)                     PASS
+tests/app (78)                     PASS
+tests/panel (23)                   PASS
+tests/panel-v2 (27)                PASS
+tests/quran (9)                    PASS
+reminders smoke                    PASS
+run-seyma driver                   PASS
+run-seyma zikr                     PASS
+kontrast                           PASS
+l2-paket --check                   PASS
+kao-plan-check                     PASS
+fix-sync-check --repro             PASS
+d2f-sync-check --strict            PASS
+d3f pin senkronu                   PASS
+== tekrar-uret özeti ==
+KAO2 denetim tekrar üretimi: 10/10 PASS · 0 FAIL
+== perf ==
+KAO2 perf: PASS (content 183.950 KiB · runtime 117.711 KiB · css 13.035 KiB · p95 5.125 ms · steady 3.442 ms · GÖRELİ BANT ATLANDI (yavaş makine): steady 3.442 ms ≤ bant 6.360 ms)
+SONUÇ: TÜM KAPILAR YEŞİL
+exit 0

@@ -332,3 +332,18 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - açık (Claude kapatamaz): L2 0/37, 13 namaz kelimesi, K-3 hece sesi, cihaz kabulü A-11/A-12, ekran okuyucu, D2-12 `8bf8f658` geri alma tercihi.
 - evidence: kao2-duzeltme/denetim-2/evidence/D2F-16/KANIT.md · CANLI.md
 - next: none
+
+## seq 25 · 2026-10-08 · NOTE · D2F-12
+- başlık: Düzeltme notu (denetim-3 F-05) — D2F-12'yi ve D2F-11 kapı kapanışını Claude değil, Copilot CLI oturumu uyguladı.
+- oturum: claude-code (denetim-3 düzeltmeleri, D3F-05; kao2-duzeltme/denetim-3/)
+- gerçek (git + kayıt): seq 18–19 `oturum: copilot-cli:4ec68470-d2f12`; `2fe3abf6`, `3f3b28cd`, `d0acd9b4`, `347884fb` trailer'ı `Co-authored-by: Copilot`.
+  158 L1 kaydının `ai-delegated` yapımı ve u09.01 başlık/hedef metni bu oturumda yazıldı.
+- ayrım: **karar** (L1 = B, u09.01 = 1) seq 17'de Claude oturumunda verildi — bu kısım doğru kayıtlı. **Uygulama ve kapı kapanışı**
+  (seq 18–19) Copilot CLI'ındır. seq 18–19'daki "kullanıcı onayı: devir (Claude kararı)" ifadesi uygulayıcıyı gizler; doğrusu:
+  "Claude kararı (seq 17), Copilot CLI uygulaması".
+- açık soru (kullanıcının): seq 17 devri Claude'a verildi; aynı devrin başka bir ajanın uygulamasını kapsayıp kapsamadığı kayıtta yok.
+  seq 18'deki "benim yerime yap gerekenleri" / "13 e kadar hepsini tamamla" cümlelerinin hangi ajana söylendiği de kayıtta yok; bu not onu varsaymaz.
+- değişen: yalnız kayıtlar (LEDGER bu not · D2F-STATE `ledgerLastSeq` · CURRENT-STATE · evidence/D2F-12/KANIT.md düzeltme notu). Geçmiş satırlar değişmedi; kod/veri/pin yok.
+- kanıt düzeyleri: kayıt/git ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-05/KANIT.md
+- next: none

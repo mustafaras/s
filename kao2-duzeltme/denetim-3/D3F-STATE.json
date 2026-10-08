@@ -17,7 +17,7 @@
     "F-02": { "severity": "YÜKSEK", "title": "test_kao_render.js saate bağlı (21:30–23:29 kırmızı)", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-02/KANIT.md" },
     "F-03": { "severity": "ORTA", "title": "kapilar.sh perf bloğu okunamayan satırı geçiriyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-03/KANIT.md" },
     "F-04": { "severity": "ORTA", "title": "strictExceptions (kural a) sınırsız muafiyet", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-04/KANIT.md" },
-    "F-05": { "severity": "ORTA", "title": "D2F-12 uygulayıcısı Copilot, 'Claude kararı' diye kayıtlı", "status": "open" },
+    "F-05": { "severity": "ORTA", "title": "D2F-12 uygulayıcısı Copilot, 'Claude kararı' diye kayıtlı", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-05/KANIT.md" },
     "F-06": { "severity": "ORTA", "title": "INCELEME-KAO2-17 [x] işaretlerinin yapay zekâ devri olduğunu söylemiyor", "status": "open" },
     "F-07": { "severity": "ORTA", "title": "FIX-STATE.releaseApproval abartılı", "status": "open" },
     "F-08": { "severity": "ORTA", "title": "3f3b28cd push/deploy kayıtsız", "status": "open" },
@@ -25,7 +25,7 @@
     "F-10": { "severity": "ORTA", "title": "state.js · zikir.js · skyFx.js · panelCoverageManifest.js pinleri yükseltilmemiş", "status": "open" },
     "F-11": { "severity": "DÜŞÜK", "title": "g17-k2 şıkları muğlak", "status": "open" },
     "F-12": { "severity": "DÜŞÜK", "title": "12 ünitenin whyReview'u draft", "status": "open" },
-    "F-13": { "severity": "DÜŞÜK", "title": "bayat ve çelişkili belgeler", "status": "open" },
+    "F-13": { "severity": "DÜŞÜK", "title": "bayat ve çelişkili belgeler", "status": "open", "note": "CURRENT-STATE kısmı D3F-05te kapandı; DUZELTME-SONUCU, CLAUDE.md 130 KB, DEVIR-LISTESI açık" },
     "F-14": { "severity": "DÜŞÜK", "title": "D2F-05/09 mutasyon betikleri depoda değil", "status": "open" },
     "F-15": { "severity": "DÜŞÜK", "title": "K2F KANIT eksikleri (Oturum satırı, bölümler)", "status": "open" },
     "F-16": { "severity": "DÜŞÜK", "title": "okuyucu alt paneli role=dialog ama dialog değil", "status": "open" },
@@ -41,6 +41,7 @@
     "D3F-01": ["fd588903"],
     "D3F-02": ["6a20c702", "bb587965"],
     "D3F-03": ["dd875348"],
-    "D3F-04": ["(bu commit)"]
+    "D3F-04": ["0d812c5c"],
+    "D3F-05": ["(bu commit)"]
   }
 }

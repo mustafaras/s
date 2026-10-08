@@ -47,7 +47,7 @@ Programın kendi süreç sapmaları (dürüstlük): D2F-03/04/05/06/08/11/12 bir
 - **Kaynak/test (K):** bu belgedeki tüm "kapandı" satırları; yukarıdaki kapılar bu oturumda koşuldu.
 - **Yayın (Y):** pin `20261007a`, `main` — yalnız git kaydından (`59abe97b`); **canlıda bayt eşitliği bu oturumda doğrulanmadı.**
 - **Cihaz (C):** hiçbiri. A-11/A-12 ölçülmedi.
-- **Kullanıcı onayı:** D2-04/D2-10 kararları kullanıcı onayı değil; yazılı devirle Claude kararıdır (geri alma: `2fe3abf6` revert ya da kullanıcının kendi cevabı).
+- **Kullanıcı onayı:** D2-04/D2-10 kararları kullanıcı onayı değil; yazılı devirle Claude kararıdır (seq 17); uygulayıcı Claude değil Copilot CLI oturumudur (seq 18–19, düzeltme notu LEDGER seq 25) (geri alma: `2fe3abf6` revert ya da kullanıcının kendi cevabı).
 
 ## 4. Kullanıcıda / uzmanda kalanlar (Claude kapatamaz)
 

@@ -46,3 +46,9 @@ Kaynak/test ✓ · yayın — (pin değişmedi) · cihaz — · kullanıcı onay
 1. Üretici review sayfasında iki kutuyu global regex ile işaretleyince gerçek olmayan L2 onayı oluşabiliyordu; aynı oturumda testle yakalanıp L1'e daraltıldı.
 2. `MUFREDAT-ESLEME.md` u09.01 başlığını taşıdığı için prompt listesindeki dar dosya sayımına ek, üretici bütünlüğü gereği araç çıktısı olarak değişti.
 3. Önceden yayımlanan `3f3b28cd` yanlışlıkla D2F-12 öneki taşıyor; geçmiş yeniden yazılmadı. Bu uygulama commit'iyle oluşan iki-commit durumu kullanıcı seçimi doğrultusunda dar `strictExceptions` kaydıyla açıklanır.
+
+## Düzeltme notu (denetim-3 F-05, 2026-10-08)
+Bu KANIT'taki "kullanıcının açık yetki devriyle Claude kararıdır" ifadesi kararın kendisi için doğrudur (L1 = B, u09.01 = 1;
+LEDGER seq 17, Claude oturumu). Ancak bu prompt'u **Copilot CLI** oturumu uyguladı (yukarıdaki `Oturum: copilot-cli:4ec68470-d2f12`;
+`2fe3abf6`/`3f3b28cd` trailer'ı `Co-authored-by: Copilot`). Doğru ifade: "Claude kararı (seq 17), Copilot CLI uygulaması".
+Devrin başka bir ajanın uygulamasını kapsayıp kapsamadığı kullanıcıya açık sorudur. Ayrıntı: LEDGER seq 25.

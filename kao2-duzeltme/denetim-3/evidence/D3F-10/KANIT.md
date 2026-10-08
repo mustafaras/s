@@ -47,3 +47,21 @@ Raporun 4'üne ek iki gerçek bulgu var: `manifest.json` (eski önbellek artık 
 
 ## Kanıt düzeyleri
 kaynak/test ✓ · yayın → sonraki YAYIN kaydı · canlı → sonraki YAYIN kaydı · cihaz — (PWA önbelleği yeni `SW_VERSION` ile yenilenir; cihazda doğrulama kullanıcıda)
+
+## Commit sonrası (b828aaea, temiz ağaç)
+- Mutasyon `pin-mutasyon.sh` **6/6 PASS**: M0 yeşil · M1 state.js eski pin (commit'li) kırmızı · M2 commit'lenmemiş dosya değişikliği kırmızı · M3 pinsiz commit kırmızı · M4 pin yükseltilince taze · M5 sığ klon açık SKIP.
+- Hızlı set **12/12 PASS**:
+```
+[17:42:59] PASS 8s kao-plan-check :: kao-plan-check: PASS (0 warn)
+[17:42:59] PASS 0s fix-sync :: KAO2-FIX senkron: PASS · 44/44 prompt done · nextPrompt none · ledger seq 127 · App.kao* 45 · pin 20261007b (dondurulmuş
+[17:43:00] PASS 1s d2f-strict :: D2F senkron: PASS · 16/16 prompt done · nextPrompt none · ledger seq 26 · N 9/9 pass · App.kao* 45 · yüzey 766 · atama 6
+[17:43:03] PASS 3s pin-tazeligi :: asset pin freshness: PASS (1 kontrol)
+[17:43:04] PASS 1s pages-kayit :: pages-kayit: PASS — 4/4 run kayıtlı (dönem cbe0d604..128ab06d)
+[17:43:05] PASS 1s mut D3F-03 :: kapilar mutasyon: 5/5 PASS
+[17:43:21] PASS 16s mut D3F-04 :: d2f mutasyon: 8/8 PASS
+[17:43:43] PASS 22s mut D3F-06 :: d3f06 mutasyon: 7/7 PASS
+[17:43:58] PASS 15s mut D3F-07 :: d3f07 mutasyon: 10/10 PASS
+[17:44:07] PASS 9s mut D3F-08 :: d3f08 mutasyon: 5/5 PASS
+[17:44:27] PASS 20s mut D3F-09 :: d3f09 mutasyon: 6/6 PASS
+[17:45:06] PASS 39s mut D3F-10 :: d3f10 mutasyon: 6/6 PASS
+```

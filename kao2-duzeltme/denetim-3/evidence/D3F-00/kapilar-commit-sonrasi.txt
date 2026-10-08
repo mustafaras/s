@@ -1,0 +1,27 @@
+14:06
+== KAO2-FIX kapıları ==
+node --check quranLearn.js         PASS
+node --check quranLearnFlow.js     PASS
+node --check quranLearnViews.js    PASS
+node --check quranCurriculumV2.js  PASS
+node --check quranGrammarV1.js     PASS
+tests/kao (55)                     PASS
+tests/app (77)                     PASS
+tests/panel (23)                   PASS
+tests/panel-v2 (27)                PASS
+tests/quran (9)                    PASS
+reminders smoke                    PASS
+run-seyma driver                   PASS
+run-seyma zikr                     PASS
+kontrast                           PASS
+l2-paket --check                   PASS
+kao-plan-check                     PASS
+fix-sync-check --repro             PASS
+d2f-sync-check --strict            PASS
+d3f pin senkronu                   PASS
+== tekrar-uret özeti ==
+KAO2 denetim tekrar üretimi: 10/10 PASS · 0 FAIL
+== perf ==
+KAO2 perf: PASS (content 183.943 KiB · runtime 117.711 KiB · css 13.035 KiB · p95 4.926 ms · steady 3.575 ms)
+SONUÇ: TÜM KAPILAR YEŞİL
+exit 0

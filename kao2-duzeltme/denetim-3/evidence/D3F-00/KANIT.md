@@ -32,3 +32,7 @@ kaynak/test ✓ · yayın — · canlı — · cihaz —
 ## Sürprizler
 D3F-00 iki commit oldu: plan-check boşluğu, D3F-01 commit'lenene kadar görünmedi (kapı commit'ten önce koşmuştu).
 Ders: kapı koşusu commit'ten SONRA, temiz ağaçta tekrarlanır.
+`kapilar-commit-sonrasi.txt`: `b3d70a16`'nın izole klonunda (14:06, temiz ağaç) TÜM KAPILAR YEŞİL, exit 0; pin kapısı PASS.
+Geçersiz koşu (kayda geçsin): 13:50'de aynı çalışma ağacında başlatılan koşu, sürerken D3F-02 için `git stash` ve
+`tests/kao/` içine geçici mutasyon dosyası yapıldığından kabul testinde kırmızı verdi; ölçüm sayılmadı, izole klonda tekrarlandı.
+Ders: uzun kapı koşusu sürerken aynı ağaçta değişiklik yapılmaz — ya bitmesi beklenir ya da klonda koşulur.

@@ -17,6 +17,21 @@ const indexSource = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
 
 const sandbox = { window: {}, Date, Math, Number, String, Object, Array, JSON };
 vm.createContext(sandbox);
+// D3F-02 (denetim-3 F-02): kaoHubCardHTML() saati içeride okur; targetBed 23:00 iken yatmadan önceki 90 dk (21:30–23:00) gece
+// penceresi hub metnini "Uyumadan önce N kart"a çevirir. Bu yüzden test her akşam kırmızıydı. Hub çağrıları sabit bir saatte yapılır:
+// gündüz modu öğlende, gece modu 22:00'de ayrıca sınanır. Saat yalnız sandbox içinde ve yalnız çağrı süresince değişir.
+function atClock(iso, run) {
+  const Real = sandbox.Date;
+  const fixedMs = new Real(iso).getTime();
+  class Fixed extends Real {
+    constructor(...args) { super(...(args.length ? args : [fixedMs])); }
+    static now() { return fixedMs; }
+  }
+  sandbox.Date = Fixed;
+  try { return run(); } finally { sandbox.Date = Real; }
+}
+const DAY_CLOCK = '2026-09-24T12:00:00';
+const NIGHT_CLOCK = '2026-09-24T22:00:00';
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranLexiconV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranLexiconV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranGrammarV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranGrammarV1.js' });
 vm.runInContext(fs.readFileSync(path.join(repoRoot, 'app/content/quranShortSurahsV1.js'), 'utf8'), sandbox, { filename: 'app/content/quranShortSurahsV1.js' });
@@ -92,7 +107,7 @@ assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
 
 quranLearn.onboarding.doneAt = null;
 assert.match(api.kaoOverlayHTML(new Date('2026-09-24T22:15:00')), /Hoş geldin/, 'ilk açılış yapılmamış sıfır kullanıcı karşılanır');
-const firstHubHtml = api.kaoHubCardHTML();
+const firstHubHtml = atClock(DAY_CLOCK, () => api.kaoHubCardHTML());
 assert.match(firstHubHtml, /id="kao-hub-entry"/);
 assert.match(firstHubHtml, /Kur’an Arapçası Öğreniyorum/);
 // KAO2-10 (05 §8, Y-01/T-05): hub tek bilgi + tek eylem; sahte yol noktaları yok. KAO-16 okuyucusu Keşfet listesinde keşfedilebilir.
@@ -106,11 +121,17 @@ quranLearn.startedAt = '2026-09-24T12:00:00.000Z';
 quranLearn.cards[`w:${firstLemma.id}:ar>tr`] = { reps: 2, state: 'review', s: 21 };
 quranLearn.cards[`w:${firstLemma.id}:tr>ar`] = { reps: 2, state: 'review', s: 21 };
 quranLearn.daily['2026-09-24'] = { answered: 3 };
-const resumeHubHtml = api.kaoHubCardHTML();
+const resumeHubHtml = atClock(DAY_CLOCK, () => api.kaoHubCardHTML());
 // KAO2-10: sayaçlar yerine "bekliyor" durumu — ünite, sıradaki ders ve gerçek süre; eylem "Devam".
 assert.match(resumeHubHtml, /Kur’an Arapçası · Ünite \d+/);
 assert.match(resumeHubHtml, /Sıradaki: [^<]+ · \d+ dk/);
 assert.match(resumeHubHtml, /class="kao-hub-cta">Devam /);
+// D3F-02: aynı durum gece penceresinde (targetBed 23:00, saat 22:00) hafif tekrara döner; eylem "Tekrar et".
+const nightHubHtml = atClock(NIGHT_CLOCK, () => api.kaoHubCardHTML());
+assert.match(nightHubHtml, /Uyumadan önce \d+ kart · \d+ dk/, 'gece penceresi: hafif tekrar');
+assert.match(nightHubHtml, /Tekrar et/);
+assert.doesNotMatch(nightHubHtml, /Sıradaki: /, 'gece penceresinde yeni ders önerilmez');
+assert.equal(atClock(DAY_CLOCK, () => api.kaoHubCardHTML()), resumeHubHtml, 'saat sandbox\'ta geri alınır; gündüz metni değişmez');
 assert.equal(Object.keys(api.kaoKnownLemmaSet(appData)).length, 1, 'iki yönde kalıcı kelime sayılır');
 
 const shiftLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift);

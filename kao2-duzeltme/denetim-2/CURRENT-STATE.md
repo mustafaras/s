@@ -2,11 +2,11 @@
 
 <!-- d2f-sync
 nextPrompt: none
-lastSeq: 25
+lastSeq: 26
 status: completed
 -->
 
-**Son güncelleme:** 2026-10-08 · kapanış sonrası düzeltme notu (LEDGER seq 25, denetim-3 D3F-05). Program 2026-10-07'de D2F-16 ile kapandı (`closeCommit` `128ab06d`); sonraki düzeltmeler `kao2-duzeltme/denetim-3/` (D3F-NN) altında.
+**Son güncelleme:** 2026-10-08 · kapanış sonrası düzeltme notları (LEDGER seq 25, denetim-3 D3F-05; seq 26, D3F-08). Program 2026-10-07'de D2F-16 ile kapandı (`closeCommit` `128ab06d`); sonraki düzeltmeler `kao2-duzeltme/denetim-3/` (D3F-NN) altında.
 
 ## Nerede kaldık
 - **YAYIN (seq 7, kullanıcı kararı):** ortam değişikliği için D2F-04 sonrası erken yayın — pin `20261007a`, `main` ff-only (tarihsel; sonraki yayın D2F-15, pin `20261007b`). Ayrıntı: evidence/D2F-04/YAYIN.md (ORTAK-KURALLAR silindi; geri getirme: `git show d439127b:kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md`).
@@ -15,7 +15,7 @@ status: completed
 - Başlangıç commit'i (`baseCommit`): `cbe0d604`. D2F-05 PROMPT `467ab6fa`, D2F-05 NOT `80ed4450`; D2F-06 `79eca899` (dal `d2f-05`); D2F-06 NOT `e7b2c170`; D2F-07 dal `d2f-07`; D2F-08 aynı dal.
 - Kullanıcı kapıları: D2F-11→12 (GATE waiting, seq 16), D2F-12, D2F-15, D2F-16. Yayın: seq 7 ile tek seferlik erken yayın (`releaseApproval: user_override_2026-10-07_early_release`).
 
-## Canlı gerçekler (2026-10-08 güncellendi; her satırın ölçüm kaynağı Araç sütununda)
+## Canlı gerçekler (2026-10-08 yeniden ölçüldü, D3F-08; her satırın ölçüm kaynağı Araç sütununda)
 | Ölçüm | Değer | Araç |
 |---|---|---|
 | `App.kao*` handler | 45 (kapanışta ve HEAD'de) | `d2f-sync-check.mjs` (kapanış) + dondurmasız kopya (HEAD, 2026-10-08) |
@@ -32,6 +32,7 @@ status: completed
 | `tekrar-uret.cjs` | 10/10 PASS | koşuldu (2026-10-08) |
 
 ## Bu oturumun işi
+- **Düzeltme notu seq 26 (denetim-3 F-08, D3F-08).** Denetim-2 dönemindeki 4 Pages yayınından 3'ü kayıtsızdı: run 37647239210 (`3f3b28cd`, Copilot CLI oturumu, 15 commit, çalışma zamanı farkı yok), run 37666380654 (`128ab06d`, 2 commit, fark yok), run 37618089484 (`59abe97b`, D2F-04 erken yayını; onay seq 7'de, run ve ff aralığı yazılmamıştı). Denetim: `denetim-3/evidence/D3F-08/pages-kayit-denetimi.mjs` 4/4.
 - **D2F-16 — Canlı doğrulama (seq 24, GATE closed).** Komutu Claude çalıştırdı: 20 EŞİT / 0 FARKLI, 4×404, perf PASS. [evidence/D2F-16/CANLI.md](evidence/D2F-16/CANLI.md), [KANIT.md](evidence/D2F-16/KANIT.md). Kanıt: kaynak ✓ · yayın ✓ · canlı ✓ · cihaz —.
 - **D2F-15 — YAYIN-3 (seq 23, GATE closed).** Pin `20261007b`; yetki devriyle Claude kararı (birebir alıntılar LEDGER'da). `ORTAK-KURALLAR.md` kullanıcı kararıyla silindi. Ayrıntı: [evidence/D2F-15/KANIT.md](evidence/D2F-15/KANIT.md), [YAYIN.md](evidence/D2F-15/YAYIN.md).
 - **D2F-14 — YAYIN-3 onayı bekleniyor (seq 22, GATE waiting).** Yayın hazırlandı, yapılmadı. Öneri: pin `20261007b`; `main`'e 3 yerel commit (ff-only); çalışma zamanı farkı yalnız `quranCurriculumV2.js` (aynı `20261007a` pininde değişmiş). Canlı pin artık `20261007a` (erken yayın), panel-v2 styles pini zaten yükseltilmiş. Ayrıntı: [evidence/D2F-14/KANIT.md](evidence/D2F-14/KANIT.md).

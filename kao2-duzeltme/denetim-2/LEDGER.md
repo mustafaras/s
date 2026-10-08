@@ -347,3 +347,19 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kayıt/git ✓ · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-3/evidence/D3F-05/KANIT.md
 - next: none
+
+## seq 26 · 2026-10-08 · NOTE · D2F-12
+- başlık: Düzeltme notu (denetim-3 F-08) — denetim-2 dönemindeki üç `main` push'u ve Pages yayını kayıtta yoktu.
+- oturum: claude-code (denetim-3 düzeltmeleri, D3F-08; kao2-duzeltme/denetim-3/)
+- yöntem: GitHub API `actions/workflows/pages.yml/runs` (salt-okur; anlık görüntü `denetim-3/evidence/D3F-08/pages-runs.json`) + git. Dönem = head'i `baseCommit` ile `closeCommit` arasında olan run'lar: 4 run, 1'i kayıtlıydı (37664767297, YAYIN-3).
+- (1) **run 37647239210** · 2026-10-07T15:50:35Z · head `3f3b28cd` (D2F-12 hazırlık/merge-istisnası) · success · tetikleyen `mustafaras`, Copilot CLI oturumu
+  (`3f3b28cd` ve iki merge `347884fb`/`d0acd9b4` `Co-authored-by: Copilot`). Push aralığı `59abe97b..3f3b28cd` = 15 commit (D2F-05…D2F-12).
+  Yayına çıkan çalışma zamanı farkı (Pages rsync dışlamalarından sonra) **boş**. YAYIN kapısı dışında yapıldı; onay kaydı yok.
+- (2) **run 37666380654** · 2026-10-07T18:22:55Z · head `128ab06d` (D2F-16 NOT, kapanış commit'i) · success. Push aralığı `b468d9a3..128ab06d` = 2 commit; yayın farkı **boş**. Kayıtta yalnız commit'ler var, push/run yok.
+- (3) **run 37618089484** · 2026-10-07T12:01:35Z · head `59abe97b` (D2F-04 erken yayın) · success. Onay seq 7'de kayıtlı; ama `evidence/D2F-04/YAYIN.md`'deki
+  "ff aralığı / run: aşağıda (push sonrası, sohbet raporunda)" hiç doldurulmadı. Push aralığı `36015f08..59abe97b` = 11 commit; yayın farkı `app/core/quranLearn.js`, `index.html`, `panel-v2.html`, `sw.js` (pin `20261007a`).
+- etki: (1) ve (2) içerik açısından zararsız (çalışma zamanı farkı yok). Üçünün de canlı bayt eşitliği o anda ölçülmedi; o pinler artık canlıda değil, geriye dönük doğrulanamaz.
+- değişen: yalnız kayıtlar (bu not · D2F-STATE `ledgerLastSeq` · CURRENT-STATE). Geçmiş satırlar değişmedi; kod/veri/pin yok.
+- kanıt düzeyleri: kayıt/git ✓ · yayın (run kaydı API'den) ✓ · canlı — · cihaz —
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-08/KANIT.md
+- next: none

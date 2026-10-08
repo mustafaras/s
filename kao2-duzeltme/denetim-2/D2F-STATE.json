@@ -8,7 +8,7 @@
   "baseCommit": "cbe0d604ffb1fcd20168c9214f590771ec878fbc",
   "startedAt": "2026-10-07",
   "nextPrompt": null,
-  "ledgerLastSeq": 26,
+  "ledgerLastSeq": 27,
   "prompts": {
     "D2F-01": {
       "title": "Başlangıç ve ölçüm",

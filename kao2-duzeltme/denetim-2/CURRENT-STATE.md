@@ -2,11 +2,11 @@
 
 <!-- d2f-sync
 nextPrompt: none
-lastSeq: 26
+lastSeq: 27
 status: completed
 -->
 
-**Son güncelleme:** 2026-10-08 · kapanış sonrası düzeltme notları (LEDGER seq 25, denetim-3 D3F-05; seq 26, D3F-08). Program 2026-10-07'de D2F-16 ile kapandı (`closeCommit` `128ab06d`); sonraki düzeltmeler `kao2-duzeltme/denetim-3/` (D3F-NN) altında.
+**Son güncelleme:** 2026-10-08 · kapanış sonrası düzeltme notları (LEDGER seq 25, denetim-3 D3F-05; seq 26, D3F-08; seq 27, D3F-12). Program 2026-10-07'de D2F-16 ile kapandı (`closeCommit` `128ab06d`); sonraki düzeltmeler `kao2-duzeltme/denetim-3/` (D3F-NN) altında.
 
 ## Nerede kaldık
 - **YAYIN (seq 7, kullanıcı kararı):** ortam değişikliği için D2F-04 sonrası erken yayın — pin `20261007a`, `main` ff-only (tarihsel; sonraki yayın D2F-15, pin `20261007b`). Ayrıntı: evidence/D2F-04/YAYIN.md (ORTAK-KURALLAR silindi; geri getirme: `git show d439127b:kao2-duzeltme/denetim-2/ORTAK-KURALLAR.md`).
@@ -24,7 +24,7 @@ status: completed
 | Yayın pini | kapanışta `20261007b` (D2F-15); güncel pin denetim-3'te (`D3F-STATE.json` → `pins.release`) | aynı + `kapilar.sh` "d3f pin senkronu" |
 | `tests/kao` envanteri | **55 test + 3 yardımcı/fixture README'de**; `test_kao2_inventory.js` PASS | koşuldu (D2F-08) |
 | Araç iki üretim | `MUFREDAT-ESLEME.md` + `quranCurriculumV2.js` **bayt-eşit** ve depodakiyle **aynı** | `--out-dir` ×2 |
-| Metin durumu | **158 kayıt · draft 0 · sourced 158 · ai-delegated 158 · owner 0** (yetki devriyle yapay zekâ; kullanıcı incelemesi değil) | bağımsız sayım (2026-10-08) |
+| Metin durumu | **158 kayıt · draft 0 · sourced 158 · ai-delegated 158 · owner 0** (yetki devriyle yapay zekâ; kullanıcı incelemesi değil). Ayrıca 12 ünitenin "Neden önemli" (`why`) alt onayı **12/12 draft** (`review.whyReview`; L1 işareti kapsamaz, hiçbir görünüm okumaz — LEDGER seq 27) | bağımsız sayım (2026-10-08) |
 | `kapilar.sh` bayraklı / bayraksız | bayraklı **TÜM KAPILAR YEŞİL**; bayraksız **saate ve yüke bağlıydı**: render testi 21:30–23:00 kırmızı (D3F-02'de giderildi), göreli p95 bandı bu makinede oynak (açık karar, D3F-STATE `openDecisions`). D2F-13'teki "ikisi de yeşil" yalnız o koşu için doğruydu | tam koşu (D3F-03, 2026-10-08) |
 | `tekrar-uret-2.cjs` | **9/9 PASS** | koşuldu (2026-10-08) |
 | `d2f-sync-check --strict` | **PASS** (15/15 kayıtlı istisna; kural-a istisnaları hash'e bağlı, kapanış sonrası D2F/K2F öneki yasak) | koşuldu + mutasyon 8/8 (D3F-04, 2026-10-08) |

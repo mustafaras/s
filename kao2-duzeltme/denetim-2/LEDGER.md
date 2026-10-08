@@ -363,3 +363,15 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kayıt/git ✓ · yayın (run kaydı API'den) ✓ · canlı — · cihaz —
 - evidence: kao2-duzeltme/denetim-3/evidence/D3F-08/KANIT.md
 - next: none
+
+## seq 27 · 2026-10-08 · NOTE · D2F-12
+- başlık: Düzeltme notu (denetim-3 F-12) — "158 kayıt · draft 0" ünitelerin "Neden önemli" (`why`) alt onayını saymıyordu.
+- oturum: claude-code (denetim-3 düzeltmeleri, D3F-12; kao2-duzeltme/denetim-3/)
+- gerçek (ölçüm, `texts.tr.json`): 12 ünitenin her birinde `review` = `sourced · ai-delegated`, ama `review.whyReview` = `{level: draft, at: 2026-09-30}` (12/12).
+  Ünite kutusundaki L1 işareti (D2F-12'de `ai-delegated`) `why` metnini kapsamaz; `why` onaysızdır. `why` müfredat modülüne yazılır ama hiçbir görünüm okumaz (kullanıcı etkisi yok).
+- düzeltme: INCELEME-KAO2-17 Durum'da why sayımı ve her ünitenin İnceleme satırında why düzeyi (araç, veriden); CURRENT-STATE "Metin durumu" satırına why notu.
+  "158 kayıt · draft 0" sayımı kendi kapsamında (133 metin + 25 kavram) doğrudur; değişmedi.
+- değişen: yalnız kayıtlar (bu not · D2F-STATE `ledgerLastSeq` · CURRENT-STATE). Geçmiş satırlar değişmedi; kod/veri/pin yok.
+- kanıt düzeyleri: kayıt/test ✓ · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-12/KANIT.md
+- next: none

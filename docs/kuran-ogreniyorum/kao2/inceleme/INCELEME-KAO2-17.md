@@ -16,6 +16,7 @@
 - `draft` (görünmez): **0**
 - `sourced` (görünür): **133**
 - `expert` (görünür): **0**
+- Ünite "Neden önemli" (`why`) metni, ayrı onay: 12 metin · `draft` **12** · `sourced` **0** · `expert` **0** — ünite kutusundaki L1 işareti bu metni kapsamaz; `draft` olan onaysızdır.
 
 ## Onayı kim verdi
 
@@ -43,84 +44,84 @@ Bunlardaki `[x]` senin kendi onayın değildir; işareti kimin koyduğu "Onayı 
 
 - Vaad: Her namazda okuduğun Fâtiha'yı kelime kelime anlayacaksın.
 - Neden önemli: Fâtiha namazlarda tekrar tekrar okunur; bu yedi âyeti anlamak, öğrendiğin ilk kelimeleri hemen gerçek bir metinde kullanmanı sağlar. Yeni başlayan biri için en güçlü çapa budur.
-- İnceleme: `sourced · ai-delegated` · kaynak: surah-theme, lexicon-meanings
+- İnceleme: `sourced · ai-delegated` · kaynak: surah-theme, lexicon-meanings · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 2 · Namazın cümleleri
 
 - Vaad: Tekbirden selâma kadar namazda söylediklerini anlayacaksın.
 - Neden önemli: Namaz, kelimeleri en sık duyduğun yerdir. İftitah tekbirinden selama kadar geçen cümleleri anlamak, öğrendiklerini günde beş kez uygulamana imkân verir.
-- İnceleme: `sourced · ai-delegated` · kaynak: lexicon-meanings
+- İnceleme: `sourced · ai-delegated` · kaynak: lexicon-meanings · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 3 · Üç kısa sûre
 
 - Vaad: İhlâs, Felak ve Nâs'ı anlayarak okuyacaksın.
 - Neden önemli: Bu üç kısa sûre hem yeni başlayan için okunması kolay hem de anlamı berrak metinlerdir; kelime dağarcığını ilk gerçek sûre okumalarında kullanırsın.
-- İnceleme: `sourced · ai-delegated` · kaynak: surah-theme, lexicon-meanings
+- İnceleme: `sourced · ai-delegated` · kaynak: surah-theme, lexicon-meanings · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 4 · Kur'an'ın tutkalı
 
 - Vaad: Cümleleri birbirine bağlayan kelimeleri tanıyacaksın.
 - Neden önemli: Uzun cümleleri anlamayı zorlaştıran şey çoğu zaman bağlaçlardır. Bu küçük kelimeleri tanıyınca cümlenin parçalarını ve bir fikrin nerede başka bir fikre bağlandığını görmen kolaylaşır.
-- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain
+- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 5 · Bu, şu, kim, ne
 
 - Vaad: İşaret ve soru kelimeleriyle âyetin kime, neye döndüğünü göreceksin.
 - Neden önemli: İşaret ve soru kelimeleri, cümlenin kimi ya da neyi konu edindiğini gösterir. Bunları tanıdığında âyetin yönünü bulman kolaylaşır.
-- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain
+- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 6 · Gök, yer ve insan
 
 - Vaad: Kur'an'ın en sık isimlerini tanıyacaksın.
 - Neden önemli: Kur'an'da isimler çok geçer ve sık geçen isimlerin birçoğu gök, yer, insan gibi gündelik kavramlardır. Bunları öğrenmek, okuduğun âyetlerde tanıdığın kelime sayısını hızla artırır.
-- İnceleme: `sourced · ai-delegated` · kaynak: lexicon-meanings
+- İnceleme: `sourced · ai-delegated` · kaynak: lexicon-meanings · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 7 · Oldu, yaptı
 
 - Vaad: Geçmiş zaman anlatılarını çözeceksin.
 - Neden önemli: Kur'an'da geçmişte olanlar sık anlatılır. Geçmiş zaman kalıbını tanıdığında kıssa anlatımlarını daha rahat takip edersin.
-- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain
+- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 8 · Yapar, yapıyor
 
 - Vaad: Şimdiki ve geniş zamanı tanıyacaksın.
 - Neden önemli: Şimdiki ve geniş zaman kalıbı, süregelen işleri ve genel doğruları anlatır. Bu kalıbı tanıyınca fiilin süren ya da genel bir işi anlattığını fark edersin.
-- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain
+- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 9 · Yap, ver, bağışla
 
 - Vaad: Emir ve dua cümlelerini anlayacaksın.
 - Neden önemli: Kur'an'da emir ve dua kalıpları sık geçer. Bunları tanımak, hem yönlendirmeyi hem de yakarışı ayırt etmeni sağlar.
-- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain
+- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 10 · Bir kök, bir aile
 
 - Vaad: Bir kökten türeyen kelime ailesini göreceksin.
 - Neden önemli: Arapçada kelimeler ortak bir kökten türer. Tek bir kökü öğrenmek, aynı aileden gelen pek çok kelimeyi birden tanımanı sağlar; ilim, talim, muallim aynı köktendir.
-- İnceleme: `sourced · ai-delegated` · kaynak: lexicon-meanings
+- İnceleme: `sourced · ai-delegated` · kaynak: lexicon-meanings · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 11 · Kalıplar
 
 - Vaad: Kalıp değişince anlamın nasıl kaydığını göreceksin.
 - Neden önemli: Aynı kökten gelen kelimeler kalıba göre farklı işler görür: yapan, yapılan, yapma. Kalıpları tanımak, bilmediğin bir kelimenin anlamı için sana ipucu verir.
-- İnceleme: `sourced · ai-delegated` · kaynak: lexicon-meanings
+- İnceleme: `sourced · ai-delegated` · kaynak: lexicon-meanings · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ### Ünite 12 · Eğer ve zaman
 
 - Vaad: Şart ve zaman cümlelerini çözeceksin.
 - Neden önemli: Şart ve zaman ifadeleri, bir olayın hangi koşulda ve ne zaman gerçekleştiğini söyler. Bunları tanımak, uzun cümleleri parçalara ayırmanı kolaylaştırır.
-- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain
+- İnceleme: `sourced · ai-delegated` · kaynak: grammar-plain · neden önemli: `draft`
 - [x] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun
 
 ## Dersler

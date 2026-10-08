@@ -620,6 +620,12 @@ function reviewerLabel(review) {
   return review.by ? ` · ${review.by}` : ' · onaylayan kayıtsız';
 }
 
+// D3F-12: ünite why metninin onay düzeyi; kayıt yoksa draft sayılır.
+function whyLevel(review) {
+  const level = review && review.whyReview && review.whyReview.level;
+  return ['sourced', 'expert'].includes(level) ? level : 'draft';
+}
+
 function renderReviewAttribution(reviews) {
   const visible = reviews.filter((r) => r && r.level !== 'draft');
   const delegated = new Map();
@@ -663,7 +669,11 @@ function renderTextReview(data) {
   lines.push(`- Toplam metin: **${all.length}**`,
     `- \`draft\` (görünmez): **${count('draft')}**`,
     `- \`sourced\` (görünür): **${count('sourced')}**`,
-    `- \`expert\` (görünür): **${count('expert')}**`, '');
+    `- \`expert\` (görünür): **${count('expert')}**`);
+  // D3F-12 (F-12): ünite "Neden önemli" metninin kendi onay durumu (review.whyReview) vardır; ünite kutusundaki L1 işareti onu kapsamaz.
+  const whyUnits = data.units.filter((u) => u.why);
+  const whyCount = (level) => whyUnits.filter((u) => whyLevel(u.review) === level).length;
+  lines.push(`- Ünite "Neden önemli" (\`why\`) metni, ayrı onay: ${whyUnits.length} metin · \`draft\` **${whyCount('draft')}** · \`sourced\` **${whyCount('sourced')}** · \`expert\` **${whyCount('expert')}** — ünite kutusundaki L1 işareti bu metni kapsamaz; \`draft\` olan onaysızdır.`, '');
   lines.push(...renderReviewAttribution(all.map((t) => t.review)));
   // KR-4: yeniden yazılanlar ve kutu onayı olmadan görünür kalanlar ayrı listelenir.
   const cell = (v) => String(v ?? '—').replace(/\|/g, '\\|');
@@ -683,7 +693,7 @@ function renderTextReview(data) {
     lines.push(`### Ünite ${u.id} · ${u.title}`, '',
       `- Vaad: ${u.promise}`,
       u.why ? `- Neden önemli: ${u.why}` : '- Neden önemli: —',
-      `- İnceleme: \`${u.review.level}${reviewerLabel(u.review)}\`${Array.isArray(u.review.sources) && u.review.sources.length ? ` · kaynak: ${u.review.sources.join(', ')}` : ''}`,
+      `- İnceleme: \`${u.review.level}${reviewerLabel(u.review)}\`${Array.isArray(u.review.sources) && u.review.sources.length ? ` · kaynak: ${u.review.sources.join(', ')}` : ''}${u.why ? ` · neden önemli: \`${whyLevel(u.review)}\`` : ''}`,
       '- [ ] L1 metin uygun   - [ ] L2 (dinî bağlam) uygun', '');
   });
   lines.push('## Dersler', '');

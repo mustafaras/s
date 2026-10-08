@@ -248,6 +248,28 @@ check('D3F-06: inceleme sayfaları [x] işaretini kimin koyduğunu veriden söyl
   assert.deepEqual([...listed].sort(), [...notOwn].sort(), 'INCELEME-17: yeniden onay listesi kullanıcının kendi onayı olmayan görünür metinlerle aynı değil');
 });
 
+// D3F-12 (F-12): ünite "Neden önemli" (why) metninin kendi onay durumu (review.whyReview) vardır; ünite kutusundaki L1 işareti onu
+// kapsamaz. İnceleme sayfası bunu veriden söylemeli: Durum'da why sayımı, her ünitenin "- İnceleme:" satırında why düzeyi.
+check('D3F-12: inceleme sayfası ünite why metninin ayrı onay durumunu veriden söyler', () => {
+  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8'));
+  const sheet = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md'), 'utf8');
+  const withWhy = Object.entries(texts.units).filter(([, u]) => typeof u.why === 'string' && u.why);
+  const levelOf = (u) => (u.review && u.review.whyReview && u.review.whyReview.level) || 'draft';
+  const count = (level) => withWhy.filter(([, u]) => levelOf(u) === level).length;
+  const status = /\n## Durum\n([\s\S]*?)\n## /.exec(sheet);
+  assert.ok(status, 'Durum bölümü yok');
+  const line = status[1].split('\n').find((l) => l.includes('Neden önemli') && l.includes('`why`'));
+  assert.ok(line, 'Durum bölümü ünite why metninin onay durumunu saymıyor');
+  for (const level of ['draft', 'sourced', 'expert']) assert.ok(line.includes(`\`${level}\` **${count(level)}**`), `why ${level} sayısı (${count(level)}) yazmıyor: ${line}`);
+  assert.match(line, /L1 işareti bu metni kapsamaz/, 'L1 kutusunun why metnini kapsamadığı söylenmiyor');
+  const lines = sheet.split('\n');
+  for (const [k, u] of withWhy) {
+    const start = lines.findIndex((l) => l.startsWith(`### Ünite ${k} ·`));
+    const review = lines.slice(start + 1).find((l) => /^- İnceleme:/.test(l));
+    assert.ok(review && review.includes(`neden önemli: \`${levelOf(u)}\``), `Ünite ${k}: why düzeyi (${levelOf(u)}) İnceleme satırında yok: ${review}`);
+  }
+});
+
 // D3F-09 (F-09): bir kaydın inceleme damgası (review.at ve varsa delegatedAt), metninin son değiştiği tarihten eski olamaz;
 // yoksa eski metnin onayı yeni metne taşınmış olur. Değişim tarihi git geçmişinden (taşıma dahil, --follow) türetilir;
 // commit'lenmemiş metin değişikliği bugünün tarihini alır. İlk görünüş değişim sayılmaz (geçmiş sığsa yanlış kırmızı vermez).

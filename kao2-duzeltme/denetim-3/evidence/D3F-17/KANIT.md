@@ -36,3 +36,7 @@ Amend yapılmadı; KANIT ayrı `D3F-17: ek` commit'iyle eklendi.
 
 ## Kanıt düzeyleri
 kayıt ✓ · yayın — (yalnız belge; Pages'e çalışma zamanı farkı yok, push kullanıcı talimatıyla) · cihaz — (gerekmez)
+
+## Sonradan düzeltme (D3F-18, 2026-10-09)
+Bu denetim kendi notunun LEDGER'daki son kayıt olmasını şart koşuyordu; seq 31 (D3F-18) eklenince kırmızıya döndü. Şart kaldırıldı, not başlık satırından tanınıyor,
+mutasyon M2 seq'ten bağımsız. Yeniden 5/5. Ayrıntı: [`../D3F-18/KANIT.md`](../D3F-18/KANIT.md).

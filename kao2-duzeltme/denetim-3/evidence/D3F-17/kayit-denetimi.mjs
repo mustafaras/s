@@ -23,11 +23,10 @@ const ledger = read(`${D2}/LEDGER.md`);
 const seqs = [...ledger.matchAll(/^## seq (\d+) · /gm)].map((m) => Number(m[1]));
 const last = Math.max(...seqs);
 const blocks = ledger.split(/^(?=## seq \d+ · )/m);
-const note = blocks.find((b) => /^## seq \d+ · [0-9-]+ · NOTE · D2F-16\b/.test(b) && /denetim-3 F-17/.test(b));
+const note = blocks.find((b) => /^## seq \d+ · [0-9-]+ · NOTE · D2F-16\b/.test(b) && /^- başlık:.*denetim-3 F-17\b/m.test(b)); // not başlıktan tanınır (gövdede geçen anma sayılmaz; D3F-18 M1 dersi)
 ok(note, 'denetim-2 LEDGER: "NOTE · D2F-16" + "denetim-3 F-17" düzeltme notu yok');
+const noteSeq = note ? Number(note.match(/^## seq (\d+)/)[1]) : -1;
 if (note) {
-  const seq = Number(note.match(/^## seq (\d+)/)[1]);
-  ok(seq === last, `F-17 notu son seq olmalı (not ${seq}, son ${last})`);
   // Sayı ve hash'ler aynı satırda: not başka bir yerde (ör. closeCommit) hash geçse de bu satır eksikse kırmızı (D3F-17 M4 dersi).
   const countLine = (note.split("\n").find((l) => /önekli \d+ commit oldu/.test(l)) || "");
   ok(new RegExp(`önekli ${commits.length} commit oldu`).test(countLine), `not commit sayısını (${commits.length}) yazmıyor`);
@@ -39,7 +38,7 @@ const state = JSON.parse(read(`${D2}/D2F-STATE.json`));
 ok(state.ledgerLastSeq === last, `D2F-STATE.ledgerLastSeq ${state.ledgerLastSeq} ≠ LEDGER son seq ${last}`);
 const cur = read(`${D2}/CURRENT-STATE.md`);
 ok(new RegExp(`^lastSeq: ${last}$`, 'm').test(cur), `CURRENT-STATE lastSeq ${last} değil`);
-ok(new RegExp(`seq ${last}, D3F-17`).test(cur), `CURRENT-STATE "Son güncelleme" seq ${last} (D3F-17) notunu anmıyor`);
+ok(new RegExp(`seq ${noteSeq}, D3F-17\\b`).test(cur), `CURRENT-STATE "Son güncelleme" seq ${noteSeq} (D3F-17) notunu anmıyor`);
 
 if (fails.length) { for (const f of fails) console.log(`FAIL  ${f}`); console.log(`d3f17 kayıt denetimi: FAIL (${fails.length})`); process.exit(1); }
 console.log(`d3f17 kayıt denetimi: PASS (D2F-16 commit ${commits.join(', ')} · LEDGER son seq ${last} · STATE/CURRENT senkron)`);

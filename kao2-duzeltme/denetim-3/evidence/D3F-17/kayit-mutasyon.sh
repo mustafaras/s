@@ -14,7 +14,7 @@ expect() { N=$((N+1)); local out rc; out="$(node "$R/$AUD" --root "$R" 2>&1)"; r
   if [ "$got" = "$2" ] && printf '%s' "$out" | grep -q -- "$3"; then echo "PASS  $1 → $got"; else echo "FAIL  $1 → beklenen $2 (\"$3\"), gelen $got"; printf '%s\n' "$out" | sed 's/^/      /' | head -4; BAD=1; fi; }
 reset; expect "M0 kayıtlı hâl" PASS 'kayıt denetimi: PASS'
 reset; mutate "$D2/LEDGER.md" 'Düzeltme notu (denetim-3 F-17)' 'Düzeltme notu'; expect "M1 not F-17'yi anmıyor" FAIL 'düzeltme notu yok'
-reset; mutate "$D2/D2F-STATE.json" '"ledgerLastSeq": 30,' '"ledgerLastSeq": 29,'; expect "M2 STATE senkron değil" FAIL 'ledgerLastSeq 29'
+reset; mutate "$D2/D2F-STATE.json" '"ledgerLastSeq": ' '"ledgerLastSeq": 9'; expect "M2 STATE senkron değil" FAIL 'ledgerLastSeq 9'
 reset; mutate "$D2/LEDGER.md" 'D2F-16 önekli 2 commit oldu' 'D2F-16 önekli commit oldu'; expect "M3 commit sayısı yok" FAIL 'commit sayısını (2)'
 reset; mutate "$D2/LEDGER.md" '`128ab06d` (NOTE' '(NOTE'; expect "M4 commit hash'i yok" FAIL "commit'ini (128ab06d)"
 rm -rf "$H"

@@ -4,7 +4,7 @@
   "source": "kao2-duzeltme/denetim-3/DENETIM-3-RAPORU.md",
   "baseCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
   "startedAt": "2026-10-08",
-  "nextFinding": "F-18",
+  "nextFinding": "F-19",
   "starter": "kao2-duzeltme/denetim-3/STARTER.md",
   "process": {
     "commitPrefix": "D3F-NN:",
@@ -41,7 +41,7 @@
     "F-15": { "severity": "DÜŞÜK", "title": "K2F KANIT eksikleri (Oturum satırı, bölümler)", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-15/KANIT.md", "note": "44 KANIT: Oturum yok 43/44, bölüm eksik 7/44 (dosya dosya envanter); tarihsel KANITlar değişmedi; FIX LEDGER seq 128 NOTE" },
     "F-16": { "severity": "DÜŞÜK", "title": "okuyucu alt paneli role=dialog ama dialog değil", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-16/KANIT.md", "note": "panel role=region + aria-live=polite (id kao-reader-panel); açan kelime aria-expanded + aria-controls; odak açılış ve Kapat sonrası açan kelimeye döner; a11y matrisi anlam paneli açık 4 yüzeyle genişledi; pin 20261008e; ekran okuyucu doğrulaması kullanıcıda" },
     "F-17": { "severity": "DÜŞÜK", "title": "D2F-16 ölçütü birebir sağlanmadı", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-17/KANIT.md", "note": "denetim-2 LEDGER seq 30 NOTE (Claude çalıştırdı; 2 commit 55da6965 + 128ab06d); ledgerLastSeq 30; CURRENT-STATE Canlı gerçekler YAYIN-9 kapısıyla 2026-10-09; kayıt denetimi + mutasyon 5/5" },
-    "F-18": { "severity": "DÜŞÜK", "title": "8bf8f658 süreç dışı (tutma kararı doğru)", "status": "open" },
+    "F-18": { "severity": "DÜŞÜK", "title": "8bf8f658 süreç dışı (tutma kararı doğru)", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-18/KANIT.md", "note": "denetim-2 LEDGER seq 31 NOTE: seq 21 8 fixture → 6 test dosyası (yalnız pin), testlerden önce atıldı, plan dışı pin 20261006c, görsel QA 127.0.0.1:9000 kurala uygun; karar değişmedi; mutasyon 8/8; D3F-17 denetimi sağlamlaştırıldı" },
     "F-19": { "severity": "DÜŞÜK", "title": "depo public: gizlilik yolları GitHub'da okunur", "status": "open" },
     "F-20": { "severity": "ORTA", "title": "KAO test düzeneği gerçek saati sızdırıyor (saate bağlı test)", "source": "rapor dışı — D3F-16 fixture turunda bulundu (2026-10-09)", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-16/saat/KANIT.md", "note": "bootKao todayStr=now ama VM gerçek Date; 2026-10-09dan itibaren ilk parça görevi order→translate, test_kao2_grammar_tasks D4 + kabul A-9 + tam kapı kırmızı; düzenek VM saatini now anından başlatır; kullanıcı kararıyla D3F-16 ek commitinde (2026-10-09)" }
   },
@@ -73,6 +73,7 @@
     "D3F-16": ["d6623275", "a384aa8a"],
     "YAYIN-9": ["aaba4b49", "0ebb26ba"],
     "D3F-17": ["0ee16b7a", "9b485ef3"],
-    "YAYIN-10": ["e3392cc8", "(bu commit)"]
+    "YAYIN-10": ["e3392cc8", "875c9b72"],
+    "D3F-18": ["(bu commit)"]
   }
 }

@@ -416,3 +416,20 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kayıt ✓ (denetim-3 evidence/D3F-17/kayit-denetimi.mjs) · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-3/evidence/D3F-17/KANIT.md
 - next: none
+
+## seq 31 · 2026-10-09 · NOTE · D2F-13
+- başlık: Düzeltme notu (denetim-3 F-18) — `8bf8f658` süreç sapmalarının eksik kalan kısmı ve seq 21'deki sayım yanlışı.
+- oturum: claude-code (denetim-3 düzeltmeleri, D3F-18; kao2-duzeltme/denetim-3/)
+- karar değişmedi: seq 21'deki "GERİ ALINMADI, kayıtla kapatıldı" doğru (denetim-3 F-18 hükmü de aynı). Geri almak canlıdaki düzeltmeleri siler.
+- seq 21'de eksik/yanlış olanlar (commit'in kendisinden ölçüldü):
+  - Sayım: seq 21 "Değiştirdiği 8 fixture" diyor. Doğrusu: 6 test dosyası, hepsinde yalnız pin dizgisi değişti
+    (`test_header_celestial_timeline.js`, `test_header_night_contrast.js`, `test_iip_09.js`, `test_v3_welcome.js`, `test_panel_v2_hit_areas.js`, `test_panel_v2_performance.js`).
+    Kalan iki yeni dosya fixture değil, görsel QA betiği (`kao2-duzeltme/tools/gorsel-qa/shoot-app.mjs`, `shoot-panel.mjs`).
+  - Süreç: commit testlerden önce atıldı (mesajı "ara durum; tam test koşusu sürüyor; yayın ayrı committe"), öneksizdi ve plan dışı pin `20261006c` taşıyordu.
+    Seq 21 yalnız "öneksiz/kapsam dışı" diyordu.
+  - Görsel QA betikleri CLAUDE.md kural 1 istisnasına uyuyor: yalnız `127.0.0.1:9000`, boş geçici profil, dış istekler kesik, token/forceSync kurulmuyor.
+    `ghToken`/`seyma-sync-force` yalnız sentetik varsayılan veride "yok" olduklarını kanıtlamak için okunuyor.
+- değişen: yalnız kayıtlar (bu not · D2F-STATE `ledgerLastSeq` · CURRENT-STATE). Geçmiş satırlar değişmedi; kod/veri/pin yok.
+- kanıt düzeyleri: kayıt ✓ (denetim-3 evidence/D3F-18/kayit-denetimi.mjs) · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-18/KANIT.md
+- next: none

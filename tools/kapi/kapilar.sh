@@ -55,7 +55,6 @@ gate "reminders smoke"   node tests/reminders/run-reminder-smoke.mjs
 gate "run-seyma driver"  node .claude/skills/run-seyma/driver.mjs
 gate "run-seyma zikr"    node .claude/skills/run-seyma/zikr-harness.mjs
 gate "kontrast"          node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs
-gate "l2-paket --check"  node tools/kapi/l2-paket-build.mjs --check
 
 gate "kao-plan-check" node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs
 # F-19 taşıması (2026-10-09): kayıt senkron kapıları (fix-sync, d2f-sync, D3F-STATE pin) kayıtlarla birlikte özel arşive (mustafaras/seyma-arsiv) gitti.

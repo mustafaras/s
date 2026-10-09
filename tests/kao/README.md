@@ -75,4 +75,5 @@ K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşitti
 | `helpers/kao-harness.js` | Ortak harness: `bootKao`/`freshUser`/`openView`/`walkLesson`; gerçek handler'larla akışı sürer (öz-testi `test_kao2_view_resolution.js`) |
 | `fixtures/fsrs-vectors.json` | FSRS referans vektörleri (`test_kao_fsrs.js`) |
 | `fixtures/qac-lemma-morph.json` | QAC'tan sayılmış lemma biçim tablosu (`test_kao2_lemma_morph.js`) |
+| `fixtures/kao2-perf-baseline.json` | KAO2-01 perf tabanı (`test_kao2_perf_budget.js` göreli bandı; 2026-10-09'da arşivden taşındı, değeri aynı) |
 

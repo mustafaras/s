@@ -1,0 +1,6 @@
+PASS  M0 kayıtlı hâl → PASS
+PASS  M1 not F-17'yi anmıyor → FAIL
+PASS  M2 STATE senkron değil → FAIL
+PASS  M3 commit sayısı yok → FAIL
+PASS  M4 commit hash'i yok → FAIL
+d3f17 mutasyon: 5/5 PASS

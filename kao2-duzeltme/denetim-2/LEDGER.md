@@ -401,3 +401,18 @@ Kurallar: [`ORTAK-KURALLAR.md`](ORTAK-KURALLAR.md) · senkron: `node kao2-duzelt
 - kanıt düzeyleri: kaynak/test ✓ · yayın — · cihaz —
 - evidence: kao2-duzeltme/denetim-3/evidence/D3F-14/KANIT.md
 - next: none
+
+## seq 30 · 2026-10-09 · NOTE · D2F-16
+- başlık: Düzeltme notu (denetim-3 F-17) — D2F-16'nın "BİTTİ SAYILIR" ölçütü birebir sağlanmadı; kayıt bunu zaten dürüstçe söylüyordu.
+- oturum: claude-code (denetim-3 düzeltmeleri, D3F-17; kao2-duzeltme/denetim-3/)
+- ölçüt (DUZELTME-PROMPTLARI PROMPT 16): "CANLI.md kullanıcı çıktısıyla · d2f-sync-check PASS · tek commit".
+- gerçek (git ve CANLI.md'den ölçüldü):
+  - Canlı doğrulama komutunu kullanıcı değil Claude çalıştırdı (kullanıcı devri, seq 23; CANLI.md başlığı ve seq 24 bunu yazıyor). Çıktı kullanıcının terminalinden gelmedi.
+  - D2F-16 önekli 2 commit oldu: `55da6965` (canlı doğrulama kaydı) ve `128ab06d` (NOTE — devir listesi, 8bf8f658 tutuldu). Ölçüt tek commit diyordu.
+  - d2f-sync-check PASS kısmı sağlandı. Canlı eşitliği denetim-3 bağımsız olarak doğruladı (65/65).
+- düzeltme: yalnız bu not. Kanıt sonradan kullanıcı çıktısına çevrilemez ve commit'ler birleştirilmez (geçmiş yeniden yazılmaz).
+  Programın kapanış kararı (`completed`, `closeCommit` `128ab06d`) değişmez. Onay türü: kullanıcı devri (explicit değil, delegated).
+- değişen: yalnız kayıtlar (bu not · D2F-STATE `ledgerLastSeq` · CURRENT-STATE). Geçmiş satırlar değişmedi; kod/veri/pin yok.
+- kanıt düzeyleri: kayıt ✓ (denetim-3 evidence/D3F-17/kayit-denetimi.mjs) · yayın — · cihaz —
+- evidence: kao2-duzeltme/denetim-3/evidence/D3F-17/KANIT.md
+- next: none

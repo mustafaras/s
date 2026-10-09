@@ -54,9 +54,9 @@ family "tests/quran"    "tests/quran/test_*.js"
 gate "reminders smoke"   node tests/reminders/run-reminder-smoke.mjs
 gate "run-seyma driver"  node .claude/skills/run-seyma/driver.mjs
 gate "run-seyma zikr"    node .claude/skills/run-seyma/zikr-harness.mjs
-gate "kontrast"          node docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs
+gate "kontrast"          node tools/kao/kao-verify-contrast.mjs
 
-gate "kao-plan-check" node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs
+gate "kao-plan-check" node tools/kao/kao-plan-check.mjs
 # F-19 taşıması (2026-10-09): kayıt senkron kapıları (fix-sync, d2f-sync, D3F-STATE pin) kayıtlarla birlikte özel arşive (mustafaras/seyma-arsiv) gitti.
 # Burada yalnız yayın pini tutarlılığı kalır: index.html quranLearn.js ?v= = sw.js SW_VERSION.
 gate "pin senkronu" node -e "const fs=require('fs');const i=(/app\/core\/quranLearn\.js\?v=(\w+)/.exec(fs.readFileSync('index.html','utf8'))||[])[1];const w=(/SW_VERSION\s*=\s*['\"]([^'\"]+)/.exec(fs.readFileSync('sw.js','utf8'))||[])[1];if(!i||!w||!w.includes(i)){console.error('pin: index '+i+' sw '+w);process.exit(1)}"

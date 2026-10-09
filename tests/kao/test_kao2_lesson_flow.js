@@ -331,9 +331,9 @@ check('K2F-24 tanış kartı: eşlenen namaz kelimesi çapa olarak kartta görü
 });
 
 check('K2F-24 eşleme dosyası ve L2 listesi: araç çıktısı modülle aynı; eşleşmeyenler kimlik + neden ile listelenir', () => {
-  const file = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/prayer-lemma-map.json'), 'utf8'));
+  const file = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/kao2/prayer-lemma-map.json'), 'utf8'));
   assert.deepEqual(plain(file.map), plain(MAP));
-  const review = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md'), 'utf8');
+  const review = fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/inceleme/NAMAZ-ESLEME-L2.md'), 'utf8');
   const uniqueLp = new Set(prayerWordsAll().map((w) => w.lemmaId).filter((id) => id.startsWith('lp_')));
   const unmatched = [...uniqueLp].filter((id) => !MAP[id]);
   assert.ok(unmatched.length > 0);

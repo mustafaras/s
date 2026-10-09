@@ -43,7 +43,7 @@ dosya yine de **değiştirilmez** ve Git'e girmez.
 Gövde hash'ini kendin üretebilirsin (araçla **aynı** tanım):
 
 ```sh
-node -e "const fs=require('fs'),c=require('crypto');const b=fs.readFileSync('quran-ogreniyorum/content/inputs/quran-uthmani.txt','utf8').replace(/\r\n/g,'\n').split('\n').filter(l=>!l.startsWith('#')).join('\n').trim();console.log(c.createHash('sha256').update(Buffer.from(b,'utf8')).digest('hex'))"
+node -e "const fs=require('fs'),c=require('crypto');const b=fs.readFileSync('kaynak/kuran/icerik/inputs/quran-uthmani.txt','utf8').replace(/\r\n/g,'\n').split('\n').filter(l=>!l.startsWith('#')).join('\n').trim();console.log(c.createHash('sha256').update(Buffer.from(b,'utf8')).digest('hex'))"
 ```
 
 Beklenen: `7f429d48…1708de` — hash tanımı **tam olarak** `stripTanzilBoilerplate()`
@@ -65,18 +65,18 @@ node tools/kao-lexicon-build.mjs --self-test
 
 ```sh
 node tools/kao-lexicon-build.mjs \
-  --inputs kuran-ogreniyorum/content/inputs \
+  --inputs kaynak/kuran/icerik/inputs \
   --stats
 ```
 
-Çıktı yalnız `kuran-ogreniyorum/evidence/KAO-01/stats.json` olur. `sourceHashes`
+Çıktı yalnız `kaynak/kuran/kanit/KAO-01/stats.json` olur. `sourceHashes`
 alanı QAC'nin tam-dosya hash'ini ve Tanzil'in hem tam-dosya hem **gövde** hash'ini
 tutarlar (`uthmaniBodySha256`).
 
 ### KAO-02 — aday liste, kognat/komşu önerisi, inceleme tablosu
 
 ```sh
-node tools/kao-lexicon-build.mjs --inputs kuran-ogreniyorum/content/inputs --draft
+node tools/kao-lexicon-build.mjs --inputs kaynak/kuran/icerik/inputs --draft
 node tools/kao-lexicon-build.mjs --review-md      # taslaktan tabloyu yeniden üretir
 node tools/kao-lexicon-build.mjs --import-md      # kullanıcı tabloyu doldurduktan sonra
 ```
@@ -85,9 +85,9 @@ node tools/kao-lexicon-build.mjs --import-md      # kullanıcı tabloyu doldurdu
 
 | Çıktı | İçerik |
 |---|---|
-| `content/lexicon.draft.json` | ~530 aday lemma: korpustan Arapça/translit/kök/POS/sıklık/örnek, kova etiketi |
-| `content/lexicon.review.md` | 06 §3 sütunlarıyla inceleme tablosu (birincil doldurma yolu) |
-| `evidence/KAO-02/draft-report.json` | Kova sayıları, kapsam oranı, kök tanısı, `verifiedTotal` |
+| `icerik/lexicon.draft.json` | ~530 aday lemma: korpustan Arapça/translit/kök/POS/sıklık/örnek, kova etiketi |
+| `icerik/lexicon.review.md` | 06 §3 sütunlarıyla inceleme tablosu (birincil doldurma yolu) |
+| `kanit/KAO-02/draft-report.json` | Kova sayıları, kapsam oranı, kök tanısı, `verifiedTotal` |
 
 **Altın kural:** araç yalnız korpustan **mekanik** alanları üretir; Türkçe anlam,
 kalıp, kognat notu ve örnek çevirilerini **doğrulayıcı yazar** (06 §3, D-12: yapay

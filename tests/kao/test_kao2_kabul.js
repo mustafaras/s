@@ -333,7 +333,7 @@ const sim = {};
   const line = out.split('\n').find((l) => l.startsWith('KAO2 design:'));
   const strict = line && line.match(/strict weights=(\d+) uppercase=(\d+) deco=(\d+) serif=(\d+)/);
   assert.ok(strict, 'tasarım sözleşmesi satırı okunamadı');
-  const contrast = JSON.parse(execFileSync(process.execPath, [path.join(repoRoot, 'docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs'), '--json'], { encoding: 'utf8' }));
+  const contrast = JSON.parse(execFileSync(process.execPath, [path.join(repoRoot, 'tools/kao/kao-verify-contrast.mjs'), '--json'], { encoding: 'utf8' }));
   const below = (contrast.failures || []).filter(Boolean).length;
   // Tek üst çubuk ve switch: gerçek ayar ekranında.
   const t = bootKao();

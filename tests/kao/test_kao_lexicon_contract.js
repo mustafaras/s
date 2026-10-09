@@ -86,7 +86,7 @@ assert.match(shortSurahs.ATTRIBUTION.verification, /surahs\.verified\.json/, '(c
 assert.match(shortSurahs.ATTRIBUTION.verification, /D-12/, '(c) doğrulama alanı D-12\'ye atıf yapmalı');
 
 // Sızıntı bekçisi: modüldeki her Türkçe karşılık doğrulanmış satırın aynısıdır.
-const surahVerified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/content/surahs.verified.json'), 'utf8'));
+const surahVerified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/icerik/surahs.verified.json'), 'utf8'));
 assert.equal(surahVerified.counts.filled, surahVerified.counts.total, 'surahs.verified.json eksiksiz olmalı');
 for (const word of shortSurahs.words) {
   assert.equal(word.tr, surahVerified.rows[word.id]?.tr, `${word.id}: tr doğrulanmış satırdan gelmeli`);
@@ -104,7 +104,7 @@ const firstCluster = (ar) => (String(ar || '').match(/^\p{L}\p{M}*/u) || [''])[0
 const contextShadda = [...lexicon.lemmas, ...shortSurahs.supplements]
   .filter((item) => firstCluster(item.ar).includes('ّ')).map((item) => item.id);
 assert.deepEqual(contextShadda, [], 'başlığın ilk harf kümesinde şedde olmamalı');
-const lexiconVerified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8'));
+const lexiconVerified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/icerik/lexicon.verified.json'), 'utf8'));
 const allahRecord = lexiconVerified.lemmas.find((record) => record.lemmaBw === '{ll~ah');
 assert.ok(allahRecord && allahRecord.ar.includes('ّ'), '{ll~ah başlığının iç şeddesi korunmalı (ilk harfte değil)');
 assert.equal(lexicon.byId(allahRecord.lemmaId).ar, allahRecord.ar, '{ll~ah başlığı modülde aynı kalmalı');
@@ -121,7 +121,7 @@ assert.deepEqual(familyEntries.filter((entry) => headwordById.has(entry.lemmaId)
   .map((entry) => entry.lemmaId), [], 'kök ailesindeki sözlük lemması sözlük başlığıyla aynı yazılmalı');
 
 // İkinci yol (girdi varsa): kısa sûre kelimelerinin hiçbiri quran.com referansıyla normalize-eşit değil.
-const referencePath = path.join(repoRoot, 'docs/kuran-ogreniyorum/content/lexicon.reference.json');
+const referencePath = path.join(repoRoot, 'kaynak/kuran/icerik/lexicon.reference.json');
 if (fs.existsSync(referencePath)) {
   const normalizeTr = (value) => String(value || '').toLocaleLowerCase('tr').replace(/[\p{P}\p{S}]+/gu, ' ').replace(/\s+/g, ' ').trim();
   const referenceByRef = new Map(JSON.parse(fs.readFileSync(referencePath, 'utf8')).words.map((item) => [`${item.ref}:${item.position}`, item.tr]));
@@ -131,7 +131,7 @@ if (fs.existsSync(referencePath)) {
 
 // KAO-FIX-14 · R-A5 anlam komşuları sözlükten (O-7): D-12 doğrulanmış semNeighbors, kısa biçim.
 {
-  const verified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/content/lexicon.verified.json'), 'utf8'));
+  const verified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/icerik/lexicon.verified.json'), 'utf8'));
   const reviewed = verified.lemmas.filter((l) => l.semNeighbors && l.semNeighbors.proposed === false);
   assert.ok(reviewed.length >= 79, `D-12 doğrulanmış komşu satırı: ${reviewed.length}`);
   for (const l of reviewed) assert.match(String(l.semNeighbors.verifiedAt), /^\d{4}-\d{2}-\d{2}$/, `verifiedAt: ${l.lemmaId}`);

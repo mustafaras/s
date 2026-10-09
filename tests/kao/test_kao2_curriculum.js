@@ -12,10 +12,10 @@ const { execFileSync } = require('node:child_process');
 const root = require('../repo-root');
 
 const MODULE = 'app/content/quranCurriculumV2.js';
-const REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md';
-const SPEC = 'docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json';
-const TEXT_SOURCE = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
-const FIX_STATE = 'docs/kuran-ogreniyorum/kao2/content/decisions.json'; // F-19: G2 kararı FIX-STATE yerine burada
+const REVIEW = 'kaynak/kuran/inceleme/MUFREDAT-ESLEME.md';
+const SPEC = 'kaynak/kuran/kao2/curriculum.spec.json';
+const TEXT_SOURCE = 'kaynak/kuran/kao2/texts.tr.json';
+const FIX_STATE = 'kaynak/kuran/kao2/decisions.json'; // F-19: G2 kararı FIX-STATE yerine burada
 const TOOL = 'tools/kao2-curriculum-build.mjs';
 const read = (file) => fs.readFileSync(path.join(root, file));
 
@@ -245,9 +245,9 @@ check('(h) gzip ≤ 48 KiB', () => {
 check('yükleme listeleri: index.html, sw.js ve üç FILES listesi', () => {
   const html = read('index.html').toString('utf8');
   const a = html.indexOf('app/content/quranPhonicsV1.js');
-  const b = html.indexOf('app/content/quranCurriculumV2.js?v=20261008e');
-  assert.ok(a > 0 && b > a, 'index.html: quranPhonicsV1.js sonrası 20261008e pinli satır yok');
-  assert.ok(read('sw.js').toString('utf8').includes("'./app/content/quranCurriculumV2.js?v=20261008e'"), 'sw.js önbellek listesi');
+  const b = html.indexOf('app/content/quranCurriculumV2.js?v=20261009a');
+  assert.ok(a > 0 && b > a, 'index.html: quranPhonicsV1.js sonrası 20261009a pinli satır yok');
+  assert.ok(read('sw.js').toString('utf8').includes("'./app/content/quranCurriculumV2.js?v=20261009a'"), 'sw.js önbellek listesi');
   for (const file of ['.claude/skills/run-seyma/driver.mjs', '.claude/skills/run-seyma/zikr-harness.mjs', 'tests/app/test_state_rebind_boundary.js']) {
     const src = read(file).toString('utf8');
     const p = src.indexOf("'app/content/quranPhonicsV1.js'");

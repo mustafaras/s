@@ -166,7 +166,7 @@ check('kavram çözümlü örnekleri: workedTr onaylıysa explain içinde görü
 });
 
 check('L0: texts.tr.json concepts girişleri geçerli ve Arapça içermez', () => {
-  const raw = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8');
+  const raw = fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/kao2/texts.tr.json'), 'utf8');
   const data = JSON.parse(raw);
   assert.ok(data.concepts && typeof data.concepts === 'object', 'concepts bölümü var');
   const ids = Object.keys(data.concepts);
@@ -181,8 +181,8 @@ check('L0: texts.tr.json concepts girişleri geçerli ve Arapça içermez', () =
 });
 
 check('inceleme sayfası ve kavram sayfası explain/workedTr kullanır', () => {
-  assert.ok(fs.existsSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md')), 'INCELEME-KAO2-18.md var');
-  const sheet = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md'), 'utf8');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'kaynak/kuran/inceleme/INCELEME-KAO2-18.md')), 'INCELEME-KAO2-18.md var');
+  const sheet = fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/inceleme/INCELEME-KAO2-18.md'), 'utf8');
   assert.match(sheet, /workedTr|Çözümlü örnek/, 'inceleme sayfası çözümlü örneği listeler');
   assert.match(sheet, /errorTr|Hata açıklaması/, 'inceleme sayfası hata açıklamasını listeler');
   const viewSrc = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnViews.js'), 'utf8');

@@ -14,7 +14,7 @@ const { execFileSync } = require('node:child_process');
 const repoRoot = require('../repo-root');
 
 const TOOL = path.join(repoRoot, 'tools/kao2-syllable-audio.mjs');
-const MANIFEST = path.join(repoRoot, 'docs/kuran-ogreniyorum/content/audio-manifest.json');
+const MANIFEST = path.join(repoRoot, 'kaynak/kuran/icerik/audio-manifest.json');
 const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
 
 let passed = 0;

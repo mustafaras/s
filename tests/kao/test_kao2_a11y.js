@@ -457,7 +457,7 @@ check('metin taşıyan KAO denetimleri sabit px yükseklik kullanmaz', () => {
 
 // ---- (8) Kontrast: araç PASS ------------------------------------------
 check('kontrast aracı tüm token çiftlerinde eşiği geçer', () => {
-  const out = execFileSync(process.execPath, [path.join(repoRoot, 'docs/kuran-ogreniyorum/tools/kao-verify-contrast.mjs'), '--json'], { encoding: 'utf8' });
+  const out = execFileSync(process.execPath, [path.join(repoRoot, 'tools/kao/kao-verify-contrast.mjs'), '--json'], { encoding: 'utf8' });
   const report = JSON.parse(out);
   const below = (report.failures || report.below || []).filter(Boolean);
   assert.equal(below.length, 0, `eşik altı çift: ${JSON.stringify(below).slice(0, 200)}`);

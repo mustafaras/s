@@ -46,8 +46,8 @@ check('lisans ve girdi pinleri: GPL telif bildirimi fixture\'ta; lexicon sha256 
   assert.match(table.license.notice, /Copyright \(C\) 2011 Kais Dukes/);
   assert.equal(table.license.source, 'https://corpus.quran.com/download/');
   const sha = (buffer) => require('node:crypto').createHash('sha256').update(buffer).digest('hex');
-  assert.equal(table.input.lexiconSha256, sha(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/content/lexicon.verified.json'))), 'fixture başka bir lexicon sürümünden üretilmiş');
-  const readme = read('docs/kuran-ogreniyorum/content/README.md');
+  assert.equal(table.input.lexiconSha256, sha(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/icerik/lexicon.verified.json'))), 'fixture başka bir lexicon sürümünden üretilmiş');
+  const readme = read('kaynak/kuran/icerik/README.md');
   const pinned = (readme.match(/quranic-corpus-morphology-0\.4\.txt`[^\n]*?([0-9a-f]{64})/) || [])[1];
   assert.ok(pinned, 'README QAC sha256 pini bulunamadı');
   assert.equal(table.input.qacSha256, pinned, 'fixture başka bir QAC sürümünden üretilmiş');
@@ -94,7 +94,7 @@ checkAsync('ayrıştırıcı: CRLF, çıplak IMPV kök özelliği sayılır, `l:
 });
 
 check('girdi varsa tablo araçla bayt-eşit yeniden üretilir (yoksa SKIP)', () => {
-  const input = path.join(repoRoot, 'docs/kuran-ogreniyorum/content/inputs/quranic-corpus-morphology-0.4.txt');
+  const input = path.join(repoRoot, 'kaynak/kuran/icerik/inputs/quranic-corpus-morphology-0.4.txt');
   if (!fs.existsSync(input)) return 'skip';
   const result = childProcess.spawnSync(process.execPath, [path.join(repoRoot, 'tools/kao2-lemma-morph-build.mjs'), '--check'], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.stdout);

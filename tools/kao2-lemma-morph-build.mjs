@@ -19,8 +19,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const QAC = join(ROOT, 'docs/kuran-ogreniyorum/content/inputs/quranic-corpus-morphology-0.4.txt');
-const LEXICON = join(ROOT, 'docs/kuran-ogreniyorum/content/lexicon.verified.json');
+const QAC = join(ROOT, 'kaynak/kuran/icerik/inputs/quranic-corpus-morphology-0.4.txt');
+const LEXICON = join(ROOT, 'kaynak/kuran/icerik/lexicon.verified.json');
 const OUT = join(ROOT, 'tests/kao/fixtures/qac-lemma-morph.json');
 const MAX_EXAMPLES = 3;
 const SOURCES = [

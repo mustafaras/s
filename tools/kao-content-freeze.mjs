@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { INPUTS, headwordBw, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic, translitTr, wordTranslitTr } from './kao-lexicon-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const CONTENT = path.join(ROOT, 'docs/kuran-ogreniyorum/content');
+const CONTENT = path.join(ROOT, 'kaynak/kuran/icerik');
 const OUT = path.join(ROOT, 'app/content');
 const QAC = path.join(CONTENT, 'inputs/quranic-corpus-morphology-0.4.txt');
 const DIANET_DUALAR = 'https://dijital.diyanet.gov.tr/File/Download?id=6054&path=6054_1.pdf';
@@ -22,7 +22,7 @@ const JSON_SHA256 = Object.freeze({
 function readJson(file) {
   const buffer = fs.readFileSync(path.join(CONTENT, file));
   const actual = crypto.createHash('sha256').update(buffer).digest('hex');
-  if (actual !== JSON_SHA256[file]) throw new Error(`${file}: sha256 uyuşmuyor (${actual}) (pini güncelle: shasum -a 256 docs/kuran-ogreniyorum/content/${file})`);
+  if (actual !== JSON_SHA256[file]) throw new Error(`${file}: sha256 uyuşmuyor (${actual}) (pini güncelle: shasum -a 256 kaynak/kuran/icerik/${file})`);
   return JSON.parse(buffer.toString('utf8'));
 }
 function deepFreezeRuntime() {

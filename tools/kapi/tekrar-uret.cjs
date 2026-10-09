@@ -107,7 +107,7 @@ check('R-02', 'K4-01 (v1 kullanıcı)', () => {
   return [isRealMastery, `Ü1–3 kelimelerini bilen v1 kullanıcı → ${step.kind} "${step.title}" · başlatınca açılan: ${lessonId} (içerik dersi = gerçek ustalık yok)`];
 });
 
-// Gramer görev kuralları (doğrulanmış kaynak: docs/kuran-ogreniyorum/content/grammar.verified.json):
+// Gramer görev kuralları (doğrulanmış kaynak: kaynak/kuran/icerik/grammar.verified.json):
 // (1) ≥2 şık · (2) "Ek çöz" cevabı yalnız g1'de "el +" ile başlar · (3) "Çekim tablosu" dışında uyaran Arapça
 // (4) "Çekim tablosu" yönergesindeki tırnaklı hücre = uyaran · (5) exampleId'li şablonda uyaran o örneğin içinde.
 function grammarDefects(task, lessonId, verified) {
@@ -139,7 +139,7 @@ function grammarDefects(task, lessonId, verified) {
 
 check('R-03', 'K4-02', () => {
   const t = boot();
-  const verified = JSON.parse(read('docs/kuran-ogreniyorum/content/grammar.verified.json'));
+  const verified = JSON.parse(read('kaynak/kuran/icerik/grammar.verified.json'));
   const bad = [];
   let grammarTasks = 0;
   for (const unit of t.win.QuranCurriculumV2.units) for (const lesson of unit.lessons) {

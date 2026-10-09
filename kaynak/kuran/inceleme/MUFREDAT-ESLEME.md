@@ -1,6 +1,6 @@
 # KAO2 — Müfredat eşlemesi (G2 incelemesi)
 
-> Araç çıktısı: `node tools/kao2-curriculum-build.mjs` — elle düzenlemeyin; değişiklik `docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json` üzerinden yapılır.
+> Araç çıktısı: `node tools/kao2-curriculum-build.mjs` — elle düzenlemeyin; değişiklik `kaynak/kuran/kao2/curriculum.spec.json` üzerinden yapılır.
 > Arapça, okunuş ve anlam `QuranLexiconV1` içerik modülünden kopyalanır. Metin durumu: 133 metin · draft 0 · sourced 133 · expert 0. Tüm başlık ve vaatler onaylıdır (`sourced`), uygulamada görünür.
 
 ## Özet

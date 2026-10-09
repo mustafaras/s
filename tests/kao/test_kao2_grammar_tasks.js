@@ -18,7 +18,7 @@ const { bootKao, freshUser, DEFAULT_NOW } = require('./helpers/kao-harness');
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
 
-const source = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/content/grammar.verified.json'), 'utf8'));
+const source = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/icerik/grammar.verified.json'), 'utf8'));
 const box = { window: {} };
 vm.createContext(box);
 const modulePath = path.join(repoRoot, 'app/content/quranGrammarV1.js');
@@ -684,7 +684,7 @@ check('C9 · GRAMER-SABLON-L2.md: desteklenmeyen şablonlar kimlikle ve gerekçe
   ];
   const text = lines.join('\n');
   assert.ok(!ARABIC.test(text), 'listede Arapça harf olmamalı');
-  const file = path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/GRAMER-SABLON-L2.md');
+  const file = path.join(repoRoot, 'kaynak/kuran/inceleme/GRAMER-SABLON-L2.md');
   if (!fs.existsSync(file) || fs.readFileSync(file, 'utf8') !== text) fs.writeFileSync(file, text);
   assert.equal(fs.readFileSync(file, 'utf8'), text);
 });

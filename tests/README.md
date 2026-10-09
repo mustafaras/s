@@ -132,8 +132,8 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   (2026-09-22): `.github/workflows/pages.yml`’in “Stage runtime-only site”
   adımından **gerçek** `--exclude` bayraklarını çıkarır, aynı rsync’i geçici bir
   dizinde **çalıştırır** ve staged ağacı denetler. İç dizinlerden biri
-  (`docs tests archive .claude tools files kuran-ogreniyorum jev-gate
-  kuran-ogreniyorum jev-gate`) sızarsa, zorunlu çalışma zamanı varlıklarından
+  (`docs kaynak tests archive .claude tools files kuran-ogreniyorum
+  jev-gate`) sızarsa, zorunlu çalışma zamanı varlıklarından
   biri (`index.html`, `app.js`, `app/styles.css`, `panel/…`, `v3` istisnası
   dâhil) düşerse veya staged ağaçta bir `.md` kalırsa FAIL eder. Guard adımının
   dizin listesi rsync dışlama listesiyle tutarsızsa da FAIL eder. Metin

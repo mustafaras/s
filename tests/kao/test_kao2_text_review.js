@@ -91,7 +91,7 @@ check('(d) elle Arapça yok: metinler Arapça karakter taşımaz', () => {
   for (const text of all) {
     assert.doesNotMatch(String(text), /[\u0600-\u06ff]/, `metinde elle Arapça var: ${text}`);
   }
-  const src = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8');
+  const src = fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/kao2/texts.tr.json'), 'utf8');
   assert.doesNotMatch(src, /[\u0600-\u06ff]/, 'metin kaynağı Arapça karakter taşımaz');
 });
 
@@ -119,7 +119,7 @@ check('(e) her metinde review kaydı; by yalnız rol kodu', () => {
 });
 
 check('devirle onaylanan 158 metin kaynağını dürüstçe söyler', () => {
-  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8'));
+  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/kao2/texts.tr.json'), 'utf8'));
   const entries = [
     ...Object.entries(texts.units).map(([k, v]) => [`u${k}`, v]),
     ...Object.entries(texts.lessons),
@@ -140,7 +140,7 @@ check('devirle onaylanan 158 metin kaynağını dürüstçe söyler', () => {
 check('(f) [KAYNAK?] işareti kalmamış', () => {
   const all = [...units.flatMap(unitText), ...lessons.flatMap(lessonText)];
   for (const text of all) assert.doesNotMatch(String(text), /\[KAYNAK\?\]/, `metinde [KAYNAK?] kaldı: ${text}`);
-  const src = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8');
+  const src = fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/kao2/texts.tr.json'), 'utf8');
   assert.doesNotMatch(src, /\[KAYNAK\?\]/, 'metin kaynağında [KAYNAK?] kaldı');
 });
 
@@ -179,9 +179,9 @@ check('sourced/expert görünür; dinî bağlamlı olanda "Kaynak:" satırı var
 });
 
 check('inceleme sayfası ve metin kaynağı mevcut', () => {
-  assert.ok(fs.existsSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json')), 'texts.tr.json var');
-  assert.ok(fs.existsSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md')), 'INCELEME-KAO2-17.md var');
-  const sheet = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md'), 'utf8');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'kaynak/kuran/kao2/texts.tr.json')), 'texts.tr.json var');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'kaynak/kuran/inceleme/INCELEME-KAO2-17.md')), 'INCELEME-KAO2-17.md var');
+  const sheet = fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/inceleme/INCELEME-KAO2-17.md'), 'utf8');
   for (const u of units) assert.ok(sheet.includes(`Ünite ${u.id}`), `inceleme sayfası: Ünite ${u.id}`);
   assert.ok(sheet.includes('- [ ]'), 'onay kutuları var');
 });
@@ -190,14 +190,14 @@ check('inceleme sayfası ve metin kaynağı mevcut', () => {
 // metin kaynağındaki review.by / delegatedBy / delegatedAt kaydından türeterek yazmalı (sayfa düzeyi + kayıt başı).
 check('D3F-06: inceleme sayfaları [x] işaretini kimin koyduğunu veriden söyler', () => {
   const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
-  const texts = JSON.parse(read('docs/kuran-ogreniyorum/kao2/content/texts.tr.json'));
+  const texts = JSON.parse(read('kaynak/kuran/kao2/texts.tr.json'));
   const SHEETS = [
-    ['docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md', [
+    ['kaynak/kuran/inceleme/INCELEME-KAO2-17.md', [
       ...Object.keys(texts.units).map((k) => [`u${k}`, texts.units[k]]),
       ...Object.entries(texts.lessons),
       ...Object.entries(texts.s0)
     ]],
-    ['docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md', Object.entries(texts.concepts)]
+    ['kaynak/kuran/inceleme/INCELEME-KAO2-18.md', Object.entries(texts.concepts)]
   ];
   const visible = (e) => e.review && ['sourced', 'expert'].includes(e.review.level);
   // Kaydın kutusunu taşıyan satır: ünite/kavram başlık bloğundaki "- İnceleme:" satırı, ders/S0 tablo satırı.
@@ -251,8 +251,8 @@ check('D3F-06: inceleme sayfaları [x] işaretini kimin koyduğunu veriden söyl
 // D3F-12 (F-12): ünite "Neden önemli" (why) metninin kendi onay durumu (review.whyReview) vardır; ünite kutusundaki L1 işareti onu
 // kapsamaz. İnceleme sayfası bunu veriden söylemeli: Durum'da why sayımı, her ünitenin "- İnceleme:" satırında why düzeyi.
 check('D3F-12: inceleme sayfası ünite why metninin ayrı onay durumunu veriden söyler', () => {
-  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8'));
-  const sheet = fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md'), 'utf8');
+  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/kao2/texts.tr.json'), 'utf8'));
+  const sheet = fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/inceleme/INCELEME-KAO2-17.md'), 'utf8');
   const withWhy = Object.entries(texts.units).filter(([, u]) => typeof u.why === 'string' && u.why);
   const levelOf = (u) => (u.review && u.review.whyReview && u.review.whyReview.level) || 'draft';
   const count = (level) => withWhy.filter(([, u]) => levelOf(u) === level).length;
@@ -275,7 +275,7 @@ check('D3F-12: inceleme sayfası ünite why metninin ayrı onay durumunu veriden
 // commit'lenmemiş metin değişikliği bugünün tarihini alır. İlk görünüş değişim sayılmaz (geçmiş sığsa yanlış kırmızı vermez).
 check('D3F-09: inceleme damgası metnin son değişiminden eski değil (git geçmişi)', () => {
   const { execFileSync } = require('node:child_process');
-  const rel = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
+  const rel = 'kaynak/kuran/kao2/texts.tr.json';
   const git = (args) => execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 });
   let log;
   try { log = git(['log', '--follow', '--name-only', '--format=@%H %cs', '--', rel]); } catch { console.log('SKIP  git yok: damga/metin tarihi denetlenmedi'); return; }
@@ -320,7 +320,7 @@ check('D3F-09: inceleme damgası metnin son değişiminden eski değil (git geç
 // K2F-20/21 (KR-4): kelime kümesi değişen bir dersin eski (onaylı) metni geçersizdir. Ders ya `draft` olmalı ya da
 // değişiklikten SONRA bir sahibin açık onayıyla (by + at ≥ 2026-10-02) `sourced` yapılmış olmalı.
 check('kelime kümesi değişen her ders draft ya da değişiklik sonrası açık onaylı', () => {
-  const before = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/curriculum.before-k2f20.json'), 'utf8')).lessons;
+  const before = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/kao2/curriculum.before-k2f20.json'), 'utf8')).lessons;
   let changed = 0;
   for (const lesson of lessons) {
     const was = before[lesson.id] || [];

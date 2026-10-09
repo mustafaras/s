@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const STATS_PATH = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'evidence', 'KAO-01', 'stats.json');
+const STATS_PATH = path.join(ROOT, 'kaynak', 'kuran', 'kanit', 'KAO-01', 'stats.json');
 const CONTRACT_TOKEN_TARGET = 77_430;
 const OFFICIAL_RELEASE_WORD_TOTAL = 77_429;
 
@@ -59,17 +59,17 @@ const RESEARCH_REFERENCE = Object.freeze([
 // KAO-02 candidate-list configuration (03 §9 buckets, 02 §2.1 priority).
 // ---------------------------------------------------------------------------
 
-const DRAFT_PATH = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'content', 'lexicon.draft.json');
-const REVIEW_PATH = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'content', 'lexicon.review.md');
-const VERIFIED_PATH = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'content', 'lexicon.verified.json');
+const DRAFT_PATH = path.join(ROOT, 'kaynak', 'kuran', 'icerik', 'lexicon.draft.json');
+const REVIEW_PATH = path.join(ROOT, 'kaynak', 'kuran', 'icerik', 'lexicon.review.md');
+const VERIFIED_PATH = path.join(ROOT, 'kaynak', 'kuran', 'icerik', 'lexicon.verified.json');
 const FROZEN_LEXICON_PATH = path.join(ROOT, 'app', 'content', 'quranLexiconV1.js');
-const WORKBOOK_PATH = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'content', 'lexicon.workbook.md');
+const WORKBOOK_PATH = path.join(ROOT, 'kaynak', 'kuran', 'icerik', 'lexicon.workbook.md');
 // 06 §2 karar tablosu: "Türkçe mealler (Diyanet, Elmalılı...) — Kopyalanmaz.
 // Yalnız insan doğrulayıcının REFERANSI". Bu yüzden ikinci bir kaynak tutulur ve
 // üretim paketine (lexicon.verified.json) ASLA girmez; insanın `tr1` yazmasına
 // yardımcı bir referanstır. Kaynak: quran.com kelime-kelime API (language=tr),
 // kelime başına resmî ses de sağlar (D-08/D-09 için aday).
-const REFERENCE_PATH = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'content', 'lexicon.reference.json');
+const REFERENCE_PATH = path.join(ROOT, 'kaynak', 'kuran', 'icerik', 'lexicon.reference.json');
 const REFERENCE_SOURCE = Object.freeze({
   api: 'https://api.quran.com/api/v4/verses/by_chapter/<n>?words=true&language=tr&word_fields=text_uthmani&per_page=all',
   provider: 'quran.com (Quran.com API v4)',
@@ -78,7 +78,7 @@ const REFERENCE_SOURCE = Object.freeze({
   note: 'Doğrulayıcı REFERANSI; kopyalanmaz, üretim paketine girmez (06 §2). Atıf zorunlu.',
   audio: 'her kelime nesnesi audio_url tasir (wbw/<s>_<a>_<w>.mp3) — D-08/D-09 ses hatti icin aday'
 });
-const DRAFT_REPORT_PATH = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'evidence', 'KAO-02', 'draft-report.json');
+const DRAFT_REPORT_PATH = path.join(ROOT, 'kaynak', 'kuran', 'kanit', 'KAO-02', 'draft-report.json');
 const CANDIDATE_TARGET = 530;
 // 03 §9 reads "sıklık ≤500" as a LEMMA RANK cut-off (bucket D is explicitly
 // "sıklık >500 olsa da"), which the corpus measurement confirms: the rank-500
@@ -2106,7 +2106,7 @@ function importReview() {
 }
 
 function buildExamplePronunciations(verified) {
-  const inputDir = path.join(ROOT, 'docs', 'kuran-ogreniyorum', 'content', 'inputs');
+  const inputDir = path.join(ROOT, 'kaynak', 'kuran', 'icerik', 'inputs');
   const parsed = parseMorphology(readPinnedInput(inputDir, INPUTS.morphology).text);
   const verseTotal = new Set(parsed.words.map((word) => `${word.surah}:${word.ayah}`)).size;
   const aligned = parseUthmani(readUthmaniInput(inputDir, verseTotal).text, parsed.words).byVerse;
@@ -2285,8 +2285,8 @@ function usage() {
   return [
     'Kullanım:',
     '  node tools/kao-lexicon-build.mjs --self-test',
-    '  node tools/kao-lexicon-build.mjs --inputs docs/kuran-ogreniyorum/content/inputs [--stats]',
-    '  node tools/kao-lexicon-build.mjs --inputs docs/kuran-ogreniyorum/content/inputs --draft',
+    '  node tools/kao-lexicon-build.mjs --inputs kaynak/kuran/icerik/inputs [--stats]',
+    '  node tools/kao-lexicon-build.mjs --inputs kaynak/kuran/icerik/inputs --draft',
     '  node tools/kao-lexicon-build.mjs --review-md',
     '  node tools/kao-lexicon-build.mjs --reference   # TEK ağ noktası: quran.com tr kelime-kelime referansı',
     '  node tools/kao-lexicon-build.mjs --workbook',

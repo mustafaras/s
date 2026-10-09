@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // KAO2-07 müfredat derleyici. Girdi: curriculum.spec.json (Arapça yok) + donmuş
 // KAO içerik modülleri + texts.tr.json (metin/review katmanı) + G2 karar kaydı
-// (docs/kuran-ogreniyorum/kao2/content/decisions.json, salt okunur). Çıktı: app/content/quranCurriculumV2.js ve
-// docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md. Belirlenimci: zaman damgası
+// (kaynak/kuran/kao2/decisions.json, salt okunur). Çıktı: app/content/quranCurriculumV2.js ve
+// kaynak/kuran/inceleme/MUFREDAT-ESLEME.md. Belirlenimci: zaman damgası
 // yok, sıralama yalnız veriye bağlı; ağ, tarayıcı ve kullanıcı verisi yok.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,19 +10,19 @@ import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SPEC = 'docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json';
+const SPEC = 'kaynak/kuran/kao2/curriculum.spec.json';
 const OUT_MODULE = 'app/content/quranCurriculumV2.js';
-const OUT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md';
-const TEXTS = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
-const BEFORE_K2F20 = 'docs/kuran-ogreniyorum/kao2/content/curriculum.before-k2f20.json';
-const OUT_TEXT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md';
-const OUT_CONCEPT_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md';
+const OUT_REVIEW = 'kaynak/kuran/inceleme/MUFREDAT-ESLEME.md';
+const TEXTS = 'kaynak/kuran/kao2/texts.tr.json';
+const BEFORE_K2F20 = 'kaynak/kuran/kao2/curriculum.before-k2f20.json';
+const OUT_TEXT_REVIEW = 'kaynak/kuran/inceleme/INCELEME-KAO2-17.md';
+const OUT_CONCEPT_REVIEW = 'kaynak/kuran/inceleme/INCELEME-KAO2-18.md';
 const OUT_CONCEPT_MODULE = 'app/content/quranConceptTextsV1.js';
-const OUT_PRAYER_MAP = 'docs/kuran-ogreniyorum/kao2/content/prayer-lemma-map.json';
-const OUT_PRAYER_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md';
+const OUT_PRAYER_MAP = 'kaynak/kuran/kao2/prayer-lemma-map.json';
+const OUT_PRAYER_REVIEW = 'kaynak/kuran/inceleme/NAMAZ-ESLEME-L2.md';
 // D2-11 · K3-07: G2 onay kararının kaydı KAO2-FIX programında tutulur; müfredat sayfası onay durumunu
 // buradan yazar (salt okunur). Kayıt yoksa sayfa kırılmaz, bölüm "bekliyor" biçiminde kalır.
-const FIX_STATE = 'docs/kuran-ogreniyorum/kao2/content/decisions.json'; // F-19: G2 kararı FIX-STATE yerine burada
+const FIX_STATE = 'kaynak/kuran/kao2/decisions.json'; // F-19: G2 kararı FIX-STATE yerine burada
 const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
 
 function fail(message) {
@@ -470,7 +470,7 @@ function renderModule(fullData) {
   const freeze = "function freeze(v){if(v&&typeof v==='object'&&!Object.isFrozen(v)){Object.keys(v).forEach(function(k){freeze(v[k]);});Object.freeze(v);}return v;}";
   const index = "var index={};data.units.forEach(function(u){u.lessons.forEach(function(l){index[l.id]=l;});});";
   const byLesson = "data.byLesson=function(id){return Object.prototype.hasOwnProperty.call(index,id)?index[id]:null;};";
-  return '/* KAO2-07 araç çıktısı: tools/kao2-curriculum-build.mjs + docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json. Elle düzenlemeyin. */\n'
+  return '/* KAO2-07 araç çıktısı: tools/kao2-curriculum-build.mjs + kaynak/kuran/kao2/curriculum.spec.json. Elle düzenlemeyin. */\n'
     + `(function(){'use strict';${freeze}var data=${JSON.stringify(data)};${index}${byLesson}window.QuranCurriculumV2=freeze(data);})();\n`;
 }
 
@@ -556,7 +556,7 @@ function renderReview(data, spec, { lex, grammar }) {
     : `Metin durumu: ${status.total} metin · draft ${status.draft} · sourced ${status.sourced} · expert ${status.expert}. ${status.draft} metin hâlâ taslaktır (\`review.level: draft\`); uygulamada görünmez.`;
   const lines = [
     '# KAO2 — Müfredat eşlemesi (G2 incelemesi)', '',
-    '> Araç çıktısı: `node tools/kao2-curriculum-build.mjs` — elle düzenlemeyin; değişiklik `docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json` üzerinden yapılır.',
+    '> Araç çıktısı: `node tools/kao2-curriculum-build.mjs` — elle düzenlemeyin; değişiklik `kaynak/kuran/kao2/curriculum.spec.json` üzerinden yapılır.',
     `> Arapça, okunuş ve anlam \`QuranLexiconV1\` içerik modülünden kopyalanır. ${statusLine}`, '',
     '## Özet', '',
     '| Ünite | Seviye | Başlık | Ders | Kelime | Kavramlar | Çapa |', '|---|---|---|---|---|---|---|'

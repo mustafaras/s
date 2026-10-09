@@ -69,6 +69,10 @@ jobs:
       # v3-tanitim'daki 'tools/...' gecisleri yalnizca YORUM satiri. Sir veya
       # kisisel veri yoktu. NOT: files/yedek/*.json git'te takipli DEGIL, zaten
       # yayinlanmiyordu (404).
+      #
+      # Ucuncu tur (2026-10-09): docs/kuran-ogreniyorum/ -> kaynak/kuran/ +
+      # tools/kao/ tasindi. kaynak/ dogrulanmis icerik JSON'lari ve inceleme
+      # sayfalaridir (arac/test girdisi), calisma zamani varligi DEGIL.
       - name: Stage runtime-only site
         run: |
           mkdir -p _site
@@ -77,6 +81,7 @@ jobs:
             --exclude '.github' \
             --exclude '.claude' \
             --exclude 'docs' \
+            --exclude 'kaynak' \
             --exclude 'tests' \
             --exclude 'archive' \
             --exclude 'demos' \
@@ -113,7 +118,7 @@ jobs:
             [ -f "_site/$f" ] || { echo "EKSIK: $f"; exit 1; }
           done
           [ -z "$(find _site -name '*.md' -print -quit)" ] || { echo "_site icinde .md kaldi"; exit 1; }
-          for d in docs tests archive demos .claude tools files \
+          for d in docs kaynak tests archive demos .claude tools files \
                    ilham-ibadet-premium-plan kuran-ogreniyorum kuran-ogreniyorum-v2 kao2-duzeltme jev-gate; do
             [ ! -e "_site/$d" ] || { echo "_site icinde $d kaldi"; exit 1; }
           done

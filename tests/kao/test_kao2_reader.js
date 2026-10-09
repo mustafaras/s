@@ -60,7 +60,7 @@ check('(a) K2F-26: sûre bağlamı kaldırıldı — motorda okuyucu, müfredat 
   const t = boot();
   assert.equal(t.api.kaoReaderContext, undefined, 'bağlam okuyucusu motordan kalkmalı');
   assert.equal(t.box.window.QuranCurriculumV2.surahs, undefined, 'müfredat modülünde surahs kalmamalı');
-  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json'), 'utf8'));
+  const texts = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/kao2/texts.tr.json'), 'utf8'));
   assert.equal(texts.surahs, undefined, 'texts.tr.json surahs kalmamalı');
   assert.deepEqual(Object.keys(texts.sources).filter((key) => key === 'diyanet-meal' || key === 'tdv-sure'), [], 'yanlış atıf kalmamalı');
   const css = fs.readFileSync(path.join(repoRoot, 'app/kao.css'), 'utf8');

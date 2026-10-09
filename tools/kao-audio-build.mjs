@@ -17,7 +17,7 @@ function fail(message, code = 1) {
 }
 
 function parseArgs(argv) {
-  const args = { manifest: 'docs/kuran-ogreniyorum/content/audio-manifest.json' };
+  const args = { manifest: 'kaynak/kuran/icerik/audio-manifest.json' };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--self-test') args.selfTest = true;

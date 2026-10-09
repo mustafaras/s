@@ -2,19 +2,19 @@
 // KAO plan denetleyici — salt-okur (yalnız --render CURRENT-STATE.md yazar).
 // Kaynak: kuran-ogreniyorum/KAO-STATE.json (tek doğruluk kaynağı).
 // Kullanım:
-//   node kuran-ogreniyorum/tools/kao-plan-check.mjs            # tüm kontroller, FAIL → exit 1
-//   node kuran-ogreniyorum/tools/kao-plan-check.mjs --render   # + .anti-amnesia/CURRENT-STATE.md üret
-//   node kuran-ogreniyorum/tools/kao-plan-check.mjs --self-test
-//   node kuran-ogreniyorum/tools/kao-plan-check.mjs --card KAO-07   # yalnız o kartın kapsam/kontrol özeti
-//   node kuran-ogreniyorum/tools/kao-plan-check.mjs --commits       # + kart başına commit sayısı (yalnız bilgi)
-//   node docs/kuran-ogreniyorum/tools/kao-plan-check.mjs --since <hash>  # yalnız <hash>'ten sonraki commitleri denetle
+//   node tools/kao/kao-plan-check.mjs            # tüm kontroller, FAIL → exit 1
+//   node tools/kao/kao-plan-check.mjs --render   # + .anti-amnesia/CURRENT-STATE.md üret
+//   node tools/kao/kao-plan-check.mjs --self-test
+//   node tools/kao/kao-plan-check.mjs --card KAO-07   # yalnız o kartın kapsam/kontrol özeti
+//   node tools/kao/kao-plan-check.mjs --commits       # + kart başına commit sayısı (yalnız bilgi)
+//   node tools/kao/kao-plan-check.mjs --since <hash>  # yalnız <hash>'ten sonraki commitleri denetle
 //                                                                       # (verilmezse kao2-duzeltme/FIX-STATE.json.planCheckBase)
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', '..');
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 const PLAN = path.join(ROOT, 'docs', 'kuran-ogreniyorum');
 const STATE_PATH = path.join(PLAN, 'KAO-STATE.json');
 const LEDGER_PATH = path.join(PLAN, '.anti-amnesia', 'LEDGER.md');

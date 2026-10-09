@@ -111,7 +111,9 @@ check('(b) dokununca anlam ALT PANELDE açılır; satır akışı bozulmaz', () 
   t.api.kaoReader('word', t.surahs.words.filter((w) => w.surahId === 95).indexOf(word));
   const after = decode(t.api.kaoReaderHTML());
   assert.match(after, /class="kao-reader-panel"/, 'alt panel var');
-  assert.match(after, /kao-reader-panel[^>]*role="dialog"|kao-reader-panel[^>]*aria-live/, 'panel erişilebilir');
+  // D3F-16: satır içi panel modal değil → role=region + aria-live (eski "dialog | aria-live" seçeneği dialog'u da kabul ediyordu).
+  assert.match(after, /kao-reader-panel"[^>]*role="region"[^>]*aria-live="polite"/, 'panel erişilebilir bölge');
+  assert.doesNotMatch(after, /kao-reader-panel"[^>]*role="dialog"/, 'panel role=dialog taşımaz');
   assert.match(after, new RegExp(esc(word.tr).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), 'panelde anlam yazılır');
   // Anlam artık kelime içinde basılmaz → satır akışı sabit kalır.
   assert.doesNotMatch(after, /kao-reader-meaning/, 'anlam kelime içinde basılmaz (akış bozulmaz)');

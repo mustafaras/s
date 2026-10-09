@@ -1,0 +1,5 @@
+PASS  okuyucu anlam paneli: role=region + aria-live=polite; kelime düğmesi aria-expanded/aria-controls; odak düğmede kalır ve kapanışta düğmeye döner
+PASS  odak halkası ve ≥44px dokunma hedefi CSS sözleşmesinde
+
+KAO2-26 erişilebilirlik: 13 kontrol PASS
+KAO2 reader: PASS (14 kontrol)

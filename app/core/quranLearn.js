@@ -3155,16 +3155,24 @@
   }
   // Y-12/T-20: okuyucunun tek eylem yüzeyi. Anlam kelime içinde değil ALT PANELDE
   // açılır (satır akışı bozulmaz) ve "Anladım" ancak hızlı kontrolden sonra yazılır.
+  // D3F-16: panel modal değil; yeniden çizim tetikleyici düğmeyi sildiği için odak açan kelimeye döner.
+  function kaoReaderFocusWord(index){
+    if(typeof index==='number'&&index>=0&&quranLearnSurfaceDeps) quranLearnSurfaceDeps.restoreFocus('kao-reader-w-'+index);
+  }
   function kaoReader(action,value){
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),words=surahWords(Number(ui.kaoSurahId));
     if(action==='word'){
       ui.kaoReaderWord=Math.floor(Number(value));
-      return kaoRevealWord(value);
+      var shown=kaoRevealWord(value);
+      if(shown) kaoReaderFocusWord(ui.kaoReaderWord);
+      return shown;
     }
     if(action==='close'){
+      var opened=ui.kaoReaderWord;
       ui.kaoReaderWord=null;
       quranLearnDeps.render();
+      kaoReaderFocusWord(opened);
       return true;
     }
     if(action==='play'){
@@ -3259,7 +3267,7 @@
       var known=wordKnown(q,word),revealed=known||!!(record.words&&record.words[word.id]&&record.words[word.id].revealedAt);
       var label=known?'bilinen kelime':'bilinmeyen kelime, dokunarak aç';
       // T-20: kelime kenarlıksız çip; anlam kelime İÇİNDE basılmaz (satır akışı sabit).
-      h+='<span class="kao-reader-word '+(known?'is-known':(revealed?'is-revealed':'is-unknown'))+'"'+(index===playing?' aria-current="true"':'')+'><button type="button" aria-label="'+label+'"'+(index===openIndex?' aria-expanded="true"':'')+' onclick="App.kaoReader(\'word\','+index+')">'+kaoArabicPairHTML(word.ar,word.pronunciation,'kao-reader-pair')+'</button>';
+      h+='<span class="kao-reader-word '+(known?'is-known':(revealed?'is-revealed':'is-unknown'))+'"'+(index===playing?' aria-current="true"':'')+'><button type="button" id="kao-reader-w-'+index+'" aria-label="'+label+'"'+(index===openIndex?' aria-expanded="true" aria-controls="kao-reader-panel"':'')+' onclick="App.kaoReader(\'word\','+index+')">'+kaoArabicPairHTML(word.ar,word.pronunciation,'kao-reader-pair')+'</button>';
       if(marks[word.id]){ var popId='kao-waqf-'+String(sid)+'-'+String(index); h+='<button type="button" class="kao-waqf" popovertarget="'+popId+'" aria-label="Vakıf işareti '+esc(marks[word.id])+' açıklaması">'+esc(marks[word.id])+'</button><span id="'+popId+'" class="kao-waqf-note" popover>burada dur: cümle/anlam sınırı</span>'; }
       h+='</span>';
     });
@@ -3267,7 +3275,7 @@
     // (b) Anlam ALT PANELİ: dokunulan kelimenin anlamı akışı bozmadan altta açılır.
     if(openIndex>=0&&words[openIndex]){
       var openWord=words[openIndex];
-      h+='<section class="kao-reader-panel" role="dialog" aria-label="Kelime anlamı"><p class="kao-reader-panel-ar" lang="ar" dir="rtl">'+esc(openWord.ar)+'</p><p class="kao-reader-panel-tr">'+esc(openWord.tr)+'</p>'
+      h+='<section id="kao-reader-panel" class="kao-reader-panel" role="region" aria-live="polite" aria-label="Kelime anlamı"><p class="kao-reader-panel-ar" lang="ar" dir="rtl">'+esc(openWord.ar)+'</p><p class="kao-reader-panel-tr">'+esc(openWord.tr)+'</p>'
         +'<div class="kao-reader-panel-actions"><button type="button" class="kao-secondary" onclick="App.kaoReader(\'play\',\'one\')">Kelimeyi dinle</button><button type="button" class="kao-secondary" onclick="App.kaoReader(\'close\')">Kapat</button></div></section>';
     }
     // (e) Y-12: "Anladım" öncesi 3 soruluk hızlı kontrol.

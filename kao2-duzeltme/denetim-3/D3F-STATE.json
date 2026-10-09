@@ -4,7 +4,7 @@
   "source": "kao2-duzeltme/denetim-3/DENETIM-3-RAPORU.md",
   "baseCommit": "128ab06dcbebe9efc3ade275a8f3b259ceb5cc0c",
   "startedAt": "2026-10-08",
-  "nextFinding": "F-16",
+  "nextFinding": "F-17",
   "starter": "kao2-duzeltme/denetim-3/STARTER.md",
   "process": {
     "commitPrefix": "D3F-NN:",
@@ -13,7 +13,7 @@
     "push": "yok — push/deploy ayrıca açık kullanıcı onayı ister",
     "closedPrograms": "FIX-STATE ve D2F-STATE closeCommit=128ab06d ile donduruldu; sync araçları kodu o commit'ten ölçer"
   },
-  "pins": { "release": "20261008d" },
+  "pins": { "release": "20261008e" },
   "releases": {
     "YAYIN-4": { "approval": "user_explicit_2026-10-08", "quote": "önce buraya kadar olan kısımları canlıya al son ra yeni adım için starter yaz", "scope": "D3F-00…D3F-05", "pin": "20261008a", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-4/YAYIN.md", "pushed": "128ab06d..700cae25", "pagesRun": "37781196494 success", "live": "63/63 bayt-eşit · gizlilik 8/8 404 (CANLI.md)" },
     "YAYIN-5": { "approval": "user_explicit_2026-10-08", "quote": "önce düzelt sonra tüm değişiklikleri canlıya al", "scope": "c4116a53 + D3F-06", "pin": "20261008a (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapilar.sh 5/20 kapıda kullanıcı kararıyla durduruldu (\"atlayalım\"); hızlı set 6/6 PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-5/YAYIN.md" },
@@ -37,7 +37,7 @@
     "F-13": { "severity": "DÜŞÜK", "title": "bayat ve çelişkili belgeler", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-13/KANIT.md", "note": "CURRENT-STATE kısmı D3F-05te; DUZELTME-SONUCU, CLAUDE.md/AGENTS.md 130 KB, DEVIR-LISTESI D3F-13te" },
     "F-14": { "severity": "DÜŞÜK", "title": "D2F-05/09 mutasyon betikleri depoda değil", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-14/KANIT.md", "note": "D2F-05 (a,b) ve D2F-09 (kontrol,b,c,d,e,f) depoda yeniden üretildi 13/13; a kuralı D3F-04te; yeniden üretilemeyen kalmadı" },
     "F-15": { "severity": "DÜŞÜK", "title": "K2F KANIT eksikleri (Oturum satırı, bölümler)", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-15/KANIT.md", "note": "44 KANIT: Oturum yok 43/44, bölüm eksik 7/44 (dosya dosya envanter); tarihsel KANITlar değişmedi; FIX LEDGER seq 128 NOTE" },
-    "F-16": { "severity": "DÜŞÜK", "title": "okuyucu alt paneli role=dialog ama dialog değil", "status": "open" },
+    "F-16": { "severity": "DÜŞÜK", "title": "okuyucu alt paneli role=dialog ama dialog değil", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-16/KANIT.md", "note": "panel role=region + aria-live=polite (id kao-reader-panel); açan kelime aria-expanded + aria-controls; odak açılış ve Kapat sonrası açan kelimeye döner; a11y matrisi anlam paneli açık 4 yüzeyle genişledi; pin 20261008e; ekran okuyucu doğrulaması kullanıcıda" },
     "F-17": { "severity": "DÜŞÜK", "title": "D2F-16 ölçütü birebir sağlanmadı", "status": "open" },
     "F-18": { "severity": "DÜŞÜK", "title": "8bf8f658 süreç dışı (tutma kararı doğru)", "status": "open" },
     "F-19": { "severity": "DÜŞÜK", "title": "depo public: gizlilik yolları GitHub'da okunur", "status": "open" }
@@ -66,6 +66,7 @@
     "D3F-13": ["070418a7"],
     "YAYIN-8": ["e28049b2", "02c99355"],
     "D3F-14": ["8e411e61", "6119f442"],
-    "D3F-15": ["(bu commit)"]
+    "D3F-15": ["7a4a0f6d"],
+    "D3F-16": ["(bu commit)"]
   }
 }

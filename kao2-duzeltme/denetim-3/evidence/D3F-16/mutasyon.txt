@@ -1,0 +1,12 @@
+PASS  M0 düzeltilmiş (a11y) → PASS
+PASS  M0 düzeltilmiş (okuyucu) → PASS
+PASS  M1 role=dialog (a11y matrisi) → FAIL
+PASS  M1 role=dialog (okuyucu) → FAIL
+PASS  M2 açılışta odak dönmez → FAIL
+PASS  M3 kapanışta odak dönmez → FAIL
+PASS  M4 aria-controls yok → FAIL
+PASS  M5 kırık aria-controls hedefi → FAIL
+PASS  M6 aria-live yok (a11y) → FAIL
+PASS  M6 aria-live yok (okuyucu) → FAIL
+PASS  M7 düğme kimliği yok → FAIL
+d3f16 mutasyon: 11/11 PASS

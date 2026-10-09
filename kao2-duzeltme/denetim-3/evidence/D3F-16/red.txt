@@ -1,0 +1,28 @@
+node:internal/assert/utils:146
+  throw error;
+  ^
+
+AssertionError [ERR_ASSERTION]: a11y ihlali (3): tohumlu/reader-112-anlam-paneli: diyalog kabuğu: 2 adet | tohumlu/reader-113-anlam-paneli: diyalog kabuğu: 2 adet | tohumlu/reader-114-anlam-paneli: diyalog kabuğu: 2 adet
++ actual - expected
+
++ [
++   'tohumlu/reader-112-anlam-paneli: diyalog kabuğu: 2 adet',
++   'tohumlu/reader-113-anlam-paneli: diyalog kabuğu: 2 adet',
++   'tohumlu/reader-114-anlam-paneli: diyalog kabuğu: 2 adet'
++ ]
+- []
+
+    at tests/kao/test_kao2_a11y.js:238:10
+    at check (tests/kao/test_kao2_a11y.js:56:32)
+    at Object.<anonymous> (tests/kao/test_kao2_a11y.js:230:1)
+    at Module._compile (node:internal/modules/cjs/loader:1873:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:2013:10)
+    at Module.load (node:internal/modules/cjs/loader:1596:32)
+node:internal/assert/utils:146
+  throw error;
+  ^
+
+AssertionError [ERR_ASSERTION]: panel erişilebilir bölge
+    at tests/kao/test_kao2_reader.js:115:10
+    at check (tests/kao/test_kao2_reader.js:41:32)
+    at Object.<anonymous> (tests/kao/test_kao2_reader.js:107:1)

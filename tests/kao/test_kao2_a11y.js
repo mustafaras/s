@@ -143,7 +143,12 @@ function buildMatrix() {
     }
     if (state === 'tohumlu') { // ek: ayarlar alt durumları, yol/ünite detayı, kök araması, farklı sûre ve kavramlar
       for (const id of [1, 2, 3, 12]) { const r = openView(t, 'unit', id); add(`tohumlu/unit-${id}`, r.html); }
-      for (const id of [112, 113, 114, 1]) { const r = openView(t, 'reader', id); add(`tohumlu/reader-${id}`, r.html); }
+      for (const id of [112, 113, 114, 1]) {
+        const r = openView(t, 'reader', id); add(`tohumlu/reader-${id}`, r.html);
+        // D3F-16: anlam paneli açık yüzey de matriste (kural h: tek diyalog kabuğu).
+        t.api.kaoReader('word', 0); add(`tohumlu/reader-${id}-anlam-paneli`, t.api.kaoOverlayHTML(t.NOW));
+        t.api.kaoReader('close');
+      }
       for (const c of grammar.concepts.slice(0, 6)) { const r = openView(t, 'concept', c.id); add(`tohumlu/concept-${c.id}`, r.html); }
       for (const l of lex.lemmas.slice(1, 6)) { const r = openView(t, 'word', l.id); add(`tohumlu/word-${l.id}`, r.html); }
     }
@@ -294,6 +299,41 @@ check('dokunma hedefi: yüzeylerdeki her düğme/bağlantı CSS\'ten ≥44 px ç
   assert.deepEqual(small.map((t) => `${t.signature}=${t.height}px (${t.surfaces} yüzey) ${t.raw}`), [], 'çözülemeyen ya da 44 px altı dokunma hedefi');
   assert.ok(found.size >= 25, `dokunma hedefi imzaları az: ${found.size}`);
   if (process.env.KAO2_A11Y_VERBOSE === '1') for (const t of [...found.values()].sort((a, b) => a.height - b.height)) console.log(String(t.height).padStart(4), String(t.surfaces).padStart(4), t.signature);
+});
+
+// ---- D3F-16: okuyucu anlam paneli modal DEĞİL — açılır bölge (disclosure) sözleşmesi ----------------
+check('okuyucu anlam paneli: role=region + aria-live=polite; kelime düğmesi aria-expanded/aria-controls; odak düğmede kalır ve kapanışta düğmeye döner', () => {
+  const t = boot();
+  t.ui.kaoSurahId = 95; t.api.kaoSetView('reader');
+  const words = t.box.window.QuranShortSurahsV1.words.filter((w) => w.surahId === 95);
+  assert.ok(words.length >= 3, 'okuyucu kelimeleri yok');
+  const index = words.length - 1;
+  const body = (html) => decode(html).replace(/^[\s\S]*?id="sey-ov-body"[^>]*>/, '');
+  t.calls.restore.length = 0;
+  t.api.kaoReader('word', index);
+  const open = decode(t.api.kaoOverlayHTML(t.NOW));
+  const panel = (open.match(/<section\b[^>]*class="kao-reader-panel"[^>]*>/) || [])[0];
+  assert.ok(panel, 'anlam paneli çizilmedi');
+  assert.doesNotMatch(panel, /role="dialog"/, 'satır içi panel role=dialog taşıyamaz (aria-modal/odak tuzağı/Escape yok)');
+  assert.match(panel, /role="region"/, 'panel role=region değil');
+  assert.match(panel, /aria-live="polite"/, 'panel aria-live=polite değil');
+  assert.match(panel, /id="kao-reader-panel"/, 'panel kimliği yok');
+  assert.match(panel, /aria-label="Kelime anlamı"/, 'panel adı yok');
+  assert.equal((body(open).match(/role="dialog"/g) || []).length, 0, 'gövdede ikinci diyalog var');
+  const trigger = (open.match(new RegExp(`<button\\b[^>]*id="kao-reader-w-${index}"[^>]*>`)) || [])[0];
+  assert.ok(trigger, 'açan kelime düğmesinin kimliği yok');
+  assert.match(trigger, /aria-expanded="true"/, 'açan düğme aria-expanded=true değil');
+  assert.match(trigger, /aria-controls="kao-reader-panel"/, 'açan düğme panele bağlı değil');
+  assert.equal((open.match(/aria-controls="kao-reader-panel"/g) || []).length, 1, 'panele yalnız açan düğme bağlanır');
+  const ids = [...open.matchAll(/id="kao-reader-w-(\d+)"/g)].map((m) => Number(m[1]));
+  assert.deepEqual(ids, Array.from({ length: words.length }, (_, k) => k), 'her kelime düğmesinin sıra kimliği tekil ve sıralı olmalı');
+  assert.deepEqual(t.calls.restore, [`kao-reader-w-${index}`], 'yeniden çizimden sonra odak açan kelimeye dönmedi');
+  t.api.kaoReader('close');
+  const closed = decode(t.api.kaoOverlayHTML(t.NOW));
+  assert.doesNotMatch(closed, /class="kao-reader-panel"/, 'panel kapanmadı');
+  assert.doesNotMatch(closed, /aria-controls="kao-reader-panel"/, 'kapalı panele işaret eden aria-controls kaldı');
+  assert.match(closed, new RegExp(`id="kao-reader-w-${index}"`), 'dönüş hedefi kapanış çiziminde yok');
+  assert.deepEqual(t.calls.restore, [`kao-reader-w-${index}`, `kao-reader-w-${index}`], '"Kapat" sonrası odak açan kelimeye dönmedi');
 });
 
 // ---- (2) Modal odak sözleşmesi ----------------------------------------

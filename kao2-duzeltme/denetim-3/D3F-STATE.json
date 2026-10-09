@@ -19,7 +19,8 @@
     "YAYIN-5": { "approval": "user_explicit_2026-10-08", "quote": "önce düzelt sonra tüm değişiklikleri canlıya al", "scope": "c4116a53 + D3F-06", "pin": "20261008a (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapilar.sh 5/20 kapıda kullanıcı kararıyla durduruldu (\"atlayalım\"); hızlı set 6/6 PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-5/YAYIN.md" },
     "YAYIN-6": { "approval": "user_explicit_2026-10-08", "quote": "başla ve tam bir push commit merge deploy istiyorum", "scope": "4a0ada6f + D3F-07 + D3F-08", "pin": "20261008a (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapilar.sh 5/20 kapıda kullanıcı kararıyla durduruldu (\"atla ve canlıya al\"); hızlı set 9/9 PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-6/YAYIN.md" },
     "YAYIN-7": { "approval": "user_explicit_2026-10-08", "quote": "başla ve tam bir push commit merge deploy istiyorum · beklememize gerek yok bence sıradakiyle devam edelim", "scope": "D3F-09 + D3F-10", "pin": "20261008c", "gate": "tam kapilar.sh TÜM KAPILAR YEŞİL (b6915f19)", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-7/YAYIN.md" },
-    "YAYIN-8": { "approval": "user_explicit_2026-10-08", "quote": "devam et · hepsini yap", "scope": "D3F-11 + D3F-12 + D3F-13", "pin": "20261008d", "gateDeviation": "tam kapı iki koşuda 19/20 yeşil; perf mutlak tavanı (p95 ≤40 ms) yük altında kırmızı (40,7 / 72,6 ms; yük 53); A/B taban↔HEAD regresyon yok", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-8/YAYIN.md" }
+    "YAYIN-8": { "approval": "user_explicit_2026-10-08", "quote": "devam et · hepsini yap", "scope": "D3F-11 + D3F-12 + D3F-13", "pin": "20261008d", "gateDeviation": "tam kapı iki koşuda 19/20 yeşil; perf mutlak tavanı (p95 ≤40 ms) yük altında kırmızı (40,7 / 72,6 ms; yük 53); A/B taban↔HEAD regresyon yok", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-8/YAYIN.md" },
+    "YAYIN-9": { "approval": "user_explicit_2026-10-09", "quote": "tümünü canlıya al ve sıradaki işe gec", "scope": "D3F-15 + D3F-16 + D3F-16 ek (F-20)", "pin": "20261008e", "gate": "tam kapı 20/20 yeşil (izole klon a384aa8a, p95 6,075 ms, yük 4–6); sapma yok", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-9/YAYIN.md" }
   },
   "findings": {
     "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-01/KANIT.md" },
@@ -68,6 +69,7 @@
     "YAYIN-8": ["e28049b2", "02c99355"],
     "D3F-14": ["8e411e61", "6119f442"],
     "D3F-15": ["7a4a0f6d"],
-    "D3F-16": ["d6623275", "(bu commit)"]
+    "D3F-16": ["d6623275", "a384aa8a"],
+    "YAYIN-9": ["(bu commit)"]
   }
 }

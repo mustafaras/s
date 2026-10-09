@@ -1,2 +1,5 @@
 PASS  M0 düzeltilmiş → PASS
 PASS  M1 gerçek Date → FAIL
+PASS  M2 new Date() kaymaz → FAIL
+PASS  M3 Date.now kaymaz → FAIL
+d3f16-saat mutasyon: 4/4 PASS

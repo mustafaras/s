@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// --stats/--draft kanıt çıktıları yereldir (kaynak/kuran/.gitignore: kanit/); kalıcı kayıt özel arşivdedir.
 const STATS_PATH = path.join(ROOT, 'kaynak', 'kuran', 'kanit', 'KAO-01', 'stats.json');
 const CONTRACT_TOKEN_TARGET = 77_430;
 const OFFICIAL_RELEASE_WORD_TOTAL = 77_429;

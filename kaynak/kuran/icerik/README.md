@@ -69,7 +69,7 @@ node tools/kao-lexicon-build.mjs \
   --stats
 ```
 
-Çıktı yalnız `kaynak/kuran/kanit/KAO-01/stats.json` olur. `sourceHashes`
+Çıktı yalnız `kaynak/kuran/kanit/KAO-01/stats.json` olur (yerel; `kaynak/kuran/.gitignore` ile git dışı, kalıcı kayıt özel arşivde). `sourceHashes`
 alanı QAC'nin tam-dosya hash'ini ve Tanzil'in hem tam-dosya hem **gövde** hash'ini
 tutarlar (`uthmaniBodySha256`).
 

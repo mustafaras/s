@@ -70,6 +70,8 @@ okuyucuyu yalnız panel **kapalıyken** çiziyordu. `test_kao2_reader.js:114` is
 - Etki: tam kapı (`kapilar.sh`) ve kabul A-9 bugünden itibaren bu nedenle kırmızı. Bu durum F-16'dan bağımsız olarak bir sonraki YAYIN'ı engeller.
 - Bu commit'te düzeltilmedi; kural 1 gereği her bulgu ayrı commit. Öneri: harness saati `now`'a sabitlesin ya da D4 ilk `order` görevini kuyrukta arasın.
   Kullanıcıya ayrı adım olarak sunuldu.
+- **Sonradan (2026-10-09, kullanıcı onayıyla):** F-20 olarak kaydedildi ve `D3F-16: ek` commit'inde düzeltildi. Test düzeneği VM saatini `now`'dan başlatıyor.
+  Kanıt: [`saat/KANIT.md`](saat/KANIT.md).
 
 ## Kanıt düzeyleri
 kaynak/test ✓ · yayın — (henüz yok; tam kapı ve kullanıcı talimatı bekliyor) · cihaz/ekran okuyucu —

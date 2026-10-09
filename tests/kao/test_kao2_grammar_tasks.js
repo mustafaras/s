@@ -872,6 +872,25 @@ function playFragment(transformSource, pickFor) {
   return { t, task, canonical, picks, before, after: answerState(t, task) };
 }
 
+// D3F-16 ek · test düzeneği saati: kod `new Date()`/`Date.now()` ile bootKao({now}) anını görür (gerçek saati değil).
+// Önceden VM'e gerçek Date veriliyordu; 2026-10-09'dan itibaren ilk parça görevi order → translate oldu ve D4 kendiliğinden kırmızıya döndü.
+check('D3F-16 ek · bootKao saati parametredir: VM içindeki new Date()/Date.now() `now` anından başlar; görev kimliği ve ilk parça görevi gerçek tarihten bağımsız', () => {
+  const firstFragment = (now) => {
+    const t = bootKao({ now });
+    const vmNow = vm.runInContext('Date.now()', t.box), vmNew = vm.runInContext('new Date().toISOString()', t.box);
+    freshUser(t); t.api.kaoStart();
+    const item = t.ui.kaoQueue[t.ui.kaoTaskIndex], task = item && t.ui.kaoTasks[item.id];
+    return { vmNow, vmNew, id: task && task.id, kind: task && task.kind };
+  };
+  for (const now of [DEFAULT_NOW, '2026-12-15T12:00:00.000Z']) {
+    const r = firstFragment(now), drift = r.vmNow - Date.parse(now);
+    assert.ok(drift >= 0 && drift < 60000, `VM Date.now() ${now} anından başlamalı (sapma ${drift} ms)`);
+    assert.equal(r.vmNew.slice(0, 10), now.slice(0, 10), `VM new Date() tarihi ${now.slice(0, 10)} olmalı (gelen ${r.vmNew})`);
+    assert.ok(r.id && r.id.startsWith(`kao:${now.slice(0, 10)}:`), `görev kimliği bootKao tarihini taşımalı (gelen ${r.id})`);
+  }
+  assert.equal(firstFragment(DEFAULT_NOW).kind, 'order', `${DEFAULT_NOW} için ilk parça görevi order (D4'ün ön koşulu)`);
+});
+
 check('D4 · parça (fragment) dizme: aynı yazılı çipler yer değişse de görünür doğru sıra "Doğru"; gerçekten yanlış sıra yanlış (errors.order +1)', () => {
   const real = playFragment(null, (c) => c);
   assert.equal(real.after.feedback, 'Doğru', 'gerçek veride doğru sıra doğru');

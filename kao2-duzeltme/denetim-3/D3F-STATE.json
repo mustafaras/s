@@ -40,7 +40,8 @@
     "F-16": { "severity": "DÜŞÜK", "title": "okuyucu alt paneli role=dialog ama dialog değil", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-16/KANIT.md", "note": "panel role=region + aria-live=polite (id kao-reader-panel); açan kelime aria-expanded + aria-controls; odak açılış ve Kapat sonrası açan kelimeye döner; a11y matrisi anlam paneli açık 4 yüzeyle genişledi; pin 20261008e; ekran okuyucu doğrulaması kullanıcıda" },
     "F-17": { "severity": "DÜŞÜK", "title": "D2F-16 ölçütü birebir sağlanmadı", "status": "open" },
     "F-18": { "severity": "DÜŞÜK", "title": "8bf8f658 süreç dışı (tutma kararı doğru)", "status": "open" },
-    "F-19": { "severity": "DÜŞÜK", "title": "depo public: gizlilik yolları GitHub'da okunur", "status": "open" }
+    "F-19": { "severity": "DÜŞÜK", "title": "depo public: gizlilik yolları GitHub'da okunur", "status": "open" },
+    "F-20": { "severity": "ORTA", "title": "KAO test düzeneği gerçek saati sızdırıyor (saate bağlı test)", "source": "rapor dışı — D3F-16 fixture turunda bulundu (2026-10-09)", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-16/saat/KANIT.md", "note": "bootKao todayStr=now ama VM gerçek Date; 2026-10-09dan itibaren ilk parça görevi order→translate, test_kao2_grammar_tasks D4 + kabul A-9 + tam kapı kırmızı; düzenek VM saatini now anından başlatır; kullanıcı kararıyla D3F-16 ek commitinde (2026-10-09)" }
   },
   "openDecisions": {
     "perf-goreli-bant": "Bayraksız kapıda göreli p95 bandı (KAO2-01 tabanı +%25 = 5,09 ms) bu makinede yük altında oynak (steady 2,8–8,6 ms) → kabul A-10 ve perf zaman zaman kırmızı. D3F-02 gece kırmızısının ve F-03 \"perf satırı okunamadı\" belirtisinin kökü (D3F-03 günlüğü). Karar kullanıcıda."
@@ -67,6 +68,6 @@
     "YAYIN-8": ["e28049b2", "02c99355"],
     "D3F-14": ["8e411e61", "6119f442"],
     "D3F-15": ["7a4a0f6d"],
-    "D3F-16": ["(bu commit)"]
+    "D3F-16": ["d6623275", "(bu commit)"]
   }
 }

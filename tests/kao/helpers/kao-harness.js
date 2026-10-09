@@ -47,9 +47,18 @@ function legacyDraftState(name, source) {
   return source.slice(0, start) + JSON.stringify(data) + source.slice(end);
 }
 
+// D3F-16 ek: VM saati `now` anından başlar ve gerçek süreyle ilerler (gerçek tarih sızmaz; süre ölçümü bozulmaz).
+function clockAt(now) {
+  const Real = Date, offset = Real.parse(now) - Real.now();
+  return class HarnessDate extends Real {
+    constructor(...args) { if (args.length === 0) super(Real.now() + offset); else super(...args); }
+    static now() { return Real.now() + offset; }
+  };
+}
+
 // Boş VM: içerik + Flow/Views/motor, `register*` sahteleriyle. `seeded` kartlı bir öğrenci kurar.
 function bootKao({ now = DEFAULT_NOW, seeded = false, transformSource = null } = {}) {
-  const box = { window: {}, Date };
+  const box = { window: {}, Date: clockAt(now) };
   vm.createContext(box);
   // transformSource(ad, kaynak) → kaynak: yalnız testte, içerik modülünü sentetik biçimde bozmak için (ör. bir şablonu desteksiz yapmak).
   for (const n of CONTENT) { const src = read(`app/content/${n}.js`); vm.runInContext(transformSource ? transformSource(n, src) : src, box, { filename: n }); }

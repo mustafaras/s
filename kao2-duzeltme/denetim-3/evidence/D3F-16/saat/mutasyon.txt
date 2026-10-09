@@ -1,0 +1,2 @@
+PASS  M0 düzeltilmiş → PASS
+PASS  M1 gerçek Date → FAIL

@@ -21,7 +21,8 @@
     "YAYIN-7": { "approval": "user_explicit_2026-10-08", "quote": "başla ve tam bir push commit merge deploy istiyorum · beklememize gerek yok bence sıradakiyle devam edelim", "scope": "D3F-09 + D3F-10", "pin": "20261008c", "gate": "tam kapilar.sh TÜM KAPILAR YEŞİL (b6915f19)", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-7/YAYIN.md" },
     "YAYIN-8": { "approval": "user_explicit_2026-10-08", "quote": "devam et · hepsini yap", "scope": "D3F-11 + D3F-12 + D3F-13", "pin": "20261008d", "gateDeviation": "tam kapı iki koşuda 19/20 yeşil; perf mutlak tavanı (p95 ≤40 ms) yük altında kırmızı (40,7 / 72,6 ms; yük 53); A/B taban↔HEAD regresyon yok", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-8/YAYIN.md" },
     "YAYIN-9": { "approval": "user_explicit_2026-10-09", "quote": "tümünü canlıya al ve sıradaki işe gec", "scope": "D3F-15 + D3F-16 + D3F-16 ek (F-20)", "pin": "20261008e", "gate": "tam kapı 20/20 yeşil (izole klon a384aa8a, p95 6,075 ms, yük 4–6); sapma yok", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-9/YAYIN.md", "live": "Pages run 37919495888 success · 64/64 bayt-eşit · gizlilik 8/8 404" },
-    "YAYIN-10": { "approval": "user_explicit_2026-10-09", "quote": "canlıya al ve devam et", "scope": "D3F-17 (+ ek)", "pin": "20261008e (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapı koşulmadı (Claude kararı, kullanıcının hız tercihi; YAYIN-5/6 emsali); hızlı kontroller PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-10/YAYIN.md", "live": "Pages run 37920386388 success · 64/64 bayt-eşit · gizlilik 8/8 404" }
+    "YAYIN-10": { "approval": "user_explicit_2026-10-09", "quote": "canlıya al ve devam et", "scope": "D3F-17 (+ ek)", "pin": "20261008e (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapı koşulmadı (Claude kararı, kullanıcının hız tercihi; YAYIN-5/6 emsali); hızlı kontroller PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-10/YAYIN.md", "live": "Pages run 37920386388 success · 64/64 bayt-eşit · gizlilik 8/8 404" },
+    "YAYIN-11": { "approval": "user_explicit_2026-10-09", "quote": "canlıya al sıradaki işlem nedir", "scope": "D3F-18", "pin": "20261008e (değişmedi; çalışma zamanı farkı yok)", "gateDeviation": "tam kapı koşulmadı (Claude kararı; YAYIN-10 gerekçesi); hızlı kontroller PASS", "record": "kao2-duzeltme/denetim-3/evidence/YAYIN-11/YAYIN.md" }
   },
   "findings": {
     "F-01": { "severity": "YÜKSEK", "title": "g21-k1 'Aynı kökten' görevi üç farklı kök gösteriyor", "status": "fixed", "evidence": "kao2-duzeltme/denetim-3/evidence/D3F-01/KANIT.md" },
@@ -74,6 +75,7 @@
     "YAYIN-9": ["aaba4b49", "0ebb26ba"],
     "D3F-17": ["0ee16b7a", "9b485ef3"],
     "YAYIN-10": ["e3392cc8", "875c9b72"],
-    "D3F-18": ["(bu commit)"]
+    "D3F-18": ["d08335fe"],
+    "YAYIN-11": ["(bu commit)"]
   }
 }

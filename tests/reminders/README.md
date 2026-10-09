@@ -8,7 +8,7 @@ verisi, token, remote veya ağ bağlantısı kullanmaz.
 ## Çalıştırma
 
 ```bash
-node docs/reminders/verify-reminder-freeze.mjs
+node docs/reminders/verify-reminder-freeze.mjs   # 2026-10-09: özel arşivde (mustafaras/seyma-arsiv), bu depoda yok
 node tests/reminders/run-reminder-smoke.mjs
 ```
 

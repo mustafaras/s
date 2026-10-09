@@ -36,7 +36,7 @@ var raw = fs.readFileSync(workflowPath, 'utf8');
 // 1. Yayınlanmaması gereken iç dizinler ve yayınlanması zorunlu varlıklar
 // ---------------------------------------------------------------------------
 var INTERNAL_DIRS = [
-  'docs', 'tests', 'archive', '.claude', 'tools', 'files',
+  'docs', 'tests', 'archive', 'demos', '.claude', 'tools', 'files',
   'kuran-ogreniyorum', 'jev-gate'
 ];
 
@@ -139,8 +139,8 @@ if (tmp && excludes.length) {
          'sızdı');
     });
 
-    // archive/ dışlanmış olsa da tek istisna dosya install ile geri konur
-    var standaloneSrc = path.join(repoRoot, 'archive/demos/profil-degerlendirme-174.html');
+    // demos/ dışlanmış olsa da tek istisna dosya install ile geri konur
+    var standaloneSrc = path.join(repoRoot, 'demos/profil-degerlendirme-174.html');
     var standaloneDst = path.join(tmp, 'profil-degerlendirme-174.html');
     if (fs.existsSync(standaloneSrc)) {
       fs.copyFileSync(standaloneSrc, standaloneDst);

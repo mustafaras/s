@@ -1,7 +1,0 @@
-./app/content/quranConceptTextsV1.js a=90cd908996287c70 b=90cd908996287c70 depo=90cd908996287c70 İKİ-ÜRETİM-EŞİT DEPO-EŞİT
-./app/content/quranCurriculumV2.js a=59146844052ab8bd b=59146844052ab8bd depo=59146844052ab8bd İKİ-ÜRETİM-EŞİT DEPO-EŞİT
-./docs/kuran-ogreniyorum/kao2/content/prayer-lemma-map.json a=d366caa9379cdb30 b=d366caa9379cdb30 depo=d366caa9379cdb30 İKİ-ÜRETİM-EŞİT DEPO-EŞİT
-./docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-17.md a=f36f7fac7338fce9 b=f36f7fac7338fce9 depo=f36f7fac7338fce9 İKİ-ÜRETİM-EŞİT DEPO-EŞİT
-./docs/kuran-ogreniyorum/kao2/inceleme/INCELEME-KAO2-18.md a=3afad0f9f556da70 b=3afad0f9f556da70 depo=3afad0f9f556da70 İKİ-ÜRETİM-EŞİT DEPO-EŞİT
-./docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md a=3df988a3509e203a b=3df988a3509e203a depo=3df988a3509e203a İKİ-ÜRETİM-EŞİT DEPO-EŞİT
-./docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md a=5b7d183e81aa5c5f b=5b7d183e81aa5c5f depo=5b7d183e81aa5c5f İKİ-ÜRETİM-EŞİT DEPO-EŞİT

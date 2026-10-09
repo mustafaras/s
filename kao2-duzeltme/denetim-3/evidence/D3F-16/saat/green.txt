@@ -1,3 +1,0 @@
-PASS  D3F-16 ek · bootKao saati parametredir: VM içindeki new Date()/Date.now() `now` anından başlar; görev kimliği ve ilk parça görevi gerçek tarihten bağımsız
-PASS  D4 · parça (fragment) dizme: aynı yazılı çipler yer değişse de görünür doğru sıra "Doğru"; gerçekten yanlış sıra yanlış (errors.order +1)
-test_kao2_grammar_tasks (bölüm A+B+C+D+E+F): 39 kontrol PASS

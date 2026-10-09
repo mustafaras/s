@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/media/readme-header.svg" alt="ŞEYMA 🦩 · ÆON — flamingo-led private signals and evidence-first observation" width="100%">
+<img src=".github/media/readme-header.svg" alt="ŞEYMA 🦩 · ÆON — flamingo-led private signals and evidence-first observation" width="100%">
 <br>
 
 <p>

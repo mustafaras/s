@@ -1,9 +1,0 @@
-PASS  M0 kayıtlı hâl → PASS
-PASS  M1 not F-18'i anmıyor → FAIL
-PASS  M2 STATE senkron değil → FAIL
-PASS  M3 yanlış sayı → FAIL
-PASS  M4 bir test adı eksik → FAIL
-PASS  M5 pin yazılmamış → FAIL
-PASS  M6 testlerden önce yok → FAIL
-PASS  M7 sonraki not eklenir (yeşil kalmalı) → PASS
-d3f18 mutasyon: 8/8 PASS

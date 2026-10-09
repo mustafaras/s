@@ -3,7 +3,7 @@ var fs=require('fs');
 var path=require('path');
 var vm=require('vm');
 var repoRoot=require('../repo-root');
-var src=fs.readFileSync(path.join(repoRoot,'archive/demos/quran-flow-demo.html'),'utf8');
+var src=fs.readFileSync(path.join(repoRoot,'demos/quran-flow-demo.html'),'utf8');
 var pass=0,fail=0;
 function ok(v,label){if(v){pass++;console.log('  ✓ '+label);}else{fail++;console.error('  ✗ '+label);}}
 console.log('=== Kur’an Yolculuğu güvenli demo denetimi ===');

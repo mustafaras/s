@@ -1,5 +1,0 @@
-index 58 sw 56 panel-v2 5
-index/sw FARK panel/panelCoverageManifest.js index= 20260926a sw= None
-index/sw FARK sw.js index= 20261007b sw= None
-index/panel-v2 FARK app/content/quranRevelationOrderV1.js index= 20260730p panel-v2= 20260811a
-index/sw fark sayısı 2

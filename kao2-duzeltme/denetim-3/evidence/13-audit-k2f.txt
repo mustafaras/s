@@ -1,8 +1,0 @@
-K2F denetimi (yalnız rapor, çıkış kodunu etkilemez) 07802fa6..cbe0d604
-  (a) 128 commit · 44 prompt · 16 tek commit'li · 28 çok commit'li prompt
-  (b) 2 öneksiz commit
-  (c) 24 pin değiştiren commit · 21 plan dışı pin (planlı: K2F-18, K2F-43; öneksiz pin commit'leri b'de)
-  (d) 44 KANIT · 43 tanesinde "Oturum:" satırı yok · 7 tanesinde 8 bölümden eksik var
-  (e)(f) K2F LEDGER/CURRENT-STATE biçimi farklı: bu araçta uygulanmaz
-D2F senkron: PASS · 16/16 prompt done · nextPrompt none · ledger seq 24 · N 9/9 pass · App.kao* 45 · yüzey 766 · atama 604 · onclick 393 · pin 20261007b
-exit=0

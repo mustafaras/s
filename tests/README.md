@@ -213,7 +213,7 @@ for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
 Reminder bakım regression:
 
 ```bash
-node docs/reminders/verify-reminder-freeze.mjs
+node docs/reminders/verify-reminder-freeze.mjs   # 2026-10-09: özel arşivde (mustafaras/seyma-arsiv), bu depoda yok
 node tests/reminders/run-reminder-smoke.mjs
 ```
 

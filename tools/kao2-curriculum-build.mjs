@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // KAO2-07 müfredat derleyici. Girdi: curriculum.spec.json (Arapça yok) + donmuş
 // KAO içerik modülleri + texts.tr.json (metin/review katmanı) + G2 karar kaydı
-// (kao2-duzeltme/FIX-STATE.json, salt okunur). Çıktı: app/content/quranCurriculumV2.js ve
+// (docs/kuran-ogreniyorum/kao2/content/decisions.json, salt okunur). Çıktı: app/content/quranCurriculumV2.js ve
 // docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md. Belirlenimci: zaman damgası
 // yok, sıralama yalnız veriye bağlı; ağ, tarayıcı ve kullanıcı verisi yok.
 import fs from 'node:fs';
@@ -22,7 +22,7 @@ const OUT_PRAYER_MAP = 'docs/kuran-ogreniyorum/kao2/content/prayer-lemma-map.jso
 const OUT_PRAYER_REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/NAMAZ-ESLEME-L2.md';
 // D2-11 · K3-07: G2 onay kararının kaydı KAO2-FIX programında tutulur; müfredat sayfası onay durumunu
 // buradan yazar (salt okunur). Kayıt yoksa sayfa kırılmaz, bölüm "bekliyor" biçiminde kalır.
-const FIX_STATE = 'kao2-duzeltme/FIX-STATE.json';
+const FIX_STATE = 'docs/kuran-ogreniyorum/kao2/content/decisions.json'; // F-19: G2 kararı FIX-STATE yerine burada
 const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
 
 function fail(message) {
@@ -496,7 +496,7 @@ function readG2Decision() {
   const file = path.join(ROOT, FIX_STATE);
   if (!fs.existsSync(file)) return null;
   let decisions;
-  try { decisions = JSON.parse(fs.readFileSync(file, 'utf8')).decisions; } catch { return null; }
+  try { decisions = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
   const raw = decisions && decisions.G2;
   if (typeof raw !== 'string' || !raw.trim()) return null;
   const text = raw.trim();

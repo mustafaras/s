@@ -1,2 +1,0 @@
-d3f17 kayıt denetimi: PASS (D2F-16 commit 128ab06d, 55da6965 · LEDGER son seq 31 · STATE/CURRENT sen
-d3f18 kayıt denetimi: PASS (8bf8f658: 6 test dosyası · pin 20261006c · QA 2 betik kurala uygun · LED

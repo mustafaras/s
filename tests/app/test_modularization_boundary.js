@@ -57,8 +57,9 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
   var appPath = path.join(repoRoot,'app.js');
   ok('app.js mevcut', fs.existsSync(appPath));
   var lines = fs.readFileSync(appPath,'utf8').split(/\r?\n/);
-  var statePath = path.join(repoRoot,'archive','monolit-bolumlenme-plan-2','MON2-STATE.json');
-  var budget = JSON.parse(fs.readFileSync(statePath,'utf8')).shellBudget || {};
+  // F-19 (2026-10-09): MON2-STATE.json özel arşive (mustafaras/seyma-arsiv) taşındı; bütçe MON2-08 kapanışında (2026-09-15) donmuştu,
+  // değer buraya aynen alındı. Gevşetmek yeni bir programın açık onayını ister.
+  var budget = { maxTotalLines: 7800 };
   ok('MON2 shellBudget.maxTotalLines tanımlı', typeof budget.maxTotalLines === 'number');
   ok('app.js kabuk bütçesi içinde (≤'+budget.maxTotalLines+')',
     lines.length > 0 && lines.length <= budget.maxTotalLines, 'satır: '+lines.length);
@@ -203,14 +204,7 @@ var expectedNewModules = [
   ok('app.js sonunda window.App expose ediliyor', hasWindowApp);
 })();
 
-// [7] Modülerleştirme planı belgesi mevcut ve güncel
-(function(){
-  var p = path.join(repoRoot,'archive/premium-fx-plan/MODULARIZATION.md');
-  ok('MODULARIZATION.md mevcut', fs.existsSync(p));
-  var txt = fs.readFileSync(p,'utf8');
-  ok('MODULARIZATION.md v2.1', txt.indexOf('**Sürüm:** 2.1') >= 0);
-  ok('MODULARIZATION.md 24 modül listesi', txt.indexOf('| 24 |') >= 0);
-})();
+// [7] (kaldırıldı, F-19 2026-10-09) MODULARIZATION.md plan belgesi özel arşive taşındı; bu blok yalnız belgeyi denetliyordu, kodu değil.
 
 // [8] MON-12/13/17: state + save gövdeleri registryde; app.js shimleri
 (function(){

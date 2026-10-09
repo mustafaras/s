@@ -1,3 +1,0 @@
-D2F strict: 30 commit incelendi (cbe0d604…HEAD) · 15/15 kayıtlı istisna kullanıldı
-D2F senkron: PASS · 16/16 prompt done · nextPrompt none · ledger seq 24 · N 9/9 pass · App.kao* 45 · yüzey 766 · atama 604 · onclick 393 · pin 20261007b
-exit=0

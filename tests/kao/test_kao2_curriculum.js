@@ -15,7 +15,7 @@ const MODULE = 'app/content/quranCurriculumV2.js';
 const REVIEW = 'docs/kuran-ogreniyorum/kao2/inceleme/MUFREDAT-ESLEME.md';
 const SPEC = 'docs/kuran-ogreniyorum/kao2/content/curriculum.spec.json';
 const TEXT_SOURCE = 'docs/kuran-ogreniyorum/kao2/content/texts.tr.json';
-const FIX_STATE = 'kao2-duzeltme/FIX-STATE.json';
+const FIX_STATE = 'docs/kuran-ogreniyorum/kao2/content/decisions.json'; // F-19: G2 kararı FIX-STATE yerine burada
 const TOOL = 'tools/kao2-curriculum-build.mjs';
 const read = (file) => fs.readFileSync(path.join(root, file));
 
@@ -192,7 +192,7 @@ check('(D2-11) metin durumu sayfaya veriden yazılır; sayılar texts.tr.json il
 // özeti ve işaretli onay satırı yazılır; eski boş kutu başlığı kalmaz.
 check('(D2-11 · K3-07) G2 kararı kayıtlıysa sayfa "G2 kararı (tarih)" + işaretli onay satırı yazar', () => {
   const fix = JSON.parse(read(FIX_STATE).toString('utf8'));
-  const g2 = fix.decisions && fix.decisions.G2;
+  const g2 = fix.G2;
   const md = read(REVIEW).toString('utf8');
   if (typeof g2 !== 'string' || !g2.trim()) {
     assert.ok(!md.includes('## Karar bekleyen noktalar'), 'G2 yokken "Karar bekleyen noktalar" başlığı beklenmez');

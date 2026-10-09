@@ -1,3 +1,0 @@
-v05-reader @320px: KAYDIRMALI-ALAN(bilgi) | div.kao-surah-picker | "NâsFelakİhlâsTebbetNasrKâfirûnKevserMâûn" sw=1654 cw=296
-v13-concept @320px: KAYDIRMALI-ALAN(bilgi) | div.kao-grammar-table-wrap | "Satır1.2.3.Türkçe sıraİbrahimtemelleriyü" sw=382 cw=294
-l06-concept @320px: KAYDIRMALI-ALAN(bilgi) | div.kao-lesson-table-wrap | "Türkçesi1. kelime (tamlanan)2. kelime (t" sw=316 cw=218

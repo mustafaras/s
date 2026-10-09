@@ -52,6 +52,7 @@ export function subjectRecognized(cm) {
 const CARD_OF_SUBJECT_RE = /^(KAO2-(?:[01]\d|2[0-7])|K2F-(?:[0-3]\d|4[0-3])|D2F-(?:0[1-9]|1[0-6])|D3F-(?:[01]\d|20)|KAO-FIX-\d+(?:\/[A-D])?|KAO-(?:P00|D\d|\d+b?))(?=[: ])/;
 // K2F-01 (M-10): plan-check tabanı — bu commit'ten SONRAKİ commitler denetlenir, öncesi tarihsel sayılır.
 const FIX_STATE_PATH = path.join(ROOT, 'kao2-duzeltme', 'FIX-STATE.json');
+const DEFAULT_PLAN_CHECK_BASE = 'd19b4576aad643fb12e61c86fef112c24163924c';
 const AUDIT_STATUSES = ['pass', 'fail', 'findings'];
 const SHADOW_BLOCK_FORBIDDEN = /\bsave\(|SeymaSave|kaoSave\(|\.data\(\)|localStorage|sessionStorage|indexedDB|SeySync|\bfetch\(|sendBeacon/;
 const FORBIDDEN_IN_REGISTRY = ['localStorage', 'XMLHttpRequest', 'SeySync', 'ghToken', 'openaiKey', 'sessionStorage', 'indexedDB'];
@@ -179,7 +180,12 @@ export function check(state, ctx) {
     if (!AUDIT_STATUSES.includes(st)) fail(`${id}: geçersiz auditStatus ${st} (${AUDIT_STATUSES.join('|')})`);
     else if (st === 'findings' && !String(accepted[id] || '').trim()) warn(`${id}: auditStatus findings ama auditFindingsAccepted[${id}] gerekçesi yok`);
   }
-  // 9 · kaynak yasakları ve yükleme listeleri
+  sourceChecks(ctx, fail);
+  return { fails, warns };
+}
+
+// 9 · kaynak yasakları ve yükleme listeleri — plandan bağımsız kod denetimi (F-19 taşımasından sonra plan yokken de koşar).
+export function sourceChecks(ctx, fail) {
   for (const f of KAO_SOURCE_FILES) {
     const src = ctx.readSource ? ctx.readSource(f) : null; if (src == null) continue;
     for (const p of FORBIDDEN_ANYWHERE) if (src.includes(p)) fail(`${f}: yasak ifade ${p}`);
@@ -199,7 +205,6 @@ export function check(state, ctx) {
     const base = path.basename(f);
     for (const L of LOAD_LISTS) { const t = ctx.readSource(L); if (t != null && !t.includes(base)) fail(`${base} ${L} yükleme listesinde yok (MON-25 dört liste kuralı)`); }
   }
-  return { fails, warns };
 }
 
 // Kart başına commit sayısı (--commits; yalnız bilgi). Konu önekinden kart kimliği; tanınmayanlar sayılmaz.
@@ -214,7 +219,8 @@ export function resolvePlanBase(args, fixState) {
   const i = (args || []).indexOf('--since');
   const cli = i >= 0 ? args[i + 1] : null;
   if (cli && !cli.startsWith('--')) return cli;
-  return (fixState && typeof fixState.planCheckBase === 'string' && fixState.planCheckBase) || null;
+  // F-19 taşıması: FIX-STATE.json özel arşive (mustafaras/seyma-arsiv) gitti; taban değeri burada sabit (KAO2-FIX kapanışında donmuştu).
+  return (fixState && typeof fixState.planCheckBase === 'string' && fixState.planCheckBase) || DEFAULT_PLAN_CHECK_BASE;
 }
 
 function realCtx(planBase) {
@@ -273,9 +279,20 @@ ${lastLedger}
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 const args = process.argv.slice(2);
 if (!IS_MAIN) { /* import edildi (test/simülasyon): CLI çalışmaz */ }
+else if (args.includes('--self-test') && !fs.existsSync(STATE_PATH)) {
+  console.error('kao-plan-check --self-test: plan (KAO-STATE.json) özel arşivde (mustafaras/seyma-arsiv); self-test orada, kod deposunun bir klonuyla koşulur.');
+  process.exit(2);
+}
 else if (args.includes('--self-test')) {
   const { runSelfTests } = await import('./kao-plan-check.test.mjs');
   process.exitCode = runSelfTests({ check, cardSummary, commitCounts, resolvePlanBase }, readJson(STATE_PATH)) ? 0 : 1;
+}
+else if (!fs.existsSync(STATE_PATH)) {
+  // F-19 taşıması: plan belgeleri özel arşivde. Burada yalnız kaynak denetimi (bölüm 9) koşar; plan tutarlılığı arşiv deposunda denetlenir.
+  const fails = []; sourceChecks({ readSource: (rel) => { const p = path.join(ROOT, rel); return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null; } }, (m) => fails.push(m));
+  for (const f of fails) console.log('FAIL ' + f);
+  console.log(fails.length ? `kao-plan-check (kod modu): FAIL (${fails.length})` : 'kao-plan-check (kod modu — plan arşivde): PASS');
+  process.exit(fails.length ? 1 : 0);
 }
 else {
   const state = readJson(STATE_PATH);

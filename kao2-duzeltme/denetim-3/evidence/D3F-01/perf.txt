@@ -1,1 +1,0 @@
-KAO2 perf: PASS (content 183.943 KiB · runtime 117.711 KiB · css 13.035 KiB · p95 4.933 ms · steady 2.943 ms)

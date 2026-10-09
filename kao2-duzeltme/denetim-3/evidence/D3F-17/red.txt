@@ -1,3 +1,0 @@
-FAIL  denetim-2 LEDGER: "NOTE · D2F-16" + "denetim-3 F-17" düzeltme notu yok
-FAIL  CURRENT-STATE "Son güncelleme" seq 29 (D3F-17) notunu anmıyor
-d3f17 kayıt denetimi: FAIL (2)

@@ -48,7 +48,7 @@ const p95Ms = samples[Math.ceil(samples.length * 0.95) - 1];
 // ortancası, kodun gerçek maliyetini ölçer (yük altındaki sapmaları dışarıda bırakır).
 const bestThree = samples.slice(0, 3);
 const steadyP95Ms = bestThree[1];
-const baselineFile = 'archive/kuran-ogreniyorum-v2/evidence/KAO2-01/perf-baseline.json';
+const baselineFile = 'tests/kao/fixtures/kao2-perf-baseline.json';
 const baseline = exists(baselineFile) ? JSON.parse(read(baselineFile)) : null;
 assert.ok(p95Ms <= 40, `p95 ${p95Ms.toFixed(3)} ms exceeds 40 ms`);
 assert.ok(steadyP95Ms <= 40, `steady p95 ${steadyP95Ms.toFixed(3)} ms exceeds 40 ms`);

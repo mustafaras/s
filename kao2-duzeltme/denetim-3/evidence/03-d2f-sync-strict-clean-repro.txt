@@ -1,6 +1,0 @@
-D2F strict: 30 commit incelendi (cbe0d604…HEAD) · 15/15 kayıtlı istisna kullanıldı
-D2F senkron: FAIL (1)
-  - çalışma ağacı temiz değil:
-?? kao2-duzeltme/denetim-2/DENETIM-3-PROMPTU.md
-?? kao2-duzeltme/denetim-3/
-exit=1

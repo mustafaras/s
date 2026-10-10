@@ -112,3 +112,16 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
   - **R-A2 zinciri.** u07.03 `aAmana` dinleme görevi ders başında kuruluyor ve aynı kartın u01.01'deki görevinden kalan `lastDistractors` listesini dışlıyor. O görev çiftliydi ve düzeldi, bu yüzden dışlanan liste ve şıklar meşru olarak değişti. Testte yalnız "aynı hedef kartın önceki görevi çiftliydi" koşulu ayrı sayılıyor; başka her fark hata.
   - **K-P · pin tazeliği (kullanıcı "en bilimsel şekilde çöz" dedi).** `test_asset_pin_freshness` (D3F-10), değişen `quranLearn.js` pini yükseltilmediği için kırmızıydı. Bu da kabul A-9'u düşürüyordu. Oysa §6.3 pini K3P-27'ye bırakıyor; plan bunu öngörmemişti, çünkü kabul testi `--yavas` olmadan atlanıyor. Korunan özellik yayın anındaki tazelik ve yayın yalnız `main`'den yapılıyor. Bu yüzden test, yalnız `pinDeferral.branch` dalında ve `pinDeferral.files` içindeki dosyalar için ERTELENDİ der; `main`'de tam katıdır. Negatif deneme: dal tutmazsa exit 1. Kayıt K3P-STATE `decisions.K-P` + `pinDeferral`, kural BAGLAM §6.3, K3P-27 prompt'una listeyi boşaltma adımı eklendi (DÜZELTME).
 - Sıradaki: K3P-02
+
+## seq 8 · — · YAYIN
+- Tarih: 2026-10-10
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı K3P-01'den sonra "canlıya al" dedi. Bu, §6.2'deki yayın kuralı için açık onaydır; program ortasında bir ara yayın.
+  - Yayına giden tek pinli varlık `app/core/quranLearn.js`. Yalnız onun pinini yükseltmek yetmedi: KAO-16 (`test_iip_22`) ve `kapilar.sh` pin senkronu, KAO runtime pininin `SW_VERSION` ile aynı olmasını istiyor. Bu yüzden önceki yayının (`6dee4ebb`) yöntemi izlendi: ortak sürüm `20261009a` → `20261010a`, `index.html` (21), `sw.js` (21; `SW_VERSION`, `SW_OFFLINE_VERSION`), `panel-v2.html` (4) ve bu değeri sabitleyen 12 testte toplam 74 yerde.
+  - Pin taze olduğu için `pinDeferral.files` boşaltıldı. Bundan sonra `quranLearn.js`'i değiştiren kart onu listeye yeniden ekler (K-P).
+- Ölçüler: değişmedi (K3P-01 ölçüleri)
+- Kapı: ilk tam kapı KIRMIZI (tek dosya pini: test_iip_22, pin senkronu, kabul A-9) → ortak sürüm yükseltmesinden sonra yeniden koşuldu (sonuç commit mesajında) · pin tazeliği, test_iip_22, curriculum, v3_welcome, iip_09 PASS
+- Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
+- Gözlem: `git fetch` ve push, otomatik izin denetiminde "Production Deploy" olarak işaretlendi; push için kullanıcı izni gerekir.
+- Sıradaki: K3P-02

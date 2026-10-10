@@ -1792,12 +1792,13 @@
       var answer=String(panel.answer||task.answer||task.choices.filter(function(item){ return item.correct===true; }).map(function(item){ return item.label; }).join(' · '));
       // Geri bildirim gövdesi satır satır: Arapça cevap kendi RTL satırında (sıra görevinde kelimeler boşlukla), sonra âyet künyesi ve kural ayrı satırlar.
       var lines=[],answerIsArabic=/[\u0600-\u06ff]/.test(answer);
-      if(answerIsArabic){ lines.push(panel.correct?'Doğru':'Doğru cevap:'); lines.push({text:task.kind==='order'?answer.split(' · ').join(' '):answer,lang:'ar'}); }
-      else lines.push(panel.correct?'Doğru'+(answer?' — '+answer:''):'Doğru cevap: '+answer);
+      // B-02: doğru cevapta başlık zaten "Doğru"; gövde yalnız cevabı taşır.
+      if(answerIsArabic){ if(!panel.correct) lines.push('Doğru cevap:'); lines.push({text:task.kind==='order'?answer.split(' · ').join(' '):answer,lang:'ar'}); }
+      else if(!panel.correct||answer) lines.push(panel.correct?answer:'Doğru cevap: '+answer);
       (Array.isArray(task.teachLines)?task.teachLines:(task.teach?[task.teach]:[])).forEach(function(line){ lines.push(line); });
       if(task.cognate&&task.cognate.tr) lines.push('Türkçedeki akrabası: '+task.cognate.tr+(task.cognate.shift?' — '+task.cognate.shift:''));
       if(panel.note) lines.push(panel.note);
-      h+=kaoViewsApi().feedbackSheet({tone:panel.correct?'success':'warning',title:panel.correct?'Doğru':'Bir daha bakalım',body:lines,actions:[{label:'Aslında biliyordum',action:'kaoUndo',kind:'link'},{label:'Devam',action:'kaoContinue',kind:'primary'}]});
+      h+=kaoViewsApi().feedbackSheet({tone:panel.correct?'success':'warning',title:panel.correct?'Doğru':'Bir daha bakalım',body:lines,actions:(panel.correct?[]:[{label:'Yanlışlıkla dokundum',action:'kaoUndo',kind:'link'}]).concat([{label:'Devam',action:'kaoContinue',kind:'primary'}])});
     }
     h+='</section>';
     return h;
@@ -2143,7 +2144,8 @@
         if(lemma) words.push({ar:lemma.ar,meaning:Array.isArray(lemma.meanings)?lemma.meanings[0]||'':'',id:id});
       });
       var answered=Math.floor(nonNegativeNumber(state.answered,0)),correct=Math.min(answered,Math.floor(nonNegativeNumber(state.correct,0))),next=kaoLessonSummaryForecast(quranLearnDeps.data(),state,new Date());
-      model.title=state.title+' tamamlandı'; model.learnedWords=words.slice(0,10); model.learnedMore=Math.max(0,words.length-10);
+      // B-05: "Ders tamamlandı" üst satırda; başlıkta yalnız ders adı.
+      model.title=state.title; model.learnedWords=words.slice(0,10); model.learnedMore=Math.max(0,words.length-10);
       model.accuracy=answered?Math.round(correct/answered*100):null; model.accuracyDetail=answered?correct+' / '+answered+' görev':'Pekiştirme yanıtı kaydı yok';
       model.tomorrowCount=Math.floor(nonNegativeNumber(next&&next.counts&&next.counts.reviews,0)); model.tomorrowMinutes=Math.floor(nonNegativeNumber(next&&next.minutes,0));
       model.tomorrowText=model.tomorrowCount?model.tomorrowCount+' tekrar kartı · günlük plan ~'+model.tomorrowMinutes+' dk':(model.tomorrowMinutes?'Vadeli tekrar görünmüyor · günlük plan ~'+model.tomorrowMinutes+' dk':'Yarın için vadeli tekrar görünmüyor.');

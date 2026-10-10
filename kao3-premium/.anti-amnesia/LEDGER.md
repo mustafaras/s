@@ -125,3 +125,19 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
 - Gözlem: `git fetch` ve push, otomatik izin denetiminde "Production Deploy" olarak işaretlendi; push için kullanıcı izni gerekir.
 - Sıradaki: K3P-02
+
+## seq 9 · K3P-02 · KART
+- Tarih: 2026-10-10
+- Commit: (bu commit)
+- Yapılan:
+  - B-02 (K-C, kayma ile hatayı ayırmak): Doğru cevap panelinde geri alma eylemi kaldırıldı. Gövdedeki tekrar eden "Doğru" satırı da kalktı; gövde yalnız cevabı taşıyor, başlık "Doğru" olarak kaldı. Yanlış cevap panelinde geri alma düğmesinin etiketi "Aslında biliyordum" yerine "Yanlışlıkla dokundum".
+  - B-05: Özet başlığı artık yalnız ders adı; "Ders tamamlandı" üst satırda kaldı.
+  - Yeni test `tests/kao/test_k3p_feedback_copy.js`: u01.01, u01.02 ve u08.02 yeni ve yerleşik kullanıcıyla oynatıldı; görevler sırayla doğru ve yanlış cevaplandı (93 doğru panel, 87 yanlış panel, 8 dizme, 6 özet). Önce kırmızıydı, sonra yeşil. README envanterine eklendi.
+  - K-P: `quranLearn.js` yeniden değişti, `pinDeferral.files` listesine eklendi.
+- Ölçüler: ekran-dok `ders-02-geribildirim-word.html` "Aslında biliyordum" 0 · runtime 118,648 → 118,709 KiB
+- Kapı: kapi-hizli 0 · kapilar.sh koşulmadı (dalga sonu değil)
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem:
+  - Eski metni bekleyen test çıkmadı. `test_kao2_feedback` doğru cevaptan sonra `api.kaoUndo()`'yu doğrudan çağırıyor (K2F-31 süre geri alma); işlev duruyor, yalnız düğme gizlendi, test değişmedi.
+  - Ara hata: Satır içi `//` yorumu aynı satırdaki `model.learnedWords` atamalarını yorum satırına çevirdi. `test_kao2_summary` bunu yakaladı, yorum ayrı satıra alındı. Yeni test özet kelime listesini denetlemiyordu; bu açığı `test_kao2_summary` kapatıyor.
+- Sıradaki: K3P-03

@@ -59,6 +59,8 @@
   // okunur; saat yalnız parametre olarak gelir, bu dosya hiçbir durum yazmaz.
   var DAY_MS=86400000,REVIEW_CAP=20,DEBT_LIMIT=60,WARMUP_GAP_DAYS=7,WARMUP_CARDS=10;
   var MIN_PER_TASK=0.55,SETTLED_STABILITY=7,MASTERY_MINUTES=4,REPAIR_MINUTES=3,S0_MINUTES=5;
+  // K3P-03 (B-06): ölçülmüş süre görev başına 6 sn'nin altına inmez (bozuk/çok küçük ms "~1 dk" yazdırmasın).
+  var FLOOR_PER_TASK=6/60;
   var curriculumCache={source:null,value:null};
 
   function obj(value){ return value&&typeof value==='object'&&!Array.isArray(value)?value:{}; }
@@ -363,7 +365,7 @@
       if(age<0||age>=7||!(num(day.ms,0)>0)||!(num(day.answered,0)>0)) return;
       ms+=day.ms; answered+=day.answered;
     });
-    var perTask=answered>0?ms/answered/60000:MIN_PER_TASK,minutes=Math.max(1,Math.ceil(tasks*perTask-1e-9));
+    var perTask=answered>0?Math.max(FLOOR_PER_TASK,ms/answered/60000):MIN_PER_TASK,minutes=Math.max(1,Math.ceil(tasks*perTask-1e-9));
     return capMinutes>0?Math.min(minutes,capMinutes):minutes;
   }
   function dueCount(q,now){

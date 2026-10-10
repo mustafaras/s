@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-03",
+  "nextPrompt": "K3P-04",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -186,7 +186,9 @@
     {
       "id": "K3P-03",
       "wave": 0,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-10",
+      "result": "görev başına 6 sn taban (FLOOR_PER_TASK); ders sonrası Bugün ~1 dk → ~4 dk; runtime 118,804 KiB"
     },
     {
       "id": "K3P-04",
@@ -355,7 +357,8 @@
     "branch": "kao3-premium",
     "until": "K3P-27",
     "files": [
-      "app/core/quranLearn.js"
+      "app/core/quranLearn.js",
+      "app/core/quranLearnFlow.js"
     ]
   }
 }

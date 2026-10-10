@@ -227,6 +227,24 @@ check('estimateMinutes: veri yoksa 0,55 dk/görev; günlük süre üst sınırı
   assert.equal(flow.estimateMinutes({ [TODAY]: { answered: 10, ms: 60000 } }, 10, now, 30), 1);
 });
 
+// K3P-03 (B-06): bozuk ya da çok küçük süre ölçümü "~1 dk" yazdırmaz; görev başına 6 sn taban.
+check('K3P-03: 24 görevlik tahmin bozuk/küçük ölçümde ≥ 3 dk, normal veride değişmez', () => {
+  const TASKS = 24;
+  const rows = [
+    { name: 'ms yok', daily: { [TODAY]: { answered: 24 } }, min: 3 },
+    { name: 'ms = 0', daily: { [TODAY]: { answered: 24, ms: 0 } }, min: 3 },
+    { name: 'ms sayı değil', daily: { [TODAY]: { answered: 24, ms: '216000' } }, min: 3 },
+    { name: 'ms çok küçük (1 ms/görev)', daily: { [TODAY]: { answered: 24, ms: 24 } }, min: 3 },
+    { name: 'answered = 0', daily: { [TODAY]: { answered: 0, ms: 216000 } }, min: 3 },
+    { name: 'normal (9 sn/görev)', daily: { [TODAY]: { answered: 24, ms: 24 * 9000 } }, exact: 4 }
+  ];
+  for (const row of rows) {
+    const minutes = flow.estimateMinutes(row.daily, TASKS, now, 0);
+    if (row.exact !== undefined) assert.equal(minutes, row.exact, `${row.name}: ${minutes} dk`);
+    else assert.ok(minutes >= row.min, `${row.name}: ${minutes} dk < ${row.min} dk`);
+  }
+});
+
 check('Flow saf: DOM/ağ/zamanlayıcı/depo/Date.now yok', () => {
   const src = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnFlow.js'), 'utf8');
   for (const banned of ['document', 'location', 'fetch', 'setTimeout', 'localStorage', 'Date.now']) {

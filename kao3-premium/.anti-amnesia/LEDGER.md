@@ -141,3 +141,16 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
   - Eski metni bekleyen test çıkmadı. `test_kao2_feedback` doğru cevaptan sonra `api.kaoUndo()`'yu doğrudan çağırıyor (K2F-31 süre geri alma); işlev duruyor, yalnız düğme gizlendi, test değişmedi.
   - Ara hata: Satır içi `//` yorumu aynı satırdaki `model.learnedWords` atamalarını yorum satırına çevirdi. `test_kao2_summary` bunu yakaladı, yorum ayrı satıra alındı. Yeni test özet kelime listesini denetlemiyordu; bu açığı `test_kao2_summary` kapatıyor.
 - Sıradaki: K3P-03
+
+## seq 10 · K3P-03 · KART
+- Tarih: 2026-10-10
+- Commit: (bu commit)
+- Yapılan:
+  - B-06 doğrulandı ve düzeltildi. `estimateMinutes` (`quranLearnFlow.js`) ölçülmüş görev süresini adlandırılmış `FLOOR_PER_TASK` (6 sn) tabanının altına indirmiyor. `ms` alanı yoksa, sayı değilse ya da 0 ise o gün zaten sayılmıyor ve `MIN_PER_TASK` (0,55 dk) kullanılıyor.
+  - `tests/kao/test_kao2_next_step.js` içine tablo güdümlü kontrol eklendi: 24 görev için ms yok, ms = 0, ms sayı değil, 1 ms/görev ve answered = 0 durumlarında ≥ 3 dk; normal veride (9 sn/görev) tam 4 dk. Önce kırmızıydı ("1 ms/görev: 1 dk < 3 dk"), sonra yeşil. Yeni test dosyası yok, README değişmedi.
+  - K-P: `app/core/quranLearnFlow.js` `pinDeferral.files` listesine eklendi.
+- Ölçüler: seeded + u01.01 oynatıldıktan sonra (ms 178 / 30 görev) Bugün "20 tekrar · ~1 dk" → "~4 dk"; 24 görev tavansız 1 → 3 dk · ekran-dok `v-home` "~5 dk" (önce de 5: seeded günlük kaydında ms yok, varsayılan + 5 dk tavanı) · runtime 118,709 → 118,804 KiB
+- Kapı: kapi-hizli 0 · kapilar.sh koşulmadı (dalga sonu değil)
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: Kabul ölçüsündeki `ekran-dok` seeded Bugün ekranı bu hatayı tek başına sınamıyor; seed günlük kaydı `ms` taşımadığı için önce de "~1 dk" göstermiyordu. Asıl koşul ders oynatıldıktan sonraki küçük `ms` (headless sahte saat); `akis-olc` "yarıda bırakma → yeniden açılış" satırı artık "~4 dk" gösteriyor.
+- Sıradaki: K3P-04

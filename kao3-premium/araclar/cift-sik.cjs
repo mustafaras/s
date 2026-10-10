@@ -16,7 +16,8 @@ function scan(seeded) {
       H.playLesson(t, {
         visit(task) {
           tasks += 1;
-          const labels = (task.choices || []).map((c) => c.label);
+          // Dizme görevinde aynı sözcük âyette iki kez geçebilir (D2F-03); orada tekillik sıra numarasıyla ölçülür (K3P-01).
+          const labels = (task.choices || []).map((c) => (task.kind === 'order' ? `#${c.ordinal}` : c.label));
           if (new Set(labels).size < labels.length) dups.push({ lesson: lesson.id, task: task.id, cards: task.choices.map((c) => c.cardId) });
         }
       });

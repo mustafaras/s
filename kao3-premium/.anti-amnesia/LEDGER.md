@@ -96,3 +96,19 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: K3P-00 kapanışında "Oku" listesi dışında `cdp.mjs` ve `shoot-modal.mjs` başları okundu (sunucusuz ve dış isteği kesen davranışı doğrulamak için).
 - Sıradaki: K3P-01
+
+## seq 7 · K3P-01 · KART
+- Tarih: 2026-10-10
+- Commit: (bu commit)
+- Yapılan:
+  - B-01 düzeltildi. `kaoDistractorPool` sıralı havuzu kurar. `kaoUniqueDistractors` sırayı bozmadan aynı lemmayı (iki yön kartı) ve aynı görünen etiketi ayıklar. Etiket çakışması tek yardımcıda toplandı: `kaoLabelParts`/`kaoLabelClash`. Sözlük yedeği ve bağ kurma görevi aynı yardımcıyı kullanıyor (DRY); eski kopya `parts`/`overlaps` silindi.
+  - Kararlılık için tekilleştirme görünen sırada yapılır: bugünkü pencere (havuzun ilk 3'ü ve yedek) görev sırasına dizilir, eksilen şık havuzun devamından, o da yetmezse sözlük yedeğinden dolar. Eski `choiceCount` kesme bloğu bu yolla gereksizleşti.
+  - Yeni test `tests/kao/test_k3p_distractors.js`: 109 ders yeni ve yerleşik kullanıcıyla oynatılır; iki yönlü kart çifti birim vakası ×25; `--taban-yaz` ile kararlılık karşılaştırması. Test önce kırmızıydı (yeni 1/1087, yerleşik 631/1127), sonra yeşil. README envanterine eklendi.
+- Ölçüler: çift şık yerleşik 631/1127 → 0/1127 · yeni 1/1087 → 0/1087 (cift-sik exit 0) · kararlılık: 1.582 çiftsiz görevin 1.581'i aynı; 1 görev R-A2 zinciriyle değişti (aşağıda) · runtime 118,105 → 118,648 KiB
+- Kapı: kapi-hizli --yavas 0 (ilk koşu kabul A-9'da kırmızıydı → K-P) · kapilar.sh koşulmadı (dalga sonu değil)
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem / kullanıcı kararları:
+  - **Dizme görevi ölçütü (kullanıcı kararı "ölçütü düzelt").** Yeni kullanıcıdaki tek "çift" u08.02 g16-k2'de, 2:24 `فَإِن لَّمْ تَفْعَلُوا۟ وَلَن تَفْعَلُوا۟`: sözcük âyette gerçekten iki kez geçiyor; D2F-03 iki çipi bilerek birbirinin yerine geçer yaptı. `cift-sik.cjs` ve yeni test dizmede tekilliği sıra numarasıyla (`ordinal`) ölçer. Uygulama davranışı değişmedi.
+  - **R-A2 zinciri.** u07.03 `aAmana` dinleme görevi ders başında kuruluyor ve aynı kartın u01.01'deki görevinden kalan `lastDistractors` listesini dışlıyor. O görev çiftliydi ve düzeldi, bu yüzden dışlanan liste ve şıklar meşru olarak değişti. Testte yalnız "aynı hedef kartın önceki görevi çiftliydi" koşulu ayrı sayılıyor; başka her fark hata.
+  - **K-P · pin tazeliği (kullanıcı "en bilimsel şekilde çöz" dedi).** `test_asset_pin_freshness` (D3F-10), değişen `quranLearn.js` pini yükseltilmediği için kırmızıydı. Bu da kabul A-9'u düşürüyordu. Oysa §6.3 pini K3P-27'ye bırakıyor; plan bunu öngörmemişti, çünkü kabul testi `--yavas` olmadan atlanıyor. Korunan özellik yayın anındaki tazelik ve yayın yalnız `main`'den yapılıyor. Bu yüzden test, yalnız `pinDeferral.branch` dalında ve `pinDeferral.files` içindeki dosyalar için ERTELENDİ der; `main`'de tam katıdır. Negatif deneme: dal tutmazsa exit 1. Kayıt K3P-STATE `decisions.K-P` + `pinDeferral`, kural BAGLAM §6.3, K3P-27 prompt'una listeyi boşaltma adımı eklendi (DÜZELTME).
+- Sıradaki: K3P-02

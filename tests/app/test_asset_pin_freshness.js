@@ -48,6 +48,17 @@ for (const [ref, hosts] of refs) {
     stale.push(`${ref} [${[...hosts].join(', ')}] pin ${first.slice(0, 8)}'de kondu; sonra ${later.length ? `${later.length} commit (son ${later[0]})` : 'çalışma ağacında'} değişti`);
   }
 }
-assert.deepEqual(stale, [], `bayat önbellek pini (dosya değişti, ?v= aynı kaldı):\n  ${stale.join('\n  ')}`);
-console.log(`PASS  ${refs.size} benzersiz ?v= bağlantısı taze (${HOSTS.join(', ')})`);
+// K3P (K-P): yayın yalnız main'den yapılır; bayat pin ancak yayında zarar verir. Program dalında pinler tek seferde
+// K3P-27'de yükseltilir (BAGLAM §6.3). Erteleme yalnız K3P-STATE.pinDeferral.branch dalında ve orada adıyla yazılmış
+// dosyalar için geçerlidir; main'de ve başka her dalda test tam katıdır.
+const deferral = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(repoRoot, 'kao3-premium', 'K3P-STATE.json'), 'utf8')).pinDeferral || null; } catch { return null; }
+})();
+const branch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
+const deferredFiles = deferral && deferral.branch && branch === deferral.branch && Array.isArray(deferral.files) ? deferral.files : [];
+const deferred = stale.filter((line) => deferredFiles.includes(line.split('?')[0]));
+const blocking = stale.filter((line) => !deferred.includes(line));
+assert.deepEqual(blocking, [], `bayat önbellek pini (dosya değişti, ?v= aynı kaldı):\n  ${blocking.join('\n  ')}`);
+if (deferred.length) console.log(`ERTELENDİ  ${deferred.length} bayat pin, dal ${branch}, ${deferral.until || '?'} yükseltecek:\n  ${deferred.join('\n  ')}`);
+console.log(`PASS  ${refs.size - deferred.length} benzersiz ?v= bağlantısı taze (${HOSTS.join(', ')})`);
 console.log('asset pin freshness: PASS (1 kontrol)');

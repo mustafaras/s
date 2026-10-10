@@ -1348,7 +1348,7 @@ Sen K3P programını uygulayan ajansın. Önce `kao3-premium/BAGLAM-YONETIMI.md`
    - `SW_VERSION`, `SW_OFFLINE_VERSION`, `test_iip_22` sürüm sabitini ve `sw.js` kayıt satırını günceller.
    - `--dene` kipinde yalnız farkı gösterir.
 
-   Önce `--dene` ile çalıştır, sonra uygula.
+   Önce `--dene` ile çalıştır, sonra uygula. Ardından `K3P-STATE.json` → `pinDeferral.files` listesini boşalt (K-P) ve `node tests/app/test_asset_pin_freshness.js` çıktısında ERTELENDİ satırı kalmadığını gör.
 2. **Tam kapı.** `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → "TÜM KAPILAR YEŞİL". Pin senkronu dahil.
 3. **Onay iste.** Kullanıcıya açıkça sor: "kao3-premium → main birleştirip GitHub Pages'e yayınlayayım mı?" Kapanış özetini de göster. **Açık "evet" gelmeden** push, merge ya da tag yapma.
 4. **Onay gelirse:**

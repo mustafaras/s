@@ -65,6 +65,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao2_text_review.js` | KAO2-17 | K-4 L0 otomatik kapılar (kaynak, imlâ, yasak ifade, elle Arapça yok) |
 | `test_kao2_today.js` | KAO2-09 | Bugün ekranı (S-02) |
 | `test_kao2_word.js` | KAO2-25 · K2F-33 | Kelime detayı v2 (S-08) + panel aynası |
+| `test_k3p_distractors.js` | K3P-01 | B-01: 109 ders yeni ve yerleşik kullanıcıyla oynatılır; şıklar tekil (dizmede sıra numarasıyla), çeldirici lemma tekil ve hedeften farklı, şık sayısı korunur; iki yönlü kart çifti birim vakası; `--taban-yaz` ile çiftsiz görevlerin kararlılık karşılaştırması |
 
 K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (55 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
 

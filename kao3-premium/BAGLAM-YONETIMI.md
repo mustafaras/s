@@ -101,7 +101,10 @@ Hiçbir prompt bu kuralları değiştiremez.
    yapılır.
 3. **Sürüm pini.** Ara kartlarda `?v=` pini yükseltilmez. Yeni bir varlık eklenirse `index.html`
    ve `sw.js` içine mevcut KAO sürüm değeriyle (`sw.js` → `SW_VERSION`) eklenir. Değişen
-   dosyaların pinleri K3P-27'de tek seferde yükseltilir.
+   dosyaların pinleri K3P-27'de tek seferde yükseltilir. **Pin tazeliği (K-P):** Pinli bir dosyayı
+   (`index.html`/`sw.js` içinde `?v=` ile anılan) değiştiren kart, dosyayı `K3P-STATE.json` →
+   `pinDeferral.files` listesine ekler. `tests/app/test_asset_pin_freshness.js` yalnız `kao3-premium`
+   dalında ve yalnız bu dosyalar için PASS yerine ERTELENDİ der; `main`'de tam katıdır.
 4. **İçerik.** Arapça içerik ve okunuşlar elle yazılmaz; yalnız
    `tools/kao-lexicon-build.mjs` ve `tools/kao-content-freeze.mjs` araçlarından üretilir.
 5. **Handler sayısı.** `App.kao*` sayısı 45'te kalır. Yeni etkileşimler mevcut eylem

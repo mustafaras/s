@@ -337,20 +337,42 @@
     var previous=Array.isArray(previousMap[targetId])?previousMap[targetId]:(Array.isArray(targetCard.lastDistractors)?targetCard.lastDistractors:[]);
     return previous.map(function(id){ return lemmaIdForCard(id)||String(id); });
   }
-  function kaoPickDistractors(d,targetId,count,options){
-    var opts=options&&typeof options==='object'?options:{},q=quranLearnRoot(d),cards=objectOr(q.cards,{});
-    var target=metaFor(targetId,null,opts),previous=previousDistractorLemmas(d,targetId,opts);
-    var limit=Math.max(0,Math.floor(nonNegativeNumber(count,3)));
+  // K3P-01: şık etiketi çakışması tek yerde. Etiket ",", ";", "(", ")", "/" ile parçalanır. partial: ortak bir parça
+  // yeter (anlamca çakışan seçenek soruyu belirsiz yapar); değilse parça dizisi aynıysa aynı şıktır.
+  function kaoLabelParts(label){ return String(label||'').toLocaleLowerCase('tr').split(/[,;()\/]+/).map(function(part){ return part.trim(); }).filter(Boolean); }
+  function kaoLabelClash(label,used,partial){
+    var own=kaoLabelParts(label),key=own.join('|');
+    return used.some(function(other){ var parts=kaoLabelParts(other); return partial?parts.some(function(part){ return own.indexOf(part)>=0; }):parts.join('|')===key; });
+  }
+  // B-01: çeldirici havuzu, kart kimlikleri sıralı. Aynı lemmanın iki yön kartı ve aynı görünen etiket ayrı şık sayılmaz;
+  // kaoUniqueDistractors bunları sırayı bozmadan ayıklar.
+  function kaoDistractorPool(d,targetId,opts){
+    var cards=objectOr(quranLearnRoot(d).cards,{}),target=metaFor(targetId,null,opts),previous=previousDistractorLemmas(d,targetId,opts),seed=String(opts.seed||'')+'|'+targetId;
     return Object.keys(cards).filter(function(id){
       if(id===targetId||previous.indexOf(lemmaIdForCard(id)||id)>=0) return false;
       var card=cards[id],meta=metaFor(id,null,opts);
       return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=21&&!!target.pos&&meta.pos===target.pos&&!!target.root&&!!meta.root&&meta.root!==target.root;
-    }).sort(function(a,b){
-      return seededRank(String(opts.seed||'')+'|'+targetId,a)-seededRank(String(opts.seed||'')+'|'+targetId,b)||a.localeCompare(b);
-    }).slice(0,limit).map(function(id){
+    }).sort(function(a,b){ return seededRank(seed,a)-seededRank(seed,b)||a.localeCompare(b); }).map(function(id){
       var meta=metaFor(id,null,opts),meanings=Array.isArray(meta.meanings)?meta.meanings:[];
       return {cardId:id,label:String(meanings[0]||meta.meaning||id)};
     });
+  }
+  // Görünen etiket: tr>ar görevinde Arapça, ar>tr görevinde anlam.
+  function kaoShownLabel(item,toAr,opts){ return toAr?String(metaFor(item.cardId,null,opts).ar||item.label):String(item.label); }
+  // Sırayı korur; hedefle ya da önce seçilenle aynı lemma veya aynı görünen etiket atlanır; en çok `limit` öğe.
+  function kaoUniqueDistractors(items,targetId,answer,limit,opts){
+    var toAr=/:tr>ar$/.test(targetId),lemmas=[lemmaIdForCard(targetId)||targetId],labels=[answer],out=[];
+    items.forEach(function(item){
+      var lemma=lemmaIdForCard(item.cardId)||item.cardId,label=kaoShownLabel(item,toAr,opts);
+      if(out.length>=limit||lemmas.indexOf(lemma)>=0||kaoLabelClash(label,labels,false)) return;
+      lemmas.push(lemma); labels.push(label); out.push(item);
+    });
+    return out;
+  }
+  function kaoPickDistractors(d,targetId,count,options){
+    var opts=options&&typeof options==='object'?options:{},target=metaFor(targetId,null,opts);
+    var answer=kaoShownLabel({cardId:targetId,label:String((Array.isArray(target.meanings)?target.meanings:[])[0]||target.meaning||targetId)},/:tr>ar$/.test(targetId),opts);
+    return kaoUniqueDistractors(kaoDistractorPool(d,targetId,opts),targetId,answer,Math.max(0,Math.floor(nonNegativeNumber(count,3))),opts);
   }
   function kaoBuildTask(queueItem,d,options){
     var opts=options&&typeof options==='object'?options:{};
@@ -359,48 +381,49 @@
     if(/^g:/.test(id)) return kaoBuildGrammarTask(queueItem,d,opts);
     if(/^k:/.test(id)) return kaoBuildLinkTask(queueItem,opts); if(/^t:/.test(id)) return kaoBuildTransferTask(queueItem,opts);
     var meta=metaFor(id,queueItem,opts),meanings=Array.isArray(meta.meanings)?meta.meanings:[];
-    var direction=/:tr>ar$/.test(id)?'tr>ar':'ar>tr';
-    var answer=direction==='tr>ar'?String(meta.ar||id):String(meanings[0]||meta.meaning||id);
-    var picked=kaoPickDistractors(d,id,3,opts),lex=window.QuranLexiconV1;
-    if(picked.length<3&&lex&&Array.isArray(lex.lemmas)){
-      // Sözlük yedeği katmanlı: (1) aynı tür, farklı kök; (2) hedef köksüzse öteki köksüz işlev kelimeleri; (3) son çare
-      // herhangi bir kelime. Aynı kök yalnız kök varken dışlanır (köksüz edatlar birbirini elemez); etiketler tekildir.
+    var direction=/:tr>ar$/.test(id)?'tr>ar':'ar>tr',toAr=direction==='tr>ar';
+    var answer=toAr?String(meta.ar||id):String(meanings[0]||meta.meaning||id);
+    var lex=window.QuranLexiconV1,pool=kaoDistractorPool(d,id,opts);
+    var need=typeof opts.choiceCount==='number'&&isFinite(opts.choiceCount)?Math.max(2,Math.min(4,Math.floor(opts.choiceCount)))-1:3;
+    var rank=function(cardId){ return seededRank(String(opts.seed||'')+'|task|'+id,cardId); };
+    // Sözlük yedeği katmanlı: (1) aynı tür, farklı kök; (2) hedef köksüzse öteki köksüz işlev kelimeleri; (3) son çare
+    // herhangi bir kelime. Aynı kök yalnız kök varken dışlanır (köksüz edatlar birbirini elemez); etiketler anlamca çakışmaz.
+    var fill=function(picked,n){
+      if(picked.length>=n||!lex||!Array.isArray(lex.lemmas)) return picked;
       var previousLemmas=previousDistractorLemmas(d,id,opts),pickedLemmas=picked.map(function(item){ return lemmaIdForCard(item.cardId); }),targetLemma=lemmaIdForCard(id);
-      var labelOf=function(lemma){ return direction==='tr>ar'?String(lemma.ar||lemma.id):String(lemma.meanings[0]||lemma.id); };
-      var usedLabels=[answer].concat(picked.map(function(item){ return direction==='tr>ar'?String(metaFor(item.cardId,null,opts).ar||item.label):String(item.label); }));
-      // Anlamca çakışan seçenek soruyu belirsiz yapar: ortak parçası (",", ";", "(", "/" ile ayrılmış) olan etiket elenir.
-      var parts=function(label){ return String(label||'').toLocaleLowerCase('tr').split(/[,;()\/]+/).map(function(part){ return part.trim(); }).filter(Boolean); };
-      var overlaps=function(label){ var own=parts(label); return usedLabels.some(function(used){ return parts(used).some(function(part){ return own.indexOf(part)>=0; }); }); };
+      var labelOf=function(lemma){ return toAr?String(lemma.ar||lemma.id):String(lemma.meanings[0]||lemma.id); };
+      var usedLabels=[answer].concat(picked.map(function(item){ return kaoShownLabel(item,toAr,opts); }));
       var eligible=function(lemma){ return lemma.id!==targetLemma&&!(meta.root&&lemma.root===meta.root)&&previousLemmas.indexOf(lemma.id)<0&&pickedLemmas.indexOf(lemma.id)<0; };
       var tiers=[function(lemma){ return lemma.pos===meta.pos; },function(lemma){ return !meta.root&&!lemma.root; },function(){ return true; }];
       tiers.some(function(tier){
         lex.lemmas.filter(function(lemma){ return eligible(lemma)&&tier(lemma); }).sort(function(a,b){ return seededRank(String(opts.seed||'')+'|fallback|'+id,a.id)-seededRank(String(opts.seed||'')+'|fallback|'+id,b.id); }).some(function(lemma){
-          if(picked.length>=3) return true;
+          if(picked.length>=n) return true;
           var label=labelOf(lemma);
-          if(overlaps(label)) return false;
+          if(kaoLabelClash(label,usedLabels,true)) return false;
           usedLabels.push(label); pickedLemmas.push(lemma.id);
           picked.push({cardId:'w:'+lemma.id+':'+direction,label:label});
           return false;
         });
-        return picked.length>=3;
+        return picked.length>=n;
       });
-    }
-    var choices=[{cardId:id,label:answer,pronunciation:direction==='tr>ar'?kaoLemmaReading(lemmaIdForCard(id),meta.translit):'',correct:true}].concat(picked.map(function(item){
+      return picked;
+    };
+    // B-01: önce bugünkü pencere (havuzun ilk 3'ü + yedek) görünen sırada dizilir ve tekilleştirme bu sırada yapılır.
+    // Böylece çiftsiz görev aynen kalır; eksilen şık havuzun devamından, o da yetmezse sözlük yedeğinden dolar.
+    var windowed=fill(pool.slice(0,3),3).sort(function(a,b){ return rank(a.cardId)-rank(b.cardId); });
+    var picked=fill(kaoUniqueDistractors(windowed.concat(pool.slice(3)),id,answer,need,opts),need);
+    var choices=[{cardId:id,label:answer,pronunciation:toAr?kaoLemmaReading(lemmaIdForCard(id),meta.translit):'',correct:true}].concat(picked.map(function(item){
       var itemMeta=metaFor(item.cardId,null,opts);
-      return {cardId:item.cardId,label:direction==='tr>ar'?String(itemMeta.ar||item.label):String(item.label),pronunciation:direction==='tr>ar'?kaoLemmaReading(lemmaIdForCard(item.cardId),itemMeta.translit):'',correct:false};
+      return {cardId:item.cardId,label:kaoShownLabel(item,toAr,opts),pronunciation:toAr?kaoLemmaReading(lemmaIdForCard(item.cardId),itemMeta.translit):'',correct:false};
     }));
-    choices.sort(function(a,b){ return seededRank(String(opts.seed||'')+'|task|'+id,a.cardId)-seededRank(String(opts.seed||'')+'|task|'+id,b.cardId); });
-    if(typeof opts.choiceCount==='number'&&isFinite(opts.choiceCount)){
-      var choiceCount=Math.max(2,Math.min(4,Math.floor(opts.choiceCount))),correctChoice=choices.find(function(choice){ return choice.correct===true; });
-      if(correctChoice&&choices.length>choiceCount) choices=[correctChoice].concat(choices.filter(function(choice){ return choice!==correctChoice; }).slice(0,choiceCount-1)).sort(function(a,b){ return seededRank(String(opts.seed||'')+'|task|'+id,a.cardId)-seededRank(String(opts.seed||'')+'|task|'+id,b.cardId); });
-    }
+    choices.sort(function(a,b){ return rank(a.cardId)-rank(b.cardId); });
     choices.forEach(function(choice,index){ choice.choiceId=String(queueItem&&queueItem.id||'task:'+id)+':choice:'+index; });
     // R-B5 / 02 §5.3: hareke soldurma yalnız review ∧ s≥30 kartta (durable30). Hedefte anlam kayması (cognate.shift)
     // varsa yanlış cevap errors.cognate'e yazılır; telaffuz hataları kelime görevinde değil phonics.misheard'de sayılır.
     return {id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),direction:direction,audioOnly:opts.audioOnly===true,answer:answer,ar:String(meta.ar||''),meaning:String(meanings[0]||meta.meaning||''),translit:kaoLemmaReading(lemmaIdForCard(id),meta.translit),cognate:meta.cognate||null,durable30:isSettled(objectOr(quranLearnRoot(d).cards,{})[id],30),errorClass:meta.cognate&&meta.cognate.shift?'cognate':'',clipId:lemmaIdForCard(id)?'w-'+lemmaIdForCard(id):'',choices:choices};
   }
   // 02 §5.6 "bağ kur": hedefin Türkçe türevi (cognate.tr) seçilir; çeldiriciler başka kökten, anlam parçası çakışmayan türevler.
-  function kaoBuildLinkTask(queueItem,opts){ var id=String(queueItem.cardId||''),lemmaId=id.slice(2),lemmas=window.QuranLexiconV1&&Array.isArray(window.QuranLexiconV1.lemmas)?window.QuranLexiconV1.lemmas:[],lemma=lemmas.find(function(l){ return l.id===lemmaId; }); if(!lemma||!lemma.cognate||!lemma.cognate.tr) return null; var seed=String(opts.seed||'')+'|link|'+lemmaId,answer=String(lemma.cognate.tr),used=[answer],picked=[],parts=function(label){ return String(label||'').toLocaleLowerCase('tr').split(/[,;()\/]+/).map(function(part){ return part.trim(); }).filter(Boolean); }; lemmas.filter(function(l){ return l.id!==lemmaId&&l.cognate&&l.cognate.tr&&!(lemma.root&&l.root===lemma.root); }).sort(function(a,b){ return seededRank(seed,a.id)-seededRank(seed,b.id)||a.id.localeCompare(b.id); }).some(function(l){ var label=String(l.cognate.tr),own=parts(label); if(used.some(function(u){ return parts(u).some(function(part){ return own.indexOf(part)>=0; }); })) return false; used.push(label); picked.push({cardId:'k:'+l.id,label:label,correct:false}); return picked.length>=3; }); var choices=[{cardId:id,label:answer,correct:true}].concat(picked).sort(function(a,b){ return seededRank(seed+'|order',a.cardId)-seededRank(seed+'|order',b.cardId); }); choices.forEach(function(choice,index){ choice.choiceId=String(queueItem.id)+':choice:'+index; }); return {id:String(queueItem.id),cardId:id,type:'link',kind:'link',isNew:false,retry:false,prompt:'Türkçedeki türevini seç',answer:answer,ar:String(lemma.ar||''),meaning:String((lemma.meanings||[])[0]||''),translit:kaoLemmaReading(lemmaId,lemma.translit),cognate:null,clipId:'',choices:choices}; }
+  function kaoBuildLinkTask(queueItem,opts){ var id=String(queueItem.cardId||''),lemmaId=id.slice(2),lemmas=window.QuranLexiconV1&&Array.isArray(window.QuranLexiconV1.lemmas)?window.QuranLexiconV1.lemmas:[],lemma=lemmas.find(function(l){ return l.id===lemmaId; }); if(!lemma||!lemma.cognate||!lemma.cognate.tr) return null; var seed=String(opts.seed||'')+'|link|'+lemmaId,answer=String(lemma.cognate.tr),used=[answer],picked=[]; lemmas.filter(function(l){ return l.id!==lemmaId&&l.cognate&&l.cognate.tr&&!(lemma.root&&l.root===lemma.root); }).sort(function(a,b){ return seededRank(seed,a.id)-seededRank(seed,b.id)||a.id.localeCompare(b.id); }).some(function(l){ var label=String(l.cognate.tr); if(kaoLabelClash(label,used,true)) return false; used.push(label); picked.push({cardId:'k:'+l.id,label:label,correct:false}); return picked.length>=3; }); var choices=[{cardId:id,label:answer,correct:true}].concat(picked).sort(function(a,b){ return seededRank(seed+'|order',a.cardId)-seededRank(seed+'|order',b.cardId); }); choices.forEach(function(choice,index){ choice.choiceId=String(queueItem.id)+':choice:'+index; }); return {id:String(queueItem.id),cardId:id,type:'link',kind:'link',isNew:false,retry:false,prompt:'Türkçedeki türevini seç',answer:answer,ar:String(lemma.ar||''),meaning:String((lemma.meanings||[])[0]||''),translit:kaoLemmaReading(lemmaId,lemma.translit),cognate:null,clipId:'',choices:choices}; }
   // Öğrenilen her 5. yeni kelimeden sonra bir "bağ kur" (sayaç: introducedAt'lı ar>tr kartlar + oturumdaki sıra; hedef son 5'ten).
   function kaoInsertLinks(queue,q,now){ var cards=objectOr(q.cards,{}),lemmas=window.QuranLexiconV1&&Array.isArray(window.QuranLexiconV1.lemmas)?window.QuranLexiconV1.lemmas:[],byId=Object.create(null),out=[]; lemmas.forEach(function(l){ byId[l.id]=l; }); var recent=Object.keys(cards).filter(function(cid){ return /:ar>tr$/.test(cid)&&cards[cid].introducedAt; }).sort(function(a,b){ return String(cards[b].introducedAt).localeCompare(String(cards[a].introducedAt)); }).map(lemmaIdForCard),count=recent.length; queue.forEach(function(item){ out.push(item); if(!item.isNew||!/^w:.+:ar>tr$/.test(item.cardId)) return; recent.unshift(lemmaIdForCard(item.cardId)); count+=1; var pick=count%5?null:recent.slice(0,5).find(function(lid){ return byId[lid]&&byId[lid].cognate&&byId[lid].cognate.tr; }); if(pick) out.push({id:'kao:'+daySeed(now)+':k:'+pick,cardId:'k:'+pick,type:'link',isNew:false}); }); return out; }
   function minuteOfDay(value){

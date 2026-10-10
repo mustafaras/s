@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-01",
+  "nextPrompt": "K3P-02",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -146,7 +146,8 @@
     "K-L": "decided: nefes ritmi Hedef→Isınma→Tanış-Sına→Karışık→Zirve; art arda ≤1 edilgin ekran",
     "K-M": "decided: overlay yerinde güncellenir; ders sırasında toast ertelenir (kriz hariç)",
     "K-N": "decided: Kaldığın yerden · n/N görünür devam",
-    "K-O": "decided: oturum seçilen dakikaya sığar; taşan tekrarlar en düşük R önce ertesi güne"
+    "K-O": "decided: oturum seçilen dakikaya sığar; taşan tekrarlar en düşük R önce ertesi güne",
+    "K-P": "decided (K3P-01, kullanıcı kararı bana bıraktı): pin tazeliği (D3F-10) yayın anının özelliğidir; yayın yalnız main. Program dalında pinli dosya değişirse pinDeferral.files listesine yazılır, test orada ERTELENDİ der; main ve başka dallarda tam katı. K3P-27 pinleri yükseltir ve listeyi boşaltır."
   },
   "hypotheses": [
     "H1",
@@ -171,7 +172,9 @@
     {
       "id": "K3P-01",
       "wave": 0,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-10",
+      "result": "çift şık yerleşik 631/1127→0, yeni 1/1087→0; runtime 118,648 KiB; K-P pin ertelemesi"
     },
     {
       "id": "K3P-02",
@@ -345,5 +348,12 @@
       "status": "todo",
       "gate": "release (prompt içinde ayrıca açık onay sorulur)"
     }
-  ]
+  ],
+  "pinDeferral": {
+    "branch": "kao3-premium",
+    "until": "K3P-27",
+    "files": [
+      "app/core/quranLearn.js"
+    ]
+  }
 }

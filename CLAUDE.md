@@ -148,8 +148,8 @@ app/core/reminder*.js  Frozen REM program modules (`ReminderCatalogV1`,
                  `ReminderDeliveryV1`): pure engine/scheduler/delivery
                  boundaries consumed by app.js; copy lexicon in
                  reminderCatalog.js.
-app.js           The Şeyma runtime shell (single IIFE, ~9.0k lines after the
-                 MON-01…60 split + MON2 Dalga 1–2). Still the sole owner of `var data/ui/dark`
+app.js           The Şeyma runtime shell (single IIFE, ~7.8k lines after the
+                 MON-01…60 split + MON2). Still the sole owner of `var data/ui/dark`
                  and the 9 `data=` rebind sites, the 7 B1 live getters, the
                  `SeyOnSyncState`/`SeyOnSynced` callbacks, all timer/listener
                  registrations, `window.App=App` and the 554 `App.x=function`
@@ -210,7 +210,7 @@ app/core/quranLearn.js  KAO registry (`window.SeymaQuranLearn`): FSRS, kuyruk ve
 app/content/quranLexiconV1.js · quranGrammarV1.js · quranShortSurahsV1.js ·
   quranPhonicsV1.js  Donmuş KAO içerik modülleri (araçla üretilir, elle düzenlenmez).
 app/kao.css      KAO yüzeyi stilleri (yalnız --quran*/--f-*/--dur-* tokenları).
-tests/kao/       KAO fixture ailesi (17 dosya); girdiler kaynak/kuran/, araçlar tools/kao/; plan ve kanıt arşivde.
+tests/kao/       KAO fixture ailesi (55 test dosyası); girdiler kaynak/kuran/, araçlar tools/kao/; plan ve kanıt arşivde.
 app/content/quranTransportV1.js  Pure QY-04 transport contract for "Raşit ile Kur'an
                  Yolculuğu": three files fully independent of the
                  latest.json chain — `data/quran-request-outbox.json`
@@ -323,7 +323,7 @@ tests/panel-v2/           ÆON Panel-v2 Premium test suite (27 fixtures);
                          see `tests/panel-v2/README.md` and its `helpers/`.
 tests/quran/              9 fixtures for the Kur'an modules (catalog,
                  transport, merge, outbox sync, striking verses, panel parity).
-tests/reminders/          20 frozen-program maintenance fixtures; run the
+tests/reminders/          21 frozen-program maintenance fixtures; run the
                  whole family via `node tests/reminders/run-reminder-smoke.mjs`.
 tests/app/ + tests/panel/ Remaining families: modularization/B1 boundary
                  fixtures (test_modularization_boundary.js,

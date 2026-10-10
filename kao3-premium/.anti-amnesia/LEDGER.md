@@ -67,3 +67,19 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/headless · görsel QA yok · cihaz yok
 - Gözlem: Yayın yalnız doküman ve araç içeriyor. Pages yeniden yayınlanır ama uygulamanın davranışı değişmez.
 - Sıradaki: K3P-00
+
+## seq 5 · K3P-00 · KART
+- Tarih: 2026-10-10
+- Commit: (bu commit)
+- Yapılan:
+  - `kao3-premium` yerel dalı `main` 02fda4f2'den açıldı. Uygulama koduna dokunulmadı.
+  - Görsel temel çizgi: `test_local_visual_qa_guard` yeşil; `shoot-modal.mjs` 390 px açık ve koyu temada 58'er görünüm çekti (sunucu yok, boş geçici profil, atlanan çekim 0). `kanit/onceki/` altına `kontak-acik.jpg`, `kontak-koyu.jpg` (PIL) ve birleşik `log.txt` kondu; iki çekimde de `origin: http://127.0.0.1:9000 token:false force:null`.
+  - Taban ölçümleri yeniden alındı; hepsi `K3P-STATE.baseline` ile birebir tuttu.
+- Ölçüler: çift şık yerleşik 631/1127, yeni 1/1087 (exit 1, beklenen) · vasl 18 · idgâm 274 (exit 1, beklenen) · dokunuş u01.01 69 kapalı / 39 açık · akış: açılış→ilk görev 2 dokunuş, u01.02 30 görev + 7 ara ekran (427 sözcük), en uzun görev dizisi 20, yarıda bırakınca devam ipucu yok (`idx` 8 → 0) · perf: content 183,939 KiB · runtime 118,105 KiB · css 13,035 KiB · p95 5,483 ms · steady 3,049 ms ≤ bant 6,360 ms
+- Kapı: kapi-hizli 0 · kapilar.sh koşulmadı (dalga sonu değil)
+- Kanıt düzeyi: kaynak/test · görsel QA var (önce çizgisi, sentetik veri) · cihaz yok
+- Gözlem:
+  - `tools/kapi/gorsel-qa/cdp.mjs` varsayılan Chrome yolu (ms-playwright chromium-1243) bu makinede yok; önbellekte 1208 ve 1247 var. Kod değiştirilmedi; çekimler `KAO_QA_CHROME=…/chromium-1247/…` ile alındı. K3P-26'da aynı değişken gerekir.
+  - `shoot-modal.mjs` görev çekimlerinin bir kısmını `l07-gorev-undefined` gibi adlandırıyor (görev türü etiketi boş geliyor); yalnız dosya adı, görüntü doğru.
+  - Perf göreli bandı bu koşuda bant içindeydi (main'deki 7,4 ms ölçümünün aksine); bant makine yüküne duyarlı.
+- Sıradaki: K3P-01

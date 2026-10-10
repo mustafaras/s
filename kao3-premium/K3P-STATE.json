@@ -3,9 +3,9 @@
   "title": "Kur'an Arapçası modalı — Tezhip (premium · elit · etkili · interaktif)",
   "plannedAt": "2026-10-10",
   "planVersion": 3,
-  "status": "planned",
+  "status": "active",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-00",
+  "nextPrompt": "K3P-01",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -103,7 +103,7 @@
     },
     "contentKiB": 183.939,
     "cssKiB": 13.035,
-    "perfRelativeBand": "kırmızı (main, 2026-10-10: steady p95 7,4 ms > 5,09 ms); kapılar KAO2_ACCEPT_SLOW_HOST=1 ile koşar",
+    "perfRelativeBand": "kırmızı (main, 2026-10-10: steady p95 7,4 ms > 5,09 ms); kapılar KAO2_ACCEPT_SLOW_HOST=1 ile koşar; K3P-00 (kao3-premium, 2026-10-10): steady 3,049 ms ≤ bant 6,360 ms, p95 5,483 ms — göreli bant makine yüküne duyarlı",
     "fullGate": "kapilar.sh: perf göreli bandı dışında hepsi PASS (tests/kao 55, tests/app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast, plan-check, pin)"
   },
   "targets": {
@@ -163,8 +163,10 @@
     {
       "id": "K3P-00",
       "wave": 0,
-      "status": "todo",
-      "gate": "screenshots (prompt verilmesi = açık istek)"
+      "status": "done",
+      "gate": "screenshots (prompt verilmesi = açık istek)",
+      "doneAt": "2026-10-10",
+      "evidence": "kao3-premium/kanit/onceki/ (kontak-acik.jpg, kontak-koyu.jpg, log.txt; 58 görünüm × 2 tema, token:false)"
     },
     {
       "id": "K3P-01",

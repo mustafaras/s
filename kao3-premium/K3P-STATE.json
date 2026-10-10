@@ -1,0 +1,347 @@
+{
+  "program": "K3P",
+  "title": "Kur'an Arapçası modalı — Tezhip (premium · elit · etkili · interaktif)",
+  "plannedAt": "2026-10-10",
+  "planVersion": 3,
+  "status": "planned",
+  "branch": "kao3-premium",
+  "nextPrompt": "K3P-00",
+  "executionOrder": [
+    "K3P-00",
+    "K3P-01",
+    "K3P-02",
+    "K3P-03",
+    "K3P-04",
+    "K3P-05",
+    "K3P-A1",
+    "K3P-A2",
+    "K3P-A3",
+    "K3P-15",
+    "K3P-A4",
+    "K3P-A5",
+    "K3P-A6",
+    "K3P-A7",
+    "K3P-A8",
+    "K3P-06",
+    "K3P-07",
+    "K3P-08",
+    "K3P-09",
+    "K3P-10",
+    "K3P-11",
+    "K3P-12",
+    "K3P-13",
+    "K3P-14",
+    "K3P-16",
+    "K3P-17",
+    "K3P-18",
+    "K3P-19",
+    "K3P-20",
+    "K3P-21",
+    "K3P-22",
+    "K3P-23",
+    "K3P-24",
+    "K3P-25",
+    "K3P-26",
+    "K3P-27"
+  ],
+  "waveEnd": [
+    "K3P-05",
+    "K3P-A8",
+    "K3P-10",
+    "K3P-14",
+    "K3P-21",
+    "K3P-25",
+    "K3P-27"
+  ],
+  "releaseApproval": "NOT_APPROVED",
+  "evidenceLevel": "source+headless",
+  "measureGates": [
+    {
+      "tool": "kao3-premium/araclar/cift-sik.cjs",
+      "activeFrom": "K3P-01",
+      "note": "çift şık 0"
+    },
+    {
+      "tool": "kao3-premium/araclar/okunus-denetim.cjs",
+      "activeFrom": "K3P-04",
+      "note": "okunuş hatası 0"
+    }
+  ],
+  "baseline": {
+    "duplicateChoiceTasks": {
+      "seeded": "631/1127",
+      "fresh": "1/1087"
+    },
+    "waslMisread": 18,
+    "sunLetterUnassimilated": 274,
+    "tapsPerLesson": {
+      "autoAdvanceOff": 69,
+      "autoAdvanceOn": 39
+    },
+    "recognitionShare": 0.93,
+    "taskMix": {
+      "word": 1030,
+      "grammar": 61,
+      "meaning": 20,
+      "order": 16
+    },
+    "homeButtons": 13,
+    "appKaoHandlers": 45,
+    "runtimeKiB": 118.105,
+    "runtimeCapKiB": 128,
+    "flow": {
+      "maxPassiveRun": 6,
+      "passiveRunWords": 328,
+      "maxPassiveWords": 68,
+      "tapsToFirstNovelty": 21,
+      "choicesAfter2Wrong": 4,
+      "resumeCue": false,
+      "overlayRemountsPerLesson": 7,
+      "toastZ": 10000,
+      "overlayZ": 380,
+      "tapsOpenToFirstTask": 2
+    },
+    "contentKiB": 183.939,
+    "cssKiB": 13.035,
+    "perfRelativeBand": "kırmızı (main, 2026-10-10: steady p95 7,4 ms > 5,09 ms); kapılar KAO2_ACCEPT_SLOW_HOST=1 ile koşar",
+    "fullGate": "kapilar.sh: perf göreli bandı dışında hepsi PASS (tests/kao 55, tests/app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast, plan-check, pin)"
+  },
+  "targets": {
+    "duplicateChoiceTasks": 0,
+    "waslMisread": 0,
+    "sunLetterUnassimilated": 0,
+    "tapsPerLesson": 40,
+    "recognitionShareMax": 0.6,
+    "homeChoicesMax": 5,
+    "appKaoHandlers": 45,
+    "fontKiBMax": 150,
+    "flow": {
+      "maxPassiveRun": 1,
+      "maxPassiveWords": 45,
+      "tapsToFirstNovelty": 7,
+      "choicesAfter2Wrong": 3,
+      "resumeCue": true,
+      "overlayRemountsPerLesson": 0,
+      "toastsDuringLesson": 0,
+      "tapsOpenToFirstTask": 2,
+      "sessionSuccessBand": [
+        0.8,
+        0.9
+      ]
+    },
+    "runtimeKiBMax": 128
+  },
+  "decisions": {
+    "K-A": "decided: bağlamsal telaffuz, kelime sınırında bölünmüş (bismi · llâhi · r-rahmâni · r-rahîm); vasl i; şemsî idgâm; vakf; dia=DİA; okunuş s≥21 solar",
+    "K-B": "decided: Scheherazade New Regular, Arapça alt küme woff2, unicode-range, ≤150 KiB; yedek Amiri Quran; KFGQPC elendi (lisans)",
+    "K-C": "decided: üç kollu geri bildirim (hızlı doğru 600 ms, yavaş doğru 1600 ms, yanlış tam kart); yeni kullanıcıda açık, mevcut kullanıcıya bir kez seçim",
+    "K-D": "decided: yeni App.kao* yok (45); eylem çoğaltıcılar kullanılır",
+    "K-E": "decided: âyet eşiği %95 kalır + merdiven",
+    "K-F": "decided: Bugün ≤5 seçim",
+    "K-G": "decided: ders âyetle açılır/kapanır",
+    "K-H": "decided: esnek haftalık 5/7, cezasız seri",
+    "K-I": "decided: tanıma payı ≤%60, R1–R4 merdiveni",
+    "K-J": "decided: konuşma tanıma yok (gizlilik)",
+    "K-K": "decided: DDA bandı %70–92 (hedef %80–90), yalnız ui; kolaylaştırılmış doğru = not 2",
+    "K-L": "decided: nefes ritmi Hedef→Isınma→Tanış-Sına→Karışık→Zirve; art arda ≤1 edilgin ekran",
+    "K-M": "decided: overlay yerinde güncellenir; ders sırasında toast ertelenir (kriz hariç)",
+    "K-N": "decided: Kaldığın yerden · n/N görünür devam",
+    "K-O": "decided: oturum seçilen dakikaya sığar; taşan tekrarlar en düşük R önce ertesi güne"
+  },
+  "hypotheses": [
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "H7",
+    "H8",
+    "H9"
+  ],
+  "cards": [
+    {
+      "id": "K3P-00",
+      "wave": 0,
+      "status": "todo",
+      "gate": "screenshots (prompt verilmesi = açık istek)"
+    },
+    {
+      "id": "K3P-01",
+      "wave": 0,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-02",
+      "wave": 0,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-03",
+      "wave": 0,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-04",
+      "wave": 0,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-05",
+      "wave": 0,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-A1",
+      "wave": "A",
+      "status": "todo"
+    },
+    {
+      "id": "K3P-A2",
+      "wave": "A",
+      "status": "todo"
+    },
+    {
+      "id": "K3P-A3",
+      "wave": "A",
+      "status": "todo"
+    },
+    {
+      "id": "K3P-15",
+      "wave": 3,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-A4",
+      "wave": "A",
+      "status": "todo"
+    },
+    {
+      "id": "K3P-A5",
+      "wave": "A",
+      "status": "todo"
+    },
+    {
+      "id": "K3P-A6",
+      "wave": "A",
+      "status": "todo"
+    },
+    {
+      "id": "K3P-A7",
+      "wave": "A",
+      "status": "todo"
+    },
+    {
+      "id": "K3P-A8",
+      "wave": "A",
+      "status": "todo"
+    },
+    {
+      "id": "K3P-06",
+      "wave": 1,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-07",
+      "wave": 1,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-08",
+      "wave": 1,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-09",
+      "wave": 1,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-10",
+      "wave": 1,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-11",
+      "wave": 2,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-12",
+      "wave": 2,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-13",
+      "wave": 2,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-14",
+      "wave": 2,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-16",
+      "wave": 3,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-17",
+      "wave": 3,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-18",
+      "wave": 3,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-19",
+      "wave": 3,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-20",
+      "wave": 3,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-21",
+      "wave": 3,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-22",
+      "wave": 4,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-23",
+      "wave": 4,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-24",
+      "wave": 4,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-25",
+      "wave": 4,
+      "status": "todo"
+    },
+    {
+      "id": "K3P-26",
+      "wave": 5,
+      "status": "todo",
+      "gate": "screenshots (prompt verilmesi = açık istek)"
+    },
+    {
+      "id": "K3P-27",
+      "wave": 5,
+      "status": "todo",
+      "gate": "release (prompt içinde ayrıca açık onay sorulur)"
+    }
+  ]
+}

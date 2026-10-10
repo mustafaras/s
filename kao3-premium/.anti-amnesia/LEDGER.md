@@ -83,3 +83,16 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
   - `shoot-modal.mjs` görev çekimlerinin bir kısmını `l07-gorev-undefined` gibi adlandırıyor (görev türü etiketi boş geliyor); yalnız dosya adı, görüntü doğru.
   - Perf göreli bandı bu koşuda bant içindeydi (main'deki 7,4 ms ölçümünün aksine); bant makine yüküne duyarlı.
 - Sıradaki: K3P-01
+
+## seq 6 · K3P-00 · DÜZELTME
+- Tarih: 2026-10-10
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı denetimi sonrası K3P-00 kapanışındaki iki sapma düzeltildi.
+  - `K3P-STATE.json` üst düzey `status` alanı, prompt istemeden `active` yapılmıştı; `planned`'a geri alındı.
+  - `CURRENT-STATE.md` §3 gereği baştan yazıldı (önceden yalnız "Son durum" bölümü güncellenmişti). Chrome yolu notu "Açık riskler"e taşındı.
+- Ölçüler: değişmedi
+- Kapı: kapi-hizli koşulmadı (yalnız durum dosyaları) · kapilar.sh koşulmadı
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: K3P-00 kapanışında "Oku" listesi dışında `cdp.mjs` ve `shoot-modal.mjs` başları okundu (sunucusuz ve dış isteği kesen davranışı doğrulamak için).
+- Sıradaki: K3P-01

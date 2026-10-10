@@ -154,3 +154,49 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: Kabul ölçüsündeki `ekran-dok` seeded Bugün ekranı bu hatayı tek başına sınamıyor; seed günlük kaydı `ms` taşımadığı için önce de "~1 dk" göstermiyordu. Asıl koşul ders oynatıldıktan sonraki küçük `ms` (headless sahte saat); `akis-olc` "yarıda bırakma → yeniden açılış" satırı artık "~4 dk" gösteriyor.
 - Sıradaki: K3P-04
+
+## seq 11 · K3P-04 · KART
+- Tarih: 2026-10-10
+- Commit: (bu commit)
+- Yapılan:
+  - **Kullanıcı kararı (imlâ):** K-A tablosundaki `istağfera` örneği, aracın ve mevcut testlerin mekanik düzeniyle (fetha = a, غ = g; `faʿala`, `rahmân`) çelişiyordu. Kullanıcı "Tam Türkçe imlâ (ayrı kart)" seçti. Bu kartta mekanik düzen korundu ve beklenti `istagfara` oldu. Tam Türkçe imlâ `K3P-STATE.decisions.K-A2` olarak açık kaldı; kart metni ve sırası kullanıcıdan istenecek.
+  - B-03, araç: `tools/kao-lexicon-build.mjs` içine adlandırılmış kural bloğu eklendi: `SUN_LETTERS_BW`, `ARTICLE_FORMS`, `LAFZATULLAH_LEMMAS`, `HELPER_VOWEL`, `waslVowel`, `pauseBw` ve `sequenceTranslitTr`. Kurallar:
+    - vasl elifi ibtidâda `i`; fiilde ikinci ünsüz ötreliyse `u` (ustuhzi'a, uʿbudû)
+    - şemsî idgâm (ar-rahmân)
+    - ön ek kaynaşması (bismi, lillâhi, bil-hakki)
+    - cümle içi vasl; önceki kelime ünsüzle bitiyorsa yardımcı ünlü (min → mina, cem mîmi → u, diğerleri → i)
+    - âyet sonu vakf: hareke ve tenvin sükûna döner, tenvinli fetha `â`, ta marbûta `h`
+    - lafza-i celâl `allâh`
+  - `dia` katmanı DİA düzeninde kaldı; yalnız vasl ve lafza kuralı uygulandı.
+  - Yeni araç komutu `--retranslit`: `auto:true` okunuş önerilerini güncel kurallarla yeniden üretir ve gramer girdisindeki birebir kopyaları eşitler.
+  - `kao-content-freeze.mjs`: kısa sûre ve Fâtiha kelimeleri âyet bağlamında okunur; gramer örnekleri cümle bağlamında, âyet sonundaysa vakfla okunur. JSON pinleri yeni özetlere çekildi. `qac-lemma-morph.json` kendi aracıyla yeniden üretildi; yalnız `lexiconSha256` değişti.
+  - Çalışma zamanı: `kaoDiaReading`, aracın vasl ve lafza kurallarının eşini kullanıyor. Ortak tablo yolu olmadığı için `test_kao_pronunciation_contract` araç, girdi ve çalışma zamanını 524/524 karşılaştırıyor. Negatif deneme: bayat girdi 19 sapma verdi.
+  - Yeniden üretim aracın kendi komutlarıyla yapıldı: `--retranslit`, `--freeze`, `--freeze-grammar`, `--freeze-surahs`, `--freeze-phonics` (bayt-eş), `kao2-curriculum-build`, `kao2-lemma-morph-build --write`.
+  - K-P: `pinDeferral.files` listesine sözlük, gramer, kısa sûre ve müfredat modülleri eklendi; `quranLearn.js` zaten listedeydi. Harf bilgisi modülü bayt-eş kaldı.
+- Ölçüler:
+  - okunus-denetim: vasl 18 → 0, idgâmsız 274 → 0, exit 0
+  - Önce/sonra JSON farkında **okunuş dışında değişen alan 0**:
+    - sözlük 1.109 (19 başlık + 1.090 örnek)
+    - gramer 104
+    - kısa sûreler 211
+    - müfredat 2
+    - inceleme tablosu `MUFREDAT-ESLEME.md` 21/21 satır yalnız okunuş
+    - girdi JSON'larında yalnız `translit` satırları (sözlük 38 = 19 × tr/dia, gramer 3)
+  - Âyet sonu vakfı 6.236/6.236 âyette tutuyor.
+  - Boyut: sözlük 324.323 → 323.248 B · gramer 72.198 → 72.107 B · kısa sûreler 87.463 → 87.161 B · içerik 183,999 KiB (≤ 256) · runtime 118,804 → 119,093 KiB
+  - ekran-dok `v-word` başlığı `ism`.
+- Okunuşu değişen lemmalar (L2 kıraat hocası incelemesi önerilir), tam liste `kao3-premium/kanit/K3P-04/okunus-degisen.md`:
+  - **19 başlık:** allah→allâh, attakâ→ittakâ, attabaʿa→ittabaʿa, attahaza→ittahaza, abn→ibn, aftarâ→iftarâ, astatâʿa→istatâʿa, ahtadâ→ihtadâ, astagfara→istagfara, astakbara→istakbara, asm→ism, astavâ→istavâ, ahtalafa→ihtalafa, abtagâ→ibtagâ, astacâba→istacâba, amra'at→imra'at, aştarâ→iştarâ, astuhzi'a→ustuhzi'a, astaʿînu→istaʿînu.
+  - **479 lemmanın** örnek cümle okunuşu da değişti.
+- Kapı: kapi-hizli 0 (ilk koşu KIRMIZI 2 → düzeltildi, aşağıda) · yavaş testler (kabul 10/10, grammar_tasks 39, denetim 10) PASS · kapilar.sh koşulmadı (dalga sonu K3P-05)
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem:
+  - **Test düzeltmesi (gevşetme değil):** `test_kao_phonics_contract`, iki harfli (th/dh) kontrolünde eski okunuşları anlık değer olarak sabitlemişti. 110:1 ve 100:2 son kelimeleri artık âyet sonu vakfıyla okunuyor (`va-al-fathu` → `val-fath`, `kadhen` → `kadhâ`). İkililer korunuyor; yalnız beklenen değer güncellendi.
+  - **Plan dışı türetilmiş dosya:** `test_kao2_curriculum`, müfredat modülünün ve `MUFREDAT-ESLEME.md`'nin sözlük okunuşunu kopyaladığını gösterdi. Kendi aracıyla yeniden üretildi; okunuş dışında fark yok.
+  - **Kapsam dışı kalan inceltmeler (L2'ye):**
+    - Vaslden önceki uzun ünlü yazımda kısaltılmadı (`fî l-ardi`).
+    - Hemzeli bazı kelimeler önceden de eksik okunuyordu (`yaûduhu`).
+    - `huva` vakf biçimi denetlenmedi.
+  - Makine yükü yüksekti (load ~10–12). `test_kao2_mastery` 955 sn ve `cift-sik` 978 sn sürdü; önceki koşularda 38–84 sn.
+  - **K3P-03 eki (kullanıcı isteği):** K3P-03 commit'inden sonra yavaş testler koşuldu: kabul 10/10, grammar_tasks 39, denetim 10, hepsi PASS.
+- Sıradaki: K3P-05

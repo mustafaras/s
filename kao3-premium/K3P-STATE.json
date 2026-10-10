@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-04",
+  "nextPrompt": "K3P-05",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -147,7 +147,8 @@
     "K-M": "decided: overlay yerinde güncellenir; ders sırasında toast ertelenir (kriz hariç)",
     "K-N": "decided: Kaldığın yerden · n/N görünür devam",
     "K-O": "decided: oturum seçilen dakikaya sığar; taşan tekrarlar en düşük R önce ertesi güne",
-    "K-P": "decided (K3P-01, kullanıcı kararı bana bıraktı): pin tazeliği (D3F-10) yayın anının özelliğidir; yayın yalnız main. Program dalında pinli dosya değişirse pinDeferral.files listesine yazılır, test orada ERTELENDİ der; main ve başka dallarda tam katı. K3P-27 pinleri yükseltir ve listeyi boşaltır."
+    "K-P": "decided (K3P-01, kullanıcı kararı bana bıraktı): pin tazeliği (D3F-10) yayın anının özelliğidir; yayın yalnız main. Program dalında pinli dosya değişirse pinDeferral.files listesine yazılır, test orada ERTELENDİ der; main ve başka dallarda tam katı. K3P-27 pinleri yükseltir ve listeyi boşaltır.",
+    "K-A2": "open (K3P-04, kullanıcı kararı 2026-10-10 \"Tam Türkçe imlâ (ayrı kart)\"): K-A tablosundaki istağfera/er-rahmân yazımı (غ → ğ, kalın/ince harfe göre e/a) bu kartta uygulanmadı; mekanik düzen (fetha = a, غ = g) korundu. Ayrı bir kart olarak yazılıp sıraya konacak; sırası ve kural tablosu kullanıcıdan. Uygulanırsa yalnız aracın TRANSLIT_TR tablosu ve bağlam kuralları değişir, veri şeması aynı kalır."
   },
   "hypotheses": [
     "H1",
@@ -193,7 +194,9 @@
     {
       "id": "K3P-04",
       "wave": 0,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-10",
+      "result": "okunuş motoru: vasl elifi, şemsî idgâm, cümle içi vasl, âyet sonu vakf, lafza-i celâl; vasl 18→0, idgâmsız 274→0; 19 lemma + 1.090 örnek + 104 gramer + 211 sûre okunuşu; okunuş dışı fark 0"
     },
     {
       "id": "K3P-05",
@@ -358,7 +361,11 @@
     "until": "K3P-27",
     "files": [
       "app/core/quranLearn.js",
-      "app/core/quranLearnFlow.js"
+      "app/core/quranLearnFlow.js",
+      "app/content/quranLexiconV1.js",
+      "app/content/quranGrammarV1.js",
+      "app/content/quranShortSurahsV1.js",
+      "app/content/quranCurriculumV2.js"
     ]
   }
 }

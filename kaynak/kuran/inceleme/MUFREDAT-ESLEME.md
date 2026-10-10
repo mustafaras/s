@@ -41,13 +41,13 @@ Toplam: 12 ünite · 109 ders · 524 lemma · Seviye 0: 12 ders.
 | u07.04 | Duymak ve girmek | sabara (`l_Sabara_34dfc2`) | balaga (`l_balaga_f89222`) |
 | u07.06 | Şükretmek ve sahip olmak | balaga (`l_balaga_f89222`) | şâ'a (`l_aA_a_25c447`) |
 | u07.09 | Tuzak ve yükseltmek | katama (`l_katama_166c72`) | hakka (`l_Haq_a_a024e5`) |
-| u08.01 | Şimdiki ve geniş zaman | şâ'a (`l_aA_a_25c447`), attakâ (`l_t_aqaY_bc8006`) | katala (`l_qatala_ae1dd2`), sabara (`l_Sabara_34dfc2`) |
+| u08.01 | Şimdiki ve geniş zaman | şâ'a (`l_aA_a_25c447`), ittakâ (`l_t_aqaY_bc8006`) | katala (`l_qatala_ae1dd2`), sabara (`l_Sabara_34dfc2`) |
 | u08.02 | Bulmak, bakmak ve sormak | daʿâ (`l_daEaA_f5ec67`), akala (`l_akala_0ec27c`) | nazara (`l_n_aZara_cdb6f4`), faʿala (`l_faEala_b34da5`) |
 | u08.09 | Bağışlamak ve yürümek | hakka (`l_Haq_a_a024e5`) | katama (`l_katama_166c72`) |
 | u09.01 | Anmak, yemek, vermek: fiil kökleri | arâda (`l_araAda_e67825`) | akala (`l_akala_0ec27c`) |
 | u09.06 | Göstermek ve dayanmak | buşşira (`l_bu_ira_749280`) | arâda (`l_araAda_e67825`) |
 | u09.07 | Açıklamak | aʿrada (`l_aEoraDa_78a3e1`) | aksamu (`l_aqosamu_a01a25`) |
-| u09.11 | Çağırmak, sakınmak ve müjdelemek | aʿadda (`l_aEad_a_17540a`), ahalla (`l_aHal_a_bf74a4`), anşa'a (`l_an_a_a_a1dde3`), aksamu (`l_aqosamu_a01a25`) | daʿâ (`l_daEaA_f5ec67`), attakâ (`l_t_aqaY_bc8006`), buşşira (`l_bu_ira_749280`), aʿrada (`l_aEoraDa_78a3e1`) |
+| u09.11 | Çağırmak, sakınmak ve müjdelemek | aʿadda (`l_aEad_a_17540a`), ahalla (`l_aHal_a_bf74a4`), anşa'a (`l_an_a_a_a1dde3`), aksamu (`l_aqosamu_a01a25`) | daʿâ (`l_daEaA_f5ec67`), ittakâ (`l_t_aqaY_bc8006`), buşşira (`l_bu_ira_749280`), aʿrada (`l_aEoraDa_78a3e1`) |
 | u10.01 | Yapan ve yapılan | hakîm (`l_Hakiym_e62e6c`), hakama (`l_Hakama_763b9a`), hukm (`l_Hukom_5dd24a`), hikmet (`l_Hikomap_d90667`) | musammen (`l_m_usam_FY_24926e`), amina (`l_amina_0a79a6`), mu'minât (`l_m_u_omina_t_b9c5a2`), mukazzibîn (`l_m_uka_ibiyn_f66cdd`) |
 | u10.03 | Daha iyi bilen ve daha çok | kufr (`l_kufor_1c9ee6`), amina (`l_amina_0a79a6`) | aksar (`l_akovar_f7f01e`), aşadd (`l_a_ad_4fecc8`) |
 | u10.20 | Kök ailesi: hüküm ve hikmet | samʿ (`l_samoE_5d4faf`), mukazzibîn (`l_m_uka_ibiyn_f66cdd`), musammen (`l_m_usam_FY_24926e`) | hukm (`l_Hukom_5dd24a`), hikmet (`l_Hikomap_d90667`), hakama (`l_Hakama_763b9a`) |
@@ -118,8 +118,8 @@ Kavram: g0_5 Fiil önce gelir · Uygula: prayer:fatiha
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | ٱسْم | asm | ad, isim | `l_som_585f33` |
-| 2 | ٱللَّه | allah | Allah (özel isim) | `l_ll_ah_d0a09b` |
+| 1 | ٱسْم | ism | ad, isim | `l_som_585f33` |
+| 2 | ٱللَّه | allâh | Allah (özel isim) | `l_ll_ah_d0a09b` |
 | 3 | رَحْمَٰن | rahmân | rahmeti her şeyi kuşatan | `l_r_aHoma_n_c13ea2` |
 
 ### u01.02 · Rahîm ve Hamd
@@ -144,7 +144,7 @@ Kavram: g2 İki isim yan yana: …nın …ı · Uygula: prayer:fatiha
 | 2 | دِين | dîn | hesap, karşılık | `l_diyn_6c222f` |
 | 3 | إِيَّا | iyyâ | yalnız (sana, beni) | `l_iy_aA_dbb412` |
 | 4 | عَبَدَ | ʿabada | kulluk etti, ibadet etti | `l_Eabada_557021` |
-| 5 | ٱسْتَعِينُ | astaʿînu | yardım dileriz | `l_sotaEiynu_1fb93f` |
+| 5 | ٱسْتَعِينُ | istaʿînu | yardım dileriz | `l_sotaEiynu_1fb93f` |
 
 ### u01.04 · Doğru yol
 
@@ -521,7 +521,7 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | ٱبْن | abn | oğul | `l_bon_228952` |
+| 1 | ٱبْن | ibn | oğul | `l_bon_228952` |
 | 2 | كَثِير | kasîr | çok, birçok | `l_kaviyr_d003d4` |
 | 3 | مَآء | mâ' | su, sıvı | `l_maA_e36bc7` |
 | 4 | نِسَآء | nisâ' | kadınlar | `l_nisaA_371a3e` |
@@ -667,7 +667,7 @@ Kavram: — · Uygula: examples
 | 2 | يُوسُف | yûsuf | Yusuf (peygamber) | `l_yuwsuf_bd02d7` |
 | 3 | ءَال | âl | aile, soy; taraftarlar | `l_aAl_95d364` |
 | 4 | جَحِيم | cahîm | alevli ateş | `l_jaHiym_0170fa` |
-| 5 | ٱمْرَأَت | amra'at | kadın; eş | `l_mora_at_d761dc` |
+| 5 | ٱمْرَأَت | imra'at | kadın; eş | `l_mora_at_d761dc` |
 
 ### u06.25 · Semûd ve Âdem
 
@@ -990,8 +990,8 @@ Kavram: g18 Seslenme: ey … · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | ٱتَّبَعَ | attabaʿa | uydu, izledi | `l_t_abaEa_e11446` |
-| 2 | ٱتَّخَذَ | attahaza | edindi, tuttu | `l_t_axa_a_6d8c4b` |
+| 1 | ٱتَّبَعَ | ittabaʿa | uydu, izledi | `l_t_abaEa_e11446` |
+| 2 | ٱتَّخَذَ | ittahaza | edindi, tuttu | `l_t_axa_a_6d8c4b` |
 | 3 | أَخْرَجَ | ahraca | dışarı çıkardı | `l_axoraja_186bcc` |
 | 4 | تَوَلَّىٰ | tavallâ | yüz çevirdi | `l_tawal_aY_fdd891` |
 | 5 | أَطَاعَ | atâʿa | itaat etti, boyun eğdi | `l_aTaAEa_74ca26` |
@@ -1016,7 +1016,7 @@ Kavram: — · Uygula: examples
 |---|---|---|---|---|
 | 1 | قَٰتَلَ | kâtala | savaştı, çarpıştı | `l_qa_tala_f7c6c3` |
 | 2 | أَهْلَكَ | ahlaka | helak etti, yok etti | `l_aholaka_36d8f7` |
-| 3 | ٱفْتَرَىٰ | aftarâ | uydurdu, iftira etti | `l_fotaraY_22f50e` |
+| 3 | ٱفْتَرَىٰ | iftarâ | uydurdu, iftira etti | `l_fotaraY_22f50e` |
 | 4 | نَبَّأَ | nabba'a | haber verdi, bildirdi | `l_nab_a_a_97ecfa` |
 | 5 | أَنذَرَ | anzara | uyardı, korkuttu | `l_an_ara_72baf2` |
 
@@ -1028,7 +1028,7 @@ Kavram: — · Uygula: examples
 |---|---|---|---|---|
 | 1 | نَادَىٰ | nâdâ | seslendi, çağırdı | `l_naAdaY_6f54dd` |
 | 2 | سَبَّحَ | sabbaha | tesbih etti, noksanlıktan tenzih etti | `l_sab_aHa_bf280a` |
-| 3 | ٱسْتَطَاعَ | astatâʿa | güç yetirdi | `l_sotaTaAEa_d34f23` |
+| 3 | ٱسْتَطَاعَ | istatâʿa | güç yetirdi | `l_sotaTaAEa_d34f23` |
 | 4 | أُدْخِلَ | udhila | (içeri) sokuldu, kondu | `l_udoxila_00b5ee` |
 | 5 | عَذَّبَ | ʿazzaba | azap etti, cezalandırdı | `l_Ea_aba_be4552` |
 
@@ -1051,9 +1051,9 @@ Kavram: — · Uygula: examples
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
 | 1 | بَيَّنُ | bayyanu | açıkladı, beyan etti | `l_bay_anu_305824` |
-| 2 | ٱسْتَوَىٰٓ | astavâ | yöneldi; eşit oldu | `l_sotawaY_89d53f` |
-| 3 | ٱخْتَلَفَ | ahtalafa | ayrılığa düştü | `l_xotalafa_cd0ab4` |
-| 4 | ٱبْتَغَىٰ | abtagâ | aradı, istedi | `l_botagaY_ad5f0f` |
+| 2 | ٱسْتَوَىٰٓ | istavâ | yöneldi; eşit oldu | `l_sotawaY_89d53f` |
+| 3 | ٱخْتَلَفَ | ihtalafa | ayrılığa düştü | `l_xotalafa_cd0ab4` |
+| 4 | ٱبْتَغَىٰ | ibtagâ | aradı, istedi | `l_botagaY_ad5f0f` |
 | 5 | أَقْسَمُ | aksamu | yemin etti, and içti | `l_aqosamu_a01a25` |
 
 ### u09.08 · Yöneltmek ve fayda
@@ -1066,7 +1066,7 @@ Kavram: — · Uygula: examples
 | 2 | أَبْصَرَ | absara | gördü, anladı | `l_aboSara_9f0224` |
 | 3 | أَغْنَتْ | agnat | fayda verdi, işe yaradı | `l_agonato_9fcd5e` |
 | 4 | أَصْبَحَ | asbaha | sabahladı; hâline geldi | `l_aSobaHa_69bc2c` |
-| 5 | ٱسْتَجَابَ | astacâba | karşılık verdi, icabet etti | `l_sotajaAba_abdb53` |
+| 5 | ٱسْتَجَابَ | istacâba | karşılık verdi, icabet etti | `l_sotajaAba_abdb53` |
 
 ### u09.09 · Kurtuluş ve çaba
 
@@ -1091,7 +1091,7 @@ Kavram: — · Uygula: examples
 | 3 | بَدَّلَ | baddala | değiştirdi | `l_bad_ala_16265e` |
 | 4 | أَذَاقَ | azâka | tattırdı | `l_a_aAqa_3f3c06` |
 | 5 | سَخَّرَ | sahhara | boyun eğdirdi, emre amade kıldı | `l_sax_ara_9612f4` |
-| 6 | ٱشْتَرَىٰ | aştarâ | satın aldı | `l_otaraY_52a098` |
+| 6 | ٱشْتَرَىٰ | iştarâ | satın aldı | `l_otaraY_52a098` |
 
 ### u09.11 · Çağırmak, sakınmak ve müjdelemek
 
@@ -1100,8 +1100,8 @@ Kavram: — · Uygula: examples
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
 | 1 | دَعَا | daʿâ | çağırdı; dua etti | `l_daEaA_f5ec67` |
-| 2 | ٱتَّقَىٰ | attakâ | sakındı, korundu | `l_t_aqaY_bc8006` |
-| 3 | ٱسْتُهْزِئَ | astuhzi'a | alay etti | `l_sotuhozi_a_a56746` |
+| 2 | ٱتَّقَىٰ | ittakâ | sakındı, korundu | `l_t_aqaY_bc8006` |
+| 3 | ٱسْتُهْزِئَ | ustuhzi'a | alay etti | `l_sotuhozi_a_a56746` |
 | 4 | بُشِّرَ | buşşira | müjdeledi | `l_bu_ira_749280` |
 | 5 | أَعْرَضَ | aʿrada | yüz çevirdi, aldırış etmedi | `l_aEoraDa_78a3e1` |
 | 6 | كَلَّمَ | kallama | konuştu, söz söyledi | `l_kal_ama_04b12e` |
@@ -1361,7 +1361,7 @@ Kavram: g21 Kalıp değişince anlam kayar: ilim → talim · Uygula: examples
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
 | 1 | عَلَّمَ | ʿallama | öğretti | `l_Eal_ama_5c04b6` |
-| 2 | ٱسْتَغْفَرَ | astagfara | bağışlanma diledi | `l_sotagofara_863081` |
+| 2 | ٱسْتَغْفَرَ | istagfara | bağışlanma diledi | `l_sotagofara_863081` |
 | 3 | مُسْلِم | muslim | teslim olan, Müslüman | `l_musolim_c8bd6d` |
 | 4 | أَسْلَمَ | aslama | teslim oldu, Müslüman oldu | `l_asolama_25091d` |
 
@@ -1403,7 +1403,7 @@ Kavram: — · Uygula: examples
 
 | # | Arapça | Okunuş | Anlam | Kimlik |
 |---|---|---|---|---|
-| 1 | ٱهْتَدَىٰ | ahtadâ | doğru yolu buldu | `l_hotadaY_132fd7` |
+| 1 | ٱهْتَدَىٰ | ihtadâ | doğru yolu buldu | `l_hotadaY_132fd7` |
 | 2 | أَشْرَكَ | aşraka | ortak koştu, şirk koştu | `l_a_oraka_c73d6e` |
 | 3 | أَقَامَ | akâma | ayakta tuttu, dosdoğru kıldı | `l_aqaAma_382983` |
 
@@ -1415,7 +1415,7 @@ Kavram: — · Uygula: examples
 |---|---|---|---|---|
 | 1 | أَضَلَّ | adalla | saptırdı, yoldan çıkardı | `l_aDal_a_5ed954` |
 | 2 | مُشْرِك | muşrik | ortak koşan, müşrik | `l_mu_orik_2ba276` |
-| 3 | ٱسْتَكْبَرَ | astakbara | büyüklendi, kibirlendi | `l_sotakobara_4181b5` |
+| 3 | ٱسْتَكْبَرَ | istakbara | büyüklendi, kibirlendi | `l_sotakobara_4181b5` |
 
 
 ## Ünite 12 · Eğer ve zaman

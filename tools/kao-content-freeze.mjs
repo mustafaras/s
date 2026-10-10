@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { INPUTS, headwordBw, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic, translitTr, wordTranslitTr } from './kao-lexicon-build.mjs';
+import { INPUTS, headwordBw, readPinnedInput, readUthmaniInput, parseMorphology, parseUthmani, bwToArabic, translitTr, wordTranslitTr, sequenceTranslitTr } from './kao-lexicon-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = path.join(ROOT, 'kaynak/kuran/icerik');
@@ -14,9 +14,9 @@ const DIANET_NAMAZ = 'https://dijital.diyanet.gov.tr/File/Download?id=4218&path=
 
 const JSON_SHA256 = Object.freeze({
   'lexicon.reference.json': '2ee7ca3d011a4fef232bffb407fac9f079ebb9b66baca5475b1a783617ed8ef6',
-  'grammar.verified.json': 'd03cd3be7e14a799025c112b2deeb1a981e501a4492d1bcc55ba50afb6f6b4fd',
+  'grammar.verified.json': '425017b56608bfc25c303776b34b4cea9f2db821b13d39a639bab6b394efe46c',
   'phonics.verified.json': '895d4d5a58aa5d457cf38d8ebffb5843bce07c896f8c7afaeb00ebf147b23384',
-  'lexicon.verified.json': 'dac5e73a871021925cabbd72d3a88728e9ce47e19ad748f058929fbc4f1fbb88',
+  'lexicon.verified.json': '00097310cdc95fe2afe333c7f177cbef6231c8d57d9588e96c8db167b9ccf572',
   'surahs.verified.json': '83194a3c90ef1fc43e61666305a22c2a7bfc87e3780045c3651d4e089127a6e3'
 });
 function readJson(file) {
@@ -45,6 +45,22 @@ function turkishPronunciation(value) {
 }
 function qacPronunciation(word, includePrefixes = true) {
   return turkishPronunciation(wordTranslitTr(word, includePrefixes));
+}
+// K3P-04 (K-A): cümledeki kelimeler bağlamda okunur (vasl, şemsî idgâm); pauseAtEnd âyet sonu vakfıdır.
+function contextPronunciations(words, pauseAtEnd) {
+  return sequenceTranslitTr(words, { pauseAtEnd }).map(turkishPronunciation);
+}
+// Âyet başına bağlam okunuşu: kelime anahtarı (sûre:âyet:kelime) → okunuş; her âyet vakfla biter.
+function verseReadings(words) {
+  const byVerse = new Map();
+  for (const word of words) {
+    const ref = `${word.surah}:${word.ayah}`;
+    if (!byVerse.has(ref)) byVerse.set(ref, []);
+    byVerse.get(ref).push(word);
+  }
+  const out = new Map();
+  for (const list of byVerse.values()) contextPronunciations(list, true).forEach((reading, index) => out.set(list[index].key, reading));
+  return out;
 }
 function compactCell(cell, pronunciationSources) {
   if (cell.text) return cell.text;
@@ -78,15 +94,18 @@ function compactExample(example, pronunciationSources) {
   if (words.map((word) => word.ar).join(' ') !== resolved.ar) throw new Error(`${example.id}: ar kelimelerin birleşimi değil (türetme güvencesi)`);
   // Kelime indeksleri ardışık ve from..to ile örtüşür → yalnız başlangıç saklanır, `w` yüklemede türetilir (boyut).
   if (!words.every((word, index) => word.w === words[0].w + index) || example.from !== words[0].w || example.to !== words[words.length - 1].w) throw new Error(`${example.id}: kelime indeksleri ardışık değil (türetme güvencesi)`);
-  const frozenWords = words.map((word) => {
+  const qacWords = words.map((word) => {
     const key = `${example.ref}:${word.w}`;
     const qac = pronunciationSources.qac.get(key);
     if (!qac) throw new Error(`${example.id}: ${key} QAC'ta yok`);
     const all = qac.segments.map((segment) => segment.form).join('');
     if (skeletonArabic(bwToArabic(all)) !== skeletonArabic(word.ar)) throw new Error(`${example.id}: ${key} Arapçası QAC yüzeyiyle (ünsüz iskeleti) örtüşmüyor`);
-    const pronunciation = turkishPronunciation(qacPronunciation(qac, true));
-    if (!pronunciation) throw new Error(`${example.id}: ${key} okunuşsuz dondurulamaz`);
-    return [word.ar, pronunciation];
+    return qac;
+  });
+  const verseEnds = !pronunciationSources.qac.has(`${example.ref}:${words[words.length - 1].w + 1}`);
+  const frozenWords = contextPronunciations(qacWords, verseEnds).map((pronunciation, index) => {
+    if (!pronunciation) throw new Error(`${example.id}: ${example.ref}:${words[index].w} okunuşsuz dondurulamaz`);
+    return [words[index].ar, pronunciation];
   });
   return [example.id, example.ref, words[0].w, example.tr, frozenWords];
 }
@@ -187,6 +206,7 @@ function prayerLine(id, title, text, meanings, readings, lemmaIndex, supplements
 // yalnız hizalama ve kopya kapısı için okunur. Verilmezse (çalışma kitabı) referans tr döner.
 function collectSurahs(verifiedRows = null) {
   const { qacWords, aligned, wordsByVerse, uthmaniSource } = verseData();
+  const readingByKey = verseReadings(qacWords.filter((word) => word.surah === 1 || word.surah >= 95));
   const refs = [...wordsByVerse.keys()];
   const rawLines = uthmaniSource.split(/\r?\n/).map((line) => line.trim()).filter((line) => line && !line.startsWith('#'));
   const rawByRef = new Map(refs.map((ref, index) => [ref, rawLines[index]]));
@@ -217,7 +237,7 @@ function collectSurahs(verifiedRows = null) {
       id: lemmaId, ar: bwToArabic(headwordBw(qac.lemmaBw || qac.formBw)), tr: trFor(lemmaId, `${ref}:${qac.wordIndex}`),
       lemmaBw: qac.lemmaBw, source: 'QAC lemma + D-12 verified KAO Turkish layer (surahs.verified.json)'
     });
-    const pronunciation = qacPronunciation(qac);
+    const pronunciation = readingByKey.get(qac.key);
     if (!pronunciation) throw new Error(`${ref}:${qac.wordIndex}: Latin okunuş yok`);
     words.push({ id, surahId: qac.surah, ayah: qac.ayah, i: qac.wordIndex, ar, lemmaId, tr, pronunciation });
   }
@@ -244,7 +264,7 @@ function collectSurahs(verifiedRows = null) {
     const refKey = `${ref}:${qac.wordIndex}`;
     const tr = trFor(`f-1-${qac.ayah}-${qac.wordIndex}`, refKey);
     if (!known && !supplements.has(lemmaId)) supplements.set(lemmaId, { id: lemmaId, ar: bwToArabic(headwordBw(qac.lemmaBw || qac.formBw)), tr: trFor(lemmaId, refKey), source: 'QAC lemma + D-12 verified KAO Turkish layer (surahs.verified.json)' });
-    const pronunciation = qacPronunciation(qac);
+    const pronunciation = readingByKey.get(qac.key);
     if (!pronunciation) throw new Error(`${ref}:${qac.wordIndex}: Fâtiha Latin okunuşu yok`);
     fatiha.push({ ar, tr, lemmaId, pronunciation });
   }

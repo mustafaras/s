@@ -99,4 +99,41 @@ const failClosedHtml = api.kaoTaskHTML(missingPronunciationTask);
 assert.match(failClosedHtml, /class="kao-content-error" role="alert"/);
 assert.doesNotMatch(failClosedHtml, new RegExp(`class="kao-arabic-text"[^>]*>${arabicChoice.label}`), 'okunuşu eksik Arapça sessizce gösterilmemeli');
 
-console.log('KAO pronunciation contract: PASS (content + task objects + visible paired rendering)');
+// K3P-04 (B-03, K-A): okunuş bağlamdaki telaffuzu yansıtır. Mekanik düzen korunur (fetha = a, غ = g;
+// tam Türkçe imlâ ayrı karar). Kurallar: vasl elifi, şemsî idgâm, cümle içi vasl, âyet sonu vakf.
+const lemmaByAr = (ar) => lexicon.lemmas.find((lemma) => lemma.ar === ar);
+assert.equal(lemmaByAr('ٱسْم').translit, 'ism', 'vasl elifi: ٱسْم → ism');
+assert.equal(lemmaByAr('ٱبْن').translit, 'ibn', 'vasl elifi: ٱبْن → ibn');
+assert.equal(lemmaByAr('ٱسْتَغْفَرَ').translit, 'istagfara', 'vasl elifi: ٱسْتَغْفَرَ → istagfara');
+assert.equal(api.kaoDiaReading('ٱسْم'), 'ism', 'DİA katmanı da vasl elifini i okur (çalışma zamanı)');
+const fatiha = shorts.prayerTexts.find((item) => item.id === 'fatiha').words;
+const besmele = Array.from(fatiha.slice(0, 4), (word) => word.pronunciation); // vm dizisi → ana bağlam
+assert.deepEqual(besmele, ['bismi', 'llâhi', 'r-rahmâni', 'r-rahîm'], 'Fâtiha 1:1 kelime sınırları korunur');
+assert.equal(besmele.join('-'), 'bismi-llâhi-r-rahmâni-r-rahîm');
+const besmeleExample = lexicon.lemmas.flatMap((lemma) => lemma.examples).find((example) => example.ref === '1:1' && example.ar.startsWith('بِسْمِ'));
+assert.equal(besmeleExample.pronunciation, 'bismi llâhi r-rahmâni r-rahîm', 'sözlük örneği: 1:1 bağlamda okunur');
+assert.equal(fatiha[4].pronunciation, 'al-hamdu', 'âyet başı (vakftan sonra) harf-i tarif ünlüsüyle başlar');
+assert.deepEqual(Array.from(shorts.words.filter((word) => word.surahId === 112 && word.ayah === 1), (word) => word.pronunciation), ['kul', 'huva', 'llâhu', 'ahad'], 'âyet sonu vakf: ahadun → ahad');
+// okunus-denetim.cjs mantığı: vasl elifi 'a' ile okunan lemma 0, idgâmsız güneş harfi 0 (her okunuş yüzeyinde).
+const SUN_UNASSIMILATED = /\bal-(t|s̱|d|ẕ|r|z|s|ş|ṣ|ḍ|ṭ|ẓ|l|n)/;
+const waslAsA = lexicon.lemmas.filter((lemma) => /^ٱ/.test(lemma.ar) && !/^ٱل/.test(lemma.ar) && /^a/.test(lemma.translit));
+assert.deepEqual(Array.from(waslAsA, (lemma) => `${lemma.ar}=${lemma.translit}`), [], 'vasl elifi a ile okunmaz');
+const readings = [
+  ...lexicon.lemmas.flatMap((lemma) => lemma.examples.map((example) => example.pronunciation)),
+  ...shorts.words.map((word) => word.pronunciation),
+  ...shorts.prayerTexts.filter((item) => item.id === 'fatiha').flatMap((item) => item.words.map((word) => word.pronunciation)),
+  ...grammar.concepts.flatMap((concept) => (concept.examples || []).flatMap((example) => example.words.map((word) => word.pronunciation)))
+];
+assert.deepEqual(readings.filter((value) => SUN_UNASSIMILATED.test(value)).slice(0, 5), [], 'güneş harfinde idgâm yazılır');
+
+// K3P-04: araç kuralları ↔ doğrulanmış girdi ↔ çalışma zamanı. auto:true okunuş önerileri aracın güncel çıktısıdır
+// (kural değişip `--retranslit` unutulursa burada düşer); çalışma zamanı DİA okuyucusu araçla aynı sonucu verir.
+import(require('node:url').pathToFileURL(path.join(repoRoot, 'tools/kao-lexicon-build.mjs')).href).then((tool) => {
+  const verified = JSON.parse(fs.readFileSync(path.join(repoRoot, 'kaynak/kuran/icerik/lexicon.verified.json'), 'utf8'));
+  const stale = verified.lemmas.filter((record) => record.translit.auto === true
+    && (record.translit.tr !== tool.translitTr(tool.headwordBw(record.lemmaBw)) || record.translit.dia !== tool.translitDia(tool.headwordBw(record.lemmaBw))));
+  assert.deepEqual(stale.map((record) => record.lemmaId), [], 'doğrulanmış girdideki okunuş önerisi araçla aynı (node tools/kao-lexicon-build.mjs --retranslit)');
+  const runtimeDrift = verified.lemmas.filter((record) => api.kaoDiaReading(record.ar) !== tool.translitDia(tool.headwordBw(record.lemmaBw)));
+  assert.deepEqual(runtimeDrift.map((record) => record.lemmaId), [], 'çalışma zamanı DİA okuyucusu araçla aynı');
+  console.log('KAO pronunciation contract: PASS (content + task objects + visible paired rendering + K3P-04 okunuş kuralları, araç↔girdi↔çalışma zamanı 524/524)');
+}).catch((error) => { console.error(error); process.exit(1); });

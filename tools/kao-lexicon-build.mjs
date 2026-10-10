@@ -304,6 +304,66 @@ const HAMZA_SEATS = Object.freeze(new Set(["'", '>', '<', '&', '}']));
 const TR_SHORT_VOWELS = Object.freeze(new Set(['a', 'e', 'u', 'ü', 'i', 'ı']));
 const DIA_SHORT_VOWELS = Object.freeze(new Set(['a', 'u', 'i']));
 
+// K3P-04 (B-03, K-A) — bağlam okunuşu. Okunuş bağlamdaki telaffuzu yansıtır ve kelime sınırında
+// bölünür; mekanik düzen (fetha = a, غ = g) korunur. Kurallar yalnız bu blokta, adlandırılmış
+// tablolar ve işlevlerdir. Bir kıraat hocası (L2) başka bir gelenek isterse yalnız burası değişir.
+// Güneş (şemsî) harfleri: harf-i tarifin lâmı okunmaz, harf ikilenir (ٱلرَّحْمَـٰن → ar-rahmân).
+const SUN_LETTERS_BW = Object.freeze(new Set(['t', 'v', 'd', '*', 'r', 'z', 's', '$', 'S', 'D', 'T', 'Z', 'l', 'n']));
+// Harf-i tarifin QAC yüzey biçimleri; başka biçimler (A^l…) eski önek yolunu izler.
+const ARTICLE_FORMS = Object.freeze(new Set(['{l', '{lo', 'l', 'lo']));
+// Lafza-i celâl: lâmdan sonraki uzun â Uthmani yazımda görünmez (ٱللَّه → allâh).
+const LAFZATULLAH_LEMMAS = Object.freeze(new Set(['{ll~ah', '{ll~ahum~a']));
+// İki sükûn yan yana gelmez: ünsüzle biten kelimeden sonra vasl gelirse araya yardımcı ünlü girer.
+const HELPER_VOWEL = Object.freeze({ default: 'i', min: 'a', jamMim: 'u' });
+const TR_VOWEL_CHARS = Object.freeze(new Set(['a', 'e', 'i', 'u', 'â', 'î', 'û', 'ı', 'ü']));
+
+function isPrefixSegment(segment) { return String(segment.features || '').startsWith('PREFIX|'); }
+function isArticleSegment(segment) {
+  return String(segment.features || '').startsWith('PREFIX|Al+') && ARTICLE_FORMS.has(segment.form);
+}
+// Vasl elifinin ibtidâ ünlüsü: harf-i tarif ve lafza (ٱل…) a; fiilde ikinci ünsüz ötreliyse u
+// (ٱسْتُهْزِئَ → ustuhzi'a); geri kalan her durumda i (ٱسْم → ism, ٱبْن → ibn, ٱسْتَغْفَرَ → istagfara).
+function waslVowel(bw, isVerb = true) {
+  if (/^\{l/.test(bw)) return 'a';
+  const match = /^\{([^aiuoFNK~`{])(?:o[^aiuoFNK~`{]|~)([aiu])/.exec(bw);
+  return isVerb && match && match[2] === 'u' ? 'u' : 'i';
+}
+// Kelime başındaki vasl elifinin okunuşta yazılan 'a'sını kuralın ünlüsüyle değiştirir.
+function withWaslVowel(bw, reading, isVerb = true) {
+  if (!String(bw).startsWith('{') || !reading.startsWith('a')) return reading;
+  return waslVowel(bw, isVerb) + reading.slice(1);
+}
+function lafzatullahBw(bw, lemmaBw = bw) {
+  return LAFZATULLAH_LEMMAS.has(lemmaBw) ? String(bw).replace('l~ah', 'l~aAh') : bw;
+}
+// Âyet sonu vakf: son hareke ve tenvin sükûna döner; tenvinli fetha â, ta marbûta he okunur.
+// QAC biçiminin sonundaki okunmayan işaretler (`[`, `,`…) kuralın dışında tutulur ve geri eklenir.
+const PAUSE_TRAILING_MARKS = /[_^#"[;,.!+%\]-]+$/;
+function pauseBw(bw) {
+  const value = String(bw || '');
+  const trail = (value.match(PAUSE_TRAILING_MARKS) || [''])[0];
+  const body = value.slice(0, value.length - trail.length);
+  if (/p[aiuFNK]$/.test(body)) return body.replace(/p[aiuFNK]$/, 'h') + trail;
+  const tanwinFath = /F([_^#"[;,.!+%\]-]*)([A`Y]?)$/;
+  if (tanwinFath.test(body)) return body.replace(tanwinFath, (_m, marks, seat) => `a${marks}${seat || 'A'}`) + trail;
+  if (/[aiuNK]$/.test(body)) return `${body.slice(0, -1)}o${trail}`;
+  return value;
+}
+function startsWithCluster(reading) {
+  const chars = Array.from(reading);
+  return chars.length > 1 && !TR_VOWEL_CHARS.has(chars[0]) && !TR_VOWEL_CHARS.has(chars[1]);
+}
+function endsWithConsonant(reading) {
+  const chars = Array.from(String(reading || ''));
+  return chars.length > 0 && !TR_VOWEL_CHARS.has(chars[chars.length - 1]);
+}
+function helperVowel(previousWord) {
+  if (previousWord.lemmaBw === 'min') return HELPER_VOWEL.min;
+  const last = (previousWord.segments || [])[previousWord.segments.length - 1] || {};
+  if (/PRON:\dMP/.test(String(last.features || '')) && /mo?$/.test(String(last.form || ''))) return HELPER_VOWEL.jamMim;
+  return HELPER_VOWEL.default;
+}
+
 class CliError extends Error {
   constructor(message, exitCode) {
     super(message);
@@ -911,6 +971,23 @@ function draftSelfTest() {
   assert(translitTr('mu&omin') === "mu'min" && translitTr('>aHad') === 'ahad', 'kelime içi hemze gösterilir, baştaki gösterilmez');
   assert(translitTr('EaAd2') === 'ʿâd' && bwToArabic('EaAd2') === bwToArabic('EaAd'), 'QAC ayırt edici rakamı düşer');
   assert(translitTr('kafaruwA@') === 'kafarû' && translitTr('>uw@la`^}ika') === "ulâ'ika", 'Uthmani ۟ işaretli harf okunmaz');
+  // K3P-04 (K-A): bağlam okunuşu kuralları.
+  assert(translitTr('{som') === 'ism' && translitTr('{bon') === 'ibn' && translitTr('{sotagofara') === 'istagfara', 'vasl elifi ibtidâda i');
+  assert(translitTr('{sotuhozi}a') === "ustuhzi'a" && translitDia('{som') === 'ism', 'ötreli fiilde vasl u; DİA da vasl okur');
+  assert(translitTr('{ll~ah') === 'allâh' && translitTr('{l~a*iY') === 'allazî', 'lafza-i celâl uzun â; harf-i tarifli ibtidâ a');
+  assert(pauseBw('>aHadN[') === '>aHado[' && pauseBw('sabiylF[A') === 'sabiyla[A' && pauseBw('Salaw`pi') === 'Salaw`h',
+    'vakf: tenvin/hareke sükûn, tenvinli fetha â, ta marbûta he');
+  {
+    const seg = (form, features) => ({ form, features });
+    const besmele = [
+      { lemmaBw: '{som', pos: 'N', segments: [seg('bi', 'PREFIX|bi+'), seg('somi', 'STEM|POS:N')] },
+      { lemmaBw: '{ll~ah', pos: 'PN', segments: [seg('{ll~ahi', 'STEM|POS:PN')] },
+      { lemmaBw: 'r~aHoma`n', pos: 'ADJ', segments: [seg('{l', 'PREFIX|Al+'), seg('r~aHoma`ni', 'STEM|POS:ADJ')] },
+      { lemmaBw: 'r~aHiym', pos: 'ADJ', segments: [seg('{l', 'PREFIX|Al+'), seg('r~aHiymi', 'STEM|POS:ADJ')] }
+    ];
+    assert(sequenceTranslitTr(besmele, { pauseAtEnd: true }).join(' ') === 'bismi llâhi r-rahmâni r-rahîm', 'besmele bağlamda okunur');
+    assert(wordTranslitTr(besmele[2]) === 'ar-rahmâni', 'yalıtık harf-i tarif + güneş harfi: idgâm');
+  }
   // doğrulanmış + eksik örnek çevirisi tutarsızlık olarak yakalanmalı
   const consProbe = parseReviewMarkdown(
     fill(fill(markdown, firstId, { tr1: 'anlam', verifiedBy: 'dogrulayici-1', verifiedAt: '2026-09-23' }),
@@ -1132,24 +1209,69 @@ function transliterate(lemmaBw, table, longTable, shortSet, options = {}) {
   return out.join('');
 }
 
+function rawTranslitTr(bw) {
+  return transliterate(bw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS, { hamzaMark: true, taMarbutaTr: true });
+}
+// Tek başına (yalıtık) okunuş: lemma başlığı ve bağlamsız kelime.
 function translitTr(lemmaBw) {
-  const raw = transliterate(lemmaBw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS,
-    { hamzaMark: true, taMarbutaTr: true });
+  const raw = rawTranslitTr(lafzatullahBw(lemmaBw));
   // Türkçe okunuş imlâsı assimilasyonu yazmaz: baştaki çift ünsüzü teke indirir
   // (Diyanet: "Rahman", "Samad" — "RRahman" değil). DİA katmanı ham kalır.
-  return raw.replace(/^([bcçdfgğhjklmnprsştvyz])\1/u, '$1');
+  return withWaslVowel(lemmaBw, raw.replace(/^([bcçdfgğhjklmnprsştvyz])\1/u, '$1'));
 }
-function wordTranslitTr(word, includePrefixes = true) {
+// Kelime okunuşu. context.joined: cümle içinde önceki kelimeye bağlanır (vasl elifi düşer);
+// context.pause: âyet sonu vakf. Ön ek, ardından ünsüz kümesi gelirse kaynaşır (bi + smi → bismi).
+function wordTranslitTr(word, includePrefixes = true, context = {}) {
   const segments = (word && Array.isArray(word.segments) ? word.segments : [])
-    .filter((segment) => includePrefixes || !String(segment.features || '').startsWith('PREFIX|'));
-  const prefixes = segments.filter((segment) => String(segment.features || '').startsWith('PREFIX|'));
-  const core = segments.filter((segment) => !String(segment.features || '').startsWith('PREFIX|'));
-  let out = prefixes.map((segment) => translitTr(segment.form)).filter(Boolean).join('-');
-  const coreReading = translitTr(core.map((segment) => segment.form).join(''));
-  if (out && coreReading) out += '-';
-  return (out + coreReading).replace(/-+/g, '-').replace(/^-|-$/g, '');
+    .filter((segment) => includePrefixes || !isPrefixSegment(segment));
+  const article = segments.find(isArticleSegment);
+  const prefixes = segments.filter((segment) => isPrefixSegment(segment) && segment !== article);
+  const core = segments.filter((segment) => !isPrefixSegment(segment));
+  let coreBw = lafzatullahBw(core.map((segment) => segment.form).join(''), word && word.lemmaBw);
+  if (context.pause === true && coreBw) coreBw = pauseBw(coreBw);
+  const pieces = prefixes.map((segment) => ({ kind: 'prefix', text: translitTr(segment.form) }));
+  const voiced = pieces.length === 0 && context.joined !== true;
+  if (article && coreBw) {
+    const sun = SUN_LETTERS_BW.has(coreBw[0]) && coreBw[1] === '~';
+    const lam = sun ? TRANSLIT_TR[coreBw[0]] : 'l';
+    pieces.push({ kind: 'article', text: (voiced && article.form.startsWith('{') ? 'a' : '') + lam });
+    pieces.push({ kind: 'core', text: translitTr(coreBw) });
+  } else if (coreBw.startsWith('{')) {
+    const raw = rawTranslitTr(coreBw);
+    pieces.push({ kind: 'core', text: voiced ? withWaslVowel(coreBw, raw, word && word.pos === 'V') : raw.slice(1) });
+  } else if (coreBw) {
+    pieces.push({ kind: 'core', text: pieces.length ? rawTranslitTr(coreBw) : translitTr(coreBw) });
+  }
+  let out = '';
+  pieces.filter((piece) => piece.text).forEach((piece, index, list) => {
+    const previous = list[index - 1];
+    const fuses = previous && previous.kind === 'prefix'
+      && (piece.kind === 'article' ? !TR_VOWEL_CHARS.has(piece.text[0]) : startsWithCluster(piece.text));
+    out += (index === 0 || fuses ? '' : '-') + piece.text;
+  });
+  return out.replace(/-+/g, '-').replace(/^-|-$/g, '');
 }
-function translitDia(lemmaBw) { return transliterate(lemmaBw, TRANSLIT_DIA, TRANSLIT_DIA_LONG, DIA_SHORT_VOWELS); }
+function startsWithWasl(word, includePrefixes = true) {
+  const first = (word && Array.isArray(word.segments) ? word.segments : [])
+    .filter((segment) => includePrefixes || !isPrefixSegment(segment))[0];
+  return !!first && (isArticleSegment(first) ? first.form.startsWith('{') : String(first.form || '').startsWith('{'));
+}
+// Bir cümle (ardışık kelimeler) okunuşu; kelime sınırı korunur, dizi döner.
+// pauseAtEnd: son kelime âyetin son kelimesidir (vakf).
+function sequenceTranslitTr(words, { pauseAtEnd = false, includePrefixes = true } = {}) {
+  const readings = [];
+  words.forEach((word, index) => {
+    const joined = index > 0;
+    if (joined && startsWithWasl(word, includePrefixes) && endsWithConsonant(readings[index - 1])) {
+      readings[index - 1] += helperVowel(words[index - 1]);
+    }
+    readings.push(wordTranslitTr(word, includePrefixes, { joined, pause: pauseAtEnd && index === words.length - 1 }));
+  });
+  return readings;
+}
+function translitDia(lemmaBw) {
+  return withWaslVowel(lemmaBw, transliterate(lafzatullahBw(lemmaBw), TRANSLIT_DIA, TRANSLIT_DIA_LONG, DIA_SHORT_VOWELS));
+}
 
 function lemmaSlug(lemmaBw) {
   return String(lemmaBw || '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'lem';
@@ -2133,7 +2255,7 @@ function buildExamplePronunciations(verified) {
       if (start < 0 || end > qac.length) {
         throw new Error(`${record.lemmaId}/${example.ref}: örnek cümle QAC/Tanzil hizasında bulunamadı`);
       }
-      const pronunciation = qac.slice(start, end).map((word) => wordTranslitTr(word)).join(' ');
+      const pronunciation = sequenceTranslitTr(qac.slice(start, end), { pauseAtEnd: end === qac.length }).join(' ');
       if (!pronunciation) throw new Error(`${record.lemmaId}/${example.ref}: örnek cümle Latin okunuşsuz dondurulamaz`);
       out.set(`${example.ref}\u0000${example.ar}`, pronunciation);
     }
@@ -2282,6 +2404,37 @@ function freezeLexicon() {
   console.log(`lemmas=${verified.lemmas.length} bytes=${size}`);
 }
 
+// K3P-04: `auto:true` okunuş önerilerini (tr/dia) aracın güncel kurallarıyla yeniden üretir. Yalnız
+// `translit.tr`/`translit.dia` değişir; doğrulama/inceleme alanlarına dokunulmaz. Gramer girdisindeki
+// lemma okunuşu kopyaları (aynı lemmaId, eski değerle birebir) birlikte güncellenir.
+const GRAMMAR_VERIFIED_PATH = path.join(ROOT, 'kaynak', 'kuran', 'icerik', 'grammar.verified.json');
+function writeJsonLike(file, value) { fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`); }
+function retranslit() {
+  const verified = JSON.parse(fs.readFileSync(VERIFIED_PATH, 'utf8'));
+  const changed = new Map();
+  verified.lemmas = verified.lemmas.map((record) => {
+    if (!record.translit || record.translit.auto !== true) return record;
+    const fields = headwordFields(record.lemmaBw);
+    if (fields.tr === record.translit.tr && fields.dia === record.translit.dia) return record;
+    changed.set(record.lemmaId, { ar: record.ar, before: record.translit.tr, after: fields.tr, diaBefore: record.translit.dia, dia: fields.dia });
+    return { ...record, translit: { ...record.translit, tr: fields.tr, dia: fields.dia } };
+  });
+  const grammar = JSON.parse(fs.readFileSync(GRAMMAR_VERIFIED_PATH, 'utf8'));
+  let grammarCopies = 0;
+  const sync = (node) => {
+    if (Array.isArray(node)) return node.map(sync);
+    if (!node || typeof node !== 'object') return node;
+    const next = Object.fromEntries(Object.entries(node).map(([key, value]) => [key, sync(value)]));
+    const change = typeof next.lemmaId === 'string' && typeof next.translit === 'string' ? changed.get(next.lemmaId) : null;
+    if (change && next.translit === change.before) { grammarCopies += 1; next.translit = change.after; }
+    return next;
+  };
+  writeJsonLike(VERIFIED_PATH, verified);
+  writeJsonLike(GRAMMAR_VERIFIED_PATH, sync(grammar));
+  console.log(`KAO retranslit: ${changed.size} lemma okunuşu değişti · gramer kopyası ${grammarCopies}`);
+  for (const [id, change] of changed) console.log(`  ${id} ${change.ar}: ${change.before} → ${change.after} · dia ${change.diaBefore} → ${change.dia}`);
+}
+
 function usage() {
   return [
     'Kullanım:',
@@ -2293,6 +2446,7 @@ function usage() {
     '  node tools/kao-lexicon-build.mjs --workbook',
     '  node tools/kao-lexicon-build.mjs --import-md',
     '  node tools/kao-lexicon-build.mjs --freeze',
+    '  node tools/kao-lexicon-build.mjs --retranslit # K3P-04: auto:true okunuş önerilerini güncel kurallarla yeniden üretir',
     '  node tools/kao-lexicon-build.mjs --sem-verify  # R-A5 komşu D-12 kararı (KAO-FIX-14)',
     '  node tools/kao-lexicon-build.mjs --rehead      # inceleme tablosunda başlık biçimi (KAO-FIX-05)'
   ].join('\n');
@@ -2347,6 +2501,11 @@ async function main(argv) {
     verifySemNeighbors();
     return;
   }
+  if (argv.includes('--retranslit')) {
+    rejectUnknown(argv, new Set(['--retranslit']));
+    retranslit();
+    return;
+  }
   if (argv.includes('--freeze')) {
     rejectUnknown(argv, new Set(['--freeze']));
     freezeLexicon();
@@ -2361,7 +2520,7 @@ async function main(argv) {
   else compile(inputArg.resolved);
 }
 
-export { headwordBw, INPUTS, CliError, readPinnedInput, readUthmaniInput, parseUthmani, missingInputs, missingMessage, validatePattern, parseApproval, arabicWordRegex, translitTr, wordTranslitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand, frozenRows, packFrozenRows, renderFrozenLexicon };
+export { headwordBw, INPUTS, CliError, readPinnedInput, readUthmaniInput, parseUthmani, missingInputs, missingMessage, validatePattern, parseApproval, arabicWordRegex, translitTr, wordTranslitTr, sequenceTranslitTr, translitDia, buildStats, bwToArabic, parseMorphology, buildDraft, renderReviewMarkdown, parseReviewMarkdown, stripTanzilBoilerplate, renderWorkbook, workbookBand, frozenRows, packFrozenRows, renderFrozenLexicon };
 
 const IS_MAIN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (IS_MAIN) {

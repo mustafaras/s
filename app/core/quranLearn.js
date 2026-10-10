@@ -514,9 +514,18 @@
   var KAO_AR_TO_BW={"ء":"'","آ":"|","أ":">","ؤ":"&","إ":"<","ئ":"}","ا":"A","ب":"b","ة":"p","ت":"t","ث":"v","ج":"j","ح":"H","خ":"x","د":"d","ذ":"*","ر":"r","ز":"z","س":"s","ش":"$","ص":"S","ض":"D","ط":"T","ظ":"Z","ع":"E","غ":"g","ـ":"_","ف":"f","ق":"q","ك":"k","ل":"l","م":"m","ن":"n","ه":"h","و":"w","ى":"Y","ي":"y","ً":"F","ٌ":"N","ٍ":"K","َ":"a","ُ":"u","ِ":"i","ْ":"o","ّ":"~","ٰ":"`","ٱ":"{","ٓ":"^","ٔ":"#","۟":"@","۠":"\"","ۢ":"[","ۣ":";","ۥ":",","ۦ":".","ۨ":"!","۪":"-","۫":"+","۬":"%","ۭ":"]"};
   var KAO_DIA={"'":'ʾ','|':'ā','>':'ʾ','&':'ʾ','<':'ʾ','}':'ʾ',A:'ā',b:'b',p:'t',t:'t',v:'s̱',j:'c',H:'ḥ',x:'ḫ',d:'d','*':'ẕ',r:'r',z:'z',s:'s','$':'ş',S:'ṣ',D:'ḍ',T:'ṭ',Z:'ẓ',E:'ʿ',g:'ġ',f:'f',q:'ḳ',k:'k',l:'l',m:'m',n:'n',h:'h',w:'v',Y:'ī',y:'y',F:'an',N:'un',K:'in',a:'a',u:'u',i:'i','`':'ā','{':'a'};
   var KAO_DIA_LONG={A:'ā',Y:'ī',w:'ū',y:'ī','|':'ā','`':'ā'},KAO_DIA_IGNORE='_^#@"[;,.!-+%]o',KAO_GLIDE_NEXT='aiuFNKo~';
+  // K3P-04 (K-A): aracın vasl elifi (waslVowel) ve lafza-i celâl (LAFZATULLAH_LEMMAS) kurallarının eşi;
+  // test_kao_requirements çalışma zamanını araç çıktısıyla 524/524 karşılaştırır.
+  var KAO_LAFZATULLAH={'{ll~ah':1,'{ll~ahum~a':1};
+  function kaoWaslVowel(bw){
+    if(/^\{l/.test(bw)) return 'a';
+    var m=/^\{([^aiuoFNK~`{])(?:o[^aiuoFNK~`{]|~)([aiu])/.exec(bw);
+    return m&&m[2]==='u'?'u':'i';
+  }
   // 10-TELAFFUZ §7: DİA katmanı, derleme aracının Buckwalter algoritmasının çalışma zamanı eşidir.
   function kaoDiaReading(ar){
-    var chars=Array.from(String(ar||''),function(c){ return Object.prototype.hasOwnProperty.call(KAO_AR_TO_BW,c)?KAO_AR_TO_BW[c]:''; }).filter(Boolean),out=[],prevBase=null;
+    var chars=Array.from(String(ar||''),function(c){ return Object.prototype.hasOwnProperty.call(KAO_AR_TO_BW,c)?KAO_AR_TO_BW[c]:''; }).filter(Boolean),out=[],prevBase=null,bw=chars.join('');
+    if(KAO_LAFZATULLAH[bw]===1) chars=Array.from(bw.replace('l~ah','l~aAh'));
     var ignored=function(c){ return KAO_DIA_IGNORE.indexOf(c)>=0; };
     for(var index=0;index<chars.length;index+=1){
       var c=chars[index],lastBase=prevBase;
@@ -537,6 +546,7 @@
       if(long){ if(out.length&&'aui'.indexOf(out[out.length-1])>=0&&out[out.length-1].length===1) out.pop(); if(out[out.length-1]===long) continue; out.push(long); continue; }
       if(Object.prototype.hasOwnProperty.call(KAO_DIA,c)) out.push(KAO_DIA[c]);
     }
+    if(bw.charAt(0)==='{'&&out[0]==='a') out[0]=kaoWaslVowel(bw);
     return out.join('');
   }
   function kaoReadability(){ return quranLearnDeps?objectOr(quranLearnRoot(quranLearnDeps.data()).readability,{}):{}; }

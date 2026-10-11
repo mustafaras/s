@@ -191,7 +191,8 @@ for (const [ad, answer] of [['doğru', 'correct'], ['yanlış', 'wrong']]) {
   assert.ok(idle.includes(AUDIO_BTN), `${ad}: cevapsız ses düğmesi erişilebilir adı`);
   assert.ok(after.includes(AUDIO_BTN), `${ad}: yanıt sonrası ses düğmesi erişilebilir adı`);
 }
-assert.match(audioShots.correct.after, /kao-feedback-success/, 'doğru: başarı geri bildirimi');
+// K3P-15: doğru cevap ölçümsüzken "yavaş" kolundadır; tam kart yerine pekiştirme şeridi görünür.
+assert.match(audioShots.correct.after, /<p class="kao-feedback-strip" role="status" aria-live="polite">Doğru<\/p>/, 'doğru: pekiştirme şeridi');
 assert.match(audioShots.wrong.after, /kao-feedback-warning/, 'yanlış: uyarı geri bildirimi');
 
 console.log('KAO2 components: PASS (escape, erişilebilirlik, güvenli eylem, ölçü, durum ve ses görevi şıkları)');

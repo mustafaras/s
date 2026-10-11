@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-15",
+  "nextPrompt": "K3P-A4",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -238,7 +238,9 @@
     {
       "id": "K3P-15",
       "wave": 3,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-11",
+      "result": "K-C üç kol: hızlı doğru panel yok (✓, 600 ms), yavaş doğru pekiştirme şeridi (1.600 ms, dokunuş durdurur), yanlış tam kart; medyan ui.kaoLatency (son 50); yeni kullanıcı autoAdvance:true; dokunus-olc açık 39/≤40"
     },
     {
       "id": "K3P-A4",
@@ -378,7 +380,8 @@
     "until": "K3P-27",
     "files": [
       "app/core/quranLearn.js",
-      "app/core/quranLearnFlow.js"
+      "app/core/quranLearnFlow.js",
+      "app/kao.css"
     ]
   }
 }

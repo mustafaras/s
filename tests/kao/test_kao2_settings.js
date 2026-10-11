@@ -187,11 +187,12 @@ check('K2F-30: Öğrenme grubu — "Doğruda otomatik geç" anahtarı + "Başlan
 
 check('K2F-30: kaoToggleAutoAdvance ayarı çevirir ve yazar; ikinci çağrı geri alır', () => {
   const t = boot();
-  assert.equal(t.q.settings.autoAdvance, false);
-  assert.equal(t.api.kaoToggleAutoAdvance(), true);
-  assert.equal(t.api.ensureQuranLearn(t.data).settings.autoAdvance, true);
+  // K3P-15 (K-C): yeni kullanıcı varsayılanı açık; ilk çağrı kapatır, ikinci geri açar.
+  assert.equal(t.q.settings.autoAdvance, true);
   assert.equal(t.api.kaoToggleAutoAdvance(), true);
   assert.equal(t.api.ensureQuranLearn(t.data).settings.autoAdvance, false);
+  assert.equal(t.api.kaoToggleAutoAdvance(), true);
+  assert.equal(t.api.ensureQuranLearn(t.data).settings.autoAdvance, true);
 });
 
 check('K2F-30: ilk açılış varsayılanları hizalı — dailyNew, onboarding.minutes ile aynı (5)', () => {

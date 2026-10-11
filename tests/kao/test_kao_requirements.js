@@ -282,7 +282,7 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   }
   // KAO2-09 (f): aç/kapat anahtarları role="switch" + aria-checked; segment düğmeleri aria-pressed. Toplam seçili sayı aynı.
   const pressedOn = (settingsHtml.match(/aria-pressed="true"/g) || []).length, switchOn = (settingsHtml.match(/role="switch" aria-checked="true"/g) || []).length;
-  assert.equal(pressedOn + switchOn, 8, 'her grupta tek seçili düğme + açık anahtarlar (görünürlük dahil)');
+  assert.equal(pressedOn + switchOn, 9, 'K3P-15: yeni kullanıcıda otomatik geçiş varsayılanı açık → bir anahtar fazla');
   assert.ok(switchOn > 0 && !/class="kao-toggle" aria-pressed=/.test(settingsHtml), 'anahtarlar switch semantiğinde');
   assert.match(settingsHtml, /role="group" aria-label="Günlük yeni kelime"/);
   assert.match(e7.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoSetView\(&quot;settings&quot;\)/, 'S-02 Sen → Ayarlar satırı');

@@ -361,3 +361,18 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: (1) **Açılış → ilk görev 2 → 3 dokunuş:** hedef ekranı artık ilk görevden önce (AKIS §3 ①), `targets.flow.tapsOpenToFirstTask: 2` ve AKIS §1 "Giriş zaten kolay — korunacak" ile çatışıyor; karar kullanıcıda. (2) Tekrarı olmayan yeni kullanıcıda hedef + ilk tanış yan yana kalır (ısınma malzemesi yok); test bunu tek istisna olarak sınar. (3) Başlatıcı metni sıradakini "K3P-A4" diyordu; `executionOrder` ve KARTLAR.md ("K3P-15 bu dalgada, K3P-A3'ten sonra") K3P-15 diyor — sıra değiştirilmedi.
 - Sıradaki: K3P-15
+
+## seq 21 · K3P-15 · KART
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - `quranLearn.js` üç kollu geri bildirim (K-C): `kaoLatencyMedian`/`kaoLatencyPush`/`kaoCorrectPauseMs`, `KAO_LATENCY_WINDOW=50`, `KAO_LATENCY_MIN=5`, `KAO_FAST_ADVANCE_MS=600`, `KAO_SLOW_ADVANCE_MS=1600` adlandırılmış sabitler. `kaoOpenFeedback(ui,task,correct,choiceId,note,elapsed)` artık medyanı okur ve `panel.slow` yazar; `kaoAdvanceMs(panel)` kolu süreye çevirir; `kaoAutoAdvance(ui,q,delayMs)` yalnız doğru cevapta kurulur (yanlış öğretir).
+  - `kaoTaskHTML` geri bildirim bölümü üç kola ayrıldı: autoAdvance açık + hızlı doğru → tam panel yok (şık ✓ + 600 ms); yavaş doğru ya da ayar kapalı → `.kao-feedback-strip` (tek satır, `role=status`) + `.kao-feedback-strip-continue` (mevcut `App.kaoContinue` ile bağlı — yeni `App.kao*` yok); yanlış → tam kart + geri alma. `paintTask` odağı yalnız yanlışta Devam'a taşır.
+  - `kaoPlay` çalınca `ui.kaoPlayed=true` (K-C "ses tekrar dinlendi" → yavaş kol); işaret görev başında/`next`/`kaoContinue`/`kaoUndo` ile sıfırlanır. `emptyQuranLearn` yeni kullanıcı için `autoAdvance: true`; `ensureQuranLearn` mevcut kayıtlı değeri değiştirmez. `kaoContinue` panel `correct` ise süreyi medyana yazar (kaoUndo anlık görüntüyle geri alır).
+  - Yeni test `tests/kao/test_k3p_feedback_arms.js` (10 kontrol; envanter 62). `dokunus-olc.cjs` üç kolu ölçer (yavaş/şerit/hızlı satırı).
+  - **Gerekçeli test güncellemeleri (gevşetme yok):** `test_kao2_feedback` (900 ms → 600/1.600 ms; doğru panel başlığı → şerit), `test_kao2_components` (doğru: panel → şerit), `test_k3p_feedback_copy` (üç kol denetimi; tam panel/şerit/hızlı), `test_kao2_settings` (varsayılan artık açık), `test_kao_migration` (boş kökte `autoAdvance: true`), `test_kao_requirements` (A-9 seçili sayı 8 → 9), `test_kao2_kabul` (A-3 işaretçisi `kao-feedback` → `kao-choice-correct`; hızlı doğruda panel yok).
+- Ölçüler (hepsi doğru, u01.01): ders başına dokunuş 69 (kapalı) / 39 (açık) → **39 ≤ 40** · kollar: yavaş(şerit) 21 · hızlı 9 · şerit 21 · çift şık 0/1087 + 0/1127 · okunuş hatası 0 · runtime 122,336 → **123,328 KiB** (tavan 128) · css 13,035 → **13,072 KiB** (tavan 14) · p95 5,96 ms · steady 3,80 ms
+- Kapı (K-Q): hedefli kapı PASS (app 78 · kao 5: navigation, a11y, inventory, design_contract, feedback_arms · driver · perf) · **hızlı kapı TAM YEŞİL** (kao ailesi + sözleşme/pin fixture'ları + driver + cift-sik + okunus-denetim) · **üç yavaş test yeşil**: `test_kao2_grammar_tasks` 39/39, `test_kao2_denetim` 10/10, `test_kao2_kabul` 10/10 (A-3 işaretçisi düzeltildikten sonra) · senkron PASS
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) `pinDeferral.files`'a `app/kao.css` eklendi (stil değişikliği). (2) Şerit düğmesi `App.kaoContinue` ile bağlandı; K-D "yeni `App.kao*` yok" korundu. (3) `dokunus-olc` yalnız doğru-cevap kollarını ölçer; ustalık/bağ kur/gecikmeli yollar aynı motordan geçer ama ayrı ölçülmedi. (4) Medyan ilk yanıtta belirsizdir (yavaş kola düşer); KARARLAR gereği kesin ölçüm tarihli kayıt ister — şema kararı.
+- Sıradaki: K3P-A4

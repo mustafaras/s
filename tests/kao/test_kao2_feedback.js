@@ -125,9 +125,10 @@ ui.kaoQueue = [
 ui.kaoTasks = { [auto.id]: auto, [next.id]: next }; ui.kaoTaskIndex = 0; ui.kaoTaskStartedAt = now - 800;
 assert.equal(api.kaoAnswer(auto.id, 'right').correct, true);
 assert.equal(ui.kaoTaskIndex, 0, 'otomatik devam zamanlayana kadar indeks sabit kalmalı');
-assert.match(api.kaoTaskHTML(auto), /<h3 class="kao-feedback-title">Doğru<\/h3>/, 'doğru cevapta Doğru bilgisi gösterilmeli');
-const advanceTimer = timers.find((timer) => timer.ms === 900);
-assert.ok(advanceTimer, 'doğru cevap ve autoAdvance için 900 ms zamanlayıcı olmalı');
+// K3P-15: ölçüm yokken doğru cevap "yavaş" kolundadır → tam kart yerine pekiştirme şeridi, 1.600 ms geçiş.
+assert.match(api.kaoTaskHTML(auto), /<p class="kao-feedback-strip" role="status" aria-live="polite">Doğru<\/p>/, 'doğru cevapta pekiştirme şeridi gösterilmeli');
+const advanceTimer = timers.find((timer) => timer.ms === 1600);
+assert.ok(advanceTimer, 'yavaş doğru ve autoAdvance için 1.600 ms zamanlayıcı olmalı');
 advanceTimer.fn();
 assert.equal(ui.kaoTaskIndex, 1);
 assert.equal(ui.kaoPanel.open, false);
@@ -164,15 +165,15 @@ assert.equal(api.kaoToggleAutoAdvance(), true);
 assert.equal(data.quranLearn.settings.autoAdvance, true);
 show(autoItem);
 assert.equal(api.kaoAnswer(autoItem.id, 'wrong').correct, false);
-assert.equal(timers.some((timer) => timer.ms === 900), false, 'yanlış cevapta otomatik devam zamanlayıcısı yok');
+assert.equal(timers.some((timer) => timer.ms === 600 || timer.ms === 1600), false, 'yanlış cevapta otomatik devam zamanlayıcısı yok');
 freshData();
 api.kaoToggleAutoAdvance(); show(autoItem);
 assert.equal(api.kaoAnswer(autoItem.id, 'right').correct, true);
-assert.ok(timers.some((timer) => timer.ms === 900), 'anahtarla açılan ayar doğru cevapta 900 ms zamanlayıcı kurar');
+assert.ok(timers.some((timer) => timer.ms === 1600), 'anahtarla açılan ayar doğru cevapta (ölçümsüz: 1.600 ms) otomatik geçiş kurar');
 freshData();
 api.kaoToggleAutoAdvance(); api.kaoToggleAutoAdvance(); show(autoItem);
 api.kaoAnswer(autoItem.id, 'right');
-assert.equal(timers.some((timer) => timer.ms === 900), false, 'kapatılan ayar zamanlayıcı kurmaz');
+assert.equal(timers.some((timer) => timer.ms === 600 || timer.ms === 1600), false, 'kapatılan ayar zamanlayıcı kurmaz');
 
 freshData();
 const order = {

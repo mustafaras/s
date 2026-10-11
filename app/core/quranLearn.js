@@ -1798,7 +1798,14 @@
       h+=kaoViewsApi().choice({button:true,state:state||'idle',label:choice.label,labelHtml:arabic?kaoArabicPairHTML(choice.label,choice.pronunciation,'kao-choice-pair'):esc(choice.label),arabic:arabic,pronunciation:choice.pronunciation,extraClasses:(isGrammar||isFragment||isTransfer)?['kao-chip']:[],pressed:task.kind==='order'?selected:undefined,disabled:disabled,onclick:'App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')'});
     });
     h+='</div><p class="kao-live" aria-live="polite">'+esc(panel?'':(ui.kaoFeedback||''))+'</p>';
-    if(panel){
+    var kaoAutoAdvanceOn=!!(quranLearnDeps.data()&&ensureQuranLearn(quranLearnDeps.data()).settings.autoAdvance===true);
+    if(panel&&panel.correct===true&&kaoAutoAdvanceOn&&panel.slow!==true){
+      // K3P-15 (K-C) hızlı doğru: tam panel açılmaz; şık ✓ işareti ve 600 ms'lik otomatik geçiş yeter.
+    }else if(panel&&panel.correct===true){
+      // Yavaş doğru (pekiştirme şeridi) ya da ayar kapalı (kompakt şerit): tek satır + "Devam" dokunuşu.
+      h+='<p class="kao-feedback-strip" role="status" aria-live="polite">Doğru</p>';
+      h+='<button type="button" class="kao-feedback-strip-continue" onclick="App.kaoContinue()">Devam</button>';
+    }else if(panel){
       var answer=String(panel.answer||task.answer||task.choices.filter(function(item){ return item.correct===true; }).map(function(item){ return item.label; }).join(' · '));
       // Geri bildirim gövdesi satır satır: Arapça cevap kendi RTL satırında (sıra görevinde kelimeler boşlukla), sonra âyet künyesi ve kural ayrı satırlar.
       var lines=[],answerIsArabic=/[\u0600-\u06ff]/.test(answer);
@@ -1855,7 +1862,7 @@
       var task=currentTask(); node.setAttribute('data-task-id',task?task.id:'done');
       if(task&&kaoShouldAutoplay(task,quranLearnDeps.data())) node.setAttribute('data-autoplay','1'); else if(typeof node.removeAttribute==='function') node.removeAttribute('data-autoplay');
     }
-    if(paintUi.kaoPanel&&paintUi.kaoPanel.open&&node&&typeof node.querySelector==='function'){
+    if(paintUi.kaoPanel&&paintUi.kaoPanel.open&&paintUi.kaoPanel.correct!==true&&node&&typeof node.querySelector==='function'){
       var continueButton=node.querySelector('.kao-feedback-continue'); if(continueButton&&typeof continueButton.focus==='function') continueButton.focus();
     }
     return true;
@@ -1871,6 +1878,24 @@
   // K2F-31: görev süresi ölçümü üst sınırı (05 §4: uzun duraklama ortalamayı bozmaz).
   var KAO_TASK_MS_CAP=120000;
   function kaoTaskMs(ui,now){ return Math.min(KAO_TASK_MS_CAP,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime()))); }
+  // K3P-15 (K-C): üç kollu geri bildirim. Yanıt süresi kişinin son 50 ölçümünün medyanıyla karşılaştırılır;
+  // medyan ve "ses tekrar dinlendi" işareti yalnız `ui` içinde tutulur (kalıcı değil, yeni veri alanı yok).
+  var KAO_LATENCY_WINDOW=50,KAO_LATENCY_MIN=5,KAO_FAST_ADVANCE_MS=600,KAO_SLOW_ADVANCE_MS=1600;
+  function kaoLatencyMedian(ui){
+    var samples=Array.isArray(ui.kaoLatency)?ui.kaoLatency:[];
+    if(!samples.length) return null;
+    var sorted=samples.slice().sort(function(a,b){ return a-b; }),mid=Math.floor(sorted.length/2);
+    return sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2;
+  }
+  function kaoLatencyPush(ui,elapsed){
+    ui.kaoLatency=Array.isArray(ui.kaoLatency)?ui.kaoLatency:[];
+    ui.kaoLatency.push(Math.min(KAO_TASK_MS_CAP,Math.max(0,elapsed)));
+    if(ui.kaoLatency.length>KAO_LATENCY_WINDOW) ui.kaoLatency=ui.kaoLatency.slice(-KAO_LATENCY_WINDOW);
+  }
+  function kaoCorrectPauseMs(elapsed,median,replayed){
+    if(replayed||median===null) return KAO_SLOW_ADVANCE_MS;
+    return elapsed<median?KAO_FAST_ADVANCE_MS:KAO_SLOW_ADVANCE_MS;
+  }
   // D2F-03: dizme görevinin doğru sırası çip YAZILARI dizisidir; aynı yazılı çipler (ör. bir kelime âyette iki kez) birbirinin yerine geçer.
   function kaoOrderLabels(task){
     return task&&Array.isArray(task.choices)?task.choices.slice().sort(function(a,b){ return nonNegativeNumber(a.ordinal,0)-nonNegativeNumber(b.ordinal,0); }).map(function(item){ return item.label; }):[];
@@ -1880,16 +1905,22 @@
     if(task&&task.answer) return String(task.answer);
     return task&&Array.isArray(task.choices)?task.choices.filter(function(item){ return item.correct===true; }).map(function(item){ return item.label; }).join(' · '):'';
   }
-  function kaoOpenFeedback(ui,task,correct,choiceId,note){
-    var answer=kaoAnswerText(task);
-    ui.kaoPanel={open:true,taskId:task.id,correct:correct===true,choiceId:choiceId||'',answer:answer,note:note||''};
-    ui.kaoFeedback=correct?'Doğru':(task.kind==='order'&&note?note:'Doğru cevap: '+answer);
+  function kaoOpenFeedback(ui,task,correct,choiceId,note,elapsed){
+    var answer=kaoAnswerText(task),isCorrect=correct===true;
+    // K3P-15: kişisel medyan yalnız yanıtlardan öğrenilir; doğru cevabın kolu bu yanıtla karşılaştırılır (yavaş doğru = pekiştirme şeridi).
+    var median=kaoLatencyMedian(ui),slow=isCorrect&&(ui.kaoPlayed===true||median===null||nonNegativeNumber(elapsed,null)===null||nonNegativeNumber(elapsed,0)>=median);
+    if(isCorrect) kaoLatencyPush(ui,nonNegativeNumber(elapsed,0));
+    ui.kaoPanel={open:true,taskId:task.id,correct:isCorrect,choiceId:choiceId||'',answer:answer,note:note||'',slow:slow===true};
+    ui.kaoFeedback=isCorrect?'Doğru':(task.kind==='order'&&note?note:'Doğru cevap: '+answer);
   }
-  function kaoAutoAdvance(ui,q){
+  function kaoAdvanceMs(panel){
+    if(panel&&panel.correct===true) return panel.slow===true?KAO_SLOW_ADVANCE_MS:KAO_FAST_ADVANCE_MS;
+    return panel&&typeof panel.pauseMs==='number'?panel.pauseMs:KAO_FAST_ADVANCE_MS;
+  }
+  function kaoAutoAdvance(ui,q,delayMs){
+    // K3P-15: otomatik geçiş yalnız doğru cevapta kurulur (yanlış öğretir, bekler); süre kola göre 600/1.600 ms.
     if(q.settings.autoAdvance!==true||!ui.kaoPanel||ui.kaoPanel.open!==true||ui.kaoPanel.correct!==true||!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.setTimer!=='function') return false;
-    ui.kaoAdvanceTimer=quranLearnSurfaceDeps.setTimer(function(){
-      if(ui.kaoPanel&&ui.kaoPanel.open&&ui.kaoPanel.correct===true) kaoContinue();
-    },900);
+    ui.kaoAdvanceTimer=quranLearnSurfaceDeps.setTimer(function(){ if(ui.kaoPanel&&ui.kaoPanel.open===true) kaoContinue(); },typeof delayMs==='number'?delayMs:kaoAdvanceMs(ui.kaoPanel));
     return true;
   }
   // K2F-31: sıradaki-adım tahmini de bu içerikle çalışır (plan eksik içerikle yarı sayıda adım üretir); ses haritası sözlük başına bir kez kurulur.
@@ -1953,7 +1984,7 @@
       while(end<state.plan.length&&state.plan[end].kind==='practice') end+=1;
       state.practiceEndAt=end;
       ui.kaoQueue=state.plan.slice(start,end).map(function(item){ return item.group==='review'?Object.assign({},item.queue,{lessonItemId:item.id}):{id:item.id,cardId:item.cardId,type:item.group==='concept'?'grammar':undefined,isNew:item.isNew===true,retry:false,choiceCount:item.choiceCount,audioOnly:item.audioOnly===true,lessonItemId:item.id}; });
-      ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoTasks={}; ui.kaoQueue.forEach(function(item){ ui.kaoTasks[item.id]=kaoBuildTask(item,quranLearnDeps.data(),{seed:item.id,choiceCount:item.choiceCount,audioOnly:item.audioOnly}); });
+      ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoPlayed=false; ui.kaoTasks={}; ui.kaoQueue.forEach(function(item){ ui.kaoTasks[item.id]=kaoBuildTask(item,quranLearnDeps.data(),{seed:item.id,choiceCount:item.choiceCount,audioOnly:item.audioOnly}); });
     }else{
       ui.kaoQueue=[]; ui.kaoTaskIndex=0; ui.kaoTasks={};
       var current=(state.plan||[])[state.at||0];
@@ -2210,7 +2241,7 @@
       if(flow&&typeof flow.estimateMinutes==='function') for(var count=1;count<=ui.kaoQueue.length;count+=1){ if(flow.estimateMinutes(q.daily,count,now,0)>extraMinutes) break; limit=count; }
       ui.kaoQueue=ui.kaoQueue.slice(0,limit);
     }
-    ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoAdvanceTimer=null; ui.kaoFeedback=''; ui.kaoAudioFailed=false; ui.kaoTasks={}; kaoApplyView(ui,'session',null,ui.kaoView==='session'?'replace':'push'); ui.kaoOrderDraft=[]; ui.kaoDurableCount=0;
+    ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoPlayed=false; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoAdvanceTimer=null; ui.kaoFeedback=''; ui.kaoAudioFailed=false; ui.kaoTasks={}; kaoApplyView(ui,'session',null,ui.kaoView==='session'?'replace':'push'); ui.kaoOrderDraft=[]; ui.kaoDurableCount=0;
     ui.kaoQueue.forEach(function(item){ ui.kaoTasks[item.id]=kaoBuildTask(item,d,{seed:item.id}); });
     if(!q.startedAt) q.startedAt=now.toISOString();
     quranLearnDeps.render();
@@ -2259,11 +2290,11 @@
       var delayedDaily=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{}));
       delayedDaily.ms=nonNegativeNumber(delayedDaily.ms,0)+kaoTaskMs(ui,now);
       delayedDaily.answered+=1; delayedDaily.reviewed+=1; if(delayedCorrect) delayedDaily.correct+=1; q.daily[key]=delayedDaily;
-      if(delayedCorrect) kaoFx('correct'); kaoOpenFeedback(ui,task,delayedCorrect,choiceId);
-      kaoSave(); paintTask(); kaoAutoAdvance(ui,q); return {correct:delayedCorrect,delayedScore:delayed.delayedScore};
+      if(delayedCorrect) kaoFx('correct'); kaoOpenFeedback(ui,task,delayedCorrect,choiceId,'',kaoTaskMs(ui,now));
+      kaoSave(); paintTask(); kaoAutoAdvance(ui,q,kaoAdvanceMs(ui.kaoPanel)); return {correct:delayedCorrect,delayedScore:delayed.delayedScore};
     }
-    if(task.type==='link'){ var daily0=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{})),link=Object.assign({n:0,ok:0},objectOr(daily0.link,{})),linkOk=choice.correct===true; link.n+=1; if(linkOk){ link.ok+=1; kaoFx('correct'); } daily0.link=link; q.daily[key]=daily0; kaoOpenFeedback(ui,task,linkOk,choiceId,linkOk?'Bağ kuruldu':''); kaoSave(); paintTask(); kaoAutoAdvance(ui,q); return {correct:linkOk}; }
-    if(task.type==='transfer'){ var tr0=objectOr(q.transfer,{}),trOk=choice.correct===true; if(trOk) kaoFx('correct'); q.transfer={lastAt:now.toISOString(),n:Math.floor(nonNegativeNumber(tr0.n,0))+1,ok:Math.floor(nonNegativeNumber(tr0.ok,0))+(trOk?1:0),seen:(Array.isArray(tr0.seen)?tr0.seen:[]).concat(task.key).slice(-120)}; kaoOpenFeedback(ui,task,trOk,choiceId); kaoSave(); paintTask(); kaoAutoAdvance(ui,q); return {correct:trOk}; }
+    if(task.type==='link'){ var daily0=Object.assign({answered:0,correct:0,new:0,reviewed:0},objectOr(q.daily[key],{})),link=Object.assign({n:0,ok:0},objectOr(daily0.link,{})),linkOk=choice.correct===true; link.n+=1; if(linkOk){ link.ok+=1; kaoFx('correct'); } daily0.link=link; q.daily[key]=daily0; kaoOpenFeedback(ui,task,linkOk,choiceId,linkOk?'Bağ kuruldu':'',kaoTaskMs(ui,now)); kaoSave(); paintTask(); kaoAutoAdvance(ui,q,kaoAdvanceMs(ui.kaoPanel)); return {correct:linkOk}; }
+    if(task.type==='transfer'){ var tr0=objectOr(q.transfer,{}),trOk=choice.correct===true; if(trOk) kaoFx('correct'); q.transfer={lastAt:now.toISOString(),n:Math.floor(nonNegativeNumber(tr0.n,0))+1,ok:Math.floor(nonNegativeNumber(tr0.ok,0))+(trOk?1:0),seen:(Array.isArray(tr0.seen)?tr0.seen:[]).concat(task.key).slice(-120)}; kaoOpenFeedback(ui,task,trOk,choiceId,'',kaoTaskMs(ui,now)); kaoSave(); paintTask(); kaoAutoAdvance(ui,q,kaoAdvanceMs(ui.kaoPanel)); return {correct:trOk}; }
     var previous=objectOr(cards[task.cardId],{}); correct=choice.correct===true;
     if(ui.kaoLesson&&ui.kaoLesson.phase==='practice') {
       ui.kaoLesson.answered=Math.floor(nonNegativeNumber(ui.kaoLesson.answered,0))+1; if(correct) ui.kaoLesson.correct=Math.floor(nonNegativeNumber(ui.kaoLesson.correct,0))+1;
@@ -2299,16 +2330,18 @@
     ui.kaoOrderDraft=task.kind==='order'?cloneValue(ui.kaoOrderDraft):[];
     var earned=recordMilestones(q,d,now),lessonMilestone=kaoRememberLessonMilestones(ui,earned); if(correct) kaoFx('correct'); if(earned.length&&!lessonMilestone) kaoFx('milestone');
     var notes=[]; if(task.kind==='order'&&task.type==='fragment'&&!correct) notes.push('Fiil önce gelir: Arapçada çoğu kez fiil–özne–nesne sırası kullanılır.'); if(earned.length&&!lessonMilestone) notes.push(KAO_MILESTONE_LABELS[earned[earned.length-1]]+' ✦');
-    kaoOpenFeedback(ui,task,correct,choiceId,notes.join(' · '));
-    kaoLessonResume(ui); kaoSave(); paintTask(); kaoAutoAdvance(ui,q);
+    kaoOpenFeedback(ui,task,correct,choiceId,notes.join(' · '),elapsed);
+    kaoLessonResume(ui); kaoSave(); paintTask(); kaoAutoAdvance(ui,q,kaoAdvanceMs(ui.kaoPanel));
     return {correct:correct,grade:grade};
   }
   function kaoContinue(){
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),q=ensureQuranLearn(quranLearnDeps.data());
     if(!ui.kaoPanel||ui.kaoPanel.open!==true) return false;
+    var panel=ui.kaoPanel,elapsed=panel.correct===true?Math.max(0,Date.now()-nonNegativeNumber(ui.kaoTaskStartedAt,Date.now())):null;
     if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
-    ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=Date.now(); ui.kaoOrderDraft=[];
+    ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=Date.now(); ui.kaoPlayed=false; ui.kaoOrderDraft=[];
+    if(panel.correct===true) kaoLatencyPush(ui,elapsed);
     if(ui.kaoLesson&&ui.kaoLesson.phase==='practice'){
       if(ui.kaoTaskIndex>=(ui.kaoQueue||[]).length){
         ui.kaoLesson.at=ui.kaoLesson.practiceEndAt; ui.kaoLesson.phase='lesson';
@@ -2328,6 +2361,7 @@
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),undo=ui.kaoUndo;
     if(!undo) return false;
+    var kaoLatencyBefore=Array.isArray(ui.kaoLatency)?ui.kaoLatency.slice():null;
     var q=ensureQuranLearn(quranLearnDeps.data());
     if(undo.hadCard) q.cards[undo.cardId]=cloneValue(undo.card); else delete q.cards[undo.cardId];
     if(undo.hadDaily) q.daily[undo.dailyKey]=cloneValue(undo.daily); else delete q.daily[undo.dailyKey];
@@ -2337,7 +2371,7 @@
     if(undo.kind==='delayed') { if(undo.hadSurah) q.surahs[undo.surahId]=cloneValue(undo.surah); else delete q.surahs[undo.surahId]; }
     if(undo.kind==='transfer') { if(undo.hadTransfer) q.transfer=cloneValue(undo.transfer); else delete q.transfer; }
     if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
-    ui.kaoAdvanceTimer=null; ui.kaoQueue=cloneValue(undo.queue); ui.kaoTaskIndex=undo.taskIndex; ui.kaoTaskStartedAt=Date.now(); ui.kaoDurableCount=Math.floor(nonNegativeNumber(undo.durableCount,0)); ui.kaoOrderDraft=cloneValue(undo.orderDraft)||[]; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoFeedback='Geri alındı';
+    ui.kaoAdvanceTimer=null; ui.kaoQueue=cloneValue(undo.queue); ui.kaoTaskIndex=undo.taskIndex; ui.kaoTaskStartedAt=Date.now(); ui.kaoPlayed=false; ui.kaoLatency=kaoLatencyBefore; ui.kaoDurableCount=Math.floor(nonNegativeNumber(undo.durableCount,0)); ui.kaoOrderDraft=cloneValue(undo.orderDraft)||[]; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoFeedback='Geri alındı';
     kaoSave(); paintTask(); return true;
   }
   // KAO2-22 (K-3): ses kimlikleri iki biçimlidir — kelime klibi (`w-l_<id>_<hex6>`)
@@ -2360,6 +2394,7 @@
     audio.preload='none';
     if(typeof audio.addEventListener==='function') audio.addEventListener('error',function(){ ui.kaoAudioFailed=true; },{once:true});
     try{ var result=audio.play(); if(result&&typeof result.catch==='function') result.catch(function(){ ui.kaoAudioFailed=true; }); }catch(_error){ ui.kaoAudioFailed=true; }
+    ui.kaoPlayed=true; // K3P-15: bu görevde ses çalındı → doğru cevap "yavaş" koluna düşer (K-C: ses tekrar dinlendi).
     return audio;
   }
   // KAO-17 · E7: ayarlar kalıcıdır (data.quranLearn.settings / readability); ağ yok.
@@ -3906,7 +3941,7 @@
       lexiconVersion:LEXICON_VERSION,
       startedAt:null,
       gate:{passed:false,skipped:false,score:null,at:null},
-      settings:{dailyNew:KAO_ONBOARD_MINUTES[0],audio:false,autoAdvance:false,audioStyle:'measured',harakat:true,translit:true,translitLayer:'tr',shadowing:false,kaoVisible:true},
+      settings:{dailyNew:KAO_ONBOARD_MINUTES[0],audio:false,autoAdvance:true,audioStyle:'measured',harakat:true,translit:true,translitLayer:'tr',shadowing:false,kaoVisible:true},
       cards:{},units:{},surahs:{},daily:{},
       milestones:KAO_MILESTONE_SHAPE(),
       phonics:{style:'muallim',misheard:{}},

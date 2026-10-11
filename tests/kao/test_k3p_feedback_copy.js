@@ -12,7 +12,10 @@ const WALK_GUARD = 400;
 const failures = [];
 const fail = (msg) => { if (failures.length < 30) failures.push(msg); };
 const sheetOf = (html) => { const at = html.indexOf('<section class="kao-feedback-sheet'); return at < 0 ? '' : html.slice(at, html.indexOf('</section>', at) + 10); };
-const seen = { correct: 0, wrong: 0, order: 0, summary: 0 };
+// K3P-15 (K-C) üç kol: hızlı doğruda panel/şerit yok (yalnız ✓ + 600 ms geçiş); yavaş doğruda panel yerine tek
+// satırlık pekiştirme şeridi; yanlışta tam panel. Doğru kol, kişisel medyana göre belirlenir.
+const stripOf = (html) => { const at = html.indexOf('<p class="kao-feedback-strip'); return at < 0 ? '' : html.slice(at, html.indexOf('</p>', at) + 4); };
+const seen = { correct: 0, wrong: 0, order: 0, summary: 0, strip: 0, fast: 0 };
 
 function checkSheet(sheet, correct, where) {
   if (!sheet) { fail(`${where}: geri bildirim paneli yok`); return; }
@@ -27,6 +30,22 @@ function checkSheet(sheet, correct, where) {
     if (!undo) fail(`${where}: yanlış cevap panelinde geri alma düğmesi yok`);
     else if (undo[1] !== 'Yanlışlıkla dokundum') fail(`${where}: geri alma etiketi "${undo[1]}"`);
   }
+}
+
+// Doğru cevabın üç kolu: tam panel (yavaş, autoAdvance kapalı) · pekiştirme şeridi (yavaş, açık) · hiçbiri (hızlı, açık).
+function checkCorrect(html, panel, where) {
+  if (panel && panel.slow !== true && html.includes('kao-feedback-strip')) fail(`${where}: hızlı doğruda şerit olmamalı`);
+  const sheet = sheetOf(html), strip = stripOf(html);
+  if (panel && panel.slow === true && !html.includes('kao-feedback-sheet')) { seen.strip += 1; checkStrip(strip, where); return; }
+  if (panel && panel.slow !== true && !html.includes('kao-feedback-sheet') && !strip) { seen.fast += 1; return; }
+  checkSheet(sheet, true, where);
+}
+
+function checkStrip(strip, where) {
+  if (!strip) { fail(`${where}: pekiştirme şeridi yok`); return; }
+  if (!/role="status" aria-live="polite"/.test(strip)) fail(`${where}: şerit aria-live taşımıyor`);
+  const text = strip.replace(/<[^>]+>/g, '').trim();
+  if (text !== 'Doğru') fail(`${where}: şerit metni "${text}"`);
 }
 
 // Görevleri sırayla doğru/yanlış cevaplar; her cevaptan sonra paneli denetler, sonra özeti.
@@ -54,7 +73,8 @@ function walk(seeded, lessonId) {
       const panel = t.ui.kaoPanel;
       if (panel && panel.open) {
         seen[panel.correct ? 'correct' : 'wrong'] += 1;
-        checkSheet(sheetOf(t.api.kaoTaskHTML(task)), panel.correct, `${seeded ? 'yerleşik' : 'yeni'} ${lessonId} ${task.id}`);
+        if (panel.correct) checkCorrect(t.api.kaoTaskHTML(task), panel, `${seeded ? 'yerleşik' : 'yeni'} ${lessonId} ${task.id}`);
+        else checkSheet(sheetOf(t.api.kaoTaskHTML(task)), false, `${seeded ? 'yerleşik' : 'yeni'} ${lessonId} ${task.id}`);
       }
       t.api.kaoContinue();
       continue;
@@ -76,11 +96,11 @@ function walk(seeded, lessonId) {
 }
 
 for (const seeded of [false, true]) for (const lessonId of LESSONS) walk(seeded, lessonId);
-assert.ok(seen.correct > 10 && seen.wrong > 10 && seen.order > 0 && seen.summary === LESSONS.length * 2, `kapsam yetersiz: ${JSON.stringify(seen)}`);
+assert.ok(seen.correct > 10 && seen.wrong > 10 && seen.order > 0 && seen.summary === LESSONS.length * 2 && seen.strip + seen.fast > 0, `kapsam yetersiz: ${JSON.stringify(seen)}`);
 
 if (failures.length) {
   console.error(failures.map((f) => '  ✗ ' + f).join('\n'));
   console.error(`K3P feedback copy: FAIL (${JSON.stringify(seen)})`);
   process.exit(1);
 }
-console.log(`K3P feedback copy: PASS (doğru ${seen.correct} · yanlış ${seen.wrong} panel, dizme ${seen.order}, özet ${seen.summary})`);
+console.log(`K3P feedback copy: PASS (doğru ${seen.correct} · yanlış ${seen.wrong} panel, dizme ${seen.order}, özet ${seen.summary}, şerit ${seen.strip}, hızlı ${seen.fast})`);

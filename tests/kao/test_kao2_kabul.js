@@ -182,7 +182,9 @@ const sim = {};
         } else {
           t.api.kaoAnswer(task.id, (task.choices.find((c) => !c.correct) || task.choices[0]).choiceId);
         }
-        stages.add('panel-açık'); record('oturum/panel-açık', t.api.kaoOverlayHTML(t.NOW), 'kao-feedback');
+        // K3P-15: hızlı doğruda tam panel açılmaz (yalnız ✓ + otomatik geçiş); işaretçi cevaplanmış-görev durumuna
+        // bağlanır. A-3'ün ölçütü (birincil düğme/NavBar bütçesi ve gerçek yüzey) değişmez.
+        stages.add('panel-açık'); record('oturum/panel-açık', t.api.kaoOverlayHTML(t.NOW), 'kao-choice-correct');
         t.api.kaoContinue();
         continue;
       }

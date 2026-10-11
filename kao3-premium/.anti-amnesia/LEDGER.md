@@ -314,3 +314,22 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok (overlay davranışı cihazda görülmeli)
 - Gözlem: Tam kapı en son K3P-04B öncesi koşuldu; bir sonraki dalga sonunda (K3P-A8) zorunlu.
 - Sıradaki: K3P-A2
+
+## seq 18 · K3P-A2 · KART
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - `quranLearn.js`: `kaoFocusLocked()` (SeymaQuranLearn, App.* değil) — `ui.kaoOpen && ui.kaoLesson && ui.kaoView==='session'`. **Sapma (gerekçeli):** prompt `ui.kaoOpen && ui.kaoLesson` diyordu; oysa `exit` ve `finish` `ui.kaoLesson`'ı devam kaydı için tutup ana ekrana dönüyor (harness'ta doğrulandı). O tanımla kilit çıkıştan sonra da sürer ve "çıkınca boşalt" kuralı çalışmazdı; kilit yalnız ders ekranında geçerli. Tekrar oturumları (`ui.kaoLesson=null`, K2F-28) kilitlenmez.
+  - `kaoReleaseToasts`: `kaoMount` sonunda (özet ekranında ya da kilit kalkınca) ve `kaoClose` gövdesinde çağrılır → `flushToasts`.
+  - `helpers.js`: `toast(msg, ms, opts)` kilitliyken kuyruğa alır (en çok 3, en eskisi düşer; tekrar eden bir kez, süresi en uzunu); `opts.urgent` ve `opts.own` ertelenmez; `flushToasts()` birleşik tek toast (` · `). Görünüm aynı (gövde `showToast`'a taşındı, değişmedi).
+  - **Kriz:** `crisis.js` ve kriz işleyicilerinde (`App.openCrisis`, `closeCrisis`, `toggleCrisis*`) toast çağrısı **yok**. Güvenlik akışındaki tek toast `App.continueEmergency` → `{urgent:true}`.
+  - **`own` bayrağı (ek, gerekçeli):** KAO'nun kendi 3 cevap toast'ı (`kaoFlag` "Teşekkürler…", ustalık/onarım uyarıları) `{own:true}` alır; kullanıcının kendi eylemine verilen cevabı ertelemek onu gizlerdi. D-8 yalnız "başka modüllerin" toast'ını kapsar.
+  - `app.js`: KAO yüzeyine `flushToasts` bağımlılığı; `toast` köprüsü değişmedi (`arguments` ile opts geçer). App.kao* 45.
+  - Yeni test `tests/kao/test_k3p_focus_lock.js` (envanter 60 test).
+  - K-P: `app.js`, `app/core/quranLearn.js`, `app/core/helpers.js` → `pinDeferral.files`.
+  - **Karar K-Q (kullanıcı):** "kısa gereklilikleri yapalım 3 dkdan fazla beklemeyelim". Kart kapanışında hedefli kapı: sözdizimi (app.js, sync.js, quranLearn*, helpers, render) + `test_kao2_navigation`, `test_kao2_a11y`, `test_kao2_inventory`, `test_kao2_design_contract` + kartın testleri + `tests/app` ailesi + run-seyma driver + perf. Hızlı kapının tamamı ve `kapilar.sh` dalga sonunda zorunlu.
+- Ölçüler: ders ekranında KAO dışı toast eklemesi 0 (uçtan uca test) · runtime 120,629 → 121,007 KiB · p95 30,1 ms (yük altında; tavan 40)
+- Kapı: hedefli kapı 49 sn PASS (tests/app 78, KAO 6, driver, perf) · ayrıca helpers 31/31, faz-1.1 27/27 · kapi-hizli tamamı başlatıldı, kullanıcı kararıyla durduruldu (durdurulana kadar koşan 8 adım yeşil) · kapilar.sh koşulmadı
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: ÆON gelen kutusu açılır penceresi `#sey-inbox-pop` (`renderAeonPopup`, z 500 > KAO 380) 30 sn yoklamasıyla ders sırasında da açılabiliyor; toast değil, kilidin kapsamı dışında — dokunulmadı (prompt "banner'lara dokunma").
+- Sıradaki: K3P-A3

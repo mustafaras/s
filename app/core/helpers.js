@@ -74,7 +74,32 @@
     h+='</div>';
     return h;
   }
-  function toast(msg,ms){
+  // K3P-A2 (A-6, D-8): odak kilidi. KAO dersi açıkken (SeymaQuranLearn.kaoFocusLocked) toast gösterilmez, kuyruğa alınır:
+  // en çok 3 mesaj, tekrar eden bir kez. opts.urgent (kriz/güvenlik) ve opts.own (odaktaki yüzeyin kendi cevabı) ertelenmez.
+  // flushToasts: kuyruğu birleştirilmiş tek bir toast olarak gösterir (ders bitince/çıkınca KAO çağırır).
+  var TOAST_QUEUE_MAX=3,toastQueue=[];
+  function toastFocusLocked(){
+    var kao=window.SeymaQuranLearn;
+    try{ return !!(kao&&typeof kao.kaoFocusLocked==='function'&&kao.kaoFocusLocked()); }catch(e){ return false; }
+  }
+  function toast(msg,ms,opts){
+    var o=opts&&typeof opts==='object'?opts:{};
+    if(o.urgent!==true&&o.own!==true&&toastFocusLocked()){
+      var text=String(msg==null?'':msg),seen=toastQueue.filter(function(item){ return item.text===text; })[0];
+      if(seen) seen.ms=Math.max(seen.ms,Number(ms)||0);
+      else{ toastQueue.push({text:text,ms:Number(ms)||0}); if(toastQueue.length>TOAST_QUEUE_MAX) toastQueue.shift(); }
+      return false;
+    }
+    showToast(msg,ms);
+    return true;
+  }
+  function flushToasts(){
+    if(!toastQueue.length) return false;
+    var held=toastQueue; toastQueue=[];
+    showToast(held.map(function(item){ return item.text; }).join(' · '),Math.max.apply(null,held.map(function(item){ return item.ms; }))||undefined);
+    return true;
+  }
+  function showToast(msg,ms){
     var ex=document.getElementById('sey-toast'); if(ex) ex.remove();
     var t=document.createElement('div'); t.id='sey-toast';
     t.setAttribute('role','status'); t.setAttribute('aria-live','polite');
@@ -107,6 +132,7 @@
     statTile: statTile,
     collapsibleCardHTML: collapsibleCardHTML,
     toast: toast,
+    flushToasts: flushToasts,
     confetti: confetti,
     haptic: haptic
   };

@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-A2",
+  "nextPrompt": "K3P-A3",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -149,7 +149,8 @@
     "K-N": "decided: Kaldığın yerden · n/N görünür devam",
     "K-O": "decided: oturum seçilen dakikaya sığar; taşan tekrarlar en düşük R önce ertesi güne",
     "K-P": "decided (K3P-01, kullanıcı kararı bana bıraktı): pin tazeliği (D3F-10) yayın anının özelliğidir; yayın yalnız main. Program dalında pinli dosya değişirse pinDeferral.files listesine yazılır, test orada ERTELENDİ der; main ve başka dallarda tam katı. K3P-27 pinleri yükseltir ve listeyi boşaltır.",
-    "K-A2": "decided (K3P-04B, kullanıcı kararı 2026-10-11): Diyanet tam tablosu — غ → ğ; kısa ünlü taşıyan harfe göre (kalın خ ص ض غ ط ق ظ: a/ı/u; fethada ayrıca ر ح ع, ötrede ر); kalın harften önceki fetha/ötre ve sakin ر öncesi kalın; harf-i tarif el-/er-; lafza-i celâl kalın. ٱسْتَغْفَرَ → istağfera (K-A ile aynı). İlk soruda ajan çerçeve hatası yaptı (istağfara dedi); düzeltilmiş soruda kullanıcı istağfera seçti. Yalnız tr katmanı değişti; dia ve veri şeması aynı."
+    "K-A2": "decided (K3P-04B, kullanıcı kararı 2026-10-11): Diyanet tam tablosu — غ → ğ; kısa ünlü taşıyan harfe göre (kalın خ ص ض غ ط ق ظ: a/ı/u; fethada ayrıca ر ح ع, ötrede ر); kalın harften önceki fetha/ötre ve sakin ر öncesi kalın; harf-i tarif el-/er-; lafza-i celâl kalın. ٱسْتَغْفَرَ → istağfera (K-A ile aynı). İlk soruda ajan çerçeve hatası yaptı (istağfara dedi); düzeltilmiş soruda kullanıcı istağfera seçti. Yalnız tr katmanı değişti; dia ve veri şeması aynı.",
+    "K-Q": "decided (kullanıcı, 2026-10-11): kart kapanışında hızlı kapının tamamı yerine hedefli kapı — sözdizimi + kartın KAO testleri + navigation/a11y/inventory/design_contract + tests/app + driver + perf (≤ 3 dk). Tam kapı ve hızlı kapının tamamı dalga sonunda (waveEnd) zorunlu kalır."
   },
   "hypotheses": [
     "H1",
@@ -223,7 +224,9 @@
     {
       "id": "K3P-A2",
       "wave": "A",
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-11",
+      "result": "odak kilidi: kaoFocusLocked (ders ekranı açıkken); helpers.js toast kuyruğu (≤3, tekrar bir kez; urgent/own ertelenmez), flushToasts özet/çıkış/kapatmada tek birleşik toast; ders sırasında KAO dışı toast eklemesi 0; test_k3p_focus_lock"
     },
     {
       "id": "K3P-A3",
@@ -371,6 +374,10 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app.js",
+      "app/core/quranLearn.js",
+      "app/core/helpers.js"
+    ]
   }
 }

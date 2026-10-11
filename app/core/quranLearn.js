@@ -1127,7 +1127,7 @@
  function kaoFlag(cardId,kind){
     if(!quranLearnDeps||['meaning','example','audio','root'].indexOf(kind)<0||!currentCardId(cardId)) return false;
     var q=ensureQuranLearn(quranLearnDeps.data()),card=objectOr(q.cards[cardId],{}); q.cards[cardId]=card; card.flagged={at:new Date().toISOString(),kind:kind};
-    kaoSave(); if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Teşekkürler, sonraki içerik sürümünde bakılacak'); quranLearnDeps.render(); return true;
+    kaoSave(); if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Teşekkürler, sonraki içerik sürümünde bakılacak',undefined,{own:true}); quranLearnDeps.render(); return true;
   }
   // KAO2-17 · K-4: 'draft' metin kullanıcıya gösterilmez; güvenli yer tutucuya düşer.
   function kaoReviewLevel(review){
@@ -2025,7 +2025,7 @@
     }
     var now=new Date(),plan=flow.masteryPlan({quranLearn:q},unit.id,now,content);
     if(!Array.isArray(plan)||!plan.length){
-      if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Ustalık kontrolü için önce bu ünitenin kelimelerini tanımalısın.');
+      if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Ustalık kontrolü için önce bu ünitenin kelimelerini tanımalısın.',undefined,{own:true});
       return false;
     }
     ui.kaoLesson={kind:'mastery',unitId:unit.id,lessonId:'mastery:'+unit.id,title:'Ustalık: '+String(unit.title||''),plan:plan,at:0,phase:'lesson',reviews:[],correct:0,answered:0,done:false,recorded:false,wrongLemmas:[],earnedMilestones:[],milestoneCelebrated:false,startedAt:now.toISOString(),resumeAt:0};
@@ -2061,7 +2061,7 @@
     }
     var now=new Date(),plan=flow.repairPlan({quranLearn:q},unit.id,now,content);
     if(!Array.isArray(plan)||!plan.length){
-      if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Bu ünite için onarılacak kelime yok.');
+      if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Bu ünite için onarılacak kelime yok.',undefined,{own:true});
       return false;
     }
     ui.kaoLesson={kind:'repair',unitId:unit.id,lessonId:'repair:'+unit.id,title:'Onarım: '+String(unit.title||''),plan:plan,at:0,phase:'lesson',reviews:[],correct:0,answered:0,done:false,recorded:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:now.toISOString(),resumeAt:0};
@@ -3843,9 +3843,27 @@
     live.back.insertAdjacentHTML('beforebegin',String(html));
     return true;
   }
+  // K3P-A2 (A-6, D-8): odak kilidi — ders ekranı açıkken başka modüllerin toast'ları bekletilir (helpers.js toast kuyruğu).
+  // exit/finish ui.kaoLesson'ı devam kaydı için tutar ama ana ekrana döner; kilit yalnız ders ekranında (session) geçerlidir.
+  function kaoFocusLocked(){
+    if(!quranLearnDeps) return false;
+    var ui=quranLearnDeps.ui();
+    return !!(ui&&ui.kaoOpen&&ui.kaoLesson&&ui.kaoView==='session');
+  }
+  function kaoAtSummary(ui){
+    var st=ui&&ui.kaoLesson,item=st&&st.phase==='lesson'&&Array.isArray(st.plan)?st.plan[st.at||0]:null;
+    return !!(item&&item.kind==='summary');
+  }
+  // Ders bitince (özet), dersten çıkınca ya da kapatınca bekleyen toast'lar birleştirilmiş tek bildirim olur.
+  function kaoReleaseToasts(force){
+    if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.flushToasts!=='function') return false;
+    if(!force&&kaoFocusLocked()&&!kaoAtSummary(quranLearnDeps.ui())) return false;
+    return quranLearnSurfaceDeps.flushToasts();
+  }
   function kaoMount(nowValue){
     if(!quranLearnDeps||!quranLearnSurfaceDeps||!quranLearnDeps.ui().kaoOpen) return false;
     quranLearnSurfaceDeps.mount(kaoOverlayHTML(nowValue));
+    kaoReleaseToasts(false);
     return true;
   }
   function kaoOpen(view){
@@ -3868,6 +3886,7 @@
       var ui=quranLearnDeps.ui(),returnId=ui.kaoReturnFocusId||'';
       kaoShadowCleanup(); quranLearnSurfaceDeps.unlockBody(); ui.kaoOpen=false; ui.kaoStack=[]; ui.kaoView='home'; ui.kaoReturnFocusId=''; ui.kaoWhatsNew=false; ui.kaoOnboard=null;
       quranLearnDeps.render(); if(returnId) quranLearnSurfaceDeps.restoreFocus(returnId);
+      kaoReleaseToasts(true);
     };
     quranLearnSurfaceDeps.sheetClose('sey-ov-card','sey-ov-back',body);
     return true;
@@ -4157,6 +4176,7 @@
     kaoS0LessonOfLetter:kaoS0LessonOfLetter,
     kaoOverlayHTML:kaoOverlayHTML,
     kaoMount:kaoMount,
+    kaoFocusLocked:kaoFocusLocked,
     kaoSplitOverlay:kaoSplitOverlay,
     kaoPatchOverlay:kaoPatchOverlay,
     kaoPaintApp:kaoPaintApp,

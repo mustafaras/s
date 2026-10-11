@@ -3793,7 +3793,55 @@
     var view=current.view,unitDetail=view==='units'&&current.param!==null,onboarding=view==='home'&&kaoOnboardActive(ui),screenView=unitDetail?'unit':(view==='grammar'&&current.param!==null?'concept':view),body=(view==='sources'?kaoSourcesPageHTML():view==='s0'?kaoS0HTML():view==='roots'?kaoRootsHTML():onboarding?kaoOnboardHTML():view==='home'?kaoHomeHTML(nowValue):(view==='units'?(unitDetail?kaoUnitHTML(current.param):kaoPathHTML()):(view==='grammar'?(current.param!==null?kaoConceptHTML(current.param):kaoGrammarHTML()):(view==='word'?kaoWordHTML():(view==='reader'?kaoReaderHTML():(view==='gate'?kaoGateHTML():(view==='settings'?kaoSettingsHTML():(view==='phonics'?kaoPhonicsHTML():(view==='ayah'?kaoAyahHTML():(view==='map'?kaoMapHTML():(view==='prayer'?kaoPrayerHTML():(view==='stats'?kaoStatsHTML(nowValue):'<main class="kao-session">'+kaoLessonHTML()+'</main>'))))))))))));
     body=kaoViewsApi().renderScreen({exit:{name:'kaoLesson',args:['exit']},exitLabel:ui.kaoLesson?'Dersten çık':'Oturumdan çık',view:onboarding?'onboard':screenView,title:onboarding?KAO_ONBOARD_TITLE:(current.title||kaoViewTitle(screenView,current.param,ui)),previousTitle:previous&&previous.title||KAO_HOME_TITLE,body:body});
     var titleId=/class="kao-largetitle">[\s\S]*?<h2\b[^>]*\sid="([^"]+)"/.exec(body),dialogName=titleId?'aria-labelledby="'+titleId[1]+'"':'aria-label="Kur’an Arapçası · günlük oturum"';
-    return '<div id="sey-ov-back" class="kao-overlay" onclick="App.kaoClose()"><div id="sey-ov-card" class="kao-dialog" style="'+kaoReadabilityStyle()+'" role="dialog" aria-modal="true" '+dialogName+' tabindex="-1" onkeydown="App.onModalKeydown(event,App.kaoClose)" onclick="event.stopPropagation()"><div id="sey-ov-body" class="kao-body scroll" style="'+kaoReadabilityStyle()+'">'+body+'</div></div></div>';
+    // K3P-A1: data-kao-step ekranın adımını taşır (görünüm parametresi, ders aşaması, ilk açılış adımı); kaydırma bu adım değişince sıfırlanır.
+    var lesson=screenView==='session'&&ui.kaoLesson?ui.kaoLesson:null,step=view+':'+(current.param===null||current.param===undefined?'':String(current.param))+(lesson?'|'+(lesson.phase==='lesson'?'lesson:'+(lesson.at||0):String(lesson.phase||'')):'')+(onboarding?'|onboard:'+String(ui.kaoOnboard.step||''):'');
+    return '<div id="sey-ov-back" class="kao-overlay" onclick="App.kaoClose()"><div id="sey-ov-card" class="kao-dialog" style="'+kaoReadabilityStyle()+'" role="dialog" aria-modal="true" '+dialogName+' tabindex="-1" onkeydown="App.onModalKeydown(event,App.kaoClose)" onclick="event.stopPropagation()"><div id="sey-ov-body" class="kao-body scroll" style="'+kaoReadabilityStyle()+'" data-kao-step="'+quranLearnDeps.esc(step)+'">'+body+'</div></div></div>';
+  }
+  // K3P-A1 (A-7, D-0, K-M): overlay her render'da sökülüp yeniden kurulmaz; düğümler korunur, yalnız içerik değişir.
+  var KAO_OVERLAY_SHAPE=/^<div id="sey-ov-back"[^>]*><div id="sey-ov-card"([^>]*)><div id="sey-ov-body"([^>]*)>([\s\S]*)<\/div><\/div><\/div>$/,KAO_CARD_ATTRS=['style','aria-labelledby','aria-label'],KAO_BODY_ATTRS=['style','data-kao-step'],kaoScreenKeyLast='';
+  function kaoAttrValue(tag,name){ var m=new RegExp('\\s'+name+'="([^"]*)"').exec(tag); return m?m[1].replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&'):null; }
+  function kaoPickAttrs(tag,names){ var out={}; names.forEach(function(name){ var value=kaoAttrValue(tag,name); if(value!==null) out[name]=value; }); return out; }
+  // Saf: kaoOverlayHTML çıktısını dış kart nitelikleri, gövde nitelikleri, gövde içeriği ve ekran anahtarına ayırır; biçim tutmazsa null.
+  function kaoSplitOverlay(html){
+    var m=KAO_OVERLAY_SHAPE.exec(String(html||''));
+    if(!m) return null;
+    var bodyAttrs=kaoPickAttrs(m[2],KAO_BODY_ATTRS),screen=/class="kao-screen kao-screen-([a-z0-9-]+)"/.exec(m[3]),view=screen?screen[1]:(/class="kao-focusbar"/.test(m[3])?'session':'none');
+    return {cardAttrs:kaoPickAttrs(m[1],KAO_CARD_ATTRS),bodyAttrs:bodyAttrs,body:m[3],screenKey:view+'|'+(bodyAttrs['data-kao-step']||'')};
+  }
+  function kaoLiveOverlay(root){
+    var back=root&&typeof root.querySelector==='function'?root.querySelector('.kao-overlay'):null,card=back&&back.firstElementChild,body=card&&card.firstElementChild;
+    return back&&card&&body&&back.id==='sey-ov-back'&&card.id==='sey-ov-card'&&body.id==='sey-ov-body'?{back:back,card:card,body:body}:null;
+  }
+  function kaoSyncAttrs(node,attrs,names){ names.forEach(function(name){ if(Object.prototype.hasOwnProperty.call(attrs,name)) node.setAttribute(name,attrs[name]); else node.removeAttribute(name); }); }
+  // app.js mount buraya devreder. Overlay yoksa ekler ('insert'); varsa düğümleri korur ('patch').
+  // Açılış animasyonu (kao.css: seyFade, sey-sheet-in) yalnız ilk eklemede oynar: CSS animasyonu düğüm belgede
+  // kaldıkça yeniden başlamaz, bu yüzden 'patch' yolu animasyona hiç dokunmaz.
+  function kaoPatchOverlay(doc,html){
+    var root=doc.getElementById('app'),live=kaoLiveOverlay(root),split=kaoSplitOverlay(html);
+    if(!live||!split){
+      var old=doc.getElementById('sey-ov-back'); if(old&&old.parentNode) old.parentNode.removeChild(old);
+      if(root&&typeof root.insertAdjacentHTML==='function') root.insertAdjacentHTML('beforeend',html);
+      kaoScreenKeyLast=split?split.screenKey:'';
+      return 'insert';
+    }
+    var active=doc.activeElement,focusId=active&&active.id&&active!==live.card&&active!==live.back?String(active.id):'',top=live.body.scrollTop||0,sameScreen=split.screenKey===kaoScreenKeyLast;
+    kaoSyncAttrs(live.card,split.cardAttrs,KAO_CARD_ATTRS);
+    kaoSyncAttrs(live.body,split.bodyAttrs,KAO_BODY_ATTRS);
+    live.body.innerHTML=split.body;
+    live.body.scrollTop=sameScreen?top:0;
+    kaoScreenKeyLast=split.screenKey;
+    if(focusId){ var again=doc.getElementById(focusId); if(again&&typeof again.focus==='function'){ try{ again.focus({preventScroll:true}); }catch(e){ again.focus(); } } }
+    return 'patch';
+  }
+  // render.js paint buraya devreder: KAO açıkken #app'in geri kalanı yeniden yazılır, overlay düğümü yerinde kalır (son çocuk olarak).
+  function kaoPaintApp(app,html){
+    if(!quranLearnDeps||!quranLearnDeps.ui().kaoOpen) return false;
+    var live=kaoLiveOverlay(app);
+    if(!live||live.back.parentNode!==app||typeof live.back.insertAdjacentHTML!=='function') return false;
+    while(app.firstChild&&app.firstChild!==live.back) app.removeChild(app.firstChild);
+    while(live.back.nextSibling) app.removeChild(live.back.nextSibling);
+    live.back.insertAdjacentHTML('beforebegin',String(html));
+    return true;
   }
   function kaoMount(nowValue){
     if(!quranLearnDeps||!quranLearnSurfaceDeps||!quranLearnDeps.ui().kaoOpen) return false;
@@ -4109,6 +4157,9 @@
     kaoS0LessonOfLetter:kaoS0LessonOfLetter,
     kaoOverlayHTML:kaoOverlayHTML,
     kaoMount:kaoMount,
+    kaoSplitOverlay:kaoSplitOverlay,
+    kaoPatchOverlay:kaoPatchOverlay,
+    kaoPaintApp:kaoPaintApp,
     kaoOpen:kaoOpen,
     kaoClose:kaoClose,
     kaoSetView:kaoSetView,

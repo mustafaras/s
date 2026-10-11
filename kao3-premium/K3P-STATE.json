@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-A1",
+  "nextPrompt": "K3P-A2",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -216,7 +216,9 @@
     {
       "id": "K3P-A1",
       "wave": "A",
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-11",
+      "result": "overlay yerinde güncelleniyor: kaoSplitOverlay/kaoPatchOverlay/kaoPaintApp (SeymaQuranLearn, App.* değil); app.js mount + render.js paint devreder; ders boyunca yeniden kurulum 10 → 0 (AKIS tabanı 7); test_k3p_mount"
     },
     {
       "id": "K3P-A2",
@@ -369,6 +371,10 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app.js",
+      "app/core/quranLearn.js",
+      "app/core/render.js"
+    ]
   }
 }

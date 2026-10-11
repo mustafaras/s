@@ -364,7 +364,9 @@ function render(){
   html+='</div>';
   html+=navHTML();
   html+=modalsHTML();
-  app.innerHTML=html;
+  // K3P-A1 (D-0): KAO açıkken overlay düğümü sökülmez; geri kalan içerik onun önüne yazılır (açılış animasyonu, kaydırma, odak korunur).
+  var kaoKept=!!(ui.kaoOpen&&window.SeymaQuranLearn&&typeof window.SeymaQuranLearn.kaoPaintApp==='function'&&window.SeymaQuranLearn.kaoPaintApp(app,html));
+  if(!kaoKept) app.innerHTML=html;
   if(ui.tab==='bugun' && !editing()){ maybeFetchDailyPhoto(); }
   if(ui.tab==='mesaj') aeonLoadVisibleMedia();
 

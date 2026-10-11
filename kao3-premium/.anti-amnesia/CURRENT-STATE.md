@@ -2,12 +2,12 @@
 
 <!-- Bu dosya her prompt'un kapanışında BAŞTAN yazılır (BAGLAM-YONETIMI §3). Başlıkları silme; senkron.mjs okur. -->
 
-Sıradaki prompt: K3P-A1
+Sıradaki prompt: K3P-A2
 
 ## Son durum
 
 - **Tarih:** 2026-10-11
-- **Son tamamlanan:** K3P-05 (Dalga 0 sonu): `kapilar.sh` artık `cift-sik` ve `okunus-denetim` kapılarını koşuyor; `araclar/deney-rapor.cjs` H2/H5/H7/H8/H9 için yalnız toplu sayı basıyor (H3 K3P-16 sonrası). Önce: K3P-04B. Okunuş Türk alfabesiyle (K-A2, Diyanet tablosu): `el-hamdü lillâhi rabbi l-ʿâlemîn`, `ihdinâ s-sırâta l-müstakîm`, `istağfera`, `er-rahmân`. Önce: K3P-04 (bağlam okunuşu), K3P-03, K3P-02, K3P-01 ve ara yayın `20261010a`.
+- **Son tamamlanan:** K3P-A1 (A-7, D-0, K-M): KAO overlay yerinde güncelleniyor. Kök neden mount değil, `render.js` paint'in `#app.innerHTML`'i baştan yazmasıydı; açık KAO düğümü artık sökülmüyor (`kaoPaintApp`), mount yalnız kart niteliklerini ve gövdeyi değiştiriyor (`kaoPatchOverlay`). Ders boyunca yeniden kurulum 10 → 0. Önce: K3P-05 (Dalga 0 sonu, deney raporu).
 - **Dal:** `kao3-premium`. `main` = ikinci ara yayın `20261011a` (K3P-02…K3P-05 dahil; 2026-10-11). Dal ile `main` aynı noktada.
 - **Yeni oturum:** `kao3-premium/STARTER.md` içindeki metni yapıştır.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yalnız K3P-00 "önce" çizgisi · cihaz yok.
@@ -21,15 +21,16 @@ Sıradaki prompt: K3P-A1
 | Ders başına dokunuş | 69 | ≤ 40 |
 | Art arda edilgin ekran | 6 | ≤ 1 |
 | İlk yeni içeriğe dokunuş | 21 | ≤ 7 |
-| Ders başına overlay yeniden kurulumu | 7 | 0 |
+| Ders başına overlay yeniden kurulumu | 0 ✓ (K3P-A1) | 0 |
 | Tanıma görevi payı | %93 | ≤ %60 |
 | Bugün ekranı seçim sayısı | 13 | ≤ 5 |
 | `App.kao*` sayısı | 45 | 45 |
 
 ## Açık riskler
 
-- **Çalışma zamanı bütçesi dar:** 119,1 / 128 KiB; yaklaşık 8,9 KiB pay kaldı. Kod ekleyen kartlar (A3, A5, 11–13, 16–18, 20, 22–24) bu payı paylaşır. Önce eski kod silinir; yetmezse tavan kararı kullanıcıdan istenir.
-- **Pin ertelemesi (K-P):** Pinli bir dosyayı değiştiren kart, dosyayı `K3P-STATE.json` → `pinDeferral.files` listesine ekler. Eklemezse `test_asset_pin_freshness` kırmızı olur ve onu koşan kabul A-9 ile `kapilar.sh` de düşer. Liste şu an **boş**: ikinci ara yayın (`20261011a`) pinleri tazeledi. Yeni ara yayın gerekirse seq 8/15 yöntemi izlenir (ortak sürüm `index.html`, `sw.js`, `panel-v2.html` ve 12 testte).
+- **Çalışma zamanı bütçesi dar:** 120,6 / 128 KiB; yaklaşık 7,4 KiB pay kaldı (K3P-A1 +1,5 KiB). Kod ekleyen kartlar (A3, A5, 11–13, 16–18, 20, 22–24) bu payı paylaşır. Önce eski kod silinir; yetmezse tavan kararı kullanıcıdan istenir.
+- **Pin ertelemesi (K-P):** Pinli bir dosyayı değiştiren kart, dosyayı `K3P-STATE.json` → `pinDeferral.files` listesine ekler. Eklemezse `test_asset_pin_freshness` kırmızı olur ve onu koşan kabul A-9 ile `kapilar.sh` de düşer. Liste şu an: `app.js`, `app/core/quranLearn.js`, `app/core/render.js` (K3P-A1). Ara yayın seq 8/15 yöntemiyle yapılır (ortak sürüm `index.html`, `sw.js`, `panel-v2.html` ve 12 testte).
+- **Overlay yerinde güncelleme (K3P-A1):** KAO overlay'i `#app` içinde son çocuk olarak kalır (`#app{contain:layout}` çerçevesi ve toast/kriz katman sırası korunsun diye dışarı taşınmadı). `render.js` paint, KAO açıkken `kaoPaintApp` ile diğer içeriği overlay'in önüne yazar; mount `kaoPatchOverlay`. Ekran anahtarı `#sey-ov-body[data-kao-step]` + `.kao-screen-<görünüm>`; kaydırma yalnız anahtar değişince 0. Gerçek tarayıcıda doğrulanmadı (yalnız sahte DOM).
 - **Kabul testi yalnız `--yavas` ile koşar.** Pin çatışması bu yüzden plan aşamasında görünmedi; `--yavas` gerektiren kartlarda (A3, A4, A5, 16, 17, 18) aynı türden sürprizlere hazırlıklı ol.
 - **Perf göreli bandı makine yüküne duyarlı.** `main`'de kırmızıydı (7,4 ms > 5,09 ms), K3P-00 ve K3P-01'de bant içindeydi. Kapılar `KAO2_ACCEPT_SLOW_HOST=1` ile koşar; mutlak tavanlar zorunludur.
 - **Yavaş testler:** `test_kao2_kabul` (~230–530 sn), `test_kao2_grammar_tasks` (~170–290 sn), `test_kao2_denetim` (~35–50 sn) hızlı kapıda varsayılan olarak atlanır.

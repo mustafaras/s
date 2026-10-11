@@ -284,3 +284,20 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
 - Gözlem: Tam kapı bu yayında koşulmadı; bir sonraki dalga sonunda (K3P-A8) zorunlu.
 - Sıradaki: K3P-A1
+
+## seq 16 · K3P-A1 · KART
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - **Kök neden (A-7, koddan doğrulandı):** Yalnız mount sorumlu değildi. `render.js` paint her render'da `#app.innerHTML=html` ile `#app`'i baştan yazıyor ve onun içindeki KAO overlay'ini de söküyordu; app.js `render()` sarmalı ardından `kaoMount` ile yeniden ekliyordu. Bu yüzden prompt'taki "mount yerinde günceller" tek başına yetmezdi; paint de düzeltildi. Overlay `#app` dışına taşınmadı: `#app{contain:layout}` fixed overlay'in 460 px çerçevesini ve toast (z 10000) / kriz modalının katman sırasını belirliyor; taşımak ikisini de değiştirirdi.
+  - `quranLearn.js` (`window.SeymaQuranLearn`, App.* değil): `kaoSplitOverlay(html)` → `{cardAttrs, bodyAttrs, body, screenKey}` (saf; `screenKey` = `.kao-screen-<görünüm>` (yoksa focusbar → `session`) + `|` + `data-kao-step`), `kaoPatchOverlay(doc, html)` (overlay yoksa ekler; varsa düğümleri korur, kart `style`/`aria-labelledby`/`aria-label` ve gövde `style`/`data-kao-step` eşitlenir, gövde `innerHTML`, aynı ekranda kaydırma korunur yoksa 0, odaklı öğe id'si yeni içerikte varsa odak geri verilir), `kaoPaintApp(app, html)` (KAO açıkken diğer içerik overlay'in önüne yazılır). `kaoOverlayHTML` gövdeye `data-kao-step` ekler (görünüm:parametre, ders aşaması `lesson:<at>` / `review` / `practice`, ilk açılış adımı). Animasyon notu `kaoPatchOverlay` yorumunda: düğüm belgede kaldıkça seyFade/sey-sheet-in yeniden başlamaz.
+  - `app.js` mount → `window.SeymaQuranLearn.kaoPatchOverlay(document,html)` (tek satır); `render.js` paint → `kaoKept` satırı. `role=dialog`/`onkeydown` dış kartta kaldı; `paintTask` değişmedi; App.kao* 45.
+  - Yeni test `tests/kao/test_k3p_mount.js` (envantere eklendi, 59 test). Harness `bootKao` isteğe bağlı `deps`/`surface` geçersiz kılmaları aldı (varsayılan davranış aynı; kayıtlar tek seferlik olduğu için).
+  - K-P: `app.js`, `app/core/quranLearn.js`, `app/core/render.js` → `pinDeferral.files`.
+- Ölçüler:
+  - Ders başına overlay yeniden kurulumu (u01.02, harness render sayımı): eski mount ile **10** (AKIS tabanı 7) → **0**; test sahnesinde 13 render, 8 ders aşaması, 12 ekran geçişi, açılış eklemesi 1.
+  - runtime 119,093 → 120,629 KiB (tavan 128) · içerik 184,591 KiB · css 13,035 KiB.
+- Kapı: kapi-hizli 0 · ek: tests/app 78 + tests/panel-v2 27 + zikr PASS (render.js değişti) · test_kao2_navigation, test_kao2_a11y PASS · kapilar.sh koşulmadı (dalga sonu değil)
+- Kanıt düzeyi: kaynak/test (sahte DOM) · görsel QA yok · cihaz yok
+- Gözlem: Gerçek tarayıcıda odak/kaydırma davranışı ve animasyonun yeniden oynamadığı yalnız cihazda görülebilir. `render.js` içindeki diğer overlay'ler (okuma/izleme hub'ları) hâlâ yeniden kuruluyor; onlar animasyonu `style.animation='none'` ile bastırıyor — kapsam dışı.
+- Sıradaki: K3P-A2

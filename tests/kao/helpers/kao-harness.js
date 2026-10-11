@@ -57,7 +57,8 @@ function clockAt(now) {
 }
 
 // Boş VM: içerik + Flow/Views/motor, `register*` sahteleriyle. `seeded` kartlı bir öğrenci kurar.
-function bootKao({ now = DEFAULT_NOW, seeded = false, transformSource = null } = {}) {
+// deps / surface: yalnız testte, kayıtlı bağımlılıkların bir kısmını değiştirmek için (ör. K3P-A1 sahte DOM mount'u).
+function bootKao({ now = DEFAULT_NOW, seeded = false, transformSource = null, deps = null, surface = null } = {}) {
   const box = { window: {}, Date: clockAt(now) };
   vm.createContext(box);
   // transformSource(ad, kaynak) → kaynak: yalnız testte, içerik modülünü sentetik biçimde bozmak için (ör. bir şablonu desteksiz yapmak).
@@ -68,17 +69,17 @@ function bootKao({ now = DEFAULT_NOW, seeded = false, transformSource = null } =
   const timers = [];
   const calls = { lock: 0, unlock: 0, focus: [], restore: [], mount: 0, render: 0, save: 0 };
   const api = box.window.SeymaQuranLearn;
-  api.registerQuranLearn({
+  api.registerQuranLearn(Object.assign({
     data: () => data, ui: () => ui, save() { calls.save += 1; }, render() { calls.render += 1; },
     todayStr: () => now.slice(0, 10), esc, icon: () => '', getDay: () => ({})
-  });
-  api.registerQuranLearnSurface({
+  }, deps));
+  api.registerQuranLearnSurface(Object.assign({
     toast() {}, isQuietTime: false, mount() { calls.mount += 1; },
     lockBody() { calls.lock += 1; }, unlockBody() { calls.unlock += 1; },
     focusDialog(id) { calls.focus.push(id); }, restoreFocus(id) { calls.restore.push(id); },
     activeElementId: () => '', sheetClose(_e, _b, done) { if (done) done(); }, taskElement: () => null,
     setTimer(fn, ms) { timers.push({ fn, ms }); return timers.length; }
-  });
+  }, surface));
   const t = { api, box, win: box.window, data, ui, calls, timers, NOW: now };
   if (seeded) seed(t);
   return t;

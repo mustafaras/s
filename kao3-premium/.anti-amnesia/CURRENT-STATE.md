@@ -2,7 +2,7 @@
 
 <!-- Bu dosya her prompt'un kapanışında BAŞTAN yazılır (BAGLAM-YONETIMI §3). Başlıkları silme; senkron.mjs okur. -->
 
-Sıradaki prompt: K3P-05
+Sıradaki prompt: K3P-04B
 
 ## Son durum
 
@@ -35,7 +35,7 @@ Sıradaki prompt: K3P-05
 - **Yavaş testler:** `test_kao2_kabul` (~230–530 sn), `test_kao2_grammar_tasks` (~170–290 sn), `test_kao2_denetim` (~35–50 sn) hızlı kapıda varsayılan olarak atlanır.
 - **Tam kapı** `bash tools/kapi/kapilar.sh` 10 dakikadan uzun sürer; yalnız dalga sonlarında (`waveEnd`, sıradaki K3P-05) koşar.
 - **Okunuş kapısı zorunlu (K3P-04'ten beri):** `okunus-denetim.cjs` exit 0 olmalı. Okunuş kuralı değişirse sıra: `node tools/kao-lexicon-build.mjs --retranslit` → `--freeze` → `kao-content-freeze --freeze-grammar/--freeze-surahs` → `node tools/kao2-curriculum-build.mjs` → `node tools/kao2-lemma-morph-build.mjs --write`; ardından `kao-content-freeze.mjs` JSON pinleri. `test_kao_pronunciation_contract` araç↔girdi↔çalışma zamanı sapmasını yakalar.
-- **Açık karar K-A2 (kullanıcı: "ayrı kart"):** Tam Türkçe imlâ (غ → ğ, e/a uyumu; K-A'daki istağfera/er-rahmân). Kart metni ve sırası henüz yok; kullanıcıdan sıra istenecek.
+- **K-A2 → K3P-04B (sıradaki):** Tam Türkçe imlâ (غ → ğ, kalın/ince ünlü, `el-`/`er-`). Kullanıcı 2026-10-11'de K3P-05'ten önceye koydu. İlk adım gelenek tablosunu ve istağfera/istağfara seçimini kullanıcıya onaylatmak; onaysız kod yazılmaz.
 - **L2 önerisi:** Okunuşu değişen 19 lemma başlığı ve 479 lemmanın örnek okunuşu kıraat hocası incelemesi bekliyor: `kao3-premium/kanit/K3P-04/okunus-degisen.md`.
 - **Dizme görevi ölçütü:** Çift şık ölçümünde dizme görevleri sıra numarasıyla (`ordinal`) ölçülür; âyette tekrar eden sözcük meşrudur (D2F-03, kullanıcı kararı K3P-01).
 - **Görsel QA Chrome yolu:** `tools/kapi/gorsel-qa/cdp.mjs` varsayılanı (ms-playwright chromium-1243) bu makinede yok. K3P-26'da `KAO_QA_CHROME="$HOME/Library/Caches/ms-playwright/chromium-1247/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"` ver.

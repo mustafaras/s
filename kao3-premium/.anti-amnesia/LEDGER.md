@@ -200,3 +200,17 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
   - Makine yükü yüksekti (load ~10–12). `test_kao2_mastery` 955 sn ve `cift-sik` 978 sn sürdü; önceki koşularda 38–84 sn.
   - **K3P-03 eki (kullanıcı isteği):** K3P-03 commit'inden sonra yavaş testler koşuldu: kabul 10/10, grammar_tasks 39, denetim 10, hepsi PASS.
 - Sıradaki: K3P-05
+
+## seq 12 · — · PLAN
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı, K-A2 tam Türkçe imlâ kartının yazılmasını onayladı ve sırasını seçti: K3P-05'ten hemen önce.
+  - Yeni kart **K3P-04B** eklendi: PROMPTLAR bloğu, KARTLAR satırı, `executionOrder`, `cards` (dalga 0, todo). `nextPrompt` K3P-05 → K3P-04B oldu.
+  - `decisions.K-A2` "scheduled" durumuna geçti.
+  - Kartın ilk adımı, önerilen Diyanet tablosunu ve K-A'daki `istağfera` ile tablonun vereceği `istağfara` çelişkisini kod yazmadan önce kullanıcıya sormak.
+- Ölçüler: değişmedi
+- Kapı: koşulmadı (yalnız plan dosyaları)
+- Kanıt düzeyi: plan
+- Gözlem: Dalga 0 artık 7 kart; tam kapı K3P-05'te K3P-04B'yi de kapsar.
+- Sıradaki: K3P-04B

@@ -255,6 +255,63 @@ Bu kart büyük olabilir. Devir protokolü (§4) normal bir yoldur; gerekirse ku
 **Commit:** `K3P-04: okunuş motoru vasl, şemsî idgâm ve vakfı uyguluyor — ism, ibn, er-rahmân`
 <!-- /PROMPT K3P-04 -->
 
+<!-- PROMPT K3P-04B -->
+**K3P-04B · Türkçe okunuş imlâsı: ğ ve kalın/ince ünlü (K-A2)**
+
+Sen K3P programını uygulayan ajansın. Önce `kao3-premium/BAGLAM-YONETIMI.md` §1 açılış protokolünü uygula. Bu prompt'un kimliği **K3P-04B**. Bitirirken §3'ü, bağlam yetmezse §4'ü uygula. Kart büyük olabilir; §4 devri normal bir yoldur.
+
+**Neden:** K3P-04 okunuşu bağlama göre düzeltti ama mekanik düzeni korudu (fetha = a, غ = g: `istagfara`, `ar-rahmân`). K-A "Türk alfabesiyle yazılır" diyor. Kullanıcı tam Türkçe imlâyı ayrı kart olarak onayladı ve bu kartı K3P-05'ten önceye koydu (K-A2, 2026-10-11).
+
+**Oku:**
+- `kao3-premium/KARARLAR.md` → K-A
+- `K3P-STATE.json` → `decisions.K-A2`
+- LEDGER seq 11 (K3P-04): kural bloğu ve yeniden üretim sırası
+- `tools/kao-lexicon-build.mjs`: K3P-04 kural bloğu, `TRANSLIT_TR`, `transliterate` (`grep -n` ile bul)
+- `tests/kao/test_kao_pronunciation_contract.js` (K3P-04 bölümü)
+
+**Görev:**
+1. **Karar adımı (kod yazmadan önce).** Aşağıdaki önerilen tabloyu kullanıcıya `AskUserQuestion` ile sun. Onay alınmadan kod yazılmaz.
+   - Önerilen gelenek, Diyanet okunuş yazımı:
+     - غ → `ğ`.
+     - Fetha: taşıyan harf kalınsa (خ ص ض غ ط ق ظ, ayrıca ر ح ع) `a`, değilse `e`.
+     - Kesre: kalın harfte (خ ص ض غ ط ق ظ) `ı`, değilse `i`.
+     - Ötre: kalın harfte (yukarıdaki küme ve ر) `u`, değilse `ü`.
+     - Uzun ünlüler `â î û` olarak kalır.
+     - Harf-i tarif `el-`/`er-` olur.
+   - Örnek çıktılar: `er-rahmân`, `el-hamdü`, `kul hüve llâhü ehad`, `ihdine s-sırâta l-müstakîm`.
+   - **Bilinen çelişki:** K-A tablosu `istağfera` yazıyor. Önerilen tabloda ر fethası kalın olduğu için sonuç `istağfara` çıkar. Hangisinin doğru olduğunu kullanıcı seçer; seçim `decisions.K-A2`'ye yazılır.
+2. **Kırmızı test.** `test_kao_pronunciation_contract.js` içindeki K3P-04 beklentileri onaylanan tabloya göre yeniden yazılır. Ayrıca ğ, e/a, ı/i ve u/ü için birer sabit örnek eklenir. Bu bir test gevşetmesi değil, gelenek değişikliğidir; gerekçe LEDGER'a yazılır.
+3. **Araç.**
+   - Kurallar K3P-04 kural bloğunda adlandırılmış bir tablo olarak durur. Örnek adlar: `TR_THICK_LETTERS`, `trVowelFor(letter, harake)`.
+   - Yalnız `tr` katmanı değişir. `dia` katmanı ve çalışma zamanı `kaoDiaReading` DİA düzeninde kalır.
+   - `okunus-denetim.cjs` güneş harfi denetimi `el-` yazımını da yakalar: `\b[ae]l-`.
+4. **Yeniden üretim (K3P-04 sırası).**
+   1. `kao-lexicon-build --retranslit`
+   2. `--freeze`
+   3. `kao-content-freeze --freeze-grammar --freeze-surahs --freeze-phonics` (her biri ayrı komut)
+   4. `kao2-curriculum-build`
+   5. `kao2-lemma-morph-build --write`
+   6. `kao-content-freeze.mjs` JSON pinleri
+
+   Kanıt: önce/sonra JSON farkında okunuş dışında değişen alan 0. Konumsal okunuş yuvaları da sayılır (gramer hücresi index 2, şablon lemması index 1).
+5. **Sabitli eski okunuşlar.** Eski okunuşu sabitleyen testler yeni geleneğe göre güncellenir; her biri LEDGER'a yazılır. Örnekler: `test_kao_phonics_contract`, `faʿala`/`hatama`/`kasabâ`. Arapça, `verified` ve inceleme alanlarına dokunulmaz. Elle yazılmış namaz okunuşları (`PRAYER_READINGS`) bu kartın kapsamı dışındadır; gözlem olarak yazılır.
+6. **L2 listesi.** `kao3-premium/kanit/K3P-04B/okunus-degisen.md` üretilir; sayılar LEDGER'a yazılır. Raporda kullanıcıya kıraat hocası (L2) incelemesi önerilir.
+
+**Yapma:**
+- Arapça metni, ses kayıtlarını ya da DİA katmanını değiştirme.
+- İçerik bütçesini (≤ 256 KiB) ve çalışma zamanı bütçesini (≤ 128 KiB) aşma.
+
+**Kabul:**
+- Karar adımı kayıtlı (`decisions.K-A2` = decided, tablo ve istağfera/istağfara seçimi).
+- `okunus-denetim.cjs` exit 0.
+- `test_kao_pronunciation_contract`, `test_kao_freeze_repro`, `test_kao_phonics_contract` ve `test_kao2_curriculum` yeşil.
+- Okunuş dışı fark 0.
+- `ekran-dok` kelime ekranında yeni okunuş görünüyor.
+- `kapi-hizli --kart K3P-04B --yavas` yeşil.
+
+**Commit:** `K3P-04B: Türkçe okunuş imlâsı — ğ ve kalın/ince ünlü, er-rahmân`
+<!-- /PROMPT K3P-04B -->
+
 <!-- PROMPT K3P-05 -->
 **K3P-05 · Deneyim ölçüleri kapıya, deney raporu aracı (dalga sonu)**
 

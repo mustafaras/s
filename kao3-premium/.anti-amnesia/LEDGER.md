@@ -376,3 +376,15 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: (1) `pinDeferral.files`'a `app/kao.css` eklendi (stil değişikliği). (2) Şerit düğmesi `App.kaoContinue` ile bağlandı; K-D "yeni `App.kao*` yok" korundu. (3) `dokunus-olc` yalnız doğru-cevap kollarını ölçer; ustalık/bağ kur/gecikmeli yollar aynı motordan geçer ama ayrı ölçülmedi. (4) Medyan ilk yanıtta belirsizdir (yavaş kola düşer); KARARLAR gereği kesin ölçüm tarihli kayıt ister — şema kararı.
 - Sıradaki: K3P-A4
+
+## seq 22 · — · YAYIN
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı "canlıya al" dedi; beşinci ara yayın. Yayına giden çalışma zamanı değişiklikleri: K3P-A3 (nefes ritmi; `quranLearnFlow.js`, `quranLearn.js`) ve K3P-15 (üç kollu geri bildirim; `quranLearn.js`, `kao.css`).
+  - Ortak sürüm `20261011c` → `20261011d` (index.html 23 · sw.js 23 · panel-v2.html 4 geçiş; `SW_VERSION` dâhil) ve pini doğrulayan 12 test dosyası aynı commit'te güncellendi. `pinDeferral.files` boşaltıldı.
+- Ölçüler: K3P-15 sonrası — runtime 123,328 KiB (tavan 128) · css 13,072 KiB (tavan 14) · çift şık 0/1127 · okunuş hatası 0 · ders başına dokunuş 39 (≤40)
+- Kapı (K-Q): tam kapı `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` + pin senkronu + pin tazeliği + tests/kao yavaş üçlü — ayrıntı aşağıdaki raporda
+- Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
+- Gözlem: —
+- Sıradaki: K3P-A4

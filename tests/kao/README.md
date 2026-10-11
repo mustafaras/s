@@ -67,6 +67,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao2_word.js` | KAO2-25 · K2F-33 | Kelime detayı v2 (S-08) + panel aynası |
 | `test_k3p_distractors.js` | K3P-01 | B-01: 109 ders yeni ve yerleşik kullanıcıyla oynatılır; şıklar tekil (dizmede sıra numarasıyla), çeldirici lemma tekil ve hedeften farklı, şık sayısı korunur; iki yönlü kart çifti birim vakası; `--taban-yaz` ile çiftsiz görevlerin kararlılık karşılaştırması |
 | `test_k3p_feedback_copy.js` | K3P-02 | B-02/B-05 (K-C): gerçek derslerde doğru panelde geri alma yok ve gövde "Doğru" demiyor; yanlışta geri alma "Yanlışlıkla dokundum"; özette "tamamlandı" bir kez, başlık yalnız ders adı |
+| `test_k3p_deney_rapor.js` | K3P-05 | Deney raporu (KARARLAR §6, AKIS §7): `--ornek` çıktısında H2/H3/H5/H7/H8/H9 satırları, Arapça/kart-ders kimliği/sır yok; sentetik örnekte elle hesaplanan değerler; izdüşüm yalnız izinli alanlar; gunluk sarmalı, `--bugun` sınırı ve hata yolları (exit 2) |
 
 K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (55 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
 

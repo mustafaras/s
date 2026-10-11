@@ -73,7 +73,7 @@ aydınlanan anlamla** ölçülür.
 
 ## Araçlar
 
-Hepsi salt-okurdur ve ağsız `node:vm` içinde çalışır.
+Hepsi salt-okurdur ve ağsızdır; uygulamayı koşanlar `node:vm` içinde çalışır. `cift-sik` ve `okunus-denetim` K3P-05'ten beri `tools/kapi/kapilar.sh` içinde de kapıdır.
 
 | Komut | Ne yapar |
 | --- | --- |
@@ -81,6 +81,7 @@ Hepsi salt-okurdur ve ağsız `node:vm` içinde çalışır.
 | `node kao3-premium/araclar/okunus-denetim.cjs` | Vasl ve şemsî okunuş taraması (B-03); bulgu varsa exit 1 |
 | `node kao3-premium/araclar/dokunus-olc.cjs [ders]` | Ders başına dokunuş, otomatik geçiş kapalı ve açık (K-C, H1) |
 | `node kao3-premium/araclar/akis-olc.cjs [ders]` | Akış: açılıştan ilk soruya, ders ritmi, yarıda bırakıp dönme, yanlışlardan sonra uyum |
+| `node kao3-premium/araclar/deney-rapor.cjs --ornek \| <yedek.json> [--kesim GG] [--bugun GG]` | Deney raporu (KARARLAR §6, AKIS §7): H2, H5, H7, H8, H9 için yalnız toplu sayı; H3 K3P-16 sonrası. Yalnız `cards[*].{s,lapses,reps,state}`, `daily`, `path.lessons[*].{resume,doneAt}` okunur; dosya/ağ yazmaz, kelime/metin/kimlik basmaz. Doğrulama yalnız `--ornek` ile; gerçek yedeği kullanıcı kendisi verir |
 | `node kao3-premium/araclar/senkron.mjs [--sonraki \| --liste \| --prompt ID]` | Anti-amnezi uyumu; sıradaki prompt'un tam metni |
 | `node kao3-premium/araclar/kapi-hizli.mjs --kart ID` | Her prompt'un kapısı: tests/kao, sözleşme fixture'ları, driver, etkin ölçü kapıları |
 | `node kao3-premium/araclar/ekran-dok.cjs "$TMPDIR/kao3-ekran"` | 27 ekranın HTML dökümü ve yoğunluk tablosu |

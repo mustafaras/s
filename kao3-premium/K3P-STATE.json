@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-05",
+  "nextPrompt": "K3P-A1",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -209,7 +209,9 @@
     {
       "id": "K3P-05",
       "wave": 0,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-11",
+      "result": "kapilar.sh: k3p çift şık + k3p okunuş kapıda; deney-rapor.cjs (H2/H5/H7/H8/H9 toplu sayı, H3 K3P-16 sonrası; izdüşüm yalnız izinli alanlar; --ornek grep: Arapça 0, kimlik 0); test_k3p_deney_rapor"
     },
     {
       "id": "K3P-A1",

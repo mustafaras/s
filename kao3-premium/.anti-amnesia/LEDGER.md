@@ -254,3 +254,21 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
     - Aracın öz-test beklentileri yeni geleneğe çekildi.
   - **Kapsam dışı:** Elle yazılmış namaz okunuşları (`kao-content-freeze.mjs` → `PRAYER_READINGS`: tekbir `allahu akbaru`, sübhâneke `subhânaka`…) mekanik düzende kaldı. Fâtiha ise Türk imlâsında; namaz ekranında iki gelenek yan yana görünebilir. Ayrı bir karar gerekiyor.
 - Sıradaki: K3P-05
+
+## seq 14 · K3P-05 · KART
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - `tools/kapi/kapilar.sh` içine iki kapı eklendi: `k3p çift şık` (`cift-sik.cjs`) ve `k3p okunuş` (`okunus-denetim.cjs`).
+  - Yeni araç `kao3-premium/araclar/deney-rapor.cjs` (KARARLAR §6, AKIS §7). Girdi: kullanıcının verdiği JSON yedeği (düz, `data` sarmalı ya da latest.json) veya `--ornek`. Önce yalnız izinli alanlar (`cards[*].{s,lapses,reps,state}`, `daily`, `path.lessons[*].{resume,doneAt}`) kimliksiz bir izdüşüme kopyalanır; hesap yalnız ona bakar. Dosya/ağ yazmaz. Çıktı: H2 (14 gün önce/sonra tekrar doğruluğu, `calib.bands`), H5, H7 (≥ 5 cevaplı günlerde %80–90 bandı), H8 (yarıda kalan ders payı), H9; H3 "K3P-16 sonrası etkin". `--kesim`/`--bugun` seçenekleri; varsayılan kesim son 14 gün.
+  - Yeni test `tests/kao/test_k3p_deney_rapor.js` (README envanterine eklendi; 58 test): sızıntı yemi (Arapça, kimlik biçimli anahtar, sır benzeri ayar) çıktıda 0; sentetik örnekte elle hesaplanan 6 değer; izdüşüm alanları; gunluk sarmalı; `--bugun` sınırı; 6 hata yolu exit 2. Program README araç tablosuna `deney-rapor` satırı eklendi.
+- Ölçüler:
+  - `--ornek` grep: girdi Arapça 40 satır / kimlik 26 → çıktı **0 / 0** (`kanit/K3P-05/grep-kanit.md`, `deney-rapor-ornek.txt`).
+  - Sentetik örnek: H2 %80,0 → %90,8 (52/65 → 59/65) · H5 2 gün · H7 20/26 · H8 2/5 · H9 7/10.
+  - runtime 119,093 KiB (değişmedi; çalışma zamanı koduna dokunulmadı) · içerik 184,591 KiB · çift şık 0 · okunuş hatası 0.
+- Kapı: kapi-hizli 0 · kapilar.sh bu commit için koşulmadı — kullanıcı "en kısa olacak şekilde geçelim ve yayına alalım" dedi; başlatılan tam kapı hızlı kapı yeşil çıktıktan sonra durduruldu. Bu commit hiçbir çalışma zamanı dosyasına dokunmuyor; yayın kaydına (seq 15) bakın.
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem:
+  - **H5 ve H9 yaklaşık ölçü.** `ayahs.understood` tarihsiz ve okuma izni dışında; H5 = ilk çalışma gününden ilk bitirilen derse gün (K-G: ders âyetle kapanır). Yerleştirme adımı (`via:'placement'`) atlanan dersleri aynı `doneAt` ile işaretlediği için aynı zamanlı bitirişler ayıklanır. H9 = tekrara geçmiş (`review`/`relearning`, reps ≥ 2) kartlarda hiç unutulmamış payı; ilk tekrar doğruluğunun alt sınırı. Kesin ölçü tarihli kayıt ister; bu bir veri şeması kararıdır (§5), kullanıcıya bırakıldı.
+  - H8'in "30 gün önce/sonra" karşılaştırması iki tarihli rapor arasında yapılır (K3P-27 takvimi: 14. ve 30. gün); izinli alanlarda yarıda kalan dersin tarihi yok.
+- Sıradaki: K3P-A1

@@ -1,0 +1,13 @@
+K3P deney raporu · yalnız toplu sayılar (kelime, metin ve kimlik yok)
+kaynak: sentetik örnek (--ornek) · bugün 2026-02-28 · kesim 2026-02-15 (varsayılan: son 14 gün)
+
+| # | Ölçü | Değer | Hedef | Durum |
+| --- | --- | --- | --- | --- |
+| H2 | Tekrar doğruluğu, kesimden 14 gün önce/sonra | önce %80,0 (n=65) · sonra %90,8 (n=65) · fark +10,8 puan | düşüş ≤ 5 puan | tutuyor |
+| H3 | Merdiven (A) ve tanıma (B) kolları | K3P-16 sonrası etkin | A > B | — |
+| H5 | İlk çalışma gününden ilk bitirilen derse (K-G: ders âyetle kapanır) | 2 gün | azalır | 14. ve 30. gün raporuyla karşılaştır |
+| H7 | Günlük başarı %80–90 bandında (≥ 5 cevaplı gün) | 20/26 gün bantta (%76,9) · kesimden sonra 7/13 | günlerin ≥ %70'i | tutuyor |
+| H8 | Yarıda kalan ders payı (resume dolu, doneAt boş) | 2/5 ders yarıda (%40,0) | azalır | 14. ve 30. gün raporuyla karşılaştır |
+| H9 | İlk tekrar doğruluğu, yaklaşık alt sınır (tekrara geçmiş kartlar) | 7/10 kart hiç unutulmadı (%70,0) | artar | 14. ve 30. gün raporuyla karşılaştır |
+
+Genel: 14 kart (new 0 · learning 4 · review 10 · relearning 0) · ortalama s 10,4 gün · en az bir kez unutulan %21,4

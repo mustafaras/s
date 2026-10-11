@@ -196,8 +196,8 @@ assert.deepEqual(JSON.parse(JSON.stringify(migrated.phonics)), { style: 'muallim
   assert.deepEqual(Array.from(silentViolations, ([ar, reading]) => ar + ' => ' + reading), [], 'Uthmani ۟ işaretli elif okunmaz');
   assert.equal(readings.filter(([, reading]) => /ûâ(?=\s|$)/.test(reading)).length, 0);
   const byId = new Map(surahs.words.map((word) => [word.id, word.pronunciation]));
-  // K3P-04 (K-A): 110:1 ve 100:2 son kelimeleri âyet sonu vakfıyla okunur (val-fath, kadhâ); ikililer (th/dh) korunur.
-  assert.deepEqual(['s-110-1-5', 's-110-2-3', 's-105-1-6', 's-98-4-10', 's-100-2-2', 's-98-5-4'].map((id) => byId.get(id)), ['val-fath', 'yadhulûna', 'bi-ashâbi', "câ'athumu", 'kadhâ', 'li-yaʿbudû'], 'iki harfli (th/dh/sh/kh) yeniden yazım bozulması yok');
+  // K3P-04 (K-A): 110:1 ve 100:2 son kelimeleri âyet sonu vakfıyla okunur; K3P-04B: Türk alfabesi (e/ü). İkililer (th/dh) korunur.
+  assert.deepEqual(['s-110-1-5', 's-110-2-3', 's-105-1-6', 's-98-4-10', 's-100-2-2', 's-98-5-4'].map((id) => byId.get(id)), ['vel-feth', 'yedhulûne', 'bi-ashâbi', "câ'ethümü", 'kadhâ', 'li-yeʿbüdû'], 'iki harfli (th/dh/sh/kh) yeniden yazım bozulması yok');
   assert.equal(grammar.unit11.roots.find((root) => root.root === 'دخل').pronunciation, 'd–h–l');
   const freezeSource = fs.readFileSync(path.join(repoRoot, 'tools/kao-content-freeze.mjs'), 'utf8');
   assert.doesNotMatch(freezeSource, /replace\(\/th\/g|replace\(\/sh\/g|replace\(\/dh\/g|replace\(\/kh\/g/, 'Türkçe okunuşa ikinci kez digraf dönüşümü uygulanmaz');

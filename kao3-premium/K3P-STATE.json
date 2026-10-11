@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-04B",
+  "nextPrompt": "K3P-05",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -149,7 +149,7 @@
     "K-N": "decided: Kaldığın yerden · n/N görünür devam",
     "K-O": "decided: oturum seçilen dakikaya sığar; taşan tekrarlar en düşük R önce ertesi güne",
     "K-P": "decided (K3P-01, kullanıcı kararı bana bıraktı): pin tazeliği (D3F-10) yayın anının özelliğidir; yayın yalnız main. Program dalında pinli dosya değişirse pinDeferral.files listesine yazılır, test orada ERTELENDİ der; main ve başka dallarda tam katı. K3P-27 pinleri yükseltir ve listeyi boşaltır.",
-    "K-A2": "scheduled (kullanıcı 2026-10-10 \"Tam Türkçe imlâ (ayrı kart)\"; 2026-10-11 sıra: K3P-05'ten hemen önce): kart K3P-04B. K3P-04 mekanik düzeni (fetha = a, غ = g) korudu. Gelenek tablosu ve istağfera/istağfara seçimi K3P-04B'nin ilk adımında kullanıcıdan alınır; yalnız aracın tr tablosu değişir, veri şeması ve dia katmanı aynı kalır."
+    "K-A2": "decided (K3P-04B, kullanıcı kararı 2026-10-11): Diyanet tam tablosu — غ → ğ; kısa ünlü taşıyan harfe göre (kalın خ ص ض غ ط ق ظ: a/ı/u; fethada ayrıca ر ح ع, ötrede ر); kalın harften önceki fetha/ötre ve sakin ر öncesi kalın; harf-i tarif el-/er-; lafza-i celâl kalın. ٱسْتَغْفَرَ → istağfera (K-A ile aynı). İlk soruda ajan çerçeve hatası yaptı (istağfara dedi); düzeltilmiş soruda kullanıcı istağfera seçti. Yalnız tr katmanı değişti; dia ve veri şeması aynı."
   },
   "hypotheses": [
     "H1",
@@ -202,7 +202,9 @@
     {
       "id": "K3P-04B",
       "wave": 0,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-11",
+      "result": "Türk alfabesi okunuşu (Diyanet tablosu, istağfera, er-rahmân); 341 lemma başlığı, 1.553 örnek, 373 gramer, 471 sûre okunuşu; okunuş dışı fark 0; dia aynı"
     },
     {
       "id": "K3P-05",

@@ -2353,7 +2353,7 @@
                   "resolved": {
                     "lemmaId": "l_lam_7f1b55",
                     "ar": "لَم",
-                    "translit": "lam",
+                    "translit": "lem",
                     "tr1": "-madı, -medi",
                     "rootBw": null,
                     "root": null,
@@ -2523,7 +2523,7 @@
             "resolved": {
               "lemmaId": "l_lam_7f1b55",
               "ar": "لَم",
-              "translit": "lam",
+              "translit": "lem",
               "tr1": "-madı, -medi",
               "rootBw": null,
               "root": null,
@@ -2660,7 +2660,7 @@
                   "resolved": {
                     "lemmaId": "l_man_48b676",
                     "ar": "مَن",
-                    "translit": "man",
+                    "translit": "men",
                     "tr1": "kim; o kimse ki",
                     "rootBw": null,
                     "root": null,
@@ -2899,7 +2899,7 @@
                   "resolved": {
                     "lemmaId": "l_an_e1bf35",
                     "ar": "أَنّ",
-                    "translit": "ann",
+                    "translit": "enn",
                     "tr1": "-dığı, ki (şüphesiz)",
                     "rootBw": null,
                     "root": null,
@@ -3887,7 +3887,7 @@
                   "resolved": {
                     "lemmaId": "l_jan_ap_50e4b4",
                     "ar": "جَنَّة",
-                    "translit": "cannet",
+                    "translit": "cennet",
                     "tr1": "bahçe; cennet",
                     "rootBw": "jnn",
                     "root": "جنن",
@@ -3938,7 +3938,7 @@
                   "resolved": {
                     "lemmaId": "l_kalimap_5d4228",
                     "ar": "كَلِمَة",
-                    "translit": "kalimet",
+                    "translit": "kelimet",
                     "tr1": "söz, kelime",
                     "rootBw": "klm",
                     "root": "كلم",
@@ -3955,7 +3955,7 @@
                   "resolved": {
                     "lemmaId": "l_um_ap_e71e1a",
                     "ar": "أُمَّة",
-                    "translit": "ummet",
+                    "translit": "ümmet",
                     "tr1": "topluluk, ümmet",
                     "rootBw": "Amm",
                     "root": "امم",
@@ -4069,7 +4069,7 @@
             "resolved": {
               "lemmaId": "l_jan_ap_50e4b4",
               "ar": "جَنَّة",
-              "translit": "cannet",
+              "translit": "cennet",
               "tr1": "bahçe; cennet",
               "rootBw": "jnn",
               "root": "جنن",
@@ -4162,7 +4162,7 @@
                   "resolved": {
                     "lemmaId": "l_mu_omin_870b47",
                     "ar": "مُؤْمِن",
-                    "translit": "mu'min",
+                    "translit": "mü'min",
                     "tr1": "inanan, mümin",
                     "rootBw": "Amn",
                     "root": "امن",
@@ -4203,7 +4203,7 @@
                   "resolved": {
                     "lemmaId": "l_jan_ap_50e4b4",
                     "ar": "جَنَّة",
-                    "translit": "cannet",
+                    "translit": "cennet",
                     "tr1": "bahçe; cennet",
                     "rootBw": "jnn",
                     "root": "جنن",
@@ -7115,7 +7115,7 @@
                   "resolved": {
                     "lemmaId": "l_lam_7f1b55",
                     "ar": "لَم",
-                    "translit": "lam",
+                    "translit": "lem",
                     "tr1": "-madı, -medi",
                     "rootBw": null,
                     "root": null,
@@ -7136,7 +7136,7 @@
                   "resolved": {
                     "lemmaId": "l_lan_094a36",
                     "ar": "لَن",
-                    "translit": "lan",
+                    "translit": "len",
                     "tr1": "asla ... -mayacak",
                     "rootBw": null,
                     "root": null,
@@ -7687,7 +7687,7 @@
                   "resolved": {
                     "lemmaId": "l_ay_uhaA_a494bb",
                     "ar": "أَيُّهَا",
-                    "translit": "ayyuhâ",
+                    "translit": "eyyühâ",
                     "tr1": "ey (seslenme)",
                     "rootBw": null,
                     "root": null,
@@ -8111,7 +8111,7 @@
                   "resolved": {
                     "lemmaId": "l_m_urosal_fc2a88",
                     "ar": "مُّرْسَل",
-                    "translit": "mursal",
+                    "translit": "mursel",
                     "tr1": "gönderilmiş elçi",
                     "rootBw": "rsl",
                     "root": "رسل",
@@ -8235,7 +8235,7 @@
             {
               "lemmaId": "l_Ealima_ceb6d7",
               "ar": "عَلِمَ",
-              "translit": "ʿalima",
+              "translit": "ʿalime",
               "tr1": "bildi",
               "rootBw": "Elm",
               "root": "علم",
@@ -8265,7 +8265,7 @@
             {
               "lemmaId": "l_Ealima_ceb6d7",
               "ar": "عَلِمَ",
-              "translit": "ʿalima",
+              "translit": "ʿalime",
               "tr1": "bildi",
               "rootBw": "Elm",
               "root": "علم",
@@ -8372,7 +8372,7 @@
                   "resolved": {
                     "lemmaId": "l_Ealima_ceb6d7",
                     "ar": "عَلِمَ",
-                    "translit": "ʿalima",
+                    "translit": "ʿalime",
                     "tr1": "bildi",
                     "rootBw": "Elm",
                     "root": "علم",
@@ -8401,7 +8401,7 @@
                   "resolved": {
                     "lemmaId": "l_akara_67cfbf",
                     "ar": "ذَكَرَ",
-                    "translit": "zakara",
+                    "translit": "zekera",
                     "tr1": "andı, hatırladı",
                     "rootBw": "*kr",
                     "root": "ذكر",
@@ -8430,7 +8430,7 @@
                   "resolved": {
                     "lemmaId": "l_kafara_af1746",
                     "ar": "كَفَرَ",
-                    "translit": "kafara",
+                    "translit": "kefera",
                     "tr1": "inkâr etti",
                     "rootBw": "kfr",
                     "root": "كفر",
@@ -8442,7 +8442,7 @@
                   "resolved": {
                     "lemmaId": "l_kufor_1c9ee6",
                     "ar": "كُفْر",
-                    "translit": "kufr",
+                    "translit": "küfr",
                     "tr1": "inkâr",
                     "rootBw": "kfr",
                     "root": "كفر",
@@ -8459,7 +8459,7 @@
                   "resolved": {
                     "lemmaId": "l_aAmana_966a5c",
                     "ar": "ءَامَنَ",
-                    "translit": "âmana",
+                    "translit": "âmene",
                     "tr1": "iman etti, inandı",
                     "rootBw": "Amn",
                     "root": "امن",
@@ -8488,7 +8488,7 @@
                   "resolved": {
                     "lemmaId": "l_r_aHima_870005",
                     "ar": "رَّحِمَ",
-                    "translit": "rahima",
+                    "translit": "rahime",
                     "tr1": "merhamet etti, acıdı",
                     "rootBw": "rHm",
                     "root": "رحم",
@@ -8632,7 +8632,7 @@
             {
               "lemmaId": "l_Ealima_ceb6d7",
               "ar": "عَلِمَ",
-              "translit": "ʿalima",
+              "translit": "ʿalime",
               "tr1": "bildi",
               "rootBw": "Elm",
               "root": "علم",
@@ -8650,7 +8650,7 @@
             {
               "lemmaId": "l_Eal_ama_5c04b6",
               "ar": "عَلَّمَ",
-              "translit": "ʿallama",
+              "translit": "ʿalleme",
               "tr1": "öğretti",
               "rootBw": "Elm",
               "root": "علم",
@@ -8730,7 +8730,7 @@
                   "resolved": {
                     "lemmaId": "l_Ealima_ceb6d7",
                     "ar": "عَلِمَ",
-                    "translit": "ʿalima",
+                    "translit": "ʿalime",
                     "tr1": "bildi",
                     "rootBw": "Elm",
                     "root": "علم",
@@ -8742,7 +8742,7 @@
                   "resolved": {
                     "lemmaId": "l_Eal_ama_5c04b6",
                     "ar": "عَلَّمَ",
-                    "translit": "ʿallama",
+                    "translit": "ʿalleme",
                     "tr1": "öğretti",
                     "rootBw": "Elm",
                     "root": "علم",
@@ -8785,7 +8785,7 @@
                   "resolved": {
                     "lemmaId": "l_anzala_adebf9",
                     "ar": "أَنزَلَ",
-                    "translit": "anzala",
+                    "translit": "enzele",
                     "tr1": "indirdi",
                     "rootBw": "nzl",
                     "root": "نزل",
@@ -8806,7 +8806,7 @@
                   "resolved": {
                     "lemmaId": "l_gafara_e47aae",
                     "ar": "غَفَرَ",
-                    "translit": "gafara",
+                    "translit": "ğafera",
                     "tr1": "bağışladı, örttü",
                     "rootBw": "gfr",
                     "root": "غفر",
@@ -8818,7 +8818,7 @@
                   "resolved": {
                     "lemmaId": "l_sotagofara_863081",
                     "ar": "ٱسْتَغْفَرَ",
-                    "translit": "istagfara",
+                    "translit": "istağfera",
                     "tr1": "bağışlanma diledi",
                     "rootBw": "gfr",
                     "root": "غفر",
@@ -8839,7 +8839,7 @@
                   "resolved": {
                     "lemmaId": "l_amina_0a79a6",
                     "ar": "أَمِنَ",
-                    "translit": "amina",
+                    "translit": "emine",
                     "tr1": "güvende oldu, emin oldu",
                     "rootBw": "Amn",
                     "root": "امن",
@@ -8851,7 +8851,7 @@
                   "resolved": {
                     "lemmaId": "l_aAmana_966a5c",
                     "ar": "ءَامَنَ",
-                    "translit": "âmana",
+                    "translit": "âmene",
                     "tr1": "iman etti, inandı",
                     "rootBw": "Amn",
                     "root": "امن",
@@ -8894,7 +8894,7 @@
                   "resolved": {
                     "lemmaId": "l_ka_aba_15a65b",
                     "ar": "كَذَّبَ",
-                    "translit": "kazzaba",
+                    "translit": "kezzebe",
                     "tr1": "yalanladı",
                     "rootBw": "k*b",
                     "root": "كذب",
@@ -8915,7 +8915,7 @@
                   "resolved": {
                     "lemmaId": "l_akara_67cfbf",
                     "ar": "ذَكَرَ",
-                    "translit": "zakara",
+                    "translit": "zekera",
                     "tr1": "andı, hatırladı",
                     "rootBw": "*kr",
                     "root": "ذكر",
@@ -8927,7 +8927,7 @@
                   "resolved": {
                     "lemmaId": "l_ta_ak_ara_901fef",
                     "ar": "تَذَكَّرَ",
-                    "translit": "tazakkara",
+                    "translit": "tezekkera",
                     "tr1": "düşünüp öğüt aldı",
                     "rootBw": "*kr",
                     "root": "ذكر",
@@ -9030,7 +9030,7 @@
             {
               "lemmaId": "l_gafara_e47aae",
               "ar": "غَفَرَ",
-              "translit": "gafara",
+              "translit": "ğafera",
               "tr1": "bağışladı, örttü",
               "rootBw": "gfr",
               "root": "غفر",
@@ -9039,7 +9039,7 @@
             {
               "lemmaId": "l_sotagofara_863081",
               "ar": "ٱسْتَغْفَرَ",
-              "translit": "istagfara",
+              "translit": "istağfera",
               "tr1": "bağışlanma diledi",
               "rootBw": "gfr",
               "root": "غفر",
@@ -9048,7 +9048,7 @@
             {
               "lemmaId": "l_gafuwr_926fa2",
               "ar": "غَفُور",
-              "translit": "gafûr",
+              "translit": "ğafûr",
               "tr1": "çok bağışlayan",
               "rootBw": "gfr",
               "root": "غفر",
@@ -9096,7 +9096,7 @@
             {
               "lemmaId": "l_Ealima_ceb6d7",
               "ar": "عَلِمَ",
-              "translit": "ʿalima",
+              "translit": "ʿalime",
               "tr1": "bildi",
               "rootBw": "Elm",
               "root": "علم",
@@ -9105,7 +9105,7 @@
             {
               "lemmaId": "l_kafara_af1746",
               "ar": "كَفَرَ",
-              "translit": "kafara",
+              "translit": "kefera",
               "tr1": "inkâr etti",
               "rootBw": "kfr",
               "root": "كفر",
@@ -9114,7 +9114,7 @@
             {
               "lemmaId": "l_akara_67cfbf",
               "ar": "ذَكَرَ",
-              "translit": "zakara",
+              "translit": "zekera",
               "tr1": "andı, hatırladı",
               "rootBw": "*kr",
               "root": "ذكر",
@@ -9130,7 +9130,7 @@
             "resolved": {
               "lemmaId": "l_sotagofara_863081",
               "ar": "ٱسْتَغْفَرَ",
-              "translit": "istagfara",
+              "translit": "istağfera",
               "tr1": "bağışlanma diledi",
               "rootBw": "gfr",
               "root": "غفر",
@@ -9235,7 +9235,7 @@
                   "resolved": {
                     "lemmaId": "l_law_8f1f74",
                     "ar": "لَو",
-                    "translit": "lav",
+                    "translit": "lev",
                     "tr1": "-se, -sa (gerçekleşmemiş)",
                     "rootBw": null,
                     "root": null,
@@ -9256,7 +9256,7 @@
                   "resolved": {
                     "lemmaId": "l_lawolaA_b76376",
                     "ar": "لَوْلَآ",
-                    "translit": "lavlâ",
+                    "translit": "levlâ",
                     "tr1": "-mese idi",
                     "rootBw": null,
                     "root": null,
@@ -9277,7 +9277,7 @@
                   "resolved": {
                     "lemmaId": "l_lam_aA_c2bb4a",
                     "ar": "لَمَّا",
-                    "translit": "lammâ",
+                    "translit": "lemmâ",
                     "tr1": "-ınca, -dığında",
                     "rootBw": null,
                     "root": null,
@@ -9491,7 +9491,7 @@
                   "resolved": {
                     "lemmaId": "l_kaAna_febd3a",
                     "ar": "كَانَ",
-                    "translit": "kâna",
+                    "translit": "kâne",
                     "tr1": "oldu, idi",
                     "rootBw": "kwn",
                     "root": "كون",
@@ -9512,7 +9512,7 @@
                   "resolved": {
                     "lemmaId": "l_l_ayosa_5684fc",
                     "ar": "لَّيْسَ",
-                    "translit": "laysa",
+                    "translit": "leyse",
                     "tr1": "değildir",
                     "rootBw": "lys",
                     "root": "ليس",
@@ -9559,7 +9559,7 @@
                   "resolved": {
                     "lemmaId": "l_aSobaHa_69bc2c",
                     "ar": "أَصْبَحَ",
-                    "translit": "asbaha",
+                    "translit": "asbeha",
                     "tr1": "sabahladı; hâline geldi",
                     "rootBw": "SbH",
                     "root": "صبح",

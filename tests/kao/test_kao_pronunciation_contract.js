@@ -53,10 +53,11 @@ for (const concept of grammar.concepts) {
 }
 const conjugationCells = grammar.byId('g13').tables[0].rows.flatMap((row) => row.cells).filter(Array.isArray);
 const pronunciationOf = (arabic) => (conjugationCells.find((cell) => cell[1] === arabic) || [])[2];
-assert.equal(pronunciationOf('فَعَلَ'), 'faʿala');
-assert.equal(pronunciationOf('فَعَلْتَ'), 'faʿalta');
-assert.equal(pronunciationOf('كَسَبَا'), 'kasabâ');
-assert.equal(pronunciationOf('خَتَمَ'), 'hatama');
+// K3P-04B (K-A2): Türk alfabesi geleneği — fetha ince harfte e, kalın harfte (ع, خ) a: feʿale, hateme.
+assert.equal(pronunciationOf('فَعَلَ'), 'feʿale');
+assert.equal(pronunciationOf('فَعَلْتَ'), 'feʿalte');
+assert.equal(pronunciationOf('كَسَبَا'), 'kesebâ');
+assert.equal(pronunciationOf('خَتَمَ'), 'hateme');
 
 const wordTask = api.kaoBuildTask({ id: 'word', cardId: `w:${sandbox.window.QuranLexiconV1.lemmas[0].id}:tr>ar`, type: 'arabic' }, { quranLearn }, { seed: 'pronunciation' });
 for (const choice of wordTask.choices) {
@@ -99,12 +100,12 @@ const failClosedHtml = api.kaoTaskHTML(missingPronunciationTask);
 assert.match(failClosedHtml, /class="kao-content-error" role="alert"/);
 assert.doesNotMatch(failClosedHtml, new RegExp(`class="kao-arabic-text"[^>]*>${arabicChoice.label}`), 'okunuşu eksik Arapça sessizce gösterilmemeli');
 
-// K3P-04 (B-03, K-A): okunuş bağlamdaki telaffuzu yansıtır. Mekanik düzen korunur (fetha = a, غ = g;
-// tam Türkçe imlâ ayrı karar). Kurallar: vasl elifi, şemsî idgâm, cümle içi vasl, âyet sonu vakf.
+// K3P-04 (B-03, K-A): okunuş bağlamdaki telaffuzu yansıtır. Kurallar: vasl elifi, şemsî idgâm, cümle içi vasl,
+// âyet sonu vakf. K3P-04B (K-A2, kullanıcı kararı 2026-10-11): Türk alfabesi — غ → ğ, kalın harfte a/ı/u, incede e/i/ü.
 const lemmaByAr = (ar) => lexicon.lemmas.find((lemma) => lemma.ar === ar);
 assert.equal(lemmaByAr('ٱسْم').translit, 'ism', 'vasl elifi: ٱسْم → ism');
 assert.equal(lemmaByAr('ٱبْن').translit, 'ibn', 'vasl elifi: ٱبْن → ibn');
-assert.equal(lemmaByAr('ٱسْتَغْفَرَ').translit, 'istagfara', 'vasl elifi: ٱسْتَغْفَرَ → istagfara');
+assert.equal(lemmaByAr('ٱسْتَغْفَرَ').translit, 'istağfera', 'vasl elifi + Türk imlâsı: ٱسْتَغْفَرَ → istağfera (K-A)');
 assert.equal(api.kaoDiaReading('ٱسْم'), 'ism', 'DİA katmanı da vasl elifini i okur (çalışma zamanı)');
 const fatiha = shorts.prayerTexts.find((item) => item.id === 'fatiha').words;
 const besmele = Array.from(fatiha.slice(0, 4), (word) => word.pronunciation); // vm dizisi → ana bağlam
@@ -112,11 +113,14 @@ assert.deepEqual(besmele, ['bismi', 'llâhi', 'r-rahmâni', 'r-rahîm'], 'Fâtih
 assert.equal(besmele.join('-'), 'bismi-llâhi-r-rahmâni-r-rahîm');
 const besmeleExample = lexicon.lemmas.flatMap((lemma) => lemma.examples).find((example) => example.ref === '1:1' && example.ar.startsWith('بِسْمِ'));
 assert.equal(besmeleExample.pronunciation, 'bismi llâhi r-rahmâni r-rahîm', 'sözlük örneği: 1:1 bağlamda okunur');
-assert.equal(fatiha[4].pronunciation, 'al-hamdu', 'âyet başı (vakftan sonra) harf-i tarif ünlüsüyle başlar');
-assert.deepEqual(Array.from(shorts.words.filter((word) => word.surahId === 112 && word.ayah === 1), (word) => word.pronunciation), ['kul', 'huva', 'llâhu', 'ahad'], 'âyet sonu vakf: ahadun → ahad');
+assert.equal(fatiha[4].pronunciation, 'el-hamdü', 'âyet başı (vakftan sonra) harf-i tarif ünlüsüyle başlar');
+assert.equal(fatiha[8].pronunciation, 'er-rahmâni', 'K-A: harf-i tarif + güneş harfi er- (1:3)');
+assert.deepEqual(Array.from(fatiha.slice(17, 20), (word) => word.pronunciation), ['ihdinâ', 's-sırâta', 'l-müstakîm'], 'kalın harfte ı, kalın harf öncesi a, incede ü (1:6)');
+assert.deepEqual(Array.from(fatiha.slice(24, 26), (word) => word.pronunciation), ['ğayri', 'l-mağdûbi'], 'غ → ğ (1:7)');
+assert.deepEqual(Array.from(shorts.words.filter((word) => word.surahId === 112 && word.ayah === 1), (word) => word.pronunciation), ['kul', 'hüve', 'llâhü', 'ehad'], 'âyet sonu vakf: ehadün → ehad');
 // okunus-denetim.cjs mantığı: vasl elifi 'a' ile okunan lemma 0, idgâmsız güneş harfi 0 (her okunuş yüzeyinde).
-const SUN_UNASSIMILATED = /\bal-(t|s̱|d|ẕ|r|z|s|ş|ṣ|ḍ|ṭ|ẓ|l|n)/;
-const waslAsA = lexicon.lemmas.filter((lemma) => /^ٱ/.test(lemma.ar) && !/^ٱل/.test(lemma.ar) && /^a/.test(lemma.translit));
+const SUN_UNASSIMILATED = /\b[ae]l-(t|s̱|d|ẕ|r|z|s|ş|ṣ|ḍ|ṭ|ẓ|l|n)/;
+const waslAsA = lexicon.lemmas.filter((lemma) => /^ٱ/.test(lemma.ar) && !/^ٱل/.test(lemma.ar) && /^[ae]/.test(lemma.translit));
 assert.deepEqual(Array.from(waslAsA, (lemma) => `${lemma.ar}=${lemma.translit}`), [], 'vasl elifi a ile okunmaz');
 const readings = [
   ...lexicon.lemmas.flatMap((lemma) => lemma.examples.map((example) => example.pronunciation)),

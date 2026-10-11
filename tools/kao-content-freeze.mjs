@@ -14,9 +14,9 @@ const DIANET_NAMAZ = 'https://dijital.diyanet.gov.tr/File/Download?id=4218&path=
 
 const JSON_SHA256 = Object.freeze({
   'lexicon.reference.json': '2ee7ca3d011a4fef232bffb407fac9f079ebb9b66baca5475b1a783617ed8ef6',
-  'grammar.verified.json': '425017b56608bfc25c303776b34b4cea9f2db821b13d39a639bab6b394efe46c',
+  'grammar.verified.json': '02ecb51d153607211c9c65483f6af161104d7b5c5bd977adae90428dccc0fb53',
   'phonics.verified.json': '895d4d5a58aa5d457cf38d8ebffb5843bce07c896f8c7afaeb00ebf147b23384',
-  'lexicon.verified.json': '00097310cdc95fe2afe333c7f177cbef6231c8d57d9588e96c8db167b9ccf572',
+  'lexicon.verified.json': '134490be528038c029186a9443773b7b2e6b0c929a4db24b41f7b56c5d160bd9',
   'surahs.verified.json': '83194a3c90ef1fc43e61666305a22c2a7bfc87e3780045c3651d4e089127a6e3'
 });
 function readJson(file) {

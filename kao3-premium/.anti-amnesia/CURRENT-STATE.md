@@ -2,13 +2,13 @@
 
 <!-- Bu dosya her prompt'un kapanışında BAŞTAN yazılır (BAGLAM-YONETIMI §3). Başlıkları silme; senkron.mjs okur. -->
 
-Sıradaki prompt: K3P-04B
+Sıradaki prompt: K3P-05
 
 ## Son durum
 
 - **Tarih:** 2026-10-10
-- **Son tamamlanan:** K3P-04. Okunuş motoru bağlamda okuyor: vasl elifi (ism, ibn, istagfara), şemsî idgâm (ar-rahmân), cümle içi vasl (bismi llâhi r-rahmâni r-rahîm), âyet sonu vakf, lafza-i celâl (allâh). Mekanik düzen korundu; tam Türkçe imlâ açık karar K-A2. Önce: K3P-03 (süre tabanı), K3P-02, K3P-01 ve ara yayın `20261010a`.
-- **Dal:** `kao3-premium`. `main` = ara yayın `b3c97d67` (K3P-01 dahil); K3P-02…K3P-04 yalnız dalda, push yok.
+- **Son tamamlanan:** K3P-04B. Okunuş Türk alfabesiyle (K-A2, Diyanet tablosu): `el-hamdü lillâhi rabbi l-ʿâlemîn`, `ihdinâ s-sırâta l-müstakîm`, `istağfera`, `er-rahmân`. Önce: K3P-04 (bağlam okunuşu), K3P-03, K3P-02, K3P-01 ve ara yayın `20261010a`.
+- **Dal:** `kao3-premium`. `main` = ara yayın `b3c97d67` (K3P-01 dahil); K3P-02…K3P-04B yalnız dalda, push yok.
 - **Yeni oturum:** `kao3-premium/STARTER.md` içindeki metni yapıştır.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yalnız K3P-00 "önce" çizgisi · cihaz yok.
 
@@ -35,8 +35,8 @@ Sıradaki prompt: K3P-04B
 - **Yavaş testler:** `test_kao2_kabul` (~230–530 sn), `test_kao2_grammar_tasks` (~170–290 sn), `test_kao2_denetim` (~35–50 sn) hızlı kapıda varsayılan olarak atlanır.
 - **Tam kapı** `bash tools/kapi/kapilar.sh` 10 dakikadan uzun sürer; yalnız dalga sonlarında (`waveEnd`, sıradaki K3P-05) koşar.
 - **Okunuş kapısı zorunlu (K3P-04'ten beri):** `okunus-denetim.cjs` exit 0 olmalı. Okunuş kuralı değişirse sıra: `node tools/kao-lexicon-build.mjs --retranslit` → `--freeze` → `kao-content-freeze --freeze-grammar/--freeze-surahs` → `node tools/kao2-curriculum-build.mjs` → `node tools/kao2-lemma-morph-build.mjs --write`; ardından `kao-content-freeze.mjs` JSON pinleri. `test_kao_pronunciation_contract` araç↔girdi↔çalışma zamanı sapmasını yakalar.
-- **K-A2 → K3P-04B (sıradaki):** Tam Türkçe imlâ (غ → ğ, kalın/ince ünlü, `el-`/`er-`). Kullanıcı 2026-10-11'de K3P-05'ten önceye koydu. İlk adım gelenek tablosunu ve istağfera/istağfara seçimini kullanıcıya onaylatmak; onaysız kod yazılmaz.
-- **L2 önerisi:** Okunuşu değişen 19 lemma başlığı ve 479 lemmanın örnek okunuşu kıraat hocası incelemesi bekliyor: `kao3-premium/kanit/K3P-04/okunus-degisen.md`.
+- **Okunuş imlâsı (K-A2, K3P-04B ile kapandı):** `tr` katmanı Türk alfabesiyle (Diyanet tablosu: ğ, a/ı/u – e/i/ü, el-/er-, istağfera). `dia` DİA düzeninde. Elle yazılmış namaz okunuşları (`PRAYER_READINGS`: tekbir, sübhâneke…) mekanik düzende kaldı; aynı ekranda iki gelenek görünebilir — ayrı karar.
+- **L2 önerisi:** Okunuş kıraat hocası incelemesi bekliyor: K3P-04 (19 başlık, 479 lemmanın örnekleri) ve K3P-04B (341 başlık, 524 lemmanın 1.553 örneği) — `kao3-premium/kanit/K3P-04/` ve `K3P-04B/okunus-degisen.md`.
 - **Dizme görevi ölçütü:** Çift şık ölçümünde dizme görevleri sıra numarasıyla (`ordinal`) ölçülür; âyette tekrar eden sözcük meşrudur (D2F-03, kullanıcı kararı K3P-01).
 - **Görsel QA Chrome yolu:** `tools/kapi/gorsel-qa/cdp.mjs` varsayılanı (ms-playwright chromium-1243) bu makinede yok. K3P-26'da `KAO_QA_CHROME="$HOME/Library/Caches/ms-playwright/chromium-1247/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"` ver.
 - Kaynakçadaki atıflar çevrimiçi doğrulanmadı. Yazı tipi alt kümesinin boyutu henüz ölçülmedi.

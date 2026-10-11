@@ -214,3 +214,43 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: plan
 - Gözlem: Dalga 0 artık 7 kart; tam kapı K3P-05'te K3P-04B'yi de kapsar.
 - Sıradaki: K3P-04B
+
+## seq 13 · K3P-04B · KART
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - **Karar adımı (kod yazılmadan önce):** Kullanıcı "Diyanet tam tablo" seçti.
+  - **Çerçeve hatası ve düzeltmesi:** İkinci soruda ajan yanlış bir çerçeve kurdu ve "K-A `istağfera` yazıyor, ر tefhîmi `istağfara` verir" dedi. Oysa kelime is-tağ-fe-**ra** ve K-A son heceyi zaten kalın yazıyor. Kullanıcı önce `istağfara` seçti. Tablo uygulanınca hata görüldü, soru düzeltilerek yeniden soruldu, kullanıcı `istağfera` seçti. Karar `decisions.K-A2` = decided.
+  - **Araç:** `tools/kao-lexicon-build.mjs` içinde yalnız `tr` katmanı için yeni tablolar: `TR_THICK_LETTERS` (خ ص ض غ ط ق ظ), `TR_THICK_FATHA` (+ ر ح ع), `TR_THICK_DAMMA` (+ ر), `TR_HARAKE`, `trVowelFor(carrier, harake, following, followingVowel)`. Kurallar:
+    - غ → ğ
+    - kısa ünlü taşıyan harfe göre a/ı/u ya da e/i/ü; tenvin de buna uyar
+    - kalın harften önceki fetha/ötre kalın (mağdûbi, müstakîm, istağfera)
+    - sakin ر öncesi kalın (ardı, kurân); harekeli ر yalnız kendi ünlüsünü etkiler (ğafera)
+    - harf-i tarif `el-`/`er-` (lafza-i celâl kalın: allâh)
+    - yardımcı ünlü min → e, cem mîmi → ü
+  - `dia` katmanı ve çalışma zamanı `kaoDiaReading` değişmedi (araç↔girdi↔çalışma zamanı 524/524).
+  - Ara düzeltmeler: lafza denetimi uzun â eklenmiş biçimi tanımıyordu (`ellâhü`), `isLafzatullahBw` düzeltildi; `ر` kuralı önce fazla genişti (`ğafara`), sakin ر ile sınırlandı.
+  - Yeniden üretim K3P-04 sırasıyla yapıldı: `--retranslit` → `--freeze` → `--freeze-grammar/--freeze-surahs/--freeze-phonics` → `kao2-curriculum-build` → `kao2-lemma-morph-build --write`. Ardından `kao-content-freeze.mjs` JSON pinleri güncellendi. `okunus-denetim.cjs` vasl ve idgâm desenleri `[ae]l-` ve `^[ae]` olarak genişletildi.
+- Ölçüler:
+  - Önce/sonra JSON farkında (taban K3P-04 `084eb2fe`) **okunuş dışında değişen alan 0**:
+    - sözlük 1.894 (341 başlık + 1.553 örnek)
+    - gramer 373
+    - kısa sûreler 471
+    - müfredat 4
+    - `MUFREDAT-ESLEME.md` 367 satır
+    - girdi JSON'larında yalnız `"tr"` satırları (sözlük 341, gramer kopyası 47; bayat kopya 0/85)
+    - `dia` 0 değişiklik
+  - okunus-denetim 0.
+  - Boyut: sözlük 323.248 → 325.858 B · gramer 72.107 → 72.297 B · kısa sûreler 87.161 → 87.335 B · harf bilgisi bayt-eş · içerik 184,591 KiB (≤ 256) · runtime 119,093 KiB (değişmedi).
+  - ekran-dok `v-word` başlığı `ism`.
+- Okunuşu değişen lemmalar (L2 önerilir): 341 başlık ve 524 lemmanın 1.553 örneği. Tam liste `kao3-premium/kanit/K3P-04B/okunus-degisen.md`.
+- Kapı: kapi-hizli --yavas 0 (kabul 341,6 sn, grammar_tasks 164,2 sn, denetim 29,6 sn PASS) · kapilar.sh koşulmadı (dalga sonu K3P-05)
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem:
+  - **Test güncellemeleri (gelenek değişikliği, gevşetme değil):**
+    - `test_kao_pronunciation_contract`: K3P-04 beklentileri ve gramer çekim sabitleri güncellendi (`faʿala` → `feʿale`, `faʿalta` → `feʿalte`, `kasabâ` → `kesebâ`, `hatama` → `hateme`). ğ, ı ve ü için Fâtiha örnekleri eklendi.
+    - `test_kao_phonics_contract`: th/dh ikilisi sabitleri (`vel-feth`, `yedhulûne`, `câ'ethümü`, `li-yeʿbüdû`) güncellendi; ikililer korunuyor.
+    - `test_kao2_lemma_morph`: lemmaları görünen okunuşla arıyordu, artık değişmeyen `lemmaId` ile arıyor. Test edilen dilbilgisi gerçekleri aynı.
+    - Aracın öz-test beklentileri yeni geleneğe çekildi.
+  - **Kapsam dışı:** Elle yazılmış namaz okunuşları (`kao-content-freeze.mjs` → `PRAYER_READINGS`: tekbir `allahu akbaru`, sübhâneke `subhânaka`…) mekanik düzende kaldı. Fâtiha ise Türk imlâsında; namaz ekranında iki gelenek yan yana görünebilir. Ayrı bir karar gerekiyor.
+- Sıradaki: K3P-05

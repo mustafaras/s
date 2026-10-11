@@ -272,7 +272,7 @@ const TRANSLIT_IGNORE = Object.freeze(new Set(['_', '^', '#', '@', '"', '[', ';'
 const TRANSLIT_TR = Object.freeze({
   "'": '', '|': 'â', '>': '', '&': '', '<': '', '}': '', A: 'â', b: 'b', p: 'e',
   t: 't', v: 's', j: 'c', H: 'h', x: 'h', d: 'd', '*': 'z', r: 'r', z: 'z', s: 's',
-  '$': 'ş', S: 's', D: 'd', T: 't', Z: 'z', E: 'ʿ', g: 'g', f: 'f', q: 'k', k: 'k',
+  '$': 'ş', S: 's', D: 'd', T: 't', Z: 'z', E: 'ʿ', g: 'ğ', f: 'f', q: 'k', k: 'k',
   l: 'l', m: 'm', n: 'n', h: 'h', w: 'v', Y: 'î', y: 'y', F: 'en', N: 'un', K: 'in',
   a: 'a', u: 'u', i: 'i', '`': 'â', '{': 'a'
 });
@@ -314,24 +314,46 @@ const ARTICLE_FORMS = Object.freeze(new Set(['{l', '{lo', 'l', 'lo']));
 // Lafza-i celâl: lâmdan sonraki uzun â Uthmani yazımda görünmez (ٱللَّه → allâh).
 const LAFZATULLAH_LEMMAS = Object.freeze(new Set(['{ll~ah', '{ll~ahum~a']));
 // İki sükûn yan yana gelmez: ünsüzle biten kelimeden sonra vasl gelirse araya yardımcı ünlü girer.
-const HELPER_VOWEL = Object.freeze({ default: 'i', min: 'a', jamMim: 'u' });
+const HELPER_VOWEL = Object.freeze({ default: 'i', min: 'e', jamMim: 'ü' });
 const TR_VOWEL_CHARS = Object.freeze(new Set(['a', 'e', 'i', 'u', 'â', 'î', 'û', 'ı', 'ü']));
+// K3P-04B (K-A2, kullanıcı kararı 2026-10-11 "Diyanet tam tablo", "istağfara"): `tr` katmanı Türk alfabesiyle.
+// Kısa ünlü onu taşıyan harfe göre yazılır: kalın harfte a/ı/u, incede e/i/ü. Uzun ünlüler (â î û) değişmez.
+// Kalın harfler (müsta'liye): خ ص ض غ ط ق ظ. Fethada ayrıca ر ح ع kalındır; ötrede ر kalındır (tefhîm).
+const TR_THICK_LETTERS = Object.freeze(new Set(['x', 'S', 'D', 'g', 'T', 'q', 'Z']));
+const TR_THICK_FATHA = Object.freeze(new Set([...TR_THICK_LETTERS, 'r', 'H', 'E']));
+const TR_THICK_DAMMA = Object.freeze(new Set([...TR_THICK_LETTERS, 'r']));
+const TR_HARAKE = Object.freeze({ a: ['a', 'e'], i: ['ı', 'i'], u: ['u', 'ü'], F: ['an', 'en'], N: ['un', 'ün'], K: ['ın', 'in'] });
+// Harekenin Türkçe yazımı; `carrier` harekeyi taşıyan, `following` ondan sonraki ilk Buckwalter harfidir.
+// Kalın harften hemen önceki fetha/ötre de kalın yazılır (mağdûbi, müstakîm, istağfera); sakin ر da öncesini
+// kalınlaştırır (l-ardı); harekeli ر yalnız kendi ünlüsünü etkiler (ğafera). Kesre yalnız taşıyana bakar.
+// `followingVowel`, `following` harfinden sonraki ilk Buckwalter harfidir (ünlü yoksa harf sakindir).
+const TR_VOWELED_NEXT = Object.freeze(new Set(['a', 'i', 'u', 'F', 'N', 'K', 'A', 'Y', '`']));
+function trVowelFor(carrier, harake, following = null, followingVowel = null) {
+  const before = TR_THICK_LETTERS.has(following) || (following === 'r' && !TR_VOWELED_NEXT.has(followingVowel));
+  const thick = harake === 'a' || harake === 'F' ? TR_THICK_FATHA.has(carrier) || before
+    : harake === 'u' || harake === 'N' ? TR_THICK_DAMMA.has(carrier) || before
+      : TR_THICK_LETTERS.has(carrier);
+  return TR_HARAKE[harake][thick ? 0 : 1];
+}
+function isLafzatullahBw(bw) { return /^\{ll~aA?h/.test(String(bw || '')); }
 
 function isPrefixSegment(segment) { return String(segment.features || '').startsWith('PREFIX|'); }
 function isArticleSegment(segment) {
   return String(segment.features || '').startsWith('PREFIX|Al+') && ARTICLE_FORMS.has(segment.form);
 }
 // Vasl elifinin ibtidâ ünlüsü: harf-i tarif ve lafza (ٱل…) a; fiilde ikinci ünsüz ötreliyse u
-// (ٱسْتُهْزِئَ → ustuhzi'a); geri kalan her durumda i (ٱسْم → ism, ٱبْن → ibn, ٱسْتَغْفَرَ → istagfara).
+// (ٱسْتُهْزِئَ → ustuhzi'a); geri kalan her durumda i (ٱسْم → ism, ٱبْن → ibn, ٱسْتَغْفَرَ → istağfera).
 function waslVowel(bw, isVerb = true) {
   if (/^\{l/.test(bw)) return 'a';
   const match = /^\{([^aiuoFNK~`{])(?:o[^aiuoFNK~`{]|~)([aiu])/.exec(bw);
   return isVerb && match && match[2] === 'u' ? 'u' : 'i';
 }
 // Kelime başındaki vasl elifinin okunuşta yazılan 'a'sını kuralın ünlüsüyle değiştirir.
-function withWaslVowel(bw, reading, isVerb = true) {
+function withWaslVowel(bw, reading, isVerb = true, turkish = false) {
   if (!String(bw).startsWith('{') || !reading.startsWith('a')) return reading;
-  return waslVowel(bw, isVerb) + reading.slice(1);
+  const vowel = waslVowel(bw, isVerb);
+  // Türk imlâsında harf-i tarifli ibtidâ ince (ellezî); lafza-i celâl kalın kalır (allâh).
+  return (turkish && vowel === 'a' && !isLafzatullahBw(bw) ? 'e' : vowel) + reading.slice(1);
 }
 function lafzatullahBw(bw, lemmaBw = bw) {
   return LAFZATULLAH_LEMMAS.has(lemmaBw) ? String(bw).replace('l~ah', 'l~aAh') : bw;
@@ -964,17 +986,24 @@ function draftSelfTest() {
   // 4f · transliterasyon düzeltmeleri (10 §7)
   assert(translitTr('Salaw`p') === 'salât' && translitTr('raHomap') === 'rahmet' && translitTr("'aAyap") === 'âyet',
     'ta marbûta: salât / rahmet / âyet');
-  assert(translitTr('hudFY') === 'huden' && translitTr('>abadFA') === 'abaden', 'tenvin taşıyıcısı okunmamalı');
-  assert(translitTr('>aw') === 'av' && translitTr("$aYo'") === "şay'" && translitTr('>aY~') === 'ayy',
+  // K3P-04B (K-A2): beklentiler Türk alfabesi geleneğiyle (ince harfte e/i/ü); gelenek değişikliği, gevşetme değil.
+  assert(translitTr('hudFY') === 'hüden' && translitTr('>abadFA') === 'ebeden', 'tenvin taşıyıcısı okunmamalı');
+  assert(translitTr('>aw') === 'ev' && translitTr("$aYo'") === "şey'" && translitTr('>aY~') === 'eyy',
     'diftong ve ünsüz ye');
-  assert(translitTr('hadaY') === 'hadâ' && translitTr('fiY') === 'fî', 'elif maksûre fethadan sonra â');
-  assert(translitTr('mu&omin') === "mu'min" && translitTr('>aHad') === 'ahad', 'kelime içi hemze gösterilir, baştaki gösterilmez');
+  assert(translitTr('hadaY') === 'hedâ' && translitTr('fiY') === 'fî', 'elif maksûre fethadan sonra â');
+  assert(translitTr('mu&omin') === "mü'min" && translitTr('>aHad') === 'ehad', 'kelime içi hemze gösterilir, baştaki gösterilmez');
   assert(translitTr('EaAd2') === 'ʿâd' && bwToArabic('EaAd2') === bwToArabic('EaAd'), 'QAC ayırt edici rakamı düşer');
-  assert(translitTr('kafaruwA@') === 'kafarû' && translitTr('>uw@la`^}ika') === "ulâ'ika", 'Uthmani ۟ işaretli harf okunmaz');
+  assert(translitTr('kafaruwA@') === 'keferû' && translitTr('>uw@la`^}ika') === "ülâ'ike", 'Uthmani ۟ işaretli harf okunmaz');
   // K3P-04 (K-A): bağlam okunuşu kuralları.
-  assert(translitTr('{som') === 'ism' && translitTr('{bon') === 'ibn' && translitTr('{sotagofara') === 'istagfara', 'vasl elifi ibtidâda i');
-  assert(translitTr('{sotuhozi}a') === "ustuhzi'a" && translitDia('{som') === 'ism', 'ötreli fiilde vasl u; DİA da vasl okur');
-  assert(translitTr('{ll~ah') === 'allâh' && translitTr('{l~a*iY') === 'allazî', 'lafza-i celâl uzun â; harf-i tarifli ibtidâ a');
+  assert(translitTr('{som') === 'ism' && translitTr('{bon') === 'ibn' && translitTr('{sotagofara') === 'istağfera', 'vasl elifi ibtidâda i');
+  assert(translitTr('{sotuhozi}a') === "ustühzi'e" && translitDia('{som') === 'ism' && translitDia('{sotagofara') === 'istaġfara',
+    'ötreli fiilde vasl u; DİA vasl okur ama Türkçeleşmez');
+  assert(translitTr('{ll~ah') === 'allâh' && translitTr('{l~a*iY') === 'ellezî', 'lafza-i celâl kalın ve uzun â; harf-i tarifli ibtidâ e');
+  // K3P-04B (K-A2): Türk alfabesi tablosu — ğ, a/e, ı/i, u/ü; kalın harf öncesi ve sakin ر kalınlaştırır.
+  assert(translitTr('gafara') === 'ğafera' && translitTr('xatama') === 'hateme' && translitTr('Sabara') === 'sabera', 'ğ; taşıyana göre a/e; harekeli ر yalnız kendini');
+  assert(translitTr('qiTo') === 'kıt' && translitTr('Eilom') === 'ʿilm', 'kesre: kalın harfte ı, değilse i');
+  assert(translitTr('qutila') === 'kutile' && translitTr('mu&omin') === "mü'min", 'ötre: kalın harfte u, değilse ü');
+  assert(translitTr('>aroD') === 'ard' && translitTr('magoDuwb') === 'mağdûb', 'sakin ر ve kalın harf öncesi fetha kalın');
   assert(pauseBw('>aHadN[') === '>aHado[' && pauseBw('sabiylF[A') === 'sabiyla[A' && pauseBw('Salaw`pi') === 'Salaw`h',
     'vakf: tenvin/hareke sükûn, tenvinli fetha â, ta marbûta he');
   {
@@ -986,7 +1015,7 @@ function draftSelfTest() {
       { lemmaBw: 'r~aHiym', pos: 'ADJ', segments: [seg('{l', 'PREFIX|Al+'), seg('r~aHiymi', 'STEM|POS:ADJ')] }
     ];
     assert(sequenceTranslitTr(besmele, { pauseAtEnd: true }).join(' ') === 'bismi llâhi r-rahmâni r-rahîm', 'besmele bağlamda okunur');
-    assert(wordTranslitTr(besmele[2]) === 'ar-rahmâni', 'yalıtık harf-i tarif + güneş harfi: idgâm');
+    assert(wordTranslitTr(besmele[2]) === 'er-rahmâni', 'yalıtık harf-i tarif + güneş harfi: idgâm (K-A: er-rahmân)');
   }
   // doğrulanmış + eksik örnek çevirisi tutarsızlık olarak yakalanmalı
   const consProbe = parseReviewMarkdown(
@@ -1204,20 +1233,25 @@ function transliterate(lemmaBw, table, longTable, shortSet, options = {}) {
       out.push(long);
       continue;
     }
+    if (options.turkishVowels && Object.prototype.hasOwnProperty.call(TR_HARAKE, character)) {
+      const rest = characters.slice(index + 1).filter((c) => !TRANSLIT_IGNORE.has(c) && c !== '~');
+      out.push(trVowelFor(lastBase, character, rest[0], rest[1]));
+      continue;
+    }
     if (Object.prototype.hasOwnProperty.call(table, character)) out.push(table[character]);
   }
   return out.join('');
 }
 
 function rawTranslitTr(bw) {
-  return transliterate(bw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS, { hamzaMark: true, taMarbutaTr: true });
+  return transliterate(bw, TRANSLIT_TR, TRANSLIT_TR_LONG, TR_SHORT_VOWELS, { hamzaMark: true, taMarbutaTr: true, turkishVowels: true });
 }
 // Tek başına (yalıtık) okunuş: lemma başlığı ve bağlamsız kelime.
 function translitTr(lemmaBw) {
   const raw = rawTranslitTr(lafzatullahBw(lemmaBw));
   // Türkçe okunuş imlâsı assimilasyonu yazmaz: baştaki çift ünsüzü teke indirir
   // (Diyanet: "Rahman", "Samad" — "RRahman" değil). DİA katmanı ham kalır.
-  return withWaslVowel(lemmaBw, raw.replace(/^([bcçdfgğhjklmnprsştvyz])\1/u, '$1'));
+  return withWaslVowel(lemmaBw, raw.replace(/^([bcçdfgğhjklmnprsştvyz])\1/u, '$1'), true, true);
 }
 // Kelime okunuşu. context.joined: cümle içinde önceki kelimeye bağlanır (vasl elifi düşer);
 // context.pause: âyet sonu vakf. Ön ek, ardından ünsüz kümesi gelirse kaynaşır (bi + smi → bismi).
@@ -1234,11 +1268,11 @@ function wordTranslitTr(word, includePrefixes = true, context = {}) {
   if (article && coreBw) {
     const sun = SUN_LETTERS_BW.has(coreBw[0]) && coreBw[1] === '~';
     const lam = sun ? TRANSLIT_TR[coreBw[0]] : 'l';
-    pieces.push({ kind: 'article', text: (voiced && article.form.startsWith('{') ? 'a' : '') + lam });
+    pieces.push({ kind: 'article', text: (voiced && article.form.startsWith('{') ? 'e' : '') + lam });
     pieces.push({ kind: 'core', text: translitTr(coreBw) });
   } else if (coreBw.startsWith('{')) {
     const raw = rawTranslitTr(coreBw);
-    pieces.push({ kind: 'core', text: voiced ? withWaslVowel(coreBw, raw, word && word.pos === 'V') : raw.slice(1) });
+    pieces.push({ kind: 'core', text: voiced ? withWaslVowel(coreBw, raw, word && word.pos === 'V', true) : raw.slice(1) });
   } else if (coreBw) {
     pieces.push({ kind: 'core', text: pieces.length ? rawTranslitTr(coreBw) : translitTr(coreBw) });
   }

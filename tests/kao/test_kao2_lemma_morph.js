@@ -16,8 +16,9 @@ const box = { window: {} };
 vm.createContext(box);
 vm.runInContext(read('app/content/quranLexiconV1.js'), box);
 const lexicon = box.window.QuranLexiconV1;
-const byTranslit = (translit) => lexicon.lemmas.find((l) => l.translit === translit);
-const row = (translit) => table.lemmas[byTranslit(translit).id];
+// K3P-04B: lemmalar değişmeyen kimlikle bulunur; görünen okunuş (translit) imlâ kararıyla değişebilir.
+const LEMMA = Object.freeze({ ayyuha: 'l_ay_uhaA_a494bb', zakara: 'l_akara_67cfbf', gafara: 'l_gafara_e47aae', rahima: 'l_r_aHima_870005', jaa: 'l_jaA_a_c0bd29', inna: 'l_in_51f9c7' });
+const row = (key) => { assert.ok(lexicon.byId(LEMMA[key]), `${key}: lemma yok`); return table.lemmas[LEMMA[key]]; };
 
 let passed = 0;
 let skipped = 0;
@@ -64,14 +65,14 @@ check('her satır tutarlı: sayımlar tamsayı, kip toplamı ≤ toplam, örnekl
 
 check('bilinen dilbilgisi gerçekleri QAC sayımlarıyla uyuşur (bağımsız doğrulama)', () => {
   // Seslenme "yā ayyuhā": ayyuhâ 153 geçişin ezici çoğunluğunda VOC önekli.
-  assert.ok(row('ayyuhâ').voc >= 100 && row('ayyuhâ').total >= 150);
+  assert.ok(row('ayyuha').voc >= 100 && row('ayyuha').total >= 150);
   // "zikret!", "bağışla!", "merhamet et!" Kur'an'da emirle gelir; 'câ'a' (geldi) hiç emirle gelmez.
   assert.ok(row('zakara').impv > 0 && row('gafara').impv > 0 && row('rahima').impv > 0);
-  assert.equal(row("câ'a").impv, 0);
+  assert.equal(row('jaa').impv, 0);
   // Salt geçmiş kullanılan fiil: câ'a tamamı PERF.
-  assert.equal(row("câ'a").perf, row("câ'a").total);
+  assert.equal(row('jaa').perf, row('jaa').total);
   // İsim ve harf lemmalarında fiil kipi yok.
-  assert.equal(row('inn').perf + row('inn').impf + row('inn').impv, 0);
+  assert.equal(row('inna').perf + row('inna').impf + row('inna').impv, 0);
 });
 
 const asyncChecks = [];

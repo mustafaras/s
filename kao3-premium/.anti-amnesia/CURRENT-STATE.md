@@ -8,7 +8,7 @@ Sıradaki prompt: K3P-A3
 
 - **Tarih:** 2026-10-11
 - **Son tamamlanan:** K3P-A2 (A-6, D-8): ders ekranı açıkken başka modüllerin toast'ları bekletiliyor (`kaoFocusLocked` + `helpers.js` kuyruğu); kriz/güvenlik (`urgent`) ve KAO'nun kendi cevabı (`own`) ertelenmiyor; özet, çıkış ve kapatmada tek birleşik bildirim. Önce: K3P-A1 (overlay yerinde güncelleme).
-- **Dal:** `kao3-premium`. `main` = üçüncü ara yayın `20261011b` (K3P-02…K3P-A1 dahil; 2026-10-11). Dal ile `main` aynı noktada.
+- **Dal:** `kao3-premium`. `main` = dördüncü ara yayın `20261011c` (K3P-02…K3P-A2 dahil; 2026-10-11). Dal ile `main` aynı noktada.
 - **Yeni oturum:** `kao3-premium/STARTER.md` içindeki metni yapıştır.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yalnız K3P-00 "önce" çizgisi · cihaz yok.
 
@@ -29,8 +29,8 @@ Sıradaki prompt: K3P-A3
 ## Açık riskler
 
 - **Çalışma zamanı bütçesi dar:** 121,0 / 128 KiB; yaklaşık 7 KiB pay kaldı (K3P-A1 +1,5, K3P-A2 +0,4 KiB). Kod ekleyen kartlar (A3, A5, 11–13, 16–18, 20, 22–24) bu payı paylaşır. Önce eski kod silinir; yetmezse tavan kararı kullanıcıdan istenir.
-- **Kapı kararı K-Q (kullanıcı, 2026-10-11):** Kart kapanışında hızlı kapının tamamı yerine hedefli kapı koşulur (≤ 3 dk): `bash "$TMPDIR/k3p-hedefli.sh" <kartın tests/kao dosyaları>` — betik yoksa LEDGER seq 18'deki tanımla yeniden kur (sözdizimi + navigation/a11y/inventory/design_contract + kartın testleri + tests/app + driver + perf). Hızlı kapının tamamı ve tam kapı dalga sonunda (sıradaki K3P-A8) zorunlu.
-- **Pin ertelemesi (K-P):** Pinli bir dosyayı değiştiren kart, dosyayı `K3P-STATE.json` → `pinDeferral.files` listesine ekler. Eklemezse `test_asset_pin_freshness` kırmızı olur. Liste şu an: `app.js`, `app/core/quranLearn.js`, `app/core/helpers.js` (K3P-A2). Ara yayın seq 8/15/17 yöntemiyle (ortak sürüm `index.html`, `sw.js`, `panel-v2.html` ve 12 testte, 76 geçiş).
+- **Kapı kararı K-Q (kullanıcı, 2026-10-11):** Kart kapanışında hızlı kapının tamamı yerine hedefli kapı koşulur (≤ 3 dk): `bash kao3-premium/araclar/kapi-hedefli.sh <kartın tests/kao dosyaları>` (sözdizimi + navigation/a11y/inventory/design_contract + kartın testleri + tests/app + driver + perf). Hızlı kapının tamamı ve tam kapı dalga sonunda (sıradaki K3P-A8) zorunlu.
+- **Pin ertelemesi (K-P):** Pinli bir dosyayı değiştiren kart, dosyayı `K3P-STATE.json` → `pinDeferral.files` listesine ekler. Liste şu an **boş** (ara yayın `20261011c`). Ara yayın seq 8/15/17/19 yöntemiyle: ortak sürüm 15 dosyada 76 geçiş; ortak sürümü kullanmayan pinler (ör. `helpers.js` artık `20261011c`) için `test_asset_pin_freshness` katı modda koşulur ve ayrıca yükseltilir.
 - **Overlay yerinde güncelleme (K3P-A1):** KAO overlay'i `#app` içinde son çocuk olarak kalır (`#app{contain:layout}` çerçevesi ve toast/kriz katman sırası korunsun diye dışarı taşınmadı). `render.js` paint, KAO açıkken `kaoPaintApp` ile diğer içeriği overlay'in önüne yazar; mount `kaoPatchOverlay`. Ekran anahtarı `#sey-ov-body[data-kao-step]` + `.kao-screen-<görünüm>`; kaydırma yalnız anahtar değişince 0. Gerçek tarayıcıda doğrulanmadı (yalnız sahte DOM).
 - **Kabul testi yalnız `--yavas` ile koşar.** Pin çatışması bu yüzden plan aşamasında görünmedi; `--yavas` gerektiren kartlarda (A3, A4, A5, 16, 17, 18) aynı türden sürprizlere hazırlıklı ol.
 - **Perf göreli bandı makine yüküne duyarlı.** `main`'de kırmızıydı (7,4 ms > 5,09 ms), K3P-00 ve K3P-01'de bant içindeydi. Kapılar `KAO2_ACCEPT_SLOW_HOST=1` ile koşar; mutlak tavanlar zorunludur.

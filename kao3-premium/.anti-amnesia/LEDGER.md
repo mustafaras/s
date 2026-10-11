@@ -333,3 +333,16 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: ÆON gelen kutusu açılır penceresi `#sey-inbox-pop` (`renderAeonPopup`, z 500 > KAO 380) 30 sn yoklamasıyla ders sırasında da açılabiliyor; toast değil, kilidin kapsamı dışında — dokunulmadı (prompt "banner'lara dokunma").
 - Sıradaki: K3P-A3
+
+## seq 19 · — · YAYIN
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı "devam et tamamla ve canlıya al" dedi; dördüncü ara yayın. Yayına giden çalışma zamanı değişikliği: K3P-A2 (odak kilidi, toast kuyruğu) — `app.js`, `app/core/quranLearn.js`, `app/core/helpers.js`.
+  - Ortak sürüm `20261011b` → `20261011c` (aynı 15 dosyada 76 geçiş). **Ek:** `app/core/helpers.js` ortak sürümü değil kendi pinini taşıyordu (`20260903b`); katı pin tazeliği testi bunu yakaladı, `index.html` ve `sw.js`'de `20261011c`'ye yükseltildi. Ders: ortak sürüm dışındaki pinler (`helpers.js` gibi) her yayında `test_asset_pin_freshness` ile ayrıca denetlenmeli. `pinDeferral.files` boşaltıldı.
+  - Hedefli kapı betiği depoya eklendi: `kao3-premium/araclar/kapi-hedefli.sh` (K-Q).
+- Ölçüler: değişmedi (K3P-A2 ölçüleri; runtime 121,007 KiB)
+- Kapı (K-Q): tests/app 78 · tests/panel-v2 27 · tests/quran 9 · tests/panel 23 · curriculum + inventory + deney_rapor · driver + zikr · reminders smoke · pin senkronu · asset pin freshness · focus_lock — hepsi PASS (46 sn)
+- Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
+- Gözlem: —
+- Sıradaki: K3P-A3

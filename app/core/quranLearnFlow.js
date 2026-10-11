@@ -162,7 +162,38 @@
     });
     return found?out:[];
   }
-  function lessonPlan(snapshot,lessonId,now,content){
+  // K3P-A3 (AKIS §3) nefes ritmi: hedef → ısınma (vadeli tekrarın en kararlı 3–5'i) → [tanış → hemen 2 şıklı soru] × yeni kelime
+  // → kavram + 1 görev → karışık pekiştirme (tür blokları, ≤5) → zirve (uygula) → özet. Değişen yalnız sıra; görev kümesi aynı.
+  var WARMUP_MAX=5,WARMUP_MIN=3,BLOCK_MAX=5;
+  function chunkBlocks(list,cat){
+    var size=Math.ceil(list.length/Math.ceil(list.length/BLOCK_MAX)),out=[];
+    for(var i=0;i<list.length;i+=size) out.push({cat:cat,items:list.slice(i,i+size)});
+    return out;
+  }
+  function mixBlocks(items,reviews,prev,grammarType){
+    var cat=function(item){ return item.group==='review'?'review':item.group==='concept'?'grammar':item.audioOnly?'audio':item.direction; };
+    var order=[],groups=Object.create(null),lessonBlocks=[];
+    items.forEach(function(item){ var key=cat(item); if(!groups[key]){ groups[key]=[]; order.push(key); } groups[key].push(item); });
+    order.forEach(function(key){
+      // K2F-11: gramer bloğu aynı türün yan yana geldiği yerde bölünür; araya başka bir blok girer.
+      var runs=[[]];
+      groups[key].forEach(function(item){ var run=runs[runs.length-1],last=run[run.length-1]; if(key==='grammar'&&last&&grammarType(last)===grammarType(item)) runs.push(run=[]); run.push(item); });
+      runs.forEach(function(run){ lessonBlocks=lessonBlocks.concat(chunkBlocks(run,key)); });
+    });
+    var reviewBlocks=reviews.length?chunkBlocks(reviews,'review'):[],blocks=[],out=[],last=prev&&prev.kind==='practice'?cat(prev):'';
+    for(var i=0;i<Math.max(lessonBlocks.length,reviewBlocks.length);i+=1){ if(lessonBlocks[i]) blocks.push(lessonBlocks[i]); if(reviewBlocks[i]) blocks.push(reviewBlocks[i]); }
+    // Sıradaki blok: son türden farklı ve en çok bloğu kalan tür (eşitlikte sıradaki); böylece aynı tür blokları yan yana kalmaz.
+    while(blocks.length){
+      var left=Object.create(null),at=-1;
+      blocks.forEach(function(block){ left[block.cat]=(left[block.cat]||0)+1; });
+      blocks.forEach(function(block,index){ if(block.cat!==last&&(at<0||left[block.cat]>left[blocks[at].cat])) at=index; });
+      var block=blocks.splice(at<0?0:at,1)[0];
+      out=out.concat(block.items); last=block.cat;
+    }
+    for(var j=0;j<out.length;j+=1){ var before=j?out[j-1]:prev; if(before&&before.cardId===out[j].cardId&&out[j+1]){ var swap=out[j]; out[j]=out[j+1]; out[j+1]=swap; } }
+    return out;
+  }
+  function lessonPlan(snapshot,lessonId,now,content,reviews){
     checkNow(now);
     var snap=obj(snapshot),q=obj(snap.quranLearn),c=content||{},cur=curriculum(c),lesson=cur.lessonById[String(lessonId)];
     if(!lesson) return null;
@@ -172,14 +203,13 @@
     var lex=c.lexicon,grammar=c.grammar,lemmas=eligible.map(function(id){ return lex&&typeof lex.byId==='function'?lex.byId(id):null; }).filter(Boolean);
     var concept=lesson.conceptId&&grammar&&typeof grammar.byId==='function'?grammar.byId(lesson.conceptId):null;
     var templates=concept&&Array.isArray(concept.templates)?concept.templates:[];
-    var items=[{id:'goal:'+lesson.id,kind:'goal',lessonId:lesson.id,title:safeLessonTitle(lesson),lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),apply:lesson.apply||null}];
+    var goal={id:'goal:'+lesson.id,kind:'goal',lessonId:lesson.id,title:safeLessonTitle(lesson),lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),apply:lesson.apply||null},intros=Object.create(null);
     fresh.forEach(function(id,index){
       var lemma=lex&&typeof lex.byId==='function'?lex.byId(id):null;
       if(!lemma) return;
       var anchorWords=applyWords(lesson,c,q,fresh),anchor=anchorWords.find(function(word){ return word.lemmaId===id||word.mappedLemmaId===id; })||null;
-      items.push({id:'intro:'+id,kind:'intro',lessonId:lesson.id,lemmaId:id,lemma:lemma,ordinal:index+1,total:fresh.length,anchor:anchor,applyRef:lesson.apply||null});
+      intros[id]={id:'intro:'+id,kind:'intro',lessonId:lesson.id,lemmaId:id,lemma:lemma,ordinal:index+1,total:fresh.length,anchor:anchor,applyRef:lesson.apply||null};
     });
-    if(concept) items.push({id:'concept:'+concept.id,kind:'concept',lessonId:lesson.id,concept:concept});
 
     var practice=[],makeWord=function(id,direction,mode){
       var audio=mode===true,suffix=direction==='tr>ar'?'tr>ar':'ar>tr';
@@ -196,33 +226,44 @@
     if(hasAudio.length&&budgetLeft-audioCount<1&&budgetLeft>1) audioCount=Math.max(1,audioCount-1),reverseCount=Math.min(eligible.length,budgetLeft-audioCount);
     hasAudio.slice(0,audioCount).forEach(function(id){ practice.push(makeWord(id,'ar>tr',true)); });
     eligible.slice(0,reverseCount).forEach(function(id){ practice.push(makeWord(id,'tr>ar',false)); });
-    // K2F-11 (K4-04): aynı gramer türü ardışık gelmez. Önce türler açgözlüyle yayılır (özgün sıra eşitlikte korunur); yine de
-    // bitişik kalan çiftler için kelime alıştırmasının bir kısmı araya konur (en fazla bitişik çift sayısı kadar, ilk öğe sabit).
+    // K2F-11 (K4-04): aynı gramer türü ardışık gelmez — türler açgözlüyle yayılır (özgün sıra eşitlikte korunur).
     var typeOfGrammar=function(item){ var found=templates.find(function(entry){ return entry.id===item.templateId; }); return found?String(found.type):''; };
-    var spread=[],pool=grammarItems.slice(),adjacent=0;
+    var spread=[],pool=grammarItems.slice();
     while(pool.length){
       var at=pool.findIndex(function(item){ return !spread.length||typeOfGrammar(item)!==typeOfGrammar(spread[spread.length-1]); });
-      if(at<0){ at=0; adjacent+=1; }
-      spread.push(pool.splice(at,1)[0]);
+      spread.push(pool.splice(at<0?0:at,1)[0]);
     }
-    var separators=practice.length>adjacent+1?practice.splice(practice.length-adjacent,adjacent):[];
-    spread.forEach(function(item,index){
-      if(index>0&&typeOfGrammar(item)===typeOfGrammar(spread[index-1])&&separators.length) practice.push(separators.shift());
-      practice.push(item);
-    });
-    practice=practice.concat(separators);
+    practice=practice.concat(spread);
     if(practice.length<6){
       var repeatIndex=0;
       while(practice.length<6&&eligible.length){ practice.push(makeWord(eligible[repeatIndex%eligible.length],'tr>ar',false)); repeatIndex+=1; }
     }
     practice=practice.slice(0,10);
-    practice.forEach(function(item,index){ item.choiceCount=index===0?2:4; });
-    items=items.concat(practice);
+    var practiceCount=practice.length;
+    practice.forEach(function(item){ item.choiceCount=4; });
+    var take=function(test){ var found=practice.findIndex(test); return found<0?null:practice.splice(found,1)[0]; };
+    var cards=obj(q.cards),stability=function(item){ return num(obj(cards[item.cardId]).s,0); },seenHere=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[];
+    var due=(Array.isArray(reviews)?reviews:[]).filter(function(item){ return item&&typeof item.id==='string'&&item.id; }).map(function(item){ return {id:item.id,kind:'practice',group:'review',lessonId:lesson.id,cardId:String(item.cardId||item.id),queue:item}; });
+    var warm=due.slice().sort(function(a,b){ return stability(b)-stability(a); }).slice(0,WARMUP_MAX);
+    // Tanış-sına döngüsü: bu derste yeni ya da bu derste tanışılmış kelimeler; devam noktası yeniden yüklemede aynı sırayı bulur.
+    var loop=eligible.filter(function(id){ return fresh.indexOf(id)>=0||seenHere.indexOf(id)>=0; });
+    while(warm.length<WARMUP_MIN){ var known=take(function(item){ return item.group==='lemma'&&item.direction==='ar>tr'&&loop.indexOf(item.lemmaId)<0; }); if(!known) break; warm.push(known); }
+    var items=[goal].concat(warm);
+    loop.forEach(function(id){
+      if(intros[id]) items.push(intros[id]);
+      var task=take(function(item){ return item.group==='lemma'&&item.lemmaId===id&&item.direction==='ar>tr'; })||makeWord(id,'ar>tr',false);
+      task.choiceCount=2; items.push(task);
+    });
+    if(concept){
+      items.push({id:'concept:'+concept.id,kind:'concept',lessonId:lesson.id,concept:concept});
+      var first=take(function(item){ return item.group==='concept'; }); if(first) items.push(first);
+    }
+    items=items.concat(mixBlocks(practice,due.filter(function(item){ return warm.indexOf(item)<0; }),items[items.length-1],typeOfGrammar));
 
     var apply={id:'apply:'+lesson.id,kind:'apply',lessonId:lesson.id,ref:lesson.apply||null,words:applyWords(lesson,c,q,fresh)};
     if(obj(lesson.apply).kind==='examples'){ apply.mode='examples'; apply.sentences=applySentences(c,fresh,eligible.concat(ids.filter(function(id){ return eligible.indexOf(id)<0; }))); }
     items.push(apply);
-    items.push({id:'summary:'+lesson.id,kind:'summary',lessonId:lesson.id,lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),practiceCount:practice.length});
+    items.push({id:'summary:'+lesson.id,kind:'summary',lessonId:lesson.id,lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),practiceCount:practiceCount});
     return items;
   }
   // K2F-05 (KR-1): ünite ustalık kontrolü — çapa metnini oku + 10 soruluk karma test. Saf; hiçbir durum yazmaz.

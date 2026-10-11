@@ -2,13 +2,13 @@
 
 <!-- Bu dosya her prompt'un kapanışında BAŞTAN yazılır (BAGLAM-YONETIMI §3). Başlıkları silme; senkron.mjs okur. -->
 
-Sıradaki prompt: K3P-A3
+Sıradaki prompt: K3P-15
 
 ## Son durum
 
 - **Tarih:** 2026-10-11
-- **Son tamamlanan:** K3P-A2 (A-6, D-8): ders ekranı açıkken başka modüllerin toast'ları bekletiliyor (`kaoFocusLocked` + `helpers.js` kuyruğu); kriz/güvenlik (`urgent`) ve KAO'nun kendi cevabı (`own`) ertelenmiyor; özet, çıkış ve kapatmada tek birleşik bildirim. Önce: K3P-A1 (overlay yerinde güncelleme).
-- **Dal:** `kao3-premium`. `main` = dördüncü ara yayın `20261011c` (K3P-02…K3P-A2 dahil; 2026-10-11). Dal ile `main` aynı noktada.
+- **Son tamamlanan:** K3P-A3 (A-1, A-2, K-L): nefes ritmi — `lessonPlan(…, reviews)` hedef → ısınma (vadeli tekrarın en kararlı 3–5'i) → [tanış → hemen 2 şıklı soru] × yeni kelime → kavram + 1 görev → karışık pekiştirme (tür blokları ≤ 5) → uygula → özet. Ayrı `review` ön fazı kalktı; tekrarlar planın parçası. Önce: K3P-A2 (odak kilidi).
+- **Dal:** `kao3-premium`. `main` = dördüncü ara yayın `20261011c` (K3P-02…K3P-A2 dahil; 2026-10-11). Dal `main`'in 1 commit önünde (K3P-A3, yayında değil).
 - **Yeni oturum:** `kao3-premium/STARTER.md` içindeki metni yapıştır.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yalnız K3P-00 "önce" çizgisi · cihaz yok.
 
@@ -19,8 +19,8 @@ Sıradaki prompt: K3P-A3
 | Çift şıklı görev (yerleşik) | 0/1127 ✓ | 0 |
 | Okunuş hatası (vasl + idgâm) | 0 + 0 ✓ | 0 |
 | Ders başına dokunuş | 69 | ≤ 40 |
-| Art arda edilgin ekran | 6 | ≤ 1 |
-| İlk yeni içeriğe dokunuş | 21 | ≤ 7 |
+| Art arda edilgin ekran | 1 ✓ (K3P-A3; özet hariç) | ≤ 1 |
+| İlk yeni içeriğe dokunuş | 7 ✓ (K3P-A3) | ≤ 7 |
 | Ders başına overlay yeniden kurulumu | 0 ✓ (K3P-A1) | 0 |
 | Tanıma görevi payı | %93 | ≤ %60 |
 | Bugün ekranı seçim sayısı | 13 | ≤ 5 |
@@ -28,11 +28,14 @@ Sıradaki prompt: K3P-A3
 
 ## Açık riskler
 
-- **Çalışma zamanı bütçesi dar:** 121,0 / 128 KiB; yaklaşık 7 KiB pay kaldı (K3P-A1 +1,5, K3P-A2 +0,4 KiB). Kod ekleyen kartlar (A3, A5, 11–13, 16–18, 20, 22–24) bu payı paylaşır. Önce eski kod silinir; yetmezse tavan kararı kullanıcıdan istenir.
+- **Çalışma zamanı bütçesi dar:** 122,3 / 128 KiB; yaklaşık 5,7 KiB pay kaldı (K3P-A1 +1,5, K3P-A2 +0,4, K3P-A3 +1,3 KiB). Kod ekleyen kartlar (A5, 11–13, 16–18, 20, 22–24) bu payı paylaşır. Önce eski kod silinir; yetmezse tavan kararı kullanıcıdan istenir.
 - **Kapı kararı K-Q (kullanıcı, 2026-10-11):** Kart kapanışında hızlı kapının tamamı yerine hedefli kapı koşulur (≤ 3 dk): `bash kao3-premium/araclar/kapi-hedefli.sh <kartın tests/kao dosyaları>` (sözdizimi + navigation/a11y/inventory/design_contract + kartın testleri + tests/app + driver + perf). Hızlı kapının tamamı ve tam kapı dalga sonunda (sıradaki K3P-A8) zorunlu.
-- **Pin ertelemesi (K-P):** Pinli bir dosyayı değiştiren kart, dosyayı `K3P-STATE.json` → `pinDeferral.files` listesine ekler. Liste şu an **boş** (ara yayın `20261011c`). Ara yayın seq 8/15/17/19 yöntemiyle: ortak sürüm 15 dosyada 76 geçiş; ortak sürümü kullanmayan pinler (ör. `helpers.js` artık `20261011c`) için `test_asset_pin_freshness` katı modda koşulur ve ayrıca yükseltilir.
+- **Pin ertelemesi (K-P):** Pinli bir dosyayı değiştiren kart, dosyayı `K3P-STATE.json` → `pinDeferral.files` listesine ekler. Liste şu an: `app/core/quranLearn.js`, `app/core/quranLearnFlow.js` (K3P-A3). Ara yayın seq 8/15/17/19 yöntemiyle: ortak sürüm 15 dosyada 76 geçiş; ortak sürümü kullanmayan pinler (ör. `helpers.js` artık `20261011c`) için `test_asset_pin_freshness` katı modda koşulur ve ayrıca yükseltilir.
 - **Overlay yerinde güncelleme (K3P-A1):** KAO overlay'i `#app` içinde son çocuk olarak kalır (`#app{contain:layout}` çerçevesi ve toast/kriz katman sırası korunsun diye dışarı taşınmadı). `render.js` paint, KAO açıkken `kaoPaintApp` ile diğer içeriği overlay'in önüne yazar; mount `kaoPatchOverlay`. Ekran anahtarı `#sey-ov-body[data-kao-step]` + `.kao-screen-<görünüm>`; kaydırma yalnız anahtar değişince 0. Gerçek tarayıcıda doğrulanmadı (yalnız sahte DOM).
-- **Kabul testi yalnız `--yavas` ile koşar.** Pin çatışması bu yüzden plan aşamasında görünmedi; `--yavas` gerektiren kartlarda (A3, A4, A5, 16, 17, 18) aynı türden sürprizlere hazırlıklı ol.
+- **Ders ritmi (K3P-A3):** Plan `goal · ısınma · (intro · görev)×n · concept · görev · karışık · apply · summary`. Tekrarlar `group:'review'` plan öğesi (`queue` = kuyruk öğesi). Devam noktası: `itemId` bekleyen görevin plan öğesi; bekleyen bir tekrarsa `lessonItemId` sıradaki ders adımı — yeniden açılışta bekleyen tekrar onun önüne alınır, öncesindeki tekrarlar vadeli kalır. Şema aynı (`phase/itemId/lessonItemId`); eski `phase:'review'` kayıtları `lessonItemId`'den sürer.
+- **Açılış → ilk görev 2 → 3 dokunuş (K3P-A3 yan etkisi):** Hedef ekranı artık ilk görevden önce geliyor (AKIS §3 ①); `targets.flow.tapsOpenToFirstTask: 2` ile çatışıyor. Karar kullanıcıda (ör. hedef ekranını Bugün kartına katmak ya da hedefi 3 kabul etmek).
+- **`test_k3p_distractors` kararlılık tabanı:** `$TMPDIR/k3p-01-secimler-onceki.json` yerel anlık görüntüsü K3P-A3 sonrası durumla yenilendi (eskisi `…onceki.K3P-01.json`); anahtarı yürüyüş sırası + şık sayısı olduğu için plan sırası değişince bilerek geçersizleşir.
+- **Kabul testi yalnız `--yavas` ile koşar.** Pin çatışması bu yüzden plan aşamasında görünmedi; `--yavas` gerektiren kartlarda (A4, A5, 16, 17, 18) aynı türden sürprizlere hazırlıklı ol.
 - **Perf göreli bandı makine yüküne duyarlı.** `main`'de kırmızıydı (7,4 ms > 5,09 ms), K3P-00 ve K3P-01'de bant içindeydi. Kapılar `KAO2_ACCEPT_SLOW_HOST=1` ile koşar; mutlak tavanlar zorunludur.
 - **Yavaş testler:** `test_kao2_kabul` (~230–530 sn), `test_kao2_grammar_tasks` (~170–290 sn), `test_kao2_denetim` (~35–50 sn) hızlı kapıda varsayılan olarak atlanır.
 - **Tam kapı** `bash tools/kapi/kapilar.sh` 10 dakikadan uzun sürer; yalnız dalga sonlarında (`waveEnd`, sıradaki K3P-A8) koşar.

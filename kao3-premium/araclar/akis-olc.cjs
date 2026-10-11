@@ -28,32 +28,38 @@ console.log(`1) Açılış → ilk görev: ${taps} dokunuş (birincil: ${tapped 
 // 2) Bir dersin baştan sona ritmi: görev ve ara ekran dizisi
 const L = H.bootKao({ seeded: true });
 L.ui.kaoStack = []; L.api.kaoOpen('home'); L.api.kaoLesson('start', lessonId);
-const rhythm = []; let interCount = 0, interWords = 0, maxRun = 0, run = 0, tasks = 0;
+// Dokunuş (K3P-A3): başlat + her cevap + her "Devam"; cevap panelindeki geç dokunuşu sayılmaz (AKIS §1 tabanı 21 de böyle).
+const rhythm = []; let interCount = 0, interWords = 0, maxRun = 0, run = 0, tasks = 0, passive = 0, maxPassive = 0, taps2 = 1, introTap = 0;
 for (let g = 0; g < 400 && L.ui.kaoLesson; g += 1) {
   const st = L.ui.kaoLesson, item = st.plan[st.at];
-  if (isTask(L)) { const task = curTask(L); if (!task) break; tasks += 1; rhythm.push('G'); run += 1; maxRun = Math.max(maxRun, run); answer(L, task, true); continue; }
+  if (isTask(L)) { const task = curTask(L); if (!task) break; tasks += 1; rhythm.push('G'); run += 1; maxRun = Math.max(maxRun, run); passive = 0; answer(L, task, true); taps2 += 1; continue; }
   if (!item || item.kind === 'summary') break;
-  run = 0; const w = words(L.api.kaoOverlayHTML(L.NOW)); interCount += 1; interWords += w; rhythm.push(`[${item.kind}:${w}]`); L.api.kaoLesson('next');
+  if (item.kind === 'intro' && !introTap) introTap = taps2;
+  run = 0; passive += 1; maxPassive = Math.max(maxPassive, passive);
+  const w = words(L.api.kaoOverlayHTML(L.NOW)); interCount += 1; interWords += w; rhythm.push(`[${item.kind}:${w}]`); L.api.kaoLesson('next'); taps2 += 1;
 }
 const compact = rhythm.join(' ').replace(/(G )+/g, (m) => `G×${m.trim().split(' ').length} `);
 console.log(`2) Ders ${lessonId}: ${tasks} görev, ${interCount} ara ekran (toplam ${interWords} sözcük), en uzun kesintisiz görev dizisi ${maxRun}`);
 console.log(`   ritim: ${compact}`);
+console.log(`   art arda en uzun edilgin dizi ${maxPassive} (özet hariç) · ilk yeni içeriğe (tanış) ${introTap || '—'}. dokunuş`);
 
 // 3) Yarıda bırak → sayfa yeniden yüklenmiş gibi ui sıfırla → aç → birincil eyleme bas
 const R = H.bootKao({ seeded: true });
-R.ui.kaoStack = []; R.api.kaoOpen('home'); R.api.kaoLesson('start', lessonId);
+R.ui.kaoStack = []; R.api.kaoOpen('home'); H.tapPrimary(R); // Bugün'ün başlattığı ders: yeniden açılış da onu sürdürür
+const resumedLesson = R.ui.kaoLesson.lessonId;
 let done = 0;
 for (let g = 0; g < 200 && R.ui.kaoLesson && done < 8; g += 1) { if (isTask(R)) { answer(R, curTask(R), true); done += 1; } else R.api.kaoLesson('next'); }
-const before = { phase: R.ui.kaoLesson.phase, at: R.ui.kaoLesson.at, idx: R.ui.kaoTaskIndex };
+const pendingOf = (t) => { const q = t.ui.kaoLesson && t.ui.kaoQueue[t.ui.kaoTaskIndex]; return q ? q.id : (t.ui.kaoLesson ? t.ui.kaoLesson.plan[t.ui.kaoLesson.at].id : ''); };
+const before = { lesson: resumedLesson, phase: R.ui.kaoLesson.phase, item: pendingOf(R) };
 R.api.kaoLesson('exit');
 for (const k of Object.keys(R.ui)) delete R.ui[k];
 Object.assign(R.ui, { kaoOpen: false, kaoView: 'home', kaoStack: [] });
 R.api.kaoOpen('home');
 const hero = H.text(R.api.kaoOverlayHTML(R.NOW)).slice(0, 140);
 const again = H.tapPrimary(R);
-const after = R.ui.kaoLesson ? { phase: R.ui.kaoLesson.phase, at: R.ui.kaoLesson.at, idx: R.ui.kaoTaskIndex } : null;
+const after = R.ui.kaoLesson ? { lesson: R.ui.kaoLesson.lessonId, phase: R.ui.kaoLesson.phase, item: pendingOf(R) } : null;
 console.log(`3) Yarıda bırakma: çıkışta ${JSON.stringify(before)} → yeniden açılış Bugün: "${hero}…"`);
-console.log(`   birincil: ${again && again.name}(${again && again.args.join(',')}) → ${JSON.stringify(after)}`);
+console.log(`   birincil: ${again && again.name}(${again && again.args.join(',')}) → ${JSON.stringify(after)} · aynı görev: ${!!after && after.item === before.item ? 'evet' : 'HAYIR'}`);
 
 // 4) Art arda 4 yanlış: sonraki görev türleri değişiyor mu (zorluk düşüyor mu)?
 const W = H.bootKao({ seeded: true });

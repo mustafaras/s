@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-A3",
+  "nextPrompt": "K3P-15",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -231,7 +231,9 @@
     {
       "id": "K3P-A3",
       "wave": "A",
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-11",
+      "result": "nefes ritmi: lessonPlan(…, reviews) — hedef → ısınma (en kararlı s, ≤5) → tanış + hemen 2 şıklı soru → kavram + 1 görev → karışık tür blokları (≤5) → uygula → özet; ayrı review fazı kalktı; devam noktası görevin plan öğesi (+ sıradaki ders adımı); akis-olc edilgin dizi 6→1, ilk tanış 21→7. dokunuş, görev sayısı aynı (30); test_k3p_rhythm"
     },
     {
       "id": "K3P-15",
@@ -374,6 +376,9 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearn.js",
+      "app/core/quranLearnFlow.js"
+    ]
   }
 }

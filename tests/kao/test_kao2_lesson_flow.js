@@ -54,15 +54,24 @@ function freshQ() {
   return q;
 }
 
-check('sıra: hedef → yeni kelimelerin tanışı → kavram → pekiştir → uygula → özet', () => {
+// K3P-A3 (AKIS §3): eski sıra "tanış ×N → kavram → pekiştir" idi (6 edilgin ekran art arda). Yeni ritimde her tanıştan hemen
+// sonra o kelimenin 2 şıklı sorusu, kavramdan hemen sonra bir görev gelir; ayrıntılı 109 ders taraması test_k3p_rhythm.js.
+check('sıra: hedef → [tanış → hemen sına] × yeni kelime → kavram + 1 görev → pekiştir → uygula → özet', () => {
   const q = freshQ(), before = JSON.stringify(q);
   const plan = flow.lessonPlan({ quranLearn: q }, lesson.id, now, content);
   assert.equal(JSON.stringify(q), before, 'ders planı veriyi değiştirdi');
   assert.equal(plan[0].kind, 'goal'); assert.equal(plan.at(-2).kind, 'apply'); assert.equal(plan.at(-1).kind, 'summary');
   const conceptAt = plan.findIndex((item) => item.kind === 'concept');
-  const practiceAt = plan.findIndex((item) => item.kind === 'practice');
-  assert.ok(conceptAt > 0 && conceptAt < practiceAt, 'kavram tanıtımı pekiştirmeden önce');
-  assert.ok(plan.slice(conceptAt + 1, practiceAt).every((item) => item.kind === 'intro'));
+  const lastIntro = plan.map((item) => item.kind).lastIndexOf('intro');
+  assert.ok(lastIntro > 0 && conceptAt > lastIntro, 'kavram tanış-sına döngüsünden sonra');
+  plan.forEach((item, at) => {
+    if (item.kind !== 'intro') return;
+    const next = plan[at + 1];
+    assert.equal(next.kind, 'practice', `${item.lemmaId} tanışından hemen sonra görev`);
+    assert.equal(next.cardId, `w:${item.lemmaId}:ar>tr`); assert.equal(next.choiceCount, 2);
+  });
+  assert.equal(plan[conceptAt + 1].kind, 'practice', 'kavramdan hemen sonra görev');
+  assert.ok(plan.slice(conceptAt + 1, -2).every((item) => item.kind === 'practice'), 'kavramdan sonra uygula ekranına kadar görev');
   assert.equal(plan[0].lessonId, lesson.id);
 });
 
@@ -79,13 +88,19 @@ check('A-2: her yeni lemma kendi tanış kartından sonra ilk kez pekiştirilir'
   assert.ok(wordPractice.length >= lesson.lemmaIds.length);
 });
 
-check('pekiştirme: 6–10 görev; ilk görev 2, diğerleri 4 seçenek; yön sırası sabit', () => {
+// K3P-A3: eski kontrol "ilk görev 2 şık" ve tek sıralı yön dizisi (ar>tr → ses → tr>ar → kavram) idi. Yeni ritimde tanış-sına
+// görevleri 2 şıklı, diğerleri 4; karışık bölümde her tür tek blok hâlinde gelir (gramer yalnız K2F-11 için bölünebilir).
+check('pekiştirme: 6–10 görev; tanış-sına görevleri 2, diğerleri 4 seçenek; karışık bölümde tür blokları', () => {
   const q = freshQ(), plan = flow.lessonPlan({ quranLearn: q }, lesson.id, now, content);
   const items = plan.filter((item) => item.kind === 'practice');
   assert.ok(items.length >= 6 && items.length <= 10, `görev sayısı ${items.length}`);
-  assert.equal(items[0].choiceCount, 2); assert.ok(items.slice(1).every((item) => item.choiceCount === 4));
-  const ranks = items.map((item) => item.group === 'concept' ? 3 : item.direction === 'ar>tr' ? 0 : item.direction === 'audio>meaning' ? 1 : 2);
-  assert.deepEqual(plain(ranks), [...plain(ranks)].sort((a, b) => a - b), 'ar>tr → ses→anlam → tr>ar → kavram blokları');
+  const probes = plan.filter((item, at) => at > 0 && plan[at - 1].kind === 'intro');
+  assert.ok(probes.length > 0 && probes.every((item) => item.choiceCount === 2), 'tanış-sına 2 şık');
+  assert.ok(items.filter((item) => !probes.includes(item)).every((item) => item.choiceCount === 4), 'diğerleri 4 şık');
+  const cat = (item) => item.group === 'concept' ? 'grammar' : item.direction;
+  const mixed = plan.slice(plan.findIndex((item) => item.kind === 'concept') + 2, -2).map(cat);
+  const seen = [];
+  mixed.forEach((key, i) => { if (i && key === mixed[i - 1]) return; assert.ok(key === 'grammar' || !seen.includes(key), `${key} bloğu bölündü: ${mixed.join(',')}`); seen.push(key); });
   const grammar = items.filter((item) => item.group === 'concept');
   assert.ok(grammar.length >= 1);
   assert.ok(grammar.every((item) => plan.indexOf(item) > plan.findIndex((value) => value.kind === 'concept')));
@@ -131,20 +146,23 @@ check('ilerleme: tanış kaydı tek başına dersi bitirmez; oturum FSRS kartın
   assert.equal(flow.lessonProgress(q, lesson.id, content).done, true);
 });
 
-check('oynatıcı: vadeli tekrar önce; intro → FSRS pekiştirme; çıkışta aynı görev; sesli soru Arapçayı saklar', () => {
+// K3P-A3: eski kontrol "vadeli tekrar ayrı bir ön fazda (review), hedeften önce" idi. Yeni ritimde hedef önce, vadeli tekrar ısınmada.
+check('oynatıcı: hedef önce, vadeli tekrar ısınmada; intro → hemen FSRS pekiştirme; çıkışta aynı görev; sesli soru Arapçayı saklar', () => {
   const q = freshQ(), reviewLemma = win.QuranLexiconV1.lemmas.find((item) => !lesson.lemmaIds.includes(item.id));
   const reviewCard = `w:${reviewLemma.id}:ar>tr`;
   q.cards[reviewCard] = { state: 'review', s: 8, reps: 2, due: '2026-09-28T00:00:00.000Z', introducedAt: '2026-09-20T00:00:00.000Z' };
   const data = { settings: {}, days: {}, quranLearn: q }, ui = { kaoView: 'home' }, state = { saves: 0, renders: 0 };
   assert.equal(api.registerQuranLearn({ data: () => data, ui: () => ui, save() { state.saves += 1; }, render() { state.renders += 1; }, todayStr: () => '2026-09-29', esc: (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char])), icon: () => '', getDay: () => ({}) }), true);
   assert.equal(api.kaoLesson('start', lesson.id), true);
-  assert.equal(ui.kaoLesson.phase, 'review');
-  assert.equal(ui.kaoQueue.length, 1, 'bir vadeli kart tekrar kuyruğunun başında');
+  assert.equal(ui.kaoLesson.phase, 'lesson'); assert.equal(ui.kaoLesson.plan[ui.kaoLesson.at].kind, 'goal', 'önce hedef');
+  assert.equal(api.kaoLesson('next'), true);
+  assert.equal(ui.kaoLesson.phase, 'practice');
+  assert.equal(ui.kaoQueue.length, 1, 'tek vadeli kart ısınmada');
   const review = ui.kaoTasks[ui.kaoQueue[0].id];
   assert.equal(review.cardId, reviewCard);
   assert.equal(api.kaoAnswer(review.id, review.choices.find((choice) => choice.correct).choiceId).correct, true);
   assert.equal(api.kaoContinue(), true);
-  assert.equal(ui.kaoLesson.phase, 'lesson'); assert.equal(ui.kaoLesson.plan[ui.kaoLesson.at].kind, 'goal');
+  assert.equal(ui.kaoLesson.phase, 'lesson'); assert.equal(ui.kaoLesson.plan[ui.kaoLesson.at].kind, 'intro', 'ısınmadan sonra ilk tanış');
   while (ui.kaoLesson.phase === 'lesson' && ui.kaoLesson.plan[ui.kaoLesson.at].kind !== 'practice') api.kaoLesson('next');
   assert.equal(ui.kaoLesson.phase, 'practice');
   const firstItem = ui.kaoQueue[0], firstTask = ui.kaoTasks[firstItem.id];
@@ -347,14 +365,20 @@ check('K2F-24 eşleme dosyası ve L2 listesi: araç çıktısı modülle aynı; 
 // K2F-25 (K5-05 · D-01): tanış kartı katmanları — doğrulanmış örnek âyet + katlanabilir "Neden böyle?" (kök anlamı, unit11 türevleri, kognat kayması).
 const unit11Roots = new Map(win.QuranGrammarV1.unit11.roots.map((row) => [row.root, row]));
 const expectedWhy = (lemma) => ({ root: unit11Roots.get(lemma.root) || null, shift: lemma.cognate && lemma.cognate.shift ? String(lemma.cognate.shift) : '' });
+// K3P-A3: tanış ekranları artık art arda değil (her birinden sonra bir görev); görevler gerçek handler'la cevaplanıp kavrama kadar sürülür.
 function introCards(t, lessonId) {
   assert.equal(t.api.kaoLesson('start', lessonId), true);
   const cards = [];
-  for (let guard = 0; guard < 40; guard += 1) {
+  for (let guard = 0; guard < 80; guard += 1) {
+    if (t.ui.kaoLesson.phase === 'practice') {
+      const task = t.ui.kaoTasks[t.ui.kaoQueue[t.ui.kaoTaskIndex].id];
+      t.api.kaoAnswer(task.id, (task.choices.find((choice) => choice.correct) || task.choices[0]).choiceId); t.api.kaoContinue();
+      continue;
+    }
     const item = t.ui.kaoLesson.plan[t.ui.kaoLesson.at];
     if (!item) break;
     if (item.kind === 'intro') cards.push({ lemmaId: item.lemmaId, html: t.api.kaoOverlayHTML(t.NOW) });
-    if (item.kind === 'concept' || item.kind === 'practice' || item.kind === 'apply' || item.kind === 'summary') break;
+    if (item.kind === 'concept' || item.kind === 'apply' || item.kind === 'summary') break;
     t.api.kaoLesson('next');
   }
   return cards;

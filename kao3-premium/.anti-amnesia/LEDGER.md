@@ -301,3 +301,16 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test (sahte DOM) · görsel QA yok · cihaz yok
 - Gözlem: Gerçek tarayıcıda odak/kaydırma davranışı ve animasyonun yeniden oynamadığı yalnız cihazda görülebilir. `render.js` içindeki diğer overlay'ler (okuma/izleme hub'ları) hâlâ yeniden kuruluyor; onlar animasyonu `style.animation='none'` ile bastırıyor — kapsam dışı.
 - Sıradaki: K3P-A2
+
+## seq 17 · — · YAYIN
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı K3P-A1 sırasında "bitince canlıya al" dedi; §6.2 için açık onay, üçüncü ara yayın. Yayına giden çalışma zamanı değişikliği: K3P-A1 (overlay yerinde güncelleme) — `app.js`, `app/core/quranLearn.js`, `app/core/render.js`.
+  - seq 8/15 yöntemi: ortak sürüm `20261011a` → `20261011b`, aynı 15 dosyada 76 geçiş. `pinDeferral.files` boşaltıldı (pin tazeliği katı modda PASS).
+  - DÜZELTME (seq 15): orada "71 yer" yazıldı; 71 değişen satır sayısıdır, geçiş sayısı 76'dır.
+- Ölçüler: değişmedi (K3P-A1 ölçüleri; runtime 120,629 KiB)
+- Kapı (kısa yol, kullanıcı isteği; tam kapı koşulmadı): tests/app 78 · tests/panel-v2 27 · tests/quran 9 · tests/panel 23 · curriculum + inventory + deney_rapor · run-seyma driver + zikr · reminders smoke · pin senkronu · asset pin freshness · test_k3p_mount — hepsi PASS. tests/kao ve ölçü kapıları K3P-A1 hızlı kapısında aynı kodla yeşildi.
+- Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok (overlay davranışı cihazda görülmeli)
+- Gözlem: Tam kapı en son K3P-04B öncesi koşuldu; bir sonraki dalga sonunda (K3P-A8) zorunlu.
+- Sıradaki: K3P-A2

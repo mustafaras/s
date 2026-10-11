@@ -272,3 +272,15 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
   - **H5 ve H9 yaklaşık ölçü.** `ayahs.understood` tarihsiz ve okuma izni dışında; H5 = ilk çalışma gününden ilk bitirilen derse gün (K-G: ders âyetle kapanır). Yerleştirme adımı (`via:'placement'`) atlanan dersleri aynı `doneAt` ile işaretlediği için aynı zamanlı bitirişler ayıklanır. H9 = tekrara geçmiş (`review`/`relearning`, reps ≥ 2) kartlarda hiç unutulmamış payı; ilk tekrar doğruluğunun alt sınırı. Kesin ölçü tarihli kayıt ister; bu bir veri şeması kararıdır (§5), kullanıcıya bırakıldı.
   - H8'in "30 gün önce/sonra" karşılaştırması iki tarihli rapor arasında yapılır (K3P-27 takvimi: 14. ve 30. gün); izinli alanlarda yarıda kalan dersin tarihi yok.
 - Sıradaki: K3P-A1
+
+## seq 15 · — · YAYIN
+- Tarih: 2026-10-11
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı K3P-05'ten sonra "canlıya al" ve "en kısa olacak şekilde geçelim ve yayına alalım" dedi; §6.2 için açık onay, ikinci ara yayın. Yayına giden çalışma zamanı değişiklikleri: K3P-02 (geri bildirim metni), K3P-03 (süre tahmini tabanı), K3P-04 (bağlam okunuşu), K3P-04B (Türkçe okunuş imlâsı) — `quranLearn.js`, `quranLearnFlow.js` ve dört içerik modülü.
+  - seq 8 yöntemi: ortak sürüm `20261010a` → `20261011a`; `index.html` (22), `sw.js` (22; `SW_VERSION`, `SW_OFFLINE_VERSION`), `panel-v2.html` (4) ve bu değeri sabitleyen 12 testte toplam 71 yer. `pinDeferral.files` boşaltıldı (pin tazeliği katı modda PASS, 60 bağlantı).
+- Ölçüler: değişmedi (K3P-05 ölçüleri; runtime 119,093 KiB)
+- Kapı (kısa yol, kullanıcı isteği; tam kapı koşulmadı): tests/app 78 · tests/panel-v2 27 · tests/quran 9 · tests/panel 23 · curriculum + inventory + deney_rapor · run-seyma driver + zikr · reminders smoke · pin senkronu · asset pin freshness — hepsi PASS. tests/kao (yavaş üçlü hariç) ve ölçü kapıları K3P-05 hızlı kapısında aynı kodla yeşildi; yavaş üçlü (kabul, grammar_tasks, denetim) en son K3P-04B'de `--yavas` ile yeşildi, sonrasında çalışma zamanı değişmedi.
+- Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
+- Gözlem: Tam kapı bu yayında koşulmadı; bir sonraki dalga sonunda (K3P-A8) zorunlu.
+- Sıradaki: K3P-A1

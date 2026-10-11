@@ -369,13 +369,6 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": [
-      "app/core/quranLearn.js",
-      "app/core/quranLearnFlow.js",
-      "app/content/quranLexiconV1.js",
-      "app/content/quranGrammarV1.js",
-      "app/content/quranShortSurahsV1.js",
-      "app/content/quranCurriculumV2.js"
-    ]
+    "files": []
   }
 }

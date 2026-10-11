@@ -8,7 +8,7 @@ Sıradaki prompt: K3P-A1
 
 - **Tarih:** 2026-10-11
 - **Son tamamlanan:** K3P-05 (Dalga 0 sonu): `kapilar.sh` artık `cift-sik` ve `okunus-denetim` kapılarını koşuyor; `araclar/deney-rapor.cjs` H2/H5/H7/H8/H9 için yalnız toplu sayı basıyor (H3 K3P-16 sonrası). Önce: K3P-04B. Okunuş Türk alfabesiyle (K-A2, Diyanet tablosu): `el-hamdü lillâhi rabbi l-ʿâlemîn`, `ihdinâ s-sırâta l-müstakîm`, `istağfera`, `er-rahmân`. Önce: K3P-04 (bağlam okunuşu), K3P-03, K3P-02, K3P-01 ve ara yayın `20261010a`.
-- **Dal:** `kao3-premium`. `main` = ara yayın `b3c97d67` (K3P-01 dahil); K3P-02…K3P-04B yalnız dalda, push yok.
+- **Dal:** `kao3-premium`. `main` = ikinci ara yayın `20261011a` (K3P-02…K3P-05 dahil; 2026-10-11). Dal ile `main` aynı noktada.
 - **Yeni oturum:** `kao3-premium/STARTER.md` içindeki metni yapıştır.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yalnız K3P-00 "önce" çizgisi · cihaz yok.
 
@@ -29,7 +29,7 @@ Sıradaki prompt: K3P-A1
 ## Açık riskler
 
 - **Çalışma zamanı bütçesi dar:** 119,1 / 128 KiB; yaklaşık 8,9 KiB pay kaldı. Kod ekleyen kartlar (A3, A5, 11–13, 16–18, 20, 22–24) bu payı paylaşır. Önce eski kod silinir; yetmezse tavan kararı kullanıcıdan istenir.
-- **Pin ertelemesi (K-P):** Pinli bir dosyayı değiştiren kart, dosyayı `K3P-STATE.json` → `pinDeferral.files` listesine ekler. Eklemezse `test_asset_pin_freshness` kırmızı olur ve onu koşan kabul A-9 ile `kapilar.sh` de düşer. Liste şu an: `app/core/quranLearn.js` (K3P-02, K3P-04), `app/core/quranLearnFlow.js` (K3P-03) ve K3P-04'ün yeniden ürettiği `app/content/quranLexiconV1.js`, `quranGrammarV1.js`, `quranShortSurahsV1.js`, `quranCurriculumV2.js`; hepsinin pini `20261010a`. K3P-27 pinleri yükseltip listeyi boşaltır; `main`'de test tam katıdır.
+- **Pin ertelemesi (K-P):** Pinli bir dosyayı değiştiren kart, dosyayı `K3P-STATE.json` → `pinDeferral.files` listesine ekler. Eklemezse `test_asset_pin_freshness` kırmızı olur ve onu koşan kabul A-9 ile `kapilar.sh` de düşer. Liste şu an **boş**: ikinci ara yayın (`20261011a`) pinleri tazeledi. Yeni ara yayın gerekirse seq 8/15 yöntemi izlenir (ortak sürüm `index.html`, `sw.js`, `panel-v2.html` ve 12 testte).
 - **Kabul testi yalnız `--yavas` ile koşar.** Pin çatışması bu yüzden plan aşamasında görünmedi; `--yavas` gerektiren kartlarda (A3, A4, A5, 16, 17, 18) aynı türden sürprizlere hazırlıklı ol.
 - **Perf göreli bandı makine yüküne duyarlı.** `main`'de kırmızıydı (7,4 ms > 5,09 ms), K3P-00 ve K3P-01'de bant içindeydi. Kapılar `KAO2_ACCEPT_SLOW_HOST=1` ile koşar; mutlak tavanlar zorunludur.
 - **Yavaş testler:** `test_kao2_kabul` (~230–530 sn), `test_kao2_grammar_tasks` (~170–290 sn), `test_kao2_denetim` (~35–50 sn) hızlı kapıda varsayılan olarak atlanır.

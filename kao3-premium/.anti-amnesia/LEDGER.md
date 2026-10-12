@@ -401,3 +401,16 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: (1) **Isınma vs bütçe çelişkisi** kullanıcı kararıyla çözüldü (ısınma en yüksek s + muaf; kırpma/sıra en düşük R). (2) Bütçe tabanı 6 sn olduğu için ölçümsüz kullanıcıda kırpma bağlayıcı değil; "seçilen dakikaya sığma" ölçülmüş süreye dayanır (K3P-03 tabanı). (3) Perf göreli bandı bu koşuda kırmızıydı (7,2 ms > 6,36 ms bant, yavaş makine); mutlak tavanlar (runtime/css/p95) yeşil.
 - Sıradaki: K3P-A5
+
+## seq 24 · — · YAYIN
+- Tarih: 2026-10-12
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı "canlıya al" dedi; altıncı ara yayın. Yayına giden çalışma zamanı değişikliği: K3P-A4 (oturum zaman bütçesi; `quranLearnFlow.js`).
+  - Ortak sürüm `20261011d` → `20261011e` (index.html 23 · sw.js 23 · panel-v2.html 4 geçiş, `SW_VERSION` dâhil; pini doğrulayan 12 test dosyası aynı commit'te). `pinDeferral.files` boşaltıldı.
+  - **Önceki kartların tamlığı doğrulandı:** tam kapı (tüm test aileleri) + senkron; 12/12 kart kayıtlı, LEDGER'da KART kaydı var, commit'li.
+- Ölçüler: değişmedi (K3P-A4 ölçüleri; runtime 124,593 KiB)
+- Kapı (K-Q): `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → TÜM KAPILAR YEŞİL (tests/kao 63 · app 78 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · çift şık · okunuş · plan-check · pin senkronu · tekrar-üretim 10/10 · perf)
+- Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
+- Gözlem: —
+- Sıradaki: K3P-A5

@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-A7",
+  "nextPrompt": "K3P-A8",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -266,7 +266,9 @@
     {
       "id": "K3P-A7",
       "wave": "A",
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-12",
+      "result": "A-5/D-7: yarım kalan ders görünür \"Kaldığın yerden\" oldu — Bugün birincil eylemi \"Kaldığın yerden · Bölüm n/5\", hub alt satırı \"Kaldığın yerden devam et\", derse dönünce 5 bölümlü çubuk kalınan bölümden dolu. Bilgi yalnız mevcut path.lessons[id].resume alanından; yeni veri alanı yok."
     },
     {
       "id": "K3P-A8",
@@ -384,6 +386,8 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearn.js"
+    ]
   }
 }

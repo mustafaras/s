@@ -66,6 +66,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_kao2_today.js` | KAO2-09 | Bugün ekranı (S-02) |
 | `test_kao2_word.js` | KAO2-25 · K2F-33 | Kelime detayı v2 (S-08) + panel aynası |
 | `test_k3p_distractors.js` | K3P-01 | B-01: 109 ders yeni ve yerleşik kullanıcıyla oynatılır; şıklar tekil (dizmede sıra numarasıyla), çeldirici lemma tekil ve hedeften farklı, şık sayısı korunur; iki yönlü kart çifti birim vakası; `--taban-yaz` ile çiftsiz görevlerin kararlılık karşılaştırması |
+| `test_k3p_resume.js` | K3P-A7 | A-5/D-7: yarım kalan ders yalnız mevcut `path.lessons[id].resume` alanından okunur; Bugün birincil eylemi "Kaldığın yerden · Bölüm n/5", hub alt satırı "Kaldığın yerden devam et", derse dönünce ilerleme kalınan bölümden dolu |
 | `test_k3p_progress.js` | K3P-A6 | D-2/D-3: plan öğesi → 5 bölüm eşlemesi (Hedef/Isınma/Tanış-Sına/Karışık/Zirve), `aria-valuetext="Bölüm n/5 · etiket · x/y"`, etkin bölüm kendi içinde dolar; sabit eylem bölgesi (birincil eylem + şıklar alta yapışık, `safe-area`) yalnız CSS |
 | `test_k3p_dda.js` | K3P-A5 | K-K uyarlanır zorluk (AKIS §4): art arda 2 yanlış → şık 3 + ses otomatik; art arda 3 yanlış → yeniden tanış paneli; p<%70 → kolay kart; p>%92 (≥8) → 4 şık + harekeler soluyor; kolaylaştırılmış doğru → `kaoGrade` 2; kayan pencere (son 8) yalnız `ui`, `data`'ya yazılmaz |
 | `test_k3p_budget.js` | K3P-A4 | K-O oturum zaman bütçesi: 5 dk kullanıcı + 60 vadeli kartta plan ≤ 5 dk (görev başına süre = ölçülmüş medyan, taban 6 sn); ısınma K3P-A3 kuralını korur (en kararlı s, 3–5); bütçe kırpması ve kalan tekrarların sırası en düşük R'den; plana alınmayan kartlar ertesi gün yine vadeli ve kart verisi değişmez |
@@ -76,7 +77,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_k3p_rhythm.js` | K3P-A3 | A-1/A-2 (K-L, AKIS §3): 109 ders gerçek handler'larla — art arda edilgin ekran ≤ 1 (hedef dâhil, özet hariç), ilk tanış ≤ 7. dokunuşta, her tanıştan hemen sonra o kelimenin 2 şıklı görevi, görev sayısı K3P-A2 tabanının ±%20'si; ısınma en kararlı (s) 3–5 tekrar, kalanlar karışık bölümde tür blokları (≤ 5); yeni kullanıcıda yalnız hedef + ilk tanış yan yana; yarıda bırak → ui sıfırla → Bugün birincil → aynı görevden sürer, çözülen görev yeniden sorulmaz |
 | `test_k3p_deney_rapor.js` | K3P-05 | Deney raporu (KARARLAR §6, AKIS §7): `--ornek` çıktısında H2/H3/H5/H7/H8/H9 satırları, Arapça/kart-ders kimliği/sır yok; sentetik örnekte elle hesaplanan değerler; izdüşüm yalnız izinli alanlar; gunluk sarmalı, `--bugun` sınırı ve hata yolları (exit 2) |
 
-K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (65 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
+K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (66 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
 
 ## Yardımcılar ve sabit veri
 

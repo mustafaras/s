@@ -452,3 +452,15 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
 - Gözlem: —
 - Sıradaki: K3P-A7
+
+## seq 28 · K3P-A7 · KART
+- Tarih: 2026-10-12
+- Commit: (bu commit)
+- Yapılan:
+  - `quranLearn.js`: `kaoResumeSectionForLesson(q,lessonId,now)` — yarım kalan dersin bölümü **yalnız mevcut `path.lessons[id].resume`** alanından okunur (yeni veri alanı yok); plan yeniden kurulur, `resume.phase==='practice'` ise `lessonItemId`, değilse `itemId` plan adımına eşlenir ve `kaoLessonSection` ile bölüm bulunur. `kaoHomeHero`: `daily/next-unit/mastery/repair` adımında birincil eylem **"Kaldığın yerden · Bölüm n/5"**. `kaoHubModel`: devam varsa alt satır **"Kaldığın yerden devam et"** (niyet önerisi varsa korunur).
+  - Yeni test `tests/kao/test_k3p_resume.js` (5 kontrol; envanter 66). K-P: `app/core/quranLearn.js` → `pinDeferral.files`.
+- Ölçüler: `akis-olc` 3) yeniden açılışta birincil "Kaldığın yerden · Bölüm 4/5" **var** · runtime 127,079 → **127,453 KiB** (tavan 128; pay ~0,5 KiB) · css 13,128 KiB · p95 9,8 ms/steady 6,1 ms · çift şık 0/1127 · okunuş 0 · ders başına dokunuş 39
+- Kapı (K-Q): `kapi-hizli --kart K3P-A7 --yavas` → HIZLI KAPI YEŞİL · üç yavaş test yeşil (`kabul` 10/10, `grammar_tasks` 39/39, `denetim` 10/10) · `test_kao2_today` + `test_kao2_hub` + `test_kao2_a11y` + `test_kao2_design_contract` + `test_kao2_navigation` PASS · pin tazeliği PASS
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) Devam ipucu bilerek yalnız `resume` alanından türetilir; yeni veri alanı eklenmedi (prompt şartı). (2) Runtime payı ~0,5 KiB'a indi; **sıradaki kod ekleyen kart (A8 ve sonrası) önce eski kod silmeli**, yetmezse §5 gereği tavan kararı kullanıcıdan istenir.
+- Sıradaki: K3P-A8

@@ -464,3 +464,15 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: (1) Devam ipucu bilerek yalnız `resume` alanından türetilir; yeni veri alanı eklenmedi (prompt şartı). (2) Runtime payı ~0,5 KiB'a indi; **sıradaki kod ekleyen kart (A8 ve sonrası) önce eski kod silmeli**, yetmezse §5 gereği tavan kararı kullanıcıdan istenir.
 - Sıradaki: K3P-A8
+
+## seq 29 · — · YAYIN
+- Tarih: 2026-10-12
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı "canlıya al" dedi; sekizinci ara yayın. Yayına giden çalışma zamanı değişikliği: K3P-A7 (görünür devam "Kaldığın yerden"; `quranLearn.js`).
+  - Ortak sürüm `20261011f` → `20261011g` (index.html 23 · sw.js 23 · panel-v2.html 4 geçiş; pini doğrulayan 12 test dosyası aynı commit'te). `pinDeferral.files` boşaltıldı.
+- Ölçüler: K3P-A7 sonrası — runtime 127,453 KiB (tavan 128) · css 13,128 KiB (tavan 14) · çift şık 0/1127 · okunuş 0 · ders başına dokunuş 39 · devam ipucu "Kaldığın yerden · Bölüm 4/5"
+- Kapı (K-Q): `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → TÜM KAPILAR YEŞİL (tests/kao 66 · app 78 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · çift şık · okunuş · plan-check · pin senkronu · tekrar-üretim 10/10 · perf)
+- Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
+- Gözlem: —
+- Sıradaki: K3P-A8

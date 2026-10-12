@@ -388,3 +388,16 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
 - Gözlem: —
 - Sıradaki: K3P-A4
+
+## seq 23 · K3P-A4 · KART
+- Tarih: 2026-10-12
+- Commit: (bu commit)
+- Yapılan:
+  - `quranLearnFlow.js`: K-O zaman bütçesi. `measuredPerTaskMs(daily,now)` (son 7 günün ms/answered ortalaması; taban **6 sn**) ve `taskBudget(capMinutes,daily,now)` = `floor(seçilen dk ÷ görev süresi)`. `lessonPlan` önce bütçe uygular: ısınma **en kararlı (s) 3–5** ve kırpmadan muaf; kalan yer en düşük R'li tekrarlara verilir (`dueByR`). Güvenlik ağı: toplam görev (dersin özü + tekrarlar) ≤ bütçe; ısınma yine korunur. R, Flow'a eklenen yerel FSRS unutma eğrisiyle hesaplanır (`BUDGET_FACTOR/BUDGET_DECAY`, motor sabitlerine bağımlı değil). `applyPlan` çıktısına `maxMinutes: capMinutes` eklendi. **Bugün ekranı** (`lessonStep`) tahmini hizalandı: `fitReviews = min(vadeli, max(min(vadeli, WARMUP_MAX), bütçe − öz))`, gösterilen tekrar sayısı sığan planla aynı.
+  - Yeni test `tests/kao/test_k3p_budget.js` (8 kontrol; envanter 63). K-P: `app/core/quranLearnFlow.js` → `pinDeferral.files`.
+  - **Gözlem (kapsam dışı):** `test_asset_pin_freshness` K3P-15 kapanışında `app/kao.css`'i listeye almam gerektiğini hatırlattı; bu kez `quranLearnFlow.js` eklendi.
+- Ölçüler: 5 dk + 60 vadeli kart, ölçümsüz kullanıcı → görev başına 6 sn, plan ≤ 41 görev kırpılmaz (davranış korunur); 20 sn/görev → bütçe 13 görev → plan 18 görev, tekrar 20→5; **Bugün reviews = plan reviews** (9/20/30 sn: 20/5/5), Bugün `~dk` ≤ seçilen · `akis-olc` 1) 3 dokunuş (K3P-A3'ten beri açık) · 2) 30 görev, ritim 1 edilgin · 3) ~4 dk · runtime 123,328 → **124,593 KiB** (tavan 128) · css 13,072 KiB · p95 6,74 ms/steady 4,08 ms · dokunus-olc 69→39 (kapalı/açık)
+- Kapı (K-Q): `kapi-hizli --kart K3P-A4 --yavas` (prompt gereği) + hedefli kapı PASS (app 78 · kao 5: navigation, a11y, inventory, design_contract, budget · driver · perf) · üç yavaş test yeşil (`kabul` 10/10, `grammar_tasks` 39/39, `denetim` 10/10) · çift şık 0/1127 · okunuş 0 · kao-plan-check PASS · pin tazeliği PASS
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) **Isınma vs bütçe çelişkisi** kullanıcı kararıyla çözüldü (ısınma en yüksek s + muaf; kırpma/sıra en düşük R). (2) Bütçe tabanı 6 sn olduğu için ölçümsüz kullanıcıda kırpma bağlayıcı değil; "seçilen dakikaya sığma" ölçülmüş süreye dayanır (K3P-03 tabanı). (3) Perf göreli bandı bu koşuda kırmızıydı (7,2 ms > 6,36 ms bant, yavaş makine); mutlak tavanlar (runtime/css/p95) yeşil.
+- Sıradaki: K3P-A5

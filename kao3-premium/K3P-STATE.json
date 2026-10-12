@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-A4",
+  "nextPrompt": "K3P-A5",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -245,7 +245,9 @@
     {
       "id": "K3P-A4",
       "wave": "A",
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-12",
+      "result": "K-O zaman bütçesi: görev üst sınırı = seçilen dk ÷ ölçülmüş görev süresi (en az 6 sn); bütçe en düşük R'li tekrarları alır, ısınma K3P-A3 (en kararlı s) korunur, taşan tekrarlar ertesi gün vadeli kalır; Bugün tahmini sığan planla hizalı"
     },
     {
       "id": "K3P-A5",
@@ -378,6 +380,8 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearnFlow.js"
+    ]
   }
 }

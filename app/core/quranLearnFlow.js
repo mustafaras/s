@@ -61,10 +61,13 @@
   var MIN_PER_TASK=0.55,SETTLED_STABILITY=7,MASTERY_MINUTES=4,REPAIR_MINUTES=3,S0_MINUTES=5;
   // K3P-03 (B-06): ölçülmüş süre görev başına 6 sn'nin altına inmez (bozuk/çok küçük ms "~1 dk" yazdırmasın).
   var FLOOR_PER_TASK=6/60;
+  // K3P-A4 (K-O): kırpma tabanı — görev başına en az 6 sn (K3P-03). Ölçüm geçmişi olmayan kullanıcıda bütçe bağlayıcı değildir.
+  var BUDGET_MIN_PER_MS=6000;
   var curriculumCache={source:null,value:null};
 
   function obj(value){ return value&&typeof value==='object'&&!Array.isArray(value)?value:{}; }
   function num(value,fallback){ return typeof value==='number'&&isFinite(value)?value:fallback; }
+  function round8(value){ return Number(value.toFixed(8)); }
   function pad2(n){ return String(n).padStart(2,'0'); }
   function dayKey(date){ return date.getFullYear()+'-'+pad2(date.getMonth()+1)+'-'+pad2(date.getDate()); }
   function dayStart(key){ var p=key.split('-'); return new Date(Number(p[0]),Number(p[1])-1,Number(p[2])).getTime(); }
@@ -193,11 +196,31 @@
     for(var j=0;j<out.length;j+=1){ var before=j?out[j-1]:prev; if(before&&before.cardId===out[j].cardId&&out[j+1]){ var swap=out[j]; out[j]=out[j+1]; out[j+1]=swap; } }
     return out;
   }
+  function elapsedForCard(c,nowMs){ var r=c&&typeof c.r==='string'?Date.parse(c.r):NaN; return isFinite(r)?Math.max(0,Math.trunc((nowMs-r)/DAY_MS)):0; }
+  // K3P-A4: FSRS unutma eğrisiyle geri çağrılabilirlik; en düşük R = unutulmaya en yakın.
+  // FSRS unutma eğrisi (motor ile aynı biçim: (1+FACTOR·gün/s)^DECAY); Flow motora bağımlı olmasın diye yerel sabitler.
+  var BUDGET_DECAY=-0.5,BUDGET_FACTOR=19/81;
+  function retrievabilityOf(c,nowMs){ var st=num(c&&c.s,0); if(!(st>0)) return 0; return round8(Math.pow(1+BUDGET_FACTOR*elapsedForCard(c,nowMs)/st,BUDGET_DECAY)); }
+  // K3P-A4: ölçülmüş görev başına süre (son 7 günün ms/answered ortalaması); en az 6 sn (K3P-03 tabanı), ölçüm yoksa 6 sn.
+  function measuredPerTaskMs(daily,now){
+    var days=obj(daily),today=dayStart(dayKey(checkNow(now))),ms=0,answered=0;
+    Object.keys(days).forEach(function(key){
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
+      var age=(today-dayStart(key))/DAY_MS,day=obj(days[key]);
+      if(age<0||age>=7||!(num(day.ms,0)>0)||!(num(day.answered,0)>0)) return;
+      ms+=day.ms; answered+=day.answered;
+    });
+    return answered>0?Math.max(BUDGET_MIN_PER_MS,ms/answered):BUDGET_MIN_PER_MS;
+  }
+  // K3P-A4: bütçelenen görev üst sınırı = seçilen dk ÷ görev başına süre (en az 6 sn); 0 = sınır yok.
+  function taskBudget(maxMinutes,daily,now){ var cap=num(maxMinutes,0); if(!(cap>0)) return 0; return Math.max(0,Math.floor(cap*60000/measuredPerTaskMs(daily,now))); }
   function lessonPlan(snapshot,lessonId,now,content,reviews){
     checkNow(now);
     var snap=obj(snapshot),q=obj(snap.quranLearn),c=content||{},cur=curriculum(c),lesson=cur.lessonById[String(lessonId)];
     if(!lesson) return null;
     var own=Array.isArray(lesson.lemmaIds)?lesson.lemmaIds.filter(function(id){ return typeof id==='string'&&id; }):[],ids=own.concat(carryOver(q,cur,lesson,c).filter(function(id){ return own.indexOf(id)<0; })),settings=obj(q.settings),budget=Math.max(0,Math.floor(num(settings.dailyNew,10))),fresh=[],record=obj(lessonRecord(q,lesson.id)),resume=obj(record.resume),resumeIntro=String(resume.itemId||'');
+    var capMinutes=[5,10,15].indexOf(num(obj(q.onboarding).minutes,0))>=0?num(q.onboarding.minutes,0):0;
+    var sessionBudget=taskBudget(capMinutes,obj(q.daily),now);
     ids.forEach(function(id){ if(resumeIntro==='intro:'+id){ fresh.push(id); return; } if(!introduced(q,id,lesson.id)&&fresh.length<budget) fresh.push(id); });
     var eligible=ids.filter(function(id){ return introduced(q,id,lesson.id)||fresh.indexOf(id)>=0; });
     var lex=c.lexicon,grammar=c.grammar,lemmas=eligible.map(function(id){ return lex&&typeof lex.byId==='function'?lex.byId(id):null; }).filter(Boolean);
@@ -242,9 +265,16 @@
     var practiceCount=practice.length;
     practice.forEach(function(item){ item.choiceCount=4; });
     var take=function(test){ var found=practice.findIndex(test); return found<0?null:practice.splice(found,1)[0]; };
-    var cards=obj(q.cards),stability=function(item){ return num(obj(cards[item.cardId]).s,0); },seenHere=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[];
-    var due=(Array.isArray(reviews)?reviews:[]).filter(function(item){ return item&&typeof item.id==='string'&&item.id; }).map(function(item){ return {id:item.id,kind:'practice',group:'review',lessonId:lesson.id,cardId:String(item.cardId||item.id),queue:item}; });
+    var stability=function(item){ return num(obj(q.cards[item.cardId]).s,0); },seenHere=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[];
+    var nowMs=now.getTime(),due=(Array.isArray(reviews)?reviews:[]).filter(function(item){ return item&&typeof item.id==='string'&&item.id; }).map(function(item){ var cardId=String(item.cardId||item.id); return {id:item.id,kind:'practice',group:'review',lessonId:lesson.id,cardId:cardId,queue:item,r:retrievabilityOf(obj(obj(q.cards)[cardId]),nowMs)}; });
+    // K3P-A4 (K-O): bütçe en düşük R'li tekrarları alır (en düşük R önce); ısınma K3P-A3 gereği en kararlı (en yüksek s) 3–5'tir
+    // ve kırpmadan muaftır. Kırpılanlar ertesi gün yine vadeli kalır (yalnız plan sırası değişir).
+    var dueByR=due.slice().sort(function(a,b){ return a.r-b.r; });
     var warm=due.slice().sort(function(a,b){ return stability(b)-stability(a); }).slice(0,WARMUP_MAX);
+    var kept=warm.slice();
+    if(sessionBudget>0){ var room=Math.max(0,sessionBudget-kept.length); dueByR.forEach(function(item){ if(room<=0||kept.indexOf(item)>=0) return; kept.push(item); room-=1; }); }
+    else { dueByR.forEach(function(item){ if(kept.indexOf(item)<0) kept.push(item); }); }
+    var keptByR=kept.slice().sort(function(a,b){ return a.r-b.r; });
     // Tanış-sına döngüsü: bu derste yeni ya da bu derste tanışılmış kelimeler; devam noktası yeniden yüklemede aynı sırayı bulur.
     var loop=eligible.filter(function(id){ return fresh.indexOf(id)>=0||seenHere.indexOf(id)>=0; });
     while(warm.length<WARMUP_MIN){ var known=take(function(item){ return item.group==='lemma'&&item.direction==='ar>tr'&&loop.indexOf(item.lemmaId)<0; }); if(!known) break; warm.push(known); }
@@ -258,9 +288,24 @@
       items.push({id:'concept:'+concept.id,kind:'concept',lessonId:lesson.id,concept:concept});
       var first=take(function(item){ return item.group==='concept'; }); if(first) items.push(first);
     }
-    items=items.concat(mixBlocks(practice,due.filter(function(item){ return warm.indexOf(item)<0; }),items[items.length-1],typeOfGrammar));
+    items=items.concat(mixBlocks(practice,kept.filter(function(item){ return warm.indexOf(item)<0; }),items[items.length-1],typeOfGrammar));
+    // K3P-A4 (K-O) güvenlik ağı: TOPLAM görev (dersin özü + tekrarlar) ≤ seçilen dk ÷ görev başına süre.
+    // Dersin özü (tanış/kavram/zirve) bütçeden önce ayrıldığı için önce o sayılır; kalan yer tekrarlara verilir.
+    var bound=taskBudget(capMinutes,obj(q.daily),now);
+    if(bound>0){
+      var coreCount=1; items.forEach(function(it){ if(it.group!=='review'&&(it.kind==='intro'||it.kind==='practice')) coreCount+=1; });
+      // Isınma (en kararlı) K3P-A3 gereği her zaman kalır; kalan yer en düşük R'li tekrarlara verilir.
+      var warmIds=Object.create(null); warm.forEach(function(it){ warmIds[it.id]=true; });
+      var room=Math.max(0,bound-coreCount-warm.length);
+      var otherReviews=[]; items.forEach(function(it){ if(it.group==='review'&&!warmIds[it.id]) otherReviews.push(it); });
+      if(otherReviews.length>room){
+        otherReviews.sort(function(a,b){ return a.r-b.r; });
+        var keepSet=Object.create(null); otherReviews.slice(0,room).forEach(function(it){ keepSet[it.id]=true; });
+        items=items.filter(function(it){ return it.group!=='review'||warmIds[it.id]||keepSet[it.id]; });
+      }
+    }
 
-    var apply={id:'apply:'+lesson.id,kind:'apply',lessonId:lesson.id,ref:lesson.apply||null,words:applyWords(lesson,c,q,fresh)};
+    var apply={id:'apply:'+lesson.id,kind:'apply',lessonId:lesson.id,ref:lesson.apply||null,maxMinutes:capMinutes,words:applyWords(lesson,c,q,fresh)};
     if(obj(lesson.apply).kind==='examples'){ apply.mode='examples'; apply.sentences=applySentences(c,fresh,eligible.concat(ids.filter(function(id){ return eligible.indexOf(id)<0; }))); }
     items.push(apply);
     items.push({id:'summary:'+lesson.id,kind:'summary',lessonId:lesson.id,lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),practiceCount:practiceCount});
@@ -447,10 +492,14 @@
   function lessonStep(q,now,content,current,due,cap){
     var daily=obj(q.daily),lesson=current.progress.nextLesson,lp=lessonProgress(q,lesson.id,content);
     var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
-    var minutes=estimateMinutes(daily,reviews+lessonTaskCount(q,lesson.id,now,content,fresh),now,cap),counts={reviews:reviews,fresh:fresh};
+    // K3P-A4 (K-O): Bugün tahmini, sığan oturumdan türetilir. Sığan tekrar = bütçe − dersin özü (en az 0), en çok vadeli sayısı.
+    var bound=taskBudget(cap,daily,now),core=lessonTaskCount(q,lesson.id,now,content,fresh);
+    // Isınma (en kararlı, ≤WARMUP_MAX) her zaman kalır; bütçe onun üstüne tekrar ekler.
+    var fitReviews=bound>0?Math.min(reviews,Math.max(Math.min(reviews,WARMUP_MAX),bound-core)):reviews;
+    var minutes=estimateMinutes(daily,fitReviews+core,now,cap),counts={reviews:fitReviews,fresh:fresh};
     // 05 §10: tekrar borcu yeni kelimeyi sıfırladıysa ünite tanıtımı yerine "yalnız tekrar" günü.
     if(current.previous&&!current.progress.started&&fresh>0) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise,minutes,'kaoLesson',lesson.id,counts);
-    var subtitle=fresh>0?(reviews>0?reviews+' tekrar + '+fresh+' yeni':fresh+' yeni kelime')+' · ~'+minutes+' dk':reviews+' tekrar · önce tekrarları bitirelim · ~'+minutes+' dk';
+    var subtitle=fresh>0?(fitReviews>0?fitReviews+' tekrar + '+fresh+' yeni':fresh+' yeni kelime')+' · ~'+minutes+' dk':fitReviews+' tekrar · önce tekrarları bitirelim · ~'+minutes+' dk';
     return step('daily',current.unit.title+' · Ders '+(current.progress.nextIndex+1),subtitle,minutes,'kaoLesson',lesson.id,counts);
   }
   // 05 §4 öncelik sırası; ilk eşleşen kazanır. Kenar: 7+ gün ara → ısınma, tekrar borcu >60 → yeni 0.

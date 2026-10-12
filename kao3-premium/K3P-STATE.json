@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-A5",
+  "nextPrompt": "K3P-A6",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -252,7 +252,9 @@
     {
       "id": "K3P-A5",
       "wave": "A",
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-12",
+      "result": "K-K uyarlanır zorluk: son 8 görevlik kayan pencere (yalnız ui). Kaygı (p<%70 ya da art arda 2 yanlış) → şık 4→3→2, ses otomatik, kolay kart; art arda 3 yanlışta yeniden tanış paneli. Sıkılma (p>%92, ≥8 görev) → harekeler soluyor. Notlama adaleti: kolaylaştırılmış doğru = Hard (2)."
     },
     {
       "id": "K3P-A6",
@@ -380,6 +382,8 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearn.js"
+    ]
   }
 }

@@ -414,3 +414,15 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
 - Gözlem: —
 - Sıradaki: K3P-A5
+
+## seq 25 · K3P-A5 · KART
+- Tarih: 2026-10-12
+- Commit: (bu commit)
+- Yapılan:
+  - `quranLearn.js`: K-K uyarlanır zorluk. Sabitler `KAO_FLOW_WINDOW=8, KAO_ANXIETY=0.70, KAO_BOREDOM=0.92, KAO_ANXIETY_WRONG=2, KAO_REINTRO_WRONG=3, KAO_HELP_GRADE=2`. `kaoWindowPush`/`kaoFlowRate`/`kaoSessionFlow` (kayan pencere yalnız `ui`), `kaoAnxiety`/`kaoBoredom`/`kaoHelp`/`kaoChoiceCap`. `currentTask` görevi şık kapağıyla kurar (akış/sıkılma 4 · kaygı 3 · art arda 3 yanlış 2) ve `kaoTrimChoices` ile 4→3→2 uygular. `kaoOpenFeedback` pencereyi ve art arda yanlış sayacını günceller; 3 yanlışta `kaoReintro` paneline yeniden tanış (anlam + ses) ekler; kaygı bandında `kaoInjectEasy` araya bilinen kolay kart koyar (yalnız kuyruk). `kaoShouldAutoplay` kaygı kolunda sesi otomatik çalar. `kaoGrade` `difficulty` parametresi alır (kolaylaştırılmış doğru = Hard 2). Sıkılmada `kaoBoredomHideHarakat` Arapça çiftlerde harekeleri solutur. Pencere ders başında sıfırlanır; `kaoContinue`/`kaoUndo` ilgili `ui` alanlarını temizler/geri alır; enjekte kolay kart devam işaretçisine yazılmaz.
+  - Yeni test `tests/kao/test_k3p_dda.js` (6 kontrol; envanter 64). `akis-olc.cjs` 4. ölçümü uyarlanır etkiyi yazar. K-P: `app/core/quranLearn.js` → `pinDeferral.files`.
+- Ölçüler: `akis-olc` 4) 2 yanlıştan sonra şık ≤3 **evet** (2,2), akışa dönünce 4 **evet**; ders başına dokunuş 69→39 · runtime 124,593 → **126,173 KiB** (tavan 128) · css 13,072 KiB · p95 13,08 ms/steady 8,36 ms (yavaş makine) · çift şık 0/1127 · okunuş 0
+- Kapı (K-Q): `kapi-hizli --kart K3P-A5 --yavas` (prompt gereği) · üç yavaş test yeşil (`kabul` 10/10, `grammar_tasks` 39/39, `denetim` 10/10) · `test_kao_fsrs` + `test_kao_queue` PASS · kritik regresyonlar (rhythm, feedback_arms, distractors, feedback, lesson_flow, next_step, budget, settings, design_contract, a11y, migration×2) PASS · pin tazeliği PASS
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) Varsayılan şık kapağı **4** olmalıydı (AKIS "4→3→2'ye iner"); ilk uygulamada 3'e indiriyordum, düzeltildi — mevcut 4 şıklı görevleri bozmamak için kritik. (2) Enjekte kolay kart devam işaretçisine (`record.resume`) sızıyordu; guard eklendi (uyarlanır durum kalıcı olmaz). (3) Kayan pencere uygulama bloğunda değil **ders (oturum) başında** sıfırlanır. (4) Runtime payı ~1,8 KiB'a indi; sıradaki kod ekleyen kart önce eski kodu silmeli.
+- Sıradaki: K3P-A6

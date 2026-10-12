@@ -69,4 +69,8 @@ for (let g = 0; g < 300 && W.ui.kaoLesson && n < 10; g += 1) {
   if (!isTask(W)) { W.api.kaoLesson('next'); continue; }
   const task = curTask(W); const wrong = n < 4; seq.push(`${wrong ? '✕' : '✓'}${task.kind || task.type}/${task.direction || ''}/${(task.choices || []).length}şık`); answer(W, task, !wrong); n += 1;
 }
-console.log(`4) 4 yanlış + devam: ${seq.join(' · ')}`);
+// K3P-A5 (AKIS §4): kaygı kolunda şık sayısı düşer (4→3→2) ve ses otomatik çalar; akışa dönünce 4'e çıkar.
+const afterTwoWrong = seq.slice(2, 4).map((x) => Number((/(\d+)şık/.exec(x) || [])[1] || 0));
+const backInFlow = seq.slice(4).map((x) => Number((/(\d+)şık/.exec(x) || [])[1] || 0));
+console.log(`4) Uyarlanır zorluk: 4 yanlış + devam: ${seq.join(' · ')}`);
+console.log(`   2 yanlıştan sonra şık ≤3: ${afterTwoWrong.every((v) => v > 0 && v <= 3) ? 'evet' : 'HAYIR'} (${afterTwoWrong.join(',')}) · akışa dönünce 4: ${backInFlow.some((v) => v === 4) ? 'evet' : 'HAYIR'} (${backInFlow.join(',')})`);

@@ -99,7 +99,8 @@ assert.match(html, /Doğru cevap: Doğru anlam/);
 assert.match(html, /akran/);
 assert.match(html, /App\.kaoUndo\(\)/);
 assert.match(html, /App\.kaoContinue\(\)/);
-assert.match(html, /class="kao-task-progress"[^>]*role="progressbar"/);
+// K3P-A6 (D-2): görev görünümündeki ilerleme çubuğu 5 bölümlüdür (tek ilerleme çubuğu; tek ince çubuk sözleşmesi).
+assert.match(html, /class="kao-lesson-progress"[^>]*role="progressbar"[^>]*aria-valuetext="Bölüm \d\/5/);
 assert.match(html, /\d+ \/ \d+/);
 assert.match(html, /Doğal hız/);
 assert.match(html, /onpointerdown=.*350/);

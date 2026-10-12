@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-A6",
+  "nextPrompt": "K3P-A7",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -259,7 +259,9 @@
     {
       "id": "K3P-A6",
       "wave": "A",
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-12",
+      "result": "D-2/D-3: ders ilerlemesi 5 bölümlü (Hedef/Isınma/Tanış-Sına/Karışık/Zirve), plan öğelerinden türetilir, etkin bölüm kendi içinde dolar, aria-valuetext \"Bölüm n/5 · etiket · x/y\"; sabit eylem bölgesi (birincil eylem + şıklar alta yapışık, safe-area) yalnız CSS. Görev görünümündeki eski tek çubuk 5 bölümlü çubukla değişti (tek ilerleme çubuğu sözleşmesi korunur)."
     },
     {
       "id": "K3P-A7",
@@ -383,7 +385,9 @@
     "branch": "kao3-premium",
     "until": "K3P-27",
     "files": [
-      "app/core/quranLearn.js"
+      "app/core/quranLearn.js",
+      "app/core/quranLearnViews.js",
+      "app/kao.css"
     ]
   }
 }

@@ -320,7 +320,10 @@
     }
     var buttonLabel=escapeText(model.buttonLabel||'Devam');
     var secondaryCall=actionCall(model.secondaryAction),secondary=model.secondaryAction?'<button type="button" class="kao-lesson-audio kao-lesson-more"'+(secondaryCall?' onclick="'+secondaryCall+'"':' disabled')+'>'+escapeText(model.secondaryLabel||'5 dakika daha')+'</button>':'';
-    return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" aria-label="Ders oynatıcı">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders adımı" aria-valuemin="1" aria-valuemax="'+escapeText(model.stepTotal||1)+'" aria-valuenow="'+escapeText(model.step||1)+'"><span style="width:'+String(Math.max(0,Math.min(100,Number(model.percent)||0)))+'%"></span></div>'+body+(model.actions?model.actions:'')+'<button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button>'+secondary+'</main>';
+    // K3P-A6 (D-2): 5 bölümlü ilerleme — etkin bölüm kendi içinde dolar; aria-valuetext "Bölüm n/5 · etiket · x/y".
+    var segs=''; for(var si=1;si<=5;si+=1){ var filled=model.section?si<model.section:false, active=model.section===si; var w=active?String(Math.max(0,Math.min(100,Number(model.sectionPercent)||0)))+'%':(filled?'100%':'0%'); segs+='<span class="kao-lesson-seg'+(active?' is-active':'')+(filled?' is-filled':'')+'"><i style="width:'+w+'"></i></span>'; }
+    var valueText=model.sectionValuetext?escapeText(model.sectionValuetext):'Bölüm '+escapeText(model.section||1)+'/5';
+    return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" data-lesson-section="'+escapeText(model.section||1)+'" aria-label="Ders oynatıcı">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+escapeText(model.section||1)+'" aria-valuetext="'+valueText+'">'+segs+'</div>'+body+(model.actions?model.actions:'')+'<button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button>'+secondary+'</main>';
   }
 
   // KAO2-11 · S-01 ilk açılış (05 §3) ve 05 §9 "Yeni düzen" notu. Eylemler yalnız actionCall ile üretilir.

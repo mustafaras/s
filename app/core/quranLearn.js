@@ -1809,8 +1809,10 @@
     }
     var panel=ui.kaoPanel&&ui.kaoPanel.open&&ui.kaoPanel.taskId===task.id?ui.kaoPanel:null,autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',isLink=task.type==='link',isTransfer=task.type==='transfer',prompt=task.audioOnly?'Dinlediğin kelimenin anlamını seç':(isGrammar||isFragment||isTransfer?task.prompt:(task.direction==='tr>ar'?task.meaning:task.ar));
     var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
-    var taskCount=Math.max(1,(ui.kaoQueue||[]).length),taskPosition=Math.min(taskCount,Math.max(1,(ui.kaoTaskIndex||0)+1));
-    h+='<div class="kao-task-progress" role="progressbar" aria-label="Görev ilerlemesi" aria-valuemin="1" aria-valuemax="'+String(taskCount)+'" aria-valuenow="'+String(taskPosition)+'"><span style="width:'+String(Math.round(taskPosition/taskCount*100))+'%"></span></div>';
+    // K3P-A6 (D-2): görev görünümünde de 5 bölümlü konum görünür (ders planındaki bölüm).
+    var taskSection=kaoLessonSection(ui.kaoLesson),taskSegs='';
+    for(var ts=1;ts<=5;ts+=1){ var tf=ts<taskSection.section,ta=ts===taskSection.section,tw=ta?String(Math.max(0,Math.min(100,taskSection.countInSection?taskSection.indexInSection/taskSection.countInSection*100:0)))+'%':(tf?'100%':'0%'); taskSegs+='<span class="kao-lesson-seg'+(ta?' is-active':'')+(tf?' is-filled':'')+'"><i style="width:'+tw+'"></i></span>'; }
+    h+='<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+String(taskSection.section)+'" aria-valuetext="'+esc(kaoSectionValuetext(taskSection))+'" data-lesson-section="'+String(taskSection.section)+'">'+taskSegs+'</div>';
     h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(isFragment?(task.kind==='order'?'Kelime dizme':'Parça çevir'):(isLink?'Bağ kur · Türkçedeki türevi':(isTransfer?'Yeni âyet · haftalık test':(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç')))))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
     if(!task.audioOnly&&!isGrammar&&!isFragment&&(task.direction==='ar>tr'||isLink)) h+='<h2 class="kao-question" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true||kaoBoredomHideHarakat())+'</h2>';
     else h+='<h2 class="kao-question'+(isGrammar||isFragment||isTransfer?' kao-question-text':'')+'">'+esc(prompt)+'</h2>';
@@ -2163,6 +2165,27 @@
     q.path.units[key]=Object.assign({masteryAt:null,masteryScore:null,attempts:0,lastAttemptAt:null,repair:null,skippedAt:null},rec,{skippedAt:new Date().toISOString()});
     kaoSave(); quranLearnDeps.render(); return true;
   }
+  // K3P-A6 (D-2, AKIS §3/§5): ders planı 5 bölüme ayrılır — ① Hedef ② Isınma ③ Tanış-Sına ④ Karışık ⑤ Zirve.
+  // Bölüm bilgisi yalnız plan öğelerinden türetilir; kalıcı yazılmaz.
+  var KAO_SECTION_LABELS=['Hedef','Isınma','Tanış-Sına','Karışık','Zirve'];
+  function kaoSectionOf(item){
+    if(!item||!item.kind) return 1;
+    if(item.kind==='goal') return 1;
+    if(item.kind==='apply'||item.kind==='read'||item.kind==='summary') return 5;
+    if(item.kind==='intro'||item.kind==='concept') return 3;
+    if(item.kind==='practice') return item.group==='review'?2:4;
+    return 1;
+  }
+  // {section, indexInSection, countInSection} — plan dizisine göre.
+  function kaoLessonSection(state){
+    var plan=Array.isArray(state&&state.plan)?state.plan:[],at=Math.max(0,Math.floor(nonNegativeNumber(state&&state.at,0)));
+    var counts=[0,0,0,0,0];
+    plan.forEach(function(it){ counts[kaoSectionOf(it)-1]+=1; });
+    var section=kaoSectionOf(plan[at]),indexInSection=0;
+    for(var i=0;i<=at&&i<plan.length;i+=1){ if(kaoSectionOf(plan[i])===section) indexInSection+=1; }
+    return {section:section,label:KAO_SECTION_LABELS[section-1],indexInSection:indexInSection,countInSection:counts[section-1]};
+  }
+  function kaoSectionValuetext(s){ return 'Bölüm '+s.section+'/5 · '+s.label+' · '+s.indexInSection+'/'+s.countInSection; }
   function kaoLessonHTML(){
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),state=ui.kaoLesson;
@@ -2174,7 +2197,8 @@
     var lessonRef=kaoCurriculumLesson(state.lessonId),lessonUnit=lessonRef?kaoCurriculumUnit(lessonRef.unitId):null;
     var contextLine=lessonUnit?(kaoUnitContextLabel(lessonUnit)+' · Ders '+String(lessonRef.index+1)+' / '+String(lessonUnit.lessons.length)):'';
     if(kaoUnitSession(state)){ var sessionUnit=kaoCurriculumUnit(state.unitId),sessionLabel=state.kind==='repair'?'Onarım':'Ustalık kontrolü'; contextLine=sessionUnit?(kaoUnitContextLabel(sessionUnit)+' · '+sessionLabel):sessionLabel; }
-    var model={stage:item.kind==='read'?'apply':item.kind,title:state.title,context:contextLine,step:(state.at||0)+1,stepTotal:state.plan.length,percent:((state.at||0)+1)/state.plan.length*100,action:item.kind==='summary'?{name:'kaoLesson',args:['finish']}:{name:'kaoLesson',args:['next']},exit:{name:'kaoLesson',args:['exit']},buttonLabel:item.kind==='summary'?'Bugün yeter':'Devam'};
+    var kaoSection=kaoLessonSection(state),kaoSectionProgress=kaoSection.countInSection?kaoSection.indexInSection/kaoSection.countInSection:0;
+    var model={stage:item.kind==='read'?'apply':item.kind,title:state.title,context:contextLine,step:(state.at||0)+1,stepTotal:state.plan.length,percent:((state.at||0)+1)/state.plan.length*100,section:kaoSection.section,sectionLabel:kaoSection.label,sectionPercent:kaoSectionProgress*100,sectionValuetext:kaoSectionValuetext(kaoSection),action:item.kind==='summary'?{name:'kaoLesson',args:['finish']}:{name:'kaoLesson',args:['next']},exit:{name:'kaoLesson',args:['exit']},buttonLabel:item.kind==='summary'?'Bugün yeter':'Devam'};
     if(item.kind==='goal'&&state.kind==='repair'){
       model.promise='Karıştırdığın '+(item.lemmaIds||[]).length+' kelimeyi iki yönde tekrar edeceğiz. Bitince ustalık kontrolünü yeniden deneyebilirsin.';
     }else if(item.kind==='goal'&&state.kind==='mastery'){

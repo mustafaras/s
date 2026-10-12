@@ -426,3 +426,17 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: (1) Varsayılan şık kapağı **4** olmalıydı (AKIS "4→3→2'ye iner"); ilk uygulamada 3'e indiriyordum, düzeltildi — mevcut 4 şıklı görevleri bozmamak için kritik. (2) Enjekte kolay kart devam işaretçisine (`record.resume`) sızıyordu; guard eklendi (uyarlanır durum kalıcı olmaz). (3) Kayan pencere uygulama bloğunda değil **ders (oturum) başında** sıfırlanır. (4) Runtime payı ~1,8 KiB'a indi; sıradaki kod ekleyen kart önce eski kodu silmeli.
 - Sıradaki: K3P-A6
+
+## seq 26 · K3P-A6 · KART
+- Tarih: 2026-10-12
+- Commit: (bu commit)
+- Yapılan:
+  - `quranLearn.js`: `KAO_SECTION_LABELS`, `kaoSectionOf(item)` (goal ①, practice/review ②, intro/concept ③, practice/lemma ④, apply/read/summary ⑤), `kaoLessonSection(state)` (bölüm + indexInSection/countInSection), `kaoSectionValuetext`. Ders modeline `section/sectionLabel/sectionPercent/sectionValuetext` eklendi. Görev görünümünde 5 bölümlü çubuk çizilir; eski `kao-task-progress` ve kullanılmayan `taskCount/taskPosition` kaldırıldı.
+  - `quranLearnViews.js` `lessonScreen`: 5 segmentli `kao-lesson-progress` (role=progressbar, aria-valuemin/max/now/valuetext), etkin bölüm kendi içinde dolar, `data-lesson-section`.
+  - `kao.css`: `.kao-lesson-progress` grid 5 sütun + `.kao-lesson-progress .kao-lesson-seg>i`; D-3 sabit eylem bölgesi `.kao-lesson>.kao-lesson-next,.kao-lesson>.kao-lesson-more{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px))}` ve `.kao-task>.kao-choices{...}`. Eski `.kao-task-progress` kaldırıldı.
+  - Yeni test `tests/kao/test_k3p_progress.js` (4 kontrol; envanter 65). `test_kao2_feedback` gerekçeli güncellendi (ilerleme çubuğu 5 bölümlü oldu). K-P: `quranLearnViews.js`, `kao.css` → `pinDeferral.files`.
+- Ölçüler: runtime 126,173 → **127,079 KiB** (tavan 128; pay ~0,9 KiB) · css 13,072 → **13,128 KiB** (tavan 14) · p95 ~12 ms/steady 7,1 ms · çift şık 0/1127 · okunuş 0 · kontrast 726 çift/0 ihlal · ders başına dokunuş 39
+- Kapı (K-Q): `kapi-hizli --kart K3P-A6 --yavas` → HIZLI KAPI YEŞİL (ilk koşuda yalnız `test_asset_pin_freshness` kırmızıydı; K-P listesine 2 dosya eklenince yeşil) · üç yavaş test yeşil (`kabul` 10/10, `grammar_tasks` 39/39, `denetim` 10/10) · `test_kao2_a11y` + `test_kao2_design_contract` + kontrast + çift şık + okunuş PASS
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) Görev görünümünde ders ekranı yerini görev görünümüne bıraktığı için bölüm çubuğu oraya da eklendi; K2F-28 "tek ilerleme çubuğu" kuralı eski çubuğu kaldırıp 5 bölümlüyle değiştirerek korundu (yeni çubuk eklenmedi, tek çubuk). (2) `.kao-lesson-seg` a11y'nin "sabit yükseklik" taramasına takıldı; seçici `.kao-lesson-progress .kao-lesson-seg` yapıldı (progress içeriyor). (3) Runtime payı ~0,9 KiB'a indi; sıradaki kod ekleyen kart önce yer açmalı.
+- Sıradaki: K3P-A7

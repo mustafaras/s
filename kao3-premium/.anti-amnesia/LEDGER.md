@@ -440,3 +440,15 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: (1) Görev görünümünde ders ekranı yerini görev görünümüne bıraktığı için bölüm çubuğu oraya da eklendi; K2F-28 "tek ilerleme çubuğu" kuralı eski çubuğu kaldırıp 5 bölümlüyle değiştirerek korundu (yeni çubuk eklenmedi, tek çubuk). (2) `.kao-lesson-seg` a11y'nin "sabit yükseklik" taramasına takıldı; seçici `.kao-lesson-progress .kao-lesson-seg` yapıldı (progress içeriyor). (3) Runtime payı ~0,9 KiB'a indi; sıradaki kod ekleyen kart önce yer açmalı.
 - Sıradaki: K3P-A7
+
+## seq 27 · — · YAYIN
+- Tarih: 2026-10-12
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı "canlıya al" dedi; yedinci ara yayın. Yayına giden çalışma zamanı değişiklikleri: K3P-A5 (uyarlanır zorluk; `quranLearn.js`) ve K3P-A6 (5 bölümlü ilerleme + sabit eylem bölgesi; `quranLearn.js`, `quranLearnViews.js`, `kao.css`).
+  - Ortak sürüm `20261011e` → `20261011f` (index.html 23 · sw.js 23 · panel-v2.html 4 geçiş; pini doğrulayan 12 test dosyası aynı commit'te). `pinDeferral.files` boşaltıldı.
+- Ölçüler: K3P-A6 sonrası — runtime 127,079 KiB (tavan 128) · css 13,128 KiB (tavan 14) · çift şık 0/1127 · okunuş 0 · ders başına dokunuş 39 · bölümlü ilerleme 5/5
+- Kapı (K-Q): `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → TÜM KAPILAR YEŞİL (tests/kao 65 · app 78 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · çift şık · okunuş · plan-check · pin senkronu · tekrar-üretim 10/10 · perf)
+- Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
+- Gözlem: —
+- Sıradaki: K3P-A7

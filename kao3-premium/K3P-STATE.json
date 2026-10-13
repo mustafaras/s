@@ -396,6 +396,6 @@
     "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": ["app/kao.css","app/core/constants.js","app/core/quranLearn.js","app/core/quranLearnViews.js"]
+    "files": []
   }
 }

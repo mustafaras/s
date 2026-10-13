@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-10",
+  "nextPrompt": "K3P-11",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -308,7 +308,9 @@
     {
       "id": "K3P-10",
       "wave": 1,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-13",
+      "result": "Hareket grameri (TASARIM §5.4, D-5/D-6): görev geçişi 24 px yatay kayma + opaklık ≤240 ms (.kao-task-in, --kao-dur-transition); şık basışı scale(.98) 120 ms (.kao-choices button, --kao-dur-micro); ✓ işareti --kao-ease ile yaylanarak belirir (.kao-choice-correct .kao-choice-mark); kaoFx('wrong') yalnız seçilen şıkta yatay sarsıntı (.kao-shake) + SeyHaptics.error, ses YOK (D-6); kaoAnimate tek kapı (SeyFx.shouldAnimate yoksa prefers-reduced-motion); reduced-motion da GERÇEK her hareket kuralını kapatır (kapsanmayan 0); yeni 2 test (test_k3p_motion_css, test_k3p_motion_fx), envanter 69"
     },
     {
       "id": "K3P-11",
@@ -396,6 +398,11 @@
     "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/kao.css",
+      "app/core/quranLearn.js",
+      "app/core/quranLearnFlow.js",
+      "app/core/quranLearnViews.js"
+    ]
   }
 }

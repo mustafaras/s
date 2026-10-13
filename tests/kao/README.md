@@ -77,8 +77,10 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_k3p_rhythm.js` | K3P-A3 | A-1/A-2 (K-L, AKIS §3): 109 ders gerçek handler'larla — art arda edilgin ekran ≤ 1 (hedef dâhil, özet hariç), ilk tanış ≤ 7. dokunuşta, her tanıştan hemen sonra o kelimenin 2 şıklı görevi, görev sayısı K3P-A2 tabanının ±%20'si; ısınma en kararlı (s) 3–5 tekrar, kalanlar karışık bölümde tür blokları (≤ 5); yeni kullanıcıda yalnız hedef + ilk tanış yan yana; yarıda bırak → ui sıfırla → Bugün birincil → aynı görevden sürer, çözülen görev yeniden sorulmaz |
 | `test_k3p_deney_rapor.js` | K3P-05 | Deney raporu (KARARLAR §6, AKIS §7): `--ornek` çıktısında H2/H3/H5/H7/H8/H9 satırları, Arapça/kart-ders kimliği/sır yok; sentetik örnekte elle hesaplanan değerler; izdüşüm yalnız izinli alanlar; gunluk sarmalı, `--bugun` sınırı ve hata yolları (exit 2) |
 | `test_k3p_typography.js` | K3P-08 | Arapça tipografi sözleşmesi (TASARIM §5.3): Arapça seçicilerde `font-weight:700` = 0 (`.kao-dialog [lang="ar"]` tabanı 400); Arapça `font-size` yalnız `--kao-ar-hero/body/inline`; oran ≥ 1,3 × gövde (`--f-body`); şık düğmeleri ≥ 56 px |
+| `test_k3p_motion_css.js` | K3P-10 | Hareket grameri sözleşmesi (TASARIM §5.4, D-5) — `app/kao.css` metin taraması: üç sınıf `--kao-dur-micro/transition/moment` + `--kao-ease`; görev geçişi 24 px yatay + opaklık ≤240 ms; şık basışı 120 ms küçülme; ✓ işareti yaylanarak belirir; `prefers-reduced-motion:reduce` GERÇEK her hareket kuralını kapatır (kapsanmayan seçici 0) |
+| `test_k3p_motion_fx.js` | K3P-10 | `kaoFx` hareket birim testi (D-6): yanlışta seçilen şık sarsılır + yalnız `SeyHaptics.error` (ses yok, kırmızı yok); `SeyFx.shouldAnimate() === false` iken ne sarsıntı ne görev-geçiş sınıfı; görev geçişi ile doğru yol ayrışır |
 
-K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (67 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
+K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (69 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
 
 ## Yardımcılar ve sabit veri
 

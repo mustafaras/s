@@ -40,7 +40,7 @@
     var title=escapeText(options.title),isRoot=options.view==='home'||options.view==='onboard'||options.view==='session',action=isRoot?'App.kaoClose()':'App.kaoBack()',label=isRoot?'Kapat':'‹ '+escapeText(options.previousTitle||"Kur'an Arapçası");
     return '<nav class="kao-navbar" aria-label="'+title+'"><button type="button" class="kao-navbar-action" onclick="'+action+'" aria-label="'+label+'">'+label+'</button><span class="kao-navbar-title" title="'+title+'">'+title+'</span><span class="kao-navbar-spacer" aria-hidden="true"></span></nav>';
   }
-  // K2F-28 (K4-03): odak çubuğu — ≥44 px ✕ tek kontroldür; ilerleme çubuğu içeriğin (ders/görev) kendi parçasıdır.
+  // K2F-28 (K4-03): odak çubuğu — ≥44 px ✕ tek kontroldür; ilerleme çubuğu içeriğin kendi parçasıdır.
   function focusBar(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     var exit=actionCall(options&&options.exit),label=escapeText(options&&options.label||'Oturumdan çık');
@@ -101,7 +101,7 @@
     }).join('');
     return '<div class="kao-group-list">'+html+'</div>';
   }
-  // K2F-29: ayar grubu — başlık + yüzey (satırlar) + isteğe bağlı alt açıklama; satırlar önceden üretilmiş HTML'dir.
+  // K2F-29: ayar grubu — başlık + yüzey (satırlar) + isteğe bağlı alt açıklama; satırlar hazır HTML'dir.
   function settingsGroup(title,rowsHtml,footer){
     if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');
     return '<div class="kao-group-section"><h3 class="kao-group-title">'+escapeText(title)+'</h3><div class="kao-group-surface">'+(Array.isArray(rowsHtml)?rowsHtml.join(''):String(rowsHtml||''))+'</div>'+(footer?'<p class="kao-group-footer">'+escapeText(footer)+'</p>':'')+'</div>';
@@ -145,7 +145,7 @@
       var kind=action.kind==='primary'?'kao-feedback-continue':(action.kind==='link'?'kao-feedback-undo':'');
       return '<button type="button" class="kao-feedback-action'+(kind?' '+kind:'')+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(action.label)+'</button>';
     }).join('');
-    // body: dize (tek paragraf) ya da satır dizisi; satır = dize ya da {text, lang:'ar'} (Arapça satır RTL ve ayrı paragraf).
+    // body: dize ya da satır dizisi; satır = dize ya da {text, lang:'ar'} (Arapça satır RTL ve ayrı paragraf).
     var bodyItems=Array.isArray(options.body)?options.body:[options.body];
     var bodyHtml=bodyItems.map(function(item){
       if(item&&typeof item==='object') return '<p class="kao-feedback-body'+(item.lang==='ar'?' kao-feedback-ar':'')+'"'+(item.lang==='ar'?' lang="ar" dir="rtl"':'')+'>'+escapeText(item.text)+'</p>';
@@ -289,7 +289,7 @@
       var rowHtml=rows.map(function(row){
         var cells=Array.isArray(row.cells)?row.cells:[];
         if(row.label!==undefined) cells=[row.label].concat(cells);
-        return '<tr>'+cells.map(function(cell){ // K2F-37 (ekran görüntüsü): Arapça hücre [âyet-referansı, Arapça, okunuş] üçlüsüdür; gösterilen Arapça + okunuş olmalı (referans değil).
+        return '<tr>'+cells.map(function(cell){ // K2F-37: Arapça hücre [âyet-referansı, Arapça, okunuş]; gösterilen Arapça + okunuş olmalı.
         if(Array.isArray(cell)){ var reading=escapeText(cell[2]); return '<td><span class="kao-grammar-ar" lang="ar" dir="rtl">'+escapeText(cell[1]||cell[0]||'')+'</span>'+(reading?'<span class="kao-grammar-reading" lang="tr" dir="ltr">'+reading+'</span>':'')+'</td>'; }
         return '<td>'+escapeMixed(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell)+'</td>'; }).join('')+'</tr>';
       }).join('');
@@ -462,7 +462,7 @@
     return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p>'+worked+'</div></div>'+ayahSection+examples+notesSection+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
   }
 
-  // K2F-14 · Seviye 0: aşamaya göre (intro → listen → drill → read → done) FARKLI HTML. Motor yalnız model üretir (K-2);
+  // K2F-14 · Seviye 0: aşamaya göre (intro → listen → drill → read → done) FARKLI HTML; motor yalnız model üretir (K-2);
   // aşama başına en fazla bir `.kao-primary`; alıştırma bitmeden birincil düğme pasif; geri bildirim aria-live.
   function s0Arabic(text,className){ return '<span'+(className?' class="'+className+'"':'')+' lang="ar" dir="rtl">'+escapeText(text)+'</span>'; }
   function s0MarkList(marks){

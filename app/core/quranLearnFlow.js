@@ -61,7 +61,7 @@
   var MIN_PER_TASK=0.55,SETTLED_STABILITY=7,MASTERY_MINUTES=4,REPAIR_MINUTES=3,S0_MINUTES=5;
   // K3P-03 (B-06): ölçülmüş süre görev başına 6 sn'nin altına inmez (bozuk/çok küçük ms "~1 dk" yazdırmasın).
   var FLOOR_PER_TASK=6/60;
-  // K3P-A4 (K-O): kırpma tabanı — görev başına en az 6 sn (K3P-03). Ölçüm geçmişi olmayan kullanıcıda bütçe bağlayıcı değildir.
+  // K3P-A4 (K-O): kırpma tabanı — görev başına en az 6 sn (K3P-03); ölçüm geçmişi olmayanda bütçe bağlayıcı değil.
   var BUDGET_MIN_PER_MS=6000;
   var curriculumCache={source:null,value:null};
 
@@ -118,8 +118,8 @@
     }
     var qRoot=obj(q),freshSet=Object.create(null);
     fresh.forEach(function(id){ freshSet[id]=true; });
-    // K2F-24 (K3-02): namaz metnindeki lp_* kelimesi, araçla üretilmiş muhafazakâr eşlemede (curriculum.prayerLemmaMap) bir l_* lemmasına
-    // bağlıysa durumu o lemmadan türer; eşlenmeyen kelime open kalır. lemmaId aynen korunur, eşlenen kimlik mappedLemmaId'de taşınır.
+    // K2F-24 (K3-02): namaz metnindeki lp_* kelimesi, muhafazakâr eşlemede (curriculum.prayerLemmaMap) bir l_* lemmasına
+    // bağlıysa durumu o lemmadan türer; eşlenmeyen kelime open kalır. lemmaId korunur, eşlenen kimlik mappedLemmaId'de.
     var prayerMap=obj(obj(content&&content.curriculum).prayerLemmaMap);
     return words.map(function(word){
       var lemmaId=typeof word.lemmaId==='string'?word.lemmaId:'',mapped=typeof prayerMap[lemmaId]==='string'?prayerMap[lemmaId]:'',stateId=mapped||lemmaId,isNew=!!(stateId&&freshSet[stateId]);
@@ -129,7 +129,7 @@
     });
   }
   // K2F-23 (K3-01): çapa metni olmayan derste "Uygula" adımı dersin lemmalarının doğrulanmış ilk örnek cümlesiyle dolar
-  // (önce yeni lemmalar, en çok 3). Arapça, okunuş ve çeviri yalnız lexicon `examples[0]`'dan gelir; doğrulanmamış örnek kullanılmaz.
+  // (önce yeni lemmalar, en çok 3). Arapça, okunuş ve çeviri yalnız lexicon `examples[0]`'dan gelir; doğrulanmamış örnek yok.
   var APPLY_SENTENCE_MAX=3;
   function applySentences(content,fresh,eligible){
     var lex=content&&content.lexicon,order=fresh.concat(eligible.filter(function(id){ return fresh.indexOf(id)<0; })),out=[];
@@ -140,9 +140,9 @@
     }
     return out;
   }
-  // KAO2-12: tek dersin kaynak-bağlı sırası. İçerik ve veri salt okunur; bütün Arapça lexicon/anchor kaynaklarından gelir.
-  // K2F-20 (A-6): ders içerikleri yeniden dağıtılabilir; tamamlanmış (doneAt) bir derse sonradan taşınan ve hiç tanışılmamış
-  // kelimeler kaybolmasın diye SIRADAKİ dersin planına eklenir. Tamamlanmış ders tamamlanmış kalır, kart verisine dokunulmaz.
+  // KAO2-12: tek dersin kaynak-bağlı sırası; içerik ve veri salt okunur, bütün Arapça lexicon/anchor kaynağından gelir.
+  // K2F-20 (A-6): ders içerikleri yeniden dağıtılabilir; tamamlanmış (doneAt) derse sonradan taşınan ve hiç tanışılmamış
+  // kelimeler kaybolmasın diye SIRADAKİ dersin planına eklenir; tamamlanmış ders tamamlanmış kalır, kart verisi değişmez.
   // K2F-21: onaylanmamış (draft) ders başlığı plana sızmaz; kimlikten türetilen güvenli başlık kullanılır.
   function safeLessonTitle(lesson){
     var level=obj(lesson&&lesson.review).level,m=/^u0*(\d+)\.0*(\d+)$/.exec(String(lesson&&lesson.id||''));
@@ -165,8 +165,8 @@
     });
     return found?out:[];
   }
-  // K3P-A3 (AKIS §3) nefes ritmi: hedef → ısınma (vadeli tekrarın en kararlı 3–5'i) → [tanış → hemen 2 şıklı soru] × yeni kelime
-  // → kavram + 1 görev → karışık pekiştirme (tür blokları, ≤5) → zirve (uygula) → özet. Değişen yalnız sıra; görev kümesi aynı.
+  // K3P-A3 (AKIS §3) nefes ritmi: hedef → ısınma (en kararlı 3–5) → [tanış → hemen 2 şıklı soru] × yeni kelime
+  // → kavram + 1 görev → karışık pekiştirme (bloklar ≤5) → zirve → özet; değişen yalnız sıra, görev kümesi aynı.
   var WARMUP_MAX=5,WARMUP_MIN=3,BLOCK_MAX=5;
   function chunkBlocks(list,cat){
     var size=Math.ceil(list.length/Math.ceil(list.length/BLOCK_MAX)),out=[];
@@ -185,7 +185,7 @@
     });
     var reviewBlocks=reviews.length?chunkBlocks(reviews,'review'):[],blocks=[],out=[],last=prev&&prev.kind==='practice'?cat(prev):'';
     for(var i=0;i<Math.max(lessonBlocks.length,reviewBlocks.length);i+=1){ if(lessonBlocks[i]) blocks.push(lessonBlocks[i]); if(reviewBlocks[i]) blocks.push(reviewBlocks[i]); }
-    // Sıradaki blok: son türden farklı ve en çok bloğu kalan tür (eşitlikte sıradaki); böylece aynı tür blokları yan yana kalmaz.
+    // Sıradaki blok: son türden farklı ve en çok bloğu kalan tür; böylece aynı tür blokları yan yana kalmaz.
     while(blocks.length){
       var left=Object.create(null),at=-1;
       blocks.forEach(function(block){ left[block.cat]=(left[block.cat]||0)+1; });
@@ -201,7 +201,7 @@
   // FSRS unutma eğrisi (motor ile aynı biçim: (1+FACTOR·gün/s)^DECAY); Flow motora bağımlı olmasın diye yerel sabitler.
   var BUDGET_DECAY=-0.5,BUDGET_FACTOR=19/81;
   function retrievabilityOf(c,nowMs){ var st=num(c&&c.s,0); if(!(st>0)) return 0; return round8(Math.pow(1+BUDGET_FACTOR*elapsedForCard(c,nowMs)/st,BUDGET_DECAY)); }
-  // K3P-A4: ölçülmüş görev başına süre (son 7 günün ms/answered ortalaması); en az 6 sn (K3P-03 tabanı), ölçüm yoksa 6 sn.
+  // K3P-A4: ölçülmüş görev başına süre (son 7 günün ms/answered ort.); en az 6 sn (K3P-03), ölçüm yoksa 6 sn.
   function measuredPerTaskMs(daily,now){
     var days=obj(daily),today=dayStart(dayKey(checkNow(now))),ms=0,answered=0;
     Object.keys(days).forEach(function(key){
@@ -267,7 +267,7 @@
     var take=function(test){ var found=practice.findIndex(test); return found<0?null:practice.splice(found,1)[0]; };
     var stability=function(item){ return num(obj(q.cards[item.cardId]).s,0); },seenHere=Array.isArray(record.introducedLemmas)?record.introducedLemmas:[];
     var nowMs=now.getTime(),due=(Array.isArray(reviews)?reviews:[]).filter(function(item){ return item&&typeof item.id==='string'&&item.id; }).map(function(item){ var cardId=String(item.cardId||item.id); return {id:item.id,kind:'practice',group:'review',lessonId:lesson.id,cardId:cardId,queue:item,r:retrievabilityOf(obj(obj(q.cards)[cardId]),nowMs)}; });
-    // K3P-A4 (K-O): bütçe en düşük R'li tekrarları alır (en düşük R önce); ısınma K3P-A3 gereği en kararlı (en yüksek s) 3–5'tir
+    // K3P-A4 (K-O): bütçe en düşük R'li tekrarları alır; ısınma K3P-A3 gereği en kararlı (en yüksek s) 3–5'tir
     // ve kırpmadan muaftır. Kırpılanlar ertesi gün yine vadeli kalır (yalnız plan sırası değişir).
     var dueByR=due.slice().sort(function(a,b){ return a.r-b.r; });
     var warm=due.slice().sort(function(a,b){ return stability(b)-stability(a); }).slice(0,WARMUP_MAX);
@@ -275,7 +275,7 @@
     if(sessionBudget>0){ var room=Math.max(0,sessionBudget-kept.length); dueByR.forEach(function(item){ if(room<=0||kept.indexOf(item)>=0) return; kept.push(item); room-=1; }); }
     else { dueByR.forEach(function(item){ if(kept.indexOf(item)<0) kept.push(item); }); }
     var keptByR=kept.slice().sort(function(a,b){ return a.r-b.r; });
-    // Tanış-sına döngüsü: bu derste yeni ya da bu derste tanışılmış kelimeler; devam noktası yeniden yüklemede aynı sırayı bulur.
+    // Tanış-sına döngüsü: bu derste yeni/tanışılmış kelimeler; devam noktası yeniden yüklemede aynı sırayı bulur.
     var loop=eligible.filter(function(id){ return fresh.indexOf(id)>=0||seenHere.indexOf(id)>=0; });
     while(warm.length<WARMUP_MIN){ var known=take(function(item){ return item.group==='lemma'&&item.direction==='ar>tr'&&loop.indexOf(item.lemmaId)<0; }); if(!known) break; warm.push(known); }
     var items=[goal].concat(warm);
@@ -483,7 +483,7 @@
     for(var i=0;i<s0.length;i+=1) if(!obj(lessonRecord(q,s0[i].id)).doneAt) return {lesson:s0[i],index:i};
     return null;
   }
-  // K2F-31: dersin gerçek görev sayısı = tanış + alıştırma + uygula (plan kurulabiliyorsa); kurulamazsa yalnız yeni kelime sayısı.
+  // K2F-31: ders görev sayısı = tanış + alıştırma + uygula; kurulamazsa yalnız yeni kelime sayısı.
   function lessonTaskCount(q,lessonId,now,content,fresh){
     var plan=lessonPlan({quranLearn:q},lessonId,now,content),count=0;
     if(Array.isArray(plan)) plan.forEach(function(item){ if(item.kind==='intro'||item.kind==='practice'||item.kind==='apply') count+=1; });
@@ -492,7 +492,7 @@
   function lessonStep(q,now,content,current,due,cap){
     var daily=obj(q.daily),lesson=current.progress.nextLesson,lp=lessonProgress(q,lesson.id,content);
     var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
-    // K3P-A4 (K-O): Bugün tahmini, sığan oturumdan türetilir. Sığan tekrar = bütçe − dersin özü (en az 0), en çok vadeli sayısı.
+    // K3P-A4 (K-O): Bugün tahmini sığan oturumdan türetilir. Sığan tekrar = bütçe − dersin özü, en çok vadeli sayısı.
     var bound=taskBudget(cap,daily,now),core=lessonTaskCount(q,lesson.id,now,content,fresh);
     // Isınma (en kararlı, ≤WARMUP_MAX) her zaman kalır; bütçe onun üstüne tekrar ekler.
     var fitReviews=bound>0?Math.min(reviews,Math.max(Math.min(reviews,WARMUP_MAX),bound-core)):reviews;

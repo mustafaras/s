@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-11",
+  "nextPrompt": "K3P-12",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -315,7 +315,9 @@
     {
       "id": "K3P-11",
       "wave": 2,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-13",
+      "result": "Tezhip sayfası (TASARIM §2) — imza bileşen: views.tezhipPage({title,lines,footer,interactive}) saf görünüm; kelime üç durumda (bilinen/öğreniliyor/yeni), Arapça RTL --kao-ar-body; yaldız açık temada mürekkep metin + altın zemin + 2 px altın alt çizgi, koyu temada altın metin, forced-colors'da Highlight; her kelime aria-label taşır; interactive:false iken kelimeler düğme DEĞİL, true iken ≥44 px düğme; rumî kenarlık aria-hidden SVG. kaoTezhipModel(d,surahId) kısa sûre (id) ya da namaz metnini (id, 'fatiha') çözer, YALNIZ türetir (bilinen = kaoKnownLemmaSet, öğreniliyor = kartı var, yeni = kartı yok) ve yaldız oranını aynı kelime kümesiyle kaoCoverage ile birebir tutarlı verir. test_k3p_tezhip (16 kontrol), envanter 70"
     },
     {
       "id": "K3P-12",

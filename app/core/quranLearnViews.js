@@ -120,6 +120,29 @@
     var circumference=169.65,offset=(circumference*(100-value)/100).toFixed(2);
     return '<span class="kao-progress-ring" role="img" aria-label="'+escapeText(label)+': %'+value+'"><svg class="kao-progress-ring-svg kao-progress-ring-'+dimension+'" width="'+dimension+'" height="'+dimension+'" viewBox="0 0 64 64" aria-hidden="true"><circle class="kao-progress-ring-track" cx="32" cy="32" r="27" fill="none" stroke-width="4"></circle><circle class="kao-progress-ring-value" cx="32" cy="32" r="27" fill="none" stroke-width="4" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 32 32)"></circle></svg><span class="kao-progress-ring-text" aria-hidden="true">%'+value+'</span></span>';
   }
+  // K3P-11: Tezhip sayfası — bilinen kelime altın; öğreniliyor ◌ yarım; yeni mürekkep. Kenarlık rumî SVG.
+  function tezhipPage(options){
+    if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
+    options=options&&typeof options==='object'?options:{};
+    var lines=Array.isArray(options.lines)?options.lines:[],interactive=options.interactive===true;
+    var words=lines.map(function(line){
+      return (Array.isArray(line)?line:[]).map(function(word){
+        word=word&&typeof word==='object'?word:{};
+        var state=['known','learning','new'].indexOf(word.state)>=0?word.state:'new';
+        var ar=escapeText(word.ar||''),label=word.index==null?ar:ar+', '+escapeText(word.index);
+        return {ar:ar,state:state,label:label,aria:ar+', '+(state==='known'?'biliniyor':(state==='learning'?'öğreniliyor':'henüz bilinmiyor'))};
+      });
+    });
+    var body=words.map(function(line){
+      return '<span class="kao-tezhip-line">'+line.map(function(word){
+        if(interactive) return '<button type="button" class="kao-tezhip-word is-'+word.state+'" aria-label="'+word.aria+'">'+word.ar+'</button>';
+        return '<span class="kao-tezhip-word is-'+word.state+'" aria-label="'+word.aria+'">'+word.ar+'</span>';
+      }).join('')+'</span>';
+    }).join('');
+    return '<figure class="kao-tezhip">'+deps.icon('rumi',120,'kao-tezhip-orn')+'<figcaption class="kao-tezhip-title">'+escapeText(options.title||'')+'</figcaption>'
+      +'<div class="kao-tezhip-body" lang="ar" dir="rtl">'+body+'</div>'
+      +(options.footer?'<p class="kao-tezhip-footer">'+escapeText(options.footer)+'</p>':'')+'</figure>';
+  }
   function choice(options){
     if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
@@ -547,5 +570,5 @@
     return '<main class="kao-s0" data-stage="'+escapeText(stage.kind)+'" aria-labelledby="kao-s0-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye 0 · şekil aileleri</p><h2 id="kao-s0-title">'+escapeText(model.title)+'</h2><p class="kao-s0-progress" aria-label="Aşama '+String(stage.index+1)+' / '+String(stage.count)+'">Aşama '+String(stage.index+1)+' / '+String(stage.count)+' · '+escapeText(stage.label)+'</p></div></div>'+body+button+'</main>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,groupRow:groupRow,switchRow:switchRow,settingsGroup:settingsGroup,progressRing:progressRing,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,groupRow:groupRow,switchRow:switchRow,settingsGroup:settingsGroup,progressRing:progressRing,tezhipPage:tezhipPage,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
 })(window);

@@ -484,6 +484,20 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-moment{position:relative;isolation:isolate;overflow:hidden;--kao-label:var(--kao-moment-ink);--kao-label-2:color-mix(in srgb,var(--kao-moment-ink) 84%,transparent);color:var(--kao-label);background:linear-gradient(color-mix(in srgb,var(--quran) 22%,var(--kao-mat-moment)),color-mix(in srgb,var(--quran2) 14%,var(--kao-mat-moment)));border-bottom:1px solid var(--kao-ok);border-bottom-color:var(--kao-ok);box-shadow:var(--kao-shadow-2)}
 .kao-moment-orn{position:absolute;top:6px;left:50%;width:112px;height:auto;transform:translateX(-50%);fill:none;stroke:var(--kao-ok);stroke-width:1.5;opacity:.08;pointer-events:none;z-index:-1}
 @media (forced-colors:active){.kao-moment{background:Canvas;border-bottom:1px solid CanvasText;box-shadow:none}.kao-moment-orn{display:none}}
+/* K3P-11 · Tezhip sayfası (TASARIM §2): bilinen kelime altın (açık: mürekkep metin + altın zemin + 2 px altın alt çizgi; koyu: altın metin), öğreniliyor yarım altın, yeni mürekkep. Yaldız yalnız renkle anlatılmaz: alt çizgi de taşınır (forced-colors'da Highlight). */
+.kao-tezhip{position:relative;isolation:isolate;display:grid;justify-items:center;gap:var(--kao-gap-1);margin:0;padding:var(--kao-gap-2);border-radius:var(--kao-r-card);background:var(--kao-mat-card);color:var(--kao-label);box-shadow:var(--kao-shadow-1)}
+.kao-tezhip-orn{position:absolute;top:6px;left:50%;width:112px;height:auto;transform:translateX(-50%);fill:none;stroke:var(--kao-ok);stroke-width:1.5;opacity:.08;pointer-events:none;z-index:-1}
+.kao-tezhip-title{margin:0;font-size:var(--f-title3);font-weight:600;color:var(--kao-label)}
+.kao-tezhip-body{display:grid;gap:2px;font-size:var(--kao-ar-body);line-height:var(--kao-ar-lh,2.2)}
+.kao-tezhip-line{display:flex;flex-wrap:wrap;justify-content:center;gap:0 10px}
+.kao-tezhip-word{padding:0 3px;border-radius:6px;color:var(--kao-label)}
+.kao-tezhip-word.is-known{background:color-mix(in srgb,var(--quran2) 22%,transparent);border-bottom:2px solid var(--kao-ok)}
+.kao-tezhip-word.is-learning{background:color-mix(in srgb,var(--quran2) 12%,transparent)}
+#root[data-theme="dark"] .kao-tezhip-word.is-known{color:var(--quran2)}
+.kao-tezhip button.kao-tezhip-word{min-height:44px;display:inline-flex;align-items:center;padding:0 6px;border:0;background:none;font:inherit;line-height:inherit;cursor:pointer}
+.kao-tezhip button.kao-tezhip-word.is-known{background:color-mix(in srgb,var(--quran2) 22%,transparent);border-bottom:2px solid var(--kao-ok)}
+.kao-tezhip-footer{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote)}
+@media (forced-colors:active){.kao-tezhip{background:Canvas;color:CanvasText;box-shadow:none}.kao-tezhip-orn{display:none}.kao-tezhip-word.is-known,.kao-tezhip-word.is-learning{border-bottom:2px solid Highlight;background:none}.kao-tezhip-word.is-new{border-bottom:1px dashed CanvasText}}
 /* K3P-10 · Hareket grameri (TASARIM §5.4): geçiş (24 px yatay + opaklık, ≤240 ms), yanlışta tek sarsıntı, ✓ yaylanarak belirir. */
 @keyframes kao-task-in{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
 .kao-task-in{animation:kao-task-in var(--kao-dur-transition) var(--kao-ease)}

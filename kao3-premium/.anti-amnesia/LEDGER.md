@@ -640,3 +640,17 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
   - **K3P-10 (hareket):** yukarıdaki kart; css 14,372 → **14,700**; runtime **127,995 L6**.
   - **Dalga kapanış ölçüleri:** **runtime 127,995 / 128 KiB** (L9 127,653; pay L6 **0,005**) · **css 14,700 / 16 KiB** (pay ~1,3) · **kontrast 734 çift / 0 ihlal** · **test sayısı: tests/kao 69** (dalga boyunca 66→69; +3 test) · içerik 184,591 / 256 KiB · tam kapı **TÜM KAPILAR YEŞİL**.
 - Sıradaki: K3P-11
+
+## seq 40 · K3P-11 · KART (Dalga 2 · Tezhip, ilk kart)
+- Tarih: 2026-10-13
+- Commit: (bu commit)
+- Yapılan:
+  - **Bileşen (`views.tezhipPage`).** `{title, lines, footer, interactive}`; `lines` biçimi `[[{ar, state, index}]]`. Arapça sağdan sola, `--kao-ar-body` (`lang="ar" dir="rtl"`). Kenarlık rumî satır içi SVG (`deps.icon('rumi')`, `aria-hidden`). Her kelime `aria-label` taşır; `interactive:false` iken kelimeler düğme DEĞİL; `interactive:true` iken ≥44 px düğme.
+  - **Yaldız (§2).** Açık tema: mürekkep metin + altın zemin (`--quran2 %22`) + **2 px altın alt çizgi**; koyu tema: altın metin; `forced-colors`: alt çizgi `Highlight` (yaldız yalnız renkle anlatılmaz). Öğreniliyor: yarım altın zemin; yeni: mürekkep.
+  - **Model (`kaoTezhipModel(d, surahId)`).** Kısa sûre (`id`) ya da namaz metni (`id`, ör. `'fatiha'`); yoksa `null`. Durum: bilinen = `kaoKnownLemmaSet` · öğreniliyor = kartı var · yeni = kartı yok. **Yalnız türetir.** Yaldız oranı **aynı kelime kümesiyle** `kaoCoverage` ile birebir tutarlı.
+  - **Test.** `tests/kao/test_k3p_tezhip.js` (16 kontrol: üç durum, escape, erişilebilir ad, `interactive:false` düğme değil, rumî `aria-hidden`, durum kuralı, `kaoKnownLemmaSet` eşliği, salt-türetim, `lines` biçimi, `kaoCoverage` tutarlılığı, İhlâs modu, bilinmeyen kimlik). Envanter **69 → 70**.
+- Ölçüler: css 14,700 → **15,041 KiB** (gzip L9; tavan 16) · runtime 127,995 → **127,835 KiB L6** (tavan 128; L9 127,475) · app.js **7799 satır** (dokunulmadı) · kontrast **742 çift / 0 ihlal** · content 184,591 · p95 4,3 ms.
+- Kapı (K-Q): `kapi-hizli --kart K3P-11` → **HIZLI KAPI YEŞİL** (70/70 kao + sözleşme/pin + driver + iki ölçü kapısı; düzeltme sonrası yeniden koşuldu).
+- Kanıt düzeyi: kaynak/test · görsel QA **yok** (bu kartta ekran görüntüsü istenmedi) · cihaz yok
+- Gözlem: (1) **Runtime tuzağı (§2, yine):** JS (~+1,0 KiB) payı aştı; tavan yükseltilmedi — "aynı işi gören eski kod" olarak **en uzun yorumlarda parantez içi açıklamalar** kısaltıldı (73 yorum satırı, ~2,1 KB ham; atıf kodları, davranış ve cümle sonları korundu; kod yolu hiç değişmedi). Dalga 2 devamında yer açma sürecek. (2) **CSS özgüllük hatası (kendi hatam):** düğme varyantındaki `border:0` kısayolu, `.kao-tezhip-word.is-known`'un `border-bottom` altın alt çizgisini eziyordu → yaldızın **renk-dışı** a11y sinyali kaybolacaktı; düğme için `.is-known{border-bottom:2px solid var(--kao-ok)}` eklendi ve regresyon testi yazıldı (`.kao-tezhip-word[role]` ölü seçicisi de kaldırıldı). (3) **Bağlantı kararı:** bileşen bu kartta **hiçbir ekrana bağlanmadı** (prompt yalnız "saf görünüm + model + test" istedi); tüketiciler K3P-12/13/14/17/18. Bağlanınca bir kez daha görsel doğrulama gerekir. (4) Yaldız oranı `kaoCoverage`'ın `words` moduyla hesaplanıyor: E9/âyet yoluyla **tam aynı** kural (bilinen lemma = iki yön kalıcı). (5) Pin ertelemesi değişmedi (aynı 4 dosya).
+- Sıradaki: K3P-12

@@ -79,8 +79,9 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_k3p_typography.js` | K3P-08 | Arapça tipografi sözleşmesi (TASARIM §5.3): Arapça seçicilerde `font-weight:700` = 0 (`.kao-dialog [lang="ar"]` tabanı 400); Arapça `font-size` yalnız `--kao-ar-hero/body/inline`; oran ≥ 1,3 × gövde (`--f-body`); şık düğmeleri ≥ 56 px |
 | `test_k3p_motion_css.js` | K3P-10 | Hareket grameri sözleşmesi (TASARIM §5.4, D-5) — `app/kao.css` metin taraması: üç sınıf `--kao-dur-micro/transition/moment` + `--kao-ease`; görev geçişi 24 px yatay + opaklık ≤240 ms; şık basışı 120 ms küçülme; ✓ işareti yaylanarak belirir; `prefers-reduced-motion:reduce` GERÇEK her hareket kuralını kapatır (kapsanmayan seçici 0) |
 | `test_k3p_motion_fx.js` | K3P-10 | `kaoFx` hareket birim testi (D-6): yanlışta seçilen şık sarsılır + yalnız `SeyHaptics.error` (ses yok, kırmızı yok); `SeyFx.shouldAnimate() === false` iken ne sarsıntı ne görev-geçiş sınıfı; görev geçişi ile doğru yol ayrışır |
+| `test_k3p_tezhip.js` | K3P-11 | Tezhip sayfası (TASARIM §2): `views.tezhipPage` üç durumu (bilinen/öğreniliyor/yeni) sınıflar, metni kaçırır, `aria-label` taşır, `interactive:false` iken düğme değil, rumî kenarlık `aria-hidden` SVG; `kaoTezhipModel` yalnız türetir (durum = kaoKnownLemmaSet / kart var / kart yok) ve yaldız oranı **aynı kelime kümesiyle** `kaoCoverage` ile birebir tutarlıdır |
 
-K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (69 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
+K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (70 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
 
 ## Yardımcılar ve sabit veri
 

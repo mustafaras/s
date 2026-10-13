@@ -61,7 +61,7 @@
   var MIN_PER_TASK=0.55,SETTLED_STABILITY=7,MASTERY_MINUTES=4,REPAIR_MINUTES=3,S0_MINUTES=5;
   // K3P-03 (B-06): ölçülmüş süre görev başına 6 sn'nin altına inmez (bozuk/çok küçük ms "~1 dk" yazdırmasın).
   var FLOOR_PER_TASK=6/60;
-  // K3P-A4 (K-O): kırpma tabanı — görev başına en az 6 sn (K3P-03); ölçüm geçmişi olmayanda bütçe bağlayıcı değil.
+  // K3P-A4: kırpma tabanı — görev başına en az 6 sn; ölçüm geçmişi olmayanda bütçe bağlayıcı değil.
   var BUDGET_MIN_PER_MS=6000;
   var curriculumCache={source:null,value:null};
 
@@ -128,7 +128,7 @@
       return out;
     });
   }
-  // K2F-23 (K3-01): çapa metni olmayan derste "Uygula" adımı dersin lemmalarının doğrulanmış ilk örnek cümlesiyle dolar
+  // K2F-23: çapa metni olmayan derste "Uygula" adımı dersin lemmalarının doğrulanmış ilk örnek cümlesiyle dolar
   // (önce yeni lemmalar, en çok 3). Arapça, okunuş ve çeviri yalnız lexicon `examples[0]`'dan gelir; doğrulanmamış örnek yok.
   var APPLY_SENTENCE_MAX=3;
   function applySentences(content,fresh,eligible){
@@ -141,7 +141,7 @@
     return out;
   }
   // KAO2-12: tek dersin kaynak-bağlı sırası; içerik ve veri salt okunur, bütün Arapça lexicon/anchor kaynağından gelir.
-  // K2F-20 (A-6): ders içerikleri yeniden dağıtılabilir; tamamlanmış (doneAt) derse sonradan taşınan ve hiç tanışılmamış
+  // K2F-20: ders içerikleri yeniden dağıtılabilir; tamamlanmış derse sonradan taşınan ve hiç tanışılmamış
   // kelimeler kaybolmasın diye SIRADAKİ dersin planına eklenir; tamamlanmış ders tamamlanmış kalır, kart verisi değişmez.
   // K2F-21: onaylanmamış (draft) ders başlığı plana sızmaz; kimlikten türetilen güvenli başlık kullanılır.
   function safeLessonTitle(lesson){
@@ -165,8 +165,8 @@
     });
     return found?out:[];
   }
-  // K3P-A3 (AKIS §3) nefes ritmi: hedef → ısınma (en kararlı 3–5) → [tanış → hemen 2 şıklı soru] × yeni kelime
-  // → kavram + 1 görev → karışık pekiştirme (bloklar ≤5) → zirve → özet; değişen yalnız sıra, görev kümesi aynı.
+  // K3P-A3 nefes ritmi: hedef → ısınma → [tanış → hemen 2 şıklı soru] × yeni kelime
+  // → kavram + 1 görev → karışık pekiştirme → zirve → özet; değişen yalnız sıra, görev kümesi aynı.
   var WARMUP_MAX=5,WARMUP_MIN=3,BLOCK_MAX=5;
   function chunkBlocks(list,cat){
     var size=Math.ceil(list.length/Math.ceil(list.length/BLOCK_MAX)),out=[];
@@ -198,7 +198,7 @@
   }
   function elapsedForCard(c,nowMs){ var r=c&&typeof c.r==='string'?Date.parse(c.r):NaN; return isFinite(r)?Math.max(0,Math.trunc((nowMs-r)/DAY_MS)):0; }
   // K3P-A4: FSRS unutma eğrisiyle geri çağrılabilirlik; en düşük R = unutulmaya en yakın.
-  // FSRS unutma eğrisi (motor ile aynı biçim: (1+FACTOR·gün/s)^DECAY); Flow motora bağımlı olmasın diye yerel sabitler.
+  // FSRS unutma eğrisi (motor ile aynı biçim:^DECAY); Flow motora bağımlı olmasın diye yerel sabitler.
   var BUDGET_DECAY=-0.5,BUDGET_FACTOR=19/81;
   function retrievabilityOf(c,nowMs){ var st=num(c&&c.s,0); if(!(st>0)) return 0; return round8(Math.pow(1+BUDGET_FACTOR*elapsedForCard(c,nowMs)/st,BUDGET_DECAY)); }
   // K3P-A4: ölçülmüş görev başına süre (son 7 günün ms/answered ort.); en az 6 sn (K3P-03), ölçüm yoksa 6 sn.
@@ -249,7 +249,7 @@
     if(hasAudio.length&&budgetLeft-audioCount<1&&budgetLeft>1) audioCount=Math.max(1,audioCount-1),reverseCount=Math.min(eligible.length,budgetLeft-audioCount);
     hasAudio.slice(0,audioCount).forEach(function(id){ practice.push(makeWord(id,'ar>tr',true)); });
     eligible.slice(0,reverseCount).forEach(function(id){ practice.push(makeWord(id,'tr>ar',false)); });
-    // K2F-11 (K4-04): aynı gramer türü ardışık gelmez — türler açgözlüyle yayılır (özgün sıra eşitlikte korunur).
+    // K2F-11: aynı gramer türü ardışık gelmez — türler açgözlüyle yayılır.
     var typeOfGrammar=function(item){ var found=templates.find(function(entry){ return entry.id===item.templateId; }); return found?String(found.type):''; };
     var spread=[],pool=grammarItems.slice();
     while(pool.length){
@@ -492,7 +492,7 @@
   function lessonStep(q,now,content,current,due,cap){
     var daily=obj(q.daily),lesson=current.progress.nextLesson,lp=lessonProgress(q,lesson.id,content);
     var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
-    // K3P-A4 (K-O): Bugün tahmini sığan oturumdan türetilir. Sığan tekrar = bütçe − dersin özü, en çok vadeli sayısı.
+    // K3P-A4: Bugün tahmini sığan oturumdan türetilir. Sığan tekrar = bütçe − dersin özü, en çok vadeli sayısı.
     var bound=taskBudget(cap,daily,now),core=lessonTaskCount(q,lesson.id,now,content,fresh);
     // Isınma (en kararlı, ≤WARMUP_MAX) her zaman kalır; bütçe onun üstüne tekrar ekler.
     var fitReviews=bound>0?Math.min(reviews,Math.max(Math.min(reviews,WARMUP_MAX),bound-core)):reviews;

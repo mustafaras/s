@@ -8,7 +8,7 @@ Sıradaki prompt: K3P-07
 
 - **Tarih:** 2026-10-13
 - **Son tamamlanan:** **K3P-06 (Dalga 1 · Görsel sistem, ilk kart) — Tasarım tokenları.** `kao.css`'in açık ve koyu token bloklarına yeni jetonlar eklendi; bu kartta jetonları **kullanan** kural değişikliği **yok** (kullanmak K3P-07…10'un işi). Önce: K3P-A8 (Dalga A kapanışı).
-- **Dal:** `kao3-premium` = `main` = **dokuzuncu ara yayın `20261013a`** (canlıda). Bu kart dalı ilerletti; **push yok**.
+- **Dal:** `kao3-premium`; **onuncu ara yayın `20261013b` hazırlanıyor** (K3P-06 pini; push/merge kullanıcı onayıyla).
 - **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`; sıradaki kart K3P-07 (Kur'an yazı tipi alt kümesi).
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yok · cihaz yok.
 
@@ -47,7 +47,7 @@ Sıradaki prompt: K3P-07
 
 - **CSS bütçesi:** 13,190 → **13,335 / 14 KiB** (pay ~0,67 KiB). Çalışma zamanı **127,654 / 128 KiB** (pay ~0,35 KiB) — bu kart runtime'a dokunmadı. Kod ekleyen sıradaki kartlar önce eski kodu silmeli; yetmezse §5 gereği tavan kararı kullanıcıdan istenir.
 - **Kapı kararı K-Q:** Bu kart dalga sonu **değil**; yalnız `kapi-hizli --kart K3P-06` koşuldu → **HIZLI KAPI YEŞİL**. Tam kapı (`bash tools/kapi/kapilar.sh`) bir sonraki dalga sonunda (K3P-10).
-- **Pin ertelemesi (K-P):** `pinDeferral.files` = `app/core/quranLearn.js`, `app/core/quranLearnViews.js`, **`app/kao.css` (K3P-06'da yeniden eklendi)**. Ara kartlarda pin yükseltilmez; K3P-27'de tek geçiş.
+- **Pin ertelemesi (K-P):** `pinDeferral.files` = `[]` (K3P-06 ara yayını `20261013b` ile yükseltildi). Bir sonraki değişiklikte yeniden doldurulur; K3P-27 kapanış yükseltmesi ayrıdır.
 - **Katlanan blok sözleşmesi (K3P-A8):** ilk görünüm bütçesi yalnız `<details>`/`<summary>` ile; `<summary>` ≥ 44 px ve klavyeyle açılır.
 - **Devam ipucu kaynağı (A-5):** yalnız `path.lessons[id].resume`; yeni veri alanı yok.
 - **Uyarlanır durum kalıcı değil (K-K):** kayan pencere/streak yalnız `ui`.

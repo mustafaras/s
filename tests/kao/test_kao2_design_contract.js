@@ -181,7 +181,9 @@ assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğr
 {
   const ORPHAN_ALLOWED = {};
   const markup = ['app/core/quranLearnViews.js', 'app/core/quranLearn.js', 'app/core/quranLearnFlow.js'].map(read).join('\n');
-  const cssNoComments = kaoCss.replace(/\/\*[\s\S]*?\*\//g, '');
+  // `@font-face` yalnız tanımlayıcı taşır (sınıf seçici yok); url() içindeki ".k3p"/".woff2" dosya uzantısı
+  // sınıf sanılmasın diye blok taramadan önce düşülür (K3P-07). @media blokları gerçek seçici içerdiğinden korunur.
+  const cssNoComments = kaoCss.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@font-face\{[^{}]*\}/g, '');
   const classes = new Set([...cssNoComments.matchAll(/\.([a-zA-Z][\w-]*)/g)].map(m => m[1]));
   const usedInMarkup = (name) => {
     if (markup.includes(name)) return true;

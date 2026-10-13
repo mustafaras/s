@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-07",
+  "nextPrompt": "K3P-08",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -287,7 +287,9 @@
     {
       "id": "K3P-07",
       "wave": 1,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-13",
+      "result": "Scheherazade New Regular v4.500 (SIL OFL, SHA-512 doğrulandı) alt kümesi: assets/kao/font/ScheherazadeNew-Regular.k3p.woff2 24,5 KiB (tavan 150), 105 kod noktası (%100 kapsam); @font-face swap + unicode-range U+0600-06FF,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF; yığın başına \"K3P Scheherazade\"; OFL lisansı aynı dizinde; sw.js precache; tools/kao/kao-font-subset.mjs (sayım+üretim+cmap doğrulama); css 13,335→13,666 KiB (tavan 14)"
     },
     {
       "id": "K3P-08",
@@ -390,6 +392,6 @@
     "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": ["app/kao.css"]
   }
 }

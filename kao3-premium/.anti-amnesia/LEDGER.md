@@ -559,3 +559,17 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · **deploy kanıtı: Pages success + canlı pin GET (kao.css jetonları doğrulandı)** · cihaz yok
 - Gözlem: Cihaz kabulü kullanıcıda (açılışta yeni sürüm; "Verileri sıfırla"ya dokunma).
 - Sıradaki: K3P-07
+
+## seq 35 · K3P-07 · KART (Dalga 1 · Görsel sistem, ikinci kart)
+- Tarih: 2026-10-13
+- Commit: (bu commit)
+- Yapılan:
+  - **İndirme (kullanıcı izniyle, yalnız `github.com/silnrsi`):** Scheherazade New v4.500 zip; SHA-512 `4ff5d859618b884e89d8a4a0c93c1823eec471b101bf6e3c4548e2493863b25e843a7ce63a12be772ac305b2dee49c2f7b1609ecea4a5208b6b5fa88198cd19c` resmî `SHA512SUMS.txt` ile birebir; SHA-256 `49c789c21305bed13d90d7500877b50d62db1e8e4d6f7715178e556319ddbda9`. Arşiv boş dizinde açıldı.
+  - **Araç:** `tools/kao/kao-font-subset.mjs` — içerik+motorda geçen Arapça kod noktalarını sayar, her zaman gereken işaret/noktalama ile birleştirir (105 kod noktası / 11 aralık), `pyftsubset` ile woff2 üretir ve **üretilen cmap'i okuyup %100 kapsamı doğrular**.
+  - **Varlık:** `assets/kao/font/ScheherazadeNew-Regular.k3p.woff2` = 25.060 bayt (24,5 KiB; tavan 150) · SHA-256 `cdf29cccf459341b9b59744ea2f728b589c839d1175fa094ecdd2bff3eb7a2c6`. Lisans `assets/kao/font/ScheherazadeNew-Regular.OFL.txt` (SIL OFL 1.1, SHA-256 `5b9fd21ce2377fc542debebd9edfe1c48f2d3525e78a2a8abdba4a0ec3280163`).
+  - **CSS:** `@font-face` (swap, 400, `unicode-range:U+0600-06FF,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF`); Arapça yığının başına `"K3P Scheherazade"`. **sw.js** precache'e eklendi. Test sabitleri düzeltildi: `test_kao_render` yığın sabiti; `test_kao2_design_contract` öksüz-sınıf tarayıcısı `@font-face` bloğunu dışlıyor (url() `.k3p`/`.woff2` yanlış pozitifi).
+- Ölçüler: css 13,335 → **13,666 KiB** (gzip, tavan 14) · runtime **127,654 KiB** (değişmedi) · app.js **7799 satır** (dokunulmadı) · font alt kümesi **24,5 KiB / %100 kapsam** · kontrast 726/0.
+- Kapı (K-Q): `kapi-hizli --kart K3P-07` → **HIZLI KAPI YEŞİL**; geniş parti (tests/kao + iip_22 + quran + panel + panel-v2) FAIL=0; `kao-plan-check` PASS. Dalga sonu değil → tam kapı K3P-10'da.
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) **Yazı tipi kabulü cihazda:** ≤150 KiB ve kod-noktası kapsamı headless doğrulandı; K-B'nin istediği "30 zor glif dizisi önce/sonra" karşılaştırması ve harekelerin çakışmadığı yalnız **kullanıcının gözüyle** onaylanır (K3P-26/27 cihaz adımı; geri dönüş koşulu Amiri Quran). (2) `pyftsubset` woff2 için `brotli`'ye ihtiyaç duydu; kullanıcı site-paketlerine `brotli` kuruldu (araç zinciri, depoya girmez). (3) Öksüz-sınıf tarayıcısındaki `@font-face` yanlış pozitifi gerçek bir araç hatasıydı, sınıf kuralı değil; gerekçesiyle daraltıldı. (4) Yazı tipi pini K3P-27'de ortak sürümle yükseltilecek (`?v=20261013b` şimdilik mevcut sürüm).
+- Sıradaki: K3P-08

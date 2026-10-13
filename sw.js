@@ -23,6 +23,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/kao.css?v=20261013b',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',
+  './assets/kao/font/ScheherazadeNew-Regular.k3p.woff2?v=20261013b',
   './app/content/motivationProgramV2.js?v=20260730p',
   './app/content/motivationNarratives.js?v=20260730p',
   './app/content/saygiPeople.js?v=20260730p',

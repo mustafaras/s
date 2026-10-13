@@ -670,7 +670,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
 
 // KAO-FIX-13 · Arapça yazı tipi yığını (O-9): KAO Arapçası planın yığınıyla, yalnız KAO kapsamında.
 {
-  const STACK = '"Noto Naskh Arabic","Amiri","Scheherazade New","Times New Roman",serif';
+  const STACK = '"K3P Scheherazade","Noto Naskh Arabic","Amiri","Scheherazade New","Times New Roman",serif';
   const rules = [...cssSource.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => ({ selectors: m[1].split(',').map((s) => s.trim()), body: m[2] }));
   const prop = (body, name) => { const m = body.match(new RegExp(`(?:^|;)\\s*${name}\\s*:\\s*([^;]+)`)); return m ? m[1].trim() : null; };
   const stackRule = rules.find((r) => r.selectors.includes('.kao-arabic-text') && r.selectors.includes('.kao-dialog [lang="ar"]'));
@@ -680,7 +680,8 @@ assert.ok(prevented >= 3 && stopped >= 3);
   const arabic = rules.filter((r) => r.selectors.some((s) => s.includes('kao-arabic-text') || s.includes('[lang="ar"]')));
   for (const r of arabic) {
     const family = prop(r.body, 'font-family');
-    if (family !== null) assert.ok(family.startsWith('"Noto Naskh Arabic"'), `Arapça seçicide yığın dışı font: ${r.selectors.join(',')} → ${family}`);
+    // K3P-07: yerel Kuran fontu ("K3P Scheherazade") yığının başına geldi; yığın dışı font yasağı sürer.
+    if (family !== null) assert.ok(family.startsWith('"K3P Scheherazade"') || family.startsWith('"Noto Naskh Arabic"'), `Arapça seçicide yığın dışı font: ${r.selectors.join(',')} → ${family}`);
     const spacing = prop(r.body, 'letter-spacing');
     if (spacing !== null) assert.equal(spacing, 'normal', `Arapça seçicide letter-spacing: ${r.selectors.join(',')}`);
   }

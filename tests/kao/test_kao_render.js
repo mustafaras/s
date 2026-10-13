@@ -98,7 +98,7 @@ assert.match(html, /onclick="App\.kaoClose\(\)"/);
 // KAO2-09 (S-02): sıfır kullanıcıda %0 kapsam yerine ilk hedef; tek HeroCard; gece satırı altbilgide.
 assert.match(html, /İlk hedef: Fâtiha’yı anlamak · \d+ kelime/);
 assert.doesNotMatch(html, /data-countup-key="kao-coverage"/);
-assert.match(html, /class="kao-hero-card"/);
+assert.match(html, /class="kao-hero-card kao-moment"/, 'K3P-09: Bugün kahramanı an kartıdır (kao-moment)');
 assert.match(html, /Fâtiha · Ders 1/, 'ilk açılış sonrası kahraman günlük dersi gösterir');
 assert.match(html, /class="kao-hero-foot"[\s\S]*Gece tekrarı/);
 assert.match(html, /App\.kaoLesson\("start","u01\.01"\)/);
@@ -419,7 +419,7 @@ for (const selector of ['.kao-hub-card', '.kao-word-hero', '.kao-word-example', 
 assert.doesNotMatch(cssSource, /:root\s*\{/);
 assert.doesNotMatch(cssSource, /#[0-9a-f]{3,8}\b/i);
 const cssVars = [...cssSource.matchAll(/var\((--[a-z0-9-]+)/gi)].map((match) => match[1]);
-assert.ok(cssVars.length > 0 && cssVars.every((name) => /^(?:--(?:quran|faith|f-|dur-|kao-ar-)|--kao-(?:bg|surface|label(?:-2)?|sep|tint|accent|ok(?:-bg)?|fix(?:-bg)?|r-(?:card|ctl|pill)|gutter|gap-[1-4]|row|mat-(?:ground|card|moment)|shadow-[12]|ease|dur-(?:micro|transition|moment)))/.test(name)), 'KAO CSS yalnız izinli token ailelerini veya kartın okunabilirlik değişkenlerini tüketmeli');
+assert.ok(cssVars.length > 0 && cssVars.every((name) => /^(?:--(?:quran|faith|f-|dur-|kao-ar-)|--kao-(?:bg|surface|label(?:-2)?|sep|tint|accent|ok(?:-bg)?|fix(?:-bg)?|r-(?:card|ctl|pill)|gutter|gap-[1-4]|row|mat-(?:ground|card|moment)|moment-ink|shadow-[12]|ease|dur-(?:micro|transition|moment)|rumi))/.test(name)), 'KAO CSS yalnız izinli token ailelerini veya kartın okunabilirlik değişkenlerini tüketmeli');
 
 const selectorStart = appSource.indexOf('var MODAL_FOCUS_SELECTOR=');
 const handlerEnd = appSource.indexOf('\nApp.onReminderKeydown=', selectorStart);

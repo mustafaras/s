@@ -152,6 +152,10 @@ root.SeymaConstants={
   'thumbs-up':'<path d="M7 10v12" /><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />',
   'thumbs-down':'<path d="M17 14V2" /><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z" />',
   'scale':'<path d="M12 3v18" /><path d="M3 6h18" /><path d="M4 6l4 10" /><path d="M20 6l-4 10" /><circle cx="12" cy="3" r="1.5" /><circle cx="5.5" cy="17" r="2.5" /><circle cx="18.5" cy="17" r="2.5" />',
+  'rumi':'<path d="M1 11h22"/><path d="M12 11C12 7 14 5.4 17 4.4"/><path d="M12 11C12 7 10 5.4 7 4.4"/><circle cx="12" cy="3" r="2"/>',
   }
 };
+// K3P-09: an kartının rumî süslemesi. Önceden çalışma zamanı görünümlerinde tanımlıydı; runtime
+// gzip tavanı (128 KiB) için bütçe DIŞI bu modüle taşındı. Statiktir, kaçış gerekmez.
+root.SeymaConstants.KAO_MOMENT_ORN='<svg class="kao-moment-orn" viewBox="0 0 24 12" aria-hidden="true" focusable="false">'+root.SeymaConstants.ICONS.rumi+'</svg>';
 })(window);

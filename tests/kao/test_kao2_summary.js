@@ -108,7 +108,7 @@ check('boş özet yeni kelime ya da doğruluk uydurmaz ve canlı duyuruyu korur'
   assert.match(output, /Bu oturumda yeni kelime tanıtılmadı/);
   assert.match(output, /Pekiştirme yanıtı kaydı yok/);
   assert.doesNotMatch(output, /NaN|%0 doğruluk/);
-  assert.match(output, /class="kao-lesson-card kao-lesson-summary"[^>]*aria-live="polite"/);
+  assert.match(output, /class="kao-lesson-card kao-lesson-summary kao-moment"[^>]*aria-live="polite"/);
 });
 
 check('ilk yedi günde sıfır kalıcı iddiası gizli; sonrasında yalnız pozitif sayaç görünür', () => {

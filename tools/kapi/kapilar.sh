@@ -7,7 +7,7 @@
 #   sıfırdan farklı çıkarsa kapı KIRMIZIDIR (önceden "okunamadı" yazıp geçiyordu).
 # Yavaş makine (D2F-02):  KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh
 #   Bayrak kabul testine (A-10) ve bütçe testine açıkça geçirilir; YALNIZ göreli p95 bandı (KAO2-01 makinesine bağlı) atlanır
-#   ve perf satırı bunu yazar. Mutlak tavanlar (içerik ≤256 · runtime ≤128 · css ≤14 KiB · p95 ≤40 ms) aynen zorunludur.
+#   ve perf satırı bunu yazar. Mutlak tavanlar (içerik ≤256 · runtime ≤128 · css ≤16 KiB · p95 ≤40 ms) aynen zorunludur.
 #   Bayraksız koşu değişmez: göreli bant da kapıdır.
 set -u
 cd "$(dirname "$0")/../.." || exit 1

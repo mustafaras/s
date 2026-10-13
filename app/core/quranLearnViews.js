@@ -1,7 +1,7 @@
 (function(window){
   'use strict';
 
-  var deps=null;
+  var deps=null,ORN=(window.SeymaConstants||{}).KAO_MOMENT_ORN||'';
 
   function register(nextDeps){
     if(deps||!nextDeps||typeof nextDeps!=='object'||Array.isArray(nextDeps)) return false;
@@ -13,7 +13,7 @@
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     return deps.esc(value==null?'':String(value));
   }
-  // K2F-37 (a11y): karışık Türkçe+Arapça metinde Arapça parçalar kendi dilini/yönünü taşır (ekran okuyucu telaffuzu, bidi).
+  // K2F-37 (a11y): karışık metinde Arapça parçalar kendi dilini/yönünü taşır (bidi, ekran okuyucu).
   function escapeMixed(value){
     return escapeText(value).replace(/[\u0600-\u06FF]+(?:[ \u00a0]+[\u0600-\u06FF]+)*/g,'<span lang="ar" dir="rtl">$&</span>');
   }
@@ -127,7 +127,7 @@
     var mark=state==='correct'?'✓':state==='wrong'?'✕':'';
     var screenText=state==='correct'?'Doğru cevap':state==='wrong'?'Senin seçimin':'';
     if(options.button===true){
-      // Görev şıkkı: gerçek düğme; sınıf sırası durum + ek sınıflar, etiket `labelHtml` (önceden kaçırılmış) ya da kaçırılmış `label`.
+      // Görev şıkkı: gerçek düğme; sınıf = durum + ek sınıflar, etiket `labelHtml` ya da kaçırılmış `label`.
       var classes=(state==='idle'?[]:['kao-choice-'+state]).concat(Array.isArray(options.extraClasses)?options.extraClasses:[]);
       var aria=options.arabic===true?' data-kao-ar aria-label="'+escapeText(options.label+', okunuşu '+options.pronunciation+(screenText?', '+screenText:''))+'"':'';
       return '<button type="button"'+(classes.length?' class="'+classes.join(' ')+'"':'')+(options.pressed===true||options.pressed===false?' aria-pressed="'+String(options.pressed)+'"':'')+(options.disabled===true?' disabled':'')+aria+(options.onclick?' onclick="'+options.onclick+'"':'')+'>'+(mark?'<span class="kao-choice-mark" aria-hidden="true">'+mark+'</span><span class="kao-sr-only">'+screenText+'</span>':'')+(options.labelHtml!=null?options.labelHtml:escapeText(options.label))+'</button>';
@@ -171,7 +171,7 @@
     }).join('');
     var secondaryCall=options.secondary&&typeof options.secondary==='object'?actionCall(options.secondary.action):'';
     var secondary=secondaryCall?'<button type="button" class="kao-hero-secondary" onclick="'+secondaryCall+'">'+escapeText(options.secondary.label)+'</button>':'';
-    return '<section class="kao-hero-card" aria-labelledby="kao-hero-title"><p class="kao-hero-eyebrow">'+escapeText(options.eyebrow)+'</p><h3 class="kao-hero-title" id="kao-hero-title">'+escapeText(options.title)+'</h3><p class="kao-hero-sub">'+escapeText(options.subtitle)+'</p>'+primaryButton(options.button)+secondary+(footHtml?'<div class="kao-hero-foot">'+footHtml+'</div>':'')+'</section>';
+    return '<section class="kao-hero-card kao-moment" aria-labelledby="kao-hero-title">'+ORN+'<p class="kao-hero-eyebrow">'+escapeText(options.eyebrow)+'</p><h3 class="kao-hero-title" id="kao-hero-title">'+escapeText(options.title)+'</h3><p class="kao-hero-sub">'+escapeText(options.subtitle)+'</p>'+primaryButton(options.button)+secondary+(footHtml?'<div class="kao-hero-foot">'+footHtml+'</div>':'')+'</section>';
   }
   function pathCard(options){
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
@@ -322,7 +322,7 @@
       var milestone=model.milestone?'<p class="kao-lesson-cognate">Bir kilometre taşını tamamladın: '+escapeText(model.milestone)+'.</p>':'';
       var next=model.nextStep&&typeof model.nextStep==='object'?model.nextStep:null;
       var nextHtml=next?'<section class="kao-lesson-anchor kao-lesson-summary-next" aria-labelledby="kao-lesson-summary-next-title"><h4 id="kao-lesson-summary-next-title">Sıradaki adım</h4><p>'+escapeText(next.title)+'</p><p>'+escapeText(next.subtitle)+'</p></section>':'';
-      body='<section class="kao-lesson-card kao-lesson-summary" aria-labelledby="kao-lesson-title" aria-live="polite"><p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
+      body='<section class="kao-lesson-card kao-lesson-summary kao-moment" aria-labelledby="kao-lesson-title" aria-live="polite">'+ORN+'<p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
     }else{
       var goalLine=model.goal?'<p class="kao-lesson-goal-line">'+escapeText(model.goal)+'</p>':'';
       body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3>'+goalLine+moreBlock('<p>'+escapeText(model.promise)+'</p>')+'</section>';
@@ -447,7 +447,7 @@
       var call=actionCall(item.action);
       return '<li><button type="button" class="kao-grammar-lesson"'+(call?' onclick="'+call+'"':' disabled')+'><span>'+escapeText(item.title)+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
     }).join('');
-    // Somutlaştır → soyutla (Fyfe vd. "concreteness fading"): önce doğrulanmış âyet örnekleri (kelime kelime okunuşuyla), sonra tablo ve notlar.
+    // Somutlaştır → soyutla (Fyfe: "concreteness fading"): önce doğrulanmış âyet örnekleri, sonra tablo/not.
     var ayahs=(Array.isArray(model.examples)?model.examples:[]).map(function(item){
       item=item&&typeof item==='object'?item:{};
       var words=(Array.isArray(item.words)?item.words:[]).map(function(word){
@@ -462,7 +462,7 @@
     return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p>'+worked+'</div></div>'+ayahSection+examples+notesSection+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
   }
 
-  // K2F-14 · Seviye 0 ekranı: aşamaya göre (intro → listen → drill → read → done) birbirinden FARKLI HTML. Motor yalnız model üretir (K-2);
+  // K2F-14 · Seviye 0: aşamaya göre (intro → listen → drill → read → done) FARKLI HTML. Motor yalnız model üretir (K-2);
   // aşama başına en fazla bir `.kao-primary`; alıştırma bitmeden birincil düğme pasif; geri bildirim aria-live.
   function s0Arabic(text,className){ return '<span'+(className?' class="'+className+'"':'')+' lang="ar" dir="rtl">'+escapeText(text)+'</span>'; }
   function s0MarkList(marks){

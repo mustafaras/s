@@ -63,8 +63,28 @@ function decl(selector, prop) {
     const shorthand = decl(selector, 'outline').match(/(var\([^)]*\)|#[0-9a-f]{3,8}|color-mix\(.+\))\s*$/i);
     if (shorthand) return shorthand[1];
   }
+  // K3P-09: an kartı altın cetveli `border-bottom` kısayoluyla verilir; kenar rengi ayrı sorulduğunda kısayoldan okunur.
+  if (value === null && prop === 'border-bottom-color') {
+    const shorthand = decl(selector, 'border-bottom').match(/(var\([^)]*\)|#[0-9a-f]{3,8}|color-mix\(.+\))\s*$/i);
+    if (shorthand) return shorthand[1];
+  }
   if (value === null) throw new Error(`Bildirim bulunamadı: ${selector} { ${prop} }`);
   return value;
+}
+
+/** Kapsamlı özel özellikler: bir kural kendi içinde --token tanımlıyorsa (ör. .kao-moment metni
+ *  açık renge çevirir) o kapsamda çözümlenir. En içteki kapsam kazanır (dıştan içe zincir sırası). */
+function scopedMap(chain, map) {
+  const scoped = { ...map };
+  for (const [selector] of chain) {
+    // Taban token blokları `.kao-dialog,.kao-hub-card` üzerinde tanımlıdır; bunlar kapsam DEĞİL,
+    // tabanın kendisidir — kapsam sayılırsa açık tokenlar koyu haritanın üstüne yazılır.
+    if (selector === '.kao-dialog' || selector === '.kao-hub-card') continue;
+    const rule = RULES.find((r) => r.selectors.includes(selector));
+    if (!rule) continue;
+    for (const m of rule.body.matchAll(/--([a-z0-9-]+)\s*:\s*([^;}]+)/g)) scoped[m[1]] = m[2].trim();
+  }
+  return scoped;
 }
 
 /** Üst düzey virgülle böler (parantez içini korur). */
@@ -160,16 +180,21 @@ const PAIRS = [
   // Arayüz bileşenleri (WCAG 1.4.11).
   ['Odak halkası', 'ui', '.kao-dialog button:focus-visible', 'outline-color', [DIALOG]],
   ['İlerleme dolgusu / izi', 'ui', '.kao-progress span', 'background', [HOME[0], HOME[1], ['.kao-progress', 'background']]],
-  ['Seçili segment / grup zemini', 'ui', '.kao-seg button[aria-pressed="true"]', 'background', [DIALOG, ['.kao-seg', 'background']]]
+  ['Seçili segment / grup zemini', 'ui', '.kao-seg button[aria-pressed="true"]', 'background', [DIALOG, ['.kao-seg', 'background']]],
+  // K3P-09 · An kartı: metin lacivert degrade üstünde; altın cetvel çizgi olarak ≥ 3:1 (WCAG 1.4.11).
+  ['An kartı metni', 'text', '.kao-moment', 'color', [DIALOG, ['.kao-moment', 'background']]],
+  ['An kartı başlığı', 'text', '.kao-hero-title', 'color', [DIALOG, ['.kao-moment', 'background']]],
+  ['An kartı altın cetveli', 'ui', '.kao-moment', 'border-bottom-color', [DIALOG, ['.kao-moment', 'background']]]
 ];
 
 const results = [];
 for (const [theme, map] of THEMES) {
   for (const [label, kind, fgSelector, fgProp, chain] of PAIRS) {
-    const bgs = backgrounds(chain, map);
+    const scope = scopedMap(chain, map);
+    const bgs = backgrounds(chain, scope);
     const fgValue = decl(fgSelector, fgProp);
     let worst = Infinity;
-    for (const bg of bgs) for (const fg of stops(fgValue, map)) worst = Math.min(worst, ratio(over(fg, bg), bg));
+    for (const bg of bgs) for (const fg of stops(fgValue, scope)) worst = Math.min(worst, ratio(over(fg, bg), bg));
     const threshold = kind === 'ui' ? UI : TEXT;
     results.push({ theme, label, kind, selector: fgSelector, ratio: Number(worst.toFixed(2)), threshold, pass: worst >= threshold });
   }
@@ -190,8 +215,9 @@ const colorSelectors = [...new Set(RULES.filter((rule) => /(?:^|;)\s*color\s*:/.
 for (const [theme, map] of THEMES) {
   for (const selector of colorSelectors) {
     const chain = autoChain(selector);
+    const scope = scopedMap(chain, map);
     let worst = Infinity;
-    for (const bg of [...backgrounds(chain, map), ...(chain === HOME ? backgrounds([DIALOG], map) : [])]) for (const fg of stops(decl(selector, 'color'), map)) worst = Math.min(worst, ratio(over(fg, bg), bg));
+    for (const bg of [...backgrounds(chain, scope), ...(chain === HOME ? backgrounds([DIALOG], scope) : [])]) for (const fg of stops(decl(selector, 'color'), scope)) worst = Math.min(worst, ratio(over(fg, bg), bg));
     const kind = ICON_MARKS.has(selector) ? 'ui' : 'text', threshold = kind === 'ui' ? UI : TEXT;
     results.push({ theme, label: 'otomatik · ' + selector, kind, selector, ratio: Number(worst.toFixed(2)), threshold, pass: worst >= threshold });
   }

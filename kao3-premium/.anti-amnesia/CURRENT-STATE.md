@@ -2,23 +2,24 @@
 
 <!-- Bu dosya her prompt'un kapanışında BAŞTAN yazılır (BAGLAM-YONETIMI §3). Başlıkları silme; senkron.mjs okur. -->
 
-Sıradaki prompt: K3P-09
+Sıradaki prompt: K3P-10
 
 ## Son durum
 
 - **Tarih:** 2026-10-13
-- **Son tamamlanan:** **K3P-08 (Dalga 1 · Görsel sistem, üçüncü kart) — Arapça tipografi sistemi.** Bütün Arapça kurallar üç kademeli ölçeğe bağlandı (`--kao-ar-hero/body/inline`), **sahte kalın kaldırıldı** (Arapça 700 = 0), inline oranı 1,3× kuralına çekildi, şıklar 56 px. Önce: K3P-07 (yazı tipi alt kümesi).
-- **Dal:** `kao3-premium`; onuncu ara yayın **`20261013b`** canlıda. Bu kart dalı ilerletti; **push yok**.
-- **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`; sıradaki kart K3P-09 (materyal hiyerarşisi ve renk görevleri).
+- **Son tamamlanan:** **K3P-09 (Dalga 1 · Görsel sistem, dördüncü kart) — Materyal hiyerarşisi ve renk görevleri.** Zemin/kart/an üç katmanı ayrıştı; yeşil kalktı, doğru cevap altın dolgu + mürekkep metin oldu. Önce: K3P-08 (Arapça tipografi).
+- **Dal:** `kao3-premium`; onuncu ara yayın **`20261013b`** canlıda. Bu kart dalı ilerletti; **push yok**. Sıradaki kart Dalga 1'in **son** kartıdır (K3P-10) → dalga sonu tam kapı da koşulacak.
+- **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yok · cihaz yok.
 
-## K3P-08 ne yaptı
+## K3P-09 ne yaptı
 
-- **Ölçek (madde 1):** 18 Arapça kuralın `font-size` değeri üç kademeden birine bağlandı — `--kao-ar-hero` (soru, ders âyeti, namaz/s0, ayar örneği, tanış, gate), `--kao-ar-body` (şıklar, âyet satırı, okuyucu, geri bildirim, ünite kelimesi, gramer, kök, sözlük, sözcük örneği), `--kao-ar-inline` (Türkçe cümle içi Arapça: kavram çipleri, ders başlığı/ızgara etiketi). Sayısal `clamp(...)` ölçekleri kaldırıldı; kademe tokenları tek kaynak.
-- **Kalınlık (madde 2):** Arapça seçicilerden **5 kural-düzeyi `font-weight:700`** kaldırıldı (soru, şık, bağlam, kelime-hero, gate, okuyucu, kök, s0, ders, ayar). Kalan sarmalayıcı kutular için tek taban eklendi: `.kao-dialog [lang="ar"]{font-weight:400}` — Arapça **her yerde 400**.
-- **Oran (madde 3):** `--kao-ar-inline` **1.25em → 1.3em** (TASARIM §5.3 tablosu 1.25em derken aynı bölümün "≥ 1,3 × Latin" kuralı ve prompt madde 3 çelişiyordu; **kural + prompt kazandı**, LEDGER gözleminde kayıtlı). hero/body zaten ≥ 1,3 (hero min 2.75rem ≈ 44px, body 1.75rem ≈ 28px, gövde 17px).
-- **Dokunma hedefi (madde 4):** `.kao-choices button` **52 → 56 px**.
-- **Test (madde 5):** yeni `tests/kao/test_k3p_typography.js` — Arapça 700 = 0, ölçek yalnız `--kao-ar-*`, oran ≥ 1,3 × `--f-body` (kaynaktan okunur), şık ≥ 56 px, sıralama body<hero, taban 400. `tests/kao/README.md` envanterine eklendi (67 dosya).
+- **Katmanlar (§5.1).** Zemin `--kao-mat-ground` (açık: parşömen `--quran-surface 92% + --quran2`; koyu: **yüzeyin kendisi** — gerekçe LEDGER'da). Kartlar (`hero`/`feedback-sheet`/`path-surface`/`lesson-card`/`choice`) 1 px çizgi yerine `--kao-shadow-1` kullanır (T-1: düz hiyerarşi kalkar).
+- **An kartı.** `.kao-moment` sınıfı **hero (Bugün kahramanı) + ders sonu (özet) + taş** bölümlerine eklendi: lacivert degrade + 1 px altın cetvel + satır içi **rumî SVG** (opaklık .08, `aria-hidden`). Süsleme gerçek `<svg>` öğesidir (sözde-öğe değil): strict sözleşme `content:""` yasaklar. Dize **bütçe dışı** `constants.js` içinde (`KAO_MOMENT_ORN`), böylece runtime gzip tavanı korunur.
+- **Altın (§5.2).** `--kao-ok` = `--quran2` (yeşil kalktı); `--kao-ok-bg` = altın %16 dolgu. **Hiçbir yerde altın metin yok** (açık temada yasak): 8 metin kuralı mürekkep rengine çevrildi, ✓ işareti ve durum işaretleri mürekkep. An kartında metin `--kao-moment-ink` ile açık renk (yeni jeton).
+- **Yanlış.** Yalnız sıcak turuncu (`--kao-fix`) — değişmedi (D-6).
+- **Kontrast.** Araca 3 yeni çift eklendi (an metni/başlığı ≥4,5 · altın cetvel ≥3) + **kapsamlı token çözümü** (bir kural kendi içinde `--token` tanımlıyorsa o kapsamda çözülür). 0 ihlal.
+- **forced-colors.** An kartı `Canvas`/`CanvasText`; cetvel `CanvasText`; süs gizlenir.
 
 ## Ölçü panosu (taban → hedef)
 
@@ -38,25 +39,24 @@ Sıradaki prompt: K3P-09
 | Tanıma görevi payı | %93 | ≤ %60 |
 | Bugün ekranı seçim sayısı | 12 | ≤ 5 |
 | `App.kao*` sayısı | 45 ✓ | 45 |
-| Arapça font alt kümesi | 24,5 KiB · %100 kapsam ✓ (K3P-07) | ≤ 150 KiB · %100 |
-| **Arapça 700 (sahte kalın)** | **0 ✓ (yeni)** | 0 |
-| **Arapça ölçek kaynaşı** | **yalnız --kao-ar-* ✓ (yeni)** | 3 kademe |
-| **Şık dokunma hedefi** | **56 px ✓ (yeni)** | ≥ 56 px |
+| Arapça 700 (sahte kalın) | 0 ✓ | 0 |
+| Şık dokunma hedefi | 56 px ✓ | ≥ 56 px |
+| **Altın METİN kullanımı** | **0 ✓ (yeni)** | 0 |
+| **An kartı (kao-moment) kapsamı** | **hero + ders sonu + taş ✓ (yeni)** | 3 yer |
 
 ## Açık riskler
 
-- **CSS bütçesi çok dar:** **13,806 / 14 KiB** (pay ~0,19 KiB). Çalışma zamanı 127,654 / 128 KiB (pay ~0,35 KiB). Bir sonraki CSS dokunuşu bütçeyi aşabilir → §5 gereği önce ölü/kopya kural silinecek; yetmezse tavan kararı kullanıcıdan istenir. (K3P-09 materyal kartı ve K3P-10 hareket bloğu CSS ekleyecek; **önceden yer açılmalı**.)
-- **Yazı tipi + tipografi kabulü cihazda:** headless ölçüm tamam; gerçek gözle onay (hareke çakışması, 30 zor glif dizisi) K3P-26/27'de. Geri dönüş koşulu: Amiri Quran.
-- **Kapı kararı K-Q:** Bu kart dalga sonu **değil**; `kapi-hizli --kart K3P-08` → **HIZLI KAPI YEŞİL**; tests/kao ailesi 67/67 (yavaşlar dâhil) FAIL=0. Tam kapı K3P-10'da.
-- **Pin ertelemesi (K-P):** `pinDeferral.files` = `app/kao.css` (K3P-08'de değişti). K3P-27'de tek geçiş.
+- **Çalışma zamanı bütçesi yine kıl payı:** **127,987 / 128 KiB (gzip level 6)**; level-9 ölçüm 127,650. K3P-09 sırasında ölü `KAO_S0_SHAPES` silindi + süs dizesi bütçe dışına taşındı + birkaç yorum sıkıştırıldı; **K3P-10 (hareket) JS ekler** → önce yer açılmalı, yetmezse tavan kararı kullanıcıdan. **CSS:** 14,372 / **16 KiB** (tavan bu kartta kullanıcı kararıyla 14→16 yükseltildi).
+- **Pin ertelemesi (K-P):** `pinDeferral.files` = `app/kao.css`, `app/core/constants.js`, `app/core/quranLearn.js`, `app/core/quranLearnViews.js` (K3P-27'de tek geçiş).
+- **Yazı tipi + tipografi + materyal kabulü cihazda:** headless tamam; gerçek gözle onay (hareke çakışması, an kartı altın cetvel/rumî görünümü, 30 zor glif dizisi) K3P-26/27'de. Geri dönüş koşulu: Amiri Quran.
+- **Kapı kararı K-Q:** Bu kart dalga sonu **değil**; `kapi-hizli --kart K3P-09` → **HIZLI KAPI YEŞİL**; tests/kao ailesi 67/67 FAIL=0.
+- **An kartı degrade istisnası:** `test_kao2_design_contract` degradeleri hâlâ yasaklar; **yalnız `.kao-moment`** istisna (kullanıcı kararı, gerekçesi yorumda).
 - **Katlanan blok sözleşmesi (K3P-A8):** ilk görünüm bütçesi yalnız `<details>`/`<summary>` ile; `<summary>` ≥ 44 px ve klavyeyle açılır.
-- **Devam ipucu kaynağı (A-5):** yalnız `path.lessons[id].resume`; yeni veri alanı yok.
+- **Devam ipucu kaynağı (A-5):** yalnız `path.lessons[id].resume`.
 - **Uyarlanır durum kalıcı değil (K-K):** kayan pencere/streak yalnız `ui`.
 - **Hedef/akış çatışması (K3P-A3'ten, açık):** açılış → ilk görev 3 dokunuş, hedef 2. Karar kullanıcıda.
 - **Bugün ekranı seçim sayısı (K-F, açık):** 12 düğme, hedef ≤ 5; K3P-12 kartının konusu.
 - **Perf göreli bandı makine yüküne duyarlı.** Kapılar `KAO2_ACCEPT_SLOW_HOST=1`; mutlak tavanlar zorunlu.
-- **Deney raporu (K3P-05):** gerçek yedeği yalnız kullanıcı verir.
-- **Okunuş kapısı zorunlu:** `okunus-denetim.cjs` exit 0 (K3P-08'de korundu).
 - **Görsel QA Chrome yolu:** K3P-26'da `KAO_QA_CHROME` ver.
 
 ## Devir notu

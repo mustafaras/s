@@ -30,7 +30,9 @@ const tokenNames = ['--kao-bg','--kao-surface','--kao-label','--kao-label-2','--
   // K3P-06 (Dalga 1, 06 §5): materyal katmanları, gölge, Arapça ölçeği ve hareket grameri.
   // Renkler yalnız --quran*'tan color-mix ile türer; süreler --dur-*'a bağlanır (yeni hex yok).
   '--kao-mat-ground','--kao-mat-card','--kao-mat-moment','--kao-shadow-1','--kao-shadow-2',
-  '--kao-ar-hero','--kao-ar-body','--kao-ar-inline','--kao-ease','--kao-dur-micro','--kao-dur-transition','--kao-dur-moment'];
+  '--kao-ar-hero','--kao-ar-body','--kao-ar-inline','--kao-ease','--kao-dur-micro','--kao-dur-transition','--kao-dur-moment',
+  // K3P-09 (Dalga 1, 06 §5.1–5.2): an kartı açık zemin mürekkebi ayrı jeton taşır (lacivert zemin).
+  '--kao-moment-ink'];
 assert.ok(tokenNames.every(name => kaoCss.includes(name+':')), '06 §1 tokens are declared');
 assert.match(kaoCss, /#root\[data-theme="dark"\] \.kao-dialog,#root\[data-theme="dark"\] \.kao-hub-card\{/);
 const metrics = cssMetrics(kaoCss);
@@ -180,7 +182,9 @@ assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğr
 // İzinli istisnalar gerekçeli liste: şu an boş (öksüz seçici yok).
 {
   const ORPHAN_ALLOWED = {};
-  const markup = ['app/core/quranLearnViews.js', 'app/core/quranLearn.js', 'app/core/quranLearnFlow.js'].map(read).join('\n');
+  // K3P-09: an kartının rumî süslemesi artık bütçe dışı `app/core/constants.js` içinde (KAO_MOMENT_ORN);
+  // öksüz taraması o dosyayı da okur, yoksa kullanılan sınıf "öksüz" sanılır.
+  const markup = ['app/core/quranLearnViews.js', 'app/core/quranLearn.js', 'app/core/quranLearnFlow.js', 'app/core/constants.js'].map(read).join('\n');
   // `@font-face` yalnız tanımlayıcı taşır (sınıf seçici yok); url() içindeki ".k3p"/".woff2" dosya uzantısı
   // sınıf sanılmasın diye blok taramadan önce düşülür (K3P-07). @media blokları gerçek seçici içerdiğinden korunur.
   const cssNoComments = kaoCss.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@font-face\{[^{}]*\}/g, '');
@@ -198,8 +202,12 @@ assert.match(kaoCss, /\.kao-word-learning\{[^}]*margin-top:var\(--f-3\)/, 'öğr
   assert.deepEqual(orphans, [], 'kao.css öksüz sınıf seçicileri: ' + orphans.join(' '));
   // Tek izinli biçim: aynı rengi iki kez veren katman (NavBar saydam --kao-bg'yi opak yüzeyin üstüne bindirir); gerçek degrade yok.
   const gradients = [...cssNoComments.matchAll(/linear-gradient\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g)].map(m => m[1]);
-  const real = gradients.filter(arg => { const parts = arg.split(/,(?![^()]*\))/).map(x => x.trim()); return new Set(parts).size > 1; });
-  assert.deepEqual(real, [], 'degrade yok (öksüz ilerleme çubuğu kalıntısı dahil); tek renkli katman hariç');
+  // K3P-09 (kullanıcı kararı): "An" kartı (`.kao-moment`) TASARIM §5.1 gereği lacivert degrade taşır;
+  // yasak kalan tek istisnadır. Diğer her multi-durak degrade yasak (öksüz ilerleme çubuğu kalıntısı dahil).
+  const MOMENT_RULE = /\.kao-moment\{[^}]*\}/;
+  const momentRule = (kaoCss.match(MOMENT_RULE) || [''])[0];
+  const real = gradients.filter(arg => { const parts = arg.split(/,(?![^()]*\))/).map(x => x.trim()); return new Set(parts).size > 1 && !momentRule.includes(arg); });
+  assert.deepEqual(real, [], 'degrade yalnız .kao-moment kartında (öksüz kalıntı dahil); başka multi-durak degrade yok');
   assert.ok(!markup.includes('kao-audio-pending'), 'ölü sınıf adı kao-audio-pending kalmadı');
   assert.doesNotMatch(cssNoComments, /\.kao-header\b/, 'eski .kao-header kuralları kalmadı');
 }

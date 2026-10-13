@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-09",
+  "nextPrompt": "K3P-10",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -301,7 +301,9 @@
     {
       "id": "K3P-09",
       "wave": 1,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-13",
+      "result": "Üç katmanlı materyal + an kartı + altın yalnız kazanılmış şeylerde: zemin --kao-mat-ground (açık parşömen / koyu yüzey), kartlar 1 px çizgi yerine --kao-shadow-1; .kao-moment (hero + ders sonu + taş) lacivert degrade + 1 px altın cetvel + satır içi rumî SVG (opaklık .08, aria-hidden); yeşil kalktı, doğru cevap altın dolgu + mürekkep metin (--kao-ok=--quran2, --kao-ok-bg altın; hiçbir yerde altın METİN yok); kontrast aracına 3 yeni çift (an metni/başlığı ≥4.5, altın cetvel ≥3) + kapsamlı token çözümü; CSS tavanı 14→16 KiB (kullanıcı kararı); css 13,806→14,372 (tavan 16), runtime 127,987 L6 (tavan 128)"
     },
     {
       "id": "K3P-10",
@@ -394,6 +396,6 @@
     "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": ["app/kao.css"]
+    "files": ["app/kao.css","app/core/constants.js","app/core/quranLearn.js","app/core/quranLearnViews.js"]
   }
 }

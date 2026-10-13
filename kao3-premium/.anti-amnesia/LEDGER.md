@@ -499,3 +499,20 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
   (3) Eski `why` katmanı iki `introWhy` fonksiyonu tanımlanmış hâlde bulundu (ikincisi ilkini gölgeliyordu); bütçe için tek tanıma indirildi — davranış değişmedi.
   (4) **Devralınan ölçüm tutarsızlığı:** START'ın verdiği 127,45 KiB `test_kao2_mastery`'nin level-6 gzip'inden; `test_kao2_perf_budget` level-9 (127,45) okur. İkisi de tavanın altında; ölçüm yöntemi farkı LEDGER'a not edildi.
 - Sıradaki: K3P-06
+
+## seq 31 · — · YAYIN (dokuzuncu ara yayın · K3P-A8)
+- Tarih: 2026-10-13
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı "tümünü canlıya al arayüz doğrulamalarını yap ve sıradaki adımdan devam et" dedi; **açık yayın onayı** verildi.
+  - Yeni araç `kao3-premium/araclar/pin-yukselt.mjs` (K3P-27 §1): `git diff main` ile değişen varlıkları bulur, **ortak sürüm** kuralıyla aynı pini paylaşan tüm dosyaları birlikte yükseltir, `SW_VERSION`/`SW_OFFLINE_VERSION`/`serviceWorker.register` satırını ve pini doğrulayan test sabitlerini tek geçişte günceller; `--dene` yalnız önizleme.
+  - Ortak sürüm `20261011g` → **`20261013a`**: index.html 24 · sw.js 23 · panel-v2.html 4 + 15 test dosyası (79 geçiş). `pinDeferral.files` boşaltıldı → tazelik testinde **ERTELENDİ satırı yok**.
+  - **K3P-A8 regresyon düzeltmesi (kapsam içi):** katlanan blokların `<summary>` düğmeleri `MODAL_FOCUS_SELECTOR`'a eklendi. Öncesinde Tab/Shift+Tab onları atlıyordu; klavye kullanıcısı "Daha fazla"yı açamıyordu. Yeni kontrol `tests/app/test_modal_focus_containment.js` içinde. `app.js` satır bütçesi (≤7800) korundu.
+- Ölçüler: K3P-A8 sonrası — runtime 127,654 KiB (tavan 128) · css 13,190 KiB (tavan 14) · p95 8,5 ms/steady 3,8 ms · çift şık 0/1087 + 0/1127 · okunuş 0 + 0 · edilgin ekran ilk görünümü goal ≤41 · tanış ≤33 · kavram ≤24 sözcük
+- Kapı (K-Q): `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → **TÜM KAPILAR YEŞİL** (tests/kao 66 · app 78 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · çift şık · okunuş · plan-check · pin senkronu · tekrar-üretim 10/10 · perf)
+- Görsel QA: **kontrollü yerel** (port 9000, boş geçici profil, token/forceSync yok) → **71 ekran görüntüsü**, düzen taşması 0; kontak sayfası gözle doğrulandı: hedef/tanış/kavram kartlarında "Daha fazla ›" katlaması doğru, kırılma yok. Kaynak-görsel kanıt; cihaz kabulü değildir.
+- Kanıt düzeyi: kaynak/test · görsel QA **var** (yerel, redakte) · cihaz yok
+- Gözlem: (1) İlk tam kapı denemesi iki satır-bütçesi testini kırdı (`app.js` 7803 > 7800); yorum tek satıra indirilerek düzeltildi, ikinci tam kapı temiz.
+  (2) İlk çalışan tam kapı, `app.js` düzeltmesinden önce başlatıldığı için iptal edilip yeniden koşuldu; sonuç bu commit'in ağacına aittir.
+  (3) K3P-A8 katlanan bloklarında kavram kural cümlesi de katlanır (LEDGER seq 30 gözlem 1).
+- Sıradaki: K3P-06

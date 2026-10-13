@@ -39,6 +39,11 @@ ok('odak seçicisi tüm metin denetimlerini kapsıyor',
   sharedSource.includes('select:not([disabled])') &&
   sharedSource.includes('textarea:not([disabled])') &&
   sharedSource.includes('a[href]'));
+// K3P-A8 (D-4): katlanan yerel blokların <summary> düğmeleri de odak listesinde olmalı; yoksa
+// Tab/Shift+Tab onları atlar ve klavye kullanıcısı ayrıntıyı açamaz. (Escape yolu <details>'in
+// kendi yerel davranışı olduğu için odak listesinde olmasa da çalışır.)
+ok('odak seçicisi katlanan blok <summary> düğmelerini de kapsıyor',
+  /(^|,)\s*summary\s*(,|$)/.test(sharedSource.slice(sharedSource.indexOf("MODAL_FOCUS_SELECTOR='") + 21, sharedSource.indexOf("';", sharedSource.indexOf("MODAL_FOCUS_SELECTOR='")))));
 ok('ortak handler Tab olayını iç modala sınırlandırıyor',
   sharedSource.includes('if(e.stopPropagation) e.stopPropagation();') &&
   sharedSource.includes('modalFocusableNodes(e.currentTarget)'));

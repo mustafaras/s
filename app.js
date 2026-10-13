@@ -3277,7 +3277,7 @@ App.closeReminderCenter=function(){ return SEYMA_REMINDER_SURFACE.closeReminderC
 // Tüm gerçek modallar tek bir klavye sözleşmesini kullanır. Arka plan yalnızca
 // fare/dokunma ile kapatılabilir; odağın kendisi daima role=dialog içindedir.
 // Bu seçici, yazı yazılan textarea/select alanlarını ve bağlantıları da kapsar.
-var MODAL_FOCUS_SELECTOR='button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])';
+var MODAL_FOCUS_SELECTOR='button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),a[href],summary,[tabindex]:not([tabindex="-1"])';
 function modalFocusableNodes(dialog){
   if(!dialog||!dialog.querySelectorAll) return [];
   var candidates=dialog.querySelectorAll(MODAL_FOCUS_SELECTOR), nodes=[];

@@ -26,7 +26,11 @@ assert.deepEqual(cssMetrics('/* font-weight:999 */ .x::before,.x::after{content:
 assert.equal(cssMetrics('.x::before,.x::after{content:""} .y::before{content:"a"}').deco, 2);
 assert.equal(cssMetrics('.kao-hub-spine-extra{color:red}').removed.length, 0);
 const kaoCss = read('app/kao.css');
-const tokenNames = ['--kao-bg','--kao-surface','--kao-label','--kao-label-2','--kao-sep','--kao-tint','--kao-accent','--kao-ok','--kao-ok-bg','--kao-fix','--kao-fix-bg','--kao-r-card','--kao-r-ctl','--kao-r-pill','--kao-gutter','--kao-gap-1','--kao-gap-2','--kao-gap-3','--kao-gap-4','--kao-row'];
+const tokenNames = ['--kao-bg','--kao-surface','--kao-label','--kao-label-2','--kao-sep','--kao-tint','--kao-accent','--kao-ok','--kao-ok-bg','--kao-fix','--kao-fix-bg','--kao-r-card','--kao-r-ctl','--kao-r-pill','--kao-gutter','--kao-gap-1','--kao-gap-2','--kao-gap-3','--kao-gap-4','--kao-row',
+  // K3P-06 (Dalga 1, 06 §5): materyal katmanları, gölge, Arapça ölçeği ve hareket grameri.
+  // Renkler yalnız --quran*'tan color-mix ile türer; süreler --dur-*'a bağlanır (yeni hex yok).
+  '--kao-mat-ground','--kao-mat-card','--kao-mat-moment','--kao-shadow-1','--kao-shadow-2',
+  '--kao-ar-hero','--kao-ar-body','--kao-ar-inline','--kao-ease','--kao-dur-micro','--kao-dur-transition','--kao-dur-moment'];
 assert.ok(tokenNames.every(name => kaoCss.includes(name+':')), '06 §1 tokens are declared');
 assert.match(kaoCss, /#root\[data-theme="dark"\] \.kao-dialog,#root\[data-theme="dark"\] \.kao-hub-card\{/);
 const metrics = cssMetrics(kaoCss);

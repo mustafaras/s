@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-06",
+  "nextPrompt": "K3P-07",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -280,7 +280,9 @@
     {
       "id": "K3P-06",
       "wave": 1,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-13",
+      "result": "tasarım tokenları (açık+koyu): --kao-mat-ground/card/moment, --kao-shadow-1/-2, --kao-ar-hero/body/inline, --kao-ease, --kao-dur-micro/transition/moment; renkler yalnız --quran*'tan color-mix, süreler --dur-*'a bağlı; yeni hex yok; izin listeleri gerekçeli genişletildi; css 13,190→13,335 KiB (tavan 14), runtime 127,654 (değişmedi)"
     },
     {
       "id": "K3P-07",
@@ -388,6 +390,6 @@
     "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": ["app/kao.css"]
   }
 }

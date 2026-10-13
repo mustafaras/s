@@ -419,7 +419,7 @@ for (const selector of ['.kao-hub-card', '.kao-word-hero', '.kao-word-example', 
 assert.doesNotMatch(cssSource, /:root\s*\{/);
 assert.doesNotMatch(cssSource, /#[0-9a-f]{3,8}\b/i);
 const cssVars = [...cssSource.matchAll(/var\((--[a-z0-9-]+)/gi)].map((match) => match[1]);
-assert.ok(cssVars.length > 0 && cssVars.every((name) => /^(?:--(?:quran|faith|f-|dur-|kao-ar-)|--kao-(?:bg|surface|label(?:-2)?|sep|tint|accent|ok(?:-bg)?|fix(?:-bg)?|r-(?:card|ctl|pill)|gutter|gap-[1-4]|row))/.test(name)), 'KAO CSS yalnız izinli token ailelerini veya kartın okunabilirlik değişkenlerini tüketmeli');
+assert.ok(cssVars.length > 0 && cssVars.every((name) => /^(?:--(?:quran|faith|f-|dur-|kao-ar-)|--kao-(?:bg|surface|label(?:-2)?|sep|tint|accent|ok(?:-bg)?|fix(?:-bg)?|r-(?:card|ctl|pill)|gutter|gap-[1-4]|row|mat-(?:ground|card|moment)|shadow-[12]|ease|dur-(?:micro|transition|moment)))/.test(name)), 'KAO CSS yalnız izinli token ailelerini veya kartın okunabilirlik değişkenlerini tüketmeli');
 
 const selectorStart = appSource.indexOf('var MODAL_FOCUS_SELECTOR=');
 const handlerEnd = appSource.indexOf('\nApp.onReminderKeydown=', selectorStart);

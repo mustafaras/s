@@ -531,3 +531,17 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA var (yerel, redakte) · **deploy kanıtı: Pages success + canlı pin GET** · cihaz yok
 - Gözlem: Cihaz kabulü hâlâ kullanıcıda (açılışta yeni sürüm, bir ders, "Verileri sıfırla"ya dokunma).
 - Sıradaki: K3P-06
+
+## seq 33 · K3P-06 · KART (Dalga 1 · Görsel sistem, ilk kart)
+- Tarih: 2026-10-13
+- Commit: (bu commit)
+- Yapılan:
+  - `app/kao.css` açık (satır 1) ve koyu (satır 2) token bloklarına tasarım jetonları eklendi: materyal `--kao-mat-ground/card/moment`, gölge `--kao-shadow-1/-2`, Arapça ölçek `--kao-ar-hero/body/inline`, hareket `--kao-ease` + `--kao-dur-micro/transition/moment`. Bu kartta jetonları **kullanan** kural değişikliği yok (K3P-07…10).
+  - Kaynak disiplini: renkler yalnız `--quran*`'tan `color-mix`; **yeni hex yok**. Süreler mevcut `--dur-*`'a bağlı (micro=dur-1, transition=dur-2, moment=dur-5); eğri `cubic-bezier(.2,.8,.2,1)`.
+  - Sözleşme izin listeleri **gerekçeli genişletildi, gevşetilmedi**: `tests/kao/test_kao_render.js` tüketim regex'ine `mat-*/shadow-[12]/ease/dur-(micro|transition|moment)`; `tests/kao/test_kao2_design_contract.js` `tokenNames`'e 12 yeni jeton + yorum.
+  - `pinDeferral.files`'a `app/kao.css` eklendi (K-P: pinli dosya değişti; K3P-27'de ortak sürümle yükseltilir).
+- Ölçüler: css 13,190 → **13,335 KiB** (gzip, tavan 14) · runtime **127,654 KiB** (değişmedi, tavan 128) · app.js **7799 satır** (dokunulmadı, tavan 7800) · kontrast 726 çift/0 ihlal (kao) + 30/0 (global) · p95 5,65 ms.
+- Kapı (K-Q): `kapi-hizli --kart K3P-06` → **HIZLI KAPI YEŞİL** (66 kao + sözleşme/pin + driver + ölçü kapıları). Dalga sonu değil → tam kapı koşulmadı (K3P-10'da).
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) Koyu temada `--kao-mat-moment` birebir aynı reçeteyle (quran 88% + altın) açık temadan **daha açık** kalıyordu (koyu `--quran` mid-blue, açık navy'den yüksek parlaklıkta); TASARIM §5.1 "aynı, daha koyu" için koyu değer `--quran` %40 + `--quran-surface` olarak yüzeye sabitlendi. (2) `--kao-mat-ground` de TASARIM §5.1'deki koyu `--quran-bg`'nin (yarı saydam tint) **opak eşdeğeri** olarak `--quran-surface` üzerinden türetildi; `--quran-bg` yarı saydam olduğu için katmanlanınca zemin rengi değişirdi. K3P-09 (materyal hiyerarşisi) bu yüzeyi kullanacak. (3) `app/kao.css` pinli bir varlık; değişiklik `test_asset_pin_freshness`'ı ERTELENDİ'ye çevirdi (beklenen, K-P). (4) Kartın kendi kabul testi yok; jetonların doğruluğu sözleşme + kontrast araçlarıyla ve K3P-07…10'un kullanımıyla sınanacak.
+- Sıradaki: K3P-07

@@ -516,3 +516,18 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
   (2) İlk çalışan tam kapı, `app.js` düzeltmesinden önce başlatıldığı için iptal edilip yeniden koşuldu; sonuç bu commit'in ağacına aittir.
   (3) K3P-A8 katlanan bloklarında kavram kural cümlesi de katlanır (LEDGER seq 30 gözlem 1).
 - Sıradaki: K3P-06
+
+## seq 32 · — · YAYIN (yayın tamamlandı + K3P-06 başlatıcısı)
+- Tarih: 2026-10-13
+- Commit: (bu commit)
+- Yapılan:
+  - `kao3-premium` → `main` **fast-forward** birleştirildi (main = 421b80e0 idi, tek adım ileri). `git push origin main` → `421b80e0..b5168d9c`.
+  - Pages koşusu **38363872562** → `status=completed conclusion=success`.
+  - Canlı pin **yalnız GET** ile doğrulandı: `https://mustafaras.github.io/s/index.html` → `quranLearn.js?v=20261013a`, `sw.js?v=20261013a`; `sw.js` → `SW_VERSION='20261013a'`, `SW_OFFLINE_VERSION='iip22-20261013a'`. Uygulama tarayıcıda açılmadı.
+  - Yeni oturum başlatıcısı `kao3-premium/STARTER-06.md` eklendi (Dalga 1 ilk kartı K3P-06; token sözleşmesi + `app.js` 7800 satır ve runtime bütçesi uyarıları).
+  - `CURRENT-STATE` yayın sonrası duruma çekildi ve `STARTER-06`'ya yönlendirildi. `K3P-STATE.status=planned`, `releaseApproval=NOT_APPROVED` kalır (program sürüyor; K3P-27 kapanış onayı ayrıdır).
+- Ölçüler: değişmedi (K3P-A8 ölçüleri; runtime 127,654 KiB · css 13,190 KiB). Canlı sürüm 20261013a.
+- Kapı (K-Q): yayın öncesi tam kapı **TÜM KAPILAR YEŞİL**; yayın sonrası `senkron` → UYUMLU.
+- Kanıt düzeyi: kaynak/test · görsel QA var (yerel, redakte) · **deploy kanıtı: Pages success + canlı pin GET** · cihaz yok
+- Gözlem: Cihaz kabulü hâlâ kullanıcıda (açılışta yeni sürüm, bir ders, "Verileri sıfırla"ya dokunma).
+- Sıradaki: K3P-06

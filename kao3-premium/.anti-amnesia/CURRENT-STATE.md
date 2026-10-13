@@ -8,8 +8,8 @@ Sıradaki prompt: K3P-06
 
 - **Tarih:** 2026-10-12
 - **Son tamamlanan:** **K3P-A8 (D-4) — Dalga A kapandı.** Hedef, tanış ve kavram ekranlarının **ilk görünümü** artık ≤ 45 sözcük. Ayrıntı (örnek âyet, çapa metni, "Neden böyle?", kavram tablosu, terimler) tek bir yerel `<details><summary>Daha fazla</summary>…</details>` içine taşındı: **handler eklenmedi, içerik metni değişmedi, yalnız sunum.** Önce: K3P-A7 (görünür devam ipucu).
-- **Dal:** `kao3-premium`. `main` = sekizinci ara yayın `20261011g` (K3P-A7 dahil, canlıda). Dal `main`'in 1 commit önünde (K3P-A8, yayında değil).
-- **Yeni oturum:** `kao3-premium/STARTER.md` içindeki metni yapıştır.
+- **Dal:** `kao3-premium` = `main` = **dokuzuncu ara yayın `20261013a`** (canlıda; Pages run 38363872562 success, canlı pin `curl` ile doğrulandı). Dal ile `main` aynı commit'te.
+- **Yeni oturum:** `kao3-premium/STARTER-06.md` içindeki metni yapıştır (Dalga 1 başlangıcı). Genel başlatıcı: `kao3-premium/STARTER.md`.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yalnız K3P-00 "önce" çizgisi · cihaz yok.
 - **Dalga A özeti:** 8/8 kart bitti (K3P-A1…A8). AKIS §6 tablosu yeniden ölçüldü (§6b eklendi).
 

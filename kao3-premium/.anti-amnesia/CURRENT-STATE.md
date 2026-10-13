@@ -8,9 +8,9 @@ Sıradaki prompt: K3P-10
 
 - **Tarih:** 2026-10-13
 - **Son tamamlanan:** **K3P-09 (Dalga 1 · Görsel sistem, dördüncü kart) — Materyal hiyerarşisi ve renk görevleri.** Zemin/kart/an üç katmanı ayrıştı; yeşil kalktı, doğru cevap altın dolgu + mürekkep metin oldu. Önce: K3P-08 (Arapça tipografi).
-- **Dal:** `kao3-premium`; onuncu ara yayın **`20261013b`** canlıda. Bu kart dalı ilerletti; **push yok**. Sıradaki kart Dalga 1'in **son** kartıdır (K3P-10) → dalga sonu tam kapı da koşulacak.
+- **Dal:** `kao3-premium` = `main` = **on birinci ara yayın `20261013c`** (canlıda; Pages run 38415139887 success, canlı pin/font GET ile doğrulandı). Sıradaki kart Dalga 1'in **son** kartıdır (K3P-10) → dalga sonu tam kapı da koşulacak.
 - **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`.
-- **Kanıt düzeyi:** kaynak/headless · görsel QA yok · cihaz yok.
+- **Kanıt düzeyi:** kaynak/headless · **görsel QA var (242 ekran görüntüsü, yerel/redakte)** · **deploy: Pages success + canlı pin/font GET** · cihaz yok.
 
 ## K3P-09 ne yaptı
 

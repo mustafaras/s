@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-A8",
+  "nextPrompt": "K3P-06",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -273,7 +273,9 @@
     {
       "id": "K3P-A8",
       "wave": "A",
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-12",
+      "result": "edilgin ekran bütçesi (D-4): akis-olc ilk görünüm ölçüsü (<details> gövdesi sayılmaz, <summary> sayılır); hedef/tanış/kavram kartlarında ayrıntı tek yerel <details><summary>Daha fazla</summary> içinde (handler yok, içerik metni değişmedi); ilk görünüm goal ≤41 · intro ≤33 · concept ≤24 sözcük, 0/633 ekran >45; <summary> ≥44 px + klavyeyle açılır (test_kao2_a11y); bütçe için ölü kod silindi (cellText, cellPronunciation, kaoBoredom, kaoCorrectPauseMs). Dalga A tamam."
     },
     {
       "id": "K3P-06",
@@ -383,9 +385,13 @@
       "gate": "release (prompt içinde ayrıca açık onay sorulur)"
     }
   ],
-  "pinDeferral": {
+    "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearn.js",
+      "app/core/quranLearnViews.js",
+      "app/kao.css"
+    ]
   }
 }

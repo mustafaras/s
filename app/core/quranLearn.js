@@ -1349,8 +1349,6 @@
     choices.forEach(function(choice,index){ choice.choiceId=taskId+':choice:'+index; });
     return {id:taskId,cardId:cardId,type:'fragment',kind:kind,isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),prompt:kind==='order'?'Kelimeleri sırayla seç':'Parçayı çevir',answer:kind==='order'?answerAr:answerTr,ar:answerAr,pronunciation:pronunciation,meaning:answerTr,errorClass:kind==='order'?'order':'rule',clipId:'',choices:choices};
   }
-  function cellText(cell){ return Array.isArray(cell)?String(cell[1]||''):(typeof cell==='string'?cell:''); }
-  function cellPronunciation(cell){ return Array.isArray(cell)?String(cell[2]||''):''; }
   function choiceValue(value){ return value&&typeof value==='object'?{label:String(value.label||''),pronunciation:String(value.pronunciation||'')}:{label:String(value||''),pronunciation:''}; }
   function choiceList(values,answer,seed,taskId){
     var seen=Object.create(null),list=[],answerValue=choiceValue(answer);
@@ -1755,7 +1753,6 @@
   function kaoBoredomHideHarakat(){ var p=kaoSessionFlow(); return p!==null&&p>KAO_BOREDOM; }
   function kaoAnxiety(){ return nonNegativeNumber(quranLearnDeps.ui().kaoWrongStreak,0)>=KAO_ANXIETY_WRONG; }
   function kaoHelp(){ var p=kaoSessionFlow(); return kaoAnxiety()||(p!==null&&p<KAO_ANXIETY); }
-  function kaoBoredom(){ var p=kaoSessionFlow(); return p!==null&&p>KAO_BOREDOM; }
   // AKIS §4: akış/sıkılma bandında 4; kaygıda 3, art arda 3 yanlışta 2 (4→3→2'ye iner).
   function kaoChoiceCap(){ if(!kaoAnxiety()) return 4; return nonNegativeNumber(quranLearnDeps.ui().kaoWrongStreak,0)>=KAO_REINTRO_WRONG?2:3; }
   // K3P-A5: kaygı bandında araya bilinen kolay bir kart girer (yalnız kuyruk, ui).
@@ -1934,10 +1931,6 @@
     ui.kaoLatency=Array.isArray(ui.kaoLatency)?ui.kaoLatency:[];
     ui.kaoLatency.push(Math.min(KAO_TASK_MS_CAP,Math.max(0,elapsed)));
     if(ui.kaoLatency.length>KAO_LATENCY_WINDOW) ui.kaoLatency=ui.kaoLatency.slice(-KAO_LATENCY_WINDOW);
-  }
-  function kaoCorrectPauseMs(elapsed,median,replayed){
-    if(replayed||median===null) return KAO_SLOW_ADVANCE_MS;
-    return elapsed<median?KAO_FAST_ADVANCE_MS:KAO_SLOW_ADVANCE_MS;
   }
   // D2F-03: dizme görevinin doğru sırası çip YAZILARI dizisidir; aynı yazılı çipler (ör. bir kelime âyette iki kez) birbirinin yerine geçer.
   function kaoOrderLabels(task){

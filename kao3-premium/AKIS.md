@@ -130,6 +130,30 @@ içinde çalışır; böylece iki sistem çakışmaz.
 | Ders başına overlay yeniden kurulumu | 7 (+ arka plan render'ları) | 0 (yalnız açılışta) | Harness `calls.mount` sayımı |
 | Ders sırasında KAO üstüne binen toast | Mümkün (z 10000 > 380) | 0 (ertelenir) | Headless DOM sayımı |
 
+### 6b. Dalga A sonu — yeniden ölçüm (2026-10-12, K3P-A8)
+
+| Ölçü | Dalga A öncesi | Dalga A sonu | Hedef | Araç |
+| --- | --- | --- | --- | --- |
+| Art arda en uzun edilgin ekran dizisi | 6 | **1** | ≤ 1 | `akis-olc` |
+| Edilgin bir ekrandaki en çok sözcük — ilk görünüm (zirve hariç) | 68 | **41** (hedef · u10.01) | ≤ 45 | `akis-olc` |
+| … tanış ekranı (499 ekran) | 78 | **33** (u06.29) | ≤ 45 | `akis-olc` |
+| … kavram ekranı (25 ekran) | 139 | **24** (u03.01) | ≤ 45 | `akis-olc` |
+| Edilgin ekran bütçesini aşan ekran | 7/… | **0/633** | 0 | `akis-olc` |
+| İlk yeni içeriğe kadar dokunuş | 21 | **7** | ≤ 7 | `akis-olc` |
+| Doğru cevaptan sonra "Devam" basışı (otomatik geçiş açık/kapalı) | 30 | 30 → **0** (açık) / 30 (kapalı) | 0 | `dokunus-olc` |
+| 2 yanlıştan sonra soru kolaylaşıyor mu | Hayır | **Evet** (4→3→2 şık) | Evet | `akis-olc` |
+| Yeniden yüklemeden sonra devam ipucu | Yok | **"Kaldığın yerden · Bölüm n/5"** | "Kaldığın yerden · n/N" | `akis-olc` |
+| Açılıştan ilk göreve dokunuş | 2 | 3 | ≤ 2 | `akis-olc` |
+| Ders başına overlay yeniden kurulumu | 7 (+ arka plan render'ları) | **0** | 0 (yalnız açılışta) | `test_k3p_mount` |
+| Ders sırasında KAO üstüne binen toast | Mümkün | **0** (ertelenir) | 0 | `test_k3p_focus_lock` |
+| Ders başına dokunuş (varsayılan açık) | 69 | **39** | ≤ 40 | `dokunus-olc` |
+| Oturum süresi | aşılabiliyordu | **≤ seçilen** | ≤ seçilen | `test_k3p_budget` |
+| Çalışma zamanı (gzip) | 119,093 KiB | **127,654 KiB** | ≤ 128 KiB | `test_kao2_perf_budget` |
+| CSS (gzip) | 13,072 KiB | **13,190 KiB** | ≤ 14 KiB | `test_kao2_perf_budget` |
+
+**Açık kalan (A-3, kullanıcı kararı):** açılış → ilk görev 3 dokunuş; hedef ≤ 2. Bu iki sayı arasındaki
+fark kullanıcı kararına bırakıldı (K3P-A3'ten beri açık).
+
 ## 7. Hipotezler (önceden kayıtlı)
 
 | # | Hipotez | Ölçü | Hedef |

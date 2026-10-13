@@ -247,7 +247,13 @@
   }
 
   // KAO2-12 · Kaynakları motor seçer; bu katman yalnız güvenli metin ve App eylemi çizer.
-  // K2F-25: tanış kartı katmanları — doğrulanmış örnek âyet (uygula adımıyla aynı kart biçimi) ve katlanabilir "Neden böyle?".
+  // K2F-25 · tanış kartı katmanları: doğrulanmış örnek âyet ve kognat ("Türkçedeki akrabası").
+  // K3P-A8 (D-4/A-8) · edilgin ekran bütçesi: kartın İLK GÖRÜNÜMÜ ≤ 45 sözcük olmalı. Bu yüzden
+  // örnek âyet, çapa metni ve "Neden böyle?" tek bir yerel <details><summary>Daha fazla</summary>…</details>
+  // içine taşındı. İçerik metni değişmedi; yalnız sunum. Yeni bir handler eklenmedi.
+  function moreBlock(inner){
+    return inner?'<details class="kao-lesson-more"><summary>Daha fazla</summary>'+inner+'</details>':'';
+  }
   function introExample(example){
     if(!example||typeof example!=='object') return '';
     return '<section class="kao-lesson-anchor kao-lesson-example" aria-label="Örnek âyet"><h4>Örnek âyet</h4><div class="kao-lesson-sentence"><p class="kao-lesson-sentence-ar" lang="ar" dir="rtl">'+escapeText(example.ar)+'</p><p class="kao-lesson-sentence-pron">'+escapeText(example.pronunciation)+'</p><p class="kao-lesson-sentence-tr">'+escapeText(example.tr)+'</p><p class="kao-lesson-sentence-meta">Âyet '+escapeText(example.ref)+'</p></div></section>';
@@ -260,7 +266,7 @@
       body+='<p>Kök <span lang="ar" dir="rtl">'+escapeText(root.ar)+'</span> ('+escapeText(root.reading)+'): “'+escapeText(root.meaning)+'”</p>'+(derivatives.length?'<p>Aynı kökten Türkçeye geçenler: '+derivatives.map(function(item){ return escapeText(item); }).join(', ')+'</p>':'');
     }
     if(why.shift) body+='<p>Dikkat: '+escapeText(why.shift)+'</p>';
-    return body?'<details class="kao-lesson-why"><summary>Neden böyle?</summary>'+body+'</details>':'';
+    return body?'<p class="kao-lesson-why-title">Neden böyle?</p>'+body:'';
   }
   function lessonScreen(model){
     if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
@@ -276,7 +282,7 @@
         return '<span class="kao-lesson-anchor-word kao-lesson-anchor-'+state+'" lang="ar" dir="rtl"><b>'+escapeText(word.ar)+'</b><small>'+escapeText(word.tr)+'</small></span>';
       }).join('');
       var audio=model.audio&&typeof model.audio==='object'?model.audio:null,audioCall=audio?actionCall(audio.action):'';
-      body='<section class="kao-lesson-card kao-lesson-intro" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Yeni kelime · '+escapeText(model.ordinal)+' / '+escapeText(model.total)+'</p><p class="kao-lesson-ar" lang="ar" dir="rtl">'+escapeText(model.ar)+'</p><p class="kao-lesson-reading" lang="tr">'+escapeText(model.pronunciation)+'</p>'+(audio?'<button type="button" class="kao-lesson-audio"'+(audioCall?' onclick="'+audioCall+'"':' disabled')+'>'+deps.icon('headphones',17)+' Dinle</button>':'')+'<h3 id="kao-lesson-title">'+escapeText(model.meaning)+'</h3>'+(model.cognate?'<p class="kao-lesson-cognate">Türkçedeki akrabası: '+escapeText(model.cognate)+'</p>':'')+(model.anchorTitle?'<section class="kao-lesson-anchor"><h4>'+escapeText(model.anchorTitle)+'</h4><div class="kao-lesson-anchor-words">'+anchor+'</div></section>':'')+introExample(model.example)+introWhy(model.why)+'</section>';
+      body='<section class="kao-lesson-card kao-lesson-intro" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Yeni kelime · '+escapeText(model.ordinal)+' / '+escapeText(model.total)+'</p><p class="kao-lesson-ar" lang="ar" dir="rtl">'+escapeText(model.ar)+'</p><p class="kao-lesson-reading" lang="tr">'+escapeText(model.pronunciation)+'</p>'+(audio?'<button type="button" class="kao-lesson-audio"'+(audioCall?' onclick="'+audioCall+'"':' disabled')+'>'+deps.icon('headphones',17)+' Dinle</button>':'')+'<h3 id="kao-lesson-title">'+escapeText(model.meaning)+'</h3>'+moreBlock((model.cognate?'<p class="kao-lesson-cognate">Türkçedeki akrabası: '+escapeText(model.cognate)+'</p>':'')+(model.anchorTitle?'<section class="kao-lesson-anchor"><h4>'+escapeText(model.anchorTitle)+'</h4><div class="kao-lesson-anchor-words">'+anchor+'</div></section>':'')+introExample(model.example)+introWhy(model.why))+'</section>';
     }else if(model.stage==='concept'){
       var table=model.table&&typeof model.table==='object'?model.table:{},columns=Array.isArray(table.columns)?table.columns:[],rows=Array.isArray(table.rows)?table.rows:[];
       var head=columns.map(function(column){ return '<th scope="col">'+escapeText(typeof column==='object'?(column.label||column.title||''):column)+'</th>'; }).join('');
@@ -287,7 +293,10 @@
         if(Array.isArray(cell)){ var reading=escapeText(cell[2]); return '<td><span class="kao-grammar-ar" lang="ar" dir="rtl">'+escapeText(cell[1]||cell[0]||'')+'</span>'+(reading?'<span class="kao-grammar-reading" lang="tr" dir="ltr">'+reading+'</span>':'')+'</td>'; }
         return '<td>'+escapeMixed(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell)+'</td>'; }).join('')+'</tr>';
       }).join('');
-      body='<section class="kao-lesson-card kao-lesson-concept" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Kavram</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.plainTr)+'</p>'+(head||rowHtml?'<div class="kao-lesson-table-wrap"><table class="kao-lesson-table"><thead><tr>'+head+'</tr></thead><tbody>'+rowHtml+'</tbody></table></div>':'')+(model.termTr?'<details class="kao-lesson-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+'</section>';
+      // K3P-A8 (D-4): kavram ekranının ilk görünümü başlık (kuralın özeti) + "Daha fazla" olur; tablo,
+      // terimler ve uzun kural cümlesi katlanır. Böylece ilk görünüm her kavramda ≤ 45 sözcük kalır.
+      var detail=(model.plainTr?'<p>'+escapeText(model.plainTr)+'</p>':'')+(head||rowHtml?'<div class="kao-lesson-table-wrap"><table class="kao-lesson-table"><thead><tr>'+head+'</tr></thead><tbody>'+rowHtml+'</tbody></table></div>':'')+(model.termTr?'<p class="kao-lesson-term-note">Terimler: '+escapeText(model.termTr)+'</p>':'');
+      body='<section class="kao-lesson-card kao-lesson-concept" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Kavram</p><h3 id="kao-lesson-title">'+title+'</h3>'+moreBlock(detail)+'</section>';
     }else if(model.stage==='apply'&&Array.isArray(model.sentences)){
       var sentences=model.sentences.map(function(sentence){
         sentence=sentence&&typeof sentence==='object'?sentence:{};
@@ -316,7 +325,7 @@
       body='<section class="kao-lesson-card kao-lesson-summary" aria-labelledby="kao-lesson-title" aria-live="polite"><p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
     }else{
       var goalLine=model.goal?'<p class="kao-lesson-goal-line">'+escapeText(model.goal)+'</p>':'';
-      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3>'+goalLine+'<p>'+escapeText(model.promise)+'</p></section>';
+      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3>'+goalLine+moreBlock('<p>'+escapeText(model.promise)+'</p>')+'</section>';
     }
     var buttonLabel=escapeText(model.buttonLabel||'Devam');
     var secondaryCall=actionCall(model.secondaryAction),secondary=model.secondaryAction?'<button type="button" class="kao-lesson-audio kao-lesson-more"'+(secondaryCall?' onclick="'+secondaryCall+'"':' disabled')+'>'+escapeText(model.secondaryLabel||'5 dakika daha')+'</button>':'';

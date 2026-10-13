@@ -196,9 +196,13 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-lesson-table th,.kao-lesson-table td{padding:9px 10px;border-bottom:1px solid var(--kao-sep);color:var(--kao-label);text-align:start;vertical-align:top}
 .kao-lesson-table th{background:color-mix(in srgb,var(--kao-tint) 8%,var(--kao-surface));font-weight:600}
 .kao-lesson-table tr:last-child td{border-bottom:0}
-.kao-lesson-term{padding-top:10px;border-top:1px solid var(--kao-sep)}
-.kao-lesson-term summary{min-height:44px;display:flex;align-items:center;color:var(--kao-tint);font-size:var(--f-subhead);font-weight:600;cursor:pointer}
-.kao-lesson-term p{padding:0 4px 8px}
+.kao-lesson-more{padding-top:10px;border-top:1px solid var(--kao-sep)}
+.kao-lesson-more summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--kao-tint);font-size:var(--f-subhead);font-weight:600;cursor:pointer}
+.kao-lesson-more summary::after{content:'\203A';flex:none;font-size:1.4em;line-height:1;transition:transform var(--dur-2) ease}
+.kao-lesson-more[open] summary::after{transform:rotate(90deg)}
+.kao-lesson-more>section,.kao-lesson-more>div,.kao-lesson-more>p{padding:0 4px 8px}
+.kao-lesson-why-title{margin:6px 0 0;color:var(--kao-tint);font-weight:600}
+.kao-lesson-term-note{margin:0;padding:0 4px 8px;color:var(--kao-label-2);line-height:1.5;overflow-wrap:anywhere}
 .kao-lesson-apply-list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
 .kao-lesson-apply-word{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
 .kao-lesson-apply-word span:first-child{color:var(--kao-label);font-size:var(--f-callout);text-align:right}
@@ -210,9 +214,8 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-lesson-sentence-tr{color:var(--kao-label);font-size:var(--f-callout)}
 .kao-lesson-sentence-meta{color:var(--kao-label-2);font-size:var(--f-footnote)}
 .kao-lesson-next{width:100%;margin-top:0}
-.kao-focus-exit:focus-visible,.kao-lesson-audio:focus-visible,.kao-lesson-why summary:focus-visible,.kao-lesson-term summary:focus-visible,.kao-lesson-next:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
-.kao-lesson-why{padding-top:10px;border-top:1px solid var(--kao-sep);color:var(--kao-label)}.kao-lesson-why summary{min-height:44px;display:flex;align-items:center;color:var(--kao-tint);font-weight:600;cursor:pointer}.kao-lesson-why p{margin:6px 0 0;font-size:var(--f-subhead)}
-@media (forced-colors:active){.kao-lesson-card,.kao-lesson-anchor-word,.kao-lesson-table-wrap,.kao-lesson-apply-word,.kao-lesson-audio{border-color:CanvasText;background:Canvas;color:CanvasText}.kao-lesson-kicker,.kao-lesson-card p,.kao-lesson-anchor-word small,.kao-lesson-table th,.kao-lesson-table td{color:CanvasText}.kao-lesson-anchor-new,.kao-lesson-apply-new,.kao-lesson-anchor-known,.kao-lesson-apply-known{outline:1px solid Highlight}.kao-lesson-progress{background:Canvas;outline:1px solid CanvasText}.kao-lesson-progress>span{background:Highlight}}
+.kao-focus-exit:focus-visible,.kao-lesson-audio:focus-visible,.kao-lesson-more summary:focus-visible,.kao-lesson-next:focus-visible{outline:3px solid var(--kao-tint);outline-offset:3px}
+@media (forced-colors:active){.kao-lesson-card,.kao-lesson-anchor-word,.kao-lesson-table-wrap,.kao-lesson-apply-word,.kao-lesson-audio,.kao-lesson-more{border-color:CanvasText;background:Canvas;color:CanvasText}.kao-lesson-kicker,.kao-lesson-card p,.kao-lesson-anchor-word small,.kao-lesson-table th,.kao-lesson-table td{color:CanvasText}.kao-lesson-more summary:focus-visible{outline-color:Highlight}.kao-lesson-anchor-new,.kao-lesson-apply-new,.kao-lesson-anchor-known,.kao-lesson-apply-known{outline:1px solid Highlight}.kao-lesson-progress{background:Canvas;outline:1px solid CanvasText}.kao-lesson-progress>span{background:Highlight}}
 /* KAO2-12 son */
 /* KAO2-13 · S-03 Yol ve S-04 Ünite: dikey, 06 tokenlarıyla çalışan KAO modal yüzeyleri. */
 .kao-screen-units,.kao-screen-unit{min-width:0}

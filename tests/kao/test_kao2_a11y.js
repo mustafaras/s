@@ -481,4 +481,56 @@ check('dar genişlik ve büyük metin için yatay kaydırma koruması var', () =
   assert.match(css, /@media[^{]*\(max-width:\s*(?:3\d\d|4\d\d)px\)/, 'dar ekran sorgusu yok');
 });
 
+// ---- (11) K3P-A8: katlanan "Daha fazla" bloğu (D-4) --------------------
+// İlk görünüm bütçesi katlanmış <details> ile sağlanır. Katlanan blok: (a) doğal <details>/<summary>
+// çifti olduğu için klavyeyle açılır (Enter/Space + odaklanabilir), (b) özeti ≥ 44 px dokunma hedefi,
+// (c) ders kartında en çok bir tane, (d) içeriği <summary> DIŞINDA (açılmadan görünmez).
+check('K3P-A8 katlanan "Daha fazla" bloğu: doğal <details>/<summary>, ≥44 px özet, kartta tek, içerik kapalı', () => {
+  const css = read('app/kao.css').replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = /\.kao-lesson-more summary\{([^}]*)\}/.exec(css);
+  assert.ok(rule, '.kao-lesson-more summary kuralı yok');
+  assert.match(rule[1], /min-height:\s*44px/, 'özet dokunma hedefi 44 px değil');
+  assert.match(rule[1], /cursor:\s*pointer/, 'özet tıklanabilir görünmüyor');
+  assert.match(css, /\.kao-lesson-more summary:focus-visible/, 'özetin odak halkası yok');
+  assert.match(css, /\.kao-lesson-more summary::after\{[^}]*content:/, 'katlanan bloğun açılır işaretçisi yok');
+  assert.match(css, /\.kao-lesson-more\[open\] summary::after\{[^}]*rotate/, 'açıkken işaretçi dönmüyor');
+  assert.doesNotMatch(css, /\.kao-lesson-(?:why|term)[,{:\s]/, 'K3P-A8 sonrası ölü katlanma kuralı kaldı');
+  // Ders kartlarında gerçek render: her intro/kavram kartı en çok bir katlanan blok taşır.
+  const t = bootKao();
+  const cards = [];
+  for (const lesson of t.win.QuranCurriculumV2.units.flatMap((u) => u.lessons)) {
+    assert.equal(t.api.kaoLesson('start', lesson.id), true);
+    const seen = new Set();
+    for (let guard = 0; guard < 400 && t.ui.kaoLesson; guard += 1) {
+      if (['practice', 'review'].includes(t.ui.kaoLesson.phase)) {
+        const queued = t.ui.kaoQueue[t.ui.kaoTaskIndex], task = queued && t.ui.kaoTasks[queued.id];
+        if (!task) break;
+        if (task.kind === 'order') (task.choices || []).slice().sort((a, b) => a.ordinal - b.ordinal).forEach((c) => t.api.kaoAnswer(task.id, c.choiceId));
+        else t.api.kaoAnswer(task.id, (task.choices.find((c) => c.correct) || task.choices[0]).choiceId);
+        t.api.kaoContinue();
+        continue;
+      }
+      const item = t.ui.kaoLesson.plan[t.ui.kaoLesson.at];
+      if (!item || item.kind === 'summary') break;
+      if (['intro', 'concept', 'goal'].includes(item.kind) && !seen.has(item.kind)) {
+        seen.add(item.kind);
+        const html = decode(t.api.kaoOverlayHTML(t.NOW));
+        const folds = [...html.matchAll(/<details class="kao-lesson-more">([\s\S]*?)<\/details>/g)];
+        for (const [, inner] of folds) {
+          assert.match(inner, /^\s*<summary>Daha fazla<\/summary>/, `${lesson.id}/${item.kind}: katlanan blok "Daha fazla" özetiyle açılmıyor`);
+          const body = inner.replace(/^\s*<summary>[\s\S]*?<\/summary>/, '');
+          assert.ok(body.trim().length > 0, `${lesson.id}/${item.kind}: katlanan blok boş`);
+          assert.doesNotMatch(body, /<details\b/, `${lesson.id}/${item.kind}: katlanan blok içinde iç içe <details>`);
+        }
+        const outer = html.slice(html.indexOf('<section class="kao-lesson-card'), html.indexOf('<button type="button" class="kao-primary kao-lesson-next"'));
+        assert.ok((outer.match(/<details/g) || []).length <= 1, `${lesson.id}/${item.kind}: kartta birden çok katlanan blok`);
+        cards.push(`${lesson.id}/${item.kind}`);
+      }
+      t.api.kaoLesson('next');
+    }
+    t.api.kaoLesson('exit');
+  }
+  assert.ok(cards.length >= 100, `az ders kartı sınandı: ${cards.length}`);
+});
+
 console.log(`\nKAO2-26 erişilebilirlik: ${passed} kontrol PASS`);

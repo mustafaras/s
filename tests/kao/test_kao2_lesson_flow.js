@@ -362,7 +362,9 @@ check('K2F-24 eşleme dosyası ve L2 listesi: araç çıktısı modülle aynı; 
   assert.ok(!/[\u0600-\u06FF]/.test(JSON.stringify(file)) && !/[\u0600-\u06FF]/.test(review), 'eşleme çıktıları Arapça harf içermez (P9)');
 });
 
-// K2F-25 (K5-05 · D-01): tanış kartı katmanları — doğrulanmış örnek âyet + katlanabilir "Neden böyle?" (kök anlamı, unit11 türevleri, kognat kayması).
+// K2F-25 (K5-05 · D-01): tanış kartı katmanları — doğrulanmış örnek âyet + "Neden böyle?" (kök anlamı, unit11 türevleri, kognat kayması).
+// K3P-A8 (D-4/A-8): bu katmanlar artık tek bir yerel <details><summary>Daha fazla</summary>…</details> içinde
+// açılır (ilk görünüm ≤ 45 sözcük). İçerik metni değişmedi; yalnız sunum değişti.
 const unit11Roots = new Map(win.QuranGrammarV1.unit11.roots.map((row) => [row.root, row]));
 const expectedWhy = (lemma) => ({ root: unit11Roots.get(lemma.root) || null, shift: lemma.cognate && lemma.cognate.shift ? String(lemma.cognate.shift) : '' });
 // K3P-A3: tanış ekranları artık art arda değil (her birinden sonra bir görev); görevler gerçek handler'la cevaplanıp kavrama kadar sürülür.
@@ -403,8 +405,8 @@ check('K2F-25 tanış kartı: her yeni kelimede doğrulanmış ilk örnek âyet 
   assert.ok(seen >= 24, `az tanış kartı sınandı: ${seen}`);
 });
 
-check('K2F-25 "Neden böyle?": kök anlamı + unit11 türevleri + kognat kayması; katman yalnız içerik varsa ve en çok bir <details>; ≤1 kao-primary', () => {
-  let withLayer = 0, withoutLayer = 0, sawRoot = 0, sawShift = 0;
+check('K2F-25 + K3P-A8 "Daha fazla": kök anlamı + unit11 türevleri + kognat kayması + örnek âyet; katman içeriğe göre kurulur ve en çok bir <details>; ≤1 kao-primary', () => {
+  let withLayer = 0, withoutLayer = 0, sawRoot = 0, sawShift = 0, sawExample = 0;
   for (const unit of curriculum.units) {
     const t = bootKao();
     freshUser(t);
@@ -414,10 +416,12 @@ check('K2F-25 "Neden böyle?": kök anlamı + unit11 türevleri + kognat kaymas�
       const details = (card.html.match(/<details/g) || []).length;
       assert.ok(details <= 1, `${card.lemmaId}: ${details} details`);
       assert.ok((card.html.match(/kao-primary/g) || []).length <= 1, `${card.lemmaId}: birden çok kao-primary`);
-      if (!why.root && !why.shift) { assert.equal(details, 0, `${card.lemmaId}: içeriksiz "Neden böyle?"`); withoutLayer += 1; continue; }
+      if (!why.root && !why.shift) { assert.ok(!flat.includes('Neden böyle?'), `${card.lemmaId}: içeriksiz "Neden böyle?" başlığı`); withoutLayer += 1; continue; }
       assert.equal(details, 1, `${card.lemmaId}: "Neden böyle?" yok`);
+      assert.match(card.html, /<details class="kao-lesson-more"><summary>Daha fazla<\/summary>/, `${card.lemmaId}: katlanan blok "Daha fazla" başlığı taşımıyor`);
       assert.ok(flat.includes('Neden böyle?'), `${card.lemmaId}: başlık yok`);
       withLayer += 1;
+      if (/<details class="kao-lesson-more"/.test(card.html) && card.html.includes('kao-lesson-example')) sawExample += 1;
       if (why.root) { sawRoot += 1; assert.ok(flat.includes(why.root.meaning), `${card.lemmaId}: kök anlamı yok`); why.root.derivatives.forEach((d) => assert.ok(flat.includes(d.tr), `${card.lemmaId}: türev ${d.tr} yok`)); }
       if (why.shift) { sawShift += 1; assert.ok(flat.includes(why.shift), `${card.lemmaId}: kayma uyarısı yok`); }
     }

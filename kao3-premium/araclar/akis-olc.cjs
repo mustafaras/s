@@ -7,7 +7,13 @@
 const path = require('node:path');
 const H = require(path.join(__dirname, '..', '..', 'tests', 'kao', 'helpers', 'kao-harness.js'));
 const lessonId = process.argv[2] || 'u01.02';
-const words = (html) => H.text(html).split(' ').filter(Boolean).length;
+// K3P-A8 (D-4): sözcük sayımı İLK GÖRÜNÜM ölçüsüdür. Katlanmış <details> gövdesi sayılmaz; yalnız
+// <summary> (açma düğmesi, ekranda hep görünür) sayılır. Kullanıcı açmadan gördüğü yük ölçülür.
+const firstView = (html) => H.text(String(html).replace(/<details\b[^>]*>[\s\S]*?<\/details>/g, (m) => {
+  const s = /<summary\b[^>]*>([\s\S]*?)<\/summary>/.exec(m);
+  return ' ' + H.text(s ? s[1] : '') + ' ';
+})).split(' ').filter(Boolean).length;
+const words = (html) => firstView(html);
 const isTask = (t) => t.ui.kaoLesson && ['practice', 'review'].includes(t.ui.kaoLesson.phase);
 const curTask = (t) => { const q = t.ui.kaoQueue[t.ui.kaoTaskIndex]; return q && t.ui.kaoTasks[q.id]; };
 const answer = (t, task, right) => {
@@ -42,6 +48,33 @@ const compact = rhythm.join(' ').replace(/(G )+/g, (m) => `G×${m.trim().split('
 console.log(`2) Ders ${lessonId}: ${tasks} görev, ${interCount} ara ekran (toplam ${interWords} sözcük), en uzun kesintisiz görev dizisi ${maxRun}`);
 console.log(`   ritim: ${compact}`);
 console.log(`   art arda en uzun edilgin dizi ${maxPassive} (özet hariç) · ilk yeni içeriğe (tanış) ${introTap || '—'}. dokunuş`);
+
+// 2b) K3P-A8 (D-4/A-8) · Edilgin ekran bütçesi: hedef, tanış ve kavram ekranlarının İLK GÖRÜNÜMÜ ≤ 45 sözcük.
+// Zirve ekranları (uygula okuma + özet) kuralın dışındadır. 109 dersin tamamı + tüm yeni kelimeler taranır.
+{
+  const lessons = H.bootKao().win.QuranCurriculumV2.units.flatMap((u) => u.lessons);
+  const budgets = { goal: [], intro: [], concept: [] };
+  for (const lesson of lessons) {
+    const t = H.bootKao({ seeded: true }); t.ui.kaoStack = []; t.api.kaoOpen('home');
+    if (!t.api.kaoLesson('start', lesson.id)) continue;
+    for (let g = 0; g < 400 && t.ui.kaoLesson; g += 1) {
+      if (isTask(t)) { const task = curTask(t); if (!task) break; answer(t, task, true); continue; }
+      const st = t.ui.kaoLesson, item = st.plan[st.at];
+      if (!item || item.kind === 'summary') break;
+      if (budgets[item.kind]) budgets[item.kind].push([words(t.api.kaoOverlayHTML(t.NOW)), lesson.id]);
+      t.api.kaoLesson('next');
+    }
+  }
+  const over = [];
+  for (const kind of Object.keys(budgets)) {
+    const list = budgets[kind];
+    const max = list.reduce((a, b) => (b[0] > a[0] ? b : a), [0, '—']);
+    const badN = list.filter((x) => x[0] > 45).length;
+    if (badN) over.push(`${kind} ${badN}/${list.length} (en çok ${max[0]} · ${max[1]})`);
+    console.log(`2b) ${kind}: ${list.length} ekran · ilk görünüm en çok ${max[0]} sözcük (${max[1]}) · >45: ${badN}`);
+  }
+  console.log(`2b) edilgin ekran bütçesi ≤ 45 sözcük (zirve hariç): ${over.length ? 'HAYIR — ' + over.join(' · ') : 'evet'}`);
+}
 
 // 3) Yarıda bırak → sayfa yeniden yüklenmiş gibi ui sıfırla → aç → birincil eyleme bas
 const R = H.bootKao({ seeded: true });

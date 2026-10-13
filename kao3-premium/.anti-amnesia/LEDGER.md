@@ -476,3 +476,26 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · canlı doğrulama yayından sonra · cihaz yok
 - Gözlem: —
 - Sıradaki: K3P-A8
+
+## seq 30 · K3P-A8 · KART (Dalga A kapanışı)
+- Tarih: 2026-10-12
+- Commit: (bu commit)
+- Yapılan:
+  - `kao3-premium/araclar/akis-olc.cjs`: sözcük sayımı artık **ilk görünüm** ölçüsü — `<details>` gövdesi sayılmaz, yalnız `<summary>` sayılır (yorumda yazılı). Yeni **2b** bölümü 109 dersin tamamını tarayıp `goal`/`intro`/`concept` ilk görünümünü ve >45 sayısını yazar.
+  - `app/core/quranLearnViews.js`: tanış kartında kognat + çapa + örnek âyet + "Neden böyle?", kavram kartında tablo + terimler ve **kural cümlesi**, hedef kartında vaat tek bir yerel `<details class="kao-lesson-more"><summary>Daha fazla</summary>…</details>` içine taşındı. **Handler eklenmedi; içerik metni değişmedi, yalnız sunum** (örnek âyetin `kao-lesson-example` sınıfı ve terimlerin metni aynen korundu).
+  - `app/kao.css`: `.kao-lesson-more` (özet `min-height:44px`, `:focus-visible` halkası, açılır `::after` işaretçisi, `[open]` dönüşü, forced-colors) eklendi; artık üretilmeyen `.kao-lesson-why` / `.kao-lesson-term` kuralları **silindi**; `.kao-lesson-why-title` / `.kao-lesson-term-note` katlanan bloğun içi için tanımlandı.
+  - **Bütçe için ölü kod silindi** (repo geneli çağrı taraması): `quranLearn.js` → `cellText`, `cellPronunciation`, `kaoBoredom`, `kaoCorrectPauseMs` (hiçbiri üretimde çağrılmıyordu).
+  - `tests/kao/test_kao2_a11y.js`: yeni kontrol (14. kontrol) — katlanan blok doğal `<details>/<summary>`, özeti ≥44 px + `cursor:pointer` + `:focus-visible`, işaretçi döner, ders kartında **en çok bir** katlanan blok, içerik `<summary>` dışında; 100+ ders kartı gerçek akışla sınanır.
+  - `tests/kao/test_kao2_lesson_flow.js`: K2F-25 assertion'ı yeni sunuma gerekçeli uyarlandı (katman artık `<details class="kao-lesson-more"><summary>Daha fazla</summary>`; içeriksiz `why` başlığı gösterilmez; örnek âyet katmanın içinde).
+  - `tests/kao/README.md` envanter satırı güncellendi. K-P: `app/core/quranLearn.js`, `app/core/quranLearnViews.js`, `app/kao.css` → `pinDeferral.files`.
+- Ölçüler (yeniden ölçüm; AKIS §6b tablosu eklendi):
+  - İlk görünüm, zirve hariç — **goal ≤ 41** (u10.01) · **tanış ≤ 33** (u06.29) · **kavram ≤ 24** (u03.01) sözcük; **>45: 0 / 633 ekran** (taban: sırasıyla 54 · 78 · 139 · 7/… ekran aşıyordu).
+  - `akis-olc` 2) ritim: `[goal:26] G×5 [intro:25] G×1 [intro:25] G×1 [intro:25] G×1 [intro:24] G×1 [concept:18] G×21 [apply:99]`; art arda edilgin dizi **1**; ilk yeni içeriğe **7.** dokunuş (korundu).
+  - runtime 127,453 → **127,654 KiB** (gzip level-9; tavan 128; pay ~0,35 KiB) · css 13,128 → **13,190 KiB** (tavan 14) · `test_kao2_mastery`'nin level-6 koşusu 128,071 KiB (tavan altı) · p95 5,4 ms/steady 3,3 ms · çift şık 0/1087 + 0/1127 · okunuş 0 + 0 · kontrast 726 çift/0 ihlal · ders başına dokunuş 39 (otomatik geçiş açık) / 69 (kapalı).
+- Kapı (K-Q): `kapi-hizli --kart K3P-A8` → **HIZLI KAPI YEŞİL** (66 kao + sözleşme/pin + driver + ölçü kapıları). **Dalga sonu:** `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → **TÜM KAPILAR YEŞİL** (tests/kao 66 · app 78 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · çift şık · okunuş · plan-check · pin senkronu · tekrar-üretim 10/10 · perf).
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) Kavram ekranında kural cümlesi de katlanır: ilk görünüm başlık (kuralın özeti) + "Daha fazla" kalır (≤24 sözcük). Kuralı görünür bırakma denemeleri (ilk cümle / 20 sözcük eşiği) 45 sözcük tavanını ya aşıyor ya da keyfî bir eşik gerektiriyordu; D-4 bütçesi metin kaybına yeğlendi. Kullanıcı kuralı açık isterse ayrı kart konusu.
+  (2) Katlanan blok `<details>`'in içinde `<summary>` dışındaki `<p>`'leri ölçüm aracı doğru dışlıyor; `text()` etiketi boşlukla değiştirdiği için bağlam satırı ile `<h3>` arası birleşme olmuyor.
+  (3) Eski `why` katmanı iki `introWhy` fonksiyonu tanımlanmış hâlde bulundu (ikincisi ilkini gölgeliyordu); bütçe için tek tanıma indirildi — davranış değişmedi.
+  (4) **Devralınan ölçüm tutarsızlığı:** START'ın verdiği 127,45 KiB `test_kao2_mastery`'nin level-6 gzip'inden; `test_kao2_perf_budget` level-9 (127,45) okur. İkisi de tavanın altında; ölçüm yöntemi farkı LEDGER'a not edildi.
+- Sıradaki: K3P-06

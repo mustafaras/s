@@ -573,3 +573,18 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: (1) **Yazı tipi kabulü cihazda:** ≤150 KiB ve kod-noktası kapsamı headless doğrulandı; K-B'nin istediği "30 zor glif dizisi önce/sonra" karşılaştırması ve harekelerin çakışmadığı yalnız **kullanıcının gözüyle** onaylanır (K3P-26/27 cihaz adımı; geri dönüş koşulu Amiri Quran). (2) `pyftsubset` woff2 için `brotli`'ye ihtiyaç duydu; kullanıcı site-paketlerine `brotli` kuruldu (araç zinciri, depoya girmez). (3) Öksüz-sınıf tarayıcısındaki `@font-face` yanlış pozitifi gerçek bir araç hatasıydı, sınıf kuralı değil; gerekçesiyle daraltıldı. (4) Yazı tipi pini K3P-27'de ortak sürümle yükseltilecek (`?v=20261013b` şimdilik mevcut sürüm).
 - Sıradaki: K3P-08
+
+## seq 36 · K3P-08 · KART (Dalga 1 · Görsel sistem, üçüncü kart)
+- Tarih: 2026-10-13
+- Commit: (bu commit)
+- Yapılan:
+  - **Ölçek:** 18 Arapça kuralın `font-size`'u üç kademeye bağlandı — `--kao-ar-hero` (soru, ders âyeti, gate, s0, ayar örneği, tanış, kelime-hero), `--kao-ar-body` (şıklar, âyet, okuyucu, geri bildirim, ünite, gramer, kök, sözlük, sözcük örneği), `--kao-ar-inline` (Türkçe içi Arapça: kavram çipi, ders başlığı/ızgara). Sayısal `clamp(...)` Arapça ölçekleri kaldırıldı.
+  - **Kalınlık:** Arapça seçicilerden **5 kural-düzeyi `font-weight:700`** kaldırıldı; kalan sarmalayıcılar için tek taban `.kao-dialog [lang="ar"]{font-weight:400}`. Arapça 700 = 0 (sözleşme).
+  - **Oran:** `--kao-ar-inline` 1.25em → **1.3em**; hero/body zaten ≥ 1,3 × gövde.
+  - **Dokunma:** `.kao-choices button` 52 → **56 px**.
+  - **Test:** yeni `tests/kao/test_k3p_typography.js` (Arapça 700=0 · ölçek yalnız --kao-ar-* · oran ≥ 1,3 · şık ≥ 56) + `tests/kao/README.md` envanteri (66 → **67**).
+- Ölçüler: css 13,335 → **13,806 KiB** (gzip, tavan 14; pay ~0,19) · runtime **127,654 KiB** (değişmedi) · app.js **7799 satır** (dokunulmadı) · kontrast 726/0.
+- Kapı (K-Q): `kapi-hizli --kart K3P-08` → **HIZLI KAPI YEŞİL**; **tests/kao ailesi 67/67 FAIL=0** (yavaş üç dâhil). Dalga sonu değil → tam kapı K3P-10'da.
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: (1) **TASARIM §5.3 iç çelişki:** tablo `--kao-ar-inline: 1.25em` derken aynı bölüm "Arapça ≥ 1,3 × Latin" kuralını koyar; 1.25em kuralı bozar. Prompt madde 3 ("oran ≥ 1,3") bağlayıcı olduğundan **1.3em** seçildi; tablodaki 1.25em bayat kabul edildi (TASARIM.md plan dosyasıdır, bu kartta düzenlenmedi; K3P-27'de gerekirse not düşülür). (2) Ölçek bağlama, kural-düzeyi 700 kaldırıldıktan sonra sarmalayıcı kutu kalınlığının Arapçaya miras kalmasını önlemek için tek taban gerektirdi; taban `.kao-dialog [lang="ar"]` (dialog kökü, sıralamada en kuvvetli değil ama yeterli). (3) CSS bütçesi ~0,19 KiB'e indi; **K3P-09/10 öncesi yer açılmalı** (§5 uyarısı CURRENT-STATE'te). (4) Arapça kural tarayıcısı sentetik olarak `:not([lang="ar"])` yanlış pozitifini düşürür (Latin eşleşi testte Arapça sayılmaz).
+- Sıradaki: K3P-09

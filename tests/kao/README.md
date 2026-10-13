@@ -76,8 +76,9 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_k3p_mount.js` | K3P-A1 | A-7/D-0 (K-M): `kaoSplitOverlay` birim testleri (16 görünüm; aynı anahtar → aynı görünüm, `role`/`onkeydown` dış kartta); sahte DOM ile app.js mount + render.js paint taklidi: ders boyunca overlay düğümü aynı, yeniden kurulum 0, açılış eklemesi 1; kaydırma ve odak aynı ekranda korunur, ekran değişince kaydırma 0; app.js/render.js devri metinle sabit |
 | `test_k3p_rhythm.js` | K3P-A3 | A-1/A-2 (K-L, AKIS §3): 109 ders gerçek handler'larla — art arda edilgin ekran ≤ 1 (hedef dâhil, özet hariç), ilk tanış ≤ 7. dokunuşta, her tanıştan hemen sonra o kelimenin 2 şıklı görevi, görev sayısı K3P-A2 tabanının ±%20'si; ısınma en kararlı (s) 3–5 tekrar, kalanlar karışık bölümde tür blokları (≤ 5); yeni kullanıcıda yalnız hedef + ilk tanış yan yana; yarıda bırak → ui sıfırla → Bugün birincil → aynı görevden sürer, çözülen görev yeniden sorulmaz |
 | `test_k3p_deney_rapor.js` | K3P-05 | Deney raporu (KARARLAR §6, AKIS §7): `--ornek` çıktısında H2/H3/H5/H7/H8/H9 satırları, Arapça/kart-ders kimliği/sır yok; sentetik örnekte elle hesaplanan değerler; izdüşüm yalnız izinli alanlar; gunluk sarmalı, `--bugun` sınırı ve hata yolları (exit 2) |
+| `test_k3p_typography.js` | K3P-08 | Arapça tipografi sözleşmesi (TASARIM §5.3): Arapça seçicilerde `font-weight:700` = 0 (`.kao-dialog [lang="ar"]` tabanı 400); Arapça `font-size` yalnız `--kao-ar-hero/body/inline`; oran ≥ 1,3 × gövde (`--f-body`); şık düğmeleri ≥ 56 px |
 
-K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (66 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
+K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (67 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
 
 ## Yardımcılar ve sabit veri
 

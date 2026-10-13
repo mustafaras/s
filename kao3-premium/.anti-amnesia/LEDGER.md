@@ -545,3 +545,17 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: (1) Koyu temada `--kao-mat-moment` birebir aynı reçeteyle (quran 88% + altın) açık temadan **daha açık** kalıyordu (koyu `--quran` mid-blue, açık navy'den yüksek parlaklıkta); TASARIM §5.1 "aynı, daha koyu" için koyu değer `--quran` %40 + `--quran-surface` olarak yüzeye sabitlendi. (2) `--kao-mat-ground` de TASARIM §5.1'deki koyu `--quran-bg`'nin (yarı saydam tint) **opak eşdeğeri** olarak `--quran-surface` üzerinden türetildi; `--quran-bg` yarı saydam olduğu için katmanlanınca zemin rengi değişirdi. K3P-09 (materyal hiyerarşisi) bu yüzeyi kullanacak. (3) `app/kao.css` pinli bir varlık; değişiklik `test_asset_pin_freshness`'ı ERTELENDİ'ye çevirdi (beklenen, K-P). (4) Kartın kendi kabul testi yok; jetonların doğruluğu sözleşme + kontrast araçlarıyla ve K3P-07…10'un kullanımıyla sınanacak.
 - Sıradaki: K3P-07
+
+## seq 34 · — · YAYIN (onuncu ara yayın · K3P-06)
+- Tarih: 2026-10-13
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı "tümünü canlıya al ve devam et" dedi; **açık yayın onayı** verildi → `pin-yukselt.mjs 20261013b` ile ortak sürüm `20261013a` → **`20261013b`** (index.html 24 · sw.js 23 · panel-v2.html 4 + 12 test dosyası, 79 geçiş; yalnız değişen varlık `app/kao.css`). `pinDeferral.files` boşaltıldı → tazelik testinde ERTELENDİ yok.
+  - Tam kapı (`KAO2_ACCEPT_SLOW_HOST=1`, yavaş makine) → **TÜM KAPILAR YEŞİL** (tests/kao 66 · app 78 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · çift şık · okunuş · plan-check · pin senkronu · tekrar-üretim 10/10 · perf). Yayın öncesi koşuldu.
+  - `kao3-premium` → `main` **fast-forward** (3 commit); `git push origin main` → `b5168d9c..f20bd7ba`.
+  - Pages koşusu **38375731941** → `status=completed conclusion=success` (headSha `f20bd7ba`). Canlı pin **yalnız GET** ile doğrulandı: `app/kao.css?v=20261013b`, `app/core/quranLearn.js?v=20261013b`, `sw.js` → `SW_VERSION='20261013b'`, `SW_OFFLINE_VERSION='iip22-20261013b'`; canlı `kao.css` ilk iki satırında yeni jetonlar (mat-ground/shadow-1/ar-hero/ease/dur-moment) ×2 tema var. **Uygulama tarayıcıda açılmadı.**
+- Ölçüler: css 13,335 KiB (tavan 14) · runtime 127,654 KiB (tavan 128) · p95 4,133 ms/steady 3,005 ms · kontrast 726/0 + 30/0 · canlı sürüm 20261013b.
+- Kapı (K-Q): yayın öncesi **TÜM KAPILAR YEŞİL**; yayın sonrası `senkron` → UYUMLU.
+- Kanıt düzeyi: kaynak/test · görsel QA yok · **deploy kanıtı: Pages success + canlı pin GET (kao.css jetonları doğrulandı)** · cihaz yok
+- Gözlem: Cihaz kabulü kullanıcıda (açılışta yeni sürüm; "Verileri sıfırla"ya dokunma).
+- Sıradaki: K3P-07

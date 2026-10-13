@@ -8,7 +8,7 @@ Sıradaki prompt: K3P-07
 
 - **Tarih:** 2026-10-13
 - **Son tamamlanan:** **K3P-06 (Dalga 1 · Görsel sistem, ilk kart) — Tasarım tokenları.** `kao.css`'in açık ve koyu token bloklarına yeni jetonlar eklendi; bu kartta jetonları **kullanan** kural değişikliği **yok** (kullanmak K3P-07…10'un işi). Önce: K3P-A8 (Dalga A kapanışı).
-- **Dal:** `kao3-premium`; **onuncu ara yayın `20261013b` hazırlanıyor** (K3P-06 pini; push/merge kullanıcı onayıyla).
+- **Dal:** `kao3-premium` = `main` = **onuncu ara yayın `20261013b`** (canlıda; Pages run 38375731941 success, canlı pin `curl` ile doğrulandı; `kao.css` jetonları canlıda). Dal ile `main` aynı commit'te.
 - **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`; sıradaki kart K3P-07 (Kur'an yazı tipi alt kümesi).
 - **Kanıt düzeyi:** kaynak/headless · görsel QA yok · cihaz yok.
 

@@ -5,12 +5,12 @@
  * gösterilen native bildirimler sw.showNotification() üzerinden buradan geçer.
  */
 
-const SW_VERSION = '20261014a';
+const SW_VERSION = '20261014b';
 
 // IIP-22: controlled, public-only offline package. This is deliberately an
 // exact allowlist, not a runtime cache. Personal data, authenticated responses,
 // panel payloads, media and third-party responses can never enter this cache.
-const SW_OFFLINE_VERSION = 'iip22-20261014a';
+const SW_OFFLINE_VERSION = 'iip22-20261014b';
 const SW_OFFLINE_PREFIX = 'seyma-offline-v1-';
 const SW_OFFLINE_CACHE = SW_OFFLINE_PREFIX + SW_OFFLINE_VERSION;
 const SW_OFFLINE_TEMP = SW_OFFLINE_CACHE + '-temp';
@@ -18,12 +18,12 @@ const SW_OFFLINE_ESTIMATED_BYTES = 3800000;
 const SW_OFFLINE_MANIFEST = Object.freeze([
   './',
   './index.html',
-  './manifest.json?v=20261014a',
-  './app/styles.css?v=20261014a',
-  './app/kao.css?v=20261014a',
+  './manifest.json?v=20261014b',
+  './app/styles.css?v=20261014b',
+  './app/kao.css?v=20261014b',
   './assets/aeon-icon-192.png',
   './assets/aeon-icon-512.png',
-  './assets/kao/font/ScheherazadeNew-Regular.k3p.woff2?v=20261014a',
+  './assets/kao/font/ScheherazadeNew-Regular.k3p.woff2?v=20261014b',
   './app/content/motivationProgramV2.js?v=20260730p',
   './app/content/motivationNarratives.js?v=20260730p',
   './app/content/saygiPeople.js?v=20260730p',
@@ -32,27 +32,27 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/content/quranRevelationOrderV1.js?v=20260730p',
   './app/content/quranTransportV1.js?v=20260730p',
   './app/content/quranStrikingVersesV1.js?v=20260922b',
-  './app/content/quranLexiconV1.js?v=20261014a',
-  './app/content/quranGrammarV1.js?v=20261014a',
-  './app/content/quranShortSurahsV1.js?v=20261014a',
+  './app/content/quranLexiconV1.js?v=20261014b',
+  './app/content/quranGrammarV1.js?v=20261014b',
+  './app/content/quranShortSurahsV1.js?v=20261014b',
   './app/content/quranPhonicsV1.js?v=20260924b',
-  './app/content/quranCurriculumV2.js?v=20261014a',
-  './app/content/quranConceptTextsV1.js?v=20261014a',
-  './app/content/quranMahrecSchemasV1.js?v=20261014a',
+  './app/content/quranCurriculumV2.js?v=20261014b',
+  './app/content/quranConceptTextsV1.js?v=20261014b',
+  './app/content/quranMahrecSchemasV1.js?v=20261014b',
   './app/content/esmaulHusnaV1.js?v=20260730p',
   './app/content/esmaulHusnaV2.js?v=20260730p',
   './app/content/zikirCoreContentV1.js?v=20260730p',
-  './app/core/constants.js?v=20261014a',
+  './app/core/constants.js?v=20261014b',
   './app/core/dateUtils.js?v=20260903b',
-  './app/core/state.js?v=20261014a',
+  './app/core/state.js?v=20261014b',
   './app/core/syncGlue.js?v=20260904a',
-  './app/core/helpers.js?v=20261014a',
+  './app/core/helpers.js?v=20261014b',
   './app/core/prayer.js?v=20260921f',
-  './app/core/zikir.js?v=20261014a',
-  './app/core/quranLearnFlow.js?v=20261014a',
-  './app/core/quranLearnViews.js?v=20261014a',
+  './app/core/zikir.js?v=20261014b',
+  './app/core/quranLearnFlow.js?v=20261014b',
+  './app/core/quranLearnViews.js?v=20261014b',
   './app/core/quran.js?v=20260915a',
-  './app/core/quranLearn.js?v=20261014a',
+  './app/core/quranLearn.js?v=20261014b',
   './app/core/saygi.js?v=20260929c',
   './app/core/motivation.js?v=20260909a',
   './app/core/crisis.js?v=20260909a',
@@ -65,18 +65,18 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './app/core/settings.js?v=20260926a',
   './app/core/mediaFx.js?v=20260909a',
   './app/core/timeTheme.js?v=20260908a',
-  './app/core/skyFx.js?v=20261014a',
+  './app/core/skyFx.js?v=20261014b',
   './app/core/reminderCatalog.js?v=20260914a',
   './app/core/reminderEngine.js?v=20260818a',
   './app/core/reminderScheduler.js?v=20260818a',
   './app/core/reminderDelivery.js?v=20260818a',
   './app/core/reminders.js?v=20260914a',
   './app/core/reminderSurface.js?v=20260914d',
-  './app/core/messaging.js?v=20261014a',
-  './app/core/render.js?v=20261014a',
-  './app/core/appSurface.js?v=20261014a',
-  './app.js?v=20261014a',
-  './sync.js?v=20261014a'
+  './app/core/messaging.js?v=20261014b',
+  './app/core/render.js?v=20261014b',
+  './app/core/appSurface.js?v=20261014b',
+  './app.js?v=20261014b',
+  './sync.js?v=20261014b'
 ]);
 
 function swManifestDescriptor() {

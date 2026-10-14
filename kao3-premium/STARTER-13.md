@@ -20,8 +20,9 @@ K3P programındasın (Kur'an Arapçası modalı · "Tezhip"). Repo kökü: /User
 5. Bağlam yetmezse §4 devir protokolünü uygula: commit yok, devir notu yaz.
 
 ⚠️ ÜÇ DAR BÜTÇE (devralınan ölçüm, 2026-10-14 · birleşik ara yayın 20261014b canlıda):
-- Çalışma zamanı 127,988 / 128 KiB (gzip L6; L9 127,630) — pay yalnız ~0,012 KiB.
-  (tests/kao/test_kao2_perf_budget.js L9; test_kao2_mastery.js L6 ölçer → kapı L9'dur.)
+- Çalışma zamanı 127,988 / 128 KiB (gzip L6; L9 127,630). İKİ test de ölçer ve İKİSİ de ≤128
+  olmalıdır: `test_kao2_mastery.js` L6 (level 1, **bağlayıcı** olan: pay yalnız ~0,012 KiB) ve
+  `test_kao2_perf_budget.js` L9 (level 9). Kapı ikisini birlikte koşar → L6'yı baz al.
 - CSS 15,221 / 16 KiB (pay ~0,8 KiB).
 - app.js kabuğu 7799 / 7800 satır (tests/app/test_modularization_boundary.js) → app.js'te yer
   neredeyse yok. Bu kart quranLearn.js/Flow/Views ve kao.css'e yazar; app.js'e DOKUNMA.

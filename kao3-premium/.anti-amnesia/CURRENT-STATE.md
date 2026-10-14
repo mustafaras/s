@@ -6,9 +6,10 @@ Sıradaki prompt: K3P-12
 
 ## Son durum
 
-- **Tarih:** 2026-10-13
+- **Tarih:** 2026-10-14
 - **Son tamamlanan:** **K3P-11 (Dalga 2 · Tezhip, ilk kart) — Tezhip sayfası bileşeni.** İmza bileşen doğdu: `views.tezhipPage` + `kaoTezhipModel`; bilinen kelime altınla işleniyor ve yaldız oranı `kaoCoverage` ile birebir tutarlı. Önce: K3P-10 (hareket grameri; Dalga 1 kapandı).
-- **Dal:** `kao3-premium` = `main` = **on birinci ara yayın `20261013c`** (canlıda). Sıradaki kart K3P-12 (Bugün ekranı yeniden) → dalga sonu DEĞİL; `kapi-hizli --kart K3P-12` yeterli.
+- **Son yayın:** 2026-10-14, **on ikinci ara yayın `20261014a`** canlıda (kullanıcı açık onayı; Pages run **38521530117** success; canlı pin GET ile doğrulandı) — Dalga 1 hareket grameri + Tezhip bileşeni yayında.
+- **Dal:** `kao3-premium` = `main` = **`20261014a`**. Sıradaki kart K3P-12 (Bugün ekranı yeniden) → dalga sonu DEĞİL; `kapi-hizli --kart K3P-12` yeterli.
 - **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA **yok** (bu kartta ekran görüntüsü istenmedi) · cihaz yok.
 

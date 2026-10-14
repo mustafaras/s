@@ -208,7 +208,7 @@ for (const variant of [{ label: 'audio=false', quiet: false }, { label: 'sessiz 
   assert.match(statsHtml, /aria-labelledby="kao-stats-title"/);
   assert.equal((statsHtml.match(/<th scope="row">/g) || []).length, 10, '10 R-bandı satırı');
   assert.match(statsHtml, /Son 2 hafta[\s\S]*Son 6 hafta[\s\S]*Gece tekrarı/);
-  assert.match(api.kaoHomeHTML(new Date(clock.now)), /App\.kaoSetView\((?:&quot;|")stats(?:&quot;|")\)/, 'S-02 Sen → İlerleme satırı (fikstür esc=String)');
+  assert.match(api.kaoLibraryHTML(), /App\.kaoSetView\((?:&quot;|")stats(?:&quot;|")\)/, 'K3P-12 Kütüphane → İlerleme satırı (fikstür esc=String)');
   report.night = { nightSessionCards: nightCount, nightRev: q.daily[nightKey].nightRev, nightFollowN: q.daily[dayKey].nightFollow.n };
 }
 

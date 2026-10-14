@@ -80,8 +80,9 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_k3p_motion_css.js` | K3P-10 | Hareket grameri sözleşmesi (TASARIM §5.4, D-5) — `app/kao.css` metin taraması: üç sınıf `--kao-dur-micro/transition/moment` + `--kao-ease`; görev geçişi 24 px yatay + opaklık ≤240 ms; şık basışı 120 ms küçülme; ✓ işareti yaylanarak belirir; `prefers-reduced-motion:reduce` GERÇEK her hareket kuralını kapatır (kapsanmayan seçici 0) |
 | `test_k3p_motion_fx.js` | K3P-10 | `kaoFx` hareket birim testi (D-6): yanlışta seçilen şık sarsılır + yalnız `SeyHaptics.error` (ses yok, kırmızı yok); `SeyFx.shouldAnimate() === false` iken ne sarsıntı ne görev-geçiş sınıfı; görev geçişi ile doğru yol ayrışır |
 | `test_k3p_tezhip.js` | K3P-11 | Tezhip sayfası (TASARIM §2): `views.tezhipPage` üç durumu (bilinen/öğreniliyor/yeni) sınıflar, metni kaçırır, `aria-label` taşır, `interactive:false` iken düğme değil, rumî kenarlık `aria-hidden` SVG; `kaoTezhipModel` yalnız türetir (durum = kaoKnownLemmaSet / kart var / kart yok) ve yaldız oranı **aynı kelime kümesiyle** `kaoCoverage` ile birebir tutarlıdır |
+| `test_k3p_today.js` | K3P-12 | Bugün ekranı (K-F, TASARIM §3.1): `.kao-today-screen` içinde ≤ 5 etkileşimli öğe; eski hedeflerin hepsine Bugün'den ≤ 2 dokunuş (tablo güdümlü, dokunuş sayısı kanıtlanır); Kütüphane keşfi tek alt sayfada (gramer, kök aileleri, S0, telaffuz, günün âyeti) + İlerleme/Ayarlar; yeni `App.kao*` yok (45 sabit) |
 
-K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (70 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
+K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (71 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
 
 ## Yardımcılar ve sabit veri
 

@@ -290,7 +290,9 @@ function touchTargets(html) { // [{signature, height, label}]
   return out;
 }
 // Gerekçeli istisnalar: satır içi/yardımcı denetimler; her biri başka bir 44 px hedefin parçası ya da bilinçli kompakt öğedir.
-const TOUCH_EXEMPT = {};
+// K3P-12: kao-today-hero-link, Tezhip an kartının kaplama düğmesidir (stretched-link) — kartın TAMAMI dokunma hedefidir;
+// düğmenin kendi kutusu 0 yüksekliktedir, hedef kart kutusudur (kao-today-hero). Kartın içindeki kelimeler düğme değildir.
+const TOUCH_EXEMPT = { 'button.kao-today-hero-link': 'K3P-12 stretched-link: hedef kartın tamamı (kao-today-hero)' };
 check('dokunma hedefi: yüzeylerdeki her düğme/bağlantı CSS\'ten ≥44 px çözülür (istisnalar gerekçeli)', () => {
   const found = new Map();
   for (const surface of MATRIX) for (const target of touchTargets(surface.html)) if (!found.has(target.signature)) found.set(target.signature, { ...target, surfaces: 0 });

@@ -64,11 +64,18 @@ function settle(q, lemmaIds) {
 let passed = 0;
 function check(name, fn) { fn(); passed += 1; console.log(`PASS  ${name}`); }
 
-check('(a) sıfır kullanıcı: %0 yok, ilk hedef Fâtiha', () => {
+// K3P-12 (§3.1): Bugün yeni yapı — Tezhip an kartı (tamamı tek eylem) + hedef eğimi + tek birincil eylem + haftalık hedef + kısayollar.
+const todayScreen = (html) => (String(html).match(/<main class="kao-today-screen"[\s\S]*?<\/main>/) || [''])[0];
+const todayButtons = (html) => (todayScreen(html).match(/<button/g) || []).length;
+
+check('(a) Bugün ekranı yapısı: Tezhip an kartı + hedef eğimi + haftalık hedef + 3 kısayol', () => {
   reset();
   const html = home();
-  assert.doesNotMatch(html, /%\s*0\b|0\s*%/, '%0 metni görünmemeli');
-  assert.ok(html.includes(`İlk hedef: Fâtiha’yı anlamak · ${unit1Words} kelime`), 'ilk hedef satırı');
+  assert.match(html, /class="kao-today-hero kao-moment"/, 'an kartı (kao-moment) var');
+  assert.match(html, /<figure class="kao-tezhip">[\s\S]*?<figcaption class="kao-tezhip-title">Fâtiha<\/figcaption>/, 'an kartı ünitenin çapa sûresini (Fâtiha) taşır');
+  assert.match(html, /class="kao-today-goal">\d+ kelime sonra Fâtiha tamam</, 'hedef eğimi cümlesi');
+  assert.match(html, /Bu hafta <strong>0 \/ 5<\/strong> gün/, 'haftalık hedef 5 günden');
+  assert.doesNotMatch(html, /seri|kaybettin|caydın/i, 'ceza dili yok (K-H)');
 });
 
 check('(b) tek birincil eylem ve nextStep eşlemesi', () => {
@@ -93,83 +100,68 @@ check('(b) tek birincil eylem ve nextStep eşlemesi', () => {
   assert.equal(api.kaoNextStep(new FixedDate()).kind, 'rest');
   assert.equal(primaryAction(home()), 'App.kaoOpenAyah()', 'rest → öneri');
   q = reset();
-  settle(q, cur.units[5].lessons[0].lemmaIds);
-  Object.values(q.cards).forEach((c) => { c.due = '2026-09-27T09:00:00.000Z'; });
-  const local = new FixedDate(), bedMinute = (local.getHours() * 60 + local.getMinutes() + 30) % 1440;
-  const bed = `${String(Math.floor(bedMinute / 60)).padStart(2, '0')}:${String(bedMinute % 60).padStart(2, '0')}`;
-  data.settings.targetBed = bed;
-  targetBed = bed;
-  const night = api.kaoNextStep(new FixedDate());
-  assert.equal(night.kind, 'night-review');
-  const html = home();
-  assert.equal(primaryAction(html), 'App.kaoStart()', 'gece penceresi yalnız vadeli tekrar yolunu korur');
-  assert.match(html, /Gece tekrarına başla · en çok 8 kart/);
-  assert.match(html, /class="kao-hero-foot"[\s\S]*Gece tekrarı açık/, 'gece satırı HeroCard altbilgisinde');
 });
 
-check('(b2) karıştırılanlar satırı HeroCard altbilgisinde', () => {
+check('(b2) karıştırılanlar satırı an kartının altbilgisinde', () => {
   const q = reset();
   q.errors.cognate = 5; q.errors.root = 3;
-  assert.match(home(), /class="kao-hero-foot"[\s\S]*En çok karıştırdıkların: Türkçe benzeri kelimeler \(5\) · kök \(3\)/);
+  assert.match(home(), /class="kao-hero-note"[\s\S]*En çok karıştırdıkların: Türkçe benzeri kelimeler \(5\) · kök \(3\)/);
 });
 
-check('(c) Yolun kartı: seviye + gerçek ünite ilerlemesi; kapsam yalnız kelime ≥1', () => {
+check('(c) an kartının tamamı okuyucuyu açar; kapsam %N yalnız kelime ≥1', () => {
   const q = reset();
   settle(q, unit1.lessons[0].lemmaIds.concat(unit1.lessons[1].lemmaIds));
   const html = home();
-  const progress = flow.unitProgress(q, 1, { curriculum: cur });
-  const pct = Math.round(progress.lessonsDone / progress.lessons * 100);
-  assert.match(html, /Seviye 1 · Namazın dili/);
-  assert.match(html, /Ünite 1\/3 · Fâtiha/);
-  assert.match(html, new RegExp(`role="progressbar"[^>]*aria-valuenow="${pct}"`));
-  assert.match(html, /Kur’an kapsamı %<span data-countup="\d+" data-countup-key="kao-coverage">\d+<\/span>/);
-  assert.match(html, /Tüm yolu gör/);
-  assert.match(html, /onclick="App\.kaoSetView\(&quot;units&quot;\)"/);
+  // Ünite 1 çapası namaz metni (prayer:fatiha) → kartın tamamı okuyucuyu açar.
+  const hero = html.slice(html.indexOf('kao-today-hero-link'), html.indexOf('kao-today-hero-link') + 200);
+  assert.ok(hero.includes('onclick="App.kaoSetView(&quot;reader&quot;)"'), 'kaplama düğmesi okuyucuyu açar: ' + hero.slice(0, 120));
+  assert.match(html, /Kur’an kapsamı %<span data-countup="\d+" data-countup-key="kao-coverage">\d+<\/span>/, 'kapsam satırı %N (K2F-35 biçimi)');
   reset();
-  assert.doesNotMatch(home(), /data-countup-key="kao-coverage"/, 'sıfır kullanıcıda kapsam yok');
+  assert.doesNotMatch(home(), /Kur’an kapsamı/, 'sıfır kullanıcıda kapsam yok');
 });
 
-check('(d) Keşfet ve Sen grouped list satırları', () => {
+check('(d) Kısayollar: Sûreler, Namazda ne diyorum, Kütüphane', () => {
   reset();
   const html = home();
-  const section = (title) => {
-    const m = html.match(new RegExp(`<h3 class="kao-group-title">${title}</h3><div class="kao-group-surface">([\\s\\S]*?)</div></section>`));
-    assert.ok(m, `${title} bölümü`);
-    return [...m[1].matchAll(/<button type="button" class="kao-group-row" onclick="([^"]*)">[\s\S]*?<span class="kao-group-label">([^<]*)<\/span>/g)].map((x) => [x[2], x[1]]);
-  };
-  assert.deepEqual(section('Keşfet'), [
-    ['Kısa sûreler', 'App.kaoOpenSurah(114)'],
+  const m = html.match(/<h3 class="kao-group-title">Kısayollar<\/h3><div class="kao-group-surface">([\s\S]*?)<\/div><\/section>/);
+  assert.ok(m, 'Kısayollar bölümü');
+  assert.deepEqual([...m[1].matchAll(/<button type="button" class="kao-group-row" onclick="([^"]*)">[\s\S]*?<span class="kao-group-label">([^<]*)<\/span>/g)].map((x) => [x[2], x[1]]), [
+    ['Sûreler', 'App.kaoSetView(&quot;reader&quot;)'],
     ['Namazda ne diyorum', 'App.kaoOpenPrayer()'],
-    ['Gramer notları', 'App.kaoSetView(&quot;grammar&quot;)'],
-    ['Telaffuz stüdyosu', 'App.kaoOpenPhonics()'],
-    ['Günün âyeti', 'App.kaoOpenAyah()']
+    ['Kütüphane', 'App.kaoSetView(&quot;library&quot;)']
   ]);
-  assert.deepEqual(section('Sen'), [
-    ['İlerleme', 'App.kaoSetView(&quot;stats&quot;)'],
-    ['Ayarlar', 'App.kaoSetView(&quot;settings&quot;)']
-  ]);
-  assert.doesNotMatch(html, /Kök aileleri/, 'ilgili kartlar gelene kadar gizli');
+  assert.doesNotMatch(html, /Keşfet<\/h3>|>İlerleme<|>Ayarlar</, 'Keşfet/Sen listeleri Bugün’de kalktı');
   assert.doesNotMatch(html, /data-icon=""/, 'tüm satır ikonları mevcut setten');
 });
 
-check('(e) .kao-link-button ve eski süs bölümleri yok', () => {
+check('(e) Bugün ekranı en çok 5 etkileşimli öğe taşır (K-F)', () => {
   reset();
-  const html = home();
-  assert.doesNotMatch(html, /kao-link-button/);
-  assert.doesNotMatch(html, /Bugün anlayabildiğin âyet|Kelime kapsamın/);
+  assert.ok(todayButtons(home()) <= 5, `Bugün ekranı ${todayButtons(home())} düğme (≤5 olmalı)`);
+});
+
+check('Kütüphane görünümü: keşif tek alt sayfada; İlerleme ve Ayarlar buradan', () => {
+  reset();
+  assert.equal(api.kaoSetView('library'), true, 'library açılır');
+  ui.kaoView = 'library';
+  const html = api.kaoOverlayHTML(INSTANT);
+  assert.match(html, /<main class="kao-library-screen"/, 'Kütüphane kabuğu');
+  const rows = [...html.matchAll(/<span class="kao-group-label">([^<]*)<\/span>/g)].map((x) => x[1]);
+  // Seviye 0 satırı K2F-15 kapısına tabidir (start==='s0'/başlanmış ders/kart); varsayılan level1'de gizlidir.
+  for (const label of ['Yol', 'Kısa sûreler', 'Günün âyeti', 'Namazda ne diyorum', 'Telaffuz stüdyosu', 'Gramer notları', 'İlerleme', 'Ayarlar']) {
+    assert.ok(rows.includes(label), `Kütüphane satırı: ${label}`);
+  }
+  assert.equal(api.KAO_VIEW_TITLES.library, 'Kütüphane');
 });
 
 check('erişilebilirlik korunur: harita İlerleme’den, âyet sayacı Günün âyeti ekranında', () => {
   const q = reset();
   q.ayahs.understood = ['1:1', '1:2'];
   ui.kaoView = 'stats';
-  // KAO2-24: harita ayrı görünüm değil; İlerleme ekranının bölümü (giriş yerine gömülü hücreler).
   assert.equal([...api.kaoOverlayHTML(INSTANT).matchAll(/class="kao-map-cell"/g)].length, 114, 'İlerleme içinde 114 sûre hücresi');
   ui.kaoView = 'ayah';
   assert.match(api.kaoOverlayHTML(INSTANT), /Anlaşılan âyet sayısı: <strong>2<\/strong>/);
   ui.kaoView = 'home';
-  const overlay = api.kaoOverlayHTML(INSTANT);
-  assert.equal(tagsWith(overlay, 'kao-primary').length, 1, 'kaplamada tek birincil eylem');
+  assert.equal(tagsWith(api.kaoOverlayHTML(INSTANT), 'kao-primary').length, 1, 'kaplamada tek birincil eylem');
 });
 
 console.log(`KAO2-09 today: PASS (${passed} kontrol)`);

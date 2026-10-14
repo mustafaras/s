@@ -11,10 +11,13 @@ fs.mkdirSync(out, { recursive: true });
 
 const rows = [];
 const count = (html, re) => (html.match(re) || []).length;
+const screenOf = (html) => (String(html).match(/<main class="(?:kao-today|kao-library)[\s\S]*?<\/main>/) || [''])[0];
 function record(name, html) {
   fs.writeFileSync(path.join(out, name + '.html'), html);
   const words = H.text(html).split(' ').length;
-  rows.push([name, words, count(html, /<button/g), count(html, /class="kao-primary"/g), count(html, /lang="ar"/g)]);
+  // K3P-12 (K-F): Bugün ekranının SEÇİM sayısı = yalnız ekran gövdesindeki düğmeler; NavBar "Kapat" modal chrome'dur (sayılmaz).
+  const screen = screenOf(html) || html;
+  rows.push([name, words, count(html, /<button/g), count(html, /class="kao-primary"/g), count(html, /lang="ar"/g), count(screen, /<button/g)]);
 }
 
 const t = H.bootKao({ seeded: true });
@@ -51,6 +54,6 @@ for (let guard = 0; guard < 200 && L.ui.kaoLesson; guard += 1) {
   if (!item || item.kind === 'summary') { record(`ders-${String(++n).padStart(2, '0')}-ozet`, L.api.kaoOverlayHTML(L.NOW)); break; }
   L.api.kaoLesson('next');
 }
-console.log(['ekran', 'sözcük', 'düğme', 'birincil', 'arapça'].join('\t'));
+console.log(['ekran', 'sözcük', 'düğme', 'birincil', 'arapça', 'ekran-düğme'].join('\t'));
 console.log(rows.map((r) => r.join('\t')).join('\n'));
 console.log(`\n${rows.length} ekran → ${out}`);

@@ -2,12 +2,12 @@
 
 <!-- Bu dosya her prompt'un kapanışında BAŞTAN yazılır (BAGLAM-YONETIMI §3). Başlıkları silme; senkron.mjs okur. -->
 
-Sıradaki prompt: K3P-12
+Sıradaki prompt: K3P-13
 
 ## Son durum
 
 - **Tarih:** 2026-10-14
-- **Son tamamlanan:** **K3P-11 (Dalga 2 · Tezhip, ilk kart) — Tezhip sayfası bileşeni.** İmza bileşen doğdu: `views.tezhipPage` + `kaoTezhipModel`; bilinen kelime altınla işleniyor ve yaldız oranı `kaoCoverage` ile birebir tutarlı. Önce: K3P-10 (hareket grameri; Dalga 1 kapandı).
+- **Son tamamlanan:** **K3P-12 (Dalga 2 · Tezhip, ikinci kart) — Bugün ekranı yeniden.** Bugün artık Tezhip an kartı (kartın tamamı okuyucuyu açar) + hedef eğimi + tek birincil eylem + haftalık hedef şeridi + 3 kısayol; keşif **Kütüphane** alt sayfasında toplandı. Önce: K3P-11 (Tezhip bileşeni + model).
 - **Son yayın:** 2026-10-14, **on ikinci ara yayın `20261014a`** canlıda (kullanıcı açık onayı; Pages run **38521530117** success; canlı pin GET ile doğrulandı) — Dalga 1 hareket grameri + Tezhip bileşeni yayında.
 - **Dal:** `kao3-premium` = `main` = **`20261014a`**. Sıradaki kart K3P-12 (Bugün ekranı yeniden) → dalga sonu DEĞİL; `kapi-hizli --kart K3P-12` yeterli.
 - **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`.

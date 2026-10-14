@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-12",
+  "nextPrompt": "K3P-13",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -322,7 +322,9 @@
     {
       "id": "K3P-12",
       "wave": 2,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-14",
+      "result": "Bugün ekranı yeniden (K-F, §3.1): Tezhip an kartı (interactive:false, ünitenin çapa sûresi; kartın tamamı okuyucuyu açar) + hedef eğimi cümlesi + tek birincil eylem + haftalık hedef şeridi (5 gün, cezasız; kapsam %N countup burada) + 3 kısayol (Sûreler · Namazda ne diyorum · Kütüphane). Yeni library görünümü (KAO_VIEW_TITLES + Flow VIEWS + kaoLibraryHTML) keşfi toplar: gramer, kök aileleri, Seviye 0 (K2F-15 kapılı), telaffuz, günün âyeti + İlerleme, Ayarlar, Yol, kaynaklar. .kao-today-screen ≤5 düğme; eski hedeflere ≤2 dokunuş (tablo güdümlü test). Yeni: test_k3p_today (envanter 71); test_kao2_today yeni yapıya güncellendi; 10 mevcut test (Bugün eski düzeni) yeni yapıya bağlandı."
     },
     {
       "id": "K3P-13",
@@ -397,9 +399,14 @@
       "gate": "release (prompt içinde ayrıca açık onay sorulur)"
     }
   ],
-    "pinDeferral": {
+  "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/kao.css",
+      "app/core/quranLearn.js",
+      "app/core/quranLearnFlow.js",
+      "app/core/quranLearnViews.js"
+    ]
   }
 }

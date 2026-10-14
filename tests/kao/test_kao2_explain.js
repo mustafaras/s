@@ -42,20 +42,20 @@ const screenOf = (h) => { const m = h.match(/<section class="kao-screen[^"]*kao-
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
 
-// ---- Y-01: Bugün'deki Yolun kartı üniteye götürmeli -------------------------
-check('Y-01 Yolun kartı birincil olarak içinde bulunulan üniteyi açar', () => {
+// ---- Y-01: Yol artık Kütüphane üzerinden erişilir (K3P-12: Bugün sadeleşti) -----
+check('Y-01 Yol Kütüphane’den açılır; ünite ekranı gerçekten yüklenir', () => {
   const { api, ui, curriculum } = boot();
   api.kaoNav('home');
+  api.kaoSetView('library');
   const html = decode(api.kaoOverlayHTML());
-  const unit = curriculum.units[0];
-  assert.match(html, /class="kao-path-more"/, 'Yolun kartı var');
-  assert.match(html, new RegExp(`App\\.kaoNav\\("unit",${unit.id}\\)`), 'kart üniteye götürür');
-  assert.match(html, /kao-path-more[^>]*App\.kaoSetView\("units"\)/, 'Yol listesi ikincil bağlantı olarak korunur');
-  assert.ok(html.indexOf('kao-path-unit-open') < html.indexOf('kao-path-more'), 'birincil ünite eylemi ikincil Yol bağlantısından önce gelir');
+  assert.match(html, /App\.kaoSetView\("units"\)/, 'Kütüphane’de Yol satırı var');
   // Basıldığında gerçekten ünite ekranı açılmalı.
-  assert.equal(api.kaoNav('unit', unit.id), true);
+  assert.equal(api.kaoNav('unit', curriculum.units[0].id), true);
   assert.equal(screenOf(decode(api.kaoOverlayHTML())), 'unit', 'ünite ekranı açılır');
   assert.equal(ui.kaoView, 'units');
+  // Yol listesi de doğrudan açılabilir.
+  assert.equal(api.kaoSetView('units'), true);
+  assert.equal(screenOf(decode(api.kaoOverlayHTML())), 'units', 'Yol listesi açılır');
 });
 
 // ---- Y-02: Ders oynatıcıda bağlam başlığı ----------------------------------

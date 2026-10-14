@@ -131,18 +131,16 @@ check('25/25 kavram erişilebilir; her kavramın en az bir dersi vardır', () =>
   assert.equal(api.kaoNav('concept', 'yok_boyle_kavram'), false, 'bilinmeyen kavram açılmaz');
 });
 
-check('girişler: Keşfet satırı görünür, ünite kavramları dokunulabilir', () => {
+check('girişler: Kütüphane satırı görünür, ünite kavramları dokunulabilir', () => {
   const { api, q } = boot();
   const unit = CURRICULUM.units[0];
   lessonDone(q, unit.lessons[0]);
   api.ensureQuranLearn({ settings: {}, days: {}, quranLearn: q });
+  api.kaoSetView('library');
   const home = decode(api.kaoOverlayHTML());
-  const discover = home.match(/<h3 class="kao-group-title">Keşfet<\/h3><div class="kao-group-surface">([\s\S]*?)<\/div><\/section>/);
-  assert.ok(discover, 'Keşfet bölümü var');
-  const labels = [...discover[1].matchAll(/<span class="kao-group-label">([^<]*)<\/span>/g)].map((match) => match[1]);
-  assert.deepEqual(labels, ['Kısa sûreler', 'Namazda ne diyorum', 'Gramer notları', 'Kök aileleri', 'Seviye 0 · şekil aileleri', 'Telaffuz stüdyosu', 'Günün âyeti']);
-  assert.match(discover[1], /App\.kaoOpenRoots\(\)/);
-  assert.match(discover[1], /onclick="App\.kaoSetView\("grammar"\)"/);
+  const labels = [...home.matchAll(/<span class="kao-group-label">([^<]*)<\/span>/g)].map((match) => match[1]);
+  assert.ok(labels.includes('Gramer notları'), 'Kütüphane’de gramer notları satırı var');
+  assert.match(home, /onclick="App\.kaoSetView\("grammar"\)"/);
   assert.equal(api.kaoNav('unit', unit.id), true);
   const unitHtml = decode(api.kaoOverlayHTML());
   assert.match(unitHtml, /<ul class="kao-unit-concepts">/);

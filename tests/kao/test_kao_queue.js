@@ -228,8 +228,8 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
   assert.match(html, /aria-labelledby="kao-ayah-title"/); assert.match(html, /Anladın ✓/);
   assert.equal((html.match(/App\.kaoAyah\('play',\d+\)/g) || []).length, today.words.length, 'kelime kelime ses');
   assert.equal((html.match(/kao-ayah-tr/g) || []).length, today.words.length, 'kelime kelime Türkçe');
-  // KAO2-09 (Y-05): ana ekranda boş vaat bölümü yok; "Günün âyeti" satırı + sayaç âyet ekranında.
-  assert.match(e9.kaoHomeHTML('2026-09-25T10:00:00'), /onclick="App\.kaoOpenAyah\(\)">[\s\S]*?Günün âyeti[\s\S]*?400 anlaşıldı/, 'S-02 Günün âyeti satırı');
+  // KAO2-09 (Y-05): ana ekranda boş vaat bölümü yok; "Günün âyeti" satırı Kütüphane'de + sayaç âyet ekranında (K3P-12).
+  assert.match(e9.kaoLibraryHTML(), /onclick="App\.kaoOpenAyah\(\)">[\s\S]*?Günün âyeti/, 'Kütüphane Günün âyeti satırı');
   assert.match(e9.kaoAyahHTML(), /Anlaşılan âyet sayısı: <strong>400<\/strong>/, 'sayaç Günün âyeti ekranında');
   // KAO2-10 (05 §8): hub tek bilgi taşır; âyet satırı hub'da yok, "Günün âyeti" ana ekrandan (yukarıda) açılır.
   assert.doesNotMatch(e9.kaoHubCardHTML(), /Bugün anlayabildiğin âyet/, 'hub kartında âyet satırı yok');

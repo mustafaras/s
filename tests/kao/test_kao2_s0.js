@@ -331,14 +331,13 @@ check('(h/K2F-13) harfsiz derslerin çizimi örnekleri okunuşuyla gösterir; ko
   assert.equal(t.api.kaoS0('audio', 99), false, 'olmayan örnek reddedilir');
 });
 
-check('(h/K2F-13) gerçek giriş satırı: Keşfet\'teki "Seviye 0" satırı (s0.01) açılır ve çizilir; 12 dersin hepsi görünüm üzerinden çökmeden açılır', () => {
+check('(h/K2F-13) S0 girişi Kütüphane’den açılır (s0.01) ve çizilir; 12 dersin hepsi görünüm üzerinden çökmeden açılır', () => {
   const t = kao.bootKao({ seeded: true });
-  const home = t.api.kaoOverlayHTML(t.NOW);
-  const m = /onclick="App\.kaoS0\(([^"]*)\)"/.exec(home);
-  assert.ok(m, 'ana ekranda S0 satırı');
-  const args = JSON.parse('[' + decode(m[1]) + ']');
-  assert.deepEqual(args, ['start', 's0.01']);
-  assert.equal(t.api.kaoS0(...args), true);
+  t.api.kaoSetView('library');
+  const lib = t.api.kaoOverlayHTML(t.NOW);
+  const m = /onclick="App\.kaoSetView\(&quot;s0&quot;\)"/.exec(lib);
+  assert.ok(m, 'Kütüphane’de Seviye 0 satırı');
+  assert.equal(t.api.kaoS0('start', 's0.01'), true);
   assert.equal(t.ui.kaoView, 's0');
   let out;
   assert.doesNotThrow(() => { out = t.api.kaoOverlayHTML(t.NOW); }, 'giriş dersi görünüm üzerinden çizilmeli');
@@ -484,7 +483,8 @@ check('(i/K2F-14) ses yoksa alıştırma ve okuma yine tamamlanır; "ses kapalı
 
 // ---- (j) K2F-15 · okuyamayan kullanıcı Bugün'den S0'a ulaşır; S0 gerçekten tamamlanır ----------------
 const S0_IDS = Array.from({ length: 12 }, (_, i) => `s0.${String(i + 1).padStart(2, '0')}`);
-const hasHubRow = (t) => /App\.kaoS0\(&quot;start&quot;,&quot;s0\.01&quot;\)/.test(t.api.kaoOverlayHTML(t.NOW));
+// K3P-12: Bugün sadeleşti → S0 girişi Kütüphane’de; satırın varlığını orada sınarız (kaoSetView('s0') + Seviye 0 etiketi).
+const hasHubRow = (t) => { t.api.kaoSetView('library'); const html = t.api.kaoOverlayHTML(t.NOW); return /App\.kaoSetView\(&quot;s0&quot;\)/.test(html) && /Seviye 0/.test(html); };
 // Gerçek handler'larla bir S0 dersini sonuna kadar oynar (tüm cevaplar doğru ya da `wrong` kadarı yanlış), "Okudum"a basar.
 function finishS0(t, id, { wrong = 0 } = {}) {
   assert.equal(t.api.kaoS0('start', id), true, `${id}: başlamalı`);
@@ -564,7 +564,7 @@ check('(j/K2F-15 d,e) 12 S0 dersi uçtan uca → sonra Fâtiha; Besmele taşı Y
   assert.equal(after.param, 'u01.01', 'sonra Fâtiha (Ünite 1, Ders 1)');
 });
 
-check('(j/K2F-15 f) Keşfet\'teki S0 satırı: onboarding.start==="s0" ya da başlanmış S0 dersi ya da kart varsa görünür; aksi hâlde gizli', () => {
+check('(j/K2F-15 f) Kütüphane’deki S0 satırı: onboarding.start==="s0" ya da başlanmış S0 dersi ya da kart varsa görünür; aksi hâlde gizli', () => {
   const none = kao.bootKao(); kao.freshUser(none, { start: 'level1' }); none.api.kaoOpen('home');
   assert.equal(hasHubRow(none), false, 'level1 + kart yok + S0 başlamamış: gizli');
   const s0 = kao.bootKao(); kao.freshUser(s0, { start: 's0' }); s0.api.kaoOpen('home');

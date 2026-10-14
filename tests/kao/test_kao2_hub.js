@@ -219,7 +219,7 @@ check('K2F-35 ek: hiçbir KAO görünümünde görünür metinde "N%" yok (Türk
   const params = { unit: 1, word: lex.lemmas[0].id, reader: 112, concept: grammar.concepts[0].id };
   const bad = [];
   let sawPercent = 0;
-  for (const view of ['home', 'units', 'unit', 'word', 'reader', 'settings', 'phonics', 'ayah', 'prayer', 'stats', 'gate', 'grammar', 'concept', 'roots', 's0', 'sources']) {
+  for (const view of ['home', 'units', 'unit', 'word', 'reader', 'settings', 'phonics', 'ayah', 'prayer', 'stats', 'gate', 'grammar', 'concept', 'roots', 's0', 'sources', 'library']) {
     const visible = viewText(openView(t, view, params[view]).html);
     if (/\d%/.test(visible)) bad.push(`${view}: ${(visible.match(/.{0,25}\d%.{0,10}/) || [''])[0]}`);
     sawPercent += (visible.match(/%\d/g) || []).length;

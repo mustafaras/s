@@ -21,7 +21,7 @@ const titleOk = (view, title) => title === TITLES[view];
 
 check('KAO_VIEW_TITLES parametresiz görünüm kümesi sabit ve s0/roots/sources dahil', () => {
   assert.deepEqual(PARAM_FREE.slice().sort(),
-    ['ayah', 'gate', 'grammar', 'phonics', 'prayer', 'roots', 's0', 'session', 'settings', 'sources', 'stats', 'units'],
+    ['ayah', 'gate', 'grammar', 'library', 'phonics', 'prayer', 'roots', 's0', 'session', 'settings', 'sources', 'stats', 'units'],
     'yeni bir görünüm eklenirse bu test ve Flow beyaz listesi birlikte güncellenmeli');
 });
 

@@ -101,16 +101,16 @@ check('(b) kök sayfası tek odaklı ve açık geri yolu içerir', () => {
 });
 
 // ---- (c) Keşfet satırı ve kelime detayından köke bağlantı --------------------
-check('(c) Keşfet bölümünde kök aileleri satırı görünür', () => {
+check('(c) Kütüphane’de kök aileleri satırı görünür', () => {
   const t = boot();
   // Kök aileleri keşif katmanıdır: kullanıcı bir kart edinmeden gizli kalır.
   const unit = t.curriculum.units[0];
   t.q.cards[`w:${unit.lessons[0].lemmaIds[0]}:ar>tr`] = { state: 'review', reps: 4 };
   t.api.kaoNav('home');
-  const home = decode(t.api.kaoHomeHTML());
-  assert.match(home, /Kök aileleri/, 'Keşfet satırı var');
-  assert.match(home, /App\.kaoOpenRoots\(\)/, 'satır kök ekranını açar');
-  assert.match(home, /73 aile/, 'satır aile sayısını gösterir');
+  assert.equal(t.api.kaoSetView('library'), true);
+  const home = decode(t.api.kaoOverlayHTML(t.NOW));
+  assert.match(home, /Kök aileleri/, 'Kütüphane satırı var');
+  assert.match(home, /App\.kaoSetView\("roots"\)/, 'satır kök ekranını açar');
 });
 
 check('(c) kelime detayından kök sayfasına bağlantı verilir', () => {

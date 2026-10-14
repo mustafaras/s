@@ -293,7 +293,7 @@
     var opts=options&&typeof options==='object'?options:{};
     var now=validDate(nowValue,'now'),q=quranLearnRoot(d),cards=objectOr(q.cards,{});
     var source=Array.isArray(opts.candidates)?opts.candidates:Object.keys(cards).map(function(id){ return {id:id}; });
-    // K2F-10: sunulamayan gramer kartı kuyruğa girmez (kart silinmez; yalnız sunumu kesilir, kapasite harcamaz).
+    // K2F-10: sunulamayan gramer kartı kuyruğa girmez.
     var records=source.map(function(raw){ return candidateRecord(raw,cards,opts); }).filter(Boolean).filter(function(item){
       return item.type!=='grammar'||kaoGrammarItemPresentable({id:'kao:'+daySeed(now)+':'+item.cardId,cardId:item.cardId},d);
     });
@@ -331,7 +331,7 @@
     }
     return out;
   }
-  // R-A2: hedefin bir önceki tekrarındaki çeldiriciler (cevapta yazılan card.lastDistractors). Aynı lemmanın
+  // R-A2: hedefin bir önceki tekrarındaki çeldiriciler. Aynı lemmanın
   // öteki yön kartı da aynı çeldirici sayılır; dışlama lemma düzeyindedir.
   function previousDistractorLemmas(d,targetId,opts){
     var cards=objectOr(quranLearnRoot(d).cards,{}),targetCard=objectOr(cards[targetId],{});
@@ -340,7 +340,7 @@
     return previous.map(function(id){ return lemmaIdForCard(id)||String(id); });
   }
   // K3P-01: şık etiketi çakışması tek yerde. Etiket ",", ";", "(", ")", "/" ile parçalanır. partial: ortak bir parça
-  // yeter (anlamca çakışan seçenek soruyu belirsiz yapar); değilse parça dizisi aynıysa aynı şıktır.
+  // yeter; değilse parça dizisi aynıysa aynı şıktır.
   function kaoLabelParts(label){ return String(label||'').toLocaleLowerCase('tr').split(/[,;()\/]+/).map(function(part){ return part.trim(); }).filter(Boolean); }
   function kaoLabelClash(label,used,partial){
     var own=kaoLabelParts(label),key=own.join('|');
@@ -420,7 +420,7 @@
     }));
     choices.sort(function(a,b){ return rank(a.cardId)-rank(b.cardId); });
     choices.forEach(function(choice,index){ choice.choiceId=String(queueItem&&queueItem.id||'task:'+id)+':choice:'+index; });
-    // R-B5 / 02 §5.3: hareke soldurma yalnız review ∧ s≥30 kartta (durable30). Hedefte anlam kayması (cognate.shift)
+    // R-B5 / 02 §5.3: hareke soldurma yalnız review ∧ s≥30 kartta. Hedefte anlam kayması
     // varsa yanlış cevap errors.cognate'e yazılır; telaffuz hataları kelime görevinde değil phonics.misheard'de sayılır.
     return {id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),direction:direction,audioOnly:opts.audioOnly===true,answer:answer,ar:String(meta.ar||''),meaning:String(meanings[0]||meta.meaning||''),translit:kaoLemmaReading(lemmaIdForCard(id),meta.translit),cognate:meta.cognate||null,durable30:isSettled(objectOr(quranLearnRoot(d).cards,{})[id],30),errorClass:meta.cognate&&meta.cognate.shift?'cognate':'',clipId:lemmaIdForCard(id)?'w-'+lemmaIdForCard(id):'',choices:choices};
   }
@@ -467,7 +467,7 @@
     keysOf(KAO_MILESTONE_LABELS).forEach(function(key){ labels[key]=KAO_MILESTONE_LABELS[key]; });
     var curriculum=window.QuranCurriculumV2,units=curriculum&&Array.isArray(curriculum.units)?curriculum.units:[];
     units.forEach(function(unit){ labels['u'+unit.id]=kaoUnitTitle(unit)+' ünitesini bitirdim'; });
-    // K2F-35 (K4-04): namaz taşı gerçek kapsamı söyler (doğrulanmış namaz lemmaları); sayı yoksa eski etiket kalır.
+    // K2F-35: namaz taşı gerçek kapsamı söyler; sayı yoksa eski etiket kalır.
     var prayerCount=kaoPrayerLemmaIds('namaz').length;
     if(prayerCount>0) labels.namaz='Namazda geçen '+prayerCount+' kelime tanıdık';
     return labels;
@@ -900,7 +900,7 @@
     }
     return model;
   }
-  // K2F-15 (K5-02 iii): S0 dersi YALNIZ read bitince kaydedilir; Besmele taşı s0.12'ye bağlıdır.
+  // K2F-15: S0 dersi YALNIZ read bitince kaydedilir; Besmele taşı s0.12'ye bağlıdır.
   function kaoS0Complete(flow,state){
     var d=quranLearnDeps.data(),q=ensureQuranLearn(d),rec=kaoLessonRecord(q,flow.id),now=new Date(),dr=state.drill,total=dr&&dr.items?dr.items.length:0;
     rec.startedAt=rec.startedAt||now.toISOString(); rec.doneAt=rec.doneAt||now.toISOString(); rec.score=total?dr.correct/total:null;
@@ -1365,7 +1365,7 @@
   }
   // K2F-11: gramer görevleri doğrulanmış âyet örneğinden ve kavram tablosundan KURULUR.
   // Her tarif görev parçalarını döndürür ya da {unsupported:neden}: tablo tek anlamlı görev türetmeye yetmiyorsa görev
-  // kurulmaz (tahmin edilmez; liste GRAMER-SABLON-L2.md). Arapça metin ve okunuş yalnız modül verisinden gelir.
+  // kurulmaz. Arapça metin ve okunuş yalnız modül verisinden gelir.
   var GRAMMAR_ARABIC=/[؀-ۿ]/;
   function gramShuffle(values,seed){ return values.slice().sort(function(a,b){ var ka=choiceValue(a).label,kb=choiceValue(b).label; return seededRank(seed,ka)-seededRank(seed,kb)||ka.localeCompare(kb); }); }
   function gramPick(list,seed){ return list[seededRank(seed,'pick')%list.length]; }
@@ -1465,7 +1465,7 @@
   // Çekim/emir tablolarında "kelimeyi parçalarına ayır" yerine ek tanıma: Arapça biçim verilir, hangi şahıs/kime ait olduğu sorulur
   // (şahıs ekini tanımak). Aynı biçim iki satırda geçiyorsa (belirsiz) o satırlar ne soru ne çeldirici olur.
   var GRAMMAR_PERSON_PROMPTS={g13:'Bu geçmiş zaman biçimi kimin için? (şahıs ekini tanı)',g15:'Bu şimdiki zaman biçimi kimin için? (şahıs ekini tanı)',g17:'Bu emir kime söylenmiş? (tek kişiye mi, topluluğa mı?)'};
-  // D3F-11: şık yalnız kişidir. Etiketteki parantez notu cinsiyetse ("o") kişiye aittir; değilse ("siz") anlam
+  // D3F-11: şık yalnız kişidir. Etiketteki parantez notu cinsiyetse kişiye aittir; değilse anlam
   // notudur ve atılır. Aynı kişiyi gösteren şıklar tekilleşir; tarif yalnız ayrı kişi var mı bakar.
   function gramPersonKey(label){ return String(label||'').replace(/\s*\((?!(?:erkek|kadın)\))[^)]*\)/g,'').replace(/\s+/g,' ').trim(); }
   function gramPersonRecipe(record,seed){
@@ -1607,7 +1607,7 @@
     if(type==='Kalıp eşle') return gramPatternRecipe(record,seed);
     return gramUnsupported('bu tür için tarif yok');
   }
-  // Boş dize = destekleniyor; aksi hâlde görev kurulamamasının gerekçesi (GRAMER-SABLON-L2.md bunu listeler).
+  // Boş dize = destekleniyor; aksi hâlde görev kurulamamasının gerekçesi.
   function kaoGrammarSupport(cardId){
     var record=grammarRecord(cardId);
     return record?(grammarRecipe(record,'support-probe',{reps:0}).unsupported||''):'şablon bulunamadı';
@@ -1684,7 +1684,7 @@
     if(!/^g:/.test(id)||!grammarRecord(id)) return true;
     return kaoGrammarTaskValid(kaoBuildGrammarTask(item,d,{seed:String(item&&item.id||id)}));
   }
-  // D2F-04 (D2-09): görünen gramer sorusu = tür + yönerge + uyaran + şık yazıları. Dizmede uyaran yalnız
+  // D2F-04: görünen gramer sorusu = tür + yönerge + uyaran + şık yazıları. Dizmede uyaran yalnız
   // tekrar sayısına bağlı ilk-kelime ipucudur; imzaya girmez.
   function kaoGrammarTaskSignature(task){
     if(!task||task.type!=='grammar') return '';
@@ -1724,7 +1724,7 @@
     // Yeni kart bütçesi (dailyNew) iki yön için ortaktır.
     var cards=objectOr(quranLearnRoot(quranLearnDeps.data()).cards,{}),today=quranLearnDeps.todayStr();
     var reverse=lex.lemmas.filter(function(lemma){
-      // Eski kartta tanıtım zamanı yoksa son tekrar (r) kullanılır; r tanıtımdan önce olamaz, ters yön erken açılmaz.
+      // Eski kartta tanıtım zamanı yoksa son tekrar kullanılır; r tanıtımdan önce olamaz, ters yön erken açılmaz.
       var forward=cards['w:'+lemma.id+':ar>tr'],introduced=forward&&(forward.introducedAt||forward.firstSeenAt||forward.r);
       return introduced&&!cards['w:'+lemma.id+':tr>ar']&&localDayOf(introduced)&&localDayOf(introduced)<today;
     }).map(function(lemma){ return {id:'w:'+lemma.id+':tr>ar',type:'arabic',priority:1}; });
@@ -1745,7 +1745,7 @@
     if(!(q&&q.settings&&q.settings.audio)) return false;
     try{ return !(typeof quiet==='function'&&quiet()); }catch(_error){ return false; }
   }
-  // K3P-A5 (K-K, AKIS §4): uyarlanır zorluk eşikleri ve kayan pencere (yalnız ui; kalıcı yazılmaz).
+  // K3P-A5: uyarlanır zorluk eşikleri ve kayan pencere.
   var KAO_FLOW_WINDOW=8,KAO_ANXIETY=0.70,KAO_BOREDOM=0.92,KAO_ANXIETY_WRONG=2,KAO_REINTRO_WRONG=3,KAO_HELP_GRADE=2;
   function kaoWindowPush(ui,correct){ ui.kaoWindow=Array.isArray(ui.kaoWindow)?ui.kaoWindow:[]; ui.kaoWindow.push(correct===true?1:0); if(ui.kaoWindow.length>KAO_FLOW_WINDOW) ui.kaoWindow=ui.kaoWindow.slice(-KAO_FLOW_WINDOW); }
   function kaoFlowRate(ui){ var w=Array.isArray(ui.kaoWindow)?ui.kaoWindow:[]; if(!w.length) return null; var sum=0; w.forEach(function(v){ sum+=v?1:0; }); return sum/w.length; }
@@ -1806,7 +1806,7 @@
     }
     var panel=ui.kaoPanel&&ui.kaoPanel.open&&ui.kaoPanel.taskId===task.id?ui.kaoPanel:null,autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',isLink=task.type==='link',isTransfer=task.type==='transfer',prompt=task.audioOnly?'Dinlediğin kelimenin anlamını seç':(isGrammar||isFragment||isTransfer?task.prompt:(task.direction==='tr>ar'?task.meaning:task.ar));
     var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
-    // K3P-A6 (D-2): görev görünümünde de 5 bölümlü konum görünür (ders planındaki bölüm).
+    // K3P-A6: görev görünümünde de 5 bölümlü konum görünür.
     var taskSection=kaoLessonSection(ui.kaoLesson),taskSegs='';
     for(var ts=1;ts<=5;ts+=1){ var tf=ts<taskSection.section,ta=ts===taskSection.section,tw=ta?String(Math.max(0,Math.min(100,taskSection.countInSection?taskSection.indexInSection/taskSection.countInSection*100:0)))+'%':(tf?'100%':'0%'); taskSegs+='<span class="kao-lesson-seg'+(ta?' is-active':'')+(tf?' is-filled':'')+'"><i style="width:'+tw+'"></i></span>'; }
     h+='<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+String(taskSection.section)+'" aria-valuetext="'+esc(kaoSectionValuetext(taskSection))+'" data-lesson-section="'+String(taskSection.section)+'">'+taskSegs+'</div>';
@@ -1839,9 +1839,9 @@
     h+='</div><p class="kao-live" aria-live="polite">'+esc(panel?'':(ui.kaoFeedback||''))+'</p>';
     var kaoAutoAdvanceOn=!!(quranLearnDeps.data()&&ensureQuranLearn(quranLearnDeps.data()).settings.autoAdvance===true);
     if(panel&&panel.correct===true&&kaoAutoAdvanceOn&&panel.slow!==true){
-      // K3P-15 (K-C) hızlı doğru: tam panel açılmaz; şık ✓ işareti ve 600 ms'lik otomatik geçiş yeter.
+      // K3P-15 hızlı doğru: tam panel açılmaz; şık ✓ işareti ve 600 ms'lik otomatik geçiş yeter.
     }else if(panel&&panel.correct===true){
-      // Yavaş doğru (pekiştirme şeridi) ya da ayar kapalı (kompakt şerit): tek satır + "Devam" dokunuşu.
+      // Yavaş doğru ya da ayar kapalı: tek satır + "Devam" dokunuşu.
       h+='<p class="kao-feedback-strip" role="status" aria-live="polite">Doğru</p>';
       h+='<button type="button" class="kao-feedback-strip-continue" onclick="App.kaoContinue()">Devam</button>';
     }else if(panel){
@@ -1868,9 +1868,9 @@
     if(!ui.kaoTasks[item.id]){ var cap=kaoChoiceCap(); ui.kaoTasks[item.id]=kaoBuildTask(item,quranLearnDeps.data(),{seed:item.id,choiceCount:item.choiceCount,audioOnly:item.audioOnly===true,choiceCap:cap}); var tc=ui.kaoTasks[item.id]; if(tc&&tc.type==='word'&&Array.isArray(tc.choices)&&tc.choices.length>cap) tc.choices=kaoTrimChoices(tc.choices,cap); }
     return ui.kaoTasks[item.id];
   }
-  // K3P-10 (§5.4): hareket azaltma tek kapıda — SeyFx.shouldAnimate yoksa prefers-reduced-motion'a düşülür.
+  // K3P-10: hareket azaltma tek kapıda — SeyFx.shouldAnimate yoksa prefers-reduced-motion'a düşülür.
   function kaoAnimate(){ var w=window; if(w.SeyFx&&typeof w.SeyFx.shouldAnimate==='function') return w.SeyFx.shouldAnimate()===true; return !(w.matchMedia&&w.matchMedia('(prefers-reduced-motion:reduce)').matches); }
-  // Tek seferlik animasyon sınıfını yeniden başlatır; animationend'de siler (ölü sınıf bırakmaz).
+  // Tek seferlik animasyon sınıfını yeniden başlatır; animationend'de siler.
   function kaoKick(node,cls){ if(!node||!node.classList) return false; node.classList.remove(cls); void node.offsetWidth; node.classList.add(cls); if(node.addEventListener&&node.removeEventListener) node.addEventListener('animationend',function off(){ node.classList.remove(cls); node.removeEventListener('animationend',off); }); return true; }
   // 04 §4 FX: premium katman kendi kapılarıyla çağrılır; konfeti yalnız SeyFx.shouldAnimate.
   // D-6 hata dostu: "wrong" yalnız seçilen şıkta sarsıntı + error titreşimi; ses/kırmızı/ceza yok.
@@ -1896,7 +1896,7 @@
     if(typeof question.setAttribute==='function') question.setAttribute('tabindex','-1');
     question.focus(); return true;
   }
-  // K3P-10: yanlış şık düğümü — sarsıntı paintTask içeriği yenilendikten SONRA oynar (paint sınıfı silerdi).
+  // K3P-10: yanlış şık düğümü — sarsıntı paintTask içeriği yenilendikten SONRA oynar.
   function kaoChoiceNode(choiceId){ if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.taskElement!=='function') return null; var node=quranLearnSurfaceDeps.taskElement(); if(!node||typeof node.querySelector!=='function') return null; return node.querySelector('.kao-choices button[onclick*="\''+choiceId+'\'"]'); }
   function paintTask(){
     if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.taskElement!=='function') return false;
@@ -1904,7 +1904,7 @@
     if(!node) return false;
     var html=kaoTaskHTML(currentTask()),match=html.match(/^<section[^>]*>([\s\S]*)<\/section>$/);
     node.innerHTML=match?match[1]:html;
-    // D-5: yeni görev 24 px yatay kayma + opaklıkla gelir (≤240 ms); sınıf yalnız animasyon açıkken eklenir.
+    // D-5: yeni görev 24 px yatay kayma + opaklıkla gelir; sınıf yalnız animasyon açıkken eklenir.
     var painted=currentTask(),paintedId=painted?painted.id:'done',paintUi=quranLearnDeps.ui(); if(paintUi.kaoPaintedId!==paintedId){ paintUi.kaoPaintedId=paintedId; if(kaoAnimate()) kaoKick(node,'kao-task-in'); kaoFx('enter',node); kaoFocusQuestion(node); }
     if(typeof node.setAttribute==='function'){
       var task=currentTask(); node.setAttribute('data-task-id',task?task.id:'done');
@@ -1927,7 +1927,7 @@
   var KAO_TASK_MS_CAP=120000;
   function kaoTaskMs(ui,now){ return Math.min(KAO_TASK_MS_CAP,Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime()))); }
   // K3P-15 (K-C): üç kollu geri bildirim. Yanıt süresi kişinin son 50 ölçümünün medyanıyla karşılaştırılır;
-  // medyan ve "ses tekrar dinlendi" işareti yalnız `ui` içinde tutulur (kalıcı değil, yeni veri alanı yok).
+  // medyan ve "ses tekrar dinlendi" işareti yalnız `ui` içinde tutulur.
   var KAO_LATENCY_WINDOW=50,KAO_LATENCY_MIN=5,KAO_FAST_ADVANCE_MS=600,KAO_SLOW_ADVANCE_MS=1600;
   function kaoLatencyMedian(ui){
     var samples=Array.isArray(ui.kaoLatency)?ui.kaoLatency:[];
@@ -1955,7 +1955,7 @@
     var median=kaoLatencyMedian(ui),slow=isCorrect&&(ui.kaoPlayed===true||median===null||nonNegativeNumber(elapsed,null)===null||nonNegativeNumber(elapsed,0)>=median);
     if(isCorrect) kaoLatencyPush(ui,nonNegativeNumber(elapsed,0));
     ui.kaoPanel={open:true,taskId:task.id,correct:isCorrect,choiceId:choiceId||'',answer:answer,note:note||'',slow:slow===true};
-    // K3P-A5 (K-K): kayan pencere ve art arda yanlış sayacı yalnız ui; yeniden tanış eşiğinde panel zenginleşir.
+    // K3P-A5: kayan pencere ve art arda yanlış sayacı yalnız ui; yeniden tanış eşiğinde panel zenginleşir.
     kaoWindowPush(ui,isCorrect);
     ui.kaoWrongStreak=isCorrect?0:Math.floor(nonNegativeNumber(ui.kaoWrongStreak,0))+1;
     if(!isCorrect&&ui.kaoWrongStreak>=KAO_REINTRO_WRONG&&/^w:/.test(String(task.cardId||''))) ui.kaoPanel.reintro=kaoReintro(task);
@@ -1967,7 +1967,7 @@
     return panel&&typeof panel.pauseMs==='number'?panel.pauseMs:KAO_FAST_ADVANCE_MS;
   }
   function kaoAutoAdvance(ui,q,delayMs){
-    // K3P-15: otomatik geçiş yalnız doğru cevapta kurulur (yanlış öğretir, bekler); süre kola göre 600/1.600 ms.
+    // K3P-15: otomatik geçiş yalnız doğru cevapta kurulur; süre kola göre 600/1.600 ms.
     if(q.settings.autoAdvance!==true||!ui.kaoPanel||ui.kaoPanel.open!==true||ui.kaoPanel.correct!==true||!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.setTimer!=='function') return false;
     ui.kaoAdvanceTimer=quranLearnSurfaceDeps.setTimer(function(){ if(ui.kaoPanel&&ui.kaoPanel.open===true) kaoContinue(); },typeof delayMs==='number'?delayMs:kaoAdvanceMs(ui.kaoPanel));
     return true;
@@ -2061,10 +2061,10 @@
     var resolved=String(lessonId||''),repairMatch=/^repair:(.+)$/.exec(resolved);
     if(repairMatch){ var repairUnit=curriculum.units.find(function(item){ return String(item.id)===repairMatch[1]; }); return repairUnit?kaoRepairStart(repairUnit,ui,q,content,flow):false; }
     var lesson=curriculum.byLesson&&curriculum.byLesson(resolved);
-    // K2F-15: Seviye 0 dersleri ders oynatıcının boş planına (goal,apply,summary) değil S0 yüzeyine devredilir.
+    // K2F-15: Seviye 0 dersleri ders oynatıcının boş planına değil S0 yüzeyine devredilir.
     if(!lesson&&curriculum.s0&&Array.isArray(curriculum.s0.lessons)&&curriculum.s0.lessons.some(function(item){ return String(item.id)===resolved; })) return kaoS0('start',resolved);
     if(!lesson){
-      // K2F-06 (K4-01): ünite kimliği ustalık oturumudur; eski "son içerik dersine düş" geri dönüşü kaldırıldı.
+      // K2F-06: ünite kimliği ustalık oturumudur; eski "son içerik dersine düş" geri dönüşü kaldırıldı.
       var unit=curriculum.units.find(function(item){ return String(item.id)===resolved; });
       if(unit) return kaoMasteryStart(unit,ui,q,content,flow);
     }
@@ -2074,7 +2074,7 @@
       if(ui.kaoLesson.phase==='practice') startTaskPresentation();
       return true;
     }
-    // K3P-A3: vadeli tekrarlar ayrı bir ön faz değil, planın parçası (ısınma + karışık pekiştirme).
+    // K3P-A3: vadeli tekrarlar ayrı bir ön faz değil, planın parçası.
     var now=new Date(),reviews=startMode==='intro'?[]:kaoBuildQueue(d,now,{sessionId:quranLearnDeps.todayStr(),candidates:kaoCandidates(),dailyNew:0}).filter(function(item){ return !item.isNew; }).slice(0,20),plan=flow.lessonPlan({quranLearn:q},lesson.id,now,content,reviews);
     if(!Array.isArray(plan)||!plan.length) return false;
     plan=kaoLessonSafePlan(plan,d);
@@ -2090,8 +2090,8 @@
     record.startedAt=record.startedAt||now.toISOString(); q.startedAt=q.startedAt||now.toISOString(); ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoLesson=state; ui.kaoNight=false; ui.kaoDurableCount=0;
     return kaoLessonActivate(ui);
   }
-  // K2F-06 (K4-01): ünite ustalığı — çapa metnini oku + 10 soruluk karma test (eşik 0,8). Plan saf Flow'dan gelir.
-  // Ders kaydı (path.lessons) yazılmaz; sonuç path.units[id]'ye özet ekranına ulaşıldığında bir kez kaydedilir.
+  // K2F-06: ünite ustalığı — çapa metnini oku + 10 soruluk karma test. Plan saf Flow'dan gelir.
+  // Ders kaydı yazılmaz; sonuç path.units[id]'ye özet ekranına ulaşıldığında bir kez kaydedilir.
   var KAO_MASTERY_PASS=0.8;
   function kaoMasteryStart(unit,ui,q,content,flow){
     if(typeof flow.masteryPlan!=='function') return false;
@@ -2154,7 +2154,7 @@
     state.recorded=true; state.result={score:answered?correct/answered:0,passed:true,answered:answered,correct:correct};
     return true;
   }
-  // "Şimdilik atla" (KR-2): yalnız skippedAt yazar; masteryAt/taş yazmaz; geçilmiş ünitede kayıt değişmez.
+  // "Şimdilik atla": yalnız skippedAt yazar; masteryAt/taş yazmaz; geçilmiş ünitede kayıt değişmez.
   function kaoMasterySkip(unitId){
     if(!quranLearnDeps) return false;
     var curriculum=window.QuranCurriculumV2,unit=curriculum&&Array.isArray(curriculum.units)?curriculum.units.find(function(item){ return String(item.id)===String(unitId); }):null;
@@ -2379,7 +2379,7 @@
     // R-A2: kelime görevinde bu tekrarın çeldiricileri (lemma kimliği; dışlama lemma düzeyinde, kart kimliğinden
     // küçük) sonraki tekrarda dışlanmak üzere kartta tutulur.
     if(/^w:/.test(task.cardId)&&Array.isArray(task.choices)) scheduled.lastDistractors=task.choices.filter(function(choice){ return !choice.correct&&choice.cardId; }).map(function(choice){ return lemmaIdForCard(choice.cardId)||String(choice.cardId); }).slice(0,3);
-    // Kartın ilk sunuluşu: ters yön uygunluğu ve anlamsal aralık bu zamana bakar (resultCard sonraki cevaplarda korur).
+    // Kartın ilk sunuluşu: ters yön uygunluğu ve anlamsal aralık bu zamana bakar.
     if(!scheduled.introducedAt&&!nonNegativeNumber(previous.reps,0)) scheduled.introducedAt=now.toISOString();
     var reviewed=nonNegativeNumber(previous.reps,0)>0,afterNight=reviewed&&typeof previous.nightAt==='string';
     if(ui.kaoNight) scheduled.nightAt=key; else delete scheduled.nightAt;
@@ -2394,9 +2394,9 @@
     if(ui.kaoNight) daily.nightRev=Math.floor(nonNegativeNumber(daily.nightRev,0))+1;
     if(!isDurable(previous)&&isDurable(scheduled)) ui.kaoDurableCount=Math.floor(nonNegativeNumber(ui.kaoDurableCount,0))+1;
     if(!correct&&task.errorClass&&Object.prototype.hasOwnProperty.call(q.errors,task.errorClass)) q.errors[task.errorClass]+=1;
-    // Ustalık karma testinde yanlışa anında yeniden deneme eklenmez: puan yalnız ilk 10 cevaptan gelir (K2F-06).
+    // Ustalık karma testinde yanlışa anında yeniden deneme eklenmez: puan yalnız ilk 10 cevaptan gelir.
     if(!correct&&!task.retry&&!(ui.kaoLesson&&ui.kaoLesson.kind==='mastery')){
-      // Yeniden deneme farklı tohumla (kimlik+':retry') kurulur; K2F-10: sunulamayan gramer görevi tekrarlanmaz.
+      // Yeniden deneme farklı tohumla kurulur; K2F-10: sunulamayan gramer görevi tekrarlanmaz.
       var retryItem=Object.assign({},ui.kaoQueue[ui.kaoTaskIndex],{id:task.id+':retry',retry:true,isNew:false});
       if(kaoGrammarItemPresentable(retryItem,d)) ui.kaoQueue.push(retryItem);
     }
@@ -2582,7 +2582,7 @@
     var intentValue=String(q.onboarding.intent||''),intentHit=KAO_INTENT_PRAYERS.filter(function(pair){ return pair[0]===intentValue; })[0];
     var intentText=intentHit?('Her '+intentHit[1]+' namazından sonra 5 dakika'):(intentValue==='custom'?'Kendim seçerim':'Henüz seçilmedi');
     var h='<main class="kao-settings" aria-labelledby="kao-settings-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Ayarlar</p><h2 id="kao-settings-title">Öğrenme ayarların</h2><p>Seçimlerin bu cihazda saklanır ve senkronla taşınır.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
-    // K2F-29 (06/KAO2-23): amaca göre gruplar; tüm aç/kapat ayarları gerçek anahtardır (etiket değer içermez).
+    // K2F-29: amaca göre gruplar; tüm aç/kapat ayarları gerçek anahtardır.
     h+=group('Günlük hedef',[kaoSegHTML('Günlük yeni kelime',KAO_DAILY_NEW.map(function(n){ return [n,String(n),n]; }),Math.floor(nonNegativeNumber(s.dailyNew,10)),'kaoSetDailyNew'),kaoSegHTML('Niyet',KAO_ONBOARD_INTENTS.map(function(pair){ return [pair[0],pair[1],"'"+pair[0]+"'"]; }),q.onboarding.intent,'kaoSetIntent')],'Niyet: '+intentText);
     h+=group('Ses',[kaoSegHTML('Yeni kelimede otomatik ses',[['off','Kapalı',"'off'"],['measured','Yavaş',"'measured'"],['flowing','Doğal',"'flowing'"]],audio,'kaoSetAudioStyle')],'Ses düğmesinde dokunmak yavaş, basılı tutmak doğal hızı çalar. Sessiz saatte otomatik ses çalmaz.');
     h+=group('Okuma',[
@@ -2601,10 +2601,10 @@
     h+='<p class="kao-live" aria-live="polite">'+esc(ui.kaoSettingsNote||'')+'</p></main>';
     return h;
   }
-  // assets/kao/svg/* dosyalarının birebir kopyası (test_kao_phonics_contract.js eşitliği denetler).
+  // assets/kao/svg/* dosyalarının birebir kopyası.
   // KAO2-20: mahreç şemaları içerik katmanındadır (app/content/quranMahrecSchemasV1.js);
   // veri çalışma zamanı bütçesine yazılmaz. Erişim yalnız yukarıdaki yardımcıdan.
-  // KAO-26 · E8 Telaffuz stüdyosu: algı görevleri yalnız paketli kliplerden; kartlar quranLearn.phonics['p:…'] (FSRS).
+  // KAO-26 · E8 Telaffuz stüdyosu: algı görevleri yalnız paketli kliplerden; kartlar quranLearn.phonics['p:…'].
   var KAO_PHONICS_BUCKETS=[['B','Kova B · Yakın ama farklı'],['C','Kova C · Türkçede yok']],KAO_PHONICS_AUDIO='assets/kao/audio/';
   function phonicsSource(){ var p=window.QuranPhonicsV1; return p&&Array.isArray(p.letters)&&Array.isArray(p.pairs)?p:null; }
   function phonicsLetter(id){ var p=phonicsSource(); return p&&p.letters.find(function(letter){ return letter.id===id; })||null; }
@@ -2750,7 +2750,7 @@
     if(attention.length) h+='<section class="kao-ph-attention"><h3>'+icon('triangle-alert',15)+' Dikkat listesi</h3>'+attention.map(function(item){ return '<div><p class="kao-cognate is-shift">'+icon('triangle-alert',14)+' dikkat · '+esc(item.letter.ar+' · '+phonicsLetterLatin(item.letter))+' '+item.count+' kez karıştı</p><ul>'+item.words.map(function(lemma){ return '<li><button type="button" onclick="App.kaoOpenWord(\''+esc(lemma.id)+'\')">'+kaoArabicPairHTML(lemma.ar,lemma.translit,'kao-ph-pairword')+'<span>'+esc(lemma.meanings[0]||'')+'</span></button></li>'; }).join('')+'</ul></div>'; }).join('')+'</section>';
     return h+'</main>';
   }
-  // KAO-27 · Gölgeleme (D-10): kayıt yalnız bellekte (Blob URL ui'de), en çok 10 sn; data/depo/senkrona asla yazılmaz.
+  // KAO-27 · Gölgeleme: kayıt yalnız bellekte, en çok 10 sn; data/depo/senkrona asla yazılmaz.
   var KAO_SHADOW_MAX_MS=10000;
   function kaoShadowEnabled(){ return kaoSettingsOf().shadowing===true; }
   function kaoShadowCleanup(){
@@ -2852,7 +2852,7 @@
     if(sh.phase==='recorded') h+='<div class="kao-setting-row"><button type="button" class="kao-secondary" onclick="App.kaoRecordPlay(\'self\')">Kendi kaydımı dinle</button><button type="button" class="kao-secondary" onclick="App.kaoRecordPlay(\'model\')">Modeli dinle</button></div><div class="kao-seg" role="group" aria-label="Öz değerlendirme"><button type="button" onclick="App.kaoRecordDiscard(\'near\')">Yakın</button><button type="button" onclick="App.kaoRecordDiscard(\'again\')">Tekrar</button></div>';
     return h+'<button type="button" class="kao-link-button" onclick="App.kaoRecordDiscard()">Kaydı sil ve kapat</button></section>';
   }
-  // KAO-28 · E9 Anlayabildiğin âyet: kapsam token düzeyindedir (01-ARASTIRMA: QAC 77.430 token; 02 §5.1 ≥%95 eşiği).
+  // KAO-28 · E9 Anlayabildiğin âyet: kapsam token düzeyindedir.
   var KAO_QURAN_TOKENS=77430,KAO_AYAH_THRESHOLD=0.95,KAO_UNDERSTOOD_MAX=400;
   // 02 §3: kalıcı kart = review ∧ s≥21, yetim ya da okuyucu-bilinmeyen değil. Tek tanım; E3 sayacı da kullanır.
   function isSettled(card,minStability){
@@ -2860,7 +2860,7 @@
     return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=minStability&&card.orphan!==true&&card.readerUnknown!==true;
   }
   function isDurable(card){ return isSettled(card,21); }
-  // Bilinen lemma = her iki yönde (ar>tr ve tr>ar) kalıcı kart. E1, hub, E9, panel ve CSV bu kümeyi kullanır.
+  // Bilinen lemma = her iki yönde kalıcı kart. E1, hub, E9, panel ve CSV bu kümeyi kullanır.
   function kaoKnownLemmaSet(d){
     var cards=objectOr(quranLearnRoot(d).cards,{}),durable=Object.create(null),known=Object.create(null);
     Object.keys(cards).forEach(function(id){ var match=String(id).match(/^w:([^:]+):(ar>tr|tr>ar)$/); if(match&&isDurable(cards[id])) (durable[match[1]]=durable[match[1]]||{})[match[2]]=1; });
@@ -2875,7 +2875,7 @@
   }
   // K3P-11 (TASARIM §2): Tezhip modeli. Yalnız TÜRETİR, hiçbir şey yazmaz.
   // Kaynak: kısa sûre (id) ya da namaz metni (id, ör. 'fatiha'); sûre yoksa null.
-  // Durum — bilinen: `kaoKnownLemmaSet` (her iki yön isSettled s≥21) · öğreniliyor: kartı var · yeni: kartı yok.
+  // Durum — bilinen: `kaoKnownLemmaSet` · öğreniliyor: kartı var · yeni: kartı yok.
   // Bilinen kuralı `kaoCoverage` ile aynıdır → yaldız oranı kapsam oranıyla birebir tutarlıdır.
   function kaoTezhipModel(d,surahId){
     var text=kaoPrayerTexts().find(function(item){ return item.id===String(surahId); });
@@ -2925,7 +2925,7 @@
   }
   function kaoTodayAyah(){
     if(!quranLearnDeps) return null;
-    // Günün âyeti gün boyunca sabittir: "Anladım" sonrası başka âyete atlamaz (seçim ui'de, kalıcı değil).
+    // Günün âyeti gün boyunca sabittir: "Anladım" sonrası başka âyete atlamaz.
     var ui=quranLearnDeps.ui(),d=quranLearnDeps.data(),today=quranLearnDeps.todayStr(),cached=ui.kaoAyahToday,group=cached&&cached.date===today&&kaoAyahGroups().find(function(item){ return item.key===cached.key; });
     if(group){ var coverage=kaoCoverage(d,group.words); if(coverage.ratio>=KAO_AYAH_THRESHOLD) return Object.assign({coverage:coverage},group); }
     var pick=kaoPickAyah(d,today); ui.kaoAyahToday=pick?{date:today,key:pick.key}:null; return pick;
@@ -3044,7 +3044,7 @@
     });
     return h+'<p class="kao-live" aria-live="polite">'+esc(ui.kaoPrayerNote||'')+'</p></main>';
   }
-  // KAO-19 · Panel aynası özeti (R-C1/R-C8): yalnız sayısal alanlar + ses sınıfı adı; kelime düzeyi bilgi yok.
+  // KAO-19 · Panel aynası özeti: yalnız sayısal alanlar + ses sınıfı adı; kelime düzeyi bilgi yok.
   // Panel sözlüğü yüklemediği için kapsam burada hesaplanır ve her kayıtta quranLearn.summary'ye yazılır.
   function kaoSoundClass(letterId){
     var lesson=kaoGateLessons().find(function(item){ return item.sounds.some(function(sound){ return sound.id===letterId; }); });
@@ -3061,7 +3061,7 @@
     var q=quranLearnRoot(d),cards=objectOr(q.cards,{}),misheard=objectOr(objectOr(q.phonics,{}).misheard,{}),classes=Object.create(null),study=kaoStudyStreak(q.daily);
     Object.keys(misheard).forEach(function(letterId){ var name=kaoSoundClass(letterId),count=Math.floor(nonNegativeNumber(misheard[letterId],0)); if(name&&count>0) classes[name]=(classes[name]||0)+count; });
     var top=Object.keys(classes).sort(function(a,b){ return classes[b]-classes[a]||a.localeCompare(b); })[0]||null;
-    // KAO2-16 · 07 §6: yeni taş anahtarları (besmele, u1…u12) yalnız sayısal olarak taşınır.
+    // KAO2-16 · 07 §6: yeni taş anahtarları yalnız sayısal olarak taşınır.
     var milestones=objectOr(q.milestones,{}),milestoneKeys=Object.keys(milestones).filter(function(key){ return !!milestones[key]; });
     // KAO2-25 · S-08 panel aynası: nerede kaldığı + taşlar. Yalnız kimlik/sayı; anlatı metni YOK.
     var unitId=null,lessonId=null,lessonsDone=0,flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2,nowValue=new Date();
@@ -3085,7 +3085,7 @@
     q.summary=kaoPanelSummary(d);
     return quranLearnDeps.save();
   }
-  // KAO-20 · E1 istatistik (R-A3 tutunma + kalibrasyon, R-A1 gece tekrarı): yalnız daily toplamlarından, ağsız.
+  // KAO-20 · E1 istatistik: yalnız daily toplamlarından, ağsız.
   function kaoStats(d,nowValue){
     var daily=objectOr(quranLearnRoot(d).daily,{}),now=validDate(nowValue||new Date(),'now');
     var windowOf=function(days){
@@ -3205,7 +3205,7 @@
     var esc=quranLearnDeps.esc,stats=kaoStats(quranLearnDeps.data(),nowValue),pct=function(ok,n){ return n?'%'+Math.round(ok/n*100):'—'; },MIN=30;
     var line=function(label,w){ return '<p><strong>'+esc(label)+':</strong> tekrar doğruluğu '+pct(w.ok,w.n)+' · FSRS öngörüsü '+pct(w.pred,w.n)+' · '+w.n+' tekrar</p>'; };
     var h='<main class="kao-stats" aria-labelledby="kao-stats-title"><div class="kao-view-head"><div><h2 id="kao-stats-title">İlerleme</h2><p>Kaç kelime tanıdığını, bu haftanı ve tekrar doğruluğunu burada görürsün.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
-    // S-12: İlerleme ekranı taşları UZLAŞTIRIR (mevcut kayıt yoluna ek; taş bir kez kazanılır).
+    // S-12: İlerleme ekranı taşları UZLAŞTIRIR.
     var awarded=recordMilestones(ensureQuranLearn(quranLearnDeps.data()),quranLearnDeps.data(),validDate(nowValue||new Date(),'now')),model;
     if(awarded.length) kaoSave();
     model=kaoProgressModel(quranLearnDeps.data(),nowValue);var curveLine=function(point){ return 'İlk '+point.n+' kelime ≈ %'+point.percent.toFixed(1).replace('.',',')+(point.earned?' · kazanıldı':''); };
@@ -3495,31 +3495,58 @@
     if(step.kind==='mastery') hero.secondary={label:'Şimdilik atla',action:{name:'kaoLesson',args:['skip-mastery',step.param]}};
     return hero;
   }
-  // Yolun kartı ve hub kartı için ortak: dersleri ya da ustalığı bitmemiş ilk ünite (hepsi bittiyse son ünite).
+  // Yolun kartı ve hub kartı için ortak: dersleri ya da ustalığı bitmemiş ilk ünite.
   function kaoCurrentUnit(q,flow,content){
     var units=content.curriculum.units,current=units[units.length-1],progress=null;
     for(var i=0;i<units.length;i+=1){ var p=flow.unitProgress(q,units[i].id,content); if(!p.complete){ current=units[i]; progress=p; break; } }
     return {unit:current,progress:progress||flow.unitProgress(q,current.id,content)};
   }
-  function kaoHomePath(d,q){
-    var flow=window.SeymaQuranLearnFlow,content={curriculum:window.QuranCurriculumV2},units=content.curriculum.units,at=kaoCurrentUnit(q,flow,content),current=at.unit,progress=at.progress;
-    var level=content.curriculum.levels.find(function(lv){ return lv.id===current.level; })||{title:'',unitIds:[current.id]};
-    var known=Object.keys(kaoKnownLemmaSet(d)).length,percent=Math.min(100,Math.floor(kaoCoverage(d).ratio*100)),first=units[0],firstWords=first.lessons.reduce(function(n,l){ return n+l.lemmaIds.length; },0);
-    return {level:'Seviye '+current.level+' · '+level.title,unit:'Ünite '+(level.unitIds.indexOf(current.id)+1)+'/'+level.unitIds.length+' · '+current.title+' · '+progress.lessonsDone+'/'+progress.lessons+' ders',percent:progress.lessons?progress.lessonsDone/progress.lessons*100:0,known:known,coverage:known>0?percent:null,goal:'İlk hedef: '+first.title+'’yı anlamak · '+firstWords+' kelime',openLabel:'Üniteyi aç',action:{name:'kaoNav',args:['unit',current.id]},moreAction:{name:'kaoSetView',args:['units']}};
+  // K3P-12: haftalık hedef — son 7 günde kaç gün ders tamamlandı; CEZA DİLİ YOK.
+  function kaoWeeklyDone(d,now){
+    var daily=objectOr(quranLearnRoot(d).daily,{});
+    return [0,1,2,3,4,5,6].filter(function(offset){ var day=daily[localDayOf(addDays(now,-offset))]; return !!(day&&(day.sessionDone||day.lesson)); }).length;
   }
-  function kaoHomeLists(q){
-    var shorts=window.QuranShortSurahsV1,surahCount=shorts&&Array.isArray(shorts.surahs)?shorts.surahs.length:0,understood=q.ayahs&&Array.isArray(q.ayahs.understood)?q.ayahs.understood.length:0;
-    // KAO2-20: kök aileleri bir keşif katmanıdır; kullanıcı henüz hiç kelime kartı
-    // edinmediyse gizli kalır (yeni hesapta yol haritası sade kalsın).
-    return [
-      {title:'Keşfet',rows:[{icon:'book-open',title:'Kısa sûreler',value:surahCount?String(surahCount):'',action:{name:'kaoOpenSurah',args:[114]}},{icon:'mosque',title:'Namazda ne diyorum',action:'kaoOpenPrayer'},{icon:'quote',title:'Gramer notları',action:{name:'kaoSetView',args:['grammar']}},Object.keys(q.cards||{}).length>0?{icon:'sprout',title:'Kök aileleri',value:'73 aile',action:'kaoOpenRoots'}:null,kaoS0Visible(q)?{icon:'hexagon',title:'Seviye 0 · şekil aileleri',value:'12 ders',action:{name:'kaoS0',args:['start','s0.01']}}:null,{icon:'headphones',title:'Telaffuz stüdyosu',action:'kaoOpenPhonics'},{icon:'sparkles',title:'Günün âyeti',value:understood?understood+' anlaşıldı':'',action:'kaoOpenAyah'}].filter(Boolean)},
-      {title:'Sen',rows:[{icon:'trending-up',title:'İlerleme',action:{name:'kaoSetView',args:['stats']}},{icon:'settings',title:'Ayarlar',action:{name:'kaoSetView',args:['settings']}}]}
+  // K3P-12: hedef eğimi — güncel ünitenin son dersi bitene kaç kelime kaldı.
+  function kaoGoalSlope(d,q){
+    var at=kaoCurrentUnit(q,window.SeymaQuranLearnFlow,{curriculum:window.QuranCurriculumV2}),unit=at.unit,last=unit.lessons[unit.lessons.length-1]||{lemmaIds:[]},known=kaoKnownLemmaSet(d);
+    var remaining=(last.lemmaIds||[]).filter(function(id){ return !known[id]; }).length;
+    return {remaining:remaining,text:remaining>0?remaining+' kelime sonra '+unit.title+' tamam':unit.title+' tamam ✓'};
+  }
+  // K3P-12: an kartının çapa referansı — ünitenin anchor'ı kısa sûre ya da namaz metni.
+  function kaoUnitAnchorRef(unit){
+    var anchor=Array.isArray(unit&&unit.anchor)?unit.anchor:[];
+    for(var i=0;i<anchor.length;i+=1){ var m=/^(surah|prayer):(\d+|[a-z_]+)$/.exec(String(anchor[i]||'')); if(m) return {kind:m[1],id:m[2]}; }
+    return null;
+  }
+  function kaoHomeShortcuts(q){
+    return [{icon:'book-open',title:'Sûreler',action:{name:'kaoSetView',args:['reader']}},{icon:'mosque',title:'Namazda ne diyorum',action:'kaoOpenPrayer'},{icon:'layers-2',title:'Kütüphane',action:{name:'kaoSetView',args:['library']}}];
+  }
+  function kaoLibraryHTML(){
+    if(!quranLearnDeps) return '';
+    var q=ensureQuranLearn(quranLearnDeps.data()),cards=Object.keys(objectOr(q.cards,{})).length,grammar=window.QuranGrammarV1;
+    var groups=[
+      {title:'Kur’an',rows:[
+        {icon:'route',title:'Yol',action:{name:'kaoSetView',args:['units']}},
+        {icon:'book-open',title:'Kısa sûreler',value:'114',action:{name:'kaoOpenSurah',args:[114]}},
+        {icon:'quote',title:'Günün âyeti',action:'kaoOpenAyah'},
+        {icon:'mosque',title:'Namazda ne diyorum',action:'kaoOpenPrayer'},
+        {icon:'book',title:'Hakkında ve kaynaklar',action:{name:'kaoSetView',args:['sources']}}
+      ]},
+      {title:'Pratik',rows:[
+        {icon:'sparkles',title:'Telaffuz stüdyosu',action:'kaoOpenPhonics'},
+        {icon:'graduation-cap',title:'Gramer notları',value:grammar&&Array.isArray(grammar.concepts)?String(grammar.concepts.length):'',action:{name:'kaoSetView',args:['grammar']}}
+      ]}
     ];
+    // K2F-15 (f) kapısı korunur: Seviye 0 satırı yalnız start==='s0', başlanmış S0 dersi ya da kart varsa görünür.
+    if(kaoS0Visible(q)) groups[1].rows.splice(1,0,{icon:'pencil',title:'Seviye 0 · Harfler',action:{name:'kaoSetView',args:['s0']}});
+    if(cards>0) groups[1].rows.push({icon:'sprout',title:'Kök aileleri',action:{name:'kaoSetView',args:['roots']}});
+    groups.push({title:'Sen',rows:[{icon:'trending-up',title:'İlerleme',action:{name:'kaoSetView',args:['stats']}},{icon:'settings',title:'Ayarlar',action:{name:'kaoSetView',args:['settings']}}]});
+    return kaoViewsApi().libraryScreen({groups:groups});
   }
   function kaoHomeHTML(nowValue){
     if(!quranLearnDeps) return '';
-    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),now=nowValue?validDate(nowValue,'now'):new Date(),step=kaoNextStepFor(d,now);
-    return kaoViewsApi().todayScreen({notice:quranLearnDeps.ui().kaoWhatsNew===true?KAO_WHATS_NEW:null,hero:kaoHomeHero(d,q,now,step),path:kaoHomePath(d,q),lists:kaoHomeLists(q)});
+    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),now=nowValue?validDate(nowValue,'now'):new Date(),step=kaoNextStepFor(d,now),hero=kaoHomeHero(d,q,now,step),at=kaoCurrentUnit(q,window.SeymaQuranLearnFlow,{curriculum:window.QuranCurriculumV2}),ref=kaoUnitAnchorRef(at.unit),anchorId=ref?ref.id:null,model=ref?kaoTezhipModel(d,anchorId):null,covered=Object.keys(kaoKnownLemmaSet(d)).length>0,anchorCall=ref?(ref.kind==='surah'?{name:'kaoOpenSurah',args:[Number(ref.id)]}:{name:'kaoSetView',args:['reader']}):null;
+    return kaoViewsApi().todayScreen({notice:quranLearnDeps.ui().kaoWhatsNew===true?KAO_WHATS_NEW:null,tezhip:model?{title:model.title,lines:model.lines,footer:covered?'%'+Math.round(model.coverage.ratio*100)+' anlam · '+model.remaining+' kelime kaldı':model.remaining+' kelime kaldı'}:null,action:anchorCall,goal:kaoGoalSlope(d,q).text,eyebrow:hero.eyebrow,title:hero.title,subtitle:hero.subtitle,foot:hero.foot,secondary:hero.secondary,primary:hero.button,weekly:{done:kaoWeeklyDone(d,now),total:5,coverage:covered?kaoCoverage(d).ratio*100:null},shortcuts:kaoHomeShortcuts()});
   }
   // KAO2-11 · S-01 ilk açılış (05 §3) ve mevcut kullanıcı geçişi (05 §9).
   // Adımlar yalnız ui.kaoOnboard'da yaşar; veri tek kayıtla "Bitir"/"Atla"da yazılır, render yazmaz.
@@ -3644,7 +3671,7 @@
   var KAO_ONBOARD_TITLE='Hoş geldin';
   function kaoOnboardState(){ return {step:1,choice:null,minutes:5,intent:null,audio:true,placement:null,result:null}; }
   function kaoOnboardActive(ui){ return !!(ui&&ui.kaoOnboard&&typeof ui.kaoOnboard==='object'); }
-  // Okuma görevi yoksa (eksik içerik) kanıt yoktur: tüm S0 dersleri eksik sayılır, hiçbiri sınanmadan işaretlenmez.
+  // Okuma görevi yoksa kanıt yoktur: tüm S0 dersleri eksik sayılır, hiçbiri sınanmadan işaretlenmez.
   function kaoPlacementResult(st){
     var tasks=kaoPlacementTasks(),p=st.placement,reading=p.reading.filter(function(ok){ return ok===true; }).length,listening=p.listening.filter(function(ok){ return ok===true; }).length;
     var start=tasks.reading.length&&reading>=KAO_PLACEMENT_PASS?'level1':'s0';
@@ -3689,7 +3716,7 @@
     if(action==='audio'){ st.audio=typeof value==='boolean'?value:!st.audio; return true; }
     return false;
   }
-  // Atla: 05 §3 varsayılanları (Seviye 1, 5 dk, ses açık). Mevcut ilerleme silinmez; yalnız eksik S0 dersleri eklenir.
+  // Atla: 05 §3 varsayılanları. Mevcut ilerleme silinmez; yalnız eksik S0 dersleri eklenir.
   function kaoOnboardCommit(ui,q,st,skip){
     var now=new Date().toISOString(),o=q.onboarding,start=skip?'level1':kaoOnboardStart(st),minutes=skip?5:st.minutes,audio=skip?true:st.audio!==false;
     o.doneAt=now; o.start=start; o.minutes=minutes; o.intent=skip?null:st.intent;
@@ -3778,7 +3805,7 @@
   // 02 §5.8 uygulama niyeti: bugünün namaz vakitleri yalnız okunur.
   var KAO_INTENT_PRAYERS=[['fajr','sabah'],['dhuhr','öğle'],['asr','ikindi'],['maghrib','akşam'],['isha','yatsı']]; function kaoIntentSuggestion(d,nowValue,today,intent){ var now=validDate(nowValue,'now'),day=objectOr(objectOr(d&&d.days,{})[today],{}),times=objectOr(day.prayer,{}),minutes=now.getHours()*60+now.getMinutes(),any=false,next=null,chosen=null; function clock(m,pair){ return pair[1]+' namazından sonra 5 dakika ('+(m[1].length<2?'0':'')+m[1]+':'+m[2]+')'; } KAO_INTENT_PRAYERS.forEach(function(pair){ var m=/(\d{1,2}):(\d{2})/.exec(String(objectOr(times[pair[0]],{}).time||'')); if(!m) return; any=true; if(pair[0]===intent) chosen=(Number(m[1])*60+Number(m[2])>minutes?'':'yarın ')+clock(m,pair); if(!next&&Number(m[1])*60+Number(m[2])>minutes) next=clock(m,pair); }); return chosen||(any?(next||'yarın sabah namazından sonra 5 dakika'):''); }
   // KAO2-10 · 05 §8 hub kartı: nextStep'ten tek bilgi + tek eylem; halka gerçek ünite ilerlemesi.
-  // Ana sekme render'ında çalışır: veri yazmaz (normalizasyon kopyada) ve motor/müfredat eksikse sade karta düşer.
+  // Ana sekme render'ında çalışır: veri yazmaz ve motor/müfredat eksikse sade karta düşer.
   var KAO_HUB_TITLE='Kur’an Arapçası';
   function kaoDueBefore(q,limitMs){
     var cards=objectOr(q.cards,{}),n=0;
@@ -3806,7 +3833,7 @@
   function kaoHubCardHTML(){
     if(!quranLearnDeps) return '';
     var d=quranLearnDeps.data()||{},raw=objectOr(d.quranLearn,{}),hidden=!!(raw.settings&&raw.settings.kaoVisible===false);
-    // Arapça sekmesi KAO'ya tek giriş; gizliyken aynı düğme geri getirme kartı olur (mevcut kaoToggleVisible).
+    // Arapça sekmesi KAO'ya tek giriş; gizliyken aynı düğme geri getirme kartı olur.
     if(hidden&&quranLearnDeps.ui().faithTab!=='arapca') return '';
     var views=kaoViewsApi(),model,label,inner,id,call;
     if(hidden){
@@ -3820,7 +3847,7 @@
     return '<button type="button" id="'+id+'" class="kao-hub-card" onclick="'+call+'"'+(hidden?'':' aria-haspopup="dialog"')+' aria-label="'+quranLearnDeps.esc(label)+'">'+inner+'</button>';
   }
   var KAO_HOME_TITLE="Kur'an Arapçası";
-  var KAO_VIEW_TITLES={home:KAO_HOME_TITLE,units:'Yol',unit:'Ünite',word:'Kelime',reader:'Sûre',settings:'Ayarlar',phonics:'Telaffuz',ayah:'Günün âyeti',prayer:'Namazda ne diyorum',stats:'İlerleme',gate:'Harf kontrolü',session:'Oturum',grammar:'Gramer notları',concept:'Kavram',roots:'Kök aileleri',s0:'Harfler',sources:'Hakkında ve kaynaklar'};
+  var KAO_VIEW_TITLES={home:KAO_HOME_TITLE,units:'Yol',unit:'Ünite',word:'Kelime',reader:'Sûre',settings:'Ayarlar',phonics:'Telaffuz',ayah:'Günün âyeti',prayer:'Namazda ne diyorum',stats:'İlerleme',gate:'Harf kontrolü',session:'Oturum',grammar:'Gramer notları',concept:'Kavram',roots:'Kök aileleri',s0:'Harfler',sources:'Hakkında ve kaynaklar',library:'Kütüphane'};
   function kaoFlowApi(){
     var flow=window.SeymaQuranLearnFlow;
     if(!flow||flow.version!==1||typeof flow.createStack!=='function'||typeof flow.openStack!=='function'||typeof flow.push!=='function'||typeof flow.reset!=='function'||typeof flow.replaceTop!=='function'||typeof flow.current!=='function'||typeof flow.previous!=='function'||typeof flow.back!=='function') throw new Error('KAO2-04: gezinme akışı yüklenmedi');
@@ -3928,7 +3955,7 @@
   function kaoOverlayHTML(nowValue){
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),stack=kaoEnsureStack(ui),flow=kaoFlowApi(),current=flow.current(stack,KAO_HOME_TITLE),previous=flow.previous(stack,KAO_HOME_TITLE);
-    var view=current.view,unitDetail=view==='units'&&current.param!==null,onboarding=view==='home'&&kaoOnboardActive(ui),screenView=unitDetail?'unit':(view==='grammar'&&current.param!==null?'concept':view),body=(view==='sources'?kaoSourcesPageHTML():view==='s0'?kaoS0HTML():view==='roots'?kaoRootsHTML():onboarding?kaoOnboardHTML():view==='home'?kaoHomeHTML(nowValue):(view==='units'?(unitDetail?kaoUnitHTML(current.param):kaoPathHTML()):(view==='grammar'?(current.param!==null?kaoConceptHTML(current.param):kaoGrammarHTML()):(view==='word'?kaoWordHTML():(view==='reader'?kaoReaderHTML():(view==='gate'?kaoGateHTML():(view==='settings'?kaoSettingsHTML():(view==='phonics'?kaoPhonicsHTML():(view==='ayah'?kaoAyahHTML():(view==='map'?kaoMapHTML():(view==='prayer'?kaoPrayerHTML():(view==='stats'?kaoStatsHTML(nowValue):'<main class="kao-session">'+kaoLessonHTML()+'</main>'))))))))))));
+    var view=current.view,unitDetail=view==='units'&&current.param!==null,onboarding=view==='home'&&kaoOnboardActive(ui),screenView=unitDetail?'unit':(view==='grammar'&&current.param!==null?'concept':view),body=(view==='sources'?kaoSourcesPageHTML():view==='s0'?kaoS0HTML():view==='roots'?kaoRootsHTML():view==='library'?kaoLibraryHTML():onboarding?kaoOnboardHTML():view==='home'?kaoHomeHTML(nowValue):(view==='units'?(unitDetail?kaoUnitHTML(current.param):kaoPathHTML()):(view==='grammar'?(current.param!==null?kaoConceptHTML(current.param):kaoGrammarHTML()):(view==='word'?kaoWordHTML():(view==='reader'?kaoReaderHTML():(view==='gate'?kaoGateHTML():(view==='settings'?kaoSettingsHTML():(view==='phonics'?kaoPhonicsHTML():(view==='ayah'?kaoAyahHTML():(view==='map'?kaoMapHTML():(view==='prayer'?kaoPrayerHTML():(view==='stats'?kaoStatsHTML(nowValue):'<main class="kao-session">'+kaoLessonHTML()+'</main>'))))))))))));
     body=kaoViewsApi().renderScreen({exit:{name:'kaoLesson',args:['exit']},exitLabel:ui.kaoLesson?'Dersten çık':'Oturumdan çık',view:onboarding?'onboard':screenView,title:onboarding?KAO_ONBOARD_TITLE:(current.title||kaoViewTitle(screenView,current.param,ui)),previousTitle:previous&&previous.title||KAO_HOME_TITLE,body:body});
     var titleId=/class="kao-largetitle">[\s\S]*?<h2\b[^>]*\sid="([^"]+)"/.exec(body),dialogName=titleId?'aria-labelledby="'+titleId[1]+'"':'aria-label="Kur’an Arapçası · günlük oturum"';
     // K3P-A1: data-kao-step ekran adımını taşır; kaydırma adım değişince sıfırlanır.
@@ -3951,8 +3978,8 @@
     return back&&card&&body&&back.id==='sey-ov-back'&&card.id==='sey-ov-card'&&body.id==='sey-ov-body'?{back:back,card:card,body:body}:null;
   }
   function kaoSyncAttrs(node,attrs,names){ names.forEach(function(name){ if(Object.prototype.hasOwnProperty.call(attrs,name)) node.setAttribute(name,attrs[name]); else node.removeAttribute(name); }); }
-  // app.js mount buraya devreder. Overlay yoksa ekler ('insert'); varsa düğümleri korur ('patch').
-  // Açılış animasyonu (kao.css: seyFade, sey-sheet-in) yalnız ilk eklemede oynar: CSS animasyonu düğüm belgede
+  // app.js mount buraya devreder. Overlay yoksa ekler; varsa düğümleri korur.
+  // Açılış animasyonu yalnız ilk eklemede oynar: CSS animasyonu düğüm belgede
   // kaldıkça yeniden başlamaz, bu yüzden 'patch' yolu animasyona hiç dokunmaz.
   function kaoPatchOverlay(doc,html){
     var root=doc.getElementById('app'),live=kaoLiveOverlay(root),split=kaoSplitOverlay(html);
@@ -3992,7 +4019,7 @@
     var st=ui&&ui.kaoLesson,item=st&&st.phase==='lesson'&&Array.isArray(st.plan)?st.plan[st.at||0]:null;
     return !!(item&&item.kind==='summary');
   }
-  // Ders bitince (özet), dersten çıkınca ya da kapatınca bekleyen toast'lar birleştirilmiş tek bildirim olur.
+  // Ders bitince, dersten çıkınca ya da kapatınca bekleyen toast'lar birleştirilmiş tek bildirim olur.
   function kaoReleaseToasts(force){
     if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.flushToasts!=='function') return false;
     if(!force&&kaoFocusLocked()&&!kaoAtSummary(quranLearnDeps.ui())) return false;
@@ -4307,6 +4334,7 @@
     kaoSurahCheck:kaoSurahCheck,
     kaoHubCardHTML:kaoHubCardHTML,
     kaoHomeHTML:kaoHomeHTML,
+    kaoLibraryHTML:kaoLibraryHTML,
     kaoOnboard:kaoOnboard,
     kaoOnboardHTML:kaoOnboardHTML,
     kaoOnboardFacts:kaoOnboardFacts,

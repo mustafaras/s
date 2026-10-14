@@ -95,15 +95,16 @@ assert.match(html, /id="sey-ov-back"/);
 assert.match(html, /id="sey-ov-card"[^>]*role="dialog"[^>]*aria-modal="true"[^>]*tabindex="-1"/);
 assert.match(html, /onkeydown="App\.onModalKeydown\(event,App\.kaoClose\)"/);
 assert.match(html, /onclick="App\.kaoClose\(\)"/);
-// KAO2-09 (S-02): sıfır kullanıcıda %0 kapsam yerine ilk hedef; tek HeroCard; gece satırı altbilgide.
-assert.match(html, /İlk hedef: Fâtiha’yı anlamak · \d+ kelime/);
+// K3P-12 (§3.1): sıfır kullanıcıda %0 kapsam yerine hedef eğimi; tek an kartı (Tezhip) + tek birincil eylem; gece satırı altbilgide.
+assert.match(html, /class="kao-today-goal">\d+ kelime sonra Fâtiha tamam/);
 assert.doesNotMatch(html, /data-countup-key="kao-coverage"/);
-assert.match(html, /class="kao-hero-card kao-moment"/, 'K3P-09: Bugün kahramanı an kartıdır (kao-moment)');
-assert.match(html, /Fâtiha · Ders 1/, 'ilk açılış sonrası kahraman günlük dersi gösterir');
+assert.match(html, /class="kao-today-hero kao-moment"/, 'K3P-12: Bugün an kartıdır (Tezhip + kao-moment)');
+assert.match(html, /<figure class="kao-tezhip">[\s\S]*?<figcaption class="kao-tezhip-title">Fâtiha<\/figcaption>/, 'an kartı Fâtiha’yı yaldızlar');
 assert.match(html, /class="kao-hero-foot"[\s\S]*Gece tekrarı/);
 assert.match(html, /App\.kaoLesson\("start","u01\.01"\)/);
 assert.doesNotMatch(html, /class="(?:kao-dialog-frame|kao-header-mark|kao-hero-rosette|kao-summary-mark|kao-done-mark)"/);
-assert.doesNotMatch(html, /lang="ar"|dir="rtl"/);
+// K3P-12: Bugün artık Tezhip an kartıyla Arapça gösterir; Arapça kendi lang/dir'ini taşımalı (miras değil).
+assert.match(html, /class="kao-tezhip-word is-[a-z]+" lang="ar" dir="rtl"/);
 
 quranLearn.onboarding.doneAt = null;
 assert.match(api.kaoOverlayHTML(new Date('2026-09-24T22:15:00')), /Hoş geldin/, 'ilk açılış yapılmamış sıfır kullanıcı karşılanır');
@@ -111,7 +112,7 @@ const firstHubHtml = atClock(DAY_CLOCK, () => api.kaoHubCardHTML());
 assert.match(firstHubHtml, /id="kao-hub-entry"/);
 assert.match(firstHubHtml, /Kur’an Arapçası Öğreniyorum/);
 // KAO2-10 (05 §8, Y-01/T-05): hub tek bilgi + tek eylem; sahte yol noktaları yok. KAO-16 okuyucusu Keşfet listesinde keşfedilebilir.
-assert.match(api.kaoHomeHTML('2026-09-24T12:00:00'), /App\.kaoOpenSurah\(114\)[\s\S]*?Kısa sûreler/, 'KAO-16 okuyucusu ana ekranda keşfedilebilir olmalı');
+assert.match(api.kaoLibraryHTML(), /App\.kaoOpenSurah\(114\)[\s\S]*?Kısa sûreler/, 'KAO-16 okuyucusu Kütüphane’de keşfedilebilir olmalı');
 assert.doesNotMatch(firstHubHtml, /kao-hub-path|Kelime<\/b>/);
 assert.doesNotMatch(firstHubHtml, /class="kao-hub-(?:spine|frame|ornament)"/);
 assert.match(firstHubHtml, /Namazda söylediklerini anlamaya başla · 5 dk/);
@@ -461,7 +462,7 @@ assert.ok(prevented >= 3 && stopped >= 3);
   const bcLetters = sandbox.window.QuranPhonicsV1.letters.filter((letter) => letter.bucket === 'B' || letter.bucket === 'C');
   assert.equal((phonicsHome.match(/App\.kaoPhonics\('lesson','/g) || []).length, bcLetters.length, 'her B/C harfinin dersi');
   assert.match(phonicsHome, /App\.kaoPhonics\('start'\)/); assert.match(phonicsHome, /App\.kaoPhonics\('silent'\)/);
-  assert.match(api.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoOpenPhonics\(\)/, 'E1 ana ekrandan stüdyo girişi');
+  assert.match(api.kaoLibraryHTML(), /App\.kaoOpenPhonics\(\)/, 'K3P-12: Kütüphane’den stüdyo girişi');
   assert.equal(api.kaoOpenPhonics('ayn'), true);
   const lesson = api.kaoPhonicsHTML();
   assert.match(lesson, /<span class="kao-mahrec"><svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"[^>]*role="img" fill="currentColor"><title>/, 'R-B6: inline SVG currentColor');

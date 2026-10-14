@@ -13,7 +13,7 @@
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     return deps.esc(value==null?'':String(value));
   }
-  // K2F-37 (a11y): karışık metinde Arapça parçalar kendi dilini/yönünü taşır (bidi, ekran okuyucu).
+  // K2F-37: karışık metinde Arapça parçalar kendi dilini/yönünü taşır.
   function escapeMixed(value){
     return escapeText(value).replace(/[\u0600-\u06FF]+(?:[ \u00a0]+[\u0600-\u06FF]+)*/g,'<span lang="ar" dir="rtl">$&</span>');
   }
@@ -40,7 +40,7 @@
     var title=escapeText(options.title),isRoot=options.view==='home'||options.view==='onboard'||options.view==='session',action=isRoot?'App.kaoClose()':'App.kaoBack()',label=isRoot?'Kapat':'‹ '+escapeText(options.previousTitle||"Kur'an Arapçası");
     return '<nav class="kao-navbar" aria-label="'+title+'"><button type="button" class="kao-navbar-action" onclick="'+action+'" aria-label="'+label+'">'+label+'</button><span class="kao-navbar-title" title="'+title+'">'+title+'</span><span class="kao-navbar-spacer" aria-hidden="true"></span></nav>';
   }
-  // K2F-28 (K4-03): odak çubuğu — ≥44 px ✕ tek kontroldür; ilerleme çubuğu içeriğin kendi parçasıdır.
+  // K2F-28: odak çubuğu — ≥44 px ✕ tek kontroldür; ilerleme çubuğu içeriğin kendi parçasıdır.
   function focusBar(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     var exit=actionCall(options&&options.exit),label=escapeText(options&&options.label||'Oturumdan çık');
@@ -55,7 +55,7 @@
   }
   function renderScreen(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
-    // K2F-28: odak modu — oturumda NavBar/LargeTitle yok; üstte yalnız ✕ (+ ders ekranında ince ilerleme çubuğu).
+    // K2F-28: odak modu — oturumda NavBar/LargeTitle yok; üstte yalnız ✕.
     if(options.view==='session') return /class="kao-focusbar"/.test(String(options.body||''))?options.body:'<section class="kao-screen kao-screen-session">'+focusBar({exit:options.exit,label:options.exitLabel})+options.body+'</section>';
     var extracted=extractLargeTitle(String(options.body||''));
     return '<section class="kao-screen kao-screen-'+escapeText(options.view)+'">'+navBar(options)+largeTitle(options.title,extracted.content)+extracted.html+'</section>';
@@ -101,7 +101,7 @@
     }).join('');
     return '<div class="kao-group-list">'+html+'</div>';
   }
-  // K2F-29: ayar grubu — başlık + yüzey (satırlar) + isteğe bağlı alt açıklama; satırlar hazır HTML'dir.
+  // K2F-29: ayar grubu — başlık + yüzey + isteğe bağlı alt açıklama; satırlar hazır HTML'dir.
   function settingsGroup(title,rowsHtml,footer){
     if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');
     return '<div class="kao-group-section"><h3 class="kao-group-title">'+escapeText(title)+'</h3><div class="kao-group-surface">'+(Array.isArray(rowsHtml)?rowsHtml.join(''):String(rowsHtml||''))+'</div>'+(footer?'<p class="kao-group-footer">'+escapeText(footer)+'</p>':'')+'</div>';
@@ -135,8 +135,9 @@
     });
     var body=words.map(function(line){
       return '<span class="kao-tezhip-line">'+line.map(function(word){
-        if(interactive) return '<button type="button" class="kao-tezhip-word is-'+word.state+'" aria-label="'+word.aria+'">'+word.ar+'</button>';
-        return '<span class="kao-tezhip-word is-'+word.state+'" aria-label="'+word.aria+'">'+word.ar+'</span>';
+        // K2F-35/a11y: her Arapça öğe kendi lang/dir'ini taşır (mirasa güvenilmez).
+        if(interactive) return '<button type="button" class="kao-tezhip-word is-'+word.state+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</button>';
+        return '<span class="kao-tezhip-word is-'+word.state+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</span>';
       }).join('')+'</span>';
     }).join('');
     return '<figure class="kao-tezhip">'+deps.icon('rumi',120,'kao-tezhip-orn')+'<figcaption class="kao-tezhip-title">'+escapeText(options.title||'')+'</figcaption>'
@@ -168,7 +169,7 @@
       var kind=action.kind==='primary'?'kao-feedback-continue':(action.kind==='link'?'kao-feedback-undo':'');
       return '<button type="button" class="kao-feedback-action'+(kind?' '+kind:'')+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(action.label)+'</button>';
     }).join('');
-    // body: dize ya da satır dizisi; satır = dize ya da {text, lang:'ar'} (Arapça satır RTL ve ayrı paragraf).
+    // body: dize ya da satır dizisi; satır = dize ya da {text, lang:'ar'}.
     var bodyItems=Array.isArray(options.body)?options.body:[options.body];
     var bodyHtml=bodyItems.map(function(item){
       if(item&&typeof item==='object') return '<p class="kao-feedback-body'+(item.lang==='ar'?' kao-feedback-ar':'')+'"'+(item.lang==='ar'?' lang="ar" dir="rtl"':'')+'>'+escapeText(item.text)+'</p>';
@@ -210,10 +211,45 @@
       (call?'<button type="button" class="kao-path-unit-open" onclick="'+call+'"><span>'+escapeText(options.openLabel||'Üniteyi aç')+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button>':'')+
       (moreCall?'<button type="button" class="kao-path-more" onclick="'+moreCall+'"><span>Tüm yolu gör</span><span class="kao-group-chevron" aria-hidden="true">›</span></button>':'')+'</div></section>';
   }
+  // K3P-12: Tezhip an kartı — yaldız figürün İÇİNDE; kartın TAMAMI tek eyleme bağlıdır.
+  // Ayrı birincil eylem kartın altında. foot: gece/karıştırma satırları.
+  function tezhipCard(options){
+    if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
+    options=options&&typeof options==='object'?options:{};
+    var tz=options.tezhip&&typeof options.tezhip==='object'?options.tezhip:{};
+    // Başlık/alt başlık nextStep'ten gelir (ör. "Hoş geldin"); foot gece/karıştırma uyarıları; ayrı birincil eylem kartın altında.
+    var foot=Array.isArray(options.foot)&&options.foot.length?'<div class="kao-hero-foot">'+options.foot.map(function(line){
+      line=line&&typeof line==='object'?line:{};
+      return '<p class="kao-hero-note"><span class="kao-hero-note-icon" aria-hidden="true">'+deps.icon(String(line.icon||''))+'</span><span>'+escapeText(line.text)+'</span></p>';
+    }).join('')+'</div>':'';
+    var secondaryCall=options.secondary&&typeof options.secondary==='object'?actionCall(options.secondary.action):'';
+    var secondary=secondaryCall?'<button type="button" class="kao-hero-secondary" onclick="'+secondaryCall+'">'+escapeText(options.secondary.label)+'</button>':'';
+    return '<section class="kao-today-hero kao-moment">'
+      +'<button type="button" class="kao-today-hero-link" aria-label="'+escapeText((options.title||'Bugün')+': '+(tz.title||''))+(options.action?'" onclick="'+actionCall(options.action)+'"':'" disabled')+'></button>'
+      +'<p class="kao-hero-eyebrow">'+escapeText(options.eyebrow||'')+'</p><h3 class="kao-today-title">'+escapeText(options.title||'')+'</h3>'+(options.subtitle?'<p class="kao-hero-sub">'+escapeText(options.subtitle)+'</p>':'')
+      +tezhipPage(tz)
+      +'<p class="kao-today-goal">'+escapeText(options.goal||'')+'</p>'+foot+'</section>'
+      +secondary+primaryButton(options.primary||{});
+  }
+  // K3P-12: haftalık hedef şeridi — 5/7 gün, cezasız; kapsam %N burada.
+  function weeklyBar(options){
+    if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
+    options=options&&typeof options==='object'?options:{};
+    var done=Math.max(0,Math.min(7,Math.floor(Number(options.done)||0))),total=Math.max(1,Math.floor(Number(options.total)||5));
+    var coverage=options.coverage===null||options.coverage===undefined?null:Math.round(Number(options.coverage));
+    var cover=coverage===null||!Number.isFinite(coverage)?'':'<span class="kao-today-week-coverage"> · Kur’an kapsamı %<span data-countup="'+coverage+'" data-countup-key="kao-coverage">'+coverage+'</span></span>';
+    return '<p class="kao-today-week" role="status" aria-label="'+escapeText('Bu hafta '+done+' / '+total+' gün')+'"><span class="kao-today-week-mark" aria-hidden="true">◔</span><span class="kao-today-week-text">Bu hafta <strong>'+done+' / '+total+'</strong> gün</span>'+cover+'</p>';
+  }
+  // K3P-12 (§3.1): Kütüphane — keşif tek alt sayfada; gruplar groupedList ile çizilir.
+  function libraryScreen(model){
+    if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
+    model=model&&typeof model==='object'?model:{};
+    return '<main class="kao-library-screen" aria-label="Kütüphane">'+groupedList(Array.isArray(model.groups)?model.groups:[])+'</main>';
+  }
   function todayScreen(model){
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
-    return '<main class="kao-today-screen" aria-label="Bugün">'+(model.notice?notice(model.notice):'')+heroCard(model.hero)+pathCard(model.path)+groupedList(model.lists)+'</main>';
+    return '<main class="kao-today-screen" aria-label="Bugün">'+(model.notice?notice(model.notice):'')+tezhipCard(model)+weeklyBar(model.weekly)+groupedList([{title:'Kısayollar',rows:Array.isArray(model.shortcuts)?model.shortcuts:[]}])+'</main>';
   }
 
   // KAO2-13 · S-03: yedi gerçek seviye; S0/S5 ayrı girişler, S6 bilgilendirici.
@@ -270,8 +306,8 @@
   }
 
   // KAO2-12 · Kaynakları motor seçer; bu katman yalnız güvenli metin ve App eylemi çizer.
-  // K2F-25 · tanış kartı katmanları: doğrulanmış örnek âyet ve kognat ("Türkçedeki akrabası").
-  // K3P-A8 (D-4/A-8) · edilgin ekran bütçesi: kartın İLK GÖRÜNÜMÜ ≤ 45 sözcük olmalı. Bu yüzden
+  // K2F-25 · tanış kartı katmanları: doğrulanmış örnek âyet ve kognat.
+  // K3P-A8 · edilgin ekran bütçesi: kartın İLK GÖRÜNÜMÜ ≤ 45 sözcük olmalı. Bu yüzden
   // örnek âyet, çapa metni ve "Neden böyle?" tek bir yerel <details><summary>Daha fazla</summary>…</details>
   // içine taşındı. İçerik metni değişmedi; yalnız sunum. Yeni bir handler eklenmedi.
   function moreBlock(inner){
@@ -352,13 +388,13 @@
     }
     var buttonLabel=escapeText(model.buttonLabel||'Devam');
     var secondaryCall=actionCall(model.secondaryAction),secondary=model.secondaryAction?'<button type="button" class="kao-lesson-audio kao-lesson-more"'+(secondaryCall?' onclick="'+secondaryCall+'"':' disabled')+'>'+escapeText(model.secondaryLabel||'5 dakika daha')+'</button>':'';
-    // K3P-A6 (D-2): 5 bölümlü ilerleme — etkin bölüm kendi içinde dolar; aria-valuetext "Bölüm n/5 · etiket · x/y".
+    // K3P-A6: 5 bölümlü ilerleme — etkin bölüm kendi içinde dolar; aria-valuetext "Bölüm n/5 · etiket · x/y".
     var segs=''; for(var si=1;si<=5;si+=1){ var filled=model.section?si<model.section:false, active=model.section===si; var w=active?String(Math.max(0,Math.min(100,Number(model.sectionPercent)||0)))+'%':(filled?'100%':'0%'); segs+='<span class="kao-lesson-seg'+(active?' is-active':'')+(filled?' is-filled':'')+'"><i style="width:'+w+'"></i></span>'; }
     var valueText=model.sectionValuetext?escapeText(model.sectionValuetext):'Bölüm '+escapeText(model.section||1)+'/5';
     return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" data-lesson-section="'+escapeText(model.section||1)+'" aria-label="Ders oynatıcı">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+escapeText(model.section||1)+'" aria-valuetext="'+valueText+'">'+segs+'</div>'+body+(model.actions?model.actions:'')+'<button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button>'+secondary+'</main>';
   }
 
-  // KAO2-11 · S-01 ilk açılış (05 §3) ve 05 §9 "Yeni düzen" notu. Eylemler yalnız actionCall ile üretilir.
+  // KAO2-11 · S-01 ilk açılış ve 05 §9 "Yeni düzen" notu. Eylemler yalnız actionCall ile üretilir.
   function linkButton(label,action,className){
     var call=actionCall(action);
     return '<button type="button" class="'+className+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(label)+'</button>';
@@ -470,7 +506,7 @@
       var call=actionCall(item.action);
       return '<li><button type="button" class="kao-grammar-lesson"'+(call?' onclick="'+call+'"':' disabled')+'><span>'+escapeText(item.title)+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
     }).join('');
-    // Somutlaştır → soyutla (Fyfe: "concreteness fading"): önce doğrulanmış âyet örnekleri, sonra tablo/not.
+    // Somutlaştır → soyutla: önce doğrulanmış âyet örnekleri, sonra tablo/not.
     var ayahs=(Array.isArray(model.examples)?model.examples:[]).map(function(item){
       item=item&&typeof item==='object'?item:{};
       var words=(Array.isArray(item.words)?item.words:[]).map(function(word){
@@ -570,5 +606,5 @@
     return '<main class="kao-s0" data-stage="'+escapeText(stage.kind)+'" aria-labelledby="kao-s0-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye 0 · şekil aileleri</p><h2 id="kao-s0-title">'+escapeText(model.title)+'</h2><p class="kao-s0-progress" aria-label="Aşama '+String(stage.index+1)+' / '+String(stage.count)+'">Aşama '+String(stage.index+1)+' / '+String(stage.count)+' · '+escapeText(stage.label)+'</p></div></div>'+body+button+'</main>';
   }
 
-  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,groupRow:groupRow,switchRow:switchRow,settingsGroup:settingsGroup,progressRing:progressRing,tezhipPage:tezhipPage,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
+  window.SeymaQuranLearnViews={version:1,register:register,navBar:navBar,largeTitle:largeTitle,renderScreen:renderScreen,focusBar:focusBar,groupedList:groupedList,groupRow:groupRow,switchRow:switchRow,settingsGroup:settingsGroup,progressRing:progressRing,tezhipPage:tezhipPage,tezhipCard:tezhipCard,weeklyBar:weeklyBar,libraryScreen:libraryScreen,choice:choice,feedbackSheet:feedbackSheet,primaryButton:primaryButton,heroCard:heroCard,pathCard:pathCard,todayScreen:todayScreen,pathScreen:pathScreen,unitScreen:unitScreen,hubCard:hubCard,notice:notice,onboardScreen:onboardScreen,lessonScreen:lessonScreen,grammarScreen:grammarScreen,grammarConceptScreen:grammarConceptScreen,s0Screen:s0Screen};
 })(window);

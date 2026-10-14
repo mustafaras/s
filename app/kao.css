@@ -107,6 +107,16 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 @media (forced-colors:active){.kao-group-surface,.kao-group-row,.kao-switch-track,.kao-choice,.kao-feedback-sheet,.kao-feedback-action,.kao-primary{border-color:CanvasText}.kao-group-row,.kao-switch-row,.kao-choice,.kao-feedback-sheet,.kao-feedback-action,.kao-primary{background:Canvas;color:CanvasText}.kao-group-separator{background:CanvasText}.kao-group-title,.kao-group-footer,.kao-group-value,.kao-group-chevron,.kao-feedback-body{color:CanvasText}.kao-group-row:focus-visible,.kao-switch-row:focus-visible,.kao-feedback-action:focus-visible,.kao-primary:focus-visible,.kao-dialog a:focus-visible{outline-color:Highlight}.kao-switch-row[aria-checked="true"] .kao-switch-track{background:Highlight}.kao-progress-ring-track{stroke:CanvasText}.kao-progress-ring-value{stroke:Highlight}}
 /* KAO2-09 · S-02 Bugün: HeroCard, Yolun kartı (06 §2); yalnız --kao-* tokenları. */
 .kao-today-screen{display:grid;gap:var(--kao-gap-3);min-width:0}
+/* K3P-12 (§3.1): Bugün = Tezhip an kartı (tamamı tek eylem) + hedef eğimi + tek birincil eylem + haftalık şerit + 3 kısayol. */
+.kao-today-hero{position:relative;box-sizing:border-box;width:100%;display:grid;gap:var(--kao-gap-1);padding:16px;border-radius:var(--kao-r-card);background:var(--kao-mat-ground);color:var(--kao-label);box-shadow:var(--kao-shadow-1)}
+.kao-today-hero-link{position:absolute;inset:0;z-index:1;border:0;background:transparent;cursor:pointer}
+.kao-today-hero:focus-within{outline:3px solid var(--kao-tint);outline-offset:3px}
+.kao-today-title{margin:0;color:var(--kao-label);font-size:var(--f-title3);font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+.kao-today-hero .kao-tezhip{padding:0;background:none;box-shadow:none}
+.kao-today-goal{margin:0;color:var(--kao-label);font-size:var(--f-callout);font-weight:600}
+.kao-today-week{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote)}
+.kao-today-week-text strong{color:var(--kao-label);font-variant-numeric:tabular-nums}
+.kao-library-screen{display:grid;gap:var(--kao-gap-3);min-width:0}
 .kao-hero-card{min-width:0;padding:16px;border-radius:var(--kao-r-card);background:var(--kao-mat-card);color:var(--kao-label);box-shadow:var(--kao-shadow-1)}
 .kao-hero-eyebrow{margin:0 0 4px;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
 .kao-hero-title{margin:0;color:var(--kao-label);font-size:var(--f-title3);font-weight:700;line-height:1.25;overflow-wrap:anywhere}

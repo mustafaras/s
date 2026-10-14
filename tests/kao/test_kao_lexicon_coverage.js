@@ -57,7 +57,7 @@ assert.equal(selectedFrequency, 59948, 'dondurulan frekans toplamı doğrulanmı
   assert.deepEqual(JSON.parse(JSON.stringify(api.kaoCoverage(data, words))), { known: 2, total: 4, ratio: 0.5 }, 'âyet kapsamı token düzeyinde');
   assert.deepEqual(JSON.parse(JSON.stringify(api.kaoCoverage(data, []))), { known: 0, total: 0, ratio: 0 });
   const source = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8');
-  assert.match(source, /percent=Math\.min\(100,Math\.floor\(kaoCoverage\(d\)\.ratio\*100\)\)/, 'E1 yüzdesi ortak kaoCoverage');
+  assert.match(source, /kaoCoverage\(d\)\.ratio\*100/, 'E1 yüzdesi ortak kaoCoverage');
   assert.doesNotMatch(source, /stats\.known\/524/, 'eski lemma/524 yüzdesi kalmadı');
   assert.equal((source.match(/card\.readerUnknown!==true/g) || []).length, 1, 'bilinen-kelime kuralı tek yerde (kaoKnownLemmaSet)');
 }

@@ -285,7 +285,7 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   assert.equal(pressedOn + switchOn, 9, 'K3P-15: yeni kullanıcıda otomatik geçiş varsayılanı açık → bir anahtar fazla');
   assert.ok(switchOn > 0 && !/class="kao-toggle" aria-pressed=/.test(settingsHtml), 'anahtarlar switch semantiğinde');
   assert.match(settingsHtml, /role="group" aria-label="Günlük yeni kelime"/);
-  assert.match(e7.kaoHomeHTML('2026-09-25T10:00:00'), /App\.kaoSetView\(&quot;settings&quot;\)/, 'S-02 Sen → Ayarlar satırı');
+  assert.match(e7.kaoLibraryHTML(), /App\.kaoSetView\(&quot;settings&quot;\)/, 'K3P-12 Kütüphane → Ayarlar satırı');
   assert.equal(e7.kaoReopenGate(), true); assert.equal(e7Ui.kaoView, 'gate', 'Seviye 0 tekrar açılır');
   assert.equal(q.gate.passed, false);
 

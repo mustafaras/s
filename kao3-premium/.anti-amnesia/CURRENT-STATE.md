@@ -8,8 +8,8 @@ Sıradaki prompt: K3P-13
 
 - **Tarih:** 2026-10-14
 - **Son tamamlanan:** **K3P-12 (Dalga 2 · Tezhip, ikinci kart) — Bugün ekranı yeniden.** Bugün artık Tezhip an kartı (kartın tamamı okuyucuyu açar) + hedef eğimi + tek birincil eylem + haftalık hedef şeridi + 3 kısayol; keşif **Kütüphane** alt sayfasında toplandı. Önce: K3P-11 (Tezhip bileşeni + model).
-- **Son yayın:** 2026-10-14, **on ikinci ara yayın `20261014a`** canlıda (kullanıcı açık onayı; Pages run **38521530117** success; canlı pin GET ile doğrulandı) — Dalga 1 hareket grameri + Tezhip bileşeni yayında.
-- **Dal:** `kao3-premium` = `main` = **`20261014a`**. Sıradaki kart K3P-12 (Bugün ekranı yeniden) → dalga sonu DEĞİL; `kapi-hizli --kart K3P-12` yeterli.
+- **Son yayın:** 2026-10-14, **on üçüncü ara yayın `20261014b`** canlıda (kullanıcı açık onayı; Pages run **38566365630** success; canlı pin GET ile doğrulandı) — Bugün ekranı (Tezhip an kartı + haftalık hedef + Kütüphane) yayında.
+- **Dal:** `kao3-premium` = `main` = **`20261014b`**. Sıradaki kart K3P-13 (Ders âyetle açılır/kapanır — K-G) → dalga sonu DEĞİL; `kapi-hizli --kart K3P-13` yeterli.
 - **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`.
 - **Kanıt düzeyi:** kaynak/headless · görsel QA **yok** (bu kartta ekran görüntüsü istenmedi) · cihaz yok.
 

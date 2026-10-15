@@ -13,7 +13,7 @@
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     return deps.esc(value==null?'':String(value));
   }
-  // K2F-37: karışık metinde Arapça parçalar kendi dilini/yönünü taşır.
+  // K2F-37: Arapça lang/dir.
   function escapeMixed(value){
     return escapeText(value).replace(/[\u0600-\u06FF]+(?:[ \u00a0]+[\u0600-\u06FF]+)*/g,'<span lang="ar" dir="rtl">$&</span>');
   }
@@ -40,7 +40,7 @@
     var title=escapeText(options.title),isRoot=options.view==='home'||options.view==='onboard'||options.view==='session',action=isRoot?'App.kaoClose()':'App.kaoBack()',label=isRoot?'Kapat':'‹ '+escapeText(options.previousTitle||"Kur'an Arapçası");
     return '<nav class="kao-navbar" aria-label="'+title+'"><button type="button" class="kao-navbar-action" onclick="'+action+'" aria-label="'+label+'">'+label+'</button><span class="kao-navbar-title" title="'+title+'">'+title+'</span><span class="kao-navbar-spacer" aria-hidden="true"></span></nav>';
   }
-  // K2F-28: odak çubuğu — ≥44 px ✕ tek kontroldür; ilerleme çubuğu içeriğin kendi parçasıdır.
+  // K2F-28: odakta tek kontrol ≥44 px ✕.
   function focusBar(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     var exit=actionCall(options&&options.exit),label=escapeText(options&&options.label||'Oturumdan çık');
@@ -49,13 +49,13 @@
   function largeTitle(title,content){
     var heading=content||'';
     if(!/<h2\b/i.test(heading)) heading='<h2 class="kao-largetitle-heading">'+escapeText(title)+'</h2>'+heading;
-    // K2F-27: diyalog adı bu başlıktan gelir; kimliği olmayan başlığa tek kimlik verilir.
+    // K2F-27: diyalog başlık kimliği.
     heading=heading.replace(/<h2\b(?![^>]*\sid=)/,'<h2 id="kao-title"');
     return '<div class="kao-largetitle">'+heading+'</div>';
   }
   function renderScreen(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
-    // K2F-28: odak modu — oturumda NavBar/LargeTitle yok; üstte yalnız ✕.
+    // K2F-28: odakta NavBar yok.
     if(options.view==='session') return /class="kao-focusbar"/.test(String(options.body||''))?options.body:'<section class="kao-screen kao-screen-session">'+focusBar({exit:options.exit,label:options.exitLabel})+options.body+'</section>';
     var extracted=extractLargeTitle(String(options.body||''));
     return '<section class="kao-screen kao-screen-'+escapeText(options.view)+'">'+navBar(options)+largeTitle(options.title,extracted.content)+extracted.html+'</section>';
@@ -101,7 +101,7 @@
     }).join('');
     return '<div class="kao-group-list">'+html+'</div>';
   }
-  // K2F-29: ayar grubu — başlık + yüzey + isteğe bağlı alt açıklama; satırlar hazır HTML'dir.
+  // K2F-29: ayar grubu.
   function settingsGroup(title,rowsHtml,footer){
     if(!deps) throw new Error('KAO2-05: görünüm bağımlılıkları kayıtlı değil');
     return '<div class="kao-group-section"><h3 class="kao-group-title">'+escapeText(title)+'</h3><div class="kao-group-surface">'+(Array.isArray(rowsHtml)?rowsHtml.join(''):String(rowsHtml||''))+'</div>'+(footer?'<p class="kao-group-footer">'+escapeText(footer)+'</p>':'')+'</div>';
@@ -120,7 +120,7 @@
     var circumference=169.65,offset=(circumference*(100-value)/100).toFixed(2);
     return '<span class="kao-progress-ring" role="img" aria-label="'+escapeText(label)+': %'+value+'"><svg class="kao-progress-ring-svg kao-progress-ring-'+dimension+'" width="'+dimension+'" height="'+dimension+'" viewBox="0 0 64 64" aria-hidden="true"><circle class="kao-progress-ring-track" cx="32" cy="32" r="27" fill="none" stroke-width="4"></circle><circle class="kao-progress-ring-value" cx="32" cy="32" r="27" fill="none" stroke-width="4" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 32 32)"></circle></svg><span class="kao-progress-ring-text" aria-hidden="true">%'+value+'</span></span>';
   }
-  // K3P-11: Tezhip sayfası — bilinen kelime altın; öğreniliyor ◌ yarım; yeni mürekkep. Kenarlık rumî SVG.
+  // K3P-11: bilinen altın, öğreniliyor yarım, yeni mürekkep; rumî SVG.
   function tezhipPage(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
@@ -136,8 +136,8 @@
     });
     var body=words.map(function(line){
       return '<span class="kao-tezhip-line">'+line.map(function(word){
-        // K3P-13: yaldızlanan kelime `is-gild` sınıfını alır.
-        // K2F-35/a11y: her Arapça öğe kendi lang/dir'ini taşır.
+        // K3P-13: is-gild.
+        // K2F-35/a11y: Arapça lang/dir.
         var cls='kao-tezhip-word is-'+word.state+(word.on?' is-gild':'');
         if(interactive) return '<button type="button" class="'+cls+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</button>';
         return '<span class="'+cls+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</span>';
@@ -154,7 +154,6 @@
     var mark=state==='correct'?'✓':state==='wrong'?'✕':'';
     var screenText=state==='correct'?'Doğru cevap':state==='wrong'?'Senin seçimin':'';
     if(options.button===true){
-      // Görev şıkkı: gerçek düğme; sınıf = durum + ek sınıflar, etiket `labelHtml` ya da kaçırılmış `label`.
       var classes=(state==='idle'?[]:['kao-choice-'+state]).concat(Array.isArray(options.extraClasses)?options.extraClasses:[]);
       var aria=options.arabic===true?' data-kao-ar aria-label="'+escapeText(options.label+', okunuşu '+options.pronunciation+(screenText?', '+screenText:''))+'"':'';
       return '<button type="button"'+(classes.length?' class="'+classes.join(' ')+'"':'')+(options.pressed===true||options.pressed===false?' aria-pressed="'+String(options.pressed)+'"':'')+(options.disabled===true?' disabled':'')+aria+(options.onclick?' onclick="'+options.onclick+'"':'')+'>'+(mark?'<span class="kao-choice-mark" aria-hidden="true">'+mark+'</span><span class="kao-sr-only">'+screenText+'</span>':'')+(options.labelHtml!=null?options.labelHtml:escapeText(options.label))+'</button>';
@@ -172,7 +171,6 @@
       var kind=action.kind==='primary'?'kao-feedback-continue':(action.kind==='link'?'kao-feedback-undo':'');
       return '<button type="button" class="kao-feedback-action'+(kind?' '+kind:'')+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(action.label)+'</button>';
     }).join('');
-    // body: dize ya da satır dizisi; satır = dize ya da {text, lang:'ar'}.
     var bodyItems=Array.isArray(options.body)?options.body:[options.body];
     var bodyHtml=bodyItems.map(function(item){
       if(item&&typeof item==='object') return '<p class="kao-feedback-body'+(item.lang==='ar'?' kao-feedback-ar':'')+'"'+(item.lang==='ar'?' lang="ar" dir="rtl"':'')+'>'+escapeText(item.text)+'</p>';
@@ -187,7 +185,7 @@
     return '<button type="button" class="kao-primary" aria-label="'+label+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+label+'</button>';
   }
 
-  // KAO2-09 · S-02 Bugün: HeroCard + Yolun kartı + iki grouped list.
+  // KAO2-09: Bugün.
   function heroCard(options){
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
@@ -210,17 +208,15 @@
     return '<section class="kao-path-card" aria-labelledby="kao-path-title"><h3 class="kao-section-title" id="kao-path-title">Yolun</h3><div class="kao-path-surface"><p class="kao-path-level">'+escapeText(options.level)+'</p>'+
       '<div class="kao-path-bar" role="progressbar" aria-label="Ünite ilerlemesi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><span class="kao-path-fill"'+(pct>0?' style="width:'+pct+'%"':'')+'></span></div>'+
       '<p class="kao-path-unit">'+escapeText(options.unit)+'</p>'+meta+
-      // KAO2-18 (Y-01): birincil eylem içinde bulunulan ÜNİTEyi açar; Yol listesi ikincil kalır.
+      // KAO2-18/Y-01: birincil = ünite; Yol ikincil.
       (call?'<button type="button" class="kao-path-unit-open" onclick="'+call+'"><span>'+escapeText(options.openLabel||'Üniteyi aç')+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button>':'')+
       (moreCall?'<button type="button" class="kao-path-more" onclick="'+moreCall+'"><span>Tüm yolu gör</span><span class="kao-group-chevron" aria-hidden="true">›</span></button>':'')+'</div></section>';
   }
-  // K3P-12: Tezhip an kartı — yaldız figürün İÇİNDE; kartın TAMAMI tek eyleme bağlıdır.
-  // Ayrı birincil eylem kartın altında. foot: gece/karıştırma satırları.
+  // K3P-12: yaldız figür içinde; tüm kart tek eylem.
   function tezhipCard(options){
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
     var tz=options.tezhip&&typeof options.tezhip==='object'?options.tezhip:{};
-    // Başlık/alt başlık nextStep'ten gelir; foot gece/karıştırma uyarıları; ayrı birincil eylem kartın altında.
     var foot=Array.isArray(options.foot)&&options.foot.length?'<div class="kao-hero-foot">'+options.foot.map(function(line){
       line=line&&typeof line==='object'?line:{};
       return '<p class="kao-hero-note"><span class="kao-hero-note-icon" aria-hidden="true">'+deps.icon(String(line.icon||''))+'</span><span>'+escapeText(line.text)+'</span></p>';
@@ -234,7 +230,7 @@
       +'<p class="kao-today-goal">'+escapeText(options.goal||'')+'</p>'+foot+'</section>'
       +secondary+primaryButton(options.primary||{});
   }
-  // K3P-12: haftalık hedef şeridi — 5/7 gün, cezasız; kapsam %N burada.
+  // K3P-12: cezasız haftalık hedef ve kapsam.
   function weeklyBar(options){
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
@@ -243,7 +239,7 @@
     var cover=coverage===null||!Number.isFinite(coverage)?'':'<span class="kao-today-week-coverage"> · Kur’an kapsamı %<span data-countup="'+coverage+'" data-countup-key="kao-coverage">'+coverage+'</span></span>';
     return '<p class="kao-today-week" role="status" aria-label="'+escapeText('Bu hafta '+done+' / '+total+' gün')+'"><span class="kao-today-week-mark" aria-hidden="true">◔</span><span class="kao-today-week-text">Bu hafta <strong>'+done+' / '+total+'</strong> gün</span>'+cover+'</p>';
   }
-  // K3P-12: Kütüphane — keşif tek alt sayfada; gruplar groupedList ile çizilir.
+  // K3P-12: Kütüphane.
   function libraryScreen(model){
     if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
@@ -255,7 +251,7 @@
     return '<main class="kao-today-screen" aria-label="Bugün">'+(model.notice?notice(model.notice):'')+tezhipCard(model)+weeklyBar(model.weekly)+groupedList([{title:'Kısayollar',rows:Array.isArray(model.shortcuts)?model.shortcuts:[]}])+'</main>';
   }
 
-  // KAO2-13 · S-03: yedi gerçek seviye; S0/S5 ayrı girişler, S6 bilgilendirici.
+  // KAO2-13/S-03: S0/S5 giriş, S6 bilgi.
   function pathScreen(model){
     if(!deps) throw new Error('KAO2-13: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
@@ -280,7 +276,7 @@
     return '<main class="kao-path-screen" aria-label="Öğrenme yolu"><div class="kao-view-head"><div><p class="kao-eyebrow">Yolun</p><h2 class="kao-largetitle-heading" id="kao-path-title">Öğrenme yolu</h2><p class="kao-path-intro">Önerilen üniteyi izle ya da istediğin durağı aç.</p></div></div><div class="kao-path-levels">'+levels+'</div></main>';
   }
 
-  // KAO2-13 · S-04: ders listesi durumları salt okunur; tek belirgin eylem sıradaki derstir.
+  // KAO2-13/S-04: tek eylem sıradaki ders.
   function unitScreen(model){
     if(!deps) throw new Error('KAO2-13: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
@@ -288,7 +284,7 @@
     var lessons=(Array.isArray(model.lessons)?model.lessons:[]).map(function(lesson){
       lesson=lesson&&typeof lesson==='object'?lesson:{};
       var status=lesson.done===true?'done':(lesson.current===true?'current':'upcoming'),mark=status==='done'?'✓':(status==='current'?'●':'○');
-      // KAO2-18: dersin hedef cümlesi listede görünür.
+      // KAO2-18: ders hedefi.
       var goal=lesson.goal?'<span class="kao-unit-step-goal">'+escapeText(lesson.goal)+'</span>':'';
       return '<li class="kao-unit-step kao-unit-step-'+status+'"'+(lesson.current===true?' aria-current="step"':'')+'><span class="kao-unit-step-mark" aria-hidden="true">'+mark+'</span><span class="kao-unit-step-body"><span class="kao-unit-step-title">'+escapeText(lesson.title)+'</span>'+goal+'</span><span class="kao-sr-only">'+escapeText(status==='done'?'Tamamlandı':(status==='current'?'Sıradaki ders':'Sırada'))+'</span></li>';
     }).join('');
@@ -308,11 +304,9 @@
     return '<main class="kao-unit-screen" aria-labelledby="kao-unit-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Seviye '+escapeText(model.level)+' · '+escapeText(model.levelTitle)+'</p><h2 class="kao-largetitle-heading" id="kao-unit-title">'+escapeText(model.title)+'</h2><p class="kao-unit-promise"><span>Bitirince</span> '+escapeText(model.promise)+'</p></div></div><section class="kao-unit-progress" aria-label="Ünite ilerlemesi"><span>'+ring+'</span><p>'+escapeText(model.wordsKnown)+' / '+escapeText(model.wordsTotal)+' kalıcı kelime · '+escapeText(model.lessonsDone)+' / '+escapeText(model.lessonsTotal)+' ders</p></section>'+primary+completion+'<section class="kao-unit-section" aria-labelledby="kao-unit-steps-title"><h3 id="kao-unit-steps-title">Dersler</h3><ol class="kao-unit-steps">'+lessons+'</ol></section>'+masterySection+'<section class="kao-unit-section" aria-labelledby="kao-unit-concepts-title"><h3 id="kao-unit-concepts-title">Kavramlar</h3><ul class="kao-unit-concepts">'+concepts+'</ul></section><details class="kao-unit-words"><summary><span>Kelimeler · '+escapeText(wordList.length)+'</span><span aria-hidden="true">›</span></summary><ol class="kao-unit-word-list">'+words+'</ol></details><p class="kao-unit-anchor"><span>Çapa metin</span> · '+escapeText(model.anchor)+'</p></main>';
   }
 
-  // KAO2-12 · Kaynakları motor seçer; bu katman yalnız güvenli metin ve App eylemi çizer.
-  // K2F-25 · tanış kartı katmanları: doğrulanmış örnek âyet ve kognat.
-  // K3P-A8 · edilgin ekran bütçesi: kartın İLK GÖRÜNÜMÜ ≤ 45 sözcük olmalı. Bu yüzden
-  // örnek âyet, çapa metni ve "Neden böyle?" tek bir yerel <details><summary>Daha fazla</summary>…</details>
-  // içine taşındı. İçerik metni değişmedi; yalnız sunum. Yeni bir handler eklenmedi.
+  // KAO2-12: kaynak seçimi motorda.
+  // K2F-25: doğrulanmış âyet ve kognat.
+  // K3P-A8: ilk görünüm ≤45 sözcük; ayrıntılar details içinde.
   function moreBlock(inner){
     return inner?'<details class="kao-lesson-more"><summary>Daha fazla</summary>'+inner+'</details>':'';
   }
@@ -334,7 +328,7 @@
     if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
     var title=escapeText(model.title),call=actionCall(model.action),body='';
-    // KAO2-18 (Y-02): kullanıcı hangi ünitenin kaçıncı dersinde olduğunu görmeli.
+    // KAO2-18/Y-02: ünite ve ders konumu.
     var ctx=model.context?'<p class="kao-lesson-context">'+escapeText(model.context)+'</p>':'';
     var top=focusBar({exit:model.exit,label:'Dersten çık'})+ctx;
     if(model.stage==='intro'){
@@ -355,8 +349,7 @@
         if(Array.isArray(cell)){ var reading=escapeText(cell[2]); return '<td><span class="kao-grammar-ar" lang="ar" dir="rtl">'+escapeText(cell[1]||cell[0]||'')+'</span>'+(reading?'<span class="kao-grammar-reading" lang="tr" dir="ltr">'+reading+'</span>':'')+'</td>'; }
         return '<td>'+escapeMixed(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell)+'</td>'; }).join('')+'</tr>';
       }).join('');
-      // K3P-A8: kavram ekranının ilk görünümü başlık + "Daha fazla" olur; tablo,
-      // terimler ve uzun kural cümlesi katlanır. Böylece ilk görünüm her kavramda ≤ 45 sözcük kalır.
+      // K3P-A8: kavram ayrıntıları katlı; ilk görünüm ≤45 sözcük.
       var detail=(model.plainTr?'<p>'+escapeText(model.plainTr)+'</p>':'')+(head||rowHtml?'<div class="kao-lesson-table-wrap"><table class="kao-lesson-table"><thead><tr>'+head+'</tr></thead><tbody>'+rowHtml+'</tbody></table></div>':'')+(model.termTr?'<p class="kao-lesson-term-note">Terimler: '+escapeText(model.termTr)+'</p>':'');
       body='<section class="kao-lesson-card kao-lesson-concept" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Kavram</p><h3 id="kao-lesson-title">'+title+'</h3>'+moreBlock(detail)+'</section>';
     }else if(model.stage==='apply'){
@@ -366,7 +359,7 @@
         var state=['new','known','open'].indexOf(word.state)>=0?word.state:'open';
         return '<li class="kao-lesson-apply-word kao-lesson-apply-'+state+'"><span lang="ar" dir="rtl">'+escapeText(word.ar)+'</span><span>'+escapeText(word.tr)+'</span></li>';
       }).join('');
-      // K3P-13: aynı satır Tezhip olarak çizilir; "Yaldızla" düğmesi kelimeleri sırayla yaldızlar.
+      // K3P-13: aynı Tezhip satırı, sıralı yaldız.
       var lead=model.hasRow?'Yaldızla’ya dokun; kelimeler çapa metninde sırayla yaldızlanır.':'';
       var play=model.hasRow?'<button type="button" class="kao-lesson-audio kao-play-start"'+(model.playCall?' onclick="'+model.playCall+'"':' disabled')+'>'+deps.icon('headphones',17)+' Yaldızla</button>':'';
       body='<section class="kao-lesson-card kao-lesson-apply" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Çapa metni</p><h3 id="kao-lesson-title">'+title+'</h3>'+(lead?'<p>'+escapeText(lead)+'</p>':'')+row+play+'<ol class="kao-lesson-apply-list">'+words+'</ol></section>';
@@ -378,11 +371,14 @@
       var accuracy=model.accuracy!==null&&Number.isFinite(Number(model.accuracy))?'<p class="kao-lesson-summary-accuracy"><strong>%'+escapeText(model.accuracy)+'</strong> doğruluk · '+escapeText(model.accuracyDetail)+'</p>':'<p class="kao-lesson-summary-accuracy">'+escapeText(model.accuracyDetail||'Pekiştirme yanıtı kaydı yok')+'</p>';
       var more=Number(model.learnedMore)>0?'<p class="kao-lesson-summary-more">ve '+escapeText(model.learnedMore)+' daha</p>':'';
       var words=learned?'<ol class="kao-lesson-apply-list">'+learned+'</ol>'+more:'<p class="kao-lesson-summary-empty">Bu oturumda yeni kelime tanıtılmadı.</p>';
+      var gilded=Array.isArray(model.gildedWords)?model.gildedWords:[];
+      var strip=gilded.length?tezhipPage({title:'İlk kez yaldızlananlar',lines:[gilded],gild:gilded.length}):'';
+      var gain=Number(model.coverageGain),coverage=Number.isFinite(gain)&&gain>=0?'<p class="kao-lesson-summary-coverage">Kur’an kapsamı +%<span data-countup="'+gain+'">'+gain.toFixed(2)+'</span> · iki yönde kalıcı kelimeler</p>':'';
       var durable=model.durable?'<p class="kao-lesson-summary-durable">'+escapeText(model.durable)+'</p>':'';
       var milestone=model.milestone?'<p class="kao-lesson-cognate">Bir kilometre taşını tamamladın: '+escapeText(model.milestone)+'.</p>':'';
       var next=model.nextStep&&typeof model.nextStep==='object'?model.nextStep:null;
       var nextHtml=next?'<section class="kao-lesson-anchor kao-lesson-summary-next" aria-labelledby="kao-lesson-summary-next-title"><h4 id="kao-lesson-summary-next-title">Sıradaki adım</h4><p>'+escapeText(next.title)+'</p><p>'+escapeText(next.subtitle)+'</p></section>':'';
-      body='<section class="kao-lesson-card kao-lesson-summary kao-moment" aria-labelledby="kao-lesson-title" aria-live="polite">'+ORN+'<p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
+      body='<section class="kao-lesson-card kao-lesson-summary kao-moment" aria-labelledby="kao-lesson-title" aria-live="polite">'+ORN+'<p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+strip+coverage+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
     }else{
       var goalLine=model.goal?'<p class="kao-lesson-goal-line">'+escapeText(model.goal)+'</p>':'';
       var row=model.rowHtml?'<div class="kao-lesson-apply-tezhip">'+model.rowHtml+'</div>':'';
@@ -390,13 +386,13 @@
     }
     var buttonLabel=escapeText(model.buttonLabel||'Devam');
     var secondaryCall=actionCall(model.secondaryAction),secondary=model.secondaryAction?'<button type="button" class="kao-lesson-audio kao-lesson-more"'+(secondaryCall?' onclick="'+secondaryCall+'"':' disabled')+'>'+escapeText(model.secondaryLabel||'5 dakika daha')+'</button>':'';
-    // K3P-A6: 5 bölümlü ilerleme — etkin bölüm kendi içinde dolar; aria-valuetext "Bölüm n/5 · etiket · x/y".
+    // K3P-A6: beş bölümlü ilerleme.
     var segs=''; for(var si=1;si<=5;si+=1){ var filled=model.section?si<model.section:false, active=model.section===si; var w=active?String(Math.max(0,Math.min(100,Number(model.sectionPercent)||0)))+'%':(filled?'100%':'0%'); segs+='<span class="kao-lesson-seg'+(active?' is-active':'')+(filled?' is-filled':'')+'"><i style="width:'+w+'"></i></span>'; }
     var valueText=model.sectionValuetext?escapeText(model.sectionValuetext):'Bölüm '+escapeText(model.section||1)+'/5';
     return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" data-lesson-section="'+escapeText(model.section||1)+'" aria-label="Ders oynatıcı">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+escapeText(model.section||1)+'" aria-valuetext="'+valueText+'">'+segs+'</div>'+body+(model.actions?model.actions:'')+'<button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button>'+secondary+'</main>';
   }
 
-  // KAO2-11 · S-01 ilk açılış ve 05 §9 "Yeni düzen" notu. Eylemler yalnız actionCall ile üretilir.
+  // KAO2-11/S-01, 05§9: ilk açılış; actionCall.
   function linkButton(label,action,className){
     var call=actionCall(action);
     return '<button type="button" class="'+className+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+escapeText(label)+'</button>';
@@ -452,8 +448,7 @@
     return '<main class="kao-onboard" aria-labelledby="kao-onboard-title"><div class="kao-view-head">'+bar+'<h2 class="kao-largetitle-heading" id="kao-onboard-title">'+escapeText(model.title)+'</h2>'+(model.lead?'<p class="kao-onboard-lead">'+escapeText(model.lead)+'</p>':'')+'</div>'+body+(model.primary?primaryButton(model.primary):'')+'</main>';
   }
 
-  // KAO2-10 · 06 §5 hub kartı iç yüzü: tek bilgi + gerçek ünite halkası + eylem kapsülü.
-  // Dış düğme motor tarafında kalır; burada etkileşimli öğe ya da tıklama niteliği üretilmez.
+  // KAO2-10/06§5: hub iç yüzü; dış düğme motorda.
   function hubCard(options){
     if(!deps) throw new Error('KAO2-10: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
@@ -462,8 +457,7 @@
       '<span class="kao-hub-cta">'+escapeText(options.action)+' <span aria-hidden="true">›</span></span>';
   }
 
-  // KAO2-15 · S-10: 25 kavramlık kütüphane. Liste ünite sırasıyla; kavram sayfası
-  // günlük Türkçe önce, terim ve tablo isteğe bağlı ayrıntı olarak gelir.
+  // KAO2-15/S-10: kavramlar ünite sırasında; ayrıntılar katlı.
   function grammarTable(table){
     table=table&&typeof table==='object'?table:{};
     var columns=Array.isArray(table.columns)?table.columns:[],rows=Array.isArray(table.rows)?table.rows:[];
@@ -508,7 +502,6 @@
       var call=actionCall(item.action);
       return '<li><button type="button" class="kao-grammar-lesson"'+(call?' onclick="'+call+'"':' disabled')+'><span>'+escapeText(item.title)+'</span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
     }).join('');
-    // Somutlaştır → soyutla: önce doğrulanmış âyet örnekleri, sonra tablo/not.
     var ayahs=(Array.isArray(model.examples)?model.examples:[]).map(function(item){
       item=item&&typeof item==='object'?item:{};
       var words=(Array.isArray(item.words)?item.words:[]).map(function(word){
@@ -523,8 +516,7 @@
     return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p>'+worked+'</div></div>'+ayahSection+examples+notesSection+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
   }
 
-  // K2F-14 · Seviye 0: aşamaya göre FARKLI HTML; motor yalnız model üretir;
-  // aşama başına en fazla bir `.kao-primary`; alıştırma bitmeden birincil düğme pasif; geri bildirim aria-live.
+  // K2F-14: S0 aşamaları ayrı; tek primary, bitişe kadar pasif, aria-live.
   function s0Arabic(text,className){ return '<span'+(className?' class="'+className+'"':'')+' lang="ar" dir="rtl">'+escapeText(text)+'</span>'; }
   function s0MarkList(marks){
     return marks.length?'<ul class="kao-s0-marks">'+marks.map(function(m){ return '<li>'+s0Arabic(m.glyph,'kao-s0-glyph')+'<span>'+escapeText(m.tr)+'</span></li>'; }).join('')+'</ul>':'';

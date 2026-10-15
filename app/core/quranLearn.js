@@ -1874,12 +1874,22 @@
   function kaoKick(node,cls){ if(!node||!node.classList) return false; node.classList.remove(cls); void node.offsetWidth; node.classList.add(cls); if(node.addEventListener&&node.removeEventListener) node.addEventListener('animationend',function off(){ node.classList.remove(cls); node.removeEventListener('animationend',off); }); return true; }
   // 04 §4 FX: premium katman kendi kapılarıyla çağrılır; konfeti yalnız SeyFx.shouldAnimate.
   // D-6 hata dostu: "wrong" yalnız seçilen şıkta sarsıntı + error titreşimi; ses/kırmızı/ceza yok.
-  function kaoFx(kind,node){ var w=window; try{ if(kind==='enter'){ if(w.SeyFx&&typeof w.SeyFx.enter==='function') w.SeyFx.enter(node); return; } if(kind==='wrong'){ if(kaoAnimate()) kaoKick(node,'kao-shake'); if(w.SeyHaptics&&typeof w.SeyHaptics.error==='function') w.SeyHaptics.error(); return; } var tone=kind==='milestone'?'success':'tap'; if(w.SeyHaptics&&typeof w.SeyHaptics[tone]==='function') w.SeyHaptics[tone](); if(w.SeyAudio&&typeof w.SeyAudio[tone]==='function') w.SeyAudio[tone](); if(kind==='milestone'&&w.SeyFx&&typeof w.SeyFx.shouldAnimate==='function'&&w.SeyFx.shouldAnimate()&&w.SeymaHelpers&&typeof w.SeymaHelpers.confetti==='function') w.SeymaHelpers.confetti(); }catch(e){} }
+  function kaoFx(kind,node){ var w=window; try{ if(kind==='enter'){ if(w.SeyFx&&typeof w.SeyFx.enter==='function') w.SeyFx.enter(node); return; } if(kind==='wrong'){ if(kaoAnimate()) kaoKick(node,'kao-shake'); if(w.SeyHaptics&&typeof w.SeyHaptics.error==='function') w.SeyHaptics.error(); return; } var tone=kind==='milestone'?'success':'tap'; if(w.SeyHaptics&&typeof w.SeyHaptics[tone]==='function') w.SeyHaptics[tone](); if(w.SeyAudio&&typeof w.SeyAudio[tone]==='function') w.SeyAudio[tone](); if(kind==='milestone') kaoConfetti(); }catch(e){} }
+  function kaoConfetti(){
+    var w=window;
+    if(!kaoAnimate()||!w.SeymaHelpers||typeof w.SeymaHelpers.confetti!=='function') return;
+    var style=w.getComputedStyle&&typeof document!=='undefined'?w.getComputedStyle(document.querySelector('.kao-dialog')||document.documentElement):null;
+    w.SeymaHelpers.confetti(['--quran','--quran2'].map(function(token,index){ return style&&style.getPropertyValue(token).trim()||['#1C3A5F','#C9A227'][index]; }));
+  }
   function kaoLessonMilestoneConfetti(ui){
     var state=ui&&ui.kaoLesson,earned=state&&Array.isArray(state.earnedMilestones)?state.earnedMilestones:[];
-    if(!state||!earned.length||state.milestoneCelebrated) return false;
+    if(!state||state.milestoneCelebrated) return false;
     state.milestoneCelebrated=true;
-    try{ if(window.SeyFx&&typeof window.SeyFx.shouldAnimate==='function'&&window.SeyFx.shouldAnimate()&&window.SeymaHelpers&&typeof window.SeymaHelpers.confetti==='function') window.SeymaHelpers.confetti(); }catch(e){}
+    try{
+      if(earned.length) kaoConfetti();
+      var counter=typeof document!=='undefined'&&document.querySelector('.kao-lesson-summary [data-countup]');
+      if(counter&&kaoAnimate()&&window.SeyFx&&typeof window.SeyFx.countUp==='function') window.SeyFx.countUp({el:counter,from:0,to:Number(counter.getAttribute('data-countup')),duration:800,formatter:function(value){ return value.toFixed(2); }});
+    }catch(e){}
     return true;
   }
   function kaoRememberLessonMilestones(ui,earned){
@@ -2044,9 +2054,9 @@
       if(current&&current.kind==='summary'&&state.kind==='repair') kaoRepairFinish(state);
     }
     kaoLessonResume(ui); ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoOrderDraft=[]; ui.kaoFeedback=''; ui.kaoAdvanceTimer=null; ui.kaoGildIndex=0; ui.kaoGildCount=0; ui.kaoGildTimer=null; kaoSave();
-    var activeItem=(state.plan||[])[state.at||0]; if(phase==='lesson'&&activeItem&&activeItem.kind==='summary') kaoLessonMilestoneConfetti(ui);
     kaoApplyView(ui,'session',null,ui.kaoView==='session'?'replace':'push');
     quranLearnDeps.render();
+    var activeItem=(state.plan||[])[state.at||0]; if(phase==='lesson'&&activeItem&&activeItem.kind==='summary') kaoLessonMilestoneConfetti(ui);
     if(phase==='practice'){
       if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.setTimer==='function') quranLearnSurfaceDeps.setTimer(startTaskPresentation,0); else startTaskPresentation();
     }else{
@@ -2078,7 +2088,7 @@
     var now=new Date(),reviews=startMode==='intro'?[]:kaoBuildQueue(d,now,{sessionId:quranLearnDeps.todayStr(),candidates:kaoCandidates(),dailyNew:0}).filter(function(item){ return !item.isNew; }).slice(0,20),plan=flow.lessonPlan({quranLearn:q},lesson.id,now,content,reviews);
     if(!Array.isArray(plan)||!plan.length) return false;
     plan=kaoLessonSafePlan(plan,d);
-    var record=kaoLessonRecord(q,lesson.id),resume=objectOr(record.resume,{}),state={lessonId:lesson.id,title:kaoSafeLessonTitle(lesson),plan:plan,at:0,phase:'lesson',correct:0,answered:0,done:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:record.startedAt||now.toISOString()};
+    var record=kaoLessonRecord(q,lesson.id),resume=objectOr(record.resume,{}),state={lessonId:lesson.id,title:kaoSafeLessonTitle(lesson),plan:plan,knownBefore:kaoKnownLemmaSet(d),coverageBefore:kaoCoverage(d).ratio,at:0,phase:'lesson',correct:0,answered:0,done:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:record.startedAt||now.toISOString()};
     var find=function(id){ return id?plan.findIndex(function(item){ return item.id===id; }):-1; },pendAt=resume.phase==='review'?-1:find(resume.itemId),nextAt=find(resume.lessonItemId);
     if(pendAt>=0&&plan[pendAt].group==='review'&&nextAt>=0){
       // Yarım kalan tekrar, sıradaki ders adımının hemen önüne alınır; öncesindeki tekrarlar vadeli kalır.
@@ -2260,6 +2270,10 @@
       var answered=Math.floor(nonNegativeNumber(state.answered,0)),correct=Math.min(answered,Math.floor(nonNegativeNumber(state.correct,0))),next=kaoLessonSummaryForecast(quranLearnDeps.data(),state,new Date());
       // B-05: "Ders tamamlandı" üst satırda; başlıkta yalnız ders adı.
       model.title=state.title; model.learnedWords=words.slice(0,10); model.learnedMore=Math.max(0,words.length-10);
+      var known=kaoKnownLemmaSet(quranLearnDeps.data());
+      model.gildedWords=lexicon.lemmas.filter(function(lemma){ return known[lemma.id]&&state.knownBefore&&!state.knownBefore[lemma.id]; }).map(function(lemma){ return {ar:lemma.ar,state:'known'}; });
+      var ratio=kaoCoverage(quranLearnDeps.data()).ratio;
+      model.coverageGain=Number((Math.max(0,ratio-nonNegativeNumber(state.coverageBefore,ratio))*100).toFixed(2));
       model.accuracy=answered?Math.round(correct/answered*100):null; model.accuracyDetail=answered?correct+' / '+answered+' görev':'Pekiştirme yanıtı kaydı yok';
       model.tomorrowCount=Math.floor(nonNegativeNumber(next&&next.counts&&next.counts.reviews,0)); model.tomorrowMinutes=Math.floor(nonNegativeNumber(next&&next.minutes,0));
       model.tomorrowText=model.tomorrowCount?model.tomorrowCount+' tekrar kartı · günlük plan ~'+model.tomorrowMinutes+' dk':(model.tomorrowMinutes?'Vadeli tekrar görünmüyor · günlük plan ~'+model.tomorrowMinutes+' dk':'Yarın için vadeli tekrar görünmüyor.');

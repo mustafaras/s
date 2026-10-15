@@ -713,3 +713,15 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA **yok** (istenmedi) · cihaz yok
 - Gözlem: (1) **Runtime tuzağı (§2, yine, iki tur):** JS (~+1,1 KiB) payı iki kez aştı; tavan yükseltilmedi — **yalnız satır-başı `//`** yorumlarda parantez içi/cümle dışı kısaltma yapıldı (70+ satır, ~4,3 KB ham; atıf kodları ve davranış korundu; kod yolu hiç değişmedi, `diff` ile doğrulandı). **Ders:** tek geçişli yorum sıkıştırma yetmedi; satır-başı kısıtı + ara ölçüm şart. (2) **`akis-olc` 2b araç sınırı:** hedef ekranını ≤45 sayıp 80/109'da kırmızı raporlar; gerçek kural **≤25 sözcük** (AKIS §3 ①, tam ekran bütçesi, K3P-A8 D-4 değil). Araç 2b güncellemesi kapsam dışı (ayrı kart olabilir). (3) **Eski örnek-cümle modeli:** K2F-23 "örnek cümle" uygula adımı K-G ile gerçek âyet satırına dönüştü; `sentences` alanını bekleyen 4 test (lesson_flow ×4, denetim R-08) güncellendi. (4) **Pencere kapsamı:** ders planı çapa metnine göre kurulmadığından 10 derste bir lemma çapada yok (gerekçeli istisna); 25 sözcük sınırı varsayılan dailyNew=5'te 95 örnek dersinin TAMAMINDA sağlanır (istisna yok).
 - Sıradaki: K3P-14
+
+## seq 45 · K3P-14 · KART (Dalga 2 kapanışı)
+- Tarih: 2026-10-15
+- Commit: (bu commit)
+- Yapılan: ders başında ui-only bilinen lemma/kapsam tabanı; özette yalnız yeni iki yönlü kalıcı kelimelerin Tezhip yaldızı ve gerçek kapsam farkı; render-sonrası 800 ms sayaç. KAO kilometre taşı konfetisi tema tokenlarından lacivert-altın, en çok 1,15 sn; 1,2 sn temizlik. Varsayılan yardımcı davranışı ve hareket azaltmada statik metin korundu. Yeni handler/schema/migration yok.
+- Dosyalar: app/core/{helpers,quranLearn,quranLearnViews}.js; tests/kao/test_k3p_lesson_moment.js + README; üç durum kaydı. Yayın istisnasıyla index.html, sw.js, panel-v2.html ve bunların 12 pin fixture'ı mekanik 20261014b→20261015a eşitlendi; pinDeferral.files boşaltıldı.
+- Ölçüler: runtime L6 127,282 / 128 KiB; L9 126,926; CSS L9 15,273 / 16; içerik 184,591 / 256; App.kao* 45; app.js 7799 satır değişmedi. KAO envanteri 72→73.
+- Kapı: tam kapı TÜM KAPILAR YEŞİL (KAO 73, app 78, panel 23, Panel-v2 27, quran 9; reminders/driver/zikr/kontrast/ölçü/plan/pin PASS). Perf p95 7,635 ms, steady 4,383 ms; yalnız göreli bant yavaş makine bayrağıyla atlandı. Son hızlı kapı tekrarı HIZLI KAPI YEŞİL; 61 pin bağlantısı taze, erteleme yok.
+- Gözlem: ilk son-tur hızlı kapıda components:195 şerit beklentisi aralıklı kırıldı; değişmeden tek başına PASS. Gerçek zamanlı ders geçmişi K3P-15 hızlı doğru kolunu seçebilir; kapsam dışı düzeltme yok. Tarihsel tekrar-uret 9/10, R-08 eski apply.words/sentences modeli; güncel denetim R-08 ve 109 ders âyet fixture'ı PASS. Tarihsel araç bilgi amaçlı, 10/10 iddiası yok.
+- Yayın yetkisi: kullanıcının açık commit/push/merge/deploy ve ara pin istisnası onayı; kapsam yalnız K3P-13+14. Yeni yayın zinciri henüz bekliyor; gerçek commit/PR/Pages/no-cache eşliği teslim mesajında. releaseApproval=NOT_APPROVED final program sınırı korunur.
+- Kanıt düzeyi: kaynak/headless; görsel QA ve cihaz kabulü yok. K3P-16 yürütülmedi.
+- Sıradaki: K3P-16

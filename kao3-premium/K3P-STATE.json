@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-14",
+  "nextPrompt": "K3P-16",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -336,7 +336,9 @@
     {
       "id": "K3P-14",
       "wave": 2,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-15",
+      "result": "Ders sonu anı: oturum başlangıcındaki bilinen lemma/kapsam tabanına göre yalnız yeni iki yönlü kalıcı kelimeler Tezhip'te yaldızlanır; gerçek kapsam farkı 800 ms sayaçla render sonrasında gösterilir. Kilometre taşında tema tokenlarından lacivert-altın konfeti ≤1,15 sn, temizlik 1,2 sn; varsayılan konfeti korunur. Hareket azaltmada statik. Yeni handler/schema/migration yok; 45 App.kao*. Yeni lesson_moment fixture, KAO envanteri 73. Kullanıcı K3P-13+14 ara yayınına ve 20261015a pin istisnasına açık onay verdi; final program releaseApproval değişmedi."
     },
     {
       "id": "K3P-16",
@@ -404,11 +406,6 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": [
-      "app/kao.css",
-      "app/core/quranLearn.js",
-      "app/core/quranLearnFlow.js",
-      "app/core/quranLearnViews.js"
-    ]
+    "files": []
   }
 }

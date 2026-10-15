@@ -1,71 +1,47 @@
 # K3P · CURRENT-STATE
 
-<!-- Bu dosya her prompt'un kapanışında BAŞTAN yazılır (BAGLAM-YONETIMI §3). Başlıkları silme; senkron.mjs okur. -->
-
-Sıradaki prompt: K3P-14
+Sıradaki prompt: K3P-16
 
 ## Son durum
 
-- **Tarih:** 2026-10-14
-- **Son tamamlanan:** **K3P-13 (Dalga 2 · Tezhip, üçüncü kart) — Ders âyetle açılır ve kapanır (K-G).** Her dersin **açılışı** (goal) ve **kapanışı** (apply) AYNI âyet satırını paylaşır; açılış o satırı Tezhip olarak (soluk altın/mürekkep) gösterir, kapanış aynı satırı sesle çalıp kelimeleri **sırayla yaldızlar**. Önceki: K3P-12 (Bugün ekranı), K3P-11 (Tezhip bileşeni).
-- **Son yayın:** 2026-10-14, **on üçüncü ara yayın `20261014b`** canlıda (kullanıcı açık onayı). K3P-13 için yayın YOK (kullanıcı onayı bekler).
-- **Dal:** `kao3-premium` = `main` = **`20261014b`**. Sıradaki kart K3P-14 (ders sonu anı) → dalga sonu DEĞİL; `kapi-hizli --kart K3P-14` yeterli.
-- **Yeni oturum:** genel başlatıcı `kao3-premium/STARTER.md`.
-- **Kanıt düzeyi:** kaynak/headless · görsel QA **yok** (bu kartta ekran görüntüsü istenmedi) · cihaz yok.
+- **Tarih:** 2026-10-15.
+- **Son tamamlanan:** K3P-14 — ders sonu anı; Dalga 2 kapandı. 25/37 kart tamamlandı; K3P-15 daha önce tamamlandığından sıradaki K3P-16'dır, bu oturumda açılmadı.
+- **Yayın yetkisi:** kullanıcı K3P-13 + K3P-14 için commit/push/merge/deploy ve ara pin istisnasını açıkça onayladı. Ortak pin **20261015a**; pin erteleme listesi boşaltıldı. Son doğrulanmış yayın 20261014b; yeni yayın zinciri henüz bekliyor. Gerçek commit/PR/Pages ve canlı bayt eşliği teslim mesajında doğrulanacak.
+- **Sınır:** bu onay K3P-27 final program yayın kabulü değildir; releaseApproval=NOT_APPROVED korunur. Veri deposuna yazma, cihaz kabulü veya K3P-16 yetkisi vermez.
+- **Kanıt:** kaynak/headless. Görsel QA ve cihaz kabulü yok. Yeni oturum başlatıcısı: kao3-premium/STARTER.md.
 
-## K3P-13 ne yaptı
+## K3P-14 ne yaptı
 
-- **Satır kuralı (`app/core/quranLearnFlow.js`).** `applyItems` (çapa kelimeleri) plan içinde **bir kez** hesaplanır; `goal.words === apply.words === apply.words` (tek referans). `goal`'a `lessonIds` (dersin kendi lemması) ve `newLemmaIds` eklendi. Çapa metni (namaz/sûre) varsa satır, hedef lemmaların çapa metnindeki **ilk-son geçişi arasındaki pencere**; yoksa yeni lemmaların doğrulanmış ilk örnek cümlelerindeki kelimeler. **Eski örnek-cümle modeli emekliye ayrıldı**: `applySentences` + `APPLY_SENTENCE_MAX` (Flow), `apply.mode==='examples'` + `apply.sentences` (Flow/runtime), `kao-lesson-sentences` görünüm dalı (Views) silindi.
-- **Görünüm (`app/core/quranLearnViews.js`).** Açılış (goal) ve kapanış (apply) ekranları satırı `<div class="kao-lesson-apply-tezhip">` içinde `views.tezhipPage` ile çizer. `tezhipPage`'e `gild` seçeneği eklendi: ilk n kelime `is-gild` sınıfını alır (yaldızlanma anı). Kapanışta **"Yaldızla"** düğmesi (`kao-play-start`).
-- **Motor (`app/core/quranLearn.js`).** `kaoAyahRow(words, lessonIds, newLemmaIds)` satır penceresini (önce çapa `words`, yoksa yeni/öncelikli lemmaların örnek cümleleri), `kaoRowHtml(row,gild)` Tezhip'i, `kaoGild`/`kaoGildStep` **⑤ zirve** oynatmasını üretir. Ses = satırdaki hedef lemmaların `w-<lemmaId>-measured` klipsi; kelimeler zamanlayıcıyla sırayla yaldızlanır, **toplam an ≤ 1,2 sn** (adım aralığı `1200/sözcük`). Hareket azaltmada (`SeyFx.shouldAnimate()===false`) yaldız **STATİK** (zamanlayıcı kurulmaz). **Yeni `App.kao*` YOK** — mevcut `kaoLesson('gild')` eylemi yeniden kullanıldı (45 sabit).
-- **CSS (`app/kao.css`).** `.kao-lesson-apply-tezhip` (yuva; iç tezhip çerçevesiz), `.kao-tezhip-word.is-gild` (yaldız anı = bilinen yaldızıyla aynı altın), `.kao-play-start`.
-- **Testler.** Yeni `tests/kao/test_k3p_lesson_ayah.js` (**5 kontrol**: 109 ders referans+satır ortaklığı, hedef lemmalar + ≤25 sözcük gerekçeli istisna listesi (yalnız küçülür), açılış/kapanış aynı Tezhip satırı, sırayla yaldız ≤1,2 sn, hareket azaltmada statik) → envanter **71 → 72**. `test_kao2_lesson_flow` (4 kontrol K-G'ye göre) ve `test_kao2_denetim` R-08 güncellendi (eski `sentences` modeli yerine satır ortaklığı).
+- Ders başında yalnız geçici ui içinde bilinen lemma kümesi ve Kur'an kapsamı tabanı alınır. Özette yalnız bu oturumda iki yönde kalıcı eşiğe ulaşan yeni kelimeler Tezhip satırında yaldızlanır; kısmi/yetim/eski kelimeler yeni kazanım sayılmaz.
+- Kapsam artışı gerçek kaoCoverage farkından yüzde puan olarak hesaplanır, negatif olamaz; 800 ms sayaç özet DOM'u render edildikten sonra çalışır. Artış yoksa sıfır gösterilir; ilk tanışmada sahte kalıcılık ödülü yoktur.
+- KAO kutlaması modalın --quran/--quran2 renklerinden lacivert-altın palet alır; yedek #1C3A5F/#C9A227. Konfeti yalnız kazanılmış kilometre taşında ve hareket izniyle bir kez; özel palet animasyonu ≤1,15 sn, temizlik 1,2 sn. Varsayılan yardımcı çağrısının eski beş renkli davranışı korunur.
+- Hareket azaltmada yaldız ve kapsam metni statik kalır. Yeni App.kao* handler, veri şeması, migration veya app.js değişikliği yoktur.
+- Yeni tests/kao/test_k3p_lesson_moment.js; envanter 72→73. Tema/yedek palet, varsayılan konfeti regresyonu, iki yönlü kalıcılık, kapsam farkı, tek seferlik kutlama ve render-sonrası sayaç test edilir.
 
 ## Ölçü panosu (taban → hedef)
 
-| Ölçü | Şimdi | Hedef |
+| Ölçü | Şimdi | Tavan/hedef |
 | --- | --- | --- |
-| Çift şıklı görev (yerleşik) | 0/1127 ✓ | 0 |
-| Okunuş hatası (vasl + idgâm) | 0 + 0 ✓ | 0 |
-| Ders başına dokunuş (varsayılan açık) | 39 ✓ | ≤ 40 |
-| Art arda edilgin ekran | 1 ✓ | ≤ 1 |
-| İlk yeni içeriğe dokunuş | 7 ✓ | ≤ 7 |
-| Oturum süresi | ≤ seçilen ✓ | ≤ seçilen |
-| Uyarlanır zorluk | 2 yanlıştan sonra şık ≤3 ✓ | kaygı ↓, sıkılma ↑ |
-| Bölümlü ilerleme | 5 bölüm ✓ | 5 bölüm |
-| Yeniden yüklemede devam ipucu | "Kaldığın yerden · Bölüm n/5" ✓ | var |
-| Ders başına overlay yeniden kurulumu | 0 ✓ | 0 |
-| Edilgin ekran ilk görünümü | goal ≤41* · tanış ≤33 · kavram ≤24 ✓ | ≤ 45 sözcük |
-| Tanıma görevi payı | %93 | ≤ %60 |
-| Bugün ekranı seçim sayısı | 5 ✓ | ≤ 5 (K3P-12) |
-| `App.kao*` sayısı | 45 ✓ | 45 |
-| Arapça 700 (sahte kalın) | 0 ✓ | 0 |
-| Şık dokunma hedefi | 56 px ✓ | ≥ 56 px |
-| Altın METİN kullanımı | 0 ✓ | 0 |
-| An kartı (kao-moment) kapsamı | hero + ders sonu + taş ✓ | 3 yer |
-| Tezhip bileşeni + model | ✓ (K3P-11) | §2 |
-| **Ders açılış/kapanış âyet satırı (K-G)** | **✓ 109/109 satır ortak** | K-G |
-| **Hedef lemmalar satırda** | **99/109 (10 gerekçeli istisna)** | hepsi istisnalı |
-| **Yeni `App.kao*` handler** | **0 (45'te sabit) ✓** | 0 |
-
-\* goal ilk görünümü 45 değil **25 sözcük** bütçesine tabi (AKIS §3 ①); ölçüm `akis-olc` sözcük sayımıyla.
+| Runtime gzip L6 (bağlayıcı) | 127,282 KiB | 128 KiB |
+| Runtime gzip L9 (perf aracı) | 126,926 KiB | 128 KiB |
+| CSS gzip L9 | 15,273 KiB | 16 KiB |
+| İçerik | 184,591 KiB | 256 KiB |
+| App.kao* | 45 | 45 |
+| app.js | 7799 satır, değişmedi | yeni çıkarım yok |
+| Konfeti / sayaç | ≤1,15 sn / 800 ms | ≤1,2 sn |
+| Tam kapı perf p95 / steady | 7,635 / 4,383 ms | mutlak tavanlar PASS |
+| KAO fixture envanteri | 73 | eşleşiyor |
 
 ## Açık riskler
 
-- **Çalışma zamanı bütçesi kıl payı:** **127,944 / 128 KiB (gzip level 6; L9 127,592)**. Bu kartta JS (~+1,1 KiB) payı aştı ve **iki kez** §2 gereği **en uzun yorumlarda parantez içi/cümle dışı kısaltma** yapıldı (70+ yorum satırı, ~4,3 KB ham; **atıf kodları, davranış ve cümle sonları korundu; kod yolu değişmedi**). **Pay ~0,05 KiB** → sonraki JS ekleyen kart önce aynı işi gören eski kodu silmeli ya da yorum kısaltmalı; yetmezse tavan kararı kullanıcıdan (§5). Yorum sıkıştırması **yalnız satır-başı `//`** yorumlarında ve `sed -n '<n>p'` ile ham doğrulanarak yapıldı (K3P-09/10 satır-birleşme tuzağı).
-- **CSS bütçesi:** 15,273 / **16 KiB** (pay ~0,7 KiB).
-- **Pin ertelemesi (K-P):** `pinDeferral.files` = `app/kao.css`, `app/core/quranLearn.js`, `app/core/quranLearnFlow.js`, `app/core/quranLearnViews.js` (K3P-27'de tek geçiş). Bu 4 dosya hiçbir ara kartta pinlenmez.
-- **`akis-olc` 2b uyarısı (araç sınırı, D-4 DEĞİL):** `akis-olc` 2b, hedef (goal) ekranının ilk görünümünü ≤45 sayar ve 109 dersin 80'inde >45 raporlar. Gerçek ölçü **AKIS §3 ①: ≤25 sözcük** (hedef ekranı edilgin ekran değil, tam ekran bütçesidir; K3P-A8 D-4 `<details>` değil). `test_k3p_lesson_ayah` doğru kuralı (≤25) doğrular. Araçtaki bu eski 2b kuralı ayrı bir kartta düzeltilebilir (kapsam dışı).
-- **Tezhip görsel kabulü cihazda:** açılış/kapanış satırı ve yaldız hareketi headless doğrulandı; **yaldızın gerçek gözle onayı** (açık temada altın zemin+çizgi, koyu temada altın metin, `forced-colors`) K3P-26/27'de.
-- **Kapı kararı K-Q:** Bu kart dalga sonu **değil**; `kapi-hizli --kart K3P-13` → **HIZLI KAPI YEŞİL**.
-- **An kartı degrade istisnası:** `test_kao2_design_contract` degradeleri hâlâ yasaklar; **yalnız `.kao-moment`** istisna (kullanıcı kararı).
-- **Katlanan blok sözleşmesi (K3P-A8):** ilk görünüm bütçesi `<details>`/`<summary>` ile; `<summary>` ≥ 44 px ve klavyeyle açılır.
-- **Devam ipucu kaynağı (A-5):** yalnız `path.lessons[id].resume`.
-- **Uyarlanır durum kalıcı değil (K-K):** kayan pencere/streak yalnız `ui`.
-- **Hedef/akış çatışması (K3P-A3'ten, açık):** açılış → ilk görev 3 dokunuş, hedef 2. Karar kullanıcıda.
-- **Perf göreli bandı makine yüküne duyarlı.** Kapılar `KAO2_ACCEPT_SLOW_HOST=1`; mutlak tavanlar zorunlu.
-- **Görsel QA Chrome yolu:** K3P-26'da `KAO_QA_CHROME` ver.
+- Tam kapı PASS: KAO 73, app 78, panel 23, Panel-v2 27, quran 9; reminders smoke, driver, zikr, kontrast, çift şık, okunuş, plan ve pin kapıları yeşil. KAO2_ACCEPT_SLOW_HOST=1 yalnız göreli perf bandını atlar; mutlak tavanlar korunur.
+- Son hızlı kapı tekrarı **HIZLI KAPI YEŞİL**; 61 pin bağlantısı taze, erteleme yok. İlk son-tur koşusunda test_kao2_components.js:195 pekiştirme şeridi beklentisi aralıklı kırıldı; aynı test değişiklik yapılmadan tek başına ve tam hızlı kapı tekrarında PASS. Test gerçek zamanlı ders yürüyüşünde geçmiş yanıt medyanını toplar; hızlı doğru kolu şeridi bilerek göstermez (K3P-15). Kapsam dışı test/üretim değişikliği yapılmadı.
+- Tarihsel bilgi betiği tekrar-uret.cjs **9/10**: R-08 eski apply.words/sentences alanlarını sayar; K3P-13'te 95 dersin âyet satırı artık doğrulanmış örneklerden runtime'da türetilir. Güncel test_kao2_denetim R-08 ve test_k3p_lesson_ayah PASS; tarihsel betik kapı değildir ve bu kartta değiştirilmedi. 10/10 iddiası yoktur.
+- akis-olc 2b eski hedef ekranı ölçüsünü kullanır; gerçek ≤25 sözcük kuralı K3P-13 fixture'ında doğrulanır. Araç düzeltmesi kapsam dışı.
+- Runtime L6 kalan pay ~0,718 KiB. Tavan yükseltilmedi; Views yorumlarında kısaltma yapıldı.
+- Hedef/akış çatışması (K3P-A3): açılış→ilk görev 3 dokunuş, hedef 2; karar kullanıcıda. Tanıma görevi payı %93, hedef ≤%60; sonraki kartlara aittir.
+- Görsel Tezhip/forced-colors ve gerçek ekran okuyucu/cihaz kabulü yapılmadı. K3P-26'da KAO_QA_CHROME gerekir. An kartı degrade istisnası ve ui-only uyarlanır durum korunur.
 
 ## Devir notu
 
-—
+K3P-14 uygulaması, hızlı ve tam kapı tamamlandı. Kayıt senkronunu ve onaylı commit→push→PR merge→Pages→no-cache SHA-256 eşliğini tamamla. K3P-16'yı yürütme; yeni kart ayrı istektir. Kişisel veri/gerçek hesap tarayıcısı açma.

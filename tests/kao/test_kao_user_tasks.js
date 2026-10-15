@@ -37,7 +37,7 @@ function answerAll(api, state, correctly) {
   const times = [];
   while ((state.ui.kaoTaskIndex || 0) < (state.ui.kaoQueue || []).length) {
     const item = state.ui.kaoQueue[state.ui.kaoTaskIndex];
-    const task = api.kaoBuildTask(item, state.data, { seed: item.id });
+    const task = state.ui.kaoTasks[item.id] || api.kaoBuildTask(item, state.data, { seed: item.id });
     const started = process.hrtime.bigint();
     if (task.kind === 'order') task.choices.slice().sort((a, b) => a.ordinal - b.ordinal).forEach((choice) => api.kaoAnswer(task.id, choice.choiceId));
     else api.kaoAnswer(task.id, (correctly ? task.choices.find((choice) => choice.correct) : task.choices.find((choice) => !choice.correct) || task.choices[0]).choiceId);

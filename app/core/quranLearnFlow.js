@@ -67,6 +67,12 @@
 
   function obj(value){ return value&&typeof value==='object'&&!Array.isArray(value)?value:{}; }
   function num(value,fallback){ return typeof value==='number'&&isFinite(value)?value:fallback; }
+  function ladderRung(card){
+    card=obj(card);
+    var stability=num(card.s,0),rung=card.state==='new'||card.st==='new'?1:stability<3?1:stability<10?2:stability<30?3:4;
+    return 'R'+Math.max(1,rung-((card.state||card.st)==='relearning'?1:0));
+  }
+  function ladderArm(cardId){ return window.SeymaQuranLearn.seededRank('k3p-ladder',cardId)%2===0?'A':'B'; }
   function round8(value){ return Number(value.toFixed(8)); }
   function pad2(n){ return String(n).padStart(2,'0'); }
   function dayKey(date){ return date.getFullYear()+'-'+pad2(date.getMonth()+1)+'-'+pad2(date.getDate()); }
@@ -522,5 +528,5 @@
   }
 
   window.SeymaQuranLearnFlow={version:1,createStack:createStack,openStack:openStack,push:push,reset:reset,replaceTop:replaceTop,current:current,previous:previous,back:back,
-    curriculum:curriculum,lessonOf:lessonOf,lessonProgress:lessonProgress,unitProgress:unitProgress,nextStep:nextStep,lessonPlan:lessonPlan,masteryPlan:masteryPlan,repairPlan:repairPlan,unitMastery:unitMastery,estimateMinutes:estimateMinutes};
+    ladderRung:ladderRung,ladderArm:ladderArm,curriculum:curriculum,lessonOf:lessonOf,lessonProgress:lessonProgress,unitProgress:unitProgress,nextStep:nextStep,lessonPlan:lessonPlan,masteryPlan:masteryPlan,repairPlan:repairPlan,unitMastery:unitMastery,estimateMinutes:estimateMinutes};
 })(window);

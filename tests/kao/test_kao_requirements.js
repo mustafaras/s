@@ -301,7 +301,8 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   assert.equal(e7.kaoLemmaReading('l_yok_000000', 'yedek'), 'yedek', 'sözlük dışı kayıt kendi doğrulanmış okunuşunu korur');
 
   // Hareke kapalı / soldurma (R-B5) / hareket ayarı ve reduced-motion dalı.
-  const lemma = e7Data.quranLearn && sandboxLemma(e7, sampleLemma.lemmaId);
+  const fadeRecord = verifiedLemmas.find((record) => e7.seededRank('k3p-ladder', 'w:' + record.lemmaId + ':ar>tr') % 2 === 1);
+  const lemma = e7Data.quranLearn && sandboxLemma(e7, fadeRecord.lemmaId);
   // KAO-FIX-15: soldurma yalnız review ∧ s≥30 kartta (durable30); isNew=false tek başına yetmez.
   const fadeCardId = 'w:' + lemma.id + ':ar>tr';
   delete e7Data.quranLearn.cards[fadeCardId];

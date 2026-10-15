@@ -1,15 +1,23 @@
 'use strict';
-// K3P-05 · deney raporu (KARARLAR §6, AKIS §7): bir JSON yedeğinden H2, H5, H7, H8, H9 için YALNIZ toplu sayılar.
+// K3P-05/16 · deney raporu (KARARLAR §6, AKIS §7): bir JSON yedeğinden H2, H3, H5, H7, H8, H9 için YALNIZ toplu sayılar.
 // Kullanım (repo kökünden):
 //   node kao3-premium/araclar/deney-rapor.cjs --ornek                         sentetik yedekle doğrulama
 //   node kao3-premium/araclar/deney-rapor.cjs <yedek.json> [--kesim GG] [--bugun GG]   (GG = YYYY-AA-GG)
 // Girdi: kullanıcının kendi verdiği yedek (files/yedek/ biçimi, data/gunluk/<tarih>.json sarmalı ya da salt-okur latest.json).
 // Okunan alanlar (başka hiçbir şey): quranLearn.cards[*].{s,lapses,reps,state} · quranLearn.daily ·
-//   quranLearn.path.lessons[*].{resume,doneAt}. Önce bu alanlar ayrı bir izdüşüme kopyalanır; hesap yalnız ona bakar.
+//   quranLearn.path.lessons[*].{resume,doneAt}. Kart kimliğinden yalnız kelime kapsamı ve A/B kolu türetilir;
+//   kimlik atılır. Önce bu alanlar ayrı bir izdüşüme kopyalanır; hesap yalnız ona bakar.
 // Yazmaz: dosya yok, ağ yok. Kelime, metin, kart ya da ders kimliği basmaz; yalnız sayı, yüzde ve tarih.
 // --kesim: "önce/sonra" sınırı (ör. otomatik geçişin cihaza ulaştığı gün). Verilmezse son 14 gün (bugün dahil) "sonra" sayılır.
 // --bugun: başvuru günü. Verilmezse yedekteki son çalışma günü alınır (saat bağımlılığı yok).
 const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const ladderContext = vm.createContext({ window: {} });
+for (const file of ['quranLearnFlow.js', 'quranLearn.js']) {
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../../app/core', file), 'utf8'), ladderContext, { filename: file });
+}
+const ladderArm = ladderContext.window.SeymaQuranLearnFlow.ladderArm;
 
 const DAY_MS = 86400000;
 const WINDOW_DAYS = 14;               // H2: kesimden önce ve sonra 14 gün
@@ -33,8 +41,8 @@ function project(backup) {
   const root = isObj(backup) && isObj(backup.data) && !isObj(backup.quranLearn) ? backup.data : backup;
   const q = isObj(root) ? root.quranLearn : null;
   if (!isObj(q)) throw new Error('yedekte quranLearn bölümü yok');
-  const cards = Object.values(isObj(q.cards) ? q.cards : {}).filter(isObj)
-    .map((c) => ({ s: num(c.s), lapses: num(c.lapses), reps: num(c.reps), state: typeof c.state === 'string' ? c.state : '' }));
+  const cards = Object.entries(isObj(q.cards) ? q.cards : {}).filter(([, card]) => isObj(card))
+    .map(([id, c]) => ({ arm: /^w:/.test(id) ? ladderArm(id) : null, s: num(c.s), lapses: num(c.lapses), reps: num(c.reps), state: typeof c.state === 'string' ? c.state : '' }));
   const daily = Object.entries(isObj(q.daily) ? q.daily : {})
     .filter(([date, row]) => DATE_RE.test(date) && isObj(row))
     .map(([date, row]) => {
@@ -123,6 +131,18 @@ function overview(cards) {
   return `${cards.length} kart (${states}) · ortalama s ${meanS.toFixed(1).replace('.', ',')} gün · en az bir kez unutulan ${cards.length ? pct(lapsed / cards.length) : '—'}`;
 }
 
+function h3(cards) {
+  const value = ['A', 'B'].map((arm) => {
+    const group = cards.filter((card) => card.arm === arm);
+    const mean = group.length ? (group.reduce((sum, card) => sum + card.s, 0) / group.length).toFixed(2).replace('.', ',') : '—';
+    const reviewed = group.filter((card) => card.reps > 0);
+    const reps = reviewed.reduce((sum, card) => sum + card.reps, 0);
+    const lapses = reviewed.reduce((sum, card) => sum + card.lapses, 0);
+    return `${arm}: n=${group.length}, ortalama s ${mean} gün, unutma ${reps ? pct(lapses / reps) : '—'} (${lapses}/${reps})`;
+  }).join(' · ');
+  return { id: 'H3', measure: 'Merdiven (A) ve tanıma (B) kolları', value, target: 'A: daha yüksek s, daha düşük unutma', status: 'Anlık kelime kartı özeti; unutma = toplam lapses/reps (reps > 0); kesim uygulanmaz. 30. gün deney sonucu değildir.' };
+}
+
 function buildReport(backup, opts) {
   const p = project(backup);
   const today = (opts && opts.today) || (p.daily.length ? p.daily[p.daily.length - 1].date : null);
@@ -131,7 +151,7 @@ function buildReport(backup, opts) {
   const daily = p.daily.filter((r) => r.date <= today);
   const rows = [
     h2(daily, today, cut),
-    { id: 'H3', measure: 'Merdiven (A) ve tanıma (B) kolları', value: 'K3P-16 sonrası etkin', target: 'A > B', status: '—' },
+    h3(p.cards),
     h5(daily, p.lessons),
     h7(daily, cut),
     h8(p.lessons),

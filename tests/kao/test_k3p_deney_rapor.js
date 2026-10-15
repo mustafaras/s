@@ -20,7 +20,8 @@ const text = out.stdout;
 for (const id of ['H2', 'H3', 'H5', 'H7', 'H8', 'H9']) assert.match(text, new RegExp(`^\\| ${id} \\|`, 'm'), `${id} satırı yok`);
 assert.doesNotMatch(text, ARABIC, 'çıktıda Arapça var');
 assert.doesNotMatch(text, IDS, 'çıktıda kart/ders kimliği ya da sır var');
-assert.match(text, /\| H3 \|[^\n]*K3P-16 sonrası etkin/);
+assert.match(text, /\| H3 \|[^\n]*A: n=\d[^\n]*B: n=\d/);
+assert.match(text, /30\. gün deney sonucu değildir/);
 
 // 2) Sentetik örneğin elle hesaplanan değerleri (son 14 gün varsayılan kesim: 2026-02-15).
 assert.match(text, /kesim 2026-02-15 \(varsayılan: son 14 gün\)/);
@@ -33,11 +34,27 @@ assert.match(text, /7\/10 kart hiç unutulmadı \(%70,0\)/);
 // 3) İzdüşüm yalnız izinli alanları taşır; kimlik ve izin dışı alanlar düşer.
 const p = R.project(R.sampleBackup());
 assert.deepEqual(Object.keys(p).sort(), ['cards', 'daily', 'lessons']);
-p.cards.forEach((c) => assert.deepEqual(Object.keys(c).sort(), ['lapses', 'reps', 's', 'state']));
+p.cards.forEach((c) => assert.deepEqual(Object.keys(c).sort(), ['arm', 'lapses', 'reps', 's', 'state']));
 p.lessons.forEach((l) => assert.deepEqual(Object.keys(l).sort(), ['doneAt', 'hasResume']));
 p.daily.forEach((d) => assert.deepEqual(Object.keys(d).sort(), ['answered', 'correct', 'date', 'reviewN', 'reviewOk']));
 assert.doesNotMatch(JSON.stringify(p), ARABIC);
 assert.doesNotMatch(JSON.stringify(p), /sample\d|ghp_|placement|lessonItemId/);
+const arm = (id) => p.cards[Number(id)].arm;
+assert.ok(p.cards.slice(10).every((card) => card.arm === null));
+const grouped = { quranLearn: { daily: { '2026-10-15': {} }, cards: {} } };
+const ids = { A: [], B: [] };
+for (let index = 0; index < 10; index += 1) ids[arm(index)].push(`w:sample${index}`);
+assert.ok(ids.A.length >= 2 && ids.B.length >= 2);
+for (const side of ['A', 'B']) {
+  grouped.quranLearn.cards[ids[side][0]] = { s: side === 'A' ? 10 : 2, reps: 4, lapses: 1 };
+  grouped.quranLearn.cards[ids[side][1]] = { s: side === 'A' ? 20 : 4, reps: 6, lapses: side === 'A' ? 0 : 2 };
+}
+const groupedBefore = JSON.stringify(grouped);
+const h3 = R.buildReport(grouped).rows.find((row) => row.id === 'H3');
+assert.match(h3.value, /A: n=2, ortalama s 15,00 gün, unutma %10,0 \(1\/10\)/);
+assert.match(h3.value, /B: n=2, ortalama s 3,00 gün, unutma %30,0 \(3\/10\)/);
+assert.equal(JSON.stringify(grouped), groupedBefore);
+assert.match(R.buildReport({ quranLearn: { daily: { '2026-10-15': {} } } }).rows.find((row) => row.id === 'H3').value, /A: n=0, ortalama s — gün, unutma — \(0\/0\)/);
 
 // 4) data/gunluk sarmalı ({app,date,savedAt,data}) da okunur; --bugun sonrası günler sayılmaz.
 const wrapped = R.buildReport({ app: 'seyma', date: '2026-02-28', data: R.sampleBackup() }, { today: '2026-02-14' });

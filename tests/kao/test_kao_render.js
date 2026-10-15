@@ -135,11 +135,13 @@ assert.doesNotMatch(nightHubHtml, /Sıradaki: /, 'gece penceresinde yeni ders ö
 assert.equal(atClock(DAY_CLOCK, () => api.kaoHubCardHTML()), resumeHubHtml, 'saat sandbox\'ta geri alınır; gündüz metni değişmez');
 assert.equal(Object.keys(api.kaoKnownLemmaSet(appData)).length, 1, 'iki yönde kalıcı kelime sayılır');
 
-const shiftLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift);
+const shiftLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.cognate && lemma.cognate.shift && sandbox.window.SeymaQuranLearnFlow.ladderArm(`w:${lemma.id}:tr>ar`) === 'A');
 const otherLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => lemma.id !== shiftLemma.id && lemma.pos === shiftLemma.pos && lemma.root !== shiftLemma.root);
 quranLearn.cards[`w:${otherLemma.id}:ar>tr`] = { state: 'review', s: 25, reps: 3 };
 const meaningTask = api.kaoBuildTask({ id: 'meaning-task', cardId: `w:${shiftLemma.id}:ar>tr`, isNew: true }, { quranLearn }, { seed: 'render' });
-const arabicTask = api.kaoBuildTask({ id: 'arabic-task', cardId: `w:${shiftLemma.id}:tr>ar`, isNew: true }, { quranLearn }, { seed: 'render' });
+quranLearn.cards[`w:${shiftLemma.id}:tr>ar`] = { state: 'review', s: 3, reps: 1 };
+const arabicTask = api.kaoBuildTask({ id: 'arabic-task', cardId: `w:${shiftLemma.id}:tr>ar`, isNew: false }, { quranLearn }, { seed: 'render' });
+assert.equal(arabicTask.direction, 'tr>ar');
 const meaningHtml = api.kaoTaskHTML(meaningTask);
 const arabicHtml = api.kaoTaskHTML(arabicTask);
 assert.match(meaningHtml, /Anlamı seç/);
@@ -208,7 +210,7 @@ assert.match(ui.kaoFeedback, /Fiil önce gelir/);
 
 // KAO-FIX-15 (D-5, R-B5 / 02 §5.3): hareke soldurma yalnız kalıcılaşmış kartta (review ∧ s≥30; task.durable30).
 {
-  const fadeLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => /[\u064b-\u0652]/.test(lemma.ar));
+  const fadeLemma = sandbox.window.QuranLexiconV1.lemmas.find((lemma) => /[\u064b-\u0652]/.test(lemma.ar) && sandbox.window.SeymaQuranLearnFlow.ladderArm(`w:${lemma.id}:ar>tr`) === 'B');
   const fadeCardId = `w:${fadeLemma.id}:ar>tr`;
   const savedCard = quranLearn.cards[fadeCardId];
   const savedFade = quranLearn.readability.fadeHarakat;

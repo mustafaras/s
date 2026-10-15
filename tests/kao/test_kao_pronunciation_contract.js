@@ -14,6 +14,7 @@ for (const relative of [
   'app/content/quranShortSurahsV1.js',
   'app/content/quranStrikingVersesV1.js',
   'app/content/quranPhonicsV1.js',
+  'app/core/quranLearnFlow.js',
   'app/core/quranLearnViews.js',
   'app/core/quranLearn.js'
 ]) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
@@ -59,7 +60,12 @@ assert.equal(pronunciationOf('فَعَلْتَ'), 'feʿalte');
 assert.equal(pronunciationOf('كَسَبَا'), 'kesebâ');
 assert.equal(pronunciationOf('خَتَمَ'), 'hateme');
 
-const wordTask = api.kaoBuildTask({ id: 'word', cardId: `w:${sandbox.window.QuranLexiconV1.lemmas[0].id}:tr>ar`, type: 'arabic' }, { quranLearn }, { seed: 'pronunciation' });
+const wordLemma = lexicon.lemmas.find((lemma) => sandbox.window.SeymaQuranLearnFlow.ladderArm(`w:${lemma.id}:tr>ar`) === 'A');
+const wordCardId = `w:${wordLemma.id}:tr>ar`;
+quranLearn.cards[wordCardId] = { state: 'review', s: 3, reps: 1 };
+const wordTask = api.kaoBuildTask({ id: 'word', cardId: wordCardId, type: 'arabic' }, { quranLearn }, { seed: 'pronunciation' });
+assert.equal(wordTask.direction, 'tr>ar');
+assert.ok(wordTask.choices.every((choice) => hasArabic(choice.label)));
 for (const choice of wordTask.choices) {
   if (hasArabic(choice.label)) assert.ok(hasPronunciation(choice.pronunciation), `kelime seçeneği: ${choice.label}`);
 }

@@ -725,3 +725,22 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Yayın yetkisi: kullanıcının açık commit/push/merge/deploy ve ara pin istisnası onayı; kapsam yalnız K3P-13+14. Yeni yayın zinciri henüz bekliyor; gerçek commit/PR/Pages/no-cache eşliği teslim mesajında. releaseApproval=NOT_APPROVED final program sınırı korunur.
 - Kanıt düzeyi: kaynak/headless; görsel QA ve cihaz kabulü yok. K3P-16 yürütülmedi.
 - Sıradaki: K3P-16
+
+## seq 46 · — · YAYIN (K3P-13 + K3P-14 ara yayın)
+- Tarih: 2026-10-15
+- Commit: (bu commit)
+- Yetki: kullanıcı açık commit/push/merge/deploy ve ara pin istisnası onayı; yalnız K3P-13+14.
+- Teslim: K3P-14 8e9901cb313131f39569c2e9f526ad3c4a3c4f36 → origin/kao3-premium; PR #107 merge b66757940e54c6bf3398e07c779d42b3ce95d8b0 → origin/main. Pages run 38727957725, validate+deploy success, headSha merge commit'iyle aynı.
+- Pin: 20261015a; main üzerinde 61 bağlantı taze, ERTELENDİ yok. senkron 25/37, sıradaki K3P-16.
+- Canlı kanıt: 2026-10-15T11:33:27.655Z; yalnız no-cache GET, 8/8 HTTP 200 ve yerel/canlı SHA-256 eşliği.
+- SHA-256 index.html: 1e8374d8cadb400e92f64683b0d645d30f6211bf7b6c884648eadbae2cf6aca9 (128195 B)
+- SHA-256 sw.js: 441810c329814513eb1ec753b8a12502f61db504205e236b597467eca9028d91 (17431 B)
+- SHA-256 panel-v2.html: 98de8cb84e6aaa2833fd20e718027700ca550c0e36192a79ab6f39c7475b9a55 (1365 B)
+- SHA-256 app/core/helpers.js: a5fbf740ce9527bfab248626480e163d4482251dd5692db91e79d46174f86b21 (11222 B)
+- SHA-256 app/core/quranLearn.js: ebbe2f5e549e865dc3c68485c2696326f411ad744e45d7a3600439b68c499533 (378172 B)
+- SHA-256 app/core/quranLearnFlow.js: b1e1ddee8950023f1b80c683dc54eea9adaa4627d1b1c87b6132d34dc999ab8d (36450 B)
+- SHA-256 app/core/quranLearnViews.js: 413f08bc074fcc52efeded4b29661f3872179db33aac999728a015aebd95bdd2 (59477 B)
+- SHA-256 app/kao.css: 62d0942fe514da6dd5617a8ff7c194c61dcb843b7d4e06874d83bf65781a3b57 (95060 B)
+- Kayıt sınırı: bu makbuz yalnız iki durum belgesini değiştirir; runtime baytları aynı kalır. Makbuzun push'undan sonraki Pages koşusu ve son dal eşliği teslim mesajında doğrulanır.
+- Açık sınırlar: ilk hızlı tur components zamanlama flake'i, tekrar PASS; tarihsel tekrar-uret 9/10 (eski R-08 modeli); perf göreli bandı atlandı, mutlak tavanlar PASS. Görsel QA/cihaz kabulü yok; kişisel veri deposuna yazılmadı; final releaseApproval=NOT_APPROVED.
+- Sıradaki: K3P-16 (yürütülmedi).

@@ -6,7 +6,7 @@ Sıradaki prompt: K3P-16
 
 - **Tarih:** 2026-10-15.
 - **Son tamamlanan:** K3P-14 — ders sonu anı; Dalga 2 kapandı. 25/37 kart tamamlandı; K3P-15 daha önce tamamlandığından sıradaki K3P-16'dır, bu oturumda açılmadı.
-- **Yayın yetkisi:** kullanıcı K3P-13 + K3P-14 için commit/push/merge/deploy ve ara pin istisnasını açıkça onayladı. Ortak pin **20261015a**; pin erteleme listesi boşaltıldı. Son doğrulanmış yayın 20261014b; yeni yayın zinciri henüz bekliyor. Gerçek commit/PR/Pages ve canlı bayt eşliği teslim mesajında doğrulanacak.
+- **Yayın yetkisi:** kullanıcı K3P-13 + K3P-14 için commit/push/merge/deploy ve ara pin istisnasını açıkça onayladı. Ortak pin **20261015a**; pin erteleme listesi boşaltıldı. K3P-14 commit 8e9901cb, PR #107 merge b6675794, Pages 38727957725 success. 8/8 canlı varlık HTTP 200 ve no-cache SHA-256 eşliği doğrulandı (LEDGER seq 46).
 - **Sınır:** bu onay K3P-27 final program yayın kabulü değildir; releaseApproval=NOT_APPROVED korunur. Veri deposuna yazma, cihaz kabulü veya K3P-16 yetkisi vermez.
 - **Kanıt:** kaynak/headless. Görsel QA ve cihaz kabulü yok. Yeni oturum başlatıcısı: kao3-premium/STARTER.md.
 
@@ -44,4 +44,4 @@ Sıradaki prompt: K3P-16
 
 ## Devir notu
 
-K3P-14 uygulaması, hızlı ve tam kapı tamamlandı. Kayıt senkronunu ve onaylı commit→push→PR merge→Pages→no-cache SHA-256 eşliğini tamamla. K3P-16'yı yürütme; yeni kart ayrı istektir. Kişisel veri/gerçek hesap tarayıcısı açma.
+K3P-14 uygulaması, hızlı/tam kapı ve onaylı commit→push→PR merge→Pages→8/8 no-cache SHA-256 eşliği tamamlandı. Bu yayın makbuzu commit’i runtime baytlarını değiştirmez; son Pages koşusu ve dal eşliği teslim mesajında doğrulanır. K3P-16'yı yürütme; yeni kart ayrı istektir. Kişisel veri/gerçek hesap tarayıcısı açma.

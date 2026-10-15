@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-17",
+  "nextPrompt": "K3P-18",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -369,7 +369,11 @@
     {
       "id": "K3P-17",
       "wave": 3,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-15",
+      "result": "R3 \"harflerden kur\" (kind:'build'): kelimenin harfleri + aynı nokta ailesinden 2 çeldirici harf tek görevde; dizme ve cevap yolu K3P-20 dizmesiyle aynı (App.kaoAnswer çoklu seçim + kaoOrderDraft), yeni App.kao* yok (45). Uygunluk: yalnız 2–6 harfli, harfe çevrilebilen ve verified lemma; aksi hâlde build kurulmaz ve kart R2'ye düşer. Geri bildirimde kelimenin harekeli hâli gösterilir. Yeni test_k3p_build (7 kontrol); KAO envanteri 75. Runtime L6 127,995 KiB (kalan 5 B), L9 127,623 KiB; tavan yükseltilmedi. Pin 20261015b; app/core/quranLearn.js pinDeferral.files'a eklendi (K-P). Yalnız yerel commit; push/merge/deploy yok, releaseApproval değişmedi.",
+      "gate": "kapi-hizli --kart K3P-17 --yavas",
+      "evidence": "source+headless"
     },
     {
       "id": "K3P-18",
@@ -427,6 +431,8 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearn.js"
+    ]
   }
 }

@@ -131,6 +131,28 @@ function playLesson(t, { answer = 'correct', visit, stopAt } = {}) {
       const task = item && t.ui.kaoTasks[item.id];
       if (!task) return false;
       if (visit) visit(task);
+      if (task.kind === 'build') {
+        // K3P-17: "harflerden kur" doğru diziyi harekeli cevabın HARekesiz harflerinden alır. 'wrong' ters sıradır;
+        // bir fonksiyon verilmişse (görev başına karar veren yürüyüşçüler) çeldirici döndürdüğünde sıra bozulur,
+        // hedef harf döndürdüğünde doğru dizi kullanılır. Fonksiyon görev başına BİR kez çağrılır.
+        // Aynı harf kelimede iki kez geçebilir (ör. لَيْل); her konum için AYRI çip tüketilir.
+        const letters = Array.from(String(task.answer || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, ''));
+        const pool = (task.choices || []).filter((c) => c.correct === true);
+        const picks = [];
+        for (const char of letters) {
+          const index = pool.findIndex((c) => c.label === char);
+          if (index >= 0) picks.push(pool.splice(index, 1)[0]);
+        }
+        // answer(task) yalnız BİR kez çağrılır: görev başına karar veren yürüyüşçüler sayaç tutar,
+        // .find() geri çağrıyı çip başına çağırdığı için onu doğrudan kullanmak sayacı şişirir.
+        const wantedId = typeof answer === 'function' ? answer(task) : null;
+        const wanted = wantedId === null ? null : (task.choices || []).find((c) => c.choiceId === wantedId);
+        const seq = answer === 'wrong' ? picks.slice().reverse()
+          : (wanted && wanted.correct !== true ? [wanted].concat(picks.slice(0, Math.max(0, picks.length - 1))) : picks);
+        for (const c of seq) t.api.kaoAnswer(task.id, c.choiceId);
+        t.api.kaoContinue();
+        continue;
+      }
       if (task.kind === 'order') {
         // K2F-11: "Kelime dizme" (kind:'order') birden çok seçim ister: ordinal sırayla (answer:'wrong' → ters sıra) tek tek seçilir.
         const byOrdinal = (task.choices || []).slice().sort((a, b) => a.ordinal - b.ordinal);

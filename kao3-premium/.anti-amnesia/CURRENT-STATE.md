@@ -7,8 +7,8 @@ Sıradaki prompt: K3P-17
 - **Tarih:** 2026-10-15.
 - **Son tamamlanan:** K3P-16 — hatırlama merdiveni seçici ve kart düzeyinde A/B ataması. 26/37 kart tamamlandı. K3P-17 açılmadı.
 - **Yetki:** kullanıcı 2026-10-15'te yalnız K3P-16 için commit/push/main merge/deploy ve ara pin istisnasını açıkça onayladı. Final K3P-27 releaseApproval=NOT_APPROVED korunur; K3P-17 açılmaz, tag yok.
-- **Yayın:** K3P-16 ara yayını doğrulandı; yeni pin **20261015b**, pinDeferral.files boş. Tam kapı yeşil; Pages/canlı eşlik kanıtı beklenir. Önceki yayın makbuzu LEDGER seq 46'dadır.
-- **Kanıt:** kaynak/headless ve sentetik veri. Tarayıcı, gerçek hesap, kişisel veri deposu, görsel QA veya cihaz kabulü yok.
+- **Yayın:** K3P-16 canlıda; pin **20261015b**, pinDeferral.files boş. Uygulama 107a243d, yayın 10600071, PR #108 merge def4627e. Pages 38740346378 SUCCESS; 2026-10-15T13:31:33.449Z önbelleksiz GET + SHA-256 eşliği **64/64 PASS** (61 sürümlü asset + 3 host). Makbuz LEDGER seq 49.
+- **Kanıt:** kaynak/headless ve sentetik veri + Pages/canlı statik bayt eşliği. Tarayıcı, gerçek hesap, kişisel veri deposu, görsel QA veya cihaz kabulü yok.
 
 ## K3P-16 ne yaptı
 
@@ -48,4 +48,4 @@ Sıradaki prompt: K3P-17
 
 ## Devir notu
 
-Yalnız K3P-16 uygulandı; kullanıcı onaylı ara yayın işlemi yürütülüyor. K3P-17'yi yürütme: yeni kart ayrı kullanıcı isteğidir. Kişisel veri/gerçek hesap tarayıcısı açma; seyma-data kapsam dışıdır. Final program yayın onayı verilmedi.
+Yalnız K3P-16 uygulandı; kullanıcı onaylı ara yayın ve canlı statik eşlik doğrulandı. K3P-17'yi yürütme: yeni kart ayrı kullanıcı isteğidir. Kişisel veri/gerçek hesap tarayıcısı açma; seyma-data kapsam dışıdır. Final program yayın onayı verilmedi.

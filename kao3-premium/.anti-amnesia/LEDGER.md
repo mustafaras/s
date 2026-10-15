@@ -768,3 +768,12 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Pin: index.html, sw.js ve panel-v2.html için 20261015a→20261015b; ilgili fixture sabitleri aynı pinle güncellenir, kontroller gevşetilmez; pinDeferral.files boşaltıldı.
 - Doğrulama: KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh exit 0, TÜM KAPILAR YEŞİL. KAO 74, app 78, panel 23, panel-v2 27, quran 9 fixture PASS; smoke, driver, zikr, kontrast, çift şık, okunuş, plan ve pin PASS. Migration 67/67, 61 benzersiz asset URL tazeliği ve diff --check PASS. Runtime L9 127,196 KiB; p95 9,809 ms / steady 3,859 ms; yalnız göreli bant atlandı, mutlak tavanlar korundu. Tarihsel tekrar-uret özeti 9/10, 10/10 iddiası yok.
 - Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. Final releaseApproval=NOT_APPROVED; 26/37, sıradaki K3P-17 korunur. Kişisel veri/seyma-data ve gerçek hesap tarayıcısı kapsam dışı.
+
+## seq 49 · — · YAYIN MAKBUZU (K3P-16 ara yayın)
+- Tarih: 2026-10-15
+- Commit: (bu commit)
+- Kaynak: uygulama 107a243deb8e7ccf90d30fb61982df3d0a395af2; yayın hazırlığı 10600071f884ce98069fe742f9c8c28f8673b31c; PR #108 MERGED, main merge def4627ec4d75ff2c186226281e76801fed0836d.
+- Pages: 38740346378, head def4627ec4d75ff2c186226281e76801fed0836d, validate/deploy SUCCESS. Statik site https://mustafaras.github.io/s/.
+- Canlı kanıt: 2026-10-15T13:31:33.449Z; Cache-Control/Pragma no-cache ve commit sorgusuyla yalnız GET. 61 benzersiz sürümlü asset + index.html/sw.js/panel-v2.html: HTTP 200 ve yerel/canlı SHA-256 eşliği 64/64 PASS. Pin 20261015b; pinDeferral.files boş; pin tazeliği 61/61 PASS, senkron 26/37 PASS.
+- Bu makbuz yalnız üç kayıt dosyasını değiştirir; üretim baytlarını değiştirmez. Makbuz commit'i de main/program dalına eşitlenerek Pages sonucu ve canlı eşlik ayrıca kontrol edilir; sonraki çalışmanın kimliği oturum sonucunda raporlanır.
+- Sınır: final releaseApproval=NOT_APPROVED; K3P-17 açılmadı, tag yok. Gerçek hesap tarayıcısı/kişisel veri/seyma-data işlemi yapılmadı; cihaz kabulü ve bilimsel öğrenme etkisi iddiası yok.

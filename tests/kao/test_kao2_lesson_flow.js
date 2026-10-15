@@ -176,8 +176,11 @@ check('oynatıcı: hedef önce, vadeli tekrar ısınmada; intro → hemen FSRS p
   assert.equal(ui.kaoView, 'home'); assert.equal(q.path.lessons[lesson.id].resume.phase, 'practice');
   assert.equal(api.kaoLesson('start', lesson.id), true);
   assert.equal(ui.kaoQueue[ui.kaoTaskIndex].id, currentId, 'yeniden giriş aynı görevden sürer');
-  const audioPlan = ui.kaoLesson.plan.find((item) => item.audioOnly);
-  const audioTask = api.kaoBuildTask({ id: audioPlan.id, cardId: audioPlan.cardId, isNew: true }, data, { seed: audioPlan.id, choiceCount: 2, audioOnly: true });
+  const audioPlan = curriculum.units.flatMap((unit) => unit.lessons).flatMap((entry) => flow.lessonPlan({ quranLearn: q }, entry.id, now, content)).find((item) => item.audioOnly && flow.ladderArm(item.cardId) === 'A');
+  assert.ok(audioPlan, 'A kolunda ses görevi bulunur');
+  q.cards[audioPlan.cardId] = { state: 'review', s: 3, reps: 1 };
+  const audioTask = api.kaoBuildTask({ id: audioPlan.id, cardId: audioPlan.cardId, isNew: false }, data, { seed: audioPlan.id, choiceCount: 2, audioOnly: true });
+  assert.equal(audioTask.rung, 'R2');
   assert.equal(audioTask.choices.length, 2); assert.equal(audioTask.audioOnly, true);
   const html = api.kaoTaskHTML(audioTask);
   assert.match(html, /Dinlediğin kelimenin anlamını seç/); assert.match(html, /class="kao-audio"/);

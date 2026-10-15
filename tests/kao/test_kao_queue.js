@@ -9,7 +9,7 @@ const repoRoot = require('../repo-root');
 function loadApi() {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/core/quranLearn.js']) {
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearn.js']) {
     vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), sandbox, { filename: relative });
   }
   return sandbox.window.SeymaQuranLearn;
@@ -255,7 +255,7 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
   class FixedDate extends RealDate { constructor(...args) { super(...(args.length ? args : [clock])); } static now() { return clock; } }
   const box = { window: {}, Date: FixedDate, Math, Number, String, Object, Array, JSON };
   vm.createContext(box);
-  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranCurriculumV2.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
+  for (const relative of ['app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/content/quranCurriculumV2.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearn.js']) vm.runInContext(fs.readFileSync(path.join(repoRoot, relative), 'utf8'), box, { filename: relative });
   const sweepApi = box.window.SeymaQuranLearn, sweepUi = {};
   const pad = (n) => String(n).padStart(2, '0');
   const localDay = (value) => { const d = new RealDate(value); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };

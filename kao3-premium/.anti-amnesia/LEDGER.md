@@ -744,3 +744,27 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kayıt sınırı: bu makbuz yalnız iki durum belgesini değiştirir; runtime baytları aynı kalır. Makbuzun push'undan sonraki Pages koşusu ve son dal eşliği teslim mesajında doğrulanır.
 - Açık sınırlar: ilk hızlı tur components zamanlama flake'i, tekrar PASS; tarihsel tekrar-uret 9/10 (eski R-08 modeli); perf göreli bandı atlandı, mutlak tavanlar PASS. Görsel QA/cihaz kabulü yok; kişisel veri deposuna yazılmadı; final releaseApproval=NOT_APPROVED.
 - Sıradaki: K3P-16 (yürütülmedi).
+
+## seq 47 · K3P-16 · KART
+- Tarih: 2026-10-15
+- Commit: (bu commit)
+- Yetki: kullanıcı K3P-16 oturum başlatıcısını uygulama talebi; yalnız bu kart ve yerel commit. Push/merge/deploy/tag yok; K3P-17/18 açılmadı.
+- Yapılan: saf Flow.ladderRung/ladderArm; yeni/s<3 R1, s<10 R2, s<30 R3, diğer R4; relearning bir basamak indirir, alt sınır R1. Tek seededRank kaynağı SeymaQuranLearn üzerinden kullanılır; B hep R1, A merdiven, uygulanmamış R3/R4 R2 yedeği. R1 Arapça→anlam, R2 anlam→Arapça veya ses→anlam. Kart/görev kimlikleri ve veri değişmez; App.kao* 45, schema/migrate/app.js/sync.js/state.js değişmedi.
+- H3: kelime kartlarından A/B ortalama s ve toplam lapses/reps (reps>0); yalnız anlık toplu sayılar, kimlik/metin sızıntısı yok. Kesim uygulanmaz; gerçek 30. gün deney sonucu veya bilimsel etki iddiası değildir.
+- Dosyalar: app/core/{quranLearn,quranLearnFlow}.js; kao3-premium/araclar/{cift-sik,deney-rapor}.cjs; tests/kao/test_k3p_ladder.js, test_k3p_deney_rapor.js, README.md ve doğrudan bağımlı components/lesson_flow/pronunciation_contract/queue/render/requirements/user_tasks fixture'ları; üç durum kaydı. Fixture'lar gerçek A/R2-B/R1 koşullarına, Flow VM bağımlılığına ve ekranda önbelleğe alınan göreve uyarlandı; eski kontroller kaldırılmadı.
+- Test: 16 basamak/alt sınır örneği, 1000 kimlikte A=522 (%52,2), ayrı VM determinismi; 40 kart × 3 durum × 4 s × 2 ses = 960 donmuş girdi görev kontrolü PASS. H3 elle hesap/sızıntı/hata yolları PASS. Envanter 73→74.
+- Sayım (tüm dersler, sentetik): yeni 0/1087 çift şık, R1 912/1087 %83,90, R2 98/1087; yerleşik 0/1127 çift şık, R1 903/1127 %80,12, R2 127/1127. Toplam kelime çoktan seçmeli yeni 1010/1087 %92,92 ve yerleşik 1030/1127 %91,39; HEAD tabanıyla aynı. R1/R2 ayrımı TASARIM §4 sınıflamasıdır; R2 de çoktan seçmelidir. Eski toplam MCQ ile yeni R1 aynı ölçü değildir; toplam pay düşmedi, ≤%60 hedefi doğrulanmadı, R3/R4 sonraki kartların kapsamıdır.
+- Ölçüler: runtime L6 130622 B = 127,560546875 KiB / 128 KiB (taban 127,282; kalan 450 B); L9 127,196 KiB; CSS 15,273 /16; içerik 184,591 /256; ayrı perf tekrarı p95 5,229 ms / steady 3,659 ms, mutlak tavanlar PASS. Yalnız göreli bant yavaş makine bayrağıyla atlandı; bütçe yükseltilmedi.
+- Kapı: kapi-hizli.mjs --kart K3P-16 --yavas exit 0, HIZLI KAPI YEŞİL; KAO 74 (kabul 358,0 sn, grammar_tasks 256,5 sn, denetim 45,5 sn dahil), sözleşme/pin 10, driver, çift şık, okunuş PASS. İlk tur eski fixture varsayımlarında sekiz hata; hedefli düzeltmeler ve tam --yavas tekrarından sonra 0 hata. K3P-16 dalga sonu değil; ayrı tam kapı bu oturumda koşulmadı.
+- Pin: 20261015a değişmedi; pinDeferral.files yalnız app/core/quranLearn.js ve app/core/quranLearnFlow.js. Canlı eşlik/yeni yayın kanıtı üretilmedi; önceki yayın makbuzu seq 46'da kalır.
+- Açık sınırlar: tarihsel tekrar-uret 9/10 (eski R-08 modeli), akis-olc 2b eski hedef ölçüsü, 3 dokunuş/hedef 2; görsel QA/gerçek ekran okuyucu/cihaz kabulü yok. Kaynak/headless kanıtı bilimsel veya kullanıcı-cihaz kabulü değildir. Kişisel veri okunmadı/yazılmadı.
+- Sıradaki: K3P-17
+
+## seq 48 · — · YAYIN HAZIRLIĞI (K3P-16 ara yayın)
+- Tarih: 2026-10-15
+- Commit: (bu commit)
+- Yetki: kullanıcı "canlıya al push commit merge deplo" isteğini kapsam ve pin istisnası açıklandıktan sonra "onayladım ya ztn" ile teyit etti. Yalnız K3P-16; final K3P-27 onayı, tag veya K3P-17 yetkisi değildir.
+- Kaynak: K3P-16 uygulama commit'i 107a243deb8e7ccf90d30fb61982df3d0a395af2. Üretim JS/CSS/içerik baytları bu yayın hazırlığında değiştirilmez.
+- Pin: index.html, sw.js ve panel-v2.html için 20261015a→20261015b; ilgili fixture sabitleri aynı pinle güncellenir, kontroller gevşetilmez; pinDeferral.files boşaltıldı.
+- Doğrulama: KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh exit 0, TÜM KAPILAR YEŞİL. KAO 74, app 78, panel 23, panel-v2 27, quran 9 fixture PASS; smoke, driver, zikr, kontrast, çift şık, okunuş, plan ve pin PASS. Migration 67/67, 61 benzersiz asset URL tazeliği ve diff --check PASS. Runtime L9 127,196 KiB; p95 9,809 ms / steady 3,859 ms; yalnız göreli bant atlandı, mutlak tavanlar korundu. Tarihsel tekrar-uret özeti 9/10, 10/10 iddiası yok.
+- Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. Final releaseApproval=NOT_APPROVED; 26/37, sıradaki K3P-17 korunur. Kişisel veri/seyma-data ve gerçek hesap tarayıcısı kapsam dışı.

@@ -131,7 +131,7 @@ assert.match(css, /@media \(forced-colors:active\)/);
 // kipine taşıdı; denetim bu türü sentetik ortamda ürettiği için ekran doğrulanamamıştı. Görev burada GERÇEK kurucuyla
 // (dersin gerçek oynatımı) üretilir; cevapsız/doğru/yanlış üç durumda şık ekranı sınanır. Görev nesnesi elle kurulmaz.
 const kaoHarness = require('./helpers/kao-harness');
-const AUDIO_LESSON = 'u01.01';
+const AUDIO_LESSON = 'u01.02';
 const AUDIO_BTN = '<button type="button" class="kao-audio" aria-label="Yavaş dinlemek için dokun; doğal hız için 350 milisaniye basılı tut"';
 
 // Görevlerde şık bloklarını (Views.choice düğme kipinin ürettiği) görev bölümünden çeker.
@@ -155,7 +155,7 @@ function kaoExpectedChoices(task, panel, choiceId) {
 function kaoAudioShot(answer) {
   const t = kaoHarness.bootKao({ seeded: true });
   let shot = null;
-  const walked = kaoHarness.walkLesson(t, AUDIO_LESSON, { answer, visit(task) {
+  const walked = kaoHarness.walkLesson(t, AUDIO_LESSON, { answer: 'correct', visit(task) {
     if (!task.audioOnly || shot) return;
     const idle = t.api.kaoOverlayHTML(t.NOW);
     const pick = answer === 'wrong' ? task.choices.find((c) => !c.correct) : task.choices.find((c) => c.correct);

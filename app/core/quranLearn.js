@@ -362,8 +362,9 @@
   // Görünen etiket: tr>ar görevinde Arapça, ar>tr görevinde anlam.
   function kaoShownLabel(item,toAr,opts){ return toAr?String(metaFor(item.cardId,null,opts).ar||item.label):String(item.label); }
   // Sırayı korur; hedefle ya da önce seçilenle aynı lemma veya aynı görünen etiket atlanır.
-  function kaoUniqueDistractors(items,targetId,answer,limit,opts){
-    var toAr=/:tr>ar$/.test(targetId),lemmas=[lemmaIdForCard(targetId)||targetId],labels=[answer],out=[];
+  function kaoUniqueDistractors(items,targetId,answer,limit,opts,toAr){
+    if(toAr===undefined) toAr=/:tr>ar$/.test(targetId);
+    var lemmas=[lemmaIdForCard(targetId)||targetId],labels=[answer],out=[];
     items.forEach(function(item){
       var lemma=lemmaIdForCard(item.cardId)||item.cardId,label=kaoShownLabel(item,toAr,opts);
       if(out.length>=limit||lemmas.indexOf(lemma)>=0||kaoLabelClash(label,labels,false)) return;
@@ -383,7 +384,9 @@
     if(/^g:/.test(id)) return kaoBuildGrammarTask(queueItem,d,opts);
     if(/^k:/.test(id)) return kaoBuildLinkTask(queueItem,opts); if(/^t:/.test(id)) return kaoBuildTransferTask(queueItem,opts);
     var meta=metaFor(id,queueItem,opts),meanings=Array.isArray(meta.meanings)?meta.meanings:[];
-    var direction=/:tr>ar$/.test(id)?'tr>ar':'ar>tr',toAr=direction==='tr>ar';
+    var flow=window.SeymaQuranLearnFlow,arm=flow.ladderArm(id),rung=arm==='B'?'R1':flow.ladderRung(objectOr(quranLearnRoot(d).cards,{})[id]);
+    if(rung==='R3'||rung==='R4') rung='R2';
+    var audioOnly=rung==='R2'&&opts.audioOnly===true,direction=rung==='R1'||audioOnly?'ar>tr':'tr>ar',toAr=direction==='tr>ar';
     var answer=toAr?String(meta.ar||id):String(meanings[0]||meta.meaning||id);
     var lex=window.QuranLexiconV1,pool=kaoDistractorPool(d,id,opts);
     var need=typeof opts.choiceCount==='number'&&isFinite(opts.choiceCount)?Math.max(2,Math.min(4,Math.floor(opts.choiceCount)))-1:3;
@@ -413,7 +416,7 @@
     // B-01: önce bugünkü pencere görünen sırada dizilir ve tekilleştirme bu sırada yapılır.
     // Böylece çiftsiz görev aynen kalır; eksilen şık havuzun devamından dolar.
     var windowed=fill(pool.slice(0,3),3).sort(function(a,b){ return rank(a.cardId)-rank(b.cardId); });
-    var picked=fill(kaoUniqueDistractors(windowed.concat(pool.slice(3)),id,answer,need,opts),need);
+    var picked=fill(kaoUniqueDistractors(windowed.concat(pool.slice(3)),id,answer,need,opts,toAr),need);
     var choices=[{cardId:id,label:answer,pronunciation:toAr?kaoLemmaReading(lemmaIdForCard(id),meta.translit):'',correct:true}].concat(picked.map(function(item){
       var itemMeta=metaFor(item.cardId,null,opts);
       return {cardId:item.cardId,label:kaoShownLabel(item,toAr,opts),pronunciation:toAr?kaoLemmaReading(lemmaIdForCard(item.cardId),itemMeta.translit):'',correct:false};
@@ -422,7 +425,7 @@
     choices.forEach(function(choice,index){ choice.choiceId=String(queueItem&&queueItem.id||'task:'+id)+':choice:'+index; });
     // R-B5 / 02 §5.3: hareke soldurma yalnız review ∧ s≥30 kartta. Hedefte anlam kayması
     // varsa yanlış cevap errors.cognate'e yazılır; telaffuz hataları phonics.misheard'de sayılır.
-    return {id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),direction:direction,audioOnly:opts.audioOnly===true,answer:answer,ar:String(meta.ar||''),meaning:String(meanings[0]||meta.meaning||''),translit:kaoLemmaReading(lemmaIdForCard(id),meta.translit),cognate:meta.cognate||null,durable30:isSettled(objectOr(quranLearnRoot(d).cards,{})[id],30),errorClass:meta.cognate&&meta.cognate.shift?'cognate':'',clipId:lemmaIdForCard(id)?'w-'+lemmaIdForCard(id):'',choices:choices};
+    return {id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),arm:arm,rung:rung,direction:direction,audioOnly:audioOnly,answer:answer,ar:String(meta.ar||''),meaning:String(meanings[0]||meta.meaning||''),translit:kaoLemmaReading(lemmaIdForCard(id),meta.translit),cognate:meta.cognate||null,durable30:isSettled(objectOr(quranLearnRoot(d).cards,{})[id],30),errorClass:meta.cognate&&meta.cognate.shift?'cognate':'',clipId:lemmaIdForCard(id)?'w-'+lemmaIdForCard(id):'',choices:choices};
   }
   // 02 §5.6 "bağ kur": hedefin Türkçe türevi; çeldirici başka kökten, anlamı çakışmayan türev.
   function kaoBuildLinkTask(queueItem,opts){ var id=String(queueItem.cardId||''),lemmaId=id.slice(2),lemmas=window.QuranLexiconV1&&Array.isArray(window.QuranLexiconV1.lemmas)?window.QuranLexiconV1.lemmas:[],lemma=lemmas.find(function(l){ return l.id===lemmaId; }); if(!lemma||!lemma.cognate||!lemma.cognate.tr) return null; var seed=String(opts.seed||'')+'|link|'+lemmaId,answer=String(lemma.cognate.tr),used=[answer],picked=[]; lemmas.filter(function(l){ return l.id!==lemmaId&&l.cognate&&l.cognate.tr&&!(lemma.root&&l.root===lemma.root); }).sort(function(a,b){ return seededRank(seed,a.id)-seededRank(seed,b.id)||a.id.localeCompare(b.id); }).some(function(l){ var label=String(l.cognate.tr); if(kaoLabelClash(label,used,true)) return false; used.push(label); picked.push({cardId:'k:'+l.id,label:label,correct:false}); return picked.length>=3; }); var choices=[{cardId:id,label:answer,correct:true}].concat(picked).sort(function(a,b){ return seededRank(seed+'|order',a.cardId)-seededRank(seed+'|order',b.cardId); }); choices.forEach(function(choice,index){ choice.choiceId=String(queueItem.id)+':choice:'+index; }); return {id:String(queueItem.id),cardId:id,type:'link',kind:'link',isNew:false,retry:false,prompt:'Türkçedeki türevini seç',answer:answer,ar:String(lemma.ar||''),meaning:String((lemma.meanings||[])[0]||''),translit:kaoLemmaReading(lemmaId,lemma.translit),cognate:null,clipId:'',choices:choices}; }
@@ -4312,6 +4315,7 @@
     kaoDelayedCandidates:kaoDelayedCandidates,
     kaoPickDistractors:kaoPickDistractors,
     kaoBuildTask:kaoBuildTask,
+    seededRank:seededRank,
     kaoGrammarCandidates:grammarCandidates,
     kaoBuildGrammarTask:kaoBuildGrammarTask,
     kaoGrammarTaskValid:kaoGrammarTaskValid,

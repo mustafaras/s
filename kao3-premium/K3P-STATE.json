@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-13",
+  "nextPrompt": "K3P-16",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -329,12 +329,16 @@
     {
       "id": "K3P-13",
       "wave": 2,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-14",
+      "result": "Ders âyetle açılır ve kapanır (K-G, TASARIM §3.2 · AKIS §3 ①⑤): açılış (goal) ve kapanış (apply) A YNI âyet satırını paylaşır — satır, hedef lemmaların çapa metnindeki ilk-son geçişi arasındaki pencere; çapa metni olmayan derste yeni lemmaların doğrulanmış ilk örnek cümlelerindeki kelimeler. Flow: applyItems bir kez hesaplanır, goal.words===apply.words===apply item; goal'a lessonIds/newLemmaIds eklendi. Runtime: kaoAyahRow (pencere) + kaoRowHtml (tezhipPage) + kaoGild/kaoGildStep (⑤ zirve; ses = hedef lemmaların w-<lemmaId>-measured klipsi; toplam ≤1,2 sn; hareket azaltmada statik); yeni App.kao* YOK — kaoLesson('gild') yeniden kullanıldı (45 sabit). tezhipPage'e gild (is-gild) eklendi. Eski örnek-cümle modeli (apply.sentences + applySentences + mode='examples') emekliye ayrıldı. test_k3p_lesson_ayah (5 kontrol, envanter 71→72); test_kao2_lesson_flow ve test_kao2_denetim yeni K-G davranışına güncellendi."
     },
     {
       "id": "K3P-14",
       "wave": 2,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-15",
+      "result": "Ders sonu anı: oturum başlangıcındaki bilinen lemma/kapsam tabanına göre yalnız yeni iki yönlü kalıcı kelimeler Tezhip'te yaldızlanır; gerçek kapsam farkı 800 ms sayaçla render sonrasında gösterilir. Kilometre taşında tema tokenlarından lacivert-altın konfeti ≤1,15 sn, temizlik 1,2 sn; varsayılan konfeti korunur. Hareket azaltmada statik. Yeni handler/schema/migration yok; 45 App.kao*. Yeni lesson_moment fixture, KAO envanteri 73. Kullanıcı K3P-13+14 ara yayınına ve 20261015a pin istisnasına açık onay verdi; final program releaseApproval değişmedi."
     },
     {
       "id": "K3P-16",

@@ -683,3 +683,45 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA **yok** (istenmedi) · cihaz yok
 - Gözlem: (1) **K-F yorumu (karar gerekebilir):** "Bugün ≤ 5 seçim" `.kao-today-screen` içinde tam **5** düğmeyle sağlanır (kaplama + birincil + 3 kısayol); `ekran-dok` v-home 6 gösterir çünkü **NavBar "Kapat"** modal sözleşmesidir (test_kao2_navigation kökte tam 1 kapatma ister). Araca `ekran-düğme` sütunu eklendi (5). (2) **Yol erişimi:** Bugün sadeleşince Yol satırı Kütüphane’ye taşındı (≤2 dokunuş). (3) **S0 kapısı:** Seviye 0 satırı K2F-15 koşuluna bağlı (varsayılan level1'de gizli). (4) **Hero başlığı tuzağı:** `heroCard` kaldırılınca "Hoş geldin" gibi step başlığı kayboldu; `tezhipCard`'a eyebrow/title/subtitle/secondary geri eklendi. (5) **Tezhip an kartında Arapça** artık GÖRÜNÜR → kendi lang/dir'ini taşır (test güncellendi). (6) **İlerleme/Ayarlar** gezinme çubuğunda simge olarak DURMUYOR (tek sütunlu NavBar sözleşmesi; iki buton ızgarayı kırar + "≤5" bütçesini aşardı) → Kütüphane’nin "Sen" grubuna kondu (2 dokunuş). Sapma; gerekiyorsa ayrı kart.
 - Sıradaki: K3P-13
+
+## seq 43 · — · YAYIN (on üçüncü ara yayın · K3P-12)
+- Tarih: 2026-10-14
+- Commit: (bu commit)
+- Yapılan:
+  - Kullanıcı "tümünü canlıya al ve sıradaki adım için starter yaz" dedi → **açık yayın onayı** verildi. `pin-yukselt.mjs 20261014b` ile ortak sürüm `20261014a` → **`20261014b`** (15 dosya, 82 geçiş; index.html 25 · sw.js 25 · panel-v2.html 4 + 12 test dosyası). Değişen varlıklar: `app/core/quranLearn.js`, `app/core/quranLearnViews.js`, `app/core/quranLearnFlow.js`, `app/kao.css`. `pinDeferral.files` boşaltıldı → tazelik testinde ERTELENDİ yok (61 bağlantı taze).
+  - Yayın öncesi tam kapı (`KAO2_ACCEPT_SLOW_HOST=1`, yavaş makine) → **TÜM KAPILAR YEŞİL** (tests/kao **71** · app 78 · panel 23 · panel-v2 27 · quran 9 · reminders · driver · zikr · kontrast · çift şık · okunuş · plan-check · pin senkronu · tekrar-üretim 10/10 · perf PASS).
+  - `kao3-premium` → `main` **fast-forward** (2 commit: K3P-12 + pin); `git push origin main` → `5fe2e549..10ef7726`.
+  - Pages koşusu **38566365630** → `status=completed conclusion=success` (headSha `10ef7726`). Canlı pin **yalnız GET** ile doğrulandı: `sw.js` → `SW_VERSION='20261014b'`, `SW_OFFLINE_VERSION='iip22-20261014b'`; `app/kao.css?v=20261014b` (HTTP 200, 94.770 B) içinde `.kao-today-hero{…}` ve `.kao-today-hero-link{position:absolute` var; `app/core/quranLearn.js?v=20261014b` (HTTP 200, 375.504 B) içinde `kaoLibraryHTML`/`kaoTezhipModel`/`kaoWeeklyDone` (8 geçiş) var. **Uygulama tarayıcıda açılmadı.**
+- Ölçüler: css 15,221 KiB L9 (tavan 16) · runtime 127,988 KiB L6 / 127,630 L9 (tavan 128) · içerik 184,591 (tavan 256) · kontrast 752/0 · p95 4,935 ms / steady 3,273 ms · canlı sürüm 20261014b.
+- Kapı (K-Q): yayın öncesi **TÜM KAPILAR YEŞİL**; yayın sonrası `senkron` → UYUMLU (23/37 · sıra K3P-13).
+- Kanıt düzeyi: kaynak/test · görsel QA yok · **deploy kanıtı: Pages success (38566365630) + canlı pin/font GET (kao.css Bugün/Tezhip sınıfları, quranLearn.js Kütüphane/model doğrulandı)** · cihaz yok
+- Gözlem: (1) **Cihaz kabulü kullanıcıda** — yenilik: Bugün ekranı yeniden (Tezhip an kartı + haftalık hedef + Kütüphane alt sayfası). Uyarı: açılışta yeni sürüm; "Verileri sıfırla"ya dokunma. (2) `releaseApproval` alanı `NOT_APPROVED` kalır (K3P-27 program sonu). (3) Bu yayında K3P-12'nin "kao-today-hero-eyebrow" ölü kuralı ve `kao-home-*` eski kartları **kaldırılmadı** (test/CSS etkisi yüksek); sonraki kart ölü kod temizliği yapabilir (ölçüm: heroCard/pathCard artık kullanılmıyor ama css orphan tarayıcısı nedeniyle duruyor). (4) `main` ile `kao3-premium` eşit; program dalı yerel.
+- Sıradaki: K3P-13
+
+## seq 44 · K3P-13 · KART (Dalga 2 · Tezhip, üçüncü kart)
+- Tarih: 2026-10-14
+- Commit: (bu commit)
+- Yapılan:
+  - **Ders âyetle açılır ve kapanır (K-G, TASARIM §3.2 · AKIS §3 ①⑤).** Açılış (goal) ve kapanış (apply) AYNI âyet satırını paylaşır. Satır, hedef lemmaların çapa metnindeki (namaz/sûre) **ilk-son geçişi arasındaki pencere**; çapa metni olmayan derste yeni lemmaların doğrulanmış ilk örnek cümlelerindeki kelimeler.
+  - **Flow.** `applyItems` plan içinde bir kez hesaplanır; `goal.words === apply.words` (tek referans). `goal`'a `lessonIds` (dersin kendi lemması) + `newLemmaIds` eklendi. **Eski örnek-cümle modeli emekliye ayrıldı:** `applySentences` + `APPLY_SENTENCE_MAX` silindi; `apply.mode==='examples'` ve `apply.sentences` kaldırıldı.
+  - **Views.** Açılış (goal) ve kapanış (apply) satırı `<div class="kao-lesson-apply-tezhip">` içinde `views.tezhipPage` ile çizilir. `tezhipPage`'e `gild` seçeneği (ilk n kelime `is-gild`); kapanışta **"Yaldızla"** (`kao-play-start`). Eski `kao-lesson-sentences` dalı silindi.
+  - **Motor.** `kaoAyahRow` (pencere), `kaoRowHtml` (Tezhip), `kaoGild`/`kaoGildStep` (⑤ zirve): ses = hedef lemmaların `w-<lemmaId>-measured` klipsi; kelimeler zamanlayıcıyla sırayla yaldızlanır, **toplam ≤ 1,2 sn** (adım 1200/sözcük). `SeyFx.shouldAnimate()===false` → yaldız STATİK (zamanlayıcı yok). **Yeni `App.kao*` YOK**; mevcut `kaoLesson('gild')` eylemi kullanıldı (45 sabit).
+  - **CSS.** `.kao-lesson-apply-tezhip`, `.kao-tezhip-word.is-gild`, `.kao-play-start`.
+  - **Testler.** Yeni `tests/kao/test_k3p_lesson_ayah.js` (**5 kontrol**: 109 ders referans+satır ortaklığı; hedef lemmalar + ≤25 sözcük, gerekçeli ve yalnız küçülen istisna listesi; açılış/kapanış aynı Tezhip satırı; sırayla yaldız ≤1,2 sn; hareket azaltmada statik) → envanter **71→72**. `test_kao2_lesson_flow` (4 kontrol) ve `test_kao2_denetim` R-08 yeni K-G davranışına güncellendi.
+- Ölçüler: runtime 127,988 → **127,944 KiB L6** (tavan 128; L9 127,592) · css 15,221 → **15,273 KiB L9** (tavan 16) · app.js **7799 satır** (dokunulmadı) · içerik 184,591 · `App.kao*` **45** · hedef ekranı ≤25 sözcük (109/109), hedef lemmalar 99/109 (10 gerekçeli istisna).
+- Kapı (K-Q): `kapi-hizli --kart K3P-13` → **HIZLI KAPI YEŞİL**; **tests/kao ailesi 72/72** (yavaş üç hariç 0 FAIL).
+- Kanıt düzeyi: kaynak/test · görsel QA **yok** (istenmedi) · cihaz yok
+- Gözlem: (1) **Runtime tuzağı (§2, yine, iki tur):** JS (~+1,1 KiB) payı iki kez aştı; tavan yükseltilmedi — **yalnız satır-başı `//`** yorumlarda parantez içi/cümle dışı kısaltma yapıldı (70+ satır, ~4,3 KB ham; atıf kodları ve davranış korundu; kod yolu hiç değişmedi, `diff` ile doğrulandı). **Ders:** tek geçişli yorum sıkıştırma yetmedi; satır-başı kısıtı + ara ölçüm şart. (2) **`akis-olc` 2b araç sınırı:** hedef ekranını ≤45 sayıp 80/109'da kırmızı raporlar; gerçek kural **≤25 sözcük** (AKIS §3 ①, tam ekran bütçesi, K3P-A8 D-4 değil). Araç 2b güncellemesi kapsam dışı (ayrı kart olabilir). (3) **Eski örnek-cümle modeli:** K2F-23 "örnek cümle" uygula adımı K-G ile gerçek âyet satırına dönüştü; `sentences` alanını bekleyen 4 test (lesson_flow ×4, denetim R-08) güncellendi. (4) **Pencere kapsamı:** ders planı çapa metnine göre kurulmadığından 10 derste bir lemma çapada yok (gerekçeli istisna); 25 sözcük sınırı varsayılan dailyNew=5'te 95 örnek dersinin TAMAMINDA sağlanır (istisna yok).
+- Sıradaki: K3P-14
+
+## seq 45 · K3P-14 · KART (Dalga 2 kapanışı)
+- Tarih: 2026-10-15
+- Commit: (bu commit)
+- Yapılan: ders başında ui-only bilinen lemma/kapsam tabanı; özette yalnız yeni iki yönlü kalıcı kelimelerin Tezhip yaldızı ve gerçek kapsam farkı; render-sonrası 800 ms sayaç. KAO kilometre taşı konfetisi tema tokenlarından lacivert-altın, en çok 1,15 sn; 1,2 sn temizlik. Varsayılan yardımcı davranışı ve hareket azaltmada statik metin korundu. Yeni handler/schema/migration yok.
+- Dosyalar: app/core/{helpers,quranLearn,quranLearnViews}.js; tests/kao/test_k3p_lesson_moment.js + README; üç durum kaydı. Yayın istisnasıyla index.html, sw.js, panel-v2.html ve bunların 12 pin fixture'ı mekanik 20261014b→20261015a eşitlendi; pinDeferral.files boşaltıldı.
+- Ölçüler: runtime L6 127,282 / 128 KiB; L9 126,926; CSS L9 15,273 / 16; içerik 184,591 / 256; App.kao* 45; app.js 7799 satır değişmedi. KAO envanteri 72→73.
+- Kapı: tam kapı TÜM KAPILAR YEŞİL (KAO 73, app 78, panel 23, Panel-v2 27, quran 9; reminders/driver/zikr/kontrast/ölçü/plan/pin PASS). Perf p95 7,635 ms, steady 4,383 ms; yalnız göreli bant yavaş makine bayrağıyla atlandı. Son hızlı kapı tekrarı HIZLI KAPI YEŞİL; 61 pin bağlantısı taze, erteleme yok.
+- Gözlem: ilk son-tur hızlı kapıda components:195 şerit beklentisi aralıklı kırıldı; değişmeden tek başına PASS. Gerçek zamanlı ders geçmişi K3P-15 hızlı doğru kolunu seçebilir; kapsam dışı düzeltme yok. Tarihsel tekrar-uret 9/10, R-08 eski apply.words/sentences modeli; güncel denetim R-08 ve 109 ders âyet fixture'ı PASS. Tarihsel araç bilgi amaçlı, 10/10 iddiası yok.
+- Yayın yetkisi: kullanıcının açık commit/push/merge/deploy ve ara pin istisnası onayı; kapsam yalnız K3P-13+14. Yeni yayın zinciri henüz bekliyor; gerçek commit/PR/Pages/no-cache eşliği teslim mesajında. releaseApproval=NOT_APPROVED final program sınırı korunur.
+- Kanıt düzeyi: kaynak/headless; görsel QA ve cihaz kabulü yok. K3P-16 yürütülmedi.
+- Sıradaki: K3P-16

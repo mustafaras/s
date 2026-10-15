@@ -226,6 +226,10 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-lesson-apply-word span:first-child{color:var(--kao-label);font-size:var(--f-callout);text-align:right}
 .kao-lesson-apply-word span:last-child{color:var(--kao-label-2);font-size:var(--f-subhead)}
 .kao-lesson-sentence{display:grid;gap:4px;padding:10px 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
+.kao-lesson-apply-tezhip{margin:0}
+.kao-lesson-apply-tezhip .kao-tezhip{padding:var(--kao-gap-1);background:none;box-shadow:none}
+.kao-tezhip-word.is-gild{background:color-mix(in srgb,var(--quran2) 22%,transparent);border-bottom:2px solid var(--kao-ok)}
+.kao-play-start{justify-self:start}
 .kao-lesson-sentence p{margin:0}
 .kao-lesson-sentence-ar{color:var(--kao-label);font-size:var(--kao-ar-body);text-align:right}
 .kao-lesson-sentence-pron{color:var(--kao-label-2);font-size:var(--f-subhead)}

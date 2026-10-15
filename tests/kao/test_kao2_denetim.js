@@ -156,10 +156,12 @@ check('R-08', 'K3-01', () => {
   let empty = 0, total = 0;
   for (const unit of content.curriculum.units) for (const lesson of unit.lessons) {
     const plan = flow.lessonPlan({ quranLearn: q }, lesson.id, new Date(NOW), content) || [];
-    const apply = plan.find((i) => i.kind === 'apply');
+    const apply = plan.find((i) => i.kind === 'apply'), goal = plan.find((i) => i.kind === 'goal');
     total += 1;
-    // Uygula adımı çapa metni kelimeleri (`words`) ya da doğrulanmış örnek cümleler (`sentences`) taşıyabilir.
-    if (!apply || !((apply.words || []).length || (apply.sentences || []).length)) empty += 1;
+    // K3P-13 (K-G): açılış ve kapanış AYNI âyet satırını paylaşır. Çapa metinli ders satırı `apply.words`
+    // taşır; çapa metni olmayan ders satırını yeni lemmaların örnek cümlelerinden çalışma zamanında kurar
+    // (bkz. test_k3p_lesson_ayah). Burada öğe varlığı ve satır ortaklığı denetlenir.
+    if (!apply || !goal || goal.words !== apply.words || (lesson.apply.kind !== 'examples' && !(apply.words || []).length)) empty += 1;
   }
   assert.ok(total > 100, `taranan ders sayısı beklenenden az (${total})`);
   return [empty === 0, `${empty}/${total} derste "Uygula" adımı içeriksiz`];

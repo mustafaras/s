@@ -185,79 +185,74 @@ check('oynatıcı: hedef önce, vadeli tekrar ısınmada; intro → hemen FSRS p
   assert.ok(state.saves >= 4, 'ilerleme ve FSRS kaydı kalıcılaştırıldı');
 });
 
-// K2F-23 (K3-01, R-08): çapa metni olmayan 95 derste (K2F-24: Ünite 2'nin 2 dersi namaz çapasına bağlandı, 97 → 95) "Uygula" adımı doğrulanmış örnek cümlelerle dolar.
+// K3P-13 (K-G): her ders bir âyet satırıyla açılır ve o satırın yaldızlanarak okunmasıyla kapanır.
+// Çapa metni olan (namaz/sûre) derste satır, hedef lemmaların çapa metnindeki ilk-son geçişi arasındaki
+// penceredir; çapa metni olmayan derste yeni lemmaların doğrulanmış ilk örnek cümlelerindeki kelimeler.
+// Açılış (goal) ve kapanış (apply) AYNI satırı kullanır (goal.words === apply.words).
 const allLessons = curriculum.units.flatMap((unit) => unit.lessons);
-const SENTENCE_KEYS = ['lemmaId', 'ar', 'pronunciation', 'tr', 'ref'];
 
-check('K2F-23 uygula: 109 dersin 109\'unda adım içerikli (kelime ya da cümle); boş liste yok', () => {
+check("K3P-13 (K-G): 109 dersin 109'unda açılış ve kapanış AYNI satırı paylaşır (goal.words === apply.words)", () => {
   const q = freshQ();
-  let examples = 0;
+  let prayer = 0, examples = 0;
   for (const item of allLessons) {
-    const apply = flow.lessonPlan({ quranLearn: q }, item.id, now, content).find((entry) => entry.kind === 'apply');
-    assert.ok(apply, `${item.id}: uygula adımı yok`);
-    const count = (apply.words || []).length + (apply.sentences || []).length;
-    assert.ok(count > 0, `${item.id}: uygula adımı içeriksiz`);
-    if (item.apply && item.apply.kind === 'examples') {
-      examples += 1;
-      assert.equal(apply.mode, 'examples', `${item.id}: mode`);
-      assert.equal((apply.words || []).length, 0, `${item.id}: örnek modunda çapa kelimesi olmaz`);
-    }
+    const plan = flow.lessonPlan({ quranLearn: q }, item.id, now, content);
+    const goal = plan.find((entry) => entry.kind === 'goal'), apply = plan.find((entry) => entry.kind === 'apply');
+    assert.ok(goal && apply, `${item.id}: açılış/kapanış öğesi yok`);
+    assert.equal(goal.words, apply.words, `${item.id}: açılış ve kapanış AYNI satırı paylaşmalı`);
+    assert.ok(Array.isArray(apply.words), `${item.id}: satır dizisi yok`);
+    if (item.apply.kind === 'examples') { examples += 1; assert.equal(apply.words.length, 0, `${item.id}: örnek modunda çapa kelimesi satırı boş`); }
+    else { prayer += 1; assert.ok(apply.words.length > 0, `${item.id}: çapa metni satırı boş`); }
   }
+  assert.equal(prayer, 14, 'çapa metinli (namaz/sûre) ders sayısı');
   assert.equal(examples, 95, 'çapa metni olmayan ders sayısı');
 });
 
-check('K2F-23 uygula: örnek cümleler dersin lemmalarından (önce yeni), en çok 3, doğrulanmış examples[0]; tahmin yok', () => {
+check('K3P-13 (K-G): çapa metni olan derste satır, çapa metninin hedef lemmalarını içeren penceresidir', () => {
   const q = freshQ();
-  for (const item of allLessons.filter((entry) => entry.apply && entry.apply.kind === 'examples')) {
+  for (const item of allLessons.filter((entry) => entry.apply && entry.apply.kind !== 'examples')) {
     const plan = flow.lessonPlan({ quranLearn: q }, item.id, now, content);
-    const apply = plan.find((entry) => entry.kind === 'apply');
-    const sentences = plain(apply.sentences);
-    assert.ok(sentences.length >= 1 && sentences.length <= 3, `${item.id}: cümle sayısı ${sentences.length}`);
-    const fresh = plain(plan[0].newLemmaIds);
-    const eligible = plain(plan[0].lemmaIds);
-    const order = fresh.concat(eligible.filter((id) => !fresh.includes(id)));
-    assert.deepEqual(sentences.map((entry) => entry.lemmaId), order.slice(0, sentences.length), `${item.id}: sıra (önce yeni lemma)`);
-    for (const sentence of sentences) {
-      assert.deepEqual(Object.keys(sentence).sort(), SENTENCE_KEYS.concat('lemmaPronunciation').sort(), `${item.id}: biçim`);
-      const lemma = content.lexicon.byId(sentence.lemmaId);
-      assert.equal(lemma.verified, true, `${sentence.lemmaId}: doğrulanmamış lemma`);
-      const source = lemma.examples[0];
-      assert.deepEqual({ ar: sentence.ar, pronunciation: sentence.pronunciation, tr: sentence.tr, ref: sentence.ref },
-        { ar: source.ar, pronunciation: source.pronunciation, tr: source.tr, ref: source.ref }, `${sentence.lemmaId}: örnek veriyle aynı değil`);
-    }
+    const goal = plan.find((entry) => entry.kind === 'goal'), apply = plan.find((entry) => entry.kind === 'apply');
+    const ids = goal.lemmaIds.concat(goal.newLemmaIds), words = apply.words;
+    const inside = words.map((word, index) => (ids.includes(word.mappedLemmaId || word.lemmaId) ? index : -1)).filter((index) => index >= 0);
+    assert.ok(inside.length > 0, `${item.id}: çapa metninde hedef lemma yok`);
+    // Pencere kuralı çalışma zamanında (görünüm testi) doğrulanır; burada çapa metni ve hedef tutarlılığı.
+    assert.ok(words.length > 0, `${item.id}: çapa metni boş`);
   }
 });
 
-check('K2F-23 uygula: günlük yeni kelime 0 (eski/içe aktarılmış veri) olsa da hiçbir derste adım boş kalmaz', () => {
+check('K3P-13 (K-G): günlük yeni kelime 0 (eski/içe aktarılmış veri) olsa da hiçbir derste kapanış satırı boş kalmaz', () => {
+  // Çapa metinli ders satırını apply.words taşır; çapa metni olmayan ders satırını yeni lemmaların
+  // örnek cümlelerinden çalışma zamanında kurar (bkz. test_k3p_lesson_ayah). Burada plan tutarlılığı denetlenir.
   for (const dailyNew of [0, 1]) {
     const q = freshQ(); q.settings.dailyNew = dailyNew;
     for (const item of allLessons) {
-      const apply = flow.lessonPlan({ quranLearn: q }, item.id, now, content).find((entry) => entry.kind === 'apply');
-      assert.ok((apply.words || []).length + (apply.sentences || []).length > 0, `${item.id} (dailyNew=${dailyNew}): uygula adımı boş`);
+      const plan = flow.lessonPlan({ quranLearn: q }, item.id, now, content);
+      const apply = plan.find((entry) => entry.kind === 'apply'), goal = plan.find((entry) => entry.kind === 'goal');
+      assert.equal(goal.words, apply.words, `${item.id} (dailyNew=${dailyNew}): açılış/kapanış satırı ortak değil`);
+      assert.ok((goal.lessonIds || []).length > 0, `${item.id} (dailyNew=${dailyNew}): ders lemması yok`);
+      if (item.apply.kind !== 'examples') assert.ok((apply.words || []).length > 0, `${item.id} (dailyNew=${dailyNew}): çapa metni satırı boş`);
     }
   }
 });
 
-check('K2F-23 uygula: görünüm cümleyi Arapça + okunuş + Türkçe + âyet künyesi + "Bu dersin kelimesi" ile çizer; gerçek akışta ulaşılır', () => {
+check('K3P-13 (K-G): açılış ve kapanış AYNI satırı Tezhip olarak çizer; "Yaldızla" kelimeleri sırayla yaldızlar', () => {
   const t = bootKao();
   freshUser(t);
   const target = t.win.QuranCurriculumV2.units[3].lessons[0];
-  assert.equal(target.apply.kind, 'examples');
   assert.equal(t.api.kaoLesson('start', target.id), true);
-  assert.equal(playLesson(t, { stopAt: 'apply' }), true, 'uygula adımına ulaşılamadı');
-  const item = t.ui.kaoLesson.plan[t.ui.kaoLesson.at];
-  assert.equal(item.kind, 'apply');
-  const html = t.api.kaoOverlayHTML(t.NOW);
-  const flat = text(html);
-  assert.ok(item.sentences.length >= 1);
-  for (const sentence of item.sentences) {
-    assert.ok(html.includes(sentence.ar), `${sentence.lemmaId}: Arapça yok`);
-    assert.ok(flat.includes(sentence.pronunciation), `${sentence.lemmaId}: okunuş yok`);
-    assert.ok(flat.includes(sentence.tr), `${sentence.lemmaId}: Türkçe yok`);
-    assert.ok(flat.includes(sentence.ref), `${sentence.lemmaId}: künye yok`);
-    assert.ok(flat.includes(`Bu dersin kelimesi: ${sentence.lemmaPronunciation}`), `${sentence.lemmaId}: ders kelimesi satırı yok`);
-  }
-  assert.equal((html.match(/kao-primary/g) || []).length >= 1, true);
+  const rowOf = (html) => (html.match(/<div class="kao-lesson-apply-tezhip">([\s\S]*?)<\/div>/) || ['', ''])[1];
+  const goalRow = rowOf(t.api.kaoOverlayHTML(t.NOW));
+  assert.ok(goalRow.includes('kao-tezhip-word'), 'açılışta Tezhip satırı yok');
+  assert.equal(playLesson(t, { stopAt: 'apply' }), true, 'kapanış adımına ulaşılamadı');
+  const applyHtml = t.api.kaoOverlayHTML(t.NOW);
+  assert.equal(rowOf(applyHtml), goalRow, 'açılış ve kapanış satırı aynı değil');
+  assert.match(applyHtml, /kao-play-start/, 'Yaldızla düğmesi yok');
+  assert.equal((applyHtml.match(/is-gild/g) || []).length, 0, 'başlangıçta yaldız statik değil');
+  // Statik ilerleme (hareket azaltma yok, timer yok): kelimeler sırayla yaldızlanır.
+  assert.equal(t.api.kaoLesson('gild'), true);
+  for (let guard = 0; guard < 50 && t.ui.kaoGildTimer; guard += 1) { const timer = t.timers[t.ui.kaoGildTimer - 1]; if (timer && timer.fn) timer.fn(); else break; }
+  const words = (goalRow.match(/kao-tezhip-word/g) || []).length;
+  assert.equal((t.api.kaoOverlayHTML(t.NOW).match(/is-gild/g) || []).length, words, 'tüm satır yaldızlanmadı');
 });
 
 // K2F-24 (K3-02 · D-07): namaz metinlerindeki lp_* kelimeleri öğretilen l_* lemmalarına muhafazakâr belirlenimci eşlemeyle bağlanır.

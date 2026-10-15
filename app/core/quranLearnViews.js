@@ -124,20 +124,23 @@
   function tezhipPage(options){
     if(!deps) throw new Error('KAO2-04: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
-    var lines=Array.isArray(options.lines)?options.lines:[],interactive=options.interactive===true;
+    var lines=Array.isArray(options.lines)?options.lines:[],interactive=options.interactive===true,gild=Number(options.gild)||0,position=0;
     var words=lines.map(function(line){
       return (Array.isArray(line)?line:[]).map(function(word){
         word=word&&typeof word==='object'?word:{};
+        position+=1;
         var state=['known','learning','new'].indexOf(word.state)>=0?word.state:'new';
-        var ar=escapeText(word.ar||''),label=word.index==null?ar:ar+', '+escapeText(word.index);
-        return {ar:ar,state:state,label:label,aria:ar+', '+(state==='known'?'biliniyor':(state==='learning'?'öğreniliyor':'henüz bilinmiyor'))};
+        var ar=escapeText(word.ar||'');
+        return {ar:ar,state:state,on:gild>=position,aria:ar+', '+(state==='known'?'biliniyor':(state==='learning'?'öğreniliyor':'henüz bilinmiyor'))};
       });
     });
     var body=words.map(function(line){
       return '<span class="kao-tezhip-line">'+line.map(function(word){
-        // K2F-35/a11y: her Arapça öğe kendi lang/dir'ini taşır (mirasa güvenilmez).
-        if(interactive) return '<button type="button" class="kao-tezhip-word is-'+word.state+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</button>';
-        return '<span class="kao-tezhip-word is-'+word.state+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</span>';
+        // K3P-13: yaldızlanan kelime `is-gild` sınıfını alır.
+        // K2F-35/a11y: her Arapça öğe kendi lang/dir'ini taşır.
+        var cls='kao-tezhip-word is-'+word.state+(word.on?' is-gild':'');
+        if(interactive) return '<button type="button" class="'+cls+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</button>';
+        return '<span class="'+cls+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</span>';
       }).join('')+'</span>';
     }).join('');
     return '<figure class="kao-tezhip">'+deps.icon('rumi',120,'kao-tezhip-orn')+'<figcaption class="kao-tezhip-title">'+escapeText(options.title||'')+'</figcaption>'
@@ -184,7 +187,7 @@
     return '<button type="button" class="kao-primary" aria-label="'+label+'"'+(call?' onclick="'+call+'"':' disabled')+'>'+label+'</button>';
   }
 
-  // KAO2-09 · S-02 Bugün: HeroCard (tek birincil eylem) + Yolun kartı + iki grouped list.
+  // KAO2-09 · S-02 Bugün: HeroCard + Yolun kartı + iki grouped list.
   function heroCard(options){
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
@@ -217,7 +220,7 @@
     if(!deps) throw new Error('KAO2-09: görünüm bağımlılıkları kayıtlı değil');
     options=options&&typeof options==='object'?options:{};
     var tz=options.tezhip&&typeof options.tezhip==='object'?options.tezhip:{};
-    // Başlık/alt başlık nextStep'ten gelir (ör. "Hoş geldin"); foot gece/karıştırma uyarıları; ayrı birincil eylem kartın altında.
+    // Başlık/alt başlık nextStep'ten gelir; foot gece/karıştırma uyarıları; ayrı birincil eylem kartın altında.
     var foot=Array.isArray(options.foot)&&options.foot.length?'<div class="kao-hero-foot">'+options.foot.map(function(line){
       line=line&&typeof line==='object'?line:{};
       return '<p class="kao-hero-note"><span class="kao-hero-note-icon" aria-hidden="true">'+deps.icon(String(line.icon||''))+'</span><span>'+escapeText(line.text)+'</span></p>';
@@ -240,7 +243,7 @@
     var cover=coverage===null||!Number.isFinite(coverage)?'':'<span class="kao-today-week-coverage"> · Kur’an kapsamı %<span data-countup="'+coverage+'" data-countup-key="kao-coverage">'+coverage+'</span></span>';
     return '<p class="kao-today-week" role="status" aria-label="'+escapeText('Bu hafta '+done+' / '+total+' gün')+'"><span class="kao-today-week-mark" aria-hidden="true">◔</span><span class="kao-today-week-text">Bu hafta <strong>'+done+' / '+total+'</strong> gün</span>'+cover+'</p>';
   }
-  // K3P-12 (§3.1): Kütüphane — keşif tek alt sayfada; gruplar groupedList ile çizilir.
+  // K3P-12: Kütüphane — keşif tek alt sayfada; gruplar groupedList ile çizilir.
   function libraryScreen(model){
     if(!deps) throw new Error('KAO2-12: görünüm bağımlılıkları kayıtlı değil');
     model=model&&typeof model==='object'?model:{};
@@ -285,7 +288,7 @@
     var lessons=(Array.isArray(model.lessons)?model.lessons:[]).map(function(lesson){
       lesson=lesson&&typeof lesson==='object'?lesson:{};
       var status=lesson.done===true?'done':(lesson.current===true?'current':'upcoming'),mark=status==='done'?'✓':(status==='current'?'●':'○');
-      // KAO2-18 (Y-03): dersin hedef cümlesi listede görünür (onaylıysa).
+      // KAO2-18: dersin hedef cümlesi listede görünür.
       var goal=lesson.goal?'<span class="kao-unit-step-goal">'+escapeText(lesson.goal)+'</span>':'';
       return '<li class="kao-unit-step kao-unit-step-'+status+'"'+(lesson.current===true?' aria-current="step"':'')+'><span class="kao-unit-step-mark" aria-hidden="true">'+mark+'</span><span class="kao-unit-step-body"><span class="kao-unit-step-title">'+escapeText(lesson.title)+'</span>'+goal+'</span><span class="kao-sr-only">'+escapeText(status==='done'?'Tamamlandı':(status==='current'?'Sıradaki ders':'Sırada'))+'</span></li>';
     }).join('');
@@ -352,23 +355,21 @@
         if(Array.isArray(cell)){ var reading=escapeText(cell[2]); return '<td><span class="kao-grammar-ar" lang="ar" dir="rtl">'+escapeText(cell[1]||cell[0]||'')+'</span>'+(reading?'<span class="kao-grammar-reading" lang="tr" dir="ltr">'+reading+'</span>':'')+'</td>'; }
         return '<td>'+escapeMixed(cell&&typeof cell==='object'?(cell.label||cell.text||''):cell)+'</td>'; }).join('')+'</tr>';
       }).join('');
-      // K3P-A8 (D-4): kavram ekranının ilk görünümü başlık (kuralın özeti) + "Daha fazla" olur; tablo,
+      // K3P-A8: kavram ekranının ilk görünümü başlık + "Daha fazla" olur; tablo,
       // terimler ve uzun kural cümlesi katlanır. Böylece ilk görünüm her kavramda ≤ 45 sözcük kalır.
       var detail=(model.plainTr?'<p>'+escapeText(model.plainTr)+'</p>':'')+(head||rowHtml?'<div class="kao-lesson-table-wrap"><table class="kao-lesson-table"><thead><tr>'+head+'</tr></thead><tbody>'+rowHtml+'</tbody></table></div>':'')+(model.termTr?'<p class="kao-lesson-term-note">Terimler: '+escapeText(model.termTr)+'</p>':'');
       body='<section class="kao-lesson-card kao-lesson-concept" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Kavram</p><h3 id="kao-lesson-title">'+title+'</h3>'+moreBlock(detail)+'</section>';
-    }else if(model.stage==='apply'&&Array.isArray(model.sentences)){
-      var sentences=model.sentences.map(function(sentence){
-        sentence=sentence&&typeof sentence==='object'?sentence:{};
-        return '<li class="kao-lesson-sentence"><p class="kao-lesson-sentence-ar" lang="ar" dir="rtl">'+escapeText(sentence.ar)+'</p><p class="kao-lesson-sentence-pron">'+escapeText(sentence.pronunciation)+'</p><p class="kao-lesson-sentence-tr">'+escapeText(sentence.tr)+'</p><p class="kao-lesson-sentence-meta">Âyet '+escapeText(sentence.ref)+' · Bu dersin kelimesi: '+escapeText(sentence.lemmaPronunciation)+'</p></li>';
-      }).join('');
-      body='<section class="kao-lesson-card kao-lesson-apply kao-lesson-sentences" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Örnek cümleler</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.lead)+'</p>'+(sentences?'<ol class="kao-lesson-apply-list">'+sentences+'</ol>':'')+'</section>';
     }else if(model.stage==='apply'){
+      var row=model.rowHtml?'<div class="kao-lesson-apply-tezhip">'+model.rowHtml+'</div>':'';
       var words=(Array.isArray(model.words)?model.words:[]).map(function(word){
         word=word&&typeof word==='object'?word:{};
         var state=['new','known','open'].indexOf(word.state)>=0?word.state:'open';
         return '<li class="kao-lesson-apply-word kao-lesson-apply-'+state+'"><span lang="ar" dir="rtl">'+escapeText(word.ar)+'</span><span>'+escapeText(word.tr)+'</span></li>';
       }).join('');
-      body='<section class="kao-lesson-card kao-lesson-apply" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Çapa metni</p><h3 id="kao-lesson-title">'+title+'</h3><p>'+escapeText(model.lead)+'</p><ol class="kao-lesson-apply-list">'+words+'</ol></section>';
+      // K3P-13: aynı satır Tezhip olarak çizilir; "Yaldızla" düğmesi kelimeleri sırayla yaldızlar.
+      var lead=model.hasRow?'Yaldızla’ya dokun; kelimeler çapa metninde sırayla yaldızlanır.':'';
+      var play=model.hasRow?'<button type="button" class="kao-lesson-audio kao-play-start"'+(model.playCall?' onclick="'+model.playCall+'"':' disabled')+'>'+deps.icon('headphones',17)+' Yaldızla</button>':'';
+      body='<section class="kao-lesson-card kao-lesson-apply" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Çapa metni</p><h3 id="kao-lesson-title">'+title+'</h3>'+(lead?'<p>'+escapeText(lead)+'</p>':'')+row+play+'<ol class="kao-lesson-apply-list">'+words+'</ol></section>';
     }else if(model.stage==='summary'){
       var learned=(Array.isArray(model.learnedWords)?model.learnedWords:[]).slice(0,10).map(function(word){
         word=word&&typeof word==='object'?word:{};
@@ -384,7 +385,8 @@
       body='<section class="kao-lesson-card kao-lesson-summary kao-moment" aria-labelledby="kao-lesson-title" aria-live="polite">'+ORN+'<p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
     }else{
       var goalLine=model.goal?'<p class="kao-lesson-goal-line">'+escapeText(model.goal)+'</p>':'';
-      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3>'+goalLine+moreBlock('<p>'+escapeText(model.promise)+'</p>')+'</section>';
+      var row=model.rowHtml?'<div class="kao-lesson-apply-tezhip">'+model.rowHtml+'</div>':'';
+      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3>'+row+goalLine+moreBlock('<p>'+escapeText(model.promise)+'</p>')+'</section>';
     }
     var buttonLabel=escapeText(model.buttonLabel||'Devam');
     var secondaryCall=actionCall(model.secondaryAction),secondary=model.secondaryAction?'<button type="button" class="kao-lesson-audio kao-lesson-more"'+(secondaryCall?' onclick="'+secondaryCall+'"':' disabled')+'>'+escapeText(model.secondaryLabel||'5 dakika daha')+'</button>':'';
@@ -521,7 +523,7 @@
     return '<main class="kao-grammar-concept" aria-labelledby="kao-grammar-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Gramer</p><h2 class="kao-largetitle-heading" id="kao-grammar-title">'+escapeText(model.title)+'</h2><p class="kao-grammar-plain">'+escapeText(model.plainTr)+'</p>'+worked+'</div></div>'+ayahSection+examples+notesSection+(model.termTr?'<details class="kao-grammar-term"><summary>Terimlere bak</summary><p>'+escapeText(model.termTr)+'</p></details>':'')+(lessons?'<section class="kao-grammar-lessons" aria-labelledby="kao-grammar-lessons-title"><h3 id="kao-grammar-lessons-title">Bu kavramın geçtiği dersler</h3><ul>'+lessons+'</ul></section>':'')+'</main>';
   }
 
-  // K2F-14 · Seviye 0: aşamaya göre (intro → listen → drill → read → done) FARKLI HTML; motor yalnız model üretir (K-2);
+  // K2F-14 · Seviye 0: aşamaya göre FARKLI HTML; motor yalnız model üretir;
   // aşama başına en fazla bir `.kao-primary`; alıştırma bitmeden birincil düğme pasif; geri bildirim aria-live.
   function s0Arabic(text,className){ return '<span'+(className?' class="'+className+'"':'')+' lang="ar" dir="rtl">'+escapeText(text)+'</span>'; }
   function s0MarkList(marks){

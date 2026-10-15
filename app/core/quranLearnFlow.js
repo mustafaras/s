@@ -55,7 +55,7 @@
     return {stack:result,entry:result[result.length-1],changed:true};
   }
 
-  // KAO2-08: saf müfredat ilerlemesi ve "sıradaki adım" (05 §4). Girdiler salt
+  // KAO2-08: saf müfredat ilerlemesi ve "sıradaki adım". Girdiler salt
   // okunur; saat yalnız parametre olarak gelir, bu dosya hiçbir durum yazmaz.
   var DAY_MS=86400000,REVIEW_CAP=20,DEBT_LIMIT=60,WARMUP_GAP_DAYS=7,WARMUP_CARDS=10;
   var MIN_PER_TASK=0.55,SETTLED_STABILITY=7,MASTERY_MINUTES=4,REPAIR_MINUTES=3,S0_MINUTES=5;
@@ -128,18 +128,8 @@
       return out;
     });
   }
-  // K2F-23: çapa metni olmayan derste "Uygula" adımı dersin lemmalarının doğrulanmış ilk örnek cümlesiyle dolar
-  // (önce yeni lemmalar, en çok 3). Arapça, okunuş ve çeviri yalnız lexicon `examples[0]`'dan gelir; doğrulanmamış örnek yok.
-  var APPLY_SENTENCE_MAX=3;
-  function applySentences(content,fresh,eligible){
-    var lex=content&&content.lexicon,order=fresh.concat(eligible.filter(function(id){ return fresh.indexOf(id)<0; })),out=[];
-    for(var i=0;i<order.length&&out.length<APPLY_SENTENCE_MAX;i+=1){
-      var lemma=lex&&typeof lex.byId==='function'?lex.byId(order[i]):null,source=lemma&&lemma.verified===true&&Array.isArray(lemma.examples)?lemma.examples[0]:null;
-      if(!source||!source.ar||!source.tr||!source.ref||!source.pronunciation) continue;
-      out.push({lemmaId:lemma.id,ar:String(source.ar),pronunciation:String(source.pronunciation),tr:String(source.tr),ref:String(source.ref),lemmaPronunciation:String(lemma.translit||'')});
-    }
-    return out;
-  }
+  // K3P-13 (K-G): çapa metni olmayan dersin "Uygula" adımı, tezhip satırını yeni lemmaların doğrulanmış
+  // ilk örnek cümlelerinden kurar; hedef `goal.row` ile aynı kaynaktan gelir.
   // KAO2-12: tek dersin kaynak-bağlı sırası; içerik ve veri salt okunur, bütün Arapça lexicon/anchor kaynağından gelir.
   // K2F-20: ders içerikleri yeniden dağıtılabilir; tamamlanmış derse sonradan taşınan ve hiç tanışılmamış
   // kelimeler kaybolmasın diye SIRADAKİ dersin planına eklenir; tamamlanmış ders tamamlanmış kalır, kart verisi değişmez.
@@ -226,11 +216,13 @@
     var lex=c.lexicon,grammar=c.grammar,lemmas=eligible.map(function(id){ return lex&&typeof lex.byId==='function'?lex.byId(id):null; }).filter(Boolean);
     var concept=lesson.conceptId&&grammar&&typeof grammar.byId==='function'?grammar.byId(lesson.conceptId):null;
     var templates=concept&&Array.isArray(concept.templates)?concept.templates:[];
-    var goal={id:'goal:'+lesson.id,kind:'goal',lessonId:lesson.id,title:safeLessonTitle(lesson),lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),apply:lesson.apply||null},intros=Object.create(null);
+    // K3P-13 (K-G): açılış ve kapanış AYNI satırı kullanır; çapa kelimeleri bir kez hesaplanır.
+    var applyItems=applyWords(lesson,c,q,fresh);
+    var goal={id:'goal:'+lesson.id,kind:'goal',lessonId:lesson.id,title:safeLessonTitle(lesson),lemmaIds:eligible.slice(),lessonIds:own,newLemmaIds:fresh.slice(),apply:lesson.apply||null,words:applyItems},intros=Object.create(null);
     fresh.forEach(function(id,index){
       var lemma=lex&&typeof lex.byId==='function'?lex.byId(id):null;
       if(!lemma) return;
-      var anchorWords=applyWords(lesson,c,q,fresh),anchor=anchorWords.find(function(word){ return word.lemmaId===id||word.mappedLemmaId===id; })||null;
+      var anchor=applyItems.find(function(word){ return word.lemmaId===id||word.mappedLemmaId===id; })||null;
       intros[id]={id:'intro:'+id,kind:'intro',lessonId:lesson.id,lemmaId:id,lemma:lemma,ordinal:index+1,total:fresh.length,anchor:anchor,applyRef:lesson.apply||null};
     });
 
@@ -305,8 +297,7 @@
       }
     }
 
-    var apply={id:'apply:'+lesson.id,kind:'apply',lessonId:lesson.id,ref:lesson.apply||null,maxMinutes:capMinutes,words:applyWords(lesson,c,q,fresh)};
-    if(obj(lesson.apply).kind==='examples'){ apply.mode='examples'; apply.sentences=applySentences(c,fresh,eligible.concat(ids.filter(function(id){ return eligible.indexOf(id)<0; }))); }
+    var apply={id:'apply:'+lesson.id,kind:'apply',lessonId:lesson.id,ref:lesson.apply||null,maxMinutes:capMinutes,words:applyItems};
     items.push(apply);
     items.push({id:'summary:'+lesson.id,kind:'summary',lessonId:lesson.id,lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),practiceCount:practiceCount});
     return items;
@@ -375,7 +366,7 @@
     items.push({id:'summary:mastery:'+unit.id,kind:'summary',mastery:true,unitId:unit.id,lemmaIds:ids.slice(),newLemmaIds:[],practiceCount:practice.length});
     return items;
   }
-  // K2F-07: başarısız ustalıktan sonra onarım — yalnız karıştırılan (repair.lemmaIds ∩ ünite) kelimeler, iki yön,
+  // K2F-07: başarısız ustalıktan sonra onarım — yalnız karıştırılan kelimeler, iki yön,
   // tanış adımı yok, en çok 10 soru. Saf; durum yazmaz. Bitişte `repair:null` yazımı motora aittir.
   function repairPlan(snapshot,unitId,now,content){
     checkNow(now);
@@ -494,7 +485,7 @@
     var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
     // K3P-A4: Bugün tahmini sığan oturumdan türetilir. Sığan tekrar = bütçe − dersin özü, en çok vadeli sayısı.
     var bound=taskBudget(cap,daily,now),core=lessonTaskCount(q,lesson.id,now,content,fresh);
-    // Isınma (en kararlı, ≤WARMUP_MAX) her zaman kalır; bütçe onun üstüne tekrar ekler.
+    // Isınma her zaman kalır; bütçe onun üstüne tekrar ekler.
     var fitReviews=bound>0?Math.min(reviews,Math.max(Math.min(reviews,WARMUP_MAX),bound-core)):reviews;
     var minutes=estimateMinutes(daily,fitReviews+core,now,cap),counts={reviews:fitReviews,fresh:fresh};
     // 05 §10: tekrar borcu yeni kelimeyi sıfırladıysa ünite tanıtımı yerine "yalnız tekrar" günü.
@@ -522,7 +513,7 @@
     if(s0) return step('s0-lesson','Harfler · Ders '+(s0.index+1)+': '+s0.lesson.title,'Seviye 0 · ~'+S0_MINUTES+' dk',S0_MINUTES,'kaoS0',s0.lesson.id);
     var current=currentUnit(q,content);
     if(current&&!current.progress.nextLesson){
-      // K2F-07: öncelik repair > mastery. Onarım biter bitmez (repair:null) yeniden mastery önerilir.
+      // K2F-07: öncelik repair > mastery. Onarım biter bitmez yeniden mastery önerilir.
       if(unitMastery(q,current.unit.id).state==='repair') return step('repair','Onarım: '+current.unit.title,'Karıştırdığın kelimeleri pekiştir · ~'+REPAIR_MINUTES+' dk',REPAIR_MINUTES,'kaoLesson','repair:'+current.unit.id);
       return step('mastery','Ustalık: '+current.unit.title,'Çapa metnini dokunmadan oku + karma test · ~'+MASTERY_MINUTES+' dk',MASTERY_MINUTES,'kaoLesson',current.unit.id);
     }

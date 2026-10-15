@@ -6,8 +6,8 @@ Sıradaki prompt: K3P-17
 
 - **Tarih:** 2026-10-15.
 - **Son tamamlanan:** K3P-16 — hatırlama merdiveni seçici ve kart düzeyinde A/B ataması. 26/37 kart tamamlandı. K3P-17 açılmadı.
-- **Yetki:** kullanıcının K3P-16 başlatıcısı yalnız bu kartın uygulaması ve yerel commit'i içindir; push/merge/deploy/tag yapılmadı. releaseApproval=NOT_APPROVED korunur.
-- **Yayın:** önceki K3P-13+14 yayını değişmedi; pin **20261015a**. Bu kartın değişen app/core/quranLearn.js ve app/core/quranLearnFlow.js dosyaları pinDeferral.files içinde; canlıya çıktığı iddia edilmez. Önceki yayın makbuzu LEDGER seq 46'dadır.
+- **Yetki:** kullanıcı 2026-10-15'te yalnız K3P-16 için commit/push/main merge/deploy ve ara pin istisnasını açıkça onayladı. Final K3P-27 releaseApproval=NOT_APPROVED korunur; K3P-17 açılmaz, tag yok.
+- **Yayın:** K3P-16 ara yayını doğrulandı; yeni pin **20261015b**, pinDeferral.files boş. Tam kapı yeşil; Pages/canlı eşlik kanıtı beklenir. Önceki yayın makbuzu LEDGER seq 46'dadır.
 - **Kanıt:** kaynak/headless ve sentetik veri. Tarayıcı, gerçek hesap, kişisel veri deposu, görsel QA veya cihaz kabulü yok.
 
 ## K3P-16 ne yaptı
@@ -40,12 +40,12 @@ Sıradaki prompt: K3P-17
 ## Kapılar ve açık sınırlar
 
 - **node kao3-premium/araclar/kapi-hizli.mjs --kart K3P-16 --yavas → HIZLI KAPI YEŞİL.** KAO 74 (kabul/grammar_tasks/denetim dahil), sözleşme 10, driver, çift şık ve okunuş PASS. İlk tur eski yön/VM/önbellek varsayımlı sekiz fixture/üst-kabul hatası verdi; ilgili fixture düzeltmelerinden sonra tüm kapı tekrar koşuldu ve yeşil. Hiçbir kabul kontrolü kaldırılmadı.
-- KAO2_ACCEPT_SLOW_HOST=1 yalnız göreli perf bandını atlar; mutlak tavanlar korunur. K3P-16 dalga sonu değildir; bu oturumda ayrı tam kapı koşulmadı, önceki kartın tam kapısı güncel kanıt sayılmadı.
+- Ara yayın için tam kapı tekrar koşuldu: KAO 74, app 78, panel 23, panel-v2 27, quran 9 fixture PASS; smoke, driver, zikr, kontrast, çift şık, okunuş, plan ve pin PASS. Migration 67/67 ve 61 benzersiz asset URL tazeliği PASS. Runtime L9 127,196 KiB; p95 9,809 ms / steady 3,859 ms. KAO2_ACCEPT_SLOW_HOST=1 yalnız göreli perf bandını atlar; mutlak tavanlar korunur. Tarihsel tekrar-uret 9/10 özeti tam kapının engelleyici kontrolü değildir; 10/10 iddiası yok.
 - R1 payı TASARIM §4 sınıflamasıdır; R2 de çoktan seçmelidir. Eski toplam çoktan seçmeli oranını yeni R1 oranıyla aynı ölçüymüş gibi karşılaştırmak doğru değildir. Toplam çoktan seçmeli payı düşmedi; üretim görevleri K3P-17/18'e aittir. %60 veya öğrenme etkisi başarı iddiası yok.
-- Runtime tavanı yükseltilmedi; kalan 450 B sonraki kart için dar bütçedir. Pin yükseltilmedi.
+- Runtime tavanı yükseltilmedi; kalan 450 B sonraki kart için dar bütçedir. Ara yayın pini kullanıcı onayıyla 20261015b olarak yenilendi.
 - Tarihsel tekrar-uret.cjs 9/10 kaydı değişmedi: R-08 eski apply.words/sentences modelini sayar. Güncel denetim PASS; 10/10 iddiası yok. akis-olc 2b eski hedef ekranı ölçüsünü kullanır; gerçek ≤25 sözcük kuralı lesson_ayah fixture'ındadır.
 - Açılış→ilk görev 3 dokunuş / hedef 2 kararı, gerçek ekran okuyucu, görsel Tezhip/forced-colors ve hedef cihaz kabulü açık kalır. K3P-26'da KAO_QA_CHROME gerekir.
 
 ## Devir notu
 
-Yalnız K3P-16 uygulandı ve doğrulandı; durum kayıtları aynı yerel commit'te kapanır. K3P-17'yi yürütme: yeni kart ayrı kullanıcı isteğidir. Kişisel veri/gerçek hesap tarayıcısı açma; yeni açık yayın onayı olmadan push/merge/deploy yapma.
+Yalnız K3P-16 uygulandı; kullanıcı onaylı ara yayın işlemi yürütülüyor. K3P-17'yi yürütme: yeni kart ayrı kullanıcı isteğidir. Kişisel veri/gerçek hesap tarayıcısı açma; seyma-data kapsam dışıdır. Final program yayın onayı verilmedi.

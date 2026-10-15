@@ -55,6 +55,13 @@
     "K3P-27"
   ],
   "releaseApproval": "NOT_APPROVED",
+  "interimRelease": {
+    "scope": "K3P-16",
+    "approvedAt": "2026-10-15",
+    "approval": "Kullanıcı commit, push, main merge, deploy ve ara yayın pin istisnasını açıkça onayladı; final K3P-27 onayı değildir.",
+    "pin": "20261015b",
+    "status": "validated_pending_deploy"
+  },
   "evidenceLevel": "source+headless",
   "measureGates": [
     {
@@ -408,6 +415,6 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": ["app/core/quranLearn.js", "app/core/quranLearnFlow.js"]
+    "files": []
   }
 }

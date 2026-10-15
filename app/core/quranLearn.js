@@ -1168,10 +1168,6 @@
     var fallback=String(prefix||'Ünite ')+String(o.id);
     return {t:kaoVisibleText(o.review,o.title,fallback),p:kaoVisibleText(o.review,o.promise,'')};
   }
-  function kaoLessonTitle(lesson){
-    var fallback='Ünite '+String(lesson&&lesson.unitId||'')+' · Ders '+String(lesson&&lesson.index||'');
-    return kaoVisibleText(lesson&&lesson.review,lesson&&lesson.title,fallback);
-  }
   // K2F-21: draft ders metni hiçbir ekranda görünmez; kimlikten türetilen güvenli başlık kullanılır.
   function kaoSafeLessonTitle(lesson){
     var m=/^u0*(\d+)\.0*(\d+)$/.exec(String(lesson&&lesson.id||''));
@@ -4325,7 +4321,6 @@
     kaoGrade:kaoGrade,
     kaoSchedule:kaoSchedule,
     kaoBuildQueue:kaoBuildQueue,
-    kaoDelayedCandidates:kaoDelayedCandidates,
     kaoPickDistractors:kaoPickDistractors,
     kaoBuildTask:kaoBuildTask,
     seededRank:seededRank,
@@ -4346,11 +4341,9 @@
     kaoMilestoneCheck:kaoMilestoneCheck,
     kaoMilestoneLabel:kaoMilestoneLabel,
     kaoUnitTitle:kaoUnitTitle,
-    kaoLessonTitle:kaoLessonTitle,
     kaoReviewLevel:kaoReviewLevel,
     kaoTextSourceLabel:kaoTextSourceLabel,
     kaoExplain:kaoExplain,
-    kaoCurriculumLesson:kaoCurriculumLesson,
     kaoMilestoneLabels:kaoMilestoneLabels,
     kaoCandidates:kaoCandidates,
     kaoWeakClass:kaoWeakClass,
@@ -4360,7 +4353,6 @@
     kaoNightWindow:kaoNightWindow,
     kaoColorHarakat:kaoColorHarakat,
     kaoReadabilityStyle:kaoReadabilityStyle,
-    kaoGateLessons:kaoGateLessons,
     kaoGateTasks:kaoGateTasks,
     kaoGate:kaoGate,
     kaoGateHTML:kaoGateHTML,
@@ -4374,7 +4366,6 @@
     kaoOpenRoots:kaoOpenRoots,
     kaoS0Lesson:kaoS0Lesson,
     kaoS0Start:kaoS0Start,
-    kaoS0Play:kaoS0Play,
     safeClipId:safeClipId,
     kaoS0SyllableClipId:kaoS0SyllableClipId,
     kaoS0ClipPlan:kaoS0ClipPlan,
@@ -4383,14 +4374,10 @@
     kaoS0:kaoS0,
     kaoLessonStart:kaoLessonStart,
     kaoS0HTML:kaoS0HTML,
-    kaoSourcesHTML:kaoSourcesHTML,
     kaoSourcesPageHTML:kaoSourcesPageHTML,
     kaoPathHTML:kaoPathHTML,
     kaoUnitHTML:kaoUnitHTML,
-    kaoGrammarHTML:kaoGrammarHTML,
     kaoConceptHTML:kaoConceptHTML,
-    kaoGrammarNoteModel:kaoGrammarNoteModel,
-    kaoConceptModel:kaoConceptModel,
     kaoOpenWord:kaoOpenWord,
     kaoVerifiedAyahPronunciation:kaoVerifiedAyahPronunciation,
     kaoWordHTML:kaoWordHTML,
@@ -4407,7 +4394,6 @@
     kaoHomeHTML:kaoHomeHTML,
     kaoLibraryHTML:kaoLibraryHTML,
     kaoOnboard:kaoOnboard,
-    kaoOnboardHTML:kaoOnboardHTML,
     kaoOnboardFacts:kaoOnboardFacts,
     kaoPlacementTasks:kaoPlacementTasks,
     kaoS0LessonOfLetter:kaoS0LessonOfLetter,
@@ -4445,10 +4431,7 @@
     kaoStats:kaoStats,
     kaoStatsHTML:kaoStatsHTML,
     kaoProgressModel:kaoProgressModel,
-    kaoCurrentUnit:kaoCurrentUnit,
     KAO_VIEW_TITLES:KAO_VIEW_TITLES,
-    kaoCoverageCurve:kaoCoverageCurve,
-    kaoCoverageAt:kaoCoverageAt,
     kaoPanelSummary:kaoPanelSummary,
     kaoSoundClass:kaoSoundClass,
     kaoKnownLemmaSet:kaoKnownLemmaSet,
@@ -4456,14 +4439,11 @@
     kaoTezhipModel:kaoTezhipModel,
     kaoAyahGroups:kaoAyahGroups,
     kaoPickAyah:kaoPickAyah,
-    kaoNearestAyah:kaoNearestAyah,
     kaoOpenAyah:kaoOpenAyah,
     kaoAyah:kaoAyah,
     kaoAyahHTML:kaoAyahHTML,
     kaoSurahMap:kaoSurahMap,
     kaoOpenMap:kaoOpenMap,
-    kaoMapHTML:kaoMapHTML,
-    kaoPrayerStats:kaoPrayerStats,
     kaoLevel1Ready:kaoLevel1Ready,
     kaoOpenPrayer:kaoOpenPrayer,
     kaoPrayerWord:kaoPrayerWord,

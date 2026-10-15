@@ -1,48 +1,56 @@
 # K3P · CURRENT-STATE
 
-Sıradaki prompt: K3P-18
+Sıradaki prompt: K3P-18 — **kullanıcı kararı bekliyor** (aşağıdaki "Devir notu")
 
 ## Son durum
 
 - **Tarih:** 2026-10-15.
-- **Son tamamlanan:** K3P-17 — R3 "harflerden kur" görevi. 27/37 kart tamamlandı. K3P-18 açılmadı.
-- **Yetki:** kullanıcı 2026-10-15'te K3P-17'yi "tam ve kusursuz biçimde uygula" isteğiyle açtı. Yalnız yerel commit; push/merge/deploy/tag yok. Final `releaseApproval=NOT_APPROVED` ve K3P-18 yetkisi yok. K3P-16 ara yayını ayrı kullanıcı onayıyla canlıdadır.
+- **Son tamamlanan:** K3P-17 (R3 "harflerden kur") — 27/37 kart bitti. K3P-18 **açılmadı**; ön incelemesi ve iki denemesi yapıldı, iki engelde duruldu (aşağıda).
+- **Yetki:** kullanıcı "tüm açıkları kapat ve sıradaki adımdan devam et" dedi. K3P-17'nin açık maddeleri kapatıldı (ölü yüzey temizliği). K3P-18'in kendisi, §5 gereği, aşağıdaki iki engel çözülmeden **uygulanmadı**. Yalnız yerel commit; push/merge/deploy/tag yok. `releaseApproval=NOT_APPROVED`.
 - **Yayın:** Yeni yayın yok. Yayın pini **20261015b** (K3P-16 ara yayını). `pinDeferral.files = ["app/core/quranLearn.js"]` (K-P: değişen dosya K3P-27'de tek seferde yükseltilir).
 - **Kanıt:** kaynak/headless ve sentetik veri. Tarayıcı, gerçek hesap, kişisel veri deposu, görsel QA veya cihaz kabulü yok.
 
-## K3P-17 ne yaptı
+## Ölü yüzey temizliği (bu oturumda yapıldı)
 
-- Yeni görev türü `kind:'build'` (TASARIM §4, R3). Çipler: kelimenin harekesiz harfleri (hedef) + biçimce en yakın **2 çeldirici** harf. Çeldirici, kelimede geçmeyen ve hedefle **aynı nokta ailesinden** (S0 şekil aileleri; aile bilgisi mevcut `kaoS0LessonOfLetter`'dan) seçilir; eşitlikte kimliğe göre kararlı sıralanır.
-- Cevap yolunda yeni handler yok: mevcut `kaoAnswer` çoklu seçim + `ui.kaoOrderDraft` yolu kullanılır. Hedef harf sayısı = çip − 2; fazla/eksik seçim beklemede kalır. Doğru sıra, **harekeli cevabın harekesiz harfleridir** (`kaoOrderLabels` build yolunda `task.answer`'dan türetir; çipler sıra numarası taşımaz).
-- Notlama mevcut `kaoGrade`/FSRS yolundan geçer; dizilim hatası `errors.order` kovasına yazılır (dizme sınıfıyla aynı hata sınıfı).
-- **Geri bildirim** kelimenin harekeli hâlini gösterir (`answer` alanı harekeli; Arapça RTL satırı).
-- Uygunluk: yalnız **2–6 harfli**, harfleri donmuş ses modülünde bulunan ve `verified` lemma; aksi hâlde kurucu `null` döner ve kart **R2**'ye düşer. B kolu R1'de kalır; R4 K3P-18'in işidir.
-- Erişilebilirlik: çipler mevcut Arapça yolundan geçer; erişilebilir ad `glif, okunuşu <donmuş okunuş>` (harfin adı donmuş modülde yok; S0 alıştırmasının ölçüsü kullanıldı).
-- Yeni test `tests/kao/test_k3p_build.js` (7 kontrol): uygunluk, bağımsız yazılmış aile çeldiricisi, sıra, doğru/yanlış sıra (gerçek `kaoAnswer` + FSRS + `errors.order`), çeldirici seçiminin sırayı bozması, a11y (`aria-label`), merdiven (yalnız R3/A + determinizm). KAO envanteri 74 → **75**.
-- Paylaşılan fixture'lar güncellendi: `test_k3p_ladder` (R3 artık build, R4→R2), `kao-harness.playLesson` (build cevap yolu; `answer(task)` görev başına bir kez), `cift-sik.cjs` (build sayımı + deterministik R3 örneği).
+- `window.SeymaQuranLearn`'dan dışarıdan tüketicisi olmayan **17 sembol** kaldırıldı: 14 ölü ihracat (`kaoDelayedCandidates`, `kaoLessonTitle`, `kaoCurriculumLesson`, `kaoGateLessons`, `kaoS0Play`, `kaoSourcesHTML`, `kaoGrammarHTML`, `kaoGrammarNoteModel`, `kaoConceptModel`, `kaoOnboardHTML`, `kaoCoverageCurve`, `kaoCoverageAt`, `kaoMapHTML`, `kaoPrayerStats`), `fsrsRequestRetention` ve iç fonksiyon `kaoLessonTitle`.
+- Doğrulama: 358 kod dosyası tarandı (`app.js`, `tests/`, `tools/`, tüm modüller, HTML) — hiçbiri kendi tanımı dışında geçmiyor; hiçbir fixture yüzey anahtar kümesini sabitlemiyor; hiçbiri shim hedefi değil.
+- Değişiklik yalnız **silme**: 20 satır, 0 ekleme. Davranış değişmedi.
+- Kazanç: runtime gzip **L6 131067 → 130905 B** (kalan **5 → 167 B**), L9 130686 → 130525 B.
+
+## K3P-18 (R4 "âyette boşluk") — neden durdu
+
+**Engel 1 · Sözleşme çelişkisi.** Kart diyor: "Doğrulanmış örneği olmayan lemma R4'e çıkmaz, **R3'te kalır**." Mevcut motor R4'ü **R2**'ye düşürüyor. Kartın istediği R4→R3 geri düşüşü, `test_k3p_ladder.js` ve `test_k3p_build.js`'in sabitlediği davranışla doğrudan çelişiyor; denemede 5 K3P fixture'ı kırıldı (build · ladder · distractors · ddc · rhythm). İkisini de memnun etmek K3P-17'nin kabul edilmiş düşüş sözleşmesini değiştirmek demek → bu kartın kapsamı dışı (§5).
+
+**Engel 2 · Bütçe.** Cloze işlevsel olarak doğrulandı: boşluk ve okunuş **aynı konumda** boşalıyor, cevap sızmıyor, 4 tekil şık (aynı tür/farklı kök, K3P-01 tekilleştirmesi), anlam + âyet künyesi görünüyor, `verified` örneği olmayan lemma kurulmuyor. Ancak temizlik kazancından sonra **94 B yetmiyor** (L6 128,092 > 128 KiB). Yetmezlik yalnız kabul kapısı değil: **yeni fixture için de yer yok**, yani kartın istediği `tests/kao/test_k3p_cloze.js` yazılamadı. Ölçülen kazançlar: 15 ölü ihracat 129 B · `kaoLessonTitle` 38 B · cloze sıkıştırma 20 B.
+
+**Neden yükseltilmedi:** §2 "önce kart içinde aynı işi gören eski kod silinir; yetmiyorsa §5 gereği DUR" diyor. Tüm girinti düzeylerinde 358 dosya tarandı: **başka ölü sembol yok** (K3P-09 temizliği işini yapmış). Üç runtime dosyasında yinelenen fonksiyon/literal yok. Kalanı kapatmanın tek yolu **183 kart-etiketli yorumu** kırpmaktı (3,7 KB gzip), ama mekanik kırpma **gerçek invariants'ları siliyordu** (örn. "r tanıtımdan önce olamaz", "Tek tanım; E3 sayacı da kullanır", "görev kümesi aynı") ve bir yorumu cümle ortasından bölüyordu → uygulanmadı. **Tavanı yalnız kullanıcı yükseltebilir** (öncekiler 80 → 88 → 128 KiB kullanıcı yetkisiyle).
+
+**Kart denemesi tamamen geri alındı.** Ağaçta yalnız temizlik kaldı; `git diff` = 20 silme, 0 ekleme.
 
 ## Ölçü panosu
 
 | Ölçü | Şimdi | Tavan/hedef |
 | --- | --- | --- |
-| Runtime gzip L6 (bağlayıcı) | 127,995117 KiB (131067 B) | 128 KiB; kalan **5 B** |
-| Runtime gzip L9 (perf aracı) | 127,623047 KiB | 128 KiB; kalan 386 B |
+| Runtime gzip L6 (bağlayıcı) | 127,837 KiB (130905 B) | 128 KiB; kalan **167 B** |
+| Runtime gzip L9 (perf aracı) | 127,466 KiB | 128 KiB; kalan 547 B |
 | CSS gzip L9 | 15,273 KiB | 16 KiB |
 | İçerik | 184,591 KiB | 256 KiB |
 | App.kao* | 45 | 45 |
 | app.js / sync.js / state.js | değişmedi | veri ve migration korunur |
 | KAO fixture envanteri | 75 | 75 PASS |
-| `build` görevi (R3 örneği) | 26 kart → 6 build | kurulamayan uygun olmayan lemmalar R2'ye düşer |
-| R3 örneği `cift-sik` | 0 çift şık | 0 |
 
 ## Kapılar ve açık sınırlar
 
-- **`node kao3-premium/araclar/kapi-hizli.mjs --kart K3P-17 --yavas`** ve tüm aile taraması koşuldu: tests/kao 75 · app 78 · panel 23 · panel-v2 27 · quran 9 · reminders smoke · driver · zikr PASS; `cift-sik` ve `okunus-denetim` PASS. Tek kırmızı `tests/app/test_asset_pin_freshness.js` idi; `app/core/quranLearn.js` `pinDeferral.files`'a eklendi ve test **ERTELENDİ** diyerek PASS verdi (K-P kuralı; pin K3P-27'de yükseltilir).
-- Hiçbir kabul kontrolü kaldırılmadı veya gevşetilmedi. Paylaşılan fixture düzeltmeleri kapsam içinde beyan edildi (aynı doğrulama yolunun parçası).
-- **Runtime tavanı yükseltilmedi.** Kalan pay 5 B'dir; bu kartta aynı işi gören eski kod silinerek yer açıldı (yorum kısaltma, gereksiz ara alan/yardımcı kaldırma, mevcut render/okunuş yollarının yeniden kullanımı). Sonraki ölçü-kapı ekleyen kart için bütçe yoktur; gerekirse §5 gereği durulur veya kullanıcı yetkisiyle yükseltilir.
+- Tam aile yeşil: tests/kao **75 PASS** (L6 bütçe dâhil), `test_k3p_build` · `ladder` · `distractors` PASS; `senkron.mjs` UYUMLU · 27/37. Cloze geri alındıktan sonra hiçbir kabul kontrolü kaldırılmadı veya gevşetilmedi.
+- `tests/app/test_asset_pin_freshness.js`: `app/core/quranLearn.js` `pinDeferral.files`'ta olduğu için **ERTELENDİ** diyerek PASS (K-P; pin K3P-27'de tek seferde yükseltilir).
 - Görsel QA (`KAO_QA_CHROME`), gerçek ekran okuyucu turu, hedef cihaz kabulü ve Tezhip görsel denetimi açık kalır (K3P-26).
-- `cift-sik` ders taramasındaki tohumlu kullanıcı `s=40` (R4 bandı) olduğu için R3 görevini hiç üretmez; R3 ayrı ve sabit bir örnekle ölçülür (karta bağlı sayım FSRS yeniden planlamasıyla şişerdi).
+- `cift-sik` ders taramasındaki tohumlu kullanıcı `s=40` (R4 bandı) olduğu için R3 görevini hiç üretmez; R3 ayrı ve sabit bir örnekle ölçülür.
 
-## Devir notu
+## Devir notu — K3P-18 için kullanıcı kararı gerekiyor
 
-Yalnız K3P-17 uygulandı ve yerel commit atıldı; yayın/pin yok. Sıradaki K3P-18 için ayrı kullanıcı isteği gerekir. Kişisel veri/gerçek hesap tarayıcısı açma; `mustafaras/seyma-data` kapsam dışıdır.
+K3P-18'e devam etmek için şu iki karardan biri gerekiyor:
+
+1. **Bütçe yetkisi:** runtime tavanını yükselt (öneri: **128 → 132 KiB**, ~4 KB pay; bu, cloze koduna *ve* `test_k3p_cloze.js` fixture'ına yeter) — ya da tavan sabit kalsın ve K3P-18 kapsamdan düşsün.
+2. **R4 düşüş sözleşmesi:** doğrulanmış örneği olmayan lemma R4'ten **R3'e** mi düşsün (kartın metni) yoksa bugünkü gibi **R2'ye** mi (mevcut testlerin sabitlediği)? R3 isteniyorsa `test_k3p_ladder.js` ve `test_k3p_build.js`'in kabul edilmiş beklentisi bu kart kapsamında bilinçli olarak güncellenmeli — bu açık kullanıcı onayı ister (§5).
+
+Bunlar çözülene kadar K3P-18 başlatılmamalı. Kişisel veri/gerçek hesap tarayıcısı açma; `mustafaras/seyma-data` kapsam dışıdır.

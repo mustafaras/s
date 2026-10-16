@@ -829,3 +829,12 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kapı: `kapi-hizli --kart K3P-19` → **HIZLI KAPI YEŞİL**; tests/kao **77 PASS**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr PASS. Kabul kontrolü kaldırılmadı/gevşetilmedi.
 - Kanıt düzeyi: kaynak/headless ve sentetik veri · görsel QA yok · cihaz yok · yayın yok.
 - Sıradaki: K3P-20
+
+## seq 54 · — · YAYIN HAZIRLIĞI (K3P-19 ara yayın)
+- Tarih: 2026-10-16
+- Commit: (bu commit)
+- Yetki: kullanıcı 2026-10-16'da "canlıya al ve sıradakini tam ve kusursuz bi şekilde uygula" dedi; plan yayını K3P-27'ye koyduğu ve pinsiz yayının önbellekte eski kod bırakacağı **açıkça bildirildi**, kullanıcı "Şimdi ara yayın yap: pinleri koordineli yükselt (index.html + sw.js → 20261016a), sonra branch'i main'e al ve push et" seçeneğini seçti. Yalnız bu ara yayın; final `releaseApproval` değişmedi, tag yok, K3P-27 onayı değildir.
+- Kaynak: K3P-19 uygulama commit'i `ae9a7481`. Üretim JS/CSS/içerik **baytları bu yayın hazırlığında değiştirilmez**.
+- Pin: `index.html`, `sw.js`, `panel-v2.html` için **20261015b → 20261016a** (24+25+4 bağlantı). Pini sabitleyen **12 test dosyası** aynı pinle güncellendi (kontroller gevşetilmedi, yalnız sabit değer yükseltildi): panel-v2 hit_areas/performance, app iip_09, iip_22, v3_welcome, header_celestial_timeline, header_night_contrast, app_surface lifecycle/overlay/domain/boot boundary, kao curriculum. `pinDeferral.files` **boşaltıldı** (K-P: pin borcu kapandı).
+- Doğrulama: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO 77, app 78, panel 23, panel-v2 27, quran 9, reminders smoke, driver, zikr, kontrast, çift şık, okunuş, kao-plan-check ve **pin senkronu** PASS. Perf: content 184,591 · runtime **128,515 KiB** · css 15,469 KiB · p95 5,886 ms / steady 3,684 ms; yalnız göreli bant atlandı (yavaş makine), mutlak tavanlar zorunlu kaldı. `test_asset_pin_freshness` **61/61 taze** PASS. Tarihsel tekrar-üret özeti **9/10** (10/10 iddiası yok).
+- Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. 29/37, sıradaki K3P-20. Kişisel veri/`mustafaras/seyma-data` ve gerçek hesap tarayıcısı kapsam dışı.

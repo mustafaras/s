@@ -868,3 +868,13 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Pin: `index.html`, `sw.js`, `panel-v2.html` **20261016a → 20261016b**; pini sabitleyen 12 test dosyası aynı değerle güncellendi (kontrol gevşetilmedi). `pinDeferral.files` **boşaltıldı**.
 - Doğrulama: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO 78, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast, çift şık, okunuş, plan ve **pin senkronu** PASS. Perf: runtime **129,776 KiB** · css 15,595 · content 184,591 · p95 6,450 ms / steady 4,020 ms (yalnız göreli bant atlandı). `test_asset_pin_freshness` **61/61 taze** PASS. Tarihsel tekrar-üret özeti 9/10.
 - Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. 30/37, sıradaki K3P-21. Kişisel veri/`mustafaras/seyma-data` kapsam dışı.
+
+## seq 58 · — · YAYIN MAKBUZU (K3P-20 ara yayın)
+- Tarih: 2026-10-16
+- Commit: (bu commit)
+- Kaynak: uygulama `8a0642cb`, yayın hazırlığı `261e4732`; `git push origin HEAD:main` ile **fast-forward** (`a6001a76..261e4732`), PR kullanılmadı.
+- Pages: run **38905143855**, head `261e4732ca7a61a90c4fbfb42da37f50ebf4b147`, **validate SUCCESS · deploy SUCCESS**. Statik site https://mustafaras.github.io/s/.
+- **Canlı kanıt (salt-okur GET):** `Cache-Control: no-cache` + `Pragma: no-cache` ile index.html, sw.js, panel-v2.html ve 61 sürümlü varlık = **64/64 hedef HTTP 200 ve yerel/canlı SHA-256 eşliği 64/64 PASS**. Canlı pin **20261016b**; eski `20261016a` canlıda **yok**. Canlı `sw.js` → `SW_VERSION = '20261016b'`.
+- **Özellik canlı doğrulaması:** canlı `app/core/quranLearn.js` sürükleme yüzeyini (`kaoDrag`/`kaoDropIndex`) taşır; canlı `quranLearnViews.js` `draggable` desteğini; canlı `kao.css` `kao-drag`/`kao-drop-ready` kurallarını. Pin tazeliği 61/61 ve pin senkronu PASS.
+- Bu makbuz yalnız kayıt dosyalarını değiştirir; **üretim baytlarına dokunmaz**. Makbuz commit'i de `main`e eşitlenir.
+- Sınır: final `releaseApproval=NOT_APPROVED`; **tag yok**, K3P-27 onayı sayılmaz. 30/37, sıradaki K3P-21. Gerçek hesap tarayıcısı/kişisel veri/`mustafaras/seyma-data` işlemi yapılmadı. **Sürükle-bırak gerçek dokunmatik cihazda denenmedi** — cihaz kabulü K3P-26'da kullanıcıda.

@@ -911,3 +911,14 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Pin: `index.html`, `sw.js`, `panel-v2.html` **20261016b → 20261016c**; pini sabitleyen 12 test dosyası aynı değerle güncellendi (kontrol gevşetilmedi). `pinDeferral.files` **boşaltıldı**.
 - Doğrulama: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO **80**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast (756/756 çift), çift şık, okunuş, plan ve **pin senkronu** PASS. Perf: runtime **130,340 KiB** · css 15,772 · content 184,591 · p95 5,002 ms / steady 3,014 ms (yalnız göreli bant atlandı). `test_asset_pin_freshness` **61/61 taze** PASS. Tarihsel tekrar-üret özeti 9/10.
 - Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. 32/37, sıradaki K3P-23. Kişisel veri/`mustafaras/seyma-data` kapsam dışı.
+
+## seq 62 · — · YAYIN MAKBUZU (K3P-21 + K3P-22 ara yayın)
+- Tarih: 2026-10-16
+- Commit: (bu commit)
+- Kaynak: uygulama `671ba9da` (K3P-21) + `3d680b2a` (K3P-22), yayın hazırlığı `c1a62ce5`; `git push origin HEAD:main` ile **fast-forward** (`d75ebb26..c1a62ce5`), PR kullanılmadı.
+- Pages: run **38925995971**, head `c1a62ce5`, **validate SUCCESS · deploy SUCCESS**. Statik site https://mustafaras.github.io/s/.
+- **Canlı kanıt (salt-okur GET):** `Cache-Control: no-cache` + `Pragma: no-cache` ile index.html, sw.js, panel-v2.html ve 61 sürümlü varlık = **64/64 hedef HTTP 200 ve yerel/canlı SHA-256 eşliği 64/64 PASS**. Canlı pin **20261016c**; eski `20261016a`/`20261016b` canlıda **yok**. Canlı `sw.js` → `SW_VERSION = '20261016c'`.
+- **Özellik canlı doğrulaması:** (K3P-21) canlı `quranLearn.js` iki görünür ses düğmesini (`◖ Yavaş` / `◗ Doğal`) taşır; gizli uzun basma metni (`350 milisaniye`) canlıda **yok** (0). (K3P-22) canlı motorda âyet merdiveni (`kaoAyahLadderHTML` / "En yakın âyet") **var**; canlı `kao.css` merdiven kurallarını ve kontrast düzeltmesini (`.kao-ayah-ladder-line strong{color:var(--quran-mid)}`) taşır.
+- **Dürüstlük notu:** "Henüz hazır âyet yok" dizesi canlı **yorumda** bir kez geçer (K3P-22'nin kendi açıklama yorumu, `kaoNearestAyah` altındaki blok). **Çizilen HTML'de geçmez**: `ekran-dok` → `v-ayah` çıktısında 0, `kao-ayah-empty` işaretlemesi ve CSS'i de yok. Boş durum kullanıcıya görünmez; kartın kabul ölçütü (`ekran-dok` → `v-ayah`'da metin yok) karşılanmıştır. Yorum, pin tazeliğini bozmamak için bu makbuzda değiştirilmedi.
+- Bu makbuz yalnız kayıt dosyalarını değiştirir; **üretim baytlarına dokunmaz**. Makbuz commit'i de `main`e eşitlenir.
+- Sınır: final `releaseApproval=NOT_APPROVED`; **tag yok**, K3P-27 onayı sayılmaz. 32/37, sıradaki K3P-23. Gerçek hesap tarayıcısı/kişisel veri/`mustafaras/seyma-data` işlemi yapılmadı; cihaz kabulü ve bilimsel etki iddiası yok.

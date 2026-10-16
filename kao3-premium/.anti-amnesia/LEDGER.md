@@ -902,3 +902,12 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kapı: `kapi-hizli --kart K3P-22` → **HIZLI KAPI YEŞİL**; tests/kao **80 PASS**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr PASS.
 - Kanıt düzeyi: kaynak/headless ve sentetik veri · görsel QA yok · cihaz yok · yayın yok.
 - Sıradaki: K3P-23
+
+## seq 61 · — · YAYIN HAZIRLIĞI (K3P-21 + K3P-22 ara yayın)
+- Tarih: 2026-10-16
+- Commit: (bu commit)
+- Yetki: kullanıcı 2026-10-16'da "canlıya al ve devam et" dedi. Plan yayını K3P-27'ye koyduğu ve pinsiz yayının önbellekte eski kod bırakacağı daha önce açıkça bildirildi; kullanıcı ara yayın akışını sürdürüyor. Yalnız bu ara yayın; final `releaseApproval` değişmedi, tag yok.
+- Kapsam: **iki kart birlikte** yayınlanır — K3P-21 (`671ba9da`, iki görünür ses düğmesi) ve K3P-22 (`3d680b2a`, âyet merdiveni). Üretim JS/CSS/içerik **baytları bu yayın hazırlığında değişmez**.
+- Pin: `index.html`, `sw.js`, `panel-v2.html` **20261016b → 20261016c**; pini sabitleyen 12 test dosyası aynı değerle güncellendi (kontrol gevşetilmedi). `pinDeferral.files` **boşaltıldı**.
+- Doğrulama: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO **80**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast (756/756 çift), çift şık, okunuş, plan ve **pin senkronu** PASS. Perf: runtime **130,340 KiB** · css 15,772 · content 184,591 · p95 5,002 ms / steady 3,014 ms (yalnız göreli bant atlandı). `test_asset_pin_freshness` **61/61 taze** PASS. Tarihsel tekrar-üret özeti 9/10.
+- Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. 32/37, sıradaki K3P-23. Kişisel veri/`mustafaras/seyma-data` kapsam dışı.

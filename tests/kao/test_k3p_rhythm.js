@@ -5,7 +5,7 @@
 // 109 ders GERÇEK handler'larla oynatılır. Dokunuş: başlat + her cevap + her "Devam" (cevap panelindeki geç dokunuşu sayılmaz;
 // AKIS §1 tabanı "21" de böyle sayıldı). Özet ekranı kapanıştır, edilgin dizi sayımına girmez. Sentetik node:vm; ağ/depo yok.
 const assert = require('node:assert/strict');
-const { bootKao, seed, freshUser, tapPrimary } = require('./helpers/kao-harness');
+const { bootKao, seed, freshUser, tapPrimary, correctTaps } = require('./helpers/kao-harness');
 
 const MAX_PASSIVE_RUN = 1;
 const MAX_TAPS_TO_INTRO = 7;
@@ -20,8 +20,8 @@ const isTask = (t) => !!t.ui.kaoLesson && ['practice', 'review'].includes(t.ui.k
 const curItem = (t) => t.ui.kaoQueue[t.ui.kaoTaskIndex];
 const curTask = (t) => { const item = curItem(t); return item && t.ui.kaoTasks[item.id]; };
 function answerRight(t, task) {
-  const picks = task.kind === 'order' ? task.choices.slice().sort((a, b) => a.ordinal - b.ordinal) : [task.choices.find((c) => c.correct) || task.choices[0]];
-  picks.forEach((c) => t.api.kaoAnswer(task.id, c.choiceId));
+  // K3P-17/18: build ve cloze çok-dokunuşlu yollar; dizi paylaşılan yardımcıdan gelir.
+  for (const id of correctTaps(task)) t.api.kaoAnswer(task.id, id);
   t.api.kaoContinue();
 }
 function resetUi(t) {

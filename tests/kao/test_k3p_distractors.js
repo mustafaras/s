@@ -28,6 +28,12 @@ const choiceKey = (task) => (task.choices || []).map((c) => `${c.cardId}=${c.lab
 function checkTask(task, expectedCount, where) {
   if (hasDup(task)) fail(`${where}: çift şık → ${shownLabels(task).join(' · ')}`);
   const correct = (task.choices || []).filter((c) => c.correct === true).length;
+  // K3P-17/18: 'order' ve 'build' çok-dokunuşlu üretim görevleridir (tek doğru şık sözleşmesi dışı).
+  // build'de çipler harf taşır (cardId yok): doğru çip = harf sayısı, fazladan tam 2 çeldirici harf.
+  if (task.kind === 'build') {
+    if (correct < 2 || task.choices.length !== correct + 2) fail(`${where}: build çip düzeni (doğru ${correct}, toplam ${task.choices.length})`);
+    return;
+  }
   if (task.kind !== 'order' && correct !== 1) fail(`${where}: doğru şık sayısı ${correct}`);
   if (!/^w:/.test(String(task.cardId || ''))) return;
   const target = lemmaOf(task.cardId);

@@ -35,9 +35,12 @@ for (const id of Object.keys(test.data.quranLearn.cards)) {
       const before = JSON.stringify(data);
       const task = test.api.kaoBuildTask(Object.freeze({ id: `task:${id}`, cardId: id }), data, Object.freeze({ audioOnly }));
       const arm = flow.ladderArm(id), rung = arm === 'B' ? 'R1' : flow.ladderRung(data.quranLearn.cards[id]);
-      // K3P-17: A kolunda R3 "harflerden kur" olur (uygunsa); R4 K3P-18'in işi, o yüzden R2'ye düşer.
-      // R3'te uygun olmayan lemma (harfe çevrilemeyen yazım, uzunluk dışı) build kuramaz ve R2'ye düşer.
-      const expectedRung = rung === 'R4' || (rung === 'R3' && task.kind !== 'build') ? 'R2' : rung;
+      // K3P-18: A kolunda R4 "âyette boşluk" olur (doğrulanmış örnek varsa); yoksa BİR basamak iner (R3):
+      // uygunsa build, değilse R2. İki basamak düşmez (TASARIM §4 "unutma kuralı").
+      let expectedRung;
+      if (rung === 'R4') expectedRung = task.kind === 'cloze' ? 'R4' : (task.kind === 'build' ? 'R3' : 'R2');
+      else if (rung === 'R3' && task.kind !== 'build') expectedRung = 'R2';
+      else expectedRung = rung;
       assert.equal(task.rung, expectedRung);
       assert.equal(task.arm, arm);
       if (task.kind === 'build') {
@@ -49,6 +52,18 @@ for (const id of Object.keys(test.data.quranLearn.cards)) {
         assert.equal(task.choices.filter((choice) => choice.correct !== true).length, 2);
         assert.equal(task.choices.length, letters.length + 2);
         assert.deepEqual(Array.from(kaoLabels(test, task)), Array.from(letters));
+      } else if (task.kind === 'cloze') {
+        // K3P-18: cevap harekeli hedef kelimedir; âyet (task.ar) ve okunuş aynı konumda boşalır,
+        // seçenekler Arapçadır ve doğru şık tam olarak cevaptır. Cevap âyette görünmez (sızma yok).
+        assert.ok(task.ar.includes('…'), `${id}: âyette boşluk olmalı`);
+        // Sızma kontrolü TAM KELİME üzerinden: harekeli cevap başka bir kelimenin alt dizisi olabilir
+        // (örn. «مَن» ⊂ «ءَامَنَّا»); ölçü "boşluk bir kelime yedi ve o kelime cevaptı" olmalı.
+        const ayahWords = task.ar.split(/\s+/).map(bare);
+        assert.ok(!ayahWords.includes(bare(task.answer)), `${id}: cevap âyette tam kelime olarak kalmamalı`);
+        assert.ok(task.pronunciation.includes('…'), `${id}: okunuşta boşluk olmalı`);
+        assert.equal(task.choices.filter((choice) => choice.correct).length, 1);
+        assert.equal(task.choices.find((choice) => choice.correct).label, task.answer);
+        assert.ok(task.choices.every((choice) => /[\u0600-\u06ff]/.test(choice.label)));
       } else {
         const expectedAudio = task.rung === 'R2' && audioOnly;
         assert.equal(task.direction, task.rung === 'R1' || expectedAudio ? 'ar>tr' : 'tr>ar');

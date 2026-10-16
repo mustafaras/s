@@ -31,7 +31,8 @@ assert.ok(gzip([curriculum]) <= 48 * 1024, 'curriculum exceeds 48 KiB');
 // K-1 revizyonu 2 (2026-09-30, kullanıcı yetkisi "istediğin kadar arttır"): 88 -> 128 KiB.
 // Gerekçe: KAO2 kalan kartları (Ayarlar, İlerleme, Kelime v2+panel, a11y) gerçek
 // çalışma zamanı kodu gerektirir; 128 KiB pay ~40 KiB verir ve tek dosyada kalır.
-assert.ok(runtimeGzip <= 128 * 1024, 'runtime exceeds 128 KiB');
+// K3P-18 (2026-10-15, kullanıcı yetkisi): 128 -> 136 KiB. R4 "âyette boşluk" görevi + fixture'ı.
+assert.ok(runtimeGzip <= 136 * 1024, 'runtime exceeds 136 KiB');
 // K3P-09 (2026-10-13, kullanıcı kararı): CSS tavanı 14 -> 16 KiB. Gerekçe: Dalga 1'in
 // görsel sistem kartları (tokenlar → yazı tipi → Arapça tipografi → materyal/an kartı →
 // hareket) gerçek CSS gerektirir; 14 KiB tavanı K3P-08 sonunda ~0,2 KiB'e kadar dolmuştu.
@@ -64,7 +65,7 @@ if (process.env.KAO2_WRITE_BASELINE === '1') {
   }, null, 2) + '\n', { flag: 'wx' });
 }
 // D2F-02: göreli bant KAO2-01 makinesine bağlıdır. KAO2_ACCEPT_SLOW_HOST=1 yalnız bu bandı atlar (ölçüm yine yazılır);
-// yukarıdaki mutlak tavanlar (içerik ≤256 · runtime ≤128 · css ≤16 KiB · p95 ≤40 ms) bayraktan bağımsız zorunludur.
+// yukarıdaki mutlak tavanlar (içerik ≤256 · runtime ≤136 · css ≤16 KiB · p95 ≤40 ms) bayraktan bağımsız zorunludur.
 const slowHost = process.env.KAO2_ACCEPT_SLOW_HOST === '1';
 let relativeNote = '';
 if (baseline) {

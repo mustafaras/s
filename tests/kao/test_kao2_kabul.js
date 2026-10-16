@@ -430,9 +430,10 @@ async function main() {
   const content = gz(contentFiles), runtime = gz(runtimeFiles), css = gz(['app/kao.css']);
   const line = out.split('\n').find((l) => l.includes('KAO2 perf:'));
   const p95 = line ? Number(line.match(/p95 ([\d.]+) ms/)[1]) : null;
-  measure('A-10', 'Bütçe ve süre (K-1)', 'runtime ≤128 · css ≤16 · content ≤256 KiB · p95 ≤40 ms',
+  // K3P-18 (2026-10-15, kullanıcı yetkisi): runtime tavanı 128 -> 136 KiB (R4 "âyette boşluk" + fixture'ı).
+  measure('A-10', 'Bütçe ve süre (K-1)', 'runtime ≤136 · css ≤16 · content ≤256 KiB · p95 ≤40 ms',
     `runtime ${runtime.toFixed(3)} · css ${css.toFixed(3)} · content ${content.toFixed(3)}${p95 === null ? '' : ` · p95 ${p95.toFixed(3)} ms`}${note}`,
-    runtime <= 128 && css <= 16 && content <= 256 && (p95 === null || p95 <= 40));
+    runtime <= 136 && css <= 16 && content <= 256 && (p95 === null || p95 <= 40));
 
   // ---- P10 kapanış kabulü ---------------------------------------------------------------------------------
   {

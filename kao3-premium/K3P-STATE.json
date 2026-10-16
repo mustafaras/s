@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-18",
+  "nextPrompt": "K3P-19",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -378,7 +378,11 @@
     {
       "id": "K3P-18",
       "wave": 3,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-15",
+      "result": "R4 \"âyette boşluk\" (kind:'cloze'): doğrulanmış örnek âyette hedef kelime boşluk olur; âyet VE okunuş aynı konumda boşalır (okunuş da boşalır, cevap sızmaz), Türkçe anlam + âyet künyesi görünür kalır, hedef kelimenin sesi çalınmaz. Şıklar normal tr>ar yolunun Arapça şıklarıdır (aynı tür/farklı kök, K3P-01 tekilleştirmesi); doğru şık = harekeli hedef. Hata kovası errors.root. Uygunluk: lemma.verified + örnek (ar/tr/ref/okunuş) + hedef âyette TAM KELİME + âyet/okunuş kelime sayısı eşit. Uygun değilse kart BİR basamak iner (R4→R3→R2): iki basamaklı düşüş (R4→R2) kaldırıldı ve TASARIM §4'e yazıldı; test_k3p_ladder + test_k3p_build beklentisi bu kuralı yansıtacak şekilde güncellendi. Şıksız (tek seçenekli) cloze hiçbir zaman kurulmaz. Yeni test_k3p_cloze (7 kontrol); KAO envanteri 76. Runtime tavanı kullanıcı yetkisiyle 128→136 KiB; L6 128,206 KiB (kalan ~7,8 KB). Kabul: cift-sik tanıma payı %48,94 ≤ %60 (814 ders kartı, 1325 TEKRAR görevi, s karışımı 40/12/5). Yalnız yerel commit; push/merge/deploy yok.",
+      "gate": "node kao3-premium/araclar/kapi-hizli.mjs --kart K3P-18 --yavas",
+      "evidence": "source+headless"
     },
     {
       "id": "K3P-19",

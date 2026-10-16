@@ -6,7 +6,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { bootKao, repoRoot } = require('./helpers/kao-harness');
+const { bootKao, repoRoot, correctTaps } = require('./helpers/kao-harness');
 
 let passed = 0;
 function check(name, fn) { fn(); passed += 1; console.log(`PASS  ${name}`); }
@@ -38,8 +38,8 @@ check('her plan öğesi doğru bölüme eşlenir (data-lesson-section ve aria-va
       if (!new RegExp('^Bölüm ' + want + '/5 · ' + labelOf(item) + ' · \\d+/\\d+$').test(vt)) bad.push(`${item.id}: aria-valuetext "${vt}"`);
       seen.add(want);
       const task = curTask(t); if (!task) break;
-      const picks = task.kind === 'order' ? task.choices.slice().sort((a, b) => a.ordinal - b.ordinal) : [task.choices.find((c) => c.correct)];
-      picks.forEach((c) => t.api.kaoAnswer(task.id, c.choiceId));
+      // K3P-17/18: build ve cloze çok-dokunuşlu yollar; dizi paylaşılan yardımcıdan gelir.
+      for (const id of correctTaps(task)) t.api.kaoAnswer(task.id, id);
       t.api.kaoContinue();
       continue;
     }

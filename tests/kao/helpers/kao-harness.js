@@ -116,6 +116,25 @@ function openView(t, view, param, { mode = 'nav' } = {}) {
 
 // Başlamış bir ders/ustalık/onarım oturumunu gerçek handler'larla özet ekranına kadar oynatır.
 // answer: 'correct' | 'wrong' | (task) => choiceId. visit(task) her görevde çağrılır. Özette (ya da stopAt aşamasında) true, takılırsa false.
+// Bir görevi DOĞRU çözen dokunma dizisi (choiceId'ler). Tek kaynak: playLesson'un build döngüsüyle
+// aynı mantık. Çağıran testler kendi yürütücülerinde build/cloze/order'ı elle çözmesin diye dışa açıldı.
+// Yalnız TAM çözüm döner; oyun hamlesi gerektiren görev 'wrong' kolunda ayrıca ele alınır.
+function correctTaps(task) {
+  const choices = task.choices || [];
+  if (task.kind === 'build') {
+    const letters = Array.from(String(task.answer || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, ''));
+    const pool = choices.filter((c) => c.correct === true), picks = [];
+    for (const char of letters) {
+      const index = pool.findIndex((c) => c.label === char);
+      if (index >= 0) picks.push(pool.splice(index, 1)[0]);
+    }
+    return picks.map((c) => c.choiceId);
+  }
+  if (task.kind === 'order') return choices.slice().sort((a, b) => a.ordinal - b.ordinal).map((c) => c.choiceId);
+  const hit = choices.find((c) => c.correct === true) || choices[0];
+  return hit ? [hit.choiceId] : [];
+}
+
 function playLesson(t, { answer = 'correct', visit, stopAt } = {}) {
   const st = t.ui.kaoLesson;
   if (!st) return false;
@@ -192,4 +211,4 @@ const tapPrimary = (t) => tap(t, 'kao-primary');
 const tapSecondary = (t) => tap(t, 'kao-hero-secondary');
 const countClass = (html, cls) => (String(html).match(new RegExp(`class="${cls}[" ]`, 'g')) || []).length;
 
-module.exports = { legacyDraftState, bootKao, freshUser, seed, openView, walkLesson, playLesson, tap, tapPrimary, tapSecondary, countClass, text, navTitle, esc, read, repoRoot, DEFAULT_NOW };
+module.exports = { legacyDraftState, bootKao, freshUser, seed, openView, walkLesson, playLesson, correctTaps, tap, tapPrimary, tapSecondary, countClass, text, navTitle, esc, read, repoRoot, DEFAULT_NOW };

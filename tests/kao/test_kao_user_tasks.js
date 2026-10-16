@@ -35,15 +35,33 @@ function boot(options) {
 const clicks = (html) => [...String(html).matchAll(/onclick="App\.(kao[A-Za-z]+)\(([^"]*)\)"/g)].map((match) => ({ name: match[1], args: match[2] }));
 function answerAll(api, state, correctly) {
   const times = [];
-  while ((state.ui.kaoTaskIndex || 0) < (state.ui.kaoQueue || []).length) {
+  const bare = (value) => String(value || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, '');
+  // K3P-17/18: 'order', 'build' ve 'cloze' çok-dokunuşlu yollar tek dokunuşla ilerlemez. Görev tipine
+  // göre TAM dokunma dizisi kurulur; build'de konum başına ayrı çip tüketilir.
+  const taps = (task) => {
+    if (task.kind === 'build') {
+      const need = bare(task.answer).length, pool = task.choices.filter((choice) => choice.correct === true).slice(), out = [];
+      for (const char of Array.from(bare(task.answer))) { const index = pool.findIndex((choice) => choice.label === char); if (index >= 0) out.push(pool.splice(index, 1)[0]); }
+      if (!correctly) { const bad = task.choices.filter((choice) => choice.correct !== true); return Array.from({ length: need }, (_unused, k) => bad[k % bad.length]); }
+      return out;
+    }
+    if (task.kind === 'order') {
+      const byOrdinal = task.choices.slice().sort((a, b) => a.ordinal - b.ordinal);
+      return correctly ? byOrdinal : byOrdinal.slice().reverse();
+    }
+    const hit = correctly ? task.choices.find((choice) => choice.correct) : (task.choices.find((choice) => !choice.correct) || task.choices[0]);
+    return hit ? [hit] : [];
+  };
+  // Guard: yanlış kurulan bir dokunma dizisi kuyruğu ilerletmezse sonsuz döngü yerine hata verilir.
+  for (let guard = 0; guard < 2000 && (state.ui.kaoTaskIndex || 0) < (state.ui.kaoQueue || []).length; guard += 1) {
     const item = state.ui.kaoQueue[state.ui.kaoTaskIndex];
     const task = state.ui.kaoTasks[item.id] || api.kaoBuildTask(item, state.data, { seed: item.id });
     const started = process.hrtime.bigint();
-    if (task.kind === 'order') task.choices.slice().sort((a, b) => a.ordinal - b.ordinal).forEach((choice) => api.kaoAnswer(task.id, choice.choiceId));
-    else api.kaoAnswer(task.id, (correctly ? task.choices.find((choice) => choice.correct) : task.choices.find((choice) => !choice.correct) || task.choices[0]).choiceId);
+    for (const choice of taps(task)) api.kaoAnswer(task.id, choice.choiceId);
     api.kaoContinue();
     times.push(Number(process.hrtime.bigint() - started) / 1e6);
   }
+  assert.ok((state.ui.kaoTaskIndex || 0) >= (state.ui.kaoQueue || []).length, 'kuyruk ilerlemeli (dokunma dizisi eksik olamaz)');
   return times;
 }
 

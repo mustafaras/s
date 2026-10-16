@@ -22,8 +22,8 @@ function measure(lessonId, arm) {
       const qi = t.ui.kaoQueue[t.ui.kaoTaskIndex], task = qi && t.ui.kaoTasks[qi.id];
       if (!task) break;
       taps.tasks += 1; startedTask = task.id;
-      const picks = task.kind === 'order' ? task.choices.slice().sort((a, b) => a.ordinal - b.ordinal) : [task.choices.find((c) => c.correct)];
-      picks.forEach((c) => { t.api.kaoAnswer(task.id, c.choiceId); taps.answer += 1; });
+      // K3P-17/18: 'order', 'build' ve 'cloze' çok-dokunuşlu yollardır; doğru dizi paylaşılan yardımcıdan gelir.
+      H.correctTaps(task).forEach((choiceId) => { t.api.kaoAnswer(task.id, choiceId); taps.answer += 1; });
       const panel = t.ui.kaoPanel;
       if (panel && panel.correct === true) { if (panel.slow === true) taps.slow += 1; else taps.fast += 1; if (t.api.kaoTaskHTML(task).includes('kao-feedback-strip')) taps.strips += 1; }
       const timer = t.timers.pop();

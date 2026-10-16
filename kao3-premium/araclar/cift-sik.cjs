@@ -22,6 +22,54 @@ function r3Sample() {
   return { cards, build, other };
 }
 
+// K3P-18: kabul ölçütü "tanıma payı ≤ %60" YALNIZ merdiven görevlerinde ve gerçek bir KARIŞIMDA ölçülür.
+//   - Yeni kelime tanışı (isNew) merdiven dışıdır; sayılırsa pay yapay olarak şişer (yerleşik tohumda
+//     %80, çünkü 1031 görevin 881'i tanış). Ölçüm bu yüzden yalnız TEKRAR görevlerini alır.
+//   - Yöntem (kart: "yerleşik kullanıcı ve s ≥ 30 kart karışımı"): 1. geçiş derslerin gerçekten kullandığı
+//     kelime kartlarını toplar; 2. geçiş o kartları KARIŞIK kararlılıkla tohumlar (üçte biri s=40 → R4,
+//     üçte biri s=12 → R3, üçte biri s=5 → R2), böylece merdivenin dört basamağı da temsil edilir.
+//     Tohum kart kimliğine göre deterministiktir; ölçüm tekrarlanabilir.
+function lessonCardIds() {
+  const t = H.bootKao({ seeded: true });
+  const used = new Set();
+  for (const unit of t.win.QuranCurriculumV2.units) {
+    for (const lesson of unit.lessons) {
+      t.ui.kaoLesson = null;
+      if (!t.api.kaoLesson('start', lesson.id)) continue;
+      H.playLesson(t, { visit(task) { if (task.type === 'word') used.add(task.cardId); } });
+      t.api.kaoLesson('exit');
+    }
+  }
+  return [...used].sort();
+}
+
+function mixedSample() {
+  const ids = lessonCardIds();
+  const t = H.bootKao({ seeded: false });
+  H.freshUser(t);
+  const q = t.data.quranLearn;
+  ids.forEach((id, index) => {
+    q.cards[id] = { state: 'review', s: index % 3 === 0 ? 40 : (index % 3 === 1 ? 12 : 5), reps: 8, due: '2026-09-29T00:00:00.000Z' };
+  });
+  let tasks = 0, recognition = 0, cloze = 0, build = 0, other = 0;
+  for (const unit of t.win.QuranCurriculumV2.units) {
+    for (const lesson of unit.lessons) {
+      t.ui.kaoLesson = null;
+      if (!t.api.kaoLesson('start', lesson.id)) continue;
+      H.playLesson(t, { visit(task) {
+        if (task.type !== 'word' || task.isNew) return;
+        tasks += 1;
+        if (task.rung === 'R1') recognition += 1;
+        else if (task.kind === 'cloze') cloze += 1;
+        else if (task.kind === 'build') build += 1;
+        else other += 1;
+      } });
+      t.api.kaoLesson('exit');
+    }
+  }
+  return { cards: ids.length, tasks, recognition, cloze, build, other };
+}
+
 function scan(seeded) {
   const t = H.bootKao({ seeded });
   if (!seeded) H.freshUser(t);
@@ -64,6 +112,10 @@ for (const [label, result] of [['yeni', fresh], ['yerleşik', seeded]]) {
 }
 const sample = r3Sample();
 console.log(`R3 örneği (yerleşik tohum, 10 ≤ s < 30, A kolu): ${sample.cards} kart, ${sample.build} build görevi${sample.other.length ? ' · build kurulamayan: ' + sample.other.join(', ') : ''}`);
-console.log('R1/R2 ayrımı TASARIM §4 sınıflamasıdır; R2 de çoktan seçmelidir. K3P-17 R3 "harflerden kur" üretim görevini ekledi (üstte build sayısı); R4 K3P-18 işidir, yüzde 60 hedefi o kartta doğrulanır.');
+const mixed = mixedSample();
+const share = mixed.tasks ? 100 * mixed.recognition / mixed.tasks : 0;
+console.log(`karışık örnek (${mixed.cards} ders kartı, s karışımı 40/12/5): ${mixed.tasks} TEKRAR görevi · R1 tanıma ${mixed.recognition} (%${share.toFixed(2)}) · R4 Âyette boşluk ${mixed.cloze} · R3 harflerden kur ${mixed.build} · R2 eşleme ${mixed.other}`);
+console.log(`K3P-18 kabul ölçütü: tanıma payı ≤ %60 → %${share.toFixed(2)} ${share <= 60 ? 'PASS' : 'FAIL'}`);
+console.log('R1/R2 ayrımı TASARIM §4 sınıflamasıdır; R2 de çoktan seçmelidir. K3P-17 R3 "harflerden kur", K3P-18 R4 "âyette boşluk" üretim görevlerini ekledi. Tanış (isNew) görevleri merdiven dışıdır, ölçüme girmez.');
 if (seeded.dups[0]) console.log('örnek:', JSON.stringify(seeded.dups[0]));
-process.exit(fresh.dups.length + seeded.dups.length > 0 ? 1 : 0);
+process.exit(fresh.dups.length + seeded.dups.length > 0 || share > 60 ? 1 : 0);

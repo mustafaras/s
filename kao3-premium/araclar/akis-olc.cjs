@@ -17,8 +17,15 @@ const words = (html) => firstView(html);
 const isTask = (t) => t.ui.kaoLesson && ['practice', 'review'].includes(t.ui.kaoLesson.phase);
 const curTask = (t) => { const q = t.ui.kaoQueue[t.ui.kaoTaskIndex]; return q && t.ui.kaoTasks[q.id]; };
 const answer = (t, task, right) => {
-  const picks = task.kind === 'order' ? task.choices.slice().sort((a, b) => a.ordinal - b.ordinal) : [task.choices.find((c) => !!c.correct === right) || task.choices[0]];
-  if (task.kind === 'order' && !right) picks.reverse();
+  // K3P-17/18: 'order', 'build' ve 'cloze' çok-dokunuşlu yollardır; doğru dizi paylaşılan yardımcıdan gelir.
+  // Doğru kurulmazsa görev 'pending' kalır ve döngü ilerlemez (bu, K3P-18'den önce ölçümü bozuyordu).
+  const picks = right ? H.correctTaps(task).map((choiceId) => ({ choiceId }))
+    : (task.kind === 'build'
+      ? Array.from({ length: String(task.answer || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, '').length },
+        (_unused, k) => { const bad = task.choices.filter((c) => c.correct !== true); return bad[k % bad.length]; })
+      : (task.kind === 'order'
+        ? task.choices.slice().sort((a, b) => b.ordinal - a.ordinal)
+        : [task.choices.find((c) => !c.correct) || task.choices[0]]));
   picks.forEach((c) => t.api.kaoAnswer(task.id, c.choiceId));
   t.api.kaoContinue();
 };

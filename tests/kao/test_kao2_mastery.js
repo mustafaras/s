@@ -198,10 +198,14 @@ check('(e) unitMastery: durum tablosu none/passed/failed/repair/skipped + puan v
   assert.deepEqual({ ...flow.unitMastery({ path: { units: { 2: { masteryAt: '2026-09-30T10:00:00.000Z' } } } }, '2') }, { state: 'passed', score: null, attempts: 0 });
 });
 
-check('runtime bütçesi tavanı (128 KiB gzip) içinde kalır', () => {
+// K3P-18 (2026-10-15, kullanıcı yetkisi "136 KiB'e yükselt"): 128 -> 136 KiB. Gerekçe:
+// R4 "âyette boşluk" görevi artı kendi fixture'ı (test_k3p_cloze.js) için ~4 KB pay gerekli;
+// ölü yüzey temizliği (17 sembol) yapıldı ve başka ölü kod bulunmadı, yani §2'nin
+// "önce eski kodu sil" adımı tükendi. Öncekiler 80 → 88 → 128, hepsi kullanıcı yetkisiyle.
+check('runtime bütçesi tavanı (136 KiB gzip) içinde kalır', () => {
   const files = ['app/core/quranLearn.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js'];
   const kib = files.reduce((sum, f) => sum + zlib.gzipSync(fs.readFileSync(path.join(repoRoot, f))).length, 0) / 1024;
-  assert.ok(kib <= 128, `runtime gzip ${kib.toFixed(3)} KiB > 128`);
+  assert.ok(kib <= 136, `runtime gzip ${kib.toFixed(3)} KiB > 136`);
 });
 
 const partA = passed;

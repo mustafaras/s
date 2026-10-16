@@ -121,12 +121,19 @@ Basamak, kartın FSRS kararlılığı `s` ve son unutma bilgisinden seçilir. Ye
 | R4 | s ≥ 30 | **Âyette boşluk:** gerçek âyette eksik kelimeyi seç; çeldiriciler aynı türden | Bağlamda geri çağırma |
 
 - **Unutma kuralı:** Unutulan kart bir basamak iner (merdiven iki yönlü çalışır).
+- **R3/R4 uygunluk düşüşü:** Bir basamağın görevi kurulamıyorsa kart **bir** basamak iner, iki değil.
+  R4 yalnız `verified` örnek âyeti olan lemmada kurulur (hedef kelime âyette tam kelime olarak geçmeli,
+  âyet ve okunuş kelime kelime hizalı olmalı); uygun değilse R3'e iner. R4'ün şıkları ancak dört şık
+  kurulabiliyorsa (aynı tür, farklı kök) cloze olur; aksi hâlde görev R2'ye düşer — **şıksız cloze
+  hiçbir zaman kurulmaz**. İki basamaklı düşüş (`R4→R2`) K3P-18'de kaldırıldı.
 - **Deney:** Kartların B kolu (hash'le seçilir) R1'de kalır, A kolu merdiveni çıkar (H3).
 - **Çeldirici kalitesi:**
   - R3'teki fazla harfler, kelimenin harflerine biçimce en yakın harflerdir (aynı nokta ailesi:
     ب ت ث ن ي). Bu, S0'ın şekil aileleriyle aynı ilke.
   - R4'teki çeldiriciler aynı türden ve farklı kökten seçilir; mevcut `kaoPickDistractors`
     süzgeci B-01 düzeltmesinden sonra kullanılır.
+  - R4'te âyet okunuşu da boşalır (hedef kelimenin okunuşu görünürse cevap sızar) ve hedef kelimenin
+    sesi çalınmaz (dinletmek cevabı verirdi); künye + Türkçe anlam görünür kalır.
 
 ## 5. Görsel sistem
 

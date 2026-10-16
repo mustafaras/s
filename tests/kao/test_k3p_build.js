@@ -9,7 +9,7 @@
 //      doğru sıra doğru, yanlış sıra yanlış sayılır (gerçek App.kaoAnswer + FSRS yolu).
 //   4) ÇELDİRİCİ ÇİPİ: seçildiğinde sıra yanlış olur (çeldirici hedef harfin yerine geçmez).
 //   5) A11Y: her çipin erişilebilir adı vardır (aria-label; harfin adı yalnız donmuş ses modülünden).
-//   6) MERDİVEN: build yalnız R3'te ve A kolunda kurulur; B kolu R1'de, R1/R2/R4 yolları değişmez.
+//   6) MERDİVEN: build yalnız R3'te ve A kolunda kurulur; B kolu R1'de; R1/R2 değişmez, R4 ya cloze ya R3.
 const assert = require('node:assert/strict');
 const { bootKao, freshUser, text } = require('./helpers/kao-harness');
 
@@ -181,6 +181,12 @@ check('merdiven: build yalnız R3/A; B kolu R1, diğer basamaklar değişmez ve 
     const built = api.kaoBuildTask({ id: `rung:${stability}`, cardId, isNew: false }, t.data, { seed: 'rung' });
     const rung = arm === 'B' ? 'R1' : expected;
     if (rung === 'R3') continue; // yalnız A kolunda ve tam bu basamakta build
+    // K3P-18: R4 uygunsa cloze; uygun değilse BİR basamak iner (R3) — orada build meşrudur.
+    if (rung === 'R4') {
+      assert.ok(built.kind === 'cloze' || built.rung === 'R3', `s=${stability} (${arm}): R4 cloze ya da R3 olmalı`);
+      assert.notEqual(built.rung, 'R2', `s=${stability} (${arm}): R4'ten iki basamak düşülmez`);
+      continue;
+    }
     assert.notEqual(built.kind, 'build', `s=${stability} (${arm}): build kurulmamalı`);
   }
   for (const lemma of lex.lemmas.slice(0, 60)) {

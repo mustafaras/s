@@ -390,6 +390,16 @@
     cs.sort(function(a,b){ return seededRank(sd,a.label)-seededRank(sd,b.label); });
     return {id:String(it.id||'task:'+id),cardId:id,type:'word',kind:'build',errorClass:'order',rung:'R3',prompt:'Harflerden kur',answer:lm.ar,choices:cs};
   }
+  // K3P-18 · R4 "âyette boşluk": doğrulanmış örnek âyette hedef kelime VE okunuşu aynı konumda
+  // boşalır (okunuş da boşalır, cevap sızmasın). Uygun örnek yoksa R4 kurulmaz, kart R3'te kalır.
+  function kaoClozeExample(lm){
+    var ex=kaoIntroExample(lm);
+    if(!ex) return null;
+    var wa=ex.ar.split(/\s+/),wp=ex.pronunciation.split(/\s+/),at=wa.map(kaoStripHarakat).indexOf(kaoStripHarakat(lm.ar));
+    if(wa.length<3||at<0||wa.length!==wp.length) return null;
+    var blank=function(a){ return a.map(function(w,k){ return k===at?'…':w; }).join(' '); };
+    return {kind:'cloze',errorClass:'root',meaning:ex.tr+' · '+ex.ref,ar:blank(wa),pronunciation:blank(wp)};
+  }
   function kaoBuildTask(queueItem,d,options){
     var opts=options&&typeof options==='object'?options:{};
     var id=String(queueItem&&queueItem.cardId||queueItem&&queueItem.id||'');
@@ -397,12 +407,15 @@
     if(/^g:/.test(id)) return kaoBuildGrammarTask(queueItem,d,opts);
     if(/^k:/.test(id)) return kaoBuildLinkTask(queueItem,opts); if(/^t:/.test(id)) return kaoBuildTransferTask(queueItem,opts);
     var meta=metaFor(id,queueItem,opts),meanings=Array.isArray(meta.meanings)?meta.meanings:[];
-    var flow=window.SeymaQuranLearnFlow,arm=flow.ladderArm(id),rung=arm==='B'?'R1':flow.ladderRung(objectOr(quranLearnRoot(d).cards,{})[id]);
+    var flow=window.SeymaQuranLearnFlow,arm=flow.ladderArm(id),rung=arm==='B'?'R1':flow.ladderRung(objectOr(quranLearnRoot(d).cards,{})[id]),lex=window.QuranLexiconV1;
+    // K3P-18: R4 doğrulanmış örnek ister; yoksa kart BİR basamak iner (R3), iki değil (TASARIM §4
+    // "unutma kuralı"). Uygun R4, normal tr>ar yolunun Arapça şıklarını (kademeli yedekle) kullanır.
+    var clz=rung==='R4'&&lex&&lex.byId?kaoClozeExample(lex.byId(lemmaIdForCard(id))):null;
+    if(rung==='R4'&&!clz) rung='R3';
     if(rung==='R3'){ var b=kaoBuildLetters(queueItem,opts); if(b){ b.arm=arm; return b; } rung='R2'; }
-    if(rung==='R4') rung='R2';
     var audioOnly=rung==='R2'&&opts.audioOnly===true,direction=rung==='R1'||audioOnly?'ar>tr':'tr>ar',toAr=direction==='tr>ar';
     var answer=toAr?String(meta.ar||id):String(meanings[0]||meta.meaning||id);
-    var lex=window.QuranLexiconV1,pool=kaoDistractorPool(d,id,opts);
+    var pool=kaoDistractorPool(d,id,opts);
     var need=typeof opts.choiceCount==='number'&&isFinite(opts.choiceCount)?Math.max(2,Math.min(4,Math.floor(opts.choiceCount)))-1:3;
     var rank=function(cardId){ return seededRank(String(opts.seed||'')+'|task|'+id,cardId); };
     // Sözlük yedeği katmanlı: aynı tür, farklı kök; hedef köksüzse öteki köksüz işlev kelimeleri; son çare
@@ -439,7 +452,13 @@
     choices.forEach(function(choice,index){ choice.choiceId=String(queueItem&&queueItem.id||'task:'+id)+':choice:'+index; });
     // R-B5 / 02 §5.3: hareke soldurma yalnız review ∧ s≥30 kartta. Hedefte anlam kayması
     // varsa yanlış cevap errors.cognate'e yazılır; telaffuz hataları phonics.misheard'de sayılır.
-    return {id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),arm:arm,rung:rung,direction:direction,audioOnly:audioOnly,answer:answer,ar:String(meta.ar||''),meaning:String(meanings[0]||meta.meaning||''),translit:kaoLemmaReading(lemmaIdForCard(id),meta.translit),cognate:meta.cognate||null,durable30:isSettled(objectOr(quranLearnRoot(d).cards,{})[id],30),errorClass:meta.cognate&&meta.cognate.shift?'cognate':'',clipId:lemmaIdForCard(id)?'w-'+lemmaIdForCard(id):'',choices:choices};
+    var task={id:String(queueItem&&queueItem.id||'task:'+id),cardId:id,type:cardType(id,queueItem&&queueItem.type),isNew:!!(queueItem&&queueItem.isNew),retry:!!(queueItem&&queueItem.retry),arm:arm,rung:rung,direction:direction,audioOnly:audioOnly,answer:answer,ar:String(meta.ar||''),meaning:String(meanings[0]||meta.meaning||''),translit:kaoLemmaReading(lemmaIdForCard(id),meta.translit),cognate:meta.cognate||null,durable30:isSettled(objectOr(quranLearnRoot(d).cards,{})[id],30),errorClass:meta.cognate&&meta.cognate.shift?'cognate':'',clipId:lemmaIdForCard(id)?'w-'+lemmaIdForCard(id):'',choices:choices};
+    // K3P-18: görev cloze olur — âyet ve okunuşu boşalır, Türkçe anlam + künye görünür. Şıklar normal
+    // tr>ar yolundan gelir (Arapça, aynı tür/farklı kök, K3P-01 tekilleştirmesi); doğru şık `answer`.
+    // Kelime sesi kaldırılır: hedef kelimeyi dinletmek cevabı verirdi.
+    if(clz&&choices.length>=4) Object.assign(task,clz,{clipId:''});
+    else if(task.rung==='R4') task.rung='R2';
+    return task;
   }
   // 02 §5.6 "bağ kur": hedefin Türkçe türevi; çeldirici başka kökten, anlamı çakışmayan türev.
   function kaoBuildLinkTask(queueItem,opts){ var id=String(queueItem.cardId||''),lemmaId=id.slice(2),lemmas=window.QuranLexiconV1&&Array.isArray(window.QuranLexiconV1.lemmas)?window.QuranLexiconV1.lemmas:[],lemma=lemmas.find(function(l){ return l.id===lemmaId; }); if(!lemma||!lemma.cognate||!lemma.cognate.tr) return null; var seed=String(opts.seed||'')+'|link|'+lemmaId,answer=String(lemma.cognate.tr),used=[answer],picked=[]; lemmas.filter(function(l){ return l.id!==lemmaId&&l.cognate&&l.cognate.tr&&!(lemma.root&&l.root===lemma.root); }).sort(function(a,b){ return seededRank(seed,a.id)-seededRank(seed,b.id)||a.id.localeCompare(b.id); }).some(function(l){ var label=String(l.cognate.tr); if(kaoLabelClash(label,used,true)) return false; used.push(label); picked.push({cardId:'k:'+l.id,label:label,correct:false}); return picked.length>=3; }); var choices=[{cardId:id,label:answer,correct:true}].concat(picked).sort(function(a,b){ return seededRank(seed+'|order',a.cardId)-seededRank(seed+'|order',b.cardId); }); choices.forEach(function(choice,index){ choice.choiceId=String(queueItem.id)+':choice:'+index; }); return {id:String(queueItem.id),cardId:id,type:'link',kind:'link',isNew:false,retry:false,prompt:'Türkçedeki türevini seç',answer:answer,ar:String(lemma.ar||''),meaning:String((lemma.meanings||[])[0]||''),translit:kaoLemmaReading(lemmaId,lemma.translit),cognate:null,clipId:'',choices:choices}; }
@@ -1817,16 +1836,17 @@
       var durable=Math.max(0,Math.floor(nonNegativeNumber(ui.kaoDurableCount,0)));
       return '<section id="kao-task" class="kao-task kao-done"><p class="kao-eyebrow">Bugünkü oturum tamam</p><h2>Bugün '+durable+' kelime daha kalıcı oldu</h2><div class="kao-done-actions"><button type="button" class="kao-primary" onclick="App.kaoSetView(\'home\')">Bugün yeter</button><button type="button" class="kao-secondary" onclick="App.kaoStart()">5 dakika daha</button></div>'+(kaoLevel1Ready(quranLearnDeps.data())?'<button type="button" class="kao-link-button kao-level1" onclick="App.kaoOpenPrayer()">Seviye 1 tamam · Namazda ne dediğini gör →</button>':'')+'</section>';
     }
-    var panel=ui.kaoPanel&&ui.kaoPanel.open&&ui.kaoPanel.taskId===task.id?ui.kaoPanel:null,autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',isBuild=task.kind==='build',isLink=task.type==='link',isTransfer=task.type==='transfer',prompt=task.audioOnly?'Dinlediğin kelimenin anlamını seç':(task.prompt||(task.direction==='tr>ar'?task.meaning:task.ar));
+    var panel=ui.kaoPanel&&ui.kaoPanel.open&&ui.kaoPanel.taskId===task.id?ui.kaoPanel:null,autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',isBuild=task.kind==='build',isCloze=task.kind==='cloze',isLink=task.type==='link',isTransfer=task.type==='transfer',prompt=task.audioOnly?'Dinlediğin kelimenin anlamını seç':(task.prompt||(task.direction==='tr>ar'?task.meaning:task.ar));
     var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
     // K3P-A6: görev görünümünde de 5 bölümlü konum görünür.
     var taskSection=kaoLessonSection(ui.kaoLesson),taskSegs='';
     for(var ts=1;ts<=5;ts+=1){ var tf=ts<taskSection.section,ta=ts===taskSection.section,tw=ta?String(Math.max(0,Math.min(100,taskSection.countInSection?taskSection.indexInSection/taskSection.countInSection*100:0)))+'%':(tf?'100%':'0%'); taskSegs+='<span class="kao-lesson-seg'+(ta?' is-active':'')+(tf?' is-filled':'')+'"><i style="width:'+tw+'"></i></span>'; }
     h+='<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+String(taskSection.section)+'" aria-valuetext="'+esc(kaoSectionValuetext(taskSection))+'" data-lesson-section="'+String(taskSection.section)+'">'+taskSegs+'</div>';
-    h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(isBuild?'Harflerden kur':(isFragment?(task.kind==='order'?'Kelime dizme':'Parça çevir'):(isLink?'Bağ kur · Türkçedeki türevi':(isTransfer?'Yeni âyet · haftalık test':(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç'))))))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
-    if(!task.audioOnly&&!isGrammar&&!isFragment&&(task.direction==='ar>tr'||isLink)) h+='<h2 class="kao-question" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true||kaoBoredomHideHarakat())+'</h2>';
+    h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(isBuild?'Harflerden kur':(isFragment?(task.kind==='order'?'Kelime dizme':'Parça çevir'):(isLink?'Bağ kur · Türkçedeki türevi':(isTransfer?'Yeni âyet · haftalık test':(isCloze?'Âyette boşluk':(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç')))))))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
+    if(isCloze) h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair')+'</div>';
+    else if(!task.audioOnly&&!isGrammar&&!isFragment&&(task.direction==='ar>tr'||isLink)) h+='<h2 class="kao-question" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true||kaoBoredomHideHarakat())+'</h2>';
     else h+='<h2 class="kao-question'+(task.prompt?' kao-question-text':'')+'">'+esc(prompt)+'</h2>';
-    if(isLink) h+='<p class="kao-eyebrow">Anlamı: '+esc(task.meaning)+'</p>';
+    if(isLink||isCloze) h+='<p class="kao-eyebrow">Anlamı: '+esc(task.meaning)+'</p>';
     if(isGrammar){ h+='<div class="kao-grammar-stimulus">'+(/[\u0600-\u06ff]/.test(task.stimulus)?kaoArabicPairHTML(task.stimulus,task.stimulusPronunciation,'kao-stimulus-pair'):esc(task.stimulus))+'</div>'; if(task.context&&task.context.length) h+='<div class="kao-grammar-context">'+task.context.map(function(item){ var value=item&&typeof item==='object'?item:{label:item,pronunciation:''}; return /[\u0600-\u06ff]/.test(value.label)?'<span>'+kaoArabicPairHTML(value.label,value.pronunciation,'kao-context-pair')+'</span>':'<span>'+esc(value.label)+'</span>'; }).join('')+'</div>'; }
     if(isTransfer) h+='<p class="kao-eyebrow">'+esc(task.surah)+'</p>'; if((isFragment&&task.kind==='translate')||isTransfer) h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair')+'</div>';
     var order=task.kind==='order'||isBuild;

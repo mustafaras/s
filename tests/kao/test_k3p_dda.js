@@ -7,7 +7,7 @@
 //   - Kolaylaştırılmış doğru → kaoGrade 2; normal doğru notu değişmez.
 //   - Kayan pencere yalnız ui; data'ya hiçbir şey yazılmaz.
 const assert = require('node:assert/strict');
-const { bootKao } = require('./helpers/kao-harness');
+const { bootKao, correctTaps } = require('./helpers/kao-harness');
 
 let passed = 0;
 function check(name, fn) { fn(); passed += 1; console.log(`PASS  ${name}`); }
@@ -25,11 +25,19 @@ function nextTask(t) { if (t.ui.kaoLesson && t.ui.kaoLesson.phase === 'lesson') 
 function toTask(t) { for (let g = 0; g < 60; g += 1) { const task = curTask(t); if (task) return task; if (!t.ui.kaoLesson || t.ui.kaoLesson.phase === 'lesson') { if (!t.api.kaoLesson('next')) return null; } else return null; } return null; }
 function answerAndNext(t, correct) {
   const task = toTask(t); assert.ok(task, 'görev bulunmalı');
+  // K3P-17/18: build ve cloze çok-dokunuşlu yollar. Doğru dizi paylaşılan yardımcıdan gelir.
+  // 'wrong' kolunda çok-dokunuşlu görev TAM ve YANLIŞ doldurulmalı; tek dokunuş 'pending' bırakır ve
+  // yanlış sayılmaz (dda bu yüzden yanlış diziyi görev tipine göre kurar).
+  const ids = correctTaps(task);
+  if (correct) { for (const id of ids) t.api.kaoAnswer(task.id, id); return task; }
   if (task.kind === 'order') {
-    const byOrdinal = task.choices.slice().sort((a, b) => a.ordinal - b.ordinal);
-    (correct ? byOrdinal : byOrdinal.slice().reverse()).forEach((c) => t.api.kaoAnswer(task.id, c.choiceId));
+    for (const id of task.choices.slice().sort((a, b) => b.ordinal - a.ordinal).map((c) => c.choiceId)) t.api.kaoAnswer(task.id, id);
+  } else if (task.kind === 'build') {
+    const bad = task.choices.filter((c) => c.correct !== true).map((c) => c.choiceId);
+    const need = String(task.answer || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, '').length;
+    for (let k = 0; k < need; k += 1) t.api.kaoAnswer(task.id, bad[k % bad.length]);
   } else {
-    t.api.kaoAnswer(task.id, correct ? rightPick(task) : wrongPick(task));
+    t.api.kaoAnswer(task.id, wrongPick(task));
   }
   return task;
 }

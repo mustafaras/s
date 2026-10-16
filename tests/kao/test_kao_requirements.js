@@ -136,7 +136,9 @@ const transitionMs = Number(process.hrtime.bigint() - transitionStart) / 1e6;
 assert.ok(transitionMs < 50, `R-C5: hedefli geçiş ${transitionMs.toFixed(3)} ms`);
 assert.equal(fullRenders, 1, 'cevap tam render çağırmamalı');
 assert.ok(taskNode.innerHTML.length > 0, '#kao-task alt ağacı yenilenmeli');
-assert.deepEqual(JSON.parse(JSON.stringify(sessionData.quranLearn.daily['2026-09-24'].calib)), { pred: 1, ok: 1, n: 1 }, 'R-A3: her cevap kalibrasyon toplamına eklenmeli');
+// K3P-19 (H4): calib ayrıca `s21` (s ≥ 21 kartlar) sayacını taşır; toplam alanlar değişmedi,
+// yalnız ölçek gözlem eklendi (s21 kart s ≥ 21 değilse 0'da kalır).
+assert.deepEqual(JSON.parse(JSON.stringify(sessionData.quranLearn.daily['2026-09-24'].calib)), { pred: 1, ok: 1, n: 1, s21: { n: 0, ok: 0 } }, 'R-A3: her cevap kalibrasyon toplamına eklenmeli');
 assert.equal(sessionApi.kaoUndo(), true);
 assert.equal(JSON.stringify(sessionData.quranLearn.cards[firstTask.cardId]), beforeCard, 'R-C3: kart bit-bit geri sarılmalı');
 assert.equal(JSON.stringify(sessionData.quranLearn.daily['2026-09-24']), beforeDaily, 'R-C3: günlük kayıt bit-bit geri sarılmalı');

@@ -519,4 +519,11 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-shake{animation:kao-shake calc(var(--kao-dur-micro)*2) var(--kao-ease)}
 @keyframes kao-mark-in{from{opacity:0;transform:scale(.6)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}
 .kao-choice-correct .kao-choice-mark{animation:kao-mark-in var(--kao-dur-transition) var(--kao-ease)}
-@media (prefers-reduced-motion:reduce){.kao-task-in,.kao-shake,.kao-choice-correct .kao-choice-mark,.kao-choices button,.kao-flag summary::after,.kao-lesson-more summary::after,.kao-lesson-seg>i{animation:none;transition:none}}
+@media (prefers-reduced-motion:reduce){.kao-task-in,.kao-shake,.kao-choice-correct .kao-choice-mark,.kao-choices button,.kao-flag summary::after,.kao-lesson-more summary::after,.kao-pronunciation-fold>summary::after,.kao-lesson-seg>i{animation:none;transition:none}}
+
+/* K3P-19 · okunuş katlaması (KARARLAR K-A, P4): s ≥ 21 kartta okunuş <details> içinde durur. */
+.kao-pronunciation-fold{margin-top:2px;display:inline-block}
+.kao-pronunciation-fold>summary{min-height:32px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--quran-gold);font-size:var(--f-caption1);font-weight:700}
+.kao-pronunciation-fold>summary::after{content:'\203A';flex:none;font-size:1.2em;line-height:1;transition:transform var(--dur-2) ease}
+.kao-pronunciation-fold[open]>summary::after{transform:rotate(90deg)}
+.kao-pronunciation-fold>summary::marker,.kao-pronunciation-fold>summary::-webkit-details-marker{content:''}

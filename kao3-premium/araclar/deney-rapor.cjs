@@ -1,5 +1,5 @@
 'use strict';
-// K3P-05/16 · deney raporu (KARARLAR §6, AKIS §7): bir JSON yedeğinden H2, H3, H5, H7, H8, H9 için YALNIZ toplu sayılar.
+// K3P-05/16/19 · deney raporu (KARARLAR §6, AKIS §7): bir JSON yedeğinden H2, H3, H4, H5, H7, H8, H9 için YALNIZ toplu sayılar.
 // Kullanım (repo kökünden):
 //   node kao3-premium/araclar/deney-rapor.cjs --ornek                         sentetik yedekle doğrulama
 //   node kao3-premium/araclar/deney-rapor.cjs <yedek.json> [--kesim GG] [--bugun GG]   (GG = YYYY-AA-GG)
@@ -26,6 +26,7 @@ const MIN_ANSWERS_PER_SESSION = 5;    // H7: bundan az cevaplı gün oturum say�
 const FLOW_BAND = [0.80, 0.90];       // H7: akış bandı (K-K)
 const FLOW_TARGET = 0.70;             // H7: oturumların ≥ %70'i bantta
 const H2_MAX_DROP = 5;                // H2: doğruluk düşüşü ≤ 5 puan
+const H4_TARGET = 0.85;               // H4: s ≥ 21 kartlarda doğruluk ≥ %85
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -47,12 +48,15 @@ function project(backup) {
     .filter(([date, row]) => DATE_RE.test(date) && isObj(row))
     .map(([date, row]) => {
       const bands = isObj(row.calib) && Array.isArray(row.calib.bands) ? row.calib.bands.filter(isObj) : [];
+      const s21 = isObj(row.calib) && isObj(row.calib.s21) ? row.calib.s21 : null;
       return {
         date,
         answered: num(row.answered),
         correct: num(row.correct),
         reviewN: bands.reduce((sum, b) => sum + num(b.n), 0),
-        reviewOk: bands.reduce((sum, b) => sum + num(b.ok), 0)
+        reviewOk: bands.reduce((sum, b) => sum + num(b.ok), 0),
+        s21N: s21 ? num(s21.n) : 0,
+        s21Ok: s21 ? num(s21.ok) : 0
       };
     })
     .sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -86,6 +90,17 @@ function h2(daily, today, cut) {
   const status = !enough ? `veri az (pencere başına ≥ ${MIN_REVIEWS_PER_WINDOW} tekrar)`
     : (before.ratio - after.ratio) * 100 <= H2_MAX_DROP ? 'tutuyor' : 'tutmuyor';
   return { id: 'H2', measure: `Tekrar doğruluğu, kesimden ${WINDOW_DAYS} gün önce/sonra`, value, target: `düşüş ≤ ${H2_MAX_DROP} puan`, status };
+}
+
+// H4 (K3P-19): okunuş s ≥ 21 kartta katlanır; destek çekilirken doğruluk korunuyor mu?
+// Ölçü yalnız s ≥ 21 cevaplarıdır (motor her cevapta sayar, bkz. quranLearn.js calib.s21).
+function h4(daily) {
+  const rows = daily.filter((r) => r.s21N > 0);
+  const n = rows.reduce((sum, r) => sum + r.s21N, 0);
+  const ok = rows.reduce((sum, r) => sum + r.s21Ok, 0);
+  const value = n ? `${pct(ok / n)} (${ok}/${n} cevap, ${rows.length} gün)` : 'henüz yok';
+  const status = !n ? 'veri yok' : ok / n >= H4_TARGET ? 'tutuyor' : 'tutmuyor';
+  return { id: 'H4', measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk', value, target: `≥ ${pct(H4_TARGET)}`, status };
 }
 
 function h5(daily, lessons) {
@@ -152,6 +167,7 @@ function buildReport(backup, opts) {
   const rows = [
     h2(daily, today, cut),
     h3(p.cards),
+    h4(daily),
     h5(daily, p.lessons),
     h7(daily, cut),
     h8(p.lessons),
@@ -184,7 +200,9 @@ function sampleBackup() {
     const after = i >= 15;
     const correct = !after ? 8 : i % 2 ? 9 : 10;          // önce hep %80; sonra %90 ve %100 dönüşümlü
     const ok = !after ? 4 : i % 2 ? 5 : 4;                 // tekrar bandı: önce 4/5; sonra 5/5 ve 4/5
-    daily[date] = { answered: 10, correct, new: 5, reviewed: 5, calib: { pred: 4, ok: correct, n: 10, bands: [{ pred: 4, ok, n: 5 }] }, note: decoyArabic };
+    // H4: s ≥ 21 kartların (katlanmış okunuş) doğruluğu. Önce 4/5, kesimden sonra 5/5.
+    const s21 = { n: 5, ok: after ? 5 : ok };
+    daily[date] = { answered: 10, correct, new: 5, reviewed: 5, calib: { pred: 4, ok: correct, n: 10, bands: [{ pred: 4, ok, n: 5 }], s21 }, note: decoyArabic };
   }
   const cards = {};
   for (let i = 0; i < 10; i += 1) cards[`w:sample${i}`] = { s: 10 + i, d: 5, reps: 3, lapses: i < 7 ? 0 : 1, state: 'review', ar: decoyArabic };

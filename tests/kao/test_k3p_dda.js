@@ -102,7 +102,9 @@ check('p > %92 (≥8 görev sonra) → şık 4\'e döner ve okunuş gizlenir (su
   // Okunuş gizlenir (sunum): sıkılma kolu motorda tanımlı ve Arapça çiftlerde kullanılır.
   const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', '..', 'app/core/quranLearn.js'), 'utf8');
   assert.match(src, /kaoBoredomHideHarakat\(\)/, 'sıkılma sunum kolu motorda tanımlı');
-  assert.ok(src.includes('kaoBoredomHideHarakat()):esc(choice.label)') || /kaoArabicPairHTML\([^)]*kaoBoredomHideHarakat\(\)\)/.test(src), 'sıkılmada harekeler soluyor sunumu bağlı');
+  // K3P-19: okunuş katlaması aynı yuvayı paylaştığı için çağrı artık `kaoBoredomHideHarakat(), pronunciationFolded`
+  // biçiminde; katı argüman dizilimini sabitlemek yerine soldurma kolunun GERÇEKTEN bağlı olduğu ölçülür.
+  assert.ok(/kaoArabicPairHTML\([^;]*kaoBoredomHideHarakat\(\)[^;]*\)/.test(src), 'sıkılmada harekeler soluyor sunumu bağlı');
   t.api.kaoLesson('exit');
 });
 

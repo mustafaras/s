@@ -1823,11 +1823,15 @@
     var esc=quranLearnDeps.esc,warning=!!task.cognate.shift;
     return '<p class="kao-cognate'+(warning?' is-shift':'')+'">'+(warning?quranLearnDeps.icon('triangle-alert',14)+' dikkat · ':'')+'Türkçede var: '+esc(task.cognate.tr)+(warning?' · '+esc(task.cognate.shift):'')+'</p>';
   }
-  function kaoArabicPairHTML(ar,pronunciation,className,fade,fadeMode){
+  function kaoArabicPairHTML(ar,pronunciation,className,fade,pronunciationFolded){
     var esc=quranLearnDeps.esc,label=String(ar||''),reading=String(pronunciation||''),settings=kaoSettingsOf(),harakat=settings.harakat!==false,readability=kaoReadability();
     if(!reading) return '<span class="kao-content-error" role="alert">Bu Arapça içerik, Latin okunuşu doğrulanmadan gösterilemez.</span>';
     var bare=kaoStripHarakat(label),text=!harakat?esc(bare):(fade&&readability.fadeHarakat&&bare!==label?'<button type="button" class="kao-fade'+(kaoMotionAllowed()?'':' is-instant')+'" aria-label="Harekeler soluyor; geri getirmek için dokun" onclick="this.classList.add(\'is-back\')"><span class="kao-fade-base" aria-hidden="true">'+esc(bare)+'</span><span class="kao-fade-full">'+esc(label)+'</span></button>':esc(label));
-    return '<span class="kao-arabic-stack'+(className?' '+className:'')+'"><span class="kao-arabic-text" lang="ar" dir="rtl">'+text+'</span><span class="kao-pronunciation-line" lang="tr">'+esc(reading)+'</span></span>';
+    // K3P-19 (KARARLAR K-A, P4): okunuş, ayar kapalıysa hiç çizilmez; katlanmışsa yalnız bir
+    // yerel <details> olarak durur (varsayılan kapalı, handler yok — <summary> kendi açar). Aksi hâlde
+    // bugünkü görünür satır kalır. Okunuşu açmak kartın notunu (FSRS) etkilemez: yalnız sunumdur.
+    var pron=settings.translit===false?'':(pronunciationFolded?'<details class="kao-pronunciation-fold"><summary>Okunuş</summary><span class="kao-pronunciation-line" lang="tr">'+esc(reading)+'</span></details>':'<span class="kao-pronunciation-line" lang="tr">'+esc(reading)+'</span>');
+    return '<span class="kao-arabic-stack'+(className?' '+className:'')+'"><span class="kao-arabic-text" lang="ar" dir="rtl">'+text+'</span>'+pron+'</span>';
   }
   function kaoTaskHTML(task){
     if(!quranLearnDeps) return '';
@@ -1836,6 +1840,8 @@
       var durable=Math.max(0,Math.floor(nonNegativeNumber(ui.kaoDurableCount,0)));
       return '<section id="kao-task" class="kao-task kao-done"><p class="kao-eyebrow">Bugünkü oturum tamam</p><h2>Bugün '+durable+' kelime daha kalıcı oldu</h2><div class="kao-done-actions"><button type="button" class="kao-primary" onclick="App.kaoSetView(\'home\')">Bugün yeter</button><button type="button" class="kao-secondary" onclick="App.kaoStart()">5 dakika daha</button></div>'+(kaoLevel1Ready(quranLearnDeps.data())?'<button type="button" class="kao-link-button kao-level1" onclick="App.kaoOpenPrayer()">Seviye 1 tamam · Namazda ne dediğini gör →</button>':'')+'</section>';
     }
+    // K3P-19: s ≥ 21 olan kartın görevinde okunuş katlanır (hareke soldurması s ≥ 30'un bir basamak öncesi).
+    var pronunciationFolded=isDurable(objectOr(quranLearnRoot(quranLearnDeps.data()).cards,{})[task.cardId]);
     var panel=ui.kaoPanel&&ui.kaoPanel.open&&ui.kaoPanel.taskId===task.id?ui.kaoPanel:null,autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',isBuild=task.kind==='build',isCloze=task.kind==='cloze',isLink=task.type==='link',isTransfer=task.type==='transfer',prompt=task.audioOnly?'Dinlediğin kelimenin anlamını seç':(task.prompt||(task.direction==='tr>ar'?task.meaning:task.ar));
     var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
     // K3P-A6: görev görünümünde de 5 bölümlü konum görünür.
@@ -1843,12 +1849,12 @@
     for(var ts=1;ts<=5;ts+=1){ var tf=ts<taskSection.section,ta=ts===taskSection.section,tw=ta?String(Math.max(0,Math.min(100,taskSection.countInSection?taskSection.indexInSection/taskSection.countInSection*100:0)))+'%':(tf?'100%':'0%'); taskSegs+='<span class="kao-lesson-seg'+(ta?' is-active':'')+(tf?' is-filled':'')+'"><i style="width:'+tw+'"></i></span>'; }
     h+='<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+String(taskSection.section)+'" aria-valuetext="'+esc(kaoSectionValuetext(taskSection))+'" data-lesson-section="'+String(taskSection.section)+'">'+taskSegs+'</div>';
     h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(isBuild?'Harflerden kur':(isFragment?(task.kind==='order'?'Kelime dizme':'Parça çevir'):(isLink?'Bağ kur · Türkçedeki türevi':(isTransfer?'Yeni âyet · haftalık test':(isCloze?'Âyette boşluk':(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç')))))))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
-    if(isCloze) h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair')+'</div>';
-    else if(!task.audioOnly&&!isGrammar&&!isFragment&&(task.direction==='ar>tr'||isLink)) h+='<h2 class="kao-question" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true||kaoBoredomHideHarakat())+'</h2>';
+    if(isCloze) h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair',false,true)+'</div>';
+    else if(!task.audioOnly&&!isGrammar&&!isFragment&&(task.direction==='ar>tr'||isLink)) h+='<h2 class="kao-question" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true||kaoBoredomHideHarakat(),pronunciationFolded)+'</h2>';
     else h+='<h2 class="kao-question'+(task.prompt?' kao-question-text':'')+'">'+esc(prompt)+'</h2>';
     if(isLink||isCloze) h+='<p class="kao-eyebrow">Anlamı: '+esc(task.meaning)+'</p>';
     if(isGrammar){ h+='<div class="kao-grammar-stimulus">'+(/[\u0600-\u06ff]/.test(task.stimulus)?kaoArabicPairHTML(task.stimulus,task.stimulusPronunciation,'kao-stimulus-pair'):esc(task.stimulus))+'</div>'; if(task.context&&task.context.length) h+='<div class="kao-grammar-context">'+task.context.map(function(item){ var value=item&&typeof item==='object'?item:{label:item,pronunciation:''}; return /[\u0600-\u06ff]/.test(value.label)?'<span>'+kaoArabicPairHTML(value.label,value.pronunciation,'kao-context-pair')+'</span>':'<span>'+esc(value.label)+'</span>'; }).join('')+'</div>'; }
-    if(isTransfer) h+='<p class="kao-eyebrow">'+esc(task.surah)+'</p>'; if((isFragment&&task.kind==='translate')||isTransfer) h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair')+'</div>';
+    if(isTransfer) h+='<p class="kao-eyebrow">'+esc(task.surah)+'</p>'; if((isFragment&&task.kind==='translate')||isTransfer) h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair',false,isDurable(objectOr(quranLearnRoot(quranLearnDeps.data()).cards,{})[task.cardId]))+'</div>';
     var order=task.kind==='order'||isBuild;
     if(order){
       var draft=Array.isArray(ui.kaoOrderDraft)?ui.kaoOrderDraft:[];
@@ -1868,7 +1874,7 @@
         else state='dim';
         disabled=true;
       }
-      h+=kaoViewsApi().choice({button:true,state:state||'idle',label:choice.label,labelHtml:arabic?kaoArabicPairHTML(choice.label,choice.pronunciation,'kao-choice-pair',kaoBoredomHideHarakat()):esc(choice.label),arabic:arabic,pronunciation:choice.pronunciation,extraClasses:task.prompt?['kao-chip']:[],pressed:order?selected:undefined,disabled:disabled,onclick:'App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')'});
+      h+=kaoViewsApi().choice({button:true,state:state||'idle',label:choice.label,labelHtml:arabic?kaoArabicPairHTML(choice.label,choice.pronunciation,'kao-choice-pair',kaoBoredomHideHarakat(),pronunciationFolded):esc(choice.label),arabic:arabic,pronunciation:choice.pronunciation,extraClasses:task.prompt?['kao-chip']:[],pressed:order?selected:undefined,disabled:disabled,onclick:'App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')'});
     });
     h+='</div><p class="kao-live" aria-live="polite">'+esc(panel?'':(ui.kaoFeedback||''))+'</p>';
     var kaoAutoAdvanceOn=!!(quranLearnDeps.data()&&ensureQuranLearn(quranLearnDeps.data()).settings.autoAdvance===true);
@@ -1888,7 +1894,7 @@
       (Array.isArray(task.teachLines)?task.teachLines:(task.teach?[task.teach]:[])).forEach(function(line){ lines.push(line); });
       if(task.cognate&&task.cognate.tr) lines.push('Türkçedeki akrabası: '+task.cognate.tr+(task.cognate.shift?' — '+task.cognate.shift:''));
       if(panel.note) lines.push(panel.note);
-      if(panel.reintro){ var ri=panel.reintro; h+='<div class="kao-reintro-panel">'+kaoArabicPairHTML(ri.ar,ri.translit,'',kaoBoredomHideHarakat())+'<p class="kao-feedback-body">'+esc(ri.meaning)+'</p>'+(ri.clipId?'<button type="button" class="kao-audio" onclick="App.kaoPlay(\''+ri.clipId+'\',\'measured\')">Dinle</button>':'')+'</div>'; }
+      if(panel.reintro){ var ri=panel.reintro; h+='<div class="kao-reintro-panel">'+kaoArabicPairHTML(ri.ar,ri.translit,'',kaoBoredomHideHarakat(),pronunciationFolded)+'<p class="kao-feedback-body">'+esc(ri.meaning)+'</p>'+(ri.clipId?'<button type="button" class="kao-audio" onclick="App.kaoPlay(\''+ri.clipId+'\',\'measured\')">Dinle</button>':'')+'</div>'; }
       h+=kaoViewsApi().feedbackSheet({tone:panel.correct?'success':'warning',title:panel.correct?'Doğru':'Bir daha bakalım',body:lines,actions:(panel.correct?[]:[{label:'Yanlışlıkla dokundum',action:'kaoUndo',kind:'link'}]).concat([{label:'Devam',action:'kaoContinue',kind:'primary'}])});
     }
     h+='</section>';
@@ -2444,7 +2450,12 @@
     daily.ms=nonNegativeNumber(daily.ms,0)+kaoTaskMs(ui,now);
     daily.answered+=1; if(correct) daily.correct+=1; if(task.isNew) daily.new+=1; else daily.reviewed+=1; q.daily[key]=daily;
     var calib=Object.assign({pred:0,ok:0,n:0},objectOr(daily.calib,{}));
-    calib.pred=round8(nonNegativeNumber(calib.pred,0)+nonNegativeNumber(scheduled.predictedR,0)); calib.ok=nonNegativeNumber(calib.ok,0)+(correct?1:0); calib.n=nonNegativeNumber(calib.n,0)+1; daily.calib=calib;
+    calib.pred=round8(nonNegativeNumber(calib.pred,0)+nonNegativeNumber(scheduled.predictedR,0)); calib.ok=nonNegativeNumber(calib.ok,0)+(correct?1:0); calib.n=nonNegativeNumber(calib.n,0)+1;
+    // K3P-19 (H4): "s ≥ 21 doğruluğu" ölçüsü. Okunuş o kartta katlandığı için, destek çekilirken
+    // doğruluğun korunup korunmadığı yalnız buradan ölçülebilir; ölçek gözlem, ek alan tutulmaz.
+    var calib21=Object.assign({n:0,ok:0},objectOr(calib.s21,{}));
+    if(nonNegativeNumber(scheduled.s,0)>=21){ calib21.n+=1; if(correct) calib21.ok+=1; }
+    calib.s21=calib21; daily.calib=calib;
     // R-A3: tekrar cevapları 10 R-bandında öngörü/gerçek; R-A1: gece tekrarı ve sonraki tekrarın doğruluğu.
     if(reviewed){ var bands=Array.isArray(calib.bands)&&calib.bands.length===10?calib.bands:Array.from({length:10},function(){ return {pred:0,ok:0,n:0}; }),band=bands[Math.min(9,Math.floor(nonNegativeNumber(scheduled.predictedR,0)*10))]; band.pred=round8(band.pred+nonNegativeNumber(scheduled.predictedR,0)); band.ok+=correct?1:0; band.n+=1; calib.bands=bands; var follow=afterNight?'nightFollow':'dayFollow'; daily[follow]=Object.assign({n:0,ok:0},objectOr(daily[follow],{})); daily[follow].n+=1; daily[follow].ok+=correct?1:0; }
     if(ui.kaoNight) daily.nightRev=Math.floor(nonNegativeNumber(daily.nightRev,0))+1;

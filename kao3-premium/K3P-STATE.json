@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-19",
+  "nextPrompt": "K3P-20",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -387,7 +387,11 @@
     {
       "id": "K3P-19",
       "wave": 3,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-16",
+      "result": "Okunuşun soldurulması (KARARLAR K-A son madde, P4/H4): s ≥ 21 olan kartın görevinde okunuş yerel `<details class=\"kao-pronunciation-fold\"><summary>Okunuş</summary>…</details>` içine alınır; VARSAYILAN KAPALI, handler YOK (tarayıcı <summary> kendi açar, yeni App.kao* yok — 45 sabit). Sınır tam s = 21 (hareke soldurması s ≥ 30'un bir basamak öncesi). Okunuş satırı <details> İÇİNDE kaldığı için `test_kao_pronunciation_contract` korunur (okunuş HTML'de durur, yalnız katlı). `settings.translit === false` ise okunuş HTML'de HİÇ çizilmez (tanımsız eski kayıt bugünkü gibi görünür kalır — migrate dokunulmadı). Katlama yalnız sunum: not/FSRS etkilenmez. Aynı yuva paylaşıldığı için `kaoArabicPairHTML` 5. parametresi artık `pronunciationFolded` (eski kullanılmayan `fadeMode` yerine). H4 ölçüsü hazırlandı: motor her cevapta `daily.calib.s21 = {n,ok}` sayar (yalnız s ≥ 21 kartlar) ve `deney-rapor.cjs` H4 satırı basar (hedef ≥ %85, sentetik örnekte %90,0 = 117/130). Yeni test `test_k3p_pronunciation_fold` (6 kontrol); KAO envanteri 76 → 77. CSS: işaretçi + hareket azaltma kuralı; `app/kao.css` pinDeferral.files'a eklendi (pinli dosya).",
+      "gate": "node kao3-premium/araclar/kapi-hizli.mjs --kart K3P-19",
+      "evidence": "source+headless"
     },
     {
       "id": "K3P-20",
@@ -436,7 +440,8 @@
     "branch": "kao3-premium",
     "until": "K3P-27",
     "files": [
-      "app/core/quranLearn.js"
+      "app/core/quranLearn.js",
+      "app/kao.css"
     ]
   }
 }

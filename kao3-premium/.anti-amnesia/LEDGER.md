@@ -816,3 +816,16 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kapı: `kapi-hizli --kart K3P-18 --yavas` çalıştırılacak; tam aile taraması ve `senkron.mjs` bu kayıttan sonra.
 - Kanıt düzeyi: kaynak/headless ve sentetik veri · görsel QA yok · cihaz yok · yayın yok.
 - Sıradaki: K3P-19
+
+## seq 53 · K3P-19 · KART
+- Tarih: 2026-10-16
+- Commit: (bu commit)
+- Yapılan: **Okunuşun soldurulması** (KARARLAR K-A son madde, P4/H4). s ≥ 21 kartın görevinde okunuş yerel `<details class="kao-pronunciation-fold"><summary>Okunuş</summary>…</details>` içine alınır; **varsayılan kapalı**, **handler yok** (tarayıcı `<summary>` kendi açar; yeni `App.kao*` yok — 45 sabit). Sınır tam **s = 21** (hareke soldurması s ≥ 30'un bir basamak öncesi): s = 20 görünür satır, s ≥ 21 katlı. Okunuş satırı `<details>` **içinde** kaldığı için `test_kao_pronunciation_contract`'ın "her Arapça satırın görünür okunuşu" eşitliği korunur — okunuş HTML'de durur, yalnız katlıdır. `settings.translit === false` ise okunuş HTML'de **hiç** çizilmez; ayar tanımsızsa (eski kayıt) bugünkü davranış sürer — `migrate()` dokunulmadı. Katlama **yalnız sunum**: aynı cevap, ayar açık/kapalı, aynı FSRS notu (test bunu kilitler).
+- Uygulama: `kaoArabicPairHTML`'in 5. parametresi artık `pronunciationFolded` (kullanılmayan eski `fadeMode` yuvası); katlanma kararı çağrı yerinde `isDurable(cards[task.cardId])` ile verilir. Çağrı yerleri: soru (`>ar`), şık çipleri (build/cloze dahil), cloze âyeti, yeniden tanış paneli, parça/transfer âyeti. Cloze okunuşu zaten s ≥ 30 (durable30) olduğu için koşulsuz katlanır.
+- **H4 ölçüm hazırlığı:** motor her cevapta `daily.calib.s21 = {n,ok}` sayar (yalnız `scheduled.s ≥ 21` kartlar; ölçek gözlem, yeni kart alanı yok) ve `deney-rapor.cjs` **H4** satırını basar — "Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk", hedef **≥ %85**. Sentetik örnekte elle doğrulanan değer **%90,0 (117/130 cevap, 26 gün)**.
+- Test: yeni `tests/kao/test_k3p_pronunciation_fold.js` **6 kontrol** — sınır (s = 20 görünür / s = 21 katlı ve bütün Arapça satırlar katlı), katlama (yerel `<details>`, varsayılan kapalı, `onclick|ontoggle|onpointerdown` yok, okunuş metni katlamanın içinde), ayar (`translit === false` → okunuş HTML'de hiç yok; tanımsız eski kayıt bozulmaz), not etkisizliği (iki kol aynı FSRS), sözleşme (satır sayısı = Arapça satır sayısı, katlama sayısı = Arapça sayısı), katlama CSS'i. KAO envanteri **76 → 77**.
+- Paylaşılan fixture düzeltmeleri (kapsam içi beyan): `test_kao_requirements` R-A3 kalibrasyon şekli (`calib` artık `s21` de taşır; toplam alanlar değişmedi, s21 = 0), `test_k3p_dda` sıkılma iddiası katı argüman dizilimi yerine **davranışsal** (`kaoBoredomHideHarakat()` hâlâ çağrıda), `test_k3p_deney_rapor` H4 satırı + `s21N/s21Ok` izdüşüm alanları.
+- Ölçüler: runtime gzip **L6 128,904 KiB** (kalan ~7,1 KB, tavan 136) · CSS L9 15,469/16 KiB · içerik 184,591/256 · App.kao* **45** · `migrate`/`data` şeması değişmedi. `app/kao.css` de değişti ve pinli olduğu için `pinDeferral.files`'a eklendi (K-P).
+- Kapı: `kapi-hizli --kart K3P-19` → **HIZLI KAPI YEŞİL**; tests/kao **77 PASS**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr PASS. Kabul kontrolü kaldırılmadı/gevşetilmedi.
+- Kanıt düzeyi: kaynak/headless ve sentetik veri · görsel QA yok · cihaz yok · yayın yok.
+- Sıradaki: K3P-20

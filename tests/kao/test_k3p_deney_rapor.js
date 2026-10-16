@@ -17,10 +17,13 @@ const IDS = /\b[ws]:[\w:]+|\bs0\.\d|\bu\d{2}\.\d{2}\b|sample\d|ghp_/;
 const out = run('--ornek');
 assert.equal(out.status, 0, out.stderr);
 const text = out.stdout;
-for (const id of ['H2', 'H3', 'H5', 'H7', 'H8', 'H9']) assert.match(text, new RegExp(`^\\| ${id} \\|`, 'm'), `${id} satırı yok`);
+for (const id of ['H2', 'H3', 'H4', 'H5', 'H7', 'H8', 'H9']) assert.match(text, new RegExp(`^\\| ${id} \\|`, 'm'), `${id} satırı yok`);
 assert.doesNotMatch(text, ARABIC, 'çıktıda Arapça var');
 assert.doesNotMatch(text, IDS, 'çıktıda kart/ders kimliği ya da sır var');
 assert.match(text, /\| H3 \|[^\n]*A: n=\d[^\n]*B: n=\d/);
+// K3P-19 H4: s ≥ 21 (okunuşu katlanmış) kartların doğruluğu. Elle hesap: 26 gün × 5 = 130 cevap;
+// kesimden önce 13 gün × 4 = 52, sonra 13 gün × 5 = 65 → 117/130 = %90,0 (hedef ≥ %85).
+assert.match(text, /\| H4 \|[^\n]*\| %90,0 \(117\/130 cevap, 26 gün\) \| ≥ %85,0 \| tutuyor \|/);
 assert.match(text, /30\. gün deney sonucu değildir/);
 
 // 2) Sentetik örneğin elle hesaplanan değerleri (son 14 gün varsayılan kesim: 2026-02-15).
@@ -36,7 +39,7 @@ const p = R.project(R.sampleBackup());
 assert.deepEqual(Object.keys(p).sort(), ['cards', 'daily', 'lessons']);
 p.cards.forEach((c) => assert.deepEqual(Object.keys(c).sort(), ['arm', 'lapses', 'reps', 's', 'state']));
 p.lessons.forEach((l) => assert.deepEqual(Object.keys(l).sort(), ['doneAt', 'hasResume']));
-p.daily.forEach((d) => assert.deepEqual(Object.keys(d).sort(), ['answered', 'correct', 'date', 'reviewN', 'reviewOk']));
+p.daily.forEach((d) => assert.deepEqual(Object.keys(d).sort(), ['answered', 'correct', 'date', 'reviewN', 'reviewOk', 's21N', 's21Ok']));
 assert.doesNotMatch(JSON.stringify(p), ARABIC);
 assert.doesNotMatch(JSON.stringify(p), /sample\d|ghp_|placement|lessonItemId/);
 const arm = (id) => p.cards[Number(id)].arm;
@@ -71,4 +74,4 @@ assert.match(missing.stderr, /dosya yok/);
 assert.throws(() => R.buildReport({ settings: {} }), /quranLearn/);
 assert.throws(() => R.buildReport({ quranLearn: { cards: {} } }), /çalışma günü yok/);
 
-console.log('test_k3p_deney_rapor: PASS (6 hipotez satırı, sızıntı 0, elle hesap 6/6, hata yolları 6)');
+console.log('test_k3p_deney_rapor: PASS (7 hipotez satırı, sızıntı 0, elle hesap 7/7, hata yolları 6)');

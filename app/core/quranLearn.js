@@ -1903,7 +1903,9 @@
       var draft=Array.isArray(ui.kaoOrderDraft)?ui.kaoOrderDraft:[];
       h+='<div class="kao-order-target" data-kao-drop="" aria-label="Seçilen sıra">'+(draft.length?draft.map(function(choiceId){ var selected=task.choices.find(function(choice){ return choice.choiceId===choiceId; }); return selected?'<span>'+kaoArabicPairHTML(selected.label,selected.pronunciation,'kao-order-pair')+'</span>':''; }).join(''):'<span class="kao-order-empty">'+(isFragment?'Önce fiili seç':'Kelimeleri sırayla seç')+'</span>')+'</div>';
     }
-    if(task.clipId) h+='<div class="kao-audio-actions"><button type="button" class="kao-audio" aria-label="Yavaş dinlemek için dokun; doğal hız için 350 milisaniye basılı tut" onpointerdown="this.dataset.kaoLong=\'\';this._kaoHold=setTimeout(()=>{this.dataset.kaoLong=\'1\';App.kaoPlay(\''+task.clipId+'\',\'flowing\')},350)" onpointerup="clearTimeout(this._kaoHold)" onpointercancel="clearTimeout(this._kaoHold)" onclick="if(this.dataset.kaoLong!==\'1\')App.kaoPlay(\''+task.clipId+'\',\'measured\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.kaoPlay(\''+task.clipId+'\',event.shiftKey?\'flowing\':\'measured\')}">'+quranLearnDeps.icon('headphones',17)+' Dinle</button><button type="button" class="kao-audio-natural" onclick="App.kaoPlay(\''+task.clipId+'\',\'flowing\')">Doğal hız</button></div>';
+    // K3P-21: gizli uzun basma (350 ms) ve satır içi ok fonksiyonu KALKTI — keşfedilemiyordu.
+    // Yerine iki görünür düğme: her biri kendi aria-label'ını taşır ve tek dokunuşla çalar.
+    if(task.clipId) h+='<div class="kao-audio-actions"><button type="button" class="kao-audio" aria-label="Yavaş oku" onclick="App.kaoPlay(\''+task.clipId+'\',\'measured\')">◖ Yavaş</button><button type="button" class="kao-audio-natural" aria-label="Doğal hızda oku" onclick="App.kaoPlay(\''+task.clipId+'\',\'flowing\')">◗ Doğal</button></div>';
     h+=kaoCognateHTML(task)+'<div class="kao-choices">';
     task.choices.forEach(function(choice){
       var selected=order&&Array.isArray(ui.kaoOrderDraft)&&ui.kaoOrderDraft.indexOf(choice.choiceId)>=0;
@@ -2694,7 +2696,7 @@
     var h='<main class="kao-settings" aria-labelledby="kao-settings-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Ayarlar</p><h2 id="kao-settings-title">Öğrenme ayarların</h2><p>Seçimlerin bu cihazda saklanır ve senkronla taşınır.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
     // K2F-29: amaca göre gruplar; tüm aç/kapat ayarları gerçek anahtardır.
     h+=group('Günlük hedef',[kaoSegHTML('Günlük yeni kelime',KAO_DAILY_NEW.map(function(n){ return [n,String(n),n]; }),Math.floor(nonNegativeNumber(s.dailyNew,10)),'kaoSetDailyNew'),kaoSegHTML('Niyet',KAO_ONBOARD_INTENTS.map(function(pair){ return [pair[0],pair[1],"'"+pair[0]+"'"]; }),q.onboarding.intent,'kaoSetIntent')],'Niyet: '+intentText);
-    h+=group('Ses',[kaoSegHTML('Yeni kelimede otomatik ses',[['off','Kapalı',"'off'"],['measured','Yavaş',"'measured'"],['flowing','Doğal',"'flowing'"]],audio,'kaoSetAudioStyle')],'Ses düğmesinde dokunmak yavaş, basılı tutmak doğal hızı çalar. Sessiz saatte otomatik ses çalmaz.');
+    h+=group('Ses',[kaoSegHTML('Yeni kelimede otomatik ses',[['off','Kapalı',"'off'"],['measured','Yavaş',"'measured'"],['flowing','Doğal',"'flowing'"]],audio,'kaoSetAudioStyle')],'Ses düğmeleri: ◖ Yavaş ölçülü okur, ◗ Doğal akıcı okur. Sessiz saatte otomatik ses çalmaz.');
     h+=group('Okuma',[
       kaoSegHTML('Latin okunuş katmanı',[['tr','Okunuş',"'tr'"],['dia','DİA',"'dia'"]],kaoTranslitLayer(),'kaoSetTranslit'),
       sw('Harekeleri göster',s.harakat!==false,{name:'kaoToggleHarakat'}),

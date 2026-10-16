@@ -341,7 +341,11 @@ assert.equal(delayedData.quranLearn.surahs['112'].needsReread, false);
   quiet = true; assert.equal(e7.kaoShouldAutoplay(withClip, e7Data), false, 'sessiz saatte otomatik ses yok'); assert.doesNotMatch(e7.kaoTaskHTML(withClip), /data-autoplay/); quiet = false;
   e7.kaoSetAudioStyle('off'); assert.equal(e7.kaoShouldAutoplay(withClip, e7Data), false, 'ses kapalıyken otomatik ses yok');
   const audioButton = e7.kaoTaskHTML(withClip);
-  assert.match(audioButton, /App\.kaoPlay\('w-[^']+','flowing'\)/); assert.match(audioButton, /App\.kaoPlay\('w-[^']+','measured'\)/); assert.match(audioButton, /event\.shiftKey/);
+  // K3P-21: gizli uzun basma ve satır içi ok fonksiyonu kalktı; ses denetimi İKİ GÖRÜNÜR düğmedir
+  // (◖ Yavaş → measured, ◗ Doğal → flowing) ve her biri kendi aria-label'ını taşır.
+  assert.match(audioButton, /App\.kaoPlay\('w-[^']+','flowing'\)/); assert.match(audioButton, /App\.kaoPlay\('w-[^']+','measured'\)/);
+  assert.match(audioButton, /aria-label="Yavaş oku"/); assert.match(audioButton, /aria-label="Doğal hızda oku"/);
+  assert.ok(!/event\.shiftKey/.test(audioButton), 'satır içi ok fonksiyonu yok');
   e7.kaoSetAudioStyle('flowing'); e7Ui.kaoWordId = lemma.id;
   assert.match(e7.kaoWordHTML(), /App\.kaoPlay\('w-[^']+','flowing'\)/, 'kelime kartı tek düğmesi seçilen stili çalar');
 

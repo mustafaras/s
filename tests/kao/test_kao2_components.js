@@ -132,7 +132,8 @@ assert.match(css, /@media \(forced-colors:active\)/);
 // (dersin gerçek oynatımı) üretilir; cevapsız/doğru/yanlış üç durumda şık ekranı sınanır. Görev nesnesi elle kurulmaz.
 const kaoHarness = require('./helpers/kao-harness');
 const AUDIO_LESSON = 'u01.02';
-const AUDIO_BTN = '<button type="button" class="kao-audio" aria-label="Yavaş dinlemek için dokun; doğal hız için 350 milisaniye basılı tut"';
+// K3P-21: gizli uzun basma kalktı; ses denetimi iki görünür düğmedir ve her biri kendi aria-label'ını taşır.
+const AUDIO_BTN = '<button type="button" class="kao-audio" aria-label="Yavaş oku"';
 
 // Görevlerde şık bloklarını (Views.choice düğme kipinin ürettiği) görev bölümünden çeker.
 function kaoChoicesBlock(html) {

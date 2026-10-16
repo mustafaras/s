@@ -149,8 +149,11 @@ assert.match(meaningHtml, /data-kao-ar>.*class="kao-arabic-text" lang="ar" dir="
 assert.match(meaningHtml, /class="kao-pronunciation-line"[^>]*>[^<]+<\/span>/);
 assert.match(arabicHtml, /Arapçayı seç/);
 assert.match(arabicHtml, /aria-live="polite"/);
-assert.match(arabicHtml, /onpointerdown=.*350/);
-assert.match(arabicHtml, /event\.shiftKey\?'flowing':'measured'/);
+// K3P-21: gizli uzun basma ve satır içi ok fonksiyonu kalktı; yerine iki görünür düğme geldi.
+assert.match(arabicHtml, /◖ Yavaş/);
+assert.match(arabicHtml, /◗ Doğal/);
+assert.ok(!/onpointerdown/.test(arabicHtml), 'görev HTML\'inde onpointerdown yok');
+assert.ok(!/shiftKey/.test(arabicHtml), 'satır içi ok fonksiyonu yok');
 assert.match(arabicHtml, /kao-cognate is-shift/);
 assert.match(arabicHtml, /dikkat/);
 assert.match(arabicHtml, /Türkçede var/);

@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-21",
+  "nextPrompt": "K3P-22",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -405,7 +405,11 @@
     {
       "id": "K3P-21",
       "wave": 3,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-16",
+      "result": "Görünür ses kontrolleri (ANALIZ §4 \"ses düğmesi\", Dalga 3 sonu): gizli uzun basma (350 ms) ve satır içi ok fonksiyonu KALDIRILDI — keşfedilemiyordu. Yerine İKİ GÖRÜNÜR DÜĞME: **◖ Yavaş** → `App.kaoPlay(id,'measured')`, **◗ Doğal** → `App.kaoPlay(id,'flowing')`. Her biri kendi `aria-label`'ını taşır ('Yavaş oku' / 'Doğal hızda oku'), gerçek `<button type=\"button\">` (klavye ve ekran okuyucu yolu doğal) ve CSS'ten ≥44 px çözülür. Ses denetiminde artık `onpointerdown`, `setTimeout` ve `shiftKey` YOK; tek dokunuş yeterli. Yeni `App.kao*` handler EKLENMEDİ (45 sabit; mevcut `kaoPlay` kullanılır). Ayarlar açıklaması uzun basmayı değil iki düğmeyi anlatır. Yeni test `test_k3p_audio_buttons` (6 kontrol); KAO envanteri 78 → 79. **K3P-20 sınırı:** çip sürükleme `onpointerdown`'ı yalnız dizme görevlerinin çiplerindedir; ses denetimi ve düz seçim görevi etkilenmez (test bunu kilitler).",
+      "gate": "node kao3-premium/araclar/kapi-hizli.mjs --kart K3P-21 + KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh",
+      "evidence": "source+headless"
     },
     {
       "id": "K3P-22",
@@ -443,6 +447,8 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearn.js"
+    ]
   }
 }

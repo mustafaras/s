@@ -102,8 +102,11 @@ assert.match(html, /App\.kaoContinue\(\)/);
 // K3P-A6 (D-2): görev görünümündeki ilerleme çubuğu 5 bölümlüdür (tek ilerleme çubuğu; tek ince çubuk sözleşmesi).
 assert.match(html, /class="kao-lesson-progress"[^>]*role="progressbar"[^>]*aria-valuetext="Bölüm \d\/5/);
 assert.match(html, /\d+ \/ \d+/);
-assert.match(html, /Doğal hız/);
-assert.match(html, /onpointerdown=.*350/);
+// K3P-21: gizli uzun basma kalktı; iki görünür düğme (Yavaş/Doğal) ve ses denetiminde onpointerdown YOK.
+assert.match(html, /◖ Yavaş/);
+assert.match(html, /◗ Doğal/);
+assert.match(html, /aria-label="Doğal hızda oku"/);
+assert.ok(!/onpointerdown/.test((html.match(/<div class="kao-audio-actions">[\s\S]*?<\/div>/) || [''])[0]), 'ses denetiminde onpointerdown yok');
 assert.equal(focusedContinue, 1, 'panel açıldığında odak Devam düğmesine taşınmalı');
 assert.equal(timers.some((timer) => timer.ms === 3000), false, '3 saniyelik undo zaman aşımı bulunmamalı');
 

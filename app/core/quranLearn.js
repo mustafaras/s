@@ -3036,6 +3036,22 @@
   function kaoNearestAyah(d){
     return kaoAyahGroups().map(function(group){ return Object.assign({coverage:kaoCoverage(d,group.words)},group); }).sort(function(a,b){ return b.coverage.ratio-a.coverage.ratio||(a.words.length-a.coverage.known)-(b.words.length-b.coverage.known)||a.key.localeCompare(b.key); })[0]||null;
   }
+  // K3P-22 · "Henüz hazır âyet yok" yerine merdiven: en yakın âyet Tezhip olarak, kalan kelime sayısı ve
+  // eksik kelimelerin her biri için mevcut kelime sayfası bağlantısı (`App.kaoNav('word', id)`).
+  // Eşik DEĞİŞMEZ (K-E): hazır âyet yoksa yalnız yön gösterilir, ödül sahteleştirilmez.
+  function kaoAyahLadderHTML(d,near){
+    var esc=quranLearnDeps.esc,views=kaoViewsApi(),known=kaoKnownLemmaSet(d);
+    if(!near) return '<p class="kao-ayah-ladder-line">Kelimelerinin %'+String(Math.round(KAO_AYAH_THRESHOLD*100))+'’ini tanıdığın bir âyet açılınca burada görünecek.</p>';
+    var total=Array.isArray(near.words)?near.words.length:0,ratio=nonNegativeNumber(near.coverage&&near.coverage.ratio,0);
+    var missing=Array.isArray(near.words)?near.words.filter(function(word){ return word&&word.lemmaId&&!known[word.lemmaId]; }):[];
+    // `tezhipPage` `lines`'i SAYFA dizisi olarak bekler: tek sayfa, kelime durumlarıyla (bilinen/henüz bilinmiyor).
+    var page=(Array.isArray(near.words)?near.words:[]).map(function(word){ return {ar:String(word.ar||''),state:word&&known[word.lemmaId]?'known':'new'}; });
+    var title=kaoSurahName(near.surahId)+' · '+near.ayah+'. âyet';
+    var tz={title:title,lines:[page]};
+    return '<p class="kao-ayah-ladder-line">En yakın âyet: <strong>%'+String(Math.floor(ratio*100))+'</strong> tanıdık · '+(missing.length?String(missing.length)+' kelime kaldı':'yalnız onay bekliyor')+'</p>'
+      +views.tezhipCard({eyebrow:'Hedefe en yakın âyet',title:title,tezhip:tz,goal:String(total)+' kelime',primary:{label:'Bugünkü oturuma başla',action:{name:'kaoStart'}}})
+      +(missing.length?'<ul class="kao-ayah-ladder-missing">'+missing.map(function(word){ return '<li><button type="button" class="kao-ayah-ladder-word" onclick="App.kaoNav(\'word\',\''+esc(String(word.lemmaId))+'\')">'+kaoArabicPairHTML(word.ar,word.pronunciation,'kao-ayah-pair')+'<span class="kao-ayah-tr">'+esc(word.tr)+'</span></button></li>'; }).join('')+'</ul>':'');
+  }
   function kaoSurahName(surahId){ var surah=kaoSurahs().find(function(item){ return item.id===surahId; }); return surah?surah.name:String(surahId); }
   function kaoPlaySequence(srcs,onFail){
     if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.createAudio!=='function'||!srcs.length) return false;
@@ -3100,10 +3116,14 @@
   function kaoAyahHTML(){
     if(!quranLearnDeps) return '';
     var ui=quranLearnDeps.ui(),esc=quranLearnDeps.esc,icon=quranLearnDeps.icon,d=quranLearnDeps.data(),pick=kaoTodayAyah(),q=ensureQuranLearn(d);
-    var h='<main class="kao-ayah" aria-labelledby="kao-ayah-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Bugün anlayabildiğin âyet</p><h2 id="kao-ayah-title">'+(pick?esc(kaoSurahName(pick.surahId))+' · '+pick.ayah+'. âyet':'Henüz hazır âyet yok')+'</h2><p class="kao-ayah-count">Anlaşılan âyet sayısı: <strong>'+(Array.isArray(q.ayahs&&q.ayahs.understood)?q.ayahs.understood.length:0)+'</strong></p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
+    // K3P-22 (K-E): boş ekran YOK. %95 eşiği korunur; eşiğe ulaşılmadıysa MERDİVEN gösterilir:
+    // en yakın âyet Tezhip olarak, "N kelime kaldı" ve eksik kelimelerin her biri için kelime sayfası bağlantısı.
+    var near=pick?null:kaoNearestAyah(d);
+    var head='<div class="kao-view-head"><div><p class="kao-eyebrow">Bugün anlayabildiğin âyet</p><h2 id="kao-ayah-title">'+(pick?esc(kaoSurahName(pick.surahId))+' · '+pick.ayah+'. âyet':'Henüz %95’e ulaşan âyet yok')+'</h2><p class="kao-ayah-count">Anlaşılan âyet sayısı: <strong>'+(Array.isArray(q.ayahs&&q.ayahs.understood)?q.ayahs.understood.length:0)+'</strong></p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
+    var h='<main class="kao-ayah" aria-labelledby="kao-ayah-title">'+head;
     if(!pick){
-      var near=kaoNearestAyah(d),missing=near?near.words.length-near.coverage.known:0;
-      return h+'<section class="kao-ayah-empty"><p>Kelimelerinin en az %95’ini tanıdığın bir âyet açılınca burada görünecek.</p>'+(near?'<p>En yakın âyet: '+esc(kaoSurahName(near.surahId))+' '+near.ayah+' · %'+Math.floor(near.coverage.ratio*100)+' tanıdık, '+missing+' kelime kaldı.</p>':'')+'<button type="button" class="kao-primary" onclick="App.kaoStart()">Bugünkü oturuma başla</button></section></main>';
+      var ladder=kaoAyahLadderHTML(d,near);
+      return h+'<section class="kao-ayah-ladder">'+ladder+'</section><p class="kao-live" aria-live="polite">'+esc(ui.kaoAyahNote||'')+'</main>';
     }
     var done=q.ayahs.understood.indexOf(pick.key)>=0;
     h+='<p class="kao-ayah-coverage">'+icon('check-circle',15)+' Kelimelerin %'+Math.floor(pick.coverage.ratio*100)+'’ini tanıyorsun ('+pick.coverage.known+' / '+pick.coverage.total+')</p>';

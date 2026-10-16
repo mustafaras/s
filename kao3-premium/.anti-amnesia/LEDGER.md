@@ -890,3 +890,15 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kapı: `kapi-hizli --kart K3P-21` → **HIZLI KAPI YEŞİL**; **dalga sonu tam kapısı** `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → **exit 0, TÜM KAPILAR YEŞİL** (KAO 79, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast, çift şık, okunuş, plan, pin senkronu PASS). Kabul kontrolü kaldırılmadı.
 - Kanıt düzeyi: kaynak/headless ve sentetik veri · görsel QA yok · cihaz yok · yayın yok.
 - Sıradaki: K3P-22
+
+## seq 60 · K3P-22 · KART
+- Tarih: 2026-10-16
+- Commit: (bu commit)
+- Yapılan: **Âyet merdiveni (K-E).** Boş durum **kaldırıldı**: "Henüz hazır âyet yok" metni ve `kao-ayah-empty` işaretlemesi artık hiçbir yerde geçmez (CSS'i de silindi — öksüz seçici bırakılmadı). %95 eşiğine ulaşmayan kullanıcıya **merdiven** gösterilir: en yakın âyet **Tezhip** olarak (kelime kelime, bilinen/henüz-bilinmiyor durum işaretli), **"En yakın âyet: %N tanıdık · M kelime kaldı"** cümlesi ve **eksik lemmaların her biri** için mevcut `App.kaoNav('word', id)` bağlantısı (tekil; yalnız gerçekten tanınmayan lemmalar). **Eşik 0.95 DEĞİŞMEDİ** (K-E: eşiği düşürmek ödülü sahteleştirir) — eşiğe ulaşan kullanıcı tam âyet ekranını görür, merdiven çizilmez. Yeni `App.kao*` handler yok (**45** sabit); birincil eylem mevcut `kaoStart`, kelime bağlantısı mevcut `kaoNav`.
+- Test: yeni `tests/kao/test_k3p_22.js` **6 kontrol** — boş durum kalktı, merdiven + Tezhip + "N kelime kaldı", eksik kelime bağlantıları (tekil, gerçekten tanınmayan, âyetin kelimesi), **eşik 0.95 sabit** (ulaşan kullanıcıda merdiven yok + kaynakta `KAO_AYAH_THRESHOLD=0.95`), **20 kelime bilen kullanıcı boş durum görmez** (kartın kabul senaryosu), `App.kao*` = 45. KAO envanteri **79 → 80**.
+- Bulunan ve düzeltilen gerçek hatalar: (1) `tezhipPage` `lines`'i **sayfa dizisi** bekliyor (ilk denemede düz dizi verilmişti → Tezhip boş çiziliyordu); tek sayfa + kelime durumları verildi. (2) `tezhipCard` kendi (etiket­siz, devre dışı) birincil düğmesini çiziyordu → hem **a11y** (adsız düğme) hem **tasarım sözleşmesi** ("primary per view") ihlali; birincil eylem `primary:{label,action}` ile karta verildi, dış düğme kaldırıldı. (3) **Kontrast:** `.kao-ayah-ladder-line strong` açık temada **2,09:1** (altın `--quran2` açık zeminde okunmuyor) → `--quran-mid` kullanıldı; kontrast aracı **756/756 PASS**. (4) `kao-ayah-empty` CSS'i öksüz kaldı → silindi.
+- Paylaşılan fixture düzeltmesi (kapsam içi beyan): `test_kao_queue` eski boş-durum metnini sabitliyordu → merdiven beklentisine çevrildi (ve olumsuz iddia eklendi: boş durum metni geçmez).
+- Ölçüler: runtime **L6 130,622 KiB** (kalan ~5,4 KB, tavan 136) · **CSS L9 15,772/16 KiB** (kalan 233 B — dikkat) · içerik 184,591/256 · `App.kao*` **45** · `data`/`migrate()` değişmedi. `app/core/quranLearn.js` ve `app/kao.css` pinli → `pinDeferral.files`.
+- Kapı: `kapi-hizli --kart K3P-22` → **HIZLI KAPI YEŞİL**; tests/kao **80 PASS**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr PASS.
+- Kanıt düzeyi: kaynak/headless ve sentetik veri · görsel QA yok · cihaz yok · yayın yok.
+- Sıradaki: K3P-23

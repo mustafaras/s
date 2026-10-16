@@ -235,7 +235,11 @@ for (let i = 2; i < mixedGrammarQueue.length; i += 1) assert.ok(!(mixedGrammarQu
   assert.doesNotMatch(e9.kaoHubCardHTML(), /Bugün anlayabildiğin âyet/, 'hub kartında âyet satırı yok');
   const emptyData = { quranLearn: { cards: {} }, settings: {} };
   data.quranLearn = emptyData.quranLearn; ui.kaoAyahToday = null;
-  assert.match(e9.kaoAyahHTML(), /Henüz hazır âyet yok[\s\S]*En yakın âyet/, 'hazır âyet yokken yol gösterir');
+  // K3P-22 (K-E): boş durum kalktı; %95'e ulaşmayan kullanıcıya MERDİVEN gösterilir —
+  // en yakın âyet ve "N kelime kaldı" cümlesi (eski "Henüz hazır âyet yok" metni artık geçmez).
+  const ladderHtml = e9.kaoAyahHTML();
+  assert.match(ladderHtml, /En yakın âyet: <strong>%\d+<\/strong> tanıdık · \d+ kelime kaldı/, 'hazır âyet yokken merdiven yol gösterir');
+  assert.ok(!ladderHtml.includes('Henüz hazır âyet yok'), 'boş durum metni geçmez');
   assert.equal(e9.kaoAyah('understood'), false, 'âyet yokken kayıt yok');
   // R-C2: ses yoksa metinle sürer.
   data.quranLearn = { cards: many, ayahs: { understood: [] } };

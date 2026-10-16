@@ -73,7 +73,6 @@
 /* KAO-28 · E9 Bugün anlayabildiğin âyet. */
 .kao-ayah{display:grid;gap:14px;max-width:460px;margin:0 auto}.kao-ayah-coverage{margin:0;display:flex;align-items:center;gap:7px;font-size:var(--f-footnote);font-weight:700;color:var(--quran-mid)}
 .kao-ayah-words{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin:0;padding:16px 10px;list-style:none;direction:rtl;border:1px solid color-mix(in srgb,var(--quran) 16%,transparent);border-radius:22px;background:var(--quran-surface)}.kao-ayah-words li{direction:ltr}.kao-ayah-words button{min-height:44px;display:grid;justify-items:center;gap:3px;padding:8px 10px;border:1px solid color-mix(in srgb,var(--quran) 14%,transparent);border-radius:14px;background:color-mix(in srgb,var(--quran2) 5%,var(--quran-surface));color:var(--quran-ink);font:inherit;cursor:pointer}.kao-ayah-tr{font-size:var(--f-caption1);color:color-mix(in srgb,var(--quran-ink) 72%,transparent)}
-.kao-ayah-empty{padding:18px;border:1px solid color-mix(in srgb,var(--quran) 18%,transparent);border-radius:22px;background:var(--quran-surface)}.kao-ayah-empty p{margin:6px 0 0;line-height:1.55;color:color-mix(in srgb,var(--quran-ink) 76%,transparent)}
 
 /* KAO-28b · E10 Mushaf ısı haritası: renk + sayı, veri yoksa boş, kesinleşen koyu. */
 .kao-map{display:grid;gap:14px;max-width:460px;margin:0 auto}.kao-map-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}.kao-map-grid>span{display:block}
@@ -533,3 +532,11 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-drag.is-dragging{z-index:3;position:relative;transition:none;box-shadow:0 10px 22px color-mix(in srgb,var(--quran) 26%,transparent)}
 .kao-order-target.kao-drop-ready{outline:2px dashed var(--quran-gold);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){.kao-drag.is-dragging{transition:none}}
+
+/* K3P-22 · âyet merdiveni: en yakın âyet + eksik kelime bağlantıları (boş durum yerine). */
+.kao-ayah-ladder-line{margin:0;font-size:var(--f-footnote);font-weight:700;color:var(--quran-mid)}
+/* Kontrast: altın vurgu (--quran2) açık zeminde 2,09:1 kalıyordu; gövde metni --quran-mid kullanır. */
+.kao-ayah-ladder-line strong{color:var(--quran-mid)}
+.kao-ayah-ladder-missing{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin:0;padding:12px 10px;list-style:none;direction:rtl}
+.kao-ayah-ladder-missing li{direction:ltr}
+.kao-ayah-ladder-word{min-height:44px;display:flex;align-items:center;gap:8px;padding:6px 11px;border:1px solid color-mix(in srgb,var(--quran) 20%,transparent);border-radius:16px;background:var(--quran-surface);cursor:pointer}

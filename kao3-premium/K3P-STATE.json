@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-22",
+  "nextPrompt": "K3P-23",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -414,7 +414,11 @@
     {
       "id": "K3P-22",
       "wave": 4,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-16",
+      "result": "Âyet merdiveni (K-E): boş durum KALDIRILDI. \"Henüz hazır âyet yok\" metni ve `kao-ayah-empty` işaretlemesi artık hiçbir yerde geçmez (CSS'i de silindi, öksüz seçici bırakılmadı). %95 eşiğine ulaşmayan kullanıcıya **merdiven** gösterilir: en yakın âyet **Tezhip** olarak (kelime kelime, bilinen/henüz-bilinmiyor durum işaretli), \"En yakın âyet: %N tanıdık · M kelime kaldı\" cümlesi ve **eksik lemmaların her biri** için mevcut `App.kaoNav('word', id)` bağlantısı (tekil; yalnız gerçekten tanınmayan lemmalar). **Eşik 0.95 DEĞİŞMEDİ** (K-E: düşürmek ödülü sahteleştirir) — eşiğe ulaşan kullanıcı tam âyet ekranını görür, merdiven çizilmez; test bunu kilitler. Yeni `App.kao*` handler yok (45 sabit; merdiven mevcut `kaoNav` ve `kaoStart`'ı kullanır). Yeni test `test_k3p_22` (6 kontrol, kartın 20-kelime kabul senaryosu dâhil); KAO envanteri 79 → 80.",
+      "gate": "node kao3-premium/araclar/kapi-hizli.mjs --kart K3P-22",
+      "evidence": "source+headless"
     },
     {
       "id": "K3P-23",
@@ -448,7 +452,8 @@
     "branch": "kao3-premium",
     "until": "K3P-27",
     "files": [
-      "app/core/quranLearn.js"
+      "app/core/quranLearn.js",
+      "app/kao.css"
     ]
   }
 }

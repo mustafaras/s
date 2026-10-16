@@ -527,3 +527,9 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-pronunciation-fold>summary::after{content:'\203A';flex:none;font-size:1.2em;line-height:1;transition:transform var(--dur-2) ease}
 .kao-pronunciation-fold[open]>summary::after{transform:rotate(90deg)}
 .kao-pronunciation-fold>summary::marker,.kao-pronunciation-fold>summary::-webkit-details-marker{content:''}
+
+/* K3P-20 · dizme çiplerinde sürükle-bırak. Dokunma ve klavye yolu değişmez. */
+.kao-drag{touch-action:none}
+.kao-drag.is-dragging{z-index:3;position:relative;transition:none;box-shadow:0 10px 22px color-mix(in srgb,var(--quran) 26%,transparent)}
+.kao-order-target.kao-drop-ready{outline:2px dashed var(--quran-gold);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.kao-drag.is-dragging{transition:none}}

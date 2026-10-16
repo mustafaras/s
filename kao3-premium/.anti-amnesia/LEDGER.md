@@ -859,3 +859,12 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kapı: `kapi-hizli --kart K3P-20` → **HIZLI KAPI YEŞİL**; tests/kao **78 PASS**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr PASS; `test_kao2_a11y` **14/14 PASS**. Kabul kontrolü kaldırılmadı/gevşetilmedi.
 - Kanıt düzeyi: kaynak/headless ve sentetik veri · görsel QA yok · cihaz yok · yayın yok. **Not:** sürükle-bırak gerçek parmak/dokunmatik cihazda denenmedi; cihaz kabulü K3P-26'da kullanıcıda.
 - Sıradaki: K3P-21
+
+## seq 57 · — · YAYIN HAZIRLIĞI (K3P-20 ara yayın)
+- Tarih: 2026-10-16
+- Commit: (bu commit)
+- Yetki: kullanıcı 2026-10-16'da "canlıya al sıradaki adıma gec tam ve kusursuz bi şekilde uygula" dedi. Plan yayını K3P-27'ye koyduğu ve pinsiz yayının önbellekte eski kod bırakacağı önceki turda açıkça bildirildi; kullanıcı ara yayın akışını sürdürüyor. Yalnız bu ara yayın; final `releaseApproval` değişmedi, tag yok.
+- Kaynak: K3P-20 uygulama commit'i `8a0642cb`. Üretim JS/CSS/içerik **baytları bu yayın hazırlığında değişmez**.
+- Pin: `index.html`, `sw.js`, `panel-v2.html` **20261016a → 20261016b**; pini sabitleyen 12 test dosyası aynı değerle güncellendi (kontrol gevşetilmedi). `pinDeferral.files` **boşaltıldı**.
+- Doğrulama: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO 78, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast, çift şık, okunuş, plan ve **pin senkronu** PASS. Perf: runtime **129,776 KiB** · css 15,595 · content 184,591 · p95 6,450 ms / steady 4,020 ms (yalnız göreli bant atlandı). `test_asset_pin_freshness` **61/61 taze** PASS. Tarihsel tekrar-üret özeti 9/10.
+- Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. 30/37, sıradaki K3P-21. Kişisel veri/`mustafaras/seyma-data` kapsam dışı.

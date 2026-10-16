@@ -838,3 +838,12 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Pin: `index.html`, `sw.js`, `panel-v2.html` için **20261015b → 20261016a** (24+25+4 bağlantı). Pini sabitleyen **12 test dosyası** aynı pinle güncellendi (kontroller gevşetilmedi, yalnız sabit değer yükseltildi): panel-v2 hit_areas/performance, app iip_09, iip_22, v3_welcome, header_celestial_timeline, header_night_contrast, app_surface lifecycle/overlay/domain/boot boundary, kao curriculum. `pinDeferral.files` **boşaltıldı** (K-P: pin borcu kapandı).
 - Doğrulama: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO 77, app 78, panel 23, panel-v2 27, quran 9, reminders smoke, driver, zikr, kontrast, çift şık, okunuş, kao-plan-check ve **pin senkronu** PASS. Perf: content 184,591 · runtime **128,515 KiB** · css 15,469 KiB · p95 5,886 ms / steady 3,684 ms; yalnız göreli bant atlandı (yavaş makine), mutlak tavanlar zorunlu kaldı. `test_asset_pin_freshness` **61/61 taze** PASS. Tarihsel tekrar-üret özeti **9/10** (10/10 iddiası yok).
 - Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. 29/37, sıradaki K3P-20. Kişisel veri/`mustafaras/seyma-data` ve gerçek hesap tarayıcısı kapsam dışı.
+
+## seq 55 · — · YAYIN MAKBUZU (K3P-19 ara yayın)
+- Tarih: 2026-10-16
+- Commit: (bu commit)
+- Kaynak: uygulama `ae9a7481`, yayın hazırlığı `b5336ae8`; `git push origin b5336ae8:main` ile **fast-forward** (`2077c3ae..b5336ae8`), PR kullanılmadı (lineer geçmiş).
+- Pages: run **38897697150**, head `b5336ae895373404a7fc06ced74893969dfa5ea2`, **validate SUCCESS · deploy SUCCESS**. Statik site https://mustafaras.github.io/s/.
+- **Canlı kanıt (yayın sonrası, salt-okur GET):** `Cache-Control: no-cache` + `Pragma: no-cache` ile index.html, sw.js, panel-v2.html ve 61 benzersiz sürümlü varlık = **64/64 hedef HTTP 200 ve yerel/canlı SHA-256 eşliği 64/64 PASS**. Canlı `index.html` pini **20261016a**; eski pin `20261015b` canlıda **yok**. `test_asset_pin_freshness` 61/61 taze; pin tazeliği ve pin senkronu PASS.
+- Bu makbuz yalnız kayıt dosyalarını değiştirir; **üretim baytlarını değiştirmez**. Makbuz commit'i de `main`e eşitlenir (kayıt dalı ile `main` aynı içerikte kalır).
+- Sınır: final `releaseApproval=NOT_APPROVED`; **tag yok**, K3P-27 onayı ya da kalan kartlar için yetki sayılmaz. 29/37, sıradaki K3P-20. Gerçek hesap tarayıcısı/kişisel veri/`mustafaras/seyma-data` işlemi yapılmadı; cihaz kabulü ve bilimsel öğrenme etkisi iddiası yok.

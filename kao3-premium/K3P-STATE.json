@@ -56,23 +56,15 @@
   ],
   "releaseApproval": "NOT_APPROVED",
   "interimRelease": {
-    "scope": "K3P-16",
-    "approvedAt": "2026-10-15",
-    "approval": "Kullanıcı commit, push, main merge, deploy ve ara yayın pin istisnasını açıkça onayladı; final K3P-27 onayı değildir.",
-    "pin": "20261015b",
-    "status": "deployed_verified",
-    "implementationCommit": "107a243deb8e7ccf90d30fb61982df3d0a395af2",
-    "releaseCommit": "10600071f884ce98069fe742f9c8c28f8673b31c",
-    "mergeCommit": "def4627ec4d75ff2c186226281e76801fed0836d",
-    "pullRequest": 108,
-    "pagesRun": "38740346378",
-    "pagesConclusion": "success",
-    "liveParity": {
-      "checkedAt": "2026-10-15T13:31:33.449Z",
-      "method": "no-cache GET + SHA-256; 61 versioned assets and 3 host files",
-      "passed": 64,
-      "total": 64
-    }
+    "scope": "K3P-23 + K3P-24",
+    "approvedAt": "2026-10-17",
+    "approval": "Kullanıcı 2026-10-17'de \"sıradaki adımı tam ve kusursuz bi şekilde uygula ve tümünü canlıya al\" dedi; ara yayın pin istisnası bu iki kart için açıkça verildi. Final K3P-27 onayı değildir; releaseApproval değişmedi.",
+    "pin": "20261017a",
+    "status": "prepared",
+    "scopeCommits": [
+      "c5e73343",
+      "658370ac"
+    ]
   },
   "evidenceLevel": "source+headless",
   "measureGates": [
@@ -453,10 +445,6 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": [
-      "app/core/quranLearn.js",
-      "app/kao.css",
-      "app/core/quranLearnViews.js"
-    ]
+    "files": []
   }
 }

@@ -945,3 +945,12 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: **PIN BEYANI EKSİK KALDI, KAPI YAKALADI:** `app/core/quranLearnViews.js` (pinned asset) değişti ama `pinDeferral.files`'ta yoktu; `test_asset_pin_freshness` kırmızı oldu ve dosya listeye eklendi (K-P, T-1). `<table>`/`<summary>`/`<details>`/`onclick` sayıları yeni **App.kao\*** eklemeden korundu; "Ayrıntılar" bloğu veri yokken çizilmediği için K2F-32 ölçümü artık **veri verilerek** koşar (test bunu açıkça yazar).
 - Sıradaki: K3P-25
+
+## seq 65 · — · YAYIN HAZIRLIĞI (K3P-23 + K3P-24 ara yayın)
+- Tarih: 2026-10-17
+- Commit: (bu commit)
+- Yetki: kullanıcı 2026-10-17'de "sıradaki adımı tam ve kusursuz bi şekilde uygula ve tümünü canlıya al" dedi. Plan yayını K3P-27'ye koyduğu ve pinsiz yayının önbellekte eski kod bırakacağı daha önce açıkça bildirildi; kullanıcı 2026-10-15 ve 2026-10-16'daki ara yayın akışını da sürdürüyor. **Yalnız bu ara yayın; final `releaseApproval` değişmedi, tag yok.**
+- Kapsam: **iki kart birlikte** yayınlanır — K3P-23 (`c5e73343`, okuyucuda senkron yaldız + "Kartlarıma ekle") ve K3P-24 (`658370ac`, İlerleme: üç ölçü, yaldızlı sûreler, katlanan ayrıntılar). Üretim baytları bu yayın hazırlığında değişmez: yalnız `?v=` pinleri ve kayıt dosyaları.
+- Pin: `index.html`, `sw.js`, `panel-v2.html` **20261016c → 20261017a** (SW_VERSION + SW_OFFLINE_VERSION `iip22-20261017a`); pini sabitleyen 12 test dosyası aynı değerle güncellendi (kontrol gevşetilmedi). `pinDeferral.files` **boşaltıldı**.
+- Doğrulama: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO **81**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast PASS. Perf: runtime **132,059 KiB** · css 15,877 · content 184,591 · p95 13,444 ms / steady 4,246 ms (yalnız göreli bant atlandı). `test_asset_pin_freshness` **61/61 taze** PASS.
+- Durum: doğrulandı, Pages/canlı kanıtı bekleniyor. 34/37, sıradaki K3P-25. Kişisel veri/`mustafaras/seyma-data` kapsam dışı.

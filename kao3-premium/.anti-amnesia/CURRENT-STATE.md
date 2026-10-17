@@ -55,7 +55,17 @@ Sıradaki prompt: K3P-25
   ya da §5 gereği durmalı.
 - **Açık:** görsel QA (`KAO_QA_CHROME`), ekran okuyucu turu, dokunmatik cihaz kabulü ve Tezhip denetimi **K3P-26**'da kullanıcıda.
 
+## Ara yayın (K3P-23 + K3P-24)
+
+- Kullanıcı 2026-10-17'de "sıradaki adımı tam ve kusursuz bi şekilde uygula ve tümünü canlıya al" dedi; bu iki kart için
+  ara yayın pin istisnası açıkça verildi (**final `releaseApproval` değişmedi**, tag yok).
+- Pin **20261016c → 20261017a** (`index.html`, `sw.js`, `panel-v2.html`; `SW_OFFLINE_VERSION` `iip22-20261017a`);
+  pini sabitleyen 12 test dosyası aynı değerle güncellendi. `pinDeferral.files` boşaltıldı.
+- Tam kapı `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → **exit 0, TÜM KAPILAR YEŞİL** (KAO 81, app 78,
+  panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast; p95 13,444 ms / steady 4,246 ms).
+- Ölçüm: runtime **132,059 KiB**, CSS **15,877 KiB** (pay 126 B), içerik 184,591 KiB.
+
 ## Devir notu
 
-K3P-24 uygulandı; çalışma ağacında pin yükseltmesi **yok**, yayın yapılmadı. Sıradaki kart **K3P-25** (Dalga 4 sonu).
+K3P-24 uygulandı ve ara yayın hazırlığı yapıldı. Sıradaki kart **K3P-25** (Dalga 4 sonu).
 Kişisel veri/gerçek hesap tarayıcısı açma; `mustafaras/seyma-data` kapsam dışıdır.

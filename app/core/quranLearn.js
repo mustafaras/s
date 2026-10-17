@@ -3798,11 +3798,22 @@
   function kaoHomeHTML(nowValue){
     if(!quranLearnDeps) return '';
     var d=quranLearnDeps.data(),q=ensureQuranLearn(d),now=nowValue?validDate(nowValue,'now'):new Date(),step=kaoNextStepFor(d,now),hero=kaoHomeHero(d,q,now,step),at=kaoCurrentUnit(q,window.SeymaQuranLearnFlow,{curriculum:window.QuranCurriculumV2}),ref=kaoUnitAnchorRef(at.unit),anchorId=ref?ref.id:null,model=ref?kaoTezhipModel(d,anchorId):null,covered=Object.keys(kaoKnownLemmaSet(d)).length>0,anchorCall=ref?(ref.kind==='surah'?{name:'kaoOpenSurah',args:[Number(ref.id)]}:{name:'kaoSetView',args:['reader']}):null;
-    return kaoViewsApi().todayScreen({notice:quranLearnDeps.ui().kaoWhatsNew===true?KAO_WHATS_NEW:null,tezhip:model?{title:model.title,lines:model.lines,footer:covered?'%'+Math.round(model.coverage.ratio*100)+' anlam · '+model.remaining+' kelime kaldı':model.remaining+' kelime kaldı'}:null,action:anchorCall,goal:kaoGoalSlope(d,q).text,eyebrow:hero.eyebrow,title:hero.title,subtitle:hero.subtitle,foot:hero.foot,secondary:hero.secondary,primary:hero.button,weekly:{done:kaoWeeklyDone(d,now),total:5,coverage:covered?kaoCoverage(d).ratio*100:null},shortcuts:kaoHomeShortcuts()});
+    return kaoViewsApi().todayScreen({notice:noticeModel(q),tezhip:model?{title:model.title,lines:model.lines,footer:covered?'%'+Math.round(model.coverage.ratio*100)+' anlam · '+model.remaining+' kelime kaldı':model.remaining+' kelime kaldı'}:null,action:anchorCall,goal:kaoGoalSlope(d,q).text,eyebrow:hero.eyebrow,title:hero.title,subtitle:hero.subtitle,foot:hero.foot,secondary:hero.secondary,primary:hero.button,weekly:{done:kaoWeeklyDone(d,now),total:5,coverage:covered?kaoCoverage(d).ratio*100:null},shortcuts:kaoHomeShortcuts()});
+  }
+  // K3P-25: evrensel "bir kez" notu — mevcut KAO_WHATS_NEW davranışı KORUNUR (öncelik ondadır),
+  // yeni hızlı geçiş teklifi YALNIZ ayar kapalıyken gösterilir; ayar açıkken teklif hiç çizilmez.
+  function noticeModel(q){
+    var ui=quranLearnDeps.ui();
+    if(ui.kaoWhatsNew===true) return KAO_WHATS_NEW;
+    if(ui.kaoAdvanceOffer===true) return KAO_AUTO_ADVANCE_OFFER;
+    return null;
   }
   // KAO2-11 · S-01 ilk açılış ve mevcut kullanıcı geçişi.
   // Adımlar yalnız ui.kaoOnboard'da yaşar; veri tek kayıtla "Bitir"/"Atla"da yazılır, render yazmaz.
   var KAO_WHATS_NEW={title:'Yeni düzen',items:['Her gün tek adım: Bugün ekranı sıradakini gösterir.','Kelimelerin tematik ünitelere yerleşti; ilerlemen olduğu gibi duruyor.','Tekrar takvimin ve kazandığın taşlar korunuyor.'],close:{label:'Tamam',action:{name:'kaoOnboard',args:['whats-new-close']}}};
+  // K3P-25 · K-C "Varsayılanlar": hızlı geçiş mevcut kullanıcıya BİR KEZ sunulur ve ayar sessizce
+  // değişmez. İki eylem: açık rıza (hızlı geçişi açar) ya da "Böyle kalsın" (hiçbir şeyi değiştirmez).
+  var KAO_AUTO_ADVANCE_OFFER={title:'Doğru cevaplarda hızlı geç',items:['Otomatik geçiş açıkken doğru cevaptan kısa süre sonra kendiliğinden sonraki göreve geçilir.','Kapalıyken her görevden sonra "Devam"a sen basarsın.'],close:{label:'Böyle kalsın',action:{name:'kaoOnboard',args:['auto-advance-offer-close']}},secondary:{label:'Hızlı geçişi aç',action:{name:'kaoToggleAutoAdvance'}}};
   var KAO_ONBOARD_MINUTES=[5,10,15],KAO_ONBOARD_INTENTS=[['fajr','Sabah'],['dhuhr','Öğle'],['asr','İkindi'],['maghrib','Akşam'],['isha','Yatsı'],['custom','Kendim seçerim']];
   // Yerleştirme = kapı görevlerinin eşit aralıklı alt kümesi; okuma ≥7/8 → Seviye 1.
   var KAO_PLACEMENT_READING=[0,2,5,7,10,12,15,17],KAO_PLACEMENT_LISTENING=[0,3,6,9],KAO_PLACEMENT_PASS=7;
@@ -4010,6 +4021,9 @@
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),q=ensureQuranLearn(quranLearnDeps.data()),st=ui.kaoOnboard,changed=false;
     if(action==='whats-new-close'){ if(ui.kaoWhatsNew!==true) return false; ui.kaoWhatsNew=false; quranLearnDeps.render(); return true; }
+    // K3P-25 · K-C: teklif yalnız kapanır ya da açık rızayla uygulanır. "Böyle kalsın" AYARA DOKUNMAZ;
+    // "Hızlı geçişi aç" mevcut App.kaoToggleAutoAdvance'ı çağırır (ikinci handler yok).
+    if(action==='auto-advance-offer-close'){ if(ui.kaoAdvanceOffer!==true) return false; ui.kaoAdvanceOffer=false; quranLearnDeps.render(); return true; }
     if(!q) return false;
     if(action==='change-start') return kaoOnboardChangeStart(ui,q);
     if(kaoOnboardActive(ui)&&st.change===true){ changed=kaoOnboardChangeStep(ui,q,st,action,value); if(changed) quranLearnDeps.render(); return changed; }
@@ -4283,10 +4297,13 @@
     var ui=quranLearnDeps.ui();
     ui.kaoReturnFocusId=quranLearnSurfaceDeps.activeElementId()||'';
     var target=typeof view==='string'&&KAO_VIEW_TITLES[view]?view:'home',q=ensureQuranLearn(quranLearnDeps.data());
-    ui.kaoWhatsNew=false; ui.kaoOnboard=null;
+    ui.kaoWhatsNew=false; ui.kaoOnboard=null; ui.kaoAdvanceOffer=false;
     // 05 §3/§9: ilk açılış yalnız kartsız+doneAt boş kullanıcıda ana ekranı ezer; legacy nota bir kez.
     if(target==='home'&&q&&!q.onboarding.doneAt) ui.kaoOnboard=kaoOnboardState();
     else if(target==='home'&&q&&q.onboarding.doneAt==='legacy'&&!q.onboarding.whatsNewAt){ q.onboarding.whatsNewAt=new Date().toISOString(); ui.kaoWhatsNew=true; kaoSave(); }
+    // K3P-25 · K-C: mevcut kullanıcıya hızlı geçiş seçimi BİR KEZ. Ayar kapalıysa ve teklif daha önce
+    // gösterilmediyse damga yazılır ve teklif açılır. Gösterim damgası yazılırken ayara DOKUNULMAZ.
+    else if(target==='home'&&q&&q.onboarding.doneAt&&q.settings.autoAdvance!==true&&!q.onboarding.k3pNoticeAt){ q.onboarding.k3pNoticeAt=new Date().toISOString(); ui.kaoAdvanceOffer=true; kaoSave(); }
     kaoApplyView(ui,target,kaoRouteParam(ui,target,null),'open');
     ui.kaoOpen=true;
     quranLearnSurfaceDeps.lockBody(); quranLearnDeps.render(); quranLearnSurfaceDeps.focusDialog('sey-ov-card');
@@ -4296,7 +4313,7 @@
     if(!quranLearnDeps||!quranLearnSurfaceDeps) return false;
     var body=function(){
       var ui=quranLearnDeps.ui(),returnId=ui.kaoReturnFocusId||'';
-      kaoShadowCleanup(); quranLearnSurfaceDeps.unlockBody(); ui.kaoOpen=false; ui.kaoStack=[]; ui.kaoView='home'; ui.kaoReturnFocusId=''; ui.kaoWhatsNew=false; ui.kaoOnboard=null;
+      kaoShadowCleanup(); quranLearnSurfaceDeps.unlockBody(); ui.kaoOpen=false; ui.kaoStack=[]; ui.kaoView='home'; ui.kaoReturnFocusId=''; ui.kaoWhatsNew=false; ui.kaoOnboard=null; ui.kaoAdvanceOffer=false;
       quranLearnDeps.render(); if(returnId) quranLearnSurfaceDeps.restoreFocus(returnId);
       kaoReleaseToasts(true);
     };
@@ -4440,6 +4457,8 @@
     o.minutes=[5,10,15].indexOf(o.minutes)>=0?o.minutes:5;
     o.intent=['fajr','dhuhr','asr','maghrib','isha','custom'].indexOf(o.intent)>=0?o.intent:null;
     o.whatsNewAt=isoOrNull(o.whatsNewAt);
+    // K3P-25 · K-C: hızlı geçiş teklifinin bir kez gösterildiği damga. Geriye uyumlu: alan yoksa null.
+    o.k3pNoticeAt=isoOrNull(o.k3pNoticeAt);
     if(o.placement!==undefined) o.placement=normalizePlacement(o.placement);
     q.onboarding=o;
   }

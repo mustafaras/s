@@ -1,74 +1,63 @@
 # K3P · CURRENT-STATE
 
-Sıradaki prompt: K3P-25
+Sıradaki prompt: K3P-26
 
 ## Son durum
 
 - **Tarih:** 2026-10-17.
-- **Son tamamlanan:** **K3P-24 — İlerleme ekranı: üç sade ölçü + yaldızlı sûreler + katlanan ayrıntılar.** 34/37 kart bitti.
-- **Yetki:** kullanıcı K3P-24'ü "tam ve kusursuz" uygulamamı istedi. Yalnız yerel commit; yayın ayrı kayıtla ve açık onayla yürür.
+- **Son tamamlanan:** **K3P-25 — Mevcut kullanıcıya hızlı geçiş seçimi (K-C "Varsayılanlar"; Dalga 4 sonu).** 35/37 kart bitti.
+- **Yetki:** kullanıcı K3P-25'i "tam ve kusursuz" uygulamamı istedi; kartın zorunlu **karar noktasında** kullanıcı
+  **(a) yolunu** seçti (yeni `onboarding.k3pNoticeAt` alanı) ve CSS payı yetmezse **eski/öksüz kuralı silip pay açma** yetkisi verdi.
 - **Kanıt:** kaynak/headless ve sentetik veri. Tarayıcı, gerçek hesap, kişisel veri deposu, görsel QA veya cihaz kabulü yok.
 
-## K3P-24 ne yaptı
+## K3P-25 ne yaptı
 
-- **Üç sade ölçü (K-H, TASARIM §3.5 · ANALIZ E-5):** ekranın tepesinde tek liste (`kao-stats-metrics`) —
-  1. **Kur'an kapsamı %** (`%N` + "N / 524 lemma"),
-  2. **Yaldızlı sûreler ×/20** — bir sûre **BÜTÜN lemmaları biliniyorsa** yaldızlı sayılır (yarısı değil; `kaoGildedSurahCount`),
-  3. **Bu hafta gün/5** (`kaoWeeklyDone`; haftalık şeritle aynı kaynak).
-  Eski "Tanıdık kelime" cümlesi ve kapsam eğrisi anlatısı ölçüye dönüştü; eğri listesi ve "sıradaki hedef" ipucu korundu.
-- **Tezhip küçük resimleri:** 20 kısa sûre, **K3P-11 bileşeninin küçük boyu** olarak çizilir (`tezhipPage({compact:true})`).
-  Sayfa hafif kalsın diye her küçük resim sûrenin yalnız **İLK âyetini** ve en çok **8 kelimesini** gösterir (kırpılır);
-  süs SVG'si işaretlemede kalır (öksüz seçici yok) ama koda taşınan `.kao-tezhip.is-compact .kao-tezhip-orn` ile gizlenir.
-  Bütün kelimeleri bilinen sûre `is-gilded` ile işaretlenir.
-- **Ayrıntılar katlanır:** kalibrasyon **tablosu** + algı özeti + gece karşılaştırması + aktarım satırı tek
-  `<details>Ayrıntılar</summary>` altına indi. **Veri yokken bölüm HİÇ çizilmez** (tablo da yok). Doğruluk satırları
-  (Son 2/6 hafta) katlanmadan görünür kalır — bir ölçü gibi okunur. İç içe `<details>` yok.
-- **Ceza dili yok:** ekranda seri/kayıp/baştan dili hiç yok; hem metin taraması hem boş+dolu render testle sabitlendi.
-- **Motor:** `kaoProgressModel`'e **saf türetim** eklendi — `gilded` (`{count,total}`), `thumbs` (sûrebaşı ilk âyet),
-  `weekly` (`kaoWeeklyDone`). Yan etki yok, `data` şeması ve `migrate()` değişmedi (I1–I6); **yeni `App.kao*` YOK (45 sabit)**;
-  yeni etkileşim eklenmedi, `onclick=` sayısı değişmedi.
-- **CSS payı kural SİLEREK açıldı** (bütçe kuralı §2): öksüz `.kao-coverage` (3 seçici + dar ekran girdisi),
-  kullanılmayan `.kao-progress-count` (2 kural), ölü `.kao-today h2`. Yeni bölüm/h3 grupları **mevcut seçici listelerine**
-  eklendi; kalan yeni kurallar yalnız `kao-metric*`, `kao-tezhip-grid`, `kao-thumb*`, `is-compact`.
-- **Test:** `test_kao2_progress` **20 → 21 kontrol** (üç ölçü; yaldızlı sayaç yalnız tam kapsamda; boş veride tablo ve
-  Ayrıntılar yok; veri varken tek katlanan blok; 20 küçük resim; ceza dili taraması). Envanter **81 sabit** (yeni dosya yok).
+- **Karar noktası (kart zorunlu kıldı):** kullanıcıya iki yol sunuldu; **(a) seçildi** — teklifin bir kez gösterildiği
+  `onboarding.k3pNoticeAt` alanı geriye uyumlu biçimde eklendi. (Kod incelendiğinde `whatsNewAt`'in zaten bir "bir kez" damgası
+  olduğu görüldü; kullanıcı yine de kartın yazdığı (a) yolunu tercih etti.)
+- **Teklif bir kez:** eski (legacy) kullanıcıda, `doneAt` dolu + `autoAdvance !== true` + damga yoksa Bugün ekranında
+  `KAO_AUTO_ADVANCE_OFFER` gösterilir ve damga yazılır. İkinci açılışta bir daha **gösterilmez**.
+- **Ayar sessizce değişmez (K-C/özerklik):** teklifin **gösterimi** de, **"Böyle kalsın"** da `autoAdvance`'a **dokunmaz**.
+  Ayar yalnız **açık rızayla** değişir.
+- **Açık rıza mevcut handler'la:** "Hızlı geçişi aç" düğmesi **doğrudan** `App.kaoToggleAutoAdvance` çağırır
+  (`actionCall` args'sız eylemi zaten destekliyor) → **yeni `App.kao*` YOK (45 sabit)**. Kapatma eylemi
+  `App.kaoOnboard('auto-advance-offer-close')` mevcut çoğaltıcıya eklenen yeni eylemdir.
+- **Mevcut davranış korundu:** `KAO_WHATS_NEW` notu ve `whatsNewAt` yolu **aynen** duruyor; hızlı geçiş teklifi yalnız
+  ayar kapalıyken ve not çakışmadığında çizilir (`noticeModel` öncelik sırası). Ayar açıkken teklif **hiç çizilmez** ve
+  damga **yazılmaz**.
+- **Bileşen:** `notice(options)` artık isteğe bağlı **ikinci eylem** destekliyor (`options.secondary`), mevcut
+  `.kao-notice-close` sınıfı kullanılır → **yeni CSS kuralı eklenmedi** (`app/kao.css` hiç değişmedi).
+- **Şema:** `normalizeOnboarding` içinde tek satır: `o.k3pNoticeAt=isoOrNull(o.k3pNoticeAt)` (yoksa `null`, bozuksa `null`,
+  geçerliyse korunur, idempotent). `data` şeması ve `migrate()` değişmedi (I1–I6).
+- **Test:** yeni `test_k3p_25` (**8 kontrol**); `test_kao2_migration` **14 → 15 kontrol** (K3P-25 eki: alan yokken `null`,
+  normalize idempotent, bozuk tip `null`). Envanter **81 → 82**.
+- **FROZEN ŞEMA fixture'ı buldu (gerçek kırmızı):** `tests/kao/test_kao_migration.js` normalize edilmiş `onboarding`'in
+  **tam** alan kümesini sabitliyordu; yeni alan eklendiğinde iki yerde `k3pNoticeAt: null` beklenmesi gerekti (kapı yakaladı,
+  fixture güncellendi — geriye uyumluluk burada kanıtlanıyor).
 
 ## Ölçü panosu
 
 | Ölçü | Şimdi | Tavan/hedef |
 | --- | --- | --- |
-| Runtime gzip L9 (bağlayıcı) | **132,059 KiB** | 136 KiB; kalan ~3,9 KB |
-| **CSS gzip L9** | **15,877 KiB** | 16 KiB; kalan **126 B** — **kritik** |
+| Runtime gzip L9 (bağlayıcı) | **132,867 KiB** | 136 KiB; kalan ~3,1 KB |
+| **CSS gzip L9** | **15,877 KiB** (değişmedi) | 16 KiB; kalan **126 B** — **kritik** |
 | İçerik | 184,591 KiB | 256 KiB |
 | App.kao* | 45 | 45 |
-| Kontrast çifti | 756/756 PASS | 0 hata |
-| KAO fixture envanteri | 81 | 81 PASS |
+| KAO fixture envanteri | 82 | 82 PASS |
 
 ## Kapılar ve açık sınırlar
 
-- `kapi-hizli --kart K3P-24` → **yeşil** (kapanış raporunda ölçüldü). `test_kao2_reader` + `test_kao2_migration` PASS;
-  `kao-verify-contrast` **756/756**.
-- Ölçüm: CSS **15,877 KiB** (bütçe 16 KiB, pay **126 B**), runtime **132,059 KiB** (tavan 136).
-- `tests/app/test_asset_pin_freshness.js`: `app/core/quranLearn.js`, `app/core/quranLearnViews.js` ve `app/kao.css`
-  `pinDeferral.files`'ta → **ERTELENDİ** diyerek PASS (K-P). `app/core/quranLearnViews.js` bu kartta `pinDeferral.files`'a **eklendi** (K-P, T-1): dosya pinned bir asset'tir ve `?v=` yalnız K3P-27'de yükselir; kapı bunu eksik yakaladı, beyan edildi.
-- **CSS bütçesi kritik:** kalan pay ~126 B. Yeni bir kart CSS kuralı ekleyecekse önce ya aynı işi gören eski kuralı silmeli
-  ya da §5 gereği durmalı.
+- `test_k3p_25`, `test_kao2_migration`, `test_kao2_onboarding`, `test_kao2_inventory`, `test_kao2_reader`,
+  `test_kao2_progress`, `test_kao2_design_contract` → **PASS**. Perf bütçesi **PASS** (css 15,877 · runtime 132,867).
+- **CSS bütçesi kritik:** kalan pay 126 B. Bu kart CSS'e **hiç dokunmadı**; sonraki CSS kartı §5 gereği ya eşdeğer eski
+  kuralı silmeli ya da durup tavan kararını sormalıdır.
+- `pinDeferral.files` = `app/core/quranLearn.js`, `app/core/quranLearnViews.js` (K-P). Ara yayın pinini **31511716**
+  koymuştu; bu kart iki varlığı değiştirdiği için tazelik kapısı bunları **beyan gerektirdi** (kapı buldu, beyan edildi).
 - **Açık:** görsel QA (`KAO_QA_CHROME`), ekran okuyucu turu, dokunmatik cihaz kabulü ve Tezhip denetimi **K3P-26**'da kullanıcıda.
-
-## Ara yayın (K3P-23 + K3P-24)
-
-- Kullanıcı 2026-10-17'de "sıradaki adımı tam ve kusursuz bi şekilde uygula ve tümünü canlıya al" dedi; bu iki kart için
-  ara yayın pin istisnası açıkça verildi (**final `releaseApproval` değişmedi**, tag yok).
-- Pin **20261016c → 20261017a** (`index.html`, `sw.js`, `panel-v2.html`; `SW_OFFLINE_VERSION` `iip22-20261017a`);
-  pini sabitleyen 12 test dosyası aynı değerle güncellendi. `pinDeferral.files` boşaltıldı.
-- Tam kapı `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → **exit 0, TÜM KAPILAR YEŞİL** (KAO 81, app 78,
-  panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast; p95 13,444 ms / steady 4,246 ms).
-- Ölçüm: runtime **132,059 KiB**, CSS **15,877 KiB** (pay 126 B), içerik 184,591 KiB.
-- **Yayınlandı ve doğrulandı:** Pages run **39039103025** (validate+deploy SUCCESS), makbuz `31511716`,
-  fast-forward `1e1d9146..31511716`. Canlı pin **20261017a**; canlı eşlik **63/63 PASS** (no-cache GET + SHA-256);
-  canlı özellik kontrolü **24/24 PASS**. Eski `20261016c` canlıda yok.
+- **Açık sınır (kartla ilgisiz):** `tekrar-uret.cjs` özeti **9/10**; düşen **R-08** tarihsel araç modelidir (eski
+  `apply.words/sentences`), güncel denetim R-08 ve âyet fixture'ı PASS. Kapı bu yüzden yeşil kaldı.
 
 ## Devir notu
 
-K3P-24 uygulandı ve ara yayın hazırlığı yapıldı. Sıradaki kart **K3P-25** (Dalga 4 sonu).
+K3P-25 uygulandı; Dalga 4 kapandı. Sıradaki kart **K3P-26**. Push/merge/tag/deploy yok; yalnız K3P-27'de açık onayla.
 Kişisel veri/gerçek hesap tarayıcısı açma; `mustafaras/seyma-data` kapsam dışıdır.

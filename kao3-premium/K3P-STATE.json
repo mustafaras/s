@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "in-progress",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-25",
+  "nextPrompt": "K3P-26",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -438,7 +438,9 @@
     {
       "id": "K3P-25",
       "wave": 4,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-17",
+      "result": "Mevcut kullanıcıya hızlı geçiş seçimi (K-C \"Varsayılanlar\"): teklif yalnız BİR KEZ gösterilir (onboarding.k3pNoticeAt damgası, geriye uyumlu: yoksa null); gösterim ve \"Böyle kalsın\" AYARA DOKUNMAZ; \"Hızlı geçişi aç\" MEVCUT App.kaoToggleAutoAdvance'ı çağırır (yeni handler YOK, 45); ayar açıkken teklif çizilmez ve damga yazılmaz. Yeni test test_k3p_25 (8 kontrol); test_kao2_migration 14→15 (K3P-25 eki). Envanter 82. CSS payı değişmedi (kural eklenmedi): css 15,877 KiB."
     },
     {
       "id": "K3P-26",
@@ -456,6 +458,9 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearn.js",
+      "app/core/quranLearnViews.js"
+    ]
   }
 }

@@ -161,6 +161,27 @@ check('boş durumda onboarding.doneAt null; karlı kullanıcıda legacy kalır',
   assert.equal(rich.quranLearn.onboarding.doneAt, 'legacy', 'zenginde legacy');
 });
 
+// ---- K3P-25 · hızlı geçiş teklifi damgası geriye uyumlu ----------------------
+check('K3P-25 · onboarding.k3pNoticeAt alan yokken null; geçerliyse korunur; normalize idempotent', () => {
+  const empty = {};
+  api.ensureQuranLearn(empty);
+  assert.equal(empty.quranLearn.onboarding.k3pNoticeAt, null, 'alan yokken null (eski kayıt bozulmaz)');
+  for (const name of ['partial', 'rich', 'malformed']) {
+    const input = STATES[name]();
+    api.ensureQuranLearn(input);
+    assert.equal(input.quranLearn.onboarding.k3pNoticeAt, null, `${name}: damga yokken null`);
+  }
+  const input = { quranLearn: { cards: {}, onboarding: { doneAt: 'legacy', k3pNoticeAt: '2026-10-17T10:00:00.000Z' } } };
+  api.ensureQuranLearn(input);
+  assert.equal(input.quranLearn.onboarding.k3pNoticeAt, '2026-10-17T10:00:00.000Z', 'geçerli damga korunur');
+  const snap = JSON.stringify(input.quranLearn.onboarding);
+  api.ensureQuranLearn(input);
+  assert.equal(JSON.stringify(input.quranLearn.onboarding), snap, 'normalize İDEMPOTENT: ikinci geçiş değiştirmez');
+  const broken = { quranLearn: { cards: {}, onboarding: { doneAt: 'legacy', k3pNoticeAt: 7 } } };
+  api.ensureQuranLearn(broken);
+  assert.equal(broken.quranLearn.onboarding.k3pNoticeAt, null, 'bozuk tip null olur');
+});
+
 check('yol/ünite ilerlemesi path kayıtlarından türetilir; kartı olan lemmalar tanışıldı', () => {
   const input = STATES.rich();
   api.ensureQuranLearn(input);

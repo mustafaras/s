@@ -403,7 +403,10 @@
     options=options&&typeof options==='object'?options:{};
     var items=(Array.isArray(options.items)?options.items:[]).map(function(item){ return '<li class="kao-notice-item">'+escapeText(item)+'</li>'; }).join('');
     var close=options.close&&typeof options.close==='object'?linkButton(options.close.label,options.close.action,'kao-notice-close'):'';
-    return '<section class="kao-notice" aria-labelledby="kao-notice-title"><h3 class="kao-notice-title" id="kao-notice-title">'+escapeText(options.title)+'</h3><ul class="kao-notice-list">'+items+'</ul>'+close+'</section>';
+    // K3P-25: ikinci, isteğe bağlı eylem (ör. "Hızlı geçişi aç"). Yeni sınıf yok; mevcut
+    // .kao-notice-close kuralı kullanılır, ikisi tek satırda kendi metnine göre hizalanır.
+    var secondary=options.secondary&&typeof options.secondary==='object'?linkButton(options.secondary.label,options.secondary.action,'kao-notice-close'):'';
+    return '<section class="kao-notice" aria-labelledby="kao-notice-title"><h3 class="kao-notice-title" id="kao-notice-title">'+escapeText(options.title)+'</h3><ul class="kao-notice-list">'+items+'</ul>'+close+secondary+'</section>';
   }
   function onboardPoints(items){
     return '<ul class="kao-onboard-points">'+(Array.isArray(items)?items:[]).map(function(item){

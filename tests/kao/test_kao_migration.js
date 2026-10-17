@@ -40,7 +40,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(fresh)), {
   ayahs: { understood: [] },
   readability: { lineHeight: 'normal', wordSpacing: 'normal', coloredHarakat: true, fadeHarakat: false },
   summary: null,
-  onboarding: { doneAt: null, start: null, minutes: 5, intent: null, whatsNewAt: null },
+  onboarding: { doneAt: null, start: null, minutes: 5, intent: null, whatsNewAt: null, k3pNoticeAt: null },
   path: { lessons: {}, units: {} }
 });
 
@@ -102,7 +102,7 @@ assert.equal(migrated.onboarding.doneAt, 'legacy');
 assert.deepEqual(JSON.parse(JSON.stringify(migrated.path)), { lessons: {}, units: {} });
 const brokenFlow = { quranLearn: { onboarding: 'x', path: [1, 2], cards: {} } };
 const bf = api.ensureQuranLearn(brokenFlow);
-assert.deepEqual(JSON.parse(JSON.stringify(bf.onboarding)), { doneAt: null, start: null, minutes: 5, intent: null, whatsNewAt: null });
+assert.deepEqual(JSON.parse(JSON.stringify(bf.onboarding)), { doneAt: null, start: null, minutes: 5, intent: null, whatsNewAt: null, k3pNoticeAt: null });
 assert.deepEqual(JSON.parse(JSON.stringify(bf.path)), { lessons: {}, units: {} });
 const keepFlow = { quranLearn: {
   onboarding: { doneAt: '2026-10-01T18:04:11.000Z', start: 'placement', minutes: 15, intent: 'isha', whatsNewAt: 'bad-date', extra: 1 },

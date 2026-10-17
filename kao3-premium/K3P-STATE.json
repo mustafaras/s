@@ -60,11 +60,20 @@
     "approvedAt": "2026-10-17",
     "approval": "Kullanıcı 2026-10-17'de \"sıradaki adımı tam ve kusursuz bi şekilde uygula ve tümünü canlıya al\" dedi; ara yayın pin istisnası bu iki kart için açıkça verildi. Final K3P-27 onayı değildir; releaseApproval değişmedi.",
     "pin": "20261017a",
-    "status": "prepared",
+    "status": "deployed_verified",
     "scopeCommits": [
       "c5e73343",
       "658370ac"
-    ]
+    ],
+    "releaseCommit": "31511716",
+    "pagesRun": "39039103025",
+    "pagesConclusion": "success",
+    "liveParity": {
+      "checkedAt": "2026-10-17T14:10:00.000Z",
+      "method": "no-cache GET + SHA-256; 60 versioned assets and 3 host files",
+      "passed": 63,
+      "total": 63
+    }
   },
   "evidenceLevel": "source+headless",
   "measureGates": [

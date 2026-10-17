@@ -64,6 +64,9 @@ Sıradaki prompt: K3P-25
 - Tam kapı `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → **exit 0, TÜM KAPILAR YEŞİL** (KAO 81, app 78,
   panel 23, panel-v2 27, quran 9, reminders, driver, zikr, kontrast; p95 13,444 ms / steady 4,246 ms).
 - Ölçüm: runtime **132,059 KiB**, CSS **15,877 KiB** (pay 126 B), içerik 184,591 KiB.
+- **Yayınlandı ve doğrulandı:** Pages run **39039103025** (validate+deploy SUCCESS), makbuz `31511716`,
+  fast-forward `1e1d9146..31511716`. Canlı pin **20261017a**; canlı eşlik **63/63 PASS** (no-cache GET + SHA-256);
+  canlı özellik kontrolü **24/24 PASS**. Eski `20261016c` canlıda yok.
 
 ## Devir notu
 

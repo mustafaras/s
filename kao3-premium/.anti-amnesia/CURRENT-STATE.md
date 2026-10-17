@@ -1,42 +1,41 @@
 # K3P · CURRENT-STATE
 
-Sıradaki prompt: K3P-23
+Sıradaki prompt: K3P-24
 
 ## Son durum
 
-- **Tarih:** 2026-10-16.
-- **Son tamamlanan:** **K3P-22 — Âyet merdiveni (K-E).** 32/37 kart bitti.
-- **Yetki:** kullanıcı K3P-22'yi "tam ve kusursuz" uygulamamı istedi. Yalnız yerel commit; yayın ayrı kayıtla ve açık onayla yürür.
+- **Tarih:** 2026-10-17.
+- **Son tamamlanan:** **K3P-23 — Okuyucu senkron yaldız + "Kartlarıma ekle".** 33/37 kart bitti.
+- **Yetki:** kullanıcı K3P-23'ü "tam ve kusursuz" uygulamamı istedi. Yalnız yerel commit; yayın ayrı kayıtla ve açık onayla yürür.
 - **Kanıt:** kaynak/headless ve sentetik veri. Tarayıcı, gerçek hesap, kişisel veri deposu, görsel QA veya cihaz kabulü yok.
 
-## K3P-22 ne yaptı
+## K3P-23 ne yaptı
 
-- **Boş durum kaldırıldı:** "Henüz hazır âyet yok" metni ve `kao-ayah-empty` işaretlemesi artık hiçbir yerde geçmez (CSS'i de silindi — öksüz seçici bırakılmadı).
-- **Merdiven:** %95 eşiğine ulaşmayan kullanıcıya — en yakın âyet **Tezhip** olarak (kelime kelime, bilinen/henüz-bilinmiyor işaretli), **"En yakın âyet: %N tanıdık · M kelime kaldı"** cümlesi ve **eksik lemmaların her biri** için mevcut `App.kaoNav('word', id)` bağlantısı.
-- **Eşik 0.95 DEĞİŞMEDİ** (K-E: düşürmek ödülü sahteleştirir). Eşiğe ulaşan kullanıcı tam âyet ekranını görür; test bunu kilitler.
-- Yeni `App.kao*` handler **yok** (45 sabit): birincil eylem mevcut `kaoStart`, kelime bağlantısı mevcut `kaoNav`.
-- Yeni test `test_k3p_22` (6 kontrol; kartın **20-kelime** kabul senaryosu dâhil). KAO envanteri **79 → 80**.
-- **Bulunan ve düzeltilen gerçek hatalar:** `tezhipPage`'in `lines`'i sayfa dizisi beklediği (Tezhip boş çiziliyordu) · `tezhipCard`'ın kendi etiketsiz birincil düğmesi (a11y + "primary per view" ihlali) · `.kao-ayah-ladder-line strong` **2,09:1** kontrast (açık temada okunmuyor → `--quran-mid`) · öksüz `kao-ayah-empty` CSS'i.
+- **Senkron yaldız (yalnız CSS):** çalan kelime (`aria-current="true"`) artık altın halkayla (`outline:2px solid var(--quran-gold)`, `outline-offset:2px`) gösterilir. Eski düz zemin vurgusu (`--kao-tint 16%`) kaldırıldı. **Hareket azaltmada** halka (renk) kalır, `animation:kao-reader-gild` kapanır (M7 uyumu; reduce tarayıcısı yeni seçiciyi kapsar).
+- **"Kartlarıma ekle":** anlam balonunda düğme; `App.kaoReader('add', index)` **mevcut** çoğaltıcıya eklenen yeni bir eylem (yeni `App.kao*` handler YOK, 45 sabit). Kart **ders tanıtımıyla AYNI şemayla** yazılır — tek kurucu `kaoNewWordCard` (`state:'new'` + `introducedAt`, `reps:0`); yeni alan uydurulmadı. **İdempotent**; lemma zaten kartlarındaysa düğme **"Kartlarında var"** olur ve **devre dışıdır**; **doğrulanmamış lemma** (`lemma.verified !== true`) eklenemez.
+- **Devralınan çelişki çözüldü (bilinçli karar):** `kaoRevealWord` (okurken anlam aç) bilinmeyen kelimeye **`readerUnknown:true`** işaretli bir kuyruk kartı yazıyordu; bu işaret yarının tekrarına alır ama kartı **gerçek/kalıcı** saydırmaz (`isSettled` dışı). "Kartlarıma ekle" bundan **AYRI** bir eylemdir. Ayrım tek yordamla yapıldı: **`kaoWordCardGenuine(card)`** = `readerUnknown!==true && (reps>0 || introducedAt)`. Okuma işareti artık ders/ekleme kartını **EZMEZ**; bilinçli ekleme readerUnknown taşıyan işareti ders şemasına çevirir. Mevcut `readerUnknown` davranışı (kapsam, yarının kuyruğu, `test_kao2_reader`/`test_kao2_migration` yeşil) korundu.
+- Yeni test **`test_k3p_23`** (12 kontrol: yaldız CSS + kontrast ölçümü + reduce + ekle düğmesi + şema + idempotentlik + "var" devre dışı + doğrulanmamış reddi + okuma/ekleme ayrımı + 45 yüzey). KAO envanteri **80 → 81**.
+- **Paylaşılan fixture düzeltmesi (kapsam içi beyan):** yok — mevcut fixture'lar değişmedi.
 
 ## Ölçü panosu
 
 | Ölçü | Şimdi | Tavan/hedef |
 | --- | --- | --- |
-| Runtime gzip L6 (bağlayıcı) | 130,728 KiB | 136 KiB; kalan ~5,3 KB |
-| **CSS gzip L9** | **15,772 KiB** | 16 KiB; **kalan yalnız 233 B — dikkat** |
+| Runtime gzip L6 (bağlayıcı) | **131,138 KiB** | 136 KiB; kalan ~4,9 KB |
+| **CSS gzip L9** | **15,847 KiB** | 16 KiB; kalan ~157 B — **kritik** |
 | İçerik | 184,591 KiB | 256 KiB |
 | App.kao* | 45 | 45 |
 | Kontrast çifti | 756/756 PASS | 0 hata |
-| KAO fixture envanteri | **80** | 80 PASS |
+| KAO fixture envanteri | **81** | 81 PASS |
 
 ## Kapılar ve açık sınırlar
 
-- `kapi-hizli --kart K3P-22` → **HIZLI KAPI YEŞİL**. tests/kao **80 PASS**, app 78, panel 23, panel-v2 27, quran 9, reminders, driver, zikr PASS; `kao-verify-contrast` **756/756**.
-- Paylaşılan fixture düzeltmesi (kapsam içi beyan): `test_kao_queue` eski boş-durum metnini sabitliyordu → merdiven beklentisine çevrildi + olumsuz iddia eklendi.
+- `kapi-hizli --kart K3P-23` → **yeşil** (kapanış raporunda ölçüldü). tests/kao **81 PASS** (yeni `test_k3p_23`), `test_kao2_reader` + `test_kao2_migration` PASS; `kao-verify-contrast` **756/756**.
+- Ölçüm: CSS **15,847 KiB** (bütçe 16 KiB, pay ~157 B), runtime **131,138 KiB** (tavan 136).
 - `tests/app/test_asset_pin_freshness.js`: `app/core/quranLearn.js` ve `app/kao.css` `pinDeferral.files`'ta → **ERTELENDİ** diyerek PASS (K-P).
-- **CSS bütçesi kritik:** yeni bir kart CSS kuralı ekleyecekse önce ya aynı işi gören eski kuralı silmeli ya da §5 gereği durmalı. Kalan pay **233 B**.
+- **CSS bütçesi kritik:** kalan pay ~157 B. Yeni bir kart CSS kuralı ekleyecekse önce ya aynı işi gören eski kuralı silmeli ya da §5 gereği durmalı.
 - **Açık:** görsel QA (`KAO_QA_CHROME`), ekran okuyucu turu, dokunmatik cihaz kabulü ve Tezhip denetimi **K3P-26**'da kullanıcıda.
 
 ## Devir notu
 
-K3P-22 uygulandı; çalışma ağacında pin yükseltmesi **yok**, yayın yapılmadı. Sıradaki kart **K3P-23**. Kişisel veri/gerçek hesap tarayıcısı açma; `mustafaras/seyma-data` kapsam dışıdır.
+K3P-23 uygulandı; çalışma ağacında pin yükseltmesi **yok**, yayın yapılmadı. Sıradaki kart **K3P-24**. Kişisel veri/gerçek hesap tarayıcısı açma; `mustafaras/seyma-data` kapsam dışıdır.

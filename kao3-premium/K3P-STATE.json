@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "planned",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-23",
+  "nextPrompt": "K3P-24",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -423,7 +423,7 @@
     {
       "id": "K3P-23",
       "wave": 4,
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "K3P-24",
@@ -451,6 +451,9 @@
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": []
+    "files": [
+      "app/core/quranLearn.js",
+      "app/kao.css"
+    ]
   }
 }

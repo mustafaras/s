@@ -2116,13 +2116,16 @@
     if(!(phase==='practice'&&currentQueued&&currentQueued.easy===true)) record.resume=item&&item.id?{phase:phase,itemId:String(item.id),lessonItemId:String(next.id)}:null;
     return true;
   }
+  // K3P-23: yeni kelime kartının şeması TEK kaynaktan gelir; ders tanıtımı (kaoLessonMarkIntro) ve
+  // okuyucudan bilinçli ekleme (kaoReaderAdd) aynı kurucuyu kullanır — yeni alan uydurulmaz.
+  function kaoNewWordCard(now){ return {state:'new',due:now,reps:0,l:0,s:0,introducedAt:now}; }
   function kaoLessonMarkIntro(ui,item){
     var q=ensureQuranLearn(quranLearnDeps.data()),record=kaoLessonRecord(q,item.lessonId),ids=Array.isArray(record.introducedLemmas)?record.introducedLemmas.slice():[];
     if(ids.indexOf(item.lemmaId)<0) ids.push(item.lemmaId);
     record.introducedLemmas=ids; record.startedAt=record.startedAt||new Date().toISOString();
     q.cards=objectOr(q.cards,{});
     var cardId='w:'+item.lemmaId+':ar>tr',card=objectOr(q.cards[cardId],{});
-    if(!nonNegativeNumber(card.reps,0)&&!card.introducedAt){ card=Object.assign({state:'new',due:new Date().toISOString(),reps:0,l:0,s:0},card,{introducedAt:new Date().toISOString()}); q.cards[cardId]=card; }
+    if(!nonNegativeNumber(card.reps,0)&&!card.introducedAt){ var nowIso=new Date().toISOString(); q.cards[cardId]=Object.assign(kaoNewWordCard(nowIso),card,{introducedAt:nowIso}); }
   }
   function kaoLessonActivate(ui){
     if(!quranLearnDeps||!ui||!ui.kaoLesson) return false;
@@ -3539,6 +3542,7 @@
       return true;
     }
     if(action==='understood') return kaoMarkUnderstood();
+    if(action==='add') return kaoReaderAdd(value);
     return false;
   }
   function kaoRevealWord(index){
@@ -3549,8 +3553,36 @@
     if(!wordKnown(q,word)){
       record.words[word.id]={status:'unknown',revealedAt:now.toISOString()};
       var cardId='w:'+word.lemmaId+':ar>tr',card=objectOr(q.cards[cardId],{}); q.cards[cardId]=card;
-      if(!nonNegativeNumber(card.reps,0)){ card.state='learning'; card.reps=1; card.s=0; card.d=0; card.r=now.toISOString(); card.due=addDays(now,1).toISOString(); card.introducedAt=now.toISOString(); card.tomorrowReason='reader_unknown'; card.readerUnknown=true; }
+      // K3P-23: bilinçli "Kartlarıma ekle" kartını (ya da ders kartını) okuma işaretiyle EZME.
+      if(!nonNegativeNumber(card.reps,0)&&!kaoWordCardGenuine(card)){ card.state='learning'; card.reps=1; card.s=0; card.d=0; card.r=now.toISOString(); card.due=addDays(now,1).toISOString(); card.introducedAt=now.toISOString(); card.tomorrowReason='reader_unknown'; card.readerUnknown=true; }
     }
+    kaoSave(); quranLearnDeps.render(); return true;
+  }
+  // K3P-23: okuyucudaki lemma çözümü iki içerik katmanını birleştirir; doğrulanmamış lemma karta alınmaz.
+  function kaoReaderLemma(lemmaId){
+    return phonicsLemma(lemmaId)||lemmaByIdFallback(lemmaId);
+  }
+  function lemmaByIdFallback(lemmaId){
+    var shorts=window.QuranShortSurahsV1;
+    return shorts&&typeof shorts.lemmaById==='function'?shorts.lemmaById(lemmaId):null;
+  }
+  // K3P-23: "gerçek" kart = bilinçli eklenmiş (okurken-anlam işareti readerUnknown DEĞİL). Okuma işareti
+  // yarının kuyruğuna alır ama kelimeyi "kartlarıma eklendi" saymaz; ikisi ayrı davranıştır.
+  function kaoWordCardGenuine(card){
+    card=objectOr(card,{});
+    return !card.readerUnknown&&(nonNegativeNumber(card.reps,0)>0||!!card.introducedAt);
+  }
+  // K3P-23: "Kartlarıma ekle" — okurken anlam açmak (kaoRevealWord, readerUnknown) AYRI bir eylemdir;
+  // burada bilinçli ekleme ders tanıtımıyla AYNI şemayı (state:'new' + introducedAt) yazar ve idempotenttir.
+  function kaoReaderAdd(index){
+    if(!quranLearnDeps) return false;
+    var ui=quranLearnDeps.ui(),word=surahWords(Number(ui.kaoSurahId))[Math.floor(Number(index))];
+    if(!word) return false;
+    var lemma=kaoReaderLemma(word.lemmaId);
+    if(!lemma||lemma.verified!==true) return false;
+    var q=ensureQuranLearn(quranLearnDeps.data()); q.cards=objectOr(q.cards,{});
+    var cardId='w:'+word.lemmaId+':ar>tr',card=objectOr(q.cards[cardId],{});
+    if(!kaoWordCardGenuine(card)) q.cards[cardId]=kaoNewWordCard(new Date().toISOString());
     kaoSave(); quranLearnDeps.render(); return true;
   }
   function kaoMarkUnderstood(){
@@ -3601,8 +3633,15 @@
     // (b) Anlam ALT PANELİ: dokunulan kelimenin anlamı akışı bozmadan altta açılır.
     if(openIndex>=0&&words[openIndex]){
       var openWord=words[openIndex];
+      // K3P-23: doğrulanmamış lemma kartlara alınamaz; lemma kartlarındaysa düğme "Kartlarında var" olur ve kapanır.
+      var openLemma=kaoReaderLemma(openWord.lemmaId),openVerified=!!(openLemma&&openLemma.verified===true);
+      var openCardId='w:'+openWord.lemmaId+':ar>tr',openCard=objectOr(objectOr(q.cards,{})[openCardId],{});
+      var openHasCard=openVerified&&kaoWordCardGenuine(openCard);
+      var addButton=openHasCard
+        ?'<button type="button" class="kao-secondary" disabled>Kartlarında var</button>'
+        :(openVerified?'<button type="button" class="kao-secondary" onclick="App.kaoReader(\'add\','+openIndex+')">Kartlarıma ekle</button>':'');
       h+='<section id="kao-reader-panel" class="kao-reader-panel" role="region" aria-live="polite" aria-label="Kelime anlamı"><p class="kao-reader-panel-ar" lang="ar" dir="rtl">'+esc(openWord.ar)+'</p><p class="kao-reader-panel-tr">'+esc(openWord.tr)+'</p>'
-        +'<div class="kao-reader-panel-actions"><button type="button" class="kao-secondary" onclick="App.kaoReader(\'play\',\'one\')">Kelimeyi dinle</button><button type="button" class="kao-secondary" onclick="App.kaoReader(\'close\')">Kapat</button></div></section>';
+        +'<div class="kao-reader-panel-actions">'+addButton+'<button type="button" class="kao-secondary" onclick="App.kaoReader(\'play\',\'one\')">Kelimeyi dinle</button><button type="button" class="kao-secondary" onclick="App.kaoReader(\'close\')">Kapat</button></div></section>';
     }
     // (e) Y-12: "Anladım" öncesi 3 soruluk hızlı kontrol.
     h+='<section class="kao-reader-understood">';
@@ -4483,6 +4522,7 @@
     kaoSurahs:kaoSurahs,
     kaoOpenSurah:kaoOpenSurah,
     kaoRevealWord:kaoRevealWord,
+    kaoReaderAdd:kaoReaderAdd,
     kaoMarkUnderstood:kaoMarkUnderstood,
     kaoReaderHTML:kaoReaderHTML,
     kaoReader:kaoReader,

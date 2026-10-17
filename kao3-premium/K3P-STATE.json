@@ -3,9 +3,9 @@
   "title": "Kur'an Arapçası modalı — Tezhip (premium · elit · etkili · interaktif)",
   "plannedAt": "2026-10-10",
   "planVersion": 3,
-  "status": "planned",
+  "status": "in-progress",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-24",
+  "nextPrompt": "K3P-25",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -428,7 +428,9 @@
     {
       "id": "K3P-24",
       "wave": 4,
-      "status": "todo"
+      "status": "done",
+      "doneAt": "2026-10-17",
+      "result": "İlerleme ekranı üç sade ölçüye indi (K-H, TASARIM §3.5 · ANALIZ E-5): Kur'an kapsamı %, yaldızlı sûreler ×/20 (bir sûre BÜTÜN lemmaları biliniyorsa yaldızlı — yarısı değil), bu hafta gün/5 (`kaoWeeklyDone`; `kaoWeekActivity` ile tutarlı). Kısa sûrelerin 20 Tezhip KÜÇÜK RESMİ (K3P-11 bileşeninin küçük boyu: `tezhipPage({compact:true})`, sûrenin yalnız İLK âyeti ≤8 kelime, `…` ile kırpılır; süs SVG'si koda taşınan `is-compact` ile gizlenir). Mühendislik metrikleri tek `<details>Ayrıntılar</details>` altına indi (kalibrasyon tablosu + algı + gece karşılaştırması + aktarım); VERİ YOKKEN bölüm hiç çizilmez; doğruluk satırları (Son 2/6 hafta) görünür kalır. Ceza/suçluluk dili sıfır (metin taraması testi). `kaoProgressModel`'e saf türetim eklendi (`gilded`, `thumbs`, `weekly`) — yan etki yok, yeni App.kao* YOK (45 sabit). CSS payı kural SİLEREK açıldı (öksüz `.kao-coverage`, `.kao-progress-count`, ölü `.kao-today h2`). test_kao2_progress 20→21 kontrole güncellendi; envanter 81 sabit (yeni dosya yok)."
     },
     {
       "id": "K3P-25",
@@ -453,7 +455,8 @@
     "until": "K3P-27",
     "files": [
       "app/core/quranLearn.js",
-      "app/kao.css"
+      "app/kao.css",
+      "app/core/quranLearnViews.js"
     ]
   }
 }

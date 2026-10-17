@@ -45,7 +45,7 @@ function boot() {
   };
   const study = (offset, answered) => {
     const d = new Date(NOW_DATE.getTime() - offset * 86400000).toISOString().slice(0, 10);
-    q.daily[d] = { answered, correct: answered, new: 0, reviewed: answered };
+    q.daily[d] = { answered, correct: answered, new: 0, reviewed: answered, lesson: true, sessionDone: true };
   };
   return { api, box, data, ui, q, NOW, know, study, byFreq };
 }
@@ -53,14 +53,41 @@ function boot() {
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
 
-// ---- (1) Üst bölüm: kelime sayısı + kapsam % + "ilk 50" anlatısı ----------
-check('üst bölüm tanıdık kelime sayısını ve kapsam yüzdesini gösterir', () => {
+// ---- (1) Üst bölüm: üç sade ölçü (K3P-24 · TASARIM §3.5) -----------------
+check('üst bölüm üç ölçüyü gösterir: kapsam %, yaldızlı sûreler ×/20, bu hafta gün/5', () => {
   const t = boot();
   t.know(50);
   const html = decode(t.api.kaoStatsHTML(t.NOW));
-  assert.match(html, /Tanıdık kelime/, 'tanıdık kelime etiketi yok');
-  assert.match(html, /50/, 'kelime sayısı yazılmıyor');
-  assert.match(html, /\/\s*524/, 'toplam lemma yazılmıyor');
+  // Kapsam ölçüsü: yüzde + tanıdık lemma sayısı toplamla birlikte.
+  assert.match(html, /<b class="kao-metric-value">%45<\/b>/, 'kapsam yüzdesi ölçü olarak yazılmıyor');
+  assert.match(html, /50 \/ 524 lemma/, 'kapsam alt satırı (tanıdık/toplam) yok');
+  // Yaldızlı sûreler: bütün lemmaları bilinen sûre sayısı / tüm kısa sûreler.
+  assert.match(html, /Yaldızlı sûreler<\/span><b class="kao-metric-value">0 \/ 20<\/b>/, 'yaldızlı sûre ölçüsü yok');
+  // Bu hafta: gün/5 hedefi.
+  assert.match(html, /Bu hafta<\/span><b class="kao-metric-value">0 \/ 5<\/b>/, 'haftalık hedef ölçüsü yok');
+  // Üç ölçü tek listede, ilk bölümde.
+  assert.equal((html.match(/class="kao-metric"/g) || []).length, 3, 'üçten çok/az ölçü var');
+});
+
+check('yaldızlı sûre sayacı yalnız BÜTÜN lemmaları bilinen sûreyi sayar', () => {
+  const t = boot();
+  const one = t.api.kaoProgressModel(t.data, t.NOW).gilded;
+  assert.equal(one.count, 0, 'sıfır kullanıcıda yaldızlı sûre olmaz');
+  assert.equal(one.total, 20, '20 kısa sûre sayılmalı');
+  // Sıklık sırasının tamamını bilmek yerine sûreyi kelime kelime doğrula: en kısa sûreyi (Kevser) besle.
+  const surahId = t.box.window.QuranShortSurahsV1.words.reduce((min, w) => {
+    const count = t.box.window.QuranShortSurahsV1.words.filter((x) => x.surahId === w.surahId).length;
+    return count < min.count ? { id: w.surahId, count } : min;
+  }, { id: null, count: Infinity }).id;
+  const words = t.box.window.QuranShortSurahsV1.words.filter((w) => w.surahId === surahId);
+  // Tek kelimeyi bilmek yetmez: sûre yaldızlanmamalı.
+  const first = words[0].lemmaId;
+  for (const dir of ['ar>tr', 'tr>ar']) t.q.cards[`w:${first}:${dir}`] = { state: 'review', s: 40, due: '2026-12-01T00:00:00.000Z' };
+  assert.equal(t.api.kaoProgressModel(t.data, t.NOW).gilded.count, 0, 'eksik lemma varken sûre yaldızlanmamalı');
+  // Bütün lemmalar bilinince o sûre yaldızlanır.
+  for (const w of words) for (const dir of ['ar>tr', 'tr>ar']) t.q.cards[`w:${w.lemmaId}:${dir}`] = { state: 'review', s: 40, due: '2026-12-01T00:00:00.000Z' };
+  assert.equal(t.api.kaoProgressModel(t.data, t.NOW).gilded.count, 1, 'bütün lemmalar bilinince sûre yaldızlanır');
+  assert.match(decode(t.api.kaoStatsHTML(t.NOW)), /<b class="kao-metric-value">1 \/ 20<\/b>/, 'sayaç ekrana yansımıyor');
 });
 
 check('"ilk 50 kelime ≈ %45" anlatısı gerçek eğriden yazılır', () => {
@@ -134,6 +161,9 @@ check('haftalık etkinlik 7 günü gösterir ve seri cezalandırıcı değil', (
   assert.equal(model.week.studied, 4, 'yumuşak seri sayısı yanlış');
   const html = decode(t.api.kaoStatsHTML(t.NOW));
   assert.match(html, /Bu hafta\s*4\s*gün/, 'yumuşak seri metni yok');
+  // K3P-24: haftalık sayım hem ölçüde hem şeritte aynı olmalı.
+  assert.match(html, /Bu hafta<\/span><b class="kao-metric-value">4 \/ 5<\/b>/, 'ölçüde haftalık sayım yanlış');
+  assert.equal(model.weekly, 4, 'haftalık hedef sayısı (kaoWeeklyDone) şeritle uyuşmuyor');
   for (const bad of ['seri bozuldu', 'Serin bozuldu', 'kaybettin', 'Seri: 0']) {
     assert.ok(!html.includes(bad), `cezalandırıcı metin: ${bad}`);
   }
@@ -142,8 +172,74 @@ check('haftalık etkinlik 7 günü gösterir ve seri cezalandırıcı değil', (
 check('boş haftada da cezalandırıcı dil yok', () => {
   const t = boot();
   const html = decode(t.api.kaoStatsHTML(t.NOW));
-  assert.match(html, /Bu hafta\s*0\s*gün|Henüz bu hafta kaydın yok/, 'boş hafta metni yok');
+  assert.match(html, /Bu hafta<\/span><b class="kao-metric-value">0 \/ 5<\/b>/, 'boş hafta ölçüsü yazılmıyor');
+  assert.match(html, /Bu hafta\s*0\s*gün/, 'boş hafta cümlesi yok');
   for (const bad of ['kaybettin', 'bozdun', 'baştan']) assert.ok(!html.includes(bad), `cezalandırıcı metin: ${bad}`);
+});
+
+// ---- (4b) K3P-24 · Boş veride ayrıntı yok; veri gelince katlanır ---------
+check('K3P-24: veri yokken kalibrasyon tablosu ve ayrıntı bölümü hiç çizilmez', () => {
+  const t = boot();
+  const html = decode(t.api.kaoStatsHTML(t.NOW));
+  assert.doesNotMatch(html, /<table class="kao-stats-table"/, 'boş veride kalibrasyon tablosu çizildi');
+  assert.doesNotMatch(html, /<details/, 'boş veride Ayrıntılar bölümü çizildi');
+  assert.doesNotMatch(html, /Gece tekrarı<\/h3>/, 'boş veride gece karşılaştırması çizildi');
+  assert.doesNotMatch(html, /Yeni âyet testi<\/h3>/, 'boş veride aktarım satırı çizildi');
+  // Doğruluk satırları (Son 2/6 hafta) görünür kalır: bir ölçü gibi okunur.
+  assert.match(html, /Son 2 hafta/, 'doğruluk satırları kaybolmamalı');
+});
+
+check('K3P-24: veri gelince Ayrıntılar tek katlanan blok; tablo ve gece karşılaştırması onun İÇİNDE', () => {
+  const t = boot();
+  t.q.phonics.misheard = { qaf: 2 };
+  t.study(1, 20);
+  t.q.daily[new Date(new Date(t.NOW).getTime() - 86400000).toISOString().slice(0, 10)] = {
+    answered: 20, correct: 16, new: 0, reviewed: 18, nightRev: 8,
+    calib: { bands: Array.from({ length: 10 }, () => ({ pred: 2, ok: 2, n: 3 })) },
+    nightFollow: { n: 8, ok: 6 }, dayFollow: { n: 10, ok: 8 }
+  };
+  t.q.transfer = { n: 2, ok: 2 };
+  const html = decode(t.api.kaoStatsHTML(t.NOW));
+  assert.equal((html.match(/<details/g) || []).length, 1, 'tek katlanan blok olmalı (Ayrıntılar)');
+  const m = html.match(/<details(?![^>]*\bopen\b)[^>]*>\s*<summary>Ayrıntılar<\/summary>([\s\S]*?)<\/details>/);
+  assert.ok(m, 'kapalı başlayan <details>Ayrıntılar</details> yok');
+  assert.match(m[1], /<table class="kao-stats-table"/, 'kalibrasyon tablosu Ayrıntılar dışında');
+  assert.match(m[1], /Gece tekrarı/, 'gece karşılaştırması Ayrıntılar dışında');
+  assert.doesNotMatch(html.replace(m[0], ''), /kao-stats-table/, 'tablo Ayrıntılar dışında da var');
+  assert.doesNotMatch(m[1], /<details/, 'Ayrıntılar içinde iç içe katlanan blok var');
+  assert.ok(html.indexOf('Son 2 hafta') < html.indexOf('<details'), 'doğruluk satırları katlanmış olmamalı');
+});
+
+// ---- (4c) K3P-24 · Tezhip küçük resimleri -------------------------------
+check('K3P-24: her kısa sûre Tezhip küçük resmi olarak çizilir (K3P-11 bileşeninin küçük boyu)', () => {
+  const t = boot();
+  const model = t.api.kaoProgressModel(t.data, t.NOW);
+  assert.equal(model.thumbs.length, 20, '20 kısa sûre küçük resmi');
+  assert.deepEqual(Array.from(new Set(model.thumbs.map((x) => x.id))).length, 20, 'sûre kimlikleri tekrarsız');
+  const html = decode(t.api.kaoStatsHTML(t.NOW));
+  assert.equal((html.match(/class="kao-tezhip is-compact"/g) || []).length, 20, '20 küçük resim beklenir');
+  assert.equal((html.match(/class="kao-tezhip-line"/g) || []).length, 20, 'her küçük resimde TEK satır olmalı');
+  for (const thumb of model.thumbs) {
+    assert.ok(html.includes('>' + thumb.name + '<'), `sûre adı yok: ${thumb.name}`);
+    assert.ok(thumb.line.length > 0 && thumb.line.length <= 8, `${thumb.name}: satır 1–8 kelime`);
+    assert.ok(thumb.line.every((w) => /^[\u0600-\u06FF]/.test(w.ar)), `${thumb.name}: Arapça yazı yok`);
+  }
+  // Yaldız durumu işaretlenir (bütün lemmaları bilinen sûre).
+  const gilded = model.thumbs.filter((x) => x.gilded);
+  assert.equal((html.match(/class="kao-thumb is-gilded"/g) || []).length, gilded.length, 'yaldız işareti sayısı uyuşmuyor');
+});
+
+// ---- (4d) K3P-24 · Ceza dili için metin taraması ------------------------
+check('K3P-24: İlerleme kaynağında suçluluk/ceza dili yok (metin taraması)', () => {
+  const source = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8');
+  const fn = source.slice(source.indexOf('function kaoStatsHTML'), source.indexOf('function kaoOpenPhonics'));
+  assert.ok(fn.length > 500, 'İlerleme gövdesi bulunamadı');
+  for (const bad of ['kaybettin', 'kayıp', 'bozdun', 'bozuldu', 'baştan başla', 'ceza', 'Seri', 'seri ', 'geriye düştün', 'utanç']) {
+    assert.ok(!fn.includes(bad), `suçluluk/ceza dili: ${bad}`);
+  }
+  // Ekranda da yok (boş + dolu veri).
+  const empty = decode(boot().api.kaoStatsHTML(boot().NOW));
+  assert.ok(!/kaybettin|bozdun|ceza/i.test(empty), 'boş ekranda ceza dili');
 });
 
 // ---- (5) Mushaf haritası tek ekranda ------------------------------------
@@ -170,20 +266,26 @@ check('harita hücreleri öğrenilen sûrede gerçek yüzdeyi taşır', () => {
   assert.match(html, /İhlâs/, 'sûre adı haritada yok');
 });
 
-// ---- (6) Algı doğruluğu + kalibrasyon ----------------------------------
-check('algı doğruluğu ve kalibrasyon özeti mevcut veriden okunur', () => {
+// ---- (6) Algı doğruluğu + kalibrasyon (K3P-24: ayrıntı katlanır) -------
+check('algı doğruluğu ve kalibrasyon ayrıntısı gerçek veriden okunur', () => {
   const t = boot();
   t.q.phonics.misheard = { qaf: 3, sad: 1 };
   t.study(1, 20);
   t.q.daily[new Date(new Date(t.NOW).getTime() - 86400000).toISOString().slice(0, 10)] = {
-    answered: 20, correct: 16, new: 0, reviewed: 18,
-    calib: { bands: Array.from({ length: 10 }, () => ({ pred: 0, ok: 0, n: 0 })) },
-    dayFollow: { n: 18, ok: 14 }
+    answered: 20, correct: 16, new: 0, reviewed: 18, nightRev: 4,
+    calib: { bands: Array.from({ length: 10 }, () => ({ pred: 2, ok: 2, n: 2 })) },
+    nightFollow: { n: 4, ok: 3 }, dayFollow: { n: 14, ok: 11 }
   };
+  t.q.transfer = { n: 3, ok: 2 };
   const html = decode(t.api.kaoStatsHTML(t.NOW));
   assert.match(html, /Tekrar doğruluğu/, 'kalibrasyon satırı yok');
-  assert.match(html, /R-bandı|Öngörülen R/, 'R-bandı tablosu yok');
-  assert.match(html, /Yeni âyet testi/, 'aktarım özeti yok');
+  // K3P-24: tablo, algı özeti, gece karşılaştırması ve aktarım satırı Ayrıntılar İÇİNDEDİR.
+  const fold = html.match(/<details(?![^>]*\bopen\b)[^>]*>\s*<summary>Ayrıntılar<\/summary>([\s\S]*?)<\/details>/);
+  assert.ok(fold, 'Ayrıntılar katlanan bloğu yok');
+  assert.match(fold[1], /Öngörülen R/, 'R-bandı tablosu Ayrıntılar içinde değil');
+  assert.match(fold[1], /Algı doğruluğu/, 'algı özeti Ayrıntılar içinde değil');
+  assert.match(fold[1], /Gece tekrarı/, 'gece karşılaştırması Ayrıntılar içinde değil');
+  assert.match(fold[1], /Yeni âyet testi[\s\S]*2 \/ 3 doğru/, 'aktarım özeti Ayrıntılar içinde değil');
   const model = t.api.kaoProgressModel(t.data, t.NOW);
   assert.ok(model.perception.flagged >= 1, 'işaretli harf sayılmadı');
   assert.ok(Array.isArray(model.perception.sounds) && model.perception.sounds.length >= 1, 'ses sınıfı özeti yok');
@@ -223,14 +325,23 @@ check('K2F-32: LargeTitle "İlerleme"; eski "İstatistik / Tutunma ve kalibrasyo
   assert.doesNotMatch(html, /<p class="kao-eyebrow">İstatistik<\/p>/, 'eski "İstatistik" üst etiketi duruyor');
 });
 
-check('K2F-32: R-bandı tablosu kapalı başlayan <details> içinde, özeti tek cümle', () => {
+check('K2F-32 + K3P-24: ayrıntı kapalı başlayan tek <details>Ayrıntılar</details>; tablo onun İÇİNDE', () => {
   const t = boot();
+  // K3P-24: ayrıntı bloğu veri yokken çizilmez; bu yüzden ölçüm verisi verilir.
+  t.study(1, 6);
+  t.q.daily[new Date(new Date(t.NOW).getTime() - 86400000).toISOString().slice(0, 10)] = {
+    answered: 6, correct: 5, new: 0, reviewed: 5, nightRev: 3,
+    calib: { bands: Array.from({ length: 10 }, () => ({ pred: 1, ok: 1, n: 1 })) },
+    nightFollow: { n: 3, ok: 2 }, dayFollow: { n: 4, ok: 3 }
+  };
   const html = decode(t.api.kaoStatsHTML(t.NOW));
   const m = html.match(/<details(?![^>]*\bopen\b)[^>]*>\s*<summary>([^<]+)<\/summary>([\s\S]*?)<\/details>/);
   assert.ok(m, 'kapalı <details> yok');
+  assert.equal(m[1].trim(), 'Ayrıntılar', 'özet "Ayrıntılar" olmalı (K3P-24: tek katlanan blok)');
   assert.match(m[2], /<table class="kao-stats-table"/, 'tablo <details> dışında');
   assert.equal(m[1].trim().split(/[.!?]/).filter(Boolean).length, 1, `özet tek cümle olmalı: ${m[1]}`);
   assert.doesNotMatch(html.replace(m[0], ''), /kao-stats-table/, 'tablo <details> dışında da var');
+  assert.equal((html.match(/<details/g) || []).length, 1, 'tek katlanan blok olmalı');
   // Aynı bölümdeki doğruluk satırları (Son 2/6 hafta) katlanmadan görünür kalır.
   assert.ok(html.indexOf('Son 2 hafta') < html.indexOf('<details'), 'doğruluk satırları katlanmış');
 });

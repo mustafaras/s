@@ -3274,6 +3274,35 @@
   // Kapsam eğrisi 03 §1 tablosunun ÇALIŞMA ZAMANI eşidir: lexicon `freq` toplamı,
   // sıklık sırasına göre ilk N lemma. Sabit yüzde yazılmaz; eğriden yeniden hesaplanır.
   var KAO_COVERAGE_POINTS=[50,100,200,300,524], KAO_COVERAGE_MIN_WORDS=15, KAO_STONE_PREVIEW=4;
+  // K3P-24 · Tezhip sayacı: bir sûre, BÜTÜN lemmaları biliniyorsa yaldızlı sayılır (yarısı değil).
+  // Yalnız TÜRETİR; eksik lemma kimliği bilinmiyor sayılır (kart yok → altın yok).
+  function kaoGildedSurahCount(d){
+    var known=kaoKnownLemmaSet(d),gilded=0,total=0;
+    kaoSurahs().forEach(function(surah){
+      var words=surahWords(surah.id);
+      if(!words.length) return;
+      total+=1;
+      if(words.every(function(word){ return !!known[String(word&&word.lemmaId||'')]; })) gilded+=1;
+    });
+    return {count:gilded,total:total};
+  }
+  // K3P-24 · Tezhip küçük resmi: sûrenin İLK âyeti yalnız okunduğu kadar (kırpılmış, `…` ile).
+  // Saf türetim; tam sûreyi 20 kez çizmek yerine sayfa hafif kalır.
+  var KAO_THUMB_WORDS=8, KAO_THUMB_MAX=20;
+  function kaoThumbData(d){
+    var known=kaoKnownLemmaSet(d),cards=objectOr(ensureQuranLearn(d).cards,{}),out=[];
+    kaoSurahs().slice(0,KAO_THUMB_MAX).forEach(function(surah){
+      var words=surahWords(surah.id).filter(function(word){ return word.ayah===1; }).slice(0,KAO_THUMB_WORDS);
+      if(!words.length) return;
+      var line=words.map(function(word){
+        var lemmaId=String(word.lemmaId||'');
+        return {ar:String(word.ar||''),state:known[lemmaId]?'known':((cards['w:'+lemmaId+':ar>tr']||cards['w:'+lemmaId+':tr>ar'])?'learning':'new')};
+      });
+      var gilded=surahWords(surah.id).every(function(word){ return !!known[String(word.lemmaId||'')]; });
+      out.push({id:surah.id,name:surah.name,line:line,gilded:gilded});
+    });
+    return out;
+  }
   function kaoTotalLemmas(){ var lex=window.QuranLexiconV1; return lex&&Array.isArray(lex.lemmas)?lex.lemmas.length:0; }
   function kaoFrequencyOrdered(){
     var lex=window.QuranLexiconV1,lemmas=lex&&Array.isArray(lex.lemmas)?lex.lemmas.slice():[];
@@ -3364,6 +3393,9 @@
       curve:curve,nextPoint:nextPoint,
       stones:kaoMilestoneProgress(d,now.toISOString()),
       week:kaoWeekActivity(d,now),
+      weekly:kaoWeeklyDone(d,now),
+      gilded:kaoGildedSurahCount(d),
+      thumbs:kaoThumbData(d),
       lastStudied:study.last,
       map:kaoSurahMap(d),
       perception:kaoPerceptionSummary(d,now),
@@ -3379,18 +3411,32 @@
     var awarded=recordMilestones(ensureQuranLearn(quranLearnDeps.data()),quranLearnDeps.data(),validDate(nowValue||new Date(),'now')),model;
     if(awarded.length) kaoSave();
     model=kaoProgressModel(quranLearnDeps.data(),nowValue);var curveLine=function(point){ return 'İlk '+point.n+' kelime ≈ %'+point.percent.toFixed(1).replace('.',',')+(point.earned?' · kazanıldı':''); };
-    h+='<section class="kao-progress-hero"><h3>Tanıdık kelime</h3><p class="kao-progress-count"><strong>'+model.knownCount+'</strong> / '+model.total+' lemma · Kur\u2019an metninin <strong>%'+model.percent+'</strong>\u2019ini okuyabilirsin</p>';
+    // K3P-24 · Üç sade ölçü: kapsam, yaldızlı sûre, bu hafta. Mühendislik metrikleri aşağıda katlanır.
+    h+='<section class="kao-progress-hero"><h3>Kur\u2019an kapsamı</h3><ul class="kao-stats-metrics">';
+    h+='<li class="kao-metric"><span class="kao-metric-label">Kapsam</span><b class="kao-metric-value">%'+model.percent+'</b><span class="kao-metric-sub">'+model.knownCount+' / '+model.total+' lemma</span></li>';
+    h+='<li class="kao-metric"><span class="kao-metric-label">Yaldızlı sûreler</span><b class="kao-metric-value">'+model.gilded.count+' / '+model.gilded.total+'</b><span class="kao-metric-sub">tüm kelimeleri bilinen</span></li>';
+    h+='<li class="kao-metric"><span class="kao-metric-label">Bu hafta</span><b class="kao-metric-value">'+model.weekly+' / 5</b><span class="kao-metric-sub">gün</span></li>';
+    h+='</ul>';
     h+='<ul class="kao-progress-curve">'+model.coverage.map(function(point){ return '<li'+(point.earned?' class="is-earned"':'')+'><span class="kao-curve-mark" aria-hidden="true">'+(point.earned?'●':'○')+'</span>'+esc(curveLine(point))+'</li>'; }).join('')+'</ul>';
     h+='<p class="kao-setting-hint">'+(model.nextPoint?'Sıradaki hedef: '+model.nextPoint.n+' kelime · %'+model.nextPoint.percent.toFixed(1).replace('.',',')+' kapsam ('+model.nextPoint.remaining+' kelime kaldı)':'Tüm kapsam basamakları kazanıldı')+'</p></section>';
+    // K3P-24 · Tezhip küçük resimleri: her kısa sûrenin İLK âyeti, K3P-11 bileşeninin küçük boyu.
+    h+='<section class="kao-progress-thumbs"><h3>Kısa sûreler</h3><ul class="kao-tezhip-grid">'+model.thumbs.map(function(thumb){ return '<li class="kao-thumb'+(thumb.gilded?' is-gilded':'')+'">'+kaoViewsApi().tezhipPage({title:thumb.name,lines:[thumb.line],compact:true})+'</li>'; }).join('')+'</ul></section>';
     h+='<section class="kao-progress-stones kao-moment">'+(window.SeymaConstants&&window.SeymaConstants.KAO_MOMENT_ORN||'')+'<h3>Taşlar</h3>'+(model.stones.earned.length?'<ul class="kao-stone-earned">'+model.stones.earned.slice(0,KAO_STONE_PREVIEW).map(function(label){ return '<li><span class="kao-stone-mark" aria-hidden="true">✓</span>'+esc(label)+'</li>'; }).join('')+'</ul>':'<p class="kao-setting-hint">Henüz taş yok; ilk taş birkaç adım uzakta.</p>')+(model.stones.next?'<p class="kao-stone-next"><strong>Sıradaki:</strong> '+esc(model.stones.next.label)+'<span class="kao-stone-condition">'+esc(model.stones.next.condition)+'</span></p>':'')+'</section>';
     h+='<section class="kao-progress-week"><h3>Bu hafta</h3><p class="kao-week-line">Bu hafta '+model.week.studied+' gün çalıştın · '+model.week.answered+' tekrar</p><ol class="kao-week-days">'+model.week.days.map(function(day){ return '<li'+(day.studied?' class="is-studied"':'')+' title="'+esc(day.date)+'"><span aria-hidden="true">'+esc(day.dow)+'</span><span class="kao-week-dot"'+(day.studied?'':' aria-hidden="true"')+'></span></li>'; }).join('')+'</ol></section>';
     h+='<section class="kao-progress-map"><h3>114 sûrede anladıkların</h3>'+kaoSurahMapHTML(model.map,null)+'</section>';
-    h+='<section class="kao-progress-perception"><h3>Algı doğruluğu</h3><p>İşaretlenen harf: <strong>'+model.perception.flagged+'</strong>'+(model.perception.sounds.length?' · en çok: '+esc(model.perception.sounds[0].name)+' ('+model.perception.sounds[0].count+')':' · henüz işaret yok')+'</p><p>Son 2 haftada tekrar doğruluğu '+pct(model.perception.accuracy.ok,model.perception.accuracy.n)+'</p></section>';
+    // K3P-24 · Doğruluk satırları görünür kalır; kalibrasyon TABLOSU ve gece karşılaştırması katlanır.
+    var w=stats.sixWeeks,tr=objectOr(quranLearnRoot(quranLearnDeps.data()).transfer,{});
+    var hasDetail=stats.sixWeeks.n>0||w.nightRev>0||model.perception.flagged>0||model.perception.accuracy.n>0||tr.n>0;
     h+='<section class="kao-progress-calibration"><h3>Tekrar doğruluğu</h3>'+line('Son 2 hafta',stats.twoWeeks)+line('Son 6 hafta',stats.sixWeeks)+(stats.sixWeeks.n<MIN?'<p class="kao-setting-hint">Anlamlı karşılaştırma için en az '+MIN+' tekrar gerekir.</p>':'');
-    h+='<details class="kao-flag"><summary>Öngörü ile gerçek 10 R-bandında nasıl örtüşüyor (son 6 hafta)</summary><p class="kao-setting-hint">Yalnız tekrar cevapları sayılır; puan değil, öngörünün ne kadar isabetli olduğunu gösterir.</p><table class="kao-stats-table"><thead><tr><th scope="col">Öngörülen R</th><th scope="col">Tekrar</th><th scope="col">Öngörü</th><th scope="col">Gerçek</th></tr></thead><tbody>'+stats.sixWeeks.bands.map(function(band,index){ return '<tr><th scope="row">'+(index/10).toFixed(1)+'–'+((index+1)/10).toFixed(1)+'</th><td>'+band.n+'</td><td>'+pct(band.pred,band.n)+'</td><td>'+pct(band.ok,band.n)+'</td></tr>'; }).join('')+'</tbody></table></details></section>';
-    var w=stats.sixWeeks;
-    h+='<section><h3>Gece tekrarı</h3><p>'+w.nightRev+' gece tekrarı · gece sonrası ilk tekrarda doğruluk '+pct(w.nightFollow.ok,w.nightFollow.n)+' ('+w.nightFollow.n+') · diğer tekrarlarda '+pct(w.dayFollow.ok,w.dayFollow.n)+' ('+w.dayFollow.n+')</p>'+(w.nightFollow.n<MIN?'<p class="kao-setting-hint">Karşılaştırma, gece sonrası en az '+MIN+' tekrar birikince anlamlıdır.</p>':'')+'</section>';
-    var tr=objectOr(quranLearnRoot(quranLearnDeps.data()).transfer,{}); h+='<section><h3>Yeni âyet testi (haftalık aktarım)</h3><p>'+(tr.n?tr.ok+' / '+tr.n+' doğru · '+pct(tr.ok,tr.n)+' · hiç görmediğin âyetlerde':'Henüz test yok: kelimelerinin %95’ini tanıdığın, görmediğin bir âyet çıkınca haftada bir sorulur.')+'</p></section>';
+    if(hasDetail){
+      h+='<details class="kao-flag"><summary>Ayrıntılar</summary>';
+      if(model.perception.flagged>0||model.perception.accuracy.n>0) h+='<section class="kao-progress-perception"><h3>Algı doğruluğu</h3><p>İşaretlenen harf: <strong>'+model.perception.flagged+'</strong>'+(model.perception.sounds.length?' · en çok: '+esc(model.perception.sounds[0].name)+' ('+model.perception.sounds[0].count+')':' · henüz işaret yok')+'</p><p>Son 2 haftada tekrar doğruluğu '+pct(model.perception.accuracy.ok,model.perception.accuracy.n)+'</p></section>';
+      if(stats.sixWeeks.n>0) h+='<section><h3>Öngörü ile gerçek (son 6 hafta)</h3><p class="kao-setting-hint">Yalnız tekrar cevapları sayılır; puan değil, öngörünün ne kadar isabetli olduğunu gösterir.</p><table class="kao-stats-table"><thead><tr><th scope="col">Öngörülen R</th><th scope="col">Tekrar</th><th scope="col">Öngörü</th><th scope="col">Gerçek</th></tr></thead><tbody>'+stats.sixWeeks.bands.map(function(band,index){ return '<tr><th scope="row">'+(index/10).toFixed(1)+'–'+((index+1)/10).toFixed(1)+'</th><td>'+band.n+'</td><td>'+pct(band.pred,band.n)+'</td><td>'+pct(band.ok,band.n)+'</td></tr>'; }).join('')+'</tbody></table></section>';
+      if(w.nightRev>0) h+='<section><h3>Gece tekrarı</h3><p>'+w.nightRev+' gece tekrarı · gece sonrası ilk tekrarda doğruluk '+pct(w.nightFollow.ok,w.nightFollow.n)+' ('+w.nightFollow.n+') · diğer tekrarlarda '+pct(w.dayFollow.ok,w.dayFollow.n)+' ('+w.dayFollow.n+')</p>'+(w.nightFollow.n<MIN?'<p class="kao-setting-hint">Karşılaştırma, gece sonrası en az '+MIN+' tekrar birikince anlamlıdır.</p>':'')+'</section>';
+      if(tr.n>0) h+='<section><h3>Yeni âyet testi (haftalık aktarım)</h3><p>'+tr.ok+' / '+tr.n+' doğru · '+pct(tr.ok,tr.n)+' · hiç görmediğin âyetlerde</p></section>';
+      h+='</details>';
+    }
+    h+='</section>';
     // KAO2-24: harita artık ayrı görünüm değil; tek İlerleme ekranının bölümü.
     h+='</main>';
     return h;

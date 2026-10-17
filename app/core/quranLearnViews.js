@@ -143,7 +143,8 @@
         return '<span class="'+cls+'" lang="ar" dir="rtl" aria-label="'+word.aria+'">'+word.ar+'</span>';
       }).join('')+'</span>';
     }).join('');
-    return '<figure class="kao-tezhip">'+deps.icon('rumi',120,'kao-tezhip-orn')+'<figcaption class="kao-tezhip-title">'+escapeText(options.title||'')+'</figcaption>'
+    // K3P-24 · Süs yalnız tam boyda: küçük resimde SVG yine çizilir, `compact` sınıfıyla gizlenir.
+    return '<figure class="kao-tezhip'+(options.compact===true?' is-compact':'')+'">'+deps.icon('rumi',120,'kao-tezhip-orn')+'<figcaption class="kao-tezhip-title">'+escapeText(options.title||'')+'</figcaption>'
       +'<div class="kao-tezhip-body" lang="ar" dir="rtl">'+body+'</div>'
       +(options.footer?'<p class="kao-tezhip-footer">'+escapeText(options.footer)+'</p>':'')+'</figure>';
   }

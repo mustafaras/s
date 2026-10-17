@@ -73,7 +73,8 @@
       "method": "no-cache GET + SHA-256; 60 versioned assets and 3 host files",
       "passed": 63,
       "total": 63
-    }
+    },
+    "receiptCommit": "4498d8ad"
   },
   "evidenceLevel": "source+headless",
   "measureGates": [

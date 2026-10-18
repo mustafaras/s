@@ -3,9 +3,9 @@
   "title": "Kur'an Arapçası modalı — Tezhip (premium · elit · etkili · interaktif)",
   "plannedAt": "2026-10-10",
   "planVersion": 3,
-  "status": "in-progress",
+  "status": "completed",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-27",
+  "nextPrompt": null,
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -76,7 +76,7 @@
     },
     "receiptCommit": "4498d8ad"
   },
-  "evidenceLevel": "source+headless",
+  "evidenceLevel": "source+headless+controlled-visual+live-static",
   "measureGates": [
     {
       "tool": "kao3-premium/araclar/cift-sik.cjs",
@@ -454,9 +454,10 @@
     {
       "id": "K3P-27",
       "wave": 5,
-      "status": "in-progress",
-      "gate": "release: kullanıcı açıkça yetkilendirdi; Pages koşusu ve canlı pin doğrulaması bekleniyor",
-      "result": "Pin 20261017a→20261018a; değişen varlıklar quranLearn.js + quranLearnViews.js. Ortak pin 15 dosyada / 82 geçişte güncellendi; pinDeferral.files boş. Pin tazeliği 61/61, IIP-22 13/13, tam kapı exit 0. Yayın yetkisi kullanıcıdan 2026-10-18; Pages/canlı kanıtı tamamlanınca program kapanacak."
+      "status": "done",
+      "gate": "Pages run 39126116607 success; live no-cache SHA-256 parity 64/64",
+      "result": "Pin 20261017a→20261018a; değişen üretim varlıkları quranLearn.js + quranLearnViews.js. Ortak pin 15 dosyada / 82 geçişte güncellendi; pinDeferral.files boş. Tam kapı exit 0. Release commit 6c10693c origin/main üzerinde; Pages run 39126116607 validate+deploy SUCCESS; 3 host dosyası + 61 versioned URL = 64/64 HTTP 200 ve yerel/canlı SHA-256 eşliği. Kullanıcı cihaz kabulü ve ekran okuyucu turu bekliyor.",
+      "doneAt": "2026-10-18"
     }
   ],
   "pinDeferral": {

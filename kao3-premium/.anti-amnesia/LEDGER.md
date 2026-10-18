@@ -1018,3 +1018,13 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Doğrulama: `tests/app/test_asset_pin_freshness.js` **61/61 taze**, `tests/app/test_iip_22.js` **13/13**, `senkron` UYUMLU, `kao-plan-check` PASS, `git diff --check` PASS.
 - Tam kapı: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO 82, app 78, panel 23, panel-v2 27, quran 9; reminders, driver, zikr, kontrast, çift şık, okunuş, plan ve pin senkronu PASS. Perf: içerik **184,591 KiB**, runtime **133,061 KiB**, CSS **15,877 KiB**, p95 **4,924 ms**, steady **3,154 ms**; yavaş-makine bayrağı göreli bandı atladı, mutlak bütçeler PASS. `tekrar-uret` bilgilendirme özeti **9/10**, tarihsel R-08 açık; 10/10 iddiası yok.
 - Durum: yerel yayın adayı hazır; Pages koşusu ve no-cache canlı parity kanıtı bekleniyor. Kişisel veri deposuna erişilmedi; uygulama tarayıcıda açılmadı; tag oluşturulmadı.
+
+## seq 72 · K3P-27 · KART (Dalga 5 sonu — yayın makbuzu ve program kapanışı)
+- Tarih: 2026-10-18
+- Commit: (bu commit)
+- Kaynak/yayın commit'i: `6c10693c` (`K3P-27: yayın pini — K3P canlıda`), `main` üzerine fast-forward; `origin/main` push başarılı.
+- Pages: run **39126116607**, head `6c10693c8e8fbed997f89bbfd41a0f5117953f4d`; validate **SUCCESS**, deploy **SUCCESS**. Site: https://mustafaras.github.io/s/.
+- Canlı kanıt (salt-okur): `Cache-Control: no-cache`, `Pragma: no-cache`, `cache: no-store` ve tek kullanımlık query ile 3 host dosyası (`index.html`, `sw.js`, `panel-v2.html`) + **61 sürümlü URL**. Toplam **64/64 HTTP 200 ve 64/64 yerel/canlı SHA-256 eşliği**. `SW_VERSION='20261018a'`.
+- Kapanış: `K3P-STATE.json` → `status=completed`, `nextPrompt=null`, `releaseApproval=APPROVED-2026-10-18`, 37/37 kart; `pinDeferral.files=[]`. `CURRENT-STATE.md`, `KAPANIS.md` ve README canlı kanıtla eşitlendi.
+- Kanıt düzeyi: source/headless + K3P-26 kontrollü sentetik görsel QA (474 görünüm) + canlı statik dosya eşliği. Cihaz kabulü, gerçek ekran okuyucu, L2 uzman incelemesi ve 230 kayıt incelemesi kullanıcı tarafında. `mustafaras/seyma-data` okunmadı/yazılmadı; uygulama gerçek tarayıcıda açılmadı; tag yok.
+- Sıradaki: —

@@ -1,9 +1,18 @@
-# K3P-26 · Son görsel QA, ölçüm ve kapanış
+# K3P · Program kapanışı (K3P-26 ölçüm + K3P-27 yayın)
 
 **Tarih:** 2026-10-18
-**Kart:** K3P-26 · **Dalga:** 5
-**Program durumu:** 36/37 kart; sıradaki K3P-27
-**Yayın onayı:** `releaseApproval=NOT_APPROVED`
+**Son kart:** K3P-27 · **Dalga:** 5
+**Program durumu:** 37/37 kart tamamlandı · `status=completed` · `nextPrompt=null`
+**Yayın onayı:** `releaseApproval=APPROVED-2026-10-18`
+
+## K3P-27 · canlı yayın makbuzu
+
+- **Yetki:** Kullanıcı “sıradaki adım dan devam et ve tümünü canlıya al” diyerek K3P-27 yayınını açıkça istedi.
+- **Pin:** `20261017a → 20261018a`. `git diff main --name-only` ile seçilen üretim varlıkları `app/core/quranLearn.js` ve `app/core/quranLearnViews.js`; ortak pin `index.html`, `panel-v2.html`, `sw.js` ve 12 testte toplam **15 dosya / 82 pin geçişi** olarak yükseltildi. `pinDeferral.files=[]`.
+- **Kaynak kapısı:** `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO 82, app 78, panel 23, panel-v2 27, quran 9; reminders, driver, zikr, kontrast, çift şık, okunuş, plan ve pin senkronu PASS. Perf: içerik 184,591 KiB · runtime 133,061 KiB · CSS 15,877 KiB · p95 4,924 ms · steady 3,154 ms. `tekrar-uret` 9/10; tarihsel R-08 araç-modeli kalemi açık, 10/10 iddiası yok.
+- **GitHub Pages:** release commit `6c10693c8e8fbed997f89bbfd41a0f5117953f4d`; run [39126116607](https://github.com/mustafaras/s/actions/runs/39126116607) — validate **SUCCESS**, deploy **SUCCESS**.
+- **Canlı kanıt:** `https://mustafaras.github.io/s/` üzerinde `Cache-Control: no-cache`, `Pragma: no-cache`, `cache: no-store` ve tek kullanımlık query ile 3 host dosyası + **61 sürümlü URL** çekildi. **64/64 HTTP 200; 64/64 yerel/canlı SHA-256 eşliği.** Pin `sw.js` içinde `SW_VERSION='20261018a'`.
+- **Kanıt düzeyi:** kaynak/headless + kontrollü sentetik görsel QA + canlı statik dosya eşliği. Fiziksel cihaz, gerçek ekran okuyucu, L2 uzman incelemesi ve 230 kayıt incelemesi kullanıcıda bekliyor.
 
 ## Kapsam ve sonuç
 
@@ -71,11 +80,11 @@ Perf ölçümleri: kart ölçümünde içerik 184,591 KiB · runtime 133,061 KiB
 
 ## H2–H9 · 14. ve 30. gün ölçüm takvimi
 
-Son canlı taban, 2026-10-17 tarihli `20261017a` pinidir. Buna göre 14. gün **2026-10-31**, 30. gün **2026-11-16**'dır. İlgili günlerde kullanıcının verdiği yedekle aşağıdaki salt-okur raporu çalıştır; canlı depoya erişme. `--kesim` her iki raporda da canlı taban tarihidir:
+Son canlı taban, 2026-10-18 tarihli `20261018a` pinidir. Buna göre 14. gün **2026-11-01**, 30. gün **2026-11-17**'dir. İlgili günlerde kullanıcının verdiği yedekle aşağıdaki salt-okur raporu çalıştır; canlı depoya erişme. `--kesim` her iki raporda da canlı taban tarihidir:
 
 ```bash
-node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> --kesim 2026-10-17 --bugun 2026-10-31
-node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> --kesim 2026-10-17 --bugun 2026-11-16
+node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> --kesim 2026-10-18 --bugun 2026-11-01
+node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> --kesim 2026-10-18 --bugun 2026-11-17
 ```
 
 | Hipotez | 14./30. gün bakılacak ölçü | Beklenen yön/eşik |
@@ -93,10 +102,10 @@ node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> 
 
 ## Açık sınırlar ve sonraki adım
 
-- Üç ölçü hedefinin altında/üstünde kalıyor: ders başına otomatik açık dokunuş 42/40, hedef ekranı 62/25 sözcük, açılıştan ilk göreve 3/2 dokunuş. Bunlar K3P-26 içinde davranış değişikliği yapılmadan kaydedildi. Yeni düzeltme K3P-27 kapsamı ve canlı yetkisiyle ele alınır.
+- Üç ölçü hedefinin altında/üstünde kalıyor: ders başına otomatik açık dokunuş 42/40, hedef ekranı 62/25 sözcük, açılıştan ilk göreve 3/2 dokunuş. Bunlar K3P-26 içinde davranış değişikliği yapılmadan kaydedildi; K3P-27 bunları değiştirmeden yayınladı. Herhangi bir yeni düzeltme için ayrı kapsam gerekir.
 - Toplam kelime görevlerinde tanıma oranı hedefi `%60`'ı aşar; karışık tekrar örneğinin `%48,94` sonucu ayrı bir ölçüdür.
 - `tekrar-uret.cjs` tarihsel R-08 ölçümü 9/10 kalır; 10/10 iddiası yoktur. `akis-olc` 2b'nin 45 sözcük eşiği hedef ekranı için bağlayıcı değildir.
 - Gerçek cihaz kabulü, gerçek ekran okuyucu turu, L2 okunuş uzmanı onayı ve 230 kayıt incelemesi kullanıcıda bekliyor. K3P-26 görseli cihaz kabulü sayılmaz.
-- `releaseApproval=NOT_APPROVED`; bu kartta push, merge, tag veya deploy yapılmadı. K3P-27'de ayrıca açık kullanıcı onayı gerekir.
+- K3P programı yerel/başsız, kontrollü sentetik görsel ve canlı statik dosya kanıtlarıyla kapandı. Cihaz, gerçek ekran okuyucu, L2 uzmanı ve 230 kayıt kabulü kullanıcıda kalır; bunlar bu yayının kanıt düzeyi değildir.
 
-**Sıradaki:** K3P-27 — `node kao3-premium/araclar/senkron.mjs --sonraki` ile al.
+**Program tamamlandı:** 37/37 kart; yeni K3P işi ayrı kapsam ister.

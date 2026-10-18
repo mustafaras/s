@@ -2,9 +2,9 @@
 
 KAO2 ve KAO2-FIX'ten sonra gelen tasarım ve kalite programı. Plan v3, 2026-10-10. v3, **öğrenme akışını** önceliğe aldı.
 
-- Kararların hepsi verildi (K-A…K-O).
-- Henüz hiçbir kart uygulanmadı.
-- Sıradaki prompt: **K3P-00**.
+- Kararların hepsi verildi (K-A…K-O); **37/37 kart 2026-10-18'de tamamlandı**.
+- `K3P-STATE.json`: `status=completed`, `nextPrompt=null`, `releaseApproval=APPROVED-2026-10-18`.
+- Canlı pin `20261018a`; Pages run [39126116607](https://github.com/mustafaras/s/actions/runs/39126116607) başarılı. `KAPANIS.md` canlı parity ve kullanıcıda kalan cihaz kabulü sınırlarını kaydeder.
 
 ## Nasıl ilerlenir: prompt'ları tek tek ver
 
@@ -89,7 +89,7 @@ Hepsi salt-okurdur ve ağsızdır; uygulamayı koşanlar `node:vm` içinde çal�
 ## Sınırlar
 
 - Çalışma yerel `kao3-premium` dalında yapılır.
-- Push, deploy ve tag için kullanıcının açık onayı gerekir (K3P-27).
+- K3P-27 canlı yayını 2026-10-18'de kullanıcı onayıyla tamamlandı; yeni yayın için yeni açık onay gerekir.
 - `mustafaras/seyma-data` deposuna yazılmaz; gerçek tarayıcı profili ve token kullanılmaz.
 - Görsel QA yalnız kullanıcı ekran görüntüsü isterse yapılır (K3P-00, K3P-26; CLAUDE.md kural 1).
 - Kanıt düzeyleri ayrı raporlanır: kaynak/headless · görsel QA · cihaz kabulü. Bu klasördeki her

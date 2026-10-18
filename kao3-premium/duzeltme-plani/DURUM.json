@@ -1,0 +1,690 @@
+{
+  "program": "K3PD",
+  "planVersion": 1,
+  "branch": "k3pd-denetim-duzeltmeleri",
+  "baselineHead": "d030610f7613fc2c4aaafc36297a34b0ffb9c3ec",
+  "status": "active",
+  "executionOrder": [
+    "K3PD-00",
+    "K3PD-01",
+    "K3PD-02",
+    "K3PD-03",
+    "K3PD-04",
+    "K3PD-05",
+    "K3PD-06",
+    "K3PD-07",
+    "K3PD-08",
+    "K3PD-09",
+    "K3PD-10",
+    "K3PD-11",
+    "K3PD-12",
+    "K3PD-13",
+    "K3PD-14",
+    "K3PD-15",
+    "K3PD-16",
+    "K3PD-17",
+    "K3PD-18",
+    "K3PD-19",
+    "K3PD-20",
+    "K3PD-21",
+    "K3PD-22",
+    "K3PD-23",
+    "K3PD-24",
+    "K3PD-25",
+    "K3PD-26",
+    "K3PD-27",
+    "K3PD-28",
+    "K3PD-29",
+    "K3PD-30",
+    "K3PD-31",
+    "K3PD-32",
+    "K3PD-33"
+  ],
+  "nextPrompt": "K3PD-01",
+  "cards": {
+    "K3PD-00": {
+      "id": "K3PD-00",
+      "status": "done",
+      "baseHead": "d030610f7613fc2c4aaafc36297a34b0ffb9c3ec",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/DENETLEYICI.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/araclar/durum.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-00/EVIDENCE.md",
+        "tests/kao/test_k3pd_control.js",
+        "tests/kao/README.md"
+      ],
+      "checks": [
+        {
+          "command": "~/.local/bin/jev-gate 'go apply'",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "checks": "gate completed; no output"
+          }
+        },
+        {
+          "command": "git branch --show-current && git rev-parse HEAD && git status --short --branch && git rev-list --left-right --count HEAD...origin/main",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "branchBefore": "main",
+            "head": "d030610f7613fc2c4aaafc36297a34b0ffb9c3ec",
+            "originMainAhead": 0,
+            "originMainBehind": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/araclar/senkron.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "legacyCards": "37/37",
+            "legacyNextPrompt": null
+          }
+        },
+        {
+          "command": "shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "threeProtectedHashesMatch": true
+          }
+        },
+        {
+          "command": "git switch -c k3pd-denetim-duzeltmeleri",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "branch": "k3pd-denetim-duzeltmeleri"
+          }
+        },
+        {
+          "command": "node --check kao3-premium/duzeltme-plani/araclar/durum.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "modes": 4,
+            "negativeCases": 33,
+            "sourceReadyExceptions": 2,
+            "syntheticPromptIds": 34
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_inventory.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "tests": 83,
+            "helpersAndFixtures": 4
+          }
+        },
+        {
+          "command": "node --check app.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check sync.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearn.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnFlow.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnViews.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/driver.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "environment": "synthetic Node/VM, no network",
+            "assertionsPassed": 35
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "environment": "synthetic Node/VM, no network",
+            "assertionsPassed": 95,
+            "assertionsFailed": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "cards": 34,
+            "statePromptLog": "aligned"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-00",
+            "authorizesWork": false
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --liste",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "promptIds": 34,
+            "activeCards": 1,
+            "todoCards": 33
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --prompt K3PD-00",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "selectedPromptOnly": true
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "git diff --cached --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0,
+            "stagedPaths": 9
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-00/EVIDENCE.md"
+      ],
+      "acceptanceDependencies": []
+    },
+    "K3PD-01": {
+      "id": "K3PD-01",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-02": {
+      "id": "K3PD-02",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-03": {
+      "id": "K3PD-03",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-04": {
+      "id": "K3PD-04",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-05": {
+      "id": "K3PD-05",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-06": {
+      "id": "K3PD-06",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-07": {
+      "id": "K3PD-07",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-08": {
+      "id": "K3PD-08",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-09": {
+      "id": "K3PD-09",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-10": {
+      "id": "K3PD-10",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-11": {
+      "id": "K3PD-11",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-12": {
+      "id": "K3PD-12",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-13": {
+      "id": "K3PD-13",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-14": {
+      "id": "K3PD-14",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-15": {
+      "id": "K3PD-15",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-16": {
+      "id": "K3PD-16",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-17": {
+      "id": "K3PD-17",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-18": {
+      "id": "K3PD-18",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-19": {
+      "id": "K3PD-19",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-20": {
+      "id": "K3PD-20",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-21": {
+      "id": "K3PD-21",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-22": {
+      "id": "K3PD-22",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-23": {
+      "id": "K3PD-23",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-24": {
+      "id": "K3PD-24",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-25": {
+      "id": "K3PD-25",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-26": {
+      "id": "K3PD-26",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-27": {
+      "id": "K3PD-27",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-28": {
+      "id": "K3PD-28",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-29": {
+      "id": "K3PD-29",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-30": {
+      "id": "K3PD-30",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-31": {
+      "id": "K3PD-31",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-32": {
+      "id": "K3PD-32",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    },
+    "K3PD-33": {
+      "id": "K3PD-33",
+      "status": "todo",
+      "baseHead": null,
+      "changedPaths": [],
+      "checks": [],
+      "auditVerdict": null,
+      "evidenceRefs": [],
+      "acceptanceDependencies": []
+    }
+  },
+  "decisions": {
+    "h4": {
+      "status": "pending",
+      "topic": "H4 ölçümü ve mevcut kalıcı alan sınırı",
+      "proposal": null,
+      "options": [],
+      "response": null,
+      "answeredAt": null,
+      "sourceRef": "PROMPTLAR.md §5; DENETLEYICI.md §§2.1–2.2; K3PD-02",
+      "scope": "Yalnız H4 ölçümü ve alan bazlı şema kararı; kullanıcı yanıtı gelmeden şema değiştirilmez."
+    },
+    "timeBudget": {
+      "status": "pending",
+      "topic": "Ders zaman bütçesinin imkânsız durumu",
+      "proposal": null,
+      "options": [],
+      "response": null,
+      "answeredAt": null,
+      "sourceRef": "PROMPTLAR.md §5; DENETLEYICI.md §§2.1–2.2; K3PD-04",
+      "scope": "Yalnız zaman bütçesi kararı; kullanıcı yanıtı gelmeden hedef/algoritma seçilmez."
+    },
+    "recognition": {
+      "status": "pending",
+      "topic": "Tanıma oranı payı, paydası ve hedefi",
+      "proposal": null,
+      "options": [],
+      "response": null,
+      "answeredAt": null,
+      "sourceRef": "PROMPTLAR.md §5; DENETLEYICI.md §§2.1–2.2; K3PD-24",
+      "scope": "Yalnız tanıma metriği kararı; kullanıcı yanıtı gelmeden hedef değişmez."
+    }
+  },
+  "releaseApproval": {
+    "status": "NOT_APPROVED",
+    "candidateSha": null,
+    "scope": [],
+    "response": null,
+    "approvedAt": null,
+    "sourceRef": "PROMPTLAR.md §2; DENETLEYICI.md §§1.1, 3.2, 9"
+  },
+  "pinDeferral": {
+    "branch": "k3pd-denetim-duzeltmeleri",
+    "until": "K3PD-32",
+    "files": [],
+    "mainExceptions": []
+  },
+  "externalGates": {
+    "device": {
+      "status": "pending",
+      "evidenceLevel": "none",
+      "owner": "user",
+      "agentVerified": false
+    },
+    "screenReader": {
+      "status": "pending",
+      "evidenceLevel": "none",
+      "owner": "user",
+      "agentVerified": false
+    },
+    "L2": {
+      "status": "pending",
+      "evidenceLevel": "none",
+      "owner": "user",
+      "agentVerified": false
+    },
+    "audio230": {
+      "status": "pending",
+      "evidenceLevel": "none",
+      "owner": "user",
+      "agentVerified": false
+    },
+    "study14": {
+      "status": "pending",
+      "evidenceLevel": "none",
+      "owner": "user",
+      "agentVerified": false
+    },
+    "study30": {
+      "status": "pending",
+      "evidenceLevel": "none",
+      "owner": "user",
+      "agentVerified": false
+    },
+    "remoteParity": {
+      "status": "pending",
+      "evidenceLevel": "none",
+      "owner": "agent",
+      "agentVerified": false
+    }
+  },
+  "legacyProgram": {
+    "program": "K3P",
+    "statePath": "kao3-premium/K3P-STATE.json",
+    "status": "completed",
+    "nextPrompt": null,
+    "releaseApproval": "APPROVED-2026-10-18",
+    "completedCards": 37,
+    "totalCards": 37
+  }
+}

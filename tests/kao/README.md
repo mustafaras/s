@@ -93,7 +93,7 @@ bu klasörde ikinci bir kök çözücü tutulmaz.
 | `test_k3p_23.js` | K3P-23 | Okuyucu senkron yaldız + "Kartlarıma ekle": çalan kelime (`aria-current`) altın halkayla (`outline:2px solid var(--quran-gold)`) **yalnız CSS** ile gösterilir ve her iki temada ölçülmüş ≥3:1 kontrast verir; **hareket azaltmada halka kalır, animasyon/geçiş kapanır** (M7); anlam balonunda **"Kartlarıma ekle"** düğmesi mevcut `App.kaoReader('add', index)` eylemini çağırır (yeni handler YOK, **45** sabit); kart `kaoLessonMarkIntro` ile **AYNI şemayı** (tek kurucu `kaoNewWordCard`: `state:'new'` + `introducedAt`, `reps:0`) yazar — yeni alan uydurulmaz; **idempotent** (iki kez eklemek tek kart, ikinci çağrı değişmez); lemma zaten kartlarındaysa düğme **"Kartlarında var"** ve devre dışı; **doğrulanmamış lemma** eklenemez; **okurken anlam açmak (`readerUnknown`) ekleme sayılmaz** — okuma işareti ders kartını ezmez, bilinçli ekleme ayrı yoldur |
 | `test_k3p_25.js` | K3P-25 | Mevcut kullanıcıya **hızlı geçiş seçimi** (K-C · "Varsayılanlar"): eski (legacy) kullanıcıya teklif yalnız **bir kez** gösterilir (`onboarding.k3pNoticeAt` damgası); gösterim ve "Böyle kalsın" **ayara dokunmaz** (`autoAdvance` false kalır — sessiz değişim yok); "Hızlı geçişi aç" MEVCUT `App.kaoToggleAutoAdvance`ı çağırır (yeni handler YOK, **45**); ayar zaten açıksa teklif hiç çizilmez ve damga yazılmaz, yeni kullanıcıda onboarding ezer; şema **geriye uyumlu** (yoksa `null`, normalize idempotent) ve panel özeti etkilenmez |
 
-K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşittir (82 test dosyası); `test_kao2_inventory.js` bunu zorlar. Yeni test aynı committe buraya eklenir.
+K2F-41 / D2F-08 tarihsel ölçümü 82 test dosyasıydı. Güncel `node tests/kao/test_kao2_inventory.js` ölçümü 83 test + 4 yardımcı/fixture gösterir; envanter kapısı güncel gerçek dosya listesini doğrular.
 
 ## Yardımcılar ve sabit veri
 
@@ -103,4 +103,11 @@ K2F-41 / D2F-08: `tests/kao/test_*.js` envanteri gerçek dosya listesine eşitti
 | `fixtures/fsrs-vectors.json` | FSRS referans vektörleri (`test_kao_fsrs.js`) |
 | `fixtures/qac-lemma-morph.json` | QAC'tan sayılmış lemma biçim tablosu (`test_kao2_lemma_morph.js`) |
 | `fixtures/kao2-perf-baseline.json` | KAO2-01 perf tabanı (`test_kao2_perf_budget.js` göreli bandı; 2026-10-09'da arşivden taşındı, değeri aynı) |
+
+## Ardıl K3PD kontrol düzlemi
+
+- `test_k3pd_control.js` — K3PD-00 `durum.mjs` CLI'si için ağsız sentetik repo
+  fixture'ı. 34 prompt kimliği, karar/kanıt/sıra sözleşmesi, `nextPrompt`,
+  legacy K3P kapanışı, exact branch/pin sınırı, log append-only davranışı ve
+  bozuk state/prompt durumlarında nonzero çıkışı gerçek child process ile sınar.
 

@@ -154,16 +154,18 @@ Bu ölçüler `araclar/` altındaki betiklerle gelir ve kapıya bağlanır (K3P-
 
 ## 7. Ölçüm tabanı (2026-10-10, headless)
 
-| Ölçü | Değer | Araç | K3P hedefi |
-| --- | --- | --- | --- |
-| Çift şıklı görev (yerleşik kullanıcı) | 631 / 1.127 (%56) | `cift-sik.cjs` | 0 |
-| Vasl hatalı lemma | 18 | `okunus-denetim.cjs` | 0 |
-| İdgâmsız örnek okunuş | 274 | `okunus-denetim.cjs` | 0 |
-| Ders başına dokunuş (otomatik geçiş kapalı / açık) | 69 / 39 | `dokunus-olc.cjs` | ≤ 40 (varsayılan) |
-| Tanıma görevi payı | %93 ((1.030 + 20) / 1.127); yalnız kelime görevleri %91 | `cift-sik.cjs` görev sayımı | ≤ %60 |
-| Bugün ekranındaki seçim sayısı | 13 düğme | `ekran-dok.cjs` | ≤ 5 |
-| `App.kao*` handler sayısı | 45 | `grep` | 45 (değişmez) |
-| Çalışma zamanı boyutu | 118,1 / 128 KiB (2026-10-10 ölçümü; eski belgelerde 92,4) | `test_kao2_perf_budget` | ≤ 128 KiB (yazı tipi ayrı, ≤ 150 KiB) |
+| Ölçü | Değer | Araç | K3P hedefi | Sonra (2026-10-18) |
+| --- | --- | --- | --- | --- |
+| Çift şıklı görev (yerleşik kullanıcı) | 631 / 1.127 (%56) | `cift-sik.cjs` | 0 | **0/1.127 yerleşik; 0/1.087 yeni — PASS** |
+| Vasl hatalı lemma | 18 | `okunus-denetim.cjs` | 0 | **0 — PASS** |
+| İdgâmsız örnek okunuş | 274 | `okunus-denetim.cjs` | 0 | **0 — PASS** |
+| Ders başına dokunuş (otomatik geçiş kapalı / açık) | 69 / 39 | `dokunus-olc.cjs` | ≤ 40 (varsayılan) | **72 / 42; açık durum 40 hedefini 2 aşıyor** |
+| Tanıma görevi payı | %93 ((1.030 + 20) / 1.127); yalnız kelime görevleri %91 | `cift-sik.cjs` görev sayımı | ≤ %60 | **Yeni %92,92; yerleşik %91,57 — genel hedef karşılanmadı. Karışık tekrar örneği ayrıca %48,94 (1.324 görev), PASS.** |
+| Bugün ekranındaki seçim sayısı | 13 düğme | `ekran-dok.cjs` | ≤ 5 | **5 ekran seçeneği; 6 toplam düğme (kapat dâhil) — PASS** |
+| `App.kao*` handler sayısı | 45 | `grep` | 45 (değişmez) | **45 — PASS** |
+| Çalışma zamanı boyutu | 118,1 / 128 KiB (2026-10-10 ölçümü; eski belgelerde 92,4) | `test_kao2_perf_budget` | ≤ 128 KiB (yazı tipi ayrı, ≤ 150 KiB) | **133,061 KiB L6; ilk 128 KiB hedefinin üstünde, K3P-18'de onaylanan 136 KiB tavanının altında. Yazı tipi: 1 WOFF2 dosyası, ölçü hedef altında.** |
+
+Tanıma payındaki karışık tekrar örneği, yeni/yerleşik kullanıcıların toplam kelime görevlerinden ayrı bir R1/R2/R3/R4 dağılımıdır; ölçüler birleştirilmemiştir.
 
 ## 8. Akış bulguları (özet; ayrıntı [AKIS.md](AKIS.md))
 

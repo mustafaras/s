@@ -5,7 +5,7 @@
   "planVersion": 3,
   "status": "in-progress",
   "branch": "kao3-premium",
-  "nextPrompt": "K3P-26",
+  "nextPrompt": "K3P-27",
   "executionOrder": [
     "K3P-00",
     "K3P-01",
@@ -445,8 +445,11 @@
     {
       "id": "K3P-26",
       "wave": 5,
-      "status": "todo",
-      "gate": "screenshots (prompt verilmesi = açık istek)"
+      "status": "done",
+      "doneAt": "2026-10-18",
+      "result": "Son görsel QA: 320/390/460 px × açık/koyu, 474 sentetik ekran; yatay sayfa taşması ve istenmeyen kırpılma yok, 15 bilgi amaçlı kaydırmalı alan. ANALIZ §7 ve AKIS §6 önce/sonra ölçümleri ile KAPANIS.md yazıldı. 3 hedef sapması açıkça kaydedildi: otomatik geçiş açıkken 42/40 dokunuş, hedef ekranı 62/25 sözcük, açılıştan ilk göreve 3/2 dokunuş; toplam kelime görevlerinde tanıma payı %60 hedefini aşıyor. Üretim JS/CSS, data, migrate() ve App.kao* değişmedi.",
+      "gate": "kapi-hizli --kart K3P-26: exit 0, HIZLI KAPI YEŞİL; KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh: exit 0, TÜM KAPILAR YEŞİL",
+      "evidence": "source+headless+controlled-local-visual; kao3-premium/KAPANIS.md; kao3-premium/kanit/sonraki/"
     },
     {
       "id": "K3P-27",

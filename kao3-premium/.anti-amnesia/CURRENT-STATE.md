@@ -1,72 +1,28 @@
 # K3P · CURRENT-STATE
 
-Sıradaki prompt: K3P-26
+Sıradaki prompt: K3P-27
 
 ## Son durum
 
-- **Tarih:** 2026-10-17.
-- **Son tamamlanan:** **K3P-25 — Mevcut kullanıcıya hızlı geçiş seçimi (K-C "Varsayılanlar"; Dalga 4 sonu).** 35/37 kart bitti.
-- **Yetki:** kullanıcı K3P-25'i "tam ve kusursuz" uygulamamı istedi; kartın zorunlu **karar noktasında** kullanıcı
-  **(a) yolunu** seçti (yeni `onboarding.k3pNoticeAt` alanı) ve CSS payı yetmezse **eski/öksüz kuralı silip pay açma** yetkisi verdi.
-- **Kanıt:** kaynak/headless ve sentetik veri. Tarayıcı, gerçek hesap, kişisel veri deposu, görsel QA veya cihaz kabulü yok.
+- **Tarih:** 2026-10-18.
+- **Son tamamlanan:** **K3P-26 — Son görsel QA, ölçüm ve kapanış** (Dalga 5). Durum **36/37 kart tamam**; K3P-27 sıradadır.
+- **Yetki sınırı:** Bu oturum K3P-26 ile sınırlıydı. K3P-26 prompt'u kontrollü yerel görsel QA'ya açık izin verdi; K3P-27, yayın, pin değişikliği veya cihaz kabulü yetkisi vermez.
+- **Yayın durumu:** `releaseApproval=NOT_APPROVED`. Push, merge, tag ve deploy yapılmadı. `pinDeferral.files` K3P-27'ye kadar `app/core/quranLearn.js` ve `app/core/quranLearnViews.js` olarak kalır.
 
-## K3P-25 ne yaptı
+## K3P-26 sonucu
 
-- **Karar noktası (kart zorunlu kıldı):** kullanıcıya iki yol sunuldu; **(a) seçildi** — teklifin bir kez gösterildiği
-  `onboarding.k3pNoticeAt` alanı geriye uyumlu biçimde eklendi. (Kod incelendiğinde `whatsNewAt`'in zaten bir "bir kez" damgası
-  olduğu görüldü; kullanıcı yine de kartın yazdığı (a) yolunu tercih etti.)
-- **Teklif bir kez:** eski (legacy) kullanıcıda, `doneAt` dolu + `autoAdvance !== true` + damga yoksa Bugün ekranında
-  `KAO_AUTO_ADVANCE_OFFER` gösterilir ve damga yazılır. İkinci açılışta bir daha **gösterilmez**.
-- **Ayar sessizce değişmez (K-C/özerklik):** teklifin **gösterimi** de, **"Böyle kalsın"** da `autoAdvance`'a **dokunmaz**.
-  Ayar yalnız **açık rızayla** değişir.
-- **Açık rıza mevcut handler'la:** "Hızlı geçişi aç" düğmesi **doğrudan** `App.kaoToggleAutoAdvance` çağırır
-  (`actionCall` args'sız eylemi zaten destekliyor) → **yeni `App.kao*` YOK (45 sabit)**. Kapatma eylemi
-  `App.kaoOnboard('auto-advance-offer-close')` mevcut çoğaltıcıya eklenen yeni eylemdir.
-  **Denetimde bulunan gerçek kusur düzeltildi (LEDGER seq 68):** handler ayarı çevirdikten sonra teklif bayrağını
-  **temizler** ve `noticeModel` ayar açıkken teklifi **hiç çizmez** (yapısal güvence); böylece "Aç"a basınca teklif
-  ekrandan kalkar, ikinci dokunuş kazancı geri alamaz.
-- **Mevcut davranış korundu:** `KAO_WHATS_NEW` notu ve `whatsNewAt` yolu **aynen** duruyor; hızlı geçiş teklifi yalnız
-  ayar kapalıyken ve not çakışmadığında çizilir (`noticeModel` öncelik sırası). Ayar açıkken teklif **hiç çizilmez** ve
-  damga **yazılmaz**.
-- **Bileşen:** `notice(options)` artık isteğe bağlı **ikinci eylem** destekliyor (`options.secondary`), mevcut
-  `.kao-notice-close` sınıfı kullanılır → **yeni CSS kuralı eklenmedi** (`app/kao.css` hiç değişmedi).
-- **Şema:** `normalizeOnboarding` içinde tek satır: `o.k3pNoticeAt=isoOrNull(o.k3pNoticeAt)` (yoksa `null`, bozuksa `null`,
-  geçerliyse korunur, idempotent). `data` şeması ve `migrate()` değişmedi (I1–I6).
-- **Test:** yeni `test_k3p_25` (**8 kontrol**); `test_kao2_migration` **14 → 15 kontrol** (K3P-25 eki: alan yokken `null`,
-  normalize idempotent, bozuk tip `null`). Envanter **81 → 82**.
-- **FROZEN ŞEMA fixture'ı buldu (gerçek kırmızı):** `tests/kao/test_kao_migration.js` normalize edilmiş `onboarding`'in
-  **tam** alan kümesini sabitliyordu; yeni alan eklendiğinde iki yerde `k3pNoticeAt: null` beklenmesi gerekti (kapı yakaladı,
-  fixture güncellendi — geriye uyumluluk burada kanıtlanıyor).
+- **Görsel QA:** Guard 1 testi 10/10 PASS. `shoot-modal.mjs` ile 320/390/460 px × açık/koyu ölçülerinde 6 ayrı boş profil kullanıldı; toplam **474 sentetik ekran**. Her görünümde `overflowX=false`. Tarama **15 bilgi amaçlı yatay kaydırma alanı** buldu (6 sûre seçicisi, 2 gramer tablosu, 7 ders tablosu); istenmeyen taşma/kırpılma yok. Kayıtlar ve altı kontakta değerlendirilir: [`KAPANIS.md`](../KAPANIS.md) ve [`kanit/sonraki/`](../kanit/sonraki/).
+- **Ölçüm:** Çift şık 0; vasl/idgâm hatası 0; `App.kao*` 45. Otomatik geçiş açıkken dokunuş 42 (hedef ≤40); hedef ekranı 62 sözcük (AKIS §3 ① hedefi ≤25); açılıştan ilk göreve 3 dokunuş (hedef ≤2). Toplam kelime görevlerinde tanıma payı yeni kullanıcıda %92,92, yerleşik kullanıcıda %91,57 (hedef ≤%60 değil); karışık tekrar örneği ayrı olarak %48,94.
+- **Perf:** İçerik 184,591 KiB, runtime L6 133,061 KiB, CSS L9 15,877 KiB; K3P-18'de onaylanan 136 KiB runtime tavanı ve güncel 16 KiB CSS tavanı içinde. Tam kapı perf koşusu p95 20,099 ms / steady 6,770 ms; `KAO2_ACCEPT_SLOW_HOST=1` göreli p95 kıyasını atladı, mutlak bütçeler PASS.
+- **Tam kapı:** `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` → **exit 0, TÜM KAPILAR YEŞİL**. KAO 82, app 78, panel 23, panel-v2 27, quran 9; reminders, run-seyma driver/zikr, kontrast, çift şık, okunuş, plan ve pin senkronu PASS. `tekrar-uret.cjs` bilgilendirme özeti 9/10'dur; tarihsel R-08 araç-modeli bulgusu kalır, 10/10 iddiası yoktur. `kapi-hizli --kart K3P-26` da exit 0 / HIZLI KAPI YEŞİL.
+- **Kapsam:** Üretim JS/CSS, `data`, `migrate()` ve `App.kao*` yüzeyi değiştirilmedi. Önce/sonra tabloları [`ANALIZ.md`](../ANALIZ.md) §7 ve [`AKIS.md`](../AKIS.md) §6'da; ayrıntılı sonuçlar ve hipotez takvimi [`KAPANIS.md`](../KAPANIS.md)'te.
 
-## Ölçü panosu
+## Açık sınırlar
 
-| Ölçü | Şimdi | Tavan/hedef |
-| --- | --- | --- |
-| Runtime gzip L9 (bağlayıcı) | **133,061 KiB** | 136 KiB; kalan ~3,1 KB |
-| **CSS gzip L9** | **15,877 KiB** (değişmedi) | 16 KiB; kalan **126 B** — **kritik** |
-| İçerik | 184,591 KiB | 256 KiB |
-| App.kao* | 45 | 45 |
-| KAO fixture envanteri | 82 | 82 PASS · `test_k3p_25` 9 kontrol |
+- Gerçek cihaz kabulü, gerçek ekran okuyucu turu, L2 okunuş uzmanı incelemesi ve 230 kayıt incelemesi hâlâ kullanıcı tarafında. Yerel QA bunların yerine geçmez.
+- H2–H9'un 14./30. gün ölçümleri KAPANIS.md'de; canlı temel pin `20261017a`, kesim tarihi 2026-10-17.
+- `releaseApproval=NOT_APPROVED`. K3P-27'nin kartındaki yayın kapısı ayrıca açık kullanıcı onayı ister.
 
-## Kapılar ve açık sınırlar
+## Devir
 
-- `test_k3p_25`, `test_kao2_migration`, `test_kao2_onboarding`, `test_kao2_inventory`, `test_kao2_reader`,
-  `test_kao2_progress`, `test_kao2_design_contract` → **PASS**. Perf bütçesi **PASS** (css 15,877 · runtime 132,867).
-- **CSS bütçesi kritik:** kalan pay 126 B. Bu kart CSS'e **hiç dokunmadı**; sonraki CSS kartı §5 gereği ya eşdeğer eski
-  kuralı silmeli ya da durup tavan kararını sormalıdır.
-- `pinDeferral.files` = `app/core/quranLearn.js`, `app/core/quranLearnViews.js` (K-P). Ara yayın pinini **31511716**
-  koymuştu; bu kart iki varlığı değiştirdiği için tazelik kapısı bunları **beyan gerektirdi** (kapı buldu, beyan edildi).
-- **Açık:** görsel QA (`KAO_QA_CHROME`), ekran okuyucu turu, dokunmatik cihaz kabulü ve Tezhip denetimi **K3P-26**'da kullanıcıda.
-- **Açık sınır (kartla ilgisiz):** `tekrar-uret.cjs` özeti **9/10**; düşen **R-08** tarihsel araç modelidir (eski
-  `apply.words/sentences`), güncel denetim R-08 ve âyet fixture'ı PASS. Kapı bu yüzden yeşil kaldı.
-
-## Devir notu
-
-K3P-25 uygulandı; Dalga 4 kapandı. Sıradaki kart **K3P-26**.
-
-**K3P-26 için hazır devir belgesi var:** [`DEVIR-K3P-26-CODEX-LUNA.md`](../DEVIR-K3P-26-CODEX-LUNA.md).
-Yeni oturum onu okumalı; **bağlayıcı olan hâlâ `BAGLAM-YONETIMI.md` §1–§6** (çelişkide BAGLAM kazanır).
-`senkron` UYUMLU, `nextPrompt: K3P-26`, kart durumu `todo` (devir kartı kapatmaz).
-
-Push/merge/tag/deploy yok; yalnız K3P-27'de açık onayla.
-Kişisel veri/gerçek hesap tarayıcısı açma; `mustafaras/seyma-data` kapsam dışıdır.
+K3P-26 kapanış kaydı LEDGER seq 70'tedir. K3P-27 için sıradaki prompt'u `node kao3-premium/araclar/senkron.mjs --sonraki` ile oku; yeni kartın authority ve yayın sınırlarını tekrar uygula.

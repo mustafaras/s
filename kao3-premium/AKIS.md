@@ -117,39 +117,39 @@ içinde çalışır; böylece iki sistem çakışmaz.
 
 ## 6. Ölçülebilir hedefler
 
-| Ölçü | Bugün | Hedef | Araç |
-| --- | --- | --- | --- |
-| Art arda en uzun edilgin ekran dizisi | 6 | ≤ 1 | `akis-olc` |
-| Edilgin bir ekrandaki en çok sözcük (zirve hariç) | 68 | ≤ 45 | `akis-olc` |
-| İlk yeni içeriğe kadar dokunuş | 21 | ≤ 7 | `akis-olc` |
-| Doğru cevaptan sonra "Devam" basışı | 30 | 0 | `dokunus-olc` |
-| 2 yanlıştan sonra soru kolaylaşıyor mu | Hayır | Evet | `akis-olc` |
-| Yeniden yüklemeden sonra devam ipucu | Yok | "Kaldığın yerden · n/N" | `akis-olc` |
-| Oturum içi başarı bandı (cihazda) | Ölçülmedi | Oturumların ≥ %70'inde %80–90 | `deney-rapor` |
-| Açılıştan ilk göreve dokunuş | 2 | ≤ 2 | `akis-olc` |
-| Ders başına overlay yeniden kurulumu | 7 (+ arka plan render'ları) | 0 (yalnız açılışta) | Harness `calls.mount` sayımı |
-| Ders sırasında KAO üstüne binen toast | Mümkün (z 10000 > 380) | 0 (ertelenir) | Headless DOM sayımı |
+| Ölçü | Bugün | Hedef | Araç | Sonra (2026-10-18) |
+| --- | --- | --- | --- | --- |
+| Art arda en uzun edilgin ekran dizisi | 6 | ≤ 1 | `akis-olc` | **1 — PASS** |
+| Edilgin bir ekrandaki en çok sözcük (zirve hariç) | 68 | ≤ 45 | `akis-olc` | **Hedef ekranı 62; AKIS §3 ① gerçek sınırı ≤25, karşılanmadı. İlk açılış 41 sözcük ve ≤45 sayımı kullanan eski araç hedefiyle karıştırılmamalı.** |
+| İlk yeni içeriğe kadar dokunuş | 21 | ≤ 7 | `akis-olc` | **7 — PASS** |
+| Doğru cevaptan sonra "Devam" basışı | 30 | 0 | `dokunus-olc` | **Otomatik geçiş açık 0; kapalı 30 — varsayılan açık hedefi PASS** |
+| 2 yanlıştan sonra soru kolaylaşıyor mu | Hayır | Evet | `akis-olc` | **Evet; 2 yanlışta 2 şık, doğru yanıttan sonra 4'e döndü — PASS** |
+| Yeniden yüklemeden sonra devam ipucu | Yok | "Kaldığın yerden · n/N" | `akis-olc` | **Aynı görev yeniden kuruldu ve Bugün devam durumu gösterdi — PASS** |
+| Oturum içi başarı bandı (cihazda) | Ölçülmedi | Oturumların ≥ %70'inde %80–90 | `deney-rapor` | **Cihaz/gerçek oturum ölçümü yok; `--ornek` yalnız sentetik araç kontrolüdür.** |
+| Açılıştan ilk göreve dokunuş | 2 | ≤ 2 | `akis-olc` | **3 — hedef karşılanmadı; A-3 kullanıcı kararına açık kaldı.** |
+| Ders başına overlay yeniden kurulumu | 7 (+ arka plan render'ları) | 0 (yalnız açılışta) | Harness `calls.mount` sayımı | **0; `test_k3p_mount` PASS** |
+| Ders sırasında KAO üstüne binen toast | Mümkün (z 10000 > 380) | 0 (ertelenir) | Headless DOM sayımı | **0; `test_k3p_focus_lock` PASS** |
 
 ### 6b. Dalga A sonu — yeniden ölçüm (2026-10-12, K3P-A8)
 
-| Ölçü | Dalga A öncesi | Dalga A sonu | Hedef | Araç |
-| --- | --- | --- | --- | --- |
-| Art arda en uzun edilgin ekran dizisi | 6 | **1** | ≤ 1 | `akis-olc` |
-| Edilgin bir ekrandaki en çok sözcük — ilk görünüm (zirve hariç) | 68 | **41** (hedef · u10.01) | ≤ 45 | `akis-olc` |
-| … tanış ekranı (499 ekran) | 78 | **33** (u06.29) | ≤ 45 | `akis-olc` |
-| … kavram ekranı (25 ekran) | 139 | **24** (u03.01) | ≤ 45 | `akis-olc` |
-| Edilgin ekran bütçesini aşan ekran | 7/… | **0/633** | 0 | `akis-olc` |
-| İlk yeni içeriğe kadar dokunuş | 21 | **7** | ≤ 7 | `akis-olc` |
-| Doğru cevaptan sonra "Devam" basışı (otomatik geçiş açık/kapalı) | 30 | 30 → **0** (açık) / 30 (kapalı) | 0 | `dokunus-olc` |
-| 2 yanlıştan sonra soru kolaylaşıyor mu | Hayır | **Evet** (4→3→2 şık) | Evet | `akis-olc` |
-| Yeniden yüklemeden sonra devam ipucu | Yok | **"Kaldığın yerden · Bölüm n/5"** | "Kaldığın yerden · n/N" | `akis-olc` |
-| Açılıştan ilk göreve dokunuş | 2 | 3 | ≤ 2 | `akis-olc` |
-| Ders başına overlay yeniden kurulumu | 7 (+ arka plan render'ları) | **0** | 0 (yalnız açılışta) | `test_k3p_mount` |
-| Ders sırasında KAO üstüne binen toast | Mümkün | **0** (ertelenir) | 0 | `test_k3p_focus_lock` |
-| Ders başına dokunuş (varsayılan açık) | 69 | **39** | ≤ 40 | `dokunus-olc` |
-| Oturum süresi | aşılabiliyordu | **≤ seçilen** | ≤ seçilen | `test_k3p_budget` |
-| Çalışma zamanı (gzip) | 119,093 KiB | **127,654 KiB** | ≤ 128 KiB | `test_kao2_perf_budget` |
-| CSS (gzip) | 13,072 KiB | **13,190 KiB** | ≤ 14 KiB | `test_kao2_perf_budget` |
+| Ölçü | Dalga A öncesi | Dalga A sonu | Hedef | Araç | Sonra (2026-10-18) |
+| --- | --- | --- | --- | --- | --- |
+| Art arda en uzun edilgin ekran dizisi | 6 | **1** | ≤ 1 | `akis-olc` | **1 — PASS** |
+| Edilgin bir ekrandaki en çok sözcük — ilk görünüm (zirve hariç) | 68 | **41** (hedef · u10.01) | ≤ 45 | `akis-olc` | **62 sözcük hedef ekranı; gerçek AKIS §3 ① sınırı ≤25, karşılanmadı. Eski aracın 45 sözcük sayımı bağlayıcı ekran hedefi değildir.** |
+| … tanış ekranı (499 ekran) | 78 | **33** (u06.29) | ≤ 45 | `akis-olc` | **33; >45 ekran 0 — PASS** |
+| … kavram ekranı (25 ekran) | 139 | **24** (u03.01) | ≤ 45 | `akis-olc` | **24; >45 ekran 0 — PASS** |
+| Edilgin ekran bütçesini aşan ekran | 7/… | **0/633** | 0 | `akis-olc` | **Araç eşiği >45: hedef 80/109; gerçek ≤25 sözcük eşiğini aşan toplam ayrıca sayılmıyor. Hedef ekranın 62 olması ihlali doğruluyor.** |
+| İlk yeni içeriğe kadar dokunuş | 21 | **7** | ≤ 7 | `akis-olc` | **7 — PASS** |
+| Doğru cevaptan sonra "Devam" basışı (otomatik geçiş açık/kapalı) | 30 | 30 → **0** (açık) / 30 (kapalı) | 0 | `dokunus-olc` | **0 (açık) / 30 (kapalı) — PASS, açık varsayılan** |
+| 2 yanlıştan sonra soru kolaylaşıyor mu | Hayır | **Evet** (4→3→2 şık) | Evet | `akis-olc` | **Evet (2 yanlışta 2 şık; başarıdan sonra 4 şık) — PASS** |
+| Yeniden yüklemeden sonra devam ipucu | Yok | **"Kaldığın yerden · Bölüm n/5"** | "Kaldığın yerden · n/N" | `akis-olc` | **Aynı görev geri yüklendi; Bugün devam ipucu gösterdi — PASS** |
+| Açılıştan ilk göreve dokunuş | 2 | 3 | ≤ 2 | `akis-olc` | **3 — hedef karşılanmadı; A-3 kullanıcı kararına açık.** |
+| Ders başına overlay yeniden kurulumu | 7 (+ arka plan render'ları) | **0** | 0 (yalnız açılışta) | `test_k3p_mount` | **0 — PASS (17 render, 8 aşama, 16 geçiş)** |
+| Ders sırasında KAO üstüne binen toast | Mümkün | **0** (ertelenir) | 0 | `test_k3p_focus_lock` | **0 — PASS** |
+| Ders başına dokunuş (varsayılan açık) | 69 | **39** | ≤ 40 | `dokunus-olc` | **42 (kapalı 72) — açık varsayılan hedefi 2 dokunuş aşıyor.** |
+| Oturum süresi | aşılabiliyordu | **≤ seçilen** | ≤ seçilen | `test_k3p_budget` | **Fixture PASS** |
+| Çalışma zamanı (gzip) | 119,093 KiB | **127,654 KiB** | ≤ 128 KiB | `test_kao2_perf_budget` | **133,061 KiB; ilk 128 KiB hedefinin üstünde, onaylı 136 KiB tavanının altında.** |
+| CSS (gzip) | 13,072 KiB | **13,190 KiB** | ≤ 14 KiB | `test_kao2_perf_budget` | **15,877 KiB; eski 14 KiB hedefinin üstünde, güncel 16 KiB tavanının altında.** |
 
 **Açık kalan (A-3, kullanıcı kararı):** açılış → ilk görev 3 dokunuş; hedef ≤ 2. Bu iki sayı arasındaki
 fark kullanıcı kararına bırakıldı (K3P-A3'ten beri açık).

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>K3P-00 → K3P-26 görsel karşılaştırma</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #111827; color: #f3f4f6; }
+    body { margin: 0; padding: 24px; }
+    h1, h2, p { max-width: 72rem; margin-inline: auto; }
+    h1 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+    p { color: #cbd5e1; line-height: 1.55; }
+    section { max-width: 96rem; margin: 32px auto; }
+    .pair, .widths { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    figure { margin: 0; min-width: 0; padding: 12px; border: 1px solid #334155; border-radius: 12px; background: #1e293b; }
+    figcaption { margin: 0 0 10px; color: #e2e8f0; font-weight: 650; }
+    img { display: block; width: 100%; height: auto; background: #f8fafc; }
+    a { color: #bfdbfe; }
+    @media (max-width: 760px) { body { padding: 14px; } .pair, .widths { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <h1>K3P-00 → K3P-26 · görsel karşılaştırma</h1>
+  <p>K3P-00 başlangıç kontakları 390 px genişlikte 58 görünüm içeriyor. K3P-26 aynı 390 px genişliğinde 79 görünüm aldı. 320 px ve 460 px sayfaları K3P-26 ek QA ölçüleridir; K3P-00 için aynı genişliklerde karşılık gelen kontak bulunmuyor.</p>
+
+  <section aria-labelledby="light-title">
+    <h2 id="light-title">Açık tema · 390 px · yan yana</h2>
+    <div class="pair">
+      <figure>
+        <figcaption>K3P-00 · başlangıç · 58 görünüm</figcaption>
+        <a href="../onceki/kontak-acik.jpg"><img src="../onceki/kontak-acik.jpg" alt="K3P-00 açık tema, 390 px, başlangıç kontak sayfası"></a>
+      </figure>
+      <figure>
+        <figcaption>K3P-26 · son QA · 79 görünüm</figcaption>
+        <a href="kontak-acik-390.jpg"><img src="kontak-acik-390.jpg" alt="K3P-26 açık tema, 390 px, son QA kontak sayfası"></a>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="dark-title">
+    <h2 id="dark-title">Koyu tema · 390 px · yan yana</h2>
+    <div class="pair">
+      <figure>
+        <figcaption>K3P-00 · başlangıç · 58 görünüm</figcaption>
+        <a href="../onceki/kontak-koyu.jpg"><img src="../onceki/kontak-koyu.jpg" alt="K3P-00 koyu tema, 390 px, başlangıç kontak sayfası"></a>
+      </figure>
+      <figure>
+        <figcaption>K3P-26 · son QA · 79 görünüm</figcaption>
+        <a href="kontak-koyu-390.jpg"><img src="kontak-koyu-390.jpg" alt="K3P-26 koyu tema, 390 px, son QA kontak sayfası"></a>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="extra-title">
+    <h2 id="extra-title">K3P-26 ek genişlik kontrolleri</h2>
+    <div class="widths">
+      <figure><figcaption>Açık tema · 320 px</figcaption><a href="kontak-acik-320.jpg"><img src="kontak-acik-320.jpg" alt="K3P-26 açık tema, 320 px kontak sayfası"></a></figure>
+      <figure><figcaption>Koyu tema · 320 px</figcaption><a href="kontak-koyu-320.jpg"><img src="kontak-koyu-320.jpg" alt="K3P-26 koyu tema, 320 px kontak sayfası"></a></figure>
+      <figure><figcaption>Açık tema · 460 px</figcaption><a href="kontak-acik-460.jpg"><img src="kontak-acik-460.jpg" alt="K3P-26 açık tema, 460 px kontak sayfası"></a></figure>
+      <figure><figcaption>Koyu tema · 460 px</figcaption><a href="kontak-koyu-460.jpg"><img src="kontak-koyu-460.jpg" alt="K3P-26 koyu tema, 460 px kontak sayfası"></a></figure>
+    </div>
+  </section>
+</body>
+</html>

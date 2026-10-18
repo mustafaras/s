@@ -1009,3 +1009,12 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/headless + kontrollü yerel sentetik görsel QA. Cihaz, gerçek ekran okuyucu, L2 uzmanı ve 230 kayıt incelemesi bekliyor. Son canlı pin temel alınarak 14. gün 2026-10-31, 30. gün 2026-11-16; yedek/veri sınırı `KAPANIS.md`'de.
 - Sınır: `releaseApproval=NOT_APPROVED`; `pinDeferral.files` aynen kaldı. Push/merge/tag/deploy ve kişisel veri/gerçek hesap işlemi yok. K3P-27 ayrıca yetki gerektirir.
 - Sıradaki: K3P-27
+
+## seq 71 · K3P-27 · YAYIN HAZIRLIĞI
+- Tarih: 2026-10-18
+- Commit: (bu commit)
+- Yetki: kullanıcı “sıradaki adım dan devam et ve tümünü canlıya al” diyerek K3P-27 yayınını açıkça istedi. `releaseApproval=APPROVED-2026-10-18`.
+- Pin aracı: mevcut `kao3-premium/araclar/pin-yukselt.mjs` incelendi; `20261018a --dene` önizlemesi ve uygulama koşusu tamamlandı. `git diff main --name-only` içindeki değişen üretim varlıkları `app/core/quranLearn.js` ve `app/core/quranLearnViews.js`; ortak pin `20261017a → 20261018a`. `index.html`, `panel-v2.html`, `sw.js` ve 12 testi içeren toplam **15 dosyada 82 pin geçişi** yapıldı. `K3P-STATE.json → pinDeferral.files=[]`.
+- Doğrulama: `tests/app/test_asset_pin_freshness.js` **61/61 taze**, `tests/app/test_iip_22.js` **13/13**, `senkron` UYUMLU, `kao-plan-check` PASS, `git diff --check` PASS.
+- Tam kapı: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL**. KAO 82, app 78, panel 23, panel-v2 27, quran 9; reminders, driver, zikr, kontrast, çift şık, okunuş, plan ve pin senkronu PASS. Perf: içerik **184,591 KiB**, runtime **133,061 KiB**, CSS **15,877 KiB**, p95 **4,924 ms**, steady **3,154 ms**; yavaş-makine bayrağı göreli bandı atladı, mutlak bütçeler PASS. `tekrar-uret` bilgilendirme özeti **9/10**, tarihsel R-08 açık; 10/10 iddiası yok.
+- Durum: yerel yayın adayı hazır; Pages koşusu ve no-cache canlı parity kanıtı bekleniyor. Kişisel veri deposuna erişilmedi; uygulama tarayıcıda açılmadı; tag oluşturulmadı.

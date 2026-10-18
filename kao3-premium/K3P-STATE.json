@@ -54,7 +54,7 @@
     "K3P-25",
     "K3P-27"
   ],
-  "releaseApproval": "NOT_APPROVED",
+  "releaseApproval": "APPROVED-2026-10-18",
   "interimRelease": {
     "scope": "K3P-23 + K3P-24",
     "approvedAt": "2026-10-17",
@@ -454,16 +454,14 @@
     {
       "id": "K3P-27",
       "wave": 5,
-      "status": "todo",
-      "gate": "release (prompt içinde ayrıca açık onay sorulur)"
+      "status": "in-progress",
+      "gate": "release: kullanıcı açıkça yetkilendirdi; Pages koşusu ve canlı pin doğrulaması bekleniyor",
+      "result": "Pin 20261017a→20261018a; değişen varlıklar quranLearn.js + quranLearnViews.js. Ortak pin 15 dosyada / 82 geçişte güncellendi; pinDeferral.files boş. Pin tazeliği 61/61, IIP-22 13/13, tam kapı exit 0. Yayın yetkisi kullanıcıdan 2026-10-18; Pages/canlı kanıtı tamamlanınca program kapanacak."
     }
   ],
   "pinDeferral": {
     "branch": "kao3-premium",
     "until": "K3P-27",
-    "files": [
-      "app/core/quranLearn.js",
-      "app/core/quranLearnViews.js"
-    ]
+    "files": []
   }
 }

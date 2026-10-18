@@ -62,5 +62,11 @@ Sıradaki prompt: K3P-26
 
 ## Devir notu
 
-K3P-25 uygulandı; Dalga 4 kapandı. Sıradaki kart **K3P-26**. Push/merge/tag/deploy yok; yalnız K3P-27'de açık onayla.
+K3P-25 uygulandı; Dalga 4 kapandı. Sıradaki kart **K3P-26**.
+
+**K3P-26 için hazır devir belgesi var:** [`DEVIR-K3P-26-CODEX-LUNA.md`](../DEVIR-K3P-26-CODEX-LUNA.md).
+Yeni oturum onu okumalı; **bağlayıcı olan hâlâ `BAGLAM-YONETIMI.md` §1–§6** (çelişkide BAGLAM kazanır).
+`senkron` UYUMLU, `nextPrompt: K3P-26`, kart durumu `todo` (devir kartı kapatmaz).
+
+Push/merge/tag/deploy yok; yalnız K3P-27'de açık onayla.
 Kişisel veri/gerçek hesap tarayıcısı açma; `mustafaras/seyma-data` kapsam dışıdır.

@@ -986,3 +986,14 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
 - Gözlem: **Ders:** kabul ölçütleri "ayar sessizce değişmiyor"ü sınıyordu ama **düğmeye basıldıktan sonraki durumu** sınamıyordu. Kart metni "Aç eylemi mevcut handler'ı çağırır" diyor; handler'ın **kendi** sonucu (teklif kapanmalı) hiçbir testte yoktu. Yeni testler bu boşluğu kapatıyor.
 - Sıradaki: K3P-26
+
+## seq 69 · K3P-26 · DEVİR (Codex Luna'ya devir notu — uygulama başlamadı)
+- Tarih: 2026-10-18
+- Commit: (bu commit)
+- Yapılan: Kullanıcı "sıradaki için codex luna için devir yaz" dedi. **K3P-26 uygulanmadı**; yalnız yeni oturumun okleyeceği devir belgesi yazıldı: [`DEVIR-K3P-26-CODEX-LUNA.md`](DEVIR-K3P-26-CODEX-LUNA.md). İçerik: yapıştırılacak başlatıcı metni, son üç kartın özeti + ara yayın kanıtı, kartın kabul ölçütleri, **görsel QA güvenlik protokolü** (Guard 1 → `shoot-modal.mjs`; sunucu açma yasağı ve 2026-07-10 veri kaybı gerekçesi), ölçü araçları + bilinen yorumlama tuzakları (akis-olc 2b ≤45 vs AKIS §3 ≤25 · tekrar-uret 9/10 R-08 · perf göreli bant · `$?`/boru tuzağı), bütçe panosu, bu dalda gerçekten ısıran 8 tuzak (K-P pin, migration TAM alan kümesi, lexicon_coverage tek yer, öksüz seçici, kontrast tokenı `--kao-tint`, fx2 pinleri, envanter sayısı, kapı süreleri), KAPANIS.md için hazır malzeme + hipotez takvimi, kabul edilmiş açık sınırlar, §3 kapanış adımları.
+- Doğrulama: belgedeki **her komut ve sayı çalıştırılarak teyit edildi** — Guard 1 exit 0 (10 PASS), `shoot-modal.mjs` argüman sırası, `deney-rapor.cjs --ornek`, `cift-sik`/`okunus-denetim`/`dokunus-olc`/`ekran-dok`/`akis-olc` exit 0, perf content 184,591 · runtime **133,061** · css **15,877** KiB, fixture **82**, `pinDeferral.files` = quranLearn.js + quranLearnViews.js, `releaseApproval=NOT_APPROVED`.
+- Ölçüler: üretim baytları **değişmedi** (yalnız belge + kayıt). Runtime 133,061 · css 15,877 · content 184,591 · App.kao* 45 · envanter 82. Kart durumu **K3P-26 = todo** (devir kartı kapatmaz).
+- Kapı: koşulmadı (kod değişmedi; devir kaydı). `senkron` **UYUMLU**.
+- Kanıt düzeyi: belge + komut doğrulaması · görsel QA yok · cihaz yok
+- Gözlem: Devir notu bağlayıcı değildir; §1–§6 hâlâ `BAGLAM-YONETIMI.md`. Belge bunu §0'da açıkça yazıyor (çelişkide BAGLAM kazanır). K3P-25'te bulunan kusurun **dersi** devir notuna taşındı ("ölçtüğün şey kullanıcının gördüğü şey mi?").
+- Sıradaki: K3P-26 (devir notuyla)

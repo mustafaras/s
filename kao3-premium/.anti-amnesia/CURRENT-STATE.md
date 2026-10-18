@@ -22,6 +22,9 @@ Sıradaki prompt: K3P-26
 - **Açık rıza mevcut handler'la:** "Hızlı geçişi aç" düğmesi **doğrudan** `App.kaoToggleAutoAdvance` çağırır
   (`actionCall` args'sız eylemi zaten destekliyor) → **yeni `App.kao*` YOK (45 sabit)**. Kapatma eylemi
   `App.kaoOnboard('auto-advance-offer-close')` mevcut çoğaltıcıya eklenen yeni eylemdir.
+  **Denetimde bulunan gerçek kusur düzeltildi (LEDGER seq 68):** handler ayarı çevirdikten sonra teklif bayrağını
+  **temizler** ve `noticeModel` ayar açıkken teklifi **hiç çizmez** (yapısal güvence); böylece "Aç"a basınca teklif
+  ekrandan kalkar, ikinci dokunuş kazancı geri alamaz.
 - **Mevcut davranış korundu:** `KAO_WHATS_NEW` notu ve `whatsNewAt` yolu **aynen** duruyor; hızlı geçiş teklifi yalnız
   ayar kapalıyken ve not çakışmadığında çizilir (`noticeModel` öncelik sırası). Ayar açıkken teklif **hiç çizilmez** ve
   damga **yazılmaz**.
@@ -39,11 +42,11 @@ Sıradaki prompt: K3P-26
 
 | Ölçü | Şimdi | Tavan/hedef |
 | --- | --- | --- |
-| Runtime gzip L9 (bağlayıcı) | **132,867 KiB** | 136 KiB; kalan ~3,1 KB |
+| Runtime gzip L9 (bağlayıcı) | **133,061 KiB** | 136 KiB; kalan ~3,1 KB |
 | **CSS gzip L9** | **15,877 KiB** (değişmedi) | 16 KiB; kalan **126 B** — **kritik** |
 | İçerik | 184,591 KiB | 256 KiB |
 | App.kao* | 45 | 45 |
-| KAO fixture envanteri | 82 | 82 PASS |
+| KAO fixture envanteri | 82 | 82 PASS · `test_k3p_25` 9 kontrol |
 
 ## Kapılar ve açık sınırlar
 

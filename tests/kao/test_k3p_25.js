@@ -69,8 +69,19 @@ check('"Aç" MEVCUT App.kaoToggleAutoAdvance\'ı çağırır; ayar yalnız açı
   assert.ok(html.includes('auto-advance-offer-close'), 'kapatma eylemi de mevcut');
   assert.equal(t.api.kaoToggleAutoAdvance(), true, 'mevcut handler çalışır');
   assert.equal(t.data.quranLearn.settings.autoAdvance, true, 'ayar açık rızayla AÇILDI');
+  // Denetimde bulunan gerçek kusur: "Aç"a basınca teklif ekranda KALIRSA ikinci basış ayarı geri kapatırdı.
+  assert.equal(t.ui.kaoAdvanceOffer, false, '"Aç"tan sonra teklif bayrağı temizlenmeli');
+  assert.ok(!homeHtml(t).includes(OFFER_TITLE), '"Aç"tan sonra teklif ekranda KALMAMALI');
   assert.equal(t.api.kaoToggleAutoAdvance(), true, 'geri kapama da mümkün (kullanıcı denetimi)');
   assert.equal(t.data.quranLearn.settings.autoAdvance, false, 'geri kapandı');
+});
+
+// Yapısal güvence: bayrak bir şekilde true kalsa bile ayar açıkken teklif çizilmez.
+check('ayar açıkken bayrak kalmış olsa da teklif çizilmez (yapısal güvence)', () => {
+  const t = legacy(bootKao());
+  t.ui.kaoAdvanceOffer = true;
+  t.data.quranLearn.settings.autoAdvance = true;
+  assert.ok(!homeHtml(t).includes(OFFER_TITLE), 'ayar açıkken teklif çizilmemeli');
 });
 
 // ---- (4) Koşul: yalnız kapalıyken ve yalnız eski kullanıcıda -----------------

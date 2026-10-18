@@ -2602,7 +2602,9 @@
     if(['off','measured','flowing'].indexOf(style)<0) return false;
     return kaoCommitSetting(function(q){ q.settings.audio=style!=='off'; if(style!=='off') q.settings.audioStyle=style; });
   }
-  function kaoToggleAutoAdvance(){ return kaoCommitSetting(function(q){ q.settings.autoAdvance=q.settings.autoAdvance!==true; }); }
+  // K3P-25: teklifin "Aç" düğmesi bu handler'ı çağırır; ayar değişince teklif KAPANIR (ikinci basış
+  // ayarı geri kapatmasın). Aynı davranış Ayarlar'daki anahtardan çevrildiğinde de geçerlidir.
+  function kaoToggleAutoAdvance(){ var ui=quranLearnDeps&&quranLearnDeps.ui(); if(ui) ui.kaoAdvanceOffer=false; return kaoCommitSetting(function(q){ q.settings.autoAdvance=q.settings.autoAdvance!==true; }); }
   function kaoToggleHarakat(){ return kaoCommitSetting(function(q){ q.settings.harakat=q.settings.harakat===false; }); }
   function kaoToggleFade(){ return kaoCommitSetting(function(q){ q.readability.fadeHarakat=!q.readability.fadeHarakat; }); }
   function kaoSetTranslit(layer){ return (layer==='tr'||layer==='dia')&&kaoCommitSetting(function(q){ q.settings.translitLayer=layer; }); }
@@ -3805,7 +3807,8 @@
   function noticeModel(q){
     var ui=quranLearnDeps.ui();
     if(ui.kaoWhatsNew===true) return KAO_WHATS_NEW;
-    if(ui.kaoAdvanceOffer===true) return KAO_AUTO_ADVANCE_OFFER;
+    // Ayar açıksa teklif HİÇ çizilmez (bayrak kalmış olsa bile): yapısal güvence.
+    if(ui.kaoAdvanceOffer===true&&q&&q.settings&&q.settings.autoAdvance!==true) return KAO_AUTO_ADVANCE_OFFER;
     return null;
   }
   // KAO2-11 · S-01 ilk açılış ve mevcut kullanıcı geçişi.

@@ -976,3 +976,13 @@ kayıt yanlışsa yeni bir `DÜZELTME` kaydıyla düzeltilir. Kayıt şablonu:
 - Gözlem: **Kod okumasında bulundu (karar noktasına taşındı):** `KAO_WHATS_NEW` notunun "bir kez" kalıcılığı ZATEN mevcut `onboarding.whatsNewAt` alanıyla sağlanıyor ve bu alan `tests/kao/test_kao2_onboarding.js`'te sabitli. Bu yüzden `whatsNewAt` **korundu** (davranış değişmedi) ve teklif yalnız ayar kapalıyken + not çakışmadığında çizilir. "Şema genişlemesi gerekmez" seçeneği kullanıcıya ek seçenek (a′) olarak sunuldu; kullanıcı kartın yazdığı (a)'yı seçti.
 - Açık sınırlar: `tools/kapi/tekrar-uret.cjs` **9/10** — düşen kalem **R-08** ("95/109 derste Uygula adımı içeriksiz"), K3P-25'ten bağımsız, **tarihsel araç modeli** (eski `apply.words/sentences` şeması); güncel denetim R-08 ve 109 ders âyet fixture'ı PASS. Bu yüzden kapı exit 0 verdi (özet bilgi amaçlı; "10/10 iddiası yok" ilkesi LEDGER'da daha önce de yazılı). Perf göreli p95 bandı yalnız yavaş-makine bayrağıyla atlandı; mutlak tavanlar korundu. Görsel QA/cihaz kabulü yok.
 - Sıradaki: K3P-26
+
+## seq 68 · K3P-25 · DÜZELTME (denetim: "Aç"tan sonra teklif ekranda kalıyordu)
+- Tarih: 2026-10-18
+- Commit: (bu commit)
+- Yapılan: Kullanıcı "bu adım tam ve kusursuz tamamlandı mı" diye denetim istedi; **gerçek bir kusur bulundu.** `App.kaoToggleAutoAdvance` yalnız ayarı çeviriyordu, teklif bayrağını (`ui.kaoAdvanceOffer`) temizlemiyordu: kullanıcı "Hızlı geçişi aç"a bastığında ayar AÇILIYOR ama teklif **ekranda kalıyordu** ve ikinci basış ayarı **geri kapatıyordu** (44 dokunuşluk kazanç bir yanlış dokunuşla geri alınabiliyordu). İki katmanlı düzeltme: (1) `kaoToggleAutoAdvance` ayar değişirken teklif bayrağını temizler (Ayarlar'daki anahtardan çevrildiğinde de geçerli); (2) `noticeModel` **yapısal güvence** olarak bayrak kalmış olsa bile `autoAdvance===true` iken teklifi hiç çizmez.
+- Ölçüler: runtime 132,867 → **133,061 KiB** (tavan 136). css 15,877 KiB **değişmedi**. content 184,591. App.kao* 45→45. KAO envanteri 82 sabit. `test_k3p_25` 8 → **9 kontrol** (kusuru yakalayan 2 yeni iddia: bayrak temizliği + yapısal güvence).
+- Kapı: `KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh` **exit 0 — TÜM KAPILAR YEŞİL** · `kapi-hizli --kart K3P-25` **exit 0 — HIZLI KAPI YEŞİL**
+- Kanıt düzeyi: kaynak/test · görsel QA yok · cihaz yok
+- Gözlem: **Ders:** kabul ölçütleri "ayar sessizce değişmiyor"ü sınıyordu ama **düğmeye basıldıktan sonraki durumu** sınamıyordu. Kart metni "Aç eylemi mevcut handler'ı çağırır" diyor; handler'ın **kendi** sonucu (teklif kapanmalı) hiçbir testte yoktu. Yeni testler bu boşluğu kapatıyor.
+- Sıradaki: K3P-26

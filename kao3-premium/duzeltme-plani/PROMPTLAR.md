@@ -186,7 +186,7 @@ Eski K3P davranışını geriye uyumlu koru. Varlık listesine ekleme, ilgili so
 
 **Oku:** quranLearn.js: kaoAnswer, isDurable, kaoArabicPairHTML; deney-rapor.cjs: project/h4; eski ledger seq 53; K3P şema durma kuralı.
 
-**Yazma allowlist’i:** Yalnız yeni program karar/state/durum/kayıt belgeleri. Üretim, test beklentisi ve kişisel veri değişikliği yasak.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` yalnızca bu K3PD-02 allowlist satırını parser uyumlu exact path listesine çevirmek için. Başka prompt metni değişemez. Yeni dosya, üretim, test beklentisi ve kişisel veri değişikliği yasak.
 
 **Uygula:**
 

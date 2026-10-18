@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-02",
+  "nextPrompt": "K3PD-03",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -390,12 +390,91 @@
     },
     "K3PD-02": {
       "id": "K3PD-02",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "9cceec923a4833046a12b28f3ca2c6dbeff71dd5",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md"
+      ],
+      "checks": [
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "cards": 34,
+            "statePromptLog": "aligned"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-03",
+            "authorizesWork": false
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controlNegativeCases": 33,
+            "k3pdPinCases": 34,
+            "legacyPinCases": 6,
+            "syntheticPromptIds": 34
+          }
+        },
+        {
+          "command": "node kao3-premium/araclar/senkron.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "legacyCards": "37/37",
+            "legacyNextPrompt": null
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "git diff --exit-code HEAD -- app/core/quranLearn.js kao3-premium/K3P-STATE.json kao3-premium/.anti-amnesia/LEDGER.md index.html sw.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "productionOldStatePinsChanged": 0
+          }
+        },
+        {
+          "command": "shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "protectedHashesMatch": 3
+          }
+        },
+        {
+          "command": "rg -o 'App\\.kao[A-Za-z0-9_]*\\s*=' app.js | wc -l",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "appKaoHandlers": 45
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-03": {
@@ -711,14 +790,17 @@
   },
   "decisions": {
     "h4": {
-      "status": "pending",
+      "status": "approved",
       "topic": "H4 ölçümü ve mevcut kalıcı alan sınırı",
-      "proposal": null,
-      "options": [],
-      "response": null,
-      "answeredAt": null,
-      "sourceRef": "PROMPTLAR.md §5; DENETLEYICI.md §§2.1–2.2; K3PD-02",
-      "scope": "Yalnız H4 ölçümü ve alan bazlı şema kararı; kullanıcı yanıtı gelmeden şema değiştirilmez."
+      "proposal": "Asistan, kullanıcı karar seçimini devrettiği için A seçeneğini seçer: daily.calib.s21={n, ok} alanını koru, yeni kalıcı alan/migration ekleme, yalnız R+1 00:00Z sonrasındaki geçerli folded cohortu ölç. Alternatif B için tam şema quranLearn.daily[YYYY-MM-DD].calib.s21v2={n: integer>=0, ok: integer>=0, ok<=n}; eski alanı değiştirmeden bırak, backfill yapma, v2 eksikliğini sıfır geçerli gözlem say ve raporu yalnız v2 üzerinden üret.",
+      "options": [
+        "A — Mevcut daily.calib.s21={n, ok} alanını koru; yeni kalıcı alan ve migration yok; yalnız düzeltme yayını sonrası ilk tam UTC gün cohortunu ölç; eski günler LEGACY_INVALID.",
+        "B — İsteğe bağlı quranLearn.daily[YYYY-MM-DD].calib.s21v2={n: integer>=0, ok: integer>=0, ok<=n}; yalnız ilk uygun cevapta yaz; backfill yok; eski alan değişmez; v2 yokluğu sıfır geçerli gözlemdir; rapor yalnız v2 okur."
+      ],
+      "response": "sen karar ver devam et",
+      "answeredAt": "2026-10-18",
+      "sourceRef": "KAYIT.md seq 15; kullanıcı yanıtı 2026-10-18",
+      "scope": "Yalnız H4 ölçümü ve daily.calib.s21 alan kararı; yeni persistent alan/migration ve geçmiş onarımı seçilmedi."
     },
     "timeBudget": {
       "status": "pending",

@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-01",
+  "nextPrompt": "K3PD-02",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -259,12 +259,133 @@
     },
     "K3PD-01": {
       "id": "K3PD-01",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "27904bce682cae1db440226850dec3e8867d0627",
+      "changedPaths": [
+        "tests/app/test_asset_pin_freshness.js",
+        "tests/kao/test_k3pd_control.js",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-01/EVIDENCE.md"
+      ],
+      "checks": [
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "cards": 34,
+            "statePromptLog": "aligned",
+            "candidate": "K3PD-01"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-01",
+            "authorizesWork": false
+          }
+        },
+        {
+          "command": "node tests/app/test_asset_pin_freshness.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "fullyFresh": 61,
+            "deferred": 0,
+            "blockingStale": 0
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controlNegativeCases": 33,
+            "k3pdPinCases": 34,
+            "legacyPinCases": 6,
+            "syntheticPromptIds": 34
+          }
+        },
+        {
+          "command": "node tests/app/test_iip_22.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "fixtureCases": "13/13"
+          }
+        },
+        {
+          "command": "node --check app.js && node --check sync.js && node --check app/core/quranLearn.js && node --check app/core/quranLearnFlow.js && node --check app/core/quranLearnViews.js && node --check tests/app/test_asset_pin_freshness.js && node --check tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/driver.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "environment": "synthetic Node/VM",
+            "result": "Done"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "assertionsPassed": 95,
+            "assertionsFailed": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/araclar/senkron.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "legacyCards": "37/37",
+            "legacyNextPrompt": null
+          }
+        },
+        {
+          "command": "node -e 'const fs=require(\"fs\");const p=fs.readFileSync(\"kao3-premium/duzeltme-plani/PROMPTLAR.md\",\"utf8\");const b=p.split(\"<!-- PROMPT K3PD-01 -->\")[1].split(\"<!-- /PROMPT K3PD-01 -->\")[0];const a=b.split(\"**Yazma allowlist’i:**\")[1].split(\"**Uygula:**\")[0];const paths=[...a.matchAll(/\\x60([^\\x60]+)\\x60/g)].map(m=>m[1]);console.log(paths.length+\" exact paths; \"+paths.join(\", \"));if(paths.length!==7||paths.some(x=>x.endsWith(\"K3P-STATE.json\")))process.exit(1)'",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "exactPaths": 7,
+            "legacyK3pStateExcluded": true
+          }
+        },
+        {
+          "command": "git status --short --branch && git rev-parse HEAD && git diff --check && shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "head": "27904bce682cae1db440226850dec3e8867d0627",
+            "protectedHashesMatch": 3
+          }
+        },
+        {
+          "command": "shasum -a 256 index.html sw.js kao3-premium/K3P-STATE.json && rg -o 'App\\.kao[A-Za-z0-9_]*\\s*=' app.js | wc -l",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "pinnedHashesUnchanged": true,
+            "appKaoHandlers": 45
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-01/EVIDENCE.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-02": {

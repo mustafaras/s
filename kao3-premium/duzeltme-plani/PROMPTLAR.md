@@ -157,7 +157,7 @@ Durum aracına --check, --sonraki, --liste, --prompt ID ekle; eksik/tekrarlı ID
 
 **Oku:** 00 makbuzu; tests/app/test_asset_pin_freshness.js; eski K3P pin sözleşmesi; index.html ve sw.js sürüm bağlantıları.
 
-**Yazma allowlist’i:** tests/app/test_asset_pin_freshness.js; test_k3pd_control.js; yeni state/durum/kayıt. Pin değerleri ve eski K3P-STATE.json yasak.
+**Yazma allowlist’i:** Yalnız `tests/app/test_asset_pin_freshness.js`; `tests/kao/test_k3pd_control.js`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/PROMPTLAR.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-01/EVIDENCE.md`. Pin değerleri ve eski kao3-premium/K3P-STATE.json yasak.
 
 **Uygula:**
 

@@ -8,10 +8,16 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const repoRoot = require('../repo-root');
+const {
+  resolveK3pdDeferredFiles,
+  resolveLegacyK3pDeferredFiles,
+} = require('../app/test_asset_pin_freshness');
 const toolSource = path.join(repoRoot, 'kao3-premium/duzeltme-plani/araclar/durum.mjs');
 const planRel = 'kao3-premium/duzeltme-plani';
 const branch = 'k3pd-denetim-duzeltmeleri';
 const ids = Array.from({ length: 34 }, (_, index) => `K3PD-${String(index).padStart(2, '0')}`);
+const K3PD_BRANCH = 'k3pd-denetim-duzeltmeleri';
+const PINNED_ASSET = 'app/core/quranLearn.js';
 const runEnv = {
   PATH: process.env.PATH || '/usr/bin:/bin',
   LANG: process.env.LANG || 'C',
@@ -182,6 +188,77 @@ function setSyntheticOwnerDecision(decision) {
   decision.answeredAt = '2026-10-18';
 }
 
+function testK3pdPinDeferralMatrix() {
+  assert.equal(typeof resolveK3pdDeferredFiles, 'function', 'asset pin test must expose its pure K3PD deferral resolver');
+  const stateFor = (overrides = {}) => {
+    const cards = Object.fromEntries(ids.map((id) => [id, { id, status: 'todo' }]));
+    return {
+      program: 'K3PD', planVersion: 1, branch: K3PD_BRANCH, baselineHead: 'a'.repeat(40),
+      status: 'active', executionOrder: ids.slice(), nextPrompt: 'K3PD-01', cards,
+      releaseApproval: {
+        status: 'NOT_APPROVED', candidateSha: null, scope: [], response: null, approvedAt: null,
+      },
+      pinDeferral: { branch: K3PD_BRANCH, until: 'K3PD-32', files: [PINNED_ASSET], mainExceptions: [] },
+      ...overrides,
+    };
+  };
+  const pinnedAssets = new Set([PINNED_ASSET]);
+  const valid = stateFor();
+  assert.deepEqual(resolveK3pdDeferredFiles(valid, K3PD_BRANCH, pinnedAssets), [PINNED_ASSET], 'only the exact active K3PD path should defer on its branch');
+  assert.deepEqual(resolveK3pdDeferredFiles(stateFor({ pinDeferral: { ...valid.pinDeferral, files: [] } }), K3PD_BRANCH, pinnedAssets), [], 'empty initial list defers nothing');
+
+  const invalid = [
+    ['main runtime branch', valid, 'main'],
+    ['other runtime branch', valid, 'other-feature-branch'],
+    ['fake suffix runtime branch', valid, `${K3PD_BRANCH}-fake`],
+    ['state branch mismatch', stateFor({ branch: 'main' }), K3PD_BRANCH],
+    ['fake state branch', stateFor({ branch: `${K3PD_BRANCH}-fake` }), K3PD_BRANCH],
+    ['legacy program state', stateFor({ program: 'K3P' }), K3PD_BRANCH],
+    ['missing plan version', stateFor({ planVersion: undefined }), K3PD_BRANCH],
+    ['bad baseline', stateFor({ baselineHead: 'not-a-sha' }), K3PD_BRANCH],
+    ['closed program', stateFor({ status: 'completed' }), K3PD_BRANCH],
+    ['release candidate state', stateFor({ status: 'release_candidate' }), K3PD_BRANCH],
+    ['missing execution order', stateFor({ executionOrder: undefined }), K3PD_BRANCH],
+    ['wrong execution order', stateFor({ executionOrder: ids.slice(1) }), K3PD_BRANCH],
+    ['missing card set', stateFor({ cards: undefined }), K3PD_BRANCH],
+    ['missing close card', stateFor({ cards: Object.fromEntries(ids.slice(0, -1).map((id) => [id, { id, status: 'todo' }])) }), K3PD_BRANCH],
+    ['K3PD-32 already done', stateFor({ cards: { ...valid.cards, 'K3PD-32': { id: 'K3PD-32', status: 'done' } } }), K3PD_BRANCH],
+    ['release approval carried', stateFor({ releaseApproval: { status: 'APPROVED' } }), K3PD_BRANCH],
+    ['missing release approval', stateFor({ releaseApproval: undefined }), K3PD_BRANCH],
+    ['missing pin deferral', stateFor({ pinDeferral: undefined }), K3PD_BRANCH],
+    ['wrong deferral branch', stateFor({ pinDeferral: { ...valid.pinDeferral, branch: 'main' } }), K3PD_BRANCH],
+    ['wrong closing card', stateFor({ pinDeferral: { ...valid.pinDeferral, until: 'K3PD-33' } }), K3PD_BRANCH],
+    ['non-array file list', stateFor({ pinDeferral: { ...valid.pinDeferral, files: PINNED_ASSET } }), K3PD_BRANCH],
+    ['missing main-exception list', stateFor({ pinDeferral: { ...valid.pinDeferral, mainExceptions: undefined } }), K3PD_BRANCH],
+    ['main exception present', stateFor({ pinDeferral: { ...valid.pinDeferral, mainExceptions: ['index.html'] } }), K3PD_BRANCH],
+    ['wildcard path', stateFor({ pinDeferral: { ...valid.pinDeferral, files: ['app/*.js'] } }), K3PD_BRANCH],
+    ['directory path', stateFor({ pinDeferral: { ...valid.pinDeferral, files: ['app/core/'] } }), K3PD_BRANCH],
+    ['parent traversal', stateFor({ pinDeferral: { ...valid.pinDeferral, files: ['../app/core/quranLearn.js'] } }), K3PD_BRANCH],
+    ['absolute path', stateFor({ pinDeferral: { ...valid.pinDeferral, files: ['/app/core/quranLearn.js'] } }), K3PD_BRANCH],
+    ['query path', stateFor({ pinDeferral: { ...valid.pinDeferral, files: [`${PINNED_ASSET}?v=pin`] } }), K3PD_BRANCH],
+    ['unreferenced exact file', stateFor({ pinDeferral: { ...valid.pinDeferral, files: ['app/core/not-pinned.js'] } }), K3PD_BRANCH],
+    ['duplicate exact path', stateFor({ pinDeferral: { ...valid.pinDeferral, files: [PINNED_ASSET, PINNED_ASSET] } }), K3PD_BRANCH],
+    ['malformed null state', null, K3PD_BRANCH],
+    ['array state', [], K3PD_BRANCH],
+  ];
+  for (const [label, state, branch] of invalid) {
+    assert.deepEqual(resolveK3pdDeferredFiles(state, branch, pinnedAssets), [], `${label} must fail closed`);
+  }
+  const legacyDeferral = { branch: 'kao3-premium', until: 'K3P-27', files: [PINNED_ASSET] };
+  const legacyCases = [
+    ['legacy K3P branch exact match', legacyDeferral, 'kao3-premium', [PINNED_ASSET]],
+    ['legacy K3P does not carry to K3PD branch', legacyDeferral, K3PD_BRANCH, []],
+    ['main is always strict', { branch: 'main', until: 'K3P-27', files: [PINNED_ASSET] }, 'main', []],
+    ['legacy K3P wrong branch', legacyDeferral, 'some-other-branch', []],
+    ['legacy K3P missing state', null, 'kao3-premium', []],
+    ['legacy K3P malformed file list', { branch: 'kao3-premium', files: PINNED_ASSET }, 'kao3-premium', []],
+  ];
+  for (const [label, deferral, branch, expected] of legacyCases) {
+    assert.deepEqual(resolveLegacyK3pDeferredFiles(deferral, branch), expected, `${label} regression`);
+  }
+  return { k3pd: invalid.length + 2, legacy: legacyCases.length };
+}
+
 function writeSourceReadyFixture(root, targetId) {
   writeFixture(root);
   const plan = path.join(root, planRel);
@@ -287,6 +364,7 @@ function expectRejected(root, baseline, mutate, pattern, label) {
   fs.writeFileSync(path.join(root, planRel, 'KAYIT.md'), baseline.log);
 }
 
+const pinDeferralCases = testK3pdPinDeferralMatrix();
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'k3pd-control-'));
 try {
   writeFixture(tempRoot);
@@ -401,7 +479,7 @@ try {
     fs.rmSync(wrongBranchRoot, { recursive: true, force: true });
   }
 
-  console.log(`PASS test_k3pd_control: valid CLI modes + ${mutations.length + 4} negative cases; source_ready K3PD-11→12 and K3PD-21→22; 34 synthetic prompt IDs; no network or task-checkout writes`);
+  console.log(`PASS test_k3pd_control: valid CLI modes + ${mutations.length + 4} control negative cases + ${pinDeferralCases.k3pd} K3PD and ${pinDeferralCases.legacy} legacy pin-policy cases; source_ready K3PD-11→12 and K3PD-21→22; 34 synthetic prompt IDs; no network or task-checkout writes`);
 } finally {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 }

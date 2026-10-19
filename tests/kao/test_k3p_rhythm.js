@@ -51,6 +51,8 @@ function play(t, lessonId, { stopAfterTasks = Infinity } = {}) {
   throw new Error(`${lessonId}: özete ulaşılamadı`);
 }
 function walk(t, lessonId, options) {
+  t.data.quranLearn.onboarding.minutes = 15;
+  t.ui.kaoLatency = [6000];
   assert.equal(t.api.kaoLesson('start', lessonId), true, `${lessonId}: başlamadı`);
   return play(t, lessonId, options);
 }
@@ -107,28 +109,21 @@ check('ritim sırası: hedef → ısınma → tanış-sına → kavram + 1 göre
   assert.equal(kinds.at(-1), 'summary'); assert.equal(kinds.at(-2), 'apply');
 });
 
-check('ısınma: vadeli tekrarların kararlılığı (s) en yüksek olanları; kalan tekrarlar karışık bölüme blok blok serpiştirilir', () => {
+check('ısınma en kararlı tekrarlar; çekirdek ders; ardından ayrı tekrar kuyruğu', () => {
   const q = seed(t); resetUi(t);
+  q.onboarding.minutes = 15; t.ui.kaoLatency = [6000];
   Object.keys(q.cards).forEach((id, i) => { q.cards[id].s = 10 + (i * 7) % 40; });
   assert.equal(t.api.kaoLesson('start', 'u01.02'), true);
   const plan = t.ui.kaoLesson.plan;
-  const firstIntro = plan.findIndex((item) => item.kind === 'intro'), concept = plan.findIndex((item) => item.kind === 'concept');
-  const apply = plan.findIndex((item) => item.kind === 'apply');
-  const warm = plan.slice(1, firstIntro), reviews = plan.filter((item) => item.group === 'review');
+  const warm = plan.filter((item) => item.warmup === true), reviews = plan.filter((item) => item.group === 'review');
   assert.ok(warm.length >= 3 && warm.length <= 5, `ısınma ${warm.length}`);
   assert.ok(warm.every((item) => item.group === 'review'), 'ısınma tekrar kartlarından');
   const stability = (item) => q.cards[item.cardId].s;
   const restMax = Math.max(...reviews.filter((item) => !warm.includes(item)).map(stability));
   assert.ok(Math.min(...warm.map(stability)) >= restMax, `ısınma s ${warm.map(stability)} · kalan en yüksek ${restMax}`);
-  const mixed = plan.slice(concept + 1, apply);
-  assert.equal(reviews.length, warm.length + mixed.filter((item) => item.group === 'review').length, 'kalan tekrarlar karışık bölümde');
-  assert.ok(mixed.some((item) => item.group === 'review') && mixed.some((item) => item.group !== 'review'), 'karışık bölüm tekrar + ders görevi');
-  // Görev türü her soruda değil, bloklar hâlinde değişir; tek tür 5'ten uzun sürmez (ikiden fazla blok varsa).
-  const cat = (item) => item.group === 'review' ? 'review' : item.group === 'concept' ? 'grammar' : item.audioOnly ? 'audio' : item.direction;
-  const blocks = [];
-  mixed.forEach((item, i) => { if (i && cat(item) === cat(mixed[i - 1])) blocks[blocks.length - 1] += 1; else blocks.push(1); });
-  assert.ok(blocks.length < mixed.length / 2, `karışık bölümde ${blocks.length} blok / ${mixed.length} görev`);
-  assert.ok(blocks.every((size) => size <= 5), `blok boyları ${blocks}`);
+  const firstExtra = plan.findIndex((item) => item.group === 'review' && item.warmup !== true), lastCore = plan.reduce((last, item, index) => item.group !== 'review' && ['intro', 'practice', 'concept'].includes(item.kind) ? index : last, -1);
+  assert.ok(firstExtra > lastCore, 'çekirdek ders işleri tümüyle tekrar kuyruğundan önce');
+  assert.ok(plan.slice(firstExtra).filter((item) => item.group === 'review' && item.warmup !== true).length + warm.length === reviews.length, 'her kalan tekrar ayrı kuyrukta');
   t.api.kaoLesson('exit');
 });
 
@@ -147,7 +142,7 @@ check('yeni kullanıcı (tekrar yok): her tanıştan hemen sonra görev; yalnız
 
 check('devam noktası: yarıda bırak → sayfa yeniden yüklenmiş gibi ui sıfırla → Bugün birincil → aynı görevden sürer; çözülen görev yeniden sorulmaz', () => {
   for (const stopAt of [3, 7, 9]) {
-    seed(t); resetUi(t); t.ui.kaoOpen = false; t.api.kaoOpen('home');
+    const q = seed(t); q.onboarding.minutes = 15; resetUi(t); t.ui.kaoOpen = false; t.api.kaoOpen('home');
     const started = tapPrimary(t);
     assert.ok(started && started.ok, 'Bugün birincil dersi başlatmadı');
     const lessonId = t.ui.kaoLesson.lessonId;
@@ -157,6 +152,7 @@ check('devam noktası: yarıda bırak → sayfa yeniden yüklenmiş gibi ui sıf
     resetUi(t); t.ui.kaoOpen = false; t.api.kaoOpen('home');
     const again = tapPrimary(t);
     assert.ok(again && again.ok && t.ui.kaoLesson && t.ui.kaoLesson.lessonId === lessonId, `${stopAt}: aynı ders açılmadı`);
+    if (!isTask(t) && t.ui.kaoLesson.plan[t.ui.kaoLesson.at].kind === 'partGoal') assert.equal(t.api.kaoLesson('next'), true, `${stopAt}: bölüm hedefi açılmadı`);
     assert.ok(isTask(t), `${stopAt}: görevle değil ${t.ui.kaoLesson.plan[t.ui.kaoLesson.at].kind} ile açıldı`);
     assert.equal(curItem(t).id, pending, `${stopAt}: yarıda kalan görevden sürmedi`);
     const reasked = play(t, lessonId).filter((s) => s.step === 'task' && answered.includes(s.itemId)).map((s) => s.itemId);

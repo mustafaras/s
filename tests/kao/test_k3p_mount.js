@@ -85,6 +85,31 @@ function stage(observe) {
   return { t, doc, rerender: () => t.api.kaoMount(), live: () => doc.app.querySelector('.kao-overlay') };
 }
 
+function startLessonForFixture(t, lessonId) {
+  return t.api.kaoLesson('start', lessonId)
+    || t.api.kaoLesson('start', lessonId, 'budget-overrun');
+}
+function playLessonAcrossParts(t, options = {}) {
+  for (let guard = 0; guard < 40; guard += 1) {
+    const state = t.ui.kaoLesson;
+    if (!state) return false;
+    const from = state.at || 0;
+    const boundary = state.plan.findIndex((item, index) => index >= from && item.kind === 'partEnd');
+    const target = options.stopAt
+      ? state.plan.findIndex((item, index) => index >= from && item.kind === options.stopAt)
+      : -1;
+    const stopAt = target >= 0 && (boundary < 0 || target < boundary) ? options.stopAt : (boundary >= 0 ? 'partEnd' : options.stopAt);
+    if (!H.playLesson(t, Object.assign({}, options, { stopAt }))) return false;
+    const currentState = t.ui.kaoLesson, current = currentState && currentState.plan[currentState.at || 0];
+    if (current && current.kind === 'partEnd') {
+      if (!t.api.kaoLesson('budget-overrun')) return false; // synthetic user explicitly accepts the displayed overrun
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+
 // 1) Bağlantı: app.js mount ve render.js paint yeni yola devreder; App.* eklenmedi.
 {
   const appJs = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
@@ -122,16 +147,16 @@ function stage(observe) {
   assert.equal(byKey.size, views.length, 'her görünümün kendi anahtarı var');
   // Ders: görevler session ekranında; aynı görev durumunda anahtar kararlı.
   t.ui.kaoOpen = false; t.api.kaoOpen('home');
-  assert.equal(t.api.kaoLesson('start', 'u01.02'), true);
+  assert.equal(startLessonForFixture(t, 'u01.02'), true);
   let seen = 0;
-  H.playLesson(t, {
+  assert.equal(playLessonAcrossParts(t, {
     visit() {
       const key = split(t.api.kaoOverlayHTML(t.NOW)).screenKey;
       assert.match(key, /^session\|/, 'ders görevleri session ekranı');
       assert.equal(split(t.api.kaoOverlayHTML(t.NOW)).screenKey, key, 'aynı görev durumunda anahtar kararlı');
       seen += 1;
     }
-  });
+  }), true, 'ders parçaları açık overrun onayıyla özete kadar yürütüldü');
   assert.ok(seen > 0, 'ders görevleri görüldü');
 }
 
@@ -155,8 +180,8 @@ function stage(observe) {
   assert.equal(doc.app.children[doc.app.children.length - 1], first, 'overlay #app içinde son çocuk');
   assert.equal(first.firstElementChild.attrs.role, 'dialog');
   assert.equal(first.firstElementChild.attrs.onkeydown, 'App.onModalKeydown(event,App.kaoClose)');
-  assert.equal(t.api.kaoLesson('start', 'u01.02'), true);
-  assert.equal(H.playLesson(t), true, 'ders özete kadar oynandı');
+  assert.equal(startLessonForFixture(t, 'u01.02'), true);
+  assert.equal(playLessonAcrossParts(t), true, 'ders özete kadar oynandı');
   const lessonStages = [...steps].filter((s) => /\|lesson:\d+$/.test(s));
   assert.ok(lessonStages.length >= 7, `en az 7 ders aşaması görüldü (${lessonStages.length})`);
   assert.ok(transitions >= 7, `en az 7 aşama geçişi (${transitions})`);

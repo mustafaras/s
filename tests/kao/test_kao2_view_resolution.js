@@ -4,10 +4,33 @@
 // gerçek yönlendirme (kaoNav/kaoSetView) her görünümü doğru başlıkla açmalı (R-09, K6-02).
 // Sentetik VM; ağ, tarayıcı, gerçek kullanıcı verisi yok.
 const assert = require('node:assert/strict');
-const { bootKao, freshUser, openView, walkLesson, navTitle, text } = require('./helpers/kao-harness');
+const { bootKao, freshUser, openView, playLesson: playLessonRaw, navTitle, text } = require('./helpers/kao-harness');
 
 let passed = 0;
 const check = (name, run) => { run(); passed += 1; console.log(`PASS  ${name}`); };
+
+function walkLessonAcrossParts(t, lessonId, options = {}) {
+  if (!t.api.kaoLesson('start', lessonId)) return false;
+  for (let guard = 0; guard < 40; guard += 1) {
+    const state = t.ui.kaoLesson;
+    if (!state) return false;
+    const current = state.plan[state.at];
+    if (current && current.kind === 'partEnd') {
+      if (!t.api.kaoLesson('budget-overrun')) return false;
+      continue;
+    }
+    const boundary = state.plan.findIndex((item, index) => index >= state.at && item.kind === 'partEnd');
+    if (!playLessonRaw(t, Object.assign({}, options, { stopAt: boundary >= 0 ? 'partEnd' : undefined }))) return false;
+    const nextState = t.ui.kaoLesson;
+    const next = nextState && nextState.plan[nextState.at];
+    if (next && next.kind === 'partEnd') {
+      if (!t.api.kaoLesson('budget-overrun')) return false;
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
 
 const t = bootKao();
 freshUser(t);
@@ -124,7 +147,7 @@ check('düzenek: walkLesson ilk dersi gerçek handler\'larla bitirir; yanlış c
     freshUser(u);
     const lesson = u.win.QuranCurriculumV2.units[0].lessons[0];
     const seen = [];
-    const done = walkLesson(u, lesson.id, { answer, visit: (task) => seen.push(task.id) });
+    const done = walkLessonAcrossParts(u, lesson.id, { answer, visit: (task) => seen.push(task.id) });
     assert.equal(done, true, `${answer}: ders özet ekranına ulaşmalı`);
     assert.ok(seen.length > 0, `${answer}: en az bir görev gösterilmeli`);
   }

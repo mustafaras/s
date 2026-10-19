@@ -9,7 +9,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn, execFileSync } = require('node:child_process');
 const os = require('node:os');
-const { bootKao, freshUser, seed, openView, walkLesson, playLesson, text, repoRoot } = require('./helpers/kao-harness');
+const { bootKao, freshUser, seed, openView, playLesson: playLessonRaw, text, repoRoot } = require('./helpers/kao-harness');
 
 const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
 const decode = (h) => String(h).replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
@@ -23,6 +23,34 @@ const measure = (id, label, target, value, pass) => {
   rows.push({ id, label, target, value, pass: !!pass });
   assert.ok(pass, `${id} FAIL — ${label}: ${value} (hedef ${target})`);
 };
+
+function startLessonForFixture(t, lessonId) {
+  return t.api.kaoLesson('start', lessonId)
+    || t.api.kaoLesson('start', lessonId, 'budget-overrun');
+}
+function playLesson(t, options = {}) {
+  for (let guard = 0; guard < 40; guard += 1) {
+    const state = t.ui.kaoLesson;
+    if (!state) return false;
+    const from = state.at || 0;
+    const boundary = state.plan.findIndex((item, index) => index >= from && item.kind === 'partEnd');
+    const target = options.stopAt
+      ? state.plan.findIndex((item, index) => index >= from && item.kind === options.stopAt)
+      : -1;
+    const stopAt = target >= 0 && (boundary < 0 || target < boundary) ? options.stopAt : (boundary >= 0 ? 'partEnd' : options.stopAt);
+    if (!playLessonRaw(t, Object.assign({}, options, { stopAt }))) return false;
+    const currentState = t.ui.kaoLesson, current = currentState && currentState.plan[currentState.at || 0];
+    if (current && current.kind === 'partEnd') {
+      if (!t.api.kaoLesson('budget-overrun')) return false; // synthetic user explicitly accepts the displayed overrun
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+function walkLesson(t, lessonId, options = {}) {
+  return startLessonForFixture(t, lessonId) && playLesson(t, options);
+}
 
 // "Dokunma": ekranda GERÇEKTEN bulunan düğmenin onclick'ini bulur, sayar ve motora iletir.
 function makeToucher(t) {
@@ -96,7 +124,7 @@ const sim = {};
     }
     const lessonId = step.param;
     assert.equal(typeof lessonId === 'string' || typeof lessonId === 'number', true, 'adımın dersi yok');
-    assert.equal(t.api.kaoLesson('start', lessonId), true, `ders ${lessonId} açılamadı`);
+    assert.equal(startLessonForFixture(t, lessonId), true, `ders ${lessonId} açılamadı`);
     const plan = t.ui.kaoLesson.plan, goal = plan.find((item) => item.kind === 'goal');
     const fresh = goal ? (goal.newLemmaIds || []) : [];
     if (step.kind !== 'repair' && fresh.length) {
@@ -171,7 +199,7 @@ const sim = {};
     freshUser(t);
     const cur = t.win.QuranCurriculumV2;
     const stages = new Set();
-    assert.equal(t.api.kaoLesson('start', cur.units[0].lessons[0].id), true);
+    assert.equal(startLessonForFixture(t, cur.units[0].lessons[0].id), true);
     for (let guard = 0; guard < 80; guard += 1) {
       const st = t.ui.kaoLesson, item = st.plan[st.at];
       if (st.phase === 'practice') {
@@ -188,6 +216,10 @@ const sim = {};
         t.api.kaoContinue();
         continue;
       }
+      if (item && item.kind === 'partEnd') {
+        assert.equal(t.api.kaoLesson('budget-overrun'), true, 'parça sonunda kullanıcı açık süre aşımı seçebilmeli');
+        continue;
+      }
       stages.add(item.kind);
       record(`oturum/${item.kind}`, t.api.kaoOverlayHTML(t.NOW), 'data-lesson-stage');
       if (item.kind === 'summary') break;
@@ -199,7 +231,7 @@ const sim = {};
     const m = bootKao();
     freshUser(m);
     m.win.QuranCurriculumV2.units[0].lessons.forEach((l) => { walkLesson(m, l.id); m.api.kaoLesson('finish'); });
-    assert.equal(m.api.kaoLesson('start', 1), true);
+    assert.equal(startLessonForFixture(m, 1), true);
     record('oturum/ustalık', m.api.kaoOverlayHTML(m.NOW), 'data-lesson-stage');
     const s = bootKao();
     freshUser(s, { start: 's0' });
@@ -301,7 +333,7 @@ const sim = {};
   const canStart = ['daily', 'mastery', 'next-unit', 'warmup', 'rest', 'repair', 's0-lesson', 'night-review'].includes(step.kind);
   let progressed = false;
   if (step.action === 'kaoLesson') {
-    assert.equal(t.api.kaoLesson('start', step.param), true, 'v1 kullanıcısı ders açamadı');
+    assert.equal(startLessonForFixture(t, step.param), true, 'v1 kullanıcısı ders açamadı');
     progressed = playLesson(t, { answer: 'correct' }) === true;
     t.api.kaoLesson('finish');
   } else {
@@ -353,7 +385,7 @@ const sim = {};
   const t = bootKao();
   freshUser(t);
   const lesson = t.win.QuranCurriculumV2.units[0].lessons[0];
-  assert.equal(t.api.kaoLesson('start', lesson.id), true);
+    assert.equal(startLessonForFixture(t, lesson.id), true);
   while (t.ui.kaoLesson.phase !== 'practice') assert.equal(t.api.kaoLesson('next'), true);
   const queued = t.ui.kaoQueue[t.ui.kaoTaskIndex], task = t.ui.kaoTasks[queued.id];
   const wrong = (task.choices.find((c) => !c.correct) || task.choices[0]);

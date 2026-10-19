@@ -132,6 +132,31 @@ assert.match(css, /@media \(forced-colors:active\)/);
 // (dersin gerçek oynatımı) üretilir; cevapsız/doğru/yanlış üç durumda şık ekranı sınanır. Görev nesnesi elle kurulmaz.
 const kaoHarness = require('./helpers/kao-harness');
 const AUDIO_LESSON = 'u01.02';
+
+function walkAudioLessonAcrossParts(t, lessonId, visit) {
+  if (!t.api.kaoLesson('start', lessonId) && !t.api.kaoLesson('start', lessonId, 'budget-overrun')) return false;
+  for (let guard = 0; guard < 400; guard += 1) {
+    const state = t.ui.kaoLesson;
+    if (!state) return false;
+    if (state.phase === 'practice' || state.phase === 'review') {
+      const item = t.ui.kaoQueue[t.ui.kaoTaskIndex];
+      const task = item && t.ui.kaoTasks[item.id];
+      if (!task) return false;
+      if (visit) visit(task);
+      for (const id of kaoHarness.correctTaps(task)) t.api.kaoAnswer(task.id, id);
+      t.api.kaoContinue();
+      continue;
+    }
+    const current = state.plan[state.at];
+    if (!current || current.kind === 'summary') return true;
+    if (current.kind === 'partEnd') {
+      if (!t.api.kaoLesson('budget-overrun')) return false;
+      continue;
+    }
+    t.api.kaoLesson('next');
+  }
+  return false;
+}
 // K3P-21: gizli uzun basma kalktı; ses denetimi iki görünür düğmedir ve her biri kendi aria-label'ını taşır.
 const AUDIO_BTN = '<button type="button" class="kao-audio" aria-label="Yavaş oku"';
 
@@ -156,13 +181,13 @@ function kaoExpectedChoices(task, panel, choiceId) {
 function kaoAudioShot(answer) {
   const t = kaoHarness.bootKao({ seeded: true });
   let shot = null;
-  const walked = kaoHarness.walkLesson(t, AUDIO_LESSON, { answer: 'correct', visit(task) {
+  const walked = walkAudioLessonAcrossParts(t, AUDIO_LESSON, (task) => {
     if (!task.audioOnly || shot) return;
     const idle = t.api.kaoOverlayHTML(t.NOW);
     const pick = answer === 'wrong' ? task.choices.find((c) => !c.correct) : task.choices.find((c) => c.correct);
     const result = t.api.kaoAnswer(task.id, pick.choiceId);
     shot = { task, idle, after: t.api.kaoOverlayHTML(t.NOW), result };
-  }});
+  });
   assert.equal(walked, true, `${answer}: ses görevli ders baştan sona oynatılmalı`);
   assert.ok(shot, `${answer}: "ses" türü görev gerçek kurucuyla üretilebilmeli (rapor §8)`);
   assert.equal(!!(shot.result && shot.result.correct), answer !== 'wrong', `${answer}: cevap doğruluk durumu`);

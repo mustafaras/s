@@ -30,9 +30,16 @@ const ARABIC = /[؀-ۿ]/;
 // Ders oynatıcıyı gerçek handler'larla özete kadar yürütür. Harness'in `walkLesson`ı görev başına tek cevap verir; "Kelime dizme"
 // (kind:'order') birden çok seçim ister, bu yüzden burada order-aware yürüyüşçü var. wrongFor(task) true ise yanlış cevap verilir.
 // D2F-03: orderFor(task) dizme görevinde seçim sırasını (çip listesi) verir; after(task) cevaptan sonra, Devam'dan önce çağrılır.
-function walkAware(t, lessonId, { wrongFor = () => false, visit, orderFor, after } = {}) {
-  if (!t.api.kaoLesson('start', lessonId)) return false;
-  const st = t.ui.kaoLesson;
+function startLessonWithOverrunChoice(t, lessonId) {
+  // Sentetik kullanıcı, bütçe sınırında sunulan "süre aşımını kabul et" eylemini seçer.
+  return t.api.kaoLesson('start', lessonId, 'budget-overrun');
+}
+function walkAware(t, lessonId, { wrongFor = () => false, visit, orderFor, after, onPart } = {}) {
+  let started = t.api.kaoLesson('start', lessonId);
+  if (!started) started = t.api.kaoLesson('start', lessonId, 'budget-overrun');
+  if (!started) return false;
+  let st = t.ui.kaoLesson;
+  if (onPart) onPart(st.plan);
   for (let guard = 0; guard < 400; guard += 1) {
     if (st.phase === 'practice' || st.phase === 'review') {
       const item = t.ui.kaoQueue[t.ui.kaoTaskIndex];
@@ -55,6 +62,12 @@ function walkAware(t, lessonId, { wrongFor = () => false, visit, orderFor, after
     }
     const current = st.plan[st.at];
     if (!current || current.kind === 'summary') return true;
+    if (current.kind === 'partEnd') {
+      if (!t.api.kaoLesson('budget-overrun')) return false;
+      st = t.ui.kaoLesson;
+      if (onPart) onPart(st.plan);
+      continue;
+    }
     t.api.kaoLesson('next');
   }
   return false;
@@ -201,15 +214,14 @@ check('B1 · 109 dersin yürüyüşünde gösterilen HİÇBİR gramer görevi ku
   let shownGrammar = 0, minPractice = Infinity;
   for (const lesson of allLessons) {
     freshUser(t);
-    assert.ok(t.api.kaoLesson('start', lesson.id), `${lesson.id}: başlamadı`);
-    const plannedPractice = t.ui.kaoLesson.plan.filter((item) => item.kind === 'practice').length;
-    let shownPractice = 0;
+    assert.ok(startLessonWithOverrunChoice(t, lesson.id), `${lesson.id}: başlamadı`);
+    let shownPractice = 0, plannedPractice = 0;
     const done = walkAware(t, lesson.id, { visit: (task) => {
       if (t.ui.kaoLesson.phase === 'practice') shownPractice += 1;
       if (task.type !== 'grammar') return;
       shownGrammar += 1;
       bad.push(...defectsOf(task, lesson.id));
-    } });
+    }, onPart: (plan) => { plannedPractice += plan.filter((item) => item.kind === 'practice').length; } });
     assert.ok(done, `${lesson.id}: özete ulaşılamadı`);
     assert.equal(shownPractice, plannedPractice, `${lesson.id}: gösterilen alıştırma ${shownPractice} ≠ plan ${plannedPractice}`);
     if (plannedPractice) minPractice = Math.min(minPractice, plannedPractice);
@@ -262,9 +274,11 @@ check('B3 · sunulamayan gramer görevi içeren ders: plan öğesi kelime alış
   let hit = null;
   for (const lesson of allLessons) {
     freshUser(t);
-    assert.ok(t.api.kaoLesson('start', lesson.id));
-    const subs = t.ui.kaoLesson.plan.filter((item) => item.substitutedFor);
-    if (subs.some(unpresentable)) { hit = { lesson, plan: t.ui.kaoLesson.plan, subs }; break; }
+    assert.ok(startLessonWithOverrunChoice(t, lesson.id));
+    const plan = [];
+    assert.ok(walkAware(t, lesson.id, { onPart: (part) => plan.push(...part) }), `${lesson.id}: ders parçaları tamamlanamadı`);
+    const subs = plan.filter((item) => item.substitutedFor);
+    if (subs.some(unpresentable)) { hit = { lesson, plan, subs }; break; }
   }
   assert.ok(hit, 'ikame edilen alıştırması olan ders bulunamadı (test verisi)');
   const lemmaIds = new Set(hit.plan.find((x) => x.kind === 'goal').lemmaIds);
@@ -477,8 +491,8 @@ check('C6 · arayüz: dizme görevi sıra düğmeleriyle işlenir; cevaptan sonr
   let task = null;
   for (const lesson of allLessons) {
     freshUser(t);
-    assert.ok(t.api.kaoLesson('start', lesson.id));
-    const st = t.ui.kaoLesson;
+    assert.ok(startLessonWithOverrunChoice(t, lesson.id));
+    let st = t.ui.kaoLesson;
     for (let guard = 0; guard < 400 && !task; guard += 1) {
       if (st.phase === 'practice' || st.phase === 'review') {
         const item = t.ui.kaoQueue[t.ui.kaoTaskIndex];
@@ -491,6 +505,11 @@ check('C6 · arayüz: dizme görevi sıra düğmeleriyle işlenir; cevaptan sonr
       } else {
         const at = st.plan[st.at];
         if (!at || at.kind === 'summary') break;
+        if (at.kind === 'partEnd') {
+          assert.equal(t.api.kaoLesson('budget-overrun'), true, 'parça sonunda kullanıcı açık süre aşımı seçebilmeli');
+          st = t.ui.kaoLesson;
+          continue;
+        }
         t.api.kaoLesson('next');
       }
     }
@@ -537,9 +556,8 @@ check('C8 · 109 dersin yürüyüşü: gösterilen gramer görevi ≥60 ve 0 ihl
   const bad = [];
   for (const lesson of allLessons) {
     freshUser(t);
-    assert.ok(t.api.kaoLesson('start', lesson.id));
-    const planned = t.ui.kaoLesson.plan.filter((item) => item.kind === 'practice').length;
-    let practice = 0, previous = null;
+    assert.ok(startLessonWithOverrunChoice(t, lesson.id));
+    let planned = 0, practice = 0, previous = null;
     const done = walkAware(t, lesson.id, { visit: (task) => {
       if (t.ui.kaoLesson.phase !== 'practice') { previous = null; return; }
       practice += 1;
@@ -551,7 +569,7 @@ check('C8 · 109 dersin yürüyüşü: gösterilen gramer görevi ≥60 ve 0 ihl
         if (previous && previous.type === 'grammar' && previous.grammarType === task.grammarType && !task.retry) bad.push(`${lesson.id}: aynı tür ardışık ${task.grammarType}`);
       }
       previous = task;
-    } });
+    }, onPart: (plan) => { planned += plan.filter((item) => item.kind === 'practice').length; } });
     assert.ok(done, `${lesson.id}: özete ulaşılamadı`);
     assert.equal(practice, planned, `${lesson.id}: gösterilen ${practice} ≠ plan ${planned}`);
     minPractice = Math.min(minPractice, planned);
@@ -938,9 +956,8 @@ check('E1 · D2-09 109 dersin yürüyüşünde hiçbir derste aynı gramer sorus
       shown += 1;
       const sig = shownSignature(task);
       if (seen.has(sig)) dup.push(`${lesson.id}: ${seen.get(sig)} ≡ ${task.cardId}`); else seen.set(sig, task.cardId);
-    } });
+    }, onPart: (part) => { substituted += part.filter((item) => item.kind === 'practice' && item.substitutedFor).length; } });
     assert.ok(done, `${lesson.id}: özete ulaşılamadı`);
-    substituted += t.ui.kaoLesson.plan.filter((item) => item.kind === 'practice' && item.substitutedFor).length;
     if (practice !== PRACTICE_BEFORE(lesson.id)) countDiff.push(`${lesson.id}: ${practice} ≠ ${PRACTICE_BEFORE(lesson.id)}`);
   }
   assert.deepEqual(dup, [], `ders içi aynı gramer sorusu: ${dup.join(', ')}`);
@@ -953,8 +970,9 @@ check('E1 · D2-09 109 dersin yürüyüşünde hiçbir derste aynı gramer sorus
 check('E2 · u01.02: ikinci kopya (g1-k2) aynı dersin kullanılmamış bir kelime alıştırmasıyla ikame edilir — öğe kimliği/sırası korunur, lemma tanış kartından sonra gelir, ilk kopya (g1-k1) kalır', () => {
   const t = bootKao();
   freshUser(t);
-  assert.ok(t.api.kaoLesson('start', 'u01.02'));
-  const plan = t.ui.kaoLesson.plan, goal = plan.find((item) => item.kind === 'goal');
+  const plan = [];
+  assert.ok(walkAware(t, 'u01.02', { onPart: (part) => plan.push(...part) }));
+  const goal = plan.find((item) => item.kind === 'goal');
   const index = plan.findIndex((item) => item.id === 'practice:u01.02:g1:g1-k2');
   assert.ok(index >= 0, 'öğe kimliği (devam noktası) korunur');
   const item = plan[index];

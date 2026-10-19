@@ -11,7 +11,10 @@ const { bootKao, repoRoot, correctTaps } = require('./helpers/kao-harness');
 let passed = 0;
 function check(name, fn) { fn(); passed += 1; console.log(`PASS  ${name}`); }
 const curTask = (t) => { const q = t.ui.kaoQueue[t.ui.kaoTaskIndex]; return q && t.ui.kaoTasks[q.id]; };
+const SECTION_LABELS = ['Hedef', 'Isınma', 'Tanış-Sına', 'Karışık', 'Zirve'];
 const labelOf = (item) => {
+  if (item.kind === 'partGoal') return SECTION_LABELS[Math.max(0, Math.min(4, (item.resumeSection || 1) - 1))];
+  if (item.kind === 'partEnd') return SECTION_LABELS[Math.max(0, Math.min(4, (item.section || 4) - 1))];
   if (item.kind === 'goal') return 'Hedef';
   if (item.kind === 'apply' || item.kind === 'read' || item.kind === 'summary') return 'Zirve';
   if (item.kind === 'intro' || item.kind === 'concept') return 'Tanış-Sına';
@@ -24,10 +27,11 @@ check('her plan öğesi doğru bölüme eşlenir (data-lesson-section ve aria-va
   const t = bootKao({ seeded: true });
   t.ui.kaoStack = []; t.api.kaoOpen('home');
   assert.ok(t.api.kaoLesson('start', 'u01.01'), 'ders başlamalı');
-  const plan = t.ui.kaoLesson.plan;
+  let plan = t.ui.kaoLesson.plan;
   const seen = new Set();
   const bad = [];
   for (let guard = 0; guard < 200 && t.ui.kaoLesson; guard += 1) {
+    plan = t.ui.kaoLesson.plan;
     if (t.ui.kaoLesson.phase === 'practice') {
       const item = plan[t.ui.kaoLesson.at];
       const html = t.api.kaoOverlayHTML(t.NOW);
@@ -50,6 +54,11 @@ check('her plan öğesi doğru bölüme eşlenir (data-lesson-section ve aria-va
     const got = Number((/data-lesson-section="(\d)"/.exec(html) || [])[1] || 0);
     if (got !== want) bad.push(`${item.id}: section ${got} ≠ ${want}`);
     seen.add(want);
+    if (item.kind === 'partEnd') {
+      assert.equal(t.api.kaoLesson('budget-overrun'), true, 'parça sonunda açık süre aşımı seçilebilmeli');
+      plan = t.ui.kaoLesson.plan;
+      continue;
+    }
     t.api.kaoLesson('next');
   }
   assert.deepEqual(bad.slice(0, 6), [], bad.join(' | '));

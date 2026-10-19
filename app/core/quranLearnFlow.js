@@ -197,26 +197,11 @@
   // FSRS unutma eğrisi; Flow motora bağımlı olmasın diye yerel sabitler.
   var BUDGET_DECAY=-0.5,BUDGET_FACTOR=19/81;
   function retrievabilityOf(c,nowMs){ var st=num(c&&c.s,0); if(!(st>0)) return 0; return round8(Math.pow(1+BUDGET_FACTOR*elapsedForCard(c,nowMs)/st,BUDGET_DECAY)); }
-  // K3P-A4: ölçülmüş görev başına süre; en az 6 sn, ölçüm yoksa 6 sn.
-  function measuredPerTaskMs(daily,now){
-    var days=obj(daily),today=dayStart(dayKey(checkNow(now))),ms=0,answered=0;
-    Object.keys(days).forEach(function(key){
-      if(!/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
-      var age=(today-dayStart(key))/DAY_MS,day=obj(days[key]);
-      if(age<0||age>=7||!(num(day.ms,0)>0)||!(num(day.answered,0)>0)) return;
-      ms+=day.ms; answered+=day.answered;
-    });
-    return answered>0?Math.max(BUDGET_MIN_PER_MS,ms/answered):BUDGET_MIN_PER_MS;
-  }
-  // K3P-A4: bütçelenen görev üst sınırı = seçilen dk ÷ görev başına süre; 0 = sınır yok.
-  function taskBudget(maxMinutes,daily,now){ var cap=num(maxMinutes,0); if(!(cap>0)) return 0; return Math.max(0,Math.floor(cap*60000/measuredPerTaskMs(daily,now))); }
   function lessonPlan(snapshot,lessonId,now,content,reviews){
     checkNow(now);
     var snap=obj(snapshot),q=obj(snap.quranLearn),c=content||{},cur=curriculum(c),lesson=cur.lessonById[String(lessonId)];
     if(!lesson) return null;
-    var own=Array.isArray(lesson.lemmaIds)?lesson.lemmaIds.filter(function(id){ return typeof id==='string'&&id; }):[],ids=own.concat(carryOver(q,cur,lesson,c).filter(function(id){ return own.indexOf(id)<0; })),settings=obj(q.settings),budget=Math.max(0,Math.floor(num(settings.dailyNew,10))),fresh=[],record=obj(lessonRecord(q,lesson.id)),resume=obj(record.resume),resumeIntro=String(resume.itemId||'');
-    var capMinutes=[5,10,15].indexOf(num(obj(q.onboarding).minutes,0))>=0?num(q.onboarding.minutes,0):0;
-    var sessionBudget=taskBudget(capMinutes,obj(q.daily),now);
+    var own=Array.isArray(lesson.lemmaIds)?lesson.lemmaIds.filter(function(id){ return typeof id==='string'&&id; }):[],ids=own.concat(carryOver(q,cur,lesson,c).filter(function(id){ return own.indexOf(id)<0; })),settings=obj(q.settings),budget=dueCount(q,now)>DEBT_LIMIT?0:Math.max(0,Math.floor(num(settings.dailyNew,10))),fresh=[],record=obj(lessonRecord(q,lesson.id)),resume=obj(record.resume),resumeIntro=String(resume.itemId||''),capMinutes=[5,10,15].indexOf(num(obj(q.onboarding).minutes,0))>=0?num(q.onboarding.minutes,0):0;
     ids.forEach(function(id){ if(resumeIntro==='intro:'+id){ fresh.push(id); return; } if(!introduced(q,id,lesson.id)&&fresh.length<budget) fresh.push(id); });
     var eligible=ids.filter(function(id){ return introduced(q,id,lesson.id)||fresh.indexOf(id)>=0; });
     var lex=c.lexicon,grammar=c.grammar,lemmas=eligible.map(function(id){ return lex&&typeof lex.byId==='function'?lex.byId(id):null; }).filter(Boolean);
@@ -269,13 +254,11 @@
     // ve kırpmadan muaftır. Kırpılanlar ertesi gün yine vadeli kalır.
     var dueByR=due.slice().sort(function(a,b){ return a.r-b.r; });
     var warm=due.slice().sort(function(a,b){ return stability(b)-stability(a); }).slice(0,WARMUP_MAX);
-    var kept=warm.slice();
-    if(sessionBudget>0){ var room=Math.max(0,sessionBudget-kept.length); dueByR.forEach(function(item){ if(room<=0||kept.indexOf(item)>=0) return; kept.push(item); room-=1; }); }
-    else { dueByR.forEach(function(item){ if(kept.indexOf(item)<0) kept.push(item); }); }
-    var keptByR=kept.slice().sort(function(a,b){ return a.r-b.r; });
+    var kept=warm.concat(dueByR.filter(function(item){ return warm.indexOf(item)<0; }).slice(0,20-warm.length));
     // Tanış-sına döngüsü: bu derste yeni/tanışılmış kelimeler; devam noktası yeniden yüklemede aynı sırayı bulur.
     var loop=eligible.filter(function(id){ return fresh.indexOf(id)>=0||seenHere.indexOf(id)>=0; });
     while(warm.length<WARMUP_MIN){ var known=take(function(item){ return item.group==='lemma'&&item.direction==='ar>tr'&&loop.indexOf(item.lemmaId)<0; }); if(!known) break; warm.push(known); }
+    warm.forEach(function(item){ item.warmup=true; });
     var items=[goal].concat(warm);
     loop.forEach(function(id){
       if(intros[id]) items.push(intros[id]);
@@ -287,26 +270,65 @@
       var first=take(function(item){ return item.group==='concept'; }); if(first) items.push(first);
     }
     items=items.concat(mixBlocks(practice,kept.filter(function(item){ return warm.indexOf(item)<0; }),items[items.length-1],typeOfGrammar));
-    // K3P-A4 güvenlik ağı: TOPLAM görev ≤ seçilen dk ÷ görev başına süre.
-    // Dersin özü bütçeden önce ayrıldığı için önce o sayılır; kalan yer tekrarlara verilir.
-    var bound=taskBudget(capMinutes,obj(q.daily),now);
-    if(bound>0){
-      var coreCount=1; items.forEach(function(it){ if(it.group!=='review'&&(it.kind==='intro'||it.kind==='practice')) coreCount+=1; });
-      // Isınma K3P-A3 gereği her zaman kalır; kalan yer en düşük R'li tekrarlara verilir.
-      var warmIds=Object.create(null); warm.forEach(function(it){ warmIds[it.id]=true; });
-      var room=Math.max(0,bound-coreCount-warm.length);
-      var otherReviews=[]; items.forEach(function(it){ if(it.group==='review'&&!warmIds[it.id]) otherReviews.push(it); });
-      if(otherReviews.length>room){
-        otherReviews.sort(function(a,b){ return a.r-b.r; });
-        var keepSet=Object.create(null); otherReviews.slice(0,room).forEach(function(it){ keepSet[it.id]=true; });
-        items=items.filter(function(it){ return it.group!=='review'||warmIds[it.id]||keepSet[it.id]; });
-      }
-    }
-
     var apply={id:'apply:'+lesson.id,kind:'apply',lessonId:lesson.id,ref:lesson.apply||null,maxMinutes:capMinutes,words:applyItems};
     items.push(apply);
     items.push({id:'summary:'+lesson.id,kind:'summary',lessonId:lesson.id,lemmaIds:eligible.slice(),newLemmaIds:fresh.slice(),practiceCount:practiceCount});
     return items;
+  }
+  function lessonTaskCost(item){ return item&&(item.kind==='intro'||item.kind==='practice'||item.kind==='apply')?1:0; }
+  function lessonPart(snapshot,lessonId,now,content,reviews,options){
+    checkNow(now);
+    var snap=obj(snapshot),q=obj(snap.quranLearn),opts=obj(options),lesson=curriculum(content).lessonById[String(lessonId)];
+    if(!lesson) return null;
+    var daily=obj(q.daily),capMinutes=[5,10,15].indexOf(num(obj(q.onboarding).minutes,0))>=0?num(q.onboarding.minutes,0):0;
+    var duration=taskDurationEstimate(daily,now,opts.sessionMedianMs),day= obj(daily[dayKey(now)]),used=typeof opts.usedMs==='number'&&isFinite(opts.usedMs)&&opts.usedMs>=0?opts.usedMs:Math.max(0,num(day.ms,0));
+    var remainingMs=Math.max(0,capMinutes*60000-used),capacity=Math.floor(remainingMs/duration.ms),allowOverrun=opts.allowOverrun===true;
+    var full=lessonPlan({quranLearn:q},lessonId,now,content,reviews);
+    if(!Array.isArray(full)||!full.length) return null;
+    if(typeof opts.preparePlan==='function') full=opts.preparePlan(full);
+    if(!Array.isArray(full)||!full.length) return null;
+    var goal,apply,summary,warm=[],core=[],extra=[];
+    full.forEach(function(item){
+      if(item.kind==='goal') goal=item;
+      else if(item.kind==='apply') apply=item;
+      else if(item.kind==='summary') summary=item;
+      else if(item.warmup===true) warm.push(item);
+      else if(item.group==='review') extra.push(item);
+      else core.push(item);
+    });
+    extra.sort(function(a,b){ return num(a.r,1)-num(b.r,1)||(String(a.cardId||'')<String(b.cardId||'')?-1:1); });
+    var sequence=warm.concat(core,extra,apply?[apply]:[],summary?[summary]:[]);
+    var record=obj(lessonRecord(q,lessonId)),resume=obj(record.resume),resumeId=String(resume.itemId||''),nextId=String(resume.lessonItemId||''),start=0;
+    if(resumeId){
+      var pending=sequence.findIndex(function(item){ return item.id===resumeId; });
+      if(pending<0&&nextId){
+        pending=sequence.findIndex(function(item){ return item.id===nextId; });
+        if(pending<0&&nextId.indexOf('intro:')===0){ var resumedLemma=nextId.slice(6); pending=sequence.findIndex(function(item){ return item.kind==='practice'&&item.lemmaId===resumedLemma; }); }
+      }
+      if(pending>=0) start=pending;
+    }
+    var resumeItem=sequence[start],goalForPart=Object.assign({},goal);
+    if(start>0||resumeId){
+      goalForPart.kind='partGoal';
+      var conceptAt=sequence.findIndex(function(item){ return item.kind==='concept'; });
+      if(conceptAt>=0&&start>conceptAt&&resumeItem.kind!=='apply'&&resumeItem.kind!=='summary'){
+        var concept=sequence[conceptAt].concept||{}; goalForPart.conceptAnchor=String(concept.termTr||concept.title||'');
+      }
+      goalForPart.resumeSection=resumeItem.kind==='intro'||resumeItem.kind==='concept'?3:(resumeItem.group==='review'?2:(resumeItem.kind==='apply'?5:4));
+    }
+    var selected=[],spent=0,index=start,overrunUsed=false;
+    while(index<sequence.length){
+      var item=sequence[index],next=sequence[index+1],end=index+1;
+      if(next&&next.kind==='practice'&&((item.kind==='intro'&&next.lemmaId===item.lemmaId)||(item.kind==='concept'&&next.group==='concept'))) end+=1;
+      var unit=sequence.slice(index,end),cost=unit.reduce(function(total,value){ return total+lessonTaskCost(value); },0);
+      if(cost===0){ selected=selected.concat(unit); index=end; continue; }
+      if(cost<=capacity-spent){ selected=selected.concat(unit); spent+=cost; index=end; continue; }
+      if(allowOverrun&&spent===0&&!overrunUsed){ selected=selected.concat(unit); spent+=cost; index=end; overrunUsed=true; continue; }
+      selected.push({id:'part-end:'+lesson.id+':'+String(item.id),kind:'partEnd',resumeItemId:String(item.id),requiredTasks:cost,requiredMinutes:Math.ceil(cost*duration.ms/60000),remainingMs:Math.max(0,remainingMs-spent*duration.ms),source:duration.source,overrun:overrunUsed,section:item.kind==='intro'||item.kind==='concept'?3:(item.group==='review'?2:(item.kind==='apply'?5:4))});
+      break;
+    }
+    goalForPart.partResume=start>0;
+    return [goalForPart].concat(selected);
   }
   // K2F-05: ünite ustalık kontrolü — çapa metnini oku + 10 soruluk karma test. Saf; hiçbir durum yazmaz.
   // Tohum unitId + gün: kararlılığı eşit kartların sırası günlük karışır ama aynı gün bayt-eşit kalır.
@@ -498,30 +520,28 @@
     for(var i=0;i<s0.length;i+=1) if(!obj(lessonRecord(q,s0[i].id)).doneAt) return {lesson:s0[i],index:i};
     return null;
   }
-  // K2F-31: ders görev sayısı = tanış + alıştırma + uygula; kurulamazsa yalnız yeni kelime sayısı.
-  function lessonTaskCount(q,lessonId,now,content,fresh){
-    var plan=lessonPlan({quranLearn:q},lessonId,now,content),count=0;
-    if(Array.isArray(plan)) plan.forEach(function(item){ if(item.kind==='intro'||item.kind==='practice'||item.kind==='apply') count+=1; });
-    return count>0?count:fresh;
-  }
-  function lessonStep(q,now,content,current,due,cap,sessionMedianMs){
+  function lessonStep(q,now,content,current,sessionMedianMs,reviews,usedMs){
     var daily=obj(q.daily),lesson=current.progress.nextLesson,lp=lessonProgress(q,lesson.id,content);
-    var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
-    // K3P-A4: Bugün tahmini sığan oturumdan türetilir. Sığan tekrar = bütçe − dersin özü, en çok vadeli sayısı.
-    var bound=taskBudget(cap,daily,now),core=lessonTaskCount(q,lesson.id,now,content,fresh);
-    // Isınma her zaman kalır; bütçe onun üstüne tekrar ekler.
-    var fitReviews=bound>0?Math.min(reviews,Math.max(Math.min(reviews,WARMUP_MAX),bound-core)):reviews;
-    var estimate=estimateDetails(daily,fitReviews+core,now,sessionMedianMs),minutes=estimate.minutes,counts={reviews:fitReviews,fresh:fresh};
+    var reviewList=Array.isArray(reviews)?reviews:Object.keys(obj(q.cards)).filter(function(id){ var card=obj(q.cards[id]),due=new Date(card.due||0).getTime(); return card.orphan!==true&&card.state!=='new'&&card.st!=='new'&&isFinite(due)&&due<=now.getTime(); }).slice(0,REVIEW_CAP).map(function(id){ return {id:id,cardId:id,isNew:false}; }),
+      part=lessonPart({quranLearn:q},lesson.id,now,content,reviewList,{sessionMedianMs:sessionMedianMs,usedMs:usedMs}),
+      selectedReviews=part.filter(function(item){ return item.group==='review'; }),fresh=part.filter(function(item){ return item.kind==='intro'; }).length,
+      tasks=part.reduce(function(total,item){ return total+lessonTaskCost(item); },0),estimate=estimateDetails(daily,tasks,now,sessionMedianMs),minutes=estimate.minutes,
+      counts={reviews:selectedReviews.length,fresh:fresh,tasks:tasks},budgetText=tasks+' görev · '+estimateText(estimate);
+    var blocked=part.filter(function(item){ return item.kind==='partEnd'; })[0],hasWork=tasks>0;
+    if(!hasWork&&blocked){
+      var required=estimateDetails(daily,blocked.requiredTasks,now,sessionMedianMs);
+      return step('budget-blocked',current.unit.title+' · Ders '+(current.progress.nextIndex+1),'Sıradaki görev için '+estimateText(required)+' gerekiyor. Bugün kalan tahmini süre '+Math.floor(blocked.remainingMs/60000)+' dk.',required.minutes,'kaoSetView',lesson.id,{reviews:0,fresh:0,tasks:0,requiredTasks:blocked.requiredTasks});
+    }
     // 05 §10: tekrar borcu yeni kelimeyi sıfırladıysa ünite tanıtımı yerine "yalnız tekrar" günü.
-    if(current.previous&&!current.progress.started&&fresh>0) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise+' · '+estimateText(estimate),minutes,'kaoLesson',lesson.id,counts);
-    var subtitle=fresh>0?(fitReviews>0?fitReviews+' tekrar + '+fresh+' yeni':fresh+' yeni kelime')+' · '+estimateText(estimate):fitReviews+' tekrar · önce tekrarları bitirelim · '+estimateText(estimate);
+    if(current.previous&&!current.progress.started&&fresh>0) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise+' · '+budgetText,minutes,'kaoLesson',lesson.id,counts);
+    var label=selectedReviews.length?selectedReviews.length+' tekrar'+(fresh?' + '+fresh+' yeni':''):(fresh?fresh+' yeni kelime':'Ders devamı'),subtitle=label+' · '+budgetText;
     return step('daily',current.unit.title+' · Ders '+(current.progress.nextIndex+1),subtitle,minutes,'kaoLesson',lesson.id,counts);
   }
   // 05 §4 öncelik sırası; ilk eşleşen kazanır. Kenar: 7+ gün ara → ısınma, tekrar borcu >60 → yeni 0.
-  function nextStep(snapshot,now,content,sessionMedianMs){
+  function nextStep(snapshot,now,content,sessionMedianMs,reviews,usedMs){
     checkNow(now);
     var snap=obj(snapshot),q=obj(snap.quranLearn),onboarding=obj(q.onboarding),daily=obj(q.daily),night=snap.night;
-    var cap=[5,10,15].indexOf(onboarding.minutes)>=0?onboarding.minutes:0,due=dueCount(q,now);
+    var due=dueCount(q,now);
     if(!onboarding.doneAt) return step('onboarding','Hoş geldin','1 dakikada başlayalım',1,'kaoOnboarding',null);
     if(night&&night.active===true&&due>0){
       var nightCards=Math.min(due,num(night.maxCards,8)),nightMin=num(night.durationMinutes,3);
@@ -541,10 +561,10 @@
       if(unitMastery(q,current.unit.id).state==='repair') return step('repair','Onarım: '+current.unit.title,'Karıştırdığın kelimeleri pekiştir · ~'+REPAIR_MINUTES+' dk',REPAIR_MINUTES,'kaoLesson','repair:'+current.unit.id);
       return step('mastery','Ustalık: '+current.unit.title,'Çapa metnini dokunmadan oku + karma test · ~'+MASTERY_MINUTES+' dk',MASTERY_MINUTES,'kaoLesson',current.unit.id);
     }
-    if(current&&!todayDone) return lessonStep(q,now,content,current,due,cap,sessionMedianMs);
+    if(current&&!todayDone) return lessonStep(q,now,content,current,sessionMedianMs,reviews,usedMs);
     return step('rest',current?'Bugünlük tamam ✓':'Tüm üniteler tamam ✓','İstersen: Günün âyeti',0,'kaoOpenAyah',null);
   }
 
   window.SeymaQuranLearnFlow={version:1,createStack:createStack,openStack:openStack,push:push,reset:reset,replaceTop:replaceTop,current:current,previous:previous,back:back,
-    ladderRung:ladderRung,ladderArm:ladderArm,curriculum:curriculum,lessonOf:lessonOf,lessonProgress:lessonProgress,unitProgress:unitProgress,nextStep:nextStep,lessonPlan:lessonPlan,masteryPlan:masteryPlan,repairPlan:repairPlan,unitMastery:unitMastery,estimateMinutes:estimateMinutes};
+    ladderRung:ladderRung,ladderArm:ladderArm,curriculum:curriculum,lessonOf:lessonOf,lessonProgress:lessonProgress,unitProgress:unitProgress,nextStep:nextStep,lessonPlan:lessonPlan,lessonPart:lessonPart,masteryPlan:masteryPlan,repairPlan:repairPlan,unitMastery:unitMastery,estimateMinutes:estimateMinutes};
 })(window);

@@ -29,7 +29,7 @@ for (const relative of [
 const api = sandbox.window.SeymaQuranLearn;
 const flow = sandbox.window.SeymaQuranLearnFlow;
 const cur = sandbox.window.QuranCurriculumV2;
-const content = { curriculum: cur };
+const content = { curriculum: cur, lexicon: sandbox.window.QuranLexiconV1, grammar: sandbox.window.QuranGrammarV1, shorts: sandbox.window.QuranShortSurahsV1, phonics: sandbox.window.QuranPhonicsV1 };
 const now = new ClockDate(NOW_MS);
 const TODAY = '2026-09-28';
 const ISO = '2026-09-20T10:00:00.000Z';
@@ -101,7 +101,9 @@ check('(4) bugün ders yok → daily (tekrar + ders parçası + dakika)', () => 
   const r = step(q);
   assert.equal(r.kind, 'daily');
   assert.equal(r.param, 'u01.01');
-  assert.deepEqual(plain(r.counts), { reviews: 3, fresh: 3 });
+  assert.equal(r.counts.reviews, 3);
+  assert.equal(r.counts.fresh, 3);
+  assert.ok(r.counts.tasks <= 10, `seçili görev sayısı bütçeye sığmalı: ${r.counts.tasks}`);
   assert.match(r.subtitle, /3 tekrar/);
   assert.ok(r.minutes >= 1);
 });
@@ -184,7 +186,8 @@ check('(kenar) tekrar borcu > 60 → yeni kelime 0', () => {
   const r = step(q);
   assert.equal(r.kind, 'daily');
   assert.equal(r.counts.fresh, 0);
-  assert.equal(r.counts.reviews, 20);
+  assert.ok(r.counts.reviews > 0 && r.counts.reviews <= 20);
+  assert.ok(r.counts.tasks <= 10);
 });
 
 check('(kenar) tekrar borcu > 60 + yeni ünite → next-unit değil, yalnız tekrar (05 §10)', () => {
@@ -193,9 +196,11 @@ check('(kenar) tekrar borcu > 60 + yeni ünite → next-unit değil, yalnız tek
   q.path.units['1'] = { masteryAt: ISO, masteryScore: 0.9 };
   const r = step(q);
   assert.equal(r.kind, 'daily');
-  assert.deepEqual(plain(r.counts), { reviews: 20, fresh: 0 });
+  assert.equal(r.counts.fresh, 0);
+  assert.ok(r.counts.reviews > 0 && r.counts.reviews <= 20);
+  assert.ok(r.counts.tasks <= 10);
   assert.doesNotMatch(r.title, /Sıradaki ünite/);
-  assert.match(r.subtitle, /önce tekrarları bitirelim/);
+  assert.match(r.subtitle, new RegExp(`${r.counts.reviews} tekrar`));
 });
 
 check('(kenar) 7+ gün ara → warmup (en zayıf 10)', () => {
@@ -277,7 +282,7 @@ check('motor: kaoNextStep gerçek veriyle Flow çağırır; kaoContinue oturum s
   assert.equal(api.kaoNextStep(now).kind, 'daily');
   ui.kaoLatency = [30000];
   const sessionEstimate = api.kaoNextStep(now);
-  assert.ok(sessionEstimate.minutes > 5, 'quranLearn UI oturum medyanı cap=5 üstü gerçek tahmini aktarmalı');
+  assert.ok(sessionEstimate.minutes <= 5, 'quranLearn UI oturum medyanıyla seçili bölüm cap=5 içine bölünmeli');
   assert.match(sessionEstimate.subtitle, /kişisel oturum medyanı/);
   assert.deepEqual(ui.kaoLatency, [30000], 'Flow tahmin çağrısı UI geçmişini değiştirmemeli');
   ui.kaoLatency = Array(50).fill(6000);
@@ -309,38 +314,41 @@ const planTasks = (q, lessonId) => flow.lessonPlan({ quranLearn: q }, lessonId, 
 const fullStep = (q) => flow.nextStep({ quranLearn: q }, now, fullContent);
 const withCap = (q, minutes) => { q.onboarding.minutes = minutes; return q; };
 
-check('K3PD-05: ders dakikası görev sayısı ve açık varsayılan etiketinden gelir', () => {
+check('K3PD-06: ders dakikası seçili parça görev sayısı ve açık varsayılan etiketinden gelir', () => {
   const q = withCap(baseQ(), 15);
-  const r = fullStep(q), tasks = planTasks(q, 'u01.01');
+  const r = fullStep(q), plan = flow.lessonPart({ quranLearn: q }, 'u01.01', now, fullContent), tasks = plan.filter((i) => ['intro', 'practice', 'apply'].includes(i.kind)).length;
   assert.ok(tasks >= 12, `gerçek ders plan adımı: ${tasks}`);
   assert.equal(r.minutes, flow.estimateMinutes({}, tasks, now, 15));
+  assert.equal(r.counts.tasks, tasks);
   assert.ok(r.minutes >= 6, `dakika: ${r.minutes}`);
-  assert.match(r.subtitle, new RegExp(`~${r.minutes} dk · ölçümsüz varsayılan$`));
+  assert.match(r.subtitle, new RegExp(`${tasks} görev · ~${r.minutes} dk · ölçümsüz varsayılan$`));
 });
 
 check('K2F-31 (b): tekrar sayısı göreve eklenir', () => {
   const lean = withCap(baseQ(), 15), busy = withCap(baseQ({ cards: reviewCards(12, PAST) }), 15);
   const a = fullStep(lean), b = fullStep(busy);
   assert.equal(b.counts.reviews, 12);
-  assert.equal(b.minutes, flow.estimateMinutes({}, 12 + planTasks(busy, 'u01.01'), now, 15));
+  assert.equal(b.counts.tasks, b.counts.reviews + planTasks(busy, 'u01.01'));
+  assert.equal(b.minutes, flow.estimateMinutes({}, b.counts.tasks, now, 15));
   assert.ok(b.minutes > a.minutes);
 });
 
 check('K3PD-05: oturum örneği yoksa önceki 7 gün yedeği açık etiketlenir', () => {
   const q = withCap(baseQ(), 15);
   q.daily['2026-09-27'] = { answered: 10, ms: 300000 };
-  const r = fullStep(q), tasks = planTasks(q, 'u01.01');
+  const r = fullStep(q), plan = flow.lessonPart({ quranLearn: q }, 'u01.01', now, fullContent), tasks = plan.filter((i) => ['intro', 'practice', 'apply'].includes(i.kind)).length;
   assert.equal(r.minutes, flow.estimateMinutes(q.daily, tasks, now, 15));
+  assert.equal(r.counts.tasks, tasks);
   assert.equal(r.minutes, flow.estimateMinutes({}, tasks, now, 15), 'ölçülmüş 0,5 dk/görev varsayılan 0,5 dk/görevle aynı tahmini verir');
   assert.match(r.subtitle, /yedek: önceki 7 gün ortalaması/);
 });
 
-check('K2F-31 (d): tekrar 0 iken alt satır "N yeni kelime · ~M dk" — "0 tekrar" yazılmaz', () => {
+check('K2F-31 (d): tekrar 0 iken alt satır yeni kelime + gerçek görev sayısı + tahmin; "0 tekrar" yazılmaz', () => {
   const q = withCap(baseQ(), 15);
   const r = fullStep(q);
   assert.equal(r.counts.reviews, 0);
   assert.ok(r.counts.fresh > 0);
-  assert.equal(r.subtitle, `${r.counts.fresh} yeni kelime · ~${r.minutes} dk · ölçümsüz varsayılan`);
+  assert.equal(r.subtitle, `${r.counts.fresh} yeni kelime · ${r.counts.tasks} görev · ~${r.minutes} dk · ölçümsüz varsayılan`);
   assert.doesNotMatch(r.subtitle, /0 tekrar/);
 });
 

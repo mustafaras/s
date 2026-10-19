@@ -2143,6 +2143,9 @@
     var lexicon=window.QuranLexiconV1,audioLemmas=kaoAudioLemmaMap(lexicon);
     return {curriculum:window.QuranCurriculumV2,lexicon:lexicon,grammar:window.QuranGrammarV1,shorts:window.QuranShortSurahsV1,phonics:window.QuranPhonicsV1,audioLemmas:audioLemmas};
   }
+  function kaoLessonReviewItems(d,now){
+    return kaoBuildQueue(d,now,{sessionId:localDayOf(now),candidates:kaoCandidates(),dailyNew:0}).filter(function(item){ return !item.isNew; });
+  }
   function kaoLessonRecord(q,id){
     q.path=objectOr(q.path,{}); q.path.lessons=objectOr(q.path.lessons,{});
     if(!q.path.lessons[id]||typeof q.path.lessons[id]!=='object'||Array.isArray(q.path.lessons[id])) q.path.lessons[id]={startedAt:null,doneAt:null,score:null};
@@ -2174,7 +2177,8 @@
     }
     // K3P-A5: enjekte edilen kolay kart ders planının adımı değildir; devam işaretçisine yazılmaz.
     var currentQueued=(ui.kaoQueue||[])[ui.kaoTaskIndex||0];
-    if(!(phase==='practice'&&currentQueued&&currentQueued.easy===true)) record.resume=item&&item.id?{phase:phase,itemId:String(item.id),lessonItemId:String(next.id)}:null;
+    if(item&&item.kind==='partEnd') record.resume={phase:'lesson',itemId:String(item.resumeItemId||''),lessonItemId:String(item.resumeItemId||'')};
+    else if(!(phase==='practice'&&currentQueued&&currentQueued.easy===true)) record.resume=item&&item.id?{phase:phase,itemId:String(item.id),lessonItemId:String(next.id)}:null;
     return true;
   }
   // K3P-23: yeni kelime kartının şeması TEK kaynaktan gelir; ders tanıtımı (kaoLessonMarkIntro) ve
@@ -2218,7 +2222,7 @@
   }
   function kaoLessonStart(lessonId,startMode){
     var ui=quranLearnDeps.ui(),d=quranLearnDeps.data(),q=ensureQuranLearn(d),content=kaoLessonContent(),curriculum=content.curriculum,flow=window.SeymaQuranLearnFlow;
-    if(!curriculum||!flow||typeof flow.lessonPlan!=='function') return false;
+    if(!curriculum||!flow||typeof flow.lessonPart!=='function') return false;
     var resolved=String(lessonId||''),repairMatch=/^repair:(.+)$/.exec(resolved);
     if(repairMatch){ var repairUnit=curriculum.units.find(function(item){ return String(item.id)===repairMatch[1]; }); return repairUnit?kaoRepairStart(repairUnit,ui,q,content,flow):false; }
     var lesson=curriculum.byLesson&&curriculum.byLesson(resolved);
@@ -2235,20 +2239,14 @@
       if(ui.kaoLesson.phase==='practice') startTaskPresentation();
       return true;
     }
-    // K3P-A3: vadeli tekrarlar ayrı bir ön faz değil, planın parçası.
-    var now=new Date(),reviews=startMode==='intro'?[]:kaoBuildQueue(d,now,{sessionId:quranLearnDeps.todayStr(),candidates:kaoCandidates(),dailyNew:0}).filter(function(item){ return !item.isNew; }).slice(0,20),plan=flow.lessonPlan({quranLearn:q},lesson.id,now,content,reviews);
+    // K3P-A3: tekrarlar planın parçasıdır.
+    var now=new Date(),reviews=startMode==='intro'?[]:kaoLessonReviewItems(d,now),plan=flow.lessonPart({quranLearn:q},lesson.id,now,content,reviews,{sessionMedianMs:kaoLatencyMedian(ui),allowOverrun:startMode==='budget-overrun',preparePlan:function(items){ return kaoLessonSafePlan(items,d); }});
     if(!Array.isArray(plan)||!plan.length) return false;
-    plan=kaoLessonSafePlan(plan,d);
+    if(plan[1]&&plan[1].kind==='partEnd'&&startMode!=='budget-overrun') return false;
     var record=kaoLessonRecord(q,lesson.id),resume=objectOr(record.resume,{}),state={lessonId:lesson.id,title:kaoSafeLessonTitle(lesson),plan:plan,knownBefore:kaoKnownLemmaSet(d),coverageBefore:kaoCoverage(d).ratio,at:0,phase:'lesson',correct:0,answered:0,done:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:record.startedAt||now.toISOString()};
-    var find=function(id){ return id?plan.findIndex(function(item){ return item.id===id; }):-1; },pendAt=resume.phase==='review'?-1:find(resume.itemId),nextAt=find(resume.lessonItemId);
-    if(pendAt>=0&&plan[pendAt].group==='review'&&nextAt>=0){
-      // Yarım kalan tekrar, sıradaki ders adımının hemen önüne alınır; öncesindeki tekrarlar vadeli kalır.
-      var pending=plan[pendAt],step=plan[nextAt],rest=plan.filter(function(item){ return item!==pending; });
-      plan=state.plan=rest.slice(0,rest.indexOf(step)).concat([pending],rest.slice(rest.indexOf(step))); pendAt=plan.indexOf(pending);
-    }
-    if(pendAt>=0||nextAt>=0) state.at=pendAt>=0?pendAt:nextAt; else if(startMode==='intro') state.at=Math.max(0,plan.findIndex(function(item){ return item.kind==='intro'; }));
+    if(startMode==='intro') state.at=Math.max(0,plan.findIndex(function(item){ return item.kind==='intro'; }));
     state.phase=plan[state.at].kind==='practice'?'practice':'lesson';
-    record.startedAt=record.startedAt||now.toISOString(); q.startedAt=q.startedAt||now.toISOString(); kaoResetLatency(ui); ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoLesson=state; ui.kaoNight=false; ui.kaoDurableCount=0;
+    record.startedAt=record.startedAt||now.toISOString(); q.startedAt=q.startedAt||now.toISOString(); if(!resume.itemId||startMode==='intro') kaoResetLatency(ui); ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoLesson=state; ui.kaoNight=false; ui.kaoDurableCount=0;
     return kaoLessonActivate(ui);
   }
   // K2F-06: ünite ustalığı — çapa metnini oku + 10 soruluk karma test. Plan saf Flow'dan gelir.
@@ -2332,6 +2330,8 @@
   var KAO_SECTION_LABELS=['Hedef','Isınma','Tanış-Sına','Karışık','Zirve'];
   function kaoSectionOf(item){
     if(!item||!item.kind) return 1;
+    if(item.kind==='partGoal') return Math.max(1,Math.min(5,Math.floor(nonNegativeNumber(item.resumeSection,1))));
+    if(item.kind==='partEnd') return Math.max(1,Math.min(5,Math.floor(nonNegativeNumber(item.section,4))));
     if(item.kind==='goal') return 1;
     if(item.kind==='apply'||item.kind==='read'||item.kind==='summary') return 5;
     if(item.kind==='intro'||item.kind==='concept') return 3;
@@ -2360,15 +2360,25 @@
     var contextLine=lessonUnit?(kaoUnitContextLabel(lessonUnit)+' · Ders '+String(lessonRef.index+1)+' / '+String(lessonUnit.lessons.length)):'';
     if(kaoUnitSession(state)){ var sessionUnit=kaoCurriculumUnit(state.unitId),sessionLabel=state.kind==='repair'?'Onarım':'Ustalık kontrolü'; contextLine=sessionUnit?(kaoUnitContextLabel(sessionUnit)+' · '+sessionLabel):sessionLabel; }
     var kaoSection=kaoLessonSection(state),kaoSectionProgress=kaoSection.countInSection?kaoSection.indexInSection/kaoSection.countInSection:0;
-    var model={stage:item.kind==='read'?'apply':item.kind,title:state.title,context:contextLine,step:(state.at||0)+1,stepTotal:state.plan.length,percent:((state.at||0)+1)/state.plan.length*100,section:kaoSection.section,sectionLabel:kaoSection.label,sectionPercent:kaoSectionProgress*100,sectionValuetext:kaoSectionValuetext(kaoSection),action:item.kind==='summary'?{name:'kaoLesson',args:['finish']}:{name:'kaoLesson',args:['next']},exit:{name:'kaoLesson',args:['exit']},buttonLabel:item.kind==='summary'?'Bugün yeter':'Devam'};
+    var model={stage:item.kind==='read'?'apply':(item.kind==='partEnd'?'budget':item.kind),title:state.title,context:contextLine,step:(state.at||0)+1,stepTotal:state.plan.length,percent:((state.at||0)+1)/state.plan.length*100,section:kaoSection.section,sectionLabel:kaoSection.label,sectionPercent:kaoSectionProgress*100,sectionValuetext:kaoSectionValuetext(kaoSection),action:item.kind==='summary'?{name:'kaoLesson',args:['finish']}:(item.kind==='partEnd'?{name:'kaoLesson',args:['budget-settings']}:{name:'kaoLesson',args:['next']}),exit:{name:'kaoLesson',args:['exit']},buttonLabel:item.kind==='summary'?'Bugün yeter':(item.kind==='partEnd'?'Daha uzun süre seç':'Devam')};
     if(item.kind==='goal'&&state.kind==='repair'){
       model.promise='Karıştırdığın '+(item.lemmaIds||[]).length+' kelimeyi iki yönde tekrar edeceğiz. Bitince ustalık kontrolünü yeniden deneyebilirsin.';
     }else if(item.kind==='goal'&&state.kind==='mastery'){
       model.promise='Önce çapa metnini dokunmadan oku, sonra 10 soruluk karma testi geç. Geçmek için en az 8 doğru gerekir; olmazsa yalnız karıştırdığın kelimeleri tekrar ederiz.';
-    }else if(item.kind==='goal'){
+    }else if(item.kind==='goal'||item.kind==='partGoal'){
       model.promise='Bu derste '+(item.lemmaIds||[]).length+' kelimeyle çalışacağız. Önce ısın, sonra tanış ve hemen dene; pekiştir, metinde bul.';
       model.goal=lessonRef?kaoVisibleText(lessonRef.lesson.review,lessonRef.lesson.goal,''):'';
+      if(item.conceptAnchor) model.context=(contextLine?contextLine+' · ':'')+'Kavram: '+String(item.conceptAnchor);
       model.rowHtml=kaoRowHtml(kaoAyahRow(item.words,item.lessonIds,item.newLemmaIds),0);
+    }
+    if(item.kind==='partEnd'){
+      var goalItem=(state.plan||[]).find(function(entry){ return entry.kind==='goal'||entry.kind==='partGoal'; })||{};
+      model.title='Günlük süre sınırı';
+      model.goal=lessonRef?kaoVisibleText(lessonRef.lesson.review,lessonRef.lesson.goal,''):'';
+      model.promise='Sıradaki görev ~'+String(item.requiredMinutes)+' dk · '+(item.source==='session'?'kişisel oturum medyanı':(item.source==='history'?'yedek: önceki 7 gün ortalaması':'ölçümsüz varsayılan'))+'. Bugün kalan '+String(Math.floor(item.remainingMs/60000))+' dk. Günlük süreyi artırabilir ya da aşımı açıkça kabul edebilirsin.';
+      model.secondaryAction={name:'kaoLesson',args:['budget-overrun']};
+      model.secondaryLabel='Süre aşımını kabul et';
+      model.rowHtml=goalItem.rowHtml||'';
     }
     if(item.kind==='intro'){
       var lemma=item.lemma||{}; model.ar=lemma.ar; model.pronunciation=kaoLemmaReading(item.lemmaId,lemma.translit); model.meaning=Array.isArray(lemma.meanings)?lemma.meanings.join(' · '):''; model.ordinal=item.ordinal; model.total=item.total;
@@ -2453,9 +2463,15 @@
     }
     if(!state) return false;
     if(action==='gild') return kaoGild();
+    if(action==='budget-settings'||action==='budget-overrun'){
+      var budgetItem=(state.plan||[])[state.at||0]; if(!budgetItem||budgetItem.kind!=='partEnd') return false;
+      var budgetLesson=state.lessonId; kaoLessonResume(ui); kaoSave(); ui.kaoLesson=null;
+      if(action==='budget-overrun') return kaoLessonStart(budgetLesson,'budget-overrun');
+      kaoApplyView(ui,'settings',null,'replace'); quranLearnDeps.render(); return true;
+    }
     if(action==='next'){
       if(state.phase!=='lesson') return false;
-      var current=(state.plan||[])[state.at||0]; if(!current||current.kind==='summary') return false;
+      var current=(state.plan||[])[state.at||0]; if(!current||current.kind==='summary'||current.kind==='partEnd') return false;
       state.at+=1; state.phase=state.plan[state.at]&&state.plan[state.at].kind==='practice'?'practice':'lesson'; return kaoLessonActivate(ui);
     }
     if(action==='finish'||action==='more'){
@@ -2765,7 +2781,7 @@
     var intentText=intentHit?('Her '+intentHit[1]+' namazından sonra 5 dakika'):(intentValue==='custom'?'Kendim seçerim':'Henüz seçilmedi');
     var h='<main class="kao-settings" aria-labelledby="kao-settings-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Ayarlar</p><h2 id="kao-settings-title">Öğrenme ayarların</h2><p>Seçimlerin bu cihazda saklanır ve senkronla taşınır.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
     // K2F-29: amaca göre gruplar; tüm aç/kapat ayarları gerçek anahtardır.
-    h+=group('Günlük hedef',[kaoSegHTML('Günlük yeni kelime',KAO_DAILY_NEW.map(function(n){ return [n,String(n),n]; }),Math.floor(nonNegativeNumber(s.dailyNew,10)),'kaoSetDailyNew'),kaoSegHTML('Niyet',KAO_ONBOARD_INTENTS.map(function(pair){ return [pair[0],pair[1],"'"+pair[0]+"'"]; }),q.onboarding.intent,'kaoSetIntent')],'Niyet: '+intentText);
+    h+=group('Günlük hedef',[kaoSegHTML('Günlük yeni kelime',KAO_DAILY_NEW.map(function(n){ return [n,String(n),n]; }),Math.floor(nonNegativeNumber(s.dailyNew,10)),'kaoSetDailyNew'),kaoSegHTML('Günlük süre',KAO_ONBOARD_MINUTES.map(function(n){ return [n,n+' dk',n]; }),Math.floor(nonNegativeNumber(q.onboarding.minutes,5)),'kaoOnboard'),kaoSegHTML('Niyet',KAO_ONBOARD_INTENTS.map(function(pair){ return [pair[0],pair[1],"'"+pair[0]+"'"]; }),q.onboarding.intent,'kaoSetIntent')],'Niyet: '+intentText);
     h+=group('Ses',[kaoSegHTML('Yeni kelimede otomatik ses',[['off','Kapalı',"'off'"],['measured','Yavaş',"'measured'"],['flowing','Doğal',"'flowing'"]],audio,'kaoSetAudioStyle')],'Ses düğmeleri: ◖ Yavaş ölçülü okur, ◗ Doğal akıcı okur. Sessiz saatte otomatik ses çalmaz.');
     h+=group('Okuma',[
       kaoSegHTML('Latin okunuş katmanı',[['tr','Okunuş',"'tr'"],['dia','DİA',"'dia'"]],kaoTranslitLayer(),'kaoSetTranslit'),
@@ -3786,7 +3802,7 @@
   }
   // KAO2-09 · S-02: nextStep eylem eşlemesi. Henüz handler'ı olmayan adımlar mevcut akışa bağlanır
   //; tek birincil eylem her zaman çalışır durumda kalır. KAO2-11: onboarding → ilk açılış.
-  var KAO_HOME_ACTIONS={onboarding:{label:'Başlayalım',action:{name:'kaoOnboard',args:['start']}},'night-review':{label:'',action:'kaoStart'},warmup:{label:'Isınmaya başla',action:'kaoStart'},'s0-lesson':{label:'Derse başla',action:'kaoS0'},mastery:{label:'Ustalığa başla',action:'kaoLesson'},repair:{label:'Onarım turuna başla',action:'kaoLesson'},'next-unit':{label:'Üniteye başla',action:'kaoLesson'},daily:{label:'Başla',action:'kaoLesson'},rest:{label:'Günün âyetini aç',action:'kaoOpenAyah'}};
+  var KAO_HOME_ACTIONS={onboarding:{label:'Başlayalım',action:{name:'kaoOnboard',args:['start']}},'night-review':{label:'',action:'kaoStart'},warmup:{label:'Isınmaya başla',action:'kaoStart'},'s0-lesson':{label:'Derse başla',action:'kaoS0'},mastery:{label:'Ustalığa başla',action:'kaoLesson'},repair:{label:'Onarım turuna başla',action:'kaoLesson'},'next-unit':{label:'Üniteye başla',action:'kaoLesson'},daily:{label:'Başla',action:'kaoLesson'},'budget-blocked':{label:'Süreyi artır',action:{name:'kaoSetView',args:['settings']}},rest:{label:'Günün âyetini aç',action:'kaoOpenAyah'}};
   // K3P-A7: yarım kalan dersin bölümü yalnız mevcut path.lessons[id].resume alanından okunur.
   function kaoResumeSectionForLesson(q,lessonId,now){
     var lessons=objectOr(objectOr(q.path,{}).lessons,{}),record=objectOr(lessons[String(lessonId)],{}),resume=objectOr(record.resume,null);
@@ -3810,6 +3826,7 @@
     // K2F-15: Seviye 0 adımı ders oynatıcıya değil S0 yüzeyine gider.
     if(step.kind==='s0-lesson') action={name:'kaoS0',args:['start',step.param]};
     var hero={eyebrow:step.kind==='rest'?'Bugün':'Sıradaki',title:step.title,subtitle:step.subtitle,button:{label:label,action:action},foot:foot};
+    if(step.kind==='budget-blocked') hero.secondary={label:'Süre aşımını kabul ederek devam et',action:{name:'kaoLesson',args:['start',step.param,'budget-overrun']}};
     // K2F-08 (KR-2): ustalık adımında ikincil metin düğmesi; atlamak taş/ustalık yazmaz.
     if(step.kind==='mastery') hero.secondary={label:'Şimdilik atla',action:{name:'kaoLesson',args:['skip-mastery',step.param]}};
     return hero;
@@ -4093,6 +4110,7 @@
     // "Hızlı geçişi aç" mevcut App.kaoToggleAutoAdvance'ı çağırır (ikinci handler yok).
     if(action==='auto-advance-offer-close'){ if(ui.kaoAdvanceOffer!==true) return false; ui.kaoAdvanceOffer=false; quranLearnDeps.render(); return true; }
     if(!q) return false;
+    if(q.onboarding.doneAt&&KAO_ONBOARD_MINUTES.indexOf(action)>=0){ q.onboarding.minutes=action; ui.kaoSettingsNote='Günlük süre '+action+' dk olarak ayarlandı.'; kaoSave(); quranLearnDeps.render(); return true; }
     if(action==='change-start') return kaoOnboardChangeStart(ui,q);
     if(kaoOnboardActive(ui)&&st.change===true){ changed=kaoOnboardChangeStep(ui,q,st,action,value); if(changed) quranLearnDeps.render(); return changed; }
     if(q.onboarding.doneAt) return false;
@@ -4571,7 +4589,8 @@
   function kaoNextStepFor(d,now,sessionMedianMs){
     var flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2;
     if(!flow||typeof flow.nextStep!=='function'||!curriculum) throw new Error('KAO2-08: akış motoru ya da müfredat yüklenmedi');
-    return flow.nextStep({quranLearn:ensureQuranLearn(d),night:kaoNightWindow(d,now)},now,kaoLessonContent(),sessionMedianMs);
+    var q=ensureQuranLearn(d),reviews=kaoLessonReviewItems(d,now);
+    return flow.nextStep({quranLearn:q,night:kaoNightWindow(d,now)},now,kaoLessonContent(),sessionMedianMs,reviews);
   }
   function kaoNextStep(nowValue){
     if(!quranLearnDeps) return null;

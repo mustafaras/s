@@ -29,6 +29,30 @@ function loadHelpers(box) {
   vm.runInContext(helpersSrc, box, { filename: 'helpers.js' });
   return box.window.SeymaHelpers;
 }
+function startLessonForFixture(t, lessonId) {
+  return t.api.kaoLesson('start', lessonId)
+    || t.api.kaoLesson('start', lessonId, 'budget-overrun');
+}
+function playLessonAcrossParts(t, options = {}) {
+  for (let guard = 0; guard < 40; guard += 1) {
+    const state = t.ui.kaoLesson;
+    if (!state) return false;
+    const from = state.at || 0;
+    const boundary = state.plan.findIndex((item, index) => index >= from && item.kind === 'partEnd');
+    const target = options.stopAt
+      ? state.plan.findIndex((item, index) => index >= from && item.kind === options.stopAt)
+      : -1;
+    const stopAt = target >= 0 && (boundary < 0 || target < boundary) ? options.stopAt : (boundary >= 0 ? 'partEnd' : options.stopAt);
+    if (!H.playLesson(t, Object.assign({}, options, { stopAt }))) return false;
+    const currentState = t.ui.kaoLesson, current = currentState && currentState.plan[currentState.at || 0];
+    if (current && current.kind === 'partEnd') {
+      if (!t.api.kaoLesson('budget-overrun')) return false; // synthetic user explicitly accepts the displayed overrun
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
 
 // 1) helpers.js tek başına: kilit, kuyruk sınırı, tekrar, urgent/own, boşaltma.
 {
@@ -82,12 +106,12 @@ function loadHelpers(box) {
   assert.equal(t.api.kaoFocusLocked(), false, 'kapalıyken kilit yok');
   t.api.kaoOpen('home');
   assert.equal(t.api.kaoFocusLocked(), false, 'ana ekranda kilit yok');
-  assert.equal(t.api.kaoLesson('start', 'u01.02'), true);
+  assert.equal(startLessonForFixture(t, 'u01.02'), true);
   assert.equal(t.api.kaoFocusLocked(), true, 'ders sırasında kilit');
   helpers.toast('Hatırlatma: su iç');
   helpers.toast('ÆON: yeni mesaj');
   assert.equal(doc.shown.length, 0, 'ders sırasında KAO dışı DOM eklemesi 0');
-  assert.equal(H.playLesson(t), true, 'ders özete kadar oynandı');
+  assert.equal(playLessonAcrossParts(t), true, 'ders özete kadar oynandı');
   const st = t.ui.kaoLesson, item = st && st.plan[st.at || 0];
   assert.ok(item && item.kind === 'summary', 'ders özette');
   assert.equal(doc.shown.length, 1, 'özette tek birleşik bildirim');
@@ -99,13 +123,13 @@ function loadHelpers(box) {
   assert.equal(doc.shown.length, 2, 'çıkışta bekleyen bildirim gösterilir');
   assert.equal(doc.shown[1].textContent, 'Özetteyken gelen');
   // "Bugün yeter" (finish) da ana ekrana döner: kilit kalkar.
-  assert.equal(t.api.kaoLesson('start', 'u01.03'), true);
+  assert.equal(startLessonForFixture(t, 'u01.03'), true);
   assert.equal(t.api.kaoFocusLocked(), true);
-  assert.equal(H.playLesson(t), true);
+  assert.equal(playLessonAcrossParts(t), true);
   assert.equal(t.api.kaoLesson('finish'), true);
   assert.equal(t.api.kaoFocusLocked(), false, 'finish sonrası kilit yok');
   // Ders ortasında kapatma da boşaltır.
-  assert.equal(t.api.kaoLesson('start', 'u01.02'), true);
+  assert.equal(startLessonForFixture(t, 'u01.02'), true);
   helpers.toast('Kapatınca görünmeli');
   assert.equal(doc.shown.length, 2);
   t.api.kaoClose();

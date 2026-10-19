@@ -4,7 +4,7 @@
 // Kaynak: kao2-duzeltme/denetim/tekrar-uret.cjs (tarihsel kayıt olarak kalır). Her kontrol DOĞRU davranışı bekler.
 // Sentetik node:vm; ağ, tarayıcı, zamanlayıcı ve dosya yazımı yok. Durum GERÇEK handler'larla sürülür.
 const assert = require('node:assert/strict');
-const { bootKao, freshUser, walkLesson, playLesson, openView, navTitle, read, DEFAULT_NOW: NOW } = require('./helpers/kao-harness');
+const { bootKao, freshUser, playLesson: playLessonRaw, openView, navTitle, read, DEFAULT_NOW: NOW } = require('./helpers/kao-harness');
 
 let passed = 0;
 function check(id, finding, run) {
@@ -12,6 +12,33 @@ function check(id, finding, run) {
   assert.ok(ok, `${id} (${finding}) · ${detail}`);
   passed += 1;
   console.log(`PASS  ${id} (${finding}) · ${detail}`);
+}
+function startLessonForFixture(t, lessonId) {
+  return t.api.kaoLesson('start', lessonId)
+    || t.api.kaoLesson('start', lessonId, 'budget-overrun');
+}
+function playLesson(t, options = {}) {
+  for (let guard = 0; guard < 40; guard += 1) {
+    const state = t.ui.kaoLesson;
+    if (!state) return false;
+    const from = state.at || 0;
+    const boundary = state.plan.findIndex((item, index) => index >= from && item.kind === 'partEnd');
+    const target = options.stopAt
+      ? state.plan.findIndex((item, index) => index >= from && item.kind === options.stopAt)
+      : -1;
+    const stopAt = target >= 0 && (boundary < 0 || target < boundary) ? options.stopAt : (boundary >= 0 ? 'partEnd' : options.stopAt);
+    if (!playLessonRaw(t, Object.assign({}, options, { stopAt }))) return false;
+    const currentState = t.ui.kaoLesson, current = currentState && currentState.plan[currentState.at || 0];
+    if (current && current.kind === 'partEnd') {
+      if (!t.api.kaoLesson('budget-overrun')) return false; // synthetic user explicitly accepts the displayed overrun
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+function walkLesson(t, lessonId, options = {}) {
+  return startLessonForFixture(t, lessonId) && playLesson(t, options);
 }
 
 // R-01 (D2F-05): ustalık GERÇEKTEN geçildiğinde path.units kaydı yazılır — masteryAt dolu, masteryScore ≥ 0,8, sonraki adım "next-unit".

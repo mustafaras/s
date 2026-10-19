@@ -240,7 +240,9 @@ check('K3P-13 (K-G): günlük yeni kelime 0 (eski/içe aktarılmış veri) olsa 
 
 check('K3P-13 (K-G): açılış ve kapanış AYNI satırı Tezhip olarak çizer; "Yaldızla" kelimeleri sırayla yaldızlar', () => {
   const t = bootKao();
-  freshUser(t);
+  const q = freshUser(t);
+  q.onboarding.minutes = 15;
+  t.ui.kaoLatency = [6000];
   const target = t.win.QuranCurriculumV2.units[3].lessons[0];
   assert.equal(t.api.kaoLesson('start', target.id), true);
   const rowOf = (html) => (html.match(/<div class="kao-lesson-apply-tezhip">([\s\S]*?)<\/div>/) || ['', ''])[1];
@@ -469,7 +471,9 @@ check('K2F-26 ek tur: Arapça sekmesinde kartı geri getirince odak yeni ders gi
 
 check('K2F-37 ek (ekran görüntüsü): ders oynatıcıdaki kavram tablosu hücrelerinde Arapça + okunuş gösterilir, çıplak âyet referansı (2:17:3) gösterilmez', () => {
   const t = bootKao();
-  freshUser(t);
+  const q = freshUser(t);
+  q.onboarding.minutes = 15;
+  t.ui.kaoLatency = [6000];
   const grammar = t.win.QuranGrammarV1, cur = t.win.QuranCurriculumV2;
   const conceptLessons = [];
   cur.units.forEach((u) => u.lessons.forEach((l) => conceptLessons.push(l.id)));

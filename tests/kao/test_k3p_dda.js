@@ -22,7 +22,7 @@ function startLesson(t, lessonId = 'u01.01') {
 }
 function nextTask(t) { if (t.ui.kaoLesson && t.ui.kaoLesson.phase === 'lesson') t.api.kaoLesson('next'); return curTask(t); }
 // Ders adımlarını (goal/kavram) geçip ilk uygulama görevine iner.
-function toTask(t) { for (let g = 0; g < 60; g += 1) { const task = curTask(t); if (task) return task; if (!t.ui.kaoLesson || t.ui.kaoLesson.phase === 'lesson') { if (!t.api.kaoLesson('next')) return null; } else return null; } return null; }
+function toTask(t) { for (let g = 0; g < 60; g += 1) { const task = curTask(t); if (task) return task; const state=t.ui.kaoLesson,current=state&&state.plan[state.at]; if(current&&current.kind==='partEnd'){ if(!t.api.kaoLesson('budget-overrun')) return null; continue; } if (!state || state.phase === 'lesson') { if (!t.api.kaoLesson('next')) return null; } else return null; } return null; }
 function answerAndNext(t, correct) {
   const task = toTask(t); assert.ok(task, 'görev bulunmalı');
   // K3P-17/18: build ve cloze çok-dokunuşlu yollar. Doğru dizi paylaşılan yardımcıdan gelir.

@@ -53,9 +53,10 @@ function walk(seeded, lessonId) {
   const t = H.bootKao({ seeded });
   if (!seeded) H.freshUser(t);
   assert.ok(t.api.kaoLesson('start', lessonId), `${lessonId} başlamalı`);
-  const st = t.ui.kaoLesson;
   let n = 0;
   for (let guard = 0; guard < WALK_GUARD; guard += 1) {
+    const st = t.ui.kaoLesson;
+    if (!st) break;
     if (st.phase === 'practice' || st.phase === 'review') {
       const item = t.ui.kaoQueue[t.ui.kaoTaskIndex];
       const task = item && t.ui.kaoTasks[item.id];
@@ -81,6 +82,10 @@ function walk(seeded, lessonId) {
     }
     const current = st.plan[st.at];
     if (!current || current.kind === 'summary') break;
+    if (current.kind === 'partEnd') {
+      assert.equal(t.api.kaoLesson('budget-overrun'), true, `${lessonId}: açık süre aşımı seçimi`);
+      continue;
+    }
     t.api.kaoLesson('next');
   }
   const html = t.api.kaoOverlayHTML(t.NOW);

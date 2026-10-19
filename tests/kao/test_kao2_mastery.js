@@ -464,7 +464,8 @@ check('C atlama geçilmiş ustalığı bozmaz', () => {
 
 check('C 12 ünite simülasyonu: Bugün adımı her ünitede ilerler, Ünite 3 kaldı → onarım → geçti, sonunda "Tüm üniteler tamam"', () => {
   const u = bootKao();
-  freshUser(u);
+  const q = freshUser(u);
+  q.onboarding.minutes = 15; u.ui.kaoLatency = [6000];
   const masterySteps = [], kinds = [];
   let failedOnce = false, finalTitle = '', guard = 0;
   // Saat sabit (harness todayStr de sabit): her oturumdan sonra günün sessionDone'ı sıfırlanır → "yeni gün" benzetimi
@@ -640,6 +641,7 @@ check('D(f) uçtan uca (sıfır kullanıcı): ilk açılıştan yalnız birincil
   // Onboarding: birincil düğme ya da (seçim ekranlarında) ilk seçenek — kullanıcı yalnız dokunur.
   while (u.ui.kaoOnboard && guard++ < 40) { const t = tapPrimary(u) || tap(u, 'kao-onboard-option'); assert.ok(t && t.ok !== false, `onboarding dokunuşu çalışmalı (${guard})`); }
   assert.ok(!u.ui.kaoOnboard, 'onboarding bitti');
+  u.data.quranLearn.onboarding.minutes = 15;
   const seen = [];
   for (guard = 0; guard < 120; guard += 1) {
     const step = u.api.kaoNextStep(u.NOW);

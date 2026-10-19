@@ -275,7 +275,7 @@ UI taslağı, resume verisine etkisi ve hedef/kavramın hangi parçada görülec
 
 **Oku:** 04 kararı; Flow estimateMinutes; kaoLatencyMedian/Push; feedback kolları; test_kao2_next_step.js ve test_k3p_budget.js.
 
-**Yazma allowlist’i:** quranLearnFlow.js; quranLearn.js yalnız süre girdisi/latency bağlama noktaları; next_step, budget, feedback_arms fixture’ları; yeni kayıtlar.
+**Yazma allowlist’i:** `app/core/quranLearnFlow.js`; `app/core/quranLearn.js` (yalnız süre girdisi/latency bağlama noktaları); `tests/kao/test_kao2_next_step.js`; `tests/kao/test_k3p_budget.js`; `tests/kao/test_k3p_feedback_arms.js`; `tests/kao/test_kao_requirements.js`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-05/EVIDENCE.md`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-05 allowlist satırını exact-path uyumlu yapmak için).
 
 **Uygula:**
 

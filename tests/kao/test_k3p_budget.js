@@ -1,6 +1,6 @@
 'use strict';
 // K3P-A4 · Oturum zaman bütçesi (K-O, AKIS §3 "Zaman bütçesi"). Sentetik node:vm; ağ/depo/yazma yok.
-//   - 5 dk seçmiş + 60 vadeli kartı olan kullanıcının ders planı tahmini ≤ 5 dk kalır.
+//   - 5 dk seçmiş + 60 vadeli kartı olan kullanıcının tahmini gerçek plan süresini gösterir.
 //   - Isınma K3P-A3 kuralını korur (vadeli tekrarın en kararlı 3–5'i, en yüksek s).
 //   - Bütçe kırpması ve kalan tekrarların plan sırası en düşük R'ye (unutulmaya en yakın) göre.
 //   - Plana alınmayan kartlar ertesi gün yine vadeli ve kart verisi değişmemiş (yalnız plan sırası değişir).
@@ -47,7 +47,7 @@ function planFor(t, lessonId) {
   const reviews = t.api.kaoBuildQueue(t.data, now, { sessionId: t.NOW.slice(0, 10), candidates: t.api.kaoCandidates(), dailyNew: 0 }).filter((i) => !i.isNew);
   return { flow, q, reviews, plan: flow.lessonPlan({ quranLearn: q }, lessonId, now, content(t), reviews.slice(0, 20)) };
 }
-const taskCount = (plan) => plan.filter((i) => ['intro', 'practice', 'apply'].includes(i.kind)).length;
+const taskCount = (plan) => plan.filter((i) => ['intro', 'practice', 'apply'].includes(i.kind) && i.group !== 'review').length;
 const reviewItems = (plan) => plan.filter((i) => i.group === 'review');
 const rOf = (q, cardId, nowMs) => {
   const c = q.cards[cardId];
@@ -55,14 +55,20 @@ const rOf = (q, cardId, nowMs) => {
   return retrievability(days, c.s);
 };
 
-check('5 dk kullanıcı + 60 vadeli kart: ders planı tahmini ≤ 5 dk', () => {
-  const t = bootKao({ seeded: true }); seedDue(t, 60, { minutes: 5 });
-  const { flow, q, plan } = planFor(t, t.win.QuranCurriculumV2.units[0].lessons[0].id);
-  assert.ok(plan && plan.length, 'plan kurulmalı');
-  const est = flow.estimateMinutes(q.daily, taskCount(plan), new Date(t.NOW), 5);
-  assert.ok(est <= 5, `tahmin ${est} dk ≤ 5 olmalı (görev ${taskCount(plan)})`);
-  assert.ok(est >= 4, `tahmin ${est} dk gerçekçi olmalı (plan yarıya inmemeli)`);
-  t.api.kaoLesson('exit');
+check('K3PD-05: 13 görevlik tahmin 30/60 sn medyanında cap=5 üstünü açık bırakır', () => {
+  for (const [msPerTask, expected] of [[30000, 7], [60000, 13]]) {
+    const t = bootKao({ seeded: true }); seedDue(t, 60, { minutes: 5, msPerTask });
+    const { flow, q, plan } = planFor(t, t.win.QuranCurriculumV2.units[0].lessons[0].id);
+    assert.ok(plan && plan.length, 'plan kurulmalı');
+    assert.equal(flow.estimateMinutes({}, 13, new Date(t.NOW), 5, msPerTask), expected, `13 × ${msPerTask / 1000} sn = ${expected} dk`);
+    const est = flow.estimateMinutes(q.daily, taskCount(plan), new Date(t.NOW), 5, msPerTask);
+    assert.equal(est, Math.ceil(taskCount(plan) * msPerTask / 60000), `${taskCount(plan)} görev gerçek medyanla hesaplanmalı`);
+    assert.ok(est > 5, `gerçek tahmin ${est} dk; seçili cap=5 gizlenmemeli`);
+    const step = flow.nextStep({ quranLearn: q }, new Date(t.NOW), content(t), msPerTask);
+    assert.ok(step.minutes > 5, `Bugün kartı gerçek plan süresini göstermeli: ${step.minutes} dk`);
+    assert.match(step.subtitle, /kişisel oturum medyanı/);
+    t.api.kaoLesson('exit');
+  }
 });
 
 check('dersin özü bütçeden önce ayrılır: yeni lemma tanışları ve kavram görevi korunur', () => {
@@ -150,14 +156,17 @@ check('plana alınmayan kartlar ertesi gün yine vadeli; kart verisi değişmemi
   t.api.kaoLesson('exit');
 });
 
-check('Bugün ekranı tahmini sığan oturumla tutarlı: ~dk ≤ seçilen, tekrar sayısı planla aynı', () => {
+check('K3PD-05: Bugün tahmini gerçek plan süresini gösterir; >5 dk K3PD-06 için açık kalır', () => {
   for (const msPerTask of [9000, 20000, 30000]) {
     const t = bootKao({ seeded: true }); const q = seedDue(t, 60, { minutes: 5, msPerTask });
     const now = new Date(t.NOW), flow = t.win.SeymaQuranLearnFlow, cur = t.win.QuranCurriculumV2;
-    const step = flow.nextStep({ quranLearn: q }, now, content(t));
-    assert.equal(step.kind, 'daily', 'Bugün ders adımı önerilmeli');
-    assert.ok(step.minutes <= 5, `Bugün tahmini ${step.minutes} dk ≤ 5 olmalı (ms ${msPerTask})`);
     const { plan } = planFor(t, cur.units[0].lessons[0].id);
+    const step = flow.nextStep({ quranLearn: q }, now, content(t), msPerTask);
+    assert.equal(step.kind, 'daily', 'Bugün ders adımı önerilmeli');
+    const expected = Math.ceil((step.counts.reviews + taskCount(plan)) * msPerTask / 60000);
+    assert.equal(step.minutes, expected, `Bugün tahmini bütün gerçek görevleri içermeli (ms ${msPerTask})`);
+    assert.match(step.subtitle, /kişisel oturum medyanı/);
+    if (step.minutes > 5) assert.ok(step.minutes > q.onboarding.minutes, 'K3PD-06 tamamlanana kadar cap üstü açık başarısızlık olarak kalmalı');
     assert.equal(step.counts.reviews, reviewItems(plan).length, `Bugün tekrar sayısı planla aynı (ms ${msPerTask})`);
     t.api.kaoLesson('exit');
   }
@@ -169,4 +178,4 @@ check('Flow kaynakta yazma yok: plan saf, kart şeması/FSRS/migrate değişmez'
   assert.doesNotMatch(src, /\.due\s*=|\.cards\s*\[[^\]]*\]\s*=/, 'Flow kart vadesini/verisini yazmaz');
 });
 
-console.log(`test_k3p_budget: PASS (${passed} kontrol — 5 dk plan ≤ 5 dk, en düşük R önce, kalan kartlar yarına)`);
+console.log(`test_k3p_budget: PASS (${passed} kontrol — tahmin gerçek süreyi gösterir; K3PD-06 bütçe uyumu açık, en düşük R önce)`);

@@ -25,6 +25,7 @@ for (const relative of [
   'app/content/quranLexiconV1.js',
   'app/content/quranGrammarV1.js',
   'app/content/quranShortSurahsV1.js',
+  'app/content/quranCurriculumV2.js',
   'app/content/quranPhonicsV1.js',
   'app/content/quranRevelationOrderV1.js',
   'app/content/quranStrikingVersesV1.js',
@@ -88,9 +89,11 @@ assert.ok(!sheet(fastHtml), 'hızlı doğruda tam panel açılmaz');
 assert.ok(!strip(fastHtml), 'hızlı doğruda pekiştirme şeridi de yok');
 assert.equal(timers.length, 1, 'hızlı doğruda tek otomatik geçiş zamanlayıcısı');
 assert.equal(timers[0].ms, 600, 'hızlı doğru 600 ms');
+assert.deepEqual(ui.kaoLatency, [1000, 300], 'doğru yanıt süresi yalnız feedback açılırken bir kez eklenir');
 timers[0].fn();
 assert.equal(ui.kaoTaskIndex, 1, '600 ms sonra zamanlayıcı ilerletir');
 assert.equal(ui.kaoPanel.open, false);
+assert.deepEqual(ui.kaoLatency, [1000, 300], 'Devam/otomatik ilerleme aynı yanıtı ikinci kez eklemez');
 
 // ---- B · Yavaş doğru (medyanın üstü): pekiştirme şeridi, 1.600 ms, dokunuş durdurur ----------
 freshData({ autoAdvance: true });
@@ -145,6 +148,7 @@ assert.match(wrongHtml, /App\.kaoContinue\(\)/, 'yanlışta Devam beklenir');
 assert.equal(timers.length, 0, 'yanlışta otomatik geçiş zamanlayıcısı yok');
 assert.equal(ui.kaoPanel.open, true);
 assert.notEqual(ui.kaoPanel.slow, true, 'yanlışta yavaş işareti yok');
+assert.deepEqual(ui.kaoLatency, [1000, 300], 'yanlış yanıt da geçerli oturum örneğine katılır');
 
 // ---- D · Ayar kapalı: kompakt şerit + tek "Devam" dokunuşu ----------------------------------
 freshData({ autoAdvance: false });
@@ -172,6 +176,56 @@ assert.equal(ui.kaoLatency.length, 50, 'medyan penceresi en çok 50 ölçüm');
 assert.equal(ui.kaoLatency[0], 11, 'pencere en eskiyi düşürür');
 assert.equal(JSON.stringify(data).includes('kaoLatency'), false, 'medyan kalıcı veriye yazılmaz');
 
+// K3PD-05: bağımsız sınırlar — invalid örnekler dışarıda, son 50 geçerli örnek, doğru+yanlış birlikte.
+freshData({ autoAdvance: true });
+ui.kaoLatency = [0, NaN, -10, 1000, 3000]; // geçerli medyan 2000 ms
+const invalidWindow = wordTask('invalid-window', 'w:l_invalid_window:ar>tr');
+show(invalidWindow); ui.kaoTaskStartedAt = now - 1999;
+assert.equal(api.kaoAnswer(invalidWindow.id, 'right').correct, true);
+assert.equal(ui.kaoPanel.slow, false, '0/NaN/negatif örnekler dışlanınca 1999 ms < medyan 2000 ms');
+assert.equal(ui.kaoLatency.length, 3, 'bozuk eski örnekler temizlenip tek yeni örnek tutulur');
+
+freshData({ autoAdvance: true });
+ui.kaoLatency = [0, NaN, -1];
+const emptyWindow = wordTask('empty-window', 'w:l_empty_window:ar>tr');
+show(emptyWindow); ui.kaoTaskStartedAt = now - 100;
+assert.equal(api.kaoAnswer(emptyWindow.id, 'right').correct, true);
+assert.equal(ui.kaoPanel.slow, true, 'boş geçerli pencere açıkça yavaş kola düşer');
+assert.deepEqual(ui.kaoLatency, [100], 'geçersiz süre örnekleri medyana eklenmez');
+
+freshData({ autoAdvance: true });
+ui.kaoLatency = Array.from({ length: 51 }, (_, index) => index + 1);
+const lastFifty = wordTask('last-fifty', 'w:l_last_fifty:ar>tr');
+show(lastFifty); ui.kaoTaskStartedAt = now - 26;
+assert.equal(api.kaoAnswer(lastFifty.id, 'right').correct, true);
+assert.equal(ui.kaoPanel.slow, false, 'son 50 örneğin medyanı 26,5 ms; 26 ms hızlı kalır');
+assert.equal(ui.kaoLatency.length, 50, 'pencere 50 geçerli örnekle sınırlı kalır');
+
+freshData({ autoAdvance: true });
+ui.kaoLatency = [1000, 2000, 3000, 4000, 100000];
+const outlierMedian = wordTask('outlier-median', 'w:l_outlier_median:ar>tr');
+show(outlierMedian); ui.kaoTaskStartedAt = now - 10000;
+assert.equal(api.kaoAnswer(outlierMedian.id, 'right').correct, true);
+assert.equal(ui.kaoPanel.slow, true, '10 sn yanıt medyan 3 sn eşiğini geçer; 100 sn uç değer ortalamaya çevrilmez');
+
+freshData({ autoAdvance: true });
+const wrongSample = wordTask('mixed-wrong', 'w:l_mixed_wrong:ar>tr');
+show(wrongSample); ui.kaoTaskStartedAt = now - 20000;
+assert.equal(api.kaoAnswer(wrongSample.id, 'wrong').correct, false);
+assert.deepEqual(ui.kaoLatency, [20000], 'yanlış yanıt örneği dahil edilir');
+assert.equal(api.kaoContinue(), true);
+const correctSample = wordTask('mixed-correct', 'w:l_mixed_correct:ar>tr');
+show(correctSample); ui.kaoTaskStartedAt = now - 10000;
+assert.equal(api.kaoAnswer(correctSample.id, 'right').correct, true);
+assert.equal(ui.kaoPanel.slow, false, '10 sn, önceki yanlış yanıtın oluşturduğu 20 sn medyandan hızlıdır');
+assert.deepEqual(ui.kaoLatency, [20000, 10000], 'doğru ve yanlış aynı oturum medyanına birer kez girer');
+assert.equal(api.kaoContinue(), true);
+assert.deepEqual(ui.kaoLatency, [20000, 10000], 'doğru cevapta devam ikinci latency örneği eklemez');
+const mixedMedianBoundary = wordTask('mixed-boundary', 'w:l_mixed_boundary:ar>tr');
+show(mixedMedianBoundary); ui.kaoTaskStartedAt = now - 14999;
+assert.equal(api.kaoAnswer(mixedMedianBoundary.id, 'right').correct, true);
+assert.equal(ui.kaoPanel.slow, false, 'bağımsız karma medyan (20+10)/2=15 sn; 14,999 ms hızlıdır');
+
 // medyan hesabı: doğru kol seçilir (5 örnek → 3. değer).
 freshData({ autoAdvance: true });
 for (const value of [10, 20, 30, 40, 50]) { ui.kaoLatency.push(value); }
@@ -179,5 +233,41 @@ const mid = wordTask('mid', 'w:l_mid:ar>tr');
 show(mid); ui.kaoTaskStartedAt = now - 35; // medyan 30 → 35 yavaş
 assert.equal(api.kaoAnswer(mid.id, 'right').correct, true);
 assert.equal(ui.kaoPanel.slow, true, 'medyanı aşan süre yavaş kol');
+
+// K3PD-05: kişisel pencere yalnız açık öğrenme oturumuna aittir.
+freshData({ autoAdvance: true });
+ui.kaoLatency = [12000, 18000];
+api.kaoStart();
+assert.ok(Array.isArray(ui.kaoLatency), 'yeni oturum latency penceresini dizi olarak başlatmalı');
+assert.equal(ui.kaoLatency.length, 0, 'yeni oturum önceki oturumun latency medyanını taşımamalı');
+
+freshData({ autoAdvance: true });
+ui.kaoLatency = [12000, 18000];
+assert.equal(api.kaoLesson('start', 'u01.01'), true, 'yeni ders oturumu başlamalı');
+assert.equal(ui.kaoLatency.length, 0, 'yeni ders oturumu önceki latency medyanını taşımamalı');
+ui.kaoLatency = [14000];
+assert.equal(api.kaoLesson('start', 'u01.01'), true, 'etkin ders aynı oturum olarak açılmalı');
+assert.deepEqual(ui.kaoLatency, [14000], 'etkin ders oturumuna dönmek aynı medyanı korumalı');
+
+freshData({ autoAdvance: true });
+const firstUnit = sandbox.window.QuranCurriculumV2.units[0];
+const firstLemma = firstUnit.lessons[0].lemmaIds[0];
+data.quranLearn.path.lessons[firstUnit.lessons[0].id] = { introducedLemmas: [firstLemma] };
+ui.kaoLatency = [12000, 18000];
+assert.equal(api.kaoLesson('start', firstUnit.id), true, 'yeni ustalık oturumu başlamalı');
+assert.equal(ui.kaoLatency.length, 0, 'yeni ustalık oturumu önceki latency medyanını taşımamalı');
+ui.kaoLatency = [14000];
+assert.equal(api.kaoLesson('start', firstUnit.id), true, 'etkin ustalık aynı oturum olarak açılmalı');
+assert.deepEqual(ui.kaoLatency, [14000], 'etkin ustalık oturumuna dönmek aynı medyanı korumalı');
+
+freshData({ autoAdvance: true });
+const repairUnit = sandbox.window.QuranCurriculumV2.units[0];
+data.quranLearn.path.units[String(repairUnit.id)] = { repair: { lemmaIds: [repairUnit.lessons[0].lemmaIds[0]] } };
+ui.kaoLatency = [12000, 18000];
+assert.equal(api.kaoLesson('start', `repair:${repairUnit.id}`), true, 'yeni onarım oturumu başlamalı');
+assert.equal(ui.kaoLatency.length, 0, 'yeni onarım oturumu önceki latency medyanını taşımamalı');
+ui.kaoLatency = [14000];
+assert.equal(api.kaoLesson('start', `repair:${repairUnit.id}`), true, 'etkin onarım aynı oturum olarak açılmalı');
+assert.deepEqual(ui.kaoLatency, [14000], 'etkin onarım oturumuna dönmek aynı medyanı korumalı');
 
 console.log('test_k3p_feedback_arms: PASS (hızlı/yavaş/yanlış/kapalı kollar, varsayılan, medyan)');

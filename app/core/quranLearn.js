@@ -2079,16 +2079,22 @@
   // K3P-15 (K-C): üç kollu geri bildirim. Yanıt süresi kişinin son 50 ölçümünün medyanıyla karşılaştırılır;
   // medyan ve "ses tekrar dinlendi" işareti yalnız `ui` içinde tutulur.
   var KAO_LATENCY_WINDOW=50,KAO_LATENCY_MIN=5,KAO_FAST_ADVANCE_MS=600,KAO_SLOW_ADVANCE_MS=1600;
+  function kaoValidLatency(elapsed){
+    return typeof elapsed==='number'&&isFinite(elapsed)&&elapsed>0?Math.min(KAO_TASK_MS_CAP,elapsed):null;
+  }
+  function kaoResetLatency(ui){ if(ui) ui.kaoLatency=[]; }
   function kaoLatencyMedian(ui){
-    var samples=Array.isArray(ui.kaoLatency)?ui.kaoLatency:[];
+    var raw=Array.isArray(ui.kaoLatency)?ui.kaoLatency:[],samples=[];
+    for(var i=raw.length-1;i>=0&&samples.length<KAO_LATENCY_WINDOW;i-=1){ var value=kaoValidLatency(raw[i]); if(value!==null) samples.push(value); }
     if(!samples.length) return null;
     var sorted=samples.slice().sort(function(a,b){ return a-b; }),mid=Math.floor(sorted.length/2);
     return sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2;
   }
   function kaoLatencyPush(ui,elapsed){
-    ui.kaoLatency=Array.isArray(ui.kaoLatency)?ui.kaoLatency:[];
-    ui.kaoLatency.push(Math.min(KAO_TASK_MS_CAP,Math.max(0,elapsed)));
-    if(ui.kaoLatency.length>KAO_LATENCY_WINDOW) ui.kaoLatency=ui.kaoLatency.slice(-KAO_LATENCY_WINDOW);
+    var sample=kaoValidLatency(elapsed); if(sample===null) return false;
+    var current=Array.isArray(ui.kaoLatency)?ui.kaoLatency.map(kaoValidLatency).filter(function(value){ return value!==null; }):[];
+    ui.kaoLatency=current.slice(-(KAO_LATENCY_WINDOW-1)).concat([sample]);
+    return true;
   }
   // D2F-03: dizme görevinin doğru sırası çip YAZILARIDIR; aynı yazılı çipler birbirinin yerine geçer.
   function kaoOrderLabels(task){
@@ -2104,8 +2110,8 @@
   function kaoOpenFeedback(ui,task,correct,choiceId,note,elapsed){
     var answer=kaoAnswerText(task),isCorrect=correct===true;
     // K3P-15: kişisel medyan yalnız yanıtlardan; doğru cevabın kolu bu yanıtla karşılaştırılır.
-    var median=kaoLatencyMedian(ui),slow=isCorrect&&(ui.kaoPlayed===true||median===null||nonNegativeNumber(elapsed,null)===null||nonNegativeNumber(elapsed,0)>=median);
-    if(isCorrect) kaoLatencyPush(ui,nonNegativeNumber(elapsed,0));
+    var measured=kaoValidLatency(elapsed),median=kaoLatencyMedian(ui),slow=isCorrect&&(ui.kaoPlayed===true||median===null||measured===null||measured>=median);
+    if(measured!==null) kaoLatencyPush(ui,measured);
     ui.kaoPanel={open:true,taskId:task.id,correct:isCorrect,choiceId:choiceId||'',answer:answer,note:note||'',slow:slow===true};
     // K3P-A5: kayan pencere ve art arda yanlış sayacı yalnız ui; yeniden tanış eşiğinde panel zenginleşir.
     kaoWindowPush(ui,isCorrect);
@@ -2147,7 +2153,7 @@
     record.doneAt=now.toISOString(); record.score=state.answered?state.correct/state.answered:null; record.resume=null;
     q.daily[today]=Object.assign({},day,{lesson:true,sessionDone:true});
     var tomorrow=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,now.getHours(),now.getMinutes(),now.getSeconds(),now.getMilliseconds());
-    return kaoNextStepFor(snapshot,tomorrow);
+    return kaoNextStepFor(snapshot,tomorrow,kaoLatencyMedian(quranLearnDeps.ui()));
   }
   function kaoElapsedProgramDays(startedAt,now){
     var startKey=localDayOf(startedAt),todayKey=localDayOf(now);
@@ -2242,7 +2248,7 @@
     }
     if(pendAt>=0||nextAt>=0) state.at=pendAt>=0?pendAt:nextAt; else if(startMode==='intro') state.at=Math.max(0,plan.findIndex(function(item){ return item.kind==='intro'; }));
     state.phase=plan[state.at].kind==='practice'?'practice':'lesson';
-    record.startedAt=record.startedAt||now.toISOString(); q.startedAt=q.startedAt||now.toISOString(); ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoLesson=state; ui.kaoNight=false; ui.kaoDurableCount=0;
+    record.startedAt=record.startedAt||now.toISOString(); q.startedAt=q.startedAt||now.toISOString(); kaoResetLatency(ui); ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoLesson=state; ui.kaoNight=false; ui.kaoDurableCount=0;
     return kaoLessonActivate(ui);
   }
   // K2F-06: ünite ustalığı — çapa metnini oku + 10 soruluk karma test. Plan saf Flow'dan gelir.
@@ -2261,7 +2267,7 @@
       if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Ustalık kontrolü için önce bu ünitenin kelimelerini tanımalısın.',undefined,{own:true});
       return false;
     }
-    ui.kaoLesson={kind:'mastery',unitId:unit.id,lessonId:'mastery:'+unit.id,title:'Ustalık: '+String(unit.title||''),plan:plan,at:0,phase:'lesson',reviews:[],correct:0,answered:0,done:false,recorded:false,wrongLemmas:[],earnedMilestones:[],milestoneCelebrated:false,startedAt:now.toISOString(),resumeAt:0};
+    kaoResetLatency(ui); ui.kaoLesson={kind:'mastery',unitId:unit.id,lessonId:'mastery:'+unit.id,title:'Ustalık: '+String(unit.title||''),plan:plan,at:0,phase:'lesson',reviews:[],correct:0,answered:0,done:false,recorded:false,wrongLemmas:[],earnedMilestones:[],milestoneCelebrated:false,startedAt:now.toISOString(),resumeAt:0};
     ui.kaoNight=false; ui.kaoDurableCount=0;
     return kaoLessonActivate(ui);
   }
@@ -2297,7 +2303,7 @@
       if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.toast==='function') quranLearnSurfaceDeps.toast('Bu ünite için onarılacak kelime yok.',undefined,{own:true});
       return false;
     }
-    ui.kaoLesson={kind:'repair',unitId:unit.id,lessonId:'repair:'+unit.id,title:'Onarım: '+String(unit.title||''),plan:plan,at:0,phase:'lesson',reviews:[],correct:0,answered:0,done:false,recorded:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:now.toISOString(),resumeAt:0};
+    kaoResetLatency(ui); ui.kaoLesson={kind:'repair',unitId:unit.id,lessonId:'repair:'+unit.id,title:'Onarım: '+String(unit.title||''),plan:plan,at:0,phase:'lesson',reviews:[],correct:0,answered:0,done:false,recorded:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:now.toISOString(),resumeAt:0};
     ui.kaoNight=false; ui.kaoDurableCount=0;
     return kaoLessonActivate(ui);
   }
@@ -2396,7 +2402,7 @@
       model.title=readTitles.length?readTitles.join(' · '):'Çapa metni'; model.lead='Dokunmadan oku: kelimelerin anlamını içinden hatırlamaya çalış, hazır olunca devam et.'; model.words=item.words||[];
     }
     if(item.kind==='summary'&&kaoUnitSession(state)){
-      var q0=ensureQuranLearn(quranLearnDeps.data()),result=objectOr(state.result,{score:0,passed:false,answered:0,correct:0}),masteryNext=kaoNextStepFor(quranLearnDeps.data(),new Date()),repairing=state.kind==='repair';
+      var q0=ensureQuranLearn(quranLearnDeps.data()),result=objectOr(state.result,{score:0,passed:false,answered:0,correct:0}),masteryNext=kaoNextStepFor(quranLearnDeps.data(),new Date(),kaoLatencyMedian(quranLearnDeps.ui())),repairing=state.kind==='repair';
       model.title=repairing?'Onarım tamam ✓':(result.passed?'Ustalık geçildi ✓':'Biraz daha pekiştirelim');
       model.learnedWords=[]; model.learnedMore=0;
       model.accuracy=result.answered?Math.round(result.correct/result.answered*100):null; model.accuracyDetail=result.answered?(repairing?result.correct+' / '+result.answered+' soru':result.answered+' sorudan '+result.correct+' doğru · geçmek için en az 8'):'Cevap kaydı yok';
@@ -2478,7 +2484,8 @@
       if(flow&&typeof flow.estimateMinutes==='function') for(var count=1;count<=ui.kaoQueue.length;count+=1){ if(flow.estimateMinutes(q.daily,count,now,0)>extraMinutes) break; limit=count; }
       ui.kaoQueue=ui.kaoQueue.slice(0,limit);
     }
-    ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoPlayed=false; ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoAdvanceTimer=null; ui.kaoFeedback=''; ui.kaoAudioFailed=false; ui.kaoTasks={}; ui.kaoH4Presentation=Object.create(null); kaoApplyView(ui,'session',null,ui.kaoView==='session'?'replace':'push'); ui.kaoOrderDraft=[]; ui.kaoDurableCount=0;
+    // K3PD-05: kişisel medyan yalnız yeni oturumun tamamlanmış yanıtlarını kapsar.
+    ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoPlayed=false; kaoResetLatency(ui); ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoAdvanceTimer=null; ui.kaoFeedback=''; ui.kaoAudioFailed=false; ui.kaoTasks={}; ui.kaoH4Presentation=Object.create(null); kaoApplyView(ui,'session',null,ui.kaoView==='session'?'replace':'push'); ui.kaoOrderDraft=[]; ui.kaoDurableCount=0;
     ui.kaoQueue.forEach(function(item){ ui.kaoTasks[item.id]=kaoBuildTask(item,d,{seed:item.id}); });
     if(!q.startedAt) q.startedAt=now.toISOString();
     quranLearnDeps.render();
@@ -2591,7 +2598,6 @@
     var panel=ui.kaoPanel,elapsed=panel.correct===true?Math.max(0,Date.now()-nonNegativeNumber(ui.kaoTaskStartedAt,Date.now())):null;
     if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
     ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=Date.now(); ui.kaoPlayed=false; ui.kaoOrderDraft=[];
-    if(panel.correct===true) kaoLatencyPush(ui,elapsed);
     if(ui.kaoLesson&&ui.kaoLesson.phase==='practice'){
       if(ui.kaoTaskIndex>=(ui.kaoQueue||[]).length){
         ui.kaoLesson.at=ui.kaoLesson.practiceEndAt; ui.kaoLesson.phase='lesson';
@@ -3858,7 +3864,7 @@
   }
   function kaoHomeHTML(nowValue){
     if(!quranLearnDeps) return '';
-    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),now=nowValue?validDate(nowValue,'now'):new Date(),step=kaoNextStepFor(d,now),hero=kaoHomeHero(d,q,now,step),at=kaoCurrentUnit(q,window.SeymaQuranLearnFlow,{curriculum:window.QuranCurriculumV2}),ref=kaoUnitAnchorRef(at.unit),anchorId=ref?ref.id:null,model=ref?kaoTezhipModel(d,anchorId):null,covered=Object.keys(kaoKnownLemmaSet(d)).length>0,anchorCall=ref?(ref.kind==='surah'?{name:'kaoOpenSurah',args:[Number(ref.id)]}:{name:'kaoSetView',args:['reader']}):null;
+    var d=quranLearnDeps.data(),q=ensureQuranLearn(d),now=nowValue?validDate(nowValue,'now'):new Date(),step=kaoNextStepFor(d,now,kaoLatencyMedian(quranLearnDeps.ui())),hero=kaoHomeHero(d,q,now,step),at=kaoCurrentUnit(q,window.SeymaQuranLearnFlow,{curriculum:window.QuranCurriculumV2}),ref=kaoUnitAnchorRef(at.unit),anchorId=ref?ref.id:null,model=ref?kaoTezhipModel(d,anchorId):null,covered=Object.keys(kaoKnownLemmaSet(d)).length>0,anchorCall=ref?(ref.kind==='surah'?{name:'kaoOpenSurah',args:[Number(ref.id)]}:{name:'kaoSetView',args:['reader']}):null;
     return kaoViewsApi().todayScreen({notice:noticeModel(q),tezhip:model?{title:model.title,lines:model.lines,footer:covered?'%'+Math.round(model.coverage.ratio*100)+' anlam · '+model.remaining+' kelime kaldı':model.remaining+' kelime kaldı'}:null,action:anchorCall,goal:kaoGoalSlope(d,q).text,eyebrow:hero.eyebrow,title:hero.title,subtitle:hero.subtitle,foot:hero.foot,secondary:hero.secondary,primary:hero.button,weekly:{done:kaoWeeklyDone(d,now),total:5,coverage:covered?kaoCoverage(d).ratio*100:null},shortcuts:kaoHomeShortcuts()});
   }
   // K3P-25: evrensel "bir kez" notu — mevcut KAO_WHATS_NEW davranışı KORUNUR (öncelik ondadır),
@@ -4139,7 +4145,7 @@
     var flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2;
     if(!flow||typeof flow.nextStep!=='function'||typeof flow.unitProgress!=='function'||!curriculum||!Array.isArray(curriculum.units)||!curriculum.units.length) return {title:KAO_HUB_TITLE,subtitle:'Kaldığın yerden devam et',action:'Aç',ring:null};
     var q=ensureQuranLearn({quranLearn:cloneValue(objectOr(d.quranLearn,null))}),content=kaoLessonContent();
-    var step=flow.nextStep({quranLearn:q,night:kaoNightWindow(d,now)},now,content);
+    var step=flow.nextStep({quranLearn:q,night:kaoNightWindow(d,now)},now,content,kaoLatencyMedian(quranLearnDeps.ui()));
     if(step.kind==='onboarding') return {title:KAO_HUB_TITLE,subtitle:'Namazda söylediklerini anlamaya başla · 5 dk',action:'Başla',ring:null};
     var at=kaoCurrentUnit(q,flow,content),pct=at.progress.lessons?Math.round(at.progress.lessonsDone/at.progress.lessons*100):0;
     var ring=pct>0?{value:pct,label:'Ünite '+at.unit.id+' ilerlemesi'}:null;
@@ -4562,14 +4568,14 @@
     p.lessons=cleanLessons; p.units=cleanUnits; q.path=p;
   }
   // KAO2-08: "sıradaki adım" tek doğruluk kaynağı; saf Flow'u gerçek veriyle çağırır.
-  function kaoNextStepFor(d,now){
+  function kaoNextStepFor(d,now,sessionMedianMs){
     var flow=window.SeymaQuranLearnFlow,curriculum=window.QuranCurriculumV2;
     if(!flow||typeof flow.nextStep!=='function'||!curriculum) throw new Error('KAO2-08: akış motoru ya da müfredat yüklenmedi');
-    return flow.nextStep({quranLearn:ensureQuranLearn(d),night:kaoNightWindow(d,now)},now,kaoLessonContent());
+    return flow.nextStep({quranLearn:ensureQuranLearn(d),night:kaoNightWindow(d,now)},now,kaoLessonContent(),sessionMedianMs);
   }
   function kaoNextStep(nowValue){
     if(!quranLearnDeps) return null;
-    return kaoNextStepFor(quranLearnDeps.data(),validDate(nowValue===undefined?new Date():nowValue,'now'));
+    return kaoNextStepFor(quranLearnDeps.data(),validDate(nowValue===undefined?new Date():nowValue,'now'),kaoLatencyMedian(quranLearnDeps.ui()));
   }
 
   window.SeymaQuranLearn={

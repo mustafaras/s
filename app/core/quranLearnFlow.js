@@ -58,7 +58,7 @@
   // KAO2-08: saf müfredat ilerlemesi ve "sıradaki adım". Girdiler salt
   // okunur; saat yalnız parametre olarak gelir, bu dosya hiçbir durum yazmaz.
   var DAY_MS=86400000,REVIEW_CAP=20,DEBT_LIMIT=60,WARMUP_GAP_DAYS=7,WARMUP_CARDS=10;
-  var MIN_PER_TASK=0.55,SETTLED_STABILITY=7,MASTERY_MINUTES=4,REPAIR_MINUTES=3,S0_MINUTES=5;
+  var MIN_PER_TASK=0.5,SETTLED_STABILITY=7,MASTERY_MINUTES=4,REPAIR_MINUTES=3,S0_MINUTES=5;
   // K3P-03: ölçülmüş süre görev başına 6 sn'nin altına inmez.
   var FLOOR_PER_TASK=6/60;
   // K3P-A4: kırpma tabanı — görev başına en az 6 sn; ölçüm geçmişi olmayanda bütçe bağlayıcı değil.
@@ -438,19 +438,37 @@
     out.complete=out.lessons>0&&out.lessonsDone===out.lessons&&(out.mastery||out.skipped);
     return out;
   }
-  // 05 §4: son 7 günün ölçülmüş görev süresi; yoksa 0,55 dk/görev; üst sınır günlük süre.
-  function estimateMinutes(daily,tasks,now,capMinutes){
-    if(!(tasks>0)) return 0;
+  // K3PD-05: aynı oturum medyanı varsa onu, yoksa etiketli 7 günlük yedeği kullan.
+  // Ölçüm de yoksa 30 sn/görev varsayılır; her kaynakta 6 sn/görev alt sınırdır.
+  function taskDurationEstimate(daily,now,sessionMedianMs){
+    if(typeof sessionMedianMs==='number'&&isFinite(sessionMedianMs)&&sessionMedianMs>0){
+      return {ms:Math.max(BUDGET_MIN_PER_MS,sessionMedianMs),source:'session'};
+    }
     var days=obj(daily),today=dayStart(dayKey(checkNow(now))),ms=0,answered=0;
     Object.keys(days).forEach(function(key){
       if(!/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
-      var age=(today-dayStart(key))/DAY_MS,day=obj(days[key]);
-      if(age<0||age>=7||!(num(day.ms,0)>0)||!(num(day.answered,0)>0)) return;
-      ms+=day.ms; answered+=day.answered;
+      var age=(today-dayStart(key))/DAY_MS,day=obj(days[key]),dayMs=num(day.ms,0),dayAnswered=num(day.answered,0);
+      if(age<0||age>=7||!(dayMs>0)||!(dayAnswered>0)) return;
+      ms+=dayMs; answered+=dayAnswered;
     });
-    var perTask=answered>0?Math.max(FLOOR_PER_TASK,ms/answered/60000):MIN_PER_TASK,minutes=Math.max(1,Math.ceil(tasks*perTask-1e-9));
-    return capMinutes>0?Math.min(minutes,capMinutes):minutes;
+    if(answered>0&&isFinite(ms)&&isFinite(answered)) return {ms:Math.max(BUDGET_MIN_PER_MS,ms/answered),source:'history'};
+    return {ms:60000*MIN_PER_TASK,source:'default'};
   }
+  function estimateDetails(daily,tasks,now,sessionMedianMs){
+    if(!(tasks>0)) return {minutes:0,source:null};
+    var duration=taskDurationEstimate(daily,now,sessionMedianMs);
+    return {minutes:Math.max(1,Math.ceil(tasks*duration.ms/60000-1e-9)),source:duration.source};
+  }
+  // capMinutes remains in the signature for existing callers; prediction reports the plan total.
+  function estimateMinutes(daily,tasks,now,capMinutes,sessionMedianMs){
+    return estimateDetails(daily,tasks,now,sessionMedianMs).minutes;
+  }
+  function estimateLabel(source){
+    if(source==='session') return 'kişisel oturum medyanı';
+    if(source==='history') return 'yedek: önceki 7 gün ortalaması';
+    return 'ölçümsüz varsayılan';
+  }
+  function estimateText(details){ return '~'+details.minutes+' dk · '+estimateLabel(details.source); }
   function dueCount(q,now){
     var cards=obj(q.cards),t=now.getTime(),n=0;
     Object.keys(cards).forEach(function(id){
@@ -486,21 +504,21 @@
     if(Array.isArray(plan)) plan.forEach(function(item){ if(item.kind==='intro'||item.kind==='practice'||item.kind==='apply') count+=1; });
     return count>0?count:fresh;
   }
-  function lessonStep(q,now,content,current,due,cap){
+  function lessonStep(q,now,content,current,due,cap,sessionMedianMs){
     var daily=obj(q.daily),lesson=current.progress.nextLesson,lp=lessonProgress(q,lesson.id,content);
     var reviews=Math.min(due,REVIEW_CAP),fresh=due>DEBT_LIMIT?0:Math.min(num(obj(q.settings).dailyNew,10),lp.total-lp.introduced);
     // K3P-A4: Bugün tahmini sığan oturumdan türetilir. Sığan tekrar = bütçe − dersin özü, en çok vadeli sayısı.
     var bound=taskBudget(cap,daily,now),core=lessonTaskCount(q,lesson.id,now,content,fresh);
     // Isınma her zaman kalır; bütçe onun üstüne tekrar ekler.
     var fitReviews=bound>0?Math.min(reviews,Math.max(Math.min(reviews,WARMUP_MAX),bound-core)):reviews;
-    var minutes=estimateMinutes(daily,fitReviews+core,now,cap),counts={reviews:fitReviews,fresh:fresh};
+    var estimate=estimateDetails(daily,fitReviews+core,now,sessionMedianMs),minutes=estimate.minutes,counts={reviews:fitReviews,fresh:fresh};
     // 05 §10: tekrar borcu yeni kelimeyi sıfırladıysa ünite tanıtımı yerine "yalnız tekrar" günü.
-    if(current.previous&&!current.progress.started&&fresh>0) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise,minutes,'kaoLesson',lesson.id,counts);
-    var subtitle=fresh>0?(fitReviews>0?fitReviews+' tekrar + '+fresh+' yeni':fresh+' yeni kelime')+' · ~'+minutes+' dk':fitReviews+' tekrar · önce tekrarları bitirelim · ~'+minutes+' dk';
+    if(current.previous&&!current.progress.started&&fresh>0) return step('next-unit','Sıradaki ünite: '+current.unit.title,current.unit.promise+' · '+estimateText(estimate),minutes,'kaoLesson',lesson.id,counts);
+    var subtitle=fresh>0?(fitReviews>0?fitReviews+' tekrar + '+fresh+' yeni':fresh+' yeni kelime')+' · '+estimateText(estimate):fitReviews+' tekrar · önce tekrarları bitirelim · '+estimateText(estimate);
     return step('daily',current.unit.title+' · Ders '+(current.progress.nextIndex+1),subtitle,minutes,'kaoLesson',lesson.id,counts);
   }
   // 05 §4 öncelik sırası; ilk eşleşen kazanır. Kenar: 7+ gün ara → ısınma, tekrar borcu >60 → yeni 0.
-  function nextStep(snapshot,now,content){
+  function nextStep(snapshot,now,content,sessionMedianMs){
     checkNow(now);
     var snap=obj(snapshot),q=obj(snap.quranLearn),onboarding=obj(q.onboarding),daily=obj(q.daily),night=snap.night;
     var cap=[5,10,15].indexOf(onboarding.minutes)>=0?onboarding.minutes:0,due=dueCount(q,now);
@@ -512,8 +530,8 @@
     var todayDone=obj(daily[dayKey(now)]).sessionDone===true,gap=daysSinceActive(q,now);
     var cardCount=Object.keys(obj(q.cards)).filter(function(id){ return obj(q.cards[id]).orphan!==true; }).length;
     if(!todayDone&&gap!==null&&gap>=WARMUP_GAP_DAYS&&cardCount>0){
-      var warm=Math.min(WARMUP_CARDS,cardCount),warmMin=estimateMinutes(daily,warm,now,cap);
-      return step('warmup','Yeniden ısınalım','En zayıf '+warm+' kelimeyle başla · ~'+warmMin+' dk',warmMin,'kaoStart',null,{reviews:warm,fresh:0});
+      var warm=Math.min(WARMUP_CARDS,cardCount),warmEstimate=estimateDetails(daily,warm,now,sessionMedianMs),warmMin=warmEstimate.minutes;
+      return step('warmup','Yeniden ısınalım','En zayıf '+warm+' kelimeyle başla · '+estimateText(warmEstimate),warmMin,'kaoStart',null,{reviews:warm,fresh:0});
     }
     var s0=onboarding.start==='s0'?firstOpenS0(q,content):null;
     if(s0) return step('s0-lesson','Harfler · Ders '+(s0.index+1)+': '+s0.lesson.title,'Seviye 0 · ~'+S0_MINUTES+' dk',S0_MINUTES,'kaoS0',s0.lesson.id);
@@ -523,7 +541,7 @@
       if(unitMastery(q,current.unit.id).state==='repair') return step('repair','Onarım: '+current.unit.title,'Karıştırdığın kelimeleri pekiştir · ~'+REPAIR_MINUTES+' dk',REPAIR_MINUTES,'kaoLesson','repair:'+current.unit.id);
       return step('mastery','Ustalık: '+current.unit.title,'Çapa metnini dokunmadan oku + karma test · ~'+MASTERY_MINUTES+' dk',MASTERY_MINUTES,'kaoLesson',current.unit.id);
     }
-    if(current&&!todayDone) return lessonStep(q,now,content,current,due,cap);
+    if(current&&!todayDone) return lessonStep(q,now,content,current,due,cap,sessionMedianMs);
     return step('rest',current?'Bugünlük tamam ✓':'Tüm üniteler tamam ✓','İstersen: Günün âyeti',0,'kaoOpenAyah',null);
   }
 

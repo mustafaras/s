@@ -220,11 +220,16 @@ check('lessonOf, lessonProgress, unitProgress, türetilmiş tamamlama', () => {
   assert.equal(flow.curriculum(content).lessonById[first.id].id, first.id);
 });
 
-check('estimateMinutes: veri yoksa 0,55 dk/görev; günlük süre üst sınırı', () => {
-  assert.equal(flow.estimateMinutes({}, 10, now, 15), 6);
-  assert.equal(flow.estimateMinutes({}, 100, now, 5), 5);
+check('K3PD-05: estimateMinutes cap=5 iken gerçek görev süresini gizlemez', () => {
+  assert.equal(flow.estimateMinutes({}, 10, now, 15), 5, 'ölçüm yoksa açık 30 sn/görev varsayılanı');
+  assert.equal(flow.estimateMinutes({}, 100, now, 5), 50, 'cap tahmini tavana kırpmamalı');
   assert.equal(flow.estimateMinutes({}, 0, now, 5), 0);
   assert.equal(flow.estimateMinutes({ [TODAY]: { answered: 10, ms: 60000 } }, 10, now, 30), 1);
+  assert.equal(flow.estimateMinutes({}, 13, now, 5, 30000), 7, '13 × 30 sn = 6:30 → yukarı yuvarlanmış 7 dk');
+  assert.equal(flow.estimateMinutes({}, 13, now, 5, 60000), 13, '13 × 60 sn = 13:00');
+  for (const invalid of [0, NaN, -1, Infinity]) {
+    assert.equal(flow.estimateMinutes({}, 13, now, 5, invalid), 7, `geçersiz oturum ölçümü varsayılana düşmeli: ${invalid}`);
+  }
 });
 
 // K3P-03 (B-06): bozuk ya da çok küçük süre ölçümü "~1 dk" yazdırmaz; görev başına 6 sn taban.
@@ -243,6 +248,7 @@ check('K3P-03: 24 görevlik tahmin bozuk/küçük ölçümde ≥ 3 dk, normal ve
     if (row.exact !== undefined) assert.equal(minutes, row.exact, `${row.name}: ${minutes} dk`);
     else assert.ok(minutes >= row.min, `${row.name}: ${minutes} dk < ${row.min} dk`);
   }
+  assert.equal(flow.estimateMinutes({}, TASKS, now, 0, 6000), 3, '24 × 6 sn tabanı tam 3 dk');
 });
 
 check('Flow saf: DOM/ağ/zamanlayıcı/depo/Date.now yok', () => {
@@ -267,7 +273,22 @@ check('motor: kaoNextStep gerçek veriyle Flow çağırır; kaoContinue oturum s
   }), true);
   assert.equal(api.kaoNextStep(now).kind, 'onboarding');
   data.quranLearn.onboarding.doneAt = ISO; data.quranLearn.onboarding.start = 'level1';
+  data.quranLearn.onboarding.minutes = 5;
   assert.equal(api.kaoNextStep(now).kind, 'daily');
+  ui.kaoLatency = [30000];
+  const sessionEstimate = api.kaoNextStep(now);
+  assert.ok(sessionEstimate.minutes > 5, 'quranLearn UI oturum medyanı cap=5 üstü gerçek tahmini aktarmalı');
+  assert.match(sessionEstimate.subtitle, /kişisel oturum medyanı/);
+  assert.deepEqual(ui.kaoLatency, [30000], 'Flow tahmin çağrısı UI geçmişini değiştirmemeli');
+  ui.kaoLatency = Array(50).fill(6000);
+  const currentSessionEstimate = api.kaoNextStep(now);
+  assert.match(currentSessionEstimate.subtitle, /kişisel oturum medyanı/);
+  api.kaoStart();
+  assert.equal(ui.kaoLatency.length, 0, 'yeni oturum eski cevap sürelerini taşımaz');
+  const nextSessionEstimate = api.kaoNextStep(now);
+  assert.ok(nextSessionEstimate.minutes > currentSessionEstimate.minutes, 'yeni oturum önceki 6 sn medyanı yerine açık varsayılanı kullanır');
+  assert.match(nextSessionEstimate.subtitle, /ölçümsüz varsayılan/);
+  ui.kaoLatency = [];
   ui.kaoQueue = [{ id: 'a' }, { id: 'b' }]; ui.kaoTaskIndex = 0; ui.kaoPanel = { open: true };
   api.kaoContinue();
   assert.equal((data.quranLearn.daily[TODAY] || {}).sessionDone, undefined, 'oturum bitmeden sessionDone yazıldı');
@@ -288,13 +309,13 @@ const planTasks = (q, lessonId) => flow.lessonPlan({ quranLearn: q }, lessonId, 
 const fullStep = (q) => flow.nextStep({ quranLearn: q }, now, fullContent);
 const withCap = (q, minutes) => { q.onboarding.minutes = minutes; return q; };
 
-check('K2F-31 (b): ders dakikası görev sayısından gelir (tekrar + tanış + alıştırma + uygula); uzun ders "~2 dk" değildir', () => {
+check('K3PD-05: ders dakikası görev sayısı ve açık varsayılan etiketinden gelir', () => {
   const q = withCap(baseQ(), 15);
   const r = fullStep(q), tasks = planTasks(q, 'u01.01');
   assert.ok(tasks >= 12, `gerçek ders plan adımı: ${tasks}`);
   assert.equal(r.minutes, flow.estimateMinutes({}, tasks, now, 15));
   assert.ok(r.minutes >= 6, `dakika: ${r.minutes}`);
-  assert.match(r.subtitle, new RegExp(`~${r.minutes} dk$`));
+  assert.match(r.subtitle, new RegExp(`~${r.minutes} dk · ölçümsüz varsayılan$`));
 });
 
 check('K2F-31 (b): tekrar sayısı göreve eklenir', () => {
@@ -305,12 +326,13 @@ check('K2F-31 (b): tekrar sayısı göreve eklenir', () => {
   assert.ok(b.minutes > a.minutes);
 });
 
-check('K2F-31 (c): son 7 günün ölçülmüş süresi varsa ortalama kullanılır', () => {
+check('K3PD-05: oturum örneği yoksa önceki 7 gün yedeği açık etiketlenir', () => {
   const q = withCap(baseQ(), 15);
   q.daily['2026-09-27'] = { answered: 10, ms: 300000 };
   const r = fullStep(q), tasks = planTasks(q, 'u01.01');
   assert.equal(r.minutes, flow.estimateMinutes(q.daily, tasks, now, 15));
-  assert.ok(r.minutes < flow.estimateMinutes({}, tasks, now, 15), 'ölçülmüş 0,5 dk/görev, varsayılan 0,55 dk/görevden kısa');
+  assert.equal(r.minutes, flow.estimateMinutes({}, tasks, now, 15), 'ölçülmüş 0,5 dk/görev varsayılan 0,5 dk/görevle aynı tahmini verir');
+  assert.match(r.subtitle, /yedek: önceki 7 gün ortalaması/);
 });
 
 check('K2F-31 (d): tekrar 0 iken alt satır "N yeni kelime · ~M dk" — "0 tekrar" yazılmaz', () => {
@@ -318,7 +340,7 @@ check('K2F-31 (d): tekrar 0 iken alt satır "N yeni kelime · ~M dk" — "0 tekr
   const r = fullStep(q);
   assert.equal(r.counts.reviews, 0);
   assert.ok(r.counts.fresh > 0);
-  assert.equal(r.subtitle, `${r.counts.fresh} yeni kelime · ~${r.minutes} dk`);
+  assert.equal(r.subtitle, `${r.counts.fresh} yeni kelime · ~${r.minutes} dk · ölçümsüz varsayılan`);
   assert.doesNotMatch(r.subtitle, /0 tekrar/);
 });
 

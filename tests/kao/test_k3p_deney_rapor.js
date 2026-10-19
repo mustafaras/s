@@ -23,8 +23,37 @@ assert.doesNotMatch(text, IDS, 'çıktıda kart/ders kimliği ya da sır var');
 assert.match(text, /\| H3 \|[^\n]*A: n=\d[^\n]*B: n=\d/);
 // K3P-19 H4: s ≥ 21 (okunuşu katlanmış) kartların doğruluğu. Elle hesap: 26 gün × 5 = 130 cevap;
 // kesimden önce 13 gün × 4 = 52, sonra 13 gün × 5 = 65 → 117/130 = %90,0 (hedef ≥ %85).
-assert.match(text, /\| H4 \|[^\n]*\| %90,0 \(117\/130 cevap, 26 gün\) \| ≥ %85,0 \| tutuyor \|/);
+assert.match(text, /\| H4 \|[^\n]*\| R\+1 2026-02-01: %90,0 \(117\/130 cevap, 26 gün\) · legacy dışlandı \(n=0\) \| ≥ %85,0 \| tutuyor \|/);
+assert.match(text, /H4 R\+1 başlangıcı 2026-02-01/);
+const laterSampleCohort = run('--ornek', '--h4-baslangic', '2026-02-15');
+assert.equal(laterSampleCohort.status, 0, laterSampleCohort.stderr);
+assert.match(laterSampleCohort.stdout, /H4 R\+1 başlangıcı 2026-02-15/);
+assert.match(laterSampleCohort.stdout, /R\+1 2026-02-15: %100,0 \(65\/65 cevap, 13 gün\) · legacy dışlandı \(n=65\)/);
 assert.match(text, /30\. gün deney sonucu değildir/);
+const cohortBackup = { quranLearn: { cards: {}, daily: {
+  '2026-10-19': { calib: { s21: { n: 10, ok: 9 } } },
+  '2026-10-21': { calib: { s21: { n: 2, ok: 1 } } },
+  '2026-10-22': { calib: { s21: { n: 4, ok: 4 } } }
+}, path: { lessons: {} } } };
+const h4Boundary = R.buildReport(cohortBackup, { today: '2026-10-21', h4Start: '2026-10-21' });
+assert.deepEqual(h4Boundary.rows.find((row) => row.id === 'H4'), {
+  id: 'H4',
+  measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk · R+1 cohort',
+  value: 'R+1 2026-10-21: %50,0 (1/2 cevap, 1 gün) · legacy dışlandı (n=10)',
+  target: '≥ %85,0',
+  status: 'tutmuyor'
+}, 'H4 raporu s21 legacy satırlarını dışlar, yanlış cevabı paydada tutar ve bugünden sonrasını dışlar');
+
+// H4 legacy sınırı: eski s21 kayıtları yeni R+1 kohort sonucuna karışmaz.
+assert.equal(h4Boundary.rows.find((row) => row.id === 'H4').value, 'R+1 2026-10-21: %50,0 (1/2 cevap, 1 gün) · legacy dışlandı (n=10)');
+const noCohort = R.buildReport(cohortBackup, { today: '2026-10-21' }).rows.find((row) => row.id === 'H4');
+assert.equal(noCohort.value, 'ölçüm yok (R+1 başlangıcı verilmedi); legacy H4 dahil edilmedi');
+assert.equal(noCohort.status, 'başlangıç gerekli');
+const futureCohort = R.buildReport(cohortBackup, { today: '2026-10-21', h4Start: '2026-10-23' }).rows.find((row) => row.id === 'H4');
+assert.equal(futureCohort.value, 'R+1 2026-10-23: yeni kohortta veri yok · legacy dışlandı (n=12)');
+assert.equal(futureCohort.status, 'veri yok');
+assert.throws(() => R.buildReport(cohortBackup, { today: '2026-10-21', h4Start: '2026-02-30' }), /geçerli bir tarih/);
+assert.equal(run('--ornek', '--h4-baslangic', '2026-02-30').status, 2);
 
 // 2) Sentetik örneğin elle hesaplanan değerleri (son 14 gün varsayılan kesim: 2026-02-15).
 assert.match(text, /kesim 2026-02-15 \(varsayılan: son 14 gün\)/);
@@ -74,4 +103,4 @@ assert.match(missing.stderr, /dosya yok/);
 assert.throws(() => R.buildReport({ settings: {} }), /quranLearn/);
 assert.throws(() => R.buildReport({ quranLearn: { cards: {} } }), /çalışma günü yok/);
 
-console.log('test_k3p_deney_rapor: PASS (7 hipotez satırı, sızıntı 0, elle hesap 7/7, hata yolları 6)');
+console.log('test_k3p_deney_rapor: PASS (7 hipotez satırı, H4 R+1 kohort sınırı, sızıntı 0, elle hesap 7/7, hata yolları 7)');

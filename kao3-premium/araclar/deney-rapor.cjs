@@ -2,7 +2,7 @@
 // K3P-05/16/19 · deney raporu (KARARLAR §6, AKIS §7): bir JSON yedeğinden H2, H3, H4, H5, H7, H8, H9 için YALNIZ toplu sayılar.
 // Kullanım (repo kökünden):
 //   node kao3-premium/araclar/deney-rapor.cjs --ornek                         sentetik yedekle doğrulama
-//   node kao3-premium/araclar/deney-rapor.cjs <yedek.json> [--kesim GG] [--bugun GG]   (GG = YYYY-AA-GG)
+//   node kao3-premium/araclar/deney-rapor.cjs <yedek.json> [--kesim GG] [--bugun GG] [--h4-baslangic GG]   (GG = YYYY-AA-GG)
 // Girdi: kullanıcının kendi verdiği yedek (files/yedek/ biçimi, data/gunluk/<tarih>.json sarmalı ya da salt-okur latest.json).
 // Okunan alanlar (başka hiçbir şey): quranLearn.cards[*].{s,lapses,reps,state} · quranLearn.daily ·
 //   quranLearn.path.lessons[*].{resume,doneAt}. Kart kimliğinden yalnız kelime kapsamı ve A/B kolu türetilir;
@@ -10,6 +10,7 @@
 // Yazmaz: dosya yok, ağ yok. Kelime, metin, kart ya da ders kimliği basmaz; yalnız sayı, yüzde ve tarih.
 // --kesim: "önce/sonra" sınırı (ör. otomatik geçişin cihaza ulaştığı gün). Verilmezse son 14 gün (bugün dahil) "sonra" sayılır.
 // --bugun: başvuru günü. Verilmezse yedekteki son çalışma günü alınır (saat bağımlılığı yok).
+// --h4-baslangic: H4 için K3PD-02'nin R+1 UTC cohort başlangıcı. Verilmezse H4 ölçümü kapalı kalır; --kesim H4'ü etkilemez.
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
@@ -33,6 +34,7 @@ const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
 const num = (v) => (typeof v === 'number' && isFinite(v) && v >= 0 ? v : 0);
 const dayNum = (date) => Date.parse(date + 'T00:00:00Z') / DAY_MS;
 const shiftDate = (date, days) => new Date((dayNum(date) + days) * DAY_MS).toISOString().slice(0, 10);
+const validDate = (date) => typeof date === 'string' && DATE_RE.test(date) && !isNaN(dayNum(date)) && shiftDate(date, 0) === date;
 const pct = (ratio) => '%' + (ratio * 100).toFixed(1).replace('.', ',');
 const pts = (diff) => (diff >= 0 ? '+' : '−') + Math.abs(diff * 100).toFixed(1).replace('.', ',') + ' puan';
 const isoDay = (v) => (typeof v === 'string' && DATE_RE.test(v.slice(0, 10)) ? v.slice(0, 10) : null);
@@ -94,13 +96,24 @@ function h2(daily, today, cut) {
 
 // H4 (K3P-19): okunuş s ≥ 21 kartta katlanır; destek çekilirken doğruluk korunuyor mu?
 // Ölçü yalnız s ≥ 21 cevaplarıdır (motor her cevapta sayar, bkz. quranLearn.js calib.s21).
-function h4(daily) {
-  const rows = daily.filter((r) => r.s21N > 0);
+function h4(daily, cohortStart) {
+  if (!cohortStart) {
+    return {
+      id: 'H4', measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk · R+1 cohort',
+      value: 'ölçüm yok (R+1 başlangıcı verilmedi); legacy H4 dahil edilmedi',
+      target: `≥ ${pct(H4_TARGET)}`, status: 'başlangıç gerekli'
+    };
+  }
+  const legacyRows = daily.filter((r) => r.date < cohortStart && r.s21N > 0);
+  const legacyN = legacyRows.reduce((sum, r) => sum + r.s21N, 0);
+  const rows = daily.filter((r) => r.date >= cohortStart && r.s21N > 0);
   const n = rows.reduce((sum, r) => sum + r.s21N, 0);
   const ok = rows.reduce((sum, r) => sum + r.s21Ok, 0);
-  const value = n ? `${pct(ok / n)} (${ok}/${n} cevap, ${rows.length} gün)` : 'henüz yok';
+  const value = n
+    ? `R+1 ${cohortStart}: ${pct(ok / n)} (${ok}/${n} cevap, ${rows.length} gün) · legacy dışlandı (n=${legacyN})`
+    : `R+1 ${cohortStart}: yeni kohortta veri yok · legacy dışlandı (n=${legacyN})`;
   const status = !n ? 'veri yok' : ok / n >= H4_TARGET ? 'tutuyor' : 'tutmuyor';
-  return { id: 'H4', measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk', value, target: `≥ ${pct(H4_TARGET)}`, status };
+  return { id: 'H4', measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk · R+1 cohort', value, target: `≥ ${pct(H4_TARGET)}`, status };
 }
 
 function h5(daily, lessons) {
@@ -160,6 +173,8 @@ function h3(cards) {
 
 function buildReport(backup, opts) {
   const p = project(backup);
+  const cohortStart = opts && opts.h4Start != null ? opts.h4Start : null;
+  if (cohortStart != null && !validDate(cohortStart)) throw new Error('H4 R+1 başlangıcı için YYYY-AA-GG biçiminde geçerli bir tarih ver');
   const today = (opts && opts.today) || (p.daily.length ? p.daily[p.daily.length - 1].date : null);
   if (!today) throw new Error('yedekte çalışma günü yok (quranLearn.daily boş)');
   const cut = (opts && opts.cut) || shiftDate(today, -(WINDOW_DAYS - 1));
@@ -167,19 +182,19 @@ function buildReport(backup, opts) {
   const rows = [
     h2(daily, today, cut),
     h3(p.cards),
-    h4(daily),
+    h4(daily, cohortStart),
     h5(daily, p.lessons),
     h7(daily, cut),
     h8(p.lessons),
     h9(p.cards)
   ];
-  return { today, cut, defaultCut: !(opts && opts.cut), rows, overview: overview(p.cards) };
+  return { today, cut, defaultCut: !(opts && opts.cut), h4Start: cohortStart, rows, overview: overview(p.cards) };
 }
 
 function render(report, sourceLabel) {
   const lines = [
     'K3P deney raporu · yalnız toplu sayılar (kelime, metin ve kimlik yok)',
-    `kaynak: ${sourceLabel} · bugün ${report.today} · kesim ${report.cut}${report.defaultCut ? ' (varsayılan: son 14 gün)' : ''}`,
+    `kaynak: ${sourceLabel} · bugün ${report.today} · kesim ${report.cut}${report.defaultCut ? ' (varsayılan: son 14 gün)' : ''} · H4 R+1 başlangıcı ${report.h4Start || 'belirtilmedi'}`,
     '',
     '| # | Ölçü | Değer | Hedef | Durum |',
     '| --- | --- | --- | --- | --- |'
@@ -223,19 +238,20 @@ function sampleBackup() {
 }
 
 function parseArgs(argv) {
-  const opts = { sample: argv.includes('--ornek'), file: null, cut: null, today: null };
+  const opts = { sample: argv.includes('--ornek'), file: null, cut: null, today: null, h4Start: null };
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
-    if (a === '--kesim' || a === '--bugun') {
+    if (a === '--kesim' || a === '--bugun' || a === '--h4-baslangic') {
       const v = argv[i + 1];
-      if (!v || !DATE_RE.test(v) || isNaN(dayNum(v)) || shiftDate(v, 0) !== v) throw new Error(`${a} için YYYY-AA-GG biçiminde bir tarih ver`);
-      opts[a === '--kesim' ? 'cut' : 'today'] = v; i += 1;
+      if (!validDate(v)) throw new Error(`${a} için YYYY-AA-GG biçiminde geçerli bir tarih ver`);
+      opts[a === '--kesim' ? 'cut' : a === '--bugun' ? 'today' : 'h4Start'] = v; i += 1;
     } else if (a !== '--ornek') {
       if (a.startsWith('--')) throw new Error(`bilinmeyen seçenek: ${a}`);
       opts.file = a;
     }
   }
-  if (!opts.sample && !opts.file) throw new Error('kullanım: deney-rapor.cjs --ornek | <yedek.json> [--kesim YYYY-AA-GG] [--bugun YYYY-AA-GG]');
+  if (!opts.sample && !opts.file) throw new Error('kullanım: deney-rapor.cjs --ornek | <yedek.json> [--kesim YYYY-AA-GG] [--bugun YYYY-AA-GG] [--h4-baslangic YYYY-AA-GG]');
+  if (opts.sample && !opts.h4Start) opts.h4Start = '2026-02-01'; // yalnız açıkça etiketlenmiş sentetik örneğin başlangıcı
   return opts;
 }
 

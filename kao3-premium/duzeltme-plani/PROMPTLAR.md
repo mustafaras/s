@@ -216,7 +216,7 @@ Kullanıcıya kararın seçeneklerini, veri etkisini ve önerilen seçeneği sun
 
 **Oku:** 02 onaylı kararı; kaoAnswer/feedback/undo; native details yaşam döngüsü; deney raporu H4.
 
-**Yazma allowlist’i:** app/core/quranLearn.js; test_k3p_pronunciation_fold.js; test_k3p_deney_rapor.js veya requirements fixture’ı; envanter gerekiyorsa tests/kao/README.md; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `app/core/quranLearn.js`; `tests/kao/test_k3p_pronunciation_fold.js`; `tests/kao/test_k3p_deney_rapor.js`; `tests/kao/README.md`; `kao3-premium/araclar/deney-rapor.cjs`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu allowlist satırını durum.mjs parserıyla uyumlu exact paths olarak düzeltmek için); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-03/EVIDENCE.md`.
 
 **Uygula:**
 

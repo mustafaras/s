@@ -1823,6 +1823,60 @@
     var esc=quranLearnDeps.esc,warning=!!task.cognate.shift;
     return '<p class="kao-cognate'+(warning?' is-shift':'')+'">'+(warning?quranLearnDeps.icon('triangle-alert',14)+' dikkat · ':'')+'Türkçede var: '+esc(task.cognate.tr)+(warning?' · '+esc(task.cognate.shift):'')+'</p>';
   }
+  function kaoH4TaskState(ui,task){
+    if(!ui||!task||!task.id||!quranLearnDeps) return {folded:false,eligible:false,opened:false};
+    ui.kaoH4Presentation=objectOr(ui.kaoH4Presentation,{});
+    var id=String(task.id),states=ui.kaoH4Presentation;
+    if(Object.prototype.hasOwnProperty.call(states,id)&&states[id]&&states[id].taskRef===task) return states[id];
+    var q=quranLearnRoot(quranLearnDeps.data()),cards=objectOr(q.cards,{}),card=objectOr(cards[task.cardId],{}),settings=objectOr(q.settings,{});
+    var folded=isDurable(card),enabled=settings.translit!==false,choices=Array.isArray(task.choices)?task.choices:[],support=false;
+    if(!task.audioOnly&&task.kind==='cloze') support=!!String(task.pronunciation||'')||choices.some(function(choice){ return !!String(choice&&choice.pronunciation||''); });
+    else if(!task.audioOnly&&task.direction==='ar>tr') support=!!String(task.translit||'');
+    else if(!task.audioOnly&&task.direction==='tr>ar') support=choices.some(function(choice){ return !!String(choice&&choice.pronunciation||''); });
+    // The Arabic-choice button names itself with its Latin reading; it is exposed support, not folded support.
+    var accessibleReading=choices.some(function(choice){ return /[\u0600-\u06ff]/.test(String(choice&&choice.label||''))&&!!String(choice&&choice.pronunciation||''); });
+    var multiStep=task.kind==='build'||task.kind==='order';
+    var eligible=/^w:/.test(String(task.cardId||''))&&folded&&enabled&&support&&!accessibleReading&&!multiStep;
+    var state={taskRef:task,folded:folded,eligible:eligible,opened:false};
+    states[id]=state;
+    return state;
+  }
+  function kaoH4MarkShown(ui,task){
+    var state=kaoH4TaskState(ui,task);
+    state.opened=true;
+    return state;
+  }
+  function kaoH4BindDetails(root,task){
+    if(!root||typeof root.querySelectorAll!=='function'||!task) return 0;
+    var nodes=root.querySelectorAll('.kao-pronunciation-fold'),id=String(task.id),bound=0;
+    for(var i=0;i<nodes.length;i+=1){
+      var detail=nodes[i];
+      if(!detail||typeof detail.addEventListener!=='function'||detail._kaoH4TaskId===id) continue;
+      detail._kaoH4TaskId=id;
+      detail.addEventListener('toggle',function(){
+        if(this.open!==true) return;
+        var ui=quranLearnDeps&&quranLearnDeps.ui(),active=currentTask();
+        var activeRoot=quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.taskElement==='function'?quranLearnSurfaceDeps.taskElement():null;
+        if(!ui||!active||active!==task||String(active.id)!==id||activeRoot!==root||!activeRoot||typeof activeRoot.querySelectorAll!=='function') return;
+        var activeDetails=activeRoot.querySelectorAll('.kao-pronunciation-fold'),isCurrent=false;
+        for(var j=0;j<activeDetails.length;j+=1){ if(activeDetails[j]===this){ isCurrent=true; break; } }
+        if(!isCurrent) return;
+        var panel=ui.kaoPanel;
+        if(panel&&panel.open===true&&String(panel.taskId)===id) return;
+        kaoH4MarkShown(ui,active);
+      });
+      bound+=1;
+    }
+    return bound;
+  }
+  function kaoH4CaptureOpenDetails(ui,task){
+    if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.taskElement!=='function') return false;
+    var node=quranLearnSurfaceDeps.taskElement();
+    if(!node||typeof node.querySelectorAll!=='function') return false;
+    var details=node.querySelectorAll('.kao-pronunciation-fold');
+    for(var i=0;i<details.length;i+=1){ if(details[i]&&details[i].open===true){ kaoH4MarkShown(ui,task); return true; } }
+    return false;
+  }
   function kaoArabicPairHTML(ar,pronunciation,className,fade,pronunciationFolded){
     var esc=quranLearnDeps.esc,label=String(ar||''),reading=String(pronunciation||''),settings=kaoSettingsOf(),harakat=settings.harakat!==false,readability=kaoReadability();
     if(!reading) return '<span class="kao-content-error" role="alert">Bu Arapça içerik, Latin okunuşu doğrulanmadan gösterilemez.</span>';
@@ -1884,7 +1938,7 @@
       return '<section id="kao-task" class="kao-task kao-done"><p class="kao-eyebrow">Bugünkü oturum tamam</p><h2>Bugün '+durable+' kelime daha kalıcı oldu</h2><div class="kao-done-actions"><button type="button" class="kao-primary" onclick="App.kaoSetView(\'home\')">Bugün yeter</button><button type="button" class="kao-secondary" onclick="App.kaoStart()">5 dakika daha</button></div>'+(kaoLevel1Ready(quranLearnDeps.data())?'<button type="button" class="kao-link-button kao-level1" onclick="App.kaoOpenPrayer()">Seviye 1 tamam · Namazda ne dediğini gör →</button>':'')+'</section>';
     }
     // K3P-19: s ≥ 21 olan kartın görevinde okunuş katlanır (hareke soldurması s ≥ 30'un bir basamak öncesi).
-    var pronunciationFolded=isDurable(objectOr(quranLearnRoot(quranLearnDeps.data()).cards,{})[task.cardId]);
+    var h4State=kaoH4TaskState(ui,task),pronunciationFolded=h4State.folded;
     var panel=ui.kaoPanel&&ui.kaoPanel.open&&ui.kaoPanel.taskId===task.id?ui.kaoPanel:null,autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',isBuild=task.kind==='build',isCloze=task.kind==='cloze',isLink=task.type==='link',isTransfer=task.type==='transfer',prompt=task.audioOnly?'Dinlediğin kelimenin anlamını seç':(task.prompt||(task.direction==='tr>ar'?task.meaning:task.ar));
     var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
     // K3P-A6: görev görünümünde de 5 bölümlü konum görünür.
@@ -1999,6 +2053,7 @@
     if(!node) return false;
     var html=kaoTaskHTML(currentTask()),match=html.match(/^<section[^>]*>([\s\S]*)<\/section>$/);
     node.innerHTML=match?match[1]:html;
+    kaoH4BindDetails(node,currentTask());
     // D-5: yeni görev 24 px yatay kayma + opaklıkla gelir; sınıf yalnız animasyon açıkken eklenir.
     var painted=currentTask(),paintedId=painted?painted.id:'done',paintUi=quranLearnDeps.ui(); if(paintUi.kaoPaintedId!==paintedId){ paintUi.kaoPaintedId=paintedId; if(kaoAnimate()) kaoKick(node,'kao-task-in'); kaoFx('enter',node); kaoFocusQuestion(node); }
     if(typeof node.setAttribute==='function'){
@@ -2135,7 +2190,7 @@
       while(end<state.plan.length&&state.plan[end].kind==='practice') end+=1;
       state.practiceEndAt=end;
       ui.kaoQueue=state.plan.slice(start,end).map(function(item){ return item.group==='review'?Object.assign({},item.queue,{lessonItemId:item.id}):{id:item.id,cardId:item.cardId,type:item.group==='concept'?'grammar':undefined,isNew:item.isNew===true,retry:false,choiceCount:item.choiceCount,audioOnly:item.audioOnly===true,lessonItemId:item.id}; });
-      ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoPlayed=false; ui.kaoTasks={}; ui.kaoQueue.forEach(function(item){ ui.kaoTasks[item.id]=kaoBuildTask(item,quranLearnDeps.data(),{seed:item.id,choiceCount:item.choiceCount,audioOnly:item.audioOnly}); });
+      ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoPlayed=false; ui.kaoTasks={}; ui.kaoH4Presentation=Object.create(null); ui.kaoQueue.forEach(function(item){ ui.kaoTasks[item.id]=kaoBuildTask(item,quranLearnDeps.data(),{seed:item.id,choiceCount:item.choiceCount,audioOnly:item.audioOnly}); });
     }else{
       ui.kaoQueue=[]; ui.kaoTaskIndex=0; ui.kaoTasks={};
       var current=(state.plan||[])[state.at||0];
@@ -2423,7 +2478,7 @@
       if(flow&&typeof flow.estimateMinutes==='function') for(var count=1;count<=ui.kaoQueue.length;count+=1){ if(flow.estimateMinutes(q.daily,count,now,0)>extraMinutes) break; limit=count; }
       ui.kaoQueue=ui.kaoQueue.slice(0,limit);
     }
-    ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoPlayed=false; ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoAdvanceTimer=null; ui.kaoFeedback=''; ui.kaoAudioFailed=false; ui.kaoTasks={}; kaoApplyView(ui,'session',null,ui.kaoView==='session'?'replace':'push'); ui.kaoOrderDraft=[]; ui.kaoDurableCount=0;
+    ui.kaoTaskIndex=0; ui.kaoTaskStartedAt=now.getTime(); ui.kaoPlayed=false; ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoAdvanceTimer=null; ui.kaoFeedback=''; ui.kaoAudioFailed=false; ui.kaoTasks={}; ui.kaoH4Presentation=Object.create(null); kaoApplyView(ui,'session',null,ui.kaoView==='session'?'replace':'push'); ui.kaoOrderDraft=[]; ui.kaoDurableCount=0;
     ui.kaoQueue.forEach(function(item){ ui.kaoTasks[item.id]=kaoBuildTask(item,d,{seed:item.id}); });
     if(!q.startedAt) q.startedAt=now.toISOString();
     quranLearnDeps.render();
@@ -2434,6 +2489,8 @@
     if(!quranLearnDeps) return false;
     var task=currentTask();
     if(!task||task.id!==taskId) return false;
+    var ui=quranLearnDeps.ui(),panel=ui.kaoPanel;
+    if(panel&&panel.open===true&&String(panel.taskId)===String(taskId)) return false;
     var choice=task.choices.find(function(item){ return item.choiceId===choiceId; });
     if(!choice) return false;
     return applyAnswer(task,choice,choiceId);
@@ -2441,6 +2498,8 @@
   function applyAnswer(task,choice,choiceId){
     if(!quranLearnDeps||!task||!choice) return false;
     var ui=quranLearnDeps.ui();
+    var h4Presentation=kaoH4TaskState(ui,task);
+    kaoH4CaptureOpenDetails(ui,task);
     var correct,orderDraftBefore=cloneValue(ui.kaoOrderDraft)||[];
     if(task.kind==='order'||task.kind==='build'){
       ui.kaoOrderDraft=Array.isArray(ui.kaoOrderDraft)?ui.kaoOrderDraft:[];
@@ -2502,7 +2561,7 @@
     // K3P-19 (H4): "s ≥ 21 doğruluğu" ölçüsü. Okunuş o kartta katlandığı için, destek çekilirken
     // doğruluğun korunup korunmadığı yalnız buradan ölçülebilir; ölçek gözlem, ek alan tutulmaz.
     var calib21=Object.assign({n:0,ok:0},objectOr(calib.s21,{}));
-    if(nonNegativeNumber(scheduled.s,0)>=21){ calib21.n+=1; if(correct) calib21.ok+=1; }
+    if(h4Presentation.eligible&&!h4Presentation.opened){ calib21.n+=1; if(correct) calib21.ok+=1; }
     calib.s21=calib21; daily.calib=calib;
     // R-A3: tekrar cevapları 10 R-bandında öngörü/gerçek; R-A1: gece tekrarı ve sonraki tekrarın doğruluğu.
     if(reviewed){ var bands=Array.isArray(calib.bands)&&calib.bands.length===10?calib.bands:Array.from({length:10},function(){ return {pred:0,ok:0,n:0}; }),band=bands[Math.min(9,Math.floor(nonNegativeNumber(scheduled.predictedR,0)*10))]; band.pred=round8(band.pred+nonNegativeNumber(scheduled.predictedR,0)); band.ok+=correct?1:0; band.n+=1; calib.bands=bands; var follow=afterNight?'nightFollow':'dayFollow'; daily[follow]=Object.assign({n:0,ok:0},objectOr(daily[follow],{})); daily[follow].n+=1; daily[follow].ok+=correct?1:0; }
@@ -4250,6 +4309,7 @@
     if(!live||!split){
       var old=doc.getElementById('sey-ov-back'); if(old&&old.parentNode) old.parentNode.removeChild(old);
       if(root&&typeof root.insertAdjacentHTML==='function') root.insertAdjacentHTML('beforeend',html);
+      kaoH4BindDetails(root,currentTask());
       kaoScreenKeyLast=split?split.screenKey:'';
       return 'insert';
     }
@@ -4257,6 +4317,7 @@
     kaoSyncAttrs(live.card,split.cardAttrs,KAO_CARD_ATTRS);
     kaoSyncAttrs(live.body,split.bodyAttrs,KAO_BODY_ATTRS);
     live.body.innerHTML=split.body;
+    kaoH4BindDetails(live.body,currentTask());
     live.body.scrollTop=sameScreen?top:0;
     kaoScreenKeyLast=split.screenKey;
     if(focusId){ var again=doc.getElementById(focusId); if(again&&typeof again.focus==='function'){ try{ again.focus({preventScroll:true}); }catch(e){ again.focus(); } } }

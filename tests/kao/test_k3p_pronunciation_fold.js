@@ -39,6 +39,260 @@ const countFolds = (html) => (String(html).match(new RegExp(`class="${FOLD}"`, '
 const countLines = (html) => (String(html).match(new RegExp(`class="${LINE}"`, 'g')) || []).length;
 const countArabic = (html) => (String(html).match(/class="kao-arabic-text"/g) || []).length;
 
+function prepareH4(stability, { seed, translit = true, orphan = false, readerUnknown = false, reviewAt = t.NOW } = {}) {
+  const id = Object.keys(q.cards).find((key) => /^w:/.test(key) && flow.ladderArm(key) === 'B');
+  assert.ok(id, 'H4 için B kolunda kelime kartı bulunmalı');
+  q.cards[id] = { state: 'review', s: stability, d: 10, reps: 6, r: reviewAt, due: '2026-09-29T00:00:00.000Z', orphan, readerUnknown };
+  q.settings.translit = translit;
+  const taskId = `k3pd03:${seed}`;
+  const task = api.kaoBuildTask({ id: taskId, cardId: id, isNew: false }, t.data, { seed: taskId });
+  t.ui.kaoQueue = [{ id: task.id, cardId: id, isNew: false }];
+  t.ui.kaoTasks = { [task.id]: task };
+  t.ui.kaoTaskIndex = 0;
+  t.ui.kaoTaskStartedAt = Date.now();
+  t.ui.kaoUndo = null;
+  t.ui.kaoPanel = { open: false };
+  t.ui.kaoOrderDraft = [];
+  t.ui.kaoFeedback = '';
+  q.daily['2026-09-30'] = { answered: 0, correct: 0, new: 0, reviewed: 0 };
+  return { id, task, html: api.kaoTaskHTML(task) };
+}
+
+function h4Counts() {
+  const s21 = q.daily['2026-09-30'] && q.daily['2026-09-30'].calib && q.daily['2026-09-30'].calib.s21;
+  return { n: s21 ? s21.n : 0, ok: s21 ? s21.ok : 0 };
+}
+
+check('H4 aynı deterministik ders görev ID’si yeni görev örneğinde yeni s koşulunu dondurur', () => {
+  const id = Object.keys(q.cards).find((key) => /^w:/.test(key) && flow.ladderArm(key) === 'B');
+  assert.ok(id, 'ders görevi için B kolunda kelime kartı bulunmalı');
+  const lemmaId = id.slice(2, id.lastIndexOf(':'));
+  const taskId = `practice:u01.01:${lemmaId}:ar>tr`;
+  q.cards[id] = { state: 'review', s: 20, d: 10, reps: 6, r: t.NOW, due: '2026-09-29T00:00:00.000Z' };
+  q.settings.translit = true;
+  const first = api.kaoBuildTask({ id: taskId, cardId: id, isNew: false }, t.data, { seed: taskId });
+  assert.equal(countFolds(api.kaoTaskHTML(first)), 0, 'ilk görev gösteriminde s=20 görünür');
+
+  q.cards[id].s = 40;
+  const resumed = api.kaoBuildTask({ id: taskId, cardId: id, isNew: false }, t.data, { seed: taskId });
+  assert.equal(resumed.id, first.id, 'lesson restart aynı deterministik practice ID’yi üretti');
+  t.ui.kaoQueue = [{ id: taskId, cardId: id, isNew: false }];
+  t.ui.kaoTasks = { [taskId]: resumed };
+  t.ui.kaoTaskIndex = 0;
+  t.ui.kaoTaskStartedAt = Date.now();
+  t.ui.kaoPanel = { open: false };
+  t.ui.kaoOrderDraft = [];
+  q.daily['2026-09-30'] = { answered: 0, correct: 0, new: 0, reviewed: 0 };
+  assert.equal(countFolds(api.kaoTaskHTML(resumed)), 1, 'yeni görev örneği s=40 cevabı öncesi katlanır');
+  assert.equal(t.ui.kaoH4Presentation[taskId].eligible, true, 'yeni örnek kendi görev başı koşulunu saklar');
+});
+
+check('H4 sınır matrisi: cevap öncesi s ve gerçek kapalı okunuş belirleyicidir', () => {
+  const cases = [];
+  for (const s of [20, 21, 40]) {
+    for (const correct of [true, false]) {
+      const reviewAt = s === 20 && correct ? '2026-09-23T12:00:00.000Z' : t.NOW;
+      const { id, task, html } = prepareH4(s, { seed: `${s}-${correct ? 'correct' : 'wrong'}`, reviewAt });
+      assert.equal(task.type, 'word');
+      assert.notEqual(task.kind, 'build');
+      assert.notEqual(task.kind, 'order');
+      assert.ok(task.translit || task.choices.some((choice) => choice.pronunciation), 'görevde gerçek Latin okunuşu var');
+      const wasFolded = s >= 21 && html.includes(`<details class="${FOLD}">`);
+      assert.equal(wasFolded, s >= 21, `başlangıç s=${s}: gerçek okunuş sunumu`);
+      const choiceId = correct ? correctTaps(task)[0] : task.choices.find((choice) => !choice.correct).choiceId;
+      const answer = api.kaoAnswer(task.id, choiceId);
+      assert.equal(answer.correct, correct);
+      const scheduled = q.cards[id];
+      if (s === 20 && correct) assert.ok(scheduled.s >= 21, 's=20 doğru cevabı sonrası zamanlanmış s sınırı aşar');
+      if (s >= 21 && !correct) assert.ok(scheduled.s < 21, `s=${s} yanlış cevabı sonrası scheduled.s sınırın altına iner`);
+      const counts = h4Counts();
+      assert.deepEqual(counts, { n: wasFolded ? 1 : 0, ok: wasFolded && correct ? 1 : 0 }, `cevap öncesi s=${s}, correct=${correct}`);
+      cases.push({ s, correct, scheduledS: scheduled.s, ...counts });
+    }
+  }
+  assert.equal(cases.length, 6, '20/21/40 × doğru/yanlış matrisi tamamlandı');
+});
+
+check('H4 aynı görevde çift cevabı saymaz; undo n/ok anlık görüntüsünü geri yükler', () => {
+  const { id, task } = prepareH4(21, { seed: 'undo-idempotence' });
+  const wrong = task.choices.find((choice) => !choice.correct).choiceId;
+  const first = api.kaoAnswer(task.id, wrong);
+  assert.equal(first.correct, false);
+  assert.ok(q.cards[id].s < 21, 'yanlış cevap scheduled.s değerini eşik altına indirdi');
+  assert.deepEqual(h4Counts(), { n: 1, ok: 0 });
+  assert.equal(api.kaoAnswer(task.id, wrong), false, 'aynı aktif görevin yinelenen cevap olayı reddedilir');
+  assert.deepEqual(h4Counts(), { n: 1, ok: 0 });
+  assert.equal(api.kaoUndo(), true, 'undo kabul edilir');
+  assert.deepEqual(h4Counts(), { n: 0, ok: 0 }, 'önceki günlük sayaç geri yüklenir');
+  const afterUndo = api.kaoAnswer(task.id, wrong);
+  assert.equal(afterUndo.correct, false);
+  assert.deepEqual(h4Counts(), { n: 1, ok: 0 }, 'aynı görevin yeniden cevabı en çok bir yeni gözlem yazar');
+  assert.equal(api.kaoAnswer(task.id, wrong), false);
+  assert.deepEqual(h4Counts(), { n: 1, ok: 0 });
+});
+
+check('H4 legacy destek koşulları korunur: okunuş kapalı, orphan ve readerUnknown dışarıda', () => {
+  const cases = [
+    { seed: 'disabled', translit: false },
+    { seed: 'orphan', orphan: true },
+    { seed: 'reader-unknown', readerUnknown: true }
+  ];
+  for (const options of cases) {
+    const { task, html } = prepareH4(40, options);
+    assert.equal(html.includes(`<details class="${FOLD}">`), false, `${options.seed}: kullanılabilir katlı destek yok`);
+    const wrong = task.choices.find((choice) => !choice.correct).choiceId;
+    const result = api.kaoAnswer(task.id, wrong);
+    assert.equal(result.correct, false);
+    assert.deepEqual(h4Counts(), { n: 0, ok: 0 }, `${options.seed}: sayaç dışında`);
+  }
+});
+
+check('H4 details toggle yalnız güncel task ve disclosure düğümünü işaretler', () => {
+  const makeDetails = () => {
+    const listeners = {};
+    return {
+      open: false,
+      listeners,
+      addEventListener(type, listener) { (listeners[type] = listeners[type] || []).push(listener); },
+      toggle(open) { this.open = open; for (const listener of listeners.toggle || []) listener.call(this, { target: this }); }
+    };
+  };
+  const root = {
+    details: [],
+    html: '',
+    render(html) {
+      this.html = String(html || '');
+      const count = (this.html.match(/<details class="kao-pronunciation-fold">/g) || []).length;
+      this.details = Array.from({ length: count }, makeDetails);
+    },
+    insertAdjacentHTML(_where, html) { this.render(html); },
+    set innerHTML(html) { this.render(html); },
+    get innerHTML() { return this.html; },
+    querySelectorAll(selector) { return selector === `.kao-pronunciation-fold` ? this.details : []; },
+    querySelector() { return null; },
+    setAttribute() {},
+    removeAttribute() {},
+    classList: { add() {}, remove() {} }
+  };
+  const dom = bootKao({ seeded: true, surface: { taskElement: () => root } });
+  const domQ = dom.data.quranLearn, domFlow = dom.win.SeymaQuranLearnFlow;
+  const id = Object.keys(domQ.cards).find((key) => /^w:/.test(key) && domFlow.ladderArm(key) === 'B');
+  domQ.cards[id] = { state: 'review', s: 40, d: 10, reps: 6, r: dom.NOW, due: '2026-09-29T00:00:00.000Z' };
+  const task = dom.api.kaoBuildTask({ id: 'k3pd03:native-details', cardId: id, isNew: false }, dom.data, { seed: 'k3pd03:native-details' });
+  dom.ui.kaoQueue = [{ id: task.id, cardId: id, isNew: false }];
+  dom.ui.kaoTasks = { [task.id]: task };
+  dom.ui.kaoTaskIndex = 0;
+  dom.ui.kaoTaskStartedAt = Date.now();
+  dom.ui.kaoPanel = { open: false };
+  dom.ui.kaoOrderDraft = [];
+  dom.data.quranLearn.daily['2026-09-30'] = { answered: 0, correct: 0, new: 0, reviewed: 0 };
+  dom.ui.kaoView = 'session';
+  dom.ui.kaoOpen = true;
+  const doc = { getElementById(key) { return key === 'app' ? root : null; } };
+  dom.api.kaoPatchOverlay(doc, dom.api.kaoOverlayHTML(dom.NOW));
+  assert.ok(root.details.length > 0, 'ilk çizimde katlı okunuş details düğümü var');
+  assert.ok(root.details.every((detail) => detail.listeners.toggle && detail.listeners.toggle.length === 1), 'yerel toggle olayı izleniyor');
+  const staleDetails = root.details[0];
+  const sameIdTask = Object.assign({}, task);
+  assert.notEqual(sameIdTask, task, 'aynı deterministik ID için yeni task nesnesi oluşturuldu');
+  dom.ui.kaoTasks[task.id] = sameIdTask;
+  dom.api.kaoPatchOverlay(doc, dom.api.kaoOverlayHTML(dom.NOW));
+  const currentDetails = root.details[0];
+  assert.equal(currentDetails.open, false, 'yeni görev disclosure düğümü kapalı başlar');
+  assert.equal(dom.ui.kaoH4Presentation[task.id].taskRef, sameIdTask, 'sunum snapshot yeni görev nesnesine bağlandı');
+  staleDetails.toggle(true);
+  assert.equal(dom.ui.kaoH4Presentation[task.id].opened, false, 'eski ayrılmış düğümün gecikmiş olayı yeni görevi işaretlemez');
+  assert.equal(currentDetails.open, false, 'eski düğümün olayı yeni disclosure düğümünü açmaz');
+  const currentWrong = sameIdTask.choices.find((choice) => !choice.correct).choiceId;
+  dom.api.kaoAnswer(sameIdTask.id, currentWrong);
+  const freshS21 = dom.data.quranLearn.daily['2026-09-30'].calib.s21;
+  assert.deepEqual({ n: freshS21.n, ok: freshS21.ok }, { n: 1, ok: 0 }, 'yeni görev kapalı destekle yanıtlanınca H4 cohortuna girer');
+  assert.equal(dom.api.kaoUndo(), true, 'stale event regresyon vakası geri alınabilir');
+  const afterStaleUndo = dom.data.quranLearn.daily['2026-09-30'].calib && dom.data.quranLearn.daily['2026-09-30'].calib.s21;
+  assert.deepEqual(afterStaleUndo ? { n: afterStaleUndo.n, ok: afterStaleUndo.ok } : { n: 0, ok: 0 }, { n: 0, ok: 0 }, 'stale event testinden sonra günlük sayaç eski haline döner');
+  dom.ui.kaoTasks[task.id] = task;
+  dom.api.kaoPatchOverlay(doc, dom.api.kaoOverlayHTML(dom.NOW));
+  dom.ui.kaoH4Presentation[task.id].opened = false;
+  staleDetails.open = false;
+  staleDetails.toggle(true);
+  assert.equal(dom.ui.kaoH4Presentation[task.id].opened, false, 'aynı task nesnesine ait olsa bile ayrılmış düğüm olayı sayılmaz');
+  root.details[0].toggle(true);
+  assert.equal(dom.ui.kaoH4Presentation[task.id].opened, true, 'açma olayı yalnız ui sunum kaydını işaretler');
+  assert.equal(JSON.stringify(dom.data.quranLearn).includes('kaoH4Presentation'), false, 'sunum işareti kalıcı veriye yazılmaz');
+  dom.api.kaoPatchOverlay(doc, dom.api.kaoOverlayHTML(dom.NOW));
+  assert.ok(root.details.every((detail) => detail.listeners.toggle && detail.listeners.toggle.length === 1), 'yeniden çizilen disclosure da izleniyor');
+  const wrong = task.choices.find((choice) => !choice.correct).choiceId;
+  dom.api.kaoAnswer(task.id, wrong);
+  const s21 = dom.data.quranLearn.daily['2026-09-30'].calib.s21;
+  assert.deepEqual({ n: s21.n, ok: s21.ok }, { n: 0, ok: 0 }, 'önceden açılmış destek sayaca girmez');
+  assert.equal(dom.api.kaoUndo(), true, 'açılmış destekli yanıt geri alınabilir');
+  assert.equal(dom.ui.kaoH4Presentation[task.id].opened, true, 'undo açılma bilgisini aynı görevde korur');
+  const restoredCalib21 = dom.data.quranLearn.daily['2026-09-30'].calib && dom.data.quranLearn.daily['2026-09-30'].calib.s21;
+  assert.deepEqual(restoredCalib21 ? { n: restoredCalib21.n, ok: restoredCalib21.ok } : { n: 0, ok: 0 }, { n: 0, ok: 0 }, 'undo günlük n/ok değerlerini geri yükler');
+  assert.equal(dom.api.kaoAnswer(task.id, wrong).correct, false);
+  const afterUndoCalib21 = dom.data.quranLearn.daily['2026-09-30'].calib.s21;
+  assert.deepEqual({ n: afterUndoCalib21.n, ok: afterUndoCalib21.ok }, { n: 0, ok: 0 }, 'undo sonrası yeniden yanıtlanan açılmış destek de dışarıda kalır');
+});
+
+check('H4 destekle ilgili ARIA okunuşu ve çok dokunuşlu build kohorta girmez', () => {
+  const { id, task: wordTask } = prepareH4(40, { seed: 'aria-choice' });
+  const cloze = {
+    id: 'k3pd03:aria-cloze',
+    cardId: id,
+    type: 'word',
+    kind: 'cloze',
+    direction: 'tr>ar',
+    answer: 'كِتَابٌ',
+    ar: 'هَٰذَا كِتَابٌ',
+    pronunciation: 'hādhā kitābun',
+    translit: wordTask.translit,
+    meaning: 'Bu bir kitaptır',
+    choices: [
+      { choiceId: 'right', label: 'كِتَابٌ', pronunciation: 'kitābun', correct: true },
+      { choiceId: 'wrong-1', label: 'قَلَمٌ', pronunciation: 'qalamun', correct: false },
+      { choiceId: 'wrong-2', label: 'بَيْتٌ', pronunciation: 'baytun', correct: false },
+      { choiceId: 'wrong-3', label: 'مَاءٌ', pronunciation: 'māʾun', correct: false }
+    ]
+  };
+  t.ui.kaoQueue = [{ id: cloze.id, cardId: id, isNew: false }];
+  t.ui.kaoTasks = { [cloze.id]: cloze };
+  t.ui.kaoPanel = { open: false };
+  t.ui.kaoOrderDraft = [];
+  q.daily['2026-09-30'] = { answered: 0, correct: 0, new: 0, reviewed: 0 };
+  const clozeHtml = api.kaoTaskHTML(cloze);
+  assert.match(clozeHtml, /aria-label="[^\"]*okunuşu kitābun/, 'Arapça cevap düğmesinin erişilebilir adı okunuşu açığa çıkarıyor');
+  api.kaoAnswer(cloze.id, 'wrong-1');
+  assert.deepEqual(h4Counts(), { n: 0, ok: 0 }, 'erişilebilir adla sunulan okunuş shown sayılır');
+
+  const buildId = Object.keys(q.cards).find((key) => /^w:/.test(key) && flow.ladderArm(key) === 'A');
+  q.cards[buildId] = { state: 'review', s: 21, d: 10, reps: 6, r: t.NOW, due: '2026-09-29T00:00:00.000Z' };
+  const build = api.kaoBuildTask({ id: 'k3pd03:build-excluded', cardId: buildId, isNew: false }, t.data, { seed: 'k3pd03:build-excluded' });
+  assert.equal(build.kind, 'build', 's=21 A kolu gerçek harf kurma görevi üretir');
+  t.ui.kaoQueue = [{ id: build.id, cardId: buildId, isNew: false }];
+  t.ui.kaoTasks = { [build.id]: build };
+  t.ui.kaoPanel = { open: false };
+  t.ui.kaoOrderDraft = [];
+  q.daily['2026-09-30'] = { answered: 0, correct: 0, new: 0, reviewed: 0 };
+  for (const choiceId of correctTaps(build)) api.kaoAnswer(build.id, choiceId);
+  assert.deepEqual(h4Counts(), { n: 0, ok: 0 }, 'build hedefi cevap öncesi Latin okunuşu açığa çıkardığı için dışarıda');
+});
+
+check('H4 sunum ayarı FSRS notunu değiştirmez', () => {
+  const before = q.settings.translit;
+  const answerOnce = (translit, seed) => {
+    const { id, task } = prepareH4(40, { seed, translit, reviewAt: t.NOW });
+    t.ui.kaoTaskStartedAt = Date.now() - 3000;
+    api.kaoAnswer(task.id, correctTaps(task)[0]);
+    const card = q.cards[id];
+    return { s: card.s, d: card.d, dueMinute: card.due.slice(0, 16), reps: card.reps, lapses: card.lapses, state: card.state };
+  };
+  const folded = answerOnce(true, 'fsrs-folded');
+  const disabled = answerOnce(false, 'fsrs-disabled');
+  assert.deepEqual(disabled, folded, 'gizli/katlı Latin desteği FSRS alanlarını değiştirmez');
+  if (before === undefined) delete q.settings.translit;
+  else q.settings.translit = before;
+});
+
 check('sınır: s = 20 görünür, s = 21 katlı — okunuş s ≥ 21 olan kartta soluyor', () => {
   const id = cardAt(20);
   assert.ok(id, 'A kolu kelime kartı bulunmalı');

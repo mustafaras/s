@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-03",
+  "nextPrompt": "K3PD-04",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -479,12 +479,427 @@
     },
     "K3PD-03": {
       "id": "K3PD-03",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "6b393f35849b6ce524174a94a37ad49558d2d644",
+      "changedPaths": [
+        "app/core/quranLearn.js",
+        "tests/kao/test_k3p_pronunciation_fold.js",
+        "tests/kao/test_k3p_deney_rapor.js",
+        "tests/kao/README.md",
+        "kao3-premium/araclar/deney-rapor.cjs",
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-03/EVIDENCE.md"
+      ],
+      "checks": [
+        {
+          "command": "node tests/kao/test_k3p_pronunciation_fold.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "13 focused H4 controls passed"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_deney_rapor.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "7 hypotheses; H4 R+1 cohort boundary; leakage 0; manual 7/7; 7 error paths"
+          }
+        },
+        {
+          "command": "node --check kao3-premium/araclar/deney-rapor.cjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "syntax check passed"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_build.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "7 controls passed"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_cloze.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "7 controls passed"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_migration.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "KAO migration: PASS (empty/old/broken/idempotent/orphan/114 surah/onboarding/path)"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_migration.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "15 controls passed"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_fsrs.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "24 published vectors passed"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_queue.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "KAO queue: PASS (20 deterministic tasks + 4 candidate types / 3 safe queue types, budgets/KF-9 interleave x1000/semantic spacing)"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_requirements.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "DİA 524/524; targeted 3.090 ms <50 ms (fresh run)"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_render.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "KAO render: PASS (KAO-FIX-13 Arapça yığın, KAO-FIX-12 E7 kaynaklar, KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_navigation.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "KAO2 navigation: PASS (yığın geri dönüşü, görünüm başlıkları, kök kapat, Escape sözleşmesi)"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_a11y.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "14 accessibility checks passed in isolated completion"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_inventory.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "83 tests + 4 helpers/fixtures"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_design_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "d/roots\":0,\"seeded/s0\":1,\"seeded/sources\":0,\"seeded/library\":0,\"seeded/unit\":1,\"seeded/concept\":1} switches={\"empty/off\":{\"count\":6,\"missing\":0},\"empty/on\":{\"count\":6,\"missing\":0},\"seeded/off\":{\"count\":6,\"missing\":0},\"seeded/on\":{\"count\":6,\"missing\":0}} KAO2 design contract: PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_pronunciation_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "KAO pronunciation contract: PASS (content + task objects + visible paired rendering + K3P-04 okunuş kuralları, araç↔girdi↔çalışma zamanı 524/524)"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_phonics_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "KAO content contract: PASS (E8 stüdyo: 13 SVG gömülü, 6 görev türü, FSRS + dikkat, sessiz mod; grammar=72297, surahs=87335, phonics=9552)"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_mount.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "17 renders; 8 lesson stages; 16 transitions; 0 remounts"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_focus_lock.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "test_k3p_focus_lock: PASS"
+          }
+        },
+        {
+          "command": "node tests/app/test_asset_pin_freshness.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "60 fresh; 1 planned deferral; 0 blocking stale"
+          }
+        },
+        {
+          "command": "node tests/app/test_iip_22.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "13/13"
+          }
+        },
+        {
+          "command": "env -u KAO2_WRITE_BASELINE node tests/kao/test_kao2_perf_budget.js",
+          "env": {
+            "KAO2_WRITE_BASELINE": "unset"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "summary": "content 184.591 KiB; runtime 133.989 KiB; CSS 15.877 KiB; p95 6.533 ms; steady 3.314 ms (fresh isolated run)"
+          }
+        },
+        {
+          "command": "node tools/kao/kao-plan-check.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "kao-plan-check (kod modu — plan arşivde): PASS"
+          }
+        },
+        {
+          "command": "node tools/kao/kao-verify-contrast.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "756 pairs; 0 below threshold"
+          }
+        },
+        {
+          "command": "node --check app.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "exit 0"
+          }
+        },
+        {
+          "command": "node --check sync.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "exit 0"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearn.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "exit 0"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnFlow.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "exit 0"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnViews.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "exit 0"
+          }
+        },
+        {
+          "command": "node --check tests/kao/test_k3p_pronunciation_fold.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "exit 0"
+          }
+        },
+        {
+          "command": "node --check tests/kao/test_k3p_deney_rapor.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "exit 0"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/driver.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "notification payload is not silently routed PASS delivery module is the live boundary owner (not the inline fallback) PASS reminder and AEON channels stay disjoint PASS reminder background capability is still reported as unsupported PASS reminder in-app path stays available Done."
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": " ✓ Reminder deep-link tablosu Saygı hedefini gerçek bir handler ile taşıyor ✓ Zikir hatırlatmasını açmak zikir sayımını/streak’ini değiştirmiyor ✓ Reminder modülleri zikir harness boot’unda da canlı ✓ Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık ✅ 95/95 assertion pass"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "33 negative; 34 K3PD and 6 legacy pin-policy cases"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "34 cards aligned; nextPrompt K3PD-03"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "K3PD-03; candidate does not authorize work"
+          }
+        },
+        {
+          "command": "node kao3-premium/araclar/senkron.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "37/37; nextPrompt=null"
+          }
+        },
+        {
+          "command": "node --input-type=module -e 'import fs from \"node:fs\";const s=fs.readFileSync(\"kao3-premium/duzeltme-plani/PROMPTLAR.md\",\"utf8\");const b=s.split(\"<!-- PROMPT K3PD-03 -->\")[1].split(\"<!-- /PROMPT K3PD-03 -->\")[0];const a=b.split(\"**Yazma allowlist’i:**\")[1].split(\"**Uygula:\")[0];const p=[...a.matchAll(/`([^`]+)`/g)].map(m=>m[1]);console.log(JSON.stringify(p));if(p.length!==10)process.exit(1)'",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "10 exact paths"
+          }
+        },
+        {
+          "command": "node <<'NODE'\nconst {execFileSync}=require('node:child_process');for(const level of ['-6','-9']){const b=execFileSync('gzip',['-n',level,'-c','app/core/quranLearn.js']);console.log(`${level} ${b.length} bytes`)}\nNODE",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "gzip -6 112368 B; gzip -9 112046 B"
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "exit 0"
+          }
+        },
+        {
+          "command": "git diff --exit-code HEAD -- kao3-premium/K3P-STATE.json kao3-premium/.anti-amnesia/LEDGER.md index.html sw.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "old K3P state/ledger/index/sw unchanged"
+          }
+        },
+        {
+          "command": "rg -o 'App\\.kao[A-Za-z0-9_]*\\s*=' app.js | wc -l",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "45"
+          }
+        },
+        {
+          "command": "shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "all 3 original hashes match"
+          }
+        },
+        {
+          "command": "git branch --show-current && git rev-parse HEAD && git rev-list --left-right --count HEAD...origin/main",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "summary": "branch k3pd-denetim-duzeltmeleri; base HEAD; ahead/behind 3/0"
+          }
+        },
+        {
+          "command": "independent in-memory Node/VM stale-details toggle reproduction",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "newTaskOpened": false,
+            "newAnswerH4": {
+              "n": 1,
+              "ok": 0
+            }
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-04",
+            "authorizesWork": false
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "negative": 33,
+            "k3pdPolicy": 34,
+            "legacyPinPolicy": 6
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-03/EVIDENCE.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-04": {
@@ -834,7 +1249,9 @@
   "pinDeferral": {
     "branch": "k3pd-denetim-duzeltmeleri",
     "until": "K3PD-32",
-    "files": [],
+    "files": [
+      "app/core/quranLearn.js"
+    ],
     "mainExceptions": []
   },
   "externalGates": {

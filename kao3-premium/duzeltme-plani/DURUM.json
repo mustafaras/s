@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-04",
+  "nextPrompt": "K3PD-05",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -904,12 +904,148 @@
     },
     "K3PD-04": {
       "id": "K3PD-04",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "b19e6b1b79d064b12365031aba0c47d2ac692f57",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md"
+      ],
+      "checks": [
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "cards": 34,
+            "nextPrompt": "K3PD-05",
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-05",
+            "authorizesWork": false
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "negative": 33,
+            "k3pdPolicy": 34,
+            "legacyPinPolicy": 6,
+            "syntheticPromptIds": 34
+          }
+        },
+        {
+          "command": "node kao3-premium/araclar/senkron.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "legacyCards": "37/37",
+            "nextPrompt": null
+          }
+        },
+        {
+          "command": "node --input-type=module -e 'const minutes=[5,10,15], seconds=[6,30,60], expected=[[50,100,150],[10,20,30],[5,10,15]];const capacities=seconds.map((s,i)=>minutes.map(m=>m*60/s));if(JSON.stringify(capacities)!==JSON.stringify(expected))throw new Error(\"capacity mismatch\");const coreSeconds=seconds.map(s=>13*s);const coreMinutes=coreSeconds.map(s=>s/60);console.log(JSON.stringify({capacities,coreSeconds,coreMinutes}));if(JSON.stringify(coreSeconds)!==JSON.stringify([78,390,780]))process.exit(1)'",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "capacityRows": 3,
+            "taskCapacities": {
+              "6s": [
+                50,
+                100,
+                150
+              ],
+              "30s": [
+                10,
+                20,
+                30
+              ],
+              "60s": [
+                5,
+                10,
+                15
+              ]
+            },
+            "core13Seconds": {
+              "6s": 78,
+              "30s": 390,
+              "60s": 780
+            },
+            "core13Minutes": {
+              "6s": 1.3,
+              "30s": 6.5,
+              "60s": 13
+            }
+          }
+        },
+        {
+          "command": "node --input-type=module -e 'import fs from \"node:fs\";const text=fs.readFileSync(\"kao3-premium/duzeltme-plani/PROMPTLAR.md\",\"utf8\");const card=text.split(\"<!-- PROMPT K3PD-04 -->\")[1]?.split(\"<!-- /PROMPT K3PD-04 -->\")[0];if(!card)throw new Error(\"card delimiters missing\");const section=card.split(\"**Yazma allowlist’i:**\")[1]?.split(\"**Uygula:**\")[0];if(!section)throw new Error(\"allowlist section missing\");const paths=[...section.matchAll(/\\x60([^\\x60]+)\\x60/g)].map(m=>m[1]);const expected=[\"kao3-premium/duzeltme-plani/DURUM.json\",\"kao3-premium/duzeltme-plani/GUNCEL-DURUM.md\",\"kao3-premium/duzeltme-plani/KAYIT.md\",\"kao3-premium/duzeltme-plani/PROMPTLAR.md\"];console.log(JSON.stringify({paths,exactPaths:paths.length,includesThreeDecisionDocs:expected.slice(0,3).every(x=>paths.includes(x)),promptSelfCorrectionOnly:/yalnızca bu K3PD-04 allowlist satırını exact-path uyumlu yapmak için/.test(section)}));if(paths.length!==expected.length||expected.some(x=>!paths.includes(x))||paths.some(x=>!expected.includes(x))||!/yalnızca bu K3PD-04 allowlist satırını exact-path uyumlu yapmak için/.test(section))process.exit(1)'",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "exactPaths": 4,
+            "includesThreeDecisionDocs": true,
+            "promptSelfCorrectionOnly": true
+          }
+        },
+        {
+          "command": "git diff --exit-code HEAD -- app.js app/core/quranLearn.js app/core/quranLearnFlow.js app/core/quranLearnViews.js index.html sw.js kao3-premium/K3P-STATE.json kao3-premium/.anti-amnesia/LEDGER.md",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "productionAndLegacyFilesChanged": 0
+          }
+        },
+        {
+          "command": "git diff --check && shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0,
+            "protectedHashesMatch": 3
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "protectedFiles": 3,
+            "hashesMatchRecordedBaseline": true
+          }
+        },
+        {
+          "command": "git diff --cached --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0,
+            "stagedPaths": 0
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-05": {
@@ -1218,14 +1354,18 @@
       "scope": "Yalnız H4 ölçümü ve daily.calib.s21 alan kararı; yeni persistent alan/migration ve geçmiş onarımı seçilmedi."
     },
     "timeBudget": {
-      "status": "pending",
+      "status": "approved",
       "topic": "Ders zaman bütçesinin imkânsız durumu",
-      "proposal": null,
-      "options": [],
-      "response": null,
-      "answeredAt": null,
-      "sourceRef": "PROMPTLAR.md §5; DENETLEYICI.md §§2.1–2.2; K3PD-04",
-      "scope": "Yalnız zaman bütçesi kararı; kullanıcı yanıtı gelmeden hedef/algoritma seçilmez."
+      "proposal": "Kullanıcının A seçimi: ders seçilen tahmini bütçeye sığan ardışık parçalara bölünür; görevler atlanmaz veya tavana göre saklanmaz. Her parçada ders başlığı ve hedef görünür; kavram plan sırasındaki yerinde ilk ilişkili görevle sunulur, resume sonrası kısa kavram çapası korunur. Tam dersin son özetine kadar doneAt/ustalık ödülü verilmez. Süre kaynağı yeni kalıcı alan olmadan aynı oturumda tamamlanmış doğru ve yanlış yanıtların son 50 geçerli görev süresi medyanıdır; 6 sn tabanı uygulanır. Oturum örneği yoksa mevcut 7 günlük günlük ortalama yalnız “yedek: önceki 7 gün ortalaması” etiketiyle kullanılır; bu da yoksa 30 sn/görev “ölçümsüz varsayılan” gösterilir. Öncelik: A3 ısınması (en kararlı s, en çok 5) bütçe içinde önce; sonra çekirdeğin kaldığı yerden ardışık parçası; boş süreye sığan ek tekrarlar en düşük R önce, geri kalan tekrarlar vadeli kalır. Tek sonraki görev bile bütçeye sığmıyorsa otomatik başlatma yok; gereken süre, daha uzun bütçe seçimi ve süre aşımını açıkça kabul ederek devam seçenekleri gösterilir; resume aynı görevde tutulur. Mevcut phase/itemId/lessonItemId yeterlidir; yeni kalıcı alan/migration yok.",
+      "options": [
+        "A — Bütçeye göre böl (kullanıcı seçti): mevcut resume ile ardışık parçalar; her parçada hedef; kavram plan yerinde ve ilişkili görevle; tam ders bitmeden doneAt/ustalık ödülü yok; ısınma bütçeye dahil, sonra çekirdek sırayla, ek tekrarlar en düşük R; tek görev sığmıyorsa otomatik başlatma yok ve süre aşımı açık seçenek; önerideki medyan/fallback/30 sn varsayılanı geçerli.",
+        "B — Tüm dersi tek oturumda tut; toplam tahmini seçili 5/10/15 dakikayı aşarsa açıkça göster ve bütçe karşılandı deme; aynı süre kaynağı, öncelik, resume ve tam bitiş ödülü sözleşmesi korunur.",
+        "C — Farklı kural: kullanıcı kendi bölümleme/süre/öncelik davranışını belirtir."
+      ],
+      "response": "A — Bütçeye göre böl",
+      "answeredAt": "2026-10-19",
+      "sourceRef": "Kullanıcı yanıtı 2026-10-19: “Evet, bu dar düzeltmeye izin ver”; “A — Bütçeye göre böl”.",
+      "scope": "Yalnız K3PD-04 zaman bütçesi kararı: oturumları bütçeye göre bölme; süre medyanı/fallback; ısınma ve R önceliği; tek görev sığmama davranışı; hedef/kavram/ödül/resume. Yeni kalıcı alan, migration, üretim kodu ve yayın kapsam dışı."
     },
     "recognition": {
       "status": "pending",

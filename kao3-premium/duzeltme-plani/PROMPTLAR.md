@@ -245,7 +245,7 @@ Kullanıcıya kararın seçeneklerini, veri etkisini ve önerilen seçeneği sun
 
 **Oku:** Flow: measuredPerTaskMs/taskBudget/lessonPlan/estimateMinutes; kaoLatency; resume; K3P-A3/A4 kabulü.
 
-**Yazma allowlist’i:** Yalnız yeni karar/state/durum/kayıt belgeleri.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` yalnızca bu K3PD-04 allowlist satırını exact-path uyumlu yapmak için.
 
 **Uygula:**
 

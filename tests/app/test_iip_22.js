@@ -10,6 +10,7 @@ const vm = require('node:vm');
 const root = require('../repo-root');
 const swSource = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const indexSource = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const pagesWorkflowSource = fs.readFileSync(path.join(root, '.github/workflows/pages.yml'), 'utf8');
 
 class SyntheticResponse {
   constructor(body, init) { this.body = body; this.status = init && init.status || 200; }
@@ -112,7 +113,7 @@ function test(name, fn) {
     assert.deepEqual(runtimeAssets.filter(item => !entries.has(item)), []);
   });
   await test('KAO-16 runtime ve service worker tek yayın sürümünü kullanır', () => {
-    const release = '20261018a';
+    const release = '20261019a';
     for (const asset of ['app/kao.css', 'app/content/quranLexiconV1.js', 'app/content/quranGrammarV1.js', 'app/content/quranShortSurahsV1.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js', 'app/core/quranLearn.js', 'app.js']) {
       assert.ok(indexSource.includes(`${asset}?v=${release}`), asset + ' index pini');
       assert.ok(Array.from(base.sandbox.swManifestDescriptor().entries).includes(`./${asset}?v=${release}`), asset + ' offline pini');
@@ -122,6 +123,14 @@ function test(name, fn) {
     assert.equal(swVersion && swVersion[1], release);
     assert.equal(base.sandbox.swManifestDescriptor().version, `iip22-${release}`);
   });
+  await test('K3PD plan/state dosyaları Pages runtime artefaktına alınmaz', () => {
+    const stage = pagesWorkflowSource.match(/- name: Stage runtime-only site\n        run: \|([\s\S]*?)(?=\n      - name: )/);
+    const guard = pagesWorkflowSource.match(/- name: Guard runtime assets present\n        run: \|([\s\S]*?)(?=\n      - name: )/);
+    assert.ok(stage, 'Pages stage adımı bulunmalı');
+    assert.ok(guard, 'Pages runtime guard adımı bulunmalı');
+    assert.match(stage[1], /--exclude 'kao3-premium'/, 'plan dizini rsync dışında olmalı');
+    assert.match(guard[1], /for d in[\s\S]*\bkao3-premium\b[\s\S]*; do/, 'guard, paket içinde K3PD/K3P plan dizini kalmasını reddetmeli');
+  });
   await test('tokenlı, kişisel, panel, video ve dış URL cache dışıdır', () => {
     const key = base.sandbox.swOfflineRequestKey;
     assert.equal(key(new SyntheticRequest('https://example.test/s/index.html?token=secret')), '');
@@ -129,7 +138,7 @@ function test(name, fn) {
     assert.equal(key(new SyntheticRequest('https://example.test/s/panel.html')), '');
     assert.equal(key(new SyntheticRequest('https://example.test/s/movie.mp4')), '');
     assert.equal(key(new SyntheticRequest('https://api.example.org/content')), '');
-    assert.equal(key(new SyntheticRequest('https://example.test/s/app.js?v=20261018a')), 'https://example.test/s/app.js?v=20261018a');
+    assert.equal(key(new SyntheticRequest('https://example.test/s/app.js?v=20261019a')), 'https://example.test/s/app.js?v=20261019a');
   });
   await test('install atomiktir; kesik indirme geçici cache bırakmaz', async () => {
     const runtime = loadSw({ failAddAt: 2 });
@@ -149,7 +158,7 @@ function test(name, fn) {
   await test('eski sürüme dönüş exact allowlist isteğini kullanıma açık tutar', async () => {
     const runtime = loadSw();
     const old = await runtime.caches.open('seyma-offline-v1-iip22-old');
-    const url = 'https://example.test/s/app.js?v=20261018a';
+    const url = 'https://example.test/s/app.js?v=20261019a';
     await old.put(url, new SyntheticResponse('old-shell'));
     const response = await runtime.sandbox.swMatchOfflineRequest(new SyntheticRequest(url));
     assert.equal(response.body, 'old-shell');
@@ -174,7 +183,7 @@ function test(name, fn) {
   });
   await test('kalıcı yüzen Offline paneli kaldırılır; güvenli SW kaydı korunur', () => {
     for (const token of ['sey-offline-tools', 'sey-offline-panel', 'Offline araçları', 'Offline paketi kaldır']) assert.ok(!indexSource.includes(token), token);
-    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20261018a'\)/);
+    assert.match(indexSource, /navigator\.serviceWorker\.register\('sw\.js\?v=20261019a'\)/);
     assert.doesNotMatch(indexSource, /SEYMA_OFFLINE_(?:STATUS|INSTALL|REMOVE)/);
   });
   await test('fetch politikası geniş runtime cache yakalaması yapmaz', () => {
@@ -186,7 +195,7 @@ function test(name, fn) {
     assert.doesNotMatch(swSource, /swNetworkFirstNavigation[\s\S]{0,500}cache\.put/);
   });
   await test('aktif sayaç/not durumu SW güncellemesinden bağımsızdır', () => {
-    const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20261018a')"));
+    const registrationBlock = indexSource.slice(indexSource.indexOf("navigator.serviceWorker.register('sw.js?v=20261019a')"));
     assert.doesNotMatch(registrationBlock, /location\.reload|skipWaiting/);
     assert.doesNotMatch(indexSource, /controllerchange/);
     assert.doesNotMatch(indexSource, /sey-offline-tools/);

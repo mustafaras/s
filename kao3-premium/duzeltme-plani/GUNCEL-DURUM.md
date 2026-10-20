@@ -1,6 +1,6 @@
 # K3PD güncel durum
 
-- Program: aktif; K3PD-00, K3PD-01 ve K3PD-02 bağımsız denetim `PASS` ile kapandı.
+- Program: aktif; K3PD-00…K3PD-08 bağımsız denetim `PASS` ile kapandı.
 - K3PD-02 başlangıç HEAD'i: 9cceec923a4833046a12b28f3ca2c6dbeff71dd5; dal `k3pd-denetim-duzeltmeleri`, origin/main farkı 2/0.
 - Çalışma dalı: `k3pd-denetim-duzeltmeleri`.
 - Eski K3P: 37/37 tamamlandı; eski `nextPrompt=null` ve `releaseApproval=APPROVED-2026-10-18` tarihsel kaydı değişmedi.
@@ -99,3 +99,20 @@ Kanıt: [K3PD-06/EVIDENCE.md](kanit/K3PD-06/EVIDENCE.md).
 Sıradaki aday: K3PD-08 (bu PASS tek başına uygulama izni değildir).
 
 Kanıt: [K3PD-07/EVIDENCE.md](kanit/K3PD-07/EVIDENCE.md).
+
+## K3PD-08 — bağımsız PASS ile kapandı
+
+- Başlangıç HEAD `f2d1041de315954356f85c80b3e5379e1b536b2a`; dal `k3pd-denetim-duzeltmeleri`; `HEAD...origin/main` `2/0`.
+- Kullanıcının açık izniyle yalnız PROMPTLAR.md içindeki K3PD-08 allowlist satırı exact yollara çevrildi; diğer kart satırları değişmedi.
+- Üç ardışık yanlışta yeniden tanış paneli, doğrulanmış `kaoIntroExample` kaynağından Arapça/okunuş/Türkçe/künye örneği çiziyor. Eksik, doğrulanmamış veya bozuk örnek için içerik uydurulmuyor; anlam yedeği korunuyor. Dinleme düğmesi yalnız mevcut `kaoAudioEnabled` izniyle görünür ve mevcut `App.kaoPlay` yolunu kullanır.
+- Geri alma snapshot’ı yalnız geçici UI’de sonuç penceresi ve yanlış sayacını saklıyor; undo bunları yanıt öncesine döndürüyor. Kalıcı alan, schema/migration veya yeni App handler eklenmedi.
+- Kırmızı kanıt: eski kaynakla `test_k3p_dda.js` üçüncü yanlışta beklenen doğrulanmış örnek yerine `undefined` verdi ve exit 1 oldu. Son kaynakta DDA 9 kontrol, feedback-copy, pronunciation contract 524/524 ve a11y 14 kontrol exit 0.
+- G0 ve G1 koşuları tamamlandı; G1’de perf göreli taban bandı makine ölçümünde iki kez aşıldı (steady 8.289/13.029 ms; limit 6.360 ms). Planın izin verdiği `KAO2_ACCEPT_SLOW_HOST=1` koşusu exit 0: p95 19.032 ms, steady 10.306 ms; mutlak 40 ms sınırı ve boyut tavanları geçti, baseline yazılmadı. Bu göreli ölçüm istisnası görünür kalır.
+- İlgili G2 lesson-flow 24/24 ve lesson-ayah 5/5 exit 0. `App.kao*` sayısı 45; 61 asset pini taze, iki önceden ertelenmiş K3PD pini aynı kaldı; şema/migration/pin/shell dosyalarında diff yok.
+- Korunan üç kirli dosyanın başlangıç SHA-256 değerleri eşleşti; dosyalar karta/stage’e alınmadı.
+- Bağımsız salt-okur denetim `PASS` verdi; 2/3 yanlış eşiği, doğrulanmış içerik, bozuk alan fallback’i, ses izni, undo, hedef testler, G0/G1 ve kapsam sınırları doğrulandı.
+- Kart `done/PASS`; DURUM/KAYIT `nextPrompt=K3PD-09` ile eşleşiyor. K3PD-09 yalnız adaydır, uygulama izni değildir. Yayın onayı `NOT_APPROVED`; push/merge/tag/deploy yapılmadı.
+
+Kanıt: [K3PD-08/EVIDENCE.md](kanit/K3PD-08/EVIDENCE.md).
+
+Sıradaki aday: K3PD-09 (bu PASS uygulama izni değildir).

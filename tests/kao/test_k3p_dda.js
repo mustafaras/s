@@ -7,7 +7,7 @@
 //   - Kolaylaştırılmış doğru → kaoGrade 2; normal doğru notu değişmez.
 //   - Kayan pencere yalnız ui; data'ya hiçbir şey yazılmaz.
 const assert = require('node:assert/strict');
-const { bootKao, correctTaps } = require('./helpers/kao-harness');
+const { bootKao, correctTaps, esc } = require('./helpers/kao-harness');
 
 let passed = 0;
 function check(name, fn) { fn(); passed += 1; console.log(`PASS  ${name}`); }
@@ -43,6 +43,45 @@ function answerAndNext(t, correct) {
 }
 function wrongPick(task) { return (task.choices.find((c) => !c.correct) || task.choices[0]).choiceId; }
 function rightPick(task) { return (task.choices.find((c) => c.correct) || task.choices[0]).choiceId; }
+function reintroArea(html) {
+  const start = html.indexOf('<div class="kao-reintro-panel">');
+  if (start < 0) return '';
+  const end = html.indexOf('</section>', start);
+  return end < 0 ? html.slice(start) : html.slice(start, end);
+}
+function thirdWrongPanel({ lemmaPatch = null, audio = true, quiet = false } = {}) {
+  const audioCalls = [];
+  const t = bootKao({ seeded: true, surface: {
+    isQuietTime: () => quiet,
+    createAudio(src) { audioCalls.push(src); return { play() {}, addEventListener() {} }; }
+  } });
+  startLesson(t);
+  let task = null;
+  for (let i = 0; i < 2; i += 1) {
+    task = answerAndNext(t, false);
+    if (i === 1) assert.equal(t.ui.kaoPanel.reintro, undefined, 'ikinci yanlışta yeniden tanış paneli erken açılmamalı');
+    t.api.kaoContinue();
+  }
+  task = toTask(t);
+  assert.ok(task && /^w:/.test(String(task.cardId || '')), 'üçüncü yanlış kelime görevinde olmalı');
+  const lemmaId = String(task.cardId).slice(2).split(':')[0];
+  const lexicon = t.win.QuranLexiconV1;
+  const sourceLemma = lexicon.byId(lemmaId);
+  assert.ok(sourceLemma, 'kelimenin içerik kaydı bulunmalı');
+  if (lemmaPatch) {
+    const replacement = Object.assign({}, sourceLemma, lemmaPatch);
+    t.win.QuranLexiconV1 = Object.assign({}, lexicon, {
+      byId(id) { return id === lemmaId ? replacement : lexicon.byId(id); }
+    });
+  }
+  if (!audio) t.data.quranLearn.settings.audio = false;
+  const windowBeforeThird = Array.from(t.ui.kaoWindow || []);
+  const wrongBeforeThird = t.ui.kaoWrongStreak;
+  audioCalls.length = 0;
+  answerAndNext(t, false);
+  const html = t.api.kaoTaskHTML(task);
+  return { t, task, sourceLemma, lemmaId, html, area: reintroArea(html), audioCalls, windowBeforeThird, wrongBeforeThird };
+}
 function boredomView(windowValues, { direction = 'ar>tr', translit = true } = {}) {
   const t = bootKao({ seeded: true });
   const q = t.data.quranLearn;
@@ -81,18 +120,73 @@ check('art arda 2 yanlış → sıradaki görev 3 şıklı ve sesi otomatik çal
 });
 
 check('art arda 3 yanlış → yeniden tanış paneli (anlam + örnek/ses), mevcut panel yolu', () => {
-  const t = bootKao({ seeded: true }); startLesson(t);
-  let task = null;
-  for (let i = 0; i < 3; i += 1) { task = answerAndNext(t, false); if (i < 2) t.api.kaoContinue(); }
-  assert.ok(t.ui.kaoWrongStreak >= 3, 'üç yanlış');
+  const { t, task, sourceLemma, html, area, audioCalls, windowBeforeThird, wrongBeforeThird } = thirdWrongPanel();
+  assert.equal(t.ui.kaoWrongStreak, 3, 'üç yanlış');
   assert.ok(t.ui.kaoPanel && t.ui.kaoPanel.reintro, 'yeniden tanış verisi panele yazılmalı');
   const ri = t.ui.kaoPanel.reintro;
-  assert.ok(ri.ar && ri.meaning, 'yeniden tanış: anlam ve örnek');
-  assert.ok(ri.clipId, 'yeniden tanış: ses');
-  const html = t.api.kaoTaskHTML(task);
-  assert.match(html, /kao-reintro-panel/, 'yeniden tanış paneli çizilir');
+  assert.ok(ri.ar && ri.meaning, 'yeniden tanış: kelime ve anlam');
+  assert.ok(ri.clipId, 'yeniden tanış: izinli mevcut ses yolu');
+  assert.equal(sourceLemma.verified, true, 'örnek kaynağı doğrulanmış lemma olmalı');
+  const sourceExample = sourceLemma.examples[0];
+  assert.deepEqual(JSON.parse(JSON.stringify(ri.example)), {
+    ar: String(sourceExample.ar), pronunciation: String(sourceExample.pronunciation),
+    tr: String(sourceExample.tr), ref: String(sourceExample.ref)
+  }, 'örnek alanları içerik kaynağındaki doğrulanmış kayıttan gelmeli');
+  const exampleAt = html.indexOf('<article class="kao-word-example kao-reintro-example"');
+  assert.ok(exampleAt >= 0, 'doğrulanmış örnek gerçek geri bildirim HTML’sinde görünmeli');
+  const exampleHtml = html.slice(exampleAt, html.indexOf('</article>', exampleAt) + 10);
+  for (const value of [sourceExample.ar, sourceExample.pronunciation, sourceExample.tr, sourceExample.ref]) {
+    assert.ok(exampleHtml.includes(esc(String(value))), `örnek alanı görünür olmalı: ${value}`);
+  }
+  assert.match(exampleHtml, /role="group" aria-label="Doğrulanmış örnek"/, 'örnek erişilebilir grup olarak adlandırılmalı');
+  assert.match(exampleHtml, /lang="ar" dir="rtl"/, 'Arapça örnek doğru dil ve yönde');
+  assert.match(exampleHtml, /class="kao-pronunciation-line" lang="tr"/, 'Latin okunuş doğru dil katmanında');
+  assert.match(area, /App\.kaoPlay\(/, 'ses desteği mevcut izinli oynatma yolunu kullanmalı');
+  assert.equal(audioCalls.length, 0, 'yanlış cevap sonrası ses otomatik çalmamalı');
   assert.match(html, /kao-feedback-sheet/, 'yeni ekran değil, mevcut geri bildirim paneli');
+
+  assert.equal(t.api.kaoUndo(), true, 'üçüncü yanlış geri alınabilmeli');
+  assert.equal(t.ui.kaoWrongStreak, wrongBeforeThird, 'geri alma yanlış sayacını üçüncü yanıttan önceki değere döndürmeli');
+  assert.deepEqual(Array.from(t.ui.kaoWindow), windowBeforeThird, 'geri alma kayan pencereyi üçüncü yanıttan önceki duruma döndürmeli');
+  assert.equal(t.ui.kaoPanel.reintro, undefined, 'geri almada yeniden tanış paneli kapanmalı');
+  answerAndNext(t, false);
+  assert.ok(t.ui.kaoPanel.reintro && t.ui.kaoPanel.reintro.example, 'aynı üçüncü yanıt yeniden verildiğinde örnek paneli geri gelmeli');
   t.api.kaoLesson('exit');
+});
+
+check('eksik, doğrulanmamış veya bozuk örnek uydurulmaz; anlam ve ses yedeği kalır', () => {
+  const sentinel = { ar: 'K3PD08-FAKE-AR', pronunciation: 'K3PD08-FAKE-READING', tr: 'K3PD08-FAKE-TR', ref: 'K3PD08-FAKE-REF' };
+  const cases = [
+    ['örnek yok', { examples: [] }],
+    ['lemma doğrulanmamış', { verified: false, examples: [sentinel] }],
+    ['örnek alanı eksik', { examples: [{ ...sentinel, ref: '' }] }],
+    ['Arapça alanı nesne', { examples: [{ ...sentinel, ar: {} }] }],
+    ['okunuş alanı nesne', { examples: [{ ...sentinel, pronunciation: {} }] }],
+    ['Türkçe alanı nesne', { examples: [{ ...sentinel, tr: {} }] }],
+    ['künye alanı nesne', { examples: [{ ...sentinel, ref: {} }] }],
+    ['geçersiz künye', { examples: [{ ...sentinel, ref: 'K3PD08-FAKE-REF' }] }],
+    ['Arapça olmayan örnek', { examples: [{ ...sentinel, ar: 'K3PD08-FAKE-AR' }] }],
+    ['Latin okunuş içermeyen alan', { examples: [{ ...sentinel, pronunciation: '123' }] }]
+  ];
+  for (const [label, lemmaPatch] of cases) {
+    const { t, html, area, sourceLemma } = thirdWrongPanel({ lemmaPatch });
+    assert.equal(t.ui.kaoPanel.reintro.example, null, `${label}: doğrulanmış örnek yok`);
+    assert.doesNotMatch(html, /kao-reintro-example/, `${label}: örnek öğesi çizilmemeli`);
+    for (const value of Object.values(sentinel)) assert.equal(html.includes(value), false, `${label}: sentineli sızdırmamalı`);
+    assert.ok(t.ui.kaoPanel.reintro.meaning, `${label}: dürüst anlam yedeği korunmalı`);
+    assert.match(area, /App\.kaoPlay\(/, `${label}: mevcut ses yedeği korunmalı`);
+    t.api.kaoLesson('exit');
+  }
+});
+
+check('ses kapalı veya sessiz saatte yeniden tanış örneği çizer, ses eylemini gizler', () => {
+  for (const options of [{ audio: false }, { quiet: true }]) {
+    const { t, html, area, sourceLemma } = thirdWrongPanel(options);
+    assert.equal(sourceLemma.verified, true, 'örnek kaynağı doğrulanmış kalmalı');
+    assert.match(html, /kao-reintro-example/, 'ses kapalıyken de doğrulanmış örnek görünmeli');
+    assert.doesNotMatch(area, /class="kao-audio"/, 'izin verilmeyen ses eylemi görünmemeli');
+    t.api.kaoLesson('exit');
+  }
 });
 
 check('p < %70 → araya bilinen kolay kart girer (yalnız kuyruk, ui)', () => {

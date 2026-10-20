@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-08",
+  "nextPrompt": "K3PD-09",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -2366,12 +2366,372 @@
     },
     "K3PD-08": {
       "id": "K3PD-08",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "f2d1041de315954356f85c80b3e5379e1b536b2a",
+      "changedPaths": [
+        "app/core/quranLearn.js",
+        "tests/kao/test_k3p_dda.js",
+        "tests/kao/test_k3p_feedback_copy.js",
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-08/EVIDENCE.md"
+      ],
+      "checks": [
+        {
+          "command": "git status --short",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "branch": "k3pd-denetim-duzeltmeleri",
+            "protectedDirtyFiles": 3
+          }
+        },
+        {
+          "command": "git rev-parse HEAD",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "head": "f2d1041de315954356f85c80b3e5379e1b536b2a"
+          }
+        },
+        {
+          "command": "git rev-list --left-right --count HEAD...origin/main",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "ahead": 2,
+            "behind": 0
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_dda.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 9,
+            "threeWrong": "verified source example",
+            "fallback": "missing/unverified/malformed",
+            "audio": "off/quiet hidden, no autoplay",
+            "undo": "window and wrong streak restored"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_feedback_copy.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "realFeedbackReintro": true,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_pronunciation_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "matched": "524/524",
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_a11y.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 14,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node --check app.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check sync.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearn.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnFlow.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnViews.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/driver.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntheticVm": "PASS"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "assertions": "95/95"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "nextPrompt": "K3PD-09"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-09",
+            "authorizesWork": false
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "policyCases": "33 negative + 34 K3PD + 6 legacy-pin",
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_migration.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_migration.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_fsrs.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_queue.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_requirements.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_render.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_navigation.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_inventory.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_design_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_phonics_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_mount.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_focus_lock.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/app/test_asset_pin_freshness.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "fresh": 61,
+            "deferred": 2,
+            "blockingStale": 0
+          }
+        },
+        {
+          "command": "node tests/app/test_iip_22.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": "14/14",
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "KAO2_ACCEPT_SLOW_HOST=1 node tests/kao/test_kao2_perf_budget.js",
+          "env": {
+            "KAO2_ACCEPT_SLOW_HOST": "1",
+            "KAO2_WRITE_BASELINE": "unset"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "contentKiB": 184.591,
+            "runtimeKiB": 135.948,
+            "cssKiB": 15.877,
+            "p95Ms": 19.032,
+            "steadyMs": 10.306,
+            "relativeBandSkipped": true,
+            "absoluteLimitMs": 40,
+            "baselineWritten": false
+          }
+        },
+        {
+          "command": "node tools/kao/kao-plan-check.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tools/kao/kao-verify-contrast.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "pairs": 756,
+            "belowThreshold": 0
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_lesson_flow.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 24,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_lesson_ayah.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 5,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "App.kao* assignment count",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "count": 45
+          }
+        },
+        {
+          "command": "git diff --exit-code HEAD -- app.js sync.js app/core/state.js app/core/quranLearnFlow.js app/core/quranLearnViews.js index.html sw.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "protectedProductionFilesChanged": false
+          }
+        },
+        {
+          "command": "shasum -a 256 protected dirty files",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "hashesMatchInitial": 3
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-08/EVIDENCE.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-09": {

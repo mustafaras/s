@@ -362,7 +362,7 @@ DOM/HTML davranışını gerçekten sınayan test yaz; kaynakta fonksiyon adı a
 
 **Oku:** kaoReintro, kaoIntroExample, feedback reintro sunumu; verified örnek üretim biçimi; test_k3p_dda.js.
 
-**Yazma allowlist’i:** quranLearn.js; test_k3p_dda.js; test_k3p_feedback_copy.js; yalnız zorunluysa kao.css; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `app/core/quranLearn.js`; `tests/kao/test_k3p_dda.js`; `tests/kao/test_k3p_feedback_copy.js`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-08/EVIDENCE.md`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` yalnız bu K3PD-08 allowlist satırı.
 
 **Uygula:**
 

@@ -595,8 +595,11 @@
   // K2F-25: tanış kartı katmanları. Yalnız doğrulanmış modül bilgisi gösterilir; eksikse katman çizilmez.
   function kaoIntroExample(lemma){
     var source=lemma&&lemma.verified===true&&Array.isArray(lemma.examples)?lemma.examples[0]:null;
-    if(!source||!source.ar||!source.tr||!source.ref||!source.pronunciation) return null;
-    return {ar:String(source.ar),pronunciation:String(source.pronunciation),tr:String(source.tr),ref:String(source.ref)};
+    if(!source||typeof source.ar!=='string'||!/[\u0600-\u06ff]/.test(source.ar)
+      ||typeof source.pronunciation!=='string'||!/[A-Za-z\u00c0-\u024f]/.test(source.pronunciation.trim())
+      ||typeof source.tr!=='string'||!source.tr.trim()
+      ||typeof source.ref!=='string'||!/^\d{1,3}:\d{1,3}$/.test(source.ref)) return null;
+    return {ar:source.ar,pronunciation:source.pronunciation,tr:source.tr,ref:source.ref};
   }
   function kaoIntroWhy(lemma){
     var grammar=window.QuranGrammarV1,unit=grammar&&grammar.unit11,roots=unit&&Array.isArray(unit.roots)?unit.roots:[],row=null,why={};
@@ -1811,7 +1814,7 @@
     var lemmaId=lemmaIdForCard(task&&task.cardId),lex=window.QuranLexiconV1,lemma=lex&&typeof lex.byId==='function'?lex.byId(lemmaId):null;
     if(!lemma) return null;
     var meanings=Array.isArray(lemma.meanings)?lemma.meanings.filter(function(m){ return typeof m==='string'&&m; }):[];
-    return {lemmaId:lemmaId,ar:String(lemma.ar||''),translit:String(lemma.translit||task.translit||''),meaning:meanings[0]||String(task.meaning||''),clipId:lemmaId?'w-'+lemmaId:''};
+    return {lemmaId:lemmaId,ar:String(lemma.ar||''),translit:String(lemma.translit||task.translit||''),meaning:meanings[0]||String(task.meaning||''),example:kaoIntroExample(lemma),clipId:lemmaId?'w-'+lemmaId:''};
   }
   function kaoShouldAutoplay(task,d){
     var q=quranLearnRoot(d),card=objectOr(objectOr(q.cards,{})[task&&task.cardId],{});
@@ -1998,7 +2001,13 @@
       (Array.isArray(task.teachLines)?task.teachLines:(task.teach?[task.teach]:[])).forEach(function(line){ lines.push(line); });
       if(task.cognate&&task.cognate.tr) lines.push('Türkçedeki akrabası: '+task.cognate.tr+(task.cognate.shift?' — '+task.cognate.shift:''));
       if(panel.note) lines.push(panel.note);
-      if(panel.reintro){ var ri=panel.reintro; h+='<div class="kao-reintro-panel">'+kaoArabicPairHTML(ri.ar,ri.translit,'',boredomHide,pronunciationFolded)+'<p class="kao-feedback-body">'+esc(ri.meaning)+'</p>'+(ri.clipId?'<button type="button" class="kao-audio" onclick="App.kaoPlay(\''+ri.clipId+'\',\'measured\')">Dinle</button>':'')+'</div>'; }
+      if(panel.reintro){
+        var ri=panel.reintro,example=ri.example;
+        h+='<div class="kao-reintro-panel">'+kaoArabicPairHTML(ri.ar,ri.translit,'',boredomHide,pronunciationFolded)+'<p class="kao-feedback-body">'+esc(ri.meaning)+'</p>';
+        if(example) h+='<article class="kao-word-example kao-reintro-example" role="group" aria-label="Doğrulanmış örnek">'+kaoArabicPairHTML(example.ar,example.pronunciation,'',boredomHide,pronunciationFolded)+'<p>'+esc(example.tr)+'</p><small>'+esc(example.ref)+'</small></article>';
+        if(ri.clipId&&kaoAudioEnabled()) h+='<button type="button" class="kao-audio" onclick="App.kaoPlay(\''+esc(ri.clipId)+'\',\'measured\')">Dinle</button>';
+        h+='</div>';
+      }
       h+=kaoViewsApi().feedbackSheet({tone:panel.correct?'success':'warning',title:panel.correct?'Doğru':'Bir daha bakalım',body:lines,actions:(panel.correct?[]:[{label:'Yanlışlıkla dokundum',action:'kaoUndo',kind:'link'}]).concat([{label:'Devam',action:'kaoContinue',kind:'primary'}])});
     }
     h+='</section>';
@@ -2076,7 +2085,7 @@
   }
   function kaoUndoSnapshot(q,ui,task,key,orderDraft){
     var cardId=String(task.cardId),surahId=String(task.delayedSurahId),hasSurah=task.fragmentKind==='delayed'&&Object.prototype.hasOwnProperty.call(q.surahs,surahId);
-    return {cardId:cardId,hadCard:Object.prototype.hasOwnProperty.call(q.cards,cardId),card:cloneValue(q.cards[cardId]),dailyKey:key,hadDaily:Object.prototype.hasOwnProperty.call(q.daily,key),daily:cloneValue(q.daily[key]),errors:cloneValue(q.errors),milestones:cloneValue(q.milestones),kind:task.fragmentKind==='delayed'?'delayed':(task.type||'card'),surahId:surahId,hadSurah:hasSurah,surah:cloneValue(q.surahs[surahId]),hadTransfer:Object.prototype.hasOwnProperty.call(q,'transfer'),transfer:cloneValue(q.transfer),taskIndex:ui.kaoTaskIndex,queue:cloneValue(ui.kaoQueue),durableCount:ui.kaoDurableCount,orderDraft:cloneValue(orderDraft)||[],lesson:cloneValue(ui.kaoLesson)};
+    return {cardId:cardId,hadCard:Object.prototype.hasOwnProperty.call(q.cards,cardId),card:cloneValue(q.cards[cardId]),dailyKey:key,hadDaily:Object.prototype.hasOwnProperty.call(q.daily,key),daily:cloneValue(q.daily[key]),errors:cloneValue(q.errors),milestones:cloneValue(q.milestones),kind:task.fragmentKind==='delayed'?'delayed':(task.type||'card'),surahId:surahId,hadSurah:hasSurah,surah:cloneValue(q.surahs[surahId]),hadTransfer:Object.prototype.hasOwnProperty.call(q,'transfer'),transfer:cloneValue(q.transfer),taskIndex:ui.kaoTaskIndex,queue:cloneValue(ui.kaoQueue),durableCount:ui.kaoDurableCount,orderDraft:cloneValue(orderDraft)||[],lesson:cloneValue(ui.kaoLesson),kaoWindow:cloneValue(ui.kaoWindow)||[],kaoWrongStreak:Math.floor(nonNegativeNumber(ui.kaoWrongStreak,0))};
   }
   // K2F-31: görev süresi ölçümü üst sınırı.
   var KAO_TASK_MS_CAP=120000;
@@ -2638,7 +2647,7 @@
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),undo=ui.kaoUndo;
     if(!undo) return false;
-    var kaoLatencyBefore=Array.isArray(ui.kaoLatency)?ui.kaoLatency.slice():null,kaoWindowBefore=Array.isArray(ui.kaoWindow)?ui.kaoWindow.slice():null,kaoWrongBefore=nonNegativeNumber(ui.kaoWrongStreak,0);
+    var kaoLatencyBefore=Array.isArray(ui.kaoLatency)?ui.kaoLatency.slice():null,kaoWindowBefore=Array.isArray(undo.kaoWindow)?undo.kaoWindow.slice():[],kaoWrongBefore=nonNegativeNumber(undo.kaoWrongStreak,0);
     var q=ensureQuranLearn(quranLearnDeps.data());
     if(undo.hadCard) q.cards[undo.cardId]=cloneValue(undo.card); else delete q.cards[undo.cardId];
     if(undo.hadDaily) q.daily[undo.dailyKey]=cloneValue(undo.daily); else delete q.daily[undo.dailyKey];

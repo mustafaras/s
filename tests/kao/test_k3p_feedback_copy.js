@@ -15,7 +15,7 @@ const sheetOf = (html) => { const at = html.indexOf('<section class="kao-feedbac
 // K3P-15 (K-C) üç kol: hızlı doğruda panel/şerit yok (yalnız ✓ + 600 ms geçiş); yavaş doğruda panel yerine tek
 // satırlık pekiştirme şeridi; yanlışta tam panel. Doğru kol, kişisel medyana göre belirlenir.
 const stripOf = (html) => { const at = html.indexOf('<p class="kao-feedback-strip'); return at < 0 ? '' : html.slice(at, html.indexOf('</p>', at) + 4); };
-const seen = { correct: 0, wrong: 0, order: 0, summary: 0, strip: 0, fast: 0 };
+const seen = { correct: 0, wrong: 0, order: 0, summary: 0, strip: 0, fast: 0, reintro: 0 };
 
 function checkSheet(sheet, correct, where) {
   if (!sheet) { fail(`${where}: geri bildirim paneli yok`); return; }
@@ -63,7 +63,13 @@ function walk(seeded, lessonId) {
       assert.ok(task, `${lessonId}: görev bulunmalı`);
       const correct = n % 2 === 0;
       n += 1;
-      if (task.kind === 'order') {
+      if (task.kind === 'build') {
+        const correctIds = H.correctTaps(task);
+        const wrongChoices = task.choices.filter((choice) => choice.correct !== true);
+        const needed = String(task.answer || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, '').length;
+        const selectedIds = correct ? correctIds : Array.from({ length: needed }, (_, index) => wrongChoices[index % wrongChoices.length].choiceId);
+        for (const id of selectedIds) t.api.kaoAnswer(task.id, id);
+      } else if (task.kind === 'order') {
         const byOrdinal = task.choices.slice().sort((a, b) => a.ordinal - b.ordinal);
         for (const c of (correct ? byOrdinal : byOrdinal.slice().reverse())) t.api.kaoAnswer(task.id, c.choiceId);
         seen.order += 1;
@@ -100,8 +106,56 @@ function walk(seeded, lessonId) {
   if (/Aslında biliyordum/.test(html)) fail(`${lessonId} özet: "Aslında biliyordum" var`);
 }
 
+function checkReintroCopy() {
+  const t = H.bootKao({ seeded: true });
+  t.data.quranLearn.settings.audio = true;
+  t.ui.kaoStack = [];
+  t.api.kaoOpen('home');
+  assert.ok(t.api.kaoLesson('start', 'u01.01'), 'yeniden tanış örneği için ders başlamalı');
+  const currentTask = () => { const item = t.ui.kaoQueue[t.ui.kaoTaskIndex]; return item && t.ui.kaoTasks[item.id]; };
+  const nextTask = () => {
+    for (let guard = 0; guard < WALK_GUARD; guard += 1) {
+      const task = currentTask();
+      if (task) return task;
+      const state = t.ui.kaoLesson, item = state && state.plan[state.at];
+      if (item && item.kind === 'partEnd') { assert.equal(t.api.kaoLesson('budget-overrun'), true, 'açık süre aşımı seçimi'); continue; }
+      if (!state || state.phase === 'lesson') { if (!t.api.kaoLesson('next')) return null; continue; }
+      return null;
+    }
+    return null;
+  };
+  let task = null;
+  for (let i = 0; i < 3; i += 1) {
+    task = nextTask();
+    assert.ok(task && /^w:/.test(String(task.cardId || '')), `yanlış ${i + 1}: kelime görevi olmalı`);
+    if (task.kind === 'order') {
+      for (const choice of task.choices.slice().sort((a, b) => b.ordinal - a.ordinal)) t.api.kaoAnswer(task.id, choice.choiceId);
+    } else if (task.kind === 'build') {
+      const wrong = task.choices.filter((choice) => choice.correct !== true);
+      const needed = String(task.answer || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, '').length;
+      assert.ok(wrong.length, 'harf kurma görevinde yanlış çip bulunmalı');
+      for (let n = 0; n < needed; n += 1) t.api.kaoAnswer(task.id, wrong[n % wrong.length].choiceId);
+    } else {
+      t.api.kaoAnswer(task.id, (task.choices.find((choice) => !choice.correct) || task.choices[0]).choiceId);
+    }
+    if (i < 2) t.api.kaoContinue();
+  }
+  assert.ok(t.ui.kaoPanel.reintro, 'üç yanlış panel içeriğini açmalı');
+  const html = t.api.kaoTaskHTML(task);
+  const sheet = sheetOf(html);
+  checkSheet(sheet, false, 'üç yanlış yeniden tanış');
+  assert.match(sheet, /kao-feedback-title/, 'örnek mevcut geri bildirim panelinde kalmalı');
+  assert.match(html, /kao-reintro-panel/, 'yeniden tanış mevcut görev yüzeyinde çizilmeli');
+  assert.match(html, /kao-reintro-example/, 'görev geri bildirimi yanında gerçek örnek çizilmeli');
+  assert.match(html, /aria-label="Doğrulanmış örnek"/, 'örnek erişilebilir ad taşımalı');
+  seen.reintro += 1;
+  t.api.kaoLesson('exit');
+}
+
 for (const seeded of [false, true]) for (const lessonId of LESSONS) walk(seeded, lessonId);
+checkReintroCopy();
 assert.ok(seen.correct > 10 && seen.wrong > 10 && seen.order > 0 && seen.summary === LESSONS.length * 2 && seen.strip + seen.fast > 0, `kapsam yetersiz: ${JSON.stringify(seen)}`);
+assert.ok(seen.reintro > 0, `üç yanlış sonrası gerçek geri bildirim panelinde doğrulanmış örnek görünmeli: ${JSON.stringify(seen)}`);
 
 if (failures.length) {
   console.error(failures.map((f) => '  ✗ ' + f).join('\n'));

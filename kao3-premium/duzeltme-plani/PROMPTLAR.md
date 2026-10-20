@@ -333,7 +333,7 @@ Plana alınmayan kartların due/reps/s ve ilerlemesine yazılmadığını plan �
 
 **Oku:** kaoFlowRate/BoredomHideHarakat, ArabicPairHTML ve currentTask; test_k3p_dda.js; K3P-19 katlama sözleşmesi.
 
-**Yazma allowlist’i:** quranLearn.js; test_k3p_dda.js; pronunciation_fold ve pronunciation_contract fixture’ları yalnız gerçek yeni sunum sözleşmesi gerekçesiyle; yeni kayıtlar.
+**Yazma allowlist’i:** `app/core/quranLearn.js`; `tests/kao/test_k3p_dda.js`; `tests/kao/test_k3p_pronunciation_fold.js` yalnız yeni davranışsal sunum sınaması için; `tests/kao/test_kao_pronunciation_contract.js` yalnız gerçek yeni sunum sözleşmesi gerekçesiyle; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` yalnız bu kartın allowlist satırını exact yollara eşlemek için; `kao3-premium/duzeltme-plani/kanit/K3PD-07/EVIDENCE.md`.
 
 **Uygula:**
 

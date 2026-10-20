@@ -38,6 +38,7 @@ const buildAt = (id, seed) => api.kaoBuildTask({ id: `k3p-19:${seed}`, cardId: i
 const countFolds = (html) => (String(html).match(new RegExp(`class="${FOLD}"`, 'g')) || []).length;
 const countLines = (html) => (String(html).match(new RegExp(`class="${LINE}"`, 'g')) || []).length;
 const countArabic = (html) => (String(html).match(/class="kao-arabic-text"/g) || []).length;
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 
 function prepareH4(stability, { seed, translit = true, orphan = false, readerUnknown = false, reviewAt = t.NOW } = {}) {
   const id = Object.keys(q.cards).find((key) => /^w:/.test(key) && flow.ladderArm(key) === 'B');
@@ -148,10 +149,11 @@ check('H4 legacy destek koşulları korunur: okunuş kapalı, orphan ve readerUn
 });
 
 check('H4 details toggle yalnız güncel task ve disclosure düğümünü işaretler', () => {
-  const makeDetails = () => {
+  const makeDetails = (summaryText) => {
     const listeners = {};
     return {
       open: false,
+      summaryText,
       listeners,
       addEventListener(type, listener) { (listeners[type] = listeners[type] || []).push(listener); },
       toggle(open) { this.open = open; for (const listener of listeners.toggle || []) listener.call(this, { target: this }); }
@@ -234,6 +236,114 @@ check('H4 details toggle yalnız güncel task ve disclosure düğümünü işare
   assert.deepEqual({ n: afterUndoCalib21.n, ok: afterUndoCalib21.ok }, { n: 0, ok: 0 }, 'undo sonrası yeniden yanıtlanan açılmış destek de dışarıda kalır');
 });
 
+check('sıkılma katlaması aynı güncel task disclosure izleyicisini kullanır', () => {
+  const makeDetails = (summaryText) => {
+    const listeners = {};
+    return {
+      open: false,
+      summaryText,
+      listeners,
+      addEventListener(type, listener) { (listeners[type] = listeners[type] || []).push(listener); },
+      toggle(open) { this.open = open; for (const listener of listeners.toggle || []) listener.call(this, { target: this }); }
+    };
+  };
+  const root = {
+    details: [], html: '',
+    render(html) {
+      this.html = String(html || '');
+      const summaries = Array.from(this.html.matchAll(/<details class="kao-pronunciation-fold"><summary>([^<]*)<\/summary>/g), (match) => match[1]);
+      this.details = summaries.map(makeDetails);
+    },
+    insertAdjacentHTML(_where, html) { this.render(html); },
+    set innerHTML(html) { this.render(html); },
+    get innerHTML() { return this.html; },
+    querySelectorAll(selector) { return selector === '.kao-pronunciation-fold' ? this.details : []; },
+    querySelector() { return null; },
+    setAttribute() {}, removeAttribute() {},
+    classList: { add() {}, remove() {} }
+  };
+  const dom = bootKao({ seeded: true, surface: { taskElement: () => root } });
+  const q = dom.data.quranLearn;
+  const id = Object.keys(q.cards).find((key) => /^w:.+:ar>tr$/.test(key));
+  assert.ok(id, 'sıkılma sunumu için Arapçadan anlama giden kelime kartı bulunur');
+  q.cards[id] = { state: 'review', s: 6, d: 10, reps: 1, due: '2026-09-30T00:00:00.000Z' };
+  q.settings.translit = true;
+  dom.ui.kaoWindow = Array(8).fill(1);
+  const task = dom.api.kaoBuildTask({ id: 'k3pd07:task-scoped-fold', cardId: id, isNew: false }, dom.data, { seed: 'k3pd07:task-scoped-fold' });
+  dom.ui.kaoQueue = [{ id: task.id, cardId: id, isNew: false }];
+  dom.ui.kaoTasks = { [task.id]: task };
+  dom.ui.kaoTaskIndex = 0;
+  dom.ui.kaoPanel = { open: false };
+  dom.ui.kaoOrderDraft = [];
+  dom.ui.kaoView = 'session';
+  dom.ui.kaoOpen = true;
+  const doc = { getElementById(key) { return key === 'app' ? root : null; } };
+  dom.api.kaoPatchOverlay(doc, dom.api.kaoOverlayHTML(dom.NOW));
+  const choiceDetails = root.details.find((detail) => detail.summaryText === 'Şıkların okunuşlarını gör');
+  assert.ok(choiceDetails, 'sekiz doğru sonrası şık okunuşları gerçek görev DOM ağacında katlı çizilir');
+  assert.equal(dom.ui.kaoH4Presentation[task.id].folded, false, 'FSRS/H4 kararlılık koşulu değişmeden kalır');
+  assert.equal(dom.ui.kaoH4Presentation[task.id].eligible, false, 'sıkılma sunumu tek başına H4 kohortuna girmez');
+  choiceDetails.toggle(true);
+  assert.equal(dom.ui.kaoH4Presentation[task.id].opened, true, 'şık okunuş disclosure düğümü mevcut task H4 UI izleyicisine bağlanır');
+  assert.equal(JSON.stringify(dom.data.quranLearn).includes('kaoH4Presentation'), false, 'açılma işareti yalnız ui içinde kalır');
+});
+
+check('H4 s=21 çok adımlı Arapça seçim okunuşu cevap düğmelerinden ayrı ve izlenir', () => {
+  const makeDetails = (summaryText) => {
+    const listeners = {};
+    return {
+      open: false,
+      summaryText,
+      listeners,
+      addEventListener(type, listener) { (listeners[type] = listeners[type] || []).push(listener); },
+      toggle(open) { this.open = open; for (const listener of listeners.toggle || []) listener.call(this, { target: this }); }
+    };
+  };
+  const root = {
+    details: [], html: '',
+    render(html) {
+      this.html = String(html || '');
+      const summaries = Array.from(this.html.matchAll(/<details class="kao-pronunciation-fold"><summary>([^<]*)<\/summary>/g), (match) => match[1]);
+      this.details = summaries.map(makeDetails);
+    },
+    insertAdjacentHTML(_where, html) { this.render(html); },
+    set innerHTML(html) { this.render(html); },
+    get innerHTML() { return this.html; },
+    querySelectorAll(selector) { return selector === '.kao-pronunciation-fold' ? this.details : []; },
+    querySelector() { return null; },
+    setAttribute() {}, removeAttribute() {},
+    classList: { add() {}, remove() {} }
+  };
+  const dom = bootKao({ seeded: true, surface: { taskElement: () => root } });
+  const q = dom.data.quranLearn, flow = dom.win.SeymaQuranLearnFlow;
+  const id = Object.keys(q.cards).find((key) => /^w:/.test(key) && flow.ladderArm(key) === 'A');
+  assert.ok(id, 'çok adımlı H4 sınaması için A kolunda kelime kartı bulunur');
+  q.cards[id] = { state: 'review', s: 21, d: 10, reps: 6, r: dom.NOW, due: '2026-09-29T00:00:00.000Z' };
+  q.settings.translit = true;
+  dom.ui.kaoWindow = [];
+  const task = dom.api.kaoBuildTask({ id: 'k3pd07:h4-build-choice-fold', cardId: id, isNew: false }, dom.data, { seed: 'k3pd07:h4-build-choice-fold' });
+  assert.equal(task.kind, 'build', 'A kolu s=21 görev türü çok adımlı harf kurma olarak kalır');
+  dom.ui.kaoQueue = [{ id: task.id, cardId: id, isNew: false }];
+  dom.ui.kaoTasks = { [task.id]: task };
+  dom.ui.kaoTaskIndex = 0;
+  dom.ui.kaoPanel = { open: false };
+  dom.ui.kaoOrderDraft = [];
+  dom.ui.kaoView = 'session';
+  dom.ui.kaoOpen = true;
+  const doc = { getElementById(key) { return key === 'app' ? root : null; } };
+  dom.api.kaoPatchOverlay(doc, dom.api.kaoOverlayHTML(dom.NOW));
+  const choiceDetails = root.details.find((detail) => detail.summaryText === 'Şıkların okunuşlarını gör');
+  assert.ok(choiceDetails, 'H4 s=21 şık okunuşları tek disclosure içinde katlıdır');
+  const answerButtons = Array.from(root.html.matchAll(/<button\b[^>]*onclick="App\.kaoAnswer\([^"]*\)"[^>]*>[\s\S]*?<\/button>/g), (match) => ({ html: match[0], end: match.index + match[0].length }));
+  assert.equal(answerButtons.length, task.choices.length);
+  assert.ok(answerButtons.every((button) => !button.html.includes('<details')), 'H4 disclosure hiçbir cevap düğmesinin içine girmez');
+  assert.ok(root.html.indexOf('<details class="kao-pronunciation-fold"><summary>Şıkların okunuşlarını gör</summary>') >= Math.max(...answerButtons.map((button) => button.end)), 'H4 disclosure tüm cevap düğmelerinden sonra kardeş öğedir');
+  assert.equal(dom.ui.kaoH4Presentation[task.id].folded, true, 'mevcut H4 s=21 katlama durumu korunur');
+  choiceDetails.toggle(true);
+  assert.equal(dom.ui.kaoH4Presentation[task.id].opened, true, 'H4 disclosure mevcut görev izleyicisine bağlıdır');
+  assert.equal(JSON.stringify(dom.data.quranLearn).includes('kaoH4Presentation'), false, 'H4 açılma işareti yalnız ui içinde kalır');
+});
+
 check('H4 destekle ilgili ARIA okunuşu ve çok dokunuşlu build kohorta girmez', () => {
   const { id, task: wordTask } = prepareH4(40, { seed: 'aria-choice' });
   const cloze = {
@@ -261,6 +371,11 @@ check('H4 destekle ilgili ARIA okunuşu ve çok dokunuşlu build kohorta girmez'
   q.daily['2026-09-30'] = { answered: 0, correct: 0, new: 0, reviewed: 0 };
   const clozeHtml = api.kaoTaskHTML(cloze);
   assert.match(clozeHtml, /aria-label="[^\"]*okunuşu kitābun/, 'Arapça cevap düğmesinin erişilebilir adı okunuşu açığa çıkarıyor');
+  const clozeAnswerButtons = Array.from(clozeHtml.matchAll(/<button\b[^>]*onclick="App\.kaoAnswer\([^"]*\)"[^>]*>[\s\S]*?<\/button>/g), (match) => ({ html: match[0], end: match.index + match[0].length }));
+  assert.equal(clozeAnswerButtons.length, cloze.choices.length);
+  assert.ok(clozeAnswerButtons.every((button) => !button.html.includes('<details')), 'cloze ARIA okunuşu korunurken disclosure cevap düğmesine gömülmez');
+  const clozeChoiceFoldIndex = clozeHtml.indexOf('<details class="kao-pronunciation-fold"><summary>Şıkların okunuşlarını gör</summary>');
+  assert.ok(clozeChoiceFoldIndex >= Math.max(...clozeAnswerButtons.map((button) => button.end)), 'cloze şık disclosure tüm cevap düğmelerinden sonra kardeş öğedir');
   api.kaoAnswer(cloze.id, 'wrong-1');
   assert.deepEqual(h4Counts(), { n: 0, ok: 0 }, 'erişilebilir adla sunulan okunuş shown sayılır');
 
@@ -301,15 +416,16 @@ check('sınır: s = 20 görünür, s = 21 katlı — okunuş s ≥ 21 olan kartt
   const folded = api.kaoTaskHTML(buildAt(id, 's21'));
   assert.equal(countFolds(open), 0, 's = 20: katlama yok');
   assert.ok(countLines(open) > 0, 's = 20: okunuş görünür satır olarak duruyor');
-  // s = 21'de görevdeki HER Arapça satır katlanır (görev tipine göre birden çok: soru + şık çipleri).
-  assert.ok(countFolds(folded) > 0, 's = 21: okunuş katlandı');
-  assert.equal(countFolds(folded), countArabic(folded), 's = 21: bütün Arapça satırlar katlı');
+  // s = 21'de görev ve şık okunuşları kapalı details içinde kalır; çok adımlı şıklar tek kardeş disclosure paylaşır.
+  const foldBlocks = Array.from(folded.matchAll(/<details class="kao-pronunciation-fold">[\s\S]*?<\/details>/g), (match) => match[0]);
+  assert.ok(foldBlocks.length > 0, 's = 21: okunuş katlandı');
+  assert.equal(countLines(folded), foldBlocks.reduce((sum, block) => sum + countLines(block), 0), 's = 21: bütün Latin okunuş satırları kapalı katlamaların içinde');
 });
 
 check('katlama: yerel <details>, varsayılan kapalı ve handler yok', () => {
   const id = cardAt(21);
   const html = api.kaoTaskHTML(buildAt(id, 'fold'));
-  assert.match(html, new RegExp(`<details class="${FOLD}"><summary>Okunuş</summary>`), 'okunuş kendi <details> içinde');
+  assert.match(html, /<details class="kao-pronunciation-fold"><summary>(?:Okunuş|Şıkların okunuşlarını gör)<\/summary>/, 'okunuş kendi <details> içinde');
   assert.ok(!new RegExp(`<details class="${FOLD}" open`).test(html), 'varsayılan olarak kapalı');
   // Açma/kapama tarayıcının işidir: <summary> ya da <details> üzerinde handler olmamalı.
   const block = html.slice(html.indexOf(`class="${FOLD}"`), html.indexOf('</details>'));
@@ -372,9 +488,17 @@ check('sözleşme: her Arapça satırın okunuş HTML\'i vardır; katlama onu gi
   // dizme görevinin seçili çipleri (`kao-order-target`). Sözleşme GÖREVİN kendi satırlarını ölçer.
   t.ui.kaoPanel = { open: false };
   t.ui.kaoOrderDraft = [];
-  const foldedHtml = api.kaoTaskHTML(buildAt(cardAt(21), 'sum-fold'));
-  assert.equal(countLines(foldedHtml), countArabic(foldedHtml), 's ≥ 21: okunuş yine HTML\'de, yalnız <details> içinde');
-  assert.equal(countFolds(foldedHtml), countArabic(foldedHtml), 's ≥ 21: hepsi katlı');
+  const foldedTask = buildAt(cardAt(21), 'sum-fold');
+  const foldedHtml = api.kaoTaskHTML(foldedTask);
+  const foldBlocks = Array.from(foldedHtml.matchAll(/<details class="kao-pronunciation-fold">[\s\S]*?<\/details>/g), (match) => match[0]);
+  assert.ok(foldBlocks.length > 0, 's ≥ 21: en az bir kapalı okunuş katlaması var');
+  assert.equal(countLines(foldedHtml), foldBlocks.reduce((sum, block) => sum + countLines(block), 0), 's ≥ 21: okunuş HTML\'de, tümü kapalı details içinde');
+  const groupedChoiceFold = foldBlocks.find((block) => block.includes('<summary>Şıkların okunuşlarını gör</summary>')) || '';
+  for (const choice of foldedTask.choices || []) {
+    if (/[\u0600-\u06ff]/.test(choice.label || '')) {
+      assert.ok(groupedChoiceFold.includes(escapeHtml(choice.label)) && groupedChoiceFold.includes(escapeHtml(choice.pronunciation)), 'katlı şık disclosure gerçek Arapça/okunuş çiftini korur');
+    }
+  }
 });
 
 check('CSS: katlanan okunuşun açılır işaretçisi ve hareket azaltma kuralı var', () => {

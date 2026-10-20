@@ -43,6 +43,27 @@ function answerAndNext(t, correct) {
 }
 function wrongPick(task) { return (task.choices.find((c) => !c.correct) || task.choices[0]).choiceId; }
 function rightPick(task) { return (task.choices.find((c) => c.correct) || task.choices[0]).choiceId; }
+function boredomView(windowValues, { direction = 'ar>tr', translit = true } = {}) {
+  const t = bootKao({ seeded: true });
+  const q = t.data.quranLearn;
+  const id = Object.keys(q.cards).find((key) => new RegExp(`^w:.+:${direction}$`).test(key));
+  assert.ok(id, `${direction} yönünde sentetik kelime kartı bulunmalı`);
+  q.cards[id] = { state: 'review', s: 6, d: 10, reps: 1, due: '2026-09-30T00:00:00.000Z' };
+  q.settings.translit = translit;
+  q.readability = { fadeHarakat: true };
+  const task = t.api.kaoBuildTask({ id: `k3pd07:${direction}`, cardId: id, isNew: false }, t.data, { seed: `k3pd07:${direction}` });
+  if (!translit) {
+    task.translit = 'K3PD07-TASK-READING-SENTINEL';
+    task.choices.forEach((choice, index) => { if (/[\u0600-\u06ff]/.test(choice.label)) choice.pronunciation = `K3PD07-CHOICE-READING-${index}`; });
+  }
+  t.ui.kaoWindow = windowValues.slice();
+  t.ui.kaoQueue = [{ id: task.id, cardId: id, isNew: false }];
+  t.ui.kaoTasks = { [task.id]: task };
+  t.ui.kaoTaskIndex = 0;
+  t.ui.kaoPanel = { open: false };
+  t.ui.kaoOrderDraft = [];
+  return { t, task, html: t.api.kaoTaskHTML(task) };
+}
 
 check('art arda 2 yanlış → sıradaki görev 3 şıklı ve sesi otomatik çalar', () => {
   const t = bootKao({ seeded: true }); startLesson(t);
@@ -88,7 +109,52 @@ check('p < %70 → araya bilinen kolay kart girer (yalnız kuyruk, ui)', () => {
   t.api.kaoLesson('exit');
 });
 
-check('p > %92 (≥8 görev sonra) → şık 4\'e döner ve okunuş gizlenir (sunum)', () => {
+check('sıkılma yalnız 8 sonuçtan sonra açılır; gerçek okunuş kapalı ve ayar kapalıyken yoktur', () => {
+  const beforeThreshold = [
+    { label: 'boş pencere', values: [] },
+    { label: '1/1', values: [1] },
+    { label: '7/7', values: Array(7).fill(1) },
+    { label: 'p=.92', values: Array(23).fill(1).concat([0, 0]) }
+  ];
+  for (const sample of beforeThreshold) {
+    const { html } = boredomView(sample.values);
+    assert.doesNotMatch(html, /<details class="kao-pronunciation-fold">/, `${sample.label}: gerçek Latin okunuş katlanmamalı`);
+    assert.doesNotMatch(html, /class="kao-fade(?: |\")/, `${sample.label}: hareke soldurma kolu açılmamalı`);
+  }
+
+  const bored = boredomView(Array(8).fill(1), { direction: 'tr>ar' });
+  const arabicChoices = bored.task.choices.filter((choice) => /[\u0600-\u06ff]/.test(choice.label));
+  assert.equal(arabicChoices.length, 4, 'dört Arapça seçenek korunur; doğru seçenek gizlenmez');
+  const answerButtons = Array.from(bored.html.matchAll(/<button\b[^>]*onclick="App\.kaoAnswer\([^"]*\)"[^>]*>[\s\S]*?<\/button>/g), (match) => ({ html: match[0], end: match.index + match[0].length }));
+  assert.equal(answerButtons.length, arabicChoices.length, 'dört cevap düğmesi gerçek görev HTML’sinde var');
+  assert.ok(answerButtons.every((button) => !button.html.includes('<details')), 'okunuş disclosure cevap düğmelerinin içinde değil');
+  const foldIndex = bored.html.indexOf('<details class="kao-pronunciation-fold">');
+  assert.ok(foldIndex >= Math.max(...answerButtons.map((button) => button.end)), 'bağımsız okunuş disclosure cevap düğmelerinden sonra kardeş öğe; summary tıklaması cevap handlerına kabarmaz');
+  const folded = bored.html.slice(foldIndex, bored.html.indexOf('</details>', foldIndex));
+  assert.ok(folded.includes('<summary>Şıkların okunuşlarını gör</summary>'), 'ilk görünümde yerel açılır başlık kullanılır');
+  for (const choice of arabicChoices) {
+    assert.ok(folded.includes(choice.label) && folded.includes(choice.pronunciation), 'her gerçek Arapça/okunuş çifti tek katlı disclosure içinde korunur');
+  }
+  assert.doesNotMatch(folded, /<details[^>]*\sopen(?:\s|>)/, 'okunuş ilk görünümde kapalıdır');
+  const ariaLabels = Array.from(bored.html.matchAll(/aria-label="([^"]*)"/g), (match) => match[1]);
+  for (const choice of arabicChoices) assert.ok(!ariaLabels.some((label) => label.includes(choice.pronunciation)), 'katlı Latin destek erişilebilir adla sızmaz');
+  assert.doesNotMatch(bored.html, /kao-choice-correct|kao-feedback-sheet/, 'yanıt öncesi doğru seçenek veya geri bildirim açığa çıkmaz');
+
+  const disabled = boredomView(Array(8).fill(1), { direction: 'tr>ar', translit: false });
+  assert.doesNotMatch(disabled.html, /kao-pronunciation-(?:fold|line)/, 'translit=false iken okunuş DOM düğümü yoktur');
+  const disabledArabicChoices = disabled.task.choices.filter((choice) => /[\u0600-\u06ff]/.test(choice.label));
+  const disabledAria = Array.from(disabled.html.matchAll(/aria-label="([^"]*)"/g), (match) => match[1]);
+  for (const choice of disabledArabicChoices) assert.ok(!disabledAria.some((label) => label.includes(choice.pronunciation)), 'translit=false iken Latin okunuş ARIA içine sızmaz');
+  assert.doesNotMatch(disabled.html, /K3PD07-(?:TASK|CHOICE)-READING/, 'translit=false iken benzersiz okunuş metni hiçbir DOM metnine sızmaz');
+
+  const normalSettingsOff = boredomView([], { direction: 'tr>ar', translit: false });
+  const normalArabicChoices = normalSettingsOff.task.choices.filter((choice) => /[\u0600-\u06ff]/.test(choice.label));
+  const normalAria = Array.from(normalSettingsOff.html.matchAll(/aria-label="([^"]*)"/g), (match) => match[1]);
+  for (const choice of normalArabicChoices) assert.ok(!normalAria.some((label) => label.includes(choice.pronunciation)), 'sıkılma kapalıyken de translit=false Latin okunuşu erişilebilir addan çıkarır');
+  assert.doesNotMatch(normalSettingsOff.html, /K3PD07-(?:TASK|CHOICE)-READING/, 'sıkılma kapalıyken ayar kapalı okunuş sentinel değerleri HTML içinde yoktur');
+});
+
+check('p > %92 (8 sonuç) → şık 4 korunur ve gerçek okunuş katlanır', () => {
   const t = bootKao({ seeded: true }); startLesson(t);
   // 8 doğru → pencere %100 (sıkılma bandı). Ders sonuna kadar gerekirse ilerle.
   for (let i = 0; i < 8; i += 1) { answerAndNext(t, true); t.api.kaoContinue(); }
@@ -99,12 +165,9 @@ check('p > %92 (≥8 görev sonra) → şık 4\'e döner ve okunuş gizlenir (su
   const bore = toTask(t);
   assert.ok(bore && bore.choices, 'görev kuruldu');
   assert.equal(bore.choices.length, 4, `sıkılma kolunda 4 şık (ölçülen ${bore.choices.length})`);
-  // Okunuş gizlenir (sunum): sıkılma kolu motorda tanımlı ve Arapça çiftlerde kullanılır.
-  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', '..', 'app/core/quranLearn.js'), 'utf8');
-  assert.match(src, /kaoBoredomHideHarakat\(\)/, 'sıkılma sunum kolu motorda tanımlı');
-  // K3P-19: okunuş katlaması aynı yuvayı paylaştığı için çağrı artık `kaoBoredomHideHarakat(), pronunciationFolded`
-  // biçiminde; katı argüman dizilimini sabitlemek yerine soldurma kolunun GERÇEKTEN bağlı olduğu ölçülür.
-  assert.ok(/kaoArabicPairHTML\([^;]*kaoBoredomHideHarakat\(\)[^;]*\)/.test(src), 'sıkılmada harekeler soluyor sunumu bağlı');
+  const html = api(t).kaoTaskHTML(bore);
+  assert.match(html, /<details class="kao-pronunciation-fold">[\s\S]*?<summary>Okunuş<\/summary>/, 'gerçek görev HTML’sinde Latin okunuş kapalı katlanır');
+  assert.doesNotMatch(html, /<details class="kao-pronunciation-fold"[^>]*\sopen(?:\s|>)/, 'okunuş kullanıcı açmadan görünmez');
   t.api.kaoLesson('exit');
 });
 

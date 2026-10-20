@@ -1,14 +1,27 @@
 # K3PD güncel durum
 
-- Program: aktif; K3PD-00…K3PD-08 bağımsız denetim `PASS` ile kapandı.
-- K3PD-02 başlangıç HEAD'i: 9cceec923a4833046a12b28f3ca2c6dbeff71dd5; dal `k3pd-denetim-duzeltmeleri`, origin/main farkı 2/0.
-- Çalışma dalı: `k3pd-denetim-duzeltmeleri`.
+- Program: aktif; K3PD-00…K3PD-09 bağımsız denetim `PASS` ile kapandı; K3PD-10 yalnız sıradaki adaydır.
+- Bu oturum başlangıcı: HEAD `10914697204b8411beae040ff108d2c80caa0a7d`; dal `k3pd-denetim-duzeltmeleri`; `HEAD...origin/main` 3/0.
+- K3PD-02 başlangıç HEAD'i (tarihsel): 9cceec923a4833046a12b28f3ca2c6dbeff71dd5; başlangıç origin/main farkı 2/0.
+- Çalışma dalı: `k3pd-denetim-duzeltmeleri`; K3PD-09 başlangıcında 3 commit önde, 0 geride.
 - Eski K3P: 37/37 tamamlandı; eski `nextPrompt=null` ve `releaseApproval=APPROVED-2026-10-18` tarihsel kaydı değişmedi.
 - K3PD-00: `done`; README'de tarihsel 82 ile güncel 83 test + 4 yardımcı/fixture ölçümü ayrıldı; bağımsız yeniden denetim `PASS`.
 - K3PD-01: pin erteleme adaptörü, exact allowlist ve sentetik dal/durum/yol matrisi tamamlandı; hedefli regresyonlar ve G0 geçti; bağımsız salt-okur hüküm `PASS`.
 - K3PD yayın onayı: `NOT_APPROVED`; cihaz/ekran okuyucu/L2/230 kayıt/çalışma/uzak eşlik kapıları `pending`.
 - Önceden kirli `KAPANIS.md`, `README.md` ve `kanit/sonraki/GORSEL-KANIT.md` korunuyor; K3PD kapsamı ve stage dışında.
 - Pinli üretim varlıkları ve sürüm değerleri değişmedi; `App.kao*` handler sayısı 45.
+
+## K3PD-09 — bağımsız PASS ile kapandı
+
+- Başlangıç HEAD `10914697204b8411beae040ff108d2c80caa0a7d`; dal `k3pd-denetim-duzeltmeleri`; başlangıç `HEAD...origin/main` 3/0. Başlangıçtaki üç korunan kirli dosya kapsam ve stage dışında kaldı.
+- Kullanıcı izniyle yalnız PROMPTLAR.md’deki K3PD-09 allowlist satırı exact yollara çevrildi; K3PD-08 satırı değişmedi. Kartın exact kapsamı sekiz yol ile sınırlı.
+- Eski HEAD kaynaklı VM replay’i DDA’da beş beklenen kusuru kırmızı yaptı. Güncel gerçek handler/UI çıktısı: iki yanlış sonrası normal MC 3 seçenek/3 düğme; kolay görev 2/2; sunulmuş yardım sonrası pencere veya streak değişse de doğru grade 2; yardımsız normal hızlı doğru grade 4. Undo, helper tekilleştirme ve restart temizliği geçti. Ladder build 5 çip/5 düğme kaldı.
+- Bağımsız salt-okur denetçi kaynak, davranış, exact diff, state/log, hash, handler/schema/migration/pin sınırlarını inceledi ve `PASS` verdi. DDA 14, FSRS 24 vektör, queue 20 görev + 1000 interleave, resume 7 kontrol ve G0/G1 denetimi geçti.
+- Perf kayıtları birlikte korunuyor: uygulayıcı varsayılanı göreli +25% bandını 8.572 ms ile 6.36 ms sınırında aştı; yavaş-host istisnası yalnız göreli bant içindi (runtime 135.996 KiB, CSS 15.877 KiB, content 184.591 KiB, p95 22.493 ms, steady 3.493 ms; mutlak 40 ms tavanı geçti). Denetçi izole varsayılanı geçti (p95 9.488 ms, steady 5.419 ms); flag’li tekrar p95 11.308 ms, steady 6.688 ms. `KAO2_WRITE_BASELINE` unset; baseline SHA-256 `302cfcc85422c346a62fb2e9b62df8a9f64c8ec362099adc5d40a35bce29d384` değişmedi.
+- `App.kao*` 45; schema/migrate, FSRS parametreleri, A/B hash, içerik, pin ve kapsam dışı runtime dosyaları değişmedi. Korunan üç dosyanın başlangıç hash’i aynı. K3PD release approval `NOT_APPROVED`; eski K3P 37/37 kaydı ayrı.
+- DURUM/KAYIT/EVIDENCE `done/PASS` ile eşlendi. Sıradaki `K3PD-10` yalnız adaydır; bu kart ona yetki vermez. Push/merge/tag/deploy veya görsel çekimi yapılmadı.
+
+Sıradaki aday: K3PD-10 (bu PASS uygulama izni değildir; bu oturum burada durur).
 
 K3PD-01 kapandı; onun PASS’i K3PD-02’ye çalışma izni değildi. Kullanıcının bu oturumdaki “sen karar ver devam et” yanıtı K3PD-02 için karar seçimini asistana devretti; asistan A’yı seçti, kullanıcıya doğrudan A atfedilmedi. K3PD-02 bağımsız salt-okur `PASS` ile yalnız karar/sözleşme kapsamı için kapandı. H4 runtime sayaç düzeltmesi, yeni ölçüm/cohort, cihaz/L2 kabulü ve yayın yapılmadı. Sonraki karta yetki verilmedi. Yeni yayın onayı `NOT_APPROVED`; K3PD-32 adayı ve ona özgü açık onay ile K3PD-33 olmadan push/merge/deploy yapılmaz.
 

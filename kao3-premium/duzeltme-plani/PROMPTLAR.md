@@ -391,7 +391,7 @@ DOM/HTML davranışını gerçekten sınayan test yaz; kaynakta fonksiyon adı a
 
 **Oku:** kaoChoiceCap/InjectEasy/currentTask/kaoGrade/kaoAnswer; window ve wrongStreak; test_k3p_dda.js.
 
-**Yazma allowlist’i:** quranLearn.js yalnız uyarlama/grade/queue; test_k3p_dda.js; test_k3p_ladder.js; yeni kayıtlar.
+**Yazma allowlist’i:** `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-09 satırı); `app/core/quranLearn.js` (yalnız uyarlama/grade/queue); `tests/kao/test_k3p_dda.js`; `tests/kao/test_k3p_ladder.js`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-09/EVIDENCE.md`.
 
 **Uygula:**
 

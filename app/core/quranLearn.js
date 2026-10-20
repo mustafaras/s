@@ -1788,17 +1788,13 @@
   function kaoBoredomHideHarakat(){ var ui=quranLearnDeps?quranLearnDeps.ui():null,p=kaoSessionFlow(); return !!(ui&&Array.isArray(ui.kaoWindow)&&ui.kaoWindow.length>=KAO_FLOW_WINDOW&&p!==null&&p>KAO_BOREDOM); }
   function kaoAnxiety(){ return nonNegativeNumber(quranLearnDeps.ui().kaoWrongStreak,0)>=KAO_ANXIETY_WRONG; }
   function kaoHelp(){ var p=kaoSessionFlow(); return kaoAnxiety()||(p!==null&&p<KAO_ANXIETY); }
-  // AKIS §4: akış/sıkılma bandında 4; kaygıda 3, art arda 3 yanlışta 2.
-  function kaoChoiceCap(){ if(!kaoAnxiety()) return 4; return nonNegativeNumber(quranLearnDeps.ui().kaoWrongStreak,0)>=KAO_REINTRO_WRONG?2:3; }
-  // K3P-A5: kaygı bandında araya bilinen kolay bir kart girer.
+  function kaoChoiceCap(){ var streak=nonNegativeNumber(quranLearnDeps.ui().kaoWrongStreak,0); return streak<KAO_ANXIETY_WRONG?4:streak<KAO_REINTRO_WRONG?3:2; }
   function kaoInjectEasy(ui){
-    var p=kaoFlowRate(ui); if(p===null||p>=KAO_ANXIETY) return false;
-    var q=ensureQuranLearn(quranLearnDeps.data()),cards=objectOr(q.cards,{}),lex=window.QuranLexiconV1;
-    if(!lex||!Array.isArray(lex.lemmas)) return false;
-    var queue=Array.isArray(ui.kaoQueue)?ui.kaoQueue:[];
-    var pick=null;
-    lex.lemmas.some(function(lemma){ var id='w:'+lemma.id+':ar>tr',card=objectOr(cards[id],{}); if(nonNegativeNumber(card.s,0)>=21&&!card.orphan&&!queue.some(function(it){ return it.cardId===id; })){ pick={id:'kao-easy:'+lemma.id,cardId:id,type:'meaning',isNew:false,choiceCount:2,easy:true}; return true; } return false; });
-    if(!pick) return false;
+    var p=kaoFlowRate(ui),lex=window.QuranLexiconV1,flow=window.SeymaQuranLearnFlow,queue=Array.isArray(ui.kaoQueue)?ui.kaoQueue:[];
+    if(p===null||p>=KAO_ANXIETY||!lex||!Array.isArray(lex.lemmas)||!flow||typeof flow.ladderArm!=='function') return false;
+    var cards=ensureQuranLearn(quranLearnDeps.data()).cards,lemma=lex.lemmas.find(function(l){ var id='w:'+l.id+':ar>tr',card=cards[id]||{}; return nonNegativeNumber(card.s,0)>=21&&!card.orphan&&flow.ladderArm(id)==='B'&&!queue.some(function(it){ return it.cardId===id; }); });
+    if(!lemma) return false;
+    var pick={id:'kao-easy:'+lemma.id,cardId:'w:'+lemma.id+':ar>tr',type:'meaning',isNew:false,choiceCount:2,easy:true};
     queue.splice(Math.min(queue.length,(ui.kaoTaskIndex||0)+1),0,pick); ui.kaoQueue=queue; ui.kaoTasks=objectOr(ui.kaoTasks,{}); delete ui.kaoTasks[pick.id];
     return true;
   }
@@ -1809,7 +1805,6 @@
     list.forEach(function(c){ if(c.correct!==true&&wanted.length<n) wanted.push(c); });
     return list.filter(function(c){ return wanted.indexOf(c)>=0; });
   }
-  // K3P-A5: art arda 3 yanlışta kelimeyle yeniden tanışma.
   function kaoReintro(task){
     var lemmaId=lemmaIdForCard(task&&task.cardId),lex=window.QuranLexiconV1,lemma=lex&&typeof lex.byId==='function'?lex.byId(lemmaId):null;
     if(!lemma) return null;
@@ -2017,9 +2012,9 @@
     if(!quranLearnDeps) return null;
     var ui=quranLearnDeps.ui(),item=(ui.kaoQueue||[])[ui.kaoTaskIndex||0];
     if(!item) return null;
-    ui.kaoTasks=objectOr(ui.kaoTasks,{});
-    if(!ui.kaoTasks[item.id]){ var cap=kaoChoiceCap(); ui.kaoTasks[item.id]=kaoBuildTask(item,quranLearnDeps.data(),{seed:item.id,choiceCount:item.choiceCount,audioOnly:item.audioOnly===true,choiceCap:cap}); var tc=ui.kaoTasks[item.id]; if(tc&&tc.type==='word'&&tc.kind!=='build'&&Array.isArray(tc.choices)&&tc.choices.length>cap) tc.choices=kaoTrimChoices(tc.choices,cap); }
-    return ui.kaoTasks[item.id];
+    ui.kaoTasks=objectOr(ui.kaoTasks,{}); var cap=kaoChoiceCap(),task=ui.kaoTasks[item.id]||(ui.kaoTasks[item.id]=kaoBuildTask(item,quranLearnDeps.data(),{seed:item.id,choiceCount:item.choiceCount,audioOnly:item.audioOnly===true}));
+    if(task&&task.kind!=='build'&&task.kind!=='order'&&task.choices){ if(item.easy||task.choices.length>cap&&cap<4) task.helped=KAO_HELP_GRADE; if(task.choices.length>cap) task.choices=kaoTrimChoices(task.choices,cap); }
+    return task;
   }
   // K3P-10: hareket azaltma tek kapıda — SeyFx.shouldAnimate yoksa prefers-reduced-motion'a düşülür.
   function kaoAnimate(){ var w=window; if(w.SeyFx&&typeof w.SeyFx.shouldAnimate==='function') return w.SeyFx.shouldAnimate()===true; return !(w.matchMedia&&w.matchMedia('(prefers-reduced-motion:reduce)').matches); }
@@ -2081,7 +2076,7 @@
   }
   function startTaskPresentation(){
     var task=currentTask();
-    if(task&&kaoShouldAutoplay(task,quranLearnDeps.data())) kaoPlay(task.clipId,kaoAudioStyle());
+    if(task&&kaoShouldAutoplay(task,quranLearnDeps.data())&&kaoPlay(task.clipId,kaoAudioStyle())&&kaoHelp()) task.helped=KAO_HELP_GRADE;
   }
   function kaoUndoSnapshot(q,ui,task,key,orderDraft){
     var cardId=String(task.cardId),surahId=String(task.delayedSurahId),hasSurah=task.fragmentKind==='delayed'&&Object.prototype.hasOwnProperty.call(q.surahs,surahId);
@@ -2580,7 +2575,7 @@
       // K2F-06: ustalıkta yanlış cevaplanan kelimeler onarım listesine gider.
       if(!correct&&ui.kaoLesson.kind==='mastery'){ var missed=lemmaIdForCard(task.cardId); ui.kaoLesson.wrongLemmas=Array.isArray(ui.kaoLesson.wrongLemmas)?ui.kaoLesson.wrongLemmas:[]; if(missed&&ui.kaoLesson.wrongLemmas.indexOf(missed)<0) ui.kaoLesson.wrongLemmas.push(missed); }
     }
-    var elapsed=Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime())),difficulty=kaoHelp()?KAO_HELP_GRADE:null,grade=kaoGrade(correct,elapsed,previous.reps,difficulty),scheduled=kaoSchedule(previous,grade,now);
+    var elapsed=Math.max(0,now.getTime()-nonNegativeNumber(ui.kaoTaskStartedAt,now.getTime())),difficulty=task.helped||null,grade=kaoGrade(correct,elapsed,previous.reps,difficulty),scheduled=kaoSchedule(previous,grade,now);
     if(correct&&scheduled.readerUnknown===true) delete scheduled.readerUnknown;
     // R-A2: kelime görevinde bu tekrarın çeldiricileri (lemma kimliği; dışlama lemma düzeyinde, kart kimliğinden
     // küçük) sonraki tekrarda dışlanmak üzere kartta tutulur.
@@ -2606,7 +2601,7 @@
     if(!isDurable(previous)&&isDurable(scheduled)) ui.kaoDurableCount=Math.floor(nonNegativeNumber(ui.kaoDurableCount,0))+1;
     if(!correct&&task.errorClass&&Object.prototype.hasOwnProperty.call(q.errors,task.errorClass)) q.errors[task.errorClass]+=1;
     // Ustalık karma testinde yanlışa anında yeniden deneme eklenmez: puan yalnız ilk 10 cevaptan gelir.
-    if(!correct&&!task.retry&&!(ui.kaoLesson&&ui.kaoLesson.kind==='mastery')){
+    if(!correct&&!task.retry&&!ui.kaoQueue[ui.kaoTaskIndex].easy&&!(ui.kaoLesson&&ui.kaoLesson.kind==='mastery')){
       // Yeniden deneme farklı tohumla kurulur; K2F-10: sunulamayan gramer görevi tekrarlanmaz.
       var retryItem=Object.assign({},ui.kaoQueue[ui.kaoTaskIndex],{id:task.id+':retry',retry:true,isNew:false});
       if(kaoGrammarItemPresentable(retryItem,d)) ui.kaoQueue.push(retryItem);

@@ -74,11 +74,41 @@ for (const id of Object.keys(test.data.quranLearn.cards)) {
       assert.equal(task.cardId, id);
       assert.equal(task.id, `task:${id}`);
       assert.equal(new Set(task.choices.map((choice) => choice.label)).size, task.choices.length);
-      if (task.kind === 'build') buildSeen += 1;
+      if (task.kind === 'build') {
+        buildSeen += 1;
+      }
       assert.equal(JSON.stringify(data), before);
     }
   }
 }
 assert.equal(test.calls.save, saves);
 assert.ok(buildSeen > 0, 'R3 basamağında build görevi kurulmalı (K3P-17)');
-console.log(`test_k3p_ladder: PASS (A=${countA}/1000; eşikler, yön, B/R1, yedek, değişmezlik; build ${buildSeen})`);
+const lexicon = test.win.QuranLexiconV1;
+let letterCapCandidate = null;
+for (const lemma of lexicon.lemmas) {
+  const cardId = `w:${lemma.id}:ar>tr`;
+  if (flow.ladderArm(cardId) !== 'A') continue;
+  const probeData = JSON.parse(JSON.stringify(test.data));
+  probeData.quranLearn.cards[cardId] = { state: 'review', s: 10, d: 10, reps: 1, due: '2026-09-30T00:00:00.000Z' };
+  const probe = test.api.kaoBuildTask({ id: `k3pd09-probe:${cardId}`, cardId, isNew: false }, probeData, { seed: `k3pd09-probe:${cardId}` });
+  if (probe.kind === 'build' && probe.choices.length > 4) {
+    letterCapCandidate = { cardId, choices: probe.choices.length };
+    break;
+  }
+}
+assert.ok(letterCapCandidate, 'dört seçenekten fazla gerçek harf çipi olan build örneği bulunmalı');
+// K3PD-09: doğru görev zinciri içinde kaygı sınırı, çoktan seçmeli şık sayısı gibi harf çiplerine uygulanmamalı.
+test.api.kaoOpen('home');
+assert.ok(test.api.kaoLesson('start', 'u01.01'), 'gerçek ders handler zinciri başlamalı');
+test.data.quranLearn.cards[letterCapCandidate.cardId] = { state: 'review', s: 10, d: 10, reps: 1, due: '2026-09-30T00:00:00.000Z' };
+const letterItem = { id: 'k3pd09-letter-cap', cardId: letterCapCandidate.cardId, isNew: false };
+test.ui.kaoQueue = [letterItem]; test.ui.kaoTasks = {}; test.ui.kaoTaskIndex = 0;
+test.ui.kaoWrongStreak = 3; test.ui.kaoWindow = [0, 0];
+assert.equal(test.api.kaoAnswer(letterItem.id, 'missing-choice'), false, 'olmayan seçim yanıtı görevi çözmemeli');
+const letterTask = test.ui.kaoTasks[letterItem.id];
+assert.equal(letterTask.kind, 'build', 'gerçek ladder/build görevi olarak kalmalı');
+assert.equal(letterTask.choices.length, letterCapCandidate.choices, '3 yanlışta build harf çipleri sayısı görev üretimindeki sayıda kalmalı');
+assert.ok(letterTask.choices.length > 4, 'harf çipi sayısı dört-seçenek varsayımından büyük olmalı');
+const letterButtons = Array.from(test.api.kaoTaskHTML(letterTask).matchAll(/<button\b[^>]*onclick="App\.kaoAnswer\(/g)).length;
+assert.equal(letterButtons, letterTask.choices.length, 'gerçek build HTML’si bütün harf çiplerini sunmalı');
+console.log(`test_k3p_ladder: PASS (A=${countA}/1000; eşikler, yön, B/R1, yedek, değişmezlik; build ${buildSeen}; kaygıda build ${letterButtons} çip)`);

@@ -9,8 +9,11 @@
 const assert = require('node:assert/strict');
 const { bootKao, correctTaps, esc } = require('./helpers/kao-harness');
 
-let passed = 0;
-function check(name, fn) { fn(); passed += 1; console.log(`PASS  ${name}`); }
+let passed = 0, failed = 0;
+function check(name, fn) {
+  try { fn(); passed += 1; console.log(`PASS  ${name}`); }
+  catch (error) { failed += 1; console.error(`FAIL  ${name}: ${error.message}`); }
+}
 
 const api = (t) => t.api;
 const curTask = (t) => { const q = t.ui.kaoQueue[t.ui.kaoTaskIndex]; return q && t.ui.kaoTasks[q.id]; };
@@ -19,6 +22,16 @@ function startLesson(t, lessonId = 'u01.01') {
   t.ui.kaoStack = []; t.api.kaoOpen('home');
   assert.ok(t.api.kaoLesson('start', lessonId), 'ders başlamalı');
   return t.ui.kaoLesson;
+}
+function presentPendingTask(t) {
+  const at = t.timers.findIndex((timer) => timer.ms === 0);
+  if (at < 0) return false;
+  const [timer] = t.timers.splice(at, 1);
+  timer.fn();
+  return true;
+}
+function answerButtonCount(t, task) {
+  return Array.from(t.api.kaoTaskHTML(task).matchAll(/<button\b[^>]*onclick="App\.kaoAnswer\(/g)).length;
 }
 function nextTask(t) { if (t.ui.kaoLesson && t.ui.kaoLesson.phase === 'lesson') t.api.kaoLesson('next'); return curTask(t); }
 // Ders adımlarını (goal/kavram) geçip ilk uygulama görevine iner.
@@ -104,18 +117,130 @@ function boredomView(windowValues, { direction = 'ar>tr', translit = true } = {}
   return { t, task, html: t.api.kaoTaskHTML(task) };
 }
 
-check('art arda 2 yanlış → sıradaki görev 3 şıklı ve sesi otomatik çalar', () => {
-  const t = bootKao({ seeded: true }); startLesson(t);
-  // İlk iki görevi yanlış cevapla.
-  for (let i = 0; i < 2; i += 1) { answerAndNext(t, false); t.api.kaoContinue(); }
-  assert.ok(t.ui.kaoWrongStreak >= 2, `art arda yanlış sayacı ${t.ui.kaoWrongStreak}`);
+check('iki yanlış sonrası önbellekteki normal çoktan seçmeli görev tam 3 seçenek sunar', () => {
+  const normalT = bootKao({ seeded: true }); startLesson(normalT);
+  assert.ok(toTask(normalT), 'normal görev dizisi başlamalı');
+  normalT.ui.kaoWindow = Array(8).fill(1);
+  answerAndNext(normalT, false); normalT.api.kaoContinue();
+  answerAndNext(normalT, false);
+  assert.equal(normalT.ui.kaoWrongStreak, 2, 'iki yanlış handler üzerinden kaydedilmeli');
+  const normalItem = normalT.ui.kaoQueue[normalT.ui.kaoTaskIndex];
+  assert.ok(normalItem && normalItem.easy !== true, 'normal görev yardım kartından önce gelmeli');
+  normalT.api.kaoContinue();
+  assert.equal(presentPendingTask(normalT), true, 'sıradaki normal görev gerçek sunum yolundan geçmeli');
+  const normal = curTask(normalT);
+  assert.ok(normal && Array.isArray(normal.choices), 'önbellekteki normal görev olmalı');
+  assert.notEqual(normal.kind, 'build', 'bu ölçüm harf çiplerini çoktan seçmeli seçenek saymaz');
+  assert.notEqual(normal.kind, 'order', 'bu ölçüm sıralama çiplerini çoktan seçmeli seçenek saymaz');
+  assert.equal(normal.choices.length, 3, `normal görev tam 3 seçenekli olmalı (ölçülen ${normal.choices.length})`);
+  assert.equal(answerButtonCount(normalT, normal), 3, 'gerçek görev HTML’sinde tam üç cevap düğmesi görünmeli');
+  normalT.api.kaoLesson('exit');
+});
 
-  const capped = toTask(t);
-  assert.ok(capped, 'sıradaki görev var');
-  assert.ok(!capped.choices || capped.choices.length <= 3, `kaygı kolunda şık ≤3 (ölçülen ${capped.choices && capped.choices.length})`);
-  assert.ok(t.ui.kaoWrongStreak >= 2);
-  const probe = Object.assign({}, capped, { clipId: 'w-l_probe_abcdef', isNew: false });
-  assert.equal(api(t).kaoShouldAutoplay(probe, t.data), true, 'kaygı kolunda ses otomatik çalar');
+check('iki yanlış sonrası araya giren gerçek kolay çoktan seçmeli görev tam 2 seçenek sunar', () => {
+  const easyT = bootKao({ seeded: true }); startLesson(easyT);
+  assert.ok(toTask(easyT), 'kolay kart akışı başlamalı');
+  easyT.ui.kaoWindow = Array(4).fill(1);
+  answerAndNext(easyT, false); easyT.api.kaoContinue();
+  answerAndNext(easyT, false);
+  assert.equal(easyT.ui.kaoWrongStreak, 2);
+  const easyQueued = easyT.ui.kaoQueue.filter((item) => item.easy === true);
+  assert.equal(easyQueued.length, 1, 'düşük akışta tek kolay kart araya eklenmeli');
+  easyT.api.kaoContinue();
+  assert.equal(presentPendingTask(easyT), true, 'kolay görev gerçek sunum yolundan geçmeli');
+  const easyItem = easyT.ui.kaoQueue[easyT.ui.kaoTaskIndex];
+  const easy = curTask(easyT);
+  assert.ok(easyItem && easyItem.easy === true, 'kolay kart gerçek sıradaki görev olmalı');
+  assert.ok(easy, 'eklenen kolay görev gerçek görev kuyruğundan sunulmalı');
+  assert.equal(easy.choices.length, 2, `kolay görev tam 2 çoktan seçmeli cevap olmalı (ölçülen ${easy.choices.length})`);
+  assert.notEqual(easy.kind, 'build', 'yardımcı çoktan seçmeli kart harf üretimi olmamalı');
+  assert.notEqual(easy.kind, 'order', 'yardımcı çoktan seçmeli kart sıralama çipi olmamalı');
+  assert.equal(answerButtonCount(easyT, easy), 2, 'gerçek kolay görev HTML’sinde tam iki cevap düğmesi görünmeli');
+  easyT.api.kaoLesson('exit');
+});
+
+check('sunulmuş ses yardımı pencere değişse de grade 2 olarak notlanır', () => {
+  const audio = [];
+  const windowT = bootKao({ seeded: true, surface: { createAudio(src) { audio.push(src); return { play() {}, addEventListener() {} }; } } });
+  startLesson(windowT);
+  const windowTask = toTask(windowT);
+  windowT.ui.kaoWindow = [0];
+  assert.equal(presentPendingTask(windowT), true, 'gerçek sunum zamanlayıcısı çalışmalı');
+  assert.ok(windowTask.clipId && windowT.ui.kaoPlayed, 'düşük pencere oranında görev sesi gerçekten başlatılmalı');
+  windowT.ui.kaoWindow = Array(8).fill(1);
+  const windowResult = correctTaps(windowTask).map((id) => windowT.api.kaoAnswer(windowTask.id, id)).at(-1);
+  assert.equal(windowResult.grade, 2, `sunumdan sonraki pencere değişse de yardımcı doğru grade 2 olmalı (ölçülen ${windowResult.grade})`);
+  windowT.api.kaoLesson('exit');
+});
+
+check('iki yanlış sonrası sunulmuş ses yardımı streak değişse de grade 2 olarak notlanır', () => {
+  const streakAudio = [];
+  const streakT = bootKao({ seeded: true, surface: { createAudio(src) { streakAudio.push(src); return { play() {}, addEventListener() {} }; } } });
+  startLesson(streakT);
+  assert.ok(toTask(streakT));
+  streakT.ui.kaoWindow = Array(8).fill(1);
+  answerAndNext(streakT, false); streakT.api.kaoContinue();
+  answerAndNext(streakT, false); streakT.api.kaoContinue();
+  const streakTask = curTask(streakT);
+  assert.equal(streakT.ui.kaoWrongStreak, 2);
+  assert.equal(presentPendingTask(streakT), true, 'iki yanlış sonrası görev sunum callback’i çalışmalı');
+  assert.ok(streakTask.clipId && streakT.ui.kaoPlayed && streakAudio.length > 0, `iki yanlış sonrası yardım gerçek görev sunumunda başlamalı (clip=${streakTask.clipId}, played=${streakT.ui.kaoPlayed}, audio=${streakAudio.length})`);
+  streakT.ui.kaoWrongStreak = 0;
+  const streakResult = correctTaps(streakTask).map((id) => streakT.api.kaoAnswer(streakTask.id, id)).at(-1);
+  assert.equal(streakResult.grade, 2, `sunumdan sonraki streak değişse de yardımcı doğru grade 2 olmalı (ölçülen ${streakResult.grade})`);
+  streakT.api.kaoLesson('exit');
+});
+
+check('yardımsız normal görev gerçek handler zincirinde mevcut FSRS grade 4 eşlemesini korur', () => {
+  const t = bootKao({ seeded: true, surface: { createAudio() { return { play() {}, addEventListener() {} }; } } });
+  t.api.kaoOpen('home');
+  assert.ok(t.api.kaoStart() > 0, 'normal oturum başlamalı');
+  const lemma = t.win.QuranLexiconV1.lemmas.find((item) => t.win.SeymaQuranLearnFlow.ladderArm(`w:${item.id}:ar>tr`) === 'B');
+  assert.ok(lemma, 'normal MC görevine uygun B/R1 kelime bulunmalı');
+  const cardId = `w:${lemma.id}:ar>tr`;
+  t.data.quranLearn.cards[cardId] = { state: 'review', s: 10, d: 10, reps: 5, due: '2026-09-30T00:00:00.000Z' };
+  const item = { id: 'k3pd09-normal-grade', cardId, isNew: false };
+  t.ui.kaoQueue = [item]; t.ui.kaoTasks = {}; t.ui.kaoTaskIndex = 0;
+  t.ui.kaoWindow = Array(8).fill(1); t.ui.kaoWrongStreak = 0; t.ui.kaoPlayed = false;
+  assert.equal(presentPendingTask(t), true, 'normal görev gerçek sunum yolundan geçmeli');
+  const task = curTask(t);
+  assert.equal(task.choices.length, 4, 'normal görev dört seçenekli kalmalı');
+  assert.equal(task.helped, undefined, 'normal görev yardım sınıflaması almamalı');
+  assert.equal(t.ui.kaoPlayed, false, 'normal görev için yardım sesi çalmamalı');
+  t.ui.kaoTaskStartedAt = Date.now();
+  const result = correctTaps(task).map((id) => t.api.kaoAnswer(task.id, id)).at(-1);
+  assert.equal(result.grade, 4, `yardımsız hızlı doğru normal FSRS grade 4 olmalı (ölçülen ${result.grade})`);
+});
+
+check('kolay kart kuyruğu tekildir; undo eklemeyi geri alır ve yeni oturum eskisini taşımaz', () => {
+  const t = bootKao({ seeded: true }); startLesson(t);
+  assert.ok(toTask(t));
+  t.ui.kaoWindow = Array(4).fill(1);
+  answerAndNext(t, false); t.api.kaoContinue();
+  const queueBefore = JSON.parse(JSON.stringify(t.ui.kaoQueue));
+  const windowBefore = Array.from(t.ui.kaoWindow);
+  const streakBefore = t.ui.kaoWrongStreak;
+  answerAndNext(t, false);
+  assert.equal(t.ui.kaoQueue.filter((item) => item.easy === true).length, 1, 'yardımcı ekleme bir kez olmalı');
+  assert.equal(t.api.kaoUndo(), true, 'son yanlış cevap geri alınabilmeli');
+  assert.deepEqual(JSON.parse(JSON.stringify(t.ui.kaoQueue)), queueBefore, 'undo araya eklenen yardımcıyı kuyruktan çıkarmalı');
+  assert.deepEqual(Array.from(t.ui.kaoWindow), windowBefore, 'undo pencereyi cevap öncesine döndürmeli');
+  assert.equal(t.ui.kaoWrongStreak, streakBefore, 'undo yanlış sayacını cevap öncesine döndürmeli');
+
+  answerAndNext(t, false);
+  t.api.kaoContinue();
+  const easy = curTask(t);
+  assert.ok(easy, 'geri alınan ekleme yeniden gerçek görev olarak sunulmalı');
+  answerAndNext(t, false);
+  const helperItems = t.ui.kaoQueue.filter((item) => item.easy === true);
+  const helperCards = helperItems.map((item) => item.cardId);
+  assert.equal(new Set(helperCards).size, helperCards.length, `aynı kolay kart UI kuyruğunda yinelenmemeli (${JSON.stringify(helperItems)})`);
+  const staleIds = helperItems.map((item) => item.id);
+  assert.ok(staleIds.length > 0, 'çıkıştan önce yardımcı kuyruk bulunmalı');
+  t.api.kaoLesson('exit');
+  t.api.kaoStart();
+  assert.equal(t.ui.kaoQueue.some((item) => item.easy === true || /^kao-easy:/.test(item.id)), false, 'çıkış ve yeni oturum eski yardımcı kuyruğunu taşımamalı');
+  assert.equal(t.ui.kaoQueue.some((item) => staleIds.includes(item.id)), false, 'eski yardımcı görev kimlikleri yeniden kullanılmamalı');
   t.api.kaoLesson('exit');
 });
 
@@ -290,4 +415,5 @@ check('kayan pencere ve uyarlanır durum yalnız ui; data\'ya yazılmaz', () => 
   t.api.kaoLesson('exit');
 });
 
-console.log(`test_k3p_dda: PASS (${passed} kontrol — kaygı/akış/sıkılma bantları, notlama adaleti, yalnız ui)`);
+console.log(`test_k3p_dda: ${failed ? 'FAIL' : 'PASS'} (${passed} geçti, ${failed} kaldı — kaygı/akış/sıkılma bantları, notlama adaleti, yalnız ui)`);
+if (failed) process.exitCode = 1;

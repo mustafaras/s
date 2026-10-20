@@ -34,7 +34,8 @@ const strip = (value) => String(value || '').replace(/[\u064b-\u065f\u0670\u06d6
 const lettersOf = (lemma) => Array.from(strip(lemma.ar));
 const eligible = (lemma) => {
   const chars = lettersOf(lemma);
-  return chars.length >= 2 && chars.length <= 6 && chars.every((ar) => byChar.has(ar) && byChar.get(ar).id !== 'hamza');
+  return lemma.verified === true && Array.isArray(lemma.meanings) && lemma.meanings.some((meaning) => typeof meaning === 'string' && meaning.trim()) &&
+    chars.length >= 2 && chars.length <= 6 && chars.every((ar) => byChar.has(ar) && byChar.get(ar).id !== 'hamza');
 };
 // Merdiveni elle kurmak yerine gerçek kart kaydı yazılır: A kolu + 10 ≤ s < 30 → R3.
 function r3Card() {
@@ -166,6 +167,92 @@ check('a11y: her çipin erişilebilir adı var (harfin adı donmuş ses modülü
   }
   const names = phonics.letters.map((letter) => String(letter.translit && letter.translit.bwToOkunus));
   assert.ok(text(html).length > 0 && names.length === 28, 'okunuş kaynağı donmuş modül');
+});
+
+check('K3PD-10: gerçek build HTML’si doğrulanmış Türkçe anlam ipucunu gösterir, cevabı sızdırmaz ve kaynaklardan bağımsızdır', () => {
+  const task = api.kaoBuildTask({ id: 'k3pd10-hint', cardId: fixture.cardId, isNew: true, retry: true }, t.data, { seed: 'k3pd10-hint' });
+  const meaning = fixture.lemma.meanings.find((value) => typeof value === 'string' && value.trim());
+  assert.equal(task.kind, 'build');
+  assert.equal(task.prompt, `Anlamı: ${meaning}`, 'ipucu doğrulanmış sözlük anlamından gelmeli');
+  assert.equal(task.direction, 'tr>ar', 'harf kurma yönü Türkçeden Arapçaya korunmalı');
+  assert.equal(task.cardId, fixture.cardId, 'kart kimliği korunmalı');
+  assert.equal(task.isNew, true, 'isNew korunmalı');
+  assert.equal(task.retry, true, 'retry korunmalı');
+  assert.equal(task.arm, 'A', 'merdiven kolu korunmalı');
+  const html = api.kaoTaskHTML(task);
+  assert.match(html, /<h2 class="kao-question[^\"]*">/, 'ipucu gerçek ve erişilebilir soru başlığında bulunmalı');
+  assert.ok(html.includes(meaning), 'ipucu görünür sözlük anlamını taşımalı');
+  assert.equal(html.includes(task.answer), false, 'harekeli hedef cevap ilk görünümde bulunmamalı');
+  assert.equal(html.includes(bare(task.answer)), false, 'harekesiz hedef cevap ilk görünümde bulunmamalı');
+
+  const altered = { ...task, answer: 'değiştirilmiş hedef cevap', choices: task.choices.map((choice, index) => ({ ...choice, label: `değiştirilmiş şık ${index}` })) };
+  const alteredHtml = api.kaoTaskHTML(altered);
+  assert.ok(alteredHtml.includes(meaning), 'cevap ve şıklar değişince sözlük ipucu aynı kalmalı');
+  assert.equal(alteredHtml.includes(altered.answer), false, 'cevap ipucu olarak kullanılmamalı');
+});
+
+check('K3PD-10: verified anlam yoksa cevaplanamaz görev kurmaz ve HTML’de boş başlık göstermez', () => {
+  const originalLexicon = t.win.QuranLexiconV1;
+  const emptyMeaningLemma = { ...fixture.lemma, meanings: [] };
+  t.win.QuranLexiconV1 = Object.assign({}, originalLexicon, {
+    byId(id) { return id === fixture.lemma.id ? emptyMeaningLemma : originalLexicon.byId(id); }
+  });
+  try {
+    resetCard();
+    const fallback = api.kaoBuildTask({ id: 'k3pd10-empty-meaning', cardId: fixture.cardId, isNew: false }, t.data, { seed: 'k3pd10-empty-meaning' });
+    assert.equal(fallback, null, 'hiçbir doğrulanmış anlam kaynağı yoksa içerik uydurmak yerine görev kurulmaz');
+    const html = api.kaoTaskHTML(fallback);
+    assert.match(html, /Bugünkü oturum tamam/, 'görev yok durumu boş soru yerine güvenli tamamlanma görünümü verir');
+    assert.doesNotMatch(html, /<h2 class="kao-question"><\/h2>/, 'boş anlam boş soru başlığına dönüşmez');
+
+    const originalData = t.data.quranLearn, originalUi = JSON.parse(JSON.stringify(t.ui));
+    const queuedData = JSON.parse(JSON.stringify(originalData));
+    queuedData.cards = { [fixture.cardId]: { state: 'review', s: 12, reps: 5, due: '2026-09-29T00:00:00.000Z' } };
+    const dailyBefore = JSON.parse(JSON.stringify(queuedData.daily[t.NOW.slice(0, 10)] || null));
+    t.data.quranLearn = queuedData;
+    t.win.QuranLexiconV1 = Object.assign({}, originalLexicon, {
+      lemmas: [emptyMeaningLemma],
+      byId(id) { return id === fixture.lemma.id ? emptyMeaningLemma : null; }
+    });
+    try {
+      const proposed = api.kaoBuildQueue(t.data, new Date(t.NOW), { candidates: [{ id: fixture.cardId, type: 'meaning' }] });
+      assert.equal(proposed.length, 1, 'eksik içerikli kart gerçek günlük kuyruğa aday olur');
+      const started = api.kaoStart();
+      assert.equal(started, t.ui.kaoQueue.length, 'başlatıcı yalnız cevaplanabilir görevleri sayar');
+      assert.equal(t.ui.kaoQueue.some((item) => item.cardId === fixture.cardId), false, 'cevaplanamayan kart aktif UI kuyruğundan çıkarılır');
+      assert.equal(Object.keys(t.ui.kaoTasks).length, t.ui.kaoQueue.length, 'her kalan kuyruk girdisinin gerçek görevi var');
+      for (const item of t.ui.kaoQueue) {
+        const html = api.kaoTaskHTML(t.ui.kaoTasks[item.id]);
+        assert.doesNotMatch(html, /<h2 class="kao-question"><\/h2>/, 'geçerli kuyrukta boş soru başlığı yok');
+      }
+      assert.deepEqual(queuedData.cards[fixture.cardId], { state: 'review', s: 12, reps: 5, due: '2026-09-29T00:00:00.000Z' }, 'atlanan kartın FSRS kaydı değişmez');
+      assert.deepEqual(queuedData.daily[t.NOW.slice(0, 10)] || null, dailyBefore, 'atlanan kart yanıt veya günlük notlama yazmaz');
+    } finally {
+      t.data.quranLearn = originalData;
+      for (const key of Object.keys(t.ui)) delete t.ui[key];
+      Object.assign(t.ui, originalUi);
+    }
+  } finally {
+    t.win.QuranLexiconV1 = originalLexicon;
+    resetCard();
+  }
+});
+
+check('K3PD-10: yalnız verified=true lemma build ipucu üretebilir', () => {
+  const originalLexicon = t.win.QuranLexiconV1;
+  const unverifiedLemma = { ...fixture.lemma, verified: 1 };
+  t.win.QuranLexiconV1 = Object.assign({}, originalLexicon, {
+    byId(id) { return id === fixture.lemma.id ? unverifiedLemma : originalLexicon.byId(id); }
+  });
+  try {
+    resetCard();
+    const fallback = api.kaoBuildTask({ id: 'k3pd10-unverified', cardId: fixture.cardId, isNew: false }, t.data, { seed: 'k3pd10-unverified' });
+    assert.notEqual(fallback.kind, 'build', 'truthy ama doğrulanmamış lemma build edilmez');
+    assert.equal(fallback.rung, 'R2', 'doğrulanmamış lemma güvenli R2 görevine düşer');
+  } finally {
+    t.win.QuranLexiconV1 = originalLexicon;
+    resetCard();
+  }
 });
 
 check('merdiven: build yalnız R3/A; B kolu R1, diğer basamaklar değişmez ve çıktı determinist', () => {

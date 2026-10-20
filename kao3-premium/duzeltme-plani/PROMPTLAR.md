@@ -420,7 +420,7 @@ Ekleme ui kuyruğunda tekilleşsin; aynı kolay kart tekrar tekrar şişmesin; �
 
 **Oku:** kaoBuildLetters, kaoTaskHTML ve sözlük verified alanları; test_k3p_build.js; diğer ar>tr/tr>ar görevleri.
 
-**Yazma allowlist’i:** quranLearn.js; test_k3p_build.js; test_k3p_ladder.js; gerekirse kao.css; yeni kayıtlar.
+**Yazma allowlist’i:** `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-10 satırı); `app/core/quranLearn.js`; `tests/kao/test_k3p_build.js`; `tests/kao/test_k3p_ladder.js`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-10/EVIDENCE.md`.
 
 **Uygula:**
 

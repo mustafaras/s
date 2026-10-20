@@ -111,4 +111,20 @@ assert.equal(letterTask.choices.length, letterCapCandidate.choices, '3 yanlışt
 assert.ok(letterTask.choices.length > 4, 'harf çipi sayısı dört-seçenek varsayımından büyük olmalı');
 const letterButtons = Array.from(test.api.kaoTaskHTML(letterTask).matchAll(/<button\b[^>]*onclick="App\.kaoAnswer\(/g)).length;
 assert.equal(letterButtons, letterTask.choices.length, 'gerçek build HTML’si bütün harf çiplerini sunmalı');
+let bArmMeaningTask = null;
+for (const lemma of lexicon.lemmas) {
+  if (lemma.verified !== true || !Array.isArray(lemma.meanings) || !lemma.meanings.some((meaning) => typeof meaning === 'string' && meaning.trim())) continue;
+  const cardId = `w:${lemma.id}:ar>tr`;
+  if (flow.ladderArm(cardId) !== 'B') continue;
+  const data = JSON.parse(JSON.stringify(test.data));
+  data.quranLearn.cards[cardId] = { state: 'review', s: 12, d: 10, reps: 1, due: '2026-09-30T00:00:00.000Z' };
+  bArmMeaningTask = test.api.kaoBuildTask({ id: `k3pd10-b-arm:${cardId}`, cardId, isNew: false, retry: true }, data, { seed: 'k3pd10-b-arm' });
+  break;
+}
+assert.ok(bArmMeaningTask, 'doğrulanmış anlamlı B kolu fixture bulunmalı');
+assert.equal(bArmMeaningTask.arm, 'B');
+assert.equal(bArmMeaningTask.rung, 'R1');
+assert.notEqual(bArmMeaningTask.kind, 'build', 'B kolu K3PD-10 ipucu değişikliğiyle harf kurmaya geçmemeli');
+assert.equal(test.api.kaoTaskHTML(bArmMeaningTask).includes('Anlamı:'), false, 'B kolunun mevcut görev anlamı build ipucu olarak gösterilmemeli');
+assert.equal(bArmMeaningTask.retry, true, 'B kolundaki görev retry bağlamını korumalı');
 console.log(`test_k3p_ladder: PASS (A=${countA}/1000; eşikler, yön, B/R1, yedek, değişmezlik; build ${buildSeen}; kaygıda build ${letterButtons} çip)`);

@@ -1,15 +1,15 @@
 # K3PD güncel durum
 
-- Program: aktif; K3PD-00…K3PD-09 bağımsız denetim `PASS` ile kapandı; K3PD-10 yalnız sıradaki adaydır.
-- Bu oturum başlangıcı: HEAD `10914697204b8411beae040ff108d2c80caa0a7d`; dal `k3pd-denetim-duzeltmeleri`; `HEAD...origin/main` 3/0.
-- K3PD-02 başlangıç HEAD'i (tarihsel): 9cceec923a4833046a12b28f3ca2c6dbeff71dd5; başlangıç origin/main farkı 2/0.
-- Çalışma dalı: `k3pd-denetim-duzeltmeleri`; K3PD-09 başlangıcında 3 commit önde, 0 geride.
-- Eski K3P: 37/37 tamamlandı; eski `nextPrompt=null` ve `releaseApproval=APPROVED-2026-10-18` tarihsel kaydı değişmedi.
-- K3PD-00: `done`; README'de tarihsel 82 ile güncel 83 test + 4 yardımcı/fixture ölçümü ayrıldı; bağımsız yeniden denetim `PASS`.
-- K3PD-01: pin erteleme adaptörü, exact allowlist ve sentetik dal/durum/yol matrisi tamamlandı; hedefli regresyonlar ve G0 geçti; bağımsız salt-okur hüküm `PASS`.
-- K3PD yayın onayı: `NOT_APPROVED`; cihaz/ekran okuyucu/L2/230 kayıt/çalışma/uzak eşlik kapıları `pending`.
-- Önceden kirli `KAPANIS.md`, `README.md` ve `kanit/sonraki/GORSEL-KANIT.md` korunuyor; K3PD kapsamı ve stage dışında.
-- Pinli üretim varlıkları ve sürüm değerleri değişmedi; `App.kao*` handler sayısı 45.
+- Program: aktif; K3PD-00…K3PD-10 bağımsız PASS ile kapandı.
+- Bu kartın başlangıcı: branch `k3pd-denetim-duzeltmeleri`; HEAD `dec3ace0db0991a592685fa989cad1ec423b9c3d`; başlangıç `HEAD...origin/main` 4/0.
+- K3PD-10 kapanış durumu: `done/PASS`; DURUM.nextPrompt `K3PD-11` (yalnız aday, uygulama yetkisi değil).
+- K3PD releaseApproval: `NOT_APPROVED`; yayın yapılmadı.
+- Eski K3P ayrı: 37/37 tamamlandı; eski `nextPrompt=null`; tarihsel onay ardıl K3PD’ye taşınmaz.
+- Başlangıçta kirli olan KAPANIS.md, README.md ve kanit/sonraki/GORSEL-KANIT.md korunuyor; K3PD-10 kapsamı/stage dışında.
+- `App.kao*` ataması 45; schema/migrate, pinler, içerik, FSRS parametreleri ve A/B hash’lerinde değişiklik yok.
+- İlk denetimin boş-anlam R2 bulgusu giderildi: task builder kullanılabilir görev üretmiyorsa gerçek oturum kuyruğundan çıkarılıyor; güncel G0/G1 exit 0. Perf’te yalnız göreli band için slow-host istisnası kaydedildi, mutlak tavanlar geçti.
+
+Sıradaki aday: K3PD-11 (bu PASS yeni karta yetki değildir).
 
 ## K3PD-09 — bağımsız PASS ile kapandı
 
@@ -129,3 +129,14 @@ Kanıt: [K3PD-07/EVIDENCE.md](kanit/K3PD-07/EVIDENCE.md).
 Kanıt: [K3PD-08/EVIDENCE.md](kanit/K3PD-08/EVIDENCE.md).
 
 Sıradaki aday: K3PD-09 (bu PASS uygulama izni değildir).
+
+
+## K3PD-10 — bağımsız PASS ile kapandı
+
+- İlk bağımsız FAIL’in bulgusu seq68’de korundu; boş doğrulanmış anlam için R2’ye düşüp boş başlık gösterme giderildi. Anlamsız build görevi kurulmaz, gerçek oturum/ders practice UI kuyruğuna alınmaz; FSRS ve günlük notlama değişmez.
+- Bağımsız VM ölçümü: build/R3/A, tr>ar, isNew/retry korunuyor; “Anlamı: -den, -dan” görünür, harekeli/harekesiz cevap ilk HTML’de yok. 274 uygun verified lemma, eksik birincil anlam 0. Ladder A=522/1000, 32 build; B/R1 build dışı; kaygı 5 çip/5 düğme.
+- Kart testleri ve bağımsız tekrarlar PASS. Bağımsız perf: p95 17.434 ms, steady 8.250 ms; KAO2_WRITE_BASELINE unset, baseline değişmedi. Yalnız göreli bant slow-host istisnası; mutlak tavanlar geçti. Tarihsel distractor-sıralama tabanı bulunmadığından yalnız eski sıralama karşılaştırması UNVERIFIABLE; K3PD-10 kabul ölçütü değil.
+- App.kao* 45; schema/migrate/pin/content/FSRS/A-B sınır diff’i yok. Üç korunan kirli dosyanın hash’i aynı ve stage dışında. K3PD release NOT_APPROVED; eski K3P 37/37 ve tarihsel onayı ayrı.
+- Bağımsız salt-okur denetim PASS; kart done/PASS. Yayın/push/merge/tag/deploy/görsel yok. K3PD-11 yalnız adaydır.
+
+Kanıt: [K3PD-10/EVIDENCE.md](kanit/K3PD-10/EVIDENCE.md)

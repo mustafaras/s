@@ -140,3 +140,11 @@ Sıradaki aday: K3PD-09 (bu PASS uygulama izni değildir).
 - Bağımsız salt-okur denetim PASS; kart done/PASS. Yayın/push/merge/tag/deploy/görsel yok. K3PD-11 yalnız adaydır.
 
 Kanıt: [K3PD-10/EVIDENCE.md](kanit/K3PD-10/EVIDENCE.md)
+
+## 2026-10-20 — açık kullanıcı onayıyla A adayının yayını
+
+- Yayımlanan aday: a6c5961dbf19a652b8bd7d57cedee1271249ad22; beş commit, origin/main ve Pages hedefi https://mustafaras.github.io/s/. Kullanıcı beş commit’i, üç korunan kirli dosyanın hariç tutulmasını ve K3PD-32/33 sıra istisnasını açıkça onayladı.
+- gh run watch 39429528599 --exit-status: exit 0; aynı SHA için validate ve deploy PASS. Uzak main SHA’sı adayla aynı.
+- index.html, sw.js, panel.html, panel-v2.html, SW offline allowlist’i ve bağlı CSS kaynaklarından çıkarılan 68 public statik URL no-cache/no-store GET ile HTTP 200 ve yerel SHA-256 eşliği verdi.
+- Sınırlama: index.html/sw.js pinleri 20261019a olarak kaldı. Kurulu offline Service Worker aynı URL’lerde önceki quranLearn baytlarını sunabilir; mevcut browser/device istemci güncellemesi doğrulanmadı.
+- K3PD-32/33 kartları yapılmış sayılmadı; nextPrompt=K3PD-11. Yayın onayı yalnız SHA A ve kayıtlı exact scope içindir. Korunan üç dirty dosya aynı hash’lerle dışarıda; tag yok, diğer remote ve seyma-data kullanılmadı. Yayın makbuzu R yalnız bu dalda yerel tutuluyor.

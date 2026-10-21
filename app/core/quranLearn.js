@@ -1798,7 +1798,10 @@
     if(!quranLearnDeps) return false;
     var q=ensureQuranLearn(quranLearnDeps.data()),quiet=quranLearnSurfaceDeps&&quranLearnSurfaceDeps.isQuietTime;
     if(!(q&&q.settings&&q.settings.audio)) return false;
-    try{ return !(typeof quiet==='function'&&quiet()); }catch(_error){ return false; }
+    // Live app dependency is function -> boolean; explicit boolean values stay valid for legacy surfaces.
+    // Unknown or failed quiet-time state must not grant audio permission.
+    if(typeof quiet==='function'){ try{ return quiet()===false; }catch(_error){ return false; } }
+    return quiet===false;
   }
   // K3P-A5: uyarlanır zorluk eşikleri ve kayan pencere.
   var KAO_FLOW_WINDOW=8,KAO_ANXIETY=0.70,KAO_BOREDOM=0.92,KAO_ANXIETY_WRONG=2,KAO_REINTRO_WRONG=3,KAO_HELP_GRADE=2;

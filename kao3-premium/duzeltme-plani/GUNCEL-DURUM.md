@@ -184,15 +184,15 @@ Sıradaki aday: K3PD-13 (bu satır sonraki karta başlama yetkisi değildir).
 - K3PD releaseApproval NOT_APPROVED; eski K3P 37/37 kaydı ayrıdır. Commit veya yayın yapılmadı.
 
 
-## K3PD-14 — ready_for_audit / NOT_MEASURED
+## K3PD-14 — done / PASS (user_attested)
 
-- Tek hedef K3PD-14. K3PD-13 commit’i `8b98d5dea1509716e41ad56efc11aec5b21669b8`; çalışma ağacındaki `quranLearn.js` farkı yalnız bu kartın yaldız ses gate’i ve hata dayanıklılığıdır. Dal `k3pd-denetim-duzeltmeleri`, taban `HEAD...origin/main=3/0`.
-- `isQuietTime` canlı dependency’de `function` ve `SeyAudio.isQuietTime()` çağırıyor. Test boolean/function sınırını denetliyor; gerçek saat yok. Ortak ses izni `q.settings.audio` + sessiz-saat resolver’ı; reduced-motion yalnız görsel timer’ı kapatıyor.
-- Sentetik 2×2×2 sonuç: izin olmayan altı hücre `createAudio=0/play=0`; ses izni ve sessiz olmayan iki hücre `8/8`, reduced-motion dahil. Ses nesnesi/çalma hata yolları okumayı ve yaldız tamamlanmasını durdurmuyor. K3P-21 iki düğme ve `App.kao* = 45` korunuyor.
-- Ortak pin 20261019a→20261021a oldu; `index.html`, `sw.js` ve IIP-22 testi eşleşiyor; K3PD pin ertelemesi boşaltıldı. Pin tazeliği, G0+G1 ve yavaş-host performans sonucu aday commit’i üzerinde yeniden kaydedilecek.
-- Kullanıcının bu oturumdaki açık canlıya alma talimatı için yalnız K3PD-14’e ait bir defalık prompt/denetleyici istisnası eklendi. Bu bağımsız denetim PASS’i değildir; kayıt sonradan `ACCEPTED_DEVIATION` olarak bağlanacaktır. K3PD-15 açılmayacak.
-- Tam exact yazma kapsamı DURUM.json `cards.K3PD-14.changedPaths` içindedir (11 yol). Önceden kirli KAPANIS, README, GORSEL-KANIT.md ve PDF kapsam dışı; başlangıç hashleri korunuyor.
+- Kullanıcı “sıradan devam et” sinyalini, bu oturumda açıklanan bağımsız denetim kuralına göre verdi. Hüküm PASS / user_attested; ayrı rapor veya komut dökümü sunulmadı ve ajan bağımsız denetim yapmadı.
+- K3PD-14 yalnız bu kart kapsamındaki yaldız sesi davranışını sınırlar: ortak q.settings.audio izni ve gerçek dependency sözleşmesi kullanılır; missing/invalid/throwing quiet-time bağımlılığı sesi reddeder. 2×2×2 gerçek çağrı ölçümünde izin olmayan altı hücre 0 createAudio/0 play, izinli iki hücre 8/8; reduced-motion ses iznini kapatmaz.
+- Ses hata/yokluk kipleri okumayı engellemez; yaldız görseli, ses yolu, K3PD-21’in iki düğmesi ve 45 App.kao* ataması korunur. Kart testleri ve DENETLEYICI G0+G1 exit 0; ayrıntılı ölçümler KAYIT seq92 ve EVIDENCE.md’dedir.
+- Bu kartın yerel değişiklikleri 5105b42eaf3b6880173135639c28ffe59e4aee81 tabanından gelir. K3PD-13 ayrı commit’inde kaldı. Dört korunan kirli yolun başlangıç SHA-256 değerleri eşleşti; exact kart yolları dışında hiçbir şey stage’e alınmadı.
+- app/core/quranLearn.js için pin yenilemesi K3PD-32’ye kadar K3PD dalında ertelidir: 62 taze / 1 ertelenmiş / 0 engelleyici; bu release PASS değildir. releaseApproval=NOT_APPROVED; eski A SHA onayı yeni adaya uygulanmaz.
+- Kapanış kapıları PASS. Yalnız exact altı K3PD-14 yolu için yerel commit yapılacak; push, merge, tag, deploy ve screenshot yok. Cihaz, gerçek ekran okuyucu, L2, 230 kayıt ve 14/30 günlük öğrenme etkisi dış kabulleri pending kalır.
 
-Sıradaki aday: K3PD-14 (aday durumudur; bu oturumda K3PD-15 başlatılmayacak).
+Sıradaki aday: K3PD-15 (yalnız aday; başlatılmadı ve bu kayıt başlatma yetkisi vermez).
 
 Kanıt: [K3PD-14/EVIDENCE.md](kanit/K3PD-14/EVIDENCE.md).

@@ -5194,15 +5194,10 @@
     "K3PD-14": {
       "id": "K3PD-14",
       "status": "done",
-      "baseHead": "8b98d5dea1509716e41ad56efc11aec5b21669b8",
+      "baseHead": "5105b42eaf3b6880173135639c28ffe59e4aee81",
       "changedPaths": [
         "app/core/quranLearn.js",
         "tests/kao/test_k3p_lesson_ayah.js",
-        "index.html",
-        "sw.js",
-        "tests/app/test_iip_22.js",
-        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
-        "kao3-premium/duzeltme-plani/DENETLEYICI.md",
         "kao3-premium/duzeltme-plani/DURUM.json",
         "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
         "kao3-premium/duzeltme-plani/KAYIT.md",
@@ -5215,8 +5210,23 @@
           "exitCode": 0,
           "measurements": {
             "branch": "k3pd-denetim-duzeltmeleri",
-            "candidatePathsCommitted": true,
-            "protectedDirtyPathsPreserved": 4
+            "trackedModifiedPaths": [
+              "app/core/quranLearn.js",
+              "kao3-premium/KAPANIS.md",
+              "kao3-premium/README.md",
+              "kao3-premium/duzeltme-plani/DURUM.json",
+              "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+              "kao3-premium/duzeltme-plani/KAYIT.md",
+              "kao3-premium/duzeltme-plani/kanit/K3PD-14/EVIDENCE.md",
+              "tests/kao/test_k3p_lesson_ayah.js"
+            ],
+            "untrackedProtectedPaths": [
+              "kao3-premium/kanit/sonraki/GORSEL-KANIT.md",
+              "kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf"
+            ],
+            "k3pd14ChangedPaths": 6,
+            "stagedPaths": 0,
+            "protectedDirtyPaths": 4
           }
         },
         {
@@ -5224,7 +5234,7 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "sha": "613a19c087e5311d0ecd324caaf470bbada065f7"
+            "sha": "5105b42eaf3b6880173135639c28ffe59e4aee81"
           }
         },
         {
@@ -5232,16 +5242,8 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "ahead": 0,
+            "ahead": 1,
             "behind": 0
-          }
-        },
-        {
-          "command": "git ls-remote origin refs/heads/main",
-          "env": {},
-          "exitCode": 0,
-          "measurements": {
-            "main": "613a19c087e5311d0ecd324caaf470bbada065f7"
           }
         },
         {
@@ -5301,35 +5303,28 @@
           }
         },
         {
-          "command": "node --check sw.js",
-          "env": {},
+          "command": "env -u SEYMA_REPO node .claude/skills/run-seyma/driver.mjs",
+          "env": {
+            "SEYMA_REPO": "unset"
+          },
           "exitCode": 0,
           "measurements": {
-            "syntax": "clean"
+            "syntheticVm": "PASS",
+            "network": "stubbed",
+            "dump": false
           }
         },
         {
-          "command": "node --check tests/app/test_iip_22.js",
-          "env": {},
+          "command": "env -u SEYMA_REPO -u IIP04_RENDER_OUT node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {
+            "SEYMA_REPO": "unset",
+            "IIP04_RENDER_OUT": "unset"
+          },
           "exitCode": 0,
           "measurements": {
-            "syntax": "clean"
-          }
-        },
-        {
-          "command": "node .claude/skills/run-seyma/driver.mjs",
-          "env": {},
-          "exitCode": 0,
-          "measurements": {
-            "syntheticVm": "PASS"
-          }
-        },
-        {
-          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
-          "env": {},
-          "exitCode": 0,
-          "measurements": {
-            "assertions": "95/95"
+            "assertions": "95/95",
+            "syntheticData": true,
+            "outputWrite": false
           }
         },
         {
@@ -5337,19 +5332,14 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
-            "controls": 7,
+            "controls": 8,
             "matrixCells": 8,
             "allowedCreateAudio": 8,
             "allowedPlay": 8,
             "deniedCells": 6,
-            "errorModes": [
-              "missing",
-              "null-audio",
-              "throw-create",
-              "throw-play",
-              "emit-error"
-            ]
+            "deniedCreateAudio": 0,
+            "deniedPlay": 0,
+            "malformedDependencyCases": 3
           }
         },
         {
@@ -5357,7 +5347,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "controls": 6,
             "visibleAudioButtons": 2,
             "AppKaoAssignments": 45
@@ -5368,7 +5357,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "passed": 14,
             "failed": 0
           }
@@ -5389,19 +5377,8 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "controls": 14,
             "quietTimeReadingContinues": true
-          }
-        },
-        {
-          "command": "node tests/app/test_iip_22.js",
-          "env": {},
-          "exitCode": 0,
-          "measurements": {
-            "result": "PASS",
-            "controls": "14/14",
-            "releasePin": "20261021a"
           }
         },
         {
@@ -5409,7 +5386,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "negativeCases": 33,
             "cardPolicyCases": 34,
             "legacyPinPolicyCases": 6,
@@ -5422,7 +5398,17 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS"
+            "result": "PASS",
+            "cases": [
+              "empty",
+              "old",
+              "broken",
+              "idempotent",
+              "orphan",
+              "114 surah",
+              "onboarding",
+              "path"
+            ]
           }
         },
         {
@@ -5430,7 +5416,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "controls": 15,
             "schemaChanged": false
           }
@@ -5440,8 +5425,8 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
-            "publishedVectors": 24
+            "publishedVectors": 24,
+            "tolerance": 0.000001
           }
         },
         {
@@ -5449,7 +5434,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "deterministicTasks": 20,
             "interleaveCases": 1000
           }
@@ -5459,9 +5443,8 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "DIA": "524/524",
-            "targetedMs": 44.038,
+            "targetedMs": 4.315,
             "thresholdMs": 50
           }
         },
@@ -5486,7 +5469,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "controls": 14,
             "surfaces": 552
           }
@@ -5496,7 +5478,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "tests": 83,
             "helpers": 4
           }
@@ -5506,7 +5487,10 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS"
+            "result": "PASS",
+            "switches": 6,
+            "uppercase": 0,
+            "decoration": 0
           }
         },
         {
@@ -5514,19 +5498,18 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "sourcePairs": "524/524"
           }
         },
         {
-          "command": "node tests/k3p_mount.js",
+          "command": "node tests/kao/test_k3p_mount.js",
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "renders": 19,
             "lessonStages": 9,
-            "screenTransitions": 18
+            "screenTransitions": 18,
+            "reinstall": 0
           }
         },
         {
@@ -5542,10 +5525,20 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
-            "fresh": 63,
-            "deferred": 0,
-            "blockingStale": 0
+            "fresh": 62,
+            "deferred": 1,
+            "blockingStale": 0,
+            "deferredFile": "app/core/quranLearn.js",
+            "releasePass": false
+          }
+        },
+        {
+          "command": "node tests/app/test_iip_22.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": "14/14",
+            "releasePin": "20261021a"
           }
         },
         {
@@ -5556,13 +5549,12 @@
           },
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "contentKiB": 184.591,
-            "runtimeKiB": 137.186,
+            "runtimeKiB": 137.187,
             "runtimeCapKiB": 137.25,
             "cssKiB": 15.922,
-            "p95Ms": 8.964,
-            "steadyP95Ms": 3.707,
+            "p95Ms": 7.785,
+            "steadyP95Ms": 3.023,
             "baselineWritten": false,
             "slowHostException": false
           }
@@ -5572,7 +5564,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "mode": "code"
           }
         },
@@ -5581,7 +5572,6 @@
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
             "pairs": 756,
             "belowThreshold": 0
           }
@@ -5592,6 +5582,50 @@
           "exitCode": 0,
           "measurements": {
             "result": "PASS",
+            "cardStatus": "ready_for_audit",
+            "auditVerdict": "NOT_MEASURED",
+            "nextPrompt": "K3PD-14"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-14",
+            "authorizesWork": false
+          }
+        },
+        {
+          "command": "git diff --cached --name-only",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "stagedPaths": 0
+          }
+        },
+        {
+          "command": "shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "startingHashesMatch": true,
+            "protectedHashes": {
+              "kao3-premium/KAPANIS.md": "d8e8419e2849b9eec922e537bca7100149fdfee6120ce850fda77128f8af9bcd",
+              "kao3-premium/README.md": "1aee47cdd05726f4a5966748ae3f786bd79d2e394dd37f3ec7b083f2d36eed0f",
+              "kao3-premium/kanit/sonraki/GORSEL-KANIT.md": "d7627027bba21007550f0a5c76130a4d9f11b7b896d001a60e9333c81ffeed28",
+              "kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf": "05ae0071c87c7bad4ed5f050cbb07479e022e912a67ad401b59e00b52ca8811b"
+            }
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "cardStatus": "done",
+            "auditVerdict": "PASS",
             "nextPrompt": "K3PD-15"
           }
         },
@@ -5605,31 +5639,29 @@
           }
         },
         {
-          "command": "node inline no-cache static asset parity scan (entry HTML, SW manifest, recursive local CSS; fragments excluded)",
+          "command": "git diff --check",
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "PASS",
-            "assets": 68,
-            "matched": 68,
-            "missing": 0,
-            "errors": 0,
-            "hash": "SHA-256"
+            "whitespaceErrors": 0
           }
         },
         {
-          "command": "gh run watch 39616251782 --repo mustafaras/s --interval 5 --exit-status",
+          "command": "shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf",
           "env": {},
           "exitCode": 0,
           "measurements": {
-            "result": "success",
-            "headSha": "613a19c087e5311d0ecd324caaf470bbada065f7",
-            "validate": "success",
-            "deploy": "success"
+            "startingHashesMatch": true,
+            "protectedHashes": {
+              "kao3-premium/KAPANIS.md": "d8e8419e2849b9eec922e537bca7100149fdfee6120ce850fda77128f8af9bcd",
+              "kao3-premium/README.md": "1aee47cdd05726f4a5966748ae3f786bd79d2e394dd37f3ec7b083f2d36eed0f",
+              "kao3-premium/kanit/sonraki/GORSEL-KANIT.md": "d7627027bba21007550f0a5c76130a4d9f11b7b896d001a60e9333c81ffeed28",
+              "kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf": "05ae0071c87c7bad4ed5f050cbb07479e022e912a67ad401b59e00b52ca8811b"
+            }
           }
         }
       ],
-      "auditVerdict": "ACCEPTED_DEVIATION",
+      "auditVerdict": "PASS",
       "evidenceRefs": [
         "kao3-premium/duzeltme-plani/kanit/K3PD-14/EVIDENCE.md"
       ],
@@ -5866,29 +5898,19 @@
     }
   },
   "releaseApproval": {
-    "status": "APPROVED",
-    "candidateSha": "613a19c087e5311d0ecd324caaf470bbada065f7",
-    "scope": [
-      "app/core/quranLearn.js",
-      "tests/kao/test_k3p_lesson_ayah.js",
-      "index.html",
-      "sw.js",
-      "tests/app/test_iip_22.js",
-      "kao3-premium/duzeltme-plani/PROMPTLAR.md",
-      "kao3-premium/duzeltme-plani/DENETLEYICI.md",
-      "kao3-premium/duzeltme-plani/DURUM.json",
-      "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
-      "kao3-premium/duzeltme-plani/KAYIT.md",
-      "kao3-premium/duzeltme-plani/kanit/K3PD-14/EVIDENCE.md"
-    ],
-    "response": "“canlıya al o zaman”; “bunları çözmelisin gerekirse prompt dosyalarımı düzel benim boyle bi istegim yok”",
-    "approvedAt": "2026-10-21",
-    "sourceRef": "Kullanıcının bu oturumdaki açık talimatları, 2026-10-21; chat."
+    "status": "NOT_APPROVED",
+    "candidateSha": null,
+    "scope": [],
+    "response": null,
+    "approvedAt": null,
+    "sourceRef": null
   },
   "pinDeferral": {
     "branch": "k3pd-denetim-duzeltmeleri",
     "until": "K3PD-32",
-    "files": [],
+    "files": [
+      "app/core/quranLearn.js"
+    ],
     "mainExceptions": []
   },
   "externalGates": {

@@ -171,10 +171,15 @@ check('K3P-13 zirve: hareket azaltmada yaldız STATİK (zamanlayıcı kurulmaz)'
   assert.equal((t.api.kaoOverlayHTML(t.NOW).match(/is-gild/g) || []).length, total, 'statik yaldız tüm satırı kaplamalı');
 });
 
-// K3PD-14 · Ses izni KAO audio ayarı + resolver işlevinden gelir; quiet-time gerçek saatten okunmaz.
-function gildAudioCase({ audioEnabled, quiet, reducedMotion, audioMode = 'normal' }) {
+// K3PD-14 · Ses izni KAO audio ayarı + function/boolean quiet-time sözleşmesinden gelir; gerçek saat kullanılmaz.
+function gildAudioCase({ audioEnabled, quiet, reducedMotion, audioMode = 'normal', quietMode = 'function' }) {
   let createAudioCalls = 0, playCalls = 0, trackGildAudio = false;
-  const surface = { isQuietTime: () => quiet };
+  const surface = {};
+  if (quietMode === 'function') surface.isQuietTime = () => quiet;
+  else if (quietMode === 'missing') surface.isQuietTime = undefined;
+  else if (quietMode === 'boolean-true') surface.isQuietTime = true;
+  else if (quietMode === 'boolean-false') surface.isQuietTime = false;
+  else if (quietMode === 'invalid-function') surface.isQuietTime = () => undefined;
   if (audioMode !== 'missing') surface.createAudio = (src) => {
     if (trackGildAudio) {
       createAudioCalls += 1;
@@ -235,6 +240,18 @@ check('K3PD-14 ses izni matrisi: ayar × sessiz saat × hareket azaltma gerçek 
     }
   }
   console.log(`K3PD-14 matrix measurements: ${measurements.join(' · ')}`);
+});
+
+check('K3PD-14 sessiz-saat bağımlılığı function/boolean sözleşmesini fail-closed uygular', () => {
+  for (const quietMode of ['missing', 'boolean-true', 'invalid-function']) {
+    const result = gildAudioCase({ audioEnabled: true, quiet: false, reducedMotion: false, quietMode });
+    assert.equal(result.createAudioCalls, 0, `${quietMode}: createAudio=0`);
+    assert.equal(result.playCalls, 0, `${quietMode}: play=0`);
+    assert.ok(result.t.ui.kaoGildTimer, `${quietMode}: sessiz görsel yaldız sürmeli`);
+  }
+  const explicitNotQuiet = gildAudioCase({ audioEnabled: true, quiet: false, reducedMotion: false, quietMode: 'boolean-false' });
+  assert.ok(explicitNotQuiet.createAudioCalls > 0, 'boolean false sözleşmesinde createAudio başlamalı');
+  assert.equal(explicitNotQuiet.playCalls, explicitNotQuiet.createAudioCalls, 'boolean false sözleşmesindeki sesler oynatılmalı');
 });
 
 check('K3PD-14 ses yokluğu veya hata okumayı ve sessiz yaldız zamanlayıcısını durdurmaz', () => {

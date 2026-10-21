@@ -2,7 +2,7 @@
 // K3P-15 · Üç kollu geri bildirim (K-C, A-4). Sentetik VM; ağ, tarayıcı, gerçek veri yok.
 //   - Hızlı doğru (süre kişisel medyanın altı): tam panel açılmaz; şık doğru + ✓; 600 ms sonra otomatik geçiş.
 //   - Yavaş doğru (medyanın üstü ya da bu görevde ses dinlendi): tek satırlık şerit; 1.600 ms sonra geçiş;
-//     şeride dokunulursa (Devam = mevcut kaoContinue çoğaltıcısı) otomatik geçiş durur ve aynı dokunuş ilerletir.
+//     şeride ilk aktivasyon timer'ı iptal edip aynı görevde Devam'ı açar; ikinci aktivasyon ilerletir.
 //   - Yanlış: tam kart, otomatik geçiş yok, "Yanlışlıkla dokundum" geri alması var.
 //   - Ayar kapalıysa (autoAdvance === false): doğru cevapta kompakt şerit + tek "Devam" dokunuşu.
 //   - Medyan yalnız `ui.kaoLatency` içinde (son 50); kalıcı yazılmaz. Yeni kullanıcı varsayılanı autoAdvance: true,
@@ -37,6 +37,19 @@ for (const relative of [
 const api = sandbox.window.SeymaQuranLearn;
 const timers = [];
 let cleared = 0;
+const taskDocument = { activeElement: null };
+const taskElement = {
+  ownerDocument: taskDocument,
+  html: '',
+  set innerHTML(value) { this.html = String(value); taskDocument.activeElement = null; },
+  get innerHTML() { return this.html; },
+  setAttribute() {}, removeAttribute() {}, getAttribute() { return null; }, contains() { return false; },
+  querySelector(selector) {
+    if (!['.kao-feedback-continue', '.kao-feedback-strip-continue'].includes(selector) || !this.html.includes(selector.slice(1))) return null;
+    return { className: selector.slice(1), focus() { taskDocument.activeElement = this; } };
+  },
+  querySelectorAll() { return []; }
+};
 let data = { quranLearn: null };
 const ui = { kaoQueue: [], kaoTasks: {}, kaoTaskIndex: 0, kaoTaskStartedAt: 0, kaoUndo: null, kaoFeedback: '', kaoAudioFailed: false, kaoPanel: { open: false } };
 
@@ -46,7 +59,7 @@ assert.equal(api.registerQuranLearn({
 }), true);
 assert.equal(api.registerQuranLearnSurface({
   lockBody() {}, unlockBody() {}, focusDialog() {}, activeElementId() { return ''; }, restoreFocus() {},
-  sheetClose(_e, _b, done) { if (done) done(); }, mount() {}, taskElement() { return null; },
+  sheetClose(_e, _b, done) { if (done) done(); }, mount() {}, taskElement() { return taskElement; },
   createAudio(src) { return { src, preload: '', addEventListener() {}, play() { return Promise.resolve(); } }; },
   isQuietTime() { return false; }, setTimer(fn, ms) { timers.push({ fn, ms }); return timers.length; }, clearTimer() { cleared += 1; }, toast() {}
 }), true);
@@ -70,7 +83,8 @@ function show(task) {
   ui.kaoTasks = { [task.id]: task }; ui.kaoTaskIndex = 0; ui.kaoTaskStartedAt = now - 300;
 }
 const sheet = (html) => (html.match(/<section class="kao-feedback-sheet[\s\S]*?<\/section>/) || [''])[0];
-const strip = (html) => /<p class="kao-feedback-strip" role="status"/.test(html);
+const strip = (html) => /class="kao-feedback-strip"/.test(html);
+const stripPause = (html) => /<button type="button" class="kao-feedback-strip"[^>]*aria-label="[^"]+"[^>]*onclick="App\.kaoContinue\(true\)"/.test(html);
 const stripContinue = (html) => /class="kao-feedback-strip-continue"[^>]*onclick="App\.kaoContinue\(\)"/.test(html);
 
 // ---- A · Hızlı doğru (autoAdvance açık): panel açılmaz, 600 ms sonra otomatik geçiş ----------
@@ -121,18 +135,52 @@ assert.equal(api.kaoAnswer(replayed.id, 'right').correct, true);
 assert.equal(ui.kaoPanel.slow, true, 'ses dinlenen görevde doğru cevap yavaş kol');
 assert.equal(timers[0].ms, 1600);
 
-// dokunuş: şeritteki "Devam" otomatik geçişi durdurur ve ilerletir (mevcut kaoContinue çoğaltıcısı).
+// İlk aktivasyon şeridi duraklatır; aynı görev kalır, Devam görünür ve odak ona taşınır.
 freshData({ autoAdvance: true });
 ui.kaoLatency = [1000];
 ui.kaoTaskStartedAt = now - 2000;
 const tapped = wordTask('tapped', 'w:l_tap:ar>tr');
 show(tapped); ui.kaoTaskStartedAt = now - 2000;
+const tappedNext = wordTask('tapped-next', 'w:l_tap_next:ar>tr');
+ui.kaoQueue.push({ id: tappedNext.id, cardId: tappedNext.cardId, type: tappedNext.type, isNew: tappedNext.isNew });
+ui.kaoTasks[tappedNext.id] = tappedNext;
 api.kaoAnswer(tapped.id, 'right');
-assert.ok(stripContinue(api.kaoTaskHTML(tapped)), 'yavaş şeritte "Devam" dokunuşu var');
+const tappedHtml = api.kaoTaskHTML(tapped);
+assert.ok(stripPause(tappedHtml), 'yavaş şerit gerçek, etiketli bir düğme olmalı');
+assert.ok(stripPause(taskElement.html), 'ilk gerçek paint geçişinde pause düğmesi görünmeli');
+assert.ok(!stripContinue(tappedHtml), 'ilk aktivasyondan önce Devam gösterilmemeli');
 assert.equal(timers.length, 1);
-assert.equal(api.kaoContinue(), true, 'şerit Devam ilerletir');
-assert.ok(cleared >= 1, 'dokunuş bekleyen otomatik geçiş zamanlayıcısını durdurur');
-assert.equal(ui.kaoTaskIndex, 1);
+const staleSlowTimer = timers[0].fn;
+assert.equal(api.kaoContinue(true), true, 'ilk şerit aktivasyonu duraklatır');
+assert.equal(ui.kaoTaskIndex, 0, 'ilk aktivasyon aynı görevde kalır');
+assert.equal(ui.kaoPanel.open, true, 'ilk aktivasyondan sonra geri bildirim açık kalır');
+assert.equal(ui.kaoPanel.paused, true, 'duraklatma panel durumunu kaydeder');
+assert.ok(cleared >= 1, 'ilk aktivasyon 1.600 ms zamanlayıcısını iptal eder');
+assert.ok(stripContinue(api.kaoTaskHTML(tapped)), 'ilk aktivasyon Devam düğmesini açar');
+assert.equal(taskDocument.activeElement && taskDocument.activeElement.className, 'kao-feedback-strip-continue', 'odak Devam düğmesine taşınır');
+assert.equal(api.kaoContinue(true), false, 'çift aktivasyon ikinci kez duraklatıp ilerletmez');
+assert.equal(ui.kaoTaskIndex, 0, 'çift aktivasyon aynı görevde tutar');
+staleSlowTimer();
+assert.equal(ui.kaoTaskIndex, 0, 'iptal edilmiş eski timer görevi ilerletemez');
+assert.equal(api.kaoContinue(), true, 'ikinci, bilinçli Devam ilerletir');
+assert.equal(ui.kaoTaskIndex, 1, 'ikinci aktivasyon tam bir ilerleme yapar');
+ui.kaoTaskStartedAt = now - 100;
+assert.equal(api.kaoAnswer(tappedNext.id, 'right').correct, true, 'ikinci görev gerçek cevap yoluyla açılır');
+assert.equal(ui.kaoPanel.taskId, tappedNext.id, 'ikinci görev kendi geri bildirimini gösterir');
+staleSlowTimer();
+assert.equal(ui.kaoTaskIndex, 1, 'eski callback sonraki görevi atlayamaz');
+assert.equal(ui.kaoPanel.open, true, 'eski callback yeni görevin panelini kapatamaz');
+
+// Modal kapatma da açık zamanlayıcıyı geçersiz kılar.
+freshData({ autoAdvance: true });
+ui.kaoLatency = [1000];
+const closeRace = wordTask('close-race', 'w:l_close_race:ar>tr');
+show(closeRace); ui.kaoTaskStartedAt = now - 2000;
+api.kaoAnswer(closeRace.id, 'right');
+const staleCloseTimer = timers[0].fn;
+assert.equal(api.kaoClose(), true, 'geri bildirim açıkken modal kapanabilmeli');
+staleCloseTimer();
+assert.equal(ui.kaoTaskIndex, 0, 'modal kapandıktan sonra eski timer ilerletmez');
 
 // ---- C · Yanlış: tam kart, otomatik geçiş yok, geri alma var --------------------------------
 freshData({ autoAdvance: true });

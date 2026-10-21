@@ -508,7 +508,7 @@ Ayet ve okunuşta aynı konum boşalsın; hedef birden çok kez geçiyorsa cevap
 
 **Oku:** kaoOpenFeedback/AutoAdvance/Continue, task HTML; test_k3p_feedback_arms.js; 05 latency sözleşmesi.
 
-**Yazma allowlist’i:** quranLearn.js; yalnız gerekirse kao.css; feedback_arms/feedback_copy ve lesson_moment fixture’ları; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-13 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearn.js`; `app/kao.css` (yalnız gerekirse); `tests/kao/test_k3p_feedback_arms.js`; `tests/kao/test_k3p_feedback_copy.js`; `tests/kao/test_k3p_lesson_moment.js`; `tests/kao/test_kao2_perf_budget.js` (yalnız runtime gzip tavanını 137’den 137.25 KiB’ye çıkar; 2026-10-21 kullanıcı onayı); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-13/EVIDENCE.md`.
 
 **Uygula:**
 

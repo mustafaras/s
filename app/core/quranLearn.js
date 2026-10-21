@@ -2010,9 +2010,13 @@
     if(panel&&panel.correct===true&&kaoAutoAdvanceOn&&panel.slow!==true){
       // K3P-15 hızlı doğru: tam panel açılmaz; şık ✓ işareti ve 600 ms'lik otomatik geçiş yeter.
     }else if(panel&&panel.correct===true){
-      // Yavaş doğru ya da ayar kapalı: tek satır + "Devam" dokunuşu.
-      h+='<p class="kao-feedback-strip" role="status" aria-live="polite">Doğru</p>';
-      h+='<button type="button" class="kao-feedback-strip-continue" onclick="App.kaoContinue()">Devam</button>';
+      // Yavaş doğru + otomatik geçiş açık: ilk gerçek düğme etkinleştirmesi yalnız timer'ı duraklatır.
+      if(kaoAutoAdvanceOn&&!panel.paused){
+        h+='<button type="button" class="kao-feedback-strip" aria-live="polite" aria-label="Doğru, duraklat" onclick="App.kaoContinue(true)">Doğru</button>';
+      }else{
+        h+='<p class="kao-feedback-strip" role="status" aria-live="polite">Doğru</p>';
+        h+='<button type="button" class="kao-feedback-strip-continue" onclick="App.kaoContinue()">Devam</button>';
+      }
     }else if(panel){
       var answer=String(panel.answer||task.answer||task.choices.filter(function(item){ return item.correct===true; }).map(function(item){ return item.label; }).join(' · '));
       // Geri bildirim satır satır: Arapça cevap kendi RTL satırında, sonra künye ve kural ayrı satırlar.
@@ -2182,11 +2186,16 @@
     if(panel&&panel.correct===true) return panel.slow===true?KAO_SLOW_ADVANCE_MS:KAO_FAST_ADVANCE_MS;
     return panel&&typeof panel.pauseMs==='number'?panel.pauseMs:KAO_FAST_ADVANCE_MS;
   }
+  function kaoCancelAdvance(ui){
+    var timer=ui.kaoAdvanceTimer;
+    ui.kaoAdvanceTimer=null;
+    if(timer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(timer);
+  }
   function kaoAutoAdvance(ui,q,delayMs){
     // K3P-15: otomatik geçiş yalnız doğru cevapta kurulur; süre kola göre 600/1.600 ms.
-    if(q.settings.autoAdvance!==true||!ui.kaoPanel||ui.kaoPanel.open!==true||ui.kaoPanel.correct!==true||!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.setTimer!=='function') return false;
-    ui.kaoAdvanceTimer=quranLearnSurfaceDeps.setTimer(function(){ if(ui.kaoPanel&&ui.kaoPanel.open===true) kaoContinue(); },typeof delayMs==='number'?delayMs:kaoAdvanceMs(ui.kaoPanel));
-    return true;
+    if(q.settings.autoAdvance!==true||!ui.kaoPanel.correct||!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.setTimer!=='function') return;
+    var panel=ui.kaoPanel;
+    ui.kaoAdvanceTimer=quranLearnSurfaceDeps.setTimer(function(){ return kaoContinue(panel); },delayMs);
   }
   // K2F-31: sıradaki-adım tahmini de bu içerikle çalışır; ses haritası sözlük başına bir kez kurulur.
   var kaoAudioLemmaCache={lexicon:null,map:null};
@@ -2269,7 +2278,7 @@
       if(current&&current.kind==='summary'&&state.kind==='mastery') kaoMasteryRecord(state);
       if(current&&current.kind==='summary'&&state.kind==='repair') kaoRepairFinish(state);
     }
-    kaoLessonResume(ui); ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoOrderDraft=[]; ui.kaoFeedback=''; ui.kaoAdvanceTimer=null; ui.kaoGildIndex=0; ui.kaoGildCount=0; ui.kaoGildTimer=null; kaoSave();
+    ui.kaoAdvanceTimer=null; kaoLessonResume(ui); ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoOrderDraft=[]; ui.kaoFeedback=''; ui.kaoGildIndex=0; ui.kaoGildCount=0; ui.kaoGildTimer=null; kaoSave();
     kaoApplyView(ui,'session',null,ui.kaoView==='session'?'replace':'push');
     quranLearnDeps.render();
     var activeItem=(state.plan||[])[state.at||0]; if(phase==='lesson'&&activeItem&&activeItem.kind==='summary') kaoLessonMilestoneConfetti(ui);
@@ -2515,8 +2524,7 @@
     if(action==='skip-mastery') return kaoMasterySkip(lessonId);
     // K2F-28: ✕ tek çıkış eylemi — ders de tekrar oturumu da buradan Bugün'e döner; bekleyen geçiş/panel temizlenir.
     if(action==='exit'){
-      if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
-      ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoOrderDraft=[];
+      kaoCancelAdvance(ui); ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoOrderDraft=[];
       if(state){ kaoLessonResume(ui); kaoSave(); }
       kaoShadowCleanup(); kaoApplyView(ui,'home',null,'reset'); quranLearnDeps.render();
       if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.focusDialog==='function') quranLearnSurfaceDeps.focusDialog('sey-ov-card');
@@ -2670,13 +2678,17 @@
     kaoAutoAdvance(ui,q,kaoAdvanceMs(ui.kaoPanel));
     return {correct:correct,grade:grade};
   }
-  function kaoContinue(){
+  function kaoContinue(advanceToken){
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),q=ensureQuranLearn(quranLearnDeps.data());
     if(!ui.kaoPanel||ui.kaoPanel.open!==true) return false;
+    if(advanceToken===true){
+      if(q.settings.autoAdvance!==true||ui.kaoPanel.correct!==true||ui.kaoPanel.slow!==true||ui.kaoPanel.paused) return false;
+      kaoCancelAdvance(ui); ui.kaoPanel.paused=true; paintTask(); return true;
+    }
+    if(advanceToken&&(ui.kaoPanel!==advanceToken||advanceToken.paused)) return false;
     var panel=ui.kaoPanel,elapsed=panel.correct===true?Math.max(0,Date.now()-nonNegativeNumber(ui.kaoTaskStartedAt,Date.now())):null;
-    if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
-    ui.kaoAdvanceTimer=null; ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=Date.now(); ui.kaoPlayed=false; ui.kaoOrderDraft=[];
+    kaoCancelAdvance(ui); ui.kaoPanel={open:false}; ui.kaoUndo=null; ui.kaoFeedback=''; ui.kaoTaskIndex+=1; ui.kaoTaskStartedAt=Date.now(); ui.kaoPlayed=false; ui.kaoOrderDraft=[];
     if(ui.kaoLesson&&ui.kaoLesson.phase==='practice'){
       if(ui.kaoTaskIndex>=(ui.kaoQueue||[]).length){
         ui.kaoLesson.at=ui.kaoLesson.practiceEndAt; ui.kaoLesson.phase='lesson';
@@ -2705,8 +2717,7 @@
     if(undo.lesson) ui.kaoLesson=cloneValue(undo.lesson);
     if(undo.kind==='delayed') { if(undo.hadSurah) q.surahs[undo.surahId]=cloneValue(undo.surah); else delete q.surahs[undo.surahId]; }
     if(undo.kind==='transfer') { if(undo.hadTransfer) q.transfer=cloneValue(undo.transfer); else delete q.transfer; }
-    if(ui.kaoAdvanceTimer&&quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.clearTimer==='function') quranLearnSurfaceDeps.clearTimer(ui.kaoAdvanceTimer);
-    ui.kaoAdvanceTimer=null; ui.kaoQueue=cloneValue(undo.queue); ui.kaoTaskIndex=undo.taskIndex; ui.kaoTaskStartedAt=Date.now(); ui.kaoPlayed=false; ui.kaoLatency=kaoLatencyBefore; ui.kaoWindow=kaoWindowBefore; ui.kaoWrongStreak=kaoWrongBefore; ui.kaoDurableCount=Math.floor(nonNegativeNumber(undo.durableCount,0)); ui.kaoOrderDraft=cloneValue(undo.orderDraft)||[]; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoFeedback='Geri alındı';
+    kaoCancelAdvance(ui); ui.kaoQueue=cloneValue(undo.queue); ui.kaoTaskIndex=undo.taskIndex; ui.kaoTaskStartedAt=Date.now(); ui.kaoPlayed=false; ui.kaoLatency=kaoLatencyBefore; ui.kaoWindow=kaoWindowBefore; ui.kaoWrongStreak=kaoWrongBefore; ui.kaoDurableCount=Math.floor(nonNegativeNumber(undo.durableCount,0)); ui.kaoOrderDraft=cloneValue(undo.orderDraft)||[]; ui.kaoUndo=null; ui.kaoPanel={open:false}; ui.kaoFeedback='Geri alındı';
     kaoSave(); paintTask(); return true;
   }
   // KAO2-22: ses kimlikleri iki biçimlidir — kelime klibi
@@ -4462,6 +4473,7 @@
   }
   function kaoClose(){
     if(!quranLearnDeps||!quranLearnSurfaceDeps) return false;
+    var closingUi=quranLearnDeps.ui(); if(closingUi.kaoPanel) closingUi.kaoPanel.open=false;
     var body=function(){
       var ui=quranLearnDeps.ui(),returnId=ui.kaoReturnFocusId||'';
       kaoShadowCleanup(); quranLearnSurfaceDeps.unlockBody(); ui.kaoOpen=false; ui.kaoStack=[]; ui.kaoView='home'; ui.kaoReturnFocusId=''; ui.kaoWhatsNew=false; ui.kaoOnboard=null; ui.kaoAdvanceOffer=false;

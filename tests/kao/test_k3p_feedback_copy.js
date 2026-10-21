@@ -14,7 +14,10 @@ const fail = (msg) => { if (failures.length < 30) failures.push(msg); };
 const sheetOf = (html) => { const at = html.indexOf('<section class="kao-feedback-sheet'); return at < 0 ? '' : html.slice(at, html.indexOf('</section>', at) + 10); };
 // K3P-15 (K-C) üç kol: hızlı doğruda panel/şerit yok (yalnız ✓ + 600 ms geçiş); yavaş doğruda panel yerine tek
 // satırlık pekiştirme şeridi; yanlışta tam panel. Doğru kol, kişisel medyana göre belirlenir.
-const stripOf = (html) => { const at = html.indexOf('<p class="kao-feedback-strip'); return at < 0 ? '' : html.slice(at, html.indexOf('</p>', at) + 4); };
+const stripOf = (html) => {
+  const match = /<(p|button)\b[^>]*class="kao-feedback-strip"[^>]*>[\s\S]*?<\/\1>/.exec(html);
+  return match ? match[0] : '';
+};
 const seen = { correct: 0, wrong: 0, order: 0, summary: 0, strip: 0, fast: 0, reintro: 0 };
 
 function checkSheet(sheet, correct, where) {
@@ -43,7 +46,12 @@ function checkCorrect(html, panel, where) {
 
 function checkStrip(strip, where) {
   if (!strip) { fail(`${where}: pekiştirme şeridi yok`); return; }
-  if (!/role="status" aria-live="polite"/.test(strip)) fail(`${where}: şerit aria-live taşımıyor`);
+  if (strip.startsWith('<button')) {
+    if (!/type="button"/.test(strip)) fail(`${where}: şerit native button değil`);
+    if (!/aria-label="Doğru[^"]+"/.test(strip)) fail(`${where}: duraklatma düğmesinin erişilebilir adı eksik`);
+    if (!/aria-live="polite"/.test(strip)) fail(`${where}: şerit canlı durum taşımıyor`);
+    if (!/onclick="App\.kaoContinue\(true\)"/.test(strip)) fail(`${where}: şerit duraklatma çoğaltıcısına bağlı değil`);
+  } else if (!/role="status" aria-live="polite"/.test(strip)) fail(`${where}: durum şeridi aria-live taşımıyor`);
   const text = strip.replace(/<[^>]+>/g, '').trim();
   if (text !== 'Doğru') fail(`${where}: şerit metni "${text}"`);
 }

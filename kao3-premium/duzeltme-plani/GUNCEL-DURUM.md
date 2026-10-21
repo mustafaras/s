@@ -177,3 +177,13 @@ Kanıt: [K3PD-10/EVIDENCE.md](kanit/K3PD-10/EVIDENCE.md)
 - Yalnız eski distractor sıralama tabanı `UNVERIFIABLE`; bu karşılaştırma K3PD-12 kabul ölçütü değildir. K3PD-11 için K3PD-29 görsel kabulü ayrı ve açık kalır.
 
 Sıradaki aday: K3PD-13 (bu satır sonraki karta başlama yetkisi değildir).
+
+## K3PD-13 — done / PASS (user_attested)
+
+- Kullanıcı, bağımsız denetimleri kendisinin yaptığını ve “devam et” dediğinde ilerlememi istedi; bu sinyal önceki mutabakat uyarınca K3PD-13 kabulü olarak kaydedildi. Ayrı denetçi raporu veya komut dökümü paylaşılmadı; bu nedenle hüküm yalnız kullanıcı beyanıdır, ajan bağımsız doğrulaması değildir.
+- Yavaş doğru şeridinin ilk native düğme aktivasyonu 1.600 ms timer’ı iptal edip aynı görevde duraklatıyor; ikinci Devam bir kez ilerletiyor. Eski timer callback’i sonraki görevi atlamıyor. Hızlı/yanlış/ayar-kapalı kollar korundu; yeni App.kao*, şema/migrate veya pin yok.
+- Kart kontrolleri ve canlı DENETLEYICI G0+G1 komutları exit 0. Perf L9 runtime 137.096 KiB / tavan 137.25 KiB, CSS 15.922 KiB, içerik 184.591 KiB, p95 15.134 ms. Göreli perf bandı belgelenmiş slow-host istisnasıyla atlandı; 467.833 ms veren yüklü ölçüm başarısızlığı kanıtta tutuldu.
+- Üç korunan kirli dosyanın hashleri başlangıç değerleriyle aynı; baseline yazılmadı. Tarayıcı, ekran okuyucu ve cihaz kabulü ajan tarafından yapılmadı; programın ilgili dış kapıları pending kalır.
+- K3PD releaseApproval NOT_APPROVED; eski K3P 37/37 kaydı ayrıdır. Commit veya yayın yapılmadı.
+
+Sıradaki aday: K3PD-14 (bu satır sonraki karta başlama yetkisi değildir).

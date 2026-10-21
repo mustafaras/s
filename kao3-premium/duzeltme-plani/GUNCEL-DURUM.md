@@ -1,18 +1,15 @@
 # K3PD güncel durum
 
-- Program aktif; K3PD-00…K3PD-10 `done/PASS`; K3PD-11 `source_ready/EVIDENCE_PENDING` ve K3PD-29 görsel kabulü beklemede; K3PD-12 `done/PASS` (kullanıcı tarafından raporlanan bağımsız salt-okur denetimi); `nextPrompt=K3PD-13`.
-- K3PD-11 başlangıç anlık görüntüsü: branch `k3pd-denetim-duzeltmeleri`; HEAD `9c211a5aabc4be4058a4d3f7308d337dc4473fc8`; `HEAD...origin/main` `1/0`. Açılışta `durum.mjs --check` PASS ve `--sonraki` K3PD-11 idi.
-- Seçilen harfler tek RTL metin düğümünde birleşiyor; çip adları OpenLearn Table 3.1 ve hamza §2.2’deki gerçek Arapça adlardan geliyor. Tekrar harfli/bağlanmayan harf, ters sıra, geri alma, source adları ve word-order ayrımı test edildi.
-- Kullanıcı onayıyla yalnız `tests/kao/test_kao2_perf_budget.js` runtime gzip tavanı 136→137 KiB oldu; son izole test runtime `136.810 KiB`, CSS `15.890 KiB`, content `184.591 KiB`, p95 `5.483 ms`, steady `3.060 ms`; baseline yazılmadı.
-- G0 exit 0; her G1 komutu ayrı/izole nihai çalıştırmada exit 0. Eşzamanlı G1 perf denemesi exit 1 olarak ayrıca kanıtta tutuldu; iki izole tekrar exit 0 verdi. A11y sonucu otomatik sözleşme kanıtıdır; gerçek ekran okuyucu/cihaz kabulü değildir.
-- K3PD-11 çalışma ağacı başlangıcında `releaseApproval=NOT_APPROVED`; izlenen başlangıç HEAD’inde onaylı olan SHA `a6c5961dbf19a652b8bd7d57cedee1271249ad22` ve seq71 makbuzu yalnız o A adayı içindir, bu kartı/yeni adayı kapsamaz. Eski K3P `37/37`, `nextPrompt=null` ve `APPROVED-2026-10-18` legacy onayı ayrı durur.
-- KAPANIS.md, README.md ve `kanit/sonraki/GORSEL-KANIT.md` hashleri korunuyor. Pin, index.html, sw.js, schema/migrate, içerik modülü ve App.kao* sayısı değiştirilmedi.
-- Denetimde bulunan iki kaynak/test açığı düzeltildi: kısmi build seçiminde odak sıradaki doğru ve etkin harfe taşınıyor; gerçek build seçimlerinin `ariaLabel` ve DOM adı onaylı kaynak tablosuyla karşılaştırılıyor. Davranış testi, K(drag), V(a11y), T(pronunciation_contract), G0 ve G1 exit 0; bağımsız salt-okur denetçi source_ready için PASS verdi.
-- K3PD-12’nin cloze kabulü ve yerel doğrulamaları tamamlandı; kullanıcı bağımsız denetimi PASS olarak bildirdi. Bu sonuç kullanıcı beyanıdır; denetim makbuzu/komut dökümü verilmediğinden ajan tarafından bağımsız tekrar edildiği iddia edilmiyor. K3PD-12 `done/PASS`; `nextPrompt=K3PD-13` yalnız adaydır, K3PD-13 başlatılmadı. K3PD-11 `source_ready/EVIDENCE_PENDING`; K3PD-29 görsel kabulü bekliyor. K3PD releaseApproval `NOT_APPROVED`; push/merge/tag/deploy veya screenshot yok.
+- Program aktif. K3PD-14 done/ACCEPTED_DEVIATION; nextPrompt=K3PD-15. Kapanış kullanıcı talimatına dayalıdır; bağımsız denetim yapılmamıştır ve PASS olarak sunulmaz.
+- Yalnız K3PD-14 A adayı 613a19c087e5311d0ecd324caaf470bbada065f7 için releaseApproval=APPROVED ve tam 11 exact yol kapsamı kaydedilmiştir. K3PD programı genel released durumuna geçirilmemiştir.
+- GitHub Pages workflow run [39616251782](https://github.com/mustafaras/s/actions/runs/39616251782): validate=success, deploy=success; uzak main SHA adayla eşit. Statik URL no-cache denetimi 68/68 SHA-256 eşliği, 0 eksik ve 0 hata verdi; dört ana giriş/çalışma zamanı varlığı ayrıca eşleşti.
+- Son G0/G1: hedef kart testleri, kontrol kapısı ve ortak KAO regresyonları exit 0; pin freshness 63/63 taze, 0 ertelenmiş; performans 184.591 KiB içerik, 137.186/137.25 KiB runtime, 15.922 KiB CSS, p95 8.964 ms ve steady 3.707 ms. Baseline yazılmadı; slow-host istisnası kullanılmadı.
+- Paylaşılan quranLearn.js farkı K3PD-13 commit’inden temiz ayrılmıştır. KAPANIS, README, GORSEL-KANIT.md ve PDF başlangıç hashleri aynı kaldı ve yayına alınmadı. Eski K3P 37/37/tarihsel onay K3PD onayı değildir.
+- Cihaz, ekran okuyucu, L2, 230 kayıt ve öğrenme etkisi kapıları kullanıcı tarafında pending; K3PD-11/K3PD-29 görsel kabulü de ayrı pending kalır. K3PD-15 yalnız sıradaki adaydır; başlatılmadı.
 
-Kanıt: [K3PD-11/EVIDENCE.md](kanit/K3PD-11/EVIDENCE.md).
+Kanıt: [K3PD-14/EVIDENCE.md](kanit/K3PD-14/EVIDENCE.md).
 
-Sıradaki aday: K3PD-12 (durum aracıyla doğrulandı; bu kart için çalışma yetkisi değildir).
+Sıradaki aday: K3PD-15 (yalnız aday; bu oturumda başlatılmadı).
 
 ## K3PD-09 — bağımsız PASS ile kapandı
 

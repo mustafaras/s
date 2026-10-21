@@ -2,10 +2,10 @@
 
 ## Durum ve başlangıç
 
-- Kart `ready_for_audit / NOT_MEASURED`; kullanıcı doğrudan bu oturumda canlıya alma talimatı verdi. Denetim PASS’i uydurulmayacak; izin verilen istisna kullanıcı sapması olarak kaydedilecek.
-- K3PD-13 commit’i `8b98d5dea1509716e41ad56efc11aec5b21669b8`; dirty `app/core/quranLearn.js` farkı yalnız K3PD-14’tür. Dal `k3pd-denetim-duzeltmeleri`; başlangıç `HEAD...origin/main=3/0`.
-- Eski `K3P-STATE.json` ayrı okundu: 37/37 `completed`, `nextPrompt=null`, tarihsel release approval `APPROVED-2026-10-18`. K3PD release approval başlangıçta `NOT_APPROVED` idi.
-- K3PD-13’ün paylaşılan kaynak dosyasındaki değişiklik committed `HEAD`’de ayrıdır. K3PD-14’ün 11 exact yazma yolu DURUM.json ve prompt allowlist’inde eşleşir.
+- Kart done / ACCEPTED_DEVIATION; bu hüküm bağımsız denetim PASS’i değildir. Kullanıcı bu oturumda açıkça “canlıya al o zaman” dedi ve ardından prompt kurallarını çözmemizi istedi; buna dayanarak yalnız K3PD-14 istisnası uygulandı.
+- Başlangıç HEAD 8b98d5dea1509716e41ad56efc11aec5b21669b8, K3PD-13 commit’i. Paylaşılan quranLearn.js farkı K3PD-13’ten temiz ayrıdır. Aday commit 613a19c087e5311d0ecd324caaf470bbada065f7; remote main aynı SHA’dadır.
+- K3PD-14 exact kapsamı 11 yoldur. Korunan KAPANIS, README, GORSEL-KANIT.md ve PDF kapsam dışıdır; başlangıç SHA-256’ları aynı kaldı.
+- Eski K3P state ayrı tutuldu: 37/37 completed, nextPrompt null ve tarihsel release approval K3PD release onayı değildir.
 
 ## Kaynak sözleşmesi ve düzeltme
 
@@ -38,8 +38,16 @@
 
 G0/G1, asset freshness ve perf kapıları aday commit üzerinde son kez çalıştırılıp sonraki kayda eklenecek.
 
-## Yetki ve sınırlar
+## G0/G1 ve canlı yayın sonucu
 
-- Prompt ve denetleyiciye eklenen bir defalık istisna yalnız bu K3PD-14 adayı içindir. Kullanıcının “canlıya al o zaman” ve prompt kapısını düzeltme talimatı bağımsız denetim ve K3PD-32/33 sırası için açık sapma yetkisi sayılır; ajan bunu bağımsız PASS olarak göstermeyecek.
-- Public Pages kaynak/varlık SHA paritesi ve doğru SHA’ya ait workflow olmadan canlı teslim tamamlandı denmeyecek. Gerçek hesap browser’ı, ekran görüntüsü, kişisel veri, token, `seyma-data`, tag ve K3PD-15 kapsam dışıdır.
-- Korunan dirty yolların başlangıç hashleri: KAPANIS `d8e8419e2849b9eec922e537bca7100149fdfee6120ce850fda77128f8af9bcd`; README `1aee47cdd05726f4a5966748ae3f786bd79d2e394dd37f3ec7b083f2d36eed0f`; GORSEL-KANIT.md `d7627027bba21007550f0a5c76130a4d9f11b7b896d001a60e9333c81ffeed28`; PDF `05ae0071c87c7bad4ed5f050cbb07479e022e912a67ad401b59e00b52ca8811b`.
+- Beş kart testi, IIP-22 14/14, K3PD control 33 negatif + 34 kart politikası + 6 legacy-pin politikası, G0 ve G1 kapıları exit 0. Ayrıntılı gerçek komut/env/exit/ölçüler KAYIT seq89 ve DURUM.json.cards.K3PD-14.checks içindedir.
+- Pin freshness: 63/63 taze, 0 ertelenmiş, 0 engelleyici bayat. Perf: içerik 184.591 KiB, runtime 137.186/137.25 KiB, CSS 15.922 KiB, p95 8.964 ms, steady 3.707 ms; baseline yazılmadı, slow-host istisnası kullanılmadı.
+- GitHub Actions Pages run [39616251782](https://github.com/mustafaras/s/actions/runs/39616251782), head 613a19c087e5311d0ecd324caaf470bbada065f7: validate success, deploy success; uzak main aynı SHA. No-cache SHA-256 taramasıyla 68/68 statik URL eşleşti; eksik/hata 0. index.html, sw.js, quranLearn.js, quranLearnFlow.js ayrıca HTTP 200 ve SHA eşliği verdi. K3PD DURUM.json public path’i 404; plan runtime yayınına dahil değildir.
+- GitHub Pages build_type=workflow; pages/builds/latest API’si 2026-06-24 tarihli, 529d448... commit’ine ait eski legacy-builder errored kaydı döndürür. Bu güncel Actions workflow’una ait değildir; mevcut workflow sonucu ve canlı SHA ölçümü success’tir.
+
+## Yetki, yayın ve kalan dış kabuller
+
+- Aday bazlı release approval yalnız 613a19c087e5311d0ecd324caaf470bbada065f7 ve bu kartın 11 exact yoluna bağlandı. Kayıt yanıtı kullanıcının “canlıya al o zaman” talimatıdır; ACCEPTED_DEVIATION bağımsız audit olarak sunulmaz.
+- remoteParity=verified. Cihaz, gerçek ekran okuyucu, L2, 230 kayıt ve 14/30 günlük öğrenme etkisi kullanıcı kapıları pending. K3PD-11/K3PD-29 görsel kabulü de bu kart dışında pending.
+- K3PD-15 yalnız next candidate olarak kaldı; başlamadı. Push sonrası yerel makbuz yalnız DURUM/GUNCEL-DURUM/KAYIT/EVIDENCE yollarında tutulacak. Tag, merge, screenshot, kullanıcı verisi veya başka kart değişikliği yok.
+- Korunan başlangıç hashleri: KAPANIS d8e8419e2849b9eec922e537bca7100149fdfee6120ce850fda77128f8af9bcd; README 1aee47cdd05726f4a5966748ae3f786bd79d2e394dd37f3ec7b083f2d36eed0f; GORSEL-KANIT.md d7627027bba21007550f0a5c76130a4d9f11b7b896d001a60e9333c81ffeed28; PDF 05ae0071c87c7bad4ed5f050cbb07479e022e912a67ad401b59e00b52ca8811b.

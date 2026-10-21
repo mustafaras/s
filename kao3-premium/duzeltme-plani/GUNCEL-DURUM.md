@@ -1,15 +1,18 @@
 # K3PD güncel durum
 
-- Program: aktif; K3PD-00…K3PD-10 bağımsız PASS ile kapandı.
-- Bu kartın başlangıcı: branch `k3pd-denetim-duzeltmeleri`; HEAD `dec3ace0db0991a592685fa989cad1ec423b9c3d`; başlangıç `HEAD...origin/main` 4/0.
-- K3PD-10 kapanış durumu: `done/PASS`; DURUM.nextPrompt `K3PD-11` (yalnız aday, uygulama yetkisi değil).
-- K3PD releaseApproval: `NOT_APPROVED`; yayın yapılmadı.
-- Eski K3P ayrı: 37/37 tamamlandı; eski `nextPrompt=null`; tarihsel onay ardıl K3PD’ye taşınmaz.
-- Başlangıçta kirli olan KAPANIS.md, README.md ve kanit/sonraki/GORSEL-KANIT.md korunuyor; K3PD-10 kapsamı/stage dışında.
-- `App.kao*` ataması 45; schema/migrate, pinler, içerik, FSRS parametreleri ve A/B hash’lerinde değişiklik yok.
-- İlk denetimin boş-anlam R2 bulgusu giderildi: task builder kullanılabilir görev üretmiyorsa gerçek oturum kuyruğundan çıkarılıyor; güncel G0/G1 exit 0. Perf’te yalnız göreli band için slow-host istisnası kaydedildi, mutlak tavanlar geçti.
+- Program aktif; K3PD-00…K3PD-10 `done/PASS`; K3PD-11 `source_ready/EVIDENCE_PENDING` ve K3PD-29 görsel kabulü beklemede; K3PD-12 `done/PASS` (kullanıcı tarafından raporlanan bağımsız salt-okur denetimi); `nextPrompt=K3PD-13`.
+- K3PD-11 başlangıç anlık görüntüsü: branch `k3pd-denetim-duzeltmeleri`; HEAD `9c211a5aabc4be4058a4d3f7308d337dc4473fc8`; `HEAD...origin/main` `1/0`. Açılışta `durum.mjs --check` PASS ve `--sonraki` K3PD-11 idi.
+- Seçilen harfler tek RTL metin düğümünde birleşiyor; çip adları OpenLearn Table 3.1 ve hamza §2.2’deki gerçek Arapça adlardan geliyor. Tekrar harfli/bağlanmayan harf, ters sıra, geri alma, source adları ve word-order ayrımı test edildi.
+- Kullanıcı onayıyla yalnız `tests/kao/test_kao2_perf_budget.js` runtime gzip tavanı 136→137 KiB oldu; son izole test runtime `136.810 KiB`, CSS `15.890 KiB`, content `184.591 KiB`, p95 `5.483 ms`, steady `3.060 ms`; baseline yazılmadı.
+- G0 exit 0; her G1 komutu ayrı/izole nihai çalıştırmada exit 0. Eşzamanlı G1 perf denemesi exit 1 olarak ayrıca kanıtta tutuldu; iki izole tekrar exit 0 verdi. A11y sonucu otomatik sözleşme kanıtıdır; gerçek ekran okuyucu/cihaz kabulü değildir.
+- K3PD-11 çalışma ağacı başlangıcında `releaseApproval=NOT_APPROVED`; izlenen başlangıç HEAD’inde onaylı olan SHA `a6c5961dbf19a652b8bd7d57cedee1271249ad22` ve seq71 makbuzu yalnız o A adayı içindir, bu kartı/yeni adayı kapsamaz. Eski K3P `37/37`, `nextPrompt=null` ve `APPROVED-2026-10-18` legacy onayı ayrı durur.
+- KAPANIS.md, README.md ve `kanit/sonraki/GORSEL-KANIT.md` hashleri korunuyor. Pin, index.html, sw.js, schema/migrate, içerik modülü ve App.kao* sayısı değiştirilmedi.
+- Denetimde bulunan iki kaynak/test açığı düzeltildi: kısmi build seçiminde odak sıradaki doğru ve etkin harfe taşınıyor; gerçek build seçimlerinin `ariaLabel` ve DOM adı onaylı kaynak tablosuyla karşılaştırılıyor. Davranış testi, K(drag), V(a11y), T(pronunciation_contract), G0 ve G1 exit 0; bağımsız salt-okur denetçi source_ready için PASS verdi.
+- K3PD-12’nin cloze kabulü ve yerel doğrulamaları tamamlandı; kullanıcı bağımsız denetimi PASS olarak bildirdi. Bu sonuç kullanıcı beyanıdır; denetim makbuzu/komut dökümü verilmediğinden ajan tarafından bağımsız tekrar edildiği iddia edilmiyor. K3PD-12 `done/PASS`; `nextPrompt=K3PD-13` yalnız adaydır, K3PD-13 başlatılmadı. K3PD-11 `source_ready/EVIDENCE_PENDING`; K3PD-29 görsel kabulü bekliyor. K3PD releaseApproval `NOT_APPROVED`; push/merge/tag/deploy veya screenshot yok.
 
-Sıradaki aday: K3PD-11 (bu PASS yeni karta yetki değildir).
+Kanıt: [K3PD-11/EVIDENCE.md](kanit/K3PD-11/EVIDENCE.md).
+
+Sıradaki aday: K3PD-12 (durum aracıyla doğrulandı; bu kart için çalışma yetkisi değildir).
 
 ## K3PD-09 — bağımsız PASS ile kapandı
 
@@ -148,3 +151,29 @@ Kanıt: [K3PD-10/EVIDENCE.md](kanit/K3PD-10/EVIDENCE.md)
 - index.html, sw.js, panel.html, panel-v2.html, SW offline allowlist’i ve bağlı CSS kaynaklarından çıkarılan 68 public statik URL no-cache/no-store GET ile HTTP 200 ve yerel SHA-256 eşliği verdi.
 - Sınırlama: index.html/sw.js pinleri 20261019a olarak kaldı. Kurulu offline Service Worker aynı URL’lerde önceki quranLearn baytlarını sunabilir; mevcut browser/device istemci güncellemesi doğrulanmadı.
 - K3PD-32/33 kartları yapılmış sayılmadı; nextPrompt=K3PD-11. Yayın onayı yalnız SHA A ve kayıtlı exact scope içindir. Korunan üç dirty dosya aynı hash’lerle dışarıda; tag yok, diğer remote ve seyma-data kullanılmadı. Yayın makbuzu R yalnız bu dalda yerel tutuluyor.
+
+
+## K3PD-12 — uygulama başladı
+
+- Canlı aday K3PD-12; branch `k3pd-denetim-duzeltmeleri`, başlangıç HEAD `9c211a5aabc4be4058a4d3f7308d337dc4473fc8`, `HEAD...origin/main` `1/0`.
+- K3PD-11 `source_ready/EVIDENCE_PENDING`; bağımsız kaynak kabulü PASS, K3PD-29 görsel bağımlılığı açık. K3PD-12’nin kaynak/fixture işi bu dış görsel kabulünü tamamlanmış saymaz.
+- K3PD başlangıç `releaseApproval=NOT_APPROVED`; K3P tarihsel kayıt ayrı `37/37`, `nextPrompt=null`, `APPROVED-2026-10-18`. Bunlar bu kart için yayın veya dış işlem izni değildir.
+- K3PD-12 allowlist satırı kullanıcı onayıyla parser uyumlu exact yollara çevrildi. Yalnız bu kartın satırı değiştirildi; başka prompt satırı değişmedi.
+- Kart `in_progress`; başlangıç 130 uygun lemma × 2 yön × 3 seed matrisinde 84 yanlış-POS ve 6/6 tekrar sızıntısı bulundu. Düzeltme sonrası K(cloze) 9 kontrol ve 780 çağrı PASS: yanlış-POS 0, tekrar sızıntısı 0; 6/39 kayıtlı fallback, oran %11.63. K(ladder)/K(build)/K(distractors)/T(queue), çift-şık ve G0/G1/G2 henüz bekliyor. Kanıt: [K3PD-12/EVIDENCE.md](kanit/K3PD-12/EVIDENCE.md).
+
+### 2026-10-21 — onaylı G2 bütçe yolu ve kabul engeli
+
+- Kullanıcı, K3PD-12 kapsamındaki doğrulama engellerini kapatmak üzere allowlist’e `tests/kao/test_kao2_mastery.js`, `tests/kao/test_kao2_kabul.js` ve A-9’daki bayat beklentiyi düzelten `tests/kao/test_k3p_dda.js` yollarının eklenmesini onayladı. Runtime tavanı yalnız bu kartın iki kabul testinde 136→137 KiB oldu. `test_kao2_mastery` ölçümünü canonical perf kapısıyla aynı gzip L9 yöntemine getirdim; L6/L9 değerleri ayrıca ayrı ölçüldü.
+- Runtime: L6 toplam 140,665 B / 137.368 KiB; L9 toplam 140,228 B / 136.941 KiB. Ayrı dosya ölçümleri EVIDENCE.md’dedir. Runtime perf kapısı L9 136.941 KiB ile PASS; CSS 15.890 KiB, içerik 184.591 KiB, p95 19.012 ms. Yalnız yavaş-host göreli bandı atlandı; baseline yazılmadı.
+- `test_kao2_mastery.js` 45/45 PASS. İlk A-9 ölçümünde `test_k3p_dda.js` eski “Okunuş” metnini bekliyordu, oysa gerçek kapalı disclosure başlığı “Şıkların okunuşlarını gör”. K3PD-12 allowlist satırındaki exact test yolu onayla eklendi ve beklenti güncellendi: DDA 14/14 PASS. Tam kabul koşusu A-9 219/219 ve A-10 PASS: runtime 136.941 KiB, CSS 15.890 KiB, içerik 184.591 KiB, p95 16.833 ms.
+- Doğrudan K(build) 14/14, K(ladder) PASS, K(distractors) PASS (tarihsel seçim sırası tabanı yok; karşılaştırma UNVERIFIABLE), K(cloze) 9/9 ve 780 çağrı, K(budget) 11/11, K(resume) 7/7, K(lesson_ayah) 5/5, `cift-sik.cjs` 0/1084 ve 0/1119 çift seçenek, karışık tekrar tanıma oranı %49.24 PASS.
+- G0 kaynak/syntax, driver, zikr harness ve kontrol fixture’ı PASS; G1 19 komut PASS; G2 A-9/A-10 PASS. Kapanışta kullanıcı bağımsız salt-okur denetimi yaptığını ve sorun bulmadığını bildirdi; K3PD-12 bu beyana dayalı PASS ile `done` oldu. Tarihsel distractor sıralaması tabanı yokluğu `UNVERIFIABLE` olarak açık tutuldu.
+
+
+## K3PD-12 kapanışı
+
+- `test_k3p_dda.js` 14/14 PASS; final `durum.mjs --check` ve `--sonraki` K3PD-13 adayıyla doğrulandı. G0/G1/G2 ve kart testlerinin ayrıntılı ölçümleri KAYIT seq82/EVIDENCE.md içindedir.
+- Kullanıcı bağımsız salt-okur incelemeyi yaptığını ve sorun bulmadığını bildirdi. Bu hüküm `user_attested`; denetçi raporu/komut dökümü paylaşılmadı ve ajan tarafından bağımsız denetim olarak sunulmuyor.
+- Yalnız eski distractor sıralama tabanı `UNVERIFIABLE`; bu karşılaştırma K3PD-12 kabul ölçütü değildir. K3PD-11 için K3PD-29 görsel kabulü ayrı ve açık kalır.
+
+Sıradaki aday: K3PD-13 (bu satır sonraki karta başlama yetkisi değildir).

@@ -131,12 +131,15 @@ await check('yüzey: mantık SeymaQuranLearn.kaoDrag\'ta, App değil; App.kao* s
 
 // ---- 4) Dokunma ve klavye yolu ------------------------------------------------------------------------
 await check('dokunma/klavye: her çipte tam bir onclick (App.kaoAnswer) ve tam bir onpointerdown', async () => {
-  const cardId = Object.keys(q.cards).find((id) => /^w:/.test(id) && flow.ladderArm(id) === 'A');
-  q.cards[cardId] = { state: 'review', s: 12, reps: 6, due: '2026-09-29T00:00:00.000Z' };
-  const task = api.kaoBuildTask({ id: `k3p-20:${cardId}`, cardId, isNew: false }, t.data, { seed: 'k3p-20' });
-  assert.equal(task.kind, 'build', 'dizme görevi kuruldu');
+  let task = null;
+  for (const cardId of Object.keys(q.cards).filter((id) => /^w:/.test(id) && flow.ladderArm(id) === 'A')) {
+    q.cards[cardId] = { state: 'review', s: 12, reps: 6, due: '2026-09-29T00:00:00.000Z' };
+    const candidate = api.kaoBuildTask({ id: `k3p-20:${cardId}`, cardId, isNew: false }, t.data, { seed: 'k3p-20' });
+    if (candidate && candidate.kind === 'build') { task = candidate; break; }
+  }
+  assert.ok(task && task.kind === 'build', 'harf-adı kaynağı bulunan gerçek dizme görevi kuruldu');
   const html = api.kaoTaskHTML(task);
-  const chips = html.match(/<button type="button" class="[^"]*kao-chip[^"]*"[\s\S]*?<\/button>/g) || [];
+  const chips = html.match(/<button\b(?=[^>]*\bclass="[^"]*kao-chip[^"]*")[^>]*>[\s\S]*?<\/button>/g) || [];
   assert.equal(chips.length, task.choices.length, 'her şık bir çip');
   for (const chip of chips) {
     assert.equal((chip.match(/onclick=/g) || []).length, 1, 'çipte TAM bir onclick');

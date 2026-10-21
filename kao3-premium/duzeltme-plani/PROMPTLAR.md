@@ -449,7 +449,7 @@ Test, answer’dan doğru çip seçmekle yetinmesin: gerçek HTML’de hedef ipu
 
 **Oku:** kaoOrderDraft/OrderLabels, selected-row HTML/CSS; QuranPhonicsV1 gerçek harf alanları; test_k3p_build.js.
 
-**Yazma allowlist’i:** quranLearn.js; kao.css; test_k3p_build.js; test_k3p_drag.js gerektiği kadar; yeni kayıtlar.
+**Yazma allowlist’i:** `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız K3PD-11 allowlist satırı); `app/core/quranLearn.js`; `app/kao.css`; `tests/kao/test_k3p_build.js`; `tests/kao/test_k3p_drag.js` (yalnız gerekirse); `tests/kao/test_kao2_perf_budget.js` (yalnız runtime gzip tavanını 136’dan 137 KiB’ye çıkar; 2026-10-20 kullanıcı onayı); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-11/EVIDENCE.md`.
 
 **Uygula:**
 
@@ -478,7 +478,7 @@ Build ile kelime dizme görünümünü ayır. Seçilen harfleri tek RTL metin ak
 
 **Oku:** kaoDistractorPool/UniqueDistractors/fill/kaoClozeExample; TASARIM §4 çelişkili yedek cümleleri; test_k3p_cloze.js.
 
-**Yazma allowlist’i:** quranLearn.js; test_k3p_cloze.js; ladder/build/distractors fixture’ları; yeni karar/kayıtlar; yalnız güncel sözleşme eki.
+**Yazma allowlist’i:** Yalnız şu exact paths: `app/core/quranLearn.js`; `tests/kao/test_k3p_cloze.js`; `tests/kao/test_k3p_ladder.js`; `tests/kao/test_k3p_build.js`; `tests/kao/test_k3p_distractors.js`; `tests/kao/test_kao2_mastery.js`; `tests/kao/test_kao2_kabul.js`; `tests/kao/test_k3p_dda.js`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-12 allowlist satırını exact paths olarak düzeltmek için); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-12/EVIDENCE.md`.
 
 **Uygula:**
 

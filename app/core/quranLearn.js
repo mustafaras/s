@@ -349,11 +349,12 @@
   // B-01: çeldirici havuzu, kart kimlikleri sıralı. Aynı lemmanın iki yön kartı ve aynı etiket ayrı şık sayılmaz;
   // kaoUniqueDistractors bunları sırayı bozmadan ayıklar.
   function kaoDistractorPool(d,targetId,opts){
-    var cards=objectOr(quranLearnRoot(d).cards,{}),target=metaFor(targetId,null,opts),previous=previousDistractorLemmas(d,targetId,opts),seed=String(opts.seed||'')+'|'+targetId;
+    var cards=objectOr(quranLearnRoot(d).cards,{}),target=metaFor(targetId,null,opts),previous=previousDistractorLemmas(d,targetId,opts),seed=String(opts.seed||'')+'|'+targetId,cloze=opts.cloze;
     return Object.keys(cards).filter(function(id){
       if(id===targetId||previous.indexOf(lemmaIdForCard(id)||id)>=0) return false;
       var card=cards[id],meta=metaFor(id,null,opts);
-      return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=21&&!!target.pos&&meta.pos===target.pos&&!!target.root&&!!meta.root&&meta.root!==target.root;
+      var rootsCompatible=cloze?(!target.root||!meta.root||meta.root!==target.root):(target.root&&meta.root&&meta.root!==target.root)
+      return (card.state==='review'||card.st==='review')&&nonNegativeNumber(card.s,0)>=21&&!!target.pos&&meta.pos===target.pos&&rootsCompatible;
     }).sort(function(a,b){ return seededRank(seed,a)-seededRank(seed,b)||a.localeCompare(b); }).map(function(id){
       var meta=metaFor(id,null,opts),meanings=Array.isArray(meta.meanings)?meta.meanings:[];
       return {cardId:id,label:String(meanings[0]||meta.meaning||id)};
@@ -377,26 +378,29 @@
     var answer=kaoShownLabel({cardId:targetId,label:String((Array.isArray(target.meanings)?target.meanings:[])[0]||target.meaning||targetId)},/:tr>ar$/.test(targetId),opts);
     return kaoUniqueDistractors(kaoDistractorPool(d,targetId,opts),targetId,answer,Math.max(0,Math.floor(nonNegativeNumber(count,3))),opts);
   }
+  // K3PD-11: Open University OpenLearn Arabic alphabet Table 3.1; hamza is named in §2.2.
+  var KAO_BUILD_LETTER_NAMES='بَاء|تَاء|ثَاء|جِيم|حَاء|خَاء|دَال|ذَال|رَاء|زَاي|سِين|شِين|صَاد|ضَاد|طَاء|ظَاء|عَين|غَين|فَاء|قَاف|كَاف|لَام|مِيم|نُون|هَاء|وَاو|يَاء|الهَمْزَة'.split('|');
   function kaoBuildLetters(it,o,meaning){
     var id=String(it.cardId||it.id),lx=window.QuranLexiconV1,lid=lemmaIdForCard(id),lm=lid&&lx.byId(lid);
-    var ch=lm&&lm.verified===true?Array.from(kaoStripHarakat(lm.ar)||''):[],ls=(window.QuranPhonicsV1||{}).letters||[];
+    var ch=lm&&lm.verified===true?Array.from(kaoStripHarakat(lm.ar)||''):[],ls=(window.QuranPhonicsV1||{}).letters||[],name=function(letter){ return KAO_BUILD_LETTER_NAMES[ls.indexOf(letter)]||''; };
     if(ch.length<2||ch.length>6) return null;
     var m=ch.map(function(c){ return ls.find(function(l){ return l.ar===c; }); });
-    if(m.some(function(l){ return !l; })) return null;
+    if(m.some(function(l){ return !l||!name(l); })) return null;
     var sd=String(o.seed||'')+'|b|'+lid,fam=m.map(function(l){ return kaoS0LessonOfLetter(l.id); });
-    var f=ls.filter(function(l){ return ch.indexOf(l.ar)<0&&fam.indexOf(kaoS0LessonOfLetter(l.id))>=0; }).sort(function(a,b){ return a.id.localeCompare(b.id); }).slice(0,2);
+    var f=ls.filter(function(l){ return name(l)&&ch.indexOf(l.ar)<0&&fam.indexOf(kaoS0LessonOfLetter(l.id))>=0; }).sort(function(a,b){ return a.id.localeCompare(b.id); }).slice(0,2);
     if(f.length<2) return null;
-    var cs=m.concat(f).map(function(l,k){ return {choiceId:'c'+k,label:l.ar,pronunciation:s0Okunus(l),correct:k<ch.length}; });
+    var cs=m.concat(f).map(function(l,k){ return {choiceId:'c'+k,label:l.ar,pronunciation:s0Okunus(l),correct:k<ch.length,ariaLabel:name(l)}; });
     cs.sort(function(a,b){ return seededRank(sd,a.label)-seededRank(sd,b.label); });
     return {id:String(it.id||'task:'+id),cardId:id,type:'word',kind:'build',direction:'tr>ar',isNew:!!it.isNew,retry:!!it.retry,errorClass:'order',rung:'R3',prompt:'Anlamı: '+meaning,answer:lm.ar,choices:cs};
   }
-  // K3P-18 · R4 "âyette boşluk": doğrulanmış örnek âyette hedef kelime VE okunuşu aynı konumda
-  // boşalır (okunuş da boşalır, cevap sızmasın). Uygun örnek yoksa R4 kurulmaz, kart R3'te kalır.
+  // K3P-18: ayet/okunuş hizası ve hedefin tek tam-kelime geçişi.
   function kaoClozeExample(lm){
     var ex=kaoIntroExample(lm);
     if(!ex) return null;
-    var wa=ex.ar.split(/\s+/),wp=ex.pronunciation.split(/\s+/),at=wa.map(kaoStripHarakat).indexOf(kaoStripHarakat(lm.ar));
-    if(wa.length<3||at<0||wa.length!==wp.length) return null;
+    var wa=ex.ar.split(/\s+/),wp=ex.pronunciation.split(/\s+/),target=kaoStripHarakat(lm.ar),matches=[];
+    wa.forEach(function(word,index){ if(kaoStripHarakat(word)===target) matches.push(index); });
+    if(wa.length<3||matches.length!==1||wa.length!==wp.length) return null;
+    var at=matches[0];
     var blank=function(a){ return a.map(function(w,k){ return k===at?'…':w; }).join(' '); };
     return {kind:'cloze',errorClass:'root',meaning:ex.tr+' · '+ex.ref,ar:blank(wa),pronunciation:blank(wp)};
   }
@@ -410,13 +414,18 @@
     if(!meaning.trim()) return null;
     var flow=window.SeymaQuranLearnFlow,arm=flow.ladderArm(id),rung=arm==='B'?'R1':flow.ladderRung(objectOr(quranLearnRoot(d).cards,{})[id]),lex=window.QuranLexiconV1;
     // R4 için örnek yoksa R3'e düş.
-    var clz=rung==='R4'&&lex&&lex.byId?kaoClozeExample(lex.byId(lemmaIdForCard(id))):null;
+    var clz=rung==='R4'&&lex&&lex.byId?kaoClozeExample(lex.byId(lemmaIdForCard(id))):null,clozePicked=null;
     if(rung==='R4'&&!clz) rung='R3';
+    if(rung==='R4'&&clz){
+      var clozeOpts=Object.assign({},opts,{cloze:true}),clozeAnswer=String(meta.ar||lex.byId(lemmaIdForCard(id)).ar||id);
+      clozePicked=kaoUniqueDistractors(kaoDistractorPool(d,id,clozeOpts),id,clozeAnswer,3,clozeOpts,true);
+      if(clozePicked.length<3){clz=clozePicked=null;rung='R2';}
+    }
     if(rung==='R3'){ var b=kaoBuildLetters(queueItem,opts,meaning); if(b){ b.arm=arm; return b; } rung='R2'; }
     var audioOnly=rung==='R2'&&opts.audioOnly===true,direction=rung==='R1'||audioOnly?'ar>tr':'tr>ar',toAr=direction==='tr>ar';
     var answer=toAr?String(meta.ar||id):meaning;
-    var pool=kaoDistractorPool(d,id,opts);
-    var need=typeof opts.choiceCount==='number'&&isFinite(opts.choiceCount)?Math.max(2,Math.min(4,Math.floor(opts.choiceCount)))-1:3;
+    var pool=clz?[]:kaoDistractorPool(d,id,opts);
+    var need=clz?3:(typeof opts.choiceCount==='number'&&isFinite(opts.choiceCount)?Math.max(2,Math.min(4,Math.floor(opts.choiceCount)))-1:3);
     var rank=function(cardId){ return seededRank(String(opts.seed||'')+'|task|'+id,cardId); };
     // Yedek sırası: aynı tür, köksüz, tüm sözlük.
     var fill=function(picked,n){
@@ -440,8 +449,12 @@
       return picked;
     };
     // B-01: sırayı ve tekilliği koru; eksik şıklar havuzun devamından dolar.
-    var windowed=fill(pool.slice(0,3),3).sort(function(a,b){ return rank(a.cardId)-rank(b.cardId); });
-    var picked=fill(kaoUniqueDistractors(windowed.concat(pool.slice(3)),id,answer,need,opts,toAr),need);
+    var picked;
+    if(clz) picked=clozePicked;
+    else {
+      var windowed=fill(pool.slice(0,3),3).sort(function(a,b){ return rank(a.cardId)-rank(b.cardId); });
+      picked=fill(kaoUniqueDistractors(windowed.concat(pool.slice(3)),id,answer,need,opts,toAr),need);
+    }
     var choices=[{cardId:id,label:answer,pronunciation:toAr?kaoLemmaReading(lemmaIdForCard(id),meta.translit):'',correct:true}].concat(picked.map(function(item){
       var itemMeta=metaFor(item.cardId,null,opts);
       return {cardId:item.cardId,label:kaoShownLabel(item,toAr,opts),pronunciation:toAr?kaoLemmaReading(lemmaIdForCard(item.cardId),itemMeta.translit):'',correct:false};
@@ -1960,7 +1973,10 @@
     var order=task.kind==='order'||isBuild;
     if(order){
       var draft=Array.isArray(ui.kaoOrderDraft)?ui.kaoOrderDraft:[];
-      h+='<div class="kao-order-target" data-kao-drop="" aria-label="Seçilen sıra">'+(draft.length?draft.map(function(choiceId){ var selected=task.choices.find(function(choice){ return choice.choiceId===choiceId; }); return selected?'<span>'+kaoArabicPairHTML(selected.label,selected.pronunciation,'kao-order-pair')+'</span>':''; }).join(''):'<span class="kao-order-empty">'+(isFragment?'Önce fiili seç':'Kelimeleri sırayla seç')+'</span>')+'</div>';
+      var selected=draft.map(function(id){return task.choices.find(function(c){return c.choiceId===id;});}).filter(Boolean);
+      var target=isBuild?'<span class="kao-order-preview kao-arabic-text" lang="ar" dir="rtl">'+esc(selected.map(function(c){return c.label;}).join(''))+'</span>':selected.map(function(c){return '<span>'+kaoArabicPairHTML(c.label,c.pronunciation,'kao-order-pair')+'</span>';}).join('');
+      var empty=isBuild?'Harfleri sırayla seç':isFragment?'Önce fiili seç':'Kelimeleri sırayla seç';
+      h+='<div class="kao-order-target" data-kao-drop="" aria-label="'+(isBuild?'Birleşik harfler':'Seçilen sıra')+'">'+(selected.length?target:'<span class="kao-order-empty">'+empty+'</span>')+'</div>';
     }
     // K3P-21: gizli uzun basma (350 ms) ve satır içi ok fonksiyonu KALKTI — keşfedilemiyordu.
     // Yerine iki görünür düğme: her biri kendi aria-label'ını taşır ve tek dokunuşla çalar.
@@ -1981,8 +1997,12 @@
       }
       var choiceReading=exposeChoiceReading?choice.pronunciation:'';
       var choiceLabel=arabic?(groupChoiceReadings?'<span class="kao-arabic-stack kao-choice-pair"><span class="kao-arabic-text" lang="ar" dir="rtl">'+esc(choice.label)+'</span></span>':kaoArabicPairHTML(choice.label,choice.pronunciation,'kao-choice-pair',false,pronunciationFolded)):esc(choice.label);
+      var sourcedLetterName=isBuild?choice.ariaLabel:'';
       if(groupChoiceReadings&&arabic&&choice.pronunciation) foldedChoiceReadings.push('<li><span class="kao-arabic-text" lang="ar" dir="rtl">'+esc(choice.label)+'</span><span class="kao-pronunciation-line" lang="tr">'+esc(choice.pronunciation)+'</span></li>');
-      h+=kaoViewsApi().choice({button:true,state:state||'idle',label:choice.label,labelHtml:choiceLabel,arabic:arabic&&exposeChoiceReading,pronunciation:choiceReading,extraClasses:(task.prompt?['kao-chip']:[]).concat(order?['kao-drag']:[]),pressed:order?selected:undefined,disabled:disabled,draggable:order===true&&disabled===false,onpointerdown:order&&disabled===false?'window.SeymaQuranLearn.kaoDrag(event,\''+esc(task.id)+'\',\''+esc(choice.choiceId)+'\')':undefined,onclick:'App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')'});
+      var choiceHTML=kaoViewsApi().choice({button:true,state:state||'idle',label:choice.label,labelHtml:choiceLabel,arabic:!isBuild&&arabic&&exposeChoiceReading,pronunciation:choiceReading,extraClasses:(task.prompt?['kao-chip']:[]).concat(order?['kao-drag']:[]),pressed:order?selected:undefined,disabled:disabled,draggable:order===true&&disabled===false,onpointerdown:order&&disabled===false?'window.SeymaQuranLearn.kaoDrag(event,\''+esc(task.id)+'\',\''+esc(choice.choiceId)+'\')':undefined,onclick:'App.kaoAnswer(\''+task.id+'\',\''+choice.choiceId+'\')'});
+      if(sourcedLetterName) choiceHTML=choiceHTML.replace('type="button"','type="button" lang="ar" aria-label="'+esc(sourcedLetterName)+'"');
+      if(isBuild) choiceHTML=choiceHTML.replace('type="button"','type="button" data-kao-choice-id="'+esc(choice.choiceId)+'"');
+      h+=choiceHTML;
     });
     if(foldedChoiceReadings.length) h+='<details class="kao-pronunciation-fold"><summary>Şıkların okunuşlarını gör</summary><ol>'+foldedChoiceReadings.join('')+'</ol></details>';
     h+='</div><p class="kao-live" aria-live="polite">'+esc(panel?'':(ui.kaoFeedback||''))+'</p>';
@@ -2063,22 +2083,44 @@
   }
   // K3P-10: yanlış şık düğümü — sarsıntı paintTask içeriği yenilendikten SONRA oynar.
   function kaoChoiceNode(choiceId){ if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.taskElement!=='function') return null; var node=quranLearnSurfaceDeps.taskElement(); if(!node||typeof node.querySelector!=='function') return null; return node.querySelector('.kao-choices button[onclick*="\''+choiceId+'\'"]'); }
+  function kaoRestoreBuildFocus(node,task){
+    if(!node||!task||task.kind!=='build'||typeof node.querySelectorAll!=='function') return false;
+    var ui=quranLearnDeps&&quranLearnDeps.ui(),draft=ui&&Array.isArray(ui.kaoOrderDraft)?ui.kaoOrderDraft:[],labels=kaoOrderLabels(task),expected=labels[draft.length],next=null;
+    if(expected!==undefined) next=task.choices.find(function(choice){ return choice.label===expected&&draft.indexOf(choice.choiceId)<0; })||null;
+    if(!next) next=task.choices.find(function(choice){ return draft.indexOf(choice.choiceId)<0; })||null;
+    if(!next) return false;
+    var nodes=node.querySelectorAll('[data-kao-choice-id]');
+    for(var i=0;i<nodes.length;i+=1){
+      var choiceNode=nodes[i];
+      if(!choiceNode||typeof choiceNode.getAttribute!=='function'||choiceNode.getAttribute('data-kao-choice-id')!==next.choiceId||choiceNode.disabled===true||typeof choiceNode.focus!=='function') continue;
+      try{ choiceNode.focus({preventScroll:true}); }catch(_error){ choiceNode.focus(); }
+      return true;
+    }
+    return false;
+  }
   function paintTask(){
     if(!quranLearnSurfaceDeps||typeof quranLearnSurfaceDeps.taskElement!=='function') return false;
     var node=quranLearnSurfaceDeps.taskElement();
     if(!node) return false;
-    var html=kaoTaskHTML(currentTask()),match=html.match(/^<section[^>]*>([\s\S]*)<\/section>$/);
+    var beforeTask=currentTask(),active=node.ownerDocument&&node.ownerDocument.activeElement,focusedChoiceId='',focusedTaskId='';
+    if(beforeTask&&beforeTask.kind==='build'&&active&&typeof node.contains==='function'&&node.contains(active)&&typeof active.getAttribute==='function'){
+      focusedChoiceId=String(active.getAttribute('data-kao-choice-id')||'');
+      if(focusedChoiceId&&typeof node.getAttribute==='function') focusedTaskId=String(node.getAttribute('data-task-id')||'');
+    }
+    var html=kaoTaskHTML(beforeTask),match=html.match(/^<section[^>]*>([\s\S]*)<\/section>$/);
     node.innerHTML=match?match[1]:html;
     kaoH4BindDetails(node,currentTask());
     // D-5: yeni görev 24 px yatay kayma + opaklıkla gelir; sınıf yalnız animasyon açıkken eklenir.
-    var painted=currentTask(),paintedId=painted?painted.id:'done',paintUi=quranLearnDeps.ui(); if(paintUi.kaoPaintedId!==paintedId){ paintUi.kaoPaintedId=paintedId; if(kaoAnimate()) kaoKick(node,'kao-task-in'); kaoFx('enter',node); kaoFocusQuestion(node); }
+    var painted=currentTask(),paintedId=painted?painted.id:'done',paintUi=quranLearnDeps.ui(),restoreBuildFocus=!!(focusedChoiceId&&focusedTaskId===paintedId&&painted&&painted.kind==='build'); if(paintUi.kaoPaintedId!==paintedId){ paintUi.kaoPaintedId=paintedId; if(kaoAnimate()) kaoKick(node,'kao-task-in'); kaoFx('enter',node); kaoFocusQuestion(node); }
     if(typeof node.setAttribute==='function'){
       var task=currentTask(); node.setAttribute('data-task-id',task?task.id:'done');
       if(task&&kaoShouldAutoplay(task,quranLearnDeps.data())) node.setAttribute('data-autoplay','1'); else if(typeof node.removeAttribute==='function') node.removeAttribute('data-autoplay');
     }
-    if(paintUi.kaoPanel&&paintUi.kaoPanel.open&&paintUi.kaoPanel.correct!==true&&node&&typeof node.querySelector==='function'){
-      var continueButton=node.querySelector('.kao-feedback-continue'); if(continueButton&&typeof continueButton.focus==='function') continueButton.focus();
-    }
+    if(paintUi.kaoPanel&&paintUi.kaoPanel.open&&node&&typeof node.querySelector==='function'){
+      var continueButton=node.querySelector('.kao-feedback-continue')||node.querySelector('.kao-feedback-strip-continue');
+      if(continueButton&&typeof continueButton.focus==='function') continueButton.focus();
+      else if(restoreBuildFocus&&paintUi.kaoPanel.correct===true) kaoFocusQuestion(node);
+    }else if(restoreBuildFocus) kaoRestoreBuildFocus(node,painted);
     return true;
   }
   function startTaskPresentation(){

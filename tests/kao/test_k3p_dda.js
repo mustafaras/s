@@ -385,7 +385,7 @@ check('p > %92 (8 sonuç) → şık 4 korunur ve gerçek okunuş katlanır', () 
   assert.ok(bore && bore.choices, 'görev kuruldu');
   assert.equal(bore.choices.length, 4, `sıkılma kolunda 4 şık (ölçülen ${bore.choices.length})`);
   const html = api(t).kaoTaskHTML(bore);
-  assert.match(html, /<details class="kao-pronunciation-fold">[\s\S]*?<summary>Okunuş<\/summary>/, 'gerçek görev HTML’sinde Latin okunuş kapalı katlanır');
+  assert.match(html, /<details class="kao-pronunciation-fold">[\s\S]*?<summary>Şıkların okunuşlarını gör<\/summary>/, 'gerçek görev HTML’sinde şık okunuşları kapalı katlanır');
   assert.doesNotMatch(html, /<details class="kao-pronunciation-fold"[^>]*\sopen(?:\s|>)/, 'okunuş kullanıcı açmadan görünmez');
   t.api.kaoLesson('exit');
 });

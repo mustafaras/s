@@ -32,7 +32,8 @@ assert.ok(gzip([curriculum]) <= 48 * 1024, 'curriculum exceeds 48 KiB');
 // Gerekçe: KAO2 kalan kartları (Ayarlar, İlerleme, Kelime v2+panel, a11y) gerçek
 // çalışma zamanı kodu gerektirir; 128 KiB pay ~40 KiB verir ve tek dosyada kalır.
 // K3P-18 (2026-10-15, kullanıcı yetkisi): 128 -> 136 KiB. R4 "âyette boşluk" görevi + fixture'ı.
-assert.ok(runtimeGzip <= 136 * 1024, 'runtime exceeds 136 KiB');
+// K3PD-11 (2026-10-20, kullanıcı onayı): 136 -> 137 KiB; birleşik RTL önizleme ve doğrulanmış harf adı arayüzü.
+assert.ok(runtimeGzip <= 137 * 1024, 'runtime exceeds 137 KiB');
 // K3P-09 (2026-10-13, kullanıcı kararı): CSS tavanı 14 -> 16 KiB. Gerekçe: Dalga 1'in
 // görsel sistem kartları (tokenlar → yazı tipi → Arapça tipografi → materyal/an kartı →
 // hareket) gerçek CSS gerektirir; 14 KiB tavanı K3P-08 sonunda ~0,2 KiB'e kadar dolmuştu.

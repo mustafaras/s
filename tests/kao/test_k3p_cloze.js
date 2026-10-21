@@ -166,4 +166,149 @@ check('akis: yerleşik kullanıcının ders taramasında cloze görevi üretilir
   assert.ok(seen > 0, `akışta cloze üretilmeli (görülen ${seen})`);
 });
 
-console.log(`test_k3p_cloze: PASS (${passed} kontrol — uygunluk, boşluk konumu, şıklar, cevap yolu, a11y, doğrulanmamış örnek, akış)`);
+check('tam lemma × iki yön × üç tohum matrisi: yalnız aynı POS, kök şartı ve sızıntısız cloze', () => {
+  const matrix = bootKao({ seeded: true });
+  const matrixLex = matrix.win.QuranLexiconV1;
+  const matrixLemmas = matrixLex.lemmas.filter(eligible);
+  const matrixCards = matrix.data.quranLearn.cards;
+  for (const lemma of matrixLex.lemmas) {
+    for (const direction of ['ar>tr', 'tr>ar']) {
+      matrixCards[`w:${lemma.id}:${direction}`] = { state: 'review', s: 40, reps: 8, due: '2026-09-29T00:00:00.000Z' };
+    }
+  }
+  const before = JSON.stringify(matrix.data.quranLearn.cards);
+  const counts = { pairs: 0, seeds: 0, armA: 0, armB: 0, cloze: 0, repeatedFallback: 0,
+    insufficientFallback: 0, wrongPos: 0, sameKnownRoot: 0, duplicateLabels: 0,
+    wrongCorrectCount: 0, repeatedLeaks: 0, rootlessTargetClozes: 0, deterministic: false };
+  for (const lemma of matrixLemmas) {
+    const targetBare = bare(lemma.ar);
+    const exampleWords = lemma.examples[0].ar.split(/\s+/).map(bare);
+    const targetOccurrences = exampleWords.filter((word) => word === targetBare).length;
+    for (const direction of ['ar>tr', 'tr>ar']) {
+      const cardId = `w:${lemma.id}:${direction}`;
+      const arm = matrix.win.SeymaQuranLearnFlow.ladderArm(cardId);
+      counts.pairs += 1;
+      counts[arm === 'A' ? 'armA' : 'armB'] += 1;
+      for (let seedIndex = 0; seedIndex < 3; seedIndex += 1) {
+        const seed = `k3pd12-matrix-${seedIndex}`;
+        const taskId = `k3pd12-matrix-${seedIndex}-${cardId}`;
+        const task = matrix.api.kaoBuildTask({ id: taskId, cardId, isNew: false }, matrix.data, { seed });
+        counts.seeds += 1;
+        assert.ok(task, `${taskId}: task exists`);
+        if (arm === 'B') {
+          assert.notEqual(task.kind, 'cloze', `${taskId}: B arm does not produce R4 cloze`);
+          continue;
+        }
+        if (targetOccurrences !== 1) {
+          counts.repeatedFallback += 1;
+          assert.notEqual(task.kind, 'cloze', `${taskId}: repeated target uses safe fallback`);
+          assert.ok(task.rung === 'R3' || task.rung === 'R2', `${taskId}: one-step example fallback or recorded R2 rule`);
+          if (task.ar) {
+            const remaining = task.ar.split(/\s+/).map(bare).filter((word) => word === targetBare).length;
+            if (remaining > 0) counts.repeatedLeaks += 1;
+          }
+          continue;
+        }
+        if (task.kind !== 'cloze') {
+          counts.insufficientFallback += 1;
+          assert.equal(task.rung, 'R2', `${taskId}: insufficient suitable options fall to recorded R2`);
+          continue;
+        }
+        counts.cloze += 1;
+        assert.equal(task.rung, 'R4', `${taskId}: cloze remains R4`);
+        assert.equal(task.choices.length, 4, `${taskId}: exactly four choices`);
+        const correct = task.choices.filter((choice) => choice.correct === true);
+        assert.equal(correct.length, 1, `${taskId}: exactly one correct choice`);
+        assert.equal(correct[0].label, task.answer, `${taskId}: correct choice is the target`);
+        if (new Set(task.choices.map((choice) => choice.choiceId)).size !== 4
+          || new Set(task.choices.map((choice) => choice.label)).size !== 4) counts.duplicateLabels += 1;
+        const arWords = task.ar.split(/\s+/).map(bare);
+        const pronWords = task.pronunciation.split(/\s+/);
+        assert.equal(arWords.filter((word) => word === BLANK).length, 1, `${taskId}: one Arabic blank`);
+        assert.equal(pronWords.filter((word) => word === BLANK).length, 1, `${taskId}: one pronunciation blank`);
+        assert.equal(arWords.indexOf(BLANK), pronWords.indexOf(BLANK), `${taskId}: aligned blank position`);
+        if (arWords.includes(targetBare)) counts.repeatedLeaks += 1;
+        assert.ok(!arWords.includes(targetBare), `${taskId}: target does not leak in Arabic text`);
+        const targetReading = String(task.translit || '').trim();
+        assert.ok(!targetReading || !pronWords.includes(targetReading), `${taskId}: target reading does not leak`);
+        if (!lemma.root) counts.rootlessTargetClozes += 1;
+        for (const choice of task.choices.filter((item) => item.correct !== true)) {
+          const match = /^w:([^:]+):(ar>tr|tr>ar)$/.exec(String(choice.cardId || ''));
+          const other = match && matrixLex.byId(match[1]);
+          if (!other || other.pos !== lemma.pos) counts.wrongPos += 1;
+          if (other && lemma.root && other.root && other.root === lemma.root) counts.sameKnownRoot += 1;
+        }
+        if (!counts.deterministic) {
+          const repeat = matrix.api.kaoBuildTask({ id: taskId, cardId, isNew: false }, matrix.data, { seed });
+          assert.deepEqual(repeat, task, `${taskId}: same input produces same cloze`);
+          counts.deterministic = true;
+        }
+      }
+    }
+  }
+  assert.equal(counts.repeatedLeaks, 0, 'no repeated target leak');
+  assert.equal(counts.wrongPos, 0, 'no different-POS cloze distractors');
+  assert.equal(counts.sameKnownRoot, 0, 'roots differ when both roots exist');
+  assert.equal(counts.duplicateLabels, 0, 'choice labels and IDs are unique');
+  assert.equal(counts.wrongCorrectCount, 0, 'all clozes have one correct choice');
+  assert.ok(counts.cloze > 0, 'matrix includes valid cloze tasks');
+  assert.ok(counts.repeatedFallback > 0, 'matrix includes repeated-target fallback');
+  assert.ok(counts.deterministic, 'determinism was checked');
+  assert.equal(JSON.stringify(matrix.data.quranLearn.cards), before, 'task construction does not mutate card data');
+  console.log(`cloze-matrix: ${JSON.stringify(counts)}`);
+});
+
+check('önceki çeldirici dışlanır ve iki uygun çeldiricide cloze doğrudan R2’ye düşer', () => {
+  const probe = bootKao({ seeded: true });
+  const probeLex = probe.win.QuranLexiconV1;
+  const singleOccurrence = (lemma) => eligible(lemma)
+    && lemma.examples[0].ar.split(/\s+/).map(bare).filter((word) => word === bare(lemma.ar)).length === 1;
+  let previousCase = null;
+  for (const lemma of probeLex.lemmas) {
+    if (!singleOccurrence(lemma)) continue;
+    for (const direction of ['ar>tr', 'tr>ar']) {
+      const cardId = `w:${lemma.id}:${direction}`;
+      if (probe.win.SeymaQuranLearnFlow.ladderArm(cardId) !== 'A') continue;
+      for (const candidate of probeLex.lemmas) {
+        probe.data.quranLearn.cards[`w:${candidate.id}:ar>tr`] = { state: 'review', s: 40, reps: 8 };
+      }
+      probe.data.quranLearn.cards[cardId] = { state: 'review', s: 40, reps: 8 };
+      const pool = probe.api.kaoPickDistractors(probe.data, cardId, 4, { seed: 'k3pd12-previous', cloze: true });
+      if (pool.length >= 4) { previousCase = { lemma, cardId, previous: pool[0].cardId }; break; }
+    }
+    if (previousCase) break;
+  }
+  assert.ok(previousCase, 'önceki çeldirici deneyi için 4 uygun aday var');
+  probe.data.quranLearn.cards[previousCase.cardId].lastDistractors = [previousCase.previous];
+  const afterPrevious = probe.api.kaoBuildTask({ id: 'k3pd12-previous', cardId: previousCase.cardId }, probe.data, { seed: 'k3pd12-previous' });
+  assert.equal(afterPrevious.kind, 'cloze', 'kalan 3 uygun seçenek cloze için yeterli');
+  const previousLemma = String(previousCase.previous).replace(/^w:([^:]+):(ar>tr|tr>ar)$/, '$1');
+  assert.ok(!afterPrevious.choices.some((choice) => String(choice.cardId).replace(/^w:([^:]+):(ar>tr|tr>ar)$/, '$1') === previousLemma), 'önceki lemma iki yönde de dışlanır');
+
+  let limitedCase = null;
+  for (const lemma of probeLex.lemmas) {
+    if (!singleOccurrence(lemma)) continue;
+    for (const direction of ['ar>tr', 'tr>ar']) {
+      const cardId = `w:${lemma.id}:${direction}`;
+      if (probe.win.SeymaQuranLearnFlow.ladderArm(cardId) !== 'A') continue;
+      const candidates = probeLex.lemmas.filter((other) => other.id !== lemma.id
+        && other.pos === lemma.pos && (!lemma.root || !other.root || lemma.root !== other.root)
+        && other.ar && other.ar !== lemma.ar)
+        .filter((other, index, all) => all.findIndex((item) => item.ar === other.ar) === index)
+        .slice(0, 2);
+      if (candidates.length === 2) { limitedCase = { lemma, cardId, candidates }; break; }
+    }
+    if (limitedCase) break;
+  }
+  assert.ok(limitedCase, 'iki aynı-POS uygun distractor bulunmalı');
+  const limitedData = { quranLearn: { cards: {
+    [limitedCase.cardId]: { state: 'review', s: 40, reps: 8 },
+    [`w:${limitedCase.candidates[0].id}:ar>tr`]: { state: 'review', s: 40, reps: 8 },
+    [`w:${limitedCase.candidates[1].id}:ar>tr`]: { state: 'review', s: 40, reps: 8 }
+  } } };
+  const limited = probe.api.kaoBuildTask({ id: 'k3pd12-limited', cardId: limitedCase.cardId }, limitedData, { seed: 'k3pd12-limited' });
+  assert.notEqual(limited.kind, 'cloze', 'generic fallback cannot be carried into cloze');
+  assert.equal(limited.rung, 'R2', 'valid example with fewer than 3 suitable distractors follows recorded R2 decision');
+});
+
+console.log(`test_k3p_cloze: PASS (${passed} kontrol — uygunluk, boşluk konumu, şıklar, cevap yolu, a11y, doğrulanmamış örnek, akış, tam matris, yedek ve önceki çeldirici)`);

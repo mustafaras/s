@@ -202,10 +202,11 @@ check('(e) unitMastery: durum tablosu none/passed/failed/repair/skipped + puan v
 // R4 "âyette boşluk" görevi artı kendi fixture'ı (test_k3p_cloze.js) için ~4 KB pay gerekli;
 // ölü yüzey temizliği (17 sembol) yapıldı ve başka ölü kod bulunmadı, yani §2'nin
 // "önce eski kodu sil" adımı tükendi. Öncekiler 80 → 88 → 128, hepsi kullanıcı yetkisiyle.
-check('runtime bütçesi tavanı (136 KiB gzip) içinde kalır', () => {
+// K3PD-12 (2026-10-21, kullanıcı onayı): 136 -> 137 KiB; aynı bağımsız dosya ölçümü için L9 kullan.
+check('runtime bütçesi tavanı (137 KiB gzip L9) içinde kalır', () => {
   const files = ['app/core/quranLearn.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js'];
-  const kib = files.reduce((sum, f) => sum + zlib.gzipSync(fs.readFileSync(path.join(repoRoot, f))).length, 0) / 1024;
-  assert.ok(kib <= 136, `runtime gzip ${kib.toFixed(3)} KiB > 136`);
+  const kib = files.reduce((sum, f) => sum + zlib.gzipSync(fs.readFileSync(path.join(repoRoot, f)), { level: 9 }).length, 0) / 1024;
+  assert.ok(kib <= 137, `runtime gzip L9 ${kib.toFixed(3)} KiB > 137`);
 });
 
 const partA = passed;

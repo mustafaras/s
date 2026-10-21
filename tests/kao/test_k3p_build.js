@@ -8,7 +8,7 @@
 //   3) SIRA: çiplerin hedef harfleri ordinal 0..n-1 taşır ve doğru sıra tam olarak onları seçmektir;
 //      doğru sıra doğru, yanlış sıra yanlış sayılır (gerçek App.kaoAnswer + FSRS yolu).
 //   4) ÇELDİRİCİ ÇİPİ: seçildiğinde sıra yanlış olur (çeldirici hedef harfin yerine geçmez).
-//   5) A11Y: her çipin erişilebilir adı vardır (aria-label; harfin adı yalnız donmuş ses modülünden).
+//   5) K3PD-11: erişilebilir harf adları yalnız Open University OpenLearn kaynak tablosundan alınır.
 //   6) MERDİVEN: build yalnız R3'te ve A kolunda kurulur; B kolu R1'de; R1/R2 değişmez, R4 ya cloze ya R3.
 const assert = require('node:assert/strict');
 const { bootKao, freshUser, text } = require('./helpers/kao-harness');
@@ -30,12 +30,20 @@ const t = bootKao({ seeded: true });
 const api = t.api;
 const lex = t.win.QuranLexiconV1, phonics = t.win.QuranPhonicsV1;
 const byChar = new Map(phonics.letters.map((letter) => [letter.ar, letter]));
+// Golden names: Open University OpenLearn, Introduction to Arabic, Table 3.1;
+// hamza is explicitly named in section 2.2. Arabic spellings are copied from the source.
+const SOURCE_NAMES = Object.freeze({
+  ba: 'بَاء', ta: 'تَاء', tha: 'ثَاء', jim: 'جِيم', hah: 'حَاء', khah: 'خَاء', dal: 'دَال', dhal: 'ذَال',
+  ra: 'رَاء', zay: 'زَاي', sin: 'سِين', shin: 'شِين', sad: 'صَاد', dad: 'ضَاد', tta: 'طَاء', zah: 'ظَاء',
+  ayn: 'عَين', ghayn: 'غَين', fa: 'فَاء', qaf: 'قَاف', kaf: 'كَاف', lam: 'لَام', mim: 'مِيم', nun: 'نُون',
+  ha: 'هَاء', waw: 'وَاو', ya: 'يَاء', hamza: 'الهَمْزَة'
+});
 const strip = (value) => String(value || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, '');
 const lettersOf = (lemma) => Array.from(strip(lemma.ar));
 const eligible = (lemma) => {
   const chars = lettersOf(lemma);
   return lemma.verified === true && Array.isArray(lemma.meanings) && lemma.meanings.some((meaning) => typeof meaning === 'string' && meaning.trim()) &&
-    chars.length >= 2 && chars.length <= 6 && chars.every((ar) => byChar.has(ar) && byChar.get(ar).id !== 'hamza');
+    chars.length >= 2 && chars.length <= 6 && chars.every((ar) => byChar.has(ar) && SOURCE_NAMES[byChar.get(ar).id]);
 };
 // Merdiveni elle kurmak yerine gerçek kart kaydı yazılır: A kolu + 10 ≤ s < 30 → R3.
 function r3Card() {
@@ -59,6 +67,75 @@ const resetCard = () => { t.data.quranLearn.cards[fixture.cardId] = { state: 're
 const build = (suffix = '') => { resetCard(); return api.kaoBuildTask({ id: `k3p-17-${fixture.cardId}${suffix}`, cardId: fixture.cardId, isNew: false }, t.data, { seed: `k3p-17${suffix}` }); };
 const word = lettersOf(fixture.lemma);
 const correctChips = (task) => task.choices.filter((choice) => choice.correct === true);
+const nonJoiningLetterIds = new Set(['dal', 'dhal', 'ra', 'zay', 'waw', 'hamza']);
+function buildForLemma(lemma, suffix) {
+  for (const direction of ['tr>ar', 'ar>tr']) {
+    const cardId = `w:${lemma.id}:${direction}`;
+    t.data.quranLearn.cards[cardId] = { state: 'review', s: 12, reps: 5, due: '2026-09-29T00:00:00.000Z' };
+    if (t.win.SeymaQuranLearnFlow.ladderArm(cardId) !== 'A' ||
+        t.win.SeymaQuranLearnFlow.ladderRung(t.data.quranLearn.cards[cardId]) !== 'R3') continue;
+    const task = api.kaoBuildTask({ id: `k3pd11-${suffix}-${cardId}`, cardId, isNew: false }, t.data, { seed: `k3pd11-${suffix}` });
+    if (task && task.kind === 'build') return { lemma, cardId, task };
+  }
+  return null;
+}
+function findBuildCase(predicate, suffix) {
+  for (const lemma of lex.lemmas) {
+    if (!eligible(lemma)) continue;
+    const candidate = buildForLemma(lemma, suffix);
+    if (candidate && predicate(lettersOf(lemma), candidate.task)) return candidate;
+  }
+  return null;
+}
+function queueTask(task) {
+  t.ui.kaoQueue = [{ id: task.id, cardId: task.cardId, isNew: false }];
+  t.ui.kaoTasks = { [task.id]: task };
+  t.ui.kaoTaskIndex = 0;
+  t.ui.kaoTaskStartedAt = Date.now();
+  t.ui.kaoUndo = null;
+  t.ui.kaoPanel = { open: false };
+  t.ui.kaoOrderDraft = [];
+}
+function buildTargetInner(html) {
+  const target = String(html).match(/<div class="kao-order-target"[^>]*>([\s\S]*?)<\/div>/);
+  assert.ok(target, 'seçim hedefi gerçek task HTML’sinde bulunmalı');
+  return target[1];
+}
+function taskDom() {
+  const doc = { body: {} };
+  doc.activeElement = doc.body;
+  const question = { focus() { doc.activeElement = this; }, setAttribute() {} };
+  const node = {
+    ownerDocument: doc, attrs: Object.create(null), buttons: [], classList: { values: new Set(), add(name) { this.values.add(name); }, remove(name) { this.values.delete(name); } },
+    contains(target) { return this.buttons.includes(target) || target === question; },
+    setAttribute(name, value) { this.attrs[name] = String(value); },
+    getAttribute(name) { return this.attrs[name] || null; },
+    removeAttribute(name) { delete this.attrs[name]; },
+    querySelectorAll(selector) { return selector === '[data-kao-choice-id]' ? this.buttons.slice() : []; },
+    querySelector(selector) { return selector === '.kao-question' || selector === 'h2' ? question : null; },
+    _html: '',
+    get innerHTML() { return this._html; },
+    set innerHTML(value) {
+      this._html = String(value);
+      const previous = this.buttons;
+      this.buttons = [...this._html.matchAll(/<button\b([^>]*)>/g)].map((match) => {
+        const attrs = match[1];
+        const get = (name) => {
+          const found = attrs.match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`));
+          return found ? found[1] : null;
+        };
+        const button = {
+          disabled: /(?:^|\s)disabled(?:\s|$)/.test(attrs),
+          getAttribute: get,
+          focus() { if (!this.disabled) doc.activeElement = this; }
+        };
+        return button;
+      });
+      if (previous.includes(doc.activeElement)) doc.activeElement = doc.body;
+    }
+  };
+  return { doc, node };
+}
 // Sıra çiplerin ordinalinde değil, kurulacak kelimede (answer) taşınır: çipleri yazım sırasına diz.
 const bare = (value) => String(value || '').replace(/[\u064b-\u065f\u0670\u06d6-\u06ed]/g, '');
 const orderedChips = (task) => {
@@ -155,18 +232,141 @@ check('çeldirici çip seçilirse sıra bozulur: çeldirici hedef harfin yerine 
   assert.equal(t.data.quranLearn.errors.order, errors + 1, 'doğru dizide hata kovası artmaz');
 });
 
-check('a11y: her çipin erişilebilir adı var (harfin adı donmuş ses modülünden)', () => {
-  const task = build(':a11y');
+check('K3PD-11: tekrar harfli ve birleşmeyen harfli gerçek kelime tek RTL önizleme düğümünde kurulur; sıra ve undo korunur', () => {
+  const repeated = findBuildCase((chars, task) => {
+    const ids = chars.map((char) => byChar.get(char).id);
+    return new Set(chars).size < chars.length && chars.join('') !== chars.slice().reverse().join('') &&
+      ids.some((id, index) => index < ids.length - 1 && nonJoiningLetterIds.has(id)) &&
+      correctChips(task).length === chars.length;
+  }, 'repeat');
+  assert.ok(repeated, 'doğrulanmış içerikte A/R3 kolunda tekrar ve birleşmeyen harf içeren görev bulunmalı');
+  const task = repeated.task, target = Array.from(bare(task.answer)), picks = orderedChips(task);
+  assert.ok(new Set(target).size < target.length, 'gerçek cevap aynı harfi tekrar içerir');
+  assert.ok(target.slice(0, -1).some((char) => nonJoiningLetterIds.has(byChar.get(char).id)), 'seçilen gerçek kelimede birleşmeyen harf bulunur');
+  assert.equal(picks.length, target.length);
+  assert.equal(new Set(picks.map((choice) => choice.choiceId)).size, target.length, 'tekrar eden gliflerin ayrı seçim kimlikleri vardır');
+  assert.deepEqual(Array.from(picks, (choice) => choice.label), target, 'hedef sırası gerçek doğrulanmış cevaptan gelir');
+
+  queueTask(task);
+  for (const choice of picks.slice(0, -1)) assert.equal(api.kaoAnswer(task.id, choice.choiceId).pending, true, 'son harften önce görev bekler');
+  const partial = target.slice(0, -1).join('');
   const html = api.kaoTaskHTML(task);
+  assert.equal(buildTargetInner(html), `<span class="kao-order-preview kao-arabic-text" lang="ar" dir="rtl">${partial}</span>`,
+    'seçilen Arapça dizge tek, bölünmemiş RTL metin düğümüdür');
+  const firstName = SOURCE_NAMES[byChar.get(picks[0].label).id];
+  const firstButton = [...html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].find((match) => match[1].includes(`aria-label="${firstName}"`) && /aria-pressed="true"/.test(match[1]));
+  assert.ok(firstButton && / disabled/.test(firstButton[1]), 'seçilen çip kaynak adını, pressed ve disabled durumunu korur');
+
+  const filler = distractorChips(task)[0];
+  const wrong = api.kaoAnswer(task.id, filler.choiceId);
+  assert.equal(wrong.correct, false, 'çeldirici son seçim yanlış sırayı değerlendirir');
+  const fillerName = SOURCE_NAMES[byChar.get(filler.label).id], wrongHTML = api.kaoTaskHTML(task);
+  const wrongButton = [...wrongHTML.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].find((match) => match[1].includes(`aria-label="${fillerName}"`) && /aria-pressed="true"/.test(match[1]));
+  assert.ok(wrongButton && /disabled/.test(wrongButton[1]), 'yanlış seçilen çip kaynak adını, pressed ve disabled durumunu korur');
+  assert.match(wrongHTML, /role="status"[\s\S]*Bir daha bakalım/, 'yanıt sonucu erişilebilir durum panelinden bildirilir');
+  assert.equal(api.kaoUndo(), true, 'yanlış son seçim geri alınabilir');
+  assert.deepEqual(Array.from(t.ui.kaoOrderDraft), picks.slice(0, -1).map((choice) => choice.choiceId), 'undo önceki doğru harf seçimlerini korur');
+  assert.equal(buildTargetInner(api.kaoTaskHTML(task)), `<span class="kao-order-preview kao-arabic-text" lang="ar" dir="rtl">${partial}</span>`,
+    'undo birleşik önizlemeyi önceki harf dizisine döndürür');
+  const solved = api.kaoAnswer(task.id, picks[picks.length - 1].choiceId);
+  assert.equal(solved.correct, true, 'tekrar harf içeren doğru sıra gerçek answer/FSRS yolunda kabul edilir');
+
+  queueTask(task);
+  let reversedResult;
+  for (const choice of picks.slice().reverse()) reversedResult = api.kaoAnswer(task.id, choice.choiceId);
+  assert.equal(reversedResult.correct, false, 'farklı gerçek ters sıra yanlış sayılır');
+  assert.equal(buildTargetInner(api.kaoTaskHTML(task)), `<span class="kao-order-preview kao-arabic-text" lang="ar" dir="rtl">${target.slice().reverse().join('')}</span>`,
+    'ters seçim de aynı tek preview düğümünde görünür');
+});
+
+check('K3PD-11: mevcut word-order görevi ayrı token görünümünü korur', () => {
+  const candidate = api.kaoFragmentCandidates()[0];
+  assert.ok(candidate && candidate.fragmentKind === 'order', 'gerçek içerikten word-order adayı bulunmalı');
+  const orderTask = api.kaoBuildFragmentTask(candidate, { seed: 'k3pd11-order-control' });
+  assert.equal(orderTask.kind, 'order');
+  t.ui.kaoOrderDraft = [orderTask.choices[0].choiceId];
+  const inner = buildTargetInner(api.kaoTaskHTML(orderTask));
+  assert.match(inner, /^<span>.+<\/span>$/, 'order görünümü seçilen kelimeyi token olarak tutar');
+  assert.doesNotMatch(inner, /kao-order-preview/, 'tek harf önizlemesi word-order görevine sızmaz');
+});
+
+check('K3PD-11: OpenLearn harf-adı kaynağı gerçek build çiplerinde Arapça erişilebilir ada dönüşür', () => {
+  const task = build(':a11y');
+  const actualTask = build(':actual-source-name');
+  for (const choice of actualTask.choices) {
+    const letter = byChar.get(choice.label);
+    assert.ok(letter, `${choice.choiceId}: üretim harfi fonik envanterde bulunmalı`);
+    assert.equal(choice.ariaLabel, SOURCE_NAMES[letter.id], `${choice.choiceId}: gerçek builder adı doğrudan onaylı kaynakla eşleşmeli`);
+  }
+  const actualHTML = api.kaoTaskHTML(actualTask);
+  const actualChips = [...actualHTML.matchAll(/<button\b([^>]*)>[\s\S]*?<\/button>/g)].filter((match) => /\bkao-drag\b/.test(match[1]));
+  for (const choice of actualTask.choices) {
+    const letter = byChar.get(choice.label);
+    const chip = actualChips.find((match) => match[1].includes(`data-kao-choice-id="${choice.choiceId}"`));
+    assert.ok(chip, `${choice.choiceId}: gerçek builder çipi DOM'a çizilmeli`);
+    assert.match(chip[1], /onclick="App\.kaoAnswer\(/, `${choice.choiceId}: gerçek çipin klavye etkinleştirmesi korunmalı`);
+    assert.ok(chip[1].includes(`aria-label="${SOURCE_NAMES[letter.id]}"`), `${choice.choiceId}: gerçek DOM adı onaylı kaynakla birebir eşleşmeli`);
+  }
+  const matrix = Object.assign({}, task, { id: 'k3pd11-source-name-matrix', choices: phonics.letters.filter((letter) => SOURCE_NAMES[letter.id]).map((letter, index) => ({
+    choiceId: `k3pd11-source-name-matrix:choice:${index}`, label: letter.ar, pronunciation: '', correct: index === 0, ariaLabel: SOURCE_NAMES[letter.id]
+  })) });
+  queueTask(matrix);
+  const html = api.kaoTaskHTML(matrix);
   assert.match(html, /Harflerden kur/, 'görev başlığı türü söyler');
   assert.match(html, /class="kao-order-target"/, 'kurulan kelime alanı görünür');
-  for (const choice of task.choices) {
-    const button = new RegExp(`aria-label="${choice.label}, okunuşu [^"]+"`).test(html);
-    const named = new RegExp(`aria-label="[^"]*harfi[^"]*"`).test(html);
-    assert.ok(button || named, `${choice.label}: çipin erişilebilir adı yok`);
+  const chips = [...html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].filter((match) => /\bkao-drag\b/.test(match[1]));
+  assert.equal(chips.length, Object.keys(SOURCE_NAMES).length, 'kaynak matrisi tek gerçek chip düğümünde işlenir');
+  for (const letter of phonics.letters.filter((item) => SOURCE_NAMES[item.id])) {
+    const chip = chips.find((match) => match[1].includes(`onclick="App.kaoAnswer('k3pd11-source-name-matrix','k3pd11-source-name-matrix:choice:${phonics.letters.filter((entry) => SOURCE_NAMES[entry.id]).findIndex((entry) => entry.id === letter.id)}')`));
+    assert.ok(chip, `${letter.id}: gerçek klavye seçim düğmesi korunur`);
+    assert.ok(chip[1].includes(`aria-label="${SOURCE_NAMES[letter.id]}"`), `${letter.id}: erişilebilir ad kaynakta doğrulanmış Arapça harf adıdır`);
+    assert.match(chip[1], /lang="ar"/, `${letter.id}: erişilebilir ad Arapça dil etiketi taşır`);
+    assert.doesNotMatch(chip[1], /aria-labelledby=/, `${letter.id}: kaynak dışı gizli label düğümü kullanılmaz`);
+    const attrs = chip[1];
+    assert.match(attrs, /aria-pressed="false"/, `${letter.id}: seçili durum semantiği korunur`);
+    assert.match(attrs, /draggable="true"/, `${letter.id}: sürükleme semantiği korunur`);
+    assert.match(attrs, /onpointerdown="window\.SeymaQuranLearn\.kaoDrag/, `${letter.id}: sürükleme hedefi korunur`);
+    assert.match(attrs, /onclick="App\.kaoAnswer/, `${letter.id}: klavye/dokunma seçimi korunur`);
   }
-  const names = phonics.letters.map((letter) => String(letter.translit && letter.translit.bwToOkunus));
-  assert.ok(text(html).length > 0 && names.length === 28, 'okunuş kaynağı donmuş modül');
+  assert.ok(text(html).length > 0, 'çiplerin görünür glifleri korunur');
+});
+
+check('K3PD-11 kaynak kapsamı: bütün gerçek fonik harfleri tabloda eşleşir; build hedef/çeldiricileri eksiksiz adlandırılır', () => {
+  const unsupported = Array.from(phonics.letters).filter((letter) => !SOURCE_NAMES[letter.id]).map((letter) => letter.id).sort();
+  assert.deepEqual(unsupported, [], 'her fonik harfin kaynak adı doğrulanmış olmalı');
+  const task = build(':unsupported-source-guard');
+  assert.ok(task.choices.every((choice) => SOURCE_NAMES[byChar.get(choice.label).id]), 'gerçek build şıklarında kaynak dışı harf yok');
+});
+
+check('K3PD-11: kısmi klavye seçimi DOM yeniden çiziminden sonra odağı sıradaki doğru harfe taşır', () => {
+  const focusSurface = taskDom();
+  const focusHarness = bootKao({ seeded: true, surface: { taskElement: () => focusSurface.node } });
+  const focusApi = focusHarness.api, focusTask = build(':focus-restoration');
+  focusHarness.data.quranLearn.cards[focusTask.cardId] = { state: 'review', s: 12, reps: 5, due: '2026-09-29T00:00:00.000Z' };
+  focusHarness.ui.kaoQueue = [{ id: focusTask.id, cardId: focusTask.cardId, isNew: false }];
+  focusHarness.ui.kaoTasks = { [focusTask.id]: focusTask };
+  focusHarness.ui.kaoTaskIndex = 0;
+  focusHarness.ui.kaoTaskStartedAt = Date.now();
+  focusHarness.ui.kaoUndo = null;
+  focusHarness.ui.kaoPanel = { open: false };
+  focusHarness.ui.kaoOrderDraft = [];
+  focusHarness.ui.kaoPaintedId = focusTask.id;
+  focusSurface.node.setAttribute('data-task-id', focusTask.id);
+  focusSurface.node.innerHTML = focusApi.kaoTaskHTML(focusTask);
+
+  const first = orderedChips(focusTask)[0];
+  const focusedBefore = focusSurface.node.buttons.find((button) => button.getAttribute('data-kao-choice-id') === first.choiceId);
+  assert.ok(focusedBefore, 'gerçek build düğmesi odak testinde çizilmeli');
+  focusedBefore.focus();
+  const result = focusApi.kaoAnswer(focusTask.id, first.choiceId);
+  assert.equal(result.pending, true, 'ilk doğru harf kısmi seçim olarak kalmalı');
+  assert.notEqual(focusSurface.doc.activeElement, focusSurface.doc.body, 'yeniden çizim odağı body üzerinde bırakmamalı');
+  assert.equal(focusSurface.doc.activeElement.getAttribute('data-kao-choice-id'), orderedChips(focusTask)[1].choiceId,
+    'odak sıradaki gerekli, seçilmemiş gerçek harf çipine gider');
+  const selected = focusSurface.node.buttons.find((button) => button.getAttribute('data-kao-choice-id') === first.choiceId);
+  assert.equal(selected.getAttribute('aria-pressed'), 'true', 'seçilen çip aria-pressed durumunu korur');
+  assert.equal(selected.disabled, true, 'seçilen çip tekrar etkinleştirilemez');
+  assert.equal(focusSurface.doc.activeElement.disabled, false, 'odaklanan sonraki çip etkin kalır');
 });
 
 check('K3PD-10: gerçek build HTML’si doğrulanmış Türkçe anlam ipucunu gösterir, cevabı sızdırmaz ve kaynaklardan bağımsızdır', () => {
@@ -287,4 +487,4 @@ check('merdiven: build yalnız R3/A; B kolu R1, diğer basamaklar değişmez ve 
   t.data.quranLearn.cards[cardId] = saved;
 });
 
-console.log(`test_k3p_build: PASS (${passed} kontrol — uygunluk, aile çeldiricisi, sıra notlama, a11y, merdiven)`);
+console.log(`test_k3p_build: PASS (${passed} kontrol — uygunluk, birleşik preview, kaynak adları, sıra/undo, order ayrımı, merdiven)`);

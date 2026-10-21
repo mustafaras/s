@@ -3218,10 +3218,12 @@
     var failed=false,fail=function(){ if(failed) return; failed=true; if(typeof onFail==='function') onFail(); };
     var playAt=function(index){
       if(index>=srcs.length||failed) return;
-      var audio=quranLearnSurfaceDeps.createAudio(srcs[index]); if(!audio){ fail(); return; }
-      audio.preload='none';
-      if(typeof audio.addEventListener==='function'){ audio.addEventListener('error',fail,{once:true}); audio.addEventListener('ended',function(){ playAt(index+1); },{once:true}); }
-      try{ var result=audio.play(); if(result&&typeof result.catch==='function') result.catch(fail); }catch(_error){ fail(); }
+      try{
+        var audio=quranLearnSurfaceDeps.createAudio(srcs[index]); if(!audio){ fail(); return; }
+        audio.preload='none';
+        if(typeof audio.addEventListener==='function'){ audio.addEventListener('error',fail,{once:true}); audio.addEventListener('ended',function(){ playAt(index+1); },{once:true}); }
+        var result=audio.play(); if(result&&typeof result.catch==='function') result.catch(fail);
+      }catch(_error){ fail(); }
     };
     playAt(0); return true;
   }
@@ -3243,7 +3245,9 @@
     var clips=row.filter(function(word){ return word.lemmaId&&safeClipId('w-'+word.lemmaId); }).map(function(word){ return 'assets/kao/audio/w-'+word.lemmaId+'-measured.m4a'; });
     ui.kaoGildCount=row.length; ui.kaoGildMs=Math.round(1200/row.length); ui.kaoGildTimer=null;
     if(!kaoAnimate()) ui.kaoGildIndex=row.length;
-    else { ui.kaoGildIndex=0; if(clips.length) kaoPlaySequence(clips); if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.setTimer==='function') ui.kaoGildTimer=quranLearnSurfaceDeps.setTimer(kaoGildStep,ui.kaoGildMs); }
+    else { ui.kaoGildIndex=0; if(quranLearnSurfaceDeps&&typeof quranLearnSurfaceDeps.setTimer==='function') ui.kaoGildTimer=quranLearnSurfaceDeps.setTimer(kaoGildStep,ui.kaoGildMs); }
+    // Tezhip sesi ortak izni (q.settings.audio + sessiz-saat resolver'ı) kullanır; görsel hareketten bağımsızdır.
+    if(clips.length&&kaoAudioEnabled()) kaoPlaySequence(clips);
     quranLearnDeps.render(); return true;
   }
   function kaoTodayAyah(){

@@ -186,4 +186,16 @@ Sıradaki aday: K3PD-13 (bu satır sonraki karta başlama yetkisi değildir).
 - Üç korunan kirli dosyanın hashleri başlangıç değerleriyle aynı; baseline yazılmadı. Tarayıcı, ekran okuyucu ve cihaz kabulü ajan tarafından yapılmadı; programın ilgili dış kapıları pending kalır.
 - K3PD releaseApproval NOT_APPROVED; eski K3P 37/37 kaydı ayrıdır. Commit veya yayın yapılmadı.
 
-Sıradaki aday: K3PD-14 (bu satır sonraki karta başlama yetkisi değildir).
+
+## K3PD-14 — ready_for_audit / NOT_MEASURED
+
+- Tek hedef K3PD-14. K3PD-13 commit’i `8b98d5dea1509716e41ad56efc11aec5b21669b8`; çalışma ağacındaki `quranLearn.js` farkı yalnız bu kartın yaldız ses gate’i ve hata dayanıklılığıdır. Dal `k3pd-denetim-duzeltmeleri`, taban `HEAD...origin/main=3/0`.
+- `isQuietTime` canlı dependency’de `function` ve `SeyAudio.isQuietTime()` çağırıyor. Test boolean/function sınırını denetliyor; gerçek saat yok. Ortak ses izni `q.settings.audio` + sessiz-saat resolver’ı; reduced-motion yalnız görsel timer’ı kapatıyor.
+- Sentetik 2×2×2 sonuç: izin olmayan altı hücre `createAudio=0/play=0`; ses izni ve sessiz olmayan iki hücre `8/8`, reduced-motion dahil. Ses nesnesi/çalma hata yolları okumayı ve yaldız tamamlanmasını durdurmuyor. K3P-21 iki düğme ve `App.kao* = 45` korunuyor.
+- Ortak pin 20261019a→20261021a oldu; `index.html`, `sw.js` ve IIP-22 testi eşleşiyor; K3PD pin ertelemesi boşaltıldı. Pin tazeliği, G0+G1 ve yavaş-host performans sonucu aday commit’i üzerinde yeniden kaydedilecek.
+- Kullanıcının bu oturumdaki açık canlıya alma talimatı için yalnız K3PD-14’e ait bir defalık prompt/denetleyici istisnası eklendi. Bu bağımsız denetim PASS’i değildir; kayıt sonradan `ACCEPTED_DEVIATION` olarak bağlanacaktır. K3PD-15 açılmayacak.
+- Tam exact yazma kapsamı DURUM.json `cards.K3PD-14.changedPaths` içindedir (11 yol). Önceden kirli KAPANIS, README, GORSEL-KANIT.md ve PDF kapsam dışı; başlangıç hashleri korunuyor.
+
+Sıradaki aday: K3PD-14 (aday durumudur; bu oturumda K3PD-15 başlatılmayacak).
+
+Kanıt: [K3PD-14/EVIDENCE.md](kanit/K3PD-14/EVIDENCE.md).

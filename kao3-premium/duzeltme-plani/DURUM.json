@@ -5193,12 +5193,168 @@
     },
     "K3PD-14": {
       "id": "K3PD-14",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "ready_for_audit",
+      "baseHead": "8b98d5dea1509716e41ad56efc11aec5b21669b8",
+      "changedPaths": [
+        "app/core/quranLearn.js",
+        "tests/kao/test_k3p_lesson_ayah.js",
+        "index.html",
+        "sw.js",
+        "tests/app/test_iip_22.js",
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/DENETLEYICI.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-14/EVIDENCE.md"
+      ],
+      "checks": [
+        {
+          "command": "git status --short --branch",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "branch": "k3pd-denetim-duzeltmeleri",
+            "cardPaths": 11,
+            "protectedDirtyPaths": 4
+          }
+        },
+        {
+          "command": "git rev-parse HEAD",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "sha": "8b98d5dea1509716e41ad56efc11aec5b21669b8"
+          }
+        },
+        {
+          "command": "git rev-list --left-right --count HEAD...origin/main",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "ahead": 3,
+            "behind": 0
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_lesson_ayah.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "controls": 7,
+            "matrixCells": 8,
+            "allowedCells": {
+              "createAudio": 8,
+              "play": 8
+            },
+            "deniedCells": 6,
+            "errorModes": [
+              "missing",
+              "null-audio",
+              "throw-create",
+              "throw-play",
+              "emit-error"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_audio_buttons.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "controls": 6,
+            "visibleAudioButtons": 2,
+            "AppKaoAssignments": 45
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_dda.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "passed": 14,
+            "failed": 0
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_phonics_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "grammarBytes": 72297,
+            "surahBytes": 87335,
+            "phonicsBytes": 9552
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_reader.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "controls": 14,
+            "quietTimeReadingContinues": true
+          }
+        },
+        {
+          "command": "node tests/app/test_iip_22.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "controls": 14,
+            "releasePin": "20261021a"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearn.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check tests/kao/test_k3p_lesson_ayah.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check sw.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "node --check tests/app/test_iip_22.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "clean"
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        }
+      ],
+      "auditVerdict": "NOT_MEASURED",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-14/EVIDENCE.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-15": {
@@ -5442,11 +5598,7 @@
   "pinDeferral": {
     "branch": "k3pd-denetim-duzeltmeleri",
     "until": "K3PD-32",
-    "files": [
-      "app/kao.css",
-      "app/core/quranLearn.js",
-      "app/core/quranLearnFlow.js"
-    ],
+    "files": [],
     "mainExceptions": []
   },
   "externalGates": {

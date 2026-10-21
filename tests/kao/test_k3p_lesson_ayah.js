@@ -171,4 +171,84 @@ check('K3P-13 zirve: hareket azaltmada yaldız STATİK (zamanlayıcı kurulmaz)'
   assert.equal((t.api.kaoOverlayHTML(t.NOW).match(/is-gild/g) || []).length, total, 'statik yaldız tüm satırı kaplamalı');
 });
 
+// K3PD-14 · Ses izni KAO audio ayarı + resolver işlevinden gelir; quiet-time gerçek saatten okunmaz.
+function gildAudioCase({ audioEnabled, quiet, reducedMotion, audioMode = 'normal' }) {
+  let createAudioCalls = 0, playCalls = 0, trackGildAudio = false;
+  const surface = { isQuietTime: () => quiet };
+  if (audioMode !== 'missing') surface.createAudio = (src) => {
+    if (trackGildAudio) {
+      createAudioCalls += 1;
+      if (audioMode === 'throw-create') throw new Error('synthetic createAudio failure');
+      if (audioMode === 'null-audio') return null;
+    }
+    const listeners = {};
+    return {
+      src,
+      addEventListener(name, fn) { listeners[name] = fn; },
+      play() {
+        if (trackGildAudio) {
+          playCalls += 1;
+          if (audioMode === 'throw-play') throw new Error('synthetic play failure');
+          if (audioMode === 'emit-error' && listeners.error) listeners.error();
+          if (listeners.ended) listeners.ended();
+        }
+        return Promise.resolve();
+      }
+    };
+  };
+  const t = bootKao({ surface });
+  const q = freshUser(t);
+  q.settings.audio = audioEnabled;
+  t.win.matchMedia = (query) => ({ matches: reducedMotion && query === '(prefers-reduced-motion:reduce)' });
+  assert.equal(startLessonForFixture(t, 'u01.02'), true, 'sentetik ders başlamalı');
+  assert.equal(playLesson(t, { stopAt: 'apply' }), true, 'sentetik ders uygulama adımına gelmeli');
+  const total = (t.api.kaoOverlayHTML(t.NOW).match(/kao-tezhip-word/g) || []).length;
+  assert.ok(total > 1, 'matris âyeti birden çok kelime içermeli');
+  t.timers.length = 0;
+  trackGildAudio = true;
+  assert.equal(t.api.kaoLesson('gild'), true, 'yaldızlama, ses durumundan bağımsız başlamalı');
+  return { t, total, createAudioCalls, playCalls };
+}
+
+check('K3PD-14 ses izni matrisi: ayar × sessiz saat × hareket azaltma gerçek ses çağrılarını sayar', () => {
+  const measurements = [];
+  for (const audioEnabled of [false, true]) for (const quiet of [false, true]) for (const reducedMotion of [false, true]) {
+    const result = gildAudioCase({ audioEnabled, quiet, reducedMotion });
+    const allowed = audioEnabled && !quiet;
+    const matrixCell = `ayar=${audioEnabled} sessiz=${quiet} reduce=${reducedMotion}`;
+    if (allowed) {
+      assert.ok(result.createAudioCalls > 0, `izinli hücrede createAudio olmalı (${matrixCell})`);
+      assert.ok(result.playCalls > 0, `izinli hücrede play olmalı (${matrixCell})`);
+      assert.equal(result.playCalls, result.createAudioCalls, `her yaratılan sentetik klip oynatılmalı (${matrixCell})`);
+    } else {
+      assert.equal(result.createAudioCalls, 0, `createAudio=0 (${matrixCell})`);
+      assert.equal(result.playCalls, 0, `play=0 (${matrixCell})`);
+    }
+    measurements.push(`${matrixCell}: createAudio=${result.createAudioCalls}, play=${result.playCalls}`);
+    if (reducedMotion) {
+      assert.equal(result.t.ui.kaoGildTimer, null, 'hareket azaltmada görsel zamanlayıcı kapalı');
+      assert.equal(result.t.timers.length, 0, 'hareket azaltmada yeni görsel zamanlayıcı yok');
+      assert.equal(result.t.ui.kaoGildIndex, result.total, 'hareket azaltmada satır statik yaldızlı');
+    } else {
+      assert.ok(result.t.ui.kaoGildTimer, 'hareket açıksa görsel yaldız zamanlayıcısı çalışmalı');
+      assert.ok(result.t.timers.length > 0, 'hareket açıksa gerçek sentetik timer kurulmalı');
+    }
+  }
+  console.log(`K3PD-14 matrix measurements: ${measurements.join(' · ')}`);
+});
+
+check('K3PD-14 ses yokluğu veya hata okumayı ve sessiz yaldız zamanlayıcısını durdurmaz', () => {
+  for (const audioMode of ['missing', 'null-audio', 'throw-create', 'throw-play', 'emit-error']) {
+    const result = gildAudioCase({ audioEnabled: true, quiet: false, reducedMotion: false, audioMode });
+    assert.ok(result.t.ui.kaoGildTimer, `${audioMode}: yaldız zamanlayıcısı kurulmalı`);
+    for (let guard = 0; guard < 60 && result.t.ui.kaoGildTimer; guard += 1) {
+      const timer = result.t.timers[result.t.ui.kaoGildTimer - 1];
+      assert.ok(timer && typeof timer.fn === 'function', `${audioMode}: sentetik timer bulunmalı`);
+      timer.fn();
+    }
+    assert.equal(result.t.ui.kaoGildIndex, result.total, `${audioMode}: okuma/yaldız tamamlanmalı`);
+    assert.equal((result.t.api.kaoOverlayHTML(result.t.NOW).match(/is-gild/g) || []).length, result.total, `${audioMode}: satırın tamamı görünmeli`);
+  }
+});
+
 console.log(`test_k3p_lesson_ayah: PASS (${passed} kontrol)`);

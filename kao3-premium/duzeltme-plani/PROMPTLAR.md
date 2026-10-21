@@ -1,6 +1,6 @@
 # K3PD — Bağımsız denetim sonrası sıralı düzeltme promptları
 
-Tarih: 2026-10-18 · Plan sürümü: 1 · Durum: PLAN_ONLY · Uygulama başlamadı.
+Tarih: 2026-10-21 · Plan sürümü: 1 · Durum: ACTIVE · K3PD-00…13 iş kayıtları canlı state’tedir.
 
 Bu belge, K3P 37 kart denetimindeki F-01…F-14 bulgularını ve kanıt açıklarını kapsayan **34 dar kapsamlı prompt** içerir. Eski K3P programını yeniden açmaz. Eşi [DENETLEYICI.md](DENETLEYICI.md), kabul/karar/kanıt ve bağımsız denetim sözleşmesidir. Bu iki dosyanın oluşturulması kod düzeltmesi, yeni şema, yeni hedef veya yayın yetkisi değildir.
 
@@ -537,7 +537,7 @@ Yeni App.kao* ekleme; mevcut kaoContinue çoğaltıcısı/argümanı veya KAO y�
 
 **Oku:** kaoAudioEnabled, kaoGild, kaoPlaySequence; isQuietTime bağımlılığının mevcut türü; lesson_ayah ve phonics/reader sessiz saat testleri.
 
-**Yazma allowlist’i:** quranLearn.js; test_k3p_lesson_ayah.js; ilgili phonics/reader fixture’ları yalnız koruma testleri; yeni kayıtlar.
+**Yazma allowlist’i:** `app/core/quranLearn.js`; `tests/kao/test_k3p_lesson_ayah.js`; yalnız koruma testi gerekirse `tests/kao/test_kao_phonics_contract.js` ve `tests/kao/test_kao2_reader.js`; pinli yayını bu kartta tamamlamak için `../../index.html`, `../../sw.js` ve `tests/app/test_iip_22.js`; bu kartın exact kapsamını ve bir defalık yetki istisnasını belgelemek için `kao3-premium/duzeltme-plani/PROMPTLAR.md` ve `kao3-premium/duzeltme-plani/DENETLEYICI.md`; K3PD-14 kayıt/kanıt yolları `kao3-premium/duzeltme-plani/DURUM.json`, `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`, `kao3-premium/duzeltme-plani/KAYIT.md` ve `kao3-premium/duzeltme-plani/kanit/K3PD-14/EVIDENCE.md`.
 
 **Uygula:**
 
@@ -551,6 +551,8 @@ Mevcut ortak ses izni yorumunu kullan; isQuietTime işlev/boolean farkında mevc
 **Hard stop:** Ses iznini premiumAtmosphere veya görsel animasyon izniyle aynı koşul yapma.
 
 **Teslim:** Değişen exactpaths; tekrar üretim; komut/exit/ölçüler; independent verdict; açık sınırlamalar ve yeni kayıt. Önerilen commit başlığı `K3PD-14: Yaldızlama sesini ayar ve sessiz saatle sınırla`. Kayıt güncellemesi ve bu kartın kapanışı dışında sonraki işe başlama.
+
+**2026-10-21 kullanıcı istisnası:** Kullanıcının bu oturumdaki “canlıya al o zaman” ve “bunları çözmelisin gerekirse prompt dosyalarımı düzel benim boyle bi istegim yok” talimatları yalnız bu K3PD-14 adayı için ortak §1.5/§3.3 ve DENETLEYICI G6’daki varsayılan bağımsız denetim ile K3PD-32/33 sırasını açıkça kaldırır. Bağımsız denetim yapılmış gibi PASS yazma; kartı ancak tüm teknik kapılar geçerse `ACCEPTED_DEVIATION` ile kapat ve kullanıcı istisnasını KAYIT’a aynen bağla. Yayın makbuzunda gerçek aday SHA’sı, exact yollar, Pages run ve canlı hash eşliği bulunur. Bu istisna K3PD-15’i başlatmaz ve sonraki kart/yayınlara aktarılmaz.
 
 **Sonraki aday:** K3PD-15. Bu bilgi sonraki karta uygulama izni değildir.
 <!-- /PROMPT K3PD-14 -->

@@ -1,6 +1,6 @@
 # K3PD — Bağımsız denetleyici ve kabul sözleşmesi
 
-Tarih: 2026-10-18 · Sürüm: 1 · Durum: PLAN_ONLY · Uygulanan K3PD kartı: 0/34.
+Tarih: 2026-10-21 · Sürüm: 1 · Durum: ACTIVE POLICY · Canlı kart sayımı DURUM.json’dan okunur.
 
 Eş belge: [PROMPTLAR.md](PROMPTLAR.md). Bu dosya planın denetleyicisidir; bir test betiği veya çalıştırılmış kabul raporu değildir. Eski K3P programının 37/37 kaydı korunur. Ardıl plan 34 karttır; “37 kartın düzeltmesi” ile “34 yeni prompt” aynı sayım değildir.
 
@@ -8,7 +8,9 @@ Eş belge: [PROMPTLAR.md](PROMPTLAR.md). Bu dosya planın denetleyicisidir; bir 
 
 ### 1.1 Bugün ne yetkilendirildi?
 
-Kullanıcı, önceki bağımsız denetimi kapsamlı, sıralı ve odaklı promptlara dönüştürüp iki Markdown dosyası kaydetmeyi istedi. Bu iki dosya oluşturuldu; uygulama, şema, hedef değişikliği veya yeni yayın henüz onaylanmış değildir. İlk aday K3PD-00; yürütülebilir kart ancak kullanıcının yeni açık isteğiyle seçilir. Eski K3P-27 yayın onayı bu plana taşınmaz.
+Kullanıcı, önceki bağımsız denetimi kapsamlı, sıralı ve odaklı promptlara dönüştürüp iki Markdown dosyası kaydetmeyi istemişti. Bu tarihsel istek yeni kod/yayın yetkisi değildi. Kartlar yalnız canlı state ve o oturumdaki kullanıcı talimatıyla seçilir. Eski K3P-27 yayın onayı bu plana taşınmaz.
+
+**Bir defalık K3PD-14 yetkisi (2026-10-21):** Kullanıcı bu oturumda “canlıya al o zaman” dedi ve prompt kapısını düzeltmemizi istedi. Bu açık talimat, yalnız K3PD-14’ün exact adayını DENETLEYICI G6’daki varsayılan K3PD-32/33 sırası ve bağımsız denetçi raporu beklenmeden canlıya alma yetkisidir; K3PD-14 kartındaki istisna ortak PROMPTLAR §1.5/§3.3 şartlarına da yalnız bu aday için açık istisnadır. Bu, bağımsız denetim PASS’i değildir; kullanıcı tarafından kabul edilmiş sapma `ACCEPTED_DEVIATION` olarak kaydedilir. Aday SHA, exact kapsam ve gerçek yanıt KAYIT.md’de aday commit’inden sonra bağlanır. Bu istisna K3PD-15’i, başka kartı veya gelecekteki yayınları yetkilendirmez.
 
 ### 1.2 Denetleyici ne yapar?
 
@@ -250,9 +252,9 @@ Final, kaynak ve ortam güvenliği incelenmiş bütün `tests/kao/test_*.js`, `t
 
 Eski kapi-hizli/kapilar scriptleri geçici log yazar ve bitmiş K3P state’ini tüketir. Bunlar yeni ardıl programın otoritesi değildir. Çalıştırılırsa gerçek kapsam ve yan etkileri raporlanır; yeni final gate yerine kullanılamaz.
 
-### G6 — Yalnız 33 veadaybazlı açık yayınonayı
+### G6 — Varsayılan 33; K3PD-14 için kaydedilmiş bir defalık kullanıcı istisnası
 
-Git remote kimliği ve onaylı adayı doğrula; kişisel depo URL’si veya token basma. Yerel commit, main/origin SHA paritesi, doğru head SHA’ya ait validate/deploy workflow ve bütün public host/varlık URL’lerinin canlı SHA eşliği ayrı kanıtlardır. Onay gelmeden push/merge/tag yok; tag varsayılan kapsamda değildir. Yayın öncesi üretim veya pinli aday değişirse aday, onay ve kapı bağı yenilenir. Geçmiş workflow sonucu yeni SHA’ya kanıt yapılamaz.
+Varsayılan kural K3PD-33 ve exact aday bazlı açık onaydır. Yalnız 2026-10-21 K3PD-14 oturumu için yukarıdaki kullanıcı istisnası K3PD-32/33 ve bağımsız denetim önkoşulunu kaldırır. Git remote kimliği ve aday SHA’yı doğrula; kişisel depo URL’si veya token basma. Bu istisna kapsamındaki push yalnız K3PD-14 exact allowlist değişikliklerini ve mevcut dalın zaten commit edilmiş atalarını içerir; korunan/önceden kirli yolları stage etme. Yerel commit, main/origin SHA paritesi, doğru head SHA’ya ait validate/deploy workflow ve bütün public host/varlık URL’lerinin canlı SHA eşliği ayrı kanıtlardır. Push yalnız bu kayıtlı kullanıcı talimatıyla yetkilidir; merge/tag kapsamda değildir. Yayın öncesi üretim veya pinli aday değişirse aday ve kanıt yenilenir. Geçmiş workflow sonucu yeni SHA’ya kanıt yapılamaz. Teknik başarısızlıkta yayın yapma ve ilgili gate’i açık bırak.
 
 Manifest URL listesini index/sw/panel ve onaylı offline allowlist’ten çıkar; 61/64 sayılarını hardcode etme. Cache-Control:no-cache, Pragma:no-cache, no-store ve benzersiz query ile public GET yap. HTTP 200 tek başına hash paritesi değildir. Uygulama gerçek hesap tarayıcısında açılmaz. Ağ/araç/credential engelinde kullanıcıdan chat üzerinden sır istenmez; ilgili uzak alan UNVERIFIABLE kalır.
 

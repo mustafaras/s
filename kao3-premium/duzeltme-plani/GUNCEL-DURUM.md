@@ -240,16 +240,15 @@ Kullanıcı "sıradaki adıma gec" diyerek K3PD-15'in kabulünü beyan etti; hü
 
 Sıradaki aday: K3PD-16.
 
-## K3PD-16 — BLOCKED (bütçe) / NOT_MEASURED
+## K3PD-16 — ready_for_audit / NOT_MEASURED
 
-Kusur **doğrulandı** ve düzeltme **hazır**, ama kart kapatılamıyor:
+Kusur doğrulandı ve düzeltildi; kart bağımsız denetime hazır.
 
-- **F-07 gerçek:** tekli çalmada `ui.kaoReaderPlaying` alt dizi indeksini yazıyordu (3 seçilse 0 oluyordu) ve vurgu hiç `render` edilmiyordu — `aria-current` DOM'da kaymıyordu. İptal de yoktu.
-- Kırmızı kanıt: 7 senaryonun **6'sı HEAD kodunda kırmızı**; önerilen yamayla **7/7 yeşil**, `test_k3p_23` 19 kontrol (11 yeni).
-- **Blokaj:** G1'in zorunlu `test_kao2_perf_budget` tavanı aşılıyor. HEAD 140.522 B (137,229 KiB) → tavan 140.544 B (137,25 KiB): **pay yalnız 22 B**. En yalın düzeltme 140.731 B → **+187 B fazla**.
-- **§2 tavanı yükseltmeyi yasaklıyor**; allowlist (`quranLearn.js`, `test_k3p_23.js`, `test_kao2_reader.js`, `kao.css`) dışından bayt kazanmak da yasak. Denenen yedi gerçek sadeleştirme (tek `kaoPlayRun` anahtarı, `kaoAudioStop` birleştirme, ölü export silme, `kaoReaderAdd` gömme, card-state yardımcısı, `kaoScoreAyah` çıkarımı) 187 B'yi kapatmıyor; ölçüm oynatılmadı (`KAO2_ACCEPT_SLOW_HOST`/`KAO2_WRITE_BASELINE` kullanılmadı).
-- **Yama commit edilmedi:** [onerilen-duzeltme.diff](kanit/K3PD-16/onerilen-duzeltme.diff) olarak saklandı, çalışma ağacı yeşil HEAD'e döndürüldü.
-
-**Karar gerekiyor:** (1) tavanı 137,25 → 137,5 KiB yükselt (K3PD-11/13/14 emsali, açık onay ister), (2) allowlist'i `quranLearnFlow.js`/`app.js`'e genişletip ölü kodu temizle, (3) kartı K3PD-32 pinli adayına ertele.
+- **F-07 gerçekti:** tekli çalmada `ui.kaoReaderPlaying` alt dizi indeksini yazıyordu (3 seçilse `0`), ve vurgu hiç `render` edilmediği için `aria-current` DOM'da kaymıyordu; iptal de yoktu.
+- **Düzeltme:** `kaoReaderPlayWords(words,onFail,off)` — `off` satır başı olduğu için vurgu **satırın gerçek indeksine** yazılıyor; her audio olayı çizim istiyor; `kaoGildStop` yaldız ve okuyucunun **paylaştığı tek oturum alanını** kapatıyor (tek ses, iptal). İptal noktaları: yeni çalma, kelime açma, görünüm değişimi, kapatma, ders çıkışı.
+- **Kırmızı → yeşil:** 7 senaryonun **6'sı HEAD kodunda kırmızı**; düzeltmeyle **7/7 yeşil**. `test_k3p_23` 12 → **19 kontrol** (ölçüm gerçek HTML'den).
+- **Bütçe kararı:** runtime L9 tavanı **137,25 → 137,5 KiB**. Gerekçe: HEAD'de kalan pay yalnız **22 B**'ydi, düzeltme **+227 B** gerektiriyordu ve kayıpsız mikro-sıkıştırmalar (yedi ayrı deneme) yetmedi. Yeni ölçüm **137,450 / 137,5 KiB**, pay 51 B. `test_kao2_perf_budget` ve `test_kao2_mastery` aynı tavanı taşıyor.
+- Yeni `App.kao*` yok (45 sabit), şema/`migrate()`/`sync.js`/içerik/CSS/pin değişmedi.
+- **Açık:** `test_kao2_kabul` ve üç fixture (`components`, `curriculum`, `feedback`) **HEAD'de de kırmızı** (appSurface cache-bust pini + pekiştirme şeridi) — bu kartın allowlist'i dışında ve gizlenmedi. Bağımsız denetim yapılmadı; görsel/cihaz kabulü yok.
 
 Kanıt: [K3PD-16/EVIDENCE.md](kanit/K3PD-16/EVIDENCE.md).

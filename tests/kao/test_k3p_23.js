@@ -241,4 +241,154 @@ check('yüzey: App.kao* sayısı 45 kalır (yeni handler eklenmedi)', () => {
   assert.ok(assigned.has('kaoReader'), 'mevcut çoğaltıcı kullanılır');
 });
 
-console.log(`test_k3p_23: PASS (${passed} kontrol — senkron yaldız yalnız CSS + "Kartlarıma ekle", aynı şema, idempotent, doğrulanmamış reddi, 45 yüzey)`);
+// ── K3PD-16 · Okuyucunun GERÇEK kelime vurgusu ve tekli indeks ────────────────────────────────
+// Ölçüm GERÇEK HTML'den yapılır: test kendi `render()`'ını çağırmaz; motorun her audio
+// olayından sonra çizdiği markup yakalanır (`deps.render` sayacı yalnız "çizim istendi mi" der).
+function playbackHarness() {
+  const clips = [], timers = [];
+  let renders = 0;
+  const t = bootKao({
+    deps: { render() { renders += 1; } },
+    surface: {
+      createAudio(src) {
+        const h = {};
+        const audio = {
+          src, preload: '',
+          addEventListener(name, fn) { h[name] = fn; },
+          play() { return Promise.resolve(); },
+          fire(name) { if (h[name]) h[name](); }
+        };
+        clips.push(audio);
+        return audio;
+      },
+      setTimer(fn, ms) { timers.push({ fn, ms }); return timers.length; },
+      clearTimer() {}, isQuietTime: false
+    }
+  });
+  freshUser(t);
+  readerIndex(t, 95, 0);
+  const words = t.win.QuranShortSurahsV1.words.filter((w) => w.surahId === 95)
+    .sort((a, b) => a.ayah - b.ayah || a.i - b.i);
+  // Yalnız KELİME çiplerinin işareti sayılır: sûre seçicisi de aria-current taşıyor.
+  const marked = () => [...t.api.kaoReaderHTML().matchAll(/class="kao-reader-word [^"]*" aria-current="true"><button type="button" id="kao-reader-w-(\d+)"/g)]
+    .map((m) => Number(m[1]));
+  return { t, clips, timers, words, marked, renders: () => renders, resetRenders: () => { renders = 0; } };
+}
+
+check('K3PD-16 vurgu gerçekten çizilir: her ended sonrası DOM işareti kayar (0→1, timer/render elle çağrılmadan)', () => {
+  const h = playbackHarness();
+  assert.equal(h.t.api.kaoReader('play', 'all'), true, 'çalma başlar');
+  assert.deepEqual(h.marked(), [0], 'ilk kelime vurgulu (0)');
+  assert.equal(h.t.ui.kaoReaderPlaying, 0);
+  for (let step = 1; step <= 2; step += 1) {
+    h.resetRenders();
+    h.clips[step - 1].fire('ended');
+    assert.deepEqual(h.marked(), [step], `${step}. ended sonrası vurgu ${step}`);
+    assert.equal(h.t.ui.kaoReaderPlaying, step);
+    assert.ok(h.renders() >= 1, `${step}. ended bir çizim istedi (vurgu kendiliğinden güncellenir)`);
+    assert.equal(h.timers.length, 0, 'okuyucu sesle senkron; timer yok');
+  }
+});
+
+check('K3PD-16 tekli çalma satır indeksini taşır: 3 seçilirse playing=3 (alt dizinin 0\'ı değil)', () => {
+  for (const wordIndex of [0, 3, 7]) {
+    const h = playbackHarness();
+    assert.equal(h.t.api.kaoReader('word', wordIndex), true, `${wordIndex}: kelime açılır`);
+    // K3PD-16: kelime açmak çalan sesi bırakır → vurgu temiz başlar.
+    assert.deepEqual(h.marked(), [], `${wordIndex}: kelime açılınca vurgu temizlenir`);
+    assert.equal(h.t.api.kaoReader('play', 'one'), true, `${wordIndex}: tekli çalma başlar`);
+    assert.equal(h.t.ui.kaoReaderPlaying, wordIndex, `${wordIndex}: satır indeksi korunur`);
+    assert.deepEqual(h.marked(), [wordIndex], `${wordIndex}: yalnız o kelime vurgulu`);
+    assert.equal(h.clips.length, 1, `${wordIndex}: tek klip`);
+  }
+});
+
+check('K3PD-16 açık kelime yokken tekli çalma satır başından başlar, alt dizi indeksi sızdırmaz', () => {
+  const h = playbackHarness();
+  assert.equal(h.t.ui.kaoReaderWord, undefined, 'açık kelime yok');
+  assert.equal(h.t.api.kaoReader('play', 'one'), true);
+  assert.equal(h.t.ui.kaoReaderPlaying, 0, 'satır indeksi 0 (alt dizi indeksi değil)');
+  assert.deepEqual(h.marked(), [0]);
+});
+
+check('K3PD-16 son klip bitince ve hata/çıkışta vurgu temizlenir', () => {
+  // (a) son klip biter
+  const last = playbackHarness();
+  last.t.api.kaoReader('word', 2);
+  last.t.api.kaoReader('play', 'one');
+  assert.deepEqual(last.marked(), [2]);
+  last.clips[0].fire('ended');
+  assert.deepEqual(last.marked(), [], 'son ended vurguyu temizler');
+  assert.equal(last.t.ui.kaoReaderPlaying, null);
+
+  // (b) audio error
+  const err = playbackHarness();
+  err.t.api.kaoReader('play', 'all');
+  assert.deepEqual(err.marked(), [0]);
+  err.clips[0].fire('error');
+  assert.deepEqual(err.marked(), [], 'hata vurguyu temizler');
+  assert.equal(err.t.ui.kaoReaderPlaying, null);
+  assert.equal(err.clips.length, 1, 'hatadan sonra yeni klip denenmez');
+
+  // (c) görünümden çıkış / başka görünüm
+  const exit = playbackHarness();
+  exit.t.api.kaoReader('play', 'all');
+  assert.deepEqual(exit.marked(), [0]);
+  exit.t.api.kaoSetView('home');
+  assert.equal(exit.t.ui.kaoReaderPlaying, null, 'görünüm değişince vurgu temizlenir');
+  exit.t.api.kaoSetView('reader');
+  assert.deepEqual(exit.marked(), [], 'dönüşte artık vurgu yok');
+
+  // (d) başka sûreye geçiş
+  const surah = playbackHarness();
+  surah.t.api.kaoReader('play', 'all');
+  surah.t.api.kaoOpenSurah(96);
+  assert.equal(surah.t.ui.kaoReaderPlaying, null, 'sûre değişince vurgu temizlenir');
+});
+
+check('K3PD-16 eski oturumun callback\'i sonraki okuyucuya dokunmaz', () => {
+  const h = playbackHarness();
+  h.t.api.kaoReader('play', 'all');
+  const stale = h.clips[0];
+  // Yeni tur: tekli çalma yeni bir oturum açar.
+  h.t.api.kaoReader('word', 4);
+  h.t.api.kaoReader('play', 'one');
+  assert.deepEqual(h.marked(), [4]);
+  const created = h.clips.length;
+  stale.fire('ended'); // eski oturumun geç gelen olayı
+  assert.deepEqual(h.marked(), [4], 'eski ended yeni vurguyu değiştirmez');
+  assert.equal(h.clips.length, created, 'eski ended yeni ses başlatmaz');
+  assert.equal(h.t.ui.kaoReaderPlaying, 4);
+});
+
+check('K3PD-16 aynı anda tek ses: yeni çalma öncekini susturur', () => {
+  const h = playbackHarness();
+  h.t.api.kaoReader('play', 'all');
+  const paused = [];
+  // Gerçek ses yolunda önceki <audio> `pause()` ile bırakılır.
+  h.clips[0].pause = () => paused.push(h.clips[0].src);
+  h.t.api.kaoReader('word', 1);
+  assert.equal(paused.length, 1, 'kelime açmak çalan sesi susturur');
+  h.t.api.kaoReader('play', 'one');
+  assert.equal(h.clips.length, 2, 'tek klip yaratıldı (önceki listeden devam etmez)');
+});
+
+check('K3PD-16 sessiz saatte hiç ses yok, vurgu temiz, okuma yolu sürer', () => {
+  const clips = [];
+  const t = bootKao({
+    surface: {
+      createAudio(src) { clips.push(src); return { preload: '', addEventListener() {}, play() { return Promise.resolve(); } }; },
+      setTimer() { return 1; }, clearTimer() {}, isQuietTime: true
+    }
+  });
+  freshUser(t);
+  readerIndex(t, 95, 0);
+  const marked = () => [...t.api.kaoReaderHTML().matchAll(/class="kao-reader-word [^"]*" aria-current="true"><button type="button" id="kao-reader-w-(\d+)"/g)].map((m) => Number(m[1]));
+  assert.equal(t.api.kaoReader('play', 'all'), false, 'sessiz saatte çalma başlamaz');
+  assert.equal(clips.length, 0, 'hiç ses yaratılmaz');
+  assert.deepEqual(marked(), [], 'vurgu yok');
+  assert.ok(t.ui.kaoReaderNote && /Sessiz saat/.test(t.ui.kaoReaderNote), 'sessiz saat notu gösterilir');
+  assert.match(t.api.kaoReaderHTML(), /kao-reader-word/, 'okuma yüzeyi yine çizilir');
+});
+
+console.log(`test_k3p_23: PASS (${passed} kontrol — senkron yaldız yalnız CSS + "Kartlarıma ekle", aynı şema, idempotent, doğrulanmamış reddi, 45 yüzey, K3PD-16 gerçek vurgu/tekli indeks/iptal)`);

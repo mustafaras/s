@@ -599,7 +599,7 @@ Ses varsa kelime vurgusu gerçek klibin başlangıç/bitiş olaylarıyla ilerles
 
 **Oku:** kaoReaderPlayWords/Reader/ReaderHTML; kaoReaderPlaying ve focus restore; test_k3p_23.js ve test_kao2_reader.js.
 
-**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-16 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearn.js`; `tests/kao/test_k3p_23.js`; `tests/kao/test_kao2_reader.js`; `app/kao.css` (yalnız gerekirse); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-16/EVIDENCE.md`.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-16 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearn.js`; `tests/kao/test_k3p_23.js`; `tests/kao/test_kao2_reader.js`; `app/kao.css` (yalnız gerekirse); `tests/kao/test_kao2_perf_budget.js` (yalnız runtime gzip tavanını 137.25’ten 137.5 KiB’ye çıkar; 2026-10-22 kullanıcı onayı); `tests/kao/test_kao2_mastery.js` (yalnız aynı L9 tavanını 137.5 KiB’ye eşitle); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-16/EVIDENCE.md`.
 
 **Uygula:**
 

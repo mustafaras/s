@@ -743,7 +743,7 @@
       return {lemmaId:id,ar:String(lemma.ar||''),tr:String((lemma.meanings&&lemma.meanings[0])||''),status:kaoRootStatus(q,id,known)};
     }).filter(Boolean);
     var knownCount=lemmas.filter(function(item){ return item.status==='known'; }).length;
-    var masteredText=!lemmas.length?'Bu kökten henüz müfredatta kelime yok.':(knownCount===lemmas.length?'Bu aileden '+String(lemmas.length)+' kelimenin tamamını biliyorsun.':String(knownCount)+' / '+String(lemmas.length)+' kelime öğrenildi.');
+    var masteredText=!lemmas.length?'Bu kökten henüz müfredatta kelime yok.':(knownCount===lemmas.length?'Bu aileden '+lemmas.length+' kelimenin tamamını biliyorsun.':String(knownCount)+' / '+lemmas.length+' kelime öğrenildi.');
     return {root:root,pronunciation:detail?detail.pronunciation:'',meaning:detail?detail.meaning:'',derivatives:detail?detail.derivatives:[],lemmas:lemmas,knownCount:knownCount,masteredText:masteredText};
   }
   function kaoRootOpen(root){
@@ -990,13 +990,13 @@
     var rows=model.visible,query=model.query;
     var h='<main class="kao-roots" aria-labelledby="kao-roots-title"><div class="kao-view-head"><div><p class="kao-eyebrow">Kök aileleri</p><h2 id="kao-roots-title">Bir kök, bir aile</h2><p>Öğrenme sırasındaki 73 aile; altında tüm sözlüğü keşfedebilirsin.</p></div><button type="button" class="kao-back" onclick="App.kaoSetView(\'home\')">Geri</button></div>';
     h+='<div class="kao-roots-tools"><label class="kao-roots-search"><span class="kao-sr-only">Kök ara</span><input type="search" value="'+esc(query)+'" placeholder="Kök ara" aria-label="Kök ara" oninput="App.kaoRoots(\'query\',this.value)"></label>'
-      +'<button type="button" class="kao-secondary" aria-pressed="'+(model.allVisible?'true':'false')+'" onclick="App.kaoRoots(\'all\')">'+(model.allVisible?'Öğrenme sırasına dön':'Tüm kökler ('+String(model.allCount)+')')+'</button></div>';
+      +'<button type="button" class="kao-secondary" aria-pressed="'+(model.allVisible?'true':'false')+'" onclick="App.kaoRoots(\'all\')">'+(model.allVisible?'Öğrenme sırasına dön':'Tüm kökler ('+model.allCount+')')+'</button></div>';
     if(!rows.length){ h+='<p class="kao-roots-empty">Bu aramaya uyan kök yok.</p>'; return h+'</main>'; }
     var listTitle=model.allVisible?'Sözlükteki tüm kökler':'Öğrenme sırasındaki kök aileleri';
     h+='<section class="kao-root-family-list" aria-label="'+esc(listTitle)+'"><h3>'+esc(listTitle)+'</h3><ul>';
     h+=rows.map(function(item){
       var meta=item.meaning?esc(item.meaning):String(item.lemmaCount)+' kelime';
-      return '<li><button type="button" class="kao-root-row" onclick="App.kaoRoots(\'open\',\''+esc(item.root)+'\')"><span class="kao-root-ar" lang="ar" dir="rtl">'+esc(item.root)+'</span><span class="kao-root-body"><span class="kao-root-meta">'+meta+'</span><small>'+String(item.derivativeCount)+' Türkçe türev · '+String(item.lemmaCount)+' kelime'+(item.knownCount?' · '+String(item.knownCount)+' biliyorsun':'')+'</small></span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
+      return '<li><button type="button" class="kao-root-row" onclick="App.kaoRoots(\'open\',\''+esc(item.root)+'\')"><span class="kao-root-ar" lang="ar" dir="rtl">'+esc(item.root)+'</span><span class="kao-root-body"><span class="kao-root-meta">'+meta+'</span><small>'+item.derivativeCount+' Türkçe türev · '+item.lemmaCount+' kelime'+(item.knownCount?' · '+item.knownCount+' biliyorsun':'')+'</small></span><span class="kao-group-chevron" aria-hidden="true">›</span></button></li>';
     }).join('');
     return h+'</ul></section></main>';
   }
@@ -1191,15 +1191,15 @@
     return kaoReviewLevel(review)==='draft'?(fallback===undefined?null:fallback):(typeof value==='string'&&value?value:null);
   }
   function kaoUnitTitle(unit){
-    return kaoVisibleText(unit&&unit.review,unit&&unit.title,'Ünite '+String(unit.id));
+    return kaoVisibleText(unit&&unit.review,unit&&unit.title,'Ünite '+unit.id);
   }
   // Bağlam satırı etiketi: draft ünitede başlık "Ünite N" güvenli başlığına düşer; ön ek ikinci kez eklenmez.
   function kaoUnitContextLabel(unit){
-    var prefix='Ünite '+String(unit.id),title=kaoUnitTitle(unit);
+    var prefix='Ünite '+unit.id,title=kaoUnitTitle(unit);
     return title===prefix?prefix:prefix+' · '+title;
   }
   function kaoTextPair(o,prefix){
-    var fallback=String(prefix||'Ünite ')+String(o.id);
+    var fallback=String(prefix||'Ünite ')+o.id;
     return {t:kaoVisibleText(o.review,o.title,fallback),p:kaoVisibleText(o.review,o.promise,'')};
   }
   // K2F-21: draft ders metni hiçbir ekranda görünmez; kimlikten türetilen güvenli başlık kullanılır.
@@ -1319,7 +1319,7 @@
     var shorts=window.QuranShortSurahsV1,groups=Object.create(null);
     if(!shorts||!Array.isArray(shorts.words)) return [];
     shorts.words.forEach(function(word){
-      var key=String(word.surahId)+':'+String(word.ayah);
+      var key=String(word.surahId)+':'+word.ayah;
       if(!groups[key]) groups[key]=[];
       groups[key].push(word);
     });
@@ -1957,7 +1957,7 @@
     // K3P-A6: görev görünümünde de 5 bölümlü konum görünür.
     var taskSection=kaoLessonSection(ui.kaoLesson),taskSegs='';
     for(var ts=1;ts<=5;ts+=1){ var tf=ts<taskSection.section,ta=ts===taskSection.section,tw=ta?String(Math.max(0,Math.min(100,taskSection.countInSection?taskSection.indexInSection/taskSection.countInSection*100:0)))+'%':(tf?'100%':'0%'); taskSegs+='<span class="kao-lesson-seg'+(ta?' is-active':'')+(tf?' is-filled':'')+'"><i style="width:'+tw+'"></i></span>'; }
-    h+='<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+String(taskSection.section)+'" aria-valuetext="'+esc(kaoSectionValuetext(taskSection))+'" data-lesson-section="'+String(taskSection.section)+'">'+taskSegs+'</div>';
+    h+='<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+taskSection.section+'" aria-valuetext="'+esc(kaoSectionValuetext(taskSection))+'" data-lesson-section="'+taskSection.section+'">'+taskSegs+'</div>';
     h+='<div class="kao-task-top"><span>'+(isGrammar?esc(task.grammarType):(isBuild?'Harflerden kur':(isFragment?(task.kind==='order'?'Kelime dizme':'Parça çevir'):(isLink?'Bağ kur · Türkçedeki türevi':(isTransfer?'Yeni âyet · haftalık test':(isCloze?'Âyette boşluk':(task.direction==='tr>ar'?'Arapçayı seç':'Anlamı seç')))))))+'</span><span>'+String((ui.kaoTaskIndex||0)+1)+' / '+String((ui.kaoQueue||[]).length)+'</span></div>';
     if(isCloze) h+='<div class="kao-fragment-stimulus">'+kaoArabicPairHTML(task.ar,task.pronunciation,'kao-fragment-pair',false,true)+'</div>';
     else if(!task.audioOnly&&!isGrammar&&!isFragment&&(task.direction==='ar>tr'||isLink)) h+='<h2 class="kao-question" data-kao-ar>'+kaoArabicPairHTML(prompt,task.translit,'kao-question-pair',task.durable30===true||boredomHide,pronunciationFolded)+'</h2>';
@@ -2433,14 +2433,14 @@
     }else if(item.kind==='goal'||item.kind==='partGoal'){
       model.promise='Bu derste '+(item.lemmaIds||[]).length+' kelimeyle çalışacağız. Önce ısın, sonra tanış ve hemen dene; pekiştir, metinde bul.';
       model.goal=lessonRef?kaoVisibleText(lessonRef.lesson.review,lessonRef.lesson.goal,''):'';
-      if(item.conceptAnchor) model.context=(contextLine?contextLine+' · ':'')+'Kavram: '+String(item.conceptAnchor);
+      if(item.conceptAnchor) model.context=(contextLine?contextLine+' · ':'')+'Kavram: '+item.conceptAnchor;
       model.rowHtml=kaoRowHtml(kaoAyahRow(item.words,item.lessonIds,item.newLemmaIds),0);
     }
     if(item.kind==='partEnd'){
       var goalItem=(state.plan||[]).find(function(entry){ return entry.kind==='goal'||entry.kind==='partGoal'; })||{};
       model.title='Günlük süre sınırı';
       model.goal=lessonRef?kaoVisibleText(lessonRef.lesson.review,lessonRef.lesson.goal,''):'';
-      model.promise='Sıradaki görev ~'+String(item.requiredMinutes)+' dk · '+(item.source==='session'?'kişisel oturum medyanı':(item.source==='history'?'yedek: önceki 7 gün ortalaması':'ölçümsüz varsayılan'))+'. Bugün kalan '+String(Math.floor(item.remainingMs/60000))+' dk. Günlük süreyi artırabilir ya da aşımı açıkça kabul edebilirsin.';
+      model.promise='Sıradaki görev ~'+item.requiredMinutes+' dk · '+(item.source==='session'?'kişisel oturum medyanı':(item.source==='history'?'yedek: önceki 7 gün ortalaması':'ölçümsüz varsayılan'))+'. Bugün kalan '+String(Math.floor(item.remainingMs/60000))+' dk. Günlük süreyi artırabilir ya da aşımı açıkça kabul edebilirsin.';
       model.secondaryAction={name:'kaoLesson',args:['budget-overrun']};
       model.secondaryLabel='Süre aşımını kabul et';
       model.rowHtml=goalItem.rowHtml||'';
@@ -3223,10 +3223,11 @@
       if(ui.kaoGildIndex<ui.kaoGildCount) ui.kaoGildTimer=kaoGildTimer(run);
     },run.step);
   }
+  // Tek ses kaynağı: yaldız + okuyucu AYNI oturum alanını kullanır (kimlik null, timer bırakılır, ses susar).
   function kaoGildStop(){
     var ui=quranLearnDeps&&quranLearnDeps.ui(),run=ui&&ui.kaoGildRun;
     if(!ui) return false;
-    ui.kaoGildRun=null; ui.kaoGildTimer=null;
+    ui.kaoGildRun=null; ui.kaoGildTimer=null; ui.kaoReaderPlaying=null;
     try{ if(run&&run.audio&&run.audio.pause) run.audio.pause(); }catch(_error){}
     return true;
   }
@@ -3649,7 +3650,7 @@
       // Belirlenimci karıştırma: sıralama metne, yön sûre kimliğine bağlı.
       choices=choices.slice().sort(function(a,b){ return a.text<b.text?-1:(a.text>b.text?1:0); });
       if(surahId%2===1) choices.reverse();
-      return {id:'sc:'+String(surahId)+':'+String(word.id),lemmaId:word.lemmaId,
+      return {id:'sc:'+String(surahId)+':'+word.id,lemmaId:word.lemmaId,
         prompt:'“'+word.ar+'” hangi anlama gelir?',correctId:'c',choices:choices};
     }).filter(Boolean);
   }
@@ -3667,10 +3668,12 @@
       done:questions.length===3&&answered===questions.length};
   }
   // S-09(c): kelime kelime çalma; çalan kelime işaretlenir, ses yoksa sessiz yola düşülür.
-  function kaoReaderPlayWords(words,onFail){
+  // K3PD-16: `off` satır başıdır (tekli çalmada alt dizi indeksi sızmaz); her olay çizim ister.
+  function kaoReaderPlayWords(words,onFail,off){
     if(!quranLearnDeps||!words.length) return false;
-    var ui=quranLearnDeps.ui();
-    return kaoPlayList(words.map(function(word){ return KAO_PHONICS_AUDIO+'s-'+String(word.surahId)+'-'+String(word.ayah)+'-'+String(word.i)+'.m4a'; }),function(index){ ui.kaoReaderPlaying=index; },null,function(){ ui.kaoReaderPlaying=null; if(typeof onFail==='function') onFail(); });
+    var ui=quranLearnDeps.ui(),run=ui.kaoGildRun={audio:null};
+    var live=function(){ return ui.kaoGildRun===run; };
+    return kaoPlayList(words.map(function(w){ return KAO_PHONICS_AUDIO+'s-'+w.surahId+'-'+w.ayah+'-'+w.i+'.m4a'; }),function(i){ if(live()){ ui.kaoReaderPlaying=(off||0)+i; quranLearnDeps.render(); } },function(a){ run.audio=a; },function(){ if(live()){ ui.kaoReaderPlaying=null; if(typeof onFail==='function') onFail(); } },function(){ if(live()){ ui.kaoReaderPlaying=null; quranLearnDeps.render(); } },live);
   }
   // Y-12/T-20: okuyucunun tek eylem yüzeyi. Anlam kelime içinde değil ALT PANELDE
   // açılır ve "Anladım" ancak hızlı kontrolden sonra yazılır.
@@ -3682,6 +3685,7 @@
     if(!quranLearnDeps) return false;
     var ui=quranLearnDeps.ui(),words=surahWords(Number(ui.kaoSurahId));
     if(action==='word'){
+      kaoGildStop();
       ui.kaoReaderWord=Math.floor(Number(value));
       var shown=kaoRevealWord(value);
       if(shown) kaoReaderFocusWord(ui.kaoReaderWord);
@@ -3703,13 +3707,14 @@
         quranLearnDeps.render();
         return false;
       }
-      var list=value==='one'?[words[ui.kaoReaderWord]].filter(Boolean):words;
+      var at=typeof ui.kaoReaderWord==='number'?ui.kaoReaderWord:0,list=value==='one'?[words[at]].filter(Boolean):words;
+      kaoGildStop();
       ui.kaoReaderNote='';
       var started=kaoReaderPlayWords(list,function(){
         ui.kaoReaderPlaying=null;
         ui.kaoReaderNote='Ses yüklenemedi; sûreyi okunuş ve Türkçe anlamla sürdürebilirsin.';
         quranLearnDeps.render();
-      });
+      },at);
       if(!started) ui.kaoReaderNote='Bu cihazda ses kapalı; okunuş ve anlam yine açık.';
       quranLearnDeps.render();
       return started;
@@ -3841,7 +3846,7 @@
       h+='<p>Okumayı bitirdiysen üç soruyla anlayışını yoklayalım.</p><button type="button" class="kao-primary" onclick="App.kaoReader(\'checkstart\')">Anladım · 3 soru</button>';
     }else{
       h+='<div class="kao-reader-check" role="group" aria-label="Hızlı kontrol">';
-      h+='<p class="kao-reader-check-kicker">Hızlı kontrol · '+String(check.answered)+' / 3</p>';
+      h+='<p class="kao-reader-check-kicker">Hızlı kontrol · '+check.answered+' / 3</p>';
       check.questions.forEach(function(item){
         var answered=check.answers[item.id]!==undefined;
         h+='<fieldset class="kao-reader-question"'+(answered?' data-answered="true"':'')+'><legend>'+esc(item.prompt)+'</legend>';
@@ -3853,12 +3858,12 @@
       });
       h+='</div>';
       if(check.done){
-        h+='<p class="kao-reader-check-result">'+String(check.correct)+' / 3 doğru. '+(check.correct===3?'Hazırsın.':'Yanlışlar yarınki tekrara eklendi.')+'</p><button type="button" class="kao-primary" onclick="App.kaoReader(\'understood\')">Anladım · kaydet</button>';
+        h+='<p class="kao-reader-check-result">'+check.correct+' / 3 doğru. '+(check.correct===3?'Hazırsın.':'Yanlışlar yarınki tekrara eklendi.')+'</p><button type="button" class="kao-primary" onclick="App.kaoReader(\'understood\')">Anladım · kaydet</button>';
       }else{
         h+='<button type="button" class="kao-primary" disabled>Önce üç soruyu yanıtla</button>';
       }
     }
-    h+='<p class="kao-reader-status">'+(record.confirmedAt?'Gecikmeli test '+String(record.delayedScore)+'/5 · anlaşıldı':(record.needsReread?'Gecikmeli test '+String(record.delayedScore)+'/5 · tekrar oku':(record.delayedTestAt?'7 günlük test planlandı':'Okuma bitince anlayışını kaydet')))+'</p></section></main>';
+    h+='<p class="kao-reader-status">'+(record.confirmedAt?'Gecikmeli test '+record.delayedScore+'/5 · anlaşıldı':(record.needsReread?'Gecikmeli test '+record.delayedScore+'/5 · tekrar oku':(record.delayedTestAt?'7 günlük test planlandı':'Okuma bitince anlayışını kaydet')))+'</p></section></main>';
     return h;
   }
   // KAO2-09 · S-02: nextStep eylem eşlemesi. Henüz handler'ı olmayan adımlar mevcut akışa bağlanır

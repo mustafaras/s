@@ -1,13 +1,12 @@
 # K3PD-16 — Okuyucunun gerçek kelime vurgusunu ve tekli indeksini düzelt
 
-## Durum: `blocked` / `NOT_MEASURED`
+## Durum: `ready_for_audit` / `NOT_MEASURED`
 
-Kusur **gerçekten var ve düzeltmesi doğrulandı**, ancak kartın zorunlu
-doğrulaması olan G1 içindeki `test_kao2_perf_budget` runtime tavanı aşılıyor.
-Plan §2 tavanı yükseltmeyi açıkça yasaklıyor ve kartın yazma allowlist'i
-(`quranLearn.js`, `test_k3p_23.js`, `test_kao2_reader.js`, gerekirse `kao.css`)
-allowlist dışı dosyalardan bayt kazanmaya izin vermiyor. Bu yüzden kart
-`blocked` olarak durduruldu; kod commit edilmedi.
+Kusur doğrulandı, düzeltme uygulandı ve doğrulandı. Kart bağımsız denetime hazır;
+hüküm `NOT_MEASURED` (bağımsız denetim yapılmadı, PASS değildir).
+
+Bütçe engeli **kullanıcı onayıyla** çözüldü: runtime L9 tavanı **137,25 → 137,5 KiB**
+(K3PD-11/13/14 emsali). Gerekçe ve ölçüm aşağıda "Bütçe" bölümünde.
 
 ## Bulgu (F-07 / K3P-23) — doğrulandı
 
@@ -54,7 +53,7 @@ Doğrulanan testler (hepsi exit 0): `test_k3p_23` (19 kontrol, 11'i yeni),
 `test_kao_queue`, `test_kao_requirements`, `driver`, `zikr-harness` (95/95),
 `asset_pin_freshness`, `iip_22`, `local_visual_qa_guard`.
 
-## Blokaj — ölçülmüş bütçe
+## Bütçe — ölçülmüş ve karara bağlanmış
 
 | Ölçüm | Değer |
 | --- | --- |
@@ -64,10 +63,11 @@ Doğrulanan testler (hepsi exit 0): `test_k3p_23` (19 kontrol, 11'i yeni),
 | Bu kartın en yalın düzeltmesiyle | 140.731 B = 137,433 KiB (**+209 B**) |
 | Tavanı aşma | **187 B** |
 
-Tavan `+187 B` yükseltilseydi kart yeşile dönerdi; **§2 bunu yasaklıyor**
-("Tavanı kod/testi geçsin diye artırma"). Allowlist dışına çıkmadan
-(ör. `quranLearnFlow.js`'teki gerçek ölü `FLOOR_PER_TASK` sabiti −40 B,
-`app.js`'te 13 kullanılmayan fonksiyon) bayt kazanmak da yasak.
+**Karar:** tavan `137,25 → 137,5 KiB` yükseltildi (kullanıcı onayı, 2026-10-22;
+K3PD-11/13/14 aynı yolu izlemişti). Yeni ölçüm **137,450 / 137,5 KiB**, pay 51 B.
+`test_kao2_perf_budget` ve `test_kao2_mastery` aynı tavanı ve aynı gerekçeyi taşır.
+Allowlist dışına çıkılmadı (ör. `quranLearnFlow.js`'teki ölü `FLOOR_PER_TASK`,
+`app.js`'teki 13 kullanılmayan fonksiyon **temizlenmedi**).
 
 Denenen ve **kazanç sağlamayan** gerçek sadeleştirmeler (ölçüldü):
 
@@ -79,19 +79,40 @@ Denenen ve **kazanç sağlamayan** gerçek sadeleştirmeler (ölçüldü):
 - `card.state='learning'…` çiftinin yardımcıya alınması (−78 B **kötüleşti**),
 - `.map(kaoScoreAyah(d))` çıkarımı (−54 B **kötüleşti**).
 
-Hiçbiri tek başına 187 B'yi kapatmıyor; birleştirildiğinde de kalan açık
-~180 B civarında kalıyor. Ölçüm oynatılmadı: `KAO2_ACCEPT_SLOW_HOST`,
+Hiçbiri tek başına açığı kapatmıyor; birleştirildiğinde de kalan açık ~180 B
+civarında kalıyor. Ölçüm oynatılmadı: `KAO2_ACCEPT_SLOW_HOST`,
 `KAO2_WRITE_BASELINE` ve taban dosyası **kullanılmadı/değiştirilmedi**.
 
-## Kullanıcı kararı gerekiyor (bu kart için)
+## Uygulanan düzeltme (özet)
 
-1. **Tavanı yükselt** — 137,25 → 137,5 KiB (≈+256 B pay). K3PD-11/13/14'te
-   olduğu gibi açık kullanıcı onayı ister; tek başına kartı yeşile döndürür.
-2. **Allowlist'i genişlet** — `app/core/quranLearnFlow.js` ve/veya `app.js`'e
-   yazma izni; oradaki gerçek ölü kod (ör. `FLOOR_PER_TASK`) temizlenerek pay
-   açılır. Yeni kapsam kararı olmadan yapılamaz.
-3. **Kartı ertele** — K3PD-32'deki pinli yayın adayı hazırlanırken bütçe
-   yeniden ölçülür; K3PD-16 o adayla birlikte değerlendirilir.
+- `kaoReaderPlayWords(words,onFail,off)` — `off` satır başı; vurgu `off + index` ile
+  **satırın gerçek indeksine** yazılır (3 seçilirse 3).
+- Her audio olayında `quranLearnDeps.render()` → `aria-current` gerçekten kayar.
+- Tek oturum alanı: yaldız ve okuyucu `ui.kaoGildRun`'ı paylaşır; `kaoGildStop()`
+  kimliği null'lar, timer'ı bırakır, çalan sesi `pause()` eder.
+- İptal noktaları: yeni çalma, kelime açma, görünüm değişimi (`kaoApplyView`),
+  kapatma (`kaoClose`), ders çıkışı (`kaoLesson`) — hepsi mevcut çağrı noktaları.
+- Yeni `App.kao*` yok (45), şema/`migrate()`/`sync.js`/içerik/CSS/pin değişmedi.
+
+## Doğrulama sonuçları
+
+| Komut | Exit |
+| --- | ---: |
+| `tests/kao/test_k3p_23.js` | 0 (19 kontrol, 7 yeni K3PD-16) |
+| `tests/kao/test_kao2_reader.js` | 0 |
+| `tests/kao/test_k3p_mount.js` · `test_kao2_a11y.js` | 0 · 0 |
+| `tests/kao/test_kao_migration.js` · `test_kao2_migration.js` | 0 · 0 |
+| `tests/kao/test_kao2_perf_budget.js` | 0 (137,450 / 137,5 KiB, p95 4,827 ms) |
+| `tests/kao/test_kao2_mastery.js` | 0 (45 kontrol) |
+| `tests/kao/test_k3p_lesson_ayah.js` · `test_k3p_audio_buttons.js` | 0 · 0 |
+| `tests/kao/test_kao_queue.js` · `test_kao_requirements.js` | 0 · 0 |
+| `driver.mjs` · `zikr-harness.mjs` | 0 · 95/95 |
+| `tests/kao` tamamı | 83 dosya, **4 kırmızı — dördü de HEAD'de kırmızı** |
+
+HEAD'de de kırmızı olanlar (kapsam dışı, gizlenmedi): `test_kao2_components`,
+`test_kao2_curriculum`, `test_kao2_feedback` ve bu üçünü içeren `test_kao2_kabul`
+(ayrıca `tests/app/test_app_surface_boot_boundary.js` ve
+`test_app_surface_domain_boundary.js` HEAD'de kırmızı).
 
 ## Sınırlar
 

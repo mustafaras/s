@@ -599,7 +599,7 @@ Ses varsa kelime vurgusu gerçek klibin başlangıç/bitiş olaylarıyla ilerles
 
 **Oku:** kaoReaderPlayWords/Reader/ReaderHTML; kaoReaderPlaying ve focus restore; test_k3p_23.js ve test_kao2_reader.js.
 
-**Yazma allowlist’i:** quranLearn.js; test_k3p_23.js; test_kao2_reader.js; gerekirse kao.css; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-16 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearn.js`; `tests/kao/test_k3p_23.js`; `tests/kao/test_kao2_reader.js`; `app/kao.css` (yalnız gerekirse); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-16/EVIDENCE.md`.
 
 **Uygula:**
 

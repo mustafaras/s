@@ -233,3 +233,23 @@ kritik kare; eski sürüm satırın tamamını yaldızlamış, yeni sürüm ilk 
 ![K3PD-15 kontak 2 — ended ilerlemesi ve klipsiz satır](kanit/K3PD-15/gorsel/kontak-2-ended-ilerleme.jpg)
 
 Kanıt: [K3PD-15/gorsel/](kanit/K3PD-15/gorsel/) · [EVIDENCE.md](kanit/K3PD-15/EVIDENCE.md).
+
+## K3PD-15 — done / PASS (user_attested)
+
+Kullanıcı "sıradaki adıma gec" diyerek K3PD-15'in kabulünü beyan etti; hüküm yalnız `user_attested`, ajan bağımsız denetim yapmadı. Kart fixture'ı 15/15, perf 137,221 KiB (tavan artırılmadı), görsel kanıt 3 kontak sayfası + log + yeniden üretim betikleri. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+
+Sıradaki aday: K3PD-16.
+
+## K3PD-16 — BLOCKED (bütçe) / NOT_MEASURED
+
+Kusur **doğrulandı** ve düzeltme **hazır**, ama kart kapatılamıyor:
+
+- **F-07 gerçek:** tekli çalmada `ui.kaoReaderPlaying` alt dizi indeksini yazıyordu (3 seçilse 0 oluyordu) ve vurgu hiç `render` edilmiyordu — `aria-current` DOM'da kaymıyordu. İptal de yoktu.
+- Kırmızı kanıt: 7 senaryonun **6'sı HEAD kodunda kırmızı**; önerilen yamayla **7/7 yeşil**, `test_k3p_23` 19 kontrol (11 yeni).
+- **Blokaj:** G1'in zorunlu `test_kao2_perf_budget` tavanı aşılıyor. HEAD 140.522 B (137,229 KiB) → tavan 140.544 B (137,25 KiB): **pay yalnız 22 B**. En yalın düzeltme 140.731 B → **+187 B fazla**.
+- **§2 tavanı yükseltmeyi yasaklıyor**; allowlist (`quranLearn.js`, `test_k3p_23.js`, `test_kao2_reader.js`, `kao.css`) dışından bayt kazanmak da yasak. Denenen yedi gerçek sadeleştirme (tek `kaoPlayRun` anahtarı, `kaoAudioStop` birleştirme, ölü export silme, `kaoReaderAdd` gömme, card-state yardımcısı, `kaoScoreAyah` çıkarımı) 187 B'yi kapatmıyor; ölçüm oynatılmadı (`KAO2_ACCEPT_SLOW_HOST`/`KAO2_WRITE_BASELINE` kullanılmadı).
+- **Yama commit edilmedi:** [onerilen-duzeltme.diff](kanit/K3PD-16/onerilen-duzeltme.diff) olarak saklandı, çalışma ağacı yeşil HEAD'e döndürüldü.
+
+**Karar gerekiyor:** (1) tavanı 137,25 → 137,5 KiB yükselt (K3PD-11/13/14 emsali, açık onay ister), (2) allowlist'i `quranLearnFlow.js`/`app.js`'e genişletip ölü kodu temizle, (3) kartı K3PD-32 pinli adayına ertele.
+
+Kanıt: [K3PD-16/EVIDENCE.md](kanit/K3PD-16/EVIDENCE.md).

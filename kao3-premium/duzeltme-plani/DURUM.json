@@ -5771,11 +5771,38 @@
             ],
             "slowHostFlag": false
           }
+        },
+        {
+          "command": "node tests/app/test_local_visual_qa_guard.js (görsel QA öncesi)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "guards": "force-sync + gerçek profil sınırı"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/kanit/K3PD-15/gorsel/yeniden-uret-1-ses-bitmeden.mjs . <out> <prof> DOGRULA",
+          "env": {
+            "KAO_QA_CHROME": "Chrome for Testing 1248"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "gildAt350ms": "1/8",
+            "gildAt1850ms": "1/8",
+            "afterExit": "0",
+            "blockedExternalRequests": 40,
+            "origin": "http://127.0.0.1:9000",
+            "token": false,
+            "forceSync": null
+          }
         }
       ],
       "auditVerdict": "NOT_MEASURED",
       "evidenceRefs": [
-        "kao3-premium/duzeltme-plani/kanit/K3PD-15/EVIDENCE.md"
+        "kao3-premium/duzeltme-plani/kanit/K3PD-15/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-15/gorsel/kontak-1-ses-bitmeden-yaldiz.jpg",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-15/gorsel/kontak-2-ended-ilerleme.jpg",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-15/gorsel/kontak-3-reduced-motion.jpg"
       ],
       "acceptanceDependencies": []
     },

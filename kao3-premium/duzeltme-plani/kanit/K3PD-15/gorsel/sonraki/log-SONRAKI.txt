@@ -1,0 +1,7 @@
+[SONRAKI] origin: http://127.0.0.1:9000 · token:false · force:null
+[SONRAKI] setup: at-apply@7
+[SONRAKI] tezhip satırı: 8 kelime · başlangıçta yaldız: 0
+[SONRAKI] sentetik ses (ended yok) t=350ms  → yaldız: 1/8
+[SONRAKI] sentetik ses (ended yok) t=1850ms → yaldız: 1/8
+[SONRAKI] çıkıştan sonra (1,4 sn bekleme): ekranda yaldız 0 · çıkış anı 1/8
+[SONRAKI] engellenen dış istek: ["https://commons.wikimedia.org/w/api.php?action=query&generator=images&prop=imageinfo&titles=Template%3APotd%2F2026-10-22&iiprop=url|extmetadata&gimlimit=12&format=json&origin=*","https://commons.wikimedia.org/w/api.php?action=query&generator=images&prop=imageinfo&titles=Template%3APotd%2F2026-10-22&iiprop=url|extmetadata&gimlimit=12&format=json&origin=*","https://commons.wikimedia.org/w/api.php?action=query&generator=images&prop=imageinfo&titles=Template%3APotd%2F2026-10-22&iiprop=url|extmetadata&gimlimit=12&format=json&origin=*","https://commons.wikimedia.org/w/api.php?action=query&generator=images&prop=imageinfo&titles=Template%3APotd%2F2026-10-22&iiprop=url|extmetadata&gimlimit=12&format=json&origin=*"]

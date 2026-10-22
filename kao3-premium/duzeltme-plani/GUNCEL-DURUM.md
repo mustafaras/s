@@ -212,3 +212,15 @@ Kanıt: [K3PD-14/EVIDENCE.md](kanit/K3PD-14/EVIDENCE.md).
 Sıradaki aday: K3PD-16 (yalnız aday; başlatılmadı ve bu kayıt başlatma yetkisi vermez).
 
 Kanıt: [K3PD-15/EVIDENCE.md](kanit/K3PD-15/EVIDENCE.md).
+
+### K3PD-15 görsel kanıt eki (2026-10-22)
+
+Kullanıcı ekran görüntüsü istedi. Kontrollü yerel QA ile (`tools/kapi/gorsel-qa/cdp.mjs`, CDP pipe — **sunucu/soket yok**, boş geçici profil, origin `127.0.0.1:9000`, token/`forceSync` yok, dış istekler kesik) **önceki (`HEAD~1`) ve sonraki** sürüm aynı 8 kelimelik `u01.02` kapanış satırında yakalandı.
+
+- **Asıl fark:** ses hiç `ended` üretmediğinde önceki sürüm 1,85 sn'de satırın **tamamını (8/8)** timer ile yaldızlıyordu; yeni sürüm **1/8**'de bekliyor.
+- **ended ilerlemesi:** önceki `2/8 → 5/8 → 8/8 → 8/8` (timer sesten bağımsız atlıyor), yeni `1/8 → 2/8 → 3/8 → 4/8` (her `ended` tam bir kelime).
+- **Değişmeyen (kasıtlı):** klipsiz satır `23/23 @1400ms`; hareket azaltmada `8/8 @600ms` statik. İki sürümde aynı.
+- Kanıt dizini 600 KiB: 3 JPG kontak sayfası + ham log + yeniden üretim betikleri. Ham PNG'ler repoya alınmadı (repo geleneği JPG kontak sayfası).
+- **Sınır:** bu kaynak-görsel kanıttır; gerçek cihaz, ses donanımı ve ekran okuyucu kabulü değildir. K3PD-15 hükmü hâlâ `NOT_MEASURED`.
+
+Kanıt: [K3PD-15/gorsel/](kanit/K3PD-15/gorsel/) · [EVIDENCE.md](kanit/K3PD-15/EVIDENCE.md).

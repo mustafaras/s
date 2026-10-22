@@ -148,3 +148,84 @@ etkilenmiyor. Gizlenmiyor, kayda geçiyor:
 - Push, merge, tag, deploy **yapılmadı**; `releaseApproval=NOT_APPROVED`;
   `app/core/quranLearn.js` pin borcu K3PD-32'ye kadar ertelenmiş kalır.
 - Cihaz, ekran okuyucu, L2, 230 kayıt ve 14/30 günlük öğrenme etkisi dış kapıları `pending`.
+
+---
+
+## Görsel kanıt (kontrollü yerel QA)
+
+Kullanıcı ekran görüntüsü istedi. CLAUDE.md/`run-seyma` “kontrollü yerel görsel QA” istisnası
+uygulandı: `tools/kapi/gorsel-qa/cdp.mjs` (CDP pipe, **soket/sunucu yok**), boş geçici profil,
+origin yalnız `127.0.0.1:9000`, dış istekler kesik, `forceSync` yok, token yok.
+Önce `node tests/app/test_local_visual_qa_guard.js` → **PASS**. Her iki koşumda
+`origin: http://127.0.0.1:9000 · token:false · force:null`.
+
+- **Önceki sürüm** = `git archive HEAD~1` (düzeltme öncesi, eski `kaoGildStep`), dizin `/tmp/k3pd15-head`.
+- **Sonraki sürüm** = çalışma ağacı (`21378852`).
+- Aynı senaryo, aynı 390×844 viewport, aynı 8 kelimelik `u01.02` kapanış satırı.
+
+Dizin: `kanit/K3PD-15/gorsel/`
+- `kontak-1-ses-bitmeden-yaldiz.jpg` — asıl fark (0/1/2/3 kareleri, yan yana ÖNCEKİ↔SONRAKİ)
+- `kontak-2-ended-ilerleme.jpg` — ended ilerlemesi + klipsiz satır
+- `kontak-3-reduced-motion.jpg` — hareket azaltma
+- `onceki/log-ONCEKI*.txt`, `sonraki/log-SONRAKI*.txt` — ham ölçüm satırları
+- `yeniden-uret-1-ses-bitmeden.mjs`, `yeniden-uret-2-ended-klipsiz-reduced.mjs`, `kontak-olustur.py`
+  — kanıtı yeniden üreten betikler (repo kökünden / bu dizinden çalışır)
+
+Ham PNG'ler repoya **alınmadı** (6,5 MB): repo geleneği JPG kontak sayfasıdır (`kao3-premium/kanit/`
+önceki kayıtlarla aynı). Betiklerle birebir yeniden üretilebilir; taşınabilirlik doğrulandı
+(`yeniden-uret-1…` yeniden koşuldu → aynı ölçümler: 1/8 · 1/8 · 0).
+
+### 1) Asıl fark — ses bitmeden yaldız (sentetik `play()` hiç `ended` üretmez)
+
+| | ÖNCEKİ | SONRAKİ |
+| --- | --- | --- |
+| `t=350 ms` | **2 / 8** yaldızlı | **1 / 8** |
+| `t=1850 ms` | **8 / 8** — tüm satır, ses hiç bitmeden | **1 / 8** — ilk kelimede bekliyor |
+| Çıkıştan 1,4 sn sonra | 8/8 (timer satırı bitirmişti) | 0 (ekran kapandı, artık timer yok) |
+
+`ONCEKI-2-sentetik-1850ms.png` (satırın tamamı altın) ↔ `SONRAKI-2-sentetik-1850ms.png`
+(yalnız ilk kelime altın) — düzeltmenin görsel kanıtı budur.
+
+### 2) `ended` olayları vurguyu gerçekten ilerletir
+
+Kontrollü klip olaylarıyla, `u01.02`, 8 kelime:
+
+| Adım | ÖNCEKİ | SONRAKİ |
+| --- | --- | --- |
+| yalnız 1. klip çalıyor (`ended` yok) | 2/8 (timer önden gidiyor) | **1/8** |
+| 1. `ended` | 5/8 (3 kelime birden atladı) | **2/8** |
+| 2. `ended` | 8/8 (satır bitti, 5 kelime ses çalmadan) | **3/8** |
+| 3. `ended` | 8/8 | **4/8** |
+
+Sonraki sürümde her `ended` **tam bir** kelime ilerletiyor; önceki sürümde timer sesin önüne geçiyor.
+Görseller: `SONRAKI-a1…a4`, `ONCEKI-a1…a4`.
+
+### 3) Klipsiz satır — dürüst sessiz yedek (`u04.01`, 23 kelime)
+
+| | ÖNCEKİ | SONRAKİ |
+| --- | --- | --- |
+| `t=1400 ms` | 23/23 | **23/23** |
+
+Davranış kasıtlı olarak aynı: lemma kimliği olmayan satırda ses yolu yok, dekoratif ritmik yedek
+1,2 sn'de satırı bitiriyor. Fark, bu yolun artık **ses çalmaya çalışmaması** (test tarafında
+`createAudio=0`) ve yanlış indeksle eşleşmemesi. Görsel: `b1-klipsiz-satir.png`.
+
+### 4) Hareket azaltma — statik satır
+
+| | ÖNCEKİ | SONRAKİ |
+| --- | --- | --- |
+| `t=600 ms` (`SeyFx.shouldAnimate=false`) | 8/8 | **8/8** (statik, timer yok) |
+
+Görsel davranış korundu; sözleşme testi ayrıca timer kurulmadığını doğruluyor.
+Görsel: `c1-reduced-motion.png`.
+
+### Sınırlar (dürüstçe)
+
+- Bu **kaynak-görsel kanıttır**, cihaz kabulü değildir. Gerçek iPhone/Safari, gerçek ses
+  donanımı, ekran okuyucu ve gerçek kullanıcı verisi kullanılmadı.
+- Sentetik `play()` bilinçli olarak hiç bitmez: “ses bitmeden yaldız ilerlemesin” iddiasını
+  yalıtmak için. Gerçek kayıtların doğal süresi bu testte ölçülmedi (dosyalara dokunulmadı).
+- Ekran görüntüleri redakte edilmiştir: yalnız sentetik onboarding durumu ve ürün içeriği
+  görünür; kişisel veri, token, hesap veya konum yok.
+- Sunucu açılmadı (CDP pipe), geçici Chrome profilleri `$TMPDIR` altında kaldı; repoya profile
+  yazılmadı.

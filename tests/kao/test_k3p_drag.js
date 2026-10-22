@@ -191,7 +191,173 @@ await check('sürüklenebilirlik: yalnız dizme görevlerinde; düz seçim şık
   assert.match(html, /onclick="App\.kaoAnswer\(/, 'dokunma yolu yine var');
 });
 
-console.log(`test_k3p_drag: PASS (${passed} kontrol — saf bırakma hesabı, bırakma yolu, yüzey/pin, dokunma+klavye, hareket azaltma, sürüklenebilirlik kapsamı)`);
+// ══ K3PD-17 · Sürükleme iptalini cevaptan ayır ═══════════════════════════════════════════════════
+// Ölçüm GERÇEK handler yolundan yapılır: kaoDrag'ın bağladığı dinleyiciler sürülür ve
+// motorun kendi cevap yolu (`ui.kaoOrderDraft` / `kaoAnswer` dönüşü) sayılır. Test kendi
+// "cevap üretildi" sonucunu uydurmaz; sahte App.kaoAnswer yerine motor kullanılır.
+
+function dragTask() {
+  const q17 = t.data.quranLearn;
+  for (const cardId of Object.keys(q17.cards).filter((id) => /^w:/.test(id))) {
+    q17.cards[cardId] = { state: 'review', s: 12, reps: 6, due: '2026-09-29T00:00:00.000Z' };
+    const candidate = api.kaoBuildTask({ id: `k3pd17:${cardId}`, cardId, isNew: false }, t.data, { seed: 'k3pd17' });
+    if (candidate && candidate.kind === 'build') return candidate;
+  }
+  return null;
+}
+
+function arm(task) {
+  t.ui.kaoQueue = [{ id: task.id, cardId: task.cardId }];
+  t.ui.kaoTasks = { [task.id]: task };
+  t.ui.kaoTaskIndex = 0;
+  t.ui.kaoOrderDraft = [];
+  // Sürükleme bırakması üretimde `App.kaoAnswer` üzerinden motora girer (app.js shim'i).
+  // Harness app.js yüklemez; bu yüzden shim GERÇEK motora yönlendirilir — test kendi
+  // "cevap üretildi" sonucunu uydurmaz, motorun kendi yazımını ölçer.
+  t.win.App = t.win.App || {};
+  t.win.App.kaoAnswer = (taskId, choiceId) => api.kaoAnswer(taskId, choiceId);
+}
+
+// Sürükleme sahnesi: pointercancel / lostpointercapture / releasePointerCapture dâhil.
+function dragScene({ zoneRect, chipRects, animate = true }) {
+  t.data.settings.premiumAtmosphere = true;
+  const listeners = {};
+  const doc = {
+    addEventListener: (n, f) => { listeners[n] = f; },
+    removeEventListener: (n) => { delete listeners[n]; },
+    querySelectorAll: () => [zone],
+    querySelector: () => null
+  };
+  const chipNodes = chipRects.map((r) => ({ getBoundingClientRect: () => r }));
+  const zone = {
+    getBoundingClientRect: () => zoneRect,
+    querySelectorAll: () => chipNodes,
+    classList: { list: new Set(), add(c) { this.list.add(c); }, remove(c) { this.list.delete(c); }, contains(c) { return this.list.has(c); } }
+  };
+  const el = {
+    ownerDocument: doc,
+    classList: { list: new Set(), add(c) { this.list.add(c); }, remove(c) { this.list.delete(c); }, contains(c) { return this.list.has(c); } },
+    style: {},
+    getBoundingClientRect: () => chipRects[0],
+    setAttribute(n, v) { this.attrs = Object.assign(this.attrs || {}, { [n]: v }); },
+    removeAttribute(n) { if (this.attrs) delete this.attrs[n]; },
+    setPointerCapture(id) { this.captured = id; },
+    releasePointerCapture(id) { this.released = id; },
+    animate: animate ? () => ({ finished: Promise.resolve() }) : undefined
+  };
+  return { el, zone, listeners, doc };
+}
+
+const dragDown = (s, x, y) => ({ currentTarget: s.el, clientX: x, clientY: y, pointerId: 7, preventDefault() { s.prevented = true; } });
+const draftLen = () => (t.ui.kaoOrderDraft || []).length;
+
+const T17 = dragTask();
+assert.ok(T17 && T17.kind === 'build', 'K3PD-17: gerçek dizme görevi kuruldu');
+const C17 = T17.choices.find((c) => c.correct === true) || T17.choices[0];
+const ZR = { left: 0, top: 100, right: 300, bottom: 200 };
+const CR = [{ left: 4, top: 110, right: 44, bottom: 150 }];
+
+await check('K3PD-17 pointercancel: hedef İÇİNDE olsa bile cevap 0, temizlik tam', async () => {
+  arm(T17);
+  const s = dragScene({ zoneRect: ZR, chipRects: CR });
+  assert.equal(api.kaoDrag(dragDown(s, 20, 120), T17.id, C17.choiceId), true);
+  s.listeners.pointermove({ clientX: 60, clientY: 130 });
+  assert.equal(typeof s.listeners.pointercancel, 'function', 'pointercancel ayrı dinlenir');
+  s.listeners.pointercancel({ clientX: 20, clientY: 120 });
+  await flush();
+  assert.equal(draftLen(), 0, 'İPTAL cevap üretmez (yanlış cevap da sayılmaz)');
+  assert.equal(s.el.style.transform, '', 'transform temizlenir');
+  assert.equal(s.el.classList.contains('is-dragging'), false, 'sürükleme sınıfı temizlenir');
+  assert.ok(!s.listeners.pointerup && !s.listeners.pointermove, 'dinleyiciler bırakılır');
+  assert.equal(s.el.released, 7, 'pointer capture serbest bırakılır');
+});
+
+await check('K3PD-17 lostpointercapture: capture kaybı cevap üretmez, cleanup çalışır', async () => {
+  arm(T17);
+  const s = dragScene({ zoneRect: ZR, chipRects: CR });
+  api.kaoDrag(dragDown(s, 20, 120), T17.id, C17.choiceId);
+  s.listeners.pointermove({ clientX: 60, clientY: 130 });
+  assert.equal(typeof s.listeners.lostpointercapture, 'function', 'lostpointercapture dinlenir');
+  s.listeners.lostpointercapture({ clientX: 20, clientY: 120 });
+  await flush();
+  assert.equal(draftLen(), 0, 'capture kaybı cevap üretmez');
+  assert.equal(s.el.classList.contains('is-dragging'), false);
+});
+
+await check('K3PD-17 geçerli drop TAM 1 cevap; drop sonrası native click İKİNCİ cevap üretmez', async () => {
+  arm(T17);
+  const s = dragScene({ zoneRect: ZR, chipRects: CR });
+  api.kaoDrag(dragDown(s, 20, 120), T17.id, C17.choiceId);
+  s.listeners.pointermove({ clientX: 60, clientY: 130 });
+  s.listeners.pointerup({ clientX: 20, clientY: 120 });
+  await flush();
+  assert.equal(draftLen(), 1, 'geçerli drop tam bir cevap yazar');
+  // Tarayıcının bırakma sonrası ürettiği native click: event.currentTarget bırakılan çiptir.
+  t.win.event = { currentTarget: s.el };
+  const second = api.kaoAnswer(T17.id, C17.choiceId);
+  t.win.event = null;
+  assert.equal(second, true, 'native click yolu hata vermez');
+  assert.equal(draftLen(), 1, 'native click İKİNCİ cevap yazmaz');
+  assert.equal(s.el._kaoDropHandled, false, 'işaret tüketildi (tek kullanımlık)');
+});
+
+await check('K3PD-17 hareketsiz / dışarı / NaN: 0 cevap; normal tek dokunma ve klavye çalışır', async () => {
+  // (a) hiç hareket yok
+  arm(T17);
+  let s = dragScene({ zoneRect: ZR, chipRects: CR });
+  api.kaoDrag(dragDown(s, 20, 120), T17.id, C17.choiceId);
+  s.listeners.pointerup({ clientX: 20, clientY: 120 });
+  await flush();
+  assert.equal(draftLen(), 0, 'hareketsiz bırakma cevap üretmez');
+  // (b) hedef dışı
+  arm(T17);
+  s = dragScene({ zoneRect: ZR, chipRects: CR });
+  api.kaoDrag(dragDown(s, 20, 120), T17.id, C17.choiceId);
+  s.listeners.pointermove({ clientX: 400, clientY: 900 });
+  s.listeners.pointerup({ clientX: 400, clientY: 900 });
+  await flush();
+  assert.equal(draftLen(), 0, 'bölge dışı cevap üretmez');
+  // (c) NaN / eksik koordinat
+  for (const pt of [{ clientX: NaN, clientY: NaN }, { clientX: 'a', clientY: 5 }, {}]) {
+    arm(T17);
+    s = dragScene({ zoneRect: ZR, chipRects: CR });
+    api.kaoDrag(dragDown(s, 20, 120), T17.id, C17.choiceId);
+    s.listeners.pointermove({ clientX: 60, clientY: 130 });
+    s.listeners.pointerup(pt);
+    await flush();
+    assert.equal(draftLen(), 0, `geçersiz koordinat (${JSON.stringify(pt)}) cevap üretmez`);
+  }
+  // (d) normal tek dokunma: işaret yokken cevap yazılır
+  arm(T17);
+  assert.notEqual(api.kaoAnswer(T17.id, C17.choiceId), false, 'tek dokunma cevabı yazılır');
+  assert.equal(draftLen(), 1, 'tek dokunma TAM bir cevap');
+});
+
+await check('K3PD-17 görev değişiminde eski pointer cevabı yok', async () => {
+  arm(T17);
+  const s = dragScene({ zoneRect: ZR, chipRects: CR });
+  api.kaoDrag(dragDown(s, 20, 120), T17.id, C17.choiceId);
+  s.listeners.pointermove({ clientX: 60, clientY: 130 });
+  // Görev değişti: motor artık başka bir görevde → eski taskId'li cevap reddedilir.
+  t.ui.kaoTasks = {};
+  t.ui.kaoQueue = [];
+  const stale = api.kaoAnswer(T17.id, C17.choiceId);
+  assert.equal(stale, false, 'görev değişince eski cevap yazılmaz');
+  assert.equal(draftLen(), 0);
+});
+
+await check('K3PD-17 hareket azaltmada aynı mantık (animasyonsuz, drop yine 1)', async () => {
+  arm(T17);
+  t.data.settings.premiumAtmosphere = false;
+  const s = dragScene({ zoneRect: ZR, chipRects: CR, animate: false });
+  api.kaoDrag(dragDown(s, 20, 120), T17.id, C17.choiceId);
+  s.listeners.pointermove({ clientX: 60, clientY: 130 });
+  s.listeners.pointerup({ clientX: 20, clientY: 120 });
+  assert.equal(draftLen(), 1, 'hareket azaltmada drop SENKRON ve tam bir cevap');
+  t.data.settings.premiumAtmosphere = true;
+});
+
+console.log(`test_k3p_drag: PASS (${passed} kontrol — saf bırakma hesabı, bırakma yolu, yüzey/pin, dokunma+klavye, hareket azaltma, sürüklenebilirlik, K3PD-17 iptal/çift-cevap)`);
 }
 
 main();

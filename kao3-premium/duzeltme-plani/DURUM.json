@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-16",
+  "nextPrompt": "K3PD-17",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -5808,7 +5808,7 @@
     },
     "K3PD-16": {
       "id": "K3PD-16",
-      "status": "ready_for_audit",
+      "status": "done",
       "baseHead": "37683eab39628f61cc5c95c8078b9b277dc4fbf2",
       "changedPaths": [
         "kao3-premium/duzeltme-plani/PROMPTLAR.md",
@@ -5912,7 +5912,7 @@
           }
         }
       ],
-      "auditVerdict": "NOT_MEASURED",
+      "auditVerdict": "PASS",
       "evidenceRefs": [
         "kao3-premium/duzeltme-plani/kanit/K3PD-16/EVIDENCE.md"
       ],
@@ -5920,12 +5920,101 @@
     },
     "K3PD-17": {
       "id": "K3PD-17",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "ready_for_audit",
+      "baseHead": "76b29277bc5a269d13c3e13ca4a7a1d26a25449e",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "app/core/quranLearn.js",
+        "tests/kao/test_k3p_drag.js",
+        "tests/kao/test_kao2_perf_budget.js",
+        "tests/kao/test_kao2_mastery.js",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-17/EVIDENCE.md"
+      ],
+      "checks": [
+        {
+          "command": "node tests/kao/test_k3p_drag.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 12,
+            "newK3pd17": 6,
+            "redBefore": 3
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_build.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/kao/test_k3p_cloze.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/kao/test_kao2_a11y.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/kao/test_kao_fsrs.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runtimeKiB": 137.608,
+            "ceilingKiB": 137.625,
+            "p95Ms": 4.458
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_mastery.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 45
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_lesson_ayah.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 15
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/driver.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "mode": "synthetic-vm"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "assertions": "95/95"
+          }
+        }
+      ],
+      "auditVerdict": "NOT_MEASURED",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-17/EVIDENCE.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-18": {

@@ -203,12 +203,12 @@ check('(e) unitMastery: durum tablosu none/passed/failed/repair/skipped + puan v
 // ölü yüzey temizliği (17 sembol) yapıldı ve başka ölü kod bulunmadı, yani §2'nin
 // "önce eski kodu sil" adımı tükendi. Öncekiler 80 → 88 → 128, hepsi kullanıcı yetkisiyle.
 // K3PD-12 (2026-10-21, kullanıcı onayı): 136 -> 137 KiB; aynı bağımsız dosya ölçümü için L9 kullan.
-// K3PD-16 (2026-10-22, kullanıcı onayı): 137 -> 137.5 KiB; okuyucunun gerçek kelime vurgusu ve
+// K3PD-16/17 (2026-10-22, kullanıcı onayı): 137 -> 137.625 KiB; okuyucunun gerçek kelime vurgusu ve
 // tekli satır indeksi + iptal sınırı (test_kao2_perf_budget ile aynı gerekçe ve aynı tavan).
-check('runtime bütçesi tavanı (137.5 KiB gzip L9) içinde kalır', () => {
+check('runtime bütçesi tavanı (137.625 KiB gzip L9) içinde kalır', () => {
   const files = ['app/core/quranLearn.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js'];
   const kib = files.reduce((sum, f) => sum + zlib.gzipSync(fs.readFileSync(path.join(repoRoot, f)), { level: 9 }).length, 0) / 1024;
-  assert.ok(kib <= 137.5, `runtime gzip L9 ${kib.toFixed(3)} KiB > 137.5`);
+  assert.ok(kib <= 137.625, `runtime gzip L9 ${kib.toFixed(3)} KiB > 137.625`);
 });
 
 const partA = passed;

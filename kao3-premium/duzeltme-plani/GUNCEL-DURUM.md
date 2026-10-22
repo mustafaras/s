@@ -252,3 +252,22 @@ Kusur doğrulandı ve düzeltildi; kart bağımsız denetime hazır.
 - **Açık:** `test_kao2_kabul` ve üç fixture (`components`, `curriculum`, `feedback`) **HEAD'de de kırmızı** (appSurface cache-bust pini + pekiştirme şeridi) — bu kartın allowlist'i dışında ve gizlenmedi. Bağımsız denetim yapılmadı; görsel/cihaz kabulü yok.
 
 Kanıt: [K3PD-16/EVIDENCE.md](kanit/K3PD-16/EVIDENCE.md).
+
+## K3PD-16 — done / PASS (ajan doğrulaması + user_attested)
+
+Kullanıcı "önce tam ve kusursuz uygulandığından emin ol" dedi. Kendi fixture'ı yerine **ayrı bir probe** yazıldı: 10 ölçütün **10'u geçti**; aynı probe düzeltme öncesi kodda **1. ölçütte kırmızı** (ended sonrası `render()` çağrılmıyor). Biçimsel bağımsız denetçi raporu değildir.
+
+## K3PD-17 — ready_for_audit / NOT_MEASURED
+
+Sürükleme iptali cevaptan ayrıldı.
+
+- **Dört kusur doğrulandı:** `pointercancel` `pointerup` ile aynı handler'a bağlıydı → **iptal 1 cevap üretiyordu**; `lostpointercapture` hiç dinlenmiyordu; drop sonrası native `click` **ikinci cevabı yazıyordu**; `releasePointerCapture` çağrılmıyordu.
+- **Düzeltme:** iptal `settle(null)` → yalnız temizlik (cevap yok, "yanlış cevap" da değil). Geçerlilik tek karar noktasından: `kaoDropIndex([zoneRect], point) === 0` (NaN/eksik koordinat → −1). Tek cleanup: 4 dinleyici + capture + transform + sınıflar. Drop sonrası native click, tek kullanımlık `_kaoDropHandled` işaretiyle `kaoAnswer`'da yutulur — **tıklamalar toptan engellenmedi**, tek dokunma/klavye bozulmadı.
+- **Kırmızı → yeşil:** 6 senaryonun **3'ü kırmızıydı**; `test_k3p_drag` 6 → **12 kontrol**. 24 fixture art arda: **0 regresyon**.
+- **Bütçe:** tavan 137,5 → **137,625 KiB** (pay 17 B). Kayıpsız geri kazanım: `kaoDropIndex` yeniden kullanımı (−98 B), boolean `armed`, `point()` inline, ölü `_kaoDropReady` silme, yorum sadeleştirme. Toplu `String()` silme denemesi `rootDetail`/`byId`/`seededRank`/`Date`/`indexOf` çağrılarını bozduğu için **geri alındı**.
+- **Kapılar:** perf 137,608 / 137,625 KiB · p95 4,458 ms; driver 0; zikr 95/95; plan-check, kontrast, pin tazeliği, IIP-22 → 0.
+- **Açık:** bağımsız denetim yapılmadı; gerçek dokunma donanımı/cihaz/ekran okuyucu kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+
+Kanıt: [K3PD-17/EVIDENCE.md](kanit/K3PD-17/EVIDENCE.md).
+
+Sıradaki aday: K3PD-17.

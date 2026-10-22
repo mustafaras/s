@@ -628,7 +628,7 @@ Kelime kaydırması, açık anlam balonu, klavye odağı ve overlay kimliğini k
 
 **Oku:** kaoDrag release/end ve pointercancel; mevcut onclick seçimi; test_k3p_drag.js; order/build notlaması.
 
-**Yazma allowlist’i:** quranLearn.js; test_k3p_drag.js; test_k3p_build.js gerekirse; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-17 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearn.js`; `tests/kao/test_k3p_drag.js`; `tests/kao/test_k3p_build.js` (yalnız gerekirse); `tests/kao/test_kao2_perf_budget.js` (yalnız runtime gzip tavanını 137.5’ten 137.625 KiB’ye çıkar; 2026-10-22 kullanıcı onayı); `tests/kao/test_kao2_mastery.js` (yalnız aynı L9 tavanını eşitle); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-17/EVIDENCE.md`.
 
 **Uygula:**
 

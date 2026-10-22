@@ -1348,7 +1348,7 @@
     if(words.length<count) return [];
     return Array.from({length:count},function(_unused,index){
       var start=Math.floor(index*words.length/count),end=Math.floor((index+1)*words.length/count);
-      return {id:'dt:'+String(surahId)+':'+String(index+1),surahId:Number(surahId),index:index,words:words.slice(start,end)};
+      return {id:'dt:'+surahId+':'+String(index+1),surahId:Number(surahId),index:index,words:words.slice(start,end)};
     });
   }
   function kaoDelayedCandidates(d,nowValue){
@@ -1357,7 +1357,7 @@
       var record=objectOr(surahs[key],{}),due=new Date(record.delayedTestAt||0),answered=Math.floor(nonNegativeNumber(record.delayedAnswered,0));
       if(record.delayedCompletedAt||!isFinite(due.getTime())||due.getTime()>now.getTime()) return false;
       surahTestGroups(Number(key)).slice(answered).forEach(function(group){
-        out.push({id:'kao-delayed:'+String(key)+':'+String(group.index+1),cardId:group.id,type:'fragment',fragmentKind:'delayed',delayedSurahId:Number(key),delayedIndex:group.index,isNew:false});
+        out.push({id:'kao-delayed:'+key+':'+String(group.index+1),cardId:group.id,type:'fragment',fragmentKind:'delayed',delayedSurahId:Number(key),delayedIndex:group.index,isNew:false});
       });
       return out.length>0;
     });
@@ -1910,37 +1910,57 @@
     }
     return -1;
   }
+  // K3PD-17: yalnız GEÇERLİ bırakma (pointerup + hareket + alan içi) TEK cevap üretir; iptal
+  // (pointercancel/lostpointercapture), hareket yok, alan dışı ve NaN → 0. Drop sonrası native
+  // click'i çipteki işaret bir kez yutar.
   function kaoDrag(event,taskId,choiceId){
     var el=event&&event.currentTarget,doc=el&&el.ownerDocument;
     if(!el||!doc||typeof doc.querySelectorAll!=='function') return false;
     if(event&&typeof event.preventDefault==='function') event.preventDefault();
-    var zone=null,zones=typeof doc.querySelectorAll==='function'?doc.querySelectorAll('[data-kao-drop]'):[];
-    if(zones&&zones.length) zone=zones[0];
-    if(!zone) return false;
-    var zoneRect=typeof zone.getBoundingClientRect==='function'?zone.getBoundingClientRect():null;
-    // Hareket azaltma açıksa sürükleme animasyonsuz çalışır: aynı bırakma mantığı, yalnız geçiş yok.
-    var reduced=!kaoMotionAllowed();
-    var chips=zone.querySelectorAll?zone.querySelectorAll('.kao-order-pair'):[];
-    var rects=[]; for(var i=0;i<chips.length;i+=1){ var c=chips[i]; if(c&&c.getBoundingClientRect) rects.push(c.getBoundingClientRect()); }
-    // Bırakma: yalnız bölge İÇİNE bırakıldığında ve hareket gerçekleştiyse cevap verilir (tek dokunma
-    // eylemi çipin kendisindedir; sürükleme bırakma yolunu ayrıca tetikler). Bölge dışı = vazgeçme.
-    var release=function(ev,drop){
-      var point={x:ev&&ev.clientX,y:ev&&ev.clientY},inZone=false;
-      if(zoneRect&&typeof point.x==='number'&&typeof point.y==='number'){
-        inZone=point.x>=zoneRect.left&&point.x<=zoneRect.right&&point.y>=zoneRect.top&&point.y<=zoneRect.bottom;
-      }
-      var commit=typeof drop==='function'&&inZone;
-      var finish=function(){ el.style.transform=''; el.classList.remove('is-dragging'); if(zone.classList) zone.classList.remove('kao-drop-ready'); el._kaoDropReady=null; if(commit) drop(); };
-      if(commit&&typeof el.animate==='function'&&!reduced) el.animate([{opacity:0}],{duration:120}).finished.then(finish,finish);
-      else finish();
+    var zone=doc.querySelectorAll('[data-kao-drop]')[0];
+    var rect=zone&&zone.getBoundingClientRect?zone.getBoundingClientRect():null;
+    if(!rect) return false;
+    var reduced=!kaoMotionAllowed(),sx=event?event.clientX:0,sy=event?event.clientY:0,pid=event?event.pointerId:null;
+    var moved=false,done=false;
+    var drop=function(){ var app=window.App; if(app&&app.kaoAnswer) app.kaoAnswer(taskId,choiceId); };
+    // Tek çıkış: temizlik + (varsa) cevap. İptal commit'siz gelir → cevap YOK.
+    var settle=function(commit){
+      if(done) return; done=true;
+      var done2=function(){
+        if(doc.removeEventListener){ doc.removeEventListener('pointermove',move); doc.removeEventListener('pointerup',up); doc.removeEventListener('pointercancel',cancel); doc.removeEventListener('lostpointercapture',cancel); }
+        if(pid!=null&&el.releasePointerCapture){ try{ el.releasePointerCapture(pid); }catch(_error){} }
+        if(el.style) el.style.transform='';
+        el.classList.remove('is-dragging');
+        if(zone.classList) zone.classList.remove('kao-drop-ready');
+        if(!commit) return;
+        el._kaoDropHandled=true;
+        if(typeof setTimeout==='function') setTimeout(function(){ el._kaoDropHandled=false; },300);
+        drop();
+      };
+      if(commit&&el.animate&&!reduced) el.animate([{opacity:0}],{duration:120}).finished.then(done2,done2); else done2();
     };
+    var move=function(ev){
+      if(done) return;
+      var x=ev&&ev.clientX,y=ev&&ev.clientY;
+      if(typeof x!=='number'||!isFinite(x)||typeof y!=='number'||!isFinite(y)) return;
+      var dx=x-(sx||0),dy=y-(sy||0);
+      if(dx||dy) moved=true;
+      if(el.style) el.style.transform='translate('+dx+'px,'+dy+'px)';
+    };
+    var up=function(ev){
+      if(done) return;
+      settle(moved&&kaoDropIndex([rect],{x:ev&&ev.clientX,y:ev&&ev.clientY})===0?drop:null);
+    };
+    var cancel=function(){ settle(null); };
     el.classList.add('is-dragging');
     if(zone.classList) zone.classList.add('kao-drop-ready');
-    var start={x:event&&event.clientX,y:event&&event.clientY};
-    var move=function(ev){ var dx=(ev&&ev.clientX||0)-start.x,dy=(ev&&ev.clientY||0)-start.y; if(dx===0&&dy===0) return; el._kaoDropReady=function(){ var app=window.App; if(app&&typeof app.kaoAnswer==='function') app.kaoAnswer(taskId,choiceId); }; if(typeof el.style!=='undefined') el.style.transform='translate('+dx+'px,'+dy+'px)'; };
-    var end=function(ev){ if(doc.removeEventListener){ doc.removeEventListener('pointermove',move); doc.removeEventListener('pointerup',end); doc.removeEventListener('pointercancel',end); } release(ev,el._kaoDropReady); };
-    if(doc.addEventListener){ doc.addEventListener('pointermove',move); doc.addEventListener('pointerup',end); doc.addEventListener('pointercancel',end); }
-    if(el.setPointerCapture&&event&&event.pointerId!=null){ try{ el.setPointerCapture(event.pointerId); }catch(_error){} }
+    if(doc.addEventListener){
+      doc.addEventListener('pointermove',move);
+      doc.addEventListener('pointerup',up);
+      doc.addEventListener('pointercancel',cancel);
+      doc.addEventListener('lostpointercapture',cancel);
+    }
+    if(el.setPointerCapture&&pid!=null){ try{ el.setPointerCapture(pid); }catch(_error){} }
     return true;
   }
   function kaoTaskHTML(task){
@@ -2468,7 +2488,7 @@
     if(item.kind==='read'){
       // K2F-06: ustalık çapa metni — kelimeler Flow'dan gelir.
       var shortsContent=window.QuranShortSurahsV1,readTitles=(Array.isArray(item.anchors)?item.anchors:[]).map(function(anchor){
-        var parts=/^(prayer|surah):(.+)$/.exec(String(anchor));
+        var parts=/^(prayer|surah):(.+)$/.exec(anchor);
         if(!parts||!shortsContent) return '';
         if(parts[1]==='prayer'&&Array.isArray(shortsContent.prayerTexts)){ var prayerText=shortsContent.prayerTexts.find(function(value){ return value.id===parts[2]; }); return prayerText?String(prayerText.title||prayerText.name||prayerText.id):''; }
         if(parts[1]==='surah'&&Array.isArray(shortsContent.surahs)){ var readSurah=shortsContent.surahs.find(function(value){ return Number(value.id)===Number(parts[2]); }); return readSurah?String(readSurah.name||readSurah.title||''):''; }
@@ -2576,6 +2596,11 @@
   }
   function kaoAnswer(taskId,choiceId){
     if(!quranLearnDeps) return false;
+    // K3PD-17: geçerli bir sürükleme bırakmasından sonra tarayıcı native click üretir; o click
+    // ikinci cevap olmasın diye işaret burada BİR KEZ tüketilir. Normal tek dokunma/klavye
+    // işaretsiz gelir ve etkilenmez.
+    var src=window.event&&window.event.currentTarget;
+    if(src&&src._kaoDropHandled===true){ src._kaoDropHandled=false; return true; }
     var task=currentTask();
     if(!task||task.id!==taskId) return false;
     var ui=quranLearnDeps.ui(),panel=ui.kaoPanel;
@@ -2596,7 +2621,7 @@
       ui.kaoOrderDraft.push(choiceId);
       var needed=task.kind==='build'?task.choices.length-2:task.choices.length;
       if(ui.kaoOrderDraft.length!==needed){
-        if(ui.kaoOrderDraft.length<needed){ ui.kaoFeedback=String(ui.kaoOrderDraft.length)+' / '+String(needed)+' seçildi'; paintTask(); } return {pending:true};
+        if(ui.kaoOrderDraft.length<needed){ ui.kaoFeedback=String(ui.kaoOrderDraft.length)+' / '+needed+' seçildi'; paintTask(); } return {pending:true};
       }
       var expectedLabels=kaoOrderLabels(task);
       correct=ui.kaoOrderDraft.every(function(selectedId,index){
@@ -3650,7 +3675,7 @@
       // Belirlenimci karıştırma: sıralama metne, yön sûre kimliğine bağlı.
       choices=choices.slice().sort(function(a,b){ return a.text<b.text?-1:(a.text>b.text?1:0); });
       if(surahId%2===1) choices.reverse();
-      return {id:'sc:'+String(surahId)+':'+word.id,lemmaId:word.lemmaId,
+      return {id:'sc:'+surahId+':'+word.id,lemmaId:word.lemmaId,
         prompt:'“'+word.ar+'” hangi anlama gelir?',correctId:'c',choices:choices};
     }).filter(Boolean);
   }
@@ -3821,7 +3846,7 @@
       var label=known?'bilinen kelime':'bilinmeyen kelime, dokunarak aç';
       // T-20: kelime kenarlıksız çip; anlam kelime İÇİNDE basılmaz.
       h+='<span class="kao-reader-word '+(known?'is-known':(revealed?'is-revealed':'is-unknown'))+'"'+(index===playing?' aria-current="true"':'')+'><button type="button" id="kao-reader-w-'+index+'" aria-label="'+label+'"'+(index===openIndex?' aria-expanded="true" aria-controls="kao-reader-panel"':'')+' onclick="App.kaoReader(\'word\','+index+')">'+kaoArabicPairHTML(word.ar,word.pronunciation,'kao-reader-pair')+'</button>';
-      if(marks[word.id]){ var popId='kao-waqf-'+String(sid)+'-'+String(index); h+='<button type="button" class="kao-waqf" popovertarget="'+popId+'" aria-label="Vakıf işareti '+esc(marks[word.id])+' açıklaması">'+esc(marks[word.id])+'</button><span id="'+popId+'" class="kao-waqf-note" popover>burada dur: cümle/anlam sınırı</span>'; }
+      if(marks[word.id]){ var popId='kao-waqf-'+sid+'-'+String(index); h+='<button type="button" class="kao-waqf" popovertarget="'+popId+'" aria-label="Vakıf işareti '+esc(marks[word.id])+' açıklaması">'+esc(marks[word.id])+'</button><span id="'+popId+'" class="kao-waqf-note" popover>burada dur: cümle/anlam sınırı</span>'; }
       h+='</span>';
     });
     h+='</section>';

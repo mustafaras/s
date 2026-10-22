@@ -164,6 +164,28 @@ origin yalnız `127.0.0.1:9000`, dış istekler kesik, `forceSync` yok, token yo
 - Aynı senaryo, aynı 390×844 viewport, aynı 8 kelimelik `u01.02` kapanış satırı.
 
 Dizin: `kanit/K3PD-15/gorsel/`
+
+### Kontak 1 — ses bitmeden yaldız (asıl fark)
+
+Her kare çifti solda ÖNCEKİ, sağda SONRAKİ. Alt sıradaki **2 · t=1850 ms** kritik karedir:
+önceki sürümde satırın tamamı altın (ses hiç bitmemişken), yeni sürümde yalnız ilk kelime.
+
+![Kontak 1 — ses bitmeden yaldız: önceki ve sonraki sürüm yan yana](gorsel/kontak-1-ses-bitmeden-yaldiz.jpg)
+
+### Kontak 2 — `ended` ilerlemesi + klipsiz satır
+
+Önceki sürümde timer sesin önüne geçiyor (2/8 → 5/8 → 8/8 → 8/8); yeni sürümde her `ended`
+tam bir kelime ilerletiyor (1/8 → 2/8 → 3/8 → 4/8). Son iki kare klipsiz satırın iki sürümde
+de aynı (23/23) bittiğini gösterir.
+
+![Kontak 2 — ended ilerlemesi ve klipsiz satır](gorsel/kontak-2-ended-ilerleme.jpg)
+
+### Kontak 3 — hareket azaltma (değişmedi)
+
+![Kontak 3 — hareket azaltmada statik satır](gorsel/kontak-3-reduced-motion.jpg)
+
+### Dosyalar
+
 - `kontak-1-ses-bitmeden-yaldiz.jpg` — asıl fark (0/1/2/3 kareleri, yan yana ÖNCEKİ↔SONRAKİ)
 - `kontak-2-ended-ilerleme.jpg` — ended ilerlemesi + klipsiz satır
 - `kontak-3-reduced-motion.jpg` — hareket azaltma

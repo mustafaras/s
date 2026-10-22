@@ -223,4 +223,13 @@ Kullanıcı ekran görüntüsü istedi. Kontrollü yerel QA ile (`tools/kapi/gor
 - Kanıt dizini 600 KiB: 3 JPG kontak sayfası + ham log + yeniden üretim betikleri. Ham PNG'ler repoya alınmadı (repo geleneği JPG kontak sayfası).
 - **Sınır:** bu kaynak-görsel kanıttır; gerçek cihaz, ses donanımı ve ekran okuyucu kabulü değildir. K3PD-15 hükmü hâlâ `NOT_MEASURED`.
 
+**Kontak 1 — ses bitmeden yaldız (solda önceki, sağda sonraki):** alt sıradaki `t=1850 ms`
+kritik kare; eski sürüm satırın tamamını yaldızlamış, yeni sürüm ilk kelimede bekliyor.
+
+![K3PD-15 kontak 1 — ses bitmeden yaldız, önceki ve sonraki](kanit/K3PD-15/gorsel/kontak-1-ses-bitmeden-yaldiz.jpg)
+
+**Kontak 2 — `ended` ilerlemesi (eski 2/8→5/8→8/8, yeni 1/8→2/8→3/8→4/8) ve klipsiz satır:**
+
+![K3PD-15 kontak 2 — ended ilerlemesi ve klipsiz satır](kanit/K3PD-15/gorsel/kontak-2-ended-ilerleme.jpg)
+
 Kanıt: [K3PD-15/gorsel/](kanit/K3PD-15/gorsel/) · [EVIDENCE.md](kanit/K3PD-15/EVIDENCE.md).

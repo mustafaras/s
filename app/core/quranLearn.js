@@ -3172,7 +3172,7 @@
     var text=kaoPrayerTexts().find(function(item){ return item.id===String(surahId); });
     var id=Number(surahId),surah=text?null:kaoSurahs().find(function(item){ return item.id===id; });
     if(!text&&!surah) return null;
-    var raw=text?text.words:surahWords(id),known=kaoKnownLemmaSet(d),cards=objectOr(ensureQuranLearn(d).cards,{}),words=[],lines=[],lastAyah;
+    var raw=text?text.words:surahWords(id),known=kaoKnownLemmaSet(d),cards=objectOr(quranLearnRoot(d).cards,{}),words=[],lines=[],lastAyah;
     raw.forEach(function(word){
       var lemmaId=String(word&&word.lemmaId||''),state=known[lemmaId]?'known':((cards['w:'+lemmaId+':ar>tr']||cards['w:'+lemmaId+':tr>ar'])?'learning':'new');
       var item={ar:String(word&&word.ar||''),state:state,lemmaId:lemmaId,index:word&&word.i,ayah:word&&word.ayah}; words.push(item);

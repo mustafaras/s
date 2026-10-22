@@ -125,4 +125,62 @@ check('kısa sûre modu (İhlâs) ve bilinmeyen kimlik', () => {
   assert.equal(t.api.kaoTezhipModel(t.data, 999), null);
 });
 
-console.log(`test_k3p_tezhip: ${passed} kontrol PASS`);
+// ══ K3PD-18 · Tezhip modeli GERÇEKTEN saf ═══════════════════════════════════════════════════════
+// Ölçüm: model çağrısı girdiyi YAZMAMALI (normalize/persistans yok), deep-frozen girdide
+// patlamamalı, save çağırmamalı ve çıktı girdinin nesnelerine referans sızdırmamalı.
+// Bu testler mevcut "JSON.stringify aynı" kontrolünü tamamlar: o kontrol ZATEN normalize
+// edilmiş veriyle başlıyordu, bu yüzden normalize eden modeli yakalayamıyordu.
+
+const deepFreeze = (o) => { if (o && typeof o === 'object' && !Object.isFrozen(o)) { Object.values(o).forEach(deepFreeze); Object.freeze(o); } return o; };
+
+check('K3PD-18 boş/eksik quranLearn: model normalize ETMEZ, girdiyi yazmaz', () => {
+  for (const data of [{ quranLearn: {} }, {}, { quranLearn: { cards: undefined } }, { quranLearn: { cards: null } }, { quranLearn: 'nope' }]) {
+    const before = JSON.stringify(data);
+    const model = t.api.kaoTezhipModel(data, 'fatiha');
+    assert.ok(model, 'geçerli sûre için model üretilir');
+    assert.equal(JSON.stringify(data), before, 'girdi DEĞİŞMEZ (normalize/persistans yok)');
+    assert.equal(data.quranLearn && data.quranLearn.schemaVersion, undefined, 'schemaVersion yazılmaz');
+    if (data.quranLearn && typeof data.quranLearn === 'object') assert.equal(data.quranLearn.settings, undefined, 'settings yaratılmaz');
+  }
+});
+
+check('K3PD-18 deep-frozen girdi: model patlamaz ve yazmaz', () => {
+  const frozen = deepFreeze(JSON.parse(JSON.stringify(t.data)));
+  const before = JSON.stringify(t.data);
+  let model;
+  assert.doesNotThrow(() => { model = t.api.kaoTezhipModel(frozen, 'fatiha'); }, 'deep-frozen state model çağrısını kırmaz');
+  assert.ok(model && Array.isArray(model.words) && model.words.length, 'model yine üretilir');
+  assert.equal(JSON.stringify(t.data), before, 'kaynak veri değişmez');
+});
+
+check('K3PD-18 save çağrısı 0 (model yan etkisiz)', () => {
+  const saves = t.calls.save;
+  t.api.kaoTezhipModel(t.data, 'fatiha');
+  t.api.kaoTezhipModel(t.data, 112);
+  assert.equal(t.calls.save, saves, 'model hiç save çağırmaz');
+});
+
+check('K3PD-18 çıktı girdiye referans sızdırmaz (çıktıyı değiştirmek girdiyi değiştirmez)', () => {
+  const before = JSON.stringify(t.data);
+  const a = t.api.kaoTezhipModel(t.data, 'fatiha');
+  assert.equal(JSON.stringify(t.data), before, 'çağrı sonrası veri aynı');
+  a.words[0].state = 'known';
+  a.words[0].ar = 'MUTATED';
+  a.lines.length = 0;
+  if (a.coverage) { a.coverage.known = -1; a.coverage.ratio = 99; }
+  assert.equal(JSON.stringify(t.data), before, 'çıktı mutasyonu girdiye geçmez');
+  const b = t.api.kaoTezhipModel(t.data, 'fatiha');
+  assert.notEqual(b.words[0].ar, 'MUTATED', 'yeni çağrı temiz çıktı verir');
+});
+
+check('K3PD-18 geçersiz sûre null; geçerli model aynı kelime kümesi/kapsam', () => {
+  assert.equal(t.api.kaoTezhipModel(t.data, 999), null);
+  assert.equal(t.api.kaoTezhipModel({}, 999), null);
+  const model = t.api.kaoTezhipModel(t.data, 'fatiha');
+  const direct = t.api.kaoCoverage(t.data, model.words);
+  assert.deepEqual(JSON.parse(JSON.stringify(model.coverage)), JSON.parse(JSON.stringify(direct)));
+  const known = t.api.kaoKnownLemmaSet(t.data);
+  model.words.forEach((word) => assert.equal(word.state === 'known', known[word.lemmaId] === 1));
+});
+
+console.log(`test_k3p_tezhip: ${passed} kontrol PASS (bileşen + model saflığı/K3PD-18)`);

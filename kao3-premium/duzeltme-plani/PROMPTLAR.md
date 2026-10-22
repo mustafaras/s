@@ -657,7 +657,7 @@ Başarılı drop sonrasında gelen native click’in ikinci cevap üretmesini s�
 
 **Oku:** kaoTezhipModel/KnownLemmaSet/Coverage/quranLearnRoot; ensureQuranLearn; test_k3p_tezhip.js.
 
-**Yazma allowlist’i:** quranLearn.js yalnız model okuma sınırı; test_k3p_tezhip.js; test_kao2_progress.js gerekirse; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-18 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearn.js` (yalnız `kaoTezhipModel` okuma sınırı); `tests/kao/test_k3p_tezhip.js`; `tests/kao/test_kao2_progress.js` (yalnız gerekirse); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-18/EVIDENCE.md`.
 
 **Uygula:**
 

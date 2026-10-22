@@ -271,3 +271,23 @@ Sürükleme iptali cevaptan ayrıldı.
 Kanıt: [K3PD-17/EVIDENCE.md](kanit/K3PD-17/EVIDENCE.md).
 
 Sıradaki aday: K3PD-17.
+
+## K3PD-17 — done / PASS (user_attested)
+
+Kullanıcı "sıradakine geç" diyerek kabulü beyan etti. Hüküm yalnız `user_attested`; ajan bağımsız denetim yapmadı. `test_k3p_drag` 12/12, perf 137,608/137,625 KiB.
+
+## K3PD-18 — ready_for_audit / NOT_MEASURED
+
+Tezhip modeli artık **gerçekten saf**.
+
+- **Kusur (F-13/K3P-11):** `kaoTezhipModel` içinde `ensureQuranLearn(d)` çağrılıyordu — o fonksiyon **normalize eder ve girdiyi yazar**. Ölçüm: `{quranLearn:{}}` çağrısı **17 alan ekliyordu**, `{}` çağrısı `d.quranLearn` **yaratıyordu**, **deep-frozen** state'te `TypeError: Cannot assign to read only property 'schemaVersion'` veriyordu.
+- **Test kör noktası:** eski "veri değişmez" kontrolü `JSON.stringify` ile karşılaştırıyordu ama test **zaten normalize edilmiş** veriyle başlıyordu → normalize eden model fark üretmiyordu. Kapatıldı.
+- **Düzeltme (1 satır):** `objectOr(ensureQuranLearn(d).cards,{})` → `objectOr(quranLearnRoot(d).cards,{})`. `migrate()` ve `ensureQuranLearn` davranışına **dokunulmadı** (hard stop).
+- **Test:** 16 → **21 kontrol**. Yeni 5: mutasyonsuzluk, deep-freeze, `save=0`, referans sızıntısı yok, geçersiz sûre `null`. Düzeltme öncesi kodda "girdi DEĞİŞMEZ" asserti **kırmızı**.
+- **Bütçe:** **tavan artırılmadı** — açık kayıpsız sıkıştırmayla kapatıldı. Son ölçüm **137,607 / 137,625 KiB** (pay 18 B). Önceki kartların tavan artışı burada kullanılmadı.
+- **Kapılar:** 18 fixture art arda **0 regresyon**; driver 0; zikr 95/95; plan-check, kontrast, pin tazeliği, IIP-22, görsel-QA guard → 0.
+- **Açık:** bağımsız denetim yok; cihaz/ekran okuyucu kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+
+Kanıt: [K3PD-18/EVIDENCE.md](kanit/K3PD-18/EVIDENCE.md).
+
+Sıradaki aday: K3PD-18.

@@ -1,0 +1,150 @@
+# K3PD-15 — Ders zirvesinde ses–kelime senkronunu ve iptali düzelt
+
+## Durum
+
+- `ready_for_audit` / `NOT_MEASURED`. Bu bir bağımsız kabul hükmü değildir; ajan kendi kabulünü vermedi.
+- Branch `k3pd-denetim-duzeltmeleri`, taban HEAD `6fbdf2d3057fe9e4d5dc46e1a13cfb942ae0ad97` (K3PD-14 kapanışı).
+- Önkoşul: K3PD-14 `done`; kullanıcı bu oturumda “tam ve kusursuz bi şekilde uygula” diyerek bu kartı açıkça verdi.
+
+## Bulgu (F-06 / K3P-13)
+
+`kaoGild()` ders zirvesinde 9 kelimeyi **sesin gerçek `ended` olayını beklemeden** sabit
+`1200/row.length` ms timer ile yaldızlıyordu; ses dizisi deklanmış 1,2 sn'de kesiliyordu.
+Ayrıca aktif oturum kimliği yoktu: çıkış, başka ders, yeniden yaldızla ve audio error
+durumlarında eski timer / ended / Promise callback'i yeni ekranı değiştirebiliyordu.
+
+Kırmızı kanıt (düzeltme öncesi `HEAD` kodu, yeni testler koşulduğunda):
+`test_k3p_lesson_ayah` → `AssertionError: sesli yolda sabit yaldız timer'ı yok` ve
+`AssertionError: toplam an > 1,2 sn`; per-assertion koşumda 5 senaryonun **4'ü kırmızı**
+(A sesli yol timer, B ended ilerlemesi, D çıkış iptali, E klipsiz satır), 1'i yeşil (C).
+
+## Kaynak sözleşmesi ve düzeltme
+
+İki ayrı sözleşme ayrıldı:
+
+1. **SESLİ yol** — `kaoPlaySequence` (genişletilmiş: `hooks.start/audio/alive`) klipleri
+   `ended` ile sırayla çalar. Vurgu klibin **başında** ilerler (`hooks.start`), bir sonraki
+   kelime ancak `ended` gelince yaldızlanır. Doğal kayıt süresi hızlandırılmaz, kesilmez;
+   1,2 sn varsayımı bu yolda yoktur.
+2. **SESSİZ yol** — ses yok/kapalı/hatalı/klipsiz satırda ritmik yedek yürür. 1,2 sn'lik
+   DEKORATİF an bütçesi yalnız bu yedeğe uygulanır ve adım **bir kez** hesaplanır
+   (her turda yeniden ölçeklenirse bütçe şişiyordu — geliştirme sırasında yakalandı).
+
+Diğer kurallar:
+
+- **Hareket azaltma** yalnız görseli etkiler: satır statik yaldızlanır, timer kurulmaz;
+  ses izni varsa ses yine çalar.
+- **Klip hizası** yalnız satırın **her** kelimesinde geçerli `w-<lemmaId>-measured` klibi
+  varsa kullanılır (`clips.every(Boolean)`). Örnek cümleden kurulan satırlarda (ör. `u04.01`)
+  lemma kimliği yoktur → createAudio **0**, dürüst sessiz yedek. Yanlış indeks eşlemesi yok.
+- **Tek aktif oturum** — `ui.kaoGildRun` kimliği. `kaoGildStop()` bunu null'lar, timer'ı
+  `clearTimer` ile temizler ve çalan sesi `pause()` eder. `alive()` her adımda kimliği
+  doğrular, böylece eski ended/timer callback'i yeni turu ilerletmez ve iki ses üst üste binmez.
+- `kaoGildStop()` çağrı noktaları: `kaoGild()` başı, ders çıkışı (`action==='exit'`),
+  ders adımı etkinleştirme (`kaoLessonActivate`), görünüm değişimi (`kaoApplyView`) ve
+  KAO kapanışı (`kaoClose`).
+- Ortak ses izni (`kaoAudioEnabled`) ve K3PD-14'te kurulan fail-closed sessiz-saat sözleşmesi
+  **değiştirilmedi**.
+
+Yol boyunca aynı dosyadaki dört neredeyse birebir aynı çalma döngüsü (S0, ses bilgisi,
+okuyucu, gölgeleme) tek `kaoPlaySequence` üzerine alındı; bu davranışı korur ve bütçeyi
+kurtarır (aşağıdaki ölçüm). Böylece runtime tavanı **artırılmadı**.
+
+## Test değişikliği gerekçesi
+
+`tests/kao/test_k3p_lesson_ayah.js`:
+
+- İki eski K3PD-14 iddiası yeni sözleşmeyle çeliştiği için gerekçeli olarak güncellendi:
+  izinli hücrede artık `kaoGildTimer` **null** olmalı (ses yolu sabit timer kullanmaz) ve
+  `playCalls == createAudioCalls` yerine vurgu-ses bağı aranıyor.
+- K3PD-14 testleri korunuyor: 2×2×2 matris (kapalı ayar/sessiz saatte createAudio=0, play=0;
+  fail-closed sessiz-saat biçimleri; ses yok/hatalı kiplerde okuma sürer).
+- Yeni 7 K3PD-15 kontrolü eklendi (timer yokluğu, ended sırası, hata sonrası yedek, çıkış
+  iptali, yeniden yaldızla tek oturum, sızıntı=0, klipsiz satır dürüst yedek).
+
+## Kırmızı → yeşil
+
+| Senaryo | HEAD (eski) | Bu değişiklik |
+| --- | --- | --- |
+| A sesli yol: ended gelmeden timer ile yaldız | RED | GREEN |
+| B ended sırayla ilerletir | RED | GREEN |
+| C ses hatası sessiz yedekle tamamlanır | GREEN | GREEN |
+| D çıkış eski ended callback'ini iptal eder | RED | GREEN |
+| E klipsiz satır dürüst sessiz yedek | RED | GREEN |
+
+`test_k3p_lesson_ayah`: 8 kontrol (K3P-13 + K3PD-14) → **15 kontrol**, exit 0.
+
+## Kart doğrulaması
+
+| Komut | Exit | Ölçüm |
+| --- | ---: | --- |
+| node tests/kao/test_k3p_lesson_ayah.js | 0 | 15 kontrol; 8 matris hücresi; 7 K3PD-15 senaryosu |
+| node tests/kao/test_k3p_lesson_moment.js | 0 | konfeti/palet/≤1,2 sn/reduced-motion/tek tetik |
+| node tests/kao/test_k3p_mount.js | 0 | 19 render · 9 ders aşaması · 18 ekran geçişi · yeniden kurulum 0 |
+| node tests/kao/test_k3p_resume.js | 0 | 7 kontrol (parça resume, retry, tam ders ödülü) |
+| node tests/kao/test_kao_requirements.js | 0 | 524/524 DİA; hedefli 2,3 sn <50 ms |
+
+## G0
+
+| Kontrol | Exit |
+| --- | ---: |
+| git status/diff --check; HEAD 6fbdf2d3 kaydı | 0 |
+| node --check app.js / sync.js / quranLearn.js / quranLearnFlow.js / quranLearnViews.js | 0 (5/5) |
+| node .claude/skills/run-seyma/driver.mjs | 0 |
+| node .claude/skills/run-seyma/zikr-harness.mjs | 0 (95/95) |
+| node kao3-premium/duzeltme-plani/araclar/durum.mjs --check | 0 |
+| node tests/kao/test_k3pd_control.js | 0 (33 negatif vaka) |
+
+## G1
+
+`test_kao_migration`, `test_kao2_migration`, `test_kao_fsrs`, `test_kao_queue`,
+`test_kao_requirements`, `test_kao_render`, `test_kao2_navigation`, `test_kao2_a11y`,
+`test_kao2_inventory`, `test_kao2_design_contract`, `test_kao_pronunciation_contract`,
+`test_kao_phonics_contract`, `test_k3p_mount`, `test_k3p_focus_lock`,
+`tests/app/test_asset_pin_freshness.js`, `tests/app/test_iip_22.js`,
+`tests/kao/test_kao2_perf_budget.js`, `tools/kao/kao-plan-check.mjs`,
+`tools/kao/kao-verify-contrast.mjs` → hepsi **exit 0**.
+
+Ölçüm: content 184,591 KiB · runtime **137,229** / 137,25 KiB · CSS 15,922 KiB ·
+p95 7,059 ms · steady 3,902 ms (`KAO2_WRITE_BASELINE`/`KAO2_ACCEPT_SLOW_HOST` unset,
+taban yazılmadı). Kontrast: 756 çift / 0 alt eşik.
+
+### Bütçe dürüstlüğü (önemli)
+
+- `test_kao2_perf_budget` tabanı **HEAD'de zaten kırmızıydı**: 137,298 KiB > 137,25 KiB
+  (K3PD-14 commit'i tavanı 49 B aşmış). Tavan **artırılmadı**.
+- Bu kart runtime'ı HEAD'e göre **−69 B** iyileştirdi (140593 → 140524 B), böylece
+  `test_kao2_perf_budget` artık **exit 0**.
+- Dört kopya çalma döngüsünün tek yola alınması bunun kaynağıdır; yeni özellik kodu
+  bütçeyi büyütmedi.
+- **Göreli p95 bandı gürültülü:** paralel fixture koşumları sırasında `steady p95` birkaç kez
+  bandı aştı (6,6 / 9,5 ms; bir koşuda mutlak `p95 50,3 ms`). Makine boşken arka arkaya üç
+  koşum: `19,871 / 7,758 / 8,415 ms` p95 ve `5,925 / 5,023 / 5,004 ms` steady → **üçü de PASS**,
+  mutlak tavanlar (137,25 KiB · 40 ms) hep sağlandı. `KAO2_ACCEPT_SLOW_HOST` kullanılmadı,
+  taban yazılmadı. Bu dalgalanma ölçüm oynatılarak gizlenmedi; burada açıkça kayıtlıdır.
+
+## Bu oturumda görülen, kapsam dışı (önceden kırmızı) fixture'lar
+
+Aşağıdakiler **HEAD'de de kırmızı**; bu kartın yazma allowlist'i dışında ve bu değişiklikten
+etkilenmiyor. Gizlenmiyor, kayda geçiyor:
+
+- `test_kao2_components` (pekiştirme şeridi), `test_kao2_feedback` (aynı konu),
+  `test_kao2_curriculum` (index.html 20261019a pin satırı), `test_kao2_kabul`,
+  `test_kao2_mastery` (L9 ≤ 137 KiB eşiği — bu kart 137,229'a indirdi, eşik hâlâ aşılıyor).
+
+`tests/kao` tamamı: 83 dosya, 5 kırmızı — beşi de yukarıdaki önceden var olan küme.
+
+## Kapsam ve sınırlar
+
+- Değişen üretim/test yolları: `app/core/quranLearn.js`, `tests/kao/test_k3p_lesson_ayah.js`
+  (+ bu kartın durum/kayıt/kanıt yolları).
+- Yeni `App.kao*` handler **yok** (45 sabit), şema/`migrate()`/`sync.js`/içerik/font/pin
+  değişikliği **yok**, yeni app/core veya app/content modülü **yok**.
+- Ses kayıt dosyaları değiştirilmedi/üretilmedi (`assets/kao/audio` salt-okur).
+- Ağ, gerçek kullanıcı verisi, token, `seyma-data` ve tarayıcı kullanılmadı; tüm koşumlar
+  ağsız sentetik Node/VM.
+- Korunan kirli yollar (`kao3-premium/KAPANIS.md`, `README.md`, `kanit/sonraki/GORSEL-KANIT.md`,
+  `.pdf`) okunmadı/değiştirilmedi/stage edilmedi.
+- Push, merge, tag, deploy **yapılmadı**; `releaseApproval=NOT_APPROVED`;
+  `app/core/quranLearn.js` pin borcu K3PD-32'ye kadar ertelenmiş kalır.
+- Cihaz, ekran okuyucu, L2, 230 kayıt ve 14/30 günlük öğrenme etkisi dış kapıları `pending`.

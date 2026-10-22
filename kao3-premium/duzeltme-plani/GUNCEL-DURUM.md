@@ -196,3 +196,19 @@ Sıradaki aday: K3PD-13 (bu satır sonraki karta başlama yetkisi değildir).
 Sıradaki aday: K3PD-15 (yalnız aday; başlatılmadı ve bu kayıt başlatma yetkisi vermez).
 
 Kanıt: [K3PD-14/EVIDENCE.md](kanit/K3PD-14/EVIDENCE.md).
+
+## K3PD-15 — ready_for_audit / NOT_MEASURED
+
+- Kullanıcı bu oturumda K3PD-15’i açıkça verdi (“tam ve kusursuz bi şekilde uygula”). Kart uygulandı; bağımsız denetim **yapılmadı**, hüküm `NOT_MEASURED` — PASS olarak sunulmaz.
+- Bulgu F-06 düzeltildi: ders zirvesinde 9 kelime artık **gerçek klip `ended` olaylarıyla** yaldızlanıyor; sabit `1200/row.length` timer’ı yalnız sessiz yedeğe indirildi ve **tek kez** hesaplanıyor. Doğal kayıt süresi hızlandırılmıyor/kesilmiyor.
+- Tek aktif oturum: `ui.kaoGildRun` kimliği + `kaoGildStop()`; çağrı noktaları `kaoGild`, ders `exit`, `kaoLessonActivate`, `kaoApplyView`, `kaoClose`. Eski ended/timer/Promise callback’i yeni ekranı değiştirmiyor, iki ses üst üste binmiyor.
+- Klip hizası yalnız tam olduğunda sesli yol; örnek cümleden kurulan satırda (ör. `u04.01`) createAudio **0** ve dürüst sessiz yedek. Hareket azaltmada görsel statik, izinli ses yine çalar. K3PD-14 ses izni sözleşmesi değişmedi.
+- Kırmızı→yeşil: 5 senaryonun 4’ü HEAD kodunda kırmızıydı (sesli yol timer, ended sırası, çıkış iptali, klipsiz satır), şimdi 5/5 yeşil; `test_k3p_lesson_ayah` 8 → **15 kontrol**, exit 0.
+- Kart testleri ve G0+G1 exit 0. Perf: content 184,591 · runtime **137,229** / 137,25 KiB · CSS 15,922 · p95 7,059 ms. **Tavan artırılmadı**: HEAD’de perf kapısı kırmızıydı (137,298); dört kopya çalma döngüsü tek yola alınarak −69 B kazanıldı ve kapı yeşile döndü. `test_kao2_mastery` 137 KiB eşiği HEAD’de de kırmızıydı ve hâlâ aşılıyor.
+- HEAD’de de kırmızı olan ve bu kartın allowlist’i dışındaki beş kardeş fixture (components, curriculum, feedback, kabul, mastery) gizlenmedi; kanıtta listelendi.
+- Yeni `App.kao*` yok (45 sabit), şema/`migrate()`/`sync.js`/içerik/font/pin değişikliği yok. `releaseApproval=NOT_APPROVED`; `app/core/quranLearn.js` pin borcu K3PD-32’ye kadar ertelenmiş. Push/merge/tag/deploy yok.
+- K3PD-15 allowlist satırı bu kartı yürütmek için exact paths biçimine getirildi (K3PD-12/13 ile aynı emsal); kapsam genişletilmedi.
+
+Sıradaki aday: K3PD-16 (yalnız aday; başlatılmadı ve bu kayıt başlatma yetkisi vermez).
+
+Kanıt: [K3PD-15/EVIDENCE.md](kanit/K3PD-15/EVIDENCE.md).

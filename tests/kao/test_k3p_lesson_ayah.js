@@ -224,20 +224,22 @@ check('K3PD-14 ses izni matrisi: ayar × sessiz saat × hareket azaltma gerçek 
     if (allowed) {
       assert.ok(result.createAudioCalls > 0, `izinli hücrede createAudio olmalı (${matrixCell})`);
       assert.ok(result.playCalls > 0, `izinli hücrede play olmalı (${matrixCell})`);
-      assert.equal(result.playCalls, result.createAudioCalls, `her yaratılan sentetik klip oynatılmalı (${matrixCell})`);
+      // K3PD-15: ses varsa vurgu gerçek klip olaylarıyla ilerler; sabit görsel timer kurulmaz.
+      assert.equal(result.t.ui.kaoGildTimer, null, `sesli yolda sabit yaldız timer'ı yok (${matrixCell})`);
+      assert.ok(result.t.ui.kaoGildIndex >= 1, `ses başlarken en az ilk kelime yaldızlı (${matrixCell})`);
     } else {
       assert.equal(result.createAudioCalls, 0, `createAudio=0 (${matrixCell})`);
       assert.equal(result.playCalls, 0, `play=0 (${matrixCell})`);
+      if (reducedMotion) {
+        assert.equal(result.t.ui.kaoGildTimer, null, 'hareket azaltmada görsel zamanlayıcı kapalı');
+        assert.equal(result.t.timers.length, 0, 'hareket azaltmada yeni görsel zamanlayıcı yok');
+        assert.equal(result.t.ui.kaoGildIndex, result.total, 'hareket azaltmada satır statik yaldızlı');
+      } else {
+        assert.ok(result.t.ui.kaoGildTimer, 'sessiz yedekte ritmik zamanlayıcı çalışmalı');
+        assert.ok(result.t.timers.length > 0, 'sessiz yedekte gerçek sentetik timer kurulmalı');
+      }
     }
     measurements.push(`${matrixCell}: createAudio=${result.createAudioCalls}, play=${result.playCalls}`);
-    if (reducedMotion) {
-      assert.equal(result.t.ui.kaoGildTimer, null, 'hareket azaltmada görsel zamanlayıcı kapalı');
-      assert.equal(result.t.timers.length, 0, 'hareket azaltmada yeni görsel zamanlayıcı yok');
-      assert.equal(result.t.ui.kaoGildIndex, result.total, 'hareket azaltmada satır statik yaldızlı');
-    } else {
-      assert.ok(result.t.ui.kaoGildTimer, 'hareket açıksa görsel yaldız zamanlayıcısı çalışmalı');
-      assert.ok(result.t.timers.length > 0, 'hareket açıksa gerçek sentetik timer kurulmalı');
-    }
   }
   console.log(`K3PD-14 matrix measurements: ${measurements.join(' · ')}`);
 });
@@ -251,13 +253,14 @@ check('K3PD-14 sessiz-saat bağımlılığı function/boolean sözleşmesini fai
   }
   const explicitNotQuiet = gildAudioCase({ audioEnabled: true, quiet: false, reducedMotion: false, quietMode: 'boolean-false' });
   assert.ok(explicitNotQuiet.createAudioCalls > 0, 'boolean false sözleşmesinde createAudio başlamalı');
-  assert.equal(explicitNotQuiet.playCalls, explicitNotQuiet.createAudioCalls, 'boolean false sözleşmesindeki sesler oynatılmalı');
+  // K3PD-15: sesli yol gerçek klip olaylarıyla ilerler; vurgu sese bağlı başlar.
+  assert.ok(explicitNotQuiet.t.ui.kaoGildIndex >= 1, 'boolean false sözleşmesinde yaldız sesle başlamalı');
 });
 
 check('K3PD-14 ses yokluğu veya hata okumayı ve sessiz yaldız zamanlayıcısını durdurmaz', () => {
   for (const audioMode of ['missing', 'null-audio', 'throw-create', 'throw-play', 'emit-error']) {
     const result = gildAudioCase({ audioEnabled: true, quiet: false, reducedMotion: false, audioMode });
-    assert.ok(result.t.ui.kaoGildTimer, `${audioMode}: yaldız zamanlayıcısı kurulmalı`);
+    assert.ok(result.t.ui.kaoGildTimer, `${audioMode}: sessiz yedek yaldız zamanlayıcısı kurulmalı`);
     for (let guard = 0; guard < 60 && result.t.ui.kaoGildTimer; guard += 1) {
       const timer = result.t.timers[result.t.ui.kaoGildTimer - 1];
       assert.ok(timer && typeof timer.fn === 'function', `${audioMode}: sentetik timer bulunmalı`);
@@ -266,6 +269,147 @@ check('K3PD-14 ses yokluğu veya hata okumayı ve sessiz yaldız zamanlayıcıs�
     assert.equal(result.t.ui.kaoGildIndex, result.total, `${audioMode}: okuma/yaldız tamamlanmalı`);
     assert.equal((result.t.api.kaoOverlayHTML(result.t.NOW).match(/is-gild/g) || []).length, result.total, `${audioMode}: satırın tamamı görünmeli`);
   }
+});
+
+
+// ── K3PD-15 · Ders zirvesinde ses–kelime senkronu ve iptal ───────────────────────────────────
+// İki ayrı sözleşme: (1) ses varsa vurgu GERÇEK klip olaylarıyla ilerler, doğal kayıt süresi
+// hızlandırılmaz/kesilmez; (2) ses yok/kapalı/hatalı/klipsiz satırda ritmik yedek 1,2 sn bütçesiyle yürür.
+// Hiç `ended` gelmeden dokuz kelimeyi timer'la yaldızlayan davranış KIRMIZI olmalı.
+function gildHarness({ audioEnabled = true, lessonId = 'u01.02', createAudio } = {}) {
+  const audios = [], timers = [], cleared = [];
+  // Doğal süre: hiçbir klip kendiliğinden bitmez; `ended` yalnız testin elinden gelir.
+  const makeAudio = createAudio || ((src) => {
+    const listeners = {};
+    const audio = {
+      src, listeners, paused: false, removed: [],
+      addEventListener(name, fn) { listeners[name] = fn; },
+      removeEventListener(name, fn) { if (listeners[name] === fn) { delete listeners[name]; audio.removed.push(name); } },
+      pause() { audio.paused = true; },
+      play() { return Promise.resolve(); },
+      fire(name) { if (listeners[name]) listeners[name](); }
+    };
+    audios.push(audio);
+    return audio;
+  });
+  const surface = {
+    setTimer(fn, ms) { timers.push({ fn, ms }); return timers.length; },
+    clearTimer(id) { cleared.push(id); },
+    createAudio: (src) => makeAudio(src)
+  };
+  const t = bootKao({ surface });
+  const q = freshUser(t);
+  q.settings.audio = audioEnabled;
+  assert.equal(startLessonForFixture(t, lessonId), true, `${lessonId}: ders başlamalı`);
+  assert.equal(playLesson(t, { stopAt: 'apply' }), true, `${lessonId}: kapanışa gelinmeli`);
+  const total = (t.api.kaoOverlayHTML(t.NOW).match(/kao-tezhip-word/g) || []).length;
+  // Ders adımları kendi ses/timer'larını üretir; ölçüm yalnız yaldızlama turunu kapsar.
+  audios.length = 0; timers.length = 0; t.timers.length = 0;
+  return { t, audios, timers, cleared, total, gilded: () => (t.api.kaoOverlayHTML(t.NOW).match(/is-gild/g) || []).length };
+}
+
+check('K3PD-15 sesli yol: hiç ended gelmeden kelimeler timer ile yaldızlanmaz', () => {
+  const h = gildHarness();
+  assert.ok(h.total > 1, `satır çok kısa (${h.total})`);
+  h.t.timers.length = 0;
+  assert.equal(h.t.api.kaoLesson('gild'), true, 'yaldızlama başlamalı');
+  assert.ok(h.audios.length >= 1, 'ilk klip yaratılmalı');
+  assert.equal(h.gilded(), 1, 'ses başlarken yalnız ilk kelime yaldızlı olmalı');
+  assert.equal(h.t.ui.kaoGildTimer, null, 'sesli yolda sabit görsel timer kurulmamalı');
+  assert.equal(h.timers.length, 0, 'sesli yolda hiç timer eklenmemeli');
+});
+
+check('K3PD-15 sesli yol: ended olayları kelimeyi sırayla ilerletir, son ended satırı tamamlar', () => {
+  const h = gildHarness();
+  assert.equal(h.t.api.kaoLesson('gild'), true);
+  const seen = [];
+  for (let step = 1; step < h.total; step += 1) {
+    const audio = h.audios[step - 1];
+    assert.ok(audio, `${step}. klip yok`);
+    audio.fire('ended');
+    const gilded = h.gilded();
+    seen.push(gilded);
+    assert.equal(gilded, step + 1, `${step}. ended sonrası vurgu ${step + 1} olmalı`);
+  }
+  assert.deepEqual(seen, seen.map((_v, i) => i + 2), 'vurgu öne geçmemeli, geride kalmamalı');
+  assert.equal(h.t.ui.kaoGildIndex, h.total, 'tüm kelimeler sesle tamamlanmalı');
+  assert.equal(h.timers.length, 0, 'sesli yolda timer yok');
+});
+
+check('K3PD-15 ses hatası: kalan kelimeler sessiz yedekle tamamlanır, okuma durmaz', () => {
+  const h = gildHarness();
+  assert.equal(h.t.api.kaoLesson('gild'), true);
+  h.audios[0].fire('ended');
+  const before = h.gilded();
+  h.audios[1].fire('error');
+  assert.ok(h.t.ui.kaoGildTimer, 'hata sonrası sessiz yedek timer kurulmalı');
+  assert.equal(h.gilded(), before, 'hata anında vurgu geri sıçramamalı');
+  for (let guard = 0; guard < 80 && h.t.ui.kaoGildTimer; guard += 1) {
+    const timer = h.timers[h.t.ui.kaoGildTimer - 1];
+    assert.ok(timer && typeof timer.fn === 'function', 'sentetik timer bulunmalı');
+    timer.fn();
+  }
+  assert.equal(h.gilded(), h.total, 'kalan satır sessiz yedekle tamamlanmalı');
+  assert.equal(h.t.ui.kaoGildIndex, h.total, 'vurgu satır sonuna ulaşmalı');
+});
+
+check('K3PD-15 iptal: çıkış eski ses/timer callback\'ini etkisizleştirir ve sesi susturur', () => {
+  const h = gildHarness();
+  assert.equal(h.t.api.kaoLesson('gild'), true);
+  h.audios[0].fire('ended');
+  const stale = h.audios[1];
+  const created = h.audios.length;
+  assert.equal(h.t.api.kaoLesson('exit'), true, 'çıkış çalışmalı');
+  const afterExit = h.t.ui.kaoGildIndex;
+  stale.fire('ended');
+  assert.equal(h.t.ui.kaoGildIndex, afterExit, 'çıkıştan sonra eski ended vurguyu değiştirmemeli');
+  assert.equal(h.audios.length, created, 'çıkıştan sonra eski ended yeni ses başlatmamalı');
+  assert.equal(h.t.ui.kaoGildRun, null, 'aktif yaldız oturumu temizlenmeli');
+  assert.equal(stale.paused, true, 'eski ses susturulmalı (iki ses üst üste binmez)');
+});
+
+check('K3PD-15 yeniden yaldızla: tek aktif oturum; önceki oturumun ended\'i yeni ekranı değiştirmez', () => {
+  const h = gildHarness();
+  assert.equal(h.t.api.kaoLesson('gild'), true);
+  const first = h.audios[0];
+  assert.equal(h.t.api.kaoLesson('gild'), true, 'ikinci kez yaldızlanabilmeli');
+  assert.ok(h.audios.length >= 2, 'ikinci tur yeni klip yaratmalı');
+  const freshIndex = h.t.ui.kaoGildIndex;
+  first.fire('ended');
+  assert.equal(h.t.ui.kaoGildIndex, freshIndex, 'eski oturumun ended\'i yeni turu ilerletmemeli');
+  assert.ok(first.paused === true || first.removed.length >= 1, 'eski oturum sesi susturulmalı');
+});
+
+check('K3PD-15 sızıntı: sesli yol ve iptal sonrası timer/dinleyici sızıntısı yok', () => {
+  const h = gildHarness();
+  assert.equal(h.t.api.kaoLesson('gild'), true);
+  for (let step = 0; step < h.total; step += 1) if (h.audios[step]) h.audios[step].fire('ended');
+  assert.equal(h.timers.length, 0, 'sesli yolda timer sızıntısı 0');
+  const active = h.t.ui.kaoGildRun;
+  assert.ok(active && active.audio, 'aktif oturum çalan sesi izlemeli');
+  assert.equal(h.t.api.kaoLesson('gild'), true, 'yeniden yaldızla');
+  assert.equal(active.audio.paused, true, 'önceki oturumun sesi susturulmalı');
+  h.t.api.kaoLesson('exit');
+  assert.equal(h.t.ui.kaoGildTimer, null, 'iptal sonrası timer yok');
+  assert.equal(h.t.ui.kaoGildRun, null, 'iptal sonrası oturum yok');
+});
+
+check('K3PD-15 klipsiz satır: yanlış indeksle eşleme yok, dürüst sessiz yedek uygulanır', () => {
+  // u04.01 kapanışı örnek cümlelerden kurulur: kelimelerin lemma kimliği yoktur → klip hizası yoktur.
+  const h = gildHarness({ lessonId: 'u04.01' });
+  assert.equal(h.t.api.kaoLesson('gild'), true, 'yaldızlama klipsiz satırda da çalışmalı');
+  const run = h.t.ui.kaoGildRun;
+  assert.equal(run.audio, undefined, 'klipsiz satırda hiç ses yaratılmamalı');
+  assert.equal(h.audios.length, 0, 'klipsiz satırda createAudio çağrılmamalı');
+  assert.ok(h.t.ui.kaoGildTimer, 'klipsiz satırda sessiz yedek zamanlayıcısı kurulmalı');
+  const step = h.timers[h.t.ui.kaoGildTimer - 1];
+  assert.ok(step.ms * h.total <= 1200 + step.ms, `dekoratif yedek bütçesi ≤ 1,2 sn (${step.ms}×${h.total})`);
+  for (let guard = 0; guard < 80 && h.t.ui.kaoGildTimer; guard += 1) {
+    const timer = h.timers[h.t.ui.kaoGildTimer - 1];
+    if (!timer) break;
+    timer.fn();
+  }
+  assert.equal(h.gilded(), h.total, 'sessiz yedek satırı baştan sona yaldızlamalı');
 });
 
 console.log(`test_k3p_lesson_ayah: PASS (${passed} kontrol)`);

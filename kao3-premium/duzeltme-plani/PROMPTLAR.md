@@ -568,7 +568,7 @@ Mevcut ortak ses izni yorumunu kullan; isQuietTime işlev/boolean farkında mevc
 
 **Oku:** 14 makbuzu; kaoGild/GildStep/PlaySequence; lesson çıkış/render/clearTimer; ders sonu an süre tokenları.
 
-**Yazma allowlist’i:** quranLearn.js; test_k3p_lesson_ayah.js; lesson_moment/mount/resume fixture’ları; gerekiyorsa kao.css; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-15 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearn.js`; `tests/kao/test_k3p_lesson_ayah.js`; `tests/kao/test_k3p_lesson_moment.js`; `tests/kao/test_k3p_mount.js`; `tests/kao/test_k3p_resume.js`; `app/kao.css` (yalnız gerekirse); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-15/EVIDENCE.md`.
 
 **Uygula:**
 
@@ -584,6 +584,8 @@ Ses varsa kelime vurgusu gerçek klibin başlangıç/bitiş olaylarıyla ilerles
 **Teslim:** Değişen exactpaths; tekrar üretim; komut/exit/ölçüler; independent verdict; açık sınırlamalar ve yeni kayıt. Önerilen commit başlığı `K3PD-15: Ders zirvesinde ses–kelime senkronunu ve iptali düzelt`. Kayıt güncellemesi ve bu kartın kapanışı dışında sonraki işe başlama.
 
 **Sonraki aday:** K3PD-16. Bu bilgi sonraki karta uygulama izni değildir.
+
+**2026-10-22 yürütme notu (K3PD-15):** Kart kullanıcı talebiyle uygulandı ve `ready_for_audit`/`NOT_MEASURED` durumunda. Bu kart için allowlist satırı K3PD-12/13 emsaliyle exact paths biçimine getirildi (kapsam genişletilmedi). Bağımsız denetim yapılmadı; PASS yazılmadı. Kanıt `kanit/K3PD-15/EVIDENCE.md`.
 <!-- /PROMPT K3PD-15 -->
 
 <!-- PROMPT K3PD-16 -->

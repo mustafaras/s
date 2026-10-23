@@ -203,12 +203,14 @@ check('(e) unitMastery: durum tablosu none/passed/failed/repair/skipped + puan v
 // ölü yüzey temizliği (17 sembol) yapıldı ve başka ölü kod bulunmadı, yani §2'nin
 // "önce eski kodu sil" adımı tükendi. Öncekiler 80 → 88 → 128, hepsi kullanıcı yetkisiyle.
 // K3PD-12 (2026-10-21, kullanıcı onayı): 136 -> 137 KiB; aynı bağımsız dosya ölçümü için L9 kullan.
-// K3PD-16/17 (2026-10-22, kullanıcı onayı): 137 -> 137.625 KiB; okuyucunun gerçek kelime vurgusu ve
+// K3PD-16/17 (2026-10-22, kullanıcı onayı): 137 -> 137.625 KiB; K3PD-22 (2026-10-23, aynı onay):
+// 137.625 -> 137.75 KiB; ana ekrandan ders başlatmanın goal ekranını atlaması (2 dokunuş) ~63 B
+// çalışma zamanı kodu gerektirdi ve kayıpsız sıkıştırma yetmedi. okuyucunun gerçek kelime vurgusu ve
 // tekli satır indeksi + iptal sınırı (test_kao2_perf_budget ile aynı gerekçe ve aynı tavan).
-check('runtime bütçesi tavanı (137.625 KiB gzip L9) içinde kalır', () => {
+check('runtime bütçesi tavanı (137.75 KiB gzip L9) içinde kalır', () => {
   const files = ['app/core/quranLearn.js', 'app/core/quranLearnFlow.js', 'app/core/quranLearnViews.js'];
   const kib = files.reduce((sum, f) => sum + zlib.gzipSync(fs.readFileSync(path.join(repoRoot, f)), { level: 9 }).length, 0) / 1024;
-  assert.ok(kib <= 137.625, `runtime gzip L9 ${kib.toFixed(3)} KiB > 137.625`);
+  assert.ok(kib <= 137.75, `runtime gzip L9 ${kib.toFixed(3)} KiB > 137.75`);
 });
 
 const partA = passed;
@@ -572,7 +574,8 @@ check('D(b) Bugün kahramanı (mastery): tek birincil "Ustalığa başla" + ikin
   assert.match(text(h), /Ustalığa başla/);
   assert.match(text(h), /Şimdilik atla/);
   const primary = tapPrimary(u);
-  assert.deepEqual([primary.name, primary.args], ['kaoLesson', ['start', 1]]);
+  // K3PD-22: ana ekrandan ders başlatmak goal ekranını atlar → üçüncü argüman 'h'.
+  assert.deepEqual([primary.name, primary.args], ['kaoLesson', ['start', 1, 'h']]);
   assert.equal(u.ui.kaoLesson.kind, 'mastery');
   const v = bootUnit1Done();
   homeHtml(v);

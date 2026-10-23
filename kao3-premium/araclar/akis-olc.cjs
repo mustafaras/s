@@ -89,7 +89,14 @@ R.ui.kaoStack = []; R.api.kaoOpen('home'); H.tapPrimary(R); // Bugün'ün başla
 const resumedLesson = R.ui.kaoLesson.lessonId;
 let done = 0;
 for (let g = 0; g < 200 && R.ui.kaoLesson && done < 8; g += 1) { if (isTask(R)) { answer(R, curTask(R), true); done += 1; } else R.api.kaoLesson('next'); }
-const pendingOf = (t) => { const q = t.ui.kaoLesson && t.ui.kaoQueue[t.ui.kaoTaskIndex]; return q ? q.id : (t.ui.kaoLesson ? t.ui.kaoLesson.plan[t.ui.kaoLesson.at].id : ''); };
+// K3PD-22: bütçe kesme ekranı (partEnd) kendi kimliğini değil, çözmeyi beklediği işi temsil eder
+// (resumeItemId). Aksi hâlde "aynı göreve dönüldü mü" ölçümü yanlış HAYIR veriyordu.
+const pendingOf = (t) => {
+  const q = t.ui.kaoLesson && t.ui.kaoQueue[t.ui.kaoTaskIndex];
+  if (q) return q.id;
+  const item = t.ui.kaoLesson && t.ui.kaoLesson.plan[t.ui.kaoLesson.at];
+  return item ? String(item.resumeItemId || item.id) : '';
+};
 const before = { lesson: resumedLesson, phase: R.ui.kaoLesson.phase, item: pendingOf(R) };
 R.api.kaoLesson('exit');
 for (const k of Object.keys(R.ui)) delete R.ui[k];

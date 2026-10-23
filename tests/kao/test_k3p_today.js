@@ -67,4 +67,127 @@ check('yeni App.kao* handler eklenmedi (45 sabit)', () => {
   assert.equal(assigned.size, 45, 'App.kao* sayısı 45 olmalı (' + assigned.size + ')');
 });
 
+// ══ K3PD-22 · Açılıştan ilk göreve iki dokunuş ════════════════════════════════════════════════
+// Ölçüm GERÇEK kullanıcı eylemlerini sayar: hub açılışı (1) + Bugün birincil CTA (1) = 2.
+// Başlangıç dokunuşu ve hedef görünürlüğü sayaçtan ÇIKARILMAZ (hard stop).
+const { freshUser } = require('./helpers/kao-harness');
+
+function openToFirstTask() {
+  const t = bootKao({ seeded: true });
+  t.ui.kaoStack = [];
+  t.api.kaoOpen('home');            // 1. dokunuş: hub açılışı
+  const hero = t.api.kaoOverlayHTML(t.NOW);
+  // CTA markup'ı HTML-kaçışlı gelir: App.kaoLesson(&quot;start&quot;,&quot;u01.01&quot;,&quot;h&quot;)
+  const primary = /App\.kaoLesson\(&quot;start&quot;,&quot;([^&]+)&quot;,&quot;h&quot;\)/.exec(hero)
+    || /App\.kaoLesson\('start','([^']+)','h'\)/.exec(hero);
+  return { t, hero, primary };
+}
+
+check('K3PD-22 açılış → ilk cevaplanabilir görev ≤2 dokunuş', () => {
+  const { t, primary } = openToFirstTask();
+  assert.ok(primary, 'Bugün birincil CTA ana-ekran modunu (h) kullanmıyor');
+  // 2. dokunuş: birincil CTA
+  assert.equal(t.api.kaoLesson('start', primary[1], 'h'), true, 'CTA dersi başlatmalı');
+  const state = t.ui.kaoLesson;
+  assert.ok(state, 'ders durumu yok');
+  const item = state.plan[state.at];
+  assert.ok(['practice', 'review'].includes(state.phase) || ['intro', 'concept'].includes(item.kind),
+    `ilk görev/öğretim adımına ulaşılmadı (phase=${state.phase}, kind=${item.kind})`);
+  // Goal ekranı ATLANDI: plan[0] hedef öğesidir (goal/partGoal) ve state.at onu geçmiş olmalı.
+  // (K3PD-22 regresyonu: yalnız 'goal' aranınca 'partGoal' planlarında atlama sessizce çalışmıyordu.)
+  assert.ok(['goal', 'partGoal'].includes(state.plan[0].kind), `plan[0] hedef değil: ${state.plan[0].kind}`);
+  assert.equal(state.at, 1, `hedef ekranı atlanmadı (at=${state.at})`);
+  assert.equal(item.kind, 'practice', `ilk cevaplanabilir görev practice olmalı, ${item.kind} geldi`);
+});
+
+check('K3PD-22 hedef sunumu KORUNUR: Bugün hero’su ders + âyet satırı + görev sayısını gösterir', () => {
+  const { hero } = openToFirstTask();
+  assert.match(hero, /kao-today-title/, 'hero ders başlığı yok');
+  assert.match(hero, /kao-tezhip-word/, 'hero âyet satırı (Tezhip) yok');
+  assert.match(hero, /görev/, 'hero görev sayısı yok');
+  // Aynı ders ve aynı satır: hero'daki Tezhip satırı dersin goal satırıyla aynı kaynaktan gelir.
+  const t = bootKao({ seeded: true });
+  t.ui.kaoStack = [];
+  t.api.kaoOpen('home');
+  const heroHtml = t.api.kaoOverlayHTML(t.NOW);
+  const heroWords = [...heroHtml.matchAll(/class="kao-tezhip-word[^"]*"[^>]*aria-label="([^,]+),/g)].map((m) => m[1]);
+  assert.ok(heroWords.length > 0, 'hero satırı kelime taşımıyor');
+  t.api.kaoLesson('start', 'u01.01');
+  const goalHtml = t.api.kaoOverlayHTML(t.NOW);
+  const goalWords = [...goalHtml.matchAll(/class="kao-tezhip-word[^"]*"[^>]*aria-label="([^,]+),/g)].map((m) => m[1]);
+  // Hero, dersin satırını KAPSAR (sûrenin tamamını gösterir; dersin hedef kelimeleri içinde).
+  // Kart "öğrenilecek kelimeleri gerçekten önceden gösterdiğini kanıtla" diyor: kapsama yeterli.
+  const missing = goalWords.filter((w) => !heroWords.includes(w));
+  assert.deepEqual(missing, [], `hero dersin kelimelerini göstermiyor: ${missing.join(', ')}`);
+  assert.ok(heroWords.length >= goalWords.length, 'hero satırı dersin satırından kısa olmamalı');
+});
+
+check('K3PD-22 resume bozulmaz: from-home olmadan yeniden başlatma aynı adıma döner', () => {
+  const t = bootKao({ seeded: true });
+  assert.equal(t.api.kaoLesson('start', 'u01.02'), true);
+  t.api.kaoLesson('next');
+  t.api.kaoLesson('next');
+  const at = t.ui.kaoLesson.at;
+  t.api.kaoLesson('exit');
+  assert.equal(t.api.kaoLesson('start', 'u01.02'), true, 'yeniden başlatma');
+  assert.equal(t.ui.kaoLesson.at, at, 'resume aynı adıma dönmeli');
+});
+
+check('K3PD-22 yarıda kalan ders ana ekrandan AYNI göreve döner (partGoal planı)', () => {
+  // K3PD-22 regresyonu: kısmi ilerlemeden sonra plan yeniden kurulur ve plan[0] 'partGoal' olur.
+  // Yalnız 'goal' aranınca atlama sessizce çalışmıyor, kullanıcı hedef ekranına geri düşüyordu.
+  const t = bootKao({ seeded: true });
+  t.ui.kaoStack = [];
+  t.api.kaoOpen('home');
+  assert.equal(t.api.kaoLesson('start', 'u01.01', 'h'), true);
+  let done = 0;
+  for (let g = 0; g < 200 && t.ui.kaoLesson && done < 8; g += 1) {
+    if (t.ui.kaoLesson.phase === 'practice') {
+      const task = t.ui.kaoTasks[t.ui.kaoQueue[t.ui.kaoTaskIndex].id];
+      t.api.kaoAnswer(task.id, task.choices.find((c) => c.correct === true).id);
+      t.api.kaoContinue();
+      done += 1;
+    } else t.api.kaoLesson('next');
+  }
+  const pending = t.ui.kaoQueue[t.ui.kaoTaskIndex].id;
+  t.api.kaoLesson('exit');
+  for (const k of Object.keys(t.ui)) delete t.ui[k];
+  Object.assign(t.ui, { kaoOpen: false, kaoView: 'home', kaoStack: [] });
+  t.api.kaoOpen('home');
+  const hero = t.api.kaoOverlayHTML(t.NOW);
+  const primary = /App\.kaoLesson\(&quot;start&quot;,&quot;([^&]+)&quot;,&quot;h&quot;\)/.exec(hero);
+  assert.ok(primary, 'yeniden açılışta ana-ekran CTA yok');
+  assert.equal(t.api.kaoLesson('start', primary[1], 'h'), true);
+  const state = t.ui.kaoLesson;
+  assert.ok(['goal', 'partGoal'].includes(state.plan[0].kind), `plan[0] hedef değil: ${state.plan[0].kind}`);
+  assert.equal(state.at, 1, `hedef ekranı atlanmadı (at=${state.at})`);
+  assert.equal(state.phase, 'practice', `göreve dönülmedi (phase=${state.phase})`);
+  assert.equal(t.ui.kaoQueue[t.ui.kaoTaskIndex].id, pending, 'aynı göreve dönülmedi');
+});
+
+check('K3PD-22 mastery/repair rotaları bozulmaz', () => {
+  const t = bootKao({ seeded: true });
+  assert.equal(t.api.kaoLesson('start', '1'), true, 'ünite kimliği ustalık başlatmalı');
+  assert.equal(t.ui.kaoLesson.kind, 'mastery', 'ustalık oturumu değil');
+});
+
+check('K3PD-22 onboarding/kilitli kullanıcı normal davranışı korunur', () => {
+  const t = bootKao(); // onboarding bitmemiş
+  t.ui.kaoStack = [];
+  t.api.kaoOpen('home');
+  const html = t.api.kaoOverlayHTML(t.NOW);
+  // Onboarding bitmemişse hero "Başlayalım" (kaoOnboard) sunar; from-home ders CTA'sı YOK.
+  assert.match(html, /kaoOnboard/, 'onboarding CTA yok');
+  assert.doesNotMatch(html, /kaoLesson\(&quot;start&quot;,&quot;[^&]+&quot;,&quot;h&quot;\)/, 'onboarding bitmemişken ders CTA’sı sunulmamalı');
+});
+
+check('K3PD-22 Bugün ≤5 seçenek ve birincil CTA tek', () => {
+  const { hero } = openToFirstTask();
+  const screen = (/<main class="kao-today-screen[\s\S]*?<\/main>/.exec(hero) || [''])[0];
+  const buttons = (screen.match(/<button/g) || []).length;
+  assert.ok(buttons <= 5, `Bugün ekranında ${buttons} düğme (>5)`);
+  const primaries = (screen.match(/class="kao-primary/g) || []).length;
+  assert.equal(primaries, 1, `birincil CTA ${primaries} (tek olmalı)`);
+});
+
 console.log(`test_k3p_today: ${passed} kontrol PASS`);

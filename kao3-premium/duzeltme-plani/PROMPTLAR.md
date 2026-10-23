@@ -773,7 +773,7 @@ Kaynakta position:sticky varlığını geometrik kanıt sayma. 29’daki çekim 
 
 **Oku:** akis-olc giriş sayımı; kaoOpen/HomeHero/Start/Lesson; hedef gösterimi; onboarding/resume/mastery route’ları.
 
-**Yazma allowlist’i:** quranLearn.js; quranLearnViews.js; akis-olc.cjs; today/navigation/resume/rhythm fixture’ları; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `app/core/quranLearn.js`; `app/core/quranLearnViews.js`; `kao3-premium/araclar/akis-olc.cjs`; `tests/kao/test_k3p_today.js`; `tests/kao/test_kao2_navigation.js`; `tests/kao/test_k3p_resume.js`; `tests/kao/test_k3p_rhythm.js`; `tests/kao/test_kao_render.js`; `tests/kao/test_kao2_mastery.js`; `tests/kao/test_kao2_perf_budget.js`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-22/EVIDENCE.md`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-22 allowlist satırı).
 
 **Uygula:**
 

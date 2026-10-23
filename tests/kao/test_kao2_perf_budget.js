@@ -36,10 +36,11 @@ assert.ok(gzip([curriculum]) <= 48 * 1024, 'curriculum exceeds 48 KiB');
 // K3PD-13 (2026-10-21, kullanıcı onayı): 137 -> 137.25 KiB; yavaş doğru şeridinde gerçek duraklatma.
 // K3PD-16 (2026-10-22, kullanıcı onayı "sıradaki aşamayı tam ve kusursuz bi şekilde uygula"):
 // 137.25 -> 137.5 KiB. K3PD-17 (aynı oturum, aynı onay): 137.5 -> 137.625 KiB; iptal/çift-cevap
-// ayrımı pointercancel + lostpointercapture + capture bırakma + tek kullanımlık işaret gerektirir. Gerekçe: okuyucunun gerçek kelime vurgusu + tekli satır indeksi + iptal
+// ayrımı pointercancel + lostpointercapture + capture bırakma + tek kullanımlık işaret gerektirir.
+// K3PD-22 (2026-10-23, aynı onay): 137.625 -> 137.75 KiB; açılıştan ilk göreve 2 dokunuş. Gerekçe: okuyucunun gerçek kelime vurgusu + tekli satır indeksi + iptal
 // sınırı ~+250 B çalışma zamanı kodu gerektirir; HEAD'de kalan pay yalnız 22 B'ydi ve kayıpsız
 // mikro-sıkıştırmalar (String() sarmalayıcıları, tek oturum alanı) ~45 B kazandırdı.
-assert.ok(runtimeGzip <= 137.625 * 1024, 'runtime exceeds 137.5 KiB');
+assert.ok(runtimeGzip <= 137.75 * 1024, 'runtime exceeds 137.5 KiB');
 // K3P-09 (2026-10-13, kullanıcı kararı): CSS tavanı 14 -> 16 KiB. Gerekçe: Dalga 1'in
 // görsel sistem kartları (tokenlar → yazı tipi → Arapça tipografi → materyal/an kartı →
 // hareket) gerçek CSS gerektirir; 14 KiB tavanı K3P-08 sonunda ~0,2 KiB'e kadar dolmuştu.

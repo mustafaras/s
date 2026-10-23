@@ -101,7 +101,9 @@ assert.doesNotMatch(html, /data-countup-key="kao-coverage"/);
 assert.match(html, /class="kao-today-hero kao-moment"/, 'K3P-12: Bugün an kartıdır (Tezhip + kao-moment)');
 assert.match(html, /<figure class="kao-tezhip">[\s\S]*?<figcaption class="kao-tezhip-title">Fâtiha<\/figcaption>/, 'an kartı Fâtiha’yı yaldızlar');
 assert.match(html, /class="kao-hero-foot"[\s\S]*Gece tekrarı/);
-assert.match(html, /App\.kaoLesson\("start","u01\.01"\)/);
+// K3PD-22: ana ekrandan ders başlatmak goal ekranını atlar (hedef hero'da zaten sunuluyor);
+// bu yüzden CTA `from-home` modunu taşır. Açılış → ilk görev 2 dokunuş.
+assert.match(html, /App\.kaoLesson\("start","u01\.01","h"\)/);
 assert.doesNotMatch(html, /class="(?:kao-dialog-frame|kao-header-mark|kao-hero-rosette|kao-summary-mark|kao-done-mark)"/);
 // K3P-12: Bugün artık Tezhip an kartıyla Arapça gösterir; Arapça kendi lang/dir'ini taşımalı (miras değil).
 assert.match(html, /class="kao-tezhip-word is-[a-z]+" lang="ar" dir="rtl"/);

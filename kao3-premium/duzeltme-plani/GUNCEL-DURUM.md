@@ -371,3 +371,21 @@ Birincil eylem bölgesi artık **aşama bazında tek kaynaktan** tanımlı.
 Kanıt: [K3PD-21/EVIDENCE.md](kanit/K3PD-21/EVIDENCE.md).
 
 Sıradaki aday: K3PD-22.
+
+## K3PD-22 — ready_for_audit / NOT_MEASURED
+
+Açılıştan ilk cevaplanabilir göreve giriş **3 → 2 dokunuş**.
+
+- **Bulgu (F-09 / K3P-A3 hedefi 3→2):** hedef ekranı (`goal`/`partGoal`) dersin ilk öğesiydi ve her ders başlangıcında bir dokunuş yiyordu.
+- **Düzeltme:** `kaoLessonStart` artık `mode==='h'` alır ve plan[0] hedefse `state.at=1` yapar; `kaoHomeHero` birincil eylemi bu modu taşır. Hedef sunumu **korunur** — Bugün hero'su aynı dersi, aynı Tezhip satırını ve görev sayısını zaten gösteriyor; test hero'nun kelime kümesinin dersin goal kelimelerini **kapsadığını** kanıtlıyor.
+- **Kendi hatam, ölçümle yakalandı:** ilk koşul yalnız `plan[0].kind==='goal'` arıyordu; kısmi ilerlemeden sonra plan yeniden kurulunca ilk öğe **`partGoal`** oluyor ve atlama sessizce çalışmıyordu. Koşul genişletildi + **regresyon testi** eklendi (yarıda kalan ders → ana ekran → aynı görev).
+- **Ölçüm aracı düzeltmesi:** `akis-olc.cjs` `pendingOf` bütçe kesme ekranında (`partEnd`) kendi kimliğini döndürüyordu; `partEnd` çözmeyi beklediği işi `resumeItemId` ile temsil eder. Düzeltilmeden "aynı göreve dönüldü mü" yanlış `HAYIR` veriyordu.
+- **Test:** 5 → **12 kontrol**. Kırmızı→yeşil iki varyantla kanıtlandı (`h` modu yok → kırmızı; yalnız `goal` arayan hatalı varyant → `at=0` kırmızı).
+- **Akış:** `akis-olc` 3 → **2 dokunuş**; yeniden açılışta aynı görev `HAYIR` → **evet**.
+- **Bütçe:** tavan **137,625 → 137,75 KiB** (62 B fazla, gerekçe kayıtta). **137,688 / 137,75 KiB**; p95 7,560 ms.
+- **Kapılar:** 20 fixture art arda **0 regresyon**; driver 0; zikr 95/95; plan-check, kontrast (756 çift, 0 eşik altı), pin tazeliği, IIP-22, görsel-QA guard → 0.
+- **Açık:** bağımsız denetim yok; cihaz kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+
+Kanıt: [K3PD-22/EVIDENCE.md](kanit/K3PD-22/EVIDENCE.md).
+
+Sıradaki aday: K3PD-22.

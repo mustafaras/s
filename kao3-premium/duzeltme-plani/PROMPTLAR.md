@@ -744,7 +744,7 @@ Gerekli bağlamı/ar kelimeleri bozarak ya da aria-only gizleyerek sayıyı dü�
 
 **Oku:** kao.css lesson/task sticky; Views focus/progress/action bölümleri; test_k3p_progress.js; viewport ve safe-area sözleşmesi.
 
-**Yazma allowlist’i:** kao.css; quranLearnViews.js; yalnız gerekiyorsa quranLearn.js sınıf/model; progress/a11y/motion_css fixture’ları; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-21 allowlist satırını exact paths olarak düzeltmek için); `app/kao.css`; `app/core/quranLearnViews.js`; `app/core/quranLearn.js` (yalnız sınıf/model); `tests/kao/test_k3p_progress.js`; `tests/kao/test_kao2_a11y.js`; `tests/kao/test_k3p_motion_css.js`; `kao3-premium/araclar/eylem-geometri.cjs`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-21/EVIDENCE.md`.
 
 **Uygula:**
 

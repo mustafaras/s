@@ -6,7 +6,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { bootKao, repoRoot, correctTaps } = require('./helpers/kao-harness');
+const { bootKao, freshUser, repoRoot, correctTaps } = require('./helpers/kao-harness');
 
 let passed = 0;
 function check(name, fn) { fn(); passed += 1; console.log(`PASS  ${name}`); }
@@ -104,4 +104,105 @@ check('5 bölümlü ilerleme çubuğu: role=progressbar, 5 segment, aria-valuema
   t.api.kaoLesson('exit');
 });
 
-console.log(`test_k3p_progress: PASS (${passed} kontrol — 5 bölüm eşlemesi, aria-valuetext, sabit eylem bölgesi)`);
+// ══ K3PD-21 · Birincil eylem bölgesi — aşama tanımı ve ölçüm sözleşmesi ═══════════════════════
+// Bu kart GEOMETRİ PASS'i üretmez (o K3PD-29'un işi). Burada ölçülen:
+//   (a) her aşamanın birincil eylemi TEK kaynaktan tanımlı,
+//   (b) her aşama DOM'da `data-lesson-stage` ile işaretli (ölçüm aracı bulabilsin),
+//   (c) sticky/safe-area sözleşmesi korunuyor,
+//   (d) 29 için ölçüm sözleşmesi (x/y/w/h, görünürlük, örtüşme, odak, ≤8 px) tanımlı ve doğrulanabilir.
+const { execFileSync } = require('node:child_process');
+const contractTool = require('node:path').join(repoRoot, 'kao3-premium', 'araclar', 'eylem-geometri.cjs');
+
+check('K3PD-21 sözleşme aracı: 9 aşama, 4 viewport, ≤8 px, hüküm EVIDENCE_PENDING', () => {
+  const out = execFileSync(process.execPath, [contractTool], { encoding: 'utf8' });
+  const c = JSON.parse(out);
+  assert.equal(c.card, 'K3PD-21');
+  assert.equal(c.verdict, 'EVIDENCE_PENDING', 'geometri hükmü 29 gelene kadar EVIDENCE_PENDING');
+  assert.equal(c.acceptance.maxConsecutiveYDeltaPx, 8, 'y-farkı eşiği 8 px');
+  assert.equal(c.acceptance.mustBeVisible, true);
+  assert.equal(c.acceptance.mustNotCoverContent, true);
+  assert.equal(c.acceptance.mustBeFocusReachable, true);
+  assert.equal(c.acceptance.minTouchTargetPx, 44);
+  assert.equal(c.viewports.length, 4, '320/390/460 + sentetik alt inset');
+  assert.ok(c.viewports.some((v) => v.safeAreaBottom > 0), 'sentetik alt inset viewport var');
+  // Kartın saydığı aşamaların hepsi tanımlı.
+  const stages = c.stages.map((s) => s.stage);
+  for (const required of ['goal', 'intro', 'concept', 'practice', 'feedback', 'apply', 'summary']) {
+    assert.ok(stages.includes(required), `${required} aşaması tanımsız`);
+  }
+  // 29'un kaydı bu alanları taşımak zorunda.
+  for (const field of ['primary.x', 'primary.y', 'primary.width', 'primary.height', 'primary.visible', 'overlap.covered', 'focusReachable']) {
+    assert.ok(c.requiredFields.includes(field), `${field} zorunlu alan değil`);
+  }
+});
+
+check('K3PD-21 sözleşme aracı --check: bütünlük doğrulaması geçer', () => {
+  const out = execFileSync(process.execPath, [contractTool, '--check'], { encoding: 'utf8' });
+  assert.match(out, /^PASS eylem-geometri sözleşmesi/);
+});
+
+check('K3PD-21 sözleşme aracı --olcum: eksik alan ve eşik ihlalini YAKALAR (negatif)', () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const tmp = path.join(os.tmpdir(), `k3pd21-${process.pid}.json`);
+  // (a) eksik alan
+  fs.writeFileSync(tmp, JSON.stringify([{ stage: 'goal', viewport: { width: 390, height: 844, safeAreaBottom: 0 }, primary: { selector: 'x' }, overlap: { covered: false }, focusReachable: true }]));
+  let failed = false;
+  try { execFileSync(process.execPath, [contractTool, '--olcum', tmp], { encoding: 'utf8', stdio: 'pipe' }); } catch (e) { failed = true; }
+  assert.equal(failed, true, 'eksik alan kabul edilmemeli');
+  // (b) y-farkı > 8
+  const row = (y) => ({ stage: 'goal', viewport: { width: 390, height: 844, safeAreaBottom: 0 }, primary: { selector: 'x', x: 0, y, width: 100, height: 50, visible: true }, overlap: { covered: false }, focusReachable: true });
+  fs.writeFileSync(tmp, JSON.stringify([row(100), row(120)]));
+  failed = false;
+  try { execFileSync(process.execPath, [contractTool, '--olcum', tmp], { encoding: 'utf8', stdio: 'pipe' }); } catch (e) { failed = true; }
+  assert.equal(failed, true, '20 px y-farkı reddedilmeli');
+  // (c) geçerli kayıt geçer
+  fs.writeFileSync(tmp, JSON.stringify([row(100), row(104)]));
+  const ok = execFileSync(process.execPath, [contractTool, '--olcum', tmp], { encoding: 'utf8' });
+  assert.match(ok, /^PASS 29 ölçüm kaydı/);
+  fs.unlinkSync(tmp);
+});
+
+check('K3PD-21 her aşama DOM’da data-lesson-stage ile işaretli (ölçüm aracı bulabilir)', () => {
+  const t = bootKao();
+  freshUser(t);
+  const flow = t.win.SeymaQuranLearnFlow;
+  const content = { curriculum: t.win.QuranCurriculumV2, lexicon: t.win.QuranLexiconV1, grammar: t.win.QuranGrammarV1, shorts: t.win.QuranShortSurahsV1, phonics: t.win.QuranPhonicsV1 };
+  const lesson = content.curriculum.units[0].lessons[1];
+  const plan = flow.lessonPlan({ quranLearn: t.data.quranLearn }, lesson.id, new Date(t.NOW), content);
+  for (const kind of ['goal', 'intro', 'concept', 'apply', 'summary']) {
+    const item = plan.find((i) => i.kind === kind);
+    assert.ok(item, `${kind} planda yok`);
+    t.ui.kaoView = 'session';
+    t.ui.kaoStack = [{ view: 'session' }];
+    t.ui.kaoLesson = { plan: [item], at: 0, phase: 'lesson', lessonId: lesson.id };
+    const html = t.api.kaoOverlayHTML(t.NOW);
+    assert.match(html, new RegExp(`data-lesson-stage="${kind}"`), `${kind}: aşama işareti yok`);
+    assert.match(html, /class="kao-primary kao-lesson-next"/, `${kind}: birincil eylem yok`);
+  }
+  // practice aşaması: görev yüzeyi de aşamasını taşır ve birincil eylem ŞIKLARDIR.
+  const pr = plan.find((i) => i.kind === 'practice');
+  t.ui.kaoView = 'session';
+  t.ui.kaoStack = [{ view: 'session' }];
+  t.ui.kaoLesson = { plan: [pr], at: 0, phase: 'practice', lessonId: lesson.id };
+  t.ui.kaoQueue = [{ id: pr.id, cardId: pr.cardId }];
+  t.ui.kaoTasks = { [pr.id]: { id: pr.id, kind: 'choice', choices: [{ choiceId: 'a', label: 'x', correct: true }], prompt: 'p' } };
+  t.ui.kaoTaskIndex = 0;
+  const ph = t.api.kaoOverlayHTML(t.NOW);
+  assert.match(ph, /class="kao-task is-practice"/, 'practice: aşama işareti yok');
+  assert.match(ph, /class="kao-choices"/, 'practice: birincil eylem şıklar değil');
+  assert.doesNotMatch(ph, /kao-lesson-next/, 'practice: next düğmesi olmamalı (birincil eylem şıklar)');
+});
+
+check('K3PD-21 sticky/safe-area sözleşmesi korunur; motor sticky bilmez', () => {
+  const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
+  const css = read('app/kao.css');
+  assert.match(css, /\.kao-lesson>\.kao-lesson-next,\.kao-lesson>\.kao-lesson-more\{position:sticky;bottom:calc\(8px \+ env\(safe-area-inset-bottom,0px\)\)\}/);
+  assert.match(css, /\.kao-task>\.kao-choices\{position:sticky;bottom:calc\(8px \+ env\(safe-area-inset-bottom,0px\)\)\}/);
+  const engine = read('app/core/quranLearn.js');
+  const flowSrc = read('app/core/quranLearnFlow.js');
+  assert.equal(/sticky|safe-area/.test(engine), false, 'motor sticky/safe-area taşımaz');
+  assert.equal(/sticky|safe-area/.test(flowSrc), false, 'Flow sticky/safe-area taşımaz');
+});
+
+console.log(`test_k3p_progress: PASS (${passed} kontrol — 5 bölüm eşlemesi, aria-valuetext, sabit eylem bölgesi, K3PD-21 aşama/ölçüm sözleşmesi)`);

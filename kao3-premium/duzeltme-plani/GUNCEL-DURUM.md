@@ -350,3 +350,24 @@ Kartın "80/109 aşımı kapat" hedefi **aşıldı** — 90 aşımın tamamı ka
 Kanıt: [K3PD-20/EVIDENCE.md](kanit/K3PD-20/EVIDENCE.md).
 
 Sıradaki aday: K3PD-20.
+
+## K3PD-20 — done / PASS (user_attested)
+
+Kullanıcı "sıradaki adımı uygula" diyerek kabulü beyan etti. Hedef ekranı 90/109 aşım → 0/109, en yüksek 45 → 25.
+
+## K3PD-21 — source_ready / EVIDENCE_PENDING (geometri 29'a bağlı)
+
+Birincil eylem bölgesi artık **aşama bazında tek kaynaktan** tanımlı.
+
+- **Bulgu (A6 UNVERIFIABLE / F-11):** (a) hangi DOM öğesinin birincil eylem olduğu aşama bazında tanımlı değildi — **practice** aşamasında birincil eylem **şıklardır** (`kao-choices`), `next` değil; (b) 29 için ölçüm sözleşmesi yoktu; (c) **practice aşaması DOM'da işaretsizdi** (ders kartı `data-lesson-stage` taşıyordu, görev yüzeyi taşımıyordu).
+- **Düzeltme:** `#kao-task` yüzeyi `class="kao-task is-practice"` taşır. Yeni araç [eylem-geometri.cjs](../../araclar/eylem-geometri.cjs) **9 aşama × 4 viewport × ≤8 px** sözleşmesini tek kaynaktan verir: `goal/intro/concept/practice/feedback/apply/summary/partEnd/read`, viewport 320/390/460 × 844 + sentetik alt inset 34 px, kabul eşikleri (görünürlük, örtüşmeme, klavye odağı, ≥44 px hedef, **ardışık y-farkı ≤8 px**), ve 29'un kaydında zorunlu alanlar.
+- **Negatif testler:** `--olcum` eksik alanı **ve 20 px y-farkını reddeder**, 4 px'i kabul eder — eşiğin gerçekten çalıştığı kanıtı.
+- **Hard stop'a uyuldu:** `position:sticky` kaynak varlığı **geometrik kanıt sayılmadı**; bu kart **≤8 px PASS yazmadı**. Geometri alt kabulü **EVIDENCE_PENDING**, gerçek piksel ölçümü **K3PD-29**'da.
+- **Test:** 5 → **9 kontrol**. Düzeltme öncesi kodda "practice: aşama işareti yok" asserti **kırmızı**.
+- **Bütçe:** **tavan artırılmadı** — `data-lesson-stage` yerine sınıf tabanlı işaret kullanıldı. **137,623 / 137,625 KiB** (pay 2 B).
+- **Kapılar:** 20 fixture art arda **0 regresyon**; driver 0; zikr 95/95; plan-check, kontrast, pin tazeliği, IIP-22, görsel-QA guard → 0.
+- **Açık:** geometri ölçümü 29'da; bağımsız denetim yok; cihaz kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+
+Kanıt: [K3PD-21/EVIDENCE.md](kanit/K3PD-21/EVIDENCE.md).
+
+Sıradaki aday: K3PD-22.

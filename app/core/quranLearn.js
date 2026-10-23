@@ -1973,7 +1973,7 @@
     // K3P-19: s ≥ 21 olan kartın görevinde okunuş katlanır (hareke soldurması s ≥ 30'un bir basamak öncesi).
     var h4State=kaoH4TaskState(ui,task),boredomHide=kaoBoredomHideHarakat(),pronunciationFolded=h4State.folded||boredomHide;
     var panel=ui.kaoPanel&&ui.kaoPanel.open&&ui.kaoPanel.taskId===task.id?ui.kaoPanel:null,autoplay=kaoShouldAutoplay(task,quranLearnDeps.data()),isGrammar=!!task.grammarType,isFragment=task.type==='fragment',isBuild=task.kind==='build',isCloze=task.kind==='cloze',isLink=task.type==='link',isTransfer=task.type==='transfer',prompt=task.audioOnly?'Dinlediğin kelimenin anlamını seç':(task.prompt||(task.direction==='tr>ar'?task.meaning:task.ar));
-    var h='<section id="kao-task" class="kao-task" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
+    var h='<section id="kao-task" class="kao-task is-practice" data-task-id="'+esc(task.id)+'"'+(autoplay?' data-autoplay="1"':'')+'>';
     // K3P-A6: görev görünümünde de 5 bölümlü konum görünür.
     var taskSection=kaoLessonSection(ui.kaoLesson),taskSegs='';
     for(var ts=1;ts<=5;ts+=1){ var tf=ts<taskSection.section,ta=ts===taskSection.section,tw=ta?String(Math.max(0,Math.min(100,taskSection.countInSection?taskSection.indexInSection/taskSection.countInSection*100:0)))+'%':(tf?'100%':'0%'); taskSegs+='<span class="kao-lesson-seg'+(ta?' is-active':'')+(tf?' is-filled':'')+'"><i style="width:'+tw+'"></i></span>'; }

@@ -320,3 +320,33 @@ Kullanıcı "sıradaki adıma geç" diyerek kabulü beyan etti. Model saflığı
 Kanıt: [K3PD-19/EVIDENCE.md](kanit/K3PD-19/EVIDENCE.md).
 
 Sıradaki aday: K3PD-19.
+
+## K3PD-19 — done / PASS (ajan doğrulaması + user_attested)
+
+Kullanıcı "önce tam ve kusursuz uygulandı mı kontrol et" dedi. Kendi fixture'ı yerine **ayrı probe**: **8/8 ölçüt geçti**; aynı probe düzeltme öncesi kodda 1. ölçütte kırmızı.
+
+## K3PD-20 — ready_for_audit / NOT_MEASURED
+
+Hedef ekranı artık 25 sözcük sınırında.
+
+- **Kusur (F-09/K3P-13+A8):** `goal` dalı ilk görünümde kicker + başlık + âyet satırı + **uzun hedef cümlesi** taşıyordu.
+- **Ölçüm (109 hedef ekranı, `<details>` hariç):**
+
+| Ölçüt | Öncesi | Sonrası |
+|---|---|---|
+| İlk görünüm ≤25 sözcük | **19/109** (90 aşım) | **109/109** |
+| En yüksek ilk görünüm | **45** | **25** |
+
+Kartın "80/109 aşımı kapat" hedefi **aşıldı** — 90 aşımın tamamı kapandı.
+
+- **Düzeltme:** uzun hedef cümlesi + süre vaadi `moreBlock` içine; **kicker kaldırıldı** (2 sözcük bütçeyi aşırtıyordu). Doğrulanmış âyet satırı görünür kaldı, `goal`/`apply` **aynı** satır. `moreBlock`'un "Daha fazla" özeti ve `min-height:44px` sözleşmesi korundu (a11y 14/14).
+- **İki ölçü ayrı (hard stop):** (a) gerçek ilk görünüm toplam metni **109/109 ≤25**; (b) **satır uzunluğu** ayrı — 7 çapa metin dersi (Fâtiha 29, iki namaz 28) kaynağın kendi uzunluğunu taşıyor. Kırpmak Arapça metni bozardı; **kapalı ve gerekçeli** `ROW_EXEMPT` listesi tutuldu, istisnaların hepsi `prayer`/`surah` çapa metni olduğu doğrulandı.
+- **Test:** 15 → **21 kontrol**. Düzeltme öncesi kodda "25 sözcüğü aşan hedef ekranları" asserti **kırmızı**.
+- **Bütçe:** **tavan artırılmadı** — eklediğim yorumun kaldırılmasıyla açık kapandı. **137,618 / 137,625 KiB** (pay 10 B).
+- **Kapılar:** 20 fixture art arda **0 regresyon**; driver 0; zikr 95/95; plan-check, kontrast, pin tazeliği, IIP-22, görsel-QA guard → 0.
+- **Açık karar:** 7 çapa metin dersinin **satırı** 25'i aşıyor (kaynak uzunluğu). Ekran ölçüsü tamamen sağlandı; satır için karar açık bırakıldı, eski hedefin FAIL durumu korunuyor.
+- **Açık:** bağımsız denetim yok; cihaz/ekran okuyucu kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+
+Kanıt: [K3PD-20/EVIDENCE.md](kanit/K3PD-20/EVIDENCE.md).
+
+Sıradaki aday: K3PD-20.

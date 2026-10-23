@@ -308,8 +308,8 @@
   // KAO2-12: kaynak seçimi motorda.
   // K2F-25: doğrulanmış âyet ve kognat.
   // K3P-A8: ilk görünüm ≤45 sözcük; ayrıntılar details içinde.
-  function moreBlock(inner){
-    return inner?'<details class="kao-lesson-more"><summary>Daha fazla</summary>'+inner+'</details>':'';
+  function moreBlock(inner,label){
+    return inner?'<details class="kao-lesson-more"><summary>'+escapeText(label||'Daha fazla')+'</summary>'+inner+'</details>':'';
   }
   function introExample(example){
     if(!example||typeof example!=='object') return '';
@@ -382,9 +382,9 @@
       var nextHtml=next?'<section class="kao-lesson-anchor kao-lesson-summary-next" aria-labelledby="kao-lesson-summary-next-title"><h4 id="kao-lesson-summary-next-title">Sıradaki adım</h4><p>'+escapeText(next.title)+'</p><p>'+escapeText(next.subtitle)+'</p></section>':'';
       body='<section class="kao-lesson-card kao-lesson-summary kao-moment" aria-labelledby="kao-lesson-title" aria-live="polite">'+ORN+'<p class="kao-lesson-kicker">Ders tamamlandı</p><h3 id="kao-lesson-title">'+title+'</h3><section class="kao-lesson-anchor kao-lesson-summary-learned" aria-labelledby="kao-lesson-summary-learned-title"><h4 id="kao-lesson-summary-learned-title">Bu derste tanıştıkların</h4>'+strip+coverage+words+accuracy+durable+'</section><section class="kao-lesson-anchor kao-lesson-summary-tomorrow" aria-labelledby="kao-lesson-summary-tomorrow-title"><h4 id="kao-lesson-summary-tomorrow-title">Yarın</h4><p>'+escapeText(model.tomorrowText)+'</p></section>'+nextHtml+milestone+'</section>';
     }else{
-      var goalLine=model.goal?'<p class="kao-lesson-goal-line">'+escapeText(model.goal)+'</p>':'';
       var row=model.rowHtml?'<div class="kao-lesson-apply-tezhip">'+model.rowHtml+'</div>':'';
-      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><p class="kao-lesson-kicker">Bugünün dersi</p><h3 id="kao-lesson-title">'+title+'</h3>'+row+goalLine+moreBlock('<p>'+escapeText(model.promise)+'</p>')+'</section>';
+      var folded=(model.goal?'<p class="kao-lesson-goal-line">'+escapeText(model.goal)+'</p>':'')+'<p>'+escapeText(model.promise)+'</p>';
+      body='<section class="kao-lesson-card kao-lesson-goal" aria-labelledby="kao-lesson-title"><h3 id="kao-lesson-title">'+title+'</h3>'+row+moreBlock(folded)+'</section>';
     }
     var buttonLabel=escapeText(model.buttonLabel||'Devam');
     var secondaryCall=actionCall(model.secondaryAction),secondary=model.secondaryAction?'<button type="button" class="kao-lesson-audio kao-lesson-more"'+(secondaryCall?' onclick="'+secondaryCall+'"':' disabled')+'>'+escapeText(model.secondaryLabel||'5 dakika daha')+'</button>':'';

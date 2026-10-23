@@ -715,7 +715,7 @@ Tanış ilk görünümünde kelime, ses erişimi, anlam ve doğrulanmış tek ö
 
 **Oku:** Flow goal/apply ortak satırı; kaoAyahRow/RowHtml; Views goal; lesson_ayah WORD_EXEMPT/LEMMA_EXEMPT; akis-olc.
 
-**Yazma allowlist’i:** quranLearnFlow.js; quranLearn.js yalnız hedef satırı; quranLearnViews.js; lesson_ayah/lesson_flow/a11y fixture’ları; akis-olc.cjs; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-20 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearnFlow.js`; `app/core/quranLearn.js` (yalnız hedef satırı); `app/core/quranLearnViews.js`; `tests/kao/test_k3p_lesson_ayah.js`; `tests/kao/test_kao2_lesson_flow.js`; `tests/kao/test_kao2_a11y.js`; `kao3-premium/araclar/akis-olc.cjs` (yalnız gerekirse); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-20/EVIDENCE.md`.
 
 **Uygula:**
 

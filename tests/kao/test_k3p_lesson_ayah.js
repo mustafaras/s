@@ -412,4 +412,124 @@ check('K3PD-15 klipsiz satır: yanlış indeksle eşleme yok, dürüst sessiz ye
   assert.equal(h.gilded(), h.total, 'sessiz yedek satırı baştan sona yaldızlamalı');
 });
 
+// ══ K3PD-20 · Hedef ekranının 25 sözcük sınırı ═════════════════════════════════════════════════
+// İKİ ÖLÇÜ AYRI TUTULUR (hard stop):
+//   (a) GERÇEK İLK GÖRÜNÜM toplam metni ≤25 — kicker/başlık/summary dâhil, <details> gövdesi hariç
+//   (b) âyet satırının kendi uzunluğu (kapsama/uzunluk ölçüsü)
+// Yalnız (b)'yi ölçüp ekranı PASS saymıyoruz.
+const goalCardOf = (html) => {
+  const src = String(html);
+  const start = src.indexOf('<section class="kao-lesson-card');
+  if (start < 0) return '';
+  let depth = 0;
+  for (let i = start; i < src.length; i += 1) {
+    if (src.startsWith('<section', i)) { depth += 1; i += 7; continue; }
+    if (src.startsWith('</section>', i)) { depth -= 1; if (depth === 0) return src.slice(start, i + 10); i += 9; }
+  }
+  return src.slice(start);
+};
+const firstViewWords = (card) => {
+  const t = String(card).replace(/<details[\s\S]*?<\/details>/g, ' ')
+    .replace(/<[^>]*>/g, ' ').replace(/&[a-z#0-9]+;/g, ' ').replace(/\s+/g, ' ').trim();
+  return t ? t.split(' ').length : 0;
+};
+
+function goalSweep() {
+  const t = bootKao();
+  freshUser(t);
+  const flow = t.win.SeymaQuranLearnFlow;
+  const content = { curriculum: t.win.QuranCurriculumV2, lexicon: t.win.QuranLexiconV1, grammar: t.win.QuranGrammarV1, shorts: t.win.QuranShortSurahsV1, phonics: t.win.QuranPhonicsV1 };
+  const rows = [];
+  for (const lesson of content.curriculum.units.flatMap((unit) => unit.lessons)) {
+    const plan = flow.lessonPlan({ quranLearn: t.data.quranLearn }, lesson.id, new Date(t.NOW), content);
+    const goal = plan.find((item) => item.kind === 'goal' || item.kind === 'partGoal');
+    if (!goal) continue;
+    t.ui.kaoView = 'session';
+    t.ui.kaoStack = [{ view: 'session' }];
+    t.ui.kaoLesson = { plan: [goal], at: 0, phase: 'lesson', lessonId: lesson.id };
+    const card = goalCardOf(t.api.kaoOverlayHTML(t.NOW));
+    rows.push({ lessonId: lesson.id, card, words: firstViewWords(card), goal, plan });
+  }
+  return { t, rows, content, flow };
+}
+
+const goalSweepResult = goalSweep();
+
+check('K3PD-20 hedef ekranı: 109 dersin TAMAMINDA ilk görünüm ≤25 sözcük', () => {
+  assert.equal(goalSweepResult.rows.length, 109, `hedef ekranı sayısı ${goalSweepResult.rows.length}`);
+  const over = goalSweepResult.rows.filter((row) => row.words > 25);
+  assert.deepEqual(over.map((row) => `${row.lessonId}:${row.words}`), [], '25 sözcüğü aşan hedef ekranları');
+  const max = Math.max(...goalSweepResult.rows.map((row) => row.words));
+  assert.ok(max <= 25, `en yüksek hedef ilk görünümü ${max}`);
+});
+
+check('K3PD-20 hedef: uzun hedef cümlesi ve süre vaadi KATLI (ilk görünümde değil)', () => {
+  const withGoal = goalSweepResult.rows.filter((row) => row.goal && row.goal.title);
+  assert.ok(withGoal.length > 0);
+  for (const row of goalSweepResult.rows) {
+    const visible = String(row.card).replace(/<details[\s\S]*?<\/details>/g, ' ');
+    assert.doesNotMatch(visible, /kao-lesson-goal-line/, `${row.lessonId}: hedef cümlesi ilk görünümde`);
+  }
+  // Katlanan gövde gerçekten var ve hedef cümlesini taşıyor.
+  const sample = goalSweepResult.rows.find((row) => /kao-lesson-goal-line/.test(row.card));
+  assert.ok(sample, 'hedef cümlesi hiçbir yerde yok (içerik kaybı)');
+  assert.match(sample.card, /<details class="kao-lesson-more">/, 'hedef cümlesi katlanmış olmalı');
+});
+
+check('K3PD-20 goal/apply AYNI doğrulanmış satırı paylaşır (gerileme yok)', () => {
+  for (const row of goalSweepResult.rows) {
+    const apply = row.plan.find((item) => item.kind === 'apply');
+    if (!apply) continue;
+    assert.equal(row.goal.words, apply.words, `${row.lessonId}: goal ve apply farklı satır`);
+    assert.deepEqual(row.goal.apply, apply.ref, `${row.lessonId}: referans farklı`);
+  }
+});
+
+check('K3PD-20 satır uzunluğu AYRI ölçü: çapa metin satırları kaynak uzunluğunda, gerekçeli', () => {
+  // Satır uzunluğu ekran ölçüsünden AYRIDIR. Çapa metin (Fâtiha/namaz) satırları kaynağın
+  // kendi uzunluğunu taşır; bunları kırpmak Arapça metni bozmak olurdu (hard stop).
+  // Bu yüzden liste KAPALI ve GEREKÇELİdir: yalnız çapa metin dersleri, kaynak uzunluğuyla.
+  const ROW_EXEMPT = {
+    'u01.01': 29, 'u01.02': 29, 'u01.03': 29, 'u01.04': 29, 'u01.05': 29,
+    'u02.02': 28, 'u02.03': 28
+  };
+  const over = goalSweepResult.rows.filter((row) => Array.isArray(row.goal.words) && row.goal.words.length > 25);
+  assert.deepEqual(
+    over.map((row) => `${row.lessonId}:${row.goal.words.length}`).sort(),
+    Object.entries(ROW_EXEMPT).map(([id, n]) => `${id}:${n}`).sort(),
+    'satır istisna listesi değişti (yalnız küçülebilir)'
+  );
+  // İstisnaların hepsi çapa metin (prayer/surah) dersidir — örnek cümle birleşimi değil.
+  for (const row of over) {
+    const apply = row.plan.find((item) => item.kind === 'apply');
+    assert.ok(apply && apply.ref && (apply.ref.kind === 'prayer' || apply.ref.kind === 'surah'),
+      `${row.lessonId}: çapa metin dışı satır 25'i aşıyor`);
+  }
+});
+
+check('K3PD-20 intro/concept ≤45 korunur (K3PD-19 gerilemedi)', () => {
+  const t = goalSweepResult.t;
+  const flow = goalSweepResult.flow;
+  const content = goalSweepResult.content;
+  const over = [];
+  for (const lesson of content.curriculum.units.flatMap((unit) => unit.lessons)) {
+    const plan = flow.lessonPlan({ quranLearn: t.data.quranLearn }, lesson.id, new Date(t.NOW), content);
+    for (const item of plan) {
+      if (item.kind !== 'intro' && item.kind !== 'concept') continue;
+      t.ui.kaoView = 'session';
+      t.ui.kaoStack = [{ view: 'session' }];
+      t.ui.kaoLesson = { plan: [item], at: 0, phase: 'lesson', lessonId: lesson.id };
+      const w = firstViewWords(goalCardOf(t.api.kaoOverlayHTML(t.NOW)));
+      if (w > 45) over.push(`${lesson.id}:${w}`);
+    }
+  }
+  assert.deepEqual(over, [], 'intro/concept 45 sözcüğü aştı');
+});
+
+check('K3PD-20 gerekçeli lemma istisna listesi gerilemedi (yalnız küçülür)', () => {
+  // K3P-13 istisna listeleri bu dosyada sabittir; sayıları artmadı.
+  assert.equal(Object.keys(WORD_EXEMPT).length, 0, 'sözcük istisnası eklenmemeli');
+  assert.equal(Object.keys(LEMMA_EXEMPT).length, 10, 'lemma istisnası 10 kaldı');
+});
+
 console.log(`test_k3p_lesson_ayah: PASS (${passed} kontrol)`);

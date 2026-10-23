@@ -686,7 +686,7 @@ Bilinen/öğreniliyor/yeni ayrımı, iki yönlü kalıcılık, orphan/readerUnkn
 
 **Oku:** Views lessonScreen intro/concept/moreBlock; runtime örnek modeli; AKIS örnekten kurala; test_kao2_lesson_flow/a11y.
 
-**Yazma allowlist’i:** quranLearnViews.js; quranLearn.js yalnız model alanı bağlama; kao.css; lesson_flow/a11y/rhythm fixture’ları; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-19 allowlist satırını exact paths olarak düzeltmek için); `app/core/quranLearnViews.js`; `app/core/quranLearn.js` (yalnız model alanı bağlama); `app/kao.css` (yalnız gerekirse); `tests/kao/test_kao2_lesson_flow.js`; `tests/kao/test_kao2_a11y.js`; `tests/kao/test_k3p_rhythm.js`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-19/EVIDENCE.md`.
 
 **Uygula:**
 

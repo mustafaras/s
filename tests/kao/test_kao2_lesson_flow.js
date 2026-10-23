@@ -502,4 +502,123 @@ check('K2F-37 ek (ekran görüntüsü): ders oynatıcıdaki kavram tablosu hücr
   assert.ok(tables >= 10 && arabicCells >= 30, `Arapça hücreler çizilmiyor (tablo ${tables}, Arapça hücre ${arabicCells})`);
 });
 
+// ══ K3PD-19 · Tanış ve kavramda öğretim çekirdeği İLK GÖRÜNÜMDE ═══════════════════════════════
+// Ölçüm GERÇEK HTML'den: `<details>` gövdesi çıkarılır, kalan metin sayılır. Test yalnız
+// details içinde örnek arayarak gerekliliği karşılanmış SAYMAZ (hard stop).
+const stripDetails = (html) => String(html).replace(/<details[\s\S]*?<\/details>/g, ' ');
+const visibleWords = (html) => {
+  const t = stripDetails(html).replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
+  return t ? t.split(' ').length : 0;
+};
+// Ders kartı iç içe <section> taşır (örnek âyet, çapa). Bu yüzden kart, açılış etiketinden
+// bir sonraki KARDEŞ bölüme kadar alınır: `kao-lesson-card` açılışından sonra gelen ilk
+// `</section>` DEĞİL, kartın kendi kapanışına kadar (derinlik sayarak) okunur.
+const lessonCard = (html) => {
+  const src = String(html);
+  const start = src.indexOf('<section class="kao-lesson-card');
+  if (start < 0) return '';
+  let depth = 0, i = start;
+  const re = /<section\b|>\s*<\/section>/g;
+  re.lastIndex = start;
+  let m;
+  while ((m = re.exec(src))) {
+    if (m[0].startsWith('<section')) depth += 1;
+    else { depth -= 1; if (depth === 0) return src.slice(start, m.index + m[0].length); }
+  }
+  return src.slice(start);
+};
+
+function introConceptSweep() {
+  const t = bootKao();
+  freshUser(t);
+  const flow = t.win.SeymaQuranLearnFlow;
+  const content = { curriculum: t.win.QuranCurriculumV2, lexicon: t.win.QuranLexiconV1, grammar: t.win.QuranGrammarV1, shorts: t.win.QuranShortSurahsV1, phonics: t.win.QuranPhonicsV1 };
+  const lessons = content.curriculum.units.flatMap((unit) => unit.lessons);
+  const out = { intro: [], concept: [] };
+  for (const lesson of lessons) {
+    const plan = flow.lessonPlan({ quranLearn: t.data.quranLearn }, lesson.id, new Date(t.NOW), content);
+    for (const item of plan) {
+      if (item.kind !== 'intro' && item.kind !== 'concept') continue;
+      t.ui.kaoView = 'session';
+      t.ui.kaoStack = [{ view: 'session' }];
+      t.ui.kaoLesson = { plan: [item], at: 0, phase: 'lesson', lessonId: lesson.id };
+      const card = lessonCard(t.api.kaoOverlayHTML(t.NOW));
+      out[item.kind].push({ lessonId: lesson.id, card, words: visibleWords(card), item });
+    }
+  }
+  return out;
+}
+
+const sweep = introConceptSweep();
+
+check('K3PD-19 tanış: 518 intro’nun TAMAMINDA doğrulanmış örnek İLK GÖRÜNÜMDE', () => {
+  assert.equal(sweep.intro.length, 518, `intro sayısı ${sweep.intro.length}`);
+  const missing = sweep.intro.filter((row) => !/kao-lesson-example/.test(stripDetails(row.card)));
+  assert.deepEqual(missing.map((row) => row.lessonId), [], 'örneği ilk görünümde olmayan dersler');
+  // Örnek gerçekten doğrulanmış kaynaktan gelir (uydurulmuş metin yok).
+  for (const row of sweep.intro.slice(0, 40)) {
+    const ex = row.item.lemma && row.item.lemma.verified === true && Array.isArray(row.item.lemma.examples) ? row.item.lemma.examples[0] : null;
+    assert.ok(ex, `${row.lessonId}: doğrulanmış örnek kaynağı yok`);
+    assert.ok(stripDetails(row.card).includes(ex.ar), `${row.lessonId}: örnek Arapçası ilk görünümde değil`);
+  }
+});
+
+check('K3PD-19 tanış: akraba/kök/uzun neden ayrıntıları details içinde kalır', () => {
+  // Ayrıntı ÜRETİLEN her intro'da (kök/akraba/çapa) o ayrıntı katlı olmalı; hiç ayrıntı
+  // yoksa boş <details> üretilmez. Ölçüm tüm 518 intro üzerinden yapılır.
+  let withDetails = 0;
+  for (const row of sweep.intro) {
+    const visible = stripDetails(row.card);
+    assert.doesNotMatch(visible, /Neden böyle\?/, `${row.lessonId}: uzun neden ilk görünümde olmamalı`);
+    assert.doesNotMatch(visible, /Türkçedeki akrabası/, `${row.lessonId}: akraba ilk görünümde olmamalı`);
+    if (/kao-lesson-more/.test(row.card)) {
+      withDetails += 1;
+      // Katlanan gövde ilk görünüm sayımına girmemeli (stripDetails zaten çıkarıyor).
+      assert.ok(row.words <= 45, `${row.lessonId}: katlama sonrası ilk görünüm ${row.words}`);
+    }
+  }
+  assert.ok(withDetails > 400, `ayrıntı katlayan intro sayısı ${withDetails} (beklenen >400)`);
+});
+
+check('K3PD-19 kavram: 25 kavramın TAMAMINDA kısa kural İLK GÖRÜNÜMDE', () => {
+  assert.equal(sweep.concept.length, 25, `kavram sayısı ${sweep.concept.length}`);
+  const missing = sweep.concept.filter((row) => !/kao-lesson-rule/.test(stripDetails(row.card)));
+  assert.deepEqual(missing.map((row) => row.lessonId), [], 'kuralı ilk görünümde olmayan kavramlar');
+  for (const row of sweep.concept) {
+    const plain = row.item.concept && (row.item.concept.plainTr || row.item.concept.description);
+    assert.ok(plain, `${row.lessonId}: onaylı kısa alan yok`);
+    // HTML kaçışı çözülür: `plainTr` içinde ' ve " olabilir; karşılaştırma görünen metinle yapılır.
+    const decode = (h) => String(h).replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    assert.ok(decode(stripDetails(row.card)).includes(plain), `${row.lessonId}: kural metni ilk görünümde değil`);
+  }
+});
+
+check('K3PD-19 kavram: tablo ve terimler katlı kalır (ilk görünüm şişmez)', () => {
+  const withTable = sweep.concept.filter((row) => row.item.concept && Array.isArray(row.item.concept.tables) && row.item.concept.tables.length);
+  assert.ok(withTable.length > 0, 'tablolu kavram bulunmalı');
+  for (const row of withTable) {
+    assert.doesNotMatch(stripDetails(row.card), /kao-lesson-table/, `${row.lessonId}: tablo ilk görünümde olmamalı`);
+    assert.match(row.card, /kao-lesson-table/, `${row.lessonId}: tablo details içinde olmalı`);
+  }
+});
+
+check('K3PD-19 ilk görünüm ≤45 sözcük (109 dersin intro+concept ekranları)', () => {
+  const over = [...sweep.intro, ...sweep.concept].filter((row) => row.words > 45);
+  assert.deepEqual(over.map((row) => `${row.lessonId}:${row.words}`), [], '45 sözcüğü aşan ekranlar');
+  const max = Math.max(...[...sweep.intro, ...sweep.concept].map((row) => row.words));
+  assert.ok(max <= 45, `en yüksek ilk görünüm ${max}`);
+});
+
+check('K3PD-19 details summary ≥44 px ve klavye ile açılabilir (native details)', () => {
+  const css = fs.readFileSync(path.join(repoRoot, 'app/kao.css'), 'utf8');
+  const rule = /\.kao-lesson-more summary\{([^}]*)\}/.exec(css);
+  assert.ok(rule, '.kao-lesson-more summary kuralı var');
+  assert.match(rule[1], /min-height:\s*44px/, 'summary en az 44 px');
+  assert.match(rule[1], /cursor:\s*pointer/, 'summary tıklanabilir');
+  // Native <details>/<summary> klavye ile açılır; ek onclick/role gerekmez ve eklenmemiş.
+  const sample = sweep.intro[0].card;
+  assert.match(sample, /<details class="kao-lesson-more"><summary>Daha fazla<\/summary>/, 'native details+summary');
+  assert.doesNotMatch(sample, /<details[^>]*role="button"/, 'details role=button yapılmamış');
+});
+
 console.log(`KAO2-12 lesson flow: PASS (${passed} kontrol)`);

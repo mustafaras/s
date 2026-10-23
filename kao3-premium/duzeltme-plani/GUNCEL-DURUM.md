@@ -291,3 +291,32 @@ Tezhip modeli artık **gerçekten saf**.
 Kanıt: [K3PD-18/EVIDENCE.md](kanit/K3PD-18/EVIDENCE.md).
 
 Sıradaki aday: K3PD-18.
+
+## K3PD-18 — done / PASS (user_attested)
+
+Kullanıcı "sıradaki adıma geç" diyerek kabulü beyan etti. Model saflığı 21/21, perf 137,607/137,625 KiB. Hüküm yalnız `user_attested`.
+
+## K3PD-19 — ready_for_audit / NOT_MEASURED
+
+Öğretim çekirdeği artık **ilk görünümde**.
+
+- **Kusur (F-09/K3P-A3/A8):** tanış ekranının doğrulanmış örneği ve kavram ekranının kısa kuralı `<details>` gövdesine konmuştu. Kavram ekranı tam olarak **yalnız başlık + "Daha fazla"** idi.
+- **Ölçüm (109 dersin tüm intro/concept ekranları):**
+
+| Ölçüt | Öncesi | Sonrası |
+|---|---|---|
+| Tanış: doğrulanmış örnek ilk görünümde | 452/518 | **518/518** |
+| Kavram: kısa kural ilk görünümde | **0/25** | **25/25** |
+| İlk görünüm en yüksek sözcük | 44 | **40** (≤45) |
+
+- **Düzeltme:** `introExample` `moreBlock` dışına alındı; `model.plainTr` yeni `kao-lesson-rule` paragrafı olarak ilk görünümde. Akraba/kök/uzun neden, tablo ve terimler **katlı kaldı**. İçerik yeniden yazılmadı, Arapça/okunuş **elle kısaltılmadı**.
+- **Ölçüm yöntemi (hard stop):** `<details>` gövdesi HTML'den çıkarılıp görünür metin sayılıyor; test yalnız `details` içinde örnek arayarak gerekliliği karşılamış **saymıyor**. Ders kartı iç içe `<section>` taşıdığı için derinlik sayan çıkarıcı kullanıldı (naif regex erken kesiyordu — o da düzeltildi).
+- **Test:** 24 → **30 kontrol**. Düzeltme öncesi kodda "örneği ilk görünümde olmayan dersler" asserti **kırmızı**.
+- **Pin:** `app/core/quranLearnViews.js` `pinDeferral.files`'a exact path olarak eklendi; pin değeri değişmedi. `test_asset_pin_freshness` → PASS (61 taze · 2 ertelenmiş · 0 engelleyici).
+- **Bütçe:** **tavan artırılmadı** — eklediğim yorumun kaldırılmasıyla açık kapandı. **137,620 / 137,625 KiB** (pay 8 B).
+- **Kapılar:** 20 fixture art arda **0 regresyon**; driver 0; zikr 95/95; plan-check, kontrast, IIP-22, görsel-QA guard → 0.
+- **Açık:** bağımsız denetim yok; cihaz/ekran okuyucu kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+
+Kanıt: [K3PD-19/EVIDENCE.md](kanit/K3PD-19/EVIDENCE.md).
+
+Sıradaki aday: K3PD-19.

@@ -388,4 +388,11 @@ Açılıştan ilk cevaplanabilir göreve giriş **3 → 2 dokunuş**.
 
 Kanıt: [K3PD-22/EVIDENCE.md](kanit/K3PD-22/EVIDENCE.md).
 
-Sıradaki aday: K3PD-22.
+## K3PD-22 — done / PASS (bağımsız sonda)
+
+Bağımsız sonda (fixture değil) **13/13 PASS**; aynı sonda düzeltme öncesi kodda **4 kırmızı**
+(taps=3, CTA modsuz, yeniden açılışta hedef ekranına düşüş, at=0). Açılış → ilk cevaplanabilir
+görev **2 dokunuş**; hero dersin tüm hedef kelimelerini kapsıyor; resume aynı göreve dönüyor;
+onboarding/mastery/Bugün sınırları korunuyor. Cihaz kabulü yok; `releaseApproval=NOT_APPROVED`.
+
+Sıradaki aday: K3PD-23.

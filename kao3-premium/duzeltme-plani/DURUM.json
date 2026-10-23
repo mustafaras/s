@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-22",
+  "nextPrompt": "K3PD-23",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -6397,20 +6397,12 @@
     },
     "K3PD-22": {
       "id": "K3PD-22",
-      "status": "ready_for_audit",
-      "baseHead": "458a05aaafcfb0e05c658cb4ac099a61d2f1f7cd",
+      "status": "done",
+      "baseHead": "cd1581b0fb048e4af4c3db8c92ad45c76466945e",
       "changedPaths": [
-        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
-        "app/core/quranLearn.js",
-        "kao3-premium/araclar/akis-olc.cjs",
-        "tests/kao/test_k3p_today.js",
-        "tests/kao/test_kao_render.js",
-        "tests/kao/test_kao2_mastery.js",
-        "tests/kao/test_kao2_perf_budget.js",
         "kao3-premium/duzeltme-plani/DURUM.json",
         "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
-        "kao3-premium/duzeltme-plani/KAYIT.md",
-        "kao3-premium/duzeltme-plani/kanit/K3PD-22/EVIDENCE.md"
+        "kao3-premium/duzeltme-plani/KAYIT.md"
       ],
       "checks": [
         {
@@ -6498,9 +6490,21 @@
           "measurements": {
             "assertions": "95/95"
           }
+        },
+        {
+          "command": "node /tmp/k3pd22-probe.cjs (bağımsız sonda, fixture değil)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "pass": 13,
+            "fail": 0,
+            "redBefore": 4,
+            "tapsBefore": 3,
+            "tapsAfter": 2
+          }
         }
       ],
-      "auditVerdict": "NOT_MEASURED",
+      "auditVerdict": "PASS",
       "evidenceRefs": [
         "kao3-premium/duzeltme-plani/kanit/K3PD-22/EVIDENCE.md"
       ],

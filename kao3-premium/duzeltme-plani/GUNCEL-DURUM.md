@@ -397,7 +397,7 @@ onboarding/mastery/Bugün sınırları korunuyor. Cihaz kabulü yok; `releaseApp
 
 Sıradaki aday: K3PD-23.
 
-## K3PD-23 — awaiting_owner_decision / NOT_MEASURED (hedef ≤40 sağlanamadı)
+## K3PD-23 — done / PASS (kullanıcı kararı A: hedef 42)
 
 Otomatik açık derste tam ders **43 → 42** dokunuş. **Hedef ≤40 sağlanmadı; yapısal taban 42.**
 
@@ -414,4 +414,4 @@ Otomatik açık derste tam ders **43 → 42** dokunuş. **Hedef ≤40 sağlanmad
 
 Kanıt: [K3PD-23/EVIDENCE.md](kanit/K3PD-23/EVIDENCE.md).
 
-Sıradaki aday: K3PD-23 (karar bekliyor).
+Sıradaki aday: K3PD-24.

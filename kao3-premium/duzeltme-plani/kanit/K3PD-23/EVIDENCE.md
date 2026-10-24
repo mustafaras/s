@@ -2,7 +2,7 @@
 
 ## Durum
 
-`awaiting_owner_decision` / `NOT_MEASURED` — **hedef ≤40 sağlanamadı; yapısal taban 42.**
+`done` / `PASS` — **kullanıcı kararı A: hedef 42'ye çekildi; bağımsız sonda 10/10.**
 
 > **KULLANICI KARARI (2026-10-24): A — hedef 42'ye çekildi.** Kullanıcı “a” yanıtıyla
 > A seçeneğini onayladı; kabul eşiği artık **≤42**. Karar `DURUM.json.decisions.goalException`

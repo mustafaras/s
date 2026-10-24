@@ -409,7 +409,8 @@ Otomatik açık derste tam ders **43 → 42** dokunuş. **Hedef ≤40 sağlanmad
 - **Neden ≤40 değil:** hedefe inmek ya görev sayısını (30→28, lemma kapsamı azalır) ya da çok dokunuşlu görevleri tek tık saymayı (gerçek kullanıcı eylemi değişmez) gerektirir — **ikisi de kartın hard stop'una girer**. Kartın öngördüğü gibi hedef değişikliği kararı kullanıcıya bırakıldı; **öneri A: hedefi 42'ye çek**.
 - **Bütçe:** tavan **artırılmadı**; iki yorum kaldırılarak 137,885 → **137,730 / 137,75 KiB**.
 - **Kapılar:** 10 fixture art arda **0 regresyon**; driver 0; zikr 95/95; plan-check, kontrast, pin tazeliği, IIP-22, görsel-QA guard → 0.
-- **Açık:** hedef kararı kullanıcıda; bağımsız denetim yok; cihaz kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+- **KARAR (2026-10-24): A — hedef 42'ye çekildi.** Kullanıcı “a” yanıtıyla onayladı; kabul eşiği artık **≤42**. Karar `decisions.goalException` + KAYIT seq 114'te. Öğretim ve kapsam değişmedi.
+- **Açık:** bağımsız denetim yok; cihaz kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
 
 Kanıt: [K3PD-23/EVIDENCE.md](kanit/K3PD-23/EVIDENCE.md).
 

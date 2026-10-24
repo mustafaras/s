@@ -6513,7 +6513,7 @@
     "K3PD-23": {
       "id": "K3PD-23",
       "status": "awaiting_owner_decision",
-      "baseHead": "a0ab4c42a639e8282ba8d2fbef5c695ab82bb576",
+      "baseHead": "2909854e8a39b46cdea285e8f7ed9c672a1f49ac",
       "changedPaths": [
         "kao3-premium/duzeltme-plani/DURUM.json",
         "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
@@ -6773,6 +6773,20 @@
       "answeredAt": null,
       "sourceRef": "PROMPTLAR.md §5; DENETLEYICI.md §§2.1–2.2; K3PD-24",
       "scope": "Yalnız tanıma metriği kararı; kullanıcı yanıtı gelmeden hedef değişmez."
+    },
+    "goalException": {
+      "status": "approved",
+      "topic": "Otomatik açık dersin dokunuş hedefi (K3PD-23)",
+      "proposal": "Kullanıcının A seçimi: hedef ≤40 yerine yapısal taban 42 kabul edilir. Gerekçe: 42 = 36 cevap dokunuşu + 6 gezinme (intro×2, concept, partEnd, apply, summary). 36 cevap tek başına hedefin %90'ı; hedefe inmek ya görev sayısını azaltmayı (lemma kapsamı — kartın hard stop'u) ya da çok dokunuşlu görevleri tek tık saymayı (gerçek kullanıcı eylemi değişmez — kartın hard stop'u) gerektirirdi. Kapsam korundu: 109 dersin görev sayısı düzeltme öncesi/sonrası 0/109 fark (106×30 + 3×29).",
+      "options": [
+        "A — Hedefi 42'ye çek (kullanıcı seçti): öğretim ve kapsam aynı kalır; ölçüm gerçeği yansıtır.",
+        "B — Görev 30→28: 2 dokunuş düşer, lemma kapsamı azalır (hard stop).",
+        "C — Çok dokunuşlu görevleri tek tık say: ölçüm 38'e düşer, gerçek eylem değişmez (hard stop)."
+      ],
+      "response": "A — Hedefi 42'ye çek",
+      "answeredAt": "2026-10-24",
+      "sourceRef": "Kullanıcı yanıtı 2026-10-24: “a”.",
+      "scope": "Yalnız K3PD-23 dokunuş hedefi: kabul eşiği ≤40 yerine 42. Üretim kodu, şema, migration ve yayın kapsam dışı."
     }
   },
   "releaseApproval": {

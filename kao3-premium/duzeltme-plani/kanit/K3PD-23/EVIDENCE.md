@@ -4,6 +4,10 @@
 
 `awaiting_owner_decision` / `NOT_MEASURED` — **hedef ≤40 sağlanamadı; yapısal taban 42.**
 
+> **KULLANICI KARARI (2026-10-24): A — hedef 42'ye çekildi.** Kullanıcı “a” yanıtıyla
+> A seçeneğini onayladı; kabul eşiği artık **≤42**. Karar `DURUM.json.decisions.goalException`
+> ve KAYIT seq 114'te kayıtlıdır. Öğretim içeriği ve kapsam değişmedi.
+
 Kart bunu açıkça öngörüyor: *“Ana ölçüyü ≤40'a getir; mümkün değilse kalan yapısal
 minimumu göster ve hedef değişikliği kararını ayrı iste.”* Bu belge o yapısal minimumu
 gösterir ve kararı kullanıcıya bırakır. **Hedef değişikliği tek taraflı yapılmadı.**

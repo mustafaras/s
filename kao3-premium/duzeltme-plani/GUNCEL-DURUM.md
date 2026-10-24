@@ -1,5 +1,21 @@
 # K3PD güncel durum
 
+## Aktif kart — 2026-10-24
+
+- K3PD-23 done/PASS; K3PD-24 done/PASS, kullanıcı A kararını onayladı; canlı state nextPrompt=K3PD-25.
+- Eski genel ≤%60 hedefi korunur ve gerçek genel MC/task ölçüsünde NOT_MET kalır. Ek olgun tekrar hedefi: isNew=false, s=5/12/40 karışık kohortunda R1 / tüm R1–R4 tekrar kelime görevleri ≤%60; iki kol birlikte, A/B ayrı raporlu.
+- R2 çoktan seçmeli olarak görünür; R3 üretim, R4 çoktan seçmeli cloze’dur. A/B ve notlama değişmedi; yeni kullanıcı pedagojisi sırf metrik için zorlaştırılmadı.
+- Kullanıcı, yalnız K3PD-24’ün PROMPTLAR allowlist satırını exact paths olarak onarma iznini verdi. Aktif kartın izinli toplamı beş exact path. Üretim/scheduler/test eşiği/ölçüm kodu değişmedi.
+- Eski yerleşik tarihsel oran kaynakları 91.57% ve 1030/1127=%91.39 olarak uyuşmuyor; fark açıkça korunuyor. Güncel sayımlar ve payda tanımları [K3PD-24/EVIDENCE.md](kanit/K3PD-24/EVIDENCE.md) içinde.
+- İlk bağımsız denetim PARTIAL verdi; eksik A/B × R1–R4 tablosu ve kart dışı `1e-06` biçim farkı düzeltildi. Focused read-only yeniden denetim PASS verdi; güncel diff ve kanıt tekrar kabul edildi.
+- Önceden kirli KAPANIS.md, README.md, GORSEL-KANIT.md ve PDF bu karta dahil edilmedi; dört hash korundu. releaseApproval=NOT_APPROVED; push/merge/tag/deploy yapılmadı.
+
+Sıradaki aday: K3PD-25 (yalnız adaydır; bu oturumda başlatılmadı ve uygulama izni değildir).
+
+Başlangıç kapısındaki exact-path hatası kullanıcı onayıyla yalnız aktif K3PD-24 allowlist satırını düzelterek giderildi. Bağımsız PASS seq 126’da; kapanış state’indeki `--check` ve `--sonraki` exit 0 makbuzu seq 127’de.
+
+## Tarihsel K3PD-14 yayın makbuzu
+
 - Program aktif. K3PD-14 done/ACCEPTED_DEVIATION; nextPrompt=K3PD-15. Kapanış kullanıcı talimatına dayalıdır; bağımsız denetim yapılmamıştır ve PASS olarak sunulmaz.
 - Yalnız K3PD-14 A adayı 613a19c087e5311d0ecd324caaf470bbada065f7 için releaseApproval=APPROVED ve tam 11 exact yol kapsamı kaydedilmiştir. K3PD programı genel released durumuna geçirilmemiştir.
 - GitHub Pages workflow run [39616251782](https://github.com/mustafaras/s/actions/runs/39616251782): validate=success, deploy=success; uzak main SHA adayla eşit. Statik URL no-cache denetimi 68/68 SHA-256 eşliği, 0 eksik ve 0 hata verdi; dört ana giriş/çalışma zamanı varlığı ayrıca eşleşti.
@@ -415,3 +431,23 @@ Otomatik açık derste tam ders **43 → 42** dokunuş. **Hedef ≤40 sağlanmad
 Kanıt: [K3PD-23/EVIDENCE.md](kanit/K3PD-23/EVIDENCE.md).
 
 Sıradaki aday: K3PD-24.
+
+## K3PD-24 — A kararı onaylandı / done-PASS
+
+Kartın başlangıç baseHead’i branch k3pd-denetim-duzeltmeleri üzerinde 753ecbe6035e61ad1b2d4d0057957942f1bff19d idi. K3PD-23 done/PASS. Üretim dosyaları, cift-sik.cjs, K3P-STATE.json, testler ve ölçüm sınıflaması değiştirilmedi.
+
+Kartta ve DENETLEYICI.md’deki 92.92% yeni, 91.57% yerleşik ve 48.94% karma oranlar bu HEAD’de yeniden üretilmedi. Tarihsel yerleşik oran kaynakları çatışıyor: K3P-STATE/LEDGER 1030/1127=%91.39 kaydeder; hiçbir değer güncel sonuç gibi kullanılmıyor. Tekrar edilen güncel sonuçlar:
+
+- Genel pay = R1+R2+R4 gerçek MC kelime cevap-görevleri; genel payda = aynı profildeki bütün cevap-görev ziyaretleri (kelime ve kelime dışı; her görev bir kez). `isNew=true` cevap görevleri genel orana dahil, intro ekranları hariçtir. R3 multi-chip üretim paya girmez.
+- Yeni profil: 1010/1084 gerçek MC (%93.17); R1=912, R2=98, R3=R4=0. `cift-sik.cjs` raw word choices 1010/1084; cevap dışı kalan word olmayan görev 74.
+- Yerleşik profil: 1022/1119 gerçek MC (%91.33); R1=900, R2=122, R3=6 build, R4=0. Raw 1028/1119 (%91.87) altı R3 çipli build görevini choices saydığı için MC numerator değildir. Cevap dışı kalan word olmayan görev 91.
+- Karşılaştırılabilir sentetik karma tekrar: 812 ders kartında 1316 tekrar kelime görevi; R1=648 (%49.24), R2=403, R3=224, R4=41. Bu headless sentetik bir görev dağılımıdır, gerçek öğrenme veya kalıcılık sonucu değildir.
+- Kol kırılımı: A=668 (R1=0, R2=403, R3=224, R4=41); B=648 (R1=648, R2/R3/R4=0). A/s=40 R2/R3/R4=74/109/41; A/s=12 R2/R3=100/115; A/s=5 R2=229. B/s=40/12/5 R1=218/231/199.
+- isNew ve rung ayrı boyutlardır: yeni profilde 1010 isNew kelime + 74 başka görev; yerleşik profilde 972 isNew kelime + 56 tekrar kelime + 91 başka görev. Intro ekranları cevap görevi değildir.
+- Genel ≤60 hedefini aynı paydayla sağlamak için MC üst sınırı yeni profilde 650 (en az 360 görev üretime dönüşmeli), yerleşik profilde 671 (en az 351 dönüşmeli) olur. B/R1 ve yeni/s<3 R1 görevlerini koruyunca yalnız R2’yi dönüştürmek yetmez.
+
+Kullanıcı “tümünü ve önerilerini onaylıyorum” yanıtıyla A’yı onayladı: eski genel ≤60 hedefi genel MC/task oranı için görünür NOT_MET kalır; ek R1≤60 hedefi yalnız isNew=false, sabit s=5/12/40 tekrar kohortunda R1/(R1+R2+R3+R4) olarak önkayıtlanır. A ve B birlikte ana sonuç; kol kırılımı ayrıca gösterilir. K3P-18 karışık örnek onayı genel hedef feragati sayılmaz. K3PD-25 başlamadı.
+
+K3PD-24’ün allowlist düzeltmesi yalnız bu kartın satırında ve kullanıcı onayıyla yapıldı. Üretim/scheduler, K3P-STATE, cift-sik ve test dosyaları diff’i 0. Bağımsız focused read-only verdict PASS’tır. Kart done/PASS; tarihsel 91.57/91.39 uyuşmazlığı, sentetik kohort sınırı ve gerçek kullanıcı/kalıcılık kanıtı yokluğu açık sınırlamalardır.
+
+Sıradaki aday: K3PD-25 (yalnız aday; yeni kullanıcı talimatı olmadan başlanmaz).

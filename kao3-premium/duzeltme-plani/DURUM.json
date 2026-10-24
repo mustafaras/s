@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-24",
+  "nextPrompt": "K3PD-25",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -6653,12 +6653,127 @@
     },
     "K3PD-24": {
       "id": "K3PD-24",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "753ecbe6035e61ad1b2d4d0057957942f1bff19d",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-24/EVIDENCE.md"
+      ],
+      "checks": [
+        {
+          "command": "node kao3-premium/araclar/cift-sik.cjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "fresh": "1010/1084 actual MC; R1=912 R2=98; duplicates=0",
+            "established": "1022/1119 actual MC; R1=900 R2=122; 6 R3 build excluded from MC; duplicates=0",
+            "mixedRepeat": "812 cards; 1316 repeat tasks; R1=648 (49.24%), R2=403, R3=224, R4=41"
+          }
+        },
+        {
+          "command": "node - (K3PD-24 EVIDENCE.md task×cohort H.playLesson cross-tab)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "fresh": "1084 tasks; 1010 isNew words; B/R1=523 A/R1=389 A/R2=98; 74 nonword",
+            "established": "1119 tasks; 972 isNew words; repeats=56; new B/R1=508 A/R1=371 A/R2=93; repeat B/R1=21 A/R2=29 A/R3 build=6; 91 nonword"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "cards": 34,
+            "nextPrompt": "K3PD-24"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "nextPrompt": "K3PD-24"
+          }
+        },
+        {
+          "command": "node - (K3PD-24 EVIDENCE.md A/B mixed-repeat cross-tab)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "cards": 812,
+            "tasks": 1316,
+            "A": {
+              "total": 668,
+              "R1": 0,
+              "R2": 403,
+              "R3": 224,
+              "R4": 41
+            },
+            "B": {
+              "total": 648,
+              "R1": 648,
+              "R2": 0,
+              "R3": 0,
+              "R4": 0
+            }
+          }
+        },
+        {
+          "command": "node (PROMPTLAR.md K3PD-24 exact allowlist parser assertion)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "exactPaths": 5,
+            "paths": [
+              "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+              "kao3-premium/duzeltme-plani/DURUM.json",
+              "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+              "kao3-premium/duzeltme-plani/KAYIT.md",
+              "kao3-premium/duzeltme-plani/kanit/K3PD-24/EVIDENCE.md"
+            ]
+          }
+        },
+        {
+          "command": "git diff --exit-code HEAD -- app/core/quranLearn.js app/core/quranLearnFlow.js kao3-premium/araclar/cift-sik.cjs kao3-premium/K3P-STATE.json",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "productionSchedulerMeasurementK3PStateChanges": 0
+          }
+        },
+        {
+          "command": "node (protected four-file SHA-256 comparison)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "protectedHashesMatch": 4
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node -e JSON.parse(K3PD DURUM.json)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "json": "valid"
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-24/EVIDENCE.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-25": {
@@ -6781,14 +6896,18 @@
       "scope": "Yalnız K3PD-04 zaman bütçesi kararı: oturumları bütçeye göre bölme; süre medyanı/fallback; ısınma ve R önceliği; tek görev sığmama davranışı; hedef/kavram/ödül/resume. Yeni kalıcı alan, migration, üretim kodu ve yayın kapsam dışı."
     },
     "recognition": {
-      "status": "pending",
+      "status": "approved",
       "topic": "Tanıma oranı payı, paydası ve hedefi",
-      "proposal": null,
-      "options": [],
-      "response": null,
-      "answeredAt": null,
-      "sourceRef": "PROMPTLAR.md §5; DENETLEYICI.md §§2.1–2.2; K3PD-24",
-      "scope": "Yalnız tanıma metriği kararı; kullanıcı yanıtı gelmeden hedef değişmez."
+      "proposal": "Kullanıcı önerilen A’yı onayladı. Eski genel ≤%60 hedefi ve genel ölçüsü (tam ders taramasında numerator=R1+R2+R4 gerçek MC kelime cevap-görevleri, denominator=aynı fresh veya seeded sentetik profildeki tüm cevap-görev ziyaretleri; her ziyaret bir kez, new/established ayrı) korunup NOT_MET gösterilecek. Ek önkayıtlı hedef: isNew=false, sabit s=5/12/40 karışık tekrar kelime kohortunda numerator=R1; denominator=aynı kohortta R1+R2+R3+R4 tekrar kelime görevlerinin tümü; iki kol birlikte ana oran ve A/B ayrı kırılım. R2 MC olarak görünür kalır, R3 üretimdir, R4 MC cloze’dur. K3P-STATE hedefi, A/B ataması, grade, motor ve ölçüm kodu değişmez.",
+      "options": [
+        "A — Kullanıcı onayladı: genel ≤%60 görünür NOT_MET; ek olgun tekrar R1≤%60, kesin isNew=false ve R1–R4 görev paydası, sabit s=5/12/40, iki kol birlikte ve A/B kırılımı. R2 açık MC; A/B ve notlama aynı.",
+        "B — Onaylanmadı: genel ≤%60 bağlayıcı kalsın; aynı genel payda korunarak fresh profilinde en az 360, established profilinde en az 351 MC görevi üretime çevrilir; A/B hipotezi ve notlama değişir.",
+        "C — Seçilmedi: başka hedef/method için kesin yüzde, pay, payda, kohort ve R1/R2/R3/R4 tanımı gerekir."
+      ],
+      "response": "tümünü ve önerilerini onaylıyorum",
+      "answeredAt": "2026-10-24",
+      "sourceRef": "Kullanıcı yanıtı 2026-10-24: “tümünü ve önerilerini onaylıyorum”; hemen önce sunulan önerilen A ve yalnız K3PD-24 allowlist satırı onarımı onayı.",
+      "scope": "Yalnız K3PD-24 tanıma metriği hedef/pay/payda yöntemi kararı. Genel hedef kaldırılmadı; sonuç NOT_MET kalır. Ek tekrar R1 hedefi önkayıtlandı. K3P-STATE, motor, scheduler, test eşiği, ölçüm kodu, A/B ve notlama değişmez; K3PD-25 veya yayın yetkisi verilmez."
     },
     "goalException": {
       "status": "approved",

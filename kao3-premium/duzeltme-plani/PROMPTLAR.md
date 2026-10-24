@@ -831,7 +831,7 @@ Gereksiz en az iki geçişi öğretim içeriğini, yeni kelime sayısını ve ce
 
 **Oku:** cift-sik.cjs; state targets.recognitionShareMax; TASARIM merdiven/A–B; ledger K3P-18 karışık örnek kararı; ANALIZ ölçü tabanı.
 
-**Yazma allowlist’i:** Yalnız yeni karar/state/durum/kayıt belgeleri; bu kartta motor/test eşiği/ölçüm sınıflaması değiştirilmez.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-24 allowlist satırını exact paths olarak onarmak için); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-24/EVIDENCE.md`. Bu kartta motor/test eşiği/ölçüm sınıflaması değiştirilmez.
 
 **Uygula:**
 

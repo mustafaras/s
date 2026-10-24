@@ -2330,7 +2330,7 @@
     if(plan[1]&&plan[1].kind==='partEnd'&&mode!=='budget-overrun') return false;
     var record=kaoLessonRecord(q,lesson.id),resume=objectOr(record.resume,{}),state={lessonId:lesson.id,title:kaoSafeLessonTitle(lesson),plan:plan,knownBefore:kaoKnownLemmaSet(d),coverageBefore:kaoCoverage(d).ratio,at:0,phase:'lesson',correct:0,answered:0,done:false,earnedMilestones:[],milestoneCelebrated:false,startedAt:record.startedAt||now.toISOString()};
     if(mode==='intro') state.at=Math.max(0,plan.findIndex(function(item){ return item.kind==='intro'; }));
-    if(mode==='h'&&(plan[0].kind==='goal'||plan[0].kind==='partGoal')) state.at=1;
+    if((mode==='h'||mode==='budget-overrun')&&/^(goal|partGoal)$/.test(plan[0].kind)) state.at=1;
     state.phase=plan[state.at].kind==='practice'?'practice':'lesson';
     record.startedAt=record.startedAt||now.toISOString(); q.startedAt=q.startedAt||now.toISOString(); if(!resume.itemId||mode==='intro') kaoResetLatency(ui); ui.kaoWindow=[]; ui.kaoWrongStreak=0; ui.kaoLesson=state; ui.kaoNight=false; ui.kaoDurableCount=0;
     return kaoLessonActivate(ui);

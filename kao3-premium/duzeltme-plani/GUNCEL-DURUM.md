@@ -396,3 +396,20 @@ görev **2 dokunuş**; hero dersin tüm hedef kelimelerini kapsıyor; resume ayn
 onboarding/mastery/Bugün sınırları korunuyor. Cihaz kabulü yok; `releaseApproval=NOT_APPROVED`.
 
 Sıradaki aday: K3PD-23.
+
+## K3PD-23 — awaiting_owner_decision / NOT_MEASURED (hedef ≤40 sağlanamadı)
+
+Otomatik açık derste tam ders **43 → 42** dokunuş. **Hedef ≤40 sağlanmadı; yapısal taban 42.**
+
+- **Ölçüm aracı bozuktu:** `dokunus-olc.cjs` bütçe kesme ekranında (`partEnd`) `kaoLesson('next')` false dönerken saymaya devam ediyordu → **403 hayalet dokunuş**. Gerçek taban **42**. Araç düzeltildi: `partEnd` tek karar dokunuşu, `summary` bitir sayılır, çok dokunuşlu görevler (`build`/`order`/`cloze`) **her seçimiyle** sayılır — K3P-15'in 39'u `build`'i tek tık sayıyordu, kartın hard stop'u.
+- **İki gerçek fazlalık kaldırıldı:** (1) kalan dizide maliyetli görev yokken üretilen, hiçbir karar sunmayan `partEnd`; (2) `budget-overrun` sonrası hedef ekranının **ikinci kez** gösterilmesi.
+- **Dağılım:** >40 ders **90/109 → 24/109**; en yüksek 47 → 46; ortalama 41,2 → 40,2.
+- **Yapısal taban 42 = 36 cevap + 6 gezinme** (intro×2, concept, partEnd, apply, summary). 36 cevap tek başına hedefin %90'ı.
+- **Neden ≤40 değil:** hedefe inmek ya görev sayısını (30→28, lemma kapsamı azalır) ya da çok dokunuşlu görevleri tek tık saymayı (gerçek kullanıcı eylemi değişmez) gerektirir — **ikisi de kartın hard stop'una girer**. Kartın öngördüğü gibi hedef değişikliği kararı kullanıcıya bırakıldı; **öneri A: hedefi 42'ye çek**.
+- **Bütçe:** tavan **artırılmadı**; iki yorum kaldırılarak 137,885 → **137,730 / 137,75 KiB**.
+- **Kapılar:** 10 fixture art arda **0 regresyon**; driver 0; zikr 95/95; plan-check, kontrast, pin tazeliği, IIP-22, görsel-QA guard → 0.
+- **Açık:** hedef kararı kullanıcıda; bağımsız denetim yok; cihaz kabulü yok. `releaseApproval=NOT_APPROVED`; push/deploy yok.
+
+Kanıt: [K3PD-23/EVIDENCE.md](kanit/K3PD-23/EVIDENCE.md).
+
+Sıradaki aday: K3PD-23 (karar bekliyor).

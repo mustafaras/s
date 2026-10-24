@@ -324,6 +324,7 @@
       if(cost===0){ selected=selected.concat(unit); index=end; continue; }
       if(cost<=capacity-spent){ selected=selected.concat(unit); spent+=cost; index=end; continue; }
       if(allowOverrun&&spent===0&&!overrunUsed){ selected=selected.concat(unit); spent+=cost; index=end; overrunUsed=true; continue; }
+      if(!sequence.slice(end).some(lessonTaskCost)){ selected=selected.concat(sequence.slice(index)); index=sequence.length; break; }
       selected.push({id:'part-end:'+lesson.id+':'+String(item.id),kind:'partEnd',resumeItemId:String(item.id),requiredTasks:cost,requiredMinutes:Math.ceil(cost*duration.ms/60000),remainingMs:Math.max(0,remainingMs-spent*duration.ms),source:duration.source,overrun:overrunUsed,section:item.kind==='intro'||item.kind==='concept'?3:(item.group==='review'?2:(item.kind==='apply'?5:4))});
       break;
     }

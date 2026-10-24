@@ -802,7 +802,7 @@ Onboarding, kilitli kullanıcı, mastery/repair ve resume için normal ana ekran
 
 **Oku:** dokunus-olc.cjs/correctTaps/playLesson; 13 şerit davranışı; 19/20 öğretim,22 giriş ve 06 parçalama kararları.
 
-**Yazma allowlist’i:** quranLearn.js; quranLearnFlow.js yalnız gereksiz geçiş birleştirme; quranLearnViews.js; dokunus-olc.cjs; feedback_arms/rhythm/budget/lesson_moment fixture’ları; yeni kayıtlar.
+**Yazma allowlist’i:** Yalnız şu exact paths: `app/core/quranLearn.js`; `app/core/quranLearnFlow.js`; `app/core/quranLearnViews.js`; `kao3-premium/araclar/dokunus-olc.cjs`; `tests/kao/test_k3p_feedback_arms.js`; `tests/kao/test_k3p_rhythm.js`; `tests/kao/test_k3p_budget.js`; `tests/kao/test_k3p_lesson_moment.js`; `tests/kao/test_kao2_lesson_flow.js`; `tests/kao/test_k3p_resume.js`; `tests/kao/test_k3p_today.js`; `tests/kao/test_kao2_next_step.js`; `tests/kao/test_kao2_perf_budget.js`; `tests/kao/test_kao2_mastery.js`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-23/EVIDENCE.md`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-23 allowlist satırı).
 
 **Uygula:**
 

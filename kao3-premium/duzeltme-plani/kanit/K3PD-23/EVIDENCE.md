@@ -81,6 +81,19 @@ u01.01 için dokunuşların **hiçbiri** kaldırılamaz:
 (30 → 28) ya da çok dokunuşlu görevlerin tek tık sayılması gerekir — ikisi de kartın
 hard stop'una girer.
 
+## Kapsam korundu — 109 dersin görev sayısı DEĞİŞMEDİ
+
+Kartın hard stop'u: *“görev/lemma kapsamı ve FSRS cevap sayısı açıklamasız azalmaz.”*
+Düzeltme öncesi ve sonrası kodla **109 dersin tamamı** oynatıldı, görev sayısı sayıldı:
+
+| Ölçüm | Önce | Sonra |
+| --- | --- | --- |
+| Görev sayısı farkı olan ders | — | **0 / 109** |
+| Dağılım | 106×30, 3×29 | **106×30, 3×29** |
+
+Yani 43 → 42 düşüşü **hiçbir görev, lemma veya FSRS cevabı kaybedilmeden** elde edildi:
+yalnız iki gezinme ekranı kaldırıldı (karar sunmayan `partEnd` ve tekrar eden hedef).
+
 ## Doğrulama
 
 | Komut | Exit |

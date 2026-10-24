@@ -6513,12 +6513,8 @@
     "K3PD-23": {
       "id": "K3PD-23",
       "status": "awaiting_owner_decision",
-      "baseHead": "b3c5b83514b546191a6157cb381720a1b41b8f36",
+      "baseHead": "a0ab4c42a639e8282ba8d2fbef5c695ab82bb576",
       "changedPaths": [
-        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
-        "app/core/quranLearn.js",
-        "app/core/quranLearnFlow.js",
-        "kao3-premium/araclar/dokunus-olc.cjs",
         "kao3-premium/duzeltme-plani/DURUM.json",
         "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
         "kao3-premium/duzeltme-plani/KAYIT.md",
@@ -6620,6 +6616,16 @@
           "exitCode": 0,
           "measurements": {
             "assertions": "95/95"
+          }
+        },
+        {
+          "command": "node /tmp/taskcount.cjs (109 ders, düzeltme öncesi/sonrası)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "lessons": 109,
+            "taskCountDiff": 0,
+            "distribution": "106x30, 3x29"
           }
         }
       ],

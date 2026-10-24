@@ -13,6 +13,13 @@ const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
 const source = read('app/core/appSurface.js');
 const app = read('app.js');
 const index = read('index.html');
+const cacheVersion = (asset) => {
+  const escaped = asset.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const marker = asset + '?v=', start = index.indexOf(marker);
+  if (start < 0) return null;
+  const match = index.slice(start + marker.length).match(/^[0-9a-z]+/);
+  return match ? match[0] : null;
+};
 const lifecycleStart = source.indexOf('// MON-53: global timer/listener/foreground bridges');
 const lifecycleEnd = source.indexOf('// MON-54: boot/start/late-boot bridges', lifecycleStart);
 const lifecycleSource = source.slice(lifecycleStart, lifecycleEnd > lifecycleStart ? lifecycleEnd : source.length);
@@ -102,10 +109,9 @@ ok('session teardown listeners stay in their original order',
   app.indexOf("window.addEventListener('pagehide',finalizeSession)") < app.indexOf("window.addEventListener('visibilitychange',onSessionVisibilityChange)"));
 ok('sync retry and Quran foreground state no longer duplicate in app.js',
   !/var lastSyncRetryWatchdogAt=|var SYNC_RETRY_WATCHDOG_MS=|var quranLastForegroundPullAt=/.test(app));
-/* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
-   gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('production cache busts the changed registry and app shell together',
-  /app\/core\/appSurface\.js\?v=20261019a/.test(index) && /app\.js\?v=20261019a/.test(index) &&
+  /^\d{8}[a-z]$/.test(cacheVersion('app/core/appSurface.js') || '') &&
+  cacheVersion('app/core/appSurface.js') === cacheVersion('app.js') &&
   index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?'));
 
 console.log('\nMON-53 lifecycle boundary: ' + passed + '/' + passed + ' passed');

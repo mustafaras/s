@@ -129,11 +129,15 @@ ui.kaoQueue = [
 ui.kaoTasks = { [auto.id]: auto, [next.id]: next }; ui.kaoTaskIndex = 0; ui.kaoTaskStartedAt = now - 800;
 assert.equal(api.kaoAnswer(auto.id, 'right').correct, true);
 assert.equal(ui.kaoTaskIndex, 0, 'otomatik devam zamanlayana kadar indeks sabit kalmalı');
-// K3P-15: ölçüm yokken doğru cevap "yavaş" kolundadır → tam kart yerine pekiştirme şeridi, 1.600 ms geçiş.
-assert.match(api.kaoTaskHTML(auto), /<p class="kao-feedback-strip" role="status" aria-live="polite">Doğru<\/p>/, 'doğru cevapta pekiştirme şeridi gösterilmeli');
+// K3P-15 + K3PD-13: yavaş doğru cevabın ilk native eylemi timer'ı duraklatır.
+assert.match(api.kaoTaskHTML(auto), /<button type="button" class="kao-feedback-strip" aria-live="polite" aria-label="Doğru, duraklat" onclick="App\.kaoContinue\(true\)">Doğru<\/button>/, 'yavaş doğru cevapta erişilebilir duraklatma eylemi gösterilmeli');
 const advanceTimer = timers.find((timer) => timer.ms === 1600);
 assert.ok(advanceTimer, 'yavaş doğru ve autoAdvance için 1.600 ms zamanlayıcı olmalı');
+assert.equal(api.kaoContinue(true), true, 'Doğru, duraklat eylemi timer’ı duraklatmalı');
+assert.equal(ui.kaoPanel.paused, true);
 advanceTimer.fn();
+assert.equal(ui.kaoTaskIndex, 0, 'iptal edilen timer gecikmiş geçiş yapmamalı');
+assert.equal(api.kaoContinue(), true, 'ikinci açık Devam görevi ilerletmeli');
 assert.equal(ui.kaoTaskIndex, 1);
 assert.equal(ui.kaoPanel.open, false);
 assert.ok(audioCalls.some((src) => src.includes('w-l_audio_abcdef-measured.m4a')), 'Devam mevcut otomatik ses davranışını korumalı');

@@ -54,7 +54,7 @@ function primaryAction(html) {
 }
 function lessonAction(step) {
   const id = typeof step.param === 'number' ? String(step.param) : `&quot;${step.param}&quot;`;
-  return `App.kaoLesson(&quot;start&quot;,${id})`;
+  return `App.kaoLesson(&quot;start&quot;,${id},&quot;h&quot;)`;
 }
 function settle(q, lemmaIds) {
   // kaoKnownLemmaSet: iki yönde kalıcı (s≥21) kart = bilinen kelime.

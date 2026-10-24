@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-25",
+  "nextPrompt": "K3PD-26",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -5426,7 +5426,7 @@
           "exitCode": 0,
           "measurements": {
             "publishedVectors": 24,
-            "tolerance": 1e-06
+            "tolerance": 0.000001
           }
         },
         {
@@ -6778,13 +6778,330 @@
     },
     "K3PD-25": {
       "id": "K3PD-25",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
-      "acceptanceDependencies": []
+      "status": "done",
+      "baseHead": "7e3fc159cf899675e12f084f2fca3d5d1905040f",
+      "changedPaths": [
+        "kao3-premium/araclar/cift-sik.cjs",
+        "tests/kao/test_k3p_recognition_gate.js",
+        "tests/kao/test_kao2_components.js",
+        "tests/kao/test_kao2_curriculum.js",
+        "tests/kao/test_kao2_feedback.js",
+        "tests/kao/test_kao2_today.js",
+        "tests/app/test_app_surface_boot_boundary.js",
+        "tests/app/test_app_surface_domain_boundary.js",
+        "tests/app/test_app_surface_lifecycle_boundary.js",
+        "tests/app/test_app_surface_overlay_boundary.js",
+        "tests/app/test_header_celestial_timeline.js",
+        "tests/app/test_header_night_contrast.js",
+        "tests/app/test_iip_09.js",
+        "tests/app/test_v3_welcome.js",
+        "tests/kao/README.md",
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-25/EVIDENCE.md",
+        "tests/kao/test_kao2_kabul.js",
+        "tests/kao/test_kao2_perf_budget.js"
+      ],
+      "checks": [
+        {
+          "command": "node kao3-premium/araclar/cift-sik.cjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "fresh": "1010/1087=92.92% raw NOT_MET / ACCEPTED_DEVIATION",
+            "established": "1025/1125=91.11% raw NOT_MET / ACCEPTED_DEVIATION",
+            "matureRepeatR1": "648/1324=48.94% PASS",
+            "gate": "PASS exit 0",
+            "integrity": 0,
+            "lessonCoverage": "109/109 each cohort",
+            "deviationRef": "K3PD-25#recognition-deviation:seq139"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_recognition_gate.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "assertions": "R1-R4; R2=MC; exact denominators; seq139 raw NOT_MET+disposition; strict integrity nonzero; CLI JSON exit 0"
+          }
+        },
+        {
+          "command": "G0 DENETLEYICI §4 + changed JavaScript syntax",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "commands": "29/29",
+            "changedJsSyntax": "16/16",
+            "driver": "PASS",
+            "zikrHarness": "95/95",
+            "controlFixture": "PASS"
+          }
+        },
+        {
+          "command": "G1 DENETLEYICI §4 ordered run plus isolated no-flag performance retry",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "commandCoverage": "19/19 individually passed after retry",
+            "firstBatch": "18/19; relative steady p95 transient fail retained in KAYIT",
+            "finalPerfRetry": "exit 0; runtime 137.730 KiB; CSS 15.922 KiB; content 184.591 KiB; p95 4.402 ms; steady 2.905 ms",
+            "slowHostException": false,
+            "baselineWritten": false
+          }
+        },
+        {
+          "command": "G2 DENETLEYICI §4 ordered batch",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "commands": "14/14",
+            "A9": "220/220",
+            "A10": "runtime 137.730/137.75 KiB; CSS 15.922/16; content 184.591/256; p95 5.196/40 ms",
+            "K3P": "rhythm5/5; duplicates0; ladder A522/1000 build32; build14; cloze9 wrongPOS0; budget11; resume7; ayah21",
+            "historicalSelectionBaseline": "UNVERIFIABLE"
+          }
+        },
+        {
+          "command": "git diff --exit-code HEAD -- app/core/quranLearn.js app/core/quranLearnFlow.js app/core/quranLearnViews.js app/core/quranLearnScheduler.js kao3-premium/K3P-STATE.json kao3-premium/araclar/scheduler.cjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "productionSchedulerFSRS_ABGradingAndLegacyStateDiffs": 0
+          }
+        },
+        {
+          "command": "Protected-file SHA-256 check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "matches": 4,
+            "hashes": {
+              "kao3-premium/KAPANIS.md": "d8e8419e2849b9eec922e537bca7100149fdfee6120ce850fda77128f8af9bcd",
+              "kao3-premium/README.md": "1aee47cdd05726f4a5966748ae3f786bd79d2e394dd37f3ec7b083f2d36eed0f",
+              "kao3-premium/kanit/sonraki/GORSEL-KANIT.md": "d7627027bba21007550f0a5c76130a4d9f11b7b896d001a60e9333c81ffeed28",
+              "kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf": "05ae0071c87c7bad4ed5f050cbb07479e022e912a67ad401b59e00b52ca8811b"
+            }
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "state": "ready_for_audit",
+            "nextPrompt": "K3PD-25",
+            "latestLog": "seq141"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-25",
+            "K3PD26Started": false
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "negativeCases": 33,
+            "validCards": 34
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "git diff --exit-code HEAD -- app/core/quranLearn.js app/core/quranLearnFlow.js app/core/quranLearnViews.js app/core/quranLearnScheduler.js kao3-premium/K3P-STATE.json kao3-premium/araclar/scheduler.cjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "productionSchedulerFSRSABGradingAndLegacyStateDiffs": 0
+          }
+        },
+        {
+          "command": "node - (exact card scope and protected SHA-256 assertions)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "scope": "22/22 exact paths",
+            "protectedHashes": "4/4 matches"
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "state": "ready_for_audit",
+            "nextPrompt": "K3PD-25",
+            "logSeq": "142"
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "status": "ready_for_audit",
+            "nextPrompt": "K3PD-25",
+            "previousLogSeq": 142
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "status": "ready_for_audit",
+            "nextPrompt": "K3PD-25",
+            "previousLogSeq": 143
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "status": "ready_for_audit",
+            "nextPrompt": "K3PD-25",
+            "previousLogSeq": 144
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "status": "ready_for_audit",
+            "nextPrompt": "K3PD-25",
+            "previousLogSeq": 145
+          }
+        },
+        {
+          "command": "Independent read-only K3PD-25 audit",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "verdict": "ACCEPTED_DEVIATION",
+            "scope": "seq139-only general target disposition",
+            "productionDiff": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "state": "done/ACCEPTED_DEVIATION",
+            "nextPrompt": "K3PD-26"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-26",
+            "K3PD26Started": false
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "negativeCases": 33,
+            "cardInventory": 34
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node - (exact card scope + protected four SHA assertions)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "changedPaths": "22/22 exact",
+            "protectedHashes": "4/4 match"
+          }
+        },
+        {
+          "command": "git diff --exit-code HEAD -- app/core/quranLearn.js app/core/quranLearnFlow.js app/core/quranLearnViews.js app/core/quranLearnScheduler.js kao3-premium/K3P-STATE.json kao3-premium/araclar/scheduler.cjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "productionSchedulerFSRSABGradingAndLegacyStateDiffs": 0
+          }
+        }
+      ],
+      "auditVerdict": "ACCEPTED_DEVIATION",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-25/EVIDENCE.md"
+      ],
+      "acceptanceDependencies": [],
+      "openAcceptances": [
+        "Tarihsel distractor seçim sırası UNVERIFIABLE; baseline fixture bulunamadı ve sınırlama olarak açık kaldı.",
+        "Sentetik VM ölçüleri gerçek öğrenme, kalıcılık, aktarım veya nedensel etki iddiası değildir; cihaz/kullanıcı kabulü ayrıca pending.",
+        "K3PD-26 sıradaki adaydır; bu kapanış uygulama yetkisi vermez.",
+        "releaseApproval=NOT_APPROVED; K3PD-32/33 ve exact aday SHA onayı olmadan yayın yok."
+      ]
     },
     "K3PD-26": {
       "id": "K3PD-26",
@@ -6898,16 +7215,16 @@
     "recognition": {
       "status": "approved",
       "topic": "Tanıma oranı payı, paydası ve hedefi",
-      "proposal": "Kullanıcı önerilen A’yı onayladı. Eski genel ≤%60 hedefi ve genel ölçüsü (tam ders taramasında numerator=R1+R2+R4 gerçek MC kelime cevap-görevleri, denominator=aynı fresh veya seeded sentetik profildeki tüm cevap-görev ziyaretleri; her ziyaret bir kez, new/established ayrı) korunup NOT_MET gösterilecek. Ek önkayıtlı hedef: isNew=false, sabit s=5/12/40 karışık tekrar kelime kohortunda numerator=R1; denominator=aynı kohortta R1+R2+R3+R4 tekrar kelime görevlerinin tümü; iki kol birlikte ana oran ve A/B ayrı kırılım. R2 MC olarak görünür kalır, R3 üretimdir, R4 MC cloze’dur. K3P-STATE hedefi, A/B ataması, grade, motor ve ölçüm kodu değişmez.",
+      "proposal": "K3PD-24 recognition:A kararının dar kapı-disposition eki: eski fresh/established genel totalMC≤%60 hedeflerinin pay/paydasını ve ham NOT_MET sonuçlarını koru, fakat bunları açıkça kabul edilmiş sapma/rapor amaçlı gösterge yap; K3PD-25 kapanışında etkin hedef olgun mixed-repeat R1≤%60 olarak kalır (isNew=false, sabit s=5/12/40, tüm R1+R2+R3+R4 tekrar görevleri paydası, A/B birlikte ve ayrı kırılım). R2 MC ve görünür; R3 üretim; R4 MC. Bütünlük/sıfır görev/bozuk havuz kapıları bağlayıcı kalır.",
       "options": [
-        "A — Kullanıcı onayladı: genel ≤%60 görünür NOT_MET; ek olgun tekrar R1≤%60, kesin isNew=false ve R1–R4 görev paydası, sabit s=5/12/40, iki kol birlikte ve A/B kırılımı. R2 açık MC; A/B ve notlama aynı.",
-        "B — Onaylanmadı: genel ≤%60 bağlayıcı kalsın; aynı genel payda korunarak fresh profilinde en az 360, established profilinde en az 351 MC görevi üretime çevrilir; A/B hipotezi ve notlama değişir.",
-        "C — Seçilmedi: başka hedef/method için kesin yüzde, pay, payda, kohort ve R1/R2/R3/R4 tanımı gerekir."
+        "A — Kullanıcı onayladı: genel fresh/established totalMC ölçüsü aynı numerator/denominator ile NOT_MET görünür; gateDisposition=ACCEPTED_DEVIATION ve seq139 referansı; etkin kapanış hedefi olgun repeat R1≤%60; A/B, grading ve motor değişmez.",
+        "B — Seçilmedi: genel ≤%60 bağlayıcı kalır; hedefi gerçek görev tasarımıyla sağlamak için ayrı kapsam ve A/B/grading değerlendirmesi gerekir."
       ],
-      "response": "tümünü ve önerilerini onaylıyorum",
+      "response": "evet uyguala kapat ve canlıya al",
       "answeredAt": "2026-10-24",
-      "sourceRef": "Kullanıcı yanıtı 2026-10-24: “tümünü ve önerilerini onaylıyorum”; hemen önce sunulan önerilen A ve yalnız K3PD-24 allowlist satırı onarımı onayı.",
-      "scope": "Yalnız K3PD-24 tanıma metriği hedef/pay/payda yöntemi kararı. Genel hedef kaldırılmadı; sonuç NOT_MET kalır. Ek tekrar R1 hedefi önkayıtlandı. K3P-STATE, motor, scheduler, test eşiği, ölçüm kodu, A/B ve notlama değişmez; K3PD-25 veya yayın yetkisi verilmez."
+      "sourceRef": "Kullanıcı yanıtı 2026-10-24: “evet uyguala kapat ve canlıya al”; hemen önceki açık öneri: genel ≤%60 sonuçlarını NOT_MET görünür ve gate açısından ACCEPTED_DEVIATION tut; olgun tekrar R1≤%60 tek etkin hedef; R1 pay/payda ve A/B değişmez.",
+      "scope": "Yalnız K3PD-24 recognition kararının K3PD-25 gate-disposition eki. Genel ölçü/pay/payda ve ham NOT_MET değişmez; yalnız açık onayla gate açısından ACCEPTED_DEVIATION olur. Etkin hedef olgun tekrar R1≤%60; integrity ve görev havuzu kapıları değişmez. Üretim motoru, FSRS, scheduler, A/B, grading, UI ve yayın yetkisi kapsam dışı.",
+      "approvedDeviationRef": "K3PD-25#recognition-deviation:seq139"
     },
     "goalException": {
       "status": "approved",

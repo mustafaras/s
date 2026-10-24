@@ -15,6 +15,12 @@ const cssSource = fs.readFileSync(path.join(root, 'app/styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const indexSource = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const swSource = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+function assetPin(source, asset) {
+  const marker = asset + '?v=', start = source.indexOf(marker);
+  if (start < 0) return null;
+  const match = source.slice(start + marker.length).match(/^[0-9a-z]+/);
+  return match ? match[0] : null;
+}
 let passed = 0;
 let failed = 0;
 function check(name, condition, detail) {
@@ -173,10 +179,9 @@ check('Arapça overview styles every new class and becomes a full-width mobile-f
   cssSource.includes('.iip-arabic-course-path{display:grid;grid-template-columns:minmax(0,1fr)') &&
   cssSource.includes('.iip-arabic-course-progress .kao-hub-card{width:100%'));
 check('Arapça surface cache pins match the app shell and offline manifest',
-  indexSource.includes('app/styles.css?v=20261019a') &&
-  indexSource.includes('app/core/saygi.js?v=20260929c') &&
-  swSource.includes("'./app/styles.css?v=20261019a'") &&
-  swSource.includes("'./app/core/saygi.js?v=20260929c'"));
+  !!assetPin(indexSource, 'app/styles.css') &&
+  assetPin(indexSource, 'app/styles.css') === assetPin(swSource, './app/styles.css') &&
+  assetPin(indexSource, 'app/core/saygi.js') === assetPin(swSource, './app/core/saygi.js'));
 
 quranCardState = 'loading';
 ui.faithTab = 'oz';

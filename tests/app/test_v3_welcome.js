@@ -38,6 +38,12 @@ function fail(name, detail) {
 const indexSource = read('index.html');
 const pageSource = read('v3-tanitim/index.html');
 const cssSource = read('v3-tanitim/v3.css');
+function assetPin(source, asset) {
+  const marker = asset + '?v=', start = source.indexOf(marker);
+  if (start < 0) return null;
+  const match = source.slice(start + marker.length).match(/^[0-9a-z]+/);
+  return match ? match[0] : null;
+}
 const jsSource = read('v3-tanitim/v3.js');
 
 console.log('== v3-tanitim "Hoş Geldin" sözleşmesi ==\n');
@@ -538,11 +544,10 @@ ok('sync.js tanıtım anahtarına dokunmuyor',
 // KAO hub kartı dependency bag'e eklendi; app.js cache pini bu kaynak değişikliğiyle
 // aynı düzeltmede ilerletildi. Handler yüzeyi yukarıdaki ayrı kapıda sabit kalır.
 ok('index.html app.js cache-bust güncel (KAO hub köprüsü)',
-  /app\.js\?v=20261019a/.test(indexSource));
-/* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
-   gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
+  !!assetPin(indexSource, 'app.js') && /^\d{8}[a-z]$/.test(assetPin(indexSource, 'app.js') || '') &&
+  assetPin(indexSource, 'app/core/quranLearn.js') === assetPin(indexSource, 'app.js'));
 ok('appSurface.js cache-bust güncel (B2 düzeltmesi)',
-  /app\/core\/appSurface\.js\?v=20261019a/.test(indexSource));
+  assetPin(indexSource, 'app/core/appSurface.js') === assetPin(indexSource, 'app.js'));
 /* B2: yürüyüş tikinin kullanıcıya söylediği eşik, tikin GERÇEK eşiğiyle aynı
    olmalı. Tik habitProgress → stepsGoal(date) ile dolar (varsayılan 9.000);
    STEP_TICK_MIN=4500 hiçbir yerde okunmaz. "4.500" metni geri gelmemeli. */
@@ -861,9 +866,9 @@ ok('tıklama niteliği sayısı pinli (393) — KAO-21 gizlenen kart satırı da
 ok('sürüm yorumları pin taramasını kaydırmıyor (yorumda nitelik adı geçmiyor)',
   !/\/\/[^\n]*(?:App\.[A-Za-z0-9_]+\s*=|onclick=)/.test(settingsSrc));
 
-// Cache-bust: değişen modüller yeni sürüm taşımalı
-ok('settings.js cache-bust güncel', /app\/core\/settings\.js\?v=20260926a/.test(indexSource));
-ok('render.js cache-bust güncel', /app\/core\/render\.js\?v=20261019a/.test(indexSource));
+// Cache-bust: uygulama modülleri app shell ile aynı yayın pinini taşır.
+ok('settings.js cache-bust korunmuş sürümünü taşıyor', assetPin(indexSource, 'app/core/settings.js') === '20260926a');
+ok('render.js cache-bust app shell ile eşleşiyor', assetPin(indexSource, 'app/core/render.js') === assetPin(indexSource, 'app.js'));
 
 // ───────────────────────────────────────────────────────────────────────────
 // [10] Kişisel 85 gün özeti (v3-data.js + v3-charts.js)

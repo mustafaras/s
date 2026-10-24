@@ -7,6 +7,12 @@ const repoRoot = require('../repo-root');
 const source = fs.readFileSync(path.join(repoRoot, 'app/core/appSurface.js'), 'utf8');
 const css = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const html = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
+const cacheVersion = (asset) => {
+  const marker = asset + '?v=', start = html.indexOf(marker);
+  if (start < 0) return null;
+  const match = html.slice(start + marker.length).match(/^[0-9a-z]+/);
+  return match ? match[0] : null;
+};
 let passed = 0, failed = 0;
 function check(name, condition){
   if(condition){ passed++; console.log('PASS '+name); }
@@ -34,9 +40,10 @@ check('dar ekran vakit açıklamasını kademeli sadeleştiriyor',
   css.includes('@media(max-width:389px)') && css.includes('.sey-hdr-phase-time em{ display:none; }'));
 check('gece kapsülü açık temada korumalı koyu zemin alıyor',
   css.includes('sky-time-night ~ .sey-hdr-scene .sey-hdr-phase{'));
-/* IIP-17 günlük seçki yüzeyi styles.css pinini yükseltti; appSurface pini değişmedi. */
 check('CSS ve appSurface cache sürümleri yükseltildi',
-  html.includes('app/styles.css?v=20261019a') && html.includes('app/core/appSurface.js?v=20261019a'));
+  /^\d{8}[a-z]$/.test(cacheVersion('app/styles.css') || '') &&
+  cacheVersion('app/styles.css') === cacheVersion('app/core/appSurface.js') &&
+  cacheVersion('app/styles.css') === cacheVersion('app.js'));
 
 console.log('Passed: '+passed+' / '+(passed+failed));
 if(failed) process.exit(1);

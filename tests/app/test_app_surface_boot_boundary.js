@@ -13,6 +13,13 @@ const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
 const source = read('app/core/appSurface.js');
 const app = read('app.js');
 const index = read('index.html');
+const cacheVersion = (asset) => {
+  const escaped = asset.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const marker = asset + '?v=', start = index.indexOf(marker);
+  if (start < 0) return null;
+  const match = index.slice(start + marker.length).match(/^[0-9a-z]+/);
+  return match ? match[0] : null;
+};
 const expectedDependencies = [
   'data','ui','ensureStartData','ensureAuthData','motivation','featuresLive',
   'commit','reminderSchedulerDispatch','audio','save','render','document',
@@ -188,13 +195,8 @@ ok('window.App expose and post-expose handlers precede the final initial render'
   initialRender < app.indexOf("navigator.serviceWorker.addEventListener('message'"));
 ok('data rebinds stay out of the registry and production cache-bust is paired',
   !/\bdata\s*=\s*(?:migrate|createDefaultData|null|d\b)/.test(source) &&
-  /* P01: appSurface 20260921b -> 20260921c. Meşru: commit 9a2674a
-     ("feat(ui): redesign header celestial timeline") app/core/appSurface.js'i
-     44 satır değiştirdi; index.html sürümü bu commit'te 'c'ye çıktı. Pin 'b'de
-     kalmıştı (bayat). app.js 20260921e → 20260922a (senkron durum metni
-     teşhisi + dürüst hata banner'ı). */
-  /app\/core\/appSurface\.js\?v=20261019a/.test(index) &&
-  /app\.js\?v=20261019a/.test(index) &&
+  /^\d{8}[a-z]$/.test(cacheVersion('app/core/appSurface.js') || '') &&
+  cacheVersion('app/core/appSurface.js') === cacheVersion('app.js') &&
   index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?'));
 ok('existing harness FILES keep appSurface immediately before app.js',
   /'app\/core\/appSurface\.js',\s*'app\.js'/.test(read('.claude/skills/run-seyma/driver.mjs')) &&

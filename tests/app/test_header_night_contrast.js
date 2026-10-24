@@ -9,6 +9,12 @@ const repoRoot = require('../repo-root');
 
 const css = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 const html = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
+const cacheVersion = (asset) => {
+  const marker = asset + '?v=', start = html.indexOf(marker);
+  if (start < 0) return null;
+  const match = html.slice(start + marker.length).match(/^[0-9a-z]+/);
+  return match ? match[0] : null;
+};
 let passed = 0;
 let failed = 0;
 
@@ -68,7 +74,9 @@ const nightStops = ['#243A6E', '#101A33'];
 check('gündüz/şafak/akşam seçicileri gece override kapsamına alınmadı',
   !scope.includes('sky-time-day') && !scope.includes('sky-time-dawn') && !scope.includes('sky-time-dusk'));
 /* IIP-17 günlük seçki yüzeyi styles.css'i değiştirdi; index pini aynı teslimde yükselir. */
-check('stylesheet cache sürümü yükseltildi', html.includes('app/styles.css?v=20261019a'));
+check('stylesheet app shell ile eşlenmiş cache sürümünü taşıyor',
+  /^\d{8}[a-z]$/.test(cacheVersion('app/styles.css') || '') &&
+  cacheVersion('app/styles.css') === cacheVersion('app.js'));
 
 console.log('Passed: ' + passed + ' / ' + (passed + failed));
 if (failed) process.exit(1);

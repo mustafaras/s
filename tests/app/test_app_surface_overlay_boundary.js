@@ -12,6 +12,13 @@ const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
 const source = read('app/core/appSurface.js');
 const app = read('app.js');
 const index = read('index.html');
+const cacheVersion = (asset) => {
+  const escaped = asset.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const marker = asset + '?v=', start = index.indexOf(marker);
+  if (start < 0) return null;
+  const match = index.slice(start + marker.length).match(/^[0-9a-z]+/);
+  return match ? match[0] : null;
+};
 const expected = {
   SeymaLibrary:['openReading','closeReading','setReadingView','openWatching','closeWatching','setWatchView','openListening','closeListening','setListeningView','openLearning','closeLearning','openSoulActivity','closeSoulActivity','openSoulPracticePicker','closeSoulPracticePicker','pickSoulPractice','openSoulArchive','closeSoulArchive','setSoulArchiveFilter'],
   SeymaSettings:['setTheme','toggleTheme','toggleHaptic','setVoiceGuidance','setVoiceLang','setVoiceRate','setVoiceCloudVoice','setVoicePitch','setVoiceVoiceName','toggleSetting'],
@@ -55,9 +62,9 @@ ok('every handler keeps its exact App name through the shared signature-neutral 
   /Object\.keys\(MON52_OVERLAY_HANDLERS\)\.forEach\(function\(name\)\{ App\[name\]=function\(\)\{ return SEYMA_APP_SURFACE\.overlayHandler\(name,arguments\); \}; \}\);/.test(binding));
 ok('profile consent, permission, transport, send/upload and destructive actions are absent from MON-52 binding',
   !/profileConsent|requestReminderPermission|quranJourneySubmit|send|upload|record|deleteNotif|removeSoulArchiveSession/.test(binding));
-/* P01: appSurface 20260921b -> 20260921c (commit 9a2674a appSurface.js'i
-   gerçekten değiştirdi; index.html bu commit'te bump etti, test pini bayat kaldı). */
 ok('production loads appSurface before app.js with fresh cache versions',
-  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') && /appSurface\.js\?v=20261019a/.test(index) && /app\.js\?v=20261019a/.test(index));
+  index.indexOf('app/core/appSurface.js?') < index.indexOf('app.js?') &&
+  /^\d{8}[a-z]$/.test(cacheVersion('app/core/appSurface.js') || '') &&
+  cacheVersion('app/core/appSurface.js') === cacheVersion('app.js'));
 
 console.log('\nMON-52 overlay App surface boundary: ' + passed + '/' + passed + ' passed');

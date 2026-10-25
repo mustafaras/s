@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-27",
+  "nextPrompt": "K3PD-28",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -5426,7 +5426,7 @@
           "exitCode": 0,
           "measurements": {
             "publishedVectors": 24,
-            "tolerance": 1e-06
+            "tolerance": 0.000001
           }
         },
         {
@@ -7600,12 +7600,376 @@
     },
     "K3PD-27": {
       "id": "K3PD-27",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "35cf4b1faf4fcb97b9513142a8520eaaf8568a95",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "app/kao.css",
+        "tests/app/test_iip_22.js",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-27/DONDURMA-KANITI.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-27/FONT-KANITI.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-27/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-27/COMMANDS.json"
+      ],
+      "checks": [
+        {
+          "command": "git status --short --branch",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "branch": "k3pd-denetim-duzeltmeleri",
+            "head": "35cf4b1faf4fcb97b9513142a8520eaaf8568a95",
+            "protectedDirtyFiles": 4,
+            "cardChangedPaths": 10,
+            "stagedPaths": 0
+          }
+        },
+        {
+          "command": "git rev-parse HEAD",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "head": "35cf4b1faf4fcb97b9513142a8520eaaf8568a95"
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceDiagnostics": 0
+          }
+        },
+        {
+          "command": "node --check app.js",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "PASS"
+          }
+        },
+        {
+          "command": "node --check sync.js",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "PASS"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearn.js",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "PASS"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnFlow.js",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "PASS"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnViews.js",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "PASS"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/driver.mjs",
+          "env": {
+            "group": "G0",
+            "dump": "unset"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {
+            "group": "G0",
+            "IIP04_RENDER_OUT": "unset"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "assertions": 95,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "cards": 34,
+            "nextPrompt": "K3PD-27",
+            "cardStatus": "ready_for_audit"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-27"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {
+            "group": "G0"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "negativeCases": 33,
+            "k3pdPinPolicyCases": 6,
+            "legacyPinPolicyCases": 6,
+            "syntheticPromptIds": 34
+          }
+        },
+        {
+          "command": "node --check tests/app/test_iip_22.js",
+          "env": {
+            "group": "scope"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "syntax": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_pronunciation_contract.js",
+          "env": {
+            "group": "G3"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "verifiedLemmas": 524,
+            "autoToolDrift": 0,
+            "runtimeCompared": 524,
+            "runtimeMatches": 524,
+            "runtimeDrift": 0,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_phonics_contract.js",
+          "env": {
+            "group": "G3"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "grammarBytes": 72297,
+            "shortSurahBytes": 87335,
+            "phonicsBytes": 9552,
+            "embeddedSvg": 13,
+            "taskTypes": 6,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_freeze_repro.js",
+          "env": {
+            "group": "G3"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "generatedModules": 4,
+            "byteEqual": 4,
+            "productionModuleHashesUnchanged": 4,
+            "skip": false,
+            "tempEntriesBefore": 0,
+            "tempEntriesAfter": 0,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tools/kao/kao-font-subset.mjs",
+          "env": {
+            "group": "G3"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "build": false,
+            "sourceFiles": 12,
+            "contentCodepoints": 70,
+            "supplementalCodepoints": 35,
+            "targetCodepoints": 105,
+            "ranges": 11
+          }
+        },
+        {
+          "command": "fontTools cmap comparison using no-build tool Unicode set",
+          "env": {
+            "group": "G3",
+            "network": "unused"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "fontTools": "4.63.0",
+            "required": 105,
+            "cmapUnique": 105,
+            "matched": 105,
+            "missing": 0,
+            "fontBytes": 25060,
+            "fontSha256": "cdf29cccf459341b9b59744ea2f728b589c839d1175fa094ecdd2bff3eb7a2c6"
+          }
+        },
+        {
+          "command": "node tests/app/test_iip_22.js",
+          "env": {
+            "group": "target"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "assertions": 15,
+            "exactFontUrlRegression": "PASS",
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/app/test_asset_pin_freshness.js",
+          "env": {
+            "group": "scope"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "fresh": 59,
+            "deferred": 4,
+            "blockingStale": 0,
+            "appKaoCssDeferred": true,
+            "deferralIsReleasePass": false,
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "git diff --quiet HEAD -- font/license/three inputs/four generated modules",
+          "env": {
+            "group": "scope"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "fontBinaryChanged": false,
+            "licenseChanged": false,
+            "verifiedInputChanged": false,
+            "productionModulesChanged": false
+          }
+        },
+        {
+          "command": "node - (K3PD-27 exact-path and staged-path comparison)",
+          "env": {
+            "group": "scope"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "expectedPaths": 10,
+            "actualPaths": 10,
+            "missing": 0,
+            "extra": 0,
+            "staged": 0,
+            "protectedDirtyFilesExcluded": 4
+          }
+        },
+        {
+          "command": "shasum -a 256 protected dirty files",
+          "env": {
+            "group": "scope"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "protectedFiles": 4,
+            "protectedHashesMatch": 4
+          }
+        },
+        {
+          "command": "find OS temp for kao-freeze-repro-*",
+          "env": {
+            "group": "G3"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "temporaryEntriesAfter": 0
+          }
+        },
+        {
+          "command": "Fresh independent read-only K3PD-27 exact-diff audit by /root/k3pd27_audit",
+          "env": {
+            "repositoryWrites": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "verdict": "PASS",
+            "filesWritten": 0,
+            "exactScope": "10/10",
+            "protectedHashes": "4/4 match",
+            "G0": "13/13 exit 0",
+            "G3": "4/4 exit 0",
+            "freeze": "4/4 byte-equal",
+            "pronunciation": "524/524; drift 0",
+            "phonics": "PASS",
+            "fontCmap": "105/105",
+            "IIP22": "15/15",
+            "pinFreshness": "59 fresh / 4 deferred / 0 blocking"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check (post-audit closure state)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "nextPrompt": "K3PD-28",
+            "cardStatus": "done",
+            "auditVerdict": "PASS"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki (post-audit closure state)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-28; candidate only; not authorized"
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-27/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-27/DONDURMA-KANITI.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-27/FONT-KANITI.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-27/COMMANDS.json"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-28": {
@@ -7740,7 +8104,8 @@
     "files": [
       "app/core/quranLearn.js",
       "app/core/quranLearnViews.js",
-      "app/core/quranLearnFlow.js"
+      "app/core/quranLearnFlow.js",
+      "app/kao.css"
     ],
     "mainExceptions": []
   },

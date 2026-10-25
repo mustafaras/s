@@ -2,13 +2,13 @@
 
 ## Aktif kartlar — 2026-10-25
 
-- K3PD-26 bağımsız salt-okur `PASS` ile seq153’te kapandı. İlk seq149 denetimindeki iki bulgu (UTC/yerel gün farkı ve parser’ın exact allowlist gereği) kaydedilip düzeltildi; yeniden G0/G1 ve hedef testleri geçti. Dokuz exact path, dört korunan SHA-256 ve seq148–153 durum/kayıt zinciri eşleşiyor.
-- H7 yalnız seçili `[kesim, bugun]` aralığındaki oranla karar verir; önce ve tüm dönem ayrı. Sentetik örnek: seçili 7/13=%53,8 `tutmuyor`; önce 13/13; tüm dönem 20/26=%76,9. Yerel gün sınırı Europe/Istanbul’da ayrıca sınandı.
-- H2 14 günlük pencerelerde ayrı ayrı en az 20 tekrar cevabı ve özgün 5 puan eşiğini korur. H4 R+1 öncesini `LEGACY_INVALID` sayar, geçersiz/eksik sayacı yüzdeye çevirmez. H3 anlık kart özeti; nedensel 30 günlük sonuç değil. H5/H9 proxy olup özgün hipotezler `NOT_MEASURED`; H8 önce/sonra tarihli snapshot yokluğunda `NOT_MEASURED`.
-- G0 13/13, G1 19/19, hedef komutlar 5/5 exit 0. Perf: runtime 137.730 KiB, CSS 15.922 KiB, content 184.591 KiB, p95 6.310 ms, steady 3.041 ms; baseline yazılmadı. Kanıt `kanit/K3PD-26/` altında.
-- K3PD-27 `nextPrompt`/adaydır, `todo` kalır ve bu oturumda uygulanmadı. `releaseApproval=NOT_APPROVED`; `candidateSha=null`. Push, merge, tag ve deploy yapılmadı.
+- K3PD-27 bağımsız salt-okur `PASS` ile seq155’te kapandı. İlk denetimin `PARTIAL` bulguları korunup kullanıcı onaylı exact-path allowlist ve CSS/SW URL düzeltmeleri yapıldı; taze denetçi güncel 10/10 diff’i kabul etti.
+- Yerel QAC/Tanzil/lexicon girdi pinleri ve provenance doğrulandı; ağ/indirme yok. Freeze replay 4/4 modülü bayt-eş üretti; üretim modülü hash değişimi 0, SKIP yok, temp cleanup 0. Araç→girdi→runtime telaffuz 524/524, sapma 0.
+- Font SHA-256 `cdf29cccf459341b9b59744ea2f728b589c839d1175fa094ecdd2bff3eb7a2c6`, 25.060 bayt, cmap 105/105; CSS/SW exact `?v=20261021a`, IIP-22 15/15. OFL 1.1 doğrulandı. Pin freshness 59 taze / 4 ertelenmiş / 0 engelleyici; bu yayın PASS’i değildir.
+- G0 13/13, G3 4/4 ve hedef IIP-22 15/15 exit 0. Exact scope 10/10, staged yol 0, dört korunan dirty dosyanın hash’i 4/4 aynı. Kanıt: [K3PD-27](kanit/K3PD-27/EVIDENCE.md).
+- Açık sınır: 30 zor glifin görsel şekillendirme karşılaştırması K3PD-29’a aittir; insan/cihaz kabulü iddia edilmiyor. `releaseApproval=NOT_APPROVED`, `candidateSha=null`; push/merge/tag/deploy yok.
 
-Sıradaki aday: K3PD-27 (bu bilgi uygulama izni değildir).
+Sıradaki aday: K3PD-28 (yalnız aday; bu oturumda başlamadı ve uygulama izni değildir).
 
 ## Tarihsel K3PD-14 yayın makbuzu
 

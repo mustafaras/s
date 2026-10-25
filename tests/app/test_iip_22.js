@@ -10,6 +10,7 @@ const vm = require('node:vm');
 const root = require('../repo-root');
 const swSource = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const indexSource = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const kaoCssSource = fs.readFileSync(path.join(root, 'app/kao.css'), 'utf8');
 const pagesWorkflowSource = fs.readFileSync(path.join(root, '.github/workflows/pages.yml'), 'utf8');
 
 class SyntheticResponse {
@@ -122,6 +123,15 @@ function test(name, fn) {
     const swVersion = swSource.match(/const SW_VERSION = '([^']+)'/);
     assert.equal(swVersion && swVersion[1], release);
     assert.equal(base.sandbox.swManifestDescriptor().version, `iip22-${release}`);
+  });
+  await test('K3PD-27 Scheherazade font isteği exact offline allowlist URL’siyle eşleşir', () => {
+    const face = kaoCssSource.match(/@font-face\{[^}]*font-family:"K3P Scheherazade"[^}]*\}/);
+    assert.ok(face, 'Scheherazade @font-face kuralı bulunmalı');
+    const src = face[0].match(/src:url\(([^)]+)\)/);
+    assert.ok(src, 'font src URL’si bulunmalı');
+    const requestUrl = new URL(src[1], 'https://example.test/s/app/kao.css').href;
+    assert.equal(base.sandbox.swOfflineRequestKey(new SyntheticRequest(requestUrl)), requestUrl,
+      'fontun tam CSS URL’si SW exact offline manifest allowlist’inde olmalı');
   });
   await test('K3PD plan/state dosyaları Pages runtime artefaktına alınmaz', () => {
     const stage = pagesWorkflowSource.match(/- name: Stage runtime-only site\n        run: \|([\s\S]*?)(?=\n      - name: )/);

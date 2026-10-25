@@ -3,7 +3,7 @@
 /* K3P-07 (K-B): Kur'an yazı tipi — Scheherazade New Regular (SIL OFL, v4.500) alt kümesi.
    Yalnız Arapça + Kur'an işaretleri; `unicode-range` sayesinde dosya ancak Arapça çizilince iner.
    Tam kural: U+0600-06FF, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF. Ağırlık yalnız 400; sahte kalın yok. */
-@font-face{font-family:"K3P Scheherazade";src:url(../assets/kao/font/ScheherazadeNew-Regular.k3p.woff2?v=20261013b)format("woff2");font-weight:400;font-style:normal;font-display:swap;unicode-range:U+0600-06FF,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF}
+@font-face{font-family:"K3P Scheherazade";src:url(../assets/kao/font/ScheherazadeNew-Regular.k3p.woff2?v=20261021a)format("woff2");font-weight:400;font-style:normal;font-display:swap;unicode-range:U+0600-06FF,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF}
 .kao-hub-card{appearance:none;position:relative;isolation:isolate;overflow:hidden;width:100%;min-height:var(--kao-row);padding:16px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface);color:var(--kao-label);display:flex;flex-direction:column;gap:14px;text-align:left;cursor:pointer;box-shadow:none;transition:transform var(--dur-2)}
 
 .kao-hub-card:active{transform:scale(.98)}

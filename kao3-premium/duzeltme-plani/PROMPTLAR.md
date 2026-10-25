@@ -919,7 +919,7 @@ Sadece toplu sayılar bas; kelime, kimlik, not, token ve dosya içeriği sızın
 
 **Oku:** test_kao_freeze_repro.js, üretim araçlarının yan etkileri; gerekli üç girdi; pronunciation/phonics contract; font-subset aracı veOFL.
 
-**Yazma allowlist’i:** Yalnız yeni program kanıtları ve gerekiyorsa freeze fixture’ının dürüst SKIP raporlama adaptörü; üretim içerik/font/okunuş girdileri değişmez.
+**Yazma allowlist’i:** `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu satırın exact-path güncellemesi); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `app/kao.css` (yalnız Scheherazade `@font-face` URL’sinin SW manifest sürümüyle eşitlenmesi); `tests/app/test_iip_22.js` (exact font URL offline regression kontrolü); bu kartın yeni program kanıtları; gerekiyorsa freeze fixture’ının dürüst SKIP raporlama adaptörü. Font binary’si ve üretim içerik/okunuş girdileri değişmez.
 
 **Uygula:**
 

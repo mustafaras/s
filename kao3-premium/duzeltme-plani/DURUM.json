@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-26",
+  "nextPrompt": "K3PD-27",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -5426,7 +5426,7 @@
           "exitCode": 0,
           "measurements": {
             "publishedVectors": 24,
-            "tolerance": 0.000001
+            "tolerance": 1e-06
           }
         },
         {
@@ -7105,12 +7105,497 @@
     },
     "K3PD-26": {
       "id": "K3PD-26",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "4e451288a71ae5123886e5d4ef20e46fca605c50",
+      "changedPaths": [
+        "kao3-premium/araclar/deney-rapor.cjs",
+        "tests/kao/test_k3p_deney_rapor.js",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-26/DENEY-SOZLESMESI.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-26/COMMANDS.json",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-26/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md"
+      ],
+      "checks": [
+        {
+          "command": "git status --short --branch",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.033,
+            "evidenceTail": [
+              " M kao3-premium/duzeltme-plani/PROMPTLAR.md",
+              " M tests/kao/test_k3p_deney_rapor.js",
+              "?? kao3-premium/duzeltme-plani/kanit/K3PD-26/",
+              "?? kao3-premium/kanit/sonraki/GORSEL-KANIT.md",
+              "?? kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf"
+            ]
+          }
+        },
+        {
+          "command": "git rev-parse HEAD",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.005,
+            "evidenceTail": [
+              "4e451288a71ae5123886e5d4ef20e46fca605c50"
+            ]
+          }
+        },
+        {
+          "command": "git diff --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.023,
+            "evidenceTail": []
+          }
+        },
+        {
+          "command": "node --check app.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.051,
+            "evidenceTail": []
+          }
+        },
+        {
+          "command": "node --check sync.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.047,
+            "evidenceTail": []
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearn.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.047,
+            "evidenceTail": []
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnFlow.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.043,
+            "evidenceTail": []
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnViews.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.043,
+            "evidenceTail": []
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/driver.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.273,
+            "evidenceTail": [
+              "PASS  reminder and AEON channels stay disjoint",
+              "PASS  reminder background capability is still reported as unsupported",
+              "PASS  reminder in-app path stays available",
+              "",
+              "Done."
+            ]
+          }
+        },
+        {
+          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.789,
+            "evidenceTail": [
+              "  ✓ Zikir hatırlatmasını açmak zikir sayımını/streak’ini değiştirmiyor",
+              "  ✓ Reminder modülleri zikir harness boot’unda da canlı",
+              "  ✓ Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık",
+              "",
+              "✅ 95/95 assertion pass"
+            ]
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.098,
+            "evidenceTail": [
+              "PASS K3PD state/prompt/log uyumlu · 34 kart · nextPrompt=K3PD-26"
+            ]
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 0.093,
+            "evidenceTail": [
+              "Sıradaki aday: K3PD-26 · K3PD-26 — Deney raporunda dönemleri, vekilleri ve geçersiz geçmişi ayır"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G0",
+            "durationSeconds": 3.799,
+            "evidenceTail": [
+              "PASS test_k3pd_control: valid CLI modes + 33 control negative cases + 34 K3PD and 6 legacy pin-policy cases; source_ready K3PD-11→12 and K3PD-21→22; 34 synthetic prompt IDs; no network or task-checkout writes"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_migration.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.063,
+            "evidenceTail": [
+              "KAO migration: PASS (empty/old/broken/idempotent/orphan/114 surah/onboarding/path)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_migration.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.085,
+            "evidenceTail": [
+              "PASS  kaoUnitSlices kaldırıldı (kullanan kalmadı)",
+              "PASS  panel projeksiyonu yeni taş anahtarlarını sayısal taşır",
+              "PASS  A-6 · tamamlanmış dersin yeni taşınan kelimeleri kaybolmaz: ders tamamlı kalır, veri eşit, sıradaki ders onları tanıştırır",
+              "PASS  A-6 · öksüz kelime yoksa plan değişmez (geri uyum)",
+              "KAO2-16 migration: PASS (15 kontrol)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_fsrs.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.063,
+            "evidenceTail": [
+              "KAO FSRS: PASS (24 published vectors, ±0.000001, monotonic, grade mapping, predictedR)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_queue.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 17.051,
+            "evidenceTail": [
+              "KAO queue: PASS (20 deterministic tasks + 4 candidate types / 3 safe queue types, budgets/KF-9 interleave x1000/semantic spacing)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_requirements.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 21.655,
+            "evidenceTail": [
+              "KAO requirements: PASS (R-A1/A2/A4/A5/A9, R-B1/B5/B8, R-C2/C3/C4/C5/C6; E7 ayarları kalıcı, DİA 524/524; iki yön, bit-bit undo, hedefli 4.544 ms <50 ms)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_render.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.509,
+            "evidenceTail": [
+              "KAO render: PASS (KAO-FIX-13 Arapça yığın, KAO-FIX-12 E7 kaynaklar, KAO-18 44 px + odak + kontrast, E11 namaz, E10 ısı haritası 114 hücre, E8 stüdyo + ikon haritası, hub card, dialog/aria, focus return, grammar/session UI, CSS wiring)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_navigation.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.763,
+            "evidenceTail": [
+              "KAO2 navigation: PASS (yığın geri dönüşü, görünüm başlıkları, kök kapat, Escape sözleşmesi)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_a11y.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 32.728,
+            "evidenceTail": [
+              "PASS  odak halkası ve ≥44px dokunma hedefi CSS sözleşmesinde",
+              "PASS  dar genişlik ve büyük metin için yatay kaydırma koruması var",
+              "PASS  K3P-A8 katlanan \"Daha fazla\" bloğu: doğal <details>/<summary>, ≥44 px özet, kartta tek, içerik kapalı",
+              "",
+              "KAO2-26 erişilebilirlik: 14 kontrol PASS"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_inventory.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.055,
+            "evidenceTail": [
+              "PASS test_kao2_inventory: 84 test + 4 yardımcı/fixture envanterde"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_design_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.376,
+            "evidenceTail": [
+              "KAO2 design: strict weights=4 uppercase=0 deco=0 serif=0 primaryPerView={\"empty/home\":1,\"empty/units\":0,\"empty/word\":0,\"empty/reader\":1,\"empty/settings\":0,\"empty/phonics\":1,\"empty/ayah\":1,\"empty/map\":1,\"empty/prayer\":0,\"empty/stats\":0,\"empty/gate\":0,\"empty/session\":0,\"empty/grammar\":0,\"empty/roots\":0,\"empty/s0\":1,\"empty/sources\":0,\"empty/library\":0,\"empty/unit\":1,\"empty/concept\":1,\"seeded/home\":1,\"seeded/units\":0,\"seeded/word\":0,\"seeded/reader\":1,\"seeded/settings\":0,\"seeded/phonics\":1,\"seeded/ayah\":1,\"seeded/map\":1,\"seeded/prayer\":0,\"seeded/stats\":0,\"seeded/gate\":0,\"seeded/session\":0,\"seeded/grammar\":0,\"seeded/roots\":0,\"seeded/s0\":1,\"seeded/sources\":0,\"seeded/library\":0,\"seeded/unit\":1,\"seeded/concept\":1} switches={\"empty/off\":{\"count\":6,\"missing\":0},\"empty/on\":{\"count\":6,\"missing\":0},\"seeded/off\":{\"count\":6,\"missing\":0},\"seeded/on\":{\"count\":6,\"missing\":0}}",
+              "KAO2 design contract: PASS"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_pronunciation_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.09,
+            "evidenceTail": [
+              "KAO pronunciation contract: PASS (content + task objects + visible paired rendering + K3P-04 okunuş kuralları, araç↔girdi↔çalışma zamanı 524/524)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao_phonics_contract.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.193,
+            "evidenceTail": [
+              "KAO content contract: PASS (E8 stüdyo: 13 SVG gömülü, 6 görev türü, FSRS + dikkat, sessiz mod; grammar=72297, surahs=87335, phonics=9552)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_mount.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 1.057,
+            "evidenceTail": [
+              "mount: 18 render, 9 ders aşaması, 17 ekran geçişi, yeniden kurulum 0",
+              "test_k3p_mount: PASS"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_focus_lock.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.83,
+            "evidenceTail": [
+              "test_k3p_focus_lock: PASS"
+            ]
+          }
+        },
+        {
+          "command": "node tests/app/test_asset_pin_freshness.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 2.934,
+            "evidenceTail": [
+              "  app/core/quranLearnFlow.js?v=20261021a [index.html, sw.js] pin 613a19c0'de kondu; sonra 1 commit (son a0ab4c42 2026-10-24) değişti",
+              "  app/core/quranLearnViews.js?v=20261021a [index.html, sw.js] pin 613a19c0'de kondu; sonra 2 commit (son 2c37602e 2026-10-23) değişti",
+              "  app/core/quranLearn.js?v=20261021a [index.html, sw.js] pin 613a19c0'de kondu; sonra 8 commit (son a0ab4c42 2026-10-24) değişti",
+              "PASS  60 tam taze ?v= bağlantısı (index.html, panel-v2.html, sw.js); 3 erteleme release PASS'i değildir",
+              "asset pin freshness: PASS (1 kontrol)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/app/test_iip_22.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.057,
+            "evidenceTail": [
+              "PASS  kalıcı yüzen Offline paneli kaldırılır; güvenli SW kaydı korunur",
+              "PASS  fetch politikası geniş runtime cache yakalaması yapmaz",
+              "PASS  aktif sayaç/not durumu SW güncellemesinden bağımsızdır",
+              "",
+              "PASS: IIP-22 14/14"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.2,
+            "evidenceTail": [
+              "KAO2 perf: PASS (content 184.591 KiB · runtime 137.730 KiB · css 15.922 KiB · p95 6.310 ms · steady 3.041 ms)"
+            ]
+          }
+        },
+        {
+          "command": "node tools/kao/kao-plan-check.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.058,
+            "evidenceTail": [
+              "kao-plan-check (kod modu — plan arşivde): PASS"
+            ]
+          }
+        },
+        {
+          "command": "node tools/kao/kao-verify-contrast.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "G1",
+            "durationSeconds": 0.082,
+            "evidenceTail": [
+              "  ✓ otomatik · .kao-pronunciation-fold>summary  10.08:1  (≥4.5)",
+              "  ✓ otomatik · .kao-ayah-ladder-line   5.17:1  (≥4.5)",
+              "  ✓ otomatik · .kao-ayah-ladder-line strong   5.17:1  (≥4.5)",
+              "",
+              "756 çift denetlendi (37 elle seçilmiş + 341 otomatik renk bildirimi, × 2 tema), 0 tanesi eşiğin altında."
+            ]
+          }
+        },
+        {
+          "command": "node --check kao3-premium/araclar/deney-rapor.cjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "target",
+            "durationSeconds": 0.048,
+            "evidenceTail": []
+          }
+        },
+        {
+          "command": "node --check tests/kao/test_k3p_deney_rapor.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "target",
+            "durationSeconds": 0.05,
+            "evidenceTail": []
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_deney_rapor.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "target",
+            "durationSeconds": 0.595,
+            "evidenceTail": [
+              "test_k3p_deney_rapor: PASS (H7 dönem/gelecek/boş; H2 19/20 ve 5 puan; H4 legacy/eksik/bozuk; H3/H5/H8/H9 NOT_MEASURED; sızıntı/ağ/yazma 0)"
+            ]
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_pronunciation_fold.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "target",
+            "durationSeconds": 0.131,
+            "evidenceTail": [
+              "PASS  ayar: settings.translit === false ise okunuş HTML'de hiç yok",
+              "PASS  not: katlama notu etkilemez (FSRS aynı)",
+              "PASS  sözleşme: her Arapça satırın okunuş HTML'i vardır; katlama onu gizler, silmez",
+              "PASS  CSS: katlanan okunuşun açılır işaretçisi ve hareket azaltma kuralı var",
+              "test_k3p_19: PASS (15 kontrol — sınır, katlama, ayar, not etkisizliği, sözleşme, CSS)"
+            ]
+          }
+        },
+        {
+          "command": "node kao3-premium/araclar/deney-rapor.cjs --ornek",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "group": "target",
+            "durationSeconds": 0.058,
+            "evidenceTail": [
+              "| H7 | Günlük başarı %80–90 bandında (≥ 5 cevaplı gün) | seçili dönem 2026-02-15→2026-02-28: 7/13 gün bantta (%53,8) · önce: 13/13 gün bantta (%100,0) · tüm dönem (bugüne kadar): 20/26 gün bantta (%76,9) | günlerin ≥ %70'i | tutmuyor |",
+              "| H8 | Anlık snapshot: yarıda kalan ders payı (resume dolu, doneAt boş); kesim uygulanmaz | 2/5 ders yarıda (%40,0) | azalır | NOT_MEASURED: H8 önce/sonra sonucu için tarihli dış snapshot gerekli |",
+              "| H9 | Proxy: hiç unutulmamış kart payı (tekrara geçmiş kartlar); ilk tekrar doğruluğu değil | 7/10 kart hiç unutulmadı (%70,0) | artar | NOT_MEASURED: özgün H9 (ertesi gün ilk tekrar doğruluğu) için olay kaydı yok |",
+              "",
+              "Genel: 14 kart (new 0 · learning 4 · review 10 · relearning 0) · ortalama s 10,4 gün · en az bir kez unutulan %21,4"
+            ]
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-26/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-26/DENEY-SOZLESMESI.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-26/COMMANDS.json"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-27": {

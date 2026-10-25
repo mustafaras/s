@@ -889,7 +889,7 @@ Karar yalnız ölçüm sözleşmesi ise üretim motorunu değiştirme. Motor de�
 
 **Oku:** deney-rapor.cjs project/h2/h3/h4/h5/h7/h8/h9; test_k3p_deney_rapor.js; özgün H2–H9 kayıtları.
 
-**Yazma allowlist’i:** kao3-premium/araclar/deney-rapor.cjs; tests/kao/test_k3p_deney_rapor.js; bu klasörde kanit/K3PD-26/DENEY-SOZLESMESI.md ve kart makbuzları; yeni state/durum/kayıt. Eski tarihsel kayıtlar değişmez.
+**Yazma allowlist’i:** `kao3-premium/araclar/deney-rapor.cjs`; `tests/kao/test_k3p_deney_rapor.js`; `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu satırın exact-path düzeltmesi); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; bu klasörde `kao3-premium/duzeltme-plani/kanit/K3PD-26/DENEY-SOZLESMESI.md` ve kart makbuzları. Eski tarihsel kayıtlar değişmez.
 
 **Uygula:**
 

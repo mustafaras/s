@@ -9,7 +9,8 @@
 //   kimlik atılır. Önce bu alanlar ayrı bir izdüşüme kopyalanır; hesap yalnız ona bakar.
 // Yazmaz: dosya yok, ağ yok. Kelime, metin, kart ya da ders kimliği basmaz; yalnız sayı, yüzde ve tarih.
 // --kesim: "önce/sonra" sınırı (ör. otomatik geçişin cihaza ulaştığı gün). Verilmezse son 14 gün (bugün dahil) "sonra" sayılır.
-// --bugun: başvuru günü. Verilmezse yedekteki son çalışma günü alınır (saat bağımlılığı yok).
+// --bugun: başvuru günü. Verilmezse çalışma ortamının yerel takvim tarihi alınır; gelecek günlükler sayılmaz.
+// --ornek, saatten bağımsız sentetik başvuru gününü kullanır (2026-02-28).
 // --h4-baslangic: H4 için K3PD-02'nin R+1 UTC cohort başlangıcı. Verilmezse H4 ölçümü kapalı kalır; --kesim H4'ü etkilemez.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -37,7 +38,11 @@ const shiftDate = (date, days) => new Date((dayNum(date) + days) * DAY_MS).toISO
 const validDate = (date) => typeof date === 'string' && DATE_RE.test(date) && !isNaN(dayNum(date)) && shiftDate(date, 0) === date;
 const pct = (ratio) => '%' + (ratio * 100).toFixed(1).replace('.', ',');
 const pts = (diff) => (diff >= 0 ? '+' : '−') + Math.abs(diff * 100).toFixed(1).replace('.', ',') + ' puan';
-const isoDay = (v) => (typeof v === 'string' && DATE_RE.test(v.slice(0, 10)) ? v.slice(0, 10) : null);
+const localIsoDate = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const isoDay = (v) => (typeof v === 'string' && validDate(v.slice(0, 10))
+  && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(v) && Number.isFinite(Date.parse(v)) ? v.slice(0, 10) : null);
+const counter = (v) => Number.isSafeInteger(v) && v >= 0;
+const validPair = (v) => isObj(v) && counter(v.n) && counter(v.ok) && v.ok <= v.n;
 
 // İzdüşüm: yalnız izin verilen alanlar. Kart ve ders anahtarları (kimlikler) atılır; değerler dizi olarak tutulur.
 function project(backup) {
@@ -45,12 +50,12 @@ function project(backup) {
   const q = isObj(root) ? root.quranLearn : null;
   if (!isObj(q)) throw new Error('yedekte quranLearn bölümü yok');
   const cards = Object.entries(isObj(q.cards) ? q.cards : {}).filter(([, card]) => isObj(card))
-    .map(([id, c]) => ({ arm: /^w:/.test(id) ? ladderArm(id) : null, s: num(c.s), lapses: num(c.lapses), reps: num(c.reps), state: typeof c.state === 'string' ? c.state : '' }));
+    .map(([id, c]) => ({ arm: /^w:/.test(id) ? ladderArm(id) : null, s: num(c.s), lapses: num(c.lapses), reps: num(c.reps), state: ['new', 'learning', 'review', 'relearning'].includes(c.state) ? c.state : '' }));
   const daily = Object.entries(isObj(q.daily) ? q.daily : {})
-    .filter(([date, row]) => DATE_RE.test(date) && isObj(row))
+    .filter(([date, row]) => validDate(date) && isObj(row))
     .map(([date, row]) => {
-      const bands = isObj(row.calib) && Array.isArray(row.calib.bands) ? row.calib.bands.filter(isObj) : [];
-      const s21 = isObj(row.calib) && isObj(row.calib.s21) ? row.calib.s21 : null;
+      const bands = isObj(row.calib) && Array.isArray(row.calib.bands) ? row.calib.bands.filter(validPair) : [];
+      const s21 = isObj(row.calib) && validPair(row.calib.s21) ? row.calib.s21 : null;
       return {
         date,
         answered: num(row.answered),
@@ -63,7 +68,7 @@ function project(backup) {
     })
     .sort((a, b) => (a.date < b.date ? -1 : 1));
   const lessons = Object.values(isObj(q.path) && isObj(q.path.lessons) ? q.path.lessons : {}).filter(isObj)
-    .map((l) => ({ hasResume: isObj(l.resume), doneAt: typeof l.doneAt === 'string' ? l.doneAt : null }));
+    .map((l) => ({ hasResume: isObj(l.resume), doneAt: isoDay(l.doneAt) ? l.doneAt : null }));
   return { cards, daily, lessons };
 }
 
@@ -77,7 +82,7 @@ function realLessons(lessons) {
 function reviewAccuracy(rows) {
   const n = rows.reduce((sum, r) => sum + r.reviewN, 0);
   const ok = rows.reduce((sum, r) => sum + r.reviewOk, 0);
-  return { n, ratio: n ? ok / n : null };
+  return { n, ok, ratio: n ? ok / n : null };
 }
 
 function h2(daily, today, cut) {
@@ -90,16 +95,17 @@ function h2(daily, today, cut) {
     ? `önce ${pct(before.ratio)} (n=${before.n}) · sonra ${pct(after.ratio)} (n=${after.n}) · fark ${pts(after.ratio - before.ratio)}`
     : `önce n=${before.n} · sonra n=${after.n}`;
   const status = !enough ? `veri az (pencere başına ≥ ${MIN_REVIEWS_PER_WINDOW} tekrar)`
-    : (before.ratio - after.ratio) * 100 <= H2_MAX_DROP ? 'tutuyor' : 'tutmuyor';
+    : (before.ok * after.n - after.ok * before.n) * 100 <= H2_MAX_DROP * before.n * after.n ? 'tutuyor' : 'tutmuyor';
   return { id: 'H2', measure: `Tekrar doğruluğu, kesimden ${WINDOW_DAYS} gün önce/sonra`, value, target: `düşüş ≤ ${H2_MAX_DROP} puan`, status };
 }
 
 // H4 (K3P-19): okunuş s ≥ 21 kartta katlanır; destek çekilirken doğruluk korunuyor mu?
-// Ölçü yalnız s ≥ 21 cevaplarıdır (motor her cevapta sayar, bkz. quranLearn.js calib.s21).
+// Ölçü yalnız K3PD-02/03 uygunluğu sağlanan cevapların R+1 UTC kohortudur.
+// Tarih sınırı dışarıdan verilir; günlük toplamlarından geçmiş uygunluk yeniden kurulamaz.
 function h4(daily, cohortStart) {
   if (!cohortStart) {
     return {
-      id: 'H4', measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk · R+1 cohort',
+      id: 'H4', measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk · R+1 cohort (öncesi LEGACY_INVALID)',
       value: 'ölçüm yok (R+1 başlangıcı verilmedi); legacy H4 dahil edilmedi',
       target: `≥ ${pct(H4_TARGET)}`, status: 'başlangıç gerekli'
     };
@@ -113,26 +119,25 @@ function h4(daily, cohortStart) {
     ? `R+1 ${cohortStart}: ${pct(ok / n)} (${ok}/${n} cevap, ${rows.length} gün) · legacy dışlandı (n=${legacyN})`
     : `R+1 ${cohortStart}: yeni kohortta veri yok · legacy dışlandı (n=${legacyN})`;
   const status = !n ? 'veri yok' : ok / n >= H4_TARGET ? 'tutuyor' : 'tutmuyor';
-  return { id: 'H4', measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk · R+1 cohort', value, target: `≥ ${pct(H4_TARGET)}`, status };
+  return { id: 'H4', measure: 'Okunuşu katlanmış (s ≥ 21) kartlarda doğruluk · R+1 cohort (öncesi LEGACY_INVALID)', value, target: `≥ ${pct(H4_TARGET)}`, status };
 }
 
-function h5(daily, lessons) {
+function h5(daily, lessons, today) {
   const firstStudy = (daily.find((r) => r.answered > 0) || {}).date || null;
   const firstDone = realLessons(lessons).map((l) => isoDay(l.doneAt)).filter(Boolean)
-    .filter((d) => !firstStudy || d >= firstStudy).sort()[0] || null;
+    .filter((d) => d <= today && (!firstStudy || d >= firstStudy)).sort()[0] || null;
   const value = firstStudy && firstDone ? `${dayNum(firstDone) - dayNum(firstStudy)} gün` : 'henüz yok';
-  return { id: 'H5', measure: 'İlk çalışma gününden ilk bitirilen derse (K-G: ders âyetle kapanır)', value, target: 'azalır', status: '14. ve 30. gün raporuyla karşılaştır' };
+  return { id: 'H5', measure: 'Proxy: ilk çalışma gününden ilk bitirilen derse (ilk anlaşılan âyet ölçümü değil)', value, target: 'azalır', status: 'NOT_MEASURED: özgün H5 (ilk anlaşılan âyet) için olay kaydı yok' };
 }
 
-function h7(daily, cut) {
-  const sessions = daily.filter((r) => r.answered >= MIN_ANSWERS_PER_SESSION);
+function h7(daily, cut, today) {
+  const sessions = daily.filter((r) => r.date <= today && r.answered >= MIN_ANSWERS_PER_SESSION);
   const inBand = (rows) => rows.filter((r) => r.correct / r.answered >= FLOW_BAND[0] && r.correct / r.answered <= FLOW_BAND[1]).length;
+  const before = sessions.filter((r) => r.date < cut);
   const after = sessions.filter((r) => r.date >= cut);
-  const all = sessions.length ? inBand(sessions) / sessions.length : null;
-  const value = sessions.length
-    ? `${inBand(sessions)}/${sessions.length} gün bantta (${pct(all)}) · kesimden sonra ${inBand(after)}/${after.length}`
-    : 'oturum yok';
-  const status = !sessions.length ? 'veri yok' : all >= FLOW_TARGET ? 'tutuyor' : 'tutmuyor';
+  const summary = (rows) => rows.length ? `${inBand(rows)}/${rows.length} gün bantta (${pct(inBand(rows) / rows.length)})` : 'oturum yok';
+  const value = `seçili dönem ${cut}→${today}: ${summary(after)} · önce: ${summary(before)} · tüm dönem (bugüne kadar): ${summary(sessions)}`;
+  const status = !after.length ? 'veri yok' : inBand(after) / after.length >= FLOW_TARGET ? 'tutuyor' : 'tutmuyor';
   return { id: 'H7', measure: `Günlük başarı %${FLOW_BAND[0] * 100}–${FLOW_BAND[1] * 100} bandında (≥ ${MIN_ANSWERS_PER_SESSION} cevaplı gün)`, value, target: `günlerin ≥ %${FLOW_TARGET * 100}'i`, status };
 }
 
@@ -140,14 +145,14 @@ function h8(lessons) {
   const started = realLessons(lessons).filter((l) => l.hasResume || l.doneAt);
   const left = started.filter((l) => l.hasResume && !l.doneAt).length;
   const value = started.length ? `${left}/${started.length} ders yarıda (${pct(left / started.length)})` : 'başlanmış ders yok';
-  return { id: 'H8', measure: 'Yarıda kalan ders payı (resume dolu, doneAt boş)', value, target: 'azalır', status: '14. ve 30. gün raporuyla karşılaştır' };
+  return { id: 'H8', measure: 'Anlık snapshot: yarıda kalan ders payı (resume dolu, doneAt boş); kesim uygulanmaz', value, target: 'azalır', status: 'NOT_MEASURED: H8 önce/sonra sonucu için tarihli dış snapshot gerekli' };
 }
 
 function h9(cards) {
   const graduated = cards.filter((c) => c.reps >= 2 && (c.state === 'review' || c.state === 'relearning'));
   const kept = graduated.filter((c) => c.lapses === 0).length;
   const value = graduated.length ? `${kept}/${graduated.length} kart hiç unutulmadı (${pct(kept / graduated.length)})` : 'tekrara geçmiş kart yok';
-  return { id: 'H9', measure: 'İlk tekrar doğruluğu, yaklaşık alt sınır (tekrara geçmiş kartlar)', value, target: 'artar', status: '14. ve 30. gün raporuyla karşılaştır' };
+  return { id: 'H9', measure: 'Proxy: hiç unutulmamış kart payı (tekrara geçmiş kartlar); ilk tekrar doğruluğu değil', value, target: 'artar', status: 'NOT_MEASURED: özgün H9 (ertesi gün ilk tekrar doğruluğu) için olay kaydı yok' };
 }
 
 function overview(cards) {
@@ -168,23 +173,26 @@ function h3(cards) {
     const lapses = reviewed.reduce((sum, card) => sum + card.lapses, 0);
     return `${arm}: n=${group.length}, ortalama s ${mean} gün, unutma ${reps ? pct(lapses / reps) : '—'} (${lapses}/${reps})`;
   }).join(' · ');
-  return { id: 'H3', measure: 'Merdiven (A) ve tanıma (B) kolları', value, target: 'A: daha yüksek s, daha düşük unutma', status: 'Anlık kelime kartı özeti; unutma = toplam lapses/reps (reps > 0); kesim uygulanmaz. 30. gün deney sonucu değildir.' };
+  return { id: 'H3', measure: 'Merdiven (A) ve tanıma (B) kolları', value, target: 'A: daha yüksek s, daha düşük unutma', status: 'Anlık kelime kartı özeti; unutma = toplam lapses/reps (reps > 0); kesim uygulanmaz. 30. gün deney sonucu değildir; nedensel etki NOT_MEASURED.' };
 }
 
 function buildReport(backup, opts) {
   const p = project(backup);
   const cohortStart = opts && opts.h4Start != null ? opts.h4Start : null;
   if (cohortStart != null && !validDate(cohortStart)) throw new Error('H4 R+1 başlangıcı için YYYY-AA-GG biçiminde geçerli bir tarih ver');
-  const today = (opts && opts.today) || (p.daily.length ? p.daily[p.daily.length - 1].date : null);
-  if (!today) throw new Error('yedekte çalışma günü yok (quranLearn.daily boş)');
+  for (const key of ['today', 'cut']) {
+    if (opts && opts[key] != null && !validDate(opts[key])) throw new Error('Kesim/bugün için YYYY-AA-GG biçiminde geçerli bir tarih ver');
+  }
+  if (!p.daily.length && !(opts && opts.today)) throw new Error('yedekte çalışma günü yok (quranLearn.daily boş)');
+  const today = (opts && opts.today) || localIsoDate();
   const cut = (opts && opts.cut) || shiftDate(today, -(WINDOW_DAYS - 1));
   const daily = p.daily.filter((r) => r.date <= today);
   const rows = [
     h2(daily, today, cut),
     h3(p.cards),
     h4(daily, cohortStart),
-    h5(daily, p.lessons),
-    h7(daily, cut),
+    h5(daily, p.lessons, today),
+    h7(daily, cut, today),
     h8(p.lessons),
     h9(p.cards)
   ];
@@ -194,7 +202,7 @@ function buildReport(backup, opts) {
 function render(report, sourceLabel) {
   const lines = [
     'K3P deney raporu · yalnız toplu sayılar (kelime, metin ve kimlik yok)',
-    `kaynak: ${sourceLabel} · bugün ${report.today} · kesim ${report.cut}${report.defaultCut ? ' (varsayılan: son 14 gün)' : ''} · H4 R+1 başlangıcı ${report.h4Start || 'belirtilmedi'}`,
+    `kaynak: ${sourceLabel === 'sentetik örnek (--ornek)' ? sourceLabel : 'kullanıcı yedeği'} · bugün ${report.today} · kesim ${report.cut}${report.defaultCut ? ' (varsayılan: son 14 gün)' : ''} · H4 R+1 başlangıcı ${report.h4Start || 'belirtilmedi'}`,
     '',
     '| # | Ölçü | Değer | Hedef | Durum |',
     '| --- | --- | --- | --- | --- |'
@@ -246,11 +254,12 @@ function parseArgs(argv) {
       if (!validDate(v)) throw new Error(`${a} için YYYY-AA-GG biçiminde geçerli bir tarih ver`);
       opts[a === '--kesim' ? 'cut' : a === '--bugun' ? 'today' : 'h4Start'] = v; i += 1;
     } else if (a !== '--ornek') {
-      if (a.startsWith('--')) throw new Error(`bilinmeyen seçenek: ${a}`);
+      if (a.startsWith('--')) throw new Error('bilinmeyen seçenek');
       opts.file = a;
     }
   }
   if (!opts.sample && !opts.file) throw new Error('kullanım: deney-rapor.cjs --ornek | <yedek.json> [--kesim YYYY-AA-GG] [--bugun YYYY-AA-GG] [--h4-baslangic YYYY-AA-GG]');
+  if (opts.sample && !opts.today) opts.today = '2026-02-28';
   if (opts.sample && !opts.h4Start) opts.h4Start = '2026-02-01'; // yalnız açıkça etiketlenmiş sentetik örneğin başlangıcı
   return opts;
 }
@@ -270,4 +279,4 @@ function main() {
 }
 
 if (require.main === module) process.exitCode = main();
-module.exports = { project, buildReport, render, sampleBackup };
+module.exports = { project, buildReport, render, sampleBackup, localIsoDate };

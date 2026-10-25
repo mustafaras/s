@@ -1,19 +1,14 @@
 # K3PD güncel durum
 
-## Aktif kart — 2026-10-24
+## Aktif kartlar — 2026-10-25
 
-- K3PD-23 ve K3PD-24 done/PASS. K3PD-25 seq139’da onaylanan dar sapma disposition’ı uygulanıp bağımsız salt-okur `ACCEPTED_DEVIATION` hükmüyle seq147’de kapandı. Eski genel totalMC ham NOT_MET kalır; olgun tekrar R1≤%60 etkin PASS hedefidir. G0/G1/G2 ve seq140–146 son kapıları tamamlandı; G1’in dış Playwright yükü altındaki başarısız ölçümleri açıkça kaydedilip yük sonrası flagsiz tekrar exit0 verdi. 22/22 exact scope, 4/4 protected hash PASS. K3PD-26 yalnız adaydır; başlatılmadı.
-- Genel MC payı R1+R2+R4 cevap görevleri, payda her kohorttaki tüm geçerli cevap görevleri; fresh ve established ayrı, isNew görevleri dahil. Ham oranlar aynı: fresh 1010/1087=%92,92 NOT_MET; established 1025/1125=%91,11 NOT_MET. Yalnız bu iki eski hedef seq139 referansıyla `ACCEPTED_DEVIATION`; sonuçlar PASS yapılmıyor. Etkin olgun tekrar hedefi `isNew=false`, s=5/12/40 karışımında R1/(R1+R2+R3+R4)≤%60, A/B birlikte ve ayrıca kırılımlı. R2 MC görünür, R3 build üretim, R4 cloze MC.
-- Tamamlanmış 109 ders yürüyüşü fresh 1010/1087=%92,92 ve established 1025/1125=%91,11 genelMC verdi; ikisi NOT_MET. Karma tam tekrar 814 kart/1324 görevde R1=648/1324=%48,94 PASS; R1/R2/R3/R4=648/388/238/50. Her kohortta 109/109 summary’ye ulaşıldı; partEnd devamı 3/22/20 görev ekledi; integrity ihlali 0. K3PD-24 varsayılan kısmi görüntüsü de ayrı tekrarlandı: fresh 1010/1084, established 1022/1119, mixed 812 kart/1316 görev, R1=648/1316=%49,24; bu snapshot `PARTIAL_BY_DEFAULT_BUDGET_PART_END` olarak işaretlidir.
-- `cift-sik.cjs` doğrudan exit 0 / gate PASS: fresh 1010/1087=%92,92 ve established 1025/1125=%91,11 ham `NOT_MET/ACCEPTED_DEVIATION`; mixed-repeat olgun R1 648/1324=%48,94 PASS. Seq139 atfı görünür. Integrity/coverage/zero-task/bozuk-pool ve R1 ihlalleri nonzero gate üretir; fixture bu negatifleri kontrol eder.
-- Güncel G0 + changed JS syntax: 29/29 exit 0 (syntax 16/16); G1 19 komutun her biri en az bir denemede exit 0 (ilk batch 18/19, perf ilk steady p95=8.223ms>5.0876ms; dış Chromium yükü altındaki ayrı tekrar p95=60.815ms>40ms; yük kalkınca flagsiz izole perf PASS p95=4.402, steady=2.905ms); G2 14/14 exit 0. G2 A-9 220/220, A-10 runtime137.730≤137.75 KiB, CSS15.922≤16, content184.591≤256, p95 5.196≤40ms. Slow-host istisnası veya baseline/evidence yazma kullanılmadı. Seq137 PARTIAL, yeni seq139 kararından önceki hüküm; yeni bağımsız hüküm bekleniyor.
-- `app/core/quranLearn.js`, `quranLearnFlow.js`, scheduler, FSRS/A-B, grading, UI ve `K3P-STATE.json` değişmedi. Önceden kirli KAPANIS/README/görsel kanıt dosyaları korunuyor. Yayın onayı bu kartta tamamlanmaz.
-- Tarihsel distractor seçimi baseline’ı bulunmadığından UNVERIFIABLE; sentetik VM sayımları insan öğrenmesi/kalıcılık/aktarım iddiası değildir. Eski genel hedefler NOT_MET kalır.
-- `releaseApproval=NOT_APPROVED`; push/merge/tag/deploy yapılmadı. K3PD-32/33 sırası ve aday SHA kapısı bu kartta atlanmaz.
+- K3PD-26 bağımsız salt-okur `PASS` ile seq153’te kapandı. İlk seq149 denetimindeki iki bulgu (UTC/yerel gün farkı ve parser’ın exact allowlist gereği) kaydedilip düzeltildi; yeniden G0/G1 ve hedef testleri geçti. Dokuz exact path, dört korunan SHA-256 ve seq148–153 durum/kayıt zinciri eşleşiyor.
+- H7 yalnız seçili `[kesim, bugun]` aralığındaki oranla karar verir; önce ve tüm dönem ayrı. Sentetik örnek: seçili 7/13=%53,8 `tutmuyor`; önce 13/13; tüm dönem 20/26=%76,9. Yerel gün sınırı Europe/Istanbul’da ayrıca sınandı.
+- H2 14 günlük pencerelerde ayrı ayrı en az 20 tekrar cevabı ve özgün 5 puan eşiğini korur. H4 R+1 öncesini `LEGACY_INVALID` sayar, geçersiz/eksik sayacı yüzdeye çevirmez. H3 anlık kart özeti; nedensel 30 günlük sonuç değil. H5/H9 proxy olup özgün hipotezler `NOT_MEASURED`; H8 önce/sonra tarihli snapshot yokluğunda `NOT_MEASURED`.
+- G0 13/13, G1 19/19, hedef komutlar 5/5 exit 0. Perf: runtime 137.730 KiB, CSS 15.922 KiB, content 184.591 KiB, p95 6.310 ms, steady 3.041 ms; baseline yazılmadı. Kanıt `kanit/K3PD-26/` altında.
+- K3PD-27 `nextPrompt`/adaydır, `todo` kalır ve bu oturumda uygulanmadı. `releaseApproval=NOT_APPROVED`; `candidateSha=null`. Push, merge, tag ve deploy yapılmadı.
 
-Sıradaki aday: K3PD-26 (K3PD-25 bağımsız kabul ve kapanış kayıtları tamamlanana kadar açılmaz; bu bilgi uygulama izni değildir).
-
-K3PD-24 bağımsız PASS seq126 ve kapanış kapıları seq127’dedir. K3PD-25 seq128–138, seq139 kararından önceki ölçüm, G2/A-10 onarımı ve bağımsız PARTIAL tarihçesidir; bu kayıtlar geriye dönük değiştirilmedi. Seq139 yeni kullanıcı disposition kararını; seq140–146 uygulama, doğrulama ve belge eşlemesini; seq147 bağımsız `ACCEPTED_DEVIATION` kapanışını kaydeder. Güncel karar, ölçüler ve sınırlamalar [K3PD-25/EVIDENCE.md](kanit/K3PD-25/EVIDENCE.md)’dedir.
+Sıradaki aday: K3PD-27 (bu bilgi uygulama izni değildir).
 
 ## Tarihsel K3PD-14 yayın makbuzu
 

@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-28",
+  "nextPrompt": "K3PD-29",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -7974,12 +7974,248 @@
     },
     "K3PD-28": {
       "id": "K3PD-28",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "status": "done",
+      "baseHead": "9d618532cb9c4c2aed4e93bd81fb465886502ec6",
+      "changedPaths": [
+        "app/core/quranLearnViews.js",
+        "kao3-premium/araclar/akis-olc.cjs",
+        "kao3-premium/araclar/dokunus-olc.cjs",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "kao3-premium/duzeltme-plani/araclar/kapi.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-28/COMMANDS.json",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-28/EVIDENCE.md",
+        "tests/kao/README.md",
+        "tests/kao/test_kao2_a11y.js",
+        "tests/kao/test_k3p_lesson_ayah.js",
+        "tests/kao/test_k3pd_control.js"
+      ],
+      "checks": [
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {
+            "network": "unused",
+            "realUserData": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "thresholdMutations": 13,
+            "finalFixtureInventory": "missing/zero fixture families fail closed"
+          }
+        },
+        {
+          "command": "Read-only actual-render comparison for u10.03",
+          "env": {
+            "network": "unused",
+            "filesystemWrites": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "syntheticFixtureVisibleWords": 25,
+            "actualPlayerCardVisibleWordsWithoutDetailsSummary": 31,
+            "actualPlayerCardVisibleWordsWithDetailsSummary": 33
+          }
+        },
+        {
+          "command": "shasum -a 256 protected dirty files",
+          "env": {
+            "filesystemWrites": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "protectedHashesMatch": "4/4"
+          }
+        },
+        {
+          "command": "node --check app/core/quranLearnViews.js && node --check tests/kao/test_k3p_lesson_ayah.js && node tests/kao/test_k3p_lesson_ayah.js",
+          "env": {
+            "network": "unused",
+            "realUserData": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "controls": 21,
+            "actualLessonStart": true,
+            "firstViewCountsOpenDetailsSummaries": true
+          }
+        },
+        {
+          "command": "node kao3-premium/araclar/akis-olc.cjs --json && node tests/kao/test_k3pd_control.js",
+          "env": {
+            "network": "unused",
+            "realUserData": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "goalFirstViewWords": "fresh 109/109 max10/25 over0; established 109/109 max10/25 over0",
+            "introFirstViewWords": "fresh 518 max42/45; established 499 max42/45",
+            "conceptFirstViewWords": "25 screens each; max41/45",
+            "lessonCoverage": "109/109 started and completed in both cohorts",
+            "controlCases": "33 control negatives + 34 K3PD + 6 legacy pin policy"
+          }
+        },
+        {
+          "command": "node --check tests/kao/test_kao2_a11y.js && node tests/kao/test_kao2_a11y.js",
+          "env": {
+            "network": "unused",
+            "realUserData": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "controls": 14,
+            "goalSummary": "Hedefi ve metni gör",
+            "introConceptSummary": "Daha fazla"
+          }
+        },
+        {
+          "command": "env -u KAO2_WRITE_BASELINE -u KAO2_EVIDENCE_OUT node tests/kao/test_kao2_kabul.js",
+          "env": {
+            "KAO2_WRITE_BASELINE": "unset",
+            "KAO2_EVIDENCE_OUT": "unset"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "A9": "220/220 child files exit 0",
+            "A10": "runtime137.743 KiB; CSS15.921 KiB; content184.591 KiB; p95 4.609 ms; PASS",
+            "A11A12": "device/user gates remain external and pending"
+          }
+        },
+        {
+          "command": "env -u KAO2_WRITE_BASELINE -u KAO2_EVIDENCE_OUT KAO2_ACCEPT_SLOW_HOST=1 node kao3-premium/duzeltme-plani/araclar/kapi.mjs --kart K3PD-28 --yavas",
+          "env": {
+            "network": "unused",
+            "realUserData": false,
+            "KAO2_WRITE_BASELINE": "unset",
+            "KAO2_EVIDENCE_OUT": "unset",
+            "KAO2_ACCEPT_SLOW_HOST": "1"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "G0": "15/15",
+            "G1": "19/19",
+            "G2": "14/14",
+            "G5Current": "6/6",
+            "metricStatus": "PASS; rawPass11; acceptedDeviation3; structuralException1; blocking0",
+            "goal": "fresh/established 109/109; max10/25; over0",
+            "historicalR08": "9/10 historical; current R08 separately PASS",
+            "timeouts": 0,
+            "skipMarkers": 0,
+            "baselineWritten": false
+          }
+        },
+        {
+          "command": "K3PD-28 compareExactScope from kapi.mjs",
+          "env": {
+            "network": "unused",
+            "filesystemWrites": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "declaredPaths": 14,
+            "actualPathsIncludingProtected": 18,
+            "protectedHashesMatched": 4,
+            "stagedPaths": 0,
+            "issues": []
+          }
+        },
+        {
+          "command": "shasum -a 256 protected dirty files",
+          "env": {
+            "filesystemWrites": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "protectedHashesMatched": "4/4"
+          }
+        },
+        {
+          "command": "git diff --check && git diff --cached --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "nextPrompt": "K3PD-28",
+            "stateLogPrompt": "aligned"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --sonraki",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "candidate": "K3PD-28",
+            "authorizesWork": false
+          }
+        },
+        {
+          "command": "K3PD-28 compareExactScope from kapi.mjs",
+          "env": {
+            "filesystemWrites": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "declaredPaths": 14,
+            "actualPathsIncludingProtected": 18,
+            "protectedVerified": 4,
+            "stagedPaths": 0,
+            "issues": []
+          }
+        },
+        {
+          "command": "shasum -a 256 four protected dirty files",
+          "env": {
+            "filesystemWrites": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "baselineMatched": "4/4"
+          }
+        },
+        {
+          "command": "git diff --check && git diff --cached --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "whitespaceErrors": 0
+          }
+        },
+        {
+          "command": "Fresh independent read-only exact-diff audit by /root/k3pd28_audit",
+          "env": {
+            "repositoryWrites": false
+          },
+          "exitCode": 0,
+          "measurements": {
+            "verdict": "PASS",
+            "filesWritten": 0,
+            "exactScope": "14 declared paths; 18 changed including 4 protected",
+            "protectedHashes": "4/4 match",
+            "stagedPathsAtAudit": 0,
+            "currentSlowGate": "G0 15/15; G1 19/19; G2 14/14; current G5 6/6; blockers/timeouts/SKIP 0",
+            "goalMetric": "fresh and established 109/109; maximum 10/25; over limit 0",
+            "closureChecks": "durum --check and git diff --check exit 0"
+          }
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-28/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-28/COMMANDS.json"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-29": {

@@ -1,0 +1,476 @@
+{
+  "schema": "k3pd.card-evidence",
+  "schemaVersion": 1,
+  "date": "2026-10-25",
+  "card": "K3PD-28",
+  "baseHead": "9d618532cb9c4c2aed4e93bd81fb465886502ec6",
+  "branch": "k3pd-denetim-duzeltmeleri",
+  "baseline": {
+    "protectedFiles": {
+      "kao3-premium/KAPANIS.md": "d8e8419e2849b9eec922e537bca7100149fdfee6120ce850fda77128f8af9bcd",
+      "kao3-premium/README.md": "1aee47cdd05726f4a5966748ae3f786bd79d2e394dd37f3ec7b083f2d36eed0f",
+      "kao3-premium/kanit/sonraki/GORSEL-KANIT.md": "d7627027bba21007550f0a5c76130a4d9f11b7b896d001a60e9333c81ffeed28",
+      "kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf": "05ae0071c87c7bad4ed5f050cbb07479e022e912a67ad401b59e00b52ca8811b"
+    }
+  },
+  "commands": [
+    {
+      "command": "node tests/kao/test_k3pd_control.js",
+      "env": {
+        "network": "unused",
+        "realUserData": false
+      },
+      "exitCode": 0,
+      "measurements": {
+        "result": "PASS",
+        "negativeThresholdCases": 13,
+        "finalFixtureInventory": "synthetic missing/zero families fail closed"
+      }
+    },
+    {
+      "command": "node kao3-premium/duzeltme-plani/araclar/kapi.mjs --kart K3PD-28 --yavas",
+      "env": {
+        "network": "unused",
+        "realUserData": false,
+        "KAO2_WRITE_BASELINE": "unset",
+        "KAO2_EVIDENCE_OUT": "unset",
+        "KAO2_ACCEPT_SLOW_HOST": "1"
+      },
+      "exitCode": 1,
+      "measurements": {
+        "result": "FAIL",
+        "G0": "15/15 child exit 0",
+        "G1": "19/19 child exit 0",
+        "G2": "14/14 child exit 0",
+        "G5Current": "6/6 child exit 0",
+        "historicalR08": "exit 1 expected; historical 9/10 PASS",
+        "childTimeouts": 0,
+        "skipMarkers": 0,
+        "exactScope": "PASS; 11 declared paths exact; 4 protected hashes match; staged 0",
+        "priorG3": "PASS; receipt/hashes reused; freeze rerun false",
+        "blockingMetrics": [
+          {
+            "id": "fresh.goalFirstViewWords",
+            "value": 33,
+            "limit": 25,
+            "status": "NOT_MET"
+          },
+          {
+            "id": "established.goalFirstViewWords",
+            "value": 33,
+            "limit": 25,
+            "status": "NOT_MET"
+          }
+        ],
+        "rawPassCount": 9,
+        "acceptedDeviationCount": 3,
+        "structuralExceptionCount": 1,
+        "blockingCount": 2,
+        "freshScreensOver25": "72/109",
+        "establishedScreensOver25": "69/109",
+        "historicalR08Summary": "9/10 PASS; 1 historical R08 FAIL",
+        "currentR08": "PASS",
+        "realRender109": "PASS"
+      }
+    },
+    {
+      "command": "node kao3-premium/duzeltme-plani/araclar/kapi.mjs --final --yavas",
+      "env": {
+        "network": "unused",
+        "realUserData": false,
+        "KAO2_WRITE_BASELINE": "unset",
+        "KAO2_EVIDENCE_OUT": "unset",
+        "KAO2_ACCEPT_SLOW_HOST": "1"
+      },
+      "exitCode": 1,
+      "measurements": {
+        "result": "BLOCKED",
+        "stateCheck": "exit 0",
+        "suiteStarted": false,
+        "suiteCount": 0,
+        "blockers": [
+          "nextPrompt must be K3PD-31 before final regression suite",
+          "K3PD-11:done+accepted-required",
+          "K3PD-21:done+accepted-required",
+          "K3PD-28:done+accepted-required",
+          "K3PD-29:done+accepted-required",
+          "K3PD-30:done+accepted-required"
+        ]
+      }
+    },
+    {
+      "command": "Read-only actual-render comparison for u10.03: synthetic lessonPlan versus kaoLesson('start')",
+      "env": {
+        "network": "unused",
+        "filesystemWrites": false
+      },
+      "exitCode": 0,
+      "measurements": {
+        "syntheticFixtureVisibleWords": 25,
+        "actualPlayerCardVisibleWordsWithoutDetailsSummary": 31,
+        "actualPlayerCardVisibleWordsWithDetailsSummary": 33,
+        "actualPlayerIncludesLessonTitle": true
+      }
+    },
+    {
+      "command": "shasum -a 256 protected dirty files",
+      "env": {
+        "filesystemWrites": false
+      },
+      "exitCode": 0,
+      "measurements": {
+        "protectedHashesMatch": "4/4"
+      }
+    },
+    {
+      "command": "node --check app/core/quranLearnViews.js && node --check tests/kao/test_k3p_lesson_ayah.js && node tests/kao/test_k3p_lesson_ayah.js",
+      "env": {
+        "network": "unused",
+        "realUserData": false
+      },
+      "exitCode": 0,
+      "measurements": {
+        "result": "PASS",
+        "controls": 21,
+        "actualLessonStart": true,
+        "firstViewCountsOpenDetailsSummaries": true
+      }
+    },
+    {
+      "command": "node kao3-premium/araclar/akis-olc.cjs --json && node tests/kao/test_k3pd_control.js",
+      "env": {
+        "network": "unused",
+        "realUserData": false
+      },
+      "exitCode": 0,
+      "measurements": {
+        "goal": "fresh 109/109 max10/25 over0; established 109/109 max10/25 over0",
+        "intro": "fresh 518 max42/45; established 499 max42/45",
+        "concept": "25 screens each; max41/45",
+        "lessonCoverage": "109/109 started and completed in both cohorts",
+        "controlCases": "33 control negatives + 34 K3PD + 6 legacy pin policy"
+      }
+    },
+    {
+      "command": "node kao3-premium/duzeltme-plani/araclar/kapi.mjs --kart K3PD-28 --yavas",
+      "env": {
+        "network": "unused",
+        "realUserData": false,
+        "KAO2_WRITE_BASELINE": "unset",
+        "KAO2_EVIDENCE_OUT": "unset",
+        "KAO2_ACCEPT_SLOW_HOST": "1"
+      },
+      "exitCode": 1,
+      "measurements": {
+        "result": "FAIL after render fix; before a11y assertion update",
+        "G0": "15/15",
+        "G1": "17/19",
+        "G2": "14/14",
+        "goalMetric": "fresh and established 109/109; max10/25; over0",
+        "blockingChildren": [
+          "test_kao2_a11y.js expected previous goal summary",
+          "test_kao2_kabul.js A-9 aggregate 219/220"
+        ],
+        "historicalR08": "9/10 historical; current R08 PASS"
+      }
+    },
+    {
+      "command": "node --check tests/kao/test_kao2_a11y.js && node tests/kao/test_kao2_a11y.js",
+      "env": {
+        "network": "unused",
+        "realUserData": false
+      },
+      "exitCode": 0,
+      "measurements": {
+        "controls": 14,
+        "goalSummary": "Hedefi ve metni gör",
+        "introConceptSummary": "Daha fazla"
+      }
+    },
+    {
+      "command": "env -u KAO2_WRITE_BASELINE -u KAO2_EVIDENCE_OUT node tests/kao/test_kao2_kabul.js",
+      "env": {
+        "KAO2_WRITE_BASELINE": "unset",
+        "KAO2_EVIDENCE_OUT": "unset"
+      },
+      "exitCode": 0,
+      "measurements": {
+        "A9": "220/220",
+        "A10": "runtime137.743 KiB; CSS15.921 KiB; content184.591 KiB; p95 4.609 ms; PASS",
+        "A11A12": "device and user acceptance remain external/pending"
+      }
+    },
+    {
+      "command": "env -u KAO2_WRITE_BASELINE -u KAO2_EVIDENCE_OUT KAO2_ACCEPT_SLOW_HOST=1 node kao3-premium/duzeltme-plani/araclar/kapi.mjs --kart K3PD-28 --yavas",
+      "env": {
+        "network": "unused",
+        "realUserData": false,
+        "KAO2_WRITE_BASELINE": "unset",
+        "KAO2_EVIDENCE_OUT": "unset",
+        "KAO2_ACCEPT_SLOW_HOST": "1"
+      },
+      "exitCode": 0,
+      "measurements": {
+        "result": "PASS",
+        "G0": "15/15",
+        "G1": "19/19",
+        "G2": "14/14",
+        "G5Current": "6/6",
+        "historicalR08": "expected exit1; 9/10 historical PASS; current R08 PASS",
+        "childCounts": "G0 15, G1 19, G2 14, G5 7 including one expected historical diagnostic",
+        "timeouts": 0,
+        "skipMarkers": 0,
+        "baselineWritten": false,
+        "durationApprox": "35 minutes"
+      }
+    },
+    {
+      "command": "K3PD-28 exact-scope comparison via compareExactScope",
+      "env": {
+        "network": "unused",
+        "filesystemWrites": false
+      },
+      "exitCode": 0,
+      "measurements": {
+        "declaredPaths": 14,
+        "actualPaths": 18,
+        "protectedVerified": 4,
+        "stagedPaths": 0,
+        "issues": []
+      }
+    },
+    {
+      "command": "shasum -a 256 kao3-premium/KAPANIS.md kao3-premium/README.md kao3-premium/kanit/sonraki/GORSEL-KANIT.md kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf",
+      "env": {
+        "filesystemWrites": false
+      },
+      "exitCode": 0,
+      "measurements": {
+        "allFourMatchRecordedBaseline": true
+      }
+    },
+    {
+      "command": "git diff --check && git diff --cached --check",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "whitespaceErrors": 0
+      }
+    },
+    {
+      "command": "env -u KAO2_WRITE_BASELINE -u KAO2_EVIDENCE_OUT KAO2_ACCEPT_SLOW_HOST=1 node kao3-premium/duzeltme-plani/araclar/kapi.mjs --final --yavas",
+      "env": {
+        "network": "unused",
+        "realUserData": false,
+        "KAO2_WRITE_BASELINE": "unset",
+        "KAO2_EVIDENCE_OUT": "unset",
+        "KAO2_ACCEPT_SLOW_HOST": "1"
+      },
+      "exitCode": 1,
+      "measurements": {
+        "expected": "BLOCKED before final suite",
+        "stateCheck": "exit0",
+        "suiteStarted": false,
+        "suiteCount": 0,
+        "blockers": [
+          "nextPrompt must be K3PD-31",
+          "K3PD-11 done+accepted required",
+          "K3PD-21 done+accepted required",
+          "K3PD-28 done+accepted required",
+          "K3PD-29 done+accepted required",
+          "K3PD-30 done+accepted required"
+        ]
+      }
+    }
+  ],
+  "measurements": {
+    "status": "READY_FOR_INDEPENDENT_AUDIT",
+    "currentMeasurement": {
+      "source": "node kao3-premium/araclar/akis-olc.cjs --json; kaoLesson(start) actual render",
+      "goalFirstViewWords": {
+        "fresh": {
+          "screens": 109,
+          "max": 10,
+          "limit": 25,
+          "overLimit": 0,
+          "empty": 0
+        },
+        "established": {
+          "screens": 109,
+          "max": 10,
+          "limit": 25,
+          "overLimit": 0,
+          "empty": 0
+        }
+      },
+      "introFirstViewWords": {
+        "fresh": {
+          "screens": 518,
+          "max": 42,
+          "limit": 45,
+          "overLimit": 0
+        },
+        "established": {
+          "screens": 499,
+          "max": 42,
+          "limit": 45,
+          "overLimit": 0
+        }
+      },
+      "conceptFirstViewWords": {
+        "fresh": {
+          "screens": 25,
+          "max": 41,
+          "limit": 45,
+          "overLimit": 0
+        },
+        "established": {
+          "screens": 25,
+          "max": 41,
+          "limit": 45,
+          "overLimit": 0
+        }
+      },
+      "coverage": {
+        "fresh": "109/109 started and completed",
+        "established": "109/109 started and completed"
+      },
+      "entryTouches": 2,
+      "freshOpeningPairOnly": true,
+      "maxPassiveRun": {
+        "fresh": 2,
+        "established": 1
+      }
+    },
+    "fullCardGate": {
+      "status": "PASS",
+      "G0": "15/15",
+      "G1": "19/19",
+      "G2": "14/14",
+      "G5Current": "6/6",
+      "blockingCount": 0,
+      "rawPassCount": 11,
+      "acceptedDeviationCount": 3,
+      "structuralExceptionCount": 1,
+      "timeouts": 0,
+      "skipMarkers": 0,
+      "baselineWritten": false,
+      "historicalR08": "9/10 historical diagnostic; current R08 PASS"
+    },
+    "releaseApproval": "NOT_APPROVED",
+    "candidateSha": null,
+    "commitPushMergeTagDeploy": "not performed",
+    "closureChecks": {
+      "stateAndPromptSync": "PASS; nextPrompt K3PD-29",
+      "exactScope": "PASS; 14 declared, 18 changed including 4 protected",
+      "protectedFiles": "4/4 recorded hashes match",
+      "stagedPaths": 0,
+      "gitDiffCheck": "PASS",
+      "finalPrerequisites": "expected BLOCKED; suiteStarted=false",
+      "independentAudit": "PASS; fresh read-only exact-diff audit"
+    },
+    "independentAudit": "PASS; auditor /root/k3pd28_audit; repositoryWrites=0"
+  },
+  "independentAudit": {
+    "verdict": "PASS",
+    "status": "fresh read-only exact-diff audit completed",
+    "previousVerdict": "PARTIAL on pre-correction diff",
+    "auditor": "/root/k3pd28_audit",
+    "repositoryWrites": 0,
+    "exactScope": "14 declared paths; 18 changed including 4 protected; issues 0",
+    "protectedHashes": "4/4 match",
+    "stagedPathsAtAudit": 0,
+    "userAuthorizedCommit": true,
+    "externalReleaseApproval": "NOT_APPROVED; candidateSha=null until K3PD-32/33"
+  },
+  "closureChecks": {
+    "stateAndPromptSync": "PASS; nextPrompt K3PD-29",
+    "exactScope": "PASS; 14 declared, 18 changed including 4 protected",
+    "protectedFiles": "4/4 recorded hashes match",
+    "stagedPaths": 0,
+    "gitDiffCheck": "PASS",
+    "finalPrerequisites": "expected BLOCKED; suiteStarted=false",
+    "updatedAt": "2026-10-26"
+  },
+  "independentVerdict": "PASS",
+  "preCorrectionFailure": {
+    "status": "FAIL",
+    "metricCount": 15,
+    "rawPassCount": 9,
+    "acceptedDeviationCount": 3,
+    "structuralExceptionCount": 1,
+    "blockingCount": 2,
+    "goalFirstViewWords": {
+      "freshMax": 33,
+      "establishedMax": 33,
+      "limit": 25,
+      "freshOver": 72,
+      "establishedOver": 69
+    },
+    "introFirstViewWordsMax": 42,
+    "conceptFirstViewWordsMax": 41,
+    "freshFirstNoveltyTouch": 2,
+    "establishedFirstNoveltyTouch": 7,
+    "entryTouches": 2,
+    "standardFullLessonTouches": {
+      "observed": 42,
+      "rawLimit": 40,
+      "status": "ACCEPTED_DEVIATION",
+      "decision": "K3PD-23#goalException"
+    },
+    "legacyGeneralRecognition": {
+      "fresh": {
+        "numerator": 1010,
+        "denominator": 1087,
+        "percent": 92.92,
+        "status": "ACCEPTED_DEVIATION"
+      },
+      "established": {
+        "numerator": 1025,
+        "denominator": 1125,
+        "percent": 91.11,
+        "status": "ACCEPTED_DEVIATION"
+      },
+      "matureRepeatR1": {
+        "numerator": 648,
+        "denominator": 1324,
+        "percent": 48.94,
+        "status": "PASS"
+      }
+    },
+    "releaseApproval": "NOT_APPROVED",
+    "candidateSha": null,
+    "commitPushMergeTagDeploy": "not performed"
+  },
+  "priorIndependentAudit": {
+    "auditor": "/root/k3pd28_audit",
+    "verdict": "PARTIAL",
+    "repositoryWrites": 0,
+    "gateFailClosed": "PASS",
+    "goalMetricFinding": "confirmed; actual u10.03 card is 31 visible words before details summary",
+    "legacyFixture": "omits state.title and excludes details summary",
+    "releaseOrCommitAuthorized": false,
+    "appliesTo": "Önceki diff; quranLearnViews düzeltmesi yapılmadan önceki seq159"
+  },
+  "scopeExpansion": {
+    "authorizedAt": "2026-10-25",
+    "source": "user message: tum gereklilikleri yapman için onay ve yetki veriyorum push commmit merge deploy",
+    "activeCard": "K3PD-28",
+    "addedExactPaths": [
+      "app/core/quranLearnViews.js",
+      "tests/kao/test_k3p_lesson_ayah.js",
+      "tests/kao/test_kao2_a11y.js"
+    ],
+    "constraint": "Only goal render and matching first-view/a11y tests; content, data, migration, App handlers, and protected dirty docs unchanged"
+  },
+  "receiptStatus": "CLOSED_PASS_READY_FOR_COMMIT",
+  "nextPrompt": "K3PD-29",
+  "nextCandidate": "K3PD-29 (candidate only; not authorization to execute)",
+  "cardStatus": "done",
+  "openAcceptances": [
+    "K3PD-11/K3PD-21 visual subacceptance depends on K3PD-29.",
+    "K3PD-29 and K3PD-30 remain unstarted; final audit K3PD-31 and candidate/release cards K3PD-32/33 remain open.",
+    "Device, screen-reader, L2, audio230 and empirical learning-effect gates are not established by this local card.",
+    "releaseApproval=NOT_APPROVED; candidateSha=null; K3PD-33 requires approval tied to its exact candidate SHA."
+  ]
+}

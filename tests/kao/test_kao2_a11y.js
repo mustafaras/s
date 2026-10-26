@@ -519,7 +519,9 @@ check('K3P-A8 katlanan "Daha fazla" bloğu: doğal <details>/<summary>, ≥44 px
         const html = decode(t.api.kaoOverlayHTML(t.NOW));
         const folds = [...html.matchAll(/<details class="kao-lesson-more">([\s\S]*?)<\/details>/g)];
         for (const [, inner] of folds) {
-          assert.match(inner, /^\s*<summary>Daha fazla<\/summary>/, `${lesson.id}/${item.kind}: katlanan blok "Daha fazla" özetiyle açılmıyor`);
+          const summary = /^\s*<summary>([\s\S]*?)<\/summary>/.exec(inner);
+          const expectedSummary = item.kind === 'goal' ? 'Hedefi ve metni gör' : 'Daha fazla';
+          assert.equal(summary && summary[1], expectedSummary, `${lesson.id}/${item.kind}: katlanan blok özeti beklenen erişilebilir etiketi taşımıyor`);
           const body = inner.replace(/^\s*<summary>[\s\S]*?<\/summary>/, '');
           assert.ok(body.trim().length > 0, `${lesson.id}/${item.kind}: katlanan blok boş`);
           assert.doesNotMatch(body, /<details\b/, `${lesson.id}/${item.kind}: katlanan blok içinde iç içe <details>`);

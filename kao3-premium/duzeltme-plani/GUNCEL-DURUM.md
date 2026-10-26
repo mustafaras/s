@@ -1,6 +1,6 @@
 # K3PD güncel durum
 
-## Aktif kartlar — 2026-10-25
+## Aktif kartlar — 2026-10-26
 
 - K3PD-27 bağımsız salt-okur `PASS` ile seq155’te kapandı. İlk denetimin `PARTIAL` bulguları korunup kullanıcı onaylı exact-path allowlist ve CSS/SW URL düzeltmeleri yapıldı; taze denetçi güncel 10/10 diff’i kabul etti.
 - Yerel QAC/Tanzil/lexicon girdi pinleri ve provenance doğrulandı; ağ/indirme yok. Freeze replay 4/4 modülü bayt-eş üretti; üretim modülü hash değişimi 0, SKIP yok, temp cleanup 0. Araç→girdi→runtime telaffuz 524/524, sapma 0.
@@ -8,7 +8,10 @@
 - G0 13/13, G3 4/4 ve hedef IIP-22 15/15 exit 0. Exact scope 10/10, staged yol 0, dört korunan dirty dosyanın hash’i 4/4 aynı. Kanıt: [K3PD-27](kanit/K3PD-27/EVIDENCE.md).
 - Açık sınır: 30 zor glifin görsel şekillendirme karşılaştırması K3PD-29’a aittir; insan/cihaz kabulü iddia edilmiyor. `releaseApproval=NOT_APPROVED`, `candidateSha=null`; push/merge/tag/deploy yok.
 
-Sıradaki aday: K3PD-28 (yalnız aday; bu oturumda başlamadı ve uygulama izni değildir).
+K3PD-28 done/PASS: güncel taze bağımsız salt-okur exact-diff denetimi PASS verdi. Tam yavaş kapı exit 0: G0 15/15, G1 19/19, G2 14/14, güncel G5 6/6; blocking 0, timeout/SKIP 0, baseline yazımı yok. Hedef ekranı fresh ve established profilde 109/109, max 10/25, aşım 0. Ham PASS 11; K3PD-25 genel recognition NOT_MET sapmaları (fresh 1010/1087, established 1025/1125) ve K3PD-23 42 dokunuş sapması PASS içine alınmadı; mature-repeat R1 648/1324 PASS. Tarihsel R08 9/10 ayrı, güncel R08 PASS. Denetçi exact scope 14 izinli yol, Git’te 18 değişiklik (4 korunan kirli dosya dahil), hash 4/4, staged 0 ve diff/state kontrolleri PASS doğruladı. Seq158 FAIL ve seq159 PARTIAL eski diffler için append-only; güncel hüküm seq164 PASS. Cihaz, ekran okuyucu, L2, ses kayıtları ve gerçek öğrenme etkisi bu yerel kapının kanıtı değildir. K3PD-11/21 görsel alt kabulü, K3PD-29/30, final K3PD-31 ve aday/yayın K3PD-32/33 açıktır. releaseApproval=NOT_APPROVED, candidateSha=null.
+
+Sıradaki aday: K3PD-29 (yalnız aday; kart promptu kullanıcıdan bu ID ile açıkça başlatma talimatı ister).
+
 
 ## Tarihsel K3PD-14 yayın makbuzu
 

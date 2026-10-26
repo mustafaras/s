@@ -429,8 +429,11 @@ const goalCardOf = (html) => {
   return src.slice(start);
 };
 const firstViewWords = (card) => {
-  const t = String(card).replace(/<details[\s\S]*?<\/details>/g, ' ')
-    .replace(/<[^>]*>/g, ' ').replace(/&[a-z#0-9]+;/g, ' ').replace(/\s+/g, ' ').trim();
+  const firstView = String(card).replace(/<details\b[^>]*>[\s\S]*?<\/details>/g, (details) => {
+    const summary = /<summary\b[^>]*>([\s\S]*?)<\/summary>/.exec(details);
+    return summary ? ' ' + summary[1] + ' ' : ' ';
+  });
+  const t = text(firstView).replace(/\s+/g, ' ').trim();
   return t ? t.split(' ').length : 0;
 };
 
@@ -441,14 +444,17 @@ function goalSweep() {
   const content = { curriculum: t.win.QuranCurriculumV2, lexicon: t.win.QuranLexiconV1, grammar: t.win.QuranGrammarV1, shorts: t.win.QuranShortSurahsV1, phonics: t.win.QuranPhonicsV1 };
   const rows = [];
   for (const lesson of content.curriculum.units.flatMap((unit) => unit.lessons)) {
-    const plan = flow.lessonPlan({ quranLearn: t.data.quranLearn }, lesson.id, new Date(t.NOW), content);
-    const goal = plan.find((item) => item.kind === 'goal' || item.kind === 'partGoal');
+    const q = freshUser(t, { minutes: 15 });
+    for (const key of Object.keys(t.ui)) delete t.ui[key];
+    Object.assign(t.ui, { kaoOpen: false, kaoView: 'home', kaoStack: [], kaoLatency: [6000] });
+    t.api.kaoOpen('home');
+    if (!startLessonForFixture(t, lesson.id)) continue;
+    const state = t.ui.kaoLesson;
+    const plan = state.plan;
+    const goal = plan[state.at || 0];
     if (!goal) continue;
-    t.ui.kaoView = 'session';
-    t.ui.kaoStack = [{ view: 'session' }];
-    t.ui.kaoLesson = { plan: [goal], at: 0, phase: 'lesson', lessonId: lesson.id };
     const card = goalCardOf(t.api.kaoOverlayHTML(t.NOW));
-    rows.push({ lessonId: lesson.id, card, words: firstViewWords(card), goal, plan });
+    rows.push({ lessonId: lesson.id, card, words: firstViewWords(card), goal, plan, title: state.title, q });
   }
   return { t, rows, content, flow };
 }
@@ -457,6 +463,7 @@ const goalSweepResult = goalSweep();
 
 check('K3PD-20 hedef ekranı: 109 dersin TAMAMINDA ilk görünüm ≤25 sözcük', () => {
   assert.equal(goalSweepResult.rows.length, 109, `hedef ekranı sayısı ${goalSweepResult.rows.length}`);
+  for (const row of goalSweepResult.rows) assert.ok(row.title, `${row.lessonId}: gerçek ders başlığı eksik`);
   const over = goalSweepResult.rows.filter((row) => row.words > 25);
   assert.deepEqual(over.map((row) => `${row.lessonId}:${row.words}`), [], '25 sözcüğü aşan hedef ekranları');
   const max = Math.max(...goalSweepResult.rows.map((row) => row.words));
@@ -474,6 +481,9 @@ check('K3PD-20 hedef: uzun hedef cümlesi ve süre vaadi KATLI (ilk görünümde
   const sample = goalSweepResult.rows.find((row) => /kao-lesson-goal-line/.test(row.card));
   assert.ok(sample, 'hedef cümlesi hiçbir yerde yok (içerik kaybı)');
   assert.match(sample.card, /<details class="kao-lesson-more">/, 'hedef cümlesi katlanmış olmalı');
+  const details = /<details class="kao-lesson-more">([\s\S]*?)<\/details>/.exec(sample.card);
+  assert.ok(details && details[1].includes('kao-lesson-apply-tezhip'), 'tam hedef satırı ayrıntıda korunmalı');
+  assert.match(details[1], /<summary>Hedefi ve metni gör<\/summary>/, 'açılır bölümün özeti erişilebilir olmalı');
 });
 
 check('K3PD-20 goal/apply AYNI doğrulanmış satırı paylaşır (gerileme yok)', () => {

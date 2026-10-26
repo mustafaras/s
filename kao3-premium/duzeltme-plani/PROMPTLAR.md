@@ -948,7 +948,7 @@ Araç→verified girdi→runtime 524 eşliğini ve dört modülün bayt-eş yeni
 
 **Oku:** Yeni state; eski kapi-hizli/kapilar kaynakları; akis/dokunus/cift/okunus; tekrar-uret ile güncel denetim; test envanteri.
 
-**Yazma allowlist’i:** Bu klasörde yeni araclar/kapi.mjs ve gerekirse yalnız araclar/olcum-sozlesmesi.mjs; akis-olc/dokunus-olc yalnız ölçüm arayüzü; test_k3pd_control.js; envanter; yeni kayıtlar. Eski program kapılarını tarihen yeniden yazma.
+**Yazma allowlist’i:** Yalnız şu exact paths: `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-28 allowlist satırı); `kao3-premium/duzeltme-plani/araclar/kapi.mjs`; `kao3-premium/araclar/akis-olc.cjs` ve `kao3-premium/araclar/dokunus-olc.cjs` (yalnız ölçüm arayüzü); `app/core/quranLearnViews.js` (yalnız hedef ekranındaki ayet ve açıklamayı erişilebilir ayrıntı bölümüne almak; içerik/handler/data değişmez); `tests/kao/test_k3p_lesson_ayah.js` (yalnız gerçek başlık-summary ilk görünümünü ve açılır satır eşliğini sınamak); `tests/kao/test_kao2_a11y.js` (yalnız yeni goal details özetini doğrulamak); `tests/kao/test_k3pd_control.js`; `tests/kao/README.md`; `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; bu kartın `kanit/K3PD-28/` kanıtları. Eski program kapıları ve üretim içeriği değişmez.
 
 **Uygula:**
 

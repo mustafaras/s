@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
 const { spawnSync } = require('node:child_process');
 
 const repoRoot = require('../repo-root');
@@ -18,6 +19,7 @@ const branch = 'k3pd-denetim-duzeltmeleri';
 const ids = Array.from({ length: 34 }, (_, index) => `K3PD-${String(index).padStart(2, '0')}`);
 const K3PD_BRANCH = 'k3pd-denetim-duzeltmeleri';
 const PINNED_ASSET = 'app/core/quranLearn.js';
+const ACCEPTED_RECOGNITION_REF = 'K3PD-25#recognition-deviation:seq139';
 const runEnv = {
   PATH: process.env.PATH || '/usr/bin:/bin',
   LANG: process.env.LANG || 'C',
@@ -483,3 +485,187 @@ try {
 } finally {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 }
+
+async function testK3pdGateContracts() {
+  const gatePath = path.join(repoRoot, 'kao3-premium/duzeltme-plani/araclar/kapi.mjs');
+  const gate = await import(pathToFileURL(gatePath).href);
+  const promptBefore = '<!-- PROMPT K3PD-28 -->\n**Yazma allowlist’i:** old paths\n**Uygula:** body\n<!-- /PROMPT K3PD-28 -->\n';
+  const promptAfter = promptBefore.replace('old paths', 'new exact paths');
+  assert.equal(gate.sameExceptPromptAllowlist(promptBefore, promptAfter), true, 'only K3PD-28 allowlist line may change');
+  assert.equal(gate.sameExceptPromptAllowlist(promptBefore, promptAfter.replace('**Uygula:** body', '**Uygula:** altered')), false,
+    'changes outside the K3PD-28 allowlist must fail');
+  assert.deepEqual(gate.parseArgs(['--kart', 'K3PD-28', '--yavas']), { mode: 'kart', slow: true });
+  assert.deepEqual(gate.parseArgs(['--final', '--yavas']), { mode: 'final', slow: true });
+  for (const args of [[], ['--kart', 'K3PD-29'], ['--final', 'K3PD-28'], ['--kart', 'K3PD-28', '--kart', 'K3PD-28'],
+    ['--kart', 'K3PD-28', '--yavas', '--yavas'], ['--final', '--unknown']]) {
+    assert.ok(gate.parseArgs(args).error, `invalid gate args should fail: ${args.join(' ')}`);
+  }
+  const inventoryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'k3pd-final-inventory-'));
+  try {
+    assert.throws(() => gate.collectFinalFixtureFiles(inventoryRoot), /required fixture directory missing/,
+      'missing final test family must fail closed');
+    for (const dir of ['tests/kao', 'tests/app', 'tests/panel', 'tests/panel-v2', 'tests/quran']) {
+      fs.mkdirSync(path.join(inventoryRoot, dir), { recursive: true });
+    }
+    assert.throws(() => gate.collectFinalFixtureFiles(inventoryRoot), /required fixture family has zero tests/,
+      'zero final fixtures must fail closed');
+    for (const [dir, name] of [['tests/kao', 'test_fixture.js'], ['tests/app', 'test_fixture.js'],
+      ['tests/panel', 'test_fixture.js'], ['tests/panel-v2', 'test_panel_v2_fixture.js'], ['tests/quran', 'test_fixture.js']]) {
+      fs.writeFileSync(path.join(inventoryRoot, dir, name), '// synthetic fixture inventory only\n');
+    }
+    fs.writeFileSync(path.join(inventoryRoot, 'tests/kao/test_kao_freeze_repro.js'), '// included fixture\n');
+    const inventory = gate.collectFinalFixtureFiles(inventoryRoot);
+    assert.equal(inventory.files.length, 6);
+    assert.equal(inventory.inventory['tests/kao'], 2);
+  } finally {
+    fs.rmSync(inventoryRoot, { recursive: true, force: true });
+  }
+  const accepted = gate.assessUpperBound('synthetic full lesson', 42, 40,
+    { status: 'approved', maximum: 42, reference: 'K3PD-23#goalException' });
+  assert.equal(accepted.status, 'NOT_MET', 'accepted deviation must preserve raw target miss');
+  assert.equal(accepted.disposition, 'ACCEPTED_DEVIATION');
+  assert.equal(accepted.countedAsPass, false, 'accepted deviation must not increase PASS count');
+  assert.equal(gate.assessUpperBound('synthetic missing', Number.NaN, 25).disposition, 'NOT_MEASURED');
+  assert.equal(gate.assessUpperBound('synthetic overflow', 43, 40,
+    { status: 'approved', maximum: 42, reference: 'K3PD-23#goalException' }).disposition, 'NOT_MET');
+
+  const flowProfile = (fresh) => ({
+    lessonCount: 109, startedLessons: 109, completedLessons: 109, coverageComplete: true,
+    maxPassiveRun: fresh ? 2 : 1, maxNoveltyTouch: 7, introductions: 109,
+    freshOpeningPairOnly: fresh ? true : null,
+    visibleText: {
+      goal: { screens: 109, minWords: 19, maxWords: 25, emptyScreens: 0, limit: 25, overLimit: 0 },
+      intro: { screens: 109, minWords: 39, maxWords: 45, emptyScreens: 0, limit: 45, overLimit: 0 },
+      concept: { screens: 109, minWords: 39, maxWords: 45, emptyScreens: 0, limit: 45, overLimit: 0 },
+    },
+  });
+  const flow = {
+    schema: 'k3pd.flow-measurement', schemaVersion: 1, source: 'kaoOverlayHTML:first-view',
+    selectedLesson: { openingToFirstTaskTouches: 2, reachedFirstTask: true, taskCount: 30, maxPassiveRun: 1, maxNoveltyTouch: 2 },
+    profiles: { fresh: flowProfile(true), established: flowProfile(false) },
+  };
+  const touchArm = (maxTouches) => ({ lessonCount: 109, startedLessons: 109, completedLessons: 109, validLessons: 109,
+    coverageComplete: true, minTouches: 30, maxTouches, meanTouches: 40.2,
+    above40: maxTouches > 40 ? 24 : 0, above42: maxTouches > 42 ? 7 : 0 });
+  const touch = {
+    schema: 'k3pd.touch-measurement', schemaVersion: 1,
+    source: 'kaoLesson/kaoAnswer/kaoContinue actual handler sequence', expectedLessonCount: 109, scope: 'all-current-lessons',
+    selectedLesson: { lessonId: 'u01.01',
+      autoAdvanceOff: { started: true, completed: true, total: 72 },
+      autoAdvanceOn: { started: true, completed: true, total: 42 },
+      autoAdvanceOnFromHome: { started: true, completed: true, total: 43 } },
+    profiles: { autoAdvanceOff: touchArm(76), autoAdvanceOn: touchArm(46), autoAdvanceOnFromHome: touchArm(47) },
+  };
+  const recognitionTarget = (numerator, denominator, disposition, deviationRef = null) => {
+    const share = Number((numerator / denominator).toFixed(6));
+    return { numerator, denominator, share, percent: Number((share * 100).toFixed(2)), maxShare: 0.6, maxPercent: 60,
+      status: share <= 0.6 ? 'PASS' : 'NOT_MET', approvedDeviationRef: deviationRef, disposition,
+      decisionRef: 'K3PD-24#recognition:A', binding: disposition === 'PASS' };
+  };
+  const fullRuns = { plannedLessons: 109, startedLessons: 109, completedLessons: 109, coverageComplete: true };
+  const recognition = {
+    schema: 'k3pd.recognition-gate', schemaVersion: 1, decisionRef: 'K3PD-24#recognition:A',
+    gate: { status: 'PASS', exitCode: 0, violations: [] },
+    cohorts: Object.fromEntries(['fresh', 'established', 'mixedRepeat'].map((name) => [name,
+      { lessonCount: 109, validTaskCount: 100, invalidTaskCount: 0, lessonRuns: { ...fullRuns } }])),
+    targets: {
+      legacyGeneralFresh: recognitionTarget(1010, 1087, 'ACCEPTED_DEVIATION', ACCEPTED_RECOGNITION_REF),
+      legacyGeneralEstablished: recognitionTarget(1025, 1125, 'ACCEPTED_DEVIATION', ACCEPTED_RECOGNITION_REF),
+      matureRepeatR1: recognitionTarget(648, 1324, 'PASS'),
+    },
+    approvedDeviation: { status: 'APPROVED', reference: ACCEPTED_RECOGNITION_REF, disposition: 'ACCEPTED_DEVIATION',
+      operativeTarget: 'matureRepeatR1', appliesTo: ['legacyGeneralFresh', 'legacyGeneralEstablished'] },
+  };
+  const decisions = {
+    goalException: { status: 'approved', response: 'A — Hedefi 42\'ye çek', scope: 'limit ≤40 yerine 42', sourceRef: 'Kullanıcı yanıtı 2026-10-24' },
+    recognition: { status: 'approved', approvedDeviationRef: ACCEPTED_RECOGNITION_REF },
+  };
+  const result = gate.evaluateMeasurements(flow, touch, recognition, decisions);
+  assert.equal(result.status, 'PASS', JSON.stringify(result.issues));
+  assert.equal(result.acceptedDeviationCount, 3, 'canonical full-lesson and two recognition deviations remain separate from raw PASS');
+  assert.equal(result.rawPassCount, result.metrics.filter((item) => item.status === 'PASS').length);
+  assert.ok(result.metrics.filter((item) => item.disposition === 'ACCEPTED_DEVIATION').every((item) => !item.countedAsPass));
+
+  const violations = [
+    ['goal', (f) => { f.profiles.fresh.visibleText.goal.maxWords = 26; }],
+    ['intro', (f) => { f.profiles.established.visibleText.intro.maxWords = 46; }],
+    ['concept', (f) => { f.profiles.fresh.visibleText.concept.maxWords = 46; }],
+    ['passive', (f) => { f.profiles.established.maxPassiveRun = 2; }],
+    ['novelty', (f) => { f.profiles.established.maxNoveltyTouch = 8; }],
+    ['entry', (f) => { f.selectedLesson.openingToFirstTaskTouches = 3; }],
+    ['canonical full lesson over approved deviation', (_f, t) => { t.selectedLesson.autoAdvanceOn.total = 43; }],
+    ['new user missing opening policy', (f) => { f.profiles.fresh.freshOpeningPairOnly = false; }],
+    ['missing measure', (f) => { delete f.profiles.established.visibleText.concept; }],
+    ['NaN measure', (f) => { f.profiles.fresh.visibleText.goal.maxWords = Number.NaN; }],
+    ['empty visible render', (f) => { f.profiles.fresh.visibleText.goal.minWords = 0; f.profiles.fresh.visibleText.goal.emptyScreens = 1; }],
+    ['missing render metric', (f) => { delete f.profiles.fresh.visibleText.goal.minWords; }],
+    ['zero fixtures', (f) => { f.profiles.established.completedLessons = 0; f.profiles.established.coverageComplete = false; }],
+  ];
+  for (const [name, mutate] of violations) {
+    const f = structuredClone(flow), t = structuredClone(touch);
+    mutate(f, t);
+    const changed = gate.evaluateMeasurements(f, t, recognition, decisions);
+    assert.equal(changed.status, 'FAIL', `${name} must fail closed`);
+  }
+  const badDecision = structuredClone(decisions);
+  badDecision.goalException.status = 'pending';
+  assert.equal(gate.evaluateMeasurements(flow, touch, recognition, badDecision).status, 'FAIL', 'missing deviation decision must fail');
+  const badRecognition = structuredClone(recognition);
+  badRecognition.targets.matureRepeatR1.numerator = 900;
+  badRecognition.targets.matureRepeatR1.share = Number((900 / 1324).toFixed(6));
+  badRecognition.targets.matureRepeatR1.percent = Number((900 / 1324 * 100).toFixed(2));
+  badRecognition.targets.matureRepeatR1.status = 'NOT_MET';
+  badRecognition.targets.matureRepeatR1.disposition = 'NOT_MET';
+  badRecognition.gate = { status: 'FAIL', exitCode: 1, violations: [{ type: 'target' }] };
+  assert.equal(gate.evaluateMeasurements(flow, touch, badRecognition, decisions).status, 'FAIL', 'recognition target miss must fail');
+  const missingRecognitionCount = structuredClone(recognition);
+  delete missingRecognitionCount.cohorts.fresh.validTaskCount;
+  assert.equal(gate.evaluateMeasurements(flow, touch, missingRecognitionCount, decisions).status, 'FAIL', 'missing recognition numerator must fail');
+  const fractionalRecognitionCount = structuredClone(recognition);
+  fractionalRecognitionCount.targets.matureRepeatR1.numerator = 648.5;
+  assert.equal(gate.evaluateMeasurements(flow, touch, fractionalRecognitionCount, decisions).status, 'FAIL', 'fractional recognition count must fail');
+
+  assert.equal(gate.parseMeasurementPayload('SKIP local input missing', 0, 'k3pd.flow-measurement').ok, false, 'SKIP exit 0 is missing evidence');
+  assert.equal(gate.parseMeasurementPayload('{"schema":"k3pd.flow-measurement","schemaVersion":2}', 0, 'k3pd.flow-measurement').ok, false, 'wrong version must fail');
+  assert.equal(gate.parseMeasurementPayload('{"schema":"k3pd.flow-measurement","schemaVersion":1}', 1, 'k3pd.flow-measurement').ok, false, 'child exit 1 must fail');
+  assert.equal(gate.parseMeasurementPayload('', 0, 'k3pd.flow-measurement').ok, false, 'empty report must fail');
+  assert.equal(gate.parseMeasurementPayload('{"schema":"k3pd.flow-measurement","schemaVersion":1,"value":NaN}', 0, 'k3pd.flow-measurement').ok, false, 'non-JSON NaN must fail');
+
+  const completeState = { program: 'K3PD', status: 'active', branch: K3PD_BRANCH, nextPrompt: 'K3PD-31',
+    cards: Object.fromEntries(Array.from({ length: 31 }, (_unused, i) => {
+    const id = `K3PD-${String(i).padStart(2, '0')}`; return [id, { status: 'done', auditVerdict: 'PASS' }];
+  })), decisions: Object.fromEntries(['h4', 'timeBudget', 'recognition', 'goalException'].map((id) => [id, { status: 'approved' }])),
+    pinDeferral: { branch: K3PD_BRANCH, until: 'K3PD-32', files: ['app/core/quranLearn.js'], mainExceptions: [] },
+    releaseApproval: { status: 'NOT_APPROVED', candidateSha: null } };
+  assert.deepEqual(gate.finalPrerequisites(completeState), []);
+  const missingFinal = structuredClone(completeState);
+  missingFinal.cards['K3PD-29'].status = 'todo';
+  missingFinal.cards['K3PD-30'].status = 'todo';
+  missingFinal.cards['K3PD-21'].status = 'source_ready';
+  assert.ok(gate.finalPrerequisites(missingFinal).some((item) => item.startsWith('K3PD-29')));
+  assert.ok(gate.finalPrerequisites(missingFinal).some((item) => item.startsWith('K3PD-30')));
+  assert.ok(gate.finalPrerequisites(missingFinal).some((item) => item.startsWith('K3PD-21')));
+  const wrongFinalCard = structuredClone(completeState);
+  wrongFinalCard.nextPrompt = 'K3PD-30';
+  assert.ok(gate.finalPrerequisites(wrongFinalCard).some((item) => item.includes('nextPrompt')));
+  const unauthorizedDeferral = structuredClone(completeState);
+  unauthorizedDeferral.pinDeferral.files = ['app/core/*.js'];
+  assert.equal(gate.validatePinPolicy(unauthorizedDeferral.pinDeferral), false, 'wildcard pin deferral must fail');
+  unauthorizedDeferral.pinDeferral = { ...completeState.pinDeferral, branch: 'main' };
+  assert.equal(gate.validatePinPolicy(unauthorizedDeferral.pinDeferral), false, 'main pin deferral must fail');
+  unauthorizedDeferral.decisions.recognition.status = 'pending';
+  assert.ok(gate.finalPrerequisites(unauthorizedDeferral).some((item) => item.startsWith('decision:recognition')));
+
+  const canaries = ['SYNTHETIC_WORD_CANARY', 'SYNTHETIC_ID_CANARY', 'SYNTHETIC_NOTE_CANARY', 'SYNTHETIC_TOKEN_CANARY', 'SYNTHETIC_FILE_CANARY'];
+  flow.debugText = canaries.join(' '); touch.debugText = canaries.join(' '); recognition.debugText = canaries.join(' ');
+  const publicResult = JSON.stringify(gate.evaluateMeasurements(flow, touch, recognition, decisions));
+  for (const canary of canaries) assert.equal(publicResult.includes(canary), false, `${canary} must not leak into the report`);
+  const parseFailure = JSON.stringify(gate.parseMeasurementPayload(`${canaries.join(' ')} SKIP`, 0, 'k3pd.flow-measurement'));
+  for (const canary of canaries) assert.equal(parseFailure.includes(canary), false, `${canary} must not leak in diagnostics`);
+  console.log(`PASS K3PD gate contracts: thresholds ${violations.length}/13 fail-closed; empty render/invalid count/CLI/PROMPT scope; child/SKIP/version/NaN; accepted deviation raw NOT_MET; final evidence and exact pin policy; 5 synthetic leak canaries`);
+}
+
+testK3pdGateContracts().catch((error) => {
+  console.error(`FAIL K3PD gate contracts: ${error.stack || error.message}`);
+  process.exitCode = 1;
+});

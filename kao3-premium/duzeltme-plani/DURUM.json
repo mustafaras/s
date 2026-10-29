@@ -9165,7 +9165,7 @@
       "owner": "user",
       "agentVerified": false,
       "attestedAt": "2026-10-29",
-      "note": "Kullanici 'cihaz kabulunu onayliyorum' dedi; beyan ajan tarafindan dogrulanmadi, kapsam/cihaz ayrintisi verilmedi."
+      "note": "Kullanici 2026-10-29: 'cihaz kabulunu onayliyorum', sonra 'kullandim sorun yok' (canli surum, gercek kullanim). Beyan ajan tarafindan dogrulanmadi; cihaz modeli/sure/kapsam belirtilmedi."
     },
     "screenReader": {
       "status": "pending",

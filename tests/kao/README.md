@@ -107,13 +107,4 @@ K2F-41 / D2F-08 tarihsel ölçümü 82 test dosyasıydı. Güncel `node tests/ka
 
 ## Ardıl K3PD kontrol düzlemi
 
-- `test_k3pd_control.js` — K3PD-00 `durum.mjs` CLI'si için ağsız sentetik repo
-- `test_k3pd_skip_marker.js` — K3PD kapısının `detectSkipMarker` kuralı: satır başı gerçek SKIP bildirimi yakalanır, test adındaki "skip" kelimesi (ör. "skip targets", "yoksa SKIP") atlama sayılmaz. Ağsız, sentetik.
-  fixture'ı. 34 prompt kimliği, karar/kanıt/sıra sözleşmesi, `nextPrompt`,
-  legacy K3P kapanışı, exact branch/pin sınırı, log append-only davranışı ve
-  bozuk state/prompt durumlarında nonzero çıkışı gerçek child process ile sınar.
-  K3PD-28 devamı: ölçü sözleşmesinin negatif eşik/eksik/NaN/SKIP/yanlış sürüm
-  testleri, seq139/seq114 sapmalarının ham NOT_MET ayrımı, K3PD-32 öncesi final
-  blokajı ve sentetik sızıntı canary'leri; gate yalnız sentetik harness raporlarını
-  ve 109 ders dağılımını ölçer, K3PD-23'ün 40/42 kabulünü sadece u01.01'de uygular.
-
+Arşivlendi (2026-10-29): `test_k3pd_control.js` ve `test_k3pd_skip_marker.js` K3PD kontrol düzlemini (`durum.mjs`, `kapi.mjs`) sınıyordu; araçlarla birlikte `mustafaras/seyma-arsiv` deposuna (`kod-deposundan/tests/`, `kao3-premium/`) taşındı. Canlı K3P fixture'ları (`test_k3p_*.js`) bu klasörde kalır; araçları `tools/kao3/` altındadır.

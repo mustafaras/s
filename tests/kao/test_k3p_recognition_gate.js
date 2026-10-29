@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
-const gate = require('../../kao3-premium/araclar/cift-sik.cjs');
+const gate = require('../../tools/kao3/cift-sik.cjs');
 
 assert.equal(gate.SCHEMA, 'k3pd.recognition-gate');
 assert.equal(gate.SCHEMA_VERSION, 1);
@@ -108,7 +108,7 @@ assert.equal(gate.evaluateGate({ legacy: acceptedDeviation, repeat: repeatPass }
   'onaylı hedef sapması integrity ihlalini gizleyemez');
 
 const cli = spawnSync(process.execPath, [
-  path.join(__dirname, '..', '..', 'kao3-premium', 'araclar', 'cift-sik.cjs'), '--json'
+  path.join(__dirname, '..', '..', 'tools', 'kao3', 'cift-sik.cjs'), '--json'
 ], { encoding: 'utf8', env: { ...process.env, KAO2_EVIDENCE_OUT: '' } });
 assert.equal(cli.status, 0, `seq139 sapma kararı ve R1 PASS ile --json geçmeli; stderr=${cli.stderr}`);
 const machine = JSON.parse(cli.stdout);

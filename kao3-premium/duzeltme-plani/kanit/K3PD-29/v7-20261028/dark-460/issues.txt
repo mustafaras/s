@@ -1,3 +1,0 @@
-v05-reader @460px: KAYDIRMALI-ALAN(bilgi) | div.kao-surah-picker | NâsFelakİhlâsTebbetNasrKâfirûnKevserMâûn | sw=1519 cw=428
-o2-ilk-acilis-2 @460px: KISALTILMIS-METIN(bilgi) | span.sey-hdr-wx-label | hava bekleniyor | sw=94 cw=85
-o2-ilk-acilis-2 @460px: KISALTILMIS-METIN(bilgi) | div | Tatil günlerinde su hedefi 10 bardak, se | sw=278 cw=276

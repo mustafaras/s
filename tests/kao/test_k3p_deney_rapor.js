@@ -7,7 +7,7 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const root = require('../repo-root');
 
-const tool = path.join(root, 'kao3-premium', 'araclar', 'deney-rapor.cjs');
+const tool = path.join(root, 'tools', 'kao3', 'deney-rapor.cjs');
 const R = require(tool);
 const fs = require('node:fs');
 const vm = require('node:vm');

@@ -1,3 +1,0 @@
-# Birleşik harf · güvenli sentetik denemeler
-
-`../build-combined-safe.mjs` token alanını okumadan, geçici profilde gerçek üreticiyle oluşturulmuş build görevinde iki doğru harfi seçer. Açık/koyu 320/390/460 ve açık 390/+34 inset için 7/7 koşumda iki seçili harf tek RTL span'dadır ve K3P fontu yüklenmiştir. `BUILD.json`, görüntü SHA-256'sını, CDP ile sunulmuş kaynakların SHA-256 listesini ve ilgili üretim dosyalarının hashlerini içerir; yedi görüntü ve kaynak envanteri çalışma ağacına karşı kontrol edildi. Bu tek görev örneği, bütün harf/görev kombinasyonları veya fiziksel cihaz testi değildir.

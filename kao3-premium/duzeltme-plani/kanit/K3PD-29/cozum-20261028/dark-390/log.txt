@@ -1,4 +1,0 @@
-origin: http://127.0.0.1:9000 token:false force:null safeAreaBottom:0
-tmp-profil: temizlendi=0 önek=k3pd29-resolved-dark-390|k3pd29-resolved-dark-390-onb|k3pd29-resolved-dark-390-glif
-tema: {"expected":"dark","dataTheme":"dark","surface":"#151C28","ink":"#E8EBF2","onb":null}
-l25-summary: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=154 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=8fafa3ec6be3 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Ders tamamlandı Yalnız sana Bu derste tanıştıkların Kur’an kapsamı +%0.00 · iki yönde ka

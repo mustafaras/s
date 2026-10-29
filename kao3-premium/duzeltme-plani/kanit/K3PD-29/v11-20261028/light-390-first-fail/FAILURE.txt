@@ -1,1 +1,0 @@
-exit 1, first attempt: TypeError: window.createDefaultData is not a function in glyph profile setup (shoot-modal.mjs:821). Four other screenshot jobs and a broad regression suite were running concurrently. Possible resource/timing sensitivity; root cause not proven. No manifest generated. Partial images retained.

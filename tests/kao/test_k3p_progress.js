@@ -111,7 +111,7 @@ check('5 bölümlü ilerleme çubuğu: role=progressbar, 5 segment, aria-valuema
 //   (c) sticky/safe-area sözleşmesi korunuyor,
 //   (d) 29 için ölçüm sözleşmesi (x/y/w/h, görünürlük, örtüşme, odak, ≤8 px) tanımlı ve doğrulanabilir.
 const { execFileSync } = require('node:child_process');
-const contractTool = require('node:path').join(repoRoot, 'kao3-premium', 'araclar', 'eylem-geometri.cjs');
+const contractTool = require('node:path').join(repoRoot, 'tools', 'kao3', 'eylem-geometri.cjs');
 const syntheticGeometryMatrix = (c) => c.stages.flatMap((stage) => c.viewports.flatMap((viewport) =>
   (viewport.safeAreaBottom ? ['light'] : ['light', 'dark']).flatMap((theme) =>
     (stage.stage === 'practice' ? ['mc', 'build', 'cloze'] : ['default']).flatMap((variant) => [1, 2].map((render) => ({

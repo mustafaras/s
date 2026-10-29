@@ -1,8 +1,14 @@
 # K3PD güncel durum
 
+Seq 212: K3PD-30 `done/PASS` (bağımsız denetim, belge/kayıt kapsamı). Sıradaki aday K3PD-31 (başlatılmadı). Zincir dışı yayın `releaseOutOfChain` alanında açık borç olarak kayıtlı.
+
+Seq 211b: Kullanıcı 2026-10-29'da "cihaz kabulünü onaylıyorum" dedi. `externalGates.device` = verified / `user_attested` (ajan doğrulaması yok, cihaz/kapsam ayrıntısı verilmedi). Ekran okuyucu, L2, 230 kayıt ve öğrenme etkisi açık.
+
+Seq 211: 746ecdd2 kullanıcı talimatıyla (zincir dışı) main'e yayınlandı, pin 20261029a, Pages run 40863074376 success, 6 dosya SHA eşit; `releaseApproval=NOT_APPROVED` değişmedi. K3PD-30 belgeleri yazıldı (ready_for_audit). [Matris](kanit/K3PD-30/K3P-37-YENIDEN-DENETIM.md), [not](kanit/K3PD-30/DUZELTME-NOTU.md).
+
 Seq 208: K3PD-29 kullanıcı kabulüyle `done/ACCEPTED_DEVIATION`: kullanıcı görselleri inceledi, source kontrolü temiz; yeni görsel üretilmedi. Bağımsız denetim PARTIAL idi ve PASS sayılmaz (217 sahne G4 hükmü, Shift+Tab/Escape klavye koşumu, kayıtlı yeşil geniş kapı açık). K3PD-11/21 görsel alt kabulü aynı şekilde kapandı. Cihaz/ekran okuyucu/L2 yok, yayın yok, `releaseApproval=NOT_APPROVED`.
 
-Sıradaki aday: K3PD-30 (yalnız aday; başlatılmadı).
+Sıradaki aday: K3PD-31 (yalnız aday; başlatılmadı).
 
 Seq 207: Taze denetim 29 PARTIAL buldu; ek gerçek Tab koşumu 7×11 senaryo, 147 hedef, 308 tuş olayı kaydetti ve yeniden inceleniyor. Önceki dört eksik koşu korunuyor; 29 ve yayın henüz kapanmadı. [Kanıt](kanit/K3PD-29/v11-20261028/README.md).
 

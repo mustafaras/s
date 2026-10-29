@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-30",
+  "nextPrompt": "K3PD-31",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -8954,13 +8954,37 @@
     },
     "K3PD-30": {
       "id": "K3PD-30",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
-      "acceptanceDependencies": []
+      "status": "done",
+      "baseHead": "746ecdd256b26129c587104050b5e9cb716150c2",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-30/K3P-37-YENIDEN-DENETIM.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-30/DUZELTME-NOTU.md"
+      ],
+      "checks": [
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runtimeKiB": 137.743,
+            "cssKiB": 15.953,
+            "contentKiB": 184.591
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        }
+      ],
+      "auditVerdict": "PASS",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-30/K3P-37-YENIDEN-DENETIM.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-30/DUZELTME-NOTU.md"
+      ],
+      "acceptanceDependencies": [],
+      "notes": "Bagimsiz salt-okur denetim: ilk tur PARTIAL (4 bulgu), duzeltmeler sonrasi PASS (belge/kayit kapsaminda). Pages run/6 dosya SHA ve 3 zaman asimi dosyasinin tek tek exit 0 iddiasi denetcide yeniden uretilmedi. 136 KiB karar metni guncellemesi K3PD-31e ertelendi. Yayin zincir disi; releaseApproval degismedi."
     },
     "K3PD-31": {
       "id": "K3PD-31",
@@ -9071,10 +9095,12 @@
   },
   "externalGates": {
     "device": {
-      "status": "pending",
-      "evidenceLevel": "none",
+      "status": "verified",
+      "evidenceLevel": "user_attested",
       "owner": "user",
-      "agentVerified": false
+      "agentVerified": false,
+      "attestedAt": "2026-10-29",
+      "note": "Kullanici 'cihaz kabulunu onayliyorum' dedi; beyan ajan tarafindan dogrulanmadi, kapsam/cihaz ayrintisi verilmedi."
     },
     "screenReader": {
       "status": "pending",
@@ -9121,5 +9147,14 @@
     "releaseApproval": "APPROVED-2026-10-18",
     "completedCards": 37,
     "totalCards": 37
+  },
+  "releaseOutOfChain": {
+    "sha": "746ecdd256b26129c587104050b5e9cb716150c2",
+    "pin": "20261029a",
+    "pagesRun": "40863074376",
+    "pagesConclusion": "success",
+    "authorizedBy": "user instruction 2026-10-29 (commit/push/merge/deploy)",
+    "date": "2026-10-29",
+    "knownDebt": "releaseApproval=NOT_APPROVED ile fiili yayin uyumsuz; K3PD-31/32/33 zinciri izlenmedi. Bilincli acik borc; releaseApproval degistirilmedi."
   }
 }

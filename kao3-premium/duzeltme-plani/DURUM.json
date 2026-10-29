@@ -9168,22 +9168,28 @@
       "note": "Kullanici 2026-10-29: 'cihaz kabulunu onayliyorum', sonra 'kullandim sorun yok' (canli surum, gercek kullanim). Beyan ajan tarafindan dogrulanmadi; cihaz modeli/sure/kapsam belirtilmedi."
     },
     "screenReader": {
-      "status": "pending",
-      "evidenceLevel": "none",
+      "status": "verified",
+      "evidenceLevel": "user_attested",
       "owner": "user",
-      "agentVerified": false
+      "agentVerified": false,
+      "attestedAt": "2026-10-29",
+      "note": "Kullanici 2026-10-29: 'bunlari da yaptim sorun yok' (ekran okuyucu, L2, 230 kayit maddesine yanit). Beyan ajan tarafindan dogrulanmadi; kapsam/arac/kayit ayrintisi verilmedi."
     },
     "L2": {
-      "status": "pending",
-      "evidenceLevel": "none",
+      "status": "verified",
+      "evidenceLevel": "user_attested",
       "owner": "user",
-      "agentVerified": false
+      "agentVerified": false,
+      "attestedAt": "2026-10-29",
+      "note": "Kullanici 2026-10-29: 'bunlari da yaptim sorun yok' (ekran okuyucu, L2, 230 kayit maddesine yanit). Beyan ajan tarafindan dogrulanmadi; kapsam/arac/kayit ayrintisi verilmedi."
     },
     "audio230": {
-      "status": "pending",
-      "evidenceLevel": "none",
+      "status": "verified",
+      "evidenceLevel": "user_attested",
       "owner": "user",
-      "agentVerified": false
+      "agentVerified": false,
+      "attestedAt": "2026-10-29",
+      "note": "Kullanici 2026-10-29: 'bunlari da yaptim sorun yok' (ekran okuyucu, L2, 230 kayit maddesine yanit). Beyan ajan tarafindan dogrulanmadi; kapsam/arac/kayit ayrintisi verilmedi."
     },
     "study14": {
       "status": "pending",

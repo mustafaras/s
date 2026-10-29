@@ -1,5 +1,7 @@
 # K3PD güncel durum
 
+Seq 221: Kullanıcı ekran okuyucu, L2 ve 230 ses kaydı kapılarını yaptığını beyan etti ("bunları da yaptım sorun yok"). Üçü `verified / user_attested` (ajan doğrulaması yok, ayrıntı verilmedi). study14/study30 (öğrenme etkisi) zamana bağlı veri ister ve pending kalır.
+
 Seq 220: Kullanıcı canlı sürümü cihazda kullandı: "kullandım sorun yok". `externalGates.device` notu güncellendi (user_attested; ajan doğrulaması yok, cihaz/süre/kapsam belirtilmedi).
 
 Seq 217–219: K3PD-32 ve K3PD-33 `done/ACCEPTED_DEVIATION`; program `released` (aday 746ecdd2, pin 20261029a, run 40863074376 success, 66/66 SHA eşit). Sapmalar: yeni pin aracı yok, onay önceden sorulmadı, 31 teknik final PASS değil. Açık: ekran okuyucu, L2, 230 kayıt, öğrenme etkisi; deney-rapor.cjs eski cutoff sabitleri. [Kanıt](kanit/K3PD-33/EVIDENCE.md).

@@ -1954,3 +1954,9 @@ K3P 37 kart matrisi ve düzeltme notu yazıldı; yayın zincir dışı kullanıc
 <!-- K3PD-RECORD {"seq":212,"cardId":"K3PD-30","type":"card","date":"2026-10-29","baseHead":"746ecdd256b26129c587104050b5e9cb716150c2","scope":["kao3-premium/duzeltme-plani/kanit/K3PD-30/K3P-37-YENIDEN-DENETIM.md","kao3-premium/duzeltme-plani/kanit/K3PD-30/DUZELTME-NOTU.md"],"commands":[{"command":"node tests/kao/test_kao2_perf_budget.js","env":{},"exitCode":0,"measurements":{"runtimeKiB":137.743,"cssKiB":15.953,"contentKiB":184.591}},{"command":"node kao3-premium/duzeltme-plani/araclar/durum.mjs --check","env":{},"exitCode":0,"measurements":{}}],"measurements":{"cards":37,"findings":14,"auditRounds":2},"auditVerdict":"PASS","openAcceptances":["K3PD-31 final denetimi","136 KiB karar metni guncellemesi","releaseApproval/fiili yayin uyumsuzlugu (releaseOutOfChain)","ekran okuyucu, L2, 230 kayit"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-30/K3P-37-YENIDEN-DENETIM.md","kao3-premium/duzeltme-plani/kanit/K3PD-30/DUZELTME-NOTU.md"],"cardStatus":"done","nextCandidate":"K3PD-31"} -->
 
 Bağımsız denetim PARTIAL → düzeltme → PASS (belge/kayıt kapsamı). Kullanıcı ayrıca cihaz kabulünü beyan etti (user_attested, ajan doğrulaması yok).
+
+
+## seq 213 · K3PD-31 · Final denetim başladı
+<!-- K3PD-RECORD {"seq":213,"cardId":"K3PD-31","type":"card","date":"2026-10-29","baseHead":"df50e5dc4626e069a4c0dab6de417b6983160fc0","scope":["kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"commands":[],"measurements":{},"auditVerdict":"NOT_MEASURED","openAcceptances":["genis yavas kapi calisiyor","bagimsiz final denetim bekliyor"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"cardStatus":"in_progress","nextCandidate":"K3PD-31"} -->
+
+Kullanıcı açık kalanların kapatılmasını istedi; K3PD-31 başladı.

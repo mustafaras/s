@@ -22,7 +22,7 @@ Başlangıçta kirli KAPANIS.md, README.md ve izlenmeyen kanit/sonraki/GORSEL-KA
 - App.kao* tam 45; yeni handler yok. Mevcut action çoğaltıcıları kullanılır.
 - migrate(), sync.js ve kişisel veri yazısı kapsam dışı. İşlevsel data kullanımını bütünsel yasak sayma; cards/due/reps/şema değişikliği yalnız kartın açık sözleşmesi kadar olabilir.
 - Kalıcı yeni alan yalnız alan bazlı açık karar;02 dışında şema kararı verilmiş sayılmaz. Eski s21 sayacı düzeltilmiş tarihsel veri değildir.
-- Runtime tavan 136 KiB, CSS16 KiB, içerik 256 KiB; eski 4 modül 176 KiB/müfredat 48 KiB, font 150 KiB alt tavanları korunur. GzipL6 veL9 ayrı yazılır. Tavanı kod/testi geçsin diye artırma.
+- Runtime tavan **137,75 KiB** (kullanıcı onaylı kademeli yükseltme: 136→137→137,25→137,5→137,625→137,75; kaynak `tests/kao/test_kao2_perf_budget.js` başlık yorumu; 2026-10-29 düzeltmesi, bkz. kanit/K3PD-30/DUZELTME-NOTU.md), CSS16 KiB, içerik 256 KiB; eski 4 modül 176 KiB/müfredat 48 KiB, font 150 KiB alt tavanları korunur. GzipL6 veL9 ayrı yazılır. Tavanı kod/testi geçsin diye artırma.
 - Varsayılan test ortamı ağsız sentetik Node/VM’dir. Gerçektoken/hesap/storage ve seyma-data okunmaz/yazılmaz. Yalnız 29 açıkça verildiğinde kontrollü yeni görselQA; yalnız 33 aday-onayından sonra yayın/ağGET.
 - Tarihsel onaylar yalnız kendi yayınlarına aittir. Bu ardıl program LOCAL_ONLY başlar; releaseApproval=NOT_APPROVED.
 - Eski program kayıtları geçmişi korur; yeni durum/kanıtlar bu klasöre aittir. Yeni branch k3pd-denetim-duzeltmeleri; main’de üretim yazımı yok.01 kurulmadan pinli üretim dosyası değiştirilemez.
@@ -1038,7 +1038,7 @@ Daha önce kirli KAPANIS/README/GORSEL-KANIT içeriğini yeniden oku ve hash/dif
 
 **Oku:** DENETLEYICI tam metni;30 matrisi; bütün karar ve kanıtlar; canlı Gitdiff ve source/testler.
 
-**Yazma allowlist’i:** Bu klasörde kanit/K3PD-31/FINAL-DENETIM.md ve kartın diğer makbuzları; yeni state/durum/kayıt. Kod/test/eşik/pin değişikliği bu kartta yasak.
+**Yazma allowlist’i:** `kao3-premium/duzeltme-plani/PROMPTLAR.md` (yalnız bu K3PD-31 allowlist satırı); `kao3-premium/duzeltme-plani/DURUM.json`; `kao3-premium/duzeltme-plani/GUNCEL-DURUM.md`; `kao3-premium/duzeltme-plani/KAYIT.md`; `kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md`. Kod/test/eşik/pin değişikliği bu kartta yasak.
 
 **Uygula:**
 

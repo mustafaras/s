@@ -8988,12 +8988,16 @@
     },
     "K3PD-31": {
       "id": "K3PD-31",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
+      "status": "in_progress",
+      "baseHead": "df50e5dc4626e069a4c0dab6de417b6983160fc0",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"
+      ],
       "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
+      "auditVerdict": "NOT_MEASURED",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"
+      ],
       "acceptanceDependencies": []
     },
     "K3PD-32": {

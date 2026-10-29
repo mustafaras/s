@@ -17,3 +17,8 @@ Kullanıcı 2026-10-29'da bu haliyle push/merge/deploy istedi; üretim kodu bu k
 Seq 215: sandbox dışı koşu için baseHead güncellendi.
 
 Seq 216: Kullanıcı kararıyla ACCEPTED_DEVIATION ile kapandı; kapı tamamlanmadı, bağımsız final denetim yok, teknik final PASS değil.
+
+## Ek (2026-10-29, sandbox dışı koşu tamamlandı)
+`kapi.mjs --final --yavas` sandbox dışında bitti: **225 testin 225'i exit 0**, hiçbirinde hata yok. Kapı yine de **FAIL** (exit 1) verdi, çünkü 4 testin çıktısında "SKIP" kelimesi geçti (`kapi.mjs:113/525` düz regex): `test_kao2_lemma_morph` (test adı "yoksa SKIP"), `test_iip_11` ("skip targets/skip control"), `test_local_visual_qa_manifest` ("çekim hatası SKIP olarak yutulmuyor"), `test_panel_p2_polling` ("input skip UI'da görünür"). Bunlar test adlarıdır; **gerçek atlama değil** (çıktı satırları doğrulandı). Kapı regex'i kelime eşlemesi yaptığı için sahte pozitiftir; düzeltmek kapı aracında kod değişikliğidir ve bu kartın kapsamı dışındadır (ayrı kart). Koşu, kart durumu sonradan değiştiği için (31/32/33 kapatıldı) kapsam kontrolü açısından resmî kabul kanıtı değildir.
+
+Sonuç: teknik kanıt, önceki "9 başarısız" iddiasından güçlü: ortam artefaktı giderilince gerçek hata yok. K3PD-31 hükmü `ACCEPTED_DEVIATION` olarak kalır (bağımsız final denetim yok, kapı formal olarak yeşil değil).

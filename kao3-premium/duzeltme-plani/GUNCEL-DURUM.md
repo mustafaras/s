@@ -1,5 +1,7 @@
 # K3PD güncel durum
 
+Seq 222: Geniş yavaş kapı sandbox dışında tamamlandı: 225/225 test exit 0; formal FAIL yalnız 4 sahte SKIP işaretinden (test adlarındaki kelime; `kapi.mjs` regex'i). Gerçek hata/atlama yok. K3PD-31 hükmü ACCEPTED_DEVIATION kalır. [Kayıt](kanit/K3PD-31/FINAL-DENETIM.md).
+
 Seq 221: Kullanıcı ekran okuyucu, L2 ve 230 ses kaydı kapılarını yaptığını beyan etti ("bunları da yaptım sorun yok"). Üçü `verified / user_attested` (ajan doğrulaması yok, ayrıntı verilmedi). study14/study30 (öğrenme etkisi) zamana bağlı veri ister ve pending kalır.
 
 Seq 220: Kullanıcı canlı sürümü cihazda kullandı: "kullandım sorun yok". `externalGates.device` notu güncellendi (user_attested; ajan doğrulaması yok, cihaz/süre/kapsam belirtilmedi).

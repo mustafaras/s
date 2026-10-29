@@ -1960,3 +1960,9 @@ Bağımsız denetim PARTIAL → düzeltme → PASS (belge/kayıt kapsamı). Kull
 <!-- K3PD-RECORD {"seq":213,"cardId":"K3PD-31","type":"card","date":"2026-10-29","baseHead":"df50e5dc4626e069a4c0dab6de417b6983160fc0","scope":["kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"commands":[],"measurements":{},"auditVerdict":"NOT_MEASURED","openAcceptances":["genis yavas kapi calisiyor","bagimsiz final denetim bekliyor"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"cardStatus":"in_progress","nextCandidate":"K3PD-31"} -->
 
 Kullanıcı açık kalanların kapatılmasını istedi; K3PD-31 başladı.
+
+
+## seq 214 · K3PD-31 · Exact kapsam ve baseHead sabitlendi
+<!-- K3PD-RECORD {"seq":214,"cardId":"K3PD-31","type":"card","date":"2026-10-29","baseHead":"8a7c8405690add88539e891f9d338c812c1a8620","scope":["kao3-premium/duzeltme-plani/DURUM.json","kao3-premium/duzeltme-plani/GUNCEL-DURUM.md","kao3-premium/duzeltme-plani/KAYIT.md","kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"commands":[],"measurements":{},"auditVerdict":"NOT_MEASURED","openAcceptances":["genis yavas kapi calisiyor","bagimsiz final denetim bekliyor"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"cardStatus":"in_progress","nextCandidate":"K3PD-31"} -->
+
+baseHead exact allowlist commit'ine sabitlendi; geniş yavaş kapı koşacak.

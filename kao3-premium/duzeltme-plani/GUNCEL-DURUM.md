@@ -1,5 +1,7 @@
 # K3PD güncel durum
 
+Seq 214: K3PD-31 `in_progress`. Geniş yavaş kapı sandbox içinde ortam artefaktıyla FAIL (TMPDIR/EPERM; 9 test tek tek PASS, 3 SKIP); sandbox dışı temiz koşu ve bağımsız denetim açık. [Kayıt](kanit/K3PD-31/FINAL-DENETIM.md).
+
 Seq 212: K3PD-30 `done/PASS` (bağımsız denetim, belge/kayıt kapsamı). Sıradaki aday K3PD-31 (başlatılmadı). Zincir dışı yayın `releaseOutOfChain` alanında açık borç olarak kayıtlı.
 
 Seq 211b: Kullanıcı 2026-10-29'da "cihaz kabulünü onaylıyorum" dedi. `externalGates.device` = verified / `user_attested` (ajan doğrulaması yok, cihaz/kapsam ayrıntısı verilmedi). Ekran okuyucu, L2, 230 kayıt ve öğrenme etkisi açık.

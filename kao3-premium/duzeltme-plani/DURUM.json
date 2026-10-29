@@ -8989,8 +8989,11 @@
     "K3PD-31": {
       "id": "K3PD-31",
       "status": "in_progress",
-      "baseHead": "df50e5dc4626e069a4c0dab6de417b6983160fc0",
+      "baseHead": "8a7c8405690add88539e891f9d338c812c1a8620",
       "changedPaths": [
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
         "kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"
       ],
       "checks": [],

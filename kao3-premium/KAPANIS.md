@@ -88,6 +88,16 @@ node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> 
 node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> --kesim 2026-10-18 --bugun 2026-11-17
 ```
 
+> **Düzeltme (2026-10-29):** Yukarıdaki tarihler `20261018a` pinine göredir ve geçersizdir. Düzeltme sürümü (pin `20261029a`, aday `746ecdd2`) 2026-10-29'da canlıya çıktı. İlk tam UTC günü 2026-10-30; 14. gün **2026-11-12**, 30. gün **2026-11-28**'dir. Güncel komutlar:
+>
+> ```bash
+> node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> --kesim 2026-10-29 --bugun 2026-11-12 --h4-baslangic 2026-10-30
+> node kao3-premium/araclar/deney-rapor.cjs <kullanıcının-verdiği-yedek.json> --kesim 2026-10-29 --bugun 2026-11-28 --h4-baslangic 2026-10-30
+> ```
+>
+> `deney-rapor.cjs` içinde sabit kesim tarihi yoktur; tarihler yalnız komut satırından gelir. Eski tarihler yalnız bu belgedeki örneklerde kalmıştı.
+
+
 | Hipotez | 14./30. gün bakılacak ölçü | Beklenen yön/eşik |
 | --- | --- | --- |
 | H2 | Kesimden önceki ve sonraki 14 günlük pencerede tekrar doğruluğu; pencere başına en az 20 cevap | Doğruluk düşüşü ≤5 puan |

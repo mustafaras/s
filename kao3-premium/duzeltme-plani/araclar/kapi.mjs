@@ -87,6 +87,12 @@ function parseJson(file, label) {
   catch (error) { throw new Error(`${label}: ${error.message}`); }
 }
 
+// Gerçek atlama bildirimi satır başında "SKIP" ile başlar (ör. "SKIP local input missing", "[SKIP] ...").
+// Test adının içinde geçen "skip" kelimesi (örn. "skip targets", "yoksa SKIP") atlama sayılmaz.
+export function detectSkipMarker(stdout, stderr) {
+  return /^[ \t]*\[?SKIP\]?(?::|\s|$)/m.test(`${stdout}\n${stderr}`);
+}
+
 function runRaw(program, args, slow = false, timeout = 300_000) {
   const binary = program === 'node' ? process.execPath : program;
   const result = spawnSync(binary, args, {
@@ -110,7 +116,7 @@ function runRaw(program, args, slow = false, timeout = 300_000) {
     spawnError: result.error ? String(result.error.code || result.error.name) : null,
     stdoutBytes: Buffer.byteLength(stdout),
     stderrBytes: Buffer.byteLength(stderr),
-    hasSkipMarker: /(?:^|\s)SKIP(?:\b|\s)/i.test(`${stdout}\n${stderr}`),
+    hasSkipMarker: detectSkipMarker(stdout, stderr),
     stdout,
     stderr,
   };

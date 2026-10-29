@@ -108,6 +108,7 @@ K2F-41 / D2F-08 tarihsel ölçümü 82 test dosyasıydı. Güncel `node tests/ka
 ## Ardıl K3PD kontrol düzlemi
 
 - `test_k3pd_control.js` — K3PD-00 `durum.mjs` CLI'si için ağsız sentetik repo
+- `test_k3pd_skip_marker.js` — K3PD kapısının `detectSkipMarker` kuralı: satır başı gerçek SKIP bildirimi yakalanır, test adındaki "skip" kelimesi (ör. "skip targets", "yoksa SKIP") atlama sayılmaz. Ağsız, sentetik.
   fixture'ı. 34 prompt kimliği, karar/kanıt/sıra sözleşmesi, `nextPrompt`,
   legacy K3P kapanışı, exact branch/pin sınırı, log append-only davranışı ve
   bozuk state/prompt durumlarında nonzero çıkışı gerçek child process ile sınar.

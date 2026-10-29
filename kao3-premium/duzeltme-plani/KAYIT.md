@@ -1966,3 +1966,33 @@ Kullanıcı açık kalanların kapatılmasını istedi; K3PD-31 başladı.
 <!-- K3PD-RECORD {"seq":214,"cardId":"K3PD-31","type":"card","date":"2026-10-29","baseHead":"8a7c8405690add88539e891f9d338c812c1a8620","scope":["kao3-premium/duzeltme-plani/DURUM.json","kao3-premium/duzeltme-plani/GUNCEL-DURUM.md","kao3-premium/duzeltme-plani/KAYIT.md","kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"commands":[],"measurements":{},"auditVerdict":"NOT_MEASURED","openAcceptances":["genis yavas kapi calisiyor","bagimsiz final denetim bekliyor"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"cardStatus":"in_progress","nextCandidate":"K3PD-31"} -->
 
 baseHead exact allowlist commit'ine sabitlendi; geniş yavaş kapı koşacak.
+
+
+## seq 215 · K3PD-31 · baseHead güncel HEAD'e alındı
+<!-- K3PD-RECORD {"seq":215,"cardId":"K3PD-31","type":"card","date":"2026-10-29","baseHead":"2d21720d039a546f6b6bd46fbb935fe31c35409b","scope":["kao3-premium/duzeltme-plani/DURUM.json","kao3-premium/duzeltme-plani/GUNCEL-DURUM.md","kao3-premium/duzeltme-plani/KAYIT.md","kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"commands":[],"measurements":{},"auditVerdict":"NOT_MEASURED","openAcceptances":["genis yavas kapi sandbox disinda kosuyor","bagimsiz final denetim bekliyor"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"cardStatus":"in_progress","nextCandidate":"K3PD-31"} -->
+
+Önceki baseHead commit edilmiş kayıtları 'staged' gösteriyordu; sandbox dışı koşu için güncellendi.
+
+
+## seq 216 · K3PD-31 · Kullanıcı kararıyla ACCEPTED_DEVIATION
+<!-- K3PD-RECORD {"seq":216,"cardId":"K3PD-31","type":"card","date":"2026-10-29","baseHead":"2d21720d039a546f6b6bd46fbb935fe31c35409b","scope":["kao3-premium/duzeltme-plani/DURUM.json","kao3-premium/duzeltme-plani/GUNCEL-DURUM.md","kao3-premium/duzeltme-plani/KAYIT.md","kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"commands":[{"command":"node kao3-premium/duzeltme-plani/araclar/durum.mjs --check + node tests/kao/test_k3pd_control.js","env":{},"exitCode":0,"measurements":{}},{"command":"9 kapi-FAIL testi tek tek (test_k3p_progress, test_k3pd_control, test_kao2_curriculum, test_kao2_review_apply, test_kao2_syllable_audio, test_kao_freeze_repro, test_deploy_surface_contract, test_local_visual_qa_manifest, test_kao2_kabul)","env":{"KAO2_ACCEPT_SLOW_HOST":"1"},"exitCode":0,"measurements":{"standalone":"PASS"}},{"command":"tests/app + tests/kao + tests/panel-v2 fixture dongusu (3 zaman asimi tek tek exit 0)","env":{},"exitCode":0,"measurements":{}}],"measurements":{"gate":"not-completed","skipTests":3},"auditVerdict":"ACCEPTED_DEVIATION","openAcceptances":["genis yavas kapi tamamlanmadi; kullanici karariyla gecildi","bagimsiz final denetim yok","3 SKIP'li test incelenmedi","teknik final PASS yok","ekran okuyucu, L2, 230 kayit"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"],"cardStatus":"done","nextCandidate":"K3PD-32"} -->
+
+Kullanıcı geniş kapıyı beklemeden ilerlemeyi seçti; bu teknik final PASS değildir.
+
+
+## seq 217 · K3PD-32 · Pin adayı (ACCEPTED_DEVIATION)
+<!-- K3PD-RECORD {"seq":217,"cardId":"K3PD-32","type":"card","date":"2026-10-29","baseHead":"47b4939d3419c299304a028fef22306ff11bd14a","scope":["index.html","sw.js","app/kao.css","tests/app/test_iip_22.js"],"commands":[{"command":"node tests/app/test_asset_pin_freshness.js && node tests/app/test_iip_22.js && node tests/app/test_iip_09.js && node tests/app/test_v3_welcome.js && node tests/kao/test_kao2_curriculum.js","env":{},"exitCode":0,"measurements":{"iip22":"15/15","pinFreshness":"PASS"}}],"measurements":{},"auditVerdict":"ACCEPTED_DEVIATION","openAcceptances":["bagimsiz denetim yok (kullanici talimatli sapma)","ekran okuyucu, L2, 230 kayit, ogrenme etkisi"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-32/EVIDENCE.md"],"cardStatus":"done","nextCandidate":null} -->
+
+Pin 20261029a adayı 746ecdd2; yeni pin aracı yazılmadı, onay önceden sorulmadı.
+
+
+## seq 218 · K3PD-33 · Yayın onayı makbuzu
+<!-- K3PD-RECORD {"seq":218,"cardId":"K3PD-33","type":"release","date":"2026-10-29","baseHead":"746ecdd256b26129c587104050b5e9cb716150c2","scope":["kao3-premium/duzeltme-plani/kanit/K3PD-33/EVIDENCE.md"],"commands":[{"command":"GitHub API actions/runs head_sha=746ecdd2 + 66 URL no-cache GET SHA-256","env":{},"exitCode":0,"measurements":{"pagesRun":"40863074376","conclusion":"success","parity":"66/66"}}],"measurements":{},"auditVerdict":"ACCEPTED_DEVIATION","openAcceptances":["bagimsiz denetim yok (kullanici talimatli sapma)","ekran okuyucu, L2, 230 kayit, ogrenme etkisi"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-33/EVIDENCE.md"],"cardStatus":"done","nextCandidate":null,"candidateSha":"746ecdd256b26129c587104050b5e9cb716150c2","releaseScope":["index.html","sw.js","app/kao.css","tests/app/test_iip_22.js"],"response":"açıkları kapat ve push commit merge deploy","sourceRef":"Kullanıcı talimatı, oturum 2026-10-29 (aday özeti önceden sorulmadı; K3PD-33 kanıtı)"} -->
+
+Kullanıcı yanıtı ve aday SHA ile eşlendi.
+
+
+## seq 219 · K3PD-33 · Yayın ve canlı eşlik (ACCEPTED_DEVIATION)
+<!-- K3PD-RECORD {"seq":219,"cardId":"K3PD-33","type":"card","date":"2026-10-29","baseHead":"746ecdd256b26129c587104050b5e9cb716150c2","scope":["kao3-premium/duzeltme-plani/kanit/K3PD-33/EVIDENCE.md"],"commands":[{"command":"GitHub API actions/runs head_sha=746ecdd2 + 66 URL no-cache GET SHA-256","env":{},"exitCode":0,"measurements":{"pagesRun":"40863074376","conclusion":"success","parity":"66/66"}}],"measurements":{},"auditVerdict":"ACCEPTED_DEVIATION","openAcceptances":["bagimsiz denetim yok (kullanici talimatli sapma)","ekran okuyucu, L2, 230 kayit, ogrenme etkisi"],"evidenceRefs":["kao3-premium/duzeltme-plani/kanit/K3PD-33/EVIDENCE.md"],"cardStatus":"done","nextCandidate":null} -->
+
+Run 40863074376 success; 66/66 SHA eşit.

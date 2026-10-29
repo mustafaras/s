@@ -3,7 +3,7 @@
   "planVersion": 1,
   "branch": "k3pd-denetim-duzeltmeleri",
   "baselineHead": "d030610f7613fc2c4aaafc36297a34b0ffb9c3ec",
-  "status": "active",
+  "status": "released",
   "executionOrder": [
     "K3PD-00",
     "K3PD-01",
@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-31",
+  "nextPrompt": null,
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -8988,40 +8988,98 @@
     },
     "K3PD-31": {
       "id": "K3PD-31",
-      "status": "in_progress",
-      "baseHead": "8a7c8405690add88539e891f9d338c812c1a8620",
+      "status": "done",
+      "baseHead": "2d21720d039a546f6b6bd46fbb935fe31c35409b",
       "changedPaths": [
         "kao3-premium/duzeltme-plani/DURUM.json",
         "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
         "kao3-premium/duzeltme-plani/KAYIT.md",
         "kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"
       ],
-      "checks": [],
-      "auditVerdict": "NOT_MEASURED",
+      "checks": [
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check + node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "9 kapi-FAIL testi tek tek (test_k3p_progress, test_k3pd_control, test_kao2_curriculum, test_kao2_review_apply, test_kao2_syllable_audio, test_kao_freeze_repro, test_deploy_surface_contract, test_local_visual_qa_manifest, test_kao2_kabul)",
+          "env": {
+            "KAO2_ACCEPT_SLOW_HOST": "1"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "standalone": "PASS"
+          }
+        },
+        {
+          "command": "tests/app + tests/kao + tests/panel-v2 fixture dongusu (3 zaman asimi tek tek exit 0)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        }
+      ],
+      "auditVerdict": "ACCEPTED_DEVIATION",
       "evidenceRefs": [
         "kao3-premium/duzeltme-plani/kanit/K3PD-31/FINAL-DENETIM.md"
       ],
-      "acceptanceDependencies": []
+      "acceptanceDependencies": [],
+      "notes": "Kullanici karari (2026-10-29): 'kapi kosmadan siradaki asamaya gecmenin yolu yok mu' -> 'tamam oyle yap ve yeni asamaya gec'. Kapi (kapi.mjs --final --yavas) sandbox icinde TMPDIR/EPERM ile FAIL verdi; sandbox disinda yeniden kosuldu ancak kullanici beklemeden ilerlemeyi istedi. Teknik final PASS DEGIL; bagimsiz final denetim yapilmadi; 3 SKIP'li test (test_kao2_lemma_morph, test_iip_11, test_panel_p2_polling) incelenmedi. Kapi arka planda surdu; yesil cikarsa kayit PASS'e yukseltilebilir."
     },
     "K3PD-32": {
       "id": "K3PD-32",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
-      "acceptanceDependencies": []
+      "status": "done",
+      "baseHead": "47b4939d3419c299304a028fef22306ff11bd14a",
+      "changedPaths": [
+        "index.html",
+        "sw.js",
+        "app/kao.css",
+        "tests/app/test_iip_22.js"
+      ],
+      "checks": [
+        {
+          "command": "node tests/app/test_asset_pin_freshness.js && node tests/app/test_iip_22.js && node tests/app/test_iip_09.js && node tests/app/test_v3_welcome.js && node tests/kao/test_kao2_curriculum.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "iip22": "15/15",
+            "pinFreshness": "PASS"
+          }
+        }
+      ],
+      "auditVerdict": "ACCEPTED_DEVIATION",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-32/EVIDENCE.md"
+      ],
+      "acceptanceDependencies": [],
+      "notes": "Pin 746ecdd2 ile yayinlandi; yeni pin-yukselt.mjs yazilmadi, onay onceden sorulmadi, 31 teknik final PASS degil: kullanici talimatli sapma."
     },
     "K3PD-33": {
       "id": "K3PD-33",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
-      "acceptanceDependencies": []
+      "status": "done",
+      "baseHead": "746ecdd256b26129c587104050b5e9cb716150c2",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-33/EVIDENCE.md"
+      ],
+      "checks": [
+        {
+          "command": "GitHub API actions/runs head_sha=746ecdd2 + 66 URL no-cache GET SHA-256",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "pagesRun": "40863074376",
+            "conclusion": "success",
+            "parity": "66/66"
+          }
+        }
+      ],
+      "auditVerdict": "ACCEPTED_DEVIATION",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-33/EVIDENCE.md"
+      ],
+      "acceptanceDependencies": [],
+      "notes": "Yayin kullanici talimatiyla yapildi; makbuz yerel dalda. Cihaz user_attested; ekran okuyucu/L2/230/etki acik."
     }
   },
   "decisions": {
@@ -9082,22 +9140,22 @@
     }
   },
   "releaseApproval": {
-    "status": "NOT_APPROVED",
-    "candidateSha": null,
-    "scope": [],
-    "response": null,
-    "approvedAt": null,
-    "sourceRef": null
+    "status": "APPROVED",
+    "candidateSha": "746ecdd256b26129c587104050b5e9cb716150c2",
+    "scope": [
+      "index.html",
+      "sw.js",
+      "app/kao.css",
+      "tests/app/test_iip_22.js"
+    ],
+    "response": "açıkları kapat ve push commit merge deploy",
+    "approvedAt": "2026-10-29",
+    "sourceRef": "Kullanıcı talimatı, oturum 2026-10-29 (aday özeti önceden sorulmadı; K3PD-33 kanıtı)"
   },
   "pinDeferral": {
     "branch": "k3pd-denetim-duzeltmeleri",
     "until": "K3PD-32",
-    "files": [
-      "app/core/quranLearn.js",
-      "app/core/quranLearnViews.js",
-      "app/core/quranLearnFlow.js",
-      "app/kao.css"
-    ],
+    "files": [],
     "mainExceptions": []
   },
   "externalGates": {
@@ -9155,13 +9213,5 @@
     "completedCards": 37,
     "totalCards": 37
   },
-  "releaseOutOfChain": {
-    "sha": "746ecdd256b26129c587104050b5e9cb716150c2",
-    "pin": "20261029a",
-    "pagesRun": "40863074376",
-    "pagesConclusion": "success",
-    "authorizedBy": "user instruction 2026-10-29 (commit/push/merge/deploy)",
-    "date": "2026-10-29",
-    "knownDebt": "releaseApproval=NOT_APPROVED ile fiili yayin uyumsuz; K3PD-31/32/33 zinciri izlenmedi. Bilincli acik borc; releaseApproval degistirilmedi."
-  }
+  "releaseNote": "releaseOutOfChain borcu K3PD-32/33 makbuzlariyla formellestirildi (ACCEPTED_DEVIATION); sapmalar kanit/K3PD-33/EVIDENCE.md."
 }

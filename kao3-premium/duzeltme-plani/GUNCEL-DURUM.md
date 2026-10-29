@@ -1,5 +1,15 @@
 # K3PD güncel durum
 
+Seq 217–219: K3PD-32 ve K3PD-33 `done/ACCEPTED_DEVIATION`; program `released` (aday 746ecdd2, pin 20261029a, run 40863074376 success, 66/66 SHA eşit). Sapmalar: yeni pin aracı yok, onay önceden sorulmadı, 31 teknik final PASS değil. Açık: ekran okuyucu, L2, 230 kayıt, öğrenme etkisi; deney-rapor.cjs eski cutoff sabitleri. [Kanıt](kanit/K3PD-33/EVIDENCE.md).
+
+Sıradaki aday: yok (kapsam tamamlandı).
+
+Seq 216: K3PD-31 kullanıcı kararıyla `done/ACCEPTED_DEVIATION` (geniş kapı tamamlanmadan; teknik final PASS değil, bağımsız final denetim yok). Sıradaki aday K3PD-32.
+
+
+
+Seq 215: K3PD-31 baseHead güncel HEAD'e alındı; geniş yavaş kapı sandbox dışında yeniden koşuyor.
+
 Seq 214: K3PD-31 `in_progress`. Geniş yavaş kapı sandbox içinde ortam artefaktıyla FAIL (TMPDIR/EPERM; 9 test tek tek PASS, 3 SKIP); sandbox dışı temiz koşu ve bağımsız denetim açık. [Kayıt](kanit/K3PD-31/FINAL-DENETIM.md).
 
 Seq 212: K3PD-30 `done/PASS` (bağımsız denetim, belge/kayıt kapsamı). Sıradaki aday K3PD-31 (başlatılmadı). Zincir dışı yayın `releaseOutOfChain` alanında açık borç olarak kayıtlı.
@@ -10,7 +20,7 @@ Seq 211: 746ecdd2 kullanıcı talimatıyla (zincir dışı) main'e yayınlandı,
 
 Seq 208: K3PD-29 kullanıcı kabulüyle `done/ACCEPTED_DEVIATION`: kullanıcı görselleri inceledi, source kontrolü temiz; yeni görsel üretilmedi. Bağımsız denetim PARTIAL idi ve PASS sayılmaz (217 sahne G4 hükmü, Shift+Tab/Escape klavye koşumu, kayıtlı yeşil geniş kapı açık). K3PD-11/21 görsel alt kabulü aynı şekilde kapandı. Cihaz/ekran okuyucu/L2 yok, yayın yok, `releaseApproval=NOT_APPROVED`.
 
-Sıradaki aday: K3PD-31 (yalnız aday; başlatılmadı).
+
 
 Seq 207: Taze denetim 29 PARTIAL buldu; ek gerçek Tab koşumu 7×11 senaryo, 147 hedef, 308 tuş olayı kaydetti ve yeniden inceleniyor. Önceki dört eksik koşu korunuyor; 29 ve yayın henüz kapanmadı. [Kanıt](kanit/K3PD-29/v11-20261028/README.md).
 

@@ -13,3 +13,7 @@ Neden: kapı alt süreç ortamını temizler ve `TMPDIR`'i atar; sandbox `/tmp` 
 - Teknik final PASS yoktur; `releaseApproval=NOT_APPROVED` kalır.
 
 Kullanıcı 2026-10-29'da bu haliyle push/merge/deploy istedi; üretim kodu bu kayıtlarla değişmez (canlı pin 20261029a, `746ecdd2`).
+
+Seq 215: sandbox dışı koşu için baseHead güncellendi.
+
+Seq 216: Kullanıcı kararıyla ACCEPTED_DEVIATION ile kapandı; kapı tamamlanmadı, bağımsız final denetim yok, teknik final PASS değil.

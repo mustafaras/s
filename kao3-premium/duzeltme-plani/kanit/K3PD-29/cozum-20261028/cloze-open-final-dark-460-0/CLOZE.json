@@ -1,0 +1,101 @@
+{
+  "viewport": {
+    "width": 460,
+    "height": 844,
+    "safeAreaBottom": 0
+  },
+  "theme": "dark",
+  "id": "k3pd29-cloze-w:l_kul_03497c:ar>tr",
+  "state": {
+    "kind": "cloze",
+    "choices": 4,
+    "body": true,
+    "choiceClientHeight": 295,
+    "choiceScrollHeight": 448,
+    "theme": "dark"
+  },
+  "first": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 22,
+    "y": 350,
+    "width": 416,
+    "height": 88,
+    "layoutY": 350,
+    "scrollTop": 0,
+    "visible": true,
+    "overlapCovered": false,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 0,
+      "scrollHeight": 844,
+      "clientHeight": 844,
+      "localScroll": false
+    },
+    "focusReachable": true,
+    "dialogRight": 460,
+    "dialogBottom": 844
+  },
+  "second": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 22,
+    "y": 350,
+    "width": 416,
+    "height": 88,
+    "layoutY": 350,
+    "scrollTop": 0,
+    "visible": true,
+    "overlapCovered": false,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 0,
+      "scrollHeight": 844,
+      "clientHeight": 844,
+      "localScroll": false
+    },
+    "focusReachable": true,
+    "dialogRight": 460,
+    "dialogBottom": 844
+  },
+  "opened": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 22,
+    "y": 389,
+    "width": 416,
+    "height": 88,
+    "layoutY": 389,
+    "scrollTop": 0,
+    "visible": true,
+    "overlapCovered": false,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 0,
+      "scrollHeight": 844,
+      "clientHeight": 844,
+      "localScroll": false
+    },
+    "focusReachable": true,
+    "dialogRight": 460,
+    "dialogBottom": 844
+  },
+  "openDetail": true,
+  "openRepeatSha256": "c1dbb64e9d3dcfdfb064b8af25ef926e5274126d54788421662ba0de02524b2f",
+  "taskSwitchSha256": "639c2f6eb10c9d898a97cfc34860aa8eac01ccf38028ef94749ce99808d52fac",
+  "delta": 0,
+  "screenshot": "cloze.webp",
+  "sha256": "ecc314a803eafbab84364211e035a6db22036e27260fd37807d8fe7f881334dc",
+  "cssSha256": "a09b6880a6a55f6811326b62f8f65a71a084435e12376d22bd37a246516d846b",
+  "viewsSha256": "9d2dceed0ab0172275ab2e781957e8bfe5539bc0d197f8af0f3a5bde7b9e3f49",
+  "engineSha256": "4aa2c643be78465b21305f1056fcdee859e291d5e9836ff0abe13741cad9b235"
+}

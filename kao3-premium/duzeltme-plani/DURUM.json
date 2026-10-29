@@ -40,7 +40,7 @@
     "K3PD-32",
     "K3PD-33"
   ],
-  "nextPrompt": "K3PD-29",
+  "nextPrompt": "K3PD-30",
   "cards": {
     "K3PD-00": {
       "id": "K3PD-00",
@@ -3666,7 +3666,7 @@
     },
     "K3PD-11": {
       "id": "K3PD-11",
-      "status": "source_ready",
+      "status": "done",
       "baseHead": "9c211a5aabc4be4058a4d3f7308d337dc4473fc8",
       "changedPaths": [
         "app/core/quranLearn.js",
@@ -4457,9 +4457,10 @@
           }
         }
       ],
-      "auditVerdict": "EVIDENCE_PENDING",
+      "auditVerdict": "ACCEPTED_DEVIATION",
       "evidenceRefs": [
-        "kao3-premium/duzeltme-plani/kanit/K3PD-11/EVIDENCE.md"
+        "kao3-premium/duzeltme-plani/kanit/K3PD-11/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/EVIDENCE.md"
       ],
       "acceptanceDependencies": [
         "K3PD-29"
@@ -5426,7 +5427,7 @@
           "exitCode": 0,
           "measurements": {
             "publishedVectors": 24,
-            "tolerance": 0.000001
+            "tolerance": 1e-06
           }
         },
         {
@@ -6297,7 +6298,7 @@
     },
     "K3PD-21": {
       "id": "K3PD-21",
-      "status": "source_ready",
+      "status": "done",
       "baseHead": "2c37602ed5c3898ceccd2faa40997068d46fe6d2",
       "changedPaths": [
         "kao3-premium/duzeltme-plani/PROMPTLAR.md",
@@ -6387,9 +6388,10 @@
           }
         }
       ],
-      "auditVerdict": "EVIDENCE_PENDING",
+      "auditVerdict": "ACCEPTED_DEVIATION",
       "evidenceRefs": [
-        "kao3-premium/duzeltme-plani/kanit/K3PD-21/EVIDENCE.md"
+        "kao3-premium/duzeltme-plani/kanit/K3PD-21/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/EVIDENCE.md"
       ],
       "acceptanceDependencies": [
         "K3PD-29"
@@ -8220,13 +8222,735 @@
     },
     "K3PD-29": {
       "id": "K3PD-29",
-      "status": "todo",
-      "baseHead": null,
-      "changedPaths": [],
-      "checks": [],
-      "auditVerdict": null,
-      "evidenceRefs": [],
-      "acceptanceDependencies": []
+      "status": "done",
+      "baseHead": "35478e6b931aac37a867732070bf4b4b19f0691b",
+      "changedPaths": [
+        "kao3-premium/duzeltme-plani/PROMPTLAR.md",
+        "tools/kapi/gorsel-qa/shoot-modal.mjs",
+        "tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs",
+        "tools/kapi/gorsel-qa/cdp.mjs",
+        "tests/app/test_local_visual_qa_manifest.js",
+        "tests/README.md",
+        "kao3-premium/duzeltme-plani/DURUM.json",
+        "kao3-premium/duzeltme-plani/GUNCEL-DURUM.md",
+        "kao3-premium/duzeltme-plani/KAYIT.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/COMMANDS.json",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/GLIF-ONCE-SONRA.webp",
+        "app/kao.css",
+        "tests/kao/test_k3p_progress.js",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/cta-dogrulama-20261028/README.md",
+        "app/core/quranLearnViews.js",
+        "app/core/quranLearn.js",
+        "tests/kao/test_k3p_mount.js",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/cozum-20261028/README.md",
+        "tests/kao/test_k3p_build.js",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v2-20261028/README.md",
+        "kao3-premium/araclar/eylem-geometri.cjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v3-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v4b-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v5b-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v7-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v8-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/build-combined-safe-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v11-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scroll-reachability.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scroll-reachability-v3.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/concept-scroll.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scroll-covered.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scroll-units-settings.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/s0-stage4.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/s0-stage4-v2.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scene-actions-review-v2.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scene-actions-review-v3.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scene-actions-review-v4.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scene-actions-review-v5.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/scroll-phonics.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v11-20261028/SAHNE-INCELEME-20261029.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/concept-visible.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/concept-visible-v2.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/home-primary-visible.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/mastery-home-primary-visible.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/supplemental-manifest.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/test-supplemental.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/shoot-s0-dryrun.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/details-scan-dryrun.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v11-20261028/shoot-modal-v11-source.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v11-20261028/SAHNE-INCELEME-DUZELTME-20261029.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-journey.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-journey-v2.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-journey-v3.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-journey-v4.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-journey-v5.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-journey-v6.mjs",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-matrix.mjs"
+      ],
+      "checks": [
+        {
+          "command": "node tests/app/test_local_visual_qa_guard.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "checks": "10/10 PASS"
+          }
+        },
+        {
+          "command": "node tests/app/test_local_visual_qa_manifest.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "checks": 214
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --negatif-test",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "cases": 113,
+            "acceptCases": 3,
+            "rejectCases": 110
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --dogrula <8 dizin>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "dirs": 8,
+            "rows": 519,
+            "ctaRows": 294,
+            "ctaStabilityRecordsPerRun": 42,
+            "hashMismatches": 0,
+            "logMismatches": 0,
+            "issueFileMismatches": 0,
+            "imageIntegrityMismatches": 0,
+            "declaredSertRejected": true,
+            "modeFieldIgnored": true,
+            "ctaHorizontalAnchor": true
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --kapsam <7 kosum>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runs": 7,
+            "rows": 518,
+            "combinations": 7,
+            "ctaContract": "7/7",
+            "fullManifestValidationPerDir": true
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --glif-karsilastir <ref> <light-460>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "series": 30,
+            "rederivedFromContent": true,
+            "themeEqual": true,
+            "measuredScale": 4,
+            "hashesFromDisk": true,
+            "screenshotsDiffer": true
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/shoot-modal.mjs <7 gercek kosum>",
+          "env": {
+            "KAO_QA_CHROME": "chromium-1248"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "runs": 7,
+            "rowsPerRun": 74,
+            "captureFailures": 0,
+            "productionFindings": 2,
+            "ctaMaxDeltaPx": 0,
+            "measuredCaptureScales": "1 ve 4"
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/shoot-modal.mjs <0beb6d0d> --glif-only light",
+          "env": {
+            "KAO_QA_CHROME": "chromium-1248"
+          },
+          "exitCode": 0,
+          "measurements": {
+            "reference": "0beb6d0d (c9dd5962^)",
+            "fontFaceCount": 0,
+            "series": 30
+          }
+        },
+        {
+          "command": "node tools/kao/kao-plan-check.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "mode": "kod"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS",
+            "nextPrompt": "K3PD-29"
+          }
+        },
+        {
+          "command": "node tests/app/test_iip_22.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/app/test_asset_pin_freshness.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "result": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_progress.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "p95Ms": 4.524,
+            "steadyMs": 3.074,
+            "cssKiB": 15.936
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "p95Ms": 12.302,
+            "steadyMs": 3.28,
+            "cssKiB": 15.952
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_mount.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "innerScrollSameScreen": "PASS",
+            "newScreen": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_progress.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 9
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_lesson_flow.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 30
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runtimeKiB": 137.702,
+            "cssKiB": 15.896,
+            "p95Ms": 5.355,
+            "steadyMs": 3.039
+          }
+        },
+        {
+          "command": "node tests/app/test_local_visual_qa_guard.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "checks": 10
+          }
+        },
+        {
+          "command": "node tests/app/test_local_visual_qa_manifest.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/kao/test_k3p_progress.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 9
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_build.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 14,
+            "focusAutoScroll": "PASS"
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runtimeKiB": 137.678,
+            "cssKiB": 15.913,
+            "p95Ms": 15.071,
+            "steadyMs": 4.463
+          }
+        },
+        {
+          "command": "node tests/app/test_local_visual_qa_manifest.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 227
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_a11y.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 14
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runtimeKiB": 137.678,
+            "cssKiB": 15.924,
+            "p95Ms": 6.11,
+            "steadyMs": 3.303
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --kapsam --v2-temiz <7 v2 dizin>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runs": 7,
+            "rows": 518,
+            "productionFindings": 0
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --glif-karsilastir <glif-referans> <light-460-0>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "series": 30,
+            "width": 460,
+            "scale": 4
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_mount.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "clozeOpenSameTask": true,
+            "clozeFocus": true,
+            "otherTaskClosed": true
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_progress.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 9
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_pronunciation_fold.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 15
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_perf_budget.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runtimeKiB": 137.743,
+            "cssKiB": 15.952,
+            "p95Ms": 19.505,
+            "steadyMs": 3.489
+          }
+        },
+        {
+          "command": "node tests/app/test_local_visual_qa_manifest.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 228
+          }
+        },
+        {
+          "command": "KAO_QA_CHROME=<Chrome> node <cloze-500.mjs> <320x500>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "focus": true,
+            "open": true,
+            "scroll": "40->40",
+            "deltaPx": 0
+          }
+        },
+        {
+          "command": "KAO_QA_CHROME=<Chrome> node <build-400.mjs> <320x400>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "visibleButtons": 5
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --kapsam --v4-guncel <7 v4b dizini>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "rows": 532,
+            "combinations": 7,
+            "fontPerScene": true,
+            "sourceAssets": true,
+            "keyboard": "not measured",
+            "viewportRepaintY": "not measured"
+          }
+        },
+        {
+          "command": "node tests/kao/test_k3p_progress.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "controls": 10,
+            "geometryMatrix": "synthetic fixture; not product acceptance"
+          }
+        },
+        {
+          "command": "node kao3-premium/araclar/eylem-geometri.cjs --olcum /tmp/k3pd29-empty-measurements.json (önce/eski araç)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "rows": 0,
+            "result": "hatalı PASS; araç sonradan düzeltildi"
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/kanit/K3PD-29/matrix-v7.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runs": 7,
+            "scenes": 546,
+            "cells": 77,
+            "observations": 154,
+            "screenReader": "not tested",
+            "g4": "PARTIAL"
+          }
+        },
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --glif-karsilastir <safe-ref> <v7-light-460>",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "series": 30,
+            "scale": 4
+          }
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/kanit/K3PD-29/matrix-v11.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runs": 7,
+            "scenes": 546,
+            "cells": 77,
+            "renderSamples": 154,
+            "additionalSceneReview": "224 UNVERIFIED"
+          }
+        },
+        {
+          "command": "v11 light-390 ve dark-390 temiz profil tekrarları",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "runs": 2,
+            "perRun": 78
+          }
+        },
+        {
+          "command": "node tests/kao/test_kao2_mastery.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/kao/test_k3p_recognition_gate.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/kanit/K3PD-29/matrix-v11.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "scroll-reachability-v3: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "concept-scroll.mjs: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "s0-stage4.mjs: yedi kombinasyon (tema root olcumu null; tema kaniti DEGIL)",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "s0-stage4-v2.mjs: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "scroll-covered.mjs: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "scroll-units-settings.mjs: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "scene-actions-review-v5.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "scroll-phonics.mjs: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "concept-visible-v2.mjs: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check (kanitRef esitlendi)",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh",
+          "env": {
+            "KAO2_ACCEPT_SLOW_HOST": "1"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "shoot-s0-dryrun.mjs sentetik gerçek S0 akışı",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "details-scan-dryrun.mjs düzeltilmiş yapay açık-paragraf denemesi",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "home-primary-visible.mjs ve mastery-home-primary-visible.mjs: 14 koşum",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "supplemental-manifest.mjs --check: dört set",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/kanit/K3PD-29/test-supplemental.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/app/test_local_visual_qa_manifest.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/app/test_local_visual_qa_guard.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node tests/kao/test_k3pd_control.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "keyboard-journey-v5.mjs: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "keyboard-journey-v6.mjs: yedi kombinasyon",
+          "env": {
+            "KAO_QA_CHROME": "Google Chrome"
+          },
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-matrix.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/kanit/K3PD-29/test-supplemental.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node .claude/skills/run-seyma/driver.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node .claude/skills/run-seyma/zikr-harness.mjs",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {}
+        },
+        {
+          "command": "node kao3-premium/duzeltme-plani/kanit/K3PD-29/keyboard-matrix.mjs + tests/kao/test_k3pd_control.js + tests/app/test_local_visual_qa_manifest.js + tests/kao/test_k3p_{build,mount,progress}.js",
+          "env": {},
+          "exitCode": 0,
+          "measurements": {
+            "keyboardRuns": 7,
+            "keyboardScenarios": 77,
+            "keyboardTargets": 147,
+            "tabEvents": 308,
+            "newScreenshots": 0
+          }
+        }
+      ],
+      "auditVerdict": "ACCEPTED_DEVIATION",
+      "evidenceRefs": [
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/EVIDENCE.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/COMMANDS.json",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/GLIF-ONCE-SONRA.webp",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/cta-dogrulama-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/cozum-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v2-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v3-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v4b-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v5b-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v7-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v8-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/build-combined-safe-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v11-20261028/README.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v11-20261028/SAHNE-INCELEME-20261029.md",
+        "kao3-premium/duzeltme-plani/kanit/K3PD-29/v11-20261028/SAHNE-INCELEME-DUZELTME-20261029.md"
+      ],
+      "acceptanceDependencies": [],
+      "notes": "2026-10-29: Kullanici gorselleri kendisi inceledigini ve source kontrolunde sorun olmadigini bildirdi; yeni gorsel uretmeden kapatma talimati verdi. Bagimsiz salt-okur denetim PARTIAL idi ve PASS'e cevrilmedi: 217 sahnenin bagimsiz G4 hukmu, Shift+Tab/Escape/odak tuzagi/ders disi yuzeylerin klavye kosumu, kayitli yesil genis kapi ve eski kontaklarin gecersiz-tema isareti acik kaldi. Bunlar kullanici kabulu ile ACCEPTED_DEVIATION olarak tasinir; cihaz, ekran okuyucu ve L2 kabulu degildir. Gecmis basarisiz kosumlar (exit!=0): node tests/kao/test_kao2_perf_budget.js; node tests/kao/test_kao2_perf_budget.js; node tests/kao/test_kao2_perf_budget.js; KAO2_ACCEPT_SLOW_HOST=1 node tests/kao/test_kao2_perf_budget.js; node kao3-premium/duzeltme-plani/araclar/kapi.mjs --final --yavas; KAO_QA_CHROME=<chromium-1248> node /tmp/k3pd29-budget-short-run.mjs <repo> /tmp/k3pd29-resume-budget-short k3pd29-resume; node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --glif-karsilastir <glif-referans> <light-390-34>; node kao3-premium/duzeltme-plani/araclar/kapi.mjs --final --yavas; KAO_QA_CHROME=<Chrome> node <cloze-open-repeat> <320x500 previous>; KAO_QA_CHROME=<Chrome> node <build-visit> <320x400 previous>; node kao3-premium/araclar/eylem-geometri.cjs --olcum /tmp/k3pd29-empty-measurements.json (düzeltme sonrası); v11 light-390 ve dark-390 ilk çekimleri; KAO2_ACCEPT_SLOW_HOST=1 bash tools/kapi/kapilar.sh (2026-10-28 baslatilan, gece kesintili kosum); scroll-reachability-v2: dark-320 ve dark-460; concept-visible.mjs light-320: ilk kosum ve ham verili tekrar; node kao3-premium/duzeltme-plani/araclar/durum.mjs --check (seq204 kanitRef eksik); details-scan-dryrun.mjs ilk yapay açık-paragraf denemesi; keyboard-journey v1-v4 light320: apply/summary eksik - ham kayitlar kanit dizininde korunur, done kontrol listesinden cikarildi.",
+      "negativeChecks": [
+        {
+          "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --dogrula <F18-1 sahte: cta.x=-1000>",
+          "env": {},
+          "exitCode": 1,
+          "measurements": {
+            "rows": 42,
+            "errors": 42,
+            "expected": "fail-closed (F18-1)"
+          }
+        }
+      ]
     },
     "K3PD-30": {
       "id": "K3PD-30",

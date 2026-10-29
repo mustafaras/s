@@ -1,0 +1,79 @@
+{
+  "opened": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 18,
+    "y": 295,
+    "width": 284,
+    "height": 88,
+    "layoutY": 335,
+    "scrollTop": 40,
+    "visible": true,
+    "overlapCovered": true,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [
+      {
+        "tag": "P",
+        "cls": "kao-cognate",
+        "y": 299,
+        "h": 30,
+        "pos": "static",
+        "z": "auto",
+        "overlapPx": 30,
+        "txt": "Türkçede var: külli"
+      }
+    ],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 40,
+      "scrollHeight": 622,
+      "clientHeight": 500,
+      "localScroll": true
+    },
+    "focusReachable": true,
+    "dialogRight": 320,
+    "dialogBottom": 500
+  },
+  "openedAgain": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 18,
+    "y": 295,
+    "width": 284,
+    "height": 88,
+    "layoutY": 335,
+    "scrollTop": 40,
+    "visible": true,
+    "overlapCovered": true,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [
+      {
+        "tag": "P",
+        "cls": "kao-cognate",
+        "y": 299,
+        "h": 30,
+        "pos": "static",
+        "z": "auto",
+        "overlapPx": 30,
+        "txt": "Türkçede var: külli"
+      }
+    ],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 40,
+      "scrollHeight": 622,
+      "clientHeight": 500,
+      "localScroll": true
+    },
+    "focusReachable": true,
+    "dialogRight": 320,
+    "dialogBottom": 500
+  },
+  "stillOpen": true,
+  "focused": true,
+  "scrollBefore": 40,
+  "scrollAfter": 40,
+  "delta": 0
+}

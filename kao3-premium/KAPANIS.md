@@ -59,11 +59,12 @@ Tanıma oranı için iki farklı ölçü birleştirilmedi: KAO hedef tablosundak
 ## Görsel QA
 
 - Ön koşul `node tests/app/test_local_visual_qa_guard.js`: **10/10 PASS**. Kaynak `sync.js` Guard 1 yerel kökenlerden push'u engelliyor.
-- `shoot-modal.mjs`, 320/390/460 px ve açık/koyu temada çalıştırıldı: **6 ayrı boş profil, her birinde 79 görünüm, toplam 474 sentetik ekran**. URL `v3done=1` kullandı; `forceSync` ayarlanmadı.
-- Altı günlükte `origin=http://127.0.0.1:9000`, `token:false`, `force:null` ve `blocked-external:42` kaydı var. Her profilin dış istekleri engellendi; uygulama ağına çıkılmadı.
-- Her görünümde `overflowX=false`. `KAO_QA_SCAN` toplam **15 bilgi bulgusu** verdi; tamamı `KAYDIRMALI-ALAN(bilgi)` sınıfındadır: 6 sûre seçicisi, 2 gramer tablosu ve 7 ders tablosu. Diyalog dışına taşma, metin kırpılması veya yatay sayfa taşması bulgusu yok.
+- `shoot-modal.mjs`, 320/390/460 px ve açık/koyu temada çalıştırıldı: **6 ana boş profil + ilk açılış için 6 ayrı boş profil**. Her kontak sayfasındaki 79 ekran, ana log'daki 74 durum + ayrı profildeki 5 onboarding/yerleştirme görüntüsüdür; toplam **474 sentetik ekran**. URL `v3done=1` kullandı; `forceSync` ayarlanmadı.
+- Altı ana `log.txt` kaydında `origin: http://127.0.0.1:9000 token:false force:null` ve `blocked-external: 42` var. Onboarding görüntüleri ayrı geçici profillerde alındı; uygulama ağına çıkılmadı.
+- Altı ana logun her birinde **74/74 kayıtlı durum `overflowX=false`**. Ayrı alınan 5 onboarding görünümü taramaya dahil edildi. `KAO_QA_SCAN` toplam **15 bilgi bulgusu** verdi; tamamı `KAYDIRMALI-ALAN(bilgi)` sınıfında: 6 sûre seçicisi, 2 gramer tablosu, 7 ders tablosu. Beklenmeyen diyalog/sayfa taşması veya kırpılma bulgusu yok.
 - Kontak sayfaları: [açık 320](kanit/sonraki/kontak-acik-320.jpg), [koyu 320](kanit/sonraki/kontak-koyu-320.jpg), [açık 390](kanit/sonraki/kontak-acik-390.jpg), [koyu 390](kanit/sonraki/kontak-koyu-390.jpg), [açık 460](kanit/sonraki/kontak-acik-460.jpg), [koyu 460](kanit/sonraki/kontak-koyu-460.jpg).
 - [K3P-00 ile karşılaştırma sayfası](kanit/sonraki/K3P-00-K3P-26-KARSILASTIRMA.html) 390 px açık/koyu görünümleri yan yana koyar. K3P-00'da 390 px'te 58, K3P-26'da 79 görünüm vardır; eski 320/460 px karşılığı olmadığı için bu genişliklerde yalnız yeni QA kontakları gösterilir.
+- Görseller, altı logun sayımı ve 15 bulgunun genişlik/tema dökümü için [K3P arayüz görsel kanıt rehberi](kanit/sonraki/GORSEL-KANIT.md).
 - Ham PNG'ler kontaklar oluşturulup incelendikten sonra kaldırıldı; altı `log.txt` ve altı `issues.txt` kaydı korunuyor.
 
 Bu, yerel kaynak-görsel kanıttır. Kullanıcı cihazında görsel kabul yapılmadı.

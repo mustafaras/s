@@ -1,0 +1,5 @@
+> Yöntem düzeltmesi: Bu genel çekimler sırasında onboarding denetimi, boş sentetik profilde parola alanının DOM’da var olup olmadığını sorguladı; parola değeri okunmadı veya doldurulmadı, gerçek profil kullanılmadı. Alanın kendisine otomasyonla erişmeme sınırı bakımından bu sorgu sorunludur; genel çekim aracından kaldırıldı. Ham sonuçlar korunur ve bu yöntem G4 uyumlu diye sunulmaz.
+
+# v8 · tek koşum · ham kontrol envanteri
+
+320 açık temada 78 sahnede düğme/bağlantı/summary/role=button geometrisi ve merkez hit-test kaydedildi. Glif dışında boş envanter yok; ham envanter tüm kontrollerin kabulü değildir. 824 kontrolün 402'si görünür ve etkin, 19'u kısmi görünür, birinin merkez hit-testi başarısız, 28'inin kutusu metinle kesişir. Kısmi görünürlükler arasında doğal kaydırma, metin kesişimlerinde de kartın tamamını kapsayan bağlantı gibi niyetli düzenler vardır; sınıflandırılmadan gerçek kusur sayılmazlar. Merkez tek başına kısmi örtülmeyi dışlamaz. Kök arama input'u bu sürümde envantere alınmamıştır. Bu tek koşum G4 tam kabulü değildir.

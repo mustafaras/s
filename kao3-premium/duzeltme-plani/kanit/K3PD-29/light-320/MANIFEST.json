@@ -1,0 +1,4123 @@
+{
+  "schema": "k3pd-visual-qa-manifest",
+  "schemaVersion": 1,
+  "card": "K3PD-29",
+  "generatedAt": "2026-10-28T09:25:54.349Z",
+  "profile": "k3pd29-light-320",
+  "theme": "light",
+  "viewport": {
+    "width": 320,
+    "height": 844,
+    "safeAreaBottom": 0
+  },
+  "captureScales": [
+    1,
+    4
+  ],
+  "imageFormat": "webp",
+  "imageQuality": 90,
+  "mode": "tam",
+  "origin": "http://127.0.0.1:9000",
+  "glyphEvidence": {
+    "scene": "g1-30-zor-glif",
+    "seriesCount": 30,
+    "lexiconVersion": "quran-lexicon-tr-v1",
+    "surahVersion": "quran-short-surahs-tr-v1",
+    "font": {
+      "faces": [
+        {
+          "family": "K3P Scheherazade",
+          "status": "loaded",
+          "weight": "400",
+          "unicodeRange": "U+600-6FF, U+8A0-8FF, U+FB50-FDFF, U+FE70-FEFF"
+        }
+      ],
+      "requests": [
+        {
+          "name": "http://127.0.0.1:9000/assets/kao/font/ScheherazadeNew-Regular.k3p.woff2?v=20261021a",
+          "transferSize": 25360
+        }
+      ],
+      "check": true,
+      "withFont": 3011,
+      "withFallback": 4492,
+      "distinct": true
+    },
+    "sheet": {
+      "rows": 30,
+      "minH": 68,
+      "maxH": 68,
+      "firstTop": 15,
+      "lastTop": 2538,
+      "sheetHeight": 2622,
+      "scrollH": 2622,
+      "clientH": 2622,
+      "sw": 460,
+      "cw": 460,
+      "docH": 2622,
+      "bodyH": 2622
+    },
+    "reference": false,
+    "screenshot": "g1-30-zor-glif.webp",
+    "screenshotSha256": "38e46400facbaf28ba5884565aea34db4fae998a50101c4e16d8ef95952d89b6",
+    "captureScale": 4,
+    "imagePixels": {
+      "width": 1840,
+      "height": 10488,
+      "bytes": 277544
+    },
+    "imageFormat": "webp",
+    "imageQuality": 90,
+    "clipHeight": 2622,
+    "viewportHeightDuringCapture": 2622,
+    "series": [
+      {
+        "index": 1,
+        "ar": "نَفَّٰثَٰت",
+        "source": "QuranLexiconV1.lemmas[l_n_af_a_va_t_b7ff1f].ar",
+        "corpus": "lexicon",
+        "marks": 6,
+        "sha256": "0862da1de135b5fa7bd6cca19c9a2f9eda45aa3e5daa2005dda9a3560f52bcfb"
+      },
+      {
+        "index": 2,
+        "ar": "ضَلَّ",
+        "source": "QuranLexiconV1.lemmas[l_Dal_a_2775a8].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "82602018c1460b3c4de1192404e82210c3688ca6927a92f8f02886ee6c77e151"
+      },
+      {
+        "index": 3,
+        "ar": "حَقَّ",
+        "source": "QuranLexiconV1.lemmas[l_Haq_a_a024e5].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "c20feee0599ab0aef8e1426485cf7cf17112e1c757736c25b82f8b272b770c97"
+      },
+      {
+        "index": 4,
+        "ar": "صَدَّ",
+        "source": "QuranLexiconV1.lemmas[l_Sad_a_552787].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "8598cab2225d415be00677d57fe615f5ff89c00fca6171d3364a5895d470b435"
+      },
+      {
+        "index": 5,
+        "ar": "ظَنَّ",
+        "source": "QuranLexiconV1.lemmas[l_Zan_a_9b29e5].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "f823ea4c0d1802bd0fff8682009154078f86681754e5a26b3095ae41b6c008f7"
+      },
+      {
+        "index": 6,
+        "ar": "مَسَّ",
+        "source": "QuranLexiconV1.lemmas[l_mas_a_ba2e94].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "0a12891583f3fc151dcddbcd2ee2ee7380db2143dd1434488ca9968c2a275054"
+      },
+      {
+        "index": 7,
+        "ar": "رَدَّ",
+        "source": "QuranLexiconV1.lemmas[l_rad_a_c68b16].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "11ced0a29cbccb8a8772923a293394b39ae7ac327ecf685b9d5ba2c87fa492e3"
+      },
+      {
+        "index": 8,
+        "ar": "عَذَّبَ",
+        "source": "QuranLexiconV1.lemmas[l_Ea_aba_be4552].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "8425406a56b5e67bed8c8640737f07e1e8a8e7466dcef9f991c494307f0cf9b5"
+      },
+      {
+        "index": 9,
+        "ar": "عَلَّمَ",
+        "source": "QuranLexiconV1.lemmas[l_Eal_ama_5c04b6].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "851c563847dd381c8ad9f89fe1b352b1578b73e9daddb238a16bfc3e022bcc81"
+      },
+      {
+        "index": 10,
+        "ar": "حَرَّمَ",
+        "source": "QuranLexiconV1.lemmas[l_Har_ama_8f6d04].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "3018bac4eab39527befddb358a7ba384c46731d8220e0cd231f790f35f33f3bd"
+      },
+      {
+        "index": 11,
+        "ar": "حَتَّىٰ",
+        "source": "QuranLexiconV1.lemmas[l_Hat_aY_47c8d9].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "124bcaae915f68b91198fd785f4e761235a1103331dca6daf8fed23dfccaee3c"
+      },
+      {
+        "index": 12,
+        "ar": "أَضَلَّ",
+        "source": "QuranLexiconV1.lemmas[l_aDal_a_5ed954].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "8c1b5940892a66d8ea4a9c0c3a11682bbd12cae5e909fa04141390983ad3bb20"
+      },
+      {
+        "index": 13,
+        "ar": "أَوْ كَصَيِّبٍ مِّنَ",
+        "source": "QuranLexiconV1.lemmas[l_aw_43116a].examples[0].ar",
+        "corpus": "lexicon-example",
+        "marks": 10,
+        "sha256": "e46e7746b3bc3d4a8fbeba003af3fa0145dfe9706975ff14b92585d546d2afcd"
+      },
+      {
+        "index": 14,
+        "ar": "بَلَىٰ مَنْ أَسْلَمَ",
+        "source": "QuranLexiconV1.lemmas[l_balaY_04cddb].examples[1].ar",
+        "corpus": "lexicon-example",
+        "marks": 9,
+        "sha256": "411934b085f3232e0659f451fca59a846a2fd0225eec4f3efbd864d1acf7f95f"
+      },
+      {
+        "index": 15,
+        "ar": "وَإِذْ قَالَ رَبُّكَ",
+        "source": "QuranLexiconV1.lemmas[l_i_a0c726].examples[0].ar",
+        "corpus": "lexicon-example",
+        "marks": 9,
+        "sha256": "3ffcef15c87ec241b40438e92499b3ce5c0cc48e0530254965cf9015a1bd0d14"
+      },
+      {
+        "index": 16,
+        "ar": "لَّيْسَ ٱلْبِرَّ أَن",
+        "source": "QuranLexiconV1.lemmas[l_l_ayosa_5684fc].examples[2].ar",
+        "corpus": "lexicon-example",
+        "marks": 9,
+        "sha256": "81de8b6a312c6e55778e51087c58f7f559b2662ea34dff6a6ce06479874351fc"
+      },
+      {
+        "index": 17,
+        "ar": "كُلِّ شَىْءٍ قَدِيرٌ",
+        "source": "QuranLexiconV1.lemmas[l_qadiyr_cd0ac2].examples[0].ar",
+        "corpus": "lexicon-example",
+        "marks": 9,
+        "sha256": "ee61788f18b0c7726d14a8419b8de7bbdbddc154fa443895d20fdda37da6770e"
+      },
+      {
+        "index": 18,
+        "ar": "إِلَىٰ قَوْمِ لُوطٍ",
+        "source": "QuranLexiconV1.lemmas[l_luwT_833109].examples[2].ar",
+        "corpus": "lexicon-example",
+        "marks": 8,
+        "sha256": "a8208bf6e2d5f79d764cf3ea6747dbe1fb56a09f26b425d96c29ff05c30576ac"
+      },
+      {
+        "index": 19,
+        "ar": "لَّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-112-4-3].ar",
+        "corpus": "surah",
+        "marks": 4,
+        "sha256": "a8cdfd456fc1787e0a7cb9ad1f9e575962d3388ed3eba696e10d32cc6aa734f2"
+      },
+      {
+        "index": 20,
+        "ar": "لِّكُلِّ",
+        "source": "QuranShortSurahsV1.words[s-104-1-2].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "9beb994c41c178d305bb1458fcf9f05282f606c932220aa2bf3da6915a64fae2"
+      },
+      {
+        "index": 21,
+        "ar": "إِنَّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-110-3-5].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "6bb7f4231e5faed88322ae81bb5ebf4638199dd01a43b93741fe86d2e5aef9ea"
+      },
+      {
+        "index": 22,
+        "ar": "مَّسَدٍۭ",
+        "source": "QuranShortSurahsV1.words[s-111-5-5].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "14af3a13d72b0a3f9d565d2ea0a13bfb52083f806834664f8c68a2eb13275bf4"
+      },
+      {
+        "index": 23,
+        "ar": "صَلَّىٰٓ",
+        "source": "QuranShortSurahsV1.words[s-96-10-3].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "1a7259ca65c91d40a00b2cee5f7b1741559a6dbc167d5dcd7fbc663fe7eb7d36"
+      },
+      {
+        "index": 24,
+        "ar": "رَبَّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-98-8-21].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "679da3ce48423529cb1f3d7338cf1a1084980be38747b6ac42be0dac501df10b"
+      },
+      {
+        "index": 25,
+        "ar": "مُّمَدَّدَةٍۭ",
+        "source": "QuranShortSurahsV1.words[s-104-9-3].ar",
+        "corpus": "surah",
+        "marks": 8,
+        "sha256": "18d64247d00c84bb3b61a1dcd648e7554be70a74eaef05071287982f77f83b40"
+      },
+      {
+        "index": 26,
+        "ar": "لِرَبِّهِۦ",
+        "source": "QuranShortSurahsV1.words[s-100-6-3].ar",
+        "corpus": "surah",
+        "marks": 6,
+        "sha256": "4d5466a34f248899c1a1f1bea55c6ce7621b39ae532de956a9ca28ca6518d398"
+      },
+      {
+        "index": 27,
+        "ar": "وَإِنَّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-100-7-1].ar",
+        "corpus": "surah",
+        "marks": 6,
+        "sha256": "140ec64e93068b8b1718100382826aea08950bf1d674cad2fb7688b8831b864a"
+      },
+      {
+        "index": 28,
+        "ar": "فَأُمُّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-101-9-1].ar",
+        "corpus": "surah",
+        "marks": 6,
+        "sha256": "551459f79ee0aefe664fbd31103cc27bb02109d59689ad19b4ae4d8f2c6ace8a"
+      },
+      {
+        "index": 29,
+        "ar": "إِنَّ",
+        "source": "QuranShortSurahsV1.words[s-100-11-1].ar",
+        "corpus": "surah",
+        "marks": 3,
+        "sha256": "82cddfc2144040248eff0e348e76bb58d93178dd98dafc5fc42609bd6b38806b"
+      },
+      {
+        "index": 30,
+        "ar": "بِهِۦ",
+        "source": "QuranShortSurahsV1.words[s-100-4-2].ar",
+        "corpus": "surah",
+        "marks": 3,
+        "sha256": "ede29d625facbdef6dd08516e5ca1b48b07068f294f2aa169c7509aab8b48f5e"
+      }
+    ]
+  },
+  "ctaReport": [
+    {
+      "scene": "l01-goal",
+      "stage": "goal",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        285,
+        285
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l02-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        305,
+        305
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l02-panel-yanlis",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        1105,
+        1105
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l03-gorev-meaning",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        342,
+        342
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l03-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        580,
+        580
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l04-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        305,
+        305
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l04-panel-yanlis",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        1135,
+        1135
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l05-gorev-meaning",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        386,
+        386
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l05-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        624,
+        624
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l06-intro",
+      "stage": "intro",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        667,
+        667
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l07-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        394,
+        394
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l07-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        632,
+        632
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l08-intro",
+      "stage": "intro",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        664,
+        664
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l09-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        317,
+        317
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l09-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        555,
+        555
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l10-intro",
+      "stage": "intro",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        715,
+        715
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l11-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        361,
+        361
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l11-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        599,
+        599
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l12-intro",
+      "stage": "intro",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        715,
+        715
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l13-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        361,
+        361
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l13-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        599,
+        599
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l14-concept",
+      "stage": "concept",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        490,
+        490
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l15-gorev-order",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        448,
+        448
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l15-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        992,
+        992
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l16-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        403,
+        403
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l16-panel-yanlis",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        926,
+        926
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l17-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        402,
+        402
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l17-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        772,
+        772
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l18-gorev-grammar",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        297,
+        297
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l18-panel-yanlis",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        936,
+        936
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l19-gorev-order",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        420,
+        420
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l19-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        1182,
+        1182
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l20-gorev-word",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        378,
+        378
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l20-panel-yanlis",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        901,
+        901
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l21-gorev-meaning",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        342,
+        342
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l21-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        580,
+        580
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l22-gorev-grammar",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        297,
+        297
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l22-panel-yanlis",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        936,
+        936
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l23-gorev-meaning",
+      "stage": "practice",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        386,
+        386
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l23-panel-dogru",
+      "stage": "feedback",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        624,
+        624
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l24-apply",
+      "stage": "apply",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        758,
+        758
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l25-summary",
+      "stage": "summary",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        758,
+        758
+      ],
+      "maxDelta": 0
+    }
+  ],
+  "productionFindings": [
+    {
+      "scene": "l25-summary",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "kind": "cta_hidden_by",
+      "coverStack": [
+        {
+          "tag": "BUTTON",
+          "cls": "kao-lesson-audio kao-lesson-more",
+          "y": 764,
+          "h": 44,
+          "pos": "sticky",
+          "z": "auto"
+        },
+        {
+          "tag": "BUTTON",
+          "cls": "kao-primary kao-lesson-next",
+          "y": 758,
+          "h": 50,
+          "pos": "sticky",
+          "z": "auto"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "kao-lesson-anchor kao-lesson-summary-next",
+          "y": 717,
+          "h": 147,
+          "pos": "static",
+          "z": "auto"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "kao-lesson-card kao-lesson-summary kao-moment",
+          "y": 141,
+          "h": 742,
+          "pos": "relative",
+          "z": "auto"
+        }
+      ]
+    },
+    {
+      "scene": "l25-summary",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "kind": "cta_control_collision",
+      "overlapsControl": [
+        {
+          "tag": "BUTTON",
+          "cls": "kao-lesson-audio kao-lesson-more",
+          "y": 764,
+          "h": 44,
+          "pos": "sticky",
+          "z": "auto",
+          "overlapPx": 44
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v01-home",
+      "sceneKind": "view",
+      "screenshot": "v01-home.webp",
+      "log": [
+        "v01-home: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | Kapat Kur'an Arapçası Kur'an Arapçası Doğru cevaplarda hızlı geç Otomatik geçiş açıkken doğru cevaptan kısa sü"
+      ],
+      "issues": [],
+      "sha256": "e09f50c621106a428d9529801501eb7d72e6046aea856af7a26d8506c9cb9854",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v02-units",
+      "sceneKind": "view",
+      "screenshot": "v02-units.webp",
+      "log": [
+        "v02-units: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Yol Yolun Öğrenme yolu Önerilen üniteyi izle ya da istediğin durağı aç. Seviye 0 · Harfler v"
+      ],
+      "issues": [],
+      "sha256": "f14df0b6eb3661b19c4f40ce5abf85bc09b36d49aa19e745a7a5721f62b10bc4",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v03-unit",
+      "sceneKind": "view",
+      "screenshot": "v03-unit.webp",
+      "log": [
+        "v03-unit: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Yol Fâtiha Seviye 1 · Namazın dili Fâtiha Bitirince Her namazda okuduğun Fâtiha'yı kelime kelime anlayacaksı"
+      ],
+      "issues": [],
+      "sha256": "7c7bcb66145f1c79a593e27390fd57ff8c0a68b4372452ea364259c1b566825d",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v04-word",
+      "sceneKind": "view",
+      "screenshot": "v04-word.webp",
+      "log": [
+        "v04-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Fâtiha ism ism ٱسْم Okunuş ism Telaffuzu dinle Anlamı ad, isim Türkçede Türkçede var: isim Kök س–م–و câmid i"
+      ],
+      "issues": [],
+      "sha256": "c61ac5685bd565b1e9dc38b54264ea8348718897025a17ed2fabe2a9add23a55",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v05-reader",
+      "sceneKind": "view",
+      "screenshot": "v05-reader.webp",
+      "log": [
+        "v05-reader: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ ism İhlâs 20 kısa sûre İhlâs Kelimeler mushaf akışında; anlamı görmek için kelimeye dokun. İhlâs Mekke’de in"
+      ],
+      "issues": [
+        "KAYDIRMALI-ALAN(bilgi) | div.kao-surah-picker | NâsFelakİhlâsTebbetNasrKâfirûnKevserMâûn | sw=1519 cw=296"
+      ],
+      "sha256": "5ec6337294a11cfe9f8d1f5baae31aa9033789df4f189365c0b0b747085dcf34",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v06-settings",
+      "sceneKind": "view",
+      "screenshot": "v06-settings.webp",
+      "log": [
+        "v06-settings: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Ayarlar Ayarlar Öğrenme ayarların Seçimlerin bu cihazda saklanır ve senkronla taşınır. Günlü"
+      ],
+      "issues": [],
+      "sha256": "8342f173065a7a88239c1d6b4327056e415f0276897db117f86a67795697170c",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v07-phonics",
+      "sceneKind": "view",
+      "screenshot": "v07-phonics.webp",
+      "log": [
+        "v07-phonics: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Telaffuz Telaffuz stüdyosu Önce duy, sonra ayırt et Minimal çiftler, uzun ünlü, şedde, dinle"
+      ],
+      "issues": [],
+      "sha256": "ea6659a4fd2ab1c6203ac6693ce87b180ee9e349d7920f69885628268364f353",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v08-ayah",
+      "sceneKind": "view",
+      "screenshot": "v08-ayah.webp",
+      "log": [
+        "v08-ayah: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Günün âyeti Bugün anlayabildiğin âyet Alak · 14. âyet Anlaşılan âyet sayısı: 0 Kelimelerin %"
+      ],
+      "issues": [],
+      "sha256": "3de9727edaa4062789336718e1978ec12c018d97ab6df48aae8b67aaaae619e9",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v09-prayer",
+      "sceneKind": "view",
+      "screenshot": "v09-prayer.webp",
+      "log": [
+        "v09-prayer: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Namazda ne diyorum Seviye 1 · Namazda ne diyorum Bir rekâtta söylediklerin Tanıdığın kelimel"
+      ],
+      "issues": [],
+      "sha256": "9c3e6d85d8616cb483c77ba1d30bade20d872c209194b45ee3602e6cd77defac",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v10-stats",
+      "sceneKind": "view",
+      "screenshot": "v10-stats.webp",
+      "log": [
+        "v10-stats: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası İlerleme İlerleme Kaç kelime tanıdığını, bu haftanı ve tekrar doğruluğunu burada görürsün. K"
+      ],
+      "issues": [],
+      "sha256": "1eb59d294b97aef077d9c02e7872cfbe04d59417f7a3e16e31654d3bb442da1f",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v11-gate",
+      "sceneKind": "view",
+      "screenshot": "v11-gate.webp",
+      "log": [
+        "v11-gate: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Harf kontrolü Seviye 0 Harf · ses · hareke 20 kısa seçim · utanma yok, yalnız başlangıç yeri"
+      ],
+      "issues": [],
+      "sha256": "de6813fe9c01fed8156049d8ae8fb4f36510d562e56e720d51a4abba0f141a43",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v12-grammar",
+      "sceneKind": "view",
+      "screenshot": "v12-grammar.webp",
+      "log": [
+        "v12-grammar: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Gramer notları Keşfet Gramer notları Bir kez oku, sonra kavramı ders içinde uygula. Seviye 1"
+      ],
+      "issues": [],
+      "sha256": "d221c31750420f2f6e98dd9870065cc712001232a4c89c17d9217aa5a2b39585",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v13-concept",
+      "sceneKind": "view",
+      "screenshot": "v13-concept.webp",
+      "log": [
+        "v13-concept: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Gramer notları Fiil önce gelir Gramer Fiil önce gelir Türkçede iş cümlenin sonunda söylenir: 'İbrahim temell"
+      ],
+      "issues": [
+        "KAYDIRMALI-ALAN(bilgi) | div.kao-grammar-table-wrap | Satır1.2.3.Türkçe sıraİbrahimtemelleriyü | sw=345 cw=294"
+      ],
+      "sha256": "4b395d12f31d26e2ec821659b04dc3289e910cceb9024c4f15e603417d6a523b",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v14-roots",
+      "sceneKind": "view",
+      "screenshot": "v14-roots.webp",
+      "log": [
+        "v14-roots: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Kök aileleri Kök aileleri Bir kök, bir aile Öğrenme sırasındaki 73 aile; altında tüm sözlüğü"
+      ],
+      "issues": [],
+      "sha256": "61433846f3bf7a97cc6d9de93560d502b09a949bf81c4da6bb25694c2376ab08",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "v15-sources",
+      "sceneKind": "view",
+      "screenshot": "v15-sources.webp",
+      "log": [
+        "v15-sources: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Hakkında ve kaynaklar Hakkında ve kaynaklar Hakkında ve kaynaklar Kur’an Arapçası öğrenme mo"
+      ],
+      "issues": [],
+      "sha256": "4638d6577a6cedbca3220a6dcb7793153bbb6277db9e4bcbf331bbbd7d134478",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l01-goal",
+      "sceneKind": "lesson",
+      "screenshot": "l01-goal.webp",
+      "log": [
+        "l01-goal: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=285 ctaR=320 ctaLay=285 ctaScr=0 focus=true sel=5a43fe942ce7 covN=4 covPx=50 covH=5a4226b86c66 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yalnız sana Hedefi ve metni gör Devam"
+      ],
+      "issues": [],
+      "sha256": "0f4d8432b3195417a55d3f07602f44985334d517c05b7adf9e6dd632ed15703e",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"goal\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 285,
+        "width": 258,
+        "height": 50,
+        "layoutY": 285,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "SPAN",
+            "cls": "kao-tezhip-line",
+            "y": 271,
+            "h": 187,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 50,
+            "txt": "يَوْمِٱلدِّينِإِيَّاكَنَعْبُدُوَ"
+          },
+          {
+            "tag": "SPAN",
+            "cls": "kao-tezhip-word is-known",
+            "y": 271,
+            "h": 64,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 36,
+            "txt": "يَوْمِ"
+          },
+          {
+            "tag": "SPAN",
+            "cls": "kao-tezhip-word is-new",
+            "y": 271,
+            "h": 64,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 50,
+            "txt": "ٱلدِّينِ"
+          },
+          {
+            "tag": "SPAN",
+            "cls": "kao-tezhip-word is-new",
+            "y": 271,
+            "h": 64,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 45,
+            "txt": "إِيَّاكَ"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l02-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l02-gorev-word.webp",
+      "log": [
+        "l02-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=88 ctaX=12 ctaY=305 ctaR=320 ctaLay=305 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Arapçayı seç 1 / 1 gün ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış أَبَدًا يَوْم "
+      ],
+      "issues": [],
+      "sha256": "c3dae95d3ad58dea751d773167cb18729fbca51bcab415d385bc676bf04b159d",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 305,
+        "width": 296,
+        "height": 88,
+        "layoutY": 305,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l02-panel-yanlis",
+      "sceneKind": "feedback",
+      "screenshot": "l02-panel-yanlis.webp",
+      "log": [
+        "l02-panel-yanlis: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=79 ctaH=44 ctaX=213 ctaY=756 ctaR=320 ctaLay=1105 ctaScr=349 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Arapçayı seç 1 / 3 gün ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış ✕ Senin seçimin أَبَدًا ✓ Doğru ce"
+      ],
+      "issues": [],
+      "sha256": "b4f1c993926622c887f6e7989db0a20d6d8578099e51de366b2d322944107e35",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 213,
+        "y": 756,
+        "width": 79,
+        "height": 44,
+        "layoutY": 1105,
+        "scrollTop": 349,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 349,
+          "scrollHeight": 1193,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l03-gorev-meaning",
+      "sceneKind": "practice",
+      "screenshot": "l03-gorev-meaning.webp",
+      "log": [
+        "l03-gorev-meaning: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=342 ctaR=320 ctaLay=342 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 2 / 3 ٱلَّذِى Okunuş ◖ Yavaş ◗ Doğal o ki; -an, -en kimse Lut (peygamber)"
+      ],
+      "issues": [],
+      "sha256": "fbd36168379e3eb049dca4a9f7f1ca225d2faeb9353cef04984a71210c1a73ae",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 342,
+        "width": 296,
+        "height": 56,
+        "layoutY": 342,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l03-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l03-panel-dogru.webp",
+      "log": [
+        "l03-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=580 ctaR=320 ctaLay=580 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 2 / 3 ٱلَّذِى Okunuş ◖ Yavaş ◗ Doğal ✓ Doğru cevap o ki; -an, -en kimse Lut (peygamber) Doğru Devam"
+      ],
+      "issues": [],
+      "sha256": "d902b5ad471265857cfda7e14ee25922fe3e59a4938685dc4639e5394290f9e0",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 580,
+        "width": 296,
+        "height": 44,
+        "layoutY": 580,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l04-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l04-gorev-word.webp",
+      "log": [
+        "l04-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=109 ctaX=12 ctaY=305 ctaR=320 ctaLay=305 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Arapçayı seç 3 / 3 gün ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış يَوْم yevm إِذ"
+      ],
+      "issues": [],
+      "sha256": "cb7864181edef557e1f6fc8261c0306918ae58e6b760c4eb873bd2ac3446bf95",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 305,
+        "width": 296,
+        "height": 109,
+        "layoutY": 305,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l04-panel-yanlis",
+      "sceneKind": "feedback",
+      "screenshot": "l04-panel-yanlis.webp",
+      "log": [
+        "l04-panel-yanlis: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=79 ctaH=44 ctaX=213 ctaY=756 ctaR=320 ctaLay=1135 ctaScr=379 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Arapçayı seç 3 / 4 gün ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış ✓ Doğru cevap يَوْم yevm ✕ Senin s"
+      ],
+      "issues": [],
+      "sha256": "e475641cdaa309504c2ae93d49245febcb1f97c8b25a5b119c93cc98851466d7",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 213,
+        "y": 756,
+        "width": 79,
+        "height": 44,
+        "layoutY": 1135,
+        "scrollTop": 379,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 379,
+          "scrollHeight": 1223,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l05-gorev-meaning",
+      "sceneKind": "practice",
+      "screenshot": "l05-gorev-meaning.webp",
+      "log": [
+        "l05-gorev-meaning: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=386 ctaR=320 ctaLay=386 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 4 / 4 رَبّ Okunuş ◖ Yavaş ◗ Doğal Türkçede var: Rab topluluk, halk terbiye edip yöneten Rab"
+      ],
+      "issues": [],
+      "sha256": "0704609e2bd27e4cd9dccb0c50f1f2f15e3dbbb390936eae73a01336811567a8",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 386,
+        "width": 296,
+        "height": 56,
+        "layoutY": 386,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l05-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l05-panel-dogru.webp",
+      "log": [
+        "l05-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=624 ctaR=320 ctaLay=624 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 4 / 4 رَبّ Okunuş ◖ Yavaş ◗ Doğal Türkçede var: Rab topluluk, halk ✓ Doğru cevap terbiye edip yöneten Rab Doğru Devam"
+      ],
+      "issues": [],
+      "sha256": "b3bb50d7c11fc3368260ed79b14bec4cf1626a493d59033e8165d4da41f31f1f",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 624,
+        "width": 296,
+        "height": 44,
+        "layoutY": 624,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l06-intro",
+      "sceneKind": "lesson",
+      "screenshot": "l06-intro.webp",
+      "log": [
+        "l06-intro: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=667 ctaR=320 ctaLay=667 ctaScr=0 focus=true sel=dc1b7000b140 covN=4 covPx=16 covH=47aae4ee2d6d coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 1 / 4 دِين dîn Dinle hesap, karşılık · din; itaat, yol Örnek âyet مَـٰلِكِ يَوْمِ ٱل"
+      ],
+      "issues": [],
+      "sha256": "73105d0c2dfec43125ecbb8f8f95ed480628df66980e61afbe8361e71052df9f",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"intro\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 667,
+        "width": 258,
+        "height": 50,
+        "layoutY": 667,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "kao-lesson-cognate",
+            "y": 637,
+            "h": 43,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 13,
+            "txt": "Türkçedeki akrabası: din"
+          },
+          {
+            "tag": "H4",
+            "cls": "",
+            "y": 680,
+            "h": 16,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 16,
+            "txt": "Fâtiha içindeki yeri"
+          },
+          {
+            "tag": "SPAN",
+            "cls": "kao-lesson-anchor-word kao-lesson-anchor-new",
+            "y": 704,
+            "h": 89,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 13,
+            "txt": "ٱلدِّينِhesap"
+          },
+          {
+            "tag": "B",
+            "cls": "",
+            "y": 711,
+            "h": 58,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 6,
+            "txt": "ٱلدِّينِ"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l07-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l07-gorev-word.webp",
+      "log": [
+        "l07-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=394 ctaR=320 ctaLay=394 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 1 / 1 دِين dîn ◖ Yavaş ◗ Doğal dikkat · Türkçede var: din · 1:4'te 'hesap / ceza' anlamında; Türkçede yalnız 'inanç s"
+      ],
+      "issues": [],
+      "sha256": "8a76fcd3cad1a3d01c4ab76354c5ca86322417c86c5e57ad8056d41d45932e2a",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 394,
+        "width": 296,
+        "height": 56,
+        "layoutY": 394,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l07-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l07-panel-dogru.webp",
+      "log": [
+        "l07-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=632 ctaR=320 ctaLay=632 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 1 / 1 دِين dîn ◖ Yavaş ◗ Doğal dikkat · Türkçede var: din · 1:4'te 'hesap / ceza' anlamında; Türkçede yalnız 'inanç sistemi' ✓ Doğru ceva"
+      ],
+      "issues": [],
+      "sha256": "08d99a920f3dddce5beaaa3ea3be5b557fb653b4ae9934faaf7277bbde70b56c",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 632,
+        "width": 296,
+        "height": 44,
+        "layoutY": 632,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l08-intro",
+      "sceneKind": "lesson",
+      "screenshot": "l08-intro.webp",
+      "log": [
+        "l08-intro: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=664 ctaR=320 ctaLay=664 ctaScr=0 focus=true sel=dc1b7000b140 covN=2 covPx=50 covH=a01441115480 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 2 / 4 إِيَّا iyyâ Dinle yalnız (sana, beni) Örnek âyet إِيَّاكَ نَعْبُدُ وَإِيَّاكَ "
+      ],
+      "issues": [],
+      "sha256": "9a26d6ef0994d07e167603f248bbc791b19c09e404cbc58088ef15889d5ff61d",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"intro\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 664,
+        "width": 258,
+        "height": 50,
+        "layoutY": 664,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "SPAN",
+            "cls": "kao-lesson-anchor-word kao-lesson-anchor-new",
+            "y": 659,
+            "h": 89,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 50,
+            "txt": "إِيَّاكَyalnız sana"
+          },
+          {
+            "tag": "B",
+            "cls": "",
+            "y": 666,
+            "h": 58,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 39,
+            "txt": "إِيَّاكَ"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l09-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l09-gorev-word.webp",
+      "log": [
+        "l09-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=317 ctaR=320 ctaLay=317 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 1 / 1 إِيَّا iyyâ ◖ Yavaş ◗ Doğal ancak, -den başka yalnız (sana, beni)"
+      ],
+      "issues": [],
+      "sha256": "9859a592db45bae4ec56ec9070f531e79dacd3fa4edb6eb815cb6b16db03df18",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 317,
+        "width": 296,
+        "height": 56,
+        "layoutY": 317,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l09-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l09-panel-dogru.webp",
+      "log": [
+        "l09-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=555 ctaR=320 ctaLay=555 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 1 / 1 إِيَّا iyyâ ◖ Yavaş ◗ Doğal ancak, -den başka ✓ Doğru cevap yalnız (sana, beni) Doğru Devam"
+      ],
+      "issues": [],
+      "sha256": "dff29639a473c2798806bf9389da82900f0c170489f2dd8130c8a8a6ca5ed2c0",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 555,
+        "width": 296,
+        "height": 44,
+        "layoutY": 555,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l10-intro",
+      "sceneKind": "lesson",
+      "screenshot": "l10-intro.webp",
+      "log": [
+        "l10-intro: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=715 ctaR=320 ctaLay=715 ctaScr=0 focus=true sel=dc1b7000b140 covN=4 covPx=16 covH=27faf0df0a6c coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 3 / 4 عَبَدَ ʿabede Dinle kulluk etti, ibadet etti Örnek âyet إِيَّاكَ نَعْبُدُ وَإِ"
+      ],
+      "issues": [],
+      "sha256": "491ddcbabaf3aa01a6f13ee5827b14270a1a49633fd88c2544f030bd2b0b20ae",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"intro\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 715,
+        "width": 258,
+        "height": 50,
+        "layoutY": 715,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "kao-lesson-cognate",
+            "y": 685,
+            "h": 43,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 13,
+            "txt": "Türkçedeki akrabası: ibadet"
+          },
+          {
+            "tag": "H4",
+            "cls": "",
+            "y": 728,
+            "h": 16,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 16,
+            "txt": "Fâtiha içindeki yeri"
+          },
+          {
+            "tag": "SPAN",
+            "cls": "kao-lesson-anchor-word kao-lesson-anchor-new",
+            "y": 752,
+            "h": 89,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 13,
+            "txt": "نَعْبُدُibadet ederiz"
+          },
+          {
+            "tag": "B",
+            "cls": "",
+            "y": 759,
+            "h": 58,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 6,
+            "txt": "نَعْبُدُ"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l11-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l11-gorev-word.webp",
+      "log": [
+        "l11-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=361 ctaR=320 ctaLay=361 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 1 / 1 عَبَدَ ʿabede ◖ Yavaş ◗ Doğal Türkçede var: ibadet yarattı kulluk etti, ibadet etti"
+      ],
+      "issues": [],
+      "sha256": "920cb7411d61c8ea8395a7e6f255b3601812cfd8b3f3fc3a2e57866ef623ad8d",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 361,
+        "width": 296,
+        "height": 56,
+        "layoutY": 361,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l11-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l11-panel-dogru.webp",
+      "log": [
+        "l11-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=599 ctaR=320 ctaLay=599 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 1 / 1 عَبَدَ ʿabede ◖ Yavaş ◗ Doğal Türkçede var: ibadet yarattı ✓ Doğru cevap kulluk etti, ibadet etti Doğru Devam"
+      ],
+      "issues": [],
+      "sha256": "85b5b62441aa621324513ce7f9bc21209174783481a6f9b2a9091e091d4daf33",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 599,
+        "width": 296,
+        "height": 44,
+        "layoutY": 599,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l12-intro",
+      "sceneKind": "lesson",
+      "screenshot": "l12-intro.webp",
+      "log": [
+        "l12-intro: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=715 ctaR=320 ctaLay=715 ctaScr=0 focus=true sel=dc1b7000b140 covN=4 covPx=16 covH=710cf654b272 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 4 / 4 ٱسْتَعِينُ isteʿînü Dinle yardım dileriz Örnek âyet نَعْبُدُ وَإِيَّاكَ نَسْتَ"
+      ],
+      "issues": [],
+      "sha256": "99e8d115a603d9ff80de49841de839c39d377cb865e4fb112175a75795905e42",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"intro\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 715,
+        "width": 258,
+        "height": 50,
+        "layoutY": 715,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "kao-lesson-cognate",
+            "y": 685,
+            "h": 43,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 13,
+            "txt": "Türkçedeki akrabası: iane"
+          },
+          {
+            "tag": "H4",
+            "cls": "",
+            "y": 728,
+            "h": 16,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 16,
+            "txt": "Fâtiha içindeki yeri"
+          },
+          {
+            "tag": "SPAN",
+            "cls": "kao-lesson-anchor-word kao-lesson-anchor-new",
+            "y": 752,
+            "h": 89,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 13,
+            "txt": "نَسْتَعِينُyardım dileriz"
+          },
+          {
+            "tag": "B",
+            "cls": "",
+            "y": 759,
+            "h": 58,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 6,
+            "txt": "نَسْتَعِينُ"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l13-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l13-gorev-word.webp",
+      "log": [
+        "l13-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=361 ctaR=320 ctaLay=361 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 1 / 1 ٱسْتَعِينُ isteʿînü ◖ Yavaş ◗ Doğal Türkçede var: iane yardım dileriz dedi, söyledi"
+      ],
+      "issues": [],
+      "sha256": "07eb76cced9268e1b070670a4be1c218d770d5b1594880b145673e662c25c470",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 361,
+        "width": 296,
+        "height": 56,
+        "layoutY": 361,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l13-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l13-panel-dogru.webp",
+      "log": [
+        "l13-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=599 ctaR=320 ctaLay=599 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 1 / 1 ٱسْتَعِينُ isteʿînü ◖ Yavaş ◗ Doğal Türkçede var: iane ✓ Doğru cevap yardım dileriz dedi, söyledi Doğru Devam"
+      ],
+      "issues": [],
+      "sha256": "14ae9f4e47655b072cb195738c563c732d36f49163573234a1ca7ddf7cbf8a75",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 599,
+        "width": 296,
+        "height": 44,
+        "layoutY": 599,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l14-concept",
+      "sceneKind": "lesson",
+      "screenshot": "l14-concept.webp",
+      "log": [
+        "l14-concept: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=490 ctaR=320 ctaLay=490 ctaScr=0 focus=true sel=cb080f6194d4 covN=4 covPx=26 covH=b7695fccd88d coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Kavram İki isim yan yana: …nın …ı İki ismi yan yana koyunca Türkçedeki '-nın … -ı' bağı kurulur; s"
+      ],
+      "issues": [
+        "KAYDIRMALI-ALAN(bilgi) | div.kao-lesson-table-wrap | Türkçesi1. kelime (tamlanan)2. kelime (t | sw=289 cw=220"
+      ],
+      "sha256": "ad474856c4c8c413fee34b98e03fa1ddcdd74d7efb8f5e4ebdd4fbd0ae44c93b",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"concept\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 490,
+        "width": 258,
+        "height": 50,
+        "layoutY": 490,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "TH",
+            "cls": "",
+            "y": 461,
+            "h": 55,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 26,
+            "txt": "Türkçesi"
+          },
+          {
+            "tag": "TH",
+            "cls": "",
+            "y": 461,
+            "h": 55,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 26,
+            "txt": "1. kelime (tamlanan)"
+          },
+          {
+            "tag": "TH",
+            "cls": "",
+            "y": 461,
+            "h": 55,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 26,
+            "txt": "2. kelime (tamlayan)"
+          },
+          {
+            "tag": "TD",
+            "cls": "",
+            "y": 516,
+            "h": 97,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 25,
+            "txt": "âlemlerin Rabbi"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l15-gorev-order",
+      "sceneKind": "practice",
+      "screenshot": "l15-gorev-order.webp",
+      "log": [
+        "l15-gorev-order: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=109 ctaX=12 ctaY=448 ctaR=320 ctaLay=448 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Kelime dizme 1 / 5 'hesap gününün sahibi' tamlamasını Arapça sırayla diz. مَـٰلِكِ mâliki Anlamı: hesap gününün sahibi İpucu: pa"
+      ],
+      "issues": [],
+      "sha256": "e89bd5bbbf84595e50276a8c0f6933507d870652be8c8e468c387281afa5424d",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 448,
+        "width": 296,
+        "height": 109,
+        "layoutY": 448,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 859,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l15-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l15-panel-dogru.webp",
+      "log": [
+        "l15-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=772 ctaR=320 ctaLay=992 ctaScr=220 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Kelime dizme 1 / 5 'hesap gününün sahibi' tamlamasını Arapça sırayla diz. مَـٰلِكِ mâliki Anlamı: hesap gününün sahibi İpucu: parça yukarıdaki kelim"
+      ],
+      "issues": [],
+      "sha256": "3036075379454f2ea91ed32375d029fb9ea65837e6715d5731a1df216ccf6e8b",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 772,
+        "width": 296,
+        "height": 44,
+        "layoutY": 992,
+        "scrollTop": 220,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 220,
+          "scrollHeight": 1064,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l16-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l16-gorev-word.webp",
+      "log": [
+        "l16-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=403 ctaR=320 ctaLay=403 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 2 / 5 Dinlediğin kelimenin anlamını seç ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' an"
+      ],
+      "issues": [],
+      "sha256": "5a24e4e749c58632b0d29d631de737cf0924f069617e5341b53eeac243dee98b",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 403,
+        "width": 296,
+        "height": 56,
+        "layoutY": 403,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l16-panel-yanlis",
+      "sceneKind": "feedback",
+      "screenshot": "l16-panel-yanlis.webp",
+      "log": [
+        "l16-panel-yanlis: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=79 ctaH=44 ctaX=213 ctaY=756 ctaR=320 ctaLay=926 ctaScr=170 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Anlamı seç 2 / 6 Dinlediğin kelimenin anlamını seç ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış ✕ Seni"
+      ],
+      "issues": [],
+      "sha256": "265cf00a848e2c4f1d99de4c832dd20b9d5836c9dd7faca63905356a5b98785f",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 213,
+        "y": 756,
+        "width": 79,
+        "height": 44,
+        "layoutY": 926,
+        "scrollTop": 170,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 170,
+          "scrollHeight": 1014,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l17-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l17-gorev-word.webp",
+      "log": [
+        "l17-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=402 ctaR=320 ctaLay=402 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 3 / 6 يَوْم Okunuş ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış gün hiç"
+      ],
+      "issues": [],
+      "sha256": "faa6b1beda15d4cb25b47181a7304ad514310883ec3385154252acf7b63732b5",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 402,
+        "width": 296,
+        "height": 56,
+        "layoutY": 402,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l17-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l17-panel-dogru.webp",
+      "log": [
+        "l17-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=772 ctaR=320 ctaLay=772 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 3 / 6 يَوْم Okunuş ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış ✓ Doğru cevap gün hiçbir za"
+      ],
+      "issues": [],
+      "sha256": "243792e21c6709e5bb8e9c141d0de53fc15ff8a48732db5c8a7de589dd0c3f9c",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 772,
+        "width": 296,
+        "height": 44,
+        "layoutY": 772,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l18-gorev-grammar",
+      "sceneKind": "practice",
+      "screenshot": "l18-gorev-grammar.webp",
+      "log": [
+        "l18-gorev-grammar: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=64 ctaX=12 ctaY=297 ctaR=320 ctaLay=297 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Parça çevir 4 / 6 Doğru çeviri hangisi? مَـٰلِكِ يَوْمِ ٱلدِّينِ mâliki yevmi d-dîn Âyet 1:4 âlemlerin Rabbi Allah'ın size olan "
+      ],
+      "issues": [],
+      "sha256": "0a340f783a36ce5a90ac3ceee8a1d0b5639bba87aa3a8b5b345c0abc70627287",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 297,
+        "width": 296,
+        "height": 64,
+        "layoutY": 297,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l18-panel-yanlis",
+      "sceneKind": "feedback",
+      "screenshot": "l18-panel-yanlis.webp",
+      "log": [
+        "l18-panel-yanlis: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=79 ctaH=44 ctaX=213 ctaY=756 ctaR=320 ctaLay=936 ctaScr=180 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Parça çevir 4 / 7 Doğru çeviri hangisi? مَـٰلِكِ يَوْمِ ٱلدِّينِ mâliki yevmi d-dîn Âyet 1:4 ✕ Senin seçimin âlemlerin Rabbi Allah'ın size olan nime"
+      ],
+      "issues": [],
+      "sha256": "6c03983f40a8b74e45c4f52ba55995484318ef6c544e24f80cf278cd9a93c40a",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 213,
+        "y": 756,
+        "width": 79,
+        "height": 44,
+        "layoutY": 936,
+        "scrollTop": 180,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 180,
+          "scrollHeight": 1024,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l19-gorev-order",
+      "sceneKind": "practice",
+      "screenshot": "l19-gorev-order.webp",
+      "log": [
+        "l19-gorev-order: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=109 ctaX=12 ctaY=313 ctaR=320 ctaLay=420 ctaScr=107 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Kelime dizme 5 / 7 Parçayı diz. وَٱذْكُرُوا۟ vezkürû Anlamı: Allah'ın size olan nimetini hatırlayın İpucu: parça yukarıdaki keli"
+      ],
+      "issues": [],
+      "sha256": "90c4d5a0960c1ebaad33dfa78f8b727d00f66f35626df9ce02f102bb8b9b8cd8",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 313,
+        "width": 296,
+        "height": 109,
+        "layoutY": 420,
+        "scrollTop": 107,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 107,
+          "scrollHeight": 951,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l19-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l19-panel-dogru.webp",
+      "log": [
+        "l19-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=772 ctaR=320 ctaLay=1182 ctaScr=410 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Kelime dizme 5 / 7 Parçayı diz. وَٱذْكُرُوا۟ vezkürû Anlamı: Allah'ın size olan nimetini hatırlayın İpucu: parça yukarıdaki kelimeyle başlar وَٱذْكُ"
+      ],
+      "issues": [],
+      "sha256": "0e9c4ad7673b843859c2adc84f7b47e3e92febd9447702fc64cf35bd9b862af3",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 772,
+        "width": 296,
+        "height": 44,
+        "layoutY": 1182,
+        "scrollTop": 410,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 410,
+          "scrollHeight": 1254,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l20-gorev-word",
+      "sceneKind": "practice",
+      "screenshot": "l20-gorev-word.webp",
+      "log": [
+        "l20-gorev-word: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=378 ctaR=320 ctaLay=378 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 6 / 7 يَوْم yevm ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış yazılı ki"
+      ],
+      "issues": [],
+      "sha256": "deaf57dc692421f730e3bcc60dcbd3c30d326f34478877bc6fbb78601387aae9",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 378,
+        "width": 296,
+        "height": 56,
+        "layoutY": 378,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l20-panel-yanlis",
+      "sceneKind": "feedback",
+      "screenshot": "l20-panel-yanlis.webp",
+      "log": [
+        "l20-panel-yanlis: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=79 ctaH=44 ctaX=213 ctaY=756 ctaR=320 ctaLay=901 ctaScr=145 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Anlamı seç 6 / 8 يَوْم yevm ◖ Yavaş ◗ Doğal dikkat · Türkçede var: yevmiye · Türkçede 'gündelik ücret' anlamına kaymış ✕ Senin seçimin yazılı kitap "
+      ],
+      "issues": [],
+      "sha256": "42d270516cb724ae860db3220497c678928fe35a5c4bda380ec862d5ce02016f",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 213,
+        "y": 756,
+        "width": 79,
+        "height": 44,
+        "layoutY": 901,
+        "scrollTop": 145,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 145,
+          "scrollHeight": 989,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l21-gorev-meaning",
+      "sceneKind": "practice",
+      "screenshot": "l21-gorev-meaning.webp",
+      "log": [
+        "l21-gorev-meaning: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=342 ctaR=320 ctaLay=342 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 7 / 8 ٱلَّذِى Okunuş ◖ Yavaş ◗ Doğal hangi? o ki; -an, -en kimse"
+      ],
+      "issues": [],
+      "sha256": "88d0e00ffff6f87703fa22a9b64fdc15f3951f1ab93075fcb73bd30411150a11",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 342,
+        "width": 296,
+        "height": 56,
+        "layoutY": 342,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l21-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l21-panel-dogru.webp",
+      "log": [
+        "l21-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=580 ctaR=320 ctaLay=580 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 7 / 8 ٱلَّذِى Okunuş ◖ Yavaş ◗ Doğal hangi? ✓ Doğru cevap o ki; -an, -en kimse Doğru Devam"
+      ],
+      "issues": [],
+      "sha256": "2a30b5b8603520383b90ef5035f21832151a7cd7d8b28415ff899b7d1d1bf9ea",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 580,
+        "width": 296,
+        "height": 44,
+        "layoutY": 580,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l22-gorev-grammar",
+      "sceneKind": "practice",
+      "screenshot": "l22-gorev-grammar.webp",
+      "log": [
+        "l22-gorev-grammar: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=64 ctaX=12 ctaY=297 ctaR=320 ctaLay=297 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Parça çevir 8 / 8 Doğru çeviri hangisi? مَـٰلِكِ يَوْمِ ٱلدِّينِ mâliki yevmi d-dîn Âyet 1:4 Allah'ın adıyla hesap gününün sahib"
+      ],
+      "issues": [],
+      "sha256": "31d3a528b970df5aa0761147cee9c147a672adea249df637a91936c489c8b311",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 297,
+        "width": 296,
+        "height": 64,
+        "layoutY": 297,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l22-panel-yanlis",
+      "sceneKind": "feedback",
+      "screenshot": "l22-panel-yanlis.webp",
+      "log": [
+        "l22-panel-yanlis: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=79 ctaH=44 ctaX=213 ctaY=756 ctaR=320 ctaLay=936 ctaScr=180 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Parça çevir 8 / 9 Doğru çeviri hangisi? مَـٰلِكِ يَوْمِ ٱلدِّينِ mâliki yevmi d-dîn Âyet 1:4 ✕ Senin seçimin Allah'ın adıyla ✓ Doğru cevap hesap gün"
+      ],
+      "issues": [],
+      "sha256": "86df151dc75136aa8c0e3d26edae6819ce3a9704a039a9b66b41a63f6080aba5",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 213,
+        "y": 756,
+        "width": 79,
+        "height": 44,
+        "layoutY": 936,
+        "scrollTop": 180,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 180,
+          "scrollHeight": 1024,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l23-gorev-meaning",
+      "sceneKind": "practice",
+      "screenshot": "l23-gorev-meaning.webp",
+      "log": [
+        "l23-gorev-meaning: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=56 ctaX=12 ctaY=386 ctaR=320 ctaLay=386 ctaScr=0 focus=true sel=7719a6096aad covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 9 / 9 رَبّ Okunuş ◖ Yavaş ◗ Doğal Türkçede var: Rab insanlar terbiye edip yöneten Rab"
+      ],
+      "issues": [],
+      "sha256": "cfc9245369339024e7f22e40395e6214798b6cd07813bdbfe0513935bce00826",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-task.is-practice .kao-choices button",
+        "present": true,
+        "x": 12,
+        "y": 386,
+        "width": 296,
+        "height": 56,
+        "layoutY": 386,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l23-panel-dogru",
+      "sceneKind": "feedback",
+      "screenshot": "l23-panel-dogru.webp",
+      "log": [
+        "l23-panel-dogru: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=296 ctaH=44 ctaX=12 ctaY=624 ctaR=320 ctaLay=624 ctaScr=0 focus=true sel=dd1ac2cf7069 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Anlamı seç 9 / 9 رَبّ Okunuş ◖ Yavaş ◗ Doğal Türkçede var: Rab insanlar ✓ Doğru cevap terbiye edip yöneten Rab Doğru Devam"
+      ],
+      "issues": [],
+      "sha256": "335f812b94b2d8a19be8b8392f1451f74d49fe65afbf22cd985c95a39e7e894d",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue",
+        "present": true,
+        "x": 12,
+        "y": 624,
+        "width": 296,
+        "height": 44,
+        "layoutY": 624,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l24-apply",
+      "sceneKind": "lesson",
+      "screenshot": "l24-apply.webp",
+      "log": [
+        "l24-apply: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=758 ctaR=320 ctaLay=758 ctaScr=0 focus=true sel=fdc9a040fbc0 covN=4 covPx=29 covH=c89fa9deec27 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Çapa metni Fâtiha Yaldızla’ya dokun; kelimeler çapa metninde sırayla yaldızlanır. يَوْمِ ٱلدِّينِ "
+      ],
+      "issues": [],
+      "sha256": "7b9a525e3f698aa62ed356c4c40a26421fb2e76ae61c10bc502a99daf67953cc",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"apply\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 758,
+        "width": 258,
+        "height": 50,
+        "layoutY": 758,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "LI",
+            "cls": "kao-lesson-apply-word kao-lesson-apply-open",
+            "y": 721,
+            "h": 52,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 15,
+            "txt": "ٱلرَّحِيمِRahîm"
+          },
+          {
+            "tag": "SPAN",
+            "cls": "",
+            "y": 731,
+            "h": 32,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 5,
+            "txt": "ٱلرَّحِيمِ"
+          },
+          {
+            "tag": "LI",
+            "cls": "kao-lesson-apply-word kao-lesson-apply-open",
+            "y": 779,
+            "h": 52,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 29,
+            "txt": "ٱلْحَمْدُhamd"
+          },
+          {
+            "tag": "SPAN",
+            "cls": "",
+            "y": 789,
+            "h": 32,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 19,
+            "txt": "ٱلْحَمْدُ"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 2374,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l25-summary",
+      "sceneKind": "lesson",
+      "screenshot": "l25-summary.webp",
+      "log": [
+        "l25-summary: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=true hiddenPx=44 collisions=1 collisionPx=44 ctaW=258 ctaH=50 ctaX=31 ctaY=758 ctaR=320 ctaLay=758 ctaScr=0 focus=true sel=8fafa3ec6be3 covN=2 covPx=21 covH=20775405dbf8 coverY=764 coverH=1c28fb90e28e lscroll=true overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Ders tamamlandı Yalnız sana Bu derste tanıştıkların Kur’an kapsamı +%0.00 · iki yönde kalıcı kelim"
+      ],
+      "issues": [],
+      "sha256": "9d653104c3846d76c4070580f018c39df8e143b9113541ed4d254dae90f00701",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 758,
+        "width": 258,
+        "height": 50,
+        "layoutY": 758,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": true,
+        "coverStack": [
+          {
+            "tag": "BUTTON",
+            "cls": "kao-lesson-audio kao-lesson-more",
+            "y": 764,
+            "h": 44,
+            "pos": "sticky",
+            "z": "auto"
+          },
+          {
+            "tag": "BUTTON",
+            "cls": "kao-primary kao-lesson-next",
+            "y": 758,
+            "h": 50,
+            "pos": "sticky",
+            "z": "auto"
+          },
+          {
+            "tag": "SECTION",
+            "cls": "kao-lesson-anchor kao-lesson-summary-next",
+            "y": 717,
+            "h": 147,
+            "pos": "static",
+            "z": "auto"
+          },
+          {
+            "tag": "SECTION",
+            "cls": "kao-lesson-card kao-lesson-summary kao-moment",
+            "y": 141,
+            "h": 742,
+            "pos": "relative",
+            "z": "auto"
+          }
+        ],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "",
+            "y": 754,
+            "h": 26,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 21,
+            "txt": "Fâtiha · Ders 4"
+          },
+          {
+            "tag": "P",
+            "cls": "",
+            "y": 787,
+            "h": 77,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 21,
+            "txt": "8 tekrar + 4 yeni · 23 görev · ~"
+          }
+        ],
+        "overlapsControl": [
+          {
+            "tag": "BUTTON",
+            "cls": "kao-lesson-audio kao-lesson-more",
+            "y": 764,
+            "h": 44,
+            "pos": "sticky",
+            "z": "auto",
+            "overlapPx": 44
+          }
+        ],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 1048,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "s0-asama-1",
+      "sceneKind": "s0",
+      "screenshot": "s0-asama-1.webp",
+      "log": [
+        "s0-asama-1: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 1 / 4 · Açıklama Aynı gövdeyi paylaşan "
+      ],
+      "issues": [],
+      "sha256": "459425334d2aaafe4dfeba9b1300da5681c75e7cf1577aa5114bcc5589d1b417",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "s0-asama-2",
+      "sceneKind": "s0",
+      "screenshot": "s0-asama-2.webp",
+      "log": [
+        "s0-asama-2: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 2 / 4 · Dinle ve gör Dinle ve gör بَأْس"
+      ],
+      "issues": [],
+      "sha256": "37ab108ef7f42f5412bb29e607224e159b5d025e7927deaa7beebca232f1a904",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "s0-asama-3",
+      "sceneKind": "s0",
+      "screenshot": "s0-asama-3.webp",
+      "log": [
+        "s0-asama-3: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma Soru 1 / 8 · Doğru: 0"
+      ],
+      "issues": [],
+      "sha256": "5a9db938bcc74ae87693a945084f248c085a2f22ec5ffe472119df051d89f253",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "s0-asama-3-cevap",
+      "sceneKind": "s0",
+      "screenshot": "s0-asama-3-cevap.webp",
+      "log": [
+        "s0-asama-3-cevap: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma Soru 1 / 8 · Doğru: 1"
+      ],
+      "issues": [],
+      "sha256": "bb2f4faad05c4afd8a7e877c5fab5b9812a6cef7a4484ef3ec5e84c438b2715d",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "s0-asama-4",
+      "sceneKind": "s0",
+      "screenshot": "s0-asama-4.webp",
+      "log": [
+        "s0-asama-4: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma Soru 2 / 8 · Doğru: 1"
+      ],
+      "issues": [],
+      "sha256": "9494f8b41e885a704dec5723327dabe029f97fde74599b20527b8dd4d29fa1b7",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "s0-asama-4-cevap",
+      "sceneKind": "s0",
+      "screenshot": "s0-asama-4-cevap.webp",
+      "log": [
+        "s0-asama-4-cevap: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Harfler Seviye 0 · şekil aileleri Nokta ailesi Aşama 3 / 4 · Alıştırma Soru 2 / 8 · Doğru: 2"
+      ],
+      "issues": [],
+      "sha256": "f3e394412293c73f50111febbddff456e4f10444c3c5c01b3bcd1dbec261f292",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "z1-ayarlar-alt",
+      "sceneKind": "view",
+      "screenshot": "z1-ayarlar-alt.webp",
+      "log": [
+        "z1-ayarlar-alt: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ‹ Kur'an Arapçası Ayarlar Ayarlar Öğrenme ayarların Seçimlerin bu cihazda saklanır ve senkronla taşınır. Günlü"
+      ],
+      "issues": [],
+      "sha256": "f674866a7a149cafe99e9493b97059b717f0712ebf55f97087a4a5f078943c93",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "z2-ustalik-baslangic",
+      "sceneKind": "mastery",
+      "screenshot": "z2-ustalik-baslangic.webp",
+      "log": [
+        "z2-ustalik-baslangic: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ustalık kontrolü Ustalık: Fâtiha Hedefi ve metni gör Devam"
+      ],
+      "issues": [],
+      "sha256": "1963a12315bc739eaf90caef0f8547427ed8140663431e648b9d8c96ed4cdf39",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "z3-tekrar-sonrasi-ana",
+      "sceneKind": "view",
+      "screenshot": "z3-tekrar-sonrasi-ana.webp",
+      "log": [
+        "z3-tekrar-sonrasi-ana: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok | Kapat Kur'an Arapçası Kur'an Arapçası Doğru cevaplarda hızlı geç Otomatik geçiş açıkken doğru cevaptan kısa süre sonra kendiliğind"
+      ],
+      "issues": [],
+      "sha256": "a518ae3f8a73c772f8187315ecb1b322e0876adf151119b85dbd67b6e8780fda",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "onboarding",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "o1-ilk-acilis-1",
+      "sceneKind": "onboarding",
+      "screenshot": "o1-ilk-acilis-1.webp",
+      "log": [
+        "o1-ilk-acilis-1: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na node=onboarding text=ee15f17c6ae1 onb=light overflowX=false hard=yok | SEYMA_OS build · aeon delight 🦩 Şeyma 🦩 delight MİNİK DENGE GÜNLÜĞÜ v3.0 seyma — denge.sys ● ready icsel_pusula ok duygu takibi · notlar · içgörü sa"
+      ],
+      "issues": [
+        "KISALTILMIS-METIN(bilgi) | div | sen bağlarsan GitHub | sw=132 cw=118"
+      ],
+      "sha256": "2e7c88789b1e72c0d64d0dc0378eea5e395795fdfccc65f0a7daa9cfae5ee2e9",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": "light"
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "onboarding",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "o2-ilk-acilis-2",
+      "sceneKind": "onboarding",
+      "screenshot": "o2-ilk-acilis-2.webp",
+      "log": [
+        "o2-ilk-acilis-2: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na node=app text=7d4a616264fa onb=yok overflowX=false hard=yok | Şeyma 🦩 Eşitle GÜN 1 Bugün 1/15 tik · kayıt bekliyor Bağlan GÜNDÜZ GÜNÜN FOTOĞRAFI Wikimedia Commons · Picture of the Day 28 Ekim Çarşamba · Bugün Bu"
+      ],
+      "issues": [
+        "KISALTILMIS-METIN(bilgi) | div | Tatil günlerinde su hedefi 10 bardak, se | sw=278 cw=136",
+        "KISALTILMIS-METIN(bilgi) | div | İyi günler | sw=58 cw=37"
+      ],
+      "sha256": "dd771619c137f7cd81e0465acdfe0e31c584c8215ed041c1a2d8f7722c9f83ef",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "onboarding",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "o3-kao-ilk-acilis-1",
+      "sceneKind": "onboarding",
+      "screenshot": "o3-kao-ilk-acilis-1.webp",
+      "log": [
+        "o3-kao-ilk-acilis-1: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na node=dialog text=f78741eb4a5e onb=yok overflowX=false hard=yok | Kapat Hoş geldin 1/3 Atla Namazda söylediklerini anlamaya başla 524 kelime Bu kelimeler Kur’an metninin %77 kadarını oluşturur. Önce öğren, sonra akıl"
+      ],
+      "issues": [],
+      "sha256": "4ae1930dd2b7a844c843365a3b045439e328a5d007e162bd96b647b5b69b007e",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "onboarding",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "o4-kao-ilk-acilis-2",
+      "sceneKind": "onboarding",
+      "screenshot": "o4-kao-ilk-acilis-2.webp",
+      "log": [
+        "o4-kao-ilk-acilis-2: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na node=dialog text=70ef86611365 onb=yok overflowX=false hard=yok | Kapat Hoş geldin ‹ Geri 2/3 Atla Arapça harfleri okuyabiliyor musun? Doğru ya da yanlış yok; yalnız başlangıç yerini buluyoruz. Henüz değil Harflerle "
+      ],
+      "issues": [],
+      "sha256": "d87d9abd3bd335ef57227cb068e4972fe734cc64392fc3b9432d2bdc335b6d92",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "onboarding",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "o5-yerlestirme-okuma",
+      "sceneKind": "onboarding",
+      "screenshot": "o5-yerlestirme-okuma.webp",
+      "log": [
+        "o5-yerlestirme-okuma: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na node=dialog text=c1a2ddbb8d75 onb=yok overflowX=false hard=yok | Kapat Hoş geldin ‹ Geri 2/3 Atla Kısa okuma kontrolü Doğru okunuşu seç; utanma yok, yalnız yerini buluyoruz. Okuma 1/8 مِن Doğru okunuşu seç min inn m"
+      ],
+      "issues": [],
+      "sha256": "243b9aa81e3fc6519314a8316379bdcc1af40be2bdf0b4a28165772c53bccb78",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "onboarding",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "o6-yerlestirme-dinleme",
+      "sceneKind": "onboarding",
+      "screenshot": "o6-yerlestirme-dinleme.webp",
+      "log": [
+        "o6-yerlestirme-dinleme: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na node=dialog text=4a071ffa3598 onb=yok overflowX=false hard=yok | Kapat Hoş geldin ‹ Geri 2/3 Atla Kısa dinleme kontrolü Sesi dinle, duyduğun harfi seç. Dinleme 1/4 Sesi dinle Hangi harf? ت ط"
+      ],
+      "issues": [],
+      "sha256": "151cb3eb73e5bd8476a9555d57be0d340323f0ea88d77700231049e820e8f767",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "onboarding",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "o7-kao-ilk-acilis-3",
+      "sceneKind": "onboarding",
+      "screenshot": "o7-kao-ilk-acilis-3.webp",
+      "log": [
+        "o7-kao-ilk-acilis-3: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na node=dialog text=ee8bde3617bb onb=yok overflowX=false hard=yok | Kapat Hoş geldin ‹ Geri 3/3 Atla Günde ne kadar? Seçimlerini sonra Ayarlar’dan değiştirebilirsin. Okuma 8/8 · Fâtiha’dan başlıyoruz. Günlük süre 5 dk "
+      ],
+      "issues": [],
+      "sha256": "3ab10f3471470c39d97bd5f417ff8709c162bb0343917a9e24c5a805ba88f593",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    },
+    {
+      "profile": "glif",
+      "theme": "light",
+      "viewport": {
+        "width": 460,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 4,
+      "scene": "g1-30-zor-glif",
+      "sceneKind": "glyph",
+      "screenshot": "g1-30-zor-glif.webp",
+      "log": [
+        "g1-30-zor-glif: theme=light surface=#F7F5EE vw=460 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok rows=30 h=68 hMin=68 hFirst=15 hLast=2538 hSw=460 hCw=460 font=K3P-Scheherazade loaded=true woff2=1 metrics=3011/4492 distinct=true check=true px=1840x10488 scale=4.00x ser=82b2d9c7cd6e1107 | نَفَّٰثَٰت ضَلَّ حَقَّ صَدَّ ظَنَّ مَسَّ رَدَّ عَذَّبَ عَلَّمَ حَرَّمَ حَتَّىٰ أَضَلَّ أَوْ كَصَيِّبٍ مِّنَ بَلَىٰ مَنْ أَسْلَمَ وَإِذْ قَالَ رَبُّكَ لَّيْسَ ٱلْبِرَّ أَن كُلِّ شَىْءٍ قَدِيرٌ إِلَىٰ قَوْمِ لُوطٍ لَّهُۥ لِّكُلِّ إِنَّهُۥ مَّسَدٍۭ صَلَّىٰٓ رَبَّهُۥ مُّمَدَّدَةٍۭ لِرَبِّهِۦ وَإِنَّهُۥ فَأُمُّهُۥ إِنَّ بِهِۦ"
+      ],
+      "issues": [],
+      "sha256": "38e46400facbaf28ba5884565aea34db4fae998a50101c4e16d8ef95952d89b6",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    }
+  ]
+}

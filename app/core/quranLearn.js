@@ -331,8 +331,7 @@
     }
     return out;
   }
-  // R-A2: hedefin bir önceki tekrarındaki çeldiriciler. Aynı lemmanın
-  // öteki yön kartı da aynı çeldirici sayılır; dışlama lemma düzeyindedir.
+  // R-A2: önceki çeldiriciler iki yön için lemma düzeyinde dışlanır.
   function previousDistractorLemmas(d,targetId,opts){
     var cards=objectOr(quranLearnRoot(d).cards,{}),targetCard=objectOr(cards[targetId],{});
     var previousMap=opts.previousDistractors&&typeof opts.previousDistractors==='object'?opts.previousDistractors:{};
@@ -2112,7 +2111,7 @@
     for(var i=0;i<nodes.length;i+=1){
       var choiceNode=nodes[i];
       if(!choiceNode||typeof choiceNode.getAttribute!=='function'||choiceNode.getAttribute('data-kao-choice-id')!==next.choiceId||choiceNode.disabled===true||typeof choiceNode.focus!=='function') continue;
-      try{ choiceNode.focus({preventScroll:true}); }catch(_error){ choiceNode.focus(); }
+      choiceNode.focus();
       return true;
     }
     return false;
@@ -4419,9 +4418,7 @@
     return back&&card&&body&&back.id==='sey-ov-back'&&card.id==='sey-ov-card'&&body.id==='sey-ov-body'?{back:back,card:card,body:body}:null;
   }
   function kaoSyncAttrs(node,attrs,names){ names.forEach(function(name){ if(Object.prototype.hasOwnProperty.call(attrs,name)) node.setAttribute(name,attrs[name]); else node.removeAttribute(name); }); }
-  // app.js mount buraya devreder. Overlay yoksa ekler; varsa düğümleri korur.
-  // Açılış animasyonu yalnız ilk eklemede oynar: CSS animasyonu düğüm belgede
-  // kaldıkça yeniden başlamaz, bu yüzden 'patch' yolu animasyona hiç dokunmaz.
+  // Patch açılış animasyonunu tekrarlamaz.
   function kaoPatchOverlay(doc,html){
     var root=doc.getElementById('app'),live=kaoLiveOverlay(root),split=kaoSplitOverlay(html);
     if(!live||!split){
@@ -4431,12 +4428,14 @@
       kaoScreenKeyLast=split?split.screenKey:'';
       return 'insert';
     }
-    var active=doc.activeElement,focusId=active&&active.id&&active!==live.card&&active!==live.back?String(active.id):'',top=live.body.scrollTop||0,sameScreen=split.screenKey===kaoScreenKeyLast;
+    var active=doc.activeElement,focusId=active&&active.id&&active!==live.card&&active!==live.back?String(active.id):'',top=live.body.scrollTop||0,inner=live.body.querySelector('.kao-lesson-content'),innerTop=inner?inner.scrollTop:0,sameScreen=split.screenKey===kaoScreenKeyLast,task=live.body.querySelector('#kao-task'),taskId=task&&task.getAttribute('data-task-id'),openCloze=task&&task.querySelector('.kao-fragment-stimulus details[open]'),clozeFocus=openCloze&&active===openCloze.querySelector('summary');
     kaoSyncAttrs(live.card,split.cardAttrs,KAO_CARD_ATTRS);
     kaoSyncAttrs(live.body,split.bodyAttrs,KAO_BODY_ATTRS);
     live.body.innerHTML=split.body;
-    kaoH4BindDetails(live.body,currentTask());
+    var activeTask=currentTask(); kaoH4BindDetails(live.body,activeTask);
+    task=live.body.querySelector('#kao-task'); if(sameScreen&&taskId&&openCloze&&activeTask&&activeTask.kind==='cloze'&&task&&task.getAttribute('data-task-id')===taskId){ var detail=task.querySelector('.kao-fragment-stimulus details'); if(detail){ detail.open=true; if(clozeFocus){ var summary=detail.querySelector('summary'); if(summary) summary.focus({preventScroll:true}); } } }
     live.body.scrollTop=sameScreen?top:0;
+    inner=live.body.querySelector('.kao-lesson-content'); if(inner) inner.scrollTop=sameScreen?innerTop:0;
     kaoScreenKeyLast=split.screenKey;
     if(focusId){ var again=doc.getElementById(focusId); if(again&&typeof again.focus==='function'){ try{ again.focus({preventScroll:true}); }catch(e){ again.focus(); } } }
     return 'patch';

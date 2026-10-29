@@ -1,0 +1,333 @@
+{
+  "schema": "k3pd-visual-qa-manifest",
+  "schemaVersion": 1,
+  "card": "K3PD-29",
+  "generatedAt": "2026-10-28T09:24:13.189Z",
+  "profile": "k3pd29-ref",
+  "theme": "light",
+  "viewport": {
+    "width": 460,
+    "height": 844,
+    "safeAreaBottom": 0
+  },
+  "captureScales": [
+    4
+  ],
+  "imageFormat": "webp",
+  "imageQuality": 90,
+  "mode": "glif-referans",
+  "origin": "http://127.0.0.1:9000",
+  "glyphEvidence": {
+    "scene": "g0-30-zor-glif-referans",
+    "seriesCount": 30,
+    "lexiconVersion": "quran-lexicon-tr-v1",
+    "surahVersion": "quran-short-surahs-tr-v1",
+    "font": {
+      "faces": [],
+      "requests": [],
+      "check": true,
+      "withFont": 2858,
+      "withFallback": 4492,
+      "distinct": true
+    },
+    "sheet": {
+      "rows": 30,
+      "minH": 68,
+      "maxH": 68,
+      "firstTop": 15,
+      "lastTop": 2538,
+      "sheetHeight": 2622,
+      "scrollH": 2622,
+      "clientH": 2622,
+      "sw": 460,
+      "cw": 460,
+      "docH": 2622,
+      "bodyH": 2622
+    },
+    "reference": true,
+    "screenshot": "g0-30-zor-glif-referans.webp",
+    "screenshotSha256": "ed26e3b278085aa56b6273d1d0f3493f7e25c22cc6f161742ca8f85816ef0c73",
+    "captureScale": 4,
+    "imagePixels": {
+      "width": 1840,
+      "height": 10488,
+      "bytes": 257460
+    },
+    "imageFormat": "webp",
+    "imageQuality": 90,
+    "clipHeight": 2622,
+    "viewportHeightDuringCapture": 2622,
+    "series": [
+      {
+        "index": 1,
+        "ar": "نَفَّٰثَٰت",
+        "source": "QuranLexiconV1.lemmas[l_n_af_a_va_t_b7ff1f].ar",
+        "corpus": "lexicon",
+        "marks": 6,
+        "sha256": "0862da1de135b5fa7bd6cca19c9a2f9eda45aa3e5daa2005dda9a3560f52bcfb"
+      },
+      {
+        "index": 2,
+        "ar": "ضَلَّ",
+        "source": "QuranLexiconV1.lemmas[l_Dal_a_2775a8].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "82602018c1460b3c4de1192404e82210c3688ca6927a92f8f02886ee6c77e151"
+      },
+      {
+        "index": 3,
+        "ar": "حَقَّ",
+        "source": "QuranLexiconV1.lemmas[l_Haq_a_a024e5].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "c20feee0599ab0aef8e1426485cf7cf17112e1c757736c25b82f8b272b770c97"
+      },
+      {
+        "index": 4,
+        "ar": "صَدَّ",
+        "source": "QuranLexiconV1.lemmas[l_Sad_a_552787].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "8598cab2225d415be00677d57fe615f5ff89c00fca6171d3364a5895d470b435"
+      },
+      {
+        "index": 5,
+        "ar": "ظَنَّ",
+        "source": "QuranLexiconV1.lemmas[l_Zan_a_9b29e5].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "f823ea4c0d1802bd0fff8682009154078f86681754e5a26b3095ae41b6c008f7"
+      },
+      {
+        "index": 6,
+        "ar": "مَسَّ",
+        "source": "QuranLexiconV1.lemmas[l_mas_a_ba2e94].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "0a12891583f3fc151dcddbcd2ee2ee7380db2143dd1434488ca9968c2a275054"
+      },
+      {
+        "index": 7,
+        "ar": "رَدَّ",
+        "source": "QuranLexiconV1.lemmas[l_rad_a_c68b16].ar",
+        "corpus": "lexicon",
+        "marks": 3,
+        "sha256": "11ced0a29cbccb8a8772923a293394b39ae7ac327ecf685b9d5ba2c87fa492e3"
+      },
+      {
+        "index": 8,
+        "ar": "عَذَّبَ",
+        "source": "QuranLexiconV1.lemmas[l_Ea_aba_be4552].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "8425406a56b5e67bed8c8640737f07e1e8a8e7466dcef9f991c494307f0cf9b5"
+      },
+      {
+        "index": 9,
+        "ar": "عَلَّمَ",
+        "source": "QuranLexiconV1.lemmas[l_Eal_ama_5c04b6].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "851c563847dd381c8ad9f89fe1b352b1578b73e9daddb238a16bfc3e022bcc81"
+      },
+      {
+        "index": 10,
+        "ar": "حَرَّمَ",
+        "source": "QuranLexiconV1.lemmas[l_Har_ama_8f6d04].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "3018bac4eab39527befddb358a7ba384c46731d8220e0cd231f790f35f33f3bd"
+      },
+      {
+        "index": 11,
+        "ar": "حَتَّىٰ",
+        "source": "QuranLexiconV1.lemmas[l_Hat_aY_47c8d9].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "124bcaae915f68b91198fd785f4e761235a1103331dca6daf8fed23dfccaee3c"
+      },
+      {
+        "index": 12,
+        "ar": "أَضَلَّ",
+        "source": "QuranLexiconV1.lemmas[l_aDal_a_5ed954].ar",
+        "corpus": "lexicon",
+        "marks": 4,
+        "sha256": "8c1b5940892a66d8ea4a9c0c3a11682bbd12cae5e909fa04141390983ad3bb20"
+      },
+      {
+        "index": 13,
+        "ar": "أَوْ كَصَيِّبٍ مِّنَ",
+        "source": "QuranLexiconV1.lemmas[l_aw_43116a].examples[0].ar",
+        "corpus": "lexicon-example",
+        "marks": 10,
+        "sha256": "e46e7746b3bc3d4a8fbeba003af3fa0145dfe9706975ff14b92585d546d2afcd"
+      },
+      {
+        "index": 14,
+        "ar": "بَلَىٰ مَنْ أَسْلَمَ",
+        "source": "QuranLexiconV1.lemmas[l_balaY_04cddb].examples[1].ar",
+        "corpus": "lexicon-example",
+        "marks": 9,
+        "sha256": "411934b085f3232e0659f451fca59a846a2fd0225eec4f3efbd864d1acf7f95f"
+      },
+      {
+        "index": 15,
+        "ar": "وَإِذْ قَالَ رَبُّكَ",
+        "source": "QuranLexiconV1.lemmas[l_i_a0c726].examples[0].ar",
+        "corpus": "lexicon-example",
+        "marks": 9,
+        "sha256": "3ffcef15c87ec241b40438e92499b3ce5c0cc48e0530254965cf9015a1bd0d14"
+      },
+      {
+        "index": 16,
+        "ar": "لَّيْسَ ٱلْبِرَّ أَن",
+        "source": "QuranLexiconV1.lemmas[l_l_ayosa_5684fc].examples[2].ar",
+        "corpus": "lexicon-example",
+        "marks": 9,
+        "sha256": "81de8b6a312c6e55778e51087c58f7f559b2662ea34dff6a6ce06479874351fc"
+      },
+      {
+        "index": 17,
+        "ar": "كُلِّ شَىْءٍ قَدِيرٌ",
+        "source": "QuranLexiconV1.lemmas[l_qadiyr_cd0ac2].examples[0].ar",
+        "corpus": "lexicon-example",
+        "marks": 9,
+        "sha256": "ee61788f18b0c7726d14a8419b8de7bbdbddc154fa443895d20fdda37da6770e"
+      },
+      {
+        "index": 18,
+        "ar": "إِلَىٰ قَوْمِ لُوطٍ",
+        "source": "QuranLexiconV1.lemmas[l_luwT_833109].examples[2].ar",
+        "corpus": "lexicon-example",
+        "marks": 8,
+        "sha256": "a8208bf6e2d5f79d764cf3ea6747dbe1fb56a09f26b425d96c29ff05c30576ac"
+      },
+      {
+        "index": 19,
+        "ar": "لَّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-112-4-3].ar",
+        "corpus": "surah",
+        "marks": 4,
+        "sha256": "a8cdfd456fc1787e0a7cb9ad1f9e575962d3388ed3eba696e10d32cc6aa734f2"
+      },
+      {
+        "index": 20,
+        "ar": "لِّكُلِّ",
+        "source": "QuranShortSurahsV1.words[s-104-1-2].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "9beb994c41c178d305bb1458fcf9f05282f606c932220aa2bf3da6915a64fae2"
+      },
+      {
+        "index": 21,
+        "ar": "إِنَّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-110-3-5].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "6bb7f4231e5faed88322ae81bb5ebf4638199dd01a43b93741fe86d2e5aef9ea"
+      },
+      {
+        "index": 22,
+        "ar": "مَّسَدٍۭ",
+        "source": "QuranShortSurahsV1.words[s-111-5-5].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "14af3a13d72b0a3f9d565d2ea0a13bfb52083f806834664f8c68a2eb13275bf4"
+      },
+      {
+        "index": 23,
+        "ar": "صَلَّىٰٓ",
+        "source": "QuranShortSurahsV1.words[s-96-10-3].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "1a7259ca65c91d40a00b2cee5f7b1741559a6dbc167d5dcd7fbc663fe7eb7d36"
+      },
+      {
+        "index": 24,
+        "ar": "رَبَّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-98-8-21].ar",
+        "corpus": "surah",
+        "marks": 5,
+        "sha256": "679da3ce48423529cb1f3d7338cf1a1084980be38747b6ac42be0dac501df10b"
+      },
+      {
+        "index": 25,
+        "ar": "مُّمَدَّدَةٍۭ",
+        "source": "QuranShortSurahsV1.words[s-104-9-3].ar",
+        "corpus": "surah",
+        "marks": 8,
+        "sha256": "18d64247d00c84bb3b61a1dcd648e7554be70a74eaef05071287982f77f83b40"
+      },
+      {
+        "index": 26,
+        "ar": "لِرَبِّهِۦ",
+        "source": "QuranShortSurahsV1.words[s-100-6-3].ar",
+        "corpus": "surah",
+        "marks": 6,
+        "sha256": "4d5466a34f248899c1a1f1bea55c6ce7621b39ae532de956a9ca28ca6518d398"
+      },
+      {
+        "index": 27,
+        "ar": "وَإِنَّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-100-7-1].ar",
+        "corpus": "surah",
+        "marks": 6,
+        "sha256": "140ec64e93068b8b1718100382826aea08950bf1d674cad2fb7688b8831b864a"
+      },
+      {
+        "index": 28,
+        "ar": "فَأُمُّهُۥ",
+        "source": "QuranShortSurahsV1.words[s-101-9-1].ar",
+        "corpus": "surah",
+        "marks": 6,
+        "sha256": "551459f79ee0aefe664fbd31103cc27bb02109d59689ad19b4ae4d8f2c6ace8a"
+      },
+      {
+        "index": 29,
+        "ar": "إِنَّ",
+        "source": "QuranShortSurahsV1.words[s-100-11-1].ar",
+        "corpus": "surah",
+        "marks": 3,
+        "sha256": "82cddfc2144040248eff0e348e76bb58d93178dd98dafc5fc42609bd6b38806b"
+      },
+      {
+        "index": 30,
+        "ar": "بِهِۦ",
+        "source": "QuranShortSurahsV1.words[s-100-4-2].ar",
+        "corpus": "surah",
+        "marks": 3,
+        "sha256": "ede29d625facbdef6dd08516e5ca1b48b07068f294f2aa169c7509aab8b48f5e"
+      }
+    ]
+  },
+  "ctaReport": [],
+  "productionFindings": [],
+  "rows": [
+    {
+      "profile": "glif",
+      "theme": "light",
+      "viewport": {
+        "width": 460,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 4,
+      "scene": "g0-30-zor-glif-referans",
+      "sceneKind": "glyph",
+      "screenshot": "g0-30-zor-glif-referans.webp",
+      "log": [
+        "g0-30-zor-glif-referans: theme=light surface=#F7F5EE vw=460 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=-1 ctaH=-1 ctaX=-1 ctaY=-1 ctaR=-1 ctaLay=-1 ctaScr=-1 focus=false sel=-1 covN=-1 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=na overflowX=false hard=yok rows=30 h=68 hMin=68 hFirst=15 hLast=2538 hSw=460 hCw=460 font=K3P-Scheherazade loaded=false woff2=0 metrics=2858/4492 distinct=true check=true px=1840x10488 scale=4.00x ser=82b2d9c7cd6e1107 | نَفَّٰثَٰت ضَلَّ حَقَّ صَدَّ ظَنَّ مَسَّ رَدَّ عَذَّبَ عَلَّمَ حَرَّمَ حَتَّىٰ أَضَلَّ أَوْ كَصَيِّبٍ مِّنَ بَلَىٰ مَنْ أَسْلَمَ وَإِذْ قَالَ رَبُّكَ لَّيْسَ ٱلْبِرَّ أَن كُلِّ شَىْءٍ قَدِيرٌ إِلَىٰ قَوْمِ لُوطٍ لَّهُۥ لِّكُلِّ إِنَّهُۥ مَّسَدٍۭ صَلَّىٰٓ رَبَّهُۥ مُّمَدَّدَةٍۭ لِرَبِّهِۦ وَإِنَّهُۥ فَأُمُّهُۥ إِنَّ بِهِۦ"
+      ],
+      "issues": [],
+      "sha256": "ed26e3b278085aa56b6273d1d0f3493f7e25c22cc6f161742ca8f85816ef0c73",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": null,
+      "scrollTop": null
+    }
+  ]
+}

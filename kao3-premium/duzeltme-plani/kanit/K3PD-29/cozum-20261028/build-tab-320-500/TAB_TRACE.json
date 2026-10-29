@@ -1,0 +1,38 @@
+[
+  {
+    "tag": "BUTTON",
+    "text": "ع\n'",
+    "choice": true,
+    "top": 299.875,
+    "bottom": 409.015625,
+    "containerTop": 266.59375,
+    "containerBottom": 441.59375,
+    "bodyTop": 0,
+    "bodyBottom": 500,
+    "scroll": 205
+  },
+  {
+    "tag": "BUTTON",
+    "text": "م\nm",
+    "choice": true,
+    "top": 332.015625,
+    "bottom": 441.15625,
+    "containerTop": 266.59375,
+    "containerBottom": 441.59375,
+    "bodyTop": 0,
+    "bodyBottom": 500,
+    "scroll": 292
+  },
+  {
+    "tag": "BUTTON",
+    "text": "✕",
+    "choice": false,
+    "top": 22,
+    "bottom": 66,
+    "containerTop": 266.59375,
+    "containerBottom": 441.59375,
+    "bodyTop": 0,
+    "bodyBottom": 500,
+    "scroll": 292
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    "label": "رَسُول",
+    "scroll": 0,
+    "top": 350.390625,
+    "bottom": 437.984375,
+    "clipTop": 344.390625,
+    "clipBottom": 639.78125,
+    "bodyTop": 0,
+    "bodyBottom": 844,
+    "focused": true,
+    "visible": true,
+    "hit": true
+  },
+  {
+    "label": "ءَايَة",
+    "scroll": 0,
+    "top": 447.984375,
+    "bottom": 535.578125,
+    "clipTop": 344.390625,
+    "clipBottom": 639.78125,
+    "bodyTop": 0,
+    "bodyBottom": 844,
+    "focused": true,
+    "visible": true,
+    "hit": true
+  },
+  {
+    "label": "رَبّ",
+    "scroll": 0,
+    "top": 545.578125,
+    "bottom": 633.171875,
+    "clipTop": 344.390625,
+    "clipBottom": 639.78125,
+    "bodyTop": 0,
+    "bodyBottom": 844,
+    "focused": true,
+    "visible": true,
+    "hit": true
+  },
+  {
+    "label": "كُلّ",
+    "scroll": 153,
+    "top": 490.171875,
+    "bottom": 577.765625,
+    "clipTop": 344.390625,
+    "clipBottom": 639.78125,
+    "bodyTop": 0,
+    "bodyBottom": 844,
+    "focused": true,
+    "visible": true,
+    "hit": true
+  }
+]

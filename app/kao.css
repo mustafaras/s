@@ -189,8 +189,13 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-lesson-progress .kao-lesson-seg{display:block;height:4px;overflow:hidden;border-radius:var(--kao-r-pill);background:color-mix(in srgb,var(--kao-tint) 15%,var(--kao-surface))}
 .kao-lesson-seg>i{display:block;height:100%;border-radius:inherit;background:var(--kao-tint);transition:width var(--dur-2)}
 .kao-lesson-seg.is-filled>i{width:100%}
-.kao-lesson>.kao-lesson-next,.kao-lesson>.kao-lesson-more{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px))}
-.kao-task>.kao-choices{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+.kao-body:has(.kao-lesson-content){overflow:hidden}
+:is(.kao-session,.kao-lesson):has(.kao-lesson-content){height:100%}
+.kao-lesson:has(>.kao-lesson-content){grid-template: minmax(0,1fr) auto / repeat(2,minmax(0,1fr))}
+.kao-lesson-content{grid-column:1/-1;min-height:0;overflow:auto;display:grid;grid-auto-rows:max-content;align-content:start;gap:var(--kao-gap-2)}
+.kao-lesson-next:last-child{grid-column:1/-1}
+.kao-task>.kao-choices{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));max-height:35dvh;overflow-y:auto;grid-auto-rows:max-content;padding:6px;scroll-padding:6px}
+@media(max-height:600px){.kao-body{scroll-padding:8px}.kao-task>.kao-choices{position:static;max-height:none;overflow:visible}}
 .kao-lesson-card{display:grid;gap:var(--kao-gap-2);min-width:0;padding:18px;border-radius:var(--kao-r-card);background:var(--kao-mat-card);color:var(--kao-label);box-shadow:var(--kao-shadow-1)}
 .kao-lesson-card h3{margin:0;color:var(--kao-label);font-size:var(--f-title2);font-weight:600;line-height:1.3;overflow-wrap:anywhere}
 .kao-lesson-card p{margin:0;color:var(--kao-label-2);font-size:var(--f-body);line-height:1.5;overflow-wrap:anywhere}
@@ -219,7 +224,7 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-lesson-why-title{margin:6px 0 0;color:var(--kao-tint);font-weight:600}
 .kao-lesson-term-note{margin:0;padding:0 4px 8px;color:var(--kao-label-2);line-height:1.5;overflow-wrap:anywhere}
 .kao-lesson-apply-list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
-.kao-lesson-apply-word{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
+.kao-lesson-apply-word{--kao-label:var(--quran-ink);--kao-label-2:var(--quran-ink);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
 .kao-lesson-apply-word span:first-child{color:var(--kao-label);font-size:var(--f-callout);text-align:right}
 .kao-lesson-apply-word span:last-child{color:var(--kao-label-2);font-size:var(--f-subhead)}
 .kao-lesson-sentence{display:grid;gap:4px;padding:10px 12px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-ctl);background:var(--kao-surface)}
@@ -406,7 +411,6 @@ button.kao-map-cell{cursor:pointer;border-color:color-mix(in srgb,var(--quran2) 
 .kao-s0-drill{display:grid;gap:12px;margin-bottom:14px}.kao-s0-drill h3{margin:0;color:var(--kao-label);font-size:var(--f-headline)}.kao-s0-count{margin:0;color:var(--kao-label-2);font-size:var(--f-footnote);font-weight:600}
 .kao-s0-stimulus{margin:0;text-align:center;color:var(--kao-label);font-size:var(--kao-ar-hero);font-weight:400;line-height:var(--kao-ar-lh,2.2)}.kao-s0-choice{display:flex;align-items:center;justify-content:center;gap:8px}
 .kao-s0-done{display:grid;gap:8px;margin-bottom:14px;padding:14px;border:1px solid var(--kao-sep);border-radius:var(--kao-r-card);background:var(--kao-surface)}.kao-s0-done h3,.kao-s0-done p{margin:0}
-/* Gramer/parça yönergeleri uzun Türkçe cümledir: Arapça kelime başlığı boyutunda değil, okunur başlık boyutunda. Cevaplanan doğru/yanlış şık soluklaşmaz (kontrast). */
 .kao-question-text{font-size:var(--f-title3);line-height:1.4;font-weight:600}
 .kao-choices .kao-chip.kao-choice-correct[disabled],.kao-choices .kao-chip.kao-choice-wrong[disabled]{opacity:1}
 .kao-primary[disabled],.kao-secondary[disabled]{opacity:.45;box-shadow:none;cursor:default}.kao-primary[disabled]:active{transform:none}

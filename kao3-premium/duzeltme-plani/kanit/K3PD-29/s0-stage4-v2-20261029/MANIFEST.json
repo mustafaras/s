@@ -1,0 +1,90 @@
+{
+  "schema": "k3pd29-supplemental-v1",
+  "note": "JSON logları çekim sırasında yazılmış gözlemdir; imzalı bağımsız tanık değildir. Kapsam ilgili sahneye özgüdür.",
+  "rows": [
+    {
+      "scene": "light-320-0",
+      "theme": "light",
+      "width": 320,
+      "height": 844,
+      "inset": 0,
+      "screenshot": "light-320-0.webp",
+      "screenshotSha256": "cb829b1717116564d7bd9fcad42645c1c52cbd1ee6ad5aad7af421acd801161b",
+      "log": "light-320-0.webp.json",
+      "logSha256": "190d3cc06b3ee439101139e8b192bb51b88f4ee88b9f6b20e28ed39e9ccc090c",
+      "generatedAt": "2026-10-29T09:54:45.013Z"
+    },
+    {
+      "scene": "dark-320-0",
+      "theme": "dark",
+      "width": 320,
+      "height": 844,
+      "inset": 0,
+      "screenshot": "dark-320-0.webp",
+      "screenshotSha256": "82273841d08f108be42079c07cbfa635dbf8fc4a3e545f41c63bdaadca9cf682",
+      "log": "dark-320-0.webp.json",
+      "logSha256": "59c44606c4f9ccc32c470122ea646225acce0af0e1b140ea777108cf961efeec",
+      "generatedAt": "2026-10-29T09:54:57.294Z"
+    },
+    {
+      "scene": "light-390-0",
+      "theme": "light",
+      "width": 390,
+      "height": 844,
+      "inset": 0,
+      "screenshot": "light-390-0.webp",
+      "screenshotSha256": "e38988bc5973cb8e2d265b0b324d25711b0deb71fd441773c14764a5feef090c",
+      "log": "light-390-0.webp.json",
+      "logSha256": "d6568a42887c5f589ae52d27beb27b83d566ee0b34295371367c2950f4491bcc",
+      "generatedAt": "2026-10-29T09:55:03.568Z"
+    },
+    {
+      "scene": "dark-390-0",
+      "theme": "dark",
+      "width": 390,
+      "height": 844,
+      "inset": 0,
+      "screenshot": "dark-390-0.webp",
+      "screenshotSha256": "b33d8452cd0c9fc79ba18beb314e3b0f0416bed41f5f961b4dfe3e9ddca39aba",
+      "log": "dark-390-0.webp.json",
+      "logSha256": "8f3e414ea55551fd8d0145f46cd75a78ed46ad26a465880da00a6b968946fd45",
+      "generatedAt": "2026-10-29T09:55:09.835Z"
+    },
+    {
+      "scene": "light-460-0",
+      "theme": "light",
+      "width": 460,
+      "height": 844,
+      "inset": 0,
+      "screenshot": "light-460-0.webp",
+      "screenshotSha256": "868942b9cb8679fc783fc367d99a27745cd9b14e3ccf1d798dce080d1172b2a9",
+      "log": "light-460-0.webp.json",
+      "logSha256": "6cff04ce013813d59865ee2df08322744cc75c1e1c12d2db4c661314f0bbc170",
+      "generatedAt": "2026-10-29T09:55:16.129Z"
+    },
+    {
+      "scene": "dark-460-0",
+      "theme": "dark",
+      "width": 460,
+      "height": 844,
+      "inset": 0,
+      "screenshot": "dark-460-0.webp",
+      "screenshotSha256": "bcf87c3e858794cb4b683a010191269aafc249551e398c3ef0596fce7875df12",
+      "log": "dark-460-0.webp.json",
+      "logSha256": "e95ac81188b84fc04b27b079f73d75d3cba19300bc852a9de2b7e8fe1af66236",
+      "generatedAt": "2026-10-29T09:55:22.405Z"
+    },
+    {
+      "scene": "light-390-34",
+      "theme": "light",
+      "width": 390,
+      "height": 844,
+      "inset": 34,
+      "screenshot": "light-390-34.webp",
+      "screenshotSha256": "543a059688f9fc40321a1170b7d1ccb077f2ab8a8e761b9435e7ebc82fe75602",
+      "log": "light-390-34.webp.json",
+      "logSha256": "a1a56e38301e77f750c2858b421d6da607573dfa1aa5f30854255ad880e8b4a7",
+      "generatedAt": "2026-10-29T09:55:28.680Z"
+    }
+  ]
+}

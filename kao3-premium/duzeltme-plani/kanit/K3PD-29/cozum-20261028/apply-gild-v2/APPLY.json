@@ -1,0 +1,103 @@
+{
+  "start": {
+    "top": 1874,
+    "max": 1874
+  },
+  "samples": [
+    {
+      "top": 1874,
+      "index": 1,
+      "count": 6
+    },
+    {
+      "top": 1874,
+      "index": 2,
+      "count": 6
+    },
+    {
+      "top": 1874,
+      "index": 3,
+      "count": 6
+    },
+    {
+      "top": 1874,
+      "index": 4,
+      "count": 6
+    },
+    {
+      "top": 1874,
+      "index": 5,
+      "count": 6
+    },
+    {
+      "top": 1874,
+      "index": 6,
+      "count": 6
+    },
+    {
+      "top": 1874,
+      "index": 6,
+      "count": 6
+    }
+  ],
+  "viewport": {
+    "width": 320,
+    "height": 500,
+    "safeAreaBottom": 0
+  },
+  "cssSha256": "29ad4e4c5cbe1d2c8e60eb75681976041b2c0003f87e66dc26f3c41be73610de",
+  "viewsSha256": "9d2dceed0ab0172275ab2e781957e8bfe5539bc0d197f8af0f3a5bde7b9e3f49",
+  "engineSha256": "d7c0fa9539a587de0907334b42fe014346284c61e477b810d0424c0b45b560fa",
+  "image": {
+    "profile": "ana",
+    "theme": "light",
+    "viewport": {
+      "width": 320,
+      "height": 500,
+      "safeAreaBottom": 0
+    },
+    "captureScale": 1,
+    "scene": "apply",
+    "sceneKind": "lesson",
+    "screenshot": "apply.webp",
+    "log": [
+      "apply: theme=light surface=#F7F5EE vw=320 vh=500 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=403 ctaR=320 ctaLay=403 ctaScr=0 focus=true sel=fdc9a040fbc0 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Çapa metni Fâtiha Yaldızla’ya dokun; kelimeler çapa metninde sırayla yaldızlanır. يَوْمِ"
+    ],
+    "issues": [],
+    "sha256": "dc12ed1b78d2d69cc8b17e2e7f0ce1c2490173d7b6ea9454f4147be86ba08105",
+    "verifiedTheme": {
+      "dataTheme": "light",
+      "surface": "#F7F5EE",
+      "ink": "#172B45",
+      "onb": null
+    },
+    "cta": {
+      "selector": ".kao-lesson[data-lesson-stage=\"apply\"] > .kao-lesson-next",
+      "present": true,
+      "x": 31,
+      "y": 403,
+      "width": 258,
+      "height": 50,
+      "layoutY": 403,
+      "scrollTop": 0,
+      "visible": true,
+      "overlapCovered": false,
+      "hiddenBy": false,
+      "coverStack": [],
+      "overlapsContent": [],
+      "overlapsControl": [],
+      "scroll": {
+        "scrollTop": 0,
+        "scrollHeight": 2224,
+        "clientHeight": 350,
+        "localScroll": true
+      },
+      "focusReachable": true,
+      "dialogRight": 320,
+      "dialogBottom": 500
+    },
+    "scrollTop": null
+  },
+  "failures": [],
+  "findings": []
+}

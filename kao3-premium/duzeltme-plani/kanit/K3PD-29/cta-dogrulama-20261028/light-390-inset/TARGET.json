@@ -1,0 +1,207 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844,
+    "safeAreaBottom": 34
+  },
+  "theme": "light",
+  "rows": [
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 34
+      },
+      "captureScale": 1,
+      "scene": "l25-summary",
+      "sceneKind": "lesson",
+      "screenshot": "l25-summary.webp",
+      "log": [
+        "l25-summary: theme=light surface=#F7F5EE vw=390 vh=844 inset=34 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=320 ctaH=50 ctaX=35 ctaY=638 ctaR=390 ctaLay=638 ctaScr=0 focus=true sel=8fafa3ec6be3 covN=1 covPx=26 covH=1cd7a231e96f coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Ders tamamlandı Yalnız sana Bu derste tanıştıkların Kur’an kapsamı +%0.00 · iki yönde ka"
+      ],
+      "issues": [],
+      "sha256": "1c231c25fe555e895b9e545de57d133bdaa3f229d77f7769db755245200b2873",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 638,
+        "width": 320,
+        "height": 50,
+        "layoutY": 638,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "",
+            "y": 646,
+            "h": 26,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 26,
+            "txt": "8 tekrar kartı · günlük plan ~3 "
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 1023,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    }
+  ],
+  "ctaReport": [
+    {
+      "scene": "l25-summary",
+      "stage": "summary",
+      "viewport": "390x844+34",
+      "samples": 2,
+      "layoutYs": [
+        638,
+        638
+      ],
+      "maxDelta": 0
+    }
+  ],
+  "scrollChecks": [
+    {
+      "fraction": 0,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 638,
+        "width": 320,
+        "height": 50,
+        "layoutY": 638,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "",
+            "y": 646,
+            "h": 26,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 26,
+            "txt": "8 tekrar kartı · günlük plan ~3 "
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 1023,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      }
+    },
+    {
+      "fraction": 0.5,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 638,
+        "width": 320,
+        "height": 50,
+        "layoutY": 728,
+        "scrollTop": 90,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "",
+            "y": 630,
+            "h": 26,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 18,
+            "txt": "Fâtiha · Ders 4"
+          },
+          {
+            "tag": "P",
+            "cls": "",
+            "y": 664,
+            "h": 51,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 24,
+            "txt": "8 tekrar + 4 yeni · 23 görev · ~"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 90,
+          "scrollHeight": 1023,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      }
+    },
+    {
+      "fraction": 1,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 638,
+        "width": 320,
+        "height": 50,
+        "layoutY": 817,
+        "scrollTop": 179,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 179,
+          "scrollHeight": 1023,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      }
+    }
+  ],
+  "failures": [],
+  "findings": [],
+  "blockedExternalCount": 16,
+  "cssSha256": "14fb1a321f481b60a5e53dd68538a0dc252f7b3fdbb67d091de54d97ed7ac485",
+  "origin": "http://127.0.0.1:9000"
+}

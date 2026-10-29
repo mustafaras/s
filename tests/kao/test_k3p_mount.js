@@ -35,6 +35,28 @@ function makeDoc() {
     }
     get innerHTML() { return this.html; }
     querySelector(sel) {
+      if (sel === '#kao-task') {
+        const match = /<section id="kao-task"[^>]*data-task-id="([^"]+)"/.exec(this.html);
+        if (!match) return null;
+        if (!this.ephemeral.has(sel)) {
+          const summary = { focus() { doc.activeElement = this; } };
+          const detail = { open: false, querySelector(query) { return query === 'summary' ? summary : null; } };
+          this.ephemeral.set(sel, {
+            getAttribute(name) { return name === 'data-task-id' ? match[1] : null; },
+            querySelector(query) {
+              if (query === '.kao-fragment-stimulus details[open]') return detail.open ? detail : null;
+              if (query === '.kao-fragment-stimulus details') return detail;
+              return null;
+            }
+          });
+        }
+        return this.ephemeral.get(sel);
+      }
+      if (sel === '.kao-lesson-content') {
+        if (!/class="kao-lesson-content"/.test(this.html)) return null;
+        if (!this.ephemeral.has(sel)) { const e = new El('', 'kao-lesson-content'); e.parentNode = this; this.ephemeral.set(sel, e); }
+        return this.ephemeral.get(sel);
+      }
       assert.equal(sel, '.kao-overlay', 'mount yalnız .kao-overlay arar');
       for (const c of this.children) { if (/\bkao-overlay\b/.test(c.className)) return c; const deep = c.querySelector(sel); if (deep) return deep; }
       return null;
@@ -220,6 +242,50 @@ function playLessonAcrossParts(t, options = {}) {
   t.api.kaoNav('reader', 112); body().scrollTop = 80; t.api.kaoNav('reader', 113);
   assert.equal(body().scrollTop, 0, 'aynı görünüm, farklı parametre → yeni ekran');
   assert.equal(doc.inserts, 1);
+}
+
+// 5) Ders iç scroll: aynı aşamada repaint korur; sonraki aşamada sıfırlar.
+{
+  const { t, rerender, live } = stage();
+  t.api.kaoOpen('home');
+  assert.ok(startLessonForFixture(t, 'u01.01'));
+  const body = () => live().firstElementChild.firstElementChild;
+  const inner = () => body().querySelector('.kao-lesson-content');
+  assert.ok(inner(), 'ders iç kaydırma alanı mevcut');
+  inner().scrollTop = 120;
+  rerender();
+  assert.equal(inner().scrollTop, 120, 'aynı ders aşamasında iç kaydırma korunur');
+  const nextLesson = t.ui.kaoLesson.plan.findIndex((item, index) => index > t.ui.kaoLesson.at && item.kind !== 'practice');
+  assert.ok(nextLesson >= 0, 'başka ders aşaması mevcut');
+  t.ui.kaoLesson.at = nextLesson;
+  t.ui.kaoLesson.phase = 'lesson';
+  rerender();
+  assert.ok(inner(), 'sonraki ders aşamasında iç alan mevcut');
+  assert.equal(inner().scrollTop, 0, 'farklı ders aşamasında iç kaydırma sıfırlanır');
+}
+
+// 6) Açık cloze okunuşu aynı görevde korunur; yeni göreve taşınmaz.
+{
+  const { t, doc, live } = stage();
+  t.api.kaoOpen('home');
+  const html = (id) => `<div id="sey-ov-back" class="kao-overlay"><div id="sey-ov-card"><div id="sey-ov-body" data-kao-step="cloze"><section id="kao-task" data-task-id="${id}"><div class="kao-fragment-stimulus"><details></details></div></section></div></div></div>`;
+  t.ui.kaoQueue = [{ id: 'a' }];
+  t.ui.kaoTasks = { a: { id: 'a', kind: 'cloze' }, b: { id: 'b', kind: 'cloze' } };
+  t.ui.kaoTaskIndex = 0;
+  t.api.kaoPatchOverlay(doc, html('a'));
+  const detail = () => live().firstElementChild.firstElementChild.querySelector('#kao-task').querySelector('.kao-fragment-stimulus details');
+  detail().open = true;
+  detail().querySelector('summary').focus();
+  t.api.kaoPatchOverlay(doc, html('a'));
+  assert.equal(detail().open, true, 'aynı görevde açık okunuş korunur');
+  assert.equal(doc.activeElement, detail().querySelector('summary'), 'açık okunuşun odağı korunur');
+  t.ui.kaoQueue = [{ id: 'b' }];
+  t.api.kaoPatchOverlay(doc, html('b'));
+  assert.equal(detail().open, false, 'açık okunuş farklı göreve taşınmaz');
+  detail().open = true;
+  t.ui.kaoTasks.b.kind = 'fragment';
+  t.api.kaoPatchOverlay(doc, html('b'));
+  assert.equal(detail().open, false, 'cloze dışı görevlerin davranışı değiştirilmez');
 }
 
 console.log('test_k3p_mount: PASS');

@@ -127,7 +127,7 @@ function taskDom() {
         const button = {
           disabled: /(?:^|\s)disabled(?:\s|$)/.test(attrs),
           getAttribute: get,
-          focus() { if (!this.disabled) doc.activeElement = this; }
+          focus(options) { if (!this.disabled) { this.focusOptions = options; doc.activeElement = this; } }
         };
         return button;
       });
@@ -367,6 +367,7 @@ check('K3PD-11: kısmi klavye seçimi DOM yeniden çiziminden sonra odağı sır
   assert.equal(selected.getAttribute('aria-pressed'), 'true', 'seçilen çip aria-pressed durumunu korur');
   assert.equal(selected.disabled, true, 'seçilen çip tekrar etkinleştirilemez');
   assert.equal(focusSurface.doc.activeElement.disabled, false, 'odaklanan sonraki çip etkin kalır');
+  assert.notEqual(focusSurface.doc.activeElement.focusOptions?.preventScroll, true, 'sonraki çip odağı görünür alana kaydırabilir');
 });
 
 check('K3PD-10: gerçek build HTML’si doğrulanmış Türkçe anlam ipucunu gösterir, cevabı sızdırmaz ve kaynaklardan bağımsızdır', () => {

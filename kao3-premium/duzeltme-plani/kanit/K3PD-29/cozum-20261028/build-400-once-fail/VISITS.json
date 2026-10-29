@@ -1,0 +1,67 @@
+[
+  {
+    "label": "و\nv",
+    "scroll": 0,
+    "top": 257,
+    "bottom": 366.140625,
+    "clipTop": 251,
+    "clipBottom": 351,
+    "bodyTop": 0,
+    "bodyBottom": 400,
+    "focused": true,
+    "visible": false,
+    "hit": true
+  },
+  {
+    "label": "ب\nb",
+    "scroll": 130,
+    "top": 246.140625,
+    "bottom": 355.28125,
+    "clipTop": 251,
+    "clipBottom": 351,
+    "bodyTop": 0,
+    "bodyBottom": 400,
+    "focused": true,
+    "visible": false,
+    "hit": true
+  },
+  {
+    "label": "ع\n'",
+    "scroll": 249,
+    "top": 246.28125,
+    "bottom": 355.421875,
+    "clipTop": 251,
+    "clipBottom": 351,
+    "bodyTop": 0,
+    "bodyBottom": 400,
+    "focused": true,
+    "visible": false,
+    "hit": true
+  },
+  {
+    "label": "م\nm",
+    "scroll": 368,
+    "top": 246.421875,
+    "bottom": 355.5625,
+    "clipTop": 251,
+    "clipBottom": 351,
+    "bodyTop": 0,
+    "bodyBottom": 400,
+    "focused": true,
+    "visible": false,
+    "hit": true
+  },
+  {
+    "label": "ي\ny",
+    "scroll": 487,
+    "top": 246.5625,
+    "bottom": 355.703125,
+    "clipTop": 251,
+    "clipBottom": 351,
+    "bodyTop": 0,
+    "bodyBottom": 400,
+    "focused": true,
+    "visible": false,
+    "hit": true
+  }
+]

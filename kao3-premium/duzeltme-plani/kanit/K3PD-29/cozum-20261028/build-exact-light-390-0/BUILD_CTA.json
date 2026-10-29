@@ -1,0 +1,75 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844,
+    "safeAreaBottom": 0
+  },
+  "theme": "light",
+  "id": "k3pd29-build-cta-w:l_yawom_9b88c1:ar>tr",
+  "state": {
+    "kind": "build",
+    "choices": 5,
+    "body": true,
+    "choiceClientHeight": 295,
+    "choiceScrollHeight": 598,
+    "theme": "light"
+  },
+  "first": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 22,
+    "y": 257,
+    "width": 346,
+    "height": 109,
+    "layoutY": 257,
+    "scrollTop": 0,
+    "visible": true,
+    "overlapCovered": false,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 0,
+      "scrollHeight": 844,
+      "clientHeight": 844,
+      "localScroll": false
+    },
+    "focusReachable": true,
+    "dialogRight": 390,
+    "dialogBottom": 844
+  },
+  "second": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 22,
+    "y": 257,
+    "width": 346,
+    "height": 109,
+    "layoutY": 257,
+    "scrollTop": 0,
+    "visible": true,
+    "overlapCovered": false,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 0,
+      "scrollHeight": 844,
+      "clientHeight": 844,
+      "localScroll": false
+    },
+    "focusReachable": true,
+    "dialogRight": 390,
+    "dialogBottom": 844
+  },
+  "probeSha256": "743d27a4fab52537ece0d7247eaa5ae1d477a307f5a1bfa0fc72f42bdc217766",
+  "visitsSha256": "8a320d2c7611f9244a5c22b75faa255c053b0bb948de7b03a229e6a3f60aacca",
+  "delta": 0,
+  "screenshot": "build-cta.webp",
+  "sha256": "41e17d0e66ae9dec88d609f887619b71fabeeea1f6a717617b0b537c0be4f10e",
+  "cssSha256": "a09b6880a6a55f6811326b62f8f65a71a084435e12376d22bd37a246516d846b",
+  "viewsSha256": "9d2dceed0ab0172275ab2e781957e8bfe5539bc0d197f8af0f3a5bde7b9e3f49",
+  "engineSha256": "19927d2f4567543be01dcc741a88c055a554600dd9453b937f8ad1a6371f9ae9"
+}

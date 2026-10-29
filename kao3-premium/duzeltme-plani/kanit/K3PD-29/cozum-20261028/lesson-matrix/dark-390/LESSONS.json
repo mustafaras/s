@@ -1,0 +1,508 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844,
+    "safeAreaBottom": 0
+  },
+  "theme": "dark",
+  "rows": [
+    {
+      "profile": "ana",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l01-goal",
+      "sceneKind": "lesson",
+      "screenshot": "l01-goal.webp",
+      "log": [
+        "l01-goal: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=320 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=5a43fe942ce7 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yalnız sana Hedefi ve metni gör Devam"
+      ],
+      "issues": [],
+      "sha256": "4d096f184e0d186152e08000f717872ff7c106849f7070ecad01da4e2508abc3",
+      "verifiedTheme": {
+        "dataTheme": "dark",
+        "surface": "#151C28",
+        "ink": "#E8EBF2",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"goal\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 320,
+        "height": 50,
+        "layoutY": 747,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l06-intro",
+      "sceneKind": "lesson",
+      "screenshot": "l06-intro.webp",
+      "log": [
+        "l06-intro: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=320 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=dc1b7000b140 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 1 / 4 دِين dîn Dinle hesap, karşılık · din; itaat, yol Örnek âyet مَـٰلِكِ يَوْمِ ٱل"
+      ],
+      "issues": [],
+      "sha256": "d4fadbcf6d97c20ce09a31918ea277a1e83d8cd87062a1fa7b9b0f570db0a5eb",
+      "verifiedTheme": {
+        "dataTheme": "dark",
+        "surface": "#151C28",
+        "ink": "#E8EBF2",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"intro\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 320,
+        "height": 50,
+        "layoutY": 747,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l08-intro",
+      "sceneKind": "lesson",
+      "screenshot": "l08-intro.webp",
+      "log": [
+        "l08-intro: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=320 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=dc1b7000b140 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 2 / 4 إِيَّا iyyâ Dinle yalnız (sana, beni) Örnek âyet إِيَّاكَ نَعْبُدُ وَإِيَّاكَ "
+      ],
+      "issues": [],
+      "sha256": "920ed1c7ec93f2c63a292c9103a745835a6beee91085b338b20834e313ee972b",
+      "verifiedTheme": {
+        "dataTheme": "dark",
+        "surface": "#151C28",
+        "ink": "#E8EBF2",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"intro\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 320,
+        "height": 50,
+        "layoutY": 747,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l10-intro",
+      "sceneKind": "lesson",
+      "screenshot": "l10-intro.webp",
+      "log": [
+        "l10-intro: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=320 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=dc1b7000b140 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 3 / 4 عَبَدَ ʿabede Dinle kulluk etti, ibadet etti Örnek âyet إِيَّاكَ نَعْبُدُ وَإِ"
+      ],
+      "issues": [],
+      "sha256": "5115c56ae1c622c1f588c84162a15ef83e381d71552b542606b1d291cce59e8f",
+      "verifiedTheme": {
+        "dataTheme": "dark",
+        "surface": "#151C28",
+        "ink": "#E8EBF2",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"intro\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 320,
+        "height": 50,
+        "layoutY": 747,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l12-intro",
+      "sceneKind": "lesson",
+      "screenshot": "l12-intro.webp",
+      "log": [
+        "l12-intro: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=320 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=dc1b7000b140 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Yeni kelime · 4 / 4 ٱسْتَعِينُ isteʿînü Dinle yardım dileriz Örnek âyet نَعْبُدُ وَإِيَّاكَ نَسْتَ"
+      ],
+      "issues": [],
+      "sha256": "992d591d0f9c3bdbf9690485433cb40d2c712ce4e055c1b623b96d7f9e91a1f6",
+      "verifiedTheme": {
+        "dataTheme": "dark",
+        "surface": "#151C28",
+        "ink": "#E8EBF2",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"intro\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 320,
+        "height": 50,
+        "layoutY": 747,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l14-concept",
+      "sceneKind": "lesson",
+      "screenshot": "l14-concept.webp",
+      "log": [
+        "l14-concept: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=320 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=cb080f6194d4 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Kavram İki isim yan yana: …nın …ı İki ismi yan yana koyunca Türkçedeki '-nın … -ı' bağı kurulur; s"
+      ],
+      "issues": [
+        "KAYDIRMALI-ALAN(bilgi) | div.kao-lesson-table-wrap | Türkçesi1. kelime (tamlanan)2. kelime (t | sw=289 cw=282"
+      ],
+      "sha256": "99ca0ad88b99bbfb561310cad529321021abfd4bded5eed42f82b8901b9fc238",
+      "verifiedTheme": {
+        "dataTheme": "dark",
+        "surface": "#151C28",
+        "ink": "#E8EBF2",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"concept\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 320,
+        "height": 50,
+        "layoutY": 747,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l24-apply",
+      "sceneKind": "lesson",
+      "screenshot": "l24-apply.webp",
+      "log": [
+        "l24-apply: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=320 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=fdc9a040fbc0 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Çapa metni Fâtiha Yaldızla’ya dokun; kelimeler çapa metninde sırayla yaldızlanır. يَوْمِ ٱلدِّينِ "
+      ],
+      "issues": [],
+      "sha256": "eccd8dae7411562fef74e38c074f339ff9d64d5a7118a2fe7b0b90d2e5541db1",
+      "verifiedTheme": {
+        "dataTheme": "dark",
+        "surface": "#151C28",
+        "ink": "#E8EBF2",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"apply\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 320,
+        "height": 50,
+        "layoutY": 747,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    },
+    {
+      "profile": "ana",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l25-summary",
+      "sceneKind": "lesson",
+      "screenshot": "l25-summary.webp",
+      "log": [
+        "l25-summary: theme=dark surface=#151C28 vw=390 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=154 ctaH=50 ctaX=35 ctaY=747 ctaR=390 ctaLay=747 ctaScr=0 focus=true sel=8fafa3ec6be3 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Ders tamamlandı Yalnız sana Bu derste tanıştıkların Kur’an kapsamı +%0.00 · iki yönde kalıcı kelim"
+      ],
+      "issues": [],
+      "sha256": "5701641275b4b3cb19047c9658f0d46f7c358578168e618836d0362c4ccf7d65",
+      "verifiedTheme": {
+        "dataTheme": "dark",
+        "surface": "#151C28",
+        "ink": "#E8EBF2",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 154,
+        "height": 50,
+        "layoutY": 747,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 390,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    }
+  ],
+  "ctaReport": [
+    {
+      "scene": "l01-goal",
+      "stage": "goal",
+      "viewport": "390x844+0",
+      "samples": 2,
+      "layoutYs": [
+        747,
+        747
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l06-intro",
+      "stage": "intro",
+      "viewport": "390x844+0",
+      "samples": 2,
+      "layoutYs": [
+        747,
+        747
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l08-intro",
+      "stage": "intro",
+      "viewport": "390x844+0",
+      "samples": 2,
+      "layoutYs": [
+        747,
+        747
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l10-intro",
+      "stage": "intro",
+      "viewport": "390x844+0",
+      "samples": 2,
+      "layoutYs": [
+        747,
+        747
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l12-intro",
+      "stage": "intro",
+      "viewport": "390x844+0",
+      "samples": 2,
+      "layoutYs": [
+        747,
+        747
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l14-concept",
+      "stage": "concept",
+      "viewport": "390x844+0",
+      "samples": 2,
+      "layoutYs": [
+        747,
+        747
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l24-apply",
+      "stage": "apply",
+      "viewport": "390x844+0",
+      "samples": 2,
+      "layoutYs": [
+        747,
+        747
+      ],
+      "maxDelta": 0
+    },
+    {
+      "scene": "l25-summary",
+      "stage": "summary",
+      "viewport": "390x844+0",
+      "samples": 2,
+      "layoutYs": [
+        747,
+        747
+      ],
+      "maxDelta": 0
+    }
+  ],
+  "failures": [],
+  "findings": [],
+  "cssSha256": "29ad4e4c5cbe1d2c8e60eb75681976041b2c0003f87e66dc26f3c41be73610de",
+  "viewsSha256": "9d2dceed0ab0172275ab2e781957e8bfe5539bc0d197f8af0f3a5bde7b9e3f49",
+  "engineSha256": "d7c0fa9539a587de0907334b42fe014346284c61e477b810d0424c0b45b560fa",
+  "origin": "http://127.0.0.1:9000"
+}

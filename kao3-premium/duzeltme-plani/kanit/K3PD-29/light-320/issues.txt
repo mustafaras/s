@@ -1,0 +1,6 @@
+v05-reader @320px: KAYDIRMALI-ALAN(bilgi) | div.kao-surah-picker | NâsFelakİhlâsTebbetNasrKâfirûnKevserMâûn | sw=1519 cw=296
+v13-concept @320px: KAYDIRMALI-ALAN(bilgi) | div.kao-grammar-table-wrap | Satır1.2.3.Türkçe sıraİbrahimtemelleriyü | sw=345 cw=294
+l14-concept @320px: KAYDIRMALI-ALAN(bilgi) | div.kao-lesson-table-wrap | Türkçesi1. kelime (tamlanan)2. kelime (t | sw=289 cw=220
+o1-ilk-acilis-1 @320px: KISALTILMIS-METIN(bilgi) | div | sen bağlarsan GitHub | sw=132 cw=118
+o2-ilk-acilis-2 @320px: KISALTILMIS-METIN(bilgi) | div | Tatil günlerinde su hedefi 10 bardak, se | sw=278 cw=136
+o2-ilk-acilis-2 @320px: KISALTILMIS-METIN(bilgi) | div | İyi günler | sw=58 cw=37

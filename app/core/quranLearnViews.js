@@ -391,7 +391,7 @@
     // K3P-A6: beş bölümlü ilerleme.
     var segs=''; for(var si=1;si<=5;si+=1){ var filled=model.section?si<model.section:false, active=model.section===si; var w=active?String(Math.max(0,Math.min(100,Number(model.sectionPercent)||0)))+'%':(filled?'100%':'0%'); segs+='<span class="kao-lesson-seg'+(active?' is-active':'')+(filled?' is-filled':'')+'"><i style="width:'+w+'"></i></span>'; }
     var valueText=model.sectionValuetext?escapeText(model.sectionValuetext):'Bölüm '+escapeText(model.section||1)+'/5';
-    return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" data-lesson-section="'+escapeText(model.section||1)+'" aria-label="Ders oynatıcı">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+escapeText(model.section||1)+'" aria-valuetext="'+valueText+'">'+segs+'</div>'+body+(model.actions?model.actions:'')+'<button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button>'+secondary+'</main>';
+    return '<main class="kao-lesson" data-lesson-stage="'+escapeText(model.stage)+'" data-lesson-section="'+escapeText(model.section||1)+'" aria-label="Ders oynatıcı"><div class="kao-lesson-content">'+top+'<div class="kao-lesson-progress" role="progressbar" aria-label="Ders bölümü" aria-valuemin="1" aria-valuemax="5" aria-valuenow="'+escapeText(model.section||1)+'" aria-valuetext="'+valueText+'">'+segs+'</div>'+body+(model.actions?model.actions:'')+'</div><button type="button" class="kao-primary kao-lesson-next"'+(call?' onclick="'+call+'"':' disabled')+'>'+buttonLabel+'</button>'+secondary+'</main>';
   }
 
   // KAO2-11/S-01, 05§9: ilk açılış; actionCall.
@@ -404,8 +404,6 @@
     options=options&&typeof options==='object'?options:{};
     var items=(Array.isArray(options.items)?options.items:[]).map(function(item){ return '<li class="kao-notice-item">'+escapeText(item)+'</li>'; }).join('');
     var close=options.close&&typeof options.close==='object'?linkButton(options.close.label,options.close.action,'kao-notice-close'):'';
-    // K3P-25: ikinci, isteğe bağlı eylem (ör. "Hızlı geçişi aç"). Yeni sınıf yok; mevcut
-    // .kao-notice-close kuralı kullanılır, ikisi tek satırda kendi metnine göre hizalanır.
     var secondary=options.secondary&&typeof options.secondary==='object'?linkButton(options.secondary.label,options.secondary.action,'kao-notice-close'):'';
     return '<section class="kao-notice" aria-labelledby="kao-notice-title"><h3 class="kao-notice-title" id="kao-notice-title">'+escapeText(options.title)+'</h3><ul class="kao-notice-list">'+items+'</ul>'+close+secondary+'</section>';
   }

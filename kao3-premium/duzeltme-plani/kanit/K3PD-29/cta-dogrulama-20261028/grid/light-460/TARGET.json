@@ -1,0 +1,186 @@
+{
+  "viewport": {
+    "width": 460,
+    "height": 844,
+    "safeAreaBottom": 0
+  },
+  "theme": "light",
+  "rows": [
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 460,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "l25-summary",
+      "sceneKind": "lesson",
+      "screenshot": "l25-summary.webp",
+      "log": [
+        "l25-summary: theme=light surface=#F7F5EE vw=460 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=189 ctaH=50 ctaX=35 ctaY=758 ctaR=460 ctaLay=758 ctaScr=0 focus=true sel=8fafa3ec6be3 covN=1 covPx=43 covH=de30eb7f385a coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Ders tamamlandı Yalnız sana Bu derste tanıştıkların Kur’an kapsamı +%0.00 · iki yönde ka"
+      ],
+      "issues": [],
+      "sha256": "c39ad85603bc02a58ad0c87921c1d2cf60f095281775091de9a2688096a15533",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 758,
+        "width": 189,
+        "height": 50,
+        "layoutY": 758,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "",
+            "y": 750,
+            "h": 51,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 43,
+            "txt": "8 tekrar + 4 yeni · 23 görev · ~"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 929,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 460,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    }
+  ],
+  "ctaReport": [
+    {
+      "scene": "l25-summary",
+      "stage": "summary",
+      "viewport": "460x844+0",
+      "samples": 2,
+      "layoutYs": [
+        758,
+        758
+      ],
+      "maxDelta": 0
+    }
+  ],
+  "scrollChecks": [
+    {
+      "fraction": 0,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 758,
+        "width": 189,
+        "height": 50,
+        "layoutY": 758,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "",
+            "y": 750,
+            "h": 51,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 43,
+            "txt": "8 tekrar + 4 yeni · 23 görev · ~"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 929,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 460,
+        "dialogBottom": 844
+      }
+    },
+    {
+      "fraction": 0.5,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 758,
+        "width": 189,
+        "height": 50,
+        "layoutY": 801,
+        "scrollTop": 43,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 43,
+          "scrollHeight": 929,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 460,
+        "dialogBottom": 844
+      }
+    },
+    {
+      "fraction": 1,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"summary\"] > .kao-lesson-next",
+        "present": true,
+        "x": 35,
+        "y": 747,
+        "width": 189,
+        "height": 50,
+        "layoutY": 832,
+        "scrollTop": 85,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 85,
+          "scrollHeight": 929,
+          "clientHeight": 844,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 460,
+        "dialogBottom": 844
+      }
+    }
+  ],
+  "failures": [],
+  "findings": [],
+  "blockedExternalCount": 16,
+  "cssSha256": "925ce813b7823116ac85c783475db4ef2593843fc8c82b2b14604fa7abb96309",
+  "origin": "http://127.0.0.1:9000"
+}

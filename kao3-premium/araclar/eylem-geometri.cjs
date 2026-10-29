@@ -26,15 +26,15 @@ const STAGES = [
   { stage: 'concept', selector: '.kao-lesson[data-lesson-stage="concept"] > .kao-lesson-next', note: 'Devam' },
   // Practice aşaması görev yüzeyinde SINIF ile işaretlidir (`is-practice`); ders kartları
   // `data-lesson-stage` taşır. İkisi de aynı ölçüm sözleşmesine girer.
-  { stage: 'practice', selector: '.kao-task.is-practice .kao-choices', note: 'şıklar (MC/build/cloze ortak yüzey)' },
+  { stage: 'practice', selector: '.kao-task.is-practice .kao-choices button:not(:disabled)', note: 'ilk etkin şık (MC/build/cloze ortak yüzey)' },
   // Geri bildirim iki biçimde çizilir: (a) tam panel (`kao-feedback-sheet` + `kao-feedback-continue`),
   // (b) hızlı/otomatik geçiş şeridi (`kao-feedback-strip-continue`). İkisi de aynı aşamanın
   // birincil eylemidir; ölçüm İKİSİNİ de kapsar (biri yoksa diğeri ölçülür).
   { stage: 'feedback', selector: '.kao-feedback-sheet .kao-feedback-continue, .kao-feedback-strip-continue', note: 'geri bildirim devamı (panel veya şerit)' },
   { stage: 'apply', selector: '.kao-lesson[data-lesson-stage="apply"] > .kao-lesson-next', note: 'Devam' },
   { stage: 'summary', selector: '.kao-lesson[data-lesson-stage="summary"] > .kao-lesson-next', note: 'Bitir' },
-  { stage: 'partEnd', selector: '.kao-lesson[data-lesson-stage="partEnd"] > .kao-lesson-next', note: 'süre sınırı' },
-  { stage: 'read', selector: '.kao-lesson[data-lesson-stage="read"] > .kao-lesson-next', note: 'okuma' }
+  { stage: 'partEnd', selector: '.kao-lesson[data-lesson-stage="budget"] > .kao-lesson-next', note: 'süre sınırı (DOM: budget)' },
+  { stage: 'read', selector: '.kao-lesson[data-lesson-stage="apply"] > .kao-lesson-next', note: 'okuma (DOM: apply)' }
 ];
 
 // ── Viewport matrisi (kart §Uygula) ────────────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ function contract() {
     viewports: VIEWPORTS,
     acceptance: ACCEPTANCE,
     // 29'un kaydı bu alanları taşımak ZORUNDA; eksik alan = ölçüm geçersiz.
-    requiredFields: ['stage', 'viewport.width', 'viewport.height', 'viewport.safeAreaBottom',
+    requiredFields: ['stage', 'theme', 'scenario', 'variant', 'render', 'viewport.width', 'viewport.height', 'viewport.safeAreaBottom',
       'primary.selector', 'primary.x', 'primary.y', 'primary.width', 'primary.height',
       'primary.visible', 'overlap.covered', 'focusReachable'],
     // Bu kartın hükmü: geometri alt kabulü 29'a kadar EVIDENCE_PENDING.
@@ -102,29 +102,51 @@ function audit(record) {
   if (!rows) return ['ölçüm kaydı dizi değil'];
   const byStage = new Map();
   for (const row of rows) {
+    const stage = STAGES.find((item) => item.stage === row.stage);
+    if (!stage) errors.push(`${row.stage || '?'}: bilinmeyen aşama`);
+    if (!['light', 'dark'].includes(row.theme)) errors.push(`${row.stage}: tema eksik/geçersiz`);
+    if (typeof row.scenario !== 'string' || !row.scenario.trim()) errors.push(`${row.stage}: senaryo kimliği eksik`);
+    if (typeof row.variant !== 'string' || !row.variant.trim()) errors.push(`${row.stage}: görev varyantı eksik`);
+    if (![1, 2].includes(row.render)) errors.push(`${row.stage}: render sırası 1 veya 2 olmalı`);
     for (const field of ['stage', 'viewport', 'primary', 'overlap', 'focusReachable']) {
       if (row[field] === undefined) errors.push(`${row.stage || '?'}: ${field} eksik`);
     }
     if (!row.viewport || typeof row.viewport.width !== 'number' || typeof row.viewport.height !== 'number'
       || typeof row.viewport.safeAreaBottom !== 'number') errors.push(`${row.stage}: viewport alanları eksik`);
     const p = row.primary || {};
+    if (stage && p.selector !== stage.selector) errors.push(`${row.stage}: seçici sözleşmeyle uyuşmuyor`);
     for (const key of ['selector', 'x', 'y', 'width', 'height', 'visible']) {
       if (p[key] === undefined) errors.push(`${row.stage}: primary.${key} eksik`);
     }
     if (p.visible !== true) errors.push(`${row.stage}: birincil eylem görünür değil`);
-    if (row.overlap && row.overlap.covered === true) errors.push(`${row.stage}: eylem bölgesi içeriği örtüyor`);
+    if (!row.overlap || row.overlap.covered !== false) errors.push(`${row.stage}: örtüşme ölçümü eksik veya içerik örtülüyor`);
     if (row.focusReachable !== true) errors.push(`${row.stage}: eylem klavye odağına ulaşmıyor`);
+    for (const key of ['x', 'y', 'width', 'height']) if (typeof p[key] !== 'number' || !Number.isFinite(p[key])) errors.push(`${row.stage}: primary.${key} sayısal değil`);
+    if (row.viewport && [p.x, p.y, p.width, p.height, row.viewport.width, row.viewport.height].every(Number.isFinite)
+      && (p.x < 0 || p.y < 0 || p.x + p.width > row.viewport.width + 1 || p.y + p.height > row.viewport.height + 1)) errors.push(`${row.stage}: görünürlük beyanı ekran geometrisiyle çelişiyor`);
+    if (typeof p.width === 'number' && p.width < ACCEPTANCE.minTouchTargetPx) errors.push(`${row.stage}: dokunma hedefi genişliği ${p.width}px < ${ACCEPTANCE.minTouchTargetPx}px`);
     if (typeof p.height === 'number' && p.height < ACCEPTANCE.minTouchTargetPx) {
       errors.push(`${row.stage}: dokunma hedefi ${p.height}px < ${ACCEPTANCE.minTouchTargetPx}px`);
     }
-    const key = `${row.stage}@${row.viewport && row.viewport.width}x${row.viewport && row.viewport.height}+${row.viewport && row.viewport.safeAreaBottom}`;
+    const key = JSON.stringify([row.stage, row.viewport && row.viewport.width, row.viewport && row.viewport.height, row.viewport && row.viewport.safeAreaBottom, row.theme, row.scenario, row.variant]);
     if (!byStage.has(key)) byStage.set(key, []);
-    byStage.get(key).push(p.y);
+    byStage.get(key).push({ render: row.render, y: p.y });
+  }
+  for (const stage of STAGES) for (const viewport of VIEWPORTS) for (const theme of viewport.safeAreaBottom ? ['light'] : ['light', 'dark']) {
+    const variants = stage.stage === 'practice' ? ['mc', 'build', 'cloze'] : [null];
+    for (const variant of variants) {
+      const match = [...byStage.entries()].some(([key, samples]) => {
+        const k = JSON.parse(key);
+        return k[0] === stage.stage && k[1] === viewport.width && k[2] === viewport.height && k[3] === viewport.safeAreaBottom && k[4] === theme && (!variant || k[6] === variant) && samples.length === 2 && samples[0].render === 1 && samples[1].render === 2;
+      });
+      if (!match) errors.push(`${stage.stage}@${viewport.width}x${viewport.height}+${viewport.safeAreaBottom}/${theme}${variant ? '/'+variant : ''}: aynı senaryoda ardışık iki ölçüm eksik`);
+    }
   }
   // Ardışık y-farkı: aynı aşama+viewport için ölçümler sıralı gelir.
   for (const [key, ys] of byStage) {
+    if (ys.length !== 2 || ys[0].render !== 1 || ys[1].render !== 2) errors.push(`${key}: iki ayrı sıralı render gerekli`);
     for (let i = 1; i < ys.length; i += 1) {
-      const delta = Math.abs(ys[i] - ys[i - 1]);
+      const delta = Math.abs(ys[i].y - ys[i - 1].y);
       if (delta > ACCEPTANCE.maxConsecutiveYDeltaPx) {
         errors.push(`${key}: ardışık y-farkı ${delta}px > ${ACCEPTANCE.maxConsecutiveYDeltaPx}px`);
       }

@@ -1,0 +1,35 @@
+{
+  "viewport": {
+    "width": 320,
+    "height": 844,
+    "safeAreaBottom": 0
+  },
+  "theme": "dark",
+  "build": {
+    "text": "يو",
+    "spanCount": 1,
+    "dir": "rtl",
+    "font": "\"K3P Scheherazade\", \"Noto Naskh Arabic\", Amiri, \"Scheherazade New\", \"Times New Roman\", serif",
+    "fontLoaded": true,
+    "selected": 2,
+    "theme": "dark",
+    "taskKind": "build"
+  },
+  "selected": [
+    {
+      "label": "ي",
+      "choiceId": "c0"
+    },
+    {
+      "label": "و",
+      "choiceId": "c1"
+    }
+  ],
+  "screenshot": "build-selected.webp",
+  "sha256": "96bef019ba2b34d7ca03954b2bf9b2d2103510383c6e493a58d32911e1998862",
+  "cssSha256": "2c3700e036f8033c585034b82aff9943684ca537c8416803805f41d48cd45614",
+  "viewsSha256": "9d2dceed0ab0172275ab2e781957e8bfe5539bc0d197f8af0f3a5bde7b9e3f49",
+  "engineSha256": "79aad74a710e8bc96f60dd527caff20db913b83b73a1fd6e539db6e457c0359c",
+  "origin": "http://127.0.0.1:9000",
+  "blockedExternalCount": 2
+}

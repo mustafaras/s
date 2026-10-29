@@ -10,3 +10,9 @@ graphify-out/
 # Üretilmiş ikili belge çıktıları (kaynak .md tracked kalır).
 # Tam yol: geniş *.pdf kuralı istenmeyen dosyaları gizlemesin.
 ilham-ibadet-premium-plan/UYGULAMA-PROMPTLARI.pdf
+
+# K3PD-29 yerel görsel QA kanıtı: ham görüntüler ve kırpık geçici dosyalar izlenmez (README/MANIFEST/ölçüm metinleri izlenir).
+kao3-premium/duzeltme-plani/kanit/K3PD-29/**/*.webp
+kao3-premium/duzeltme-plani/kanit/K3PD-29/**/*.png
+kao3-premium/duzeltme-plani/kanit/K3PD-29/*.webp
+kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf

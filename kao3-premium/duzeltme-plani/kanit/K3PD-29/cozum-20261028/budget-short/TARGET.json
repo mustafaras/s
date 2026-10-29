@@ -1,0 +1,190 @@
+{
+  "viewport": {
+    "width": 320,
+    "height": 500,
+    "safeAreaBottom": 0
+  },
+  "theme": "light",
+  "rows": [
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 500,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "budget",
+      "sceneKind": "lesson",
+      "screenshot": "budget.webp",
+      "log": [
+        "budget: theme=light surface=#F7F5EE vw=320 vh=500 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=123 ctaH=172 ctaX=31 ctaY=281 ctaR=320 ctaLay=281 ctaScr=0 focus=true sel=cb5899ed19f4 covN=0 covPx=0 covH=-1 coverY=-1 coverH=-1 lscroll=true overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Günlük süre sınırı Hedefi ve metni gör Kulluğun yalnız O'na yöneldiğini anlatan cümleyi "
+      ],
+      "issues": [],
+      "sha256": "8dfdce6806afd44010e8e4821f9f8ebcbe99a5cc27fd4ce2a7ae143d07853faf",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"budget\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 281,
+        "width": 123,
+        "height": 172,
+        "layoutY": 281,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": false,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 477,
+          "clientHeight": 228,
+          "localScroll": true
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 500
+      },
+      "scrollTop": null
+    }
+  ],
+  "ctaReport": [
+    {
+      "scene": "budget",
+      "stage": "budget",
+      "viewport": "320x500+0",
+      "samples": 2,
+      "layoutYs": [
+        281,
+        281
+      ],
+      "maxDelta": 0
+    }
+  ],
+  "scrollChecks": [
+    {
+      "fraction": 0,
+      "scrollTop": 0,
+      "scrollHeight": 477,
+      "clientHeight": 228,
+      "primary": {
+        "x": 31,
+        "y": 281,
+        "w": 123,
+        "h": 172,
+        "bottom": 453,
+        "hit": true,
+        "text": "Daha uzun süre seç"
+      },
+      "secondary": {
+        "x": 159.15625,
+        "y": 281,
+        "w": 136.6875,
+        "h": 172,
+        "bottom": 453,
+        "hit": true,
+        "text": "Süre aşımını kabul et"
+      },
+      "content": {
+        "x": 31,
+        "y": 41,
+        "w": 258,
+        "h": 228,
+        "bottom": 269,
+        "hit": true,
+        "text": "✕\n\nÜnite 1 · Fâtiha · Ders 3 / 5\n\nGünlük süre sınırı\nHedefi ve metni gör\n\nKulluğun yalnız O'na yöneldiğini anlatan cümleyi çözeceksin.\n\nSıradaki görev ~3 dk · yedek: önceki 7 gün ortalaması. Bugün kalan 0 dk. Günlük süreyi artırabilir ya da aşımı açıkça kabul edebilirsin."
+      },
+      "detailsOpen": true,
+      "font": "32px",
+      "contentSeparate": true
+    },
+    {
+      "fraction": 0.5,
+      "scrollTop": 125,
+      "scrollHeight": 477,
+      "clientHeight": 228,
+      "primary": {
+        "x": 31,
+        "y": 281,
+        "w": 123,
+        "h": 172,
+        "bottom": 453,
+        "hit": true,
+        "text": "Daha uzun süre seç"
+      },
+      "secondary": {
+        "x": 159.15625,
+        "y": 281,
+        "w": 136.6875,
+        "h": 172,
+        "bottom": 453,
+        "hit": true,
+        "text": "Süre aşımını kabul et"
+      },
+      "content": {
+        "x": 31,
+        "y": 41,
+        "w": 258,
+        "h": 228,
+        "bottom": 269,
+        "hit": true,
+        "text": "✕\n\nÜnite 1 · Fâtiha · Ders 3 / 5\n\nGünlük süre sınırı\nHedefi ve metni gör\n\nKulluğun yalnız O'na yöneldiğini anlatan cümleyi çözeceksin.\n\nSıradaki görev ~3 dk · yedek: önceki 7 gün ortalaması. Bugün kalan 0 dk. Günlük süreyi artırabilir ya da aşımı açıkça kabul edebilirsin."
+      },
+      "detailsOpen": true,
+      "font": "32px",
+      "contentSeparate": true
+    },
+    {
+      "fraction": 1,
+      "scrollTop": 249,
+      "scrollHeight": 477,
+      "clientHeight": 228,
+      "primary": {
+        "x": 31,
+        "y": 281,
+        "w": 123,
+        "h": 172,
+        "bottom": 453,
+        "hit": true,
+        "text": "Daha uzun süre seç"
+      },
+      "secondary": {
+        "x": 159.15625,
+        "y": 281,
+        "w": 136.6875,
+        "h": 172,
+        "bottom": 453,
+        "hit": true,
+        "text": "Süre aşımını kabul et"
+      },
+      "content": {
+        "x": 31,
+        "y": 41,
+        "w": 258,
+        "h": 228,
+        "bottom": 269,
+        "hit": true,
+        "text": "✕\n\nÜnite 1 · Fâtiha · Ders 3 / 5\n\nGünlük süre sınırı\nHedefi ve metni gör\n\nKulluğun yalnız O'na yöneldiğini anlatan cümleyi çözeceksin.\n\nSıradaki görev ~3 dk · yedek: önceki 7 gün ortalaması. Bugün kalan 0 dk. Günlük süreyi artırabilir ya da aşımı açıkça kabul edebilirsin."
+      },
+      "detailsOpen": true,
+      "font": "32px",
+      "contentSeparate": true
+    }
+  ],
+  "failures": [],
+  "findings": [],
+  "blockedExternalCount": 17,
+  "cssSha256": "29ad4e4c5cbe1d2c8e60eb75681976041b2c0003f87e66dc26f3c41be73610de",
+  "viewsSha256": "9d2dceed0ab0172275ab2e781957e8bfe5539bc0d197f8af0f3a5bde7b9e3f49",
+  "engineSha256": "d7c0fa9539a587de0907334b42fe014346284c61e477b810d0424c0b45b560fa",
+  "origin": "http://127.0.0.1:9000"
+}

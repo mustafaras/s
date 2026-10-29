@@ -79,10 +79,10 @@ check('etkin bölüm kendi içinde dolar (indexInSection/countInSection) ve aria
   t.api.kaoLesson('exit');
 });
 
-check('sabit eylem bölgesi: birincil eylem ve şıklar alta yapışık (sticky + safe-area)', () => {
+check('sabit eylem bölgesi: ders içeriği ayrı, görev şıkları sticky ve safe-area uyumlu', () => {
   const css = fs.readFileSync(path.join(repoRoot, 'app/kao.css'), 'utf8');
-  assert.match(css, /\.kao-lesson>\.kao-lesson-next,\.kao-lesson>\.kao-lesson-more\{position:sticky;bottom:calc\(8px \+ env\(safe-area-inset-bottom,0px\)\)\}/, 'ders birincil eylemi alta yapışık ve safe-area');
-  assert.match(css, /\.kao-task>\.kao-choices\{position:sticky;bottom:calc\(8px \+ env\(safe-area-inset-bottom,0px\)\)\}/, 'şıklar alta yapışık ve safe-area');
+  assert.match(css, /\.kao-lesson-content\{grid-column:1\/-1;min-height:0;overflow:auto/, 'ders içeriği eylemlerden ayrı kaydırılır');
+  assert.match(css, /\.kao-task>\.kao-choices\{position:sticky;bottom:calc\(8px \+ env\(safe-area-inset-bottom,0px\)\);max-height:35dvh;overflow-y:auto/, 'şıklar safe-area ile yapışık ve yerel kaydırılabilir');
   // Yalnız CSS ve sınıf adı değişir: motor/Flow sticky/safe-area bilmez.
   const engine = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearn.js'), 'utf8');
   const flow = fs.readFileSync(path.join(repoRoot, 'app/core/quranLearnFlow.js'), 'utf8');
@@ -112,6 +112,12 @@ check('5 bölümlü ilerleme çubuğu: role=progressbar, 5 segment, aria-valuema
 //   (d) 29 için ölçüm sözleşmesi (x/y/w/h, görünürlük, örtüşme, odak, ≤8 px) tanımlı ve doğrulanabilir.
 const { execFileSync } = require('node:child_process');
 const contractTool = require('node:path').join(repoRoot, 'kao3-premium', 'araclar', 'eylem-geometri.cjs');
+const syntheticGeometryMatrix = (c) => c.stages.flatMap((stage) => c.viewports.flatMap((viewport) =>
+  (viewport.safeAreaBottom ? ['light'] : ['light', 'dark']).flatMap((theme) =>
+    (stage.stage === 'practice' ? ['mc', 'build', 'cloze'] : ['default']).flatMap((variant) => [1, 2].map((render) => ({
+      stage: stage.stage, theme, scenario: `${stage.stage}-${variant}`, variant, render, viewport,
+      primary: { selector: stage.selector, x: 0, y: render === 1 ? 100 : 104, width: 100, height: 50, visible: true }, overlap: { covered: false }, focusReachable: true,
+    }))))) );
 
 check('K3PD-21 sözleşme aracı: 9 aşama, 4 viewport, ≤8 px, hüküm EVIDENCE_PENDING', () => {
   const out = execFileSync(process.execPath, [contractTool], { encoding: 'utf8' });
@@ -141,6 +147,29 @@ check('K3PD-21 sözleşme aracı --check: bütünlük doğrulaması geçer', () 
   assert.match(out, /^PASS eylem-geometri sözleşmesi/);
 });
 
+check('K3PD-21 ölçüm aracı boş veya eksik matrisi reddeder, tam matrisi kabul eder', () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const tmp = path.join(os.tmpdir(), `k3pd21-matrix-${process.pid}.json`);
+  const c = JSON.parse(execFileSync(process.execPath, [contractTool], { encoding: 'utf8' }));
+  const rows = syntheticGeometryMatrix(c);
+  try {
+    const run = (data) => { fs.writeFileSync(tmp, JSON.stringify(data)); return execFileSync(process.execPath, [contractTool, '--olcum', tmp], { encoding: 'utf8', stdio: 'pipe' }); };
+    assert.throws(() => run([]));
+    assert.throws(() => run(rows.slice(2)));
+    const duplicated = structuredClone(rows); duplicated[1] = structuredClone(duplicated[0]);
+    assert.throws(() => run(duplicated));
+    const offscreen = structuredClone(rows); offscreen[0].primary.x = -10000;
+    assert.throws(() => run(offscreen));
+    assert.throws(() => run(rows.filter((row) => row.variant !== 'cloze')));
+    const missingOverlap = structuredClone(rows); delete missingOverlap[0].overlap.covered;
+    assert.throws(() => run(missingOverlap));
+    assert.match(run(rows), /^PASS/);
+    assert.match(c.stages.find((stage) => stage.stage === 'partEnd').selector, /stage="budget"/);
+    assert.match(c.stages.find((stage) => stage.stage === 'read').selector, /stage="apply"/);
+  } finally { fs.rmSync(tmp, { force: true }); }
+});
+
 check('K3PD-21 sözleşme aracı --olcum: eksik alan ve eşik ihlalini YAKALAR (negatif)', () => {
   const fs = require('node:fs');
   const os = require('node:os');
@@ -150,14 +179,16 @@ check('K3PD-21 sözleşme aracı --olcum: eksik alan ve eşik ihlalini YAKALAR (
   let failed = false;
   try { execFileSync(process.execPath, [contractTool, '--olcum', tmp], { encoding: 'utf8', stdio: 'pipe' }); } catch (e) { failed = true; }
   assert.equal(failed, true, 'eksik alan kabul edilmemeli');
-  // (b) y-farkı > 8
-  const row = (y) => ({ stage: 'goal', viewport: { width: 390, height: 844, safeAreaBottom: 0 }, primary: { selector: 'x', x: 0, y, width: 100, height: 50, visible: true }, overlap: { covered: false }, focusReachable: true });
-  fs.writeFileSync(tmp, JSON.stringify([row(100), row(120)]));
+  // (b) Tam matriste y-farkı > 8; kapsam eksikliğinden bağımsız sınanır.
+  const c = JSON.parse(execFileSync(process.execPath, [contractTool], { encoding: 'utf8' }));
+  const rows = syntheticGeometryMatrix(c);
+  const drift = structuredClone(rows); drift[1].primary.y = 120;
+  fs.writeFileSync(tmp, JSON.stringify(drift));
   failed = false;
   try { execFileSync(process.execPath, [contractTool, '--olcum', tmp], { encoding: 'utf8', stdio: 'pipe' }); } catch (e) { failed = true; }
   assert.equal(failed, true, '20 px y-farkı reddedilmeli');
   // (c) geçerli kayıt geçer
-  fs.writeFileSync(tmp, JSON.stringify([row(100), row(104)]));
+  fs.writeFileSync(tmp, JSON.stringify(rows));
   const ok = execFileSync(process.execPath, [contractTool, '--olcum', tmp], { encoding: 'utf8' });
   assert.match(ok, /^PASS 29 ölçüm kaydı/);
   fs.unlinkSync(tmp);
@@ -194,11 +225,12 @@ check('K3PD-21 her aşama DOM’da data-lesson-stage ile işaretli (ölçüm ara
   assert.doesNotMatch(ph, /kao-lesson-next/, 'practice: next düğmesi olmamalı (birincil eylem şıklar)');
 });
 
-check('K3PD-21 sticky/safe-area sözleşmesi korunur; motor sticky bilmez', () => {
+check('K3PD-21 sabit eylem ve safe-area sözleşmesi; motor sticky bilmez', () => {
   const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8');
   const css = read('app/kao.css');
-  assert.match(css, /\.kao-lesson>\.kao-lesson-next,\.kao-lesson>\.kao-lesson-more\{position:sticky;bottom:calc\(8px \+ env\(safe-area-inset-bottom,0px\)\)\}/);
-  assert.match(css, /\.kao-task>\.kao-choices\{position:sticky;bottom:calc\(8px \+ env\(safe-area-inset-bottom,0px\)\)\}/);
+  assert.match(css, /\.kao-lesson:has\(>\.kao-lesson-content\)\{grid-template: minmax\(0,1fr\) auto \/ repeat\(2,minmax\(0,1fr\)\)\}/, 'eylemler kaydırılan içerikten ayrı satırda yer alır');
+  assert.match(css, /\.kao-lesson-next:last-child\{grid-column:1\/-1\}/, 'tek eylem tüm satırı kullanır');
+  assert.match(css, /\.kao-task>\.kao-choices\{position:sticky;bottom:calc\(8px \+ env\(safe-area-inset-bottom,0px\)\);max-height:35dvh;overflow-y:auto/);
   const engine = read('app/core/quranLearn.js');
   const flowSrc = read('app/core/quranLearnFlow.js');
   assert.equal(/sticky|safe-area/.test(engine), false, 'motor sticky/safe-area taşımaz');

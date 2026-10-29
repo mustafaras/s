@@ -4,7 +4,7 @@ KAO2 ve KAO2-FIX'ten sonra gelen tasarım ve kalite programı. Plan v3, 2026-10-
 
 - Kararların hepsi verildi (K-A…K-O); **37/37 kart 2026-10-18'de tamamlandı**.
 - `K3P-STATE.json`: `status=completed`, `nextPrompt=null`, `releaseApproval=APPROVED-2026-10-18`.
-- Canlı pin `20261018a`; Pages run [39126116607](https://github.com/mustafaras/s/actions/runs/39126116607) başarılı. `KAPANIS.md` canlı parity ve kullanıcıda kalan cihaz kabulü sınırlarını kaydeder.
+- Canlı pin `20261018a`; Pages run [39126116607](https://github.com/mustafaras/s/actions/runs/39126116607) başarılı. [KAPANIS.md](KAPANIS.md) canlı parity ve kullanıcıda kalan cihaz kabulü sınırlarını; [görsel kanıt rehberi](kanit/sonraki/GORSEL-KANIT.md) altı arayüz kontak sayfasını kaydeder.
 
 ## Nasıl ilerlenir: prompt'ları tek tek ver
 

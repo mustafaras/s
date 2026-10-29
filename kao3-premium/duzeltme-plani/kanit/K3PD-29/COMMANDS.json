@@ -1,0 +1,677 @@
+{
+  "schema": "k3pd.commands",
+  "schemaVersion": 1,
+  "card": "K3PD-29",
+  "date": "2026-10-26",
+  "baseline": {
+    "branch": "k3pd-denetim-duzeltmeleri",
+    "baseHead": "35478e6b931aac37a867732070bf4b4b19f0691b",
+    "nextPromptAtStart": "K3PD-29",
+    "cardStatusAtStart": "todo"
+  },
+  "protectedFiles": {
+    "kao3-premium/KAPANIS.md": "d8e8419e2849b9eec922e537bca7100149fdfee6120ce850fda77128f8af9bcd",
+    "kao3-premium/README.md": "1aee47cdd05726f4a5966748ae3f786bd79d2e394dd37f3ec7b083f2d36eed0f",
+    "kao3-premium/kanit/sonraki/GORSEL-KANIT.md": "d7627027bba21007550f0a5c76130a4d9f11b7b896d001a60e9333c81ffeed28",
+    "kao3-premium/kanit/sonraki/GORSEL-KANIT.pdf": "05ae0071c87c7bad4ed5f050cbb07479e022e912a67ad401b59e00b52ca8811b"
+  },
+  "environment": {
+    "networkRequested": false,
+    "realUserData": false,
+    "serverStarted": false,
+    "origin": "http://127.0.0.1:9000",
+    "chrome": "ms-playwright chromium-1248 (KAO_QA_CHROME)",
+    "tokenPresent": false,
+    "forceSync": null,
+    "tempCleanup": "0 k3pd29 artefakti kaldi (profil dizinleri + betikler silindi)"
+  },
+  "commands": [
+    {
+      "command": "node tests/app/test_local_visual_qa_guard.js",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "checks": "10/10 PASS"
+      }
+    },
+    {
+      "command": "node tests/app/test_local_visual_qa_manifest.js",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "checks": 214
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --negatif-test",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "cases": 113,
+        "acceptCases": 3,
+        "rejectCases": 110
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --dogrula <8 dizin>",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "dirs": 8,
+        "rows": 519,
+        "ctaRows": 294,
+        "ctaStabilityRecords": 294,
+        "hashMismatches": 0,
+        "logMismatches": 0,
+        "issueFileMismatches": 0,
+        "imageIntegrityMismatches": 0,
+        "declaredSertRejected": true,
+        "ctaHorizontalAnchor": "x/dialogRight log ctaX=/ctaR= ile capali"
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --kapsam <7 kosum>",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "runs": 7,
+        "rows": 518,
+        "combinations": 7,
+        "ctaContract": "7/7",
+        "fullManifestValidationPerDir": true
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --glif-karsilastir <glif-referans> <light-460>",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "series": 30,
+        "sameOrder": true,
+        "rederivedFromContent": true,
+        "themeEqual": true,
+        "measuredScale": 4,
+        "hashesFromDisk": true,
+        "screenshotsDiffer": true
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/shoot-modal.mjs <7 gercek kosum>",
+      "env": {
+        "KAO_QA_CHROME": "chromium-1248"
+      },
+      "exitCode": 0,
+      "measurements": {
+        "runs": 7,
+        "rowsPerRun": 74,
+        "captureFailures": 0,
+        "productionFindings": 2,
+        "ctaMaxDeltaPx": 0,
+        "measuredCaptureScales": "1 ve 4"
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/shoot-modal.mjs <c9dd5962^> --glif-only light",
+      "env": {
+        "KAO_QA_CHROME": "chromium-1248"
+      },
+      "exitCode": 0,
+      "measurements": {
+        "reference": "0beb6d0d (= c9dd5962^)",
+        "fontFaceCount": 0,
+        "series": 30
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/shoot.mjs <root> <dir> <prof>",
+      "env": {
+        "KAO_QA_CHROME": "chromium-1248"
+      },
+      "exitCode": 0,
+      "measurements": {
+        "note": "cdp.mjs geriye uyumluluk: eski arac kirilmadi"
+      }
+    },
+    {
+      "command": "node tools/kao/kao-plan-check.mjs",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "mode": "kod"
+      }
+    },
+    {
+      "command": "node tests/app/test_asset_pin_freshness.js",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "fresh": 59,
+        "deferred": 4,
+        "blocking": 0
+      }
+    },
+    {
+      "command": "node tests/app/test_iip_22.js",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "checks": "15/15"
+      }
+    },
+    {
+      "command": "node --check <4 degisen JS>",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "files": 4
+      }
+    },
+    {
+      "command": "node kao3-premium/duzeltme-plani/araclar/durum.mjs --check",
+      "env": {},
+      "exitCode": 0,
+      "measurements": {
+        "result": "PASS",
+        "nextPrompt": "K3PD-29"
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --dogrula <F18-1 sahte kopya: butun cta.x=-1000>",
+      "env": {},
+      "exitCode": 1,
+      "measurements": {
+        "patchedRows": 42,
+        "errors": 42,
+        "reason": "CTA yatayda diyalog disinda (x=-1000) — fail-closed"
+      }
+    },
+    {
+      "command": "node tools/kapi/gorsel-qa/gorsel-qa-manifest.mjs --dogrula <F18-1 sahte kopya: manifest+log ctaX=-1000 tutarli>",
+      "env": {},
+      "exitCode": 1,
+      "measurements": {
+        "patchedRows": 42,
+        "reason": "log capasi da yamalandi; yatay geometri kapisi yine reddetti"
+      }
+    }
+  ],
+  "runs": [
+    {
+      "dir": "light-320",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "rows": 74,
+      "ctaRows": 42,
+      "stabilityRecords": 42,
+      "productionFindings": 2,
+      "hardFindings": 0,
+      "ctaMaxDeltaPx": 0,
+      "measuredCaptureScales": [
+        1,
+        4
+      ]
+    },
+    {
+      "dir": "light-390",
+      "theme": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "rows": 74,
+      "ctaRows": 42,
+      "stabilityRecords": 42,
+      "productionFindings": 2,
+      "hardFindings": 0,
+      "ctaMaxDeltaPx": 0,
+      "measuredCaptureScales": [
+        1,
+        4
+      ]
+    },
+    {
+      "dir": "light-460",
+      "theme": "light",
+      "viewport": {
+        "width": 460,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "rows": 74,
+      "ctaRows": 42,
+      "stabilityRecords": 42,
+      "productionFindings": 2,
+      "hardFindings": 0,
+      "ctaMaxDeltaPx": 0,
+      "measuredCaptureScales": [
+        1,
+        4
+      ]
+    },
+    {
+      "dir": "dark-320",
+      "theme": "dark",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "rows": 74,
+      "ctaRows": 42,
+      "stabilityRecords": 42,
+      "productionFindings": 2,
+      "hardFindings": 0,
+      "ctaMaxDeltaPx": 0,
+      "measuredCaptureScales": [
+        1,
+        4
+      ]
+    },
+    {
+      "dir": "dark-390",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "rows": 74,
+      "ctaRows": 42,
+      "stabilityRecords": 42,
+      "productionFindings": 2,
+      "hardFindings": 0,
+      "ctaMaxDeltaPx": 0,
+      "measuredCaptureScales": [
+        1,
+        4
+      ]
+    },
+    {
+      "dir": "dark-460",
+      "theme": "dark",
+      "viewport": {
+        "width": 460,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "rows": 74,
+      "ctaRows": 42,
+      "stabilityRecords": 42,
+      "productionFindings": 2,
+      "hardFindings": 0,
+      "ctaMaxDeltaPx": 0,
+      "measuredCaptureScales": [
+        1,
+        4
+      ]
+    },
+    {
+      "dir": "light-390-inset",
+      "theme": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "safeAreaBottom": 34
+      },
+      "rows": 74,
+      "ctaRows": 42,
+      "stabilityRecords": 42,
+      "productionFindings": 2,
+      "hardFindings": 0,
+      "ctaMaxDeltaPx": 0,
+      "measuredCaptureScales": [
+        1,
+        4
+      ]
+    }
+  ],
+  "glyphComparison": {
+    "reference": {
+      "build": "0beb6d0d (= c9dd5962^)",
+      "screenshotSha256": "ed26e3b278085aa56b6273d1d0f3493f7e25c22cc6f161742ca8f85816ef0c73",
+      "fontLoaded": false,
+      "woff2": 0,
+      "measuredScale": 4
+    },
+    "current": {
+      "width": 460,
+      "screenshotSha256": "38e46400facbaf28ba5884565aea34db4fae998a50101c4e16d8ef95952d89b6",
+      "fontLoaded": true,
+      "woff2": 1,
+      "transferSize": 25360,
+      "measuredScale": 4
+    },
+    "seriesCount": 30,
+    "comparisonImage": "kao3-premium/duzeltme-plani/kanit/K3PD-29/GLIF-ONCE-SONRA.webp",
+    "doubleCaptureRejected": "tahrifat testiyle kanıtlandı (rc=1)",
+    "sourceHashes": {
+      "reference": "ed26e3b278085aa56b6273d1d0f3493f7e25c22cc6f161742ca8f85816ef0c73",
+      "current": "38e46400facbaf28ba5884565aea34db4fae998a50101c4e16d8ef95952d89b6"
+    },
+    "composite": {
+      "path": "kao3-premium/duzeltme-plani/kanit/K3PD-29/GLIF-ONCE-SONRA.webp",
+      "sha256": "c5c12f22703217181407075a4c1c69a2181e885fe8148992d7332588a62ace4f",
+      "note": "iki gercek kirpimdan yeniden birlestirildi; tanik degil sunum"
+    }
+  },
+  "openFinding": {
+    "id": "K3PD-29-F1",
+    "scene": "l25-summary",
+    "severity": "P2",
+    "kind": "primary CTA obscured by sticky sibling",
+    "evidence": "cta.hiddenBy=true, overlapsControl[0].overlapPx=44 (7/7 runs, all widths/themes)",
+    "cause": "app/kao.css: .kao-lesson>.kao-lesson-next,.kao-lesson>.kao-lesson-more share position:sticky;bottom:calc(8px+safe-area)",
+    "ancestry": "sticky rule from c99de5e6 (K3P-A6), ancestor of base -> pre-existing, not a regression",
+    "inScope": false,
+    "note": "production change forbidden by this card; measurement not relaxed, reported as FINDING + productionFindings"
+  },
+  "independentAudits": "PARTIAL x25 + kendi on-tarama",
+  "releaseApproval": "NOT_APPROVED",
+  "candidateSha": null,
+  "round4": {
+    "severity": "2 CRITICAL + 3 MAJOR + 7 MINOR",
+    "fixed": 12,
+    "highlights": [
+      "F1 hashes from disk",
+      "F2 validateCta/deriveFindings",
+      "F3 MIN_IMAGE_BYTES + pixel dims",
+      "F4 captured surface measured",
+      "F5 measured captureScale",
+      "F7 theme equality",
+      "F8 first button",
+      "F9 practiceKind",
+      "F10 width-only",
+      "F11 Range clipping + auto cleanup",
+      "F12 historical count"
+    ]
+  },
+  "round5": {
+    "severity": "1 CRITICAL + 3 MAJOR + 4 MINOR",
+    "fixed": 8,
+    "highlights": [
+      "R5-F1 cta:null rejected + --kapsam calls validateCta",
+      "R5-F2 truncated image (RIFF/IEND)",
+      "R5-F3 declared SERT rejected",
+      "R5-F4 doc aligned to code",
+      "R5-F5 444 IS reproducible (474 was wrong)",
+      "R5-F6 o2 is app surface",
+      "R5-F7 count 93",
+      "R5-F8 real onboarding hashes"
+    ]
+  },
+  "knownLimit": "Tek manifest alani artik kacis kapisi degil (sceneKind enum+ad capali, envanter log.txt e bagli, tema computed token, olcumler disk hash). Kalan sinir: birden cok alani TUTARLI bicimde yalan soylemek hash-tabanli yakalanmaz.",
+  "round6": {
+    "severity": "1 CRITICAL + 2 MAJOR + 3 MINOR",
+    "fixed": 6,
+    "highlights": [
+      "N6-F1 mode-field exemption removed (structural only)",
+      "N6-F2 fixture count unified to 93",
+      "N6-F3 7.1 25->42 scenes",
+      "N6-F5 blocked-external 67->84",
+      "N6-F6 unverifiable 7.3 pixel numbers removed"
+    ]
+  },
+  "roundsTotalFixed": 98,
+  "round7": {
+    "severity": "1 CRITICAL + 2 MINOR",
+    "fixed": 3,
+    "highlights": [
+      "N7-F1 sceneKind enum + scene-name anchor",
+      "N7-F2 inventory bound to log.txt",
+      "N7-F3 superseding record seq171"
+    ]
+  },
+  "round8": {
+    "severity": "1 CRITICAL + 1 MAJOR + 1 MINOR",
+    "fixed": 3,
+    "highlights": [
+      "N8-F1 --kapsam now calls validateManifest per dir",
+      "N8-F2 maxDelta derived from layoutYs",
+      "N8-F3 profile anchored to scene name"
+    ]
+  },
+  "round9": {
+    "severity": "2 MAJOR + 3 MINOR",
+    "fixed": 5,
+    "highlights": [
+      "F9-1 captureScale integer >=1 + width anchored to log vw=",
+      "F9-2 viewport.{width,height,safeAreaBottom} validated + anchored to vw=/vh=/inset=",
+      "F9-3 \"stops on first error\" wording corrected",
+      "F9-4 absolute \"no single field\" claim removed -> measured anchor list",
+      "F9-5 GUNCEL-DURUM honest finding count"
+    ]
+  },
+  "round10": {
+    "severity": "2 CRITICAL + 3 MAJOR + 2 MINOR",
+    "fixed": 7,
+    "highlights": [
+      "F10-1 theme anchored to log.txt theme=/surface= (label+verifiedTheme were both manifest)",
+      "F10-2 glyph compare theme read from disk log, not manifest string",
+      "F10-3 glyph font proof anchored (faces[].status/requests) + before must be fontless",
+      "F10-4 issues.txt is a derived witness: absolute inventory floor explicitly NOT claimed",
+      "F10-5 collisions=/collisionPx= in scene log anchor overlapsControl (derive from raw geometry)",
+      "F10-6 WebP chunk walk rejects RIFF-patched truncation",
+      "F10-7 finding-count corrected: 2 records / 1 defect (was claimed \"3\")"
+    ]
+  },
+  "round11": {
+    "severity": "1 CRITICAL + 1 MAJOR + 1 MINOR",
+    "fixed": 3,
+    "highlights": [
+      "F11-1 every log anchor was gated on vw=; deleting the token disabled theme/surface/viewport/collision anchors",
+      "F11-2 cta.hiddenBy was self-declared; now anchored to log hidden=/hiddenPx=",
+      "F11-3 glyph font metrics unanchored; now parsed from log metrics=NNN/NNN"
+    ]
+  },
+  "round12": {
+    "severity": "2 MAJOR + 1 MINOR",
+    "fixed": 3,
+    "highlights": [
+      "F12-1 overflowX= written but never parsed; hard= now carries all five SERT kinds and must equal rows[].issues",
+      "F12-2 --kapsam cross-run inventory excluded o*/g* scenes; now full + per-profile comparison",
+      "F12-3 glyph before-image not bound to declared font state: absolute \"rejects double capture\" wording softened to bit-identical, pixel<->font binding disclosed as not machine-checked"
+    ]
+  },
+  "round13": {
+    "severity": "1 CRITICAL + 2 MAJOR + 1 MINOR",
+    "fixed": 4,
+    "highlights": [
+      "F13-1 g* rows still skipped combo.scenes/byProfile (the F12-2 hole was only half closed) - glyph inventory now compared per run",
+      "F13-2 glyphEvidence never cross-checked in validateManifest/validateCoverage - now bound to rows and disk",
+      "F13-3 node=/text= written to onboarding log but never parsed - now parsed and mandatory",
+      "F13-4 hard= writer joins with \",\" but parser expected \"|\" - multi-kind rows were silently truncated"
+    ]
+  },
+  "round14": {
+    "severity": "2 CRITICAL + 1 MAJOR",
+    "fixed": 3,
+    "highlights": [
+      "F14-1 row.log only membership-checked; scene prefix never compared to row.scene -> single-field decoupling",
+      "F14-2 screenshot+sha256 not bound to scene; two-field swap moved a row's whole evidence",
+      "F14-3 glyphEvidence bound to any row, not the glyph row -> retargetable in 6 of 7 runs"
+    ]
+  },
+  "round15": {
+    "severity": "2 MAJOR + 2 MINOR",
+    "fixed": 4,
+    "highlights": [
+      "F15-1 ctaReport[].layoutYs not anchored to rows[].cta.layoutY -> now compared",
+      "F15-2 glyphEvidence optional; deletable from 6/7 runs -> mandatory when a glyph row exists",
+      "F15-3 collisions=/collisionPx= not in mandatory list -> doc narrowed to CTA rows",
+      "F15-4 hiddenPx writer used min(cta.height, coverStack[0].h) but validator expected raw h -> raw now"
+    ]
+  },
+  "round16": {
+    "severity": "1 HIGH + 2 MEDIUM",
+    "fixed": 3,
+    "highlights": [
+      "F16-1 cta.visible was self-declared; visible=false->true flipped rc=1 to rc=0 -> now re-derived from geometry",
+      "F16-2 >=44px rule was height-only; width unchecked -> both dimensions now enforced",
+      "F16-3 glyphEvidence.font unread by --dogrula/--kapsam in 6 of 7 runs -> now anchored to log loaded=/woff2=/metrics="
+    ]
+  },
+  "round17": {
+    "severity": "1 HIGH + 2 MEDIUM",
+    "fixed": 3,
+    "highlights": [
+      "F17-1 cta.height/width/focusReachable still self-declared -> anchored to log ctaW=/ctaH=/focus=",
+      "F17-2 glyphEvidence.scene was free and the log lookup had no else -> anchored + hard error",
+      "F17-3 cta.dialogBottom and y+scrollTop unanchored -> dialogBottom==viewport.height, y+scrollTop==layoutY"
+    ]
+  },
+  "round18": {
+    "severity": "1 HIGH",
+    "finding": "F18-1 cta.x/cta.dialogRight hicbir kapida okunmuyordu ve log tanigi yoktu; yatayda ekran disina tasinan eylem visible:true geciyordu (42/42 satir x 7 kosum)",
+    "fix": "gorunurluk iki eksende turetilir (x>=0 ve x+width<=dialogRight+1); log satirlarina ctaX=/ctaR= yazilir ve CTA satirlarinda zorunludur; x/dialogRight eksikse sert hata",
+    "evidence": {
+      "manifestOnlyTamper": "rc=1 x42 (CTA x -1000 != ctaX=35)",
+      "manifestPlusLogTamper": "rc=1 (CTA yatayda diyalog disinda)",
+      "width900": "rc=1",
+      "missingDialogRight": "rc=1"
+    },
+    "counts": {
+      "fixtureBefore": 166,
+      "fixtureAfter": 171,
+      "negativeBefore": 65,
+      "negativeAfter": 72,
+      "acceptCases": 3,
+      "rejectCases": 69
+    },
+    "lesson": "Gorunur iki boyutlu bir yargidir: her iki eksende hem turetilmeli hem log ile capalanmali."
+  },
+  "round19": {
+    "severity": "1 MEDIUM + 1 MINOR",
+    "finding": "F20-1: yedi beyan alani hicbir kapida okunmuyordu (verifiedTheme.onb, cta.selector, cta.overlapsContent, cta.scroll.localScroll, glyphEvidence.series[].sha256, glyphEvidence.imagePixels/captureScale, productionFindings[].theme/viewport); N20-1: blocked-external makbuzu tekrar uretmiyordu (bir kosum 83).",
+    "fix": "log taniklari sel=/covN=/lscroll=/onb=/ser= eklendi ve zorunlu; overlapCovered+localScroll turetilir; glyphEvidence.series[] alanlarinin tamami canli icerikten yeniden turetilir; imagePixels/captureScale diskten yeniden olculur.",
+    "evidence": {
+      "selector": "rc=1 (sel= uyusmazligi)",
+      "overlapsContent": "rc=1 (covN= uyusmazligi)",
+      "localScroll": "rc=1 (lscroll= uyusmazligi)",
+      "onb": "rc=1 (onb= uyusmazligi)",
+      "seriesSha256": "rc=1 (kendi metninden turetilen hash ile celisiyor)",
+      "imagePixels": "rc=1 (diskteki 1840 != 1)"
+    },
+    "counts": {
+      "fixtureBefore": 171,
+      "fixtureAfter": 177,
+      "negativeBefore": 72,
+      "negativeAfter": 83,
+      "rejectCases": 80
+    },
+    "lesson": "Bir kanit alani ya bagimsiz kaynaktan yeniden turetIlmeli ya da EVIDENCE onu dogrulanmis gercek olarak aktarmamali. Manifestte duruyor olmasi dogrulama degildir."
+  },
+  "round20": {
+    "severity": "1 HIGH + 3 MEDIUM + 1 LOW",
+    "finding": "productionFindings[].theme/viewport hala serbest (F20-1 kismen kapanmis); glyphEvidence.sheet.* hic okunmuyordu; cta.coverStack[]/overlapsContent[] kayit icerigi serbestti; `ser=` yazildi ama hic okunmadi; manifest.origin/mode/card/captureScales serbestti.",
+    "fix": "uretim bulgusu theme/viewport satirin olcumune bagli; sheet zinciri denetlenir + maxH log h=; covPx=/covH=/coverY=/coverH= log taniklari (tam liste sha256 ozeti); ser= iki kapida zorunlu; manifest.origin log origin satirina capali; card/mode/captureScales/schema denetlenir.",
+    "evidence": {
+      "singleFieldMatrix": "23/23 rc=1",
+      "fixtureBefore": 177,
+      "fixtureAfter": 183,
+      "negativeBefore": 83,
+      "negativeAfter": 93,
+      "rejectCases": 90
+    },
+    "lesson": "Bir alani \"kapatti\" demek icin o alanin HER kardes alani ve ICERIGI de capalanmali; yazilan tanik OKUNMADIKCA tanik degildir."
+  },
+  "round21": {
+    "severity": "yapisal (sinif kapatma)",
+    "finding": "Her tur \"bir alan daha vardi\" buluyordu; kok neden tek tek alan kapatmakti.",
+    "fix": "MANIFEST_FIELD_CONTRACT: manifestte beyan edilen her alan anchor: veya derived: olarak kayitli olmak zorunda; sozlesmede olmayan alan manifest REDDEDILIR. Tabloya girerken 8 gizli alan daha ortaya cikti.",
+    "evidence": {
+      "unregisteredFieldRejected": "rc=1 (brandNewClaim x3 seviye)",
+      "fixtureBefore": 183,
+      "fixtureAfter": 190,
+      "negativeBefore": 93,
+      "negativeAfter": 96
+    },
+    "lesson": "Sinifi kapatmak, alan alan kapatmaktan farklidir: sozlesme tablosu yeni alan eklemeyi imkansiz kilar."
+  },
+  "round22": {
+    "severity": "1 HIGH + 1 MEDIUM + 1 MEDIUM + 1 LOW",
+    "finding": "Sozlesme yalniz yeni alan eklemeyi engelliyordu; kayitli bir alani degistirmek serbestti (60 yapraktan 20sinin okuyucusu yoktu). Ayrica yol taklidi: m[\"rows[].cta.height\"] has() ile kayitli sanilip geciyordu. EVIDENCE 8 alani \"mevcut kapilara baglandi\" diye YANLIS beyan etmisti.",
+    "fix": "20 yapragin hepsi baglandi; yol dizesi tasiyan alan adlari yapisal olarak reddediliyor. EVIDENCE §7.28 beyani duzeltildi.",
+    "evidence": {
+      "leafTamperMatrix": "13/13 rc=1",
+      "forgedPathRejected": "rc=1",
+      "fixtureBefore": 190,
+      "fixtureAfter": 202,
+      "negativeBefore": 96,
+      "negativeAfter": 100
+    },
+    "lesson": "Kayit, okuma degildir: sozlesmeye yazmak alani baglamaz; her yapragin bir OKUYUCUSU olmali."
+  },
+  "round23": {
+    "severity": "2 MEDIUM + 2 LOW",
+    "finding": "Okuyucu var ama SEKIL denetimi: font.check/.distinct --dogrula da okunmuyordu; productionFindings listeleri prefix denetimindeydi (bosaltilabiliyordu); sheet.minH/firstTop/cw yalniz sekil; EVIDENCE derived sayaci kendisiyle celisiyordu (3 vs 4).",
+    "fix": "check=/distinct= --dogrula capasi; bulgu listeleri birebir uzunluk + tur kendi listesini tasimak zorunda; hMin=/hFirst=/hLast=/hSw=/hCw= log taniklari; derived sayaci 4.",
+    "evidence": {
+      "fontCheckFalse": "rc=1",
+      "fontCheckDeleted": "rc=1",
+      "coverStackEmptied": "rc=1",
+      "overlapsControlEmptied": "rc=1",
+      "sheetMinH1": "rc=1",
+      "firstTop0": "rc=1",
+      "cw1": "rc=1",
+      "fixtureBefore": 202,
+      "fixtureAfter": 206,
+      "negativeBefore": 100,
+      "negativeAfter": 102
+    },
+    "lesson": "Okuyucu olmasi yetmez: okuyucu GERCEGI denetlemeli. \"Aralikta mi/pozitif mi/enum uyesi mi\" sekil sorusudur ve yazicinin urettigi degeri her zaman gecer."
+  },
+  "round24": {
+    "severity": "2 MEDIUM (on-kontrol)",
+    "finding": "productionFindings duplicate/cogaltma rc=0 idi; sheet yukseklik zinciri tek tek veya birlikte kaydirilabiliyordu.",
+    "fix": "bulgu listesi kumesel (her iki kapi yolu); yukseklik zinciri butun olarak tek deger + satir geometrisi bagi.",
+    "evidence": {
+      "duplicateFindings": "rc=1",
+      "sheetScrollPlus1": "rc=1",
+      "sheetWholeChainShift": "rc=1",
+      "secondLayerProbes": "9 test: 7 zaten rc=1, 2 kapatildi",
+      "fixtureBefore": 206,
+      "fixtureAfter": 208,
+      "negativeBefore": 102,
+      "negativeAfter": 104
+    },
+    "lesson": "Kume alanlari tekil olmali; birbirine bagli olcumler (yukseklik zinciri) tek tek degil BUTUN olarak capalanmali."
+  },
+  "round25": {
+    "severity": "3 MEDIUM + 1 LOW",
+    "finding": "(1) manifest.theme ve manifest.viewport --dogrula/--kapsam da okunmuyordu; (2) sozlesme ctaY=/ctaLay=/ctaScr= taniklarini ADLANDIRIYORDU ama log'da YOKTU (uydurma beyan) ve cta.y/layoutY/scroll.scrollTop serbestti; (3) font istegi adi/boyutu serbestti (999999 B, Sahte-Font.woff2).",
+    "fix": "manifest.theme/viewport satirlardan turetilir; ctaY=/ctaLay=/ctaScr= log'a yazilir ve capalanir; cta.scroll ic alanlari turetili; font istegi tek yayin fontu + <=1 MiB.",
+    "evidence": {
+      "manifestTheme": "rc=1",
+      "manifestViewport": "rc=1",
+      "ctaY": "rc=1",
+      "ctaLay": "rc=1",
+      "ctaScr": "rc=1",
+      "scrollScrollTop9999": "rc=1",
+      "scrollHeight10": "rc=1",
+      "fontNameFake": "rc=1",
+      "fontSizeAboveCap": "rc=1",
+      "fixtureBefore": 208,
+      "fixtureAfter": 213,
+      "negativeBefore": 104,
+      "negativeAfter": 112
+    },
+    "lesson": "Bir sozlesme bir tanigi ADLANDIRIYORSA o tanik log'da GERCEKTEN olmali; aksi halde beyan yanlistir ve alan acikta kalir. Uydurma tanik adi, tanik yoklugundan daha kotudur."
+  },
+  "round26PreScan": {
+    "kind": "kendi on-taramam (bagimsiz degil)",
+    "probes": 12,
+    "alreadyRejected": 11,
+    "closedThisRound": [
+      "glyphEvidence.viewportHeightDuringCapture (min(sheetHeight,8000) turetimi)"
+    ],
+    "fixtureBefore": 213,
+    "fixtureAfter": 214,
+    "negativeBefore": 112,
+    "negativeAfter": 113
+  }
+}

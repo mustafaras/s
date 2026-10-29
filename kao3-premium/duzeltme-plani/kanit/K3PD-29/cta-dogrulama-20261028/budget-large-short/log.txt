@@ -1,0 +1,4 @@
+origin: http://127.0.0.1:9000 token:false force:null safeAreaBottom:0
+tmp-profil: temizlendi=0 önek=k3pd29-resume-budget-short|k3pd29-resume-budget-short-onb|k3pd29-resume-budget-short-glif
+tema: {"expected":"light","dataTheme":"light","surface":"#F7F5EE","ink":"#172B45","onb":null}
+budget: theme=light surface=#F7F5EE vw=320 vh=500 inset=0 hidden=true hiddenPx=96 collisions=1 collisionPx=44 ctaW=258 ctaH=50 ctaX=31 ctaY=362 ctaR=320 ctaLay=362 ctaScr=0 focus=true sel=cb5899ed19f4 covN=1 covPx=50 covH=b7eabd09a806 coverY=368 coverH=5a39cb02efbc lscroll=true overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Günlük süre sınırı Hedefi ve metni gör Kulluğun yalnız O'na yöneldiğini anlatan cümleyi 

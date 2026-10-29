@@ -1,0 +1,75 @@
+{
+  "viewport": {
+    "width": 320,
+    "height": 400,
+    "safeAreaBottom": 0
+  },
+  "theme": "light",
+  "id": "k3pd29-build-cta-w:l_yawom_9b88c1:ar>tr",
+  "state": {
+    "kind": "build",
+    "choices": 5,
+    "body": true,
+    "choiceClientHeight": 598,
+    "choiceScrollHeight": 598,
+    "theme": "light"
+  },
+  "first": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 18,
+    "y": 257,
+    "width": 284,
+    "height": 109,
+    "layoutY": 257,
+    "scrollTop": 0,
+    "visible": true,
+    "overlapCovered": false,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 0,
+      "scrollHeight": 913,
+      "clientHeight": 400,
+      "localScroll": true
+    },
+    "focusReachable": true,
+    "dialogRight": 320,
+    "dialogBottom": 400
+  },
+  "second": {
+    "selector": ".kao-task.is-practice .kao-choices button",
+    "present": true,
+    "x": 18,
+    "y": 257,
+    "width": 284,
+    "height": 109,
+    "layoutY": 257,
+    "scrollTop": 0,
+    "visible": true,
+    "overlapCovered": false,
+    "hiddenBy": false,
+    "coverStack": [],
+    "overlapsContent": [],
+    "overlapsControl": [],
+    "scroll": {
+      "scrollTop": 0,
+      "scrollHeight": 913,
+      "clientHeight": 400,
+      "localScroll": true
+    },
+    "focusReachable": true,
+    "dialogRight": 320,
+    "dialogBottom": 400
+  },
+  "probeSha256": "743d27a4fab52537ece0d7247eaa5ae1d477a307f5a1bfa0fc72f42bdc217766",
+  "visitsSha256": "93c3208a37984f188310978996fae3f523f3efe0bd329b276d594ad52984010a",
+  "delta": 0,
+  "screenshot": "build-cta.webp",
+  "sha256": "757de3ca93f2404279b72fbc3b2a85884cf4b4544ac997475284cf221051a117",
+  "cssSha256": "2c3700e036f8033c585034b82aff9943684ca537c8416803805f41d48cd45614",
+  "viewsSha256": "9d2dceed0ab0172275ab2e781957e8bfe5539bc0d197f8af0f3a5bde7b9e3f49",
+  "engineSha256": "79aad74a710e8bc96f60dd527caff20db913b83b73a1fd6e539db6e457c0359c"
+}

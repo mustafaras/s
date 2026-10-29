@@ -128,6 +128,21 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_local_visual_qa_guard.js` — Ajanın ekran görüntüsü alabilen yerel
   QA istisnasının Guard 1, force-sync ve gerçek profil sınırlarını kaynak
   düzeyinde ağsız doğrular.
+- `app/test_local_visual_qa_manifest.js` — K3PD-29 görsel kanıt sözleşmesi
+  (277 kontrol, ağsız/tarayıcısız). Manifest satırı ↔ disk ↔ log ↔ issues.txt eşliğini
+  fail-closed doğrular: eksik alan/log, bozuk hash, disk baytı değişimi,
+  manifest dışı ya da eksik görüntü, tema etiketinin root `data-theme` ile
+  çelişmesi, sahnenin tek temada kalması, profil/viewport/kombinasyon kapsamı,
+  ana sahne envanterinin kayması ve tek koşumla tam kapsam iddiası **kırmızı**
+  olur. Ayrıca 30 zor glif dizisinin doğrulanmış içerikten deterministik
+  seçildiğini (kaynak + SHA-256 + ≤20 karakter + tekrarsızlık) ve çekim
+  aracının SKIP'e yutmadığını, ölçüm kırılmasının (`failures` dizisi) `exit 1` verdiğini,
+  üretim bulgusunun (`findings`) yalnız 3 gerçek kusur sitesinde üretildiğini ve
+  `THEME_TOKENS`'ın `app/styles.css` ile pinli olduğunu denetler. Yeni sürümler
+  sahne fontunu, sunulan kaynak hashlerini, iki ekran koordinatını, iki klavye
+  denemesini ve kırpıcı ata geometrisini de doğrular; sentetik fixture kendi
+  başına gerçek tarayıcı veya cihaz kabulü değildir.
+  `node tests/app/test_local_visual_qa_manifest.js`.
 - `app/test_deploy_surface_contract.js` — Pages yayın yüzeyi sözleşmesi
   (2026-09-22): `.github/workflows/pages.yml`’in “Stage runtime-only site”
   adımından **gerçek** `--exclude` bayraklarını çıkarır, aynı rsync’i geçici bir

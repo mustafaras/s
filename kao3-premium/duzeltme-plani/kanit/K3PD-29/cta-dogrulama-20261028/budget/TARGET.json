@@ -1,0 +1,208 @@
+{
+  "viewport": {
+    "width": 320,
+    "height": 844,
+    "safeAreaBottom": 0
+  },
+  "theme": "light",
+  "rows": [
+    {
+      "profile": "ana",
+      "theme": "light",
+      "viewport": {
+        "width": 320,
+        "height": 844,
+        "safeAreaBottom": 0
+      },
+      "captureScale": 1,
+      "scene": "budget",
+      "sceneKind": "lesson",
+      "screenshot": "budget.webp",
+      "log": [
+        "budget: theme=light surface=#F7F5EE vw=320 vh=844 inset=0 hidden=false hiddenPx=0 collisions=0 collisionPx=0 ctaW=258 ctaH=50 ctaX=31 ctaY=285 ctaR=320 ctaLay=285 ctaScr=0 focus=true sel=cb5899ed19f4 covN=1 covPx=50 covH=45aa0289f53a coverY=-1 coverH=-1 lscroll=false overflowX=false hard=yok | ✕ Ünite 1 · Fâtiha · Ders 3 / 5 Günlük süre sınırı Hedefi ve metni gör Daha uzun süre seç Süre aşımını kabul et"
+      ],
+      "issues": [],
+      "sha256": "c1b37de682bd0e8e6de8029662069ed9587e8e7deddf0835dff26c97f2a9f236",
+      "verifiedTheme": {
+        "dataTheme": "light",
+        "surface": "#F7F5EE",
+        "ink": "#172B45",
+        "onb": null
+      },
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"budget\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 285,
+        "width": 258,
+        "height": 50,
+        "layoutY": 285,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "kao-lesson-goal-line",
+            "y": 255,
+            "h": 85,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 50,
+            "txt": "Kulluğun yalnız O'na yöneldiğini"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      },
+      "scrollTop": null
+    }
+  ],
+  "ctaReport": [
+    {
+      "scene": "budget",
+      "stage": "budget",
+      "viewport": "320x844+0",
+      "samples": 2,
+      "layoutYs": [
+        285,
+        285
+      ],
+      "maxDelta": 0
+    }
+  ],
+  "scrollChecks": [
+    {
+      "fraction": 0,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"budget\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 285,
+        "width": 258,
+        "height": 50,
+        "layoutY": 285,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "kao-lesson-goal-line",
+            "y": 255,
+            "h": 85,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 50,
+            "txt": "Kulluğun yalnız O'na yöneldiğini"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      }
+    },
+    {
+      "fraction": 0.5,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"budget\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 285,
+        "width": 258,
+        "height": 50,
+        "layoutY": 285,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "kao-lesson-goal-line",
+            "y": 255,
+            "h": 85,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 50,
+            "txt": "Kulluğun yalnız O'na yöneldiğini"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      }
+    },
+    {
+      "fraction": 1,
+      "cta": {
+        "selector": ".kao-lesson[data-lesson-stage=\"budget\"] > .kao-lesson-next",
+        "present": true,
+        "x": 31,
+        "y": 285,
+        "width": 258,
+        "height": 50,
+        "layoutY": 285,
+        "scrollTop": 0,
+        "visible": true,
+        "overlapCovered": true,
+        "hiddenBy": false,
+        "coverStack": [],
+        "overlapsContent": [
+          {
+            "tag": "P",
+            "cls": "kao-lesson-goal-line",
+            "y": 255,
+            "h": 85,
+            "pos": "static",
+            "z": "auto",
+            "overlapPx": 50,
+            "txt": "Kulluğun yalnız O'na yöneldiğini"
+          }
+        ],
+        "overlapsControl": [],
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 844,
+          "clientHeight": 844,
+          "localScroll": false
+        },
+        "focusReachable": true,
+        "dialogRight": 320,
+        "dialogBottom": 844
+      }
+    }
+  ],
+  "failures": [],
+  "findings": [],
+  "blockedExternalCount": 17,
+  "cssSha256": "14fb1a321f481b60a5e53dd68538a0dc252f7b3fdbb67d091de54d97ed7ac485",
+  "origin": "http://127.0.0.1:9000"
+}

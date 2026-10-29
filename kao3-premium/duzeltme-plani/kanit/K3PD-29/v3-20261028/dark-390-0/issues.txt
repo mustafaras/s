@@ -1,0 +1,4 @@
+v05-reader @390px: KAYDIRMALI-ALAN(bilgi) | div.kao-surah-picker | NâsFelakİhlâsTebbetNasrKâfirûnKevserMâûn | sw=1519 cw=358
+l14-concept @390px: KAYDIRMALI-ALAN(bilgi) | div.kao-lesson-table-wrap | Türkçesi1. kelime (tamlanan)2. kelime (t | sw=289 cw=282
+o2-ilk-acilis-2 @390px: KISALTILMIS-METIN(bilgi) | span.sey-hdr-wx-label | hava bekleniyor | sw=94 cw=85
+o2-ilk-acilis-2 @390px: KISALTILMIS-METIN(bilgi) | div | Tatil günlerinde su hedefi 10 bardak, se | sw=278 cw=206

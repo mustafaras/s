@@ -115,6 +115,7 @@ jobs:
                    app/content/profileAssessmentV1.js \
                    app/content/quranRevelationOrderV1.js \
                    assets/aeon-icon-192.png assets/aeon-icon-512.png \
+                   aeon-fallback/index.html aeon-fallback/fallback.css aeon-fallback/fallback.js \
                    profil-degerlendirme-174.html; do
             [ -f "_site/$f" ] || { echo "EKSIK: $f"; exit 1; }
           done

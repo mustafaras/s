@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="theme-color" content="#04060A">
+<meta name="description" content="ÆON fallback protocol — Şeyma çekirdeği kapalı, veriler dokunulmadan yerinde.">
+<title>ÆON · FALLBACK PROTOCOL</title>
+<link rel="icon" href="../assets/aeon-icon-192.png">
+<link rel="apple-touch-icon" href="../assets/aeon-icon-192.png">
+<link rel="stylesheet" href="fallback.css?v=20261029a">
+</head>
+<body>
+
+<canvas id="field" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="scan" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<main class="shell">
+
+  <header class="topbar">
+    <span class="brand">ÆON</span>
+    <span class="slash">/</span>
+    <span class="mode">OBSERVATION CORE</span>
+    <span class="clock" id="clock">--:--:--</span>
+  </header>
+
+  <section class="hero">
+
+    <div class="sigil" id="sigil" aria-hidden="true">
+      <span class="sigil-halo" aria-hidden="true"></span>
+      <svg class="sigil-svg" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="sigilGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#5FF0C8"/>
+            <stop offset="52%" stop-color="#BFF7E6"/>
+            <stop offset="100%" stop-color="#E9C07B"/>
+          </linearGradient>
+          <filter id="sigilGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="2.4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#sigilGlow)">
+          <circle cx="60" cy="60" r="56" fill="none" stroke="#5FF0C8" stroke-opacity=".16" stroke-width="1"/>
+          <circle class="ring-dash" cx="60" cy="60" r="48" fill="none" stroke="#5FF0C8" stroke-opacity=".38" stroke-width="1" stroke-dasharray="2 7"/>
+          <circle class="ring-tick" cx="60" cy="60" r="40" fill="none" stroke="#E9C07B" stroke-opacity=".30" stroke-width="1" stroke-dasharray="1 5"/>
+          <path class="ring-arc" d="M60 12 A48 48 0 0 1 108 60" fill="none" stroke="url(#sigilGrad)" stroke-width="2" stroke-linecap="round"/>
+          <path class="ring-arc2" d="M60 108 A48 48 0 0 1 12 60" fill="none" stroke="url(#sigilGrad)" stroke-width="1.4" stroke-linecap="round" stroke-opacity=".55"/>
+          <text x="60" y="73" text-anchor="middle" fill="url(#sigilGrad)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="34" font-weight="600">Æ</text>
+        </g>
+      </svg>
+    </div>
+
+    <h1 class="title" aria-label="AEON HAS ACTIVATED FALLBACK PROTOCOL">
+      <span class="t-aeon" id="tAeon">AEON</span>
+      <span class="t-has" id="tHas">HAS ACTIVATED</span>
+      <span class="t-fallback" id="tFallback" data-t="FALLBACK PROTOCOL">FALLBACK PROTOCOL</span>
+    </h1>
+
+    <p class="subtitle" id="subtitle">
+      Şeyma çekirdeği durduruldu. Kapı kapalı, <em>veriler yerinde</em>.
+    </p>
+
+  </section>
+
+  <section class="readout" id="readout" aria-label="Protokol durumu"></section>
+
+  <footer class="foot">
+    <span class="dot" aria-hidden="true"></span>
+    <span id="footText">PROTOCOL FALLBACK · SEALED</span>
+  </footer>
+
+</main>
+
+<script src="fallback.js?v=20261029a"></script>
+</body>
+</html>

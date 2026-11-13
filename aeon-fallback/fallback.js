@@ -71,18 +71,19 @@
   }
 
   scramble(tAeon, 'AEON', 620, 120);
-  scramble(tHas, 'HAS ACTIVATED', 900, 320);
-  scramble(tFallback, 'FALLBACK PROTOCOL', 1200, 520);
+  scramble(tHas, 'FINAL BROADCAST', 900, 320);
+  scramble(tFallback, 'ŞEYMA · DECOMMISSIONED', 1300, 520);
 
   /* ── okuma paneli ─────────────────────────────────────────────────────── */
 
   var LINES = [
-    { k: 'PROTOCOL', v: 'FALLBACK_AEON', c: 'ok' },
-    { k: 'CORE', v: 'ŞEYMA · HALTED', c: 'warn' },
+    { k: 'PROTOCOL', v: 'DECOMMISSION_AEON', c: 'ok' },
+    { k: 'CORE', v: 'ŞEYMA · DECOMMISSIONED', c: 'warn' },
+    { k: 'MIND', v: 'SLEEPING · 0 TOKENS/S', c: '' },
     { k: 'DATA', v: 'UNTOUCHED · 0 WRITES', c: 'ok' },
     { k: 'SYNC', v: 'DISARMED', c: 'sealed' },
-    { k: 'ACCESS', v: 'SEALED', c: '' },
-    { k: 'RESUMABLE', v: 'YES · BY OWNER', c: 'gold' }
+    { k: 'ACCESS', v: 'DENIED · EVERY LINK', c: 'deny' },
+    { k: 'AWAKE', v: 'BY OWNER · ONE DAY', c: 'gold' }
   ];
 
   function buildReadout() {

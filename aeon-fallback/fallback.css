@@ -240,7 +240,7 @@ body{
 .t-fallback{
   position:relative;
   font-family:var(--display);
-  font-size:clamp(1.32rem,6.6vw,1.92rem);
+  font-size:clamp(1.12rem,5.9vw,1.72rem);
   font-weight:700;
   letter-spacing:.055em;
   text-transform:uppercase;
@@ -340,6 +340,7 @@ body{
 .row .v.warn{color:var(--amber)}
 .row .v.sealed{color:var(--mint)}
 .row .v.gold{color:var(--gold)}
+.row .v.deny{color:var(--alert)}
 
 .row .v::after{
   content:"";

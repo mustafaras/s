@@ -3,9 +3,8 @@
    ağa çıkmaz; sync.js yüklü değildir. Depoya HİÇBİR ŞEY yazmaz.
 
    Bu sayfa bilerek hareketsizdir: dokunuş, tuş, jest veya düğme ile uygulamaya
-   geçiş yolu YOKTUR. Sahip uygulamayı yeniden açmak istediğinde index.html'i
-   `?aeon=active` ile açar (kapı bunu <head>'de, bu sayfa hiç yüklenmeden işler)
-   ya da kapı betiğini kaldırır. Ayrıntı: README.md */
+   geçiş yolu YOKTUR. Uygulama yalnız KAYNAK DEĞİŞİKLİĞİYLE açılır: index.html'deki
+   kapı <script> bloğu kaldırılıp yayınlanır. Ayrıntı: README.md */
 
 (function () {
   'use strict';

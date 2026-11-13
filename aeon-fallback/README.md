@@ -1,8 +1,9 @@
-# AEON · Fallback Protocol (uygulama kilidi)
+# AEON · Fallback Protocol (uygulama kilidi — koşulsuz)
 
-Şeyma uygulamasının **giriş kapısı**. Kilit açıkken (varsayılan) `index.html`'e gelen
-her istek bu sayfaya yönlenir ve `app.js` **hiç çalışmaz**. Amaç: uygulama
-kullanılamasın, ama geçmiş veriler ve mevcut durum hiç etkilenmesin.
+Şeyma uygulamasının **giriş kapısı**. 2026-11-13'ten itibaren kilit **koşulsuzdur**:
+`index.html`'e gelen her istek (her link, her parametre, her cihaz) bu sayfaya
+yönlenir ve `app.js` **hiç çalışmaz**. Amaç: uygulamanın hiç kimse tarafından
+kullanılamaması; geçmiş veriler ve mevcut durumun hiç etkilenmemesi.
 
 ## Ne yapar / ne yapmaz
 
@@ -12,11 +13,10 @@ kullanılamasın, ama geçmiş veriler ve mevcut durum hiç etkilenmesin.
 | `mustafaras/seyma-data` | **hiç dokunulmaz** (ağ isteği yok) |
 | `sync.js` / `SeySync.schedule()` / `save()` | **hiç çalışmaz** (yönlendirme `<body>`'den önce) |
 | Panel (`panel.html`, `panel-v2.html`), `v3-tanitim/` | kilit **kapsamı dışında** |
-| Kilit durumu | ayrı ad alanı: `localStorage['seyma-aeon-lock-v1']` |
+| Kilit durumu | **depo yok** — kapı koşulsuz yönlendirir; hiçbir anahtar okunmaz/yazılmaz |
 
-Kilit anahtarı uygulamanın `seyma-reset-v1` anahtarından ayrı olduğu için
-uygulama içindeki **"Verileri sıfırla" kilidi açmaz**; kilit sıfırlamak da veriye
-dokunmaz.
+`?aeon=active`, `?aeon=lock` ve `localStorage['seyma-aeon-lock-v1']` 2026-11-13'te
+**bilerek kaldırıldı**: artık hiçbir URL parametresi kilidi açmaz veya kapatmaz.
 
 ## Bu sayfa çıkmaz sokaktır (bilerek)
 
@@ -30,26 +30,22 @@ Doğrulaması: sayfada `button, a[href], input, select, textarea, [tabindex],
 [contenteditable]` seçicilerinin toplamı **0**; 7 dokunuş + `AEON` yazımı +
 `Escape` denendiğinde adres değişmez ve depo boş kalır.
 
-## Açma (uygulamaya dönüş)
+## Açma (yalnız kaynak değişikliğiyle)
 
-Tek yol var — o da bu sayfada değil, **uygulama girişinde**:
+URL parametresi veya depo anahtarı YOKTUR. Sahip uygulamayı yeniden açmak
+istediğinde:
 
-1. `https://mustafaras.github.io/s/?aeon=active` — `index.html`'in `<head>`'indeki
-   kapı anahtarı `active` yazar, doğrular ve uygulama yoluna döner. Bu sayfa hiç
-   yüklenmez.
-2. Alternatif: `index.html` içindeki kapı `<script>`'i kaldırılır (kaynak düzeyinde).
+1. `index.html`'in `<head>`'indeki `ÆON FALLBACK KİLİDİ` `<script>` bloğunu
+   kaldır (veya yorumla),
+2. commit + push → Pages yayını.
 
-## Yeniden kilitleme
+Bu iki adım atılmadıkça hiçbir link, hiçbir cihaz uygulamaya ulaşamaz.
 
-`https://mustafaras.github.io/s/?aeon=lock` — anahtarı `locked` yazar ve bu sayfaya
-yönlendirir. Kilit kalıcıdır (tarayıcı deposu silinene kadar).
+## Depo engelliyse
 
-## Depo engelliyse (fail-open)
-
-- Depo tamamen kapalıysa (SecurityError) `index.html`'deki kapı sessizce düşer ve
-  uygulama açılır — kilit döngüsü/kilitlenme olmaz.
-- Depo salt-okunursa (gizli sekme) sayfa açılır; sayfa zaten yazmadığı için fark
-  etmez, sahip `?aeon=active` ile çıkar.
+Kapı artık hiçbir depoya dokunmaz; tek işi `location.replace`tir. Yönlendirme
+bizzat başarısız olursa (alışılmadık tarayıcı) en dış `catch` yutar ve uygulama
+açılır — kilitli-döngü olmaz.
 
 ## Dosyalar
 

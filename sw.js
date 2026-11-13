@@ -79,7 +79,7 @@ const SW_OFFLINE_MANIFEST = Object.freeze([
   './sync.js?v=20261029a',
   './aeon-fallback/index.html',
   './aeon-fallback/fallback.css?v=20261113a',
-  './aeon-fallback/fallback.js?v=20261113a'
+  './aeon-fallback/fallback.js?v=20261113b'
 ]);
 
 function swManifestDescriptor() {

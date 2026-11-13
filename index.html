@@ -14,43 +14,28 @@
 <link rel="stylesheet" href="app/styles.css?v=20261029a">
 <link rel="stylesheet" href="app/kao.css?v=20261029a">
 <script>
-/* ÆON FALLBACK KİLİDİ — uygulama girişi KAPALI (varsayılan).
+/* ÆON FALLBACK KİLİDİ — uygulama girişi KOŞULSUZ KAPALI (2026-11-13).
    Ayrı sayfa: aeon-fallback/index.html
 
    Neden <head>'de, her şeyden ÖNCE: yönlendirme ilk boyamadan önce olur ve
    app.js / sync.js hiç ÇALIŞMAZ — save() çağrılmaz, SeySync.schedule()
    kurulmaz, hiçbir veri okunmaz veya yazılmaz. seyma-reset-v1 anahtarına
-   dokunulmaz; kilit kendi ad alanında yaşar (seyma-aeon-lock-v1), bu yüzden
-   "Verileri sıfırla" kilidi açamaz.
+   dokunulmaz.
 
-   Açmak:   ?aeon=active     (kilit 'active' yazar, uygulama açılır)
-   Kilitle: ?aeon=lock       (kilit 'locked' yazar, fallback'e döner)
-   Mühür sayfasında HİÇBİR çıkış yolu yoktur (dokunuş/tuş/jest yok); sahip
-   ancak yukarıdaki parametrelerle açabilir.
+   Kilit KOŞULSUZDUR: hiçbir parametre, depo anahtarı veya çıkış yolu yoktur.
+   ?aeon=active / ?aeon=lock ve seyma-aeon-lock-v1 bilerek kaldırıldı —
+   uygulama yalnız KAYNAK DEĞİŞİKLİĞİYLE açılır: bu <script> bloğunu
+   kaldırıp (veya yorumlayıp) yayınla. Mühür sayfasında da hiçbir çıkış
+   yolu yoktur (dokunuş/tuş/jest yok).
 
-   Depo tamamen erişilemezse (SecurityError) en dış catch yutar ve uygulama
+   Yönlendirme bizzat başarısız olursa en dış catch yutar ve uygulama
    açılır — kilit asla veri kaybına veya kilitli-döngüye yol açmaz. */
 (function(){
-  var KEY = 'seyma-aeon-lock-v1';
   try{
-    var q = location.search || '';
     var base = location.pathname;
     if(/\.html?$/i.test(base)){ base = base.replace(/[^/]*$/, ''); }
     else if(base.charAt(base.length - 1) !== '/'){ base += '/'; }
-    var page = base + 'aeon-fallback/index.html';
-
-    if(/[?&]aeon=active(?:&|$)/.test(q)){
-      try{ localStorage.setItem(KEY, 'active'); }catch(e){}
-      if(localStorage.getItem(KEY) === 'active'){ location.replace(location.pathname); }
-      return;
-    }
-    if(/[?&]aeon=lock(?:&|$)/.test(q)){
-      try{ localStorage.setItem(KEY, 'locked'); }catch(e){}
-      location.replace(page);
-      return;
-    }
-    if(localStorage.getItem(KEY) === 'active'){ return; }
-    location.replace(page);
+    location.replace(base + 'aeon-fallback/index.html');
   }catch(e){}
 })();
 </script>
